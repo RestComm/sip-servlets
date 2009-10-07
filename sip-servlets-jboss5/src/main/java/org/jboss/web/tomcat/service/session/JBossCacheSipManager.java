@@ -2307,7 +2307,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
         			OwnedSessionUpdate osu = unloadedSipSessions_.get(key);
         	        passivated = (osu != null && osu.passivated);
         		}
-            	session.update(data);
+            	if(session != null) {
+            		session.update(data);
+            	}
             } else {
             	if(logger.isDebugEnabled()) {
         			logger.debug("no data for sip session " + key + " in the distributed cache");
@@ -2435,7 +2437,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 					OwnedSessionUpdate osu = unloadedSipApplicationSessions_.get(key);
 					passivated = (osu != null && osu.passivated);
 				}
-				session.update(data);
+				if(session != null) {
+					session.update(data);
+				}
 			} 
 //			else if (mustAdd) {
 //				// Clunky; we set the session variable to null to indicate

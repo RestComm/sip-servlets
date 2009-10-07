@@ -1442,8 +1442,10 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					// a replication message from another server
 					mustAdd = true;
 					session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, true, sipFactory, sipApplicationSessionImpl);
-				}		
-				session = proxy_.loadSipSession(applicationSessionId, session, sessionData);
+				}	
+				if(session != null) {
+					session = proxy_.loadSipSession(applicationSessionId, session, sessionData);
+				}
 			}
 		} catch (Exception ex) {
 			try {
@@ -1545,7 +1547,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					mustAdd = true;
 					session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, true);
 				}
-				session = proxy_.loadSipApplicationSession(session, sessionData);
+				if(session != null) {
+					session = proxy_.loadSipApplicationSession(session, sessionData);
+				}
 			}
 		} catch (Exception ex) {
 			try {
