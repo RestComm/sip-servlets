@@ -402,6 +402,13 @@
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.cluster</groupId>
+					<artifactId>server-all-beans</artifactId>
+					<type>zip</type>
+					<classifier>beans</classifier>
+					<version>1.0.0BETA1-SNAPSHOT</version>
+				</dependency>
+				<!--dependency>
+					<groupId>org.mobicents.cluster</groupId>
 					<artifactId>core</artifactId>
 					<version>1.0.0BETA1-SNAPSHOT</version>
 				</dependency>
@@ -414,7 +421,7 @@
 					<groupId>org.mobicents.cluster</groupId>
 					<artifactId>timers</artifactId>
 					<version>1.0.0BETA1-SNAPSHOT</version>
-				</dependency>
+				</dependency-->
 			</dependencies>						
 			<build>			
 				<plugins>				
@@ -429,12 +436,65 @@
 										<goal>copy-dependencies</goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-jboss5,mobicents-jain-sip-ha-core,core,cache,timers</includeArtifactIds>
+									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-jboss5,mobicents-jain-sip-ha-core</includeArtifactIds>
 					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
+		 	          		<execution>
+                                    <id>unpack-all</id>
+                                    <phase>compile</phase>
+                                    <goals>
+                                            <goal>unpack</goal>
+                                    </goals>
+                                    <configuration>
+                                            <artifactItems>
+                                                    <artifactItem>
+                                                            <groupId>org.mobicents.cluster</groupId>
+                                                            <artifactId>server-all-beans</artifactId>
+                                                            <type>zip</type>
+                                                            <classifier>beans</classifier>
+                                                    </artifactItem>
+                                            </artifactItems>
+                                            <outputDirectory>${project.build.directory}/${node}</outputDirectory>
+                                    </configuration>
+                            </execution> 
 		 	        	</executions>
 		 	      	</plugin>
+		 	      	<plugin>
+                                <artifactId>maven-antrun-plugin</artifactId>
+                                <executions>
+                                        <execution>
+                                                <id>deploy</id>
+                                                <phase>install</phase>
+                                                <goals>
+                                                        <goal>run</goal>
+                                                </goals>
+                                                <configuration>
+                                                        <tasks>
+                                                                <copy todir="${env.JBOSS_HOME}/server/${node}/deploy">
+                                                                        <fileset dir="${project.build.directory}/${node}" >                                                                         
+                                                                                <include name="mobicents-cluster/**" />
+                                                                        </fileset>                                                                      
+                                                                </copy>                                                                
+                                                        </tasks>
+                                                </configuration>
+                                        </execution>
+                                        <execution>
+                                                <id>undeploy</id>
+                                                <phase>clean</phase>
+                                                <goals>
+                                                        <goal>run</goal>
+                                                </goals>
+                                                <configuration>
+                                                        <tasks>
+                                                                <delete failonerror="false" includeemptydirs="true">
+                                                                        <fileset dir="${env.JBOSS_HOME}/server/${node}/deploy/mobicents-cluster" />
+                                                                </delete>                                                                
+                                                        </tasks>
+                                                </configuration>
+                                        </execution>
+                                </executions>
+                        </plugin>
 				</plugins>
 			</build>
 		</profile>
