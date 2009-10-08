@@ -57,7 +57,6 @@ import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.HeaderAddress;
-import javax.sip.header.HeaderFactory;
 import javax.sip.header.Parameters;
 import javax.sip.header.ToHeader;
 import javax.sip.message.Message;
@@ -93,7 +92,6 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	
 	private static final String CONTENT_TYPE_TEXT = "text";
 //	private static final String HCOLON = " : ";
-	private static final HeaderFactory headerFactory = SipFactories.headerFactory;
 	
 	protected final Message message;
 	protected final SipFactoryImpl sipFactoryImpl;
@@ -105,7 +103,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	private Transaction transaction;
 	protected TransactionApplicationData transactionApplicationData;		
 
-	protected transient HeaderForm headerForm = HeaderForm.DEFAULT;
+	protected HeaderForm headerForm = HeaderForm.DEFAULT;
 	
 	// IP address of the next upstream/downstream hop from which this message
 	// was received. Applications can determine the actual IP address of the UA
@@ -182,7 +180,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	 */
 	public void addAcceptLanguage(Locale locale) {
 		checkCommitted();
-		AcceptLanguageHeader ach = headerFactory
+		AcceptLanguageHeader ach = SipFactories.headerFactory
 				.createAcceptLanguageHeader(locale);
 		message.addHeader(ach);
 
@@ -220,7 +218,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 
 		try {
 			String nameToAdd = getCorrectHeaderName(hName);
-			Header h = headerFactory.createHeader(nameToAdd, addr.toString());
+			Header h = SipFactories.headerFactory.createHeader(nameToAdd, addr.toString());
 
 			if (first) {
 				this.message.addFirst(h);
@@ -1006,7 +1004,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	 */
 	public void setAcceptLanguage(Locale locale) {
 		checkCommitted();
-		AcceptLanguageHeader alh = headerFactory
+		AcceptLanguageHeader alh = SipFactories.headerFactory
 				.createAcceptLanguageHeader(locale);
 
 		this.message.setHeader(alh);
@@ -1142,7 +1140,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		checkMessageState();
 		checkCommitted();
 		try {
-			ContentLengthHeader h = headerFactory.createContentLengthHeader(len);
+			ContentLengthHeader h = SipFactories.headerFactory.createContentLengthHeader(len);
 			this.message.setHeader(h);
 		} catch (InvalidArgumentException e) {
 			throw new IllegalStateException("Impossible to set a content length lower than 0", e);
@@ -1158,7 +1156,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		checkCommitted();
 		String name = getCorrectHeaderName(ContentTypeHeader.NAME);
 		try {
-			Header h = headerFactory.createHeader(name, type);
+			Header h = SipFactories.headerFactory.createHeader(name, type);
 			this.message
 					.removeHeader(getCorrectHeaderName(ContentTypeHeader.NAME));
 			this.message.addHeader(h);

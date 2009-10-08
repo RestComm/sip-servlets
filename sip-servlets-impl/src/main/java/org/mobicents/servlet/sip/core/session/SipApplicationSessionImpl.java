@@ -174,24 +174,25 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	protected SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
-		sipSessions = new ConcurrentHashMap<String,SipSessionKey>();
-		if(sipContext != null && ConcurrencyControlMode.SipApplicationSession.equals(sipContext.getConcurrencyControlMode())) {
-			semaphore = new Semaphore(1);
-		}
+		sipSessions = new ConcurrentHashMap<String,SipSessionKey>();	
 		this.key = key;
-		this.sipContext = sipContext;
-		this.currentRequestHandler = sipContext.getMainServlet();
+		this.sipContext = sipContext;		
 		lastAccessedTime = creationTime = System.currentTimeMillis();
 		expired = false;		
 		isValid = true;		
 		// the sip context can be null if the AR returned an application that was not deployed
 		if(sipContext != null) {
+			this.currentRequestHandler = sipContext.getMainServlet();
+			if(ConcurrencyControlMode.SipApplicationSession.equals(sipContext.getConcurrencyControlMode())) {
+				semaphore = new Semaphore(1);
+			}
 			//scheduling the timer for session expiration
-			if(sipContext.getSipApplicationSessionTimeout() > 0) {				
-				sipApplicationSessionTimeout = sipContext.getSipApplicationSessionTimeout() * 60 * 1000;				
+			final int sipContextTimeout = sipContext.getSipApplicationSessionTimeout();
+			if(sipContextTimeout > 0) {				
+				sipApplicationSessionTimeout = sipContextTimeout * 60 * 1000L;				
 				expirationTimerTask = new SipApplicationSessionTimerTask();
 				if(logger.isDebugEnabled()) {
-					logger.debug("Scheduling sip application session "+ key +" to expire in " + (sipApplicationSessionTimeout / 1000 / 60) + " minutes");
+					logger.debug("Scheduling sip application session "+ key +" to expire in " + (sipApplicationSessionTimeout / (double) 1000 / (double) 60) + " minutes");
 				}
 				expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) sipContext.getThreadPoolExecutor().schedule(expirationTimerTask, sipApplicationSessionTimeout, TimeUnit.MILLISECONDS);
 			} else {
@@ -246,7 +247,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		SipSessionKey key = this.sipSessions.putIfAbsent(mobicentsSipSession.getKey().toString(), mobicentsSipSession.getKey());
 		if(key == null) {
 			if(logger.isDebugEnabled()) {
-				logger.debug("Added sip session " + mobicentsSipSession.getKey() + " to sip app session " + key);
+				logger.debug("Added sip session " + mobicentsSipSession.getKey() + " to sip app session " + getKey());
 			}
 		}
 		readyToInvalidate = false;
@@ -256,8 +257,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	public SipSessionKey removeSipSession (MobicentsSipSession mobicentsSipSession) {
 		if(sipSessions != null) {			
 			SipSessionKey key = this.sipSessions.remove(mobicentsSipSession.getKey().toString());
-			if(logger.isDebugEnabled()) {
-				logger.debug("Removed sip session " + mobicentsSipSession.getKey() + " from sip app session " + key);
+			if(key != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Removed sip session " + mobicentsSipSession.getKey() + " from sip app session " + getKey());
+				}
 			}
 			return key;
 		} 
@@ -319,10 +322,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			URL ret;
 			if (urlStr.contains("?")) {
 				ret = new URL(url + "&" + SIP_APPLICATION_KEY_PARAM_NAME + "="
-						+ getId().toString());
+						+ getId());
 			} else {
 				ret = new URL(url + "?" + SIP_APPLICATION_KEY_PARAM_NAME + "="
-						+ getId().toString());
+						+ getId());
 			}
 			return ret;
 		} catch (Exception e) {
