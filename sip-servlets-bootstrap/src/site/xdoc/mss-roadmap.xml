@@ -34,6 +34,16 @@
 						</a>
 						<br />							
 						<img src="red.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=990">
+						JAIN SIP Configurable Timers
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=987">
+						Default Application Router to support INBOUND and OUTBOUND differentiation
+						</a>
+						<br />								
+						<img src="red.jpeg" />
 						HA perf tests and improvements 
 						<br />
 						<img src="orange.jpeg" />
@@ -70,7 +80,12 @@
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=660">
 						HA persistent timers (JB5 version only)
 						</a>
-						<br />		
+						<br />
+						<img src="red.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=987">
+						Application Router to support INBOUND and OUTBOUND
+						</a>
+						<br />			
 						<img src="red.jpeg" />
 						Geographical redundancy  
 						<br />						
@@ -217,6 +232,19 @@
 									Remove Display of Exception if Load Balancer cannot be accessed
 								</a>
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a
+									href="http://code.google.com/p/mobicents/issues/detail?id=988">
+									Allow modifying Contact header parameters when creating INVITE requests
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a href="http://code.google.com/p/mobicents/issues/detail?id=991">
+								Obfuscate Via Headers routing
+								</a>
+							</li>
 						</ul>
 						<br />						
 					</p>		
@@ -352,7 +380,7 @@
 				<subsection name="Version 1.7 - 1st October 2010 ">					
 					<p>											
 						<img src="red.jpeg" />
-						<a href="http://code.google.com/p/mobicents/issues/detail?id=324">														
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=961">														
 						Allow Regexp in Application Router to select based on headers.
 						</a>
 						<br />
