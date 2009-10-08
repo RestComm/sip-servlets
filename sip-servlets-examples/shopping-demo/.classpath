@@ -21,7 +21,7 @@
 	<classpathentry kind="var" path="M2_REPO/javax/faces/jsf-api/1.2_02/jsf-api-1.2_02.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/persistence/persistence-api/1.0/persistence-api-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1/commons-logging-1.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/external/freetts/freetts/1.0/freetts-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/testng/testng/4.7/testng-4.7-jdk15.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/geronimo/specs/geronimo-ejb_3.0_spec/1.0/geronimo-ejb_3.0_spec-1.0.jar"/>

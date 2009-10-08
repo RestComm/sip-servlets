@@ -14,7 +14,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/jboss/seam/jboss-seam-ui/2.0.1.GA/jboss-seam-ui-2.0.1.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/el/el-api/1.0/el-api-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1/commons-logging-1.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/external/freetts/freetts/1.0/freetts-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/geronimo/specs/geronimo-ejb_3.0_spec/1.0/geronimo-ejb_3.0_spec-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.14/annotations-api-6.0.14.jar"/>
