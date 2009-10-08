@@ -932,6 +932,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					}
 				}
 			}
+			final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();
+			if(viaHeader.getBranch() == null) {
+				final String branch = JainSipUtils.createBranch(sipApplicationSession.getKey().getId(),  sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));			
+				viaHeader.setBranch(branch);
+			}
 			if(logger.isDebugEnabled()) {
 				getSipSession().getSipApplicationSession().getSipContext().getSipManager().dumpSipSessions();
 			}
@@ -1058,12 +1063,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 									SubscriptionStateHeader.TERMINATED.equalsIgnoreCase(subscriptionStateHeader.getState())) {
 					session.removeSubscription(this);
 				}
-			}		
-			final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();		
-			viaHeader.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
-					sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));
-			viaHeader.setParameter(MessageDispatcher.APP_ID,
-					sipApplicationSession.getKey().getId());
+			}					
 			//updating the last accessed times 
 			session.access();
 			sipApplicationSession.access();

@@ -115,28 +115,33 @@ public class ResponseDispatcher extends MessageDispatcher {
 			final SipServletRequestImpl originalRequest = tmpOriginalRequest;
 			sipServletResponse.setOriginalRequest(originalRequest);
 			
-			final String appNameNotDeployed = viaHeader.getParameter(APP_NOT_DEPLOYED);
-			if(appNameNotDeployed != null && appNameNotDeployed.length() > 0) {
-				forwardResponseStatefully(sipServletResponse);
-				return ;
+			if(applicationData != null) {
+				final String appNameNotDeployed = applicationData.getAppNotDeployed();
+				if(appNameNotDeployed != null && appNameNotDeployed.length() > 0) {
+					forwardResponseStatefully(sipServletResponse);
+					return ;
+				}
+				final boolean noAppReturned = applicationData.isNoAppReturned();
+				if(noAppReturned) {
+					forwardResponseStatefully(sipServletResponse);
+					return ;
+				}
+				final String modifier = applicationData.getModifier();
+				if(modifier != null && modifier.length() > 0) {
+					forwardResponseStatefully(sipServletResponse);
+					return ;
+				}		
 			}
-			final String noAppReturned = viaHeader.getParameter(NO_APP_RETURNED);
-			if(noAppReturned != null && noAppReturned.length() > 0) {
-				forwardResponseStatefully(sipServletResponse);
-				return ;
-			}
-			final String modifier = viaHeader.getParameter(MODIFIER);
-			if(modifier != null && modifier.length() > 0) {
-				forwardResponseStatefully(sipServletResponse);
-				return ;
-			}
-			final String appId = viaHeader.getParameter(APP_ID);
+			final String branch = viaHeader.getBranch();
+			String strippedBranchId = branch.substring(BRANCH_MAGIC_COOKIE.length());
+			final String appId = strippedBranchId.substring(0, strippedBranchId.indexOf("_"));
 			if(appId == null) {
-				throw new DispatcherException("the via header " + viaHeader + " for the response is missing the appid parameter previsouly set by the container");
+				throw new DispatcherException("the via header branch " + branch + " for the response is missing the appid previsouly set by the container");
 			}
-			final String appNameHashed = viaHeader.getParameter(RR_PARAM_APPLICATION_NAME);
+			strippedBranchId = strippedBranchId.substring(strippedBranchId.indexOf("_") + 1);
+			final String appNameHashed = strippedBranchId.substring(0, strippedBranchId.indexOf("_"));
 			if(appNameHashed == null) {
-				throw new DispatcherException("the via header " + viaHeader + " for the response is missing the appname parameter previsouly set by the container");
+				throw new DispatcherException("the via header branch " + branch + " for the response is missing the appname previsouly set by the container");
 			}
 			final String appName = sipApplicationDispatcher.getApplicationNameFromHash(appNameHashed);
 			boolean inverted = false;
@@ -144,6 +149,13 @@ public class ResponseDispatcher extends MessageDispatcher {
 				inverted = true;
 			}
 			final SipContext sipContext = sipApplicationDispatcher.findSipApplication(appName);
+			if(sipContext == null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("The application " + appName + " is not deployed anymore, fowarding response statefully to the next app in chain if any");
+				}
+				forwardResponseStatefully(sipServletResponse);
+				return ;
+			}
 			final SipManager sipManager = (SipManager)sipContext.getManager();
 			SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(appId, appName, response, inverted);
 			if(logger.isDebugEnabled()) {

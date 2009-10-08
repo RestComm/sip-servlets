@@ -561,12 +561,10 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 
 		ViaHeader viaHeader = (ViaHeader) clonedRequest.getHeader(ViaHeader.NAME);
 		try {
-			viaHeader.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
-					proxy.getSipFactoryImpl().getSipApplicationDispatcher().getHashFromApplicationName(request.getSipSession().getKey().getApplicationName()));
-			viaHeader.setParameter(MessageDispatcher.APP_ID,
-					request.getSipSession().getSipApplicationSession().getKey().getId());
+			final String branch = JainSipUtils.createBranch(request.getSipSession().getSipApplicationSession().getKey().getId(),  proxy.getSipFactoryImpl().getSipApplicationDispatcher().getHashFromApplicationName(request.getSipSession().getKey().getApplicationName()));
+			viaHeader.setBranch(branch);
 		} catch (ParseException pe) {
-			logger.error("A problem occured while proxying a request in a dialog-stateless transaction", pe);
+			logger.error("A problem occured while setting the via branch while proxying a request", pe);
 		}
 		
 		RouteHeader routeHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);

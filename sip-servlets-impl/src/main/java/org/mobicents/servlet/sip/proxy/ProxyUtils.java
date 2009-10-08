@@ -109,6 +109,8 @@ public class ProxyUtils {
 				// Cancel is hop by hop so remove all other via headers.
 				clonedRequest.removeHeader(ViaHeader.NAME);				
 			} 
+			SipApplicationSessionKey sipAppKey = originalRequest.getSipSession().getSipApplicationSession().getKey();
+			String appName = proxy.getSipFactoryImpl().getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());
 			//Add via header
 			ViaHeader viaHeader = proxyBranch.viaHeader;
 			if(viaHeader == null) {
@@ -148,7 +150,7 @@ public class ProxyUtils {
 					branchId = ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction().getBranchId();
 					logger.debug("reusing original branch id " + branchId);
 				} else {
-					branchId = "z9hG4bK" + Long.toHexString(System.nanoTime()^32543621) + Integer.toString(random.nextInt());
+					branchId = JainSipUtils.createBranch(sipAppKey.getId(), appName);
 				}
 				viaHeader.setBranch(branchId);
 			}
@@ -172,10 +174,9 @@ public class ProxyUtils {
 					rrURI.setParameter(paramName,
 							params.routeRecord.getParameter(paramName));
 				}
-				
-				SipApplicationSessionKey sipAppKey = originalRequest.getSipSession().getSipApplicationSession().getKey();
+								
 				rrURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
-						proxy.getSipFactoryImpl().getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName()));
+						appName);
 				rrURI.setParameter(MessageDispatcher.RR_PARAM_PROXY_APP,
 						"true");				
 				rrURI.setParameter(MessageDispatcher.APP_ID, sipAppKey.getId());

@@ -80,33 +80,33 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 				sipNetworkInterfaceManager, clonedRequest, null);
 		MobicentsSipSession session = sipServletRequest.getSipSession();
 		
+		// used for response routing, stored later in the tx app data so that it interoperates with UA/proxies not handling correctly via params 
+		String appNotDeployed = null;
+		boolean noAppReturned = false;
+		String modifier = null;
+		
 		if(session != null) {			
 			if(SipSessionRoutingType.CURRENT_SESSION.equals(sipSessionRoutingType)) {
 				//an app was found or an app was returned by the AR but not found
 				String handlerName = session.getHandler();
-				if(handlerName != null) { 
-					viaHeader.setParameter(APP_ID,
-							sipServletRequest.getSipSession().getSipApplicationSession().getKey().getId());
-					viaHeader.setParameter(RR_PARAM_APPLICATION_NAME,
-							sipApplicationDispatcher.getHashFromApplicationName(sipServletRequest.getSipSession().getKey().getApplicationName()));
+				if(handlerName != null) {
+					final String branch = JainSipUtils.createBranch(session.getSipApplicationSession().getKey().getId(),  sipApplicationDispatcher.getHashFromApplicationName(session.getKey().getApplicationName()));
+					viaHeader.setBranch(branch);
 				} else {				
 					// if the handler name is null it means that the app returned by the AR was not deployed
 					// and couldn't be called, 
 					// we specify it so that on response handling this app can be skipped
-					viaHeader.setParameter(APP_ID,
-							sipServletRequest.getSipSession().getSipApplicationSession().getKey().getId());
-					viaHeader.setParameter(APP_NOT_DEPLOYED,
-							sipServletRequest.getSipSession().getKey().getApplicationName());					
+					final String branch = JainSipUtils.createBranch(session.getSipApplicationSession().getKey().getId(),  sipApplicationDispatcher.getHashFromApplicationName(session.getKey().getApplicationName()));
+					viaHeader.setBranch(branch);
+					appNotDeployed = session.getKey().getApplicationName();					
 				}			
 				clonedRequest.addHeader(viaHeader);
 			} else {				
 				if(SipRouteModifier.NO_ROUTE.equals(sipRouteModifier)) {
 					// no app was returned by the AR 				
-					viaHeader.setParameter(NO_APP_RETURNED,
-						"noappreturned");
+					noAppReturned = true;
 				} else {
-					viaHeader.setParameter(MODIFIER,
-							sipRouteModifier.toString());
+					modifier = sipRouteModifier.toString();
 				}
 				clonedRequest.addHeader(viaHeader);
 			}
@@ -116,11 +116,9 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 				// if the handler name is null it means that the app returned by the AR was not deployed
 				// and couldn't be called, 
 				// we specify it so that on response handling this app can be skipped
-				viaHeader.setParameter(NO_APP_RETURNED,
-						"noappreturned");
+				noAppReturned = true;
 			} else {
-				viaHeader.setParameter(MODIFIER,
-						sipRouteModifier.toString());
+				modifier = sipRouteModifier.toString();
 			}
 			clonedRequest.addHeader(viaHeader);	 			
 		}
@@ -171,14 +169,27 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 				//keeping the server transaction in the client transaction's application data
 				TransactionApplicationData appData = new TransactionApplicationData(sipServletRequest);					
 				appData.setTransaction(serverTransaction);
+				appData.setNoAppReturned(noAppReturned);
+				appData.setAppNotDeployed(appNotDeployed);
+				appData.setModifier(modifier);
 				ctx.setApplicationData(appData);				
 				//keeping the client transaction in the server transaction's application data
 				((TransactionApplicationData)serverTransaction.getApplicationData()).setTransaction(ctx);
 				if(logger.isInfoEnabled()) {
 					logger.info("Sending the request through a new client transaction " + clonedRequest);
-				}
+				}				
 				ctx.sendRequest();												
-			} else {
+			} else {				
+				TransactionApplicationData appData = (TransactionApplicationData) transaction.getApplicationData();
+				if(appData == null) {
+					appData = new TransactionApplicationData(sipServletRequest);
+					appData.setTransaction(transaction);
+				}
+				appData.setNoAppReturned(noAppReturned);
+				appData.setAppNotDeployed(appNotDeployed);
+				appData.setModifier(modifier);
+				//keeping the client transaction in the server transaction's application data
+				((TransactionApplicationData)serverTransaction.getApplicationData()).setTransaction(transaction);
 				if(logger.isInfoEnabled()) {
 					logger.info("Sending the request through the existing transaction " + clonedRequest);
 				}
@@ -238,7 +249,10 @@ public abstract class RequestDispatcher extends MessageDispatcher {
             ClientTransaction clientTransaction =
             	sipProvider.getNewClientTransaction(dialogRequest);
             //keeping the server transaction in the client transaction's application data
-			TransactionApplicationData appData = new TransactionApplicationData(sipServletRequest);					
+			TransactionApplicationData appData = new TransactionApplicationData(sipServletRequest);
+			appData.setNoAppReturned(noAppReturned);
+			appData.setAppNotDeployed(appNotDeployed);
+			appData.setModifier(modifier);
 			appData.setTransaction(serverTransaction);
 			clientTransaction.setApplicationData(appData);
 			//keeping the client transaction in the server transaction's application data

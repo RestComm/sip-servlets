@@ -65,32 +65,14 @@ public abstract class MessageDispatcher {
 	 * It will help us to determine if the next request coming from either side is a subsequent request
 	 */
 	public static final String RR_PARAM_PROXY_APP = "proxy";
-	/* 
-	 * This parameter is to know if a servlet application sent a final response
+	/*
+	 * since we generate our own branch ids, this is the constant for the magic cookie 
 	 */
-//	public static final String FINAL_RESPONSE = "final_response";
-	/* 
-	 * This parameter is to know if a servlet application has generated its own application key
-	 */
-	public static final String GENERATED_APP_KEY = "gen_app_key";
+	public static final String BRANCH_MAGIC_COOKIE = "z9hG4bK";
 	/* 
 	 * This parameter is to know the application id
 	 */
 	public static final String APP_ID = "app_id";
-	/* 
-	 * This parameter is to know when an app was not deployed and couldn't handle the request
-	 * used so that the response doesn't try to call the app not deployed
-	 */
-	public static final String APP_NOT_DEPLOYED = "appnotdeployed";
-	/* 
-	 * This parameter is to know when no app was returned by the AR when doing the initial selection process
-	 * used so that the response is forwarded externally directly
-	 */
-	public static final String NO_APP_RETURNED = "noappreturned";
-	/*
-	 * This parameter is to know when the AR returned an external route instead of an app
-	 */
-	public static final String MODIFIER = "modifier";
 
 	/*
 	 * Those parameters is to indicate to the SIP Load Balancer, from which node comes from the request

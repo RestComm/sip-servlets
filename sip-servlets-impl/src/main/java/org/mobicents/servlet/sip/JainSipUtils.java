@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip;
 
 
+import gov.nist.javax.sip.Utils;
 import gov.nist.javax.sip.header.extensions.ReferredByHeader;
 import gov.nist.javax.sip.header.extensions.SessionExpiresHeader;
 import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
@@ -65,6 +66,7 @@ import javax.sip.message.Request;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
+import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.message.SipFactoryImpl.NamesComparator;
 
 /**
@@ -371,6 +373,17 @@ public class JainSipUtils {
 		boolean usePublicAddress = findUsePublicAddress(
 				sipNetworkInterfaceManager, request, listeningPoint);
 		return listeningPoint.createViaHeader(branch, usePublicAddress);		
+    }
+	
+	/**
+	 * 
+	 * @param sipNetworkInterfaceManager
+	 * @param transport
+	 * @param branch
+	 * @return
+	 */
+	public static String createBranch(String appSessionId, String appname) {
+		return MessageDispatcher.BRANCH_MAGIC_COOKIE + appSessionId + "_" + appname + "_" + System.nanoTime();		
     }
 	 
 	/**

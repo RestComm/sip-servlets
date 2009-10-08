@@ -43,8 +43,13 @@ public class TransactionApplicationData implements Serializable {
 	private transient int initialRemotePort;
 	private transient String initialRemoteTransport;
 	private transient Address initialPoppedRoute;
-	private transient AtomicInteger rseqNumber;	
-		
+	private transient AtomicInteger rseqNumber;
+	// to be made non transient if we support tx failover at some point
+	// or handle it conditionally through an Externalizable interface
+	private transient String appNotDeployed = null;
+	private transient boolean noAppReturned = false;
+	private transient String modifier = null;	
+	
 	public TransactionApplicationData(SipServletMessageImpl sipServletMessage ) {		
 		this.sipServletMessage = sipServletMessage;
 		sipServletResponses = new CopyOnWriteArraySet<SipServletResponseImpl>();
@@ -145,5 +150,47 @@ public class TransactionApplicationData implements Serializable {
 	 */
 	public void setRseqNumber(AtomicInteger rseqNumber) {
 		this.rseqNumber = rseqNumber;
+	}
+
+	/**
+	 * @param appNotDeployed the appNotDeployed to set
+	 */
+	public void setAppNotDeployed(String appNotDeployed) {
+		this.appNotDeployed = appNotDeployed;
+	}
+
+	/**
+	 * @return the appNotDeployed
+	 */
+	public String getAppNotDeployed() {
+		return appNotDeployed;
+	}
+
+	/**
+	 * @param noAppReturned the noAppReturned to set
+	 */
+	public void setNoAppReturned(boolean noAppReturned) {
+		this.noAppReturned = noAppReturned;
+	}
+
+	/**
+	 * @return the noAppReturned
+	 */
+	public boolean isNoAppReturned() {
+		return noAppReturned;
+	}
+
+	/**
+	 * @param modifier the modifier to set
+	 */
+	public void setModifier(String modifier) {
+		this.modifier = modifier;
+	}
+
+	/**
+	 * @return the modifier
+	 */
+	public String getModifier() {
+		return modifier;
 	}
 }

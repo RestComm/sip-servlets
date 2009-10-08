@@ -82,6 +82,7 @@ import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.MobicentsSipSessionFacade;
@@ -376,12 +377,19 @@ public class SipSessionImpl implements MobicentsSipSession {
 				}
 				request.setHeader(cSeq);
 				request.removeHeader(ViaHeader.NAME);
-				SipProvider sipProvider = sipFactory.getSipNetworkInterfaceManager().findMatchingListeningPoint(
+				final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactory.getSipNetworkInterfaceManager();
+				SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
 						JainSipUtils.findTransport(request), false).getSipProvider();
+				
+				final String branch = JainSipUtils.createBranch(getSipApplicationSession().getKey().getId(),  sipFactory.getSipApplicationDispatcher().getHashFromApplicationName(getKey().getApplicationName()));
+				ViaHeader viaHeader = JainSipUtils.createViaHeader(
+	    				sipNetworkInterfaceManager, request, branch);
+	    		request.addHeader(viaHeader);
+				
 				try {
 					ClientTransaction retryTran = sipProvider
 						.getNewClientTransaction(request);
-					
+														
 					sipServletRequest = new SipServletRequestImpl(
 							request, this.sipFactory, this, retryTran, retryTran.getDialog(),
 							true);
@@ -425,6 +433,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		//removing the route headers and adding them back again except the one
 		//corresponding to the app that is creating the subsequent request
 		//avoid going through the same app that created the subsequent request
+				
 		Request request = (Request) sipServletRequest.getMessage();
 		final ListIterator<RouteHeader> routeHeaders = request.getHeaders(RouteHeader.NAME);
 		request.removeHeader(RouteHeader.NAME);
