@@ -82,7 +82,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 
 	private static transient Logger logger = Logger.getLogger(B2buaHelperImpl.class);
 	
-	protected transient static final HashSet<String> singletonHeadersNames = new HashSet<String>();
+	protected static final HashSet<String> singletonHeadersNames = new HashSet<String>();
 	static {
 		singletonHeadersNames.add(FromHeader.NAME);
 		singletonHeadersNames.add(ToHeader.NAME);
@@ -95,7 +95,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		//TODO are there any other singleton headers ?
 	}	
 	
-	protected transient static final HashSet<String> b2buaSystemHeaders = new HashSet<String>();
+	protected static final HashSet<String> b2buaSystemHeaders = new HashSet<String>();
 	static {
 		b2buaSystemHeaders.add(CallIdHeader.NAME);
 		b2buaSystemHeaders.add(CSeqHeader.NAME);

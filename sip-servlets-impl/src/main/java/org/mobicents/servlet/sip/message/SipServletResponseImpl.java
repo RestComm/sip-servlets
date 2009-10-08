@@ -71,9 +71,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	
 	private static final long serialVersionUID = 1L;
 
-	private transient static final String REL100_OPTION_TAG = "100rel";
+	private static final String REL100_OPTION_TAG = "100rel";
 
-	private static transient Logger logger = Logger.getLogger(SipServletResponseImpl.class);
+	private static final Logger logger = Logger.getLogger(SipServletResponseImpl.class);
 	
 	Response response;
 	SipServletRequestImpl originalRequest;
