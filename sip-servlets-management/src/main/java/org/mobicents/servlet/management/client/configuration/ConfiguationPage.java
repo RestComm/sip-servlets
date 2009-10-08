@@ -20,6 +20,7 @@ import com.gwtext.client.widgets.form.event.ComboBoxListenerAdapter;
 public class ConfiguationPage extends Panel {
 	private static Object[][] concurrencyControlModes = new Object[][]{  
 		new Object[]{"None"},  
+		new Object[]{"Transaction"},
 		new Object[]{"SipSession"},
 		new Object[]{"SipApplicationSession"}
 	};  

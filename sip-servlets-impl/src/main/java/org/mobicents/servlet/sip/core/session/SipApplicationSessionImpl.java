@@ -175,7 +175,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
 		sipSessions = new ConcurrentHashMap<String,SipSessionKey>();
-		if(sipContext != null && !ConcurrencyControlMode.None.equals(sipContext.getConcurrencyControlMode())) {
+		if(sipContext != null && ConcurrencyControlMode.SipApplicationSession.equals(sipContext.getConcurrencyControlMode())) {
 			semaphore = new Semaphore(1);
 		}
 		this.key = key;

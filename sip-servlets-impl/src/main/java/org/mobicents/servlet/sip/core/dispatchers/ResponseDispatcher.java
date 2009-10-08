@@ -35,6 +35,7 @@ import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipManager;
@@ -276,7 +277,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 				}
 			};
 			// if the flag is set we bypass the executor 
-			if(sipApplicationDispatcher.isBypassResponseExecutor()) {
+			if(sipApplicationDispatcher.isBypassResponseExecutor() || ConcurrencyControlMode.Transaction.equals((sipContext.getConcurrencyControlMode()))) {
 				dispatchTask.dispatchAndHandleExceptions();
 			} else {
 				getConcurrencyModelExecutorService(sipContext, sipServletMessage).execute(dispatchTask);				

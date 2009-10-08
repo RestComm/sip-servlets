@@ -22,6 +22,7 @@ package org.mobicents.servlet.sip.annotation;
  *
  */
 public enum ConcurrencyControlMode {
+	Transaction,
 	SipSession,
 	SipApplicationSession,
 	None

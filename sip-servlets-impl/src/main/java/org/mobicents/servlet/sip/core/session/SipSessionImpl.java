@@ -252,7 +252,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		this.state = State.INITIAL;
 		this.isValid = true;		
 		this.ongoingTransactions = new CopyOnWriteArraySet<Transaction>();
-		if(mobicentsSipApplicationSession.getSipContext() != null && !ConcurrencyControlMode.None.equals(mobicentsSipApplicationSession.getSipContext().getConcurrencyControlMode())) {
+		if(mobicentsSipApplicationSession.getSipContext() != null && ConcurrencyControlMode.SipSession.equals(mobicentsSipApplicationSession.getSipContext().getConcurrencyControlMode())) {
 			semaphore = new Semaphore(1);		
 		}
 		// the sip context can be null if the AR returned an application that was not deployed

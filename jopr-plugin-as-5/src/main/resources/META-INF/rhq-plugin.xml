@@ -771,6 +771,7 @@
         		<c:simple-property name="concurrencyControlMode" defaultValue="SipSession">
         			<c:property-options>
 	                   <c:option value="None"/>
+	                   <c:option value="Transaction"/>
 	                   <c:option value="SipSession" default="true"/>
 	                   <c:option value="SipApplicationSession"/>	                   
 	                </c:property-options>        		
