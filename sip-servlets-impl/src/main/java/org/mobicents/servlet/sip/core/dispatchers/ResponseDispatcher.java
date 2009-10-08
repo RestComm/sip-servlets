@@ -135,16 +135,13 @@ public class ResponseDispatcher extends MessageDispatcher {
 			}
 			final String branch = viaHeader.getBranch();
 			String strippedBranchId = branch.substring(BRANCH_MAGIC_COOKIE.length());
-			final String appId = strippedBranchId.substring(0, strippedBranchId.indexOf("_"));
-			if(appId == null) {
-				throw new DispatcherException("the via header branch " + branch + " for the response is missing the appid previsouly set by the container");
-			}
+			final String appId = strippedBranchId.substring(0, strippedBranchId.indexOf("_"));			
 			strippedBranchId = strippedBranchId.substring(strippedBranchId.indexOf("_") + 1);
-			final String appNameHashed = strippedBranchId.substring(0, strippedBranchId.indexOf("_"));
-			if(appNameHashed == null) {
+			final String appNameHashed = strippedBranchId.substring(0, strippedBranchId.indexOf("_"));			
+			final String appName = sipApplicationDispatcher.getApplicationNameFromHash(appNameHashed);
+			if(appName == null) {
 				throw new DispatcherException("the via header branch " + branch + " for the response is missing the appname previsouly set by the container");
 			}
-			final String appName = sipApplicationDispatcher.getApplicationNameFromHash(appNameHashed);
 			boolean inverted = false;
 			if(dialog != null && dialog.isServer()) {
 				inverted = true;

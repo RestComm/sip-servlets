@@ -154,7 +154,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					"in this popped routed header " + poppedRouteHeader);
 		}
 		final SipManager sipManager = (SipManager)sipContext.getManager();		
-		SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
+		final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				applicationName, 
 				applicationId);
 	
@@ -169,10 +169,8 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			final SipApplicationSessionKey replacesSipApplicationSessionKey = sipContext.getSipSessionsUtil().getCorrespondingSipApplicationSession(sipApplicationSessionKey, ReplacesHeader.NAME);
 			if(joinSipApplicationSessionKey != null) {
 				sipApplicationSession = sipManager.getSipApplicationSession(joinSipApplicationSessionKey, false);
-				sipApplicationSessionKey = joinSipApplicationSessionKey;
 			} else if(replacesSipApplicationSessionKey != null) {
 				sipApplicationSession = sipManager.getSipApplicationSession(replacesSipApplicationSessionKey, false);
-				sipApplicationSessionKey = replacesSipApplicationSessionKey;
 			}
 			if(sipApplicationSession == null) {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip application session to this subsequent request " + request +
