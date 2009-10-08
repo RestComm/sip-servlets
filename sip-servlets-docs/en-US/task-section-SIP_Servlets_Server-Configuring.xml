@@ -19,6 +19,9 @@ ipAddress="127.0.0.1"
  useStun="false"
  stunServerAddress="stun01.sipphone.com"
  stunServerPort="3478"
+ staticServerAddress="122.122.122.122" 
+ staticServerPort="44"
+ useStaticAddress="true"
  sipStackPropertiesFile="conf/mss-sip-stack.properties"/>]]></programlisting>
     </example>
     <variablelist>
@@ -106,6 +109,24 @@ ipAddress="127.0.0.1"
           </itemizedlist>
         </listitem>
       </varlistentry>
+      <varlistentry>
+        <term>staticServerAddress</term>
+        <listitem>
+          <para>Specifies what address to put in Contact/Via headers of requests created by the server. It is useful in cluster configurations where you don't want requests to be bound to a specific node address and you want to requests to be bound to the load-balancer address.</para>
+        </listitem>
+      </varlistentry>
+       <varlistentry>
+        <term>staticServerPort</term>
+        <listitem>
+          <para>Specifies the port of the load-balancer specified in staticServerAddress . It is useful in cluster configurations where you don't want requests to be bound to a specific node address and you want to requests to be bound to the load-balancer address.</para>
+        </listitem>
+      </varlistentry>
+       <varlistentry>
+        <term>useStaticAddress</term>
+        <listitem>
+          <para>Specifies whether the settings in staticServerAddress and staticServerPort should are active. It is useful in cluster configurations where you don't want requests to be bound to a specific node address and you want to requests to be bound to the load-balancer address.</para>
+        </listitem>
+      </varlistentry>     
     </variablelist>
     <note>
       <para>A comprehensive list of implementing classes for the SIP Stack is available from the <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html">Interface Sip Stack page on nist.gov</ulink>.  For a comprehensive list of properties associated with the SIP Stack implementation, refer to <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html">Class SipStackImpl page on nist.gov</ulink>.</para>
@@ -123,6 +144,7 @@ ipAddress="127.0.0.1"
   <Service name="Sip-Servlets"
  className="org.mobicents.servlet.sip.startup.SipStandardService"
  sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+ additionalParameterableHeaders="Header1,Header2" 
  darConfigurationFileLocation="file:///home/silas/workspaces/mobicents-sip-servlets/
  sip-servlets-examples/reinvite-demo/reinvite-dar.properties">]]>
  </programlisting>
@@ -147,6 +169,12 @@ ipAddress="127.0.0.1"
           <para>The default application router file location. This is used by the default application router to determine the application selection logic. Refer to Appendix C of the JSR 289 specification for more details.</para>
         </listitem>
       </varlistentry>
+      <varlistentry>
+        <term>additionalParameterableHeaders</term>
+        <listitem>
+          <para>A comma-separated list of header names that are treated as Parameterable by the container in addition to the standard headers that are already Parameterable according to the Sip Servlets 1.1 Specification. For these headers setting and getting parameters is allowed, others will result in ServletParseExcpetion.</para>
+        </listitem>
+      </varlistentry>       
     </variablelist>
   </section>
   <section id="bsssc-binary-SIP_Servlets_Server-Configuring_Logging">

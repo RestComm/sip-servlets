@@ -44,6 +44,13 @@
       </listitem>
     </varlistentry>
     <varlistentry>
+      <term>Transaction</term>
+      <listitem>
+        <para>Since Mobicents Sip Servlets uses a ThreadPoolExecutor backed by a LinkedBlockingQueue to dispatch the requests/responses, a race condition can occur where two different threads handle two responses (180 Ringing and 200 OK) at the same time, one taking over the other.(200 OK dispatched to the application before the ringing).
+        This mode rely on the underlying jain sip stack serializing per transaction and bypassing completely the Executors to ensure such race conditions dont occur</para>        
+      </listitem>
+    </varlistentry>
+    <varlistentry>
       <term>SipSession</term>
       <listitem>
         <para>SIP messages are processed as soon as possible except for messages originating from the same <literal>SipSession</literal>. These messages are  excluded from any simultaneous processing. </para>

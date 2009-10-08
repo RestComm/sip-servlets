@@ -2182,6 +2182,9 @@ ipAddress="127.0.0.1"
  useStun="false"
  stunServerAddress="stun01.sipphone.com"
  stunServerPort="3478"
+ staticServerAddress="122.122.122.122" 
+ staticServerPort="44"
+ useStaticAddress="true"
  sipStackPropertiesFile="conf/mss-sip-stack.properties"/&gt;
 </programlisting>
 		</example>
@@ -2306,6 +2309,30 @@ ipAddress="127.0.0.1"
 					</itemizedlist>
 				</listitem>
 			</varlistentry>
+			<varlistentry>
+		        <term>staticServerAddress</term>
+		        <listitem>
+		        	<para>
+		          		Specifies what address to put in Contact/Via headers of requests created by the server. It is useful in cluster configurations where you don't want requests to be bound to a specific node address and you want to requests to be bound to the load-balancer address.
+		          	</para>
+		        </listitem>
+		    </varlistentry>
+		    <varlistentry>
+		    	<term>staticServerPort</term>
+		        <listitem>
+		        	<para>
+		        		Specifies the port of the load-balancer specified in staticServerAddress . It is useful in cluster configurations where you don't want requests to be bound to a specific node address and you want to requests to be bound to the load-balancer address.
+		        	</para>
+		        </listitem>
+		    </varlistentry>
+		    <varlistentry>
+		        <term>useStaticAddress</term>
+		        <listitem>
+		        	<para>
+		        		Specifies whether the settings in staticServerAddress and staticServerPort should are active. It is useful in cluster configurations where you don't want requests to be bound to a specific node address and you want to requests to be bound to the load-balancer address.
+		        	</para>
+		        </listitem>
+		    </varlistentry> 
 		</variablelist>
 		<note>
 			<para>
@@ -2332,6 +2359,7 @@ ipAddress="127.0.0.1"
   &lt;Service name="Sip-Servlets"
  className="org.mobicents.servlet.sip.startup.SipStandardService"
  sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+ additionalParameterableHeaders="Header1,Header2" 
  darConfigurationFileLocation="file:///home/silas/workspaces/mobicents-sip-servlets/
  sip-servlets-examples/reinvite-demo/reinvite-dar.properties"&gt;
 </programlisting>
@@ -2364,6 +2392,14 @@ ipAddress="127.0.0.1"
 					</para>
 				</listitem>
 			</varlistentry>
+			<varlistentry>
+        		<term>additionalParameterableHeaders</term>
+        		<listitem>
+          			<para>
+          				A comma-separated list of header names that are treated as Parameterable by the container in addition to the standard headers that are already Parameterable according to the Sip Servlets 1.1 Specification. For these headers setting and getting parameters is allowed, others will result in ServletParseExcpetion.
+          			</para>
+        		</listitem>
+      		</varlistentry>
 		</variablelist>
 	</section>
 	
@@ -5654,6 +5690,14 @@ useStaticAddress="true"/&gt;
 				</para>
 			</listitem>
 		</varlistentry>
+		<varlistentry>
+      		<term>Transaction</term>
+      		<listitem>
+        		<para>
+        			Since Mobicents Sip Servlets uses a ThreadPoolExecutor backed by a LinkedBlockingQueue to dispatch the requests/responses, a race condition can occur where two different threads handle two responses (180 Ringing and 200 OK) at the same time, one taking over the other.(200 OK dispatched to the application before the ringing). This mode rely on the underlying jain sip stack serializing per transaction and bypassing completely the Executors to ensure such race conditions dont occur
+        		</para>        
+      		</listitem>
+    	</varlistentry>
 		<varlistentry>
 			<term>SipSession</term>
 			<listitem>
