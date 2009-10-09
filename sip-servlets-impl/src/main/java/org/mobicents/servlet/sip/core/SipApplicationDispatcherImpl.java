@@ -108,6 +108,17 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, MBeanRegistration {
 	
+	//list of methods supported by the AR
+	static final String[] METHODS_SUPPORTED = 
+		{"REGISTER", "INVITE", "ACK", "BYE", "CANCEL", "MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE", "PUBLISH", "REFER", "PRACK", "OPTIONS"};
+	
+	// List of sip extensions supported by the container	
+	static final String[] EXTENSIONS_SUPPORTED = 
+		{"MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE", "PUBLISH", "REFER", "PRACK", "100rel", "STUN", "path", "join"};
+	// List of sip rfcs supported by the container
+	static final String[] RFC_SUPPORTED = 
+		{"3261", "3428", "2976", "3265", "3311", "3903", "3515", "3262", "3489", "3327", "3911"};
+	
 	/**
 	 * Timer task that will gather information about congestion control 
 	 * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
@@ -172,6 +183,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	private double maxMemory;
 	
 	private int memoryThreshold;
+	
+	// base timer interval for jain sip tx 
+	private int baseTimerInterval = 500;
 	
 	private CongestionControlPolicy congestionControlPolicy;
 	
@@ -474,8 +488,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	private void analyzeMemory() {
 		Runtime runtime = Runtime.getRuntime();  
 		   
-		double allocatedMemory = runtime.totalMemory() / 1024;  
-		double freeMemory = runtime.freeMemory() / 1024;
+		double allocatedMemory = runtime.totalMemory() / (double) 1024;  
+		double freeMemory = runtime.freeMemory() / (double) 1024;
 		
 		double totalFreeMemory = freeMemory + (maxMemory - allocatedMemory);
 		this.percentageOfMemoryUsed=  (((double)100) - ((totalFreeMemory / maxMemory) * ((double)100)));
@@ -517,7 +531,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				    if(request.getHeader(MaxForwardsHeader.NAME) == null){
 					    request.setHeader(SipFactories.headerFactory.createMaxForwardsHeader(70));
 					}
-				    requestTransaction = sipProvider.getNewServerTransaction(request);					
+				    requestTransaction = sipProvider.getNewServerTransaction(request);
+				    requestTransaction.setRetransmitTimer(baseTimerInterval);
 				} catch ( TransactionUnavailableException tae) {
 					logger.error("cannot get a new Server transaction for this request " + request, tae);
 					// Sends a 500 Internal server error and stops processing.				
@@ -1339,4 +1354,26 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public boolean isBypassResponseExecutor() {
 		return bypassResponseExecutor;
 	}
+
+	/**
+	 * @param baseTimerInterval the baseTimerInterval to set
+	 */
+	public void setBaseTimerInterval(int baseTimerInterval) {
+		this.baseTimerInterval = baseTimerInterval;
+	}
+
+	/**
+	 * @return the baseTimerInterval
+	 */
+	public int getBaseTimerInterval() {
+		return baseTimerInterval;
+	}
+
+	public String[] getExtensionsSupported() {
+		return EXTENSIONS_SUPPORTED;
+	}
+
+	public String[] getRfcSupported() {
+		return RFC_SUPPORTED;
+	}	
 }

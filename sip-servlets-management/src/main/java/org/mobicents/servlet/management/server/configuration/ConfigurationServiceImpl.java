@@ -13,6 +13,7 @@ import org.mobicents.servlet.sip.core.CongestionControlPolicy;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
 public class ConfigurationServiceImpl  extends RemoteServiceServlet implements ConfigurationService {
+	static final long serialVersionUID = 1L;
 	private static MBeanServer mserver = MBeanUtils.createServer();
 	
 	private ObjectName getApplicationDispatcher() {
@@ -52,6 +53,19 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 			throw new RuntimeException("Error", t);
 		}
 	}
+	
+	public int getBaseTimerInterval() {
+		try {
+			ObjectName dispatcherName = getApplicationDispatcher();
+			
+			String size = 
+				mserver.getAttribute(
+						dispatcherName, "baseTimerInterval").toString();
+			return Integer.parseInt(size);
+		} catch (Throwable t) {
+			throw new RuntimeException("Error", t);
+		}
+	}
 
 	public void setConcurrencyControlMode(String mode) {
 		try {
@@ -66,6 +80,17 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 		try {
 			ObjectName dispatcherName = getApplicationDispatcher();
 			Attribute att = new Attribute("queueSize", new Integer(queueSize));
+			mserver.setAttribute(dispatcherName, att);
+		} catch (Throwable t) {
+			throw new RuntimeException("Error", t);
+		}
+		
+	}
+	
+	public void setBaseTimerInterval(int baseTimerInterval) {
+		try {
+			ObjectName dispatcherName = getApplicationDispatcher();
+			Attribute att = new Attribute("baseTimerInterval", new Integer(baseTimerInterval));
 			mserver.setAttribute(dispatcherName, att);
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);

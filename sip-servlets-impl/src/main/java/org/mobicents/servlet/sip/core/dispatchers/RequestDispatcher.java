@@ -166,6 +166,7 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 					serverTransaction.getApplicationData()).getSipServletMessage().getTransaction();
 			if(transaction == null || transaction instanceof ServerTransaction) {
 				ClientTransaction ctx = sipProvider.getNewClientTransaction(clonedRequest);
+				ctx.setRetransmitTimer(sipApplicationDispatcher.getBaseTimerInterval());
 				//keeping the server transaction in the client transaction's application data
 				TransactionApplicationData appData = new TransactionApplicationData(sipServletRequest);					
 				appData.setTransaction(serverTransaction);

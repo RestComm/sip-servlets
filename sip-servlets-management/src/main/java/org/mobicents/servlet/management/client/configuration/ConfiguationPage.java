@@ -35,6 +35,7 @@ public class ConfiguationPage extends Panel {
 	TextField queueSize;
 	TextField memoryThreshold;
 	TextField congestionControlCheckingInterval;
+	TextField baseTimerInterval;
 	
 	private ComboBox makeCombo(Store store, String field, ComboBoxListenerAdapter listener, String defaultValue) {
 		final ComboBox box;
@@ -154,6 +155,19 @@ public class ConfiguationPage extends Panel {
 							
 						});
 				
+				ConfigurationService.Util.getInstance().setBaseTimerInterval(
+						Integer.parseInt(baseTimerInterval.getValueAsString()), new AsyncCallback<Void>() {
+
+							public void onFailure(Throwable caught) {
+								Console.error("Error while trying to set the Base Timer Interval.");
+							}
+
+							public void onSuccess(Void result) {
+								result = result;
+							}
+							
+						});
+				
 				ConfigurationService.Util.getInstance().setMemoryThreshold(
 						Integer.parseInt(memoryThreshold.getValueAsString()), new AsyncCallback<Void>() {
 
@@ -198,6 +212,18 @@ public class ConfiguationPage extends Panel {
 
 					public void onSuccess(Integer result) {
 						queueSize.setValue(result.toString());
+					}
+					
+				});
+				
+				ConfigurationService.Util.getInstance().getBaseTimerInterval(new AsyncCallback<Integer>() {
+
+					public void onFailure(Throwable caught) {
+						Console.error("Error while trying to get the base timer interval.");
+					}
+
+					public void onSuccess(Integer result) {
+						baseTimerInterval.setValue(result.toString());
 					}
 					
 				});

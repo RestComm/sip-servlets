@@ -14,5 +14,7 @@ public interface ConfigurationServiceAsync {
 	void getCongestionControlPolicy(AsyncCallback<String> callback);
 	void setCongestionControlPolicy(String policy, AsyncCallback<Void> callback);
 	void setCongestionControlCheckingInterval(long interval, AsyncCallback<Void> callback);
-	void getCongestionControlCheckingInterval(AsyncCallback<Long> callback);	
+	void getCongestionControlCheckingInterval(AsyncCallback<Long> callback);
+	void setBaseTimerInterval(int baseTimerInterval, AsyncCallback<Void> callback);
+	void getBaseTimerInterval(AsyncCallback<Integer> callback);
 }

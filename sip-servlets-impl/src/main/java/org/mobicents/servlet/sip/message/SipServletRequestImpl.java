@@ -218,6 +218,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					.createCancel();
 			ClientTransaction clientTransaction = sipProvider
 					.getNewClientTransaction(cancelRequest);
+			clientTransaction.setRetransmitTimer(sipFactoryImpl.getSipApplicationDispatcher().getBaseTimerInterval());
 			SipServletRequest newRequest = new SipServletRequestImpl(
 					cancelRequest, sipFactoryImpl, getSipSession(),
 					clientTransaction, getTransaction().getDialog(), false);
@@ -964,6 +965,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				}
 				final ClientTransaction ctx = sipProvider
 						.getNewClientTransaction(request);				
+				ctx.setRetransmitTimer(sipFactoryImpl.getSipApplicationDispatcher().getBaseTimerInterval());
 				
 				session.setSessionCreatingTransaction(ctx);
 				

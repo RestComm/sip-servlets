@@ -52,9 +52,12 @@ import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
@@ -542,6 +545,10 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Proxying request dialog-statelessly" + request);
 		}
+		final SipFactoryImpl sipFactoryImpl = proxy.getSipFactoryImpl();
+		final SipApplicationDispatcher sipApplicationDispatcher = sipFactoryImpl.getSipApplicationDispatcher();
+		final MobicentsSipSession sipSession = request.getSipSession();
+		final MobicentsSipApplicationSession sipAppSession = sipSession.getSipApplicationSession();
 		// Update the last proxied request
 		request.setRoutingState(RoutingState.PROXIED);
 		this.prackOriginalRequest = request;
@@ -561,7 +568,9 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 
 		ViaHeader viaHeader = (ViaHeader) clonedRequest.getHeader(ViaHeader.NAME);
 		try {
-			final String branch = JainSipUtils.createBranch(request.getSipSession().getSipApplicationSession().getKey().getId(),  proxy.getSipFactoryImpl().getSipApplicationDispatcher().getHashFromApplicationName(request.getSipSession().getKey().getApplicationName()));
+			final String branch = JainSipUtils.createBranch(
+					sipSession.getKey().getApplicationSessionId(),  
+					sipApplicationDispatcher.getHashFromApplicationName(sipSession.getKey().getApplicationName()));			
 			viaHeader.setBranch(branch);
 		} catch (ParseException pe) {
 			logger.error("A problem occured while setting the via branch while proxying a request", pe);
@@ -569,26 +578,27 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		
 		RouteHeader routeHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
 		if(routeHeader != null) {
-			if(!((SipApplicationDispatcherImpl)proxy.getSipFactoryImpl().getSipApplicationDispatcher()).isRouteExternal(routeHeader)) {
+			if(!sipApplicationDispatcher.isRouteExternal(routeHeader)) {
 				clonedRequest.removeFirst(RouteHeader.NAME);	
 			}
 		}	
 	
 		String transport = JainSipUtils.findTransport(clonedRequest);
-		SipProvider sipProvider = proxy.getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(
+		SipProvider sipProvider =sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
 				transport, false).getSipProvider();
 		
 		if(logger.isDebugEnabled()) {
 			logger.debug("Getting new Client Tx for request " + clonedRequest);
 		}
 		// we mark them as accessed so that HA replication can occur		
-		request.getSipSession().access();
-		if(request.getSipSession().getSipApplicationSession() != null) {
-			request.getSipSession().getSipApplicationSession().access();
+		sipSession.access();
+		if(sipAppSession != null) {
+			sipAppSession.access();
 		}
 		try {
 			ClientTransaction ctx = sipProvider
 				.getNewClientTransaction(clonedRequest);			
+			ctx.setRetransmitTimer(sipApplicationDispatcher.getBaseTimerInterval());
 			
 			TransactionApplicationData appData = (TransactionApplicationData) request.getTransactionApplicationData();
 			appData.setProxyBranch(this);

@@ -119,23 +119,23 @@ public class SipStandardContext extends StandardContext implements SipContext {
     protected String namingContextName;
     
     protected transient Method sipApplicationKeyMethod;
-    protected transient ConcurrencyControlMode concurrencyControlMode;    
+    protected ConcurrencyControlMode concurrencyControlMode;    
 	/**
      * The set of sip application listener class names configured for this
      * application, in the order they were encountered in the sip.xml file.
      */
-    protected List<String> sipApplicationListeners = new CopyOnWriteArrayList<String>();
+    protected transient List<String> sipApplicationListeners = new CopyOnWriteArrayList<String>();
     
     /**
      * The set of sip servlet mapping configured for this
      * application.
      */
-    protected List<SipServletMapping> sipServletMappings = new ArrayList<SipServletMapping>();
+    protected transient List<SipServletMapping> sipServletMappings = new ArrayList<SipServletMapping>();
     
     protected transient SipApplicationDispatcher sipApplicationDispatcher = null;
     
-    protected Map<String, Container> childrenMap;
-    protected Map<String, Container> childrenMapByClassName;
+    protected transient Map<String, Container> childrenMap;
+    protected transient Map<String, Container> childrenMapByClassName;
 
     protected transient ScheduledThreadPoolExecutor executor = null;
 	/**
@@ -196,10 +196,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
 				TimerServiceImpl.getInstance());
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED,
-				Arrays.asList(SipApplicationDispatcher.EXTENSIONS_SUPPORTED));
+				Arrays.asList(sipApplicationDispatcher.getExtensionsSupported()));
 		this.getServletContext().setAttribute("javax.servlet.sip.100rel", Boolean.TRUE);
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED_RFCs,
-				Arrays.asList(SipApplicationDispatcher.RFC_SUPPORTED));
+				Arrays.asList(sipApplicationDispatcher.getRfcSupported()));
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_SESSIONS_UTIL,
 				sipSessionsUtil);
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,

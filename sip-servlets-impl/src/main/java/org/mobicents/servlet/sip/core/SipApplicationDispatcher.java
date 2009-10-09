@@ -40,19 +40,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * dispatching them to sip applications. 
  *
  */
-public interface SipApplicationDispatcher extends SipListener {
-
-	//list of methods supported by the AR
-	public static final String[] METHODS_SUPPORTED = 
-		{"REGISTER", "INVITE", "ACK", "BYE", "CANCEL", "MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE", "PUBLISH", "REFER", "PRACK", "OPTIONS"};
-	
-	// List of sip extensions supported by the container	
-	public static final String[] EXTENSIONS_SUPPORTED = 
-		{"MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE", "PUBLISH", "REFER", "PRACK", "100rel", "STUN", "path", "join"};
-	// List of sip rfcs supported by the container
-	public static final String[] RFC_SUPPORTED = 
-		{"3261", "3428", "2976", "3265", "3311", "3903", "3515", "3262", "3489", "3327", "3911"};
-	
+public interface SipApplicationDispatcher extends SipListener {	
 	/**
 	 * Initialize the sip application dispatcher. <br/>
 	 * It will look for the first implementation of an application routerand 
@@ -185,4 +173,10 @@ public interface SipApplicationDispatcher extends SipListener {
 
 	public void setBypassResponseExecutor(boolean bypassResponseExecutor);
 	public boolean isBypassResponseExecutor();
+	
+	public void setBaseTimerInterval(int baseTimerInterval);
+	public int getBaseTimerInterval();
+
+	String[] getExtensionsSupported();
+	String[] getRfcSupported();
 }

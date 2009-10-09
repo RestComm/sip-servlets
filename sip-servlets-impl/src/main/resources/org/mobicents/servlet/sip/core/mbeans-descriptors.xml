@@ -29,6 +29,10 @@
 			description="Maximum number of pending messages allowed to wait in a queue to be executed"
 			type="int" />
 			
+		<attribute name="baseTimerInterval"
+			description="JAIN SIP Timer Interval"
+			type="int" />
+			
 		<attribute name="memoryThreshold"
 			description="Percentage of memory to be used by the container before applying the congestion control policy"
 			type="int" />

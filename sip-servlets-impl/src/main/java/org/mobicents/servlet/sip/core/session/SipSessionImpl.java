@@ -82,6 +82,7 @@ import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
@@ -377,11 +378,13 @@ public class SipSessionImpl implements MobicentsSipSession {
 				}
 				request.setHeader(cSeq);
 				request.removeHeader(ViaHeader.NAME);
-				final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactory.getSipNetworkInterfaceManager();
-				SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
-						JainSipUtils.findTransport(request), false).getSipProvider();
 				
-				final String branch = JainSipUtils.createBranch(getSipApplicationSession().getKey().getId(),  sipFactory.getSipApplicationDispatcher().getHashFromApplicationName(getKey().getApplicationName()));
+				final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactory.getSipNetworkInterfaceManager();
+				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
+						JainSipUtils.findTransport(request), false).getSipProvider();
+				final SipApplicationDispatcher sipApplicationDispatcher = sipFactory.getSipApplicationDispatcher();				
+				final String branch = JainSipUtils.createBranch(getSipApplicationSession().getKey().getId(),  sipApplicationDispatcher.getHashFromApplicationName(getKey().getApplicationName()));
+				
 				ViaHeader viaHeader = JainSipUtils.createViaHeader(
 	    				sipNetworkInterfaceManager, request, branch);
 	    		request.addHeader(viaHeader);
@@ -389,6 +392,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				try {
 					ClientTransaction retryTran = sipProvider
 						.getNewClientTransaction(request);
+					retryTran.setRetransmitTimer(sipApplicationDispatcher.getBaseTimerInterval());
 														
 					sipServletRequest = new SipServletRequestImpl(
 							request, this.sipFactory, this, retryTran, retryTran.getDialog(),
@@ -989,9 +993,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 	}
 
 	protected void setSipApplicationSession(
-			MobicentsSipApplicationSession sipApplicationSession) {
-		this.sipApplicationSessionKey = sipApplicationSession.getKey();
-		if ( sipApplicationSession != null) {			
+			MobicentsSipApplicationSession sipApplicationSession) {		
+		if (sipApplicationSession != null) {			
+			this.sipApplicationSessionKey = sipApplicationSession.getKey();
 			sipApplicationSession.addSipSession(this);			
 		}
 	}

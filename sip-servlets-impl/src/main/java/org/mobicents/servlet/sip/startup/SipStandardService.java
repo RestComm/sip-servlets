@@ -63,6 +63,8 @@ public class SipStandardService extends StandardService implements SipService {
 	protected int sipMessageQueueSize = 1500;
 	protected int memoryThreshold = 90;
 	protected long congestionControlCheckingInterval = 30000;
+	// base timer interval for jain sip tx 
+	private int baseTimerInterval = 500;
 	
 	protected String concurrencyControlMode = ConcurrencyControlMode.SipSession.toString();
 	protected String congestionControlPolicy = CongestionControlPolicy.ErrorResponse.toString();
@@ -153,13 +155,14 @@ public class SipStandardService extends StandardService implements SipService {
 		super.initialize();
 		sipApplicationDispatcher.setDomain(this.domain);
 		
+		sipApplicationDispatcher.setBaseTimerInterval(baseTimerInterval);
 		sipApplicationDispatcher.setMemoryThreshold(getMemoryThreshold());
 		sipApplicationDispatcher.setCongestionControlCheckingInterval(getCongestionControlCheckingInterval());
 		sipApplicationDispatcher.setCongestionControlPolicyByName(getCongestionControlPolicy());
 		sipApplicationDispatcher.setQueueSize(getSipMessageQueueSize());
-		sipApplicationDispatcher.setConcurrencyControlMode(ConcurrencyControlMode.valueOf(getConcurrencyControlMode()));
+		sipApplicationDispatcher.setConcurrencyControlMode(ConcurrencyControlMode.valueOf(getConcurrencyControlMode()));		
 		sipApplicationDispatcher.setBypassRequestExecutor(bypassRequestExecutor);
-		sipApplicationDispatcher.setBypassResponseExecutor(bypassResponseExecutor);
+		sipApplicationDispatcher.setBypassResponseExecutor(bypassResponseExecutor);		
 		sipApplicationDispatcher.init();
 	}
 	
@@ -453,5 +456,21 @@ public class SipStandardService extends StandardService implements SipService {
 	 */
 	public String getSipPathName() {
 		return sipPathName;
+	}
+
+
+	/**
+	 * @param baseTimerInterval the baseTimerInterval to set
+	 */
+	public void setBaseTimerInterval(int baseTimerInterval) {
+		this.baseTimerInterval = baseTimerInterval;
+	}
+
+
+	/**
+	 * @return the baseTimerInterval
+	 */
+	public int getBaseTimerInterval() {
+		return baseTimerInterval;
 	}	
 }
