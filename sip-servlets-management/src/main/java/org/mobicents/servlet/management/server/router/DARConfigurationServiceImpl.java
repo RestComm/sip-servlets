@@ -89,6 +89,9 @@ public class DARConfigurationServiceImpl extends RemoteServiceServlet implements
 					clientNode.setSubscriber(routeNode.getSubscriberIdentity());
 					clientNode.setRouteModifier(routeNode.getRouteModifier().toString());
 					clientNode.setRoutingRegion(routeNode.getRoutingRegion().toString());
+					String direction = routeNode.getOptionalParameters().get("DIRECTION");
+					if(direction == null) direction = "NONE";
+					clientNode.setDirection(direction);
 					clientRouteArray.add(clientNode);
 				}
 				DARRouteNode[] array = new DARRouteNode[clientRouteArray.size()];

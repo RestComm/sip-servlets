@@ -30,6 +30,7 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 	private TextField route;
 	private ComboBox routeModified; //CLEAR NO_ROUTE ROUTE
 	private TextField order;
+	private ComboBox direction; //OUTBOUND NONE
 	private boolean isNew = true; // if this node is just created by the user or loaded from the config file
 
 	private static Object[][] regions = new Object[][]{  
@@ -42,6 +43,12 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 		new Object[]{"NO_ROUTE"},  
 		new Object[]{"ROUTE"},
 		new Object[]{"CLEAR_ROUTE"}
+	};  
+	
+	private static Object[][] directions = new Object[][]{  
+		new Object[]{"NONE"},  
+		new Object[]{"OUTBOUND"},
+		new Object[]{"INBOUND"}
 	};  
 
 	private void addLabeledControl(String label, Widget component, Panel panel) {
@@ -156,7 +163,7 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 
 		// Route modifiers
 		final Store modifiersStore = new SimpleStore(new String[]{"modifiers"}, routeModifiers);  
-		regionStore.load();  
+		modifiersStore.load();  
 	
 		this.routeModified = makeCombo(modifiersStore, "modifiers", new ComboBoxListenerAdapter() {  
 
@@ -164,6 +171,17 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 				System.out.println("Route modifiers::onSelect('" + record.getAsString("modifiers") + "')");  
 			}  
 		}, (String) routeModifiers[0][0]);  
+		
+		// Direction markers
+		final Store directionsStore = new SimpleStore(new String[]{"direction"}, directions);  
+		directionsStore.load();  
+	
+		this.direction = makeCombo(directionsStore, "direction", new ComboBoxListenerAdapter() {  
+
+			public void onSelect(ComboBox comboBox, com.gwtext.client.data.Record record, int index) {  
+				System.out.println("Direction::onSelect('" + record.getAsString("direction") + "')");  
+			}  
+		}, (String) directions[0][0]);  
 		
 		// Order 
 		this.order = makeTextField("Order", "Order", 160);
@@ -180,6 +198,7 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 		addLabeledControl("Routing region", routingRegion, collapsedPanel);
 		addLabeledControl("Route", route, collapsedPanel);
 		addLabeledControl("Route modifiers", routeModified, collapsedPanel);
+		addLabeledControl("Direction", direction, collapsedPanel);
 		addLabeledControl("Order", order, collapsedPanel);
 		collapsedPanel.setCollapsible(true);
 		collapsedPanel.setTitle("Options");
@@ -221,7 +240,7 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 		setRoute(node.getRoute());
 		setRouteModified(node.getRouteModifier());
 		setRoutingRegion(node.getRoutingRegion());
-		
+		setDirection(node.getDirection());
 	}
 
 	public Widget getDragHandle() {
@@ -268,6 +287,14 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 		this.routeModified.setValue(str);
 	}
 	
+	public String getDirection() {
+		return direction.getValue();
+	}
+	
+	public void setDirection(String str) {
+		this.direction.setValue(str);
+	}
+	
 	public String getOrder() {
 		String text = order.getText();
 		if(text == null || text.equals("")) return "0";
@@ -279,10 +306,13 @@ public class ApplicationRouteNodeEditor extends VerticalPanel {
 	}
 	
 	public String toString() {
+		String direction = getDirection().equalsIgnoreCase("none")?"":", " + quoteString("DIRECTION="+getDirection());
 		// INVITE: ("org.mobicents.servlet.sip.example.SimpleSipServlet", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0")
 		String result = "(" + quoteString(getApplicationName()) + ", " + quoteString(getSubscriberIdentity()) + ", " +
 		quoteString(getRoutingRegion()) + ", " + quoteString(getRoute()) + ", " +
-		quoteString(getRouteModified()) + ", " + quoteString(getOrder()) + ")";
+		quoteString(getRouteModified()) + ", " + quoteString(getOrder()) + 
+		direction +
+		")";
 		return result;
 	}
 	private static String quoteString(String str) {
