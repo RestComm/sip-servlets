@@ -20,8 +20,8 @@
     production environments.</para>
     <para>The Mobicents SIP Servlet Jopr plug in provides a facility to view
     metrics related to the deployed applications, metrics related to the SIP
-    Servlets Server.  Additionally, the plugin provides the option to manage the Congestion and Concurrency settings of the
-    SIP Servlets Server.</para>
+    Servlets Server.  Additionally, the plugin provides the option to manage the various configuration settings of the
+    SIP Servlets Server such as Congestion and Concurrency control.</para>
     <section>
       <title>Installation of the Enterprise Monitoring and Management Console</title>
       <section>
@@ -201,9 +201,9 @@
           </listitem>
           <listitem>
             <para>Click on the <guilabel>Configuration</guilabel> tab to  tune the
-            Congestion Control parameters as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
+            Container configuration parameters such as Concurrency and Congestion as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
             <figure>
-              <title>SIP Application Dispatcher Congestion Control Parameters Configuration</title>
+              <title>SIP Application Dispatcher Configuration</title>
               <mediaobject>
                 <imageobject>
                   <imagedata width="700" fileref="images/mss-jopr-queue.png"/>

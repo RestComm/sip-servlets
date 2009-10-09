@@ -145,6 +145,7 @@ ipAddress="127.0.0.1"
  className="org.mobicents.servlet.sip.startup.SipStandardService"
  sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
  additionalParameterableHeaders="Header1,Header2" 
+ baseTimerInterval="500"
  darConfigurationFileLocation="file:///home/silas/workspaces/mobicents-sip-servlets/
  sip-servlets-examples/reinvite-demo/reinvite-dar.properties">]]>
  </programlisting>
@@ -176,6 +177,14 @@ ipAddress="127.0.0.1"
           <para>Setting and getting parameters is allowed for the standard, and additional parameters.  Parameters that are not specified in <literal>additionalParameterableHeaders</literal> will result in a ServletParseException error.</para>
         </listitem>
       </varlistentry>
+      <varlistentry>
+        <term>baseTimerInterval</term>
+        <listitem>
+          <para>Specifies the Base Timer Interval T1 from the <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">Table of Timer Values defined in RFC3261</ulink> and the 3GPP-IMS specifications : Section 7.7, Table 7.8 of <ulink ref="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">TS 24.229 Version 9.1.0</ulink></para>
+          <para>In the above mentionned tables, most of the timers depend on T1 except T2, T4 and Timer D (for the client transaction) are not dependent on it. In the Mobicents Sip Servlets underlying JAIN SIP stack those last 3 timers are conditionned on the <literal>baseTimerInterval</literal> as well</para>
+          <para>This parameter accepts an integer defining the interval in milliseconds whose the default value is 500, it allows to adjust the SIP timers depending on the conditions of the newtork where the Mobicents Sip Servlets container is deployed</para>
+        </listitem>
+      </varlistentry>      
     </variablelist>
   </section>
   <section id="bsssc-binary-SIP_Servlets_Server-Configuring_Logging">
