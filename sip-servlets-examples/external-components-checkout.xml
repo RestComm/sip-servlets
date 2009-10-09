@@ -14,8 +14,8 @@
         <checkout.username>mobicents-read-only</checkout.username>
         <checkout.password></checkout.password>
         
-        <media.core.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/mobicents-media-server-core-1.0.0.BETA4</media.core.connectionURL>
-        <media.controllers.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/mobicents-media-server-controllers-1.0.0.BETA4</media.controllers.connectionURL>
+        <media.core.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/media/core/mobicents-media-server-core-1.0.3.GA</media.core.connectionURL>
+        <media.controllers.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/media/controllers/mobicents-media-server-controllers-1.0.3.GA</media.controllers.connectionURL>
 
     </properties>
     
