@@ -2396,7 +2396,7 @@ ipAddress="127.0.0.1"
 				<term>additionalParameterableHeaders</term>
 				<listitem>
 					<para>
-						Comma-separated list of header names that are treated as Parameterable by the container. The specified parameters are classed as valid, in addition to the standard Parameterable headers defined in the Sip Servlets 1.1 Specification.
+						Comma-separated list of header names that are treated as Parameterable by the container. The specified headers are classed as valid, in addition to the standard Parameterable headers defined in the Sip Servlets 1.1 Specification.
 					</para>
 					<para>
 						Setting and getting parameters is allowed for the standard, and additional parameters. Parameters that are not specified in <literal>additionalParameterableHeaders</literal> will result in a ServletParseException error.
@@ -5730,10 +5730,10 @@ useStaticAddress="true"/&gt;
 			<term>Transaction</term>
 			<listitem>
 				<para>
-					Bypass the SIP Servlets request/response dispatcher, and utilize the JAIN SLEE serializers to manage thread race conditions.
+					Bypass the SIP Servlets request/response executors, and utilize the JAIN SIP built-in Transaction serialization to manage race conditions on the same transaction.
 				</para>
 				<para>
-					By default, the SIP Servlets server uses a ThreadPoolExecutor linked to a LinkedBlockingQueue to dispatch the request/response threads. If one thread handles a single request (for example a 180 Ringing) and another thread handles the response (for example a 200 OK) concurrently, a race condition can occur where the response overtakes the request(200 OK dispatched to the application before the 180 Ringing).
+					By default, the SIP Servlets server uses a ThreadPoolExecutor linked to a LinkedBlockingQueue to dispatch the request/response threads. The container can thus handles two different response (for example a 180 Ringing and a 200 OK) concurrently, a race condition can occur where the second response overtakes the first one (200 OK dispatched to the application before the 180 Ringing).
 				</para>
 			</listitem>
 		</varlistentry>

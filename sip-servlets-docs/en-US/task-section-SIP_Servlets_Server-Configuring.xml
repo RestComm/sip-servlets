@@ -172,7 +172,7 @@ ipAddress="127.0.0.1"
       <varlistentry>
         <term>additionalParameterableHeaders</term>
         <listitem>
-          <para>Comma-separated list of header names that are treated as Parameterable by the container.  The specified parameters are classed as valid, in addition to the standard Parameterable headers defined in the  Sip Servlets 1.1 Specification. </para>
+          <para>Comma-separated list of header names that are treated as Parameterable by the container.  The specified headers are classed as valid, in addition to the standard Parameterable headers defined in the Sip Servlets 1.1 Specification. </para>
           <para>Setting and getting parameters is allowed for the standard, and additional parameters.  Parameters that are not specified in <literal>additionalParameterableHeaders</literal> will result in a ServletParseException error.</para>
         </listitem>
       </varlistentry>
