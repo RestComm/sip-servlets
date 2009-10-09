@@ -69,7 +69,7 @@ public class ConfiguationPage extends Panel {
 	public ConfiguationPage() {
 		final FormPanel formPanel = new FormPanel();  
 
-		formPanel.setTitle("Concurrency and Congestion Control");  
+//		formPanel.setTitle("Concurrency and Congestion Control");  
 
 		formPanel.setWidth(900);  
 		formPanel.setFrame(true); 
@@ -90,6 +90,12 @@ public class ConfiguationPage extends Panel {
 		congestionControlCheckingInterval.setAllowBlank(false); 
 		congestionControlCheckingInterval.setHideLabel(true);
 		addLabeledControl("Congestion Control Checking Interval:", congestionControlCheckingInterval, formPanel);
+		
+		// Create base timer interval text box
+		baseTimerInterval = new TextField();  
+		baseTimerInterval.setAllowBlank(false); 
+		baseTimerInterval.setHideLabel(true);
+		addLabeledControl("JAIN SIP Base Timer Interval:", baseTimerInterval, formPanel);
 		
 		//Concurrency control modes selector
 		final Store ccmsStore = new SimpleStore(new String[]{"ccms"}, concurrencyControlModes);  
