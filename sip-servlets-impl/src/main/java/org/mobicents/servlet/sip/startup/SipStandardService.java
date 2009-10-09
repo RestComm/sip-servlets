@@ -154,7 +154,9 @@ public class SipStandardService extends StandardService implements SipService {
  		}		
 		super.initialize();
 		sipApplicationDispatcher.setDomain(this.domain);
-		
+		if(baseTimerInterval < 1) {
+			throw new LifecycleException("It's forbidden to set the Base Timer Interval to a non positive value");		
+		}
 		sipApplicationDispatcher.setBaseTimerInterval(baseTimerInterval);
 		sipApplicationDispatcher.setMemoryThreshold(getMemoryThreshold());
 		sipApplicationDispatcher.setCongestionControlCheckingInterval(getCongestionControlCheckingInterval());

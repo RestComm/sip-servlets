@@ -1379,6 +1379,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @param baseTimerInterval the baseTimerInterval to set
 	 */
 	public void setBaseTimerInterval(int baseTimerInterval) {
+		if(baseTimerInterval < 1) {
+			logger.error("It's forbidden to set the Base Timer Interval to a non positive value");
+		}
 		this.baseTimerInterval = baseTimerInterval;
 		if(logger.isInfoEnabled()) {
 			logger.info("Base Timer Interval set to " + baseTimerInterval +"ms");
