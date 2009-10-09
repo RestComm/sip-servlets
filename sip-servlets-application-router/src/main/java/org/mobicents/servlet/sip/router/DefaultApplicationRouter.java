@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -30,6 +31,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.ar.SipApplicationRouter;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
@@ -163,6 +165,9 @@ import org.apache.log4j.Logger;
  * </p>
  */
 public class DefaultApplicationRouter implements SipApplicationRouter, ManageableApplicationRouter{	
+	private static final String DIRECTION_PARAMETER = "DIRECTION";
+	private static final String DIRECTION_OUTBOUND = "OUTBOUND";
+	private static final String DIRECTION_INBOUND = "INBOUND";
 	//	the logger
 	private static Logger log = Logger.getLogger(DefaultApplicationRouter.class);
 	//the prefix used in the dar configuration file to specify the subscriber URI to use
@@ -251,6 +256,23 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 		}
 		return new SipApplicationRouterInfo(null,null,null,null,null,null);
 	}
+	
+	/*
+	 * This method is checking if the application that initiated the request is currently configured to be called for this method.
+	 * Apps that initiate request may not be in the list.
+	 */
+	private DefaultSipApplicationRouterInfo getFirstRequestApplicationEntry(List<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoList, SipServletRequest initialRequest) {
+		SipSession sipSession = initialRequest.getSession(false);
+		if(sipSession != null) {
+			String appName = sipSession.getApplicationSession().getApplicationName();
+			Iterator<DefaultSipApplicationRouterInfo> iterator = defaultSipApplicationRouterInfoList.iterator();
+			while(iterator.hasNext()) {
+				DefaultSipApplicationRouterInfo next = iterator.next();
+				if(next.getApplicationName().equals(appName)) return next;
+			}
+		}
+		return null;
+	}
 
 	private SipApplicationRouterInfo getNextApplication(
 			SipServletRequest initialRequest,
@@ -267,7 +289,46 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 			}
 			ListIterator<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoIt = defaultSipApplicationRouterInfoList.listIterator(previousAppOrder++);
 			while (defaultSipApplicationRouterInfoIt.hasNext() ) {
+				
+				/*
+				 *  Fix for http://code.google.com/p/mobicents/issues/detail?id=987 Issue 987
+				 *  
+				 *  INBOUND and OUTBOUND request routing logic is as follows:
+				 *  Determine if the request was initiated by the previous application by either see the application missing in the DAR
+				 *  or by looking at the DIRECTION hint in the optional parameters. If the request was initiated by the app then we will
+				 *  call only applications without INBOUND direction. All applications without hint will be called to keep backward compatibility.
+				 */
 				DefaultSipApplicationRouterInfo defaultSipApplicationRouterInfo = defaultSipApplicationRouterInfoIt.next();
+				
+				/*
+				 * This method is checking if the application that initiated the request is currently configured to be called for this method.
+				 * Apps that initiate request may not be in the list thus params must be assumed for them.
+				 */
+				DefaultSipApplicationRouterInfo requestSipApplicationRouterInfo = getFirstRequestApplicationEntry(defaultSipApplicationRouterInfoList, initialRequest);
+				
+				String currentDirection = defaultSipApplicationRouterInfo.getOptionalParameters().get(DIRECTION_PARAMETER);
+				String requestDirection = null;
+				if(requestSipApplicationRouterInfo != null) {
+					requestDirection = requestSipApplicationRouterInfo.getOptionalParameters().get(DIRECTION_PARAMETER);
+				} else {
+					if(initialRequest.getSession(false) != null) {
+						// If this request comes from outside (was not initiated by some app) the session will be null,
+						// thus if it's not null we can assume the request already has a session and was initiated by
+						// the application...
+						requestDirection = DIRECTION_OUTBOUND;
+					}
+				}
+				
+				if(DIRECTION_OUTBOUND.equalsIgnoreCase(requestDirection)) { // If the request was initiated by the previous app or the previous app has out marker
+					if(DIRECTION_INBOUND.equalsIgnoreCase(currentDirection)) { // but the new application is handling only INBOUND request
+						if(log.isDebugEnabled()) {
+							log.debug(defaultSipApplicationRouterInfo.getApplicationName() + " will not be called because we are routing the request out and the application has 'DIRECTION=INBOUND' hint.");
+						}
+						continue; // .. then just don't call the application
+					}
+				}
+				
+				
 				boolean isApplicationPresentInContainer = false;
 				synchronized (containerDeployedApplicationNames) {
 					if(containerDeployedApplicationNames.contains(defaultSipApplicationRouterInfo.getApplicationName())) {

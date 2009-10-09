@@ -171,7 +171,7 @@ public class DefaultApplicationRouterParser {
 			int indexOfLeftParenthesis = sipApplicationRouterInfosStringified.indexOf("(");
 			int indexOfRightParenthesis = sipApplicationRouterInfosStringified.indexOf(")");
 			if(indexOfLeftParenthesis == -1 || indexOfRightParenthesis == -1) {
-				throw new ParseException("Cannot parse the following string from the default application router file" + sipApplicationRouterInfosStringified,0);
+				throw new ParseException("Parenthesis expectected. Cannot parse the following string from the default application router file" + sipApplicationRouterInfosStringified,0);
 			}
 				
 			String sipApplicationRouterInfoStringified = 
@@ -198,11 +198,11 @@ public class DefaultApplicationRouterParser {
 		for (int i = 0; i < SIP_APPLICATION_ROUTER_INFO_PARAM_NB; i++) {
 			int indexOfLeftQuote = sipApplicationRouterInfoStringified.indexOf("\"");
 			if(indexOfLeftQuote == -1) {
-				throw new ParseException("Cannot parse the following string from the default application router file" + sipApplicationRouterInfoStringified,0);
+				throw new ParseException("Left quote expected. Cannot parse the following string from the default application router file" + sipApplicationRouterInfoStringified,0);
 			}
 			int indexOfRightQuote = sipApplicationRouterInfoStringified.substring(indexOfLeftQuote + 1).indexOf("\"");
 			if(indexOfRightQuote == -1) {				
-				throw new ParseException("Cannot parse the following string from the default application router file " + sipApplicationRouterInfoStringified,0);
+				throw new ParseException("Right quote expected. Cannot parse the following string from the default application router file " + sipApplicationRouterInfoStringified,0);
 			}				
 			indexOfRightQuote += indexOfLeftQuote;
 			String sipApplicationRouterInfoParameter = 
@@ -210,6 +210,23 @@ public class DefaultApplicationRouterParser {
 			sipApplicationRouterInfoParameters[i] = sipApplicationRouterInfoParameter;
 			sipApplicationRouterInfoStringified = sipApplicationRouterInfoStringified.substring(indexOfRightQuote + 2);
 		}		
+		
+		// Parse optional DAR field while is a set of key/value pairs
+		String optionalParameters = null;
+		int indexOfLeftQuote = sipApplicationRouterInfoStringified.indexOf("\"");
+		if(indexOfLeftQuote != -1) {
+			int indexOfRightQuote = sipApplicationRouterInfoStringified.substring(indexOfLeftQuote + 1).indexOf("\"");
+			if(indexOfRightQuote != -1) {				
+				indexOfRightQuote += indexOfLeftQuote;
+				optionalParameters = 
+					sipApplicationRouterInfoStringified.substring(indexOfLeftQuote + 1, indexOfRightQuote + 1);
+			} else {
+				throw new ParseException("Expected a right quote in the optiona parameters", indexOfLeftQuote);
+			}
+
+		}
+	
+		// Parsing is done
 		int order = -1;
 		try{
 			order = Integer.parseInt(sipApplicationRouterInfoParameters[5]);
@@ -231,7 +248,7 @@ public class DefaultApplicationRouterParser {
 				//sip route modifier
 				SipRouteModifier.valueOf(SipRouteModifier.class,sipApplicationRouterInfoParameters[4]),
 				//stateinfo
-				order);		
+				order, optionalParameters);		
 	}
 	
 	public String getDarConfigurationFileLocation() {

@@ -16,6 +16,9 @@
  */
 package org.mobicents.servlet.sip.router;
 
+import java.text.ParseException;
+import java.util.HashMap;
+
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.servlet.sip.ar.SipRouteModifier;
 
@@ -32,6 +35,7 @@ public class DefaultSipApplicationRouterInfo {
 	private String[] routes;
 	private SipRouteModifier routeModifier;
 	private int order;
+	private HashMap<String, String> optionalParameters;
 			
 	/**
 	 * 
@@ -50,7 +54,7 @@ public class DefaultSipApplicationRouterInfo {
 	public DefaultSipApplicationRouterInfo(String applicationName,
 			String subscriberIdentity,
 			SipApplicationRoutingRegion routingRegion, String[] routes,
-			SipRouteModifier routeModifier, int order) {
+			SipRouteModifier routeModifier, int order, String optionalParameters) {
 		super();
 		this.applicationName = applicationName;
 		this.subscriberIdentity = subscriberIdentity;
@@ -58,6 +62,40 @@ public class DefaultSipApplicationRouterInfo {
 		this.routes = routes;
 		this.routeModifier = routeModifier;
 		this.order = order;
+		try {
+			this.optionalParameters = stringToMap(optionalParameters);
+		} catch (ParseException e) {
+			throw new RuntimeException("Error", e);
+		}
+		
+	}
+	
+	public static HashMap<String, String> stringToMap(String str) throws ParseException {
+		
+		HashMap<String, String> map = new HashMap<String, String>();
+		if(str == null) return map;
+		String[] props = str.split(" ");
+		for(String prop : props) {
+			if(prop.equals("") || prop.equals(" ")) continue;
+			
+			int indexOfEq = prop.indexOf('=');
+			if(indexOfEq == -1) {
+				throw new RuntimeException("Expected '=' sign in the optional Parameters");
+			}
+			
+			String key = prop.substring(0, indexOfEq);
+			String value = prop.substring(indexOfEq + 1);
+			map.put(key, value);
+		}
+		return map;
+	}
+	
+	public static String mapToString(HashMap<String, String> map) {
+		String str = "";
+		for(String key : map.keySet().toArray(new String[] {})) {
+			str += key + "=" + map.get(key) + " ";
+		}
+		return str;
 	}
 	
 	/**
@@ -131,5 +169,21 @@ public class DefaultSipApplicationRouterInfo {
 	 */
 	public void setStateInfo(int stateInfo) {
 		this.order = stateInfo;
+	}
+	
+	/**
+	 * 
+	 * @return optional params as a string (command separated key=value pairs)
+	 */
+	public HashMap<String, String> getOptionalParameters() {
+		return optionalParameters;
+	}
+	
+	/**
+	 * 
+	 * @param optionalParameters
+	 */
+	public void setOptionalParameters(HashMap<String, String> optionalParameters) {
+		this.optionalParameters = optionalParameters;
 	}
 }
