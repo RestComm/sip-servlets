@@ -1229,6 +1229,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	
 	public void setConcurrencyControlModeByName(String concurrencyControlMode) {
 		this.concurrencyControlMode = ConcurrencyControlMode.valueOf(concurrencyControlMode);
+		if(logger.isInfoEnabled()) {
+			logger.info("Container wide Concurrency Control set to " + concurrencyControlMode.toString());
+		}
 	}	
 
 	/**
@@ -1285,11 +1288,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public void setCongestionControlPolicy(CongestionControlPolicy congestionControlPolicy) {
 		this.congestionControlPolicy = congestionControlPolicy;
+		if(logger.isInfoEnabled()) {
+			logger.info("Congestion Control policy set to " + congestionControlPolicy.toString());
+		}
 	}
 
 	
 	public void setCongestionControlPolicyByName(String congestionControlPolicy) {
 		this.congestionControlPolicy = CongestionControlPolicy.valueOf(congestionControlPolicy);
+		if(logger.isInfoEnabled()) {
+			logger.info("Congestion Control policy set to " + congestionControlPolicy.toString());
+		}
 	}	
 
 	/**
@@ -1304,6 +1313,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public void setMemoryThreshold(int memoryThreshold) {
 		this.memoryThreshold = memoryThreshold;
+		if(logger.isInfoEnabled()) {
+			logger.info("Memory threshold set to " + memoryThreshold +"%");
+		}
 	}
 
 	/**
@@ -1332,6 +1344,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public void setBypassRequestExecutor(boolean bypassRequestExecutor) {
 		this.bypassRequestExecutor = bypassRequestExecutor;
+		if(logger.isInfoEnabled()) {
+			logger.info("Bypass Request Executor enabled ?" + bypassRequestExecutor);
+		}
 	}
 
 	/**
@@ -1346,6 +1361,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public void setBypassResponseExecutor(boolean bypassResponseExecutor) {
 		this.bypassResponseExecutor = bypassResponseExecutor;
+		if(logger.isInfoEnabled()) {
+			logger.info("Bypass Response Executor enabled ?" + bypassRequestExecutor);
+		}
 	}
 
 	/**
@@ -1360,6 +1378,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public void setBaseTimerInterval(int baseTimerInterval) {
 		this.baseTimerInterval = baseTimerInterval;
+		if(logger.isInfoEnabled()) {
+			logger.info("Base Timer Interval set to " + baseTimerInterval +"ms");
+		}
 	}
 
 	/**
