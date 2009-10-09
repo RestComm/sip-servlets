@@ -2310,29 +2310,29 @@ ipAddress="127.0.0.1"
 				</listitem>
 			</varlistentry>
 			<varlistentry>
-		        <term>staticServerAddress</term>
-		        <listitem>
-		        	<para>
-		          		Specifies what address to put in Contact/Via headers of requests created by the server. It is useful in cluster configurations where you don't want requests to be bound to a specific node address and you want to requests to be bound to the load-balancer address.
-		          	</para>
-		        </listitem>
-		    </varlistentry>
-		    <varlistentry>
-		    	<term>staticServerPort</term>
-		        <listitem>
-		        	<para>
-		        		Specifies the port of the load-balancer specified in staticServerAddress . It is useful in cluster configurations where you don't want requests to be bound to a specific node address and you want to requests to be bound to the load-balancer address.
-		        	</para>
-		        </listitem>
-		    </varlistentry>
-		    <varlistentry>
-		        <term>useStaticAddress</term>
-		        <listitem>
-		        	<para>
-		        		Specifies whether the settings in staticServerAddress and staticServerPort should are active. It is useful in cluster configurations where you don't want requests to be bound to a specific node address and you want to requests to be bound to the load-balancer address.
-		        	</para>
-		        </listitem>
-		    </varlistentry> 
+				<term>useStaticAddress</term>
+				<listitem>
+					<para>
+						Specifies whether the settings in staticServerAddress and staticServerPort are activated. The default value is "false" (deactivated).
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>staticServerAddress</term>
+				<listitem>
+					<para>
+						Specifies what load-balancer server address is insterted in Contact/Via headers for server-created requests. This parameter is useful for cluster configurations where requests should be bound to a load-balancer address, rather than a specific node address.
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>staticServerPort</term>
+				<listitem>
+					<para>
+						Specifies the port of the load-balancer specified in staticServerAddress . This parameter is useful in cluster configurations where requests should be bound to a load-balancer address rather than a specific node address.
+					</para>
+				</listitem>
+			</varlistentry>
 		</variablelist>
 		<note>
 			<para>
@@ -2393,13 +2393,16 @@ ipAddress="127.0.0.1"
 				</listitem>
 			</varlistentry>
 			<varlistentry>
-        		<term>additionalParameterableHeaders</term>
-        		<listitem>
-          			<para>
-          				A comma-separated list of header names that are treated as Parameterable by the container in addition to the standard headers that are already Parameterable according to the Sip Servlets 1.1 Specification. For these headers setting and getting parameters is allowed, others will result in ServletParseExcpetion.
-          			</para>
-        		</listitem>
-      		</varlistentry>
+				<term>additionalParameterableHeaders</term>
+				<listitem>
+					<para>
+						Comma-separated list of header names that are treated as Parameterable by the container. The specified parameters are classed as valid, in addition to the standard Parameterable headers defined in the Sip Servlets 1.1 Specification.
+					</para>
+					<para>
+						Setting and getting parameters is allowed for the standard, and additional parameters. Parameters that are not specified in <literal>additionalParameterableHeaders</literal> will result in a ServletParseException error.
+					</para>
+				</listitem>
+			</varlistentry>
 		</variablelist>
 	</section>
 	
@@ -5673,36 +5676,81 @@ useStaticAddress="true"/&gt;
 	<section id="sscacc-MSS_Concurrency_and_Congestion_Control" lang="en-US">
 	<!--  chapter id nickname: sscacc  --><title>Concurrency and Congestion Control</title>
 	<para>
-		Concurrency and Congestion control refer to settings you can tune that define the way in which messages are processed under heavy load. Needless to say, such configurable settings become highly-important in production environments. Tuning the concurrency control mode changes the way in which the SIP Servlets Server processes messages. Tuning the congestion control parameter means increasing or decreasing the point at which the server begins rejecting new requests. Both of these parameters can be set in one of four different ways: through the SIP Servlets Management Console; by editing the server's <filename>server.xml</filename> configuration file; from the <literal>dispatcher</literal> MBean; or from the Embedded Jopr integrated management platform.
+		Concurrency and Congestion control refer to settings that define the way in which messages are processed under heavy load. The way Mobicents SIP Servlets Server processes messages in a production environment is crucial to ensure quality of service for customers.
+	</para>
+	<para>
+		Concurrency control mode tuning affects the way in which the SIP Servlets Server processes messages, whereas Congestion Control tuning affects the point at which the server begins rejecting new requests. Both of these parameters can be set using the following methods:
+	</para>
+	<para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					through the SIP Servlets Management Console.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					editing the server's <filename>server.xml</filename> configuration file.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					from the <literal>dispatcher</literal> MBean.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					from the Embedded Jopr integrated management platform.
+				</para>
+			</listitem>
+		</itemizedlist>
 	</para>
 	<formalpara>
 		<title>Concurrency Control</title>
 		<para>
-			Although the JSR 289 expert group could not agree on a concurrency control mechanism for JSR 289, leaving the details up to individual implementors, we believe that concurrency control as implemented in the Mobicents SIP Servlets Servers provides a highly-useful feature necessary in production environments. Concurrency control is implemented in both Mobicents SIP Servlets for JBoss and Mobicents SIP Servlets for Tomcat as a configurable mode which defines the way in which the SIP Servlets Server processes messages. There are a total of three different modes to choose from, based upon the individual requirements of your setup:
+			The JSR 289 expert group does not specify how concurrency control should be implemented.
 		</para>
 	</formalpara>
+	<para>
+		Mobicents SIP Servlets for JBoss and Mobicents SIP Servlets for Tomcat have concurrency control implemented as a configurable mode, which defines the way in which the SIP Servlets Server processes messages. The following modes are provided, and cater for the particular setup required in an implementation:
+	</para>
 	<variablelist>
 		<varlistentry>
 			<term>None</term>
 			<listitem>
 				<para>
-					All SIP messages are processed as soon as possible in a thread from the global thread pool. Note that when using the <literal>None</literal> concurrency control mode, two messages belonging to the same <literal>SipSession</literal> can be processed simultaneously, so you must take measures to ensure that access to a shared resource such as the session attribute is synchronized in a thread-safe manner.
+					All SIP messages are processed as soon as possible in a thread from the global thread pool.
+				</para>
+				<para>
+					When two messages belong to the same <literal>SipSession</literal>, they can be concurrently processed. Ensure that SIP Messages that access shared resources (such as the session attribute) concurrently are synchronized in a thread-safe manner.
 				</para>
 			</listitem>
 		</varlistentry>
 		<varlistentry>
-      		<term>Transaction</term>
-      		<listitem>
-        		<para>
-        			Since Mobicents Sip Servlets uses a ThreadPoolExecutor backed by a LinkedBlockingQueue to dispatch the requests/responses, a race condition can occur where two different threads handle two responses (180 Ringing and 200 OK) at the same time, one taking over the other.(200 OK dispatched to the application before the ringing). This mode rely on the underlying jain sip stack serializing per transaction and bypassing completely the Executors to ensure such race conditions dont occur
-        		</para>        
-      		</listitem>
-    	</varlistentry>
+			<term>Transaction</term>
+			<listitem>
+				<para>
+					Bypass the SIP Servlets request/response dispatcher, and utilize the JAIN SLEE serializers to manage thread race conditions.
+				</para>
+				<para>
+					By default, the SIP Servlets server uses a ThreadPoolExecutor linked to a LinkedBlockingQueue to dispatch the request/response threads. If one thread handles a single request (for example a 180 Ringing) and another thread handles the response (for example a 200 OK) concurrently, a race condition can occur where the response overtakes the request(200 OK dispatched to the application before the 180 Ringing).
+				</para>
+			</listitem>
+		</varlistentry>
 		<varlistentry>
 			<term>SipSession</term>
 			<listitem>
 				<para>
-					SIP messages are processed as soon as possible except that two messages from the same <literal>SipSession</literal> are guaranteed never to be processed simultaneously. Messages from the same <literal>SipSession</literal> are processed sequentially in their order-of-arrival. However, two (or more) messages from different <literal>SipSession</literal>s in the same <literal>SipApplicationSession</literal> may be processed simultaneously, in which case you should take measures to ensure shared resource synchronization. You should also pay special attention to Back-to-Back User Agent (B2BUA) cases in which each leg of the B2BUA consists of a different <literal>SipSession</literal> in the same <literal>SipApplicationSession</literal>.
+					SIP messages are processed as soon as possible except for messages originating from the same <literal>SipSession</literal>. These messages are excluded from any simultaneous processing.
+				</para>
+				<para>
+					Messages from the same <literal>SipSession</literal> are processed sequentially, in the order they originally arrived.
+				</para>
+				<para>
+					Two (or more) messages from different <literal>SipSession</literal> instances in the same <literal>SipApplicationSession</literal> may be processed simultaneously. For this reason, ensure that SIP Messages which access shared resources (such as the session attribute) concurrently are synchronized in a thread-safe manner.
+				</para>
+				<para>
+					Thread-safety is particularly important in Back-to-Back User Agent (B2BUA) cases, where each communication leg of the B2BUA consists of a different <literal>SipSession</literal> in the same <literal>SipApplicationSession</literal>.
 				</para>
 			</listitem>
 		</varlistentry>
@@ -5710,7 +5758,10 @@ useStaticAddress="true"/&gt;
 			<term>SipApplicationSession</term>
 			<listitem>
 				<para>
-					SIP messages are processed as soon as possible with the guarantee that no two messages from the same <literal>SipSession</literal> <emphasis>or</emphasis> from the same <literal>SipApplicationSession</literal> will ever be processed simultaneously: they are instead processed sequentially in their order-of-arrival. This mode is the most thread-safe. However, you must still be careful if you are accessing shared resources in an unmanaged way, such as by accessing a <literal>SipSession</literal> attribute from an unmanaged thread, or from an Enterprise JavaBean. If you do so, be aware that such access will not be synchronized.
+					SIP messages are processed as soon as possible, with the guarantee that no two messages from the same <literal>SipSession</literal> <emphasis>or</emphasis> from the same <literal>SipApplicationSession</literal> will ever be processed simultaneously. Of all the available methods, this mode is the best choice for guaranteed thread-safety.
+				</para>
+				<para>
+					If applications access shared resources in an unmanaged way (for example, by accessing a <literal>SipSession</literal> attribute from an unmanaged thread, or from an Enterprise JavaBean) access will not be synchronized.
 				</para>
 			</listitem>
 		</varlistentry>
@@ -5718,29 +5769,55 @@ useStaticAddress="true"/&gt;
 	<formalpara>
 		<title>Congestion Control</title>
 		<para>
-			Mobicents Sip Servlets currently defines two different congestion control mechanisms :
+			Mobicents Sip Servlets currently provides the following congestion control mechanisms :
 		</para>
 	</formalpara>
 	<itemizedlist>
 		<listitem>
 			<para>
-				All SIP messages which cannot be processed immediately are put into a queue, and therein wait for either a free thread or for the lock on their session to be released. The exact size of this SIP message queue is a tunable parameter, and it currently defaults to <literal>1500</literal>. If the SIP Message queue becomes full, the container immediately begins rejecting any new SIP requests with either SIP error code 503 until the server catches up or drop any incoming messages depending of the congestion control policy chosen until the queue is once again diminished.
+				All SIP messages which cannot be processed immediately are put into a queue, and wait for either a free thread or for the lock on their session to be released. The size of the SIP message queue is a tunable parameter, which defaults to <literal>1500</literal>.
 			</para>
 		</listitem>
 		<listitem>
 			<para>
-				If the percentage of memory currently used by the container goes over a configurable threshold (90% per default), the container will start rejecting any new SIP requests with either SIP error code 503 until the server catches up or drop any incoming messages depending of the congestion control policy chosen until the percentage of memory used by the container goes back below the threshold.
+				If the SIP Message queue becomes full, the container immediately begins rejecting new SIP requests until the queue clears. This is achieved by using one of the following methods:
 			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						Sending a <literal>503</literal> SIP error code to the originating application.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Dropping incoming messages (according to the specified congestion control policy).
+					</para>
+				</listitem>
+			</itemizedlist>
+		</listitem>
+		<listitem>
+			<para>
+				If the container exceeds the configurable memory threshold (90% by default), new SIP requests are rejected until the memory usage falls below the specified memory threshold. This is achieved by using one of the following methods:
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						Sending a <literal>503</literal> SIP error code to the originating application.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						Dropping incoming messages (according to the specified congestion control policy) .
+					</para>
+				</listitem>
+			</itemizedlist>
 		</listitem>
 	</itemizedlist>
 	<para>
-		Note that either situation, only new SIP requests are rejected; SIP responses which arrive in the milieu of a full queue are appropriately stored and are processed eventually.
+		A background task gathers information about the current server congestion. The data collection interval can be adjusted, and congestion control deactivated, by setting the interval to 0 or a negative value.
 	</para>
 	<para>
-		A background task is running at regular intervals within Mobicents SIP Servlets to gather information about the current server congestion and the interval can be adjusted in the configuration. This background task can be stopped and congestion control deactivated by setting the interval to 0 or a negative value.
-	</para>
-	<para>
-		Also the congestion control policy, what to do with an incoming message when the server is overloaded, is configurable and the possible values are :
+		The congestion control policy defines how an incoming message is handled when the server is overloaded. The following parameters are configurable:
 	</para>
 	<itemizedlist>
 		<listitem>
@@ -5757,26 +5834,57 @@ useStaticAddress="true"/&gt;
 	<formalpara id="sscacc-Configuring_the_Concurrency_and_Congestion_Control_Settings">
 		<title>Configuring the Concurrency and Congestion Control Settings</title>
 		<para>
-			The concurrency and congestion control settings can be configured through the SIP Servlets Management Console, by editing the server's <filename>server.xml</filename> configuration file, from the <literal>dispatcher</literal> MBean, or from the Embedded Jopr integrated management platform. Instructions for each method are given below.
+			The concurrency and congestion control settings can be configured through the SIP Servlets Management Console, using the following methods:
 		</para>
 	</formalpara>
+	<para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					through the SIP Servlets Management Console.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					editing the server's <filename>server.xml</filename> configuration file.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					from the <literal>dispatcher</literal> MBean.
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					from the Embedded Jopr integrated management platform.
+				</para>
+			</listitem>
+		</itemizedlist>
+	</para>
 	<variablelist>
 		<varlistentry>
 			<term>Tuning Parameters with the SIP Servlets Management Console</term>
 			<listitem>
 				<para>
-					The easiest way to configure the <guilabel>SIP Message Queue Size</guilabel> and <guilabel>Concurrency Control Mode</guilabel> tunable parameters is to open the <literal>SIP Servlets Management Console</literal> in your browser (by going to <ulink url="http://localhost:8080/sip-servlets-management"/>), making your changes, and then <guibutton>Apply</guibutton>ing them. Note that configuring the settings in the SIP Servlets Management Console does not persist across reboots. To make your settings changes permanent, you should edit your server's <filename>server.xml</filename> configuration file; instructions for doing so follow.
+					The easiest way to configure the <guilabel>SIP Message Queue Size</guilabel> and <guilabel>Concurrency Control Mode</guilabel> tunable parameters is to open the <literal>SIP Servlets Management Console</literal> in your browser (by going to <ulink url="http://localhost:8080/sip-servlets-management"/>), making your changes, and then <guibutton>Apply</guibutton>ing them.
 				</para>
-				<mediaobject id="sscacc-sas-MSSSManagementConsole-ss-ServerSettings-1">
-					<imageobject>
-						<imagedata align="center" fileref="images/mss-MSSSManagementConsole-ss-ServerSettings.png" format="PNG" scalefit="1" width="440"/>
-					</imageobject>
-					<caption>
+				<figure>
+					<title>SIP Servlets Management Console Concurrency and Congestion Control Tuning Parameters</title>
+					<mediaobject id="sscacc-sas-MSSSManagementConsole-ss-ServerSettings-1">
+						<imageobject>
+							<imagedata align="center" fileref="images/mss-MSSSManagementConsole-ss-ServerSettings.png" format="PNG" scalefit="1" width="440"/>
+						</imageobject>
+					</mediaobject>
+				</figure>
+				<important>
+					<title>Persistent Settings</title>
 					<para>
-						Tuning the concurrency and congestion control settings in the SIP Servlets Management Console
+						Concurrency and congestion control settings altered through the SIP Servlets Management console are not saved to the <filename>server.xml</filename> configuration file.
 					</para>
-					</caption>
-				</mediaobject>
+					<para>
+						To make settings persistent, append the settings to the <filename>server.xml</filename> file directly.
+					</para>
+				</important>
 			</listitem>
 		</varlistentry>
 		<varlistentry>
@@ -5788,22 +5896,18 @@ useStaticAddress="true"/&gt;
 				<procedure>
 					<title>Tuning Mobicents SIP Servlets for JBoss Server Settings for Concurrency and Congestion Control</title>
 					<step>
+						<title>Open server.xml File</title>
 						<para>
 							Open the <filename><envar>$JBOSS_HOME</envar>/server/default/deploy/jboss-web.deployer/server.xml</filename> configuration file in a text editor.
 						</para>
 					</step>
 					<step>
+						<title>Add Parameters to &lt;service&gt; Element</title>
 						<para>
-							Find the <literal>Service</literal> element and add a <literal>concurrencyControlMode</literal> and/or a <literal>sipMessageQueueSize</literal> attribute to it.
-						</para>
-						<para>
-							The default value of the <literal>sipMessageQueueSize</literal> attribute is <replaceable>1500</replaceable>, of the congestion control checking interval is <emphasis>30000 millisecs (3O seconds)</emphasis>, of the default memory threshold is <emphasis>90%</emphasis> and the congestion control policy is <emphasis>ErrorResponse</emphasis>. Those are the default values which are used even if the attribute is not present in <filename>server.xml</filename>. You will need to play around with this setting for the optimal value, which depends on the hardware running your SIP Servlets Server.
-						</para>
-						<para>
-							Possible values for the <literal>concurrencyControlMode</literal> attribute include: <replaceable>None</replaceable>, <replaceable>SipSession</replaceable> or <replaceable>SipApplicationSession</replaceable>. <replaceable>SipSession</replaceable> is the value of this attribute when it is not present—and overridden—in <filename>server.xml</filename>.
+							Locate the <markup>&lt;service&gt;</markup> element, and add the <literal>concurrencyControlMode</literal> and/or <literal>sipMessageQueueSize</literal> attributes.
 						</para>
 						<example id="sscacc-MSSJ-Permanently_Changing_Tunable_Parameters_by_Editing_server.xml">
-							<title>Permanently Changing Tunable Parameters by Editing JBoss's server.xml</title>
+							<title>server.xml Concurrency and Congestion Control Attributes</title>
 							
 <programlisting role="XML">&lt;Service
  name="jboss.web"
@@ -5817,41 +5921,90 @@ useStaticAddress="true"/&gt;
  memoryThreshold="80"&gt;
 </programlisting>
 						</example>
+						<para>
+							Possible values for the <literal>concurrencyControlMode</literal> attribute include: <replaceable>None</replaceable>, <replaceable>SipSession</replaceable> or <replaceable>SipApplicationSession</replaceable>. <replaceable>SipSession</replaceable> is the value of this attribute when it is not present—and overridden—in <filename>server.xml</filename>.
+						</para>
+					</step>
+					<step>
+						<title>Define the Correct Attribute Values</title>
+						<para>
+							The following default values for the concurrency and congestion control parameters are used regardless of whether the attributes are defined in the <filename>server.xml</filename> file:
+						</para>
+						<itemizedlist>
+							<listitem>
+								<para>
+									sipMessageQueueSize = "1500"
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									congestionControlCheckingInterval="30000" (30 seconds, in milliseconds)
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									memoryThreshold="90" (in percentage)
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									congestionControlPolicy="ErrorResponse"
+								</para>
+							</listitem>
+						</itemizedlist>
+						<para>
+							Experimentation is required for these tuning parameters depending on the operating system and server.
+						</para>
 					</step>
 				</procedure>
 				
 				<procedure>
 					<title>Tuning Mobicents SIP Servlets for Tomcat Server Settings for Concurrency and Congestion Control</title>
 					<step>
+						<title>Open server.xml File</title>
 						<para>
 							Open the <filename><envar>$CATALINA_HOME</envar>/conf/server.xml</filename> configuration file in your text editor.
 						</para>
 					</step>
 					<step>
+						<title>Add Parameters to &lt;service&gt; Element</title>
 						<para>
-							Find the <literal>Service</literal> element and add a <literal>concurrencyControlMode</literal> and/or a <literal>sipMessageQueueSize</literal> attribute to it.
+							Locate the <markup>&lt;service&gt;</markup> element, and add the <literal>concurrencyControlMode</literal> and/or <literal>sipMessageQueueSize</literal> attributes.
 						</para>
 						<para>
-							The default value of the <literal>sipMessageQueueSize</literal> attribute is <replaceable>1500</replaceable>, of the congestion control checking interval is <emphasis>30000 millisecs (3O seconds)</emphasis>, of the default memory threshold is <emphasis>90%</emphasis> and the congestion control policy is <emphasis>ErrorResponse</emphasis>. Those are the default values which are used even if the attribute is not present in <filename>server.xml</filename>. You will need to play around with this setting for the optimal value, which depends on the hardware running your SIP Servlets Server.
+							Possible values for the <literal>concurrencyControlMode</literal> attribute include: <replaceable>None</replaceable>, <replaceable>SipSession</replaceable> or <replaceable>SipApplicationSession</replaceable>. <replaceable>SipSession</replaceable> is the value of this attribute when it is not present—and overridden—in <filename>server.xml</filename>.
 						</para>
+					</step>
+					<step>
+						<title>Define the Correct Attribute Values</title>
 						<para>
-							Possible values for the <literal>concurrencyControlMode</literal> attribute include: <replaceable>None</replaceable>, <replaceable>SipSession</replaceable> or <replaceable>SipApplicationSession</replaceable>. <replaceable>SipSession</replaceable> is the value of this attribute if when it is not present and overridden in <filename>server.xml</filename>.
+							The following default values for the concurrency and congestion control parameters are used regardless of whether the attributes are defined in the <filename>server.xml</filename> file:
 						</para>
-						<example id="sscacc-MSST-Permanently_Changing_Tunable_Parameters_by_Editing_server.xml">
-							<title>Permanently Changing Tunable Parameters by Editing Tomcat's server.xml</title>
-							
-<programlisting linenumbering="unnumbered" role="XML">&lt;Service
- name="jboss.web"
- className="org.mobicents.servlet.sip.startup.SipStandardService"
- sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
- darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
- concurrencyControlMode="SipApplicationSession"
- sipMessageQueueSize="1600"
- congestionControlCheckingInterval="2000"
- congestionControlPolicy="DropMessage"
- memoryThreshold="80"&gt;
-</programlisting>
-						</example>
+						<itemizedlist>
+							<listitem>
+								<para>
+									sipMessageQueueSize = "1500"
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									congestionControlCheckingInterval="30000" (30 seconds, in milliseconds)
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									memoryThreshold="90" (in percentage)
+								</para>
+							</listitem>
+							<listitem>
+								<para>
+									congestionControlPolicy="ErrorResponse"
+								</para>
+							</listitem>
+						</itemizedlist>
+						<para>
+							Experimentation is required for these tuning parameters depending on the operating system and server.
+						</para>
 					</step>
 				</procedure>
 
@@ -5861,7 +6014,10 @@ useStaticAddress="true"/&gt;
 			<term>Tuning Parameters from the dispatcher MBean</term>
 			<listitem>
 				<para>
-					You can navigate to the <literal>dispatcher</literal> MBean from Mobicents SIP Servlets for JBoss's JMX console. All changes performed at run time are effective immediately, but are not persisted across reboots (which, if you want to happen, would require editing your server's <filename>server.xml</filename> configuration file as well, or instead).
+					Navigate to the <literal>dispatcher</literal> MBean from Mobicents SIP Servlets for JBoss's JMX console.
+				</para>
+				<para>
+					All changes performed at run time are effective immediately, but do not persist across reboots. As with JBoss and Tomcat, the <filename>server.xml</filename> must be appended with the settings in order to make the configuration persistent.
 				</para>
 				<para>
 					When editing the <literal>dispatcher</literal> MBean from Mobicents SIP Servlets for JBoss's JMX console, values allowed for the concurrency control mode are <userinput>None</userinput>, <userinput>SipSession</userinput> or <userinput>SipApplicationSession</userinput>.
@@ -5872,7 +6028,7 @@ useStaticAddress="true"/&gt;
 			<term>Tuning Parameters from Enterprise Monitoring and Managent Console</term>
 			<listitem>
 				<para>
-					Finally, once you have installed the Enterprise Monitoring and Managenemt console as described in <xref linkend="emom-Enterprise-Monitoring-Operations-Management"/>, you can change the tunable parameters, follow instructions given in <xref linkend="emom-Embedded-Jopr"/> or <xref linkend="emom-Jopr4Production"/>
+					If the Enterprise Monitoring and Managenemt console is installed as described in <xref linkend="emom-Enterprise-Monitoring-Operations-Management"/>, the tunable parameters can be altered by following the instructions in <xref linkend="emom-Embedded-Jopr"/> or <xref linkend="emom-Jopr4Production"/>
 				</para>
 			</listitem>
 		</varlistentry>
@@ -5928,7 +6084,7 @@ useStaticAddress="true"/&gt;
 			</orderedlist>
 		</step>
 		<step>
-			<title>Update SIP Server user properties file</title>
+			<title>Update SIP Server User Properties File</title>
 			<orderedlist>
 				<listitem>
 					<para>
@@ -5970,7 +6126,7 @@ useStaticAddress="true"/&gt;
 			</orderedlist>
 		</step>
 		<step>
-			<title>Update SIP Server roles file</title>
+			<title>Update SIP Server Roles File</title>
 			<orderedlist>
 				<listitem>
 					<para>
@@ -5995,7 +6151,7 @@ admin=caller,role1,role2,..
 			</orderedlist>
 		</step>
 		<step>
-			<title>Add the security domain to the SIP application</title>
+			<title>Add the Security Domain to the SIP Application</title>
 			<orderedlist>
 				<listitem>
 					<para>
@@ -6004,7 +6160,7 @@ admin=caller,role1,role2,..
 				</listitem>
 				<listitem>
 					<para>
-						Add &lt;security-domain&gt; to the &lt;jboss-web&gt; element:
+						Add the <markup>&lt;security-domain&gt;</markup> element as a child of the <markup>&lt;jboss-web&gt;</markup> element:
 					</para>
 					
 <programlisting role="XML">
@@ -6018,7 +6174,7 @@ admin=caller,role1,role2,..
 			</orderedlist>
 		</step>
 		<step>
-			<title>Add security constraints to the SIP application</title>
+			<title>Add Security Constraints to the SIP Application</title>
 			<orderedlist>
 				<listitem>
 					<para>
@@ -6027,7 +6183,7 @@ admin=caller,role1,role2,..
 				</listitem>
 				<listitem>
 					<para>
-						Add &lt;security-domain&gt; to the &lt;jboss-web&gt; element:
+						Add the <markup>&lt;security-domain&gt;</markup> element as a child of the <markup>&lt;jboss-web&gt;</markup> element:
 					</para>
 					
 <programlisting role="XML">
@@ -6060,7 +6216,7 @@ admin=caller,role1,role2,..
 			<orderedlist>
 				<listitem>
 					<para>
-						Open a terminal and navigate to the /conf directory:
+						Open a terminal and navigate to the <filename>/conf</filename> directory:
 					</para>
 					
 <programlisting>home]$ cd server/default/&lt;tomcat_home&gt;/conf/
@@ -6077,11 +6233,11 @@ admin=caller,role1,role2,..
 			</orderedlist>
 		</step>
 		<step>
-			<title>Update SIP Server user properties file</title>
+			<title>Update SIP Server User Properties File</title>
 			<orderedlist>
 				<listitem>
 					<para>
-						In the /conf directory, open <literal>tomcat-users.xml</literal> (using your preferred editor) and append the following &lt;user&gt; sub-element:
+						In the <filename>/conf</filename> directory, open <literal>tomcat-users.xml</literal> (using your preferred editor) and append the following <markup>&lt;user&gt;</markup> child element:
 					</para>
 					
 <programlisting role="XML">&lt;user name="user" password="password" roles="caller"/&gt;
@@ -6090,7 +6246,7 @@ admin=caller,role1,role2,..
 			</orderedlist>
 		</step>
 		<step>
-			<title>Add security constraints to the SIP application</title>
+			<title>Add Security Constraints to the SIP Application</title>
 			<orderedlist>
 				<listitem>
 					<para>
@@ -6099,7 +6255,7 @@ admin=caller,role1,role2,..
 				</listitem>
 				<listitem>
 					<para>
-						Add &lt;security-domain&gt; to the &lt;jboss-web&gt; element:
+						Add the <markup>&lt;security-domain&gt;</markup> child element to the <markup>&lt;jboss-web&gt;</markup> element:
 					</para>
 					
 <programlisting role="XML">
@@ -6135,7 +6291,7 @@ admin=caller,role1,role2,..
 		STUN support is provided at the SIP connector level, using the <ulink url="https://stun4j.dev.java.net/">STUN for Java</ulink> project. The STUN for Java project provides a Java implementation of the STUN Protocol (RFC 3489), which allows each SIP connector to select whether it should use STUN to discover a public IP address, and use this address in the SIP messages sent through the connector.
 	</para>
 	<para>
-		To make a SIP connector STUN-enabled, three attributes must be appended to the &lt;connector&gt; tag in the <filename>server.xml</filename> file. The properties are: 
+		To make a SIP connector STUN-enabled, three attributes must be appended to the <markup>&lt;connector&gt;</markup> child element in the <filename>server.xml</filename> file. The properties are: 
 		<itemizedlist>
 			<listitem>
 				<para>
@@ -6150,7 +6306,7 @@ admin=caller,role1,role2,..
 					stunServerAddress="&lt;Public_STUN_Server&gt;"
 				</para>
 				<para>
-					STUN server address used to discover the public IP address of this SIP Connector. See the table below for a suggested list of public STUN servers.
+					STUN server address used to discover the public IP address of this SIP Connector. See <xref linkend="tab-pss-Public_STUN_Servers"/>for a suggested list of public STUN servers.
 				</para>
 			</listitem>
 			<listitem>
@@ -6169,7 +6325,7 @@ admin=caller,role1,role2,..
 		</para>
 	</note>
 	<para>
-		A number of public STUN servers are available, and can be specified in the stunServerAddress. Depending on the router firmware used, the STUN reply packets' MAPPED_ADDRESS may be changed to the router's WAN port. To alleviate this problem, certain public STUN servers provide XOR_MAPPED_ADDRESS support. <xref linkend="tab-pss-Public_STUN_Servers"/> provides a selection of public STUN servers.
+		A number of public STUN servers are available, and can be specified in the <literal>stunServerAddress</literal>. Depending on the router firmware used, the STUN reply packets' MAPPED_ADDRESS may be changed to the router's WAN port. To alleviate this problem, certain public STUN servers provide XOR_MAPPED_ADDRESS support. <xref linkend="tab-pss-Public_STUN_Servers"/> provides a selection of public STUN servers.
 	</para>
 	<table frame="all" id="tab-pss-Public_STUN_Servers">
 		<title>Public STUN Servers</title>
@@ -6295,7 +6451,7 @@ admin=caller,role1,role2,..
 	</table>
 	<note>
 		<para>
-			Please make sure to read our Best Practices regarding NAT Traversal as described in <xref linkend="bp-Best_Practices_NAT"/>
+			For more information about NAT traversal best practices, refer to <xref linkend="bp-Best_Practices_NAT"/>
 		</para>
 	</note>
 </section>
@@ -6757,7 +6913,7 @@ admin=caller,role1,role2,..
 	<section id="jruby-telco-integration" lang="en-US">
 	<title>JRuby/Rails Integration with Torquebox Telco Framework</title>
 	<para>
-		Mobicents SIP Servlets is compatible with the <ulink url="http://torquebox.org/">Torquebox</ulink> Telco Framework. The framework allows you to create powerful, pure or converged VoIP JRuby on Rails applications using the same model as Sip Servlets and allowing for Media Control.
+		Mobicents Sip Servlets is compatible with the <ulink url="http://torquebox.org/">Torquebox</ulink> Telco Framework JRuby on Rails integration. The framework allows you to create powerful, pure or converged VoIP JRuby on Rails applications.
 	</para>
 	<para>
 		JRuby features a powerful and well deployed scripting language that allows you to modify your application at runtime (this is true even for the SIP and Media part that Mobicents SIP Servlets offer) without restarting the server. In addition, TorqueBox is a new kind of Ruby application platform that integrates popular technologies such as Ruby-on-Rails, while extending the footprint of Ruby applications to include support for Job Scheduling, Task Queues, SOAP Handling, and other capabilities.

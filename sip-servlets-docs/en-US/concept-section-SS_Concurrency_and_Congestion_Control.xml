@@ -46,8 +46,9 @@
     <varlistentry>
       <term>Transaction</term>
       <listitem>
-        <para>Since Mobicents Sip Servlets uses a ThreadPoolExecutor backed by a LinkedBlockingQueue to dispatch the requests/responses, a race condition can occur where two different threads handle two responses (180 Ringing and 200 OK) at the same time, one taking over the other.(200 OK dispatched to the application before the ringing).
-        This mode rely on the underlying jain sip stack serializing per transaction and bypassing completely the Executors to ensure such race conditions dont occur</para>        
+        <para>Bypass the SIP Servlets request/response dispatcher, and utilize the JAIN SLEE serializers to manage thread race conditions.</para>
+        <para>By default, the SIP Servlets server  uses a ThreadPoolExecutor linked to a  LinkedBlockingQueue to dispatch the request/response threads.    If one thread handles a single request (for example a 180 Ringing) and another thread handles the  response (for example a 200 OK) concurrently,  a race condition can occur where the response overtakes the request(200 OK dispatched to the application before the 180 Ringing).
+        </para>
       </listitem>
     </varlistentry>
     <varlistentry>

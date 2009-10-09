@@ -110,23 +110,23 @@ ipAddress="127.0.0.1"
         </listitem>
       </varlistentry>
       <varlistentry>
-        <term>staticServerAddress</term>
-        <listitem>
-          <para>Specifies what address to put in Contact/Via headers of requests created by the server. It is useful in cluster configurations where you don't want requests to be bound to a specific node address and you want to requests to be bound to the load-balancer address.</para>
-        </listitem>
-      </varlistentry>
-       <varlistentry>
-        <term>staticServerPort</term>
-        <listitem>
-          <para>Specifies the port of the load-balancer specified in staticServerAddress . It is useful in cluster configurations where you don't want requests to be bound to a specific node address and you want to requests to be bound to the load-balancer address.</para>
-        </listitem>
-      </varlistentry>
-       <varlistentry>
         <term>useStaticAddress</term>
         <listitem>
-          <para>Specifies whether the settings in staticServerAddress and staticServerPort should are active. It is useful in cluster configurations where you don't want requests to be bound to a specific node address and you want to requests to be bound to the load-balancer address.</para>
+          <para>Specifies  whether the settings in staticServerAddress and staticServerPort are activated.  The default value is &quot;false&quot; (deactivated).</para>
         </listitem>
-      </varlistentry>     
+      </varlistentry>
+      <varlistentry>
+        <term>staticServerAddress</term>
+        <listitem>
+          <para>Specifies what load-balancer server address is insterted in Contact/Via headers for server-created requests. This parameter  is useful for  cluster configurations where  requests should  be bound to a load-balancer address, rather than  a specific node address.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>staticServerPort</term>
+        <listitem>
+          <para>Specifies the port of the load-balancer specified in staticServerAddress . This parameter is useful in cluster configurations where requests should be bound to a load-balancer address rather than a specific node address.</para>
+        </listitem>
+      </varlistentry>
     </variablelist>
     <note>
       <para>A comprehensive list of implementing classes for the SIP Stack is available from the <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html">Interface Sip Stack page on nist.gov</ulink>.  For a comprehensive list of properties associated with the SIP Stack implementation, refer to <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html">Class SipStackImpl page on nist.gov</ulink>.</para>
@@ -172,9 +172,10 @@ ipAddress="127.0.0.1"
       <varlistentry>
         <term>additionalParameterableHeaders</term>
         <listitem>
-          <para>A comma-separated list of header names that are treated as Parameterable by the container in addition to the standard headers that are already Parameterable according to the Sip Servlets 1.1 Specification. For these headers setting and getting parameters is allowed, others will result in ServletParseExcpetion.</para>
+          <para>Comma-separated list of header names that are treated as Parameterable by the container.  The specified parameters are classed as valid, in addition to the standard Parameterable headers defined in the  Sip Servlets 1.1 Specification. </para>
+          <para>Setting and getting parameters is allowed for the standard, and additional parameters.  Parameters that are not specified in <literal>additionalParameterableHeaders</literal> will result in a ServletParseException error.</para>
         </listitem>
-      </varlistentry>       
+      </varlistentry>
     </variablelist>
   </section>
   <section id="bsssc-binary-SIP_Servlets_Server-Configuring_Logging">
