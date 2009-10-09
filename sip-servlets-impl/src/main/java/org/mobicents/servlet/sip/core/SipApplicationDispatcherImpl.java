@@ -1253,26 +1253,28 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public void setCongestionControlCheckingInterval(
 			long congestionControlCheckingInterval) {
-		this.congestionControlCheckingInterval = congestionControlCheckingInterval;
-		statusLock.lock();
-		try {
-			if(started) {
-				if(congestionControlTimerFuture != null) {
-					congestionControlTimerFuture.cancel(false);
+		if(congestionControlCheckingInterval != this.congestionControlCheckingInterval) {
+			this.congestionControlCheckingInterval = congestionControlCheckingInterval;
+			statusLock.lock();
+			try {
+				if(started) {
+					if(congestionControlTimerFuture != null) {
+						congestionControlTimerFuture.cancel(false);
+					}
+					if(congestionControlCheckingInterval > 0) {
+						congestionControlTimerFuture = congestionControlThreadPool.scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
+						if(logger.isInfoEnabled()) {
+					 		logger.info("Congestion control background task modified to check every " + congestionControlCheckingInterval + " milliseconds.");
+					 	}
+					} else {
+						if(logger.isInfoEnabled()) {
+					 		logger.info("No Congestion control background task started since the checking interval is equals to " + congestionControlCheckingInterval + " milliseconds.");
+					 	}
+					}
 				}
-				if(congestionControlCheckingInterval > 0) {
-					congestionControlTimerFuture = congestionControlThreadPool.scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
-					if(logger.isInfoEnabled()) {
-				 		logger.info("Congestion control background task modified to check every " + congestionControlCheckingInterval + " milliseconds.");
-				 	}
-				} else {
-					if(logger.isInfoEnabled()) {
-				 		logger.info("No Congestion control background task started since the checking interval is equals to " + congestionControlCheckingInterval + " milliseconds.");
-				 	}
-				}
+			} finally {
+				statusLock.unlock();
 			}
-		} finally {
-			statusLock.unlock();
 		}
 	}
 
