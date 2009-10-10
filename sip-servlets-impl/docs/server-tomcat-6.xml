@@ -44,7 +44,7 @@
   		className="org.mobicents.servlet.sip.startup.SipStandardService" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
   		concurrencyControlMode="None"
-  		darConfigurationFileLocation="file:///E:/workspaces/sip-servlets/sip-servlets-impl/docs/dar-click2dial.properties">
+  		darConfigurationFileLocation="conf/dars/mobicents-dar.properties">
   		<!--darConfigurationFileLocation="conf/dars/dar.properties"-->
   		<!--darConfigurationFileLocation="conf/dars/call-blocking-servlet-dar.properties"-->  		
   		<!--darConfigurationFileLocation="conf/dars/call-forwarding-b2bua-servlet-dar.properties"-->
