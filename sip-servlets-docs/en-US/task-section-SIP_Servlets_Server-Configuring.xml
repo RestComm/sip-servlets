@@ -180,9 +180,9 @@ ipAddress="127.0.0.1"
       <varlistentry>
         <term>baseTimerInterval</term>
         <listitem>
-          <para>Specifies the Base Timer Interval T1 from the <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">Table of Timer Values defined in RFC3261</ulink> and the 3GPP-IMS specifications : Section 7.7, Table 7.8 of <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">TS 24.229 Version 9.1.0</ulink></para>
-          <para>In the above mentionned tables, most of the timers depend on T1 except T2, T4 and Timer D (for the client transaction) are not dependent on it. In the Mobicents Sip Servlets underlying JAIN SIP stack those last 3 timers are conditionned on the <literal>baseTimerInterval</literal> as well</para>
-          <para>This parameter accepts an integer defining the interval in milliseconds whose the default value is 500, it allows to adjust the SIP timers depending on the conditions of the newtork where the Mobicents Sip Servlets container is deployed</para>
+          <para>Specifies the <literal>T1</literal> Base Timer Interval, which allows the SIP Servlets Container to adjust its timers depending on network conditions.  The default interval is 500 (milliseconds).</para>
+          <para>For more information about  available timers, refer to  <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
+          <para>Most of the timers present in the tables depend on <literal>T1</literal>,  except for <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal> (for the client transactions). The underlying SIP Servlets JAIN SLEE stack places further conditions on <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal> through  <literal>baseTimerInterval</literal>.</para>
         </listitem>
       </varlistentry>
     </variablelist>
