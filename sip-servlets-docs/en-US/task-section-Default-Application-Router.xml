@@ -110,75 +110,70 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
           <para>A string representing the order in which  applications must be
           invoked (starts at 0).  The string is removed later on in the routing process,  and substituted with the order positions of sip-router-info data.</para>
         </listitem>
-	<listitem>
-		<para>
-			An optional string that contains Mobicents-specific parameters. At
-			this time there is only one such parameter called
-			<literal>DIRECTION</literal>
-			.
-			The
-			<literal>DIRECTION</literal>
-			parameter specifies whether an applications serves
-			only external(INBOUND) requests or initiates (OUTBOUND) requests. If an
-			application is
-			marked
-			<literal>DIRECTION=INBOUND</literal>
-			it will not be
-			called for requests initiated by applications behaving as UAC. To mark an
-			application
-			as UAC you must specify
-			<literal>DIRECTION=INBOUND</literal>
-			in the optinal parameters in the DAR.
-			Applications that do not exists in the DAR list for the container are assumed to
-			be
-			<literal>OUTBOUND</literal>
-			, because they could not possibly have been called to serve an
-			external
-			request, thus they must have initiated the request by themselves. For
-			convenience you can
-			use the Sip Servlets Management Console to specify the
-			<literal>DIRECTION</literal>
-			parameter.
-		</para>
-		<para>The syntaxt is demostrated by the following example:</para>
-		<para>
-			<screen>
-INVITE: ("org.mobicents.servlet.sip.testsuite.Click2DialApplication", "DAR:From",
-"ORIGINATING", "", "NO_ROUTE", "0", "DIRECTION=OUTBOUND"), \
-("org.mobicents.servlet.sip.testsuite.LocationServiceApplication", "DAR\:From",
-"ORIGINATING", "", "NO_ROUTE", "0", "DIRECTION=INBOUND")</screen>
-		</para>
-		<para>
-			In this example two applications are declared for the
-			<literal>INVITE</literal>
-			request. The
-			<literal>LocationServiceApplication</literal>
-			will be called for requests coming from outside the container, but it
-			will not be
-			called for the requests initiated by the UAC application
-			<literal>Click2DialApplication</literal>
-			. Such configuration is usefulr in cases where you want different application to be responsible for requests initited by the container and those that arrived in the container externally.
-		</para>
-		<para>
-			In general, the optional field added to the configuration in DAR can
-			contain many
-			<literal>key=value</literal>
-			properties to allow extensions in the future. For example:
-			"DIRECTION=OUTBOUND ANOTHERPARAM=ANOTHERVALUE
-			YETANOTHERONE=YETANOTHERVALUE .. and so forth"
-		</para>
-	</listitem>
+        <listitem>
+          <para>An optional string that contains Mobicents-specific parameters. Currently, only the 
+   <literal>DIRECTION</literal>
+   parameter is supported.
+   The
+   <literal>DIRECTION</literal>
+   parameter specifies whether an application serves
+    external(INBOUND) requests or initiates (OUTBOUND) requests. </para>
+          <para>If an
+   application is
+   marked
+   <literal>DIRECTION=INBOUND</literal>,
+   it will not be
+   called for requests initiated by applications behaving as  UAC. To mark an
+   application
+   as UAC,  specify
+   <literal>DIRECTION=INBOUND</literal>
+   in the optinal parameters in the DAR.
+   </para>
+          <para>Applications that do not exist in the DAR list for the container are assumed to
+   be
+   <literal>OUTBOUND</literal>. Because  undefined applications  are incapable of serving  external
+   requests,  they must have self-initiated the request. The Sip Servlets Management Console can be used  to specify the
+   <literal>DIRECTION</literal>
+   parameter.
+  </para>
+          <note>
+            <para>The field can
+   contain unsupported  
+   <literal>key=value</literal>
+   properties that may be supported in future releases.  The unsupported properties will be ignored during parsing, until support for the attributes is provided.  
+  </para>
+          </note>
+          <para>The syntaxt is demonstrated in <xref linkend="example-DAR_Direction_Example"/>.</para>
+        </listitem>
       </itemizedlist>
-      <para>Following is an example of the DAR configuration file:</para>
-      <para><screen>INVITE: (&quot;OriginatingCallWaiting&quot;, &quot;DAR:From&quot;, &quot;ORIGINATING&quot;, &quot;&quot;, &quot;NO_ROUTE&quot;, &quot;0&quot;), (&quot;CallForwarding&quot;, &quot;DAR:To&quot;, &quot;TERMINATING&quot;, &quot;&quot;,&quot;NO_ROUTE&quot;, &quot;1&quot;) </screen></para>
-      <para>In this example, the DAR is configured to invoke two applications on
-      INVITE request, one each in the originating and the terminating half.  The applications are identified by their names as defined in the
-      application deployment descriptors.</para>
-      <para>The subscriber identity returned in this case is the URI from the
-      <literal>From</literal> and <literal>To</literal> header respectively from  each application respectively.  The DAR does
+      <example id="example-DAR_Direction_Example">
+        <title>DIRECTION Example</title>
+        <para>In this example, two applications are declared for the
+   <literal>INVITE</literal>
+   request. The
+   <literal>LocationServiceApplication</literal> is called for requests coming from outside the container, but it
+   will not be
+   called for the requests initiated by the UAC application
+   <literal>Click2DialApplication</literal>.    </para>
+        <screen>
+INVITE: (&quot;org.mobicents.servlet.sip.testsuite.Click2DialApplication&quot;, &quot;DAR:From&quot;,
+&quot;ORIGINATING&quot;, &quot;&quot;, &quot;NO_ROUTE&quot;, &quot;0&quot;, &quot;DIRECTION=OUTBOUND&quot;), \
+(&quot;org.mobicents.servlet.sip.testsuite.LocationServiceApplication&quot;, &quot;DAR\:From&quot;,
+&quot;ORIGINATING&quot;, &quot;&quot;, &quot;NO_ROUTE&quot;, &quot;0&quot;, &quot;DIRECTION=INBOUND&quot;)</screen>
+        <para>This type of configuration is useful in cases where different application must be responsible for both requests initited by the container,  and external requests received by the container.
+  </para>
+      </example>
+      <example>
+        <title>ORIGINATING/TERMINATING DAR Example</title>
+        <para>In this example, the DAR is configured to invoke two applications on
+      receipt of an INVITE request; one each in the originating and the terminating halves.  The applications are identified by their application deployment descriptor names.</para>
+        <screen>INVITE: (&quot;OriginatingCallWaiting&quot;, &quot;DAR:From&quot;, &quot;ORIGINATING&quot;, &quot;&quot;, &quot;NO_ROUTE&quot;, &quot;0&quot;), (&quot;CallForwarding&quot;, &quot;DAR:To&quot;, &quot;TERMINATING&quot;, &quot;&quot;,&quot;NO_ROUTE&quot;, &quot;1&quot;) </screen>
+        <para>For this example, the returned subscriber identity  is the URI from each application&apos;s 
+      <literal>From</literal> and <literal>To</literal> headers respectively.  The DAR does
       not return any route to the container, and maintains the invocation state
       in the <literal>stateInfo</literal> as the index of the last application in the
       list.</para>
+      </example>
     </section>
     <section>
       <title>Routing of SIP Messages to Applications</title>

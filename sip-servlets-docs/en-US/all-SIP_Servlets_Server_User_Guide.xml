@@ -2359,8 +2359,8 @@ ipAddress="127.0.0.1"
   &lt;Service name="Sip-Servlets"
  className="org.mobicents.servlet.sip.startup.SipStandardService"
  sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
- additionalParameterableHeaders="Header1,Header2"
- baseTimerInterval="500" 
+ additionalParameterableHeaders="Header1,Header2" 
+ baseTimerInterval="500"
  darConfigurationFileLocation="file:///home/silas/workspaces/mobicents-sip-servlets/
  sip-servlets-examples/reinvite-demo/reinvite-dar.properties"&gt;
 </programlisting>
@@ -2405,19 +2405,19 @@ ipAddress="127.0.0.1"
 				</listitem>
 			</varlistentry>
 			<varlistentry>
-        		<term>baseTimerInterval</term>
-        		<listitem>
-          			<para>
-          				Specifies the Base Timer Interval T1 from the <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">Table of Timer Values defined in RFC3261</ulink> and the 3GPP-IMS specifications : Section 7.7, Table 7.8 of <ulink ref="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">TS 24.229 Version 9.1.0</ulink>
-          			</para>
-          			<para>
-          				In the above mentionned tables, most of the timers depend on T1 except T2, T4 and Timer D (for the client transaction) are not dependent on it. In the Mobicents Sip Servlets underlying JAIN SIP stack those last 3 timers are conditionned on the <literal>baseTimerInterval</literal> as well.
-          			</para>
-          			<para>
-          				This parameter accepts an integer defining the interval in milliseconds whose the default value is 500, it allows to adjust the SIP timers depending on the conditions of the newtork where the Mobicents Sip Servlets container is deployed
-          			</para>
-        </listitem>
-      </varlistentry> 
+				<term>baseTimerInterval</term>
+				<listitem>
+					<para>
+						Specifies the Base Timer Interval T1 from the <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">Table of Timer Values defined in RFC3261</ulink> and the 3GPP-IMS specifications : Section 7.7, Table 7.8 of <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">TS 24.229 Version 9.1.0</ulink>
+					</para>
+					<para>
+						In the above mentionned tables, most of the timers depend on T1 except T2, T4 and Timer D (for the client transaction) are not dependent on it. In the Mobicents Sip Servlets underlying JAIN SIP stack those last 3 timers are conditionned on the <literal>baseTimerInterval</literal> as well
+					</para>
+					<para>
+						This parameter accepts an integer defining the interval in milliseconds whose the default value is 500, it allows to adjust the SIP timers depending on the conditions of the newtork where the Mobicents Sip Servlets container is deployed
+					</para>
+				</listitem>
+			</varlistentry>
 		</variablelist>
 	</section>
 	
@@ -2556,21 +2556,54 @@ ALL: (sip-router-info-5), (sip-router-info-6)..
 						A string representing the order in which applications must be invoked (starts at 0). The string is removed later on in the routing process, and substituted with the order positions of sip-router-info data.
 					</para>
 				</listitem>
+				<listitem>
+					<para>
+						An optional string that contains Mobicents-specific parameters. Currently, only the <literal>DIRECTION</literal> parameter is supported. The <literal>DIRECTION</literal> parameter specifies whether an application serves external(INBOUND) requests or initiates (OUTBOUND) requests.
+					</para>
+					<para>
+						If an application is marked <literal>DIRECTION=INBOUND</literal>, it will not be called for requests initiated by applications behaving as UAC. To mark an application as UAC, specify <literal>DIRECTION=INBOUND</literal> in the optinal parameters in the DAR.
+					</para>
+					<para>
+						Applications that do not exist in the DAR list for the container are assumed to be <literal>OUTBOUND</literal>. Because undefined applications are incapable of serving external requests, they must have self-initiated the request. The Sip Servlets Management Console can be used to specify the <literal>DIRECTION</literal> parameter.
+					</para>
+					<note>
+						<para>
+							The field can contain unsupported <literal>key=value</literal> properties that may be supported in future releases. The unsupported properties will be ignored during parsing, until support for the attributes is provided.
+						</para>
+					</note>
+					<para>
+						The syntaxt is demonstrated in <xref linkend="example-DAR_Direction_Example"/>.
+					</para>
+				</listitem>
 			</itemizedlist>
-			<para>
-				Following is an example of the DAR configuration file:
-			</para>
-			<para>
+			<example id="example-DAR_Direction_Example">
+				<title>DIRECTION Example</title>
+				<para>
+					In this example, two applications are declared for the <literal>INVITE</literal> request. The <literal>LocationServiceApplication</literal> is called for requests coming from outside the container, but it will not be called for the requests initiated by the UAC application <literal>Click2DialApplication</literal>.
+				</para>
+				
+<screen>
+INVITE: ("org.mobicents.servlet.sip.testsuite.Click2DialApplication", "DAR:From",
+"ORIGINATING", "", "NO_ROUTE", "0", "DIRECTION=OUTBOUND"), \
+("org.mobicents.servlet.sip.testsuite.LocationServiceApplication", "DAR\:From",
+"ORIGINATING", "", "NO_ROUTE", "0", "DIRECTION=INBOUND")
+</screen>
+				<para>
+					This type of configuration is useful in cases where different application must be responsible for both requests initited by the container, and external requests received by the container.
+				</para>
+			</example>
+			<example>
+				<title>ORIGINATING/TERMINATING DAR Example</title>
+				<para>
+					In this example, the DAR is configured to invoke two applications on receipt of an INVITE request; one each in the originating and the terminating halves. The applications are identified by their application deployment descriptor names.
+				</para>
 				
 <screen>INVITE: ("OriginatingCallWaiting", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0"), ("CallForwarding", "DAR:To", "TERMINATING", "","NO_ROUTE", "1")
 </screen>
-			</para>
-			<para>
-				In this example, the DAR is configured to invoke two applications on INVITE request, one each in the originating and the terminating half. The applications are identified by their names as defined in the application deployment descriptors.
-			</para>
-			<para>
-				The subscriber identity returned in this case is the URI from the <literal>From</literal> and <literal>To</literal> header respectively from each application respectively. The DAR does not return any route to the container, and maintains the invocation state in the <literal>stateInfo</literal> as the index of the last application in the list.
-			</para>
+				<para>
+					For this example, the returned subscriber identity is the URI from each application's <literal>From</literal> and <literal>To</literal> headers respectively. The DAR does not return any route to the container, and maintains the invocation state in the <literal>stateInfo</literal> as the index of the last application in the list.
+				</para>
+			</example>
 		</section>
 		
 		<section>
@@ -5198,7 +5231,7 @@ useStaticAddress="true"/&gt;
 			This chapter provides information on how to enable the management of Mobicents SIP Servlets Servers through Jopr with our custom Jopr plug in. Two versions of Jopr are available: an embedded version, which is better suited to development environments; and a full version, which is better suited to production environments.
 		</para>
 		<para>
-			The Mobicents SIP Servlet Jopr plug in provides a facility to view metrics related to the deployed applications, metrics related to the SIP Servlets Server. Additionally, the plugin provides the option to manage the Congestion and Concurrency settings of the SIP Servlets Server.
+			The Mobicents SIP Servlet Jopr plug in provides a facility to view metrics related to the deployed applications, metrics related to the SIP Servlets Server. Additionally, the plugin provides the option to manage the various configuration settings of the SIP Servlets Server such as Congestion and Concurrency control.
 		</para>
 		<section>
 			<title>Installation of the Enterprise Monitoring and Management Console</title>
@@ -5401,7 +5434,7 @@ useStaticAddress="true"/&gt;
 					</listitem>
 					<listitem>
 						<para>
-							Click on the <guilabel>Configuration</guilabel> tab to tune Container configuration parameters such as Concurrency and Congestion as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/>
+							Click on the <guilabel>Configuration</guilabel> tab to tune the Container configuration parameters such as Concurrency and Congestion as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/>
 						</para>
 						<figure>
 							<title>SIP Application Dispatcher Configuration</title>
