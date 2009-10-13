@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
@@ -166,6 +168,7 @@ import org.apache.log4j.Logger;
  */
 public class DefaultApplicationRouter implements SipApplicationRouter, ManageableApplicationRouter{	
 	private static final String DIRECTION_PARAMETER = "DIRECTION";
+	private static final String REGEX_PARAMETER = "REGEX";
 	private static final String DIRECTION_OUTBOUND = "OUTBOUND";
 	private static final String DIRECTION_INBOUND = "INBOUND";
 	//	the logger
@@ -328,6 +331,23 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 					}
 				}
 				
+				String regEx = defaultSipApplicationRouterInfo.getOptionalParameters().get(REGEX_PARAMETER);
+				if(regEx != null) {
+					Pattern pattern = Pattern.compile(regEx);
+					Matcher matcher = pattern.matcher(initialRequest.toString());
+					if(matcher.find()) {
+						if(log.isDebugEnabled()) {
+							log.debug("initialRequest " + initialRequest + " matching regex pattern " + regEx +
+			                   "begin index " + matcher.start() + " and ending at index " + matcher.end() + " for application " + defaultSipApplicationRouterInfo.getApplicationName());
+						}						
+					} else {
+						if(log.isDebugEnabled()) {
+							log.debug("initialRequest " + initialRequest + " not matching regex pattern " + regEx +
+			                   " skipping application " + defaultSipApplicationRouterInfo.getApplicationName());
+						}
+						continue; // pattern not matching, just don't call the application
+					}
+				}
 				
 				boolean isApplicationPresentInContainer = false;
 				synchronized (containerDeployedApplicationNames) {
