@@ -111,41 +111,42 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
           invoked (starts at 0).  The string is removed later on in the routing process,  and substituted with the order positions of sip-router-info data.</para>
         </listitem>
         <listitem>
-          <para>An optional string that contains Mobicents-specific parameters. Currently, only the 
-   <literal>DIRECTION</literal>
-   parameter is supported.
-   The
-   <literal>DIRECTION</literal>
-   parameter specifies whether an application serves
-    external(INBOUND) requests or initiates (OUTBOUND) requests. </para>
-          <para>If an
-   application is
-   marked
-   <literal>DIRECTION=INBOUND</literal>,
-   it will not be
-   called for requests initiated by applications behaving as  UAC. To mark an
-   application
-   as UAC,  specify
-   <literal>DIRECTION=INBOUND</literal>
-   in the optinal parameters in the DAR.
-   </para>
-          <para>Applications that do not exist in the DAR list for the container are assumed to
-   be
-   <literal>OUTBOUND</literal>. Because  undefined applications  are incapable of serving  external
-   requests,  they must have self-initiated the request. The Sip Servlets Management Console can be used  to specify the
-   <literal>DIRECTION</literal>
-   parameter.
-  </para>
-          <note>
-            <para>The field can
-   contain unsupported  
-   <literal>key=value</literal>
-   properties that may be supported in future releases.  The unsupported properties will be ignored during parsing, until support for the attributes is provided.  
-  </para>
-          </note>
-          <para>The syntaxt is demonstrated in <xref linkend="example-DAR_Direction_Example"/>.</para>
-        </listitem>
-      </itemizedlist>
+			<para>
+				An optional string that contains Mobicents-specific parameters. Currently, only the <literal>DIRECTION</literal> and <literal>REGEX</literal> parameters are supported.
+			</para>.
+			<note>
+				<para>
+					The field can contain unsupported <literal>key=value</literal> properties that may be supported in future releases. The unsupported properties will be ignored during parsing, until support for the attributes is provided.
+				</para>
+			</note>
+			<para>
+				The syntax is demonstrated in <xref linkend="example-DAR_Direction_Example"/>.
+			</para>
+			<itemizedlist>
+				<listitem>
+					<para>
+						The <literal>DIRECTION</literal> parameter specifies whether an application serves external(INBOUND) requests or initiates (OUTBOUND) requests.
+					</para>
+					<para>
+						If an application is marked <literal>DIRECTION=INBOUND</literal>, it will not be called for requests initiated by applications behaving as UAC. To mark an application as UAC, specify <literal>DIRECTION=INBOUND</literal> in the optinal parameters in the DAR.
+					</para>
+					<para>
+						Applications that do not exist in the DAR list for the container are assumed to be <literal>OUTBOUND</literal>. Because undefined applications are incapable of serving external requests, they must have self-initiated the request. The Sip Servlets Management Console can be used to specify the <literal>DIRECTION</literal> parameter.
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						The <literal>REGEX</literal> parameter specifies a regular expression to be matched against the initial request passed to the Application Router.
+					</para>
+          			<para>
+          				If the regular expression matches a part of the initial request, the application is called otherwise it is skipped.
+          			</para>
+          			<para>
+          				By example in the following sip-router-info data : <screen>INVITE: ("org.mobicents.servlet.sip.testsuite.SimpleApplication", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0", "REGEX=From:.*sip:.*@sip-servlets\.com")</screen>, only incoming initial requests having a From Header whose the SIP URI belongs to the sip-servlets.com domain will be passed to the SimpleApplication.
+           			</para>		
+          			</listitem>	
+         			</itemizedlist>		
+		</listitem>
       <example id="example-DAR_Direction_Example">
         <title>DIRECTION Example</title>
         <para>In this example, two applications are declared for the
@@ -312,8 +313,6 @@ Any questions regarding this, give me a yell and we can work through it.-->     
     <title>Limitations of the Default Application Router</title>
     <para>The DAR  is a minimalist Application Router implementation that is part of the reference implementation.  While it could be used instead of a production Application Router, it offers no
     processing logic except for  the declaration of the application order. </para>
-    <para>It is not currently possible to target specific application and filter out  requests based on the incoming
-    request headers. </para>
     <para>In real world deployments, the Application Router plays
     an extremely important role in application orchestration and composition.
     It is likely that the Application Router would  make use of complex rules and diverse data
