@@ -56,6 +56,9 @@
         <row>
           <entry>SUBSCRIBE/NOTIFY</entry><entry><ulink url="http://www.ietf.org/rfc/rfc3265.txt">RFC 3265</ulink></entry><entry>SIP-specific Event Notification</entry>
         </row>
+        <row>
+          <entry>Symmetric Response Routing</entry><entry><ulink url="http://www.ietf.org/rfc/rfc3581.txt">RFC 3581</ulink></entry><entry>An Extension to the Session Initiation Protocol (SIP) for Symmetric Response Routing</entry>
+        </row>
       </tbody>
     </tgroup>
     </table>
