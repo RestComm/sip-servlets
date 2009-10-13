@@ -168,4 +168,8 @@ public class SessionBasedJBossCacheConvergedSipService extends
 			SipSessionKey sipSessionKey) {
 		// no-op by default    
 	}
+	
+	public Cache getJBossCache() {		
+		return getCache();
+	}
 }

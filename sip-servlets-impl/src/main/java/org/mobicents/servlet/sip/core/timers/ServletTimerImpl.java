@@ -17,7 +17,7 @@
 package org.mobicents.servlet.sip.core.timers;
 
 import java.io.Serializable;
-import java.rmi.server.UID;
+import java.util.UUID;
 import java.util.concurrent.ScheduledFuture;
 
 import javax.servlet.sip.ServletTimer;
@@ -145,7 +145,7 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 	public ServletTimerImpl(Serializable info, long delay, boolean fixedDelay,
 			long period, TimerListener listener,
 			MobicentsSipApplicationSession appSession) {
-		this.id = new UID().toString();
+		this.id = UUID.randomUUID().toString();
 		this.info = info;
 		this.delay = delay;
 		this.scheduledExecutionTime = delay + System.currentTimeMillis();

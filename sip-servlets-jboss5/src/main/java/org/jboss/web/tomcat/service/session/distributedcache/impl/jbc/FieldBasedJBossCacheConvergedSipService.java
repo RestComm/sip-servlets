@@ -23,6 +23,7 @@ package org.jboss.web.tomcat.service.session.distributedcache.impl.jbc;
 
 import java.util.Map;
 
+import org.jboss.cache.Cache;
 import org.jboss.cache.pojo.PojoCache;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.ClusteringNotSupportedException;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheConvergedSipManager;
@@ -166,5 +167,9 @@ public class FieldBasedJBossCacheConvergedSipService extends
 			SipApplicationSessionKey sipApplicationSessionKey,
 			SipSessionKey sipSessionKey) {
 		// no-op by default    
+	}
+	
+	public Cache getJBossCache() {		
+		return getCache();
 	}
 }

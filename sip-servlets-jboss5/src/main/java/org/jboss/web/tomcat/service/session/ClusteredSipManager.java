@@ -29,6 +29,7 @@ import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCach
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipApplicationSessionNotificationPolicy;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipSessionNotificationPolicy;
+import org.mobicents.cluster.MobicentsCluster;
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 
 /**
@@ -95,4 +96,6 @@ public interface ClusteredSipManager<O extends OutgoingDistributableSessionData>
 	void sipSessionActivated();
 	
 	public DistributedCacheConvergedSipManager getDistributedCacheConvergedSipManager();
+
+	MobicentsCluster getMobicentsCluster();
 }

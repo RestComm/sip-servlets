@@ -66,6 +66,7 @@ import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.core.timers.FaultTolerantTimerServiceImpl;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -89,7 +90,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	
 	private static final long serialVersionUID = 1L;
 	//	 the logger
-	private static transient Logger logger = Logger.getLogger(SipStandardContext.class);
+	private static final Logger logger = Logger.getLogger(SipStandardContext.class);
 	private transient SipRubyController rubyController;
 
 	/**
@@ -138,6 +139,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
     protected transient Map<String, Container> childrenMapByClassName;
 
     protected transient ScheduledThreadPoolExecutor executor = null;
+    protected transient TimerService timerService = null;
 	/**
 	 * 
 	 */
@@ -192,9 +194,19 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}
 		//needed when restarting applications through the tomcat manager 
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,
-				sipFactoryFacade);		
+				sipFactoryFacade);
+		if(timerService == null) {
+			if(getDistributable() && hasDistributableManager) {
+				if(logger.isInfoEnabled()) {
+					logger.info("Using the Fault Tolerant Timer Service to schedule fault tolerant timers in a distributed environment");
+				}
+				timerService = new FaultTolerantTimerServiceImpl((DistributableSipManager)getSipManager());			
+			} else {
+				timerService = new TimerServiceImpl();
+			}
+		}
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
-				TimerServiceImpl.getInstance());
+				timerService);
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED,
 				Arrays.asList(sipApplicationDispatcher.getExtensionsSupported()));
 		this.getServletContext().setAttribute("javax.servlet.sip.100rel", Boolean.TRUE);
@@ -283,7 +295,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			//called implicitly within sipApplicationDispatcher.addSipApplication
 			sipApplicationDispatcher.addSipApplication(applicationName, this);
 			if(manager instanceof DistributableSipManager) {
-				hasDistributableManager = true;
+				hasDistributableManager = true;				
 				if(logger.isInfoEnabled()) {
 					logger.info("this context contains a manager that allows applications to work in a distributed environment");
 				}
@@ -680,7 +692,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 * @return the timerService
 	 */
 	public TimerService getTimerService() {
-		return TimerServiceImpl.getInstance();
+		return timerService;
 	}
 	
 	/**
@@ -719,8 +731,15 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			hasDistributableManager = true;
 			if(logger.isInfoEnabled()) {
 				logger.info("this context contains a manager that allows applications to work in a distributed environment");
+			}			
+			if(logger.isInfoEnabled()) {
+				logger.info("Using the Fault Tolerant Timer Service to schedule fault tolerant timers in a distributed environment");
 			}
-		}
+			timerService = null;
+			timerService = new FaultTolerantTimerServiceImpl((DistributableSipManager)manager);										
+			this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
+					timerService);
+		} 
     	super.setManager(manager);
     }
     
@@ -970,6 +989,11 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	public boolean notifySipServletsListeners() {
 		boolean ok = true;
 		
+		// we need to make sure the scheduler is created to be able to fail over fault tolerant timers
+		// we can't create it before because the mobicents cluster is not yet initialized
+		if(getDistributable() && hasDistributableManager) {
+			((FaultTolerantTimerServiceImpl)timerService).getScheduler();
+		}
 		List<SipServletListener> sipServletListeners = listeners.getSipServletsListeners();
 		if(logger.isDebugEnabled()) {
 			logger.debug(sipServletListeners.size() + " SipServletListener to notify of servlet initialization");

@@ -69,6 +69,10 @@ import org.jboss.web.tomcat.service.session.notification.ClusteredSipSessionNoti
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipSessionNotificationPolicy;
 import org.jboss.web.tomcat.service.session.notification.IgnoreUndeployLegacyClusteredSipApplicationSessionNotificationPolicy;
 import org.jboss.web.tomcat.service.session.notification.IgnoreUndeployLegacyClusteredSipSessionNotificationPolicy;
+import org.mobicents.cache.MobicentsCache;
+import org.mobicents.cluster.DefaultMobicentsCluster;
+import org.mobicents.cluster.MobicentsCluster;
+import org.mobicents.cluster.election.SimpleSingletonElector;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -156,6 +160,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	
 	/** Are we running embedded in JBoss? */
 	private boolean embedded_ = false;
+	private MobicentsCluster mobicentsCluster;
+	private MobicentsCache mobicentsCache;
 	
 	// ---------------------------------------------------------- Constructors
 
@@ -3610,7 +3616,13 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	
 	@Override
 	protected void startExtensions() {
-		super.startExtensions();
+		super.startExtensions();		
+		
+		mobicentsCache = new MobicentsCache(getDistributedCacheConvergedSipManager().getJBossCache(), null);
+		mobicentsCluster = new DefaultMobicentsCluster(mobicentsCache, null, new SimpleSingletonElector());
+		if(logger.isDebugEnabled()) {
+			logger.debug("Mobicents Sip Servlets Default Mobicents Cluster " + mobicentsCluster + " created");
+		}
 		initializeUnloadedSipApplicationSessions();
 //		initializeUnloadedSipSessions();
 		initClusteredSipSessionNotificationPolicy();
@@ -3631,6 +3643,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	protected void stopExtensions() {
 		super.stopExtensions();
 		
+		mobicentsCache.stop();
+		mobicentsCache = null;
+		mobicentsCluster = null;
 		removeAllSessions();
 		
 		sipSessionPassivatedCount_.set(0);
@@ -4302,5 +4317,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	         return (thisVal<anotherVal ? -1 : (thisVal==anotherVal ? 0 : 1));
 	      }
 	   }
+
+	public MobicentsCluster getMobicentsCluster() {		
+		return mobicentsCluster;
+	}
 	   
 }

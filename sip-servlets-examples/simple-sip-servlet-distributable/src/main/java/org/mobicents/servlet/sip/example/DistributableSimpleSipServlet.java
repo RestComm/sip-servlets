@@ -50,7 +50,7 @@ public class DistributableSimpleSipServlet
 	
 	private static final String CALLEE_SEND_BYE = "YouSendBye";
 	//60 sec
-	private static final int DEFAULT_BYE_DELAY = 180000;
+	private static final int DEFAULT_BYE_DELAY = 25000;
 	
 	/** Creates a new instance of SimpleProxyServlet */
 	public DistributableSimpleSipServlet() {

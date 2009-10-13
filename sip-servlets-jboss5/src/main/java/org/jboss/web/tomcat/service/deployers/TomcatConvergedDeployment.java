@@ -272,10 +272,8 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 		SipJBossContextConfig.kernelLocal.set(kernel);
 		SipJBossContextConfig.deploymentUnitLocal.set(unit);
 		try {
-			// Start it
-			context.start();			
-			// Build the ENC
-			injectSipUtilitiesIntoEJBs(context, metaData);
+			// Start it			
+			context.start();						
 		} catch (Exception e) {
 			context.destroy();
 			DeploymentException.rethrowAsDeploymentException("URL " + warUrlStr
@@ -336,6 +334,9 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 			}
 		}
 
+		// Build the ENC
+		injectSipUtilitiesIntoEJBs(context, metaData);
+		
 		/*
 		 * Add security association valve after the authorization valves so that
 		 * the authenticated user may be associated with the request

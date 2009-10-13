@@ -17,9 +17,6 @@
 package org.mobicents.servlet.sip.core.timers;
 
 import java.io.Serializable;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
@@ -27,21 +24,27 @@ import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 
 import org.apache.log4j.Logger;
+import org.jboss.web.tomcat.service.session.ClusteredSipManager;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
+import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.timers.FaultTolerantScheduler;
+import org.mobicents.timers.PeriodicScheduleStrategy;
+import org.mobicents.timers.TimerTaskFactory;
 
-public class TimerServiceImpl implements TimerService, Serializable {
+public class FaultTolerantTimerServiceImpl implements TimerService, Serializable {
 	
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = Logger.getLogger(TimerServiceImpl.class
+	private static final Logger logger = Logger.getLogger(FaultTolerantTimerServiceImpl.class
 			.getName());
-	
 	public static final int SCHEDULER_THREAD_POOL_DEFAULT_SIZE = 10;
+	public static final String NAME = "MSSFaultTolerantTimers";
 	
-	private ScheduledThreadPoolExecutor scheduledExecutor;
+	private FaultTolerantScheduler scheduledExecutor;
+	private ClusteredSipManager<? extends OutgoingDistributableSessionData> sipManager;
 	
-	public TimerServiceImpl() {		
-		scheduledExecutor = new ScheduledThreadPoolExecutor(SCHEDULER_THREAD_POOL_DEFAULT_SIZE);;
-		scheduledExecutor.prestartAllCoreThreads();
+	public FaultTolerantTimerServiceImpl(DistributableSipManager sipManager) {
+		this.sipManager = (ClusteredSipManager<? extends OutgoingDistributableSessionData>)sipManager;			
 	}
 	
 	/*
@@ -60,8 +63,7 @@ public class TimerServiceImpl implements TimerService, Serializable {
 		if (!sipApplicationSessionImpl.hasTimerListener()) {
 			throw new IllegalStateException("No Timer listeners have been configured for this application ");
 		}
-		TimerListener listener = sipApplicationSessionImpl.getSipContext().getListeners().getTimerListener();
-		ServletTimerImpl servletTimer = createTimerLocaly(listener, delay, isPersistent, info, sipApplicationSessionImpl);				
+		ServletTimerImpl servletTimer = createTimerLocaly(delay, isPersistent, info, sipApplicationSessionImpl);				
 		
 		return servletTimer;
 	}
@@ -85,9 +87,8 @@ public class TimerServiceImpl implements TimerService, Serializable {
 		
 		if (!sipApplicationSessionImpl.hasTimerListener()) {
 			throw new IllegalStateException("No Timer listeners have been configured for this application ");
-		}
-		TimerListener timerListener = sipApplicationSessionImpl.getSipContext().getListeners().getTimerListener();
-		ServletTimerImpl servletTimer = createTimerLocaly(timerListener , delay, period, fixedDelay,isPersistent, info,sipApplicationSessionImpl);			
+		}		
+		ServletTimerImpl servletTimer = createTimerLocaly(delay, period, fixedDelay,isPersistent, info,sipApplicationSessionImpl);			
 		
 		return servletTimer;
 	}
@@ -101,14 +102,15 @@ public class TimerServiceImpl implements TimerService, Serializable {
 	 * @param sipApplicationSession
 	 * @return
 	 */
-	private ServletTimerImpl createTimerLocaly(TimerListener listener, long delay,
-			boolean isPersistent, Serializable info, MobicentsSipApplicationSession sipApplicationSession) {				
-		ServletTimerImpl servletTimer = new ServletTimerImpl(info, delay, listener, sipApplicationSession);
-		// logger.log(Level.FINE, "starting timer
-		// at:"+System.currentTimeMillis());
-		ScheduledFuture<?> future = scheduledExecutor.schedule(servletTimer, delay, TimeUnit.MILLISECONDS);
-		servletTimer.setFuture(future);
-//		sipApplicationSession.timerScheduled(st);
+	private ServletTimerImpl createTimerLocaly(long delay,
+			boolean isPersistent, Serializable info, MobicentsSipApplicationSession sipApplicationSession) {
+		
+		final TimerListener listener = sipApplicationSession.getSipContext().getListeners().getTimerListener();
+		final ServletTimerImpl servletTimer = new ServletTimerImpl(info, delay, listener, sipApplicationSession);
+		final TimerServiceTaskData timerTaskData = new TimerServiceTaskData(servletTimer.getId(), System.currentTimeMillis() + delay, -1, null);		
+		final TimerServiceTask timerServiceTask = new TimerServiceTask(sipManager, servletTimer, timerTaskData);
+		
+		getScheduler().schedule(timerServiceTask);				
 		sipApplicationSession.addServletTimer(servletTimer);
 		if (isPersistent) {
 			persist(servletTimer);
@@ -126,21 +128,20 @@ public class TimerServiceImpl implements TimerService, Serializable {
 	 * @param sipApplicationSession
 	 * @return
 	 */
-	private ServletTimerImpl createTimerLocaly(TimerListener listener, long delay,
+	private ServletTimerImpl createTimerLocaly(long delay, 
 			long period, boolean fixedDelay, boolean isPersistent,
-			Serializable info, MobicentsSipApplicationSession sipApplicationSession) {		
+			Serializable info, MobicentsSipApplicationSession sipApplicationSession) {
+		final TimerListener listener = sipApplicationSession.getSipContext().getListeners().getTimerListener();
 		final ServletTimerImpl servletTimer = new ServletTimerImpl(
 				info, delay, fixedDelay, period, listener, sipApplicationSession);
-		ScheduledFuture<?> future = null;
-		if (fixedDelay) {
-			future = scheduledExecutor.scheduleWithFixedDelay(servletTimer, delay, period,
-					TimeUnit.MILLISECONDS);
-		} else {
-			future = scheduledExecutor.scheduleAtFixedRate(servletTimer, delay, period,
-					TimeUnit.MILLISECONDS);
+		PeriodicScheduleStrategy periodicScheduleStrategy = PeriodicScheduleStrategy.withFixedDelay;
+		if(!fixedDelay) {
+			periodicScheduleStrategy = PeriodicScheduleStrategy.atFixedRate;
 		}
-		servletTimer.setFuture(future);
-//		sipApplicationSession.timerScheduled(servletTimer);
+		final TimerServiceTaskData timerTaskData = new TimerServiceTaskData(servletTimer.getId(), System.currentTimeMillis() + delay, period, periodicScheduleStrategy);		
+		final TimerServiceTask timerServiceTask = new TimerServiceTask(sipManager, servletTimer, timerTaskData);
+				
+		getScheduler().schedule(timerServiceTask);			
 		sipApplicationSession.addServletTimer(servletTimer);
 		if (isPersistent) {			
 			persist(servletTimer);
@@ -157,4 +158,13 @@ public class TimerServiceImpl implements TimerService, Serializable {
 		
 	}
 	
+	public FaultTolerantScheduler getScheduler() {
+		if(scheduledExecutor == null) {
+			TimerTaskFactory timerTaskFactory = new TimerServiceTaskFactory(this.sipManager);
+			scheduledExecutor = new FaultTolerantScheduler(NAME, SCHEDULER_THREAD_POOL_DEFAULT_SIZE, this.sipManager.getMobicentsCluster(), (byte) 0, null, timerTaskFactory);
+		}
+		return scheduledExecutor;
+	}
+	
 }
+ 

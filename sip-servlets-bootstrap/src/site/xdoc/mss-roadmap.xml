@@ -33,18 +33,25 @@
 						Sip Session Dialog replication moved to JAIN SIP HA
 						</a>
 						<br />							
-						<img src="red.jpeg" />
+						<img src="green.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=990">
 						JAIN SIP Configurable Timers
 						</a>
 						<br />
-						<img src="red.jpeg" />
+						<img src="green.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=989">
+						New 'Transaction' Concurrency Control Mode
+						</a>
+						<br />
+						<img src="green.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=987">
 						Default Application Router to support INBOUND and OUTBOUND differentiation
 						</a>
 						<br />								
 						<img src="red.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=999">
 						HA perf tests and improvements 
+						</a>
 						<br />
 						<img src="orange.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=955">
@@ -56,7 +63,7 @@
 						Distributed LB
 						</a>
 						<br />
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=953">
 						Stateless LB
 						</a>
@@ -77,14 +84,14 @@
 						</a> 
 						<br />						
 						<img src="red.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=1000">
+						SIP LB notification protocol and Health report
+						</a> 
+						<br />						
+						<img src="green.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=660">
 						HA persistent timers (JB5 version only)
-						</a>
-						<br />
-						<img src="red.jpeg" />
-						<a href="http://code.google.com/p/mobicents/issues/detail?id=987">
-						Application Router to support INBOUND and OUTBOUND
-						</a>
+						</a>						
 						<br />			
 						<img src="red.jpeg" />
 						Geographical redundancy  
@@ -135,7 +142,7 @@
 								</a>
 							</li-->
 							<li>
-								<img src="orange.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=870">
 									Sip Load Balancer should not OK CANCEL requests
@@ -156,7 +163,7 @@
 								</a>
 							</li>
 							<li>
-								<img src="red.jpeg" />
+								<img src="green.jpeg" />
 								<a
 									href="http://code.google.com/p/mobicents/issues/detail?id=880">
 									MSS crashes under proxy load
@@ -243,6 +250,12 @@
 								<img src="green.jpeg" />
 								<a href="http://code.google.com/p/mobicents/issues/detail?id=991">
 								Obfuscate Via Headers routing
+								</a>
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a href="http://code.google.com/p/mobicents/issues/detail?id=1002">
+								B2buaHelperImpl.singletonHeadersNames map is mising some headers
 								</a>
 							</li>
 						</ul>

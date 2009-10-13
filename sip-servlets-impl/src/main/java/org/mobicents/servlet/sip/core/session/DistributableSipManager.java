@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
+
 /**
  * Interface that should be implemented by all manager allowing applications to work in a distributed environment.
  * 
@@ -23,4 +24,5 @@ package org.mobicents.servlet.sip.core.session;
  *
  */
 public interface DistributableSipManager extends SipManager {
+	
 }

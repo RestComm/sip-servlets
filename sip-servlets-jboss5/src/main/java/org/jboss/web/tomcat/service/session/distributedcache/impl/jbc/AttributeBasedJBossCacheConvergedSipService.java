@@ -220,4 +220,10 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 			}
 		}
 	}
+
+	public Cache getJBossCache() {		
+		return getCache();
+	}
+	
+	
 }

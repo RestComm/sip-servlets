@@ -23,6 +23,7 @@ package org.jboss.web.tomcat.service.session.distributedcache.spi;
 
 import java.util.Map;
 
+import org.jboss.cache.Cache;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 
@@ -245,4 +246,6 @@ public interface DistributedCacheConvergedSipManager<T extends OutgoingDistribut
 	 *            the session's key
 	 */
 	void sipApplicationSessionCreated(SipApplicationSessionKey key);
+	
+	Cache getJBossCache();
 }

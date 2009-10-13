@@ -43,6 +43,11 @@ if [ $# -ne 0 ]; then
 	            echo "Distributed example used is uas";
 	    		./sipp 127.0.0.1:5080 -s isendbye -sf uas/clustering-reinvite-uac.xml -trace_err -i 127.0.0.1 -p 5050 -r 1 -m 1 -rsa 127.0.0.1:5060 -trace_msg -nd
 	    		;;	            	   
+	    uas-timer)
+	    		rm ./uas/*.log
+	            echo "Distributed example used is uas";
+	    		./sipp 127.0.0.1:5080 -s yousendbye -sf uas/clustering-uac-timer.xml -trace_err -i 127.0.0.1 -p 5050 -r 1 -m 1 -rsa 127.0.0.1:5060 -trace_msg -nd
+	            ;;
 	    *)
 	    		rm ./uas/*.log
 	            echo "Distributed example used is uas";

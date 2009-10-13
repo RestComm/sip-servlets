@@ -166,5 +166,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-impl"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-spec"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-jboss5-metadata"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/cluster/core/1.0.0BETA1-SNAPSHOT/core-1.0.0BETA1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/cluster/cache/1.0.0BETA1-SNAPSHOT/cache-1.0.0BETA1-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/cluster/timers/1.0.0BETA1-SNAPSHOT/timers-1.0.0BETA1-SNAPSHOT.jar" sourcepath="/MOBICENTS_HOME/servers/cluster/timers/src/main/java"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

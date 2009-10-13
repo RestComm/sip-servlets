@@ -139,6 +139,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	protected boolean sipJNDIContextLoaded = false;
 	
     protected transient ScheduledThreadPoolExecutor executor = null;
+    protected transient TimerService timerService = null;
 	/**
 	 * 
 	 */
@@ -192,11 +193,14 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if(sipSessionsUtil == null) {
 			sipSessionsUtil = new SipSessionsUtilImpl(this);
 		}
+		if(timerService == null) {			
+			timerService = new TimerServiceImpl();			
+		}
 		//needed when restarting applications through the tomcat manager 
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,
 				sipFactoryFacade);		
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
-				TimerServiceImpl.getInstance());
+				timerService);
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED,
 				Arrays.asList(sipApplicationDispatcher.getExtensionsSupported()));
 		this.getServletContext().setAttribute("javax.servlet.sip.100rel", Boolean.TRUE);
@@ -565,7 +569,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_APPNAME_SUBCONTEXT_ADDED_EVENT, null);
 			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_FACTORY_ADDED_EVENT, sipFactoryFacade);
 			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_SESSIONS_UTIL_ADDED_EVENT, sipSessionsUtil);
-			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_TIMER_SERVICE_ADDED_EVENT, TimerServiceImpl.getInstance());			
+			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_TIMER_SERVICE_ADDED_EVENT, timerService);			
 		} else {
         	try {
 				InitialContext iniCtx = new InitialContext();
@@ -575,7 +579,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				SipNamingContextListener.addAppNameSubContext(envCtx, applicationName);
 				SipNamingContextListener.addSipFactory(envCtx, applicationName, sipFactoryFacade);
 				SipNamingContextListener.addSipSessionsUtil(envCtx, applicationName, sipSessionsUtil);
-				SipNamingContextListener.addTimerService(envCtx, applicationName, TimerServiceImpl.getInstance());
+				SipNamingContextListener.addTimerService(envCtx, applicationName, timerService);
 			} catch (NamingException e) {
 				logger.error("Impossible to get the naming context ", e);
 				throw new IllegalStateException(e);
@@ -811,7 +815,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 * @return the timerService
 	 */
 	public TimerService getTimerService() {
-		return TimerServiceImpl.getInstance();
+		return timerService;
 	}
 	
 	/**

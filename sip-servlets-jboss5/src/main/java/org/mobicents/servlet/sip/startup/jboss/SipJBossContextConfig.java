@@ -68,9 +68,6 @@ import org.mobicents.servlet.sip.startup.loading.rules.MatchingRule;
 import org.mobicents.servlet.sip.startup.loading.rules.NotRule;
 import org.mobicents.servlet.sip.startup.loading.rules.OrRule;
 import org.mobicents.servlet.sip.startup.loading.rules.SubdomainRule;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Startup event listener for a the <b>SipStandardContext</b> that configures
@@ -283,7 +280,7 @@ public class SipJBossContextConfig extends JBossContextConfig {
 		}
 		convergedContext.setSipApplicationKeyMethod(convergedMetaData.getSipApplicationKeyMethod());
 		convergedContext.setConcurrencyControlMode(convergedMetaData.getConcurrencyControlMode());
-		convergedContext.setWrapperClass(StandardWrapper.class.getName());
+		convergedContext.setWrapperClass(StandardWrapper.class.getName());		
 	}
 	
 	public static MatchingRule buildRule(ConditionMetaData condition) {
