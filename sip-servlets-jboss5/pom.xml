@@ -117,7 +117,29 @@
 			<groupId>org.jboss.cache</groupId>
 			<artifactId>jbosscache-pojo</artifactId>
 			<version>3.0.0.GA</version>			
-		</dependency>			
+		</dependency>	
+		
+		<dependency>
+			<groupId>org.mobicents.cluster</groupId>
+			<artifactId>core</artifactId>
+			<version>1.0.0BETA1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>	
+		
+		<dependency>
+			<groupId>org.mobicents.cluster</groupId>
+			<artifactId>cache</artifactId>
+			<version>1.0.0BETA1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.mobicents.cluster</groupId>
+			<artifactId>timers</artifactId>
+			<version>1.0.0BETA1-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>
+						
 	</dependencies>
 	
 	<repositories>
