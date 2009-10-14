@@ -239,6 +239,8 @@ public class TestSipListener implements SipListener {
 	
 	public Request receivedInvite;
 
+	private Request byeRequestReceived;
+
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
 		private EventHeader eventHeader;
@@ -1019,6 +1021,7 @@ public class TestSipListener implements SipListener {
 				return ;
 			}
 			this.byeReceived  = true;
+			setByeRequestReceived(request);
 			if (serverTransactionId == null) {
 				logger.info("shootist:  null TID.");
 				return;
@@ -2310,6 +2313,20 @@ public class TestSipListener implements SipListener {
 	 */
 	public boolean isTestAckViaParam() {
 		return testAckViaParam;
+	}
+
+	/**
+	 * @param byeRequestReceived the byeRequestReceived to set
+	 */
+	public void setByeRequestReceived(Request byeRequestReceived) {
+		this.byeRequestReceived = byeRequestReceived;
+	}
+
+	/**
+	 * @return the byeRequestReceived
+	 */
+	public Request getByeRequestReceived() {
+		return byeRequestReceived;
 	}
 
 }

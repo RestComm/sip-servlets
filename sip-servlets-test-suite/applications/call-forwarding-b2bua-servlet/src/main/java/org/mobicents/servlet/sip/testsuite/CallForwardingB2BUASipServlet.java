@@ -128,9 +128,18 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 					SIP_FACTORY);
 			
 			Map<String, List<String>> headers=new HashMap<String, List<String>>();
+			
 			List<String> toHeaderList = new ArrayList<String>();
 			toHeaderList.add(forwardingUri[0]);
 			headers.put("To", toHeaderList);
+			
+			List<String> userAgentHeaderList = new ArrayList<String>();
+			userAgentHeaderList.add("CallForwardingB2BUASipServlet");
+			headers.put("User-Agent", userAgentHeaderList);
+			
+			List<String> contactHeaderList = new ArrayList<String>();
+			contactHeaderList.add("\"callforwardingB2BUA\" <sip:127.0.0.1:5070;transport=tcp>");
+			headers.put("Contact", contactHeaderList);
 			
 			SipServletRequest forkedRequest = helper.createRequest(request, true,
 					headers);
@@ -156,8 +165,18 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		if(request.getSession().getAttribute(ACT_AS_UAS) == null) {
 			//we forward the BYE
 			SipSession session = request.getSession();		
-			SipSession linkedSession = request.getB2buaHelper().getLinkedSession(session);		
-			SipServletRequest forkedRequest = linkedSession.createRequest("BYE");			
+			SipSession linkedSession = request.getB2buaHelper().getLinkedSession(session);
+			Map<String, List<String>> headers=new HashMap<String, List<String>>();
+			
+			List<String> userAgentHeaderList = new ArrayList<String>();
+			userAgentHeaderList.add("CallForwardingB2BUASipServlet");
+			headers.put("User-Agent", userAgentHeaderList);
+			
+			List<String> contactHeaderList = new ArrayList<String>();
+			contactHeaderList.add("\"callforwardingB2BUA\" <sip:127.0.0.1:5070;transport=tcp>");
+			headers.put("Contact", contactHeaderList);
+			SipServletRequest forkedRequest = request.getB2buaHelper().createRequest(linkedSession, request, headers);
+//			SipServletRequest forkedRequest = linkedSession.createRequest("BYE");			
 			logger.info("forkedRequest = " + forkedRequest);			
 			forkedRequest.send();
 		}

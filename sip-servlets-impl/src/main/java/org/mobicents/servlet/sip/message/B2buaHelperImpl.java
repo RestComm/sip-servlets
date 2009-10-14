@@ -48,12 +48,24 @@ import javax.sip.header.ContactHeader;
 import javax.sip.header.ContentDispositionHeader;
 import javax.sip.header.ContentLengthHeader;
 import javax.sip.header.ContentTypeHeader;
+import javax.sip.header.DateHeader;
+import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.MimeVersionHeader;
+import javax.sip.header.MinExpiresHeader;
+import javax.sip.header.OrganizationHeader;
+import javax.sip.header.PriorityHeader;
 import javax.sip.header.RecordRouteHeader;
+import javax.sip.header.ReplyToHeader;
+import javax.sip.header.RetryAfterHeader;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.ServerHeader;
+import javax.sip.header.SubjectHeader;
+import javax.sip.header.TimeStampHeader;
 import javax.sip.header.ToHeader;
+import javax.sip.header.UserAgentHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
@@ -81,19 +93,6 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private static transient Logger logger = Logger.getLogger(B2buaHelperImpl.class);
-	
-	protected static final HashSet<String> singletonHeadersNames = new HashSet<String>();
-	static {
-		singletonHeadersNames.add(FromHeader.NAME);
-		singletonHeadersNames.add(ToHeader.NAME);
-		singletonHeadersNames.add(CSeqHeader.NAME);
-		singletonHeadersNames.add(CallIdHeader.NAME);
-		singletonHeadersNames.add(MaxForwardsHeader.NAME);
-		singletonHeadersNames.add(ContentLengthHeader.NAME);		
-		singletonHeadersNames.add(ContentDispositionHeader.NAME);
-		singletonHeadersNames.add(ContentTypeHeader.NAME);
-		//TODO are there any other singleton headers ?
-	}	
 	
 	protected static final HashSet<String> b2buaSystemHeaders = new HashSet<String>();
 	static {
@@ -309,7 +308,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 					for (String value : entry.getValue()) {							
 						final Header header = SipFactories.headerFactory.createHeader(
 								headerName, value);					
-						if(! singletonHeadersNames.contains(header.getName())) {
+						if(! JainSipUtils.singletonHeadersNames.contains(header.getName())) {
 							newRequest.addHeader(header);
 						} else {
 							newRequest.setHeader(header);

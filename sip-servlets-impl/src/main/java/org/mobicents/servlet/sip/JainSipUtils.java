@@ -46,9 +46,16 @@ import javax.sip.header.ContentDispositionHeader;
 import javax.sip.header.ContentEncodingHeader;
 import javax.sip.header.ContentLengthHeader;
 import javax.sip.header.ContentTypeHeader;
+import javax.sip.header.DateHeader;
 import javax.sip.header.ErrorInfoHeader;
 import javax.sip.header.EventHeader;
+import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
+import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.MimeVersionHeader;
+import javax.sip.header.MinExpiresHeader;
+import javax.sip.header.OrganizationHeader;
+import javax.sip.header.PriorityHeader;
 import javax.sip.header.RAckHeader;
 import javax.sip.header.RSeqHeader;
 import javax.sip.header.RecordRouteHeader;
@@ -56,9 +63,12 @@ import javax.sip.header.ReferToHeader;
 import javax.sip.header.ReplyToHeader;
 import javax.sip.header.RetryAfterHeader;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.ServerHeader;
 import javax.sip.header.SubjectHeader;
 import javax.sip.header.SupportedHeader;
+import javax.sip.header.TimeStampHeader;
 import javax.sip.header.ToHeader;
+import javax.sip.header.UserAgentHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Message;
 import javax.sip.message.Request;
@@ -314,11 +324,35 @@ public class JainSipUtils {
 	// we don't have any other choice as to maintain a static list of multi value headers
 	// because checking for , for the values as a delimiter won't work for WWW-Authenticate header which is not a multivalue header
 	// but contains multiple , 
-	public static final Set<String> multiValueHeaders = new HashSet<String>();	
-
+	public static final Set<String> singletonHeadersNames = new HashSet<String>();
 	static {
-		multiValueHeaders.add(AllowHeader.NAME);
-	}
+		singletonHeadersNames.add(FromHeader.NAME);
+		singletonHeadersNames.add(ToHeader.NAME);
+		singletonHeadersNames.add(CSeqHeader.NAME);
+		singletonHeadersNames.add(CallIdHeader.NAME);
+		singletonHeadersNames.add(MaxForwardsHeader.NAME);
+		singletonHeadersNames.add(ContentLengthHeader.NAME);		
+		singletonHeadersNames.add(ContentDispositionHeader.NAME);
+		singletonHeadersNames.add(ContentTypeHeader.NAME);
+		singletonHeadersNames.add(ContentLengthHeader.NAME);
+		singletonHeadersNames.add(ContentTypeHeader.NAME);
+		singletonHeadersNames.add(DateHeader.NAME);
+		singletonHeadersNames.add(ContentTypeHeader.NAME);
+		singletonHeadersNames.add(ExpiresHeader.NAME);
+		singletonHeadersNames.add(MinExpiresHeader.NAME);
+		singletonHeadersNames.add(MimeVersionHeader.NAME);
+		singletonHeadersNames.add(MinExpiresHeader.NAME);
+		singletonHeadersNames.add(OrganizationHeader.NAME);
+		singletonHeadersNames.add(PriorityHeader.NAME);
+		singletonHeadersNames.add(ReplyToHeader.NAME);
+		singletonHeadersNames.add(RetryAfterHeader.NAME);
+		singletonHeadersNames.add(PriorityHeader.NAME);
+		singletonHeadersNames.add(ServerHeader.NAME);
+		singletonHeadersNames.add(SubjectHeader.NAME);
+		singletonHeadersNames.add(TimeStampHeader.NAME);
+		singletonHeadersNames.add(UserAgentHeader.NAME);
+		//TODO are there any other singleton headers ?
+	}	
 
 	private static final String[] allowedAddressSchemes = {"sip","sips","http","https","tel","tels","mailto"};
 	

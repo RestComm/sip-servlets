@@ -248,16 +248,16 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		String nameToAdd = getCorrectHeaderName(hName);
 		
 		try {
-			if(JainSipUtils.multiValueHeaders.contains(name)) {
+			if(JainSipUtils.singletonHeadersNames.contains(name)) {
+				Header header = SipFactory.getInstance().createHeaderFactory()
+					.createHeader(nameToAdd, value);
+				this.message.addLast(header);				
+			} else {				
 				List<Header> headers = SipFactory.getInstance().createHeaderFactory().createHeaders(nameToAdd + ":" +
 						value);
 				for (Header header : headers) {
 					this.message.addLast(header);
 				}
-			} else {
-				Header header = SipFactory.getInstance().createHeaderFactory()
-					.createHeader(nameToAdd, value);
-				this.message.addLast(header);
 			}
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal args supplied ", ex);
@@ -1198,16 +1198,16 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		checkCommitted();
 		
 		try {
-			if(JainSipUtils.multiValueHeaders.contains(name)) {
+			if(JainSipUtils.singletonHeadersNames.contains(name)) {
+				Header header = SipFactory.getInstance().createHeaderFactory()
+					.createHeader(name, value);
+				this.message.setHeader(header);				
+			} else {				
 				List<Header> headers = SipFactory.getInstance().createHeaderFactory().createHeaders(name + ":" +
 						value);
 				for (Header header : headers) {
 					this.message.addLast(header);
 				}
-			} else {
-				Header header = SipFactory.getInstance().createHeaderFactory()
-					.createHeader(name, value);
-				this.message.setHeader(header);
 			}
 		} catch (Exception e) {
 			throw new RuntimeException("Error creating header!", e);

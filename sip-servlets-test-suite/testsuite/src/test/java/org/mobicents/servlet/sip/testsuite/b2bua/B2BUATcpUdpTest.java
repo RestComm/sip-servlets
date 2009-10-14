@@ -16,10 +16,14 @@
  */
 package org.mobicents.servlet.sip.testsuite.b2bua;
 
+import java.util.ListIterator;
+
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.CallIdHeader;
+import javax.sip.header.ContactHeader;
+import javax.sip.header.UserAgentHeader;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -39,8 +43,8 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 	private static final String TRANSPORT_UDP = "udp";
 	private static final String TRANSPORT_TCP = "tcp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 10000;	
-//	private static final int TIMEOUT = 100000000;
+//	private static final int TIMEOUT = 10000;	
+	private static final int TIMEOUT = 100000000;
 	
 	TestSipListener sender;
 	TestSipListener receiver;
@@ -107,12 +111,48 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {UserAgentHeader.NAME}, new String[] {"TestSipListener UA"});		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
 		CallIdHeader receiverCallIdHeader = (CallIdHeader)receiver.getInviteRequest().getHeader(CallIdHeader.NAME);
 		CallIdHeader senderCallIdHeader = (CallIdHeader)sender.getInviteRequest().getHeader(CallIdHeader.NAME);
+		ListIterator<UserAgentHeader> userAgentHeaderIt = receiver.getInviteRequest().getHeaders(UserAgentHeader.NAME);
+		int i = 0; 
+		while (userAgentHeaderIt.hasNext()) {
+			UserAgentHeader userAgentHeader = (UserAgentHeader) userAgentHeaderIt
+					.next();
+			assertTrue(userAgentHeader.toString().trim().endsWith("CallForwardingB2BUASipServlet"));
+			i++;
+		}
+		assertEquals(1, i);
+		ListIterator<ContactHeader> contactHeaderIt = receiver.getInviteRequest().getHeaders(ContactHeader.NAME);
+		i = 0; 
+		while (contactHeaderIt.hasNext()) {
+			ContactHeader contactHeader = (ContactHeader) contactHeaderIt
+					.next();
+			assertTrue(contactHeader.toString().trim().startsWith("Contact: \"callforwardingB2BUA\""));
+			i++;
+		}
+		assertEquals(1, i);
+		userAgentHeaderIt = receiver.getByeRequestReceived().getHeaders(UserAgentHeader.NAME);
+		i = 0; 
+		while (userAgentHeaderIt.hasNext()) {
+			UserAgentHeader userAgentHeader = (UserAgentHeader) userAgentHeaderIt
+					.next();
+			assertTrue(userAgentHeader.toString().trim().endsWith("CallForwardingB2BUASipServlet"));
+			i++;
+		}
+		assertEquals(1, i);
+		contactHeaderIt = receiver.getByeRequestReceived().getHeaders(ContactHeader.NAME);
+		i = 0; 
+		while (contactHeaderIt.hasNext()) {
+			ContactHeader contactHeader = (ContactHeader) contactHeaderIt
+					.next();
+			assertTrue(contactHeader.toString().trim().startsWith("Contact: \"callforwardingB2BUA\""));
+			i++;
+		}
+		assertEquals(1, i);
 		assertFalse(receiverCallIdHeader.getCallId().equals(senderCallIdHeader.getCallId()));
 	}
 
