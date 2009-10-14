@@ -150,13 +150,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 //			((FromHeader) newRequest.getHeader(FromHeader.NAME)).setParameter("tag", tag);
 			
 			// Remove the record route headers. This is a new call leg.
-			newRequest.removeHeader(RecordRouteHeader.NAME);
-			
-			//For non-REGISTER requests, the Contact header field is not copied 
-			//but is populated by the container as usualB2buaHelperImpl
-			if(!Request.REGISTER.equalsIgnoreCase(origRequest.getMethod())) {
-				newRequest.removeHeader(ContactHeader.NAME);
-			}
+			newRequest.removeHeader(RecordRouteHeader.NAME);			
 	
 			//Creating new call id
 			final ExtendedListeningPoint extendedListeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints().next();
@@ -193,8 +187,17 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			//If Contact header is present in the headerMap 
 			//then relevant portions of Contact header is to be used in the request created, 
 			//in accordance with section 4.1.3 of the specification.
-			for (String contactHeaderValue : contactHeaderSet) {
-				newSipServletRequest.addHeaderInternal(ContactHeader.NAME, contactHeaderValue, true);
+			if(contactHeaderSet.size() > 0) {
+				newRequest.removeHeader(ContactHeader.NAME);
+				for (String contactHeaderValue : contactHeaderSet) {
+					newSipServletRequest.addHeaderInternal(ContactHeader.NAME, contactHeaderValue, true);
+				}
+			} else {
+				//For non-REGISTER requests, the Contact header field is not copied 
+				//but is populated by the container as usualB2buaHelperImpl
+				if(!Request.REGISTER.equalsIgnoreCase(origRequest.getMethod())) {
+					newRequest.removeHeader(ContactHeader.NAME);
+				}
 			}
 			
 			originalRequestMap.put(originalSession.getKey(), origRequest);
