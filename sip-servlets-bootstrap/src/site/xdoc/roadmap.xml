@@ -47,7 +47,12 @@
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=987">
 						Default Application Router to support INBOUND and OUTBOUND differentiation
 						</a>
-						<br />								
+						<br />	
+						<img src="green.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=961">														
+						Allow Regexp in Default Application Router to select based on headers.
+						</a>
+						<br />							
 						<img src="red.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=999">
 						HA perf tests and improvements 
@@ -253,9 +258,15 @@
 								</a>
 							</li>
 							<li>
-								<img src="red.jpeg" />
+								<img src="green.jpeg" />
 								<a href="http://code.google.com/p/mobicents/issues/detail?id=1002">
 								B2buaHelperImpl.singletonHeadersNames map is mising some headers
+								</a>
+							</li>
+							<li>
+								<img src="red.jpeg" />
+								<a href="http://code.google.com/p/mobicents/issues/detail?id=1010">
+								Unable to set flag parameter to parameterable header
 								</a>
 							</li>
 						</ul>
@@ -284,10 +295,7 @@
 						<br />
 						<img src="red.jpeg" />
 						Server Header Support
-						<br />
-						<img src="red.jpeg" />
-						JAIN SIP Timers Configuration
-						<br />											
+						<br />																
 					</p>	
 				</subsection>
 				<subsection name="Version 1.3 - 1st February 2010">
@@ -391,12 +399,7 @@
 					</p>
 				</subsection>									
 				<subsection name="Version 1.7 - 1st October 2010 ">					
-					<p>											
-						<img src="red.jpeg" />
-						<a href="http://code.google.com/p/mobicents/issues/detail?id=961">														
-						Allow Regexp in Application Router to select based on headers.
-						</a>
-						<br />
+					<p>																	
 						<img src="red.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=677">
 						Hot deployment of Application Router
