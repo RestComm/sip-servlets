@@ -47,6 +47,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	private static final String TEST_REGISTER_C_SEQ = "testRegisterCSeq";
 	private static final String TEST_REGISTER_SAVED_SESSION = "testRegisterSavedSession";
 	private static final String TEST_SUBSCRIBER_URI = "testSubscriberUri";
+	private static final String TEST_FLAG_PARAM = "testFlagParameter";
 	private static final String TEST_EXTERNAL_ROUTING = "testExternalRouting";
 	private static final String TEST_EXTERNAL_ROUTING_NO_INFO = "testExternalRoutingNoInfo";
 	private static final String TEST_NON_EXISTING_HEADER = "TestNonExistingHeader";
@@ -152,7 +153,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 				sipServletResponse.send();
 				return;
 			}
-		}
+		}				
 		
 		request.getAddressHeader(TEST_NON_EXISTING_HEADER);
 		request.getHeader(TEST_NON_EXISTING_HEADER);
@@ -179,12 +180,41 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 			return;
 		}
 		if(!TEST_CANCEL_USERNAME.equalsIgnoreCase(((SipURI)request.getFrom().getURI()).getUser())) {
-			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);			
 			sipServletResponse.send();
 			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+			if(fromString.contains(TEST_FLAG_PARAM)) {
+				try {
+					sipServletResponse.setHeader("Contact", "sip:127.0.0.1:5070");
+					logger.error("an IllegalArgumentException should be thrown when trying to set the Contact Header on a 2xx response");
+					sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+					sipServletResponse.send();
+				} catch (IllegalArgumentException e) {
+					logger.info("Contact Header is not set-able for the 2XX response to an INVITE");
+				}
+				Parameterable contact = sipServletResponse.getParameterableHeader("Contact");
+				contact.setParameter("flagparam", "");
+				String contactStringified = contact.toString().trim();
+				logger.info("Contact Header with flag param " + contactStringified);
+				if(contactStringified.endsWith("flagparam=")) {
+					logger.error("the flagParam should not contains the equals followed by empty, it is a flag so no equals sign should be present, sending 500 response");
+					sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+					sipServletResponse.send();
+					return;
+				}
+				contact.setParameter("flagparam", null);
+				contactStringified = contact.toString().trim();
+				logger.info("Contact Header with flag param " + contactStringified);
+				if(contactStringified.endsWith("flagparam")) {
+					logger.error("the flagParam should have been removed when setting its value to null, sending 500 response");
+					sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+					sipServletResponse.send();
+					return;
+				}
+			}
 			sipServletResponse.send();
 		} else {
-			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);			
 			sipServletResponse.send();
 			try {
 				Thread.sleep(2000);

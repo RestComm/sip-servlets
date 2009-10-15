@@ -120,20 +120,22 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	 * @see javax.servlet.sip.Parameterable#setParameter(java.lang.String, java.lang.String)
 	 */
 	public void setParameter(String name, String value) {
+		// Global Fix by alexvinn for Issue 1010 : Unable to set flag parameter to parameterable header 
 		if(name == null) {
 			throw new NullPointerException("parameter name is null ! ");
 		}
 		if(value == null) {
-			throw new NullPointerException("parameter value is null ! ");
+			removeParameter(name);
+			return;
 		}
 		if(!isModifiable) {
 			throw new IllegalStateException("it is forbidden to modify the parameters");
 		}
-		//Fix from abondar for Issue 494 and angelo.marletta for Issue 502		
-		this.parameters.put(name.toLowerCase(),value);
+		//Fix from abondar for Issue 494 and angelo.marletta for Issue 502      
+		this.parameters.put(name.toLowerCase(), value);
 		if(header != null) {
 			try {
-				header.setParameter(name, value);
+				header.setParameter(name, "".equals(value) ? null : value);
 			} catch (ParseException e) {
 				throw new IllegalArgumentException("Problem setting parameter",e);
 			}

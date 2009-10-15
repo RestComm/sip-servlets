@@ -217,6 +217,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		
 		sender.sendSipRequest("INVITE", fromAddress, fromAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
+		assertEquals( 200, sender.getFinalResponseStatus());
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());	
 	}
@@ -230,6 +231,21 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		
 		sender.sendSipRequest("INVITE", fromAddress, fromAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
+		assertEquals( 200, sender.getFinalResponseStatus());
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());	
+	}
+	
+	// test for http://code.google.com/p/mobicents/issues/detail?id=1010
+	public void testFlagParameter() throws Exception {
+		String fromName = "testFlagParameter";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, fromAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertEquals( 200, sender.getFinalResponseStatus());
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());	
 	}
