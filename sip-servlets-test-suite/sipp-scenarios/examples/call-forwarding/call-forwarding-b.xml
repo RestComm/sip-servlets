@@ -63,7 +63,7 @@
     <![CDATA[
     
       BYE sip:barreiro@[remote_ip]:[remote_port] SIP/2.0      
-      [last_Via:]
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
       From: [$2]
       To: [$1]
       [last_Call-ID:]
@@ -77,14 +77,14 @@
     ]]>
   </send>
 
+  <recv response="200" optional="false" next="3"/>
+
   <nop>
     <action>
       <exec command="echo 'call-forwarding-b: looking good' >> results.txt"/>
       <exec int_cmd="stop_now"/>
     </action>
   </nop>
-  
-  <recv response="200" optional="false" next="3">
 
   <nop>
     <action>
