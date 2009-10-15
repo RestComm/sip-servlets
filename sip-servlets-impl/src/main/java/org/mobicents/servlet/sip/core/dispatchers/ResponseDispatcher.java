@@ -387,9 +387,9 @@ public class ResponseDispatcher extends MessageDispatcher {
 			// than adding it as a custom information, we add it as headers only if 
 			// the next via header is for the container
 			if(nextViaHeader != null && !sipApplicationDispatcher.isViaHeaderExternal(nextViaHeader)) {
-				sipServletMessage.addHeaderInternal(JainSipUtils.INITIAL_REMOTE_ADDR_HEADER_NAME, initialRemoteAddr, true); 
-				sipServletMessage.addHeaderInternal(JainSipUtils.INITIAL_REMOTE_PORT_HEADER_NAME, "" + initialRemotePort, true);
-				sipServletMessage.addHeaderInternal(JainSipUtils.INITIAL_REMOTE_TRANSPORT_HEADER_NAME, initialRemoteTransport, true);
+				sipServletMessage.setHeaderInternal(JainSipUtils.INITIAL_REMOTE_ADDR_HEADER_NAME, initialRemoteAddr, true); 
+				sipServletMessage.setHeaderInternal(JainSipUtils.INITIAL_REMOTE_PORT_HEADER_NAME, "" + initialRemotePort, true);
+				sipServletMessage.setHeaderInternal(JainSipUtils.INITIAL_REMOTE_TRANSPORT_HEADER_NAME, initialRemoteTransport, true);
 			}
 		} else {
 			// if the message comes from an internal source we add the initial remote info from the previously added headers

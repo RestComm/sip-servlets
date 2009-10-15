@@ -152,10 +152,8 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 					if(protocol != null && reasonCode != null && reasonText != null
 							&& protocol.length == reasonCode.length && reasonCode.length == reasonText.length) {
 						for (int i = 0; i < protocol.length; i++) {
-							((SipServletRequestImpl)cancelRequest).
-							addHeaderInternal("Reason", 
-									protocol[i] + ";cause=" + reasonCode[i] + ";text=\"" + reasonText[i] + "\"",
-									false);
+							((SipServletRequestImpl)cancelRequest).setHeaderInternal("Reason", 
+									protocol[i] + ";cause=" + reasonCode[i] + ";text=\"" + reasonText[i] + "\"", false);
 						}
 					}
 					cancelRequest.send();

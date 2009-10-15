@@ -264,6 +264,26 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		}
 	}
 	
+	public void setHeaderInternal(String name, String value, boolean bypassSystemHeaderCheck) {
+		if(name == null) {
+			throw new NullPointerException ("name parameter is null");
+		}
+		if(value == null) {
+			throw new NullPointerException ("value parameter is null");
+		}
+		if(!bypassSystemHeaderCheck && isSystemHeader(name)) {
+			throw new IllegalArgumentException(name + " is a system header !");
+		}		
+		
+		try {
+			Header header = SipFactory.getInstance().createHeaderFactory()
+				.createHeader(name, value);
+			this.message.setHeader(header);				
+		} catch (Exception e) {
+			throw new RuntimeException("Error creating header!", e);
+		}
+	}
+	
 	//check if the submitted value is of the form header-value *(COMMA header-value)
 //	private boolean isMultipleValue(String value) {
 //		StringTokenizer tokenizer = new StringTokenizer(value, ",");
