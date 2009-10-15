@@ -180,7 +180,12 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 			return;
 		}
 		if(!TEST_CANCEL_USERNAME.equalsIgnoreCase(((SipURI)request.getFrom().getURI()).getUser())) {
-			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);			
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
+			if(sipServletResponse.getParameterableHeader("Contact") == null) {
+				logger.error("the Contact Header on a non 3xx or 485 response should be set");
+				sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+				sipServletResponse.send();
+			}
 			sipServletResponse.send();
 			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 			if(fromString.contains(TEST_FLAG_PARAM)) {

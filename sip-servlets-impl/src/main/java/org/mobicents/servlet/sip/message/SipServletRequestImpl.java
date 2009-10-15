@@ -284,18 +284,21 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						toHeader.setTag(Integer.toString(new Random().nextInt(10000000)));
 					}
 				}
-				if (statusCode == Response.OK ) {
-					//Following restrictions in JSR 289 Section 4.1.3 Contact Header Field					
-					if(!Request.REGISTER.equals(requestMethod) && !Request.OPTIONS.equals(requestMethod)) { 
-					    // Add the contact header for the dialog.					    
-					    final ContactHeader contactHeader = JainSipUtils.createContactHeader(
-					    		super.sipFactoryImpl.getSipNetworkInterfaceManager(), request, null);
-					    if(logger.isDebugEnabled()) {
-					    	logger.debug("We're adding this contact header to our new response: '" + contactHeader + ", transport=" + JainSipUtils.findTransport(request));
-					    }
-					    response.setHeader(contactHeader);
+				// Following restrictions in JSR 289 Section 4.1.3 Contact Header Field
+				boolean setContactHeader = true;
+				if ((statusCode >= 300 && statusCode < 400) || statusCode == 485 || Request.REGISTER.equals(requestMethod) || Request.OPTIONS.equals(requestMethod)) {
+					// don't set the contact header in those case
+					setContactHeader = false;					
+				} 				
+				if(setContactHeader) { 
+				    // Add the contact header for the dialog.					    
+				    final ContactHeader contactHeader = JainSipUtils.createContactHeader(
+				    		super.sipFactoryImpl.getSipNetworkInterfaceManager(), request, null);
+				    if(logger.isDebugEnabled()) {
+				    	logger.debug("We're adding this contact header to our new response: '" + contactHeader + ", transport=" + JainSipUtils.findTransport(request));
 				    }
-				}
+				    response.setHeader(contactHeader);
+			    }
 			}
 			// Application Routing : Adding the recorded route headers as route headers
 			final ListIterator<RecordRouteHeader> recordRouteHeaders = request.getHeaders(RecordRouteHeader.NAME);
@@ -417,7 +420,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		MaxForwardsHeader mfHeader = (MaxForwardsHeader)this.message.getHeader(MaxForwardsHeader.NAME);
 		if(mfHeader.getMaxForwards()<=0) {
 			try {
-				this.createResponse(483, "Too many hops").send();
+				this.createResponse(Response.TOO_MANY_HOPS, "Too many hops").send();
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
