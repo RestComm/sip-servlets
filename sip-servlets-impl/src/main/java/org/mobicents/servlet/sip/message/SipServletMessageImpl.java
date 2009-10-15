@@ -1198,17 +1198,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		checkCommitted();
 		
 		try {
-			if(JainSipUtils.singletonHeadersNames.contains(name)) {
-				Header header = SipFactory.getInstance().createHeaderFactory()
-					.createHeader(name, value);
-				this.message.setHeader(header);				
-			} else {				
-				List<Header> headers = SipFactory.getInstance().createHeaderFactory().createHeaders(name + ":" +
-						value);
-				for (Header header : headers) {
-					this.message.addLast(header);
-				}
-			}
+			Header header = SipFactory.getInstance().createHeaderFactory()
+				.createHeader(name, value);
+			this.message.setHeader(header);				
 		} catch (Exception e) {
 			throw new RuntimeException("Error creating header!", e);
 		}
