@@ -84,7 +84,7 @@
     </action>
   </nop>
   
-  <recv response="200" optional="false" next="3">
+  <recv response="200" optional="false" next="3"/>
 
   <nop>
     <action>
