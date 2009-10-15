@@ -63,7 +63,7 @@
     <![CDATA[
     
       BYE sip:barreiro@[remote_ip]:[remote_port] SIP/2.0      
-      [last_Via:]
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]      
       From: [$2]
       To: [$1]
       [last_Call-ID:]
