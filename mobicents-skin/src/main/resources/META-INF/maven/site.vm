@@ -382,10 +382,7 @@ $bodyContent
 </div>
 </div>
 </div>
-<div class="footer">
-    <p><a href="https://mobicents.dev.java.net/servlets/ProjectNewsRSS">RSS Feed</a> | <a href="mailto:telco@redhat.com">Contact</a> | <a href="#">Products</a> | <a href="#">Disclaimer</a> | <a href="#">Privacy</a> <br />
-
-    </p>
+<div class="footer">   
   </div>
   <div id="footer">
     <div>
