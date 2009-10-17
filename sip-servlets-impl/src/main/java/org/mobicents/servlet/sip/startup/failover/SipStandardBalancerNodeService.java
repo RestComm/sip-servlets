@@ -218,7 +218,7 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 			throw new IllegalArgumentException(
 					"Somethign wrong with host creation.", e);
 		}		
-		String balancerName = address.getCanonicalHostName();
+		String balancerName = address.getCanonicalHostName() + ":" + rmiPort;
 
 		if (register.get(balancerName) != null) {
 			logger.info("Sip balancer " + balancerName + " already present, not added");
@@ -378,7 +378,7 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 			} catch (Exception e) {
 				if(displayBalancerWarning) {
 					logger.warn("Cannot access the SIP load balancer RMI registry: " + e.getMessage() +
-							"\nIf you need a cluster configuration make sure the SIP load balancer is running.");
+							"\nIf you need a cluster configuration make sure the SIP load balancer is running. Host " + balancerDescription.toString());
 //					logger.error("Cannot access the SIP load balancer RMI registry: " , e);
 					displayBalancerWarning = false;
 				}

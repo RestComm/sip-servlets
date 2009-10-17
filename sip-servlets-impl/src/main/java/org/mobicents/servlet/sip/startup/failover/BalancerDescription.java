@@ -39,6 +39,7 @@ public class BalancerDescription implements Serializable {
 		super();
 		this.address = address;
 		this.sipPort = sipPort;
+		this.rmiPort = rmiPort;
 	}
 	/**
 	 * @param address the address to set
@@ -106,6 +107,9 @@ public class BalancerDescription implements Serializable {
 		return true;
 	}
 	
-	
+	@Override
+	public String toString() {
+		return getAddress() + ":" + getSipPort() + ":" + getRmiPort();
+	}
 	
 }
