@@ -36,7 +36,7 @@ public interface SipBalancerNodeService {
 	 */
 	public String[] getBalancers();
 
-	public boolean addBalancer(String addr, int sipPort)
+	public boolean addBalancer(String addr, int sipPort, int rmiPort)
 			throws IllegalArgumentException, NullPointerException, IOException;
 
 	/**
@@ -55,7 +55,7 @@ public interface SipBalancerNodeService {
 	 *            </ul>
 	 * @throws IllegalArgumentException if something goes wrong when adding the balancer address or while trying to connect to it
 	 */
-	public boolean addBalancer(String hostName, int sipPort, int index)
+	public boolean addBalancer(String hostName, int sipPort, int index, int rmiPort)
 			throws IllegalArgumentException;
 
 	/**
@@ -74,10 +74,10 @@ public interface SipBalancerNodeService {
 	 * @throws IllegalArgumentException -
 	 *             if there is no balancer with that name on the list.
 	 */
-	public boolean removeBalancer(String addr, int sipPort)
+	public boolean removeBalancer(String addr, int sipPort, int rmiPort)
 			throws IllegalArgumentException;
 
-	public boolean removeBalancer(String hostName, int sipPort, int index)
+	public boolean removeBalancer(String hostName, int sipPort, int index, int rmiPort)
 			throws IllegalArgumentException;
 
 	

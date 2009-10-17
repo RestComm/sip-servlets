@@ -62,6 +62,7 @@ public class SipStandardService extends StandardService implements SipService {
 	protected SipApplicationDispatcher sipApplicationDispatcher;
 	protected int sipMessageQueueSize = 1500;
 	protected int memoryThreshold = 90;
+	protected String outboundProxy;
 	protected long congestionControlCheckingInterval = 30000;
 	// base timer interval for jain sip tx 
 	private int baseTimerInterval = 500;
@@ -474,5 +475,15 @@ public class SipStandardService extends StandardService implements SipService {
 	 */
 	public int getBaseTimerInterval() {
 		return baseTimerInterval;
+	}
+
+
+	public String getOutboundProxy() {
+		return outboundProxy;
+	}
+
+
+	public void setOutboundProxy(String outboundProxy) {
+		this.outboundProxy = outboundProxy;
 	}	
 }

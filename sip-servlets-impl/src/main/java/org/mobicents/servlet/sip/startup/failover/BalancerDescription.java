@@ -29,12 +29,13 @@ public class BalancerDescription implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private InetAddress address;
 	private int sipPort;
+	private int rmiPort;
 	/**
 	 * @param address
 	 * @param sipPort
 	 * @param hostName
 	 */
-	public BalancerDescription(InetAddress address, int sipPort) {
+	public BalancerDescription(InetAddress address, int sipPort, int rmiPort) {
 		super();
 		this.address = address;
 		this.sipPort = sipPort;
@@ -63,6 +64,12 @@ public class BalancerDescription implements Serializable {
 	public int getSipPort() {
 		return sipPort;
 	}
+	public int getRmiPort() {
+		return rmiPort;
+	}
+	public void setRmiPort(int rmiPort) {
+		this.rmiPort = rmiPort;
+	}
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()
 	 */
@@ -72,6 +79,7 @@ public class BalancerDescription implements Serializable {
 		int result = 1;
 		result = prime * result + ((address == null) ? 0 : address.hashCode());
 		result = prime * result + sipPort;
+		result = prime * result + rmiPort;
 		return result;
 	}
 	/* (non-Javadoc)
@@ -92,6 +100,8 @@ public class BalancerDescription implements Serializable {
 		} else if (!address.equals(other.address))
 			return false;
 		if (sipPort != other.sipPort)
+			return false;
+		if (rmiPort != other.rmiPort)
 			return false;
 		return true;
 	}

@@ -680,8 +680,21 @@ public class SipFactoryImpl implements Externalizable {
 	 */
 	public void addLoadBalancerRouteHeader(Request request) {
 		try {
-			javax.sip.address.SipURI sipUri = SipFactories.addressFactory.createSipURI(null, loadBalancerToUse.getAddress().getHostAddress());
-			sipUri.setPort(loadBalancerToUse.getSipPort());
+			String host = null;
+			int port = -1; 
+			String proxy = StaticServiceHolder.sipStandardService.getOutboundProxy();
+			if(proxy == null) {
+				host = loadBalancerToUse.getAddress().getHostAddress();
+				port = loadBalancerToUse.getSipPort();
+			} else {
+				int separatorIndex = proxy.indexOf(":");
+				if(separatorIndex>0) {
+					host = proxy.substring(0, separatorIndex);
+					port = Integer.parseInt(proxy.substring(separatorIndex + 1));
+				}
+			}
+			javax.sip.address.SipURI sipUri = SipFactories.addressFactory.createSipURI(null, host);
+			sipUri.setPort(port);
 			sipUri.setLrParam();
 			String transport = JainSipUtils.findTransport(request);
 			sipUri.setTransportParam(transport);
