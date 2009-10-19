@@ -24,7 +24,7 @@
 	
 	<context-param>
       <param-name>bye.delay</param-name>
-      <param-value>180000</param-value>
+      <param-value>60000</param-value>
     </context-param>
     
     <listener>

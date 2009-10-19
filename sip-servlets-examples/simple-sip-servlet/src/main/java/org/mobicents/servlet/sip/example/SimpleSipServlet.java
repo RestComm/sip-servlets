@@ -72,7 +72,7 @@ public class SimpleSipServlet extends SipServlet implements TimerListener {
 			IOException {
 		
 		if(logger.isInfoEnabled()) {
-			logger.info("SimpleProxyServlet: Got request:\n"
+			logger.info("Simple Servlet: Got request:\n"
 				+ request.getMethod());
 		}
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
@@ -95,6 +95,10 @@ public class SimpleSipServlet extends SipServlet implements TimerListener {
 		}
 		SipServletResponse sipServletResponse = request.createResponse(200);
 		sipServletResponse.send();
+		SipApplicationSession sipApplicationSession = sipServletResponse.getApplicationSession(false);
+		if(sipApplicationSession != null && sipApplicationSession.isValid()) {
+			sipApplicationSession.invalidate();
+		}		
 	}
 
 	/**
