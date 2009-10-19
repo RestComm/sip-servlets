@@ -282,7 +282,11 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 			
 			if(sipApplicationDispatcher.getSipFactory().getLoadBalancerToUse() != null && 
 					sipApplicationDispatcher.getSipFactory().getLoadBalancerToUse().equals(balancerDescription)) {
-				sipApplicationDispatcher.getSipFactory().setLoadBalancerToUse(null);
+				if(register.size() > 0) {
+					sipApplicationDispatcher.getSipFactory().setLoadBalancerToUse(register.get(register.keySet().iterator().next()));
+				} else {
+					sipApplicationDispatcher.getSipFactory().setLoadBalancerToUse(null);
+				}
 			}
 			return true;
 		}
@@ -401,7 +405,7 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 		}
 		for(BalancerDescription  balancerDescription:new HashSet<BalancerDescription>(register.values())) {
 			try {
-				Registry registry = LocateRegistry.getRegistry(balancerDescription.getAddress().getHostAddress(),2000);
+				Registry registry = LocateRegistry.getRegistry(balancerDescription.getAddress().getHostAddress(),balancerDescription.getRmiPort());
 				NodeRegisterRMIStub reg=(NodeRegisterRMIStub) registry.lookup("SIPBalancer");
 				reg.switchover(fromJvmRoute, toJvmRoute);
 				displayBalancerWarning = true;
@@ -431,7 +435,7 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 	private void removeNodesFromBalancers(ArrayList<SIPNode> info) {
 		for(BalancerDescription balancerDescription:new HashSet<BalancerDescription>(register.values())) {
 			try {
-				Registry registry = LocateRegistry.getRegistry(balancerDescription.getAddress().getHostAddress(),2000);
+				Registry registry = LocateRegistry.getRegistry(balancerDescription.getAddress().getHostAddress(),balancerDescription.getRmiPort());
 				NodeRegisterRMIStub reg=(NodeRegisterRMIStub) registry.lookup("SIPBalancer");
 				reg.forceRemoval(info);
 				displayBalancerWarning = true;
