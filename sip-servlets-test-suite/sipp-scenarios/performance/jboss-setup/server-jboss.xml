@@ -88,7 +88,7 @@
          -->
         
         <Host name="localhost"
-           autoDeploy="false" deployOnStartup="false" deployXML="false"
+           autoDeploy="false" deployOnStartup="false" deployXML="false" xmlNamespaceAware="true"
            hostConfigClass="org.mobicents.servlet.sip.startup.SipHostConfig"
            configClass="org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig"
            >
