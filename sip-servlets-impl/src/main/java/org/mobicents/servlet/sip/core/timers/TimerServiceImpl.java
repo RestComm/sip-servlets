@@ -37,7 +37,7 @@ public class TimerServiceImpl implements TimerService, Serializable {
 	
 	public static final int SCHEDULER_THREAD_POOL_DEFAULT_SIZE = 10;
 	
-	private ScheduledThreadPoolExecutor scheduledExecutor;
+	private transient ScheduledThreadPoolExecutor scheduledExecutor;
 	
 	public TimerServiceImpl() {		
 		scheduledExecutor = new ScheduledThreadPoolExecutor(SCHEDULER_THREAD_POOL_DEFAULT_SIZE);;
