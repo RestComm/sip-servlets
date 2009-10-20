@@ -1060,8 +1060,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			
 //			maxInactiveInterval = in.readInt();
 //			isNew = in.readBoolean();
-			isValid = in.readBoolean();
-			lastAccessedTime = in.readLong();
+			isValid = in.readBoolean();			
 
 			boolean proxySerialized = in.readBoolean();
 			if(proxySerialized) {
@@ -1164,8 +1163,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			out.writeLong(lastAccessedTime);
 //			out.writeInt(maxInactiveInterval);
 //			out.writeBoolean(isNew);
-			out.writeBoolean(isValid);
-			out.writeLong(lastAccessedTime);
+			out.writeBoolean(isValid);			
 			
 			if(proxy == null) {
 				out.writeBoolean(false);

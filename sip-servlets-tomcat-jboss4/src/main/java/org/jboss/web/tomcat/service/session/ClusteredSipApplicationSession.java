@@ -1005,8 +1005,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			lastAccessedTime = in.readLong();
 //			maxInactiveInterval = in.readInt();
 //			isNew = in.readBoolean();
-			isValid = in.readBoolean();
-			lastAccessedTime = in.readLong();
+			isValid = in.readBoolean();			
 
 			futureExpirationTimeOnPassivation = in.readLong();
 			if(expirationTimerTask == null && sipContext.getSipApplicationSessionTimeout() > 0) {
@@ -1098,8 +1097,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			out.writeLong(lastAccessedTime);
 //			out.writeInt(maxInactiveInterval);
 //			out.writeBoolean(isNew);
-			out.writeBoolean(isValid);
-			out.writeLong(lastAccessedTime);
+			out.writeBoolean(isValid);			
 
 			out.writeLong(expirationTime);
 			
