@@ -46,7 +46,7 @@ public class DistributableSimpleSipServlet
 	private static final long serialVersionUID = 1L;
 	private static final String RECEIVED = "Received";
 
-	private static Logger logger = Logger.getLogger(DistributableSimpleSipServlet.class);
+	private static final Logger logger = Logger.getLogger(DistributableSimpleSipServlet.class);
 	
 	private static final String CALLEE_SEND_BYE = "YouSendBye";
 	//60 sec
@@ -150,7 +150,7 @@ public class DistributableSimpleSipServlet
 			logger.info("Distributable Simple Servlet: timer expired\n");
 		}
 		SipSession sipSession = servletTimer.getApplicationSession().getSipSession((String)servletTimer.getInfo());
-		if(!State.TERMINATED.equals(sipSession.getState())) {
+		if(sipSession != null && !State.TERMINATED.equals(sipSession.getState())) {
 			try {
 				sipSession.createRequest("BYE").send();
 			} catch (IOException e) {
