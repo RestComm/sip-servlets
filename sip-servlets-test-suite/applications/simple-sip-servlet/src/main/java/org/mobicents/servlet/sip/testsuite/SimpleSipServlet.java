@@ -156,8 +156,11 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		}				
 		
 		request.getAddressHeader(TEST_NON_EXISTING_HEADER);
-		request.getHeader(TEST_NON_EXISTING_HEADER);
+		request.getHeader(TEST_NON_EXISTING_HEADER);		
 		request.getHeaders(TEST_NON_EXISTING_HEADER);
+		request.setHeader(TEST_NON_EXISTING_HEADER,"true");
+		request.removeHeader(TEST_NON_EXISTING_HEADER);
+		request.addHeader(TEST_NON_EXISTING_HEADER,"true");
 		request.getParameterableHeader("Reply-To");
 		request.getParameterableHeaders("Reply-To");
 		// Test register cseq issue http://groups.google.com/group/mobicents-public/browse_thread/thread/70f472ca111baccf

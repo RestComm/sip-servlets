@@ -248,16 +248,12 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		String nameToAdd = getCorrectHeaderName(hName);
 		
 		try {
+			// Fix to Issue 1015 by alexander.kozlov.IV
+			Header header = SipFactory.getInstance().createHeaderFactory().createHeader(nameToAdd, value);
 			if(JainSipUtils.singletonHeadersNames.contains(name)) {
-				Header header = SipFactory.getInstance().createHeaderFactory()
-					.createHeader(nameToAdd, value);
-				this.message.addLast(header);				
+				this.message.setHeader(header);				
 			} else {				
-				List<Header> headers = SipFactory.getInstance().createHeaderFactory().createHeaders(nameToAdd + ":" +
-						value);
-				for (Header header : headers) {
-					this.message.addLast(header);
-				}
+				this.message.addLast(header);				
 			}
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal args supplied ", ex);
