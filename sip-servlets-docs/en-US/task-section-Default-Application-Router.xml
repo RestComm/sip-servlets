@@ -147,6 +147,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
           			</listitem>	
          			</itemizedlist>		
 		</listitem>
+	</itemizedlist>
       <example id="example-DAR_Direction_Example">
         <title>DIRECTION Example</title>
         <para>In this example, two applications are declared for the
