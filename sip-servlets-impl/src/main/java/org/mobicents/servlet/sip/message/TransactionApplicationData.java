@@ -31,10 +31,9 @@ import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
  * 
  *@author mranga
  */
-public class TransactionApplicationData implements Serializable {
-		
-	private static final long serialVersionUID = 1L;
-	
+public class TransactionApplicationData implements Serializable {		
+
+	private static final long serialVersionUID = 9170581635026591070L;
 	private transient ProxyBranchImpl proxyBranch;	
 	private SipServletMessageImpl sipServletMessage;
 	private transient Set<SipServletResponseImpl> sipServletResponses;
