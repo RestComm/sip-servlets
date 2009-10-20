@@ -719,10 +719,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		return stored;
 	}
 
-	public boolean storeSipSession(SipSession baseSession) {
+	public boolean storeSipSession(final ClusteredSipSession session) {
 		boolean stored = false;
-		if (baseSession != null && started_) {
-			ClusteredSipSession session = (ClusteredSipSession) baseSession;
+		if (session != null && started_) {			
 
 			synchronized (session) {
 				if (logger.isDebugEnabled()) {
@@ -733,10 +732,10 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				if (session.isValid()
 						&& (session.isSessionDirty() || session
 								.getExceedsMaxUnreplicatedInterval())) {
-					if(logger.isInfoEnabled()) {
-						logger.info("replicating following sip session " + session.getId());
+					if(logger.isDebugEnabled()) {
+						logger.debug("replicating following sip session " + session.getId());
 					}
-					String realId = session.getId();
+					final String realId = session.getId();
 
 					// Notify all session attributes that they get serialized
 					// (SRV 7.7.2)
@@ -758,10 +757,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		return stored;
 	}
 	
-	public boolean storeSipApplicationSession(SipApplicationSession baseSession) {
+	public boolean storeSipApplicationSession(final ClusteredSipApplicationSession session) {
 		boolean stored = false;
-		if (baseSession != null && started_) {
-			ClusteredSipApplicationSession session = (ClusteredSipApplicationSession) baseSession;
+		if (session != null && started_) {
 
 			synchronized (session) {
 				if (logger.isDebugEnabled()) {
@@ -1408,7 +1406,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			sipFactory = this.getSipFactoryImpl();
 		}
 		long begin = System.currentTimeMillis();
-		boolean mustAdd = false;
+		boolean loadedFromCache = false;
 		ClusteredSipSession session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactory, sipApplicationSessionImpl);
 		
 		boolean doTx = false;
@@ -1417,7 +1415,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			// is sent in batch.
 			// Don't do anything if there is already transaction context
 			// associated with this thread.
-			if (tm.getTransaction() == null)
+			if (tm != null && tm.getTransaction() == null)
 				doTx = true;
 
 			if (doTx)
@@ -1440,18 +1438,20 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					// This is either the first time we've seen this session on this
 					// server, or we previously expired it and have since gotten
 					// a replication message from another server
-					mustAdd = true;
-					session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, true, sipFactory, sipApplicationSessionImpl);
+					session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, true, sipFactory, sipApplicationSessionImpl);					
 				}	
 				if(session != null) {
-					session = proxy_.loadSipSession(applicationSessionId, session, sessionData);
+					session = proxy_.loadSipSession(applicationSessionId, session, sessionData);					
+					loadedFromCache = true;
 				}
 			}
 		} catch (Exception ex) {
 			try {
 				// if(doTx)
 				// Let's set it no matter what.
-				tm.setRollbackOnly();
+				if(tm != null) {
+					tm.setRollbackOnly();
+				}
 			} catch (Exception exn) {
 				log_.error("Problem rolling back session mgmt transaction",
 						exn);
@@ -1473,11 +1473,10 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		}
 
 		if (session != null) {
-			
+			unloadedSipSessions_.remove(key.toString());
 			// Need to initialize.
-			session.initAfterLoad(this);
-			if (mustAdd)
-				add(session, false); // don't replicate
+			if(loadedFromCache)
+				session.initAfterLoad(this);			
 			long elapsed = System.currentTimeMillis() - begin;
 			stats_.updateLoadStats(key.toString(), elapsed);
 
@@ -1520,7 +1519,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		}
 
 		long begin = System.currentTimeMillis();
-		boolean mustAdd = false;
+		boolean loadedFromCache = false;
 		ClusteredSipApplicationSession session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, create);
 		boolean doTx = false;
 		try {
@@ -1528,7 +1527,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			// is sent in batch.
 			// Don't do anything if there is already transaction context
 			// associated with this thread.
-			if (tm.getTransaction() == null)
+			if (tm != null && tm.getTransaction() == null)
 				doTx = true;
 
 			if (doTx)
@@ -1544,11 +1543,11 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					// This is either the first time we've seen this session on this
 					// server, or we previously expired it and have since gotten
 					// a replication message from another server
-					mustAdd = true;
 					session = (ClusteredSipApplicationSession) sipManagerDelegate.getSipApplicationSession(key, true);
 				}
 				if(session != null) {
 					session = proxy_.loadSipApplicationSession(session, sessionData);
+					loadedFromCache = true;
 				}
 			}
 		} catch (Exception ex) {
@@ -1577,10 +1576,10 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		}
 
 		if (session != null) {
+			unloadedSipApplicationSessions_.remove(key.toString());
 			// Need to initialize.
-			session.initAfterLoad(this);
-			if (mustAdd)
-				add(session, false); // don't replicate
+			if(loadedFromCache)
+				session.initAfterLoad(this);			
 			long elapsed = System.currentTimeMillis() - begin;
 			stats_.updateLoadStats(key.toString(), elapsed);
 
@@ -1716,7 +1715,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				if (doTx)
 					endTransaction(session.getId());
 			} finally {
-				ConvergedSessionReplicationContext.finishCacheActivity();
+				ConvergedSessionReplicationContext.finishSipCacheActivity();
 			}
 		}
 	}
@@ -1777,7 +1776,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				if (doTx)
 					endTransaction(session.getId());
 			} finally {
-				ConvergedSessionReplicationContext.finishCacheActivity();
+				ConvergedSessionReplicationContext.finishSipCacheActivity();
 			}
 		}
 	}
@@ -2773,7 +2772,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			return null;
 		}
 		synchronized (clusterSess) {
-			String realId = clusterSess.getId();
+			final String realId = clusterSess.getId();
 
 			if (log_.isDebugEnabled()) {
 				log_.debug("Removing session from store with id: " + realId);
@@ -2808,7 +2807,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			return null;
 		}
 		synchronized (clusterSess) {
-			String realId = clusterSess.getId();
+			final String realId = clusterSess.getId();
 
 			if (log_.isDebugEnabled()) {
 				log_.debug("Removing session from store with id: " + realId);
@@ -2860,11 +2859,11 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 						+ " in the distributed cache");
 
 			session = loadSipApplicationSession(key, create);
-			if (session != null) {
-				add(session);
-				// TODO should we advise of a new session?
-				// tellNew();
-			}
+//			if (session != null) {
+//				add(session);
+//				// TODO should we advise of a new session?
+//				// tellNew();
+//			}
 		} else if (session != null && session.isOutdated()) {
 			if (logger.isDebugEnabled())
 				log_.debug("Updating session " + key
@@ -2929,11 +2928,11 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 						+ " in the distributed cache");
 
 			session = loadSipSession(key, create, sipFactoryImpl, sipApplicationSessionImpl);
-			if (session != null) {
-				add(session);
-				// TODO should we advise of a new session?
-				// tellNew();
-			}
+//			if (session != null) {
+//				add(session);
+//				// TODO should we advise of a new session?
+//				// tellNew();
+//			}
 		} else if (session != null && session.isOutdated()) {
 			if (logger.isDebugEnabled())
 				logger.debug("Updating session " + key

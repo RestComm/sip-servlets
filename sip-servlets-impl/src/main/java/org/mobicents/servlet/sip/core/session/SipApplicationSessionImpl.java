@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -123,7 +124,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected Map<String, Object> sipApplicationSessionAttributeMap;
 
-	protected transient ConcurrentHashMap<String,SipSessionKey> sipSessions;
+	protected transient Set<SipSessionKey> sipSessions;
 	
 	protected transient Set<String> httpSessions;
 	
@@ -174,7 +175,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	protected SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
-		sipSessions = new ConcurrentHashMap<String,SipSessionKey>();	
+		sipSessions = new CopyOnWriteArraySet<SipSessionKey>();	
 		this.key = key;
 		this.sipContext = sipContext;		
 		lastAccessedTime = creationTime = System.currentTimeMillis();
@@ -244,8 +245,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	public void addSipSession(MobicentsSipSession mobicentsSipSession) {
-		SipSessionKey key = this.sipSessions.putIfAbsent(mobicentsSipSession.getKey().toString(), mobicentsSipSession.getKey());
-		if(key == null) {
+		boolean wasPresent = this.sipSessions.add(mobicentsSipSession.getKey());
+		if(!wasPresent) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Added sip session " + mobicentsSipSession.getKey() + " to sip app session " + getKey());
 			}
@@ -255,11 +256,12 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	public SipSessionKey removeSipSession (MobicentsSipSession mobicentsSipSession) {
+		final SipSessionKey key = mobicentsSipSession.getKey();
 		if(sipSessions != null) {			
-			SipSessionKey key = this.sipSessions.remove(mobicentsSipSession.getKey().toString());
-			if(key != null) {
+			boolean wasPresent = this.sipSessions.remove(key);
+			if(wasPresent) {
 				if(logger.isDebugEnabled()) {
-					logger.debug("Removed sip session " + mobicentsSipSession.getKey() + " from sip app session " + getKey());
+					logger.debug("Removed sip session " + key + " from sip app session " + getKey());
 				}
 			}
 			return key;
@@ -430,7 +432,12 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		if(!isValid) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
-		return sipSessions.values().iterator();
+		Set<MobicentsSipSession> sipSessions = getSipSessions();
+		Set<HttpSession> httpSessions = getHttpSessions();
+		Set protocolSessions = new HashSet();
+		protocolSessions.addAll(httpSessions);
+		protocolSessions.addAll(sipSessions);
+		return protocolSessions.iterator();
 	}
 
 	/*
@@ -456,7 +463,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	protected Set<MobicentsSipSession> getSipSessions() {
 		Set<MobicentsSipSession> retSipSessions = new HashSet<MobicentsSipSession>();
 		if(sipSessions != null) {
-			for(SipSessionKey sipSessionKey : sipSessions.values()) {
+			for(SipSessionKey sipSessionKey : sipSessions) {
 				MobicentsSipSession sipSession = sipContext.getSipManager().getSipSession(sipSessionKey, false, null, this);
 				if(sipSession != null) {
 					retSipSessions.add(sipSession);
@@ -495,8 +502,15 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			logger.debug("Trying to find a session with the id " + id);
 			dumpSipSessions();
 		}
-		SipSessionKey sipSessionKey = sipSessions.get(id);
-		if(sipSessionKey != null) {
+		boolean isPresent = false;
+		SipSessionKey sipSessionKey = null;
+		try {
+			sipSessionKey = SessionManagerUtil.parseSipSessionKey(id);
+			isPresent = sipSessions.contains(sipSessionKey);
+		} catch (ParseException e) {
+			//can happen if the id passed is invalid
+		}		 
+		if(isPresent) {
 			return sipContext.getSipManager().getSipSession(sipSessionKey, false, null, this);
 		} else {
 			return null;
@@ -506,7 +520,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	private void dumpSipSessions() {
 		if(logger.isDebugEnabled()) {
 			logger.debug("sessions contained in the following app session " + key);
-			for (String sessionKey : sipSessions.keySet()) {
+			for (SipSessionKey sessionKey : sipSessions) {
 				logger.debug("session key " + sessionKey);
 			}
 		}

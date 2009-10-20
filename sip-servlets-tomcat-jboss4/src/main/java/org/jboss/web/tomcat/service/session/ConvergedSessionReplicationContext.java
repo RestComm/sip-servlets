@@ -213,8 +213,8 @@ public final class ConvergedSessionReplicationContext
             ctx.outerSipRequest = null;
             ctx.outerSipResponse = null;
             
-            if (ctx.sipActivityCount < 1)
-               sipReplicationContext.set(null);
+//            if (ctx.sipActivityCount < 1)
+//               sipReplicationContext.set(null);
             
             return ctx;
          }
@@ -390,7 +390,9 @@ public final class ConvergedSessionReplicationContext
          ctx.sipActivityCount--;
          if (ctx.sipActivityCount < 1 && ctx.sipappCount < 1)
          {
-            sipReplicationContext.set(null);
+        	ctx.soleSipSession = null;
+        	ctx.soleSipApplicationSession = null;
+            sipReplicationContext.set(null);            
          }
       }
    }

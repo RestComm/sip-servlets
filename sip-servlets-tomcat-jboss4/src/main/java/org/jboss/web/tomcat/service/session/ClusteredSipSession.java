@@ -67,7 +67,7 @@ import org.mobicents.servlet.sip.proxy.ProxyImpl;
 public abstract class ClusteredSipSession extends SipSessionImpl  
 	implements Externalizable {
 
-	private static transient final Logger logger = Logger.getLogger(ClusteredSipSession.class);
+	private static final Logger logger = Logger.getLogger(ClusteredSipSession.class);
 
 	/**
 	 * Descriptive information describing this Session implementation.
@@ -172,9 +172,9 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	 * Has this session only been accessed once?
 	 */
 	protected transient boolean firstAccess;
-	
-	protected transient SipApplicationSessionKey sipAppSessionParentKey;
-	
+	/**
+	 * SIP Dialog id
+	 */
 	protected transient String sessionCreatingDialogId = null;
 
 	/**
@@ -789,7 +789,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 		// Notify interested session event listeners
 //		fireSessionEvent(Session.SESSION_PASSIVATED_EVENT, null);
 
-		if (hasActivationListener != Boolean.FALSE) {
+		if (hasActivationListener != null && hasActivationListener) {
 			boolean hasListener = false;
 
 			// Notify ActivationListeners
@@ -826,7 +826,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 		// Notify interested session event listeners
 //		fireSessionEvent(Session.SESSION_ACTIVATED_EVENT, null);
 
-		if (hasActivationListener != Boolean.FALSE) {
+		if (hasActivationListener != null && hasActivationListener) {
 			// Notify ActivationListeners
 
 			boolean hasListener = false;
@@ -1021,9 +1021,9 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			if(logger.isDebugEnabled()) {
 				logger.debug("reading sip session from the cache. sip session key = " + key);
 			}
-			sipAppSessionParentKey = (SipApplicationSessionKey) in.readObject();
+			sipApplicationSessionKey = (SipApplicationSessionKey) in.readObject();
 			if(logger.isDebugEnabled()) {
-				logger.debug("reading sip session from the cache. sip app session key = " + sipAppSessionParentKey);
+				logger.debug("reading sip session from the cache. sip app session key = " + sipApplicationSessionKey);
 			}
 			routingRegion = (SipApplicationRoutingRegion) in.readObject();
 //			stateInfo = (Serializable) in.readObject();
@@ -1144,14 +1144,17 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 				out.writeUTF(subscriberURI.toString());
 			} else {
 				out.writeUTF("");
-			}
-			if(logger.isDebugEnabled()) {
-				logger.debug("serializing dialog for the sip session "+ sessionCreatingDialog);
-			}
+			}			
 //			out.writeObject((SIPDialog)sessionCreatingDialog);
 			if(sessionCreatingDialog != null && sessionCreatingDialog.getDialogId() != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("serializing dialog id for the sip session "+ sessionCreatingDialog.getDialogId());
+				}
 				out.writeUTF(sessionCreatingDialog.getDialogId());
 			} else {
+				if(logger.isDebugEnabled()) {
+					logger.debug("dialog id is null nothing to serialize ");
+				}
 				out.writeUTF("");
 			}
 			out.writeBoolean(invalidateWhenReady);

@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
-import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -44,7 +43,6 @@ import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
 import org.jboss.metadata.WebMetaData;
-import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
@@ -60,7 +58,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
 public abstract class ClusteredSipApplicationSession extends SipApplicationSessionImpl
 	implements Externalizable {
 
-	private static transient Logger logger = Logger.getLogger(ClusteredSipApplicationSession.class);
+	private static Logger logger = Logger.getLogger(ClusteredSipApplicationSession.class);
 	
 	/**
 	 * Descriptive information describing this Session implementation.
@@ -169,14 +167,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	 * this will hold the remaining time at which the session should have been expired at the time it has been passivated
 	 */
 	protected transient long futureExpirationTimeOnPassivation;
-	/**
-	 * the Set of keys of the sip sessions that were present in the sip application session at the time it has been passivated
-	 */
-	protected transient Set<SipSessionKey> sipSessionsOnPassivation;
-	/**
-	 * the Set of realId of the http sessions that were present in the sip application session at the time it has been passivated
-	 */
-	protected transient Set<String> httpSessionsOnPassivation;
+	
 	/**
 	 * The string manager for this package.
 	 */
@@ -192,9 +183,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 		this.firstAccess = true;
 		// it starts with true so that it gets replicated when first created
 		sessionMetadataDirty = true;
-		checkAlwaysReplicateMetadata();
-		sipSessionsOnPassivation = new HashSet<SipSessionKey>();
-		httpSessionsOnPassivation = new HashSet<String>();
+		checkAlwaysReplicateMetadata();		
 	}
 
 	/**
@@ -791,7 +780,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 		// Notify interested session event listeners
 //		fireSessionEvent(Session.SESSION_PASSIVATED_EVENT, null);
 
-		if (hasActivationListener != Boolean.FALSE) {
+		if (hasActivationListener != null && hasActivationListener) {
 			boolean hasListener = false;
 
 			// Notify ActivationListeners
@@ -822,7 +811,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 		// Notify interested session event listeners
 //		fireSessionEvent(Session.SESSION_ACTIVATED_EVENT, null);
 
-		if (hasActivationListener != Boolean.FALSE) {
+		if (hasActivationListener != null && hasActivationListener) {
 			// Notify ActivationListeners
 
 			boolean hasListener = false;
@@ -1032,16 +1021,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			}
 			int nbOfSipSessions = in.readInt();
 			for (int i = 0; i < nbOfSipSessions; i++) {
-				String sipSessionKeyStringified = in.readUTF();
-				try {
-					SipSessionKey sipSessionKey = SessionManagerUtil.parseSipSessionKey(sipSessionKeyStringified);
-					if(logger.isDebugEnabled()) {
-						logger.debug("reading sip session from the cached sip appsession . sip session key = " + sipSessionKey);
-					}
-					sipSessionsOnPassivation.add(sipSessionKey);
-				} catch (ParseException e) {
-					logger.error("Unexpected exception while parsing the sip session key that has been previously passivated " + sipSessionKeyStringified, e);
-				}				
+				sipSessions.add((SipSessionKey)in.readObject());								
 			}
 			
 			int nbOfHttpSessions = in.readInt();
@@ -1049,7 +1029,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 				httpSessions = new CopyOnWriteArraySet<String>();
 			}
 			for (int i = 0; i < nbOfHttpSessions; i++) {
-				httpSessionsOnPassivation.add(in.readUTF());
+				httpSessions.add(in.readUTF());
 			}
 			
 			//TODO get the persistent servletTimers
@@ -1124,8 +1104,8 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			out.writeLong(expirationTime);
 			
 			out.writeInt(sipSessions.size());
-			for (String sipSessionKey : sipSessions.keySet()) {
-				out.writeUTF(sipSessionKey);
+			for (SipSessionKey sipSessionKey : sipSessions) {
+				out.writeObject(sipSessionKey);
 			}
 			if(httpSessions != null) {
 				out.writeInt(httpSessions.size());

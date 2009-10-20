@@ -429,7 +429,7 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 		DistributableSipApplicationSessionMetadata dsm = (DistributableSipApplicationSessionMetadata)sipApplicationSessionData.getMetadata();
 		if (dsm != null) {
 			if (log_.isDebugEnabled()) {
-				log_.debug("putSipSession(): sip session ids to serialize " + dsm.getSipSessionIds());
+				log_.debug("putSipSession(): sip session ids to serialize " + dsm.getSipSessionKeys());
 				log_.debug("putSipSession(): http session ids to serialize " + dsm.getHttpSessionIds());
 			}
 			map.put(jBossCacheService.METADATA_KEY, dsm);

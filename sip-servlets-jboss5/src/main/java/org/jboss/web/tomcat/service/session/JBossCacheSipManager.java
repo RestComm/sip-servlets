@@ -2296,7 +2296,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 //               batchingManager.startBatch();
 //               doTx = true;
 //            }
-			
+			if(session == null) {
+				initialLoad = true;
+			}
             IncomingDistributableSessionData data = getDistributedCacheConvergedSipManager().getSessionData(applicationSessionKey, key, initialLoad);
             if (data != null)
             {
@@ -2356,7 +2358,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		}
 		if (session != null) {
 			if (mustAdd) {
-				add(session, false); // don't replicate
+				unloadedSipSessions_.remove(key);				
 				if (!passivated) {
 					session.tellNew(ClusteredSessionNotificationCause.FAILOVER);
 				}
@@ -2427,7 +2429,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 //				batchingManager.startBatch();
 //				doTx = true;
 //			}
-
+			if(session == null) {
+				initialLoad = true;
+			}
 			IncomingDistributableSessionData data = 
 				getDistributedCacheConvergedSipManager().getSessionData(key, initialLoad);
 			if (data != null) {
@@ -2479,7 +2483,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		}
 		if (session != null) {
 			if (mustAdd) {
-				add(session, false); // don't replicate
+				unloadedSipApplicationSessions_.remove(key);	
 				if (!passivated) {
 					session.tellNew(ClusteredSessionNotificationCause.FAILOVER);
 				}
@@ -3052,8 +3056,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 						+ " in the distributed cache");
 
 			session = loadSipApplicationSession(key, create);
-			if (session != null) {
-				add(session);
+//			if (session != null) {
+//				add(session);
 //				Iterator<ClusteredSipSession<OutgoingDistributableSessionData>> sipSessionIt = 
 //					(Iterator<ClusteredSipSession<OutgoingDistributableSessionData>>)
 //						((MobicentsSipApplicationSession)session).getSessions("SIP");
@@ -3068,9 +3072,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 //					}
 //					getSipSession(sipSession.getKey(), false, null, session);
 //				}	
-				// TODO should we advise of a new session?
-				// tellNew();
-			}
+//				// TODO should we advise of a new session?
+//				// tellNew();
+//			}
 		} else if (session != null && session.isOutdated()) {
 			if (logger.isDebugEnabled())
 				log_.debug("Updating sip app session " + key
@@ -3140,15 +3144,15 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 						+ " in the distributed cache");
 
 			session = loadSipSession(key, create, sipFactoryImpl, sipApplicationSessionImpl);
-			if (session != null)
-		    {
-		          add(session);
-//		          // We now notify, since we've added a policy to allow listeners 
-//		          // to discriminate. But the default policy will not allow the 
-//		          // notification to be emitted for FAILOVER, so the standard
-//		          // behavior is unchanged.
-//		          session.tellNew(ClusteredSessionNotificationCause.FAILOVER);
-		    }
+//			if (session != null)
+//		    {
+//		          add(session);
+////		          // We now notify, since we've added a policy to allow listeners 
+////		          // to discriminate. But the default policy will not allow the 
+////		          // notification to be emitted for FAILOVER, so the standard
+////		          // behavior is unchanged.
+////		          session.tellNew(ClusteredSessionNotificationCause.FAILOVER);
+//		    }
 		} else if (session != null && session.isOutdated()) {
 			if (logger.isDebugEnabled())
 				logger.debug("Updating sip session " + key

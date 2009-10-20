@@ -53,14 +53,7 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 	 *            the manager for this session
 	 */
 	public void initAfterLoad(JBossCacheSipManager manager) {		
-		sipContext = (SipContext) manager.getContainer();
-		for (SipSessionKey sipSessionKey : sipSessionsOnPassivation) {			
-			sipSessions.put(sipSessionKey.toString(), sipSessionKey);				
-		}
-		
-		for (String httpSessionKey : httpSessionsOnPassivation) {
-			httpSessions.add(httpSessionKey);
-		}
+		sipContext = (SipContext) manager.getContainer();		
 		
 		establishProxy();
 

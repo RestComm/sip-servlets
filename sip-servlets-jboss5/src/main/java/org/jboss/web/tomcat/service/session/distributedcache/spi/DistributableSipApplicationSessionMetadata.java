@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
 
 /**
  * @author jean.deruelle@gmail.com
@@ -33,11 +34,11 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 public class DistributableSipApplicationSessionMetadata extends
 		DistributableSessionMetadata {
 	private SipApplicationSessionKey sipApplicationSessionKey;
-	private Set<String> sipSessionIds;
+	private Set<SipSessionKey> sipSessionKeys;
 	private Set<String> httpSessionIds;
 	
 	public DistributableSipApplicationSessionMetadata() {
-		sipSessionIds = new HashSet<String>();
+		sipSessionKeys = new HashSet<SipSessionKey>();
 		httpSessionIds = new HashSet<String>();
 	}
 
@@ -55,16 +56,16 @@ public class DistributableSipApplicationSessionMetadata extends
 		return sipApplicationSessionKey;
 	}
 
-	public void addSipSessionId(String sipSessionId) {
-		sipSessionIds.add(sipSessionId);
+	public void addSipSessionKey(SipSessionKey sipSessionKey) {
+		sipSessionKeys.add(sipSessionKey);
 	}
 	
 	public void addHttpSessionId(String httpSessionId) {
 		httpSessionIds.add(httpSessionId);
 	}
 	
-	public Set<String> getSipSessionIds() {
-		return sipSessionIds;
+	public Set<SipSessionKey> getSipSessionKeys() {
+		return sipSessionKeys;
 	}
 	
 	public Set<String> getHttpSessionIds() {

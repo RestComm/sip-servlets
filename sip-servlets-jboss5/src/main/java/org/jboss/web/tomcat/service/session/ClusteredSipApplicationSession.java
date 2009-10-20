@@ -628,8 +628,8 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 
 	private void getSipApplicationSessionMetadata() {
 		this.metadata.setSipApplicationSessionKey(key);
-		for(String sessionId : sipSessions.keySet()) {
-			this.metadata.addSipSessionId(sessionId);
+		for(SipSessionKey sessionKey : sipSessions) {
+			this.metadata.addSipSessionKey(sessionKey);
 		}
 		if(httpSessions != null) {
 			for(String sessionId : httpSessions) {
@@ -666,16 +666,8 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		// From Sip Application Session
 		this.key = md.getSipApplicationSessionKey();
 
-		for (String sipSessionId : md.getSipSessionIds()) {
-			try {
-				SipSessionKey sipSessionKey = SessionManagerUtil.parseSipSessionKey(sipSessionId);
-				sipSessions.put(sipSessionId, sipSessionKey);
-				if(logger.isDebugEnabled()) {
-					logger.debug("reading sip session from the cached sip appsession . sip session key = " + sipSessionKey);
-				}				
-			} catch (ParseException e) {
-				logger.error("Unexpected exception while parsing the sip session key that has been previously passivated " + sipSessionId, e);
-			}								
+		for (SipSessionKey sipSessionKey : md.getSipSessionKeys()) {
+			sipSessions.add(sipSessionKey);							
 		}		
 		if(md.getHttpSessionIds().size() > 0  && httpSessions == null) {
 			httpSessions = new CopyOnWriteArraySet<String>();
