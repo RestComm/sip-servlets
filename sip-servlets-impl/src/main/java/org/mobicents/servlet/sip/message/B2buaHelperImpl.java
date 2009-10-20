@@ -308,6 +308,11 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 					if(b2buaSystemHeaders.contains(headerName)) {
 						throw new IllegalArgumentException(headerName + " in the provided map is a system header");
 					}
+					// Fix for Issue 1002 : The header field map is then used to 
+					// override the headers in the newly created request so the header copied from the original request is removed 
+					if(entry.getValue().size() > 0)  {						
+						newRequest.removeHeader(headerName);
+					}
 					for (String value : entry.getValue()) {							
 						final Header header = SipFactories.headerFactory.createHeader(
 								headerName, value);					

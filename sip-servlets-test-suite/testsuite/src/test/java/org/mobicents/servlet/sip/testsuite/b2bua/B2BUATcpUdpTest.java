@@ -23,6 +23,7 @@ import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.Header;
 import javax.sip.header.UserAgentHeader;
 
 import org.apache.log4j.Logger;
@@ -111,7 +112,7 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {UserAgentHeader.NAME}, new String[] {"TestSipListener UA"});		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {UserAgentHeader.NAME, "extension-header"}, new String[] {"TestSipListener UA", "extension-sip-listener"});		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
@@ -135,6 +136,13 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 			i++;
 		}
 		assertEquals(1, i);
+		ListIterator<Header> extensionHeaderIt = receiver.getInviteRequest().getHeaders("extension-header");
+		i = 0; 
+		while (extensionHeaderIt.hasNext()) {	
+			extensionHeaderIt.next();
+			i++;
+		}
+		assertEquals(2, i);
 		userAgentHeaderIt = receiver.getByeRequestReceived().getHeaders(UserAgentHeader.NAME);
 		i = 0; 
 		while (userAgentHeaderIt.hasNext()) {
@@ -154,6 +162,13 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		}
 		assertEquals(1, i);
 		assertFalse(receiverCallIdHeader.getCallId().equals(senderCallIdHeader.getCallId()));
+		extensionHeaderIt = receiver.getByeRequestReceived().getHeaders("extension-header");
+		i = 0; 
+		while (extensionHeaderIt.hasNext()) {	
+			extensionHeaderIt.next();
+			i++;
+		}
+		assertEquals(2, i);
 	}
 
 	public void testCallForwardingCalleeSendBye() throws Exception {

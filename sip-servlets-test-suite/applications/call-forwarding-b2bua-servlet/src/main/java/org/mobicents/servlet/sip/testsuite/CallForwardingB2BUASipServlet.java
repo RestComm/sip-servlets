@@ -141,6 +141,11 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			contactHeaderList.add("\"callforwardingB2BUA\" <sip:127.0.0.1:5070;transport=tcp>");
 			headers.put("Contact", contactHeaderList);
 			
+			List<String> extensionsHeaderList = new ArrayList<String>();
+			extensionsHeaderList.add("extension-header-value1");
+			extensionsHeaderList.add("extension-header-value2");
+			headers.put("extension-header", extensionsHeaderList);
+			
 			SipServletRequest forkedRequest = helper.createRequest(request, true,
 					headers);
 			SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1]);
@@ -175,6 +180,12 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			List<String> contactHeaderList = new ArrayList<String>();
 			contactHeaderList.add("\"callforwardingB2BUA\" <sip:127.0.0.1:5070;transport=tcp>");
 			headers.put("Contact", contactHeaderList);
+			
+			List<String> extensionsHeaderList = new ArrayList<String>();
+			extensionsHeaderList.add("extension-header-value1");
+			extensionsHeaderList.add("extension-header-value2");
+			headers.put("extension-header", extensionsHeaderList);
+			
 			SipServletRequest forkedRequest = request.getB2buaHelper().createRequest(linkedSession, request, headers);
 //			SipServletRequest forkedRequest = linkedSession.createRequest("BYE");			
 			logger.info("forkedRequest = " + forkedRequest);			
