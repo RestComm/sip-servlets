@@ -79,16 +79,16 @@ public class MobicentsSipApplicationSessionFacade implements
 		this.sipApplicationSession.access();
 	}
 
-	public void addHttpSession(HttpSession httpSession) {
-		this.sipApplicationSession.addHttpSession(httpSession);
+	public boolean addHttpSession(HttpSession httpSession) {
+		return this.sipApplicationSession.addHttpSession(httpSession);
 	}
 
 	public void addServletTimer(ServletTimer servletTimer) {
 		this.sipApplicationSession.addServletTimer(servletTimer);
 	}
 
-	public void addSipSession(MobicentsSipSession mobicentsSipSession) {
-		this.sipApplicationSession.addSipSession(mobicentsSipSession);
+	public boolean addSipSession(MobicentsSipSession mobicentsSipSession) {
+		return this.sipApplicationSession.addSipSession(mobicentsSipSession);
 	}
 
 	public HttpSession findHttpSession(String id) {

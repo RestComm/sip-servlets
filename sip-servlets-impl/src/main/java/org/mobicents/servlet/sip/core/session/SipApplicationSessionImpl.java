@@ -106,7 +106,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			//should not be treated as expired.
 			if(getDelay() <= 0) {
 				expired = true;
-				if(isValid) {
+				if(isValid()) {
 					sipContext.enterSipApp(null, null, null, true, false);
 					try {
 						invalidate();
@@ -176,13 +176,13 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
 		sipSessions = new CopyOnWriteArraySet<SipSessionKey>();	
-		this.key = key;
-		this.sipContext = sipContext;		
+		this.key = key;			
 		lastAccessedTime = creationTime = System.currentTimeMillis();
 		expired = false;		
 		isValid = true;		
 		// the sip context can be null if the AR returned an application that was not deployed
 		if(sipContext != null) {
+			this.sipContext = sipContext;
 			this.currentRequestHandler = sipContext.getMainServlet();
 			if(ConcurrencyControlMode.SipApplicationSession.equals(sipContext.getConcurrencyControlMode())) {
 				semaphore = new Semaphore(1);
@@ -244,14 +244,15 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}		
 	}
 	
-	public void addSipSession(MobicentsSipSession mobicentsSipSession) {
-		boolean wasPresent = this.sipSessions.add(mobicentsSipSession.getKey());
-		if(!wasPresent) {
+	public boolean addSipSession(MobicentsSipSession mobicentsSipSession) {
+		boolean wasNotPresent = this.sipSessions.add(mobicentsSipSession.getKey());
+		if(wasNotPresent) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Added sip session " + mobicentsSipSession.getKey() + " to sip app session " + getKey());
 			}
 		}
 		readyToInvalidate = false;
+		return wasNotPresent;
 //		sipSessionImpl.setSipApplicationSession(this);
 	}
 	
@@ -269,16 +270,17 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		return null;
 	}
 	
-	public void addHttpSession(HttpSession httpSession) {
+	public boolean addHttpSession(HttpSession httpSession) {
 		if(httpSessions == null) {
 			httpSessions = new CopyOnWriteArraySet<String>();
 		}
-		this.httpSessions.add(JvmRouteUtil.removeJvmRoute(httpSession.getId()));
+		boolean wasNotPresent = this.httpSessions.add(JvmRouteUtil.removeJvmRoute(httpSession.getId()));
 		readyToInvalidate = false;
 		// TODO: We assume that there is only one HTTP session in the app session. In this case
 		// we are safe to only assign jvmRoute once here. When we support multiple http sessions
 		// we will need something more sophisticated.
 		setJvmRoute(JvmRouteUtil.extractJvmRoute(httpSession.getId()));
+		return wasNotPresent;
 	}
 	
 	public boolean removeHttpSession(HttpSession httpSession) {
@@ -316,7 +318,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * http://hostname/link?something=1 -> http://hostname/link?something=1&org.mobicents.servlet.sip.ApplicationSessionKey=0
 	 */
 	public URL encodeURL(URL url) {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		String urlStr = url.toExternalForm();
@@ -339,7 +341,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * {@inheritDoc}
 	 */
 	public Object getAttribute(String name) {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		return this.getAttributeMap().get(name);
@@ -350,7 +352,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#getAttributeNames()
 	 */
 	public Iterator<String> getAttributeNames() {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		return this.getAttributeMap().keySet().iterator();
@@ -361,7 +363,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#getCreationTime()
 	 */
 	public long getCreationTime() {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		return creationTime;
@@ -372,7 +374,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#getExpirationTime()
 	 */
 	public long getExpirationTime() {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("this sip application session is not valid anymore");
 		}
 		if(expirationTimerTask == null) {
@@ -429,7 +431,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#getSessions()
 	 */
 	public Iterator<?> getSessions() {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		Set<MobicentsSipSession> sipSessions = getSipSessions();
@@ -445,7 +447,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#getSessions(java.lang.String)
 	 */
 	public Iterator<?> getSessions(String protocol) {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		if(protocol == null) {
@@ -495,7 +497,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#getSipSession(java.lang.String)
 	 */
 	public SipSession getSipSession(String id) {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		if(logger.isDebugEnabled()) {
@@ -531,7 +533,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#getTimers()
 	 */
 	public Collection<ServletTimer> getTimers() {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		if(servletTimers != null) {
@@ -605,7 +607,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);
 		
-		isValid = false;	
+		setValid(false);	
 		//cancelling the timers
 		if(servletTimers != null) {
 			for (Map.Entry<String, ServletTimer> servletTimerEntry : servletTimers.entrySet()) {
@@ -705,13 +707,20 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		return isValid;
 	}
 
+	/**
+	 * @param isValid the isValid to set
+	 */
+	protected void setValid(boolean isValid) {
+		this.isValid = isValid;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipApplicationSession#removeAttribute(java.lang.String)
 	 */
 	public void removeAttribute(String name) {
 
-		if (!isValid)
+		if (!isValid())
 			throw new IllegalStateException(
 					"Can not bind object to session that has been invalidated!!");
 
@@ -756,7 +765,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 */
 	public void setAttribute(String key, Object attribute) {
 
-		if (!isValid)
+		if (!isValid())
 			throw new IllegalStateException(
 					"Can not bind object to session that has been invalidated!!");
 
@@ -833,7 +842,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#setExpires(int)
 	 */
 	public int setExpires(int deltaMinutes) {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("Impossible to change the sip application " +
 					"session timeout when it has been invalidated !");
 		}
@@ -922,7 +931,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#getTimer(java.lang.String)
 	 */
 	public ServletTimer getTimer(String id) {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		if(servletTimers != null) {
@@ -982,7 +991,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
     }
 
 	public boolean getInvalidateWhenReady() {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		return invalidateWhenReady;
@@ -992,7 +1001,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * {@inheritDoc}
 	 */
 	public Object getSession(String id, Protocol protocol) {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		if(id == null) {
@@ -1012,7 +1021,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 
 	public boolean isReadyToInvalidate() {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		updateReadyToInvalidateState();
@@ -1020,7 +1029,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 
 	public void setInvalidateWhenReady(boolean invalidateWhenReady) {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		this.invalidateWhenReady = invalidateWhenReady;
@@ -1032,7 +1041,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	private void updateReadyToInvalidateState() {
-		if(isValid && !readyToInvalidate) {
+		if(isValid() && !readyToInvalidate) {
 			for(MobicentsSipSession sipSession : getSipSessions()) {
 				if(sipSession.isValid() && !sipSession.isReadyToInvalidate()) {
 					if(logger.isDebugEnabled()) {
@@ -1074,7 +1083,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	public void tryToInvalidate() {
-		if(isValid && invalidateWhenReady) {
+		if(isValid() && invalidateWhenReady) {
 			notifySipApplicationSessionListeners(SipApplicationSessionEventType.READYTOINVALIDATE);
 			if(readyToInvalidate) {
 				boolean allSipSessionsInvalidated = true;

@@ -370,7 +370,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	 */
 	public void setMaxInactiveInterval(int interval) {
 		this.maxInactiveInterval = interval;
-		if (isValid && interval == 0) {
+		if (isValid() && interval == 0) {
 			invalidate();
 		}
 		checkAlwaysReplicateTimestamp();
@@ -772,7 +772,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		this.metadata.setCreationTime(creationTime);
 		this.metadata.setMaxInactiveInterval(maxInactiveInterval);
 		this.metadata.setNew(isNew);
-		this.metadata.setValid(isValid);
+		this.metadata.setValid(isValid());
 		
 		getSipSessionMetadata();
 		
@@ -784,9 +784,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		this.metadata.setSipSessionKey(key);
 		this.metadata.setB2buaHelper(b2buaHelper);
 		this.metadata.setProxy(proxy);
-		this.metadata.setHandlerServlet(handlerServlet);
-		this.metadata.setInvalidateWhenReady(invalidateWhenReady);
-		this.metadata.setReadyToInvalidate(readyToInvalidate);
+		this.metadata.setHandlerServlet(getHandler());
+		this.metadata.setInvalidateWhenReady(getInvalidateWhenReady());
+		this.metadata.setReadyToInvalidate(isReadyToInvalidate());
 		this.metadata.setRoutingRegion(routingRegion);
 		if(sessionCreatingDialog != null) {
 			this.metadata.setSipDialogId(sessionCreatingDialog.getDialogId());
@@ -820,7 +820,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		this.creationTime = md.getCreationTime();
 		this.maxInactiveInterval = md.getMaxInactiveInterval();
 		this.isNew = md.isNew();
-		this.isValid = md.isValid();
+		this.setValid(md.isValid());
 		this.metadata = md;
 		
 		updateSipSession(md);
@@ -908,7 +908,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			logger.debug("deserialized dialog id for the sip session "+ sessionCreatingDialogId);
 		}
 		invalidateWhenReady = md.isInvalidateWhenReady();
-		readyToInvalidate = md.isReadyToInvalidate();
+		setReadyToInvalidate(md.isReadyToInvalidate());
 		proxy = (ProxyImpl) md.getProxy();
 		b2buaHelper = (B2buaHelperImpl) md.getB2buaHelper();
 		if(logger.isDebugEnabled()) {

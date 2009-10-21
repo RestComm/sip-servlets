@@ -33,7 +33,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
 public interface MobicentsSipApplicationSession extends SipApplicationSession {
 	public static final String SIP_APPLICATION_KEY_PARAM_NAME = "org.mobicents.servlet.sip.ApplicationSessionKey";
 	
-	void addHttpSession(HttpSession httpSession);
+	boolean addHttpSession(HttpSession httpSession);
 	
 	boolean removeHttpSession(HttpSession httpSession);
 	
@@ -43,7 +43,7 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession {
 
 	void onSipSessionReadyToInvalidate(MobicentsSipSession mobicentsSipSession);
 
-	void addSipSession(MobicentsSipSession mobicentsSipSession);
+	boolean addSipSession(MobicentsSipSession mobicentsSipSession);
 
 	SipApplicationSessionKey getKey();
 

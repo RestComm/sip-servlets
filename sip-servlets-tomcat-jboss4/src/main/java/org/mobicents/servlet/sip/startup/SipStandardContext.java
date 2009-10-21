@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -54,6 +55,8 @@ import org.apache.catalina.core.NamingContextListener;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.log4j.Logger;
+import org.jboss.web.tomcat.service.session.ClusteredSipApplicationSession;
+import org.jboss.web.tomcat.service.session.ClusteredSipSession;
 import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
 import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
@@ -1091,15 +1094,19 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			try {
 				ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
 						.exitSipapp();
-
+				final SnapshotSipManager snapshotSipManager =(SnapshotSipManager) ctx.getSoleSnapshotManager();
 				if(logger.isInfoEnabled()) {
 					logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
 				}
-				if (ctx.getSoleSnapshotManager() != null) {
-					((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-							ctx.getSoleSipSession());
-					((SnapshotSipManager)ctx.getSoleSnapshotManager()).snapshot(
-							ctx.getSoleSipApplicationSession());
+				if (snapshotSipManager != null) {
+					Set<ClusteredSipSession> sipSessions = ctx.getSipSessions();
+					for (ClusteredSipSession clusteredSipSession : sipSessions) {
+						snapshotSipManager.snapshot(clusteredSipSession);
+					}
+					Set<ClusteredSipApplicationSession> sipApplicationSessions = ctx.getSipApplicationSessions();
+					for (ClusteredSipApplicationSession clusteredSipApplicationSession : sipApplicationSessions) {
+						snapshotSipManager.snapshot(clusteredSipApplicationSession);
+					}
 				} 
 			} finally {
 				ConvergedSessionReplicationContext.finishSipCacheActivity();

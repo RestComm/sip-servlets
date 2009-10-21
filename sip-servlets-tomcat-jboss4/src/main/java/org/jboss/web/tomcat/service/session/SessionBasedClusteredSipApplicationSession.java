@@ -21,6 +21,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -52,7 +53,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public class SessionBasedClusteredSipApplicationSession extends
 		JBossCacheClusteredSipApplicationSession {
-
+	private static final Logger logger = Logger.getLogger(SessionBasedClusteredSipApplicationSession.class);
 	/**
 	 * Descriptive information describing this Session implementation.
 	 */
@@ -142,12 +143,14 @@ public class SessionBasedClusteredSipApplicationSession extends
 	 */
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
-		synchronized (this) {
+//		synchronized (this) {
 			// Let superclass read in everything but the attribute map
 			super.readExternal(in);
 
-			sipApplicationSessionAttributeMap = (Map) in.readObject();
-		}
+			final String sipAppSessionKey = getId();
+			
+			sipApplicationSessionAttributeMap = (Map)proxy_.getSipApplicationSessionAttribute(sipAppSessionKey, "attributes");
+//		}
 	}
 
 	/**
@@ -158,19 +161,22 @@ public class SessionBasedClusteredSipApplicationSession extends
 	 * @see org.jboss.web.tomcat.service.session.ClusteredSession#writeExternal(java.io.ObjectOutput)
 	 */
 	public void writeExternal(ObjectOutput out) throws IOException {
-		synchronized (this) {
+//		synchronized (this) {
 			// Let superclass write out everything but the attribute map
 			super.writeExternal(out);
 
-			// Don't replicate any excluded attributes
-			Map excluded = removeExcludedAttributes(getAttributeMap());
+			if(sessionAttributesDirty) {
+				final String sipAppSessionKey = getId();
+				// Don't replicate any excluded attributes
+				Map excluded = removeExcludedAttributes(getAttributeMap());
 
-			out.writeObject(sipApplicationSessionAttributeMap);
+				proxy_.putSipApplicationSessionAttribute(sipAppSessionKey, "attributes", sipApplicationSessionAttributeMap);
 
-			// Restore any excluded attributes
-			if (excluded != null)
-				sipApplicationSessionAttributeMap.putAll(excluded);
-		}
+				// Restore any excluded attributes
+				if (excluded != null)
+					sipApplicationSessionAttributeMap.putAll(excluded);								
+			}
+//		}
 
 	}
 

@@ -69,6 +69,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
    public static final String SESSION = "JSESSION";
    public static final String SIPSESSION = "SIPSESSION";
    public static final String ATTRIBUTE = "ATTRIBUTE";
+   public static final String META = "META";
    // Needed for cache invalidation
    public static final String VERSION_KEY = "VERSION";
    static final String FQN_DELIMITER = "/";
@@ -709,6 +710,18 @@ public class ConvergedJBossCacheService extends JBossCacheService
       return getUnMarshalledValue(cacheWrapper_.get(fqn, key));
    }
    
+   public Object getSipApplicationSessionMetaData(String realId, String key)
+   {
+      Fqn fqn = getSipApplicationSessionMetaAttributeFqn(realId);
+      return getUnMarshalledValue(cacheWrapper_.get(fqn, key));
+   }
+
+   public Object getSipSessionMetaData(String id, String realId, String key)
+   {
+      Fqn fqn = getSipSessionMetaAttributeFqn(id, realId);
+      return getUnMarshalledValue(cacheWrapper_.get(fqn, key));
+   }
+   
    public void putAttribute(String realId, String key, Object value)
    {
       Fqn fqn = getAttributeFqn(realId);
@@ -724,6 +737,18 @@ public class ConvergedJBossCacheService extends JBossCacheService
    public void putSipSessionAttribute(String id, String realId, String key, Object value)
    {
       Fqn fqn = getSipSessionAttributeFqn(id, realId);
+      cacheWrapper_.put(fqn, key, getMarshalledValue(value));
+   }
+   
+   public void putSipApplicationSessionMetaData(String realId, String key, Object value)
+   {
+      Fqn fqn = getSipApplicationSessionMetaAttributeFqn(realId);
+      cacheWrapper_.put(fqn, key, getMarshalledValue(value));
+   }
+   
+   public void putSipSessionMetaData(String id, String realId, String key, Object value)
+   {
+      Fqn fqn = getSipSessionMetaAttributeFqn(id, realId);
       cacheWrapper_.put(fqn, key, getMarshalledValue(value));
    }
 
@@ -1825,6 +1850,20 @@ public class ConvergedJBossCacheService extends JBossCacheService
    {
       // /SIPSESSION/hostName/sipapplicationname/id/sessionid/ATTR
       Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationName, id, sessionId, ATTRIBUTE};
+      return new Fqn(objs);
+   }
+   
+   private Fqn getSipSessionMetaAttributeFqn(String id, String sessionId)
+   {
+      // /SIPSESSION/hostName/sipapplicationname/id/sessionid/META
+      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationName, id, sessionId, META};
+      return new Fqn(objs);
+   }
+   
+   private Fqn getSipApplicationSessionMetaAttributeFqn(String id)
+   {
+      // /SIPSESSION/hostName/sipapplicationname/id/META
+      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationName, id, META};
       return new Fqn(objs);
    }
 

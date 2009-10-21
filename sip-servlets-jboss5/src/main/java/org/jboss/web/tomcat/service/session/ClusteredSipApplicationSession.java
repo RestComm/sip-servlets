@@ -373,7 +373,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	}	
 
 	public void setValid(boolean isValid) {
-		this.isValid = isValid;
+		super.setValid(isValid);
 		sessionMetadataDirty();
 	}
 
@@ -619,7 +619,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		this.metadata.setCreationTime(creationTime);
 		this.metadata.setMaxInactiveInterval(maxInactiveInterval);
 		this.metadata.setNew(isNew);
-		this.metadata.setValid(isValid);
+		this.metadata.setValid(isValid());
 
 		getSipApplicationSessionMetadata();
 		
@@ -660,7 +660,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		this.creationTime = md.getCreationTime();
 		this.maxInactiveInterval = md.getMaxInactiveInterval();
 		this.isNew = md.isNew();
-		this.isValid = md.isValid();
+		this.setValid(md.isValid());
 		this.metadata = md;
 		
 		// From Sip Application Session

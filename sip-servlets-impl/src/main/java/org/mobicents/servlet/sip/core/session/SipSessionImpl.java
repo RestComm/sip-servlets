@@ -122,7 +122,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	
 	private static transient Logger logger = Logger.getLogger(SipSessionImpl.class);
 	
-	protected SipApplicationSessionKey sipApplicationSessionKey;			
+	protected transient SipApplicationSessionKey sipApplicationSessionKey;			
 	//lazy loaded and not serialized
 	protected transient MobicentsSipApplicationSession sipApplicationSession;
 	
@@ -132,11 +132,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 
 	volatile protected Map<String, Object> sipSessionAttributeMap;
 	
-	protected SipSessionKey key;
+	protected transient SipSessionKey key;
 	
 	protected transient Principal userPrincipal;
 	
-	protected boolean ackReceived;
+	protected transient boolean ackReceived;
 	
 	protected long cseq = -1;
 	
@@ -156,17 +156,17 @@ public class SipSessionImpl implements MobicentsSipSession {
 	/**
 	 * Routing region per session/dialog.
 	 */
-	protected SipApplicationRoutingRegion routingRegion;
+	protected transient SipApplicationRoutingRegion routingRegion;
 	
 	/**
 	 * AR state info
 	 */
-	protected Serializable stateInfo;
+	protected transient Serializable stateInfo;
 	
 	/**
 	 * AR router info for the next app in chain
 	 */
-	protected SipApplicationRouterInfo nextSipApplicationRouterInfo;
+	protected transient SipApplicationRouterInfo nextSipApplicationRouterInfo;
 	
 	/**
 	 * Current state of the session, one of INTITIAL, EARLY, ESTABLISHED and TERMINATED.
@@ -186,7 +186,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	/**
 	 * Subscriber URI should be set for outbound sessions, from requests created in the container.
 	 */
-	protected URI subscriberURI;
+	protected transient URI subscriberURI;
 	
 	/**
 	 * Outbound interface is one of the allowed values in the Servlet Context attribute
@@ -203,7 +203,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * We use this for dialog-related requests. In this case the dialog
 	 * directly corresponds to the session.
 	 */
-	protected Dialog sessionCreatingDialog;
+	protected transient Dialog sessionCreatingDialog;
 	
 	/**
 	 * We use this for REGISTER, where a dialog doesn't exist to carry the session info.
@@ -266,33 +266,35 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @param sipSessionEventType the type of event that happened
 	 */
 	private void notifySipSessionListeners(SipSessionEventType sipSessionEventType) {
-		SipContext sipContext = 
-			getSipApplicationSession().getSipContext();					
-		List<SipSessionListener> sipSessionListeners = 
-			sipContext.getListeners().getSipSessionListeners();		
-		if(sipSessionListeners.size() > 0) {
-			if(logger.isDebugEnabled()) {
-				logger.debug("notifying sip session listeners of context " + sipContext.getApplicationName() + " of following event " +
-						sipSessionEventType);
-			}
-			ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
-			java.lang.Thread.currentThread().setContextClassLoader(sipContext.getLoader().getClassLoader());	
-			SipSessionEvent sipSessionEvent = new SipSessionEvent(this.getSession());
-			for (SipSessionListener sipSessionListener : sipSessionListeners) {
-				try {
-					if(SipSessionEventType.CREATION.equals(sipSessionEventType)) {
-						sipSessionListener.sessionCreated(sipSessionEvent);
-					} else if (SipSessionEventType.DELETION.equals(sipSessionEventType)) {
-						sipSessionListener.sessionDestroyed(sipSessionEvent);
-					} else if (SipSessionEventType.READYTOINVALIDATE.equals(sipSessionEventType)) {
-						sipSessionListener.sessionReadyToInvalidate(sipSessionEvent);
-					}
-				} catch (Throwable t) {
-					logger.error("SipSessionListener threw exception", t);
+		MobicentsSipApplicationSession sipApplicationSession = getSipApplicationSession();
+		if(sipApplicationSession != null) {
+			SipContext sipContext = sipApplicationSession.getSipContext(); 							
+			List<SipSessionListener> sipSessionListeners = 
+				sipContext.getListeners().getSipSessionListeners();		
+			if(sipSessionListeners.size() > 0) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("notifying sip session listeners of context " + sipContext.getApplicationName() + " of following event " +
+							sipSessionEventType);
 				}
-			}
-			java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
-		}		
+				ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
+				java.lang.Thread.currentThread().setContextClassLoader(sipContext.getLoader().getClassLoader());	
+				SipSessionEvent sipSessionEvent = new SipSessionEvent(this.getSession());
+				for (SipSessionListener sipSessionListener : sipSessionListeners) {
+					try {
+						if(SipSessionEventType.CREATION.equals(sipSessionEventType)) {
+							sipSessionListener.sessionCreated(sipSessionEvent);
+						} else if (SipSessionEventType.DELETION.equals(sipSessionEventType)) {
+							sipSessionListener.sessionDestroyed(sipSessionEvent);
+						} else if (SipSessionEventType.READYTOINVALIDATE.equals(sipSessionEventType)) {
+							sipSessionListener.sessionReadyToInvalidate(sipSessionEvent);
+						}
+					} catch (Throwable t) {
+						logger.error("SipSessionListener threw exception", t);
+					}
+				}
+				java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
+			}		
+		}
 	}
 
 	/*
@@ -305,7 +307,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 			throw new IllegalArgumentException(
 					"Can not create ACK, PRACK or CANCEL requests with this method");
 		}
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("cannot create a request because the session is invalid");
 		}
 		if(State.TERMINATED.equals(state)) {
@@ -482,7 +484,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#getAttribute(java.lang.String)
 	 */
 	public Object getAttribute(String name) {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		return getAttributeMap().get(name);
@@ -493,7 +495,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#getAttributeNames()
 	 */
 	public Enumeration<String> getAttributeNames() {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		Vector<String> names = new Vector<String>(getAttributeMap().keySet());
@@ -570,8 +572,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * {@inheritDoc}
 	 */
 	public SipApplicationRoutingRegion getRegion() {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("the session has been invalidated");
+		}
+		if(routingRegion == null) {
+			throw new IllegalStateException("This methos can be called only on initial requests");
 		}
 		return routingRegion;
 	}
@@ -636,7 +641,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#getState()
 	 */
 	public State getState() {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("the session has been invalidated");
 		}
 		return this.state;
@@ -649,7 +654,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * {@inheritDoc}
 	 */
 	public URI getSubscriberURI() {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("the session has been invalidated");
 		}
 		if (this.subscriberURI == null)
@@ -663,7 +668,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#invalidate()
 	 */
 	public void invalidate() {		
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("SipSession already invalidated !");
 		}		
 		if(logger.isInfoEnabled()) {
@@ -679,7 +684,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		notifySipSessionListeners(SipSessionEventType.DELETION);
 		
-		isValid = false;	
+		setValid(false);	
 		
 		if(derivedSipSessions != null) {
 			for (MobicentsSipSession derivedMobicentsSipSession : derivedSipSessions.values()) {
@@ -810,13 +815,19 @@ public class SipSessionImpl implements MobicentsSipSession {
 		return this.isValid;
 	}
 
+	/**
+	 * @param isValid the isValid to set
+	 */
+	protected void setValid(boolean isValid) {
+		this.isValid = isValid;
+	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipSession#removeAttribute(java.lang.String)
 	 */
 	public void removeAttribute(String name) {
 
-		if(!isValid)
+		if(!isValid())
 			throw new IllegalStateException("Can not bind object to session that has been invalidated!!");
 		
 		if(name==null)
@@ -858,7 +869,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#setAttribute(java.lang.String, java.lang.Object)
 	 */
 	public void setAttribute(String key, Object attribute) {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("Can not bind object to session that has been invalidated!!");
 		}
 		if(key == null) {
@@ -936,7 +947,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#setHandler(java.lang.String)
 	 */
 	public void setHandler(String name) throws ServletException {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("the session has already been invalidated, no handler can be set on it anymore !");
 		}
 		if(name != null && name.equals(handlerServlet)) {
@@ -986,8 +997,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 	public MobicentsSipApplicationSession getSipApplicationSession() {
 		if(sipApplicationSession == null) {
 			final String applicationName = key.getApplicationName(); 
-			final SipContext sipContext = sipFactory.getSipApplicationDispatcher().findSipApplication(applicationName); 
-			sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
+			final SipContext sipContext = sipFactory.getSipApplicationDispatcher().findSipApplication(applicationName);
+			if(sipContext != null) {
+				sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
+			}
 		} 
 		return sipApplicationSession;
 	}
@@ -1056,7 +1069,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	}
 	
 	public void onTerminatedState() {
-		if(isValid) {
+		if(isValid()) {
 			onReadyToInvalidate();
 			if(this.parentSession != null) {
 				Iterator<MobicentsSipSession> derivedSessionsIterator = parentSession.getDerivedSipSessions();
@@ -1077,13 +1090,13 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void addOngoingTransaction(Transaction transaction) {
 		
-		if(!readyToInvalidate && ongoingTransactions != null) { 
+		if(!isReadyToInvalidate() && ongoingTransactions != null) { 
 			boolean added = this.ongoingTransactions.add(transaction);
 			if(added) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("transaction "+ transaction +" has been added to sip session's ongoingTransactions" );
 				}
-				readyToInvalidate = false;
+				setReadyToInvalidate(false);
 			}
 		}
 	}
@@ -1130,7 +1143,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				!JainSipUtils.dialogTerminatingMethods.contains(method)) {
 			this.setState(State.CONFIRMED);
 			if(this.proxy != null && this.proxy.getFinalBranchForSubsequentRequests() != null && !this.proxy.getFinalBranchForSubsequentRequests().getRecordRoute()) {
-				readyToInvalidate = true;
+				setReadyToInvalidate(true);
 			}
 			if(logger.isDebugEnabled()) {
 				logger.debug("the following sip session " + getKey() + " has its state updated to " + state);
@@ -1178,7 +1191,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 			// the state of the SipSession object becomes TERMINATED.
 			else {
 				setState(State.TERMINATED);
-				readyToInvalidate =true;
+				setReadyToInvalidate(true);
 				if(logger.isDebugEnabled()) {
 					logger.debug("the following sip session " + getKey() + " has its state updated to " + state);
 				}
@@ -1198,7 +1211,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 			}	
 			if(!hasOngoingSubscriptions) {
 				setState(State.TERMINATED);
-				readyToInvalidate =true;				
+				setReadyToInvalidate(true);				
 			}
 			okToByeSentOrReceived = true;
 			
@@ -1243,17 +1256,17 @@ public class SipSessionImpl implements MobicentsSipSession {
      * session are met
      */
     public void onReadyToInvalidate() {
-    	this.readyToInvalidate = true;
+    	this.setReadyToInvalidate(true);
     	
     	if(logger.isDebugEnabled()) {
     		logger.debug("invalidateWhenReady flag is set to " + invalidateWhenReady);
     	}
     	
-    	if(isValid && this.invalidateWhenReady) {
+    	if(isValid() && this.invalidateWhenReady) {
     		this.notifySipSessionListeners(SipSessionEventType.READYTOINVALIDATE);
     		//If the application does not explicitly invalidate the session in the callback or has not defined a listener, 
         	//the container will invalidate the session. 
-        	if(isValid) {
+        	if(isValid()) {
         		invalidate();
         	}
     	}    	    	
@@ -1359,25 +1372,32 @@ public class SipSessionImpl implements MobicentsSipSession {
 	}
 	
 	public boolean getInvalidateWhenReady() {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("the session has been invalidated");
 		}
 		return invalidateWhenReady;
 	}
 	
 	public boolean isReadyToInvalidate() {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("the session has been invalidated");
 		}
 		return readyToInvalidate;
 	}
+	
+	/**
+	 * @param readyToInvalidate the readyToInvalidate to set
+	 */
+	protected void setReadyToInvalidate(boolean readyToInvalidate) {
+		this.readyToInvalidate = readyToInvalidate;
+	}
 
 	public boolean isReadyToInvalidateInternal() {
-		return readyToInvalidate;
+		return isReadyToInvalidate();
 	}
 	
 	public void setInvalidateWhenReady(boolean arg0) {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("the session has been invalidated");
 		}
 		invalidateWhenReady = arg0;
@@ -1387,7 +1407,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * {@inheritDoc}
 	 */
 	public void setOutboundInterface(InetAddress inetAddress) {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("the session has been invalidated");
 		}
 		if(inetAddress == null) {
@@ -1408,7 +1428,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * {@inheritDoc}
 	 */
 	public void setOutboundInterface(InetSocketAddress inetSocketAddress) {
-		if(!isValid) {
+		if(!isValid()) {
 			throw new IllegalStateException("the session has been invalidated");
 		}
 		if(inetSocketAddress == null) {
@@ -1545,13 +1565,13 @@ public class SipSessionImpl implements MobicentsSipSession {
 			if(!hasOngoingSubscriptions) {		
 				if(subscriptions.size() < 1) {
 					if((originalMethod != null && okToByeSentOrReceived) || !Request.INVITE.equals(originalMethod) ) {
-						readyToInvalidate = true;
+						setReadyToInvalidate(true);
 						setState(State.TERMINATED);
 					}
 				}			
 			}
 		}
-		if(readyToInvalidate) {
+		if(isReadyToInvalidate()) {
 			if(logger.isInfoEnabled()) {
 				logger.info("no more subscriptions in session " + getId());
 			}

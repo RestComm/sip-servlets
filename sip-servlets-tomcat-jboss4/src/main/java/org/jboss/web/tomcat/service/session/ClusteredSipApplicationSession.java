@@ -28,7 +28,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipApplicationSessionActivationListener;
@@ -43,6 +42,7 @@ import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
 import org.jboss.metadata.WebMetaData;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
@@ -92,6 +92,12 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	 */
 	protected transient boolean isSessionModifiedSinceLastSave;
 
+	/**
+	 * If true, means the local in-memory session data contains metadata changes
+	 * that have not been published to the distributed cache.
+	 */
+	protected transient boolean sessionLastAccessTimeDirty;
+	
 	/**
 	 * If true, means the local in-memory session data contains metadata changes
 	 * that have not been published to the distributed cache.
@@ -167,6 +173,12 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	 * this will hold the remaining time at which the session should have been expired at the time it has been passivated
 	 */
 	protected transient long futureExpirationTimeOnPassivation;
+	
+	// Transient map to store meta data changes for replication.
+	protected transient Map<String, Object> metaDataModifiedMap = new HashMap<String, Object>();
+
+	protected transient boolean sipSessionsMapModified;
+	protected transient boolean httpSessionsMapModified;
 	
 	/**
 	 * The string manager for this package.
@@ -629,7 +641,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 //			return true;
 //		}
 
-		if (!this.isValid) {
+		if (!isValid) {
 			return false;
 		}
 
@@ -648,7 +660,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 //			}
 //		}
 
-		return (this.isValid);
+		return isValid;
 
 	}
 
@@ -698,10 +710,10 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 //		if (expiring)
 //			return;
 
-		synchronized (this) {
+//		synchronized (this) {
 			// If we had a race to this sync block, another thread may
 			// have already completed expiration. If so, don't do it again
-			if (!isValid)
+			if (!isValid())
 				return;
 
 			if (sipContext.getSipManager() == null)
@@ -753,7 +765,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			// We have completed expire of this session
 //			setValid(false);
 //			expiring = false;
-		}
+//		}
 
 	}
 
@@ -994,18 +1006,18 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 		if(logger.isDebugEnabled()) {
 			logger.debug("reading sip app session from the cache ");
 		}
-		synchronized (this) {
+//		synchronized (this) {
 			// From SipApplicationSessionImpl
-			key = (SipApplicationSessionKey )in.readObject();
-			if(logger.isDebugEnabled()) {
-				logger.debug("reading sip app session from the cache. key = " + key);
-			}
+//			key = (SipApplicationSessionKey )in.readObject();
+//			if(logger.isDebugEnabled()) {
+//				logger.debug("reading sip app session from the cache. key = " + key);
+//			}
 			
 			creationTime = in.readLong();
 			lastAccessedTime = in.readLong();
 //			maxInactiveInterval = in.readInt();
 //			isNew = in.readBoolean();
-			isValid = in.readBoolean();			
+//			setValid(in.readBoolean());			
 
 			futureExpirationTimeOnPassivation = in.readLong();
 			if(expirationTimerTask == null && sipContext.getSipApplicationSessionTimeout() > 0) {
@@ -1015,20 +1027,10 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 				if(logger.isDebugEnabled()) {
 					logger.debug("Scheduling reactivted sip application session "+ key +" to expire at " + futureExpirationTimeOnPassivation);
 				}
-				expirationTime = futureExpirationTimeOnPassivation;
+				if(futureExpirationTimeOnPassivation > expirationTime) {
+					expirationTime = futureExpirationTimeOnPassivation;
+				}
 //				expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) ExecutorServiceWrapper.getInstance().schedule(expirationTimerTask, futureExpirationTimeOnPassivation, TimeUnit.MILLISECONDS);
-			}
-			int nbOfSipSessions = in.readInt();
-			for (int i = 0; i < nbOfSipSessions; i++) {
-				sipSessions.add((SipSessionKey)in.readObject());								
-			}
-			
-			int nbOfHttpSessions = in.readInt();
-			if(nbOfHttpSessions > 0) {
-				httpSessions = new CopyOnWriteArraySet<String>();
-			}
-			for (int i = 0; i < nbOfHttpSessions; i++) {
-				httpSessions.add(in.readUTF());
 			}
 			
 			//TODO get the persistent servletTimers
@@ -1052,6 +1054,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			// If the session has been replicated, any subsequent
 			// access cannot be the first.
 			this.firstAccess = false;
+			sessionLastAccessTimeDirty = false;
 			sessionMetadataDirty = false;
 			sessionAttributesDirty = false;
 
@@ -1078,7 +1081,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			// {
 			// super.removeNote(Constants.SESS_PASSWORD_NOTE);
 			// }
-		}
+//		}
 	}
 
 	/**
@@ -1089,30 +1092,16 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	 * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
 	 */
 	public void writeExternal(ObjectOutput out) throws IOException {
-		synchronized (this) {
+//		synchronized (this) {
 			// From SipApplicationSessionImpl
-			out.writeObject(key);
+//			out.writeObject(key);
 			
 			out.writeLong(creationTime);
 			out.writeLong(lastAccessedTime);
 //			out.writeInt(maxInactiveInterval);
 //			out.writeBoolean(isNew);
-			out.writeBoolean(isValid);			
-
+//			out.writeBoolean(isValid());			
 			out.writeLong(expirationTime);
-			
-			out.writeInt(sipSessions.size());
-			for (SipSessionKey sipSessionKey : sipSessions) {
-				out.writeObject(sipSessionKey);
-			}
-			if(httpSessions != null) {
-				out.writeInt(httpSessions.size());
-				for (HttpSession httpSession : getHttpSessions()) {
-					out.writeUTF(((ClusteredSession)httpSession).getRealId());
-				}
-			} else {
-				out.writeInt(0);
-			}
 			
 			// From ClusteredSession
 			out.writeInt(invalidationPolicy);
@@ -1128,7 +1117,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			// String password = (String) getNote(Constants.SESS_PASSWORD_NOTE);
 			// logger.debug(Constants.SESS_PASSWORD_NOTE + " = " + password);
 			// out.writeObject(password);
-		}
+//		}
 	}
 
 	// ----------------------------------------------------- Protected Methods
@@ -1317,6 +1306,14 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	protected boolean getSessionMetadataDirty() {
 		return sessionMetadataDirty;
 	}
+	
+	protected void sessionLastAccessTimeDirty() {
+		sessionLastAccessTimeDirty = true;
+	}
+	
+	protected boolean getSessionLastAccessTimeDirty() {
+		return sessionLastAccessTimeDirty;
+	}
 
 	/**
 	 * Calls {@link #sessionAttributesDirty()} and
@@ -1330,7 +1327,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	}
 
 	public boolean isSessionDirty() {
-		return sessionAttributesDirty || sessionMetadataDirty;
+		return sessionAttributesDirty || sessionMetadataDirty || sessionLastAccessTimeDirty;
 	}
 
 	public boolean getReplicateSessionBody() {
@@ -1359,5 +1356,47 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 						|| attribute instanceof Character || attribute instanceof Boolean);
 	}
 
+	@Override
+	protected void setValid(boolean isValid) {
+		super.setValid(isValid);
+		sessionMetadataDirty();
+		metaDataModifiedMap.put("iv", isValid);
+	}			
 	
+	@Override
+	public boolean addSipSession(MobicentsSipSession mobicentsSipSession) {
+		boolean wasNotPresent = super.addSipSession(mobicentsSipSession);
+		if(wasNotPresent) {
+			sipSessionsMapModified = true;
+		}
+		return wasNotPresent;
+	}
+	
+	@Override
+	public SipSessionKey removeSipSession(
+			MobicentsSipSession mobicentsSipSession) {
+		SipSessionKey sessionKey = super.removeSipSession(mobicentsSipSession);
+		if(sessionKey != null) {
+			sipSessionsMapModified = true;
+		}
+		return sessionKey;
+	}
+	
+	@Override
+	public boolean addHttpSession(HttpSession httpSession) {
+		boolean wasNotPresent = super.addHttpSession(httpSession);
+		if(wasNotPresent) {
+			httpSessionsMapModified = true;
+		}
+		return wasNotPresent;
+	}
+	
+	@Override
+	public boolean removeHttpSession(HttpSession httpSession) {
+		boolean wasPresent = super.removeHttpSession(httpSession);
+		if(wasPresent) {
+			httpSessionsMapModified = true;
+		}
+		return wasPresent;
+	}
 }

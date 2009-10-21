@@ -16,6 +16,8 @@
  */
 package org.jboss.web.tomcat.service.session;
 
+import java.util.Map.Entry;
+
 import gov.nist.javax.sip.SipStackImpl;
 
 import javax.sip.SipStack;
@@ -27,7 +29,9 @@ import org.apache.catalina.connector.Connector;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipService;
 
 
@@ -39,12 +43,12 @@ import org.mobicents.servlet.sip.startup.SipService;
  *
  */
 public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession {
-	private static transient final Logger logger = Logger.getLogger(JBossCacheClusteredSipSession.class);
+	private static final Logger logger = Logger.getLogger(JBossCacheClusteredSipSession.class);
 	
 	/**
 	 * Our proxy to the cache.
 	 */
-	protected transient ConvergedJBossCacheService proxy_;
+	protected transient ConvergedJBossCacheService proxy_;		
 	   
 	protected JBossCacheClusteredSipSession(SipSessionKey key,
 			SipFactoryImpl sipFactoryImpl,
@@ -65,6 +69,9 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 	 */
 	public void initAfterLoad(JBossCacheSipManager manager) {
 		sipFactory = manager.getSipFactoryImpl();
+		// Since attribute map may be transient, we may need to populate it
+		// from the underlying store.
+		populateMetaData();
 		if(proxy != null) {
 			proxy.setSipFactoryImpl(sipFactory);
 		}
@@ -142,20 +149,66 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 //		proxy_ = null;
 //	}
 
+	protected void populateMetaData() {
+		final String sipAppSessionId = sipApplicationSessionKey.getId();
+		final String sipSessionId = getId();				
+		handlerServlet = (String) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "handler");
+		Boolean valid = (Boolean) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "iv");
+		if(valid != null) {
+			isValid = valid;
+		} else {
+			isValid = true;
+		}
+		state = (State) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "state");
+		Long cSeq = (Long) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "cseq");
+		if(cSeq != null) {
+			cseq = cSeq;
+		} 
+		Boolean iwr = (Boolean) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "iwr");		
+		if(iwr != null) {
+			invalidateWhenReady = iwr;
+		} 
+		Boolean rti = (Boolean) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "rti");		
+		if(rti != null) {
+			readyToInvalidate = rti;
+		} 
+		sessionCreatingDialogId = (String) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "dialogId");
+		proxy = (ProxyImpl) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "proxy");
+		b2buaHelper = (B2buaHelperImpl) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "b2b");
+		
+	}
+	
 	/**
 	 * Increment our version and place ourself in the cache.
 	 */
-	public synchronized void processSessionRepl() {
+	public void processSessionRepl() {
 		// Replicate the session.
 		if (logger.isDebugEnabled()) {
 			logger.debug("processSessionRepl(): session is dirty. Will increment "
 					+ "version from: " + getVersion() + " and replicate.");
+		}		
+		final String sipAppSessionKey = sipApplicationSessionKey.getId();
+		final String sipSessionKey = getId();		
+		if(sessionMetadataDirty) {			
+			for (Entry<String, Object> entry : metaModifiedMap_.entrySet()) {
+				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, entry.getKey(), entry.getValue());
+			}
+			metaModifiedMap_.clear();
+						
+			if(proxy != null) {											
+				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, "proxy", proxy);
+			}
+			
+			if(b2buaHelper != null) {											
+				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, "b2b", b2buaHelper);
+			}
 		}
 		this.incrementVersion();
-		proxy_.putSipSession(getId(), this);
+		proxy_.putSipSession(sipSessionKey, this);
 
 		sessionAttributesDirty = false;
 		sessionMetadataDirty = false;
+		sessionLastAccessTimeDirty = false;
 
 		updateLastReplicated();
 	}

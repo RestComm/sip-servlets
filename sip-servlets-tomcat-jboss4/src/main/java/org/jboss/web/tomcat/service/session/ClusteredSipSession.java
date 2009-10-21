@@ -22,7 +22,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
 import java.security.Principal;
-import java.text.ParseException;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -31,14 +30,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.ServletException;
 import javax.servlet.sip.SipSessionActivationListener;
 import javax.servlet.sip.SipSessionAttributeListener;
 import javax.servlet.sip.SipSessionBindingEvent;
 import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
-import javax.servlet.sip.ar.SipApplicationRoutingRegion;
-import javax.sip.address.URI;
+import javax.sip.Dialog;
 
 import org.apache.catalina.Globals;
 import org.apache.catalina.session.StandardSession;
@@ -46,16 +45,10 @@ import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
 import org.jboss.metadata.WebMetaData;
-import org.mobicents.servlet.sip.SipFactories;
-import org.mobicents.servlet.sip.address.SipURIImpl;
-import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
-import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
-import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 /**
  * Abstract base class for sip session clustering based on SipSessionImpl. Different session
@@ -101,6 +94,12 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	 */
 	protected transient boolean isSessionModifiedSinceLastSave;
 
+	/**
+	 * If true, means the local in-memory session data contains metadata changes
+	 * that have not been published to the distributed cache.
+	 */
+	protected transient boolean sessionLastAccessTimeDirty;
+	
 	/**
 	 * If true, means the local in-memory session data contains metadata changes
 	 * that have not been published to the distributed cache.
@@ -177,6 +176,9 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	 */
 	protected transient String sessionCreatingDialogId = null;
 
+	// Transient map to store meta data changes for replication.
+	protected transient Map<String, Object> metaModifiedMap_ = new HashMap<String, Object>();
+	
 	/**
 	 * The string manager for this package.
 	 */
@@ -454,9 +456,11 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 //			setNew(false);
 //		}
 
-		if (invalidationPolicy == WebMetaData.SESSION_INVALIDATE_ACCESS) {
-			this.sessionMetadataDirty();
-		}
+		sessionLastAccessTimeDirty();
+		
+//		if (invalidationPolicy == WebMetaData.SESSION_INVALIDATE_ACCESS) {
+//			this.sessionMetadataDirty();
+//		}
 	}
 
 //	public void endAccess() {
@@ -638,7 +642,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 //			return true;
 //		}
 
-		if (!this.isValid) {
+		if (!isValid) {
 			return false;
 		}
 
@@ -657,7 +661,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 //			}
 //		}
 
-		return (this.isValid);
+		return isValid;
 
 	}
 
@@ -707,10 +711,10 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 //		if (expiring)
 //			return;
 
-		synchronized (this) {
+//		synchronized (this) {
 			// If we had a race to this sync block, another thread may
 			// have already completed expiration. If so, don't do it again
-			if (!isValid)
+			if (!isValid())
 				return;
 
 			if (getSipApplicationSession().getSipContext().getSipManager() == null)
@@ -762,7 +766,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			// We have completed expire of this session
 //			setValid(false);
 //			expiring = false;
-		}
+//		}
 
 	}
 
@@ -1015,61 +1019,10 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 		if(logger.isDebugEnabled()) {
 			logger.debug("reading sip session from the cache ");
 		}
-		synchronized (this) {
+//		synchronized (this) {
 			// From SipSessionImpl
-			key = (SipSessionKey) in.readObject();
-			if(logger.isDebugEnabled()) {
-				logger.debug("reading sip session from the cache. sip session key = " + key);
-			}
-			sipApplicationSessionKey = (SipApplicationSessionKey) in.readObject();
-			if(logger.isDebugEnabled()) {
-				logger.debug("reading sip session from the cache. sip app session key = " + sipApplicationSessionKey);
-			}
-			routingRegion = (SipApplicationRoutingRegion) in.readObject();
-//			stateInfo = (Serializable) in.readObject();
-			handlerServlet = in.readUTF();
-			if(logger.isDebugEnabled()) {
-				logger.debug("reading handlerServlet "+ handlerServlet);
-			}
-			String subscriberURIStringified = in.readUTF();
-			if("".equals(subscriberURIStringified)) {
-				subscriberURIStringified = null;
-			} else {
-				try {
-					URI jsipSubscriberUri = SipFactories.addressFactory.createURI(subscriberURIStringified);				
-					if(jsipSubscriberUri instanceof javax.sip.address.SipURI) {
-						subscriberURI = new SipURIImpl((javax.sip.address.SipURI)jsipSubscriberUri);
-					} else if (jsipSubscriberUri instanceof javax.sip.address.TelURL) {
-						subscriberURI = new TelURLImpl((javax.sip.address.TelURL)jsipSubscriberUri);
-					}
-				} catch (ParseException pe) {
-					logger.error("Impossible to parse the subscriber URI " 
-							+ subscriberURIStringified, pe);
-				}
-			}
-//			sessionCreatingDialog = (SIPDialog) in.readObject();
-			sessionCreatingDialogId = in.readUTF();
-			if(logger.isDebugEnabled()) {
-				logger.debug("deserialized dialog Id for the sip session "+ sessionCreatingDialogId);
-			}
-			invalidateWhenReady = in.readBoolean();
-			readyToInvalidate = in.readBoolean();
-			
+			lastAccessedTime = in.readLong();
 			creationTime = in.readLong();
-			lastAccessedTime = in.readLong();					
-			
-//			maxInactiveInterval = in.readInt();
-//			isNew = in.readBoolean();
-			isValid = in.readBoolean();			
-
-			boolean proxySerialized = in.readBoolean();
-			if(proxySerialized) {
-				proxy = (ProxyImpl) in.readObject();
-			} 
-			boolean b2buaSerialized = in.readBoolean();
-			if(b2buaSerialized) {
-				b2buaHelper = (B2buaHelperImpl) in.readObject();
-			}
 			// From ClusteredSession
 			invalidationPolicy = in.readInt();
 			version = in.readInt();
@@ -1085,6 +1038,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			this.firstAccess = false;
 			sessionMetadataDirty = false;
 			sessionAttributesDirty = false;
+			sessionLastAccessTimeDirty = false;
 			
 			// Assume deserialization means replication and use thisAccessedTime
 			// as a proxy for when replication occurred
@@ -1118,7 +1072,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			// {
 			// super.removeNote(Constants.SESS_PASSWORD_NOTE);
 			// }
-		}
+//		}
 	}
 
 	/**
@@ -1129,55 +1083,10 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	 * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
 	 */
 	public void writeExternal(ObjectOutput out) throws IOException {
-		synchronized (this) {
-			// From SipSessionimpl			
-			out.writeObject(key);
-			out.writeObject(sipApplicationSessionKey);
-			out.writeObject(routingRegion);
-//			out.writeObject(stateInfo);
-			if(logger.isDebugEnabled()) {
-				logger.debug("writing handlerServlet "+ handlerServlet);
-			}
-			out.writeUTF(handlerServlet);
-			if(subscriberURI != null) {
-				out.writeUTF(subscriberURI.toString());
-			} else {
-				out.writeUTF("");
-			}			
-//			out.writeObject((SIPDialog)sessionCreatingDialog);
-			if(sessionCreatingDialog != null && sessionCreatingDialog.getDialogId() != null) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("serializing dialog id for the sip session "+ sessionCreatingDialog.getDialogId());
-				}
-				out.writeUTF(sessionCreatingDialog.getDialogId());
-			} else {
-				if(logger.isDebugEnabled()) {
-					logger.debug("dialog id is null nothing to serialize ");
-				}
-				out.writeUTF("");
-			}
-			out.writeBoolean(invalidateWhenReady);
-			out.writeBoolean(readyToInvalidate);
-			
-			out.writeLong(creationTime);
+//		synchronized (this) {
+			// From SipSessionimpl
 			out.writeLong(lastAccessedTime);
-//			out.writeInt(maxInactiveInterval);
-//			out.writeBoolean(isNew);
-			out.writeBoolean(isValid);			
-			
-			if(proxy == null) {
-				out.writeBoolean(false);
-			} else {
-				out.writeBoolean(true);
-				out.writeObject(proxy);
-			}
-			
-			if(b2buaHelper == null) {
-				out.writeBoolean(false);
-			} else {
-				out.writeBoolean(true);
-				out.writeObject(b2buaHelper);
-			}
+			out.writeLong(creationTime);
 			
 			// From ClusteredSession
 			out.writeInt(invalidationPolicy);
@@ -1193,7 +1102,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			// String password = (String) getNote(Constants.SESS_PASSWORD_NOTE);
 			// logger.debug(Constants.SESS_PASSWORD_NOTE + " = " + password);
 			// out.writeObject(password);
-		}
+//		}
 	}
 
 	// ----------------------------------------------------- Protected Methods
@@ -1377,12 +1286,20 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 
 	protected void sessionMetadataDirty() {
 		sessionMetadataDirty = true;
-	}
+	}		
 
 	protected boolean getSessionMetadataDirty() {
 		return sessionMetadataDirty;
 	}
 
+	protected void sessionLastAccessTimeDirty() {
+		sessionLastAccessTimeDirty = true;
+	}
+	
+	protected boolean getSessionLastAccessTimeDirty() {
+		return sessionLastAccessTimeDirty;
+	}
+	
 	/**
 	 * Calls {@link #sessionAttributesDirty()} and
 	 * {@link #sessionMetadataDirty()}.
@@ -1395,7 +1312,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	}
 
 	public boolean isSessionDirty() {
-		return sessionAttributesDirty || sessionMetadataDirty;
+		return sessionAttributesDirty || sessionMetadataDirty || sessionLastAccessTimeDirty;
 	}
 
 	public boolean getReplicateSessionBody() {
@@ -1422,5 +1339,56 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 		return attribute != null
 				&& !(attribute instanceof String || attribute instanceof Number
 						|| attribute instanceof Character || attribute instanceof Boolean);
-	}	
+	}
+	
+	@Override
+	public void setState(State state) {
+		super.setState(state);
+		sessionMetadataDirty();
+		metaModifiedMap_.put("state", state);
+	}
+	
+	@Override
+	public void setCseq(long cseq) {
+		super.setCseq(cseq);
+		sessionMetadataDirty();
+		metaModifiedMap_.put("cseq", cseq);
+	}
+	
+	@Override
+	public void setHandler(String name) throws ServletException {
+		super.setHandler(name);
+		sessionMetadataDirty();
+		metaModifiedMap_.put("handler", name);
+	}
+	
+	@Override
+	public void setInvalidateWhenReady(boolean arg0) {
+		super.setInvalidateWhenReady(arg0);
+		sessionMetadataDirty();		
+		metaModifiedMap_.put("iwr", arg0);
+	}
+
+	@Override
+	protected void setReadyToInvalidate(boolean readyToInvalidate) {
+		super.setReadyToInvalidate(readyToInvalidate);
+		sessionMetadataDirty();
+		metaModifiedMap_.put("rti", readyToInvalidate);
+	}
+	
+	@Override
+	protected void setValid(boolean isValid) {
+		super.setValid(isValid);
+		sessionMetadataDirty();
+		metaModifiedMap_.put("iv", isValid);
+	}
+	
+	@Override
+	public void setSessionCreatingDialog(Dialog dialog) {
+		super.setSessionCreatingDialog(dialog);
+		if(dialog != null && dialog.getDialogId() != null) {
+			sessionMetadataDirty();
+			metaModifiedMap_.put("dialogId", dialog.getDialogId() );
+		}
+	}
 }

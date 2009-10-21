@@ -680,13 +680,17 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 					callServlet(sipServletRequest);
 					if(logger.isInfoEnabled()) {
 						logger.info("Request event dispatched to " + sipContext.getApplicationName());
-					}
+					}					
 				} catch (ServletException e) {
 					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing the following initial request " + request, e);
 				} catch (IOException e) {				
 					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected IO exception occured while routing the following initial request " + request, e);
 				}
 			} finally {
+				// those information are only available for initial requests (not responses, nor subsequent requests) so putting them back to null
+				// to save memory and avoid unecessary replication
+				sipSessionImpl.setRoutingRegion(null);
+				sipSessionImpl.setSipSubscriberURI(null);
 				sipContext.exitSipApp(sipServletRequest, null);
 			}
 			//nothing more needs to be done, either the app acted as UA, PROXY or B2BUA. in any case we stop routing							

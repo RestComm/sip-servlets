@@ -90,6 +90,12 @@ public class DistributableSimpleSipServlet
 			request.getSession().setAttribute("sipSessionActivationListener", new SipSessionActivationListenerAttribute());
 			request.getApplicationSession().setAttribute("INVITE", RECEIVED);
 			request.getSession().setAttribute("sipAppSessionActivationListener", new SipApplicationSessionActivationListenerAttribute());
+			if("reinvite".equals(((SipURI)request.getTo().getURI()).getUser())) {
+				request.getSession().setAttribute("ISREINVITE", RECEIVED);
+			}
+		} else {
+			request.getSession().setAttribute("REINVITE", RECEIVED);			
+			request.getApplicationSession().setAttribute("REINVITE", RECEIVED);
 		}
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
 		sipServletResponse.send();
@@ -111,18 +117,34 @@ public class DistributableSimpleSipServlet
 		}
 		String sipSessionInviteAttribute  = (String) request.getSession().getAttribute("INVITE");
 		String sipApplicationSessionInviteAttribute  = (String) request.getApplicationSession().getAttribute("INVITE");
+		String sipSessionReInviteAttribute  = (String) request.getSession().getAttribute("REINVITE");
+		String sipApplicationSessionReInviteAttribute  = (String) request.getApplicationSession().getAttribute("REINVITE");
 		if(logger.isInfoEnabled()) {			
 			logger.info("Distributable Simple Servlet: attributes previously set in sip session INVITE : "+ sipSessionInviteAttribute);
 			logger.info("Distributable Simple Servlet: attributes previously set in sip application session INVITE : "+ sipApplicationSessionInviteAttribute);
+			logger.info("Distributable Simple Servlet: attributes previously set in sip session REINVITE : "+ sipSessionReInviteAttribute);
+			logger.info("Distributable Simple Servlet: attributes previously set in sip application session REINVITE : "+ sipApplicationSessionReInviteAttribute);
 		}
-		if(sipSessionInviteAttribute != null  && sipApplicationSessionInviteAttribute != null 
+		if(sipSessionInviteAttribute != null  && sipApplicationSessionInviteAttribute != null 				
 				&& RECEIVED.equalsIgnoreCase(sipSessionInviteAttribute) 
-				&& RECEIVED.equalsIgnoreCase(sipApplicationSessionInviteAttribute)) {
+				&& RECEIVED.equalsIgnoreCase(sipApplicationSessionInviteAttribute)) {			
+			if(request.getSession().getAttribute("ISREINVITE") !=null && sipSessionReInviteAttribute != null  && sipApplicationSessionReInviteAttribute != null 				
+					&& RECEIVED.equalsIgnoreCase(sipSessionReInviteAttribute) 
+					&& RECEIVED.equalsIgnoreCase(sipApplicationSessionReInviteAttribute)) {
+				request.getSession().setAttribute("BYE", RECEIVED);
+				request.getApplicationSession().setAttribute(" BYE", RECEIVED);
+				SipServletResponse sipServletResponse = request.createResponse(200);
+				sipServletResponse.send();
+				return;
+			}
 			request.getSession().setAttribute("BYE", RECEIVED);
 			request.getApplicationSession().setAttribute(" BYE", RECEIVED);
 			SipServletResponse sipServletResponse = request.createResponse(200);
 			sipServletResponse.send();
+			return;
 		}
+		SipServletResponse sipServletResponse = request.createResponse(500);
+		sipServletResponse.send();
 	}
 
 	/**

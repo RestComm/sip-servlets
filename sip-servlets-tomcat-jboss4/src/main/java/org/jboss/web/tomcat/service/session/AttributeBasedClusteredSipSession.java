@@ -121,6 +121,22 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 			logger.debug("processSessionRepl(): session is dirty. Will increment "
 					+ "version from: " + getVersion() + " and replicate.");
 		}
+		final String sipAppSessionKey = sipApplicationSessionKey.getId();
+		final String sipSessionKey = getId();		
+		if(sessionMetadataDirty) {			
+			for (Entry<String, Object> entry : metaModifiedMap_.entrySet()) {
+				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, entry.getKey(), entry.getValue());
+			}
+			metaModifiedMap_.clear();
+						
+			if(proxy != null) {											
+				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, "proxy", proxy);
+			}
+			
+			if(b2buaHelper != null) {											
+				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, "b2b", b2buaHelper);
+			}
+		}
 		this.incrementVersion();
 		proxy_.putSipSession(getId(), this);
 
@@ -155,7 +171,8 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 
 		sessionAttributesDirty = false;
 		sessionMetadataDirty = false;
-
+		sessionLastAccessTimeDirty = false;
+		
 		updateLastReplicated();
 	}
 

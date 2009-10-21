@@ -33,6 +33,7 @@ import javax.management.ObjectName;
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipSession.State;
 import javax.transaction.RollbackException;
 import javax.transaction.Status;
 import javax.transaction.TransactionManager;
@@ -723,7 +724,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		boolean stored = false;
 		if (session != null && started_) {			
 
-			synchronized (session) {
+//			synchronized (session) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("check to see if needs to store and replicate "
 							+ "session with id " + session.getId());
@@ -731,7 +732,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 
 				if (session.isValid()
 						&& (session.isSessionDirty() || session
-								.getExceedsMaxUnreplicatedInterval())) {
+								.getExceedsMaxUnreplicatedInterval()) && State.CONFIRMED.equals(session.getState())) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("replicating following sip session " + session.getId());
 					}
@@ -751,7 +752,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					stored = true;
 					stats_.updateReplicationStats(realId, elapsed);
 				}
-			}
+//			}
 		}
 
 		return stored;
@@ -761,7 +762,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		boolean stored = false;
 		if (session != null && started_) {
 
-			synchronized (session) {
+//			synchronized (session) {
 				if (logger.isDebugEnabled()) {
 					log_.debug("check to see if needs to store and replicate "
 							+ "session with id " + session.getId());
@@ -789,7 +790,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					stored = true;
 					stats_.updateReplicationStats(realId, elapsed);
 				}
-			}
+//			}
 		}
 
 		return stored;
@@ -1201,9 +1202,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	 * distributed cache (but does not remove it from other servers' distributed
 	 * cache).
 	 */
-	public void removeLocal(SipSession session) {
-		ClusteredSipSession clusterSess = (ClusteredSipSession) session;
-		synchronized (clusterSess) {
+	public void removeLocal(ClusteredSipSession clusterSess) {		
+//		synchronized (clusterSess) {
 			String realId = clusterSess.getId();
 			if (realId == null)
 				return;
@@ -1234,7 +1234,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				expiredCounter_++;
 				activeCounter_--;
 			}
-		}
+//		}
 	}
 
 	/**
@@ -1243,9 +1243,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	 * distributed cache (but does not remove it from other servers' distributed
 	 * cache).
 	 */
-	public void removeLocal(SipApplicationSession session) {
-		ClusteredSipApplicationSession clusterSess = (ClusteredSipApplicationSession) session;
-		synchronized (clusterSess) {
+	public void removeLocal(ClusteredSipApplicationSession clusterSess) {
+//		ClusteredSipApplicationSession clusterSess = (ClusteredSipApplicationSession) session;
+//		synchronized (clusterSess) {
 			String realId = clusterSess.getId();
 			if (realId == null)
 				return;
@@ -1277,7 +1277,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				expiredCounter_++;
 				activeCounter_--;
 			}
-		}
+//		}
 	}
 
 	/**
@@ -1975,10 +1975,10 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					.getContextClassLoader();
 			try {
 				Thread.currentThread().setContextClassLoader(tcl_);
-				synchronized (session) {
+//				synchronized (session) {
 					session.removeAttributeInternal(attrKey, localCall,
 							localOnly, notify);
-				}
+//				}
 				if (logger.isDebugEnabled())
 					log_
 							.debug("processRemoteAttributeRemoval: removed attribute "
@@ -2010,10 +2010,10 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					.getContextClassLoader();
 			try {
 				Thread.currentThread().setContextClassLoader(tcl_);
-				synchronized (session) {
+//				synchronized (session) {
 					session.removeAttributeInternal(attrKey, localCall,
 							localOnly, notify);
-				}
+//				}
 				if (logger.isDebugEnabled())
 					log_
 							.debug("processRemoteAttributeRemoval: removed attribute "
@@ -2771,7 +2771,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		if(clusterSess == null) {
 			return null;
 		}
-		synchronized (clusterSess) {
+//		synchronized (clusterSess) {
 			final String realId = clusterSess.getId();
 
 			if (log_.isDebugEnabled()) {
@@ -2793,7 +2793,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				stats_.removeStats(realId);
 				activeCounter_--;
 			}
-		}
+//		}
 		return clusterSess;
 	}
 
@@ -2806,7 +2806,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		if(clusterSess == null) {
 			return null;
 		}
-		synchronized (clusterSess) {
+//		synchronized (clusterSess) {
 			final String realId = clusterSess.getId();
 
 			if (log_.isDebugEnabled()) {
@@ -2828,7 +2828,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				stats_.removeStats(realId);
 				activeCounter_--;
 			}
-		}
+//		}
 		return clusterSess;
 	}
 

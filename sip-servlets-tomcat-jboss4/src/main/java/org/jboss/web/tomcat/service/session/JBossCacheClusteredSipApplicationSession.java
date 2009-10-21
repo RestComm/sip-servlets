@@ -16,6 +16,9 @@
  */
 package org.jboss.web.tomcat.service.session;
 
+import java.util.Set;
+import java.util.Map.Entry;
+
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
@@ -57,6 +60,7 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 		
 		establishProxy();
 
+		populateMetaData();
 		// Since attribute map may be transient, we may need to populate it
 		// from the underlying store.
 		populateAttributes();
@@ -98,21 +102,47 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 //
 //		proxy_ = null;
 //	}
+	
+	protected void populateMetaData() {
+		final String sipAppSessionId = key.getId();
+		Boolean valid = (Boolean) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "iv");
+		if(valid != null) {
+			isValid = valid;
+		} else {
+			isValid = true;
+		}
+		sipSessions = (Set<SipSessionKey>) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "sipSessions");
+		httpSessions = (Set<String>) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "httpSessions");				
+	}
 
 	/**
 	 * Increment our version and place ourself in the cache.
 	 */
-	public synchronized void processSessionRepl() {
+	public void processSessionRepl() {
 		// Replicate the session.
 		if (logger.isDebugEnabled()) {
 			logger.debug("processSessionRepl(): session is dirty. Will increment "
 					+ "version from: " + getVersion() + " and replicate.");
+		}
+		final String sipAppSessionKey = key.getId();
+		if(sessionMetadataDirty) {			
+			for (Entry<String, Object> entry : metaDataModifiedMap.entrySet()) {
+				proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, entry.getKey(), entry.getValue());
+			}
+			metaDataModifiedMap.clear();									
+		}		
+		if(sipSessionsMapModified) {					
+			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "sipSessions", sipSessions);		
+		}		
+		if(httpSessionsMapModified) {			
+			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "httpSessions", httpSessions);
 		}
 		this.incrementVersion();
 		proxy_.putSipApplicationSession(getId(), this);
 
 		sessionAttributesDirty = false;
 		sessionMetadataDirty = false;
+		sessionLastAccessTimeDirty = false;
 
 		updateLastReplicated();
 	}
