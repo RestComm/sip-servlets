@@ -33,6 +33,7 @@ import javax.servlet.sip.ar.SipApplicationRouter;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
+import javax.servlet.sip.ar.SipApplicationRoutingRegionType;
 import javax.servlet.sip.ar.SipRouteModifier;
 import javax.servlet.sip.ar.SipTargetedRequestInfo;
 import javax.servlet.sip.ar.SipTargetedRequestType;
@@ -115,6 +116,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		SipApplicationRouterInfo applicationRouterInfo = null;
 		//If request is received from an external SIP entity, directive is set to NEW. 
 		SipApplicationRoutingDirective sipApplicationRoutingDirective = SipApplicationRoutingDirective.NEW;
+		SipApplicationRoutingRegion routingRegion = null;
 		if(poppedRoute != null) {
 			Parameters poppedAddress = (Parameters)poppedRoute.getAddress().getURI();
 			// get the state info associated with the request because it means 
@@ -128,6 +130,12 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				}
 				sipApplicationRoutingDirective = SipApplicationRoutingDirective.valueOf(
 						SipApplicationRoutingDirective.class, directive);
+				String region = poppedAddress.getParameter(ROUTE_PARAM_REGION);
+				if(region != null) {
+					routingRegion = new SipApplicationRoutingRegion(
+							region,
+							SipApplicationRoutingRegionType.valueOf(SipApplicationRoutingRegionType.class,region));
+				}
 				String previousAppName = poppedAddress.getParameter(ROUTE_PARAM_PREV_APPLICATION_NAME);
 				String previousAppId = poppedAddress.getParameter(ROUTE_PARAM_PREV_APP_ID);
 				if(logger.isDebugEnabled()) {
@@ -154,11 +162,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			if(logger.isDebugEnabled()) {
 				logger.debug("previous state info : " + stateInfo);
 			}
-		}
-		SipApplicationRoutingRegion routingRegion = null;
-		if(sipSessionImpl != null) {
-			routingRegion = sipSessionImpl.getRegion();
-		}
+		}				
 		
 		// 15.11.3 Target Session : Encode URI mechanism
 		// Upon receiving an initial request for processing, a container MUST check the topmost Route header and 

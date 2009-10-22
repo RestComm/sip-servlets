@@ -1111,6 +1111,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		sipURI.setLrParam();
 		sipURI.setParameter(MessageDispatcher.ROUTE_PARAM_DIRECTIVE, 
 				routingDirective.toString());
+		if(sipSession.getRegionInternal() != null) {
+			sipURI.setParameter(MessageDispatcher.ROUTE_PARAM_REGION, 
+				sipSession.getRegionInternal().toString());
+		}
 		sipURI.setParameter(MessageDispatcher.ROUTE_PARAM_PREV_APPLICATION_NAME, 
 				applicationName);
 		sipURI.setParameter(MessageDispatcher.ROUTE_PARAM_PREV_APP_ID, 
