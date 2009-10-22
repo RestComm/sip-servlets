@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -248,12 +249,23 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		String nameToAdd = getCorrectHeaderName(hName);
 		
 		try {
-			// Fix to Issue 1015 by alexander.kozlov.IV
-			Header header = SipFactory.getInstance().createHeaderFactory().createHeader(nameToAdd, value);
+			// Fix to Issue 1015 by alexander.kozlov.IV			
 			if(JainSipUtils.singletonHeadersNames.contains(name)) {
+				Header header = SipFactory.getInstance().createHeaderFactory().createHeader(nameToAdd, value);
 				this.message.setHeader(header);				
-			} else {				
-				this.message.addLast(header);				
+			} else {	
+				// Dealing with Allow:INVITE, ACK, CANCEL, OPTIONS, BYE kind of values
+				if(new StringTokenizer(value, ",").hasMoreTokens()) {
+					List<Header> headers = SipFactory.getInstance().createHeaderFactory()
+						.createHeaders(name + ":" + value);
+					for (Header header : headers) {
+						this.message.addHeader(header);
+					}
+				} else {
+					Header header = SipFactory.getInstance().createHeaderFactory()
+						.createHeader(name, value);
+					this.message.addLast(header);
+				}				
 			}
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal args supplied ", ex);
@@ -1214,9 +1226,18 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		checkCommitted();
 		
 		try {
-			Header header = SipFactory.getInstance().createHeaderFactory()
-				.createHeader(name, value);
-			this.message.setHeader(header);				
+			// Dealing with Allow:INVITE, ACK, CANCEL, OPTIONS, BYE kind of headers
+			if(!JainSipUtils.singletonHeadersNames.contains(name) && new StringTokenizer(value, ",").hasMoreTokens()) {
+				List<Header> headers = SipFactory.getInstance().createHeaderFactory()
+					.createHeaders(name + ":" + value);
+				for (Header header : headers) {
+					this.message.addHeader(header);
+				}
+			} else {
+				Header header = SipFactory.getInstance().createHeaderFactory()
+					.createHeader(name, value);
+				this.message.setHeader(header);
+			}
 		} catch (Exception e) {
 			throw new RuntimeException("Error creating header!", e);
 		}
