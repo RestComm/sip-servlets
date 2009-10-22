@@ -134,6 +134,12 @@
 			<artifactId>sip-balancer</artifactId>
 			<version>1.0.BETA7</version>
 		</dependency>
+		
+		<dependency>			
+			<groupId>org.mobicents.ha.javax.sip</groupId>
+			<artifactId>mobicents-jain-sip-ha-core</artifactId>
+			<version>0.1-SNAPSHOT</version>				
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
