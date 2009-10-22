@@ -23,21 +23,22 @@ package org.jboss.web.tomcat.service.session;
  */
 
 import java.io.IOException;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.sip.SipApplicationSession;
-import javax.servlet.ServletException;
 
-import org.apache.catalina.*;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import org.apache.catalina.Lifecycle;
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.valves.ValveBase;
 import org.jboss.logging.Logger;
-
+import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.ConvergedSessionFacade;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
-import org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService;
 
 /**
  * Web request valve to specifically handle Tomcat jvmRoute using mod_jk(2)
@@ -173,13 +174,8 @@ public class ConvergedJvmRouteValve extends ValveBase implements Lifecycle
             	
             	// Change the jvmRoute in case of failover
             	sessionFacade.getApplicationSession(true).setJvmRoute(jvmRoute);
-            	if(StaticServiceHolder.sipStandardService instanceof SipStandardBalancerNodeService) {
-    				SipStandardBalancerNodeService service = 
-    					(SipStandardBalancerNodeService) StaticServiceHolder.sipStandardService;
-    				service.sendSwitchoverInstruction(requestedJvmRoute, jvmRoute);
-    			} else {
-    				log_.error("The tomcat service is not a SipStandardBalancerNodeService service!!!!!");
-    			}
+            	StaticServiceHolder.sipStandardService.getSipApplicationDispatcher().
+    				sendSwitchoverInstruction(requestedJvmRoute, jvmRoute);    			  				    			
             }
          }
          

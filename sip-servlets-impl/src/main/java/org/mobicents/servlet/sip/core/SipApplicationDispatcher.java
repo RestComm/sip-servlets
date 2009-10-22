@@ -145,6 +145,9 @@ public interface SipApplicationDispatcher extends SipListener {
 
 	SipApplicationRouter getSipApplicationRouter();
 
+	// should be in a seperate HA interface, but this may become deprecated in the future
+	void sendSwitchoverInstruction(String fromJvmRoute, String toJvmRoute);
+	
 	public String getApplicationNameFromHash(String hash);
 	public String getHashFromApplicationName(String appName);
 	

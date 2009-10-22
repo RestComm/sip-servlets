@@ -51,6 +51,10 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.modeler.Registry;
+import org.mobicents.ha.javax.sip.ClusteredSipStack;
+import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingListener;
+import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingService;
+import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingServiceImpl;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.DNSAddressResolver;
@@ -76,6 +80,8 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	private static final String SERVER_LOG_STACK_PROP = "gov.nist.javax.sip.SERVER_LOG";
 	private static final String DEBUG_LOG_STACK_PROP = "gov.nist.javax.sip.DEBUG_LOG";
 	private static final String IS_SIP_CONNECTOR = "isSipConnector";	
+	private static final String BALANCERS = "balancers";
+	private static final String JVM_ROUTE = "jvmRoute";
 	// the logger
 	private static transient Logger logger = Logger.getLogger(SipProtocolHandler.class.getName());
 	// *
@@ -137,6 +143,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	private String staticServerPort;
 	private boolean useStaticAddress;
 
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -353,9 +360,24 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			if(logger.isInfoEnabled()) {
 				logger.info("Mobicents Sip Servlets sip stack properties : " + sipStackProperties);
 			}
+			final String balancers = (String)getAttribute(BALANCERS);
+			if(balancers != null) {
+				if(sipStackProperties.get(LoadBalancerHeartBeatingService.LB_HB_SERVICE_CLASS_NAME) == null) {
+					sipStackProperties.put(LoadBalancerHeartBeatingService.LB_HB_SERVICE_CLASS_NAME, LoadBalancerHeartBeatingServiceImpl.class.getCanonicalName());
+				}
+				if(sipStackProperties.get(LoadBalancerHeartBeatingService.BALANCERS) == null) {
+					sipStackProperties.put(LoadBalancerHeartBeatingService.BALANCERS, balancers);
+				}
+			}			
 			// Create SipStack object
 			sipStack = SipFactories.sipFactory.createSipStack(sipStackProperties);
-
+			final String jvmRoute = (String)getAttribute(JVM_ROUTE);
+			LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = null;
+			if(sipStack instanceof ClusteredSipStack && jvmRoute != null) {
+				loadBalancerHeartBeatingService = ((ClusteredSipStack) sipStack).getLoadBalancerHeartBeatingService();
+				loadBalancerHeartBeatingService.setJvmRoute(jvmRoute);
+			}
+			
 			ListeningPoint listeningPoint = sipStack.createListeningPoint(ipAddress,
 					port, signalingTransport);
 			if(useStun) {
@@ -368,6 +390,12 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 				listeningPoint.setSentBy(staticServerAddress + ":" + globalPort);
 			}
 			SipProvider sipProvider = sipStack.createSipProvider(listeningPoint);
+			
+			SipApplicationDispatcher sipApplicationDispatcher = (SipApplicationDispatcher)
+				getAttribute(SipApplicationDispatcher.class.getSimpleName());
+			if(sipApplicationDispatcher != null && loadBalancerHeartBeatingService != null && loadBalancerHeartBeatingService instanceof LoadBalancerHeartBeatingService) {
+				loadBalancerHeartBeatingService.addLoadBalancerHeartBeatingListener((LoadBalancerHeartBeatingListener)sipApplicationDispatcher);
+			}
 			sipStack.start();
 			
 			//creating the extended listening point
@@ -394,10 +422,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			//made the sip stack and the extended listening Point available to the service implementation
 			setAttribute(SipStack.class.getSimpleName(), sipStack);					
 			setAttribute(ExtendedListeningPoint.class.getSimpleName(), extendedListeningPoint);
-			
 			//Jboss specific loading case
-			SipApplicationDispatcher sipApplicationDispatcher = (SipApplicationDispatcher)
-				getAttribute(SipApplicationDispatcher.class.getSimpleName());
 			if(sipApplicationDispatcher != null) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Adding the Sip Application Dispatcher as a sip listener for connector listening on port " + port);
@@ -628,7 +653,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	public void setUseStaticAddress(boolean useStaticAddress) {
 		this.useStaticAddress = useStaticAddress;
 	}
-
+	
 	// *
     protected String domain;
     protected ObjectName oname;

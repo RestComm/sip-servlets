@@ -21,7 +21,7 @@ import java.io.IOException;
 /**
  * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
- *
+ * @deprecated
  */
 public interface SipBalancerNodeService {
 

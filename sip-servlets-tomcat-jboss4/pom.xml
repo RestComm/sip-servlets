@@ -300,7 +300,7 @@
 										<goal>copy-dependencies</goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-jboss4,mobicents-jain-sip-ha-core</includeArtifactIds>
+									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-jboss4</includeArtifactIds>
 					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>

@@ -75,6 +75,8 @@ import javax.sip.message.Response;
 import org.apache.catalina.LifecycleException;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.modeler.Registry;
+import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingListener;
+import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
@@ -106,7 +108,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * dispatches the messages.
  * @author Jean Deruelle 
  */
-public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, MBeanRegistration {
+public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, MBeanRegistration, LoadBalancerHeartBeatingListener {
 	
 	//list of methods supported by the AR
 	static final String[] METHODS_SUPPORTED = 
@@ -206,6 +208,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	// fatcory for dispatching SIP messages
 	private MessageDispatcherFactory messageDispatcherFactory;
 	
+    //the balancers names to send heartbeat to and our health info
+	private Set<SipLoadBalancer> sipLoadBalancers = new CopyOnWriteArraySet<SipLoadBalancer>();
 	/**
 	 * 
 	 */
@@ -1401,5 +1405,37 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 
 	public String[] getRfcSupported() {
 		return RFC_SUPPORTED;
+	}
+
+	public void loadBalancerAdded(SipLoadBalancer sipLoadBalancer) {
+		sipLoadBalancers.add(sipLoadBalancer);
+		if(sipFactoryImpl.getLoadBalancerToUse() == null) {
+			sipFactoryImpl.setLoadBalancerToUse(sipLoadBalancer);
+		}
+	}
+
+	public void loadBalancerRemoved(SipLoadBalancer sipLoadBalancer) {
+		sipLoadBalancers.remove(sipLoadBalancer);
+		if(sipFactoryImpl.getLoadBalancerToUse() != null && 
+				sipFactoryImpl.getLoadBalancerToUse().equals(sipLoadBalancer)) {
+			if(sipLoadBalancers.size() > 0) {
+				sipFactoryImpl.setLoadBalancerToUse(sipLoadBalancers.iterator().next());
+			} else {
+				sipFactoryImpl.setLoadBalancerToUse(null);
+			}
+		}
 	}	
+	
+	/**
+	 * @param info
+	 */
+	public void sendSwitchoverInstruction(String fromJvmRoute, String toJvmRoute) {
+		logger.info("switching over from " + fromJvmRoute + " to " + toJvmRoute);
+		if(fromJvmRoute == null || toJvmRoute == null) {
+			return;
+		}
+		for(SipLoadBalancer  sipLoadBalancer : sipLoadBalancers) {
+			sipLoadBalancer.switchover(fromJvmRoute, toJvmRoute);			
+		}		
+	}
 }

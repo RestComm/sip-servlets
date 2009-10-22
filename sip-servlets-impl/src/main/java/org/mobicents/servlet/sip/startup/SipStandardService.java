@@ -24,9 +24,11 @@ import java.util.TooManyListenersException;
 
 import javax.sip.SipStack;
 
+import org.apache.catalina.Engine;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardService;
+import org.apache.coyote.ProtocolHandler;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
@@ -87,6 +89,10 @@ public class SipStandardService extends StandardService implements SipService {
 	 * use Pretty Encoding
 	 */
 	private boolean usePrettyEncoding = true;
+	
+	//the balancers to send heartbeat to and our health info
+	@Deprecated
+	private String balancers;
 	
 	@Override
     public String getInfo() {
@@ -174,23 +180,29 @@ public class SipStandardService extends StandardService implements SipService {
 		super.start();		
 		synchronized (connectors) {
 			for (Connector connector : connectors) {
+				final ProtocolHandler protocolHandler = connector.getProtocolHandler();
 				//Jboss sepcific loading case
-				Boolean isSipConnector = (Boolean)
-					connector.getProtocolHandler().getAttribute("isSipConnector");				
+				Boolean isSipConnector = (Boolean) protocolHandler.getAttribute("isSipConnector");				
 				if(isSipConnector != null && isSipConnector) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Attaching the sip application dispatcher " +
 							"as a sip listener to connector listening on port " + 
 							connector.getPort());
 					}
-					connector.getProtocolHandler().setAttribute(SipApplicationDispatcher.class.getSimpleName(), sipApplicationDispatcher);
+					protocolHandler.setAttribute(SipApplicationDispatcher.class.getSimpleName(), sipApplicationDispatcher);
+					if(balancers != null) {
+						protocolHandler.setAttribute("balancers", balancers);
+					}
+					if ((this.container != null) && (this.container instanceof Engine) && ((Engine)container).getJvmRoute() != null) {			            
+						protocolHandler.setAttribute("jvmRoute", ((Engine)container).getJvmRoute());
+					}
 					connectorsStartedExternally = true;
 				} 
 				//Tomcat specific loading case
 				ExtendedListeningPoint extendedListeningPoint = (ExtendedListeningPoint)
-					connector.getProtocolHandler().getAttribute(ExtendedListeningPoint.class.getSimpleName());
+					protocolHandler.getAttribute(ExtendedListeningPoint.class.getSimpleName());
 				SipStack sipStack = (SipStack)
-					connector.getProtocolHandler().getAttribute(SipStack.class.getSimpleName());
+					protocolHandler.getAttribute(SipStack.class.getSimpleName());
 				if(extendedListeningPoint != null && sipStack != null) {
 					// for nist sip stack set the DNS Address resolver allowing to make DNS SRV lookups
 					if(sipStack instanceof SipStackExt) {
@@ -485,5 +497,13 @@ public class SipStandardService extends StandardService implements SipService {
 
 	public void setOutboundProxy(String outboundProxy) {
 		this.outboundProxy = outboundProxy;
-	}	
+	}
+	
+	/**
+	 * @deprecated
+	 * @param balancers the balancers to set
+	 */	
+	public void setBalancers(String balancers) {
+		this.balancers = balancers;
+	}
 }

@@ -83,10 +83,10 @@
 			<scope>provided</scope>
 		</dependency>									
 		
-		<dependency>
-			<groupId>org.mobicents.tools</groupId>
-			<artifactId>sip-balancer</artifactId>
-			<version>1.0.BETA7</version>
+		<dependency>			
+			<groupId>org.mobicents.ha.javax.sip</groupId>
+			<artifactId>mobicents-jain-sip-ha-core</artifactId>
+			<version>0.1-SNAPSHOT</version>	
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
@@ -150,7 +150,7 @@
 										<goal> copy-dependencies </goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j</includeArtifactIds>
+									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,mobicents-jain-sip-ha-core</includeArtifactIds>
 					    			<outputDirectory>${CATALINA_HOME}/lib</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
@@ -201,7 +201,7 @@
 										<goal> copy-dependencies </goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j</includeArtifactIds>
+									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,mobicents-jain-sip-ha-core</includeArtifactIds>
 					    			<outputDirectory>${env.CATALINA_HOME}/lib</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
@@ -248,7 +248,7 @@
 										<goal>copy-dependencies</goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,dnsjava,stun4j</includeArtifactIds>
+									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-ha-core</includeArtifactIds>
 					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
@@ -294,7 +294,7 @@
 										<goal> copy-dependencies </goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,dnsjava,stun4j</includeArtifactIds>
+									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-ha-core</includeArtifactIds>
 					    			<outputDirectory>${JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer/</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
@@ -342,7 +342,7 @@
 										<goal>copy-dependencies</goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,dnsjava,stun4j</includeArtifactIds>
+									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-ha-core</includeArtifactIds>
 					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
@@ -389,7 +389,7 @@
 										<goal>copy-dependencies</goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,dnsjava,stun4j</includeArtifactIds>
+									<includeArtifactIds>sip-balancer,jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-ha-core</includeArtifactIds>
 					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>

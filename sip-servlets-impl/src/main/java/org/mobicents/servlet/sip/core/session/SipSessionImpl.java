@@ -77,6 +77,7 @@ import javax.sip.message.Request;
 import org.apache.catalina.Container;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.log4j.Logger;
+import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
@@ -94,7 +95,6 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
-import org.mobicents.servlet.sip.startup.failover.BalancerDescription;
 
 /**
  * 
@@ -331,7 +331,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 					try {
 						ContactHeader contactHeader = null;
 						if(sipFactory.isUseLoadBalancer()) {
-							BalancerDescription loadBalancerToUse = sipFactory.getLoadBalancerToUse();
+							SipLoadBalancer loadBalancerToUse = sipFactory.getLoadBalancerToUse();
 							javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI("", loadBalancerToUse.getAddress().getHostAddress());
 							sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
 							sipURI.setPort(loadBalancerToUse.getSipPort());	

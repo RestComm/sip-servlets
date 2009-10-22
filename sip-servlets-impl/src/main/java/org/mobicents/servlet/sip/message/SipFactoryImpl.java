@@ -52,6 +52,7 @@ import javax.sip.header.ToHeader;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
+import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
@@ -73,7 +74,6 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
-import org.mobicents.servlet.sip.startup.failover.BalancerDescription;
 
 public class SipFactoryImpl implements Externalizable {	
 
@@ -88,7 +88,7 @@ public class SipFactoryImpl implements Externalizable {
 	private static final String LR_PARAM = "lr";
 
 	private boolean useLoadBalancer = false;
-	private BalancerDescription loadBalancerToUse = null;
+	private SipLoadBalancer loadBalancerToUse = null;
 	
 	public static class NamesComparator implements Comparator<String>, Serializable {		
 		private static final long serialVersionUID = 1L;
@@ -650,14 +650,14 @@ public class SipFactoryImpl implements Externalizable {
 	/**
 	 * @return the loadBalancerToUse
 	 */
-	public BalancerDescription getLoadBalancerToUse() {
+	public SipLoadBalancer getLoadBalancerToUse() {
 		return loadBalancerToUse;
 	}
 
 	/**
 	 * @param loadBalancerToUse the loadBalancerToUse to set
 	 */
-	public void setLoadBalancerToUse(BalancerDescription loadBalancerToUse) {
+	public void setLoadBalancerToUse(SipLoadBalancer loadBalancerToUse) {
 		if(loadBalancerToUse == null) {
 			useLoadBalancer = false;
 		} else {
@@ -722,7 +722,7 @@ public class SipFactoryImpl implements Externalizable {
 			ClassNotFoundException {
 		useLoadBalancer = in.readBoolean();
 		if(useLoadBalancer) {
-			loadBalancerToUse = (BalancerDescription) in.readObject();
+			loadBalancerToUse = (SipLoadBalancer) in.readObject();
 		}
 		sipApplicationDispatcher = StaticServiceHolder.sipStandardService.getSipApplicationDispatcher();
 	}
