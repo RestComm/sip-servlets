@@ -19,8 +19,6 @@ package javax.servlet.sip.ar;
 import java.util.List;
 import java.util.Properties;
 
-import javax.servlet.sip.SipServletRequest;
-
 /**
  * This interface class specifies the API between the container and the application router.
  * Since: 1.1
