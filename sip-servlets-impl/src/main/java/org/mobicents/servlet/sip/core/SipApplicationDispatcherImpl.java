@@ -1215,7 +1215,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public void setConcurrencyControlMode(ConcurrencyControlMode concurrencyControlMode) {
 		this.concurrencyControlMode = concurrencyControlMode;
 		if(logger.isInfoEnabled()) {
-			logger.info("Container wide Concurrency Control set to " + concurrencyControlMode.toString());
+			logger.info("Container wide Concurrency Control set to " + concurrencyControlMode);
 		}
 	}
 
@@ -1230,7 +1230,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public void setConcurrencyControlModeByName(String concurrencyControlMode) {
 		this.concurrencyControlMode = ConcurrencyControlMode.valueOf(concurrencyControlMode);
 		if(logger.isInfoEnabled()) {
-			logger.info("Container wide Concurrency Control set to " + concurrencyControlMode.toString());
+			logger.info("Container wide Concurrency Control set to " + concurrencyControlMode);
 		}
 	}	
 

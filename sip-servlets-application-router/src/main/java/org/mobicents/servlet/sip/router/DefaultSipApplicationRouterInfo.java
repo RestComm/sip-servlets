@@ -18,6 +18,9 @@ package org.mobicents.servlet.sip.router;
 
 import java.text.ParseException;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.servlet.sip.ar.SipRouteModifier;
@@ -35,7 +38,7 @@ public class DefaultSipApplicationRouterInfo {
 	private String[] routes;
 	private SipRouteModifier routeModifier;
 	private int order;
-	private HashMap<String, String> optionalParameters;
+	private Map<String, String> optionalParameters;
 			
 	/**
 	 * 
@@ -70,9 +73,9 @@ public class DefaultSipApplicationRouterInfo {
 		
 	}
 	
-	public static HashMap<String, String> stringToMap(String str) throws ParseException {
+	public static Map<String, String> stringToMap(String str) throws ParseException {
 		
-		HashMap<String, String> map = new HashMap<String, String>();
+		Map<String, String> map = new HashMap<String, String>();
 		if(str == null) return map;
 		String[] props = str.split(" ");
 		for(String prop : props) {
@@ -90,12 +93,13 @@ public class DefaultSipApplicationRouterInfo {
 		return map;
 	}
 	
-	public static String mapToString(HashMap<String, String> map) {
-		String str = "";
-		for(String key : map.keySet().toArray(new String[] {})) {
-			str += key + "=" + map.get(key) + " ";
+	public static String mapToString(Map<String, String> map) {
+		StringBuilder str = new StringBuilder("");
+		Set<Entry<String, String>> entries = map.entrySet();
+		for(Entry<String, String> entry : entries) {
+			str.append(entry.getKey()).append("=").append(entry.getValue()).append(" ");
 		}
-		return str;
+		return str.toString();
 	}
 	
 	/**
@@ -175,7 +179,7 @@ public class DefaultSipApplicationRouterInfo {
 	 * 
 	 * @return optional params as a string (command separated key=value pairs)
 	 */
-	public HashMap<String, String> getOptionalParameters() {
+	public Map<String, String> getOptionalParameters() {
 		return optionalParameters;
 	}
 	
