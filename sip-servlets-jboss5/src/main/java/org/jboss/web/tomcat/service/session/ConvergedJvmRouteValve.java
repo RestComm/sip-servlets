@@ -37,6 +37,7 @@ import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.valves.ValveBase;
 import org.jboss.logging.Logger;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.ConvergedSessionFacade;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 import org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService;
@@ -176,13 +177,8 @@ public class ConvergedJvmRouteValve extends ValveBase implements Lifecycle
             	
             	// Change the jvmRoute in case of failover
             	sessionFacade.getApplicationSession(true).setJvmRoute(jvmRoute);
-            	if(StaticServiceHolder.sipStandardService instanceof SipStandardBalancerNodeService) {
-    				SipStandardBalancerNodeService service = 
-    					(SipStandardBalancerNodeService) StaticServiceHolder.sipStandardService;
-    				service.sendSwitchoverInstruction(requestedJvmRoute, jvmRoute);
-    			} else {
-    				log_.error("The tomcat service is not a SipStandardBalancerNodeService service!!!!!");
-    			}
+            	StaticServiceHolder.sipStandardService.getSipApplicationDispatcher().
+        			sendSwitchoverInstruction(requestedJvmRoute, jvmRoute);    				
             }
          }
          
