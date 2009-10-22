@@ -14,9 +14,9 @@
 	<name>JSLEE - SIP Servlets Alerting Application Parent</name>
 	<url>http://www.mobicents.org/mss-alerting-application.html</url>
 	<modules>				
-		<module>jslee-events</module>
+		<!-->module>jslee-events</module>		
+		<module>jslee-services</module-->
 		<module>sip-servlets</module>
-		<module>jslee-services</module>
 	</modules>
 	<build>
 		<plugins>

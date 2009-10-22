@@ -73,8 +73,8 @@
 			<artifactId>cmutimelex</artifactId>
 			<version>1.0</version>
 		</dependency>
-		<!-- jslee deps -->
-		<dependency>		
+		<!-- jslee deps : Commented out since the prefferred way is through SMS Servlets -->
+		<!--dependency>		
 			<groupId>org.mobicents.servlet.sip.example</groupId>
 			<artifactId>alerting-app-jslee-custom-events</artifactId>
 			<version>1.5-SNAPSHOT</version>
@@ -85,7 +85,7 @@
 			<artifactId>jain-slee</artifactId>
 			<version>1.0</version>	
 			<scope>provided</scope>		
-		</dependency>
+		</dependency-->
 		<!-- various -->			
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>

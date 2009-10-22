@@ -9,16 +9,51 @@
         <load-on-startup>1</load-on-startup>        
     </servlet>
     <servlet>
-        <servlet-name>SmsAlertServlet</servlet-name>
-        <servlet-class>org.mobicents.servlet.sip.alerting.SmsAlertServlet</servlet-class>
+        <servlet-name>RedOxygenSmsAlertServlet</servlet-name>
+        <servlet-class>org.mobicents.servlet.sip.alerting.RedOxygenSmsAlertServlet</servlet-class>
         <load-on-startup>1</load-on-startup>        
     </servlet>
+     <servlet>
+        <servlet-name>EsendexSmsAlertServlet</servlet-name>
+        <servlet-class>org.mobicents.servlet.sip.alerting.EsendexSmsAlertServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>        
+    </servlet>
+     <servlet>
+        <servlet-name>EricssonSmsAlertServlet</servlet-name>
+        <servlet-class>org.mobicents.servlet.sip.alerting.EricssonSmsAlertServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>        
+    </servlet>
+     <servlet>
+        <servlet-name>JainSleeSmsAlertServlet</servlet-name>
+        <servlet-class>org.mobicents.servlet.sip.alerting.JainSleeSmsAlertServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>        
+    </servlet>        
+    
     <servlet-mapping>
         <servlet-name>PhoneAlertServlet</servlet-name>
         <url-pattern>/call</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
-        <servlet-name>SmsAlertServlet</servlet-name>
+        <servlet-name>JainSleeSmsAlertServlet</servlet-name>
+        <url-pattern>/jain-slee-sms</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EsendexSmsAlertServlet</servlet-name>
+        <url-pattern>/esendex-sms</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EricssonSmsAlertServlet</servlet-name>
+        <url-pattern>/ericsson-sms</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>EsendexSmsAlertServlet</servlet-name>
         <url-pattern>/sms</url-pattern>
-    </servlet-mapping>            
+    </servlet-mapping>
+    
+    <context-param>
+      <param-name>esendexAccountRef</param-name>
+      <param-value>EX0059334</param-value>
+    </context-param>
+    
+         
 </web-app>

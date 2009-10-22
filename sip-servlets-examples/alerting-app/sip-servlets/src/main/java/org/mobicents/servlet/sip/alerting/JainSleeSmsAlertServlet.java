@@ -22,18 +22,19 @@ import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import org.apache.log4j.Logger;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.slee.EventTypeID;
-import javax.slee.connection.ExternalActivityHandle;
-import javax.slee.connection.SleeConnection;
-import javax.slee.connection.SleeConnectionFactory;
+//import javax.slee.EventTypeID;
+//import javax.slee.connection.ExternalActivityHandle;
+//import javax.slee.connection.SleeConnection;
+//import javax.slee.connection.SleeConnectionFactory;
+//import org.mobicents.slee.service.events.SmsAlertingCustomEvent;
 
-import org.apache.log4j.Logger;
-import org.mobicents.slee.service.events.SmsAlertingCustomEvent;
+
 
 public class JainSleeSmsAlertServlet extends HttpServlet
 { 	
@@ -68,18 +69,19 @@ public class JainSleeSmsAlertServlet extends HttpServlet
         try {
         	Properties jndiProps = new Properties();			
 			Context initCtx = new InitialContext(jndiProps);
-        	SleeConnectionFactory factory = (SleeConnectionFactory) initCtx.lookup("java:/MobicentsConnectionFactory");
-        	
-			SleeConnection conn1 = factory.getConnection();
-			ExternalActivityHandle handle = conn1.createActivityHandle();
-
-			EventTypeID requestType = conn1.getEventTypeID(
-					EVENT_TYPE,
-					"org.mobicents", "1.0");
-			SmsAlertingCustomEvent smsAlertingCustomEvent = new SmsAlertingCustomEvent(alertId, tel, alertText);
-			
-			conn1.fireEvent(smsAlertingCustomEvent, requestType, handle, null);
-			conn1.close();
+			// Commented out since the preferred way is through SMS Servlets
+//        	SleeConnectionFactory factory = (SleeConnectionFactory) initCtx.lookup("java:/MobicentsConnectionFactory");
+//        	
+//			SleeConnection conn1 = factory.getConnection();
+//			ExternalActivityHandle handle = conn1.createActivityHandle();
+//
+//			EventTypeID requestType = conn1.getEventTypeID(
+//					EVENT_TYPE,
+//					"org.mobicents", "1.0");
+//			SmsAlertingCustomEvent smsAlertingCustomEvent = new SmsAlertingCustomEvent(alertId, tel, alertText);
+//			
+//			conn1.fireEvent(smsAlertingCustomEvent, requestType, handle, null);
+//			conn1.close();
 		} catch (Exception e) {
 			logger.error("unexpected exception while firing the event " + EVENT_TYPE + " into jslee", e);
 		}	
