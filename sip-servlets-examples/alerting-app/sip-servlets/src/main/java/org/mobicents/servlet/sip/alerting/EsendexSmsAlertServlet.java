@@ -69,6 +69,8 @@ public class EsendexSmsAlertServlet extends HttpServlet {
 	        alertText = new String(content); 	        
         }
         
+        alertText = "Alert Id : " + alertId + ",  Alert Details :" + alertText;
+        
         StringBuffer responseBuffer = new StringBuffer();
         
 		try {									
