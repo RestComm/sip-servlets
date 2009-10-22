@@ -25,7 +25,7 @@
 						<br />
 						<img src="green.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=902">
-						JAIN SIP pluggable data structures and clustering 
+						JAIN SIP pluggable data structures and clustering aka JAIN SIP HA
 						</a>
 						<br />
 						<img src="green.jpeg" />
@@ -33,6 +33,11 @@
 						Sip Session Dialog replication moved to JAIN SIP HA
 						</a>
 						<br />							
+						<img src="green.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=1016">
+						Move RMI Keep alive notifying Mobicents SIP Load Balancers to JAIN SIP HA
+						</a>
+						<br />
 						<img src="green.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=990">
 						JAIN SIP Configurable Timers
@@ -53,7 +58,7 @@
 						Allow Regexp in Default Application Router to select based on headers.
 						</a>
 						<br />							
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=999">
 						HA perf tests and improvements 
 						</a>
@@ -63,7 +68,7 @@
 						HA colocating LB and nodes
 						</a>
 						<br />
-						<img src="red.jpeg" />
+						<img src="orange.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=956">
 						Distributed LB
 						</a>
@@ -78,7 +83,7 @@
 						HTTP redirect-based cooperative load-balancing
 						</a>
 						<br />
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=954">
 						Load Balancer pluggable algorithms
 						</a> 
@@ -264,9 +269,15 @@
 								</a>
 							</li>
 							<li>
-								<img src="red.jpeg" />
+								<img src="green.jpeg" />
 								<a href="http://code.google.com/p/mobicents/issues/detail?id=1010">
 								Unable to set flag parameter to parameterable header
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a href="http://code.google.com/p/mobicents/issues/detail?id=1015">
+								Exception on addition a custom header to request.
 								</a>
 							</li>
 						</ul>
