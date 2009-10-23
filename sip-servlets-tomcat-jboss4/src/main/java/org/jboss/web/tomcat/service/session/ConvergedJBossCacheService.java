@@ -610,13 +610,12 @@ public class ConvergedJBossCacheService extends JBossCacheService
    }
    public void removeSipSession(String sipApplicationSessionId, String realId)
    {
-      Fqn fqn = getSipSessionFqn(sipApplicationSessionId, realId);
+      final Fqn fqn = getSipSessionFqn(sipApplicationSessionId, realId);                  
+      //Object obj = getUnMarshalledValue(cacheWrapper_.remove(fqn, realId));
       if (log_.isDebugEnabled())
       {
-         log_.debug("Remove session from distributed store. Fqn: " + fqn);
-      }
-      //Object obj = getUnMarshalledValue(cacheWrapper_.remove(fqn, realId));
-      cacheWrapper_.remove(fqn, realId); 
+         log_.debug("Remove sip session from distributed store. Fqn: " + fqn);
+      }      
       // This needs to go after object removal to support correct cache invalidation.
 //      _remove(fqn, VERSION_KEY);
       // Let just remove the whole thing (including the fqn)
@@ -625,15 +624,14 @@ public class ConvergedJBossCacheService extends JBossCacheService
    }
    public void removeSipApplicationSession(String realId)
    {
-      Fqn fqn = getSipApplicationSessionFqn(realId);
+      final Fqn fqn = getSipApplicationSessionFqn(realId);           
+      //Object obj = getUnMarshalledValue(cacheWrapper_.remove(fqn, realId));
       if (log_.isDebugEnabled())
       {
-         log_.debug("Remove session from distributed store. Fqn: " + fqn);
-      }
-      //Object obj = getUnMarshalledValue(cacheWrapper_.remove(fqn, realId));
-      cacheWrapper_.remove(fqn, realId); 
+         log_.debug("Remove sip application session from distributed store. Fqn: " + fqn);
+      }      
       // This needs to go after object removal to support correct cache invalidation.
-//      _remove(fqn, VERSION_KEY);
+//      _remove(fqn, VERSION_KEY);      
       // Let just remove the whole thing (including the fqn)
       cacheWrapper_.remove(fqn);
       //return obj;

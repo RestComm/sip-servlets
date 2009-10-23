@@ -2978,7 +2978,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	            // from the distributed cache
 	            ConvergedSessionInvalidationTracker.sipSessionInvalidated(key, this);
 
-	            sipManagerDelegate.removeSipSession(key);
+//	            sipManagerDelegate.removeSipSession(key);
 				stats_.removeStats(realId);
 				
 				// Compute how long this session has been alive, and update
@@ -3018,7 +3018,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	            // from the distributed cache
 	            ConvergedSessionInvalidationTracker.sipApplicationSessionInvalidated(key, this);
 
-	            sipManagerDelegate.removeSipApplicationSession(key);
+//	            sipManagerDelegate.removeSipApplicationSession(key);
 				stats_.removeStats(realId);
 				
 				// Compute how long this session has been alive, and update

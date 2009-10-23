@@ -88,11 +88,11 @@ public class SessionBasedClusteredSipSession extends
 	}
 
 	public void removeMyself() {
-		proxy_.removeSipSession(sipApplicationSessionKey.getId(), getId());
+		proxy_.removeSipSession(sipApplicationSessionKey.toString(), getId());
 	}
 
 	public void removeMyselfLocal() {
-		proxy_.removeSipSessionLocal(sipApplicationSessionKey.getId(), getId());
+		proxy_.removeSipSessionLocal(sipApplicationSessionKey.toString(), getId());
 	}
 
 	// ----------------------------------------------HttpSession Public Methods
@@ -151,7 +151,7 @@ public class SessionBasedClusteredSipSession extends
 			// Let superclass read in everything but the attribute map
 			super.readExternal(in);
 
-			final String sipAppSessionKey = sipApplicationSessionKey.getId();
+			final String sipAppSessionKey = sipApplicationSessionKey.toString();
 			final String sipSessionKey = getId();
 			
 			sipSessionAttributeMap = (Map)proxy_.getSipSessionAttribute(sipAppSessionKey, sipSessionKey, "attributes");
@@ -171,7 +171,7 @@ public class SessionBasedClusteredSipSession extends
 			super.writeExternal(out);
 
 			if(sessionAttributesDirty) {
-				final String sipAppSessionKey = sipApplicationSessionKey.getId();
+				final String sipAppSessionKey = sipApplicationSessionKey.toString();
 				final String sipSessionKey = getId();
 				// Don't replicate any excluded attributes
 				Map excluded = removeExcludedAttributes(getAttributeMap());

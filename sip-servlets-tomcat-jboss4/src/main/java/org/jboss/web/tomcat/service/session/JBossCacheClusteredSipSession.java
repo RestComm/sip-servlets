@@ -150,7 +150,7 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 //	}
 
 	protected void populateMetaData() {
-		final String sipAppSessionId = sipApplicationSessionKey.getId();
+		final String sipAppSessionId = sipApplicationSessionKey.toString();
 		final String sipSessionId = getId();				
 		Long ct = (Long) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "ct");
 		if(ct != null) {
@@ -191,7 +191,7 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 	 */
 	public void processSessionRepl() {		
 		// Replicate the session.
-		final String sipAppSessionKey = sipApplicationSessionKey.getId();
+		final String sipAppSessionKey = sipApplicationSessionKey.toString();
 		final String sipSessionKey = getId();
 		if(isNew) {
 			proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, "ct", creationTime);
