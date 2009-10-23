@@ -1669,7 +1669,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	protected void processSipSessionRepl(ClusteredSipSession session) {
 		// If we are using SESSION granularity, we don't want to initiate a TX
 		// for a single put
-		boolean notSession = (replicationGranularity_ != WebMetaData.REPLICATION_GRANULARITY_SESSION);
+//		boolean notSession = (replicationGranularity_ != WebMetaData.REPLICATION_GRANULARITY_SESSION);
+		boolean notSession = true;
 		boolean doTx = false;
 		try {
 			// We need transaction so all the replication are sent in batch.
@@ -1730,7 +1731,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	protected void processSipApplicationSessionRepl(ClusteredSipApplicationSession session) {
 		// If we are using SESSION granularity, we don't want to initiate a TX
 		// for a single put
-		boolean notSession = (replicationGranularity_ != WebMetaData.REPLICATION_GRANULARITY_SESSION);
+//		boolean notSession = (replicationGranularity_ != WebMetaData.REPLICATION_GRANULARITY_SESSION);
+		boolean notSession = true;
 		boolean doTx = false;
 		try {
 			// We need transaction so all the replication are sent in batch.
