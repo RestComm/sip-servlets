@@ -693,9 +693,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(sipSessionKey != null) {
 			SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());
 			//the context can be null if the server is being shutdown
-			if(sipContext != null) {		
-				sipContext.enterSipApp(null, null, null, true, false);
-				try {
+			if(sipContext != null) {
+				// we don't replicate since this is just a check to see if the sessions are going to be removed
+//				sipContext.enterSipApp(null, null, null, true, false);
+//				try {
 					MobicentsSipSession sipSessionImpl = sipContext.getSipManager().getSipSession(sipSessionKey, false, sipFactoryImpl, null);
 					MobicentsSipApplicationSession sipApplicationSession = null;
 					if(sipSessionImpl != null) {
@@ -732,9 +733,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 							}							
 						}
 					}
-				} finally {
-					sipContext.exitSipApp(null, null);
-				}
+				// we don't replicate since this is just a check to see if the sessions are going to be removed
+//				} finally {
+//					sipContext.exitSipApp(null, null);
+//				}
 			}
 		}
 	}

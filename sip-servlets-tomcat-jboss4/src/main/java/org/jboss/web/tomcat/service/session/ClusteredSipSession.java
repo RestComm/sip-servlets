@@ -141,6 +141,11 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	 * Whether JK is being used, in which case our realId will not match our id
 	 */
 	private transient boolean useJK;
+	
+	/**
+	 * If this session is new
+	 */
+	protected transient boolean isNew;
 
 	/**
 	 * Timestamp when we were last replicated.
@@ -190,7 +195,8 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 		super(key, sipFactoryImpl, mobicentsSipApplicationSession);
 		invalidationPolicy = ((AbstractJBossManager)mobicentsSipApplicationSession.getSipContext().getSipManager()).getInvalidateSessionPolicy();
 		this.useJK = useJK;
-		this.firstAccess = true;	
+		this.firstAccess = true;
+		isNew = true;
 		// it starts with true so that it gets replicated when first created
 		sessionMetadataDirty = true;
 		checkAlwaysReplicateMetadata();
@@ -1022,9 +1028,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 //		synchronized (this) {
 			// From SipSessionImpl
 			lastAccessedTime = in.readLong();
-			creationTime = in.readLong();
 			// From ClusteredSession
-			invalidationPolicy = in.readInt();
 			version = in.readInt();
 
 			// Get our id without any jvmRoute appended
@@ -1038,7 +1042,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			this.firstAccess = false;
 			sessionMetadataDirty = false;
 			sessionAttributesDirty = false;
-			sessionLastAccessTimeDirty = false;
+			sessionLastAccessTimeDirty = false;			
 			
 			// Assume deserialization means replication and use thisAccessedTime
 			// as a proxy for when replication occurred
@@ -1085,11 +1089,9 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	public void writeExternal(ObjectOutput out) throws IOException {
 //		synchronized (this) {
 			// From SipSessionimpl
-			out.writeLong(lastAccessedTime);
-			out.writeLong(creationTime);
+			out.writeLong(lastAccessedTime);			
 			
-			// From ClusteredSession
-			out.writeInt(invalidationPolicy);
+			// From ClusteredSession			
 			out.writeInt(version);
 
 			// TODO uncomment when work on JBAS-1900 is completed

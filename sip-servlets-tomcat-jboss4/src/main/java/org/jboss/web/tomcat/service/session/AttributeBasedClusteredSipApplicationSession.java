@@ -118,6 +118,11 @@ public class AttributeBasedClusteredSipApplicationSession extends JBossCacheClus
 					+ "version from: " + getVersion() + " and replicate.");
 		}
 		final String sipAppSessionKey = key.getId();
+		if(isNew) {
+			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "ct", creationTime);
+			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "ip", invalidationPolicy);
+			isNew = false;
+		}
 		if(sessionMetadataDirty) {			
 			for (Entry<String, Object> entry : metaDataModifiedMap.entrySet()) {
 				proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, entry.getKey(), entry.getValue());
@@ -125,10 +130,12 @@ public class AttributeBasedClusteredSipApplicationSession extends JBossCacheClus
 			metaDataModifiedMap.clear();									
 		}		
 		if(sipSessionsMapModified) {					
-			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "sipSessions", sipSessions);		
+			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "sipSessions", sipSessions);
+			sipSessionsMapModified = false;
 		}		
 		if(httpSessionsMapModified) {			
 			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "httpSessions", httpSessions);
+			httpSessionsMapModified = false;
 		}
 		this.incrementVersion();
 		proxy_.putSipApplicationSession(getId(), this);

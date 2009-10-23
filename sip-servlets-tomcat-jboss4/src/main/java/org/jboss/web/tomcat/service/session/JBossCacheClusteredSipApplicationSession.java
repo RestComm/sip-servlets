@@ -105,6 +105,14 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 	
 	protected void populateMetaData() {
 		final String sipAppSessionId = key.getId();
+		Long ct = (Long) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "ct");
+		if(ct != null) {
+			creationTime = ct;
+		}
+		Integer ip = (Integer) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "ip");
+		if(ip != null) {
+			invalidationPolicy = ip;
+		}
 		Boolean valid = (Boolean) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "iv");
 		if(valid != null) {
 			isValid = valid;
@@ -112,7 +120,8 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 			isValid = true;
 		}
 		sipSessions = (Set<SipSessionKey>) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "sipSessions");
-		httpSessions = (Set<String>) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "httpSessions");				
+		httpSessions = (Set<String>) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "httpSessions");
+		isNew = false;
 	}
 
 	/**
@@ -125,23 +134,30 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 					+ "version from: " + getVersion() + " and replicate.");
 		}
 		final String sipAppSessionKey = key.getId();
+		if(isNew) {
+			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "ct", creationTime);
+			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "ip", invalidationPolicy);
+			isNew = false;
+		}
 		if(sessionMetadataDirty) {			
 			for (Entry<String, Object> entry : metaDataModifiedMap.entrySet()) {
 				proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, entry.getKey(), entry.getValue());
-			}
-			metaDataModifiedMap.clear();									
+			}			
+			metaDataModifiedMap.clear();			
 		}		
 		if(sipSessionsMapModified) {					
-			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "sipSessions", sipSessions);		
+			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "sipSessions", sipSessions);
+			sipSessionsMapModified = false;
 		}		
 		if(httpSessionsMapModified) {			
 			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "httpSessions", httpSessions);
+			httpSessionsMapModified = false;
 		}
 		this.incrementVersion();
 		proxy_.putSipApplicationSession(getId(), this);
 
-		sessionAttributesDirty = false;
 		sessionMetadataDirty = false;
+		sessionAttributesDirty = false;		
 		sessionLastAccessTimeDirty = false;
 
 		updateLastReplicated();

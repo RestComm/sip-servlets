@@ -139,6 +139,11 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	 * Whether JK is being used, in which case our realId will not match our id
 	 */
 	private transient boolean useJK;
+	
+	/**
+	 * If the session is New
+	 */
+	protected transient boolean isNew;
 
 	/**
 	 * Timestamp when we were last replicated.
@@ -193,6 +198,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 		invalidationPolicy = ((AbstractJBossManager)sipContext.getSipManager()).getInvalidateSessionPolicy();
 		this.useJK = useJK;
 		this.firstAccess = true;
+		this.isNew = true;
 		// it starts with true so that it gets replicated when first created
 		sessionMetadataDirty = true;
 		checkAlwaysReplicateMetadata();		
@@ -1008,16 +1014,9 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 		}
 //		synchronized (this) {
 			// From SipApplicationSessionImpl
-//			key = (SipApplicationSessionKey )in.readObject();
-//			if(logger.isDebugEnabled()) {
-//				logger.debug("reading sip app session from the cache. key = " + key);
-//			}
 			
-			creationTime = in.readLong();
 			lastAccessedTime = in.readLong();
 //			maxInactiveInterval = in.readInt();
-//			isNew = in.readBoolean();
-//			setValid(in.readBoolean());			
 
 			futureExpirationTimeOnPassivation = in.readLong();
 			if(expirationTimerTask == null && sipContext.getSipApplicationSessionTimeout() > 0) {
@@ -1036,7 +1035,6 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			//TODO get the persistent servletTimers
 			
 			// From ClusteredSession
-			invalidationPolicy = in.readInt();
 			version = in.readInt();
 
 			// Get our id without any jvmRoute appended
@@ -1094,17 +1092,12 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	public void writeExternal(ObjectOutput out) throws IOException {
 //		synchronized (this) {
 			// From SipApplicationSessionImpl
-//			out.writeObject(key);
 			
-			out.writeLong(creationTime);
 			out.writeLong(lastAccessedTime);
 //			out.writeInt(maxInactiveInterval);
-//			out.writeBoolean(isNew);
-//			out.writeBoolean(isValid());			
 			out.writeLong(expirationTime);
 			
 			// From ClusteredSession
-			out.writeInt(invalidationPolicy);
 			out.writeInt(version);			
 
 			// TODO uncomment when work on JBAS-1900 is completed

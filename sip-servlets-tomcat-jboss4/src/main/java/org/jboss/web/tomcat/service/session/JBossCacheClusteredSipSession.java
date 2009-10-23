@@ -152,6 +152,14 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 	protected void populateMetaData() {
 		final String sipAppSessionId = sipApplicationSessionKey.getId();
 		final String sipSessionId = getId();				
+		Long ct = (Long) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "ct");
+		if(ct != null) {
+			creationTime = ct;
+		}
+		Integer ip = (Integer) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "ip");
+		if(ip != null) {
+			invalidationPolicy = ip;
+		}
 		handlerServlet = (String) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "handler");
 		Boolean valid = (Boolean) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "iv");
 		if(valid != null) {
@@ -175,21 +183,26 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 		sessionCreatingDialogId = (String) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "dialogId");
 		proxy = (ProxyImpl) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "proxy");
 		b2buaHelper = (B2buaHelperImpl) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "b2b");
-		
+		isNew = false;
 	}
 	
 	/**
 	 * Increment our version and place ourself in the cache.
 	 */
-	public void processSessionRepl() {
+	public void processSessionRepl() {		
 		// Replicate the session.
-		if (logger.isDebugEnabled()) {
-			logger.debug("processSessionRepl(): session is dirty. Will increment "
-					+ "version from: " + getVersion() + " and replicate.");
-		}		
 		final String sipAppSessionKey = sipApplicationSessionKey.getId();
-		final String sipSessionKey = getId();		
-		if(sessionMetadataDirty) {			
+		final String sipSessionKey = getId();
+		if(isNew) {
+			proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, "ct", creationTime);
+			proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, "ip", invalidationPolicy);
+			isNew = false;
+		}
+					
+		if(sessionMetadataDirty) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("processSessionRepl(): session metadata is dirty.");
+			}			
 			for (Entry<String, Object> entry : metaModifiedMap_.entrySet()) {
 				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, entry.getKey(), entry.getValue());
 			}

@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -47,8 +46,8 @@ public final class ConvergedSessionReplicationContext
    private int sipActivityCount;
    private SnapshotManager soleManager;
    private ClusteredSession soleSession;
-   private Set<ClusteredSipSession> sipSessions = new HashSet<ClusteredSipSession>();
-   private Set<ClusteredSipApplicationSession> sipApplicationSessions = new HashSet<ClusteredSipApplicationSession>();;
+   private final Set<ClusteredSipSession> sipSessions = new HashSet<ClusteredSipSession>();
+   private final Set<ClusteredSipApplicationSession> sipApplicationSessions = new HashSet<ClusteredSipApplicationSession>();;
    private Map crossCtxSessions;
 //   private Map crossCtxSipSessions;
 //   private Map crossCtxSipApplicationSessions;

@@ -122,7 +122,12 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 					+ "version from: " + getVersion() + " and replicate.");
 		}
 		final String sipAppSessionKey = sipApplicationSessionKey.getId();
-		final String sipSessionKey = getId();		
+		final String sipSessionKey = getId();
+		if(isNew) {
+			proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, "ct", creationTime);
+			proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, "ip", invalidationPolicy);
+			isNew = false;
+		}
 		if(sessionMetadataDirty) {			
 			for (Entry<String, Object> entry : metaModifiedMap_.entrySet()) {
 				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, entry.getKey(), entry.getValue());

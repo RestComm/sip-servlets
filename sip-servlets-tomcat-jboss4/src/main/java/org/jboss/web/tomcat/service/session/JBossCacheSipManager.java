@@ -722,7 +722,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 
 	public boolean storeSipSession(final ClusteredSipSession session) {
 		boolean stored = false;
-		if (session != null && started_) {			
+		if (started_) {			
 
 //			synchronized (session) {
 				if (logger.isDebugEnabled()) {
@@ -733,10 +733,10 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				if (session.isValid()
 						&& (session.isSessionDirty() || session
 								.getExceedsMaxUnreplicatedInterval()) && State.CONFIRMED.equals(session.getState())) {
-					if(logger.isDebugEnabled()) {
-						logger.debug("replicating following sip session " + session.getId());
-					}
 					final String realId = session.getId();
+					if(logger.isDebugEnabled()) {
+						logger.debug("replicating following sip session " + realId);
+					}					
 
 					// Notify all session attributes that they get serialized
 					// (SRV 7.7.2)
@@ -760,7 +760,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	
 	public boolean storeSipApplicationSession(final ClusteredSipApplicationSession session) {
 		boolean stored = false;
-		if (session != null && started_) {
+		if (started_) {
 
 //			synchronized (session) {
 				if (logger.isDebugEnabled()) {

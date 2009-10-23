@@ -87,9 +87,9 @@ public class DistributableSimpleSipServlet
 		}
 		if(request.isInitial()) { 
 			request.getSession().setAttribute("INVITE", RECEIVED);
-			request.getSession().setAttribute("sipSessionActivationListener", new SipSessionActivationListenerAttribute());
+//			request.getSession().setAttribute("sipSessionActivationListener", new SipSessionActivationListenerAttribute());
 			request.getApplicationSession().setAttribute("INVITE", RECEIVED);
-			request.getSession().setAttribute("sipAppSessionActivationListener", new SipApplicationSessionActivationListenerAttribute());
+//			request.getSession().setAttribute("sipAppSessionActivationListener", new SipApplicationSessionActivationListenerAttribute());
 			if("reinvite".equals(((SipURI)request.getTo().getURI()).getUser())) {
 				request.getSession().setAttribute("ISREINVITE", RECEIVED);
 			}
