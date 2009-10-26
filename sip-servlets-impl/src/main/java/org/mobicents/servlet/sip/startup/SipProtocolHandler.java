@@ -142,6 +142,8 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	private String staticServerAddress;
 	private String staticServerPort;
 	private boolean useStaticAddress;
+	
+	private boolean started = false;
 
 	
 	/**
@@ -181,6 +183,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
             Registry.getRegistry(null, null).unregisterComponent(tpOname);
         if (rgOname != null)
             Registry.getRegistry(null, null).unregisterComponent(rgOname);
+        started = false;
 	}
 
 	public Adapter getAdapter() {		
@@ -373,9 +376,11 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			sipStack = SipFactories.sipFactory.createSipStack(sipStackProperties);
 			final String jvmRoute = (String)getAttribute(JVM_ROUTE);
 			LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = null;
-			if(sipStack instanceof ClusteredSipStack && jvmRoute != null) {
+			if(sipStack instanceof ClusteredSipStack) {
 				loadBalancerHeartBeatingService = ((ClusteredSipStack) sipStack).getLoadBalancerHeartBeatingService();
-				loadBalancerHeartBeatingService.setJvmRoute(jvmRoute);
+				if(jvmRoute != null) {
+					loadBalancerHeartBeatingService.setJvmRoute(jvmRoute);
+				}
 			}
 			
 			ListeningPoint listeningPoint = sipStack.createListeningPoint(ipAddress,
@@ -439,7 +444,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			}
 			
 			logger.info("Sip Connector started on ip address : " + ipAddress
-					+ ",port " + port + ", useStun " + useStun + ", stunAddress " + stunServerAddress + ", stunPort : " + stunServerPort);
+					+ ",port " + port + ", transport " + signalingTransport + ", useStun " + useStun + ", stunAddress " + stunServerAddress + ", stunPort : " + stunServerPort);
 			
 			if (this.domain != null) {
 //	            try {
@@ -455,10 +460,15 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	            Registry.getRegistry(null, null).registerComponent
 	                ( sipStack, rgOname, null );
 	        }
-		} catch (Exception ex) {
+			started = true;
+		} catch (Exception ex) {			
 			logger.fatal(
-					"Bad shit happened -- check server.xml for tomcat. ", ex);
+					"Bad shit happened -- check server.xml for tomcat. ", ex);			
 			throw ex;
+		} finally {
+			if(!started) {
+				destroy();
+			}
 		}
 	}	
 	
@@ -523,9 +533,14 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	/**
 	 * @param signalingTransport
 	 *            the signalingTransport to set
+	 * @throws Exception 
 	 */
-	public void setSignalingTransport(String transport) {
+	public void setSignalingTransport(String transport) throws Exception {
 		this.signalingTransport = transport;
+		if(started) {
+			destroy();
+			start();
+		}
 	}
 
 	/**
@@ -538,13 +553,22 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	/**
 	 * @param port
 	 *            the port to set
+	 * @throws Exception 
 	 */
-	public void setPort(int port) {
+	public void setPort(int port) throws Exception {
 		this.port = port;
+		if(started) {
+			destroy();
+			start();
+		}
 	}
 		
-	public void setIpAddress(String ipAddress) {
+	public void setIpAddress(String ipAddress) throws Exception {
 		this.ipAddress = ipAddress;
+		if(started) {
+			destroy();
+			start();
+		}
 	}
 
 	public String getIpAddress() {
