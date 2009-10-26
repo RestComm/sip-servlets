@@ -75,6 +75,7 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
 
 /**
@@ -399,9 +400,7 @@ public class TestSipListener implements SipListener {
 			}
 			
 		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.exit(0);
-
+			ex.printStackTrace();			
 		}		
 	}
 
@@ -453,8 +452,6 @@ public class TestSipListener implements SipListener {
 		
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			System.exit(0);
-
 		}		
 	}
 
@@ -480,8 +477,6 @@ public class TestSipListener implements SipListener {
 		
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			System.exit(0);
-
 		}
 	}
 
@@ -1038,8 +1033,6 @@ public class TestSipListener implements SipListener {
 		
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			System.exit(0);
-
 		}
 	}
 
@@ -1122,8 +1115,7 @@ public class TestSipListener implements SipListener {
 				return;
 			}
 		} catch (Exception ex) {
-			ex.printStackTrace();
-			System.exit(0);
+			ex.printStackTrace();			
 		}
 	}
 	public void processResponse(ResponseEvent responseReceivedEvent) {
@@ -1513,6 +1505,10 @@ public class TestSipListener implements SipListener {
 				try {
 					if(sendByeInNewThread) Thread.sleep(600);
 					Request byeRequest = dialog.createRequest(Request.BYE);
+					URI uri = ((FromHeader)byeRequest.getHeader(FromHeader.NAME)).getAddress().getURI();
+					if(uri.isSipURI()) {
+						((SipURI)uri).removeParameter("fromParam"); 
+					}
 					ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
 					logger.info("Sending BYE " + byeRequest);
 					if(!sendSubsequentRequestsThroughSipProvider) {

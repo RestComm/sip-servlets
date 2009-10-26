@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.testsuite.composition;
 
+import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
@@ -46,6 +47,8 @@ public class B2BUACompositionJunitTest extends SipServletTestCase {
 
 	public B2BUACompositionJunitTest(String name) {
 		super(name);
+		autoDeployOnStartup = false;
+		startTomcatOnStartup = false;
 	}
 
 	@Override
@@ -77,10 +80,12 @@ public class B2BUACompositionJunitTest extends SipServletTestCase {
 	}
 	
 	@Override
-	protected void setUp() throws Exception {
-		autoDeployOnStartup = false;
+	protected void setUp() throws Exception {		
 		super.setUp();
 
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
+		tomcat.startTomcat();		
+		
 		senderProtocolObjects = new ProtocolObjects(FROM_NAME,
 				"gov.nist", TRANSPORT, AUTODIALOG, null);
 		receiverProtocolObjects = new ProtocolObjects(TO_NAME,
@@ -146,7 +151,7 @@ public class B2BUACompositionJunitTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getOkToByeReceived());
 		assertTrue(sender.getByeReceived());		

@@ -138,7 +138,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			headers.put("User-Agent", userAgentHeaderList);
 			
 			List<String> contactHeaderList = new ArrayList<String>();
-			contactHeaderList.add("\"callforwardingB2BUA\" <sip:127.0.0.1:5070;transport=tcp>");
+			contactHeaderList.add("\"callforwardingB2BUA\" <sip:127.0.0.1:5070>");
 			headers.put("Contact", contactHeaderList);
 			
 			List<String> extensionsHeaderList = new ArrayList<String>();

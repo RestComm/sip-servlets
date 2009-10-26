@@ -249,6 +249,21 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());	
 	}
+	
+	// test for http://code.google.com/p/mobicents/issues/detail?id=1021
+	public void testSessionRetrieval() throws Exception {
+		String fromName = "testSessionRetrieval";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		fromAddress.setParameter("fromParam", "whatever");
+		
+		sender.sendSipRequest("INVITE", fromAddress, fromAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertEquals( 200, sender.getFinalResponseStatus());
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());	
+	}
 
 	@Override
 	protected void tearDown() throws Exception {					
