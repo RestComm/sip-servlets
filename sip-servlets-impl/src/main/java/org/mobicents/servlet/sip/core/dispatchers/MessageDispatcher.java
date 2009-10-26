@@ -53,7 +53,8 @@ public abstract class MessageDispatcher {
 	
 	public static final String ROUTE_PARAM_DIRECTIVE = "directive";
 	
-	public static final String ROUTE_PARAM_REGION= "region";
+	public static final String ROUTE_PARAM_REGION_LABEL= "region_label";
+	public static final String ROUTE_PARAM_REGION_TYPE= "region_type";
 	
 	public static final String ROUTE_PARAM_PREV_APPLICATION_NAME = "previousappname";
 	

@@ -1112,8 +1112,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		sipURI.setParameter(MessageDispatcher.ROUTE_PARAM_DIRECTIVE, 
 				routingDirective.toString());
 		if(sipSession.getRegionInternal() != null) {
-			sipURI.setParameter(MessageDispatcher.ROUTE_PARAM_REGION, 
-				sipSession.getRegionInternal().toString());
+			sipURI.setParameter(MessageDispatcher.ROUTE_PARAM_REGION_LABEL, 
+				sipSession.getRegionInternal().getLabel());
+			sipURI.setParameter(MessageDispatcher.ROUTE_PARAM_REGION_TYPE, 
+					sipSession.getRegionInternal().getType().toString());
 		}
 		sipURI.setParameter(MessageDispatcher.ROUTE_PARAM_PREV_APPLICATION_NAME, 
 				applicationName);
