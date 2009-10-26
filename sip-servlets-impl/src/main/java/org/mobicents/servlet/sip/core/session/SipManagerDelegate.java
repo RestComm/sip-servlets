@@ -316,7 +316,7 @@ public abstract class SipManagerDelegate {
 			//cannot happen
 			logger.error("Problem creating derived session", e);
 		}
-		sipSessionImpl.setRoutingRegion(parentSipSession.getRegion());
+//		sipSessionImpl.setRoutingRegion(parentSipSession.getRegion());
 		// dialog will be set when the response will be associated with this session
 //		sipSessionImpl.sessionCreatingDialog = dialog;
 		sipSessionImpl.setState(parentSipSession.getState());

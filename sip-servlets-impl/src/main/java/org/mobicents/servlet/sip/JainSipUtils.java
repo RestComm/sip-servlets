@@ -56,6 +56,7 @@ import javax.sip.header.MimeVersionHeader;
 import javax.sip.header.MinExpiresHeader;
 import javax.sip.header.OrganizationHeader;
 import javax.sip.header.PriorityHeader;
+import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.RAckHeader;
 import javax.sip.header.RSeqHeader;
 import javax.sip.header.RecordRouteHeader;
@@ -70,6 +71,7 @@ import javax.sip.header.TimeStampHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.UserAgentHeader;
 import javax.sip.header.ViaHeader;
+import javax.sip.header.WWWAuthenticateHeader;
 import javax.sip.message.Message;
 import javax.sip.message.Request;
 
@@ -351,6 +353,8 @@ public class JainSipUtils {
 		singletonHeadersNames.add(SubjectHeader.NAME);
 		singletonHeadersNames.add(TimeStampHeader.NAME);
 		singletonHeadersNames.add(UserAgentHeader.NAME);
+		singletonHeadersNames.add(WWWAuthenticateHeader.NAME);
+		singletonHeadersNames.add(ProxyAuthenticateHeader.NAME);
 		//TODO are there any other singleton headers ?
 	}	
 
