@@ -130,11 +130,12 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				}
 				sipApplicationRoutingDirective = SipApplicationRoutingDirective.valueOf(
 						SipApplicationRoutingDirective.class, directive);
-				String region = poppedAddress.getParameter(ROUTE_PARAM_REGION);
-				if(region != null) {
+				String regionLabel = poppedAddress.getParameter(ROUTE_PARAM_REGION_LABEL);
+				String regionType = poppedAddress.getParameter(ROUTE_PARAM_REGION_TYPE);
+				if(regionLabel != null) {
 					routingRegion = new SipApplicationRoutingRegion(
-							region,
-							SipApplicationRoutingRegionType.valueOf(SipApplicationRoutingRegionType.class,region));
+							regionLabel,
+							SipApplicationRoutingRegionType.valueOf(SipApplicationRoutingRegionType.class,regionType));
 				}
 				String previousAppName = poppedAddress.getParameter(ROUTE_PARAM_PREV_APPLICATION_NAME);
 				String previousAppId = poppedAddress.getParameter(ROUTE_PARAM_PREV_APP_ID);

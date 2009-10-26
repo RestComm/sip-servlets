@@ -17,11 +17,18 @@
 package org.mobicents.servlet.sip;
 
 
-import gov.nist.javax.sip.Utils;
 import gov.nist.javax.sip.header.extensions.ReferredByHeader;
 import gov.nist.javax.sip.header.extensions.SessionExpiresHeader;
 import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
+import gov.nist.javax.sip.header.ims.PAssociatedURIHeader;
+import gov.nist.javax.sip.header.ims.PMediaAuthorizationHeader;
+import gov.nist.javax.sip.header.ims.PVisitedNetworkIDHeader;
 import gov.nist.javax.sip.header.ims.PathHeader;
+import gov.nist.javax.sip.header.ims.PrivacyHeader;
+import gov.nist.javax.sip.header.ims.SecurityClientHeader;
+import gov.nist.javax.sip.header.ims.SecurityServerHeader;
+import gov.nist.javax.sip.header.ims.SecurityVerifyHeader;
+import gov.nist.javax.sip.header.ims.ServiceRouteHeader;
 import gov.nist.javax.sip.message.SIPMessage;
 
 import java.util.HashMap;
@@ -35,15 +42,19 @@ import javax.sip.ListeningPoint;
 import javax.sip.address.SipURI;
 import javax.sip.header.AcceptEncodingHeader;
 import javax.sip.header.AcceptHeader;
+import javax.sip.header.AcceptLanguageHeader;
 import javax.sip.header.AlertInfoHeader;
 import javax.sip.header.AllowEventsHeader;
 import javax.sip.header.AllowHeader;
+import javax.sip.header.AuthenticationInfoHeader;
+import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.CallInfoHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.ContentDispositionHeader;
 import javax.sip.header.ContentEncodingHeader;
+import javax.sip.header.ContentLanguageHeader;
 import javax.sip.header.ContentLengthHeader;
 import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.DateHeader;
@@ -51,17 +62,22 @@ import javax.sip.header.ErrorInfoHeader;
 import javax.sip.header.EventHeader;
 import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
+import javax.sip.header.InReplyToHeader;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.MimeVersionHeader;
 import javax.sip.header.MinExpiresHeader;
 import javax.sip.header.OrganizationHeader;
 import javax.sip.header.PriorityHeader;
 import javax.sip.header.ProxyAuthenticateHeader;
+import javax.sip.header.ProxyAuthorizationHeader;
+import javax.sip.header.ProxyRequireHeader;
 import javax.sip.header.RAckHeader;
 import javax.sip.header.RSeqHeader;
+import javax.sip.header.ReasonHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.ReferToHeader;
 import javax.sip.header.ReplyToHeader;
+import javax.sip.header.RequireHeader;
 import javax.sip.header.RetryAfterHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ServerHeader;
@@ -69,9 +85,11 @@ import javax.sip.header.SubjectHeader;
 import javax.sip.header.SupportedHeader;
 import javax.sip.header.TimeStampHeader;
 import javax.sip.header.ToHeader;
+import javax.sip.header.UnsupportedHeader;
 import javax.sip.header.UserAgentHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.header.WWWAuthenticateHeader;
+import javax.sip.header.WarningHeader;
 import javax.sip.message.Message;
 import javax.sip.message.Request;
 
@@ -356,6 +374,48 @@ public class JainSipUtils {
 		singletonHeadersNames.add(WWWAuthenticateHeader.NAME);
 		singletonHeadersNames.add(ProxyAuthenticateHeader.NAME);
 		//TODO are there any other singleton headers ?
+	}	
+	
+	// we don't have any other choice as to maintain a static list of multi value headers
+	// because checking for , for the values as a delimiter won't work for WWW-Authenticate header which is not a multivalue header
+	// but contains multiple , 
+	public static final Set<String> listHeaderNames = new HashSet<String>();
+	static {
+		listHeaderNames.add(AcceptEncodingHeader.NAME);
+		listHeaderNames.add(AcceptLanguageHeader.NAME);
+		listHeaderNames.add(AcceptHeader.NAME);
+		listHeaderNames.add(AlertInfoHeader.NAME);
+		listHeaderNames.add(AllowEventsHeader.NAME);
+		listHeaderNames.add(AllowHeader.NAME);
+		listHeaderNames.add(AuthenticationInfoHeader.NAME);
+		listHeaderNames.add(AuthorizationHeader.NAME);
+		listHeaderNames.add(CallInfoHeader.NAME);
+		listHeaderNames.add(ContactHeader.NAME);
+		listHeaderNames.add(ContentEncodingHeader.NAME);
+		listHeaderNames.add(ContentLanguageHeader.NAME);
+		listHeaderNames.add(ErrorInfoHeader.NAME);
+		listHeaderNames.add(InReplyToHeader.NAME);
+		listHeaderNames.add(ProxyAuthenticateHeader.NAME);
+		listHeaderNames.add(ProxyAuthorizationHeader.NAME);
+		listHeaderNames.add(ProxyRequireHeader.NAME);
+		listHeaderNames.add(ReasonHeader.NAME);
+		listHeaderNames.add(RecordRouteHeader.NAME);
+		listHeaderNames.add(RequireHeader.NAME);
+		listHeaderNames.add(RouteHeader.NAME);
+		listHeaderNames.add(SupportedHeader.NAME);
+		listHeaderNames.add(UnsupportedHeader.NAME);
+		listHeaderNames.add(ViaHeader.NAME);
+		listHeaderNames.add(WarningHeader.NAME);
+		listHeaderNames.add(PAssertedIdentityHeader.NAME);
+		listHeaderNames.add(PAssociatedURIHeader.NAME);
+		listHeaderNames.add(PathHeader.NAME);
+		listHeaderNames.add(PMediaAuthorizationHeader.NAME);
+		listHeaderNames.add(PrivacyHeader.NAME);
+		listHeaderNames.add(PVisitedNetworkIDHeader.NAME);
+		listHeaderNames.add(SecurityClientHeader.NAME);
+		listHeaderNames.add(SecurityServerHeader.NAME);
+		listHeaderNames.add(SecurityVerifyHeader.NAME);
+		listHeaderNames.add(ServiceRouteHeader.NAME);
 	}	
 
 	private static final String[] allowedAddressSchemes = {"sip","sips","http","https","tel","tels","mailto"};
