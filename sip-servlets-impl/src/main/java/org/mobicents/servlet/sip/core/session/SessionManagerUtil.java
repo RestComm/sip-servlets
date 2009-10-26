@@ -16,6 +16,10 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
+import gov.nist.core.Separators;
+import gov.nist.javax.sip.address.Authority;
+import gov.nist.javax.sip.address.SipUri;
+
 import java.text.ParseException;
 import java.util.StringTokenizer;
 
@@ -44,6 +48,7 @@ public class SessionManagerUtil {
 	private static transient Logger logger = Logger.getLogger(SessionManagerUtil.class);
 	
 	public final static String TAG_PARAMETER_NAME = "tag";
+	public final static String SESSION_KEY_SEPARATOR = ":";
 	
 	/**
 	 * Computes the sip session key from the input parameters. The sip session
@@ -58,27 +63,36 @@ public class SessionManagerUtil {
 		if(applicationName == null) {
 			throw new NullPointerException("the application name cannot be null for sip session key creation");
 		}
-		
-		String toUri = ((ToHeader) message.getHeader(ToHeader.NAME)).getAddress().getURI().toString();
-		String fromUri = ((FromHeader) message.getHeader(FromHeader.NAME)).getAddress().getURI().toString();
-		String toTag = ((ToHeader) message.getHeader(ToHeader.NAME)).getTag();
-		String fromTag = 	((FromHeader) message.getHeader(FromHeader.NAME)).getTag();
+		final ToHeader to = (ToHeader) message.getHeader(ToHeader.NAME);
+		final FromHeader from = (FromHeader) message.getHeader(FromHeader.NAME); 
+//		final URI toUri = to.getAddress().getURI();
+//		final URI fromUri = from.getAddress().getURI();
+//		String toUriString = null;
+//		String fromURIString = null;
+//		if(toUri.isSipURI()) {
+//			toUriString = encode(((SipUri)toUri));
+//		} else {
+//			toUriString = toUri.toString();
+//		}
+//		if(fromUri.isSipURI()) {
+//			fromURIString = encode(((SipUri)fromUri));
+//		} else {
+//			fromURIString = fromUri.toString();
+//		}
+		final String toTag = to.getTag();
+		final String fromTag = 	from.getTag();
 
 		
 		if(inverted) {
 			return new SipSessionKey(
-					toUri,
 					toTag,
-					fromUri,
 					fromTag,
 					((CallIdHeader) message.getHeader(CallIdHeader.NAME)).getCallId(),
 					applicationSessionId,
 					applicationName);
 		} else {
 			return new SipSessionKey(
-				fromUri,
 				fromTag,
-				toUri,
 				toTag,
 				((CallIdHeader) message.getHeader(CallIdHeader.NAME)).getCallId(),
 				applicationSessionId,
@@ -86,6 +100,16 @@ public class SessionManagerUtil {
 		}
 	}
 	
+	private static String encode(SipUri sipUri) {
+		StringBuffer buffer = new StringBuffer("");
+		buffer.append(sipUri.getScheme()).append(Separators.COLON);
+		final Authority authority = sipUri.getAuthority();
+        if (authority != null) {
+            authority.encode(buffer);
+        }
+        return buffer.toString();
+	}
+
 	/**
 	 * Computes the sip application session key from the input parameters. 
 	 * The sip application session key will be of the form (UUID,APPNAME)
@@ -114,7 +138,7 @@ public class SessionManagerUtil {
 			String sipApplicationKey) throws ParseException {
 		
 		int indexOfLeftParenthesis = sipApplicationKey.indexOf("(");
-		int indexOfComma = sipApplicationKey.indexOf(",");
+		int indexOfComma = sipApplicationKey.indexOf(SESSION_KEY_SEPARATOR);
 		int indexOfRightParenthesis = sipApplicationKey.indexOf(")");
 		if(indexOfLeftParenthesis == -1) {
 			throw new ParseException("The left parenthesis could not be found in the following key " + sipApplicationKey, 0);
@@ -155,13 +179,11 @@ public class SessionManagerUtil {
 			logger.info("sipSession key to parse " + sipSessionKeyToParse );
 		}
 		StringTokenizer stringTokenizer = new StringTokenizer(sipSessionKeyToParse, ",");
-		String fromAddress = stringTokenizer.nextToken();
 		String fromTag = stringTokenizer.nextToken();
-		String toAddress = stringTokenizer.nextToken();
 		String callId = stringTokenizer.nextToken();
 		String applicationSessionId = stringTokenizer.nextToken();
 		String applicationName = stringTokenizer.nextToken();
 		
-		return new SipSessionKey(fromAddress, fromTag, toAddress, null, callId, applicationSessionId, applicationName);			
+		return new SipSessionKey(fromTag, null, callId, applicationSessionId, applicationName);
 	}
 }

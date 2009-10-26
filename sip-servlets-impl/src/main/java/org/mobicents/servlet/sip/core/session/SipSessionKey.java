@@ -21,10 +21,9 @@ import java.io.Serializable;
 /**
  * <p>
  * Class representing the key (which will also be its id) for a sip session.<br/>
- * It is composed of the From Header Address, the From Header parameter Tag, the To Header Address,
- * the To Header parameter tag, the Call-Id and the application Name.
+ * It is composed of the From Header parameter Tag, the To Header parameter tag, the Call-Id, the app session id and the application Name.
  * </p>
- * 
+ * IT is maaped to the SIP Dialog from RFC3261 (from tag, to tag + call-ID)
  * <p>
  * It is to be noted that the To Header parameter Tag will not be used in SipSessionKey comparison (equals() and hashcode() methods).<br/>
  * It will only be used to check if a new derived sip session needs to be created.
@@ -35,9 +34,7 @@ import java.io.Serializable;
  */
 public class SipSessionKey implements Serializable {
 	private static final long serialVersionUID = 1L;
-	String fromAddress;
 	String fromTag;
-	String toAddress;
 	String toTag;
 	String callId; 
 	String applicationName;
@@ -54,24 +51,15 @@ public class SipSessionKey implements Serializable {
 	 * @param applicationSessionId
 	 * @param applicationName
 	 */
-	public SipSessionKey(String fromAddress, String fromTag, String toAddress,
-			String toTag, String callId, String applicationSessionId, String applicationName) {
+	public SipSessionKey(String fromTag, String toTag, String callId, String applicationSessionId, String applicationName) {
 		super();
-		this.fromAddress = fromAddress;
 		this.fromTag = fromTag;
-		this.toAddress = toAddress;
 		this.toTag = toTag;
 		this.callId = callId;
 		this.applicationName = applicationName;
 		this.applicationSessionId = applicationSessionId;
 		
-		toString = "(" + fromAddress + "," + fromTag + "," + toAddress + "," +	callId + "," + applicationSessionId +"," + applicationName + ")";
-	}
-	/**
-	 * @return the fromAddress
-	 */
-	public String getFromAddress() {
-		return fromAddress;
+		toString = "(" + SessionManagerUtil.SESSION_KEY_SEPARATOR + fromTag + SessionManagerUtil.SESSION_KEY_SEPARATOR + SessionManagerUtil.SESSION_KEY_SEPARATOR +	callId + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationSessionId +SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName + ")";
 	}
 	/**
 	 * @return the fromTag
@@ -84,12 +72,6 @@ public class SipSessionKey implements Serializable {
 	 */
 	public String getToTag() {
 		return toTag;
-	}
-	/**
-	 * @return the toAddress
-	 */
-	public String getToAddress() {
-		return toAddress;
 	}
 	/**
 	 * @return the callId
@@ -121,11 +103,7 @@ public class SipSessionKey implements Serializable {
 		result = prime * result
 				+ ((applicationSessionId == null) ? 0 : applicationSessionId.hashCode());
 		result = prime * result + ((callId == null) ? 0 : callId.hashCode());
-		result = prime * result
-				+ ((fromAddress == null) ? 0 : fromAddress.hashCode());
 		result = prime * result + ((fromTag == null) ? 0 : fromTag.hashCode());
-		result = prime * result
-				+ ((toAddress == null) ? 0 : toAddress.hashCode());
 		return result;
 	}
 	/* (non-Javadoc)
@@ -155,20 +133,10 @@ public class SipSessionKey implements Serializable {
 				return false;
 		} else if (!callId.equals(other.callId))
 			return false;
-		if (fromAddress == null) {
-			if (other.fromAddress != null)
-				return false;
-		} else if (!fromAddress.equals(other.fromAddress))
-			return false;
 		if (fromTag == null) {
 			if (other.fromTag != null)
 				return false;
 		} else if (!fromTag.equals(other.fromTag))
-			return false;
-		if (toAddress == null) {
-			if (other.toAddress != null)
-				return false;
-		} else if (!toAddress.equals(other.toAddress))
 			return false;
 		return true;
 	}

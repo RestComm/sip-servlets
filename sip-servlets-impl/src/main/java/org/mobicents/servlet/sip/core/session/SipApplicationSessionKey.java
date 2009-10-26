@@ -47,7 +47,7 @@ public class SipApplicationSessionKey implements Serializable {
 			this.uuid = id;
 		}		
 		this.applicationName = applicationName;
-		toString = "(" + uuid + "," + applicationName +	")";
+		toString = "(" + uuid + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName +	")";
 	}
 	/**
 	 * @return the Id

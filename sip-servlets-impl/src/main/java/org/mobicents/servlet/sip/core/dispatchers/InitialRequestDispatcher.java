@@ -621,13 +621,11 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 						logger.debug("dialog localParty = " + dialog.getLocalParty().getURI() + ", localTag " + dialog.getLocalTag());
 						logger.debug("dialog remoteParty = " + dialog.getRemoteParty().getURI() + ", remoteTag " + dialog.getRemoteTag());
 					}
-					if(sessionKey.getFromAddress().equals(dialog.getLocalParty().getURI().toString()) && sessionKey.getToAddress().equals(dialog.getRemoteParty().getURI().toString()) &&
-							sessionKey.getFromTag().equals(dialog.getLocalTag()) && sessionKey.getToTag().equals(dialog.getRemoteTag())) {
+					if(sessionKey.getFromTag().equals(dialog.getLocalTag()) && sessionKey.getToTag().equals(dialog.getRemoteTag())) {
 						if(mobicentsSipSession.getProxy() == null) {
 							return mobicentsSipSession;	
 						}
-					} else if (sessionKey.getFromAddress().equals(dialog.getRemoteParty().getURI().toString()) && sessionKey.getToAddress().equals(dialog.getLocalParty().getURI().toString()) &&
-							sessionKey.getFromTag().equals(dialog.getRemoteTag()) && sessionKey.getToTag().equals(dialog.getLocalTag())){
+					} else if (sessionKey.getFromTag().equals(dialog.getRemoteTag()) && sessionKey.getToTag().equals(dialog.getLocalTag())){
 						if(mobicentsSipSession.getProxy() == null) {
 							return mobicentsSipSession;	
 						}
