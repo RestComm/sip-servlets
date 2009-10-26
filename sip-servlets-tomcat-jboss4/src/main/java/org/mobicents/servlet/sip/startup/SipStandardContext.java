@@ -503,8 +503,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if(manager instanceof SipManager) {
 			((SipManager)manager).dumpSipSessions();
 			((SipManager)manager).dumpSipApplicationSessions();
-			logger.warn("number of active sip sessions : " + ((SipManager)manager).getActiveSipSessions()); 
-			logger.warn("number of active sip application sessions : " + ((SipManager)manager).getActiveSipApplicationSessions());
+			logger.info("number of active sip sessions : " + ((SipManager)manager).getActiveSipSessions()); 
+			logger.info("number of active sip application sessions : " + ((SipManager)manager).getActiveSipApplicationSessions());
 		}
 		sipListeners.deallocateServletsActingAsListeners();
 		super.stop();

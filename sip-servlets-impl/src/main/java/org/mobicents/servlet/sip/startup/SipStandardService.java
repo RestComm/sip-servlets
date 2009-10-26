@@ -69,7 +69,7 @@ public class SipStandardService extends StandardService implements SipService {
 	// base timer interval for jain sip tx 
 	private int baseTimerInterval = 500;
 	
-	protected String concurrencyControlMode = ConcurrencyControlMode.SipSession.toString();
+	protected String concurrencyControlMode = ConcurrencyControlMode.None.toString();
 	protected String congestionControlPolicy = CongestionControlPolicy.ErrorResponse.toString();
 	protected String additionalParameterableHeaders;
 	protected boolean bypassResponseExecutor;
@@ -245,7 +245,7 @@ public class SipStandardService extends StandardService implements SipService {
 		}
 		if(!connectorsStartedExternally) {
 			sipApplicationDispatcher.stop();
-		}
+		}	
 		super.stop();
 	}
 	
