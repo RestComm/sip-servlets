@@ -255,7 +255,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 				this.message.setHeader(header);				
 			} else {	
 				// Dealing with Allow:INVITE, ACK, CANCEL, OPTIONS, BYE kind of values
-				if(new StringTokenizer(value, ",").hasMoreTokens()) {
+				if(new StringTokenizer(value, ",").countTokens() > 1) {
 					List<Header> headers = SipFactory.getInstance().createHeaderFactory()
 						.createHeaders(name + ":" + value);
 					for (Header header : headers) {
@@ -1227,7 +1227,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		
 		try {
 			// Dealing with Allow:INVITE, ACK, CANCEL, OPTIONS, BYE kind of headers
-			if(!JainSipUtils.singletonHeadersNames.contains(name) && new StringTokenizer(value, ",").hasMoreTokens()) {
+			if(!JainSipUtils.singletonHeadersNames.contains(name) && new StringTokenizer(value, ",").countTokens() > 1) {
 				List<Header> headers = SipFactory.getInstance().createHeaderFactory()
 					.createHeaders(name + ":" + value);
 				for (Header header : headers) {
