@@ -23,6 +23,7 @@ import javax.sip.InvalidArgumentException;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.header.ContactHeader;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -132,6 +133,17 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isFinalResponseReceived());
 		assertEquals(200, sender.getFinalResponseStatus());
+	}
+	
+	public void testShootmeRegisterNoContact() throws Exception {
+		String fromName = "testRegisterNoContact";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, fromAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertNull(registerReciever.getRegisterReceived().getHeader(ContactHeader.NAME));
 	}
 	
 	public void testShootmeRegisterCSeqIncrease() throws Exception {

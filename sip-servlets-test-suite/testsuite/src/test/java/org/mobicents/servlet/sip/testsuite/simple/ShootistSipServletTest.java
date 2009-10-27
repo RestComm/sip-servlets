@@ -17,7 +17,6 @@
 package org.mobicents.servlet.sip.testsuite.simple;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
-import javax.sip.header.ContactHeader;
 import javax.sip.header.ToHeader;
 
 import org.apache.catalina.deploy.ApplicationParameter;
@@ -110,8 +109,8 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		tomcat.startTomcat();
 		deployApplication();
 		Thread.sleep(TIMEOUT);
-		assertTrue((receiver.receivedInvite.getHeader("Contact").toString().contains("uriparam=urivalue")));
-		assertTrue((receiver.receivedInvite.getHeader("Contact").toString().contains("headerparam1=headervalue1")));
+		assertTrue((receiver.getInviteRequest().getHeader("Contact").toString().contains("uriparam=urivalue")));
+		assertTrue((receiver.getInviteRequest().getHeader("Contact").toString().contains("headerparam1=headervalue1")));
 		assertTrue(receiver.getByeReceived());		
 	}
 	

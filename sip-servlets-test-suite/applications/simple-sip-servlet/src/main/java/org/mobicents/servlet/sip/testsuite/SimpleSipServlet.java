@@ -47,6 +47,7 @@ import org.mobicents.servlet.sip.listener.SipConnectorListener;
 public class SimpleSipServlet extends SipServlet implements SipErrorListener, TimerListener, SipConnectorListener {
 	private static final long serialVersionUID = 1L;
 	private static final String TEST_REGISTER_C_SEQ = "testRegisterCSeq";
+	private static final String TEST_REGISTER_NO_CONTACT = "testRegisterNoContact";
 	private static final String TEST_REGISTER_SAVED_SESSION = "testRegisterSavedSession";
 	private static final String TEST_SUBSCRIBER_URI = "testSubscriberUri";
 	private static final String TEST_FLAG_PARAM = "testFlagParameter";
@@ -57,7 +58,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	private static final String TEST_TO_TAG = "TestToTag";
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final String CANCEL_RECEIVED = "cancelReceived";
-	private static final String SUBSCRIBER_URI = "sip:testSubscriberUri@sip-servlets.com";	
+	private static final String SUBSCRIBER_URI = "sip:testSubscriberUri@sip-servlets.com";		
 	
 	@Resource
 	SipFactory sipFactory;
@@ -172,7 +173,16 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 			sipServletResponse.send();
 			
-			sendRegister(null);			
+			sendRegister(null, false);			
+			return;
+		}
+		if(fromString.contains(TEST_REGISTER_NO_CONTACT)) {
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
+			sipServletResponse.send();
+			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+			sipServletResponse.send();
+			
+			sendRegister(null, true);			
 			return;
 		}
 		if(fromString.contains(TEST_REGISTER_SAVED_SESSION)) {
@@ -269,7 +279,8 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	protected void doSuccessResponse(SipServletResponse resp)
 			throws ServletException, IOException {
 		// This is for the REGISTER CSeq test
-		if(resp.getMethod().equalsIgnoreCase("REGISTER")) {
+		final String fromString = resp.getFrom().toString();
+		if(resp.getMethod().equalsIgnoreCase("REGISTER") && !fromString.contains(TEST_REGISTER_NO_CONTACT)) {
 			int cseq = Integer.parseInt(resp.getRequest().getHeader("CSeq").substring(0,1));
 			if(cseq < 4) {
 				try {
@@ -279,13 +290,12 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 					logger.error("Unexpected exception", e);
 				}
 				// Check if the session remains in INITIAL state, if not, the test will fail for missing registers
-				if(resp.getSession().getState().equals(State.INITIAL)) {
-					String fromString = resp.getFrom().toString();
+				if(resp.getSession().getState().equals(State.INITIAL)) {					
 					if(fromString.contains(TEST_REGISTER_SAVED_SESSION)) {
 //						registerSipSession = resp.getSession();
 						sendRegister();
 					} else {
-						sendRegister(resp.getSession());
+						sendRegister(resp.getSession(), false);
 					}					
 				}
 			}
@@ -456,7 +466,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		register.send();
 	}
 	
-	private void sendRegister(SipSession sipSession) throws ServletParseException, IOException {
+	private void sendRegister(SipSession sipSession, boolean removeContact) throws ServletParseException, IOException {
 		SipServletRequest register = null;
 		if (sipSession != null) {			
 			register = sipSession.createRequest("REGISTER");
@@ -468,8 +478,11 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		}
 		register.setHeader("Expires", "3600");
 		register.setHeader("test", "test");
+		if(removeContact) {
+			register.removeHeader("Contact");
+		}
 		register.send();
-	}
+	}	
 
 	public void sipConnectorAdded(SipConnector connector) {
 		logger.info(connector + " added" );

@@ -237,10 +237,10 @@ public class TestSipListener implements SipListener {
 	private boolean sendSubsequentRequestsThroughSipProvider;
 	
 	private boolean testAckViaParam;
-	
-	public Request receivedInvite;
 
 	private Request byeRequestReceived;
+	
+	private Request registerReceived;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -785,6 +785,7 @@ public class TestSipListener implements SipListener {
 			ServerTransaction serverTransactionId) {				
 
         try {
+        	registerReceived = request;
         	ServerTransaction serverTransaction = serverTransactionId == null? sipProvider.getNewServerTransaction(request) : serverTransactionId;
         	
         	System.out.println("challenge Requests ? " +  challengeRequests);
@@ -866,10 +867,10 @@ public class TestSipListener implements SipListener {
 	 */
 	public void processInvite(RequestEvent requestEvent,
 			ServerTransaction serverTransaction) {
-		inviteReceived = true;
-		receivedInvite = requestEvent.getRequest();
+		inviteReceived = true; 
 		SipProvider sipProvider = (SipProvider) requestEvent.getSource();
 		Request request = requestEvent.getRequest();
+		inviteRequest = request;
 		logger.info("shootme: got an Invite " + request);
 		try {
 			if(challengeRequests) {
@@ -1016,7 +1017,7 @@ public class TestSipListener implements SipListener {
 				return ;
 			}
 			this.byeReceived  = true;
-			setByeRequestReceived(request);
+			byeRequestReceived = request;
 			if (serverTransactionId == null) {
 				logger.info("shootist:  null TID.");
 				return;
@@ -2312,17 +2313,17 @@ public class TestSipListener implements SipListener {
 	}
 
 	/**
-	 * @param byeRequestReceived the byeRequestReceived to set
-	 */
-	public void setByeRequestReceived(Request byeRequestReceived) {
-		this.byeRequestReceived = byeRequestReceived;
-	}
-
-	/**
 	 * @return the byeRequestReceived
 	 */
 	public Request getByeRequestReceived() {
 		return byeRequestReceived;
+	}
+
+	/**
+	 * @return the registerReceived
+	 */
+	public Request getRegisterReceived() {
+		return registerReceived;
 	}
 
 }

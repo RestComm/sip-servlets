@@ -950,7 +950,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						transport, false).getSipProvider();
 				
 				ContactHeader contactHeader = (ContactHeader)request.getHeader(ContactHeader.NAME);
-				if(contactHeader == null) {
+				if(contactHeader == null && !Request.REGISTER.equalsIgnoreCase(requestMethod)) {
 					final FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
 					final javax.sip.address.URI fromUri = fromHeader.getAddress().getURI();
 					String fromName = null;
