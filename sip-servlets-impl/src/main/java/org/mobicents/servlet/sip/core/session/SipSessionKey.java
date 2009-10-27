@@ -59,7 +59,7 @@ public class SipSessionKey implements Serializable {
 		this.applicationName = applicationName;
 		this.applicationSessionId = applicationSessionId;
 		
-		toString = "(" + SessionManagerUtil.SESSION_KEY_SEPARATOR + fromTag + SessionManagerUtil.SESSION_KEY_SEPARATOR + SessionManagerUtil.SESSION_KEY_SEPARATOR +	callId + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationSessionId +SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName + ")";
+		toString = "(" + fromTag + SessionManagerUtil.SESSION_KEY_SEPARATOR + callId + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationSessionId +SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName + ")";
 	}
 	/**
 	 * @return the fromTag

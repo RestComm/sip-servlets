@@ -178,7 +178,7 @@ public class SessionManagerUtil {
 		if(logger.isInfoEnabled()) {
 			logger.info("sipSession key to parse " + sipSessionKeyToParse );
 		}
-		StringTokenizer stringTokenizer = new StringTokenizer(sipSessionKeyToParse, ",");
+		StringTokenizer stringTokenizer = new StringTokenizer(sipSessionKeyToParse, SESSION_KEY_SEPARATOR);
 		String fromTag = stringTokenizer.nextToken();
 		String callId = stringTokenizer.nextToken();
 		String applicationSessionId = stringTokenizer.nextToken();
