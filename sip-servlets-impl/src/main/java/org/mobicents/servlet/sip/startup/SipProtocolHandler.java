@@ -380,7 +380,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			
 			SipApplicationDispatcher sipApplicationDispatcher = (SipApplicationDispatcher)
 				getAttribute(SipApplicationDispatcher.class.getSimpleName());
-			if(sipApplicationDispatcher != null && loadBalancerHeartBeatingService != null && loadBalancerHeartBeatingService instanceof LoadBalancerHeartBeatingService) {
+			if(sipApplicationDispatcher != null && loadBalancerHeartBeatingService != null && sipApplicationDispatcher instanceof LoadBalancerHeartBeatingListener) {
 				loadBalancerHeartBeatingService.addLoadBalancerHeartBeatingListener((LoadBalancerHeartBeatingListener)sipApplicationDispatcher);
 			}
 			sipStack.start();
