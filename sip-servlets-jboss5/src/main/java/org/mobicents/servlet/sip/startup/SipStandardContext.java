@@ -21,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,8 +58,12 @@ import org.jboss.web.tomcat.service.session.ClusteredSipManager;
 import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.BatchingManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheConvergedSipManager;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
+import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
+import org.mobicents.servlet.sip.core.SipContextEvent;
+import org.mobicents.servlet.sip.core.SipContextEventType;
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -68,6 +73,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.core.timers.FaultTolerantTimerServiceImpl;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
+import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -109,7 +115,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	protected String description;
 	protected int proxyTimeout;
 	protected int sipApplicationSessionTimeout;
-	protected transient SipListenersHolder listeners;
+	protected transient SipListenersHolder sipListeners;
 	protected String mainServlet;	
 	protected transient SipFactoryFacade sipFactoryFacade;	
 	protected transient SipSessionsUtilImpl sipSessionsUtil;
@@ -147,7 +153,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		super();
 		sipApplicationSessionTimeout = DEFAULT_LIFETIME;
 		pipeline.setBasic(new SipStandardContextValve());
-		listeners = new SipListenersHolder(this);
+		sipListeners = new SipListenersHolder(this);
 		childrenMap = new HashMap<String, Container>();
 		childrenMapByClassName = new HashMap<String, Container>();
 		int idleTime = getSipApplicationSessionTimeout();
@@ -336,12 +342,12 @@ public class SipStandardContext extends StandardContext implements SipContext {
 
         // Instantiate the required listeners
         ClassLoader loader = getLoader().getClassLoader();
-        ok = listeners.loadListeners(findSipApplicationListeners(), loader);
+        ok = sipListeners.loadListeners(findSipApplicationListeners(), loader);
         if(!ok) {
 			return ok;
 		}
         
-        List<ServletContextListener> servletContextListeners = listeners.getServletContextListeners();
+        List<ServletContextListener> servletContextListeners = sipListeners.getServletContextListeners();
         if (servletContextListeners != null) {
             ServletContextEvent event =
                 new ServletContextEvent(getServletContext());
@@ -373,7 +379,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if (logger.isDebugEnabled())
             logger.debug("Sending application stop events");
         
-        List<ServletContextListener> servletContextListeners = listeners.getServletContextListeners();
+        List<ServletContextListener> servletContextListeners = sipListeners.getServletContextListeners();
         if (servletContextListeners != null) {
             ServletContextEvent event =
                 new ServletContextEvent(getServletContext());
@@ -399,7 +405,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 
         // TODO Annotation processing check super class on tomcat 6
         
-        listeners.clean();
+        sipListeners.clean();
 
         return ok;
 	}
@@ -444,7 +450,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			logger.warn("number of active sip sessions : " + ((SipManager)manager).getActiveSipSessions()); 
 			logger.warn("number of active sip application sessions : " + ((SipManager)manager).getActiveSipApplicationSessions());
 		}		
-		listeners.deallocateServletsActingAsListeners();
+		sipListeners.deallocateServletsActingAsListeners();
 		super.stop();
 		// this should happen after so that applications can still do some processing
 		// in destroy methods to notify that context is getting destroyed and app removed
@@ -552,13 +558,13 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 * @see org.mobicents.servlet.sip.startup.SipContext#getListeners()
 	 */
 	public SipListenersHolder getListeners() {
-		return listeners;
+		return sipListeners;
 	}
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.SipContext#setListeners(org.mobicents.servlet.sip.core.session.SipListenersHolder)
 	 */
 	public void setListeners(SipListenersHolder listeners) {
-		this.listeners = listeners;
+		this.sipListeners = listeners;
 	}
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.SipContext#getMainServlet()
@@ -971,7 +977,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	}
 	
 	private void endBatchTransaction() {
-		DistributedCacheConvergedSipManager distributedConvergedManager = ((ClusteredSipManager) manager)
+		DistributedCacheConvergedSipManager<? extends OutgoingDistributableSessionData> distributedConvergedManager = ((ClusteredSipManager) manager)
 				.getDistributedCacheConvergedSipManager();
 		BatchingManager tm = distributedConvergedManager.getBatchingManager();
 		try {
@@ -984,17 +990,14 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}
 	}
 	
-	public boolean notifySipServletsListeners() {
+	public boolean notifySipContextListeners(SipContextEvent event) {
 		boolean ok = true;
-		
-		// we need to make sure the scheduler is created to be able to fail over fault tolerant timers
-		// we can't create it before because the mobicents cluster is not yet initialized
-		if(getDistributable() && hasDistributableManager) {
-			((FaultTolerantTimerServiceImpl)timerService).getScheduler();
-		}
-		List<SipServletListener> sipServletListeners = listeners.getSipServletsListeners();
-		if(logger.isDebugEnabled()) {
-			logger.debug(sipServletListeners.size() + " SipServletListener to notify of servlet initialization");
+		if(event.getEventType() == SipContextEventType.SERVLET_INITIALIZED) {
+			// we need to make sure the scheduler is created to be able to fail over fault tolerant timers
+			// we can't create it before because the mobicents cluster is not yet initialized
+			if(getDistributable() && hasDistributableManager) {
+				((FaultTolerantTimerServiceImpl)timerService).getScheduler();
+			}	
 		}
 		Container[] children = findChildren();
 		if(logger.isDebugEnabled()) {
@@ -1012,11 +1015,40 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					try {
 						sipServlet = wrapper.allocate();
 						if(sipServlet instanceof SipServlet) {
-							SipServletContextEvent sipServletContextEvent = 
-								new SipServletContextEvent(getServletContext(), (SipServlet)sipServlet);
-							for (SipServletListener sipServletListener : sipServletListeners) {					
-								sipServletListener.servletInitialized(sipServletContextEvent);					
+							switch(event.getEventType()) {
+							case SERVLET_INITIALIZED : {
+								SipServletContextEvent sipServletContextEvent = 
+									new SipServletContextEvent(getServletContext(), (SipServlet)sipServlet);
+								List<SipServletListener> sipServletListeners = sipListeners.getSipServletsListeners();
+								if(logger.isDebugEnabled()) {
+									logger.debug(sipServletListeners.size() + " SipServletListener to notify of servlet initialization");
+								}
+								for (SipServletListener sipServletListener : sipServletListeners) {					
+									sipServletListener.servletInitialized(sipServletContextEvent);					
+								}
+								break;
 							}
+							case SIP_CONNECTOR_ADDED : {
+								List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
+								if(logger.isDebugEnabled()) {
+									logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector addition");
+								}
+								for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {					
+									sipConnectorListener.sipConnectorAdded((SipConnector)event.getEventObject());				
+								}
+								break;
+							}
+							case SIP_CONNECTOR_REMOVED : {
+								List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
+								if(logger.isDebugEnabled()) {
+									logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector removal");
+								}
+								for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {					
+									sipConnectorListener.sipConnectorRemoved((SipConnector)event.getEventObject());				
+								}
+								break;
+							}
+						}
 						}					
 					} catch (ServletException e) {
 						logger.error("Cannot allocate the servlet "+ wrapper.getServletClass() +" for notifying the listener " +

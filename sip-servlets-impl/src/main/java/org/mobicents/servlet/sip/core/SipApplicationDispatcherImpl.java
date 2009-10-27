@@ -220,7 +220,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		sipFactoryImpl = new SipFactoryImpl(this);
 		hostNames = new CopyOnWriteArraySet<String>();
 		sipNetworkInterfaceManager = new SipNetworkInterfaceManager(this);
-		maxMemory = Runtime.getRuntime().maxMemory() / (double)1024;
+		maxMemory = Runtime.getRuntime().maxMemory() / (double) 1024;
 		congestionControlPolicy = CongestionControlPolicy.ErrorResponse;
 		congestionControlThreadPool = new ScheduledThreadPoolExecutor(2,
 				new ThreadPoolExecutor.CallerRunsPolicy());
@@ -324,7 +324,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		resetOutboundInterfaces();
 		//JSR 289 Section 2.1.1 Step 4.If present invoke SipServletListener.servletInitialized() on each of initialized Servlet's listeners.
 		for (SipContext sipContext : applicationDeployed.values()) {
-			sipContext.notifySipServletsListeners();
+			sipContext.notifySipContextListeners(new SipContextEvent(SipContextEventType.SERVLET_INITIALIZED, null));
 		}		
 	}	
 	
@@ -388,7 +388,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		statusLock.lock();
 		try {
 			if(started) {
-				sipApplication.notifySipServletsListeners();
+				sipApplication.notifySipContextListeners(new SipContextEvent(SipContextEventType.SERVLET_INITIALIZED, null));
 			}
 		} finally {
 			statusLock.unlock();

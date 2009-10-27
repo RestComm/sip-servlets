@@ -56,6 +56,7 @@ import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingListener;
 import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingService;
 import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingServiceImpl;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.DNSAddressResolver;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
@@ -79,7 +80,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	private static final String LOOSE_DIALOG_VALIDATION = "gov.nist.javax.sip.LOOSE_DIALOG_VALIDATION";
 	private static final String SERVER_LOG_STACK_PROP = "gov.nist.javax.sip.SERVER_LOG";
 	private static final String DEBUG_LOG_STACK_PROP = "gov.nist.javax.sip.DEBUG_LOG";
-	private static final String IS_SIP_CONNECTOR = "isSipConnector";	
+	public static final String IS_SIP_CONNECTOR = "isSipConnector";	
 	private static final String BALANCERS = "balancers";
 	private static final String JVM_ROUTE = "jvmRoute";
 	// the logger
@@ -104,47 +105,20 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	 */
 	public ExtendedListeningPoint extendedListeningPoint;
 
-	// sip stack attributes defined by the server.xml
-	private String sipStackPropertiesFileLocation;
 	// defining sip stack properties
 	private Properties sipStackProperties;
 	
-	/**
-	 * the sip stack signaling transport
-	 */
-	private String signalingTransport;
-
-	/**
-	 * the sip stack listening port
-	 */
-	private int port;
-	/*
-	 * IP address for this protocol handler.
-	 */
-	private String ipAddress;	
-	/*
-	 * use Stun
-	 */
-	private boolean useStun;
-	/*
-	 * Stun Server Address
-	 */
-	private String stunServerAddress;
-	/*
-	 * Stun Server Port
-	 */
-	private int stunServerPort;
-	
-	/*
-	 * These settings staticServerAddress, staticServerPort will override all stun settings and will 
-	 * put the server address in the Via/RR/Contact headers
-	 */
-	private String staticServerAddress;
-	private String staticServerPort;
-	private boolean useStaticAddress;
-	
 	private boolean started = false;
 
+	private SipConnector sipConnector;
+	
+	public SipProtocolHandler() {
+		sipConnector = new SipConnector();
+	}
+	
+	public SipProtocolHandler(SipConnector connector) {
+		sipConnector = connector;
+	}
 	
 	/**
 	 * {@inheritDoc}
@@ -246,6 +220,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
         if(catalinaHome == null) {
         	catalinaHome = ".";
         }
+        String sipStackPropertiesFileLocation = sipConnector.getSipStackPropertiesFileLocation();
         if(sipStackPropertiesFileLocation != null && !sipStackPropertiesFileLocation.startsWith("file:///")) {
 			sipStackPropertiesFileLocation = "file:///" + catalinaHome.replace(File.separatorChar, '/') + "/" + sipStackPropertiesFileLocation;
  		}	
@@ -305,6 +280,9 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			logger.warn("no sip stack properties file defined ");		
 		}			
 		
+		final String ipAddress = sipConnector.getIpAddress();
+		final int port = sipConnector.getPort();
+		final String signalingTransport = sipConnector.getTransport();
 		if(!isPropsLoaded) {
 			logger.warn("loading default Mobicents Sip Servlets sip stack properties");
 			// Silently set default values
@@ -327,6 +305,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			//checking the external ip address if stun enabled			
 			String globalIpAddress = null;			
 			int globalPort = -1;
+			boolean useStun = sipConnector.isUseStun();
 			if (useStun) {
 				if(InetAddress.getByName(ipAddress).isLoopbackAddress()) {
 					logger.warn("The Ip address provided is the loopback address, stun won't be enabled for it");
@@ -341,7 +320,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 							randomPort);
 	
 					StunAddress serverStunAddress = new StunAddress(
-							stunServerAddress, stunServerPort);
+							sipConnector.getStunServerAddress(), sipConnector.getStunServerPort());
 	
 					NetworkConfigurationDiscoveryProcess addressDiscovery = new NetworkConfigurationDiscoveryProcess(
 							localStunAddress, serverStunAddress);
@@ -390,6 +369,9 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 //				listeningPoint.setSentBy(globalIpAddress + ":" + globalPort);
 				listeningPoint.setSentBy(globalIpAddress + ":" + port);
 			}
+			final boolean useStaticAddress = sipConnector.isUseStaticAddress();
+			final String staticServerAddress = sipConnector.getStaticServerAddress();
+			final int staticServerPort = sipConnector.getStaticServerPort();
 			if(useStaticAddress) {
 				// TODO: (ISSUE-CONFUSION) Check what is the confusion here as above
 				listeningPoint.setSentBy(staticServerAddress + ":" + globalPort);
@@ -404,15 +386,15 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			sipStack.start();
 			
 			//creating the extended listening point
-			extendedListeningPoint = new ExtendedListeningPoint(sipProvider, listeningPoint);
+			extendedListeningPoint = new ExtendedListeningPoint(sipProvider, listeningPoint, sipConnector);
 			extendedListeningPoint.setUseStaticAddress(useStaticAddress);
 			
 			if(useStaticAddress) {
 				extendedListeningPoint.setGlobalIpAddress(staticServerAddress);
-				extendedListeningPoint.setGlobalPort(Integer.parseInt(staticServerPort));
+				extendedListeningPoint.setGlobalPort(staticServerPort);
 				
 				// TODO: (ISSUE-CONFUSION) This is a bit of a hack related to the same issue
-				extendedListeningPoint.setPort(Integer.parseInt(staticServerPort));
+				extendedListeningPoint.setPort(staticServerPort);
 				if(logger.isInfoEnabled()) {
 					logger.info("Using static server address: " + staticServerAddress 
 							+ " and port: " + staticServerPort);
@@ -444,7 +426,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			}
 			
 			logger.info("Sip Connector started on ip address : " + ipAddress
-					+ ",port " + port + ", transport " + signalingTransport + ", useStun " + useStun + ", stunAddress " + stunServerAddress + ", stunPort : " + stunServerPort);
+					+ ",port " + port + ", transport " + signalingTransport + ", useStun " + useStun + ", stunAddress " + sipConnector.getStunServerAddress() + ", stunPort : " + sipConnector.getStaticServerPort());
 			
 			if (this.domain != null) {
 //	            try {
@@ -527,7 +509,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	 * @return the signalingTransport
 	 */
 	public String getSignalingTransport() {
-		return signalingTransport;
+		return sipConnector.getTransport();
 	}
 
 	/**
@@ -536,7 +518,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	 * @throws Exception 
 	 */
 	public void setSignalingTransport(String transport) throws Exception {
-		this.signalingTransport = transport;
+		sipConnector.setTransport(transport);
 		if(started) {
 			destroy();
 			start();
@@ -547,7 +529,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	 * @return the port
 	 */
 	public int getPort() {
-		return port;
+		return sipConnector.getPort();
 	}
 
 	/**
@@ -556,7 +538,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	 * @throws Exception 
 	 */
 	public void setPort(int port) throws Exception {
-		this.port = port;
+		sipConnector.setPort(port);
 		if(started) {
 			destroy();
 			start();
@@ -564,7 +546,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	}
 		
 	public void setIpAddress(String ipAddress) throws Exception {
-		this.ipAddress = ipAddress;
+		sipConnector.setIpAddress(ipAddress);
 		if(started) {
 			destroy();
 			start();
@@ -572,62 +554,102 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	}
 
 	public String getIpAddress() {
-		return ipAddress;
+		return sipConnector.getIpAddress();
 	}
 
 	/**
 	 * @return the stunServerAddress
 	 */
 	public String getStunServerAddress() {
-		return stunServerAddress;
+		return sipConnector.getStunServerAddress();
 	}
 
 	/**
 	 * @param stunServerAddress the stunServerAddress to set
 	 */
 	public void setStunServerAddress(String stunServerAddress) {
-		this.stunServerAddress = stunServerAddress;
+		sipConnector.setStunServerAddress(stunServerAddress);
 	}
 
 	/**
 	 * @return the stunServerPort
 	 */
 	public int getStunServerPort() {
-		return stunServerPort;
+		return sipConnector.getStunServerPort();
 	}
 
 	/**
 	 * @param stunServerPort the stunServerPort to set
 	 */
 	public void setStunServerPort(int stunServerPort) {
-		this.stunServerPort = stunServerPort;
+		sipConnector.setStunServerPort(stunServerPort);
 	}
 
 	/**
 	 * @return the useStun
 	 */
 	public boolean isUseStun() {
-		return useStun;
+		return sipConnector.isUseStun();
 	}
 
 	/**
 	 * @param useStun the useStun to set
 	 */
 	public void setUseStun(boolean useStun) {
-		this.useStun = useStun;
-	}	
+		sipConnector.setUseStun(useStun);
+	}
+
+	public String getStaticServerAddress() {
+		return sipConnector.getStaticServerAddress();
+	}
+
+	public void setStaticServerAddress(String staticServerAddress) {
+		sipConnector.setStaticServerAddress(staticServerAddress);
+	}
+
+	public int getStaticServerPort() {
+		return sipConnector.getStaticServerPort();
+	}
+
+	public void setStaticServerPort(int staticServerPort) {
+		sipConnector.setStaticServerPort(staticServerPort);
+	}
+
+	public boolean isUseStaticAddress() {
+		return sipConnector.isUseStaticAddress();
+	}
+
+	public void setUseStaticAddress(boolean useStaticAddress) {
+		sipConnector.setUseStaticAddress(useStaticAddress);
+	}
 	
 	public InetAddress getAddress() {
 		try {
-			return InetAddress.getByName(ipAddress);
+			return InetAddress.getByName(sipConnector.getIpAddress());
 		} catch (UnknownHostException e) {
 			logger.error("unexpected exception while getting the ipaddress of the sip protocol handler", e);
 			return null;
 		}
 	}
-    public void setAddress(InetAddress ia) { ipAddress = ia.getHostAddress(); }
+    public void setAddress(InetAddress ia) { 
+    	sipConnector.setIpAddress(ia.getHostAddress());
+    }
 
-    public String getName() {
+    /**
+	 * @param sipConnector the sipConnector to set
+	 */
+	public void setSipConnector(SipConnector sipConnector) {
+		this.sipConnector = sipConnector;
+	}
+
+	/**
+	 * @return the sipConnector
+	 */
+	public SipConnector getSipConnector() {
+		return sipConnector;
+	}
+
+	public String getName() {
         String encodedAddr = "";
         if (getAddress() != null) {
             encodedAddr = "" + getAddress();
@@ -638,46 +660,9 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
         return ("sip-" + encodedAddr + getPort());
     }
     
-    /**
-	 * @param sipStackPropertiesFile the sipStackPropertiesFile to set
-	 */
-	public void setSipStackPropertiesFile(String sipStackPropertiesFile) {
-		this.sipStackPropertiesFileLocation = sipStackPropertiesFile;
-	}
-
-	/**
-	 * @return the sipStackPropertiesFile
-	 */
-	public String getSipStackPropertiesFile() {
-		return sipStackPropertiesFileLocation;
-	}
-    
     // -------------------- JMX related methods --------------------
 
-    public String getStaticServerAddress() {
-		return staticServerAddress;
-	}
-
-	public void setStaticServerAddress(String staticServerAddress) {
-		this.staticServerAddress = staticServerAddress;
-	}
-
-	public String getStaticServerPort() {
-		return staticServerPort;
-	}
-
-	public void setStaticServerPort(String staticServerPort) {
-		this.staticServerPort = staticServerPort;
-	}
-
-	public boolean isUseStaticAddress() {
-		return useStaticAddress;
-	}
-
-	public void setUseStaticAddress(boolean useStaticAddress) {
-		this.useStaticAddress = useStaticAddress;
-	}
-	
+   
 	// *
     protected String domain;
     protected ObjectName oname;

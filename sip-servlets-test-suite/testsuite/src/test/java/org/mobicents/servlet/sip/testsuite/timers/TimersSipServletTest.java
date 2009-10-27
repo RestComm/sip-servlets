@@ -56,7 +56,7 @@ public class TimersSipServletTest extends SipServletTestCase {
 		"timerExpired",
 		"sipAppSessionExpired",
 		"sipAppSessionReadyToBeInvalidated"
-		};				
+	};				
 	
 	TestSipListener sender;
 	

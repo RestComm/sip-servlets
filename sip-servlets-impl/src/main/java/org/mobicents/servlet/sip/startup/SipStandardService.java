@@ -20,6 +20,9 @@ package org.mobicents.servlet.sip.startup;
 import gov.nist.javax.sip.SipStackExt;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.TooManyListenersException;
 
 import javax.sip.SipStack;
@@ -31,6 +34,7 @@ import org.apache.catalina.core.StandardService;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.CongestionControlPolicy;
@@ -112,6 +116,10 @@ public class SipStandardService extends StandardService implements SipService {
 				logger.error("Connector.initialize", e);
 			}			
 		}
+		ProtocolHandler protocolHandler = connector.getProtocolHandler();
+		if(protocolHandler instanceof SipProtocolHandler) {
+			connector.setPort(((SipProtocolHandler)protocolHandler).getPort());
+		}
 		super.addConnector(connector);
 	}
 	
@@ -182,7 +190,7 @@ public class SipStandardService extends StandardService implements SipService {
 			for (Connector connector : connectors) {
 				final ProtocolHandler protocolHandler = connector.getProtocolHandler();
 				//Jboss sepcific loading case
-				Boolean isSipConnector = (Boolean) protocolHandler.getAttribute("isSipConnector");				
+				Boolean isSipConnector = (Boolean) protocolHandler.getAttribute(SipProtocolHandler.IS_SIP_CONNECTOR);				
 				if(isSipConnector != null && isSipConnector) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Attaching the sip application dispatcher " +
@@ -505,5 +513,54 @@ public class SipStandardService extends StandardService implements SipService {
 	 */	
 	public void setBalancers(String balancers) {
 		this.balancers = balancers;
+	}
+	
+	public void addSipConnector(SipConnector sipConnector) throws Exception {
+		Connector connector = new Connector(
+				SipProtocolHandler.class.getName());
+		SipProtocolHandler protocolHandler = (SipProtocolHandler) connector
+				.getProtocolHandler();
+		protocolHandler.setSipConnector(sipConnector);		
+		connector.setService(this);
+		connector.init();
+		addConnector(connector);	
+		ExtendedListeningPoint extendedListeningPoint = (ExtendedListeningPoint)
+		connector.getProtocolHandler().getAttribute(ExtendedListeningPoint.class.getSimpleName());
+		if(extendedListeningPoint != null) {
+			try {
+				extendedListeningPoint.getSipProvider().addSipListener(sipApplicationDispatcher);
+				sipApplicationDispatcher.getSipNetworkInterfaceManager().addExtendedListeningPoint(extendedListeningPoint);
+			} catch (TooManyListenersException e) {
+				logger.error("Connector.initialize", e);
+			}			
+		}
+	}
+	
+	public void removeSipConnector(String ipAddress, int port, String transport) throws Exception {
+		Connector connectorToRemove = null;
+		for (Connector connector : connectors) {
+			final ProtocolHandler protocolHandler = connector.getProtocolHandler();
+			if(protocolHandler instanceof SipProtocolHandler) {
+				final SipProtocolHandler sipProtocolHandler = (SipProtocolHandler) protocolHandler;
+				if(sipProtocolHandler.getIpAddress().equals(ipAddress) && sipProtocolHandler.getPort() == port && sipProtocolHandler.getSignalingTransport().equals(transport)) {
+//					connector.destroy();
+					connectorToRemove = connector;
+					break;
+				}
+			}
+		}
+		
+		removeConnector(connectorToRemove);
+	}
+	
+	public SipConnector[] findSipConnectors() {
+		List<SipConnector> sipConnectors = new ArrayList<SipConnector>();
+		for (Connector connector : connectors) {
+			final ProtocolHandler protocolHandler = connector.getProtocolHandler();
+			if(protocolHandler instanceof SipProtocolHandler) {
+				sipConnectors.add(((SipProtocolHandler)protocolHandler).getSipConnector());
+			}
+		}
+		return sipConnectors.toArray(new SipConnector[sipConnectors.size()]);
 	}
 }

@@ -29,6 +29,7 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
+import org.mobicents.servlet.sip.core.SipContextEvent;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
@@ -132,7 +133,7 @@ public interface SipContext extends Context {
 
 	String getBasePath();
 	
-	boolean notifySipServletsListeners();
+	boolean notifySipContextListeners(SipContextEvent event);
 	
 	void enterSipApp(SipServletRequestImpl request, SipServletResponseImpl response, SipManager manager, boolean startCacheActivity, boolean bindSessions);
 	

@@ -38,6 +38,7 @@ import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.annotation.SipServlet;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
@@ -55,6 +56,7 @@ public class SipListenersHolder {
 	private List<SipSessionListener> sipSessionListeners;
 	private List<SipServletListener> sipServletsListeners;
 	private List<SipErrorListener> sipErrorListeners;
+	private List<SipConnectorListener> sipConnectorListeners;
 	private List<ServletContextListener> servletContextListeners;
 	private Map<EventListener, SipServletImpl> listenerServlets;
 	// There may be at most one TimerListener defined.
@@ -78,6 +80,7 @@ public class SipListenersHolder {
 		this.sipServletsListeners = new ArrayList<SipServletListener>();
 		this.sipErrorListeners = new ArrayList<SipErrorListener>();
 		this.servletContextListeners = new ArrayList<ServletContextListener>();		
+		this.sipConnectorListeners = new ArrayList<SipConnectorListener>();
 		listenerServlets = new HashMap<EventListener, SipServletImpl>();
 	}
 	
@@ -180,6 +183,11 @@ public class SipListenersHolder {
 			this.setTimerListener((TimerListener) listener);
 			added = true;
 		}
+		
+		if (listener instanceof SipConnectorListener) {
+			this.addListener((SipConnectorListener) listener);
+			added = true;
+		}
 
 		if(!added) {
 			throw new IllegalArgumentException("Wrong type of LISTENER!!!["
@@ -240,6 +248,10 @@ public class SipListenersHolder {
 	public void addListener(ServletContextListener listener) {
 		this.servletContextListeners.add(listener);
 	}
+	
+	public void addListener(SipConnectorListener listener) {
+		this.sipConnectorListeners.add(listener);
+	}
 
 	public void setTimerListener(TimerListener listener) {
 		if(timerListener != null) {
@@ -294,6 +306,10 @@ public class SipListenersHolder {
 		return servletContextListeners;
 	}
 
+	public List<SipConnectorListener> getSipConnectorListeners() {
+		return sipConnectorListeners;
+	}
+	
 	public TimerListener getTimerListener() {
 		return timerListener;
 	}
@@ -333,6 +349,9 @@ public class SipListenersHolder {
 		for(ServletContextListener servletContextListener : servletContextListeners) {
 			checkDeallocateServlet(servletContextListener);
 		}
+		for(SipConnectorListener sipConnectorListener : sipConnectorListeners) {
+			checkDeallocateServlet(sipConnectorListener);
+		}
 		checkDeallocateServlet(timerListener);
 	}
 	
@@ -352,6 +371,7 @@ public class SipListenersHolder {
 		this.sipServletsListeners.clear();
 		this.sipErrorListeners.clear();
 		this.servletContextListeners.clear();
+		this.sipConnectorListeners.clear();
 		this.timerListener = null;
 	}
 

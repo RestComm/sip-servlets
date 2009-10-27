@@ -59,9 +59,11 @@ import org.jboss.web.tomcat.service.session.ClusteredSipApplicationSession;
 import org.jboss.web.tomcat.service.session.ClusteredSipSession;
 import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
 import org.jboss.web.tomcat.service.session.SnapshotSipManager;
+import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.annotations.SipAnnotationProcessor;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
+import org.mobicents.servlet.sip.core.SipContextEvent;
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -70,6 +72,7 @@ import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
+import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -948,13 +951,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 * @param sipContext the sip context of the application where the listeners reside.
 	 * @return true if all listeners have been notified correctly
 	 */
-	public boolean notifySipServletsListeners() {
+	public boolean notifySipContextListeners(SipContextEvent event) {
 		boolean ok = true;
 		
-		List<SipServletListener> sipServletListeners = sipListeners.getSipServletsListeners();
-		if(logger.isDebugEnabled()) {
-			logger.debug(sipServletListeners.size() + " SipServletListener to notify of servlet initialization");
-		}
 		Container[] children = findChildren();
 		if(logger.isDebugEnabled()) {
 			logger.debug(children.length + " container to notify of servlet initialization");
@@ -971,10 +970,39 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					try {
 						sipServlet = wrapper.allocate();
 						if(sipServlet instanceof SipServlet) {
-							SipServletContextEvent sipServletContextEvent = 
-								new SipServletContextEvent(getServletContext(), (SipServlet)sipServlet);
-							for (SipServletListener sipServletListener : sipServletListeners) {					
-								sipServletListener.servletInitialized(sipServletContextEvent);					
+							switch(event.getEventType()) {
+								case SERVLET_INITIALIZED : {
+									SipServletContextEvent sipServletContextEvent = 
+										new SipServletContextEvent(getServletContext(), (SipServlet)sipServlet);
+									List<SipServletListener> sipServletListeners = sipListeners.getSipServletsListeners();
+									if(logger.isDebugEnabled()) {
+										logger.debug(sipServletListeners.size() + " SipServletListener to notify of servlet initialization");
+									}
+									for (SipServletListener sipServletListener : sipServletListeners) {					
+										sipServletListener.servletInitialized(sipServletContextEvent);					
+									}
+									break;
+								}
+								case SIP_CONNECTOR_ADDED : {
+									List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
+									if(logger.isDebugEnabled()) {
+										logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector addition");
+									}
+									for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {					
+										sipConnectorListener.sipConnectorAdded((SipConnector)event.getEventObject());				
+									}
+									break;
+								}
+								case SIP_CONNECTOR_REMOVED : {
+									List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
+									if(logger.isDebugEnabled()) {
+										logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector removal");
+									}
+									for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {					
+										sipConnectorListener.sipConnectorRemoved((SipConnector)event.getEventObject());				
+									}
+									break;
+								}
 							}
 						}					
 					} catch (ServletException e) {

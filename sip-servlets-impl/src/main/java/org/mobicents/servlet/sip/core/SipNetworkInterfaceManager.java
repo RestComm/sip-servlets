@@ -44,6 +44,7 @@ import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
+import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.utils.Inet6Util;
 
 /**
@@ -123,15 +124,22 @@ public class SipNetworkInterfaceManager {
 		// Adding to the transport cache map
 		List<ExtendedListeningPoint> extendedListeningPoints = 
 			transportMappingCacheMap.get(extendedListeningPoint.getTransport().toLowerCase());
-	    extendedListeningPoints.add(extendedListeningPoint);
-	    // Adding private ipaddress to the triplet cache map
-	    for(String ipAddress : extendedListeningPoint.getIpAddresses()) {
-	    	extendedListeningPointsCacheMap.put(ipAddress + "/" + extendedListeningPoint.getPort() + ":" + extendedListeningPoint.getTransport().toLowerCase(), extendedListeningPoint);
-	    }
-	    // Adding public address if any to the triplet cache map
-	    if(extendedListeningPoint.getGlobalIpAddress() != null) {
-	    	extendedListeningPointsCacheMap.put(extendedListeningPoint.getGlobalIpAddress() + "/" + extendedListeningPoint.getPort() + ":" + extendedListeningPoint.getTransport().toLowerCase(), extendedListeningPoint);
-	    	extendedListeningPointsCacheMap.put(extendedListeningPoint.getGlobalIpAddress() + "/" + extendedListeningPoint.getGlobalPort() + ":" + extendedListeningPoint.getTransport().toLowerCase(), extendedListeningPoint);
+	    boolean added = extendedListeningPoints.add(extendedListeningPoint);
+	    if(added) {
+		    // Adding private ipaddress to the triplet cache map
+		    for(String ipAddress : extendedListeningPoint.getIpAddresses()) {
+		    	extendedListeningPointsCacheMap.put(ipAddress + "/" + extendedListeningPoint.getPort() + ":" + extendedListeningPoint.getTransport().toLowerCase(), extendedListeningPoint);
+		    }
+		    // Adding public address if any to the triplet cache map
+		    if(extendedListeningPoint.getGlobalIpAddress() != null) {
+		    	extendedListeningPointsCacheMap.put(extendedListeningPoint.getGlobalIpAddress() + "/" + extendedListeningPoint.getPort() + ":" + extendedListeningPoint.getTransport().toLowerCase(), extendedListeningPoint);
+		    	extendedListeningPointsCacheMap.put(extendedListeningPoint.getGlobalIpAddress() + "/" + extendedListeningPoint.getGlobalPort() + ":" + extendedListeningPoint.getTransport().toLowerCase(), extendedListeningPoint);
+		    }
+		    Iterator<SipContext> sipContextIterator = sipApplicationDispatcher.findSipApplications();
+		    while (sipContextIterator.hasNext()) {
+				SipContext sipContext = (SipContext) sipContextIterator.next();
+				sipContext.notifySipContextListeners(new SipContextEvent(SipContextEventType.SIP_CONNECTOR_ADDED, extendedListeningPoint.getSipConnector()));
+			}
 	    }
 	}
 	
@@ -155,6 +163,11 @@ public class SipNetworkInterfaceManager {
 	    	extendedListeningPointsCacheMap.remove(extendedListeningPoint.getGlobalIpAddress() + "/" + extendedListeningPoint.getPort() + ":" + extendedListeningPoint.getTransport().toLowerCase());
 	    	extendedListeningPointsCacheMap.remove(extendedListeningPoint.getGlobalIpAddress() + "/" + extendedListeningPoint.getGlobalPort() + ":" + extendedListeningPoint.getTransport().toLowerCase());
 	    }
+	    Iterator<SipContext> sipContextIterator = sipApplicationDispatcher.findSipApplications();
+	    while (sipContextIterator.hasNext()) {
+			SipContext sipContext = (SipContext) sipContextIterator.next();
+			sipContext.notifySipContextListeners(new SipContextEvent(SipContextEventType.SIP_CONNECTOR_REMOVED, extendedListeningPoint.getSipConnector()));
+		}
 	}
 	
 	/**

@@ -34,6 +34,7 @@ import javax.sip.header.ViaHeader;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.SipFactories;
 
 /**
@@ -48,6 +49,7 @@ public class ExtendedListeningPoint {
 	private ListeningPoint listeningPoint;
 	// the sip provider attached to 
 	private SipProvider sipProvider;
+	private SipConnector sipConnector;
 	private String globalIpAddress;
 	String mostOutboundAddress = null;
 	private int globalPort;
@@ -62,9 +64,10 @@ public class ExtendedListeningPoint {
 	/**
 	 * 
 	 */
-	public ExtendedListeningPoint(SipProvider sipProvider, ListeningPoint listeningPoint) {
-		this.sipProvider = sipProvider;
+	public ExtendedListeningPoint(SipProvider sipProvider, ListeningPoint listeningPoint, SipConnector sipConnector) {
+		this.sipProvider = sipProvider;		
 		this.listeningPoint = listeningPoint;
+		this.setSipConnector(sipConnector);
 		this.globalIpAddress = null;
 		this.globalPort = -1;
 		ipAddresses = new ArrayList<String>();
@@ -321,5 +324,19 @@ public class ExtendedListeningPoint {
 	 */
 	public boolean isAnyLocalAddress() {
 		return isAnyLocalAddress;
+	}
+
+	/**
+	 * @param sipConnector the sipConnector to set
+	 */
+	public void setSipConnector(SipConnector sipConnector) {
+		this.sipConnector = sipConnector;
+	}
+
+	/**
+	 * @return the sipConnector
+	 */
+	public SipConnector getSipConnector() {
+		return sipConnector;
 	}
 }

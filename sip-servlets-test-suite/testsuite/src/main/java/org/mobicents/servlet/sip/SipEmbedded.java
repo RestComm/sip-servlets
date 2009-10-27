@@ -32,6 +32,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.loader.StandardClassLoader;
+import org.apache.catalina.mbeans.MBeanUtils;
 import org.apache.catalina.security.SecurityClassLoad;
 import org.apache.catalina.security.SecurityConfig;
 import org.apache.catalina.startup.CatalinaProperties;
@@ -71,6 +72,8 @@ public class SipEmbedded {
 	private String serviceFullClassName;
 	
 	private String serverName;
+	
+	MBeanServer mBeanServer = null;
 
 	/**
 	 * Default Constructor
@@ -121,6 +124,15 @@ public class SipEmbedded {
 //		PropertyConfigurator.configure(loggingFilePath);		
 		//Those are for trying to make it work under mvn test command
 		// don't know why but some jars aren't loaded
+		// Retrieving MBean server  
+		MBeanUtils.createServer();
+        if (MBeanServerFactory.findMBeanServer(null).size() > 0) {
+            mBeanServer =
+                (MBeanServer) MBeanServerFactory.findMBeanServer(null).get(0);
+        } else {
+            mBeanServer = MBeanServerFactory.createMBeanServer();
+        }
+        MBeanUtils.createRegistry();
 		setSecurityProtection();
 		initDirs();
 		initNaming();
@@ -154,6 +166,7 @@ public class SipEmbedded {
 		engine.setDefaultHost("localhost");
 		engine.setService(sipService);
 		// Install the assembled container hierarchy
+		
 		sipService.setContainer(engine);
 		sipService.init();
 		// Create a default virtual host
@@ -302,13 +315,13 @@ public class SipEmbedded {
 	
 	private void initClassLoaders() throws Exception {
         
-            commonLoader = createClassLoader(serverName + "common", null);
+            commonLoader = createClassLoader(serverName + "/common", null);
             if( commonLoader == null ) {
                 // no config file, default to this loader - we might be in a 'single' env.
                 commonLoader=this.getClass().getClassLoader();
             }
-            catalinaLoader = createClassLoader(serverName + "server", commonLoader);
-            sharedLoader = createClassLoader(serverName + "shared", commonLoader);        
+            catalinaLoader = createClassLoader(serverName + "/server", commonLoader);
+            sharedLoader = createClassLoader(serverName + "/shared", commonLoader);        
     }
 
 

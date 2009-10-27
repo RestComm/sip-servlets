@@ -41,8 +41,10 @@ import javax.servlet.sip.TimerService;
 import javax.servlet.sip.SipSession.State;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.SipConnector;
+import org.mobicents.servlet.sip.listener.SipConnectorListener;
 
-public class SimpleSipServlet extends SipServlet implements SipErrorListener, TimerListener {
+public class SimpleSipServlet extends SipServlet implements SipErrorListener, TimerListener, SipConnectorListener {
 	private static final long serialVersionUID = 1L;
 	private static final String TEST_REGISTER_C_SEQ = "testRegisterCSeq";
 	private static final String TEST_REGISTER_SAVED_SESSION = "testRegisterSavedSession";
@@ -62,7 +64,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	@Resource
 	TimerService timerService;
 	SipSession registerSipSession;
-	
+		
 	@Override
 	protected void doBranchResponse(SipServletResponse resp)
 			throws ServletException, IOException {
@@ -289,7 +291,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 			}
 			return;
 		}
-		if(!"BYE".equalsIgnoreCase(resp.getMethod())) {
+		if(!"BYE".equalsIgnoreCase(resp.getMethod()) && !"MESSAGE".equalsIgnoreCase(resp.getMethod())) {
 			resp.createAck().send();
 			resp.getSession(false).createRequest("BYE").send();
 		}
@@ -469,4 +471,37 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		register.send();
 	}
 
+	public void sipConnectorAdded(SipConnector connector) {
+		logger.info(connector + " added" );
+		sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipConnectorAdded");
+	}
+
+	public void sipConnectorRemoved(SipConnector connector) {
+		logger.info(connector + " removed" );
+		sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipConnectorRemoved");
+	}
+
+	/**
+	 * @param sipApplicationSession
+	 * @param storedFactory
+	 */
+	private void sendMessage(SipApplicationSession sipApplicationSession,
+			SipFactory storedFactory, String content) {
+		try {
+			SipServletRequest sipServletRequest = storedFactory.createRequest(
+					sipApplicationSession, 
+					"MESSAGE", 
+					"sip:sender@sip-servlets.com", 
+					"sip:receiver@sip-servlets.com");
+			SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+			sipServletRequest.setRequestURI(sipUri);
+			sipServletRequest.setContentLength(content.length());
+			sipServletRequest.setContent(content, CONTENT_TYPE);
+			sipServletRequest.send();
+		} catch (ServletParseException e) {
+			logger.error("Exception occured while parsing the addresses",e);
+		} catch (IOException e) {
+			logger.error("Exception occured while sending the request",e);			
+		}
+	}
 }
