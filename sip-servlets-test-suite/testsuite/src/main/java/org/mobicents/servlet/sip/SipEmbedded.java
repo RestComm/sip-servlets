@@ -74,6 +74,8 @@ public class SipEmbedded {
 	private String serverName;
 	
 	MBeanServer mBeanServer = null;
+	
+	private boolean isHA = false;
 
 	/**
 	 * Default Constructor
@@ -157,6 +159,10 @@ public class SipEmbedded {
 		sipService.setCongestionControlCheckingInterval(30000);
 		sipService.setAdditionalParameterableHeaders("additionalParameterableHeader");
 		sipService.setUsePrettyEncoding(true);
+		if(isHA) {
+			sipService.setSipPathName("org.mobicents.ha");
+			sipService.setBalancers("127.0.0.1");
+		}
 //		sipService.setBypassRequestExecutor(true);
 //		sipService.setBypassResponseExecutor(true);
 		// Create an engine		
@@ -642,5 +648,19 @@ public class SipEmbedded {
 	 */
 	public SipStandardService getSipService() {
 		return sipService;
+	}
+
+	/**
+	 * @param isHA the isHA to set
+	 */
+	public void setHA(boolean isHA) {
+		this.isHA = isHA;
+	}
+
+	/**
+	 * @return the isHA
+	 */
+	public boolean isHA() {
+		return isHA;
 	}
 }

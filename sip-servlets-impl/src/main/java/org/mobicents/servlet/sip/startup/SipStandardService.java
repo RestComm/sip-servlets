@@ -118,7 +118,10 @@ public class SipStandardService extends StandardService implements SipService {
 		}
 		ProtocolHandler protocolHandler = connector.getProtocolHandler();
 		if(protocolHandler instanceof SipProtocolHandler) {
-			connector.setPort(((SipProtocolHandler)protocolHandler).getPort());
+			connector.setPort(((SipProtocolHandler)protocolHandler).getPort());			
+		}
+		if(balancers != null) {
+			protocolHandler.setAttribute("balancers", balancers);
 		}
 		super.addConnector(connector);
 	}

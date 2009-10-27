@@ -36,6 +36,7 @@ import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
+import org.mobicents.tools.sip.balancer.CallIDAffinityBalancerAlgorithm;
 import org.mobicents.tools.sip.balancer.NodeRegisterImpl;
 import org.mobicents.tools.sip.balancer.RouterImpl;
 import org.mobicents.tools.sip.balancer.SIPBalancerForwarder;
@@ -61,7 +62,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 15000;
+	private static final int TIMEOUT = 20000;
 	private static final int CANCEL_TIMEOUT = 500;
 	InetAddress balancerAddress = null;
 	private final static int BALANCER_EXTERNAL_PORT = 5060;
@@ -768,6 +769,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 	 */
 	private SipEmbedded setupAndStartTomcat(String serverName, String darConfigurationFile, String specificTomcatBasePath, int sipConnectorPort) throws IOException, Exception {
 		SipEmbedded tomcatServer = new SipEmbedded(serverName, SIP_SERVICE_CLASS_NAME);
+		tomcatServer.setHA(true);
 		tomcatServer.setLoggingFilePath(  
 				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
 				File.separatorChar + "testsuite" + 
@@ -807,9 +809,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 	}
 
 	private void startSipBalancer() throws Exception {
-		prepareRegister();		
-		reg.startRegistry(2000);
-		RouterImpl.setRegister(reg);
+		prepareRegister();				
 		Properties properties = new Properties();
 		properties.setProperty("javax.sip.STACK_NAME", "SipBalancerForwarder");
 		properties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT", "off");
@@ -827,8 +827,16 @@ public class BasicFailoverTest extends SipServletTestCase {
 		properties.setProperty("host", "127.0.0.1");
 		properties.setProperty("internalPort", "" + BALANCER_INTERNAL_PORT);
 		properties.setProperty("externalPort", "" + BALANCER_EXTERNAL_PORT);
+		CallIDAffinityBalancerAlgorithm balancerAlgorithm = new CallIDAffinityBalancerAlgorithm();
+		balancerAlgorithm.setProperties(properties);
+		reg.setBalancerAlgorithm(balancerAlgorithm);
+		reg.startRegistry(2000);
+		RouterImpl.setRegister(reg);
 		fwd=new SIPBalancerForwarder(properties,reg);
+		fwd.setBalancerAlgorithm(balancerAlgorithm);
 		fwd.start();
+		
+		balancerAlgorithm.init();
 	}
 	
 	private NodeRegisterImpl prepareRegister() throws Exception {
