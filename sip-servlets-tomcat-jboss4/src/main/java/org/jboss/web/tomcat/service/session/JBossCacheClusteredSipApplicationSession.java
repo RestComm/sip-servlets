@@ -17,6 +17,7 @@
 package org.jboss.web.tomcat.service.session;
 
 import java.util.Map.Entry;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
@@ -122,11 +123,17 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 		SipSessionKey[] sipSessionKeys = (SipSessionKey[]) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "sipSessions");
 		for (SipSessionKey sipSessionKey : sipSessionKeys) {
 			sipSessions.add(sipSessionKey);
-		}
-		httpSessions.clear();
+		}		
 		String[] httpSessionIds = (String[]) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "httpSessions");
-		for (String httpSessionId : httpSessionIds) {
-			httpSessions.add(httpSessionId);
+		if(httpSessionIds != null && httpSessionIds.length > 0) {
+			if(httpSessions == null) {
+				httpSessions = new CopyOnWriteArraySet<String>();
+			} else {
+				httpSessions.clear();
+			}
+			for (String httpSessionId : httpSessionIds) {
+				httpSessions.add(httpSessionId);
+			}
 		}
 		isNew = false;
 	}
