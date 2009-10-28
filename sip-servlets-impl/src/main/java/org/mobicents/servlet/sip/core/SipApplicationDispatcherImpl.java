@@ -698,6 +698,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 //				sipContext.enterSipApp(null, null, null, true, false);
 //				try {
 					MobicentsSipSession sipSessionImpl = sipContext.getSipManager().getSipSession(sipSessionKey, false, sipFactoryImpl, null);
+					
+					// If this is a client transaction no need to invalidate proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
 					if(sipSessionImpl.getProxy() != null && !invalidateProxySession) return;
 					MobicentsSipApplicationSession sipApplicationSession = null;
 					if(sipSessionImpl != null) {
@@ -850,6 +852,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					logger.info("no sip session were returned for this key " + sipServletMessageImpl.getSipSessionKey() + " and message " + sipServletMessageImpl);
 				}
 			} else {
+				// If it is a client transaction, do not kill the proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
 				tryToInvalidateSession(sipSessionKey, transactionTerminatedEvent.isServerTransaction());				
 //				sipSessionImpl.removeOngoingTransaction(transaction);
 			}
