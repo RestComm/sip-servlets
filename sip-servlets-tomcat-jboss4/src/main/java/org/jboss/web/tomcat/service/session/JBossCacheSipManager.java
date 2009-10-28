@@ -724,7 +724,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		boolean stored = false;
 		if (started_) {			
 
-//			synchronized (session) {
+			synchronized (session) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("check to see if needs to store and replicate "
 							+ "session with id " + session.getId());
@@ -752,7 +752,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					stored = true;
 					stats_.updateReplicationStats(realId, elapsed);
 				}
-//			}
+			}
 		}
 
 		return stored;
@@ -761,8 +761,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	public boolean storeSipApplicationSession(final ClusteredSipApplicationSession session) {
 		boolean stored = false;
 		if (started_) {
-
-//			synchronized (session) {
+			synchronized (session) {
 				if (logger.isDebugEnabled()) {
 					log_.debug("check to see if needs to store and replicate "
 							+ "session with id " + session.getId());
@@ -790,7 +789,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					stored = true;
 					stats_.updateReplicationStats(realId, elapsed);
 				}
-//			}
+			}
 		}
 
 		return stored;
@@ -1203,7 +1202,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	 * cache).
 	 */
 	public void removeLocal(ClusteredSipSession clusterSess) {		
-//		synchronized (clusterSess) {
+		synchronized (clusterSess) {
 			String realId = clusterSess.getId();
 			if (realId == null)
 				return;
@@ -1234,7 +1233,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				expiredCounter_++;
 				activeCounter_--;
 			}
-//		}
+		}
 	}
 
 	/**
@@ -1245,7 +1244,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	 */
 	public void removeLocal(ClusteredSipApplicationSession clusterSess) {
 //		ClusteredSipApplicationSession clusterSess = (ClusteredSipApplicationSession) session;
-//		synchronized (clusterSess) {
+		synchronized (clusterSess) {
 			String realId = clusterSess.getId();
 			if (realId == null)
 				return;
@@ -1277,7 +1276,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				expiredCounter_++;
 				activeCounter_--;
 			}
-//		}
+		}
 	}
 
 	/**
@@ -1977,10 +1976,10 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					.getContextClassLoader();
 			try {
 				Thread.currentThread().setContextClassLoader(tcl_);
-//				synchronized (session) {
+				synchronized (session) {
 					session.removeAttributeInternal(attrKey, localCall,
 							localOnly, notify);
-//				}
+				}
 				if (logger.isDebugEnabled())
 					log_
 							.debug("processRemoteAttributeRemoval: removed attribute "
@@ -2012,10 +2011,10 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					.getContextClassLoader();
 			try {
 				Thread.currentThread().setContextClassLoader(tcl_);
-//				synchronized (session) {
+				synchronized (session) {
 					session.removeAttributeInternal(attrKey, localCall,
 							localOnly, notify);
-//				}
+				}
 				if (logger.isDebugEnabled())
 					log_
 							.debug("processRemoteAttributeRemoval: removed attribute "
@@ -2773,7 +2772,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		if(clusterSess == null) {
 			return null;
 		}
-//		synchronized (clusterSess) {
+		synchronized (clusterSess) {
 			final String realId = clusterSess.getId();
 
 			if (log_.isDebugEnabled()) {
@@ -2795,7 +2794,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				stats_.removeStats(realId);
 				activeCounter_--;
 			}
-//		}
+		}
 		return clusterSess;
 	}
 
@@ -2808,7 +2807,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		if(clusterSess == null) {
 			return null;
 		}
-//		synchronized (clusterSess) {
+		synchronized (clusterSess) {
 			final String realId = clusterSess.getId();
 
 			if (log_.isDebugEnabled()) {
@@ -2830,7 +2829,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 				stats_.removeStats(realId);
 				activeCounter_--;
 			}
-//		}
+		}
 		return clusterSess;
 	}
 

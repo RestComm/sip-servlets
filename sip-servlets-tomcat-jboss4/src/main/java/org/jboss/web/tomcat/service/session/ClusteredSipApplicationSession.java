@@ -159,10 +159,10 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	 * Maximum number of milliseconds this session should be allowed to go
 	 * unreplicated if access to the session doesn't mark it as dirty.
 	 */
-	protected transient long maxUnreplicatedInterval = 0;
+	protected transient long maxUnreplicatedInterval = -1;
 	
 	/** True if maxUnreplicatedInterval is 0 or less than maxInactiveInterval */
-	protected transient boolean alwaysReplicateMetadata = true;
+	protected transient boolean alwaysReplicateMetadata = false;
 
 	/**
 	 * Whether any of this session's attributes implement
@@ -407,7 +407,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	public boolean getExceedsMaxUnreplicatedInterval() {
 		boolean exceeds = alwaysReplicateMetadata;
 
-		if (!exceeds && maxUnreplicatedInterval > 0) // -1 means ignore
+		if (!exceeds && maxUnreplicatedInterval >= 0) // -1 means ignore
 		{
 			long unrepl = System.currentTimeMillis() - lastReplicated;
 			exceeds = (unrepl >= maxUnreplicatedInterval);
@@ -418,7 +418,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 
 	private void checkAlwaysReplicateMetadata() {
 		boolean was = this.alwaysReplicateMetadata;
-		this.alwaysReplicateMetadata = (maxUnreplicatedInterval == 0 || (maxUnreplicatedInterval > 0));
+		this.alwaysReplicateMetadata = maxUnreplicatedInterval == 0;
 
 		if (this.alwaysReplicateMetadata && !was && logger.isTraceEnabled()) {
 			logger

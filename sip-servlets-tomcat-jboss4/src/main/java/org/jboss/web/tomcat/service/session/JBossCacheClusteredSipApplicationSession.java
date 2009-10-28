@@ -16,7 +16,6 @@
  */
 package org.jboss.web.tomcat.service.session;
 
-import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -119,8 +118,16 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 		} else {
 			isValid = true;
 		}
-		sipSessions = (Set<SipSessionKey>) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "sipSessions");
-		httpSessions = (Set<String>) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "httpSessions");
+		sipSessions.clear();
+		SipSessionKey[] sipSessionKeys = (SipSessionKey[]) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "sipSessions");
+		for (SipSessionKey sipSessionKey : sipSessionKeys) {
+			sipSessions.add(sipSessionKey);
+		}
+		httpSessions.clear();
+		String[] httpSessionIds = (String[]) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "httpSessions");
+		for (String httpSessionId : httpSessionIds) {
+			httpSessions.add(httpSessionId);
+		}
 		isNew = false;
 	}
 
@@ -146,11 +153,11 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 			metaDataModifiedMap.clear();			
 		}		
 		if(sipSessionsMapModified) {					
-			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "sipSessions", sipSessions);
+			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "sipSessions", sipSessions.toArray(new SipSessionKey[sipSessions.size()]));
 			sipSessionsMapModified = false;
 		}		
 		if(httpSessionsMapModified) {			
-			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "httpSessions", httpSessions);
+			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "httpSessions", httpSessions.toArray(new String[httpSessions.size()]));
 			httpSessionsMapModified = false;
 		}
 		this.incrementVersion();

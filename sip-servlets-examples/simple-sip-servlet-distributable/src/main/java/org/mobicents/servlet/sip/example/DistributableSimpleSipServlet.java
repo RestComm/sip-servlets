@@ -131,14 +131,14 @@ public class DistributableSimpleSipServlet
 			if(request.getSession().getAttribute("ISREINVITE") !=null && sipSessionReInviteAttribute != null  && sipApplicationSessionReInviteAttribute != null 				
 					&& RECEIVED.equalsIgnoreCase(sipSessionReInviteAttribute) 
 					&& RECEIVED.equalsIgnoreCase(sipApplicationSessionReInviteAttribute)) {
-				request.getSession().setAttribute("BYE", RECEIVED);
-				request.getApplicationSession().setAttribute(" BYE", RECEIVED);
+//				request.getSession().setAttribute("BYE", RECEIVED);
+//				request.getApplicationSession().setAttribute(" BYE", RECEIVED);
 				SipServletResponse sipServletResponse = request.createResponse(200);
 				sipServletResponse.send();
 				return;
 			}
-			request.getSession().setAttribute("BYE", RECEIVED);
-			request.getApplicationSession().setAttribute(" BYE", RECEIVED);
+//			request.getSession().setAttribute("BYE", RECEIVED);
+//			request.getApplicationSession().setAttribute(" BYE", RECEIVED);
 			SipServletResponse sipServletResponse = request.createResponse(200);
 			sipServletResponse.send();
 			return;
