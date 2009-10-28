@@ -679,7 +679,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(tad != null && tad.getSipServletMessage() != null) {
 			SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
 			SipSessionKey sipSessionKey = sipServletMessageImpl.getSipSessionKey();
-			tryToInvalidateSession(sipSessionKey);
+			tryToInvalidateSession(sipSessionKey, false);
 		} else {
 			logger.warn("no application data for this dialog " + dialogTerminatedEvent.getDialog().getDialogId());
 		}
@@ -688,7 +688,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	/**
 	 * @param sipSessionImpl
 	 */
-	private void tryToInvalidateSession(SipSessionKey sipSessionKey) {
+	private void tryToInvalidateSession(SipSessionKey sipSessionKey, boolean invalidateProxySession) {
 		//the key can be null if the application already invalidated the session
 		if(sipSessionKey != null) {
 			SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());
@@ -698,6 +698,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 //				sipContext.enterSipApp(null, null, null, true, false);
 //				try {
 					MobicentsSipSession sipSessionImpl = sipContext.getSipManager().getSipSession(sipSessionKey, false, sipFactoryImpl, null);
+					if(sipSessionImpl.getProxy() != null && !invalidateProxySession) return;
 					MobicentsSipApplicationSession sipApplicationSession = null;
 					if(sipSessionImpl != null) {
 						if(logger.isInfoEnabled()) {
@@ -820,7 +821,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						}
 					}
 				}
-				tryToInvalidateSession(sipSessionKey);
+				tryToInvalidateSession(sipSessionKey, false);
 			}
 		}
 	}
@@ -848,8 +849,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				if(logger.isInfoEnabled()) {
 					logger.info("no sip session were returned for this key " + sipServletMessageImpl.getSipSessionKey() + " and message " + sipServletMessageImpl);
 				}
-			} else {				
-				tryToInvalidateSession(sipSessionKey);				
+			} else {
+				tryToInvalidateSession(sipSessionKey, transactionTerminatedEvent.isServerTransaction());				
 //				sipSessionImpl.removeOngoingTransaction(transaction);
 			}
 		} else {
