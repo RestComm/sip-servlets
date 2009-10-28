@@ -204,6 +204,11 @@
       <priority value="ERROR"/>
    </category>
    
+    <category name="org.jboss.web.tomcat.service.session">
+      <priority value="DEBUG"/>
+   </category>
+   
+   
    <category name="org.mobicents">
       <priority value="DEBUG"/>
    </category>

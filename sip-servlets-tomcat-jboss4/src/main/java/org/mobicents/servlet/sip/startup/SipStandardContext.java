@@ -1114,15 +1114,15 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				break;
 		}		
 		if (getDistributable() && hasDistributableManager) {
-			if(logger.isInfoEnabled()) {
-				logger.info("We are now after the servlet invocation, We replicate no matter what");
+			if(logger.isDebugEnabled()) {
+				logger.debug("We are now after the servlet invocation, We replicate no matter what");
 			}
 			try {
 				ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
 						.exitSipapp();
 				final SnapshotSipManager snapshotSipManager =(SnapshotSipManager) ctx.getSoleSnapshotManager();
-				if(logger.isInfoEnabled()) {
-					logger.info("Snapshot Manager " + ctx.getSoleSnapshotManager());
+				if(logger.isDebugEnabled()) {
+					logger.debug("Snapshot Manager " + ctx.getSoleSnapshotManager());
 				}
 				if (snapshotSipManager != null) {
 					Set<ClusteredSipSession> sipSessions = ctx.getSipSessions();

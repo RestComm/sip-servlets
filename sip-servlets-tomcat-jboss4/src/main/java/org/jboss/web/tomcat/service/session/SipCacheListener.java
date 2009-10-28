@@ -100,16 +100,28 @@ public class SipCacheListener extends AbstractCacheListener
    @Override
    public void nodeCreated(Fqn fqn)
    {
-	   logger.info("following node created " + fqn.toString() + " with name " +fqn.getName());
+	   boolean local = ConvergedSessionReplicationContext.isSipLocallyActive();
+	   
+	   if(!local && logger.isDebugEnabled() && fqn.get(0).toString().indexOf(ConvergedJBossCacheService.SIPSESSION) != -1) {
+		   logger.debug("following node created " + fqn.toString() + " with name " +fqn.getName());
+	   }
+	   
+	   if (!fieldBased_ && local)
+	         return;	   
    }
    
    public void nodeRemoved(Fqn fqn)
    {
-	   logger.info("following node removed " + fqn.toString() + " with name " +fqn.getName());
+	   
       // Ignore our own activity if not field based
       boolean local = ConvergedSessionReplicationContext.isSipLocallyActive();
+      
+      if(!local && logger.isDebugEnabled() && fqn.get(0).toString().indexOf(ConvergedJBossCacheService.SIPSESSION) != -1) {
+    	  logger.debug("following node removed " + fqn.toString() + " with name " +fqn.getName());
+	  }
+      
       if (!fieldBased_ && local)
-         return;
+         return;          
       
       boolean isBuddy = isBuddyFqn(fqn);
       int size = fqn.size();
@@ -164,10 +176,15 @@ public class SipCacheListener extends AbstractCacheListener
 
    public void nodeModified(Fqn fqn)
    {
-	  logger.info("following node modified " + fqn.toString() + " with name " +fqn.getName());
+	  
       boolean local = ConvergedSessionReplicationContext.isSipLocallyActive();
+      
+      if(!local && logger.isDebugEnabled() && fqn.get(0).toString().indexOf(ConvergedJBossCacheService.SIPSESSION) != -1) {
+    	  logger.debug("following node modified " + fqn.toString() + " with name " +fqn.getName());
+	  }
+      
       if (!fieldBased_ && local)
-         return;
+         return;          
       
       boolean isBuddy = isBuddyFqn(fqn);      
       int size = fqn.size();
