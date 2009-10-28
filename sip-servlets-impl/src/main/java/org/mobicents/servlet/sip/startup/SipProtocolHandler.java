@@ -350,7 +350,8 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 				if(sipStackProperties.get(LoadBalancerHeartBeatingService.BALANCERS) == null) {
 					sipStackProperties.put(LoadBalancerHeartBeatingService.BALANCERS, balancers);
 				}
-			}			
+			}		
+			sipStackProperties.put("org.mobicents.ha.javax.sip.REPLICATION_STRATEGY", "ConfirmedDialogNoApplicationData");
 			// Create SipStack object
 			sipStack = SipFactories.sipFactory.createSipStack(sipStackProperties);
 			final String jvmRoute = (String)getAttribute(JVM_ROUTE);
@@ -635,6 +636,20 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
     	sipConnector.setIpAddress(ia.getHostAddress());
     }
 
+    /**
+	 * @param sipStackPropertiesFile the sipStackPropertiesFile to set
+	 */
+	public void setSipStackPropertiesFile(String sipStackPropertiesFile) {
+		sipConnector.setSipStackPropertiesFileLocation(sipStackPropertiesFile);
+	}
+
+	/**
+	 * @return the sipStackPropertiesFile
+	 */
+	public String getSipStackPropertiesFile() {
+		return sipConnector.getSipStackPropertiesFileLocation();
+	}
+    
     /**
 	 * @param sipConnector the sipConnector to set
 	 */
