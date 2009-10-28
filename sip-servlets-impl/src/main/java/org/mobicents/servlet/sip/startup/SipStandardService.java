@@ -552,8 +552,9 @@ public class SipStandardService extends StandardService implements SipService {
 				}
 			}
 		}
-		
-		removeConnector(connectorToRemove);
+		if(connectorToRemove != null) {
+			removeConnector(connectorToRemove);
+		}
 	}
 	
 	public SipConnector[] findSipConnectors() {
