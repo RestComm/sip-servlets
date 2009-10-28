@@ -317,7 +317,7 @@ public class Shootme implements SipListener {
 				System.out.println("shootme:  null tid.");
 				return;
 			}
-			Response response = messageFactory.createResponse(200, request);
+			Response response = messageFactory.createResponse(487, request);
 			serverTransactionId.sendResponse(response);
 			cancelled = true;
 			if (dialog.getState() != DialogState.CONFIRMED) {

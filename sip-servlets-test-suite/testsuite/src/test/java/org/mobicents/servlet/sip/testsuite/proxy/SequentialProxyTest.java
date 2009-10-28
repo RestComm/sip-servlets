@@ -66,7 +66,7 @@ public class SequentialProxyTest extends SipServletTestCase {
 		this.shootme.init("stackName");
 		this.cutme.init();
 		this.shootist.init("sequential", false);
-		for (int q = 0; q < 30; q++) {
+		for (int q = 0; q < 50; q++) {
 			if (shootist.ended == false && cutme.canceled == false)
 				try {
 					Thread.sleep(TIMEOUT);

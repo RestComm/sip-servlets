@@ -55,6 +55,8 @@ public class Cutme implements SipListener {
 	private static final int myPort = 5056;
 
 	protected ServerTransaction inviteTid;
+	
+	protected Request inviteRequest;
 
 	private Response okResponse;
 
@@ -164,6 +166,8 @@ public class Cutme implements SipListener {
 			if (st == null) {
 				st = sipProvider.getNewServerTransaction(request);
 			}
+			inviteTid = st;
+			inviteRequest = request;
 			dialog = st.getDialog();
 //			inviteRequest = request;
 			st.sendResponse(response);
@@ -221,8 +225,10 @@ public class Cutme implements SipListener {
 				System.out.println("cutme:  null tid.");
 				return;
 			}
-			Response response = messageFactory.createResponse(200, request);
-			serverTransactionId.sendResponse(response);
+			Response responseOK = messageFactory.createResponse(200, request);
+			serverTransactionId.sendResponse(responseOK);
+			Response response = messageFactory.createResponse(487, inviteRequest);
+			inviteTid.sendResponse(response);
 
 			this.canceled = true;
 
