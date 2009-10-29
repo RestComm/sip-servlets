@@ -447,7 +447,7 @@
 	
 	<target name="build-documentation" depends="get-documentation">
 		<echo>Building documentation</echo>
-		
+		<!-- TODO: TEMPORARY FIX FOR THE BUILD
 		<exec executable="${mvn.executable}" dir="${docs.stage.dir}/media/">
 			<arg line="clean compile" />
 		</exec>
@@ -457,13 +457,13 @@
 		
 		<copy overwrite="true" todir="${jboss.home}/docs/mobicents-media-server">
 			<fileset dir="${docs.stage.dir}/media/target/docbook/publish/en-US/" />
-		</copy>
+		</copy> -->
 		<!--copy overwrite="true" todir="${jboss.home}/docs/mobicents-sip-servlets">
 			<fileset dir="${docs.stage.dir}/sip-servlets/target/docbook/publish/en-US/" />
-		</copy-->
+		</copy--> <!--
 		<copy overwrite="true" todir="${jboss.home}/docs/mobicents-sip-servlets">
 			<fileset dir="${base.path}/../../sip-servlets-docs/target/docbook/publish/en-US/" />
-		</copy>
+		</copy> -->
 		
 		<!--delete dir="${docs.stage.dir}" /-->
 	</target>
