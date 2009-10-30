@@ -103,7 +103,7 @@
 			<artifactId>jboss-as-system-jmx</artifactId>
 			<version>${jboss.version}</version>
 			<scope>provided</scope>
-		</dependency>		
+		</dependency>	
 		
 		<!-- clustering deps -->
 		<dependency>
@@ -239,6 +239,12 @@
 					<artifactId>cache</artifactId>										
 					<version>1.0.0BETA1-SNAPSHOT</version>
 				</dependency>
+				<dependency>
+					<groupId>org.mobicents.tools</groupId>
+					<artifactId>sip-balancer</artifactId>
+					<version>1.0.BETA8-SNAPSHOT</version>
+					<scope>provided</scope>
+				</dependency>
 			</dependencies>						
 			<build>			
 				<plugins>				
@@ -253,7 +259,7 @@
 										<goal>copy-dependencies</goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>mobicents-jain-sip-jboss5,core,cache,timers</includeArtifactIds>
+									<includeArtifactIds>sip-balancer,mobicents-jain-sip-jboss5,core,cache,timers</includeArtifactIds>
 					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>		 	          		
@@ -289,6 +295,12 @@
 					<groupId>org.mobicents.cluster</groupId>
 					<artifactId>cache</artifactId>										
 					<version>1.0.0BETA1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>org.mobicents.tools</groupId>
+					<artifactId>sip-balancer</artifactId>
+					<version>1.0.BETA8-SNAPSHOT</version>
+					<scope>provided</scope>
 				</dependency>
 			</dependencies>						
 			<build>			

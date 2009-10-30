@@ -290,7 +290,13 @@
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-jboss4</artifactId>
-					<version>0.1-SNAPSHOT</version>
+					<version>0.1-SNAPSHOT</version>					
+				</dependency>
+				<dependency>
+					<groupId>org.mobicents.tools</groupId>
+					<artifactId>sip-balancer</artifactId>
+					<version>1.0.BETA8-SNAPSHOT</version>
+					<scope>provided</scope>
 				</dependency>
 			</dependencies>						
 			<build>			
@@ -306,7 +312,7 @@
 										<goal>copy-dependencies</goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>mobicents-jain-sip-jboss4</includeArtifactIds>
+									<includeArtifactIds>sip-balancer,mobicents-jain-sip-jboss4</includeArtifactIds>
 					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
@@ -327,6 +333,12 @@
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-jboss4</artifactId>
 					<version>0.1-SNAPSHOT</version>
+				</dependency>
+				<dependency>
+					<groupId>org.mobicents.tools</groupId>
+					<artifactId>sip-balancer</artifactId>
+					<version>1.0.BETA8-SNAPSHOT</version>
+					<scope>provided</scope>
 				</dependency>
 			</dependencies>						
 			<build>			
