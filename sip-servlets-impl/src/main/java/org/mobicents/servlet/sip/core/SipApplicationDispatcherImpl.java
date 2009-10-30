@@ -697,12 +697,20 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				// we don't replicate since this is just a check to see if the sessions are going to be removed
 //				sipContext.enterSipApp(null, null, null, true, false);
 //				try {
-					MobicentsSipSession sipSessionImpl = sipContext.getSipManager().getSipSession(sipSessionKey, false, sipFactoryImpl, null);
-					
-					// If this is a client transaction no need to invalidate proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
-					if(sipSessionImpl.getProxy() != null && !invalidateProxySession) return;
-					MobicentsSipApplicationSession sipApplicationSession = null;
+				MobicentsSipSession sipSessionImpl = sipContext.getSipManager().getSipSession(sipSessionKey, false, sipFactoryImpl, null);
+
+				MobicentsSipApplicationSession sipApplicationSession = null;
 					if(sipSessionImpl != null) {
+						if(sipSessionImpl.getProxy() != null) {
+							// If this is a client transaction no need to invalidate proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
+							if(!invalidateProxySession) {
+								return;
+							} else {
+								if(logger.isDebugEnabled()) {
+									logger.debug("Proxy session is being invalidated on server transaction termination " + sipSessionKey);
+								}
+							}
+						}
 						if(logger.isInfoEnabled()) {
 							logger.info("sip session " + sipSessionKey + " is valid ? :" + sipSessionImpl.isValid());
 							if(sipSessionImpl.isValid()) {
