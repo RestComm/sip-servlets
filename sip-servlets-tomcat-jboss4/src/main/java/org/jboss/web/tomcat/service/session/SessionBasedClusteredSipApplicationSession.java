@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
@@ -149,7 +151,15 @@ public class SessionBasedClusteredSipApplicationSession extends
 
 			final String sipAppSessionKey = getId();
 			
-			sipApplicationSessionAttributeMap = (Map)proxy_.getSipApplicationSessionAttribute(sipAppSessionKey, "attributes");
+			int size = (Integer) proxy_.getSipApplicationSessionAttribute(sipAppSessionKey, "attributesSize");
+			Object[][] attributesArray = (Object[][] )proxy_.getSipApplicationSessionAttribute(sipAppSessionKey, "attributes");
+			Map<String, Object> attributesMap = new ConcurrentHashMap<String, Object>();
+			for (int i = 0; i < size; i++) {
+				String key = (String) attributesArray[0][i];
+				Object value = attributesArray[1][i];
+				attributesMap.put(key, value);
+			}						
+			sipApplicationSessionAttributeMap = attributesMap;
 //		}
 	}
 
@@ -170,7 +180,16 @@ public class SessionBasedClusteredSipApplicationSession extends
 				// Don't replicate any excluded attributes
 				Map excluded = removeExcludedAttributes(getAttributeMap());
 
-				proxy_.putSipApplicationSessionAttribute(sipAppSessionKey, "attributes", sipApplicationSessionAttributeMap);
+				final int size = sipApplicationSessionAttributeMap.size();
+				Object[][] attributesArray = new Object[2][size];
+				int i = 0;
+				for (Entry<String, Object> entry : sipApplicationSessionAttributeMap.entrySet()) {
+					attributesArray [0][i] = entry.getKey(); 
+					attributesArray [1][i] = entry.getValue();
+					i++;
+				}
+				proxy_.putSipApplicationSessionAttribute(sipAppSessionKey, "attributesSize", size);
+				proxy_.putSipApplicationSessionAttribute(sipAppSessionKey, "attributes", attributesArray);
 
 				// Restore any excluded attributes
 				if (excluded != null)

@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -154,7 +156,15 @@ public class SessionBasedClusteredSipSession extends
 			final String sipAppSessionKey = sipApplicationSessionKey.toString();
 			final String sipSessionKey = getId();
 			
-			sipSessionAttributeMap = (Map)proxy_.getSipSessionAttribute(sipAppSessionKey, sipSessionKey, "attributes");
+			int size = (Integer) proxy_.getSipSessionAttribute(sipAppSessionKey, sipSessionKey, "attributesSize");
+			Object[][] attributesArray = (Object[][] )proxy_.getSipSessionAttribute(sipAppSessionKey, sipSessionKey, "attributes");
+			Map<String, Object> attributesMap = new ConcurrentHashMap<String, Object>();
+			for (int i = 0; i < size; i++) {
+				String key = (String) attributesArray[0][i];
+				Object value = attributesArray[1][i];
+				attributesMap.put(key, value);
+			}						
+			sipSessionAttributeMap = attributesMap;
 //		}
 	}
 
@@ -174,9 +184,17 @@ public class SessionBasedClusteredSipSession extends
 				final String sipAppSessionKey = sipApplicationSessionKey.toString();
 				final String sipSessionKey = getId();
 				// Don't replicate any excluded attributes
-				Map excluded = removeExcludedAttributes(getAttributeMap());
-				
-				proxy_.putSipSessionAttribute(sipAppSessionKey, sipSessionKey, "attributes", sipSessionAttributeMap);
+				final Map excluded = removeExcludedAttributes(getAttributeMap());
+				final int size = sipSessionAttributeMap.size();
+				Object[][] attributesArray = new Object[2][size];
+				int i = 0;
+				for (Entry<String, Object> entry : sipSessionAttributeMap.entrySet()) {
+					attributesArray [0][i] = entry.getKey(); 
+					attributesArray [1][i] = entry.getValue();
+					i++;
+				}
+				proxy_.putSipSessionAttribute(sipAppSessionKey, sipSessionKey, "attributesSize", size);
+				proxy_.putSipSessionAttribute(sipAppSessionKey, sipSessionKey, "attributes", attributesArray);
 	
 				// Restore any excluded attributes
 				if (excluded != null)
