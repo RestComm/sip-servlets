@@ -46,7 +46,7 @@
 	</repositories>
 	
 	<properties>
-		<jopr-version>2.2.0-SNAPSHOT</jopr-version>
+		<jopr-version>2.2.0</jopr-version>
 		<rhq-version>1.2.0.GA</rhq-version>
         <jboss-man.version>2.1.0.SP1</jboss-man.version>        
 	</properties>
