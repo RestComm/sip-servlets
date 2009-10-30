@@ -243,9 +243,10 @@
 			<param name="management.deploy.folder" value="${jboss-5.home}/server/${jboss.config}/deploy" />
 		</antcall>
 		
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../jopr-plugin-as-5">
+		<!-- comment temporarily the jopr 5 plugin -->
+		<!--exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../jopr-plugin-as-5">
 			<arg line="clean install -U -DJBOSS_HOME=${jboss-5.home} -Dnode=${jboss.config}" />
-		</exec>
+		</exec-->
 		
 		<condition property="ha.capable">
 			<or>
