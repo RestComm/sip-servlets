@@ -304,7 +304,7 @@
 										<goal>copy-dependencies</goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>mobicents-jain-sip-jboss5,core,cache,timers</includeArtifactIds>
+									<includeArtifactIds>sip-balancer,mobicents-jain-sip-jboss5,core,cache,timers</includeArtifactIds>
 					    			<outputDirectory>${JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>		 	          		
