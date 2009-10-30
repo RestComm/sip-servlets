@@ -131,7 +131,6 @@
 		<antcall target="make-final-zip-jboss" />
 	</target>
 	
-	<!--target name="release-jboss-5" depends="extract-jboss-5,extract-jboss-5-rails-deployer"-->
 	<target name="release-jboss-5" depends="extract-jboss-5,extract-jboss-5-torquebox-deployer">
 		<for delimiter="," param="jboss.config" list="${mss.release.configurations.jboss5}">
 			<sequential>
@@ -267,7 +266,7 @@
 		<copy overwrite="true" file="${base.path}/webserver-xmbean.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml" />
 				
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -U -P jboss-distro,jboss-cluster,set-svn-revision -DJBOSS_HOME=${jboss.home} -Dnode=${jboss.config}" />
+			<arg line="clean install -U -P set-svn-revision,jboss-distro,jboss-cluster-distro -DJBOSS_HOME=${jboss.home} -Dnode=${jboss.config}" />
 		</exec>
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
@@ -295,7 +294,7 @@
 		<move file="${jboss-5.home}/common/lib/jboss-ha-server-cache-jbc.jar" tofile="${jboss-5.home}/common/lib/jboss-ha-server-cache-jbc.jar.bak" />		
 
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -U -P set-svn-revision,jboss-5-distro,jboss-5-cluster -DJBOSS_HOME=${jboss.home} -Dnode=${jboss.config}" />
+			<arg line="clean install -U -P set-svn-revision,jboss-5-distro,jboss-5-cluster-distro -DJBOSS_HOME=${jboss.home} -Dnode=${jboss.config}" />
 		</exec>
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">

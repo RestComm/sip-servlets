@@ -280,6 +280,24 @@
 								Exception on addition a custom header to request.
 								</a>
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a href="http://code.google.com/p/mobicents/issues/detail?id=1019">
+								JMX methods to enumerate, add or remove SIP listening points
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a href="http://code.google.com/p/mobicents/issues/detail?id=1021">
+								Sip Session key should not contain addresses only tags
+								</a>
+							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a href="http://code.google.com/p/mobicents/issues/detail?id=1024">
+								Proxy SipSessions are invalidated improperly on client transaction termination
+								</a>
+							</li>
 						</ul>
 						<br />						
 					</p>		
