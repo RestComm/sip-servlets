@@ -44,6 +44,7 @@ public class ShootistSipServlet
 		extends SipServlet 
 		implements SipServletListener,TimerListener {
 	private static final long serialVersionUID = 1L;
+	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static transient Logger logger = Logger.getLogger(ShootistSipServlet.class);	
 	@Resource
 	TimerService timerService;
@@ -96,6 +97,13 @@ public class ShootistSipServlet
 	public void servletInitialized(SipServletContextEvent ce) {
 		SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);
 		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
+		
+		String testServletListener = ce.getServletContext().getInitParameter("testServletListener");
+		if(testServletListener != null) {
+			logger.error("servlet initialized " + this);
+			sendMessage(sipApplicationSession, sipFactory, "testServletListener");
+			return;
+		}
 		
 		String userName = ce.getServletContext().getInitParameter("username");
 		if(userName == null || userName.length() < 1) {
@@ -153,6 +161,30 @@ public class ShootistSipServlet
 			sipServletRequest.send();
 		} catch (IOException e) {
 			logger.error("Unexpected exception while sending the BYE request",e);
+		}
+	}
+	
+	/**
+	 * @param sipApplicationSession
+	 * @param storedFactory
+	 */
+	private void sendMessage(SipApplicationSession sipApplicationSession,
+			SipFactory storedFactory, String content) {
+		try {
+			SipServletRequest sipServletRequest = storedFactory.createRequest(
+					sipApplicationSession, 
+					"MESSAGE", 
+					"sip:sender@sip-servlets.com", 
+					"sip:receiver@sip-servlets.com");
+			SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+			sipServletRequest.setRequestURI(sipUri);
+			sipServletRequest.setContentLength(content.length());
+			sipServletRequest.setContent(content, CONTENT_TYPE);
+			sipServletRequest.send();
+		} catch (ServletParseException e) {
+			logger.error("Exception occured while parsing the addresses",e);
+		} catch (IOException e) {
+			logger.error("Exception occured while sending the request",e);			
 		}
 	}
 }

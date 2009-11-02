@@ -65,7 +65,22 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		applicationParameter.setValue(value);
 		context.addApplicationParameter(applicationParameter);
 		assertTrue(tomcat.deployContext(context));
-	}		
+	}
+	
+	public SipStandardContext deployApplicationServletListenerTest() {
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp");
+		context.setName("sip-test-context");
+		context.setPath("sip-test");
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		ApplicationParameter applicationParameter = new ApplicationParameter();
+		applicationParameter.setName("testServletListener");
+		applicationParameter.setValue("true");
+		context.addApplicationParameter(applicationParameter);
+		assertTrue(tomcat.deployContext(context));
+		return context;
+	}	
 
 	@Override
 	protected String getDarConfigurationFile() {
@@ -201,6 +216,32 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());		
 	}
+	
+	/**
+	 * non regression test for Issue 1025 http://code.google.com/p/mobicents/issues/detail?id=1025
+	 * sipservletlistner called twice on redeploy
+	 */
+	public void testShootistSipServletListener() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		SipStandardContext context = deployApplicationServletListenerTest();
+		Thread.sleep(TIMEOUT);
+		tomcat.undeployContext(context);		
+		Thread.sleep(TIMEOUT);
+		deployApplicationServletListenerTest();
+		Thread.sleep(TIMEOUT);
+		assertEquals(2, receiver.getAllMessagesContent().size());
+	}
+	
 	
 	public void testShootistCallerSendsBye() throws Exception {
 //		receiver.sendInvite();
