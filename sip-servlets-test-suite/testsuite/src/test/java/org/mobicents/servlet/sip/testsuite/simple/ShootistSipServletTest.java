@@ -237,9 +237,12 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		tomcat.undeployContext(context);		
 		Thread.sleep(TIMEOUT);
-		deployApplicationServletListenerTest();
+		context = deployApplicationServletListenerTest();
 		Thread.sleep(TIMEOUT);
 		assertEquals(2, receiver.getAllMessagesContent().size());
+		context.reload();
+		Thread.sleep(TIMEOUT);
+		assertEquals(3, receiver.getAllMessagesContent().size());
 	}
 	
 	

@@ -463,7 +463,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
         }
 
         // TODO Annotation processing check super class on tomcat 6
-        
+         
         sipListeners.clean();
 
         return ok;
@@ -510,6 +510,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			logger.info("number of active sip application sessions : " + ((SipManager)manager).getActiveSipApplicationSessions());
 		}
 		sipListeners.deallocateServletsActingAsListeners();
+		sipApplicationListeners.clear();
+		sipServletMappings.clear();
+		childrenMap.clear();
+		childrenMapByClassName.clear();
 		super.stop();
 		// this should happen after so that applications can still do some processing
 		// in destroy methods to notify that context is getting destroyed and app removed

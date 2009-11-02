@@ -254,7 +254,7 @@ public class SipListenersHolder {
 	}
 
 	public void setTimerListener(TimerListener listener) {
-		if(timerListener != null) {
+		if(this.timerListener != null) {
 			throw new IllegalArgumentException(
 					"the time listener has already been set ("+timerListener.getClass().getName() +
 					"), There may be at most one TimerListener defined !");
@@ -372,6 +372,7 @@ public class SipListenersHolder {
 		this.sipErrorListeners.clear();
 		this.servletContextListeners.clear();
 		this.sipConnectorListeners.clear();
+		this.listenerServlets.clear();
 		this.timerListener = null;
 	}
 
