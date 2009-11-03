@@ -45,27 +45,11 @@ import javax.sip.Transaction;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
-import javax.sip.header.ContentDispositionHeader;
-import javax.sip.header.ContentLengthHeader;
-import javax.sip.header.ContentTypeHeader;
-import javax.sip.header.DateHeader;
-import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
-import javax.sip.header.MaxForwardsHeader;
-import javax.sip.header.MimeVersionHeader;
-import javax.sip.header.MinExpiresHeader;
-import javax.sip.header.OrganizationHeader;
-import javax.sip.header.PriorityHeader;
 import javax.sip.header.RecordRouteHeader;
-import javax.sip.header.ReplyToHeader;
-import javax.sip.header.RetryAfterHeader;
 import javax.sip.header.RouteHeader;
-import javax.sip.header.ServerHeader;
-import javax.sip.header.SubjectHeader;
-import javax.sip.header.TimeStampHeader;
 import javax.sip.header.ToHeader;
-import javax.sip.header.UserAgentHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
@@ -635,5 +619,19 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 				logger.debug(key + " tied to session " + sessionMap.get(key));
 			}
 		}
+	}
+
+	/**
+	 * @param sessionMap the sessionMap to set
+	 */
+	public void setSessionMap(Map<SipSessionKey, SipSessionKey> sessionMap) {
+		this.sessionMap = sessionMap;
+	}
+
+	/**
+	 * @return the sessionMap
+	 */
+	public Map<SipSessionKey, SipSessionKey> getSessionMap() {
+		return sessionMap;
 	}
 }

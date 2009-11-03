@@ -121,11 +121,11 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 			logger.debug("processSessionRepl(): session is dirty. Will increment "
 					+ "version from: " + getVersion() + " and replicate.");
 		}
-		final String sipAppSessionKey = sipApplicationSessionKey.toString();
+		final String sipAppSessionKey = sipApplicationSessionKey.getId();
 		final String sipSessionKey = getId();
 		if(isNew) {
-			proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, "ct", creationTime);
-			proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, "ip", invalidationPolicy);
+			proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, CREATION_TIME, creationTime);
+			proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, INVALIDATION_POLICY, invalidationPolicy);
 			isNew = false;
 		}
 		if(sessionMetadataDirty) {			
@@ -135,11 +135,21 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 			metaModifiedMap_.clear();
 						
 			if(proxy != null) {											
-				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, "proxy", proxy);
+				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, PROXY, proxy);
 			}
 			
-			if(b2buaHelper != null) {											
-				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, "b2b", b2buaHelper);
+			if(b2buaHelper != null) {
+				final Map<SipSessionKey, SipSessionKey> sessionMap = b2buaHelper.getSessionMap();
+				final int size = sessionMap.size();
+				String[][] sessionArray = new String[2][size];
+				int i = 0;
+				for (Entry<SipSessionKey, SipSessionKey> entry : sessionMap.entrySet()) {
+					sessionArray [0][i] = entry.getKey().toString(); 
+					sessionArray [1][i] = entry.getValue().toString();
+					i++;
+				}
+				proxy_.putSipSessionAttribute(sipAppSessionKey, sipSessionKey,B2B_SESSION_SIZE, size);
+				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, B2B_SESSION_MAP, sessionArray);
 			}
 		}
 		this.incrementVersion();
@@ -183,7 +193,7 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 
 	public void removeMyself() {
 		// This is a shortcut to remove session and it's child attributes.
-		proxy_.removeSipSession(sipApplicationSessionKey.toString(), getId());
+		proxy_.removeSipSession(sipApplicationSessionKey.getId(), getId());
 	}
 
 	public void removeMyselfLocal() {
@@ -192,8 +202,8 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 		// removeAttributesLocal call here in order to evict the ATTRIBUTE node.
 		// Otherwise empty nodes for the session root and child ATTRIBUTE will
 		// remain in the tree and screw up our list of session names.
-		proxy_.removeSipSessionAttributesLocal(sipApplicationSessionKey.toString(), getId());
-		proxy_.removeSipSessionLocal(sipApplicationSessionKey.toString(), getId());
+		proxy_.removeSipSessionAttributesLocal(sipApplicationSessionKey.getId(), getId());
+		proxy_.removeSipSessionLocal(sipApplicationSessionKey.getId(), getId());
 	}
 
 	// ------------------------------------------------ JBoss internal abstract
@@ -204,7 +214,7 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 	 * transient ones.
 	 */
 	protected void populateAttributes() {
-		Map map = proxy_.getSipSessionAttributes(sipApplicationSessionKey.toString(), getId());
+		Map map = proxy_.getSipSessionAttributes(sipApplicationSessionKey.getId(), getId());
 
 		// Preserve any local attributes that were excluded from replication
 		Map excluded = removeExcludedAttributes(attributes_);

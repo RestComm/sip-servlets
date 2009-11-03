@@ -16,9 +16,12 @@
  */
 package org.jboss.web.tomcat.service.session;
 
-import java.util.Map.Entry;
-
 import gov.nist.javax.sip.SipStackImpl;
+
+import java.text.ParseException;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.sip.SipStack;
 
@@ -28,6 +31,7 @@ import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -150,39 +154,62 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 //	}
 
 	protected void populateMetaData() {
-		final String sipAppSessionId = sipApplicationSessionKey.toString();
+		final String sipAppSessionId = sipApplicationSessionKey.getId();
 		final String sipSessionId = getId();				
-		Long ct = (Long) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "ct");
+		Long ct = (Long) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, CREATION_TIME);
 		if(ct != null) {
 			creationTime = ct;
 		}
-		Integer ip = (Integer) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "ip");
+		Integer ip = (Integer) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, INVALIDATION_POLICY);
 		if(ip != null) {
 			invalidationPolicy = ip;
 		}
-		handlerServlet = (String) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "handler");
-		Boolean valid = (Boolean) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, "iv");
+		handlerServlet = (String) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, HANDLER);
+		Boolean valid = (Boolean) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, IS_VALID);
 		if(valid != null) {
 			isValid = valid;
 		} else {
 			isValid = true;
 		}
-		state = (State) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "state");
-		Long cSeq = (Long) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "cseq");
+		state = (State) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, STATE);
+		Long cSeq = (Long) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, CSEQ);
 		if(cSeq != null) {
 			cseq = cSeq;
 		} 
-		Boolean iwr = (Boolean) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "iwr");		
+		Boolean iwr = (Boolean) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, INVALIDATE_WHEN_READY);		
 		if(iwr != null) {
 			invalidateWhenReady = iwr;
 		} 
-		Boolean rti = (Boolean) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "rti");		
+		Boolean rti = (Boolean) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, READY_TO_INVALIDATE);		
 		if(rti != null) {
 			readyToInvalidate = rti;
 		} 
-		sessionCreatingDialogId = (String) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "dialogId");
-		proxy = (ProxyImpl) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "proxy");
-		b2buaHelper = (B2buaHelperImpl) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, "b2b");
+		sessionCreatingDialogId = (String) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, DIALOG_ID);
+		proxy = (ProxyImpl) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, PROXY);
+		
+		Integer size = (Integer) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, B2B_SESSION_SIZE);
+		String[][] sessionArray = (String[][])proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, B2B_SESSION_MAP);
+		if(logger.isDebugEnabled()) {
+			logger.debug("b2bua session array size = " + size + ", value = " + sessionArray);
+		}
+		if(size != null && sessionArray != null) {
+			Map<SipSessionKey, SipSessionKey> sessionMap = new ConcurrentHashMap<SipSessionKey, SipSessionKey>();
+			for (int i = 0; i < size; i++) {
+				String key = sessionArray[0][i];
+				String value = sessionArray[1][i];
+				try {
+					SipSessionKey sipSessionKeyKey = SessionManagerUtil.parseSipSessionKey(key);
+					SipSessionKey sipSessionKeyValue = SessionManagerUtil.parseSipSessionKey(value);
+					sessionMap.put(sipSessionKeyKey, sipSessionKeyValue);
+				} catch (ParseException e) {
+					logger.warn("couldn't parse a deserialized sip session key from the B2BUA", e);
+				}
+			}
+			if(b2buaHelper == null) {
+				b2buaHelper = new B2buaHelperImpl();
+			}
+			b2buaHelper.setSessionMap(sessionMap);
+		}
 		isNew = false;
 	}
 	
@@ -191,11 +218,11 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 	 */
 	public void processSessionRepl() {		
 		// Replicate the session.
-		final String sipAppSessionKey = sipApplicationSessionKey.toString();
+		final String sipAppSessionKey = sipApplicationSessionKey.getId();
 		final String sipSessionKey = getId();
 		if(isNew) {
-			proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, "ct", creationTime);
-			proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, "ip", invalidationPolicy);
+			proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, CREATION_TIME, creationTime);
+			proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, INVALIDATION_POLICY, invalidationPolicy);
 			isNew = false;
 		}
 					
@@ -209,11 +236,24 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 			metaModifiedMap_.clear();
 						
 			if(proxy != null) {											
-				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, "proxy", proxy);
+				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, PROXY, proxy);
 			}
 			
-			if(b2buaHelper != null) {											
-				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, "b2b", b2buaHelper);
+			if(b2buaHelper != null) {
+				final Map<SipSessionKey, SipSessionKey> sessionMap = b2buaHelper.getSessionMap();
+				final int size = sessionMap.size();
+				final String[][] sessionArray = new String[2][size];
+				int i = 0;
+				for (Entry<SipSessionKey, SipSessionKey> entry : sessionMap.entrySet()) {
+					sessionArray [0][i] = entry.getKey().toString(); 
+					sessionArray [1][i] = entry.getValue().toString();
+					i++;
+				}
+				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey,B2B_SESSION_SIZE, size);
+				if(logger.isDebugEnabled()) {
+					logger.debug("storing b2bua session array " + sessionArray);
+				}
+				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, B2B_SESSION_MAP, sessionArray);
 			}
 		}
 		this.incrementVersion();

@@ -34,13 +34,13 @@ import java.io.Serializable;
  */
 public class SipSessionKey implements Serializable {
 	private static final long serialVersionUID = 1L;
-	String fromTag;
-	String toTag;
-	String callId; 
-	String applicationName;
+	private String fromTag;
+	private String toTag;
+	private String callId; 
+	private String applicationName;
 	// Issue 790 : 1 SipSession should not be used in 2 different app session (http://code.google.com/p/mobicents/issues/detail?id=790)
 	// so we add the app session id in the key as well
-	String applicationSessionId;
+	private String applicationSessionId;
 	private String toString;
 	/**
 	 * @param fromAddress
@@ -59,7 +59,7 @@ public class SipSessionKey implements Serializable {
 		this.applicationName = applicationName;
 		this.applicationSessionId = applicationSessionId;
 		
-		toString = "(" + fromTag + SessionManagerUtil.SESSION_KEY_SEPARATOR + callId + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationSessionId +SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName + ")";
+		computeToString();		
 	}
 	/**
 	 * @return the fromTag
@@ -150,6 +150,30 @@ public class SipSessionKey implements Serializable {
 	 */
 	public void setToTag(String toTag) {
 		this.toTag = toTag;
+	}
+	/**
+	 * @param applicationSessionId the applicationSessionId to set
+	 */
+	public void setApplicationSessionId(String applicationSessionId) {
+		this.applicationSessionId = applicationSessionId;
+	}
+	/**
+	 * @param applicationName the applicationName to set
+	 */
+	public void setApplicationName(String applicationName) {
+		this.applicationName = applicationName;
+	}
+	/**
+	 * @param toString the toString to set
+	 */
+	public void setToString(String toString) {
+		this.toString = toString;
+	}
+	/**
+	 * @return the toString
+	 */
+	public void computeToString() {
+		toString = "(" + fromTag + SessionManagerUtil.SESSION_KEY_SEPARATOR + callId + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationSessionId +SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName + ")";
 	}	
 	
 }

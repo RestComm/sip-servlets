@@ -652,6 +652,12 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		return applicationName;
 	}
 	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#getApplicationNameHashed()
+	 */
+	public String getApplicationNameHashed() {
+		return sipApplicationDispatcher.getHashFromApplicationName(applicationName);
+	}
+	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.SipContext#setApplicationName(java.lang.String)
 	 */
 	public void setApplicationName(String applicationName) {

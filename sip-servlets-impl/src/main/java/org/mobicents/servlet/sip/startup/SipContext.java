@@ -58,6 +58,7 @@ public interface SipContext extends Context {
 	public static final String LOAD_BALANCER = "org.mobicents.servlet.sip.LoadBalancer";	
 	
 	String getApplicationName();
+	String getApplicationNameHashed();
 
 	void setApplicationName(String applicationName);
 

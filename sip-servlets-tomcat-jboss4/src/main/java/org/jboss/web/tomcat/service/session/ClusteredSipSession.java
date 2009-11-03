@@ -29,6 +29,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipSessionActivationListener;
@@ -46,6 +47,7 @@ import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
 import org.jboss.metadata.WebMetaData;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -62,6 +64,19 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 
 	private static final Logger logger = Logger.getLogger(ClusteredSipSession.class);
 
+	protected static final String B2B_SESSION_MAP = "b2bsm";
+	protected static final String B2B_SESSION_SIZE = "b2bss";
+	protected static final String PROXY = "prox";
+	protected static final String DIALOG_ID = "did";
+	protected static final String READY_TO_INVALIDATE = "rti";
+	protected static final String INVALIDATE_WHEN_READY = "iwr";
+	protected static final String CSEQ = "cseq";
+	protected static final String STATE = "stat";
+	protected static final String IS_VALID = "iv";
+	protected static final String HANDLER = "hler";
+	protected static final String INVALIDATION_POLICY = "ip";
+	protected static final String CREATION_TIME = "ct";
+	
 	/**
 	 * Descriptive information describing this Session implementation.
 	 */
@@ -182,7 +197,9 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	protected transient String sessionCreatingDialogId = null;
 
 	// Transient map to store meta data changes for replication.
-	protected transient Map<String, Object> metaModifiedMap_ = new HashMap<String, Object>();
+	protected transient Map<String, Object> metaModifiedMap_ = new ConcurrentHashMap<String, Object>();
+	
+	private transient String haId;
 	
 	/**
 	 * The string manager for this package.
@@ -200,6 +217,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 		// it starts with true so that it gets replicated when first created
 		sessionMetadataDirty = true;
 		checkAlwaysReplicateMetadata();
+		haId = SessionManagerUtil.getSipSessionHaKey(key);
 	}
 
 	/**
@@ -1347,42 +1365,42 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	public void setState(State state) {
 		super.setState(state);
 		sessionMetadataDirty();
-		metaModifiedMap_.put("state", state);
+		metaModifiedMap_.put(STATE, state);
 	}
 	
 	@Override
 	public void setCseq(long cseq) {
 		super.setCseq(cseq);
 		sessionMetadataDirty();
-		metaModifiedMap_.put("cseq", cseq);
+		metaModifiedMap_.put(CSEQ, cseq);
 	}
 	
 	@Override
 	public void setHandler(String name) throws ServletException {
 		super.setHandler(name);
 		sessionMetadataDirty();
-		metaModifiedMap_.put("handler", name);
+		metaModifiedMap_.put(HANDLER, name);
 	}
 	
 	@Override
 	public void setInvalidateWhenReady(boolean arg0) {
 		super.setInvalidateWhenReady(arg0);
 		sessionMetadataDirty();		
-		metaModifiedMap_.put("iwr", arg0);
+		metaModifiedMap_.put(INVALIDATE_WHEN_READY, arg0);
 	}
 
 	@Override
 	protected void setReadyToInvalidate(boolean readyToInvalidate) {
 		super.setReadyToInvalidate(readyToInvalidate);
 		sessionMetadataDirty();
-		metaModifiedMap_.put("rti", readyToInvalidate);
+		metaModifiedMap_.put(READY_TO_INVALIDATE, readyToInvalidate);
 	}
 	
 	@Override
 	protected void setValid(boolean isValid) {
 		super.setValid(isValid);
 		sessionMetadataDirty();
-		metaModifiedMap_.put("iv", isValid);
+		metaModifiedMap_.put(IS_VALID, isValid);
 	}
 	
 	@Override
@@ -1390,7 +1408,12 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 		super.setSessionCreatingDialog(dialog);
 		if(dialog != null && dialog.getDialogId() != null) {
 			sessionMetadataDirty();
-			metaModifiedMap_.put("dialogId", dialog.getDialogId() );
+			metaModifiedMap_.put(DIALOG_ID, dialog.getDialogId() );
 		}
+	}
+	
+	@Override
+	public String getId() {
+		return haId;
 	}
 }

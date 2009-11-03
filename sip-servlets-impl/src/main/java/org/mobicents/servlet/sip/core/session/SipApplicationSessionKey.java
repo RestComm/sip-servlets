@@ -30,9 +30,9 @@ import java.io.Serializable;
 public class SipApplicationSessionKey implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	String uuid;
-	String appGeneratedKey;
-	String applicationName;
+	private String uuid;
+	private String appGeneratedKey;
+	private String applicationName;
 	private String toString;
 	
 	/**

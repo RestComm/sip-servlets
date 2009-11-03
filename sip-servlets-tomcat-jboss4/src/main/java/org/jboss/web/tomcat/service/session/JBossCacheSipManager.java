@@ -1426,12 +1426,12 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			
 			String applicationSessionId = null;
 			if(sipApplicationSessionImpl != null) {
-				applicationSessionId = sipApplicationSessionImpl.getId();
+				applicationSessionId = sipApplicationSessionImpl.getKey().getId();
 			} else {
-				applicationSessionId = "(" + key.getApplicationSessionId() + "," + key.getApplicationName() +	")";
+				applicationSessionId = key.getApplicationSessionId();
 			}
 			
-			Object sessionData = proxy_.getSipSessionData(applicationSessionId, key.toString());
+			Object sessionData = proxy_.getSipSessionData(applicationSessionId, SessionManagerUtil.getSipSessionHaKey(key));
 			if(sessionData != null) {
 				if (session == null && sipApplicationSessionImpl != null) {
 					// This is either the first time we've seen this session on this
@@ -1536,7 +1536,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			// session if data gravitation occurs.
 			ConvergedSessionReplicationContext.startSipCacheActivity();
 
-			Object sessionData = proxy_.getSipApplicationSessionData(key.toString());
+			Object sessionData = proxy_.getSipApplicationSessionData(key.getId());
 			if(sessionData != null) {			
 				if (session == null) {			
 					// This is either the first time we've seen this session on this

@@ -28,6 +28,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipApplicationSessionActivationListener;
@@ -59,6 +60,12 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	implements Externalizable {
 
 	private static Logger logger = Logger.getLogger(ClusteredSipApplicationSession.class);
+
+	protected static final String HTTP_SESSIONS = "hs";
+	protected static final String SIP_SESSIONS = "ss";
+	protected static final String IS_VALID = "iv";
+	protected static final String INVALIDATION_POLICY = "ip";	
+	protected static final String CREATION_TIME = "ct";
 	
 	/**
 	 * Descriptive information describing this Session implementation.
@@ -180,7 +187,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	protected transient long futureExpirationTimeOnPassivation;
 	
 	// Transient map to store meta data changes for replication.
-	protected transient Map<String, Object> metaDataModifiedMap = new HashMap<String, Object>();
+	protected transient Map<String, Object> metaDataModifiedMap = new ConcurrentHashMap<String, Object>();
 
 	protected transient boolean sipSessionsMapModified;
 	protected transient boolean httpSessionsMapModified;
@@ -1353,7 +1360,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	protected void setValid(boolean isValid) {
 		super.setValid(isValid);
 		sessionMetadataDirty();
-		metaDataModifiedMap.put("iv", isValid);
+		metaDataModifiedMap.put(IS_VALID, isValid);
 	}			
 	
 	@Override
@@ -1391,5 +1398,10 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			httpSessionsMapModified = true;
 		}
 		return wasPresent;
+	}
+	
+	@Override
+	public String getId() {
+		return key.getId();
 	}
 }

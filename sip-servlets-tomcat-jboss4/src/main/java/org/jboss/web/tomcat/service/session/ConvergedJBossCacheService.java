@@ -83,6 +83,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
    // Idea is host_name + web_app_path + session id is a unique combo.
    private String webAppPath_;
    // Idea is host_name + sip_application_name + session id is a unique combo.
+   private String sipApplicationNameHashed;
    private String sipApplicationName;
    private TransactionManager tm;
 
@@ -193,13 +194,14 @@ public class ConvergedJBossCacheService extends JBossCacheService
       if(webapp instanceof SipContext) {    	  
     	  SipContext sipApp = (SipContext) webapp;
     	  //As per JSR 289, application name should be unique
-    	  sipApplicationName = sipApp.getApplicationName();    	  
+    	  sipApplicationName = sipApp.getApplicationName();
+    	  sipApplicationNameHashed = sipApp.getApplicationNameHashed();    	  
     	  // Listen for cache changes
-          sipCacheListener_ = new SipCacheListener(cacheWrapper_, manager_, hostName_, sipApplicationName);
+          sipCacheListener_ = new SipCacheListener(cacheWrapper_, manager_, hostName_, sipApplicationNameHashed);
           proxy_.addTreeCacheListener(sipCacheListener_);
 
           // register the tcl and bring over the state for the webapp
-          Object[] sipObjs = new Object[]{SIPSESSION, hostName_, sipApplicationName};
+          Object[] sipObjs = new Object[]{SIPSESSION, hostName_, sipApplicationNameHashed};
           Fqn sipPathFqn = new Fqn( sipObjs );
           String sipFqnStr = sipPathFqn.toString();
           log_.info("Adding jboss cache listener for sip application : " + sipApplicationName + " on following fqn : " + sipFqnStr);
@@ -257,9 +259,9 @@ public class ConvergedJBossCacheService extends JBossCacheService
       // remove session data
       cacheWrapper_.evictSubtree(pathFqn);
       
-      if(sipApplicationName != null) {
+      if(sipApplicationNameHashed != null) {
 	      // Construct the fqn
-	      Object[] sipObjs = new Object[]{SIPSESSION, hostName_, sipApplicationName};
+	      Object[] sipObjs = new Object[]{SIPSESSION, hostName_, sipApplicationNameHashed};
 	      Fqn sipPathFqn = new Fqn( sipObjs );
 	
 	      String sipFqnStr = sipPathFqn.toString();
@@ -551,7 +553,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
    
    public void putSipSession(String realId, ClusteredSipSession session)
    {
-      Fqn fqn = getSipSessionFqn(session.getSipApplicationSession().getId(), realId);
+      Fqn fqn = getSipSessionFqn(session.getSipApplicationSession().getKey().getId(), realId);
       
       if (session.getReplicateSessionBody())
       {
@@ -1723,7 +1725,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
       List list = new ArrayList(6);
       list.add(SIPSESSION);
       list.add(hostName_);
-      list.add(sipApplicationName);
+      list.add(sipApplicationNameHashed);
       list.add(id);
       list.add(ATTRIBUTE);
       breakKeys(key, list);
@@ -1737,7 +1739,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
       List list = new ArrayList(6);
       list.add(SIPSESSION);
       list.add(hostName_);
-      list.add(sipApplicationName);
+      list.add(sipApplicationNameHashed);
       list.add(id);
       list.add(sessionId);
       list.add(ATTRIBUTE);
@@ -1764,7 +1766,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
    private Fqn getSipappFqn()
    {
       // /SIPSESSION/hostname/sipApplicationName
-      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationName};
+      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationNameHashed};
       return new Fqn(objs);
    }
    
@@ -1784,7 +1786,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
          return getSipappFqn();
       
       // /SIPSESSION/hostname/sipApplicationName
-      Object[] objs = new Object[]{BUDDY_BACKUP, dataOwner, SIPSESSION, hostName_, sipApplicationName};
+      Object[] objs = new Object[]{BUDDY_BACKUP, dataOwner, SIPSESSION, hostName_, sipApplicationNameHashed};
       return new Fqn(objs);
    }
    
@@ -1798,14 +1800,14 @@ public class ConvergedJBossCacheService extends JBossCacheService
    private Fqn getSipApplicationSessionFqn(String id)
    {
       // /SIPSESSION/hostname/sipApplicationName/id
-      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationName, id};
+      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationNameHashed, id};
       return new Fqn(objs);
    }
    
    private Fqn getSipSessionFqn(String id, String sessionId)
    {
       // /SIPSESSION/hostname/sipApplicationName/id/sessionId
-      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationName, id, sessionId};
+      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationNameHashed, id, sessionId};
       return new Fqn(objs);
    }
 
@@ -1819,14 +1821,14 @@ public class ConvergedJBossCacheService extends JBossCacheService
    private Fqn getSipApplicationSessionFqn(String id, String dataOwner)
    {
       // /_BUDDY_BACKUP_/dataOwner/SIPSESSION/hostname/sipApplicationName/id
-      Object[] objs = new Object[]{BUDDY_BACKUP, dataOwner, SIPSESSION, hostName_, sipApplicationName, id};
+      Object[] objs = new Object[]{BUDDY_BACKUP, dataOwner, SIPSESSION, hostName_, sipApplicationNameHashed, id};
       return new Fqn(objs);
    }
    
    private Fqn getSipSessionFqn(String id, String sessionId, String dataOwner)
    {
       // /_BUDDY_BACKUP_/dataOwner/SIPSESSION/hostname/sipApplicationName/id/sessionId
-      Object[] objs = new Object[]{BUDDY_BACKUP, dataOwner, SIPSESSION, hostName_, sipApplicationName, id, sessionId};
+      Object[] objs = new Object[]{BUDDY_BACKUP, dataOwner, SIPSESSION, hostName_, sipApplicationNameHashed, id, sessionId};
       return new Fqn(objs);
    }
 
@@ -1840,28 +1842,28 @@ public class ConvergedJBossCacheService extends JBossCacheService
    private Fqn getSipApplicationSessionAttributeFqn(String id)
    {
       // /SIPSESSION/hostName/sipapplicationname/id/ATTR
-      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationName, id, ATTRIBUTE};
+      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationNameHashed, id, ATTRIBUTE};
       return new Fqn(objs);
    }
    
    private Fqn getSipSessionAttributeFqn(String id, String sessionId)
    {
       // /SIPSESSION/hostName/sipapplicationname/id/sessionid/ATTR
-      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationName, id, sessionId, ATTRIBUTE};
+      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationNameHashed, id, sessionId, ATTRIBUTE};
       return new Fqn(objs);
    }
    
    private Fqn getSipSessionMetaAttributeFqn(String id, String sessionId)
    {
       // /SIPSESSION/hostName/sipapplicationname/id/sessionid/META
-      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationName, id, sessionId, META};
+      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationNameHashed, id, sessionId, META};
       return new Fqn(objs);
    }
    
    private Fqn getSipApplicationSessionMetaAttributeFqn(String id)
    {
       // /SIPSESSION/hostName/sipapplicationname/id/META
-      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationName, id, META};
+      Object[] objs = new Object[]{SIPSESSION, hostName_, sipApplicationNameHashed, id, META};
       return new Fqn(objs);
    }
 
@@ -2020,5 +2022,19 @@ public class ConvergedJBossCacheService extends JBossCacheService
       }
       
    }
+
+/**
+ * @param sipApplicationName the sipApplicationName to set
+ */
+public void setSipApplicationName(String sipApplicationName) {
+	this.sipApplicationName = sipApplicationName;
+}
+
+/**
+ * @return the sipApplicationName
+ */
+public String getSipApplicationName() {
+	return sipApplicationName;
+}
 
 }

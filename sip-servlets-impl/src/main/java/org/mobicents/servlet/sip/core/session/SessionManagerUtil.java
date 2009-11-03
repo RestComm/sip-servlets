@@ -186,4 +186,10 @@ public class SessionManagerUtil {
 		
 		return new SipSessionKey(fromTag, null, callId, applicationSessionId, applicationName);
 	}
+
+	public static String getSipSessionHaKey(SipSessionKey key) {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append(key.getFromTag()).append(SESSION_KEY_SEPARATOR).append(key.getCallId());
+		return stringBuilder.toString();
+	}
 }
