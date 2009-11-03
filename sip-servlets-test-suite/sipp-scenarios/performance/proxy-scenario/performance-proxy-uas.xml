@@ -54,7 +54,7 @@
     </action>
   </recv>
     
-  <pause milliseconds="300" /> 
+  <pause milliseconds="2000" /> 
   
   <send retrans="500">
     <![CDATA[
