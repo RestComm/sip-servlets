@@ -298,6 +298,12 @@
 								Proxy SipSessions are invalidated improperly on client transaction termination
 								</a>
 							</li>
+							<li>
+								<img src="green.jpeg" />
+								<a href="http://code.google.com/p/mobicents/issues/detail?id=1025">
+								SipServletListener.servletInitialized is called twice after redeployment
+								</a>
+							</li>
 						</ul>
 						<br />						
 					</p>		
