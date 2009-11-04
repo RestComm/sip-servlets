@@ -1412,8 +1412,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 		}
 	}
 	
-	@Override
-	public String getId() {
+	public String getHaId() {
 		return haId;
 	}
 }

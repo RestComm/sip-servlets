@@ -104,7 +104,7 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 //	}
 	
 	protected void populateMetaData() {
-		final String sipAppSessionId = getId();
+		final String sipAppSessionId = getHaId();
 		Long ct = (Long) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, CREATION_TIME);
 		if(ct != null) {
 			creationTime = ct;
@@ -150,7 +150,7 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 			logger.debug("processSessionRepl(): session is dirty. Will increment "
 					+ "version from: " + getVersion() + " and replicate.");
 		}
-		final String sipAppSessionKey = getId();
+		final String sipAppSessionKey = getHaId();
 		if(isNew) {
 			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, CREATION_TIME, creationTime);
 			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, INVALIDATION_POLICY, invalidationPolicy);

@@ -1400,8 +1400,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 		return wasPresent;
 	}
 	
-	@Override
-	public String getId() {
+	public String getHaId() {
 		return key.getId();
 	}
 }

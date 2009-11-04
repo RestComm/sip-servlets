@@ -117,7 +117,7 @@ public class AttributeBasedClusteredSipApplicationSession extends JBossCacheClus
 			logger.debug("processSessionRepl(): session is dirty. Will increment "
 					+ "version from: " + getVersion() + " and replicate.");
 		}
-		final String sipAppSessionKey = getId();
+		final String sipAppSessionKey = getHaId();
 		if(isNew) {
 			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "ct", creationTime);
 			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "ip", invalidationPolicy);
@@ -178,7 +178,7 @@ public class AttributeBasedClusteredSipApplicationSession extends JBossCacheClus
 
 	public void removeMyself() {
 		// This is a shortcut to remove session and it's child attributes.
-		proxy_.removeSipApplicationSession(getId());
+		proxy_.removeSipApplicationSession(getHaId());
 	}
 
 	public void removeMyselfLocal() {
@@ -187,8 +187,8 @@ public class AttributeBasedClusteredSipApplicationSession extends JBossCacheClus
 		// removeAttributesLocal call here in order to evict the ATTRIBUTE node.
 		// Otherwise empty nodes for the session root and child ATTRIBUTE will
 		// remain in the tree and screw up our list of session names.
-		proxy_.removeSipApplicationSessionAttributesLocal(getId());
-		proxy_.removeSipApplicationSessionLocal(getId());
+		proxy_.removeSipApplicationSessionAttributesLocal(getHaId());
+		proxy_.removeSipApplicationSessionLocal(getHaId());
 	}
 
 	// ------------------------------------------------ JBoss internal abstract
@@ -199,7 +199,7 @@ public class AttributeBasedClusteredSipApplicationSession extends JBossCacheClus
 	 * transient ones.
 	 */
 	protected void populateAttributes() {
-		Map map = proxy_.getSipApplicationSessionAttributes(getId());
+		Map map = proxy_.getSipApplicationSessionAttributes(getHaId());
 
 		// Preserve any local attributes that were excluded from replication
 		Map excluded = removeExcludedAttributes(attributes_);

@@ -104,9 +104,13 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		if(applicationId == null) {
 			final ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);
 			final String arText = toHeader.getTag();
-			final String[] tuple = ApplicationRoutingHeaderComposer.getAppNameAndSessionId(sipApplicationDispatcher, arText);
-			applicationName = tuple[0];
-			applicationId = tuple[1];
+			try {
+				final String[] tuple = ApplicationRoutingHeaderComposer.getAppNameAndSessionId(sipApplicationDispatcher, arText);
+				applicationName = tuple[0];
+				applicationId = tuple[1];
+			} catch(IllegalArgumentException e) {
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, e);
+			}
 			if(applicationId == null && applicationName == null) {
 				javax.sip.address.SipURI sipRequestUri = (javax.sip.address.SipURI)request.getRequestURI();
 				

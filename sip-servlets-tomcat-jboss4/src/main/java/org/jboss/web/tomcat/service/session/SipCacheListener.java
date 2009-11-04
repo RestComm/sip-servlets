@@ -29,6 +29,7 @@ import org.jboss.logging.Logger;
 import org.jboss.metadata.WebMetaData;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
 
 /**
  * Listens for distributed caches events, notifying the JBossCacheManager
@@ -78,17 +79,20 @@ public class SipCacheListener extends AbstractCacheListener
    private JBossCacheWrapper cacheWrapper_;
    private JBossCacheSipManager manager_;
    private String sipApplicationName;
+   private String sipApplicationNameHashed;
+//   private String sipApplicationNameHashed;   
    private String hostname_;
    private boolean fieldBased_;
    // When trying to ignore unwanted notifications, do we check for local activity first?
    private boolean disdainLocalActivity_;
 
-   SipCacheListener(JBossCacheWrapper wrapper, JBossCacheSipManager manager, String hostname, String sipApplicationName)
+   SipCacheListener(JBossCacheWrapper wrapper, JBossCacheSipManager manager, String hostname, String sipApplicationName, String sipApplicationNameHashed)
    {
       cacheWrapper_ = wrapper;
       manager_ = manager;
       hostname_ = hostname;
       this.sipApplicationName =  sipApplicationName;
+      this.sipApplicationNameHashed =  sipApplicationNameHashed;
       int granularity = manager_.getReplicationGranularity();
       fieldBased_ = (granularity == WebMetaData.REPLICATION_GRANULARITY_FIELD);
       // TODO decide if disdaining local activity is always good for REPL_ASYNC
@@ -102,12 +106,17 @@ public class SipCacheListener extends AbstractCacheListener
    {
 	   boolean local = ConvergedSessionReplicationContext.isSipLocallyActive();
 	   
-	   if(!local && logger.isDebugEnabled() && fqn.get(0).toString().indexOf(ConvergedJBossCacheService.SIPSESSION) != -1) {
+	   boolean isBuddy = isBuddyFqn(fqn);
+	   int size = fqn.size();
+
+	   if(isFqnSessionRootSized(size, isBuddy) && isFqnForOurSipapp(fqn, isBuddy)) {
 		   logger.debug("following node created " + fqn.toString() + " with name " +fqn.getName());
 	   }
 	   
 	   if (!fieldBased_ && local)
-	         return;	   
+	         return;	
+	   
+	   
    }
    
    public void nodeRemoved(Fqn fqn)
@@ -115,16 +124,16 @@ public class SipCacheListener extends AbstractCacheListener
 	   
       // Ignore our own activity if not field based
       boolean local = ConvergedSessionReplicationContext.isSipLocallyActive();
-      
-      if(!local && logger.isDebugEnabled() && fqn.get(0).toString().indexOf(ConvergedJBossCacheService.SIPSESSION) != -1) {
+
+      boolean isBuddy = isBuddyFqn(fqn);
+      int size = fqn.size();
+
+      if(isFqnSessionRootSized(size, isBuddy) && isFqnForOurSipapp(fqn, isBuddy)) {
     	  logger.debug("following node removed " + fqn.toString() + " with name " +fqn.getName());
 	  }
       
       if (!fieldBased_ && local)
          return;          
-      
-      boolean isBuddy = isBuddyFqn(fqn);
-      int size = fqn.size();
       
       if(isFqnSessionRootSized(size, isBuddy))
       {
@@ -132,13 +141,21 @@ public class SipCacheListener extends AbstractCacheListener
          {
             // A session has been invalidated from another node;
             // need to inform manager
-        	String sessId = null;
+        	
         	if(isFqnSipApplicationSessionRootSized(size, isBuddy)) {
-        		sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
-        		manager_.processRemoteSipApplicationSessionInvalidation(sessId);
+        		String sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
+        		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessId, sipApplicationName);
+        		manager_.processRemoteSipApplicationSessionInvalidation(sipApplicationSessionKey);
         	} else {
-        		sessId = getSipSessionIdFromFqn(fqn, isBuddy);
-        		manager_.processRemoteSipSessionInvalidation(sessId);
+        		String sipAppSessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
+        		String sessId = getSipSessionIdFromFqn(fqn, isBuddy);
+				try {
+					SipSessionKey sipSessionKey = SessionManagerUtil.parseHaSipSessionKey(sessId, sipAppSessId, sipApplicationName);
+					manager_.processRemoteSipSessionInvalidation(sipSessionKey);
+				} catch (ParseException e) {
+					logger.error("Unexpected exception while parsing the following sip session key " + sessId, e);
+					return;
+				}        		
         	}            
          }
       }
@@ -152,11 +169,19 @@ public class SipCacheListener extends AbstractCacheListener
          	if(isFqnSipApplicationSessionRootSized(size, isBuddy)) {
          		sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
          		attrKey = getSipApplicationSessionIdPojoKeyFromFqn(fqn, isBuddy);
-         		manager_.processRemoteSipApplicationSessionAttributeRemoval(sessId, attrKey);
+         		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessId, sipApplicationName);
+         		manager_.processRemoteSipApplicationSessionAttributeRemoval(sipApplicationSessionKey, attrKey);
          	} else {
+         		String sipAppSessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
          		sessId = getSipSessionIdFromFqn(fqn, isBuddy);
          		attrKey = getSipSessionIdPojoKeyFromFqn(fqn, isBuddy);
-         		manager_.processRemoteSipSessionAttributeRemoval(sessId, attrKey);
+         		try {
+					SipSessionKey sipSessionKey = SessionManagerUtil.parseHaSipSessionKey(sessId, sipAppSessId, sipApplicationName);
+					manager_.processRemoteSipSessionAttributeRemoval(sipSessionKey, attrKey);
+				} catch (ParseException e) {
+					logger.error("Unexpected exception while parsing the following sip session key " + sessId, e);
+					return;
+				}   
          	}         	
          }
          else if (local && isFqnInPojo(size, isBuddy))
@@ -165,10 +190,18 @@ public class SipCacheListener extends AbstractCacheListener
         	 String sessId = null;
          	if(isFqnSipApplicationSessionRootSized(size, isBuddy)) {
          		sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
-         		manager_.processSipApplicationSessionLocalPojoModification(sessId);
+         		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessId, sipApplicationName);
+         		manager_.processSipApplicationSessionLocalPojoModification(sipApplicationSessionKey);
          	} else {
+         		String sipAppSessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
          		sessId = getSipSessionIdFromFqn(fqn, isBuddy);
-         		manager_.processSipSessionLocalPojoModification(sessId);
+         		try {
+					SipSessionKey sipSessionKey = SessionManagerUtil.parseHaSipSessionKey(sessId, sipAppSessId, sipApplicationName);
+					manager_.processSipSessionLocalPojoModification(sipSessionKey);
+				} catch (ParseException e) {
+					logger.error("Unexpected exception while parsing the following sip session key " + sessId, e);
+					return;
+				}   
          	}
          }
       }
@@ -179,15 +212,15 @@ public class SipCacheListener extends AbstractCacheListener
 	  
       boolean local = ConvergedSessionReplicationContext.isSipLocallyActive();
       
-      if(!local && logger.isDebugEnabled() && fqn.get(0).toString().indexOf(ConvergedJBossCacheService.SIPSESSION) != -1) {
+      boolean isBuddy = isBuddyFqn(fqn);      
+      int size = fqn.size();
+      
+      if(isFqnSessionRootSized(size, isBuddy) && isFqnForOurSipapp(fqn, isBuddy)) {
     	  logger.debug("following node modified " + fqn.toString() + " with name " +fqn.getName());
 	  }
       
       if (!fieldBased_ && local)
          return;          
-      
-      boolean isBuddy = isBuddyFqn(fqn);      
-      int size = fqn.size();
       
       // We only care if this is for a session root or it's for a pojo
       if (isFqnSessionRootSized(size, isBuddy))
@@ -206,10 +239,18 @@ public class SipCacheListener extends AbstractCacheListener
     	 String sessId = null;
       	 if(isFqnSipApplicationSessionRootSized(size, isBuddy)) {
       		 sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
-      		manager_.processSipApplicationSessionLocalPojoModification(sessId);
+      		 SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessId, sipApplicationName);
+      		 manager_.processSipApplicationSessionLocalPojoModification(sipApplicationSessionKey);
       	 } else {
+      		 String sipAppSessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
       		 sessId = getSipSessionIdFromFqn(fqn, isBuddy);
-      		manager_.processSipSessionLocalPojoModification(sessId);
+      		try {
+				SipSessionKey sipSessionKey = SessionManagerUtil.parseHaSipSessionKey(sessId, sipAppSessId, sipApplicationName);
+				manager_.processSipSessionLocalPojoModification(sipSessionKey);
+			} catch (ParseException e) {
+				logger.error("Unexpected exception while parsing the following sip session key " + sessId, e);
+				return;
+			}   
       	 }         
       }
    }
@@ -232,122 +273,117 @@ public class SipCacheListener extends AbstractCacheListener
        		isSipApplicationSession = false;
        	 }
          
-   		 SipApplicationSessionKey key;
-		 try {
-			 key = SessionManagerUtil.parseSipApplicationSessionKey(sessId);
-			 ClusteredSipApplicationSession sipApplicationSession = manager_.findLocalSipApplicationSession(key, false);
-	         if (sipApplicationSession == null)
-	         {
-	            String owner = isBuddy ? getBuddyOwner(fqn) : null;
-	            // Notify the manager that an unloaded session has been updated
-	            manager_.unloadedSessionChanged(sessId, owner);
-	         }
-	         else if (sipApplicationSession.isNewData(version.intValue()))
-	         {
-	            // Need to invalidate the loaded session
-	        	 sipApplicationSession.setOutdatedVersion(version.intValue());
-	            if(log_.isTraceEnabled())
-	            {
-	               log_.trace("nodeDirty(): session in-memory data is " +
-	                          "invalidated with id: " + sessId + " and version: " +
-	                          version.intValue());
-	            }
-	         }
-	         else if (isBuddy)
-	         {
-	            // We have a local session but got a modification for the buddy tree.
-	            // This means another node is in the process of taking over the session;
-	            // we don't worry about it
-	            ;
-	         }
-	         else 
-	         {
-	            // This could be an issue but can happen legitimately in unusual 
-	            // circumstances, so just log something at INFO, not WARN
-	            
-	            // Unusual circumstance: create session; don't touch session again
-	            // until timeout period expired; fail over to another node after
-	            // timeout but before session expiration thread has run. Existing
-	            // session will be expired locally on new node and a new session created.
-	            // When that session replicates, the version id will match the still
-	            // existing cached session on the first node.  Unlikely, but due
-	            // to design of a unit test, it happens every testsuite run :-)
-	            log_.info("Possible concurrency problem: Replicated version id " + 
-	                       version + " matches in-memory version for session " + sessId);
-	            
-	            // Mark the loaded session outdated anyway; in the above mentioned
-	            // "unusual circumstance" that's the correct thing to do
-	            sipApplicationSession.setOutdatedVersion(version.intValue());
-	         }
-	       	 if(!isSipApplicationSession) {
-	       		sessId = getSipSessionIdFromFqn(fqn, isBuddy);
-	       		ClusteredSipSession session = null;
-				try {
-					session = manager_.findLocalSipSession(SessionManagerUtil.parseSipSessionKey(sessId), false, sipApplicationSession);
-					if (session == null)
-			         {
-			            String owner = isBuddy ? getBuddyOwner(fqn) : null;
-			            // Notify the manager that an unloaded session has been updated
-			            manager_.unloadedSipSessionChanged(sessId, owner);
-			         }
-			         else if (session.isNewData(version.intValue()))
-			         {
-			            // Need to invalidate the loaded session
-			            session.setOutdatedVersion(version.intValue());
-			            if(log_.isTraceEnabled())
-			            {
-			               log_.trace("nodeDirty(): session in-memory data is " +
-			                          "invalidated with id: " + sessId + " and version: " +
-			                          version.intValue());
-			            }
-			         }
-			         else if (isBuddy)
-			         {
-			            // We have a local session but got a modification for the buddy tree.
-			            // This means another node is in the process of taking over the session;
-			            // we don't worry about it
-			            ;
-			         }
-			         else 
-			         {
-			            // This could be an issue but can happen legitimately in unusual 
-			            // circumstances, so just log something at INFO, not WARN
-			            
-			            // Unusual circumstance: create session; don't touch session again
-			            // until timeout period expired; fail over to another node after
-			            // timeout but before session expiration thread has run. Existing
-			            // session will be expired locally on new node and a new session created.
-			            // When that session replicates, the version id will match the still
-			            // existing cached session on the first node.  Unlikely, but due
-			            // to design of a unit test, it happens every testsuite run :-)
-			            log_.info("Possible concurrency problem: Replicated version id " + 
-			                       version + " matches in-memory version for session " + sessId);
-			            
-			            // Mark the loaded session outdated anyway; in the above mentioned
-			            // "unusual circumstance" that's the correct thing to do
-			            session.setOutdatedVersion(version.intValue());
-			         }
-				} catch (ParseException e) {
-					logger.error("An unexpected exception happened while parsing the sip session id : "+ sessId, e);
-				}
-	       	 }
-		} catch (ParseException pe) {
-			logger.error("An unexpected exception happened while parsing the sip app session id : "+ sessId, pe);
-		}         
-      }
-      else
-      {
-         log_.warn("No VERSION_KEY attribute found in " + fqn);
-      }
+		 
+		 SipApplicationSessionKey key = new SipApplicationSessionKey(sessId, sipApplicationName);
+		 ClusteredSipApplicationSession sipApplicationSession = manager_.findLocalSipApplicationSession(key, false);
+         if (sipApplicationSession == null)
+         {
+        	 return;
+//            String owner = isBuddy ? getBuddyOwner(fqn) : null;
+//            // Notify the manager that an unloaded session has been updated
+//            manager_.unloadedSipApplicationSessionChanged(key, owner);
+         }
+         else if (sipApplicationSession.isNewData(version.intValue()))
+         {
+            // Need to invalidate the loaded session
+        	 sipApplicationSession.setOutdatedVersion(version.intValue());
+            if(log_.isTraceEnabled())
+            {
+               log_.trace("nodeDirty(): session in-memory data is " +
+                          "invalidated with id: " + sessId + " and version: " +
+                          version.intValue());
+            }
+         }
+         else if (isBuddy)
+         {
+            // We have a local session but got a modification for the buddy tree.
+            // This means another node is in the process of taking over the session;
+            // we don't worry about it
+            ;
+         }
+         else 
+         {
+            // This could be an issue but can happen legitimately in unusual 
+            // circumstances, so just log something at INFO, not WARN
+            
+            // Unusual circumstance: create session; don't touch session again
+            // until timeout period expired; fail over to another node after
+            // timeout but before session expiration thread has run. Existing
+            // session will be expired locally on new node and a new session created.
+            // When that session replicates, the version id will match the still
+            // existing cached session on the first node.  Unlikely, but due
+            // to design of a unit test, it happens every testsuite run :-)
+            log_.info("Possible concurrency problem: Replicated version id " + 
+                       version + " matches in-memory version for session " + sessId);
+            
+            // Mark the loaded session outdated anyway; in the above mentioned
+            // "unusual circumstance" that's the correct thing to do
+            sipApplicationSession.setOutdatedVersion(version.intValue());
+         }
+       	 if(!isSipApplicationSession) {
+       		String sipSessionId = getSipSessionIdFromFqn(fqn, isBuddy);
+       		ClusteredSipSession session = null;
+			try {
+				SipSessionKey sipSessionKey = SessionManagerUtil.parseHaSipSessionKey(sipSessionId, sessId, sipApplicationName);				
+				session = manager_.findLocalSipSession(sipSessionKey, false, sipApplicationSession);
+				if (session == null)
+		         {
+					return;
+//		            String owner = isBuddy ? getBuddyOwner(fqn) : null;
+//		            // Notify the manager that an unloaded session has been updated
+//		            manager_.unloadedSipSessionChanged(sipSessionKey, owner);
+		         }
+		         else if (session.isNewData(version.intValue()))
+		         {
+		            // Need to invalidate the loaded session
+		            session.setOutdatedVersion(version.intValue());
+		            if(log_.isTraceEnabled())
+		            {
+		               log_.trace("nodeDirty(): session in-memory data is " +
+		                          "invalidated with id: " + sipSessionId + " and version: " +
+		                          version.intValue());
+		            }
+		         }
+		         else if (isBuddy)
+		         {
+		            // We have a local session but got a modification for the buddy tree.
+		            // This means another node is in the process of taking over the session;
+		            // we don't worry about it
+		            ;
+		         }
+		         else 
+		         {
+		            // This could be an issue but can happen legitimately in unusual 
+		            // circumstances, so just log something at INFO, not WARN
+		            
+		            // Unusual circumstance: create session; don't touch session again
+		            // until timeout period expired; fail over to another node after
+		            // timeout but before session expiration thread has run. Existing
+		            // session will be expired locally on new node and a new session created.
+		            // When that session replicates, the version id will match the still
+		            // existing cached session on the first node.  Unlikely, but due
+		            // to design of a unit test, it happens every testsuite run :-)
+		            log_.info("Possible concurrency problem: Replicated version id " + 
+		                       version + " matches in-memory version for session " + sipSessionId);
+		            
+		            // Mark the loaded session outdated anyway; in the above mentioned
+		            // "unusual circumstance" that's the correct thing to do
+		            session.setOutdatedVersion(version.intValue());
+		         }
+			} catch (ParseException e) {
+				logger.error("An unexpected exception happened while parsing the sip session id : "+ sessId, e);
+			}
+       	 }
+      }      
    }
 
    private boolean isFqnForOurSipapp(Fqn fqn, boolean isBuddy)
    {
       try
       {
-         if (sipApplicationName.equals(fqn.get(isBuddy ? BUDDY_BACKUP_ROOT_OWNER_SIZE + SIPAPPNAME_FQN_INDEX : SIPAPPNAME_FQN_INDEX))
+         if (sipApplicationNameHashed.equals(fqn.get(isBuddy ? BUDDY_BACKUP_ROOT_OWNER_SIZE + SIPAPPNAME_FQN_INDEX : SIPAPPNAME_FQN_INDEX))
                && hostname_.equals(fqn.get(isBuddy ? BUDDY_BACKUP_ROOT_OWNER_SIZE + HOSTNAME_FQN_INDEX : HOSTNAME_FQN_INDEX))
-               && JBossCacheService.SESSION.equals(fqn.get(isBuddy ? BUDDY_BACKUP_ROOT_OWNER_SIZE + SIPSESSION_FQN_INDEX : SIPSESSION_FQN_INDEX)))
+               && ConvergedJBossCacheService.SIPSESSION.equals(fqn.get(isBuddy ? BUDDY_BACKUP_ROOT_OWNER_SIZE + SIPSESSION_FQN_INDEX : SIPSESSION_FQN_INDEX)))
             return true;
       }
       catch (IndexOutOfBoundsException e)
@@ -360,7 +396,7 @@ public class SipCacheListener extends AbstractCacheListener
    
    private static boolean isFqnSessionRootSized(int size, boolean isBuddy)
    {
-      return size == (isBuddy ? BUDDY_BACKUP_ROOT_OWNER_SIZE + SIPAPPSESSION_FQN_SIZE : SIPAPPSESSION_FQN_SIZE) || 
+      return size == (isBuddy ? BUDDY_BACKUP_ROOT_OWNER_SIZE + SIPAPPSESSION_FQN_SIZE: SIPAPPSESSION_FQN_SIZE) || 
       	size == (isBuddy ? BUDDY_BACKUP_ROOT_OWNER_SIZE + SIPSESSION_FQN_SIZE : SIPSESSION_FQN_SIZE);
    }
    

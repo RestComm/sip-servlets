@@ -122,7 +122,7 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 					+ "version from: " + getVersion() + " and replicate.");
 		}
 		final String sipAppSessionKey = sipApplicationSessionKey.getId();
-		final String sipSessionKey = getId();
+		final String sipSessionKey = getHaId();
 		if(isNew) {
 			proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, CREATION_TIME, creationTime);
 			proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, INVALIDATION_POLICY, invalidationPolicy);
@@ -193,7 +193,7 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 
 	public void removeMyself() {
 		// This is a shortcut to remove session and it's child attributes.
-		proxy_.removeSipSession(sipApplicationSessionKey.getId(), getId());
+		proxy_.removeSipSession(sipApplicationSessionKey.getId(), getHaId());
 	}
 
 	public void removeMyselfLocal() {
@@ -202,8 +202,8 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 		// removeAttributesLocal call here in order to evict the ATTRIBUTE node.
 		// Otherwise empty nodes for the session root and child ATTRIBUTE will
 		// remain in the tree and screw up our list of session names.
-		proxy_.removeSipSessionAttributesLocal(sipApplicationSessionKey.getId(), getId());
-		proxy_.removeSipSessionLocal(sipApplicationSessionKey.getId(), getId());
+		proxy_.removeSipSessionAttributesLocal(sipApplicationSessionKey.getId(), getHaId());
+		proxy_.removeSipSessionLocal(sipApplicationSessionKey.getId(), getHaId());
 	}
 
 	// ------------------------------------------------ JBoss internal abstract
@@ -214,7 +214,7 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 	 * transient ones.
 	 */
 	protected void populateAttributes() {
-		Map map = proxy_.getSipSessionAttributes(sipApplicationSessionKey.getId(), getId());
+		Map map = proxy_.getSipSessionAttributes(sipApplicationSessionKey.getId(), getHaId());
 
 		// Preserve any local attributes that were excluded from replication
 		Map excluded = removeExcludedAttributes(attributes_);

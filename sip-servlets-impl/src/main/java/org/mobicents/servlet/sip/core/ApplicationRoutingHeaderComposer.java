@@ -48,7 +48,7 @@ public class ApplicationRoutingHeaderComposer {
 				final String hashedAppName = tokens[1];
 				String appName = sipApplicationDispatcher.getApplicationNameFromHash(hashedAppName);
 				if(appName == null) 
-					throw new NullPointerException("The hash doesn't correspond to any app name: " + hashedAppName);
+					throw new IllegalArgumentException("The hash doesn't correspond to any app name: " + hashedAppName);
 				tuple[0] = appName;				
 				tuple[1] = tokens[2];
 			}

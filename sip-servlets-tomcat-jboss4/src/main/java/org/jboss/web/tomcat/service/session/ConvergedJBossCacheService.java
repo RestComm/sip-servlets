@@ -197,7 +197,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
     	  sipApplicationName = sipApp.getApplicationName();
     	  sipApplicationNameHashed = sipApp.getApplicationNameHashed();    	  
     	  // Listen for cache changes
-          sipCacheListener_ = new SipCacheListener(cacheWrapper_, manager_, hostName_, sipApplicationNameHashed);
+          sipCacheListener_ = new SipCacheListener(cacheWrapper_, manager_, hostName_, sipApplicationName, sipApplicationNameHashed);
           proxy_.addTreeCacheListener(sipCacheListener_);
 
           // register the tcl and bring over the state for the webapp
@@ -519,7 +519,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
       // need to fix the version
       if (firstLoad)
       {         
-    	  Fqn fqn = getSipApplicationSessionFqn(toLoad.getId());
+    	  Fqn fqn = getSipApplicationSessionFqn(toLoad.getHaId());
     	  Integer ver = (Integer) cacheWrapper_.get(fqn, VERSION_KEY);
     	  if (ver != null)
             toLoad.setVersion(ver.intValue());

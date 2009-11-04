@@ -186,6 +186,27 @@ public class SessionManagerUtil {
 		
 		return new SipSessionKey(fromTag, null, callId, applicationSessionId, applicationName);
 	}
+	
+	
+	/**
+	 * Parse a sip application key that was previously generated and put as an http request param
+	 * through the encodeURL method of SipApplicationSession
+	 * @param sipSessionKey the stringified version of the sip application key
+	 * @return the corresponding sip application session key
+	 * @throws ParseException if the stringfied key cannot be parse to a valid key
+	 */
+	public static SipSessionKey parseHaSipSessionKey(
+			String sipSessionKey, String sipAppSessionId, String sipApplicationName) throws ParseException {
+		
+		if(logger.isInfoEnabled()) {
+			logger.info("sipSession key to parse " + sipSessionKey );
+		}
+		StringTokenizer stringTokenizer = new StringTokenizer(sipSessionKey, SESSION_KEY_SEPARATOR);
+		String fromTag = stringTokenizer.nextToken();
+		String callId = stringTokenizer.nextToken();
+		
+		return new SipSessionKey(fromTag, null, callId, sipAppSessionId, sipApplicationName);
+	}
 
 	public static String getSipSessionHaKey(SipSessionKey key) {
 		StringBuilder stringBuilder = new StringBuilder();

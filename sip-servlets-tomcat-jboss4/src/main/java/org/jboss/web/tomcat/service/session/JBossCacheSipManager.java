@@ -16,7 +16,6 @@
  */
 package org.jboss.web.tomcat.service.session;
 
-import java.text.ParseException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -569,45 +568,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			proxy_.removeSessionLocal(realId);
 			unloadedSessions_.remove(realId);
 		}
-	}
-	
-	/**
-	 * Clear the underlying cache store and also pojo that has the observers.
-	 */
-	protected void clearSipApplicationSessions() {
-		// First, the sessions we have actively loaded
-		ClusteredSession[] sessions = findLocalSessions();
-		for (int i = 0; i < sessions.length; i++) {
-			ClusteredSession ses = sessions[i];
-			if (log_.isDebugEnabled()) {
-				log_
-						.debug("clearSessions(): clear session by expiring: "
-								+ ses);
-			}
-			boolean notify = true;
-			boolean localCall = true;
-			boolean localOnly = true;
-			try {
-				ses.expire(notify, localCall, localOnly);
-			} catch (Throwable t) {
-				log_.warn("clearSessions(): Caught exception expiring session "
-						+ ses.getIdInternal(), t);
-			} finally {
-				// Guard against leaking memory if anything is holding a
-				// ref to the session by clearing its internal state
-				ses.recycle();
-			}
-		}
-
-		// Next, the local copy of the distributed cache
-		Map unloaded = new HashMap(unloadedSipSessions_);
-		Set keys = unloaded.keySet();
-		for (Iterator it = keys.iterator(); it.hasNext();) {
-			String realId = (String) it.next();
-			proxy_.removeSipApplicationSessionLocal(realId);
-			unloadedSipSessions_.remove(realId);
-		}
-	}
+	}	
 
 	/**
 	 * Create a new session with a generated id.
@@ -1955,16 +1916,10 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		}
 	}
 	
-	public void processRemoteSipApplicationSessionAttributeRemoval(String realId, String attrKey) {
-		SipApplicationSessionKey sipApplicationSessionKey;
-		try {
-			sipApplicationSessionKey = SessionManagerUtil.parseSipApplicationSessionKey(realId);
-		} catch (ParseException e) {
-			logger.error("Unexpected exception while parsing the following sip application session key " + realId, e);
-			return;
-		}
+	public void processRemoteSipApplicationSessionAttributeRemoval(SipApplicationSessionKey sipApplicationSessionKey, String attrKey) {		
 		ClusteredSipApplicationSession session = findLocalSipApplicationSession(sipApplicationSessionKey, false);
 		if (session != null) {
+			final String realId = sipApplicationSessionKey.toString();
 			boolean localCall = false; // call is due to remote event
 			boolean localOnly = true; // don't call back into cache
 			boolean notify = false; // SRV.10.7 gives us leeway
@@ -1990,16 +1945,10 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		}
 	}
 
-	public void processRemoteSipSessionAttributeRemoval(String realId, String attrKey) {
-		SipSessionKey sipSessionKey;
-		try {
-			sipSessionKey = SessionManagerUtil.parseSipSessionKey(realId);
-		} catch (ParseException e) {
-			logger.error("Unexpected exception while parsing the following sip session key " + realId, e);
-			return;
-		}
+	public void processRemoteSipSessionAttributeRemoval(SipSessionKey sipSessionKey, String attrKey) {	
 		ClusteredSipSession session = findLocalSipSession(sipSessionKey, false, null);
 		if (session != null) {
+			final String realId = sipSessionKey.toString();
 			boolean localCall = false; // call is due to remote event
 			boolean localOnly = true; // don't call back into cache
 			boolean notify = false; // SRV.10.7 gives us leeway
@@ -2068,17 +2017,11 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		}
 	}
 
-	public void processRemoteSipApplicationSessionInvalidation(String realId) {
-		// Remove the session from our local map
-		SipApplicationSessionKey sipApplicationSessionKey;
-		try {
-			sipApplicationSessionKey = SessionManagerUtil.parseSipApplicationSessionKey(realId);
-		} catch (ParseException e) {
-			logger.error("Unexpected exception while parsing the following sip application session key " + realId, e);
-			return;
-		}
+	public void processRemoteSipApplicationSessionInvalidation(SipApplicationSessionKey sipApplicationSessionKey) {
+		// Remove the session from our local map			
 		ClusteredSipApplicationSession session = (ClusteredSipApplicationSession) 
 			sipManagerDelegate.removeSipApplicationSession(sipApplicationSessionKey);
+		final String realId = sipApplicationSessionKey.toString();
 		if (session == null) {
 			// We weren't managing the session anyway. But remove it
 			// from the list of cached sessions we haven't loaded
@@ -2119,16 +2062,10 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		}
 	}
 	
-	public void processRemoteSipSessionInvalidation(String realId) {
-		// Remove the session from our local map
-		SipSessionKey sipSessionKey;
-		try {
-			sipSessionKey = SessionManagerUtil.parseSipSessionKey(realId);
-		} catch (ParseException e) {
-			logger.error("Unexpected exception while parsing the following sip session key " + realId, e);
-			return;
-		}
+	public void processRemoteSipSessionInvalidation(SipSessionKey sipSessionKey) {
+		// Remove the session from our local map		
 		ClusteredSipSession session = (ClusteredSipSession) sipManagerDelegate.removeSipSession(sipSessionKey);
+		final String realId = sipSessionKey.toString();
 		if (session == null) {
 			// We weren't managing the session anyway. But remove it
 			// from the list of cached sessions we haven't loaded
@@ -2183,36 +2120,22 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		}
 	}
 	
-	public void processSipApplicationSessionLocalPojoModification(String realId) {
-		SipApplicationSessionKey sipApplicationSessionKey;
-		try {
-			sipApplicationSessionKey = SessionManagerUtil.parseSipApplicationSessionKey(realId);
-		} catch (ParseException e) {
-			logger.error("Unexpected exception while parsing the following sip application session key " + realId, e);
-			return;
-		}
+	public void processSipApplicationSessionLocalPojoModification(SipApplicationSessionKey sipApplicationSessionKey) {
 		ClusteredSipApplicationSession session = findLocalSipApplicationSession(sipApplicationSessionKey, false);
 		if (session != null) {
 			if (logger.isDebugEnabled()) {
-				log_.debug("Marking attributes of session " + realId
+				log_.debug("Marking attributes of session " + sipApplicationSessionKey
 						+ " dirty due to POJO modification");
 			}
 			session.sessionAttributesDirty();
 		}
 	}
 	
-	public void processSipSessionLocalPojoModification(String realId) {
-		SipSessionKey sipSessionKey;
-		try {
-			sipSessionKey = SessionManagerUtil.parseSipSessionKey(realId);
-		} catch (ParseException e) {
-			logger.error("Unexpected exception while parsing the following sip session key " + realId, e);
-			return;
-		}
+	public void processSipSessionLocalPojoModification(SipSessionKey sipSessionKey) {		
 		ClusteredSipSession session = findLocalSipSession(sipSessionKey, false, null);
 		if (session != null) {
 			if (logger.isDebugEnabled()) {
-				log_.debug("Marking attributes of session " + realId
+				log_.debug("Marking attributes of session " + sipSessionKey
 						+ " dirty due to POJO modification");
 			}
 			session.sessionAttributesDirty();
@@ -2263,15 +2186,15 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	 *            the owner of the session. Can be <code>null</code> if the
 	 *            owner is unknown.
 	 */
-	protected void unloadedSipSessionChanged(String realId, String dataOwner) {
-		Object obj = unloadedSipSessions_.put(realId, new OwnedSessionUpdate(
+	protected void unloadedSipSessionChanged(SipSessionKey key, String dataOwner) {
+		Object obj = unloadedSipSessions_.put(key, new OwnedSessionUpdate(
 				dataOwner, System.currentTimeMillis()));
 		if (logger.isDebugEnabled()) {
 			if (obj == null) {
-				log_.debug("New session " + realId
-						+ " added to unloaded session map");
+				log_.debug("New session " + key
+						+ " added to unloaded sip session map");
 			} else {
-				log_.debug("Updated timestamp for unloaded session " + realId);
+				log_.debug("Updated timestamp for unloaded sip session " + key);
 			}
 		}
 	}
@@ -2286,15 +2209,15 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	 *            the owner of the session. Can be <code>null</code> if the
 	 *            owner is unknown.
 	 */
-	protected void unloadedSipApplicationSessionChanged(String realId, String dataOwner) {
-		Object obj = unloadedSessions_.put(realId, new OwnedSessionUpdate(
+	protected void unloadedSipApplicationSessionChanged(SipApplicationSessionKey key, String dataOwner) {
+		Object obj = unloadedSipApplicationSessions_.put(key, new OwnedSessionUpdate(
 				dataOwner, System.currentTimeMillis()));
 		if (logger.isDebugEnabled()) {
 			if (obj == null) {
-				log_.debug("New session " + realId
-						+ " added to unloaded session map");
+				log_.debug("New session " + key
+						+ " added to unloaded sip application session map");
 			} else {
-				log_.debug("Updated timestamp for unloaded session " + realId);
+				log_.debug("Updated timestamp for unloaded sip application session " + key);
 			}
 		}
 	}
