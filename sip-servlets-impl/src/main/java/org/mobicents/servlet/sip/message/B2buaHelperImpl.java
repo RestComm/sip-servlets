@@ -486,18 +486,20 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			throw new NullPointerException("the argument is null");
 		}
 		final MobicentsSipSession key = (MobicentsSipSession) session;
+		final SipSessionKey sipSessionKey = key.getKey();
 		if(checkSession) {
 			if(!session.isValid() || 
 					State.TERMINATED.equals(key.getState()) ||
-					sessionMap.get(key.getKey()) == null) {
+					sessionMap.get(sipSessionKey) == null) {
 				throw new IllegalArgumentException("the session is not currently linked to another session or it has been terminated");
 			}		
 		}
-		final SipSessionKey value  = this.sessionMap.get(key.getKey());
+		final SipSessionKey value  = this.sessionMap.get(sipSessionKey);
 		if (value != null) {
 			this.sessionMap.remove(value);
 		}
-		this.sessionMap.remove(key.getKey());
+		this.sessionMap.remove(sipSessionKey);
+		this.originalRequestMap.remove(sipSessionKey);
 		dumpLinkedSessions();
 	}
 	
