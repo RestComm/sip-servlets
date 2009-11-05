@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ListIterator;
 
 import javax.servlet.ServletException;
+import javax.servlet.sip.SipSession.State;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
@@ -46,6 +47,7 @@ import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
+import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -233,6 +235,13 @@ public class ResponseDispatcher extends MessageDispatcher {
 								}
 								if(proxyBranch.getProxy().getSupervised() && response.getStatusCode() != Response.TRYING) {
 									callServlet(sipServletResponse);
+								}
+								if(sipServletResponse.getStatus() == 487 && ((ProxyImpl)proxyBranch.getProxy()).allResponsesHaveArrived()) {
+									session.setState(State.TERMINATED);
+									session.setInvalidateWhenReady(true);
+									if(logger.isDebugEnabled()) {
+										logger.debug("Received 487 on a proxy branch and we are not waiting on other branches. Setting state to TERMINATED for " + this.toString());
+									}
 								}
 								// Handle it at the branch
 								proxyBranch.onResponse(sipServletResponse); 

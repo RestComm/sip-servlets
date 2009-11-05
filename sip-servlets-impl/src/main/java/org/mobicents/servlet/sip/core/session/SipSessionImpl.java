@@ -1210,8 +1210,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 				}
 			}	
 			if(!hasOngoingSubscriptions) {
-				setState(State.TERMINATED);
-				setReadyToInvalidate(true);				
+				if(getProxy() == null || response.getStatus() != 487) {
+					setState(State.TERMINATED);
+					setReadyToInvalidate(true);
+				}
 			}
 			okToByeSentOrReceived = true;
 			
