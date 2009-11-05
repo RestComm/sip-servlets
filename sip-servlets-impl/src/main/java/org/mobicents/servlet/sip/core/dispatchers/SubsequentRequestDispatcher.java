@@ -140,8 +140,13 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						}				
 						return ;
 					} else {
-						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request +
-								"in this popped routed header " + poppedRouteHeader);
+						if(poppedRouteHeader != null) {
+							throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request +
+								"in this popped routed header " + poppedRouteHeader + ", it may already have been invalidated or timed out");
+						} else {
+							throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request +
+									", it may already have been invalidated or timed out");
+						}
 					}
 				}
 			} 

@@ -185,14 +185,14 @@ public class ResponseDispatcher extends MessageDispatcher {
 			}					
 			
 			if(tmpSession == null) {
-				logger.error("Dropping the response since no active sip session has been found for it : " + response);
+				logger.warn("Dropping the response since no active sip session has been found for it : " + response + ", it may already have been invalidated");
 				return ;
 			} else {
 				sipServletResponse.setSipSessionKey(sessionKey);					
 			}			
 			
-			if(logger.isInfoEnabled()) {
-				logger.info("route response on following session " + tmpSession.getId());
+			if(logger.isDebugEnabled()) {
+				logger.debug("route response on following session " + tmpSession.getId());
 			}
 
 			final MobicentsSipSession session = tmpSession;
