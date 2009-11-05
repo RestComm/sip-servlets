@@ -129,6 +129,24 @@ public class SequentialProxyTest extends SipServletTestCase {
 			fail("This party must not ever be contacted");
 	}
 	
+	public void testOKRetransmissionsReachApplication() {
+		this.shootme.init("stackName");
+		this.cutme.init();
+		this.shootist.pauseBeforeAck = 4000;
+		this.shootist.init("sequential-retransmission", false);
+		for (int q = 0; q < 2; q++) {
+			if (shootist.ended == false || cutme.canceled == false)
+				try {
+					Thread.sleep(TIMEOUT);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+		if (shootist.ended == false)
+			fail("Conversation not complete!");
+	}
+	
 	public void testFirstTargetRespondsBusy() {
 		this.shootme.inviteResponseCode = 483;
 		this.shootme.init("stackName");

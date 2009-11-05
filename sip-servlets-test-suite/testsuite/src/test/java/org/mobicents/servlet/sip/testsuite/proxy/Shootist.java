@@ -96,6 +96,7 @@ public class Shootist implements SipListener {
 	public boolean okToInviteRecevied = false;
 	
 	public int pauseBeforeBye = 3000;
+	public int pauseBeforeAck = 0;
 	
 	int count = 0;
 	
@@ -245,6 +246,7 @@ public class Shootist implements SipListener {
 		try {
 			if (response.getStatusCode() == Response.OK) {
 				if (cseq.getMethod().equals(Request.INVITE)) {
+					Thread.sleep(pauseBeforeAck);
 					ackRequest = dialog.createAck(cseq.getSeqNumber());
 					if(forkingProxy) {
 						logger.info("dialog = " + dialog);
