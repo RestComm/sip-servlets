@@ -105,8 +105,11 @@ public class ConcurrentyControlSipSessionIsolationTest extends SipServletTestCas
 		Thread.sleep(2000);
 //		long startTime = System.currentTimeMillis();
 		sender.sendInDialogSipRequest("INFO", "1", "text", "plain", null);
+		Thread.sleep(100);
 		sender.sendInDialogSipRequest("INFO", "2", "text", "plain", null);
+		Thread.sleep(100);
 		sender.sendInDialogSipRequest("INFO", "3", "text", "plain", null);
+		Thread.sleep(100);
 		sender.sendBye();
 		Thread.sleep(20000);
 //		long elapsedTime = sender.getLastInfoResponseTime() - startTime;
@@ -133,8 +136,11 @@ public class ConcurrentyControlSipSessionIsolationTest extends SipServletTestCas
 		Thread.sleep(2000);
 //		long startTime = System.currentTimeMillis();
 		sender.sendInDialogSipRequest("INFO", "1", "text", "plain", null);
+		Thread.sleep(100);
 		sender.sendInDialogSipRequest("INFO", "2", "text", "plain", null);
+		Thread.sleep(100);
 		sender.sendInDialogSipRequest("INFO", "3", "text", "plain", null);
+		Thread.sleep(100);
 		sender.sendBye();
 		Thread.sleep(20000);
 //		long elapsedTime = sender.getLastInfoResponseTime() - startTime;
@@ -161,10 +167,13 @@ public class ConcurrentyControlSipSessionIsolationTest extends SipServletTestCas
 		Thread.sleep(3000);
 //		long startTime = System.currentTimeMillis();
 		sender.sendInDialogSipRequest("INFO", "1", "text", "plain", null);
+		Thread.sleep(100);
 		sender.sendInDialogSipRequest("INFO", "2", "text", "plain", null);
+		Thread.sleep(100);
 		sender.sendInDialogSipRequest("INFO", "3", "text", "plain", null);
+		Thread.sleep(100);
 		sender.sendBye();
-		Thread.sleep(10000);
+		Thread.sleep(20000);
 //		long elapsedTime = sender.getLastInfoResponseTime() - startTime;
 //		assertTrue(elapsedTime<7000);
 		assertTrue(sender.isServerErrorReceived());

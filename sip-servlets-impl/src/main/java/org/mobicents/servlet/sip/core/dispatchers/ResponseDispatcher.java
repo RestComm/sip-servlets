@@ -196,11 +196,12 @@ public class ResponseDispatcher extends MessageDispatcher {
 			}
 
 			final MobicentsSipSession session = tmpSession;
-			final TransactionApplicationData finalApplicationData = applicationData;
+			final TransactionApplicationData finalApplicationData = applicationData;						
+			
 			final DispatchTask dispatchTask = new DispatchTask(sipServletResponse, sipProvider) {
 
 				public void dispatch() throws DispatcherException {
-					sipContext.enterSipApp(null, sipServletResponse, sipManager, true, true);
+					sipContext.enterSipAppHa(null, sipServletResponse, true, true);
 					try {
 						try {
 							session.setSessionCreatingTransaction(clientTransaction);
@@ -283,14 +284,18 @@ public class ResponseDispatcher extends MessageDispatcher {
 							//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
 						}
 					} finally {
-						sipContext.exitSipApp(null, sipServletResponse);
+						sipContext.exitSipAppHa(null, sipServletResponse);
+						sipContext.exitSipApp(null, sipServletResponse);						
 					}
 				}
 			};
-			// if the flag is set we bypass the executor 
+			// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that
+			// the tx serialization is preserved
+			sipContext.enterSipApp(null, sipServletResponse);
+			// if the flag is set we bypass the executor, the bypassExecutor flag should be made deprecated 
 			if(sipApplicationDispatcher.isBypassResponseExecutor() || ConcurrencyControlMode.Transaction.equals((sipContext.getConcurrencyControlMode()))) {
 				dispatchTask.dispatchAndHandleExceptions();
-			} else {
+			} else {				
 				getConcurrencyModelExecutorService(sipContext, sipServletMessage).execute(dispatchTask);				
 			}
 		} else {

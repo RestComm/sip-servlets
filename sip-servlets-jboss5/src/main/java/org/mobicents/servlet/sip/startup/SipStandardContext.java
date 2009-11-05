@@ -829,7 +829,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	/**
 	 * {@inheritDoc}
 	 */
-	public SipManager getSipManager() {
+	public final SipManager getSipManager() {
 		return (SipManager)manager;
 	}
 	
@@ -866,7 +866,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
         
     }
 
-    public void enterSipApp(SipServletRequestImpl request, SipServletResponseImpl response, SipManager manager, boolean startCacheActivity, boolean bindSessions) {		
+    public void enterSipApp(SipServletRequestImpl request, SipServletResponseImpl response) {		
 		switch (concurrencyControlMode) {
 			case SipSession:
 				MobicentsSipSession sipSession = null;
@@ -898,11 +898,14 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				break;
 			case None:
 				break;
-		}
+		}		
+	}
+    
+    public void enterSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response, boolean startCacheActivity, boolean bindSessions) {		
 		if(getDistributable() && hasDistributableManager) {
 			startBatchTransaction();
 			if(bindSessions) {
-				ConvergedSessionReplicationContext.enterSipappAndBindSessions(request, response, manager, startCacheActivity);
+				ConvergedSessionReplicationContext.enterSipappAndBindSessions(request, response, getSipManager(), startCacheActivity);
 			} else {
 				ConvergedSessionReplicationContext.enterSipapp(request, response, startCacheActivity);
 			}
@@ -935,7 +938,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				break;
 			case None:
 				break;
-		}
+		}		
+	}
+	
+	public void exitSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response) {		
 		if (getDistributable() && hasDistributableManager) {
 			if(logger.isInfoEnabled()) {
 				if(request != null) {
@@ -1012,7 +1018,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if(logger.isDebugEnabled()) {
 			logger.debug(children.length + " container to notify of servlet initialization");
 		}
-		enterSipApp(null, null, null, true, false);
+		enterSipApp(null, null);
+		enterSipAppHa(null, null, true, false);
 		try {
 			for (Container container : children) {
 				if(logger.isDebugEnabled()) {
@@ -1081,7 +1088,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				}
 			}
 		} finally {
-			exitSipApp(null, null);
+			exitSipAppHa(null, null);
+			exitSipApp(null, null);			
 		}
 		return ok;
 	}

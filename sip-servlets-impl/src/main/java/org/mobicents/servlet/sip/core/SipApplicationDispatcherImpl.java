@@ -543,7 +543,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, requestTransaction, request, sipProvider);				
 	                return;
 				} catch ( TransactionAlreadyExistsException taex ) {
-					// Already processed this request so just return.
+					// This is a retransmission so just return.
 					return;				
 				} 
 			} 	

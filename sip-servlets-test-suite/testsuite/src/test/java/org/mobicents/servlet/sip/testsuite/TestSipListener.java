@@ -1980,7 +1980,7 @@ public class TestSipListener implements SipListener {
 		}
 		
 		addSpecificHeaders(method, message);
-		
+		message.removeHeader(ViaHeader.NAME);
 		ClientTransaction clientTransaction = sipProvider.getNewClientTransaction(message);
 		dialog.sendRequest(clientTransaction);
 	}

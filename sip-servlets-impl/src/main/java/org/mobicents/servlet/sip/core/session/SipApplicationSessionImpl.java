@@ -106,11 +106,13 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			//should not be treated as expired.
 			if(getDelay() <= 0) {
 				expired = true;
-				if(isValid()) {
-					sipContext.enterSipApp(null, null, null, true, false);
+				if(isValid()) {					
+					sipContext.enterSipApp(null, null);
+					sipContext.enterSipAppHa(null, null, true, false);
 					try {
 						invalidate();
-					} finally {
+					} finally {						
+						sipContext.exitSipAppHa(null, null);
 						sipContext.exitSipApp(null, null);
 					}
 				}

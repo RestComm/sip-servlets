@@ -136,9 +136,13 @@ public interface SipContext extends Context {
 	
 	boolean notifySipContextListeners(SipContextEvent event);
 	
-	void enterSipApp(SipServletRequestImpl request, SipServletResponseImpl response, SipManager manager, boolean startCacheActivity, boolean bindSessions);
+	void enterSipApp(SipServletRequestImpl request, SipServletResponseImpl response);
 	
 	void exitSipApp(SipServletRequestImpl request, SipServletResponseImpl response);
+	
+	void enterSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response, boolean startCacheActivity, boolean bindSessions);
+	
+	void exitSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response);
 	
 	SipFactoryFacade getSipFactoryFacade();
 	
