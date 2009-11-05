@@ -95,6 +95,8 @@ public class Shootist implements SipListener {
 	
 	public boolean okToInviteRecevied = false;
 	
+	public int pauseBeforeBye = 3000;
+	
 	int count = 0;
 	
 	private boolean forkingProxy = false;
@@ -272,7 +274,7 @@ public class Shootist implements SipListener {
 						dialog.sendAck(ackRequest);
 						
 						try {
-							 Thread.sleep(2000);
+							 Thread.sleep(pauseBeforeBye);
 							   Request byeRequest = dialog.createRequest(Request.BYE);
 							   ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
 							   dialog.sendRequest(ct);

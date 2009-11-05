@@ -48,7 +48,7 @@ public class SequentialProxyTest extends SipServletTestCase {
 		this.cutme.init();
 		this.shootist.init("sequential-three", false);
 		for (int q = 0; q < 30; q++) {
-			if (shootist.ended == false && cutme.canceled == false)
+			if (shootist.ended == false || cutme.canceled == false)
 				try {
 					Thread.sleep(TIMEOUT);
 				} catch (InterruptedException e) {
@@ -63,11 +63,16 @@ public class SequentialProxyTest extends SipServletTestCase {
 	}
 
 	public void testFirstTargetTimeout() {
-		this.shootme.init("stackName");
-		this.cutme.init();
-		this.shootist.init("sequential", false);
-		for (int q = 0; q < 50; q++) {
-			if (shootist.ended == false && cutme.canceled == false)
+		new Thread() {
+			public void run() {
+				shootist.pauseBeforeBye = 20000;
+				shootme.init("stackName");
+				cutme.init();
+				shootist.init("sequential", false);
+			}
+		}.start();
+		for (int q = 0; q < 8; q++) {
+			if (shootist.ended == false || cutme.canceled == false)
 				try {
 					Thread.sleep(TIMEOUT);
 				} catch (InterruptedException e) {
@@ -79,15 +84,38 @@ public class SequentialProxyTest extends SipServletTestCase {
 			fail("Conversation not complete!");
 		if (cutme.canceled == false)
 			fail("The party that was supposed to be cancelled didn't cancel.");
+
+
 	}
 	
+	public void testSingleTargetCancel() {
+		new Thread() {
+			public void run() {
+				shootme.init("stackName");
+				cutme.init();
+				shootist.init("sequential-cut", false);
+			}
+		}.start();
+		for (int q = 0; q < 8; q++) {
+			if (cutme.canceled == false)
+				try {
+					Thread.sleep(TIMEOUT);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+		if (cutme.canceled == false)
+			fail("The party that was supposed to be cancelled didn't cancel.");
+	}
+
 	// Here we want to test if the seq proxy will continue to check next branches
 	public void testFirstTargetResponds() {
 		this.shootme.init("stackName");
 		this.cutme.init();
 		this.shootist.init("sequential-reverse", false);
 		for (int q = 0; q < 20; q++) {
-			if (shootist.ended == false && cutme.canceled == false)
+			if (shootist.ended == false || cutme.canceled == false)
 				try {
 					Thread.sleep(TIMEOUT);
 				} catch (InterruptedException e) {
@@ -106,7 +134,7 @@ public class SequentialProxyTest extends SipServletTestCase {
 		this.shootme.init("stackName");
 		this.cutme.init();
 		this.shootist.init("sequential-reverse-one", false);
-		for (int q = 0; q <2; q++) {
+		for (int q = 0; q <6; q++) {
 			if (shootist.ended == false)
 				try {
 					Thread.sleep(TIMEOUT);

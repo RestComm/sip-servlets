@@ -86,7 +86,7 @@ public class Shootme implements SipListener {
 	
 	public int inviteResponseCode = 0;
 	
-	public static final boolean callerSendsBye = true;
+	public static boolean callerSendsBye = true;
 
 	class MyTimerTask extends TimerTask {
 		Shootme shootme;

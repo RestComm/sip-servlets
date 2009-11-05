@@ -42,6 +42,30 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 		this.shootme = new Shootme(5057);
 		this.cutme = new Cutme();
 	}
+	
+	public void testProxyCalleeSendsBye() {
+		this.shootme.init("stackName");
+		this.shootme.callerSendsBye = false;
+		try {
+		this.cutme.init();
+		this.shootist.init("useHostName",false);
+		for (int q = 0; q < 20; q++) {
+			if (shootist.ended == false && cutme.canceled == false)
+				try {
+					Thread.sleep(TIMEOUT);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+		} catch(Exception e) {}
+		this.shootme.callerSendsBye = true;
+		if (shootist.ended == false)
+			fail("Conversation not complete!");
+		if (cutme.canceled == false)
+			fail("The party that was supposed to be cancelled didn't cancel.");
+	}
+	
 
 	public void testProxy() {
 		this.shootme.init("stackName");

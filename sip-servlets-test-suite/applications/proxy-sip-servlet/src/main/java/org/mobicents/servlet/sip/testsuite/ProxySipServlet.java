@@ -41,7 +41,7 @@ import org.apache.log4j.Logger;
 public class ProxySipServlet extends SipServlet implements SipErrorListener {
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(ProxySipServlet.class);
-	
+	String host = "127.0.0.1";
 	private static String USE_HOSTNAME = "useHostName";
 	private static String CHECK_URI = "check_uri";
 	private static String NON_RECORD_ROUTING = "nonRecordRouting";
@@ -68,7 +68,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener {
 		//This is a proxying sample.
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 
-		String host = "127.0.0.1";
+		
 		SipURI fromURI = ((SipURI)request.getFrom().getURI());
 		if(USE_HOSTNAME.equals(fromURI.getUser())) {		
 			host = "localhost";
@@ -94,7 +94,10 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener {
 				uris.add(uri3);
 				uris.add(uri2);
 				uris.add(uri1);
-			} else {
+			} else if(request.getFrom().getURI().toString().contains("sequential-cut")) {
+				uris.add(uri2);
+			}
+			else {
 				uris.add(uri2);
 				uris.add(uri1);
 			}
