@@ -1,0 +1,146 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY PLATFORM_NAME "${platform.name}">
+]><!-- chapter id nickname: sps -->
+<chapter
+	id="sps-SIP_Presence_Server">
+	<title>&PLATFORM_NAME; SIP Presence Server</title>
+	<para>The <application>&PLATFORM_NAME; SIP Presence Server</application> is a free and open source implementation of a SIP Presence Server, as defined by the Internet Engineering Task Force (IETF), the Open Mobile Alliance (OMA), the 3rd Generation Partnership Project (3GPP) and the European Telecommunications Standards Institute (ETSI).</para>
+	<para>The <application>SIP Presence Server</application> is an entity that accepts, stores and distributes SIP presence information.</para>
+	<section
+		id="sps-Functional_Architecture_of_the_SIP_Presence_Server">
+		<title>Functional Architecture of the SIP Presence Server</title>
+		<mediaobject
+			id="img-msps-PSFunctionalArchitecture">
+			<imageobject>
+				<imagedata
+					width="553"
+					align="center"
+					fileref="images/msps-PSFunctionalArchitecture.jpg"
+					format="JPG" />
+			</imageobject>
+			<caption>
+				<para>Functional Diagram of the &PLATFORM_NAME; SIP Presence Server</para>
+			</caption>
+		</mediaobject>
+		<para>The <application>SIP Presence Server</application> is comprised of the following functional elements:</para>
+		<variablelist
+			id="sps-Functional_Elements_of_the_SIP_Presence_Server">
+			<varlistentry>
+				<term>Presence Publication Control</term>
+				<listitem>
+					<para>This functional element manages the publication of presence events, which includes not only the handling of new publications, but also the refreshing, modification or removal of, already-published information.</para>
+					<para>Because the presence resource, which is also called a <emphasis>presentity</emphasis>, can have multiple publications simultaneously, such as some state published by a user agent or device, and some location data published by a Presence Network Agent (on behalf of the presentity), this element is also responsible for composing all of the different publications for the same resource.</para>
+					<para>In some presence networks, it may be of interest to allow resources to have a static presence state which is stored in the XDM Server. In cases like these, Presence Publication Control may need to interface with the <application>XDM Server</application> to retrieve and subscribe to (learn about changes to) that information, and use it when composing the final presence information document.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Presence Subscription Control</term>
+				<listitem>
+					<para>This functional element handles subscriptions to presence events or to the list of subscribers (watchers), for any specific resource. It is, of course, responsible for emitting notifications related to those subscriptions.</para>
+					<para>Presence authorization rules, which define if a subscription is allowed or rejected and, if allowed, define which transformations to the original presence events are needed, are stored on the <application>XDM Server</application> by the user. Thus, Presence Subscription Control needs to retrieve and subscribe to that information.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>XDM Client Control</term>
+				<listitem>
+					<para>This last element is responsible for interfacing with the <application>XDM Server</application> that manages the user's XML documents, and is related to the main functions of the presence server. It is capable not only of retrieving a document or part of one, but also of subscribing to either updates of a single, specific document, or to a full collection of documents of a specific type or application.</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<section
+			id="sps-Implementation_Architecture_of_the_Mobicents_SIP_Presence_Server">
+			<title>Implementation Architecture of the &PLATFORM_NAME; SIP Presence Server</title>
+			
+			<mediaobject id="img-msps-PSImplementationArchitecture">
+				<imageobject>
+					<imagedata align="center"
+						width="550"
+						fileref="images/msps-PSImplementationArchitecture.jpg"
+						format="JPG" />
+				</imageobject>
+				<caption>
+					<para>Implementation Architecture of the &PLATFORM_NAME; SIP Presence Server</para>
+				</caption>
+			</mediaobject>
+			
+			<para>The implementation of the &PLATFORM_NAME; SIP Presence Server comprises the following functional elements:</para>
+			<variablelist
+				id="sps-The_Two_Services_Which_Compose_the_Presence_Server">
+				<title>The Two Services Which Compose the SIP Presence Server</title>
+				<varlistentry>
+					<term>Presence Publication Control Service</term>
+					<listitem>
+						<para>This JAIN SLEE service includes the root Service Building Block (SBB), <literal>PresencePublicationControlSbb</literal>, which is the implementation of the abstract SIP event <literal>PublicationControlSbb</literal>. It handles publications on the <application>presence</application> event package.</para>
+						<para>The <literal>PresencePublicationControlSbb</literal> provides the following capabilities:</para>
+						<itemizedlist>
+							<listitem>
+								<para>It provides the logic to authorize a publication; however, it only authorizes <literal>PUBLISH</literal> requests when the request URI matches the PIDF document <quote>entity</quote> attribute.</para>
+							</listitem>
+							<listitem>
+								<para>It provides JAXB unmarshallers to validate and parse the PIDF document for the abstract <literal>PublicationControlSbb</literal>.</para>
+							</listitem>
+							<listitem>
+								<para>It demands that notifying subscribers occur through a child relation to the root SBB of the Presence Subscription Control Service.</para>
+							</listitem>
+							<listitem>
+								<para>Finally, it also provides an <literal>SbbLocalObject</literal> interface that can be used, in JAIN SLEE child relations, to obtain the composed presence information for a specific resource.</para>
+							</listitem>
+						</itemizedlist>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term>Presence Subscription Control Service.</term>
+					<listitem>
+						<para>This JAIN SLEE service includes the root SBB <literal>PresenceSubscriptionControlSbb</literal>, which is the implementation of the abstract SIP Event <literal>SubscriptionControlSbb</literal>. It handles subscriptions on the <quote>presence</quote> event package.</para>
+						<para>The standout SBB logic item is the usage of presence-rules documents, obtained through the XDM Client SBB child relation, in order to authorize subscriptions and transform the content notified<footnote><para>Note that this feature is not yet used.</para></footnote>. It also defines a child relation to the root SBB of <literal>PresencePublicationService</literal> to retrieve the composed PIDF document for the subscription's notifier.</para>
+						<para>The SBB also provides an <literal>SbbLocalObject</literal> interface that can be used, in JAIN SLEE child relations, to make the presence event known to the subscribers of a specific resource.</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+			<para>The implementation architecture of the SIP Presence Server also contains client-side components:</para>
+			<variablelist>
+				<varlistentry>
+					<term>Presence Client SBB</term>
+					<listitem>
+						<para>The <literal>PresenceClientSBB</literal> is the interface to a JAIN SLEE SBB intended to be used as a client for the <application>&PLATFORM_NAME; SIP Presence Server</application> (and other servers compliant with same standards), in JAIN SLEE child relations.</para>
+						<para>Two implementations of this interface are provided: the <literal>InternalPresenceClientSBB</literal> that is used with applications running in the <application>&PLATFORM_NAME; SIP Presence Server</application> JAIN SLEE container, and the <literal>ExternalPresenceClientSBB</literal>, used with applications running in a different JAIN SLEE container than the <application>&PLATFORM_NAME; SIP Presence Server</application>.</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+		</section>
+	</section>
+	<section
+	id="sps-Resource_List_Server">
+		<title>&PLATFORM_NAME; Resource List Server</title>
+		<para>The <application>&PLATFORM_NAME; Resource List Server</application> is currently tightly integrated with the <application>&PLATFORM_NAME; SIP Presence Server</application>, supporting <acronym>RFC</acronym> 5367 and <acronym>OMA</acronym> service uri template.</para>		
+	</section>
+	<section
+	id="sps-Configuring_The_Sip_Presence_Server">
+		<title>Configuring The SIP Presence Server</title>
+		<para>TODO how to configure the SIP Publication and Subscription Interfaces</para>		
+	</section>
+	<section
+		id="sps-Resources_and_Further_Information_about_the_SIP_Presence_Server">
+		<title>Resources and Further Information about the SIP Presence Server</title>
+		<para>For further information on the &PLATFORM_NAME; SIP Presence Server, see the following list of additional resources:</para>
+		<itemizedlist
+			id="sps-Further_Information_on_the_SIP_Presence_Server">
+			<!--<listitem>
+				<para>How to Manage the &PLATFORM_NAME; SIP Presence Server</para>
+			</listitem>
+			<listitem>
+				<para>Integrating the &PLATFORM_NAME; SIP Presence Server into Your JAIN SLEE Applications: Code Snippets for Internal Presence Client SBB Usage.</para>
+			</listitem>
+			<listitem>
+				<para>Integrating the &PLATFORM_NAME; SIP Presence Server into Your JAIN SLEE Applications: Code Snippets for External Presence Client SBB Usage.</para>
+			</listitem>-->
+			<listitem>
+				<para>
+					<ulink
+						url="http://groups.google.com/group/mobicents-public/web/mobicents-sip-event-components">&PLATFORM_NAME; SIP Event Publication and Subscription Control Components</ulink>
+				</para>
+			</listitem>
+		</itemizedlist>
+	</section>
+</chapter>

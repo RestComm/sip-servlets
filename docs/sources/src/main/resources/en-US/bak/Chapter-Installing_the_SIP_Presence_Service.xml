@@ -1,0 +1,202 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY PLATFORM_NAME "${platform.name}">
+<!ENTITY RELEASE_INTEGRATED_FILENAME "${release.integrated.filename}">
+<!ENTITY RELEASE_XDMS_FILENAME "${release.xdms.filename}">
+<!ENTITY VERSION "${version}">
+]><!-- chapter id nickname: itsps -->
+<chapter
+	id="itsps-Installing_the_SIP_Presence_Service">
+	<title>Installing the &PLATFORM_NAME; SIP Presence Service</title>
+	<section
+		id="itsps-binary-SIP_Presence_Service-Installing_Configuring_and_Running">
+		<title>&PLATFORM_NAME; SIP Presence Service: Installing, Configuring and Running</title>
+		<para>There are multiple binary distributions of the <application>&PLATFORM_NAME; SIP Presence Service</application>.</para>
+		<variablelist
+			id="itsps-Description_of_the_Different_SIP_Presence_Service_Distributions">
+			<title>Description of the different &PLATFORM_NAME; SIP Presence Service Distributions</title>
+			<varlistentry>
+				<term>The <application>Integrated SIP Presence Service</application> binary distribution <emphasis>with &PLATFORM_NAME; JAIN SLEE</emphasis>
+				</term>
+				<listitem>
+					<para>These installation instructions detail the installation, running and configuring of the <emphasis>Integrated</emphasis> binary <application>&PLATFORM_NAME; SIP Presence Service</application> distribution. This distribution includes the <application>XDM</application> and <application>SIP Presence Servers</application>, the servers are pre-installed in a version of the <application>&PLATFORM_NAME; JAIN SLEE Server</application>, and the &PLATFORM_NAME; JAIN SLEE SIP11 and HTTP Servlet Resource Adaptors. Examples of JAIN SLEE applications interacting with the <application> &PLATFORM_NAME; Integrated SIP Presence Service</application> are also included and come pre-installed.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>The stand-alone <application>&PLATFORM_NAME; XDM Server</application> binary distribution <emphasis> with &PLATFORM_NAME; JAIN SLEE</emphasis>
+				</term>
+				<listitem>
+					<para>Users who wish to deploy the <application>&PLATFORM_NAME; XML Document Server</application> on a different host or who do not require the <application>&PLATFORM_NAME; Presence Server</application> should install the stand-alone <application>&PLATFORM_NAME; XDM Server</application> binary distribution. The following installation, running and configuring instructions provide parallel instructions specific to the <application>&PLATFORM_NAME; XDM Server</application>.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>The <application>&PLATFORM_NAME; SIP Presence Service</application> binary distribution <emphasis>without</emphasis> &PLATFORM_NAME; JAIN SLEE</term>
+				<listitem>
+					<para>Users who have already installed and set up a separate <application>&PLATFORM_NAME; JAIN SLEE</application> installation may want to install one or more servers of the <application>&PLATFORM_NAME; SIP Presence Service</application>.</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		
+		<!-- 
+		<bridgehead
+			id="itsps-Installing_the_Java_Development_Kit">Installing the Java Development Kit</bridgehead>
+		<xi:include
+			xmlns:xi="http://www.w3.org/2001/XInclude"
+			href="Common_Content/Java_Development_Kit-Installing_Configuring_and_Running.xml"/>
+		-->
+		
+		<section
+			id="itsps-binary-SIP_Presence_Service-PreInstall_Requirements_and_Prerequisites">
+			<title>Pre-Install Requirements and Prerequisites</title>
+			<para>You should ensure that a few requirements have been met before continuing with the install.</para>
+			<variablelist
+				id="itsps-binary-SIP_Presence_Service-Hardware_Requirements">
+				<title>Hardware Requirements</title>
+				<varlistentry>
+					<term>Anything Java Itself Will Run On</term>
+					<listitem>
+						<para>The <application>&PLATFORM_NAME; SIP Presence Service</application> is an 100% Java application. <application>&PLATFORM_NAME; SIP Presence Service</application> will run on the same hardware that the <application>&PLATFORM_NAME; JAIN SLEE</application> runs on.</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+			<variablelist
+				id="itsps-binary-SIP_Presence_Service-Software_Prerequisites">
+				<title>Software Prerequisites</title>
+				<varlistentry>
+					<term>JDK 5</term>
+					<listitem>
+						<para>A working installation of the Java Development Kit (<acronym>JDK</acronym>) version 5 is required in order to run the <application>&PLATFORM_NAME; SIP Presence Service</application>.</para>
+						<note><para>JDK 6 is not supported by the <application>&PLATFORM_NAME; XDM Server</application></para></note>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term>Apache Ant 1.6 or later</term>
+					<listitem>
+						<para>A working installation of the Apache Ant 1.6 or later is required in order to install the <application>&PLATFORM_NAME; SIP Presence Service</application> release without <application>$PLATFORM_NAME JAIN SLEE</application>.</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term>JBOSS_HOME Environment Variable</term>
+					<listitem>
+						<para>The environment variable JBOSS_HOME, if set, must be pointing to the <application>JBoss AS</application> within <application>&PLATFORM_NAME; JAIN SLEE</application>.</para>						
+					</listitem>
+				</varlistentry>
+			</variablelist>
+		</section>
+		<section
+			id="itsps-binary-SIP_Presence_Service-Downloading">
+			<title>Downloading</title>
+			<para>You can download the latest version of the <application>&PLATFORM_NAME; SIP Presence Service</application> distribution you need from the &PLATFORM_NAME; <literal>Downloads</literal> page at <ulink
+					url="http://sourceforge.net/project/showfiles.php?group_id=102670"/>. Click on the <literal>&PLATFORM_NAME; SIP Presence Service</literal> link to view all available distributions and downloads. The latest releases are nearer the top.</para>
+			<para>If you are unsure which distribution zip file to download, refer to <xref
+					linkend="itsps-Description_of_the_Different_SIP_Presence_Service_Distributions"/>, and then to the following list of release binaries.</para>
+			<variablelist
+				id="itsps-SIP_Presence_Service_Binary_Distribution_Zip_Files">
+				<title>&PLATFORM_NAME; SIP Presence Service Binary Distribution Zip Files</title>
+				<varlistentry>
+					<term>&RELEASE_INTEGRATED_FILENAME;</term>
+					<listitem>
+						<para>Download this zip file to obtain the <application>&PLATFORM_NAME; Integrated SIP Presence Service</application> binary distribution, which includes the <application>&PLATFORM_NAME; SIP Presence Server</application>, the <application>&PLATFORM_NAME; XDM Server</application>, and the <application>JBoss Application Server</application> with <application>&PLATFORM_NAME; JAIN SLEE</application>, well as all required JAIN SLEE Resource Adaptors.</para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term>&RELEASE_XDMS_FILENAME;</term>
+					<listitem>
+						<para>Download this zip file to obtain the <application>&PLATFORM_NAME; XDM Server</application> binary distribution, which bundles the <application>JBoss Application Server</application> with <application>&PLATFORM_NAME; JAIN SLEE</application>.</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+		</section>
+		<section
+			id="itsps-binary-SIP_Presence_Service-Configuring">
+			<title>Configuring (and Setting JBOSS_HOME)</title>
+			<xi:include
+				xmlns:xi="http://www.w3.org/2001/XInclude"
+				href="Common_Content/Section-Setting_the_JBOSS_HOME_Environment_Variable.xml"></xi:include>
+		</section>
+		<section
+			id="itsps-binary-SIP_Presence_Service-Installing">
+			<title>Installing</title>
+			<para>Once the requirements and prerequisites have been met, and you have downloaded the correct zip file for the binary distribution you need, you are ready to install, please follow the instructions below.</para>
+			<procedure>
+				<title>Installing a &PLATFORM_NAME; SIP Presence Service Binary Distribution bundled <emphasis>with</emphasis> <application>&PLATFORM_NAME; JAIN SLEE</application></title>
+				<step>
+					<para>Unzip the release file</para>					
+				</step>
+				<step>
+					<para>Ensure that the environment variable JBOSS_HOME is either not set, or pointing to the <filename>&lt;install_directory&gt;</filename> directory extracted from the release file.</para>
+				</step>
+			</procedure>
+			<procedure>
+				<title>Installing a &PLATFORM_NAME; SIP Presence Service Binary Distribution <emphasis>without</emphasis> &PLATFORM_NAME; JAIN SLEE</title>
+				<step>
+					<para>Unzip the release file</para>					
+				</step>
+				<step>
+					<para>Ensure that the environment variable JBOSS_HOME is set and pointing to the JBoss AS with the <application>&PLATFORM_NAME; JAIN SLEE</application>, where <application>&PLATFORM_NAME; SIP Presence Service</application> components should be installed.</para>
+				</step>
+				<step>
+					<para>Invoke the correct Apache Ant target in build.xml script to install:</para>
+					<bridgehead>Install the Integrated <application>SIP Presence Service</application>:</bridgehead>
+					<screen>~]$ ant integrated-deploy</screen>
+					<bridgehead>Install the stand-alone <application> XDM Server</application>:</bridgehead>
+					<screen>~]$ ant xdms-deploy</screen>					
+				</step>
+			</procedure>
+		</section>
+		<section
+			id="itsps-binary-SIP_Presence_Service-Running">
+			<title>Running</title>
+			<para>Once installed, you can run server(s) by executing the run.sh (Unix) or run.bat (Microsoft Windows) startup scripts in the <filename>&lt;install_directory&gt;/bin</filename> directory (on Unix or Windows). In the Unix terminal or Command Prompt, you will be able to tell that the server started successfully if the last line of output is similar to the following (ending with <quote>Started in 23s:648ms</quote>):</para>
+			<programlisting><![CDATA[11:23:07,656 INFO  [Server] JBoss (MX MicroKernel) [4.2.3.GA (build: SVNTag=JBoss_4_2_2_GA date=200710221139)] Started in 23s:648ms]]></programlisting>
+			<note><para>By default the server(s) start and bind to 127.0.0.1 IP, to use a different hostname or IP use the -b HOST parameter when executing the startup script (e.g. run.sh -b 172.31.1.1).</para></note>
+		</section>
+		<section
+			id="itsps-binary-SIP_Presence_Service-Stopping">
+			<title>Stopping</title>
+			<para>You can shut down the server(s) you can run server(s) by executing the shutdown.sh (Unix) or shutdown.bat (Microsoft Windows) scripts in the <filename>&lt;install_directory&gt;/bin</filename> directory (on Unix or Windows). Note that if you properly stop the server, you will see the following three lines as the last output in the Unix terminal or Command Prompt:</para>
+			<programlisting><![CDATA[[Server] Shutdown complete
+Shutdown complete
+Halting VM]]></programlisting>
+		</section>		
+		<section
+			id="itsps-binary-SIP_Presence_Service-Testing">
+			<title>Testing</title>
+			<para>TODO</para>
+		</section>
+		<section
+			id="itsps-binary-SIP_Presence_Service-Uninstalling">
+			<title>Uninstalling</title>
+			<procedure>
+				<title>Uninstalling a &PLATFORM_NAME; SIP Presence Service Binary Distribution bundled <emphasis>with</emphasis> <application>&PLATFORM_NAME; JAIN SLEE</application></title>
+				<step>
+					<para>To uninstall the <application>SIP Presence Service</application> or <application>XDM Server</application>, simply delete the directory you decompressed the binary distribution archive into.</para>					
+				</step>				
+			</procedure>
+			<procedure>
+				<title>Uninstalling a &PLATFORM_NAME; SIP Presence Service Binary Distribution <emphasis>without</emphasis> &PLATFORM_NAME; JAIN SLEE</title>
+				<step>
+					<para>Invoke the correct Apache Ant target in build.xml script to uninstall:</para>
+					<bridgehead>Uninstall the Integrated <application>SIP Presence Service</application>:</bridgehead>
+					<screen>~]$ ant integrated-undeploy</screen>
+					<bridgehead>Uninstall the stand-alone <application>XDM Server</application>:</bridgehead>
+					<screen>~]$ ant xdms-undeploy</screen>					
+				</step>
+			</procedure>			
+		</section>
+		<section
+			id="itsps-binary-SIP_Presence_Service-Building_From_Source">
+			<title>Building from Source Project</title>
+			<note><para>The source building process requires access to the Internet. It also requires an <application>SVN Client</application> (to sources checkout) and <application>Apache Maven2 2.0.9+</application> (for the building process) installed.</para></note>
+			<para>The source project can be downloaded using SVN, the checkout URL is <uri>http://mobicents.googlecode.com/svn/tags/servers/sip-presence/mobicents-sip-presence-service-&VERSION;</uri> </para>
+			<para>To build the binaries from source, enter the release directory inside the directory used to checkout the source project and:</para>
+			<screen>~]$ ant</screen>
+		</section>
+		<section
+			id="itsps-binary-SIP_Presence_Service-Binary_Releases_Daily_Snapshots">
+			<title>Binary Releases Daily Snapshots</title>
+			<para>Everyday a binary release snapshot is built using current sources in development trunk, those are accessible from <uri>http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsSipPresenceRelease/</uri></para>
+		</section>
+	</section>
+</chapter>
+

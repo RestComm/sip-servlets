@@ -1,0 +1,52 @@
+<?xml version='1.0'?>
+<!DOCTYPE appendix PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY PLATFORM_NAME "${platform.name}">
+]><!-- chapter id nickname: spsug -->
+<appendix
+	id="spsug-appe-Publican-Revision_History">
+	<title>Revision History</title>
+	<simpara>
+		<revhistory>
+		<!--revisions must be listed in chronological order with the latest at the top-->
+			<revision>
+				<revnumber>3.0</revnumber>
+				<date>Fri Jul 10 2009</date>
+				<author>
+					<firstname>Eduardo</firstname>
+					<surname>Martins</surname>					
+				</author>
+				<revdescription>
+					<simplelist>
+						<member>Major update to include XDM Server authentication and authorization, creation of XCAP Application Usages, SIP Client configuration examples and Resource List Server.</member>
+					</simplelist>
+				</revdescription>
+			</revision>
+			<revision>
+				<revnumber>2.0</revnumber>
+				<date>Fri Mar 06 2009</date>
+				<author>
+					<firstname>Douglas</firstname>
+					<surname>Silas</surname>
+				</author>
+				<revdescription>
+					<simplelist>
+						<member>First release of the "parameterized" and much-improved &PLATFORM_NAME; documentation.</member>
+					</simplelist>
+				</revdescription>
+			</revision>
+			<revision>
+				<revnumber>1.0</revnumber>
+				<date>Tue Jan 20 2009</date>
+				<author>
+					<firstname>Douglas</firstname>
+					<surname>Silas</surname>
+				</author>
+				<revdescription>
+					<simplelist>
+						<member>Creation of the &PLATFORM_NAME; SIP Presence User Guide separate from the &PLATFORM_NAME; Platform User Guide.</member>
+					</simplelist>
+				</revdescription>
+			</revision>
+		</revhistory>
+	</simpara>
+</appendix>

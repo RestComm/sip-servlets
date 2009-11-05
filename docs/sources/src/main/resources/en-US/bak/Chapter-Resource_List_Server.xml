@@ -1,0 +1,14 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY PLATFORM_NAME "${platform.name}">
+]><!-- chapter id nickname: rls -->
+<chapter
+	id="rls-Resource_List_Server">
+	<title>&PLATFORM_NAME; Resource List Server</title>
+	<para>&nbsp;</para>
+	<note>
+		<title>Resource List Server</title>
+		<para>The <application>&PLATFORM_NAME; Resource List Server</application> is currently tightly integrated with the <application>&PLATFORM_NAME; SIP Presence Server</application>, supporting <acronym>RFC</acronym> 5367 and <acronym>OMA</acronym> service uri template.</para>
+	</note>
+</chapter>
+

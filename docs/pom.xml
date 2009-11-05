@@ -1,0 +1,49 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>org.mobicents.servlet.sip</groupId>
+		<artifactId>sip-servlets-bootstrap</artifactId>
+		<version>1.1-SNAPSHOT</version>
+	</parent>
+	
+	<artifactId>sip-servlets-docs</artifactId>
+		
+	<packaging>pom</packaging>
+	
+	<modules>
+		<module>sources</module>
+	</modules>
+
+	<profiles>
+		<profile>
+			<id>all</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<modules>
+				<module>sources-mobicents</module>
+				<module>sources-jbcp</module>
+				<module>jdocbook-mobicents</module>
+				<module>jdocbook-jbcp</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>mobicents</id>			
+			<modules>
+				<module>sources-mobicents</module>
+				<module>jdocbook-mobicents</module>				
+			</modules>
+		</profile>
+		<profile>
+			<id>jbcp</id>
+			<modules>
+				<module>sources-jbcp</module>
+				<module>jdocbook-jbcp</module>
+			</modules>
+		</profile>
+	</profiles>
+
+</project>

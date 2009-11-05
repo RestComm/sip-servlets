@@ -1,0 +1,251 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+]><!-- chapter id nickname: jdkicar -->
+<section>
+	<title>Java Development Kit: Installing, Configuring and Running</title>
+	<para>
+		The <application>JBoss Communications Platform</application> is written in Java; therefore, before running any <application>JBCP</application> server, you must have a working Java Runtime Environment (<acronym>JRE</acronym>) or Java Development Kit (<acronym>JDK</acronym>) installed on your system. In addition, the JRE or JDK you are using to run <application>JBCP</application> must be version 5 or higher<footnote>
+		<para>
+			At this point in time, it is possible to run most <application>JBCP</application> servers, such as the JAIN SLEE Server, using a Java 6 JRE or JDK. Be aware, however, that presently the XML Document Management Server does not run on Java 6. We suggest checking the Mobicents web site, forums or discussion pages if you need to inquire about the status of running the XML Document Management Server with Java 6.
+		</para>
+		</footnote>
+	</para>
+	<formalpara>
+		<title>Should I Install the JRE or JDK?</title>
+		<para>
+			Although you can run <application>JBCP</application> servers using the Java Runtime Environment, we assume that most users are developers interested in developing Java-based, <application>JBCP</application>-driven solutions. Therefore, in this guide we take the tact of showing how to install the full Java Development Kit.
+		</para>
+	</formalpara>
+	<formalpara>
+		<title>Should I Install the 32-Bit or the 64-Bit JDK, and Does It Matter?</title>
+		<para>
+			Briefly stated: if you are running on a 64-Bit Linux or Windows platform, you should consider installing and running the 64-bit JDK over the 32-bit one. Here are some heuristics for determining whether you would rather run the 64-bit Java Virtual Machine (JVM) over its 32-bit cousin for your application:
+		</para>
+	</formalpara>
+	<itemizedlist>
+		<listitem>
+			<para>
+				Wider datapath: the pipe between RAM and CPU is doubled, which improves the performance of memory-bound applications when using a 64-bit JVM.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				64-bit memory addressing gives virtually unlimited (1 exabyte) heap allocation. However large heaps affect garbage collection.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Applications that run with more than 1.5 GB of RAM (including free space for garbage collection optimization) should utilize the 64-bit JVM.
+			</para>
+		</listitem>
+		<listitem>
+			<para>
+				Applications that run on a 32-bit JVM and do not require more than minimal heap sizes will gain nothing from a 64-bit JVM. Barring memory issues, 64-bit hardware with the same relative clock speed and architecture is not likely to run Java applications faster than their 32-bit cousin.
+			</para>
+		</listitem>
+	</itemizedlist>
+	<para>
+		Note that the following instructions detail how to download and install the 32-bit JDK, although the steps are nearly identical for installing the 64-bit version.
+	</para>
+	<!-- <formalpara
+			id="jdkicar-binary-Java_Development_Kit-Pre-Install Requirements and Prerequisites">
+			<title>Pre-Install Requirements and Prerequisites</title>
+			<para></para>
+		</formalpara> --><!--  <variablelist
+			condition="jdkicar-binary-Java_Development_Kit-Hardware_Requirements">
+			<title>Hardware Requirements</title>
+			<varlistentry>
+				<term>Sufficient Disk Space</term>
+				<listitem>
+					<para></para>
+				</listitem>
+			</varlistentry>
+		</variablelist>  --><!--  <variablelist
+			condition="jdkicar-binary-Java_Development_Kit-Software_Prerequisites">
+			<title>Software Prerequisites</title>
+			<varlistentry>
+				<term></term>
+				<listitem>
+					<para></para>
+				</listitem>
+			</varlistentry>
+		</variablelist>  -->
+	<formalpara>
+		<!-- id="jdkicar-binary-Java_Development_Kit-Downloading"> -->
+		<title>Downloading</title>
+		<para>
+			You can download the Sun JDK 5.0 (Java 2 Development Kit) from Sun&#39;s website: <ulink
+				url="http://java.sun.com/javase/downloads/index_jdk5.jsp"></ulink>. Click on the <guilabel>Download</guilabel> link next to "JDK 5.0 Update <replaceable>&lt;x&gt;</replaceable>" (where <replaceable>&lt;x&gt;</replaceable> is the latest minor version release number). On the next page, select your language and platform (both architecture—whether 32- or 64-bit—and operating system), read and agree to the <literal>Java Development Kit 5.0 License Agreement</literal>, and proceed to the download page.
+		</para>
+	</formalpara>
+	<para>
+		The Sun website will present two download alternatives to you: one is an RPM inside a self-extracting file (for example, <filename>jdk-1_5_0_16-linux-i586-rpm.bin</filename>), and the other is merely a self-extracting file (e.g. <filename>jdk-1_5_0_16-linux-i586.bin</filename>). If you are installing the JDK on Red Hat Enterprise Linux, Fedora, or another RPM-based Linux system, we suggest that you download the self-extracting file containing the RPM package, which will set up and use the SysV service scripts in addition to installing the JDK. We also suggest installing the self-extracting RPM file if you will be running <application>JBCP</application> in a production environment.
+	</para>
+	<formalpara>
+		<!-- id="jdkicar-binary-Java_Development_Kit-Installing"> -->
+		<title>Installing</title>
+		<para>
+			The following procedures detail how to install the Java Development Kit on both Linux and Windows.
+		</para>
+	</formalpara>
+	<procedure>
+		<title>Installing the JDK on Linux</title>
+		<step>
+			<para>
+				Regardless of which file you downloaded, you can install it on Linux by simply making sure the file is executable and then running it:
+			</para>
+			<!--  ~]$ chmod +x "jdk-1_5_0_<minor_version>-linux-<architecture>-rpm.bin"
+~]$ ./"jdk-1_5_0_<minor_version>-linux-<architecture>-rpm.bin"  -->
+			<screen>~]$ chmod +x "jdk-1_5_0_&lt;minor_version&gt;-linux-&lt;architecture&gt;-rpm.bin"
+~]$ ./"jdk-1_5_0_&lt;minor_version&gt;-linux-&lt;architecture&gt;-rpm.bin"</screen>
+		</step>
+	</procedure>
+
+	<note>
+		<title>You Installed Using the Non-RPM Installer, but Want the SysV Service Scripts</title>
+		<para>
+			If you download the non-RPM self-extracting file (and installed it), and you are running on an RPM-based system, you can still set up the SysV service scripts by downloading and installing one of the <literal>-compat</literal> packages from the JPackage project. Remember to download the <literal>-compat</literal> package which corresponds correctly to the minor release number of the JDK you installed. The compat packages are available from <ulink
+				url="ftp://jpackage.hmdc.harvard.edu/JPackage/1.7/generic/RPMS.non-free/"></ulink>.
+		</para>
+	</note>
+	<important>
+		<para>
+			You do not need to install a <literal>-compat</literal> package in addition to the JDK if you installed the self-extracting RPM file! The <literal>-compat</literal> package merely performs the same SysV service script set up that the RPM version of the JDK installer does.
+		</para>
+	</important>
+	<procedure>
+		<title>Installing the JDK on Windows</title>
+		<step>
+			<para>
+				Using Explorer, simply double-click the downloaded self-extracting installer and follow the instructions to install the JDK.
+			</para>
+		</step>
+	</procedure>
+
+	<formalpara>
+		<!-- id="jdkicar-binary-Java_Development_Kit-Configuring"> -->
+		<title>Configuring</title>
+		<para>
+			Configuring your system for the JDK consists in two tasks: setting the <envar>JAVA_HOME</envar> environment variable, and ensuring that the system is using the proper JDK (or JRE) using the <command>alternatives</command> command. Setting <envar>JAVA_HOME</envar> usually overrides the values for <command>java</command>, <command>javac</command> and <command>java_sdk_1.5.0</command> in <command>alternatives</command>, but we will set them all just to be safe and consistent.
+		</para>
+	</formalpara>
+	<variablelist>
+		<varlistentry>
+			<term>Setting the <envar>JAVA_HOME</envar> Environment Variable on Generic Linux</term>
+			<listitem>
+				<para>
+					After installing the JDK, you must ensure that the <envar>JAVA_HOME</envar> environment variable exists and points to the location of your JDK installation.
+				</para>
+				<formalpara>
+					<title>Setting the <envar>JAVA_HOME</envar> Environment Variable on Linux</title>
+					<para>
+						You can determine whether <envar>JAVA_HOME</envar> is set on your system by <command>echo</command>ing it on the command line:
+					</para>
+				</formalpara>
+				<!--  ~]$ echo $JAVA_HOME  -->
+				<screen>~]$ echo $JAVA_HOME</screen>
+				<para>
+					If <envar>JAVA_HOME</envar> is not set already, then you must set its value to the location of the JDK installation on your system. You can do this by adding two lines to your personal <filename>~/.bashrc</filename> configuration file. Open <filename>~/.bashrc</filename> (or create it if it doesn&#39;t exist) and add a line similar to the following one anywhere inside the file:
+				</para>
+
+				<programlisting>export JAVA_HOME="/usr/lib/jvm/jdk1.5.0_&lt;version&gt;"
+</programlisting>
+				<para>
+					You should also set this environment variable for any other users who will be running <application>JBCP</application> (any environment variables <command>export</command>ed from <filename>~/.bashrc</filename> files are local to that user).
+				</para>
+			</listitem>
+		</varlistentry>
+		<varlistentry>
+			<term>Setting <envar>java</envar>, <envar>javac</envar> and <envar>java_sdk_1.5.0</envar> Using the <command>alternatives</command> command </term>
+			<listitem>
+				<formalpara>
+					<title>Selecting the Correct System JVM on Linux using <command>alternatives</command>
+					</title>
+					<para>
+						On systems with the <command>alternatives</command> command, including Red Hat Enterprise Linux and Fedora, you can easily choose which JDK (or JRE) installation you wish to use, as well as which <command>java</command> and <command>javac</command> executables should be run when called.
+					</para>
+				</formalpara>
+				<para>
+					<emphasis>As the root user</emphasis>, call <command>/usr/sbin/alternatives</command> with the <option>--config java</option> option to select between JDKs and JREs installed on your system:
+				</para>
+
+				<programlisting>root@localhost ~]$ /usr/sbin/alternatives --config java
+
+There are 3 programs which provide &#39;java&#39;.
+
+  Selection    Command
+-----------------------------------------------
+   1           /usr/lib/jvm/jre-1.5.0-gcj/bin/java
+   2           /usr/lib/jvm/jre-1.6.0-sun/bin/java
+*+ 3         /usr/lib/jvm/jre-1.5.0-sun/bin/java
+
+
+Enter to keep the current selection[+], or type selection number:
+</programlisting>
+				<para>
+					In our case, we want to use the Sun JDK, version 5, that we downloaded and installed, to run the <command>java</command> executable. In the <command>alternatives</command> information printout above, a plus (<literal>+</literal>) next to a number indicates the one currently being used. As per <command>alternatives</command>&#39; instructions, pressing <keycap>Enter</keycap> will simply keep the current JVM, or you can enter the number corresponding to the JVM you would prefer to use.
+				</para>
+				<para>
+					Repeat the procedure above for the <command>javac</command> command and the <literal>java_sdk_1.5.0</literal> environment variable, <emphasis>as the root user</emphasis>:
+				</para>
+
+				<screen>~]$ /usr/sbin/alternatives --config javac</screen>
+
+				<screen>~]$ /usr/sbin/alternatives --config java_sdk_1.5.0</screen>
+			</listitem>
+		</varlistentry>
+		<varlistentry>
+			<term>Setting the <envar>JAVA_HOME</envar> Environment Variable on Windows</term>
+			<listitem>
+				<para>
+					For information on how to set environment variables in Windows, refer to <ulink
+						url="http://support.microsoft.com/kb/931715"></ulink>.
+				</para>
+			</listitem>
+		</varlistentry>
+	</variablelist>
+	<formalpara>
+		<!-- id="jdkicar-binary-Java_Development_Kit-Testing"> -->
+		<title>Testing</title>
+		<para>
+			Finally, to make sure that you are using the correct JDK or Java version (5 or higher), and that the java executable is in your <envar>PATH</envar>, run the <command>java <option>-version</option>
+			</command> command in the terminal from your home directory:
+		</para>
+	</formalpara>
+
+	<screen>~]$ java -version
+java version "1.5.0_16"
+Java(TM) 2 Runtime Environment, Standard Edition (build 1.5.0_16-b03)
+Java HotSpot(TM) Client VM (build 1.5.0_16-b03, mixed mode, sharing)</screen>
+	<!-- <formalpara
+		id="jdkicar-binary-Java_Development_Kit-Running">
+		<title>Running</title>
+		<para></para>
+	</formalpara> --><!--  <formalpara
+		id="jdkicar-binary-Java_Development_Kit-Stopping">
+		<title>Stopping</title>
+		<para></para>
+	</formalpara>  -->
+	<formalpara>
+		<!-- id="jdkicar-binary-Java_Development_Kit-Uninstalling"> -->
+		<title>Uninstalling</title>
+		<para>
+			There is usually no reason (other than space concerns) to remove a particular JDK from your system, given that you can switch between JDKs and JREs easily using <command>alternatives</command>, and/or by setting <envar>JAVA_HOME</envar>.
+		</para>
+	</formalpara>
+	<formalpara>
+		<title>Uninstalling the JDK on Linux</title>
+		<para>
+			On RPM-based systems, you can uninstall the JDK using the <command>yum <option>remove &lt;jdk_rpm_name&gt;</option>
+			</command> command.
+		</para>
+	</formalpara>
+	<formalpara>
+		<title>Uninstalling the JDK on Windows</title>
+		<para>
+			On Windows systems, check the JDK entry in the <literal>Start</literal> menu for an uninstall command, or use <literal>Add/Remove Programs</literal>.
+		</para>
+	</formalpara>
+</section>
+
+

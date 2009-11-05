@@ -1,0 +1,64 @@
+<?xml version='1.0'?>
+<!DOCTYPE authorgroup PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY AUTHOR_EMAIL_IVELIN "${author.email.ivelin}">
+<!ENTITY AUTHOR_EMAIL_JEAN "${author.email.jean}">
+<!ENTITY AUTHOR_EMAIL_VLAD "${author.email.vlad}">
+]>
+<authorgroup
+	id="sps-Author_Group">
+	<author>
+		<firstname>Douglas</firstname>
+		<surname>Silas</surname>
+		<!-- 
+		<affiliation>
+			<orgname>Red Hat, Inc.</orgname>
+			<orgdiv>Engineering Content Services</orgdiv>
+		</affiliation>
+		-->
+		<email>dhensley@redhat.com</email>
+	</author>
+	<author>
+		<firstname>Jean</firstname>
+		<surname>Deruelle</surname>
+		<!-- 
+		<affiliation>
+			<orgname>Red Hat, Inc.</orgname>
+			<orgdiv>${platform.name} ${product.name} Lead</orgdiv>			
+		</affiliation>
+		-->
+		<email>&AUTHOR_EMAIL_JEAN;</email>
+	</author>
+	<author>
+		<firstname>Vladimir</firstname>
+		<surname>Ralev</surname>
+		<!-- 
+		<affiliation>
+			<orgname>Red Hat, Inc.</orgname>
+			<orgdiv>${platform.name} ${product.name} Lead</orgdiv>			
+		</affiliation>
+		-->
+		<email>&AUTHOR_EMAIL_VLAD;</email>
+	</author>
+	<author>
+		<firstname>Ivelin</firstname>
+		<surname>Ivanov</surname>
+		<!-- 
+		<affiliation>
+			<orgname>Red Hat, Inc.</orgname>
+			<orgdiv>${platform.name} Lead</orgdiv>
+		</affiliation>
+		-->
+		<email>&AUTHOR_EMAIL_IVELIN;</email>
+	</author>
+	<author>
+        <firstname>Jared</firstname>
+        <surname>Morgan</surname>
+        <!-- 
+        <affiliation>
+             <orgname>Red Hat, Inc.</orgname>
+             <orgdiv>Engineering Content Services</orgdiv>
+         </affiliation>
+         -->
+          <email>jmorgan@redhat.com</email>
+    </author>
+</authorgroup>

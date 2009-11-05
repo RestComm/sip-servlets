@@ -1,0 +1,152 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY PLATFORM_NAME "${platform.name}">
+<!ENTITY VERSION "${version}">
+<!ENTITY YEAR "${year}">
+]><!-- chapter id nickname: ittsps -->
+<chapter
+	id="Introduction_to_the_SIP_Presence_Service">
+	
+	<title>Introduction to the &PLATFORM_NAME; SIP Presence Service</title>
+	
+	<para>
+		<mediaobject id="img-msps_standards">
+			<imageobject>
+				<imagedata
+					align="center"
+					fileref="images/msps_standards.jpg"
+					format="JPG" />
+			</imageobject>
+			<caption>
+				<para>&PLATFORM_NAME; SIP Presence Service relation with standard groups</para>
+			</caption>
+		</mediaobject>
+	</para>
+
+	<para>The <application>&PLATFORM_NAME;</application> <application>SIP Presence Service</application> provides presence functionalities to SIP-based networks using standards developed by the Internet Engineering Task Force (IETF), the Open Mobile Alliance (OMA), the 3rd Generation Partnership Project (3GPP) and the European Telecommunications Standards Institute (ETSI).</para>
+		
+	<section
+		id="Architecture_of_the_SIP_Presence_Service">
+		
+		<title>Architecture of the &PLATFORM_NAME; SIP Presence Service</title>
+		
+		<indexterm>
+			<primary>architecture</primary>
+		</indexterm>
+	
+		<para>The <application>SIP Presence Service</application> is comprised of three separate but interrelated servers.</para>
+		<para>
+			<mediaobject id="img-msps_servers">
+				<imageobject>
+					<imagedata
+						align="center"
+						fileref="images/msps_servers.jpg"
+						format="JPG" />
+				</imageobject>
+				<caption>
+					<para>&PLATFORM_NAME; SIP Presence Service servers</para>
+				</caption>
+			</mediaobject>
+		</para>
+		
+		<variablelist
+			id="ittsps-The_Three_Servers_Comprising_the_SIP_Presence_Service">
+			<title>The Three Servers Comprising the SIP Presence Service</title>
+			<varlistentry>
+				<term>The SIP Presence Server</term>
+				<listitem>
+					<para>The <application>&PLATFORM_NAME;</application> <application>SIP Presence Server</application> (<acronym>PS</acronym>) is an entity that accepts, stores and distributes <acronym>SIP</acronym> Presence Information. The <application>Presence Server</application> performs the following functions:</para>
+					<itemizedlist>
+						<listitem>
+							<para>It manages publications from one or multiple presence source(s) of a certain <emphasis>presentity</emphasis>. This includes refreshing presence information, replacing existing presence information with newly-published information, or removing presence information.</para>
+						</listitem>
+						<listitem>
+							<para>It manages subscriptions from watchers to presence information and generates notifications about presence information state changes, retrieving the presence authorization rules from the <application>XDM Server</application>.</para>
+						</listitem>
+						<listitem>
+							<para>It manages subscriptions from watcher information subscribers to watcher information and generates notifications about watcher information state changes.</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>The XML Document Management Server</term>
+				<listitem>
+					<para>The <application>XML Document Management Server</application> (<acronym>XDMS</acronym>) is a functional element of next-generation IP communications networks is responsible for handling the management of user XML documents stored on the network side, such as presence authorization rules, static presence information, contact and group lists (also known as <quote>resource lists</quote>), policy data, and many others.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>The Resource List Server</term>
+				<listitem>
+					<para>The <application>Resource List Server</application> (<acronym>RLS</acronym>) handles subscriptions to presence lists. It creates and manages back-end subscriptions to all resources in the presence list. The list content is retrieved from the <application>XDM Server</application>.</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		
+		<!--<title>&PLATFORM_NAME; SIP Presence Service Integrated Server</title>-->
+		
+		<para>
+			<mediaobject id="ittsps-img-msps_integrated">
+				<imageobject>
+					<imagedata
+						align="center"
+						fileref="images/msps_integrated.jpg"
+						format="JPG" />
+				</imageobject>
+				<caption>
+					<para>&PLATFORM_NAME; SIP Presence Service Integrated server</para>
+				</caption>
+			</mediaobject>
+		</para>
+
+		<para>A major advantage of the <application>&PLATFORM_NAME;</application> <application>SIP Presence Service</application> is that, depending on your needs, each server can be deployed separately, or all servers can be integrated on the same host.</para>		
+
+		<!--<title>Implementation of the &PLATFORM_NAME; SIP Presence Service</title>-->
+		
+		<para>
+			The <application>&PLATFORM_NAME;</application> <application>SIP Presence Service</application> is built on top of <application>&PLATFORM_NAME;</application> <application>JAIN SLEE</application>, a high performance and scalable Application Server and uses many additional Java Enterprise (<acronym>JEE</acronym>) technologies, such as Java Persistence API (<acronym>JPA</acronym>) to manage data.
+		</para>
+		
+		<para>
+			<mediaobject id="ittsps-img-msps_implementation">
+				<imageobject>
+					<imagedata
+						align="center"
+						fileref="images/msps_implementation.jpg"
+						format="JPG" />
+				</imageobject>
+				<caption>
+					<para>&PLATFORM_NAME; SIP Presence Service Integrated implementation</para>
+				</caption>
+			</mediaobject>
+		</para>
+			
+		<para>In addition, there are <acronym>JAIN SLEE</acronym> internal client interfaces available for interaction with each server, which distinguishes the <application>&PLATFORM_NAME;</application> <application>SIP Presence Service</application> from other presence services.</para>
+		
+		<formalpara>
+			<title>Resources and Further Information about the &PLATFORM_NAME; SIP Presence Service</title>
+			<para>For further information on the <application>&PLATFORM_NAME;</application> <application>SIP Presence Service</application>, here is a list of additional resources:</para>
+		</formalpara>
+		<variablelist>
+			<varlistentry>
+				<term>Sources</term>
+				<listitem>
+					<para>
+						<ulink
+							url="http://mobicents.googlecode.com/svn/trunk/servers/sip-presence/">Source Code Location</ulink>
+					</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Community</term>
+				<listitem>
+					<para>
+						<ulink
+							url="http://groups.google.com/group/mobicents-public">Mobicents Community</ulink>
+					</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</section>
+</chapter>
+

@@ -1,0 +1,44 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+]>
+
+<book>
+	<xi:include
+		href="Book_Info.xml"
+		xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<xi:include
+		href="Common_Content/Preface.xml"
+		xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<xi:include
+		xmlns:xi="http://www.w3.org/2001/XInclude"
+		href="Chapter-Introduction_to_the_SIP_Presence_Service.xml" />
+	<xi:include
+		xmlns:xi="http://www.w3.org/2001/XInclude"
+		href="Chapter-Installing_the_SIP_Presence_Service.xml" />
+	<xi:include
+		xmlns:xi="http://www.w3.org/2001/XInclude"
+		href="Chapter-XML_Document_Management_Server.xml" />
+	<xi:include
+		xmlns:xi="http://www.w3.org/2001/XInclude"
+		href="Chapter-SIP_Presence_Server.xml" />
+	<!--
+	<xi:include
+		xmlns:xi="http://www.w3.org/2001/XInclude"
+		href="Chapter-Resource_List_Server.xml" />
+	-->
+	<!--
+	<xi:include
+		xmlns:xi="http://www.w3.org/2001/XInclude"
+		href="Chapter-Presence_Aware_JAINSLEE_Application_Examples.xml" />
+	-->
+	<!--
+	<xi:include
+		xmlns:xi="http://www.w3.org/2001/XInclude"
+		href="Chapter-SIP_Presence_Clients_Configuration.xml" />
+	-->
+	<xi:include
+		href="Revision_History.xml"
+		xmlns:xi="http://www.w3.org/2001/XInclude" />
+	<index />
+</book>
+

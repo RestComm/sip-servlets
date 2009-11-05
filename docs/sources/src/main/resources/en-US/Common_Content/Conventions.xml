@@ -1,0 +1,172 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+]>
+
+<section>
+	<title>Document Conventions</title>
+	<para>
+		This manual uses several conventions to highlight certain words and phrases and draw attention to specific pieces of information.
+	</para>
+	<para>
+		In PDF and paper editions, this manual uses typefaces drawn from the <ulink url="https://fedorahosted.org/liberation-fonts/">Liberation Fonts</ulink> set. The Liberation Fonts set is also used in HTML editions if the set is installed on your system. If not, alternative but equivalent typefaces are displayed. Note: Red Hat Enterprise Linux 5 and later includes the Liberation Fonts set by default.
+	</para>
+	<section>
+		<title>Typographic Conventions</title>
+		<para>
+			Four typographic conventions are used to call attention to specific words and phrases. These conventions, and the circumstances they apply to, are as follows.
+		</para>
+		<para>
+			<literal>Mono-spaced Bold</literal>
+		</para>
+		<para>
+			Used to highlight system input, including shell commands, file names and paths. Also used to highlight key caps and key-combinations. For example:
+		</para>
+		<blockquote>
+			<para>
+				To see the contents of the file <filename>my_next_bestselling_novel</filename> in your current working directory, enter the <command>cat my_next_bestselling_novel</command> command at the shell prompt and press <keycap>Enter</keycap> to execute the command.
+			</para>
+		</blockquote>
+		<para>
+			The above includes a file name, a shell command and a key cap, all presented in Mono-spaced Bold and all distinguishable thanks to context.
+		</para>
+		<para>
+			Key-combinations can be distinguished from key caps by the hyphen connecting each part of a key-combination. For example:
+		</para>
+		<blockquote>
+			<para>
+				Press <keycap>Enter</keycap> to execute the command.
+			</para>
+			<para>
+				Press <keycombo><keycap>Ctrl</keycap><keycap>Alt</keycap><keycap>F1</keycap></keycombo> to switch to the first virtual terminal. Press <keycombo><keycap>Ctrl</keycap><keycap>Alt</keycap><keycap>F7</keycap></keycombo> to return to your X-Windows session.
+			</para>
+		</blockquote>
+		<para>
+			The first sentence highlights the particular key cap to press. The second highlights two sets of three key caps, each set pressed simultaneously.
+		</para>
+		<para>
+			If source code is discussed, class names, methods, functions, variable names and returned values mentioned within a paragraph will be presented as above, in <literal>Mono-spaced Bold</literal>. For example:
+		</para>
+		<blockquote>
+			<para>
+				File-related classes include <classname>filesystem</classname> for file systems, <classname>file</classname> for files, and <classname>dir</classname> for directories. Each class has its own associated set of permissions.
+			</para>
+		</blockquote>
+		<para>
+			<application>Proportional Bold</application>
+		</para>
+		<para>
+			This denotes words or phrases encountered on a system, including application names; dialogue box text; labelled buttons; check-box and radio button labels; menu titles and sub-menu titles. For example:
+		</para>
+		<blockquote>
+			<para>
+				Choose <guimenu>System &gt; Preferences &gt; Mouse</guimenu> from the main menu bar to launch <application>Mouse Preferences</application>. In the <guilabel>Buttons</guilabel> tab, click the <guilabel>Left-handed mouse</guilabel> check box and click <guibutton>Close</guibutton> to switch the primary mouse button from the left to the right (making the mouse suitable for use in the left hand).
+			</para>
+			<para>
+				To insert a special character into a <application>gedit</application> file, choose <guimenu>Applications &gt; Accessories &gt; Character Map</guimenu> from the main menu bar. Next, choose <guimenu>Search &gt; Find&hellip;</guimenu> from the <application>Character Map</application> menu bar, type the name of the character in the <guilabel>Search</guilabel> field and click <guibutton>Next</guibutton>. The character you sought will be highlighted in the <guilabel>Character Table</guilabel>. Double-click this highlighted character to place it in the <guilabel>Text to copy</guilabel> field and then click the <guibutton>Copy</guibutton> button. Now switch back to your document and choose <guimenu>Edit &gt; Paste</guimenu> from the <application>gedit</application> menu bar.
+			</para>
+		</blockquote>
+		<para>
+			The above text includes application names; system-wide menu names and items; application-specific menu names; and buttons and text found within a GUI interface, all presented in Proportional Bold and all distinguishable by context.
+		</para>
+		<para>
+			Note the <guimenu>&gt;</guimenu> shorthand used to indicate traversal through a menu and its sub-menus. This is to avoid the difficult-to-follow &#39;Select <guimenuitem>Mouse</guimenuitem> from the <guimenu>Preferences</guimenu> sub-menu in the <guimenu>System</guimenu> menu of the main menu bar&#39; approach.
+		</para>
+		<para>
+			<command><replaceable>Mono-spaced Bold Italic</replaceable></command> or <application><replaceable>Proportional Bold Italic</replaceable></application>
+		</para>
+		<para>
+			Whether Mono-spaced Bold or Proportional Bold, the addition of Italics indicates replaceable or variable text. Italics denotes text you do not input literally or displayed text that changes depending on circumstance. For example:
+		</para>
+		<blockquote>
+			<para>
+				To connect to a remote machine using ssh, type <command>ssh <replaceable>username</replaceable>@<replaceable>domain.name</replaceable></command> at a shell prompt. If the remote machine is <filename>example.com</filename> and your username on that machine is john, type <command>ssh john@example.com</command>.
+			</para>
+			<para>
+				The <command>mount -o remount <replaceable>file-system</replaceable></command> command remounts the named file system. For example, to remount the <filename>/home</filename> file system, the command is <command>mount -o remount /home</command>.
+			</para>
+			<para>
+				To see the version of a currently installed package, use the <command>rpm -q <replaceable>package</replaceable></command> command. It will return a result as follows: <command><replaceable>package-version-release</replaceable></command>.
+			</para>
+		</blockquote>
+		<para>
+			Note the words in bold italics above &mdash; username, domain.name, file-system, package, version and release. Each word is a placeholder, either for text you enter when issuing a command or for text displayed by the system.
+		</para>
+		<para>
+			Aside from standard usage for presenting the title of a work, italics denotes the first use of a new and important term. For example:
+		</para>
+		<blockquote>
+			<para>
+				When the Apache HTTP Server accepts requests, it dispatches child processes or threads to handle them. This group of child processes or threads is known as a <firstterm>server-pool</firstterm>. Under Apache HTTP Server 2.0, the responsibility for creating and maintaining these server-pools has been abstracted to a group of modules called <firstterm>Multi-Processing Modules</firstterm> (<firstterm>MPMs</firstterm>). Unlike other modules, only one module from the MPM group can be loaded by the Apache HTTP Server.
+			</para>
+		</blockquote>
+	</section>
+	
+	<section>
+		<title>Pull-quote Conventions</title>
+		<para>
+			Two, commonly multi-line, data types are set off visually from the surrounding text.
+		</para>
+		<para>
+			Output sent to a terminal is set in <computeroutput>Mono-spaced Roman</computeroutput> and presented thus:
+		</para>
+		
+<screen>
+books        Desktop   documentation  drafts  mss    photos   stuff  svn
+books_tests  Desktop1  downloads      images  notes  scripts  svgs
+</screen>
+		<para>
+			Source-code listings are also set in <computeroutput>Mono-spaced Roman</computeroutput> but are presented and highlighted as follows:
+		</para>
+		
+<programlisting language="java">
+package org.jboss.book.jca.ex1;
+
+import javax.naming.InitialContext;
+
+public class ExClient
+{
+   public static void main(String args[]) 
+       throws Exception
+   {
+      InitialContext iniCtx = new InitialContext();
+      Object         ref    = iniCtx.lookup("EchoBean");
+      EchoHome       home   = (EchoHome) ref;
+      Echo           echo   = home.create();
+
+      System.out.println("Created Echo");
+
+      System.out.println("Echo.echo(&#39;Hello&#39;) = " + echo.echo("Hello"));
+   }
+   
+}
+</programlisting>
+	</section>
+	
+	<section>
+		<title>Notes and Warnings</title>
+		<para>
+			Finally, we use three visual styles to draw attention to information that might otherwise be overlooked.
+		</para>
+		<note>
+			<title>Note</title>
+			<para>
+				A note is a tip or shortcut or alternative approach to the task at hand. Ignoring a note should have no negative consequences, but you might miss out on a trick that makes your life easier.
+			</para>
+		</note>
+		<important>
+			<title>Important</title>
+			<para>
+				Important boxes detail things that are easily missed: configuration changes that only apply to the current session, or services that need restarting before an update will apply. Ignoring Important boxes won&#39;t cause data loss but may cause irritation and frustration.
+			</para>
+		</important>
+		<warning>
+			<title>Warning</title>
+			<para>
+				A Warning should not be ignored. Ignoring warnings will most likely cause data loss.
+			</para>
+		</warning>
+	</section>
+
+</section>
+
+

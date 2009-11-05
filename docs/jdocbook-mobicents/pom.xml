@@ -1,0 +1,98 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<parent>
+		<groupId>org.mobicents.servlet.sip</groupId>
+		<artifactId>sip-servlets-docs</artifactId>
+		<version>1.1-SNAPSHOT</version>
+	</parent>
+	
+	<artifactId>sip-servlets-docs-jdocbook-mobicents</artifactId>
+	
+	<modelVersion>4.0.0</modelVersion>
+		
+	<packaging>jdocbook</packaging>
+	
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>unpack</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>unpack</goal>
+						</goals>
+						<configuration>
+							<artifactItems>								
+								<artifactItem>
+									<groupId>${pom.groupId}</groupId>
+									<artifactId>sip-servlets-docs-sources-mobicents</artifactId>
+									<version>${pom.version}</version>
+									<type>jar</type>
+									<overWrite>true</overWrite>
+									<outputDirectory>${project.build.directory}/docbook/resources</outputDirectory>
+								</artifactItem>
+							</artifactItems>							
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.jboss.maven.plugins</groupId>
+				<artifactId>maven-jdocbook-plugin</artifactId>
+				<version>2.2.0</version>
+				<extensions>true</extensions>
+				<dependencies>
+					<dependency>
+						<groupId>org.jboss</groupId>
+						<artifactId>jbossorg-docbook-xslt</artifactId>
+						<version>1.1.0</version>
+					</dependency>
+					<dependency>
+						<groupId>org.jboss</groupId>
+						<artifactId>jbossorg-jdocbook-style</artifactId>
+						<version>1.1.0</version>
+						<type>jdocbook-style</type>
+					</dependency>
+				</dependencies>
+				<configuration>					
+					<sourceDocumentName>SIP_Servlets_Server_User_Guide.xml</sourceDocumentName>
+					<sourceDirectory>${project.build.directory}/docbook/resources</sourceDirectory>
+					<imageResource>
+						<directory>${project.build.directory}/docbook/resources/en-US</directory>
+						<includes>
+							<include>images/*</include>
+						</includes>
+					</imageResource>
+					<formats>
+						<format>
+							<formatName>pdf</formatName>
+							<stylesheetResource>classpath:/xslt/org/jboss/pdf.xsl</stylesheetResource>
+							<finalName>SIP_Servlets_Server_User_Guide.pdf</finalName>
+						</format>
+						<format>
+							<formatName>html</formatName>
+							<stylesheetResource>classpath:/xslt/org/jboss/xhtml.xsl</stylesheetResource>
+							<finalName>index.html</finalName>
+						</format>
+						<format>
+							<formatName>html_single</formatName>
+							<stylesheetResource>classpath:/xslt/org/jboss/xhtml-single.xsl</stylesheetResource>
+							<finalName>index.html</finalName>
+						</format>
+					</formats>
+					<options>
+						<xincludeSupported>true</xincludeSupported>
+						<!-- needed for uri-resolvers; can be ommitted if using 'current' uri scheme -->
+						<!-- could also locate the docbook dependency and inspect its version... -->
+						<docbookVersion>1.72.0</docbookVersion>					
+					</options>		
+				</configuration>			
+			</plugin>
+		</plugins>
+	</build>
+
+</project>

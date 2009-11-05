@@ -1,0 +1,15 @@
+<?xml version='1.0'?>
+<!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+]><!-- chapter id nickname: spsug -->
+<preface
+	id="spsug-SIP_Presence_Service_User_Guide-Preface">
+	<title>Preface</title>
+	<xi:include
+		xmlns:xi="http://www.w3.org/2001/XInclude"
+		href="Conventions.xml">
+	</xi:include>
+	<xi:include
+		href="Feedback.xml"
+		xmlns:xi="http://www.w3.org/2001/XInclude">		
+	</xi:include>
+</preface>

@@ -1,0 +1,254 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY PLATFORM_NAME "${platform.name}">
+<!ENTITY VERSION "${version}">
+]><!-- chapter id nickname: xdms -->
+<chapter
+	id="xdms-XML_Document_Management_Server">
+	<title>&PLATFORM_NAME; XML Document Management Server</title>
+	<para>The <application>&PLATFORM_NAME; XML Document Management Server</application> (<application>XDM Server</application>) is part of the <application>&PLATFORM_NAME; SIP Presence Service</application>; it is the first free and open source implementation of an <application>XML Document Management Server</application> as defined in the <ulink
+			url="Open Mobile Alliance (OMA) XML Document Management v1.1 specification"/>. This functional element of next-generation IP communication networks is responsible for handling the management of user XML documents stored on the network side, such as presence authorization rules, contact and group lists (also known as resource lists), static presence information, and much more.</para>
+	<section
+		id="xdms-Functional_Architecture_of_the_XDM_Server">
+		<title>Functional Architecture of the XDM Server</title>
+		<para>The <application>&PLATFORM_NAME; XDM Server</application> includes the following XCAP application usages:</para>
+		<itemizedlist>
+			<listitem>
+				<para>
+					<ulink
+						url="http://tools.ietf.org/html/rfc5025">IETF Presence Rules (RFC 5025)</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<ulink
+						url="http://www.openmobilealliance.org/Technical/release_program/Presence_simple_v1_1.aspx">OMA Presence Rules (OMA Presence Simple v1.1 Candidate Release)</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<ulink
+						url="http://tools.ietf.org/html/rfc4826">IETF Resource Lists</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<ulink
+						url="http://tools.ietf.org/html/rfc4826">IETF RLS Services (RFC 4826)</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<ulink
+						url="http://tools.ietf.org/html/rfc4825">IETF XCAP-CAPS (RFC 4825)</ulink>
+				</para>
+			</listitem>
+		</itemizedlist>
+		<para>The SIP interface partially implements the XCAP Diff Event IETF draft, version 3. Subscriptions to a single document or usage by an entire application are supported. However, these differing usages do not extend to the single-XML element or attribute value level. Regarding the notifications, the diff-processing subscription parameter, if present, is ignored, and patching of content is not available at the moment, which means that only the document etags, new and/or old, will be provided.</para>
+		<mediaobject
+			id="img_msps-XDMFunctionalArchitecture">
+			<imageobject>
+				<imagedata
+					align="center"
+					width="700"
+					fileref="images/msps-XDMFunctionalArchitecture.jpg"
+					format="JPG" />
+			</imageobject>
+			<caption>
+				<para>The &PLATFORM_NAME; XML Document Management Server</para>
+			</caption>
+		</mediaobject>
+		<para>The <application>XDM Server</application> comprises the following functional elements:</para>
+		<variablelist
+			id="xdms-Functional_Elements_of_the_XDM_Server">
+			<title>Functional Elements of the XDM Server</title>
+			<varlistentry>
+				<term>Data Source</term>
+				<listitem>
+					<para>The <application>XDM Server</application> data source is where all user XML documents are stored. Information related to the server itself is also stored in this element along with the user's provisioned data</para>
+					<para>The data source also handles subscriptions to updates on specific documents, or complete XCAP application usages.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Aggregation Proxy</term>
+				<listitem>
+					<para>The aggregation proxy is responsible for handling an XDM client's XCAP requests, which includes authentication of the requester.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Request Processor</term>
+				<listitem>
+					<para>This element includes the XCAP Server logic to process an XCAP request and return a proper response, including authorization for the authenticated user.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>XDM Event Subscription Control</term>
+				<listitem>
+					<para>This element, using the SIP protocol, is responsible for handling subscriptions to documents managed by the XDM. Its functions include the authentication and authorization of a subscription, attachment to update events on specific documents or application usages, and the sending of notifications when documents change.</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<formalpara>
+			<title>Implementation Architecture of the &PLATFORM_NAME; XML Document Management Server</title>
+			<para>The <application>XDM Server</application> is built on top of the <application>&PLATFORM_NAME; JAIN SLEE</application> container. This figure depicts the architecture of the <application>XDM Server</application> implementation.</para>
+		</formalpara>
+		<mediaobject
+			id="img_msps-XDMSImplementationArchitecture">
+			<imageobject>
+				<imagedata
+					align="center"
+					width="500"
+					fileref="images/msps-XDMSImplementationArchitecture.jpg"
+					format="JPG" />
+			</imageobject>
+			<caption>
+				<para>&PLATFORM_NAME; XML Document Management Server Implementation</para>
+			</caption>
+		</mediaobject>
+		<variablelist
+			id="xdms-The_Functional_Elements_Which_Compose_the_XML_Document_Management_Server">
+			<title>The Functional Elements of the XML Document Management Server</title>
+			<varlistentry>
+				<term>Data Source Resource Adapter</term>
+				<listitem>
+					<para>This resource adapter implements the Data Source functional element.</para>
+					<para>The <literal>RA Type</literal> defines two activities objects, <literal>DocumentActivity</literal> and <literal>AppUsageActivity</literal>, both of which are used to fire events that signal that a document, element or attribute was updated.</para>
+					<para>The <literal>RA Type</literal> also defines a Service Building Block (<acronym>SBB</acronym>) RA interface to manage the users and documents stored in the XDM Server, and create activities, where events will be fired. The resource adapter will only fire events on activities that exist; that is, the RA won't create activities implicitly if a document is updated.</para>
+					<para>The <literal>RA Type</literal> also provides a base abstract implementation of the resource adapter, making it very simple to change the underlying resource used to store information, which is by default the internal JDBC datasource of the <application>JBoss Application Server</application>.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>AppUsage Cache Resource Adaptor</term>
+				<listitem>
+					<para>This resource adapter stores the XCAP application usages installed in the server.</para>
+					<para>Each <literal>AppUsage</literal> is an object that includes the logic to validate XCAP documents that result from XCAP requests and are expensive to create; this resource adapter  thus provides caching of AppUsages, using a pool model.</para>
+					<para>The resource adapter doesn't possess events or activities.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>AppUsage Service</term>
+				<listitem>
+					<para>XCAP Application Usages are installed through a  JAIN SLEE service, making it possible to add and/or remove application usages while the server is running.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Aggregation Proxy Service</term>
+				<listitem>
+					<para>This JAIN SLEE service implements the aggregation proxy functional element. It handles events fired by the &PLATFORM_NAME; HTTP Servlet resource adapter and then uses two child SBBs: the <literal>User Profile Enabler SBB</literal> to retrieve information regarding the user needed for authentication/authorization of the XCAP request, and the <literal>Request Processor SBB</literal>, which handles the XCAP request.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>Request Processor SBB</term>
+				<listitem>
+					<para>The <literal>Request Processor SBB</literal> implements the request processor functional element, providing a synchronous SBB interface to process XCAP requests. It uses the <literal>AppUsage Cache</literal> resource adapter to borrow AppUsage objects, and the Data Source resource adapter to retrieve or set documents stored in the server's data source.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>User Profile Enabler SBB</term>
+				<listitem>
+					<para>This SBB provides a synchronous SBB interface used in JAIN SLEE child relations in order to retrieve user information, to be used on user authentication. Two different implementations of the interface are provided: the first considers whether the information is stored in the XDM Data Source, another interfaces with a Diameter Sh Server, such as <application>IMS HSS</application>.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>XCAP Diff Subscription Control Service</term>
+				<listitem>
+					<para>This JAIN SLEE Service extends the abstract SIP Event Subscription Control component to handle SIP subscriptions on the xcap-diff event package.</para>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+		<para>The implementation architecture figure also contains client-side components:</para>
+		<variablelist
+			id="xdms-Client-Side_Components_of_the_XML_Document_Management_Server_">
+			<title>Client-Side Components of the XML Document Management Server </title>
+			<varlistentry>
+				<term>XCAP Client</term>
+				<listitem>
+					<para>The XCAP client is a simple API to interact with an XCAP Server that internally uses the Apache HTTP Client.</para>
+					<!--<para>The API documentation and example code snippets can be found TBD</para>-->
+					<para>&nbsp;</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>XCAP Client Resource Adaptor</term>
+				<listitem>
+					<para>The XCAP Client Resource Adapter adapts the XCAP Client API into the JAIN SLEE domain. It provides methods to interact with the XCAP server in both synchronous and asynchronous ways.</para>
+					<para>The RA Type description and code snippets using the RA can be found here.</para>
+				</listitem>
+			</varlistentry>
+			<varlistentry>
+				<term>XDM Client SBB</term>
+				<listitem>
+					<para>The XDMClientSBB is an interface of a JAIN SLEE SBB to be used as a client to the <application>&PLATFORM_NAME; XDM Server</application> (and others compliant with same standards), in JAIN SLEE child relations.</para>
+					<para>Two implementations of this interface are provided:</para>
+					<itemizedlist>
+						<listitem>
+							<para>
+								<literal>InternalXDMClientSBB</literal> is intended to be used on applications running in the <application>&PLATFORM_NAME; XDM Server</application> JAIN SLEE container, and</para>
+						</listitem>
+						<listitem>
+							<para>
+								<literal>ExternalXDMClientSBB</literal>, which is intended to be used on applications in a different JAIN SLEE container than the <application>&PLATFORM_NAME; XDM Server</application>.</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+			</varlistentry>
+		</variablelist>
+	</section>
+	
+	<section id="xdms-Configuring_the_XDM_Server">
+		<title>Configuring the XDM Server</title>
+			
+		<section id="xdms-Configuring_the_XDM_Server_XCAP_ROOT">
+			<title>Configuring the XDM Server XCAP root</title>
+			<para>The &PLATFORM_NAME; XDM Server comes pre-configured for an XCAP root of http://&lt;hostname&gt;:8080/mobicents, hostname being the host/<acronym>IP</acronym> used to start the server (127.0.0.1 by default). It is possible to change the last path segment:</para>
+			<itemizedlist>	
+				<listitem>
+					<para>Rename <filename>$JBOSS_HOME/server/&lt;server_profile&gt;/deploy/mobicents.war</filename> to the desired last path segment in the XCAP root (e.g. rename to xcap-root.war for an XCAP root of http://&lt;hostname&gt;:8080/xcap-root). The &lt;server_profile&gt; is the server configuration/profile used in the underlying <application>JBoss AS</application>, by default it is <emphasis>default</emphasis></para>					
+				</listitem>
+				<listitem>
+					<para>Edit properties file <filename>$JBOSS_HOME/server/&lt;server_profile&gt;/deploy/msps-xdms-ds-ra-DU-&VERSION;.jar/library/msps-xdms-core-sbb-&VERSION;.jar/org/mobicents/slee/xdm/server/configuration.properties</filename>, define the new XCAP root last path segment through the property XCAP_ROOT, don't forget to use a leading / . Again the &lt;server_profile&gt; is the server configuration/profile used in the underlying <application>JBoss AS</application>.</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		
+		<section id="xdms-Configuring_the_XDM_Server_Users">
+			<title>XDM Server User Profile Provisioning</title>
+				<para>XCAP interface is public, used by users to manage their information such as buddy list, presence authorization rules, etc. thus it needs to enforce user authentication. To do the user authentication, the server relies on the User Profile Enabler managed data, such as the users passwords, and this information must be provisioned, this can be done in two ways, both requiring the server to be running:</para>
+				<variablelist>
+				<varlistentry>
+					<term>User Provisioning through an JMX Client</term>
+					<listitem>
+						<para>Users can be added/removed through the MBean named <emphasis>slee:userprofile=UserProfileControl</emphasis></para>
+					</listitem>
+				</varlistentry>
+				<varlistentry>
+					<term>User Provisioning through the <application>JBoss AS</application> default datasource.</term>
+					<listitem>
+						<para>Users can be added/removed through adding/removing rows of the table named <emphasis>MOBICENTS_SLEE_ENABLER_USERPROFILES</emphasis>.</para>
+					</listitem>
+				</varlistentry>
+			</variablelist>
+		</section>
+	</section>
+	
+	<section
+		id="xdms-Resources_and_Further_Information_about_the_XDM_Server">
+		<title>Resources and Further Information about the XDM Server</title>
+		<para>For further information on the &PLATFORM_NAME; XDM Server, here is a list of additional resources:</para>
+		<itemizedlist
+			id="xdms-Further_Information_on_the_XDM_Server">
+			<listitem>
+				<para>
+					<ulink
+						url="http://groups.google.com/group/mobicents-public/web/xcap-client-api">XCAP Client API Documentation</ulink>
+				</para>
+			</listitem>
+			<listitem>
+				<para>
+					<ulink
+						url="http://groups.google.com/group/mobicents-public/web/xcap-client-resource-adaptor">XCAP Client RA Type Description and Example Code Snippets</ulink>
+				</para>
+			</listitem>
+		</itemizedlist>
+	</section>
+</chapter>

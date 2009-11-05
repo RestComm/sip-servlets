@@ -1,0 +1,46 @@
+<?xml version='1.0'?>
+<!DOCTYPE bookinfo PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY PLATFORM_NAME "${platform.name}">
+<!ENTITY VERSION "${version}">
+<!ENTITY YEAR "${year}">
+]><!-- chapter id nickname: spsug -->
+<bookinfo
+	id="spsug-SIP_Presence_Service_User_Guide">
+	<title>&PLATFORM_NAME; SIP Presence Service User Guide</title>
+	<subtitle></subtitle>
+	<productname>&PLATFORM_NAME; SIP Presence Service</productname>
+	<productnumber>&VERSION;</productnumber>
+	<edition>3.0</edition>
+	<pubsnumber>1</pubsnumber>
+	<abstract>
+		<para><application>The &PLATFORM_NAME; Platform</application> is the first and only open source <acronym>VoIP</acronym> platform certified for <acronym>JAIN SLEE</acronym> 1.0 and <acronym>SIP</acronym> Servlets 1.1 compliance. <application>&PLATFORM_NAME;</application> serves as a high-performance core for Service Delivery Platforms (<acronym>SDP</acronym>s) and <acronym>IP</acronym> Multimedia Subsystems (<acronym>IMS</acronym>es) by leveraging <acronym>J2EE</acronym> to enable the convergence of data and video in Next-Generation Intelligent Network (<acronym>NGIN</acronym>) applications.</para>
+		<para>The <application>&PLATFORM_NAME;</application> <application>SIP Presence Service</application>, provides presence functionalities to <acronym>SIP</acronym>-based networks, and is built upon &PLATFORM_NAME; <acronym>JAIN SLEE</acronym>.</para>
+	</abstract>
+	<corpauthor>
+		<inlinemediaobject>
+			<imageobject>
+				<imagedata
+					format="SVG"
+					fileref="images/icon.svg" />
+			</imageobject>
+			<textobject>
+				<phrase>Logo</phrase>
+			</textobject>
+		</inlinemediaobject>
+	</corpauthor>
+	<copyright>
+		<year>&YEAR;</year>
+		<holder>Red Hat, Inc.</holder>
+	</copyright>
+	<!-- FIXME this include is throwing compile errors
+	<xi:include
+		href="Common_Content/Legal_Notice.xml"
+		xmlns:xi="http://www.w3.org/2001/XInclude" />
+	-->
+	<xi:include
+		href="Author_Group.xml"
+		xmlns:xi="http://www.w3.org/2001/XInclude" />
+</bookinfo>
+
+
+
