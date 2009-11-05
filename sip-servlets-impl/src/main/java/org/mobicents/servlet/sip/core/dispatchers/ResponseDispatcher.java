@@ -114,12 +114,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 //					forwardResponseStatefully(sipServletResponse);
 					return ;
 				}
-			} else {
-				if(logger.isDebugEnabled()) {
-					logger.debug("retransmission received dropping the response " + response);
-				}
-				return ;
-			}
+			} 
 			final SipServletRequestImpl originalRequest = tmpOriginalRequest;
 			sipServletResponse.setOriginalRequest(originalRequest);
 			
