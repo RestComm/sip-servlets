@@ -244,7 +244,7 @@
 		<profile>			
 			<id>docs</id>
 			<modules>
-				<module>sip-servlets-docs</module>				
+				<module>docs</module>				
 			</modules>			
 		</profile>
 	</profiles>
