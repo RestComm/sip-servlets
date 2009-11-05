@@ -142,10 +142,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					} else {
 						if(poppedRouteHeader != null) {
 							throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request +
-								"in this popped routed header " + poppedRouteHeader + ", it may already have been invalidated or timed out");
+								"in this popped routed header " + poppedRouteHeader);
 						} else {
-							throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request +
-									", it may already have been invalidated or timed out");
+							throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request);
 						}
 					}
 				}
@@ -159,8 +158,12 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		
 		final SipContext sipContext = sipApplicationDispatcher.findSipApplication(applicationName);
 		if(sipContext == null) {
-			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request +
+			if(poppedRouteHeader != null) {
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request +
 					"in this popped routed header " + poppedRouteHeader);
+			} else {
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request);
+			}
 		}
 		final SipManager sipManager = (SipManager)sipContext.getManager();		
 		final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
@@ -182,8 +185,13 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				sipApplicationSession = sipManager.getSipApplicationSession(replacesSipApplicationSessionKey, false);
 			}
 			if(sipApplicationSession == null) {
-				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip application session to this subsequent request " + request +
-					" with the following popped route header " + sipServletRequest.getPoppedRoute());
+				if(poppedRouteHeader != null) {
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip application session to this subsequent request " + request +
+							" with the following popped route header " + sipServletRequest.getPoppedRoute() + ", it may already have been invalidated or timed out");
+				} else {
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip application session to this subsequent request " + request +
+							", it may already have been invalidated or timed out");					
+				}
 			}
 		}
 		
@@ -206,8 +214,13 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		
 		if(tmpSipSession == null) {
 			sipManager.dumpSipSessions();
-			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip session with key " + key + " to this subsequent request " + request +
-					" with the following popped route header " + sipServletRequest.getPoppedRoute());
+			if(poppedRouteHeader != null) {
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip session to this subsequent request " + request +
+						" with the following popped route header " + sipServletRequest.getPoppedRoute() + ", it may already have been invalidated or timed out");
+			} else {
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip session to this subsequent request " + request +
+						", it may already have been invalidated or timed out");					
+			}			
 		} else {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Inverted try worked. sip session found : " + tmpSipSession.getId());
