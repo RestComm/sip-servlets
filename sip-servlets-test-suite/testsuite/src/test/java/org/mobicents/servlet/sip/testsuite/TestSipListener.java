@@ -1136,12 +1136,9 @@ public class TestSipListener implements SipListener {
 			throw new IllegalArgumentException("we received a contact header with 0.0.0.0 in a response !");
 		}
 		
-		if(response.getStatusCode() >= 400 && response.getStatusCode() < 510) {
-			this.serverErrorReceived = true;
-		}
 		if(response.getStatusCode() >= 400 && response.getStatusCode() < 999) {
-			this.setErrorResponseReceived(true);
-		}
+			this.serverErrorReceived = true;
+		}		
 		if(response.toString().toLowerCase().contains("info")) {
 			lastInfoResponseTime = System.currentTimeMillis();
 		}
