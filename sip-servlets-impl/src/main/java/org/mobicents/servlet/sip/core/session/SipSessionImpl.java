@@ -120,7 +120,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		CREATION, DELETION, READYTOINVALIDATE;
 	}
 	
-	private static transient Logger logger = Logger.getLogger(SipSessionImpl.class);
+	private static final Logger logger = Logger.getLogger(SipSessionImpl.class);
 	
 	protected transient SipApplicationSessionKey sipApplicationSessionKey;			
 	//lazy loaded and not serialized
@@ -407,7 +407,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 					retryTran.setApplicationData(sipServletRequest.getTransactionApplicationData());
 					
 					Dialog dialog = retryTran.getDialog();
-					if (dialog == null && JainSipUtils.dialogCreatingMethods.contains(sipServletRequest.getMethod())) {					
+					if (dialog == null && JainSipUtils.DIALOG_CREATING_METHODS.contains(sipServletRequest.getMethod())) {					
 						dialog = sipProvider.getNewDialog(retryTran);
 						dialog.setApplicationData(sipServletRequest.getTransactionApplicationData());
 						if(logger.isDebugEnabled()) {
@@ -561,7 +561,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				FromHeader fromHeader = (FromHeader)sessionCreatingTransaction.getRequest().getHeader(FromHeader.NAME);
 				return new AddressImpl(fromHeader.getAddress(), AddressImpl.getParameters((Parameters)fromHeader), false);
 			} catch(Exception e) {
-				throw new RuntimeException("Error creating Address", e);
+				throw new IllegalArgumentException("Error creating Address", e);
 			}
 		} else {
 			return localParty;
@@ -629,7 +629,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 					return new AddressImpl(toHeader.getAddress(), AddressImpl.getParameters((Parameters)toHeader),  false);
 				}
 			} catch(Exception e) {
-				throw new RuntimeException("Error creating Address", e);
+				throw new IllegalArgumentException("Error creating Address", e);
 			}
 		} else {
 			return remoteParty;
@@ -1133,14 +1133,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 		// for a non-dialog creating request also leaves the SipSession state unchanged. 
 		// The exception to the general rule is that it does not apply to requests (e.g. BYE, CANCEL) 
 		// that are dialog terminating according to the appropriate RFC rules relating to the kind of dialog.		
-		if(!JainSipUtils.dialogCreatingMethods.contains(method) &&
-				!JainSipUtils.dialogTerminatingMethods.contains(method)) {
+		if(!JainSipUtils.DIALOG_CREATING_METHODS.contains(method) &&
+				!JainSipUtils.DIALOG_TERMINATING_METHODS.contains(method)) {
 			return;
 		}
 		// Mapping to the sip session state machine (proxy is covered here too)
 		if( (State.INITIAL.equals(state) || State.EARLY.equals(state)) && 
 				response.getStatus() >= 200 && response.getStatus() < 300 && 
-				!JainSipUtils.dialogTerminatingMethods.contains(method)) {
+				!JainSipUtils.DIALOG_TERMINATING_METHODS.contains(method)) {
 			this.setState(State.CONFIRMED);
 			if(this.proxy != null && this.proxy.getFinalBranchForSubsequentRequests() != null && !this.proxy.getFinalBranchForSubsequentRequests().getRecordRoute()) {
 				setReadyToInvalidate(true);
@@ -1158,8 +1158,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}		
 		if( (State.INITIAL.equals(state) || State.EARLY.equals(state)) && 
 				response.getStatus() >= 300 && response.getStatus() < 700 &&
-				JainSipUtils.dialogCreatingMethods.contains(method) && 
-				!JainSipUtils.dialogTerminatingMethods.contains(method)) {
+				JainSipUtils.DIALOG_CREATING_METHODS.contains(method) && 
+				!JainSipUtils.DIALOG_TERMINATING_METHODS.contains(method)) {
 			// If the servlet acts as a UAC and sends a dialog creating request, 
 			// then the SipSession state tracks directly the SIP dialog state except 
 			// that non-2XX final responses received in the EARLY or INITIAL states 

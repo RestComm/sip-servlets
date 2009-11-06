@@ -44,7 +44,7 @@ import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 
 public class SipListenersHolder {
-	private static Logger logger = Logger.getLogger(SipListenersHolder.class);
+	private static final Logger logger = Logger.getLogger(SipListenersHolder.class);
 	
 	private List<SipApplicationSessionAttributeListener> sipApplicationSessionAttributeListeners;
 	private List<SipApplicationSessionBindingListener> sipApplicationSessionBindingListeners;

@@ -36,7 +36,7 @@ public class SipHostConfig extends HostConfig {
 	public static final String SIP_CONTEXT_CLASS = "org.mobicents.servlet.sip.startup.SipStandardContext";
 	public static final String SIP_CONTEXT_CONFIG_CLASS = "org.mobicents.servlet.sip.startup.SipContextConfig";
 	
-	private static transient Logger logger = Logger.getLogger(SipHostConfig.class);
+	private static final Logger logger = Logger.getLogger(SipHostConfig.class);
 	/**
 	 * 
 	 */
@@ -84,7 +84,7 @@ public class SipHostConfig extends HostConfig {
 	
 	/**
 	 * 
-	 * @param name
+	 * @param NAME
 	 * @param sar
 	 * @param string
 	 */

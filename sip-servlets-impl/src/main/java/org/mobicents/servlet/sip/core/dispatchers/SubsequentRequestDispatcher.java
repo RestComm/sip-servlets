@@ -66,7 +66,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public class SubsequentRequestDispatcher extends RequestDispatcher {
 
-	private static transient Logger logger = Logger.getLogger(SubsequentRequestDispatcher.class);
+	private static final Logger logger = Logger.getLogger(SubsequentRequestDispatcher.class);
 	
 	public SubsequentRequestDispatcher() {}
 	

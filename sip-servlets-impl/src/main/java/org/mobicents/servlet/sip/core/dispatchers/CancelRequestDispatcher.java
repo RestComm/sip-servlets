@@ -88,7 +88,7 @@ import org.mobicents.servlet.sip.message.TransactionApplicationData;
  */
 public class CancelRequestDispatcher extends RequestDispatcher {
 
-	private static transient Logger logger = Logger.getLogger(CancelRequestDispatcher.class);
+	private static final Logger logger = Logger.getLogger(CancelRequestDispatcher.class);
 	
 	public CancelRequestDispatcher() {}
 	

@@ -160,7 +160,7 @@ public class AddressImpl extends ParameterableImpl implements Address {
 		else if (getAddress().getURI() instanceof javax.sip.address.TelURL)
 			return new TelURLImpl((javax.sip.address.TelURL) getAddress().getURI());
 		else
-			throw new RuntimeException("unsupported operation - unknown scheme");
+			throw new IllegalArgumentException("unsupported operation - unknown scheme");
 	}
 	/*
 	 * (non-Javadoc)

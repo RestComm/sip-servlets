@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip;
 
 import gov.nist.javax.sip.header.HeaderFactoryImpl;
 
+import javax.sip.PeerUnavailableException;
 import javax.sip.SipFactory;
 import javax.sip.address.AddressFactory;
 import javax.sip.header.HeaderFactory;
@@ -26,7 +27,7 @@ import javax.sip.message.MessageFactory;
 import org.apache.log4j.Logger;
 
 public class SipFactories {
-	private static transient Logger logger = Logger.getLogger(SipFactories.class.getCanonicalName());
+	private final static Logger logger = Logger.getLogger(SipFactories.class.getCanonicalName());
 
 	private static boolean initialized;
 
@@ -51,9 +52,9 @@ public class SipFactories {
 				}
 				messageFactory = sipFactory.createMessageFactory();
 				initialized = true;
-			} catch (Exception ex) {
+			} catch (PeerUnavailableException ex) {
 				logger.error("Could not instantiate factories -- exitting", ex);
-				throw new RuntimeException("Cannot instantiate factories ", ex);
+				throw new IllegalArgumentException("Cannot instantiate factories ", ex);
 			}
 		}
 	}

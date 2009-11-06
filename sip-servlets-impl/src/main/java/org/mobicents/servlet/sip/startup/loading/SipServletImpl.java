@@ -36,7 +36,7 @@ public class SipServletImpl extends StandardWrapper {
 	/**
      * The descriptive information string for this implementation.
      */
-    protected static final String info =
+    protected static final String INFO =
         "org.mobicents.servlet.sip.startup.loading.SipServletImpl/1.0";
     
     static final String[] DEFAULT_SIP_SERVLET_METHODS = new String[] {
@@ -155,7 +155,7 @@ public class SipServletImpl extends StandardWrapper {
      * <code>&lt;description&gt;/&lt;version&gt;</code>.
      */
     public String getInfo() {
-        return (info);
+        return (INFO);
     }
     
     /**

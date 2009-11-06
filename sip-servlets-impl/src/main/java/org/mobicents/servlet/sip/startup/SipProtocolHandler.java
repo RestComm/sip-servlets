@@ -84,7 +84,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	private static final String BALANCERS = "balancers";
 	private static final String JVM_ROUTE = "jvmRoute";
 	// the logger
-	private static transient Logger logger = Logger.getLogger(SipProtocolHandler.class.getName());
+	private static final Logger logger = Logger.getLogger(SipProtocolHandler.class.getName());
 	// *
     protected ObjectName tpOname = null;
     // *

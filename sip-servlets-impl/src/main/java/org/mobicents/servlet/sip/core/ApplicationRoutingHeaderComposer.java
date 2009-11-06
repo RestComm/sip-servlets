@@ -16,10 +16,10 @@ import org.apache.log4j.Logger;
  *
  */
 public class ApplicationRoutingHeaderComposer {
-	private static transient Logger logger = Logger.getLogger(ApplicationRoutingHeaderComposer.class
+	private static final Logger logger = Logger.getLogger(ApplicationRoutingHeaderComposer.class
 			.getCanonicalName());
 	
-	private static final Random random = new Random();
+	private static final Random RANDOM = new Random();
 	private static final String TOKEN_SEPARATOR = "_";
 	
 	private final static String reduceRandomValue(String str, int maxChars) {
@@ -31,7 +31,7 @@ public class ApplicationRoutingHeaderComposer {
 		}
 	}
 	public final static String randomString() {
-		long randValue = Math.abs(random.nextInt(1211111) ^ System.nanoTime());
+		long randValue = Math.abs(RANDOM.nextInt(1211111) ^ System.nanoTime());
 		return reduceRandomValue(String.valueOf(randValue), 8);
 	}
 

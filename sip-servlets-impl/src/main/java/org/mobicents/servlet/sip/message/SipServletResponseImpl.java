@@ -125,7 +125,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		 */
 
 		// This doesnt contain contact!!!!
-		boolean isSystemHeader = JainSipUtils.systemHeaders.contains(hName);
+		boolean isSystemHeader = JainSipUtils.SYSTEM_HEADERS.contains(hName);
 
 		if (isSystemHeader) {
 			return isSystemHeader;
@@ -465,7 +465,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					&& (RoutingState.INITIAL.equals(originalRequest.getRoutingState()) 
 							|| RoutingState.RELAYED.equals(originalRequest.getRoutingState())) 
 					&& getTransaction().getDialog() == null 
-					&& JainSipUtils.dialogCreatingMethods.contains(getMethod())) {					
+					&& JainSipUtils.DIALOG_CREATING_METHODS.contains(getMethod())) {					
 				final String transport = JainSipUtils.findTransport(transaction.getRequest());
 				final SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
 						transport, false).getSipProvider();

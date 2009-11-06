@@ -60,7 +60,7 @@ public class MobicentsSipApplicationSessionFacade implements
 		MobicentsSipApplicationSession, Externalizable {
 
 	private static final long serialVersionUID = 1L;
-	private static transient Logger logger = Logger.getLogger(MobicentsSipApplicationSessionFacade.class);
+	private static final Logger logger = Logger.getLogger(MobicentsSipApplicationSessionFacade.class);
 	private MobicentsSipApplicationSession sipApplicationSession;
 
 	public MobicentsSipApplicationSessionFacade() {
@@ -252,7 +252,7 @@ public class MobicentsSipApplicationSessionFacade implements
 			key = SessionManagerUtil.parseSipApplicationSessionKey(sipApplicationSessionId);
 		} catch (ParseException e) {
 			logger.error("Couldn't parse the following sip application session key " + sipApplicationSessionId, e);
-			throw new RuntimeException(e);
+			throw new IllegalArgumentException("Couldn't parse the following sip application session key " + sipApplicationSessionId, e);
 		}
 		SipContext sipContext = StaticServiceHolder.sipStandardService
 				.getSipApplicationDispatcher().findSipApplication(key.getApplicationName());

@@ -48,7 +48,7 @@ import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
 
 public class DigestAuthenticator
     extends AuthenticatorBase {
-	private static transient Logger log = Logger.getLogger(DigestAuthenticator.class);
+	private static final Logger log = Logger.getLogger(DigestAuthenticator.class);
 
 
     // -------------------------------------------------------------- Constants
@@ -56,13 +56,13 @@ public class DigestAuthenticator
     /**
      * The MD5 helper object for this class.
      */
-    static final MD5Encoder md5Encoder = new MD5Encoder();
+    static final MD5Encoder MD5_ECNODER = new MD5Encoder();
 
 
     /**
      * Descriptive information about this implementation.
      */
-    protected static final String info =
+    protected static final String INFO =
         "org.apache.catalina.authenticator.DigestAuthenticator/1.0";
 
 
@@ -109,7 +109,7 @@ public class DigestAuthenticator
      */
     public String getInfo() {
 
-        return (info);
+        return (INFO);
 
     }
 
@@ -191,17 +191,17 @@ public class DigestAuthenticator
                                              Realm realm) {
 
         //System.out.println("Authorization token : " + authorization);
-        // Validate the authorization credentials format
+        // Validate the authorization credentials format    	
         if (authorization == null)
             return (null);
         if (!authorization.startsWith("Digest "))
             return (null);
-        authorization = authorization.substring(7).trim();
+        String tmpAuthorization = authorization.substring(7).trim();
 
         // Bugzilla 37132: http://issues.apache.org/bugzilla/show_bug.cgi?id=37132
         // The solution of 37132 doesn't work with : response="2d05f1206becab904c1f311f205b405b",cnonce="5644k1k670",username="admin",nc=00000001,qop=auth,nonce="b6c73ab509830b8c0897984f6b0526e8",realm="sip-servlets-realm",opaque="9ed6d115d11f505f9ee20f6a68654cc2",uri="sip:192.168.1.142",algorithm=MD5
         // That's why I am going back to simple comma (Vladimir). TODO: Review this.
-        String[] tokens = authorization.split(",");//(?=(?:[^\"]*\"[^\"]*\")+$)");
+        String[] tokens = tmpAuthorization.split(",");//(?=(?:[^\"]*\"[^\"]*\")+$)");
 
         String userName = null;
         String realmName = null;
@@ -256,7 +256,7 @@ public class DigestAuthenticator
         synchronized (md5Helper) {
             buffer = md5Helper.digest(a2.getBytes());
         }
-        String md5a2 = md5Encoder.encode(buffer);
+        String md5a2 = MD5_ECNODER.encode(buffer);
 
         return (realm.authenticate(userName, response, nOnce, nc, cnonce, qop,
                                    realmName, md5a2));
@@ -278,10 +278,10 @@ public class DigestAuthenticator
             return (null);
         if (!authorization.startsWith("Digest "))
             return (null);
-        authorization = authorization.substring(7).trim();
+        String tmpAuthorization = authorization.substring(7).trim();
 
         StringTokenizer commaTokenizer =
-            new StringTokenizer(authorization, ",");
+            new StringTokenizer(tmpAuthorization, ",");
 
         while (commaTokenizer.hasMoreTokens()) {
             String currentToken = commaTokenizer.nextToken();
@@ -343,7 +343,7 @@ public class DigestAuthenticator
         synchronized (md5Helper) {
             buffer = md5Helper.digest(nOnceValue.getBytes());
         }
-        nOnceValue = md5Encoder.encode(buffer);
+        nOnceValue = MD5_ECNODER.encode(buffer);
 
         return nOnceValue;
     }
@@ -394,7 +394,7 @@ public class DigestAuthenticator
 
         String authenticateHeader = "Digest realm=\"" + realmName + "\", "
             +  "qop=\"auth\", nonce=\"" + nOnce + "\", " + "opaque=\""
-            + md5Encoder.encode(buffer) + "\"";
+            + MD5_ECNODER.encode(buffer) + "\"";
         
         // There are different headers for different types of auth
         if(response.getStatus() == 

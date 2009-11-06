@@ -69,7 +69,7 @@ import org.mobicents.servlet.sip.message.TransactionApplicationData;
 public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = Logger.getLogger(ProxyBranchImpl.class);
+	private static final Logger logger = Logger.getLogger(ProxyBranchImpl.class);
 	private transient ProxyImpl proxy;
 	private transient SipServletRequestImpl originalRequest;
 	private transient SipServletRequestImpl prackOriginalRequest;
@@ -348,7 +348,7 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 			newSession.setHandler(((MobicentsSipSession)this.originalRequest.getSipSession()).getHandler());
 		} catch (ServletException e) {
 			logger.error("could not set the session handler while forwarding the request", e);
-			throw new RuntimeException(e);
+			throw new RuntimeException("could not set the session handler while forwarding the request", e);
 		}
 		
 		// Use the original dialog in the new session
@@ -441,7 +441,7 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 					pbi.start();
 					recursed = true;
 				} catch (ServletParseException e) {
-					throw new RuntimeException("Can not parse contact header", e);
+					throw new IllegalArgumentException("Can not parse contact header", e);
 				}
 			}
 		}

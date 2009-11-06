@@ -60,7 +60,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  *
  */
 public class ResponseDispatcher extends MessageDispatcher {
-	private static transient Logger logger = Logger.getLogger(ResponseDispatcher.class);
+	private static final Logger logger = Logger.getLogger(ResponseDispatcher.class);
 	
 	public ResponseDispatcher() {}
 	

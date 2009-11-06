@@ -35,7 +35,7 @@ import org.mobicents.servlet.sip.SipFactories;
  */
 public class TelURLImpl extends URIImpl implements TelURL {
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = Logger.getLogger(TelURLImpl.class
+	private static final Logger logger = Logger.getLogger(TelURLImpl.class
 			.getCanonicalName());
 
 	private javax.sip.address.TelURL telUrl;		
@@ -71,7 +71,7 @@ public class TelURLImpl extends URIImpl implements TelURL {
 			phoneNumber = phoneNumber.substring(1);
 		}
 		try {
-			base_phone_number(phoneNumber);		
+			basePhoneNumber(phoneNumber);		
 			telUrl.setPhoneNumber(phoneNumber);
 		} catch (ParseException ex) {
 			logger.error("Error setting phone number " + number);
@@ -192,7 +192,7 @@ public class TelURLImpl extends URIImpl implements TelURL {
 	
 	// there might be a bug in the jsip impl in URLParser class need to check with ranga after TCK is done
 	// the part in comment 
-	private String base_phone_number(String number) throws ParseException {
+	private final static String basePhoneNumber(String number) throws ParseException {
 		StringBuffer s = new StringBuffer();
 		Lexer lexer = new Lexer("sip_urlLexer", number);
 		

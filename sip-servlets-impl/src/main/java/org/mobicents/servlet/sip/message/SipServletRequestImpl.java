@@ -98,19 +98,19 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger logger = Logger.getLogger(SipServletRequestImpl.class);
+	private static final Logger logger = Logger.getLogger(SipServletRequestImpl.class);
 	
 	private static final String EXCEPTION_MESSAGE = "The context does not allow you to modify this request !";
 	
-	public static final Set<String> nonInitialSipRequestMethods = new HashSet<String>();
+	public static final Set<String> NON_INITIAL_SIP_REQUEST_METHODS = new HashSet<String>();
 	
 	static {
-		nonInitialSipRequestMethods.add("CANCEL");
-		nonInitialSipRequestMethods.add("BYE");
-		nonInitialSipRequestMethods.add("PRACK");
-		nonInitialSipRequestMethods.add("ACK");
-		nonInitialSipRequestMethods.add("UPDATE");
-		nonInitialSipRequestMethods.add("INFO");
+		NON_INITIAL_SIP_REQUEST_METHODS.add("CANCEL");
+		NON_INITIAL_SIP_REQUEST_METHODS.add("BYE");
+		NON_INITIAL_SIP_REQUEST_METHODS.add("PRACK");
+		NON_INITIAL_SIP_REQUEST_METHODS.add("ACK");
+		NON_INITIAL_SIP_REQUEST_METHODS.add("UPDATE");
+		NON_INITIAL_SIP_REQUEST_METHODS.add("INFO");
 	};
 	
 	/* Linked request (for b2bua) */
@@ -171,7 +171,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		 * responses so it is not contained in system headers and as such
 		 * as a special treatment
 		 */
-		boolean isSystemHeader = JainSipUtils.systemHeaders.contains(hName);
+		boolean isSystemHeader = JainSipUtils.SYSTEM_HEADERS.contains(hName);
 
 		if (isSystemHeader)
 			return isSystemHeader;
@@ -342,7 +342,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			Request request = (Request) super.message;
 			if (this.getTransaction() != null
 					&& this.getTransaction().getDialog() == null
-					&& JainSipUtils.dialogCreatingMethods.contains(request.getMethod())) {
+					&& JainSipUtils.DIALOG_CREATING_METHODS.contains(request.getMethod())) {
 				
 				String transport = JainSipUtils.findTransport(request);
 				SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
@@ -353,7 +353,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				session.setSessionCreatingDialog(dialog);
 				dialog.setApplicationData( this.transactionApplicationData);				
 			}			
-			if(JainSipUtils.dialogCreatingMethods.contains(request.getMethod())) {
+			if(JainSipUtils.DIALOG_CREATING_METHODS.contains(request.getMethod())) {
 				this.createDialog = true; // flag that we want to create a dialog for outgoing request.
 			}
 			session.setB2buaHelper(b2buaHelper);
@@ -422,7 +422,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			try {
 				this.createResponse(Response.TOO_MANY_HOPS, "Too many hops").send();
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				throw new RuntimeException("could not send the Too many hops response out !", e);
 			}
 			throw new TooManyHopsException();
 		}
@@ -1365,7 +1365,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		}		
 		// 3. Examine Request Method. If it is CANCEL, BYE, PRACK or ACK, stop. 
 		//The request is not an initial request for which application selection occurs.
-		if(nonInitialSipRequestMethods.contains(sipServletRequest.getMethod())) {
+		if(NON_INITIAL_SIP_REQUEST_METHODS.contains(sipServletRequest.getMethod())) {
 			return RoutingState.SUBSEQUENT;
 		}
 		// 4. Existing Dialog Detection - If the request has a tag in the To header field, 

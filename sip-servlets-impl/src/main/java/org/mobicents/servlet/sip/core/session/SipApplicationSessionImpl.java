@@ -69,7 +69,7 @@ import org.mobicents.servlet.sip.utils.JvmRouteUtil;
  */
 public class SipApplicationSessionImpl implements MobicentsSipApplicationSession {
 
-	private static transient Logger logger = Logger.getLogger(SipApplicationSessionImpl.class);
+	private static final Logger logger = Logger.getLogger(SipApplicationSessionImpl.class);
 
 	/**
 	 * Timer task that will notify the listeners that the sip application session has expired 
@@ -1018,6 +1018,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				
 			case HTTP :
 				return findHttpSession(id);
+				
+			default : 
+				break;
 		}
 		return null;
 	}

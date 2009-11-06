@@ -49,7 +49,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public abstract class MessageDispatcher {
 
-	private static transient Logger logger = Logger.getLogger(MessageDispatcher.class);
+	private static final Logger logger = Logger.getLogger(MessageDispatcher.class);
 	
 	public static final String ROUTE_PARAM_DIRECTIVE = "directive";
 	

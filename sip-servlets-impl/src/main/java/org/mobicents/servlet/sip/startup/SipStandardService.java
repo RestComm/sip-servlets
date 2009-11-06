@@ -22,7 +22,6 @@ import gov.nist.javax.sip.SipStackExt;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.TooManyListenersException;
 
 import javax.sip.SipStack;
@@ -55,12 +54,12 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
  */
 public class SipStandardService extends StandardService implements SipService {
 	//the logger
-	private static transient Logger logger = Logger.getLogger(SipStandardService.class);
+	private static final Logger logger = Logger.getLogger(SipStandardService.class);
 	private static final String DEFAULT_SIP_PATH_NAME = "gov.nist";
 	/**
      * The descriptive information string for this implementation.
      */
-    private static final String info =
+    private static final String INFO =
         "org.mobicents.servlet.sip.startup.SipStandardService/1.0";
 	//the sip application dispatcher class name defined in the server.xml
 	protected String sipApplicationDispatcherClassName;
@@ -100,7 +99,7 @@ public class SipStandardService extends StandardService implements SipService {
 	
 	@Override
     public String getInfo() {
-        return (info);
+        return (INFO);
     }
 
 	
@@ -419,7 +418,7 @@ public class SipStandardService extends StandardService implements SipService {
 		String[] headers = additionalParameterableHeaders.split(",");
 		for(String header : headers) {
 			if(header != null && header.length()>0) {
-				JainSipUtils.parameterableHeadersNames.add(header);
+				JainSipUtils.PARAMETERABLE_HEADER_NAMES.add(header);
 			}
 		}
 	}

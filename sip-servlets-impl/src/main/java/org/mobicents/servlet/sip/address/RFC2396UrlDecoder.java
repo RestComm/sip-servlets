@@ -41,28 +41,29 @@ import org.apache.log4j.Logger;
  */
 public class RFC2396UrlDecoder {
 
-	static BitSet charactersDontNeedingEncoding;
-	static final int characterCaseDiff = ('a' - 'A');
-	private static Logger logger = Logger.getLogger(RFC2396UrlDecoder.class.getCanonicalName());
+	private static final String UTF_8 = "UTF-8";
+	static final BitSet CHARACHTERS_DONT_NEED_ECNODING;
+	static final int CHARACTER_CASE_DIFF = ('a' - 'A');
+	private final static Logger logger = Logger.getLogger(RFC2396UrlDecoder.class.getCanonicalName());
 	
 	/** Initialize the BitSet */
 	static {
-		charactersDontNeedingEncoding = new BitSet(256);
+		CHARACHTERS_DONT_NEED_ECNODING = new BitSet(256);
 		int i;
 		for (i = 'a'; i <= 'z'; i++) {
-			charactersDontNeedingEncoding.set(i);
+			CHARACHTERS_DONT_NEED_ECNODING.set(i);
 		}
 		for (i = 'A'; i <= 'Z'; i++) {
-			charactersDontNeedingEncoding.set(i);
+			CHARACHTERS_DONT_NEED_ECNODING.set(i);
 		}
 		for (i = '0'; i <= '9'; i++) {
-			charactersDontNeedingEncoding.set(i);
+			CHARACHTERS_DONT_NEED_ECNODING.set(i);
 		}
-		charactersDontNeedingEncoding.set('-');
-		charactersDontNeedingEncoding.set('_');
-		charactersDontNeedingEncoding.set('.');
-		charactersDontNeedingEncoding.set('*');
-		charactersDontNeedingEncoding.set('"');
+		CHARACHTERS_DONT_NEED_ECNODING.set('-');
+		CHARACHTERS_DONT_NEED_ECNODING.set('_');
+		CHARACHTERS_DONT_NEED_ECNODING.set('.');
+		CHARACHTERS_DONT_NEED_ECNODING.set('*');
+		CHARACHTERS_DONT_NEED_ECNODING.set('"');
 	}
 
 	    
@@ -78,7 +79,7 @@ public class RFC2396UrlDecoder {
 		final OutputStreamWriter writer = new OutputStreamWriter(buf);
 		for (int i = 0; i < s.length(); i++) {
 			int c = s.charAt(i);
-			if (charactersDontNeedingEncoding.get(c)) {
+			if (CHARACHTERS_DONT_NEED_ECNODING.get(c)) {
 				out.append((char) c);
 			} else {
 				try {
@@ -95,12 +96,12 @@ public class RFC2396UrlDecoder {
 					// converting to use uppercase letter as part of
 					// the hex value if ch is a letter.
 					if (Character.isLetter(ch)) {
-						ch -= characterCaseDiff;
+						ch -= CHARACTER_CASE_DIFF;
 					}
 					out.append(ch);
 					ch = Character.forDigit(ba[j] & 0xF, 16);
 					if (Character.isLetter(ch)) {
-						ch -= characterCaseDiff;
+						ch -= CHARACTER_CASE_DIFF;
 					}
 					out.append(ch);
 				}
@@ -160,11 +161,11 @@ public class RFC2396UrlDecoder {
                     }
                 }
                 try {
-                    String translatedPart = new String(encodedchars, 0, encodedcharsLength, "UTF-8");
+                    String translatedPart = new String(encodedchars, 0, encodedcharsLength, UTF_8);
                     translatedUri.append(translatedPart);
                 } catch (UnsupportedEncodingException e) {
                     //the situation that UTF-8 is not supported is quite theoretical, so throw a runtime exception
-                    throw new RuntimeException("Problem in decodePath: UTF-8 encoding not supported.");
+                    throw new IllegalArgumentException("Problem in decodePath: UTF-8 encoding not supported.");
                 }
                 encodedcharsLength = 0;
             } else {

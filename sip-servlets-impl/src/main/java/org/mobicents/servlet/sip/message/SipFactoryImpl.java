@@ -78,7 +78,7 @@ import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 public class SipFactoryImpl implements Externalizable {	
 
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = Logger.getLogger(SipFactoryImpl.class
+	private static final Logger logger = Logger.getLogger(SipFactoryImpl.class
 			.getCanonicalName());
 	private static final String TAG_PARAM = "tag";
 	private static final String METHOD_PARAM = "method";
@@ -98,15 +98,15 @@ public class SipFactoryImpl implements Externalizable {
 		}
 	}
 	
-	private static final Set<String> forbbidenParams = new HashSet<String>();
+	private static final Set<String> FORBIDDEN_PARAMS = new HashSet<String>();
 
 	static {
-		forbbidenParams.add(TAG_PARAM);
-		forbbidenParams.add(METHOD_PARAM);
-		forbbidenParams.add(MADDR_PARAM);
-		forbbidenParams.add(TTL_PARAM);
-		forbbidenParams.add(TRANSPORT_PARAM);
-		forbbidenParams.add(LR_PARAM);
+		FORBIDDEN_PARAMS.add(TAG_PARAM);
+		FORBIDDEN_PARAMS.add(METHOD_PARAM);
+		FORBIDDEN_PARAMS.add(MADDR_PARAM);
+		FORBIDDEN_PARAMS.add(TTL_PARAM);
+		FORBIDDEN_PARAMS.add(TRANSPORT_PARAM);
+		FORBIDDEN_PARAMS.add(LR_PARAM);
 	}	
 
 	private transient SipApplicationDispatcher sipApplicationDispatcher = null;
@@ -420,7 +420,7 @@ public class SipFactoryImpl implements Externalizable {
 			// Issue 676 : Any component of the from and to URIs not allowed in the context of
 			// SIP From and To headers are removed from the copies [refer Table 1, Section
 			// 19.1.1, RFC3261]
-			for(String param : forbbidenParams) {
+			for(String param : FORBIDDEN_PARAMS) {
 				from.getURI().removeParameter(param);	
 			}
 			
@@ -440,7 +440,7 @@ public class SipFactoryImpl implements Externalizable {
 			// Issue 676 : Any component of the from and to URIs not allowed in the context of
 			// SIP From and To headers are removed from the copies [refer Table 1, Section
 			// 19.1.1, RFC3261]
-			for(String param : forbbidenParams) {
+			for(String param : FORBIDDEN_PARAMS) {
 				to.getURI().removeParameter(param);	
 			}
 			// Issue 676 : to tags not removed so removing the tag
@@ -540,7 +540,7 @@ public class SipFactoryImpl implements Externalizable {
 			
 			SipServletRequest retVal = new SipServletRequestImpl(
 					requestToWrap, this, session, null, null,
-					JainSipUtils.dialogCreatingMethods.contains(method));						
+					JainSipUtils.DIALOG_CREATING_METHODS.contains(method));						
 			
 			return retVal;
 		} catch (Exception e) {

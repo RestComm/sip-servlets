@@ -45,12 +45,12 @@ public class SipStandardManager extends StandardManager implements SipManager {
 	/**
      * The descriptive information about this implementation.
      */
-    protected static final String info = "SipStandardManager/1.0";
+    protected static final String INFO = "SipStandardManager/1.0";
     
     /**
      * The descriptive name of this Manager implementation (for logging).
      */
-    protected final static String name = "SipStandardManager";
+    protected final static String NAME = "SipStandardManager";
 
     
 	/**
@@ -218,14 +218,14 @@ public class SipStandardManager extends StandardManager implements SipManager {
 	 * <code>&lt;description&gt;/&lt;version&gt;</code>.
 	 */
 	public String getInfo() {
-		return (info);
+		return (INFO);
 	}
 
 	/**
      * Return the descriptive short name of this Manager implementation.
      */
     public String getName() {
-        return (name);
+        return (NAME);
     }
 	
 	/**

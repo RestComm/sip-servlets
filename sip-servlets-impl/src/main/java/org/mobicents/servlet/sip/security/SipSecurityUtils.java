@@ -41,7 +41,7 @@ import org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint;
 
 public class SipSecurityUtils {
 	
-	private static transient Logger log = Logger.getLogger(SipSecurityUtils.class);
+	private static final Logger log = Logger.getLogger(SipSecurityUtils.class);
 	
 	public static boolean authenticate(SipContext sipStandardContext,
 			SipServletRequestImpl request,

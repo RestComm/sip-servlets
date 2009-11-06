@@ -5,14 +5,16 @@ import java.io.StringReader;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.NodeCreateRule;
 import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
 
+import org.mobicents.servlet.sip.startup.SipStandardService;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.Attributes;
 
 public class Mapping {
-	
+	private static final Logger logger = Logger.getLogger(Mapping.class);
 	/**
 	 * From JSR: amounts to 
 	 * method == "RULETEST1" &&
@@ -24,7 +26,7 @@ public class Mapping {
      * r-uri.param.foo != null &&
      * r-uri.port == 5000
 	 */
-	public static final String test = 
+	public static final String TEST = 
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 		+ "<sip-app>"
 	    + "<servlet-mapping>"
@@ -84,7 +86,7 @@ public class Mapping {
         digester.addRule("sip-app/servlet-mapping/pattern",
                 new TestRule());
         
-       digester.parse(new StringReader(test));
+       digester.parse(new StringReader(TEST));
 	}
 	
 	static class TestRule extends NodeCreateRule {
@@ -109,7 +111,7 @@ public class Mapping {
 			   try {
 				   MatchingRule rule = MatchingRuleParser.buildRule((Element) list.item(0));
 				   if (rule != null) {
-					   System.out.println(rule.getExpression());
+					   logger.debug(rule.getExpression());
 				   }
 			   } catch (Throwable t) {
 				   t.printStackTrace();

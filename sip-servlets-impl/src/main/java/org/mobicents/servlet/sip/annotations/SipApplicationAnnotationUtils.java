@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
  *
  */
 public class SipApplicationAnnotationUtils {
-	private static transient Logger logger = Logger.getLogger(SipApplicationAnnotationUtils.class);
+	private static final Logger logger = Logger.getLogger(SipApplicationAnnotationUtils.class);
 	
 	private final static byte[] SIP_APPLICATION_BYTES = "SipApplication".getBytes();
 	private final static byte[] ANNOTATION_BYTES = "annotation".getBytes();

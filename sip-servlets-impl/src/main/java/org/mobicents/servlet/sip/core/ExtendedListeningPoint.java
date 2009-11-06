@@ -43,7 +43,7 @@ e@gmail.com">Jean Deruelle</A>
  *
  */
 public class ExtendedListeningPoint {
-	private static transient Logger logger = Logger.getLogger(ExtendedListeningPoint.class);		
+	private static final Logger logger = Logger.getLogger(ExtendedListeningPoint.class);		
 	
 	// the listening point this class is extending
 	private ListeningPoint listeningPoint;
@@ -67,7 +67,7 @@ public class ExtendedListeningPoint {
 	public ExtendedListeningPoint(SipProvider sipProvider, ListeningPoint listeningPoint, SipConnector sipConnector) {
 		this.sipProvider = sipProvider;		
 		this.listeningPoint = listeningPoint;
-		this.setSipConnector(sipConnector);
+		this.sipConnector = sipConnector;
 		this.globalIpAddress = null;
 		this.globalPort = -1;
 		ipAddresses = new ArrayList<String>();

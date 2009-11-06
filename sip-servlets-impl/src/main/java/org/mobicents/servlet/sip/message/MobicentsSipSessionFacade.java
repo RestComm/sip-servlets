@@ -46,7 +46,7 @@ import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = Logger.getLogger(MobicentsSipSessionFacade.class);
+	private static final Logger logger = Logger.getLogger(MobicentsSipSessionFacade.class);
 	private transient MobicentsSipSession sipSession;
 	private SipSessionKey sipSessionKey = null;
 	private SipApplicationSessionKey sipAppSessionKey = null;

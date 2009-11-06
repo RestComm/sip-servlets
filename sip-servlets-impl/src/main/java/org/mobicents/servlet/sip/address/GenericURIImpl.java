@@ -31,7 +31,7 @@ import org.mobicents.servlet.sip.SipFactories;
  */
 public class GenericURIImpl extends URIImpl {
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = Logger.getLogger(GenericURIImpl.class.getCanonicalName());
+	private static final Logger logger = Logger.getLogger(GenericURIImpl.class.getCanonicalName());
 
 	public GenericURIImpl(javax.sip.address.URI uri) {
 		super(uri);

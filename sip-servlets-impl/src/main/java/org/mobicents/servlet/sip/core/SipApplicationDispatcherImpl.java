@@ -139,7 +139,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	} 
 	
 	//the logger
-	private static transient Logger logger = Logger.getLogger(SipApplicationDispatcherImpl.class);
+	private static final Logger logger = Logger.getLogger(SipApplicationDispatcherImpl.class);
 		
 	//the sip factory implementation, it is not clear if the sip factory should be the same instance
 	//for all applications
@@ -560,7 +560,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						null,
 						transaction,
 						dialog,
-						JainSipUtils.dialogCreatingMethods.contains(requestMethod));
+						JainSipUtils.DIALOG_CREATING_METHODS.contains(requestMethod));
 			requestsProcessed.incrementAndGet();	
 			// Check if the request is meant for me. If so, strip the topmost
 			// Route header.

@@ -31,7 +31,7 @@ import org.xbill.DNS.Type;
  *
  */
 public class DNSAddressResolver implements AddressResolver {
-	private static Logger logger = Logger.getLogger(DNSAddressResolver.class);
+	private static final Logger logger = Logger.getLogger(DNSAddressResolver.class);
 	//the sip factory implementation to be able
 	SipApplicationDispatcher sipApplicationDispatcher;
 	

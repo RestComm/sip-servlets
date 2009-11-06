@@ -59,7 +59,7 @@ import org.mobicents.servlet.sip.utils.Inet6Util;
  *
  */
 public class SipNetworkInterfaceManager {
-	private static transient Logger logger = Logger.getLogger(SipNetworkInterfaceManager.class);
+	private static final Logger logger = Logger.getLogger(SipNetworkInterfaceManager.class);
 	
 	/**
      * The maximum int value that could correspond to a port nubmer.
@@ -179,11 +179,12 @@ public class SipNetworkInterfaceManager {
 	 * If none has been found, null is returned if strict is true.
 	 * If none has been found, an exception is thrown is strict is false and no listening point could be found.
 	 */
-	public ExtendedListeningPoint findMatchingListeningPoint(String transport, boolean strict) {		
-		if(transport == null) {
-			transport = ListeningPoint.UDP;
+	public ExtendedListeningPoint findMatchingListeningPoint(String transport, final boolean strict) {
+		String tmpTransport = transport;
+		if(tmpTransport == null) {
+			tmpTransport = ListeningPoint.UDP;
 		}
-		List<ExtendedListeningPoint> extendedListeningPoints = transportMappingCacheMap.get(transport.toLowerCase());
+		List<ExtendedListeningPoint> extendedListeningPoints = transportMappingCacheMap.get(tmpTransport.toLowerCase());
 		if(extendedListeningPoints.size() > 0) {
 			return extendedListeningPoints.get(0);
 		}		
@@ -208,13 +209,14 @@ public class SipNetworkInterfaceManager {
 	 * @return Retrieve the first matching listening point corresponding to the ipAddress port and transport.
 	 * If none has been found, null is returned.
 	 */
-	public ExtendedListeningPoint findMatchingListeningPoint(String ipAddress, int port, String transport) {
-		int portChecked = checkPortRange(port, transport);
-		if(transport == null) {
-			transport = ListeningPoint.UDP;
+	public ExtendedListeningPoint findMatchingListeningPoint(final String ipAddress, int port, String transport) {
+		String tmpTransport = transport;
+		int portChecked = checkPortRange(port, tmpTransport);
+		if(tmpTransport == null) {
+			tmpTransport = ListeningPoint.UDP;
 		}	
 		// we check first if a listening point can be found (we only do the host resolving if not found to have better perf )
-		ExtendedListeningPoint listeningPoint = extendedListeningPointsCacheMap.get(ipAddress + "/" + portChecked + ":" + transport.toLowerCase());
+		ExtendedListeningPoint listeningPoint = extendedListeningPointsCacheMap.get(ipAddress + "/" + portChecked + ":" + tmpTransport.toLowerCase());
 		if(listeningPoint == null && !Inet6Util.isValidIP6Address(ipAddress) 
 					&& !Inet6Util.isValidIPV4Address(ipAddress)) {
 			// if no listening point has been found and the ipaddress is not a valid IP6 address nor a valid IPV4 address 
@@ -227,7 +229,7 @@ public class SipNetworkInterfaceManager {
 				// but an ip address not found in the searched listening points above				
 			}
 			for (InetAddress inetAddress : inetAddresses) {
-				listeningPoint = extendedListeningPointsCacheMap.get(inetAddress.getHostAddress() + "/" + portChecked + ":" + transport.toLowerCase());
+				listeningPoint = extendedListeningPointsCacheMap.get(inetAddress.getHostAddress() + "/" + portChecked + ":" + tmpTransport.toLowerCase());
 				if(listeningPoint != null) {
 					return listeningPoint;
 				}

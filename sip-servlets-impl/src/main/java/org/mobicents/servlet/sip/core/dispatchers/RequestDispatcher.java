@@ -51,7 +51,7 @@ import org.mobicents.servlet.sip.message.TransactionApplicationData;
  */
 public abstract class RequestDispatcher extends MessageDispatcher {
 
-	private static transient Logger logger = Logger.getLogger(RequestDispatcher.class);
+	private static final Logger logger = Logger.getLogger(RequestDispatcher.class);
 	
 	public RequestDispatcher() {}
 	

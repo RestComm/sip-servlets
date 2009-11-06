@@ -34,7 +34,7 @@ import org.mobicents.servlet.sip.message.SipServletRequestImpl;
  */
 public abstract class DispatchTask implements Runnable {
 	
-	private static transient Logger logger = Logger.getLogger(DispatchTask.class);
+	private static final Logger logger = Logger.getLogger(DispatchTask.class);
 	
 	protected SipServletMessageImpl sipServletMessage;
 	protected SipProvider sipProvider;

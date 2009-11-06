@@ -28,7 +28,7 @@ import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 
 public class ServletTimerImpl implements ServletTimer, Runnable {
-	private static transient Logger logger = Logger.getLogger(ServletTimerImpl.class);
+	private static final Logger logger = Logger.getLogger(ServletTimerImpl.class);
 	
 	private MobicentsSipApplicationSession appSession;
 	/**

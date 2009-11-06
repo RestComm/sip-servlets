@@ -38,7 +38,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public abstract class SipManagerDelegate {
 
-	private static transient Logger logger = Logger.getLogger(SipManagerDelegate.class);
+	private static final Logger logger = Logger.getLogger(SipManagerDelegate.class);
 	
 	protected ConcurrentHashMap<SipApplicationSessionKey, MobicentsSipApplicationSession> sipApplicationSessions = 
 		new ConcurrentHashMap<SipApplicationSessionKey, MobicentsSipApplicationSession>();

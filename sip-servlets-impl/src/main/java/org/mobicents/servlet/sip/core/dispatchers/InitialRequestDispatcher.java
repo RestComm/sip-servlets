@@ -84,7 +84,7 @@ import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
  */
 public class InitialRequestDispatcher extends RequestDispatcher {
 
-	private static transient Logger logger = Logger.getLogger(InitialRequestDispatcher.class);
+	private static final Logger logger = Logger.getLogger(InitialRequestDispatcher.class);
 	
 	public InitialRequestDispatcher() {}
 	

@@ -32,8 +32,8 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 public class TimerServiceImpl implements TimerService, Serializable {
 	
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = Logger.getLogger(TimerServiceImpl.class
-			.getName());
+//	private static final Logger logger = Logger.getLogger(TimerServiceImpl.class
+//			.getName());
 	
 	public static final int SCHEDULER_THREAD_POOL_DEFAULT_SIZE = 10;
 	

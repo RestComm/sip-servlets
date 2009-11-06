@@ -48,7 +48,7 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
  *
  */
 public class ProxyUtils {
-	private static transient Logger logger = Logger.getLogger(ProxyUtils.class);
+	private static final Logger logger = Logger.getLogger(ProxyUtils.class);
 	private SipFactoryImpl sipFactoryImpl;
 	private ProxyImpl proxy;
 	private static transient Random random = new Random(System.currentTimeMillis());
@@ -216,8 +216,7 @@ public class ProxyUtils {
 			
 			return clonedRequest;
 		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
+			throw new RuntimeException("Problem while creating the proxied request for message " + originalRequest.getMessage(), e);
 		}
 	}
 	

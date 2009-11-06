@@ -46,6 +46,7 @@ import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipSession;
 import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
+import javax.sip.ListeningPoint;
 import javax.sip.SipFactory;
 import javax.sip.Transaction;
 import javax.sip.header.AcceptLanguageHeader;
@@ -88,7 +89,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 
 
 	private static final long serialVersionUID = 1L;
-	private static Logger logger = Logger.getLogger(SipServletMessageImpl.class
+	private static final Logger logger = Logger.getLogger(SipServletMessageImpl.class
 			.getCanonicalName());
 	
 	private static final String CONTENT_TYPE_TEXT = "text";
@@ -250,7 +251,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		
 		try {
 			// Fix to Issue 1015 by alexander.kozlov.IV			
-			if(JainSipUtils.singletonHeadersNames.contains(name)) {
+			if(JainSipUtils.SINGELTON_HEADER_NAMES.contains(name)) {
 				Header header = SipFactory.getInstance().createHeaderFactory().createHeader(nameToAdd, value);
 				this.message.setHeader(header);				
 			} else {	
@@ -288,7 +289,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 				.createHeader(name, value);
 			this.message.setHeader(header);				
 		} catch (Exception e) {
-			throw new RuntimeException("Error creating header!", e);
+			throw new IllegalArgumentException("Error creating header!", e);
 		}
 	}
 	
@@ -955,9 +956,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#isSecure()
 	 */
-	public boolean isSecure() {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean isSecure() {		
+		return ListeningPoint.TLS.equalsIgnoreCase(JainSipUtils.findTransport(message));
 	}
 
 	/*
@@ -1105,7 +1105,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	 * @see javax.servlet.sip.SipServletMessage#setContent(java.lang.Object, java.lang.String)
 	 */
 	public void setContent(Object content, String contentType)
-			throws UnsupportedEncodingException {
+			throws UnsupportedEncodingException {		
 		checkMessageState();
 		checkContentType(contentType);
 		checkCommitted();
@@ -1113,12 +1113,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		if(contentType != null && contentType.length() > 0) {
 			this.addHeader(ContentTypeHeader.NAME, contentType);
 			String charset = this.getCharacterEncoding();
-			try {				
-				if(content instanceof String  && charset != null) {
+			try {		
+				Object tmpContent = content;
+				if(tmpContent instanceof String  && charset != null) {
 					//test for unsupportedencoding exception
 					new String("testEncoding".getBytes(charset));
 					
-					content = new String(((String)content).getBytes());
+					tmpContent = new String(((String)tmpContent).getBytes());
 				}
 				ContentTypeHeader contentTypeHeader = (ContentTypeHeader)this.message.getHeader(ContentTypeHeader.NAME);
 				this.message.setContent(content, contentTypeHeader);
@@ -1141,10 +1142,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		}
 		int indexOfSlash = contentType.indexOf("/");
 		if(indexOfSlash != -1) { 
-			if(!JainSipUtils.ianaAllowedContentTypes.contains(contentType.substring(0, indexOfSlash))) {
+			if(!JainSipUtils.IANA_ALLOWED_CONTENT_TYPES.contains(contentType.substring(0, indexOfSlash))) {
 				throw new IllegalArgumentException("the given content type " + contentType + " is not allowed");
 			}
-		} else if(!JainSipUtils.ianaAllowedContentTypes.contains(contentType.toLowerCase())) {
+		} else if(!JainSipUtils.IANA_ALLOWED_CONTENT_TYPES.contains(contentType.toLowerCase())) {
 			throw new IllegalArgumentException("the given content type " + contentType + " is not allowed");
 		}
 	}
@@ -1205,7 +1206,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 			expiresHeader.setExpires(seconds);
 			this.message.setExpires(expiresHeader);
 		} catch (Exception e) {
-			throw new RuntimeException("Error setting expiration header!", e);
+			throw new IllegalArgumentException("Error setting expiration header!", e);
 		}
 	}
 
@@ -1227,7 +1228,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		
 		try {
 			// Dealing with Allow:INVITE, ACK, CANCEL, OPTIONS, BYE kind of headers
-			if(!JainSipUtils.singletonHeadersNames.contains(name) && new StringTokenizer(value, ",").countTokens() > 1) {
+			if(!JainSipUtils.SINGELTON_HEADER_NAMES.contains(name) && new StringTokenizer(value, ",").countTokens() > 1) {
 				List<Header> headers = SipFactory.getInstance().createHeaderFactory()
 					.createHeaders(name + ":" + value);
 				for (Header header : headers) {
@@ -1239,7 +1240,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 				this.message.setHeader(header);
 			}
 		} catch (Exception e) {
-			throw new RuntimeException("Error creating header!", e);
+			throw new IllegalArgumentException("Error creating header!", e);
 		}
 	}
 
@@ -1318,7 +1319,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	 */
 	public static boolean isAddressTypeHeader(String headerName) {
 
-		return JainSipUtils.addressHeadersNames.contains(getFullHeaderName(headerName));
+		return JainSipUtils.ADDRESS_HEADER_NAMES.contains(getFullHeaderName(headerName));
 
 	}
 
@@ -1332,8 +1333,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	protected static String getFullHeaderName(String headerName) {
 
 		String fullName = null;
-		if (JainSipUtils.headerCompact2FullNamesMappings.containsKey(headerName)) {
-			fullName = JainSipUtils.headerCompact2FullNamesMappings.get(headerName);
+		if (JainSipUtils.HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.containsKey(headerName)) {
+			fullName = JainSipUtils.HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.get(headerName);
 		} else {
 			fullName = headerName;
 		}
@@ -1356,11 +1357,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	public static String getCompactName(String headerName) {
 
 		String compactName = null;
-		if (JainSipUtils.headerCompact2FullNamesMappings.containsKey(headerName)) {
-			compactName = JainSipUtils.headerCompact2FullNamesMappings.get(headerName);
+		if (JainSipUtils.HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.containsKey(headerName)) {
+			compactName = JainSipUtils.HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.get(headerName);
 		} else {
 			// This can be null if there is no mapping!!!
-			compactName = JainSipUtils.headerFull2CompactNamesMappings.get(headerName);
+			compactName = JainSipUtils.HEADER_FULL_TO_COMPACT_NAMES_MAPPINGS.get(headerName);
 		}
 		if (logger.isDebugEnabled())
 			logger.debug("Fetching compact header name for [" + headerName
@@ -1515,14 +1516,14 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 			}
 		}		
 
-		boolean isNotModifiable = JainSipUtils.systemHeaders.contains(header.getName());
+		boolean isNotModifiable = JainSipUtils.SYSTEM_HEADERS.contains(header.getName());
 		ParameterableHeaderImpl parameterable = new ParameterableHeaderImpl(
 				header, value, paramMap, isNotModifiable);
 		return parameterable;
 	}
 
 	public static boolean isParameterable(String header) {
-		if(JainSipUtils.parameterableHeadersNames.contains(header)) {
+		if(JainSipUtils.PARAMETERABLE_HEADER_NAMES.contains(header)) {
 			return true;
 		}
 		return false;

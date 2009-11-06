@@ -34,7 +34,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  *
  */
 public class ConvergedSessionDelegate {
-	private static transient Logger logger = Logger.getLogger(ConvergedSessionDelegate.class);
+	private static final Logger logger = Logger.getLogger(ConvergedSessionDelegate.class);
 	// We are storing the app session id in the http sessions (since they are replicated) under this key
 	private static final String APPLICATION_SESSION_ID_ATTRIBUTE_NAME = "org.mobicents.servlet.sip.SipApplicationSessionId";
 	

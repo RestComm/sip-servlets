@@ -36,7 +36,7 @@ public class SipStandardEngine extends StandardEngine {
 	/**
      * The descriptive information string for this implementation.
      */
-    private static final String info =
+    private static final String INFO =
         "org.mobicents.servlet.sip.startup.SipStandardEngine/1.0";
 	
 	@Override

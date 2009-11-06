@@ -106,7 +106,7 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl.NamesComparator;
  * @author mranga
  * @author Jean Deruelle
  */
-public class JainSipUtils {
+public final class JainSipUtils {
 	
 	/**
      * The maximum int value that could correspond to a port nubmer.
@@ -120,22 +120,22 @@ public class JainSipUtils {
     public static final int    MIN_PORT_NUMBER = 1024;
     
 	
-    private static transient Logger logger = Logger.getLogger(JainSipUtils.class);
+//    private static final transient Logger logger = Logger.getLogger(JainSipUtils.class);
 
 	public static final String GLOBAL_IPADDRESS = "0.0.0.0";
 	
-	public static final TreeSet<String> dialogCreatingMethods = new TreeSet<String>(
+	public static final Set<String> DIALOG_CREATING_METHODS = new TreeSet<String>(
 			new NamesComparator());
 	
-	public static final TreeSet<String> dialogTerminatingMethods = new TreeSet<String>(
+	public static final Set<String> DIALOG_TERMINATING_METHODS = new TreeSet<String>(
 			new NamesComparator());
 
 	static {		
-		dialogCreatingMethods.add(Request.INVITE);
-		dialogCreatingMethods.add(Request.SUBSCRIBE);
-		dialogCreatingMethods.add(Request.REFER);
-		dialogTerminatingMethods.add(Request.CANCEL);
-		dialogTerminatingMethods.add(Request.BYE);
+		DIALOG_CREATING_METHODS.add(Request.INVITE);
+		DIALOG_CREATING_METHODS.add(Request.SUBSCRIBE);
+		DIALOG_CREATING_METHODS.add(Request.REFER);
+		DIALOG_TERMINATING_METHODS.add(Request.CANCEL);
+		DIALOG_TERMINATING_METHODS.add(Request.BYE);
 	}
 	
 	public static final String INITIAL_REMOTE_ADDR_HEADER_NAME = "MSS_Initial_Remote_Addr";
@@ -145,32 +145,32 @@ public class JainSipUtils {
 	/**
 	 * List of headers that ARE system at all times
 	 */
-	public static final Set<String> systemHeaders = new HashSet<String>();
+	public static final Set<String> SYSTEM_HEADERS = new HashSet<String>();
 	static {
 
-		systemHeaders.add(FromHeader.NAME);
-		systemHeaders.add(ToHeader.NAME);
-		systemHeaders.add(CallIdHeader.NAME);
-		systemHeaders.add(CSeqHeader.NAME);
-		systemHeaders.add(ViaHeader.NAME);
-		systemHeaders.add(RouteHeader.NAME);
-		systemHeaders.add(RecordRouteHeader.NAME);
-		systemHeaders.add(PathHeader.NAME);
+		SYSTEM_HEADERS.add(FromHeader.NAME);
+		SYSTEM_HEADERS.add(ToHeader.NAME);
+		SYSTEM_HEADERS.add(CallIdHeader.NAME);
+		SYSTEM_HEADERS.add(CSeqHeader.NAME);
+		SYSTEM_HEADERS.add(ViaHeader.NAME);
+		SYSTEM_HEADERS.add(RouteHeader.NAME);
+		SYSTEM_HEADERS.add(RecordRouteHeader.NAME);
+		SYSTEM_HEADERS.add(PathHeader.NAME);
 		// This is system in messages other than REGISTER!!! ContactHeader.NAME
 		// Contact is a system header field in messages other than REGISTER
 		// requests and responses, 3xx and 485 responses, and 200/OPTIONS
 		// responses. Additionally, for containers implementing the reliable
 		// provisional responses extension, RAck and RSeq are considered system
 		// headers also.
-		systemHeaders.add(RSeqHeader.NAME);
-		systemHeaders.add(RAckHeader.NAME);
+		SYSTEM_HEADERS.add(RSeqHeader.NAME);
+		SYSTEM_HEADERS.add(RAckHeader.NAME);
 		//custom header used by Mobicents Sip Servlets and not allowed to be overriden by apps
-		systemHeaders.add(INITIAL_REMOTE_ADDR_HEADER_NAME);
-		systemHeaders.add(INITIAL_REMOTE_PORT_HEADER_NAME);
-		systemHeaders.add(INITIAL_REMOTE_TRANSPORT_HEADER_NAME);
+		SYSTEM_HEADERS.add(INITIAL_REMOTE_ADDR_HEADER_NAME);
+		SYSTEM_HEADERS.add(INITIAL_REMOTE_PORT_HEADER_NAME);
+		SYSTEM_HEADERS.add(INITIAL_REMOTE_TRANSPORT_HEADER_NAME);
 	}
 
-	public static final Set<String> addressHeadersNames = new HashSet<String>();
+	public static final Set<String> ADDRESS_HEADER_NAMES = new HashSet<String>();
 
 	static {
 
@@ -182,47 +182,47 @@ public class JainSipUtils {
 		// This includes the RFC 3261 defined header fields listed above as well as extension headers 
 		// such as Refer-To [refer] and P-Asserted-Identity [privacy]. 
 
-		addressHeadersNames.add(FromHeader.NAME);
-		addressHeadersNames.add(ToHeader.NAME);
-		addressHeadersNames.add(ContactHeader.NAME);
-		addressHeadersNames.add(RouteHeader.NAME);
-		addressHeadersNames.add(RecordRouteHeader.NAME);
-		addressHeadersNames.add(ReplyToHeader.NAME);
-		addressHeadersNames.add(AlertInfoHeader.NAME);
-		addressHeadersNames.add(CallInfoHeader.NAME);
-		addressHeadersNames.add(ErrorInfoHeader.NAME);
-		addressHeadersNames.add(ReferToHeader.NAME);
-		addressHeadersNames.add(PAssertedIdentityHeader.NAME);
+		ADDRESS_HEADER_NAMES.add(FromHeader.NAME);
+		ADDRESS_HEADER_NAMES.add(ToHeader.NAME);
+		ADDRESS_HEADER_NAMES.add(ContactHeader.NAME);
+		ADDRESS_HEADER_NAMES.add(RouteHeader.NAME);
+		ADDRESS_HEADER_NAMES.add(RecordRouteHeader.NAME);
+		ADDRESS_HEADER_NAMES.add(ReplyToHeader.NAME);
+		ADDRESS_HEADER_NAMES.add(AlertInfoHeader.NAME);
+		ADDRESS_HEADER_NAMES.add(CallInfoHeader.NAME);
+		ADDRESS_HEADER_NAMES.add(ErrorInfoHeader.NAME);
+		ADDRESS_HEADER_NAMES.add(ReferToHeader.NAME);
+		ADDRESS_HEADER_NAMES.add(PAssertedIdentityHeader.NAME);
 			
 	}
 
-	public static final Set<String> parameterableHeadersNames = new HashSet<String>();
+	public static final Set<String> PARAMETERABLE_HEADER_NAMES = new HashSet<String>();
 
 	static {
 
 		// All of the Address header fields are Parameterable, including Contact, From, To, Route, Record-Route, and Reply-To. 
 		// In addition, the header fields Accept, Accept-Encoding, Alert-Info, 
 		// Call-Info, Content-Disposition, Content-Type, Error-Info, Retry-After and Via are also Parameterable. 
-		parameterableHeadersNames.add(FromHeader.NAME);
-		parameterableHeadersNames.add(ToHeader.NAME);
-		parameterableHeadersNames.add(ContactHeader.NAME);
-		parameterableHeadersNames.add(RouteHeader.NAME);
-		parameterableHeadersNames.add(RecordRouteHeader.NAME);
-		parameterableHeadersNames.add(ReplyToHeader.NAME);
-		parameterableHeadersNames.add(AcceptHeader.NAME);
-		parameterableHeadersNames.add(AcceptEncodingHeader.NAME);
-		parameterableHeadersNames.add(AlertInfoHeader.NAME);
-		parameterableHeadersNames.add(CallInfoHeader.NAME);
-		parameterableHeadersNames.add(ContentDispositionHeader.NAME);
-		parameterableHeadersNames.add(ContentTypeHeader.NAME);
-		parameterableHeadersNames.add(ErrorInfoHeader.NAME);
-		parameterableHeadersNames.add(RetryAfterHeader.NAME);
-		parameterableHeadersNames.add(ViaHeader.NAME);
+		PARAMETERABLE_HEADER_NAMES.add(FromHeader.NAME);
+		PARAMETERABLE_HEADER_NAMES.add(ToHeader.NAME);
+		PARAMETERABLE_HEADER_NAMES.add(ContactHeader.NAME);
+		PARAMETERABLE_HEADER_NAMES.add(RouteHeader.NAME);
+		PARAMETERABLE_HEADER_NAMES.add(RecordRouteHeader.NAME);
+		PARAMETERABLE_HEADER_NAMES.add(ReplyToHeader.NAME);
+		PARAMETERABLE_HEADER_NAMES.add(AcceptHeader.NAME);
+		PARAMETERABLE_HEADER_NAMES.add(AcceptEncodingHeader.NAME);
+		PARAMETERABLE_HEADER_NAMES.add(AlertInfoHeader.NAME);
+		PARAMETERABLE_HEADER_NAMES.add(CallInfoHeader.NAME);
+		PARAMETERABLE_HEADER_NAMES.add(ContentDispositionHeader.NAME);
+		PARAMETERABLE_HEADER_NAMES.add(ContentTypeHeader.NAME);
+		PARAMETERABLE_HEADER_NAMES.add(ErrorInfoHeader.NAME);
+		PARAMETERABLE_HEADER_NAMES.add(RetryAfterHeader.NAME);
+		PARAMETERABLE_HEADER_NAMES.add(ViaHeader.NAME);
 		
 	}
 
 	
-	public static final Map<String, String> headerCompact2FullNamesMappings = new HashMap<String, String>();
+	public static final Map<String, String> HEADER_COMPACT_2_FULL_NAMES_MAPPINGS = new HashMap<String, String>();
 
 	{ // http://www.iana.org/assignments/sip-parameters
 		// Header Name compact Reference
@@ -249,30 +249,30 @@ public class JainSipUtils {
 		// Subject s [RFC3261]
 		// Supported k [RFC3261]
 
-		headerCompact2FullNamesMappings.put("i", CallIdHeader.NAME);
-		headerCompact2FullNamesMappings.put("f", FromHeader.NAME);
-		headerCompact2FullNamesMappings.put("t", ToHeader.NAME);
-		headerCompact2FullNamesMappings.put("v", ViaHeader.NAME);
-		headerCompact2FullNamesMappings.put("m", ContactHeader.NAME);
+		HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.put("i", CallIdHeader.NAME);
+		HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.put("f", FromHeader.NAME);
+		HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.put("t", ToHeader.NAME);
+		HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.put("v", ViaHeader.NAME);
+		HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.put("m", ContactHeader.NAME);
 		// headerCompact2FullNamesMappings.put("a",); // Where is this header?
-		headerCompact2FullNamesMappings.put("u", AllowEventsHeader.NAME);
-		headerCompact2FullNamesMappings.put("e", ContentEncodingHeader.NAME);
-		headerCompact2FullNamesMappings.put("l", ContentLengthHeader.NAME);
-		headerCompact2FullNamesMappings.put("c", ContentTypeHeader.NAME);
-		headerCompact2FullNamesMappings.put("o", EventHeader.NAME);
+		HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.put("u", AllowEventsHeader.NAME);
+		HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.put("e", ContentEncodingHeader.NAME);
+		HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.put("l", ContentLengthHeader.NAME);
+		HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.put("c", ContentTypeHeader.NAME);
+		HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.put("o", EventHeader.NAME);
 		// headerCompact2FullNamesMappings.put("y", IdentityHeader); // Where is
 		// sthis header?
 		// headerCompact2FullNamesMappings.put("n",IdentityInfoHeader );
-		headerCompact2FullNamesMappings.put("r", ReferToHeader.NAME);
-		 headerCompact2FullNamesMappings.put("b", ReferredByHeader.NAME);
+		HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.put("r", ReferToHeader.NAME);
+		 HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.put("b", ReferredByHeader.NAME);
 		// headerCompact2FullNamesMappings.put("j", RejectContactHeader);
-		headerCompact2FullNamesMappings.put("d", ContentDispositionHeader.NAME);
-		 headerCompact2FullNamesMappings.put("x", SessionExpiresHeader.NAME);
-		headerCompact2FullNamesMappings.put("s", SubjectHeader.NAME);
-		headerCompact2FullNamesMappings.put("k", SupportedHeader.NAME);
+		HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.put("d", ContentDispositionHeader.NAME);
+		 HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.put("x", SessionExpiresHeader.NAME);
+		HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.put("s", SubjectHeader.NAME);
+		HEADER_COMPACT_2_FULL_NAMES_MAPPINGS.put("k", SupportedHeader.NAME);
 	}
 
-	public static final Map<String, String> headerFull2CompactNamesMappings = new HashMap<String, String>();
+	public static final Map<String, String> HEADER_FULL_TO_COMPACT_NAMES_MAPPINGS = new HashMap<String, String>();
 
 	static { // http://www.iana.org/assignments/sip-parameters
 		// Header Name compact Reference
@@ -299,126 +299,126 @@ public class JainSipUtils {
 		// Subject s [RFC3261]
 		// Supported k [RFC3261]
 
-		headerFull2CompactNamesMappings.put(CallIdHeader.NAME, "i");
-		headerFull2CompactNamesMappings.put(FromHeader.NAME, "f");
-		headerFull2CompactNamesMappings.put(ToHeader.NAME, "t");
-		headerFull2CompactNamesMappings.put(ViaHeader.NAME, "v");
-		headerFull2CompactNamesMappings.put(ContactHeader.NAME, "m");
+		HEADER_FULL_TO_COMPACT_NAMES_MAPPINGS.put(CallIdHeader.NAME, "i");
+		HEADER_FULL_TO_COMPACT_NAMES_MAPPINGS.put(FromHeader.NAME, "f");
+		HEADER_FULL_TO_COMPACT_NAMES_MAPPINGS.put(ToHeader.NAME, "t");
+		HEADER_FULL_TO_COMPACT_NAMES_MAPPINGS.put(ViaHeader.NAME, "v");
+		HEADER_FULL_TO_COMPACT_NAMES_MAPPINGS.put(ContactHeader.NAME, "m");
 		// headerFull2CompactNamesMappings.put(,"a"); // Where is this header?
-		headerFull2CompactNamesMappings.put(AllowEventsHeader.NAME, "u");
-		headerFull2CompactNamesMappings.put(ContentEncodingHeader.NAME, "e");
-		headerFull2CompactNamesMappings.put(ContentLengthHeader.NAME, "l");
-		headerFull2CompactNamesMappings.put(ContentTypeHeader.NAME, "c");
-		headerFull2CompactNamesMappings.put(EventHeader.NAME, "o");
+		HEADER_FULL_TO_COMPACT_NAMES_MAPPINGS.put(AllowEventsHeader.NAME, "u");
+		HEADER_FULL_TO_COMPACT_NAMES_MAPPINGS.put(ContentEncodingHeader.NAME, "e");
+		HEADER_FULL_TO_COMPACT_NAMES_MAPPINGS.put(ContentLengthHeader.NAME, "l");
+		HEADER_FULL_TO_COMPACT_NAMES_MAPPINGS.put(ContentTypeHeader.NAME, "c");
+		HEADER_FULL_TO_COMPACT_NAMES_MAPPINGS.put(EventHeader.NAME, "o");
 		// headerCompact2FullNamesMappings.put(IdentityHeader,"y"); // Where is
 		// sthis header?
 		// headerCompact2FullNamesMappings.put(IdentityInfoHeader ,"n");
-		headerFull2CompactNamesMappings.put(ReferToHeader.NAME, "r");
+		HEADER_FULL_TO_COMPACT_NAMES_MAPPINGS.put(ReferToHeader.NAME, "r");
 		// headerCompact2FullNamesMappings.put(ReferedByHeader,"b");
 		// headerCompact2FullNamesMappings.put(RejectContactHeader,"j");
-		headerFull2CompactNamesMappings.put(ContentDispositionHeader.NAME, "d");
+		HEADER_FULL_TO_COMPACT_NAMES_MAPPINGS.put(ContentDispositionHeader.NAME, "d");
 		// headerCompact2FullNamesMappings.put(SessionExpiresHeader,"x");
-		headerFull2CompactNamesMappings.put(SubjectHeader.NAME, "s");
-		headerFull2CompactNamesMappings.put(SupportedHeader.NAME, "k");
+		HEADER_FULL_TO_COMPACT_NAMES_MAPPINGS.put(SubjectHeader.NAME, "s");
+		HEADER_FULL_TO_COMPACT_NAMES_MAPPINGS.put(SupportedHeader.NAME, "k");
 	}
 	
-	public static final Set<String> ianaAllowedContentTypes = new HashSet<String>();	
+	public static final Set<String> IANA_ALLOWED_CONTENT_TYPES = new HashSet<String>();	
 
 	static {
 
 		// All of the Address header fields are Parameterable, including Contact, From, To, Route, Record-Route, and Reply-To. 
 		// In addition, the header fields Accept, Accept-Encoding, Alert-Info, 
 		// Call-Info, Content-Disposition, Content-Type, Error-Info, Retry-After and Via are also Parameterable. 
-		ianaAllowedContentTypes.add("application");
-		ianaAllowedContentTypes.add("audio");
-		ianaAllowedContentTypes.add("example");
-		ianaAllowedContentTypes.add("image");
-		ianaAllowedContentTypes.add("message");
-		ianaAllowedContentTypes.add("model");
-		ianaAllowedContentTypes.add("multipart");
-		ianaAllowedContentTypes.add("text");
-		ianaAllowedContentTypes.add("video");
+		IANA_ALLOWED_CONTENT_TYPES.add("application");
+		IANA_ALLOWED_CONTENT_TYPES.add("audio");
+		IANA_ALLOWED_CONTENT_TYPES.add("example");
+		IANA_ALLOWED_CONTENT_TYPES.add("image");
+		IANA_ALLOWED_CONTENT_TYPES.add("message");
+		IANA_ALLOWED_CONTENT_TYPES.add("model");
+		IANA_ALLOWED_CONTENT_TYPES.add("multipart");
+		IANA_ALLOWED_CONTENT_TYPES.add("text");
+		IANA_ALLOWED_CONTENT_TYPES.add("video");
 			
 	}
 
 	// we don't have any other choice as to maintain a static list of multi value headers
 	// because checking for , for the values as a delimiter won't work for WWW-Authenticate header which is not a multivalue header
 	// but contains multiple , 
-	public static final Set<String> singletonHeadersNames = new HashSet<String>();
+	public static final Set<String> SINGELTON_HEADER_NAMES = new HashSet<String>();
 	static {
-		singletonHeadersNames.add(FromHeader.NAME);
-		singletonHeadersNames.add(ToHeader.NAME);
-		singletonHeadersNames.add(CSeqHeader.NAME);
-		singletonHeadersNames.add(CallIdHeader.NAME);
-		singletonHeadersNames.add(MaxForwardsHeader.NAME);
-		singletonHeadersNames.add(ContentLengthHeader.NAME);		
-		singletonHeadersNames.add(ContentDispositionHeader.NAME);
-		singletonHeadersNames.add(ContentTypeHeader.NAME);
-		singletonHeadersNames.add(ContentLengthHeader.NAME);
-		singletonHeadersNames.add(ContentTypeHeader.NAME);
-		singletonHeadersNames.add(DateHeader.NAME);
-		singletonHeadersNames.add(ContentTypeHeader.NAME);
-		singletonHeadersNames.add(ExpiresHeader.NAME);
-		singletonHeadersNames.add(MinExpiresHeader.NAME);
-		singletonHeadersNames.add(MimeVersionHeader.NAME);
-		singletonHeadersNames.add(MinExpiresHeader.NAME);
-		singletonHeadersNames.add(OrganizationHeader.NAME);
-		singletonHeadersNames.add(PriorityHeader.NAME);
-		singletonHeadersNames.add(ReplyToHeader.NAME);
-		singletonHeadersNames.add(RetryAfterHeader.NAME);
-		singletonHeadersNames.add(PriorityHeader.NAME);
-		singletonHeadersNames.add(ServerHeader.NAME);
-		singletonHeadersNames.add(SubjectHeader.NAME);
-		singletonHeadersNames.add(TimeStampHeader.NAME);
-		singletonHeadersNames.add(UserAgentHeader.NAME);
-		singletonHeadersNames.add(WWWAuthenticateHeader.NAME);
-		singletonHeadersNames.add(ProxyAuthenticateHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(FromHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(ToHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(CSeqHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(CallIdHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(MaxForwardsHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(ContentLengthHeader.NAME);		
+		SINGELTON_HEADER_NAMES.add(ContentDispositionHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(ContentTypeHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(ContentLengthHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(ContentTypeHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(DateHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(ContentTypeHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(ExpiresHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(MinExpiresHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(MimeVersionHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(MinExpiresHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(OrganizationHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(PriorityHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(ReplyToHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(RetryAfterHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(PriorityHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(ServerHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(SubjectHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(TimeStampHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(UserAgentHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(WWWAuthenticateHeader.NAME);
+		SINGELTON_HEADER_NAMES.add(ProxyAuthenticateHeader.NAME);
 		//TODO are there any other singleton headers ?
 	}	
 	
 	// we don't have any other choice as to maintain a static list of multi value headers
 	// because checking for , for the values as a delimiter won't work for WWW-Authenticate header which is not a multivalue header
 	// but contains multiple , 
-	public static final Set<String> listHeaderNames = new HashSet<String>();
+	public static final Set<String> LIST_HEADER_NAMES = new HashSet<String>();
 	static {
-		listHeaderNames.add(AcceptEncodingHeader.NAME);
-		listHeaderNames.add(AcceptLanguageHeader.NAME);
-		listHeaderNames.add(AcceptHeader.NAME);
-		listHeaderNames.add(AlertInfoHeader.NAME);
-		listHeaderNames.add(AllowEventsHeader.NAME);
-		listHeaderNames.add(AllowHeader.NAME);
-		listHeaderNames.add(AuthenticationInfoHeader.NAME);
-		listHeaderNames.add(AuthorizationHeader.NAME);
-		listHeaderNames.add(CallInfoHeader.NAME);
-		listHeaderNames.add(ContactHeader.NAME);
-		listHeaderNames.add(ContentEncodingHeader.NAME);
-		listHeaderNames.add(ContentLanguageHeader.NAME);
-		listHeaderNames.add(ErrorInfoHeader.NAME);
-		listHeaderNames.add(InReplyToHeader.NAME);
-		listHeaderNames.add(ProxyAuthenticateHeader.NAME);
-		listHeaderNames.add(ProxyAuthorizationHeader.NAME);
-		listHeaderNames.add(ProxyRequireHeader.NAME);
-		listHeaderNames.add(ReasonHeader.NAME);
-		listHeaderNames.add(RecordRouteHeader.NAME);
-		listHeaderNames.add(RequireHeader.NAME);
-		listHeaderNames.add(RouteHeader.NAME);
-		listHeaderNames.add(SupportedHeader.NAME);
-		listHeaderNames.add(UnsupportedHeader.NAME);
-		listHeaderNames.add(ViaHeader.NAME);
-		listHeaderNames.add(WarningHeader.NAME);
-		listHeaderNames.add(PAssertedIdentityHeader.NAME);
-		listHeaderNames.add(PAssociatedURIHeader.NAME);
-		listHeaderNames.add(PathHeader.NAME);
-		listHeaderNames.add(PMediaAuthorizationHeader.NAME);
-		listHeaderNames.add(PrivacyHeader.NAME);
-		listHeaderNames.add(PVisitedNetworkIDHeader.NAME);
-		listHeaderNames.add(SecurityClientHeader.NAME);
-		listHeaderNames.add(SecurityServerHeader.NAME);
-		listHeaderNames.add(SecurityVerifyHeader.NAME);
-		listHeaderNames.add(ServiceRouteHeader.NAME);
+		LIST_HEADER_NAMES.add(AcceptEncodingHeader.NAME);
+		LIST_HEADER_NAMES.add(AcceptLanguageHeader.NAME);
+		LIST_HEADER_NAMES.add(AcceptHeader.NAME);
+		LIST_HEADER_NAMES.add(AlertInfoHeader.NAME);
+		LIST_HEADER_NAMES.add(AllowEventsHeader.NAME);
+		LIST_HEADER_NAMES.add(AllowHeader.NAME);
+		LIST_HEADER_NAMES.add(AuthenticationInfoHeader.NAME);
+		LIST_HEADER_NAMES.add(AuthorizationHeader.NAME);
+		LIST_HEADER_NAMES.add(CallInfoHeader.NAME);
+		LIST_HEADER_NAMES.add(ContactHeader.NAME);
+		LIST_HEADER_NAMES.add(ContentEncodingHeader.NAME);
+		LIST_HEADER_NAMES.add(ContentLanguageHeader.NAME);
+		LIST_HEADER_NAMES.add(ErrorInfoHeader.NAME);
+		LIST_HEADER_NAMES.add(InReplyToHeader.NAME);
+		LIST_HEADER_NAMES.add(ProxyAuthenticateHeader.NAME);
+		LIST_HEADER_NAMES.add(ProxyAuthorizationHeader.NAME);
+		LIST_HEADER_NAMES.add(ProxyRequireHeader.NAME);
+		LIST_HEADER_NAMES.add(ReasonHeader.NAME);
+		LIST_HEADER_NAMES.add(RecordRouteHeader.NAME);
+		LIST_HEADER_NAMES.add(RequireHeader.NAME);
+		LIST_HEADER_NAMES.add(RouteHeader.NAME);
+		LIST_HEADER_NAMES.add(SupportedHeader.NAME);
+		LIST_HEADER_NAMES.add(UnsupportedHeader.NAME);
+		LIST_HEADER_NAMES.add(ViaHeader.NAME);
+		LIST_HEADER_NAMES.add(WarningHeader.NAME);
+		LIST_HEADER_NAMES.add(PAssertedIdentityHeader.NAME);
+		LIST_HEADER_NAMES.add(PAssociatedURIHeader.NAME);
+		LIST_HEADER_NAMES.add(PathHeader.NAME);
+		LIST_HEADER_NAMES.add(PMediaAuthorizationHeader.NAME);
+		LIST_HEADER_NAMES.add(PrivacyHeader.NAME);
+		LIST_HEADER_NAMES.add(PVisitedNetworkIDHeader.NAME);
+		LIST_HEADER_NAMES.add(SecurityClientHeader.NAME);
+		LIST_HEADER_NAMES.add(SecurityServerHeader.NAME);
+		LIST_HEADER_NAMES.add(SecurityVerifyHeader.NAME);
+		LIST_HEADER_NAMES.add(ServiceRouteHeader.NAME);
 	}	
 
-	private static final String[] allowedAddressSchemes = {"sip","sips","http","https","tel","tels","mailto"};
+	private static final String[] ALLOWED_ADDRESS_SCHEMES = {"sip","sips","http","https","tel","tels","mailto"};
 	
 	public static final int MAX_FORWARD_HEADER_VALUE = 70;
 
@@ -581,14 +581,15 @@ public class JainSipUtils {
 	}
 	
 	public static boolean checkScheme(String address) {
-		for(String scheme:allowedAddressSchemes) {
-			int start = address.indexOf("<");
+		String tmpAddress = address;
+		for(String scheme:ALLOWED_ADDRESS_SCHEMES) {
+			int start = tmpAddress.indexOf("<");
 			if(start >= 0) {
-				int end = address.indexOf(">");
-				address = address.substring(start + 1, end);
+				int end = tmpAddress.indexOf(">");
+				tmpAddress = tmpAddress.substring(start + 1, end);
 			}
 				
-			if(scheme.equalsIgnoreCase(address.substring(0, scheme.length())))
+			if(scheme.equalsIgnoreCase(tmpAddress.substring(0, scheme.length())))
 				return true;
 		}
 		return false;

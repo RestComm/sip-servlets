@@ -44,7 +44,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	protected static final String TTL = "ttl";
 	protected static final String USER = "user";
 	protected static final String TRANSPORT = "transport";
-	private static Logger logger = Logger.getLogger(SipURIImpl.class.getCanonicalName());
+	private final static Logger logger = Logger.getLogger(SipURIImpl.class.getCanonicalName()); 
 
 	public SipURIImpl(javax.sip.address.SipURI sipUri) {
 		super(sipUri);

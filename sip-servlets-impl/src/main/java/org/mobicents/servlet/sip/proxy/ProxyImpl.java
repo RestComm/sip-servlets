@@ -62,7 +62,7 @@ public class ProxyImpl implements Proxy, Externalizable {
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger logger = Logger.getLogger(ProxyImpl.class);
+	private static final Logger logger = Logger.getLogger(ProxyImpl.class);
 	
 	private SipServletRequestImpl originalRequest;
 	private transient SipServletResponseImpl bestResponse;
@@ -185,7 +185,9 @@ public class ProxyImpl implements Proxy, Externalizable {
 		ArrayList<ProxyBranch> list = new ArrayList<ProxyBranch>();
 		for(URI target: targets)
 		{
-			if(target == null) throw new NullPointerException("URI can't be null");
+			if(target == null) {
+				throw new NullPointerException("URI can't be null");
+			}
 			if(!JainSipUtils.checkScheme(target.toString())) {
 				throw new IllegalArgumentException("Scheme " + target.getScheme() + " is not supported");
 			}
@@ -304,7 +306,9 @@ public class ProxyImpl implements Proxy, Externalizable {
 	public void proxyTo(List<? extends URI> uris) {
 		for (URI uri : uris)
 		{
-			if(uri == null) throw new NullPointerException("URI can't be null");
+			if(uri == null) {
+				throw new NullPointerException("URI can't be null");
+			}
 			if(!JainSipUtils.checkScheme(uri.toString())) {
 				throw new IllegalArgumentException("Scheme " + uri.getScheme() + " is not supported");
 			}
@@ -320,7 +324,9 @@ public class ProxyImpl implements Proxy, Externalizable {
 	 * @see javax.servlet.sip.Proxy#proxyTo(javax.servlet.sip.URI)
 	 */
 	public void proxyTo(URI uri) {
-		if(uri == null) throw new NullPointerException("URI can't be null");
+		if(uri == null) {
+			throw new NullPointerException("URI can't be null");
+		}
 		if(!JainSipUtils.checkScheme(uri.toString())) {
 			throw new IllegalArgumentException("Scheme " + uri.getScheme() + " is not supported");
 		}

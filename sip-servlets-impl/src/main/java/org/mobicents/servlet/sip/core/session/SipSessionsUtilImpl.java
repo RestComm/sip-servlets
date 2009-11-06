@@ -37,7 +37,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 	private static final long serialVersionUID = 1L;
-	private static transient Logger logger = Logger.getLogger(SipSessionsUtilImpl.class);
+	private static final Logger logger = Logger.getLogger(SipSessionsUtilImpl.class);
 	
 	private transient SipContext sipContext;
 	

@@ -43,7 +43,7 @@ import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
 public abstract class AuthenticatorBase
     implements Authenticator{
 	
-	private static transient Logger log = Logger.getLogger(AuthenticatorBase.class);
+	private static final Logger log = Logger.getLogger(AuthenticatorBase.class);
 
 
     // ----------------------------------------------------- Instance Variables
@@ -93,7 +93,7 @@ public abstract class AuthenticatorBase
     /**
      * Descriptive information about this implementation.
      */
-    protected static final String info =
+    protected static final String INFO =
         "org.apache.catalina.authenticator.AuthenticatorBase/1.0";
 
 
@@ -113,7 +113,7 @@ public abstract class AuthenticatorBase
     /**
      * The string manager for this package.
      */
-    protected static final StringManager sm =
+    protected static final StringManager STRING_MANAGER =
         StringManager.getManager(Constants.Package);
 
 
@@ -196,7 +196,7 @@ public abstract class AuthenticatorBase
      */
     public String getInfo() {
 
-        return (info);
+        return (INFO);
 
     }
 

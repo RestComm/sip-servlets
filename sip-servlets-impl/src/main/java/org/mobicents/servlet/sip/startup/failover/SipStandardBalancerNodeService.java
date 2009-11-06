@@ -47,7 +47,7 @@ public class SipStandardBalancerNodeService extends SipStandardService implement
 
 	public String[] getBalancers() {
 		// TODO Auto-generated method stub
-		return null;
+		return new String[]{};
 	}
 
 	public long getHeartBeatInterval() {

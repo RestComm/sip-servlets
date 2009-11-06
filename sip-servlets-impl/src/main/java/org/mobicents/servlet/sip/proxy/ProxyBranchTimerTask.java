@@ -21,7 +21,7 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
 public class ProxyBranchTimerTask extends TimerTask{
-	private static transient Logger logger = Logger.getLogger(ProxyBranchTimerTask.class);
+	private static final Logger logger = Logger.getLogger(ProxyBranchTimerTask.class);
 	private ProxyBranchImpl proxyBranch;
 	
 	public ProxyBranchTimerTask(ProxyBranchImpl proxyBranch)

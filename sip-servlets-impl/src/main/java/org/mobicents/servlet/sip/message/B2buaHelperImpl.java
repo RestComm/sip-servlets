@@ -76,16 +76,16 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private static transient Logger logger = Logger.getLogger(B2buaHelperImpl.class);
+	private static final Logger logger = Logger.getLogger(B2buaHelperImpl.class);
 	
-	protected static final HashSet<String> b2buaSystemHeaders = new HashSet<String>();
+	protected static final Set<String> B2BUA_SYSTEM_HEADERS = new HashSet<String>();
 	static {
-		b2buaSystemHeaders.add(CallIdHeader.NAME);
-		b2buaSystemHeaders.add(CSeqHeader.NAME);
-		b2buaSystemHeaders.add(ViaHeader.NAME);
-		b2buaSystemHeaders.add(RouteHeader.NAME);
-		b2buaSystemHeaders.add(RecordRouteHeader.NAME);
-		b2buaSystemHeaders.add(PathHeader.NAME);
+		B2BUA_SYSTEM_HEADERS.add(CallIdHeader.NAME);
+		B2BUA_SYSTEM_HEADERS.add(CSeqHeader.NAME);
+		B2BUA_SYSTEM_HEADERS.add(ViaHeader.NAME);
+		B2BUA_SYSTEM_HEADERS.add(RouteHeader.NAME);
+		B2BUA_SYSTEM_HEADERS.add(RecordRouteHeader.NAME);
+		B2BUA_SYSTEM_HEADERS.add(PathHeader.NAME);
 	}
 	
 	//Map to handle linked sessions
@@ -165,7 +165,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 					session, 
 					null, 
 					null, 
-					JainSipUtils.dialogCreatingMethods.contains(newRequest.getMethod()));			
+					JainSipUtils.DIALOG_CREATING_METHODS.contains(newRequest.getMethod()));			
 			//JSR 289 Section 15.1.6
 			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);			
 			//If Contact header is present in the headerMap 
@@ -289,7 +289,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			for (Entry<String, List<String>> entry : headerMap.entrySet()) {
 				final String headerName = entry.getKey();
 				if(!headerName.equalsIgnoreCase(ContactHeader.NAME)) {
-					if(b2buaSystemHeaders.contains(headerName)) {
+					if(B2BUA_SYSTEM_HEADERS.contains(headerName)) {
 						throw new IllegalArgumentException(headerName + " in the provided map is a system header");
 					}
 					// Fix for Issue 1002 : The header field map is then used to 
@@ -300,7 +300,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 					for (String value : entry.getValue()) {							
 						final Header header = SipFactories.headerFactory.createHeader(
 								headerName, value);					
-						if(! JainSipUtils.singletonHeadersNames.contains(header.getName())) {
+						if(! JainSipUtils.SINGELTON_HEADER_NAMES.contains(header.getName())) {
 							newRequest.addHeader(header);
 						} else {
 							newRequest.setHeader(header);
@@ -554,7 +554,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 					session, 
 					null, 
 					null, 
-					JainSipUtils.dialogCreatingMethods.contains(newRequest.getMethod()));			
+					JainSipUtils.DIALOG_CREATING_METHODS.contains(newRequest.getMethod()));			
 			//JSR 289 Section 15.1.6
 			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);			
 			

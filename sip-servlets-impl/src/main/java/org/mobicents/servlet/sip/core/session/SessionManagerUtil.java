@@ -45,7 +45,7 @@ import org.apache.log4j.Logger;
  * remove methods when the sessions are no longer used.
  */
 public class SessionManagerUtil {
-	private static transient Logger logger = Logger.getLogger(SessionManagerUtil.class);
+	private static final Logger logger = Logger.getLogger(SessionManagerUtil.class);
 	
 	public final static String TAG_PARAMETER_NAME = "tag";
 	public final static String SESSION_KEY_SEPARATOR = ":";
