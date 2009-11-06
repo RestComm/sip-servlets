@@ -1478,7 +1478,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	
 				for (String pair : split) {
 					String[] vals = pair.split("=");
-					if (vals.length != 2) {
+					if (vals.length > 2) {
 						logger
 								.error("Wrong parameter format, expected value and name, got ["
 										+ pair + "]");
@@ -1486,7 +1486,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 								"Wrong parameter format, expected value or name["
 										+ pair + "]");
 					}
-					paramMap.put(vals[0], vals[1]);
+					// Fix to Issue 1010 (http://code.google.com/p/mobicents/issues/detail?id=1010) : Unable to set flag parameter to parameterable header
+					// from Alexander Kozlov from Codeminders
+					paramMap.put(vals[0], vals.length == 2 ? vals[1] : "");
 				}
 			}
 		} else {
@@ -1498,7 +1500,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	
 				for (String pair : split) {
 					String[] vals = pair.split("=");
-					if (vals.length != 2) {
+					if (vals.length > 2) {
 						logger
 								.error("Wrong parameter format, expected value and name, got ["
 										+ pair + "]");
@@ -1506,7 +1508,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 								"Wrong parameter format, expected value or name["
 										+ pair + "]");
 					}
-					paramMap.put(vals[0], vals[1]);
+					// Fix to Issue 1010 (http://code.google.com/p/mobicents/issues/detail?id=1010) : Unable to set flag parameter to parameterable header 
+					// from Alexander Kozlov from Codeminders
+					paramMap.put(vals[0], vals.length == 2 ? vals[1] : "");
 				}
 			}
 		}		

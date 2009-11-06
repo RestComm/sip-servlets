@@ -211,7 +211,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 					sipServletResponse.send();
 				} catch (IllegalArgumentException e) {
 					logger.info("Contact Header is not set-able for the 2XX response to an INVITE");
-				}
+				}				
 				Parameterable contact = sipServletResponse.getParameterableHeader("Contact");
 				contact.setParameter("flagparam", "");
 				String contactStringified = contact.toString().trim();
@@ -227,6 +227,15 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 				logger.info("Contact Header with flag param " + contactStringified);
 				if(contactStringified.endsWith("flagparam")) {
 					logger.error("the flagParam should have been removed when setting its value to null, sending 500 response");
+					sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+					sipServletResponse.send();
+					return;
+				}
+				contact = sipFactory.createParameterable("sip:user@127.0.0.1:5080;flagparam");
+				contactStringified = contact.toString().trim();
+				logger.info("Contact Header with flag param " + contactStringified);
+				if(contactStringified.endsWith("flagparam=")) {
+					logger.error("the flagParam should not contains the equals followed by empty, it is a flag so no equals sign should be present, sending 500 response");
 					sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
 					sipServletResponse.send();
 					return;
