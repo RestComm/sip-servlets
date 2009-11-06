@@ -27,10 +27,14 @@ import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.startup.SipContextConfig;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 
 public class Click2CallBasicTest extends SipServletTestCase {
 
 	private static final String CLICK2DIAL_URL = "http://127.0.0.1:8080/click2call/call";
+	private static final String RESOURCE_LEAK_URL = "http://127.0.0.1:8080/click2call/index.html";
 	private static final String CLICK2DIAL_PARAMS = "?from=sip:from@127.0.0.1:5056&to=sip:to@127.0.0.1:5057";
 	private static transient Logger logger = Logger.getLogger(Click2CallBasicTest.class);
 
@@ -45,6 +49,9 @@ public class Click2CallBasicTest extends SipServletTestCase {
 	// Don't restart the server for this set of tests.
 	private static boolean firstTime = true;
 
+	SipStandardContext context = null;
+	SipStandardManager manager = null; 
+		
 	public Click2CallBasicTest(String name) {
 		super(name);
 	}
@@ -59,26 +66,35 @@ public class Click2CallBasicTest extends SipServletTestCase {
 
 	@Override
 	public void tearDown() throws Exception {
-		for (SipPhone sp : sipPhoneReceivers) {
-			if(sp != null) {
-				sp.dispose();
+		if(sipPhoneReceivers != null) {
+			for (SipPhone sp : sipPhoneReceivers) {
+				if(sp != null) {
+					sp.dispose();
+				}
 			}
 		}
-		for (SipStack ss : sipStackReceivers) {
-			if(ss != null) {
-				ss.dispose();
+		if(sipStackReceivers != null) {
+			for (SipStack ss : sipStackReceivers) {
+				if(ss != null) {
+					ss.dispose();
+				}
 			}
 		}
 		super.tearDown();
+		context = null;
+		manager = null;
 	}
 
 	@Override
 	public void deployApplication() {
-		assertTrue(tomcat
-				.deployContext(
-						projectHome
-								+ "/sip-servlets-test-suite/applications/click-to-call-servlet/src/main/sipapp",
-						"click2call-context", "/click2call"));
+		context = new SipStandardContext();
+		context.setDocBase(projectHome +  "/sip-servlets-test-suite/applications/click-to-call-servlet/src/main/sipapp");
+		context.setName("click2call-context");
+		context.setPath("/click2call");		
+		context.addLifecycleListener(new SipContextConfig());
+		manager = new SipStandardManager();
+		context.setManager(manager);
+		assertTrue(tomcat.deployContext(context));		
 	}
 
 	@Override
@@ -167,5 +183,29 @@ public class Click2CallBasicTest extends SipServletTestCase {
 		assertTrue(receiverCalls[0].disconnect());
 		assertTrue(receiverCalls[1].waitForDisconnect(timeout));
 		assertTrue(receiverCalls[1].respondToDisconnect());
+	}
+
+	/**
+	 * http://code.google.com/p/mobicents/issues/detail?id=882 
+	 * HTTP requests to a SIP application always create an HTTP session, even for static resources
+	 */
+	public void testClickToCallHttpSessionLeak()
+		throws Exception {
+		
+		final int sessionsNumber = manager.getActiveSessions();
+		
+		logger.info("Trying to reach url : " + RESOURCE_LEAK_URL);
+		
+		URL url = new URL(RESOURCE_LEAK_URL);
+		InputStream in = url.openConnection().getInputStream();
+		
+		byte[] buffer = new byte[10000];
+		int len = in.read(buffer);
+		String httpResponse = "";
+		for (int q = 0; q < len; q++)
+			httpResponse += (char) buffer[q];
+		logger.info("Received the follwing HTTP response: " + httpResponse);
+		
+		assertEquals(sessionsNumber, manager.getActiveSessions());
 	}
 }
