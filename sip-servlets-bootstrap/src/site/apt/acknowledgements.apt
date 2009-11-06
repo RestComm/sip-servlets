@@ -35,5 +35,7 @@ Acknowledgements
 	* Alexander Kozlov from {{{http://www.codeminders.com}Codeminders}} : 
 	
 		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1015}Issue 1015}} and contributed a fix for it.		
+		
+		* contributed a fix for {{{http://code.google.com/p/mobicents/issues/detail?id=1010}Issue 1010}}.
 	
 	* Eric Cheung and Tom Smith from AT&T ECharts team for making sure E4SS is working continuously on Mobicents Sip Servlets and for their excellent bug reports.

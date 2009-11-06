@@ -65,22 +65,27 @@
 						<br />
 						<img src="orange.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=955">
-						HA colocating LB and nodes
+						HA colocating Load Balancer and nodes
 						</a>
 						<br />
-						<img src="orange.jpeg" />
+						<img src="green.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=956">
-						Distributed LB
+						Distributed Load Balancer
 						</a>
 						<br />
 						<img src="green.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=953">
-						Stateless LB
+						Stateless SIP Load Balancer
 						</a>
 						<br />
 						<img src="red.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=958">
 						HTTP redirect-based cooperative load-balancing
+						</a>
+						<br />
+						<img src="red.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=958">
+						Add HTTP Forwarder to Mobicents Load Balancer
 						</a>
 						<br />
 						<img src="green.jpeg" />
@@ -95,13 +100,18 @@
 						<br />						
 						<img src="red.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=1000">
-						SIP LB notification protocol and Health report
+						Mobicents Load Balancer notification protocol and Health report
 						</a> 
 						<br />						
 						<img src="green.jpeg" />
 						<a href="http://code.google.com/p/mobicents/issues/detail?id=660">
 						HA persistent timers (JB5 version only)
-						</a>						
+						</a>
+						<br />			
+						<img src="green.jpeg" />
+						<a href="http://code.google.com/p/mobicents/issues/detail?id=1039">
+						Move to Diameter 1.1.0.GA and inclusion of Diameter in JBoss 5 version 
+						</a>					
 						<br />			
 						<img src="red.jpeg" />
 						Geographical redundancy  
