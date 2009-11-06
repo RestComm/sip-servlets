@@ -223,6 +223,8 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
 		        
         wrapper.getPipeline().getFirst().invoke(request, response);
         context.exitSipAppHa(null, null);
+        // Fix for Issue 882 :remove the http session from the thread local to avoid any leaking of the session
+        context.getSipFactoryFacade().removeHttpSession();
         
         if ((instances !=null ) &&
                 (instances.length > 0)) {
