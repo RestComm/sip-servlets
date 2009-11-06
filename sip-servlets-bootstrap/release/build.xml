@@ -20,10 +20,11 @@
 	<property name="embjopr.version" value="1.2.0.CR-JBAS4" />
 	<property name="embjopr.download.url" value="http://downloads.sourceforge.net/rhq/embedded-jopr-${embjopr.version}.zip" />
 	
-	<property name="diameter.version" value="1.0.1.GA" />
-	<property name="diameter.download.url" value="http://downloads.sourceforge.net/mobicents/mobicents-diameter-${diameter.version}.zip" />
-	<property name="diameter.distro.zip.path" value="${base.path}/mobicents-diameter-${diameter.version}.zip" />
-	<property name="diameter.extracted" value="${release.path}/mobicents-diameter-${diameter.version}-extracted" />
+	<property name="diameter.version" value="1.1.0.GA" />
+	<property name="diameter.download.url" value="http://repository.jboss.com/maven2/org/mobicents/servers/diameter/mobicents-diameter-mux-sar-jboss-4/${diameter.version}/mobicents-diameter-mux-sar-jboss-4-${diameter.version}.sar" />
+	<property name="diameter-jboss-5.download.url" value="http://repository.jboss.com/maven2/org/mobicents/servers/diameter/mobicents-diameter-mux-sar-jboss-5/${diameter.version}/mobicents-diameter-mux-sar-jboss-5-${diameter.version}.sar" />
+	<property name="diameter.distro.path" value="${base.path}/mobicents-diameter-jboss-4-${diameter.version}.sar" />
+	<property name="diameter-jboss-5.distro.path" value="${base.path}/mobicents-diameter-jboss-5-${diameter.version}.sar" />
 	
 	<property name="tomcat.distro.zip.path" value="${base.path}/apache-tomcat-${tomcat.version}.zip" />
 	<property name="jboss.distro.zip.path" value="${base.path}/jboss-${jboss.version}.zip" />
@@ -140,9 +141,13 @@
 				</ant>				
 			</sequential>
 		</for>
+		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-jboss-5">
+			<property name="jboss.home" value="${jboss-5.home}"/>
+			<property name="jboss.config" value="default"/>
+		</ant>
 		<!-- include MMS 2.X in default dir only -->
 		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-2.x">
-			<property name="jboss.home" value="${jboss.home}"/>
+			<property name="jboss.home" value="${jboss-5.home}"/>
 			<property name="jboss.config" value="default"/>
 		</ant>
 		<!-- include JSR309 media example -->
@@ -368,12 +373,19 @@
 		</exec>				
 	</target>
 	
-	<target name="build-mobicents-diameter" depends="get-deps">
+	<!--target name="build-mobicents-diameter" depends="get-deps">
 		<echo>Building Mobicents Diameter</echo>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/diameter">
 			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss.home} -Dnode=${jboss.config} -Dmaven.test.skip=true" />
 		</exec>				
 	</target>
+	
+	<target name="build-mobicents-diameter-jboss-5" depends="get-deps">
+		<echo>Building Mobicents Diameter</echo>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/diameter">
+			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss-5.home} -Dnode=${jboss.config} -Dmaven.test.skip=true" />
+		</exec>				
+	</target-->
 	
 	<target name="build-mobicents-sip-load-balancer" depends="get-deps">
 		<echo>Building Mobicents SIP Load Balancer</echo>
@@ -403,22 +415,25 @@
 	
 	<!-- Download dependencies from SourceForge -->
 	
-	<!--target name="build-mobicents-diameter" depends="get-mobicents-diameter">
-		<unzip overwrite="true" dest="${diameter.extracted}" src="${diameter.distro.zip.path}">
-			<patternset>
-				<include name="core/mux/mobicents-diameter-mux-${diameter.version}.sar/**/*" />
-			</patternset>
-		</unzip>
-		<copy verbose="true" todir="${jboss.home}/server/${jboss.config}/deploy/">
-			<fileset dir="${diameter.extracted}/core/mux" />
-		</copy>
+	<target name="build-mobicents-diameter" depends="get-mobicents-diameter">		
+		<copy verbose="true" todir="${jboss.home}/server/${jboss.config}/deploy/" file="${diameter.distro.path}"/>			
 	</target>
 	
-	<available file="${diameter.distro.zip.path}" property="got.mobicents-diameter" />
+	<target name="build-mobicents-diameter-jboss-5" depends="get-mobicents-diameter-jboss-5">		
+		<copy verbose="true" todir="${jboss-5.home}/server/${jboss.config}/deploy/" file="${diameter-jboss-5.distro.path}"/>			
+	</target>
+	
+	<available file="${diameter.distro.path}" property="got.mobicents-diameter" />
 	<target name="get-mobicents-diameter" unless="got.mobicents-diameter">
-		<echo>Downloading Mobicents Diameter</echo>
-			<get dest="${diameter.distro.zip.path}" src="${diameter.download.url}" />
-	</target-->
+		<echo>Downloading Mobicents Diameter JBoss 4</echo>
+			<get dest="${diameter.distro.path}" src="${diameter.download.url}" />
+	</target>
+	
+	<available file="${diameter-jboss-5.distro.path}" property="got.mobicents-diameter-jboss-5" />
+		<target name="get-mobicents-diameter-jboss-5" unless="got.mobicents-diameter-jboss-5">
+			<echo>Downloading Mobicents Diameter JBoss5</echo>
+				<get dest="${diameter-jboss-5.distro.path}" src="${diameter-jboss-5.download.url}" />
+		</target>
 	
 	<!-- Fetch and build documentation -->
 	
