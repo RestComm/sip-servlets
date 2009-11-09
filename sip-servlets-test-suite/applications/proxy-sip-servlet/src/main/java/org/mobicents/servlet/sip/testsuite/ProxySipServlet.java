@@ -180,6 +180,22 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener {
 		if(!"PRACK".equals(response.getMethod()) && response.getProxy() != null && response.getProxy().getOriginalRequest() != null) {
 			logger.info("Original Sip Session is :" + response.getProxy().getOriginalRequest().getSession(false));
 		}
+		if(response.getFrom().getURI().toString().contains("sequential-retransmission")) {
+			if(response.getMethod().equals("INVITE")) {
+				if(response.getStatus() == 200) {
+					String lastOK = (String) response.getSession().getAttribute("lastOK");
+					if(lastOK != null) {
+						if(!response.toString().equals(lastOK)) {
+							// We expect to see the retransmissions. Fail the whole test in an ugly way otherwise.
+							System.out.print("ERROR ERROR ERROR : // We expect to see the retransmissions. Fail the whole test in an ugly way otherwise.\nERROR\ndsfdsf\n\n\n\n\n\n\nERROR'n");
+							System.exit(0);
+						}
+					}
+					response.getSession().setAttribute("lastOK", response.toString());
+				}
+			}
+		}
+		response.toString();
 		super.doResponse(response);
 	}
 	
