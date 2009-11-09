@@ -566,4 +566,21 @@ public class SipStandardService extends StandardService implements SipService {
 		}
 		return sipConnectors.toArray(new SipConnector[sipConnectors.size()]);
 	}
+	
+	/**
+	 * This method simply makes the HTTP and SSL ports avaialble everywhere in the JVM in order jsip ha to read them for
+	 * balancer description purposes. There is no other good way to communicate the properies to jsip ha without adding
+	 * more dependencies.
+	 */
+	public void initializeSystemPortProperties() {
+		for (Connector connector : connectors) {
+			if(connector.getProtocol().contains("HTTP")) {
+				if(connector.getSecure()) {
+					System.setProperty("org.mobicents.properties.sslPort", Integer.toString(connector.getPort()));
+				} else {
+					System.setProperty("org.mobicents.properties.httpPort", Integer.toString(connector.getPort()));
+				}
+			}
+		}
+	}
 }

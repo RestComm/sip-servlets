@@ -213,6 +213,9 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			logger.debug("Starting a sip protocol handler");
 		}						
 		
+		// This simply puts HTTP and SSL port numbers in JVM properties menat to be read by jsip ha when sending heart beats with Node description.
+		StaticServiceHolder.sipStandardService.initializeSystemPortProperties();
+		
 		String catalinaHome = System.getProperty("catalina.home");
         if (catalinaHome == null) {
         	catalinaHome = System.getProperty("catalina.base");
