@@ -36,6 +36,7 @@ import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
+import org.mobicents.tools.sip.balancer.BalancerContext;
 import org.mobicents.tools.sip.balancer.CallIDAffinityBalancerAlgorithm;
 import org.mobicents.tools.sip.balancer.NodeRegisterImpl;
 import org.mobicents.tools.sip.balancer.RouterImpl;
@@ -828,12 +829,12 @@ public class BasicFailoverTest extends SipServletTestCase {
 		properties.setProperty("internalPort", "" + BALANCER_INTERNAL_PORT);
 		properties.setProperty("externalPort", "" + BALANCER_EXTERNAL_PORT);
 		CallIDAffinityBalancerAlgorithm balancerAlgorithm = new CallIDAffinityBalancerAlgorithm();
+		BalancerContext.balancerContext.balancerAlgorithm = balancerAlgorithm;
 		balancerAlgorithm.setProperties(properties);
-		reg.setBalancerAlgorithm(balancerAlgorithm);
 		reg.startRegistry(2000);
 		RouterImpl.setRegister(reg);
+		BalancerContext.balancerContext.balancerAlgorithm = balancerAlgorithm;
 		fwd=new SIPBalancerForwarder(properties,reg);
-		fwd.setBalancerAlgorithm(balancerAlgorithm);
 		fwd.start();
 		
 		balancerAlgorithm.init();
