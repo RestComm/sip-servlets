@@ -1543,11 +1543,11 @@ public class TestSipListener implements SipListener {
 
 	}
 
-	public void sendSipRequest(String method, URI fromURI, URI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri) throws SipException, ParseException, InvalidArgumentException {
-		sendSipRequest(method, fromURI, toURI, messageContent, route, useToURIasRequestUri, null, null);
+	public Request sendSipRequest(String method, URI fromURI, URI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri) throws SipException, ParseException, InvalidArgumentException {
+		return sendSipRequest(method, fromURI, toURI, messageContent, route, useToURIasRequestUri, null, null);
 	}
 
-	public void sendSipRequest(String method, URI fromURI, URI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri, String[] headerNames, String[] headerContents) throws SipException, ParseException, InvalidArgumentException {
+	public Request sendSipRequest(String method, URI fromURI, URI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri, String[] headerNames, String[] headerContents) throws SipException, ParseException, InvalidArgumentException {
 		this.useToURIasRequestUri = useToURIasRequestUri;
 		// create >From Header
 		Address fromNameAddress = protocolObjects.addressFactory
@@ -1680,9 +1680,10 @@ public class TestSipListener implements SipListener {
 			inviteRequest = request;
 		}
 		this.dialogCount++;
+		return inviteRequest;
 	}
 	
-	public void sendSipRequest(String method, URI fromURI, URI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri, String[] headerNames, String[] headerContents, SipURI requestUri) throws SipException, ParseException, InvalidArgumentException {
+	public Request sendSipRequest(String method, URI fromURI, URI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri, String[] headerNames, String[] headerContents, SipURI requestUri) throws SipException, ParseException, InvalidArgumentException {
 		this.useToURIasRequestUri = useToURIasRequestUri;
 		// create >From Header
 		Address fromNameAddress = protocolObjects.addressFactory
@@ -1802,6 +1803,7 @@ public class TestSipListener implements SipListener {
 			dialog = inviteClientTid.getDialog();
 		}
 		this.dialogCount++;
+		return request;
 	}
 
 	private void addSpecificHeaders(String method, Request request)

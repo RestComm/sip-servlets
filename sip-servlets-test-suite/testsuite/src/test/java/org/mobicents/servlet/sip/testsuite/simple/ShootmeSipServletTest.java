@@ -24,6 +24,7 @@ import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.ContactHeader;
+import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -42,6 +43,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 	
 	
 	TestSipListener sender;
+	SipProvider senderProvider = null;
 	TestSipListener registerReciever;
 	
 	ProtocolObjects senderProtocolObjects;	
@@ -72,7 +74,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
 		
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
-		SipProvider senderProvider = sender.createProvider();			
+		senderProvider = sender.createProvider();			
 		
 		senderProvider.addSipListener(sender);
 		
@@ -102,6 +104,25 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());		
+	}
+	
+	// Issue 1042 : Trying to simulate the 2 Invites arriving at the same time
+	public void testShootmeRetransTest() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		Request request = sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+		senderProvider.sendRequest(request);
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());		
