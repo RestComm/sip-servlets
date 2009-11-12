@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
+import gov.nist.javax.sip.DialogExt;
 import gov.nist.javax.sip.ServerTransactionExt;
 import gov.nist.javax.sip.message.SIPMessage;
 
@@ -409,6 +410,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 					Dialog dialog = retryTran.getDialog();
 					if (dialog == null && JainSipUtils.DIALOG_CREATING_METHODS.contains(sipServletRequest.getMethod())) {					
 						dialog = sipProvider.getNewDialog(retryTran);
+						((DialogExt)dialog).disableSequenceNumberValidation();
 						dialog.setApplicationData(sipServletRequest.getTransactionApplicationData());
 						if(logger.isDebugEnabled()) {
 							logger.debug("new Dialog for request " + sipServletRequest + ", ref = " + dialog);

@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.message;
 
+import gov.nist.javax.sip.DialogExt;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
@@ -350,6 +351,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				
 				Dialog dialog = sipProvider.getNewDialog(this
 						.getTransaction());
+				((DialogExt)dialog).disableSequenceNumberValidation();
 				session.setSessionCreatingDialog(dialog);
 				dialog.setApplicationData( this.transactionApplicationData);				
 			}			
@@ -978,6 +980,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				
 				if (dialog == null && this.createDialog) {					
 					dialog = sipProvider.getNewDialog(ctx);
+					((DialogExt)dialog).disableSequenceNumberValidation();
 					session.setSessionCreatingDialog(dialog);
 					if(logger.isDebugEnabled()) {
 						logger.debug("new Dialog for request " + request + ", ref = " + dialog);

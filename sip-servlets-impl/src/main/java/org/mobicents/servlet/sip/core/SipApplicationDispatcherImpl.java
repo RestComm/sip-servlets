@@ -527,7 +527,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		final String requestMethod = request.getMethod();
 		try {
 			if(logger.isDebugEnabled()) {
-				logger.debug("sipApplicationDispatcher " + this + "Got a request event "  + request.toString());
+				logger.debug("sipApplicationDispatcher " + this + ", Got a request event "  + request.toString());
 			}			
 			if (!Request.ACK.equals(requestMethod) && requestTransaction == null ) {
 				try {

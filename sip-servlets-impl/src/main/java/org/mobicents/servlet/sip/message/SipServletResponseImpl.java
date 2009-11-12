@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.message;
 
+import gov.nist.javax.sip.DialogExt;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.ParseException;
@@ -474,7 +476,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				// Creates a dialog only for non trying responses
 				if(statusCode != Response.TRYING) {
 					dialog = sipProvider.getNewDialog(this
-						.getTransaction());				
+						.getTransaction());	
+					((DialogExt)dialog).disableSequenceNumberValidation();
 				}
 				session.setSessionCreatingDialog(dialog);
 				if(logger.isDebugEnabled()) {
