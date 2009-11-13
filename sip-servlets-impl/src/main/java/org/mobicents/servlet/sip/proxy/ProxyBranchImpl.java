@@ -402,14 +402,22 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 			SipServletResponse proxiedResponse = 
 				proxy.getProxyUtils().createProxiedResponse(response, this);
 			
-			if(proxiedResponse == null) 
+			if(proxiedResponse == null) {
+				if(logger.isDebugEnabled())
+					logger.debug("Response dropped because it was addressed to this machine.");
 				return; // this response was addressed to this proxy
+			}
 			
 			try {
 				proxiedResponse.send();
+				if(logger.isDebugEnabled())
+					logger.debug("Proxy response sent out sucessfully");
 			} catch (IOException e) {
 				logger.error("A problem occured while proxying a response", e);
 			}
+			
+			if(logger.isDebugEnabled())
+					logger.debug("About to return from onResponse");
 			
 			return;
 		}
@@ -429,6 +437,8 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 			if(contact != null) {
 				//javax.sip.address.SipURI uri = SipFactories.addressFactory.createAddress(contact);
 				try {
+					if(logger.isDebugEnabled())
+						logger.debug("Processing recursed response");
 					int start = contact.indexOf('<');
 					int end = contact.indexOf('>');
 					contact = contact.substring(start + 1, end);
@@ -447,9 +457,14 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		}
 		if(response.getStatus() >= 200 && !recursed)
 		{
+			
 			if(outgoingRequest != null && outgoingRequest.isInitial()) {
+				if(logger.isDebugEnabled())
+					logger.debug("Handling final response for initial request");
 				this.proxy.onFinalResponse(this);
 			} else {
+				if(logger.isDebugEnabled())
+					logger.debug("Handling final response for non-initial request");
 				this.proxy.sendFinalResponse(response, this);
 			}
 		}

@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.core.dispatchers;
 
+import gov.nist.javax.sip.SipStackExt;
+import gov.nist.javax.sip.SipStackImpl;
 import gov.nist.javax.sip.message.SIPMessage;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
@@ -217,9 +219,37 @@ public class ResponseDispatcher extends MessageDispatcher {
 							ProxyBranchImpl proxyBranch = null;
 							if(finalApplicationData != null) {
 								proxyBranch = finalApplicationData.getProxyBranch();
-							} else if(session.getProxy() != null) {
+							}
+							
+							if(session.getProxy() != null) {
+								// TODO: FIXME: On retrans - we get null transaction from JSIP thus we lose the info about the
+								// proxy branch. Figure out a way to do the mapping.
+								
 								// the final Application data is null meaning that the CTX was null, so it's a retransmission
-								proxyBranch = session.getProxy().getFinalBranchForSubsequentRequests();								
+								if(proxyBranch == null) {
+									proxyBranch = session.getProxy().getFinalBranchForSubsequentRequests();	
+								}
+								
+								if(proxyBranch == null) {
+									SIPTransaction tx = ((SipStackImpl)sipProvider.getSipStack()).findTransaction((SIPMessage) response, false);
+									if(tx != null) {
+										TransactionApplicationData tad = (TransactionApplicationData) tx.getApplicationData();
+										if(tad != null) {
+											proxyBranch = tad.getProxyBranch();
+											logger.debug("A proxy response retransmission was able to recover the transaction application data");
+										}
+									}
+								}
+								
+								if(proxyBranch == null) {
+									logger.debug("A proxy retransmission has arrived without knowing which proxybranch to use (tx data lost)");
+									if(session.getProxy().getSupervised() && response.getStatusCode() != Response.TRYING) {
+										callServlet(sipServletResponse);
+									}
+									forwardResponseStatefully(sipServletResponse);
+								}
+								
+
 							} 
 							if(proxyBranch != null) {
 								sipServletResponse.setProxyBranch(proxyBranch);								

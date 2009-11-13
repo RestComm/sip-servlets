@@ -478,6 +478,8 @@ public class ProxyImpl implements Proxy, Externalizable {
 			if(this.getParallel()) {
 				if( (response.getStatus() >= 200 && response.getStatus() < 300) 
 					|| (response.getStatus() >= 600 && response.getStatus() < 700) ) { 
+					if(logger.isDebugEnabled())
+						logger.debug("Cancelling all other broanches in this proxy");
 					cancelAllExcept(branch, null, null, null, false);
 				}
 			}
@@ -526,19 +528,30 @@ public class ProxyImpl implements Proxy, Externalizable {
 			}
 		}
 		
+		if(logger.isDebugEnabled())
+					logger.debug("Best response so far is " + bestResponse);
+		
 		// Check if we are waiting for more response
 		if(parallel && allResponsesHaveArrived()) {
 			finalBranchForSubsequentRequests = bestBranch;
+			if(logger.isDebugEnabled())
+					logger.debug("All responses have arrived, sending final response for parallel proxy" );
 			sendFinalResponse(bestResponse, bestBranch);
 		} 
 		if(!parallel) {
 			if(bestResponse.getStatus()>=200 && bestResponse.getStatus()<300) {
 				finalBranchForSubsequentRequests = bestBranch;
+				if(logger.isDebugEnabled())
+					logger.debug("Sending final response for sequential proxy" );
 				sendFinalResponse(bestResponse, bestBranch);
 			} else {
 				if(allResponsesHaveArrived()) {
+					if(logger.isDebugEnabled())
+						logger.debug("All responses have arrived for sequential proxy and we are sending the best one");
 					sendFinalResponse(bestResponse, bestBranch);
 				} else {
+					if(logger.isDebugEnabled())
+						logger.debug("Trying new branch in proxy" );
 					startNextUntriedBranch();
 				}
 			}
@@ -610,25 +623,30 @@ public class ProxyImpl implements Proxy, Externalizable {
 		if(proxyBranch.isTimedOut()) {
 			try {
 				originalRequest.createResponse(Response.REQUEST_TIMEOUT).send();
+				if(logger.isDebugEnabled())
+					logger.debug("Proxy branch has timed out");
 				return;
 			} catch (IOException e) {
 				throw new IllegalStateException("Failed to send a timeout response", e);
 			}
 		}
+			
+		if(logger.isDebugEnabled())
+					logger.debug("Proxy branch has NOT timed out");
+	
 		
 		//Otherwise proceed with proxying the response
 		SipServletResponseImpl proxiedResponse = 
 			getProxyUtils().createProxiedResponse(response, proxyBranch);
 		
 		if(proxiedResponse == null) {
-			return; // this response was addressed to this proxy
-		}
-
-		if(proxiedResponse.getTransaction() != null) {
+			if(logger.isDebugEnabled())
+					logger.debug("Response was dropped because getProxyUtils().createProxiedResponse(response, proxyBranch) returned zero");
 			// non retransmission case
 			try {
 				proxiedResponse.send();
-					
+				if(logger.isDebugEnabled())
+					logger.debug("Sending out proxied final response with existing transaction");
 				proxyBranches = new LinkedHashMap<URI, ProxyBranch> ();
 				originalRequest = null;
 				bestBranch = null;
@@ -642,6 +660,8 @@ public class ProxyImpl implements Proxy, Externalizable {
 			SipProvider sipProvider = getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(
 					transport, false).getSipProvider();
 			try {
+				if(logger.isDebugEnabled())
+					logger.debug("Sending out proxied final response retransmission " + proxiedResponse);
 				sipProvider.sendResponse((Response)proxiedResponse.getMessage());
 			} catch (SipException e) {
 				logger.error("A problem occured while proxying the final response retransmission", e);
