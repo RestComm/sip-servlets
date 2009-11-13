@@ -508,15 +508,15 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			((SipManager)manager).dumpSipApplicationSessions();
 			logger.info("number of active sip sessions : " + ((SipManager)manager).getActiveSipSessions()); 
 			logger.info("number of active sip application sessions : " + ((SipManager)manager).getActiveSipApplicationSessions());
-		}
+		}		
+		super.stop();		
+		// this should happen after so that applications can still do some processing
+		// in destroy methods to notify that context is getting destroyed and app removed
 		sipListeners.deallocateServletsActingAsListeners();
 		sipApplicationListeners.clear();
 		sipServletMappings.clear();
 		childrenMap.clear();
 		childrenMapByClassName.clear();
-		super.stop();
-		// this should happen after so that applications can still do some processing
-		// in destroy methods to notify that context is getting destroyed and app removed
 		if(sipApplicationDispatcher != null) {
 			if(applicationName != null) {
 				sipApplicationDispatcher.removeSipApplication(applicationName);
