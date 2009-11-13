@@ -110,6 +110,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				} else if(((SipURI)request.getTo().getURI()).getUser().contains("error")) {
 					request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "expected error").send();
 				} else {
+					request.createResponse(SipServletResponse.SC_RINGING).send();
 					request.createResponse(SipServletResponse.SC_OK).send();
 				}
 			} else {

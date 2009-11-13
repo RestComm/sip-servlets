@@ -75,7 +75,6 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
 
 /**
@@ -241,6 +240,8 @@ public class TestSipListener implements SipListener {
 	private Request byeRequestReceived;
 	
 	private Request registerReceived;
+
+	private long timeToWaitBeforeBye = 1000;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -1057,7 +1058,7 @@ public class TestSipListener implements SipListener {
 				}
 			}
 			if(sendBye) {											
-				Thread.sleep(1000);
+				Thread.sleep(timeToWaitBeforeBye );
 				if(serverTransactionId != null && serverTransactionId.getDialog() != null) {
 					Request byeRequest = serverTransactionId.getDialog().createRequest(Request.BYE);
 					ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
@@ -1483,9 +1484,11 @@ public class TestSipListener implements SipListener {
 	 * @throws SipException
 	 * @throws TransactionUnavailableException
 	 * @throws TransactionDoesNotExistException
+	 * @throws InterruptedException 
 	 */
 	public void sendBye() throws SipException,
-			TransactionUnavailableException, TransactionDoesNotExistException {
+			TransactionUnavailableException, TransactionDoesNotExistException, InterruptedException {
+		Thread.sleep(timeToWaitBeforeBye);
 		sendBye(this.dialog);
 	}
 	
@@ -2323,6 +2326,20 @@ public class TestSipListener implements SipListener {
 	 */
 	public Request getRegisterReceived() {
 		return registerReceived;
+	}
+
+	/**
+	 * @param timeToWaitBeforeBye the timeToWaitBeforeBye to set
+	 */
+	public void setTimeToWaitBeforeBye(long timeToWaitBeforeBye) {
+		this.timeToWaitBeforeBye = timeToWaitBeforeBye;
+	}
+
+	/**
+	 * @return the timeToWaitBeforeBye
+	 */
+	public long getTimeToWaitBeforeBye() {
+		return timeToWaitBeforeBye;
 	}
 
 }

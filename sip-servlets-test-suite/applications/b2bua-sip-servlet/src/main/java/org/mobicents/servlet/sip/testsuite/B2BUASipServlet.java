@@ -42,6 +42,13 @@ public class B2BUASipServlet extends SipServlet {
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
 		logger.info("Got request:\n" + request);
+		if(((SipURI)request.getFrom().getURI()).getUser().contains("generateResponses")) {
+			SipServletResponse ringing = request.createResponse(SipServletResponse.SC_RINGING);
+			SipServletResponse ok = request.createResponse(SipServletResponse.SC_OK);
+			ringing.send();
+			ok.send();
+		}
+		
 		Map<String, List<String>> headers=new HashMap<String, List<String>>();
 		List<String> toHeaderList = new ArrayList<String>();
 		toHeaderList.add("sip:aa@sip-servlets.com");
@@ -49,7 +56,7 @@ public class B2BUASipServlet extends SipServlet {
 		
 		B2buaHelper helper = request.getB2buaHelper();
 		SipServletRequest forkedRequest = helper.createRequest(request, true,
-				headers);
+				headers);				
 		
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
 				SIP_FACTORY);				
@@ -71,20 +78,20 @@ public class B2BUASipServlet extends SipServlet {
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.getStatus() + " "
 				+ sipServletResponse.getMethod());		
-		int status = sipServletResponse.getStatus();
-		if (status == SipServletResponse.SC_OK) {
-			String cSeqValue = sipServletResponse.getHeader("CSeq");
+		if (sipServletResponse.getStatus() == SipServletResponse.SC_OK) {			
 			//if this is a response to an INVITE we ack it and forward the OK 
-			if(cSeqValue.indexOf("INVITE") != -1) {
+			if(sipServletResponse.getMethod().equalsIgnoreCase("INVITE")) {
 				SipServletRequest ackRequest = sipServletResponse.createAck();
 				ackRequest.send();
-				B2buaHelper helper = sipServletResponse.getRequest().getB2buaHelper();
-				//create and sends OK for the first call leg
-				SipSession originalSession =   
-				    helper.getLinkedSession(sipServletResponse.getSession());					
-				SipServletResponse responseToOriginalRequest = 
-					helper.createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), "OK");
-				responseToOriginalRequest.send();
+				if(!((SipURI)sipServletResponse.getTo().getURI()).getUser().contains("generateResponses")) {
+					B2buaHelper helper = sipServletResponse.getRequest().getB2buaHelper();
+					//create and sends OK for the first call leg
+					SipSession originalSession =   
+					    helper.getLinkedSession(sipServletResponse.getSession());					
+					SipServletResponse responseToOriginalRequest = 
+						helper.createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), "OK");
+					responseToOriginalRequest.send();
+				}
 			}
 		} else {
 			super.doResponse(sipServletResponse);

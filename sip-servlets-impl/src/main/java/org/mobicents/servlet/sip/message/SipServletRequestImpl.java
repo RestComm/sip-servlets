@@ -88,6 +88,7 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.security.AuthInfoEntry;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
@@ -147,7 +148,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	
 	private boolean is1xxResponseGenerated;	
 	
-	private transient boolean isReadOnly; 
+	private transient boolean isReadOnly;		
 	
 	public SipServletRequestImpl(Request request, SipFactoryImpl sipFactoryImpl,
 			MobicentsSipSession sipSession, Transaction transaction, Dialog dialog,
@@ -260,8 +261,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		try {
 			final Request request = transaction.getRequest();
 			final Response response = SipFactories.messageFactory.createResponse(
-					statusCode, request);
-			final Dialog dialog = transaction.getDialog();
+					statusCode, request);			
 			if(reasonPhrase!=null) {
 				response.setReasonPhrase(reasonPhrase);
 			}
@@ -275,11 +275,22 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				if (toHeader.getTag() == null) {					
 					// if a dialog has already been created
 					// reuse local tag
+					final Dialog dialog = transaction.getDialog();
 					if(dialog != null && dialog.getLocalTag() != null && dialog.getLocalTag().length() > 0) {																	
 						toHeader.setTag(dialog.getLocalTag());						
 					} else if(session != null && session.getSipApplicationSession() != null) {						
 						final SipApplicationSessionKey sipAppSessionKey = session.getSipApplicationSession().getKey();
-						toHeader.setTag(ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(), session.getKey().getApplicationName(), sipAppSessionKey.getId()));
+						final SipSessionKey sipSessionKey = session.getKey();
+						// Fix for Issue 1044 : javax.sip.SipException: Tag mismatch dialogTag during process B2B response
+						// make sure not to generate a new tag
+						synchronized (this) {
+							String toTag = sipSessionKey.getToTag();
+							if(toTag == null) {
+								toTag = ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(),sipSessionKey.getApplicationName(), sipAppSessionKey.getId());
+								session.getKey().setToTag(toTag);
+							}											
+							toHeader.setTag(toTag);	
+						}						
 					} else {							
 						//if the sessions are null, it means it is a cancel response
 						toHeader.setTag(Integer.toString(new Random().nextInt(10000000)));
