@@ -180,7 +180,9 @@ public class ResponseDispatcher extends MessageDispatcher {
 			}					
 			
 			if(tmpSession == null) {
-				logger.warn("Dropping the response since no active sip session has been found for it : " + response + ", it may already have been invalidated");
+				if(logger.isDebugEnabled()) {
+					logger.debug("Dropping the response since no active sip session has been found for it : " + response + ", it may already have been invalidated");
+				}
 				return ;
 			} else {
 				sipServletResponse.setSipSessionKey(sessionKey);					
