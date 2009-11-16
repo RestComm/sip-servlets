@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.testsuite.simple;
 
 import java.text.ParseException;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.sip.InvalidArgumentException;
 import javax.sip.SipException;
@@ -296,6 +297,24 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertEquals( 200, sender.getFinalResponseStatus());
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());	
+	}
+	
+	// test for http://code.google.com/p/mobicents/issues/detail?id=1061
+	public void testNoAckReceived() throws Exception {
+		String fromName = "noAckReceived";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		sender.sendSipRequest("INVITE", fromAddress, fromAddress, null, null, false);
+		sender.setSendAck(false);
+		Thread.sleep(TIMEOUT);
+		assertEquals( 200, sender.getFinalResponseStatus());
+		assertFalse(sender.isAckSent());
+		Thread.sleep(TIMEOUT_CSEQ_INCREASE);
+		List<String> allMessagesContent = sender.getAllMessagesContent();
+		assertEquals(1,allMessagesContent.size());
+		assertEquals("noAckReceived", allMessagesContent.get(0));
 	}
 
 	@Override
