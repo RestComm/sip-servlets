@@ -39,6 +39,6 @@
     
     <context-param>
       <param-name>password</param-name>
-      <param-value>adamjade</param-value>
+      <param-value>xxx</param-value>
     </context-param>
 </sip-app>
