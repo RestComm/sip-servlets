@@ -225,6 +225,8 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing the following CANCEL " + request, e);
 				} catch (IOException e) {				
 					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected IO exception occured while routing the following CANCEL " + request, e);
+				} catch (Throwable e) {				
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected exception occured while routing the following CANCEL " + request, e);
 				} 
 			} else if(RoutingState.FINAL_RESPONSE_SENT.equals(inviteRequest.getRoutingState())) {
 				if(logger.isDebugEnabled()) {
@@ -258,7 +260,9 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while routing the following CANCEL " + request, e);
 				} catch (IOException e) {				
 					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected IO exception occured while routing the following CANCEL " + request, e);
-				} 	
+				} catch (Throwable e) {				
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected exception occured while routing the following CANCEL " + request, e);
+				} 
 			} 	
 		}			
 	}
