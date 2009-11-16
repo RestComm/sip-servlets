@@ -76,6 +76,7 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
  * 
  */
 public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
+	private static final String PASS_INVITE_NON_2XX_ACK_TO_LISTENER = "gov.nist.javax.sip.PASS_INVITE_NON_2XX_ACK_TO_LISTENER";
 	private static final String AUTOMATIC_DIALOG_SUPPORT_STACK_PROP = "javax.sip.AUTOMATIC_DIALOG_SUPPORT";
 	private static final String LOOSE_DIALOG_VALIDATION = "gov.nist.javax.sip.LOOSE_DIALOG_VALIDATION";
 	private static final String SERVER_LOG_STACK_PROP = "gov.nist.javax.sip.SERVER_LOG";
@@ -278,6 +279,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			// The whole MSS is built upon those assumptions, so those properties are not overrideable
 			sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");
 			sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
+			sipStackProperties.setProperty(PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");
 			isPropsLoaded = true;
 		} else {
 			logger.warn("no sip stack properties file defined ");		
@@ -303,6 +305,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
 			sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
 			sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
+			sipStackProperties.setProperty(PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");
 		}
 		try {	
 			//checking the external ip address if stun enabled			
