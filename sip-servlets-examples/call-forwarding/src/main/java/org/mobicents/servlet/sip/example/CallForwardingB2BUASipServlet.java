@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.B2buaHelper;
+import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
@@ -120,7 +121,11 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 		if(logger.isInfoEnabled()) {
 			logger.info("forkedRequest = " + forkedRequest);
 		}
-		forkedRequest.send();		
+		forkedRequest.send();	
+		if(session != null && session.isValid()) {
+			session.invalidate();
+		}	
+		return;
 	}	
 	
 	@Override
@@ -145,7 +150,14 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 			logger.info("Got : " + sipServletResponse.toString());
 		}		
 		if(sipServletResponse.getMethod().indexOf("BYE") != -1) {
-			sipServletResponse.getApplicationSession().invalidate();
+			SipSession sipSession = sipServletResponse.getSession(false);
+			if(sipSession != null && sipSession.isValid()) {
+				sipSession.invalidate();
+			}
+			SipApplicationSession sipApplicationSession = sipServletResponse.getApplicationSession(false);
+			if(sipApplicationSession != null && sipApplicationSession.isValid()) {
+				sipApplicationSession.invalidate();
+			}	
 			return;
 		} 
 		
