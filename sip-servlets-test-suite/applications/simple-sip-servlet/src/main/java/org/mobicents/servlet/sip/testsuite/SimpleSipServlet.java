@@ -45,7 +45,9 @@ import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
 
 public class SimpleSipServlet extends SipServlet implements SipErrorListener, TimerListener, SipConnectorListener {
+	private static transient Logger logger = Logger.getLogger(SimpleSipServlet.class);
 	private static final long serialVersionUID = 1L;
+	private static final String TEST_PRACK = "prack";
 	private static final String TEST_REGISTER_C_SEQ = "testRegisterCSeq";
 	private static final String TEST_REGISTER_NO_CONTACT = "testRegisterNoContact";
 	private static final String TEST_REGISTER_SAVED_SESSION = "testRegisterSavedSession";
@@ -59,7 +61,10 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final String CANCEL_RECEIVED = "cancelReceived";
 	private static final String SUBSCRIBER_URI = "sip:testSubscriberUri@sip-servlets.com";		
-	
+	private static final String TEST_REINVITE_USERNAME = "reinvite";
+	private static final String TEST_IS_SEND_REINVITE_USERNAME = "isendreinvite";
+	private static final String TEST_IS_SEND_REINVITE_PRACK = "prackisendreinvite";
+	private static final String TEST_CANCEL_USERNAME = "cancel";
 	@Resource
 	SipFactory sipFactory;
 	@Resource
@@ -73,10 +78,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		super.doBranchResponse(resp);
 	}
 
-	private static transient Logger logger = Logger.getLogger(SimpleSipServlet.class);
-	private static String TEST_REINVITE_USERNAME = "reinvite";
-	private static String TEST_IS_SEND_REINVITE_USERNAME = "isendreinvite";
-	private static String TEST_CANCEL_USERNAME = "cancel";
+	
 	
 	/** Creates a new instance of SimpleProxyServlet */
 	public SimpleSipServlet() {
@@ -194,6 +196,14 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 			sendRegister();
 			return;
 		}
+		if(fromString.contains(TEST_PRACK)) {
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
+			sipServletResponse.sendReliably();
+			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+			sipServletResponse.getSession().setAttribute("okResponse", sipServletResponse);
+			
+			return;
+		}
 		if(!TEST_CANCEL_USERNAME.equalsIgnoreCase(((SipURI)request.getFrom().getURI()).getUser())) {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
 			if(sipServletResponse.getParameterableHeader("Contact") == null) {
@@ -256,6 +266,14 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	}
 	
 	@Override
+	protected void doPrack(SipServletRequest req) throws ServletException,
+			IOException {
+		req.createResponse(SipServletResponse.SC_OK).send();		
+		SipServletResponse okResponseToInvite = (SipServletResponse) req.getSession().getAttribute("okResponse");
+		okResponseToInvite.send();
+	}
+	
+	@Override
 	protected void doAck(SipServletRequest req) throws ServletException,
 			IOException {
 		if(req.getFrom().getURI() instanceof SipURI) {
@@ -272,7 +290,8 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 					logger.error("the newly created subsequent request doesn't have " +
 							"the same session instance as the one it has been created from");
 				}
-			} else if(TEST_IS_SEND_REINVITE_USERNAME.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {
+			} else if(TEST_IS_SEND_REINVITE_USERNAME.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())
+					|| TEST_IS_SEND_REINVITE_PRACK.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {
 				Integer nbOfAcks = (Integer) req.getSession().getAttribute("nbAcks");
 				if(nbOfAcks == null) {
 					nbOfAcks = Integer.valueOf(1);
@@ -437,6 +456,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	 */
 	public void noAckReceived(SipErrorEvent ee) {
 		logger.error("noAckReceived.");
+		sendMessage(ee.getRequest().getApplicationSession(), sipFactory, "noAckReceived");
 	}
 
 	/**

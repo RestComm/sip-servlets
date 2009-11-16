@@ -60,6 +60,18 @@ public class ShootistSipServlet
 	}		
 	
 	@Override
+	protected void doProvisionalResponse(SipServletResponse resp)
+			throws ServletException, IOException {		
+		if(resp.getHeader("require") != null) {
+			SipServletRequest prack = resp.createPrack();
+			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
+			prack.setRequestURI(requestURI);
+			prack.send();
+		}
+	}
+	
+	@Override
 	protected void doSuccessResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.getStatus() + " "
@@ -136,6 +148,10 @@ public class ShootistSipServlet
 		} catch (ServletParseException e1) {
 		}
 		if(addr == null) return; // Fail the test, we need that header
+		String prack = ce.getServletContext().getInitParameter("prack");
+		if(prack != null) {
+			sipServletRequest.addHeader("Require", "100rel");
+		}
 		addr.setParameter("headerparam1", "headervalue1");
 		addr.setParameter("param5", "ffff");
 		addr.getURI().setParameter("uriparam", "urivalue");
