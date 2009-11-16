@@ -484,7 +484,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					logger.debug("created following dialog since the application is acting as an endpoint " + dialog);
 				}
 			}
-			final Dialog dialog  = transaction.getDialog();
+			final Dialog dialog  = transaction == null ? null:transaction.getDialog();
 			//keeping track of application data and transaction in the dialog
 			if(dialog != null) {
 				if(dialog.getApplicationData() == null) {
@@ -511,7 +511,12 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			//updating the last accessed times 
 			session.access();
 			sipApplicationSession.access();
-			if(sendReliably) {
+			if(transaction == null) {
+				final String transport = JainSipUtils.findTransport(((SipServletRequestImpl)this.getRequest()).getMessage());
+				final SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
+						transport, false).getSipProvider();
+				sipProvider.sendResponse((Response)this.message);
+			} else if(sendReliably) {
 				dialog.sendReliableProvisionalResponse((Response)this.message);
 			} else {
 				transaction.sendResponse( (Response)this.message );
