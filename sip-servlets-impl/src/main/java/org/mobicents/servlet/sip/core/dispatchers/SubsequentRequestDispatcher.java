@@ -252,9 +252,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				return;
 			}
 			
-			if(localCseq>remoteCseq) {
-				logger.error("CSeq out of order for the following request");
+			if(localCseq > remoteCseq) {				
 				if(!isAck) {
+					logger.error("CSeq out of order for the following request");
 					final SipServletResponse response = sipServletRequest.createResponse(Response.SERVER_INTERNAL_ERROR, "CSeq out of order");
 					try {
 						response.send();

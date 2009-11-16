@@ -466,7 +466,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			if(!Request.CANCEL.equals(originalRequest.getMethod())					
 					&& (RoutingState.INITIAL.equals(originalRequest.getRoutingState()) 
 							|| RoutingState.RELAYED.equals(originalRequest.getRoutingState())) 
-					&& getTransaction().getDialog() == null 
+					&& transaction.getDialog() == null 
 					&& JainSipUtils.DIALOG_CREATING_METHODS.contains(getMethod())) {					
 				final String transport = JainSipUtils.findTransport(transaction.getRequest());
 				final SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
@@ -475,8 +475,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				Dialog dialog = null;
 				// Creates a dialog only for non trying responses
 				if(statusCode != Response.TRYING) {
-					dialog = sipProvider.getNewDialog(this
-						.getTransaction());	
+					dialog = sipProvider.getNewDialog(transaction);	
 					((DialogExt)dialog).disableSequenceNumberValidation();
 				}
 				session.setSessionCreatingDialog(dialog);

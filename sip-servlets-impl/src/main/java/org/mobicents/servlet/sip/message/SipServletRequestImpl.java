@@ -871,10 +871,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	@Override
 	public void send() {
 		checkReadOnly();
-		try {
-			final Request request = (Request) super.message;			
-			final String transport = JainSipUtils.findTransport(request);
-			final MobicentsSipSession session = getSipSession();
+		final Request request = (Request) super.message;			
+		final String transport = JainSipUtils.findTransport(request);
+		final MobicentsSipSession session = getSipSession();
+		try {			
 			ProxyImpl proxy = null;
 			if(session != null) {
 				proxy = session.getProxy();
@@ -1105,7 +1105,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}			
 			isMessageSent = true;								
 		} catch (Exception ex) {			
-			throw new IllegalStateException("Error sending request",ex);
+			throw new IllegalStateException("Error sending request " + request,ex);
 		}
 
 	}
