@@ -79,6 +79,8 @@ import org.mobicents.servlet.sip.testsuite.simple.ShootistSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootistTelURLSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootmeSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootmeTelURLSipServletTest;
+import org.mobicents.servlet.sip.testsuite.simple.prack.ShootistPrackSipServletTest;
+import org.mobicents.servlet.sip.testsuite.simple.prack.ShootmePrackSipServletTest;
 import org.mobicents.servlet.sip.testsuite.subsnotify.InDialogNotifierSipServletTest;
 import org.mobicents.servlet.sip.testsuite.subsnotify.InDialogSubscriberSipServletTest;
 import org.mobicents.servlet.sip.testsuite.subsnotify.NotifierSipServletTest;
@@ -121,6 +123,8 @@ public class AllTests {
 		suite.addTestSuite(ParallelProxyTelURLWithRecordRouteTest.class);
 		suite.addTestSuite(ParallelProxyWithRecordRouteUseHostNameTest.class);
 		suite.addTestSuite(ProxyPrackTest.class);
+		suite.addTestSuite(ShootmePrackSipServletTest.class);
+		suite.addTestSuite(ShootistPrackSipServletTest.class);
 		suite.addTestSuite(ConcurrentyControlSipSessionIsolationTest.class);
 		suite.addTestSuite(CongestionControlTest.class);
 		suite.addTestSuite(ProxyBranchTimeoutTest.class);

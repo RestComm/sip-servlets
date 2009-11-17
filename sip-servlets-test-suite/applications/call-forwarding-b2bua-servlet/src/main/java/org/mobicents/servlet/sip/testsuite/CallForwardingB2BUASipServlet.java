@@ -203,9 +203,13 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			B2buaHelper b2buaHelper = request.getB2buaHelper();
 			SipSession linkedSession = b2buaHelper.getLinkedSession(session);
 			SipServletRequest originalRequest = (SipServletRequest)linkedSession.getAttribute("originalRequest");
-			SipServletRequest  cancelRequest = b2buaHelper.getLinkedSipServletRequest(originalRequest).createCancel();				
-			logger.info("forkedRequest = " + cancelRequest);			
-			cancelRequest.send();
+			if(originalRequest != null) {
+				SipServletRequest  cancelRequest = b2buaHelper.getLinkedSipServletRequest(originalRequest).createCancel();				
+				logger.info("forkedRequest = " + cancelRequest);			
+				cancelRequest.send();
+			} else {
+				logger.info("no invite to cancel, it hasn't been forwarded");
+			}
 		}
 	}
 	

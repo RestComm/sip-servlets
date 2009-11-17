@@ -1371,7 +1371,7 @@ public class TestSipListener implements SipListener {
 						.println("INVITE AUTHORIZATION sent:\n" + authrequest);
 			} else if (response.getStatusCode() > Response.TRYING && response.getStatusCode() < Response.OK) {
 				RequireHeader requireHeader = (RequireHeader) response.getHeader(RequireHeader.NAME);				
-				if("100rel".equalsIgnoreCase(requireHeader.getOptionTag().trim())) {
+				if(requireHeader != null && "100rel".equalsIgnoreCase(requireHeader.getOptionTag().trim())) {
 					Request prack = dialog.createPrack(response);
 					ClientTransaction ct = sipProvider
 						.getNewClientTransaction(prack);
