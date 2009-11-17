@@ -657,13 +657,16 @@ public class SipFactoryImpl implements Externalizable {
 	/**
 	 * @param loadBalancerToUse the loadBalancerToUse to set
 	 */
-	public void setLoadBalancerToUse(SipLoadBalancer loadBalancerToUse) {
+	public void setLoadBalancerToUse(SipLoadBalancer loadBalancerToUse) {		
 		if(loadBalancerToUse == null) {
 			useLoadBalancer = false;
 		} else {
 			useLoadBalancer = true;
 		}
 		this.loadBalancerToUse = loadBalancerToUse;
+		if(logger.isInfoEnabled()) {
+			logger.info("Load Balancer to Use " + loadBalancerToUse);
+		}
 	}
 
 	/**

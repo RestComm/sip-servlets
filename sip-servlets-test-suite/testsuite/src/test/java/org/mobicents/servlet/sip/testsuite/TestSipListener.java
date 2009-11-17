@@ -221,8 +221,6 @@ public class TestSipListener implements SipListener {
 
 	private int finalResponseStatus;
 
-	private boolean errorResponseReceived;
-	
 	private boolean inviteReceived;
 
 	private boolean sendReinvite;
@@ -256,6 +254,10 @@ public class TestSipListener implements SipListener {
 	private boolean okToPrackReceived;
 	
 	private AtomicInteger rseqNumber = new AtomicInteger(1);	
+	
+	public boolean sendByeInNewThread = false;
+
+	private boolean useDefaultRoute = true;;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -1564,9 +1566,7 @@ public class TestSipListener implements SipListener {
 			TransactionUnavailableException, TransactionDoesNotExistException, InterruptedException {
 		Thread.sleep(timeToWaitBeforeBye);
 		sendBye(this.dialog);
-	}
-	
-	public boolean sendByeInNewThread = false;
+	}		
 	
 	/**
 	 * @throws SipException
@@ -1718,7 +1718,7 @@ public class TestSipListener implements SipListener {
 			Address address = protocolObjects.addressFactory.createAddress(route);
 			RouteHeader routeHeader = protocolObjects.headerFactory.createRouteHeader(address);
 			request.addHeader(routeHeader);
-		} else {
+		} else if(useDefaultRoute ) {
 			Address address = protocolObjects.addressFactory.createAddress(uri);
 			RouteHeader routeHeader = protocolObjects.headerFactory.createRouteHeader(address);
 			request.addHeader(routeHeader);
@@ -1983,12 +1983,25 @@ public class TestSipListener implements SipListener {
 	public boolean isCancelOkReceived() {
 		return cancelOkReceived;
 	}
+	
+	/**
+	 */
+	public void setCancelOkReceived(boolean cancelOkReceived) {
+		this.cancelOkReceived = cancelOkReceived;
+	}
 
 	/**
 	 * @return the requestTerminatedReceived
 	 */
 	public boolean isRequestTerminatedReceived() {
 		return requestTerminatedReceived;
+	}
+	
+	/**
+	 * @return the requestTerminatedReceived
+	 */
+	public void setRequestTerminatedReceived(boolean requestTerminatedReceived) {
+		this.requestTerminatedReceived = requestTerminatedReceived;
 	}
 
 	/**
@@ -2303,20 +2316,6 @@ public class TestSipListener implements SipListener {
 	}
 
 	/**
-	 * @param errorResponseReceived the errorResponseReceived to set
-	 */
-	public void setErrorResponseReceived(boolean errorResponseReceived) {
-		this.errorResponseReceived = errorResponseReceived;
-	}
-
-	/**
-	 * @return the errorResponseReceived
-	 */
-	public boolean isErrorResponseReceived() {
-		return errorResponseReceived;
-	}
-
-	/**
 	 * @param replacesRequestReceived the replacesRequestReceived to set
 	 */
 	public void setReplacesRequestReceived(boolean replacesRequestReceived) {
@@ -2470,6 +2469,20 @@ public class TestSipListener implements SipListener {
 	 */
 	public boolean isPrackReceived() {
 		return prackReceived;
+	}
+
+	/**
+	 * @param useDefaultRoute the useDefaultRoute to set
+	 */
+	public void setUseDefaultRoute(boolean useDefaultRoute) {
+		this.useDefaultRoute = useDefaultRoute;
+	}
+
+	/**
+	 * @return the useDefaultRoute
+	 */
+	public boolean isUseDefaultRoute() {
+		return useDefaultRoute;
 	}
 
 }

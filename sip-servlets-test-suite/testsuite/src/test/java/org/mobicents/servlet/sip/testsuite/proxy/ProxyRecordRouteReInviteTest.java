@@ -34,7 +34,7 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 	ProtocolObjects	receiverProtocolObjects;
 
 
-	private static final int TIMEOUT = 10000;
+	private static final int TIMEOUT = 20000;
 
 	public ProxyRecordRouteReInviteTest(String name) {
 		super(name);

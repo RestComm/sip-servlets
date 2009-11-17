@@ -184,9 +184,10 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	public void testBasicFailover() throws Exception {
 		senderProtocolObjects =new ProtocolObjects(
-				"failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");
+				"failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");		
 		sender = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
+		sender.setUseDefaultRoute(false);
 		SipProvider senderProvider = sender.createProvider();			
 		senderProvider.addSipListener(sender);
 		senderProtocolObjects.start();	
@@ -210,7 +211,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		tomcat.stopTomcat();
@@ -219,7 +220,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		toUser = "receiver2";
 		toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		sender.setOkToByeReceived(false);
@@ -228,9 +229,10 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	public void testBasicFailoverUAC() throws Exception {
 		receiverProtocolObjects =new ProtocolObjects(
-				"failover-receiver", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"failover-receiver", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");
 		receiver = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
+		receiver.setUseDefaultRoute(false);
 		SipProvider receiverProvider = receiver.createProvider();			
 		receiverProvider.addSipListener(receiver);
 		receiverProtocolObjects.start();	
@@ -256,9 +258,10 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	public void testBasicFailoverUACCalleeSendsBye() throws Exception {
 		receiverProtocolObjects =new ProtocolObjects(
-				"failover-receiver", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"failover-receiver", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");
 		receiver = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, receiverProtocolObjects, true);
 		receiver.setRecordRoutingProxyTesting(true);
+		receiver.setUseDefaultRoute(false);
 		SipProvider receiverProvider = receiver.createProvider();			
 		receiverProvider.addSipListener(receiver);
 		receiverProtocolObjects.start();	
@@ -284,9 +287,10 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	public void testBasicFailoverUACReInvite() throws Exception {
 		receiverProtocolObjects =new ProtocolObjects(
-				"failover-receiver", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"failover-receiver", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");
 		receiver = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
+		receiver.setUseDefaultRoute(false);
 		SipProvider receiverProvider = receiver.createProvider();			
 		receiverProvider.addSipListener(receiver);
 		receiverProtocolObjects.start();	
@@ -312,9 +316,10 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	public void testBasicFailoverUASReInviteStickiness() throws Exception {
 		senderProtocolObjects =new ProtocolObjects(
-				"failover-receiver", "gov.nist", TRANSPORT, AUTODIALOG, null);
-		sender = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, senderProtocolObjects, false);
+				"failover-receiver", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");
+		sender = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
+		sender.setUseDefaultRoute(false);
 		SipProvider senderProvider = sender.createProvider();			
 		senderProvider.addSipListener(sender);
 		senderProtocolObjects.start();	
@@ -349,9 +354,10 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	public void testBasicFailoverCancelTest() throws Exception {
 		senderProtocolObjects =new ProtocolObjects(
-				"failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
-		sender = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, senderProtocolObjects, true);
+				"failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
+		sender.setUseDefaultRoute(false);
 		SipProvider senderProvider = sender.createProvider();			
 		senderProvider.addSipListener(sender);
 		senderProtocolObjects.start();	
@@ -375,7 +381,8 @@ public class BasicFailoverTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+		sender.setUseDefaultRoute(false);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(CANCEL_TIMEOUT);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
@@ -385,9 +392,11 @@ public class BasicFailoverTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		sender.setOkToByeReceived(false);
 		toUser = "receiver2";
+		sender.setCancelOkReceived(false);
+		sender.setRequestTerminatedReceived(false);
 		toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
 		Thread.sleep(CANCEL_TIMEOUT);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
@@ -398,16 +407,18 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	public void testBasicFailoverSpeedDialLocationService() throws Exception {
 		senderProtocolObjects =new ProtocolObjects(
-				"sdls-failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sdls-failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");
 		sender = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
+		sender.setUseDefaultRoute(false);
 		SipProvider senderProvider = sender.createProvider();			
 		senderProvider.addSipListener(sender);
 		senderProtocolObjects.start();	
 		receiverProtocolObjects = new ProtocolObjects("sdls-failover-receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);			
+				"gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");			
 		receiver = new TestSipListener(5090, 5060, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
+		receiver.setUseDefaultRoute(false);
 		SipProvider receiverProvider = receiver.createProvider();
 		receiverProvider.addSipListener(receiver);
 		receiverProtocolObjects.start();
@@ -433,7 +444,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
@@ -444,7 +455,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		toUser = "6";
 		toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
@@ -455,16 +466,18 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	public void testBasicFailoverSpeedDialLocationServiceCalleeSendsBye() throws Exception {
 		senderProtocolObjects =new ProtocolObjects(
-				"sdls-failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sdls-failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");
 		sender = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
+		sender.setUseDefaultRoute(false);
 		SipProvider senderProvider = sender.createProvider();			
 		senderProvider.addSipListener(sender);
 		senderProtocolObjects.start();	
 		receiverProtocolObjects = new ProtocolObjects("sdls-failover-receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);			
+				"gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");			
 		receiver = new TestSipListener(5090, 5060, receiverProtocolObjects, true);
 		receiver.setRecordRoutingProxyTesting(true);
+		receiver.setUseDefaultRoute(false);
 		SipProvider receiverProvider = receiver.createProvider();
 		receiverProvider.addSipListener(receiver);
 		receiverProtocolObjects.start();
@@ -490,7 +503,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipHost);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getByeReceived());
 		assertTrue(receiver.getOkToByeReceived());
@@ -501,7 +514,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		toUser = "6";
 		toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipHost);
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getByeReceived());
 		assertTrue(receiver.getOkToByeReceived());
@@ -512,17 +525,19 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	public void testBasicFailoverCancelSpeedDialLocationService() throws Exception {
 		senderProtocolObjects =new ProtocolObjects(
-				"sdls-failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sdls-failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");
 		sender = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
+		sender.setUseDefaultRoute(false);
 		SipProvider senderProvider = sender.createProvider();			
 		senderProvider.addSipListener(sender);
 		senderProtocolObjects.start();	
 		receiverProtocolObjects = new ProtocolObjects("sdls-failover-receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);			
+				"gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");			
 		receiver = new TestSipListener(5090, 5060, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		receiver.setWaitForCancel(true);
+		receiver.setUseDefaultRoute(false);
 		SipProvider receiverProvider = receiver.createProvider();
 		receiverProvider.addSipListener(receiver);
 		receiverProtocolObjects.start();
@@ -548,7 +563,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(500);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
@@ -560,7 +575,9 @@ public class BasicFailoverTest extends SipServletTestCase {
 		toUser = "6";
 		toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
+		sender.setCancelOkReceived(false);
+		sender.setRequestTerminatedReceived(false);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
 		Thread.sleep(500);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
@@ -572,16 +589,18 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	public void testBasicFailoverCallForwardingB2BUA() throws Exception {
 		senderProtocolObjects =new ProtocolObjects(
-				"cfb2bua-failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"cfb2bua-failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");
 		sender = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
+		sender.setUseDefaultRoute(false);
 		SipProvider senderProvider = sender.createProvider();			
 		senderProvider.addSipListener(sender);
 		senderProtocolObjects.start();	
 		receiverProtocolObjects = new ProtocolObjects("cfb2bua-failover-receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);			
+				"gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");			
 		receiver = new TestSipListener(5090, 5060, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
+		receiver.setUseDefaultRoute(false);
 		SipProvider receiverProvider = receiver.createProvider();
 		receiverProvider.addSipListener(receiver);
 		receiverProtocolObjects.start();
@@ -605,7 +624,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
@@ -627,16 +646,18 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	public void testBasicFailoverCallForwardingB2BUACalleeSendsBye() throws Exception {
 		senderProtocolObjects =new ProtocolObjects(
-				"cfb2bua-failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"cfb2bua-failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");
 		sender = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
+		sender.setUseDefaultRoute(false);
 		SipProvider senderProvider = sender.createProvider();			
 		senderProvider.addSipListener(sender);
 		senderProtocolObjects.start();	
 		receiverProtocolObjects = new ProtocolObjects("cfb2bua-failover-receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);			
+				"gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");			
 		receiver = new TestSipListener(5090, 5060, receiverProtocolObjects, true);
 		receiver.setRecordRoutingProxyTesting(true);
+		receiver.setUseDefaultRoute(false);
 		SipProvider receiverProvider = receiver.createProvider();
 		receiverProvider.addSipListener(receiver);
 		receiverProtocolObjects.start();
@@ -660,7 +681,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getOkToByeReceived());
 		assertTrue(sender.getByeReceived());
@@ -682,16 +703,19 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	public void testBasicFailoverCancelCallForwardingB2BUA() throws Exception {
 		senderProtocolObjects =new ProtocolObjects(
-				"cfb2bua-failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"cfb2bua-failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");
 		sender = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
+		sender.setUseDefaultRoute(false);
 		SipProvider senderProvider = sender.createProvider();			
 		senderProvider.addSipListener(sender);
 		senderProtocolObjects.start();	
 		receiverProtocolObjects = new ProtocolObjects("cfb2bua-failover-receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);			
+				"gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");			
 		receiver = new TestSipListener(5090, 5060, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
+		receiver.setUseDefaultRoute(false);
+		receiver.setWaitForCancel(true);
 		SipProvider receiverProvider = receiver.createProvider();
 		receiverProvider.addSipListener(receiver);
 		receiverProtocolObjects.start();
@@ -715,8 +739,8 @@ public class BasicFailoverTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
-		Thread.sleep(500);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(CANCEL_TIMEOUT);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isCancelOkReceived());
@@ -727,8 +751,10 @@ public class BasicFailoverTest extends SipServletTestCase {
 		toUser = "receiver2";
 		toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
+		sender.setCancelOkReceived(false);
+		sender.setRequestTerminatedReceived(false);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
-		Thread.sleep(500);
+		Thread.sleep(CANCEL_TIMEOUT);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isCancelOkReceived());
@@ -739,9 +765,10 @@ public class BasicFailoverTest extends SipServletTestCase {
 	
 	public void testFailoverNoNodeStarted() throws Exception {
 		senderProtocolObjects =new ProtocolObjects(
-				"failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"failover-sender", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");
 		sender = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
+		sender.setUseDefaultRoute(false);
 		SipProvider senderProvider = sender.createProvider();			
 		senderProvider.addSipListener(sender);
 		senderProtocolObjects.start();	
@@ -759,9 +786,9 @@ public class BasicFailoverTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
-		assertTrue(sender.isErrorResponseReceived());
+		assertTrue(sender.isServerErrorReceived());
 	}
 
 	/**

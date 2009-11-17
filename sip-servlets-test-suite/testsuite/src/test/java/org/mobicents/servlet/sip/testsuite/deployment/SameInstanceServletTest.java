@@ -80,7 +80,7 @@ public class SameInstanceServletTest extends SipServletTestCase {
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
-		assertFalse(sender.isErrorResponseReceived());
+		assertFalse(sender.isServerErrorReceived());
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getAllMessagesContent().size() < 1);
 	}

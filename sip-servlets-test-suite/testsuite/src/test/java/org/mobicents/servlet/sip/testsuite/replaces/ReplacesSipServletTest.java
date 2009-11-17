@@ -133,7 +133,7 @@ public class ReplacesSipServletTest extends SipServletTestCase {
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertNotNull(receiver.getLastMessageContent());		
-		assertFalse(receiver.isErrorResponseReceived());
+		assertFalse(receiver.isServerErrorReceived());
 		assertTrue(receiver.getByeReceived());
 		assertTrue(sender.getByeReceived());
 	}

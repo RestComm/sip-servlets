@@ -92,17 +92,16 @@ public class CongestionControlTest extends SipServletTestCase {
 		
 		sender.setSendBye(false);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
-		Thread.sleep(3000);
+		Thread.sleep(5000);
+		assertTrue(sender.isAckSent());
 		// For this test the queue size is 3, so we feed 40 messages asap and watch for error response.
 		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
 		for(int q=0; q<40; q++) {
 			sender.sendInDialogSipRequest("INFO", Integer.valueOf(q).toString(), "text", "plain", null);
-			Thread.sleep(500);
+			Thread.sleep(100);
 		}
-		sender.sendBye();
-		Thread.sleep(10000);
-		assertTrue(sender.isServerErrorReceived());
-		assertTrue(sender.isAckSent());		
+		Thread.sleep(10000);	
+		assertTrue(sender.isServerErrorReceived());		
 	}
 	
 	public void testCongestedQueueDropMessage() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
@@ -121,17 +120,16 @@ public class CongestionControlTest extends SipServletTestCase {
 		
 		sender.setSendBye(false);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
-		Thread.sleep(3000);
+		Thread.sleep(5000);
+		assertTrue(sender.isAckSent());
 		// For this test the queue size is 3, so we feed 40 messages asap and watch for error response.
 		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
 		for(int q=0; q<40; q++) {
 			sender.sendInDialogSipRequest("INFO", Integer.valueOf(q).toString(), "text", "plain", null);
-			Thread.sleep(500);
+			Thread.sleep(100);
 		}
-		sender.sendBye();
-		Thread.sleep(10000);
+		Thread.sleep(10000);	
 		assertFalse(sender.isServerErrorReceived());
-		assertTrue(sender.isAckSent());		
 	}
 	
 	public void testMemoryCongestedErrorResponse() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
@@ -150,17 +148,16 @@ public class CongestionControlTest extends SipServletTestCase {
 		
 		sender.setSendBye(false);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
-		Thread.sleep(3000);
+		Thread.sleep(5000);
+		assertTrue(sender.isAckSent());
 		// For this test the queue size is 3, so we feed 40 messages asap and watch for error response.
 		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
 		for(int q=0; q<40; q++) {
 			sender.sendInDialogSipRequest("INFO", Integer.valueOf(q).toString(), "text", "plain", null);
-			Thread.sleep(500);
+			Thread.sleep(100);
 		}
-		sender.sendBye();
-		Thread.sleep(10000);
+		Thread.sleep(10000);	
 		assertTrue(sender.isServerErrorReceived());
-		assertTrue(sender.isAckSent());		
 	}
 	
 	public void testMemoryCongestedDropMessage() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
@@ -179,17 +176,16 @@ public class CongestionControlTest extends SipServletTestCase {
 		
 		sender.setSendBye(false);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
-		Thread.sleep(3000);
+		Thread.sleep(5000);
+		assertTrue(sender.isAckSent());
 		// For this test the queue size is 3, so we feed 40 messages asap and watch for error response.
 		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
 		for(int q=0; q<40; q++) {			
 			sender.sendInDialogSipRequest("INFO", Integer.valueOf(q).toString(), "text", "plain", null);
-			Thread.sleep(500);
+			Thread.sleep(100);
 		}
-		sender.sendBye();
-		Thread.sleep(10000);
-		assertFalse(sender.isServerErrorReceived());		
-		assertTrue(sender.isAckSent());		
+		Thread.sleep(10000);	
+		assertFalse(sender.isServerErrorReceived());
 	}
 	
 	@Override

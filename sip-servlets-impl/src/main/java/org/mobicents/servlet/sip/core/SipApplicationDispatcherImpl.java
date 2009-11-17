@@ -1243,6 +1243,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 
 	public void setQueueSize(int queueSize) {
 		this.queueSize = queueSize;
+		if(logger.isInfoEnabled()) {
+			logger.info("Queue Size set to " + queueSize);
+		}
 	}
 	
 	public void setConcurrencyControlModeByName(String concurrencyControlMode) {

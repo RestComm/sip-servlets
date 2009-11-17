@@ -260,8 +260,8 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 			} catch (InterruptedException e) {
 				logger.error("unexpected exception while waiting ", e);
 			}
-			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
-			sipServletResponse.send();
+//			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+//			sipServletResponse.send();
 		}
 	}
 	
