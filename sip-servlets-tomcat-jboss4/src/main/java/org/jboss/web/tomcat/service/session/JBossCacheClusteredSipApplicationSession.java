@@ -115,9 +115,7 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 		}
 		Boolean valid = (Boolean) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, IS_VALID);
 		if(valid != null) {
-			isValid = valid;
-		} else {
-			isValid = true;
+			setValid(valid);
 		}
 		sipSessions.clear();
 		SipSessionKey[] sipSessionKeys = (SipSessionKey[]) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, SIP_SESSIONS);

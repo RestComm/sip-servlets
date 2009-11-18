@@ -665,10 +665,10 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 //		if (this.expiring) {
 //			return true;
 //		}
-
-		if (!isValid) {
-			return false;
-		}
+		return super.isValid();
+//		if (!isValid) {
+//			return false;
+//		}
 
 //		if (ACTIVITY_CHECK && accessCount.get() > 0) {
 //			return true;
@@ -685,7 +685,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 //			}
 //		}
 
-		return isValid;
+//		return isValid;
 
 	}
 

@@ -16,8 +16,6 @@
  */
 package org.jboss.web.tomcat.service.session;
 
-import gov.nist.javax.sip.SipStackImpl;
-
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -36,22 +34,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.sip.SipSessionActivationListener;
 import javax.servlet.sip.SipSessionAttributeListener;
 import javax.servlet.sip.SipSessionBindingEvent;
 import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
-import javax.servlet.sip.ar.SipApplicationRoutingRegion;
-import javax.sip.SipStack;
-import javax.sip.address.URI;
+import javax.sip.Dialog;
 
-import org.apache.catalina.Container;
 import org.apache.catalina.Context;
-import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
-import org.apache.catalina.Service;
-import org.apache.catalina.connector.Connector;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
@@ -65,10 +58,8 @@ import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistrib
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionManagementStatus;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionNotificationCause;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipSessionNotificationPolicy;
-import org.mobicents.servlet.sip.SipFactories;
-import org.mobicents.servlet.sip.address.SipURIImpl;
-import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
@@ -76,7 +67,6 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
-import org.mobicents.servlet.sip.startup.SipService;
 
 /**
  * Abstract base class for sip session clustering based on SipSessionImpl. Different session
@@ -87,8 +77,20 @@ import org.mobicents.servlet.sip.startup.SipService;
  */
 public abstract class ClusteredSipSession<O extends OutgoingDistributableSessionData> extends SipSessionImpl {
 
-	private static transient final Logger logger = Logger.getLogger(ClusteredSipSession.class);
+	private static final Logger logger = Logger.getLogger(ClusteredSipSession.class);
 
+	protected static final String B2B_SESSION_MAP = "b2bsm";
+	protected static final String B2B_SESSION_SIZE = "b2bss";
+	protected static final String PROXY = "prox";
+	protected static final String DIALOG_ID = "did";
+	protected static final String READY_TO_INVALIDATE = "rti";
+	protected static final String INVALIDATE_WHEN_READY = "iwr";
+	protected static final String CSEQ = "cseq";
+	protected static final String STATE = "stat";
+	protected static final String IS_VALID = "iv";
+	protected static final String HANDLER = "hler";
+	protected static final String INVALIDATION_POLICY = "ip";
+	protected static final String CREATION_TIME = "ct";
 	
 	protected static final boolean ACTIVITY_CHECK = 
 	      Globals.STRICT_SERVLET_COMPLIANCE
@@ -155,11 +157,6 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	 * it is declared transient).
 	 */
 	private transient Method containerEventMethod = null;			
-
-	/**
-	 * The session identifier of this Session.
-	 */
-	private String id = null;
 
 	/**
 	 * The Manager with which this Session is associated.
@@ -277,7 +274,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	private transient long maxUnreplicatedInterval;
 
 	/** True if maxUnreplicatedInterval is 0 or less than maxInactiveInterval */
-	private transient boolean alwaysReplicateTimestamp = true;
+	private transient boolean alwaysReplicateTimestamp = false;
 
 	/**
 	 * Whether any of this session's attributes implement
@@ -307,12 +304,14 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	
 	protected transient String sessionCreatingDialogId = null;
 	
+	private transient String haId;
+	
 	// ------------------------------------------------------------ Constructors
 
 	protected ClusteredSipSession(SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession, boolean useJK) {
-		super(key, sipFactoryImpl, mobicentsSipApplicationSession);
-		id = key.toString();
-	    this.clusterStatus = new ClusteredSessionManagementStatus(this.id, true, null, null);
+		super(key, sipFactoryImpl, mobicentsSipApplicationSession);	
+		haId = SessionManagerUtil.getSipSessionHaKey(key);
+	    this.clusterStatus = new ClusteredSessionManagementStatus(haId, true, null, null);
 		if(mobicentsSipApplicationSession.getSipContext() != null) {
 			setManager((ClusteredSipManager)mobicentsSipApplicationSession.getSipContext().getSipManager());
 			this.invalidationPolicy = this.manager.getReplicationTrigger();
@@ -321,7 +320,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		this.firstAccess = true;
 		accessCount = ACTIVITY_CHECK ? new AtomicInteger() : null;
 		// it starts with true so that it gets replicated when first created
-		sessionMetadataDirty = true;
+		sessionMetadataDirty = true;		
 //		checkAlwaysReplicateMetadata();
 	}
 
@@ -390,8 +389,6 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		if (!firstAccess && isNew) {
 			setNew(false);
 		}
-		// everytime a SIP Message is sent, the state has to be replicated
-		sessionMetadataDirty();
 	}		
 
 	public void setNew(boolean isNew) {
@@ -406,11 +403,6 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		// sessionMetadataDirty();
 	}
 
-
-	public void setValid(boolean isValid) {
-		this.isValid = isValid;
-		sessionMetadataDirty();
-	}
 
 	/**
 	 * Invalidates this session and unbinds any objects bound to it. Overridden
@@ -728,16 +720,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	}
 
 	// ---------------------------------------------------- DistributableSession
-
-	/**
-	 * Gets the session id with any appended jvmRoute info removed.
-	 * 
-	 * @see #getUseJK()
-	 */
-	public String getRealId() {
-		return key.toString();
-	}
-
+	
 	protected int getVersion() {
 		return version.get();
 	}
@@ -767,35 +750,11 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		return sessionMetadataDirty;
 	}
 
-	protected DistributableSessionMetadata getSessionMetadata() {
-		this.metadata.setId(id);
+	protected DistributableSessionMetadata getSessionMetadata() {		
 		this.metadata.setCreationTime(creationTime);
-		this.metadata.setMaxInactiveInterval(maxInactiveInterval);
-		this.metadata.setNew(isNew);
-		this.metadata.setValid(isValid());
-		
-		getSipSessionMetadata();
+		this.metadata.setMaxInactiveInterval(maxInactiveInterval);			
 		
 		return this.metadata;
-	}
-
-	protected void getSipSessionMetadata() {
-		this.metadata.setSipApplicationSessionKey(sipApplicationSessionKey);
-		this.metadata.setSipSessionKey(key);
-		this.metadata.setB2buaHelper(b2buaHelper);
-		this.metadata.setProxy(proxy);
-		this.metadata.setHandlerServlet(getHandler());
-		this.metadata.setInvalidateWhenReady(getInvalidateWhenReady());
-		this.metadata.setReadyToInvalidate(isReadyToInvalidate());
-		this.metadata.setRoutingRegion(routingRegion);
-		if(sessionCreatingDialog != null) {
-			this.metadata.setSipDialogId(sessionCreatingDialog.getDialogId());
-		} else {
-			this.metadata.setSipDialogId("");
-		}
-		if(subscriberURI != null) {
-			this.metadata.setSubscriberURI(subscriberURI.toString());
-		}
 	}
 
 	protected boolean isSessionAttributeMapDirty() {
@@ -814,20 +773,13 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		this.lastAccessedTime = this.thisAccessedTime = ts;
 		this.timestamp.set(ts);
 
-		DistributableSipSessionMetadata md = (DistributableSipSessionMetadata)sessionData.getMetadata();
+		this.metadata = (DistributableSipSessionMetadata)sessionData.getMetadata();
 		// TODO -- get rid of these field and delegate to metadata
-		this.id = md.getId();
-		this.creationTime = md.getCreationTime();
-		this.maxInactiveInterval = md.getMaxInactiveInterval();
-		this.isNew = md.isNew();
-		this.setValid(md.isValid());
-		this.metadata = md;
+		this.creationTime = metadata.getCreationTime();
+		this.maxInactiveInterval = metadata.getMaxInactiveInterval();					
 		
-		updateSipSession(md);
+		updateSipSession(metadata);
 		
-		// Get our id without any jvmRoute appended
-//		parseRealId(id);
-
 		// We no longer know if we have an activationListener
 		hasActivationListener = null;
 
@@ -843,114 +795,65 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		// a heavy cost.
 		this.lastReplicated = this.creationTime;
 
-		this.clusterStatus = new ClusteredSessionManagementStatus(getRealId(),
+		this.clusterStatus = new ClusteredSessionManagementStatus(haId,
 				true, null, null);
 
 		checkAlwaysReplicateTimestamp();
 
 		populateAttributes(sessionData.getSessionAttributes());
 
-		// TODO uncomment when work on JBAS-1900 is completed
-		// // Session notes -- for FORM auth apps, allow replicated session
-		// // to be used without requiring a new login
-		// // We use the superclass set/removeNote calls here to bypass
-		// // the custom logic we've added
-		// String username = (String) in.readObject();
-		// if (username != null)
-		// {
-		// super.setNote(Constants.SESS_USERNAME_NOTE, username);
-		// }
-		// else
-		// {
-		// super.removeNote(Constants.SESS_USERNAME_NOTE);
-		// }
-		// String password = (String) in.readObject();
-		// if (password != null)
-		// {
-		// super.setNote(Constants.SESS_PASSWORD_NOTE, password);
-		// }
-		// else
-		// {
-		// super.removeNote(Constants.SESS_PASSWORD_NOTE);
-		// }
-
+		isNew = false;
 		// We are no longer outdated vis a vis distributed cache
 		clearOutdated();
 	}
 
 	protected void updateSipSession(DistributableSipSessionMetadata md) {
 		//From SipSession
-		key = md.getSipSessionKey();
-		sipAppSessionParentKey = md.getSipApplicationSessionKey();
-		routingRegion = (SipApplicationRoutingRegion) md.getRoutingRegion();
-		handlerServlet = md.getHandlerServlet();
+		final Map<String, Object> metaData = md.getMetaData();
+		handlerServlet = (String) metaData.get(HANDLER);		
+		Boolean valid = (Boolean)metaData.get(IS_VALID);
+		if(valid != null) {
+			setValid(valid);
+		} 
+		state = (State)metaData.get(STATE);
+		Long cSeq = (Long) metaData.get(CSEQ);
+		if(cSeq != null) {
+			cseq = cSeq;
+		} 
+		Boolean iwr = (Boolean) metaData.get(INVALIDATE_WHEN_READY);		
+		if(iwr != null) {
+			invalidateWhenReady = iwr;
+		} 
+		Boolean rti = (Boolean) metaData.get(READY_TO_INVALIDATE);		
+		if(rti != null) {
+			readyToInvalidate = rti;
+		} 
+		sessionCreatingDialogId = (String) metaData.get(DIALOG_ID);
+		proxy = (ProxyImpl) metaData.get(PROXY);
+		
+		Integer size = (Integer) metaData.get(B2B_SESSION_SIZE);
+		String[][] sessionArray = (String[][])metaData.get(B2B_SESSION_MAP);
 		if(logger.isDebugEnabled()) {
-			logger.debug("reading handlerServlet "+ handlerServlet);
+			logger.debug("b2bua session array size = " + size + ", value = " + sessionArray);
 		}
-		String subscriberURIStringified = md.getSubscriberURI();
-		if(subscriberURIStringified == null || "".equals(subscriberURIStringified)) {
-			subscriberURIStringified = null;
-		} else {
-			try {
-				URI jsipSubscriberUri = SipFactories.addressFactory.createURI(subscriberURIStringified);				
-				if(jsipSubscriberUri instanceof javax.sip.address.SipURI) {
-					subscriberURI = new SipURIImpl((javax.sip.address.SipURI)jsipSubscriberUri);
-				} else if (jsipSubscriberUri instanceof javax.sip.address.TelURL) {
-					subscriberURI = new TelURLImpl((javax.sip.address.TelURL)jsipSubscriberUri);
-				}
-			} catch (ParseException pe) {
-				logger.error("Impossible to parse the subscriber URI " 
-						+ subscriberURIStringified, pe);
-			}
-		}
-		sessionCreatingDialogId = md.getSipDialogId();
-		if(logger.isDebugEnabled()) {
-			logger.debug("deserialized dialog id for the sip session "+ sessionCreatingDialogId);
-		}
-		invalidateWhenReady = md.isInvalidateWhenReady();
-		setReadyToInvalidate(md.isReadyToInvalidate());
-		proxy = (ProxyImpl) md.getProxy();
-		b2buaHelper = (B2buaHelperImpl) md.getB2buaHelper();
-		if(logger.isDebugEnabled()) {
-			logger.debug("deserialized proxy for the sip session "+ proxy);
-		}
-		if(proxy != null) {
-			proxy.setSipFactoryImpl(sipFactory);
-		}
-		if(logger.isDebugEnabled()) {
-			logger.debug("deserialized b2buahelper for the sip session "+ b2buaHelper);
-		}
-		if(b2buaHelper != null) {
-			b2buaHelper.setSipFactoryImpl(sipFactory);
-			b2buaHelper.setSipManager(manager);
-		}
-		//inject the dialog into the available sip stacks
-		if(logger.isDebugEnabled()) {
-			logger.debug("dialog to inject " + sessionCreatingDialogId);
-			if(sessionCreatingDialogId != null) {
-				logger.debug("dialog id of the dialog to inject " + sessionCreatingDialogId);
-			}
-		}
-		if(sessionCreatingDialogId != null && sessionCreatingDialogId.length() > 0) {
-			Container context = manager.getContainer();
-			Container container = context.getParent().getParent();
-			if(container instanceof Engine) {
-				Service service = ((Engine)container).getService();
-				if(service instanceof SipService) {
-					Connector[] connectors = service.findConnectors();
-					for (Connector connector : connectors) {
-						SipStack sipStack = (SipStack)
-							connector.getProtocolHandler().getAttribute(SipStack.class.getSimpleName());
-						if(sipStack != null) {
-							sessionCreatingDialog = ((SipStackImpl)sipStack).getDialog(sessionCreatingDialogId);							
-							if(logger.isDebugEnabled()) {
-								logger.debug("dialog injected " + sessionCreatingDialog);
-							}							
-						}
-					}
+		if(size != null && sessionArray != null) {
+			Map<SipSessionKey, SipSessionKey> sessionMap = new ConcurrentHashMap<SipSessionKey, SipSessionKey>();
+			for (int i = 0; i < size; i++) {
+				String key = sessionArray[0][i];
+				String value = sessionArray[1][i];
+				try {
+					SipSessionKey sipSessionKeyKey = SessionManagerUtil.parseSipSessionKey(key);
+					SipSessionKey sipSessionKeyValue = SessionManagerUtil.parseSipSessionKey(value);
+					sessionMap.put(sipSessionKeyKey, sipSessionKeyValue);
+				} catch (ParseException e) {
+					logger.warn("couldn't parse a deserialized sip session key from the B2BUA", e);
 				}
 			}
-		}				
+			if(b2buaHelper == null) {
+				b2buaHelper = new B2buaHelperImpl();
+			}
+			b2buaHelper.setSessionMap(sessionMap);
+		}						
 	}
 
 	// ------------------------------------------------------------------ Public
@@ -984,14 +887,14 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	 * Remove myself from the distributed cache.
 	 */
 	public void removeMyself() {
-		getDistributedCacheManager().removeSession(getRealId());
+		((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeSession(sipApplicationSessionKey, key);
 	}
 
 	/**
 	 * Remove myself from the <t>local</t> instance of the distributed cache.
 	 */
 	public void removeMyselfLocal() {
-		getDistributedCacheManager().removeSessionLocal(getRealId());
+		((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeSessionLocal(sipApplicationSessionKey, key, null);
 	}
 
 	/**
@@ -1236,7 +1139,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	@Override
 	public String toString() {
 		return new StringBuilder(getClass().getSimpleName()).append('[')
-				.append("id: ").append(id).append(" lastAccessedTime: ")
+				.append("id: ").append(haId).append(" lastAccessedTime: ")
 				.append(lastAccessedTime).append(" version: ").append(version)
 				.append(" lastOutdated: ").append(outdatedTime).append(']')
 				.toString();
@@ -1382,7 +1285,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 
 	protected final void sessionAttributesDirty() {
 		if (!sessionAttributesDirty && log.isTraceEnabled())
-			log.trace("Marking session attributes dirty " + id);
+			log.trace("Marking session attributes dirty " + haId);
 
 		sessionAttributesDirty = true;
 	}
@@ -1540,5 +1443,60 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			version.set(outdatedVersion);
 
 		outdatedVersion = 0;
-	}	
+	}
+
+	@Override
+	public void setState(State state) {
+		super.setState(state);
+		sessionMetadataDirty();
+		metadata.getMetaData().put(STATE, state);
+	}
+	
+	@Override
+	public void setCseq(long cseq) {
+		super.setCseq(cseq);
+		sessionMetadataDirty();
+		metadata.getMetaData().put(CSEQ, cseq);
+	}
+	
+	@Override
+	public void setHandler(String name) throws ServletException {
+		super.setHandler(name);
+		sessionMetadataDirty();
+		metadata.getMetaData().put(HANDLER, name);
+	}
+	
+	@Override
+	public void setInvalidateWhenReady(boolean arg0) {
+		super.setInvalidateWhenReady(arg0);
+		sessionMetadataDirty();		
+		metadata.getMetaData().put(INVALIDATE_WHEN_READY, arg0);
+	}
+
+	@Override
+	protected void setReadyToInvalidate(boolean readyToInvalidate) {
+		super.setReadyToInvalidate(readyToInvalidate);
+		sessionMetadataDirty();
+		metadata.getMetaData().put(READY_TO_INVALIDATE, readyToInvalidate);
+	}
+	
+	@Override
+	protected void setValid(boolean isValid) {
+		super.setValid(isValid);
+		sessionMetadataDirty();
+		metadata.getMetaData().put(IS_VALID, isValid);
+	}
+	
+	@Override
+	public void setSessionCreatingDialog(Dialog dialog) {
+		super.setSessionCreatingDialog(dialog);
+		if(dialog != null && dialog.getDialogId() != null) {
+			sessionMetadataDirty();
+			metadata.getMetaData().put(DIALOG_ID, dialog.getDialogId() );
+		}
+	}
+	
+	public String getHaId() {
+		return haId;
+	}
 }

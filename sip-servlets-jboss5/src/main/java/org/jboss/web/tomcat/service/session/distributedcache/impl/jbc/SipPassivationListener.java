@@ -16,12 +16,12 @@ import org.jboss.web.tomcat.service.session.distributedcache.spi.LocalDistributa
 @org.jboss.cache.notifications.annotation.CacheListener
 public class SipPassivationListener extends CacheListenerBase
 {
-	private String sipApplicationName;
+	private String sipApplicationNameHashed;
 	
-   SipPassivationListener(LocalDistributableSessionManager manager, String contextHostPath, String sipApplicationName)
+   SipPassivationListener(LocalDistributableSessionManager manager, String contextHostPath, String sipApplicationNameHashed)
    {      
       super(manager, contextHostPath);
-      this.sipApplicationName = sipApplicationName;
+      this.sipApplicationNameHashed = sipApplicationNameHashed;
    }
    
    // NOTE: Don't track passivation from here -- we know in JBossCacheManager
@@ -70,7 +70,7 @@ public class SipPassivationListener extends CacheListenerBase
    {   
       try
       {
-         if (sipApplicationName.equals(fqn.get(isBuddy ? SipCacheListener.BUDDY_BACKUP_ROOT_OWNER_SIZE + SipCacheListener.SIPAPPNAME_FQN_INDEX : SipCacheListener.SIPAPPNAME_FQN_INDEX))
+         if (sipApplicationNameHashed.equals(fqn.get(isBuddy ? SipCacheListener.BUDDY_BACKUP_ROOT_OWNER_SIZE + SipCacheListener.SIPAPPNAME_FQN_INDEX : SipCacheListener.SIPAPPNAME_FQN_INDEX))
                && AbstractJBossCacheService.SESSION.equals(fqn.get(isBuddy ? SipCacheListener.BUDDY_BACKUP_ROOT_OWNER_SIZE + SipCacheListener.SIPSESSION_FQN_INDEX : SipCacheListener.SIPSESSION_FQN_INDEX)))
             return true;
       }

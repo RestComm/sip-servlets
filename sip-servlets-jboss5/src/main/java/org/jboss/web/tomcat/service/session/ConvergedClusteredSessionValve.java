@@ -19,6 +19,7 @@ package org.jboss.web.tomcat.service.session;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 
@@ -28,6 +29,7 @@ import org.apache.catalina.connector.Response;
 import org.jboss.logging.Logger;
 import org.jboss.servlet.http.HttpEvent;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.BatchingManager;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 
 /**
  * This class extends the jboss ClusteredSessionValve (JBoss AS 5.1.0.GA Tag) to
@@ -128,14 +130,19 @@ public class ConvergedClusteredSessionValve extends ClusteredSessionValve {
 					handleCrossContextSessions(ctx);
 				}
 				ctx = ConvergedSessionReplicationContext.exitSipapp();
-				if(logger.isInfoEnabled()) {
-					logger.info("Snapshot Manager " + ctx.getSoleSnapshotSipManager());
+				final SnapshotSipManager snapshotSipManager = ctx.getSoleSnapshotSipManager();
+				if(logger.isDebugEnabled()) {
+					logger.debug("Snapshot Manager " + snapshotSipManager);
 				}
-				if (ctx.getSoleSnapshotSipManager() != null) {
-					ctx.getSoleSnapshotSipManager().snapshot(
-							ctx.getSoleSipSession());
-					ctx.getSoleSnapshotSipManager().snapshot(
-							ctx.getSoleSipApplicationSession());
+				if (snapshotSipManager != null) {
+					Set<ClusteredSipSession<? extends OutgoingDistributableSessionData>> sipSessions = ctx.getSipSessions();
+					for (ClusteredSipSession<? extends OutgoingDistributableSessionData> clusteredSipSession : sipSessions) {
+						snapshotSipManager.snapshot(clusteredSipSession);
+					}
+					Set<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>> sipApplicationSessions = ctx.getSipApplicationSessions();
+					for (ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> clusteredSipApplicationSession : sipApplicationSessions) {
+						snapshotSipManager.snapshot(clusteredSipApplicationSession);
+					}
 				} 
 			} finally {
 				if (startedBatch) {

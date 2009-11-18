@@ -40,6 +40,7 @@ import javax.management.ObjectName;
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipSession.State;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -1558,7 +1559,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 
 				if (session.isValid()
 						&& (session.isSessionDirty() || session
-								.getMustReplicateTimestamp())) {
+								.getMustReplicateTimestamp()) && State.CONFIRMED.equals(session.getState())) {
 					if(logger.isInfoEnabled()) {
 						logger.info("replicating following sip session " + session.getId());
 					}
@@ -1612,22 +1613,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 
 					// Do the actual replication
 					begin = System.currentTimeMillis();
-					processSipApplicationSessionRepl(session);
-					// we make sure we replicate all underlying sip sessions that could have been made dirty
-//					Iterator<ClusteredSipSession<OutgoingDistributableSessionData>> sipSessionIt = 
-//						(Iterator<ClusteredSipSession<OutgoingDistributableSessionData>>)
-//							((MobicentsSipApplicationSession)session).getSessions("SIP");
-//					if(logger.isDebugEnabled()) {
-//						logger.debug("checking if the underlying sip sessions are dirty and need to be replicated as well");
-//					}
-//					while (sipSessionIt.hasNext()) {						
-//						ClusteredSipSession sipSession = (ClusteredSipSession) sipSessionIt
-//								.next();
-//						if(logger.isDebugEnabled()) {
-//							logger.debug("checking if the underlying sip session " + sipSession.getKey() + " is dirty and need to be replicated as well");
-//						}
-//						storeSipSession(sipSession);
-//					}					
+					processSipApplicationSessionRepl(session);		
 					elapsed = System.currentTimeMillis() - begin;
 					stored = true;
 					stats_.updateReplicationStats(realId, elapsed);
@@ -1690,7 +1676,6 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
          return;
       }
 
-      String realId = session.getRealId();
       SipSessionKey key = session.getKey();
 	  Object existing = ((ClusteredSipManagerDelegate)sipManagerDelegate).putSipSession(key, session);
       unloadedSipSessions_.remove(key);
@@ -1735,7 +1720,6 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
          return;
       }
 
-      String realId = session.getRealId();
       SipApplicationSessionKey key = session.getKey();
 	  Object existing = ((ClusteredSipManagerDelegate)sipManagerDelegate).putSipApplicationSession(key, session);
       unloadedSipSessions_.remove(key);
@@ -2284,18 +2268,18 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		 
 		ClusteredSipSession<? extends OutgoingDistributableSessionData> session = (ClusteredSipSession) sipManagerDelegate.getSipSession(key, create, sipFactory, sipApplicationSessionImpl);
 		boolean initialLoad = false;
-//		boolean doTx = false;
-//		BatchingManager batchingManager = getDistributedCacheConvergedSipManager().getBatchingManager();
+		boolean doTx = false;
+		BatchingManager batchingManager = getDistributedCacheConvergedSipManager().getBatchingManager();
 		try {
 			// We need transaction so any data gravitation replication
 			// is sent in batch.
 			// Don't do anything if there is already transaction context
 			// associated with this thread.
-//			if (batchingManager.isBatchInProgress() == false)
-//            {
-//               batchingManager.startBatch();
-//               doTx = true;
-//            }
+			if (batchingManager.isBatchInProgress() == false)
+            {
+               batchingManager.startBatch();
+               doTx = true;
+            }
 			if(session == null) {
 				initialLoad = true;
 			}
@@ -2337,14 +2321,14 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 //               session.notifyDidActivate(cause);
 //            }
 		} catch (Exception ex) {
-//			try {
-//				// if(doTx)
-//				// Let's set it no matter what.
-//				batchingManager.setBatchRollbackOnly();
-//			} catch (Exception exn) {
-//				log_.error("Problem rolling back session mgmt transaction",
-//						exn);
-//			}
+			try {
+				// if(doTx)
+				// Let's set it no matter what.
+				batchingManager.setBatchRollbackOnly();
+			} catch (Exception exn) {
+				log_.error("Problem rolling back session mgmt transaction",
+						exn);
+			}
 
 			// We will need to alert Tomcat of this exception.
 			if (ex instanceof RuntimeException)
@@ -2353,8 +2337,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			throw new RuntimeException("Failed to load session " + key.toString(),
 					ex);
 		} finally {
-//			if (doTx)
-//				batchingManager.endBatch();
+			if (doTx) {
+				batchingManager.endBatch();
+			}
 		}
 		if (session != null) {
 			if (mustAdd) {
@@ -2416,19 +2401,18 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 
 	
 //		synchronized (session) {
-		// ClusteredSipApplicationSession sessionInCache = null;
 		boolean doTx = false;
-//		BatchingManager batchingManager = 
-//			getDistributedCacheConvergedSipManager().getBatchingManager();
+		BatchingManager batchingManager = 
+			getDistributedCacheConvergedSipManager().getBatchingManager();
 		try {
 			// We need transaction so any data gravitation replication
 			// is sent in batch.
 			// Don't do anything if there is already transaction context
 			// associated with this thread.
-//			if (batchingManager.isBatchInProgress() == false) {
-//				batchingManager.startBatch();
-//				doTx = true;
-//			}
+			if (batchingManager.isBatchInProgress() == false) {
+				batchingManager.startBatch();
+				doTx = true;
+			}
 			if(session == null) {
 				initialLoad = true;
 			}
@@ -2463,13 +2447,13 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 //				session.notifyDidActivate(cause);
 //			}
 		} catch (Exception ex) {
-//			try {
-//				// if(doTx)
-//				// Let's set it no matter what.
-//				batchingManager.setBatchRollbackOnly();
-//			} catch (Exception exn) {
-//				log_.error("Problem rolling back session mgmt transaction",	exn);
-//			}
+			try {
+				// if(doTx)
+				// Let's set it no matter what.
+				batchingManager.setBatchRollbackOnly();
+			} catch (Exception exn) {
+				log_.error("Problem rolling back session mgmt transaction",	exn);
+			}
 
 			// We will need to alert Tomcat of this exception.
 			if (ex instanceof RuntimeException){
@@ -2477,9 +2461,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			}
 			throw new RuntimeException("Failed to load session " + key, ex);
 		} finally {
-//			if (doTx) {
-//				batchingManager.endBatch();
-//			}
+			if (doTx) {
+				batchingManager.endBatch();
+			}
 		}
 		if (session != null) {
 			if (mustAdd) {
@@ -2518,7 +2502,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	protected void processSipSessionRepl(ClusteredSipSession session) {
 		// If we are using SESSION granularity, we don't want to initiate a TX
 		// for a single put
-		boolean notSession = (getReplicationGranularity() != ReplicationGranularity.SESSION);
+//		boolean notSession = (getReplicationGranularity() != ReplicationGranularity.SESSION);
+		boolean notSession = true;
 		boolean doTx = false;
 		BatchingManager batchingManager = getDistributedCacheConvergedSipManager().getBatchingManager();
 		try {

@@ -24,6 +24,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -53,8 +54,11 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.LoginConfig;
 import org.apache.log4j.Logger;
+import org.jboss.web.tomcat.service.session.ClusteredSipApplicationSession;
 import org.jboss.web.tomcat.service.session.ClusteredSipManager;
+import org.jboss.web.tomcat.service.session.ClusteredSipSession;
 import org.jboss.web.tomcat.service.session.ConvergedSessionReplicationContext;
+import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.BatchingManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheConvergedSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
@@ -448,15 +452,15 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			((SipManager)manager).dumpSipApplicationSessions();
 			logger.warn("number of active sip sessions : " + ((SipManager)manager).getActiveSipSessions()); 
 			logger.warn("number of active sip application sessions : " + ((SipManager)manager).getActiveSipApplicationSessions());
-		}		
+		}				
+		super.stop();
+		// this should happen after so that applications can still do some processing
+		// in destroy methods to notify that context is getting destroyed and app removed
 		sipListeners.deallocateServletsActingAsListeners();
 		sipApplicationListeners.clear();
 		sipServletMappings.clear();
 		childrenMap.clear();
 		childrenMapByClassName.clear();
-		super.stop();
-		// this should happen after so that applications can still do some processing
-		// in destroy methods to notify that context is getting destroyed and app removed
 		if(sipApplicationDispatcher != null) {
 			if(applicationName != null) {
 				sipApplicationDispatcher.removeSipApplication(applicationName);
@@ -956,14 +960,19 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				ConvergedSessionReplicationContext ctx = ConvergedSessionReplicationContext
 						.exitSipapp();
 
-				if(logger.isInfoEnabled()) {
-					logger.info("Snapshot Manager " + ctx.getSoleSnapshotSipManager());
+				final SnapshotSipManager snapshotSipManager = ctx.getSoleSnapshotSipManager();
+				if(logger.isDebugEnabled()) {
+					logger.debug("Snapshot Manager " + snapshotSipManager);
 				}
-				if (ctx.getSoleSnapshotSipManager() != null) {
-					ctx.getSoleSnapshotSipManager().snapshot(
-							ctx.getSoleSipSession());
-					ctx.getSoleSnapshotSipManager().snapshot(
-							ctx.getSoleSipApplicationSession());
+				if (snapshotSipManager != null) {
+					Set<ClusteredSipSession<? extends OutgoingDistributableSessionData>> sipSessions = ctx.getSipSessions();
+					for (ClusteredSipSession<? extends OutgoingDistributableSessionData> clusteredSipSession : sipSessions) {
+						snapshotSipManager.snapshot(clusteredSipSession);
+					}
+					Set<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>> sipApplicationSessions = ctx.getSipApplicationSessions();
+					for (ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> clusteredSipApplicationSession : sipApplicationSessions) {
+						snapshotSipManager.snapshot(clusteredSipApplicationSession);
+					}
 				} 
 			} finally {
 				endBatchTransaction();

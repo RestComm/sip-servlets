@@ -33,6 +33,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ServletTimer;
@@ -146,7 +147,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected transient ConcurrentHashMap<String, ServletTimer> servletTimers;
 	
-	protected boolean isValid;
+	protected AtomicBoolean isValid;
 	
 	protected boolean invalidateWhenReady = true;
 	
@@ -181,7 +182,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		this.key = key;			
 		lastAccessedTime = creationTime = System.currentTimeMillis();
 		expired = false;		
-		isValid = true;		
+		isValid = new AtomicBoolean(true);		
 		// the sip context can be null if the AR returned an application that was not deployed
 		if(sipContext != null) {
 			this.sipContext = sipContext;
@@ -570,11 +571,15 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#invalidate()
 	 */
 	public void invalidate() {
+		invalidate(false);
+	}
+	
+	public void invalidate(boolean bypassCheck) {
 		//JSR 289 Section 6.1.2.2.1
 		//When the IllegalStateException is thrown, the application is guaranteed 
 		//that the state of the SipApplicationSession object will be unchanged from its state prior to the invalidate() 
 		//method call. Even session objects that were eligible for invalidation will not have been invalidated.
-		if(!isValid) {
+		if(!bypassCheck && isValid.compareAndSet(true, false)) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		if(logger.isInfoEnabled()) {
@@ -609,7 +614,6 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);
 		
-		setValid(false);	
 		//cancelling the timers
 		if(servletTimers != null) {
 			for (Map.Entry<String, ServletTimer> servletTimerEntry : servletTimers.entrySet()) {
@@ -706,14 +710,14 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#isValid()
 	 */
 	public boolean isValid() {
-		return isValid;
+		return isValid.get();
 	}
 
 	/**
 	 * @param isValid the isValid to set
 	 */
 	protected void setValid(boolean isValid) {
-		this.isValid = isValid;
+		this.isValid.set(isValid);
 	}
 
 	/*
@@ -1107,7 +1111,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 					}
 				}
 				if(allSipSessionsInvalidated && allHttpSessionsInvalidated) {
-					this.invalidate();
+					this.invalidate(true);
 				}
 			}
 		}

@@ -22,7 +22,9 @@
 package org.jboss.web.tomcat.service.session;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -51,8 +53,8 @@ public final class ConvergedSessionReplicationContext
    private SnapshotManager soleManager;
    private SnapshotSipManager soleSipManager;
    private ClusteredSession<? extends OutgoingDistributableSessionData> soleSession;
-   private ClusteredSipSession<? extends OutgoingDistributableSessionData> soleSipSession;
-   private ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> soleSipApplicationSession;
+   private final Set<ClusteredSipSession<? extends OutgoingDistributableSessionData>> sipSessions = new HashSet<ClusteredSipSession<? extends OutgoingDistributableSessionData>>();
+   private final Set<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>> sipApplicationSessions = new HashSet<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>>();
    private Map<ClusteredSession<? extends OutgoingDistributableSessionData>, SnapshotManager> crossCtxSessions;
 //   private Map crossCtxSipSessions;
 //   private Map crossCtxSipApplicationSessions;
@@ -488,9 +490,9 @@ public final class ConvergedSessionReplicationContext
     * otherwise, in which case a cross-context request is a possibility,
     * and {@link #getCrossContextSessions()} should be checked.
     */
-   public ClusteredSipSession<? extends OutgoingDistributableSessionData> getSoleSipSession()
+   public Set<ClusteredSipSession<? extends OutgoingDistributableSessionData>> getSipSessions()
    {
-      return soleSipSession;
+      return sipSessions;
    }
    
    /**
@@ -500,9 +502,9 @@ public final class ConvergedSessionReplicationContext
     * otherwise, in which case a cross-context request is a possibility,
     * and {@link #getCrossContextSessions()} should be checked.
     */
-   public ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> getSoleSipApplicationSession()
+   public Set<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>> getSipApplicationSessions()
    {
-      return soleSipApplicationSession;
+      return sipApplicationSessions;
    }
    
    private void addReplicatableSession(ClusteredSession<? extends OutgoingDistributableSessionData> session, SnapshotManager mgr)
@@ -546,7 +548,7 @@ public final class ConvergedSessionReplicationContext
 		if (soleSipManager == null) {
 			// First one bound
 			soleSipManager = mgr;
-			soleSipSession = session;
+			sipSessions.add(session);
 		}
 		// else if (!mgr.equals(soleManager))
 		// {
@@ -558,7 +560,7 @@ public final class ConvergedSessionReplicationContext
 		// soleSipSession = null;
 		// }
 		else {
-			soleSipSession = session;
+			sipSessions.add(session);
 		}
    }
    
@@ -576,7 +578,7 @@ public final class ConvergedSessionReplicationContext
 		if (soleSipManager == null) {
 			// First one bound
 			soleSipManager = mgr;
-			soleSipApplicationSession = session;
+			sipApplicationSessions.add(session);
 		}
 		// else if (!mgr.equals(soleManager))
 		// {
@@ -589,7 +591,7 @@ public final class ConvergedSessionReplicationContext
 		// soleSipApplicationSession = null;
 		// }
 		else {
-			soleSipApplicationSession = session;
+			sipApplicationSessions.add(session);
 		}
 	}
    
@@ -613,7 +615,7 @@ public final class ConvergedSessionReplicationContext
       {
     	  logger.info("Unbinding following sip session " + session.getKey());
     	  soleSipManager = null;
-    	  soleSipSession = null;
+    	  sipSessions.remove(session);
       }      
    }
    
@@ -624,7 +626,7 @@ public final class ConvergedSessionReplicationContext
       {
     	  logger.info("Unbinding following sip app session " + session.getKey());
     	  soleSipManager = null;
-    	  soleSipApplicationSession = null;
+    	  sipApplicationSessions.remove(session);
       }      
    }         
 }

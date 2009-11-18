@@ -22,7 +22,9 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.jboss.aop.Advised;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipSessionMetadata;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheConvergedSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSipSessionData;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -89,13 +91,14 @@ public class FieldBasedClusteredSipSession extends
 
 	@Override
 	protected OutgoingDistributableSessionData getOutgoingSipSessionData() {
-		DistributableSipSessionMetadata metadata = isSessionMetadataDirty() ? (DistributableSipSessionMetadata)getSessionMetadata()
-				: null;
+		DistributableSipSessionMetadata metadata = (DistributableSipSessionMetadata)getSessionMetadata();
 		Long timestamp = metadata != null || isSessionAttributeMapDirty()
 				|| getMustReplicateTimestamp() ? Long
 				.valueOf(getSessionTimestamp()) : null;
-		return new OutgoingDistributableSipSessionDataImpl(getRealId(),
+		OutgoingDistributableSipSessionData outgoingData = new OutgoingDistributableSipSessionDataImpl(null,
 				getVersion(), timestamp, sipApplicationSessionKey, key, metadata);
+		outgoingData.setSessionMetaDataDirty(isSessionMetadataDirty());
+		return outgoingData;
 	}
 
 	/**
@@ -116,10 +119,10 @@ public class FieldBasedClusteredSipSession extends
 		// Remove it from the underlying store
 		if (localCall && !replicationExcludes.contains(name)) {
 			if (localOnly)
-				getDistributedCacheManager().removeAttributeLocal(getRealId(),
+				((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeAttributeLocal(sipApplicationSessionKey, key,
 						name);
 			else
-				getDistributedCacheManager().removeAttribute(getRealId(), name);
+				((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeAttribute(sipApplicationSessionKey, key, name);
 
 			sessionAttributesDirty();
 		}
@@ -148,14 +151,14 @@ public class FieldBasedClusteredSipSession extends
 	@Override
 	protected Object setAttributeInternal(String key, Object value) {
 		if (!replicationExcludes.contains(key)) {
-			String myRealId = getRealId();
-			getDistributedCacheManager().putAttribute(myRealId, key, value);
+			((DistributedCacheConvergedSipManager)getDistributedCacheManager()).
+				putAttribute(sipApplicationSessionKey, this.key, key, value);
 
 			// Special case for Collection classes.
 			if (value instanceof Map || value instanceof Collection) {
 				// We need to obtain the proxy first.
-				value = getDistributedCacheManager()
-						.getAttribute(myRealId, key);
+				value = ((DistributedCacheConvergedSipManager)getDistributedCacheManager())
+						.getAttribute(sipApplicationSessionKey, this.key, key);
 			}
 
 			// Only mark session dirty if we can replicate the attribute

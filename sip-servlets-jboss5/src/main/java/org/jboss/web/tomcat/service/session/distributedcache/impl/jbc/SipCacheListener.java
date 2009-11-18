@@ -93,19 +93,21 @@ public class SipCacheListener extends CacheListenerBase
 //   private static final String DATA_GRAVITATION_CLEANUP = "_dataGravitationCleanup";
    
    private static Logger log_ = Logger.getLogger(SipCacheListener.class);
+   private String sipApplicationNameHashed;
    private String sipApplicationName;
    private boolean fieldBased_;
    private boolean attributeBased_;
    
    SipCacheListener(JBossCacheWrapper wrapper,
 			LocalDistributableSessionManager manager, String contextHostPath,
-			ReplicationGranularity granularity, String sipApplicationName) {
+			ReplicationGranularity granularity, String sipApplicationName, String sipApplicationNameHashed) {
 		super(manager, contextHostPath);
 		if (granularity == ReplicationGranularity.FIELD)
 			fieldBased_ = true;
 		else if (granularity == ReplicationGranularity.ATTRIBUTE)
 			attributeBased_ = true;
 		this.sipApplicationName = sipApplicationName;
+		this.sipApplicationNameHashed = sipApplicationNameHashed;
 	}
 
    protected boolean isFqnForOurSipapp(Fqn<String> fqn, boolean isBuddy)

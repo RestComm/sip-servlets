@@ -38,6 +38,7 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -177,7 +178,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	/**
 	 * Is the session valid.
 	 */
-	protected boolean isValid;
+	protected AtomicBoolean isValid;
 	
 	/**
 	 * The name of the servlet withing this same app to handle all subsequent requests.
@@ -252,7 +253,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		this.sipFactory = sipFactoryImpl;
 		this.creationTime = this.lastAccessedTime = System.currentTimeMillis();		
 		this.state = State.INITIAL;
-		this.isValid = true;		
+		this.isValid = new AtomicBoolean(true);		
 		this.ongoingTransactions = new CopyOnWriteArraySet<Transaction>();
 		if(mobicentsSipApplicationSession.getSipContext() != null && ConcurrencyControlMode.SipSession.equals(mobicentsSipApplicationSession.getSipContext().getConcurrencyControlMode())) {
 			semaphore = new Semaphore(1);		
@@ -429,12 +430,15 @@ public class SipSessionImpl implements MobicentsSipSession {
 				
 				return sipServletRequest;
 			} else {
-				sipServletRequest =(SipServletRequestImpl) sipFactory.createRequest(
-					getSipApplicationSession(),
-					method,
-					this.getLocalParty(),
-					this.getRemoteParty(),
-					handlerServlet);			
+				String errorMessage = "Couldn't create the subsequent request " + method + " for this session " + key + ", isValid " + isValid() + ", session state " + state + " , sessionCreatingDialog = " + sessionCreatingDialog;
+				if(sessionCreatingDialog != null) {
+					errorMessage += " , dialog state " + sessionCreatingDialog.getState();
+				}
+				errorMessage += " , sessionCreatingTransaction = " + sessionCreatingTransaction;
+				if(sessionCreatingTransaction != null) {
+					errorMessage += " , sessionCreatingTransaction method = " +sessionCreatingTransaction.getRequest().getMethod();
+				}				
+				throw new IllegalStateException(errorMessage);			
 			}
 		}
 		//Application Routing :
@@ -669,8 +673,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipSession#invalidate()
 	 */
-	public void invalidate() {		
-		if(!isValid()) {
+	public void invalidate() {
+		
+		if(!isValid.compareAndSet(true, false)) {
 			throw new IllegalStateException("SipSession already invalidated !");
 		}		
 		if(logger.isInfoEnabled()) {
@@ -681,12 +686,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 		//checkInvalidation();
 		if(sipSessionAttributeMap != null) {
 			for (String key : sipSessionAttributeMap.keySet()) {
-				removeAttribute(key);
+				removeAttribute(key, true);
 			}
 		}
-		notifySipSessionListeners(SipSessionEventType.DELETION);
-		
-		setValid(false);	
+		notifySipSessionListeners(SipSessionEventType.DELETION);			
 		
 		if(derivedSipSessions != null) {
 			for (MobicentsSipSession derivedMobicentsSipSession : derivedSipSessions.values()) {
@@ -758,7 +761,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 			semaphore.release();
 			semaphore = null;
 		}
-		facade = null;
+		facade = null;		
 	}
 	
 	/**
@@ -814,22 +817,26 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#isValid()
 	 */
 	public boolean isValid() {
-		return this.isValid;
+		return this.isValid.get();
 	}
 
 	/**
 	 * @param isValid the isValid to set
 	 */
 	protected void setValid(boolean isValid) {
-		this.isValid = isValid;
+		this.isValid.set(isValid);
 	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipSession#removeAttribute(java.lang.String)
 	 */
 	public void removeAttribute(String name) {
+		removeAttribute(name, false);
+	}
+	
+	public void removeAttribute(String name, boolean byPassValidCheck) {
 
-		if(!isValid())
+		if(!byPassValidCheck && !isValid())
 			throw new IllegalStateException("Can not bind object to session that has been invalidated!!");
 		
 		if(name==null)

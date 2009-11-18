@@ -22,7 +22,6 @@
 package org.jboss.web.tomcat.service.session;
 
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipApplicationSessionMetadata;
-import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSipApplicationSessionData;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 
@@ -34,6 +33,7 @@ public class OutgoingDistributableSipApplicationSessionDataImpl extends Outgoing
 		OutgoingDistributableSipApplicationSessionData {
 	
 	SipApplicationSessionKey sipApplicationSessionKey;
+	private boolean isSessionMetaDataDirty;
 	
 	public OutgoingDistributableSipApplicationSessionDataImpl(String realId,
 			int version, Long timestamp, SipApplicationSessionKey key, DistributableSipApplicationSessionMetadata metadata) {
@@ -44,5 +44,17 @@ public class OutgoingDistributableSipApplicationSessionDataImpl extends Outgoing
 	public SipApplicationSessionKey getSipApplicationSessionKey() {
 		return this.sipApplicationSessionKey;
 	}
+	/**
+	 * @param isSessionMetaDataDirty the isSessionMetaDataDirty to set
+	 */
+	public void setSessionMetaDataDirty(boolean isSessionMetaDataDirty) {
+		this.isSessionMetaDataDirty = isSessionMetaDataDirty;
+	}
 
+	/**
+	 * @return the isSessionMetaDataDirty
+	 */
+	public boolean isSessionMetaDataDirty() {
+		return isSessionMetaDataDirty;
+	}
 }

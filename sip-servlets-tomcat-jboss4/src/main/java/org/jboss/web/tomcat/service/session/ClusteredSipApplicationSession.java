@@ -654,10 +654,6 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 //			return true;
 //		}
 
-		if (!isValid) {
-			return false;
-		}
-
 //		if (ACTIVITY_CHECK && accessCount.get() > 0) {
 //			return true;
 //		}
@@ -673,7 +669,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 //			}
 //		}
 
-		return isValid;
+		return isValid();
 
 	}
 

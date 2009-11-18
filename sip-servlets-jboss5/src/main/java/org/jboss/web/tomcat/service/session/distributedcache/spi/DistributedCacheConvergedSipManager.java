@@ -22,8 +22,10 @@
 package org.jboss.web.tomcat.service.session.distributedcache.spi;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.jboss.cache.Cache;
+import org.jboss.cache.Fqn;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 
@@ -33,6 +35,23 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
  */
 public interface DistributedCacheConvergedSipManager<T extends OutgoingDistributableSessionData>
 		extends DistributedCacheManager<T> {
+
+	/**
+	 * Globally remove a session from the distributed cache.
+	 * 
+	 * @param realId
+	 *            the session's id, excluding any jvmRoute
+	 */
+	void removeSession(SipApplicationSessionKey sipApplicationSessionKey);
+
+	/**
+	 * Globally remove a session from the distributed cache.
+	 * 
+	 * @param realId
+	 *            the session's id, excluding any jvmRoute
+	 */
+	void removeSession(SipApplicationSessionKey sipApplicationSessionKey,
+			SipSessionKey sipSessionKey);
 
 	/**
 	 * Remove a non-locally active sip application session from the distributed
@@ -236,7 +255,8 @@ public interface DistributedCacheConvergedSipManager<T extends OutgoingDistribut
 	 * @param sipSessionKey
 	 *            the session's key
 	 */
-	void sipSessionCreated(SipApplicationSessionKey sipApplicationSessionKey, SipSessionKey sipSessionKey);
+	void sipSessionCreated(SipApplicationSessionKey sipApplicationSessionKey,
+			SipSessionKey sipSessionKey);
 
 	/**
 	 * Notification to the distributed cache that a session has been newly
@@ -246,6 +266,223 @@ public interface DistributedCacheConvergedSipManager<T extends OutgoingDistribut
 	 *            the session's key
 	 */
 	void sipApplicationSessionCreated(SipApplicationSessionKey key);
-	
-	Cache getJBossCache();
+
+	/**
+	 * Get the value of the attribute with the given key from the given session.
+	 * 
+	 * @param realId
+	 *            the session id with any jvmRoute removed
+	 * @param key
+	 *            the attribute key
+	 * @return the attribute value, or <code>null</code>
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if {@link #getSupportsAttributeOperations()} would return
+	 *             <code>false</code>
+	 */
+	Object getAttribute(SipApplicationSessionKey sipApplicationSessionKey,
+			String key);
+
+	/**
+	 * Stores the given value under the given key in the given session.
+	 * 
+	 * @param realId
+	 *            the session id with any jvmRoute removed
+	 * @param key
+	 *            the attribute key
+	 * @param value
+	 *            the previous attribute value, or <code>null</code>
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if {@link #getSupportsAttributeOperations()} would return
+	 *             <code>false</code>
+	 */
+	void putAttribute(SipApplicationSessionKey sipApplicationSessionKey,
+			String key, Object value);
+
+	/**
+	 * Stores the given map of attribute key/value pairs in the given session.
+	 * 
+	 * @param realId
+	 *            the session id with any jvmRoute removed
+	 * @param map
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if {@link #getSupportsAttributeOperations()} would return
+	 *             <code>false</code>
+	 */
+	void putAttribute(SipApplicationSessionKey sipApplicationSessionKey,
+			Map<String, Object> map);
+
+	/**
+	 * Removes the attribute with the given key from the given session.
+	 * 
+	 * @param realId
+	 *            the session id with any jvmRoute removed
+	 * @param key
+	 *            the attribute key
+	 * @return the previous attribute value, or <code>null</code>
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if {@link #getSupportsAttributeOperations()} would return
+	 *             <code>false</code>
+	 */
+	Object removeAttribute(SipApplicationSessionKey sipApplicationSessionKey,
+			String key);
+
+	/**
+	 * Removes the attribute with the given key from the given session, but only
+	 * on the local node.
+	 * 
+	 * @param realId
+	 *            the session id with any jvmRoute removed
+	 * @param key
+	 *            the attribute key
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if {@link #getSupportsAttributeOperations()} would return
+	 *             <code>false</code>
+	 */
+	void removeAttributeLocal(
+			SipApplicationSessionKey sipApplicationSessionKey, String key);
+
+	/**
+	 * Obtain the attribute keys associated with this session.
+	 * 
+	 * @param realId
+	 *            the session id with any jvmRoute removed
+	 * @return the attribute keys or an empty Set if none are found
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if {@link #getSupportsAttributeOperations()} would return
+	 *             <code>false</code>
+	 */
+	Set<String> getAttributeKeys(
+			SipApplicationSessionKey sipApplicationSessionKey);
+
+	/**
+	 * Return all attributes associated with this session id.
+	 * 
+	 * @param realId
+	 *            the session id with any jvmRoute removed
+	 * @return the attributes, or any empty Map if none are found.
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if {@link #getSupportsAttributeOperations()} would return
+	 *             <code>false</code>
+	 */
+	Map<String, Object> getAttributes(
+			SipApplicationSessionKey sipApplicationSessionKey);
+
+	/**
+	 * Get the value of the attribute with the given key from the given session.
+	 * 
+	 * @param realId
+	 *            the session id with any jvmRoute removed
+	 * @param key
+	 *            the attribute key
+	 * @return the attribute value, or <code>null</code>
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if {@link #getSupportsAttributeOperations()} would return
+	 *             <code>false</code>
+	 */
+	Object getAttribute(SipApplicationSessionKey sipApplicationSessionKey,
+			SipSessionKey sipSessionKey, String key);
+
+	/**
+	 * Stores the given value under the given key in the given session.
+	 * 
+	 * @param realId
+	 *            the session id with any jvmRoute removed
+	 * @param key
+	 *            the attribute key
+	 * @param value
+	 *            the previous attribute value, or <code>null</code>
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if {@link #getSupportsAttributeOperations()} would return
+	 *             <code>false</code>
+	 */
+	void putAttribute(SipApplicationSessionKey sipApplicationSessionKey,
+			SipSessionKey sipSessionKey, String key, Object value);
+
+	/**
+	 * Stores the given map of attribute key/value pairs in the given session.
+	 * 
+	 * @param realId
+	 *            the session id with any jvmRoute removed
+	 * @param map
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if {@link #getSupportsAttributeOperations()} would return
+	 *             <code>false</code>
+	 */
+	void putAttribute(SipApplicationSessionKey sipApplicationSessionKey,
+			SipSessionKey sipSessionKey, Map<String, Object> map);
+
+	/**
+	 * Removes the attribute with the given key from the given session.
+	 * 
+	 * @param realId
+	 *            the session id with any jvmRoute removed
+	 * @param key
+	 *            the attribute key
+	 * @return the previous attribute value, or <code>null</code>
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if {@link #getSupportsAttributeOperations()} would return
+	 *             <code>false</code>
+	 */
+	Object removeAttribute(SipApplicationSessionKey sipApplicationSessionKey,
+			SipSessionKey sipSessionKey, String key);
+
+	/**
+	 * Removes the attribute with the given key from the given session, but only
+	 * on the local node.
+	 * 
+	 * @param realId
+	 *            the session id with any jvmRoute removed
+	 * @param key
+	 *            the attribute key
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if {@link #getSupportsAttributeOperations()} would return
+	 *             <code>false</code>
+	 */
+	void removeAttributeLocal(
+			SipApplicationSessionKey sipApplicationSessionKey,
+			SipSessionKey sipSessionKey, String key);
+
+	/**
+	 * Obtain the attribute keys associated with this session.
+	 * 
+	 * @param realId
+	 *            the session id with any jvmRoute removed
+	 * @return the attribute keys or an empty Set if none are found
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if {@link #getSupportsAttributeOperations()} would return
+	 *             <code>false</code>
+	 */
+	Set<String> getAttributeKeys(
+			SipApplicationSessionKey sipApplicationSessionKey,
+			SipSessionKey sipSessionKey);
+
+	/**
+	 * Return all attributes associated with this session id.
+	 * 
+	 * @param realId
+	 *            the session id with any jvmRoute removed
+	 * @return the attributes, or any empty Map if none are found.
+	 * 
+	 * @throws UnsupportedOperationException
+	 *             if {@link #getSupportsAttributeOperations()} would return
+	 *             <code>false</code>
+	 */
+	Map<String, Object> getAttributes(
+			SipApplicationSessionKey sipApplicationSessionKey,
+			SipSessionKey sipSessionKey);
+
+	Cache getJBossCache();	
 }

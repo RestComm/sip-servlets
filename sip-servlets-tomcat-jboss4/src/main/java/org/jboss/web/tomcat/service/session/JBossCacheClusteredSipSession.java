@@ -167,9 +167,7 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 		handlerServlet = (String) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, HANDLER);
 		Boolean valid = (Boolean) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, IS_VALID);
 		if(valid != null) {
-			isValid = valid;
-		} else {
-			isValid = true;
+			setValid(valid);
 		}
 		state = (State) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, STATE);
 		Long cSeq = (Long) proxy_.getSipSessionMetaData(sipAppSessionId, sipSessionId, CSEQ);

@@ -21,11 +21,9 @@
  */
 package org.jboss.web.tomcat.service.session.distributedcache.spi;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipSessionKey;
 
 /**
  * @author jean.deruelle@gmail.com
@@ -33,42 +31,52 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
  */
 public class DistributableSipApplicationSessionMetadata extends
 		DistributableSessionMetadata {
-	private SipApplicationSessionKey sipApplicationSessionKey;
-	private Set<SipSessionKey> sipSessionKeys;
-	private Set<String> httpSessionIds;
-	
-	public DistributableSipApplicationSessionMetadata() {
-		sipSessionKeys = new HashSet<SipSessionKey>();
-		httpSessionIds = new HashSet<String>();
+	private transient boolean sipSessionsMapModified;
+	private transient boolean httpSessionsMapModified;
+
+	// map to store meta data changes for replication.
+	private transient Map<String, Object> metaData = new HashMap<String, Object>();
+
+
+	/**
+	 * @param metaData the metaData to set
+	 */
+	public void setMetaData(Map<String, Object> metaData) {
+		this.metaData = metaData;
 	}
 
 	/**
-	 * @param sipApplicationSessionKey the sipApplicationSessionKey to set
+	 * @return the metaData
 	 */
-	public void setSipApplicationSessionKey(SipApplicationSessionKey sipApplicationSessionKey) {
-		this.sipApplicationSessionKey = sipApplicationSessionKey;
+	public Map<String, Object> getMetaData() {
+		return metaData;
 	}
 
 	/**
-	 * @return the sipApplicationSessionKey
+	 * @param sipSessionsMapModified the sipSessionsMapModified to set
 	 */
-	public SipApplicationSessionKey getSipApplicationSessionKey() {
-		return sipApplicationSessionKey;
+	public void setSipSessionsMapModified(boolean sipSessionsMapModified) {
+		this.sipSessionsMapModified = sipSessionsMapModified;
 	}
 
-	public void addSipSessionKey(SipSessionKey sipSessionKey) {
-		sipSessionKeys.add(sipSessionKey);
+	/**
+	 * @return the sipSessionsMapModified
+	 */
+	public boolean isSipSessionsMapModified() {
+		return sipSessionsMapModified;
 	}
-	
-	public void addHttpSessionId(String httpSessionId) {
-		httpSessionIds.add(httpSessionId);
+
+	/**
+	 * @param httpSessionsMapModified the httpSessionsMapModified to set
+	 */
+	public void setHttpSessionsMapModified(boolean httpSessionsMapModified) {
+		this.httpSessionsMapModified = httpSessionsMapModified;
 	}
-	
-	public Set<SipSessionKey> getSipSessionKeys() {
-		return sipSessionKeys;
-	}
-	
-	public Set<String> getHttpSessionIds() {
-		return httpSessionIds;
+
+	/**
+	 * @return the httpSessionsMapModified
+	 */
+	public boolean isHttpSessionsMapModified() {
+		return httpSessionsMapModified;
 	}
 }

@@ -19,7 +19,6 @@ package org.jboss.web.tomcat.service.session;
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.lang.reflect.Method;
-import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,6 +33,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipApplicationSessionActivationListener;
 import javax.servlet.sip.SipApplicationSessionAttributeListener;
 import javax.servlet.sip.SipApplicationSessionBindingEvent;
@@ -55,7 +55,7 @@ import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistrib
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionManagementStatus;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionNotificationCause;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipApplicationSessionNotificationPolicy;
-import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
@@ -73,6 +73,12 @@ import org.mobicents.servlet.sip.startup.SipContext;
 public abstract class ClusteredSipApplicationSession<O extends OutgoingDistributableSessionData> extends SipApplicationSessionImpl {
 
 	private static transient Logger logger = Logger.getLogger(ClusteredSipApplicationSession.class);
+	
+	protected static final String HTTP_SESSIONS = "hs";
+	protected static final String SIP_SESSIONS = "ss";
+	protected static final String IS_VALID = "iv";
+	protected static final String INVALIDATION_POLICY = "ip";	
+	protected static final String CREATION_TIME = "ct";
 	
 	protected static final boolean ACTIVITY_CHECK = 
 	      Globals.STRICT_SERVLET_COMPLIANCE
@@ -138,12 +144,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	 * dynamically the first time it is needed, or after a session reload (since
 	 * it is declared transient).
 	 */
-	private transient Method containerEventMethod = null;
-
-	/**
-	 * The session identifier of this Session.
-	 */
-	private String id = null;
+	private transient Method containerEventMethod = null;	
 
 	/**
 	 * The Manager with which this Session is associated.
@@ -260,7 +261,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	private transient long maxUnreplicatedInterval;
 
 	/** True if maxUnreplicatedInterval is 0 or less than maxInactiveInterval */
-	private transient boolean alwaysReplicateTimestamp = true;
+	private transient boolean alwaysReplicateTimestamp = false;
 
 	/**
 	 * Whether any of this session's attributes implement
@@ -290,8 +291,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 
 	protected ClusteredSipApplicationSession(SipApplicationSessionKey key, SipContext sipContext, boolean useJK) {
 		super(key, sipContext);
-		id = key.toString();
-		this.clusterStatus = new ClusteredSessionManagementStatus(this.id, true, null, null);
+		this.clusterStatus = new ClusteredSessionManagementStatus(key.getId(), true, null, null);
 		if(sipContext != null) {
 			setManager((ClusteredSipManager)sipContext.getSipManager());
 			this.invalidationPolicy = this.manager.getReplicationTrigger();
@@ -355,9 +355,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		// the 'new' flag is correct
 		if (!firstAccess && isNew) {
 			setNew(false);
-		}
-		// everytime a SIP Message is sent, the state has to be replicated
-		sessionMetadataDirty();
+		}		
 	}
 
 	public void setNew(boolean isNew) {
@@ -371,11 +369,6 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		// set isNew=false, so the request will see the correct value
 		// sessionMetadataDirty();
 	}	
-
-	public void setValid(boolean isValid) {
-		super.setValid(isValid);
-		sessionMetadataDirty();
-	}
 
 	/**
 	 * Invalidates this session and unbinds any objects bound to it. Overridden
@@ -576,15 +569,6 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 
 	// ---------------------------------------------------- DistributableSession
 
-	/**
-	 * Gets the session id with any appended jvmRoute info removed.
-	 * 
-	 * @see #getUseJK()
-	 */
-	public String getRealId() {
-		return key.toString();
-	}
-
 	protected int getVersion() {
 		return version.get();
 	}
@@ -615,26 +599,21 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	}
 
 	protected DistributableSessionMetadata getSessionMetadata() {
-		this.metadata.setId(id);
 		this.metadata.setCreationTime(creationTime);
 		this.metadata.setMaxInactiveInterval(maxInactiveInterval);
 		this.metadata.setNew(isNew);
 		this.metadata.setValid(isValid());
 
 		getSipApplicationSessionMetadata();
-		
 		return this.metadata;
 	}
 
 	private void getSipApplicationSessionMetadata() {
-		this.metadata.setSipApplicationSessionKey(key);
-		for(SipSessionKey sessionKey : sipSessions) {
-			this.metadata.addSipSessionKey(sessionKey);
+		if(metadata.isSipSessionsMapModified()) {
+			this.metadata.getMetaData().put(SIP_SESSIONS, sipSessions.toArray(new SipSessionKey[sipSessions.size()]));
 		}
-		if(httpSessions != null) {
-			for(String sessionId : httpSessions) {
-				this.metadata.addHttpSessionId(sessionId);
-			}
+		if(metadata.isHttpSessionsMapModified()) {
+			this.metadata.getMetaData().put(HTTP_SESSIONS, httpSessions.toArray(new String[httpSessions.size()]));
 		}
 	}
 
@@ -656,7 +635,6 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 
 		DistributableSipApplicationSessionMetadata md = (DistributableSipApplicationSessionMetadata)sessionData.getMetadata();
 		// TODO -- get rid of these field and delegate to metadata
-		this.id = md.getId();
 		this.creationTime = md.getCreationTime();
 		this.maxInactiveInterval = md.getMaxInactiveInterval();
 		this.isNew = md.isNew();
@@ -664,16 +642,24 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		this.metadata = md;
 		
 		// From Sip Application Session
-		this.key = md.getSipApplicationSessionKey();
-
-		for (SipSessionKey sipSessionKey : md.getSipSessionKeys()) {
+		Boolean valid = (Boolean) md.getMetaData().get(IS_VALID);
+		if(valid != null) {
+			setValid(valid);
+		} 
+		sipSessions.clear();
+		for (SipSessionKey sipSessionKey : (SipSessionKey[])md.getMetaData().get(SIP_SESSIONS)) {			
 			sipSessions.add(sipSessionKey);							
-		}		
-		if(md.getHttpSessionIds().size() > 0  && httpSessions == null) {
-			httpSessions = new CopyOnWriteArraySet<String>();
-		}
-		for (String httpSessionId : md.getHttpSessionIds()) {
-			httpSessions.add(httpSessionId);
+		}	
+		String[] httpSessionIds = (String[])md.getMetaData().get(HTTP_SESSIONS);
+		if(httpSessionIds != null && httpSessionIds.length > 0) {
+			if(httpSessions == null) {
+				httpSessions = new CopyOnWriteArraySet<String>();
+			} else {
+				httpSessions.clear();
+			}
+			for (String httpSessionId : httpSessionIds) {
+				httpSessions.add(httpSessionId);
+			}
 		}
 		
 		// Get our id without any jvmRoute appended
@@ -694,7 +680,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		// a heavy cost.
 		this.lastReplicated = this.creationTime;
 
-		this.clusterStatus = new ClusteredSessionManagementStatus(getRealId(),
+		this.clusterStatus = new ClusteredSessionManagementStatus(key.getId(),
 				true, null, null);
 
 		checkAlwaysReplicateTimestamp();
@@ -760,14 +746,14 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	 * Remove myself from the distributed cache.
 	 */
 	public void removeMyself() {
-		getDistributedCacheManager().removeSession(getRealId());
+		((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeSession(key);
 	}
 
 	/**
 	 * Remove myself from the <t>local</t> instance of the distributed cache.
 	 */
 	public void removeMyselfLocal() {
-		getDistributedCacheManager().removeSessionLocal(getRealId());
+		((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeSessionLocal(key, null);
 	}
 
 	/**
@@ -1012,7 +998,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	@Override
 	public String toString() {
 		return new StringBuilder(getClass().getSimpleName()).append('[')
-				.append("id: ").append(id).append(" lastAccessedTime: ")
+				.append("id: ").append(key).append(" lastAccessedTime: ")
 				.append(lastAccessedTime).append(" version: ").append(version)
 				.append(" lastOutdated: ").append(outdatedTime).append(']')
 				.toString();
@@ -1158,7 +1144,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 
 	protected final void sessionAttributesDirty() {
 		if (!sessionAttributesDirty && log.isTraceEnabled())
-			log.trace("Marking session attributes dirty " + id);
+			log.trace("Marking session attributes dirty " + key);
 
 		sessionAttributesDirty = true;
 	}
@@ -1314,5 +1300,53 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 			version.set(outdatedVersion);
 
 		outdatedVersion = 0;
-	}	
+	}
+	
+	@Override
+	protected void setValid(boolean isValid) {
+		super.setValid(isValid);
+		sessionMetadataDirty();
+		metadata.getMetaData().put(IS_VALID, isValid);
+	}			
+	
+	@Override
+	public boolean addSipSession(MobicentsSipSession mobicentsSipSession) {
+		boolean wasNotPresent = super.addSipSession(mobicentsSipSession);
+		if(wasNotPresent) {
+			metadata.setSipSessionsMapModified(true);
+		}
+		return wasNotPresent;
+	}
+	
+	@Override
+	public SipSessionKey removeSipSession(
+			MobicentsSipSession mobicentsSipSession) {
+		SipSessionKey sessionKey = super.removeSipSession(mobicentsSipSession);
+		if(sessionKey != null) {
+			metadata.setSipSessionsMapModified(true);
+		}
+		return sessionKey;
+	}
+	
+	@Override
+	public boolean addHttpSession(HttpSession httpSession) {
+		boolean wasNotPresent = super.addHttpSession(httpSession);
+		if(wasNotPresent) {
+			metadata.setHttpSessionsMapModified(true);
+		}
+		return wasNotPresent;
+	}
+	
+	@Override
+	public boolean removeHttpSession(HttpSession httpSession) {
+		boolean wasPresent = super.removeHttpSession(httpSession);
+		if(wasPresent) {
+			metadata.setHttpSessionsMapModified(true);
+		}
+		return wasPresent;
+	}
+	
+	public String getHaId() {
+		return key.getId();
+	}
 }

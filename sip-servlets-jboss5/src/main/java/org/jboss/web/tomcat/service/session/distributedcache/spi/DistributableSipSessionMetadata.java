@@ -21,12 +21,8 @@
  */
 package org.jboss.web.tomcat.service.session.distributedcache.spi;
 
-import javax.servlet.sip.ar.SipApplicationRoutingRegion;
-
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipSessionKey;
-import org.mobicents.servlet.sip.message.B2buaHelperImpl;
-import org.mobicents.servlet.sip.proxy.ProxyImpl;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author jean.deruelle@gmail.com
@@ -34,153 +30,21 @@ import org.mobicents.servlet.sip.proxy.ProxyImpl;
  */
 public class DistributableSipSessionMetadata extends
 		DistributableSessionMetadata {
-	private SipApplicationSessionKey sipApplicationSessionKey;
-	private SipSessionKey sipSessionKey;
-	private SipApplicationRoutingRegion routingRegion;
-	private String handlerServlet;
-	private String subscriberURI;
-	private String dialogId;
-	private boolean invalidateWhenReady;
-	private boolean readyToInvalidate;
-	private ProxyImpl proxy;
-	private B2buaHelperImpl b2buaHelper;
+	// map to store meta data changes for replication.
+	private transient Map<String, Object> metaData = new ConcurrentHashMap<String, Object>();
+
 	/**
-	 * @param sipApplicationSessionKey the sipApplicationSessionKey to set
+	 * @param metaData the metaData to set
 	 */
-	public void setSipApplicationSessionKey(SipApplicationSessionKey sipApplicationSessionKey) {
-		this.sipApplicationSessionKey = sipApplicationSessionKey;
+	public void setMetaData(Map<String, Object> metaData) {
+		this.metaData = metaData;
 	}
 
 	/**
-	 * @return the sipApplicationSessionKey
+	 * @return the metaData
 	 */
-	public SipApplicationSessionKey getSipApplicationSessionKey() {
-		return sipApplicationSessionKey;
+	public Map<String, Object> getMetaData() {
+		return metaData;
 	}
-
-	/**
-	 * @param sipSessionKey the sipSessionKey to set
-	 */
-	public void setSipSessionKey(SipSessionKey sipSessionKey) {
-		this.sipSessionKey = sipSessionKey;
-	}
-
-	/**
-	 * @return the sipSessionKey
-	 */
-	public SipSessionKey getSipSessionKey() {
-		return sipSessionKey;
-	}
-
-	/**
-	 * @return the routingRegion
-	 */
-	public SipApplicationRoutingRegion getRoutingRegion() {
-		return routingRegion;
-	}
-
-	/**
-	 * @param routingRegion the routingRegion to set
-	 */
-	public void setRoutingRegion(SipApplicationRoutingRegion routingRegion) {
-		this.routingRegion = routingRegion;
-	}
-
-	/**
-	 * @return the handlerServlet
-	 */
-	public String getHandlerServlet() {
-		return handlerServlet;
-	}
-
-	/**
-	 * @param handlerServlet the handlerServlet to set
-	 */
-	public void setHandlerServlet(String handlerServlet) {
-		this.handlerServlet = handlerServlet;
-	}
-
-	/**
-	 * @return the subscriberURI
-	 */
-	public String getSubscriberURI() {
-		return subscriberURI;
-	}
-
-	/**
-	 * @param subscriberURI the subscriberURI to set
-	 */
-	public void setSubscriberURI(String subscriberURI) {
-		this.subscriberURI = subscriberURI;
-	}
-
-	/**
-	 * @return the sipDialogId
-	 */
-	public String getSipDialogId() {
-		return dialogId;
-	}
-
-	/**
-	 * @param sipDialogId the sipDialogId to set
-	 */
-	public void setSipDialogId(String sipDialogId) {
-		this.dialogId = sipDialogId;
-	}
-
-	/**
-	 * @return the invalidateWhenReady
-	 */
-	public boolean isInvalidateWhenReady() {
-		return invalidateWhenReady;
-	}
-
-	/**
-	 * @param invalidateWhenReady the invalidateWhenReady to set
-	 */
-	public void setInvalidateWhenReady(boolean invalidateWhenReady) {
-		this.invalidateWhenReady = invalidateWhenReady;
-	}
-
-	/**
-	 * @return the readyToInvalidate
-	 */
-	public boolean isReadyToInvalidate() {
-		return readyToInvalidate;
-	}
-
-	/**
-	 * @param readyToInvalidate the readyToInvalidate to set
-	 */
-	public void setReadyToInvalidate(boolean readyToInvalidate) {
-		this.readyToInvalidate = readyToInvalidate;
-	}
-
-	/**
-	 * @return the proxy
-	 */
-	public ProxyImpl getProxy() {
-		return proxy;
-	}
-
-	/**
-	 * @param proxy the proxy to set
-	 */
-	public void setProxy(ProxyImpl proxy) {
-		this.proxy = proxy;
-	}
-
-	/**
-	 * @return the b2buaHelper
-	 */
-	public B2buaHelperImpl getB2buaHelper() {
-		return b2buaHelper;
-	}
-
-	/**
-	 * @param helper the b2buaHelper to set
-	 */
-	public void setB2buaHelper(B2buaHelperImpl helper) {
-		b2buaHelper = helper;
-	}	
+		
 }

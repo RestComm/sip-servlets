@@ -29,4 +29,6 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
  */
 public interface OutgoingDistributableSipApplicationSessionData extends OutgoingDistributableSessionData {
 	SipApplicationSessionKey getSipApplicationSessionKey();
+	void setSessionMetaDataDirty(boolean isSessionMetaDataDirty);
+	boolean isSessionMetaDataDirty();
 }

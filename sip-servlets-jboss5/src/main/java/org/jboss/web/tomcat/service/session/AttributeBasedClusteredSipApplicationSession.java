@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipApplicationSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingAttributeGranularitySessionData;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
@@ -104,13 +103,14 @@ public class AttributeBasedClusteredSipApplicationSession extends
 
 			clearAttrChangedMaps();
 		}
-		DistributableSipApplicationSessionMetadata metadata = isSessionMetadataDirty() ? (DistributableSipApplicationSessionMetadata)getSessionMetadata()
-				: null;
+		DistributableSipApplicationSessionMetadata metadata = (DistributableSipApplicationSessionMetadata)getSessionMetadata();
 		Long timestamp = modAttrs != null || removeAttrs != null
 				|| metadata != null || getMustReplicateTimestamp() ? Long
 				.valueOf(getSessionTimestamp()) : null;
-		return new OutgoingData(getRealId(), getVersion(), timestamp, key, metadata,
+		OutgoingData outgoingData = new OutgoingData(null, getVersion(), timestamp, key, metadata,
 				modAttrs, removeAttrs);
+		outgoingData.setSessionMetaDataDirty(isSessionMetadataDirty());
+		return outgoingData;
 	}
 
 	@Override

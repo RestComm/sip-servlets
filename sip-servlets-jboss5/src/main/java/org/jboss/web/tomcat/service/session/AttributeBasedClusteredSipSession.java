@@ -102,13 +102,13 @@ public class AttributeBasedClusteredSipSession extends ClusteredSipSession<Outgo
 
 			clearAttrChangedMaps();
 		}
-		DistributableSipSessionMetadata metadata = isSessionMetadataDirty() ? (DistributableSipSessionMetadata)getSessionMetadata()
-				: null;
+		DistributableSipSessionMetadata metadata = (DistributableSipSessionMetadata)getSessionMetadata();
 		Long timestamp = modAttrs != null || removeAttrs != null
 				|| metadata != null || getMustReplicateTimestamp() ? Long
 				.valueOf(getSessionTimestamp()) : null;
-		OutgoingData outgoingData = new OutgoingData(getRealId(), getVersion(), timestamp, sipApplicationSessionKey, key, metadata,
-				modAttrs, removeAttrs);		
+		OutgoingData outgoingData = new OutgoingData(null, getVersion(), timestamp, sipApplicationSessionKey, key, metadata,
+				modAttrs, removeAttrs);
+		outgoingData.setSessionMetaDataDirty(isSessionMetadataDirty());
 		return outgoingData;
 	}
 
