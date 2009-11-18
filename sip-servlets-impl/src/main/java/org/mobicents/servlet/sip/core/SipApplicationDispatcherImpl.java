@@ -16,6 +16,9 @@
  */
 package org.mobicents.servlet.sip.core;
 
+import gov.nist.javax.sip.DialogTimeoutEvent;
+import gov.nist.javax.sip.DialogTimeoutEvent.Reason;
+
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -748,6 +751,72 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 //				} finally {
 //					sipContext.exitSipApp(null, null);
 //				}
+			}
+		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see gov.nist.javax.sip.SipListenerExt#processDialogTimeout(gov.nist.javax.sip.DialogTimeoutEvent)
+	 */
+	public void processDialogTimeout(DialogTimeoutEvent timeoutEvent) {
+		if(timeoutEvent.getReason() == Reason.AckNotReceived) {
+			final Dialog dialog = timeoutEvent.getDialog();
+			TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
+			if(tad != null) {
+				SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
+				SipSessionKey sipSessionKey = sipServletMessage.getSipSessionKey();
+				MobicentsSipSession sipSession = sipServletMessage.getSipSession();
+				if(sipSession != null) {
+					//notifying SipErrorListener that no ACK has been received for a UAS only
+					SipServletResponseImpl lastFinalResponse = (SipServletResponseImpl)
+						((SipServletRequestImpl)sipServletMessage).getLastInformationalResponse();
+					if(logger.isInfoEnabled()) {
+						logger.info("last Final Response" + lastFinalResponse);
+					}
+					ProxyImpl proxy = sipSession.getProxy();
+					if(sipServletMessage instanceof SipServletRequestImpl &&
+							proxy == null &&
+							lastFinalResponse != null) {
+						List<SipErrorListener> sipErrorListeners = 
+							sipSession.getSipApplicationSession().getSipContext().getListeners().getSipErrorListeners();			
+						
+						SipErrorEvent sipErrorEvent = new SipErrorEvent(
+								(SipServletRequest)sipServletMessage, 
+								lastFinalResponse);
+						for (SipErrorListener sipErrorListener : sipErrorListeners) {
+							try {					
+								sipErrorListener.noAckReceived(sipErrorEvent);
+							} catch (Throwable t) {
+								logger.error("SipErrorListener threw exception", t);
+							}
+						}
+					}
+					SipServletResponseImpl lastInfoResponse = (SipServletResponseImpl)
+						((SipServletRequestImpl)sipServletMessage).getLastInformationalResponse();
+					if(logger.isInfoEnabled()) {
+						logger.info("last Informational Response" + lastInfoResponse);
+					}
+					if(sipServletMessage instanceof SipServletRequestImpl &&
+							proxy == null &&
+							 lastInfoResponse != null) {
+						List<SipErrorListener> sipErrorListeners = 
+							sipSession.getSipApplicationSession().getSipContext().getListeners().getSipErrorListeners();			
+						
+						SipErrorEvent sipErrorEvent = new SipErrorEvent(
+								(SipServletRequest)sipServletMessage, 
+								lastInfoResponse);
+						for (SipErrorListener sipErrorListener : sipErrorListeners) {
+							try {					
+								sipErrorListener.noPrackReceived(sipErrorEvent);
+							} catch (Throwable t) {
+								logger.error("SipErrorListener threw exception", t);
+							}
+						}
+					}
+					dialog.delete();
+					tryToInvalidateSession(sipSessionKey, false);
+				}
 			}
 		}
 	}

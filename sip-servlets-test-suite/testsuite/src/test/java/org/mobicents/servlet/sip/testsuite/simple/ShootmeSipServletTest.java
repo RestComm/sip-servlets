@@ -41,6 +41,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 	private static final int TIMEOUT = 10000;
 //	private static final int TIMEOUT = 100000000;
 	private static final int TIMEOUT_CSEQ_INCREASE = 100000;
+	private static final int DIALOG_TIMEOUT = 40000;
 	
 	
 	TestSipListener sender;
@@ -311,7 +312,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertEquals( 200, sender.getFinalResponseStatus());
 		assertFalse(sender.isAckSent());
-		Thread.sleep(TIMEOUT_CSEQ_INCREASE);
+		Thread.sleep(DIALOG_TIMEOUT);
 		List<String> allMessagesContent = sender.getAllMessagesContent();
 		assertEquals(1,allMessagesContent.size());
 		assertEquals("noAckReceived", allMessagesContent.get(0));

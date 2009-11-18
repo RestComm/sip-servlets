@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.core;
 
+import gov.nist.javax.sip.SipListenerExt;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +25,6 @@ import java.util.Set;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.ar.SipApplicationRouter;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
-import javax.sip.SipListener;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 
@@ -40,7 +41,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * dispatching them to sip applications. 
  *
  */
-public interface SipApplicationDispatcher extends SipListener {	
+public interface SipApplicationDispatcher extends SipListenerExt {	
 	/**
 	 * Initialize the sip application dispatcher. <br/>
 	 * It will look for the first implementation of an application routerand 
