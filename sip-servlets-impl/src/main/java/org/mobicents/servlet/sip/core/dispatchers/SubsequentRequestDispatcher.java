@@ -230,30 +230,11 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		final MobicentsSipSession sipSession = tmpSipSession;
 		sipServletRequest.setSipSessionKey(key);
 		
-		
 		// BEGIN validation delegated to the applicationas per JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
-		
-		final boolean isAck = Request.ACK.equalsIgnoreCase(method);
-		final boolean isAckRetranmission = sipSession.isAckReceived() && isAck;			
-		
-		if(isAck) {
-			sipSession.setAckReceived(true);
-		} 
-
-		//CSeq validation should only be done for non proxy applications
-		if(sipSession.getProxy() == null) {			
-			if(isAckRetranmission) {
-				// Filter out ACK retransmissions for JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
-				logger.debug("ACK filtered out as a retransmission. This Sip Session already has been ACKed.");
+		boolean isValid = sipSession.validateCSeq(sipServletRequest);
+		if(!isValid) {
 				return;
-			}
-			
-			boolean isValid = sipSession.validateCSeq(sipServletRequest);
-			if(!isValid) {
-				return;
-			}
-		}	
-		
+		}
 		// END of validation for http://code.google.com/p/mobicents/issues/detail?id=766
 		
 		
