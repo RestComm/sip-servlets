@@ -255,7 +255,7 @@ public class SipEmbedded {
 			try {
 				sipService.stop();
 			} catch (LifecycleException e) {
-				e.printStackTrace();
+				log.error("SipService already stopped ", e);
 			}		
 		}
 	}

@@ -1564,7 +1564,9 @@ public class TestSipListener implements SipListener {
 	 */
 	public void sendBye() throws SipException,
 			TransactionUnavailableException, TransactionDoesNotExistException, InterruptedException {
-		Thread.sleep(timeToWaitBeforeBye);
+		if(timeToWaitBeforeBye > 0) {
+			Thread.sleep(timeToWaitBeforeBye);
+		}
 		sendBye(this.dialog);
 	}		
 	

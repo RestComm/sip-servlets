@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.util.Properties;
 
+import javax.servlet.sip.SipFactory;
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
@@ -215,6 +216,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		tomcat.stopTomcat();
+		tomcat = null;
 		Thread.sleep(TIMEOUT);
 		sender.setOkToByeReceived(false);
 		toUser = "receiver2";
@@ -225,11 +227,12 @@ public class BasicFailoverTest extends SipServletTestCase {
 		assertTrue(sender.getOkToByeReceived());
 		sender.setOkToByeReceived(false);
 		secondTomcatServer.stopTomcat();
+		secondTomcatServer = null;
 	}	
 	
 	public void testBasicFailoverUAC() throws Exception {
 		receiverProtocolObjects =new ProtocolObjects(
-				"failover-receiver", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");
+				"failover-receiver", "gov.nist", TRANSPORT, AUTODIALOG, null);
 		receiver = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		receiver.setUseDefaultRoute(false);
@@ -250,16 +253,20 @@ public class BasicFailoverTest extends SipServletTestCase {
 		assertTrue(receiver.getByeReceived());
 		
 		tomcat.stopTomcat();
+		tomcat = null;
 		receiver.setByeReceived(false);
 		deployShootistApplication(secondTomcatServer, false);	
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());
+		secondTomcatServer.stopTomcat();
+		secondTomcatServer = null;
 	}		
 	
-	public void testBasicFailoverUACCalleeSendsBye() throws Exception {
+	public void testBasicFailoverUACCallerSendsBye() throws Exception {
 		receiverProtocolObjects =new ProtocolObjects(
-				"failover-receiver", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");
+				"failover-receiver", "gov.nist", TRANSPORT, AUTODIALOG, null);
 		receiver = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, receiverProtocolObjects, true);
+		receiver.setTimeToWaitBeforeBye(0);
 		receiver.setRecordRoutingProxyTesting(true);
 		receiver.setUseDefaultRoute(false);
 		SipProvider receiverProvider = receiver.createProvider();			
@@ -279,15 +286,18 @@ public class BasicFailoverTest extends SipServletTestCase {
 		assertTrue(receiver.getOkToByeReceived());
 		
 		tomcat.stopTomcat();
+		tomcat = null;
 		receiver.setOkToByeReceived(false);
 		deployShootistApplication(secondTomcatServer, false);	
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getOkToByeReceived());
+		secondTomcatServer.stopTomcat();
+		secondTomcatServer = null;
 	}
 	
 	public void testBasicFailoverUACReInvite() throws Exception {
 		receiverProtocolObjects =new ProtocolObjects(
-				"failover-receiver", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5060");
+				"failover-receiver", "gov.nist", TRANSPORT, AUTODIALOG, null);
 		receiver = new TestSipListener(5080, BALANCER_EXTERNAL_PORT, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		receiver.setUseDefaultRoute(false);
@@ -308,10 +318,13 @@ public class BasicFailoverTest extends SipServletTestCase {
 		assertTrue(receiver.getByeReceived());
 		
 		tomcat.stopTomcat();
+		tomcat = null;
 		receiver.setByeReceived(false);
 		deployShootistApplication(secondTomcatServer, true);	
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());
+		secondTomcatServer.stopTomcat();
+		secondTomcatServer = null;
 	}
 	
 	public void testBasicFailoverUASReInviteStickiness() throws Exception {
@@ -349,7 +362,11 @@ public class BasicFailoverTest extends SipServletTestCase {
 		sender.setSendBye(true);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
-		assertTrue(sender.getOkToByeReceived());						
+		assertTrue(sender.getOkToByeReceived());
+		tomcat.stopTomcat();
+		tomcat = null;
+		secondTomcatServer.stopTomcat();
+		secondTomcatServer = null;
 	}
 	
 	public void testBasicFailoverCancelTest() throws Exception {
@@ -389,6 +406,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		assertTrue(sender.isCancelOkReceived());
 		assertTrue(sender.isRequestTerminatedReceived());
 		tomcat.stopTomcat();
+		tomcat = null;
 		Thread.sleep(TIMEOUT);
 		sender.setOkToByeReceived(false);
 		toUser = "receiver2";
@@ -403,6 +421,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		assertTrue(sender.isCancelOkReceived());
 		assertTrue(sender.isRequestTerminatedReceived());
 		secondTomcatServer.stopTomcat();
+		secondTomcatServer = null;
 	}
 	
 	public void testBasicFailoverSpeedDialLocationService() throws Exception {
@@ -451,6 +470,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		sender.setOkToByeReceived(false);
 		receiver.setByeReceived(false);
 		tomcat.stopTomcat();
+		tomcat = null;
 		Thread.sleep(TIMEOUT);
 		toUser = "6";
 		toAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -462,6 +482,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		sender.setOkToByeReceived(false);
 		receiver.setByeReceived(false);
 		secondTomcatServer.stopTomcat();
+		secondTomcatServer = null;
 	}
 	
 	public void testBasicFailoverSpeedDialLocationServiceCalleeSendsBye() throws Exception {
@@ -510,6 +531,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		sender.setOkToByeReceived(false);
 		receiver.setByeReceived(false);
 		tomcat.stopTomcat();
+		tomcat = null;
 		Thread.sleep(TIMEOUT);
 		toUser = "6";
 		toAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -521,6 +543,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		sender.setOkToByeReceived(false);
 		receiver.setByeReceived(false);
 		secondTomcatServer.stopTomcat();
+		secondTomcatServer = null;
 	}
 	
 	public void testBasicFailoverCancelSpeedDialLocationService() throws Exception {
@@ -571,6 +594,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		assertTrue(sender.isRequestTerminatedReceived());
 		assertTrue(receiver.isCancelReceived());
 		tomcat.stopTomcat();
+		tomcat= null;
 		Thread.sleep(TIMEOUT);
 		toUser = "6";
 		toAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -585,6 +609,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		assertTrue(sender.isRequestTerminatedReceived());
 		assertTrue(receiver.isCancelReceived());
 		secondTomcatServer.stopTomcat();
+		secondTomcatServer = null;
 	}
 	
 	public void testBasicFailoverCallForwardingB2BUA() throws Exception {
@@ -631,6 +656,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		sender.setOkToByeReceived(false);
 		receiver.setByeReceived(false);
 		tomcat.stopTomcat();
+		tomcat= null;
 		Thread.sleep(TIMEOUT);
 		toUser = "receiver2";
 		toAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -642,6 +668,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		sender.setOkToByeReceived(false);
 		receiver.setByeReceived(false);
 		secondTomcatServer.stopTomcat();
+		secondTomcatServer = null;
 	}
 	
 	public void testBasicFailoverCallForwardingB2BUACalleeSendsBye() throws Exception {
@@ -688,6 +715,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		receiver.setOkToByeReceived(false);
 		sender.setByeReceived(false);
 		tomcat.stopTomcat();
+		tomcat = null;
 		Thread.sleep(TIMEOUT);
 		toUser = "receiver2";
 		toAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -699,6 +727,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		receiver.setOkToByeReceived(false);
 		sender.setByeReceived(false);
 		secondTomcatServer.stopTomcat();
+		secondTomcatServer = null;
 	}
 	
 	public void testBasicFailoverCancelCallForwardingB2BUA() throws Exception {
@@ -747,6 +776,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		assertTrue(sender.isRequestTerminatedReceived());
 		assertTrue(receiver.isCancelReceived());
 		tomcat.stopTomcat();
+		tomcat= null;
 		Thread.sleep(TIMEOUT);
 		toUser = "receiver2";
 		toAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -761,6 +791,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		assertTrue(sender.isRequestTerminatedReceived());
 		assertTrue(receiver.isCancelReceived());
 		secondTomcatServer.stopTomcat();
+		secondTomcatServer = null;
 	}
 	
 	public void testFailoverNoNodeStarted() throws Exception {
@@ -837,17 +868,14 @@ public class BasicFailoverTest extends SipServletTestCase {
 	}
 
 	private void startSipBalancer() throws Exception {
+		logger.info("Starting Load Balancer");
 		prepareRegister();				
 		Properties properties = new Properties();
 		properties.setProperty("javax.sip.STACK_NAME", "SipBalancerForwarder");
 		properties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT", "off");
 		// You need 16 for logging traces. 32 for debug + traces.
 		// Your code will limp at 32 but it is best for debugging.
-		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "32");
-		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
-				"logs/sipbalancerforwarderdebug.txt");
-		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"logs/sipbalancerforwarder.xml");
+		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "LOG4J");		
 		properties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
 		properties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
 		properties.setProperty("gov.nist.javax.sip.CANCEL_CLIENT_TRANSACTION_CHECKED", "false");
@@ -865,6 +893,8 @@ public class BasicFailoverTest extends SipServletTestCase {
 		fwd.start();
 		
 		balancerAlgorithm.init();
+		javax.sip.SipFactory.getInstance().setPathName("org.mobicents.ha");
+		logger.info("Load Balancer started");
 	}
 	
 	private NodeRegisterImpl prepareRegister() throws Exception {
@@ -895,10 +925,13 @@ public class BasicFailoverTest extends SipServletTestCase {
 		}
 		if(tomcat != null) {
 			tomcat.stopTomcat();
+			tomcat = null;
 		}
 		if(secondTomcatServer != null) {
 			secondTomcatServer.stopTomcat();
+			secondTomcatServer = null;
 		}
+		logger.info("BasicFailoverTest stopped");
 //		super.tearDown();
 	}
 }
