@@ -194,7 +194,7 @@
 				<module>sip-servlets-management</module>
 				<module>sip-servlets-examples</module>
 				<module>sip-servlets-test-suite</module>
-				<module>sip-servlets-docs</module>
+				<module>docs</module>
 			</modules>
 			<properties>
 				 <maven.test.skip>true</maven.test.skip>
