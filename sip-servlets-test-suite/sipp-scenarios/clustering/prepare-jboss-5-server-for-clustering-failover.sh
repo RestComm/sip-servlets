@@ -30,8 +30,8 @@ cp setup/jboss-5/server-jboss-5-failover-port-1.xml $JBOSS_HOME/server/port-1/de
 cp setup/jboss-5/server-jboss-5-failover-port-2.xml $JBOSS_HOME/server/port-2/deploy/jbossweb.sar/server.xml
 
 
-#mkdir $JBOSS_HOME/server/port-1/conf/dars
-#mkdir $JBOSS_HOME/server/port-2/conf/dars
+mkdir $JBOSS_HOME/server/port-1/conf/dars
+mkdir $JBOSS_HOME/server/port-2/conf/dars
 
 if [ $# -ne 0 ]; then
 	case $1 in	
