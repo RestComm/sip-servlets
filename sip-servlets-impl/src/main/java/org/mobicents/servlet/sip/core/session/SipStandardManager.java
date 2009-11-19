@@ -17,15 +17,18 @@
 package org.mobicents.servlet.sip.core.session;
 
 import java.util.Iterator;
+import java.util.TimerTask;
 
 import javax.management.ObjectName;
 import javax.servlet.http.HttpSession;
+import javax.servlet.sip.SipApplicationSession;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.session.StandardManager;
 import org.apache.catalina.session.StandardSession;
+import org.apache.log4j.Logger;
 import org.apache.tomcat.util.modeler.Registry;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -40,6 +43,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public class SipStandardManager extends StandardManager implements SipManager {
 
+	private static final Logger logger = Logger.getLogger(SipStandardManager.class);
 	private SipManagerDelegate sipManagerDelegate;
 	
 	/**
@@ -83,6 +87,39 @@ public class SipStandardManager extends StandardManager implements SipManager {
                 throw new IllegalStateException("error registering the mbean " + objectNameString, e);
             }
         }
+        
+        new java.util.Timer().scheduleAtFixedRate(new TimerTask() {
+			
+			@Override
+			public void run() {
+				try {
+				if(sipManagerDelegate != null) {
+					Iterator<MobicentsSipSession> sessions = sipManagerDelegate.getAllSipSessions();
+					while(sessions.hasNext()) {
+						SipSessionImpl session = (SipSessionImpl) sessions.next();
+						if(session.isReadyToInvalidate()) {
+							long idleTime = System.currentTimeMillis() - session.getLastAccessedTime();
+							if(idleTime > 2000) {
+								session.onTerminatedState();
+								
+								MobicentsSipApplicationSession sipApplicationSession =  session.getSipApplicationSession();
+								if(sipApplicationSession != null) {
+									if(sipApplicationSession.isValid() && sipApplicationSession.isReadyToInvalidate()) {				
+										sipApplicationSession.tryToInvalidate();
+									}		
+								}
+								if(logger.isInfoEnabled()) {
+									logger.info("Reaper thread cleaned up the folowing SIP session" + session.getId());
+								}
+							}
+						}
+					}
+				}
+				} catch (Throwable t) {
+					logger.warn("Error reaping inactive SIP sessions. You can ignore this warning as long as it doesn't happen too often", t);
+				}
+			}
+		}, 1000, 4000);
 
 		super.init();
 	}

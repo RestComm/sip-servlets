@@ -35,6 +35,8 @@ public class ProxyBranchTimerTask extends TimerTask{
 			proxyBranch.onTimeout();
 		} catch (Exception e) {
 			logger.error("Problem in timeout task", e);
+		} finally {
+			this.proxyBranch = null;
 		}
 	}
 }
