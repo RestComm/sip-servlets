@@ -639,9 +639,9 @@ public class ProxyImpl implements Proxy, Externalizable {
 		SipServletResponseImpl proxiedResponse = 
 			getProxyUtils().createProxiedResponse(response, proxyBranch);
 		
-		if(proxiedResponse != null) {
+		if(proxiedResponse.getRequest() != null) {
 			if(logger.isDebugEnabled())
-					logger.debug("Response was dropped because getProxyUtils().createProxiedResponse(response, proxyBranch) returned zero");
+					logger.debug("Response was dropped because getProxyUtils().createProxiedResponse(response, proxyBranch) returned null");
 			// non retransmission case
 			try {
 				proxiedResponse.send();
