@@ -1663,7 +1663,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(isAck) {
 			setAckReceived(true);
 		} 
-		if(getProxy() != null) {
+		if(getProxy() == null) {
 			if(isAckRetranmission) {
 				// Filter out ACK retransmissions for JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
 				logger.debug("ACK filtered out as a retransmission. This Sip Session already has been ACKed.");
