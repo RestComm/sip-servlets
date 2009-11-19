@@ -579,7 +579,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		//When the IllegalStateException is thrown, the application is guaranteed 
 		//that the state of the SipApplicationSession object will be unchanged from its state prior to the invalidate() 
 		//method call. Even session objects that were eligible for invalidation will not have been invalidated.
-		if(!bypassCheck && isValid.compareAndSet(true, false)) {
+		if(!bypassCheck && !isValid.compareAndSet(true, false)) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		if(logger.isInfoEnabled()) {
