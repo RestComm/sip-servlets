@@ -16,6 +16,8 @@
  */
 package org.jboss.web.tomcat.service.session;
 
+import gov.nist.javax.sip.SipStackImpl;
+
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -29,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -42,9 +45,14 @@ import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
 import javax.sip.Dialog;
+import javax.sip.SipStack;
 
+import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
+import org.apache.catalina.Service;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
@@ -67,6 +75,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
+import org.mobicents.servlet.sip.startup.SipService;
 
 /**
  * Abstract base class for sip session clustering based on SipSessionImpl. Different session
@@ -830,6 +839,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		} 
 		sessionCreatingDialogId = (String) metaData.get(DIALOG_ID);
 		proxy = (ProxyImpl) metaData.get(PROXY);
+		if(proxy != null) {
+			proxy.setSipFactoryImpl(getManager().getSipFactoryImpl());
+		}
 		
 		Integer size = (Integer) metaData.get(B2B_SESSION_SIZE);
 		String[][] sessionArray = (String[][])metaData.get(B2B_SESSION_MAP);
@@ -851,9 +863,37 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			}
 			if(b2buaHelper == null) {
 				b2buaHelper = new B2buaHelperImpl();
+				b2buaHelper.setSipFactoryImpl(getManager().getSipFactoryImpl());
+				b2buaHelper.setSipManager(getManager());
 			}
 			b2buaHelper.setSessionMap(sessionMap);
-		}						
+		}	
+		if(logger.isDebugEnabled()) {
+			logger.debug("dialog to inject " + sessionCreatingDialogId);
+			if(sessionCreatingDialogId != null) {
+				logger.debug("dialog id of the dialog to inject " + sessionCreatingDialogId);
+			}
+		}
+		if(sessionCreatingDialogId != null && sessionCreatingDialogId.length() > 0) {
+			Container context = getManager().getContainer();
+			Container container = context.getParent().getParent();
+			if(container instanceof Engine) {
+				Service service = ((Engine)container).getService();
+				if(service instanceof SipService) {
+					Connector[] connectors = service.findConnectors();
+					for (Connector connector : connectors) {
+						SipStack sipStack = (SipStack)
+							connector.getProtocolHandler().getAttribute(SipStack.class.getSimpleName());
+						if(sipStack != null) {
+							sessionCreatingDialog = ((SipStackImpl)sipStack).getDialog(sessionCreatingDialogId); 
+							if(logger.isDebugEnabled()) {
+								logger.debug("dialog injected " + sessionCreatingDialog);
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	// ------------------------------------------------------------------ Public
@@ -873,6 +913,27 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		version.incrementAndGet();
 
 		O outgoingData = getOutgoingSipSessionData();
+		Map<String, Object> metaData = ((DistributableSipSessionMetadata)outgoingData.getMetadata()).getMetaData();
+		if(proxy != null) {											
+			metaData.put(PROXY, proxy);
+		}
+		
+		if(b2buaHelper != null) {
+			final Map<SipSessionKey, SipSessionKey> sessionMap = b2buaHelper.getSessionMap();
+			final int size = sessionMap.size();
+			final String[][] sessionArray = new String[2][size];
+			int i = 0;
+			for (Entry<SipSessionKey, SipSessionKey> entry : sessionMap.entrySet()) {
+				sessionArray [0][i] = entry.getKey().toString(); 
+				sessionArray [1][i] = entry.getValue().toString();
+				i++;
+			}
+			metaData.put(B2B_SESSION_SIZE, size);
+			if(logger.isDebugEnabled()) {
+				logger.debug("storing b2bua session array " + sessionArray);
+			}
+			metaData.put(B2B_SESSION_MAP, sessionArray);
+		}
 		distributedCacheManager.storeSipSessionData(outgoingData);
 
 		sessionAttributesDirty = false;
