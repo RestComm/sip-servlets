@@ -380,6 +380,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		if(TEST_IS_SEND_REINVITE_USERNAME.equalsIgnoreCase(((SipURI)request.getFrom().getURI()).getUser())) {
 			Integer nbOfAcks = (Integer) request.getSession().getAttribute("nbAcks");
 			if(nbOfAcks == null || nbOfAcks.intValue() != 2) {
+				logger.error("Number of ACK seen " + nbOfAcks + " sending Error Response");
 				statusCode = SipServletResponse.SC_DECLINE;
 			}
 		} 
