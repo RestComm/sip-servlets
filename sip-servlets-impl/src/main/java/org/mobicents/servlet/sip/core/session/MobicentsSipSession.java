@@ -32,6 +32,7 @@ import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.sip.Dialog;
 import javax.sip.SipException;
 import javax.sip.Transaction;
+import javax.sip.message.Request;
 
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.MobicentsSipSessionFacade;
@@ -167,4 +168,6 @@ public interface MobicentsSipSession extends SipSession {
 	public long getCseq();
 
 	public void setCseq(long cseq);
+
+	boolean validateCSeq(SipServletRequestImpl sipServletRequestImpl);
 }

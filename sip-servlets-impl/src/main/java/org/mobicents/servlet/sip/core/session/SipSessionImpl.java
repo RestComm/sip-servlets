@@ -20,6 +20,7 @@ import gov.nist.javax.sip.DialogExt;
 import gov.nist.javax.sip.ServerTransactionExt;
 import gov.nist.javax.sip.message.SIPMessage;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -45,6 +46,7 @@ import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSessionActivationListener;
 import javax.servlet.sip.SipSessionAttributeListener;
 import javax.servlet.sip.SipSessionBindingEvent;
@@ -75,6 +77,7 @@ import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
+import javax.sip.message.Response;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.security.SecurityUtil;
@@ -1647,5 +1650,39 @@ public class SipSessionImpl implements MobicentsSipSession {
 	}
 	public void setCseq(long cseq) {
 		this.cseq = cseq;
+	}
+	
+	public synchronized boolean validateCSeq(SipServletRequestImpl sipServletRequest) {
+		final long localCseq = cseq;
+		final Request request = (Request) sipServletRequest.getMessage();
+		final long remoteCseq =  ((CSeqHeader) request.getHeader(CSeqHeader.NAME)).getSeqNumber();
+		final String method = request.getMethod();
+		
+		if(localCseq == remoteCseq) {
+			logger.debug("dropping retransmission " + request + " since it matches the current sip session cseq " + localCseq);
+			return false;
+		}
+		final boolean isAck = Request.ACK.equalsIgnoreCase(method);
+		if(localCseq > remoteCseq) {				
+			if(!isAck) {
+				logger.error("CSeq out of order for the following request");
+				final SipServletResponse response = sipServletRequest.createResponse(Response.SERVER_INTERNAL_ERROR, "CSeq out of order");
+				try {
+					response.send();
+				} catch (IOException e) {
+					logger.error("Can not send error response", e);
+				}
+				return false;
+			}
+		}
+		if(Request.INVITE.equalsIgnoreCase(method)){			
+			//if it's a reinvite, we reset the ACK retransmission flag
+			setAckReceived(false);
+			if(logger.isDebugEnabled()) {
+				logger.debug("resetting the ack retransmission flag on the sip session " + getKey() + " because following reINVITE has been received " + request);
+			}
+		}
+		setCseq(remoteCseq);
+		return true;
 	}
 }

@@ -22,6 +22,7 @@ import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.sip.Dialog;
 import javax.sip.SipException;
 import javax.sip.Transaction;
+import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -386,17 +387,23 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	}
 
 	public void setAckReceived(boolean ackReceived) {
+		getSipSession().setAckReceived(ackReceived);
 	}
 
 	public boolean isAckReceived() {
-		return false;
+		return getSipSession().isAckReceived();
 	}
 
 	public void setCseq(long cseq) {
+		getSipSession().setCseq(cseq);
 	}
 
 	public long getCseq() {
-		return 0;
+		return getSipSession().getCseq();
+	}
+	
+	public boolean validateCSeq(SipServletRequestImpl request) {
+		return getSipSession().validateCSeq(request);
 	}
 	
 	/**
@@ -419,5 +426,5 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 						+ sipSessionKey);
 		}
 		return sipSession;
-	}
+	}	
 }
