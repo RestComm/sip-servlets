@@ -609,7 +609,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		if(this.sipApplicationSessionAttributeMap != null) {
 			for (String key : getAttributeMap().keySet()) {
-				removeAttribute(key);
+				removeAttribute(key, true);
 			}
 		}
 		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);
@@ -725,8 +725,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#removeAttribute(java.lang.String)
 	 */
 	public void removeAttribute(String name) {
-
-		if (!isValid())
+		removeAttribute(name, false);
+	}
+	
+	public void removeAttribute(String name, boolean byPassValidCheck) {
+		if (!byPassValidCheck && !isValid())
 			throw new IllegalStateException(
 					"Can not bind object to session that has been invalidated!!");
 
