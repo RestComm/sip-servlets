@@ -14,7 +14,8 @@
         <checkout.password></checkout.password>
         
         <media.docs.connectionURL>scm:svn:https://svn.devel.redhat.com/repos/ecs/JBoss_Communications_Platform/1.2.0/Media_Server_User_Guide</media.docs.connectionURL>
-        <sipservlets.docs.connectionURL>scm:svn:https://svn.devel.redhat.com/repos/ecs/JBoss_Communications_Platform/1.2.0/SIP_Servlets_Server_User_Guide</sipservlets.docs.connectionURL>
+        <!--sipservlets.docs.connectionURL>scm:svn:https://svn.devel.redhat.com/repos/ecs/JBoss_Communications_Platform/1.2.0/SIP_Servlets_Server_User_Guide</sipservlets.docs.connectionURL-->        
+        <sipservlets.docs.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/docs</sipservlets.docs.connectionURL>
         
     </properties>
     
@@ -56,9 +57,7 @@
                                     <scmVersionType>revision</scmVersionType>
                                     <skipCheckoutIfExists>true</skipCheckoutIfExists>
                                     <checkoutDirectory>${checkout.basedir}/sip-servlets</checkoutDirectory>
-                                    <connectionUrl>${sipservlets.docs.connectionURL}</connectionUrl>
-                                    <username>${checkout.username}</username>
-                                    <password>${checkout.password}</password>
+                                    <connectionUrl>${sipservlets.docs.connectionURL}</connectionUrl>                                    
                                 </configuration>
                             </execution>
                         </executions>
@@ -101,9 +100,7 @@
                                     <basedir>${checkout.basedir}/sip-servlets</basedir>
                                     <scmVersion>HEAD</scmVersion>
                                     <scmVersionType>revision</scmVersionType>
-                                    <connectionUrl>${sipservlets.docs.connectionURL}</connectionUrl>
-                                    <username>${checkout.username}</username>
-                                    <password>${checkout.password}</password>
+                                    <connectionUrl>${sipservlets.docs.connectionURL}</connectionUrl>                                   
                                 </configuration>
                             </execution>
                         </executions>
