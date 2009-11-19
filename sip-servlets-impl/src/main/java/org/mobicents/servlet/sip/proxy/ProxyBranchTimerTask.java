@@ -21,6 +21,7 @@ import java.util.TimerTask;
 import org.apache.log4j.Logger;
 
 public class ProxyBranchTimerTask extends TimerTask{
+
 	private static final Logger logger = Logger.getLogger(ProxyBranchTimerTask.class);
 	private ProxyBranchImpl proxyBranch;
 	
@@ -29,14 +30,24 @@ public class ProxyBranchTimerTask extends TimerTask{
 		this.proxyBranch = proxyBranch;
 	}
 	
+	@Override
 	public void run()
 	{
 		try {
-			proxyBranch.onTimeout();
+			if(proxyBranch != null) {
+				proxyBranch.onTimeout();
+			}
 		} catch (Exception e) {
 			logger.error("Problem in timeout task", e);
 		} finally {
 			this.proxyBranch = null;
 		}
 	}
+	
+	@Override
+	public boolean cancel() {
+		proxyBranch = null;
+		return super.cancel();
+	}
+
 }

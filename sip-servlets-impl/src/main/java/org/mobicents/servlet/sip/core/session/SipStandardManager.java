@@ -87,7 +87,7 @@ public class SipStandardManager extends StandardManager implements SipManager {
                 throw new IllegalStateException("error registering the mbean " + objectNameString, e);
             }
         }
-        
+        /*
         new java.util.Timer().scheduleAtFixedRate(new TimerTask() {
 			
 			@Override
@@ -119,7 +119,7 @@ public class SipStandardManager extends StandardManager implements SipManager {
 					logger.warn("Error reaping inactive SIP sessions. You can ignore this warning as long as it doesn't happen too often", t);
 				}
 			}
-		}, 1000, 4000);
+		}, 1000, 4000);*/
 
 		super.init();
 	}
