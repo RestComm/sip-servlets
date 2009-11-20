@@ -669,7 +669,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 //			}
 //		}
 
-		return isValid();
+		return super.isValid();
 
 	}
 
