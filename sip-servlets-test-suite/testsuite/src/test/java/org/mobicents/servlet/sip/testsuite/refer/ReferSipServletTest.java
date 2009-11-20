@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.testsuite.refer;
 
 import java.text.ParseException;
+import java.util.Iterator;
 
 import javax.sip.InvalidArgumentException;
 import javax.sip.SipException;
@@ -117,12 +118,21 @@ public class ReferSipServletTest extends SipServletTestCase {
 		sender.sendSipRequest(Request.REFER, fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT*2);		
 		assertTrue(referTo.isAckReceived());
-		assertEquals(3, sender.getAllMessagesContent().size());
+		logger.info("all messages received : ");
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));
+		while(sender.getAllMessagesContent().contains(SESSION_INVALIDATED)) {
+			sender.getAllMessagesContent().remove(SESSION_INVALIDATED);
+		}
+		assertEquals(NOTIFICATIONS.length, sender.getAllMessagesContent().size());
 		for (String subscriptionState : NOTIFICATIONS) {
 			assertTrue(subscriptionState + " not present",sender.getAllMessagesContent().contains(subscriptionState));	
 		}
-		assertTrue(referTo.getOkToByeReceived());
-		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));
+		assertTrue(referTo.getOkToByeReceived());		
 		
 	}
 	
@@ -132,13 +142,21 @@ public class ReferSipServletTest extends SipServletTestCase {
 	 */
 	public void testSipServletsSendsReferOutOfDialog() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		
-		Thread.sleep(TIMEOUT * 2);		
-		assertEquals(NOTIFICATIONS.length + 1, sender.getAllMessagesContent().size());
-		for (String subscriptionState : NOTIFICATIONS) {
-			assertTrue(subscriptionState + " not present",sender.getAllMessagesContent().contains(subscriptionState));	
+		Thread.sleep(TIMEOUT * 2);
+		logger.info("all messages received : ");
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
 		}
 		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));
-		
+		while(sender.getAllMessagesContent().contains(SESSION_INVALIDATED)) {
+			sender.getAllMessagesContent().remove(SESSION_INVALIDATED);
+		}
+		assertEquals(NOTIFICATIONS.length, sender.getAllMessagesContent().size());
+		for (String subscriptionState : NOTIFICATIONS) {
+			assertTrue(subscriptionState + " not present",sender.getAllMessagesContent().contains(subscriptionState));	
+		}		
 	}
 	
 	/**
@@ -163,6 +181,12 @@ public class ReferSipServletTest extends SipServletTestCase {
 		sender.sendInDialogSipRequest(Request.REFER, null, null, null, null);		
 		Thread.sleep(TIMEOUT);		
 		assertTrue(referTo.isAckReceived());
+		logger.info("all messages received : ");
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
 		assertEquals(NOTIFICATIONS.length, sender.getAllMessagesContent().size());
 		for (String subscriptionState : NOTIFICATIONS) {
 			assertTrue(subscriptionState + " not present",sender.getAllMessagesContent().contains(subscriptionState));	
@@ -171,6 +195,16 @@ public class ReferSipServletTest extends SipServletTestCase {
 		sender.getAllMessagesContent().clear();
 		sender.sendInDialogSipRequest(Request.REFER, null, null, null, null);
 		Thread.sleep(TIMEOUT);
+		logger.info("all messages received : ");
+		allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));
+		while(sender.getAllMessagesContent().contains(SESSION_INVALIDATED)) {
+			sender.getAllMessagesContent().remove(SESSION_INVALIDATED);
+		}
 		assertEquals(INDIALOG_NOTIFICATIONS.length, sender.getAllMessagesContent().size());
 		for (String subscriptionState : INDIALOG_NOTIFICATIONS) {
 			assertTrue(subscriptionState + " not present",sender.getAllMessagesContent().contains(subscriptionState));	
@@ -178,7 +212,6 @@ public class ReferSipServletTest extends SipServletTestCase {
 		sender.sendBye();
 		Thread.sleep(TIMEOUT);	
 		assertTrue(sender.getOkToByeReceived());
-		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));
 	}
 	
 	/**
@@ -204,12 +237,21 @@ public class ReferSipServletTest extends SipServletTestCase {
 		sender.sendInDialogSipRequest(Request.REFER, null, null, null, null);		
 		Thread.sleep(TIMEOUT*2);		
 		assertTrue(referTo.isAckReceived());
-		assertEquals(3, sender.getAllMessagesContent().size());
+		logger.info("all messages received : ");
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));
+		while(sender.getAllMessagesContent().contains(SESSION_INVALIDATED)) {
+			sender.getAllMessagesContent().remove(SESSION_INVALIDATED);
+		}
+		assertEquals(NOTIFICATIONS.length, sender.getAllMessagesContent().size());
 		for (String subscriptionState : NOTIFICATIONS) {
 			assertTrue(subscriptionState + " not present",sender.getAllMessagesContent().contains(subscriptionState));	
 		}						
 		assertTrue(sender.getOkToByeReceived());
-		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));
 	}
 
 	@Override
