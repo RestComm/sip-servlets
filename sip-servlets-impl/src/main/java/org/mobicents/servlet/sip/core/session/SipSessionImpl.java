@@ -36,6 +36,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.Semaphore;
@@ -44,6 +45,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
+import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
@@ -62,6 +64,7 @@ import javax.sip.Dialog;
 import javax.sip.DialogState;
 import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
+import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
@@ -181,7 +184,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 	/**
 	 * Is the session valid.
 	 */
-	protected AtomicBoolean isValid;
+	protected AtomicBoolean isValidInternal;
+	
+	protected transient boolean isValid;
 	
 	/**
 	 * The name of the servlet withing this same app to handle all subsequent requests.
@@ -211,7 +216,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	protected transient Dialog sessionCreatingDialog;
 	
 	/**
-	 * We use this for REGISTER, where a dialog doesn't exist to carry the session info.
+	 * We use this for REGISTER or MESSAGE, where a dialog doesn't exist to carry the session info.
 	 * In this case the session only spans a single transaction.
 	 */
 	protected transient Transaction sessionCreatingTransaction;
@@ -256,7 +261,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		this.sipFactory = sipFactoryImpl;
 		this.creationTime = this.lastAccessedTime = System.currentTimeMillis();		
 		this.state = State.INITIAL;
-		this.isValid = new AtomicBoolean(true);		
+		this.isValidInternal = new AtomicBoolean(true);
+		this.isValid = true;
 		this.ongoingTransactions = new CopyOnWriteArraySet<Transaction>();
 		if(mobicentsSipApplicationSession.getSipContext() != null && ConcurrencyControlMode.SipSession.equals(mobicentsSipApplicationSession.getSipContext().getConcurrencyControlMode())) {
 			semaphore = new Semaphore(1);		
@@ -351,7 +357,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 						}
 						methodRequest.setHeader(contactHeader);
 					} catch (Exception e) {
-						logger.error("Can not create contact header for subsequent request", e);
+						logger.error("Can not create contact header for subsequent request " + method + " for session " + key, e);
 					}
 				}
 
@@ -363,72 +369,135 @@ public class SipSessionImpl implements MobicentsSipSession {
 						methodRequest, this.sipFactory, this, null, sessionCreatingDialog,
 						false);
 			} catch (SipException e) {
-				logger.error("Cannot create the " + method + " request from the dialog",e);
-				throw new IllegalArgumentException("Cannot create the " + method + " request",e);
+				logger.error("Cannot create the " + method + " request from the dialog " + sessionCreatingDialog,e);
+				throw new IllegalArgumentException("Cannot create the " + method + " request from the dialog " + sessionCreatingDialog + " for sip session " + key,e);
 			} 	
-		} else {
-			if(logger.isDebugEnabled()) {
-				logger.debug("The new request for the session is dialog creating (" + method + ")");
-			}
+		} else {			
 			//case where other requests are sent with the same session like REGISTER or for challenge requests
-			if(sessionCreatingTransaction != null && sessionCreatingTransaction.getRequest().getMethod().equalsIgnoreCase(method)
-					&& sessionCreatingTransaction instanceof ClientTransaction) {
-				Request request = (Request) sessionCreatingTransaction.getRequest().clone();
-				((SIPMessage)request).setApplicationData(null);
-				
-				CSeqHeader cSeq = (CSeqHeader) request.getHeader((CSeqHeader.NAME));
-				try {
-					cSeq.setSeqNumber(cSeq.getSeqNumber() + 1l);
-				} catch (InvalidArgumentException e) {
-					logger.error("Cannot increment the Cseq header to the new " + method + " request",e);
-					throw new IllegalArgumentException("Cannot create the " + method + " request",e);				
-				}
-				request.setHeader(cSeq);
-				request.removeHeader(ViaHeader.NAME);
-				
-				final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactory.getSipNetworkInterfaceManager();
-				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
-						JainSipUtils.findTransport(request), false).getSipProvider();
-				final SipApplicationDispatcher sipApplicationDispatcher = sipFactory.getSipApplicationDispatcher();				
-				final String branch = JainSipUtils.createBranch(getSipApplicationSession().getKey().getId(),  sipApplicationDispatcher.getHashFromApplicationName(getKey().getApplicationName()));
-				
-				ViaHeader viaHeader = JainSipUtils.createViaHeader(
-	    				sipNetworkInterfaceManager, request, branch);
-	    		request.addHeader(viaHeader);
-				
-				try {
-					ClientTransaction retryTran = sipProvider
-						.getNewClientTransaction(request);
-					retryTran.setRetransmitTimer(sipApplicationDispatcher.getBaseTimerInterval());
-														
-					sipServletRequest = new SipServletRequestImpl(
-							request, this.sipFactory, this, retryTran, retryTran.getDialog(),
-							true);
+			if(sessionCreatingTransaction != null) {
+				if(sessionCreatingTransaction instanceof ClientTransaction) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("orignal tx for creating susbequent request " + method + " on session " + key +" was a Client Tx");
+					}
+					Request request = (Request) sessionCreatingTransaction.getRequest().clone();
+					((SIPMessage)request).setApplicationData(null);
 					
-					// SIP Request is ALWAYS pointed to by the client tx.
-					// Notice that the tx appplication data is cached in the request
-					// copied over to the tx so it can be quickly accessed when response
-					// arrives.
-					retryTran.setApplicationData(sipServletRequest.getTransactionApplicationData());
+					final CSeqHeader cSeqHeader = (CSeqHeader) request.getHeader((CSeqHeader.NAME));					
+					try {
+						cSeqHeader.setSeqNumber(cSeqHeader.getSeqNumber() + 1l);
+						cSeqHeader.setMethod(method);
+					} catch (InvalidArgumentException e) {
+						logger.error("Cannot increment the Cseq header to the new " + method + " on the susbequent request to create on session " + key,e);
+						throw new IllegalArgumentException("Cannot create the " + method + " on the susbequent request to create on session " + key,e);				
+					} catch (ParseException e) {
+						throw new IllegalArgumentException("Cannot set the " + method + " on the susbequent request to create on session " + key,e);		
+					}				
+					request.removeHeader(ViaHeader.NAME);
 					
-					Dialog dialog = retryTran.getDialog();
-					if (dialog == null && JainSipUtils.DIALOG_CREATING_METHODS.contains(sipServletRequest.getMethod())) {					
-						dialog = sipProvider.getNewDialog(retryTran);
-						((DialogExt)dialog).disableSequenceNumberValidation();
-						dialog.setApplicationData(sipServletRequest.getTransactionApplicationData());
-						if(logger.isDebugEnabled()) {
-							logger.debug("new Dialog for request " + sipServletRequest + ", ref = " + dialog);
+					final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactory.getSipNetworkInterfaceManager();
+					final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
+							JainSipUtils.findTransport(request), false).getSipProvider();
+					final SipApplicationDispatcher sipApplicationDispatcher = sipFactory.getSipApplicationDispatcher();				
+					final String branch = JainSipUtils.createBranch(getSipApplicationSession().getKey().getId(),  sipApplicationDispatcher.getHashFromApplicationName(getKey().getApplicationName()));
+					
+					ViaHeader viaHeader = JainSipUtils.createViaHeader(
+		    				sipNetworkInterfaceManager, request, branch);
+		    		request.addHeader(viaHeader);
+					
+					try {
+						ClientTransaction retryTran = sipProvider
+							.getNewClientTransaction(request);
+						retryTran.setRetransmitTimer(sipApplicationDispatcher.getBaseTimerInterval());
+						
+						sipServletRequest = new SipServletRequestImpl(
+								request, this.sipFactory, this, retryTran, retryTran.getDialog(),
+								true);
+						
+						// SIP Request is ALWAYS pointed to by the client tx.
+						// Notice that the tx appplication data is cached in the request
+						// copied over to the tx so it can be quickly accessed when response
+						// arrives.
+						retryTran.setApplicationData(sipServletRequest.getTransactionApplicationData());
+						
+						Dialog dialog = retryTran.getDialog();
+						if (dialog == null && JainSipUtils.DIALOG_CREATING_METHODS.contains(sipServletRequest.getMethod())) {					
+							dialog = sipProvider.getNewDialog(retryTran);
+							((DialogExt)dialog).disableSequenceNumberValidation();
+							dialog.setApplicationData(sipServletRequest.getTransactionApplicationData());
+							if(logger.isDebugEnabled()) {
+								logger.debug("new Dialog for request " + sipServletRequest + ", ref = " + dialog);
+							}
+						}													
+						sessionCreatingDialog = dialog;
+						
+						sipServletRequest.setTransaction(retryTran);					
+					} catch (TransactionUnavailableException e) {
+						logger.error("Cannot get a new transaction for the newly created susbequent request " + sipServletRequest,e);
+						throw new IllegalArgumentException("Cannot get a new transaction for the newly created susbequent request " + sipServletRequest,e);
+					} catch (SipException e) {
+						logger.error("Cannot get a new dialog for the the newly created susbequent request " + sipServletRequest,e);
+						throw new IllegalArgumentException("Cannot get a new dialog for the newly created subsequent request " + sipServletRequest,e);
+					}
+				} else {
+					if(logger.isDebugEnabled()) {
+						logger.debug("orignal tx for creating susbequent request " + method + " on session " + key +" was a Server Tx");
+					}
+					try {
+						// copying original params and call id
+						final Request originalRequest = (Request) sessionCreatingTransaction.getRequest();
+						final FromHeader fromHeader = (FromHeader) originalRequest.getHeader(FromHeader.NAME);
+						final ToHeader toHeader = (ToHeader) originalRequest.getHeader(ToHeader.NAME);
+						final AddressImpl currentLocalParty = (AddressImpl)this.getLocalParty().clone();
+						final AddressImpl currentRemoteParty = (AddressImpl)this.getRemoteParty().clone();
+						((Parameters)currentRemoteParty .getAddress().getURI()).removeParameter("tag");
+						((Parameters)currentLocalParty .getAddress().getURI()).removeParameter("tag");
+						final String originalCallId = ((CallIdHeader)originalRequest.getHeader(CallIdHeader.NAME)).getCallId();
+						sipServletRequest =(SipServletRequestImpl) sipFactory.createRequest(
+							getSipApplicationSession(),
+							method,
+							currentLocalParty,
+							currentRemoteParty,
+							handlerServlet,
+							originalCallId,
+							fromHeader.getTag());						
+						final Request request = ((Request)sipServletRequest.getMessage());
+						sipServletRequest.getSipSession().setCseq(((CSeqHeader)request.getHeader(CSeqHeader.NAME)).getSeqNumber());
+						final Map<String, String> fromParameters = new HashMap<String, String>();
+						final Iterator<String> fromParameterNames = fromHeader.getParameterNames();
+						while (fromParameterNames.hasNext()) {
+							String parameterName = (String) fromParameterNames.next();
+							if(!SipFactoryImpl.FORBIDDEN_PARAMS.contains(parameterName)) {
+								fromParameters.put(parameterName, fromHeader.getParameter(parameterName));
+							}
 						}
-					}													
-					sessionCreatingDialog = dialog;
+						final Map<String, String> toParameters = new HashMap<String, String>();
+						final Iterator<String> toParameterNames = toHeader.getParameterNames();
+						while (toParameterNames.hasNext()) {
+							String parameterName = (String) toParameterNames.next();
+							if(!SipFactoryImpl.FORBIDDEN_PARAMS.contains(parameterName)) {
+								toParameters.put(parameterName, toHeader.getParameter(parameterName));
+							}
+						}			
 					
-					sipServletRequest.setTransaction(retryTran);					
-				} catch (TransactionUnavailableException e) {
-					logger.error("Cannot get a new transaction for the request " + sipServletRequest,e);
-					throw new IllegalArgumentException("Cannot get a new transaction for the request " + sipServletRequest,e);
-				} catch (SipException e) {
-					logger.error("Cannot get a new dialog for the new request " + sipServletRequest,e);
-					throw new IllegalArgumentException("Cannot get a new dialog for the request " + sipServletRequest,e);
+						final ToHeader newTo = (ToHeader) request.getHeader(ToHeader.NAME);
+						for (Entry<String, String> fromParameter : fromParameters.entrySet()) {
+							String value = fromParameter.getValue();
+							if(value == null) {
+								value = "";
+							}
+							newTo.setParameter(fromParameter.getKey(),  value);
+						}
+						final FromHeader newFrom = (FromHeader) request.getHeader(FromHeader.NAME);
+						for (Entry<String, String> toParameter : toParameters.entrySet()) {
+							String value = toParameter.getValue();
+							if(value == null) {
+								value = "";
+							}
+							newFrom.setParameter(toParameter.getKey(),  value);
+						}	
+					} catch (ParseException e) {
+						throw new IllegalArgumentException("Problem setting param on the newly created susbequent request " + sipServletRequest,e);
+					}					
 				}
 				
 				return sipServletRequest;
@@ -566,12 +635,13 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(sessionCreatingDialog != null) {
 			return new AddressImpl(sessionCreatingDialog.getLocalParty(), null, false);
 		} else if (sessionCreatingTransaction != null){
-			try {
+			if(sessionCreatingTransaction instanceof ServerTransaction) {
+				ToHeader toHeader = (ToHeader)sessionCreatingTransaction.getRequest().getHeader(ToHeader.NAME);
+				return new AddressImpl(toHeader.getAddress(), AddressImpl.getParameters((Parameters)toHeader),  false);
+			} else {
 				FromHeader fromHeader = (FromHeader)sessionCreatingTransaction.getRequest().getHeader(FromHeader.NAME);
-				return new AddressImpl(fromHeader.getAddress(), AddressImpl.getParameters((Parameters)fromHeader), false);
-			} catch(Exception e) {
-				throw new IllegalArgumentException("Error creating Address", e);
-			}
+				return new AddressImpl(fromHeader.getAddress(), AddressImpl.getParameters((Parameters)fromHeader),  false);
+			}			
 		} else {
 			return localParty;
 		}
@@ -634,8 +704,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 					ToHeader toHeader = (ToHeader)sessionCreatingTransaction.getRequest().getHeader(ToHeader.NAME);
 					return new AddressImpl(toHeader.getAddress(), AddressImpl.getParameters((Parameters)toHeader),  false);
 				} else {
-					FromHeader toHeader = (FromHeader)sessionCreatingTransaction.getRequest().getHeader(FromHeader.NAME);
-					return new AddressImpl(toHeader.getAddress(), AddressImpl.getParameters((Parameters)toHeader),  false);
+					FromHeader fromHeader = (FromHeader)sessionCreatingTransaction.getRequest().getHeader(FromHeader.NAME);
+					return new AddressImpl(fromHeader.getAddress(), AddressImpl.getParameters((Parameters)fromHeader),  false);
 				}
 			} catch(Exception e) {
 				throw new IllegalArgumentException("Error creating Address", e);
@@ -678,7 +748,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void invalidate() {
 		
-		if(!isValid.compareAndSet(true, false)) {
+		if(!isValidInternal.compareAndSet(true, false)) {
 			throw new IllegalStateException("SipSession already invalidated !");
 		}		
 		if(logger.isInfoEnabled()) {
@@ -693,6 +763,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 			}
 		}
 		notifySipSessionListeners(SipSessionEventType.DELETION);			
+		
+		isValid = false;
 		
 		if(derivedSipSessions != null) {
 			for (MobicentsSipSession derivedMobicentsSipSession : derivedSipSessions.values()) {
@@ -820,14 +892,22 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#isValid()
 	 */
 	public boolean isValid() {
-		return this.isValid.get();
+		return this.isValid;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.MobicentsSipSession#isValidInternal()
+	 */
+	public boolean isValidInternal() {
+		return isValidInternal.get();
+	}
+	
 	/**
 	 * @param isValid the isValid to set
 	 */
 	protected void setValid(boolean isValid) {
-		this.isValid.set(isValid);
+		this.isValidInternal.set(isValid);
 	}
 	/*
 	 * (non-Javadoc)
@@ -1081,14 +1161,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 	}
 	
 	public void onTerminatedState() {
-		if(isValid()) {
+		if(isValidInternal()) {
 			onReadyToInvalidate();
 			if(this.parentSession != null) {
 				Iterator<MobicentsSipSession> derivedSessionsIterator = parentSession.getDerivedSipSessions();
 				while (derivedSessionsIterator.hasNext()) {
 					MobicentsSipSession mobicentsSipSession = (MobicentsSipSession) derivedSessionsIterator
 							.next();
-					if(mobicentsSipSession.isValid() && !mobicentsSipSession.isReadyToInvalidate()) {
+					if(mobicentsSipSession.isValidInternal() && !mobicentsSipSession.isReadyToInvalidate()) {
 						return;
 					}
 				}					

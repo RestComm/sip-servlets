@@ -127,7 +127,7 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 	 */
 	public SipServletRequest createRequest(SipApplicationSession appSession,
 			String method, Address from, Address to) {
-		SipServletRequest sipServletRequest = sipFactoryImpl.createRequest(appSession, method, from, to, ((MobicentsSipApplicationSession)appSession).getCurrentRequestHandler());
+		SipServletRequest sipServletRequest = sipFactoryImpl.createRequest(appSession, method, from, to, ((MobicentsSipApplicationSession)appSession).getCurrentRequestHandler(), null, null);
 		return sipServletRequest;
 	}
 

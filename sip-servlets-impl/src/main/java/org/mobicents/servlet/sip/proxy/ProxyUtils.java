@@ -259,14 +259,16 @@ public class ProxyUtils {
 					sipFactoryImpl,
 					originalRequest.getTransaction(),
 					originalRequest.getSipSession(),
-					sipServetResponse.getDialog());
+					sipServetResponse.getDialog(),
+					false);
 		} else {
 			// retransmission case
 			newServletResponseImpl = new SipServletResponseImpl(clonedResponse,		
 					sipFactoryImpl,
 					null,
 					sipServetResponse.getSipSession(),
-					sipServetResponse.getDialog());
+					sipServetResponse.getDialog(),
+					false);
 		}
 		newServletResponseImpl.setOriginalRequest(originalRequest);
 		newServletResponseImpl.setProxiedResponse(true);

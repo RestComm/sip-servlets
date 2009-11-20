@@ -163,6 +163,8 @@ public interface MobicentsSipSession extends SipSession {
 
 	public boolean isAckReceived();
 
+	public boolean isValidInternal();
+	
 	public void setAckReceived(boolean ackReceived);
 
 	public long getCseq();

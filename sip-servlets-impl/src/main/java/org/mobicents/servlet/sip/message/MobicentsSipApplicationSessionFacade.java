@@ -224,6 +224,10 @@ public class MobicentsSipApplicationSessionFacade implements
 		return this.sipApplicationSession.isValid();
 	}
 
+	public boolean isValidInternal() {
+		return this.sipApplicationSession.isValidInternal();
+	}
+	
 	public void removeAttribute(String name) {
 		this.sipApplicationSession.removeAttribute(name);
 	}

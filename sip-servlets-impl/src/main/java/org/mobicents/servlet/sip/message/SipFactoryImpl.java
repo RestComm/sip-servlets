@@ -98,7 +98,7 @@ public class SipFactoryImpl implements Externalizable {
 		}
 	}
 	
-	private static final Set<String> FORBIDDEN_PARAMS = new HashSet<String>();
+	public static final Set<String> FORBIDDEN_PARAMS = new HashSet<String>();
 
 	static {
 		FORBIDDEN_PARAMS.add(TAG_PARAM);
@@ -214,7 +214,7 @@ public class SipFactoryImpl implements Externalizable {
 	 *      javax.servlet.sip.Address)
 	 */
 	public SipServletRequest createRequest(SipApplicationSession sipAppSession,
-			String method, Address from, Address to, String handler) {
+			String method, Address from, Address to, String handler, String originalCallId, String fromTagToUse) {
 		if (logger.isDebugEnabled()) {
 			logger
 					.debug("Creating new SipServletRequest for SipApplicationSession["
@@ -228,7 +228,7 @@ public class SipFactoryImpl implements Externalizable {
 
 		try { 
 			//javadoc specifies that a copy of the address should be done hence the clone
-			return createSipServletRequest(sipAppSession, method, (Address)from.clone(), (Address)to.clone(), handler);
+			return createSipServletRequest(sipAppSession, method, (Address)from.clone(), (Address)to.clone(), handler, originalCallId, fromTagToUse);
 		} catch (ServletParseException e) {
 			logger.error("Error creating sipServletRequest", e);
 			return null;
@@ -259,7 +259,7 @@ public class SipFactoryImpl implements Externalizable {
 		Address fromA = this.createAddress(from.clone());
 
 		try {
-			return createSipServletRequest(sipAppSession, method, fromA, toA, handler);
+			return createSipServletRequest(sipAppSession, method, fromA, toA, handler, null, null);
 		} catch (ServletParseException e) {
 			logger.error("Error creating sipServletRequest", e);
 			return null;
@@ -290,7 +290,7 @@ public class SipFactoryImpl implements Externalizable {
 		Address toA = this.createAddress(to);
 		Address fromA = this.createAddress(from);
 
-		return createSipServletRequest(sipAppSession, method, fromA, toA, handler);
+		return createSipServletRequest(sipAppSession, method, fromA, toA, handler, null, null);
 
 	}
 
@@ -375,7 +375,7 @@ public class SipFactoryImpl implements Externalizable {
 					"Wrong method to create request with[" + Request.CANCEL
 							+ "]!");
 		}
-		if (!app.isValid()) {
+		if (!((MobicentsSipApplicationSession)app).isValidInternal()) {
 			throw new IllegalArgumentException(
 					"Cant associate request with invalidaded sip session application!");
 		}
@@ -390,11 +390,12 @@ public class SipFactoryImpl implements Externalizable {
 	 * @param method
 	 * @param from
 	 * @param to
+	 * @param originalCallId 
 	 * @return
 	 */
 	private SipServletRequest createSipServletRequest(
 			SipApplicationSession sipAppSession, String method, Address from,
-			Address to, String handler) throws ServletParseException {
+			Address to, String handler, String originalCallId, String fromTagToUse) throws ServletParseException {
 		
 		MobicentsSipApplicationSession mobicentsSipApplicationSession = (MobicentsSipApplicationSession) sipAppSession;
 		
@@ -460,9 +461,13 @@ public class SipFactoryImpl implements Externalizable {
 			cseqHeader = SipFactories.headerFactory.createCSeqHeader(1L, method);
 			// Fix provided by Hauke D. Issue 411
 			SipApplicationSessionKey sipApplicationSessionKey = mobicentsSipApplicationSession.getKey();
-//			if(sipApplicationSessionKey.isAppGeneratedKey()) {				
+//			if(sipApplicationSessionKey.isAppGeneratedKey()) {
+			if(originalCallId == null) {
 				callIdHeader = SipFactories.headerFactory.createCallIdHeader(
-						getSipNetworkInterfaceManager().getExtendedListeningPoints().next().getSipProvider().getNewCallId().getCallId());	
+						getSipNetworkInterfaceManager().getExtendedListeningPoints().next().getSipProvider().getNewCallId().getCallId());
+			} else {
+				callIdHeader = SipFactories.headerFactory.createCallIdHeader(originalCallId);
+			}
 //			} else {
 //				callIdHeader = SipFactories.headerFactory.createCallIdHeader(
 //						sipApplicationSessionKey.getId());
@@ -528,7 +533,11 @@ public class SipFactoryImpl implements Externalizable {
 				requestToWrap.addHeader(contactHeader);
 			}
 						
-			fromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(sipApplicationDispatcher, sipAppSession.getApplicationName(), sipApplicationSessionKey.getId()));
+			if(fromTagToUse == null) {
+				fromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(sipApplicationDispatcher, sipAppSession.getApplicationName(), sipApplicationSessionKey.getId()));
+			} else {
+				fromHeader.setTag(fromTagToUse);
+			}
 			
 			SipSessionKey key = SessionManagerUtil.getSipSessionKey(
 					mobicentsSipApplicationSession.getKey().getId(), mobicentsSipApplicationSession.getKey().getApplicationName(), requestToWrap, false);

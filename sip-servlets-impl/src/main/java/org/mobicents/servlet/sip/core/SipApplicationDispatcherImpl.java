@@ -659,7 +659,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				sipFactoryImpl,
 				clientTransaction, 
 				null, 
-				dialog);
+				dialog,
+				true);
 		try {		
 			messageDispatcherFactory.getResponseDispatcher(sipServletResponse, this).
 				dispatchMessage(null, sipServletResponse);
@@ -685,7 +686,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			tryToInvalidateSession(sipSessionKey, false);
 		} else {
 			logger.warn("no application data for this dialog " + dialogTerminatedEvent.getDialog().getDialogId());
-		}
+		}		
+		dialog.setApplicationData(null);
 	}
 
 	/**
@@ -715,13 +717,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 							}
 						}
 						if(logger.isInfoEnabled()) {
-							logger.info("sip session " + sipSessionKey + " is valid ? :" + sipSessionImpl.isValid());
-							if(sipSessionImpl.isValid()) {
+							logger.info("sip session " + sipSessionKey + " is valid ? :" + sipSessionImpl.isValidInternal());
+							if(sipSessionImpl.isValidInternal()) {
 								logger.info("Sip session " + sipSessionKey + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
 							}
 						}
 						sipApplicationSession = sipSessionImpl.getSipApplicationSession();
-						if(sipSessionImpl.isValid() && sipSessionImpl.isReadyToInvalidate()) {				
+						if(sipSessionImpl.isValidInternal() && sipSessionImpl.isReadyToInvalidate()) {				
 							sipSessionImpl.onTerminatedState();
 						}
 					} else {
@@ -737,12 +739,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						
 						if(sipApplicationSession != null) {
 							if(logger.isInfoEnabled()) {
-								logger.info("sip app session " + sipApplicationSessionKey + " is valid ? :" + sipApplicationSession.isValid());
-								if(sipApplicationSession.isValid()) {
+								logger.info("sip app session " + sipApplicationSessionKey + " is valid ? :" + sipApplicationSession.isValidInternal());
+								if(sipApplicationSession.isValidInternal()) {
 									logger.info("Sip app session " + sipApplicationSessionKey + " is ready to be invalidated ? :" + sipApplicationSession.isReadyToInvalidate());
 								}
 							}
-							if(sipApplicationSession.isValid() && sipApplicationSession.isReadyToInvalidate()) {				
+							if(sipApplicationSession.isValidInternal() && sipApplicationSession.isReadyToInvalidate()) {				
 								sipApplicationSession.tryToInvalidate();
 							}							
 						}
@@ -760,8 +762,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @see gov.nist.javax.sip.SipListenerExt#processDialogTimeout(gov.nist.javax.sip.DialogTimeoutEvent)
 	 */
 	public void processDialogTimeout(DialogTimeoutEvent timeoutEvent) {
-		if(timeoutEvent.getReason() == Reason.AckNotReceived) {
-			final Dialog dialog = timeoutEvent.getDialog();
+		final Dialog dialog = timeoutEvent.getDialog();
+		if(timeoutEvent.getReason() == Reason.AckNotReceived) {			
 			TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
 			if(tad != null) {
 				SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
@@ -819,6 +821,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				}
 			}
 		}
+		dialog.setApplicationData(null);
 	}
 	
 	/*
@@ -903,6 +906,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				tryToInvalidateSession(sipSessionKey, false);
 			}
 		}
+		transaction.setApplicationData(null);
 	}
 	
 	/*

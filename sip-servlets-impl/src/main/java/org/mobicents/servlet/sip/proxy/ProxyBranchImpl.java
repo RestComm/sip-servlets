@@ -763,7 +763,7 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 	}	
 	
 	private void checkSessionValidity() {
-		if(this.originalRequest.getSipSession().isValid() && this.originalRequest.getSipSession().getSipApplicationSession().isValid())
+		if(this.originalRequest.getSipSession().isValidInternal() && this.originalRequest.getSipSession().getSipApplicationSession().isValidInternal())
 			return;
 		throw new IllegalStateException("Invalid session.");
 	}

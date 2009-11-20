@@ -44,6 +44,7 @@ import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.Address;
 import javax.sip.address.URI;
+import javax.sip.header.CSeqHeader;
 import javax.sip.header.Header;
 import javax.sip.header.Parameters;
 import javax.sip.header.RouteHeader;
@@ -395,7 +396,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		sipSessionImpl.setRoutingRegion(applicationRouterInfo.getRoutingRegion());
 		sipServletRequest.setRoutingRegion(applicationRouterInfo.getRoutingRegion());		
 		sipSessionImpl.setSipSubscriberURI(sipServletRequest.getSubscriberURI());
-		
+		sipSessionImpl.setCseq(((CSeqHeader)request.getHeader(CSeqHeader.NAME)).getSeqNumber());
 		final InitialDispatchTask dispatchTask = new InitialDispatchTask(sipServletRequest, sipProvider);
 		// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that
 		// the tx serialization is preserved		

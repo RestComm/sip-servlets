@@ -131,6 +131,10 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public boolean isValid() {
 		return getSipSession().isValid();
 	}
+	
+	public boolean isValidInternal() {
+		return getSipSession().isValidInternal();
+	}
 
 	public void removeAttribute(String arg0) {
 		getSipSession().removeAttribute(arg0);

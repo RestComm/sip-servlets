@@ -1557,7 +1557,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 							+ "session with id " + session.getId());
 				}
 
-				if (session.isValid()
+				if (session.isValidInternal()
 						&& (session.isSessionDirty() || session
 								.getMustReplicateTimestamp()) && State.CONFIRMED.equals(session.getState())) {
 					if(logger.isInfoEnabled()) {
@@ -1596,7 +1596,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 							+ "session with id " + session.getId());
 				}
 
-				if (session.isValid()
+				if (session.isValidInternal()
 						&& (session.isSessionDirty() || session
 								.getMustReplicateTimestamp())) {
 					if(logger.isInfoEnabled()) {
@@ -1667,7 +1667,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
    {
       // TODO -- why are we doing this check? The request checks session 
       // validity and will expire the session; this seems redundant
-      if (!session.isValid())
+      if (!session.isValidInternal())
       {
          // Not an error; this can happen if a failover request pulls in an
          // outdated session from the distributed cache (see TODO above)
@@ -1709,9 +1709,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
     */
    private void add(ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session, boolean replicate)
    {
-      // TODO -- why are we doing this check? The request checks session 
-      // validity and will expire the session; this seems redundant
-      if (!session.isValid())
+      if (!session.isValidInternal())
       {
          // Not an error; this can happen if a failover request pulls in an
          // outdated session from the distributed cache (see TODO above)
@@ -1862,7 +1860,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	                  // JBAS-2403. Check for outdated sessions where we think
 	                  // the local copy has timed out.  If found, refresh the
 	                  // session from the cache in case that might change the timeout
-	                  if (session.isOutdated() && !(session.isValid()))
+	                  if (session.isOutdated() && !(session.isValidInternal()))
 	                  {
 	                     // FIXME in AS 5 every time we get a notification from the distributed
 	                     // cache of an update, we get the latest timestamp. So
@@ -1881,7 +1879,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	                  // expire() are meant to be multi-threaded and synchronize
 	                  // properly internally; synchronizing externally can lead
 	                  // to deadlocks!!
-	                  if (!session.isValid()) continue;
+	                  if (!session.isValidInternal()) continue;
 	               }
 	                
 	               // we now have a valid session; store it so we can check later
@@ -1926,10 +1924,10 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	                  {
 	                     // Passivated session needs to be expired. A call to 
 	                     // findSession will bring it out of passivation
-	                     SipSession session = getSipSession(key.getSipSessionKey(), false, getSipFactoryImpl(), getSipApplicationSession(key.getSipApplicationSessionKey(), false));
+	                     MobicentsSipSession session = getSipSession(key.getSipSessionKey(), false, getSipFactoryImpl(), getSipApplicationSession(key.getSipApplicationSessionKey(), false));
 	                     if (session != null)
 	                     {
-	                        session.isValid(); // will expire
+	                        session.isValidInternal(); // will expire
 	                        continue;
 	                     }
 	                  }
@@ -2070,7 +2068,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	                  // JBAS-2403. Check for outdated sessions where we think
 	                  // the local copy has timed out.  If found, refresh the
 	                  // session from the cache in case that might change the timeout
-	                  if (session.isOutdated() && !(session.isValid()))
+	                  if (session.isOutdated() && !(session.isValidInternal()))
 	                  {
 	                     // FIXME in AS 5 every time we get a notification from the distributed
 	                     // cache of an update, we get the latest timestamp. So

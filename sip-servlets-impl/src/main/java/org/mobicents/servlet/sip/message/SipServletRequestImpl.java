@@ -112,7 +112,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		NON_INITIAL_SIP_REQUEST_METHODS.add("PRACK");
 		NON_INITIAL_SIP_REQUEST_METHODS.add("ACK");
 		NON_INITIAL_SIP_REQUEST_METHODS.add("UPDATE");
-		NON_INITIAL_SIP_REQUEST_METHODS.add("INFO");
+		NON_INITIAL_SIP_REQUEST_METHODS.add("INFO");		
 	};
 	
 	/* Linked request (for b2bua) */
@@ -322,7 +322,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 			
 			final SipServletResponseImpl newSipServletResponse = new SipServletResponseImpl(response, super.sipFactoryImpl,
-					validate ? (ServerTransaction) transaction : transaction, session, getDialog());
+					validate ? (ServerTransaction) transaction : transaction, session, getDialog(), false);
 			newSipServletResponse.setOriginalRequest(this);
 			if(!Request.PRACK.equals(requestMethod) && statusCode >= Response.OK && 
 					statusCode <= Response.SESSION_NOT_ACCEPTABLE) {	

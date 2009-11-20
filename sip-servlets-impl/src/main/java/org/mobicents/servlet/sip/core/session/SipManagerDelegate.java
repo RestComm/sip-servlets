@@ -282,7 +282,7 @@ public abstract class SipManagerDelegate {
 			} else {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Original session " + key + " with To Tag " + toTag + 
-							" already has a derived session with following to Tag " + currentKeyToTag  + " - reusing it");
+							" already has a derived session differnt than the following to Tag " + currentKeyToTag  + " - reusing it");
 				}
 			}
 			return derivedSipSession;	

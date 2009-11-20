@@ -85,6 +85,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	private boolean isResponseForwardedUpstream;
 	private boolean isAckGenerated;
 	private boolean isPrackGenerated;
+	//Added for TCK test SipServletResponseTest.testSend101
+	private boolean hasBeenReceived;
 	
 	/**
 	 * Constructor
@@ -100,13 +102,15 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			SipFactoryImpl sipFactoryImpl, 
 			Transaction transaction, 
 			MobicentsSipSession session, 
-			Dialog dialog) {
+			Dialog dialog,
+			boolean hasBeenReceived) {
 		
 		super(response, sipFactoryImpl, transaction, session, dialog);
 		this.response = response;	
 		setProxiedResponse(false);
 		isResponseForwardedUpstream = false;
 		isAckGenerated = false;
+		this.hasBeenReceived = hasBeenReceived;
 	}
 	
 	/**
@@ -413,6 +417,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	public void send(boolean sendReliably) {
 		if(isMessageSent) {
 			throw new IllegalStateException("message already sent");
+		}
+		if(hasBeenReceived) {
+			throw new IllegalStateException("this response was received from downstream");
 		}
 		try {	
 			final int statusCode = response.getStatusCode();

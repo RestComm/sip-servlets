@@ -80,6 +80,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 */
 	public class SipApplicationSessionTimerTask implements Runnable {
 		
+		@SuppressWarnings("unchecked")
 		public void run() {	
 			if(logger.isDebugEnabled()) {
 				logger.debug("initial kick off of SipApplicationSessionTimerTask running for sip application session " + getId());
@@ -92,7 +93,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				if(logger.isDebugEnabled()) {
 					logger.debug("expirationTime is " + expirationTime + 
 							", now is " + now + 
-							" sleeping for " + sleep / 1000 + " seconds");
+							" sleeping for " + sleep / 1000L + " seconds");
 				}
 				expirationTimerTask = new SipApplicationSessionTimerTask();					
 				expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) sipContext.getThreadPoolExecutor().schedule(expirationTimerTask, sleep, TimeUnit.MILLISECONDS);
@@ -107,7 +108,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			//should not be treated as expired.
 			if(getDelay() <= 0) {
 				expired = true;
-				if(isValid()) {					
+				if(isValidInternal()) {					
 					sipContext.enterSipApp(null, null);
 					sipContext.enterSipAppHa(null, null, true, false);
 					try {
@@ -147,7 +148,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected transient ConcurrentHashMap<String, ServletTimer> servletTimers;
 	
-	protected AtomicBoolean isValid;
+	protected transient AtomicBoolean isValidInternal;
+	
+	protected transient boolean isValid;
 	
 	protected boolean invalidateWhenReady = true;
 	
@@ -181,8 +184,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		sipSessions = new CopyOnWriteArraySet<SipSessionKey>();	
 		this.key = key;			
 		lastAccessedTime = creationTime = System.currentTimeMillis();
-		expired = false;		
-		isValid = new AtomicBoolean(true);		
+		expired = false;
+		isValid = true;
+		isValidInternal = new AtomicBoolean(true);		
 		// the sip context can be null if the AR returned an application that was not deployed
 		if(sipContext != null) {
 			this.sipContext = sipContext;
@@ -579,7 +583,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		//When the IllegalStateException is thrown, the application is guaranteed 
 		//that the state of the SipApplicationSession object will be unchanged from its state prior to the invalidate() 
 		//method call. Even session objects that were eligible for invalidation will not have been invalidated.
-		if(!bypassCheck && !isValid.compareAndSet(true, false)) {
+		if(!bypassCheck && !isValidInternal.compareAndSet(true, false)) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		if(logger.isInfoEnabled()) {
@@ -588,7 +592,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		
 		//doing the invalidation
 		for(MobicentsSipSession session: getSipSessions()) {
-			if(session.isValid()) {
+			if(session.isValidInternal()) {
 				session.invalidate();
 			}
 		}
@@ -614,6 +618,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);
 		
+		isValid = false;
 		//cancelling the timers
 		if(servletTimers != null) {
 			for (Map.Entry<String, ServletTimer> servletTimerEntry : servletTimers.entrySet()) {
@@ -710,14 +715,23 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * @see javax.servlet.sip.SipApplicationSession#isValid()
 	 */
 	public boolean isValid() {
-		return isValid.get();
+		return isValid;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession#isValidInternal()
+	 */
+	public boolean isValidInternal() {
+		return isValidInternal.get();
 	}
 
+	
 	/**
 	 * @param isValid the isValid to set
 	 */
 	protected void setValid(boolean isValid) {
-		this.isValid.set(isValid);
+		this.isValidInternal.set(isValid);
 	}
 
 	/*
@@ -1053,9 +1067,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	private void updateReadyToInvalidateState() {
-		if(isValid() && !readyToInvalidate) {
+		if(isValidInternal() && !readyToInvalidate) {
 			for(MobicentsSipSession sipSession : getSipSessions()) {
-				if(sipSession.isValid() && !sipSession.isReadyToInvalidate()) {
+				if(sipSession.isValidInternal() && !sipSession.isReadyToInvalidate()) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Sip Session not ready to be invalidated : " + sipSession.getKey());
 					}
@@ -1095,12 +1109,12 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	public void tryToInvalidate() {
-		if(isValid() && invalidateWhenReady) {
+		if(isValidInternal() && invalidateWhenReady) {
 			notifySipApplicationSessionListeners(SipApplicationSessionEventType.READYTOINVALIDATE);
 			if(readyToInvalidate) {
 				boolean allSipSessionsInvalidated = true;
 				for(MobicentsSipSession sipSession : getSipSessions()) {
-					if(sipSession.isValid()) {
+					if(sipSession.isValidInternal()) {
 						allSipSessionsInvalidated = false;
 						break;
 					}

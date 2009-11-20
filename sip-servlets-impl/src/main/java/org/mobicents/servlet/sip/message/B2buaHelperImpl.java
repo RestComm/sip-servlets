@@ -324,11 +324,10 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		if (session == null) {
 			throw new NullPointerException("Null arg");
 		}
-		if(!session.isValid()) {
-			throw new IllegalArgumentException("session is invalid !");
-		}
-		
 		final MobicentsSipSession sipSession = (MobicentsSipSession) session;
+		if(!sipSession.isValidInternal()) {
+			throw new IllegalArgumentException("sip session " + sipSession.getId() + " is invalid !");
+		}
 		final Transaction trans = sipSession.getSessionCreatingTransaction();				
 		final TransactionApplicationData appData = (TransactionApplicationData) trans.getApplicationData();
 		
@@ -347,10 +346,10 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		if ( session == null) { 
 			throw new NullPointerException("the argument is null");
 		}
-		if(!session.isValid()) {
-			throw new IllegalArgumentException("the session is invalid");
-		}
 		final MobicentsSipSession mobicentsSipSession = (MobicentsSipSession)session;
+		if(!mobicentsSipSession.isValidInternal()) {
+			throw new IllegalArgumentException("the session " + mobicentsSipSession.getId() + " is invalid");
+		}		
 		final SipSessionKey sipSessionKey = this.sessionMap.get(mobicentsSipSession.getKey());
 		if(sipSessionKey == null) {
 			dumpLinkedSessions();
@@ -398,10 +397,11 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	 */
 	public List<SipServletMessage> getPendingMessages(SipSession session,
 			UAMode mode) {
-		if(!session.isValid()) {
-			throw new IllegalArgumentException("the session is invalid!");
-		}
 		final MobicentsSipSession sipSessionImpl = (MobicentsSipSession) session;
+		if(!sipSessionImpl.isValidInternal()) {
+			throw new IllegalArgumentException("the session " + sipSessionImpl.getId() + " is invalid");
+		}	
+		
 		final List<SipServletMessage> retval = new ArrayList<SipServletMessage> ();
 		if (mode.equals(UAMode.UAC)) {
 			final Set<Transaction> ongoingTransactions = sipSessionImpl.getOngoingTransactions();
@@ -454,7 +454,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			throw new NullPointerException("Second argument is null");
 		}
 		
-		if(!session1.isValid() || !session2.isValid() || 
+		if(!((MobicentsSipSession)session1).isValidInternal() || !((MobicentsSipSession)session2).isValidInternal() || 
 				State.TERMINATED.equals(((MobicentsSipSession)session1).getState()) ||
 				State.TERMINATED.equals(((MobicentsSipSession)session2).getState()) ||
 				!session1.getApplicationSession().equals(session2.getApplicationSession()) ||
@@ -488,7 +488,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		final MobicentsSipSession key = (MobicentsSipSession) session;
 		final SipSessionKey sipSessionKey = key.getKey();
 		if(checkSession) {
-			if(!session.isValid() || 
+			if(!((MobicentsSipSession)session).isValidInternal() || 
 					State.TERMINATED.equals(key.getState()) ||
 					sessionMap.get(sipSessionKey) == null) {
 				throw new IllegalArgumentException("the session is not currently linked to another session or it has been terminated");
