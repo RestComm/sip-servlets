@@ -687,7 +687,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		} else {
 			logger.warn("no application data for this dialog " + dialogTerminatedEvent.getDialog().getDialogId());
 		}		
-		dialog.setApplicationData(null);
 	}
 
 	/**
@@ -905,8 +904,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				}
 				tryToInvalidateSession(sipSessionKey, false);
 			}
-		}
-		transaction.setApplicationData(null);
+		}		
 	}
 	
 	/*
@@ -941,8 +939,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(logger.isDebugEnabled()) {
 				logger.debug("TransactionApplicationData not available on the following request " + transaction.getRequest().toString());
 			}
-		}
-		transaction.setApplicationData(null);
+		}		
 	}
 
 	public String getApplicationNameFromHash(String hash) {
