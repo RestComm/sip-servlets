@@ -132,20 +132,42 @@
 		<dependency>
 			<groupId>org.mobicents.tools</groupId>
 			<artifactId>sip-balancer</artifactId>
-			<version>1.0.BETA8-SNAPSHOT</version>
+			<version>1.0.BETA9-SNAPSHOT</version>
 		</dependency>
 		
 		<dependency>			
 			<groupId>org.mobicents.ha.javax.sip</groupId>
 			<artifactId>mobicents-jain-sip-ha-core</artifactId>
-			<version>0.1-SNAPSHOT</version>				
+			<version>0.2-SNAPSHOT</version>				
 		</dependency>
 		
 		<dependency>			
 			<groupId>org.mobicents.ha.javax.sip</groupId>
 			<artifactId>mobicents-jain-sip-jboss4</artifactId>
-			<version>0.1-SNAPSHOT</version>				
+			<version>0.2-SNAPSHOT</version>				
 		</dependency>
+		
+		<!-- clustering deps -->
+		<dependency>
+			<groupId>jboss</groupId>
+			<artifactId>jboss-cache</artifactId>
+			<version>1.4.1.SP5</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>jgroups</groupId>
+			<artifactId>jgroups</artifactId>
+			<version>2.4.1</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>jta</artifactId>
+			<version>1.0.1B</version>
+			<scope>test</scope>
+		</dependency>		
 	</dependencies>
 	<build>
 		<plugins>
