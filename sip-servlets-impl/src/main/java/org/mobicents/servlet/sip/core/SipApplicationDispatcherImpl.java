@@ -939,7 +939,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(logger.isDebugEnabled()) {
 				logger.debug("TransactionApplicationData not available on the following request " + transaction.getRequest().toString());
 			}
-		}		
+		}
+		transaction.setApplicationData(null);
 	}
 
 	public String getApplicationNameFromHash(String hash) {
