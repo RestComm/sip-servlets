@@ -22,38 +22,38 @@
   */
 package org.rhq.plugins.jbossas5.util;
 
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
-import java.io.Serializable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.jboss.deployers.spi.management.KnownDeploymentTypes;
+import org.jboss.managed.api.ComponentType;
 import org.jboss.managed.api.ManagedOperation;
 import org.jboss.managed.api.ManagedParameter;
 import org.jboss.managed.api.ManagedProperty;
-import org.jboss.managed.api.ComponentType;
 import org.jboss.managed.api.annotation.ViewUse;
-import org.jboss.metatype.api.types.MetaType;
 import org.jboss.metatype.api.types.MapCompositeMetaType;
+import org.jboss.metatype.api.types.MetaType;
 import org.jboss.metatype.api.types.SimpleMetaType;
+import org.jboss.metatype.api.values.EnumValue;
 import org.jboss.metatype.api.values.MetaValue;
 import org.jboss.metatype.api.values.SimpleValue;
-import org.jboss.metatype.api.values.EnumValue;
-
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.rhq.core.domain.configuration.Configuration;
 import org.rhq.core.domain.configuration.Property;
 import org.rhq.core.domain.configuration.PropertySimple;
 import org.rhq.core.domain.configuration.definition.ConfigurationDefinition;
+import org.rhq.core.domain.configuration.definition.ConfigurationTemplate;
 import org.rhq.core.domain.configuration.definition.PropertyDefinition;
-import org.rhq.core.domain.configuration.definition.PropertyDefinitionSimple;
-import org.rhq.core.domain.configuration.definition.PropertySimpleType;
 import org.rhq.core.domain.configuration.definition.PropertyDefinitionList;
 import org.rhq.core.domain.configuration.definition.PropertyDefinitionMap;
-import org.rhq.core.domain.configuration.definition.ConfigurationTemplate;
+import org.rhq.core.domain.configuration.definition.PropertyDefinitionSimple;
+import org.rhq.core.domain.configuration.definition.PropertySimpleType;
 import org.rhq.core.domain.measurement.MeasurementDefinition;
 import org.rhq.core.domain.measurement.MeasurementReport;
 import org.rhq.core.domain.measurement.MeasurementScheduleRequest;
@@ -63,10 +63,8 @@ import org.rhq.plugins.jbossas5.adapter.api.MeasurementAdapter;
 import org.rhq.plugins.jbossas5.adapter.api.MeasurementAdapterFactory;
 import org.rhq.plugins.jbossas5.adapter.api.PropertyAdapter;
 import org.rhq.plugins.jbossas5.adapter.api.PropertyAdapterFactory;
-import org.rhq.plugins.jbossas5.ManagedComponentComponent;
-import org.rhq.plugins.jbossas5.AbstractManagedDeploymentComponent;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.rhq.plugins.mobicents.servlet.sip.jboss5.AbstractManagedDeploymentComponent;
+import org.rhq.plugins.mobicents.servlet.sip.jboss5.ManagedComponentComponent;
 
  /**
  * Utility class to convert some basic Profile Service objects to JON objects, and some basic

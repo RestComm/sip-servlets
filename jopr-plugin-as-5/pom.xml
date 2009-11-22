@@ -5,7 +5,7 @@
 	<parent>
         <artifactId>mobicents</artifactId>
         <groupId>org.mobicents</groupId>
-        <version>13-SNAPSHOT</version>
+        <version>1.14-SNAPSHOT</version>
     </parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>jopr-mobicents-sip-servlets-as-5-plugin</artifactId>
@@ -15,12 +15,6 @@
 	<name>Jopr Mobicents Sip Servlets Plugin For JBoss 5</name>
 	<description>A plugin for managing Mobicents Sip Servlets on JBoss 5 servers</description>
 	<repositories>
-		<repository>
-			<id>maven2-repository.dev.java.net</id>
-			<name>Java.net Repository for Maven</name>
-			<url>http://download.java.net/maven/2/</url>
-			<layout>default</layout>
-		</repository>
 		<repository>			
 			<id>JbossRepository</id>
 			<name>Jboss Repository</name>
@@ -46,13 +40,19 @@
 	</repositories>
 	
 	<properties>
-		<jopr-version>2.4.0-SNAPSHOT</jopr-version>
+		<jopr-version>2.2.0.GA</jopr-version>
 		<rhq-version>1.2.0.GA</rhq-version>
         <jboss-man.version>2.1.0.SP1</jboss-man.version>        
 	</properties>
 	
 	<dependencies>
-
+		<dependency>
+            <groupId>org.rhq</groupId>
+            <artifactId>rhq-core-parent</artifactId>
+            <version>${rhq-version}</version>
+	    	<type>pom</type>
+        </dependency>   
+        
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
@@ -67,6 +67,13 @@
 			<version>1.0.4</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>1.4</version>
+			<scope>provided</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>mc4j</groupId>
@@ -74,7 +81,7 @@
 			<version>1.2.5</version>
 		</dependency>
 
-		<dependency>
+		<!--dependency>
 			<groupId>org.jboss.on</groupId>
 		   	<artifactId>jopr-jboss-as-5-plugin</artifactId>
 		   	<version>${jopr-version}</version>
@@ -84,7 +91,7 @@
 			<groupId>org.jboss.on</groupId>
 		   	<artifactId>jopr-tomcat-plugin</artifactId>
 		   	<version>${jopr-version}</version>
-		</dependency>
+		</dependency-->
 		
 		<dependency>
 			<groupId>org.jetbrains</groupId>
