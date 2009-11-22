@@ -636,8 +636,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			logger.error("dropping response, memory is too high or too many messages present in queues");
 			return;
 		}
-		if(logger.isInfoEnabled()) {
-			logger.info("Response " + responseEvent.getResponse().toString());
+		if(logger.isDebugEnabled()) {
+			logger.debug("Response " + responseEvent.getResponse().toString());
 		}
 		final Response response = responseEvent.getResponse();
 		final CSeqHeader cSeqHeader = (CSeqHeader)response.getHeader(CSeqHeader.NAME);
@@ -675,8 +675,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @see javax.sip.SipListener#processDialogTerminated(javax.sip.DialogTerminatedEvent)
 	 */
 	public void processDialogTerminated(DialogTerminatedEvent dialogTerminatedEvent) {
-		if(logger.isInfoEnabled()) {
-			logger.info("Dialog Terminated => " + dialogTerminatedEvent.getDialog().getCallId().getCallId());
+		if(logger.isDebugEnabled()) {
+			logger.debug("Dialog Terminated => " + dialogTerminatedEvent.getDialog().getCallId().getCallId());
 		}
 		Dialog dialog = dialogTerminatedEvent.getDialog();		
 		TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
@@ -684,8 +684,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
 			SipSessionKey sipSessionKey = sipServletMessageImpl.getSipSessionKey();
 			tryToInvalidateSession(sipSessionKey, false);
-		} else {
-			logger.warn("no application data for this dialog " + dialogTerminatedEvent.getDialog().getDialogId());
+		} else {	
+			if(logger.isDebugEnabled()) {
+				logger.debug("no application data for this dialog " + dialogTerminatedEvent.getDialog().getDialogId());
+			}
 		}		
 	}
 
@@ -715,10 +717,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 								}
 							}
 						}
-						if(logger.isInfoEnabled()) {
-							logger.info("sip session " + sipSessionKey + " is valid ? :" + sipSessionImpl.isValidInternal());
+						if(logger.isDebugEnabled()) {
+							logger.debug("sip session " + sipSessionKey + " is valid ? :" + sipSessionImpl.isValidInternal());
 							if(sipSessionImpl.isValidInternal()) {
-								logger.info("Sip session " + sipSessionKey + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
+								logger.debug("Sip session " + sipSessionKey + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
 							}
 						}
 						sipApplicationSession = sipSessionImpl.getSipApplicationSession();
@@ -726,8 +728,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 							sipSessionImpl.onTerminatedState();
 						}
 					} else {
-						if(logger.isInfoEnabled()) {
-							logger.info("sip session already invalidated" + sipSessionKey);
+						if(logger.isDebugEnabled()) {
+							logger.debug("sip session already invalidated" + sipSessionKey);
 						}
 					}										
 					if(sipApplicationSession == null) {
@@ -737,10 +739,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
 						
 						if(sipApplicationSession != null) {
-							if(logger.isInfoEnabled()) {
-								logger.info("sip app session " + sipApplicationSessionKey + " is valid ? :" + sipApplicationSession.isValidInternal());
+							if(logger.isDebugEnabled()) {
+								logger.debug("sip app session " + sipApplicationSessionKey + " is valid ? :" + sipApplicationSession.isValidInternal());
 								if(sipApplicationSession.isValidInternal()) {
-									logger.info("Sip app session " + sipApplicationSessionKey + " is ready to be invalidated ? :" + sipApplicationSession.isReadyToInvalidate());
+									logger.debug("Sip app session " + sipApplicationSessionKey + " is ready to be invalidated ? :" + sipApplicationSession.isReadyToInvalidate());
 								}
 							}
 							if(sipApplicationSession.isValidInternal() && sipApplicationSession.isReadyToInvalidate()) {				
@@ -772,8 +774,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					//notifying SipErrorListener that no ACK has been received for a UAS only
 					SipServletResponseImpl lastFinalResponse = (SipServletResponseImpl)
 						((SipServletRequestImpl)sipServletMessage).getLastInformationalResponse();
-					if(logger.isInfoEnabled()) {
-						logger.info("last Final Response" + lastFinalResponse);
+					if(logger.isDebugEnabled()) {
+						logger.debug("last Final Response" + lastFinalResponse);
 					}
 					ProxyImpl proxy = sipSession.getProxy();
 					if(sipServletMessage instanceof SipServletRequestImpl &&
@@ -795,8 +797,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					}
 					SipServletResponseImpl lastInfoResponse = (SipServletResponseImpl)
 						((SipServletRequestImpl)sipServletMessage).getLastInformationalResponse();
-					if(logger.isInfoEnabled()) {
-						logger.info("last Informational Response" + lastInfoResponse);
+					if(logger.isDebugEnabled()) {
+						logger.debug("last Informational Response" + lastInfoResponse);
 					}
 					if(sipServletMessage instanceof SipServletRequestImpl &&
 							proxy == null &&
@@ -834,8 +836,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		} else {
 			transaction = timeoutEvent.getClientTransaction();
 		}
-		if(logger.isInfoEnabled()) {
-			logger.info("transaction " + transaction + " timed out => " + transaction.getRequest().toString());
+		if(logger.isDebugEnabled()) {
+			logger.debug("transaction " + transaction + " timed out => " + transaction.getRequest().toString());
 		}
 		
 		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
@@ -859,8 +861,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				//notifying SipErrorListener that no ACK has been received for a UAS only
 				SipServletResponseImpl lastFinalResponse = (SipServletResponseImpl)
 					((SipServletRequestImpl)sipServletMessage).getLastInformationalResponse();
-				if(logger.isInfoEnabled()) {
-					logger.info("last Final Response" + lastFinalResponse);
+				if(logger.isDebugEnabled()) {
+					logger.debug("last Final Response" + lastFinalResponse);
 				}
 				ProxyImpl proxy = sipSession.getProxy();
 				if(sipServletMessage instanceof SipServletRequestImpl &&
@@ -882,8 +884,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				}
 				SipServletResponseImpl lastInfoResponse = (SipServletResponseImpl)
 					((SipServletRequestImpl)sipServletMessage).getLastInformationalResponse();
-				if(logger.isInfoEnabled()) {
-					logger.info("last Informational Response" + lastInfoResponse);
+				if(logger.isDebugEnabled()) {
+					logger.debug("last Informational Response" + lastInfoResponse);
 				}
 				if(sipServletMessage instanceof SipServletRequestImpl &&
 						proxy == null &&
@@ -918,7 +920,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		} else {
 			transaction = transactionTerminatedEvent.getClientTransaction();
 		}
-		if(logger.isInfoEnabled()) {
+		if(logger.isDebugEnabled()) {
 			logger.info("transaction " + transaction + " terminated => " + transaction.getRequest().toString());
 		}		
 		
@@ -927,8 +929,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
 			SipSessionKey sipSessionKey = sipServletMessageImpl.getSipSessionKey();
 			if(sipSessionKey == null) {
-				if(logger.isInfoEnabled()) {
-					logger.info("no sip session were returned for this key " + sipServletMessageImpl.getSipSessionKey() + " and message " + sipServletMessageImpl);
+				if(logger.isDebugEnabled()) {
+					logger.debug("no sip session were returned for this key " + sipServletMessageImpl.getSipSessionKey() + " and message " + sipServletMessageImpl);
 				}
 			} else {
 				// If it is a client transaction, do not kill the proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
@@ -1518,7 +1520,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @param info
 	 */
 	public void sendSwitchoverInstruction(String fromJvmRoute, String toJvmRoute) {
-		logger.info("switching over from " + fromJvmRoute + " to " + toJvmRoute);
+		if(logger.isDebugEnabled()) {
+			logger.debug("switching over from " + fromJvmRoute + " to " + toJvmRoute);
+		}
 		if(fromJvmRoute == null || toJvmRoute == null) {
 			return;
 		}
