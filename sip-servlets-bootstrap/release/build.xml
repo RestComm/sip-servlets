@@ -81,6 +81,10 @@
 			<param name="management.deploy.folder" value="${tomcat.home}/webapps" />
 		</antcall>
 		
+		<mkdir dir="${tomcat.home}/docs" />
+		<antcall target="build-documentation">
+			<param name="jboss.home" value="${tomcat.home}"/>
+		</antcall>
 		<antcall target="make-final-zip-tomcat" />
 	</target>
 	
