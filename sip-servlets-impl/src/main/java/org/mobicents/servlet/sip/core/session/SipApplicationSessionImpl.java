@@ -1091,7 +1091,6 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 					logger.debug("All sip sessions and http session are ready to be invalidated, no timers alive, can invalidate this application session " + key);
 				}
 				this.readyToInvalidate = true;
-				tryToInvalidate();
 			} else {
 				if(logger.isDebugEnabled()) {
 					logger.debug(servletTimers.size() + " Timers still alive, cannot invalidate this application session " + key);
@@ -1102,7 +1101,6 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				logger.debug("Sip application session already invalidated "+ key);
 			}
 			this.readyToInvalidate = true;
-			tryToInvalidate();
 		}
 	}
 	

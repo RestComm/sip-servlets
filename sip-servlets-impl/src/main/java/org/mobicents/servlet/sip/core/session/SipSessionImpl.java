@@ -823,11 +823,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 		sipSessionAttributeMap = null;
 //		key = null;
 		if(sessionCreatingDialog != null) {
-			sessionCreatingDialog.setApplicationData(null);
+//			sessionCreatingDialog.setApplicationData(null);
 			sessionCreatingDialog = null;
 		}
 		if(sessionCreatingTransaction != null) {
-			sessionCreatingTransaction.setApplicationData(null);
+//			sessionCreatingTransaction.setApplicationData(null);
 			sessionCreatingTransaction = null;
 		}
 		proxy = null;
