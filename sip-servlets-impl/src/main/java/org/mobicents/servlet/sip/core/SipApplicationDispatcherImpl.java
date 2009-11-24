@@ -663,7 +663,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				true);
 		try {		
 			messageDispatcherFactory.getResponseDispatcher(sipServletResponse, this).
-				dispatchMessage(null, sipServletResponse);
+				dispatchMessage(((SipProvider)responseEvent.getSource()), sipServletResponse);
 		} catch (Throwable e) {
 			logger.error("An unexpected exception happened while routing the response " +  sipServletResponse, e);
 			return;
