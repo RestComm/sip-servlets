@@ -2076,7 +2076,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			}
 		} else {
 			//remove the dialog from the local stacks 
-			session.getSessionCreatingDialog().delete();
+			if(session.getSessionCreatingDialog() != null) {
+				session.getSessionCreatingDialog().delete();
+			}
 			
 			// Expire the session
 			// DON'T SYNCHRONIZE ON SESSION HERE -- isValid() and
