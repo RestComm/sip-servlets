@@ -153,10 +153,10 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.toString());
 		
-		SipSession originalSession =   
-		    helper.getLinkedSession(sipServletResponse.getSession());		
+//		SipSession originalSession =   
+//		    helper.getLinkedSession(sipServletResponse.getSession());		
 		//if this is a response to an INVITE we ack it and forward the OK 
-		if(originalSession!= null && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
+		if("INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
 			SipServletRequest ackRequest = sipServletResponse.createAck();
 			logger.info("Sending " +  ackRequest);
 			ackRequest.send();
@@ -168,7 +168,7 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 			if(sipServletResponse.getContent() != null && sipServletResponse.getContentType() != null)
 				responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
 			responseToOriginalRequest.send();
-		}			
+		} 
 	}
 	
 	@Override
