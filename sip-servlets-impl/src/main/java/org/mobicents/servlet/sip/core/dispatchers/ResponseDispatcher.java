@@ -221,8 +221,6 @@ public class ResponseDispatcher extends MessageDispatcher {
 							}
 							
 							if(session.getProxy() != null) {
-								// TODO: FIXME: On retrans - we get null transaction from JSIP thus we lose the info about the
-								// proxy branch. Figure out a way to do the mapping.
 								
 								// the final Application data is null meaning that the CTX was null, so it's a retransmission
 								if(proxyBranch == null) {
@@ -233,6 +231,15 @@ public class ResponseDispatcher extends MessageDispatcher {
 									SIPTransaction tx = ((SipStackImpl)sipProvider.getSipStack()).findTransaction((SIPMessage) response, false);
 									if(tx != null) {
 										TransactionApplicationData tad = (TransactionApplicationData) tx.getApplicationData();
+										if(tad == null) {
+											if(logger.isDebugEnabled()) {
+												logger.debug("Attempting to recover lost transaction app data for " + branch);
+											}
+											tad = (TransactionApplicationData) session.getProxy().getTransactionMap().get(branch);
+											if(logger.isDebugEnabled()) {
+												if(tad != null) logger.debug("Sucessfully recovered app data for " + branch + " " + tad);
+											}
+										}
 										if(tad != null) {
 											proxyBranch = tad.getProxyBranch();
 											logger.debug("A proxy response retransmission was able to recover the transaction application data");

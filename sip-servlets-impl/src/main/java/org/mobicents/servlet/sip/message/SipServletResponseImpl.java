@@ -50,6 +50,7 @@ import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RequireHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SupportedHeader;
+import javax.sip.header.ViaHeader;
 import javax.sip.header.WWWAuthenticateHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -467,6 +468,19 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			}
 			if(logger.isDebugEnabled()) {
 				logger.debug("sending response "+ this.message);
+			}
+			if(originalRequest == null && session.getProxy() != null) {
+				String txid = ((ViaHeader) message.getHeader(ViaHeader.NAME)).getBranch();
+				TransactionApplicationData tad = (TransactionApplicationData) session.getProxy().getTransactionMap().get(txid);
+				if(logger.isDebugEnabled()) {
+					logger.debug("OTrying to recover lost transaction for proxy: " + txid);
+				}
+				if(tad != null) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Recovering lost transaction from the proxy transaction map is succesful: " + txid);
+					}
+					originalRequest = (SipServletRequestImpl) tad.getSipServletMessage();
+				}
 			}
 			//if a response is sent for an initial request, it means that the application
 			//acted as an endpoint so a dialog must be created but only for dialog creating method

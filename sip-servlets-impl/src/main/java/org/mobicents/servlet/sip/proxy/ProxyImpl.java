@@ -25,6 +25,7 @@ import java.io.ObjectOutput;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -82,6 +83,8 @@ public class ProxyImpl implements Proxy, Externalizable {
 	// clustering : will be recreated when loaded from the cache
 	private transient ProxyUtils proxyUtils;
 	
+	transient HashMap<String, Object> transactionMap = new HashMap<String, Object>();
+	
 	private transient Map<URI, ProxyBranch> proxyBranches;
 	private boolean started; 
 	private boolean ackReceived = false;
@@ -110,6 +113,10 @@ public class ProxyImpl implements Proxy, Externalizable {
 		this.outboundInterface = ((MobicentsSipSession)request.getSession()).getOutboundInterface();
 		this.callerFromHeader = request.getFrom().toString();
 		this.previousNode = extractPreviousNodeFromRequest(request);
+		String txid = ((ViaHeader) request.getMessage().getHeader(ViaHeader.NAME)).getBranch();
+		if(originalRequest.getTransactionApplicationData() != null) {
+			this.transactionMap.put(txid, originalRequest.getTransactionApplicationData());
+		}
 	}
 	
 	/*
@@ -553,6 +560,7 @@ public class ProxyImpl implements Proxy, Externalizable {
 					if(logger.isDebugEnabled())
 						logger.debug("Trying new branch in proxy" );
 					startNextUntriedBranch();
+					branch.onBranchTerminated();
 				}
 			}
 		}
@@ -572,6 +580,7 @@ public class ProxyImpl implements Proxy, Externalizable {
 			{
 				branch.cancel();
 				startNextUntriedBranch();
+				branch.onBranchTerminated();
 			}
 		}
 	}
@@ -633,13 +642,18 @@ public class ProxyImpl implements Proxy, Externalizable {
 			
 		if(logger.isDebugEnabled())
 					logger.debug("Proxy branch has NOT timed out");
-	
-		
+
 		//Otherwise proceed with proxying the response
 		SipServletResponseImpl proxiedResponse = 
 			getProxyUtils().createProxiedResponse(response, proxyBranch);
 		
-		if(proxiedResponse.getRequest() != null) {
+
+		if(proxiedResponse.getMessage() == null) {
+			return;// drop out of order message
+		}
+		
+		
+		if(originalRequest != null && proxiedResponse.getRequest() != null) {
 			if(logger.isDebugEnabled())
 					logger.debug("Response was dropped because getProxyUtils().createProxiedResponse(response, proxyBranch) returned null");
 			// non retransmission case
@@ -772,6 +786,10 @@ public class ProxyImpl implements Proxy, Externalizable {
 
 	public void setCallerFromHeader(String initiatorFromHeader) {
 		this.callerFromHeader = initiatorFromHeader;
+	}
+
+	public HashMap<String, Object> getTransactionMap() {
+		return transactionMap;
 	}
 
 	public void readExternal(ObjectInput in) throws IOException,

@@ -142,6 +142,7 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 	 */
 	public void cancel(String[] protocol, int[] reasonCode, String[] reasonText) {
 		if(proxy.getAckReceived()) throw new IllegalStateException("There has been an ACK received on this branch. Can not cancel.");
+		
 		try {			
 			cancelTimer();
 			if(this.isStarted() && !canceled && !timedOut &&
@@ -186,6 +187,17 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		}
 		catch(Exception e) {
 			throw new IllegalStateException("Failed canceling proxy branch", e);
+		} finally {
+			onBranchTerminated();
+		}
+			
+	}
+	
+	// This will be called when we are sure this branch will not succeed and we moved on to other branches.
+	public void onBranchTerminated() {
+		if(outgoingRequest != null) {
+			String txid = ((ViaHeader) outgoingRequest.getMessage().getHeader(ViaHeader.NAME)).getBranch();
+			proxy.getTransactionMap().remove(txid);
 		}
 	}
 	
@@ -364,6 +376,10 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		}
 		clonedRequest.getTransactionApplicationData().setProxyBranch(this);			
 		clonedRequest.send();
+		String txid = ((ViaHeader) clonedRequest.getMessage().getHeader(ViaHeader.NAME)).getBranch();
+		if(clonedRequest.getTransactionApplicationData() != null) {
+			proxy.transactionMap.put(txid, clonedRequest.getTransactionApplicationData());
+		}
 	}
 	
 	/**

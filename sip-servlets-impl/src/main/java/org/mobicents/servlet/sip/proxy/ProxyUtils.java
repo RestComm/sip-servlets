@@ -253,7 +253,8 @@ public class ProxyUtils {
 		}
 		
 		SipServletResponseImpl newServletResponseImpl = null;
-		if(sipServetResponse.getTransaction() != null) {
+		
+		if(sipServetResponse.getTransaction() != null && originalRequest != null) {
 			// non retransmission case
 			newServletResponseImpl = new SipServletResponseImpl(clonedResponse,		
 					sipFactoryImpl,
