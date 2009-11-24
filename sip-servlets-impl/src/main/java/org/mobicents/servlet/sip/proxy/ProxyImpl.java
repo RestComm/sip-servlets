@@ -789,7 +789,9 @@ public class ProxyImpl implements Proxy, Externalizable {
 		ackReceived = in.readBoolean();
 		tryingSent = in.readBoolean();
 		finalBranchForSubsequentRequests = (ProxyBranchImpl) in.readObject();
-		finalBranchForSubsequentRequests.setProxy(this);
+		if(finalBranchForSubsequentRequests != null) {
+			finalBranchForSubsequentRequests.setProxy(this);
+		}
 		previousNode = (SipURI) in.readObject();
 		callerFromHeader = in.readUTF();
 	}
