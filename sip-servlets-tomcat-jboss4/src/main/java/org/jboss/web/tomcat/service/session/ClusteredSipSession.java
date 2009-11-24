@@ -648,9 +648,9 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	 * Overrides the {@link StandardSession#isValid() superclass method} to call @
 	 * #isValid(boolean) isValid(true)} .
 	 */
-	public boolean isValid() {
-		return isValid(true);
-	}
+//	public boolean isValid() {
+//		return isValid(true);
+//	}
 
 	/**
 	 * Returns whether the current session is still valid, but only calls
@@ -661,19 +661,19 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	 *            <code>true</code> if sessions that have been timed out should
 	 *            be expired
 	 */
-	public boolean isValid(boolean expireIfInvalid) {
+//	public boolean isValid(boolean expireIfInvalid) {
 //		if (this.expiring) {
 //			return true;
 //		}
-		return super.isValid();
+//		return super.isValid();
 //		if (!isValid) {
 //			return false;
 //		}
-
+//
 //		if (ACTIVITY_CHECK && accessCount.get() > 0) {
 //			return true;
 //		}
-
+//
 //		if (maxInactiveInterval >= 0) {
 //			long timeNow = System.currentTimeMillis();
 //			int timeIdle = (int) ((timeNow - thisAccessedTime) / 1000L);
@@ -684,10 +684,10 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 //					return false;
 //			}
 //		}
-
+//
 //		return isValid;
-
-	}
+//
+//	}
 
 	/**
 	 * Expires the session, but in such a way that other cluster nodes are
