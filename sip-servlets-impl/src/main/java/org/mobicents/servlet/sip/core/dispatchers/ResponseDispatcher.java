@@ -78,8 +78,8 @@ public class ResponseDispatcher extends MessageDispatcher {
 		final Response response = sipServletResponse.getResponse();
 		final ListIterator<ViaHeader> viaHeaders = response.getHeaders(ViaHeader.NAME);				
 		final ViaHeader viaHeader = viaHeaders.next();
-		if(logger.isInfoEnabled()) {
-			logger.info("viaHeader = " + viaHeader.toString());
+		if(logger.isDebugEnabled()) {
+			logger.debug("viaHeader = " + viaHeader.toString());
 		}
 		//response meant for the container
 		if(!sipApplicationDispatcher.isViaHeaderExternal(viaHeader)) {

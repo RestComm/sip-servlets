@@ -206,8 +206,8 @@ public abstract class MessageDispatcher {
 		final SipContext sipContext = sipApplicationSessionImpl.getSipContext();
 		final Wrapper sipServletImpl = (Wrapper) sipContext.findChild(sessionHandler);
 		if(sipServletImpl != null) {
-			if(logger.isInfoEnabled()) {
-				logger.info("Dispatching request " + request.toString() + 
+			if(logger.isDebugEnabled()) {
+				logger.debug("Dispatching request " + request.toString() + 
 					" to following App/servlet => " + session.getKey().getApplicationName()+ 
 					"/" + session.getHandler() + " on following sip session " + session.getId());
 			}
@@ -233,8 +233,8 @@ public abstract class MessageDispatcher {
 			}
 		} else if(sipContext.getSipRubyController() != null) {
 			//handling the ruby case
-			if(logger.isInfoEnabled()) {
-				logger.info("Dispatching request " + request.toString() + 
+			if(logger.isDebugEnabled()) {
+				logger.debug("Dispatching request " + request.toString() + 
 					" to following App/ruby controller => " + request.getSipSession().getKey().getApplicationName()+ 
 					"/" + sipContext.getSipRubyController().getName());
 			}
@@ -258,8 +258,8 @@ public abstract class MessageDispatcher {
 		if(sipServletImpl == null || sipServletImpl.isUnavailable()) {
 			if(sipContext.getSipRubyController() != null) {
 				//handling the ruby case	
-				if(logger.isInfoEnabled()) {
-					logger.info("Dispatching response " + response.toString() + 
+				if(logger.isDebugEnabled()) {
+					logger.debug("Dispatching response " + response.toString() + 
 						" to following App/ruby controller => " + response.getSipSession().getKey().getApplicationName()+ 
 						"/" + sipContext.getSipRubyController().getName());
 				}
@@ -272,8 +272,8 @@ public abstract class MessageDispatcher {
 			}
 		} else {
 			final Servlet servlet = sipServletImpl.allocate();
-			if(logger.isInfoEnabled()) {
-				logger.info("Dispatching response " + response.toString() + 
+			if(logger.isDebugEnabled()) {
+				logger.debug("Dispatching response " + response.toString() + 
 					" to following App/servlet => " + session.getKey().getApplicationName()+ 
 					"/" + session.getHandler() + " on following sip session " + session.getId());
 			}
