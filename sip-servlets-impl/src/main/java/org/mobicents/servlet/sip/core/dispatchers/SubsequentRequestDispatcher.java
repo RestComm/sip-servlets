@@ -291,6 +291,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					final ProxyImpl proxy = sipSession.getProxy();
 					if(proxy != null) {
 						final ProxyBranchImpl finalBranch = proxy.getFinalBranchForSubsequentRequests();
+						boolean isPrack = requestMethod.equalsIgnoreCase(Request.PRACK);
 						if(finalBranch != null) {								
 							proxy.setAckReceived(requestMethod.equalsIgnoreCase(Request.ACK));
 							proxy.setOriginalRequest(sipServletRequest);
@@ -298,7 +299,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 								callServlet(sipServletRequest);
 
 							finalBranch.proxySubsequentRequest(sipServletRequest);
-						} else if(requestMethod.equals(Request.PRACK)) {
+						} else if(isPrack) {
 							callServlet(sipServletRequest);
 							List<ProxyBranch> branches = proxy.getProxyBranches();
 							for(ProxyBranch pb : branches) {
@@ -308,6 +309,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 									proxyBranch.setWaitingForPrack(false);
 								}
 							}
+						} else {
+							logger.warn("Final branch is null, this will probably result in a lost call \n" + request, new
+									RuntimeException("Final branch is null"));
 						}
 					}
 					// If it's not for a proxy then it's just an AR, so go to the next application
