@@ -228,27 +228,24 @@ public class ResponseDispatcher extends MessageDispatcher {
 								}
 								
 								if(proxyBranch == null) {
-									SIPTransaction tx = ((SipStackImpl)sipProvider.getSipStack()).findTransaction((SIPMessage) response, false);
-									if(tx != null) {
-										TransactionApplicationData tad = (TransactionApplicationData) tx.getApplicationData();
-										if(tad == null) {
-											if(logger.isDebugEnabled()) {
-												logger.debug("Attempting to recover lost transaction app data for " + branch);
-											}
-											tad = (TransactionApplicationData) session.getProxy().getTransactionMap().get(branch);
-											if(logger.isDebugEnabled()) {
-												if(tad != null) logger.debug("Sucessfully recovered app data for " + branch + " " + tad);
-											}
-										}
-										if(tad != null) {
-											proxyBranch = tad.getProxyBranch();
-											logger.debug("A proxy response retransmission was able to recover the transaction application data");
+									if(logger.isDebugEnabled()) {
+										logger.debug("Attempting to recover lost transaction app data for " + branch);
+									}
+									//String txid = ((ViaHeader)response.getHeader(ViaHeader.NAME)).getBranch();
+									TransactionApplicationData tad = (TransactionApplicationData) 
+										session.getProxy().getTransactionMap().get(branch);
+
+									if(tad != null) {
+
+										proxyBranch = tad.getProxyBranch();
+										if(logger.isDebugEnabled()) {
+											logger.debug("Sucessfully recovered app data for " + branch + " " + tad);
 										}
 									}
 								}
 								
 								if(proxyBranch == null) {
-									logger.debug("A proxy retransmission has arrived without knowing which proxybranch to use (tx data lost)");
+									logger.warn("A proxy retransmission has arrived without knowing which proxybranch to use (tx data lost)");
 									if(session.getProxy().getSupervised() && response.getStatusCode() != Response.TRYING) {
 										callServlet(sipServletResponse);
 									}

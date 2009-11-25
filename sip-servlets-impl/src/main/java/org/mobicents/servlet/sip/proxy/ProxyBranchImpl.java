@@ -646,10 +646,14 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 	 */
 	public void onTimeout()
 	{
-		this.cancel();
-		this.timedOut = true;
-		// Just do a timeout response
-		proxy.onBranchTimeOut(this);
+		if(!proxy.getAckReceived()) {
+			this.cancel();
+			this.timedOut = true;
+			// Just do a timeout response
+			proxy.onBranchTimeOut(this);
+		} else {
+			logger.debug("ACKed proxybranch has timeout");
+		}
 	}
 	
 	/**
