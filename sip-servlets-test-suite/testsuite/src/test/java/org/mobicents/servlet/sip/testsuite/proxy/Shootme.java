@@ -73,6 +73,8 @@ public class Shootme implements SipListener {
 	protected ServerTransaction inviteTid;
 
 	private Response okResponse;
+	
+	private Response ringingResponse;
 
 	private Request inviteRequest;
 
@@ -187,21 +189,43 @@ public class Shootme implements SipListener {
 
 	public void processResponse(ResponseEvent responseEvent) {
 	}
-
+	
+	public int retrans = -1;
+	public boolean scrambleResponses = false;
 	/**
 	 * Process the ACK request. Send the bye and complete the call flow.
 	 */
 	public void processAck(RequestEvent requestEvent,
 			ServerTransaction serverTransaction) {
 		try {
-			System.out.println("shootme: got an ACK! ");
-			System.out.println("Dialog State = " + dialog.getState());
-			SipProvider provider = (SipProvider) requestEvent.getSource();
-			if (!callerSendsBye) {
-				Request byeRequest = dialog.createRequest(Request.BYE);
-				ClientTransaction ct = provider
-						.getNewClientTransaction(byeRequest);
-				dialog.sendRequest(ct);
+			if(retrans >= 0 && retrans <4) {
+				new Timer().scheduleAtFixedRate(new TimerTask(){
+					public void run() {
+						if(retrans >= 0 && retrans <4) {
+							retrans ++;
+							try {
+								sipProvider.sendResponse(okResponse);
+								if(scrambleResponses) {
+									sipProvider.sendResponse(ringingResponse);
+								}
+							} catch (Exception e) {
+								e.printStackTrace();
+								System.exit(0);
+							}
+						}
+					}
+				}, 0, 1000);
+				
+			} else {
+				System.out.println("shootme: got an ACK! ");
+				System.out.println("Dialog State = " + dialog.getState());
+				SipProvider provider = (SipProvider) requestEvent.getSource();
+				if (!callerSendsBye) {
+					Request byeRequest = dialog.createRequest(Request.BYE);
+					ClientTransaction ct = provider
+					.getNewClientTransaction(byeRequest);
+					dialog.sendRequest(ct);
+				}
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -227,6 +251,8 @@ public class Shootme implements SipListener {
 			if(!usePrack) response = messageFactory.createResponse(Response.RINGING,
 					request);
 			else response = serverTransaction.getDialog().createReliableProvisionalResponse(180);
+			
+			ringingResponse = response;
 			String toTag = Integer.toString((int) (Math.random()*10000000));
 			ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
 			toHeader.setTag(toTag); // Application is supposed to set.
