@@ -2,26 +2,27 @@
 <project name="ant.file.mobicents.sip-servlets.examples.build.mms" default="checkout-and-install" basedir=".">
 
 	<property name="external-modules-checkout-mms" value="${ant.file.mobicents.sip-servlets.examples.build.mms}/../mms" />
-
+	<property name="node" value="default" />
+	
 	<condition property="mvn.executable" value="${sys.M2_HOME}\bin\mvn.bat" else="mvn">
 		<os family="windows" />
 	</condition>
 
 	<target name="checkout">
 		<echo>Checking out Mobicents Media Server</echo>
-		<exec executable="${mvn.executable}" dir="${ant.file.mobicents.all.release}/../">
+		<exec executable="${mvn.executable}" dir="${ant.file.mobicents.sip-servlets.examples.build.mms}/../">
 			<arg line="-f external-components-checkout.xml validate" />
 		</exec>
 	</target>
 
 	<target name="install">
         <echo>Building Media Server core</echo>
-        <exec executable="${mvn.executable}" dir="${ant.file.mobicents.all.release}/../">
-            <arg line="-f target/mms/core/pom.xml clean install" />
+        <exec executable="${mvn.executable}" dir="${ant.file.mobicents.sip-servlets.examples.build.mms}/../">
+            <arg line="-f target/mms/core/pom.xml clean install -Dnode=${node}" />
         </exec>
         <echo>Building Media Server controllers</echo>
-        <exec executable="${mvn.executable}" dir="${ant.file.mobicents.all.release}/../">
-            <arg line="-f target/mms/controllers/pom.xml clean install" />
+        <exec executable="${mvn.executable}" dir="${ant.file.mobicents.sip-servlets.examples.build.mms}/../">
+            <arg line="-f target/mms/controllers/pom.xml clean install -Dnode=${node}" />
         </exec>
 	</target>
 

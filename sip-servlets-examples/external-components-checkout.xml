@@ -10,7 +10,7 @@
 	<version>0.6-SNAPSHOT</version>
 	
         <properties>
-        <checkout.basedir>${basedir}/target/mss/</checkout.basedir>
+        <checkout.basedir>${basedir}/target/mms/</checkout.basedir>
         <checkout.username>mobicents-read-only</checkout.username>
         <checkout.password></checkout.password>
         
