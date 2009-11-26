@@ -310,8 +310,11 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 								}
 							}
 						} else {
-							logger.warn("Final branch is null, this will probably result in a lost call \n" + request, new
-									RuntimeException("Final branch is null"));
+							logger.warn("Final branch is null, enable debug for more information.");
+							if(logger.isDebugEnabled()) {
+								logger.debug("Final branch is null, this will probably result in a lost call or request. Here is the request:\n" + request, new
+										RuntimeException("Final branch is null"));
+							}
 						}
 					}
 					// If it's not for a proxy then it's just an AR, so go to the next application
