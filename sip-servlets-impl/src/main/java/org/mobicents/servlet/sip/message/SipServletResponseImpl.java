@@ -546,8 +546,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				isResponseForwardedUpstream = true;
 			}			
 		} catch (Exception e) {			
-			logger.error("an exception occured when sending the response", e);
-			throw new IllegalStateException(e);
+			throw new IllegalStateException("an exception occured when sending the response", e);
 		}
 	}
 	/*
