@@ -31,7 +31,7 @@
     
     <context-param>
       <param-name>caller.password</param-name>
-      <param-value>311578</param-value>
+      <param-value>XXXXXX</param-value>
     </context-param>
 	
 	<!-- Uncomment to enable security
