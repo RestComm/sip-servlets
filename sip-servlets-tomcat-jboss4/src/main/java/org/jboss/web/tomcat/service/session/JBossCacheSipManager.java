@@ -74,7 +74,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * 
  */
 public class JBossCacheSipManager extends JBossCacheManager implements
-		DistributableSipManager {
+		DistributableSipManager, JBossCacheSipManagerMBean {
 
 	/**
      * The descriptive information about this implementation.
@@ -165,6 +165,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 
 	private int maxUnreplicatedInterval_ = WebMetaData.DEFAULT_MAX_UNREPLICATED_INTERVAL;
 	
+	protected ObjectName oname;
+	
 	// ---------------------------------------------------------- Constructors
 
 	public JBossCacheSipManager() {
@@ -202,7 +204,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		try {
 			// Give this manager a name
 			objectName_ = new ObjectName(
-					"jboss.web:service=ClusterManager,WebModule=" + name);
+					"jboss.web:service=ClusterSipManager,WebModule=" + name);
 		} catch (Throwable e) {
 			log_.error("Could not create ObjectName", e);
 			throw new ClusteringNotSupportedException(e.toString());
@@ -2265,6 +2267,44 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			throw new LifecycleException(e);
 		}
 	}
+	
+	@Override
+	protected void startManager() throws LifecycleException {
+		super.startManager();
+		MBeanServer server = MBeanServerLocator.locateJBoss();
+		String domain;
+		if (container_ instanceof ContainerBase) {
+			domain = ((ContainerBase) container_).getDomain();
+		} else {
+			domain = server.getDefaultDomain();
+		}
+		String hostName = ((Host) container_.getParent()).getName();
+		hostName = (hostName == null) ? "localhost" : hostName;
+		String objectNameString = domain + ":type=ClusterSipManager,path="
+    		+ ((Context) container_).getPath() + ",host=" + hostName;
+		try {
+			oname = new ObjectName(objectNameString);
+			if(server.isRegistered(oname)) {
+				log_.warn("MBean " + oname + " already registered");
+			} else {
+		            server.registerMBean(this, oname);
+			}
+		} catch (Exception e) {
+            throw new IllegalStateException("error registering the mbean " + objectNameString, e);
+        }
+	}
+	
+	@Override
+	protected void stopManager() throws LifecycleException {
+		try {
+			MBeanServer server = MBeanServerLocator.locateJBoss();
+			server.unregisterMBean(oname);
+		} catch (Exception e) {
+			log_.error("Could not unregister ClusterSipManagerMBean from MBeanServer",
+							e);
+		}
+		super.stopManager();
+	}
 
 	// ----------------------------------------------- Lifecyle When Unembedded
 
@@ -2394,13 +2434,26 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			String hostName = ((Host) container_.getParent()).getName();
 			hostName = (hostName == null) ? "localhost" : hostName;
 			ObjectName clusterName = new ObjectName(domain
-					+ ":service=ClusterManager,WebModule=//" + hostName
+					+ ":service=ClusterSipManager,WebModule=//" + hostName
 					+ ((Context) container_).getPath());
 
+			String objectNameString = domain + ":type=ClusterSipManager,path="
+	        	+ ((Context) container_).getPath() + ",host=" + hostName;
+			oname = new ObjectName(objectNameString);
+			if(server.isRegistered(oname)) {
+				log_.warn("MBean " + oname + " already registered");
+			} else {
+		        try {	            
+		            server.registerMBean(this, oname);
+		        } catch (Exception e) {
+		            throw new IllegalStateException("error registering the mbean " + objectNameString, e);
+		        }
+			}
+			
 			if (server.isRegistered(clusterName)) {
 				log_.warn("MBean " + clusterName + " already registered");
 				return;
-			}
+			}						
 
 			objectName_ = clusterName;
 			server.registerMBean(this, clusterName);
@@ -2417,6 +2470,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		if (mserver_ != null) {
 			try {
 				mserver_.unregisterMBean(objectName_);
+				mserver_.unregisterMBean(oname);
 			} catch (Exception e) {
 				log_.error(e);
 			}
