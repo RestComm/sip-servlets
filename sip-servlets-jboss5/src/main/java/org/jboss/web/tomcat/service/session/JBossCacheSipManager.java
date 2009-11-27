@@ -44,6 +44,7 @@ import javax.servlet.sip.SipSession.State;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Session;
 import org.apache.catalina.Valve;
@@ -97,7 +98,7 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
  * 
  */
 public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> extends JBossCacheManager implements
-		ClusteredSipManager<O> {
+		ClusteredSipManager<O>, JBossCacheSipManagerMBean {
 
     protected static final String DISTRIBUTED_CACHE_FACTORY_CLASSNAME = "org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheConvergedSipManagerFactoryImpl";
     
@@ -3599,6 +3600,37 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		unloadedSessions_.clear();
 		passivatedCount_.set(0);
 		super.stop();
+	}
+	
+	@Override
+	protected void registerManagerMBean() {
+		try {
+			MBeanServer server = getMBeanServer();
+
+			String domain;
+			if (container_ instanceof ContainerBase) {
+				domain = ((ContainerBase) container_).getDomain();
+			} else {
+				domain = server.getDefaultDomain();
+			}
+			String hostName = ((Host) container_.getParent()).getName();
+			hostName = (hostName == null) ? "localhost" : hostName;
+			ObjectName clusterName = new ObjectName(domain
+					+ ":type=SipManager,host=" + hostName + ",path="
+					+ ((Context) container_).getPath());
+
+			if (server.isRegistered(clusterName)) {
+				log_.warn("MBean " + clusterName + " already registered");
+				return;
+			}
+
+			objectName_ = clusterName;
+			server.registerMBean(this, clusterName);
+
+		} catch (Exception ex) {
+			log_.error("Could not register " + getClass().getSimpleName()
+					+ " to MBeanServer", ex);
+		}
 	}
 	
 	@Override
