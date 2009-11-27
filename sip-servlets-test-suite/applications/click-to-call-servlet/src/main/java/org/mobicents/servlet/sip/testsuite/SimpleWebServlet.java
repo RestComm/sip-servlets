@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Properties;
 
+import javax.annotation.Resource;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -40,6 +41,7 @@ import org.apache.log4j.Logger;
 public class SimpleWebServlet extends HttpServlet { 	
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(SimpleWebServlet.class);
+	@Resource
 	private SipFactory sipFactory;
 	
 	@Override
@@ -57,10 +59,19 @@ public class SimpleWebServlet extends HttpServlet {
 			Properties jndiProps = new Properties();			
 			Context initCtx = new InitialContext(jndiProps);
 			Context envCtx = (Context) initCtx.lookup("java:comp/env");
-			sipFactory = (SipFactory) envCtx.lookup("sip/org.mobicents.servlet.sip.testsuite.Click2DialApplication/SipFactory");
-			logger.info("Sip Factory ref from JNDI : " + sipFactory);
+			SipFactory jndiSipFactory = (SipFactory) envCtx.lookup("sip/org.mobicents.servlet.sip.testsuite.Click2DialApplication/SipFactory");
+			if(jndiSipFactory == null) {
+				throw new IllegalStateException("The Sip Factory from JNDI should be available in init method");
+			} else {
+				logger.info("Sip Factory ref from JNDI : " + jndiSipFactory);
+			}
 		} catch (NamingException e) {
 			throw new ServletException("Uh oh -- JNDI problem !", e);
+		}
+		if(sipFactory == null) {
+			throw new IllegalStateException("The Sip Factory from Annotations should be available in init method");
+		} else {
+			logger.info("Sip Factory ref from Annotations : " + sipFactory);								
 		}
 	}
     /**
