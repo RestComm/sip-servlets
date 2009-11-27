@@ -31,7 +31,7 @@
   <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
   <classpathentry kind="var" path="M2_REPO/mc4j/org-mc4j-ems/1.2.5/org-mc4j-ems-1.2.5.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/persistence/persistence-api/1.0/persistence-api-1.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/rhq/rhq-core-domain/1.2.0.GA/rhq-core-domain-1.2.0.GA.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/rhq/rhq-core-domain/1.2.0.GA/rhq-core-domain-1.2.0.GA.jar"/> 
   <classpathentry kind="var" path="M2_REPO/org/rhq/rhq-core-native-system/1.2.0.GA/rhq-core-native-system-1.2.0.GA.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/rhq/rhq-core-plugin-api/1.2.0.GA/rhq-core-plugin-api-1.2.0.GA.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/rhq/rhq-core-util/1.2.0.GA/rhq-core-util-1.2.0.GA.jar"/>

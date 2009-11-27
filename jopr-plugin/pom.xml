@@ -47,11 +47,11 @@
 	
     <dependencies>
 
-	<dependency>
+		<dependency>
             <groupId>org.rhq</groupId>
             <artifactId>rhq-core-parent</artifactId>
             <version>${rhq.version}</version>
-	    <type>pom</type>
+	    	<type>pom</type>
         </dependency>   
 
         <dependency>

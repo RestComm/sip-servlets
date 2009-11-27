@@ -162,9 +162,19 @@ public class ConvergedDeploymentUtility {
         String pattern = "jboss.web:host=%host%,path=" + ConvergedWarDiscoveryHelper.getContextPath(contextRoot)
                 + ",type=SipManager";
         ObjectNameQueryUtility queryUtil = new ObjectNameQueryUtility(pattern);
-        List<EmsBean> mBeans = emsConnection.queryBeans(queryUtil.getTranslatedQuery());
+        String translatedQuery = queryUtil.getTranslatedQuery();
+        List<EmsBean> mBeans = emsConnection.queryBeans(translatedQuery);
+        
+        pattern = "jboss.web:host=%host%,path=" + ConvergedWarDiscoveryHelper.getContextPath(contextRoot)
+        + ",type=ClusterSipManager";
+        queryUtil = new ObjectNameQueryUtility(pattern);
+        translatedQuery = queryUtil.getTranslatedQuery();
+        List<EmsBean> haMBeans = emsConnection.queryBeans(translatedQuery);
                 
-        return mBeans;
+        List<EmsBean> allBeans = new ArrayList<EmsBean>(mBeans);
+        allBeans.addAll(haMBeans);
+        
+        return allBeans;
     }
     
     private static Collection getDeploymentInformations(EmsConnection connection) throws Exception {

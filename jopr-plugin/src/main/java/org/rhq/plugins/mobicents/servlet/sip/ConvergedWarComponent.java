@@ -89,6 +89,7 @@ public class ConvergedWarComponent extends ApplicationComponent implements Opera
     
     private static final String SESSION_PREFIX = "Session.";
     private static final String SIP_SESSION_NAME_BASE_TEMPLATE = "jboss.web:host=%HOST%,type=SipManager,path=%PATH%";
+    private static final String HA_SIP_SESSION_NAME_BASE_TEMPLATE = "jboss.web:host=%HOST%,type=ClusterSipManager,path=%PATH%";
     private static final String SIP_SESSION_PREFIX = "SipSession.";
     
     private static final String VHOST_PREFIX = "Vhost";
@@ -200,12 +201,29 @@ public class ConvergedWarComponent extends ApplicationComponent implements Opera
     private Double getSessionMetric(String metricName) {
         EmsConnection jmxConnection = getEmsConnection();
         
+        List<EmsBean> mBeans = null;
         String servletMBeanNames = SIP_SESSION_NAME_BASE_TEMPLATE.replace("%PATH%",
                 ConvergedWarDiscoveryHelper.getContextPath(this.contextRoot));
-        servletMBeanNames = servletMBeanNames.replace("%HOST%", vhost);
-        ObjectNameQueryUtility queryUtility = new ObjectNameQueryUtility(servletMBeanNames);
-        List<EmsBean> mBeans = jmxConnection.queryBeans(queryUtility.getTranslatedQuery());
+        if( servletMBeanNames != null) {
+        	servletMBeanNames = servletMBeanNames.replace("%HOST%", vhost);
+        	if( servletMBeanNames != null) {
+        		ObjectNameQueryUtility queryUtility = new ObjectNameQueryUtility(servletMBeanNames);
+        		mBeans = jmxConnection.queryBeans(queryUtility.getTranslatedQuery());
+        	}
+        }        
 
+        if(mBeans == null || mBeans.size() < 1) {
+        	servletMBeanNames = HA_SIP_SESSION_NAME_BASE_TEMPLATE.replace("%PATH%",
+                    ConvergedWarDiscoveryHelper.getContextPath(this.contextRoot));
+        	if( servletMBeanNames != null) {
+        		servletMBeanNames = servletMBeanNames.replace("%HOST%", vhost);
+        		if( servletMBeanNames != null) {
+        			ObjectNameQueryUtility queryUtility = new ObjectNameQueryUtility(servletMBeanNames);
+        			mBeans = jmxConnection.queryBeans(queryUtility.getTranslatedQuery());
+        		}
+        	}
+        }
+        
         String property = metricName.substring(SIP_SESSION_PREFIX.length());
 
         Double ret = Double.NaN;
