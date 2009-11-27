@@ -474,7 +474,7 @@ public class SipFactoryImpl implements Externalizable {
 //			}
 			maxForwardsHeader = SipFactories.headerFactory
 					.createMaxForwardsHeader(JainSipUtils.MAX_FORWARD_HEADER_VALUE);
-						URIImpl requestURI = (URIImpl)to.getURI().clone();
+			URIImpl requestURI = (URIImpl)to.getURI().clone();
 
 			// copying address params into headers.
 			Iterator<String> keys = to.getParameterNames();

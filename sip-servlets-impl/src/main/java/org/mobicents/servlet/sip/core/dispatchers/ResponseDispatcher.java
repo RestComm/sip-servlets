@@ -16,7 +16,6 @@
  */
 package org.mobicents.servlet.sip.core.dispatchers;
 
-import gov.nist.javax.sip.SipStackImpl;
 import gov.nist.javax.sip.message.SIPMessage;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
