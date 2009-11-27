@@ -54,7 +54,9 @@ public class LocationServiceSipServlet extends SipServlet {
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
-		logger.info("the locationb service sip servlet has been started");
+		if(logger.isInfoEnabled()) {
+			logger.info("the locationb service sip servlet has been started");
+		}
 		super.init(servletConfig);
 		SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
 		registeredUsers = new HashMap<String, List<URI>>();
@@ -73,9 +75,9 @@ public class LocationServiceSipServlet extends SipServlet {
 	@Override
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
-
-		logger.info("Got request:\n" + request.toString());		
-		
+		if(logger.isInfoEnabled()) {
+			logger.info("Got request:\n" + request.toString());		
+		}
 		List<URI> contactAddresses = registeredUsers.get(request.getRequestURI().toString());
 		if(contactAddresses != null && contactAddresses.size() > 0) {			
 			Proxy proxy = request.getProxy();
@@ -84,7 +86,9 @@ public class LocationServiceSipServlet extends SipServlet {
 			proxy.setSupervised(false);
 			proxy.proxyTo(contactAddresses);		
 		} else {
-			logger.info(request.getRequestURI().toString() + " is not currently registered");
+			if(logger.isInfoEnabled()) {
+				logger.info(request.getRequestURI().toString() + " is not currently registered");
+			}
 			SipServletResponse sipServletResponse = 
 				request.createResponse(SipServletResponse.SC_MOVED_PERMANENTLY, "Moved Permanently");
 			sipServletResponse.send();
@@ -94,7 +98,9 @@ public class LocationServiceSipServlet extends SipServlet {
 	@Override
 	protected void doRegister(SipServletRequest req) throws ServletException,
 			IOException {
-		logger.info("Received register request: " + req.getTo());
+		if(logger.isInfoEnabled()) {
+			logger.info("Received register request: " + req.getTo());
+		}
 		int response = SipServletResponse.SC_OK;
 		SipServletResponse resp = req.createResponse(response);
 		HashMap<String, String> users = (HashMap<String, String>) getServletContext().getAttribute("registeredUsersMap");
@@ -110,12 +116,16 @@ public class LocationServiceSipServlet extends SipServlet {
 		}
 		if(expires == 0) {
 			users.remove(fromURI);
-			logger.info("User " + fromURI + " unregistered");
+			if(logger.isInfoEnabled()) {
+				logger.info("User " + fromURI + " unregistered");
+			}
 		} else {
 			resp.setAddressHeader(CONTACT_HEADER, address);
 			users.put(fromURI, address.getURI().toString());
-			logger.info("User " + fromURI + 
+			if(logger.isInfoEnabled()) {
+				logger.info("User " + fromURI + 
 					" registered with an Expire time of " + expires);
+			}
 		}				
 						
 		resp.send();
@@ -126,8 +136,9 @@ public class LocationServiceSipServlet extends SipServlet {
 	 */
 	protected void doResponse(SipServletResponse response)
 			throws ServletException, IOException {
-
-		logger.info("SimpleProxyServlet: Got response:\n" + response);
+		if(logger.isInfoEnabled()) {
+			logger.info("SimpleProxyServlet: Got response:\n" + response);
+		}
 		// session should not be invalidated so fast
 //		if(SipServletResponse.SC_OK == response.getStatus() && "BYE".equalsIgnoreCase(response.getMethod())) {
 //			SipSession sipSession = response.getSession(false);
