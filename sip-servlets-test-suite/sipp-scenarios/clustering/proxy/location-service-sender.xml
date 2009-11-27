@@ -5,7 +5,7 @@
 
 <scenario name="UAC for SIP-Servlets Tests - location-service-a">
 
-  <send retrans="500">
+  <send retrans="1000">
     <![CDATA[
     
       INVITE sip:[service]@sip-servlets.com SIP/2.0
@@ -35,24 +35,25 @@
 
   <recv response="180" optional="true" />
 
-  <recv response="200" rrs="true">
+  <recv response="200" rtd="true" rrs="true">
     <action>
-		<!-- TODO: Better regEx -->>
-		<ereg regexp="([[:graph:]])(.*:(.*@)?.*(:[[:digit:]]*)?)([[:graph:]])" search_in="hdr" header="Contact:" check_it="true" assign_to="1" />
-	</action>
+      <ereg regexp="\&lt;([a-zA-Z0-9@.=;]+)[^&gt;]+" search_in="hdr" header="Contact:" assign_to="1"/>
+    </action>
   </recv>
+
+  <pause milliseconds="300"/>
 
   <send>
     <![CDATA[
-    
-      ACK sip:receiver-failover@[local_ip]:5090 SIP/2.0
-      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
-      From: sipp <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
-      To: sut <sip:[service]@sip-servlets.com>[peer_tag_param]
+      ACK [$1] SIP/2.0
+      [last_Via:]
+      [last_From:]
+      [last_To:]
       Call-ID: [call_id]
       CSeq: 1 ACK
-      Max-Forwards: 70
       [routes]
+      Contact: sip:barreiro@[local_ip]:[local_port]
+      Max-Forwards: 70
       Subject: Clustering Test
       Content-Length: 0
 
@@ -63,10 +64,10 @@
   
 <send retrans="500">
  <![CDATA[
-      BYE sip:receiver-failover@[local_ip]:5090 SIP/2.0
+      BYE sip:receiver-failover@[remote_ip]:5090 SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
-      From: sipp <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
-      To: sut <sip:[service]@sip-servlets.com>[peer_tag_param]
+      [last_From:]
+      [last_To:]
       Call-ID: [call_id]
       CSeq: 2 BYE
       Contact: sip:sipp@[local_ip]:[local_port]

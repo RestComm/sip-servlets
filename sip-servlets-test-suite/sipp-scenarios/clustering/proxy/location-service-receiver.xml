@@ -5,9 +5,7 @@
 
 <scenario name="UAC for SIP-Servlets Tests - location-service-c">
 
-  <recv request="INVITE" rrs="true" timeout="5000" ontimeout="1" />
-
-  <!--pause milliseconds="1000"/-->	
+  <recv request="INVITE" rrs="true" timeout="5000"/>
 
   <send>
     <![CDATA[
@@ -19,13 +17,13 @@
       [last_Call-ID:]
       [last_CSeq:]
       [last_Record-Route:]
-      Contact: sip:receiver-failover@[local_ip]:[local_port]
+	  Contact: <sip:[local_ip]:[local_port];transport=[transport]>
       Content-Length: 0
       
     ]]>
   </send>
 
-  <!-- pause milliseconds="1000"/-->
+  <pause milliseconds="300"/>
 
   <send retrans="500">
     <![CDATA[
@@ -37,7 +35,7 @@
       [last_Call-ID:]
       [last_CSeq:]
       [last_Record-Route:]
-      Contact: sip:receiver-failover@[local_ip]:[local_port]
+      Contact: <sip:[local_ip]:[local_port];transport=[transport]>
       Content-Type: application/sdp
       Content-Length: [len]
 
@@ -52,14 +50,9 @@
     ]]>
   </send>  
   
-  <recv request="ACK" >
-    <action>
-      <ereg regexp=".*" search_in="hdr" header="From:" check_it="true" assign_to="1" />
-      <ereg regexp=".*" search_in="hdr" header="To:" check_it="true" assign_to="2" />
-    </action>
-  </recv>   
+  <recv request="ACK" />
   
-  <recv request="BYE" timeout="25000" />
+  <recv request="BYE" timeout="30000" />
 
   <send>
     <![CDATA[
