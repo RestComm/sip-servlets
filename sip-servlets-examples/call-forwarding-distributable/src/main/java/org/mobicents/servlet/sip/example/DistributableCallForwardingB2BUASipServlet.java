@@ -68,15 +68,18 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 	@Override
 	protected void doAck(SipServletRequest request) throws ServletException,
 			IOException {		
-		logger.info("Got : " + request.toString());
+		if(logger.isInfoEnabled()) {
+			logger.info("Got : " + request.toString());
+		}
 	}
 
 	@Override
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
-
-		logger.info("Got INVITE: " + request.toString());
-		logger.info(request.getFrom().getURI().toString());
+		if(logger.isInfoEnabled()) {
+			logger.info("Got INVITE: " + request.toString());
+			logger.info(request.getFrom().getURI().toString());
+		}
 		String[] forwardingUri = forwardingUris.get(request.getTo().getURI().toString());
 		if(forwardingUri != null && forwardingUri.length > 0) {
 			helper = request.getB2buaHelper();						
@@ -95,21 +98,26 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 					headers);
 			SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1]);		
 			forkedRequest.setRequestURI(sipUri);						
-			
-			logger.info("forkedRequest = " + forkedRequest);
+			if(logger.isInfoEnabled()) {
+				logger.info("forkedRequest = " + forkedRequest);
+			}
 			forkedRequest.getSession().setAttribute("originalRequest", request);
 			forkedRequest.getSession().setAttribute("INVITE", RECEIVED);
 			
 			forkedRequest.send();
 		} else {
-			logger.info("INVITE has not been forwarded.");
+			if(logger.isInfoEnabled()) {
+				logger.info("INVITE has not been forwarded.");
+			}
 		}
 	}	
 	
 	@Override
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {
-		logger.info("Got BYE: " + request.toString());
+		if(logger.isInfoEnabled()) {
+			logger.info("Got BYE: " + request.toString());
+		}
 		//we forward the BYE
 		B2buaHelper byeHelper = request.getB2buaHelper();
 		SipSession linkedSipSession = byeHelper.getLinkedSession(request.getSession());
@@ -136,8 +144,10 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 		
 		SipSession session = request.getSession();		
 		SipSession linkedSession = byeHelper.getLinkedSession(session);		
-		SipServletRequest forkedRequest = linkedSession.createRequest("BYE");			
-		logger.info("forkedRequest = " + forkedRequest);			
+		SipServletRequest forkedRequest = linkedSession.createRequest("BYE");
+		if(logger.isInfoEnabled()) {
+			logger.info("forkedRequest = " + forkedRequest);
+		}
 		forkedRequest.send();	
 		helper = byeHelper;
 	}	
@@ -151,19 +161,25 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 	@Override
 	protected void doSuccessResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
-		logger.info("Got : " + sipServletResponse.toString());
+		if(logger.isInfoEnabled()) {
+			logger.info("Got : " + sipServletResponse.toString());
+		}
 		
 //		SipSession originalSession =   
 //		    helper.getLinkedSession(sipServletResponse.getSession());		
 		//if this is a response to an INVITE we ack it and forward the OK 
 		if("INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
 			SipServletRequest ackRequest = sipServletResponse.createAck();
-			logger.info("Sending " +  ackRequest);
+			if(logger.isInfoEnabled()) {
+				logger.info("Sending " +  ackRequest);
+			}
 			ackRequest.send();
 			//create and sends OK for the first call leg							
 			SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
 			SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
-			logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);
+			if(logger.isInfoEnabled()) {
+				logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);
+			}
 			responseToOriginalRequest.setContentLength(sipServletResponse.getContentLength());
 			if(sipServletResponse.getContent() != null && sipServletResponse.getContentType() != null)
 				responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
@@ -174,13 +190,17 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 	@Override
 	protected void doErrorResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
-		logger.info("Got : " + sipServletResponse.getStatus() + " "
-				+ sipServletResponse.getReasonPhrase());		
+		if(logger.isInfoEnabled()) {
+			logger.info("Got : " + sipServletResponse.getStatus() + " "
+				+ sipServletResponse.getReasonPhrase());
+		}
 						
 		//create and sends the error response for the first call leg
 		SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
 			SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
-		logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
+		if(logger.isInfoEnabled()) {
+			logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
+		}
 		responseToOriginalRequest.send();		
 	}
 	
@@ -189,7 +209,9 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 			throws ServletException, IOException {
 		SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
 		SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
-		logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
+		if(logger.isInfoEnabled()) {
+			logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
+		}
 		responseToOriginalRequest.send();
 	}
 }
