@@ -56,7 +56,13 @@ public class Click2DialSipServlet extends SipServlet implements SipApplicationSe
 	public void init(ServletConfig servletConfig) throws ServletException {		
 		super.init(servletConfig);
 		logger.info("the click to dial servlet has been started");
-		try { 			
+		try { 	
+			SipFactory contextFactory = (SipFactory) servletConfig.getServletContext().getAttribute(SipServlet.SIP_FACTORY);
+			if(contextFactory == null) {
+				throw new IllegalStateException("The Sip Factory should be available in init method");
+			} else {
+				logger.info("Sip Factory ref from Servlet Context : " + contextFactory);								
+			}
 			// Getting the Sip factory from the JNDI Context
 			Properties jndiProps = new Properties();			
 			Context initCtx = new InitialContext(jndiProps);

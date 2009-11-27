@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.sip.ConvergedHttpSession;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
+import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.URI;
 
@@ -46,6 +47,12 @@ public class SimpleWebServlet extends HttpServlet {
 		super.init(config);
 		logger.info("the SimpleWebServlet has been started");
 		try { 			
+			SipFactory contextFactory = (SipFactory) config.getServletContext().getAttribute(SipServlet.SIP_FACTORY);
+			if(contextFactory == null) {
+				throw new IllegalStateException("The Sip Factory should be available in init method");
+			} else {
+				logger.info("Sip Factory ref from Servlet Context : " + contextFactory);				
+			}
 			// Getting the Sip factory from the JNDI Context
 			Properties jndiProps = new Properties();			
 			Context initCtx = new InitialContext(jndiProps);
