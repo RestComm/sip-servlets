@@ -188,14 +188,16 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 			logger.info("Got : " + sipServletResponse.getStatus() + " "
 				+ sipServletResponse.getReasonPhrase());
 		}
-						
-		//create and sends the error response for the first call leg
-		SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
-		SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
-		if(logger.isInfoEnabled()) {
-			logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
+		// we don't forward the timeout
+		if(sipServletResponse.getStatus() != 408) {
+			//create and sends the error response for the first call leg
+			SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
+			SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
+			if(logger.isInfoEnabled()) {
+				logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
+			}
+			responseToOriginalRequest.send();		
 		}
-		responseToOriginalRequest.send();		
 	}
 	
 	@Override
