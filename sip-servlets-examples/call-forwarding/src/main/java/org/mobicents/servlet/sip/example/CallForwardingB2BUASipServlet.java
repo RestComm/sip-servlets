@@ -138,8 +138,10 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 		B2buaHelper helper = request.getB2buaHelper();
 		SipSession linkedSession = helper.getLinkedSession(session);
 		SipServletRequest originalRequest = (SipServletRequest)linkedSession.getAttribute("originalRequest");
-		SipServletRequest  cancelRequest = helper.getLinkedSipServletRequest(originalRequest).createCancel();				
-		logger.info("forkedRequest = " + cancelRequest);			
+		SipServletRequest  cancelRequest = helper.getLinkedSipServletRequest(originalRequest).createCancel();
+		if(logger.isInfoEnabled()) {
+			logger.info("forkedRequest = " + cancelRequest);
+		}
 		cancelRequest.send();
 	}
 	
