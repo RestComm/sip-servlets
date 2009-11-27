@@ -70,8 +70,14 @@
         <listitem>
           <para><emphasis>gov.nist.javax.sip.TRACE_LEVEL=0</emphasis>
           </para>
-          <para><emphasis>Default value: true</emphasis>. </para>
-          <para>Set the parameter to <userinput>false</userinput> to disable JAIN SIP stack logging.</para>
+          <para><emphasis>Default value: 32</emphasis>. </para>
+          <para>Set the parameter to <userinput>0</userinput> to disable JAIN SIP stack logging.</para>
+        </listitem>
+	<listitem>
+          <para><emphasis>gov.nist.javax.sip.RECEIVE_UDP_BUFFER_SIZE=65536 and gov.nist.javax.sip.SEND_UDP_BUFFER_SIZE=65536</emphasis>
+          </para>
+          <para><emphasis>Default value: 8192</emphasis>. </para>
+          <para>Those properties control the size of the UDP buffer used for SIP messages. Under load, if the buffer capacity is overflown the messages are dropped causing retransmissions, further increasing the load and causing even more retransmissions</para>
         </listitem>
       </itemizedlist>
       <para>The full list of JAIN SIP stack properties is available from
