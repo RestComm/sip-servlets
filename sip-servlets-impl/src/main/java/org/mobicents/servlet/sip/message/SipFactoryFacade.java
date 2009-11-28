@@ -202,6 +202,7 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 	 * Remove the http session in the sip Factory's thread local  
 	 */
 	public void removeHttpSession() {
+		threadLocalHttpSession.set(null);
 		threadLocalHttpSession.remove();
 	}
 	
