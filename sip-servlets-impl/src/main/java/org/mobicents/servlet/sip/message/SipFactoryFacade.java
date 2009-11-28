@@ -51,12 +51,11 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 	
 	private SipFactoryImpl sipFactoryImpl;
 	private transient SipContext sipContext;
-	private transient ThreadLocal<HttpSession> threadLocalHttpSession;
+	private static transient ThreadLocal<HttpSession> threadLocalHttpSession = new ThreadLocal<HttpSession>();;
 	
 	public SipFactoryFacade(SipFactoryImpl sipFactoryImpl, SipContext sipContext) {
 		this.sipFactoryImpl = sipFactoryImpl;
 		this.sipContext = sipContext;
-		threadLocalHttpSession = new ThreadLocal<HttpSession>();
 	}
 	
 	/* (non-Javadoc)
