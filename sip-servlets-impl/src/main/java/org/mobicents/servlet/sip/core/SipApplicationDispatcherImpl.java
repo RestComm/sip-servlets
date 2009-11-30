@@ -295,6 +295,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		messageDispatcherFactory = new MessageDispatcherFactory(this);
 		asynchronousExecutor = new ThreadPoolExecutor(StaticServiceHolder.sipStandardService.getDispatcherThreadPoolSize(), 64, 90, TimeUnit.SECONDS,
 				new LinkedBlockingQueue<Runnable>());
+		logger.info("AsynchronousThreadPoolExecutor size is " + StaticServiceHolder.sipStandardService.getDispatcherThreadPoolSize());
 		asynchronousExecutor.setRejectedExecutionHandler(new RejectedExecutionHandler(){
 
 			public void rejectedExecution(Runnable r,
