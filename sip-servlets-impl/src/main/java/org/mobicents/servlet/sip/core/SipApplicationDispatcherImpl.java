@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -102,6 +103,7 @@ import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.router.ManageableApplicationRouter;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
  * Implementation of the SipApplicationDispatcher interface.
@@ -202,8 +204,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	
 	// This executor is used for async things that don't need to wait on session executors, like CANCEL requests
 	// or when the container is configured to execute every request ASAP without waiting on locks (no concurrency control)
-	private ThreadPoolExecutor asynchronousExecutor = new ThreadPoolExecutor(4, 32, 90, TimeUnit.SECONDS,
-			new LinkedBlockingQueue<Runnable>());
+	private ThreadPoolExecutor asynchronousExecutor = null;
 	
 	//used for the congestion control mechanism
 	private ScheduledThreadPoolExecutor congestionControlThreadPool = null;
@@ -292,6 +293,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			logger.info("bypassResponseExecutor ? " + bypassResponseExecutor);
 		}
 		messageDispatcherFactory = new MessageDispatcherFactory(this);
+		asynchronousExecutor = new ThreadPoolExecutor(StaticServiceHolder.sipStandardService.getDispatcherThreadPoolSize(), 64, 90, TimeUnit.SECONDS,
+				new LinkedBlockingQueue<Runnable>());
+		asynchronousExecutor.setRejectedExecutionHandler(new RejectedExecutionHandler(){
+
+			public void rejectedExecution(Runnable r,
+					ThreadPoolExecutor executor) {
+				logger.warn("Executor job was rejected " + r.toString());
+				
+			}
+			
+		});
 	}
 	/**
 	 * {@inheritDoc}

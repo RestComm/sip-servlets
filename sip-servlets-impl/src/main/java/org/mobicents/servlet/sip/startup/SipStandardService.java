@@ -72,6 +72,8 @@ public class SipStandardService extends StandardService implements SipService {
 	// base timer interval for jain sip tx 
 	private int baseTimerInterval = 500;
 	
+	protected int dispatcherThreadPoolSize = 4;
+	
 	protected String concurrencyControlMode = ConcurrencyControlMode.None.toString();
 	protected String congestionControlPolicy = CongestionControlPolicy.ErrorResponse.toString();
 	protected String additionalParameterableHeaders;
@@ -510,6 +512,16 @@ public class SipStandardService extends StandardService implements SipService {
 		this.outboundProxy = outboundProxy;
 	}
 	
+	public int getDispatcherThreadPoolSize() {
+		return dispatcherThreadPoolSize;
+	}
+
+
+	public void setDispatcherThreadPoolSize(int dispatcherThreadPoolSize) {
+		this.dispatcherThreadPoolSize = dispatcherThreadPoolSize;
+	}
+
+
 	/**
 	 * @deprecated
 	 * @param balancers the balancers to set
