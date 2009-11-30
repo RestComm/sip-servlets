@@ -17,23 +17,29 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
-import javax.servlet.Servlet;
+import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.sip.SipErrorEvent;
-import javax.servlet.sip.SipErrorListener;
+import javax.servlet.sip.ServletParseException;
+import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
+import javax.servlet.sip.SipServletContextEvent;
+import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
 import org.apache.log4j.Logger;
 
 
-public class ServletMappingSipServlet extends SipServlet implements SipErrorListener {
+public class ServletMappingSipServlet extends SipServlet implements SipServletListener {
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(ServletMappingSipServlet.class);
 	
+	@Resource
+    private SipFactory factory;
 	
 	/** Creates a new instance of ServletMappingSipServlet */
 	public ServletMappingSipServlet() {
@@ -57,6 +63,8 @@ public class ServletMappingSipServlet extends SipServlet implements SipErrorList
 		sipServletResponse.send();
 		sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
+		
+		sendMessage("inviteReceived");
 	}
 
 	/**
@@ -68,22 +76,34 @@ public class ServletMappingSipServlet extends SipServlet implements SipErrorList
 		logger.info("Got BYE request: " + request);
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
+	}
+
+	public void servletInitialized(SipServletContextEvent ce) {
+		try {
+			if(ce.getSipServlet().equals(this)) {
+	            sendMessage("servletInitialized");
+			}
+        } catch (Exception e) {
+            logger.error("unexpected exception while trying to send the invite out", e);
+        }
+	}
+
+	/**
+	 * @throws ServletParseException
+	 * @throws UnsupportedEncodingException
+	 * @throws IOException
+	 */
+	private void sendMessage(String body) throws ServletParseException,
+			UnsupportedEncodingException, IOException {
+		SipApplicationSession appSession = factory.createApplicationSession();
+		SipServletRequest request =
+		    factory.createRequest(appSession, "MESSAGE",
+		                          "sip:from@127.0.0.1:5070", "sip:to@127.0.0.1:5080");
+		request.setContentLength(2);
+		request.setContent(body, "text/plain;charset=UTF-8");
+		request.send();
 	}	
 
-	// SipErrorListener methods
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void noAckReceived(SipErrorEvent ee) {
-		logger.error("noAckReceived.");
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	public void noPrackReceived(SipErrorEvent ee) {
-		logger.error("noPrackReceived.");
-	}
+	
 
 }

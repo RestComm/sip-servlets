@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.testsuite.mapping;
 
 import java.text.ParseException;
+import java.util.Iterator;
 
 import javax.sip.InvalidArgumentException;
 import javax.sip.SipException;
@@ -41,6 +42,10 @@ public class ServletMappingSipServletTest extends SipServletTestCase {
 	
 	ProtocolObjects senderProtocolObjects;	
 
+	private static final String[] MESSAGES = new String[]{
+		"servletInitialized",
+		"inviteReceived"
+	};	
 	
 	public ServletMappingSipServletTest(String name) {
 		super(name);
@@ -87,6 +92,14 @@ public class ServletMappingSipServletTest extends SipServletTestCase {
 		toAddress.setParameter("foo", "fighter");
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		for (int i = 0; i < MESSAGES.length; i++) {
+			assertTrue(sender.getAllMessagesContent().contains(MESSAGES[i]));
+		}			
 		assertTrue(sender.getFinalResponseStatus() == 200);
 		assertTrue(sender.getOkToByeReceived());		
 	}
