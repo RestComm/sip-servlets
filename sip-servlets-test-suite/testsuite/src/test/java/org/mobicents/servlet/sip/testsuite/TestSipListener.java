@@ -165,6 +165,8 @@ public class TestSipListener implements SipListener {
 	
 	private Request inviteRequest;
 	
+	private Request messageRequest;
+	
 	private Response finalResponse;
 	
 	private boolean cancelSent;
@@ -735,6 +737,7 @@ public class TestSipListener implements SipListener {
 		}
 		ServerTransaction serverTransaction = null;
 
+		messageRequest = request;
         try {
 
             serverTransaction = 
@@ -2485,6 +2488,20 @@ public class TestSipListener implements SipListener {
 	 */
 	public boolean isUseDefaultRoute() {
 		return useDefaultRoute;
+	}
+
+	/**
+	 * @param messageRequest the messageRequest to set
+	 */
+	public void setMessageRequest(Request messageRequest) {
+		this.messageRequest = messageRequest;
+	}
+
+	/**
+	 * @return the messageRequest
+	 */
+	public Request getMessageRequest() {
+		return messageRequest;
 	}
 
 }

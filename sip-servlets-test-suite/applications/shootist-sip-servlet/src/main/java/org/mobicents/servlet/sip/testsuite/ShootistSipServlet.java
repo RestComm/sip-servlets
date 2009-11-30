@@ -116,6 +116,11 @@ public class ShootistSipServlet
 			sendMessage(sipApplicationSession, sipFactory, "testServletListener");
 			return;
 		}
+		String testContentLength = ce.getServletContext().getInitParameter("testContentLength");
+		if(testContentLength != null) {
+			sendMessage(sipApplicationSession, sipFactory, null);
+			return;
+		}
 		
 		String userName = ce.getServletContext().getInitParameter("username");
 		if(userName == null || userName.length() < 1) {
@@ -194,8 +199,12 @@ public class ShootistSipServlet
 					"sip:receiver@sip-servlets.com");
 			SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
 			sipServletRequest.setRequestURI(sipUri);
-			sipServletRequest.setContentLength(content.length());
-			sipServletRequest.setContent(content, CONTENT_TYPE);
+			if(content != null) {
+				sipServletRequest.setContentLength(content.length());
+				sipServletRequest.setContent(content, CONTENT_TYPE);
+			} else {
+				sipServletRequest.setContentLength(0);
+			}
 			sipServletRequest.send();
 		} catch (ServletParseException e) {
 			logger.error("Exception occured while parsing the addresses",e);

@@ -53,7 +53,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 				"sip-test-context", "sip-test"));
 	}
 	
-	public void deployApplicationSetToParam(String name, String value) {
+	public SipStandardContext deployApplication(String name, String value) {
 		SipStandardContext context = new SipStandardContext();
 		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp");
 		context.setName("sip-test-context");
@@ -65,6 +65,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		applicationParameter.setValue(value);
 		context.addApplicationParameter(applicationParameter);
 		assertTrue(tomcat.deployContext(context));
+		return context;
 	}
 	
 	public SipStandardContext deployApplicationServletListenerTest() {
@@ -145,7 +146,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		
 		receiverProtocolObjects.start();
 		tomcat.startTomcat();
-		deployApplicationSetToParam("toTag", "callernwPort1241042500479");
+		deployApplication("toTag", "callernwPort1241042500479");
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());		
 	}
@@ -166,7 +167,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		
 		receiverProtocolObjects.start();
 		tomcat.startTomcat();
-		deployApplicationSetToParam("toParam", "http://yaris.research.att.com:23280/vxml/test.jsp");
+		deployApplication("toParam", "http://yaris.research.att.com:23280/vxml/test.jsp");
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());		
 	}
@@ -188,7 +189,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		receiverProtocolObjects.start();
 		tomcat.startTomcat();
 		String toParamValue = "http://yaris.research.att.com:23280/vxml/test.jsp?toto=tata";
-		deployApplicationSetToParam("toParam", toParamValue);
+		deployApplication("toParam", toParamValue);
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());		
 		ToHeader toHeader = (ToHeader) receiver.getInviteRequest().getHeader(ToHeader.NAME);
@@ -244,6 +245,26 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertEquals(3, receiver.getAllMessagesContent().size());
 	}
+	
+	/**
+	 * non regression test for Issue 1090 http://code.google.com/p/mobicents/issues/detail?id=1090
+	 * 	Content-Type is not mandatory if Content-Length is 0
+	 */
+	public void testShootistContentLength() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		deployApplication("testContentLength", "testContentLength");
+		Thread.sleep(TIMEOUT);
+		assertNotNull(receiver.getMessageRequest());		
+	}	
 	
 	
 	public void testShootistCallerSendsBye() throws Exception {
