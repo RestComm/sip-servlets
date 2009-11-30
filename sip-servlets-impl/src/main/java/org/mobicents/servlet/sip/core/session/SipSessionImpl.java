@@ -1748,38 +1748,36 @@ public class SipSessionImpl implements MobicentsSipSession {
 		
 		if(isAck) {
 			setAckReceived(true);
-		} 
-		if(getProxy() == null) {
-			if(isAckRetranmission) {
-				// Filter out ACK retransmissions for JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
-				logger.debug("ACK filtered out as a retransmission. This Sip Session already has been ACKed.");
-				return false;
-			}
-			if(localCseq == remoteCseq && !isAck) {
-				logger.debug("dropping retransmission " + request + " since it matches the current sip session cseq " + localCseq);
-				return false;
-			}		
-			if(localCseq > remoteCseq) {				
-				if(!isAck) {
-					logger.error("CSeq out of order for the following request");
-					final SipServletResponse response = sipServletRequest.createResponse(Response.SERVER_INTERNAL_ERROR, "CSeq out of order");
-					try {
-						response.send();
-					} catch (IOException e) {
-						logger.error("Can not send error response", e);
-					}
-					return false;
-				}
-			}
-			if(Request.INVITE.equalsIgnoreCase(method)){			
-				//if it's a reinvite, we reset the ACK retransmission flag
-				setAckReceived(false);
-				if(logger.isDebugEnabled()) {
-					logger.debug("resetting the ack retransmission flag on the sip session " + getKey() + " because following reINVITE has been received " + request);
-				}
-			}
-			setCseq(remoteCseq);
+		} 		
+		if(isAckRetranmission) {
+			// Filter out ACK retransmissions for JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
+			logger.debug("ACK filtered out as a retransmission. This Sip Session already has been ACKed.");
+			return false;
 		}
+		if(localCseq == remoteCseq && !isAck) {
+			logger.debug("dropping retransmission " + request + " since it matches the current sip session cseq " + localCseq);
+			return false;
+		}		
+		if(localCseq > remoteCseq) {				
+			if(!isAck) {
+				logger.error("CSeq out of order for the following request");
+				final SipServletResponse response = sipServletRequest.createResponse(Response.SERVER_INTERNAL_ERROR, "CSeq out of order");
+				try {
+					response.send();
+				} catch (IOException e) {
+					logger.error("Can not send error response", e);
+				}
+				return false;
+			}
+		}
+		if(Request.INVITE.equalsIgnoreCase(method)){			
+			//if it's a reinvite, we reset the ACK retransmission flag
+			setAckReceived(false);
+			if(logger.isDebugEnabled()) {
+				logger.debug("resetting the ack retransmission flag on the sip session " + getKey() + " because following reINVITE has been received " + request);
+			}
+		}
+		setCseq(remoteCseq);
 		return true;
 	}
 }

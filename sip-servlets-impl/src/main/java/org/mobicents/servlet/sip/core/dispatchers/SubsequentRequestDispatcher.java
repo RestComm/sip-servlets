@@ -231,9 +231,11 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		sipServletRequest.setSipSessionKey(key);
 		
 		// BEGIN validation delegated to the applicationas per JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
-		boolean isValid = sipSession.validateCSeq(sipServletRequest);
-		if(!isValid) {
+		if(sipSession.getProxy() == null) {
+			boolean isValid = sipSession.validateCSeq(sipServletRequest);
+			if(!isValid) {
 				return;
+			}
 		}
 		// END of validation for http://code.google.com/p/mobicents/issues/detail?id=766
 		
