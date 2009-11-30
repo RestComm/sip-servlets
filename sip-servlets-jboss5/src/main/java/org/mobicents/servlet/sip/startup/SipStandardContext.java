@@ -1025,7 +1025,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}
 		Container[] children = findChildren();
 		if(logger.isDebugEnabled()) {
-			logger.debug(children.length + " container to notify of servlet initialization");
+			logger.debug(children.length + " container to notify of " + event.getEventType());
 		}
 		enterSipApp(null, null);
 		enterSipAppHa(null, null, true, false);
@@ -1040,40 +1040,50 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					try {
 						sipServlet = wrapper.allocate();
 						if(sipServlet instanceof SipServlet) {
+							// Fix for issue 1086 (http://code.google.com/p/mobicents/issues/detail?id=1086) : 
+							// Cannot send a request in SipServletListener.initialize() for servlet-selection applications
+							boolean mainServletWasNull = false;
+							if(mainServlet == null) {
+								mainServlet = container.getName();
+								mainServletWasNull = true;
+							}
 							switch(event.getEventType()) {
-							case SERVLET_INITIALIZED : {
-								SipServletContextEvent sipServletContextEvent = 
-									new SipServletContextEvent(getServletContext(), (SipServlet)sipServlet);
-								List<SipServletListener> sipServletListeners = sipListeners.getSipServletsListeners();
-								if(logger.isDebugEnabled()) {
-									logger.debug(sipServletListeners.size() + " SipServletListener to notify of servlet initialization");
+								case SERVLET_INITIALIZED : {
+									SipServletContextEvent sipServletContextEvent = 
+										new SipServletContextEvent(getServletContext(), (SipServlet)sipServlet);
+									List<SipServletListener> sipServletListeners = sipListeners.getSipServletsListeners();
+									if(logger.isDebugEnabled()) {
+										logger.debug(sipServletListeners.size() + " SipServletListener to notify of servlet initialization");
+									}
+									for (SipServletListener sipServletListener : sipServletListeners) {					
+										sipServletListener.servletInitialized(sipServletContextEvent);					
+									}
+									break;
 								}
-								for (SipServletListener sipServletListener : sipServletListeners) {					
-									sipServletListener.servletInitialized(sipServletContextEvent);					
+								case SIP_CONNECTOR_ADDED : {
+									List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
+									if(logger.isDebugEnabled()) {
+										logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector addition");
+									}
+									for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {					
+										sipConnectorListener.sipConnectorAdded((SipConnector)event.getEventObject());				
+									}
+									break;
 								}
-								break;
+								case SIP_CONNECTOR_REMOVED : {
+									List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
+									if(logger.isDebugEnabled()) {
+										logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector removal");
+									}
+									for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {					
+										sipConnectorListener.sipConnectorRemoved((SipConnector)event.getEventObject());				
+									}
+									break;
+								}								
 							}
-							case SIP_CONNECTOR_ADDED : {
-								List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
-								if(logger.isDebugEnabled()) {
-									logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector addition");
-								}
-								for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {					
-									sipConnectorListener.sipConnectorAdded((SipConnector)event.getEventObject());				
-								}
-								break;
+							if(mainServletWasNull) {
+								mainServlet = null;
 							}
-							case SIP_CONNECTOR_REMOVED : {
-								List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
-								if(logger.isDebugEnabled()) {
-									logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector removal");
-								}
-								for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {					
-									sipConnectorListener.sipConnectorRemoved((SipConnector)event.getEventObject());				
-								}
-								break;
-							}
-						}
 						}					
 					} catch (ServletException e) {
 						logger.error("Cannot allocate the servlet "+ wrapper.getServletClass() +" for notifying the listener " +

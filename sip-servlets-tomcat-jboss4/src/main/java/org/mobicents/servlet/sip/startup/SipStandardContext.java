@@ -966,7 +966,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		
 		Container[] children = findChildren();
 		if(logger.isDebugEnabled()) {
-			logger.debug(children.length + " container to notify of servlet initialization");
+			logger.debug(children.length + " container to notify of " + event.getEventType());
 		}
 		enterSipApp(null, null);
 		enterSipAppHa(null, null, true, false);
@@ -981,6 +981,13 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					try {
 						sipServlet = wrapper.allocate();
 						if(sipServlet instanceof SipServlet) {
+							// Fix for issue 1086 (http://code.google.com/p/mobicents/issues/detail?id=1086) : 
+							// Cannot send a request in SipServletListener.initialize() for servlet-selection applications
+							boolean mainServletWasNull = false;
+							if(mainServlet == null) {
+								mainServlet = container.getName();
+								mainServletWasNull = true;
+							}
 							switch(event.getEventType()) {
 								case SERVLET_INITIALIZED : {
 									SipServletContextEvent sipServletContextEvent = 
@@ -989,7 +996,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 									if(logger.isDebugEnabled()) {
 										logger.debug(sipServletListeners.size() + " SipServletListener to notify of servlet initialization");
 									}
-									for (SipServletListener sipServletListener : sipServletListeners) {					
+									for (SipServletListener sipServletListener : sipServletListeners) {
 										sipServletListener.servletInitialized(sipServletContextEvent);					
 									}
 									break;
@@ -1014,6 +1021,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 									}
 									break;
 								}
+							}
+							if(mainServletWasNull) {
+								mainServlet = null;
 							}
 						}					
 					} catch (ServletException e) {
