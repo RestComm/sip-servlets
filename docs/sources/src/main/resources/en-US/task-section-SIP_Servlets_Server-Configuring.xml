@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
 <!ENTITY PLATFORM_NAME "${platform.name}">
-<!ENTITY PLATFORM_NAME "${short.platform.name}">
+
 <!ENTITY VERSION "${version}">
 <!ENTITY YEAR "${year}">
 ]>
@@ -149,7 +149,7 @@ ipAddress="127.0.0.1"
  className="org.mobicents.servlet.sip.startup.SipStandardService"
  sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
  additionalParameterableHeaders="Header1,Header2" 
- baseTimerInterval="500"
+ baseTimerInterval="500" dispatcherThreadPoolSize="4"
  darConfigurationFileLocation="file:///home/silas/workspaces/mobicents-sip-servlets/
  sip-servlets-examples/reinvite-demo/reinvite-dar.properties">]]>
  </programlisting>
@@ -187,6 +187,12 @@ ipAddress="127.0.0.1"
           <para>Specifies the <literal>T1</literal> Base Timer Interval, which allows the SIP Servlets Container to adjust its timers depending on network conditions.  The default interval is 500 (milliseconds).</para>
           <para>For more information about  available timers, refer to  <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
           <para>Most of the timers present in the tables depend on <literal>T1</literal>,  except for <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal> (for the client transactions). The underlying SIP Servlets JAIN SLEE stack places further conditions on <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal> through  <literal>baseTimerInterval</literal>.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>dispatcherThreadPoolSize</term>
+        <listitem>
+          <para>The number of threads used for processing  SIP messages inside the Sip Servlets container by the dispatcher. The default value is 4.</para>
         </listitem>
       </varlistentry>
     </variablelist>
