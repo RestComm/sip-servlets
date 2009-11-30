@@ -106,7 +106,7 @@
 concurrencyControlMode=&quot;None&quot; 
   darConfigurationFileLocation=&quot;conf/dars/mobicents-dar.properties&quot;&gt;
 </programlisting>
-      <para>Multiple load balancers can be specified and all of them will be updated on the health status of the node. The complete syntaxt for the balancers string is the following:</para>
+      <para>Multiple load balancers can be specified and all of them will be updated on the health status of the node. The complete syntax for the balancers string is the following:</para>
       <programlisting role="XML">&lt;Service name=&quot;jboss.web&quot; 
       ...
   balancers=&quot;ipAddress1:sipPort1:rmiPort1;ipAddress2:sipPort2:rmiPort2;..3...4..&quot;  
@@ -114,10 +114,10 @@ concurrencyControlMode=&quot;None&quot;
 </programlisting>
       <para>If the RMI port is omitted port 2000 is assumed, and if the SIP port is omitted 5065 is assumed.</para>
       <warning>
-        <para>The SIP port  specified in the balancers string for each balancer refers to the internal SIP port of the SIP balancer. That is because the internal port faces the cluster nodes directly. Requests coming through the internal port will go to the external port and vice versa. If you put the external port in the <literal>balancers</literal> string, then the SIP LB will assume that the requests comes from outside the cluster and it wil route it back to some cluster node instead of routing it outside the cluster as expected. Always use the SIP internal port in the <literal>balancers</literal> string. Excpetion to this rule is when a single port is used for internal and external ports in the SIP load balancer. In that case the direction analysis is done based on <literal>Via</literal> headers and the requests are routed correctly without extra settings.</para>
+        <para>The SIP port  specified in the balancers string for each balancer refers to the internal SIP port of the SIP balancer. That is because the internal port faces the cluster nodes directly. Requests coming through the internal port will go to the external port and vice versa. If you put the external port in the <literal>balancers</literal> string, then the SIP LB will assume that the requests comes from outside the cluster and it will route it back to some cluster node instead of routing it outside the cluster as expected. Always use the SIP internal port in the <literal>balancers</literal> string. Exception to this rule is when a single port is used for internal and external ports in the SIP load balancer. In that case the direction analysis is done based on <literal>Via</literal> headers and the requests are routed correctly without extra settings.</para>
         <para/>
       </warning>
-      <para>When multiple SIP load balancers are specified, the outgoing requests will always go through the first one, or an IP load balancer can be used and the requests will be distributed based on the IP balancer policy. To route the outgoing requests to a prticular IP address (the IP load balancer address for example) the <literal>outboundProxy</literal> property can be used:</para>
+      <para>When multiple SIP load balancers are specified, the outgoing requests will always go through the first one, or an IP load balancer can be used and the requests will be distributed based on the IP balancer policy. To route the outgoing requests to a particular IP address (the IP load balancer address for example) the <literal>outboundProxy</literal> property can be used:</para>
       <programlisting role="XML">&lt;Service name=&quot;jboss.web&quot; 
       ...
   balancers=&quot;127.0.0.1:5060:2000;127.0.0.1:5160:2100&quot;  
