@@ -53,8 +53,6 @@ import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
-import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -253,8 +251,8 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		return lastResponse;
 	}
 	
-	public void setResponse(SipServletResponse response) {
-		lastResponse = (SipServletResponseImpl) response;
+	public void setResponse(SipServletResponseImpl response) {
+		lastResponse = response;
 	}
 
 	/* (non-Javadoc)
@@ -312,13 +310,13 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 			recordRoute = recordRouteURI;
 		}
 						
-		Request cloned = proxy.getProxyUtils().createProxiedRequest(
+		Request cloned = ProxyUtils.createProxiedRequest(
 				outgoingRequest,
 				this,
-				new ProxyParams(this.targetURI,
+				this.targetURI,
 				this.outboundInterface,
 				recordRoute, 
-				this.pathURI));
+				this.pathURI);
 		//tells the application dispatcher to stop routing the original request
 		//since it has been proxied
 		originalRequest.setRoutingState(RoutingState.PROXIED);
@@ -337,7 +335,7 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		if(logger.isDebugEnabled()) {
 			logger.debug("creating cloned Request for proxybranch " + request);
 		}
-		SipServletRequestImpl clonedRequest = new SipServletRequestImpl(
+		final SipServletRequestImpl clonedRequest = new SipServletRequestImpl(
 				request,
 				proxy.getSipFactoryImpl(),
 				null,
@@ -350,21 +348,22 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		this.outgoingRequest = clonedRequest;
 		
 		// Initialize the sip session for the new request if initial
+		final MobicentsSipSession originalSipSession = originalRequest.getSipSession();
 		clonedRequest.setCurrentApplicationName(originalRequest.getCurrentApplicationName());
 		if(clonedRequest.getCurrentApplicationName() == null && subsequent) {
-			clonedRequest.setCurrentApplicationName(originalRequest.getSipSession().getSipApplicationSession().getApplicationName());
+			clonedRequest.setCurrentApplicationName(originalSipSession.getSipApplicationSession().getApplicationName());
 		}
-		clonedRequest.setSipSessionKey(originalRequest.getSipSession().getKey());
-		MobicentsSipSession newSession = (MobicentsSipSession) clonedRequest.getSipSession();
+		clonedRequest.setSipSessionKey(originalSipSession.getKey());
+		final MobicentsSipSession newSession = (MobicentsSipSession) clonedRequest.getSipSession();
 		try {
-			newSession.setHandler(((MobicentsSipSession)this.originalRequest.getSipSession()).getHandler());
+			newSession.setHandler(originalSipSession.getHandler());
 		} catch (ServletException e) {
 			logger.error("could not set the session handler while forwarding the request", e);
 			throw new RuntimeException("could not set the session handler while forwarding the request", e);
 		}
 		
 		// Use the original dialog in the new session
-		newSession.setSessionCreatingDialog(originalRequest.getSipSession().getSessionCreatingDialog());
+		newSession.setSessionCreatingDialog(originalSipSession.getSessionCreatingDialog());
 		
 		// And set a reference to the proxy		
 		newSession.setProxy(proxy);		
@@ -387,12 +386,12 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 	 * 
 	 * @param response
 	 */
-	public void onResponse(SipServletResponseImpl response)
+	public void onResponse(final SipServletResponseImpl response, final int status)
 	{
 		// If we are canceled but still receiving provisional responses try to cancel them
-		if(canceled && response.getStatus() < 200) {
+		if(canceled && status < 200) {
 			try {
-				SipServletRequest cancelRequest = outgoingRequest.createCancel();
+				final SipServletRequest cancelRequest = outgoingRequest.createCancel();
 				cancelRequest.send();
 			} catch (Exception e) {
 				if(logger.isDebugEnabled()) {
@@ -403,11 +402,11 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		}
 
 		// We have already sent TRYING, don't send another one
-		if(response.getStatus() == 100)
+		if(status == 100)
 			return;
 		
 		// Send informational responses back immediately
-		if((response.getStatus() > 100 && response.getStatus() < 200) || (response.getStatus() == 200 && Request.PRACK.equals(response.getMethod())))
+		if((status > 100 && status < 200) || (status == 200 && Request.PRACK.equals(response.getMethod())))
 		{
 			// Deterimine if the response is reliable. We just look at RSeq, because
 			// every such response is required to have it.
@@ -415,8 +414,8 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 				this.setWaitingForPrack(true); // this branch is expecting a PRACK now
 			}
 			
-			SipServletResponse proxiedResponse = 
-				proxy.getProxyUtils().createProxiedResponse(response, this);
+			final SipServletResponse proxiedResponse = 
+				ProxyUtils.createProxiedResponse(response, this);
 			
 			if(proxiedResponse == null) {
 				if(logger.isDebugEnabled())
@@ -442,13 +441,13 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		// and return multiple responses for a single transaction.
 		cancelTimer();
 		
-		if(response.getStatus() >= 600) // Cancel all 10.2.4
+		if(status >= 600) // Cancel all 10.2.4
 			this.proxy.cancelAllExcept(this, null, null, null, false);
 		
 		// FYI: ACK is sent automatically by jsip when needed
 		
 		boolean recursed = false;
-		if(response.getStatus() >= 300 && response.getStatus()<400 && recurse) {
+		if(status >= 300 && status < 400 && recurse) {
 			String contact = response.getHeader("Contact");
 			if(contact != null) {
 				//javax.sip.address.SipURI uri = SipFactories.addressFactory.createAddress(contact);
@@ -471,7 +470,7 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 				}
 			}
 		}
-		if(response.getStatus() >= 200 && !recursed)
+		if(status >= 200 && !recursed)
 		{
 			
 			if(outgoingRequest != null && outgoingRequest.isInitial()) {
@@ -524,9 +523,9 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		this.originalRequest = request;
 		
 		// No proxy params, sine the target is already in the Route headers
-		ProxyParams params = new ProxyParams(null, null, null, null);
-		Request clonedRequest = 
-			proxy.getProxyUtils().createProxiedRequest(request, this, params);
+//		final ProxyParams params = new ProxyParams(null, null, null, null);
+		final Request clonedRequest = 
+			ProxyUtils.createProxiedRequest(request, this, null, null, null, null);
 
 //      There is no need for that, it makes application composition fail (The subsequent request is not dispatched to the next application since the route header is removed)
 //		RouteHeader routeHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
@@ -541,12 +540,14 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 			proxy.setSupervised(true);
 			if(clonedRequest.getMethod().equalsIgnoreCase(Request.ACK) ) { //|| clonedRequest.getMethod().equalsIgnoreCase(Request.PRACK)) {
 				// we mark them as accessed so that HA replication can occur
-				request.getSipSession().access();
-				if(request.getSipSession().getSipApplicationSession() != null) {
-					request.getSipSession().getSipApplicationSession().access();
+				final MobicentsSipSession sipSession = request.getSipSession();
+				final MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
+				sipSession.access();
+				if(sipApplicationSession != null) {
+					sipApplicationSession.access();
 				}
-				String transport = JainSipUtils.findTransport(clonedRequest);
-				SipProvider sipProvider = proxy.getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(
+				final String transport = JainSipUtils.findTransport(clonedRequest);
+				final SipProvider sipProvider = proxy.getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(
 						transport, false).getSipProvider();
 				sipProvider.sendRequest(clonedRequest);
 			}
@@ -591,9 +592,9 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 			targetURI = proxy.getPreviousNode();
 		}
 		
-		ProxyParams params = new ProxyParams(targetURI, null, null, null);
+//		ProxyParams params = new ProxyParams(targetURI, null, null, null);
 		Request clonedRequest = 
-			proxy.getProxyUtils().createProxiedRequest(request, this, params);
+			ProxyUtils.createProxiedRequest(request, this, targetURI, null, null, null);
 
 		ViaHeader viaHeader = (ViaHeader) clonedRequest.getHeader(ViaHeader.NAME);
 		try {
@@ -667,7 +668,7 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 			synchronized (cTimerLock) {
 				if(!proxyBranchTimerStarted) {
 					try {
-						ProxyBranchTimerTask timerCTask = new ProxyBranchTimerTask(this);
+						final ProxyBranchTimerTask timerCTask = new ProxyBranchTimerTask(this);
 						if(logger.isDebugEnabled()) {
 							logger.debug("Proxy Branch Timeout set to " + proxyBranchTimeout);
 						}

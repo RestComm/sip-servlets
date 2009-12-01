@@ -441,9 +441,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				sipURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));
 				sipURI.setParameter(MessageDispatcher.APP_ID, sipAppSessionKey.getId());
 				sipURI.setLrParam();				
-				javax.sip.address.Address recordRouteAddress = 
+				final javax.sip.address.Address recordRouteAddress = 
 					SipFactories.addressFactory.createAddress(sipURI);
-				RecordRouteHeader recordRouteHeader = 
+				final RecordRouteHeader recordRouteHeader = 
 					SipFactories.headerFactory.createRecordRouteHeader(recordRouteAddress);
 				response.addFirst(recordRouteHeader);
 				if(logger.isDebugEnabled()) {
@@ -461,19 +461,19 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			}
 			// RFC 3262 Section 3 UAS Behavior
 			if(sendReliably) {
-				Header requireHeader = SipFactories.headerFactory.createRequireHeader(REL100_OPTION_TAG);
+				final Header requireHeader = SipFactories.headerFactory.createRequireHeader(REL100_OPTION_TAG);
 				response.addHeader(requireHeader);
-				Header rseqHeader = SipFactories.headerFactory.createRSeqHeader(getTransactionApplicationData().getRseqNumber().getAndIncrement());
+				final Header rseqHeader = SipFactories.headerFactory.createRSeqHeader(getTransactionApplicationData().getRseqNumber().getAndIncrement());
 				response.addHeader(rseqHeader);
 			}
 			if(logger.isDebugEnabled()) {
 				logger.debug("sending response "+ this.message);
 			}
-			if(originalRequest == null && session.getProxy() != null) {
+			if(originalRequest == null && proxy != null) {
 				String txid = ((ViaHeader) message.getHeader(ViaHeader.NAME)).getBranch();
-				TransactionApplicationData tad = (TransactionApplicationData) session.getProxy().getTransactionMap().get(txid);
+				TransactionApplicationData tad = (TransactionApplicationData) proxy.getTransactionMap().get(txid);
 				if(logger.isDebugEnabled()) {
-					logger.debug("OTrying to recover lost transaction for proxy: " + txid);
+					logger.debug("Trying to recover lost transaction for proxy: " + txid);
 				}
 				if(tad != null) {
 					if(logger.isDebugEnabled()) {

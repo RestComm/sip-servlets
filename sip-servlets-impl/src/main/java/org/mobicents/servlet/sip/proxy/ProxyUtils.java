@@ -18,12 +18,15 @@ package org.mobicents.servlet.sip.proxy;
 
 import gov.nist.javax.sip.header.HeaderFactoryExt;
 import gov.nist.javax.sip.header.ims.PathHeader;
+import gov.nist.javax.sip.message.MessageExt;
 import gov.nist.javax.sip.message.SIPMessage;
 
 import java.util.Iterator;
-import java.util.Random;
 
+import javax.servlet.sip.SipURI;
+import javax.servlet.sip.URI;
 import javax.sip.ListeningPoint;
+import javax.sip.Transaction;
 import javax.sip.address.Address;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RecordRouteHeader;
@@ -39,7 +42,6 @@ import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
-import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 /**
@@ -49,28 +51,24 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
  */
 public class ProxyUtils {
 	private static final Logger logger = Logger.getLogger(ProxyUtils.class);
-	private SipFactoryImpl sipFactoryImpl;
-	private ProxyImpl proxy;
-	private static transient Random random = new Random(System.currentTimeMillis());
-	public ProxyUtils(SipFactoryImpl sipFactoryImpl, ProxyImpl proxy) {
-		this.sipFactoryImpl = sipFactoryImpl;
-		this.proxy = proxy;
-	}
 	
-	public Request createProxiedRequest(SipServletRequestImpl originalRequest, ProxyBranchImpl proxyBranch, ProxyParams params)
+	public static Request createProxiedRequest(SipServletRequestImpl originalRequest, ProxyBranchImpl proxyBranch, URI destination, SipURI outboundInterface, SipURI routeRecord, SipURI path)
 	{
 		try {
-			Request clonedRequest = (Request) originalRequest.getMessage().clone();
+			final Request clonedRequest = (Request) originalRequest.getMessage().clone();
+			final String method = clonedRequest.getMethod();
+			final ProxyImpl proxy = (ProxyImpl) proxyBranch.getProxy(); 
+			final SipFactoryImpl sipFactoryImpl = proxy.getSipFactoryImpl();
 			((SIPMessage)clonedRequest).setApplicationData(null);
 
 			// The target is null when proxying subsequent requests (the Route header is already there)
-			if(params.destination != null)
+			if(destination != null)
 			{				
 				if(logger.isDebugEnabled()){
-					logger.debug("request URI on the request to proxy : " + params.destination);
+					logger.debug("request URI on the request to proxy : " + destination);
 				}
 				//this way everything is copied even the port but might not work for TelURI...
-				clonedRequest.setRequestURI(((URIImpl)params.destination).getURI());
+				clonedRequest.setRequestURI(((URIImpl)destination).getURI());
 				
 //				// Add route header
 //				javax.sip.address.SipURI routeUri = SipFactories.addressFactory.createSipURI(
@@ -89,7 +87,7 @@ public class ProxyUtils {
 				// headers,
 				// Record-Route headers. We insert Via header below so we will
 				// get response.
-				if (clonedRequest.getMethod().equals(Request.CANCEL)) {
+				if (method.equals(Request.CANCEL)) {
 					clonedRequest.removeHeader(ViaHeader.NAME);
 					clonedRequest.removeHeader(RecordRouteHeader.NAME);
 				}
@@ -105,20 +103,21 @@ public class ProxyUtils {
 				mf.setMaxForwards(mf.getMaxForwards() - 1);
 			}
 
-			if (clonedRequest.getMethod().equals(Request.CANCEL)) {				
+			if (method.equals(Request.CANCEL)) {				
 				// Cancel is hop by hop so remove all other via headers.
 				clonedRequest.removeHeader(ViaHeader.NAME);				
 			} 
-			SipApplicationSessionKey sipAppKey = originalRequest.getSipSession().getSipApplicationSession().getKey();
-			String appName = proxy.getSipFactoryImpl().getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());
+			final SipApplicationSessionKey sipAppKey = originalRequest.getSipSession().getSipApplicationSession().getKey();
+			final String appName = sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());
+			final SipServletRequestImpl proxyBranchRequest = (SipServletRequestImpl) proxyBranch.getRequest();
 			//Add via header
 			ViaHeader viaHeader = proxyBranch.viaHeader;
 			if(viaHeader == null) {
 				if(proxy.getOutboundInterface() == null) {
 					String branchId = null;
 
-					if(Request.ACK.equals(clonedRequest.getMethod()) && proxyBranch.getRequest() != null && ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction() != null) {
-						branchId = ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction().getBranchId();
+					if(Request.ACK.equals(method) && proxyBranchRequest != null && proxyBranchRequest.getTransaction() != null) {
+						branchId = proxyBranchRequest.getTransaction().getBranchId();
 						logger.debug("reusing original branch id " + branchId);
 					}
 					viaHeader = JainSipUtils.createViaHeader(
@@ -131,8 +130,8 @@ public class ProxyUtils {
 					}
 					String branchId = null;
 
-					if(Request.ACK.equals(clonedRequest.getMethod()) && proxyBranch.getRequest() != null && ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction() != null) {
-						branchId = ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction().getBranchId();
+					if(Request.ACK.equals(method) && proxyBranchRequest != null && proxyBranchRequest.getTransaction() != null) {
+						branchId = proxyBranchRequest.getTransaction().getBranchId();
 						logger.debug("reusing original branch id " + branchId);
 					}
 
@@ -146,8 +145,8 @@ public class ProxyUtils {
 			} else {
 				String branchId = null;
 				viaHeader = (ViaHeader) viaHeader.clone();
-				if(Request.ACK.equals(clonedRequest.getMethod()) && proxyBranch.getRequest() != null && ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction() != null) {
-					branchId = ((SipServletMessageImpl)proxyBranch.getRequest()).getTransaction().getBranchId();
+				if(Request.ACK.equals(method) && proxyBranchRequest != null && proxyBranchRequest.getTransaction() != null) {
+					branchId = proxyBranchRequest.getTransaction().getBranchId();
 					logger.debug("reusing original branch id " + branchId);
 				} else {
 					branchId = JainSipUtils.createBranch(sipAppKey.getId(), appName);
@@ -159,20 +158,20 @@ public class ProxyUtils {
 			
 			
 			//Add route-record header, if enabled and if needed (if not null)
-			if(params.routeRecord != null && !Request.REGISTER.equalsIgnoreCase(originalRequest.getMethod())) {
+			if(routeRecord != null && !Request.REGISTER.equalsIgnoreCase(method)) {
 				javax.sip.address.SipURI rrURI = null;
 				if(proxy.getOutboundInterface() == null) {
 					rrURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest);
 				} else {
 					rrURI = ((SipURIImpl) proxy.getOutboundInterface()).getSipURI();
 				}
-				Iterator<String> paramNames = params.routeRecord.getParameterNames();
+				final Iterator<String> paramNames = routeRecord.getParameterNames();
 				
 				// Copy the parameters set by the user
 				while(paramNames.hasNext()) {
 					String paramName = paramNames.next();
 					rrURI.setParameter(paramName,
-							params.routeRecord.getParameter(paramName));
+							routeRecord.getParameter(paramName));
 				}
 								
 				rrURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME,
@@ -182,33 +181,32 @@ public class ProxyUtils {
 				rrURI.setParameter(MessageDispatcher.APP_ID, sipAppKey.getId());
 				rrURI.setLrParam();
 				
-				Address rraddress = SipFactories.addressFactory
-				.createAddress(null, rrURI);
-				RecordRouteHeader recordRouteHeader = SipFactories.headerFactory
-				.createRecordRouteHeader(rraddress);
+				final Address rraddress = SipFactories.addressFactory
+					.createAddress(null, rrURI);
+				final RecordRouteHeader recordRouteHeader = SipFactories.headerFactory
+					.createRecordRouteHeader(rraddress);
 				
 				clonedRequest.addFirst(recordRouteHeader);
 			}
 			
 			// Add path header
-			if(params.path != null && Request.REGISTER.equalsIgnoreCase(originalRequest.getMethod()))
+			if(path != null && Request.REGISTER.equalsIgnoreCase(method))
 			{
-				javax.sip.address.SipURI pathURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest);
+				final javax.sip.address.SipURI pathURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest);
 
-				Iterator<String> paramNames = params.path.getParameterNames();
-				
+				final Iterator<String> paramNames = path.getParameterNames();				
 				// Copy the parameters set by the user
 				while(paramNames.hasNext()) {
 					String paramName = paramNames.next();
 					pathURI.setParameter(paramName,
-							params.path.getParameter(paramName));
+							path.getParameter(paramName));
 				}
 				
-				Address pathAddress = SipFactories.addressFactory
+				final Address pathAddress = SipFactories.addressFactory
 					.createAddress(null, pathURI);
 				
 				// Here I need to reference the header factory impl class because can't create path header otherwise
-				PathHeader pathHeader = ((HeaderFactoryExt)SipFactories.headerFactory)
+				final PathHeader pathHeader = ((HeaderFactoryExt)SipFactories.headerFactory)
 					.createPathHeader(pathAddress);
 				
 				clonedRequest.addFirst(pathHeader);
@@ -220,32 +218,35 @@ public class ProxyUtils {
 		}
 	}
 	
-	public SipServletResponseImpl createProxiedResponse(SipServletResponseImpl sipServetResponse, ProxyBranchImpl proxyBranch)
+	public static SipServletResponseImpl createProxiedResponse(SipServletResponseImpl sipServetResponse, ProxyBranchImpl proxyBranch)
 	{
-		Response response = (Response)sipServetResponse.getMessage();
-		Response clonedResponse = (Response)  response.clone();
-		((SIPMessage)clonedResponse).setApplicationData(null);
-
+		final Response response = (Response)sipServetResponse.getMessage();
+		final Response clonedResponse = (Response)  response.clone();
+		((MessageExt)clonedResponse).setApplicationData(null);
+		final Transaction transaction = sipServetResponse.getTransaction();
+		final int status = response.getStatusCode();
 		// 1. Update timer C for provisional non retransmission responses
-		if(sipServetResponse.getTransaction() != null && sipServetResponse.getTransaction().getRequest().getMethod().equals(Request.INVITE)) {
-			if(Response.TRYING < response.getStatusCode() && response.getStatusCode() < Response.OK) {
+		if(transaction != null && transaction.getRequest().getMethod().equals(Request.INVITE)) {
+			if(Response.TRYING < status && status < Response.OK) {
 				proxyBranch.updateTimer();
-			} else if(response.getStatusCode() >= Response.OK) {
+			} else if(status >= Response.OK) {
 				//remove it if response is final
 				proxyBranch.cancelTimer();
 			}
 		}
 			
 		// 2. Remove topmost via
-		Iterator<ViaHeader> viaHeaderIt = clonedResponse.getHeaders(ViaHeader.NAME);
+		final Iterator<ViaHeader> viaHeaderIt = clonedResponse.getHeaders(ViaHeader.NAME);
 		viaHeaderIt.next();
 		viaHeaderIt.remove();
 		if (!viaHeaderIt.hasNext()) {
 			return null; // response was meant for this proxy
 		}
+		final ProxyImpl proxy = (ProxyImpl) proxyBranch.getProxy(); 
+		final SipFactoryImpl sipFactoryImpl = proxy.getSipFactoryImpl();
 		
 		SipServletRequestImpl originalRequest =
-			(SipServletRequestImpl) this.proxy.getOriginalRequest();
+			(SipServletRequestImpl) proxy.getOriginalRequest();
 		
 		if(Request.PRACK.equals(sipServetResponse.getMethod())) {
 			originalRequest =
@@ -254,7 +255,7 @@ public class ProxyUtils {
 		
 		SipServletResponseImpl newServletResponseImpl = null;
 		
-		if(sipServetResponse.getTransaction() != null && originalRequest != null) {
+		if(transaction != null && originalRequest != null) {
 			// non retransmission case
 			newServletResponseImpl = new SipServletResponseImpl(clonedResponse,		
 					sipFactoryImpl,

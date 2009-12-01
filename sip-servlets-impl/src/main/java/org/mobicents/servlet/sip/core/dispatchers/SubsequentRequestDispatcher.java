@@ -303,9 +303,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 							finalBranch.proxySubsequentRequest(sipServletRequest);
 						} else if(isPrack) {
 							callServlet(sipServletRequest);
-							List<ProxyBranch> branches = proxy.getProxyBranches();
+							final List<ProxyBranch> branches = proxy.getProxyBranches();
 							for(ProxyBranch pb : branches) {
-								ProxyBranchImpl proxyBranch = (ProxyBranchImpl) pb;
+								final ProxyBranchImpl proxyBranch = (ProxyBranchImpl) pb;
 								if(proxyBranch.isWaitingForPrack()) {
 									proxyBranch.proxyDialogStateless(sipServletRequest);
 									proxyBranch.setWaitingForPrack(false);

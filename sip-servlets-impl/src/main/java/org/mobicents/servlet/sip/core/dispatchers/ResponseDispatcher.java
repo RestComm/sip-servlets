@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.util.ListIterator;
 
 import javax.servlet.ServletException;
+import javax.servlet.sip.Proxy;
 import javax.servlet.sip.SipSession.State;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -206,9 +207,10 @@ public class ResponseDispatcher extends MessageDispatcher {
 							if(originalRequest != null) {				
 								originalRequest.setResponse(sipServletResponse);					
 							}
+							final int status = sipServletResponse.getStatus();
 							// RFC 3265 : If a 200-class response matches such a SUBSCRIBE or REFER request,
 							// it creates a new subscription and a new dialog.
-							if(Request.SUBSCRIBE.equals(sipServletResponse.getMethod()) && sipServletResponse.getStatus() >= 200 && sipServletResponse.getStatus() <= 300) {					
+							if(Request.SUBSCRIBE.equals(sipServletResponse.getMethod()) && status >= 200 && status <= 300) {					
 								session.addSubscription(sipServletResponse);
 							}
 							// See if this is a response to a proxied request
@@ -245,7 +247,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 								
 								if(proxyBranch == null) {
 									logger.warn("A proxy retransmission has arrived without knowing which proxybranch to use (tx data lost)");
-									if(session.getProxy().getSupervised() && response.getStatusCode() != Response.TRYING) {
+									if(session.getProxy().getSupervised() && status != Response.TRYING) {
 										callServlet(sipServletResponse);
 									}
 									forwardResponseStatefully(sipServletResponse);
@@ -259,14 +261,15 @@ public class ResponseDispatcher extends MessageDispatcher {
 								session.updateStateOnResponse(sipServletResponse, true);
 								proxyBranch.setResponse(sipServletResponse);
 
+								final ProxyImpl proxy = (ProxyImpl) proxyBranch.getProxy();
 								// Notfiy the servlet
 								if(logger.isDebugEnabled()) {
-									logger.debug("Is Supervised enabled for this proxy branch ? " + proxyBranch.getProxy().getSupervised());
+									logger.debug("Is Supervised enabled for this proxy branch ? " + proxy.getSupervised());
 								}
-								if(proxyBranch.getProxy().getSupervised() && response.getStatusCode() != Response.TRYING) {
+								if(proxy.getSupervised() && status != Response.TRYING) {
 									callServlet(sipServletResponse);
 								}
-								if(sipServletResponse.getStatus() == 487 && ((ProxyImpl)proxyBranch.getProxy()).allResponsesHaveArrived()) {
+								if(status == 487 && proxy.allResponsesHaveArrived()) {
 									session.setState(State.TERMINATED);
 									session.setInvalidateWhenReady(true);
 									if(logger.isDebugEnabled()) {
@@ -274,12 +277,12 @@ public class ResponseDispatcher extends MessageDispatcher {
 									}
 								}
 								// Handle it at the branch
-								proxyBranch.onResponse(sipServletResponse); 
+								proxyBranch.onResponse(sipServletResponse, status); 
 								//we don't forward the response here since this has been done by the proxy
 							}
 							else {
 								//if this is a trying response, the response is dropped
-								if(Response.TRYING == response.getStatusCode()) {
+								if(Response.TRYING == status) {
 									if(logger.isDebugEnabled()) {
 										logger.debug("the response is dropped accordingly to JSR 289 " +
 												"since this a 100 for a non proxy application");

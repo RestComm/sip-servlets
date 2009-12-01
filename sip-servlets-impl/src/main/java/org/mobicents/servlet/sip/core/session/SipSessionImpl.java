@@ -830,7 +830,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 //			sessionCreatingTransaction.setApplicationData(null);
 			sessionCreatingTransaction = null;
 		}
-		proxy = null;
+		if(proxy != null) {
+			proxy.getTransactionMap().clear();
+			proxy.getProxyBranchesMap().clear();
+			proxy = null;
+		}
 		remoteParty = null;
 		routingRegion = null;
 		sipFactory = null;

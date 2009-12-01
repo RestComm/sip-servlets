@@ -430,7 +430,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		final MobicentsSipSession session = getSipSession();
 		if (session.getB2buaHelper() != null ) throw new IllegalStateException("Cannot proxy request");
 		
-		MaxForwardsHeader mfHeader = (MaxForwardsHeader)this.message.getHeader(MaxForwardsHeader.NAME);
+		final MaxForwardsHeader mfHeader = (MaxForwardsHeader)this.message.getHeader(MaxForwardsHeader.NAME);
 		if(mfHeader.getMaxForwards()<=0) {
 			try {
 				this.createResponse(Response.TOO_MANY_HOPS, "Too many hops").send();
@@ -447,13 +447,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		// if this request is initial. TODO: Consider deleting the session contents too? JSR 289 says
 		// the session is keyed against the headers, not against initial/non-initial...
 		if (create) { 
+			ProxyImpl proxy = session.getProxy();
 			boolean createNewProxy = false;
-			if(isInitial() && session.getProxy() != null && session.getProxy().getOriginalRequest() == null)  {
+			if(isInitial() && proxy != null && proxy.getOriginalRequest() == null)  {
 				createNewProxy = true;
 			}
-			if(session.getProxy() == null || createNewProxy) {
-				ProxyImpl proxy = new ProxyImpl(this, super.sipFactoryImpl);
-				session.setProxy(proxy);
+			if(proxy == null || createNewProxy) {				
+				session.setProxy(new ProxyImpl(this, super.sipFactoryImpl));
 			}
 		}
 		return session.getProxy();

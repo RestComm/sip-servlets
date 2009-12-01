@@ -43,6 +43,7 @@ import javax.sip.header.ContactHeader;
 import javax.sip.header.Header;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.ViaHeader;
+import javax.sip.message.Message;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -80,12 +81,10 @@ public class ProxyImpl implements Proxy, Externalizable {
 	private transient SipURI outboundInterface;
 	private transient SipFactoryImpl sipFactoryImpl;
 	private boolean isNoCancel;
-	// clustering : will be recreated when loaded from the cache
-	private transient ProxyUtils proxyUtils;
 	
 	transient HashMap<String, Object> transactionMap = new HashMap<String, Object>();
 	
-	private transient Map<URI, ProxyBranch> proxyBranches;
+	private transient Map<URI, ProxyBranchImpl> proxyBranches;
 	private boolean started; 
 	private boolean ackReceived = false;
 	private boolean tryingSent = false;
@@ -107,8 +106,7 @@ public class ProxyImpl implements Proxy, Externalizable {
 	{
 		this.originalRequest = request;
 		this.sipFactoryImpl = sipFactoryImpl;
-		this.proxyBranches = new LinkedHashMap<URI, ProxyBranch> ();
-		this.proxyUtils = new ProxyUtils(sipFactoryImpl, this);
+		this.proxyBranches = new LinkedHashMap<URI, ProxyBranchImpl> ();		
 		this.proxyTimeout = 180; // 180 secs default
 		this.outboundInterface = ((MobicentsSipSession)request.getSession()).getOutboundInterface();
 		this.callerFromHeader = request.getFrom().toString();
@@ -249,6 +247,10 @@ public class ProxyImpl implements Proxy, Externalizable {
 	public List<ProxyBranch> getProxyBranches() {
 		return new ArrayList<ProxyBranch>(this.proxyBranches.values());
 	}
+		
+	public Map<URI, ProxyBranchImpl> getProxyBranchesMap() {
+		return this.proxyBranches;
+	}
 
 	/**
 	 * @return the finalBranchForSubsequentRequest
@@ -310,7 +312,7 @@ public class ProxyImpl implements Proxy, Externalizable {
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.Proxy#proxyTo(java.util.List)
 	 */
-	public void proxyTo(List<? extends URI> uris) {
+	public void proxyTo(final List<? extends URI> uris) {
 		for (URI uri : uris)
 		{
 			if(uri == null) {
@@ -319,7 +321,7 @@ public class ProxyImpl implements Proxy, Externalizable {
 			if(!JainSipUtils.checkScheme(uri.toString())) {
 				throw new IllegalArgumentException("Scheme " + uri.getScheme() + " is not supported");
 			}
-			ProxyBranchImpl branch = new ProxyBranchImpl((SipURI) uri, this);
+			final ProxyBranchImpl branch = new ProxyBranchImpl((SipURI) uri, this);
 			branch.setRecordRoute(recordRoutingEnabled);
 			branch.setRecurse(recurse);
 			this.proxyBranches.put(uri, branch);
@@ -330,14 +332,14 @@ public class ProxyImpl implements Proxy, Externalizable {
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.Proxy#proxyTo(javax.servlet.sip.URI)
 	 */
-	public void proxyTo(URI uri) {
+	public void proxyTo(final URI uri) {
 		if(uri == null) {
 			throw new NullPointerException("URI can't be null");
 		}
 		if(!JainSipUtils.checkScheme(uri.toString())) {
 			throw new IllegalArgumentException("Scheme " + uri.getScheme() + " is not supported");
 		}
-		ProxyBranchImpl branch = new ProxyBranchImpl(uri, this);
+		final ProxyBranchImpl branch = new ProxyBranchImpl(uri, this);
 		branch.setRecordRoute(recordRoutingEnabled);
 		branch.setRecurse(recurse);
 		this.proxyBranches.put(uri, branch);
@@ -374,8 +376,8 @@ public class ProxyImpl implements Proxy, Externalizable {
 		if(seconds<=0) throw new IllegalArgumentException("Negative or zero timeout not allowed");
 		
 		proxyTimeout = seconds;
-		for(ProxyBranch proxyBranch : proxyBranches.values()) {	
-			boolean inactive = ((ProxyBranchImpl)proxyBranch).isCanceled() || ((ProxyBranchImpl)proxyBranch).isTimedOut();
+		for(ProxyBranchImpl proxyBranch : proxyBranches.values()) {	
+			final boolean inactive = proxyBranch.isCanceled() || proxyBranch.isTimedOut();
 			
 			if(!inactive) {
 				proxyBranch.setProxyBranchTimeout(seconds);
@@ -463,9 +465,10 @@ public class ProxyImpl implements Proxy, Externalizable {
 		
 		started = true;
 		if(this.parallel) {
-			for (ProxyBranch pb : this.proxyBranches.values()) {
-				if(!((ProxyBranchImpl)pb).isStarted())
-					((ProxyBranchImpl)pb).start();
+			for (final ProxyBranchImpl pb : this.proxyBranches.values()) {
+				if(!pb.isStarted()) {
+					pb.start();
+				}
 			}
 		} else {
 			startNextUntriedBranch();
@@ -478,13 +481,14 @@ public class ProxyImpl implements Proxy, Externalizable {
 	
 	public void onFinalResponse(ProxyBranchImpl branch) {
 		//Get the final response
-		SipServletResponseImpl response = (SipServletResponseImpl) branch.getResponse();
+		final SipServletResponseImpl response = (SipServletResponseImpl) branch.getResponse();
+		final int status = response.getStatus(); 
 		
 		// Cancel all others if 2xx or 6xx 10.2.4 and it's not a retransmission
 		if(!isNoCancel && response.getTransaction() != null) {
 			if(this.getParallel()) {
-				if( (response.getStatus() >= 200 && response.getStatus() < 300) 
-					|| (response.getStatus() >= 600 && response.getStatus() < 700) ) { 
+				if( (status >= 200 && status < 300) 
+					|| (status >= 600 && status < 700) ) { 
 					if(logger.isDebugEnabled())
 						logger.debug("Cancelling all other broanches in this proxy");
 					cancelAllExcept(branch, null, null, null, false);
@@ -492,15 +496,15 @@ public class ProxyImpl implements Proxy, Externalizable {
 			}
 		}
 		// Recurse if allowed
-		if(response.getStatus() >= 300 && response.getStatus() < 400
-				&& getRecurse())
+		if(status >= 300 && status < 400
+				&& recurse)
 		{
 			// We may want to store these for "moved permanently" and others
 			ListIterator<Header> headers = 
 				response.getMessage().getHeaders(ContactHeader.NAME);
 			while(headers.hasNext()) {
-				ContactHeader contactHeader = (ContactHeader) headers.next();
-				javax.sip.address.URI addressURI = contactHeader.getAddress().getURI();
+				final ContactHeader contactHeader = (ContactHeader) headers.next();
+				final javax.sip.address.URI addressURI = contactHeader.getAddress().getURI();
 				URI contactURI = null;
 				if (addressURI instanceof javax.sip.address.SipURI) {
 					contactURI = new SipURIImpl(
@@ -510,22 +514,24 @@ public class ProxyImpl implements Proxy, Externalizable {
 							(javax.sip.address.TelURL) addressURI);
 
 				}
-				ProxyBranchImpl recurseBranch = new ProxyBranchImpl(contactURI, this);
+				final ProxyBranchImpl recurseBranch = new ProxyBranchImpl(contactURI, this);
 				recurseBranch.setRecordRoute(recordRoutingEnabled);
 				recurseBranch.setRecurse(recurse);
 				this.proxyBranches.put(contactURI, recurseBranch);
 				branch.addRecursedBranch(branch);
-				if(parallel) recurseBranch.start();
+				if(parallel) {
+					recurseBranch.start();
+				}
 				// if not parallel, just adding it to the list is enough
 			}
 		}
 		
-		// Sort best do far		
-		if(bestResponse == null || bestResponse.getStatus() > response.getStatus())
+		// Sort best do far				
+		if(bestResponse == null || bestResponse.getStatus() > status)
 		{
 			//Assume 600 and 400 are equally bad, the better one is the one that came first (TCK doBranchBranchTest)
 			if(bestResponse != null) {
-				if(response.getStatus()<400) {
+				if(status < 400) {
 					bestResponse = response;
 					bestBranch = branch;
 				}
@@ -544,9 +550,9 @@ public class ProxyImpl implements Proxy, Externalizable {
 			if(logger.isDebugEnabled())
 					logger.debug("All responses have arrived, sending final response for parallel proxy" );
 			sendFinalResponse(bestResponse, bestBranch);
-		} 
-		if(!parallel) {
-			if(bestResponse.getStatus()>=200 && bestResponse.getStatus()<300) {
+		} else if (!parallel) {
+			final int bestResponseStatus = bestResponse.getStatus();
+			if(bestResponseStatus >= 200 && bestResponseStatus < 300) {
 				finalBranchForSubsequentRequests = bestBranch;
 				if(logger.isDebugEnabled())
 					logger.debug("Sending final response for sequential proxy" );
@@ -591,9 +597,8 @@ public class ProxyImpl implements Proxy, Externalizable {
 		if(this.parallel) 
 			throw new IllegalStateException("This method is only for sequantial proxying");
 		
-		for(ProxyBranch pb: this.proxyBranches.values())
-		{
-			ProxyBranchImpl pbi = (ProxyBranchImpl) pb;			
+		for(final ProxyBranchImpl pbi: this.proxyBranches.values())
+		{			
 			if(!pbi.isStarted())
 			{
 				pbi.start();
@@ -604,10 +609,9 @@ public class ProxyImpl implements Proxy, Externalizable {
 	
 	public boolean allResponsesHaveArrived()
 	{
-		for(ProxyBranch pb: this.proxyBranches.values())
+		for(final ProxyBranchImpl pbi: this.proxyBranches.values())
 		{
-			ProxyBranchImpl pbi = (ProxyBranchImpl) pb;
-			SipServletResponse response = pb.getResponse();
+			final SipServletResponse response = pbi.getResponse();
 			
 			// The unstarted branches still haven't got a chance to get response
 			if(!pbi.isStarted()) { 
@@ -644,8 +648,8 @@ public class ProxyImpl implements Proxy, Externalizable {
 					logger.debug("Proxy branch has NOT timed out");
 
 		//Otherwise proceed with proxying the response
-		SipServletResponseImpl proxiedResponse = 
-			getProxyUtils().createProxiedResponse(response, proxyBranch);
+		final SipServletResponseImpl proxiedResponse = 
+			ProxyUtils.createProxiedResponse(response, proxyBranch);
 		
 
 		if(proxiedResponse.getMessage() == null) {
@@ -661,7 +665,7 @@ public class ProxyImpl implements Proxy, Externalizable {
 				proxiedResponse.send();
 				if(logger.isDebugEnabled())
 					logger.debug("Sending out proxied final response with existing transaction");
-				proxyBranches = new LinkedHashMap<URI, ProxyBranch> ();
+				proxyBranches.clear();
 				originalRequest = null;
 				bestBranch = null;
 				bestResponse = null;
@@ -670,25 +674,19 @@ public class ProxyImpl implements Proxy, Externalizable {
 			}
 		} else {
 			// retransmission case, RFC3261 specifies that the retrans should be proxied statelessly
-			String transport = JainSipUtils.findTransport(proxiedResponse.getMessage());
+			final Message message = proxiedResponse.getMessage();
+			String transport = JainSipUtils.findTransport(message);
 			SipProvider sipProvider = getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(
 					transport, false).getSipProvider();
 			try {
 				if(logger.isDebugEnabled())
 					logger.debug("Sending out proxied final response retransmission " + proxiedResponse);
-				sipProvider.sendResponse((Response)proxiedResponse.getMessage());
+				sipProvider.sendResponse((Response)message);
 			} catch (SipException e) {
 				logger.error("A problem occured while proxying the final response retransmission", e);
 			}
 		}
-	}
-	
-	ProxyUtils getProxyUtils() {
-		if(proxyUtils == null) {
-			proxyUtils = new ProxyUtils(sipFactoryImpl, this);
-		}
-		return proxyUtils;
-	}
+	}		
 
 	/**
 	 * @return the bestResponse
