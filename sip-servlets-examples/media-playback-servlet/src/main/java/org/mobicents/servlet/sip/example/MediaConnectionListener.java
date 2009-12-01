@@ -96,7 +96,7 @@ public class MediaConnectionListener implements MsConnectionListener{
 				
 				MsPlayRequestedSignal play = (MsPlayRequestedSignal) eventFactory.createRequestedSignal(MsAnnouncement.PLAY);
 				
-				play.setURL("file://" + speech.getAbsolutePath());
+				play.setURL("file:///" + speech.getAbsolutePath().replace('\\', '/'));
 				
 				DTMFListener dtmfListener = new DTMFListener(eventFactory, link);
 				provider.addNotificationListener(dtmfListener);
