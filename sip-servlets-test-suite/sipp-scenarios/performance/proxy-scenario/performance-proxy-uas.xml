@@ -54,9 +54,9 @@
     </action>
   </recv>
     
-  <pause milliseconds="2000" /> 
+  <pause milliseconds="30000" /> 
   
-  <send retrans="500">
+  <send retrans="1000">
     <![CDATA[
       BYE [$3] SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
