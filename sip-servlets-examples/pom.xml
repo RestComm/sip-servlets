@@ -13,12 +13,13 @@
 	<name>Mobicents Sip Servlet Examples</name>
 	<url>http://www.mobicents.org/examples.html</url>
 	<modules>
+		<module>alerting-app</module>
 		<module>call-blocking</module>
 		<module>call-forwarding</module>
 		<module>call-forwarding-distributable</module>
 		<module>chatserver</module>
-		<module>click-to-call</module>
 		<module>click2call-distributable</module>
+		<module>click-to-call</module>
 		<module>conference-demo</module>
 		<module>diameter-event-charging</module>
 		<module>diameter-openims</module>
@@ -26,8 +27,9 @@
 		<module>jslee-sips-interop</module>
 		<module>location-service</module>
 		<module>location-service-distributable</module>
-		<module>media-playback-servlet</module>
 		<module>media-jsr309-servlet</module>
+		<module>media-playback-servlet</module>
+		<module>pure-jruby-telco</module>
 		<module>shootist-sip-servlet</module>
 		<module>shootist-sip-servlet-distributable</module>
 		<module>shopping-demo</module>
@@ -35,8 +37,6 @@
 		<module>simple-sip-servlet-distributable</module>
 		<module>speed-dial</module>
 		<module>uac-register</module>
-		<module>pure-jruby-telco</module>
-		<module>alerting-app</module>
 	</modules>
 
 	<properties>
