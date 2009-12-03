@@ -6,7 +6,7 @@
 	<parent>
 		<artifactId>mobicents</artifactId>
 		<groupId>org.mobicents</groupId>
-		<version>9</version>
+		<version>1.14</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 	<groupId>org.mobicents.servlet.sip.pbx</groupId>
