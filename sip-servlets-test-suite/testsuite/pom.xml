@@ -132,19 +132,19 @@
 		<dependency>
 			<groupId>org.mobicents.tools</groupId>
 			<artifactId>sip-balancer</artifactId>
-			<version>1.0.BETA9-SNAPSHOT</version>
+			<version>1.0.BETA9</version>
 		</dependency>
 		
 		<dependency>			
 			<groupId>org.mobicents.ha.javax.sip</groupId>
 			<artifactId>mobicents-jain-sip-ha-core</artifactId>
-			<version>0.2-SNAPSHOT</version>				
+			<version>0.2</version>				
 		</dependency>
 		
 		<dependency>			
 			<groupId>org.mobicents.ha.javax.sip</groupId>
 			<artifactId>mobicents-jain-sip-jboss4</artifactId>
-			<version>0.2-SNAPSHOT</version>				
+			<version>0.2</version>				
 		</dependency>
 		
 		<!-- clustering deps -->
