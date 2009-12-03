@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.example</groupId>
 		<artifactId>alerting-app-parent</artifactId>
-		<version>1.5-SNAPSHOT</version>
+		<version>1.5</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>org.mobicents.servlet.sip.example</groupId>
 	<artifactId>alerting-app</artifactId>
 	<packaging>war</packaging>
-	<version>1.5-SNAPSHOT</version>
+	<version>1.5</version>
 	<name>Alerting Application</name>
 	<dependencies>	
 		<!-- media dependencies -->
