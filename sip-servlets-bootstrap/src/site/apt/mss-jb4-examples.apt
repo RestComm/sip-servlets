@@ -2,6 +2,8 @@ JBoss 4.x only Examples
 
 	Here is our list of examples showcasing Media, Diameter, JSLEE interoperability that will work only on Mobicents Sip Servlets for JBoss 4.x version :
 		
+		* {{{alerting-app.html}Alerting Application}} : a sip servlet application showing how to use media capabilities (Media playback, Text to Speech with FreeTTS and DTMF detection) and SMS sending through a Provider
+		
 		* {{{media-demo.html}Media Example}} : a sip servlet application showing how to use media capabilities (Media playback, Text to Speech with FreeTTS and DTMF detection).
 	
 		* {{{shopping-demo.html}Shopping Example}} : a Converged JEE Application showing SEAM integration, JEE, Media integration with TTS and DTMF support.   

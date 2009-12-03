@@ -1,5 +1,13 @@
 Doing a Release : 
 
+Release JSIP first
+Release Mobicents Parent with the new JSIP
+Release Sip Balancer
+Release Mobicents Cluster
+Release Mobicents JAIN SIP HA
+
+Important note : make sure to do a clean checkout of those projects to make the release to avoid messing up the SVN (happened to me on 1.1 release)
+
 Checkout the branch and do mvn release:prepare -P release -Dmaven.test.skip=true from there
 when asked for SCM release tag, put release-<version-number>
 if thet svn tag fails, do a svn update then retry  mvn release:prepare -P release -Dmaven.test.skip=true (it won't prompt you for anything since it has already everything from the previous failed one) -> this problem is mainly due to compatibility issue between mvn and svn 1.5

@@ -1,0 +1,652 @@
+<?xml version="1.0"?>
+<project name="mobicents.sipservlets.release" default="release" basedir=".">
+	<property environment="sys"/>
+	<property name="release.path" location="${ant.file.mobicents.sipservlets.release}/../target" />
+	<property name="base.path" location="${ant.file.mobicents.sipservlets.release}/.." />
+	<property name="docs.stage.dir" location="${ant.file.mobicents.sipservlets.release}/../documentation" />
+	
+	<property name="mss.release.version" value="1.1" />
+	<property name="mss.release.configurations" value="all,default" />
+	<property name="mss.release.configurations.jboss5" value="all,default" />
+	
+	<property name="jboss.version" value="4.2.3.GA" />
+	<property name="jboss-5.version" value="5.1.0.GA" />
+	<property name="jboss.download.url" value="http://downloads.sourceforge.net/jboss/jboss-${jboss.version}.zip" />
+	<property name="jboss-5.download.url" value="http://downloads.sourceforge.net/jboss/jboss-${jboss-5.version}.zip" />
+	
+	<property name="tomcat.version" value="6.0.14" />
+	<property name="tomcat.download.url" value="http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip" />
+	
+	<property name="embjopr.version" value="1.2.0.CR-JBAS4" />
+	<property name="embjopr.download.url" value="http://downloads.sourceforge.net/rhq/embedded-jopr-${embjopr.version}.zip" />
+	
+	<property name="diameter.version" value="1.1.0.GA" />
+	<property name="diameter.download.url" value="http://repository.jboss.com/maven2/org/mobicents/servers/diameter/mobicents-diameter-mux-sar-jboss-4/${diameter.version}/mobicents-diameter-mux-sar-jboss-4-${diameter.version}.sar" />
+	<property name="diameter-jboss-5.download.url" value="http://repository.jboss.com/maven2/org/mobicents/servers/diameter/mobicents-diameter-mux-sar-jboss-5/${diameter.version}/mobicents-diameter-mux-sar-jboss-5-${diameter.version}.sar" />
+	<property name="diameter.distro.path" value="${base.path}/mobicents-diameter-jboss-4-${diameter.version}.sar" />
+	<property name="diameter-jboss-5.distro.path" value="${base.path}/mobicents-diameter-jboss-5-${diameter.version}.sar" />
+	
+	<property name="tomcat.distro.zip.path" value="${base.path}/apache-tomcat-${tomcat.version}.zip" />
+	<property name="jboss.distro.zip.path" value="${base.path}/jboss-${jboss.version}.zip" />
+	<property name="jboss-5.distro.zip.path" value="${base.path}/jboss-${jboss-5.version}.zip" />
+	<property name="jboss-5.torquebox.deployer.url" value="http://repository.torquebox.org/maven2/snapshots/org/torquebox/torquebox-core/1.0.0.Beta14-SNAPSHOT/torquebox-core-1.0.0.Beta14-20090709.162929-1-deployer.jar"/>
+	<property name="jboss-5.torquebox.deployer.zip.path" value="${base.path}/torquebox-deployer.zip"/>
+	<property name="embjopr.distro.zip.path" value="${base.path}/embjopr-${embjopr.version}.zip" />
+	
+	<property name="jboss.home" value="${release.path}/jboss-${jboss.version}" />
+	<property name="jboss-5.home" value="${release.path}/jboss-${jboss-5.version}" />
+	<property name="tomcat.home" value="${release.path}/apache-tomcat-${tomcat.version}" />
+	<property name="embjopr.war" value="admin-console.war" />
+	<property name="embjopr.home" value="${release.path}/${embjopr.war}" />
+	<property name="embjopr.home.contents" value="${release.path}/embedded-jopr.war-contents" />
+	
+	<condition property="mvn.executable" value="${sys.M2_HOME}\bin\mvn.bat" else="mvn">
+		<os family="windows"/>
+	</condition>
+	
+	<taskdef onerror="fail" resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+			<pathelement location="${ant.file.mobicents.release}/../ant-contrib-1.0b3.jar" />
+		</classpath>
+	</taskdef>
+	
+	<!-- Release target -->
+	
+	<target name="release" depends="clean,release-jboss,release-jboss-5,release-tomcat,make-src-zip,clean" />
+	
+	<!-- Tomcat version -->
+	
+	<target name="release-tomcat" depends="extract-tomcat">
+		<copy file="TOMCAT-SIP-SERVLETS-README.txt" todir="${tomcat.home}" />
+		
+		<mkdir dir="${tomcat.home}/conf/dars"/>
+		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" tofile="${tomcat.home}/conf/dars/mobicents-dar.properties" />
+		
+		<copy file="${base.path}/server-tomcat-6.xml" tofile="${tomcat.home}/conf/server.xml" />
+		<copy file="${base.path}/mss-sip-stack.properties" tofile="${tomcat.home}/conf/mss-sip-stack.properties" />
+		
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
+			<arg line="clean install -U -P set-svn-revision -DCATALINA_HOME=${tomcat.home} -P tomcat-distro,docs" />
+		</exec>
+		
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
+		
+		<copy tofile="${tomcat.home}/webapps/click2call.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
+		</copy>
+		
+		<antcall target="deploy-mgmnt">
+			<param name="management.deploy.folder" value="${tomcat.home}/webapps" />
+		</antcall>
+		
+		<mkdir dir="${tomcat.home}/docs" />
+		<antcall target="build-documentation">
+			<param name="jboss.home" value="${tomcat.home}"/>
+		</antcall>
+		<antcall target="make-final-zip-tomcat" />
+	</target>
+	
+	<!-- JBoss version -->
+
+	<target name="release-jboss" depends="extract-jboss,extract-embjopr">
+		<for delimiter="," param="jboss.config" list="${mss.release.configurations}">
+			<sequential>
+				<ant dir="${base.path}" antfile="build.xml" target="release-jboss-node">
+					<property name="jboss.home" value="${jboss.home}"/>
+					<property name="jboss.config" value="@{jboss.config}"/>
+				</ant>				
+			</sequential>
+		</for>
+		<!-- removing diameter and mms from ha node -->
+		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-1.x">
+			<property name="jboss.home" value="${jboss.home}"/>
+			<property name="jboss.config" value="default"/>
+		</ant>
+		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter">
+			<property name="jboss.home" value="${jboss.home}"/>
+			<property name="jboss.config" value="default"/>
+		</ant>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/diameter-event-charging">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>		
+		<copy tofile="${jboss.home}/server/default/deploy/diameter-event-charging.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/diameter-event-charging/target/" includes="diameter-event-charging-*.war" />
+		</copy>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
+		
+		<copy tofile="${jboss.home}/server/default/deploy/click2call.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
+		</copy>		
+		
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click2call-distributable">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
+		
+		<copy tofile="${jboss.home}/server/all/deploy/click2call-distributable.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/click2call-distributable/target/" includes="click2call-distributable-*.war" />
+		</copy>
+		
+		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${jboss.home}" />
+		<antcall target="build-mobicents-sip-load-balancer"/>
+		<antcall target="build-documentation"/>
+		<antcall target="make-final-zip-jboss" />
+	</target>
+	
+	<target name="release-jboss-5" depends="extract-jboss-5,extract-jboss-5-torquebox-deployer">
+		<for delimiter="," param="jboss.config" list="${mss.release.configurations.jboss5}">
+			<sequential>
+				<ant dir="${base.path}" antfile="build.xml" target="release-jboss-5-node">
+					<property name="jboss-5.home" value="${jboss-5.home}"/>
+					<property name="jboss.config" value="@{jboss.config}"/>
+				</ant>				
+			</sequential>
+		</for>
+		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-jboss-5">
+			<property name="jboss.home" value="${jboss-5.home}"/>
+			<property name="jboss.config" value="default"/>
+		</ant>
+		<!-- include MMS 2.X in default dir only -->
+		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-2.x">
+			<property name="jboss.home" value="${jboss-5.home}"/>
+			<property name="jboss.config" value="default"/>
+		</ant>
+		<!-- include JSR309 media example -->
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
+		<copy tofile="${jboss-5.home}/server/default/deploy/media-jsr309-servlet.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet/target/" includes="media-jsr309-servlet.war" />
+		</copy>
+		<!-- Commented out because Diameter don't run on JB5 yet -->
+		<!--ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter">
+			<property name="jboss.home" value="${jboss.home}"/>
+			<property name="jboss.config" value="@{jboss.config}"/>
+		</ant-->
+		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${jboss-5.home}" />
+		<antcall target="build-mobicents-sip-load-balancer">
+			<param name="jboss.home" value="${jboss-5.home}"/>
+		</antcall>
+		<antcall target="build-documentation">
+			<param name="jboss.home" value="${jboss-5.home}"/>
+		</antcall>
+		<!-- include Click to Call example -->
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
+				
+		<copy tofile="${jboss-5.home}/server/default/deploy/click2call.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
+		</copy>				
+		
+		<antcall target="make-final-zip-jboss-5" />
+	</target>
+	
+	<target name="release-jboss-node">
+		<mkdir dir="${jboss.home}/server/${jboss.config}/conf/dars" />
+		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" tofile="${jboss.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" />
+		
+		<copy file="${base.path}/mss-sip-stack-jboss.properties" tofile="${jboss.home}/server/${jboss.config}/conf/mss-sip-stack.properties" />
+		<copy file="${base.path}/server-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/server.xml" />
+		<copy file="${base.path}/context-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/context.xml" />
+		<copy file="${base.path}/jboss-service.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/jboss-service.xml" />
+		<copy file="${base.path}/webserver-xmbean.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml" />
+		
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
+			<arg line="clean install -U -P set-svn-revision,jboss-distro,docs -DJBOSS_HOME=${jboss.home} -Dnode=${jboss.config}" />
+		</exec>
+				
+		<antcall target="deploy-mgmnt" >
+			<param name="management.deploy.folder" value="${jboss.home}/server/${jboss.config}/deploy" />
+		</antcall>
+		
+		<antcall target="build-mobicents-jopr-plugin" />
+		
+		<condition property="ha.capable">
+			<or>
+				<equals arg1="${jboss.config}" arg2="all" />
+				<equals arg1="${jboss.config}" arg2="production" />
+			</or>
+		</condition>
+		
+		<antcall target="release-jboss-node-ha" />
+		
+	</target>
+	
+	<target name="release-jboss-5-node">
+		<mkdir dir="${jboss-5.home}/server/${jboss.config}/conf/dars" />
+		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" />
+		<copy file="${base.path}/mss-sip-stack-jboss.properties" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/conf/mss-sip-stack.properties" />
+		<copy file="${base.path}/server-jboss-5.xml" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/server.xml" />		
+		<copy file="${base.path}/jboss-beans.xml" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/META-INF/jboss-beans.xml" />
+		<copy file="${base.path}/metadata-deployer-jboss-beans.xml" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/deployers/metadata-deployer-jboss-beans.xml" />
+		<copy file="${base.path}/war-deployers-jboss-beans.xml" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml" />
+		<copy file="${base.path}/context-jboss-5.xml" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/context.xml" />
+		
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
+			<arg line="clean install -U -P set-svn-revision,jboss-5-distro,docs -DJBOSS_HOME=${jboss-5.home} -Dnode=${jboss.config}" />
+		</exec>
+		
+		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-annotations.jar" />
+		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-impl.jar" />
+		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-spec.jar" />
+		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-jboss5-metadata.jar" />
+		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-annotations.jar">
+			<fileset dir="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-annotations-*.jar" />
+		</copy>
+		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-impl.jar">
+			<fileset dir="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-impl-*.jar" />
+		</copy>
+		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-spec.jar">
+			<fileset dir="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-spec-*.jar" />
+		</copy>
+		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-jboss5-metadata.jar">
+			<fileset dir="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-jboss5-metadata-*.jar" />
+		</copy>				
+				
+		<antcall target="deploy-mgmnt" >
+			<param name="management.deploy.folder" value="${jboss-5.home}/server/${jboss.config}/deploy" />
+		</antcall>
+		
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../jopr-plugin-as-5">
+			<arg line="clean install -U -DJBOSS_HOME=${jboss-5.home} -Dnode=${jboss.config}" />
+		</exec>
+		
+		<condition property="ha.capable">
+			<or>
+				<equals arg1="${jboss.config}" arg2="all" />
+				<equals arg1="${jboss.config}" arg2="production" />
+			</or>
+		</condition>
+		
+		<antcall target="release-jboss-5-node-ha" />
+		
+	</target>
+	
+	<target name="release-jboss-node-ha" if="ha.capable">
+		<copy overwrite="true" file="${base.path}/mss-sip-stack-jboss.properties" tofile="${jboss.home}/server/${jboss.config}/conf/mss-sip-stack.properties" />
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/failover-server-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/server.xml" />
+		<copy overwrite="true" file="${base.path}/context-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/context.xml" />
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/jboss-service-all.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/jboss-service.xml" />
+		<copy overwrite="true" file="${base.path}/webserver-xmbean.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml" />
+				
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
+			<arg line="clean install -U -P set-svn-revision,jboss-distro,jboss-cluster-distro -DJBOSS_HOME=${jboss.home} -Dnode=${jboss.config}" />
+		</exec>
+		
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
+			<arg line="clean install -U -P set-svn-revision"/>
+		</exec>
+		
+		<copy tofile="${jboss.home}/server/${jboss.config}/deploy/simple-distributable.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/target/" includes="simple-sip-servlet-distributable-*.war" />
+		</copy>
+		
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${jboss.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" />
+	</target>
+	
+	<target name="release-jboss-5-node-ha" if="ha.capable">
+		<copy overwrite="true" file="${base.path}/mss-sip-stack-jboss-5-all.properties" tofile="${jboss-5.home}/server/${jboss.config}/conf/mss-sip-stack.properties" />
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/jboss5/failover-server-jboss-5.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/server.xml" />
+		<copy overwrite="true" file="${base.path}/context-jboss-5.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/context.xml" />
+		<copy overwrite="true" file="${base.path}/jboss-beans.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/META-INF/jboss-beans.xml" />
+		<copy overwrite="true" file="${base.path}/metadata-deployer-jboss-beans.xml" tofile="${jboss-5.home}/server/${jboss.config}/deployers/metadata-deployer-jboss-beans.xml" />
+		<copy overwrite="true" file="${base.path}/failover-war-deployers-jboss-beans.xml" tofile="${jboss-5.home}/server/${jboss.config}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml" />
+				
+		<!-- we need to copy those jars otherwise we get an IllegalAccessError (might be due to a classloading issue => post a message on jboss forum) -->
+		<copy overwrite="true" file="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/jboss-web-service.jar" tofile="${jboss-5.home}/server/${jboss.config}/deployers/jbossweb.deployer/jboss-web-service.jar" />
+		<copy overwrite="true" file="${jboss-5.home}/common/lib/jboss-ha-server-cache-jbc.jar" tofile="${jboss-5.home}/server/${jboss.config}/deployers/jbossweb.deployer/jboss-ha-server-cache-jbc.jar" />
+		<move file="${jboss-5.home}/common/lib/jboss-ha-server-cache-jbc.jar" tofile="${jboss-5.home}/common/lib/jboss-ha-server-cache-jbc.jar.bak" />		
+
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
+			<arg line="clean install -U -P set-svn-revision,jboss-5-distro,jboss-5-cluster-distro -DJBOSS_HOME=${jboss-5.home} -Dnode=${jboss.config}" />
+		</exec>
+		
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
+			<arg line="clean install -U -P set-svn-revision"/>
+		</exec>
+			
+		<copy tofile="${jboss-5.home}/server/${jboss.config}/deploy/simple-distributable.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/target/" includes="simple-sip-servlet-distributable-*.war" />
+		</copy>						
+			
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click2call-distributable">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
+									
+		<copy tofile="${jboss-5.home}/server/all/deploy/click2call-distributable.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/click2call-distributable/target/" includes="click2call-distributable-*.war" />
+		</copy>
+		
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${jboss-5.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" />
+	</target>
+	
+	<!-- MSS Management Console -->
+	
+	<target name="deploy-mgmnt">
+		<property name="management.home" location="${base.path}/../../sip-servlets-management/"/>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${management.home}">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
+		<copy file="${management.home}/target/sip-servlets-management-${mss.release.version}.war" tofile="${management.deploy.folder}/sip-servlets-management.war"/>
+	</target>
+	
+	<!-- Get dependencies -->
+	
+	<condition property="dependencies.checkedout">
+		<and>
+			<available file="${base.path}/target/dependencies/media/1.x/core/.svn/entries" />
+			<available file="${base.path}/target/dependencies/media/2.x/core/.svn/entries" />
+			<available file="${base.path}/target/dependencies/diameter/.svn/entries" />
+			<available file="${base.path}/target/dependencies/sip-balancer/.svn/entries" />
+		</and>
+	</condition>
+	<target name="get-deps" depends="checkout-deps,update-deps" />
+	
+	<target name="checkout-deps" unless="dependencies.checkedout">
+		<echo>Checking out dependencies</echo>
+		<exec executable="${mvn.executable}" dir="${base.path}">
+			<arg line="-f external-components.xml validate -P checkout" />
+		</exec>
+	</target>
+	
+	<target name="update-deps">
+		<echo>Updating dependencies</echo>
+		<exec executable="${mvn.executable}" dir="${base.path}">
+			<arg line="-f external-components.xml validate -P update" />
+		</exec>
+	</target>
+	
+	<!-- Build dependencies-->
+	
+	<target name="build-mobicents-media-server-1.x" depends="get-deps">
+		<echo>Building Mobicents Media Server 1.x</echo>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/media/1.x/core">
+			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss.home} -Dnode=${jboss.config}" />
+		</exec>
+	</target>
+	
+	<target name="build-mobicents-media-server-2.x" depends="get-deps">
+		<echo>Building Mobicents Media Server 2.x</echo>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/media/2.x/core">
+			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss-5.home} -Dnode=${jboss.config} -Dmaven.test.skip=true" />
+		</exec>				
+	</target>
+	
+	<!--target name="build-mobicents-diameter" depends="get-deps">
+		<echo>Building Mobicents Diameter</echo>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/diameter">
+			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss.home} -Dnode=${jboss.config} -Dmaven.test.skip=true" />
+		</exec>				
+	</target>
+	
+	<target name="build-mobicents-diameter-jboss-5" depends="get-deps">
+		<echo>Building Mobicents Diameter</echo>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/diameter">
+			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss-5.home} -Dnode=${jboss.config} -Dmaven.test.skip=true" />
+		</exec>				
+	</target-->
+	
+	<target name="build-mobicents-sip-load-balancer" depends="get-deps">
+		<echo>Building Mobicents SIP Load Balancer</echo>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/sip-balancer">
+			<arg line="clean install -P set-svn-revision" />
+		</exec>
+		<copy tofile="${jboss.home}/sip-balancer/sip-balancer-jar-with-dependencies.jar">
+			<fileset dir="${base.path}/target/dependencies/sip-balancer/target/" includes="sip-balancer-*-jar-with-dependencies.jar" />
+		</copy>
+		<copy file="${base.path}/target/dependencies/sip-balancer/src/test/resources/lb-configuration.properties"
+			tofile="${jboss.home}/sip-balancer/lb-configuration.properties" />
+	</target>
+	
+	<target name="build-mobicents-jopr-plugin">
+		<echo>Building Mobicents Jopr Plugin</echo>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../jopr-plugin">
+			<arg line="clean install" />
+		</exec>
+		<copy todir="${embjopr.home.contents}/plugins/">
+			<fileset dir="${base.path}/../../jopr-plugin/target/" includes="jopr-mobicents-sip-servlets-plugin-*.jar" />
+		</copy>
+		<mkdir dir="${jboss.home}/server/${jboss.config}/deploy/${embjopr.war}"/>
+		<copy todir="${jboss.home}/server/${jboss.config}/deploy/${embjopr.war}">
+			<fileset dir="${embjopr.home.contents}" includes="**/*" />
+		</copy>
+	</target>
+	
+	<!-- Download dependencies from SourceForge -->
+	
+	<target name="build-mobicents-diameter" depends="get-mobicents-diameter">		
+		<copy verbose="true" todir="${jboss.home}/server/${jboss.config}/deploy/" file="${diameter.distro.path}"/>			
+	</target>
+	
+	<target name="build-mobicents-diameter-jboss-5" depends="get-mobicents-diameter-jboss-5">		
+		<copy verbose="true" todir="${jboss-5.home}/server/${jboss.config}/deploy/" file="${diameter-jboss-5.distro.path}"/>			
+	</target>
+	
+	<available file="${diameter.distro.path}" property="got.mobicents-diameter" />
+	<target name="get-mobicents-diameter" unless="got.mobicents-diameter">
+		<echo>Downloading Mobicents Diameter JBoss 4</echo>
+			<get dest="${diameter.distro.path}" src="${diameter.download.url}" />
+	</target>
+	
+	<available file="${diameter-jboss-5.distro.path}" property="got.mobicents-diameter-jboss-5" />
+		<target name="get-mobicents-diameter-jboss-5" unless="got.mobicents-diameter-jboss-5">
+			<echo>Downloading Mobicents Diameter JBoss5</echo>
+				<get dest="${diameter-jboss-5.distro.path}" src="${diameter-jboss-5.download.url}" />
+		</target>
+	
+	<!-- Fetch and build documentation -->
+	
+	<condition property="docs.checked.out">
+		<and>
+			<available file="${docs.stage.dir}/common/.svn/entries" />
+			<available file="${docs.stage.dir}/media/.svn/entries" />
+			<available file="${docs.stage.dir}/sip-servlets/.svn/entries" />
+		</and>
+	</condition>
+	<target name="get-documentation" depends="checkout-documentation,update-documentation" />
+	
+	<target name="checkout-documentation" unless="docs.checked.out">
+		<echo>Checking out documentation</echo>
+		<exec executable="${mvn.executable}" dir="${ant.file.media.server.release}/../">
+			<arg line="-f documentation-checkout.xml validate -P checkout" />
+		</exec>
+	</target>
+	
+	<target name="update-documentation">
+		<echo>Updating documentation</echo>
+		<exec executable="${mvn.executable}" dir="${ant.file.media.server.release}/../">
+			<arg line="-f documentation-checkout.xml validate -P update" />
+		</exec>
+	</target>
+	
+	<target name="build-documentation" depends="get-documentation">
+		<echo>Building documentation</echo>
+		
+		<exec executable="${mvn.executable}" dir="${docs.stage.dir}/media/">
+			<arg line="clean compile" />
+		</exec>
+		<exec executable="${mvn.executable}" dir="${docs.stage.dir}/sip-servlets/">
+			<arg line="clean install" />
+		</exec>
+		
+		<!--copy overwrite="true" todir="${jboss.home}/docs/mobicents-media-server">
+			<fileset dir="${docs.stage.dir}/media/target/docbook/publish/en-US/" />
+		</copy-->
+		<!--copy overwrite="true" todir="${jboss.home}/docs/mobicents-sip-servlets">
+			<fileset dir="${docs.stage.dir}/sip-servlets/target/docbook/publish/en-US/" />
+		</copy--> 
+		<copy overwrite="true" todir="${jboss.home}/docs/mobicents-sip-servlets">
+			<fileset dir="${base.path}/../../docs/jdocbook-mobicents/target/docbook/publish/en-US/" />
+		</copy>
+		
+		<!--delete dir="${docs.stage.dir}" /-->
+	</target>
+	
+	<!-- zip source project that can be used to build release -->
+	
+	<target name="set-src-excludes">
+		<defaultexcludes add="**/target/**" />
+		<defaultexcludes add="**/design-docs/**" />
+		<defaultexcludes add="**/legacy/**" />
+		<defaultexcludes add="**/release/**" />
+		<defaultexcludes add="**/logs/**" />
+		<defaultexcludes add="**/tests/**" />
+		<defaultexcludes add="**/build/**" />
+		<defaultexcludes add="**/GWT/**" />
+		<defaultexcludes add="**/${*}/**" />
+		<defaultexcludes add="**/*JBOSS_HOME*/**" />
+		<defaultexcludes add="**/*CATALINA_HOME*/**" />
+		<defaultexcludes add="**/.gwt-cache/**" />
+		<defaultexcludes add="**/.settings/**" />
+		<defaultexcludes add="**/.project" />
+		<defaultexcludes add="**/.classpath" />
+		<defaultexcludes add="**/*.class" echo="true"/>
+	</target>
+	
+	<target name="make-src-zip"  depends="set-time-stamp,set-src-excludes">
+		<property name="zip.filename" value="mss-${mss.release.version}-${time.stamp}-src.zip" />
+		
+		<copy todir="${release.path}/src/mobicents/servers/sip-servlets" includeEmptyDirs="false">
+			<fileset dir="${base.path}/../.."
+				includes="**/pom.xml **/sip-servlets-application-router/** **/sip-servlets-bootstrap/** **/sip-servlets-examples/** **/sip-servlets-impl/** **/sip-servlets-management/** **/sip-servlets-spec/**"
+				excludes="**/mobicents-skin/** **/sip-servlets-bootstrap/src/site/** **/sip-servlets-impl/null/** **/www/**" />
+		</copy>
+		
+		<zip destfile="${base.path}/${zip.filename}" basedir="${release.path}/src"/>
+		<delete dir="${release.path}/src"/>
+		
+		<defaultexcludes default="true"/>
+	</target>
+	
+	<!-- zip binary distributions -->
+	
+	<target name="make-final-zip-jboss" depends="set-time-stamp">
+		<fixcrlf srcdir="${jboss.home}/bin" includes="*.sh" eol="lf" eof="remove" />
+		<zip destfile="${base.path}/mss-${mss.release.version}-jboss-${jboss.version}-${time.stamp}.zip" filesonly="false">
+			<zipfileset dir="${jboss.home}/bin" filemode="755" prefix="bin">
+				<include name="*.sh" />
+			</zipfileset>
+			<zipfileset dir="${jboss.home}/bin" prefix="bin">
+				<exclude name="*.sh" />
+			</zipfileset>
+			<zipfileset dir="${jboss.home}" prefix="" excludes="**/bin/** **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**"/>
+		</zip>
+	</target>
+	
+	<target name="make-final-zip-jboss-5" depends="set-time-stamp">
+		<fixcrlf srcdir="${jboss-5.home}/bin" includes="*.sh" eol="lf" eof="remove" />
+		<zip destfile="${base.path}/mss-${mss.release.version}-jboss-${jboss-5.version}-${time.stamp}-TECH-PREVIEW.zip" filesonly="false">
+			<zipfileset dir="${jboss-5.home}/bin" filemode="755" prefix="bin">
+				<include name="*.sh" />
+			</zipfileset>
+			<zipfileset dir="${jboss-5.home}/bin" prefix="bin">
+				<exclude name="*.sh" />
+			</zipfileset>
+			<zipfileset dir="${jboss-5.home}" prefix="" excludes="**/bin/** **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**"/>
+		</zip>
+	</target>
+	
+	<target name="make-final-zip-tomcat" depends="set-time-stamp">
+		<fixcrlf srcdir="${tomcat.home}/bin" includes="*.sh" eol="lf" eof="remove" />
+		<zip destfile="${base.path}/mss-${mss.release.version}-apache-tomcat-${tomcat.version}-${time.stamp}.zip" filesonly="false">
+			<zipfileset dir="${tomcat.home}/bin" filemode="755" prefix="bin">
+				<include name="*.sh" />
+			</zipfileset>
+			<zipfileset dir="${tomcat.home}/bin" prefix="bin">
+				<exclude name="*.sh" />
+			</zipfileset>
+			<zipfileset dir="${tomcat.home}" prefix="" excludes="**/bin/**"/>
+		</zip>
+	</target>
+	
+	<target name="set-time-stamp" unless="skip.timestamp">
+		<tstamp>
+			<format property="time.stamp" pattern="yyMMddHHmm" />
+		</tstamp>
+	</target>
+	
+	<!-- The cleanup target -->
+	
+	<target name="clean">
+		<delete dir="${jboss.home}" />
+		<delete dir="${tomcat.home}" />
+		<delete dir="${release.path}"/>
+	</target>
+	
+	<!-- Download and dependency building -->
+	
+	<available file="${jboss.distro.zip.path}" property="got.jboss" />
+	<target name="get-jboss" unless="got.jboss">
+		<echo>Downloading JBoss AS</echo>
+		<get dest="${jboss.distro.zip.path}" src="${jboss.download.url}"/>
+	</target>
+	
+	<available file="${jboss-5.distro.zip.path}" property="got.jboss-5" />
+	<target name="get-jboss-5" unless="got.jboss-5">
+		<echo>Downloading JBoss AS 5</echo>
+		<get dest="${jboss-5.distro.zip.path}" src="${jboss-5.download.url}"/>
+	</target>
+	
+	<available file="${jboss-5.torquebox.deployer.zip.path}" property="got.jboss-5-torquebox-deployer" />
+	<target name="get-jboss-5-torquebox-deployer" unless="got.jboss-5-torquebox-deployer">
+		<echo>Downloading JBoss AS 5 Torquebox Deployer</echo>
+		<get dest="${jboss-5.torquebox.deployer.zip.path}" src="${jboss-5.torquebox.deployer.url}"/>
+	</target>
+	
+	<target name="extract-jboss" depends="get-jboss">
+		<delete dir="${jboss.home}" failonerror="true" />
+		<unzip src="${jboss.distro.zip.path}" dest="${jboss.home}/.." />
+		
+		<propertyregex input="${mss.release.configurations}" regexp="(\w+)" global="true" replace="**/\1/**" property="used.configurations" />
+		<echo>Included configurations: ${mss.release.configurations} -&gt; Excludes list: ${used.configurations}</echo>
+		
+		<delete includeemptydirs="true" failonerror="false" verbose="false">
+			<fileset dir="${jboss.home}/server" excludes="${used.configurations}" />
+		</delete>
+	</target>
+	
+	<target name="extract-jboss-5" depends="get-jboss-5">
+		<delete dir="${jboss-5.home}" failonerror="true" />
+		<unzip src="${jboss-5.distro.zip.path}" dest="${jboss-5.home}/.." />
+		
+		<propertyregex input="${mss.release.configurations.jboss5}" regexp="(\w+)" global="true" replace="**/\1/**" property="used.configurations.jboss5" />
+		<echo>Included profiles: ${mss.release.configurations.jboss5} -&gt; Excludes list: ${used.configurations.jboss5}</echo>
+		
+		<delete includeemptydirs="true" failonerror="false" verbose="false">
+			<fileset dir="${jboss-5.home}/server" excludes="${used.configurations.jboss5}" />
+		</delete>
+	</target>
+	
+	<target name="extract-jboss-5-torquebox-deployer" depends="get-jboss-5-torquebox-deployer">			
+		<unzip src="${jboss-5.torquebox.deployer.zip.path}" dest="${jboss-5.home}/server/default/deployers/torquebox.deployer" />					
+	</target>
+	
+	<available file="${tomcat.distro.zip.path}" property="got.tomcat" />
+	<target name="get-tomcat" unless="got.tomcat">
+		<echo>Downloading Apache Tomcat</echo>
+		<get dest="${tomcat.distro.zip.path}" src="${tomcat.download.url}"/>
+	</target>
+	
+	<target name="extract-tomcat" depends="get-tomcat">
+		<delete dir="${tomcat.home}" failonerror="true" />
+		<unzip src="${tomcat.distro.zip.path}" dest="${tomcat.home}/.." />
+	</target>
+	
+	<available file="${embjopr.distro.zip.path}" property="got.jopr" />
+	<target name="get-embjopr" unless="got.jopr">
+		<echo>Downloading Embedded Jopr</echo>
+		<get dest="${embjopr.distro.zip.path}" src="${embjopr.download.url}"/>
+	</target>
+	
+	<target name="extract-embjopr" depends="get-embjopr">
+		<delete dir="${embjopr.home}" failonerror="true" />
+		<unzip src="${embjopr.distro.zip.path}" dest="${embjopr.home}/.." />
+		<mkdir dir="${embjopr.home.contents}"/>
+		<unjar src="${embjopr.home}" dest="${embjopr.home.contents}" />
+	</target>
+	
+</project>
