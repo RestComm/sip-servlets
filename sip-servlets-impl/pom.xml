@@ -91,7 +91,7 @@
 		<dependency>			
 			<groupId>org.mobicents.ha.javax.sip</groupId>
 			<artifactId>mobicents-jain-sip-ha-core</artifactId>
-			<version>0.2</version>	
+			<version>0.3-SNAPSHOT</version>	
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
