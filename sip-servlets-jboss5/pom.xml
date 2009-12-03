@@ -129,21 +129,21 @@
 		<dependency>
 			<groupId>org.mobicents.cluster</groupId>
 			<artifactId>core</artifactId>
-			<version>1.1-SNAPSHOT</version>
+			<version>1.1</version>
 			<scope>provided</scope>
 		</dependency>	
 		
 		<dependency>
 			<groupId>org.mobicents.cluster</groupId>
 			<artifactId>cache</artifactId>
-			<version>1.1-SNAPSHOT</version>
+			<version>1.1</version>
 			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.mobicents.cluster</groupId>
 			<artifactId>timers</artifactId>
-			<version>1.1-SNAPSHOT</version>
+			<version>1.1</version>
 			<scope>provided</scope>
 		</dependency>
 						
@@ -224,32 +224,32 @@
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-ha-core</artifactId>
-					<version>0.2-SNAPSHOT</version>
+					<version>0.2</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-jboss5</artifactId>
-					<version>0.2-SNAPSHOT</version>
+					<version>0.2</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.cluster</groupId>
 					<artifactId>timers</artifactId>										
-					<version>1.1-SNAPSHOT</version>
+					<version>1.1</version>
 				</dependency>				
 				<dependency>
 					<groupId>org.mobicents.cluster</groupId>
 					<artifactId>core</artifactId>										
-					<version>1.1-SNAPSHOT</version>
+					<version>1.1</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.cluster</groupId>
 					<artifactId>cache</artifactId>										
-					<version>1.1-SNAPSHOT</version>
+					<version>1.1</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.tools</groupId>
 					<artifactId>sip-balancer</artifactId>
-					<version>1.0.BETA9-SNAPSHOT</version>
+					<version>1.0.BETA9</version>
 					<scope>provided</scope>
 				</dependency>
 			</dependencies>						
@@ -281,32 +281,32 @@
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-ha-core</artifactId>
-					<version>0.1-SNAPSHOT</version>
+					<version>0.1</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-jboss5</artifactId>
-					<version>0.1-SNAPSHOT</version>
+					<version>0.1</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.cluster</groupId>
 					<artifactId>timers</artifactId>										
-					<version>1.0.0BETA1-SNAPSHOT</version>
+					<version>1.1</version>
 				</dependency>				
 				<dependency>
 					<groupId>org.mobicents.cluster</groupId>
 					<artifactId>core</artifactId>										
-					<version>1.0.0BETA1-SNAPSHOT</version>
+					<version>1.1</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.cluster</groupId>
 					<artifactId>cache</artifactId>										
-					<version>1.0.0BETA1-SNAPSHOT</version>
+					<version>1.1</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.tools</groupId>
 					<artifactId>sip-balancer</artifactId>
-					<version>1.0.BETA8-SNAPSHOT</version>
+					<version>1.0.BETA9</version>
 					<scope>provided</scope>
 				</dependency>
 			</dependencies>						
