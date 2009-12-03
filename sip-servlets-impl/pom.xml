@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip</groupId>
 		<artifactId>sip-servlets-bootstrap</artifactId>
-		<version>1.1</version>
+		<version>1.1-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>sip-servlets-impl</artifactId>
@@ -15,19 +15,19 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-spec</artifactId>
-			<version>1.1.11</version>			
+			<version>1.1.11-SNAPSHOT</version>			
 		</dependency>		
 
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-annotations</artifactId>
-			<version>1.1</version>			
+			<version>1.1-SNAPSHOT</version>			
 		</dependency>
 
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-client</artifactId>
-			<version>1.1</version>			
+			<version>1.1-SNAPSHOT</version>			
 		</dependency>
 		
 		<!-- logging dependency -->
