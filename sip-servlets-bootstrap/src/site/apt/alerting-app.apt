@@ -1,0 +1,62 @@
+Alerting Application
+
+* Service Description
+
+	Application that can be used to alert a phone number that an event has occured. 
+	
+	This application was developped so that the JBoss {{{http://www.jopr.org}RHQ/Jopr}} Enterprise Management Solution would be able to notify system administrators when a monitoring alert is fired by Jopr/RHQ
+	
+	More information can be found on {{{http://pilhuhn.blogspot.com/2009/09/jopr-talking.html}heiko's blog}} or on the {{{https://docs.google.com/present/edit?id=0AXZ3Uhj-XHcDZGZjanI0OHpfMTg1aGZ3c3EzZHE&hl=en}following online presentation}} 
+	 
+	The intent is to have multiple communication channels to alert people through Twitter, SMS, Phone calls, XMPP etc...
+	
+	So the application features one context path per communication channel :
+	
+		* SMS is on http://<host>:<port>/alerting-app/sms : an SMS is send to the phone number
+		
+		* Phone calls is on http://<host>:<port>/alerting-app/sms : a Phone call is placed to the phone number and the callee can give feedback by pressing phone buttons 
+ 	
+ 	Each Servlet for a Communication Channel takes the mandatory following arguments :
+ 	
+ 		* alertId : the id of the alert (by example 12345)
+ 		
+ 		* tel : the phone number you want to dial ( by example sip:mobicents@127.0.0.1:5060 for a SIP Phone or sip:+33679797979@callwithus.com for a phone call going through the callwithus VoIP provider)
+ 		
+ 		* alertText : the text of the alert (by example Server 1 on Cluster Mobicents is overloaded, press 1 to restart, press 2 to stop...) 
+	 
+* How to activate it
+
+** From the binary
+
+	You can find the war file corresponding to this example
+ 	{{{http://repository.jboss.com/maven2/org/mobicents/servlet/sip/example/alerting-app/1.5/alerting-app-1.5.war}here}}.\
+ 	Drop the downloaded war file into your <<<tomcat_home/webapps>>> directory or <<<jboss_home/server/default/deploy>>> directory  
+ 	
+ 	Get the corresponding {{{/alerting-app-dar.properties}dar configuration file}}.\
+ 	To understand what the dar configuration file is used for, check the {{{./mss-dar.html}Application Router Documentation}}.\
+ 	Drop it in your <<<tomcat_home/conf/dars>>> directory or <<<jboss_home/server/default/conf/dars>>> directory.\
+	To use this dar file for this service, specify in the Service xml tag, 
+	darConfigurationFileLocation attribute of the <<<tomcat_home/conf/server.xml>>> file or <<<jboss_home/server/default/deploy/jboss-web.deployer/server.xml>>>, the following :\
+	<<<conf/dars/chatserver-dar.properties>>>
+
+	You can now run your container (Tomcat or Jboss).
+
+** From the source
+
+	Please check out the chatserver example located under this 
+	{{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-examples/alerting-app}location}} 
+	from the svn repository.
+	Follow the instructions in the README.txt to build and run the example.
+	
+	The DAR file for this example can be found at the root of the example 
+	Copy it to JBOSS_HOME/server/default/conf/dars or TOMCAT_HOME/conf/dars and use this as a DAR file (Service tag/darConfigurationFileLocation attribute in the tomcat or jboss's server.xml):
+	./conf/dars/alerting-app-dar.properties  
+
+* How to play with it
+
+	Depending on which alert you want to try hit one of the following test pages : 
+	
+		* SMS : http://localhost:8080/alerting-app/send-sms-alert-test.html (you will need to open an account with {{{http://www.esendex.com}Esendex}} and modify the web.xml to enter your credentials)
+		
+		* Phone calls : http://localhost:8080/alerting-app/send-alert-test.html (if you need to call out to a real phone you will need to open an account with {{{http://www.callwithus.com}Call With Us}} or an online VoIP"provider and modify the web.xml to enter your credentials)
+ 
