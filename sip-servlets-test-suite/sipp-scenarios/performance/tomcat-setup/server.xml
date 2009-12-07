@@ -214,7 +214,7 @@
       <!-- Define the default virtual host
            Note: XML Schema validation will not work with Xerces 2.2.
        -->      
-      <Host appBase="webapps" autoDeploy="true" name="localhost" unpackWARs="true" xmlNamespaceAware="false" xmlValidation="false" hostConfigClass="org.mobicents.servlet.sip.startup.SipHostConfig" configClass="org.mobicents.servlet.sip.startup.SipContextConfig">
+      <Host className="org.mobicents.servlet.sip.startup.SipStandardHost" appBase="webapps" autoDeploy="true" name="localhost" unpackWARs="true" xmlNamespaceAware="false" xmlValidation="false" configClass="org.mobicents.servlet.sip.startup.SipContextConfig">
 
 		<!--Context name="sip-test-context" path="/simple-sip-servlet" docBase="/home/deruelle/workspaces/mobicents-sip-servlets/sip-servlets-examples/simple-sip-servlet/src/main/sipapp" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.SipContextConfig">
 			<Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						

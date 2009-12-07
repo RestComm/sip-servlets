@@ -14,7 +14,7 @@
 	<property name="jboss.download.url" value="http://downloads.sourceforge.net/jboss/jboss-${jboss.version}.zip" />
 	<property name="jboss-5.download.url" value="http://downloads.sourceforge.net/jboss/jboss-${jboss-5.version}.zip" />
 	
-	<property name="tomcat.version" value="6.0.14" />
+	<property name="tomcat.version" value="6.0.20" />
 	<property name="tomcat.download.url" value="http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip" />
 	
 	<property name="embjopr.version" value="1.2.0.CR-JBAS4" />
