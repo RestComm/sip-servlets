@@ -1,4 +1,4 @@
-mvn clean install -f ../../../pom.xml -P jboss -U
+mvn clean install -f ../../../pom.xml -U
 
 cp tomcat-setup/mss-sip-stack.properties $CATALINA_HOME/conf/mss-sip-stack.properties
 cp tomcat-setup/server.xml $CATALINA_HOME/conf/server.xml

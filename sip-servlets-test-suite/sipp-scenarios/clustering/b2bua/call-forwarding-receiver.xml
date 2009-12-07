@@ -5,7 +5,7 @@
 
 <scenario name="UAC for SIP-Servlets Tests - location-service-c">
 
-  <recv request="INVITE" rrs="true" timeout="5000" ontimeout="1" />
+  <recv request="INVITE" rrs="true" timeout="10000" />
 
   <send>
     <![CDATA[
@@ -23,7 +23,7 @@
     ]]>
   </send>
 
-  <pause milliseconds="1000"/>
+  <pause milliseconds="500"/>
 
   <send retrans="500">
     <![CDATA[
@@ -59,7 +59,7 @@
   
   <pause milliseconds="14000"/>
   
-  <recv request="BYE" timeout="5000" />
+  <recv request="BYE" timeout="10000" />
 
   <send>
     <![CDATA[

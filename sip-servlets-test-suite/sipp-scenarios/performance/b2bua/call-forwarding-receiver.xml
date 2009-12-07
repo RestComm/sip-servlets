@@ -23,6 +23,7 @@
     ]]>
   </send>
 
+  <pause milliseconds="500"/>
 
   <send retrans="500">
     <![CDATA[
