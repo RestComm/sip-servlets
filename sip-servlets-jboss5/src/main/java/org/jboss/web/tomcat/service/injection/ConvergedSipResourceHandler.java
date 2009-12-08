@@ -149,6 +149,21 @@ public class ConvergedSipResourceHandler<X extends RemoteEnvironment> extends We
        {
           injectors.put(accObj, new TimerServicePropertyInjector(property, (Container) container)); // only EJBs
        }
+       //Injects a Sip Factory
+       else if (type.equals(SipFactory.class))
+       {          
+    	   injectors.put(accObj, new SipFactoryPropertyInjector(property, container));
+       }
+       //Injects a SipSessionsUtil
+       else if (type.equals(SipSessionsUtil.class))
+       {
+    	   injectors.put(accObj, new SipSessionsUtilPropertyInjector(property, container));          
+       }
+       //Injects a Timer Service
+       else if (type.equals(javax.servlet.sip.TimerService.class))
+       {
+    	   injectors.put(accObj, new SipTimerServicePropertyInjector(property, container));          
+       }
        else if(type.equals(URL.class) && ref.mappedName() != null && ref.mappedName().length() > 0)
        {
           createURLInjector(encName, ref.mappedName(), container);
