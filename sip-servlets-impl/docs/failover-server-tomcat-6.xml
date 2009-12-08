@@ -131,7 +131,7 @@
     --> 
          
     <!-- Define the top level container in our container hierarchy -->
-    <Engine defaultHost="localhost" name="Catalina" className="org.mobicents.servlet.sip.startup.SipStandardEngine">
+    <Engine defaultHost="localhost" name="Sip-Servlets" className="org.mobicents.servlet.sip.startup.SipStandardEngine">
     
 	  <!--Listener className="org.mobicents.servlet.sip.startup.SipServiceListener"/-->
       <!-- The request dumper valve dumps useful debugging information about

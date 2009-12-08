@@ -220,10 +220,10 @@ public class SipContextConfig extends ContextConfig {
 					docBase = "ROOT";
 				} else {
 					if (path.startsWith("/")) {
-						docBase = path.substring(1);
-					} else {
-						docBase = path;
-					}
+	                    docBase = path.substring(1).replace('/', '#');
+	                } else {
+	                    docBase = path.replace('/', '#');
+	                }
 				}
 			}
 			File file = new File(docBase);
@@ -237,11 +237,16 @@ public class SipContextConfig extends ContextConfig {
 			if ((docBase.toLowerCase().endsWith(".sar") || docBase.toLowerCase()
 					.endsWith(".war"))
 					&& !file.isDirectory() && unpackWARs) {
-				URL war = new URL("jar:" + (new File(docBase)).toURL() + "!/");
+				URL war = new URL("jar:" + (new File(docBase)).toURI().toURL() + "!/");
 				String contextPath = context.getPath();
 				if (contextPath.equals("")) {
 					contextPath = "ROOT";
-				}
+				} else {
+		            if (contextPath.lastIndexOf('/') > 0) {
+		                contextPath = "/" + contextPath.substring(1).replace('/','#');
+		            }
+		        }
+				
 				docBase = ExpandWar.expand(host, war, contextPath);
 				file = new File(docBase);
 				docBase = file.getCanonicalPath();
@@ -258,7 +263,7 @@ public class SipContextConfig extends ContextConfig {
 						File archiveFile = new File(docBase + extension);
 						if (archiveFile.exists()) {
 							if (unpackWARs) {
-								URL war = new URL("jar:" + archiveFile.toURL()
+								URL war = new URL("jar:" + archiveFile.toURI().toURL()
 										+ "!/");
 								docBase = ExpandWar.expand(host, war, context
 										.getPath());
@@ -278,7 +283,7 @@ public class SipContextConfig extends ContextConfig {
 	                }
 				}
 			}
-			if (docBase.startsWith(canonicalAppBase.getPath())) {
+			if (docBase.startsWith(canonicalAppBase.getPath() + File.separatorChar)) {
 				docBase = docBase.substring(canonicalAppBase.getPath().length());
 				docBase = docBase.replace(File.separatorChar, '/');
 				if (docBase.startsWith("/")) {

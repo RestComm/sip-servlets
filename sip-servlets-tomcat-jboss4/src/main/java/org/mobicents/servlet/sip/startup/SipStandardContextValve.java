@@ -129,13 +129,14 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
             || (requestPathMB.equalsIgnoreCase("/META-INF"))
             || (requestPathMB.startsWithIgnoreCase("/WEB-INF/", 0))
             || (requestPathMB.equalsIgnoreCase("/WEB-INF"))) {
-            String requestURI = request.getDecodedRequestURI();
-            notFound(requestURI, response);
+        	notFound(response);
             return;
         }
 
         // Wait if we are reloading
+        boolean reloaded = false;
         while (context.getPaused()) {
+            reloaded = true;
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -143,12 +144,27 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
             }
         }
 
+        // Reloading will have stopped the old webappclassloader and
+        // created a new one
+        if (reloaded &&
+                context.getLoader() != null &&
+                context.getLoader().getClassLoader() != null) {
+            Thread.currentThread().setContextClassLoader(
+                    context.getLoader().getClassLoader());
+        }
+
         // Select the Wrapper to be used for this Request
         Wrapper wrapper = request.getWrapper();
         if (wrapper == null) {
-            String requestURI = request.getDecodedRequestURI();
-            notFound(requestURI, response);
+            notFound(response);
             return;
+        } else if (wrapper.isUnavailable()) {
+            // May be as a result of a reload, try and find the new wrapper
+            wrapper = (Wrapper) container.findChild(wrapper.getName());
+            if (wrapper == null) {
+                notFound(response);
+                return;
+            }
         }
 
         // Normal request processing
@@ -300,13 +316,12 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
      * application, but currently that code runs at the wrapper level rather
      * than the context level.
      *
-     * @param requestURI The request URI for the requested resource
      * @param response The response we are creating
      */
-    private void notFound(String requestURI, HttpServletResponse response) {
+    private void notFound(HttpServletResponse response) {
 
         try {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, requestURI);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } catch (IllegalStateException e) {
             ;
         } catch (IOException e) {

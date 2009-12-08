@@ -48,13 +48,26 @@ public class SipHostConfig extends HostConfig {
 	protected void deployApps() {		
 		super.deployApps();		
 	}
-	
+		
+	//completely overwritten since jboss web in jboss as5 and as 4.2.3 are not based on tomcat 6.0.20 
+	@Override
+    protected String getDocBase(String path) {
+        String basename = null;
+        if (path.equals("")) {
+            basename = "ROOT";
+        } else {
+            basename = path.substring(1).replace('/', '#');
+        }
+        return (basename);
+    }
+
+    
 	@Override
 	protected void deployApps(String name) {		
 		File appBase = appBase();
         File configBase = configBase();
         String baseName = getConfigFile(name);
-        String docBase = getConfigFile(name);
+        String docBase = getDocBase(name);
         
         // Deploy XML descriptors from configBase
         File xml = new File(configBase, baseName + ".xml");
