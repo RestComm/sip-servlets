@@ -3,7 +3,7 @@
 ]>
 <!-- chapter id nickname: jdkicar --><section>
   <title>Java Development Kit: Installing, Configuring and Running</title>
-  <para>The <application condition="mob">Mobicents</application><application condition="jbcp">JBCP</application> platform is written in Java.  A working Java Runtime Environment (<acronym>JRE</acronym>) or Java Development Kit (<acronym>JDK</acronym>) must be installed prior to running the server.  The required version must be version 5 or higher.</para>
+  <para>The <application condition="mob">Mobicents</application>/<application condition="jbcp">JBCP</application> platform is written in Java.  A working Java Runtime Environment (<acronym>JRE</acronym>) or Java Development Kit (<acronym>JDK</acronym>) must be installed prior to running the server.  The required version must be version 5 or higher.</para>
   <para>It is possible to run most <application condition="mob">Mobicents</application><application condition="jbcp">JBCP</application> servers, such as the JAIN SLEE Server, using a Java 6 JRE or JDK.  However, the XML Document Management Server does not run on Java 6.  Check the <ulink url="http://groups.google.com/group/mobicents-public/topics">public support forum</ulink> and <ulink url="http://www.mobicents.org/roadmap.html">project road map</ulink> pages to verify Java 6 support prior to running the XML Document Management Server with Java 6.
   </para>
   <formalpara>
