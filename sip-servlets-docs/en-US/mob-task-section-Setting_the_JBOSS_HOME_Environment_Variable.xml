@@ -4,7 +4,7 @@
 <section>
   <title>Setting the JBOSS_HOME Environment Variable</title>
   <para>
-  The <application>Mobicents Platform</application> (<application>Mobicents</application>) is built on top of the <application>JBoss Application Server</application> (<application>JBoss AS</application>). You do not need to set the <envar>JBOSS_HOME</envar> environment variable to run any of the <application>Mobicents Platform</application> servers <emphasis>unless</emphasis> <envar>JBOSS_HOME</envar> is <emphasis>already</emphasis> set.
+  The <application>Mobicents Platform</application> is built on top of the <application>JBoss Application Server</application> (<application>JBoss AS</application>). You do not need to set the <envar>JBOSS_HOME</envar> environment variable to run any of the <application>Mobicents Platform</application> servers <emphasis>unless</emphasis> <envar>JBOSS_HOME</envar> is <emphasis>already</emphasis> set.
  </para>
   <para>The best way to know for sure whether <envar>JBOSS_HOME</envar> was set previously or not is to perform a simple check which may save you time and frustration.</para>
   <formalpara>
@@ -24,34 +24,29 @@
    Even if you fall into the category below of <emphasis>not needing</emphasis> to set <envar>JBOSS_HOME</envar>, you may want to for various reasons anyway. Also, even if you are instructed that you do <emphasis>not need</emphasis> to set <envar>JBOSS_HOME</envar>, it is good practice nonetheless to check and make sure that <envar>JBOSS_HOME</envar> actually <emphasis>isn&apos;t</emphasis> set or defined on your system for some reason. This can save you both time and frustration.
   </para>
   </important>
-  <bridgehead>You <emphasis>DO NOT NEED</emphasis> to set <envar>JBOSS_HOME</envar> if...</bridgehead>
+  <bridgehead>You <emphasis>DO NOT NEED</emphasis> to set <envar>JBOSS_HOME</envar> if:</bridgehead>
   <itemizedlist>
     <listitem>
-      <para>
-    ...you have installed the <application>Mobicents Platform</application> binary distribution.
+      <para>you have installed the <application>Mobicents Platform</application> binary distribution, or
    </para>
     </listitem>
     <listitem>
-      <para>
-    ...you have installed a Mobicents server binary distribution <emphasis>which bundles <application>JBoss AS</application>.</emphasis>
+      <para>you have installed a Mobicents server binary distribution <emphasis>which bundles <application>JBoss AS</application>.</emphasis>
    </para>
     </listitem>
   </itemizedlist>
-  <bridgehead>You <emphasis>MUST</emphasis> set <envar>JBOSS_HOME</envar> if...</bridgehead>
+  <bridgehead>You <emphasis>MUST</emphasis> set <envar>JBOSS_HOME</envar> if:</bridgehead>
   <itemizedlist>
     <listitem>
-      <para>
-    ...you are installing the <application>Mobicents Platform</application> or any of the Mobicents servers <emphasis>from source</emphasis>.
+      <para>you are installing the <application>Mobicents Platform</application> or any of the Mobicents servers <emphasis>from source</emphasis>, or
    </para>
     </listitem>
     <listitem>
-      <para>
-    ...you are installing the <application>Mobicents Platform</application> binary distribution, or one of the Mobicents server binary distributions, which <emphasis>do not</emphasis> bundle <application>JBoss AS</application>.
+      <para>you are installing the <application>Mobicents Platform</application> binary distribution, or one of the Mobicents server binary distributions, which <emphasis>do not</emphasis> bundle <application>JBoss AS</application>.
    </para>
     </listitem>
   </itemizedlist>
-  <para>
-  Naturally, if you installed the <application>Mobicents Platform</application> or one of the Mobicents server binary releases which <emphasis>do not</emphasis> bundle <application>JBoss AS</application>, yet requires it to run, then you should <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Installation_Guide/4/html/index.html">install <application>JBoss AS</application></ulink> before setting <envar>JBOSS_HOME</envar> or proceeding with anything else.
+  <para>If you installed the <application>Mobicents Platform</application> or one of the Mobicents server binary releases which <emphasis>do not</emphasis> bundle <application>JBoss AS</application>, yet requires it to run, then you should <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Installation_Guide/4/html/index.html">install <application>JBoss AS</application></ulink> before setting <envar>JBOSS_HOME</envar> or proceeding with anything else.
  </para>
   <formalpara>
     <title>Setting the JBOSS_HOME Environment Variable on Linux</title>

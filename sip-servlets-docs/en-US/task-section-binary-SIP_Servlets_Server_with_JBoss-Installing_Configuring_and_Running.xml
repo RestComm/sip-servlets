@@ -3,8 +3,7 @@
 ]>
 <!-- chapter id nickname: bssswjicar --><section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing_Configuring_and_Running">
   <title>SIP Servlet-Enabled JBoss Application Server: Installing, Configuring and Running</title>
-  <para>The <productname condition="mob">Mobicents</productname><productname condition="jbcp">JBCP</productname> SIP Servlets Server can run on either the JBoss Application Server or the Tomcat Servlet Container. This section details how to install the SIP Servlets Server on top of the JBoss Application Server. For installation instructions for the Tomcat Servlet Container, refer to <xref linkend="bssswticar-SIP_Servlets_Server_with_Tomcat-Installing_Configuring_and_Running"/>
- </para>
+  <para>The SIP Servlets Server can run on either the JBoss Application Server or the Tomcat Servlet Container. This section details how to install the server on top of the JBoss Application Server. For installation instructions for the Tomcat Servlet Container, refer to <xref linkend="bssswticar-SIP_Servlets_Server_with_Tomcat-Installing_Configuring_and_Running"/></para>
   <note>
     <para>It is recommended that the SIP Servlets Server is run on the JBoss platform.  Some functionality, including the ability to execute some SIP Extension examples, is not available in the Tomcat version.</para>
   </note>
@@ -217,7 +216,7 @@
   </section>
   <section>
     <title>Testing</title>
-    <para>After installation, there should be one pre-configured sample application deployed in the <literal>default</literal> server onfiguration. You can use it to verify that the server is installed and running correctly. The application name is <quote>org.mobicents.servlet.sip.example.SimpleApplication</quote>. From the Sip Servlets Management Console you can make sure it is subscribed to receive <literal>INVITE</literal> and <literal>REGISTER</literal> SIP requests.  It is a simple <filename>Click2Call</filename> application allowing SIP registration and calling phones from the Web user interface.</para>
+    <para>After installation, there should be one pre-configured sample application deployed in the <literal>default</literal> server configuration. You can use it to verify that the server is installed and running correctly. The application name is <quote>org.mobicents.servlet.sip.example.SimpleApplication</quote>. From the Sip Servlets Management Console you can make sure it is subscribed to receive <literal>INVITE</literal> and <literal>REGISTER</literal> SIP requests.  It is a simple <filename>Click2Call</filename> application allowing SIP registration and calling phones from the Web user interface.</para>
     <para>The scenario for this example consists of the following steps:</para>
     <orderedlist>
       <listitem>

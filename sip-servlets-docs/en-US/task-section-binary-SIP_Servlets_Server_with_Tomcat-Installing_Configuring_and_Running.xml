@@ -4,7 +4,7 @@
 <!-- chapter id nickname: bssswticar --><section id="bssswticar-SIP_Servlets_Server_with_Tomcat-Installing_Configuring_and_Running">
   <title>SIP Servlet-Enabled Tomcat Servlet Container: Installing, Configuring and Running</title>
   <para>You can also run Mobicents SIP Servlets on top of the Apache Tomcat Servlet Container. This section provides information on the requirements and prerequisites for running MSS for Tomcat, as well as instructions on how to download, install, configure, run, use, stop, test and uninstall it.</para>
-  <para>Keep in mind that not all capabilities provided by running Mobicents SIP Servlets Server on top of the JBoss Application Server are available with MSS for Tomcat. In particular, MSS for Tomcat lacks support for both clustering and failover; MSS for Tomcat nodes can utilize the SIP load balancer, however.</para>
+  <para>Not all capabilities provided by running Mobicents SIP Servlets Server on top of the JBoss Application Server are available with MSS for Tomcat. In particular, MSS for Tomcat lacks support for both clustering and failover. MSS for Tomcat nodes can utilize the SIP load balancer, however.</para>
   <para>If you are interested in clustering and failover support, or would rather run the Mobicents SIP Servlets Server on top of the JBoss Application Server, go to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing_Configuring_and_Running"/>.</para>
   <formalpara>
     <title>Differences Between the Standard Tomcat Installation and One Customized for the SIP Servlets Server</title>
@@ -68,7 +68,7 @@
         <screen>~]$ cd downloads</screen>
       </step>
       <step>
-        <para>In <filename>downloads</filename>, create a subdirectory to hold the unzipped MSS for Tomcat files. It is good practice to include the version number in this directory name; if you do so, remember to correctly match it with the version of the MSS for Tomcat binary distribution you downloaded.</para>
+        <para>In <filename>downloads</filename>, create a subdirectory to hold the unzipped MSS for Tomcat files. It is good practice to include the version number in this directory name; if you do so, remember to correctly match it with the version of the MSS for Tomcat binary distribution you downloaded.<!--Note - Editor: Step One and Two are the same for all intents and purposes--></para>
         <screen>~]$ mkdir &quot;mss-tomcat-&lt;version&gt;&quot;</screen>
       </step>
       <step>
