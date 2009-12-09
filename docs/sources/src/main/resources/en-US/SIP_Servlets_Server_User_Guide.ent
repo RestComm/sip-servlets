@@ -1,0 +1,16 @@
+<!ENTITY AUTHOR_EMAIL_IVELIN "${author.email.ivelin}">
+<!ENTITY AUTHOR_EMAIL_JEAN "${author.email.jean}">
+<!ENTITY AUTHOR_EMAIL_VLAD "${author.email.vlad}">
+<!ENTITY BOOKID "${bookid}">
+<!ENTITY CMD_PLATFORM_NAME "${cmd.platform.name}">
+<!ENTITY HOME_LIN "${home.link}">
+<!ENTITY PLATFORM_NAME "${platform.name}">
+<!ENTITY RELEASE_INTEGRATED_FILENAME "${release.integrated.filename}">
+<!ENTITY RELEASE_XDMS_FILENAME "${release.xdms.filename}">
+<!ENTITY SHORT_PLATFORM_NAME "${short.platform.name}">
+<!ENTITY SSS_MSS4J_SIZE "${mss4t.release.size}">
+<!ENTITY SSS_MSS4J_ZIP "${mss4t.release.zip}">
+<!ENTITY SSS_MSS4T_SIZE "${mss4t.release.size}">
+<!ENTITY SSS_MSS4T_ZIP "${mss4t.release.zip}">
+<!ENTITY VERSION "${version}">
+<!ENTITY YEAR "${year}">

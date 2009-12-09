@@ -1,12 +1,7 @@
-<?xml version='1.0' encoding='UTF-8'?>
+﻿<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY PLATFORM_NAME "${platform.name}">
-<!ENTITY SHORT_PLATFORM_NAME "${short.platform.name}">
-<!ENTITY CMD_PLATFORM_NAME "${cmd.platform.name}">
-<!ENTITY VERSION "${version}">
-<!ENTITY YEAR "${year}">
-<!ENTITY SSS_MSS4T_SIZE "${mss4t.release.size}">
-<!ENTITY SSS_MSS4T_ZIP "${mss4t.release.zip}">
+<!ENTITY % BOOK_ENTITIES SYSTEM "SIP_Servlets_Server_User_Guide.ent">
+%BOOK_ENTITIES;
 ]>
 <!-- chapter id nickname: bssswticar --><section id="bssswticar-SIP_Servlets_Server_with_Tomcat-Installing_Configuring_and_Running">
   <title>SIP Servlet-Enabled Tomcat Servlet Container: Installing, Configuring and Running</title>

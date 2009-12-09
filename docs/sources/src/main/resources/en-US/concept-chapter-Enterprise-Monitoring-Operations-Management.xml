@@ -1,9 +1,7 @@
-<?xml version='1.0' encoding='UTF-8'?>
+﻿<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
-<!ENTITY PLATFORM_NAME "${platform.name}">
-<!ENTITY SHORT_PLATFORM_NAME "${short.platform.name}">
-<!ENTITY VERSION "${version}">
-<!ENTITY YEAR "${year}">
+<!ENTITY % BOOK_ENTITIES SYSTEM "SIP_Servlets_Server_User_Guide.ent">
+%BOOK_ENTITIES;
 ]>
 <chapter id="emom-Enterprise-Monitoring-Operations-Management">
   <title>Enterprise Monitoring and Management</title>
