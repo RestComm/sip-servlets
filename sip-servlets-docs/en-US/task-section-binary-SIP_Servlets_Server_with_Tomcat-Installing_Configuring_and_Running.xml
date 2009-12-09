@@ -152,7 +152,7 @@
       <title>Setting the <envar>CATALINA_HOME</envar> Environment Variable on Linux</title>
       <step>
         <para>The <envar>CATALINA_HOME</envar> environment variable must point to the location of your Tomcat installation. Any Mobicents server which runs on top of the Tomcat servlet container has a topmost directory, i.e. the directory in which you unzipped the zip file to install the server, and underneath that directory, a <filename>bin</filename> directory. <envar>CATALINA_HOME</envar> must be set to the topmost directory of your Mobicents server installation.</para>
-        <para>Setting this variable in your personal <filename>~/.bashrc</filename> file has the advantage that it will always be set (for you, as a user) each time you log in or reboot the system. To do so, open <filename>~/.bashrc</filename> in a text editor (or create the file if it doesn&apos;t already exist) and insert the following line anywhere in the file, taking care to substitute <filename>&lt;mobicents_server&gt;</filename> for the topmost directory of the Mobicents server you installed:</para>
+        <para>Setting this variable in your personal <filename>~/.bashrc</filename> file has the advantage that it will always be set (for you, as a user) each time you log in or reboot the system. To do so, open <filename>~/.bashrc</filename> in a text editor (or create the file if it doesn&apos;t already exist) and insert the following lines anywhere in the file, taking care to substitute <filename>&lt;mobicents_server&gt;</filename> for the topmost directory of the Mobicents server you installed:</para>
         <screen>export CATALINA_HOME=&quot;/home/&lt;username&gt;/&lt;path&gt;/&lt;to&gt;/&lt;mobicents_server&gt;&quot;</screen>
         <para>Save and close <filename>.bashrc</filename>.</para>
       </step>
@@ -184,7 +184,7 @@
   </section>
   <section id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Running">
     <title>Running</title>
-    <para>Once installed, you can run the Tomcat Servlet Container by executing the one of the startup scripts in the <filename>bin</filename> directory (on Linux or Windows), or by double-clicking the <filename>run.bat</filename> executable batch file in that same directory (on Windows only). However, we suggest always starting Tomcat using the terminal or Command Prompt because you are then able to read—and act upon—any startup messages, and possibly debug any problems that may arise. In the Linux terminal or Command Prompt, you will be able to tell that the container started successfully if the last line of output is similar to the following:</para>
+    <para>Once installed, you can run the Tomcat Servlet Container by executing one of the startup scripts in the <filename>bin</filename> directory (on Linux or Windows), or by double-clicking the <filename>run.bat</filename> executable batch file in that same directory (on Windows only). However, we suggest always starting Tomcat using the terminal or Command Prompt because you are then able to read—and act upon—any startup messages, and possibly debug any problems that may arise. In the Linux terminal or Command Prompt, you will be able to tell that the container started successfully if the last line of output is similar to the following:</para>
     <programlisting><![CDATA[Using CATALINA_BASE:   /home/silas/temp/apps/mobicents/sip_servlets_server/mss-tomcat-0.7.2
 Using CATALINA_HOME:   /home/silas/temp/apps/mobicents/sip_servlets_server/mss-tomcat-0.7.2
 Using CATALINA_TMPDIR: /home/silas/temp/apps/mobicents/sip_servlets_server/mss-tomcat-0.7.2/temp
@@ -252,7 +252,7 @@ Using JRE_HOME:       /etc/java-config-2/current-system-vm]]></screen>
     <procedure>
       <title>Stopping MSS for Tomcat on Windows</title>
       <step>
-        <para>Stopping the Tomcat Servlet Container on Windows consists in executing the <filename>shutdown.bat</filename> executable batch script in the <filename>bin</filename> subdirectory of the SIP Servlets-customized Tomcat binary distribution:</para>
+        <para>Stopping the Tomcat Servlet Container on Windows consists of executing the <filename>shutdown.bat</filename> executable batch script in the <filename>bin</filename> subdirectory of the SIP Servlets-customized Tomcat binary distribution:</para>
         <screen>C:&bsol;Users&bsol;Me&bsol;My Downloads&bsol;mss-tomcat-&lt;version&gt;&gt;bin&bsol;shutdown.bat</screen>
       </step>
     </procedure>
@@ -265,7 +265,7 @@ Using JRE_HOME:       /etc/java-config-2/current-system-vm]]></screen>
   <section id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Testing">
     <title>Testing</title>
     <para>&nbsp;</para>
-  </section>
+<!--Note - Developer: Is the testing for MSS on Tomcat different? or can this section just link to the previous section?-->  </section>
   <section id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Uninstalling">
     <title>Uninstalling</title>
     <para>To uninstall MSS for Tomcat, simply delete the directory you decompressed the binary distribution archive into.</para>

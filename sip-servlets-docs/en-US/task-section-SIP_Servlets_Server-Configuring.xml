@@ -4,7 +4,7 @@
 <!-- chapter id nickname: bsssc --><section id="bsssc-binary-SIP_Servlets_Server-Configuring">
   <title>Configuring</title>
   <para>&nbsp;</para>
-  <section id="bsssc-binary-SIP_Servlets_Server-Adding_SIP_Connectors">
+<!--Note - Developer: Should there be content here? Or is a paragraph being used as a break here?-->  <section id="bsssc-binary-SIP_Servlets_Server-Adding_SIP_Connectors">
     <title>Configuring SIP Connectors</title>
     <para>SIP Connectors are added in the same way as HTTP Connectors: by adding a <literal>&lt;Connector&gt;</literal> element under the <literal>&lt;Service&gt;</literal> element in the container&apos;s <filename>server.xml</filename> configuration file.</para>
     <para>For example, to add a SIP Connector on the IP address <literal>127.0.0.1</literal>, on port <literal>5080</literal>, using the UDP transport protocol, you should insert the following XML element:</para>
@@ -118,7 +118,7 @@ ipAddress="127.0.0.1"
       <varlistentry>
         <term>staticServerAddress</term>
         <listitem>
-          <para>Specifies what load-balancer server address is insterted in Contact/Via headers for server-created requests. This parameter  is useful for  cluster configurations where  requests should  be bound to a load-balancer address, rather than  a specific node address.</para>
+          <para>Specifies what load-balancer server address is inserted in Contact/Via headers for server-created requests. This parameter  is useful for  cluster configurations where  requests should  be bound to a load-balancer address, rather than  a specific node address.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
@@ -134,7 +134,7 @@ ipAddress="127.0.0.1"
   </section>
   <section id="bsssc-binary-SIP_Servlets_Server-Configuring_Application_Routing">
     <title>Application Routing and Service Configuration</title>
-    <para>The application router is called by the container—whether JBoss or Tomcat—to select a SIP Servlet application to service an initial request. It embodies the logic used to choose which applications to invoke. An application router is required for a container to function, but it is a separate logical entity from the container. The application router is solely responsible for application selection and must not implement application logic. For example, the application router cannot modify a request or send a response.</para>
+<!--Note - Editor: Paragraph sounds wrong :)-->    <para>The application router is called by the container—whether JBoss or Tomcat—to select a SIP Servlet application to service an initial request. It embodies the logic used to choose which applications to invoke. An application router is required for a container to function, but it is a separate logical entity from the container. The application router is solely responsible for application selection and must not implement application logic. For example, the application router cannot modify a request or send a response.</para>
     <para>For more information about the application router, refer to the following sections of the JSR 289 specification: Application Router Packaging and Deployment, Application Selection Process, and Appendix C.
    </para>
     <para>In order to configure the application router, you should edit the <literal>Service</literal> element in the container&apos;s <filename>server.xml</filename> configuration file:</para>
