@@ -1,0 +1,144 @@
+#! /usr/bin/env bash
+# :mode=shellscript:
+
+# short script for building Mobicents docs and ensuring
+# necessary files for JDocBook (all-*) are updated
+# for usage, call ./build_docs.bash without any arguments
+
+# EXAMPLES:
+
+# mkbk test
+#    ...means: run xmllint on all books, looking for the first that does not build
+
+#   make CONDITION="mob" html-single-en-US
+#       BECOMES
+#   mkbk jss mob html-single-en-US
+
+#   make CONDITION="jbcp" html-single-en-US
+#       BECOMES
+#   mkbk jss jbcp html-single-en-US
+
+# JDocBook Reference (ignore this):
+#   mvn compile -Denv.DOCNAME="SIP_Servlets_Server_User_Guide" -Phtml_single
+
+echo "Arg 1 [\$BK] (codename of book OR simply 'test'): $1"; BK=$(echo $1 | tr '[:upper:]' '[:lower:]')
+echo "Arg 2 [\$COND] (CONDITION): $2"; COND=$(echo $2 | tr '[:upper:]' '[:lower:]')
+echo -n "Arg 3 (pass-through arg; 3rd arg to 'make', if exists): "; THIRD="$3"; echo $THIRD
+echo -n "Arg 4 (pass-through arg; 4th arg to 'make', if exists): "; FOURTH="$4"; echo $FOURTH
+echo -n "Arg 5 (pass-through arg; 5th arg to 'make', if exists): "; FIFTH="$5"; echo $FIFTH
+echo "-------------------------------------------------"
+
+pre="[MKBK] "
+
+ALL_BKS="jss ms sss sps pig plat"
+ALL_CONDS="mob jbcp"
+
+PLAT="Platform_User_Guide"
+PIG="Platform_Installation_Guide"
+JSS="JAIN_SLEE_Server_User_Guide"
+MS="Media_Server_User_Guide"
+SSS="SIP_Servlets_Server_User_Guide"
+SPS="SIP_Presence_Service_User_Guide"
+
+set_docname() {
+	case $BK in
+		"plat") DOCNAME="$PLAT";;
+		"pig" ) DOCNAME="$PIG";;
+		"jss" ) DOCNAME="$JSS";;
+		"ms" ) DOCNAME="$MS";;
+		"sss") DOCNAME="$SSS";;
+		"sps") DOCNAME="$SPS";;
+	esac
+}
+
+test() {
+	for bk in "jss" "ms" "sss" "sps" "pig" "plat" # $PLAT $PIG $JSS $MS $SPS
+	do
+		BK=$bk
+		set_docname
+		cmd = "mkbk $bk jbcp xml-en-US &>/dev/null"
+
+		echo -n "$pre"; echo "DOCNAME is $DOCNAME"
+		echo -n "$pre"; echo "Calling:"; echo ""
+		echo -n "$pre"; echo "	$cmd"
+
+		eval $cmd
+
+		if [  $? -ne 0 ]; then
+			echo -n "$pre"; echo "$bk is failing to build! Run!"
+			exit 1
+		else
+			echo -n "$pre"; echo "$DOCNAME builds correctly."
+			echo -n "$pre"; echo "*****************************"
+		fi
+	done
+	echo -n "$pre"; echo "All books build correctly. Throw a party!"
+	exit 0
+}
+
+rm_tmp() {
+	if [[ -e Makefile ]]; then
+		if [[ -e pom.xml ]]; then
+			if [[ -e tmp ]]; then
+				echo -n "$pre"; echo "Removing 'tmp'..."
+				rm tmp -fr
+			fi
+		fi
+	fi
+}
+
+build_bk() {
+	rm_tmp
+	set_docname
+	cmd="make DOCNAME=$DOCNAME CONDITION=$COND $THIRD $FOURTH $FIFTH"
+	echo -n "$pre"; echo "DOCNAME is '$DOCNAME'"
+	echo -n "$pre"; echo "Calling:"; echo ""
+	echo -n "$pre"; echo "	$cmd"
+	eval $cmd
+
+	if [ $? -ne 0 ]; then
+		echo -n "$pre"; echo "$DOCNAME did not build!"
+		exit 1
+	else
+		if [ "$COND" = "mob" ]; then
+			echo -n "$pre"; echo "Removing 'en-US/all-$DOCNAME.xml'..."
+			rm "en-US/all-$DOCNAME.xml"
+			echo -n "$pre"; echo "Copying 'tmp/en-US/xml/$DOCNAME.xml' to 'en-US/all-$DOCNAME.xml'..."
+			xmllint --postvalid --noent --xinclude "tmp/en-US/xml/$DOCNAME.xml" > "en-US/all-$DOCNAME.xml"
+		fi
+		echo -n "$pre"; echo "$DOCNAME built. Exiting successfully."
+		exit 0
+	fi
+}
+
+# TEST ARGUMENTS
+chk_BK_arg() {
+	if [ "$BK" = "" ]; then
+		echo -n "$pre"; echo "***************************************"
+		echo -n "$pre"; echo "Error: the BK argument must either represent a book or be 'test'"
+		echo -n "$pre"; echo "  A possible argument for the BK OPTION is one of : $ALL_BKS"
+		echo -n "$pre"; echo "***************************************"
+		exit 1
+	fi
+}
+
+chk_COND_arg() {
+	if [ "$COND" != "mob" -a "$COND" != "jbcp" ]; then
+		echo -n "$pre"; echo "***************************************"
+		echo -n "$pre"; echo "Error: the second argument must be one of these conditions: $ALL_CONDS"
+		echo -n "$pre"; echo "***************************************"
+		exit 1
+	fi
+}
+
+dispatch() {
+	chk_BK_arg
+	if [ "$BK" = "test" ]; then
+		test
+	fi
+	chk_COND_arg
+
+	build_bk
+}
+
+dispatch
