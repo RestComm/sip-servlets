@@ -344,35 +344,35 @@ public final class JainSipUtils {
 	// we don't have any other choice as to maintain a static list of multi value headers
 	// because checking for , for the values as a delimiter won't work for WWW-Authenticate header which is not a multivalue header
 	// but contains multiple , 
-	public static final Set<String> SINGELTON_HEADER_NAMES = new HashSet<String>();
+	public static final Set<String> SINGLETON_HEADER_NAMES = new HashSet<String>();
 	static {
-		SINGELTON_HEADER_NAMES.add(FromHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(ToHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(CSeqHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(CallIdHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(MaxForwardsHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(ContentLengthHeader.NAME);		
-		SINGELTON_HEADER_NAMES.add(ContentDispositionHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(ContentTypeHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(ContentLengthHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(ContentTypeHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(DateHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(ContentTypeHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(ExpiresHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(MinExpiresHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(MimeVersionHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(MinExpiresHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(OrganizationHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(PriorityHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(ReplyToHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(RetryAfterHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(PriorityHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(ServerHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(SubjectHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(TimeStampHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(UserAgentHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(WWWAuthenticateHeader.NAME);
-		SINGELTON_HEADER_NAMES.add(ProxyAuthenticateHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(FromHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(ToHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(CSeqHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(CallIdHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(MaxForwardsHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(ContentLengthHeader.NAME);		
+		SINGLETON_HEADER_NAMES.add(ContentDispositionHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(ContentTypeHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(ContentLengthHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(ContentTypeHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(DateHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(ContentTypeHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(ExpiresHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(MinExpiresHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(MimeVersionHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(MinExpiresHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(OrganizationHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(PriorityHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(ReplyToHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(RetryAfterHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(PriorityHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(ServerHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(SubjectHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(TimeStampHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(UserAgentHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(WWWAuthenticateHeader.NAME);
+		SINGLETON_HEADER_NAMES.add(ProxyAuthenticateHeader.NAME);
 		//TODO are there any other singleton headers ?
 	}	
 	

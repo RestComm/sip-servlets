@@ -300,7 +300,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 					for (String value : entry.getValue()) {							
 						final Header header = SipFactories.headerFactory.createHeader(
 								headerName, value);					
-						if(! JainSipUtils.SINGELTON_HEADER_NAMES.contains(header.getName())) {
+						if(! JainSipUtils.SINGLETON_HEADER_NAMES.contains(header.getName())) {
 							newRequest.addHeader(header);
 						} else {
 							newRequest.setHeader(header);

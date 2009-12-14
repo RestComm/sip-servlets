@@ -251,7 +251,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		
 		try {
 			// Fix to Issue 1015 by alexander.kozlov.IV			
-			if(JainSipUtils.SINGELTON_HEADER_NAMES.contains(name)) {
+			if(JainSipUtils.SINGLETON_HEADER_NAMES.contains(name)) {
 				Header header = SipFactory.getInstance().createHeaderFactory().createHeader(nameToAdd, value);
 				this.message.setHeader(header);				
 			} else {	
@@ -1228,7 +1228,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		
 		try {
 			// Dealing with Allow:INVITE, ACK, CANCEL, OPTIONS, BYE kind of headers
-			if(!JainSipUtils.SINGELTON_HEADER_NAMES.contains(name) && new StringTokenizer(value, ",").countTokens() > 1) {
+			if(!JainSipUtils.SINGLETON_HEADER_NAMES.contains(name) && new StringTokenizer(value, ",").countTokens() > 1) {
 				List<Header> headers = SipFactory.getInstance().createHeaderFactory()
 					.createHeaders(name + ":" + value);
 				for (Header header : headers) {
