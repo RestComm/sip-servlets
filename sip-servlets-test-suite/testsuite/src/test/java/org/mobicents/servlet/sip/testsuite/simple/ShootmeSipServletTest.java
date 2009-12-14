@@ -158,6 +158,10 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertEquals(200, sender.getFinalResponseStatus());
 	}
 	
+	/**
+	 * non regression test for Issue 1004 http://code.google.com/p/mobicents/issues/detail?id=1004
+	 * Cannot find the corresponding sip session to this subsequent request
+	 */
 	public void testShootmeErrorResponse() throws Exception {
 		String fromName = "testErrorResponse";
 		String fromSipAddress = "sip-servlets.com";

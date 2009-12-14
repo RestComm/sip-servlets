@@ -145,8 +145,22 @@ public class ShootistSipServlet
 		if(toParam != null) {
 			toURI.setParameter("toParam", toParam);
 		}
-		SipServletRequest sipServletRequest = 
-			sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);
+		
+		SipServletRequest sipServletRequest = null;
+		if(ce.getServletContext().getInitParameter("useStringFactory") != null) {
+			try {
+				sipServletRequest =	sipFactory.createRequest(sipApplicationSession, "INVITE", "sip:LittleGuy@there.com", userName);
+				if(!sipServletRequest.getTo().toString().contains(userName)) {
+					logger.error("To Address and username should match!");
+					return; 
+				}
+			} catch (ServletParseException e) {
+				logger.error("Impossible to create the INVITE request ", e);
+				return;
+			}
+		} else {
+			sipServletRequest =	sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);
+		}
 		Address addr = null;
 		try {
 			addr = sipServletRequest.getAddressHeader("Contact");

@@ -477,19 +477,20 @@ public class SipFactoryImpl implements Externalizable {
 			URIImpl requestURI = (URIImpl)to.getURI().clone();
 
 			// copying address params into headers.
-			Iterator<String> keys = to.getParameterNames();
-
-			while (keys.hasNext()) {
-				String key = keys.next();				
-				toHeader.setParameter(key, to.getParameter(key));
-			}
-
-			keys = from.getParameterNames();
-
-			while (keys.hasNext()) {
-				String key = keys.next();				
-				fromHeader.setParameter(key, from.getParameter(key));
-			}
+			// commented out because of Issue 1105
+//			Iterator<String> keys = to.getParameterNames();
+//
+//			while (keys.hasNext()) {
+//				String key = keys.next();				
+//				toHeader.setParameter(key, to.getParameter(key));
+//			}
+//
+//			keys = from.getParameterNames();
+//
+//			while (keys.hasNext()) {
+//				String key = keys.next();				
+//				fromHeader.setParameter(key, from.getParameter(key));
+//			}
 			//Issue 112 by folsson : no via header to add will be added when the request will be sent out
 			List<Header> viaHeaders = new ArrayList<Header>();
 						 			

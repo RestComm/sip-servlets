@@ -15,6 +15,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package org.mobicents.servlet.sip.testsuite.simple;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.ToHeader;
@@ -64,6 +68,23 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		applicationParameter.setName(name);
 		applicationParameter.setValue(value);
 		context.addApplicationParameter(applicationParameter);
+		assertTrue(tomcat.deployContext(context));
+		return context;
+	}
+	
+	public SipStandardContext deployApplication(Map<String, String> params) {
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp");
+		context.setName("sip-test-context");
+		context.setPath("sip-test");
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		for (Entry<String, String> param : params.entrySet()) {
+			ApplicationParameter applicationParameter = new ApplicationParameter();
+			applicationParameter.setName(param.getKey());
+			applicationParameter.setValue(param.getValue());
+			context.addApplicationParameter(applicationParameter);
+		}
 		assertTrue(tomcat.deployContext(context));
 		return context;
 	}
@@ -169,6 +190,33 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		tomcat.startTomcat();
 		deployApplication("toParam", "http://yaris.research.att.com:23280/vxml/test.jsp");
 		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());		
+	}
+	
+	/**
+	 * non regression test for Issue 1105 http://code.google.com/p/mobicents/issues/detail?id=1105
+	 * sipFactory.createRequest(sipApplicationSession, "METHOD", fromString, toString) function does not handle URI parameters properly 
+	 */
+	public void testShootistSetToWithParam() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		Map<String, String> params = new HashMap<String, String>();
+		String userName = "sip:+34666666666@127.0.0.1:5080;pres-list=mylist";
+		params.put("username", userName);
+		params.put("useStringFactory", "true");
+		deployApplication(params);
+		Thread.sleep(TIMEOUT);
+		ToHeader toHeader = (ToHeader) receiver.getInviteRequest().getHeader(ToHeader.NAME);
+		assertEquals("To: <sip:+34666666666@127.0.0.1:5080;pres-list=mylist>", toHeader.toString().trim());
 		assertTrue(receiver.getByeReceived());		
 	}
 	
