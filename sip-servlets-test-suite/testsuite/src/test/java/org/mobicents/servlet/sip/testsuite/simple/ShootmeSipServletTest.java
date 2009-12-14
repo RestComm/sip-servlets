@@ -158,6 +158,24 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertEquals(200, sender.getFinalResponseStatus());
 	}
 	
+	public void testShootmeErrorResponse() throws Exception {
+		String fromName = "testErrorResponse";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isFinalResponseReceived());
+		assertEquals(486, sender.getFinalResponseStatus());
+		assertTrue(sender.getAllMessagesContent().contains("ackReceived"));
+	}
+	
 	public void testShootmeRegisterNoContact() throws Exception {
 		String fromName = "testRegisterNoContact";
 		String fromSipAddress = "sip-servlets.com";

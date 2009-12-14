@@ -48,6 +48,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	private static transient Logger logger = Logger.getLogger(SimpleSipServlet.class);
 	private static final long serialVersionUID = 1L;
 	private static final String TEST_PRACK = "prack";
+	private static final String TEST_ERROR_RESPONSE = "testErrorResponse";
 	private static final String TEST_REGISTER_C_SEQ = "testRegisterCSeq";
 	private static final String TEST_REGISTER_NO_CONTACT = "testRegisterNoContact";
 	private static final String TEST_REGISTER_SAVED_SESSION = "testRegisterSavedSession";
@@ -117,6 +118,12 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		request.createResponse(SipServletResponse.SC_TRYING).send();
 		
 		String fromString = request.getFrom().toString();
+		if(fromString.contains(TEST_ERROR_RESPONSE)) {			
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_BUSY_HERE);
+			sipServletResponse.send();
+			return;
+		}
+		
 		if(fromString.contains(TEST_EXTERNAL_ROUTING_NO_INFO)) {			
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 			timerService.createTimer(request.getApplicationSession(), 1000, false, (Serializable)sipServletResponse);
@@ -300,6 +307,11 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 				}
 				req.getSession().setAttribute("nbAcks", nbOfAcks);
 			}
+		}
+		String fromString = req.getFrom().toString();
+		if(fromString.contains(TEST_ERROR_RESPONSE)) {			
+			sendMessage(req.getApplicationSession(), sipFactory, "ackReceived");
+			return;
 		}
 	}
 	

@@ -494,8 +494,12 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 						transport, false).getSipProvider();
 				
 				Dialog dialog = null;
-				// Creates a dialog only for non trying responses
-				if(statusCode != Response.TRYING) {
+				// Creates a dialog only for non trying responses 
+				// and non error responses to cope with Issue 1104 : http://code.google.com/p/mobicents/issues/detail?id=1104 
+				// there is no need to create a dialog in this case since it goes directly from NULL state to TERMINATED state
+				// and this will avoid early invalidation of the session (ie, dialogterminatedevent sent by the stack 
+				// invalidating the session before ACK has been received)
+				if(statusCode != Response.TRYING && statusCode < 300) {
 					dialog = sipProvider.getNewDialog(transaction);	
 					((DialogExt)dialog).disableSequenceNumberValidation();
 				}
