@@ -65,14 +65,14 @@
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>catalina</artifactId>
-			<version>6.0.14</version>
+			<version>6.0.20</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>coyote</artifactId>
-			<version>6.0.14</version>
+			<version>6.0.20</version>
 			<scope>provided</scope>
 		</dependency>		
 	
@@ -285,12 +285,12 @@
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-ha-core</artifactId>
-					<version>0.3-SNAPSHOT</version>
+					<version>0.4-SNAPSHOT</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-jboss4</artifactId>
-					<version>0.3-SNAPSHOT</version>					
+					<version>0.4-SNAPSHOT</version>					
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.tools</groupId>
@@ -327,12 +327,12 @@
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-ha-core</artifactId>
-					<version>0.3-SNAPSHOT</version>
+					<version>0.4-SNAPSHOT</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-jboss4</artifactId>
-					<version>0.3-SNAPSHOT</version>
+					<version>0.4-SNAPSHOT</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.tools</groupId>

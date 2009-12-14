@@ -224,12 +224,12 @@
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-ha-core</artifactId>
-					<version>0.3-SNAPSHOT</version>
+					<version>0.4-SNAPSHOT</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-jboss5</artifactId>
-					<version>0.3-SNAPSHOT</version>
+					<version>0.4-SNAPSHOT</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.cluster</groupId>
@@ -281,12 +281,12 @@
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-ha-core</artifactId>
-					<version>0.3-SNAPSHOT</version>
+					<version>0.4-SNAPSHOT</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-jboss5</artifactId>
-					<version>0.3-SNAPSHOT</version>
+					<version>0.4-SNAPSHOT</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.cluster</groupId>
