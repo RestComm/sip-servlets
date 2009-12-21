@@ -810,6 +810,7 @@ public class ProxyImpl implements Proxy, Externalizable {
 		}
 		previousNode = (SipURI) in.readObject();
 		callerFromHeader = in.readUTF();
+		this.proxyBranches = new LinkedHashMap<URI, ProxyBranchImpl> ();
 	}
 
 	public void writeExternal(ObjectOutput out) throws IOException {
