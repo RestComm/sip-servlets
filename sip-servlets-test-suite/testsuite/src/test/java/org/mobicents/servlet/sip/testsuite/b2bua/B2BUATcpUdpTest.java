@@ -171,6 +171,39 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		assertEquals(2, i);
 	}
 
+	public void testCallForwardingCalleeSendByeTCPSender() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);		
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		receiver.setTransport(false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-udp-sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		receiver.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getOkToByeReceived());
+		assertTrue(receiver.getByeReceived());
+		CallIdHeader receiverCallIdHeader = (CallIdHeader)sender.getInviteRequest().getHeader(CallIdHeader.NAME);
+		CallIdHeader senderCallIdHeader = (CallIdHeader)receiver.getInviteRequest().getHeader(CallIdHeader.NAME);		
+		assertFalse(receiverCallIdHeader.getCallId().equals(senderCallIdHeader.getCallId()));
+	}
+	
 	public void testCallForwardingCalleeSendBye() throws Exception {
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();

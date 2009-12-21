@@ -56,6 +56,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
 		forwardingUris.put("sip:forward-tcp-sender@sip-servlets.com", 
 			new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090;transport=tcp"});
+		forwardingUris.put("sip:forward-udp-sender@sip-servlets.com", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5080"});
 		forwardingUris.put("sip:forward-sender@127.0.0.1:5090", 
 				new String[]{"sip:forward-receiver@127.0.0.1:5090", "sip:forward-receiver@127.0.0.1:5090"});
 		forwardingUris.put("sip:composition@127.0.0.1:5090", 

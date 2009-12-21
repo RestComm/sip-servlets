@@ -259,7 +259,9 @@ public class TestSipListener implements SipListener {
 	
 	public boolean sendByeInNewThread = false;
 
-	private boolean useDefaultRoute = true;;
+	private boolean useDefaultRoute = true;
+
+	private boolean setTransport=true;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -1232,8 +1234,8 @@ public class TestSipListener implements SipListener {
 					Request ackRequest = tid.getDialog().createAck(cseq.getSeqNumber());
 					if (useToURIasRequestUri) {
 						ackRequest.setRequestURI(requestURI);	
-					}
-					logger.info("Sending ACK");
+					}					
+					logger.info("Sending ACK " + ackRequest);					
 					if(!sendSubsequentRequestsThroughSipProvider) {
 						tid.getDialog().sendAck(ackRequest);
 					} else {
@@ -1649,7 +1651,9 @@ public class TestSipListener implements SipListener {
 			this.requestURI = protocolObjects.addressFactory.createSipURI(
 					toSipUri.getUser(), peerHostPort);
 			((SipURI)this.requestURI).setPort(peerPort);
-			((SipURI)this.requestURI).setTransportParam(listeningPoint.getTransport());
+			if(setTransport) {
+				((SipURI)this.requestURI).setTransportParam(listeningPoint.getTransport());
+			}
 		}
 		if(useToURIasRequestUri || toURI instanceof TelURL) {
 			this.requestURI = toURI;
@@ -1696,8 +1700,10 @@ public class TestSipListener implements SipListener {
 			 * either use tcp or udp
 			 */
 			((SipURI)contactUrl).setPort(listeningPoint.getPort());
-			((SipURI)contactUrl).setTransportParam(listeningPoint.getTransport());		
-			((SipURI)contactUrl).setLrParam();
+			if(setTransport) {
+				((SipURI)contactUrl).setTransportParam(listeningPoint.getTransport());		
+				((SipURI)contactUrl).setLrParam();
+			}
 		} else {
 			contactUrl = fromURI;
 		}
@@ -2502,6 +2508,10 @@ public class TestSipListener implements SipListener {
 	 */
 	public Request getMessageRequest() {
 		return messageRequest;
+	}
+
+	public void setTransport(boolean b) {
+		setTransport = b;
 	}
 
 }
