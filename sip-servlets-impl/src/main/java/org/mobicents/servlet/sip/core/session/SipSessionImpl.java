@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.core.session;
 
 import gov.nist.javax.sip.DialogExt;
 import gov.nist.javax.sip.ServerTransactionExt;
+import gov.nist.javax.sip.message.MessageExt;
 import gov.nist.javax.sip.message.SIPMessage;
 
 import java.io.IOException;
@@ -45,7 +46,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
-import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
@@ -360,7 +360,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 						logger.error("Can not create contact header for subsequent request " + method + " for session " + key, e);
 					}
 				}
-
+				// Fix for Issue 1130 (http://code.google.com/p/mobicents/issues/detail?id=1130) : 
+				// NullPointerException when sending request to client which support both UDP and TCP transport
+				// before removing the via header we store the transport into its app data
+				ListIterator<ViaHeader> viaHeaders = methodRequest.getHeaders(ViaHeader.NAME);				
+				if(viaHeaders != null && viaHeaders.hasNext()) {
+					ViaHeader viaHeader = viaHeaders.next();
+					((MessageExt)methodRequest).setApplicationData(viaHeader.getTransport());
+				}
 				//Issue 112 fix by folsson
 				methodRequest.removeHeader(ViaHeader.NAME);
 				
@@ -391,7 +398,15 @@ public class SipSessionImpl implements MobicentsSipSession {
 						throw new IllegalArgumentException("Cannot create the " + method + " on the susbequent request to create on session " + key,e);				
 					} catch (ParseException e) {
 						throw new IllegalArgumentException("Cannot set the " + method + " on the susbequent request to create on session " + key,e);		
-					}				
+					}
+					// Fix for Issue 1130 (http://code.google.com/p/mobicents/issues/detail?id=1130) : 
+					// NullPointerException when sending request to client which support both UDP and TCP transport
+					// before removing the ViaHeader we store the transport into its app data
+					ListIterator<ViaHeader> viaHeaders = request.getHeaders(ViaHeader.NAME);				
+					if(viaHeaders != null && viaHeaders.hasNext()) {
+						ViaHeader viaHeader = viaHeaders.next();
+						((MessageExt)request).setApplicationData(viaHeader.getTransport());
+					}
 					request.removeHeader(ViaHeader.NAME);
 					
 					final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactory.getSipNetworkInterfaceManager();
