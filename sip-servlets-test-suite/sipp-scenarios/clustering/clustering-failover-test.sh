@@ -46,7 +46,12 @@ if [ $# -ne 0 ]; then
 	    		rm ./uas/*.log
 	            echo "Distributed example used is uas";
 	    		./sipp $TEST_IP:5080 -s reinvite -sf uas/clustering-reinvite-uac.xml -trace_err -i $TEST_IP -p 5050 -r 1 -m 1 -rsa $TEST_IP:5060 -trace_msg -nd
-	    		;;	            	   
+	    		;;
+	    uas-no-attributes)
+	    		rm ./uas/*.log
+	            echo "Distributed example used is uas";
+	    		./sipp $TEST_IP:5080 -s reinvite -sf uas/clustering-uac-no-attrs.xml -trace_err -i $TEST_IP -p 5050 -r 1 -m 1 -rsa $TEST_IP:5060 -trace_msg -nd
+	    		;;	       	            	   
 	    uas-timer)
 	    		rm ./uas/*.log
 	            echo "Distributed example used is uas";

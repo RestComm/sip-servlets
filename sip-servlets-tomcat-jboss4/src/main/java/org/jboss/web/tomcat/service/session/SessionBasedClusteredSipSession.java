@@ -156,15 +156,17 @@ public class SessionBasedClusteredSipSession extends
 			final String sipAppSessionKey = sipApplicationSessionKey.getId();
 			final String sipSessionKey = getHaId();
 			
-			int size = (Integer) proxy_.getSipSessionAttribute(sipAppSessionKey, sipSessionKey, "attributesSize");
-			Object[][] attributesArray = (Object[][] )proxy_.getSipSessionAttribute(sipAppSessionKey, sipSessionKey, "attributes");
-			Map<String, Object> attributesMap = new ConcurrentHashMap<String, Object>();
-			for (int i = 0; i < size; i++) {
-				String key = (String) attributesArray[0][i];
-				Object value = attributesArray[1][i];
-				attributesMap.put(key, value);
-			}						
-			sipSessionAttributeMap = attributesMap;
+			Integer size = (Integer) proxy_.getSipSessionAttribute(sipAppSessionKey, sipSessionKey, "attributesSize");
+			if(size != null) {
+				Object[][] attributesArray = (Object[][] )proxy_.getSipSessionAttribute(sipAppSessionKey, sipSessionKey, "attributes");
+				Map<String, Object> attributesMap = new ConcurrentHashMap<String, Object>();
+				for (int i = 0; i < size; i++) {
+					String key = (String) attributesArray[0][i];
+					Object value = attributesArray[1][i];
+					attributesMap.put(key, value);
+				}						
+				sipSessionAttributeMap = attributesMap;
+			}
 //		}
 	}
 
