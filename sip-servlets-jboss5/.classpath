@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
-	<classpathentry kind="lib" path="lib/jboss-web-deployer-5.1.0.GA.jar"/>
-	<classpathentry kind="lib" path="lib/jboss-web-service-5.1.0.GA.jar" sourcepath="/home/deruelle/workspaces/JBoss_5_1_0_GA/tomcat/src/main/"/>
+	<classpathentry kind="lib" path="lib/jboss-web-deployer-5.1.0.GA.jar" sourcepath="/JBoss_5_1_0_GA/tomcat/src/main"/>
+	<classpathentry kind="lib" path="lib/jboss-web-service-5.1.0.GA.jar" sourcepath="/JBoss_5_1_0_GA/tomcat/src/main"/>
 	<classpathentry kind="var" path="M2_REPO/antlr/antlr/2.7.6/antlr-2.7.6.jar"/>
 	<classpathentry kind="var" path="M2_REPO/apache-avalon/avalon-framework/4.1.5/avalon-framework-4.1.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/apache-xerces/xercesImpl/2.9.1/xercesImpl-2.9.1.jar"/>
@@ -122,7 +122,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-mbeans/5.1.0.GA/jboss-as-mbeans-5.1.0.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-profileservice/5.1.0.GA/jboss-as-profileservice-5.1.0.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-security/5.1.0.GA/jboss-as-security-5.1.0.GA.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-server/5.1.0.GA/jboss-as-server-5.1.0.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-server/5.1.0.GA/jboss-as-server-5.1.0.GA.jar" sourcepath="/JBOSS-5/server/src/main"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-system-jmx/5.1.0.GA/jboss-as-system-jmx-5.1.0.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-system/5.1.0.GA/jboss-as-system-5.1.0.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-tomcat/5.1.0.GA/jboss-as-tomcat-5.1.0.GA.jar"/>
