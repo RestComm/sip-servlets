@@ -103,7 +103,7 @@ public abstract class SipUnitServletTestCase extends SipTestCase {
 				 * sipPathName="gov.nist" sipStackName="SIP-Servlet-Tomcat-Server"/>
 				 */
 				if(addSipConnectorOnStartup) {
-					tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
+					tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport, null);
 				}
 			}		
 			if(startTomcatOnStartup) {

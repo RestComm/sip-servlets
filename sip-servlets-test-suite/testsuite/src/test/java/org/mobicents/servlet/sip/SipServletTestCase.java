@@ -24,6 +24,7 @@ import javax.sip.ListeningPoint;
 
 import junit.framework.TestCase;
 
+import org.apache.catalina.connector.Connector;
 import org.apache.log4j.Logger;
 
 /**
@@ -46,6 +47,7 @@ public abstract class SipServletTestCase extends TestCase {
 	protected boolean initTomcatOnStartup = true;
 	protected boolean startTomcatOnStartup = true;
 	protected boolean addSipConnectorOnStartup = true;
+	protected Connector sipConnector;
 		
 	public SipServletTestCase(String name) {
 		super(name);
@@ -105,7 +107,7 @@ public abstract class SipServletTestCase extends TestCase {
 			 * sipPathName="gov.nist" sipStackName="SIP-Servlet-Tomcat-Server"/>
 			 */
 			if(addSipConnectorOnStartup) {
-				tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
+				sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport, null);
 			}
 		}		
 		if(startTomcatOnStartup) {

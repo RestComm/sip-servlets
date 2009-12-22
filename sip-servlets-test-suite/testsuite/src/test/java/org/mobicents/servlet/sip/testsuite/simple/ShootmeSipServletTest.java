@@ -19,13 +19,16 @@ package org.mobicents.servlet.sip.testsuite.simple;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import javax.sip.InvalidArgumentException;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.ServerHeader;
 import javax.sip.message.Request;
+import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -340,6 +343,42 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertEquals("noAckReceived", allMessagesContent.get(0));
 	}
 
+	public void testShootmeServerHeader() throws Exception {
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		tomcat.removeConnector(sipConnector);
+		Properties sipStackProperties = new Properties();
+		sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-"
+				+ sipIpAddress + "-" + 5070);
+		sipStackProperties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT",
+				"off");
+		sipStackProperties.setProperty(
+				"gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
+		sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE",
+				"64");
+		sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER",
+				"true");
+		sipStackProperties.setProperty("org.mobicents.servlet.sip.SERVER_HEADER",
+			"MobicentsSipServletsServer");
+		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport, sipStackProperties);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());		
+			
+		Response finalResponse = sender.getFinalResponse();
+		ServerHeader serverHeader = (ServerHeader) finalResponse.getHeader(ServerHeader.NAME);
+		assertNotNull(serverHeader);
+		assertTrue(serverHeader.toString().contains("MobicentsSipServletsServer"));
+	}
+	
 	@Override
 	protected void tearDown() throws Exception {					
 		senderProtocolObjects.destroy();	

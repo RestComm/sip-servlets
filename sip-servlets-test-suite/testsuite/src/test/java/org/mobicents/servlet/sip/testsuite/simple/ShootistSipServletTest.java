@@ -17,11 +17,15 @@
 package org.mobicents.servlet.sip.testsuite.simple;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Map.Entry;
 
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.header.ServerHeader;
 import javax.sip.header.ToHeader;
+import javax.sip.header.UserAgentHeader;
+import javax.sip.message.Request;
 
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
@@ -330,6 +334,41 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		deployApplication();
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getOkToByeReceived());		
+	}
+	
+	public void testShootistUserAgentHeader() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.removeConnector(sipConnector);
+		Properties sipStackProperties = new Properties();
+		sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-"
+				+ sipIpAddress + "-" + 5070);
+		sipStackProperties.setProperty("javax.sip.AUTOMATIC_DIALOG_SUPPORT",
+				"off");
+		sipStackProperties.setProperty(
+				"gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
+		sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE",
+				"64");
+		sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER",
+				"true");
+		sipStackProperties.setProperty("org.mobicents.servlet.sip.USER_AGENT_HEADER",
+			"MobicentsSipServletsUserAgent");
+		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport, sipStackProperties);
+		tomcat.startTomcat();
+		deployApplication();
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());	
+		Request invite = receiver.getInviteRequest();
+		UserAgentHeader userAgentHeader = (UserAgentHeader) invite.getHeader(UserAgentHeader.NAME);
+		assertNotNull(userAgentHeader);
+		assertTrue(userAgentHeader.toString().contains("MobicentsSipServletsUserAgent"));
 	}
 
 	@Override

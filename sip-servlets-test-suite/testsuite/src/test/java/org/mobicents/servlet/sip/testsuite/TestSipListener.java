@@ -382,7 +382,7 @@ public class TestSipListener implements SipListener {
 			
 			Thread.sleep(200);
 			
-			inviteServerTid.sendResponse(finalResponse);
+			inviteServerTid.sendResponse(getFinalResponse());
 		} catch(Exception e) {
 			logger.error("Unexpected exception while trying to send the 200 to PRACK " + request, e);
 		}
@@ -1014,19 +1014,19 @@ public class TestSipListener implements SipListener {
 						+";transport="+protocolObjects.transport
 						+ ">");
 				contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
-				finalResponse = protocolObjects.messageFactory
-						.createResponse(finalResponseToSend, request);
+				setFinalResponse(protocolObjects.messageFactory
+						.createResponse(finalResponseToSend, request));
 				if(testAckViaParam) {
-					ViaHeader viaHeader = (ViaHeader)finalResponse.getHeader(ViaHeader.NAME);
+					ViaHeader viaHeader = (ViaHeader)getFinalResponse().getHeader(ViaHeader.NAME);
 					viaHeader.setParameter("testAckViaParam", "true");
 				}
-				ToHeader toHeader = (ToHeader) finalResponse.getHeader(ToHeader.NAME);
+				ToHeader toHeader = (ToHeader) getFinalResponse().getHeader(ToHeader.NAME);
 				if(toHeader.getTag() == null) {
 					toHeader.setTag(TO_TAG); // Application is supposed to set.
 				}
-				finalResponse.addHeader(contactHeader);
+				getFinalResponse().addHeader(contactHeader);
 				if(!sendReliably) {
-					st.sendResponse(finalResponse);
+					st.sendResponse(getFinalResponse());
 				}
 			} else {
 				logger.info("Waiting for CANCEL, stopping the INVITE processing ");
@@ -1227,6 +1227,7 @@ public class TestSipListener implements SipListener {
 			if(response.getStatusCode() >= 200 && response.getStatusCode() < 700) {
 				finalResponseReceived = true;
 				setFinalResponseStatus(response.getStatusCode());
+				setFinalResponse(response);
 			}
 			if (response.getStatusCode() == Response.OK) {
 				logger.info("response = " + response);
@@ -2512,6 +2513,20 @@ public class TestSipListener implements SipListener {
 
 	public void setTransport(boolean b) {
 		setTransport = b;
+	}
+
+	/**
+	 * @param finalResponse the finalResponse to set
+	 */
+	public void setFinalResponse(Response finalResponse) {
+		this.finalResponse = finalResponse;
+	}
+
+	/**
+	 * @return the finalResponse
+	 */
+	public Response getFinalResponse() {
+		return finalResponse;
 	}
 
 }

@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.startup;
 
 import gov.nist.javax.sip.SipStackExt;
+import gov.nist.javax.sip.message.MessageFactoryExt;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,11 +31,14 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.util.StringTokenizer;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
@@ -42,6 +46,8 @@ import javax.management.ObjectName;
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.SipStack;
+import javax.sip.header.ServerHeader;
+import javax.sip.header.UserAgentHeader;
 
 import net.java.stun4j.StunAddress;
 import net.java.stun4j.client.NetworkConfigurationDiscoveryProcess;
@@ -82,6 +88,8 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	private static final String SERVER_LOG_STACK_PROP = "gov.nist.javax.sip.SERVER_LOG";
 	private static final String DEBUG_LOG_STACK_PROP = "gov.nist.javax.sip.DEBUG_LOG";
 	public static final String IS_SIP_CONNECTOR = "isSipConnector";	
+	private static final String SERVER_HEADER = "org.mobicents.servlet.sip.SERVER_HEADER";
+	private static final String USER_AGENT_HEADER = "org.mobicents.servlet.sip.USER_AGENT_HEADER";
 	private static final String BALANCERS = "balancers";
 	private static final String JVM_ROUTE = "jvmRoute";
 	// the logger
@@ -227,9 +235,14 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
         String sipStackPropertiesFileLocation = sipConnector.getSipStackPropertiesFileLocation();
         if(sipStackPropertiesFileLocation != null && !sipStackPropertiesFileLocation.startsWith("file:///")) {
 			sipStackPropertiesFileLocation = "file:///" + catalinaHome.replace(File.separatorChar, '/') + "/" + sipStackPropertiesFileLocation;
- 		}	
-        sipStackProperties = new Properties();
+ 		}
         boolean isPropsLoaded = false;
+        if(sipStackProperties == null) {
+        	sipStackProperties = new Properties();
+        } else {
+        	isPropsLoaded = true;
+        }
+        
 		if (logger.isDebugEnabled()) {
 			logger.debug("Loading SIP stack properties from following file : " + sipStackPropertiesFileLocation);
 		}
@@ -306,6 +319,26 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
 			sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
 			sipStackProperties.setProperty(PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");
+		}
+		String serverHeaderValue = sipStackProperties.getProperty(SERVER_HEADER);
+		if(serverHeaderValue != null) {
+			List<String> serverHeaderList = new ArrayList<String>();
+			StringTokenizer stringTokenizer = new StringTokenizer(serverHeaderValue, ",");
+			while(stringTokenizer.hasMoreTokens()) {
+				serverHeaderList.add(stringTokenizer.nextToken());
+			}
+			ServerHeader serverHeader = SipFactories.headerFactory.createServerHeader(serverHeaderList);
+			((MessageFactoryExt)SipFactories.messageFactory).setDefaultServerHeader(serverHeader);
+		}
+		String userAgent = sipStackProperties.getProperty(USER_AGENT_HEADER);
+		if(userAgent != null) {
+			List<String> userAgentList = new ArrayList<String>();
+			StringTokenizer stringTokenizer = new StringTokenizer(userAgent, ",");
+			while(stringTokenizer.hasMoreTokens()) {
+				userAgentList.add(stringTokenizer.nextToken());
+			}
+			UserAgentHeader userAgentHeader = SipFactories.headerFactory.createUserAgentHeader(userAgentList);
+			((MessageFactoryExt)SipFactories.messageFactory).setDefaultUserAgentHeader(userAgentHeader);
 		}
 		try {	
 			//checking the external ip address if stun enabled			
@@ -647,6 +680,20 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	 */
 	public void setSipStackPropertiesFile(String sipStackPropertiesFile) {
 		sipConnector.setSipStackPropertiesFileLocation(sipStackPropertiesFile);
+	}
+
+	/**
+	 * @return the sipStackProperties
+	 */
+	public Properties getSipStackProperties() {
+		return sipStackProperties;
+	}
+	
+	/**
+	 * @param sipStackProperties the sipStackProperties to set
+	 */
+	public void setSipStackProperties(Properties sipStackProperties) {
+		this.sipStackProperties = sipStackProperties;
 	}
 
 	/**

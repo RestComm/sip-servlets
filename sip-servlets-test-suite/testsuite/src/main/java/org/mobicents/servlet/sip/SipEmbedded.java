@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Properties;
 import java.util.StringTokenizer;
 
 import javax.management.MBeanServer;
@@ -215,9 +216,8 @@ public class SipEmbedded {
 	}
 
 	/**
-	 * @throws Exception
 	 */
-	public void addSipConnector(String connectorName, String ipAddress, int port, String transport) throws Exception {
+	public Connector addSipConnector(String connectorName, String ipAddress, int port, String transport, Properties sipStackProperties) throws Exception {
 		Connector udpSipConnector = new Connector(
 				SipProtocolHandler.class.getName());
 		SipProtocolHandler udpProtocolHandler = (SipProtocolHandler) udpSipConnector
@@ -225,9 +225,10 @@ public class SipEmbedded {
 		udpProtocolHandler.setPort(port);
 		udpProtocolHandler.setIpAddress(ipAddress);
 		udpProtocolHandler.setSignalingTransport(transport);
-//		udpProtocolHandler.setSipStackPropertiesFile("file:///" + loggingFilePath + "mss-sip-stack.properties");
+		udpProtocolHandler.setSipStackProperties(sipStackProperties);
 
 		sipService.addConnector(udpSipConnector);
+		return udpSipConnector;
 	}
 
 	/**
@@ -242,7 +243,7 @@ public class SipEmbedded {
 	 * 
 	 * @param connector
 	 */
-	public void removeConnector(Connector connector) {
+	public void removeConnector(Connector connector) {		
 		sipService.removeConnector(connector);
 	}
 	

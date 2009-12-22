@@ -74,7 +74,7 @@ public class NoApplicationDeployedTest extends SipServletTestCase {
 	}
 	
 	public void testNoAppDeployed404() throws Exception {
-		tomcat.addSipConnector(serverName, sipIpAddress, 5060, listeningPointTransport);
+		tomcat.addSipConnector(serverName, sipIpAddress, 5060, listeningPointTransport, null);
 		super.tomcat.startTomcat();		
 		
 		sender = new TestSipListener(5080, 5060, senderProtocolObjects, true);

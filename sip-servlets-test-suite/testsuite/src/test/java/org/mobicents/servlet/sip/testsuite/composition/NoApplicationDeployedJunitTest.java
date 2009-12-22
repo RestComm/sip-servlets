@@ -77,7 +77,7 @@ public class NoApplicationDeployedJunitTest extends SipServletTestCase {
 				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
 				+ "org/mobicents/servlet/sip/testsuite/composition/dummy-dar.properties");
 		super.tomcat.initTomcat(tomcatBasePath);
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport, null);
 		super.tomcat.startTomcat();
 		
 		sender = new TestSipListener(5080, 5090, senderProtocolObjects, true);
@@ -120,7 +120,7 @@ public class NoApplicationDeployedJunitTest extends SipServletTestCase {
 				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
 				+ "org/mobicents/servlet/sip/testsuite/composition/empty-dar.properties");
 		super.tomcat.initTomcat(tomcatBasePath);
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport, null);
 		super.tomcat.startTomcat();
 		
 		sender = new TestSipListener(5080, 5090, senderProtocolObjects, true);
