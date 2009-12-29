@@ -171,7 +171,7 @@
 										<goal> copy-dependencies </goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,mobicents-jain-sip-ha-core</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,activation,mail,mobicents-jain-sip-ha-core</includeArtifactIds>
 					    			<outputDirectory>${CATALINA_HOME}/lib</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
@@ -222,7 +222,7 @@
 										<goal> copy-dependencies </goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,mobicents-jain-sip-ha-core</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,mobicents-jain-sip-ha-core</includeArtifactIds>
 					    			<outputDirectory>${env.CATALINA_HOME}/lib</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
