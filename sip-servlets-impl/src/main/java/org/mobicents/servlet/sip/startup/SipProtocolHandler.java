@@ -16,12 +16,14 @@
  */
 package org.mobicents.servlet.sip.startup;
 
+import gov.nist.core.net.AddressResolver;
 import gov.nist.javax.sip.SipStackExt;
 import gov.nist.javax.sip.message.MessageFactoryExt;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -44,6 +46,7 @@ import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.sip.ListeningPoint;
+import javax.sip.PeerUnavailableException;
 import javax.sip.SipProvider;
 import javax.sip.SipStack;
 import javax.sip.header.ServerHeader;
@@ -120,6 +123,8 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	private boolean started = false;
 
 	private SipConnector sipConnector;
+	
+	private String addressResolverClass = DNSAddressResolver.class.getName();
 	
 	public SipProtocolHandler() {
 		sipConnector = new SipConnector();
@@ -457,11 +462,34 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 				sipProvider.addSipListener(sipApplicationDispatcher);
 				sipApplicationDispatcher.getSipNetworkInterfaceManager().addExtendedListeningPoint(extendedListeningPoint);
 				// for nist sip stack set the DNS Address resolver allowing to make DNS SRV lookups
-				if(sipStack instanceof SipStackExt) {
-					if(logger.isDebugEnabled()) {
-						logger.debug(sipStack.getStackName() +" will be using DNS SRV lookups as AddressResolver");
+				if(addressResolverClass != null && addressResolverClass.trim().length() > 0) {
+					if(sipStack instanceof SipStackExt) {
+						if(logger.isDebugEnabled()) {
+							logger.debug("Sip Stack " + sipStack.getStackName() +" will be using " + addressResolverClass + " as AddressResolver");
+						}
+						try {
+				            // create parameters argument to identify constructor
+				            Class[] paramTypes = new Class[1];
+				            paramTypes[0] = SipApplicationDispatcher.class;
+				            // get constructor of AddressResolver in order to instantiate
+				            Constructor addressResolverConstructor = Class.forName(addressResolverClass).getConstructor(
+				                    paramTypes);
+				            // Wrap properties object in order to pass to constructor of AddressResolver
+				            Object[] conArgs = new Object[1];
+				            conArgs[0] = sipApplicationDispatcher;
+				            // Creates a new instance of AddressResolver Class with the supplied sipApplicationDispatcher.
+				            AddressResolver addressResolver = (AddressResolver) addressResolverConstructor.newInstance(conArgs);
+				            ((SipStackExt) sipStack).setAddressResolver(addressResolver);
+				        } catch (Exception e) {
+				            logger.error("Couldn't set the AddressResolver " + addressResolverClass, e);
+				            throw e;
+				        }
+						
 					}
-					((SipStackExt) sipStack).setAddressResolver(new DNSAddressResolver(sipApplicationDispatcher));
+				} else {
+					if(logger.isInfoEnabled()) {
+						logger.info("no AddressResolver will be used since none has been specified.");
+					}
 				}
 			}
 			
@@ -760,4 +788,18 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 
     public void postDeregister() {
     }
+
+	/**
+	 * @param dnsAddressResolverClass the dnsAddressResolverClass to set
+	 */
+	public void setAddressResolverClass(String dnsAddressResolverClass) {
+		this.addressResolverClass = dnsAddressResolverClass;
+	}
+
+	/**
+	 * @return the dnsAddressResolverClass
+	 */
+	public String getAddressResolverClass() {
+		return addressResolverClass;
+	}
 }
