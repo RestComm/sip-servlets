@@ -114,7 +114,21 @@
 			<version>6.0.20</version>
 			<scope>provided</scope>
 		</dependency>
-		
+				
+		<!-- javax.mail deps for multipart support -->
+		<dependency>
+			<groupId>javax.activation</groupId>
+			<artifactId>activation</artifactId>
+			<version>1.1.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4</version>
+			<scope>provided</scope>
+		</dependency>
 		
 	</dependencies>
 	<build>

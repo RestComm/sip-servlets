@@ -1750,7 +1750,7 @@ public class TestSipListener implements SipListener {
 		if(headerNames != null) {
 			for(int q=0; q<headerNames.length; q++) {
 				Header h = protocolObjects.headerFactory.createHeader(headerNames[q], headerContents[q]);
-				request.addLast(h);
+				request.setHeader(h);
 			}
 		}
 		addSpecificHeaders(method, request);

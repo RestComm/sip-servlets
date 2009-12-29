@@ -38,6 +38,12 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMultipart;
+import javax.mail.util.ByteArrayDataSource;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.ServletParseException;
@@ -87,12 +93,17 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public abstract class SipServletMessageImpl implements SipServletMessage, Serializable {
 
-
+	
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(SipServletMessageImpl.class
 			.getCanonicalName());
 	
 	private static final String CONTENT_TYPE_TEXT = "text";
+	private static final String CONTENT_TYPE_MULTIPART = "multipart";
+	private static final String MULTIPART_BOUNDARY = "boundary";
+	private static final String MULTIPART_START = "start";
+	private static final String MULTIPART_BOUNDARY_DELIM = "--";
+	private static final String LINE_RETURN_DELIM = "\n";
 //	private static final String HCOLON = " : ";
 	
 	protected final Message message;
@@ -569,7 +580,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	 */
 	public Object getContent() throws IOException, UnsupportedEncodingException {
 		ContentTypeHeader contentTypeHeader = (ContentTypeHeader) 
-			this.message.getHeader(ContentTypeHeader.NAME);		
+ 			this.message.getHeader(ContentTypeHeader.NAME);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Content type " + contentTypeHeader.getContentType());
+			logger.debug("Content sub type " + contentTypeHeader.getContentSubType());
+		}		
 		if(contentTypeHeader!= null && CONTENT_TYPE_TEXT.equals(contentTypeHeader.getContentType())) {
 			String content = null;
 			if(message.getRawContent() != null) {
@@ -583,9 +598,84 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 				content = "";
 			}
 			return content;
+		} else if(contentTypeHeader!= null && CONTENT_TYPE_MULTIPART.equals(contentTypeHeader.getContentType())) {
+			return getContentAsMimeMultipart(contentTypeHeader, message.getRawContent());
 		} else {
 			return this.message.getRawContent();
 		}
+	}
+
+	/**
+	 * Return a mimemultipart from raw Content
+	 * FIXME Doesn't support nested multipart in the body content
+	 * @param contentTypeHeader content type header related to the rawContent
+	 * @param rawContent body content
+	 * @return a mimemultipart from raw Content
+	 */
+	private static MimeMultipart getContentAsMimeMultipart(ContentTypeHeader contentTypeHeader, byte[] rawContent) {
+		// Issue 1123 : http://code.google.com/p/mobicents/issues/detail?id=1123 : Multipart type is supported
+		String delimiter = contentTypeHeader.getParameter(MULTIPART_BOUNDARY);
+		String start = contentTypeHeader.getParameter(MULTIPART_START);
+		
+		MimeMultipart mimeMultipart = new MimeMultipart(contentTypeHeader.getContentSubType());
+		if (delimiter == null) {
+			MimeBodyPart mbp = new MimeBodyPart();			
+		    DataSource ds = new ByteArrayDataSource(rawContent, contentTypeHeader.getContentSubType());
+		    try {
+				mbp.setDataHandler(new DataHandler(ds));
+				mimeMultipart.addBodyPart(mbp);				
+			} catch (MessagingException e) {
+				throw new IllegalArgumentException("couldn't create the multipart object from the message content " + rawContent, e);
+			}
+		} else {
+			// splitting the body content by delimiter
+		    String[] fragments = new String(rawContent).split(MULTIPART_BOUNDARY_DELIM + delimiter);
+			for (String fragment: fragments) { 
+				final String trimmedFragment = fragment.trim();
+				// skipping empty fragment and ending fragment looking like --
+				if(trimmedFragment.length() > 0 && !MULTIPART_BOUNDARY_DELIM.equals(trimmedFragment)) {
+					String fragmentHeaders = null; 
+					String fragmentBody = fragment;
+					// if there is a start, it means that there is probably headers before the content that need to be added to the mime body part
+					// so we split headers from body content
+					if(start != null && start.length() > 0) {
+						int indexOfStart = fragment.indexOf(start);
+						if(indexOfStart != -1) {
+							fragmentHeaders = fragmentBody.substring(0, indexOfStart + start.length());
+							fragmentBody = fragmentBody.substring(indexOfStart + start.length()).trim();    							
+						}
+					}
+					MimeBodyPart mbp = new MimeBodyPart();	    				
+				    try {
+				    	String contentType = contentTypeHeader.getContentSubType();
+				    	// check if the body content start with a Content-Type header
+				    	// if so we strip it from the content body
+				    	if(fragmentBody.startsWith(ContentTypeHeader.NAME)) {
+				    		int indexOfLineReturn =  fragmentBody.indexOf(LINE_RETURN_DELIM);
+				    		contentType = fragmentBody.substring(0, indexOfLineReturn -1).trim();	    			    		
+				    		fragmentBody = fragmentBody.substring(indexOfLineReturn).trim();
+				    	}
+				    	// setting the content body stripped from the headers
+				    	mbp.setContent(fragmentBody, contentType);
+				    	// adding the headers to the body part
+				    	mbp.addHeaderLine(contentType);
+				    	if(fragmentHeaders != null) {
+				    		StringTokenizer stringTokenizer = new StringTokenizer(fragmentHeaders, LINE_RETURN_DELIM);
+				    		while (stringTokenizer.hasMoreTokens()) {
+				    			String token = stringTokenizer.nextToken().trim();
+				    			if(token != null && token.length() > 0) {
+				    				mbp.addHeaderLine(token);
+				    			}
+							}
+				    	}
+						mimeMultipart.addBodyPart(mbp);				    					
+					} catch (MessagingException e) {
+						throw new IllegalArgumentException("couldn't create the multipart object from the message content " + rawContent, e);
+					}
+				}
+			}					    			
+		}
+		return mimeMultipart;
 	}
 
 	/*

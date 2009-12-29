@@ -18,9 +18,18 @@ package org.mobicents.servlet.sip.testsuite.subsnotify;
 import gov.nist.javax.sip.header.SubscriptionState;
 
 import javax.sip.SipProvider;
+import javax.sip.address.SipURI;
+import javax.sip.header.ContentTypeHeader;
+import javax.sip.header.EventHeader;
+import javax.sip.header.SubscriptionStateHeader;
+import javax.sip.message.Request;
 
+import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.startup.SipContextConfig;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -43,6 +52,7 @@ public class SubscriberSipServletTest extends SipServletTestCase {
 	
 	public SubscriberSipServletTest(String name) {
 		super(name);
+		autoDeployOnStartup = false;
 	}
 
 	@Override
@@ -50,6 +60,21 @@ public class SubscriberSipServletTest extends SipServletTestCase {
 		assertTrue(tomcat.deployContext(
 				projectHome + "/sip-servlets-test-suite/applications/subscriber-servlet/src/main/sipapp",
 				"sip-test-context", "sip-test"));
+	}
+	
+	public SipStandardContext deployApplication(String name, String value) {
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/subscriber-servlet/src/main/sipapp");
+		context.setName("sip-test-context");
+		context.setPath("sip-test");
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		ApplicationParameter applicationParameter = new ApplicationParameter();
+		applicationParameter.setName(name);
+		applicationParameter.setValue(value);
+		context.addApplicationParameter(applicationParameter);
+		assertTrue(tomcat.deployContext(context));
+		return context;
 	}
 
 	@Override
@@ -70,7 +95,8 @@ public class SubscriberSipServletTest extends SipServletTestCase {
 		
 		senderProvider.addSipListener(receiver);
 		
-		receiverProtocolObjects.start();			
+		receiverProtocolObjects.start();
+		
 	}
 	
 	/*
@@ -80,6 +106,7 @@ public class SubscriberSipServletTest extends SipServletTestCase {
 	 * containing Subscription State of Terminated.
 	 */
 	public void testSipServletSendsSubscribe() throws InterruptedException {
+		deployApplication();
 //		receiver.sendInvite();
 		Thread.sleep(TIMEOUT*2);
 		assertEquals(6, receiver.getAllSubscriptionState().size());
@@ -90,6 +117,31 @@ public class SubscriberSipServletTest extends SipServletTestCase {
 		assertEquals(1, receiver.getAllMessagesContent().size());
 		assertTrue("session not invalidated after receiving Terminated Subscription State", receiver.getAllMessagesContent().contains(SESSION_INVALIDATED));
 		
+	}
+	
+	/*
+	 * Issue 1123 : http://code.google.com/p/mobicents/issues/detail?id=1123
+	 * Multipart type is not supported
+	 */
+	public void testSipServletsReceiveNotifyMultipart() throws Exception {
+		deployApplication("testMultipart", "testMultipart");
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = receiverProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = receiverProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+
+		String content = "--50UBfW7LSCVLtggUPe5z\r\nContent-Transfer-Encoding: binary\r\nContent-ID: <nXYxAE@pres.vancouver.example.com>\r\nContent-Type: application/rlmi+xml;charset=\"UTF-8\"\r\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<list xmlns=\"urn:ietf:params:xml:ns:rlmi\" uri=\"sip:adam-friends@pres.vancouver.example.com\" version=\"1\" fullState=\"true\">\n<name xml:lang=\"en\">Buddy List at COM</name>\n<name xml:lang=\"de\">Liste der Freunde an COM</name>\n<resource uri=\"sip:bob@vancouver.example.com\"\">\n<name>Bob Smith</name>\n<instance id=\"juwigmtboe\" state=\"active\" cid=\"bUZBsM@pres.vancouver.example.com\"/>\n</resource>\n<resource uri=\"sip:dave@vancouver.example.com\">\n<name>Dave Jones</name>\n<instance id=\"hqzsuxtfyq\" state=\"active\" cid=\"ZvSvkz@pres.vancouver.example.com\"/>\n</resource>\n<resource uri=\"sip:ed@dallas.example.net\">\n<name>Ed at NET</name>\n</resource>\n<resource uri=\"sip:adam-friends@stockholm.example.org\">\n<name xml:lang=\"en\">My Friends at ORG</name>\n<name xml:lang=\"de\">Meine Freunde an ORG</name>\n</resource>\n</list>\n\n--50UBfW7LSCVLtggUPe5z\r\nContent-Transfer-Encoding: binary\r\nContent-ID: <bUZBsM@pres.vancouver.example.com>\r\nContent-Type: application/pidf+xml;charset=\"UTF-8\"\r\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<presence xmlns=\"urn:ietf:params:xml:ns:pidf\" entity=\"sip:bob@vancouver.example.com\">\n<tuple id=\"sg89ae\">\n<status>\n<basic>open</basic>\n</status>\n<contact priority=\"1.0\">sip:bob@vancouver.example.com</contact>\n</tuple>\n</presence>\n\n--50UBfW7LSCVLtggUPe5z\r\nContent-Transfer-Encoding: binary\r\nContent-ID: <ZvSvkz@pres.vancouver.example.com>\r\nContent-Type: application/pidf+xml;charset=\"UTF-8\"\r\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<presence xmlns=\"urn:ietf:params:xml:ns:pidf\" entity=\"sip:dave@vancouver.example.com\">\n<tuple id=\"slie74\">\n<status>\n<basic>closed</basic>\n</status>\n</tuple>\n</presence>\n\n--50UBfW7LSCVLtggUPe5z";
+		
+		receiver.sendSipRequest(Request.NOTIFY, fromAddress, toAddress, content, null, false, new String[] {ContentTypeHeader.NAME, SubscriptionStateHeader.NAME, EventHeader.NAME}, new String[]{"multipart/related;type=\"application/rlmi+xml\";start=\"<nXYxAE@pres.vancouver.example.com>\";boundary=\"50UBfW7LSCVLtggUPe5z\"", "pending", "presence"});
+		Thread.sleep(TIMEOUT);
+		assertEquals(200, receiver.getFinalResponseStatus());
+		assertTrue(receiver.getAllMessagesContent().size() > 0);
+		assertTrue(receiver.getAllMessagesContent().contains("3"));
 	}
 
 	@Override

@@ -69,23 +69,18 @@ public class InDialogSubscriberSipServletTest extends SipServletTestCase {
 	}
 	
 	@Override
-	protected void setUp() {
-		try {
-			super.setUp();						
-			
-			senderProtocolObjects =new ProtocolObjects(
-					"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
-						
-			sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
-			SipProvider senderProvider = sender.createProvider();			
-			
-			senderProvider.addSipListener(sender);
-			
-			senderProtocolObjects.start();			
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			fail("unexpected exception ");
-		}
+	protected void setUp() throws Exception {
+		super.setUp();						
+		
+		senderProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();			
+		
+		senderProvider.addSipListener(sender);
+		
+		senderProtocolObjects.start();			
 	}
 	
 	/*

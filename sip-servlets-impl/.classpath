@@ -21,5 +21,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-annotations"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-spec"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-client"/>
+	<classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1.1/activation-1.1.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

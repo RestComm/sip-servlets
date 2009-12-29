@@ -59,5 +59,7 @@
 	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.X-SNAPSHOT/jain-sip-ri-1.2.X-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/ha/javax/sip/mobicents-jain-sip-jboss4/0.4-SNAPSHOT/mobicents-jain-sip-jboss4-0.4-SNAPSHOT.jar"/>	
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-client"/>
+	<classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1.1/activation-1.1.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar"/>
 	<classpathentry kind="output" path="testsuite/target/test-classes"/>
 </classpath>

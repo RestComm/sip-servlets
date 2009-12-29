@@ -17,8 +17,13 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.util.Enumeration;
 
 import javax.annotation.Resource;
+import javax.mail.BodyPart;
+import javax.mail.Header;
+import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletTimer;
@@ -29,6 +34,7 @@ import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
@@ -175,12 +181,34 @@ public class SubscriberSipServlet
 				sipServletRequest.send();		
 			}
 		}
+		if(getServletContext().getInitParameter("testMultipart") != null) {
+			Multipart multipart = (Multipart) request.getContent();
+			try {
+				int count = multipart.getCount();
+				logger.info("mulitpart count " + count);
+				sendMessage(request.getSession(), "" + count);
+				BodyPart bodyPart = multipart.getBodyPart(0);					
+				logger.info("body part 0 's content type " + bodyPart.getContentType());
+				logger.info("body part 0 's content " + bodyPart.getContent());
+				Enumeration headers = bodyPart.getAllHeaders();
+				while (headers.hasMoreElements()) {
+					Header header = (Header) headers.nextElement();
+					logger.info("body part 0 's headers: name = " + header.getName() + ", value = " + header.getValue());
+				}
+			} catch (MessagingException e) {
+				logger.error("couldn't get count ", e);
+				SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+				sipServletResponse.send();
+				return;
+			}						
+		} 
 		if(getServletContext().getInitParameter("no200OKToNotify") == null) {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 			sipServletResponse.send();
 		} else {
-			logger.info("no sending 200 to Initial Notify as specified by the test configuration");			
+			logger.info("not sending 200 to Initial Notify as specified by the test configuration");			
 		}
+		
 	}
 	
 	// SipServletListener methods
@@ -206,7 +234,7 @@ public class SubscriberSipServlet
 			} catch (IOException e) {
 				logger.error("Unexpected exception while sending the INVITE request",e);
 			}					
-		} else {
+		} else if (ce.getServletContext().getInitParameter("testMultipart") == null){
 			SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);
 			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 			TimerService timerService = (TimerService)ce.getServletContext().getAttribute(TIMER_SERVICE);
@@ -261,16 +289,23 @@ public class SubscriberSipServlet
 	public void sessionReadyToInvalidate(SipSessionEvent se) {
 		logger.info("sip session expired " +  se.getSession());
 		
+		sendMessage(se.getSession(), SIP_SESSION_READY_TO_BE_INVALIDATED);
+	}
+
+	/**
+	 * @param se
+	 */
+	private void sendMessage(SipSession sipSession, String body) {
 		try {
 			SipServletRequest sipServletRequest = sipFactory.createRequest(
 					sipFactory.createApplicationSession(), 
 					"MESSAGE", 
-					se.getSession().getLocalParty(), 
-					se.getSession().getRemoteParty());
+					sipSession.getLocalParty(), 
+					sipSession.getRemoteParty());
 			SipURI sipUri=sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
 			sipServletRequest.setRequestURI(sipUri);
-			sipServletRequest.setContentLength(SIP_SESSION_READY_TO_BE_INVALIDATED.length());
-			sipServletRequest.setContent(SIP_SESSION_READY_TO_BE_INVALIDATED, CONTENT_TYPE);
+			sipServletRequest.setContentLength(body.length());
+			sipServletRequest.setContent(body, CONTENT_TYPE);
 			sipServletRequest.send();
 		} catch (IOException e) {
 			logger.error("Exception occured while sending the request",e);			
