@@ -581,7 +581,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	public Object getContent() throws IOException, UnsupportedEncodingException {
 		ContentTypeHeader contentTypeHeader = (ContentTypeHeader) 
  			this.message.getHeader(ContentTypeHeader.NAME);
-		if(logger.isDebugEnabled()) {
+		if(contentTypeHeader != null && logger.isDebugEnabled()) {
 			logger.debug("Content type " + contentTypeHeader.getContentType());
 			logger.debug("Content sub type " + contentTypeHeader.getContentSubType());
 		}		
