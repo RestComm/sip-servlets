@@ -11,11 +11,6 @@ rm -rf $JBOSS_HOME/server/port-2
 
 mvn clean install  -f ../../../pom.xml -P jboss-5,jboss-5-cluster -Dnode=all
 
-cp $JBOSS_HOME/server/all/deploy/jbossweb.sar/jboss-web-service.jar $JBOSS_HOME/server/all/deployers/jbossweb.deployer/jboss-web-service.jar
-# we need to copy those jars otherwise we get an IllegalAccessError (might be due to a classloading issue => post a message on jboss forum)
-cp $JBOSS_HOME/common/lib/jboss-ha-server-cache-jbc.jar $JBOSS_HOME/server/all/deployers/jbossweb.deployer/jboss-ha-server-cache-jbc.jar
-mv $JBOSS_HOME/common/lib/jboss-ha-server-cache-jbc.jar $JBOSS_HOME/common/lib/jboss-ha-server-cache-jbc.jar.bak
-# end of jars dirty copy
 cp setup/jboss-5/mss-sip-stack-jboss.properties $JBOSS_HOME/server/all/conf/mss-sip-stack.properties
 cp setup/jboss-5/context-jboss-5.xml $JBOSS_HOME/server/all/deploy/jbossweb.sar/context.xml
 cp setup/jboss-5/jboss-beans.xml $JBOSS_HOME/server/all/deploy/jbossweb.sar/META-INF/jboss-beans.xml
