@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -78,8 +79,8 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 	   
 	protected AttributeBasedClusteredSipSession(SipSessionKey key,
 			SipFactoryImpl sipFactoryImpl,
-			MobicentsSipApplicationSession mobicentsSipApplicationSession) {
-		super(key, sipFactoryImpl, mobicentsSipApplicationSession);
+			MobicentsSipApplicationSession mobicentsSipApplicationSession, JBossCacheManager jBossCacheManager) {
+		super(key, sipFactoryImpl, mobicentsSipApplicationSession, jBossCacheManager);
 	}
 
 	/**

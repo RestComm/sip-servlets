@@ -30,6 +30,7 @@ import org.apache.catalina.Engine;
 import org.apache.catalina.Service;
 import org.apache.catalina.connector.Connector;
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
@@ -56,12 +57,12 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 	   
 	protected JBossCacheClusteredSipSession(SipSessionKey key,
 			SipFactoryImpl sipFactoryImpl,
-			MobicentsSipApplicationSession mobicentsSipApplicationSession) {
+			MobicentsSipApplicationSession mobicentsSipApplicationSession, JBossCacheManager jBossCacheManager) {
 		super(key, sipFactoryImpl, mobicentsSipApplicationSession, 
-				((JBossCacheSipManager)mobicentsSipApplicationSession.getSipContext().getSipManager()).getUseJK());
-		int maxUnrep = ((JBossCacheSipManager)mobicentsSipApplicationSession.getSipContext().getSipManager()).getMaxUnreplicatedInterval() * 1000;
+				jBossCacheManager.getUseJK());
+		int maxUnrep = jBossCacheManager.getMaxUnreplicatedInterval() * 1000;
 	    setMaxUnreplicatedInterval(maxUnrep);
-		establishProxy();
+		establishProxy(jBossCacheManager);
 	}
 	
 	/**
@@ -124,10 +125,11 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 
 	/**
 	 * Gets a reference to the JBossCacheService.
+	 * @param jBossCacheManager 
 	 */
-	protected void establishProxy() {
+	protected void establishProxy(JBossCacheManager jBossCacheManager) {
 		if (proxy_ == null) {
-			proxy_ = (ConvergedJBossCacheService)((JBossCacheSipManager) getSipApplicationSession().getSipContext().getSipManager()).getCacheService();
+			proxy_ = (ConvergedJBossCacheService) jBossCacheManager.getCacheService();
 
 			// still null???
 			if (proxy_ == null) {

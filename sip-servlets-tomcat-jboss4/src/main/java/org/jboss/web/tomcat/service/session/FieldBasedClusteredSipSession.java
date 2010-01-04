@@ -85,8 +85,8 @@ public class FieldBasedClusteredSipSession extends JBossCacheClusteredSipSession
 
    protected FieldBasedClusteredSipSession(SipSessionKey key,
 			SipFactoryImpl sipFactoryImpl,
-			MobicentsSipApplicationSession mobicentsSipApplicationSession) {
-		super(key, sipFactoryImpl, mobicentsSipApplicationSession);
+			MobicentsSipApplicationSession mobicentsSipApplicationSession, JBossCacheManager jBossCacheManager) {
+		super(key, sipFactoryImpl, mobicentsSipApplicationSession, jBossCacheManager);
 	}
 
    // ----------------------------------------------- Overridden Public Methods

@@ -68,11 +68,12 @@ public class SessionBasedClusteredSipSession extends
 	 * @param key
 	 * @param sipFactoryImpl
 	 * @param mobicentsSipApplicationSession
+	 * @param jBossCacheManager 
 	 */
 	public SessionBasedClusteredSipSession(SipSessionKey key,
 			SipFactoryImpl sipFactoryImpl,
-			MobicentsSipApplicationSession mobicentsSipApplicationSession) {
-		super(key, sipFactoryImpl, mobicentsSipApplicationSession);
+			MobicentsSipApplicationSession mobicentsSipApplicationSession, JBossCacheManager jBossCacheManager) {
+		super(key, sipFactoryImpl, mobicentsSipApplicationSession, jBossCacheManager);
 	}
 
 	// ---------------------------------------------- Overridden Public Methods
