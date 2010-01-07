@@ -10,6 +10,12 @@ if [ $# -ne 0 ]; then
 	    		./sipp $TEST_IP:5080 -sf proxy/location-service-receiver.xml -i $TEST_IP -p 5090 -bg -trace_msg -timeout 30  
 	    		./sipp $TEST_IP:5080 -s receiver-failover -sf proxy/location-service-sender.xml -trace_err -i $TEST_IP -p 5050 -r 1 -m 1 -rsa $TEST_IP:5060 -trace_msg
 	            ;;
+	    proxy-remote-send-bye)
+	    		rm ./proxy/*.log
+	    		echo "Distributed example used is proxy";
+	    		./sipp $TEST_IP:5080 -sf proxy/location-service-receiver-sends-bye.xml -i $TEST_IP -p 5090 -bg -trace_msg -timeout 30 -nd
+	    		./sipp $TEST_IP:5080 -s receiver-failover -sf proxy/location-service-sender-receives-bye.xml -trace_err -i $TEST_IP -p 5050 -r 1 -m 1 -rsa $TEST_IP:5060 -trace_msg -nd
+	            ;;
 	    b2bua)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is b2bua";
@@ -56,6 +62,11 @@ if [ $# -ne 0 ]; then
 	    		rm ./uas/*.log
 	            echo "Distributed example used is uas";
 	    		./sipp $TEST_IP:5080 -s yousendbye -sf uas/clustering-uac-timer.xml -trace_err -i $TEST_IP -p 5050 -r 1 -m 1 -rsa $TEST_IP:5060 -trace_msg -nd
+	            ;;
+	    uas-sas-timer)
+	    		rm ./uas/*.log
+	            echo "Distributed example used is uas";
+	    		./sipp $TEST_IP:5080 -s sastimersendbye -sf uas/clustering-uac-timer.xml -trace_err -i $TEST_IP -p 5050 -r 1 -m 1 -rsa $TEST_IP:5060 -trace_msg -nd
 	            ;;
 	    *)
 	    		rm ./uas/*.log

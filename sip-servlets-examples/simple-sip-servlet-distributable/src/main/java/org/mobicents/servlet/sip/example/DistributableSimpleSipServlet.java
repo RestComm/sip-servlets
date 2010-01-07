@@ -22,6 +22,8 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipApplicationSessionEvent;
+import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
@@ -42,13 +44,14 @@ import org.apache.log4j.Logger;
  */
 public class DistributableSimpleSipServlet 
 		extends SipServlet 
-		implements TimerListener {
+		implements TimerListener, SipApplicationSessionListener {
 	private static final long serialVersionUID = 1L;
 	private static final String RECEIVED = "Received";
 
 	private static final Logger logger = Logger.getLogger(DistributableSimpleSipServlet.class);
 	
-	private static final String CALLEE_SEND_BYE = "YouSendBye";		
+	private static final String CALLEE_SEND_BYE = "yousendbye";	
+	private static final String SAS_TIMER_SEND_BYE = "sastimersendbye";
 	
 	private static final String NO_ATTRIBUTES = "NoAttributes";
 	
@@ -109,6 +112,8 @@ public class DistributableSimpleSipServlet
 		if((((SipURI)request.getTo().getURI()).getUser()).contains(CALLEE_SEND_BYE)) {
 			TimerService timer = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);			
 			timer.createTimer(request.getApplicationSession(), byeDelay, false, request.getSession().getId());
+		} else if ((((SipURI)request.getTo().getURI()).getUser()).contains(SAS_TIMER_SEND_BYE)) {
+			request.getSession().getApplicationSession().setExpires(1);
 		}
 	}
 
@@ -189,5 +194,40 @@ public class DistributableSimpleSipServlet
 				logger.error("An unexpected exception occured while sending the BYE", e);
 			}				
 		}
+	}
+
+	public void sessionCreated(SipApplicationSessionEvent event) {
+		if(logger.isInfoEnabled()) {
+			logger.info("Distributable Simple Servlet: sip app session " + event.getApplicationSession().getId() + " created");
+		}
+	}
+
+	public void sessionDestroyed(SipApplicationSessionEvent event) {
+		if(logger.isInfoEnabled()) {
+			logger.info("Distributable Simple Servlet: sip app session " + event.getApplicationSession().getId() + " destroyed");
+		}
+	}
+
+	public void sessionExpired(SipApplicationSessionEvent event) {
+		if(logger.isInfoEnabled()) {
+			logger.info("Distributable Simple Servlet: sip app session " + event.getApplicationSession().getId() + " expired");
+		}
+		if(logger.isInfoEnabled()) {
+			logger.info("Distributable Simple Servlet: timer expired\n");
+		}
+		SipSession sipSession = (SipSession)event.getApplicationSession().getSessions("SIP").next();
+		if(sipSession != null && sipSession.isValid() && !State.TERMINATED.equals(sipSession.getState())) {
+			try {
+				sipSession.createRequest("BYE").send();
+			} catch (IOException e) {
+				logger.error("An unexpected exception occured while sending the BYE", e);
+			}				
+		}
+	}
+
+	public void sessionReadyToInvalidate(SipApplicationSessionEvent event) {
+		if(logger.isInfoEnabled()) {
+			logger.info("Distributable Simple Servlet: sip app session " + event.getApplicationSession().getId() + " ready to invalidate");
+		}		
 	}
 }
