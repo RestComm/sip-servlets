@@ -19,16 +19,29 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.web.tomcat.service.session.distributedcache.spi;
+package org.mobicents.servlet.sip.core.timers;
 
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 
 /**
+ * Base interface for the sip application session expiration timer task responsible
+ * to expire the session
+ * 
  * @author jean.deruelle@gmail.com
  *
  */
-public interface OutgoingDistributableSipApplicationSessionData extends OutgoingDistributableSessionData {
-	SipApplicationSessionKey getSipApplicationSessionKey();
-	void setSessionMetaDataDirty(boolean isSessionMetaDataDirty);
-	boolean isSessionMetaDataDirty();
+public interface SipApplicationSessionTimerTask extends Runnable {
+	/**
+	 * Retrieve the sip application Session associated with the timer task
+	 * @return the sip application session
+	 */
+	MobicentsSipApplicationSession getSipApplicationSession();
+
+	/**
+	 * Returns the delay in milliseconds before the session is due to expire or a negative value
+	 * if it has already passed the time it should have expired 
+	 * @return
+	 */
+	long getDelay();
+
 }

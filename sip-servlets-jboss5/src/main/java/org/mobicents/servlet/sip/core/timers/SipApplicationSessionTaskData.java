@@ -19,19 +19,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.mobicents.servlet.sip.ruby;
+package org.mobicents.servlet.sip.core.timers;
 
-import javax.servlet.ServletContext;
-import javax.servlet.sip.SipServletMessage;
+import java.io.Serializable;
+
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.timers.TimerTaskData;
 
 /**
+ * Data to be saved so that the fault tolerant sip application session timer canbe restored and fired if a node crash
+ * and fail over occurs
+ * 
+ * We just save the sip application session key so that we are able to retrieve it from the cache 
+ * and do the expiration process on failover
+ * 
  * @author jean.deruelle@gmail.com
  *
  */
-public interface SipRubyController {
-
-	void routeSipMessageToRubyApp(ServletContext servletContext, SipServletMessage sipServletMessage);	
+public class SipApplicationSessionTaskData extends TimerTaskData implements Serializable {
 	
-	String getName();
-	void setName(String name);
+	private SipApplicationSessionKey key;
+	
+	public SipApplicationSessionTaskData(MobicentsSipApplicationSession sipApplicationSession) {
+		super(sipApplicationSession.getId(), -1, -1, null);
+		this.key = sipApplicationSession.getKey();
+	}
+	/**
+	 * @return the data
+	 */
+	public SipApplicationSessionKey getKey() {
+		return key;
+	}
 }

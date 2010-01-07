@@ -746,14 +746,14 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	 * Remove myself from the distributed cache.
 	 */
 	public void removeMyself() {
-		((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeSession(key);
+		((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeSipApplicationSession(key.getId());
 	}
 
 	/**
 	 * Remove myself from the <t>local</t> instance of the distributed cache.
 	 */
 	public void removeMyselfLocal() {
-		((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeSessionLocal(key, null);
+		((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeSipApplicationSessionLocal(key.getId(), null);
 	}
 
 	/**

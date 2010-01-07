@@ -29,6 +29,7 @@ import java.net.URL;
 import java.text.ParseException;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Semaphore;
 
 import javax.servlet.http.HttpSession;
@@ -43,6 +44,7 @@ import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionEventType;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
+import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
@@ -290,6 +292,24 @@ public class MobicentsSipApplicationSessionFacade implements
 	@Override
 	public String toString() {
 		return this.sipApplicationSession.toString();
+	}
+
+	public void setExpirationTimerFuture(
+			ScheduledFuture<MobicentsSipApplicationSession> schedule) {
+		this.sipApplicationSession.setExpirationTimerFuture(schedule);
+	}
+
+	public void setExpirationTimerTask(
+			SipApplicationSessionTimerTask expirationTimerTask) {
+		this.sipApplicationSession.setExpirationTimerTask(expirationTimerTask);
+	}
+
+	public void setExpired(boolean hasExpired) {
+		this.sipApplicationSession.setExpired(hasExpired);
+	}
+
+	public long getExpirationTimeInternal() {
+		return sipApplicationSession.getExpirationTimeInternal();
 	}
 
 }

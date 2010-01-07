@@ -19,19 +19,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.mobicents.servlet.sip.ruby;
+package org.mobicents.servlet.sip.core.timers;
 
-import javax.servlet.ServletContext;
-import javax.servlet.sip.SipServletMessage;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 
 /**
  * @author jean.deruelle@gmail.com
  *
  */
-public interface SipRubyController {
+public class DefaultSipApplicationSessionTimerFactory implements
+		SipApplicationSessionTimerFactory {
 
-	void routeSipMessageToRubyApp(ServletContext servletContext, SipServletMessage sipServletMessage);	
-	
-	String getName();
-	void setName(String name);
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerFactory#createSipApplicationSessionTimerTask()
+	 */
+	public SipApplicationSessionTimerTask createSipApplicationSessionTimerTask(MobicentsSipApplicationSession sipApplicationSession) {		
+		return new DefaultSasTimerTask(sipApplicationSession);
+	}
+
 }

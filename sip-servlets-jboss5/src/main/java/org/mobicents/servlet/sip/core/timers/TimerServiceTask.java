@@ -33,6 +33,8 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.timers.TimerTask;
 
 /**
+ * Sip ServletTimer implementation that can be failed over
+ * 
  * @author jean.deruelle@gmail.com
  *
  */

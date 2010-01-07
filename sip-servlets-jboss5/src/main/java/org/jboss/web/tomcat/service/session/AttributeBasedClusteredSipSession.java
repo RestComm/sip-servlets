@@ -25,7 +25,7 @@ import org.apache.log4j.Logger;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingAttributeGranularitySessionData;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
@@ -106,7 +106,7 @@ public class AttributeBasedClusteredSipSession extends ClusteredSipSession<Outgo
 		Long timestamp = modAttrs != null || removeAttrs != null
 				|| metadata != null || getMustReplicateTimestamp() ? Long
 				.valueOf(getSessionTimestamp()) : null;
-		OutgoingData outgoingData = new OutgoingData(null, getVersion(), timestamp, sipApplicationSessionKey, key, metadata,
+		OutgoingData outgoingData = new OutgoingData(null, getVersion(), timestamp, sipApplicationSessionKey.getId(), SessionManagerUtil.getSipSessionHaKey(key), metadata,
 				modAttrs, removeAttrs);
 		outgoingData.setSessionMetaDataDirty(isSessionMetadataDirty());
 		return outgoingData;
@@ -173,7 +173,7 @@ public class AttributeBasedClusteredSipSession extends ClusteredSipSession<Outgo
 		private final Map<String, Object> modifiedAttributes;
 		private final Set<String> removedAttributes;
 
-		public OutgoingData(String realId, int version, Long timestamp, SipApplicationSessionKey sipApplicationSessionKey, SipSessionKey sipSessionKey,
+		public OutgoingData(String realId, int version, Long timestamp, String sipApplicationSessionKey, String sipSessionKey,
 				DistributableSipSessionMetadata metadata,
 				Map<String, Object> modifiedAttributes,
 				Set<String> removedAttributes) {

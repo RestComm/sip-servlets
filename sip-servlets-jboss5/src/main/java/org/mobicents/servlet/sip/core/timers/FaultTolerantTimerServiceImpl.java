@@ -32,13 +32,19 @@ import org.mobicents.timers.FaultTolerantScheduler;
 import org.mobicents.timers.PeriodicScheduleStrategy;
 import org.mobicents.timers.TimerTaskFactory;
 
+/**
+ * Fault Tolerant Timer Service implementation allowing to shcedule ServletTimers that can be failed over
+ * 
+ * @author jean.deruelle@gmail.com
+ *
+ */
 public class FaultTolerantTimerServiceImpl implements TimerService, Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(FaultTolerantTimerServiceImpl.class
 			.getName());
 	public static final int SCHEDULER_THREAD_POOL_DEFAULT_SIZE = 10;
-	public static final String NAME = "MSSFaultTolerantTimers";
+	public static final String NAME = "MSS_FT_Timers";
 	
 	private FaultTolerantScheduler scheduledExecutor;
 	private ClusteredSipManager<? extends OutgoingDistributableSessionData> sipManager;

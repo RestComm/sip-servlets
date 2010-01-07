@@ -20,6 +20,7 @@ import org.jboss.metadata.web.jboss.ReplicationGranularity;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManagerDelegate;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
@@ -67,7 +68,7 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 		} else {
 			session = new SessionBasedClusteredSipApplicationSession(key,sipContext, useJK);
 		}
-		clusteredSipManager.getDistributedCacheConvergedSipManager().sipApplicationSessionCreated(key);
+		clusteredSipManager.getDistributedCacheConvergedSipManager().sipApplicationSessionCreated(key.getId());
 		session.setNew(true);
 		return session;
 	}
@@ -87,7 +88,7 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 		} else {
 			session = new SessionBasedClusteredSipSession(key, sipFactoryImpl, mobicentsSipApplicationSession, useJK);
 		}
-		clusteredSipManager.getDistributedCacheConvergedSipManager().sipSessionCreated(mobicentsSipApplicationSession.getKey(), key);
+		clusteredSipManager.getDistributedCacheConvergedSipManager().sipSessionCreated(mobicentsSipApplicationSession.getKey().getId(), SessionManagerUtil.getSipSessionHaKey(key));
 		session.setNew(true);
 		return session;
 	}

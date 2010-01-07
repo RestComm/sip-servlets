@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.Semaphore;
 
 import javax.naming.NamingException;
@@ -74,7 +73,12 @@ import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.core.timers.DefaultSipApplicationSessionTimerFactory;
+import org.mobicents.servlet.sip.core.timers.DefaultSipApplicationSessionTimerService;
+import org.mobicents.servlet.sip.core.timers.FaultTolerantSasTimerService;
+import org.mobicents.servlet.sip.core.timers.FaultTolerantSipApplicationSessionTimerFactory;
 import org.mobicents.servlet.sip.core.timers.FaultTolerantTimerServiceImpl;
+import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerFactory;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
@@ -147,8 +151,13 @@ public class SipStandardContext extends StandardContext implements SipContext {
     protected transient Map<String, Container> childrenMap;
     protected transient Map<String, Container> childrenMapByClassName;
 
-    protected transient ScheduledThreadPoolExecutor executor = null;
-    protected transient TimerService timerService = null;
+    // timer service used to schedule sip application session expiration timer
+    protected transient SipApplicationSessionTimerService sasTimerService = null;
+    // factory used to create instances of sip application session expiration timer
+    protected transient SipApplicationSessionTimerFactory sipApplicationSessionTimerFactory;
+    // timer service used to schedule sip servlet originated timer tasks
+    protected transient TimerService timerService = null;   	
+    
 	/**
 	 * 
 	 */
@@ -163,7 +172,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if(idleTime <= 0) {
 			idleTime = 1;
 		}
-		executor = new ScheduledThreadPoolExecutor(4);
+		sasTimerService = new DefaultSipApplicationSessionTimerService(4);
+		sipApplicationSessionTimerFactory = new DefaultSipApplicationSessionTimerFactory();
 	}
 
 	@Override
@@ -209,7 +219,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				if(logger.isInfoEnabled()) {
 					logger.info("Using the Fault Tolerant Timer Service to schedule fault tolerant timers in a distributed environment");
 				}
-				timerService = new FaultTolerantTimerServiceImpl((DistributableSipManager)getSipManager());			
+				timerService = new FaultTolerantTimerServiceImpl((DistributableSipManager)getSipManager());
+				sasTimerService = new FaultTolerantSasTimerService((DistributableSipManager)getSipManager(), 4);
+				sipApplicationSessionTimerFactory = new FaultTolerantSipApplicationSessionTimerFactory();
 			} else {
 				timerService = new TimerServiceImpl();
 			}
@@ -751,7 +763,11 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			}			
 			if(logger.isInfoEnabled()) {
 				logger.info("Using the Fault Tolerant Timer Service to schedule fault tolerant timers in a distributed environment");
-			}
+			}			
+			sasTimerService.shutdownNow();
+			sasTimerService = null;
+			sasTimerService = new FaultTolerantSasTimerService((DistributableSipManager)manager, 4);
+			sipApplicationSessionTimerFactory = new FaultTolerantSipApplicationSessionTimerFactory();
 			timerService = null;
 			timerService = new FaultTolerantTimerServiceImpl((DistributableSipManager)manager);										
 			this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
@@ -1129,7 +1145,21 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		this.rubyController = sipRubyController;
 	}
 	
-	public ScheduledThreadPoolExecutor getThreadPoolExecutor() {
-		return executor;
+	public SipApplicationSessionTimerService getSipApplicationSessionTimerService() {
+		return sasTimerService;
+	}	
+
+	/**
+	 * @return the hasDistributableManager
+	 */
+	public boolean hasDistributableManager() {
+		return hasDistributableManager;
+	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#getSipApplicationSessionTimerFactory()
+	 */
+	public SipApplicationSessionTimerFactory getSipApplicationSessionTimerFactory() {
+		return sipApplicationSessionTimerFactory;
 	}
 }

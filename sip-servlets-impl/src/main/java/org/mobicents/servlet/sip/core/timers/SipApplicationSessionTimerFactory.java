@@ -19,18 +19,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.web.tomcat.service.session.distributedcache.spi;
+package org.mobicents.servlet.sip.core.timers;
 
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+
 
 /**
+ * Factory allowing to instantiate different implementations of SipApplicationSessionTimerTask depending on the need 
+ * (Fault Tolerant or not by example)
+ *  
  * @author jean.deruelle@gmail.com
  *
  */
-public interface OutgoingDistributableSipSessionData extends OutgoingDistributableSessionData {
-	SipSessionKey getSipSessionKey();
-	SipApplicationSessionKey getSipApplicationSessionKey();
-	void setSessionMetaDataDirty(boolean isSessionMetaDataDirty);
-	boolean isSessionMetaDataDirty();
+public interface SipApplicationSessionTimerFactory {
+	SipApplicationSessionTimerTask createSipApplicationSessionTimerTask(MobicentsSipApplicationSession sipApplicationSession);
 }

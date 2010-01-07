@@ -302,8 +302,8 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	 */
 	private void dispatchInsideContainer(final SipProvider sipProvider, final SipApplicationRouterInfo applicationRouterInfo, final SipServletRequestImpl sipServletRequest, final SipFactoryImpl sipFactoryImpl, MobicentsSipSession joinReplacesSipSession) throws DispatcherException {
 		final String nextApplicationName = applicationRouterInfo.getNextApplicationName();
-		if(logger.isInfoEnabled()) {
-			logger.info("Dispatching the request event to " + nextApplicationName);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Dispatching the request event to " + nextApplicationName);
 		}
 		final Request request = (Request) sipServletRequest.getMessage();
 		sipServletRequest.setCurrentApplicationName(nextApplicationName);

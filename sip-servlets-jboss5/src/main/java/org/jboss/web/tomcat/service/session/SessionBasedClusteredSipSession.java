@@ -22,6 +22,7 @@ import java.util.Map;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingSessionGranularitySessionData;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -76,7 +77,7 @@ public class SessionBasedClusteredSipSession extends
 		Long timestamp = attrs != null || metadata != null
 				|| getMustReplicateTimestamp() ? Long
 				.valueOf(getSessionTimestamp()) : null;
-		OutgoingData outgoingData = new OutgoingData(null, getVersion(), timestamp, sipApplicationSessionKey, key, metadata,
+		OutgoingData outgoingData = new OutgoingData(null, getVersion(), timestamp, sipApplicationSessionKey.getId(), SessionManagerUtil.getSipSessionHaKey(key), metadata,
 				attrs);
 		outgoingData.setSessionMetaDataDirty(isSessionMetadataDirty());
 		return outgoingData;
@@ -112,7 +113,7 @@ public class SessionBasedClusteredSipSession extends
 			OutgoingSessionGranularitySessionData {
 		private final Map<String, Object> attributes;
 
-		public OutgoingData(String realId, int version, Long timestamp, SipApplicationSessionKey sipApplicationSessionKey, SipSessionKey sipSessionKey,
+		public OutgoingData(String realId, int version, Long timestamp, String sipApplicationSessionKey, String sipSessionKey,
 				DistributableSipSessionMetadata metadata,
 				Map<String, Object> attributes) {
 			super(realId, version, timestamp, sipApplicationSessionKey, sipSessionKey, metadata);

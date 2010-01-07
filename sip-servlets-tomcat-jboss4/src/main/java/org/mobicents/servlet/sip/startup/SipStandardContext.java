@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.Semaphore;
 
 import javax.naming.Context;
@@ -71,6 +70,9 @@ import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.core.timers.DefaultSipApplicationSessionTimerFactory;
+import org.mobicents.servlet.sip.core.timers.DefaultSipApplicationSessionTimerService;
+import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerFactory;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
@@ -144,7 +146,11 @@ public class SipStandardContext extends StandardContext implements SipContext {
 
 	protected boolean sipJNDIContextLoaded = false;
 	
-    protected transient ScheduledThreadPoolExecutor executor = null;
+	// timer service used to schedule sip application session expiration timer
+    protected transient SipApplicationSessionTimerService sasTimerService = null;
+    // factory used to create instances of sip application session expiration timer
+    protected transient SipApplicationSessionTimerFactory sipApplicationSessionTimerFactory;
+    // timer service used to schedule sip servlet originated timer tasks
     protected transient TimerService timerService = null;
 	/**
 	 * 
@@ -161,7 +167,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			idleTime = 1;
 		}
 		hasDistributableManager = false;
-		executor = new ScheduledThreadPoolExecutor(4);
+		sasTimerService = new DefaultSipApplicationSessionTimerService(4);
+		sipApplicationSessionTimerFactory = new DefaultSipApplicationSessionTimerFactory();
 	}
 
 	@Override
@@ -1187,7 +1194,18 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		throw new UnsupportedOperationException("ruby applications are not supported on Tomcat or JBoss 4.X versions");
 	}
 	
-	public ScheduledThreadPoolExecutor getThreadPoolExecutor() {
-		return executor;
+	public SipApplicationSessionTimerService getSipApplicationSessionTimerService() {
+		return sasTimerService;
+	}
+
+	public boolean hasDistributableManager() {		
+		return hasDistributableManager;
+	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#getSipApplicationSessionTimerFactory()
+	 */
+	public SipApplicationSessionTimerFactory getSipApplicationSessionTimerFactory() {
+		return sipApplicationSessionTimerFactory;
 	}
 }

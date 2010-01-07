@@ -1023,7 +1023,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 
 			futureExpirationTimeOnPassivation = in.readLong();
 			if(expirationTimerTask == null && sipContext.getSipApplicationSessionTimeout() > 0) {
-				expirationTimerTask = new SipApplicationSessionTimerTask();
+				expirationTimerTask = sipContext.getSipApplicationSessionTimerFactory().createSipApplicationSessionTimerTask(this);
 			}
 			if(expirationTimerTask != null) {
 				if(logger.isDebugEnabled()) {

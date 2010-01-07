@@ -22,9 +22,7 @@
 package org.jboss.web.tomcat.service.deployers;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.security.CodeSource;
 import java.security.cert.Certificate;
@@ -52,7 +50,6 @@ import org.jboss.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.naming.NonSerializableFactory;
 import org.jboss.security.SecurityUtil;
-import org.jboss.virtual.VirtualFile;
 import org.jboss.web.WebApplication;
 import org.jboss.web.tomcat.security.JaccContextValve;
 import org.jboss.web.tomcat.security.RunAsListener;
@@ -298,12 +295,15 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 
 		// Clustering
 		if (metaData.getDistributable() != null) {
+			// MSS : we set the classloader because Clustering class are mixed up with deployers class
+			// causing CL problems : need to separate them in different jars
+//			ClassLoader previousClassLoader = Thread.currentThread().getContextClassLoader();
+//			Thread.currentThread().setContextClassLoader(ClusteredSession.class.getClassLoader());
 			// Try to initate clustering, fallback to standard if no clustering
-			// is
-			// available
+			// is available
 			try {
 				AbstractJBossManager manager = null;
-				String managerClassName = config.getManagerClass();
+				String managerClassName = config.getManagerClass();								
 				Class managerClass = Thread.currentThread()
 						.getContextClassLoader().loadClass(managerClassName);
 				manager = (AbstractJBossManager) managerClass.newInstance();
@@ -323,11 +323,10 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 								+ e.getMessage());
 			} catch (NoClassDefFoundError ncdf) {
 				// JBAS-3513 Just log a WARN, not an ERROR
+				log.warn("Failed to setup clustering, clustering disabled. NoClassDefFoundError: "
+						+ ncdf.getMessage());
 				log.debug("Classes needed for clustered webapp unavailable",
-						ncdf);
-				log
-						.warn("Failed to setup clustering, clustering disabled. NoClassDefFoundError: "
-								+ ncdf.getMessage());
+						ncdf);				
 			} catch (Throwable t) {
 				// TODO consider letting this through and fail the deployment
 				log
@@ -335,6 +334,7 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 								"Failed to setup clustering, clustering disabled. Exception: ",
 								t);
 			}
+//			Thread.currentThread().setContextClassLoader(previousClassLoader);
 		}
 
 		// Build the ENC

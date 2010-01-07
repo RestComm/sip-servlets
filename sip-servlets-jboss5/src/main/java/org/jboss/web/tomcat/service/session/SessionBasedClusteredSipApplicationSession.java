@@ -75,7 +75,7 @@ public class SessionBasedClusteredSipApplicationSession extends ClusteredSipAppl
 		Long timestamp = attrs != null || metadata != null
 				|| getMustReplicateTimestamp() ? Long
 				.valueOf(getSessionTimestamp()) : null;
-		OutgoingData outgoingData = new OutgoingData(null, getVersion(), timestamp, key, metadata,
+		OutgoingData outgoingData = new OutgoingData(null, getVersion(), timestamp, key.getId(), metadata,
 				attrs);
 		outgoingData.setSessionMetaDataDirty(isSessionMetadataDirty());
 		return outgoingData;
@@ -111,7 +111,7 @@ public class SessionBasedClusteredSipApplicationSession extends ClusteredSipAppl
 			OutgoingSessionGranularitySessionData {
 		private final Map<String, Object> attributes;
 
-		public OutgoingData(String realId, int version, Long timestamp, SipApplicationSessionKey key,
+		public OutgoingData(String realId, int version, Long timestamp, String key,
 				DistributableSipApplicationSessionMetadata metadata,
 				Map<String, Object> attributes) {
 			super(realId, version, timestamp, key, metadata);

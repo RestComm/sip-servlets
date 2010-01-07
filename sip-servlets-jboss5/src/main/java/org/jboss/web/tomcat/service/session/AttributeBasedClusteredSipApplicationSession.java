@@ -107,7 +107,7 @@ public class AttributeBasedClusteredSipApplicationSession extends
 		Long timestamp = modAttrs != null || removeAttrs != null
 				|| metadata != null || getMustReplicateTimestamp() ? Long
 				.valueOf(getSessionTimestamp()) : null;
-		OutgoingData outgoingData = new OutgoingData(null, getVersion(), timestamp, key, metadata,
+		OutgoingData outgoingData = new OutgoingData(null, getVersion(), timestamp, key.getId(), metadata,
 				modAttrs, removeAttrs);
 		outgoingData.setSessionMetaDataDirty(isSessionMetadataDirty());
 		return outgoingData;
@@ -174,7 +174,7 @@ public class AttributeBasedClusteredSipApplicationSession extends
 		private final Map<String, Object> modifiedAttributes;
 		private final Set<String> removedAttributes;
 
-		public OutgoingData(String realId, int version, Long timestamp, SipApplicationSessionKey key,
+		public OutgoingData(String realId, int version, Long timestamp, String key,
 				DistributableSipApplicationSessionMetadata metadata,
 				Map<String, Object> modifiedAttributes,
 				Set<String> removedAttributes) {

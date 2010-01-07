@@ -26,6 +26,7 @@ import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCach
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSipSessionData;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
@@ -96,7 +97,7 @@ public class FieldBasedClusteredSipSession extends
 				|| getMustReplicateTimestamp() ? Long
 				.valueOf(getSessionTimestamp()) : null;
 		OutgoingDistributableSipSessionData outgoingData = new OutgoingDistributableSipSessionDataImpl(null,
-				getVersion(), timestamp, sipApplicationSessionKey, key, metadata);
+				getVersion(), timestamp, sipApplicationSessionKey.getId(), SessionManagerUtil.getSipSessionHaKey(key), metadata);
 		outgoingData.setSessionMetaDataDirty(isSessionMetadataDirty());
 		return outgoingData;
 	}
@@ -119,10 +120,10 @@ public class FieldBasedClusteredSipSession extends
 		// Remove it from the underlying store
 		if (localCall && !replicationExcludes.contains(name)) {
 			if (localOnly)
-				((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeAttributeLocal(sipApplicationSessionKey, key,
+				((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeSipSessionAttributeLocal(sipApplicationSessionKey.getId(), SessionManagerUtil.getSipSessionHaKey(key),
 						name);
 			else
-				((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeAttribute(sipApplicationSessionKey, key, name);
+				((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeSipSessionAttribute(sipApplicationSessionKey.getId(), SessionManagerUtil.getSipSessionHaKey(key), name);
 
 			sessionAttributesDirty();
 		}
@@ -152,13 +153,13 @@ public class FieldBasedClusteredSipSession extends
 	protected Object setAttributeInternal(String key, Object value) {
 		if (!replicationExcludes.contains(key)) {
 			((DistributedCacheConvergedSipManager)getDistributedCacheManager()).
-				putAttribute(sipApplicationSessionKey, this.key, key, value);
+				putSipSessionAttribute(sipApplicationSessionKey.getId(), SessionManagerUtil.getSipSessionHaKey(this.key), key, value);
 
 			// Special case for Collection classes.
 			if (value instanceof Map || value instanceof Collection) {
 				// We need to obtain the proxy first.
 				value = ((DistributedCacheConvergedSipManager)getDistributedCacheManager())
-						.getAttribute(sipApplicationSessionKey, this.key, key);
+						.getSipSessionAttribute(sipApplicationSessionKey.getId(), SessionManagerUtil.getSipSessionHaKey(this.key), key);
 			}
 
 			// Only mark session dirty if we can replicate the attribute

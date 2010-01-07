@@ -23,29 +23,32 @@ package org.mobicents.servlet.sip.core.timers;
 
 import org.jboss.web.tomcat.service.session.ClusteredSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.timers.TimerTask;
 import org.mobicents.timers.TimerTaskData;
 import org.mobicents.timers.TimerTaskFactory;
 
 /**
- * Allow to recreate a sip servlet timer task upon failover
+ * Allow to recreate a sip application session timer task upon failover
  * 
  * @author jean.deruelle@gmail.com
  *
  */
-public class TimerServiceTaskFactory implements TimerTaskFactory {
+public class SipApplicationSessionTaskFactory implements TimerTaskFactory {
 	
 	private ClusteredSipManager<? extends OutgoingDistributableSessionData> sipManager;
 	
-	public TimerServiceTaskFactory(ClusteredSipManager<? extends OutgoingDistributableSessionData> sipManager) {
+	public SipApplicationSessionTaskFactory(ClusteredSipManager<? extends OutgoingDistributableSessionData> sipManager) {
 		this.sipManager = sipManager;
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.mobicents.timers.TimerTaskFactory#newTimerTask(org.mobicents.timers.TimerTaskData)
 	 */
-	public TimerTask newTimerTask(TimerTaskData data) {		
-		return new TimerServiceTask(sipManager, null, (TimerServiceTaskData)data);
+	public TimerTask newTimerTask(TimerTaskData data) {	
+		SipApplicationSessionTaskData sasData = (SipApplicationSessionTaskData)data;
+		MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(sasData.getKey(), false);
+		return new FaultTolerantSasTimerTask(sipApplicationSession, sasData);
 	}
 
 }

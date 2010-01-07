@@ -33,6 +33,7 @@ import org.mobicents.servlet.sip.core.SipContextEvent;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
+import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerFactory;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -60,6 +61,8 @@ public interface SipContext extends Context {
 	String getApplicationName();
 	String getApplicationNameHashed();
 
+	boolean hasDistributableManager();
+	
 	void setApplicationName(String applicationName);
 
 	String getDescription();
@@ -150,11 +153,13 @@ public interface SipContext extends Context {
 	
 	TimerService getTimerService();
 	
-	ScheduledThreadPoolExecutor getThreadPoolExecutor();
+	SipApplicationSessionTimerService getSipApplicationSessionTimerService();
 
 	void setConcurrencyControlMode(ConcurrencyControlMode mode);
 	ConcurrencyControlMode getConcurrencyControlMode();
 
 	void setSipRubyController(SipRubyController rubyController);
 	SipRubyController getSipRubyController();
+	
+	SipApplicationSessionTimerFactory getSipApplicationSessionTimerFactory();
 }

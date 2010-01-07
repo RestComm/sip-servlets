@@ -16,12 +16,14 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Semaphore;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 
+import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
 import org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -58,7 +60,9 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession {
 	void notifySipApplicationSessionListeners(SipApplicationSessionEventType expiration);
 
 	boolean isExpired();
+	void setExpired(boolean hasExpired);
 	
+	long getExpirationTimeInternal();
 	boolean isValidInternal();
 	
 	String getCurrentRequestHandler();
@@ -74,4 +78,6 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession {
 	String getJvmRoute();
 	void setJvmRoute(String jvmRoute);
 
+	void setExpirationTimerTask(SipApplicationSessionTimerTask expirationTimerTask);
+	void setExpirationTimerFuture(ScheduledFuture<MobicentsSipApplicationSession> schedule);
 }

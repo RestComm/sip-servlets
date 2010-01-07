@@ -85,7 +85,7 @@ public class FieldBasedClusteredSipApplicationSession extends ClusteredSipApplic
    {
       DistributableSipApplicationSessionMetadata metadata = (DistributableSipApplicationSessionMetadata)getSessionMetadata();
       Long timestamp = metadata != null || isSessionAttributeMapDirty() || getMustReplicateTimestamp() ? Long.valueOf(getSessionTimestamp()) : null;
-      OutgoingDistributableSipApplicationSessionData outgoingData = new OutgoingDistributableSipApplicationSessionDataImpl(null, getVersion(), timestamp, key, metadata);
+      OutgoingDistributableSipApplicationSessionData outgoingData = new OutgoingDistributableSipApplicationSessionDataImpl(null, getVersion(), timestamp, key.getId(), metadata);
       outgoingData.setSessionMetaDataDirty(isSessionMetadataDirty());
       return outgoingData;
    }
@@ -110,9 +110,9 @@ public class FieldBasedClusteredSipApplicationSession extends ClusteredSipApplic
       if (localCall && !replicationExcludes.contains(name))
       { 
          if (localOnly)         
-            ((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeAttributeLocal(key, name);      
+            ((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeSipApplicationSessionAttributeLocal(key.getId(), name);      
          else
-        	 ((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeAttribute(key, name); 
+        	 ((DistributedCacheConvergedSipManager)getDistributedCacheManager()).removeSipApplicationSessionAttribute(key.getId(), name); 
          
          sessionAttributesDirty();
       }
@@ -142,13 +142,13 @@ public class FieldBasedClusteredSipApplicationSession extends ClusteredSipApplic
    {
       if (!replicationExcludes.contains(key))
       {   
-    	  ((DistributedCacheConvergedSipManager)getDistributedCacheManager()).putAttribute(this.key, key, value);
+    	  ((DistributedCacheConvergedSipManager)getDistributedCacheManager()).putSipApplicationSessionAttribute(this.key.getId(), key, value);
    
          // Special case for Collection classes.
          if( value instanceof Map || value instanceof Collection)
          {
             // We need to obtain the proxy first.
-            value = ((DistributedCacheConvergedSipManager)getDistributedCacheManager()).getAttribute(this.key, key);
+            value = ((DistributedCacheConvergedSipManager)getDistributedCacheManager()).getSipApplicationSessionAttribute(this.key.getId(), key);
          }
 
          // Only mark session dirty if we can replicate the attribute

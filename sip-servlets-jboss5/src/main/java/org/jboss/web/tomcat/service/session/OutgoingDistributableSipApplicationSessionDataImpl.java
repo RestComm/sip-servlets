@@ -32,16 +32,16 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 public class OutgoingDistributableSipApplicationSessionDataImpl extends OutgoingDistributableSessionDataImpl implements
 		OutgoingDistributableSipApplicationSessionData {
 	
-	SipApplicationSessionKey sipApplicationSessionKey;
+	String sipApplicationSessionKey;
 	private boolean isSessionMetaDataDirty;
 	
 	public OutgoingDistributableSipApplicationSessionDataImpl(String realId,
-			int version, Long timestamp, SipApplicationSessionKey key, DistributableSipApplicationSessionMetadata metadata) {
+			int version, Long timestamp, String key, DistributableSipApplicationSessionMetadata metadata) {
 		super(realId, version, timestamp, metadata);
 		this.sipApplicationSessionKey = key;
 	}
 
-	public SipApplicationSessionKey getSipApplicationSessionKey() {
+	public String getSipApplicationSessionKey() {
 		return this.sipApplicationSessionKey;
 	}
 	/**

@@ -19,32 +19,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.jboss.web.tomcat.service.session.distributedcache.spi;
+package org.mobicents.servlet.sip.startup;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.List;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
 
 /**
  * @author jean.deruelle@gmail.com
  *
  */
-public class DistributableSipSessionMetadata extends
-		DistributableSessionMetadata {
-	// map to store meta data changes for replication.
-	private transient Map<String, Object> metaData = new ConcurrentHashMap<String, Object>();
+public interface SipApplicationSessionTimerService {
 
-	/**
-	 * @param metaData the metaData to set
-	 */
-	public void setMetaData(Map<String, Object> metaData) {
-		this.metaData = metaData;
-	}
+	ScheduledFuture<?> schedule(
+			SipApplicationSessionTimerTask expirationTimerTask, long delay,
+			TimeUnit unit);
 
-	/**
-	 * @return the metaData
-	 */
-	public Map<String, Object> getMetaData() {
-		return metaData;
-	}
-		
+	boolean remove(SipApplicationSessionTimerTask expirationTimerTask);
+
+	void purge();
+
+	List<Runnable> shutdownNow();
+
 }
