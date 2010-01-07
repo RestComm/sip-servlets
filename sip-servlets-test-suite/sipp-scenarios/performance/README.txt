@@ -1,9 +1,4 @@
-To use perf test, first run the 'download-and-compile-sipp.sh' to download and compile sipp, as the filename says.
-This is needed once, because sipp is a C program and needs to be compiled in you system. It takes about 1 minute. 
-
-Start the sip-servlets container with the server.xml provided in the folder (just change the absolute paths), 
-running the simple-sip-servlet example, and run the the performance-test script.
-
-use keys + and - to increase or decrease the calls per second rate. 
-
-Note: There are no plans at the moment to port the bash scripts to windows batch files.
+modify the JBOSS_HOME variable in prepare-jboss-server-for-perf.sh script to map your own or set the JBOSS_HOME env variable
+run sh prepare-jboss-server-for-perf.sh uas (or proxy, b2bua or uac  if you want to test something else) from this directory
+run sh start-jboss-server.sh from this directory
+un sh performance-test.sh uas (or proxy or b2bua, if you want to test something else) from this directory 
