@@ -61,13 +61,20 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
             long delay, 
             TimeUnit unit) {			
 		if(expirationTimerTask instanceof FaultTolerantSasTimerTask) {
-			FaultTolerantSasTimerTask faultTolerantSasTimerTask = (FaultTolerantSasTimerTask)expirationTimerTask;
-			faultTolerantSasTimerTask.getData().setStartTime(System.currentTimeMillis() + delay);
-			if(logger.isDebugEnabled()) {
-				logger.debug("Scheduling sip application session "+ expirationTimerTask.getSipApplicationSession().getKey() +" to expire in " + (delay / (double) 1000 / (double) 60) + " minutes");
+			if(getScheduler().getTimerTaskData(expirationTimerTask.getSipApplicationSession().getId()) == null) {
+				FaultTolerantSasTimerTask faultTolerantSasTimerTask = (FaultTolerantSasTimerTask)expirationTimerTask;
+				faultTolerantSasTimerTask.getData().setStartTime(System.currentTimeMillis() + delay);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Scheduling sip application session "+ expirationTimerTask.getSipApplicationSession().getKey() +" to expire in " + (delay / (double) 1000 / (double) 60) + " minutes");
+				}
+				getScheduler().schedule(faultTolerantSasTimerTask);
+				return faultTolerantSasTimerTask.getScheduledFuture();
+			} else {
+				if(logger.isDebugEnabled()) {
+					logger.debug("sip application session expiration timer "+ expirationTimerTask.getSipApplicationSession().getKey() +" is already present in the cache not scheduling it again");
+				}
+				return null;
 			}
-			getScheduler().schedule(faultTolerantSasTimerTask);
-			return faultTolerantSasTimerTask.getScheduledFuture();
 		} 				
 		throw new IllegalArgumentException("the task to schedule is not an instance of FaultTolerantSasTimerTask");
 	}
@@ -75,6 +82,12 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 	public boolean remove(SipApplicationSessionTimerTask expirationTimerTask) {
 		if(expirationTimerTask instanceof FaultTolerantSasTimerTask) {
 			TimerTask cancelledTask = getScheduler().cancel(((FaultTolerantSasTimerTask)expirationTimerTask).getData().getTaskID());
+			if(cancelledTask == null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Task "+ expirationTimerTask.getSipApplicationSession().getKey() +" couldn't be cancelled because it was not found locally");
+				}
+				return false;
+			}
 			return true;
 		} 				
 		throw new IllegalArgumentException("the task to remove is not an instance of FaultTolerantSasTimerTask");
@@ -91,12 +104,21 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 		return new ArrayList<Runnable>();
 	}
 	
-	public FaultTolerantScheduler getScheduler() {
+	private FaultTolerantScheduler getScheduler() {
 		if(scheduledExecutor == null) {
 			TimerTaskFactory timerTaskFactory = new SipApplicationSessionTaskFactory(this.sipManager);
 			scheduledExecutor = new FaultTolerantScheduler(NAME, corePoolSize, this.sipManager.getMobicentsCluster(), (byte) 0, null, timerTaskFactory);
 		}
 		return scheduledExecutor;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipApplicationSessionTimerService#init()
+	 */
+	public void init() {
+		// we need to start the scheduler upon init so that the local listener gets registered and can failover timers
+		getScheduler();
 	}
 
 }

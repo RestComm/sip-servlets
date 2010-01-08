@@ -95,4 +95,8 @@ public class DefaultSipApplicationSessionTimerService extends
 		return super.schedule(expirationTimerTask, delay, unit);
 	}
 
+	public void init() {
+		prestartAllCoreThreads();
+	}
+
 }

@@ -1033,10 +1033,11 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	public boolean notifySipContextListeners(SipContextEvent event) {
 		boolean ok = true;
 		if(event.getEventType() == SipContextEventType.SERVLET_INITIALIZED) {
-			// we need to make sure the scheduler is created to be able to fail over fault tolerant timers
+			// we need to make sure the scheduler are created to be able to fail over fault tolerant timers
 			// we can't create it before because the mobicents cluster is not yet initialized
 			if(getDistributable() && hasDistributableManager) {
 				((FaultTolerantTimerServiceImpl)timerService).getScheduler();
+				sasTimerService.init();
 			}	
 		}
 		Container[] children = findChildren();

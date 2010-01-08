@@ -643,9 +643,15 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		if(logger.isDebugEnabled()) {
 			logger.debug("expiration timer on sip application session " + key + " removed : " + removed);
 		}		
-		boolean cancelled = expirationTimerFuture.cancel(true);
-		if(logger.isDebugEnabled()) {
-			logger.debug("expiration timer on sip application session " + key + " Cancelled : " + cancelled);
+		if(expirationTimerFuture != null) {
+			boolean cancelled = expirationTimerFuture.cancel(true);
+			if(logger.isDebugEnabled()) {
+				logger.debug("expiration timer on sip application session " + key + " Cancelled : " + cancelled);
+			}
+		} else {
+			if(logger.isDebugEnabled()) {
+				logger.debug("expiration timer future is null, thus cannot be Cancelled");
+			}
 		}
 
         // Purge is expensive when called frequently, only call it every now and then.

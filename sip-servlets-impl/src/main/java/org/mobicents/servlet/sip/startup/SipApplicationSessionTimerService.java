@@ -43,4 +43,6 @@ public interface SipApplicationSessionTimerService {
 
 	List<Runnable> shutdownNow();
 
+	void init();
+
 }

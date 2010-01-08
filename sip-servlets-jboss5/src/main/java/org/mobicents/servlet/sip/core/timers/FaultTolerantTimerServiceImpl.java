@@ -167,7 +167,7 @@ public class FaultTolerantTimerServiceImpl implements TimerService, Serializable
 	public FaultTolerantScheduler getScheduler() {
 		if(scheduledExecutor == null) {
 			TimerTaskFactory timerTaskFactory = new TimerServiceTaskFactory(this.sipManager);
-			scheduledExecutor = new FaultTolerantScheduler(NAME, SCHEDULER_THREAD_POOL_DEFAULT_SIZE, this.sipManager.getMobicentsCluster(), (byte) 0, null, timerTaskFactory);
+			scheduledExecutor = new FaultTolerantScheduler(NAME, SCHEDULER_THREAD_POOL_DEFAULT_SIZE, this.sipManager.getMobicentsCluster(), (byte) 1, null, timerTaskFactory);
 		}
 		return scheduledExecutor;
 	}
