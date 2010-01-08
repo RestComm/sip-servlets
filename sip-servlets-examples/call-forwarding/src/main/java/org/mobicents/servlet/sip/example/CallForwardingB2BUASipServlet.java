@@ -126,7 +126,19 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 			session.invalidate();
 		}	
 		return;
-	}	
+	}
+	
+    @Override
+    protected void doUpdate(SipServletRequest request) throws ServletException,
+            IOException {
+		if(logger.isInfoEnabled()) {
+			logger.info("Got UPDATE: " + request.toString());
+		}
+        B2buaHelper helper = request.getB2buaHelper();
+        SipSession peerSession = helper.getLinkedSession(request.getSession());
+        SipServletRequest update = helper.createRequest(peerSession, request, null);
+        update.send();
+    }
 	
 	@Override
 	protected void doCancel(SipServletRequest request) throws ServletException,
@@ -180,7 +192,13 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 			if(sipServletResponse.getContent() != null && sipServletResponse.getContentType() != null)
 				responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
 			responseToOriginalRequest.send();
-		}			
+		}		
+		if(sipServletResponse.getMethod().indexOf("UPDATE") != -1) {
+			B2buaHelper helper = sipServletResponse.getRequest().getB2buaHelper();
+			SipServletRequest orgReq = helper.getLinkedSipServletRequest(sipServletResponse.getRequest());
+			SipServletResponse res2 = orgReq.createResponse(sipServletResponse.getStatus());
+			res2.send();
+		}	
 	}
 	
 	@Override
