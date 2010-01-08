@@ -48,7 +48,10 @@ public class SipApplicationSessionTaskFactory implements TimerTaskFactory {
 	public TimerTask newTimerTask(TimerTaskData data) {	
 		SipApplicationSessionTaskData sasData = (SipApplicationSessionTaskData)data;
 		MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(sasData.getKey(), false);
-		return new FaultTolerantSasTimerTask(sipApplicationSession, sasData);
+		FaultTolerantSasTimerTask faultTolerantSasTimerTask = new FaultTolerantSasTimerTask(sipApplicationSession, sasData);
+		sipApplicationSession.setExpirationTimerTask(faultTolerantSasTimerTask);
+		
+		return faultTolerantSasTimerTask;
 	}
 
 }

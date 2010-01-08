@@ -64,10 +64,17 @@ if [ $# -ne 0 ]; then
 	    		./sipp $TEST_IP:5080 -s yousendbye -sf uas/clustering-uac-timer.xml -trace_err -i $TEST_IP -p 5050 -r 1 -m 1 -rsa $TEST_IP:5060 -trace_msg -nd
 	            ;;
 	    uas-sas-timer)
+	    		# kill first node after the ACK
 	    		rm ./uas/*.log
 	            echo "Distributed example used is uas";
-	    		./sipp $TEST_IP:5080 -s sastimersendbye -sf uas/clustering-uac-timer.xml -trace_err -i $TEST_IP -p 5050 -r 1 -m 1 -rsa $TEST_IP:5060 -trace_msg -nd
+	    		./sipp $TEST_IP:5080 -s sastimersendbye -sf uas/clustering-uac-timer.xml -trace_err -i $TEST_IP -p 5050 -r 1 -m 1 -rsa $TEST_IP:5060 -trace_msg -nd	    		
 	            ;;
+		uas-reinvite-sas-timer)
+	    		# kill first node after the first ACK
+	    		rm ./uas/*.log
+	            echo "Distributed example used is uas";
+	    		./sipp $TEST_IP:5080 -s sastimersendbye -sf uas/clustering-reinvite-sas-timer.xml -trace_err -i $TEST_IP -p 5050 -r 1 -m 1 -rsa $TEST_IP:5060 -trace_msg -nd	    		
+	            ;;	            	            
 	    *)
 	    		rm ./uas/*.log
 	            echo "Distributed example used is uas";

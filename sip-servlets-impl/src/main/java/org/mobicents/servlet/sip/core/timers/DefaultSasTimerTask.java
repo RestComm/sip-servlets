@@ -63,6 +63,7 @@ public class DefaultSasTimerTask implements SipApplicationSessionTimerTask {
 			}
 			final SipContext sipContext = sipApplicationSession.getSipContext();
 			final SipApplicationSessionTimerTask expirationTimerTask = sipContext.getSipApplicationSessionTimerFactory().createSipApplicationSessionTimerTask(sipApplicationSession);
+			sipContext.getSipApplicationSessionTimerService().remove(expirationTimerTask);
 			sipApplicationSession.setExpirationTimerTask(expirationTimerTask);					
 			sipApplicationSession.setExpirationTimerFuture((ScheduledFuture<MobicentsSipApplicationSession>) sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sleep, TimeUnit.MILLISECONDS));
 		} else {

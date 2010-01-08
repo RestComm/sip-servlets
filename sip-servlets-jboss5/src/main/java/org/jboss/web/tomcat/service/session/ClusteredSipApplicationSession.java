@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -55,12 +57,14 @@ import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistrib
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionManagementStatus;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionNotificationCause;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipApplicationSessionNotificationPolicy;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.core.timers.FaultTolerantSasTimerTask;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -347,6 +351,24 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		this.lastAccessedTime = this.thisAccessedTime;
 		this.thisAccessedTime = System.currentTimeMillis();
 
+		//JSR 289 Section 6.3 : starting the sip app session expiry timer anew 
+		if(sipApplicationSessionTimeout > 0) {
+			expirationTime = thisAccessedTime + sipApplicationSessionTimeout;
+			
+			if(expirationTimerTask == null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("expiration task for sipappsession " + key + " is not present locally, removing the existing one from the cluster and rescheduling a new one");
+				}
+				// means the expiration task has been started on another node and has not been failed over
+				// so we remove the task in the cluster 
+				FaultTolerantSasTimerTask fakeTimerTask =  new FaultTolerantSasTimerTask(this);				
+				sipContext.getSipApplicationSessionTimerService().remove(fakeTimerTask);
+				// and reschedule the task to run with this node being the master ofthe task 
+				expirationTimerTask = sipContext.getSipApplicationSessionTimerFactory().createSipApplicationSessionTimerTask(this);				
+				expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sipApplicationSessionTimeout, TimeUnit.MILLISECONDS);
+			}
+		}
+		
 		if (ACTIVITY_CHECK) {
 			accessCount.incrementAndGet();
 		}
