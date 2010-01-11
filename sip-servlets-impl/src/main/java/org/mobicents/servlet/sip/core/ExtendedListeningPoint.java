@@ -126,8 +126,13 @@ public class ExtendedListeningPoint {
 			String host = getIpAddress(usePublicAddress);
 			javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(null, host);
 			sipURI.setHost(host);
-			sipURI.setPort(port);			
-			sipURI.setTransportParam(transport);
+			sipURI.setPort(port);		
+			// Issue 1150 : we assume that if the transport match the default protocol of the transport protocol used it is not added
+			// See RFC 32661 Section 19.1.2 Character Escaping Requirements :
+			// (2): The default transport is scheme dependent.  For sip:, it is UDP.  For sips:, it is TCP.
+			if((!sipURI.isSecure() && !ListeningPoint.UDP.equalsIgnoreCase(transport)) || (sipURI.isSecure() && !ListeningPoint.TCP.equalsIgnoreCase(transport))) { 
+				sipURI.setTransportParam(transport);
+			}
 			javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);			
 			ContactHeader contact = SipFactories.headerFactory.createContactHeader(contactAddress);
 		
