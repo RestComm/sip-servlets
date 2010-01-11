@@ -72,7 +72,7 @@ public class SipNetworkInterfaceManager {
      */
     public static final int MIN_PORT_NUMBER = 1024;    
     
-	List<ExtendedListeningPoint> extendedListeningPointList = null;
+	Set<ExtendedListeningPoint> extendedListeningPointList = null;
 	List<SipURI> outboundInterfaces = null;
 	//related to google code issue 563, will be used to check if a request is aimed at a local network or outside
 	Set<String> outboundInterfacesIpAddresses = null;
@@ -81,7 +81,7 @@ public class SipNetworkInterfaceManager {
 	
 	//those maps are present to improve the performance of finding a listening point either from a transport
 	// or from a triplet ipaddress, port and transport
-	Map<String, List<ExtendedListeningPoint>> transportMappingCacheMap = null;	
+	Map<String, Set<ExtendedListeningPoint>> transportMappingCacheMap = null;	
 	Map<String, ExtendedListeningPoint> extendedListeningPointsCacheMap = null;
 	
 	Lock lock = null;
@@ -91,16 +91,16 @@ public class SipNetworkInterfaceManager {
 	 */
 	public SipNetworkInterfaceManager(SipApplicationDispatcher sipApplicationDispatcher) {
 		this.sipApplicationDispatcher = sipApplicationDispatcher;
-		extendedListeningPointList = new CopyOnWriteArrayList<ExtendedListeningPoint>();
+		extendedListeningPointList = new CopyOnWriteArraySet<ExtendedListeningPoint>();
 		outboundInterfaces = new CopyOnWriteArrayList<SipURI>();
 		outboundInterfacesIpAddresses = new CopyOnWriteArraySet<String>();
 		
 		// creating and populating the transport cache map with transports
-		transportMappingCacheMap = new HashMap<String, List<ExtendedListeningPoint>>();
-		transportMappingCacheMap.put(ListeningPoint.TCP.toLowerCase(), new CopyOnWriteArrayList<ExtendedListeningPoint>());
-		transportMappingCacheMap.put(ListeningPoint.UDP.toLowerCase(), new CopyOnWriteArrayList<ExtendedListeningPoint>());
-		transportMappingCacheMap.put(ListeningPoint.SCTP.toLowerCase(), new CopyOnWriteArrayList<ExtendedListeningPoint>());
-		transportMappingCacheMap.put(ListeningPoint.TLS.toLowerCase(), new CopyOnWriteArrayList<ExtendedListeningPoint>());
+		transportMappingCacheMap = new HashMap<String, Set<ExtendedListeningPoint>>();
+		transportMappingCacheMap.put(ListeningPoint.TCP.toLowerCase(), new CopyOnWriteArraySet<ExtendedListeningPoint>());
+		transportMappingCacheMap.put(ListeningPoint.UDP.toLowerCase(), new CopyOnWriteArraySet<ExtendedListeningPoint>());
+		transportMappingCacheMap.put(ListeningPoint.SCTP.toLowerCase(), new CopyOnWriteArraySet<ExtendedListeningPoint>());
+		transportMappingCacheMap.put(ListeningPoint.TLS.toLowerCase(), new CopyOnWriteArraySet<ExtendedListeningPoint>());
 		// creating the ipaddress/port/transport cache map
 		extendedListeningPointsCacheMap = new ConcurrentHashMap<String, ExtendedListeningPoint>();
 		lock = new ReentrantLock();
@@ -122,7 +122,7 @@ public class SipNetworkInterfaceManager {
 		extendedListeningPointList.add(extendedListeningPoint);
 		computeOutboundInterfaces();
 		// Adding to the transport cache map
-		List<ExtendedListeningPoint> extendedListeningPoints = 
+		Set<ExtendedListeningPoint> extendedListeningPoints = 
 			transportMappingCacheMap.get(extendedListeningPoint.getTransport().toLowerCase());
 	    boolean added = extendedListeningPoints.add(extendedListeningPoint);
 	    if(added) {
@@ -151,7 +151,7 @@ public class SipNetworkInterfaceManager {
 		extendedListeningPointList.remove(extendedListeningPoint);
 		computeOutboundInterfaces();
 		// removing from the transport cache map
-		List<ExtendedListeningPoint> extendedListeningPoints = 
+		Set<ExtendedListeningPoint> extendedListeningPoints = 
 			transportMappingCacheMap.get(extendedListeningPoint.getTransport().toLowerCase());
 	    extendedListeningPoints.remove(extendedListeningPoint);
 	    // Removing private ipaddress from the triplet cache map for listening point
@@ -184,15 +184,15 @@ public class SipNetworkInterfaceManager {
 		if(tmpTransport == null) {
 			tmpTransport = ListeningPoint.UDP;
 		}
-		List<ExtendedListeningPoint> extendedListeningPoints = transportMappingCacheMap.get(tmpTransport.toLowerCase());
+		Set<ExtendedListeningPoint> extendedListeningPoints = transportMappingCacheMap.get(tmpTransport.toLowerCase());
 		if(extendedListeningPoints.size() > 0) {
-			return extendedListeningPoints.get(0);
+			return extendedListeningPoints.iterator().next();
 		}		
 		if(strict) {
 			return null;
 		} else {
 			if(extendedListeningPointList.size() > 0) {
-				return extendedListeningPointList.get(0);
+				return extendedListeningPointList.iterator().next();
 			} else {
 				throw new RuntimeException("no valid sip connectors could be found to create the sip application session !!!");
 			} 
