@@ -148,7 +148,7 @@ public class SipNetworkInterfaceManager {
 	 * @param extendedListeningPoint
 	 */
 	public void removeExtendedListeningPoint(ExtendedListeningPoint extendedListeningPoint) {
-		extendedListeningPointList.add(extendedListeningPoint);
+		extendedListeningPointList.remove(extendedListeningPoint);
 		computeOutboundInterfaces();
 		// removing from the transport cache map
 		List<ExtendedListeningPoint> extendedListeningPoints = 
