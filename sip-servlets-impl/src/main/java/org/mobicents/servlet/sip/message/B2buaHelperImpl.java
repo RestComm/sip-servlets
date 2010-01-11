@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -137,7 +138,11 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			newRequest.removeHeader(RecordRouteHeader.NAME);			
 	
 			//Creating new call id
-			final ExtendedListeningPoint extendedListeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints().next();
+			final Iterator<ExtendedListeningPoint> listeningPointsIterator = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints();				
+			if(!listeningPointsIterator.hasNext()) {				
+				throw new IllegalStateException("There is no SIP connectors available to create the request");
+			}
+			final ExtendedListeningPoint extendedListeningPoint = listeningPointsIterator.next();
 			final CallIdHeader callIdHeader = SipFactories.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
 			newRequest.setHeader(callIdHeader);
 			
@@ -534,7 +539,11 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 				newRequest.removeHeader(ContactHeader.NAME);
 			}
 			//Creating new call id
-			final ExtendedListeningPoint extendedListeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints().next();
+			final Iterator<ExtendedListeningPoint> listeningPointsIterator = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints();				
+			if(!listeningPointsIterator.hasNext()) {				
+				throw new IllegalStateException("There is no SIP connectors available to create the request");
+			}
+			final ExtendedListeningPoint extendedListeningPoint = listeningPointsIterator.next();
 			final CallIdHeader callIdHeader = SipFactories.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
 			newRequest.setHeader(callIdHeader);
 			

@@ -25,6 +25,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -455,15 +456,19 @@ public class SipFactoryImpl implements Externalizable {
 		} catch (Exception pe) {
 			throw new ServletParseException("Impossoible to parse the given To " + to.toString(), pe);
 		}
-		
 		try {
 			cseqHeader = SipFactories.headerFactory.createCSeqHeader(1L, method);
 			// Fix provided by Hauke D. Issue 411
 			SipApplicationSessionKey sipApplicationSessionKey = mobicentsSipApplicationSession.getKey();
 //			if(sipApplicationSessionKey.isAppGeneratedKey()) {
 			if(originalCallId == null) {
-				callIdHeader = SipFactories.headerFactory.createCallIdHeader(
-						getSipNetworkInterfaceManager().getExtendedListeningPoints().next().getSipProvider().getNewCallId().getCallId());
+				final Iterator<ExtendedListeningPoint> listeningPointsIterator = getSipNetworkInterfaceManager().getExtendedListeningPoints();				
+				if(listeningPointsIterator.hasNext()) {
+					callIdHeader = SipFactories.headerFactory.createCallIdHeader(
+							listeningPointsIterator.next().getSipProvider().getNewCallId().getCallId());
+				} else {
+					throw new IllegalStateException("There is no SIP connectors available to create the request");
+				}
 			} else {
 				callIdHeader = SipFactories.headerFactory.createCallIdHeader(originalCallId);
 			}
@@ -553,11 +558,8 @@ public class SipFactoryImpl implements Externalizable {
 			
 			return retVal;
 		} catch (Exception e) {
-			logger.error("Error creating sipServletRequest", e);
+			throw new IllegalStateException("Error creating sipServletRequest", e);
 		}
- 
-		return null;
-
 	}
 
 	/**
