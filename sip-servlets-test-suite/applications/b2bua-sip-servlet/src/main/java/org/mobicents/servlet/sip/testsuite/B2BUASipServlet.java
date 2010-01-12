@@ -66,8 +66,13 @@ public class B2BUASipServlet extends SipServlet {
 		if (logger.isDebugEnabled()) {
 			logger.debug("forkedRequest = " + forkedRequest);
 		}
-		forkedRequest.getSession().setAttribute("originalRequest", request);
-		forkedRequest.send();
+		// Issue 1151 : making sure the contact is present in the B2BUAHelper newly created request
+		if(forkedRequest.getParameterableHeaders("Contact").hasNext()) {
+			forkedRequest.getSession().setAttribute("originalRequest", request);
+			forkedRequest.send();
+		} else {
+			request.createResponse(500, "Contact not present in newly created request").send();
+		}
 
 	}
 

@@ -34,6 +34,7 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
+import javax.sip.header.ContactHeader;
 
 import org.apache.log4j.Logger;
 
@@ -57,6 +58,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		forwardingUris.put("sip:forward-tcp-sender@sip-servlets.com", 
 			new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090;transport=tcp"});
 		forwardingUris.put("sip:forward-udp-sender@sip-servlets.com", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5080"});
+		forwardingUris.put("sip:forward-udp-sender-tcp-sender@sip-servlets.com", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5080"});
 		forwardingUris.put("sip:forward-sender@127.0.0.1:5090", 
 				new String[]{"sip:forward-receiver@127.0.0.1:5090", "sip:forward-receiver@127.0.0.1:5090"});
@@ -140,9 +143,17 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			userAgentHeaderList.add("CallForwardingB2BUASipServlet");
 			headers.put("User-Agent", userAgentHeaderList);
 			
-			List<String> contactHeaderList = new ArrayList<String>();
-			contactHeaderList.add("\"callforwardingB2BUA\" <sip:127.0.0.1:5070>");
-			headers.put("Contact", contactHeaderList);
+			if(((SipURI)request.getFrom().getURI()).getUser().contains("tcp-sender")) {
+				if(request.getHeader(ContactHeader.NAME).contains("transport=tcp")) {
+					List<String> contactHeaderList = new ArrayList<String>();
+					contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@127.0.0.1:5070;q=0.1;lr;transport=udp;test>;test");
+					headers.put("Contact", contactHeaderList);
+				} else {
+					List<String> contactHeaderList = new ArrayList<String>();
+					contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@127.0.0.1:5070;q=0.1;lr;transport=tcp;test>;test");
+					headers.put("Contact", contactHeaderList);
+				}
+			}
 			
 			List<String> extensionsHeaderList = new ArrayList<String>();
 			extensionsHeaderList.add("extension-header-value1");
@@ -231,7 +242,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			//create and sends OK for the first call leg							
 			SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
 			SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
-			logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);
+			logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);			
 			responseToOriginalRequest.setContentLength(sipServletResponse.getContentLength());
 			//responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
 			responseToOriginalRequest.send();

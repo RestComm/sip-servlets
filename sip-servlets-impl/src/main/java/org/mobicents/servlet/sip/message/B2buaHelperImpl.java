@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.message;
 
+import gov.nist.javax.sip.address.SipURIExt;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.SIPMessage;
 
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
@@ -41,8 +43,11 @@ import javax.servlet.sip.UAMode;
 import javax.servlet.sip.SipSession.State;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.sip.ClientTransaction;
+import javax.sip.ListeningPoint;
 import javax.sip.ServerTransaction;
 import javax.sip.Transaction;
+import javax.sip.address.SipURI;
+import javax.sip.address.URI;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
@@ -55,6 +60,7 @@ import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
+import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
@@ -87,6 +93,15 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		B2BUA_SYSTEM_HEADERS.add(RouteHeader.NAME);
 		B2BUA_SYSTEM_HEADERS.add(RecordRouteHeader.NAME);
 		B2BUA_SYSTEM_HEADERS.add(PathHeader.NAME);
+	}
+	
+	// contact parameters not allowed to be modified as per JSR 289 Section 4.1.3
+	protected static final Set<String> CONTACT_FORBIDDEN_PARAMETER = new HashSet<String>();
+	static {
+		CONTACT_FORBIDDEN_PARAMETER.add("method");
+		CONTACT_FORBIDDEN_PARAMETER.add("ttl");
+		CONTACT_FORBIDDEN_PARAMETER.add("maddr");
+		CONTACT_FORBIDDEN_PARAMETER.add("lr");
 	}
 	
 	//Map to handle linked sessions
@@ -171,21 +186,45 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 					null, 
 					null, 
 					JainSipUtils.DIALOG_CREATING_METHODS.contains(newRequest.getMethod()));			
-			//JSR 289 Section 15.1.6
+			//JSR 289 Section 15.1.6	
 			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);			
-			//If Contact header is present in the headerMap 
-			//then relevant portions of Contact header is to be used in the request created, 
-			//in accordance with section 4.1.3 of the specification.
-			if(contactHeaderSet.size() > 0) {
-				newRequest.removeHeader(ContactHeader.NAME);
+			
+			final String method = origRequest.getMethod();
+			newRequest.removeHeader(ContactHeader.NAME);	
+			// Following JSR 289 section 4.1.3, for REGISTER requests
+			if(Request.REGISTER.equalsIgnoreCase(method) && contactHeaderSet.size() > 0) {
 				for (String contactHeaderValue : contactHeaderSet) {
 					newSipServletRequest.addHeaderInternal(ContactHeader.NAME, contactHeaderValue, true);
 				}
 			} else {
-				//For non-REGISTER requests, the Contact header field is not copied 
-				//but is populated by the container as usualB2buaHelperImpl
-				if(!Request.REGISTER.equalsIgnoreCase(origRequest.getMethod())) {
-					newRequest.removeHeader(ContactHeader.NAME);
+				//Creating container contact header
+				ContactHeader contactHeader = null;
+				String fromName = null;
+				if(newFromHeader.getAddress().getURI() instanceof javax.sip.address.SipURI) {
+					fromName = ((javax.sip.address.SipURI) newFromHeader.getAddress().getURI()).getUser();
+				}										
+				// if a sip load balancer is present in front of the server, the contact header is the one from the sip lb
+				// so that the subsequent requests can be failed over
+				if(sipFactoryImpl.isUseLoadBalancer()) {
+					final SipLoadBalancer loadBalancerToUse = sipFactoryImpl.getLoadBalancerToUse();
+					javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(fromName, loadBalancerToUse.getAddress().getHostAddress());
+					sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
+					sipURI.setPort(loadBalancerToUse.getSipPort());			
+					sipURI.setTransportParam(ListeningPoint.UDP);
+					javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);
+					if(fromName != null && fromName.length() > 0) {
+						contactAddress.setDisplayName(fromName);
+					}
+					contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);													
+				} else {
+					contactHeader = JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, fromName);
+				}	
+				if(contactHeaderSet.size() > 0) {
+					// if the set is not empty then we adjust the values of the set to match the host and port + forbidden params of the container
+					setContactHeaders(contactHeaderSet, newSipServletRequest, contactHeader);
+				} else if(JainSipUtils.CONTACT_HEADER_METHODS.contains(method)) {
+					// otherwise we set the container contact header for allowed methods
+					newRequest.setHeader(contactHeader);
 				}
 			}
 			
@@ -249,8 +288,10 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			//If Contact header is present in the headerMap 
 			//then relevant portions of Contact header is to be used in the request created, 
 			//in accordance with section 4.1.3 of the specification.
-			for (String contactHeaderValue : contactHeaderSet) {
-				newSubsequentServletRequest.addHeaderInternal(ContactHeader.NAME, contactHeaderValue, true);
+			Request subsequentRequest = (Request)newSubsequentServletRequest.getMessage();
+			ContactHeader contactHeader = (ContactHeader) subsequentRequest.getHeader(ContactHeader.NAME);
+			if(contactHeader != null && contactHeaderSet.size() > 0) {
+				setContactHeaders(contactHeaderSet, newSubsequentServletRequest, contactHeader);
 			}
 			
 			//Fix for Issue 585 by alexandre sova
@@ -280,6 +321,67 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		}
 	}
 
+	/**
+	 * Issue 1151 :
+	 * For Contact header if present only the user part and some parameters are to be used as defined in 4.1.3 The Contact Header Field
+	 * 
+	 * @param newRequest
+	 * @param contactHeaderSet
+	 * @param newSipServletRequest
+	 * @param contactHeader
+	 * @throws ParseException
+	 */
+	private void setContactHeaders(
+			final List<String> contactHeaderSet,
+			final SipServletRequestImpl newSipServletRequest,
+			ContactHeader contactHeader) throws ParseException {
+		// we parse and add the contact headers defined in the map
+		Request newRequest = (Request) newSipServletRequest.getMessage();
+		for (String contactHeaderValue : contactHeaderSet) {
+			newSipServletRequest.addHeaderInternal(ContactHeader.NAME, contactHeaderValue, true);
+		}
+		// we set up a list of contact headers to be added to the request
+		List<ContactHeader> newContactHeaders = new ArrayList<ContactHeader>();
+		
+		ListIterator<ContactHeader> contactHeaders = newRequest.getHeaders(ContactHeader.NAME);
+		while (contactHeaders.hasNext()) {
+			// we clone the default Mobicents Sip Servlets Contact Header
+			ContactHeader newContactHeader = (ContactHeader) contactHeader.clone();
+			
+			ContactHeader newRequestContactHeader = contactHeaders.next();
+			final URI newURI = newRequestContactHeader.getAddress().getURI();
+			newContactHeader.getAddress().setDisplayName(newRequestContactHeader.getAddress().getDisplayName());
+			// and reset its user part and params accoridng to 4.1.3 The Contact Header Field
+			if(newURI instanceof SipURI) {
+				SipURI newSipURI = (SipURI) newURI;
+				SipURI newContactSipURI = (SipURI) newContactHeader.getAddress().getURI();
+				((SipURI)newContactHeader.getAddress().getURI()).setUser(newSipURI.getUser());								
+				Iterator<String> uriParameters = newSipURI.getParameterNames();
+				while (uriParameters.hasNext()) {
+					String parameter = uriParameters.next();
+					if(!CONTACT_FORBIDDEN_PARAMETER.contains(parameter)) {
+						String value = newSipURI.getParameter(parameter);
+						newContactSipURI.setParameter(parameter, "".equals(value) ? null : value);
+					}
+				}
+			}
+			// reset the header params according to 4.1.3 The Contact Header Field
+			Iterator<String> headerParameters = newRequestContactHeader.getParameterNames();
+			while (headerParameters.hasNext()) {
+				String parameter = headerParameters.next();
+				String value = newRequestContactHeader.getParameter(parameter);
+				newContactHeader.setParameter(parameter, "".equals(value) ? null : value);
+			}
+			newContactHeaders.add(newContactHeader);
+		}
+		// we remove the previously added contact headers
+		newRequest.removeHeader(ContactHeader.NAME);	
+		// and set the new correct ones
+		for (ContactHeader newContactHeader : newContactHeaders) {
+			newRequest.addHeader(newContactHeader);
+		}
+	}
+	
 	/**
 	 * @param headerMap
 	 * @param newRequest

@@ -1122,7 +1122,8 @@ public class TestSipListener implements SipListener {
 			if(sendBye) {											
 				Thread.sleep(timeToWaitBeforeBye );
 				if(serverTransactionId != null && serverTransactionId.getDialog() != null) {
-					Request byeRequest = serverTransactionId.getDialog().createRequest(Request.BYE);
+					Request byeRequest = serverTransactionId.getDialog().createRequest(Request.BYE);					
+					logger.info("BYE created : " + byeRequest);
 					ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
 					logger.info("Sending BYE : " + byeRequest);
 					serverTransactionId.getDialog().sendRequest(ct);

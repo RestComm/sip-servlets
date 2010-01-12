@@ -42,7 +42,7 @@ public class Click2CallBasicTest extends SipServletTestCase {
 
 	private SipPhone[] sipPhoneReceivers;
 
-	private static final int timeout = 5000;
+	private static final int timeout = 10000;
 
 	private static final int receiversCount = 2;
 

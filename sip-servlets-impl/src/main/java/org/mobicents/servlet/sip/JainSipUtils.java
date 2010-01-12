@@ -124,6 +124,19 @@ public final class JainSipUtils {
 
 	public static final String GLOBAL_IPADDRESS = "0.0.0.0";
 	
+	// methods where a contact header is mandatory
+	public static final Set<String> CONTACT_HEADER_METHODS = new TreeSet<String>(
+			new NamesComparator());
+	
+	static {		
+		CONTACT_HEADER_METHODS.add(Request.INVITE);
+		CONTACT_HEADER_METHODS.add(Request.REGISTER);
+		CONTACT_HEADER_METHODS.add(Request.SUBSCRIBE);
+		CONTACT_HEADER_METHODS.add(Request.NOTIFY);
+		CONTACT_HEADER_METHODS.add(Request.REFER);
+		CONTACT_HEADER_METHODS.add(Request.UPDATE);
+	}
+	
 	public static final Set<String> DIALOG_CREATING_METHODS = new TreeSet<String>(
 			new NamesComparator());
 	
@@ -593,5 +606,5 @@ public final class JainSipUtils {
 				return true;
 		}
 		return false;
-	}
+	}	
 }

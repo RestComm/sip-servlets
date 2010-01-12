@@ -508,9 +508,8 @@ public class SipFactoryImpl implements Externalizable {
 					viaHeaders, 
 					maxForwardsHeader);
 
-			//Adding default contact header for register
-			if(Request.REGISTER.equalsIgnoreCase(method)
-					|| Request.INVITE.equalsIgnoreCase(method)) {				
+			//Adding default contact header for specific methods only
+			if(JainSipUtils.CONTACT_HEADER_METHODS.contains(method)) {				
 				String fromName = null;
 				if(fromHeader.getAddress().getURI() instanceof javax.sip.address.SipURI) {
 					fromName = ((javax.sip.address.SipURI)fromHeader.getAddress().getURI()).getUser();

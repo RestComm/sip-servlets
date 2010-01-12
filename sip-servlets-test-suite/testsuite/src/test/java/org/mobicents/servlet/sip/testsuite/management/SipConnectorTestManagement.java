@@ -143,7 +143,7 @@ public class SipConnectorTestManagement extends SipServletTestCase {
 			String message = (String) allMessagesIterator.next();
 			logger.info(message);
 		}
-		assertEquals(2, sender.getAllMessagesContent().size());
+		assertEquals(3, sender.getAllMessagesContent().size());
 		for (int i = 0; i < CONNECTORS_TO_TEST.length; i++) {
 			assertTrue(sender.getAllMessagesContent().contains(CONNECTORS_TO_TEST[i]));
 		}	

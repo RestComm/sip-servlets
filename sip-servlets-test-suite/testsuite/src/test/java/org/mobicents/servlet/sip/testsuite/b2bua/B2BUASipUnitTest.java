@@ -76,7 +76,7 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 		properties1.setProperty("gov.nist.javax.sip.DEBUG_LOG",
 			"logs/b2buadebug1.txt");
 		properties1.setProperty("gov.nist.javax.sip.SERVER_LOG",
-			"logs/b2bualog1.txt");
+			"logs/b2bualog1.xml");
 		properties1.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
 			"32");
 
@@ -90,7 +90,7 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 		properties2.setProperty("gov.nist.javax.sip.DEBUG_LOG",
 			"logs/b2buadebug2.txt");
 		properties2.setProperty("gov.nist.javax.sip.SERVER_LOG",
-			"logs/b2bualog2.txt");
+			"logs/b2bualog2.xml");
 		properties2.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
 			"32");
 

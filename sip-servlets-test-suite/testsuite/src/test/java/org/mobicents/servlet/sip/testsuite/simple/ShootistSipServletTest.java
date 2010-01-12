@@ -23,7 +23,6 @@ import java.util.Map.Entry;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.ContactHeader;
-import javax.sip.header.ServerHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.UserAgentHeader;
 import javax.sip.message.Request;
@@ -42,7 +41,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	private static transient Logger logger = Logger.getLogger(ShootistSipServletTest.class);		
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 5000;	
+	private static final int TIMEOUT = 10000;	
 //	private static final int TIMEOUT = 100000000;
 	
 	TestSipListener receiver;

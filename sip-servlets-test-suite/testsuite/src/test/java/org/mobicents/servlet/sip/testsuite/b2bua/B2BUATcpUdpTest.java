@@ -131,8 +131,8 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		i = 0; 
 		while (contactHeaderIt.hasNext()) {
 			ContactHeader contactHeader = (ContactHeader) contactHeaderIt
-					.next();
-			assertTrue(contactHeader.toString().trim().startsWith("Contact: \"callforwardingB2BUA\""));
+					.next();			
+			assertTrue(contactHeader.toString().trim().startsWith("Contact: \"callforwardingB2BUA\" <sip:test@127.0.0.1:5070;q=0.1;transport=tcp;test>;test"));
 			i++;
 		}
 		assertEquals(1, i);
@@ -157,10 +157,9 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		while (contactHeaderIt.hasNext()) {
 			ContactHeader contactHeader = (ContactHeader) contactHeaderIt
 					.next();
-			assertTrue(contactHeader.toString().trim().startsWith("Contact: \"callforwardingB2BUA\""));
 			i++;
 		}
-		assertEquals(1, i);
+		assertEquals(0, i);
 		assertFalse(receiverCallIdHeader.getCallId().equals(senderCallIdHeader.getCallId()));
 		extensionHeaderIt = receiver.getByeRequestReceived().getHeaders("extension-header");
 		i = 0; 
@@ -176,7 +175,7 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		SipProvider senderProvider = sender.createProvider();
 
 		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
-		receiver.setTransport(false);
+//		receiver.setTransport(false);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
@@ -185,7 +184,7 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
 
-		String fromName = "forward-udp-sender";
+		String fromName = "forward-udp-sender-tcp-sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);

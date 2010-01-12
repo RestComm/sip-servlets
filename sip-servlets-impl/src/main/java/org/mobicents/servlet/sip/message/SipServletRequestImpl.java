@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.DialogExt;
 import gov.nist.javax.sip.header.ims.PathHeader;
+import gov.nist.javax.sip.message.MessageExt;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.BufferedReader;
@@ -872,7 +873,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public void send() {
 		checkReadOnly();
 		final Request request = (Request) super.message;			
-		final String transport = JainSipUtils.findTransport(request);
 		final MobicentsSipSession session = getSipSession();
 		try {			
 			ProxyImpl proxy = null;
@@ -880,6 +880,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				proxy = session.getProxy();
 			}
 			final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
+			 
+			((MessageExt)message).setApplicationData(null);			
+			
 			ViaHeader viaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
 			//Issue 112 fix by folsson
 		    if(!getMethod().equalsIgnoreCase(Request.CANCEL) && viaHeader == null) {
@@ -903,7 +906,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    		message.addHeader(viaHeader);
 			    }
 		    }
-		    
+			final String transport = JainSipUtils.findTransport(request);
 		    if(logger.isDebugEnabled()) {
 		    	logger.debug("The found transport for sending request is '" + transport + "'");
 		    }
@@ -958,12 +961,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				getSipSession().getSipApplicationSession().getSipContext().getSipManager().dumpSipSessions();
 			}
 			if (super.getTransaction() == null) {				
-
-				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
-						transport, false).getSipProvider();
 				
 				ContactHeader contactHeader = (ContactHeader)request.getHeader(ContactHeader.NAME);
-				if(contactHeader == null && !Request.REGISTER.equalsIgnoreCase(requestMethod)) {
+				if(contactHeader == null && JainSipUtils.CONTACT_HEADER_METHODS.contains(requestMethod) && proxy == null) {
 					final FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
 					final javax.sip.address.URI fromUri = fromHeader.getAddress().getURI();
 					String fromName = null;
@@ -979,6 +979,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				if(logger.isDebugEnabled()) {
 					logger.debug("Getting new Client Tx for request " + request);
 				}
+				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
+						transport, false).getSipProvider();
 				final ClientTransaction ctx = sipProvider
 						.getNewClientTransaction(request);				
 				ctx.setRetransmitTimer(sipFactoryImpl.getSipApplicationDispatcher().getBaseTimerInterval());
