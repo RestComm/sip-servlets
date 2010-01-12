@@ -199,6 +199,44 @@ public class SipNetworkInterfaceManager {
 		}
 	}
 	
+	public ExtendedListeningPoint findMatchingListeningPoint(
+			javax.sip.address.SipURI outboundInterface, boolean strict) {		
+		String tmpTransport = outboundInterface.getTransportParam();
+		if(tmpTransport == null) {
+			if(outboundInterface.isSecure()) {
+				tmpTransport =  ListeningPoint.TCP;
+			} else {
+				tmpTransport =  ListeningPoint.UDP;
+			}
+		}
+		Set<ExtendedListeningPoint> extendedListeningPoints = transportMappingCacheMap.get(tmpTransport.toLowerCase());
+		if(extendedListeningPoints.size() > 0) {
+			Iterator<ExtendedListeningPoint> extentdedLPiterator = extendedListeningPoints.iterator();
+			while (extentdedLPiterator.hasNext()) {
+				ExtendedListeningPoint extendedListeningPoint = extentdedLPiterator.next();
+				if(extendedListeningPoint.getIpAddresses().contains(outboundInterface.getHost())) {
+					return extendedListeningPoint;
+				}
+			}
+		}		
+		if(strict) {
+			return null;
+		} else {
+			if(extendedListeningPointList.size() > 0) {
+				Iterator<ExtendedListeningPoint> extentdedLPiterator = extendedListeningPoints.iterator();
+				while (extentdedLPiterator.hasNext()) {
+					ExtendedListeningPoint extendedListeningPoint = extentdedLPiterator.next();
+					if(extendedListeningPoint.getIpAddresses().contains(outboundInterface.getHost())) {
+						return extendedListeningPoint;
+					}
+				}
+				throw new RuntimeException("no valid sip connectors could be found to create the sip application session !!!");
+			} else {
+				throw new RuntimeException("no valid sip connectors could be found to create the sip application session !!!");
+			} 
+		}
+	}
+	
 	/**
 	 * Retrieve the first matching listening Point corresponding to the 
 	 * ipAddress port and transport given in parameter.
@@ -236,7 +274,7 @@ public class SipNetworkInterfaceManager {
 			}
 		}
 		return listeningPoint;
-	}
+	}		
 	
 	/**
 	 * Checks if the port is in the UDP-TCP port numbers (0-65355) range 
@@ -382,5 +420,5 @@ public class SipNetworkInterfaceManager {
 			}
 			return false;
 		}
-	}
+	}	
 }

@@ -303,10 +303,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					// don't set the contact header in those case
 					setContactHeader = false;					
 				} 				
-				if(setContactHeader) { 
+				if(setContactHeader) {
+					SipURI outboundInterface = null;
+					if(session != null) {
+						outboundInterface = session.getOutboundInterface();
+					}
 				    // Add the contact header for the dialog.					    
 				    final ContactHeader contactHeader = JainSipUtils.createContactHeader(
-				    		super.sipFactoryImpl.getSipNetworkInterfaceManager(), request, null);
+				    		super.sipFactoryImpl.getSipNetworkInterfaceManager(), request, null, outboundInterface);
 				    if(logger.isDebugEnabled()) {
 				    	logger.debug("We're adding this contact header to our new response: '" + contactHeader + ", transport=" + JainSipUtils.findTransport(request));
 				    }
@@ -900,9 +904,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    		if(logger.isDebugEnabled()) {
 				    	logger.debug("Adding via Header");
 				    }
-		    		
+		    		// Issue 					
 		    		viaHeader = JainSipUtils.createViaHeader(
-		    				sipNetworkInterfaceManager, request, null);
+		    				sipNetworkInterfaceManager, request, null, session.getOutboundInterface());
 		    		message.addHeader(viaHeader);
 			    }
 		    }
@@ -972,7 +976,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					}
 					// Create the contact name address.
 					contactHeader = 
-						JainSipUtils.createContactHeader(sipNetworkInterfaceManager, request, fromName);										
+						JainSipUtils.createContactHeader(sipNetworkInterfaceManager, request, fromName, session.getOutboundInterface());										
 					request.addHeader(contactHeader);
 				}
 				

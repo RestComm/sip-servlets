@@ -529,7 +529,7 @@ public class SipFactoryImpl implements Externalizable {
 					}
 					contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);													
 				} else {
-					contactHeader = JainSipUtils.createContactHeader(getSipNetworkInterfaceManager(), requestToWrap, fromName);
+					contactHeader = JainSipUtils.createContactHeader(getSipNetworkInterfaceManager(), requestToWrap, fromName, null);
 				}
 			}
 			// Add all headers		

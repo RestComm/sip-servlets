@@ -94,6 +94,7 @@ import javax.sip.message.Message;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
@@ -477,10 +478,14 @@ public final class JainSipUtils {
 	 * @return
 	 */
 	public static ViaHeader createViaHeader(
-			SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String branch) {
+			SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String branch, javax.servlet.sip.SipURI outboundInterface) {
 		String transport = findTransport(request);
-		ExtendedListeningPoint listeningPoint = 
-			sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
+		ExtendedListeningPoint listeningPoint = null;
+		if(outboundInterface == null) {
+			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
+		} else {
+			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(((SipURIImpl)outboundInterface).getSipURI(), false);
+		}
 		boolean usePublicAddress = findUsePublicAddress(
 				sipNetworkInterfaceManager, request, listeningPoint);
 		return listeningPoint.createViaHeader(branch, usePublicAddress);		
@@ -503,10 +508,14 @@ public final class JainSipUtils {
 	 * @param transport
 	 * @return
 	 */
-	public static ContactHeader createContactHeader(SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String displayName) {
+	public static ContactHeader createContactHeader(SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String displayName, javax.servlet.sip.SipURI outboundInterface) {
 		String transport = findTransport(request);
-		ExtendedListeningPoint listeningPoint = 
-			sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
+		ExtendedListeningPoint listeningPoint = null;
+		if(outboundInterface == null) {
+			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
+		} else {
+			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(((SipURIImpl)outboundInterface).getSipURI(), false);
+		}
 		boolean usePublicAddress = findUsePublicAddress(
 				sipNetworkInterfaceManager, request, listeningPoint);
 		return listeningPoint.createContactHeader(displayName, usePublicAddress);

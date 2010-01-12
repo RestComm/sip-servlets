@@ -16,7 +16,6 @@
  */
 package org.mobicents.servlet.sip.message;
 
-import gov.nist.javax.sip.address.SipURIExt;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.SIPMessage;
 
@@ -217,7 +216,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 					}
 					contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);													
 				} else {
-					contactHeader = JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, fromName);
+					contactHeader = JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, fromName, session.getOutboundInterface());
 				}	
 				if(contactHeaderSet.size() > 0) {
 					// if the set is not empty then we adjust the values of the set to match the host and port + forbidden params of the container

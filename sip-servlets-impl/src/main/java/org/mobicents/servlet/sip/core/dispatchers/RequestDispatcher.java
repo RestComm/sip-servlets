@@ -20,6 +20,7 @@ import gov.nist.javax.sip.message.SIPMessage;
 
 import java.text.ParseException;
 
+import javax.servlet.sip.SipURI;
 import javax.servlet.sip.ar.SipRouteModifier;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -76,9 +77,13 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 		//Add via header
 		String transport = JainSipUtils.findTransport(clonedRequest);
 		((SIPMessage)clonedRequest).setApplicationData(null);
-		ViaHeader viaHeader = JainSipUtils.createViaHeader(
-				sipNetworkInterfaceManager, clonedRequest, null);
 		MobicentsSipSession session = sipServletRequest.getSipSession();
+		SipURI outboundInterface = null;
+		if(session != null) {
+			outboundInterface = session.getOutboundInterface();
+		}
+		ViaHeader viaHeader = JainSipUtils.createViaHeader(
+				sipNetworkInterfaceManager, clonedRequest, null, outboundInterface);		
 		
 		// used for response routing, stored later in the tx app data so that it interoperates with UA/proxies not handling correctly via params 
 		String appNotDeployed = null;

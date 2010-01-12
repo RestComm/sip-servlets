@@ -353,7 +353,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 							javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);
 							contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);													
 						} else {
-							contactHeader = JainSipUtils.createContactHeader(sipFactory.getSipNetworkInterfaceManager(), methodRequest, "");
+							contactHeader = JainSipUtils.createContactHeader(sipFactory.getSipNetworkInterfaceManager(), methodRequest, "", outboundInterface);
 						}
 						methodRequest.setHeader(contactHeader);
 					} catch (Exception e) {
@@ -416,7 +416,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 					final String branch = JainSipUtils.createBranch(getSipApplicationSession().getKey().getId(),  sipApplicationDispatcher.getHashFromApplicationName(getKey().getApplicationName()));
 					
 					ViaHeader viaHeader = JainSipUtils.createViaHeader(
-		    				sipNetworkInterfaceManager, request, branch);
+		    				sipNetworkInterfaceManager, request, branch, outboundInterface);
 		    		request.addHeader(viaHeader);
 					
 					try {

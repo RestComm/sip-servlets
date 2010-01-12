@@ -120,13 +120,18 @@ public class ProxyUtils {
 						branchId = proxyBranchRequest.getTransaction().getBranchId();
 						logger.debug("reusing original branch id " + branchId);
 					}
+					// Issue 					
 					viaHeader = JainSipUtils.createViaHeader(
-							sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest, branchId);
+							sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest, branchId, null);
 				} else { 
 					//If outbound interface is specified use it
 					String outboundTransport = proxy.getOutboundInterface().getTransportParam();
 					if(outboundTransport == null) {
-						outboundTransport = ListeningPoint.UDP;
+						if(proxy.getOutboundInterface().isSecure()) {
+							outboundTransport =  ListeningPoint.TCP;
+						} else {
+							outboundTransport =  ListeningPoint.UDP;
+						}
 					}
 					String branchId = null;
 

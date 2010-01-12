@@ -123,6 +123,7 @@ public class ExtendedListeningPoint {
 	 */
 	public ContactHeader createContactHeader(String displayName, boolean usePublicAddress) {
 		try {
+			// FIXME : the SIP URI can be cached to improve performance 
 			String host = getIpAddress(usePublicAddress);
 			javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(null, host);
 			sipURI.setHost(host);
