@@ -967,7 +967,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			if (super.getTransaction() == null) {				
 				
 				ContactHeader contactHeader = (ContactHeader)request.getHeader(ContactHeader.NAME);
-				if(contactHeader == null && JainSipUtils.CONTACT_HEADER_METHODS.contains(requestMethod) && proxy == null) {
+				if(contactHeader == null && !Request.REGISTER.equalsIgnoreCase(requestMethod) && JainSipUtils.CONTACT_HEADER_METHODS.contains(requestMethod) && proxy == null) {
 					final FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
 					final javax.sip.address.URI fromUri = fromHeader.getAddress().getURI();
 					String fromName = null;
