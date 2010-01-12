@@ -1,10 +1,10 @@
-#mvn clean install -f ../../../pom.xml -P jboss -U
+mvn clean install -f ../../../pom.xml -P jboss -U
 
 cp jboss-setup/mss-sip-stack.properties $JBOSS_HOME/server/default/conf/mss-sip-stack.properties
 cp jboss-setup/server-jboss.xml $JBOSS_HOME/server/default/deploy/jboss-web.deployer/server.xml
-#cp jboss-setup/jboss-context.xml $JBOSS_HOME/server/default/deploy/jboss-web.deployer/context.xml
-#cp jboss-setup/jboss-service.xml $JBOSS_HOME/server/default/deploy/jboss-web.deployer/META-INF/jboss-service.xml
-#cp jboss-setup/webserver-xmbean.xml $JBOSS_HOME/server/default/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml
+cp jboss-setup/jboss-context.xml $JBOSS_HOME/server/default/deploy/jboss-web.deployer/context.xml
+cp jboss-setup/jboss-service.xml $JBOSS_HOME/server/default/deploy/jboss-web.deployer/META-INF/jboss-service.xml
+cp jboss-setup/webserver-xmbean.xml $JBOSS_HOME/server/default/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml
 cp jboss-setup/log4j.xml $JBOSS_HOME/server/default/conf/jboss-log4j.xml
 
 if [ $# -ne 0 ]; then
