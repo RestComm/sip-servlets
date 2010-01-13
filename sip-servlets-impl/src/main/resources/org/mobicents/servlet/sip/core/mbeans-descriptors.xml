@@ -46,11 +46,25 @@
 			description="number of responses processed by the sip application dispatcher"
 			type="long"
 			writeable="false" />
-
+			
+		<attribute name="requestsProcessedByMethod"
+			description="number of requests processed by method by the sip application dispatcher"
+			type="java.util.Map"
+			writeable="false" />
+			
+		<attribute name="responsesProcessedByStatusCode"
+			description="number of responses processed by status code by the sip application dispatcher"
+			type="java.util.Map"
+			writeable="false" />
+			
 		<attribute name="numberOfMessagesInQueue"
 			description="number of pending messages in all queues for all concurrency control modes."
 			type="int"
 			writeable="false" />
+			
+		<attribute name="gatherStatistics"
+			description="whether or not gather usage statistics"
+			type="boolean" />
 			
 		<attribute name="percentageOfMemoryUsed"
 			description="Percentage of memory to be used by the container before applying the congestion control policy."
@@ -105,6 +119,22 @@
 		<operation name="getSipFactory"
 			description="retrieve the sip factory used by this application dispatcher"
 			impact="ACTION" returnType="javax.servlet.sip.SipFactory" />
+			
+		<operation name="getResponsesProcessedByStatusCode"
+			description="get the number of responses processed for a specific response status code range given in param"
+			impact="ACTION" returnType="long">
+			<parameter name="statusCode"
+				description="the status code range (1XX or 2XX or 3XX etc up to 9XX) to query for getting the corresponding number of responses processed"
+				type="java.lang.String" />
+		</operation>
+		
+		<operation name="getRequestsProcessedByMethod"
+			description="get the number of requests processed for a specific SIP method given in param"
+			impact="ACTION" returnType="long">
+			<parameter name="method"
+				description="the SIP method to query for getting the corresponding number of requests processed"
+				type="java.lang.String" />
+		</operation>
 	</mbean>
 
 </mbeans-descriptors>

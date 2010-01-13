@@ -116,15 +116,18 @@ import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, MBeanRegistration, LoadBalancerHeartBeatingListener {
 	
 	//list of methods supported by the AR
-	static final String[] METHODS_SUPPORTED = 
+	private static final String[] METHODS_SUPPORTED = 
 		{"REGISTER", "INVITE", "ACK", "BYE", "CANCEL", "MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE", "PUBLISH", "REFER", "PRACK", "OPTIONS"};
 	
 	// List of sip extensions supported by the container	
-	static final String[] EXTENSIONS_SUPPORTED = 
+	private static final String[] EXTENSIONS_SUPPORTED = 
 		{"MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE", "PUBLISH", "REFER", "PRACK", "100rel", "STUN", "path", "join"};
 	// List of sip rfcs supported by the container
-	static final String[] RFC_SUPPORTED = 
+	private static final String[] RFC_SUPPORTED = 
 		{"3261", "3428", "2976", "3265", "3311", "3903", "3515", "3262", "3489", "3327", "3911"};
+
+	private static final String[] RESPONSES_PER_CLASS_OF_SC = 
+		{"1XX", "2XX", "3XX", "4XX", "5XX", "6XX", "7XX", "8XX", "9XX"};
 	
 	/**
 	 * Timer task that will gather information about congestion control 
@@ -158,56 +161,54 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	private Map<String, String> mdToApplicationName = null;
 	//map app names to hashes
 	private Map<String, String> applicationNameToMd = null;
-
 	//List of host names managed by the container
 	private Set<String> hostNames = null;
-
-	//30 sec
-	private long congestionControlCheckingInterval;		
-	
-	protected transient CongestionControlTimerTask congestionControlTimerTask;
-	
-	protected transient ScheduledFuture congestionControlTimerFuture;
 	
 	private Boolean started = Boolean.FALSE;
 	private Lock statusLock = new ReentrantLock();
 
 	private SipNetworkInterfaceManager sipNetworkInterfaceManager;
 	
-	private ConcurrencyControlMode concurrencyControlMode;
-	
-	private AtomicLong requestsProcessed = new AtomicLong(0);
-	
-	private AtomicLong responsesProcessed = new AtomicLong(0);
-	
-	private boolean rejectSipMessages = false;
-	
-	private boolean bypassResponseExecutor = false;
-	private boolean bypassRequestExecutor = false;
-	
+	// stats
+	private boolean gatherStatistics = true;
+	private static AtomicLong requestsProcessed = new AtomicLong(0);
+	private static AtomicLong responsesProcessed = new AtomicLong(0);
+	static final Map<String, AtomicLong> requestsProcessedByMethod = new ConcurrentHashMap<String, AtomicLong>();
+	static {
+		for (String method : METHODS_SUPPORTED) {
+			requestsProcessedByMethod.put(method, new AtomicLong(0));
+		}
+	}
+	static final Map<String, AtomicLong> responsesProcessedByStatusCode = new ConcurrentHashMap<String, AtomicLong>();
+	static {
+		for (String classOfSc : RESPONSES_PER_CLASS_OF_SC) {
+			responsesProcessedByStatusCode.put(classOfSc, new AtomicLong(0));
+		}
+	}
+	// congestion control
 	private boolean memoryToHigh = false;	
-	
 	private double maxMemory;
-	
 	private int memoryThreshold;
-	
-	// base timer interval for jain sip tx 
-	private int baseTimerInterval = 500;
-	
+	private boolean rejectSipMessages = false;
+	private long congestionControlCheckingInterval; //30 sec		
+	protected transient CongestionControlTimerTask congestionControlTimerTask;
+	protected transient ScheduledFuture congestionControlTimerFuture;
 	private CongestionControlPolicy congestionControlPolicy;
-	
-	int queueSize;
-	
 	private int numberOfMessagesInQueue;
-	
 	private double percentageOfMemoryUsed;
+	private int queueSize;
+	//used for the congestion control mechanism
+	private ScheduledThreadPoolExecutor congestionControlThreadPool = null;
+	
+	// configuration
+	private boolean bypassResponseExecutor = false;
+	private boolean bypassRequestExecutor = false;			
+	private int baseTimerInterval = 500; // base timer interval for jain sip tx
+	private ConcurrencyControlMode concurrencyControlMode;
 	
 	// This executor is used for async things that don't need to wait on session executors, like CANCEL requests
 	// or when the container is configured to execute every request ASAP without waiting on locks (no concurrency control)
 	private ThreadPoolExecutor asynchronousExecutor = null;
-	
-	//used for the congestion control mechanism
-	private ScheduledThreadPoolExecutor congestionControlThreadPool = null;
 	
 	// fatcory for dispatching SIP messages
 	private MessageDispatcherFactory messageDispatcherFactory;
@@ -576,8 +577,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						null,
 						transaction,
 						dialog,
-						JainSipUtils.DIALOG_CREATING_METHODS.contains(requestMethod));
-			requestsProcessed.incrementAndGet();	
+						JainSipUtils.DIALOG_CREATING_METHODS.contains(requestMethod));			
+			updateRequestStatistics(request);
 			// Check if the request is meant for me. If so, strip the topmost
 			// Route header.
 			final RouteHeader routeHeader = (RouteHeader) request
@@ -640,6 +641,62 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 	}
 
+	/**
+	 * @param requestMethod
+	 */
+	private void updateRequestStatistics(final Request request) {
+		if(gatherStatistics) {
+			requestsProcessed.incrementAndGet();
+			final String method = request.getMethod();
+			final AtomicLong requestsProcessed = requestsProcessedByMethod.get(method);
+			if(requestsProcessed == null) {
+				requestsProcessedByMethod.put(method, new AtomicLong());
+			} else {
+				requestsProcessed.incrementAndGet();
+			}
+		}
+	}
+	
+	/**
+	 * @param requestMethod
+	 */
+	private void updateResponseStatistics(final Response response) {
+		if(gatherStatistics) {
+			responsesProcessed.incrementAndGet();	
+			final int statusCode = response.getStatusCode();
+			int statusCodeDiv = statusCode / 100;
+			switch (statusCodeDiv) {
+				case 1:
+					responsesProcessedByStatusCode.get("1XX").incrementAndGet();
+					break;
+				case 2:
+					responsesProcessedByStatusCode.get("2XX").incrementAndGet();
+					break;
+				case 3:
+					responsesProcessedByStatusCode.get("3XX").incrementAndGet();
+					break;
+				case 4:
+					responsesProcessedByStatusCode.get("4XX").incrementAndGet();
+					break;
+				case 5:
+					responsesProcessedByStatusCode.get("5XX").incrementAndGet();
+					break;
+				case 6:
+					responsesProcessedByStatusCode.get("6XX").incrementAndGet();
+					break;
+				case 7:
+					responsesProcessedByStatusCode.get("7XX").incrementAndGet();
+					break;
+				case 8:
+					responsesProcessedByStatusCode.get("8XX").incrementAndGet();
+					break;
+				case 9:
+					responsesProcessedByStatusCode.get("9XX").incrementAndGet();
+					break;
+			}			
+		}
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * @see javax.sip.SipListener#processResponse(javax.sip.ResponseEvent)
@@ -663,7 +720,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			return;
 		}
 
-		responsesProcessed.incrementAndGet();
+		updateResponseStatistics(response);
 		final ClientTransaction clientTransaction = responseEvent.getClientTransaction();		
 		final Dialog dialog = responseEvent.getDialog();
 		// Transate the response to SipServletResponse
@@ -1349,6 +1406,39 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	}
 	
 	/**
+	 * @return the requestsProcessedByMethod
+	 */
+	public Map<String, AtomicLong> getRequestsProcessedByMethod() {		
+		return requestsProcessedByMethod;
+	}
+
+	/**
+	 * @return the responsesProcessedByStatusCode
+	 */
+	public Map<String, AtomicLong> getResponsesProcessedByStatusCode() {		
+		return responsesProcessedByStatusCode;
+	}
+	
+	/**
+	 * @return the requestsProcessed
+	 */
+	public long getRequestsProcessedByMethod(String method) {
+		AtomicLong requestsProcessed = requestsProcessedByMethod.get(method);
+		if(requestsProcessed != null) {
+			return requestsProcessed.get();
+		}
+		return 0;
+	}
+	
+	public long getResponsesProcessedByStatusCode(String statusCode) {
+		AtomicLong responsesProcessed = responsesProcessedByStatusCode.get(statusCode);
+		if(responsesProcessed != null) {
+			return responsesProcessed.get();
+		}
+		return 0;
+	}
+	
+	/**
 	 * @return the requestsProcessed
 	 */
 	public long getResponsesProcessed() {
@@ -1542,5 +1632,30 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		for(SipLoadBalancer  sipLoadBalancer : sipLoadBalancers) {
 			sipLoadBalancer.switchover(fromJvmRoute, toJvmRoute);			
 		}		
+	}
+
+	/**
+	 * @param skipStatistics the skipStatistics to set
+	 */
+	public void setGatherStatistics(boolean skipStatistics) {
+		this.gatherStatistics = skipStatistics;
+		if(logger.isInfoEnabled()) {
+			logger.info("Gathering Statistics set to " + skipStatistics);
+		}
+	}
+
+	/**
+	 * @return the skipStatistics
+	 */
+	public boolean isGatherStatistics() {
+		return gatherStatistics;
+	}
+	
+	/**
+	 * PRESENT TO ACCOMODATE JOPR. NEED TO FILE A BUG ON THIS
+	 * @return the skipStatistics
+	 */
+	public boolean getGatherStatistics() {
+		return gatherStatistics;
 	}
 }
