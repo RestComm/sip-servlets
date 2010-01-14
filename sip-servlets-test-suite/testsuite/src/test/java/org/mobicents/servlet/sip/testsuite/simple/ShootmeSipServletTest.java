@@ -17,14 +17,18 @@
 package org.mobicents.servlet.sip.testsuite.simple;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Properties;
 
 import javax.sip.InvalidArgumentException;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.header.AllowHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.ServerHeader;
 import javax.sip.message.Request;
@@ -46,6 +50,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 	private static final int TIMEOUT_CSEQ_INCREASE = 100000;
 	private static final int DIALOG_TIMEOUT = 40000;
 	
+	public final static String[] ALLOW_HEADERS = new String[] {"INVITE","ACK","CANCEL","OPTIONS","BYE","SUBSCRIBE","NOTIFY","REFER"};
 	
 	TestSipListener sender;
 	SipProvider senderProvider = null;
@@ -266,6 +271,14 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isFinalResponseReceived());
 		assertEquals(405, sender.getFinalResponseStatus());
+		//Issue 1164 non regression test
+		ListIterator<AllowHeader> allowHeaders = (ListIterator<AllowHeader>) sender.getFinalResponse().getHeaders(AllowHeader.NAME);
+		assertNotNull(allowHeaders);
+		List<String> allowHeadersList = new ArrayList<String>();
+		while (allowHeaders.hasNext()) {
+			allowHeadersList.add(allowHeaders.next().getMethod());
+		}
+		assertTrue(Arrays.equals(ALLOW_HEADERS, (String[])allowHeadersList.toArray(new String[allowHeadersList.size()])));
 	}
 	
 	// test for http://code.google.com/p/mobicents/issues/detail?id=676

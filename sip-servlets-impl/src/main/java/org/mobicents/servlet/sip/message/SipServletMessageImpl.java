@@ -1319,6 +1319,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		try {
 			// Dealing with Allow:INVITE, ACK, CANCEL, OPTIONS, BYE kind of headers
 			if(!JainSipUtils.SINGLETON_HEADER_NAMES.contains(name) && new StringTokenizer(value, ",").countTokens() > 1) {
+				this.message.removeHeader(name);
 				List<Header> headers = SipFactory.getInstance().createHeaderFactory()
 					.createHeaders(name + ":" + value);
 				for (Header header : headers) {

@@ -141,6 +141,8 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		if(fromString.contains(TEST_ALLOW_HEADER)) {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_METHOD_NOT_ALLOWED);
 			sipServletResponse.setHeader("Allow", "INVITE, ACK, CANCEL, OPTIONS, BYE");
+			// Calling setHeader 2 times for Issue 1164 non regression test
+			sipServletResponse.setHeader("Allow", "INVITE, ACK, CANCEL, OPTIONS, BYE");
 			sipServletResponse.addHeader("Allow", "SUBSCRIBE, NOTIFY");
 			sipServletResponse.addHeader("Allow", "REFER");
 			sipServletResponse.send();
