@@ -39,6 +39,7 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 import javax.servlet.sip.SipSession.State;
+import javax.sip.ListeningPoint;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipConnector;
@@ -312,7 +313,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		}
 		String fromString = req.getFrom().toString();
 		if(fromString.contains(TEST_ERROR_RESPONSE)) {			
-			sendMessage(req.getApplicationSession(), sipFactory, "ackReceived");
+			sendMessage(req.getApplicationSession(), sipFactory, "ackReceived", null);
 			return;
 		}
 	}
@@ -471,7 +472,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	 */
 	public void noAckReceived(SipErrorEvent ee) {
 		logger.error("noAckReceived.");
-		sendMessage(ee.getRequest().getApplicationSession(), sipFactory, "noAckReceived");
+		sendMessage(ee.getRequest().getApplicationSession(), sipFactory, "noAckReceived", null);
 	}
 
 	/**
@@ -530,12 +531,12 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 
 	public void sipConnectorAdded(SipConnector connector) {
 		logger.info(connector + " added" );
-		sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipConnectorAdded");
+		sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipConnectorAdded", connector);
 	}
 
 	public void sipConnectorRemoved(SipConnector connector) {
 		logger.info(connector + " removed" );
-		sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipConnectorRemoved");
+		sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipConnectorRemoved", connector);
 	}
 
 	/**
@@ -543,14 +544,20 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	 * @param storedFactory
 	 */
 	private void sendMessage(SipApplicationSession sipApplicationSession,
-			SipFactory storedFactory, String content) {
+			SipFactory storedFactory, String content, SipConnector sipConnector) {
 		try {
 			SipServletRequest sipServletRequest = storedFactory.createRequest(
 					sipApplicationSession, 
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+			SipURI sipUri = storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+			if(sipConnector != null) {
+				if(sipConnector.getTransport().equalsIgnoreCase(ListeningPoint.TCP)) {
+					sipUri = storedFactory.createSipURI("receiver", "127.0.0.1:5081");
+				}
+				sipUri.setTransportParam(sipConnector.getTransport());
+			}
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(content.length());
 			sipServletRequest.setContent(content, CONTENT_TYPE);
