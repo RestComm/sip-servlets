@@ -210,13 +210,13 @@ public class SipConnectorTestManagement extends SipServletTestCase {
         // adding udp connector
         SipConnector udpSipConnector = new SipConnector();
         udpSipConnector.setIpAddress("127.0.0.1");
-        udpSipConnector.setPort(5071);
+        udpSipConnector.setPort(5072);
         udpSipConnector.setTransport(ListeningPoint.UDP);
         mbsc.invoke(objectName, "addSipConnector",new Object[] {udpSipConnector}, new String[]{SipConnector.class.getCanonicalName()});
         // adding tcp connector
         SipConnector tcpSipConnector = new SipConnector();
         tcpSipConnector.setIpAddress("127.0.0.1");
-        tcpSipConnector.setPort(5071);
+        tcpSipConnector.setPort(5072);
         tcpSipConnector.setTransport(ListeningPoint.TCP);
         mbsc.invoke(objectName, "addSipConnector",new Object[] {tcpSipConnector}, new String[]{SipConnector.class.getCanonicalName()});
         // making sure they were both added correctly

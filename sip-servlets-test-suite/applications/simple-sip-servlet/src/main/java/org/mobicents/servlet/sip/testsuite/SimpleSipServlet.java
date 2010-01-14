@@ -531,12 +531,18 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 
 	public void sipConnectorAdded(SipConnector connector) {
 		logger.info(connector + " added" );
-		sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipConnectorAdded", connector);
+		if(connector.getTransport().equalsIgnoreCase(ListeningPoint.TCP) && connector.getPort() == 5072) {
+			// Issue 1161
+			sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipConnectorAdded", ListeningPoint.UDP);
+			sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipConnectorAdded", connector.getTransport());			
+		} else if(connector.getPort() != 5072) {
+			sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipConnectorAdded", connector.getTransport());
+		}
 	}
 
 	public void sipConnectorRemoved(SipConnector connector) {
 		logger.info(connector + " removed" );
-		sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipConnectorRemoved", connector);
+		sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipConnectorRemoved", connector.getTransport());
 	}
 
 	/**
@@ -544,7 +550,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	 * @param storedFactory
 	 */
 	private void sendMessage(SipApplicationSession sipApplicationSession,
-			SipFactory storedFactory, String content, SipConnector sipConnector) {
+			SipFactory storedFactory, String content, String transport) {
 		try {
 			SipServletRequest sipServletRequest = storedFactory.createRequest(
 					sipApplicationSession, 
@@ -552,11 +558,11 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
 			SipURI sipUri = storedFactory.createSipURI("receiver", "127.0.0.1:5080");
-			if(sipConnector != null) {
-				if(sipConnector.getTransport().equalsIgnoreCase(ListeningPoint.TCP)) {
+			if(transport != null) {
+				if(transport.equalsIgnoreCase(ListeningPoint.TCP)) {
 					sipUri = storedFactory.createSipURI("receiver", "127.0.0.1:5081");
 				}
-				sipUri.setTransportParam(sipConnector.getTransport());
+				sipUri.setTransportParam(transport);
 			}
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(content.length());
