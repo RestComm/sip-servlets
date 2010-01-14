@@ -285,17 +285,17 @@
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-ha-core</artifactId>
-					<version>0.4-SNAPSHOT</version>
+					<version>${mobicents.jain.sip.ha.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-jboss4</artifactId>
-					<version>0.4-SNAPSHOT</version>					
+					<version>${mobicents.jain.sip.ha.version}</version>					
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.tools</groupId>
 					<artifactId>sip-balancer</artifactId>
-					<version>1.0.BETA10-SNAPSHOT</version>
+					<version>${mobicents.balancer.version}</version>
 					<scope>provided</scope>
 				</dependency>
 			</dependencies>						
@@ -327,17 +327,17 @@
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-ha-core</artifactId>
-					<version>0.4-SNAPSHOT</version>
+					<version>${mobicents.jain.sip.ha.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
 					<artifactId>mobicents-jain-sip-jboss4</artifactId>
-					<version>0.4-SNAPSHOT</version>
+					<version>${mobicents.jain.sip.ha.version}</version>
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.tools</groupId>
 					<artifactId>sip-balancer</artifactId>
-					<version>1.0.BETA10-SNAPSHOT</version>
+					<version>${mobicents.balancer.version}</version>
 					<scope>provided</scope>
 				</dependency>
 			</dependencies>						
