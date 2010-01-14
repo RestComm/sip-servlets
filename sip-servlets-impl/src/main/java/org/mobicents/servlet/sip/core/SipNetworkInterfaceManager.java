@@ -148,6 +148,12 @@ public class SipNetworkInterfaceManager {
 	 * @param extendedListeningPoint
 	 */
 	public void removeExtendedListeningPoint(ExtendedListeningPoint extendedListeningPoint) {
+		// notifying the applications before removing the listening point so that apps can still try to send a message on it
+		Iterator<SipContext> sipContextIterator = sipApplicationDispatcher.findSipApplications();
+	    while (sipContextIterator.hasNext()) {
+			SipContext sipContext = (SipContext) sipContextIterator.next();
+			sipContext.notifySipContextListeners(new SipContextEvent(SipContextEventType.SIP_CONNECTOR_REMOVED, extendedListeningPoint.getSipConnector()));
+		}
 		extendedListeningPointList.remove(extendedListeningPoint);
 		computeOutboundInterfaces();
 		// removing from the transport cache map
@@ -162,12 +168,7 @@ public class SipNetworkInterfaceManager {
 	    if(extendedListeningPoint.getGlobalIpAddress() != null) {
 	    	extendedListeningPointsCacheMap.remove(extendedListeningPoint.getGlobalIpAddress() + "/" + extendedListeningPoint.getPort() + ":" + extendedListeningPoint.getTransport().toLowerCase());
 	    	extendedListeningPointsCacheMap.remove(extendedListeningPoint.getGlobalIpAddress() + "/" + extendedListeningPoint.getGlobalPort() + ":" + extendedListeningPoint.getTransport().toLowerCase());
-	    }
-	    Iterator<SipContext> sipContextIterator = sipApplicationDispatcher.findSipApplications();
-	    while (sipContextIterator.hasNext()) {
-			SipContext sipContext = (SipContext) sipContextIterator.next();
-			sipContext.notifySipContextListeners(new SipContextEvent(SipContextEventType.SIP_CONNECTOR_REMOVED, extendedListeningPoint.getSipConnector()));
-		}
+	    }	    
 	}
 	
 	/**

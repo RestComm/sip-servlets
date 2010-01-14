@@ -555,6 +555,8 @@ public class SipStandardService extends StandardService implements SipService {
 				.getProtocolHandler();
 		protocolHandler.setSipConnector(sipConnector);		
 		connector.setService(this);
+		// added for Issue 1161 : Only the last sip connector (which was added programmatically using JMX) is working
+		connector.initialize();
 		connector.init();
 		addConnector(connector);	
 		ExtendedListeningPoint extendedListeningPoint = (ExtendedListeningPoint)
