@@ -143,8 +143,7 @@ public class SipStandardService extends StandardService implements SipService {
 	protected void registerSipConnector(Connector connector) {
 		try {
 		     
-		    StandardEngine cb = (StandardEngine) container;
-		    oname = createSipConnectorObjectName(connector, cb.getName(), "SipConnector");
+		    oname = createSipConnectorObjectName(connector, getName(), "SipConnector");
 		    Registry.getRegistry(null, null)
 		        .registerComponent(connector, oname, null);
 		    connector.setController(oname);
