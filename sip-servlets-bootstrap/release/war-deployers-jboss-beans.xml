@@ -48,7 +48,7 @@ $Id: war-deployers-jboss-beans.xml 85945 2009-03-16 19:45:12Z dimitris@jboss.org
         and conf/standardjboss.xml as the source for defaults. 
    -->
    <bean name="WebAppClusteringDefaultsDeployer" 
-         class="org.jboss.web.tomcat.service.deployers.ClusteringDefaultsDeployer">
+         class="org.jboss.web.tomcat.service.deployers.ConvergedSipClusteringDefaultsDeployer">
       
       <!-- Default session cache config used by distributable webapps -->
       <property name="cacheName">standard-session-cache</property>
