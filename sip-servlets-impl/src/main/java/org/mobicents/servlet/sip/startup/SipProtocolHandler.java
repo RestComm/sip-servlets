@@ -699,6 +699,10 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
     public void setAddress(InetAddress ia) { 
     	sipConnector.setIpAddress(ia.getHostAddress());
     }
+    
+    public String getTransport() {
+    	return sipConnector.getTransport();
+    }
 
     /**
 	 * @param sipStackPropertiesFile the sipStackPropertiesFile to set

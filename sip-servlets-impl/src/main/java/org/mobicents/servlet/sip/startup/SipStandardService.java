@@ -22,24 +22,28 @@ import gov.nist.javax.sip.SipStackExt;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TooManyListenersException;
 
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
 import javax.sip.SipStack;
 
 import org.apache.catalina.Engine;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
+import org.apache.catalina.core.StandardEngine;
 import org.apache.catalina.core.StandardService;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.log4j.Logger;
+import org.apache.tomcat.util.modeler.Registry;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.CongestionControlPolicy;
-import org.mobicents.servlet.sip.core.DNSAddressResolver;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 
@@ -126,8 +130,29 @@ public class SipStandardService extends StandardService implements SipService {
 			if(balancers != null) {
 				protocolHandler.setAttribute("balancers", balancers);
 			}
+			registerSipConnector(connector);
 		}		
 		super.addConnector(connector);
+	}
+
+
+	/**
+	 * Register the sip connector under a different name than HTTP Connector and we add the transport to avoid clashing with 2 connectors having the same port and address
+	 * @param connector connector to register
+	 */
+	protected void registerSipConnector(Connector connector) {
+		try {
+		     
+		    StandardEngine cb = (StandardEngine) container;
+		    oname = createSipConnectorObjectName(connector, cb.getName(), "SipConnector");
+		    Registry.getRegistry(null, null)
+		        .registerComponent(connector, oname, null);
+		    connector.setController(oname);
+		} catch (Exception e) {
+		    logger.error( "Error registering connector ", e);
+		}
+		if(logger.isDebugEnabled())
+		    logger.debug("Creating name for connector " + oname);
 	}
 	
 	@Override
@@ -548,30 +573,58 @@ public class SipStandardService extends StandardService implements SipService {
 		this.balancers = balancers;
 	}
 	
-	public void addSipConnector(SipConnector sipConnector) throws Exception {
-		Connector connector = new Connector(
-				SipProtocolHandler.class.getName());
-		SipProtocolHandler protocolHandler = (SipProtocolHandler) connector
-				.getProtocolHandler();
-		protocolHandler.setSipConnector(sipConnector);		
-		connector.setService(this);
-		// added for Issue 1161 : Only the last sip connector (which was added programmatically using JMX) is working
-		connector.initialize();
-		connector.init();
-		addConnector(connector);	
-		ExtendedListeningPoint extendedListeningPoint = (ExtendedListeningPoint)
-		connector.getProtocolHandler().getAttribute(ExtendedListeningPoint.class.getSimpleName());
-		if(extendedListeningPoint != null) {
-			try {
-				extendedListeningPoint.getSipProvider().addSipListener(sipApplicationDispatcher);
-				sipApplicationDispatcher.getSipNetworkInterfaceManager().addExtendedListeningPoint(extendedListeningPoint);
-			} catch (TooManyListenersException e) {
-				logger.error("Connector.initialize", e);
-			}			
+	public boolean addSipConnector(SipConnector sipConnector) throws Exception {
+		if(sipConnector == null) {
+			throw new IllegalArgumentException("The sip connector passed is null");
 		}
+		Connector connectorToRemove = findSipConnector(sipConnector.getIpAddress(), sipConnector.getPort(),
+				sipConnector.getTransport());
+		if(connectorToRemove == null) {
+			Connector connector = new Connector(
+					SipProtocolHandler.class.getName());
+			SipProtocolHandler protocolHandler = (SipProtocolHandler) connector
+					.getProtocolHandler();
+			protocolHandler.setSipConnector(sipConnector);		
+			connector.setService(this);
+			connector.setContainer(container);
+			connector.init();
+			addConnector(connector);	
+			ExtendedListeningPoint extendedListeningPoint = (ExtendedListeningPoint)
+			connector.getProtocolHandler().getAttribute(ExtendedListeningPoint.class.getSimpleName());
+			if(extendedListeningPoint != null) {
+				try {
+					extendedListeningPoint.getSipProvider().addSipListener(sipApplicationDispatcher);
+					sipApplicationDispatcher.getSipNetworkInterfaceManager().addExtendedListeningPoint(extendedListeningPoint);
+				} catch (TooManyListenersException e) {
+					logger.error("Connector.initialize", e);
+					return false;
+				}			
+			}
+			return true;
+		}
+		return false;
 	}
 	
-	public void removeSipConnector(String ipAddress, int port, String transport) throws Exception {
+	public boolean removeSipConnector(String ipAddress, int port, String transport) throws Exception {
+		Connector connectorToRemove = findSipConnector(ipAddress, port,
+				transport);
+		if(connectorToRemove != null) {
+			removeConnector(connectorToRemove);
+			return true;
+		}
+		return false;
+	}
+
+
+	/**
+	 * Find a sip Connector by it's ip address, port and transport
+	 * @param ipAddress ip address of the connector to find
+	 * @param port port of the connector to find
+	 * @param transport transport of the connector to find
+	 * @return the found sip connector or null if noting found 
+	 */
+	private Connector findSipConnector(String ipAddress, int port,
+			String transport) {
 		Connector connectorToRemove = null;
 		for (Connector connector : connectors) {
 			final ProtocolHandler protocolHandler = connector.getProtocolHandler();
@@ -584,9 +637,7 @@ public class SipStandardService extends StandardService implements SipService {
 				}
 			}
 		}
-		if(connectorToRemove != null) {
-			removeConnector(connectorToRemove);
-		}
+		return connectorToRemove;
 	}
 	
 	public SipConnector[] findSipConnectors() {
@@ -615,5 +666,18 @@ public class SipStandardService extends StandardService implements SipService {
 				}
 			}
 		}
+	}
+	
+	 protected ObjectName createSipConnectorObjectName(Connector connector, String domain, String type)
+	     throws MalformedObjectNameException {
+		 String encodedAddr = null;
+		 if (connector.getProperty("address") != null) {
+		     encodedAddr = URLEncoder.encode(connector.getProperty("address").toString());
+		 }
+		 String addSuffix = (connector.getProperty("address") == null) ? "" : ",address="
+		         + encodedAddr;
+		 ObjectName _oname = new ObjectName(domain + ":type=" + type + ",port="
+		         + connector.getPort() + ",transport=" + connector.getProperty("transport") + addSuffix);
+		 return _oname;
 	}
 }
