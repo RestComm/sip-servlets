@@ -143,10 +143,10 @@ public class SipStandardService extends StandardService implements SipService {
 	protected void registerSipConnector(Connector connector) {
 		try {
 		     
-		    oname = createSipConnectorObjectName(connector, getName(), "SipConnector");
+		    ObjectName objectName = createSipConnectorObjectName(connector, getName(), "SipConnector");
 		    Registry.getRegistry(null, null)
-		        .registerComponent(connector, oname, null);
-		    connector.setController(oname);
+		        .registerComponent(connector, objectName, null);
+		    connector.setController(objectName);
 		} catch (Exception e) {
 		    logger.error( "Error registering connector ", e);
 		}
@@ -199,7 +199,7 @@ public class SipStandardService extends StandardService implements SipService {
 			System.setProperty("javax.servlet.sip.dar", darConfigurationFileLocation);
  		}		
 		super.initialize();
-		sipApplicationDispatcher.setDomain(this.domain);
+		sipApplicationDispatcher.setDomain(this.getName());
 		if(baseTimerInterval < 1) {
 			throw new LifecycleException("It's forbidden to set the Base Timer Interval to a non positive value");		
 		}
