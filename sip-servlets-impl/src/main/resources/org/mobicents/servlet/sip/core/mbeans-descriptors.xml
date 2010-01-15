@@ -29,12 +29,20 @@
 			description="Maximum number of pending messages allowed to wait in a queue to be executed"
 			type="int" />
 			
+		<attribute name="backToNormalQueueSize"
+			description="if the queue size drops below this threshold, the container starts processing messages again"
+			type="int" />
+			
 		<attribute name="baseTimerInterval"
 			description="JAIN SIP Timer Interval"
 			type="int" />
 			
 		<attribute name="memoryThreshold"
 			description="Percentage of memory to be used by the container before applying the congestion control policy"
+			type="int" />
+			
+		<attribute name="backToNormalMemoryThreshold"
+			description="if the Percentage of memory be used by the container drops below this threshold, the container starts processing messages again"
 			type="int" />
 			
 		<attribute name="requestsProcessed"

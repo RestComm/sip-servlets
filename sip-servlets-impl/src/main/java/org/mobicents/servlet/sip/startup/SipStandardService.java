@@ -34,7 +34,6 @@ import javax.sip.SipStack;
 import org.apache.catalina.Engine;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.connector.Connector;
-import org.apache.catalina.core.StandardEngine;
 import org.apache.catalina.core.StandardService;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.log4j.Logger;
@@ -71,8 +70,11 @@ public class SipStandardService extends StandardService implements SipService {
 	protected String sipApplicationDispatcherClassName;
 	//instatiated class from the sipApplicationDispatcherClassName of the sip application dispatcher 
 	protected SipApplicationDispatcher sipApplicationDispatcher;
+	private boolean gatherStatistics = true;
 	protected int sipMessageQueueSize = 1500;
-	protected int memoryThreshold = 90;
+	private int backToNormalSipMessageQueueSize = 1300;
+	protected int memoryThreshold = 95;
+	private int backToNormalMemoryThreshold = 90;
 	protected String outboundProxy;
 	protected long congestionControlCheckingInterval = 30000;
 	// base timer interval for jain sip tx 
@@ -205,9 +207,12 @@ public class SipStandardService extends StandardService implements SipService {
 		}
 		sipApplicationDispatcher.setBaseTimerInterval(baseTimerInterval);
 		sipApplicationDispatcher.setMemoryThreshold(getMemoryThreshold());
+		sipApplicationDispatcher.setBackToNormalMemoryThreshold(backToNormalMemoryThreshold);
 		sipApplicationDispatcher.setCongestionControlCheckingInterval(getCongestionControlCheckingInterval());
 		sipApplicationDispatcher.setCongestionControlPolicyByName(getCongestionControlPolicy());
 		sipApplicationDispatcher.setQueueSize(getSipMessageQueueSize());
+		sipApplicationDispatcher.setBackToNormalQueueSize(backToNormalSipMessageQueueSize);
+		sipApplicationDispatcher.setGatherStatistics(gatherStatistics);
 		sipApplicationDispatcher.setConcurrencyControlMode(ConcurrencyControlMode.valueOf(getConcurrencyControlMode()));		
 		sipApplicationDispatcher.setBypassRequestExecutor(bypassRequestExecutor);
 		sipApplicationDispatcher.setBypassResponseExecutor(bypassResponseExecutor);		
@@ -418,6 +423,60 @@ public class SipStandardService extends StandardService implements SipService {
 		return memoryThreshold;
 	}
 
+	/**
+	 * @param skipStatistics the skipStatistics to set
+	 */
+	public void setGatherStatistics(boolean skipStatistics) {
+		this.gatherStatistics = skipStatistics;
+		if(logger.isInfoEnabled()) {
+			logger.info("Gathering Statistics set to " + skipStatistics);
+		}
+	}
+
+	/**
+	 * @return the skipStatistics
+	 */
+	public boolean isGatherStatistics() {
+		return gatherStatistics;
+	}
+	
+	/**
+	 * PRESENT TO ACCOMODATE JOPR. NEED TO FILE A BUG ON THIS
+	 * @return the skipStatistics
+	 */
+	public boolean getGatherStatistics() {
+		return gatherStatistics;
+	}
+
+	/**
+	 * @param backToNormalPercentageOfMemoryUsed the backToNormalPercentageOfMemoryUsed to set
+	 */
+	public void setBackToNormalMemoryThreshold(
+			int backToNormalMemoryThreshold) {
+		this.backToNormalMemoryThreshold = backToNormalMemoryThreshold;
+	}
+
+	/**
+	 * @return the backToNormalPercentageOfMemoryUsed
+	 */
+	public int getBackToNormalMemoryThreshold() {
+		return backToNormalMemoryThreshold;
+	}
+
+	/**
+	 * @param backToNormalQueueSize the backToNormalQueueSize to set
+	 */
+	public void setBackToNormalSipMessageQueueSize(int backToNormalSipMessageQueueSize) {
+		this.backToNormalSipMessageQueueSize = backToNormalSipMessageQueueSize;
+	}
+
+	/**
+	 * @return the backToNormalQueueSize
+	 */
+	public int getBackToNormalSipMessageQueueSize() {
+		return backToNormalSipMessageQueueSize;
+	}
+	
 
 	/**
 	 * @param congestionControlPolicy the congestionControlPolicy to set

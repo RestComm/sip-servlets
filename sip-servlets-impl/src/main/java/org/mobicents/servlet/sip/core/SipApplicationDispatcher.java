@@ -183,4 +183,14 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 
 	String[] getExtensionsSupported();
 	String[] getRfcSupported();
+		
+	void setGatherStatistics(boolean gatherStatistics);	
+	boolean isGatherStatistics();
+	
+	void setBackToNormalMemoryThreshold(
+			int backToNormalMemoryThreshold);
+	int getBackToNormalMemoryThreshold();
+	
+	void setBackToNormalQueueSize(int backToNormalQueueSize);
+	int getBackToNormalQueueSize();
 }

@@ -194,14 +194,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	private boolean memoryToHigh = false;	
 	private double maxMemory;
 	private int memoryThreshold;
+	private int backToNormalMemoryThreshold;
 	private boolean rejectSipMessages = false;
 	private long congestionControlCheckingInterval; //30 sec		
 	protected transient CongestionControlTimerTask congestionControlTimerTask;
 	protected transient ScheduledFuture congestionControlTimerFuture;
 	private CongestionControlPolicy congestionControlPolicy;
 	private int numberOfMessagesInQueue;
-	private double percentageOfMemoryUsed;
-	private double backToNormalPercentageOfMemoryUsed;
+	private double percentageOfMemoryUsed;	
 	private int queueSize;
 	private int backToNormalQueueSize;
 	//used for the congestion control mechanism
@@ -501,8 +501,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	private void analyzeQueueCongestionState() {
 		this.numberOfMessagesInQueue = getNumberOfPendingMessages();
 		if(rejectSipMessages) {
-			if(numberOfMessagesInQueue  <queueSize) {
-				logger.warn("number of pending messages in the queues : " + numberOfMessagesInQueue + " < to the queue Size : " + queueSize + " => stopping to reject requests");
+			if(numberOfMessagesInQueue  < backToNormalQueueSize) {
+				logger.warn("number of pending messages in the queues : " + numberOfMessagesInQueue + " < to the back to normal queue Size : " + backToNormalQueueSize + " => stopping to reject requests");
 				rejectSipMessages = false;
 			}
 		} else {
@@ -523,8 +523,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		this.percentageOfMemoryUsed=  (((double)100) - ((totalFreeMemory / maxMemory) * ((double)100)));
 
 		if(memoryToHigh) {
-			if(percentageOfMemoryUsed < memoryThreshold) {
-				logger.warn("Memory used: " + percentageOfMemoryUsed + "% < to the memory threshold : " + memoryThreshold + " => stopping to reject requests");
+			if(percentageOfMemoryUsed < backToNormalMemoryThreshold) {
+				logger.warn("Memory used: " + percentageOfMemoryUsed + "% < to the back to normal memory threshold : " + backToNormalMemoryThreshold + " => stopping to reject requests");
 				memoryToHigh = false;				
 			}
 		} else {
@@ -1664,5 +1664,40 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public boolean getGatherStatistics() {
 		return gatherStatistics;
+	}
+
+	/**
+	 * @param backToNormalPercentageOfMemoryUsed the backToNormalPercentageOfMemoryUsed to set
+	 */
+	public void setBackToNormalMemoryThreshold(
+			int backToNormalMemoryThreshold) {
+		this.backToNormalMemoryThreshold = backToNormalMemoryThreshold;
+		if(logger.isInfoEnabled()) {
+			logger.info("Back To Normal Memory threshold set to " + backToNormalMemoryThreshold +"%");
+		}
+	}
+
+	/**
+	 * @return the backToNormalPercentageOfMemoryUsed
+	 */
+	public int getBackToNormalMemoryThreshold() {
+		return backToNormalMemoryThreshold;
+	}
+
+	/**
+	 * @param backToNormalQueueSize the backToNormalQueueSize to set
+	 */
+	public void setBackToNormalQueueSize(int backToNormalQueueSize) {
+		this.backToNormalQueueSize = backToNormalQueueSize;
+		if(logger.isInfoEnabled()) {
+			logger.info("Back To Normal Queue Size set to " + backToNormalQueueSize);
+		}
+	}
+
+	/**
+	 * @return the backToNormalQueueSize
+	 */
+	public int getBackToNormalQueueSize() {
+		return backToNormalQueueSize;
 	}
 }
