@@ -533,5 +533,17 @@ public class SipStandardManager extends StandardManager implements SipManager {
         }
         return sb.toString();
     }
+
+	public double getNumberOfSipApplicationSessionCreationPerSecond() {
+		return sipManagerDelegate.getNumberOfSipApplicationSessionCreationPerSecond();
+	}
+
+	public double getNumberOfSipSessionCreationPerSecond() {
+		return sipManagerDelegate.getNumberOfSipSessionCreationPerSecond();
+	}
+
+	public void updateStats() {
+		sipManagerDelegate.updateStats();
+	}
 	
 }

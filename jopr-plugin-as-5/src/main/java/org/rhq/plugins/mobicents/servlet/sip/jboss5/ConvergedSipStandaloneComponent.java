@@ -237,8 +237,12 @@ public class ConvergedSipStandaloneComponent extends StandaloneManagedDeployment
             eBean.refreshAttributes();
             EmsAttribute att = eBean.getAttribute(property);
             if (att != null) {
-                Integer i = (Integer) att.getValue();
-                ret = new Double(i);
+            	if(att.getValue() instanceof Double) {
+            		ret = (Double) att.getValue();                
+            	} else {
+            		Integer i = (Integer) att.getValue();                
+            		ret = new Double(i);
+            	}
             }
 
         }

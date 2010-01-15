@@ -4044,6 +4044,19 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		this.sipManagerDelegate.setExpiredSipApplicationSessions(expiredSipApplicationSessions);
 	}
 	
+
+	public double getNumberOfSipApplicationSessionCreationPerSecond() {
+		return sipManagerDelegate.getNumberOfSipApplicationSessionCreationPerSecond();
+	}
+
+	public double getNumberOfSipSessionCreationPerSecond() {
+		return sipManagerDelegate.getNumberOfSipSessionCreationPerSecond();
+	}
+
+	public void updateStats() {
+		sipManagerDelegate.updateStats();
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */

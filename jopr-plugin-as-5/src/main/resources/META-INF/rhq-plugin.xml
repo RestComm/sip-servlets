@@ -2271,6 +2271,10 @@
             <metric property="SipSession.sipSessionCounter" displayName="Sip Sessions created"
                     units="none" description="Number of sip sessions created for the sipapp"
                     measurementType="trendsup" />
+                    
+            <metric property="SipSession.numberOfSipSessionCreationPerSecond" displayName="Sip Sessions created per second"
+                    units="none" description="Number of sip sessions created per second for the sipapp"
+                    measurementType="trendsup" />
 
             <metric property="SipSession.expiredSipSessions" displayName="Expired Sip Sessions"
                     units="none" description="Number of expired  sip sessions for the sipapp"
@@ -2294,6 +2298,10 @@
 
             <metric property="SipSession.sipApplicationSessionCounter" displayName="Sip Application Sessions created"
                     units="none" description="Number of sip application sessions created for the sipapp"
+                    measurementType="trendsup" />
+                    
+            <metric property="SipSession.numberOfSipApplicationSessionCreationPerSecond" displayName="Sip Application Sessions created per second"
+                    units="none" description="Number of sip application sessions created per second for the sipapp"
                     measurementType="trendsup" />
 
             <metric property="SipSession.expiredSipApplicationSessions" displayName="Expired Sip Application Sessions"
@@ -2410,6 +2418,10 @@
                     units="none" description="Number of expired Http sessions for the sipapp"
                     measurementType="trendsup" />
                     
+            <metric property="SipSession.numberOfSipSessionCreationPerSecond" displayName="Sip Sessions created per second"
+                    units="none" description="Number of sip sessions created per second for the sipapp"
+                    measurementType="trendsup" />
+                    
             <metric property="SipSession.rejectedSessions" displayName="Rejected Http Sessions"
                     units="none" description="Number of Http sessions rejected for the sipapp"
                     measurementType="trendsup" />
@@ -2456,6 +2468,10 @@
 
             <metric property="SipSession.expiredSipApplicationSessions" displayName="Expired Sip Application Sessions"
                     units="none" description="Number of expired Sip Application sessions for the sipapp"
+                    measurementType="trendsup" />
+                    
+            <metric property="SipSession.numberOfSipApplicationSessionCreationPerSecond" displayName="Sip Application Sessions created per second"
+                    units="none" description="Number of sip application sessions created per second for the sipapp"
                     measurementType="trendsup" />
                     
             <metric property="SipSession.rejectedSipApplicationSessions" displayName="Rejected Sip Application Sessions"

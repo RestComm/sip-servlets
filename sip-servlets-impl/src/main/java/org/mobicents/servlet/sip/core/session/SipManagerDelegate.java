@@ -116,7 +116,14 @@ public abstract class SipManagerDelegate {
     
     // Number of sip Application sessions created by this manager
     protected int sipApplicationSessionCounter=0;
-	
+    
+    protected int lastUpdatedSasCreationCounter = 0;
+    protected long lastSipApplicationSessionUpdatedTime = 0;
+    double lastAverageSasCreationPerSecond = 0.0;
+    
+    protected int lastUpdatedSsCreationCounter = 0;
+    protected long lastSipSessionUpdatedTime = 0;
+    double lastAverageSsCreationPerSecond = 0.0;
 	/**
 	 * @return the SipFactoryImpl
 	 */
@@ -663,5 +670,48 @@ public abstract class SipManagerDelegate {
 	public void setExpiredSipApplicationSessions(
 			int expiredSipApplicationSessions) {
 		this.expiredSipApplicationSessions = expiredSipApplicationSessions;
+	}
+
+	public double getNumberOfSipApplicationSessionCreationPerSecond() {
+		return lastAverageSasCreationPerSecond;
+	}
+
+	public double getNumberOfSipSessionCreationPerSecond() {
+		return lastAverageSsCreationPerSecond;
+	}
+
+	public void updateStats() {
+		if(logger.isDebugEnabled()) {
+			logger.debug("updating sip manager " + container.getName() + " statistics");
+		}
+		long now = System.currentTimeMillis();
+		// Updating the number of Sip Application Session Creation Per Seconds
+		int elapsedNumberOfSasCreationCounter = sipApplicationSessionCounter - lastUpdatedSasCreationCounter;		
+		if(elapsedNumberOfSasCreationCounter > 0) {
+			double elapsedSasCreationUpdatedTimeInSeconds = (now - lastSipApplicationSessionUpdatedTime) / 1000;
+			double elapsedAverageSasCreationPerSecond = elapsedNumberOfSasCreationCounter  / elapsedSasCreationUpdatedTimeInSeconds;
+			lastAverageSasCreationPerSecond = (lastAverageSasCreationPerSecond + elapsedAverageSasCreationPerSecond) / 2;			
+		}
+		lastUpdatedSasCreationCounter = sipApplicationSessionCounter;
+		lastSipApplicationSessionUpdatedTime = now;
+		if(logger.isDebugEnabled()) {
+			logger.debug("elapsedNumberOfSasCreationCounter "+ elapsedNumberOfSasCreationCounter);
+			logger.debug("lastUpdatedSasCreationCounter "+ lastUpdatedSasCreationCounter);
+			logger.debug("lastSipApplicationSessionUpdatedTime "+ lastSipApplicationSessionUpdatedTime);
+		}
+		// Updating the number of Sip Application Session Creation Per Seconds
+		int elapsedNumberOfSsCreationCounter = sipSessionCounter - lastUpdatedSsCreationCounter;
+		if(elapsedNumberOfSsCreationCounter > 0) {
+			double elapsedSsCreationUpdatedTimeInSeconds = (now - lastSipSessionUpdatedTime) / 1000;
+			double elapsedAverageSsCreationPerSecond = elapsedNumberOfSsCreationCounter  / elapsedSsCreationUpdatedTimeInSeconds;
+			lastAverageSsCreationPerSecond = (lastAverageSsCreationPerSecond + elapsedAverageSsCreationPerSecond) / 2;			
+		}
+		lastUpdatedSsCreationCounter = sipSessionCounter;
+		lastSipSessionUpdatedTime = now;
+		if(logger.isDebugEnabled()) {
+			logger.debug("elapsedNumberOfSsCreationCounter "+ elapsedNumberOfSsCreationCounter);
+			logger.debug("lastUpdatedSsCreationCounter "+ lastUpdatedSsCreationCounter);
+			logger.debug("lastSipSessionUpdatedTime "+ lastSipSessionUpdatedTime);
+		}
 	}
 }

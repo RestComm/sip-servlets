@@ -141,6 +141,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 			analyzeQueueCongestionState();
 			analyzeMemory();
+			if(gatherStatistics) {
+				for (SipContext sipContext : applicationDeployed.values()) {
+					sipContext.getSipManager().updateStats();
+				}
+			}
 			//TODO wait for JDK 6 new OperatingSystemMXBean
 //			analyzeCPU();
 		}
@@ -196,7 +201,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	private CongestionControlPolicy congestionControlPolicy;
 	private int numberOfMessagesInQueue;
 	private double percentageOfMemoryUsed;
+	private double backToNormalPercentageOfMemoryUsed;
 	private int queueSize;
+	private int backToNormalQueueSize;
 	//used for the congestion control mechanism
 	private ScheduledThreadPoolExecutor congestionControlThreadPool = null;
 	

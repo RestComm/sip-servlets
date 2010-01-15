@@ -1035,10 +1035,11 @@ public class SipStandardContext extends StandardContext implements SipContext {
 						}					
 					} catch (ServletException e) {
 						logger.error("Cannot allocate the servlet "+ wrapper.getServletClass() +" for notifying the listener " +
-								"that it has been initialized", e);
+								" of the event " + event.getEventType(), e);
 						ok = false; 
 					} catch (Throwable e) {
-						logger.error("An error occured when initializing the servlet " + wrapper.getServletClass(), e);
+						logger.error("An error occured when notifying the servlet " + wrapper.getServletClass() +
+								" of the event " + event.getEventType(), e);
 						ok = false; 
 					} 
 					try {

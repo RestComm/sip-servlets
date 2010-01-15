@@ -3223,4 +3223,17 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			int expiredSipApplicationSessions) {
 		this.sipManagerDelegate.setExpiredSipApplicationSessions(expiredSipApplicationSessions);
 	}
+	
+
+	public double getNumberOfSipApplicationSessionCreationPerSecond() {
+		return sipManagerDelegate.getNumberOfSipApplicationSessionCreationPerSecond();
+	}
+
+	public double getNumberOfSipSessionCreationPerSecond() {
+		return sipManagerDelegate.getNumberOfSipSessionCreationPerSecond();
+	}
+
+	public void updateStats() {
+		sipManagerDelegate.updateStats();
+	}
 }

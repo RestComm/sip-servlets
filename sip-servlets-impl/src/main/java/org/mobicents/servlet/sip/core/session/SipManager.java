@@ -282,4 +282,23 @@ public interface SipManager extends org.apache.catalina.Manager {
    * @param expiredSessions Number of sessions that have expired
    */
   public void setExpiredSipApplicationSessions(int expiredSipApplicationSessions);
+  
+  /**
+   * Gets the number of sip application sessions per seconds that have been created.
+   *
+   * @return number of sip application sessions per seconds that have been created.
+   */
+  public double getNumberOfSipApplicationSessionCreationPerSecond();
+  
+  /**
+   * Gets the number of sip sessions per seconds that have been created.
+   *
+   * @return number of sip sessions per seconds that have been created.
+   */
+  public double getNumberOfSipSessionCreationPerSecond();
+  
+  /**
+   * Update statistics
+   */
+  public void updateStats();
 }

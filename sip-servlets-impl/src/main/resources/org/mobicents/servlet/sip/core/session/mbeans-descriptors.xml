@@ -162,7 +162,15 @@
                  
 	<attribute   name="expiredSipApplicationSessions"
           description="Number of sip application sessions that expired ( doesn't include explicit invalidations )"
-                 type="int" />                                  
+                 type="int" />
+                 
+    <attribute   name="numberOfSipSessionCreationPerSecond"
+          description="Number of sip sessions created per second"
+                 type="double" />
+                 
+	<attribute   name="numberOfSipApplicationSessionCreationPerSecond"
+          description="Number of sip application sessions created per second"
+                 type="double" />                                    
 
     <attribute   name="processingTime"
           description="Time spent doing housekeeping and expiration"
