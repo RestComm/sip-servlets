@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.Properties;
 
 import javax.media.mscontrol.MediaEventListener;
@@ -26,8 +27,11 @@ import javax.media.mscontrol.MsControlFactory;
 import javax.media.mscontrol.networkconnection.NetworkConnection;
 import javax.media.mscontrol.networkconnection.SdpPortManager;
 import javax.media.mscontrol.networkconnection.SdpPortManagerEvent;
+import javax.media.mscontrol.spi.Driver;
 import javax.media.mscontrol.spi.DriverManager;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
@@ -42,11 +46,10 @@ import org.apache.log4j.Logger;
  * @author amit bhayani
  * 
  */
-public class PlayerServlet extends SipServlet {
+public class PlayerServlet extends SipServlet implements ServletContextListener {
+	private static final String MS_CONTROL_FACTORY = "MsControlFactory";
 	private static Logger logger = Logger.getLogger(PlayerServlet.class);
 	private static final long serialVersionUID = 1L;
-	protected MsControlFactory msControlFactory;
-
 	/**
 	 * The JSR309 Impl is over the MGCP Stack and hence IP Address/Port of MGCP
 	 * Stack of Call Agent (CA) and Media Gateway (MGW) needs to be passed to
@@ -89,26 +92,10 @@ public class PlayerServlet extends SipServlet {
 	}
 
 	@Override
-	public void init(ServletConfig servletConfig) throws ServletException {
+	public void init(ServletConfig servletConfig) throws ServletException {		
+		super.init(servletConfig);
 		if (logger.isDebugEnabled()) {
 			logger.debug("the simple sip servlet has been started");
-		}
-		super.init(servletConfig);
-
-		Properties property = new Properties();
-		property.setProperty(MGCP_STACK_NAME, "SipServlets");
-		property.setProperty(MGCP_PEER_IP, PEER_ADDRESS);
-		property.setProperty(MGCP_PEER_PORT, MGW_PORT);
-
-		property.setProperty(MGCP_STACK_IP, LOCAL_ADDRESS);
-		property.setProperty(MGCP_STACK_PORT, CA_PORT);
-
-		try {
-			// create the Media Session Factory
-			msControlFactory = DriverManager.getDrivers().next().getFactory(
-					property);
-		} catch (Exception e) {
-			throw new ServletException(e);
 		}
 	}
 
@@ -131,6 +118,7 @@ public class PlayerServlet extends SipServlet {
 		SipSession sipSession = request.getSession();
 
 		try {
+			MsControlFactory msControlFactory = (MsControlFactory) getServletContext().getAttribute(MS_CONTROL_FACTORY);
 			// Create new media session and store in SipSession
 			MediaSession mediaSession = (MediaSession) msControlFactory
 					.createMediaSession();
@@ -277,5 +265,38 @@ public class PlayerServlet extends SipServlet {
 			}
 		}
 
+	}
+
+	public void contextDestroyed(ServletContextEvent event) {		
+		Iterator<Driver> drivers = DriverManager.getDrivers();
+		while (drivers.hasNext()) {
+			Driver driver = drivers.next();
+			DriverManager.deregisterDriver(driver);
+			drivers = DriverManager.getDrivers();
+		}
+	}
+
+	public void contextInitialized(ServletContextEvent event) {
+		if(event.getServletContext().getAttribute(MS_CONTROL_FACTORY) == null) {
+			Properties property = new Properties();
+			property.setProperty(MGCP_STACK_NAME, "SipServlets");
+			property.setProperty(MGCP_PEER_IP, PEER_ADDRESS);
+			property.setProperty(MGCP_PEER_PORT, MGW_PORT);
+	
+			property.setProperty(MGCP_STACK_IP, LOCAL_ADDRESS);
+			property.setProperty(MGCP_STACK_PORT, CA_PORT);
+	
+			try {
+				// create the Media Session Factory
+				MsControlFactory msControlFactory = DriverManager.getDrivers().next().getFactory(
+						property);
+				event.getServletContext().setAttribute(MS_CONTROL_FACTORY, msControlFactory);
+				logger.info("started MGCP Stack on " + LOCAL_ADDRESS + "and port " + CA_PORT);
+			} catch (Exception e) {
+				logger.error("couldn't start the underlying MGCP Stack", e);
+			}
+		} else {
+			logger.info("MGCP Stack already started on " + LOCAL_ADDRESS + "and port " + CA_PORT);
+		}
 	}
 }

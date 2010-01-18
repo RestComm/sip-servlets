@@ -13,9 +13,12 @@ There is an Enterprise Monitoring and Management Console at this location http:/
 This application will help you to see metrics and control the different settings of the server (user = admin, password = admin)
 
 This package includes Mobicents Media Server to allow developers to create complete SIP/JEE/Web/Media
-converged applications. For more information about Media Server visit http://groups.google.com/group/mobicents-public/web/mobicents-media-server.
-You can find a real example demonstrating Sip Servlets, JEE, JBoss Seam, Media Server, Text to Speech and
-jBPM working together here http://www.mobicents.org/shopping-demo.html.
+converged applications. For more information about Media Server visit http://www.mobicents.org/mms/mms-main.html
+
+The Media Server is packaged separately at the top level of this distribution in mobicents-media-server and should be started in a different JVM than the Mobicents Sip Servlets one through 
+sh ./mobicents-media-server/bin/run.sh
+
+You can find a real example demonstrating Sip Servlets, JEE, JBoss Seam, Media Server, Text to Speech and jBPM working together here http://www.mobicents.org/shopping-demo.html.
 
 The default port for SIP is 5080. There is two predeployed sample application :
 - click2call : You can navigate to http://localhost:8080/click2call in order to see it in action. See http://www.mobicents.org/click2call.html for more information

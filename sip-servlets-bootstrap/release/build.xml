@@ -12,10 +12,14 @@
 	<property name="jboss.version" value="4.2.3.GA" />
 	<property name="jboss-5.version" value="5.1.0.GA" />
 	<property name="jboss.download.url" value="http://downloads.sourceforge.net/jboss/jboss-${jboss.version}.zip" />
-	<property name="jboss-5.download.url" value="http://downloads.sourceforge.net/jboss/jboss-${jboss-5.version}.zip" />
+	<property name="jboss-5.download.url" value="http://downloads.sourceforge.net/jboss/jboss-${jboss-5.version}.zip" />	
 	
 	<property name="tomcat.version" value="6.0.20" />
 	<property name="tomcat.download.url" value="http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip" />
+	
+	<property name="mms.version" value="2.0.0.BETA3" />
+	<property name="mms.download.url" value="http://sourceforge.net/projects/mobicents/files/Mobicents%20Media%20Server/${mms.version}/mms-standalone-${mms.version}.zip/download" />
+	<property name="mms.zip.path" value="${base.path}/mobicents-media-server.zip" />
 	
 	<property name="embjopr.version" value="1.2.0.CR-JBAS4" />
 	<property name="embjopr.download.url" value="http://downloads.sourceforge.net/rhq/embedded-jopr-${embjopr.version}.zip" />
@@ -149,11 +153,8 @@
 			<property name="jboss.home" value="${jboss-5.home}"/>
 			<property name="jboss.config" value="default"/>
 		</ant>
-		<!-- include MMS 2.X in default dir only -->
-		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-media-server-2.x">
-			<property name="jboss.home" value="${jboss-5.home}"/>
-			<property name="jboss.config" value="default"/>
-		</ant>
+		<!-- include MMS 2.X -->
+		<antcall target="extract-mms"/>
 		<!-- include JSR309 media example -->
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet">
 			<arg line="clean install -U -P set-svn-revision" />
@@ -364,12 +365,12 @@
 		</exec>
 	</target>
 	
-	<target name="build-mobicents-media-server-2.x" depends="get-deps">
+	<!--target name="build-mobicents-media-server-2.x" depends="get-deps">
 		<echo>Building Mobicents Media Server 2.x</echo>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/media/2.x/core">
 			<arg line="clean install -P set-svn-revision -Djboss.home=${jboss-5.home} -Dnode=${jboss.config} -Dmaven.test.skip=true" />
 		</exec>				
-	</target>
+	</target-->
 	
 	<!--target name="build-mobicents-diameter" depends="get-deps">
 		<echo>Building Mobicents Diameter</echo>
@@ -586,6 +587,12 @@
 		<get dest="${jboss-5.distro.zip.path}" src="${jboss-5.download.url}"/>
 	</target>
 	
+	<available file="${mms.zip.path}" property="got.mms" />
+	<target name="get-mms" unless="got.mms">
+		<echo>Downloading JBoss AS 5</echo>
+		<get dest="${mms.zip.path}" src="${mms.download.url}"/>
+	</target>
+	
 	<available file="${jboss-5.torquebox.deployer.zip.path}" property="got.jboss-5-torquebox-deployer" />
 	<target name="get-jboss-5-torquebox-deployer" unless="got.jboss-5-torquebox-deployer">
 		<echo>Downloading JBoss AS 5 Torquebox Deployer</echo>
@@ -614,6 +621,10 @@
 		<delete includeemptydirs="true" failonerror="false" verbose="false">
 			<fileset dir="${jboss-5.home}/server" excludes="${used.configurations.jboss5}" />
 		</delete>
+	</target>
+	
+	<target name="extract-mms" depends="get-mms">
+		<unzip src="${mms.zip.path}" dest="${jboss-5.home}" />
 	</target>
 	
 	<target name="extract-jboss-5-torquebox-deployer" depends="get-jboss-5-torquebox-deployer">			
