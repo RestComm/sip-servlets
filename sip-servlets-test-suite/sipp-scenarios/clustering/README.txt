@@ -1,9 +1,9 @@
 modify the JBOSS_HOME variable in prepare-jboss-server-for-clustering-failover.sh script to map your own
-run sh prepare-jboss-server-for-clustering-failover.sh uas (or proxy, b2bua or uac  if you want to test something else) from this directory
+run sh prepare-jboss-5-server-for-clustering-failover.sh uas (or proxy, b2bua or uac  if you want to test something else) from this directory
 run sh start-lb.sh from this directory
-run sh start-jboss-server-port-1.sh from this directory
+run sh start-jboss-5-server-node1.sh from this directory
 When server is fully started
-run sh start-jboss-server-port-2.sh from this directory
+run sh start-jboss-5-server-node2.sh from this directory
 When server is fully started
 run sh clustering-failover-test.sh uas (or proxy, b2bua, b2bua-remote-send-bye, uac if you want to test something else) from this directory 
 When the ACK has been received kill the first node, the second node still handles the BYE and sends the OK to it :-)

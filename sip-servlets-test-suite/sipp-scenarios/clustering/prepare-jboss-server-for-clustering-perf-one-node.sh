@@ -12,7 +12,7 @@
 rm -rf $JBOSS_HOME/server/port-1
 rm -rf $JBOSS_HOME/server/port-2
 
-mvn clean install -o -f ../../../pom.xml -P jboss,jboss-cluster -Dnode=all
+mvn clean install -f ../../../pom.xml -P jboss,jboss-cluster -Dnode=all
 cp setup/jboss/performance/mss-sip-stack.properties $JBOSS_HOME/server/all/conf/mss-sip-stack.properties
 cp setup/jboss/jboss-context.xml $JBOSS_HOME/server/all/deploy/jboss-web.deployer/context.xml
 cp setup/jboss/jboss-tomcat-service.xml $JBOSS_HOME/server/all/deploy/jboss-web.deployer/META-INF/jboss-service.xml
@@ -26,25 +26,25 @@ if [ $# -ne 0 ]; then
 	case $1 in	
 	    proxy)
 	    		echo "Distributed example used is proxy"
-	    		mvn clean install -o -f ../../../sip-servlets-examples/location-service-distributable/pom.xml
+	    		mvn clean install -f ../../../sip-servlets-examples/location-service-distributable/pom.xml
 				cp ../../../sip-servlets-examples/location-service-distributable/target/location-service-distributable-*.war $JBOSS_HOME/server/all/deploy
 				cp ../../../sip-servlets-examples/location-service-distributable/distributable-location-service-dar.properties $JBOSS_HOME/server/all/conf/dars/distributable-dar.properties
 	            ;;
 	    b2bua)
 	            echo "Distributed example used is b2bua"
-	    		mvn clean install -o -f ../../../sip-servlets-examples/call-forwarding-distributable/pom.xml
+	    		mvn clean install -f ../../../sip-servlets-examples/call-forwarding-distributable/pom.xml
 				cp ../../../sip-servlets-examples/call-forwarding-distributable/target/call-forwarding-distributable-*.war $JBOSS_HOME/server/all/deploy
 				cp ../../../sip-servlets-examples/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/all/conf/dars/distributable-dar.properties
 	            ;;
 	    c2c)
 	    		echo "Distributed example used is Click To call"
-	    		mvn clean install -o -f ../../../sip-servlets-examples/click2call-distributable/pom.xml
+	    		mvn clean install -f ../../../sip-servlets-examples/click2call-distributable/pom.xml
 				cp ../../../sip-servlets-examples/click2call-distributable/target/click2call-distributable*.war $JBOSS_HOME/server/all/deploy/click2call-distributable.war
 				echo "" > $JBOSS_HOME/server/all/conf/dars/distributable-dar.properties
 				;;	    
 	    *)
 	            echo "Distributed example used is uas"
-	    		mvn clean install -o -f ../../../sip-servlets-examples/simple-sip-servlet-distributable/pom.xml
+	    		mvn clean install -f ../../../sip-servlets-examples/simple-sip-servlet-distributable/pom.xml
 				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/all/deploy
 				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/all/conf/dars/distributable-dar.properties
 	            ;;
@@ -59,9 +59,9 @@ if [ $# -ne 0 ]; then
 	case $1 in		    
 	    uac)
 	            echo "Distributed example used is uac"
-	    		mvn clean process-resources -Dsend.on.init=true install -o -f ../../../sip-servlets-examples/shootist-sip-servlet-distributable/pom.xml
+	    		mvn clean process-resources -Dsend.on.init=true install -f ../../../sip-servlets-examples/shootist-sip-servlet-distributable/pom.xml
 				cp ../../../sip-servlets-examples/shootist-sip-servlet-distributable/target/shootist-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-1/deploy
-				mvn clean process-resources -Dsend.on.init=false install -o -f ../../../sip-servlets-examples/shootist-sip-servlet-distributable/pom.xml
+				mvn clean process-resources -Dsend.on.init=false install -f ../../../sip-servlets-examples/shootist-sip-servlet-distributable/pom.xml
 				cp ../../../sip-servlets-examples/shootist-sip-servlet-distributable/target/shootist-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-2/deploy
 				cp ../../../sip-servlets-examples/shootist-sip-servlet-distributable/distributable-shootist-dar.properties $JBOSS_HOME/server/port-1/conf/dars/distributable-dar.properties
 				cp ../../../sip-servlets-examples/shootist-sip-servlet-distributable/distributable-shootist-dar.properties $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties

@@ -1,4 +1,4 @@
-#export TEST_IP=192.168.0.10
+#export TEST_IP=192.168.0.11
 export TEST_IP=127.0.0.1
 echo Using $TEST_IP for the test
 
