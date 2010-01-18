@@ -121,6 +121,20 @@
 	signalingTransport="udp" 
     sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
 	
+	<!-- Define the default TCP SIP Connector -->
+    <Connector port="5080" 
+	     ipAddress = "127.0.0.1"
+	     protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
+	     signalingTransport="tcp" 
+    	 sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
+    	 
+    <!-- Define the default TLS SIP Connector -->
+    <Connector port="5081" 
+	     ipAddress = "127.0.0.1"
+	     protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
+	     signalingTransport="tls" 
+    	 sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
+	
     <!-- An Engine represents the entry point (within Catalina) that processes
          every request.  The Engine implementation for Tomcat stand alone
          analyzes the HTTP headers included with the request, and passes them
