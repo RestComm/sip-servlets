@@ -624,7 +624,8 @@
 	</target>
 	
 	<target name="extract-mms" depends="get-mms">
-		<unzip src="${mms.zip.path}" dest="${jboss-5.home}" />
+		<mkdir dir="${jboss-5.home}/mobicents-media-server"/>
+		<unzip src="${mms.zip.path}" dest="${jboss-5.home}/mobicents-media-server" />
 	</target>
 	
 	<target name="extract-jboss-5-torquebox-deployer" depends="get-jboss-5-torquebox-deployer">			
