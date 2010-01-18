@@ -67,7 +67,7 @@ Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
 From : [$2]
 To : [$1]
 Call-ID: [call_id]
-CSeq: 2 BYE
+CSeq: 1 BYE
 Contact: sip:LittleGuy@[local_ip]:[local_port]
 [routes]
 Max-Forwards: 70
