@@ -734,9 +734,10 @@ public class ProxyImpl implements Proxy, Externalizable {
 		String address = inetAddress.getHostAddress();
 		List<SipURI> list = this.sipFactoryImpl.getSipNetworkInterfaceManager().getOutboundInterfaces();
 		SipURI networkInterface = null;
-		for(SipURI networkInterfaceURI:list) {
+		for(SipURI networkInterfaceURI : list) {
 			if(networkInterfaceURI.toString().contains(address)) {
 				networkInterface = networkInterfaceURI;
+				break;
 			}
 		}
 		
@@ -754,9 +755,10 @@ public class ProxyImpl implements Proxy, Externalizable {
 			+ ":" + inetSocketAddress.getPort();
 		List<SipURI> list = this.sipFactoryImpl.getSipNetworkInterfaceManager().getOutboundInterfaces();
 		SipURI networkInterface = null;
-		for(SipURI networkInterfaceURI:list) {
+		for(SipURI networkInterfaceURI : list) {
 			if(networkInterfaceURI.toString().contains(address)) {
 				networkInterface = networkInterfaceURI;
+				break;
 			}
 		}
 		
