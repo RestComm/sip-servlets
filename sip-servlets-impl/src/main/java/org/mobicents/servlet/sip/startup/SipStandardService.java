@@ -635,30 +635,37 @@ public class SipStandardService extends StandardService implements SipService {
 		if(sipConnector == null) {
 			throw new IllegalArgumentException("The sip connector passed is null");
 		}
-		Connector connectorToRemove = findSipConnector(sipConnector.getIpAddress(), sipConnector.getPort(),
+		Connector connectorToAdd = findSipConnector(sipConnector.getIpAddress(), sipConnector.getPort(),
 				sipConnector.getTransport());
-		if(connectorToRemove == null) {
+		if(connectorToAdd == null) {
 			Connector connector = new Connector(
 					SipProtocolHandler.class.getName());
-			SipProtocolHandler protocolHandler = (SipProtocolHandler) connector
+			SipProtocolHandler sipProtocolHandler = (SipProtocolHandler) connector
 					.getProtocolHandler();
-			protocolHandler.setSipConnector(sipConnector);		
+			sipProtocolHandler.setSipConnector(sipConnector);		
 			connector.setService(this);
 			connector.setContainer(container);
-			connector.init();
-			addConnector(connector);	
+			connector.init();		
+			addConnector(connector);			
 			ExtendedListeningPoint extendedListeningPoint = (ExtendedListeningPoint)
-			connector.getProtocolHandler().getAttribute(ExtendedListeningPoint.class.getSimpleName());
+			sipProtocolHandler.getAttribute(ExtendedListeningPoint.class.getSimpleName());
 			if(extendedListeningPoint != null) {
 				try {
 					extendedListeningPoint.getSipProvider().addSipListener(sipApplicationDispatcher);
 					sipApplicationDispatcher.getSipNetworkInterfaceManager().addExtendedListeningPoint(extendedListeningPoint);
 				} catch (TooManyListenersException e) {
 					logger.error("Connector.initialize", e);
+					removeConnector(connector);
 					return false;
 				}			
 			}
-			return true;
+			if(!sipProtocolHandler.isStarted()) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Sip Connector couldn't be started, removing it automatically");
+				}
+				removeConnector(connector);
+			}
+			return sipProtocolHandler.isStarted();
 		}
 		return false;
 	}

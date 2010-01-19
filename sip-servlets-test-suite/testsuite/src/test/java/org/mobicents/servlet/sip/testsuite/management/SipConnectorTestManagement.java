@@ -304,6 +304,74 @@ public class SipConnectorTestManagement extends SipServletTestCase {
         logger.info("All clear");
 	}
 	
+	/**
+	 * Non regression  test for Issue 1166 : NullPointerException on remove sip connector programmatically using JMX which was added with bind errors
+	 * http://code.google.com/p/mobicents/issues/detail?id=1166
+	 */
+	public void testShootmeAlreadyBoundAndRemove() throws Exception {
+		logger.info("\nCreate an RMI connector client and " +
+		 "connect it to the RMI connector server");
+		StringBuffer urlString = new StringBuffer();
+		urlString.append("service:jmx:rmi://localhost:");
+		urlString.append(8999);
+		urlString.append("/jndi/rmi://localhost:");
+		urlString.append(8999);
+		urlString.append("/jmxrmi");
+           JMXServiceURL url = new JMXServiceURL(
+        		   urlString.toString());
+           JMXConnector jmxc = JMXConnectorFactory.connect(url, null);
+
+           
+		ObjectName objectName = new ObjectName(serverName + ":type=Service,serviceName="+ serverName);
+		// Get the Platform MBean Server
+		MBeanServerConnection mbsc = jmxc.getMBeanServerConnection();
+        MBeanInfo mbeanInfo = mbsc.getMBeanInfo(objectName);
+        MBeanOperationInfo[] operationInfos = mbeanInfo.getOperations();
+        System.out.println("MBean Operations:");
+        String[] operationNames = new String[operationInfos.length];
+        for (int i = 0; i < operationInfos.length; i++) {
+           System.out.println(i + ": " + operationInfos[i].getDescription() + " " +
+        		   operationInfos[i].getSignature());
+           operationNames[i] = operationInfos[i].getName();
+        }
+		
+        Thread.sleep(TIMEOUT);
+        
+        receiver.getAllMessagesContent().clear();
+        
+        SipConnector[] sipConnectors = (SipConnector[]) mbsc.invoke(objectName, "findSipConnectors", null, null);
+//        Thread.sleep(TIMEOUT);
+        assertEquals(1, sipConnectors.length);
+        for (int i = 0; i < sipConnectors.length; i++) {
+			logger.info(sipConnectors[i]);
+		}
+        
+        // trying to add a connector that is already bound to an external application
+        SipConnector udpSipConnector = new SipConnector();
+        udpSipConnector.setIpAddress("127.0.0.1");
+        udpSipConnector.setPort(5080);
+        udpSipConnector.setTransport(ListeningPoint.UDP);
+        logger.info("Trying to add a sip connector already bound to an external applicaiton");
+        assertFalse((Boolean)mbsc.invoke(objectName, "addSipConnector",new Object[] {udpSipConnector}, new String[]{SipConnector.class.getCanonicalName()}));
+        assertEquals(1, sipConnectors.length);
+        for (int i = 0; i < sipConnectors.length; i++) {
+			logger.info(sipConnectors[i]);
+		}
+        // trying to remove a connector not present should return false and no messages should have been received
+        logger.info("Trying to remove a sip connector that was badly added");
+        assertFalse((Boolean)mbsc.invoke(objectName, "removeSipConnector",new Object[] {"127.0.0.1", 5080, ListeningPoint.UDP}, new String[]{String.class.getCanonicalName(), int.class.getCanonicalName(), String.class.getCanonicalName()}));
+        sipConnectors = (SipConnector[]) mbsc.invoke(objectName, "findSipConnectors", null, null);
+        assertEquals(1, sipConnectors.length);
+        for (int i = 0; i < sipConnectors.length; i++) {
+			logger.info(sipConnectors[i]);
+		}
+        
+        assertEquals(1, sipConnectors.length);                     
+        assertEquals(0, receiver.getAllMessagesContent().size());
+        assertEquals(0, receiverTcp.getAllMessagesContent().size());                  
+        logger.info("All clear");
+	}
+	
 	@Override
 	protected void tearDown() throws Exception {							
 		super.tearDown();

@@ -144,7 +144,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 		//Jboss specific unloading case
 		SipApplicationDispatcher sipApplicationDispatcher = (SipApplicationDispatcher)
 			getAttribute(SipApplicationDispatcher.class.getSimpleName());
-		if(sipApplicationDispatcher != null) {
+		if(sipApplicationDispatcher != null && extendedListeningPoint != null) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Removing the Sip Application Dispatcher as a sip listener for listening point " + extendedListeningPoint);
 			}
@@ -152,26 +152,30 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			sipApplicationDispatcher.getSipNetworkInterfaceManager().removeExtendedListeningPoint(extendedListeningPoint);
 		}
 		// removing listening point and sip provider
-		if(logger.isDebugEnabled()) {
-			logger.debug("Removing the following Listening Point " + extendedListeningPoint);
+		if(sipStack != null) {
+			if(extendedListeningPoint != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Removing the following Listening Point " + extendedListeningPoint);
+				}
+				sipStack.deleteSipProvider(extendedListeningPoint.getSipProvider());
+				if(logger.isDebugEnabled()) {
+					logger.debug("Removing the sip provider");
+				}
+				sipStack.deleteListeningPoint(extendedListeningPoint.getListeningPoint());
+				extendedListeningPoint = null;
+			}
+			// stopping the sip stack
+			if(!sipStack.getListeningPoints().hasNext() && !sipStack.getSipProviders().hasNext()) {
+				sipStack.stop();
+				sipStack = null;
+				logger.info("Sip stack stopped");
+			}		
 		}
-		sipStack.deleteSipProvider(extendedListeningPoint.getSipProvider());
-		if(logger.isDebugEnabled()) {
-			logger.debug("Removing the sip provider");
-		}
-		sipStack.deleteListeningPoint(extendedListeningPoint.getListeningPoint());
-		extendedListeningPoint = null;
-		// stopping the sip stack
-		if(!sipStack.getListeningPoints().hasNext() && !sipStack.getSipProviders().hasNext()) {
-			sipStack.stop();
-			sipStack = null;
-			logger.info("Sip stack stopped");
-		}		
-		if (tpOname!=null)
+		if (tpOname != null)
             Registry.getRegistry(null, null).unregisterComponent(tpOname);
         if (rgOname != null)
             Registry.getRegistry(null, null).unregisterComponent(rgOname);
-        started = false;
+        setStarted(false);
 	}
 
 	public Adapter getAdapter() {		
@@ -507,13 +511,12 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	            Registry.getRegistry(null, null).registerComponent
 	                ( sipStack, rgOname, null );
 	        }
-			started = true;
+			setStarted(true);
 		} catch (Exception ex) {			
-			logger.fatal(
-					"Bad shit happened -- check server.xml for tomcat. ", ex);			
-			throw ex;
+			logger.error(
+					"Bad shit happened -- check server.xml for tomcat. ", ex);						
 		} finally {
-			if(!started) {
+			if(!isStarted()) {
 				destroy();
 			}
 		}
@@ -584,7 +587,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	 */
 	public void setSignalingTransport(String transport) throws Exception {
 		sipConnector.setTransport(transport);
-		if(started) {
+		if(isStarted()) {
 			destroy();
 			start();
 		}
@@ -604,7 +607,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	 */
 	public void setPort(int port) throws Exception {
 		sipConnector.setPort(port);
-		if(started) {
+		if(isStarted()) {
 			destroy();
 			start();
 		}
@@ -612,7 +615,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 		
 	public void setIpAddress(String ipAddress) throws Exception {
 		sipConnector.setIpAddress(ipAddress);
-		if(started) {
+		if(isStarted()) {
 			destroy();
 			start();
 		}
@@ -802,5 +805,19 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	 */
 	public String getAddressResolverClass() {
 		return addressResolverClass;
+	}
+
+	/**
+	 * @param started the started to set
+	 */
+	public void setStarted(boolean started) {
+		this.started = started;
+	}
+
+	/**
+	 * @return the started
+	 */
+	public boolean isStarted() {
+		return started;
 	}
 }
