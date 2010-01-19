@@ -66,6 +66,13 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>org.mobicents.servlet.sip</groupId>
+			<artifactId>sip-servlets-jruby</artifactId>
+			<version>1.2-SNAPSHOT</version>	
+			<scope>provided</scope>		
+		</dependency>
+		
+		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>${commons-logging.version}</version>
@@ -244,8 +251,7 @@
 							<execution>
 								<phase>package</phase>
 								<configuration>
-									<tasks>
-										<!--copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deployers/jbossweb.deployer/" /-->
+									<tasks>										
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar/" />
 									</tasks>
 								</configuration>
@@ -434,8 +440,7 @@
 							<execution>
 								<phase>package</phase>
 								<configuration>
-									<tasks>
-										<!--copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deployers/jbossweb.deployer/" /-->
+									<tasks>										
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar/" />
 									</tasks>
 								</configuration>

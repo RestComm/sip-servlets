@@ -30,6 +30,12 @@
 			<version>1.2-SNAPSHOT</version>			
 		</dependency>
 		
+		<dependency>
+			<groupId>org.mobicents.servlet.sip</groupId>
+			<artifactId>sip-servlets-jruby</artifactId>
+			<version>1.2-SNAPSHOT</version>			
+		</dependency>
+		
 		<!-- logging dependency -->
 		<dependency>
 			<groupId>log4j</groupId>
@@ -337,8 +343,7 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar" />
-										<!--copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deployers/jbossweb.deployer" /-->
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar" />										
 										<copy verbose="true" file="docs/jboss5/jboss-log4j.xml" todir="${env.JBOSS_HOME}/server/${node}/conf" />
 										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${env.JBOSS_HOME}/server/${node}/conf" />
                                         <copy todir="${env.JBOSS_HOME}/docs/licenses">
@@ -385,8 +390,7 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar" />
-										<!--copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deployers/jbossweb.deployer" /-->
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar" />										
 										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${env.JBOSS_HOME}/server/${node}/conf" />
                                         <copy todir="${env.JBOSS_HOME}/docs/licenses">
                                             <fileset file="LICENSES/*" />

@@ -44,5 +44,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-spec"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-annotations"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-client"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-jruby"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
