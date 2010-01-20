@@ -17,7 +17,6 @@
 package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.Properties;
 
 import javax.media.mscontrol.MediaEventListener;
@@ -27,16 +26,13 @@ import javax.media.mscontrol.MsControlFactory;
 import javax.media.mscontrol.networkconnection.NetworkConnection;
 import javax.media.mscontrol.networkconnection.SdpPortManager;
 import javax.media.mscontrol.networkconnection.SdpPortManagerEvent;
-import javax.media.mscontrol.spi.Driver;
 import javax.media.mscontrol.spi.DriverManager;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
-import javax.servlet.sip.SipServlet;
-import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipServletResponse;
-import javax.servlet.sip.SipSession;
+
+import org.mobicents.javax.media.mscontrol.MsControlFactoryImpl;
 
 import org.apache.log4j.Logger;
 
@@ -267,13 +263,22 @@ public class PlayerServlet extends SipServlet implements ServletContextListener 
 
 	}
 
-	public void contextDestroyed(ServletContextEvent event) {		
-		Iterator<Driver> drivers = DriverManager.getDrivers();
-		while (drivers.hasNext()) {
-			Driver driver = drivers.next();
-			DriverManager.deregisterDriver(driver);
-			drivers = DriverManager.getDrivers();
+	public void contextDestroyed(ServletContextEvent event) {
+		//This happens automatically. No need to force it
+//		Iterator<Driver> drivers = DriverManager.getDrivers();
+//		while (drivers.hasNext()) {
+//			Driver driver = drivers.next();
+//			DriverManager.deregisterDriver(driver);
+//			drivers = DriverManager.getDrivers();
+//		}
+		MsControlFactoryImpl msControlFactoryImpl = (MsControlFactoryImpl)event.getServletContext().getAttribute(MS_CONTROL_FACTORY);
+		if(msControlFactoryImpl != null) {
+			msControlFactoryImpl.clearMgcpStackProvider();
+		} else{
+			logger.warn("couldn't find the MsControlFactoryImpl");
 		}
+		
+		
 	}
 
 	public void contextInitialized(ServletContextEvent event) {
