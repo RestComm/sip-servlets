@@ -31,10 +31,14 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
-
-import org.mobicents.javax.media.mscontrol.MsControlFactoryImpl;
+import javax.servlet.sip.SipServlet;
+import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSession;
 
 import org.apache.log4j.Logger;
+
+import org.mobicents.javax.media.mscontrol.MsControlFactoryImpl;
 
 /**
  * This example shows a simple usage of JSR 309.
