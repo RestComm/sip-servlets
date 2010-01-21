@@ -202,7 +202,7 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.CATALINA_HOME}\lib" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.CATALINA_HOME}/lib" />
 										<copy verbose="true" file="docs/logging.properties" todir="${env.CATALINA_HOME}/conf" />
 										<copy verbose="true" file="docs/log4j.xml" todir="${env.CATALINA_HOME}/lib" />
 										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${CATALINA_HOME}/conf" />
