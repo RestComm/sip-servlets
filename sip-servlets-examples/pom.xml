@@ -41,7 +41,7 @@
 
 	<properties>
 		<!-- MOBICENTS MEDIA SERVER VERSIONS -->
-		<mms.version>2.0.0.BETA3</mms.version>
+		<mms.version>1.0.3.GA</mms.version>
 		<jsr309.version>2.0.0.BETA3-SNAPSHOT</jsr309.version>
 		<jsr309.mscontrol.version>0.3</jsr309.mscontrol.version>
         <war.plugin.version>2.1-beta-1</war.plugin.version>
