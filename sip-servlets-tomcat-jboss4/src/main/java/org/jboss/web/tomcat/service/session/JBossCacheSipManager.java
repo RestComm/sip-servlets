@@ -1808,8 +1808,8 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 			return;
 		}
 
-		if (log_.isDebugEnabled()) {
-			log_.debug("Looking for sessions that have expired ...");
+		if (log_.isTraceEnabled()) {
+			log_.trace("Looking for sessions that have expired ...");
 		}
 
 		try {
