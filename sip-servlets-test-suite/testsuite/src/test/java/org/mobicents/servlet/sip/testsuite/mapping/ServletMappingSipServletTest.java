@@ -100,7 +100,7 @@ public class ServletMappingSipServletTest extends SipServletTestCase {
 		for (int i = 0; i < MESSAGES.length; i++) {
 			assertTrue(sender.getAllMessagesContent().contains(MESSAGES[i]));
 		}			
-		assertTrue(sender.getFinalResponseStatus() == 200);
+		assertEquals(200, sender.getFinalResponseStatus());
 		assertTrue(sender.getOkToByeReceived());		
 	}
 	
@@ -117,7 +117,7 @@ public class ServletMappingSipServletTest extends SipServletTestCase {
 		toAddress.setParameter("foo", "fighter");
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
-		assertTrue(sender.getFinalResponseStatus() == 404);
+		assertEquals(404, sender.getFinalResponseStatus());
 		assertTrue(sender.isFinalResponseReceived());		
 	}
 	
@@ -134,7 +134,7 @@ public class ServletMappingSipServletTest extends SipServletTestCase {
 		toAddress.setParameter("foo", "fighter");
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
-		assertTrue(sender.getFinalResponseStatus() == 404);
+		assertEquals(404, sender.getFinalResponseStatus());
 		assertTrue(sender.isFinalResponseReceived());		
 	}
 	
@@ -150,7 +150,7 @@ public class ServletMappingSipServletTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
-		assertTrue(sender.getFinalResponseStatus() == 404);
+		assertEquals(404, sender.getFinalResponseStatus());
 		assertTrue(sender.isFinalResponseReceived());		
 	}
 	
@@ -166,9 +166,44 @@ public class ServletMappingSipServletTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
-		assertTrue(sender.getFinalResponseStatus() == 410);
+		assertEquals(410, sender.getFinalResponseStatus());
 		assertTrue(sender.isFinalResponseReceived());		
 	}
+	
+	public void testServletMappingsInTurn() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "servlet-mapping";
+		String toSipAddress = "mobicents.sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		toAddress.setParameter("foo", "fighter");
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
+		Thread.sleep(TIMEOUT);
+		assertEquals(200, sender.getFinalResponseStatus());
+		assertTrue(sender.isFinalResponseReceived());
+		
+		toUser = "servlet-mapping2";
+		toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+		Thread.sleep(TIMEOUT);
+		assertEquals(410, sender.getFinalResponseStatus());
+		assertTrue(sender.isFinalResponseReceived());
+		
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		for (int i = 0; i < MESSAGES.length; i++) {
+			assertTrue(sender.getAllMessagesContent().contains(MESSAGES[i]));
+		}			
+	}
+	
 	public void testServletSecondMappingKO() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
@@ -181,7 +216,7 @@ public class ServletMappingSipServletTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);
-		assertTrue(sender.getFinalResponseStatus() == 404);
+		assertEquals(404, sender.getFinalResponseStatus());
 		assertTrue(sender.isFinalResponseReceived());		
 	}
 

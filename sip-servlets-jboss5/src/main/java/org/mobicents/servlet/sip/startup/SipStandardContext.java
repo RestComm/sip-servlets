@@ -122,8 +122,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	protected String description;
 	protected int proxyTimeout;
 	protected int sipApplicationSessionTimeout;
-	protected transient SipListenersHolder sipListeners;
-	protected String mainServlet;	
+	protected transient SipListenersHolder sipListeners;	
 	protected transient SipFactoryFacade sipFactoryFacade;	
 	protected transient SipSessionsUtilImpl sipSessionsUtil;
 	protected transient SipLoginConfig sipLoginConfig;
@@ -139,7 +138,11 @@ public class SipStandardContext extends StandardContext implements SipContext {
      * application, in the order they were encountered in the sip.xml file.
      */
     protected transient List<String> sipApplicationListeners = new CopyOnWriteArrayList<String>();
-    
+    // Issue 1200 this is needed to be able to give a default servlet handler if we are not in main-servlet servlet selection case
+    // by example when creating a new sip application session from a factory from an http servlet
+    private String servletHandler;
+    protected boolean isMainServlet;
+    private String mainServlet;
     /**
      * The set of sip servlet mapping configured for this
      * application.
@@ -174,6 +177,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}
 		sasTimerService = new DefaultSipApplicationSessionTimerService(4);
 		sipApplicationSessionTimerFactory = new DefaultSipApplicationSessionTimerFactory();
+		isMainServlet = false;
 	}
 
 	@Override
@@ -591,6 +595,13 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	public void setListeners(SipListenersHolder listeners) {
 		this.sipListeners = listeners;
 	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#isMainServlet()
+	 */
+	public boolean isMainServlet() {
+		return isMainServlet;
+	}
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.SipContext#getMainServlet()
 	 */
@@ -602,6 +613,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 */
 	public void setMainServlet(String mainServlet) {
 		this.mainServlet = mainServlet;
+		this.isMainServlet = true;
 	}
 
 	/* (non-Javadoc)
@@ -812,6 +824,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 */
 	public void addSipServletMapping(SipServletMapping sipServletMapping) {
 		sipServletMappings.add(sipServletMapping);
+		isMainServlet = false;
+		if(servletHandler == null) {
+			servletHandler = sipServletMapping.getServletName();
+		}
 	}
 	/**
 	 * {@inheritDoc}
@@ -1163,5 +1179,19 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 */
 	public SipApplicationSessionTimerFactory getSipApplicationSessionTimerFactory() {
 		return sipApplicationSessionTimerFactory;
+	}
+
+	/**
+	 * @return the servletHandler
+	 */
+	public String getServletHandler() {
+		return servletHandler;
+	}
+
+	/**
+	 * @param servletHandler the servletHandler to set
+	 */
+	public void setServletHandler(String servletHandler) {
+		this.servletHandler = servletHandler;
 	}
 }

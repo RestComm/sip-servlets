@@ -57,14 +57,14 @@ public class ServletMappingSipServlet extends SipServlet implements SipServletLi
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
 
+		sendMessage("inviteReceived");
+		
 		logger.info("Got request: "
 				+ request.getMethod());
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
 		sipServletResponse.send();
 		sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
-		
-		sendMessage("inviteReceived");
 	}
 
 	/**

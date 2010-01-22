@@ -77,9 +77,14 @@ public interface SipContext extends Context {
 
 	void setListeners(SipListenersHolder listeners);
 
+	boolean isMainServlet();
+	
 	String getMainServlet();
 
 	void setMainServlet(String mainServlet);
+	
+	void setServletHandler(String servletHandler);
+	String getServletHandler();
 
 	int getProxyTimeout();
 	

@@ -167,7 +167,7 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 		MobicentsSipSession sipSessionImpl = (MobicentsSipSession)request.getSession();
 		if(sipSessionImpl.getHandler() == null) {
 			try {
-				sipSessionImpl.setHandler(sipContext.getMainServlet());
+				sipSessionImpl.setHandler(sipContext.getServletHandler());
 //				((SipApplicationSessionImpl)sipSessionImpl.getApplicationSession()).setSipContext(sipContext);
 			} catch (ServletException se) {
 				//should never happen

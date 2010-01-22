@@ -661,7 +661,8 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				String sipSessionHandlerName = sipSessionImpl.getHandler();						
 				if(sipSessionHandlerName == null || sipSessionHandlerName.length() < 1) {
 					String mainServlet = appSession.getCurrentRequestHandler();
-					if(mainServlet != null && mainServlet.length() > 0) {
+					//Fix for Issue 1200 : if we are not in a main-servlet servlet selection type, the mapping discovery should always be performed 
+					if(sipContext.isMainServlet() && mainServlet != null && mainServlet.length() > 0) {
 						sipSessionHandlerName = mainServlet;				
 					} else {
 						SipServletMapping sipServletMapping = sipContext.findSipServletMappings(sipServletRequest);

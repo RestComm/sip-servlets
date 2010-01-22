@@ -18,7 +18,6 @@ package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
 
-import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipErrorEvent;
