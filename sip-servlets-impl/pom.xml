@@ -83,14 +83,14 @@
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>catalina</artifactId>
-			<version>6.0.20</version>
+			<version>${tomcat.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>coyote</artifactId>
-			<version>6.0.20</version>
+			<version>${tomcat.version}</version>
 			<scope>provided</scope>
 		</dependency>									
 		
