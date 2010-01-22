@@ -523,39 +523,39 @@
 	<target name="make-final-zip-jboss" depends="set-time-stamp">
 		<fixcrlf srcdir="${jboss.home}/bin" includes="*.sh" eol="lf" eof="remove" />
 		<zip destfile="${base.path}/mss-${mss.release.version}-jboss-${jboss.version}-${time.stamp}.zip" filesonly="false">
-			<zipfileset dir="${jboss.home}/bin" filemode="755" prefix="bin">
+			<zipfileset dir="${jboss.home}/bin" filemode="755" prefix="mss-${mss.release.version}-jboss-${jboss.version}/bin">
 				<include name="*.sh" />
 			</zipfileset>
-			<zipfileset dir="${jboss.home}/bin" prefix="bin">
+			<zipfileset dir="${jboss.home}/bin" prefix="mss-${mss.release.version}-jboss-${jboss.version}/bin">
 				<exclude name="*.sh" />
 			</zipfileset>
-			<zipfileset dir="${jboss.home}" prefix="" excludes="**/bin/** **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**"/>
+			<zipfileset dir="${jboss.home}" prefix="mss-${mss.release.version}-jboss-${jboss.version}" excludes="**/bin/** **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**"/>
 		</zip>
 	</target>
 	
 	<target name="make-final-zip-jboss-5" depends="set-time-stamp">
 		<fixcrlf srcdir="${jboss-5.home}/bin" includes="*.sh" eol="lf" eof="remove" />
 		<zip destfile="${base.path}/mss-${mss.release.version}-jboss-${jboss-5.version}-${time.stamp}.zip" filesonly="false">
-			<zipfileset dir="${jboss-5.home}/bin" filemode="755" prefix="bin">
+			<zipfileset dir="${jboss-5.home}/bin" filemode="755" prefix="mss-${mss.release.version}-jboss-${jboss-5.version}/bin">
 				<include name="*.sh" />
 			</zipfileset>
-			<zipfileset dir="${jboss-5.home}/bin" prefix="bin">
+			<zipfileset dir="${jboss-5.home}/bin" prefix="mss-${mss.release.version}-jboss-${jboss-5.version}/bin">
 				<exclude name="*.sh" />
 			</zipfileset>
-			<zipfileset dir="${jboss-5.home}" prefix="" excludes="**/bin/** **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**"/>
+			<zipfileset dir="${jboss-5.home}" prefix="mss-${mss.release.version}-jboss-${jboss-5.version}" excludes="**/bin/** **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**"/>
 		</zip>
 	</target>
 	
 	<target name="make-final-zip-tomcat" depends="set-time-stamp">
 		<fixcrlf srcdir="${tomcat.home}/bin" includes="*.sh" eol="lf" eof="remove" />
 		<zip destfile="${base.path}/mss-${mss.release.version}-apache-tomcat-${tomcat.version}-${time.stamp}.zip" filesonly="false">
-			<zipfileset dir="${tomcat.home}/bin" filemode="755" prefix="bin">
+			<zipfileset dir="${tomcat.home}/bin" filemode="755" prefix="mss-${mss.release.version}-apache-tomcat-${tomcat.version}/bin">
 				<include name="*.sh" />
 			</zipfileset>
-			<zipfileset dir="${tomcat.home}/bin" prefix="bin">
+			<zipfileset dir="${tomcat.home}/bin" prefix="mss-${mss.release.version}-apache-tomcat-${tomcat.version}/bin">
 				<exclude name="*.sh" />
 			</zipfileset>
-			<zipfileset dir="${tomcat.home}" prefix="" excludes="**/bin/**"/>
+			<zipfileset dir="${tomcat.home}" prefix="mss-${mss.release.version}-apache-tomcat-${tomcat.version}" excludes="**/bin/**"/>
 		</zip>
 	</target>
 	
