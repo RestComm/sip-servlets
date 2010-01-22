@@ -658,9 +658,15 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			try {
 				sipSessionImpl.setSessionCreatingTransaction(sipServletRequest.getTransaction());								
 				
-				String sipSessionHandlerName = sipSessionImpl.getHandler();						
+				String sipSessionHandlerName = sipSessionImpl.getHandler();
+				if(logger.isDebugEnabled()) {
+					logger.debug("sipSessionHandlerName = " + sipSessionHandlerName);
+				}
 				if(sipSessionHandlerName == null || sipSessionHandlerName.length() < 1) {
 					String mainServlet = appSession.getCurrentRequestHandler();
+					if(logger.isDebugEnabled()) {
+						logger.debug("current request Handler = " + sipSessionHandlerName);
+					}
 					//Fix for Issue 1200 : if we are not in a main-servlet servlet selection type, the mapping discovery should always be performed 
 					if(sipContext.isMainServlet() && mainServlet != null && mainServlet.length() > 0) {
 						sipSessionHandlerName = mainServlet;				
@@ -670,8 +676,11 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 							logger.error("Sending 404 because no matching servlet found for this request ");
 							sendErrorResponse(Response.NOT_FOUND, (ServerTransaction) sipServletRequest.getTransaction(), request, sipProvider);
 							return;
-						} else if(sipServletMapping != null) {
+						} else if(sipServletMapping != null) {							
 							sipSessionHandlerName = sipServletMapping.getServletName();
+							if(logger.isDebugEnabled()) {
+								logger.debug("servlet mapping Handler Name= " + sipSessionHandlerName);
+							}
 						}
 					}
 					if(sipSessionHandlerName!= null) {							

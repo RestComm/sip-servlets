@@ -1100,7 +1100,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		this.currentRequestHandler = currentRequestHandler;
 		// Fix for issue 1087 (http://code.google.com/p/mobicents/issues/detail?id=1087) : 
 		// Can not make an instance of SipApplicationSession for servlet-selection type of applications
-		if(sipContext != null) {
+		if(sipContext != null && !sipContext.isMainServlet()) {
 			sipContext.setServletHandler(currentRequestHandler);
 		}
 	}
