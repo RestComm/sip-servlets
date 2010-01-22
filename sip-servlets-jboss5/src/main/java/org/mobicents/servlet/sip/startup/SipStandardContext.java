@@ -312,7 +312,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			// if there is only one servlet in the application then this
 			// declaration is optional and the lone servlet becomes the main servlet
 			if((mainServlet == null || mainServlet.length() < 1) && childrenMap.size() == 1) {
-				mainServlet = childrenMap.keySet().iterator().next();
+				setMainServlet(childrenMap.keySet().iterator().next());
 			}
 			//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
 			//called implicitly within sipApplicationDispatcher.addSipApplication
@@ -613,6 +613,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 */
 	public void setMainServlet(String mainServlet) {
 		this.mainServlet = mainServlet;
+		servletHandler = mainServlet;
 		this.isMainServlet = true;
 	}
 
@@ -1075,10 +1076,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 						if(sipServlet instanceof SipServlet) {
 							// Fix for issue 1086 (http://code.google.com/p/mobicents/issues/detail?id=1086) : 
 							// Cannot send a request in SipServletListener.initialize() for servlet-selection applications
-							boolean mainServletWasNull = false;
-							if(mainServlet == null) {
-								mainServlet = container.getName();
-								mainServletWasNull = true;
+							boolean servletHandlerWasNull = false;
+							if(servletHandler == null) {
+								servletHandler = container.getName();
+								servletHandlerWasNull = true;
 							}
 							switch(event.getEventType()) {
 								case SERVLET_INITIALIZED : {
@@ -1114,8 +1115,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 									break;
 								}								
 							}
-							if(mainServletWasNull) {
-								mainServlet = null;
+							if(servletHandlerWasNull) {
+								servletHandler = null;
 							}
 						}					
 					} catch (ServletException e) {
