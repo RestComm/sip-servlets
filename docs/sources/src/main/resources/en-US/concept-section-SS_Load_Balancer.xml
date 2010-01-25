@@ -242,6 +242,13 @@ externalTransport=UDP
 #This is the JBoss Cache 3.1 configuration file (with jgroups), if not specified it will use default
 #persistentConsistentHashCacheConfiguration=/home/config.xml
 
+#Adjusting the heatbeat. The hearbeat must be specified together with the individual server JAIN SIP property org.mobicents.ha.javax.sip.HEARTBEAT_INTERVAL
+#If a node doesnt check in within that time (in ms), it is considered dead
+nodeTimeout=5100
+#The consistency of the above condition is checked every heartbeatInterval milliseconds
+heartbeatInterval=5000
+
+
 #JSIP stack configuration.....
 javax.sip.STACK_NAME = SipBalancerForwarder
 javax.sip.AUTOMATIC_DIALOG_SUPPORT = off
@@ -332,6 +339,18 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
               <term>algorithmClass</term>
               <listitem>
                 <para>The fully-qualified Java class name of the balancing algorithm to be used. There are three algorithms to choose from and you can write your own to implement more complex routing behaviour. Refer to the sample configuration file for details about the available options for each algorithm. Each algorithm can have algorithm-specific properties for fine-grained configuration.</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>nodeTimeout</term>
+              <listitem>
+                <para>In milliseonds. Default value is 5100. If a server node doesnt check in within this time (in ms), it is considered dead.</para>
+              </listitem>
+            </varlistentry>
+            <varlistentry>
+              <term>heartbeatInterval</term>
+              <listitem>
+                <para>In milliseconds. Default value is 5000 milliseonds. The hearbeat interval  must be the same or close to the interval specified  in the   JAIN SIP property on the server machines - <literal>org.mobicents.ha.javax.sip.HEARTBEAT_INTERVAL</literal></para>
               </listitem>
             </varlistentry>
           </variablelist>
