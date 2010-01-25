@@ -390,7 +390,7 @@
 	<target name="build-mobicents-sip-load-balancer" depends="get-deps">
 		<echo>Building Mobicents SIP Load Balancer</echo>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/sip-balancer">
-			<arg line="clean install -P set-svn-revision" />
+			<arg line="clean install -P set-svn-revision -Dmaven.test.skip=true" />
 		</exec>
 		<copy tofile="${jboss.home}/sip-balancer/sip-balancer-jar-with-dependencies.jar">
 			<fileset dir="${base.path}/target/dependencies/sip-balancer/target/" includes="sip-balancer-*-jar-with-dependencies.jar" />
