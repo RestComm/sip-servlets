@@ -100,6 +100,21 @@
             <scope>provided</scope> <!-- provided by the agent/plugin-container -->
         </dependency>
 
+	<dependency>
+            <groupId>org.rhq</groupId>
+            <artifactId>rhq-core-util</artifactId>
+            <version>${rhq.version}</version>
+            <scope>provided</scope> <!-- provided by the agent/plugin-container -->
+        </dependency>
+
+	<dependency>
+            <groupId>org.rhq</groupId>
+            <artifactId>rhq-plugins-parent</artifactId>
+            <version>${rhq.version}</version>
+	    <type>pom</type>
+            <scope>provided</scope> <!-- provided by the agent/plugin-container -->
+        </dependency>
+
         <dependency>
             <groupId>org.rhq</groupId>
             <artifactId>rhq-jmx-plugin</artifactId>
