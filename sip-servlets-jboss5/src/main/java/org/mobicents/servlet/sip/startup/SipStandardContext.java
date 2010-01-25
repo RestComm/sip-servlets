@@ -498,16 +498,21 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	}		
 	
 	public void addChild(SipServletImpl sipServletImpl) {
-				SipServletImpl existingSipServlet = (SipServletImpl )children.get(sipServletImpl.getName());
-		if(existingSipServlet != null) {			
-			logger.warn(sipServletImpl.getName() + " servlet already present, removing the previous one. " +
-					"This might be due to the fact that the definition of the servlet " +
-					"is present both in annotations and in sip.xml");
-			//we remove the previous one (annoations) because it may not have init parameters that has been defined in sip.xml
-			//See TCK Test ContextTest.testContext1
-			childrenMap.remove(sipServletImpl.getName());
-			childrenMapByClassName.remove(sipServletImpl.getServletClass());
-			super.removeChild(existingSipServlet);
+		Object existingServlet = children.get(sipServletImpl.getName());		
+		if(existingServlet != null) {
+			if(existingServlet instanceof SipServletImpl) {
+				SipServletImpl existingSipServlet = (SipServletImpl) existingServlet;
+				logger.warn(sipServletImpl.getName() + " servlet already present, removing the previous one. " +
+						"This might be due to the fact that the definition of the servlet " +
+						"is present both in annotations and in sip.xml");
+				//we remove the previous one (annoations) because it may not have init parameters that has been defined in sip.xml
+				//See TCK Test ContextTest.testContext1
+				childrenMap.remove(sipServletImpl.getName());
+				childrenMapByClassName.remove(sipServletImpl.getServletClass());
+				super.removeChild(existingSipServlet);
+			} else {
+				throw new SipDeploymentException("It is not possible to deploy the Sip Servlet " + sipServletImpl.getServletClass() + " both as a Sip Servlet and an Http servlet");
+			}
 		}
 		childrenMap.put(sipServletImpl.getName(), sipServletImpl);
 		childrenMapByClassName.put(sipServletImpl.getServletClass(), sipServletImpl);
