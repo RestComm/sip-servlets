@@ -21,6 +21,7 @@
  */
 package org.mobicents.servlet.sip.core.timers;
 
+import org.apache.log4j.Logger;
 import org.jboss.web.tomcat.service.session.ClusteredSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -36,6 +37,8 @@ import org.mobicents.timers.TimerTaskFactory;
  */
 public class SipApplicationSessionTaskFactory implements TimerTaskFactory {
 	
+	private static final Logger logger = Logger.getLogger(SipApplicationSessionTaskFactory.class);
+	
 	private ClusteredSipManager<? extends OutgoingDistributableSessionData> sipManager;
 	
 	public SipApplicationSessionTaskFactory(ClusteredSipManager<? extends OutgoingDistributableSessionData> sipManager) {
@@ -49,7 +52,13 @@ public class SipApplicationSessionTaskFactory implements TimerTaskFactory {
 		SipApplicationSessionTaskData sasData = (SipApplicationSessionTaskData)data;
 		MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(sasData.getKey(), false);
 		FaultTolerantSasTimerTask faultTolerantSasTimerTask = new FaultTolerantSasTimerTask(sipApplicationSession, sasData);
-		sipApplicationSession.setExpirationTimerTask(faultTolerantSasTimerTask);
+		if(sipApplicationSession != null) {
+			sipApplicationSession.setExpirationTimerTask(faultTolerantSasTimerTask);
+		} else {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Sip Application Session " + sasData.getKey() + " couldn't be found either in the cache or locally");
+			}
+		}
 		
 		return faultTolerantSasTimerTask;
 	}
