@@ -38,9 +38,6 @@
   </recv>
 
   <recv response="200" rtd="true" rrs="true">
-    <action>
-      <ereg regexp="\&lt;([a-zA-Z0-9@.=;]+)[^&gt;]+" search_in="hdr" header="Contact:" assign_to="1"/>
-    </action>
   </recv>
 
   <pause milliseconds="150"/>
@@ -48,7 +45,7 @@
   <send>
     <![CDATA[
 
-      ACK [$1] SIP/2.0
+      ACK [next_url] SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
       From: sipp <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
       To: sut <sip:[service]@[remote_ip]:[remote_port]>[peer_tag_param]

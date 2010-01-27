@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE scenario SYSTEM "sipp.dtd">
 
-<!-- Jean Deruelle -->
+<!-- Luis Barreiro - Mobicents QA team -->
 
 <scenario name="UAC for SIP-Servlets Tests - location-service-a">
 
   <send retrans="1000">
     <![CDATA[
-    
+
       INVITE sip:[service]@sip-servlets.com SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
       From: sipp <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
@@ -27,7 +27,7 @@
       t=0 0
       m=audio [media_port] RTP/AVP 0
       a=rtpmap:0 PCMU/8000
-      
+
     ]]>
   </send>
 
@@ -37,7 +37,8 @@
 
   <recv response="200" rtd="true" rrs="true">
     <action>
-      <ereg regexp="\&lt;([a-zA-Z0-9@.=;]+)[^&gt;]+" search_in="hdr" header="Contact:" assign_to="1"/>
+      <ereg regexp=".*" search_in="hdr" header="From:" check_it="true" assign_to="1" />
+      <ereg regexp=".*" search_in="hdr" header="To:" check_it="true" assign_to="2" />
     </action>
   </recv>
 
@@ -45,7 +46,8 @@
 
   <send>
     <![CDATA[
-      ACK [$1] SIP/2.0
+
+      ACK [next_url] SIP/2.0
       [last_Via:]
       [last_From:]
       [last_To:]
@@ -60,25 +62,27 @@
     ]]>
   </send>
 
-<pause milliseconds="20000"/>
-  
-<send retrans="500">
- <![CDATA[
-      BYE sip:receiver-failover@[remote_ip]:5090 SIP/2.0
+  <pause milliseconds="20000"/>
+
+  <send retrans="5000">
+    <![CDATA[
+
+      BYE [next_url] SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
-      [last_From:]
-      [last_To:]
+      From : [$2]
+      To : [$1]
       Call-ID: [call_id]
-      CSeq: 2 BYE
+      CSeq: 1 BYE
       Contact: sip:sipp@[local_ip]:[local_port]
       [routes]
       Max-Forwards: 70
       Subject: Clustering Test
       Content-Length: 0
+
     ]]>
-</send>
-<recv response="200" crlf="true">
-</recv>
+  </send>
+
+  <recv response="200" crlf="true">
+  </recv>
 
 </scenario>
-

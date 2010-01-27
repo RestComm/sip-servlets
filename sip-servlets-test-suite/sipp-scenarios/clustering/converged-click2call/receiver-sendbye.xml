@@ -9,7 +9,7 @@
 
   <send>
     <![CDATA[
-    
+
       SIP/2.0 180 Ringing
       [last_Via:]
       [last_From:]
@@ -19,7 +19,7 @@
       [last_Record-Route:]
       Contact: sip:receiver@[local_ip]:[local_port]
       Content-Length: 0
-      
+
     ]]>
   </send>
 
@@ -27,7 +27,7 @@
 
   <send retrans="500">
     <![CDATA[
-    
+
       SIP/2.0 200 OK
       [last_Via:]
       [last_From:]
@@ -46,7 +46,7 @@
       t=0 0
       m=audio [media_port] RTP/AVP 0
       a=rtpmap:0 PCMU/8000
-      
+
     ]]>
   </send>
   
@@ -56,23 +56,29 @@
       <ereg regexp=".*" search_in="hdr" header="To:" check_it="true" assign_to="2" />
     </action>
   </recv>
-  
+
   <pause milliseconds="40000"/>
-  	<send retrans="500">
-	 <![CDATA[BYE sip:BigGuy@127.0.0.1:5080 SIP/2.0
-Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
-From : [$2]
-To : [$1]
-Call-ID: [call_id]
-CSeq: 2 BYE
-Contact: sip:LittleGuy@[local_ip]:[local_port]
-[routes]
-Max-Forwards: 70
-Subject: Clustering Test
-Content-Length: 0]]>
-	</send>
-	<recv response="200" crlf="true">
-	</recv>
-   
+
+  <send retrans="500">
+    <![CDATA[
+
+      BYE [next_url] SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      From : [$2]
+      To : [$1]
+      Call-ID: [call_id]
+      CSeq: 2 BYE
+      Contact: sip:LittleGuy@[local_ip]:[local_port]
+      [routes]
+      Max-Forwards: 70
+      Subject: Clustering Test
+      Content-Length: 0
+
+    ]]>
+  </send>
+
+  <recv response="200" crlf="true">
+  </recv>
+
 </scenario>
 

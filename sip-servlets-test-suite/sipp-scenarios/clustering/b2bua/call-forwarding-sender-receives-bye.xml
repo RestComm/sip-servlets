@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE scenario SYSTEM "sipp.dtd">
 
-<!-- Jean Deruelle -->
+<!-- Luis Barreiro - Mobicents QA team -->
 
 <scenario name="UAC for SIP-Servlets Tests - location-service-a">
 
   <send retrans="500">
     <![CDATA[
-    
+
       INVITE sip:[service]@sip-servlets.com SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
       From: sipp <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
@@ -21,13 +21,13 @@
       Content-Length: [len]
 
       v=0
-      o=user1 53655765 2353687637 IN IP[local_ip_type] [local_ip]
+      z=user1 53655765 2353687637 IN IP[local_ip_type] [local_ip]
       s=-
       c=IN IP[media_ip_type] [media_ip]
       t=0 0
       m=audio [media_port] RTP/AVP 0
       a=rtpmap:0 PCMU/8000
-      
+
     ]]>
   </send>
 
@@ -36,16 +36,12 @@
   <recv response="180" optional="true" />
 
   <recv response="200" rrs="true">
-    <action>
-		<!-- TODO: Better regEx -->>
-		<ereg regexp="([[:graph:]])(.*:(.*@)?.*(:[[:digit:]]*)?)([[:graph:]])" search_in="hdr" header="Contact:" check_it="true" assign_to="1" />
-	</action>
   </recv>
 
   <send>
     <![CDATA[
-    
-      ACK sip:[service]@127.0.0.1:5080 SIP/2.0
+
+      ACK [next_url] SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
       From: sipp <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
       To: sut <sip:[service]@sip-servlets.com>[peer_tag_param]
@@ -59,13 +55,13 @@
     ]]>
   </send>
 
-<pause milliseconds="14000"/>
-  
+  <pause milliseconds="14000"/>
+
   <recv request="BYE" timeout="20000" />
 
   <send>
     <![CDATA[
-    
+
       SIP/2.0 200 OK
       [last_Via:]
       [last_From:]
@@ -75,9 +71,8 @@
       [last_Record-Route:]
       Contact: sip:receiver-failover@[local_ip]:[local_port]
       Content-Length: 0
-      
+
     ]]>
   </send>
 
 </scenario>
-

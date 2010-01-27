@@ -9,7 +9,7 @@
 
   <send>
     <![CDATA[
-    
+
       SIP/2.0 180 Ringing
       [last_Via:]
       [last_From:]
@@ -19,7 +19,7 @@
       [last_Record-Route:]
       Contact: sip:receiver@[local_ip]:[local_port]
       Content-Length: 0
-      
+
     ]]>
   </send>
 
@@ -27,7 +27,7 @@
 
   <send retrans="500">
     <![CDATA[
-    
+
       SIP/2.0 200 OK
       [last_Via:]
       [last_From:]
@@ -46,21 +46,31 @@
       t=0 0
       m=audio [media_port] RTP/AVP 0
       a=rtpmap:0 PCMU/8000
-      
+
     ]]>
   </send>
   
   <recv request="ACK" >
-    <action>
-      <ereg regexp=".*" search_in="hdr" header="From:" check_it="true" assign_to="1" />
-      <ereg regexp=".*" search_in="hdr" header="To:" check_it="true" assign_to="2" />
-    </action>
   </recv>
-  
-  
-	</send>
-	<recv request="BYE" crlf="true">
-	</recv>
-   
+
+  <recv request="BYE" rrs="true">
+  </recv>
+
+  <send crlf="true">
+    <![CDATA[
+
+      SIP/2.0 200 OK
+      [last_Via:]
+      [last_From:]
+      [last_To:]
+      [last_Call-ID:]
+      [last_CSeq:]
+      [last_Record-Route:]
+      Contact: sip:receiver-failover@[local_ip]:[local_port]
+      Content-Length: 0
+
+    ]]>
+  </send>
+
 </scenario>
 

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE scenario SYSTEM "sipp.dtd">
 
-<!-- Jean Deruelle -->
+<!-- Luis Barreiro - Mobicents QA team -->
 
 <scenario name="UAC for SIP-Servlets Tests - location-service-a">
 
   <send retrans="1000">
     <![CDATA[
-    
+
       INVITE sip:[service]@sip-servlets.com SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
       From: sipp <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
@@ -27,7 +27,7 @@
       t=0 0
       m=audio [media_port] RTP/AVP 0
       a=rtpmap:0 PCMU/8000
-      
+
     ]]>
   </send>
 
@@ -35,17 +35,14 @@
 
   <recv response="180" optional="true" />
 
-  <recv response="200" rtd="true" rrs="true">
-    <action>
-      <ereg regexp="\&lt;([a-zA-Z0-9@.=;]+)[^&gt;]+" search_in="hdr" header="Contact:" assign_to="1"/>
-    </action>
-  </recv>
+  <recv response="200" rtd="true" rrs="true" />
 
   <pause milliseconds="300"/>
 
   <send>
     <![CDATA[
-      ACK [$1] SIP/2.0
+
+      ACK [next_url] SIP/2.0
       [last_Via:]
       [last_From:]
       [last_To:]
@@ -60,11 +57,11 @@
     ]]>
   </send>
 
-	 <recv request="BYE" timeout="30000" />
+  <recv request="BYE" timeout="30000" />
 
   <send>
     <![CDATA[
-    
+
       SIP/2.0 200 OK
       [last_Via:]
       [last_From:]
@@ -74,7 +71,7 @@
       [last_Record-Route:]
       Contact: sip:receiver-failover@[local_ip]:[local_port]
       Content-Length: 0
-      
+
     ]]>
   </send>
 

@@ -9,7 +9,7 @@
 
   <send>
     <![CDATA[
-    
+
       SIP/2.0 180 Ringing
       [last_Via:]
       [last_From:]
@@ -17,9 +17,9 @@
       [last_Call-ID:]
       [last_CSeq:]
       [last_Record-Route:]
-	  Contact: <sip:[local_ip]:[local_port];transport=[transport]>
+      Contact: <sip:[local_ip]:[local_port];transport=[transport]>
       Content-Length: 0
-      
+
     ]]>
   </send>
 
@@ -27,7 +27,7 @@
 
   <send retrans="500">
     <![CDATA[
-    
+
       SIP/2.0 200 OK
       [last_Via:]
       [last_From:]
@@ -46,17 +46,17 @@
       t=0 0
       m=audio [media_port] RTP/AVP 0
       a=rtpmap:0 PCMU/8000
-      
+
     ]]>
-  </send>  
-  
+  </send>
+
   <recv request="ACK" />
-  
+
   <recv request="BYE" timeout="30000" />
 
   <send>
     <![CDATA[
-    
+
       SIP/2.0 200 OK
       [last_Via:]
       [last_From:]
@@ -66,9 +66,9 @@
       [last_Record-Route:]
       Contact: sip:receiver-failover@[local_ip]:[local_port]
       Content-Length: 0
-      
+
     ]]>
   </send>
-   
+
 </scenario>
 
