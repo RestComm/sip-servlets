@@ -28,6 +28,7 @@ import org.jboss.web.tomcat.service.session.ClusteredSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.timers.FaultTolerantScheduler;
 import org.mobicents.timers.PeriodicScheduleStrategy;
 import org.mobicents.timers.TimerTaskFactory;
@@ -167,7 +168,7 @@ public class FaultTolerantTimerServiceImpl implements TimerService, Serializable
 	public FaultTolerantScheduler getScheduler() {
 		if(scheduledExecutor == null) {
 			TimerTaskFactory timerTaskFactory = new TimerServiceTaskFactory(this.sipManager);
-			scheduledExecutor = new FaultTolerantScheduler(NAME, SCHEDULER_THREAD_POOL_DEFAULT_SIZE, this.sipManager.getMobicentsCluster(), (byte) 1, null, timerTaskFactory);
+			scheduledExecutor = new FaultTolerantScheduler(NAME + ((SipContext)sipManager.getContainer()).getApplicationNameHashed(), SCHEDULER_THREAD_POOL_DEFAULT_SIZE, this.sipManager.getMobicentsCluster(), (byte) 1, null, timerTaskFactory);
 		}
 		return scheduledExecutor;
 	}

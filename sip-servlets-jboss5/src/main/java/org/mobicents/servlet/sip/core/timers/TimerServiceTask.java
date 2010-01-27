@@ -27,6 +27,7 @@ import java.util.concurrent.ScheduledFuture;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 
+import org.apache.log4j.Logger;
 import org.jboss.web.tomcat.service.session.ClusteredSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -39,7 +40,7 @@ import org.mobicents.timers.TimerTask;
  *
  */
 public class TimerServiceTask extends TimerTask implements ServletTimer {
-	
+	private static Logger logger = Logger.getLogger(TimerServiceTask.class);
 	ServletTimerImpl servletTimer;	
 	TimerServiceTaskData data;
 	
@@ -51,7 +52,14 @@ public class TimerServiceTask extends TimerTask implements ServletTimer {
 		this.data = data;
 		if(servletTimerImpl == null) {
 			MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(data.getKey(), false);
-			this.servletTimer = new ServletTimerImpl(data.getData(), data.getDelay(), sipApplicationSession.getSipContext().getListeners().getTimerListener(), sipApplicationSession);						
+			if(sipApplicationSession != null) {
+				if(logger.isDebugEnabled()) {				
+					logger.debug("sip application session for key " + data.getKey() + " was found");
+				} 			
+				this.servletTimer = new ServletTimerImpl(data.getData(), data.getDelay(), sipApplicationSession.getSipContext().getListeners().getTimerListener(), sipApplicationSession);
+			} else {
+				logger.debug("sip application session for key " + data.getKey() + " was not found neither locally or in the cache, sip servlet timer recreation will be problematic");				
+			}
 		} else {
 			this.servletTimer = servletTimerImpl;
 			data.setData(servletTimerImpl.getInfo());
