@@ -109,6 +109,15 @@ ipAddress="127.0.0.1"
               <para>gov.nist.javax.sip.REENTRANT_LISTENER=true</para>
             </listitem>
           </itemizedlist>
+          <para>&PLATFORM_NAME; SIP Servlets also adds its own properties to allow for even more configuration and flexibility :</para>
+          <itemizedlist>
+            <listitem>
+              <para>If the property <literal>org.mobicents.servlet.sip.SERVER_HEADER</literal> is set, A Server header will be added to all SIP Responses leaving the container.</para>
+            </listitem>
+            <listitem>
+              <para>If the property <literal>org.mobicents.servlet.sip.USER_AGENT_HEADER</literal> is set, A Server header will be added to all SIP Requests leaving the container.</para>
+            </listitem>            
+           </itemizedlist>
         </listitem>
       </varlistentry>
       <varlistentry>
