@@ -1,3 +1,4 @@
+killall sipp
 export TEST_IP=127.0.0.1
 
 export MSS_IP=$TEST_IP
