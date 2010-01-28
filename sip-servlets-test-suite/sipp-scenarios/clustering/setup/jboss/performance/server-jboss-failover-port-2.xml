@@ -47,7 +47,7 @@
          emptySessionPath="true" enableLookups="false" redirectPort="8443" />
 
 	<!-- Define a SIP Connector -->
-    <Connector port="5080" 
+    <Connector port="5081" 
 	     ipAddress = "${jboss.bind.address}"
 	     protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
 	     signalingTransport="udp"
