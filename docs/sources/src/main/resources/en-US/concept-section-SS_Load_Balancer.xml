@@ -394,6 +394,8 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
           </itemizedlist>
         </step-->
       </procedure>
+      <title>Configuring Logging</title>
+      <para>the SIP load balancer uses <ulink url="http://java.sun.com/j2se/1.4.2/docs/guide/util/logging/overview.html">Java Logging as a logging mechanism</ulink>. As such you cna configure it through a property file and specify the property file to be used by using the following command <literal>-Djava.util.logging.config.file=./lb-logging.properties</literal>. Please refer to JDK logging for more informationon how to configure the Java logging.</para>
       <note>
         <title>Configuration File Locations</title>
         <para>On &SHORT_PLATFORM_NAME; for Tomcat server installations, <filename>server.xml</filename> is located in <filename>&lt;install_directory&gt;/conf</filename>.</para>
