@@ -12,7 +12,7 @@
 rm -rf $JBOSS_HOME/server/port-1
 rm -rf $JBOSS_HOME/server/port-2
 
-mvn clean install -f ../../../pom.xml -P jboss,jboss-cluster -Dnode=all
+#mvn clean install -f ../../../pom.xml -P jboss,jboss-cluster -Dnode=all
 cp setup/jboss/performance/mss-sip-stack.properties $JBOSS_HOME/server/all/conf/mss-sip-stack.properties
 cp setup/jboss/jboss-context.xml $JBOSS_HOME/server/all/deploy/jboss-web.deployer/context.xml
 cp setup/jboss/jboss-tomcat-service.xml $JBOSS_HOME/server/all/deploy/jboss-web.deployer/META-INF/jboss-service.xml
@@ -52,8 +52,11 @@ if [ $# -ne 0 ]; then
 fi
 
 cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-1
+cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-2
 cp setup/jboss/jboss-service-port-1.xml $JBOSS_HOME/server/port-1/conf/jboss-service.xml
+cp setup/jboss/jboss-service-port-2.xml $JBOSS_HOME/server/port-2/conf/jboss-service.xml
 cp setup/jboss/performance/server-jboss-failover-port-1.xml $JBOSS_HOME/server/port-1/deploy/jboss-web.deployer/server.xml
+cp setup/jboss/performance/server-jboss-failover-port-2.xml $JBOSS_HOME/server/port-2/deploy/jboss-web.deployer/server.xml
 
 if [ $# -ne 0 ]; then
 	case $1 in		    
