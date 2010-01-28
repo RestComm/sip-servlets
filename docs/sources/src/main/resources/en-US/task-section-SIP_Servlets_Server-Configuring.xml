@@ -9,6 +9,7 @@
   <section id="bsssc-binary-SIP_Servlets_Server-Adding_SIP_Connectors">
     <title>Configuring SIP Connectors</title>
     <para>SIP Connectors are added in the same way as HTTP Connectors: by adding a <literal>&lt;Connector&gt;</literal> element under the <literal>&lt;Service&gt;</literal> element in the container&apos;s <filename>server.xml</filename> configuration file.</para>
+    <para>&PLATFORM_NAME; SIP Servlets has three SIP Connectors configured by default : UDP And TCP are running on the binding IP Address of the container and port 5080 and TLS is running on the binding IP Address of the container and port 5081</para>
     <para>For example, to add a SIP Connector on the IP address <literal>127.0.0.1</literal>, on port <literal>5080</literal>, using the UDP transport protocol, you should insert the following XML element:</para>
     <example>
       <title>Adding a SIP Connector to server.xml</title>
