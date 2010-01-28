@@ -77,6 +77,12 @@ ipAddress="127.0.0.1"
         </listitem>
       </varlistentry>
       <varlistentry>
+        <term>addressResolverClass</term>
+        <listitem>
+          <para>Specifies the <literal>gov.nist.core.net.AddressResolver</literal> implementation class that will be used by the container to perform DNS lookups. The default class used by the container is <literal>org.mobicents.servlet.sip.core.DNSAddressResolver</literal> but any class implementing <literal>gov.nist.core.net.AddressResolver</literal> NIST SIP Stack interface and having a Constructor with a <literal>org.mobicents.servlet.sip.core.SipApplicationDispatcher</literal> param can be used. To disable DNS lookups, this attribute should be left empty..</para>
+        </listitem>
+      </varlistentry>      
+      <varlistentry>
         <term>sipStackPropertiesFile</term>
         <listitem>
           <para>Specifies the location of the file containing key-value pairs corresponding to the SIP stack configuration properties.  This attribute is used to further tune the JAIN SIP Stack.  If this property is omitted, the following default values are assumed:</para>
