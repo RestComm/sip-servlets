@@ -10,7 +10,8 @@ Important note : make sure to do a clean checkout of those projects to make the 
 
 Checkout the branch and do mvn release:prepare -P release -Dmaven.test.skip=true from there
 when asked for SCM release tag, put release-<version-number>
-if thet svn tag fails, do a svn update then retry  mvn release:prepare -P release -Dmaven.test.skip=true (it won't prompt you for anything since it has already everything from the previous failed one) -> this problem is mainly due to compatibility issue between mvn and svn 1.5
+
+if the svn tag fails, do a svn update then retry  mvn release:prepare -P release -Dmaven.test.skip=true (it won't prompt you for anything since it has already everything from the previous failed one) -> this problem is mainly due to compatibility issue between mvn and svn 1.5
 
 Update your local jboss repo or create one if that is not already done (See http://wiki.jboss.org/auth/wiki/MavenReleaseRepository and ask Paul Gier to add you in the authorized list to upload to the main JBoss repository)
 
@@ -18,6 +19,9 @@ mvn release:perform -P release -Dmaven.test.skip=true,
 (if that fails (usually due to sip servlets management console don't know why) do cd target/checkout, and then mvn deploy -P release -Dmaven.test.skip=true or upgrade to maven 2.1.0+)
 
 Go into your local jboss repo and add and commit all artifacts corresponding to the release that has been done.
+
+gedit target/checkout/sip-servlets-bootstrap/release/build.xml and change the mss.release.version to remove the -SNAPSHOT suffix then commit the file with 
+svn ci target/checkout/sip-servlets-bootstrap/release/build.xml -m "removing the -SNAPSHOT suffix"
 
 Go to http://hudson.qa.jboss.com/hudson/job/MobicentsSipServletsRelease/configure and make a release based on the new tag corresponding to the release that has just been made.
 
