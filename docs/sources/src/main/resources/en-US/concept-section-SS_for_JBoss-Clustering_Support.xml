@@ -149,7 +149,7 @@ outboundProxy=&quot;127.0.0.1:5500&quot;
     </section>
     <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Testing">
       <title>Testing</title>
-      <para>To test your JBoss cluster setup for mid-call failover, refer to:</para>
+      <para>To test your JBoss cluster setup for mid-call failover (Established SIP Dialog), refer to:</para>
       <itemizedlist>
         <listitem>
           <para>

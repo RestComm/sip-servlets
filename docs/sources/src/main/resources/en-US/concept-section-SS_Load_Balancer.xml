@@ -1,4 +1,4 @@
-﻿<?xml version='1.0' encoding='UTF-8'?>
+﻿﻿<?xml version='1.0' encoding='UTF-8'?>
 <!-- This document was created with Syntext Serna Free. --><!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
 <!ENTITY % BOOK_ENTITIES SYSTEM "SIP_Servlets_Server_User_Guide.ent">
 %BOOK_ENTITIES;
@@ -361,7 +361,7 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
           </note>
         </step>
         <step>
-          <title>Configure the <filename>server.xml</filename> configuration files</title>
+          <title>Configure the <filename>server.xml</filename> configuration file</title>
           <para>Ensure the following attributes are configured for the <literal>&lt;service&gt;</literal> element in <filename>server.xml</filename>.</para>
           <itemizedlist>
             <listitem>
@@ -370,8 +370,29 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
             <listitem>
               <para>The <literal>balancers</literal> attribute must contain a IP address (or list of addresses) of the SIP load balancer(s) to which heartbeat information will be sent.</para>
             </listitem>
+            <listitem>
+              <para>The <literal>sipPathName</literal> attribute must contain the following value <literal>org.mobicents.ha</literal> to indicate that the server will be using the Mobicents JAIN SIP HA SIP Stack which is an extension of the JAIN SIP Stack offering transparent replication.</para>
+            </listitem>
           </itemizedlist>
         </step>
+        <!-- Is needed on JB5 Version only -->
+        <!--step>
+          <title>Configure the <filename>mss-sip-stack.properties</filename> configuration file</title>          
+          <itemizedlist>
+            <listitem>
+              <para>The <literal>org.mobicents.ha.javax.sip.cache.MobicentsSipCache.cacheName</literal> property must contain the name of the cache that will be responsible for holding the replicated data of the SIP Stack layer (namely the established SIP dialog data). The value has to be one of the cache name present in the jboss-cache-manager-jboss-beans.xml file of the jboss-cache-manager JBoss Service of the container. The default value is <literal>standard-session-cache</literal></para>
+            </listitem>    
+			<listitem>
+				<para>The <literal>org.mobicents.ha.javax.sip.BALANCERS</literal> property must be configured with the list of load balancer IP address and internal ports. As an example, suppose a single &THIS.PLATFORM; SIP Load Balancer is running with IP <literal>192.168.0.1</literal> and internal port <literal>5065</literal>, the property would be set with value <literal>192.168.0.1:5065</literal>. To specify multiple balancers use <literal>;</literal> as separator. If this property is used the balancers attribute located in server.xml should not be used as it is a replacement for it.</para>
+			</listitem>
+			<listitem>
+				<para>The <literal>org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingServiceClassName</literal> property is optional, it defines the class name of the HeartBeating service implementation, currently the only one available is <literal>org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingServiceImpl</literal></para>
+			</listitem>			
+			<listitem>
+				<para>The <literal>org.mobicents.ha.javax.sip.LoadBalancerElector</literal> property is optional, it defines the class of the load balancer elector from JAIN SIP HA Stack. The elector is used to define which load balancer will receive outgoing requests, which are out of dialog or in dialog with null state. Currently only one elector implementation is available, <literal>org.mobicents.ha.javax.sip.RoundRobinLoadBalancerElector</literal>, which, as the class name says, uses round robin algorythm to select the balancer.</para>
+			</listitem>       
+          </itemizedlist>
+        </step-->
       </procedure>
       <note>
         <title>Configuration File Locations</title>

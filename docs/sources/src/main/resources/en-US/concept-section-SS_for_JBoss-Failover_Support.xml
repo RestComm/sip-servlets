@@ -5,15 +5,20 @@
 ]>
 <!-- chapter id nickname: ssfjfs --><section id="ssfjfs-SS_for_JBoss-Failover_Support">
   <title>&PLATFORM_NAME; SIP Servlets for JBoss: Transparent Failover</title>
-  <para>Just as with a &PLATFORM_NAME; JAIN SLEE cluster, a &PLATFORM_NAME; SIP Servlets Server for JBoss cluster does not employ any standby nodes. Typically, therefore, proxies and registrars must share the user location table by using a database cluster.</para>
-  <para>The &PLATFORM_NAME; SIP load balancer, which is a SIP Call ID-aware load balancer, is used as the intermediary. The SIP load balancer forwards stateful transaction requests to cluster nodes based on its provisioning algorithm. The SIP load balancer acts as an entry-point to the cluster and distributes the incoming requests between nodes. It is always advised to use a SIP load balancer or an IP load balancer in a cluster configuration. </para>
+  <para>A &PLATFORM_NAME; SIP Servlets Server for JBoss cluster does not employ any standby nodes. 
+  Typically, therefore, proxies and registrars must share the user location table by using a database cluster.</para>
+  <para>The &PLATFORM_NAME; SIP load balancer, which is a SIP Call ID-aware load balancer, is used as the intermediary. 
+  The SIP load balancer forwards stateful transaction requests to cluster nodes based on its provisioning algorithm. 
+  The SIP load balancer acts as an entry-point to the cluster and distributes the incoming requests between nodes. 
+  It is always advised to use a SIP load balancer or an IP load balancer in a cluster configuration. </para>
+  <para>The SIP Stack used by the &PLATFORM_NAME; SIP Servlets for JBoss supports <literal>ESTABLISHED SIP DIALOG</literal> failover. This means that failover will occur only on established calls (SIP Dialogs which are in the CONFIRMED state as per RFC 3261) and calls that are in the process of being setup will not be failed over (SIP Dialogs which are in the EARLY state as per RFC 3261).</para>
   <formalpara>
     <title>Testing a cluster</title>
     <para>This choice of implementation has many benefits:</para>
   </formalpara>
   <itemizedlist>
     <listitem>
-      <para>There is no need for standby nodes, because the remaining nodes in a degraded cluster automatically and transparently (to the user) take on the load of the failed node. This can be done because both the SIP load balancer and SIP Servlet-enabled JBoss Application Servers support mid-call failover.</para>
+      <para>There is no need for standby nodes, because the remaining nodes in a degraded cluster automatically and transparently (to the user) take on the load of the failed node. This can be done because both the SIP load balancer and SIP Servlet-enabled JBoss Application Servers support mid-call failover (Established SIP Dialog).</para>
     </listitem>
     <listitem>
       <para>There is no need to ensure that requests are directed to the correct node, because in a SIP Servlets-enabled JBoss Application Server (or &PLATFORM_NAME; JAIN SLEE server) cluster, any node can serve any request to any User Agent (UA).</para>
