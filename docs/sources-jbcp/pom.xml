@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip</groupId>
 		<artifactId>sip-servlets-docs</artifactId>
-		<version>1.2-SNAPSHOT</version>
+		<version>1.2</version>
 	</parent>
 	
 	<artifactId>sip-servlets-docs-sources-jbcp</artifactId>
@@ -67,10 +67,8 @@
                </goals>
                <configuration>
                  <tasks>
-                   <copy file="mkbk"
-                         todir="src/main/resources/"/>
-			<copy file="Makefile"
-                         todir="src/main/resources/"/>
+                   <copy file="mkbk" todir="src/main/resources/" />
+			<copy file="Makefile" todir="src/main/resources/" />
                  </tasks>
                </configuration>
              </execution>
