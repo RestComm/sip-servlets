@@ -48,7 +48,7 @@ Media Example
 ** From the binary
 
 	You can find the war file corresponding to this example
- 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/media-jsr309-servlet/1.5/media-jsr309-servlet-1.5.war}here}}.\
+ 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/media-jsr309-servlet/1.6/media-jsr309-servlet-1.6.war}here}}.\
  	Drop the downloaded war file into your <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/media-jsr309-dar.properties}dar configuration file}}.\
@@ -69,7 +69,9 @@ Media Example
 
 * How to play with it
 
-	First you need to have Mobicents Media Server (MMS) up and running if its standalone. If its embedded in JBoss AS, it starts when JBoss AS container starts. For further instruction on how to start MMS please look at doco TODO 
+	First you need to have Mobicents Media Server (MMS) up and running. Go to $JBOSS_HOME/mobicents-media-server/bin and type sudo sh run.sh (sudo is needed because RTSP starts on port below 1024 which requires root privilege on linux) or run.bat on windows
+	
+	Then start up Mobicents Sip Servlets. 
 
 	Just dial the servlet directly as explained in below steps, without any proxy. Tested with Twinkle
 	

@@ -42,26 +42,35 @@ Goals
 		 
 		 * {{{./user_guides/sip_servlets/index.html#ss_jslee_interop}SIP Servlets/JAIN SLEE Interoperability}}	
 
-Version 1.1 is out !
+Version 1.2 is out !
 
-	We are proud to announce our {{{./mss-downloads.html}Mobicents Sip Servlets 1.1 version}}, certified against the {{{http://jcp.org/en/jsr/detail?id=289}Sip Servlets 1.1 specification}} and working on top of <Tomcat 6.0.14> and <JBoss AS 4.2.3.GA & 5.1.0.GA>. 
+	We are proud to announce our {{{./mss-downloads.html}Mobicents Sip Servlets 1.2 version}}, certified against the {{{http://jcp.org/en/jsr/detail?id=289}Sip Servlets 1.1 specification}} and working on top of <Tomcat 6.0.20> and <JBoss AS 4.2.3.GA & 5.1.0.GA>. 
 	
-	Our latest release has a strong focus on {{{./user_guides/sip_servlets/index.html#d0e5361}Clustering and High Availability}} where refactoring has been done to give the community 
-	{{{https://docs.google.com/present/edit?id=0AdgrvwaZgnJ1ZGM1anA1dnhfODljeGR2dHhjbQ&hl=en}more flexibility, stability and accomodate more architectures}} : 		  		 		   		           
- 
-	Thus our Sip Load Balancer has been completely revamped to be completely SIP Stateless, Distributable, Convergent with an HTTP Forwarder (based on {{{http://www.jboss.org/netty}Netty}} project) added, {{{http://www.mobicents.org/user_guides/sip_servlets/index.html#d0e5734}allow pluggable algorithms}} and the Sip Servlets Container itself has had numerous improvements for Clustering and Failover with HA persistent timers, reduced network traffic for SIP Sessions replication, JAIN SIP has been extended to become an HA SIP Stack and much more
-
-	We also added a new {{{./alerting-app.html}alerting application}} allowing the {{{http://www.jboss.org/jopr}JBoss RHQ/Jopr Enterprise Management Solution}} to give calls or send SMS when monitoring alerts are fired : See {{{http://pilhuhn.blogspot.com/2009/09/jopr-talking.html}Jopr is Talking}}, {{{http://pilhuhn.blogspot.com/2009/11/rhq-and-future-of-alerts.html}RHQ and future of Alerts}}, and {{{https://docs.google.com/present/edit?id=0AXZ3Uhj-XHcDZGZjanI0OHpfMTg1aGZ3c3EzZHE&amp;hl=en}RHQ/Jopr Mobicents Alerts}}
+	<<This release is the last community version that will propose Mobicents Sip Servlets on top of JBoss 4.2.x series. If you need still need support for it, we recommend you to either upgrade to the JBoss 5.x series or buy a {{{http://www.redhat.com/solutions/telco/communications_platform/}JBCP subscription}}>>
+	
+	As such our latest release's focus was essentially on the JBoss 5.x version and has a mixed focus :
+	
+		* More management metrics/control :
+			
+			** {{{http://code.google.com/p/mobicents/issues/detail?id=1031}More Congestion Controls : Sip Session/ Sip App Session Creation per sec; and Alerts and value or percentage for back to normal}}
+			
+			** {{{http://code.google.com/p/mobicents/issues/detail?id=1032}More Monitoring Stats : Number of responses received per Status code, Number of requests received per Request Method}}
+			
+			** {{{http://code.google.com/p/mobicents/issues/detail?id=1033}More Monitoring Stats for the Mobicents Load Balancer : Number of responses received per Status code, Number of requests received per Request Method}}
+			
+			** {{{http://code.google.com/p/mobicents/issues/detail?id=1106}Add JMX capabilities to the Mobicents JAIN SIP Stack}}
+			
+		* {{{./user_guides/sip_servlets/index.html#d0e5361}Clustering and High Availability}} where many bugs were fixed and {{{http://code.google.com/p/mobicents/issues/detail?id=1081} SipApplicationSession Fault Tolerant Timers}} have been implemented (only on JBoss 5.x version)
 
 	The other highlights of this release are :
 
-		* {{{http://code.google.com/p/mobicents/issues/detail?id=961}Application Router : Filtering SIP requests based on Public Service Identities (PSI) in IMS}}
+		* {{{http://code.google.com/p/mobicents/issues/detail?id=1121}Port Seam Telco Framework to JB5}}
 		
-		* {{{http://code.google.com/p/mobicents/issues/detail?id=1039}Move to Diameter version 1.1.0.GA and inclusion of Diameter in JBoss 5 version}}
+		* {{{http://code.google.com/p/mobicents/issues/detail?id=1168}Move To Mobicents Media Server 2.0 BETA3}}
 		
-		* Improved performance
+		* {{{http://code.google.com/p/mobicents/issues/detail?id=1098}Move To Apache Tomcat 6.0.20}}		
 		
-		* {{{http://code.google.com/p/mobicents/issues/list?can=1&q=milestone=Release-1.1%20type=Defect&colspec=ID%20Priority%20Component%20Milestone%20Version%20Release%20Type%20Status%20Owner%20Summary}More than 30 bug fixes}}
+		* {{{http://code.google.com/p/mobicents/issues/list?can=1&q=label:Version-1.2.00+Component:Sip-Servlets&colspec=ID+Priority+Component+Milestone+Version+Release+Type+Status+Owner+Summary&cells=tiles}More than 20 bug fixes}}
  
 	Check the complete Roadmap to see {{{mss-roadmap.html} the feature details and the usual round of bug fixes}} and what's cooking ahead.
 	
@@ -77,10 +86,10 @@ Version 1.1 is out !
 		
 		* Diameter event charging example : {{{diameter_event_charging.html}Diameter Event Charging}}
 	
-		* For JBoss 4.2.3 only, {{{./products_media_server.html}Mobicents Media Server 1.0.3.GA}}, {{{http://groups.google.com/group/mobicents-public/web/mobicents-diameter}Mobicents Diameter 1.1.0.GA}}, {{{./user_guides/sip_servlets/index.html#sslb-MSS_Load_Balancer}the Mobicents SIP load Balancer BETA9}} and 'all' profile in JBoss with predeployed click to call distributable and simple-sip-servlet-distributable applications 
+		* For JBoss 4.2.3 only, {{{./products_media_server.html}Mobicents Media Server 1.0.3.GA}}, {{{http://groups.google.com/group/mobicents-public/web/mobicents-diameter}Mobicents Diameter 1.1.0.GA}}, {{{./user_guides/sip_servlets/index.html#sslb-MSS_Load_Balancer}the Mobicents SIP load Balancer BETA13}} and 'all' profile in JBoss with predeployed click to call distributable and simple-sip-servlet-distributable applications 
 		to test clustering and mid call failover. 					
 		
-		* For JBoss 5.1.0 only, {{{./products_media_server.html}Mobicents Media Server 2.0.0.BETA1}}, {{{http://groups.google.com/group/mobicents-public/web/mobicents-diameter}Mobicents Diameter 1.1.0.GA}}, {{{./user_guides/sip_servlets/index.html#sslb-MSS_Load_Balancer}the Mobicents SIP load Balancer BETA9}} and 'all' profile in JBoss with predeployed click to call distributable and simple-sip-servlet-distributable applications 
+		* For JBoss 5.1.0 only, {{{./products_media_server.html}Mobicents Media Server 2.0.0.BETA3}}, {{{http://groups.google.com/group/mobicents-public/web/mobicents-diameter}Mobicents Diameter 1.1.0.GA}}, {{{./user_guides/sip_servlets/index.html#sslb-MSS_Load_Balancer}the Mobicents SIP load Balancer BETA13}} and 'all' profile in JBoss with predeployed click to call distributable and simple-sip-servlet-distributable applications 
 		to test clustering and mid call failover.				  
   
 Try it !
