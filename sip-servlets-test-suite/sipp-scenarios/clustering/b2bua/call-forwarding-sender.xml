@@ -68,6 +68,7 @@
       CSeq: 3 UPDATE
       Contact: sip:sipp@[local_ip]:[local_port]
       Max-Forwards: 70
+      [routes]
       Subject: Performance Test
       Content-Type: application/sdp
       Content-Length: [len]
@@ -99,6 +100,7 @@
       CSeq: 4 UPDATE
       Contact: sip:sipp@[local_ip]:[local_port]
       Max-Forwards: 70
+      [routes]
       Subject: Performance Test
       Content-Type: application/sdp
       Content-Length: [len]
@@ -119,7 +121,7 @@
   <recv response="200" rtd="true">
   </recv>
 
-  <pause milliseconds="5000"/>
+  <pause milliseconds="20000"/>
 
   <send retrans="500">
     <![CDATA[

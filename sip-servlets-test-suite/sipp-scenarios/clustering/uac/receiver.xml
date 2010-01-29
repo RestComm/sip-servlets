@@ -5,7 +5,7 @@
 
 <scenario name="Distributable UAC for SIP-Servlets Tests">
 
-  <recv request="INVITE" rrs="true" timeout="5000" ontimeout="1" />
+  <recv request="INVITE" rrs="true" />
 
   <send>
     <![CDATA[
