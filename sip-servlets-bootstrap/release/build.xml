@@ -56,7 +56,7 @@
 	
 	<!-- Release target -->
 	
-	<target name="release" depends="clean,release-jboss,release-jboss-5,release-tomcat,make-src-zip,clean" />
+	<target name="release" depends="clean,release-jboss-5,release-tomcat,make-src-zip,clean" />
 	
 	<!-- Tomcat version -->
 	

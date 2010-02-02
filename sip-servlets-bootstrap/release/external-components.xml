@@ -11,7 +11,7 @@
         <checkout.username>mobicents-read-only</checkout.username>
         <checkout.password></checkout.password>
         
-        <media.core.1.x.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/media/core/mobicents-media-server-core-1.0.3.GA</media.core.1.x.connectionURL>
+        <!--media.core.1.x.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/media/core/mobicents-media-server-core-1.0.3.GA</media.core.1.x.connectionURL-->
         <media.core.2.x.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/media/2.x.y/core/mms-core-2.0.0.BETA3</media.core.2.x.connectionURL>
         <!--diameter.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/diameter/core/mux/mobicents-diameter-mux-1.1.0.GA/</diameter.connectionURL-->        
         <!--sip.balancer.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/tools/sip-balancer/sip-balancer-1.0.BETA7</sip.balancer.connectionURL-->
@@ -28,7 +28,7 @@
                         <artifactId>maven-scm-plugin</artifactId>
                         <inherited>false</inherited>
                         <executions>
-                            <execution>
+                            <!--execution>
                                 <id>media-core-1.x-checkout</id>
                                 <phase>validate</phase>
                                 <goals>
@@ -41,7 +41,7 @@
                                     <username>${checkout.username}</username>
                                     <password>${checkout.password}</password>
                                 </configuration>
-                            </execution>
+                            </execution-->
                             <execution>
                                 <id>media-core-2.x-checkout</id>
                                 <phase>validate</phase>
@@ -98,7 +98,7 @@
                         <artifactId>maven-scm-plugin</artifactId>
                         <inherited>false</inherited>
                         <executions>
-                            <execution>
+                            <!--execution>
                                 <id>media-core-1.x-update</id>
                                 <goals>
                                     <goal>update</goal>
@@ -112,7 +112,7 @@
                                     <username>${checkout.username}</username>
                                     <password>${checkout.password}</password>
                                 </configuration>
-                            </execution>
+                            </execution-->
                             <execution>
                                 <id>media-core-2.x-update</id>
                                 <goals>
