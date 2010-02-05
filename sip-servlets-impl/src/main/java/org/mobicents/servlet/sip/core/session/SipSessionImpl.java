@@ -1207,7 +1207,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void addOngoingTransaction(Transaction transaction) {
 		
-		if(!isReadyToInvalidate() && ongoingTransactions != null) { 
+		if(transaction != null && ongoingTransactions != null  && !isReadyToInvalidate() ) { 
 			boolean added = this.ongoingTransactions.add(transaction);
 			if(added) {
 				if(logger.isDebugEnabled()) {
