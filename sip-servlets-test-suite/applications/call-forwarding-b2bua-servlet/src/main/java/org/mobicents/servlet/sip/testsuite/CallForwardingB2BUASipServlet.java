@@ -293,17 +293,24 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
             return;
         } 
 		//if this is a response to an INVITE we ack it and forward the OK 
-		if(originalSession!= null && cSeqValue.indexOf("INVITE") != -1) {
-			SipServletRequest ackRequest = sipServletResponse.createAck();
-			logger.info("Sending " +  ackRequest);
-			ackRequest.send();
+		if(originalSession!= null && cSeqValue.indexOf("INVITE") != -1) {			
 			//create and sends OK for the first call leg							
-			SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
-			SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
-			logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);			
-			responseToOriginalRequest.setContentLength(sipServletResponse.getContentLength());
-			//responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
-			responseToOriginalRequest.send();
+			SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");			
+			if(originalRequest.getHeader("Require") == null) {
+				// we send the ACK directly only in non PRACK scenario
+				SipServletRequest ackRequest = sipServletResponse.createAck();
+				logger.info("Sending " +  ackRequest);
+				ackRequest.send();
+				SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
+				logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);			
+				responseToOriginalRequest.setContentLength(sipServletResponse.getContentLength());
+				//responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
+				responseToOriginalRequest.send();
+			} else {
+			    SipSession peerSession = sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
+			    SipServletResponse responseToOriginalRequest = sipServletResponse.getRequest().getB2buaHelper().createResponseToOriginalRequest(peerSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
+			    responseToOriginalRequest.send();
+			}			
 		}			
 	}
 	
