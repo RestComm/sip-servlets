@@ -268,7 +268,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			
 			final String requestMethod = sipServletRequest.getMethod();
 			try {
-				sipSession.setSessionCreatingTransaction(sipServletRequest.getTransaction());
+				sipSession.addOngoingTransaction(sipServletRequest.getTransaction());
 				// JSR 289 Section 6.2.1 :
 				// any state transition caused by the reception of a SIP message, 
 				// the state change must be accomplished by the container before calling 
