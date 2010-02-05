@@ -1379,13 +1379,15 @@ public class TestSipListener implements SipListener {
 				System.out
 						.println("INVITE AUTHORIZATION sent:\n" + authrequest);
 			} else if (response.getStatusCode() > Response.TRYING && response.getStatusCode() < Response.OK) {
-				RequireHeader requireHeader = (RequireHeader) response.getHeader(RequireHeader.NAME);				
-				if(requireHeader != null && "100rel".equalsIgnoreCase(requireHeader.getOptionTag().trim())) {
-					Request prack = dialog.createPrack(response);
-					ClientTransaction ct = sipProvider
-						.getNewClientTransaction(prack);
-					dialog.sendRequest(ct);
-					prackSent = true;
+				if(!prackSent) {
+					RequireHeader requireHeader = (RequireHeader) response.getHeader(RequireHeader.NAME);				
+					if(requireHeader != null && "100rel".equalsIgnoreCase(requireHeader.getOptionTag().trim())) {
+						Request prack = dialog.createPrack(response);
+						ClientTransaction ct = sipProvider
+							.getNewClientTransaction(prack);
+						dialog.sendRequest(ct);
+						prackSent = true;
+					}
 				}
 			}
 			/**

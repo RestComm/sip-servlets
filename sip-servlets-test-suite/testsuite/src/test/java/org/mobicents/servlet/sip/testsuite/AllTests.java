@@ -25,6 +25,7 @@ import org.mobicents.servlet.sip.testsuite.address.TelURLTest;
 import org.mobicents.servlet.sip.testsuite.annotations.AnnotationTest;
 import org.mobicents.servlet.sip.testsuite.b2bua.B2BUASipUnitTest;
 import org.mobicents.servlet.sip.testsuite.b2bua.B2BUATcpUdpTest;
+import org.mobicents.servlet.sip.testsuite.b2bua.prack.CallForwardingB2BUAPrackTest;
 import org.mobicents.servlet.sip.testsuite.callcontroller.CallBlockingTest;
 import org.mobicents.servlet.sip.testsuite.callcontroller.CallControllerCancelTest;
 import org.mobicents.servlet.sip.testsuite.callcontroller.CallControllerJunitTest;
@@ -125,6 +126,7 @@ public class AllTests {
 		suite.addTestSuite(ProxyPrackTest.class);
 		suite.addTestSuite(ShootmePrackSipServletTest.class);
 		suite.addTestSuite(ShootistPrackSipServletTest.class);
+		suite.addTestSuite(CallForwardingB2BUAPrackTest.class);
 		suite.addTestSuite(ConcurrentyControlSipSessionIsolationTest.class);
 		suite.addTestSuite(CongestionControlTest.class);
 		suite.addTestSuite(ProxyBranchTimeoutTest.class);

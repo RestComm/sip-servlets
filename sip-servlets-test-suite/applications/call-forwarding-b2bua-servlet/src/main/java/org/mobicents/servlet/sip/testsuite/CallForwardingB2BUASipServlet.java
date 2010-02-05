@@ -30,10 +30,12 @@ import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
+import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.UAMode;
 import javax.sip.header.ContactHeader;
 
 import org.apache.log4j.Logger;
@@ -227,6 +229,48 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	}
 	
 	@Override
+    protected void doUpdate(SipServletRequest request) throws ServletException,
+            IOException {
+		if(logger.isInfoEnabled()) {
+			logger.info("Got UPDATE: " + request.toString());
+		}
+        B2buaHelper helper = request.getB2buaHelper();
+        SipSession peerSession = helper.getLinkedSession(request.getSession());
+        SipServletRequest update = helper.createRequest(peerSession, request, null);
+        update.send();
+    }
+	
+	@Override
+    protected void doPrack(SipServletRequest req) throws ServletException,
+            IOException {
+        
+        B2buaHelper helper = req.getB2buaHelper();
+        SipSession peerSession = helper.getLinkedSession(req.getSession());
+        List<SipServletMessage> pendingMessages = helper.getPendingMessages(peerSession, UAMode.UAC);
+        SipServletResponse invitePendingResponse = null;
+        logger.info("pending messages : ");
+        for(SipServletMessage pendingMessage : pendingMessages) {
+        	logger.info("\t pending message : " + pendingMessage);
+        	if(((SipServletResponse)pendingMessage).getStatus() > 100) {
+        		invitePendingResponse = (SipServletResponse)pendingMessage;
+        		break;
+        	}
+        }
+        SipServletResponse inviteResponse = (SipServletResponse) invitePendingResponse;
+        SipServletRequest prack = inviteResponse.createPrack();
+        String[] forwardingUri = forwardingUris.get(prack.getFrom().getURI().toString());
+        SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
+				SIP_FACTORY);
+        SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1]);
+		prack.setRequestURI(sipUri);						
+        prack.send();
+        
+        if(logger.isTraceEnabled()) {
+            logger.trace("[Send " + prack.getMethod() + " Request]:" + prack);
+        }
+    }
+	
+	@Override
 	protected void doSuccessResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.toString());
@@ -234,6 +278,20 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		SipSession originalSession =   
 		    sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
 		String cSeqValue = sipServletResponse.getHeader("CSeq");
+		if ("PRACK".equals(sipServletResponse.getMethod())) {            
+            List<SipServletMessage> pendingMessages = sipServletResponse.getRequest().getB2buaHelper().getPendingMessages(originalSession, UAMode.UAS);
+            SipServletRequest prackPendingMessage =null; 
+            logger.info("pending messages : ");
+            for(SipServletMessage pendingMessage : pendingMessages) {
+            	logger.info("\t pending message : " + pendingMessage);
+            	if(((SipServletRequest) pendingMessage).getMethod().equals("PRACK")) {
+            		prackPendingMessage = (SipServletRequest) pendingMessage;
+            		break;
+            	}
+            }
+            prackPendingMessage.createResponse(sipServletResponse.getStatus()).send();
+            return;
+        } 
 		//if this is a response to an INVITE we ack it and forward the OK 
 		if(originalSession!= null && cSeqValue.indexOf("INVITE") != -1) {
 			SipServletRequest ackRequest = sipServletResponse.createAck();
@@ -284,6 +342,21 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			}
 		}
 	}
+	
+	@Override
+	protected void doProvisionalResponse(SipServletResponse sipServletResponse)
+			throws ServletException, IOException {
+		SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
+		SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
+		if(logger.isInfoEnabled()) {
+			logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
+		}
+		if(sipServletResponse.getHeader("Require") != null) {
+			responseToOriginalRequest.sendReliably();
+		} else {
+			responseToOriginalRequest.send();
+		}
+	}	
 	
 	// SipErrorListener methods
 	/**
