@@ -310,6 +310,10 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			    SipSession peerSession = sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
 			    SipServletResponse responseToOriginalRequest = sipServletResponse.getRequest().getB2buaHelper().createResponseToOriginalRequest(peerSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
 			    responseToOriginalRequest.send();
+			    //
+			    SipServletRequest ackRequest = sipServletResponse.createAck();
+				logger.info("Sending " +  ackRequest);
+				ackRequest.send();
 			}			
 		}			
 	}

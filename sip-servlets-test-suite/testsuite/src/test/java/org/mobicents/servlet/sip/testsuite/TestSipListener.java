@@ -1243,7 +1243,7 @@ public class TestSipListener implements SipListener {
 					} else {
 						sipProvider.sendRequest(ackRequest);
 					}
-					ackSent = true;
+					ackSent = true;					
 					Thread.sleep(1000);
 					// If the caller is supposed to send the bye
 					if(sendReinvite && !reinviteSent) {
@@ -1379,15 +1379,13 @@ public class TestSipListener implements SipListener {
 				System.out
 						.println("INVITE AUTHORIZATION sent:\n" + authrequest);
 			} else if (response.getStatusCode() > Response.TRYING && response.getStatusCode() < Response.OK) {
-				if(!prackSent) {
-					RequireHeader requireHeader = (RequireHeader) response.getHeader(RequireHeader.NAME);				
-					if(requireHeader != null && "100rel".equalsIgnoreCase(requireHeader.getOptionTag().trim())) {
-						Request prack = dialog.createPrack(response);
-						ClientTransaction ct = sipProvider
-							.getNewClientTransaction(prack);
-						dialog.sendRequest(ct);
-						prackSent = true;
-					}
+				RequireHeader requireHeader = (RequireHeader) response.getHeader(RequireHeader.NAME);				
+				if(requireHeader != null && "100rel".equalsIgnoreCase(requireHeader.getOptionTag().trim())) {
+					Request prack = dialog.createPrack(response);
+					ClientTransaction ct = sipProvider
+						.getNewClientTransaction(prack);
+					dialog.sendRequest(ct);
+					prackSent = true;
 				}
 			}
 			/**
