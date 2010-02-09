@@ -64,7 +64,7 @@ public class ConvergedSipModule extends WebModule {
 	public synchronized void startModule() throws Exception {
 		// Get the war URL
 		JBossConvergedSipMetaData sipMetaData = di.getAttachment(JBossConvergedSipMetaData.class);
-		if(sipMetaData != null) {
+		if(sipMetaData != null && sipMetaData.getApplicationName() != null) {
 			WebApplication webApp = deployment.start(di, sipMetaData);
 			String warURL = di.getName();
 			container.addDeployedApp(warURL, webApp);
