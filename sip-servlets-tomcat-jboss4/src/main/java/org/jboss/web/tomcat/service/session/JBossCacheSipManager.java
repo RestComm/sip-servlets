@@ -693,7 +693,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 							+ "session with id " + session.getId());
 				}
 
-				if (session.isValid()
+				if (session.isValidInternal()
 						&& (session.isSessionDirty() || session
 								.getExceedsMaxUnreplicatedInterval()) && State.CONFIRMED.equals(session.getState())) {
 					final String realId = session.getId();
@@ -730,7 +730,7 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 							+ "session with id " + session.getId());
 				}
 
-				if (session.isValid()
+				if (session.isValidInternal()
 						&& (session.isSessionDirty() || session
 								.getExceedsMaxUnreplicatedInterval())) {
 					if(logger.isInfoEnabled()) {
