@@ -389,13 +389,20 @@
 	
 	<target name="build-mobicents-sip-load-balancer" depends="get-deps">
 		<echo>Building Mobicents SIP Load Balancer</echo>
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/sip-balancer">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/sip-balancer/jar">
 			<arg line="clean install -P set-svn-revision -Dmaven.test.skip=true" />
 		</exec>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/sip-balancer/docs">
+			<arg line="clean install -P set-svn-revision,maven-release -Dmaven.test.skip=true" />
+		</exec>
 		<copy tofile="${jboss.home}/sip-balancer/sip-balancer-jar-with-dependencies.jar">
-			<fileset dir="${base.path}/target/dependencies/sip-balancer/target/" includes="sip-balancer-*-jar-with-dependencies.jar" />
+			<fileset dir="${base.path}/target/dependencies/sip-balancer/jar/target/" includes="sip-balancer-*-jar-with-dependencies.jar" />
+		<mkdir dir="${jboss.home}/sip-balancer/docs"/>
+		<copy todir="${jboss.home}/sip-balancer/docs">
+			<fileset dir="${base.path}/target/dependencies/sip-balancer/docs/jdocbook-mobicents/target/docbook/publish/en-US" includes="**/*" />
 		</copy>
-		<copy file="${base.path}/target/dependencies/sip-balancer/src/test/resources/lb-configuration.properties"
+		</copy>
+		<copy file="${base.path}/target/dependencies/sip-balancer/jar/src/test/resources/lb-configuration.properties"
 			tofile="${jboss.home}/sip-balancer/lb-configuration.properties" />
 	</target>
 	
