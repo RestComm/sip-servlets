@@ -236,7 +236,7 @@
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.tools</groupId>
-					<artifactId>sip-balancer</artifactId>
+					<artifactId>sip-balancer-jar</artifactId>
 					<version>${mobicents.balancer.version}</version>
 					<scope>provided</scope>
 				</dependency>
@@ -272,7 +272,7 @@
 										<goal>copy-dependencies</goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>sip-balancer,mobicents-jain-sip-jboss5,core,cache,timers</includeArtifactIds>
+									<includeArtifactIds>sip-balancer-jar,mobicents-jain-sip-jboss5,core,cache,timers</includeArtifactIds>
 					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>		 	          		
@@ -311,7 +311,7 @@
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.tools</groupId>
-					<artifactId>sip-balancer</artifactId>
+					<artifactId>sip-balancer-jar</artifactId>
 					<version>${mobicents.balancer.version}</version>
 					<scope>provided</scope>
 				</dependency>
@@ -329,7 +329,7 @@
 										<goal>copy-dependencies</goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>sip-balancer,mobicents-jain-sip-jboss5,core,cache,timers</includeArtifactIds>
+									<includeArtifactIds>sip-balancer-jar,mobicents-jain-sip-jboss5,core,cache,timers</includeArtifactIds>
 					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>		 	          		
@@ -368,7 +368,7 @@
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.tools</groupId>
-					<artifactId>sip-balancer</artifactId>
+					<artifactId>sip-balancer-jar</artifactId>
 					<version>${mobicents.balancer.version}</version>
 					<scope>provided</scope>
 				</dependency>
@@ -386,7 +386,7 @@
 										<goal>copy-dependencies</goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>sip-balancer,mobicents-jain-sip-jboss5,core,cache,timers</includeArtifactIds>
+									<includeArtifactIds>sip-balancer-jar,mobicents-jain-sip-jboss5,core,cache,timers</includeArtifactIds>
 					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>		 	          		
@@ -425,7 +425,7 @@
 				</dependency>
 				<dependency>
 					<groupId>org.mobicents.tools</groupId>
-					<artifactId>sip-balancer</artifactId>
+					<artifactId>sip-balancer-jar</artifactId>
 					<version>${mobicents.balancer.version}</version>
 					<scope>provided</scope>
 				</dependency>
@@ -461,7 +461,7 @@
 										<goal>copy-dependencies</goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>sip-balancer,mobicents-jain-sip-jboss5,core,cache,timers</includeArtifactIds>
+									<includeArtifactIds>sip-balancer-jar,mobicents-jain-sip-jboss5,core,cache,timers</includeArtifactIds>
 					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>		 	          		
