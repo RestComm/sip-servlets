@@ -34,7 +34,7 @@
 	<property name="tomcat.distro.zip.path" value="${base.path}/apache-tomcat-${tomcat.version}.zip" />
 	<property name="jboss.distro.zip.path" value="${base.path}/jboss-${jboss.version}.zip" />
 	<property name="jboss-5.distro.zip.path" value="${base.path}/jboss-${jboss-5.version}.zip" />
-	<property name="jboss-5-jd6.distro.zip.path" value="${base.path}/jboss-${jboss-5.version}-jdk6.zip" />
+	<property name="jboss-5-jdk6.distro.zip.path" value="${base.path}/jboss-${jboss-5.version}-jdk6.zip" />
 	<property name="jboss-5.torquebox.deployer.url" value="http://repository.torquebox.org/maven2/snapshots/org/torquebox/torquebox-core/1.0.0.Beta14-SNAPSHOT/torquebox-core-1.0.0.Beta14-20090709.162929-1-deployer.jar"/>
 	<property name="jboss-5.torquebox.deployer.zip.path" value="${base.path}/torquebox-deployer.zip"/>
 	<property name="embjopr.distro.zip.path" value="${base.path}/embjopr-${embjopr.version}.zip" />
@@ -198,7 +198,7 @@
 	
 	<!-- JBoss 5 jdk6 version -->
 		
-	<target name="release-jboss-5-jdk6" depends="extract-jboss-5,extract-jboss-5-torquebox-deployer">
+	<target name="release-jboss-5-jdk6" depends="extract-jboss-5-jdk6,extract-jboss-5-torquebox-deployer">
 		<for delimiter="," param="jboss.config" list="${mss.release.configurations.jboss5}">
 			<sequential>
 				<ant dir="${base.path}" antfile="build.xml" target="release-jboss-5-node">
@@ -685,6 +685,12 @@
 		<get dest="${jboss-5.distro.zip.path}" src="${jboss-5.download.url}"/>
 	</target>
 	
+	<available file="${jboss-5-jdk6.distro.zip.path}" property="got.jboss-5-jdk6" />
+	<target name="get-jboss-5-jdk6" unless="got.jboss-5-jdk6">
+		<echo>Downloading JBoss AS 5</echo>
+		<get dest="${jboss-5-jdk6.distro.zip.path}" src="${jboss-5-jdk6.download.url}"/>
+	</target>
+	
 	<available file="${mms.zip.path}" property="got.mms" />
 	<target name="get-mms" unless="got.mms">
 		<echo>Downloading JBoss AS 5</echo>
@@ -710,6 +716,18 @@
 	</target>
 	
 	<target name="extract-jboss-5" depends="get-jboss-5">
+		<delete dir="${jboss-5.home}" failonerror="true" />
+		<unzip src="${jboss-5.distro.zip.path}" dest="${jboss-5.home}/.." />
+		
+		<propertyregex input="${mss.release.configurations.jboss5}" regexp="(\w+)" global="true" replace="**/\1/**" property="used.configurations.jboss5" />
+		<echo>Included profiles: ${mss.release.configurations.jboss5} -&gt; Excludes list: ${used.configurations.jboss5}</echo>
+		
+		<delete includeemptydirs="true" failonerror="false" verbose="false">
+			<fileset dir="${jboss-5.home}/server" excludes="${used.configurations.jboss5}" />
+		</delete>
+	</target>
+	
+	<target name="extract-jboss-5-jdk6" depends="get-jboss-5-jdk6">
 		<delete dir="${jboss-5.home}" failonerror="true" />
 		<unzip src="${jboss-5.distro.zip.path}" dest="${jboss-5.home}/.." />
 		
