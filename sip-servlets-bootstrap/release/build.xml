@@ -170,7 +170,9 @@
 			<fileset dir="${base.path}/../../sip-servlets-examples/diameter-event-charging/target/" includes="diameter-event-charging-*.war" />
 		</copy>
 		<!-- include MMS 2.X -->
-		<antcall target="extract-mms"/>
+		<antcall target="extract-mms">
+			<param name="mss.home" value="${jboss-5.home}"/>
+		</antcall>
 		<!-- include JSR309 media example -->
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet">
 			<arg line="clean install -U -P set-svn-revision" />
@@ -219,7 +221,9 @@
 			<fileset dir="${base.path}/../../sip-servlets-examples/diameter-event-charging/target/" includes="diameter-event-charging-*.war" />
 		</copy>
 		<!-- include MMS 2.X -->
-		<antcall target="extract-mms"/>
+		<antcall target="extract-mms">
+			<param name="mss.home" value="${jboss-5-jdk6.home}"/>
+		</antcall>
 		<!-- include JSR309 media example -->
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet">
 			<arg line="clean install -U -P set-svn-revision" />
@@ -744,8 +748,8 @@
 	</target>
 	
 	<target name="extract-mms" depends="get-mms">
-		<mkdir dir="${jboss-5.home}/mobicents-media-server"/>
-		<unzip src="${mms.zip.path}" dest="${jboss-5.home}/mobicents-media-server" />
+		<mkdir dir="${mss.home}/mobicents-media-server"/>
+		<unzip src="${mms.zip.path}" dest="${mss.home}/mobicents-media-server" />
 	</target>
 	
 	<target name="extract-jboss-5-torquebox-deployer" depends="get-jboss-5-torquebox-deployer">			
