@@ -146,7 +146,7 @@
 		
 		<dependency>
 			<groupId>org.mobicents.tools</groupId>
-			<artifactId>sip-balancer</artifactId>
+			<artifactId>sip-balancer-jar</artifactId>
 			<version>${mobicents.balancer.version}</version>
 		</dependency>
 		

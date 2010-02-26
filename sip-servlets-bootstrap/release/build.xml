@@ -13,6 +13,7 @@
 	<property name="jboss-5.version" value="5.1.0.GA" />
 	<property name="jboss.download.url" value="http://downloads.sourceforge.net/jboss/jboss-${jboss.version}.zip" />
 	<property name="jboss-5.download.url" value="http://downloads.sourceforge.net/jboss/jboss-${jboss-5.version}.zip" />	
+	<property name="jboss-5-jdk6.download.url" value="http://downloads.sourceforge.net/project/jboss/JBoss/JBoss-${jboss-5.version}/jboss-${jboss-5.version}-jdk6.zip" />
 	
 	<property name="tomcat.version" value="6.0.20" />
 	<property name="tomcat.download.url" value="http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip" />
@@ -33,12 +34,14 @@
 	<property name="tomcat.distro.zip.path" value="${base.path}/apache-tomcat-${tomcat.version}.zip" />
 	<property name="jboss.distro.zip.path" value="${base.path}/jboss-${jboss.version}.zip" />
 	<property name="jboss-5.distro.zip.path" value="${base.path}/jboss-${jboss-5.version}.zip" />
+	<property name="jboss-5-jd6.distro.zip.path" value="${base.path}/jboss-${jboss-5.version}-jdk6.zip" />
 	<property name="jboss-5.torquebox.deployer.url" value="http://repository.torquebox.org/maven2/snapshots/org/torquebox/torquebox-core/1.0.0.Beta14-SNAPSHOT/torquebox-core-1.0.0.Beta14-20090709.162929-1-deployer.jar"/>
 	<property name="jboss-5.torquebox.deployer.zip.path" value="${base.path}/torquebox-deployer.zip"/>
 	<property name="embjopr.distro.zip.path" value="${base.path}/embjopr-${embjopr.version}.zip" />
 	
 	<property name="jboss.home" value="${release.path}/jboss-${jboss.version}" />
 	<property name="jboss-5.home" value="${release.path}/jboss-${jboss-5.version}" />
+	<property name="jboss-5-jdk6.home" value="${release.path}/jboss-jdk6-${jboss-5.version}" />
 	<property name="tomcat.home" value="${release.path}/apache-tomcat-${tomcat.version}" />
 	<property name="embjopr.war" value="admin-console.war" />
 	<property name="embjopr.home" value="${release.path}/${embjopr.war}" />
@@ -56,7 +59,7 @@
 	
 	<!-- Release target -->
 	
-	<target name="release" depends="clean,release-jboss-5,release-tomcat,make-src-zip,clean" />
+	<target name="release" depends="clean,release-jboss-5,release-jboss-5-jdk6,release-tomcat,make-src-zip,clean" />
 	
 	<!-- Tomcat version -->
 	
@@ -87,7 +90,7 @@
 		
 		<mkdir dir="${tomcat.home}/docs" />
 		<antcall target="build-documentation">
-			<param name="jboss.home" value="${tomcat.home}"/>
+			<param name="mss.home" value="${tomcat.home}"/>
 		</antcall>
 		<antcall target="make-final-zip-tomcat" />
 	</target>
@@ -135,22 +138,28 @@
 		</copy>
 		
 		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${jboss.home}" />
-		<antcall target="build-mobicents-sip-load-balancer"/>
-		<antcall target="build-documentation"/>
+		<antcall target="build-mobicents-sip-load-balancer">
+			<param name="mss.home" value="${jboss.home}"/>
+		</antcall>
+		<antcall target="build-documentation">
+			<param name="mss.home" value="${jboss.home}"/>
+		</antcall>		
 		<antcall target="make-final-zip-jboss" />
 	</target>
+	
+	<!-- JBoss 5 version -->
 	
 	<target name="release-jboss-5" depends="extract-jboss-5,extract-jboss-5-torquebox-deployer">
 		<for delimiter="," param="jboss.config" list="${mss.release.configurations.jboss5}">
 			<sequential>
 				<ant dir="${base.path}" antfile="build.xml" target="release-jboss-5-node">
-					<property name="jboss-5.home" value="${jboss-5.home}"/>
+					<property name="mss.home" value="${jboss-5.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
 				</ant>				
 			</sequential>
 		</for>
 		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-jboss-5">
-			<property name="jboss.home" value="${jboss-5.home}"/>
+			<property name="mss.home" value="${jboss-5.home}"/>
 			<property name="jboss.config" value="default"/>
 		</ant>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/diameter-event-charging">
@@ -170,10 +179,10 @@
 		</copy>		
 		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${jboss-5.home}" />
 		<antcall target="build-mobicents-sip-load-balancer">
-			<param name="jboss.home" value="${jboss-5.home}"/>
+			<param name="mss.home" value="${jboss-5.home}"/>
 		</antcall>
 		<antcall target="build-documentation">
-			<param name="jboss.home" value="${jboss-5.home}"/>
+			<param name="mss.home" value="${jboss-5.home}"/>
 		</antcall>
 		<!-- include Click to Call example -->
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
@@ -185,6 +194,55 @@
 		</copy>				
 		
 		<antcall target="make-final-zip-jboss-5" />
+	</target>
+	
+	<!-- JBoss 5 jdk6 version -->
+		
+	<target name="release-jboss-5-jdk6" depends="extract-jboss-5,extract-jboss-5-torquebox-deployer">
+		<for delimiter="," param="jboss.config" list="${mss.release.configurations.jboss5}">
+			<sequential>
+				<ant dir="${base.path}" antfile="build.xml" target="release-jboss-5-node">
+					<property name="mss.home" value="${jboss-5-jdk6}"/>
+					<property name="jboss.config" value="@{jboss.config}"/>
+				</ant>				
+			</sequential>
+		</for>
+		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-jboss-5">
+			<property name="mss.home" value="${jboss-5-jdk6}"/>
+			<property name="jboss.config" value="default"/>
+		</ant>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/diameter-event-charging">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>		
+		<copy tofile="${jboss-5-jdk6.home}/server/default/deploy/diameter-event-charging.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/diameter-event-charging/target/" includes="diameter-event-charging-*.war" />
+		</copy>
+		<!-- include MMS 2.X -->
+		<antcall target="extract-mms"/>
+		<!-- include JSR309 media example -->
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
+		<copy tofile="${jboss-5-jdk6.home}/server/default/deploy/media-jsr309-servlet.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet/target/" includes="media-jsr309-servlet.war" />
+		</copy>		
+		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${jboss-5-jdk6.home}" />
+		<antcall target="build-mobicents-sip-load-balancer">
+			<param name="mss.home" value="${jboss-5-jdk6.home}"/>
+		</antcall>
+		<antcall target="build-documentation">
+			<param name="mss.home" value="${jboss-5-jdk6.home}"/>
+		</antcall>
+		<!-- include Click to Call example -->
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
+			<arg line="clean install -U -P set-svn-revision" />
+		</exec>
+				
+		<copy tofile="${jboss-5-jdk6.home}/server/default/deploy/click2call.war">
+			<fileset dir="${base.path}/../../sip-servlets-examples/click-to-call/target/" includes="click-to-call-servlet-*.war" />
+		</copy>				
+		
+		<antcall target="make-final-zip-jboss-5-jdk6" />
 	</target>
 	
 	<target name="release-jboss-node">
@@ -219,42 +277,43 @@
 	</target>
 	
 	<target name="release-jboss-5-node">
-		<mkdir dir="${jboss-5.home}/server/${jboss.config}/conf/dars" />
-		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" />
-		<copy file="${base.path}/mss-sip-stack-jboss-5.properties" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/conf/mss-sip-stack.properties" />
-		<copy file="${base.path}/server-jboss-5.xml" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/server.xml" />		
-		<copy file="${base.path}/jboss-beans.xml" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/META-INF/jboss-beans.xml" />
-		<copy file="${base.path}/metadata-deployer-jboss-beans.xml" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/deployers/metadata-deployer-jboss-beans.xml" />
-		<copy file="${base.path}/war-deployers-jboss-beans.xml" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml" />
-		<copy file="${base.path}/context-jboss-5.xml" overwrite="true" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/context.xml" />
+		<echo message="MSS_HOME= ${mss.home}"/>
+		<mkdir dir="${mss.home}/server/${jboss.config}/conf/dars" />
+		<copy file="${base.path}/../src/site/resources/click2call-dar.properties" overwrite="true" tofile="${mss.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" />
+		<copy file="${base.path}/mss-sip-stack-jboss-5.properties" overwrite="true" tofile="${mss.home}/server/${jboss.config}/conf/mss-sip-stack.properties" />
+		<copy file="${base.path}/server-jboss-5.xml" overwrite="true" tofile="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/server.xml" />		
+		<copy file="${base.path}/jboss-beans.xml" overwrite="true" tofile="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/META-INF/jboss-beans.xml" />
+		<copy file="${base.path}/metadata-deployer-jboss-beans.xml" overwrite="true" tofile="${mss.home}/server/${jboss.config}/deployers/metadata-deployer-jboss-beans.xml" />
+		<copy file="${base.path}/war-deployers-jboss-beans.xml" overwrite="true" tofile="${mss.home}/server/${jboss.config}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml" />
+		<copy file="${base.path}/context-jboss-5.xml" overwrite="true" tofile="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/context.xml" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -U -P set-svn-revision,jboss-5-distro,docs -DJBOSS_HOME=${jboss-5.home} -Dnode=${jboss.config}" />
+			<arg line="clean install -U -P set-svn-revision,jboss-5-distro,docs -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
 		</exec>
 		
-		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-annotations.jar" />
-		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-impl.jar" />
-		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-spec.jar" />
-		<delete file="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-jboss5-metadata.jar" />
-		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-annotations.jar">
-			<fileset dir="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-annotations-*.jar" />
+		<delete file="${mss.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-annotations.jar" />
+		<delete file="${mss.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-impl.jar" />
+		<delete file="${mss.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-spec.jar" />
+		<delete file="${mss.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-jboss5-metadata.jar" />
+		<copy tofile="${mss.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-annotations.jar">
+			<fileset dir="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-annotations-*.jar" />
 		</copy>
-		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-impl.jar">
-			<fileset dir="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-impl-*.jar" />
+		<copy tofile="${mss.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-impl.jar">
+			<fileset dir="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-impl-*.jar" />
 		</copy>
-		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-spec.jar">
-			<fileset dir="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-spec-*.jar" />
+		<copy tofile="${mss.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-spec.jar">
+			<fileset dir="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-spec-*.jar" />
 		</copy>
-		<copy tofile="${jboss-5.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-jboss5-metadata.jar">
-			<fileset dir="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-jboss5-metadata-*.jar" />
+		<copy tofile="${mss.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-jboss5-metadata.jar">
+			<fileset dir="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-jboss5-metadata-*.jar" />
 		</copy>				
 				
 		<antcall target="deploy-mgmnt" >
-			<param name="management.deploy.folder" value="${jboss-5.home}/server/${jboss.config}/deploy" />
+			<param name="management.deploy.folder" value="${mss.home}/server/${jboss.config}/deploy" />
 		</antcall>
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../jopr-plugin-as-5">
-			<arg line="clean install -U -DJBOSS_HOME=${jboss-5.home} -Dnode=${jboss.config}" />
+			<arg line="clean install -U -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
 		</exec>
 		
 		<condition property="ha.capable">
@@ -264,11 +323,14 @@
 			</or>
 		</condition>
 		
-		<antcall target="release-jboss-5-node-ha" />
+		<antcall target="release-jboss-5-node-ha">
+			<param name="mss.home" value="${mss.home}" />
+		</antcall>
 		
 	</target>
 	
 	<target name="release-jboss-node-ha" if="ha.capable">
+		<echo message="MSS_HOME= ${mss.home}"/>
 		<copy overwrite="true" file="${base.path}/mss-sip-stack-jboss.properties" tofile="${jboss.home}/server/${jboss.config}/conf/mss-sip-stack.properties" />
 		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/failover-server-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/server.xml" />
 		<copy overwrite="true" file="${base.path}/context-jboss.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/context.xml" />
@@ -291,22 +353,23 @@
 	</target>
 	
 	<target name="release-jboss-5-node-ha" if="ha.capable">
-		<copy overwrite="true" file="${base.path}/mss-sip-stack-jboss-5-all.properties" tofile="${jboss-5.home}/server/${jboss.config}/conf/mss-sip-stack.properties" />
-		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/jboss5/failover-server-jboss-5.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/server.xml" />
-		<copy overwrite="true" file="${base.path}/context-jboss-5.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/context.xml" />
-		<copy overwrite="true" file="${base.path}/jboss-beans.xml" tofile="${jboss-5.home}/server/${jboss.config}/deploy/jbossweb.sar/META-INF/jboss-beans.xml" />
-		<copy overwrite="true" file="${base.path}/metadata-deployer-jboss-beans.xml" tofile="${jboss-5.home}/server/${jboss.config}/deployers/metadata-deployer-jboss-beans.xml" />
-		<copy overwrite="true" file="${base.path}/failover-war-deployers-jboss-beans.xml" tofile="${jboss-5.home}/server/${jboss.config}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml" />
+		<echo message="MSS_HOME= ${mss.home}"/>
+		<copy overwrite="true" file="${base.path}/mss-sip-stack-jboss-5-all.properties" tofile="${mss.home}/server/${jboss.config}/conf/mss-sip-stack.properties" />
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/jboss5/failover-server-jboss-5.xml" tofile="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/server.xml" />
+		<copy overwrite="true" file="${base.path}/context-jboss-5.xml" tofile="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/context.xml" />
+		<copy overwrite="true" file="${base.path}/jboss-beans.xml" tofile="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/META-INF/jboss-beans.xml" />
+		<copy overwrite="true" file="${base.path}/metadata-deployer-jboss-beans.xml" tofile="${mss.home}/server/${jboss.config}/deployers/metadata-deployer-jboss-beans.xml" />
+		<copy overwrite="true" file="${base.path}/failover-war-deployers-jboss-beans.xml" tofile="${mss.home}/server/${jboss.config}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml" />
 						
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -U -P set-svn-revision,jboss-5-distro,jboss-5-cluster-distro -DJBOSS_HOME=${jboss-5.home} -Dnode=${jboss.config}" />
+			<arg line="clean install -U -P set-svn-revision,jboss-5-distro,jboss-5-cluster-distro -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
 		</exec>
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
 			<arg line="clean install -U -P set-svn-revision"/>
 		</exec>
 			
-		<copy tofile="${jboss-5.home}/server/${jboss.config}/deploy/simple-distributable.war">
+		<copy tofile="${mss.home}/server/${jboss.config}/deploy/simple-distributable.war">
 			<fileset dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/target/" includes="simple-sip-servlet-distributable-*.war" />
 		</copy>						
 			
@@ -314,11 +377,11 @@
 			<arg line="clean install -U -P set-svn-revision" />
 		</exec>
 									
-		<copy tofile="${jboss-5.home}/server/all/deploy/click2call-distributable.war">
+		<copy tofile="${mss.home}/server/all/deploy/click2call-distributable.war">
 			<fileset dir="${base.path}/../../sip-servlets-examples/click2call-distributable/target/" includes="click2call-distributable-*.war" />
 		</copy>
 		
-		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${jboss-5.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" />
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${mss.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" />
 	</target>
 	
 	<!-- MSS Management Console -->
@@ -395,15 +458,15 @@
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/sip-balancer/docs">
 			<arg line="clean install -P set-svn-revision,maven-release -Dmaven.test.skip=true" />
 		</exec>
-		<copy tofile="${jboss.home}/sip-balancer/sip-balancer-jar-with-dependencies.jar">
+		<copy tofile="${mss.home}/sip-balancer/sip-balancer-jar-with-dependencies.jar">
 			<fileset dir="${base.path}/target/dependencies/sip-balancer/jar/target/" includes="sip-balancer-*-jar-with-dependencies.jar" />
-		<mkdir dir="${jboss.home}/sip-balancer/docs"/>
-		<copy todir="${jboss.home}/sip-balancer/docs">
+		<mkdir dir="${mss.home}/sip-balancer/docs"/>
+		<copy todir="${mss.home}/sip-balancer/docs">
 			<fileset dir="${base.path}/target/dependencies/sip-balancer/docs/jdocbook-mobicents/target/docbook/publish/en-US" includes="**/*" />
 		</copy>
 		</copy>
 		<copy file="${base.path}/target/dependencies/sip-balancer/jar/src/test/resources/lb-configuration.properties"
-			tofile="${jboss.home}/sip-balancer/lb-configuration.properties" />
+			tofile="${mss.home}/sip-balancer/lb-configuration.properties" />
 	</target>
 	
 	<target name="build-mobicents-jopr-plugin">
@@ -427,7 +490,7 @@
 	</target>
 	
 	<target name="build-mobicents-diameter-jboss-5" depends="get-mobicents-diameter-jboss-5">		
-		<copy verbose="true" todir="${jboss-5.home}/server/${jboss.config}/deploy/" file="${diameter-jboss-5.distro.path}"/>			
+		<copy verbose="true" todir="${mss.home}/server/${jboss.config}/deploy/" file="${diameter-jboss-5.distro.path}"/>			
 	</target>
 	
 	<available file="${diameter.distro.path}" property="got.mobicents-diameter" />
@@ -483,7 +546,7 @@
 		<!--copy overwrite="true" todir="${jboss.home}/docs/mobicents-sip-servlets">
 			<fileset dir="${docs.stage.dir}/sip-servlets/target/docbook/publish/en-US/" />
 		</copy--> 
-		<copy overwrite="true" todir="${jboss.home}/docs/mobicents-sip-servlets">
+		<copy overwrite="true" todir="${mss.home}/docs/mobicents-sip-servlets">
 			<fileset dir="${base.path}/../../docs/jdocbook-mobicents/target/docbook/publish/en-US/" />
 		</copy>
 		
@@ -560,6 +623,26 @@
 			<zipfileset dir="${jboss-5.home}" prefix="mss-${mss.release.version}-jboss-${jboss-5.version}" excludes="**/bin/** **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**"/>
 		</zip>
 	</target>
+	
+	<target name="make-final-zip-jboss-5-jdk6" depends="set-time-stamp">
+			<fixcrlf srcdir="${jboss-5-jdk6.home}/bin" includes="*.sh" eol="lf" eof="remove" />
+			<fixcrlf srcdir="${jboss-5-jdk6.home}/mobicents-media-server/bin" includes="*.sh" eol="lf" eof="remove" />
+			<zip destfile="${base.path}/mss-${mss.release.version}-jboss-${jboss-5.version}-jdk6-${time.stamp}.zip" filesonly="false">
+				<zipfileset dir="${jboss-5-jdk6.home}/bin" filemode="755" prefix="mss-${mss.release.version}-jboss-${jboss-5.version}-jdk6/bin">
+					<include name="*.sh" />
+				</zipfileset>			
+				<zipfileset dir="${jboss-5-jdk6.home}/bin" prefix="mss-${mss.release.version}-jboss-${jboss-5.version}-jdk6/bin">
+					<exclude name="*.sh" />
+				</zipfileset>
+				<zipfileset dir="${jboss-5-jdk6.home}/mobicents-media-server/bin" filemode="755" prefix="mss-${mss.release.version}-jboss-${jboss-5.version}-jdk6/mobicents-media-server/bin">
+					<include name="*.sh" />
+				</zipfileset>
+				<zipfileset dir="${jboss-5-jdk6.home}/mobicents-media-server/bin" prefix="mss-${mss.release.version}-jboss-${jboss-5.version}-jdk6/mobicents-media-server/bin">
+					<exclude name="*.sh" />
+				</zipfileset>
+				<zipfileset dir="${jboss-5-jdk6.home}" prefix="mss-${mss.release.version}-jboss-${jboss-5.version}-jdk6" excludes="**/bin/** **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**"/>
+			</zip>
+		</target>
 	
 	<target name="make-final-zip-tomcat" depends="set-time-stamp">
 		<fixcrlf srcdir="${tomcat.home}/bin" includes="*.sh" eol="lf" eof="remove" />

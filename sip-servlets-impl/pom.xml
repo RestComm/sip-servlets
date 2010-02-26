@@ -390,9 +390,9 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar" />										
-										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${env.JBOSS_HOME}/server/${node}/conf" />
-                                        <copy todir="${env.JBOSS_HOME}/docs/licenses">
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/${node}/deploy/jbossweb.sar" />										
+										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${JBOSS_HOME}/server/${node}/conf" />
+                                        <copy todir="${JBOSS_HOME}/docs/licenses">
                                             <fileset file="LICENSES/*" />
                                         </copy>
 									</tasks>
@@ -415,7 +415,7 @@
 		 	            			</goals>
 		 	            			<configuration>
 									<includeArtifactIds>jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-ha-core</includeArtifactIds>
-					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
+					    			<outputDirectory>${JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
 		 	        	</executions>
