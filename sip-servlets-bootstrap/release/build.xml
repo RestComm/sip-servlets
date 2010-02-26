@@ -460,11 +460,11 @@
 		</exec>
 		<copy tofile="${mss.home}/sip-balancer/sip-balancer-jar-with-dependencies.jar">
 			<fileset dir="${base.path}/target/dependencies/sip-balancer/jar/target/" includes="sip-balancer-*-jar-with-dependencies.jar" />
+		</copy>
 		<mkdir dir="${mss.home}/sip-balancer/docs"/>
 		<copy todir="${mss.home}/sip-balancer/docs">
 			<fileset dir="${base.path}/target/dependencies/sip-balancer/docs/jdocbook-mobicents/target/docbook/publish/en-US" includes="**/*" />
-		</copy>
-		</copy>
+		</copy>		
 		<copy file="${base.path}/target/dependencies/sip-balancer/jar/src/test/resources/lb-configuration.properties"
 			tofile="${mss.home}/sip-balancer/lb-configuration.properties" />
 	</target>
