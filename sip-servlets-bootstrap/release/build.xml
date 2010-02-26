@@ -202,13 +202,13 @@
 		<for delimiter="," param="jboss.config" list="${mss.release.configurations.jboss5}">
 			<sequential>
 				<ant dir="${base.path}" antfile="build.xml" target="release-jboss-5-node">
-					<property name="mss.home" value="${jboss-5-jdk6}"/>
+					<property name="mss.home" value="${jboss-5-jdk6.home}"/>
 					<property name="jboss.config" value="@{jboss.config}"/>
 				</ant>				
 			</sequential>
 		</for>
 		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-jboss-5">
-			<property name="mss.home" value="${jboss-5-jdk6}"/>
+			<property name="mss.home" value="${jboss-5-jdk6.home}"/>
 			<property name="jboss.config" value="default"/>
 		</ant>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/diameter-event-charging">
