@@ -627,20 +627,20 @@
 	<target name="make-final-zip-jboss-5-jdk6" depends="set-time-stamp">
 			<fixcrlf srcdir="${jboss-5-jdk6.home}/bin" includes="*.sh" eol="lf" eof="remove" />
 			<fixcrlf srcdir="${jboss-5-jdk6.home}/mobicents-media-server/bin" includes="*.sh" eol="lf" eof="remove" />
-			<zip destfile="${base.path}/mss-${mss.release.version}-jboss-${jboss-5.version}-jdk6-${time.stamp}.zip" filesonly="false">
-				<zipfileset dir="${jboss-5-jdk6.home}/bin" filemode="755" prefix="mss-${mss.release.version}-jboss-${jboss-5.version}-jdk6/bin">
+			<zip destfile="${base.path}/mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}-${time.stamp}.zip" filesonly="false">
+				<zipfileset dir="${jboss-5-jdk6.home}/bin" filemode="755" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}/bin">
 					<include name="*.sh" />
 				</zipfileset>			
-				<zipfileset dir="${jboss-5-jdk6.home}/bin" prefix="mss-${mss.release.version}-jboss-${jboss-5.version}-jdk6/bin">
+				<zipfileset dir="${jboss-5-jdk6.home}/bin" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}/bin">
 					<exclude name="*.sh" />
 				</zipfileset>
-				<zipfileset dir="${jboss-5-jdk6.home}/mobicents-media-server/bin" filemode="755" prefix="mss-${mss.release.version}-jboss-${jboss-5.version}-jdk6/mobicents-media-server/bin">
+				<zipfileset dir="${jboss-5-jdk6.home}/mobicents-media-server/bin" filemode="755" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}/mobicents-media-server/bin">
 					<include name="*.sh" />
 				</zipfileset>
-				<zipfileset dir="${jboss-5-jdk6.home}/mobicents-media-server/bin" prefix="mss-${mss.release.version}-jboss-${jboss-5.version}-jdk6/mobicents-media-server/bin">
+				<zipfileset dir="${jboss-5-jdk6.home}/mobicents-media-server/bin" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}/mobicents-media-server/bin">
 					<exclude name="*.sh" />
 				</zipfileset>
-				<zipfileset dir="${jboss-5-jdk6.home}" prefix="mss-${mss.release.version}-jboss-${jboss-5.version}-jdk6" excludes="**/bin/** **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**"/>
+				<zipfileset dir="${jboss-5-jdk6.home}" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}" excludes="**/bin/** **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**"/>
 			</zip>
 		</target>
 	
@@ -728,14 +728,14 @@
 	</target>
 	
 	<target name="extract-jboss-5-jdk6" depends="get-jboss-5-jdk6">
-		<delete dir="${jboss-5.home}" failonerror="true" />
-		<unzip src="${jboss-5.distro.zip.path}" dest="${jboss-5.home}/.." />
+		<delete dir="${jboss-5-jdk6.home}" failonerror="true" />
+		<unzip src="${jboss-5.distro.zip.path}" dest="${jboss-5-jdk6.home}/.." />
 		
 		<propertyregex input="${mss.release.configurations.jboss5}" regexp="(\w+)" global="true" replace="**/\1/**" property="used.configurations.jboss5" />
 		<echo>Included profiles: ${mss.release.configurations.jboss5} -&gt; Excludes list: ${used.configurations.jboss5}</echo>
 		
 		<delete includeemptydirs="true" failonerror="false" verbose="false">
-			<fileset dir="${jboss-5.home}/server" excludes="${used.configurations.jboss5}" />
+			<fileset dir="${jboss-5-jdk6.home}/server" excludes="${used.configurations.jboss5}" />
 		</delete>
 	</target>
 	
