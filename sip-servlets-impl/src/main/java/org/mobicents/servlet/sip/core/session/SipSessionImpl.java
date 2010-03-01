@@ -857,10 +857,12 @@ public class SipSessionImpl implements MobicentsSipSession {
 		stateInfo = null;
 		subscriberURI = null;
 		subscriptions = null;
-		if(semaphore != null) {
-			semaphore.release();
-			semaphore = null;
-		}
+		// don't release or nullify the semaphore, it should be done externally
+		// see Issue http://code.google.com/p/mobicents/issues/detail?id=1294
+//		if(semaphore != null) {
+//			semaphore.release();
+//			semaphore = null;
+//		}
 		facade = null;		
 	}
 	

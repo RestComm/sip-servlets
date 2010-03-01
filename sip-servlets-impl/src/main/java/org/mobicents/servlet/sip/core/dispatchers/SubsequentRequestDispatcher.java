@@ -243,7 +243,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		final SubsequentDispatchTask dispatchTask = new SubsequentDispatchTask(sipServletRequest, sipProvider);
 		// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that
 		// the tx serialization is preserved		
-		sipContext.enterSipApp(sipServletRequest, null);
+		sipContext.enterSipApp(sipApplicationSession, sipSession);
 		// if the flag is set we bypass the executor. This flag should be made deprecated 
 		if(sipApplicationDispatcher.isBypassRequestExecutor() || ConcurrencyControlMode.Transaction.equals((sipContext.getConcurrencyControlMode()))) {
 			dispatchTask.dispatchAndHandleExceptions();
@@ -343,7 +343,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					}
 				}
 				sipContext.exitSipAppHa(sipServletRequest, null);
-				sipContext.exitSipApp(sipServletRequest, null);				
+				sipContext.exitSipApp(sipSession.getSipApplicationSession(), sipSession);				
 			}
 			//nothing more needs to be done, either the app acted as UA, PROXY or B2BUA. in any case we stop routing	
 		}

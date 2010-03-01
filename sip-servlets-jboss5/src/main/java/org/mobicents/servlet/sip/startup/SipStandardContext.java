@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,6 +41,7 @@ import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.TimerService;
+import javax.servlet.sip.SipApplicationSession.Protocol;
 
 import org.apache.AnnotationProcessor;
 import org.apache.catalina.Container;
@@ -908,29 +910,32 @@ public class SipStandardContext extends StandardContext implements SipContext {
         
     }
 
-    public void enterSipApp(SipServletRequestImpl request, SipServletResponseImpl response) {		
+    public void enterSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession) {		
 		switch (concurrencyControlMode) {
-			case SipSession:
-				MobicentsSipSession sipSession = null;
-				if(request != null) {
-					sipSession = ((MobicentsSipSession)request.getSipSession());
-				} else if (response != null ) {
-					sipSession = ((MobicentsSipSession)response.getSipSession());
-				}
+			case SipSession:				
 				if(sipSession != null) {
 					final Semaphore semaphore = sipSession.getSemaphore();
 					if(semaphore != null) {
 						semaphore.acquireUninterruptibly();
 					}
+				} else if (sipApplicationSession != null) {
+					// if the sip session is null but not the sip app session,
+					// we try to acquire the semaphore of all the underlying sip sessions
+					// but this could lead to deadlocks in certain cases, if it occurs
+					// it is recommended to upgrade to SipApplicationSession concurrency control mode
+					Iterator<MobicentsSipSession> sipSessionIt = (Iterator<MobicentsSipSession>) 
+						sipApplicationSession.getSessions(Protocol.SIP.toString());
+					while (sipSessionIt.hasNext()) {
+						MobicentsSipSession childSipSession = sipSessionIt
+								.next();
+						final Semaphore semaphore = sipSession.getSemaphore();
+						if(semaphore != null) {
+							semaphore.acquireUninterruptibly();
+						}
+					}
 				}
 				break;
 			case SipApplicationSession:
-				MobicentsSipApplicationSession sipApplicationSession = null;
-				if(request != null) {
-					sipApplicationSession = ((MobicentsSipApplicationSession)request.getApplicationSession(false));
-				} else if (response != null ) {
-					sipApplicationSession = ((MobicentsSipApplicationSession)response.getApplicationSession(false));
-				}
 				if(sipApplicationSession != null) {
 					final Semaphore semaphore = sipApplicationSession.getSemaphore();
 					if(semaphore != null) {
@@ -954,26 +959,28 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}
 	}
     
-	public void exitSipApp(SipServletRequestImpl request, SipServletResponseImpl response) {
+	public void exitSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession) {
 		switch (concurrencyControlMode) {
 			case SipSession:
-				MobicentsSipSession sipSession = null;
-				if(request != null) {
-					sipSession = ((MobicentsSipSession)request.getSipSession());
-				} else if (response != null ) {
-					sipSession = ((MobicentsSipSession)response.getSipSession());
-				}
-				if(sipSession != null && sipSession.getSemaphore() != null) {
-					sipSession.getSemaphore().release();
+				if(sipSession != null) {
+					final Semaphore semaphore = sipSession.getSemaphore();
+					if(semaphore != null) {
+						semaphore.release();
+					}
+				} else if (sipApplicationSession != null) {
+					Iterator<MobicentsSipSession> sipSessionIt = (Iterator<MobicentsSipSession>) 
+						sipApplicationSession.getSessions(Protocol.SIP.toString());
+					while (sipSessionIt.hasNext()) {
+						MobicentsSipSession childSipSession = sipSessionIt
+								.next();
+						final Semaphore semaphore = sipSession.getSemaphore();
+						if(semaphore != null) {
+							semaphore.release();
+						}
+					}
 				}
 				break;
 			case SipApplicationSession:
-				MobicentsSipApplicationSession sipApplicationSession = null;
-				if(request != null) {
-					sipApplicationSession = ((MobicentsSipApplicationSession)request.getApplicationSession(false));
-				} else if (response != null ) {
-					sipApplicationSession = ((MobicentsSipApplicationSession)response.getApplicationSession(false));
-				}
 				if(sipApplicationSession != null && sipApplicationSession.getSemaphore() != null) {
 					sipApplicationSession.getSemaphore().release();
 				}

@@ -781,61 +781,64 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				try {
 					final ClassLoader cl = sipContext.getLoader().getClassLoader();
 					Thread.currentThread().setContextClassLoader(cl);
-				
-					// we don't replicate since this is just a check to see if the sessions are going to be removed
-	//				sipContext.enterSipApp(null, null, null, true, false);
-	//				try {
+									
 					MobicentsSipSession sipSessionImpl = sipContext.getSipManager().getSipSession(sipSessionKey, false, sipFactoryImpl, null);
 	
 					MobicentsSipApplicationSession sipApplicationSession = null;
-						if(sipSessionImpl != null) {
-							if(sipSessionImpl.getProxy() != null) {
-								// If this is a client transaction no need to invalidate proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
-								if(!invalidateProxySession) {
-									return;
-								} else {
-									if(logger.isDebugEnabled()) {
-										logger.debug("Proxy session is being invalidated on server transaction termination " + sipSessionKey);
-									}
-								}
-							}
-							if(logger.isDebugEnabled()) {
-								logger.debug("sip session " + sipSessionKey + " is valid ? :" + sipSessionImpl.isValidInternal());
-								if(sipSessionImpl.isValidInternal()) {
-									logger.debug("Sip session " + sipSessionKey + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
-								}
-							}
-							sipApplicationSession = sipSessionImpl.getSipApplicationSession();
-							if(sipSessionImpl.isValidInternal() && sipSessionImpl.isReadyToInvalidate()) {				
-								sipSessionImpl.onTerminatedState();
-							}
-						} else {
-							if(logger.isDebugEnabled()) {
-								logger.debug("sip session already invalidated" + sipSessionKey);
-							}
-						}										
-						if(sipApplicationSession == null) {
-							final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
-									sipSessionKey.getApplicationName(), 
-									sipSessionKey.getApplicationSessionId());
-							sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
-							
-							if(sipApplicationSession != null) {
+					if(sipSessionImpl != null) {
+						if(sipSessionImpl.getProxy() != null) {
+							// If this is a client transaction no need to invalidate proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
+							if(!invalidateProxySession) {
+								return;
+							} else {
 								if(logger.isDebugEnabled()) {
-									logger.debug("sip app session " + sipApplicationSessionKey + " is valid ? :" + sipApplicationSession.isValidInternal());
-									if(sipApplicationSession.isValidInternal()) {
-										logger.debug("Sip app session " + sipApplicationSessionKey + " is ready to be invalidated ? :" + sipApplicationSession.isReadyToInvalidate());
-									}
+									logger.debug("Proxy session is being invalidated on server transaction termination " + sipSessionKey);
 								}
-								if(sipApplicationSession.isValidInternal() && sipApplicationSession.isReadyToInvalidate()) {				
-									sipApplicationSession.tryToInvalidate();
-								}							
 							}
 						}
-					// we don't replicate since this is just a check to see if the sessions are going to be removed
-	//				} finally {
-	//					sipContext.exitSipApp(null, null);
-	//				}
+						if(logger.isDebugEnabled()) {
+							logger.debug("sip session " + sipSessionKey + " is valid ? :" + sipSessionImpl.isValidInternal());
+							if(sipSessionImpl.isValidInternal()) {
+								logger.debug("Sip session " + sipSessionKey + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
+							}
+						}
+						sipApplicationSession = sipSessionImpl.getSipApplicationSession();
+						if(sipSessionImpl.isValidInternal() && sipSessionImpl.isReadyToInvalidate()) {
+							sipContext.enterSipApp(sipApplicationSession, sipSessionImpl);
+							try {
+								sipSessionImpl.onTerminatedState();
+							} finally {
+								sipContext.exitSipApp(sipApplicationSession, sipSessionImpl);
+							}
+						}							
+					} else {
+						if(logger.isDebugEnabled()) {
+							logger.debug("sip session already invalidated" + sipSessionKey);
+						}
+					}										
+					if(sipApplicationSession == null) {
+						final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
+								sipSessionKey.getApplicationName(), 
+								sipSessionKey.getApplicationSessionId());
+						sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
+						
+						if(sipApplicationSession != null) {
+							if(logger.isDebugEnabled()) {
+								logger.debug("sip app session " + sipApplicationSessionKey + " is valid ? :" + sipApplicationSession.isValidInternal());
+								if(sipApplicationSession.isValidInternal()) {
+									logger.debug("Sip app session " + sipApplicationSessionKey + " is ready to be invalidated ? :" + sipApplicationSession.isReadyToInvalidate());
+								}
+							}
+							if(sipApplicationSession.isValidInternal() && sipApplicationSession.isReadyToInvalidate()) {
+								sipContext.enterSipApp(sipApplicationSession, sipSessionImpl);
+								try {
+									sipApplicationSession.tryToInvalidate();
+								} finally {
+									sipContext.exitSipApp(sipApplicationSession, sipSessionImpl);
+								}
+							}							
+						}
+					}
 				} finally {
 					Thread.currentThread().setContextClassLoader(oldClassLoader);
 				}
@@ -883,12 +886,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 									
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();						
 			try {
+				sipContext.enterSipApp(sipSession.getSipApplicationSession(), sipSession);
 				final ClassLoader cl = sipContext.getLoader().getClassLoader();
 				Thread.currentThread().setContextClassLoader(cl);
 				
 				final SipErrorEvent sipErrorEvent = new SipErrorEvent(
 						(SipServletRequest)sipServletMessage, 
 						lastFinalResponse);
+				
 				for (SipErrorListener sipErrorListener : sipErrorListeners) {
 					try {					
 						sipErrorListener.noAckReceived(sipErrorEvent);
@@ -897,6 +902,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					}
 				}
 			} finally {
+				sipContext.exitSipApp(sipSession.getSipApplicationSession(), sipSession);
 				Thread.currentThread().setContextClassLoader(oldClassLoader);
 			}
 			
@@ -915,6 +921,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 			try {
+				sipContext.enterSipApp(sipSession.getSipApplicationSession(), sipSession);
 				final ClassLoader cl = sipContext.getLoader().getClassLoader();
 				Thread.currentThread().setContextClassLoader(cl);
 				
@@ -929,6 +936,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					}
 				}
 			} finally {
+				sipContext.exitSipApp(sipSession.getSipApplicationSession(), sipSession);
 				Thread.currentThread().setContextClassLoader(oldClassLoader);
 			}
 			

@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.ListIterator;
 
 import javax.servlet.ServletException;
-import javax.servlet.sip.Proxy;
 import javax.servlet.sip.SipSession.State;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -317,13 +316,13 @@ public class ResponseDispatcher extends MessageDispatcher {
 						}
 					} finally {
 						sipContext.exitSipAppHa(null, sipServletResponse);
-						sipContext.exitSipApp(null, sipServletResponse);						
+						sipContext.exitSipApp(session.getSipApplicationSession(), session);						
 					}
 				}
 			};
 			// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that
 			// the tx serialization is preserved
-			sipContext.enterSipApp(null, sipServletResponse);
+			sipContext.enterSipApp(session.getSipApplicationSession(), session);
 			// if the flag is set we bypass the executor, the bypassExecutor flag should be made deprecated 
 			if(sipApplicationDispatcher.isBypassResponseExecutor() || ConcurrencyControlMode.Transaction.equals((sipContext.getConcurrencyControlMode()))) {
 				dispatchTask.dispatchAndHandleExceptions();

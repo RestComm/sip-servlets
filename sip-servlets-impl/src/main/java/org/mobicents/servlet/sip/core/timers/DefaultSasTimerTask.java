@@ -72,23 +72,24 @@ public class DefaultSasTimerTask implements SipApplicationSessionTimerTask {
 	}
 
 	private void tryToExpire() {
-		getSipApplicationSession().notifySipApplicationSessionListeners(SipApplicationSessionEventType.EXPIRATION);
-		//It is possible that the application grant an extension to the lifetime of the session, thus the sip application
-		//should not be treated as expired.
-		if(getDelay() <= 0) {
-			getSipApplicationSession().setExpired(true);
-			if(getSipApplicationSession().isValidInternal()) {			
-				final SipContext sipContext = getSipApplicationSession().getSipContext();
-				sipContext.enterSipApp(null, null);
-				sipContext.enterSipAppHa(null, null, true, false);
-				try {
-					getSipApplicationSession().invalidate();
-				} finally {							
-					sipContext.exitSipAppHa(null, null);
-					sipContext.exitSipApp(null, null);
-					setSipApplicationSession(null);
+		final SipContext sipContext = getSipApplicationSession().getSipContext();
+		sipContext.enterSipApp(getSipApplicationSession(), null);
+		sipContext.enterSipAppHa(null, null, true, false);
+		try {
+			getSipApplicationSession().notifySipApplicationSessionListeners(SipApplicationSessionEventType.EXPIRATION);
+			//It is possible that the application grant an extension to the lifetime of the session, thus the sip application
+			//should not be treated as expired.
+			if(getDelay() <= 0) {
+				
+				getSipApplicationSession().setExpired(true);
+				if(getSipApplicationSession().isValidInternal()) {			
+					getSipApplicationSession().invalidate();				
 				}
 			}
+		} finally {							
+			sipContext.exitSipAppHa(null, null);
+			sipContext.exitSipApp(getSipApplicationSession(), null);
+			setSipApplicationSession(null);
 		}
 	}				
 	

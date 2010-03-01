@@ -19,7 +19,6 @@ package org.mobicents.servlet.sip.startup;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.TimerService;
@@ -30,6 +29,8 @@ import org.apache.catalina.Context;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipContextEvent;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
@@ -144,12 +145,13 @@ public interface SipContext extends Context {
 	
 	boolean notifySipContextListeners(SipContextEvent event);
 	
-	void enterSipApp(SipServletRequestImpl request, SipServletResponseImpl response);
+//	void enterSipApp(SipServletRequestImpl request, SipServletResponseImpl response);
+//	void exitSipApp(SipServletRequestImpl request, SipServletResponseImpl response);
 	
-	void exitSipApp(SipServletRequestImpl request, SipServletResponseImpl response);
+	void enterSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession);
+	void exitSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession);
 	
 	void enterSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response, boolean startCacheActivity, boolean bindSessions);
-	
 	void exitSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response);
 	
 	SipFactoryFacade getSipFactoryFacade();

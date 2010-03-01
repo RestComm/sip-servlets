@@ -267,11 +267,13 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 		try {
 			ClassLoader cl = sipContext.getLoader().getClassLoader();
 			Thread.currentThread().setContextClassLoader(cl);
-						
+			sipContext.enterSipApp(appSession, null);
+			
 			listener.timeout(this);
 		} catch(Throwable t) {
 			logger.error("An unexpected exception happened in the timer callback!",t);
 		} finally {
+			sipContext.exitSipApp(appSession, null);
 			Thread.currentThread().setContextClassLoader(oldClassLoader);
 			if (isRepeatingTimer) {
 				estimateNextExecution();
