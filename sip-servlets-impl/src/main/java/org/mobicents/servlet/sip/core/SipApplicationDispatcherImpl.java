@@ -777,60 +777,68 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());
 			//the context can be null if the server is being shutdown
 			if(sipContext != null) {
-				// we don't replicate since this is just a check to see if the sessions are going to be removed
-//				sipContext.enterSipApp(null, null, null, true, false);
-//				try {
-				MobicentsSipSession sipSessionImpl = sipContext.getSipManager().getSipSession(sipSessionKey, false, sipFactoryImpl, null);
-
-				MobicentsSipApplicationSession sipApplicationSession = null;
-					if(sipSessionImpl != null) {
-						if(sipSessionImpl.getProxy() != null) {
-							// If this is a client transaction no need to invalidate proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
-							if(!invalidateProxySession) {
-								return;
-							} else {
-								if(logger.isDebugEnabled()) {
-									logger.debug("Proxy session is being invalidated on server transaction termination " + sipSessionKey);
+				final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+				try {
+					final ClassLoader cl = sipContext.getLoader().getClassLoader();
+					Thread.currentThread().setContextClassLoader(cl);
+				
+					// we don't replicate since this is just a check to see if the sessions are going to be removed
+	//				sipContext.enterSipApp(null, null, null, true, false);
+	//				try {
+					MobicentsSipSession sipSessionImpl = sipContext.getSipManager().getSipSession(sipSessionKey, false, sipFactoryImpl, null);
+	
+					MobicentsSipApplicationSession sipApplicationSession = null;
+						if(sipSessionImpl != null) {
+							if(sipSessionImpl.getProxy() != null) {
+								// If this is a client transaction no need to invalidate proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
+								if(!invalidateProxySession) {
+									return;
+								} else {
+									if(logger.isDebugEnabled()) {
+										logger.debug("Proxy session is being invalidated on server transaction termination " + sipSessionKey);
+									}
 								}
 							}
-						}
-						if(logger.isDebugEnabled()) {
-							logger.debug("sip session " + sipSessionKey + " is valid ? :" + sipSessionImpl.isValidInternal());
-							if(sipSessionImpl.isValidInternal()) {
-								logger.debug("Sip session " + sipSessionKey + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
-							}
-						}
-						sipApplicationSession = sipSessionImpl.getSipApplicationSession();
-						if(sipSessionImpl.isValidInternal() && sipSessionImpl.isReadyToInvalidate()) {				
-							sipSessionImpl.onTerminatedState();
-						}
-					} else {
-						if(logger.isDebugEnabled()) {
-							logger.debug("sip session already invalidated" + sipSessionKey);
-						}
-					}										
-					if(sipApplicationSession == null) {
-						final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
-								sipSessionKey.getApplicationName(), 
-								sipSessionKey.getApplicationSessionId());
-						sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
-						
-						if(sipApplicationSession != null) {
 							if(logger.isDebugEnabled()) {
-								logger.debug("sip app session " + sipApplicationSessionKey + " is valid ? :" + sipApplicationSession.isValidInternal());
-								if(sipApplicationSession.isValidInternal()) {
-									logger.debug("Sip app session " + sipApplicationSessionKey + " is ready to be invalidated ? :" + sipApplicationSession.isReadyToInvalidate());
+								logger.debug("sip session " + sipSessionKey + " is valid ? :" + sipSessionImpl.isValidInternal());
+								if(sipSessionImpl.isValidInternal()) {
+									logger.debug("Sip session " + sipSessionKey + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
 								}
 							}
-							if(sipApplicationSession.isValidInternal() && sipApplicationSession.isReadyToInvalidate()) {				
-								sipApplicationSession.tryToInvalidate();
-							}							
+							sipApplicationSession = sipSessionImpl.getSipApplicationSession();
+							if(sipSessionImpl.isValidInternal() && sipSessionImpl.isReadyToInvalidate()) {				
+								sipSessionImpl.onTerminatedState();
+							}
+						} else {
+							if(logger.isDebugEnabled()) {
+								logger.debug("sip session already invalidated" + sipSessionKey);
+							}
+						}										
+						if(sipApplicationSession == null) {
+							final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
+									sipSessionKey.getApplicationName(), 
+									sipSessionKey.getApplicationSessionId());
+							sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
+							
+							if(sipApplicationSession != null) {
+								if(logger.isDebugEnabled()) {
+									logger.debug("sip app session " + sipApplicationSessionKey + " is valid ? :" + sipApplicationSession.isValidInternal());
+									if(sipApplicationSession.isValidInternal()) {
+										logger.debug("Sip app session " + sipApplicationSessionKey + " is ready to be invalidated ? :" + sipApplicationSession.isReadyToInvalidate());
+									}
+								}
+								if(sipApplicationSession.isValidInternal() && sipApplicationSession.isReadyToInvalidate()) {				
+									sipApplicationSession.tryToInvalidate();
+								}							
+							}
 						}
-					}
-				// we don't replicate since this is just a check to see if the sessions are going to be removed
-//				} finally {
-//					sipContext.exitSipApp(null, null);
-//				}
+					// we don't replicate since this is just a check to see if the sessions are going to be removed
+	//				} finally {
+	//					sipContext.exitSipApp(null, null);
+	//				}
+				} finally {
+					Thread.currentThread().setContextClassLoader(oldClassLoader);
+				}
 			}
 		}
 	}
@@ -842,64 +850,89 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public void processDialogTimeout(DialogTimeoutEvent timeoutEvent) {
 		final Dialog dialog = timeoutEvent.getDialog();
 		if(timeoutEvent.getReason() == Reason.AckNotReceived) {			
-			TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
+			final TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
 			if(tad != null) {
-				SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
-				SipSessionKey sipSessionKey = sipServletMessage.getSipSessionKey();
-				MobicentsSipSession sipSession = sipServletMessage.getSipSession();
+				final SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
+				final SipSessionKey sipSessionKey = sipServletMessage.getSipSessionKey();
+				final MobicentsSipSession sipSession = sipServletMessage.getSipSession();
 				if(sipSession != null) {
-					//notifying SipErrorListener that no ACK has been received for a UAS only
-					SipServletResponseImpl lastFinalResponse = (SipServletResponseImpl)
-						((SipServletRequestImpl)sipServletMessage).getLastInformationalResponse();
-					if(logger.isDebugEnabled()) {
-						logger.debug("last Final Response" + lastFinalResponse);
-					}
-					ProxyImpl proxy = sipSession.getProxy();
-					if(sipServletMessage instanceof SipServletRequestImpl &&
-							proxy == null &&
-							lastFinalResponse != null) {
-						List<SipErrorListener> sipErrorListeners = 
-							sipSession.getSipApplicationSession().getSipContext().getListeners().getSipErrorListeners();			
-						
-						SipErrorEvent sipErrorEvent = new SipErrorEvent(
-								(SipServletRequest)sipServletMessage, 
-								lastFinalResponse);
-						for (SipErrorListener sipErrorListener : sipErrorListeners) {
-							try {					
-								sipErrorListener.noAckReceived(sipErrorEvent);
-							} catch (Throwable t) {
-								logger.error("SipErrorListener threw exception", t);
-							}
-						}
-					}
-					SipServletResponseImpl lastInfoResponse = (SipServletResponseImpl)
-						((SipServletRequestImpl)sipServletMessage).getLastInformationalResponse();
-					if(logger.isDebugEnabled()) {
-						logger.debug("last Informational Response" + lastInfoResponse);
-					}
-					if(sipServletMessage instanceof SipServletRequestImpl &&
-							proxy == null &&
-							 lastInfoResponse != null) {
-						List<SipErrorListener> sipErrorListeners = 
-							sipSession.getSipApplicationSession().getSipContext().getListeners().getSipErrorListeners();			
-						
-						SipErrorEvent sipErrorEvent = new SipErrorEvent(
-								(SipServletRequest)sipServletMessage, 
-								lastInfoResponse);
-						for (SipErrorListener sipErrorListener : sipErrorListeners) {
-							try {					
-								sipErrorListener.noPrackReceived(sipErrorEvent);
-							} catch (Throwable t) {
-								logger.error("SipErrorListener threw exception", t);
-							}
-						}
-					}
+					checkForAckNotReceived(sipServletMessage);
 					dialog.delete();
 					tryToInvalidateSession(sipSessionKey, false);
 				}
 			}
 		}
 		dialog.setApplicationData(null);
+	}
+	
+	private void checkForAckNotReceived(SipServletMessageImpl sipServletMessage) {
+		//notifying SipErrorListener that no ACK has been received for a UAS only
+		final MobicentsSipSession sipSession = sipServletMessage.getSipSession();
+		final SipServletResponseImpl lastFinalResponse = (SipServletResponseImpl)
+			((SipServletRequestImpl)sipServletMessage).getLastFinalResponse();
+		if(logger.isDebugEnabled()) {
+			logger.debug("last Final Response" + lastFinalResponse);
+		}
+		final ProxyImpl proxy = sipSession.getProxy();
+		if(sipServletMessage instanceof SipServletRequestImpl &&
+				proxy == null &&
+				lastFinalResponse != null) {
+			final SipContext sipContext = sipSession.getSipApplicationSession().getSipContext();
+			final List<SipErrorListener> sipErrorListeners = 
+				sipContext.getListeners().getSipErrorListeners();
+									
+			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();						
+			try {
+				final ClassLoader cl = sipContext.getLoader().getClassLoader();
+				Thread.currentThread().setContextClassLoader(cl);
+				
+				final SipErrorEvent sipErrorEvent = new SipErrorEvent(
+						(SipServletRequest)sipServletMessage, 
+						lastFinalResponse);
+				for (SipErrorListener sipErrorListener : sipErrorListeners) {
+					try {					
+						sipErrorListener.noAckReceived(sipErrorEvent);
+					} catch (Throwable t) {
+						logger.error("SipErrorListener threw exception", t);
+					}
+				}
+			} finally {
+				Thread.currentThread().setContextClassLoader(oldClassLoader);
+			}
+			
+		}
+		SipServletResponseImpl lastInfoResponse = (SipServletResponseImpl)
+			((SipServletRequestImpl)sipServletMessage).getLastInformationalResponse();
+		if(logger.isDebugEnabled()) {
+			logger.debug("last Informational Response" + lastInfoResponse);
+		}
+		if(sipServletMessage instanceof SipServletRequestImpl &&
+				proxy == null &&
+				 lastInfoResponse != null) {
+			final SipContext sipContext = sipSession.getSipApplicationSession().getSipContext();
+			final List<SipErrorListener> sipErrorListeners = 
+				sipContext.getListeners().getSipErrorListeners();
+			
+			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+			try {
+				final ClassLoader cl = sipContext.getLoader().getClassLoader();
+				Thread.currentThread().setContextClassLoader(cl);
+				
+				final SipErrorEvent sipErrorEvent = new SipErrorEvent(
+						(SipServletRequest)sipServletMessage, 
+						lastInfoResponse);
+				for (SipErrorListener sipErrorListener : sipErrorListeners) {
+					try {					
+						sipErrorListener.noPrackReceived(sipErrorEvent);
+					} catch (Throwable t) {
+						logger.error("SipErrorListener threw exception", t);
+					}
+				}
+			} finally {
+				Thread.currentThread().setContextClassLoader(oldClassLoader);
+			}
+			
+		}
 	}
 	
 	/*
@@ -935,52 +968,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 			if(sipSession != null) {
 				sipSession.removeOngoingTransaction(transaction);			
-				//notifying SipErrorListener that no ACK has been received for a UAS only
-				SipServletResponseImpl lastFinalResponse = (SipServletResponseImpl)
-					((SipServletRequestImpl)sipServletMessage).getLastInformationalResponse();
-				if(logger.isDebugEnabled()) {
-					logger.debug("last Final Response" + lastFinalResponse);
-				}
-				ProxyImpl proxy = sipSession.getProxy();
-				if(sipServletMessage instanceof SipServletRequestImpl &&
-						proxy == null &&
-						lastFinalResponse != null) {
-					List<SipErrorListener> sipErrorListeners = 
-						sipSession.getSipApplicationSession().getSipContext().getListeners().getSipErrorListeners();			
-					
-					SipErrorEvent sipErrorEvent = new SipErrorEvent(
-							(SipServletRequest)sipServletMessage, 
-							lastFinalResponse);
-					for (SipErrorListener sipErrorListener : sipErrorListeners) {
-						try {					
-							sipErrorListener.noAckReceived(sipErrorEvent);
-						} catch (Throwable t) {
-							logger.error("SipErrorListener threw exception", t);
-						}
-					}
-				}
-				SipServletResponseImpl lastInfoResponse = (SipServletResponseImpl)
-					((SipServletRequestImpl)sipServletMessage).getLastInformationalResponse();
-				if(logger.isDebugEnabled()) {
-					logger.debug("last Informational Response" + lastInfoResponse);
-				}
-				if(sipServletMessage instanceof SipServletRequestImpl &&
-						proxy == null &&
-						 lastInfoResponse != null) {
-					List<SipErrorListener> sipErrorListeners = 
-						sipSession.getSipApplicationSession().getSipContext().getListeners().getSipErrorListeners();			
-					
-					SipErrorEvent sipErrorEvent = new SipErrorEvent(
-							(SipServletRequest)sipServletMessage, 
-							lastInfoResponse);
-					for (SipErrorListener sipErrorListener : sipErrorListeners) {
-						try {					
-							sipErrorListener.noPrackReceived(sipErrorEvent);
-						} catch (Throwable t) {
-							logger.error("SipErrorListener threw exception", t);
-						}
-					}
-				}
+				checkForAckNotReceived(sipServletMessage);
 				tryToInvalidateSession(sipSessionKey, false);
 			}
 		}		

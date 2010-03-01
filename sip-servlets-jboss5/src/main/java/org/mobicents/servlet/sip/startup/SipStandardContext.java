@@ -1086,42 +1086,50 @@ public class SipStandardContext extends StandardContext implements SipContext {
 								servletHandler = container.getName();
 								servletHandlerWasNull = true;
 							}
-							switch(event.getEventType()) {
-								case SERVLET_INITIALIZED : {
-									SipServletContextEvent sipServletContextEvent = 
-										new SipServletContextEvent(getServletContext(), (SipServlet)sipServlet);
-									List<SipServletListener> sipServletListeners = sipListeners.getSipServletsListeners();
-									if(logger.isDebugEnabled()) {
-										logger.debug(sipServletListeners.size() + " SipServletListener to notify of servlet initialization");
+							final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+							try {
+								final ClassLoader cl = getLoader().getClassLoader();
+								Thread.currentThread().setContextClassLoader(cl);
+							
+								switch(event.getEventType()) {
+									case SERVLET_INITIALIZED : {
+										SipServletContextEvent sipServletContextEvent = 
+											new SipServletContextEvent(getServletContext(), (SipServlet)sipServlet);
+										List<SipServletListener> sipServletListeners = sipListeners.getSipServletsListeners();
+										if(logger.isDebugEnabled()) {
+											logger.debug(sipServletListeners.size() + " SipServletListener to notify of servlet initialization");
+										}
+										for (SipServletListener sipServletListener : sipServletListeners) {					
+											sipServletListener.servletInitialized(sipServletContextEvent);					
+										}
+										break;
 									}
-									for (SipServletListener sipServletListener : sipServletListeners) {					
-										sipServletListener.servletInitialized(sipServletContextEvent);					
+									case SIP_CONNECTOR_ADDED : {
+										List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
+										if(logger.isDebugEnabled()) {
+											logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector addition");
+										}
+										for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {					
+											sipConnectorListener.sipConnectorAdded((SipConnector)event.getEventObject());				
+										}
+										break;
 									}
-									break;
+									case SIP_CONNECTOR_REMOVED : {
+										List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
+										if(logger.isDebugEnabled()) {
+											logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector removal");
+										}
+										for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {					
+											sipConnectorListener.sipConnectorRemoved((SipConnector)event.getEventObject());				
+										}
+										break;
+									}								
 								}
-								case SIP_CONNECTOR_ADDED : {
-									List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
-									if(logger.isDebugEnabled()) {
-										logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector addition");
-									}
-									for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {					
-										sipConnectorListener.sipConnectorAdded((SipConnector)event.getEventObject());				
-									}
-									break;
+								if(servletHandlerWasNull) {
+									servletHandler = null;
 								}
-								case SIP_CONNECTOR_REMOVED : {
-									List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
-									if(logger.isDebugEnabled()) {
-										logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector removal");
-									}
-									for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {					
-										sipConnectorListener.sipConnectorRemoved((SipConnector)event.getEventObject());				
-									}
-									break;
-								}								
-							}
-							if(servletHandlerWasNull) {
-								servletHandler = null;
+							} finally {
+								Thread.currentThread().setContextClassLoader(oldClassLoader);
 							}
 						}					
 					} catch (ServletException e) {

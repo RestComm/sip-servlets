@@ -26,6 +26,7 @@ import javax.servlet.sip.TimerListener;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.startup.SipContext;
 
 public class ServletTimerImpl implements ServletTimer, Runnable {
 	private static final Logger logger = Logger.getLogger(ServletTimerImpl.class);
@@ -260,11 +261,19 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 	 */
 	public void run() {
 
+		SipContext sipContext = appSession.getSipContext();
+		
+		ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 		try {
+			ClassLoader cl = sipContext.getLoader().getClassLoader();
+			Thread.currentThread().setContextClassLoader(cl);
+			
+			sipContext.enterSipApp(null, null);
 			listener.timeout(this);
 		} catch(Throwable t) {
 			logger.error("An unexpected exception happened in the timer callback!",t);
 		} finally {
+			Thread.currentThread().setContextClassLoader(oldClassLoader);
 			if (isRepeatingTimer) {
 				estimateNextExecution();
 			} else {

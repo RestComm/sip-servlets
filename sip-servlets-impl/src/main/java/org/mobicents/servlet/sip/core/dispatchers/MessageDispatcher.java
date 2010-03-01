@@ -217,19 +217,25 @@ public abstract class MessageDispatcher {
 			// which has no idea where the servlet ENC is. We will use the classloader of the
 			// servlet class, which is the WebAppClassLoader, and has ENC fully loaded with
 			// with java:comp/env/security (manager, context etc)
-			ClassLoader cl = servlet.getClass().getClassLoader();
-			Thread.currentThread().setContextClassLoader(cl);
-			
-			if(!securityCheck(request)) return;
-
-			if(logger.isDebugEnabled()) {
-				logger.debug("Invoking instance " + servlet);
-			}
+			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 			
 			try {
-				servlet.service(request, null);
-			} finally {			
-				sipServletImpl.deallocate(servlet);
+				final ClassLoader cl = sipContext.getLoader().getClassLoader();
+				Thread.currentThread().setContextClassLoader(cl);
+			
+				if(!securityCheck(request)) return;
+	
+				if(logger.isDebugEnabled()) {
+					logger.debug("Invoking instance " + servlet);
+				}
+				
+				try {
+					servlet.service(request, null);
+				} finally {			
+					sipServletImpl.deallocate(servlet);
+				}
+			} finally {
+				Thread.currentThread().setContextClassLoader(oldClassLoader);
 			}
 		} else if(sipContext.getSipRubyController() != null) {
 			//handling the ruby case
@@ -238,10 +244,16 @@ public abstract class MessageDispatcher {
 					" to following App/ruby controller => " + request.getSipSession().getKey().getApplicationName()+ 
 					"/" + sipContext.getSipRubyController().getName());
 			}
-			ClassLoader cl = sipContext.getLoader().getClassLoader();
-			Thread.currentThread().setContextClassLoader(cl);
 			
-			sipContext.getSipRubyController().routeSipMessageToRubyApp(sipContext.getServletContext(), request);
+			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+			try {
+				final ClassLoader cl = sipContext.getLoader().getClassLoader();
+				Thread.currentThread().setContextClassLoader(cl);
+			
+				sipContext.getSipRubyController().routeSipMessageToRubyApp(sipContext.getServletContext(), request);
+			} finally {
+				Thread.currentThread().setContextClassLoader(oldClassLoader);
+			}
 		} else {
 			logger.error("no handler found for sip session " + session.getKey() + " and request " + request);
 		}
@@ -263,10 +275,16 @@ public abstract class MessageDispatcher {
 						" to following App/ruby controller => " + response.getSipSession().getKey().getApplicationName()+ 
 						"/" + sipContext.getSipRubyController().getName());
 				}
-				ClassLoader cl = sipContext.getLoader().getClassLoader();
-				Thread.currentThread().setContextClassLoader(cl);
+				final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+			
+				try {
+					final ClassLoader cl = sipContext.getLoader().getClassLoader();
+					Thread.currentThread().setContextClassLoader(cl);
 				
-				sipContext.getSipRubyController().routeSipMessageToRubyApp(sipContext.getServletContext(), response);
+					sipContext.getSipRubyController().routeSipMessageToRubyApp(sipContext.getServletContext(), response);
+				} finally {
+					Thread.currentThread().setContextClassLoader(oldClassLoader);
+				}
 			} else {
 				logger.warn(sessionHandler + " is unavailable, dropping response " + response);
 			}
@@ -277,10 +295,18 @@ public abstract class MessageDispatcher {
 					" to following App/servlet => " + session.getKey().getApplicationName()+ 
 					"/" + session.getHandler() + " on following sip session " + session.getId());
 			}
-			try {				
-				servlet.service(null, response);
+			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+			try {
+				final ClassLoader cl = sipContext.getLoader().getClassLoader();
+				Thread.currentThread().setContextClassLoader(cl);
+			
+				try {				
+					servlet.service(null, response);
+				} finally {
+					sipServletImpl.deallocate(servlet);
+				}
 			} finally {
-				sipServletImpl.deallocate(servlet);
+				Thread.currentThread().setContextClassLoader(oldClassLoader);
 			}
 		}
 				
