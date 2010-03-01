@@ -133,6 +133,11 @@ public class TimersSipServlet
 	 */
 	public void sessionExpired(SipApplicationSessionEvent ev) {
 		logger.info("sip application session expired " +  ev.getApplicationSession());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		if(!ev.getApplicationSession().isReadyToInvalidate() && ev.getApplicationSession().getAttribute(ALREADY_EXTENDED) == null) {
 			logger.info("extending lifetime of sip app session" +  ev.getApplicationSession());
 			ev.getApplicationSession().setExpires(1);
@@ -181,6 +186,11 @@ public class TimersSipServlet
 	 * @see javax.servlet.sip.TimerListener#timeout(javax.servlet.sip.ServletTimer)
 	 */
 	public void timeout(ServletTimer timer) {
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		SipApplicationSession sipApplicationSession = timer.getApplicationSession();
 		Integer recurringTime = (Integer) sipApplicationSession.getAttribute(RECURRING_TIME);
 		logger.info("timer expired " +  timer.getId() + " , info " + timer.getInfo() + " , recurring Time " + recurringTime.intValue());		
@@ -222,6 +232,11 @@ public class TimersSipServlet
 	}
 
 	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		logger.info("sessionReadyToInvalidate called");
 		if(ev.getApplicationSession().getAttribute(ALREADY_INVALIDATED) == null) {
 			ev.getApplicationSession().setAttribute(ALREADY_INVALIDATED, Boolean.TRUE);

@@ -270,6 +270,28 @@ public class ListenersSipServlet
 		}
 		return false;
 	}
+	
+	@Override
+	protected void doRequest(SipServletRequest req) throws ServletException,
+			IOException {
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
+		super.doRequest(req);
+	}
+	
+	@Override
+	protected void doResponse(SipServletResponse resp) throws ServletException,
+			IOException {
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
+		super.doResponse(resp);
+	}
 
 	// Listeners methods	
 	/*
@@ -286,7 +308,12 @@ public class ListenersSipServlet
 	 * @see javax.servlet.sip.SipErrorListener#noPrackReceived(javax.servlet.sip.SipErrorEvent)
 	 */
 	public void noPrackReceived(SipErrorEvent ee) {
-		logger.error("noPrackReceived.");
+		logger.info("noPrackReceived.");
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		ee.getRequest().getSession().setAttribute(NO_PRACK_RECEIVED, OK);	
 	}
 	
@@ -296,6 +323,11 @@ public class ListenersSipServlet
 	 */
 	public void servletInitialized(SipServletContextEvent ce) {
 		logger.info("servlet initialized ");
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		ce.getServletContext().setAttribute(SIP_SERVLET_INITIALIZED, OK);
 	}
 
@@ -304,6 +336,11 @@ public class ListenersSipServlet
 	 * @see javax.servlet.sip.SipSessionListener#sessionCreated(javax.servlet.sip.SipSessionEvent)
 	 */
 	public void sessionCreated(SipSessionEvent se) {
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		logger.info("sip session created " +  se.getSession());
 		se.getSession().setAttribute(SIP_SESSION_CREATED, OK);		
 	}
@@ -313,6 +350,11 @@ public class ListenersSipServlet
 	 */
 	public void sessionDestroyed(SipSessionEvent se) {
 		logger.info("sip session destroyed " +  se.getSession());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 //		SipFactory storedFactory = (SipFactory)se.getSession().getApplicationSession().getAttribute("sipFactory");
 		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 		try {
@@ -338,6 +380,11 @@ public class ListenersSipServlet
 	 */
 	public void sessionDidActivate(SipSessionEvent se) {
 		logger.info("sip session activated " +  se.getSession());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		if(se.getSession().isValid()){
 			se.getSession().setAttribute(SIP_SESSION_ACTIVATED, OK);
 		}
@@ -348,6 +395,11 @@ public class ListenersSipServlet
 	 */
 	public void sessionWillPassivate(SipSessionEvent se) {
 		logger.info("sip session passivated " +  se.getSession());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		if(se.getSession().isValid()){
 			se.getSession().setAttribute(SIP_SESSION_PASSIVATED, OK);
 		}
@@ -359,6 +411,11 @@ public class ListenersSipServlet
 	 */
 	public void attributeAdded(SipSessionBindingEvent ev) {
 		logger.info("sip session attribute added " +  ev.getName());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		if(!SIP_SESSION_ATTRIBUTE_ADDED.equals(ev.getName()) && 
 				!SIP_SESSION_VALUE_BOUND.equals(ev.getName()) && 
 				!SIP_SESSION_ATTRIBUTE_REPLACED.equals(ev.getName())) {
@@ -373,6 +430,11 @@ public class ListenersSipServlet
 	 */
 	public void attributeRemoved(SipSessionBindingEvent ev) {
 		logger.info("sip session attribute removed " +  ev.getName());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		if(!SIP_SESSION_ATTRIBUTE_REMOVED.equals(ev.getName()) && 
 				!SIP_SESSION_VALUE_UNBOUND.equals(ev.getName()) && 
 				!SIP_SESSION_ATTRIBUTE_REPLACED.equals(ev.getName())) {
@@ -387,6 +449,11 @@ public class ListenersSipServlet
 	 */
 	public void attributeReplaced(SipSessionBindingEvent ev) {
 		logger.info("sip session attribute removed " +  ev.getName());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		if(!SIP_SESSION_ATTRIBUTE_REPLACED.equals(ev.getName())) {
 			if(ev.getSession().isValid()){
 				ev.getSession().setAttribute(SIP_SESSION_ATTRIBUTE_REPLACED, OK);
@@ -399,6 +466,11 @@ public class ListenersSipServlet
 	 */
 	public void valueBound(SipSessionBindingEvent event) {
 		logger.info("sip session attribute bound " +  event.getName());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		if(!SIP_SESSION_VALUE_BOUND.equals(event.getName()) && 
 				!SIP_SESSION_ATTRIBUTE_ADDED.equals(event.getName()) && 
 				!SIP_SESSION_ATTRIBUTE_REPLACED.equals(event.getName())) {
@@ -413,6 +485,11 @@ public class ListenersSipServlet
 	 */
 	public void valueUnbound(SipSessionBindingEvent event) {
 		logger.info("sip session attribute unbound " +  event.getName());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		if(!SIP_SESSION_VALUE_UNBOUND.equals(event.getName()) && 
 				!SIP_SESSION_ATTRIBUTE_REMOVED.equals(event.getName()) && 
 				!SIP_SESSION_ATTRIBUTE_REPLACED.equals(event.getName())) { 
@@ -425,6 +502,11 @@ public class ListenersSipServlet
 	 */
 	public void sessionCreated(SipApplicationSessionEvent ev) {
 		logger.info("sip application session created " +  ev.getApplicationSession());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		if(ev.getApplicationSession().isValid()){
 			ev.getApplicationSession().setAttribute(SIP_APP_SESSION_CREATED, OK);
 		}
@@ -435,6 +517,11 @@ public class ListenersSipServlet
 	 */
 	public void sessionDestroyed(SipApplicationSessionEvent ev) {
 		logger.info("sip application session destroyed " +  ev.getApplicationSession());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 //		SipFactory storedFactory = (SipFactory)ev.getApplicationSession().getAttribute("sipFactory");
 		if(sipFactory != null) {
 			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
@@ -462,6 +549,11 @@ public class ListenersSipServlet
 	 */
 	public void sessionExpired(SipApplicationSessionEvent ev) {
 		logger.info("sip application session expired " +  ev.getApplicationSession());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		if(ev.getApplicationSession().isValid()){
 			ev.getApplicationSession().setAttribute(SIP_APP_SESSION_EXPIRED, OK);
 		}
@@ -472,6 +564,11 @@ public class ListenersSipServlet
 	 */
 	public void sessionDidActivate(SipApplicationSessionEvent se) {
 		logger.info("sip application session activated " +  se.getApplicationSession());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		if(se.getApplicationSession().isValid()){
 			se.getApplicationSession().setAttribute(SIP_APP_SESSION_ACTIVATED, OK);
 		}
@@ -482,6 +579,11 @@ public class ListenersSipServlet
 	 */
 	public void sessionWillPassivate(SipApplicationSessionEvent se) {
 		logger.info("sip application session passivated " +  se.getApplicationSession());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		if(se.getApplicationSession().isValid()){
 			se.getApplicationSession().setAttribute(SIP_APP_SESSION_PASSIVATED, OK);
 		}
@@ -492,6 +594,11 @@ public class ListenersSipServlet
 	 */
 	public void attributeAdded(SipApplicationSessionBindingEvent ev) {
 		logger.info("sip application session attribute added " +  ev.getName());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		if(!SIP_APP_SESSION_ATTRIBUTE_ADDED.equals(ev.getName()) && 
 				!SIP_APP_SESSION_VALUE_BOUND.equals(ev.getName()) && 
 				!SIP_APP_SESSION_ATTRIBUTE_REPLACED.equals(ev.getName())) {
@@ -506,6 +613,11 @@ public class ListenersSipServlet
 	 */
 	public void attributeRemoved(SipApplicationSessionBindingEvent ev) {
 		logger.info("sip application session attribute removed " +  ev.getName());		
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		if(!SIP_APP_SESSION_ATTRIBUTE_REMOVED.equals(ev.getName()) && 
 				!SIP_APP_SESSION_VALUE_UNBOUND.equals(ev.getName()) && 
 				!SIP_APP_SESSION_ATTRIBUTE_REPLACED.equals(ev.getName())) {
@@ -520,6 +632,11 @@ public class ListenersSipServlet
 	 */
 	public void attributeReplaced(SipApplicationSessionBindingEvent ev) {
 		logger.info("sip application session attribute replaced " +  ev.getName());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		if(!SIP_APP_SESSION_ATTRIBUTE_REMOVED.equals(ev.getName()) && 
 				!SIP_APP_SESSION_VALUE_UNBOUND.equals(ev.getName()) && 
 				!SIP_APP_SESSION_ATTRIBUTE_REPLACED.equals(ev.getName())) {
@@ -534,6 +651,11 @@ public class ListenersSipServlet
 	 */
 	public void valueBound(SipApplicationSessionBindingEvent event) {
 		logger.info("sip application session value bound " +  event.getName());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		if(!SIP_APP_SESSION_VALUE_BOUND.equals(event.getName()) && 
 				!SIP_APP_SESSION_ATTRIBUTE_ADDED.equals(event.getName()) && 
 				!SIP_APP_SESSION_ATTRIBUTE_REPLACED.equals(event.getName())) {
@@ -548,6 +670,11 @@ public class ListenersSipServlet
 	 */
 	public void valueUnbound(SipApplicationSessionBindingEvent event) {
 		logger.info("sip application session value unbound " +  event.getName());
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		if(!SIP_APP_SESSION_VALUE_UNBOUND.equals(event.getName()) && 
 				!SIP_APP_SESSION_ATTRIBUTE_REMOVED.equals(event.getName()) && 
 				!SIP_APP_SESSION_ATTRIBUTE_REPLACED.equals(event.getName())) { 
@@ -563,6 +690,11 @@ public class ListenersSipServlet
 	 */
 	@SuppressWarnings("unchecked")
 	public void timeout(ServletTimer timer) {
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		SipApplicationSession sipApplicationSession = timer.getApplicationSession();
 		Iterator<SipSession> sipSessions = (Iterator<SipSession>)
 			sipApplicationSession.getSessions("SIP");
@@ -587,12 +719,18 @@ public class ListenersSipServlet
 	}
 
 	public void sessionReadyToInvalidate(SipSessionEvent se) {
-		// TODO Auto-generated method stub
-		
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 	}
 
 	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
-		// TODO Auto-generated method stub
-		
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 	}
 }

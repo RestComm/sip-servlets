@@ -74,6 +74,7 @@ public class ShootistSipServlet
 	@Override
 	protected void doSuccessResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
+		
 		logger.info("Got : " + sipServletResponse.getStatus() + " "
 				+ sipServletResponse.getMethod());
 		int status = sipServletResponse.getStatus();
@@ -94,8 +95,31 @@ public class ShootistSipServlet
 	}
 
 	@Override
+	protected void doRequest(SipServletRequest req) throws ServletException,
+			IOException {
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
+		super.doRequest(req);
+	}
+	
+	@Override
+	protected void doResponse(SipServletResponse resp) throws ServletException,
+			IOException {
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
+		super.doResponse(resp);
+	}
+	
+	@Override
 	protected void doBye(SipServletRequest req) throws ServletException,
 			IOException {
+				
 		ServletTimer timer = (ServletTimer) req.getApplicationSession().getAttribute("timer");
 		timer.cancel();
 		req.createResponse(SipServletResponse.SC_OK).send();
@@ -107,6 +131,11 @@ public class ShootistSipServlet
 	 * @see javax.servlet.sip.SipServletListener#servletInitialized(javax.servlet.sip.SipServletContextEvent)
 	 */
 	public void servletInitialized(SipServletContextEvent ce) {
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();		
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);			
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);
 		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 		
@@ -191,6 +220,11 @@ public class ShootistSipServlet
 	}
 
 	public void timeout(ServletTimer timer) {
+		ClassLoader cl = Thread.currentThread().getContextClassLoader();
+		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+			logger.error("ClassLoader " + cl);
+			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+		}
 		SipServletRequest sipServletRequest = (SipServletRequest) timer.getInfo();
 		try {
 			sipServletRequest.send();
