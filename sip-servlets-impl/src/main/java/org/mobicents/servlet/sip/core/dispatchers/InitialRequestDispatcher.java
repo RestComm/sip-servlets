@@ -48,6 +48,7 @@ import javax.sip.header.CSeqHeader;
 import javax.sip.header.Header;
 import javax.sip.header.Parameters;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -653,9 +654,17 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			final MobicentsSipApplicationSession appSession = sipSessionImpl.getSipApplicationSession();
 			final SipContext sipContext = appSession.getSipContext();
 			final Request request = (Request) sipServletRequest.getMessage();
-			
+
 			sipContext.enterSipAppHa(sipServletRequest, null, true, true);
 			try {
+				String transport = ((ViaHeader)request.getHeader(ViaHeader.NAME)).getTransport();
+				java.util.List<SipURI> list = (java.util.List<SipURI>)sipContext.getServletContext().getAttribute("javax.servlet.sip.outboundInterfaces");
+				for(SipURI uri:list) {
+					if(uri.getTransportParam().equalsIgnoreCase(transport)) {
+						appSession.setDefaultOutboundInterface(uri);
+						break;
+					}
+				}
 				sipSessionImpl.setSessionCreatingTransaction(sipServletRequest.getTransaction());								
 				
 				String sipSessionHandlerName = sipSessionImpl.getHandler();

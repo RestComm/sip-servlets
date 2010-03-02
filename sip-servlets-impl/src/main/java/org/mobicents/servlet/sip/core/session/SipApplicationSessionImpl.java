@@ -46,6 +46,7 @@ import javax.servlet.sip.SipApplicationSessionBindingListener;
 import javax.servlet.sip.SipApplicationSessionEvent;
 import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
 import org.apache.catalina.security.SecurityUtil;
@@ -117,6 +118,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	protected transient MobicentsSipApplicationSessionFacade facade = null;
 	
 	protected long sipApplicationSessionTimeout = -1;
+	
+	protected SipURI defaultOutboundInterface;
 	
 	// Does it need to be synchronized?
 	protected Map<String,Object> getAttributeMap() {
@@ -1188,5 +1191,14 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 
 	public long getExpirationTimeInternal() {		
 		return expirationTime;
+	}
+
+	public SipURI getDefaultOutboundInterface() {
+		return defaultOutboundInterface;
+	}
+
+	public void setDefaultOutboundInterface(SipURI outbound) {
+		defaultOutboundInterface = outbound;
+		
 	}
 }

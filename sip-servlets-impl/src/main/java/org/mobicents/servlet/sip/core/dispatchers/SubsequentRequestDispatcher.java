@@ -25,6 +25,7 @@ import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipURI;
 import javax.sip.Dialog;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
@@ -33,6 +34,7 @@ import javax.sip.header.Parameters;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
+import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -265,7 +267,14 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			final Request request = (Request) sipServletRequest.getMessage();
 			
 			sipContext.enterSipAppHa(sipServletRequest, null, true, true);
-			
+			String transport = ((ViaHeader)request.getHeader(ViaHeader.NAME)).getTransport();
+			java.util.List<SipURI> list = (java.util.List<SipURI>)sipContext.getServletContext().getAttribute("javax.servlet.sip.outboundInterfaces");
+			for(SipURI uri:list) {
+				if(uri.getTransportParam().equalsIgnoreCase(transport)) {
+					appSession.setDefaultOutboundInterface(uri);
+					break;
+				}
+			}
 			final String requestMethod = sipServletRequest.getMethod();
 			try {
 				sipSession.addOngoingTransaction(sipServletRequest.getTransaction());

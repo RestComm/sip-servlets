@@ -227,8 +227,12 @@ public class SipFactoryImpl implements Externalizable {
 		validateCreation(method, sipAppSession);
 
 		try { 
+			SipURI transportUri = ((MobicentsSipApplicationSession)sipAppSession).getDefaultOutboundInterface();
+			String transport = transportUri != null ? transportUri.getTransportParam():null;
+			
 			//javadoc specifies that a copy of the address should be done hence the clone
-			return createSipServletRequest(sipAppSession, method, (Address)from.clone(), (Address)to.clone(), handler, originalCallId, fromTagToUse);
+			return createSipServletRequest(sipAppSession, method, (Address)from.clone(), (Address)to.clone(), handler, originalCallId, fromTagToUse,
+					transport);
 		} catch (ServletParseException e) {
 			logger.error("Error creating sipServletRequest", e);
 			return null;
@@ -253,13 +257,15 @@ public class SipFactoryImpl implements Externalizable {
 		}
 
 		validateCreation(method, sipAppSession);
+		SipURI transportUri = ((MobicentsSipApplicationSession)sipAppSession).getDefaultOutboundInterface();
+		String transport = transportUri != null ? transportUri.getTransportParam():null;
 
 		//javadoc specifies that a copy of the uri should be done hence the clone
 		Address toA = this.createAddress(to.clone());
 		Address fromA = this.createAddress(from.clone());
 
 		try {
-			return createSipServletRequest(sipAppSession, method, fromA, toA, handler, null, null);
+			return createSipServletRequest(sipAppSession, method, fromA, toA, handler, null, null, transport);
 		} catch (ServletParseException e) {
 			logger.error("Error creating sipServletRequest", e);
 			return null;
@@ -286,11 +292,14 @@ public class SipFactoryImpl implements Externalizable {
 		}
 
 		validateCreation(method, sipAppSession);
+		SipURI transportUri = ((MobicentsSipApplicationSession)sipAppSession).getDefaultOutboundInterface();
+		String transport = transportUri != null ? transportUri.getTransportParam():null;
+
 
 		Address toA = this.createAddress(to);
 		Address fromA = this.createAddress(from);
 
-		return createSipServletRequest(sipAppSession, method, fromA, toA, handler, null, null);
+		return createSipServletRequest(sipAppSession, method, fromA, toA, handler, null, null, transport);
 
 	}
 
@@ -395,9 +404,11 @@ public class SipFactoryImpl implements Externalizable {
 	 */
 	private SipServletRequest createSipServletRequest(
 			SipApplicationSession sipAppSession, String method, Address from,
-			Address to, String handler, String originalCallId, String fromTagToUse) throws ServletParseException {
+			Address to, String handler, String originalCallId, String fromTagToUse, String transport) throws ServletParseException {
 		
 		MobicentsSipApplicationSession mobicentsSipApplicationSession = (MobicentsSipApplicationSession) sipAppSession;
+		
+		if(transport == null) transport = ListeningPoint.UDP;
 		
 		// the request object with method, request URI, and From, To, Call-ID,
 		// CSeq, Route headers filled in.
@@ -409,11 +420,6 @@ public class SipFactoryImpl implements Externalizable {
 		CSeqHeader cseqHeader = null;
 		CallIdHeader callIdHeader = null;
 		MaxForwardsHeader maxForwardsHeader = null;		
-
-		// FIXME: Is this nough?
-		// We need address from which this will be sent, also this one will be
-		// default for contact and via
-		String transport = ListeningPoint.UDP;
 
 		// LETS CREATE OUR HEADERS			
 		javax.sip.address.Address fromAddress = null;
