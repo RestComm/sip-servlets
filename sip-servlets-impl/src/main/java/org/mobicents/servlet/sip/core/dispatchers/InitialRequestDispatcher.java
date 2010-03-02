@@ -89,12 +89,6 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	private static final Logger logger = Logger.getLogger(InitialRequestDispatcher.class);
 	
 	public InitialRequestDispatcher() {}
-	
-//	public InitialRequestDispatcher(
-//			SipApplicationDispatcher sipApplicationDispatcher) {		
-//		super(sipApplicationDispatcher);
-//		
-//	}
 
 	/**
 	 * {@inheritDoc}
@@ -172,14 +166,17 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		// Request-URI (in that order) to see if it contains an encoded URI. 
 		// If it does, the container MUST use the encoded URI to locate the targeted SipApplicationSession object
 		String targetedApplicationKey = ((Parameters)request.getRequestURI()).getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
-		if(targetedApplicationKey != null) {
-			targetedApplicationKey = RFC2396UrlDecoder.decode(targetedApplicationKey);
-		}
-		SipTargetedRequestInfo targetedRequestInfo = retrieveTargetedApplication(targetedApplicationKey);
-		if(targetedRequestInfo == null && poppedRoute != null) {
+		MobicentsSipApplicationSession encodeURISipApplicationSession = retrieveTargetedApplication(targetedApplicationKey);
+		SipTargetedRequestInfo targetedRequestInfo = null;
+		if(encodeURISipApplicationSession != null) {
+			targetedRequestInfo = new SipTargetedRequestInfo(SipTargetedRequestType.ENCODED_URI, encodeURISipApplicationSession.getApplicationName());
+		} else if(poppedRoute != null) {
 			Parameters poppedAddress = (Parameters)poppedRoute.getAddress().getURI();
 			targetedApplicationKey = poppedAddress.getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
-			targetedRequestInfo = retrieveTargetedApplication(targetedApplicationKey);
+			encodeURISipApplicationSession = retrieveTargetedApplication(targetedApplicationKey);
+			if(encodeURISipApplicationSession != null) {
+				targetedRequestInfo = new SipTargetedRequestInfo(SipTargetedRequestType.ENCODED_URI, encodeURISipApplicationSession.getApplicationName());
+			}
 		}	
 		
 		// 15.11.4 Join and Replaces Targeting Mechanism		
@@ -288,7 +285,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		if(applicationRouterInfo.getNextApplicationName() == null) {
 			dispatchOutsideContainer(sipServletRequest);
 		} else {			
-			dispatchInsideContainer(sipProvider, applicationRouterInfo, sipServletRequest, sipFactoryImpl, joinReplacesCorrespondingSession);
+			dispatchInsideContainer(sipProvider, applicationRouterInfo, sipServletRequest, sipFactoryImpl, joinReplacesCorrespondingSession, encodeURISipApplicationSession);
 		}		
 	}
 
@@ -301,7 +298,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	 * @param joinReplacesSipSession the potential corresponding Join/Replaces SipSession previously found, can be null
 	 * @throws DispatcherException a problem occured while dispatching the request
 	 */
-	private void dispatchInsideContainer(final SipProvider sipProvider, final SipApplicationRouterInfo applicationRouterInfo, final SipServletRequestImpl sipServletRequest, final SipFactoryImpl sipFactoryImpl, MobicentsSipSession joinReplacesSipSession) throws DispatcherException {
+	private void dispatchInsideContainer(final SipProvider sipProvider, final SipApplicationRouterInfo applicationRouterInfo, final SipServletRequestImpl sipServletRequest, final SipFactoryImpl sipFactoryImpl, MobicentsSipSession joinReplacesSipSession, MobicentsSipApplicationSession encodeURISipApplicationSession) throws DispatcherException {
 		final String nextApplicationName = applicationRouterInfo.getNextApplicationName();
 		if(logger.isDebugEnabled()) {
 			logger.debug("Dispatching the request event to " + nextApplicationName);
@@ -339,7 +336,10 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 					", please put one of DAR:<HeaderName> with Header containing a valid URI or an exlicit valid URI ", pe);
 		} 		
 		
-		MobicentsSipApplicationSession sipApplicationSession = null;
+		MobicentsSipApplicationSession sipApplicationSession = encodeURISipApplicationSession;
+		if(logger.isDebugEnabled())  {
+			logger.debug("the encoded URI Sip Application Session is " + sipApplicationSession);
+		}
 		if(joinReplacesSipSession != null && nextApplicationName.equals(joinReplacesSipSession.getKey().getApplicationName())) {
 			// 15.11.4.5. If the Application Router returns an application name that matches the application name found in step 15.11.4.2, 
 			// then the container must create a SipSession object and associate it with the SipApplicationSession identified in step 2. 
@@ -359,7 +359,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			SipApplicationSessionKey sipApplicationSessionKey = makeAppSessionKey(
 					sipContext, sipServletRequest, nextApplicationName);
 			sipContext.getSipSessionsUtil().addCorrespondingSipApplicationSession(sipApplicationSessionKey, sipApplicationSession.getKey(), headerName);
-		} else {
+		} else if(sipApplicationSession == null) {
 			// 15.11.4.6. If the Application Router returns an application name that does not match the application name found in step 15.11.4.2,
 			// then the container invokes the application using its normal procedure, creating a new SipSession and SipApplicationSession.
 
@@ -584,10 +584,11 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	 * @return null if no corresponding SipApplicationSession could be found or 
 	 * if the param is null, the SipTargetedRequestInfo completed otherwise
 	 */
-	private final SipTargetedRequestInfo retrieveTargetedApplication(
+	private final MobicentsSipApplicationSession retrieveTargetedApplication(
 			String targetedApplicationKey) {
 		if( targetedApplicationKey != null && 
 				targetedApplicationKey.length() > 0) {
+			targetedApplicationKey = RFC2396UrlDecoder.decode(targetedApplicationKey);
 			SipApplicationSessionKey targetedApplicationSessionKey;
 			try {
 				targetedApplicationSessionKey = SessionManagerUtil.parseSipApplicationSessionKey(targetedApplicationKey);
@@ -596,9 +597,9 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				return null;
 			}
 			SipContext sipContext = sipApplicationDispatcher.findSipApplication(targetedApplicationSessionKey.getApplicationName());
-			if(sipContext != null && ((SipManager)sipContext.getManager()).getSipApplicationSession(targetedApplicationSessionKey, false) != null) {
-				return new SipTargetedRequestInfo(SipTargetedRequestType.ENCODED_URI, targetedApplicationSessionKey.getApplicationName());
-			}				
+			if(sipContext != null) {
+				return ((SipManager)sipContext.getManager()).getSipApplicationSession(targetedApplicationSessionKey, false);
+			}						
 		}
 		return null;
 	}

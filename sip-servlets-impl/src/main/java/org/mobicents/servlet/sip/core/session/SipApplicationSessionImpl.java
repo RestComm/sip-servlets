@@ -262,7 +262,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * {@inheritDoc}
 	 */
 	public void encodeURI(URI uri) {
-		uri.setParameter(SIP_APPLICATION_KEY_PARAM_NAME, RFC2396UrlDecoder.encode(getId()));
+		// no need to encode the id it is done automatically in setParameter method of the uri
+		// Issue 1299 Sip request contains ApplicationSessionKey in request URI is not dispatched to existing SippApplicationSession
+		// http://code.google.com/p/mobicents/issues/detail?id=1299
+		uri.setParameter(SIP_APPLICATION_KEY_PARAM_NAME, getId());
 	}
 
 	/**

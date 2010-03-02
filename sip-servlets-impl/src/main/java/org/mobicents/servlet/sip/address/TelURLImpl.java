@@ -126,9 +126,10 @@ public class TelURLImpl extends URIImpl implements TelURL {
 	 * @see org.mobicents.servlet.sip.address.ParameterableImpl#setParameter(java.lang.String, java.lang.String)
 	 */
 	public void setParameter(String name, String value) {
+		String escapedValue = RFC2396UrlDecoder.encode(value);
 		super.setParameter(name, value);
 		try {
-			telUrl.setParameter(name, value);
+			telUrl.setParameter(name, escapedValue);
 		} catch (ParseException e) {
 			throw new IllegalArgumentException("Problem setting parameter", e);
 		}
