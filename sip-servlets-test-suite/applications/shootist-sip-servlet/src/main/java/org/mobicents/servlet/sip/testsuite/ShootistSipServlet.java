@@ -45,6 +45,7 @@ public class ShootistSipServlet
 		implements SipServletListener,TimerListener {
 	private static final long serialVersionUID = 1L;
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
+	private static final String ENCODE_URI = "encodeURI";
 	private static transient Logger logger = Logger.getLogger(ShootistSipServlet.class);	
 	@Resource
 	TimerService timerService;
@@ -87,9 +88,11 @@ public class ShootistSipServlet
 				SipServletRequest request=sipServletResponse.getSession().createRequest("INVITE");				
 				request.send();
 			}  else {
-				SipServletRequest sipServletRequest = sipServletResponse.getSession().createRequest("BYE");
-				ServletTimer timer = timerService.createTimer(sipServletResponse.getApplicationSession(), 2000, false, (Serializable)sipServletRequest);
-				sipServletResponse.getApplicationSession().setAttribute("timer", timer);
+				if(sipServletResponse.getApplicationSession().getAttribute(ENCODE_URI) == null) {
+					SipServletRequest sipServletRequest = sipServletResponse.getSession().createRequest("BYE");
+					ServletTimer timer = timerService.createTimer(sipServletResponse.getApplicationSession(), 2000, false, (Serializable)sipServletRequest);
+					sipServletResponse.getApplicationSession().setAttribute("timer", timer);
+				}
 			}
 		}
 	}
@@ -117,11 +120,25 @@ public class ShootistSipServlet
 	}
 	
 	@Override
+	protected void doInvite(SipServletRequest req) throws ServletException,
+			IOException {
+		if(((SipURI)req.getFrom().getURI()).getUser().equalsIgnoreCase(ENCODE_URI)) {
+			if(req.getApplicationSession().getAttribute(ENCODE_URI) != null) {
+				req.createResponse(200).send();
+			} else {
+				req.createResponse(500, "received a request using the encodeURI mechanism but not the same sip application session").send();
+			}
+		}
+	}
+	
+	@Override
 	protected void doBye(SipServletRequest req) throws ServletException,
 			IOException {
 				
 		ServletTimer timer = (ServletTimer) req.getApplicationSession().getAttribute("timer");
-		timer.cancel();
+		if(timer != null) {
+			timer.cancel();
+		}
 		req.createResponse(SipServletResponse.SC_OK).send();
 	}
 	
@@ -206,6 +223,7 @@ public class ShootistSipServlet
 		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
 		if(ce.getServletContext().getInitParameter("encodeRequestURI") != null) {
 			sipApplicationSession.encodeURI(requestURI);
+			sipApplicationSession.setAttribute(ENCODE_URI, "true");
 		}
 		sipServletRequest.setRequestURI(requestURI);
 		if(sipServletRequest.getTo().getParameter("tag") != null) {
