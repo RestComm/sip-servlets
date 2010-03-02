@@ -208,10 +208,8 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 					final SipLoadBalancer loadBalancerToUse = sipFactoryImpl.getLoadBalancerToUse();
 					javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(fromName, loadBalancerToUse.getAddress().getHostAddress());
 					sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
-					sipURI.setPort(loadBalancerToUse.getSipPort());		
-					String transport = session.getOutboundInterface() != null ?
-							session.getOutboundInterface().getTransportParam():"udp";
-					sipURI.setTransportParam(transport);
+					sipURI.setPort(loadBalancerToUse.getSipPort());			
+					sipURI.setTransportParam(ListeningPoint.UDP);
 					javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);
 					if(fromName != null && fromName.length() > 0) {
 						contactAddress.setDisplayName(fromName);

@@ -35,7 +35,6 @@ import java.util.concurrent.Semaphore;
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipSession;
-import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
@@ -311,14 +310,6 @@ public class MobicentsSipApplicationSessionFacade implements
 
 	public long getExpirationTimeInternal() {
 		return sipApplicationSession.getExpirationTimeInternal();
-	}
-
-	public SipURI getDefaultOutboundInterface() {
-		return sipApplicationSession.getDefaultOutboundInterface();
-	}
-
-	public void setDefaultOutboundInterface(SipURI outbound) {
-		sipApplicationSession.setDefaultOutboundInterface(outbound);
 	}
 
 }

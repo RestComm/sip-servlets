@@ -22,7 +22,6 @@ import java.util.concurrent.Semaphore;
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
-import javax.servlet.sip.SipURI;
 
 import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
 import org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade;
@@ -81,7 +80,4 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession {
 
 	void setExpirationTimerTask(SipApplicationSessionTimerTask expirationTimerTask);
 	void setExpirationTimerFuture(ScheduledFuture<MobicentsSipApplicationSession> schedule);
-	
-	void setDefaultOutboundInterface(SipURI outbound);
-	SipURI getDefaultOutboundInterface();
 }

@@ -889,8 +889,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			
 			ViaHeader viaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
 			//Issue 112 fix by folsson
-		    SipURI outboundInterface = session.getOutboundInterface();
-			if(!getMethod().equalsIgnoreCase(Request.CANCEL) && viaHeader == null) {
+		    if(!getMethod().equalsIgnoreCase(Request.CANCEL) && viaHeader == null) {
 		    	boolean addViaHeader = false;
 		    	if(proxy == null) {
 		    		addViaHeader = true;
@@ -907,17 +906,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				    }
 		    		// Issue 					
 		    		viaHeader = JainSipUtils.createViaHeader(
-		    				sipNetworkInterfaceManager, request, null, outboundInterface);
+		    				sipNetworkInterfaceManager, request, null, session.getOutboundInterface());
 		    		message.addHeader(viaHeader);
 			    }
 		    }
-			((MessageExt)message).setApplicationData(null);	
-			String transport = null;
-			if(outboundInterface != null) {
-				transport = outboundInterface.getTransportParam();
-			} else {
-				transport = JainSipUtils.findTransport(request);
-			}
+			final String transport = JainSipUtils.findTransport(request);
 		    if(logger.isDebugEnabled()) {
 		    	logger.debug("The found transport for sending request is '" + transport + "'");
 		    }
@@ -983,7 +976,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					}
 					// Create the contact name address.
 					contactHeader = 
-						JainSipUtils.createContactHeader(sipNetworkInterfaceManager, request, fromName, outboundInterface);										
+						JainSipUtils.createContactHeader(sipNetworkInterfaceManager, request, fromName, session.getOutboundInterface());										
 					request.addHeader(contactHeader);
 				}
 				

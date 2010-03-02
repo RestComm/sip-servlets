@@ -346,14 +346,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 							javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI("", loadBalancerToUse.getAddress().getHostAddress());
 							sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
 							sipURI.setPort(loadBalancerToUse.getSipPort());	
-							
-							String transport = getOutboundInterface() != null? getOutboundInterface().getTransportParam():"udp";
-							sipURI.setTransportParam(transport);
+
+							// TODO: Is this enough or we must specify the transport somewhere?
+							sipURI.setTransportParam(ListeningPoint.UDP);
 							
 							javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);
 							contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);													
 						} else {
-							contactHeader = JainSipUtils.createContactHeader(sipFactory.getSipNetworkInterfaceManager(), methodRequest, "", getOutboundInterface());
+							contactHeader = JainSipUtils.createContactHeader(sipFactory.getSipNetworkInterfaceManager(), methodRequest, "", outboundInterface);
 						}
 						methodRequest.setHeader(contactHeader);
 					} catch (Exception e) {
@@ -1173,9 +1173,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 	}
 
 	public SipURI getOutboundInterface() {
-		if(outboundInterface == null) {
-			return this.sipApplicationSession.getDefaultOutboundInterface();
-		}
 		return outboundInterface;
 	}	
 	
