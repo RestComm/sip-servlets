@@ -111,9 +111,11 @@ public class EncodeURISipServletTest extends SipServletTestCase {
 		String toSipAddress = "sip-servlets.com";
 		SipURI toAddress = receiverProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
-		toAddress.setParameter("org.mobicents.servlet.sip.ApplicationSessionKey", ((SipURI)invite.getRequestURI()).getParameter("org.mobicents.servlet.sip.ApplicationSessionKey"));
+
+		SipURI requestURI = (SipURI) toAddress.clone();
+		requestURI.setParameter("org.mobicents.servlet.sip.ApplicationSessionKey", ((SipURI)invite.getRequestURI()).getParameter("org.mobicents.servlet.sip.ApplicationSessionKey"));
 		
-		receiver.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+		receiver.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, null, null, requestURI);		
 		Thread.sleep(TIMEOUT);
 		assertEquals(200, receiver.getFinalResponseStatus());			
 	}		

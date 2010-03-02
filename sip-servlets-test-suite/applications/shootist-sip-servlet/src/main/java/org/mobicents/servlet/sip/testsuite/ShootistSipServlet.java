@@ -45,7 +45,7 @@ public class ShootistSipServlet
 		implements SipServletListener,TimerListener {
 	private static final long serialVersionUID = 1L;
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
-	private static final String ENCODE_URI = "encodeURI";
+	private static final String ENCODE_URI = "encodedURI";
 	private static transient Logger logger = Logger.getLogger(ShootistSipServlet.class);	
 	@Resource
 	TimerService timerService;
@@ -128,6 +128,8 @@ public class ShootistSipServlet
 			} else {
 				req.createResponse(500, "received a request using the encodeURI mechanism but not the same sip application session").send();
 			}
+		} else {
+			req.createResponse(500, "received a request using the encodeURI mechanism but not the same sip application session").send();
 		}
 	}
 	
