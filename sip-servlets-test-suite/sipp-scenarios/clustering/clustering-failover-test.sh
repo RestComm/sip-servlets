@@ -4,6 +4,7 @@ export TEST_IP=127.0.0.1
 export MSS_IP=$TEST_IP
 export LB_IP=$TEST_IP
 export SIPP_IP=$TEST_IP
+#export SIPP_OPTIONS="-t t1"
 
 echo Using $MSS_IP as the MSS test IP
 echo Using $LB_IP as the Load Balancer IP
@@ -26,8 +27,14 @@ if [ $# -ne 0 ]; then
 	    b2bua)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is b2bua";
-	            ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -bg -trace_msg -timeout 20  
-	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r 1 -m 1 -rsa $LB_IP:5060 -trace_msg
+	            ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -bg -trace_msg -timeout 20 $SIPP_OPTIONS
+	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r 1 -m 1 -rsa $LB_IP:5060 -trace_msg $SIPP_OPTIONS
+	            ;;
+	    custom-b2bua)
+	    		rm ./b2bua/*.log
+	            echo "Distributed example used is b2bua";
+	            ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -bg -trace_msg -timeout 100 $SIPP_OPTIONS
+	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/custom-call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r 1 -m 1 -rsa $LB_IP:5060 -trace_msg $SIPP_OPTIONS
 	            ;;
 	    b2bua-remote-send-bye)
 	    		rm ./b2bua/*.log
