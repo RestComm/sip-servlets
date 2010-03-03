@@ -151,8 +151,9 @@ public interface SipContext extends Context {
 	void enterSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession);
 	void exitSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession);
 	
-	void enterSipAppHa(MobicentsSipApplicationSession sipApplicationSession, boolean startCacheActivity, boolean bindSessions);
-	void enterSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response, boolean startCacheActivity, boolean bindSessions);
+//	void enterSipAppHa(MobicentsSipApplicationSession sipApplicationSession, boolean startCacheActivity, boolean bindSessions);
+	void enterSipAppHa(boolean startCacheActivity);
+//	void enterSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response, boolean startCacheActivity, boolean bindSessions);
 	void exitSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response);
 	
 	SipFactoryFacade getSipFactoryFacade();

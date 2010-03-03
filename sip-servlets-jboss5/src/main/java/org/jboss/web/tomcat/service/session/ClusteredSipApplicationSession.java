@@ -351,6 +351,8 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		this.lastAccessedTime = this.thisAccessedTime;
 		this.thisAccessedTime = System.currentTimeMillis();
 
+		ConvergedSessionReplicationContext.bindSipApplicationSession(this, manager.getSnapshotSipManager());
+		
 		//JSR 289 Section 6.3 : starting the sip app session expiry timer anew 
 		if(sipApplicationSessionTimeout > 0) {
 			expirationTime = thisAccessedTime + sipApplicationSessionTimeout;
@@ -1169,6 +1171,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 			log.trace("Marking session attributes dirty " + key);
 
 		sessionAttributesDirty = true;
+		ConvergedSessionReplicationContext.bindSipApplicationSession(this, manager.getSnapshotSipManager());
 	}
 
 	protected final void setHasActivationListener(boolean hasListener) {
@@ -1289,6 +1292,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 //		if (!sessionMetadataDirty && !isNew && log.isTraceEnabled())
 			log.debug("Marking session metadata dirty " + key);
 		sessionMetadataDirty = true;
+		ConvergedSessionReplicationContext.bindSipApplicationSession(this, manager.getSnapshotSipManager());
 	}
 
 	/**

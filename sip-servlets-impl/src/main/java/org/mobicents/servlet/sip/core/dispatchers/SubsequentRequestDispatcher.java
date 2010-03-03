@@ -264,11 +264,13 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			final SipContext sipContext = appSession.getSipContext();
 			final Request request = (Request) sipServletRequest.getMessage();
 			
-			sipContext.enterSipAppHa(sipServletRequest, null, true, true);
+			sipContext.enterSipAppHa(true);
 			
 			final String requestMethod = sipServletRequest.getMethod();
 			try {
-				sipSession.addOngoingTransaction(sipServletRequest.getTransaction());
+				if(!Request.ACK.equalsIgnoreCase(requestMethod)) {
+					sipSession.addOngoingTransaction(sipServletRequest.getTransaction());
+				}
 				// JSR 289 Section 6.2.1 :
 				// any state transition caused by the reception of a SIP message, 
 				// the state change must be accomplished by the container before calling 

@@ -388,6 +388,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	public void access() {
 		this.lastAccessedTime = this.thisAccessedTime;
 		this.thisAccessedTime = System.currentTimeMillis();
+		ConvergedSessionReplicationContext.bindSipSession(this, manager.getSnapshotSipManager());
 
 		if (ACTIVITY_CHECK) {
 			accessCount.incrementAndGet();
@@ -1349,6 +1350,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			log.trace("Marking session attributes dirty " + haId);
 
 		sessionAttributesDirty = true;
+		ConvergedSessionReplicationContext.bindSipSession(this, manager.getSnapshotSipManager());
 	}
 
 	protected final void setHasActivationListener(boolean hasListener) {
@@ -1471,8 +1473,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 //		if (!sessionMetadataDirty && !isNew && log.isTraceEnabled())
 			log.debug("Marking session metadata dirty " + key);
 		sessionMetadataDirty = true;
-	}
-
+		ConvergedSessionReplicationContext.bindSipSession(this, manager.getSnapshotSipManager());
+	}	
+	
 	/**
 	 * Advise our manager to remove this expired session.
 	 * 

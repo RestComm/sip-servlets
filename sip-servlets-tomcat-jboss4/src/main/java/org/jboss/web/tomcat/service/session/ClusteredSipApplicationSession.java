@@ -39,7 +39,6 @@ import javax.servlet.sip.SipApplicationSessionEvent;
 import javax.servlet.sip.SipApplicationSessionListener;
 
 import org.apache.catalina.Globals;
-import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
 import org.jboss.metadata.WebMetaData;
@@ -462,7 +461,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 
 	public void access() {
 		super.access();
-
+		ConvergedSessionReplicationContext.bindSipApplicationSession(this, ((JBossCacheSipManager)sipContext.getManager()).getSnapshotManager());
 		// JBAS-3528. If it's not the first access, make sure
 		// the 'new' flag is correct
 		//SipSession doesn't have the isNew flag
@@ -1289,6 +1288,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 
 	protected void sessionAttributesDirty() {
 		sessionAttributesDirty = true;
+		ConvergedSessionReplicationContext.bindSipApplicationSession(this, ((JBossCacheSipManager)sipContext.getManager()).getSnapshotManager());
 	}
 
 	protected boolean getSessionAttributesDirty() {
@@ -1297,6 +1297,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 
 	protected void sessionMetadataDirty() {
 		sessionMetadataDirty = true;
+		ConvergedSessionReplicationContext.bindSipApplicationSession(this, ((JBossCacheSipManager)sipContext.getManager()).getSnapshotManager());
 	}
 
 	protected boolean getSessionMetadataDirty() {
@@ -1305,6 +1306,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	
 	protected void sessionLastAccessTimeDirty() {
 		sessionLastAccessTimeDirty = true;
+		ConvergedSessionReplicationContext.bindSipApplicationSession(this, ((JBossCacheSipManager)sipContext.getManager()).getSnapshotManager());
 	}
 	
 	protected boolean getSessionLastAccessTimeDirty() {

@@ -200,6 +200,8 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	protected transient Map<String, Object> metaModifiedMap_ = new ConcurrentHashMap<String, Object>();
 	
 	private transient String haId;
+
+	protected transient JBossCacheSipManager manager;
 	
 	/**
 	 * The string manager for this package.
@@ -210,7 +212,10 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 
 	protected ClusteredSipSession(SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession, boolean useJK) {
 		super(key, sipFactoryImpl, mobicentsSipApplicationSession);
-		invalidationPolicy = ((AbstractJBossManager)mobicentsSipApplicationSession.getSipContext().getSipManager()).getInvalidateSessionPolicy();
+		if(mobicentsSipApplicationSession.getSipContext() != null) {
+			manager = ((JBossCacheSipManager)mobicentsSipApplicationSession.getSipContext().getSipManager());
+			invalidationPolicy = manager.getInvalidateSessionPolicy();
+		}
 		this.useJK = useJK;
 		this.firstAccess = true;
 		isNew = true;
@@ -1298,6 +1303,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 
 	protected void sessionAttributesDirty() {
 		sessionAttributesDirty = true;
+		ConvergedSessionReplicationContext.bindSipSession(this, manager.getSnapshotManager());
 	}
 
 	protected boolean getSessionAttributesDirty() {
@@ -1306,6 +1312,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 
 	protected void sessionMetadataDirty() {
 		sessionMetadataDirty = true;
+		ConvergedSessionReplicationContext.bindSipSession(this, manager.getSnapshotManager());
 	}		
 
 	protected boolean getSessionMetadataDirty() {
@@ -1314,6 +1321,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 
 	protected void sessionLastAccessTimeDirty() {
 		sessionLastAccessTimeDirty = true;
+		ConvergedSessionReplicationContext.bindSipSession(this, manager.getSnapshotManager());
 	}
 	
 	protected boolean getSessionLastAccessTimeDirty() {

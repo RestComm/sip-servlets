@@ -655,7 +655,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			final SipContext sipContext = appSession.getSipContext();
 			final Request request = (Request) sipServletRequest.getMessage();
 			
-			sipContext.enterSipAppHa(sipServletRequest, null, true, true);
+			sipContext.enterSipAppHa(true);
 			try {
 				sipSessionImpl.setSessionCreatingTransaction(sipServletRequest.getTransaction());								
 				

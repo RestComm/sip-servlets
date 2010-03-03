@@ -74,7 +74,7 @@ public class DefaultSasTimerTask implements SipApplicationSessionTimerTask {
 	private void tryToExpire() {
 		final SipContext sipContext = getSipApplicationSession().getSipContext();
 		sipContext.enterSipApp(getSipApplicationSession(), null);
-		sipContext.enterSipAppHa(null, null, true, false);
+		sipContext.enterSipAppHa(true);
 		try {
 			getSipApplicationSession().notifySipApplicationSessionListeners(SipApplicationSessionEventType.EXPIRATION);
 			//It is possible that the application grant an extension to the lifetime of the session, thus the sip application

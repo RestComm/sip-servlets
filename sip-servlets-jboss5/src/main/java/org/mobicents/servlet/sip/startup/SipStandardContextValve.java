@@ -180,7 +180,7 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
                 }
             }
         }
-        context.enterSipAppHa(null, null, false, false);        
+        context.enterSipAppHa(false);        
     	//the line below was replaced by the whole bunch of code because getting the parameter from the request is causing
     	//JRuby-Rails persistence to fail, go figure...
 //			String sipApplicationKey = request.getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);

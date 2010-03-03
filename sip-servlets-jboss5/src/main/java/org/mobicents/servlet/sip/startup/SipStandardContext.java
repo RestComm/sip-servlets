@@ -948,25 +948,38 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}		
 	}
     
-    public void enterSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response, boolean startCacheActivity, boolean bindSessions) {		
+//    public void enterSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response, boolean startCacheActivity, boolean bindSessions) {		
+//		if(getDistributable() && hasDistributableManager) {
+//			startBatchTransaction();
+//			if(bindSessions) {
+//				ConvergedSessionReplicationContext.enterSipappAndBindSessions(request, response, getSipManager(), startCacheActivity);
+//			} else {
+//				ConvergedSessionReplicationContext.enterSipapp(request, response, startCacheActivity);
+//			}
+//		}
+//	}
+    
+//	public void enterSipAppHa(MobicentsSipApplicationSession sipApplicationSession, boolean startCacheActivity, boolean bindSessions) {
+//		if(getDistributable() && hasDistributableManager) {
+//			startBatchTransaction();
+//			if(bindSessions) {
+//				ConvergedSessionReplicationContext.enterSipappAndBindSessions(sipApplicationSession,
+//				getSipManager(), startCacheActivity);
+//			} else {
+//				ConvergedSessionReplicationContext.enterSipapp(null, null, startCacheActivity);
+//			}
+//		}
+//	}
+    
+    public void enterSipAppHa(boolean startCacheActivity) {
 		if(getDistributable() && hasDistributableManager) {
 			startBatchTransaction();
-			if(bindSessions) {
-				ConvergedSessionReplicationContext.enterSipappAndBindSessions(request, response, getSipManager(), startCacheActivity);
-			} else {
-				ConvergedSessionReplicationContext.enterSipapp(request, response, startCacheActivity);
-			}
-		}
-	}
-    
-	public void enterSipAppHa(MobicentsSipApplicationSession sipApplicationSession, boolean startCacheActivity, boolean bindSessions) {
-		if(getDistributable() && hasDistributableManager) {
-			if(bindSessions) {
-				ConvergedSessionReplicationContext.enterSipappAndBindSessions(sipApplicationSession,
-				getSipManager(), startCacheActivity);
-			} else {
+//			if(bindSessions) {
+//				ConvergedSessionReplicationContext.enterSipappAndBindSessions(sipApplicationSession,
+//				getSipManager(), startCacheActivity);
+//			} else {
 				ConvergedSessionReplicationContext.enterSipapp(null, null, startCacheActivity);
-			}
+//			}
 		}
 	}
     
@@ -1085,7 +1098,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			logger.debug(children.length + " container to notify of " + event.getEventType());
 		}
 		enterSipApp(null, null);
-		enterSipAppHa(null, null, true, false);
+		enterSipAppHa(true);
 		try {
 			for (Container container : children) {
 				if(logger.isDebugEnabled()) {

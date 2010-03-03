@@ -29,6 +29,7 @@ import java.util.Set;
 
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipApplicationSession.Protocol;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -67,8 +68,8 @@ public final class ConvergedSessionReplicationContext
 //   private Map expiredSipApplicationSessions;
    private Request outerRequest;
    private Response outerResponse;
-   private SipServletRequestImpl outerSipRequest;
-   private SipServletResponseImpl outerSipResponse;
+//   private SipServletRequestImpl outerSipRequest;
+//   private SipServletResponseImpl outerSipResponse;
    
    
    /**
@@ -146,7 +147,7 @@ public final class ConvergedSessionReplicationContext
       ConvergedSessionReplicationContext ctx = getCurrentSipContext();
       if (ctx == null)
       {
-         ctx = new ConvergedSessionReplicationContext(request, response);
+         ctx = new ConvergedSessionReplicationContext();
          sipReplicationContext.set(ctx);
       }
       
@@ -165,74 +166,74 @@ public final class ConvergedSessionReplicationContext
     * @param request
     * @param response
     */
-   public static void enterSipappAndBindSessions(SipServletRequestImpl request, SipServletResponseImpl response, SipManager manager, boolean startCacheActivity)
-   {
-      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
-      if (ctx == null)
-      {
-         ctx = new ConvergedSessionReplicationContext(request, response);
-         sipReplicationContext.set(ctx);
-      }
-      
-      ctx.sipappCount++;     
-      
-      ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> clusteredSipApplicationSession = null;
-      ClusteredSipSession<? extends OutgoingDistributableSessionData> clusteredSipSession = null; 
-      if(request != null) {
-    	  clusteredSipSession = (ClusteredSipSession<? extends OutgoingDistributableSessionData>)request.getSipSession();    	  
-      } else {
-    	  clusteredSipSession = (ClusteredSipSession<? extends OutgoingDistributableSessionData>)response.getSipSession();
-      }
-      
-      if(clusteredSipSession.getSipApplicationSession() instanceof org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade) {
-      clusteredSipApplicationSession = (ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>) 
-      	((org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade)
-      			clusteredSipSession.getSipApplicationSession()).getMobicentstSipApplicationSession();
-      } else {
-    	  clusteredSipApplicationSession = (ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>)clusteredSipSession.getSipApplicationSession();
-      }
-      
-      bindSipApplicationSession(clusteredSipApplicationSession, ((ClusteredSipManager<OutgoingDistributableSessionData>)manager).getSnapshotSipManager());
-      bindSipSession(clusteredSipSession, ((ClusteredSipManager<OutgoingDistributableSessionData>)manager).getSnapshotSipManager());
-   }
-   
-   public static void enterSipappAndBindSessions(SipApplicationSession appSession, SipManager manager, boolean startCacheActivity)
-   {
-      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
-      if (ctx == null)
-      {
-         ctx = new ConvergedSessionReplicationContext(request, response);
-         sipReplicationContext.set(ctx);
-      }
-      
-      ctx.sipappCount++;     
-      
-      ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> clusteredSipApplicationSession = null;
-      
-      if(appSession instanceof org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade) {
-      clusteredSipApplicationSession = (ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>) 
-      	((org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade)
-      			appSession).getMobicentstSipApplicationSession();
-      } else {
-    	  clusteredSipApplicationSession = (ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>)
-    	  	appSession;
-      }
-      
-      SnapshotSipManager snapshotSipManager = ((ClusteredSipManager<OutgoingDistributableSessionData>)manager).getSnapshotSipManager();
-      bindSipApplicationSession(clusteredSipApplicationSession, snapshotSipManager);
-      Iterator<?> sipSessionIterator = clusteredSipApplicationSession.getSessions("sip");
-      while(sipSessionIterator.hasNext()) {
-    	  SipSession sipSession = (SipSession) sipSessionIterator.next();
-    	  ClusteredSipSession clusteredSipSession = null;
-    	  if(sipSession instanceof org.mobicents.servlet.sip.message.MobicentsSipSessionFacade) {
-    		  clusteredSipSession = (ClusteredSipSession) ((org.mobicents.servlet.sip.message.MobicentsSipSessionFacade)
-    				  sipSession).getMobicentsSipSession();
-    	  } else {
-    		  clusteredSipSession = (ClusteredSipSession) sipSession;
-    	  }
-    	  bindSipSession(clusteredSipSession, snapshotSipManager);
-      }
-    }
+//   public static void enterSipappAndBindSessions(SipServletRequestImpl request, SipServletResponseImpl response, SipManager manager, boolean startCacheActivity)
+//   {
+//      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
+//      if (ctx == null)
+//      {
+//         ctx = new ConvergedSessionReplicationContext();
+//         sipReplicationContext.set(ctx);
+//      }
+//      
+//      ctx.sipappCount++;     
+//      
+//      ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> clusteredSipApplicationSession = null;
+//      ClusteredSipSession<? extends OutgoingDistributableSessionData> clusteredSipSession = null; 
+//      if(request != null) {
+//    	  clusteredSipSession = (ClusteredSipSession<? extends OutgoingDistributableSessionData>)request.getSipSession();    	  
+//      } else {
+//    	  clusteredSipSession = (ClusteredSipSession<? extends OutgoingDistributableSessionData>)response.getSipSession();
+//      }
+//      
+//      if(clusteredSipSession.getSipApplicationSession() instanceof org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade) {
+//      clusteredSipApplicationSession = (ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>) 
+//      	((org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade)
+//      			clusteredSipSession.getSipApplicationSession()).getMobicentstSipApplicationSession();
+//      } else {
+//    	  clusteredSipApplicationSession = (ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>)clusteredSipSession.getSipApplicationSession();
+//      }
+//      
+//      bindSipApplicationSession(clusteredSipApplicationSession, ((ClusteredSipManager<OutgoingDistributableSessionData>)manager).getSnapshotSipManager());
+//      bindSipSession(clusteredSipSession, ((ClusteredSipManager<OutgoingDistributableSessionData>)manager).getSnapshotSipManager());
+//   }
+//   
+//   public static void enterSipappAndBindSessions(SipApplicationSession appSession, SipManager manager, boolean startCacheActivity)
+//   {
+//      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
+//      if (ctx == null)
+//      {
+//         ctx = new ConvergedSessionReplicationContext();
+//         sipReplicationContext.set(ctx);
+//      }
+//      
+//      ctx.sipappCount++;     
+//      
+//      ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> clusteredSipApplicationSession = null;
+//      
+//      if(appSession instanceof org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade) {
+//      clusteredSipApplicationSession = (ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>) 
+//      	((org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade)
+//      			appSession).getMobicentstSipApplicationSession();
+//      } else {
+//    	  clusteredSipApplicationSession = (ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>)
+//    	  	appSession;
+//      }
+//      
+//      SnapshotSipManager snapshotSipManager = ((ClusteredSipManager<OutgoingDistributableSessionData>)manager).getSnapshotSipManager();
+//      bindSipApplicationSession(clusteredSipApplicationSession, snapshotSipManager);
+//      Iterator<?> sipSessionIterator = clusteredSipApplicationSession.getSessions(Protocol.SIP.toString());
+//      while(sipSessionIterator.hasNext()) {
+//    	  SipSession sipSession = (SipSession) sipSessionIterator.next();
+//    	  ClusteredSipSession clusteredSipSession = null;
+//    	  if(sipSession instanceof org.mobicents.servlet.sip.message.MobicentsSipSessionFacade) {
+//    		  clusteredSipSession = (ClusteredSipSession) ((org.mobicents.servlet.sip.message.MobicentsSipSessionFacade)
+//    				  sipSession).getMobicentsSipSession();
+//    	  } else {
+//    		  clusteredSipSession = (ClusteredSipSession) sipSession;
+//    	  }
+//    	  bindSipSession(clusteredSipSession, snapshotSipManager);
+//      }
+//    }
    
    /**
     * Signals that the webapp is finished handling the request (and
@@ -254,8 +255,8 @@ public final class ConvergedSessionReplicationContext
             // return the context to allow replication.  If all cache activity
             // is done as well, clear the ThreadLocal
             
-            ctx.outerSipRequest = null;
-            ctx.outerSipResponse = null;
+//            ctx.outerSipRequest = null;
+//            ctx.outerSipResponse = null;
             
             sipReplicationContext.set(null);
             
@@ -469,11 +470,11 @@ public final class ConvergedSessionReplicationContext
       this.outerResponse = response;
    }
    
-   private ConvergedSessionReplicationContext(SipServletRequestImpl request, SipServletResponseImpl response) 
-   {
-      this.outerSipRequest = request;
-      this.outerSipResponse = response;
-   }
+//   private ConvergedSessionReplicationContext(SipServletRequestImpl request, SipServletResponseImpl response) 
+//   {
+//      this.outerSipRequest = request;
+//      this.outerSipResponse = response;
+//   }
    
    private ConvergedSessionReplicationContext() {}
 

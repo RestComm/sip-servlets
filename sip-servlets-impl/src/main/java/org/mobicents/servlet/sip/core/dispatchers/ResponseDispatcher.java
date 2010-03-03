@@ -198,7 +198,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 			final DispatchTask dispatchTask = new DispatchTask(sipServletResponse, sipProvider) {
 
 				public void dispatch() throws DispatcherException {
-					sipContext.enterSipAppHa(null, sipServletResponse, true, true);
+					sipContext.enterSipAppHa(true);
 					try {
 						try {
 							session.setSessionCreatingTransaction(clientTransaction);
