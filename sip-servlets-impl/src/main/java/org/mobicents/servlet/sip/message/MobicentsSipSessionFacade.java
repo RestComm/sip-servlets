@@ -431,4 +431,8 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 		}
 		return sipSession;
 	}	
+	
+	public MobicentsSipSession getMobicentsSipSession() {
+		return sipSession;
+	}
 }

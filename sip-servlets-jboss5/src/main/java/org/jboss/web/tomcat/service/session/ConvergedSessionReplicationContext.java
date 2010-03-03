@@ -23,8 +23,12 @@ package org.jboss.web.tomcat.service.session;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipSession;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
@@ -191,6 +195,44 @@ public final class ConvergedSessionReplicationContext
       bindSipApplicationSession(clusteredSipApplicationSession, ((ClusteredSipManager<OutgoingDistributableSessionData>)manager).getSnapshotSipManager());
       bindSipSession(clusteredSipSession, ((ClusteredSipManager<OutgoingDistributableSessionData>)manager).getSnapshotSipManager());
    }
+   
+   public static void enterSipappAndBindSessions(SipApplicationSession appSession, SipManager manager, boolean startCacheActivity)
+   {
+      ConvergedSessionReplicationContext ctx = getCurrentSipContext();
+      if (ctx == null)
+      {
+         ctx = new ConvergedSessionReplicationContext(request, response);
+         sipReplicationContext.set(ctx);
+      }
+      
+      ctx.sipappCount++;     
+      
+      ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> clusteredSipApplicationSession = null;
+      
+      if(appSession instanceof org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade) {
+      clusteredSipApplicationSession = (ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>) 
+      	((org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade)
+      			appSession).getMobicentstSipApplicationSession();
+      } else {
+    	  clusteredSipApplicationSession = (ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>)
+    	  	appSession;
+      }
+      
+      SnapshotSipManager snapshotSipManager = ((ClusteredSipManager<OutgoingDistributableSessionData>)manager).getSnapshotSipManager();
+      bindSipApplicationSession(clusteredSipApplicationSession, snapshotSipManager);
+      Iterator<?> sipSessionIterator = clusteredSipApplicationSession.getSessions("sip");
+      while(sipSessionIterator.hasNext()) {
+    	  SipSession sipSession = (SipSession) sipSessionIterator.next();
+    	  ClusteredSipSession clusteredSipSession = null;
+    	  if(sipSession instanceof org.mobicents.servlet.sip.message.MobicentsSipSessionFacade) {
+    		  clusteredSipSession = (ClusteredSipSession) ((org.mobicents.servlet.sip.message.MobicentsSipSessionFacade)
+    				  sipSession).getMobicentsSipSession();
+    	  } else {
+    		  clusteredSipSession = (ClusteredSipSession) sipSession;
+    	  }
+    	  bindSipSession(clusteredSipSession, snapshotSipManager);
+      }
+    }
    
    /**
     * Signals that the webapp is finished handling the request (and

@@ -959,6 +959,17 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}
 	}
     
+	public void enterSipAppHa(MobicentsSipApplicationSession sipApplicationSession, boolean startCacheActivity, boolean bindSessions) {
+		if(getDistributable() && hasDistributableManager) {
+			if(bindSessions) {
+				ConvergedSessionReplicationContext.enterSipappAndBindSessions(sipApplicationSession,
+				getSipManager(), startCacheActivity);
+			} else {
+				ConvergedSessionReplicationContext.enterSipapp(null, null, startCacheActivity);
+			}
+		}
+	}
+    
 	public void exitSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession) {
 		switch (concurrencyControlMode) {
 			case SipSession:
