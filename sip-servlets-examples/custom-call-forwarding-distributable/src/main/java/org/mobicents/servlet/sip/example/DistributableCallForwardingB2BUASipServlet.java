@@ -17,20 +17,26 @@
 package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.B2buaHelper;
+import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.TimerListener;
+import javax.servlet.sip.TimerService;
 
 import org.apache.log4j.Logger;
 
@@ -41,10 +47,10 @@ import org.apache.log4j.Logger;
  * @author Jean Deruelle
  *
  */
-public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
+public class DistributableCallForwardingB2BUASipServlet extends SipServlet implements TimerListener {
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(DistributableCallForwardingB2BUASipServlet.class);
-	B2buaHelper helper = null;
+	
 	private static final String RECEIVED = "Received";
 	Map<String, String[]> forwardingUris = null;
 	
@@ -80,11 +86,44 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 			logger.info("Got INVITE: " + request.toString());
 			logger.info(request.getFrom().getURI().toString());
 		}
-		logger.error("OUTBOUNDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD  " + getServletContext().getAttribute("javax.servlet.sip.outboundInterfaces"));
+		if(!request.isInitial()) {
+			// REINVITE within the same session
+			Composite composite = (Composite) request.getSession().getAttribute("timerRequest");
+			Composite composite2 = (Composite) request.getSession().getAttribute("timerRequest2");
+			if(composite2 == null) logger.info("timerRequest2=null, this is normal because it is from unmanaged timer.");
+			SipServletRequest testMessageMethodRequest = composite.request;
+			testMessageMethodRequest.getSession().createRequest("MESSAGE");
+			
+			
+			SipSession linkedSipSession = (SipSession) request.getSession().getAttribute("linkedSession");
+			SipServletRequest secondLegReinvite = (SipServletRequest) linkedSipSession.createRequest("INVITE");
+			secondLegReinvite.getSession().getAttribute("fff");
+			secondLegReinvite.send();
+			SipServletRequest originalRequestLoadedFromSecondLeg = (SipServletRequest) linkedSipSession.getAttribute("originalRequest");
+			request.getSession().getAttribute("INVITEREQUEST");
+			originalRequestLoadedFromSecondLeg.getSession().getAttribute("fff");
+			
+			/// Test sessions are not null
+			SipServletRequest forkedRequestLoadedFromFirstLeg = (SipServletRequest) request.getSession().getAttribute("forkedRequest");
+			forkedRequestLoadedFromFirstLeg.getSession().getAttribute("fffff");
+			SipServletRequest forkedRequestLoadedFromSecondLeg = (SipServletRequest) linkedSipSession.getAttribute("forkedRequest");
+			forkedRequestLoadedFromSecondLeg.getSession().getAttribute("fffff");
+			SipServletRequest repeatedLoadRequest = (SipServletRequest) request.getSession().getAttribute("forkedRequest");
+			repeatedLoadRequest.getSession().getAttribute("fffff");
+			logger.info("subsequent request");
+			linkedSipSession.setAttribute("originalRequest", request);
+			
+			//forkedRequest.getSession().setAttribute("INVITE", RECEIVED);
+			return;
+		}
+
+		TimerService timerService = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);
+		timerService.createTimer(request.getApplicationSession(), 5000, false, (Serializable) request);
+		
 		String[] forwardingUri = forwardingUris.get(request.getTo().getURI().toString());
-		if(forwardingUri != null && forwardingUri.length > 0) {
-			helper = request.getB2buaHelper();						
+		if(forwardingUri != null && forwardingUri.length > 0) {					
 			request.getSession().setAttribute("INVITE", RECEIVED);
+			request.getSession().setAttribute("INVITEREQUEST", request);
 			request.getApplicationSession().setAttribute("INVITE", RECEIVED);			
 			
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
@@ -95,14 +134,23 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 			toHeaderSet.add(forwardingUri[0]);
 			headers.put("To", toHeaderSet);
 			
-			SipServletRequest forkedRequest = helper.createRequest(request, true,
-					headers);
+			SipServletRequest forkedRequest = sipFactory.createRequest (request.getApplicationSession(), 
+                    "INVITE",
+                    request.getFrom().getURI().toString(),
+                    forwardingUri[0]);
+			
+			forkedRequest.getSession().setAttribute("linkedSession", request.getSession());
+			request.getSession().setAttribute("linkedSession", forkedRequest.getSession());
+			
+			logger.info("One session" + request.getSession() + " vs " + forkedRequest.getSession());
 			SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1]);		
 			forkedRequest.setRequestURI(sipUri);						
 			if(logger.isInfoEnabled()) {
 				logger.info("forkedRequest = " + forkedRequest);
 			}
 			forkedRequest.getSession().setAttribute("originalRequest", request);
+			forkedRequest.getSession().setAttribute("forkedRequest", forkedRequest);
+			request.getSession().setAttribute("forkedRequest", forkedRequest);
 			forkedRequest.getSession().setAttribute("INVITE", RECEIVED);
 			
 			forkedRequest.send();
@@ -120,9 +168,15 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 			logger.info("Got BYE: " + request.toString());
 		}
 		//we forward the BYE
-		B2buaHelper byeHelper = request.getB2buaHelper();
-		SipSession linkedSipSession = byeHelper.getLinkedSession(request.getSession());
+		SipSession linkedSipSession = (SipSession) request.getSession().getAttribute("linkedSession");
+		
 		String linkedSipSessionInviteAttribute  = (String) linkedSipSession.getAttribute("INVITE");
+		SipServletRequest r2 = (SipServletRequest) request.getSession().getAttribute("INVITEREQUEST");
+		SipServletRequest r = (SipServletRequest) linkedSipSession.getAttribute("originalRequest");
+		logger.info("Loaded r=" + r);
+		logger.info("R session = " + r.getSession());
+		logger.info("Loaded r2=" + r2);
+		logger.info("R2 session = " + r2.getSession());
 		String sipSessionInviteAttribute  = (String) request.getSession().getAttribute("INVITE");
 		String sipApplicationSessionInviteAttribute  = (String) request.getApplicationSession().getAttribute("INVITE");		
 		if(logger.isInfoEnabled()) {			
@@ -144,13 +198,13 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 		sipServletResponse.send();
 		
 		SipSession session = request.getSession();		
-		SipSession linkedSession = byeHelper.getLinkedSession(session);		
-		SipServletRequest forkedRequest = linkedSession.createRequest("BYE");
+		SipSession linkedSession =(SipSession) linkedSipSession.getAttribute("linkedSession");	
+		logger.info("Two session " + linkedSipSession + " vs " + linkedSession);
+		SipServletRequest forkedRequest = linkedSipSession.createRequest("BYE");
 		if(logger.isInfoEnabled()) {
 			logger.info("forkedRequest = " + forkedRequest);
 		}
 		forkedRequest.send();	
-		helper = byeHelper;
 	}	
 	
 	@Override
@@ -159,10 +213,7 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 		if(logger.isInfoEnabled()) {
 			logger.info("Got UPDATE: " + request.toString());
 		}
-        B2buaHelper helper = request.getB2buaHelper();
-        SipSession peerSession = helper.getLinkedSession(request.getSession());
-        SipServletRequest update = helper.createRequest(peerSession, request, null);
-        update.send();
+        
     }
     
 	@Override
@@ -232,5 +283,31 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 			logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
 		}
 		responseToOriginalRequest.send();
+	}
+
+	public void timeout(ServletTimer arg0) {
+		final SipServletRequest request = (SipServletRequest) arg0.getInfo();
+		request.getSession().setAttribute("timerRequest", new Composite(request, request.getSession()));
+		
+		new Timer().schedule(new TimerTask() {
+			
+			@Override
+			public void run() {
+				request.getSession().setAttribute("timerRequest2", new Composite(request, request.getSession()));
+				logger.info("READY FOR FAILOVER!");
+			}
+		}, 1000);
+	}
+	
+	// Test with composite
+	public static class Composite implements Serializable
+	{
+		public Composite(SipServletRequest r, SipSession s) {
+			this.request = r;
+			this.session = s;
+		}
+		public SipServletRequest request;
+		public SipSession session;
+		String someString;
 	}
 }
