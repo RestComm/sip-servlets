@@ -321,7 +321,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 * @see org.mobicents.servlet.sip.address.URIImpl#toString()
 	 */
 	public String toString() {
-		return RFC2396UrlDecoder.decode(getSipURI().toString());
+		return getSipURI().toString();
 	}
 
 	/*
