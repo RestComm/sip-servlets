@@ -1257,6 +1257,7 @@ public class TestSipListener implements SipListener {
 						return;
 					}
 					if(sendBye) {
+//						Thread.sleep(30000);
 						sendBye();
 					}
 					if(sendByeAfterTerminatingNotify) {
