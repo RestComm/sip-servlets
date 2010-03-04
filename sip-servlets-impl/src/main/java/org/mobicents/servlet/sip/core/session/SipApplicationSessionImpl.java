@@ -50,7 +50,6 @@ import javax.servlet.sip.URI;
 
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
 import org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade;
@@ -533,7 +532,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		//When the IllegalStateException is thrown, the application is guaranteed 
 		//that the state of the SipApplicationSession object will be unchanged from its state prior to the invalidate() 
 		//method call. Even session objects that were eligible for invalidation will not have been invalidated.
-		if(!bypassCheck && !isValidInternal.compareAndSet(true, false)) {
+		boolean wasValid = isValidInternal.compareAndSet(true, false);
+		if(!bypassCheck && !wasValid) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
 		if(logger.isInfoEnabled()) {

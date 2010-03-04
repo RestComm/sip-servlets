@@ -74,7 +74,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	
 	private static final long serialVersionUID = 1L;
 
-	private static final String REL100_OPTION_TAG = "100rel";
+	public static final String REL100_OPTION_TAG = "100rel";
 
 	private static final Logger logger = Logger.getLogger(SipServletResponseImpl.class);
 	
@@ -536,13 +536,22 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			session.access();
 			sipApplicationSession.access();
 			if(transaction == null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Sending response statelessly " + message);
+				}
 				final String transport = JainSipUtils.findTransport(((SipServletRequestImpl)this.getRequest()).getMessage());
 				final SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
 						transport, false).getSipProvider();
 				sipProvider.sendResponse((Response)this.message);
 			} else if(sendReliably) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Sending response reliably " + message);
+				}
 				dialog.sendReliableProvisionalResponse((Response)this.message);
 			} else {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Sending response " + message + " through tx " + transaction);
+				}
 				transaction.sendResponse( (Response)this.message );
 			}
 			isMessageSent = true;

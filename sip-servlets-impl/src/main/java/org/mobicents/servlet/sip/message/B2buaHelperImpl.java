@@ -434,10 +434,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		if(!sipSession.isValidInternal()) {
 			throw new IllegalArgumentException("sip session " + sipSession.getId() + " is invalid !");
 		}
-		final Transaction trans = sipSession.getSessionCreatingTransaction();				
-		final TransactionApplicationData appData = (TransactionApplicationData) trans.getApplicationData();
-		
-		final SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) appData.getSipServletMessage();
+		final SipServletRequestImpl sipServletRequestImpl = sipSession.getSessionCreatingTransactionRequest();
 		if(RoutingState.FINAL_RESPONSE_SENT.equals(sipServletRequestImpl.getRoutingState())) {
 			throw new IllegalStateException("subsequent response is inconsistent with an already sent response. a Final response has already been sent ! ");
 		}
@@ -522,9 +519,12 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 						if (!sipServletMessage.isCommitted() && !Request.ACK.equals(sipServletMessage.getMethod()) && !Request.PRACK.equals(sipServletMessage.getMethod())) {
 							retval.add(sipServletMessage);
 						}
-						for(SipServletResponseImpl sipServletResponseImpl : tad.getSipServletResponses()) {
-							if (!sipServletResponseImpl.isCommitted()) {
-								retval.add(sipServletResponseImpl);
+						final Set<SipServletResponseImpl> sipServletsResponses = tad.getSipServletResponses();
+						if(sipServletsResponses != null) {
+							for(SipServletResponseImpl sipServletResponseImpl : sipServletsResponses) {
+								if (!sipServletResponseImpl.isCommitted()) {
+									retval.add(sipServletResponseImpl);
+								}
 							}
 						}
 					}

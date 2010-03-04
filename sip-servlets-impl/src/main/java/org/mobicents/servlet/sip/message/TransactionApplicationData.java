@@ -51,7 +51,7 @@ public class TransactionApplicationData implements Serializable {
 	
 	public TransactionApplicationData(SipServletMessageImpl sipServletMessage ) {		
 		this.sipServletMessage = sipServletMessage;
-		sipServletResponses = new CopyOnWriteArraySet<SipServletResponseImpl>();
+		sipServletResponses = null;
 		rseqNumber = new AtomicInteger(1);
 	}
 	
@@ -86,6 +86,9 @@ public class TransactionApplicationData implements Serializable {
 	 * used to get access from the B2BUA to pending messages on the transaction
 	 */
 	public void addSipServletResponse(SipServletResponseImpl sipServletResponse) {
+		if(sipServletResponses == null) {
+			sipServletResponses = new CopyOnWriteArraySet<SipServletResponseImpl>();
+		}
 		sipServletResponses.add(sipServletResponse);
 	}
 	
@@ -191,5 +194,17 @@ public class TransactionApplicationData implements Serializable {
 	 */
 	public String getModifier() {
 		return modifier;
+	}
+	
+	public void cleanUp() {
+		initialPoppedRoute = null;
+		proxyBranch = null;
+		// cannot nullify because of noAckReceived needs it
+//		sipServletMessage = null;
+		if(sipServletResponses != null) {
+			sipServletResponses.clear();
+			sipServletResponses = null;
+		}
+		transaction = null;
 	}
 }

@@ -756,16 +756,24 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			logger.debug("Dialog Terminated => " + dialogTerminatedEvent.getDialog().getCallId().getCallId());
 		}
 		Dialog dialog = dialogTerminatedEvent.getDialog();		
-		TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
+		TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();		
+		if(tad != null && tad.getSipServletMessage() == null) {						
+			Transaction transaction = tad.getTransaction();
+			if(transaction != null && transaction.getApplicationData() != null) {
+				tad = (TransactionApplicationData) transaction.getApplicationData();
+			}			
+		}		
 		if(tad != null && tad.getSipServletMessage() != null) {
 			SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
 			SipSessionKey sipSessionKey = sipServletMessageImpl.getSipSessionKey();
 			tryToInvalidateSession(sipSessionKey, false);
-		} else {	
+			tad.cleanUp();
+			dialog.setApplicationData(null);
+		} else {
 			if(logger.isDebugEnabled()) {
 				logger.debug("no application data for this dialog " + dialogTerminatedEvent.getDialog().getDialogId());
 			}
-		}		
+		}
 	}
 
 	/**
@@ -852,9 +860,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public void processDialogTimeout(DialogTimeoutEvent timeoutEvent) {
 		final Dialog dialog = timeoutEvent.getDialog();
+		if(logger.isDebugEnabled()) {
+			logger.info("dialog timeout " + dialog + " reason => " + timeoutEvent.getReason());
+		}	
 		if(timeoutEvent.getReason() == Reason.AckNotReceived) {			
 			final TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
-			if(tad != null) {
+			if(tad != null && tad.getSipServletMessage() != null) {
 				final SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
 				final SipSessionKey sipSessionKey = sipServletMessage.getSipSessionKey();
 				final MobicentsSipSession sipSession = sipServletMessage.getSipSession();
@@ -863,6 +874,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					dialog.delete();
 					tryToInvalidateSession(sipSessionKey, false);
 				}
+				tad.cleanUp();					
 			}
 		}
 		dialog.setApplicationData(null);
@@ -959,7 +971,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 		
 		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
-		if(tad != null) {
+		if(tad != null && tad.getSipServletMessage() != null) {
 			SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
 			SipSessionKey sipSessionKey = sipServletMessage.getSipSessionKey();
 			MobicentsSipSession sipSession = sipServletMessage.getSipSession();
@@ -974,11 +986,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					logger.error("Failed to deliver 408 respone on transaction timeout" + transaction, t);
 				}
 			}
-			if(sipSession != null) {
-				sipSession.removeOngoingTransaction(transaction);			
+			if(sipSession != null) {							
 				checkForAckNotReceived(sipServletMessage);
+				sipSession.removeOngoingTransaction(transaction);
 				tryToInvalidateSession(sipSessionKey, false);
 			}
+			tad.cleanUp();
+			transaction.setApplicationData(null);
 		}		
 	}
 	
@@ -998,7 +1012,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}		
 		
 		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
-		if(tad != null) {
+		if(tad != null && tad.getSipServletMessage() != null) {
 			SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
 			SipSessionKey sipSessionKey = sipServletMessageImpl.getSipSessionKey();
 			if(sipSessionKey == null) {
@@ -1009,11 +1023,19 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				// If it is a client transaction, do not kill the proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
 				tryToInvalidateSession(sipSessionKey, transactionTerminatedEvent.isServerTransaction());				
 //				sipSessionImpl.removeOngoingTransaction(transaction);
+			}			
+			MobicentsSipSession sipSession = sipServletMessageImpl.getSipSession();
+			if(sipSession != null) {
+				sipSession.removeOngoingTransaction(transaction);
 			}
+			tad.cleanUp();
+			transaction.setApplicationData(null);
 		} else {
 			if(logger.isDebugEnabled()) {
 				logger.debug("TransactionApplicationData not available on the following request " + transaction.getRequest().toString());
 			}
+			tad.cleanUp();
+			transaction.setApplicationData(null);
 		}		
 	}
 

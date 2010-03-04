@@ -247,9 +247,9 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 		return getSipSession().getSessionCreatingDialog();
 	}
 
-	public Transaction getSessionCreatingTransaction() {
+	public SipServletRequestImpl getSessionCreatingTransactionRequest() {
 		
-		return getSipSession().getSessionCreatingTransaction();
+		return getSipSession().getSessionCreatingTransactionRequest();
 	}
 
 	public MobicentsSipApplicationSession getSipApplicationSession() {

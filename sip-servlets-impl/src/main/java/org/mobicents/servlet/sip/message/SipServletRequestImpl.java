@@ -66,6 +66,7 @@ import javax.sip.header.FromHeader;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.RecordRouteHeader;
+import javax.sip.header.RequireHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
@@ -987,9 +988,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						transport, false).getSipProvider();
 				final ClientTransaction ctx = sipProvider
 						.getNewClientTransaction(request);				
-				ctx.setRetransmitTimer(sipFactoryImpl.getSipApplicationDispatcher().getBaseTimerInterval());
-				
-				session.setSessionCreatingTransaction(ctx);
+				ctx.setRetransmitTimer(sipFactoryImpl.getSipApplicationDispatcher().getBaseTimerInterval());								
 				
 				Dialog dialog = ctx.getDialog();
 				
@@ -1030,7 +1029,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				// copied over to the tx so it can be quickly accessed when response
 				// arrives.				
 				ctx.setApplicationData(this.transactionApplicationData);
-
+				session.setSessionCreatingTransaction(ctx);
+				
 				super.setTransaction(ctx);
 
 			} else if (Request.PRACK.equals(request.getMethod())) {
@@ -1097,15 +1097,15 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			// If dialog does not exist or has no state.
 			if (dialog == null || dialog.getState() == null
 					|| (dialog.getState() == DialogState.EARLY && !Request.PRACK.equals(requestMethod))) {
-				if(logger.isInfoEnabled()) {
-					logger.info("Sending the request " + request);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Sending the request " + request);
 				}
 				((ClientTransaction) super.getTransaction()).sendRequest();
 			} else {
 				// This is a subsequent (an in-dialog) request. 
 				// we don't redirect it to the container for now
-				if(logger.isInfoEnabled()) {
-					logger.info("Sending the in dialog request " + request);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Sending the in dialog request " + request);
 				}
 				dialog.sendRequest((ClientTransaction) getTransaction());
 			}			
@@ -1324,12 +1324,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	/**
 	 * @param finalResponse the finalResponse to set
 	 */
-	public void setResponse(SipServletResponse response) {
+	public void setResponse(SipServletResponse response) {		
 		if(response.getStatus() >= 200 && 
 				(lastFinalResponse == null || lastFinalResponse.getStatus() < response.getStatus())) {
 			this.lastFinalResponse = response;
 		}
-		if((response.getStatus() > 100 && response.getStatus() < 200) && 
+		// we keep the last informational response for noPrackReceived only
+		if(SipServletResponseImpl.REL100_OPTION_TAG.equals(response.getHeader(RequireHeader.NAME)) && (response.getStatus() > 100 && response.getStatus() < 200) && 
 				(lastInformationalResponse == null || lastInformationalResponse.getStatus() < response.getStatus())) {
 			this.lastInformationalResponse = response;
 		}
@@ -1582,5 +1583,22 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public String getInitialTransport() {		
 		return ((SIPTransaction)getTransaction()).getTransport();
+	}
+	
+	public void cleanUp() {
+		if(transactionApplicationData != null) {
+			transactionApplicationData.cleanUp();
+			transactionApplicationData = null;
+		}
+		setTransaction(null);
+//		lastFinalResponse = null;
+//		lastInformationalResponse = null;
+		sipSession = null;
+		linkedRequest = null;		
+	}
+	
+	public void cleanUpLastResponses() {
+		lastFinalResponse = null;
+		lastInformationalResponse = null;
 	}
 }
