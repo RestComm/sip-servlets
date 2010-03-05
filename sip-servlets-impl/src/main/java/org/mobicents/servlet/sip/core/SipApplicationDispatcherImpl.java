@@ -751,11 +751,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * (non-Javadoc)
 	 * @see javax.sip.SipListener#processDialogTerminated(javax.sip.DialogTerminatedEvent)
 	 */
-	public void processDialogTerminated(DialogTerminatedEvent dialogTerminatedEvent) {
-		if(logger.isDebugEnabled()) {
-			logger.debug("Dialog Terminated => " + dialogTerminatedEvent.getDialog().getCallId().getCallId());
-		}
+	public void processDialogTerminated(DialogTerminatedEvent dialogTerminatedEvent) {		
 		Dialog dialog = dialogTerminatedEvent.getDialog();		
+		if(logger.isDebugEnabled()) {
+			logger.debug("Dialog Terminated => dialog Id : " + dialogTerminatedEvent.getDialog().getDialogId());
+		}
 		TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();		
 		if(tad != null && tad.getSipServletMessage() == null) {						
 			Transaction transaction = tad.getTransaction();
@@ -1034,7 +1034,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(logger.isDebugEnabled()) {
 				logger.debug("TransactionApplicationData not available on the following request " + transaction.getRequest().toString());
 			}
-			tad.cleanUp();
+			if(tad != null) {
+				tad.cleanUp();
+			}
 			transaction.setApplicationData(null);
 		}		
 	}

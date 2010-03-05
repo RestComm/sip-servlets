@@ -1593,7 +1593,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		setTransaction(null);
 //		lastFinalResponse = null;
 //		lastInformationalResponse = null;
-		sipSession = null;
+		// cannot dereference since com.bea.sipservlet.tck.agents.api.javax_servlet_sip.B2buaHelperTest.testCreateResponseToOriginalRequest102 needs it
+//		sipSession = null;
 		linkedRequest = null;		
 	}
 	
