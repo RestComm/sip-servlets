@@ -120,8 +120,7 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 //		boolean proxyCancel = false;
 		ServerTransaction cancelTransaction = 
 			(ServerTransaction) sipServletRequest.getTransaction();
-		// we get the tx here because the jain sip stack perf eagerly cleans the ref to the invite tx once the final response has been sent
-		ServerTransaction inviteTransaction = ((ServerTransactionExt) cancelTransaction).getCanceledInviteTransaction();
+		
 		try {
 			// First we need to send OK ASAP because of retransmissions both for 
 			//proxy or app			
@@ -137,7 +136,7 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 		if(logger.isDebugEnabled()) {
 			logger.debug("checking what to do with the CANCEL " + sipServletRequest);
 		}								
-		DispatchTask dispatchTask = new CancelDispatchTask(sipServletRequest, sipProvider, inviteTransaction);
+		DispatchTask dispatchTask = new CancelDispatchTask(sipServletRequest, sipProvider);
 		// Execute CANCEL without waiting for previous requests because if we wait for an INVITE to complete
 		// all responses will be already sent by the time the CANCEL is out of the queue.
 		((SipApplicationDispatcherImpl)this.sipApplicationDispatcher).getAsynchronousExecutor().execute(dispatchTask);
@@ -168,16 +167,14 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 	
 	public static class CancelDispatchTask extends DispatchTask {
 		
-		final ServerTransaction inviteTransaction;
-		
-		CancelDispatchTask(SipServletRequestImpl sipServletRequest, SipProvider sipProvider, ServerTransaction inviteTransaction) {
+		CancelDispatchTask(SipServletRequestImpl sipServletRequest, SipProvider sipProvider) {
 			super(sipServletRequest, sipProvider);
-			this.inviteTransaction = inviteTransaction;
 		}
 		
 		public void dispatch() throws DispatcherException {
 			final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl)sipServletMessage;
-			final Request request = (Request) sipServletRequest.getMessage();	
+			final Request request = (Request) sipServletRequest.getMessage();	 			
+			final ServerTransaction inviteTransaction = ((ServerTransactionExt) sipServletRequest.getTransaction()).getCanceledInviteTransaction();
 			
 			if(inviteTransaction == null) {
 				logger.error("couldn't find the original invite transaction for this cancel " + request);
