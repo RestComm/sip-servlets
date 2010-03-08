@@ -16,14 +16,11 @@
  */
 package org.mobicents.servlet.sip.testsuite.session;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.sip.SipSession;
-import javax.sip.InvalidArgumentException;
-import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.message.Response;
 
@@ -97,7 +94,7 @@ public class SessionStateUACSipServletTest extends SipServletTestCase {
 		super.setUp();																							
 	}
 	
-	public void testSessionStateUAC_1xx_4xx() throws InterruptedException, SipException, ParseException, InvalidArgumentException {		
+	public void testSessionStateUAC_1xx_4xx() throws Exception {		
 		Thread.sleep(TIMEOUT);
 		
 		Iterator<String> allMessagesIterator = receiver.getAllMessagesContent().iterator();		
@@ -113,7 +110,7 @@ public class SessionStateUACSipServletTest extends SipServletTestCase {
 	}	
 	
 	// Test for SS spec 11.1.6 transaction timeout notification
-	public void testTransactionTimeoutResponse() throws InterruptedException, SipException, ParseException, InvalidArgumentException {		
+	public void testTransactionTimeoutResponse() throws Exception {		
 		Thread.sleep(TIMEOUT);
 		
 		Iterator<String> allMessagesIterator = receiver.getAllMessagesContent().iterator();		
