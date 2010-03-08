@@ -76,18 +76,7 @@ public class SipJBossContextConfig extends JBossContextConfig
 			if(logger.isDebugEnabled()) {
 				logger.debug("starting sipContextConfig");
 			}
-			ServletContext servletContext = context.getServletContext();
-			// calling start on the parent to initialize web resources of the web
-			// app if any. That mean that this is a converged application.
-			InputStream webXmlInputStream = servletContext
-					.getResourceAsStream(Constants.ApplicationWebXml);			
-			context.setWrapperClass(StandardWrapper.class.getName());						
-			if (webXmlInputStream != null) {
-				if(logger.isDebugEnabled()) {
-					logger.debug(Constants.ApplicationWebXml + " has been found, calling super.start() !");
-				}
-				super.start();
-			}						
+			ServletContext servletContext = context.getServletContext();						
 			
 			context.setWrapperClass(SipServletImpl.class.getName());
 			
@@ -138,9 +127,25 @@ public class SipJBossContextConfig extends JBossContextConfig
 				ok = true;
 			}
 			
+			// We parse the web application after so that all converged sip and http servlets are instances of SipServletImpl
+			
+			// calling start on the parent to initialize web resources of the web
+			// app if any. That mean that this is a converged application.
+			InputStream webXmlInputStream = servletContext
+					.getResourceAsStream(Constants.ApplicationWebXml);			
+			context.setWrapperClass(StandardWrapper.class.getName());						
+			if (webXmlInputStream != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug(Constants.ApplicationWebXml + " has been found, calling super.start() !");
+				}
+				super.start();
+			}
+			
+			context.setWrapperClass(SipServletImpl.class.getName());
+			
 			if(!scanner.isApplicationParsed() && sipXmlInputStream != null) {
 				context.setWrapperClass(StandardWrapper.class.getName());
-			}
+			}						
 			
 			checkSipDeploymentRequirements(context);
 			

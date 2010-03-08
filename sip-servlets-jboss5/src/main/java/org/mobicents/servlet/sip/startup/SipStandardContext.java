@@ -499,6 +499,17 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		return super.createWrapper();
 	}		
 	
+	@Override
+	public void addChild(Container container) {
+		if(children.get(container.getName()) == null) {
+			super.addChild(container);
+		} else {
+			if(logger.isDebugEnabled()) {
+				logger.debug(container.getName() + " already present as a Sip Servlet not adding it again");
+			}
+		}
+	}
+	
 	public void addChild(SipServletImpl sipServletImpl) {
 		SipServletImpl existingServlet = (SipServletImpl) childrenMap.get(sipServletImpl.getName());		
 		if(existingServlet != null) {			
@@ -513,14 +524,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}
 		childrenMap.put(sipServletImpl.getName(), sipServletImpl);
 		childrenMapByClassName.put(sipServletImpl.getServletClass(), sipServletImpl);
-		// we cannot add a SipServlet which is already an HTTP Servlet 
-		if(children.get(sipServletImpl.getName()) == null) {
-			super.addChild(sipServletImpl);
-			// we remove the sip servlet from the http children map
-			children.remove(sipServletImpl.getName());
-		} else {
-			sipServletImpl.setParent(this);  // May throw IAE
-		}
+		super.addChild(sipServletImpl);		
 	}
 	
 	public void removeChild(SipServletImpl sipServletImpl) {
