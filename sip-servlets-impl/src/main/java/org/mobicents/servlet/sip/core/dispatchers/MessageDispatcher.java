@@ -204,7 +204,7 @@ public abstract class MessageDispatcher {
 		final String sessionHandler = session.getHandler();
 		final MobicentsSipApplicationSession sipApplicationSessionImpl = session.getSipApplicationSession();
 		final SipContext sipContext = sipApplicationSessionImpl.getSipContext();
-		final Wrapper sipServletImpl = (Wrapper) sipContext.findChild(sessionHandler);
+		final Wrapper sipServletImpl = (Wrapper) sipContext.findChildrenByName(sessionHandler);
 		if(sipServletImpl != null) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Dispatching request " + request.toString() + 
@@ -265,7 +265,7 @@ public abstract class MessageDispatcher {
 		final String sessionHandler = session.getHandler();
 		final MobicentsSipApplicationSession sipApplicationSessionImpl = session.getSipApplicationSession();
 		final SipContext sipContext = sipApplicationSessionImpl.getSipContext();
-		final Wrapper sipServletImpl = (Wrapper) sipContext.findChild(sessionHandler);
+		final Wrapper sipServletImpl = (Wrapper) sipContext.findChildrenByName(sessionHandler);
 		
 		if(sipServletImpl == null || sipServletImpl.isUnavailable()) {
 			if(sipContext.getSipRubyController() != null) {

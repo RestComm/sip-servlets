@@ -615,25 +615,27 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	}		
 	
 	public void addChild(SipServletImpl sipServletImpl) {
-		Object existingServlet = children.get(sipServletImpl.getName());		
-		if(existingServlet != null) {
-			if(existingServlet instanceof SipServletImpl) {	
-				SipServletImpl existingSipServlet = (SipServletImpl) existingServlet;
-				logger.warn(sipServletImpl.getName() + " servlet already present, removing the previous one. " +
-						"This might be due to the fact that the definition of the servlet " +
-						"is present both in annotations and in sip.xml");
-				//we remove the previous one (annoations) because it may not have init parameters that has been defined in sip.xml
-				//See TCK Test ContextTest.testContext1
-				childrenMap.remove(sipServletImpl.getName());
-				childrenMapByClassName.remove(sipServletImpl.getServletClass());
-				super.removeChild(existingSipServlet);
-			} else {
-				throw new SipDeploymentException("It is not possible to deploy the Sip Servlet " + sipServletImpl.getServletClass() + " both as a Sip Servlet and an Http servlet");
-			}
+		SipServletImpl existingServlet = (SipServletImpl) childrenMap.get(sipServletImpl.getName());		
+		if(existingServlet != null) {			
+			logger.warn(sipServletImpl.getName() + " servlet already present, removing the previous one. " +
+					"This might be due to the fact that the definition of the servlet " +
+					"is present both in annotations and in sip.xml");
+			//we remove the previous one (annoations) because it may not have init parameters that has been defined in sip.xml
+			//See TCK Test ContextTest.testContext1
+			childrenMap.remove(sipServletImpl.getName());
+			childrenMapByClassName.remove(sipServletImpl.getServletClass());
+			super.removeChild(existingServlet);
 		}
 		childrenMap.put(sipServletImpl.getName(), sipServletImpl);
 		childrenMapByClassName.put(sipServletImpl.getServletClass(), sipServletImpl);
-		super.addChild(sipServletImpl);
+		// we cannot add a SipServlet which is already an HTTP Servlet 
+		if(children.get(sipServletImpl.getName()) == null) {
+			super.addChild(sipServletImpl);
+			// we remove the sip servlet from the http children map
+			children.remove(sipServletImpl.getName());
+		} else {
+			sipServletImpl.setParent(this);  // May throw IAE
+		}
 	}
 		
 	public void removeChild(SipServletImpl sipServletImpl) {
@@ -652,14 +654,18 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Container findChildrenByName(String name) {		
+	public Container findChildrenByName(String name) {
+		if (name == null)
+            return (null);
 		return childrenMap.get(name);
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
-	public Container findChildrenByClassName(String className) {		
+	public Container findChildrenByClassName(String className) {
+		if (className == null)
+            return (null);
 		return childrenMapByClassName.get(className);
 	}
 
@@ -996,14 +1002,13 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	public boolean notifySipContextListeners(SipContextEvent event) {
 		boolean ok = true;
 		
-		Container[] children = findChildren();
 		if(logger.isDebugEnabled()) {
-			logger.debug(children.length + " container to notify of " + event.getEventType());
+			logger.debug(childrenMap.size() + " container to notify of " + event.getEventType());
 		}
 		enterSipApp(null, null);
 		enterSipAppHa(true);
 		try {
-			for (Container container : children) {
+			for (Container container : childrenMap.values()) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("container " + container.getName() + ", class : " + container.getClass().getName());
 				}

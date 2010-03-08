@@ -1083,8 +1083,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 			return ;
 		}
 		SipContext sipContext = getSipApplicationSession().getSipContext();
-		Map<String, Container> childrenMap = sipContext.getChildrenMap();
-		Container container = childrenMap.get(name);
+		Container container = sipContext.findChildrenByName(name);		
 		
 		if(container == null && sipContext.getSipRubyController() == null) {
 			throw new ServletException("the sip servlet with the name "+ name + 

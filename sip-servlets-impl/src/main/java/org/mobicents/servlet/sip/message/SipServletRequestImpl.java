@@ -838,7 +838,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public RequestDispatcher getRequestDispatcher(String handler) {
 		SipServletImpl sipServletImpl = (SipServletImpl) 
-			getSipSession().getSipApplicationSession().getSipContext().getChildrenMap().get(handler);
+			getSipSession().getSipApplicationSession().getSipContext().findChildrenByName(handler);
 		if(sipServletImpl == null) {
 			throw new IllegalArgumentException(handler + " is not a valid servlet name");
 		}
