@@ -347,7 +347,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		} else {
 			if(sipServletResponse.getStatus() != SipServletResponse.SC_REQUEST_TERMINATED) {
 				SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
-				SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
+				SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
 				logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
 				responseToOriginalRequest.send();
 			}

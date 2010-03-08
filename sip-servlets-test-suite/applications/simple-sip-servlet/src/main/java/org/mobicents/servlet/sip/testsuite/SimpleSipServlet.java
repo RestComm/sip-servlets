@@ -557,6 +557,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
+			sipServletRequest.addHeader("Ext", "Test 1, 2 ,3");
 			SipURI sipUri = storedFactory.createSipURI("receiver", "127.0.0.1:5080");
 			if(transport != null) {
 				if(transport.equalsIgnoreCase(ListeningPoint.TCP)) {
