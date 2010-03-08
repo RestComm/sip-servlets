@@ -105,10 +105,10 @@ public class SipJBossContextConfig extends JBossContextConfig {
 
 	@Override
 	protected void processWebMetaData(JBossWebMetaData metaData) {
-		super.processWebMetaData(metaData);
 		if(metaData instanceof JBossConvergedSipMetaData && context instanceof SipContext) {			
 			processSipMetaData((JBossConvergedSipMetaData)metaData);
-		}				
+		}
+		super.processWebMetaData(metaData);					
 	}
 
 	/**
