@@ -267,13 +267,14 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 				this.message.setHeader(header);				
 			} else {	
 				// Dealing with Allow:INVITE, ACK, CANCEL, OPTIONS, BYE kind of values
-				if(new StringTokenizer(value, ",").countTokens() > 1) {
+				if(JainSipUtils.LIST_HEADER_NAMES.contains(name)) {
 					List<Header> headers = SipFactory.getInstance().createHeaderFactory()
 						.createHeaders(name + ":" + value);
 					for (Header header : headers) {
 						this.message.addHeader(header);
 					}
 				} else {
+					// Extension Header: those cannot be lists. See jain sip issue 270
 					Header header = SipFactory.getInstance().createHeaderFactory()
 						.createHeader(name, value);
 					this.message.addLast(header);
@@ -1318,7 +1319,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		
 		try {
 			// Dealing with Allow:INVITE, ACK, CANCEL, OPTIONS, BYE kind of headers
-			if(!JainSipUtils.SINGLETON_HEADER_NAMES.contains(name) && new StringTokenizer(value, ",").countTokens() > 1) {
+			if(JainSipUtils.LIST_HEADER_NAMES.contains(name)) {
 				this.message.removeHeader(name);
 				List<Header> headers = SipFactory.getInstance().createHeaderFactory()
 					.createHeaders(name + ":" + value);
@@ -1326,6 +1327,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 					this.message.addHeader(header);
 				}
 			} else {
+				// dealing with non list headers and extension header
 				Header header = SipFactory.getInstance().createHeaderFactory()
 					.createHeader(name, value);
 				this.message.setHeader(header);
