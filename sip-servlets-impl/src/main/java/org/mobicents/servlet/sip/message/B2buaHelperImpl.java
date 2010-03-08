@@ -434,7 +434,11 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		if(!sipSession.isValidInternal()) {
 			throw new IllegalArgumentException("sip session " + sipSession.getId() + " is invalid !");
 		}
-		final SipServletRequestImpl sipServletRequestImpl = sipSession.getSessionCreatingTransactionRequest();
+		final SipServletMessageImpl sipServletMessageImpl = sipSession.getSessionCreatingTransactionRequest();
+		if(sipServletMessageImpl instanceof SipServletRequestImpl) {
+			throw new IllegalStateException("session creating transaction message is not a request !");
+		}
+		final SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipServletMessageImpl;
 		if(RoutingState.FINAL_RESPONSE_SENT.equals(sipServletRequestImpl.getRoutingState())) {
 			throw new IllegalStateException("subsequent response is inconsistent with an already sent response. a Final response has already been sent ! ");
 		}

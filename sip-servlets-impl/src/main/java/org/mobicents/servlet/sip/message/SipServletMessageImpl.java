@@ -978,7 +978,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 			SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(sipApplicationSessionImpl.getKey().getId(), currentApplicationName, message, false);
 			session = ((SipManager)sipApplicationSessionImpl.getSipContext().getManager()).getSipSession(sessionKey, create,
 					sipFactoryImpl, sipApplicationSessionImpl);
-			session.setSessionCreatingTransaction(transaction);
+			session.setSessionCreatingTransactionRequest(this);
 			sessionKey = session.getKey();
 		} 
 		if(session != null) {
@@ -1664,4 +1664,6 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 			return listeningPoint.getPort();
 		}
 	}
+	
+	public abstract void cleanUp();
 }

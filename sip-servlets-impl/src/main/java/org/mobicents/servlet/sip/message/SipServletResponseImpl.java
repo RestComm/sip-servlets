@@ -682,4 +682,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		}
 
 	}
+	
+	@Override
+	public void cleanUp() {
+		
+	}
 }

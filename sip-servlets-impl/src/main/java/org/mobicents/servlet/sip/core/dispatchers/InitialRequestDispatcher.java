@@ -657,7 +657,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			
 			sipContext.enterSipAppHa(true);
 			try {
-				sipSessionImpl.setSessionCreatingTransaction(sipServletRequest.getTransaction());								
+				sipSessionImpl.setSessionCreatingTransactionRequest(sipServletRequest);								
 				
 				String sipSessionHandlerName = sipSessionImpl.getHandler();
 				if(logger.isDebugEnabled()) {

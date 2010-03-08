@@ -1028,10 +1028,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				// Notice that the tx appplication data is cached in the request
 				// copied over to the tx so it can be quickly accessed when response
 				// arrives.				
-				ctx.setApplicationData(this.transactionApplicationData);
-				session.setSessionCreatingTransaction(ctx);
-				
+				ctx.setApplicationData(this.transactionApplicationData);								
 				super.setTransaction(ctx);
+				session.setSessionCreatingTransactionRequest(this);
 
 			} else if (Request.PRACK.equals(request.getMethod())) {
 				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(

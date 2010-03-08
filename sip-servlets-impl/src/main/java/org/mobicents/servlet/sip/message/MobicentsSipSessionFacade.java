@@ -22,7 +22,6 @@ import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.sip.Dialog;
 import javax.sip.SipException;
 import javax.sip.Transaction;
-import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -247,7 +246,7 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 		return getSipSession().getSessionCreatingDialog();
 	}
 
-	public SipServletRequestImpl getSessionCreatingTransactionRequest() {
+	public SipServletMessageImpl getSessionCreatingTransactionRequest() {
 		
 		return getSipSession().getSessionCreatingTransactionRequest();
 	}
@@ -327,8 +326,8 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 		getSipSession().setSessionCreatingDialog(dialog);
 	}
 
-	public void setSessionCreatingTransaction(Transaction transaction) {
-		getSipSession().setSessionCreatingTransaction(transaction);
+	public void setSessionCreatingTransactionRequest(SipServletMessageImpl message) {
+		getSipSession().setSessionCreatingTransactionRequest(message);
 	}
 
 	public void setSipSessionAttributeMap(

@@ -983,7 +983,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 
 					MessageDispatcher.callServlet(response);
 				} catch (Throwable t) {
-					logger.error("Failed to deliver 408 respone on transaction timeout" + transaction, t);
+					logger.error("Failed to deliver 408 response on transaction timeout" + transaction, t);
 				}
 			}
 			if(sipSession != null) {							

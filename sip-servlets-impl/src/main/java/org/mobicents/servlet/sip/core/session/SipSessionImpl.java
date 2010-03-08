@@ -1148,9 +1148,19 @@ public class SipSessionImpl implements MobicentsSipSession {
 	/**
 	 * @param sessionCreatingTransaction the sessionCreatingTransaction to set
 	 */
-	public void setSessionCreatingTransaction(Transaction sessionCreatingTransaction) {		
-		this.sessionCreatingTransactionRequest = (SipServletRequestImpl) ((TransactionApplicationData)sessionCreatingTransaction.getApplicationData()).getSipServletMessage();
-		this.isSessionCreatingTransactionServer = sessionCreatingTransaction instanceof ServerTransaction;
+	public void setSessionCreatingTransactionRequest(SipServletMessageImpl message) {
+		if(message != null) {
+			if(message instanceof SipServletRequestImpl) {		
+				this.sessionCreatingTransactionRequest = (SipServletRequestImpl) message;
+				this.isSessionCreatingTransactionServer = message.getTransaction() instanceof ServerTransaction;
+			} else {
+				SipServletMessageImpl sipServletMessageImpl = ((TransactionApplicationData)message.getTransaction().getApplicationData()).getSipServletMessage();
+				if(sipServletMessageImpl != null && sipServletMessageImpl instanceof SipServletRequestImpl) {		
+					this.sessionCreatingTransactionRequest = (SipServletRequestImpl) message;
+					this.isSessionCreatingTransactionServer = message.getTransaction() instanceof ServerTransaction;
+				}
+			}
+		}
 		if(sessionCreatingTransactionRequest != null) {
 			if(originalMethod == null) {
 				originalMethod = sessionCreatingTransactionRequest.getMethod();
@@ -1161,7 +1171,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 			// we update the parent session for the REGISTER so that the CSeq is correctly increased
 			// if the session is stored
 			if(parentSession != null && Request.REGISTER.equals(originalMethod)) {
-				parentSession.setSessionCreatingTransaction(sessionCreatingTransaction);
+				parentSession.setSessionCreatingTransactionRequest(message);
 			}
 		}
 	}

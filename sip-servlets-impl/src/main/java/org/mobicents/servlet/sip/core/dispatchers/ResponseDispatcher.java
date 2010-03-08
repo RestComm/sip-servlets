@@ -201,7 +201,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 					sipContext.enterSipAppHa(true);
 					try {
 						try {
-							session.setSessionCreatingTransaction(clientTransaction);
+							session.setSessionCreatingTransactionRequest(sipServletResponse);
 							session.setSessionCreatingDialog(dialog);
 							if(originalRequest != null) {				
 								originalRequest.setResponse(sipServletResponse);					

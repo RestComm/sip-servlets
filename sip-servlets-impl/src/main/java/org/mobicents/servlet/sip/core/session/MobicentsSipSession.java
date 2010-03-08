@@ -81,9 +81,9 @@ public interface MobicentsSipSession extends SipSession {
 
 	void setSessionCreatingDialog(Dialog dialog);
 	
-	SipServletRequestImpl getSessionCreatingTransactionRequest();
+	SipServletMessageImpl getSessionCreatingTransactionRequest();
 
-	void setSessionCreatingTransaction(Transaction transaction);
+	void setSessionCreatingTransactionRequest(SipServletMessageImpl message);
 
 	Set<Transaction> getOngoingTransactions();
 	
