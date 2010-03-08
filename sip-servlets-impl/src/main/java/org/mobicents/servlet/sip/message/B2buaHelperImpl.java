@@ -435,7 +435,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			throw new IllegalArgumentException("sip session " + sipSession.getId() + " is invalid !");
 		}
 		final SipServletMessageImpl sipServletMessageImpl = sipSession.getSessionCreatingTransactionRequest();
-		if(sipServletMessageImpl instanceof SipServletRequestImpl) {
+		if(!(sipServletMessageImpl instanceof SipServletRequestImpl)) {
 			throw new IllegalStateException("session creating transaction message is not a request !");
 		}
 		final SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipServletMessageImpl;
