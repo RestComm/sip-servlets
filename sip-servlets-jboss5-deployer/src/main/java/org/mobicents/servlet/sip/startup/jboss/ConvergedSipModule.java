@@ -23,6 +23,7 @@ package org.mobicents.servlet.sip.startup.jboss;
 
 import org.jboss.deployers.vfs.spi.structure.VFSDeploymentUnit;
 import org.jboss.metadata.sip.jboss.JBossConvergedSipMetaData;
+import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.web.WebApplication;
 import org.jboss.web.deployers.AbstractWarDeployer;
 import org.jboss.web.deployers.AbstractWarDeployment;
@@ -63,8 +64,9 @@ public class ConvergedSipModule extends WebModule {
 	 */
 	public synchronized void startModule() throws Exception {
 		// Get the war URL
+		JBossWebMetaData webMetaData = di.getAttachment(JBossWebMetaData.class);
 		JBossConvergedSipMetaData sipMetaData = di.getAttachment(JBossConvergedSipMetaData.class);
-		if(sipMetaData != null && sipMetaData.getApplicationName() != null) {
+		if(sipMetaData != null && (webMetaData == null || (webMetaData != null && webMetaData instanceof JBossConvergedSipMetaData))) {
 			WebApplication webApp = deployment.start(di, sipMetaData);
 			String warURL = di.getName();
 			container.addDeployedApp(warURL, webApp);
