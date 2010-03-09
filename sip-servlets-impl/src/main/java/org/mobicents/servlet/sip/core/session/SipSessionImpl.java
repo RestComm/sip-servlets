@@ -1547,7 +1547,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	}
 
 	public boolean isReadyToInvalidateInternal() {
-		return isReadyToInvalidate();
+		return readyToInvalidate;
 	}
 	
 	public void setInvalidateWhenReady(boolean arg0) {
@@ -1681,7 +1681,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	public void addSubscription(SipServletMessageImpl sipServletMessageImpl) throws SipException {
 		EventHeader eventHeader = null;
 		if(sipServletMessageImpl instanceof SipServletResponseImpl) {
-			eventHeader =  (EventHeader) ((SipServletRequestImpl)((SipServletResponseImpl)sipServletMessageImpl).getRequest()).getMessage().getHeader(EventHeader.NAME);
+			eventHeader =  (EventHeader) ((SipServletRequestImpl)((SipServletResponseImpl)sipServletMessageImpl).getRequest()).getMessage().getHeader(EventHeader.NAME);			
 		} else {
 			eventHeader =  (EventHeader) sipServletMessageImpl.getMessage().getHeader(EventHeader.NAME);
 		}
@@ -1725,7 +1725,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				}			
 			}
 		}
-		if(isReadyToInvalidate()) {
+		if(isReadyToInvalidateInternal()) {
 			if(logger.isInfoEnabled()) {
 				logger.info("no more subscriptions in session " + getId());
 			}
