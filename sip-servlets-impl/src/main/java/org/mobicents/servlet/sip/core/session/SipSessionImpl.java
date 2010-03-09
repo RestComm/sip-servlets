@@ -1148,12 +1148,12 @@ public class SipSessionImpl implements MobicentsSipSession {
 	/**
 	 * @param sessionCreatingTransaction the sessionCreatingTransaction to set
 	 */
-	public void setSessionCreatingTransactionRequest(SipServletMessageImpl message) {
+	public void setSessionCreatingTransactionRequest(SipServletMessageImpl message) {		
 		if(message != null) {
 			if(message instanceof SipServletRequestImpl) {		
 				this.sessionCreatingTransactionRequest = (SipServletRequestImpl) message;
 				this.isSessionCreatingTransactionServer = message.getTransaction() instanceof ServerTransaction;
-			} else {
+			} else if(message.getTransaction() != null && message.getTransaction().getApplicationData() != null) {
 				SipServletMessageImpl sipServletMessageImpl = ((TransactionApplicationData)message.getTransaction().getApplicationData()).getSipServletMessage();
 				if(sipServletMessageImpl != null && sipServletMessageImpl instanceof SipServletRequestImpl) {		
 					this.sessionCreatingTransactionRequest = (SipServletRequestImpl) sipServletMessageImpl;
