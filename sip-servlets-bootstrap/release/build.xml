@@ -60,7 +60,7 @@
 	
 	<!-- Release target -->
 	
-	<target name="release" depends="clean,release-jboss-5,release-jboss-5-jdk6,release-tomcat,make-src-zip,clean" />
+	<target name="release" depends="clean,release-jboss-5,release-jboss-5-jdk6,release-tomcat,release-jboss,make-src-zip,clean" />
 	
 	<!-- Tomcat version -->
 	
