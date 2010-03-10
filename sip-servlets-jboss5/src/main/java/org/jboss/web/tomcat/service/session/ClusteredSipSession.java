@@ -1566,6 +1566,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	@Override
 	public void setTransport(String transport) {
 		super.setTransport(transport);
+		sessionMetadataDirty();
 		metadata.getMetaData().put(TRANSPORT, transport );
 	}
 	
