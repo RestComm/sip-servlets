@@ -88,7 +88,7 @@
 		<mobicents.balancer.version>1.0.BETA15-SNAPSHOT</mobicents.balancer.version>
 		<mobicents.jain.sip.ha.version>0.7-SNAPSHOT</mobicents.jain.sip.ha.version>
 		<tomcat.version>6.0.20</tomcat.version>
-		<jain-sip-ri.version>1.2.X.PERF-SNAPSHOT</jain-sip-ri.version>
+		<!--jain-sip-ri.version>1.2.X.PERF-SNAPSHOT</jain-sip-ri.version-->
 	</properties>
 	
 	<dependencies>
