@@ -100,6 +100,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	protected static final String HANDLER = "hler";
 	protected static final String INVALIDATION_POLICY = "ip";
 	protected static final String CREATION_TIME = "ct";
+	protected static final String TRANSPORT = "tp";
 	
 	protected static final boolean ACTIVITY_CHECK = 
 	      Globals.STRICT_SERVLET_COMPLIANCE
@@ -844,6 +845,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			proxy.setSipFactoryImpl(getManager().getSipFactoryImpl());
 		}
 		
+		transport = (String) metaData.get(TRANSPORT);
+		
 		Integer size = (Integer) metaData.get(B2B_SESSION_SIZE);
 		String[][] sessionArray = (String[][])metaData.get(B2B_SESSION_MAP);
 		if(logger.isDebugEnabled()) {
@@ -1558,6 +1561,12 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			sessionMetadataDirty();
 			metadata.getMetaData().put(DIALOG_ID, dialog.getDialogId() );
 		}
+	}
+	
+	@Override
+	public void setTransport(String transport) {
+		super.setTransport(transport);
+		metadata.getMetaData().put(TRANSPORT, transport );
 	}
 	
 	public String getHaId() {
