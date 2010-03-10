@@ -172,4 +172,8 @@ public interface MobicentsSipSession extends SipSession {
 	public void setCseq(long cseq);
 
 	boolean validateCSeq(SipServletRequestImpl sipServletRequestImpl);
+	
+	String getTransport();
+	
+	void setTransport(String transport);
 }

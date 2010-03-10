@@ -434,4 +434,12 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public MobicentsSipSession getMobicentsSipSession() {
 		return sipSession;
 	}
+
+	public String getTransport() {
+		return sipSession.getTransport();
+	}
+
+	public void setTransport(String transport) {
+		sipSession.setTransport(transport);
+	}
 }

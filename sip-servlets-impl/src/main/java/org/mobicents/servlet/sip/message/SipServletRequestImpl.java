@@ -886,7 +886,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 			final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
 			 
-			((MessageExt)message).setApplicationData(null);			
+			((MessageExt)message).setApplicationData(session.getTransport());			
 			
 			ViaHeader viaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
 			//Issue 112 fix by folsson
@@ -912,6 +912,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			    }
 		    }
 			final String transport = JainSipUtils.findTransport(request);
+			if(session.getTransport() == null) {
+				session.setTransport(transport);
+			}
 		    if(logger.isDebugEnabled()) {
 		    	logger.debug("The found transport for sending request is '" + transport + "'");
 		    }
@@ -1095,6 +1098,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					session.removeSubscription(this);
 				}
 			}					
+			
+			updateContactHeaderTransport(transport);
+
 			//updating the last accessed times 
 			session.access();
 			sipApplicationSession.access();
@@ -1115,11 +1121,27 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				}
 				dialog.sendRequest((ClientTransaction) getTransaction());
 			}			
-			isMessageSent = true;								
+			isMessageSent = true;
 		} catch (Exception ex) {			
 			throw new IllegalStateException("Error sending request " + request,ex);
 		}
 
+	}
+	
+	protected void updateContactHeaderTransport(String transport) throws ParseException {
+		ContactHeader contactHeader = (ContactHeader)message.getHeader(ContactHeader.NAME);
+		if(contactHeader != null) {
+			// We need to update the originally created contact header if the request changed the transport
+			javax.sip.address.URI uri = contactHeader.getAddress().getURI();
+			if(uri.isSipURI()) {
+				javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
+
+				// It is always UDP by default, so we only need to modify it if it is different that UDP
+				if(!transport.equalsIgnoreCase("udp")) {
+					sipUri.setTransportParam(transport);
+				}
+			}
+		}
 	}
 
 	/**

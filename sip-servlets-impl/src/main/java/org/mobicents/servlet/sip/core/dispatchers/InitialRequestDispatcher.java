@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.core.dispatchers;
 import gov.nist.javax.sip.SipStackExt;
 import gov.nist.javax.sip.header.extensions.JoinHeader;
 import gov.nist.javax.sip.header.extensions.ReplacesHeader;
+import gov.nist.javax.sip.message.MessageExt;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -401,6 +402,10 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that
 		// the tx serialization is preserved		
 		sipContext.enterSipApp(sipApplicationSession, sipSessionImpl);
+		
+		// We are using only one priover per LP and per transport so this is safe
+		sipSessionImpl.setTransport(sipProvider.getListeningPoints()[0].getTransport());
+		
 		// if the flag is set we bypass the executor. This flag should be made deprecated 
 		if(sipApplicationDispatcher.isBypassRequestExecutor() || ConcurrencyControlMode.Transaction.equals((sipContext.getConcurrencyControlMode()))) {
 			dispatchTask.dispatchAndHandleExceptions();

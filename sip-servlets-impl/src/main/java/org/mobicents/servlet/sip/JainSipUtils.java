@@ -40,6 +40,7 @@ import java.util.TreeSet;
 
 import javax.sip.ListeningPoint;
 import javax.sip.address.SipURI;
+import javax.sip.address.URI;
 import javax.sip.header.AcceptEncodingHeader;
 import javax.sip.header.AcceptHeader;
 import javax.sip.header.AcceptLanguageHeader;
@@ -576,6 +577,33 @@ public final class JainSipUtils {
 				transport = viaTransport;
 			}
 		}
+		
+		if(transport == null && message instanceof Request) {
+			
+			Request request = (Request)message;
+
+			RouteHeader route = (RouteHeader) request.getHeader(RouteHeader.NAME);
+			if(route != null) {
+				transport = ListeningPoint.UDP;
+				URI uri = route.getAddress().getURI();
+				if(uri instanceof SipURI) {
+					SipURI sipURI = (SipURI) uri;
+					String transportParam = sipURI.getTransportParam();
+
+					if (transportParam != null
+							&& transportParam.equalsIgnoreCase(ListeningPoint.TLS)) {
+						transport = ListeningPoint.TLS;
+					}
+					//Fix by Filip Olsson for Issue 112
+					else if ((transportParam != null
+							&& transportParam.equalsIgnoreCase(ListeningPoint.TCP)) || 
+							request.getContentLength().getContentLength() > 4096) {
+						transport = ListeningPoint.TCP;
+					}
+				}
+			}
+		}
+
 		if(transport == null && message instanceof Request) {
 			transport = ListeningPoint.UDP;
 			Request request = (Request)message;

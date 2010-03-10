@@ -149,6 +149,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 	
 	protected long cseq = -1;
 	
+	protected String transport;
+	
 //	protected transient ThreadPoolExecutor executorService = new ThreadPoolExecutor(1, 1, 90, TimeUnit.SECONDS,
 //			new LinkedBlockingQueue<Runnable>());
 	
@@ -350,6 +352,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 							sipURI.setPort(loadBalancerToUse.getSipPort());	
 
 							// TODO: Is this enough or we must specify the transport somewhere?
+							// We can leave it like this. It will be updated if needed in the send() method
 							sipURI.setTransportParam(ListeningPoint.UDP);
 							
 							javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);
@@ -1833,5 +1836,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		setCseq(remoteCseq);
 		return true;
+	}
+	public String getTransport() {
+		return transport;
+	}
+	public void setTransport(String transport) {
+		this.transport = transport;
 	}
 }
