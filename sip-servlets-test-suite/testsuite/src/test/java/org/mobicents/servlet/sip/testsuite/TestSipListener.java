@@ -246,6 +246,7 @@ public class TestSipListener implements SipListener {
 	private Request registerReceived;
 
 	private long timeToWaitBeforeBye = 1000;
+	private long timeToWaitBeforeAck = 0;
 
 	private boolean sendAck = true;
 
@@ -1236,7 +1237,10 @@ public class TestSipListener implements SipListener {
 					Request ackRequest = tid.getDialog().createAck(cseq.getSeqNumber());
 					if (useToURIasRequestUri) {
 						ackRequest.setRequestURI(requestURI);	
-					}					
+					}			
+					if(timeToWaitBeforeAck > 0) {
+						Thread.sleep(timeToWaitBeforeAck);
+					}
 					logger.info("Sending ACK " + ackRequest);					
 					if(!sendSubsequentRequestsThroughSipProvider) {
 						tid.getDialog().sendAck(ackRequest);
@@ -2529,6 +2533,20 @@ public class TestSipListener implements SipListener {
 	 */
 	public Response getFinalResponse() {
 		return finalResponse;
+	}
+
+	/**
+	 * @param timeToWaitBeforeAck the timeToWaitBeforeAck to set
+	 */
+	public void setTimeToWaitBeforeAck(long timeToWaitBeforeAck) {
+		this.timeToWaitBeforeAck = timeToWaitBeforeAck;
+	}
+
+	/**
+	 * @return the timeToWaitBeforeAck
+	 */
+	public long getTimeToWaitBeforeAck() {
+		return timeToWaitBeforeAck;
 	}
 
 }

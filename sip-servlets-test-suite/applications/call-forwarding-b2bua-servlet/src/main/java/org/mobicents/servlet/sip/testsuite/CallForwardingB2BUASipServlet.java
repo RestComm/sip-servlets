@@ -51,6 +51,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		forwardingUris = new HashMap<String, String[]>();
 		forwardingUris.put("sip:forward-sender@sip-servlets.com", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+		forwardingUris.put("sip:forward-pending-sender@sip-servlets.com", 
+				new String[]{"sip:forward-pending-receiver@sip-servlets.com", "sip:forward-pending-receiver@127.0.0.1:5090"});
 		forwardingUris.put("sip:blocked-sender@sip-servlets.com", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
 		forwardingUris.put("sip:forward-sender@127.0.0.1", 
@@ -92,6 +94,21 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		SipSession session = request.getSession();
 		if(request.getTo().toString().contains("b2bua@sip-servlet")) {
 			session.createRequest("MESSAGE").send();
+		}
+		if(request.getFrom().getURI().toString().contains("pending")) {
+			B2buaHelper helper = request.getB2buaHelper();
+	        SipSession peerSession = helper.getLinkedSession(request.getSession());
+			List<SipServletMessage> pendingMessages = helper.getPendingMessages(peerSession, UAMode.UAC);
+	        SipServletResponse invitePendingResponse = null;
+	        logger.info("pending messages : ");
+	        for(SipServletMessage pendingMessage : pendingMessages) {
+	        	logger.info("\t pending message : " + pendingMessage);
+	        	if(((SipServletResponse)pendingMessage).getStatus() == 200) {
+	        		invitePendingResponse = (SipServletResponse)pendingMessage;
+	        		break;
+	        	}
+	        }
+	        invitePendingResponse.createAck().send();
 		}
 //		SipSession linkedSession = helper.getLinkedSession(session);
 //		SipServletRequest forkedRequest = linkedSession.createRequest("ACK");
@@ -295,12 +312,21 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		//if this is a response to an INVITE we ack it and forward the OK 
 		if(originalSession!= null && cSeqValue.indexOf("INVITE") != -1) {			
 			//create and sends OK for the first call leg							
-			SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");			
+			SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
+			boolean sendAck = true;
+			if(sipServletResponse.getFrom().getURI().toString().contains("pending")) {
+				sendAck= false;
+				if (logger.isDebugEnabled()) {
+					logger.debug("testing pending messages so not sending ACK");
+				}
+			} 
 			if(originalRequest.getHeader("Require") == null) {
-				// we send the ACK directly only in non PRACK scenario
-				SipServletRequest ackRequest = sipServletResponse.createAck();
-				logger.info("Sending " +  ackRequest);
-				ackRequest.send();
+				if(sendAck) {
+					// we send the ACK directly only in non PRACK scenario
+					SipServletRequest ackRequest = sipServletResponse.createAck();
+					logger.info("Sending " +  ackRequest);
+					ackRequest.send();
+				}
 				SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
 				logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);			
 				responseToOriginalRequest.setContentLength(sipServletResponse.getContentLength());
@@ -311,10 +337,12 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			    SipServletResponse responseToOriginalRequest = sipServletResponse.getRequest().getB2buaHelper().createResponseToOriginalRequest(peerSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
 			    responseToOriginalRequest.send();
 			    //
-			    SipServletRequest ackRequest = sipServletResponse.createAck();
-				logger.info("Sending " +  ackRequest);
-				ackRequest.send();
-			}			
+			    if(sendAck) {
+				    SipServletRequest ackRequest = sipServletResponse.createAck();
+					logger.info("Sending " +  ackRequest);
+					ackRequest.send();
+			    }
+			}
 		}			
 	}
 	

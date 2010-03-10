@@ -30,7 +30,7 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 10000;	
+	private static final int TIMEOUT = 10000;		
 //	private static final int TIMEOUT = 100000000;
 	
 	TestSipListener sender;
@@ -157,6 +157,38 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		assertTrue(sender.isCancelOkReceived());
 		assertTrue(sender.isRequestTerminatedReceived());
 		assertTrue(receiver.isCancelReceived());
+	}
+	
+	public void testCallForwardingCallerSendByePendingMessages() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-pending-sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setTimeToWaitBeforeAck(6000);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT*2);
+		assertTrue(sender.isAckSent());
+		assertTrue(receiver.isAckReceived());
+		assertTrue(sender.getOkToByeReceived());
+		assertTrue(receiver.getByeReceived());
 	}
 	
 	@Override
