@@ -17,7 +17,11 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.util.Properties;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletParseException;
@@ -67,7 +71,15 @@ public class SessionStateUACSipServlet
 		}
 		if(sipServletResponse.getStatus() == 408) {
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
-			sendMessage(sipFactory, "408 received");
+			try {
+				Properties jndiProps = new Properties();			
+				Context initCtx = new InitialContext(jndiProps);
+				Context envCtx = (Context) initCtx.lookup("java:comp/env");
+				sipFactory = (SipFactory) envCtx.lookup("sip/org.mobicents.servlet.sip.testsuite.SessionStateUACApplication/SipFactory");
+				sendMessage(sipFactory, "408 received");
+			} catch (NamingException e) {
+				throw new ServletException("Uh oh -- JNDI problem !", e);			
+			}
 		}
 	}	
 
