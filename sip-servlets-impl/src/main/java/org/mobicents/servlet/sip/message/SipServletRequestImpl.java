@@ -918,6 +918,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    final String requestMethod = getMethod();
 			if(Request.ACK.equals(requestMethod)) {
 				session.getSessionCreatingDialog().sendAck(request);
+				final Transaction transaction = getTransaction();
+				final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
+				session.removeOngoingTransaction(transaction);
+				tad.cleanUp();
+				transaction.setApplicationData(null);
 				return;
 			}
 			//Added for initial requests only (that are not REGISTER) not for subsequent requests 
@@ -1065,8 +1070,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				if(!RoutingState.PROXIED.equals(linkedRequest.getRoutingState())) {
 					linkedRequest.setRoutingState(RoutingState.RELAYED);
 				}
-			}			
-			session.addOngoingTransaction(getTransaction());
+			}		
+			if(!Request.ACK.equals(method)) {				
+				session.addOngoingTransaction(getTransaction());
+			}
 			// Update Session state
 			session.updateStateOnSubsequentRequest(this, false);			
 			if(Request.NOTIFY.equals(getMethod())) {

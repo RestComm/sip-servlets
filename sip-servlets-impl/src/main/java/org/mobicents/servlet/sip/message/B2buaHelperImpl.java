@@ -518,7 +518,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 						final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
 						final SipServletMessage sipServletMessage = tad.getSipServletMessage();
 						//not specified if ACK is a committed message in the spec but it seems not since Proxy api test
-						//testCanacel101 method adds a header to the ACK and it cannot be on a committed message
+						//testCancel101 method adds a header to the ACK and it cannot be on a committed message
 						//so we don't want to return ACK as pending messages here. related to TCK test B2BUAHelper.testCreateRequest002
 						if (!sipServletMessage.isCommitted() && !Request.ACK.equals(sipServletMessage.getMethod()) && !Request.PRACK.equals(sipServletMessage.getMethod())) {
 							retval.add(sipServletMessage);

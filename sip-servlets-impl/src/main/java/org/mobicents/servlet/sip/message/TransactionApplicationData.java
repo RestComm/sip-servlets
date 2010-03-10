@@ -24,6 +24,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.servlet.sip.Address;
 import javax.sip.Transaction;
 
+import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 
 /**
@@ -34,6 +36,7 @@ import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 public class TransactionApplicationData implements Serializable {		
 
 	private static final long serialVersionUID = 9170581635026591070L;
+	private static final Logger logger = Logger.getLogger(TransactionApplicationData.class);
 	private transient ProxyBranchImpl proxyBranch;	
 	private SipServletMessageImpl sipServletMessage;
 	private transient Set<SipServletResponseImpl> sipServletResponses;
@@ -197,6 +200,9 @@ public class TransactionApplicationData implements Serializable {
 	}
 	
 	public void cleanUp() {
+		if(logger.isDebugEnabled()) {
+			logger.debug("cleaning up the application data");
+		}
 		initialPoppedRoute = null;
 		proxyBranch = null;
 		// cannot nullify because of noAckReceived needs it

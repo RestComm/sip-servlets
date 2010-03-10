@@ -42,6 +42,7 @@ import javax.imageio.spi.ServiceRegistry;
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
+import javax.servlet.sip.B2buaHelper;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipServletRequest;
@@ -95,6 +96,7 @@ import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -1015,6 +1017,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(tad != null && tad.getSipServletMessage() != null) {
 			SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
 			SipSessionKey sipSessionKey = sipServletMessageImpl.getSipSessionKey();
+			MobicentsSipSession sipSession = sipServletMessageImpl.getSipSession();
+			B2buaHelperImpl b2buaHelperImpl = null;
+			if(sipSession != null) {
+				b2buaHelperImpl = sipSession.getB2buaHelper();
+			}
 			if(sipSessionKey == null) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("no sip session were returned for this key " + sipServletMessageImpl.getSipSessionKey() + " and message " + sipServletMessageImpl);
@@ -1024,12 +1031,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				tryToInvalidateSession(sipSessionKey, transactionTerminatedEvent.isServerTransaction());				
 //				sipSessionImpl.removeOngoingTransaction(transaction);
 			}			
-			MobicentsSipSession sipSession = sipServletMessageImpl.getSipSession();
-			if(sipSession != null) {
+			
+			// Issue 1333 : B2buaHelper.getPendingMessages(linkedSession, UAMode.UAC) returns empty list
+			// don't remove the transaction on terminated state for INVITE Tx because it won't be possible
+			// to create the ACK on second leg for B2BUA apps
+			if(sipSession != null && 
+					(b2buaHelperImpl == null && transaction instanceof ClientTransaction && !Request.INVITE.equals(sipServletMessageImpl.getMethod()))) {
 				sipSession.removeOngoingTransaction(transaction);
-			}
-			tad.cleanUp();
-			transaction.setApplicationData(null);
+				tad.cleanUp();
+				transaction.setApplicationData(null);
+			}			
 		} else {
 			if(logger.isDebugEnabled()) {
 				logger.debug("TransactionApplicationData not available on the following request " + transaction.getRequest().toString());
