@@ -353,7 +353,7 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		if(clonedRequest.getCurrentApplicationName() == null && subsequent) {
 			clonedRequest.setCurrentApplicationName(originalSipSession.getSipApplicationSession().getApplicationName());
 		}
-		clonedRequest.setSipSessionKey(originalSipSession.getKey());
+		clonedRequest.setSipSession(originalSipSession);
 		final MobicentsSipSession newSession = (MobicentsSipSession) clonedRequest.getSipSession();
 		try {
 			newSession.setHandler(originalSipSession.getHandler());

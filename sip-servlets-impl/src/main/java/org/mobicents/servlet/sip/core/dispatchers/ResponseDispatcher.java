@@ -185,7 +185,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 				}
 				return ;
 			} else {
-				sipServletResponse.setSipSessionKey(sessionKey);					
+				sipServletResponse.setSipSession(tmpSession);					
 			}			
 			
 			if(logger.isDebugEnabled()) {

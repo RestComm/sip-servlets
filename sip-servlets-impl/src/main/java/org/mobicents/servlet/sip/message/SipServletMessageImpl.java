@@ -109,7 +109,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	protected final Message message;
 	protected final SipFactoryImpl sipFactoryImpl;
 	protected SipSessionKey sessionKey;
-	//lazy loaded and not serialized
+	//lazy loaded and not serialized to avoid unecessary replication
 	protected transient MobicentsSipSession sipSession;
 
 	protected final Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
@@ -1004,8 +1004,12 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	/**
 	 * @param session the session to set
 	 */
-	public void setSipSessionKey(SipSessionKey sessionKey) {
-		this.sessionKey = sessionKey;
+	public void setSipSession(MobicentsSipSession session) {
+		// we store the session in JVM to cope with race conditions on session invalidation 
+		// See Issue 1294 http://code.google.com/p/mobicents/issues/detail?id=1294
+		// but it will not be persisted to avoid unecessary replication if the message is persisted
+		this.sipSession = session;
+		this.sessionKey = session.getKey();		
 	}
 
 	/**

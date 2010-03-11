@@ -34,6 +34,7 @@ import javax.sip.message.Response;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -184,7 +185,7 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 			final SipServletRequestImpl inviteRequest = (SipServletRequestImpl)
 				inviteAppData.getSipServletMessage();
 			final MobicentsSipSession sipSession = inviteRequest.getSipSession();			
-			sipServletRequest.setSipSessionKey(sipSession.getKey());
+			sipServletRequest.setSipSession(sipSession);
 			
 			if(logger.isDebugEnabled()) {
 				logger.debug("message associated with the inviteAppData " +
@@ -201,9 +202,10 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 			if(logger.isDebugEnabled()) {
 				logger.debug("routing state of the INVITE request for the CANCEL = " + inviteRequest.getRoutingState());
 			}
-			final SipContext sipContext = sipSession.getSipApplicationSession().getSipContext();
+			final MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
+			final SipContext sipContext = sipApplicationSession.getSipContext();
 			try {
-				sipContext.enterSipApp(sipSession.getSipApplicationSession(), sipSession);		
+				sipContext.enterSipApp(sipApplicationSession, sipSession);		
 				final Proxy proxy = sipSession.getProxy();
 				if(proxy != null) {
 					if(logger.isDebugEnabled()) {
@@ -271,7 +273,7 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 					} 
 				}
 			} finally {
-				sipContext.exitSipApp(sipSession.getSipApplicationSession(), sipSession);
+				sipContext.exitSipApp(sipApplicationSession, sipSession);
 			}
 		}			
 	}

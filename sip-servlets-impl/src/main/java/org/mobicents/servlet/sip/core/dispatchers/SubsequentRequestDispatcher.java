@@ -228,7 +228,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}			
 		
 		final MobicentsSipSession sipSession = tmpSipSession;
-		sipServletRequest.setSipSessionKey(key);
+		sipServletRequest.setSipSession(sipSession);
 		
 		// BEGIN validation delegated to the applicationas per JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
 		if(sipSession.getProxy() == null) {

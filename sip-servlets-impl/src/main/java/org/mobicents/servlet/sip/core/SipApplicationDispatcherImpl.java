@@ -758,23 +758,26 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(logger.isDebugEnabled()) {
 			logger.debug("Dialog Terminated => dialog Id : " + dialogTerminatedEvent.getDialog().getDialogId());
 		}
-		TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();		
-		if(tad != null && tad.getSipServletMessage() == null) {						
-			Transaction transaction = tad.getTransaction();
-			if(transaction != null && transaction.getApplicationData() != null) {
-				tad = (TransactionApplicationData) transaction.getApplicationData();
-			}			
-		}		
-		if(tad != null && tad.getSipServletMessage() != null) {
-			SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
-			SipSessionKey sipSessionKey = sipServletMessageImpl.getSipSessionKey();
-			tryToInvalidateSession(sipSessionKey, false);
-			tad.cleanUp();
-			dialog.setApplicationData(null);
-		} else {
-			if(logger.isDebugEnabled()) {
-				logger.debug("no application data for this dialog " + dialogTerminatedEvent.getDialog().getDialogId());
+		boolean appDataFound = false;
+		TransactionApplicationData dialogAppData = (TransactionApplicationData) dialog.getApplicationData();
+		TransactionApplicationData txAppData = null; 
+		if(dialogAppData != null) {						
+			if(dialogAppData.getSipServletMessage() == null) {
+				Transaction transaction = dialogAppData.getTransaction();
+				if(transaction != null && transaction.getApplicationData() != null) {
+					txAppData = (TransactionApplicationData) transaction.getApplicationData();
+					txAppData.cleanUp();
+				}
+			} else {
+				SipServletMessageImpl sipServletMessageImpl = dialogAppData.getSipServletMessage();
+				SipSessionKey sipSessionKey = sipServletMessageImpl.getSipSessionKey();
+				tryToInvalidateSession(sipSessionKey, false);				
 			}
+			dialogAppData.cleanUp();
+//			dialog.setApplicationData(null);
+		}		
+		if(!appDataFound && logger.isDebugEnabled()) {
+			logger.debug("no application data for this dialog " + dialogTerminatedEvent.getDialog().getDialogId());
 		}
 	}
 

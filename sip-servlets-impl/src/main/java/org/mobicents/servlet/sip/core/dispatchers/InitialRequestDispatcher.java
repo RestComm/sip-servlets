@@ -147,7 +147,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				stateInfo = sipSessionImpl.getStateInfo();
 				applicationRouterInfo = sipSessionImpl.getNextSipApplicationRouterInfo();
 				sipSessionImpl.setNextSipApplicationRouterInfo(null);
-				sipServletRequest.setSipSessionKey(sipSessionKey);
+				sipServletRequest.setSipSession(sipSessionImpl);
 				if(logger.isDebugEnabled()) {
 					logger.debug("state info before the request has been routed back to container : " + stateInfo);
 					logger.debug("router info before the request has been routed back to container : " + applicationRouterInfo);
@@ -374,7 +374,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		//sip session association
 		final SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(appSession.getKey().getId(), nextApplicationName, request, false);
 		final MobicentsSipSession sipSessionImpl = sipManager.getSipSession(sessionKey, true, sipFactoryImpl, appSession);
-		sipServletRequest.setSipSessionKey(sessionKey);
+		sipServletRequest.setSipSession(sipSessionImpl);
 
 		if(joinReplacesSipSession != null && nextApplicationName.equals(joinReplacesSipSession.getKey().getApplicationName())) {
 			final JoinHeader joinHeader = (JoinHeader)request.getHeader(JoinHeader.NAME);
