@@ -98,17 +98,7 @@ public class SessionManagerUtil {
 				applicationSessionId,
 				applicationName);
 		}
-	}
-	
-	private static String encode(SipUri sipUri) {
-		StringBuffer buffer = new StringBuffer("");
-		buffer.append(sipUri.getScheme()).append(Separators.COLON);
-		final Authority authority = sipUri.getAuthority();
-        if (authority != null) {
-            authority.encode(buffer);
-        }
-        return buffer.toString();
-	}
+	}	
 
 	/**
 	 * Computes the sip application session key from the input parameters. 
