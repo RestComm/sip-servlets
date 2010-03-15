@@ -876,6 +876,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				final MobicentsSipSession sipSession = sipServletMessage.getSipSession();
 				if(sipSession != null) {
 					checkForAckNotReceived(sipServletMessage);
+					checkForPrackNotReceived(sipServletMessage);
 					dialog.delete();
 					tryToInvalidateSession(sipSessionKey, false);
 				}
@@ -883,81 +884,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 		}
 		dialog.setApplicationData(null);
-	}
-	
-	private void checkForAckNotReceived(SipServletMessageImpl sipServletMessage) {
-		//notifying SipErrorListener that no ACK has been received for a UAS only
-		final MobicentsSipSession sipSession = sipServletMessage.getSipSession();
-		final SipServletResponseImpl lastFinalResponse = (SipServletResponseImpl)
-			((SipServletRequestImpl)sipServletMessage).getLastFinalResponse();
-		if(logger.isDebugEnabled()) {
-			logger.debug("last Final Response" + lastFinalResponse);
-		}
-		final ProxyImpl proxy = sipSession.getProxy();
-		if(sipServletMessage instanceof SipServletRequestImpl &&
-				proxy == null &&
-				lastFinalResponse != null) {
-			final SipContext sipContext = sipSession.getSipApplicationSession().getSipContext();
-			final List<SipErrorListener> sipErrorListeners = 
-				sipContext.getListeners().getSipErrorListeners();
-									
-			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();						
-			try {
-				sipContext.enterSipApp(sipSession.getSipApplicationSession(), sipSession);
-				final ClassLoader cl = sipContext.getLoader().getClassLoader();
-				Thread.currentThread().setContextClassLoader(cl);
-				
-				final SipErrorEvent sipErrorEvent = new SipErrorEvent(
-						(SipServletRequest)sipServletMessage, 
-						lastFinalResponse);
-				
-				for (SipErrorListener sipErrorListener : sipErrorListeners) {
-					try {					
-						sipErrorListener.noAckReceived(sipErrorEvent);
-					} catch (Throwable t) {
-						logger.error("SipErrorListener threw exception", t);
-					}
-				}
-			} finally {
-				sipContext.exitSipApp(sipSession.getSipApplicationSession(), sipSession);
-				Thread.currentThread().setContextClassLoader(oldClassLoader);
-			}
-			
-		}
-		SipServletResponseImpl lastInfoResponse = (SipServletResponseImpl)
-			((SipServletRequestImpl)sipServletMessage).getLastInformationalResponse();
-		if(logger.isDebugEnabled()) {
-			logger.debug("last Informational Response" + lastInfoResponse);
-		}
-		if(sipServletMessage instanceof SipServletRequestImpl &&
-				proxy == null &&
-				 lastInfoResponse != null) {
-			final SipContext sipContext = sipSession.getSipApplicationSession().getSipContext();
-			final List<SipErrorListener> sipErrorListeners = 
-				sipContext.getListeners().getSipErrorListeners();
-			
-			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-			try {
-				sipContext.enterSipApp(sipSession.getSipApplicationSession(), sipSession);
-				final ClassLoader cl = sipContext.getLoader().getClassLoader();
-				Thread.currentThread().setContextClassLoader(cl);
-				
-				final SipErrorEvent sipErrorEvent = new SipErrorEvent(
-						(SipServletRequest)sipServletMessage, 
-						lastInfoResponse);
-				for (SipErrorListener sipErrorListener : sipErrorListeners) {
-					try {					
-						sipErrorListener.noPrackReceived(sipErrorEvent);
-					} catch (Throwable t) {
-						logger.error("SipErrorListener threw exception", t);
-					}
-				}
-			} finally {
-				sipContext.exitSipApp(sipSession.getSipApplicationSession(), sipSession);
-				Thread.currentThread().setContextClassLoader(oldClassLoader);
-			}
-			
-		}
 	}
 	
 	/*
@@ -991,14 +917,108 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					logger.error("Failed to deliver 408 response on transaction timeout" + transaction, t);
 				}
 			}
+			boolean appNotifiedOfPrackNotReceived = false;
 			if(sipSession != null) {							
 				checkForAckNotReceived(sipServletMessage);
+				appNotifiedOfPrackNotReceived = checkForPrackNotReceived(sipServletMessage);
 				sipSession.removeOngoingTransaction(transaction);
-				tryToInvalidateSession(sipSessionKey, false);
+				// don't invalidate here because if the application sends a final response on the noPrack received
+				// the ACK to this final response won't be able to get routed since the sip session would have been invalidated
+				if(!appNotifiedOfPrackNotReceived) {
+					tryToInvalidateSession(sipSessionKey, false);
+				}
 			}
-			tad.cleanUp();
-			transaction.setApplicationData(null);
+			// don't clean up for the same reason we don't invalidate the sip session right above
+			if(appNotifiedOfPrackNotReceived) {
+				tad.cleanUp();
+				transaction.setApplicationData(null);
+			}
 		}		
+	}
+	
+	private boolean checkForAckNotReceived(SipServletMessageImpl sipServletMessage) {
+		//notifying SipErrorListener that no ACK has been received for a UAS only
+		final MobicentsSipSession sipSession = sipServletMessage.getSipSession();
+		final SipServletResponseImpl lastFinalResponse = (SipServletResponseImpl)
+			((SipServletRequestImpl)sipServletMessage).getLastFinalResponse();
+		final ProxyImpl proxy = sipSession.getProxy();
+		if(logger.isDebugEnabled()) {
+			logger.debug("last Final Response" + lastFinalResponse);
+		}		
+		boolean notifiedApplication = false;
+		if(sipServletMessage instanceof SipServletRequestImpl &&
+				proxy == null &&
+				lastFinalResponse != null) {
+			final SipContext sipContext = sipSession.getSipApplicationSession().getSipContext();
+			final List<SipErrorListener> sipErrorListeners = 
+				sipContext.getListeners().getSipErrorListeners();
+									
+			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();						
+			try {
+				sipContext.enterSipApp(sipSession.getSipApplicationSession(), sipSession);
+				final ClassLoader cl = sipContext.getLoader().getClassLoader();
+				Thread.currentThread().setContextClassLoader(cl);
+				
+				final SipErrorEvent sipErrorEvent = new SipErrorEvent(
+						(SipServletRequest)sipServletMessage, 
+						lastFinalResponse);
+				
+				for (SipErrorListener sipErrorListener : sipErrorListeners) {
+					try {				
+						notifiedApplication = true;
+						sipErrorListener.noAckReceived(sipErrorEvent);
+					} catch (Throwable t) {
+						logger.error("SipErrorListener threw exception", t);
+					}
+				}
+			} finally {
+				sipContext.exitSipApp(sipSession.getSipApplicationSession(), sipSession);
+				Thread.currentThread().setContextClassLoader(oldClassLoader);
+			}
+		}
+		return notifiedApplication;
+	}
+	
+	private boolean checkForPrackNotReceived(SipServletMessageImpl sipServletMessage) {
+		//notifying SipErrorListener that no ACK has been received for a UAS only
+		final MobicentsSipSession sipSession = sipServletMessage.getSipSession();
+		SipServletResponseImpl lastInfoResponse = (SipServletResponseImpl)
+			((SipServletRequestImpl)sipServletMessage).getLastInformationalResponse();
+		final ProxyImpl proxy = sipSession.getProxy();
+		if(logger.isDebugEnabled()) {
+			logger.debug("last Informational Response" + lastInfoResponse);
+		}
+		boolean notifiedApplication = false;
+		if(sipServletMessage instanceof SipServletRequestImpl &&
+				proxy == null &&
+				 lastInfoResponse != null) {
+			final SipContext sipContext = sipSession.getSipApplicationSession().getSipContext();
+			final List<SipErrorListener> sipErrorListeners = 
+				sipContext.getListeners().getSipErrorListeners();
+			
+			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+			try {
+				sipContext.enterSipApp(sipSession.getSipApplicationSession(), sipSession);
+				final ClassLoader cl = sipContext.getLoader().getClassLoader();
+				Thread.currentThread().setContextClassLoader(cl);
+				
+				final SipErrorEvent sipErrorEvent = new SipErrorEvent(
+						(SipServletRequest)sipServletMessage, 
+						lastInfoResponse);
+				for (SipErrorListener sipErrorListener : sipErrorListeners) {
+					try {				
+						notifiedApplication = true;
+						sipErrorListener.noPrackReceived(sipErrorEvent);
+					} catch (Throwable t) {
+						logger.error("SipErrorListener threw exception", t);
+					}
+				}
+			} finally {
+				sipContext.exitSipApp(sipSession.getSipApplicationSession(), sipSession);
+				Thread.currentThread().setContextClassLoader(oldClassLoader);
+			}			
+		}
+		return notifiedApplication;
 	}
 	
 	/*
