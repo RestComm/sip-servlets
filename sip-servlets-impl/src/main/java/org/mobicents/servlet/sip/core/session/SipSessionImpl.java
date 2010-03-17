@@ -1116,6 +1116,12 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void setSessionCreatingDialog(Dialog dialog) {
 		this.sessionCreatingDialog = dialog;
+		if(logger.isDebugEnabled()) {
+			logger.debug("setting session creating dialog for this session to " + dialog);
+			if(dialog != null) {
+				logger.debug("session creating dialog dialogId " + dialog.getDialogId());
+			}
+		}
 	}
 
 	/**

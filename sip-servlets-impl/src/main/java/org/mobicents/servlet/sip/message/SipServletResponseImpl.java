@@ -482,6 +482,13 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					originalRequest = (SipServletRequestImpl) tad.getSipServletMessage();
 				}
 			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("original req method "+ originalRequest.getMethod());
+				logger.debug("original req routing state "+ originalRequest.getRoutingState());
+				if(transaction != null) {
+					logger.debug("transaction dialog "+ transaction.getDialog());
+				}
+			}
 			//if a response is sent for an initial request, it means that the application
 			//acted as an endpoint so a dialog must be created but only for dialog creating method
 			if(!Request.CANCEL.equals(originalRequest.getMethod())					
@@ -516,7 +523,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 							originalRequest.getTransactionApplicationData());	
 				}				
 				((TransactionApplicationData)dialog.getApplicationData()).
-					setTransaction(transaction);
+					setTransaction(transaction);				
 			}
 			//specify that a final response has been sent for the request
 			//so that the application dispatcher knows it has to stop
@@ -553,6 +560,12 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					logger.debug("Sending response " + message + " through tx " + transaction);
 				}
 				transaction.sendResponse( (Response)this.message );
+				if(dialog != null) {
+					// we need to set the dialog again because it's possible that when the dialog
+					// was created it was in null state thus no dialog id so we need to reset it to trigger
+					// replication of the dialog id since the dialog id is computed only after the response has been sent
+					session.setSessionCreatingDialog(dialog);
+				}
 			}
 			isMessageSent = true;
 			if(isProxiedResponse) {
