@@ -5,47 +5,63 @@ export MSS_IP=$TEST_IP
 export LB_IP=$TEST_IP
 export SIPP_IP=$TEST_IP
 #export SIPP_OPTIONS="-t t1"
+export ACTIVE_TIMEOUT=$2
+
+export RATE=$3
+export CALLS=$4
 
 echo Using $MSS_IP as the MSS test IP
 echo Using $LB_IP as the Load Balancer IP
 echo Using $SIPP_IP as the SIPp IP
 
-if [ $# -ne 0 ]; then
+if [ $# -eq 4 ]; then
 	case $1 in	
 	    proxy)
 	    		rm ./proxy/*.log
 	    		echo "Distributed example used is proxy";
-	    		./sipp $MSS_IP:5080 -sf proxy/location-service-receiver.xml -i $SIPP_IP -p 5090 -bg -trace_msg -timeout 30  
-	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-sender.xml -trace_err -i $SIPP_IP -p 5050 -r 1 -m 1 -rsa $LB_IP:5060 -trace_msg
+	    		./sipp $MSS_IP:5080 -sf proxy/location-service-receiver.xml -i $SIPP_IP -p 5090 -bg -trace_msg -timeout 30 
+	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 	    proxy-remote-send-bye)
 	    		rm ./proxy/*.log
 	    		echo "Distributed example used is proxy";
 	    		./sipp $MSS_IP:5080 -sf proxy/location-service-receiver-sends-bye.xml -i $SIPP_IP -p 5090 -bg -trace_msg -timeout 30 -nd
-	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-sender-receives-bye.xml -trace_err -i $SIPP_IP -p 5050 -r 1 -m 1 -rsa $LB_IP:5060 -trace_msg -nd
+	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-sender-receives-bye.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 	    b2bua)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is b2bua";
-	            ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -bg -trace_msg -timeout 20 $SIPP_OPTIONS
-	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r 1 -m 1 -rsa $LB_IP:5060 -trace_msg $SIPP_OPTIONS
+	            ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -bg -trace_msg -timeout 20
+	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT $SIPP_OPTIONS -timeout_error
 	            ;;
 	    custom-b2bua)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is b2bua";
-	            ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -bg -trace_msg -timeout 100 $SIPP_OPTIONS
-	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/custom-call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r 1 -m 1 -rsa $LB_IP:5060 -trace_msg $SIPP_OPTIONS
+	            ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -bg -trace_msg -timeout 100
+	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/custom-call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
+	            ;;
+	    custom-b2bua-udp-tcp)
+	    		rm ./b2bua/*.log
+	            echo "Distributed example used is b2bua";
+	            ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -bg -trace_msg -timeout 100 -t t1
+	    		./sipp $MSS_IP:5080 -s receiver-tcp -sf b2bua/custom-call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
+	            ;;
+	    custom-b2bua-tcp-tcp)
+	    		rm ./b2bua/*.log
+	            echo "Distributed example used is b2bua";
+	            ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -bg -trace_msg -timeout 100 -t t1
+	    		./sipp $MSS_IP:5080 -s receiver-tcp -sf b2bua/custom-call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -t t1 -timeout_error
 	            ;;
 	    b2bua-remote-send-bye)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is b2bua-remote-send-bye";
 	            ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver-sends-bye.xml -i $SIPP_IP -p 5090 -bg -trace_msg -timeout 30 
-	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/call-forwarding-sender-receives-bye.xml -trace_err -i $SIPP_IP -p 5050 -r 1 -m 1 -rsa $LB_IP:5060 -trace_msg -nd
+	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/call-forwarding-sender-receives-bye.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 		uac)
 				rm ./uac/*.log
 	            echo "Distributed example used is uac";
-	            ./sipp $MSS_IP:5080 -sf uac/receiver.xml -i $SIPP_IP -p 5090 -trace_msg -timeout 30
+	            ./sipp $MSS_IP:5080 -sf uac/receiver.xml -i $SIPP_IP -p 5090 -trace_msg -timeout $ACTIVE_TIMEOUT
 	            ;;
 		c2c)
 				rm ./converged-click2call/*.log
@@ -65,34 +81,36 @@ if [ $# -ne 0 ]; then
 	    uas-reinvite)
 	    		rm ./uas/*.log
 	            echo "Distributed example used is uas";
-	    		./sipp $MSS_IP:5080 -s reinvite -sf uas/clustering-reinvite-uac.xml -trace_err -i $SIPP_IP -p 5050 -r 1 -m 1 -rsa $LB_IP:5060 -trace_msg -nd
+	    		./sipp $MSS_IP:5080 -s reinvite -sf uas/clustering-reinvite-uac.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
 	    		;;
 	    uas-no-attributes)
 	    		rm ./uas/*.log
 	            echo "Distributed example used is uas";
-	    		./sipp $MSS_IP:5080 -s NoAttributes -sf uas/clustering-uac-no-attrs.xml -trace_err -i $SIPP_IP -p 5050 -r 1 -m 1 -rsa $LB_IP:5060 -trace_msg -nd
+	    		./sipp $MSS_IP:5080 -s NoAttributes -sf uas/clustering-uac-no-attrs.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
 	    		;;
 	    uas-timer)
 	    		rm ./uas/*.log
 	            echo "Distributed example used is uas";
-	    		./sipp $MSS_IP:5080 -s yousendbye -sf uas/clustering-uac-timer.xml -trace_err -i $SIPP_IP -p 5050 -r 1 -m 1 -rsa $LB_IP:5060 -trace_msg -nd
+	    		./sipp $MSS_IP:5080 -s yousendbye -sf uas/clustering-uac-timer.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 	    uas-sas-timer)
 	    		# kill first node after the ACK
 	    		rm ./uas/*.log
 	            echo "Distributed example used is uas";
-	    		./sipp $MSS_IP:5080 -s sastimersendbye -sf uas/clustering-uac-timer.xml -trace_err -i $SIPP_IP -p 5050 -r 1 -m 1 -rsa $LB_IP:5060 -trace_msg -nd	    		
+	    		./sipp $MSS_IP:5080 -s sastimersendbye -sf uas/clustering-uac-timer.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error  		
 	            ;;
 		uas-reinvite-sas-timer)
 	    		# kill first node after the first ACK
 	    		rm ./uas/*.log
 	            echo "Distributed example used is uas";
-	    		./sipp $MSS_IP:5080 -s sastimersendbye -sf uas/clustering-reinvite-sas-timer.xml -trace_err -i $SIPP_IP -p 5050 -r 1 -m 1 -rsa $LB_IP:5060 -trace_msg -nd	    		
+	    		./sipp $MSS_IP:5080 -s sastimersendbye -sf uas/clustering-reinvite-sas-timer.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
-	    *)
+	    uas)
 	    		rm ./uas/*.log
 	            echo "Distributed example used is uas";
-	    		./sipp $MSS_IP:5080 -s isendbye -sf uas/clustering-uac.xml -trace_err -i $SIPP_IP -p 5050 -r 1 -m 1 -rsa $LB_IP:5060 -trace_msg -nd
+	    		./sipp $MSS_IP:5080 -s isendbye -sf uas/clustering-uac.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
     esac
+else
+echo "Syntax is command SCENARIO TIMEOUT CALL_RATE NUMBER_OF_CALLS"
 fi

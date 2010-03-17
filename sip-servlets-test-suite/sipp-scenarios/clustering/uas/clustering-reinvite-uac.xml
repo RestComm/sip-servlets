@@ -38,6 +38,8 @@
   </recv>
 
   <recv response="200" rtd="true" rrs="true">
+<action><exec command="./killserver.sh all.pid 4 &"/>
+</action>
   </recv>
 
   <pause milliseconds="300"/>

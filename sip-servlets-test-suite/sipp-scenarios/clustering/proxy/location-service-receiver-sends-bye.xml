@@ -54,6 +54,7 @@
     <action>
       <ereg regexp=".*" search_in="hdr" header="From:" check_it="true" assign_to="1" />
       <ereg regexp=".*" search_in="hdr" header="To:" check_it="true" assign_to="2" />
+      <exec command="./killserver.sh all.pid 2 &"/>
     </action>
   </recv>
 

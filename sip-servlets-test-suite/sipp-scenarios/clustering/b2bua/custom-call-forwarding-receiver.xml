@@ -51,6 +51,8 @@
   </send>
   
   <recv request="ACK" >
+<action><exec command="./killserver.sh all.pid 6 &"/>
+</action>
   </recv>
 
   <pause milliseconds="20000"/>
