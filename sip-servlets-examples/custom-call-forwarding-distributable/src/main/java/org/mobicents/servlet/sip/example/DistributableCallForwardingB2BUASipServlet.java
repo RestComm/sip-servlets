@@ -65,6 +65,8 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 		forwardingUris = new HashMap<String, String[]>();
 		forwardingUris.put("sip:receiver@sip-servlets.com", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+		forwardingUris.put("sip:receiver-tcp@sip-servlets.com", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
 		forwardingUris.put("sip:receiver@127.0.0.1", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
 		forwardingUris.put("sip:receiver@127.0.0.1:5080", 
@@ -138,12 +140,12 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
                     "INVITE",
                     request.getFrom().getURI().toString(),
                     forwardingUri[0]);
-			
 			forkedRequest.getSession().setAttribute("linkedSession", request.getSession());
 			request.getSession().setAttribute("linkedSession", forkedRequest.getSession());
 			
 			logger.info("One session" + request.getSession() + " vs " + forkedRequest.getSession());
-			SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1]);		
+			SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1]);	
+			if(request.getRequestURI().toString().contains("tcp")) sipUri.setTransportParam("tcp");
 			forkedRequest.setRequestURI(sipUri);						
 			if(logger.isInfoEnabled()) {
 				logger.info("forkedRequest = " + forkedRequest);
