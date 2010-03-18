@@ -318,14 +318,15 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				    response.setHeader(contactHeader);
 			    }
 			}
+			// Issue 1355 http://code.google.com/p/mobicents/issues/detail?id=1355 Not RFC compliant :
 			// Application Routing : Adding the recorded route headers as route headers
-			final ListIterator<RecordRouteHeader> recordRouteHeaders = request.getHeaders(RecordRouteHeader.NAME);
-			while (recordRouteHeaders.hasNext()) {
-				RecordRouteHeader recordRouteHeader = (RecordRouteHeader) recordRouteHeaders
-						.next();
-				RouteHeader routeHeader = SipFactories.headerFactory.createRouteHeader(recordRouteHeader.getAddress());
-				response.addHeader(routeHeader);
-			}
+//			final ListIterator<RecordRouteHeader> recordRouteHeaders = request.getHeaders(RecordRouteHeader.NAME);
+//			while (recordRouteHeaders.hasNext()) {
+//				RecordRouteHeader recordRouteHeader = (RecordRouteHeader) recordRouteHeaders
+//						.next();
+//				RouteHeader routeHeader = SipFactories.headerFactory.createRouteHeader(recordRouteHeader.getAddress());
+//				response.addHeader(routeHeader);
+//			}
 			
 			final SipServletResponseImpl newSipServletResponse = new SipServletResponseImpl(response, super.sipFactoryImpl,
 					validate ? (ServerTransaction) transaction : transaction, session, getDialog(), false);
