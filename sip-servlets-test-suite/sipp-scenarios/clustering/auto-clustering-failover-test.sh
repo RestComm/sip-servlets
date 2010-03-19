@@ -27,8 +27,8 @@ echo "================================"
 ./auto-prepare-example.sh custom-b2bua $config1
 ./auto-prepare-example.sh custom-b2bua $config2
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1
-./auto-start-jboss-server.sh $config1 $config1.pid 0
+./auto-start-jboss-server.sh $config2 $config2.pid 1 custom-b2bua
+./auto-start-jboss-server.sh $config1 $config1.pid 0 custom-b2bua
 
 #Wait to boot
 sleep $FULLSTARTSLEEP
@@ -37,7 +37,7 @@ sleep $FULLSTARTSLEEP
 
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 0
+./auto-start-jboss-server.sh $config1 $config1.pid 0 custom-b2bua-udp-tcp
 
 sleep $HALFSTARTSLEEP
 
@@ -45,7 +45,7 @@ sleep $HALFSTARTSLEEP
 
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 0
+./auto-start-jboss-server.sh $config1 $config1.pid 0 custom-b2bua-tcp-tcp
 
 sleep $HALFSTARTSLEEP
 
@@ -65,8 +65,8 @@ echo "================================"
 ./auto-prepare-example.sh uac $config1 -Dsend.on.init=true
 ./auto-prepare-example.sh uac $config2 -Dsend.on.init=false
 
-./auto-start-jboss-server.sh $config1 $config1.pid 0
-./auto-start-jboss-server.sh $config2 $config2.pid 1
+./auto-start-jboss-server.sh $config1 $config1.pid 0 uac
+./auto-start-jboss-server.sh $config2 $config2.pid 1 uac
 #Wait to boot
 sleep 20
 ./auto-run-test.sh uac result.txt
@@ -85,8 +85,8 @@ echo "================================"
 ./auto-prepare-example.sh b2bua $config1
 ./auto-prepare-example.sh b2bua $config2
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1
-./auto-start-jboss-server.sh $config1 $config1.pid 0
+./auto-start-jboss-server.sh $config2 $config2.pid 1 b2bua
+./auto-start-jboss-server.sh $config1 $config1.pid 0 b2bua
 
 #Wait to boot
 sleep $FULLSTARTSLEEP
@@ -94,7 +94,7 @@ sleep $FULLSTARTSLEEP
 ./auto-run-test.sh b2bua result.txt
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 0
+./auto-start-jboss-server.sh $config1 $config1.pid 0 b2bua-remote-send-bye
 
 sleep $HALFSTARTSLEEP
 
@@ -114,8 +114,8 @@ echo "================================"
 ./auto-prepare-example.sh proxy $config1
 ./auto-prepare-example.sh proxy $config2
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1
-./auto-start-jboss-server.sh $config1 $config1.pid 0
+./auto-start-jboss-server.sh $config2 $config2.pid 1 proxy
+./auto-start-jboss-server.sh $config1 $config1.pid 0 proxy
 
 #Wait to boot
 sleep $FULLSTARTSLEEP
@@ -123,7 +123,7 @@ sleep $FULLSTARTSLEEP
 ./auto-run-test.sh proxy result.txt
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 0
+./auto-start-jboss-server.sh $config1 $config1.pid 0 proxy-remote-send-bye
 
 sleep $HALFSTARTSLEEP
 
@@ -143,8 +143,8 @@ echo "================================"
 ./auto-prepare-example.sh uas $config1
 ./auto-prepare-example.sh uas $config2
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1
-./auto-start-jboss-server.sh $config1 $config1.pid 0
+./auto-start-jboss-server.sh $config2 $config2.pid 1 uas
+./auto-start-jboss-server.sh $config1 $config1.pid 0 uas
 
 #Wait to boot
 sleep $FULLSTARTSLEEP
@@ -152,21 +152,21 @@ sleep $FULLSTARTSLEEP
 ./auto-run-test.sh uas result.txt
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 0
+./auto-start-jboss-server.sh $config1 $config1.pid 0 uas-reinvite
 
 sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh uas-reinvite result.txt
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 0
+./auto-start-jboss-server.sh $config1 $config1.pid 0 uas-timer
 
 sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh uas-timer result.txt
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 0
+./auto-start-jboss-server.sh $config1 $config1.pid 0 uas-sas-timer
 
 sleep $HALFSTARTSLEEP
 
