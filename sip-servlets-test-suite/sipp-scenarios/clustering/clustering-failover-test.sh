@@ -20,43 +20,43 @@ if [ $# -eq 4 ]; then
 	    proxy)
 	    		rm ./proxy/*.log
 	    		echo "Distributed example used is proxy";
-	    		./sipp $MSS_IP:5080 -sf proxy/location-service-receiver.xml -i $SIPP_IP -p 5090 -trace_msg -timeout 30 $BACKGROUNDMETHOD
+	    		./sipp $MSS_IP:5080 -sf proxy/location-service-receiver.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
 	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 	    proxy-remote-send-bye)
 	    		rm ./proxy/*.log
 	    		echo "Distributed example used is proxy";
-	    		./sipp $MSS_IP:5080 -sf proxy/location-service-receiver-sends-bye.xml -i $SIPP_IP -p 5090 -trace_msg -timeout 30 -nd $BACKGROUNDMETHOD
+	    		./sipp $MSS_IP:5080 -sf proxy/location-service-receiver-sends-bye.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
 	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-sender-receives-bye.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 	    b2bua)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is b2bua";
-	            ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -trace_msg -timeout 20 $BACKGROUNDMETHOD
+	            ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
 	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT $SIPP_OPTIONS -timeout_error
 	            ;;
 	    custom-b2bua)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is b2bua";
-	            ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -trace_msg -timeout 100 $BACKGROUNDMETHOD
+	            ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 $BACKGROUNDMETHOD
 	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/custom-call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 	    custom-b2bua-udp-tcp)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is b2bua";
-	            ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -trace_msg -timeout 100 -t t1 $BACKGROUNDMETHOD
+	            ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -t t1 $BACKGROUNDMETHOD
 	    		./sipp $MSS_IP:5080 -s receiver-tcp -sf b2bua/custom-call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 	    custom-b2bua-tcp-tcp)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is b2bua";
-	            ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -trace_msg -timeout 100 -t t1 $BACKGROUNDMETHOD
+	            ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -t t1 $BACKGROUNDMETHOD
 	    		./sipp $MSS_IP:5080 -s receiver-tcp -sf b2bua/custom-call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -t t1 -timeout_error
 	            ;;
 	    b2bua-remote-send-bye)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is b2bua-remote-send-bye";
-	            ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver-sends-bye.xml -i $SIPP_IP -p 5090 -trace_msg -timeout 30 $BACKGROUNDMETHOD
+	            ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver-sends-bye.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
 	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/call-forwarding-sender-receives-bye.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 		uac)
