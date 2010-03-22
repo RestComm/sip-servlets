@@ -85,8 +85,8 @@ public class SipStandardService extends StandardService implements SipService {
 	protected String concurrencyControlMode = ConcurrencyControlMode.None.toString();
 	protected String congestionControlPolicy = CongestionControlPolicy.ErrorResponse.toString();
 	protected String additionalParameterableHeaders;
-	protected boolean bypassResponseExecutor;
-	protected boolean bypassRequestExecutor;
+	protected boolean bypassResponseExecutor = true;
+	protected boolean bypassRequestExecutor = true;
 	//the sip application router class name defined in the server.xml
 //	private String sipApplicationRouterClassName;
 	//this should be made available to the application router as a system prop

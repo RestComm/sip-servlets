@@ -210,8 +210,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	private ScheduledThreadPoolExecutor congestionControlThreadPool = null;
 	
 	// configuration
-	private boolean bypassResponseExecutor = false;
-	private boolean bypassRequestExecutor = false;			
+	private boolean bypassResponseExecutor = true;
+	private boolean bypassRequestExecutor = true;			
 	private int baseTimerInterval = 500; // base timer interval for jain sip tx
 	private ConcurrencyControlMode concurrencyControlMode;
 	
