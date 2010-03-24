@@ -43,13 +43,13 @@ if [ $# -eq 4 ]; then
 	            ;;
 	    custom-b2bua-udp-tcp)
 	    		rm ./b2bua/*.log
-	            echo "Distributed example used is b2bua";
+	            echo "Distributed example used is b2bua udp tcp";
 	            $NOHUP ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -t t1 $BACKGROUNDMETHOD
 	    		./sipp $MSS_IP:5080 -s receiver-tcp -sf b2bua/custom-call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 	    custom-b2bua-tcp-tcp)
 	    		rm ./b2bua/*.log
-	            echo "Distributed example used is b2bua";
+	            echo "Distributed example used is b2bua tcp tcp";
 	            $NOHUP ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -t t1 $BACKGROUNDMETHOD
 	    		./sipp $MSS_IP:5080 -s receiver-tcp -sf b2bua/custom-call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -t t1 -timeout_error
 	            ;;
@@ -57,6 +57,12 @@ if [ $# -eq 4 ]; then
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is b2bua-remote-send-bye";
 	            $NOHUP ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver-sends-bye.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
+	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/call-forwarding-sender-receives-bye.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
+	            ;;
+	    b2bua-remote-send-bye-no-ring)
+	    		rm ./b2bua/*.log
+	            echo "Distributed example used is b2bua-remote-send-bye-no-ring";
+	            $NOHUP ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver-sends-bye-no-ring.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
 	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/call-forwarding-sender-receives-bye.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 		uac)

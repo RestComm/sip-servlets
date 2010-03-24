@@ -22,7 +22,7 @@ echo "SIP LB $SIPLB"
 ##################################
 # Test Custom B2BUA
 ##################################
-echo "Test Cusom B2BUA"
+echo "Test Custom B2BUA"
 echo "================================"
 ./auto-prepare-example.sh custom-b2bua $config1
 ./auto-prepare-example.sh custom-b2bua $config2
@@ -99,6 +99,13 @@ sleep $FULLSTARTSLEEP
 sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh b2bua-remote-send-bye result.txt
+
+#The test killed server 1, so we start it again
+./auto-start-jboss-server.sh $config1 $config1.pid 0 b2bua-remote-send-bye
+
+sleep $HALFSTARTSLEEP
+
+./auto-run-test.sh b2bua-remote-send-bye-no-ring result.txt
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat $config1.pid` $config1
