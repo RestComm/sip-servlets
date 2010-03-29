@@ -26,6 +26,7 @@ import javax.servlet.ServletRequestListener;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.catalina.CometEvent;
 import org.apache.catalina.Container;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Wrapper;
@@ -188,7 +189,7 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
                 try {
                     listener.requestInitialized(event);
                 } catch (Throwable t) {
-                    container.getLogger().error(sm.getString("requestListenerValve.requestInit",
+                    container.getLogger().error(sm.getString("standardContext.requestListener.requestInit",
                                      instances[i].getClass().getName()), t);
                     ServletRequest sreq = request.getRequest();
                     sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
@@ -236,12 +237,89 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
 				context.getSipFactoryFacade().storeHttpSession(httpSession);
 			}
 		}
-		        
+		
         wrapper.getPipeline().getFirst().invoke(request, response);
         context.exitSipAppHa(null, null);
         // Fix for Issue 882 :remove the http session from the thread local to avoid any leaking of the session
         context.getSipFactoryFacade().removeHttpSession();
         
+        if ((instances !=null ) &&
+                (instances.length > 0)) {
+            // create post-service event
+            for (int i = 0; i < instances.length; i++) {
+                if (instances[i] == null)
+                    continue;
+                if (!(instances[i] instanceof ServletRequestListener))
+                    continue;
+                ServletRequestListener listener =
+                    (ServletRequestListener) instances[i];
+                try {
+                    listener.requestDestroyed(event);
+                } catch (Throwable t) {
+                    container.getLogger().error(sm.getString("standardContext.requestListener.requestDestroy",
+                                     instances[i].getClass().getName()), t);
+                    ServletRequest sreq = request.getRequest();
+                    sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
+                }
+            }
+        }
+                
+    }
+
+    /**
+     * Select the appropriate child Wrapper to process this request,
+     * based on the specified request URI.  If no matching Wrapper can
+     * be found, return an appropriate HTTP error.
+     *
+     * @param request Request to be processed
+     * @param response Response to be produced
+     * @param valveContext Valve context used to forward to the next Valve
+     *
+     * @exception IOException if an input/output error occurred
+     * @exception ServletException if a servlet error occurred
+     */
+    public final void event(Request request, Response response, CometEvent event)
+        throws IOException, ServletException {
+
+        // Select the Wrapper to be used for this Request
+        Wrapper wrapper = request.getWrapper();
+
+        // Normal request processing
+        // FIXME: This could be an addition to the core API too
+        /*
+        Object instances[] = context.getApplicationEventListeners();
+
+        ServletRequestEvent event = null;
+
+        if ((instances != null) 
+                && (instances.length > 0)) {
+            event = new ServletRequestEvent
+                (((StandardContext) container).getServletContext(), 
+                 request.getRequest());
+            // create pre-service event
+            for (int i = 0; i < instances.length; i++) {
+                if (instances[i] == null)
+                    continue;
+                if (!(instances[i] instanceof ServletRequestListener))
+                    continue;
+                ServletRequestListener listener =
+                    (ServletRequestListener) instances[i];
+                try {
+                    listener.requestInitialized(event);
+                } catch (Throwable t) {
+                    container.getLogger().error(sm.getString("requestListenerValve.requestInit",
+                                     instances[i].getClass().getName()), t);
+                    ServletRequest sreq = request.getRequest();
+                    sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
+                    return;
+                }
+            }
+        }
+        */
+
+        wrapper.getPipeline().getFirst().event(request, response, event);
+
+        /*
         if ((instances !=null ) &&
                 (instances.length > 0)) {
             // create post-service event
@@ -262,52 +340,12 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
                 }
             }
         }
-                
+        */
+      
     }
-
 
     // -------------------------------------------------------- Private Methods
 
-
-    /**
-     * Report a "bad request" error for the specified resource.  FIXME:  We
-     * should really be using the error reporting settings for this web
-     * application, but currently that code runs at the wrapper level rather
-     * than the context level.
-     *
-     * @param requestURI The request URI for the requested resource
-     * @param response The response we are creating
-     */
-    private void badRequest(String requestURI, HttpServletResponse response) {
-
-        try {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, requestURI);
-        } catch (IllegalStateException e) {
-            ;
-        } catch (IOException e) {
-            ;
-        }
-
-    }
-    
-    
-    /**
-     * Report a "forbidden" error for the specified resource. 
-     *
-     * @param requestURI The request URI for the requested resource
-     * @param response The response we are creating
-     */
-    private void forbidden(String requestURI, HttpServletResponse response) {
-
-        try {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, requestURI);
-        } catch (IllegalStateException e) {
-            ;
-        } catch (IOException e) {
-            ;
-        }
-
-    }
 
 
     /**

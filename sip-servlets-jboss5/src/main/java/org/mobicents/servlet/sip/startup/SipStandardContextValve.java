@@ -36,6 +36,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.jboss.servlet.http.HttpEvent;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
@@ -75,7 +76,7 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
         StringManager.getManager(Constants.Package);
 
 
-    private static transient Logger logger = Logger.getLogger(SipStandardContextValve.class);
+    private static transient final Logger logger = Logger.getLogger(SipStandardContextValve.class);
 
     
     private SipStandardContext context = null;
@@ -129,13 +130,14 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
             || (requestPathMB.equalsIgnoreCase("/META-INF"))
             || (requestPathMB.startsWithIgnoreCase("/WEB-INF/", 0))
             || (requestPathMB.equalsIgnoreCase("/WEB-INF"))) {
-            String requestURI = request.getDecodedRequestURI();
-            notFound(requestURI, response);
+        	notFound(response);
             return;
         }
 
         // Wait if we are reloading
+        boolean reloaded = false;
         while (context.getPaused()) {
+            reloaded = true;
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -143,12 +145,27 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
             }
         }
 
+        // Reloading will have stopped the old webappclassloader and
+        // created a new one
+        if (reloaded &&
+                context.getLoader() != null &&
+                context.getLoader().getClassLoader() != null) {
+            Thread.currentThread().setContextClassLoader(
+                    context.getLoader().getClassLoader());
+        }
+
         // Select the Wrapper to be used for this Request
         Wrapper wrapper = request.getWrapper();
         if (wrapper == null) {
-            String requestURI = request.getDecodedRequestURI();
-            notFound(requestURI, response);
+            notFound(response);
             return;
+        } else if (wrapper.isUnavailable()) {
+            // May be as a result of a reload, try and find the new wrapper
+            wrapper = (Wrapper) container.findChild(wrapper.getName());
+            if (wrapper == null) {
+                notFound(response);
+                return;
+            }
         }
 
         // Normal request processing
@@ -172,7 +189,7 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
                 try {
                     listener.requestInitialized(event);
                 } catch (Throwable t) {
-                    container.getLogger().error(sm.getString("requestListenerValve.requestInit",
+                    container.getLogger().error(sm.getString("standardContext.requestListener.requestInit",
                                      instances[i].getClass().getName()), t);
                     ServletRequest sreq = request.getRequest();
                     sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
@@ -180,7 +197,8 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
                 }
             }
         }
-        context.enterSipAppHa(false);        
+        context.enterSipAppHa(false);
+        
     	//the line below was replaced by the whole bunch of code because getting the parameter from the request is causing
     	//JRuby-Rails persistence to fail, go figure...
 //			String sipApplicationKey = request.getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
@@ -238,7 +256,7 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
                 try {
                     listener.requestDestroyed(event);
                 } catch (Throwable t) {
-                    container.getLogger().error(sm.getString("requestListenerValve.requestDestroy",
+                    container.getLogger().error(sm.getString("standardContext.requestListener.requestDestroy",
                                      instances[i].getClass().getName()), t);
                     ServletRequest sreq = request.getRequest();
                     sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
@@ -248,87 +266,86 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
                 
     }
 
+    /**
+     * Select the appropriate child Wrapper to process this request,
+     * based on the specified request URI.  If no matching Wrapper can
+     * be found, return an appropriate HTTP error.
+     *
+     * @param request Request to be processed
+     * @param response Response to be produced
+     * @param valveContext Valve context used to forward to the next Valve
+     *
+     * @exception IOException if an input/output error occurred
+     * @exception ServletException if a servlet error occurred
+     */
+    public final void event(Request request, Response response, HttpEvent event)
+        throws IOException, ServletException {
 
-//    /**
-//     * Select the appropriate child Wrapper to process this request,
-//     * based on the specified request URI.  If no matching Wrapper can
-//     * be found, return an appropriate HTTP error.
-//     *
-//     * @param request Request to be processed
-//     * @param response Response to be produced
-//     * @param valveContext Valve context used to forward to the next Valve
-//     *
-//     * @exception IOException if an input/output error occurred
-//     * @exception ServletException if a servlet error occurred
-//     */
-//    public final void event(Request request, Response response, CometEvent event)
-//        throws IOException, ServletException {
-//
-//        // Select the Wrapper to be used for this Request
-//        Wrapper wrapper = request.getWrapper();
-//
-//        // Normal request processing
-//        // FIXME: This could be an addition to the core API too
-//        /*
-//        Object instances[] = context.getApplicationEventListeners();
-//
-//        ServletRequestEvent event = null;
-//
-//        if ((instances != null) 
-//                && (instances.length > 0)) {
-//            event = new ServletRequestEvent
-//                (((StandardContext) container).getServletContext(), 
-//                 request.getRequest());
-//            // create pre-service event
-//            for (int i = 0; i < instances.length; i++) {
-//                if (instances[i] == null)
-//                    continue;
-//                if (!(instances[i] instanceof ServletRequestListener))
-//                    continue;
-//                ServletRequestListener listener =
-//                    (ServletRequestListener) instances[i];
-//                try {
-//                    listener.requestInitialized(event);
-//                } catch (Throwable t) {
-//                    container.getLogger().error(sm.getString("requestListenerValve.requestInit",
-//                                     instances[i].getClass().getName()), t);
-//                    ServletRequest sreq = request.getRequest();
-//                    sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
-//                    return;
-//                }
-//            }
-//        }
-//        */
-//
-//        wrapper.getPipeline().getFirst().event(request, response, event);
-//
-//        /*
-//        if ((instances !=null ) &&
-//                (instances.length > 0)) {
-//            // create post-service event
-//            for (int i = 0; i < instances.length; i++) {
-//                if (instances[i] == null)
-//                    continue;
-//                if (!(instances[i] instanceof ServletRequestListener))
-//                    continue;
-//                ServletRequestListener listener =
-//                    (ServletRequestListener) instances[i];
-//                try {
-//                    listener.requestDestroyed(event);
-//                } catch (Throwable t) {
-//                    container.getLogger().error(sm.getString("requestListenerValve.requestDestroy",
-//                                     instances[i].getClass().getName()), t);
-//                    ServletRequest sreq = request.getRequest();
-//                    sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
-//                }
-//            }
-//        }
-//        */
-//      
-//    }
+        // Select the Wrapper to be used for this Request
+        Wrapper wrapper = request.getWrapper();
 
+        // Normal request processing
+        // FIXME: This could be an addition to the core API too
+        /*
+        Object instances[] = context.getApplicationEventListeners();
+
+        ServletRequestEvent event = null;
+
+        if ((instances != null) 
+                && (instances.length > 0)) {
+            event = new ServletRequestEvent
+                (((StandardContext) container).getServletContext(), 
+                 request.getRequest());
+            // create pre-service event
+            for (int i = 0; i < instances.length; i++) {
+                if (instances[i] == null)
+                    continue;
+                if (!(instances[i] instanceof ServletRequestListener))
+                    continue;
+                ServletRequestListener listener =
+                    (ServletRequestListener) instances[i];
+                try {
+                    listener.requestInitialized(event);
+                } catch (Throwable t) {
+                    container.getLogger().error(sm.getString("requestListenerValve.requestInit",
+                                     instances[i].getClass().getName()), t);
+                    ServletRequest sreq = request.getRequest();
+                    sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
+                    return;
+                }
+            }
+        }
+        */
+
+        wrapper.getPipeline().getFirst().event(request, response, event);
+
+        /*
+        if ((instances !=null ) &&
+                (instances.length > 0)) {
+            // create post-service event
+            for (int i = 0; i < instances.length; i++) {
+                if (instances[i] == null)
+                    continue;
+                if (!(instances[i] instanceof ServletRequestListener))
+                    continue;
+                ServletRequestListener listener =
+                    (ServletRequestListener) instances[i];
+                try {
+                    listener.requestDestroyed(event);
+                } catch (Throwable t) {
+                    container.getLogger().error(sm.getString("requestListenerValve.requestDestroy",
+                                     instances[i].getClass().getName()), t);
+                    ServletRequest sreq = request.getRequest();
+                    sreq.setAttribute(Globals.EXCEPTION_ATTR,t);
+                }
+            }
+        }
+        */
+      
+    }
 
     // -------------------------------------------------------- Private Methods
+
 
 
     /**
@@ -337,13 +354,12 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
      * application, but currently that code runs at the wrapper level rather
      * than the context level.
      *
-     * @param requestURI The request URI for the requested resource
      * @param response The response we are creating
      */
-    private void notFound(String requestURI, HttpServletResponse response) {
+    protected void notFound(HttpServletResponse response) {
 
         try {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND, requestURI);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
         } catch (IllegalStateException e) {
             ;
         } catch (IOException e) {
