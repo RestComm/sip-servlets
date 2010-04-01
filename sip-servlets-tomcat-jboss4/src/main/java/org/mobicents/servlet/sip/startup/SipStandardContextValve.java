@@ -37,6 +37,7 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.mobicents.servlet.sip.core.session.ConvergedSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
@@ -219,11 +220,12 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
         	}
     	}
     	
+    	MobicentsSipApplicationSession sipApplicationSessionImpl = null;
 		if(sipApplicationKey != null && sipApplicationKey.length() > 0) {
 			try {
 				SipApplicationSessionKey sipApplicationSessionKey = 
 					SessionManagerUtil.parseSipApplicationSessionKey(sipApplicationKey);
-				MobicentsSipApplicationSession sipApplicationSessionImpl = 
+				sipApplicationSessionImpl = 
 					((SipManager)context.getManager()).getSipApplicationSession(sipApplicationSessionKey, false);
 				sipApplicationSessionImpl.addHttpSession(request.getSession());
 			} catch (ParseException pe) {
@@ -234,11 +236,18 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
 			// Don't create an http session if not already created
 			final HttpSession httpSession = request.getSession(false);
 			if(httpSession != null) {
-				context.getSipFactoryFacade().storeHttpSession(httpSession);
+				context.getSipFactoryFacade().storeHttpSession(httpSession);				
+				ConvergedSession convergedSession = (ConvergedSession) httpSession;
+				sipApplicationSessionImpl = convergedSession.getApplicationSession(false);
 			}
 		}
+		// Fix for http://code.google.com/p/mobicents/issues/detail?id=1386 : 
+		// Ensure SipApplicationSession concurrency control on converged HTTP apps
+		context.enterSipApp(sipApplicationSessionImpl, null);
 		
         wrapper.getPipeline().getFirst().invoke(request, response);
+        
+        context.exitSipApp(sipApplicationSessionImpl, null);
         context.exitSipAppHa(null, null);
         // Fix for Issue 882 :remove the http session from the thread local to avoid any leaking of the session
         context.getSipFactoryFacade().removeHttpSession();
