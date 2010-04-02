@@ -46,11 +46,10 @@
     ]]>
   </send>
 
-  <recv request="ACK" >
+  <recv request="ACK">
     <action>
       <ereg regexp=".*" search_in="hdr" header="From:" check_it="true" assign_to="1" />
       <ereg regexp=".*" search_in="hdr" header="To:" check_it="true" assign_to="2" />
-      <ereg regexp="\&lt;([a-zA-Z0-9@.=;]+)[^&gt;]+" search_in="hdr" header="Contact:" assign_to="3"/>
     </action>
   </recv>
     
@@ -58,7 +57,7 @@
   
   <send retrans="1000">
     <![CDATA[
-      BYE [$3] SIP/2.0
+      BYE [next_url] SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
       From: [$2]
       To: [$1]

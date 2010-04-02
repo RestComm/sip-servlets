@@ -51,10 +51,6 @@
   </send>
   
   <recv request="ACK" >
-    <action>
-      <ereg regexp=".*" search_in="hdr" header="From:" check_it="true" assign_to="1" />
-      <ereg regexp=".*" search_in="hdr" header="To:" check_it="true" assign_to="2" />
-    </action>
   </recv>  
   
   <recv request="BYE" timeout="60000" />

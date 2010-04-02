@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <!DOCTYPE scenario SYSTEM "sipp.dtd">
 
-<!-- Jean Deruelle -->
+<!-- Luis Barreiro - Mobicents QA team -->
 
 <scenario name="UAC for SIP-Servlets Tests">
 
@@ -35,13 +35,13 @@
 
   <recv response="180" optional="true" />
 
-  <recv response="200" rrs="true">    
+  <recv response="200" rtd="true" rrs="true">
   </recv>
 
   <send>
     <![CDATA[
     
-      ACK sip:[service]@127.0.0.1:5080 SIP/2.0
+      ACK [next_url] SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
       From: sipp <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
       To: sut <sip:[service]@sip-servlets.com>[peer_tag_param]
@@ -56,11 +56,12 @@
     ]]>
   </send>
 
-<pause milliseconds="58000"/>
-  
-<send retrans="500">
- <![CDATA[
-      BYE sip:[service]@127.0.0.1:5080 SIP/2.0
+  <pause milliseconds="58000"/>
+
+  <send retrans="500">
+    <![CDATA[
+    
+      BYE [next_url] SIP/2.0
       Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
       From: sipp <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
       To: sut <sip:[service]@sip-servlets.com>[peer_tag_param]
@@ -71,10 +72,12 @@
       Max-Forwards: 70
       Subject: Performance Test
       Content-Length: 0
+    
     ]]>
-</send>
-<recv response="200" crlf="true">
-</recv>
+  </send>
+
+  <recv response="200" crlf="true">
+  </recv>
 
 </scenario>
 
