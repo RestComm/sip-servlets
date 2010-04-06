@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,8 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.B2buaHelper;
+import javax.servlet.sip.ServletParseException;
+import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
@@ -35,7 +38,9 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.UAMode;
+import javax.servlet.sip.URI;
 import javax.sip.header.ContactHeader;
 
 import org.apache.log4j.Logger;
@@ -51,6 +56,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		forwardingUris = new HashMap<String, String[]>();
 		forwardingUris.put("sip:forward-sender@sip-servlets.com", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+		forwardingUris.put("sip:factory-sender@sip-servlets.com", 
+				new String[]{"sip:factory-receiver@sip-servlets.com", "sip:factory-receiver@127.0.0.1:5090"});
 		forwardingUris.put("sip:forward-pending-sender@sip-servlets.com", 
 				new String[]{"sip:forward-pending-receiver@sip-servlets.com", "sip:forward-pending-receiver@127.0.0.1:5090"});
 		forwardingUris.put("sip:blocked-sender@sip-servlets.com", 
@@ -95,7 +102,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		if(request.getTo().toString().contains("b2bua@sip-servlet")) {
 			session.createRequest("MESSAGE").send();
 		}
-		if(request.getFrom().getURI().toString().contains("pending")) {
+		if(request.getFrom().getURI().toString().contains("pending") || request.getFrom().getURI().toString().contains("factory")) {
 			B2buaHelper helper = request.getB2buaHelper();
 	        SipSession peerSession = helper.getLinkedSession(request.getSession());
 			List<SipServletMessage> pendingMessages = helper.getPendingMessages(peerSession, UAMode.UAC);
@@ -109,7 +116,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	        	}
 	        }
 	        invitePendingResponse.createAck().send();
-		}
+		}	
 //		SipSession linkedSession = helper.getLinkedSession(session);
 //		SipServletRequest forkedRequest = linkedSession.createRequest("ACK");
 //		forkedRequest.setContentLength(request.getContentLength());
@@ -145,54 +152,78 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		
 		
 		if(forwardingUri != null && forwardingUri.length > 0) {
-			B2buaHelper helper = request.getB2buaHelper();						
-			
-			helper.createResponseToOriginalRequest(request.getSession(), SipServletResponse.SC_TRYING, "").send();
-			
-			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
-					SIP_FACTORY);
-			
-			Map<String, List<String>> headers=new HashMap<String, List<String>>();
-			
-			List<String> toHeaderList = new ArrayList<String>();
-			toHeaderList.add(forwardingUri[0]);
-			headers.put("To", toHeaderList);
-			
-			List<String> userAgentHeaderList = new ArrayList<String>();
-			userAgentHeaderList.add("CallForwardingB2BUASipServlet");
-			headers.put("User-Agent", userAgentHeaderList);
-			
-			if(((SipURI)request.getFrom().getURI()).getUser().contains("tcp-sender")) {
-				if(request.getHeader(ContactHeader.NAME).contains("transport=tcp")) {
-					List<String> contactHeaderList = new ArrayList<String>();
-					contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@127.0.0.1:5070;q=0.1;lr;transport=udp;test>;test");
-					headers.put("Contact", contactHeaderList);
-				} else {
-					List<String> contactHeaderList = new ArrayList<String>();
-					contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@127.0.0.1:5070;q=0.1;lr;transport=tcp;test>;test");
-					headers.put("Contact", contactHeaderList);
-				}
+			if(((SipURI)request.getTo().getURI()).getUser().contains("factory")) {
+				forwardInviteUsingSipFactory(request, forwardingUri);
+			} else {
+				forwardInviteUsingB2BUAHelper(request, forwardingUri);
 			}
-			
-			List<String> extensionsHeaderList = new ArrayList<String>();
-			extensionsHeaderList.add("extension-header-value1");
-			extensionsHeaderList.add("extension-header-value2");
-			headers.put("extension-header", extensionsHeaderList);
-			
-			SipServletRequest forkedRequest = helper.createRequest(request, true,
-					headers);
-			SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1]);
-			forkedRequest.setRequestURI(sipUri);						
-			
-			logger.info("forkedRequest = " + forkedRequest);
-			forkedRequest.getSession().setAttribute("originalRequest", request);
-			
-			forkedRequest.send();
 		} else {
 			logger.info("INVITE has not been forwarded.");
 		}
 	}	
 	
+	private void forwardInviteUsingB2BUAHelper(SipServletRequest request,
+			String[] forwardingUri) throws IOException, IllegalArgumentException, TooManyHopsException, ServletParseException {
+		B2buaHelper helper = request.getB2buaHelper();						
+		
+		helper.createResponseToOriginalRequest(request.getSession(), SipServletResponse.SC_TRYING, "").send();
+		
+		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
+				SIP_FACTORY);
+		
+		Map<String, List<String>> headers=new HashMap<String, List<String>>();
+		
+		List<String> toHeaderList = new ArrayList<String>();
+		toHeaderList.add(forwardingUri[0]);
+		headers.put("To", toHeaderList);
+		
+		List<String> userAgentHeaderList = new ArrayList<String>();
+		userAgentHeaderList.add("CallForwardingB2BUASipServlet");
+		headers.put("User-Agent", userAgentHeaderList);
+		
+		if(((SipURI)request.getFrom().getURI()).getUser().contains("tcp-sender")) {
+			if(request.getHeader(ContactHeader.NAME).contains("transport=tcp")) {
+				List<String> contactHeaderList = new ArrayList<String>();
+				contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@127.0.0.1:5070;q=0.1;lr;transport=udp;test>;test");
+				headers.put("Contact", contactHeaderList);
+			} else {
+				List<String> contactHeaderList = new ArrayList<String>();
+				contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@127.0.0.1:5070;q=0.1;lr;transport=tcp;test>;test");
+				headers.put("Contact", contactHeaderList);
+			}
+		}
+		
+		List<String> extensionsHeaderList = new ArrayList<String>();
+		extensionsHeaderList.add("extension-header-value1");
+		extensionsHeaderList.add("extension-header-value2");
+		headers.put("extension-header", extensionsHeaderList);
+		
+		SipServletRequest forkedRequest = helper.createRequest(request, true,
+				headers);
+		SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1]);
+		forkedRequest.setRequestURI(sipUri);						
+		
+		logger.info("forkedRequest = " + forkedRequest);
+		forkedRequest.getSession().setAttribute("originalRequest", request);
+		
+		forkedRequest.send();
+	}
+
+	private void forwardInviteUsingSipFactory(SipServletRequest origReq, String[] forwardingUri) throws ServletParseException, UnsupportedEncodingException, IOException {
+		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
+				SIP_FACTORY);
+		B2buaHelper b2buaHelper = origReq.getB2buaHelper();
+        URI from = origReq.getTo().getURI();
+        URI to= sipFactory.createURI(forwardingUri[1]);
+        SipApplicationSession appSession = origReq.getApplicationSession();
+        SipServletRequest newRequest = sipFactory.createRequest(appSession, "INVITE", from, to);
+        newRequest.setContent(origReq.getContent(), origReq.getContentType());
+        newRequest.setHeader("Allow", "INVITE, ACK, CANCEL, BYE, REFER, UPDATE, INFO");
+        b2buaHelper.linkSipSessions(origReq.getSession(), newRequest.getSession()); //Linking sessions!
+        origReq.getSession().setAttribute("originalRequest", origReq);
+        newRequest.send();        
+	}
+
 	@Override
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {		
@@ -314,7 +345,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			//create and sends OK for the first call leg							
 			SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
 			boolean sendAck = true;
-			if(sipServletResponse.getFrom().getURI().toString().contains("pending")) {
+			if(sipServletResponse.getFrom().getURI().toString().contains("pending") || sipServletResponse.getFrom().getURI().toString().contains("factory")) {
 				sendAck= false;
 				if (logger.isDebugEnabled()) {
 					logger.debug("testing pending messages so not sending ACK");
