@@ -168,8 +168,7 @@ public class TimersSipServlet
 	 * @see javax.servlet.sip.SipApplicationSessionListener#sessionCreated(javax.servlet.sip.SipApplicationSessionEvent)
 	 */
 	public void sessionCreated(SipApplicationSessionEvent ev) {
-		// TODO Auto-generated method stub
-		
+		logger.info("sip application session created " +  ev.getApplicationSession());
 	}
 
 	/*
@@ -177,7 +176,7 @@ public class TimersSipServlet
 	 * @see javax.servlet.sip.SipApplicationSessionListener#sessionDestroyed(javax.servlet.sip.SipApplicationSessionEvent)
 	 */
 	public void sessionDestroyed(SipApplicationSessionEvent ev) {
-		// TODO Auto-generated method stub
+		logger.info("sip application session destroyed " +  ev.getApplicationSession());
 		
 	}
 	

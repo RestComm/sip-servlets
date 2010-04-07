@@ -119,6 +119,25 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertTrue(sender.getOkToByeReceived());		
 	}
 	
+	public void testShootmeSendBye() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "SSsendBye";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setSendBye(false);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT* 2);
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getByeReceived());
+		Thread.sleep(TIMEOUT* 4);
+	}
+	
 	// Issue 1042 : Trying to simulate the 2 Invites arriving at the same time
 	public void testShootmeRetransTest() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		String fromName = "sender";

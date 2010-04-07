@@ -66,6 +66,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	private static final String TEST_REINVITE_USERNAME = "reinvite";
 	private static final String TEST_IS_SEND_REINVITE_USERNAME = "isendreinvite";
 	private static final String TEST_IS_SEND_REINVITE_PRACK = "prackisendreinvite";
+	private static final String TEST_IS_SIP_SERVLET_SEND_BYE = "SSsendBye";
 	private static final String TEST_CANCEL_USERNAME = "cancel";
 	@Resource
 	SipFactory sipFactory;
@@ -309,6 +310,8 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 					nbOfAcks = Integer.valueOf(nbOfAcks.intValue() + 1);
 				}
 				req.getSession().setAttribute("nbAcks", nbOfAcks);
+			} else if(TEST_IS_SIP_SERVLET_SEND_BYE.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {				
+				timerService.createTimer(req.getApplicationSession(), 10000, false, (Serializable)req.getSession());
 			}
 		}
 		String fromString = req.getFrom().toString();
@@ -483,11 +486,21 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	}
 
 	public void timeout(ServletTimer timer) {
-		SipServletResponse sipServletResponse = (SipServletResponse)timer.getInfo();
-		try {
-			sipServletResponse.send();
-		} catch (IOException e) {
-			logger.error("Unexpected exception while sending the OK", e);
+		Serializable info = timer.getInfo();
+		if(info instanceof SipServletResponse) {
+			SipServletResponse sipServletResponse = (SipServletResponse)timer.getInfo();
+			try {
+				sipServletResponse.send();
+			} catch (IOException e) {
+				logger.error("Unexpected exception while sending the OK", e);
+			}
+		} else {
+			try {
+				((SipSession)info).createRequest("BYE").send();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	

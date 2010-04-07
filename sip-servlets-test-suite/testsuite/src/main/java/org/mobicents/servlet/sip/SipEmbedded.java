@@ -157,7 +157,7 @@ public class SipEmbedded {
 		sipService.setSipApplicationDispatcherClassName(SipApplicationDispatcherImpl.class.getName());
 //		sipService.setSipApplicationRouterClassName(DefaultApplicationRouter.class.getName());		
 		sipService.setDarConfigurationFileLocation(darConfigurationFilePath);
-		sipService.setCongestionControlCheckingInterval(30000);
+		sipService.setCongestionControlCheckingInterval(-1);
 		sipService.setAdditionalParameterableHeaders("additionalParameterableHeader");
 		sipService.setUsePrettyEncoding(true);
 		if(isHA) {
