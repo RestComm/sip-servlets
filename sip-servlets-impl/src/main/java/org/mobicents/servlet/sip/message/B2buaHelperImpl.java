@@ -215,7 +215,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 						contactAddress.setDisplayName(fromName);
 					}
 					contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);													
-				} else {
+				} else {					
 					contactHeader = JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, fromName, session.getOutboundInterface());
 				}	
 				if(contactHeaderSet.size() > 0) {

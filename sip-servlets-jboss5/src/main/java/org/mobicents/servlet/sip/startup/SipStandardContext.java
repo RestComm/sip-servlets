@@ -75,12 +75,9 @@ import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
-import org.mobicents.servlet.sip.core.timers.DefaultSipApplicationSessionTimerFactory;
-import org.mobicents.servlet.sip.core.timers.DefaultSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.FaultTolerantSasTimerService;
-import org.mobicents.servlet.sip.core.timers.FaultTolerantSipApplicationSessionTimerFactory;
 import org.mobicents.servlet.sip.core.timers.FaultTolerantTimerServiceImpl;
-import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerFactory;
+import org.mobicents.servlet.sip.core.timers.StandardSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
@@ -158,8 +155,6 @@ public class SipStandardContext extends StandardContext implements SipContext {
 
     // timer service used to schedule sip application session expiration timer
     protected transient SipApplicationSessionTimerService sasTimerService = null;
-    // factory used to create instances of sip application session expiration timer
-    protected transient SipApplicationSessionTimerFactory sipApplicationSessionTimerFactory;
     // timer service used to schedule sip servlet originated timer tasks
     protected transient TimerService timerService = null;   	
     
@@ -177,8 +172,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if(idleTime <= 0) {
 			idleTime = 1;
 		}
-		sasTimerService = new DefaultSipApplicationSessionTimerService(4);
-		sipApplicationSessionTimerFactory = new DefaultSipApplicationSessionTimerFactory();
+		sasTimerService = new StandardSipApplicationSessionTimerService();
 		isMainServlet = false;
 	}
 
@@ -226,8 +220,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					logger.info("Using the Fault Tolerant Timer Service to schedule fault tolerant timers in a distributed environment");
 				}
 				timerService = new FaultTolerantTimerServiceImpl((DistributableSipManager)getSipManager());
-				sasTimerService = new FaultTolerantSasTimerService((DistributableSipManager)getSipManager(), 4);
-				sipApplicationSessionTimerFactory = new FaultTolerantSipApplicationSessionTimerFactory();
+				sasTimerService = new FaultTolerantSasTimerService((DistributableSipManager)getSipManager(), 4);				
 			} else {
 				timerService = new TimerServiceImpl();
 			}
@@ -794,10 +787,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			if(logger.isInfoEnabled()) {
 				logger.info("Using the Fault Tolerant Timer Service to schedule fault tolerant timers in a distributed environment");
 			}			
-			sasTimerService.shutdownNow();
+			sasTimerService.stop();
 			sasTimerService = null;
 			sasTimerService = new FaultTolerantSasTimerService((DistributableSipManager)manager, 4);
-			sipApplicationSessionTimerFactory = new FaultTolerantSipApplicationSessionTimerFactory();
 			timerService = null;
 			timerService = new FaultTolerantTimerServiceImpl((DistributableSipManager)manager);										
 			this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
@@ -1100,7 +1092,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			// we can't create it before because the mobicents cluster is not yet initialized
 			if(getDistributable() && hasDistributableManager) {
 				((FaultTolerantTimerServiceImpl)timerService).getScheduler();
-				sasTimerService.init();
+				sasTimerService.start();
 			}	
 		}
 		
@@ -1228,14 +1220,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	public boolean hasDistributableManager() {
 		return hasDistributableManager;
 	}
-	/*
-	 * (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.SipContext#getSipApplicationSessionTimerFactory()
-	 */
-	public SipApplicationSessionTimerFactory getSipApplicationSessionTimerFactory() {
-		return sipApplicationSessionTimerFactory;
-	}
-
+	
 	/**
 	 * @return the servletHandler
 	 */

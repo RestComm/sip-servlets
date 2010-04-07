@@ -294,10 +294,10 @@ public class MobicentsSipApplicationSessionFacade implements
 		return this.sipApplicationSession.toString();
 	}
 
-	public void setExpirationTimerFuture(
-			ScheduledFuture<MobicentsSipApplicationSession> schedule) {
-		this.sipApplicationSession.setExpirationTimerFuture(schedule);
-	}
+//	public void setExpirationTimerFuture(
+//			ScheduledFuture<MobicentsSipApplicationSession> schedule) {
+//		this.sipApplicationSession.setExpirationTimerFuture(schedule);
+//	}
 
 	public void setExpirationTimerTask(
 			SipApplicationSessionTimerTask expirationTimerTask) {

@@ -221,7 +221,7 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 		return getSipSession().getOngoingTransactions();
 	}
 
-	public SipURI getOutboundInterface() {
+	public String getOutboundInterface() {
 		
 		return getSipSession().getOutboundInterface();
 	}
@@ -261,7 +261,7 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 		return getSipSession().getSipSessionAttributeMap();
 	}
 
-	public URI getSipSubscriberURI() {
+	public String getSipSubscriberURI() {
 		
 		return getSipSession().getSipSubscriberURI();
 	}
@@ -335,7 +335,7 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 		getSipSession().setSipSessionAttributeMap(sipSessionAttributeMap);
 	}
 
-	public void setSipSubscriberURI(URI subscriberURI) {
+	public void setSipSubscriberURI(String subscriberURI) {
 		getSipSession().setSipSubscriberURI(subscriberURI);
 	}
 

@@ -31,6 +31,7 @@ import gov.nist.javax.sip.header.ims.SecurityVerifyHeader;
 import gov.nist.javax.sip.header.ims.ServiceRouteHeader;
 import gov.nist.javax.sip.message.SIPMessage;
 
+import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -479,13 +480,19 @@ public final class JainSipUtils {
 	 * @return
 	 */
 	public static ViaHeader createViaHeader(
-			SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String branch, javax.servlet.sip.SipURI outboundInterface) {
+			SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String branch, String outboundInterface) {
 		String transport = findTransport(request);
 		ExtendedListeningPoint listeningPoint = null;
 		if(outboundInterface == null) {
 			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
 		} else {
-			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(((SipURIImpl)outboundInterface).getSipURI(), false);
+			javax.sip.address.SipURI outboundInterfaceURI = null;			
+			try {
+				outboundInterfaceURI = (javax.sip.address.SipURI) SipFactories.addressFactory.createURI(outboundInterface);
+			} catch (ParseException e) {
+				throw new IllegalArgumentException("couldn't parse the outbound interface " + outboundInterface, e);
+			}
+			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(outboundInterfaceURI, false);
 		}
 		boolean usePublicAddress = findUsePublicAddress(
 				sipNetworkInterfaceManager, request, listeningPoint);
@@ -509,13 +516,19 @@ public final class JainSipUtils {
 	 * @param transport
 	 * @return
 	 */
-	public static ContactHeader createContactHeader(SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String displayName, javax.servlet.sip.SipURI outboundInterface) {
+	public static ContactHeader createContactHeader(SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String displayName, String outboundInterface) {
 		String transport = findTransport(request);
 		ExtendedListeningPoint listeningPoint = null;
 		if(outboundInterface == null) {
 			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
 		} else {
-			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(((SipURIImpl)outboundInterface).getSipURI(), false);
+			javax.sip.address.SipURI outboundInterfaceURI = null;			
+			try {
+				outboundInterfaceURI = (javax.sip.address.SipURI) SipFactories.addressFactory.createURI(outboundInterface);
+			} catch (ParseException e) {
+				throw new IllegalArgumentException("couldn't parse the outbound interface " + outboundInterface, e);
+			}			
+			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(outboundInterfaceURI, false);
 		}
 		boolean usePublicAddress = findUsePublicAddress(
 				sipNetworkInterfaceManager, request, listeningPoint);

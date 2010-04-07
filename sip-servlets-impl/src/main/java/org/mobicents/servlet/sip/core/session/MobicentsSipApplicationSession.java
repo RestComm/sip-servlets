@@ -79,5 +79,5 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession {
 	void setJvmRoute(String jvmRoute);
 
 	void setExpirationTimerTask(SipApplicationSessionTimerTask expirationTimerTask);
-	void setExpirationTimerFuture(ScheduledFuture<MobicentsSipApplicationSession> schedule);
+//	void setExpirationTimerFuture(ScheduledFuture<MobicentsSipApplicationSession> schedule);
 }

@@ -46,6 +46,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
+import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
@@ -55,7 +56,6 @@ import javax.servlet.sip.SipSessionBindingEvent;
 import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
-import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
@@ -199,14 +199,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 	/**
 	 * Subscriber URI should be set for outbound sessions, from requests created in the container.
 	 */
-	protected transient URI subscriberURI;
+	protected transient String subscriberURI;
 	
 	/**
 	 * Outbound interface is one of the allowed values in the Servlet Context attribute
 	 * "javax.servlet.ip.outboundinterfaces"
 	 * This one is not serialized, it has to be reset by the app on sessionActivated listener method
 	 */
-	protected transient SipURI outboundInterface;
+	protected transient String outboundInterface;
 	
 	
 	// === THESE ARE THE OBJECTS A SIP SESSION CAN BE ASSIGNED TO ===
@@ -357,7 +357,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 							
 							javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);
 							contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);													
-						} else {
+						} else {														
 							contactHeader = JainSipUtils.createContactHeader(sipFactory.getSipNetworkInterfaceManager(), methodRequest, "", outboundInterface);
 						}
 						methodRequest.setHeader(contactHeader);
@@ -419,7 +419,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 							JainSipUtils.findTransport(request), false).getSipProvider();
 					final SipApplicationDispatcher sipApplicationDispatcher = sipFactory.getSipApplicationDispatcher();				
 					final String branch = JainSipUtils.createBranch(getSipApplicationSession().getKey().getId(),  sipApplicationDispatcher.getHashFromApplicationName(getKey().getApplicationName()));
-					
+										
 					ViaHeader viaHeader = JainSipUtils.createViaHeader(
 		    				sipNetworkInterfaceManager, request, branch, outboundInterface);
 		    		request.addHeader(viaHeader);
@@ -755,8 +755,13 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		if (this.subscriberURI == null)
 			throw new IllegalStateException("Subscriber URI is only available for outbound sessions.");
-		else 
-			return this.subscriberURI;
+		else {		
+			try {
+				return sipFactory.createURI(subscriberURI);
+			} catch (ServletParseException e) {
+				throw new IllegalArgumentException("couldn't parse the outbound interface " + subscriberURI, e);
+			}
+		}
 	}
 
 	/*
@@ -816,7 +821,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(ongoingTransactions != null) {
 			for(Transaction transaction : ongoingTransactions) {
 				if(!TransactionState.TERMINATED.equals(transaction.getState())) {
-					((TransactionApplicationData)transaction.getApplicationData()).cleanUp();
+//					((TransactionApplicationData)transaction.getApplicationData()).cleanUp(true);
 					try {
 						transaction.terminate();
 					} catch (ObjectInUseException e) {
@@ -855,7 +860,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		if(sessionCreatingTransactionRequest != null) {
 //			sessionCreatingTransaction.setApplicationData(null);
-			sessionCreatingTransactionRequest.cleanUp();
+//			sessionCreatingTransactionRequest.cleanUp();
 			sessionCreatingTransactionRequest = null;
 		}
 		if(proxy != null) {
@@ -1193,15 +1198,15 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 	}
 
-	public void setSipSubscriberURI(URI subscriberURI) {
+	public void setSipSubscriberURI(String subscriberURI) {
 		this.subscriberURI = subscriberURI;
 	}
 	
-	public URI getSipSubscriberURI() {
+	public String getSipSubscriberURI() {
 		return subscriberURI;
 	}
 
-	public SipURI getOutboundInterface() {
+	public String getOutboundInterface() {
 		return outboundInterface;
 	}	
 	
@@ -1256,6 +1261,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 
 		if(this.ongoingTransactions != null) {
 			this.ongoingTransactions.remove(transaction);
+		}
+		
+		if(sessionCreatingTransactionRequest != null && sessionCreatingTransactionRequest.getMessage() != null && JainSipUtils.DIALOG_CREATING_METHODS.contains(sessionCreatingTransactionRequest.getMethod())) {
+			sessionCreatingTransactionRequest = null;
 		}
 		
 		if(sessionCreatingTransactionRequest != null && 
@@ -1579,7 +1588,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		//TODO check against our defined outbound interfaces
 		String address = inetAddress.getHostAddress();
 		try {
-			outboundInterface = new SipURIImpl(SipFactories.addressFactory.createSipURI(null, address));
+			outboundInterface = new SipURIImpl(SipFactories.addressFactory.createSipURI(null, address)).toString();
 		} catch (ParseException e) {
 			logger.error("couldn't parse the SipURI from USER[" + null
 					+ "] HOST[" + address + "]", e);
@@ -1600,7 +1609,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		//TODO check against our defined outbound interfaces		
 		String address = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
 		try {
-			outboundInterface = new SipURIImpl(SipFactories.addressFactory.createSipURI(null, address));
+			outboundInterface = new SipURIImpl(SipFactories.addressFactory.createSipURI(null, address)).toString();
 		} catch (ParseException e) {
 			logger.error("couldn't parse the SipURI from USER[" + null
 					+ "] HOST[" + address + "]", e);

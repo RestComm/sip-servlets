@@ -28,6 +28,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.startup.SipApplicationSessionTimerService;
 
 /**
@@ -41,6 +42,8 @@ public class DefaultSipApplicationSessionTimerService extends
 	private static final Logger logger = Logger.getLogger(DefaultSipApplicationSessionTimerService.class
 			.getName());
 	
+	// Counts the number of cancelled tasks
+    private static volatile int numCancelled = 0;
 	/**
 	 * @param corePoolSize
 	 */
@@ -75,28 +78,66 @@ public class DefaultSipApplicationSessionTimerService extends
 			ThreadFactory threadFactory, RejectedExecutionHandler handler) {
 		super(corePoolSize, threadFactory, handler);
 	}
+	
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipApplicationSessionTimerService#createSipApplicationSessionTimerTask()
+	 */
+	public SipApplicationSessionTimerTask createSipApplicationSessionTimerTask(MobicentsSipApplicationSession sipApplicationSession) {		
+		return new DefaultSasTimerTask(sipApplicationSession);
+	}
 
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.SipApplicationSessionTimerService#remove(org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask)
 	 */
-	public boolean remove(SipApplicationSessionTimerTask expirationTimerTask) {		
-		return super.remove(expirationTimerTask);
+	public boolean cancel(SipApplicationSessionTimerTask expirationTimerTask) {
+		//CANCEL needs to remove the shceduled timer see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6602600
+		//to improve perf		
+		ScheduledFuture<MobicentsSipApplicationSession> future = ((DefaultSasTimerTask)expirationTimerTask).getScheduledFuture();
+		if(future != null) {
+			boolean removed = super.remove((Runnable) future);
+			if(logger.isDebugEnabled()) {
+				logger.debug("expiration timer on sip application session " + expirationTimerTask.getSipApplicationSession().getKey() + " removed : " + removed);
+			}					
+			boolean cancelled = future.cancel(true);
+			if(logger.isDebugEnabled()) {
+				logger.debug("expiration timer on sip application session " + expirationTimerTask.getSipApplicationSession().getKey() + " Cancelled : " + cancelled);
+			}
+			future = null;
+			// Purge is expensive when called frequently, only call it every now and then.
+	        // We do not sync the numCancelled variable. We dont care about correctness of
+	        // the number, and we will still call purge rought once on every 25 cancels.
+	        numCancelled++;
+	        if(numCancelled % 100 == 0) {
+	            super.purge();
+	        }	
+	        return cancelled;
+		} else {
+			if(logger.isDebugEnabled()) {
+				logger.debug("expiration timer future is null, thus cannot be Cancelled");
+			}
+			return false;
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.SipApplicationSessionTimerService#schedule(org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask, long, java.util.concurrent.TimeUnit)
 	 */
-	public ScheduledFuture<?> schedule(
+	public SipApplicationSessionTimerTask schedule(
 			SipApplicationSessionTimerTask expirationTimerTask, long delay,
 			TimeUnit unit) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Scheduling sip application session "+ expirationTimerTask.getSipApplicationSession().getKey() +" to expire in " + (delay / (double) 1000 / (double) 60) + " minutes");
 		}
-		return super.schedule(expirationTimerTask, delay, unit);
+		((DefaultSasTimerTask)expirationTimerTask).setScheduledFuture((ScheduledFuture<MobicentsSipApplicationSession>)super.schedule(expirationTimerTask, delay, unit));
+		return expirationTimerTask;
 	}
 
-	public void init() {
+	public void start() {
 		prestartAllCoreThreads();
+	}
+	
+	public void stop() {
+		super.shutdownNow();
 	}
 
 }

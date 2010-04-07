@@ -48,7 +48,6 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Host;
-import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Manager;
 import org.apache.catalina.Service;
@@ -73,9 +72,8 @@ import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
-import org.mobicents.servlet.sip.core.timers.DefaultSipApplicationSessionTimerFactory;
 import org.mobicents.servlet.sip.core.timers.DefaultSipApplicationSessionTimerService;
-import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerFactory;
+import org.mobicents.servlet.sip.core.timers.StandardSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
@@ -155,8 +153,6 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	
 	// timer service used to schedule sip application session expiration timer
     protected transient SipApplicationSessionTimerService sasTimerService = null;
-    // factory used to create instances of sip application session expiration timer
-    protected transient SipApplicationSessionTimerFactory sipApplicationSessionTimerFactory;
     // timer service used to schedule sip servlet originated timer tasks
     protected transient TimerService timerService = null;
 	/**
@@ -174,8 +170,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			idleTime = 1;
 		}
 		hasDistributableManager = false;
-		sasTimerService = new DefaultSipApplicationSessionTimerService(4);
-		sipApplicationSessionTimerFactory = new DefaultSipApplicationSessionTimerFactory();
+//		sasTimerService = new DefaultSipApplicationSessionTimerService(4);
+		sasTimerService = new StandardSipApplicationSessionTimerService();
 	}
 
 	@Override
@@ -1265,13 +1261,6 @@ public class SipStandardContext extends StandardContext implements SipContext {
 
 	public boolean hasDistributableManager() {		
 		return hasDistributableManager;
-	}
-	/*
-	 * (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.SipContext#getSipApplicationSessionTimerFactory()
-	 */
-	public SipApplicationSessionTimerFactory getSipApplicationSessionTimerFactory() {
-		return sipApplicationSessionTimerFactory;
 	}
 	
 	/**

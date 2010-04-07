@@ -78,7 +78,7 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 		String transport = JainSipUtils.findTransport(clonedRequest);
 		((SIPMessage)clonedRequest).setApplicationData(null);
 		MobicentsSipSession session = sipServletRequest.getSipSession();
-		SipURI outboundInterface = null;
+		String outboundInterface = null;
 		if(session != null) {
 			outboundInterface = session.getOutboundInterface();
 		}

@@ -200,9 +200,13 @@ public class ResponseDispatcher extends MessageDispatcher {
 				public void dispatch() throws DispatcherException {
 					sipContext.enterSipAppHa(true);
 					try {
-						try {
-							session.setSessionCreatingTransactionRequest(sipServletResponse);
-							session.setSessionCreatingDialog(dialog);
+						try {														
+							// we store the request only if the dialog is null and the method is not a dialog creating one
+							if(dialog == null) {
+								session.setSessionCreatingTransactionRequest(sipServletResponse);
+							} else {
+								session.setSessionCreatingDialog(dialog);
+							}
 							if(originalRequest != null) {				
 								originalRequest.setResponse(sipServletResponse);					
 							}

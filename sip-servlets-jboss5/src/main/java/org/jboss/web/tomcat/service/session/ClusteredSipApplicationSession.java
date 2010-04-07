@@ -364,10 +364,10 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 				// means the expiration task has been started on another node and has not been failed over
 				// so we remove the task in the cluster 
 				FaultTolerantSasTimerTask fakeTimerTask =  new FaultTolerantSasTimerTask(this);				
-				sipContext.getSipApplicationSessionTimerService().remove(fakeTimerTask);
+				sipContext.getSipApplicationSessionTimerService().cancel(fakeTimerTask);
 				// and reschedule the task to run with this node being the master ofthe task 
-				expirationTimerTask = sipContext.getSipApplicationSessionTimerFactory().createSipApplicationSessionTimerTask(this);				
-				expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sipApplicationSessionTimeout, TimeUnit.MILLISECONDS);
+				expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(this);				
+//				expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sipApplicationSessionTimeout, TimeUnit.MILLISECONDS);
 			}
 		}
 		

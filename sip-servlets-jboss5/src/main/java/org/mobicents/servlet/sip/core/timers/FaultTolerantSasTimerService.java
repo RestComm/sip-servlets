@@ -21,15 +21,13 @@
  */
 package org.mobicents.servlet.sip.core.timers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.jboss.web.tomcat.service.session.ClusteredSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.startup.SipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.timers.FaultTolerantScheduler;
@@ -58,7 +56,16 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 		this.sipManager = (ClusteredSipManager<? extends OutgoingDistributableSessionData>)sipManager;	
 	}
 	
-	public ScheduledFuture<?> schedule(SipApplicationSessionTimerTask expirationTimerTask, 
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipApplicationSessionTimerService#createSipApplicationSessionTimerTask(org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession)
+	 */
+	public SipApplicationSessionTimerTask createSipApplicationSessionTimerTask(
+			MobicentsSipApplicationSession sipApplicationSession) {
+		return new FaultTolerantSasTimerTask(sipApplicationSession);
+	}
+	
+	public SipApplicationSessionTimerTask schedule(SipApplicationSessionTimerTask expirationTimerTask, 
             long delay, 
             TimeUnit unit) {			
 		if(expirationTimerTask instanceof FaultTolerantSasTimerTask) {
@@ -69,7 +76,7 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 					logger.debug("Scheduling sip application session "+ expirationTimerTask.getSipApplicationSession().getKey() +" to expire in " + (delay / (double) 1000 / (double) 60) + " minutes");
 				}
 				getScheduler().schedule(faultTolerantSasTimerTask);
-				return faultTolerantSasTimerTask.getScheduledFuture();
+				return faultTolerantSasTimerTask;
 			} else {
 				if(logger.isDebugEnabled()) {
 					logger.debug("sip application session expiration timer "+ expirationTimerTask.getSipApplicationSession().getKey() +" is already present in the cache not scheduling it again");
@@ -80,7 +87,7 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 		throw new IllegalArgumentException("the task to schedule is not an instance of FaultTolerantSasTimerTask");
 	}
 	
-	public boolean remove(SipApplicationSessionTimerTask expirationTimerTask) {
+	public boolean cancel(SipApplicationSessionTimerTask expirationTimerTask) {
 		if(expirationTimerTask instanceof FaultTolerantSasTimerTask) {
 			TimerTask cancelledTask = getScheduler().cancel(((FaultTolerantSasTimerTask)expirationTimerTask).getData().getTaskID());
 			if(cancelledTask == null) {
@@ -90,6 +97,7 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 				return false;
 			}
 			return true;
+			
 		} 				
 		throw new IllegalArgumentException("the task to remove is not an instance of FaultTolerantSasTimerTask");
 	}
@@ -99,10 +107,10 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 		// method not exposed by Mobicents FaultTolerantScheduler
 	}
 	
-	public List<Runnable> shutdownNow() {
+	public void stop() {
 //		return super.shutdownNow();
 		// method not exposed by Mobicents FaultTolerantScheduler
-		return new ArrayList<Runnable>();
+		getScheduler().shutdownNow();
 	}
 	
 	private FaultTolerantScheduler getScheduler() {
@@ -117,7 +125,7 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 	 * (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.SipApplicationSessionTimerService#init()
 	 */
-	public void init() {
+	public void start() {
 		// we need to start the scheduler upon init so that the local listener gets registered and can failover timers
 		getScheduler();
 	}

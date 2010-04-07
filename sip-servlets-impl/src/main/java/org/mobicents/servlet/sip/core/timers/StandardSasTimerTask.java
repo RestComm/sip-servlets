@@ -21,7 +21,7 @@
  */
 package org.mobicents.servlet.sip.core.timers;
 
-import java.util.concurrent.ScheduledFuture;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -36,15 +36,13 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  */
-public class DefaultSasTimerTask implements SipApplicationSessionTimerTask {
+public class StandardSasTimerTask extends TimerTask implements SipApplicationSessionTimerTask {
 	
-	private static final Logger logger = Logger.getLogger(DefaultSasTimerTask.class);
+	private static final Logger logger = Logger.getLogger(StandardSasTimerTask.class);
 	
 	private MobicentsSipApplicationSession sipApplicationSession;
 	
-	protected transient ScheduledFuture<MobicentsSipApplicationSession> expirationTimerFuture;
-	
-	public DefaultSasTimerTask(MobicentsSipApplicationSession mobicentsSipApplicationSession) {
+	public StandardSasTimerTask(MobicentsSipApplicationSession mobicentsSipApplicationSession) {
 		this.sipApplicationSession = mobicentsSipApplicationSession;
 	}
 	
@@ -64,10 +62,9 @@ public class DefaultSasTimerTask implements SipApplicationSessionTimerTask {
 						" sleeping for " + sleep / 1000L + " seconds");
 			}
 			final SipContext sipContext = sipApplicationSession.getSipContext();
-			final SipApplicationSessionTimerTask expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(sipApplicationSession);
-//			sipContext.getSipApplicationSessionTimerService().cancel(expirationTimerTask);
+			final SipApplicationSessionTimerTask expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(sipApplicationSession);			
 			sipApplicationSession.setExpirationTimerTask(expirationTimerTask);					
-			expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sleep, TimeUnit.MILLISECONDS);
+			sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sleep, TimeUnit.MILLISECONDS);
 		} else {
 			tryToExpire();
 		}
@@ -111,13 +108,5 @@ public class DefaultSasTimerTask implements SipApplicationSessionTimerTask {
 	 */
 	public MobicentsSipApplicationSession getSipApplicationSession() {
 		return sipApplicationSession;
-	}
-
-	public void setScheduledFuture(ScheduledFuture<MobicentsSipApplicationSession> schedule) {
-		expirationTimerFuture = schedule;
-	}						
-	
-	public ScheduledFuture<MobicentsSipApplicationSession> getScheduledFuture() {
-		return expirationTimerFuture;
 	}
 } 

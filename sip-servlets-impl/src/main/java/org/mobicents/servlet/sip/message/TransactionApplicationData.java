@@ -25,7 +25,7 @@ import javax.servlet.sip.Address;
 import javax.sip.Transaction;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 
 /**
@@ -39,6 +39,7 @@ public class TransactionApplicationData implements Serializable {
 	private static final Logger logger = Logger.getLogger(TransactionApplicationData.class);
 	private transient ProxyBranchImpl proxyBranch;	
 	private SipServletMessageImpl sipServletMessage;
+	private SipSessionKey sipSessionKey;
 	private transient Set<SipServletResponseImpl> sipServletResponses;
 	private transient Transaction transaction;
 	private transient String initialRemoteHostAddress;
@@ -54,8 +55,7 @@ public class TransactionApplicationData implements Serializable {
 	
 	public TransactionApplicationData(SipServletMessageImpl sipServletMessage ) {		
 		this.sipServletMessage = sipServletMessage;
-		sipServletResponses = null;
-		rseqNumber = new AtomicInteger(1);
+		sipServletResponses = null;		
 	}
 	
 	public void setProxyBranch(ProxyBranchImpl proxyBranch) {
@@ -148,6 +148,9 @@ public class TransactionApplicationData implements Serializable {
 	 * @return the rseqNumber
 	 */
 	public AtomicInteger getRseqNumber() {
+		if(rseqNumber == null) {
+			rseqNumber = new AtomicInteger(1);
+		}
 		return rseqNumber;
 	}
 	/**
@@ -199,18 +202,36 @@ public class TransactionApplicationData implements Serializable {
 		return modifier;
 	}
 	
-	public void cleanUp() {
+	public void cleanUp(boolean cleanUpSipServletMessage) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("cleaning up the application data");
 		}
 		initialPoppedRoute = null;
 		proxyBranch = null;
 		// cannot nullify because of noAckReceived needs it
-//		sipServletMessage = null;
+		if(cleanUpSipServletMessage && sipServletMessage != null) {
+			sipServletMessage.cleanUp();
+			if(sipServletMessage instanceof SipServletRequestImpl) {
+				((SipServletRequestImpl)sipServletMessage).cleanUpLastResponses();
+			}
+			sipSessionKey = sipServletMessage.getSipSessionKey();
+			sipServletMessage = null;
+		}
 		if(sipServletResponses != null) {
 			sipServletResponses.clear();
 			sipServletResponses = null;
 		}
 		transaction = null;
+		rseqNumber = null;
 	}
+
+	/**
+	 * @return the sipSessionKey
+	 */
+	public SipSessionKey getSipSessionKey() {
+		if(sipServletMessage != null) {
+			return sipServletMessage.getSipSessionKey();
+		}
+		return sipSessionKey;
+	}	
 }

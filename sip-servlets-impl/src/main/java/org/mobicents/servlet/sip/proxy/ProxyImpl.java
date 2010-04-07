@@ -24,6 +24,7 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -33,6 +34,7 @@ import java.util.Map;
 
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
+import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
@@ -49,6 +51,7 @@ import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -108,7 +111,14 @@ public class ProxyImpl implements Proxy, Externalizable {
 		this.sipFactoryImpl = sipFactoryImpl;
 		this.proxyBranches = new LinkedHashMap<URI, ProxyBranchImpl> ();		
 		this.proxyTimeout = 180; // 180 secs default
-		this.outboundInterface = ((MobicentsSipSession)request.getSession()).getOutboundInterface();
+		String outboundInterfaceStringified = ((MobicentsSipSession)request.getSession()).getOutboundInterface();
+		if(outboundInterfaceStringified != null) {
+			try {
+				outboundInterface = (SipURI) sipFactoryImpl.createURI(outboundInterfaceStringified);
+			} catch (ServletParseException e) {
+				throw new IllegalArgumentException("couldn't parse the outbound interface " + outboundInterface, e);
+			}
+		}
 		this.callerFromHeader = request.getFrom().toString();
 		this.previousNode = extractPreviousNodeFromRequest(request);
 		String txid = ((ViaHeader) request.getMessage().getHeader(ViaHeader.NAME)).getBranch();

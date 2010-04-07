@@ -106,13 +106,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	private static final String LINE_RETURN_DELIM = "\n";
 //	private static final String HCOLON = " : ";
 	
-	protected final Message message;
-	protected final SipFactoryImpl sipFactoryImpl;
+	protected Message message;
+	protected SipFactoryImpl sipFactoryImpl;
 	protected SipSessionKey sessionKey;
 	//lazy loaded and not serialized to avoid unecessary replication
 	protected transient MobicentsSipSession sipSession;
 
-	protected final Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
+	protected Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
 	private Transaction transaction;
 	protected TransactionApplicationData transactionApplicationData;		
 
@@ -134,7 +134,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	
 	protected boolean isMessageSent;
 	
-	protected final Dialog dialog;
+	protected Dialog dialog;
 	
 	protected transient String method;
 	
@@ -1671,5 +1671,28 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		}
 	}
 	
-	public abstract void cleanUp();
+	public void cleanUp() {
+		if(attributes != null) {
+			attributes.clear();
+			attributes = null;
+		}
+		currentApplicationName = null;
+		dialog = null;
+		headerForm= null;
+		message= null;
+		
+		remoteAddr = null;
+//		sessionKey = null;
+//		sipFactoryImpl = null;		
+		sipSession = null;
+		method = null;
+		
+//		if(transactionApplicationData != null) {
+//			transactionApplicationData.cleanUp(false);
+			transactionApplicationData = null;
+//		}
+		transaction = null;
+		transport= null;
+		userPrincipal= null;
+	}
 }

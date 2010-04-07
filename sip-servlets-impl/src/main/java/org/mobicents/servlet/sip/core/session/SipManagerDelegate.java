@@ -330,7 +330,7 @@ public abstract class SipManagerDelegate {
 		sipSessionImpl.setStateInfo(parentSipSession.getStateInfo());
 		sipSessionImpl.setProxy(parentSipSession.getProxy());
 		if(parentSipSession.getSipSubscriberURI() != null) {
-			sipSessionImpl.setSipSubscriberURI(parentSipSession.getSipSubscriberURI().clone());
+			sipSessionImpl.setSipSubscriberURI(parentSipSession.getSipSubscriberURI());
 		}
 		sipSessionImpl.setUserPrincipal(parentSipSession.getUserPrincipal());
 		sipSessionImpl.setParentSession(parentSipSession);

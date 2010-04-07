@@ -697,7 +697,10 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	}
 	
 	@Override
-	public void cleanUp() {
-		
+	public void cleanUp() {		
+		super.cleanUp();
+		originalRequest = null;
+		proxyBranch = null;		
+		response =null;
 	}
 }

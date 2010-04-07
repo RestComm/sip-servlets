@@ -396,7 +396,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		sipSessionImpl.setStateInfo(applicationRouterInfo.getStateInfo());
 		sipSessionImpl.setRoutingRegion(applicationRouterInfo.getRoutingRegion());
 		sipServletRequest.setRoutingRegion(applicationRouterInfo.getRoutingRegion());		
-		sipSessionImpl.setSipSubscriberURI(sipServletRequest.getSubscriberURI());
+		sipSessionImpl.setSipSubscriberURI(sipServletRequest.getSubscriberURI().toString());
 		sipSessionImpl.setCseq(((CSeqHeader)request.getHeader(CSeqHeader.NAME)).getSeqNumber());
 		final InitialDispatchTask dispatchTask = new InitialDispatchTask(sipServletRequest, sipProvider);
 		// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that
@@ -662,7 +662,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			
 			sipContext.enterSipAppHa(true);
 			try {
-				sipSessionImpl.setSessionCreatingTransactionRequest(sipServletRequest);								
+				sipSessionImpl.setSessionCreatingTransactionRequest(sipServletRequest);
 				
 				String sipSessionHandlerName = sipSessionImpl.getHandler();
 				if(logger.isDebugEnabled()) {

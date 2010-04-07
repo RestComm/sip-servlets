@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.core;
 
 import gov.nist.javax.sip.DialogTimeoutEvent;
 import gov.nist.javax.sip.DialogTimeoutEvent.Reason;
+import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -42,7 +43,6 @@ import javax.imageio.spi.ServiceRegistry;
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
-import javax.servlet.sip.B2buaHelper;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipServletRequest;
@@ -762,18 +762,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		TransactionApplicationData dialogAppData = (TransactionApplicationData) dialog.getApplicationData();
 		TransactionApplicationData txAppData = null; 
 		if(dialogAppData != null) {						
-			if(dialogAppData.getSipServletMessage() == null) {
+			if(dialogAppData.getSipSessionKey() == null) {
 				Transaction transaction = dialogAppData.getTransaction();
 				if(transaction != null && transaction.getApplicationData() != null) {
 					txAppData = (TransactionApplicationData) transaction.getApplicationData();
-					txAppData.cleanUp();
+					txAppData.cleanUp(true);
 				}
 			} else {
-				SipServletMessageImpl sipServletMessageImpl = dialogAppData.getSipServletMessage();
-				SipSessionKey sipSessionKey = sipServletMessageImpl.getSipSessionKey();
+				SipSessionKey sipSessionKey = dialogAppData.getSipSessionKey();
 				tryToInvalidateSession(sipSessionKey, false);				
 			}
-			dialogAppData.cleanUp();
+			dialogAppData.cleanUp(true);
 //			dialog.setApplicationData(null);
 		}		
 		if(!appDataFound && logger.isDebugEnabled()) {
@@ -880,7 +879,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					dialog.delete();
 					tryToInvalidateSession(sipSessionKey, false);
 				}
-				tad.cleanUp();					
+				tad.cleanUp(true);					
 			}
 		}
 		dialog.setApplicationData(null);
@@ -930,9 +929,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 			// don't clean up for the same reason we don't invalidate the sip session right above
 			if(appNotifiedOfPrackNotReceived) {
-				tad.cleanUp();
-				transaction.setApplicationData(null);
+				tad.cleanUp(false);				
+			} else {
+				tad.cleanUp(true);
 			}
+			transaction.setApplicationData(null);
 		}		
 	}
 	
@@ -1037,39 +1038,46 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}		
 		
 		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
-		if(tad != null && tad.getSipServletMessage() != null) {
-			SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
-			SipSessionKey sipSessionKey = sipServletMessageImpl.getSipSessionKey();
-			MobicentsSipSession sipSession = sipServletMessageImpl.getSipSession();
-			B2buaHelperImpl b2buaHelperImpl = null;
-			if(sipSession != null) {
-				b2buaHelperImpl = sipSession.getB2buaHelper();
-			}
-			if(sipSessionKey == null) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("no sip session were returned for this key " + sipServletMessageImpl.getSipSessionKey() + " and message " + sipServletMessageImpl);
+		if(tad != null && tad.getSipSessionKey() != null) {
+			SipContext sipContext = findSipApplication(tad.getSipSessionKey().getApplicationName());
+			if(sipContext != null) {
+				MobicentsSipSession sipSession = sipContext.getSipManager().getSipSession(tad.getSipSessionKey(), false, sipFactoryImpl, null);			
+				B2buaHelperImpl b2buaHelperImpl = null;
+				if(sipSession != null) {
+					b2buaHelperImpl = sipSession.getB2buaHelper();
 				}
-			} else {
-				// If it is a client transaction, do not kill the proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
-				tryToInvalidateSession(sipSessionKey, transactionTerminatedEvent.isServerTransaction());				
-//				sipSessionImpl.removeOngoingTransaction(transaction);
-			}			
-			
-			// Issue 1333 : B2buaHelper.getPendingMessages(linkedSession, UAMode.UAC) returns empty list
-			// don't remove the transaction on terminated state for INVITE Tx because it won't be possible
-			// to create the ACK on second leg for B2BUA apps
-			if(sipSession != null && 
-					(b2buaHelperImpl == null && transaction instanceof ClientTransaction && !Request.INVITE.equals(sipServletMessageImpl.getMethod()))) {
-				sipSession.removeOngoingTransaction(transaction);
-				tad.cleanUp();
-				transaction.setApplicationData(null);
-			}			
+				
+					// If it is a client transaction, do not kill the proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
+					tryToInvalidateSession(tad.getSipSessionKey(), transactionTerminatedEvent.isServerTransaction());				
+	//				sipSessionImpl.removeOngoingTransaction(transaction);
+							
+				
+				// Issue 1333 : B2buaHelper.getPendingMessages(linkedSession, UAMode.UAC) returns empty list
+				// don't remove the transaction on terminated state for INVITE Tx because it won't be possible
+				// to create the ACK on second leg for B2BUA apps
+				boolean cleanUp = true;
+				if(sipSession != null && 
+						(b2buaHelperImpl != null && transaction instanceof ClientTransaction && Request.INVITE.equals(((SIPTransaction)transaction).getMethod()))) {
+					cleanUp = false;				
+				}
+				if(cleanUp) {
+					if(Request.INVITE.equals(((SIPTransaction)transaction).getMethod()) && sipSession != null && !sipSession.isAckReceived()) {
+						tad.cleanUp(false);
+					} else {
+						tad.cleanUp(true);					
+						transaction.setApplicationData(null);
+					}		
+					if(sipSession!= null) {
+						sipSession.removeOngoingTransaction(transaction);
+					}
+				}
+			}
 		} else {
 			if(logger.isDebugEnabled()) {
 				logger.debug("TransactionApplicationData not available on the following request " + transaction.getRequest().toString());
 			}
 			if(tad != null) {
-				tad.cleanUp();
+				tad.cleanUp(true);
 			}
 			transaction.setApplicationData(null);
 		}		

@@ -128,15 +128,15 @@ public interface MobicentsSipSession extends SipSession {
 
 	void onReadyToInvalidate();
 	
-	SipURI getOutboundInterface();
+	String getOutboundInterface();
 
 	Iterator<MobicentsSipSession> getDerivedSipSessions();
 
 	void setState(State state);	
 
-	void setSipSubscriberURI(URI subscriberURI);
+	void setSipSubscriberURI(String subscriberURI);
 
-	URI getSipSubscriberURI();
+	String getSipSubscriberURI();
 	
 	void setParentSession(MobicentsSipSession mobicentsSipSession);
 

@@ -34,7 +34,6 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
-import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerFactory;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -169,6 +168,4 @@ public interface SipContext extends Context {
 
 	void setSipRubyController(SipRubyController rubyController);
 	SipRubyController getSipRubyController();
-	
-	SipApplicationSessionTimerFactory getSipApplicationSessionTimerFactory();
 }

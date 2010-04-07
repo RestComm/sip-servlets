@@ -304,11 +304,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					// don't set the contact header in those case
 					setContactHeader = false;					
 				} 				
-				if(setContactHeader) {
-					SipURI outboundInterface = null;
+				if(setContactHeader) {	
+					String outboundInterface = null;
 					if(session != null) {
 						outboundInterface = session.getOutboundInterface();
-					}
+					}		
 				    // Add the contact header for the dialog.					    
 				    final ContactHeader contactHeader = JainSipUtils.createContactHeader(
 				    		super.sipFactoryImpl.getSipNetworkInterfaceManager(), request, null, outboundInterface);
@@ -373,7 +373,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				session.setSessionCreatingDialog(dialog);
 				dialog.setApplicationData( this.transactionApplicationData);				
 			}			
-			if(JainSipUtils.DIALOG_CREATING_METHODS.contains(request.getMethod())) {
+			if(JainSipUtils.DIALOG_CREATING_METHODS.contains(method)) {
 				this.createDialog = true; // flag that we want to create a dialog for outgoing request.
 			}
 			session.setB2buaHelper(b2buaHelper);
@@ -925,7 +925,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				final Transaction transaction = getTransaction();
 				final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
 				session.removeOngoingTransaction(transaction);
-				tad.cleanUp();
+				tad.cleanUp(true);
 				transaction.setApplicationData(null);
 				return;
 			}
@@ -984,7 +984,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					if(fromUri instanceof javax.sip.address.SipURI) {
 						fromName = ((javax.sip.address.SipURI)fromUri).getUser();
 					}
-					// Create the contact name address.
+					// Create the contact name address.						
 					contactHeader = 
 						JainSipUtils.createContactHeader(sipNetworkInterfaceManager, request, fromName, session.getOutboundInterface());										
 					request.addHeader(contactHeader);
@@ -1615,15 +1615,15 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	}
 	
 	public void cleanUp() {
-		if(transactionApplicationData != null) {
-			transactionApplicationData.cleanUp();
-			transactionApplicationData = null;
-		}
-		setTransaction(null);
+		super.cleanUp();
+		poppedRoute =null;
+		poppedRouteHeader = null;
+		routingDirective =null;
+		routingRegion = null;
+		routingState = null;
+		subscriberURI = null;
 //		lastFinalResponse = null;
-//		lastInformationalResponse = null;
-		// cannot dereference since com.bea.sipservlet.tck.agents.api.javax_servlet_sip.B2buaHelperTest.testCreateResponseToOriginalRequest102 needs it
-//		sipSession = null;
+//		lastInformationalResponse = null;		
 		linkedRequest = null;		
 	}
 	

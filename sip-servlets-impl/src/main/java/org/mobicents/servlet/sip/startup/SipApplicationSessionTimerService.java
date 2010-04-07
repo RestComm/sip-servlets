@@ -21,10 +21,9 @@
  */
 package org.mobicents.servlet.sip.startup;
 
-import java.util.List;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
 
 /**
@@ -33,16 +32,16 @@ import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
  */
 public interface SipApplicationSessionTimerService {
 
-	ScheduledFuture<?> schedule(
+	SipApplicationSessionTimerTask createSipApplicationSessionTimerTask(MobicentsSipApplicationSession sipApplicationSession);
+	
+	SipApplicationSessionTimerTask schedule(
 			SipApplicationSessionTimerTask expirationTimerTask, long delay,
 			TimeUnit unit);
 
-	boolean remove(SipApplicationSessionTimerTask expirationTimerTask);
+	boolean cancel(SipApplicationSessionTimerTask expirationTimerTask);
 
-	void purge();
+	void stop();
 
-	List<Runnable> shutdownNow();
-
-	void init();
+	void start();
 
 }

@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -92,7 +91,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	protected transient SipApplicationSessionTimerTask expirationTimerTask;
 	
-	protected transient ScheduledFuture<MobicentsSipApplicationSession> expirationTimerFuture;
+//	protected transient ScheduledFuture<MobicentsSipApplicationSession> expirationTimerFuture;
 	
 	protected transient ConcurrentHashMap<String, ServletTimer> servletTimers;
 	
@@ -144,8 +143,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			final int sipContextTimeout = sipContext.getSipApplicationSessionTimeout();
 			if(sipContextTimeout > 0) {				
 				sipApplicationSessionTimeout = sipContextTimeout * 60 * 1000L;				
-				expirationTimerTask = sipContext.getSipApplicationSessionTimerFactory().createSipApplicationSessionTimerTask(this);				
-				expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sipApplicationSessionTimeout, TimeUnit.MILLISECONDS);
+				expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(this);				
+				sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sipApplicationSessionTimeout, TimeUnit.MILLISECONDS);
+//				expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sipApplicationSessionTimeout, TimeUnit.MILLISECONDS);
 			} else {
 				if(logger.isDebugEnabled()) {
 					logger.debug("The sip application session "+ key +" will never expire ");
@@ -176,6 +176,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			}
 			for (SipApplicationSessionListener sipApplicationSessionListener : listeners) {
 				try {
+					if(logger.isDebugEnabled()) {
+						logger.debug("notifying sip application session listener " + sipApplicationSessionListener.getClass().getName() + " of context " + 
+								key.getApplicationName() + " of following event " + sipApplicationSessionEventType);
+					}
 					if(SipApplicationSessionEventType.CREATION.equals(sipApplicationSessionEventType)) {
 						sipApplicationSessionListener.sessionCreated(event);
 					} else if (SipApplicationSessionEventType.DELETION.equals(sipApplicationSessionEventType)) {
@@ -504,7 +508,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 */
 	public void addServletTimer(ServletTimer servletTimer){
 		if(servletTimers == null) {
-			servletTimers = new ConcurrentHashMap<String, ServletTimer>();
+			servletTimers = new ConcurrentHashMap<String, ServletTimer>(1);
 		}
 		servletTimers.putIfAbsent(servletTimer.getId(), servletTimer);
 	}
@@ -604,7 +608,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		sipContext.getSipManager().removeSipApplicationSession(key);
 		sipContext.getSipSessionsUtil().removeCorrespondingSipApplicationSession(key);
 		expirationTimerTask = null;
-		expirationTimerFuture = null;
+//		expirationTimerFuture = null;
 		if(httpSessions != null) {
 			httpSessions.clear();
 		}
@@ -637,35 +641,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		facade = null;
 	}
 
-    // Counts the number of cancelled tasks
-    private static int numCancelled = 0;
-
 	private void cancelExpirationTimer() {
-		//CANCEL needs to remove the shceduled timer see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6602600
-		//to improve perf
-//		expirationTimerTask.cancel();
-		boolean removed = sipContext.getSipApplicationSessionTimerService().remove(expirationTimerTask);
-		if(logger.isDebugEnabled()) {
-			logger.debug("expiration timer on sip application session " + key + " removed : " + removed);
-		}		
-		if(expirationTimerFuture != null) {
-			boolean cancelled = expirationTimerFuture.cancel(true);
-			if(logger.isDebugEnabled()) {
-				logger.debug("expiration timer on sip application session " + key + " Cancelled : " + cancelled);
-			}
-		} else {
-			if(logger.isDebugEnabled()) {
-				logger.debug("expiration timer future is null, thus cannot be Cancelled");
-			}
-		}
-
-        // Purge is expensive when called frequently, only call it every now and then.
-        // We do not sync the numCancelled variable. We dont care about correctness of
-        // the number, and we will still call purge rought once on every 25 cancels.
-        numCancelled++;
-        if(numCancelled % 25 == 0) {
-            sipContext.getSipApplicationSessionTimerService().purge();
-        }
+		sipContext.getSipApplicationSessionTimerService().cancel(expirationTimerTask);		
 	}
 
 	/*
@@ -866,10 +843,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				}
 				cancelExpirationTimer();
 				expirationTimerTask = null;
-				expirationTimerFuture = null;
+//				expirationTimerFuture = null;
 			}
-			expirationTimerTask = sipContext.getSipApplicationSessionTimerFactory().createSipApplicationSessionTimerTask(this);
-			expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, deltaMilliseconds, TimeUnit.MILLISECONDS);
+			expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(this);
+			sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, deltaMilliseconds, TimeUnit.MILLISECONDS);
 
 			return deltaMinutes;
 		}				
@@ -1175,10 +1152,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		return getId();
 	}
 
-	public void setExpirationTimerFuture(
-			ScheduledFuture<MobicentsSipApplicationSession> schedule) {
-		expirationTimerFuture = schedule;
-	}
+//	public void setExpirationTimerFuture(
+//			ScheduledFuture<MobicentsSipApplicationSession> schedule) {
+//		expirationTimerFuture = schedule;
+//	}
 
 	public void setExpirationTimerTask(
 			SipApplicationSessionTimerTask expirationTimerTask) {
