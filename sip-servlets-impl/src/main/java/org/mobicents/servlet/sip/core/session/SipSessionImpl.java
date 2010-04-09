@@ -1267,11 +1267,12 @@ public class SipSessionImpl implements MobicentsSipSession {
 			sessionCreatingTransactionRequest = null;
 		}
 		
-		if(sessionCreatingTransactionRequest != null && 
-				sessionCreatingTransactionRequest.getTransaction()!= null && 
-				sessionCreatingTransactionRequest.getTransaction().equals(transaction)) {
-			sessionCreatingTransactionRequest.cleanUp();
-		}
+		// don't cleanup since the TCK SipApplicationSessionListenerTest.testSessionExpired001
+//		if(sessionCreatingTransactionRequest != null && 
+//				sessionCreatingTransactionRequest.getTransaction()!= null && 
+//				sessionCreatingTransactionRequest.getTransaction().equals(transaction)) {
+//			sessionCreatingTransactionRequest.cleanUp();
+//		}
 			
 		
 		if(logger.isDebugEnabled()) {

@@ -72,7 +72,6 @@ import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
-import org.mobicents.servlet.sip.core.timers.DefaultSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.StandardSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;

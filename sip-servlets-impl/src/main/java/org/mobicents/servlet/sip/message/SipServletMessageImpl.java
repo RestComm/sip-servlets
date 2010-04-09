@@ -1672,6 +1672,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	}
 	
 	public void cleanUp() {
+		if(logger.isDebugEnabled()) {
+			logger.debug("cleaning up the message " + message);
+		}
 		if(attributes != null) {
 			attributes.clear();
 			attributes = null;

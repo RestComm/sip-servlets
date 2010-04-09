@@ -106,16 +106,11 @@ public interface MobicentsSipSession extends SipSession {
 	 * @return
 	 */
 	ProxyImpl getProxy();
-
-	/**
-	 * Set the proxy of the sip session
-	 * @param proxy
-	 */
 	void setProxy(ProxyImpl proxy);
 	
 	public void setB2buaHelper(B2buaHelperImpl helperImpl);
-	
 	public B2buaHelperImpl getB2buaHelper();	
+
 	void access();
 
 	void updateStateOnResponse(SipServletResponseImpl sipServletResponseImpl,

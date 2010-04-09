@@ -237,6 +237,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			}
 			session.setB2buaHelper(this);
 			originalSession.setB2buaHelper(this);
+			session.setSessionCreatingTransactionRequest(newSipServletRequest);
 			
 			return newSipServletRequest;
 		} catch (ParseException ex) {
@@ -587,9 +588,10 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		unlinkSipSessionsInternal(session, true);
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.sip.B2buaHelper#unlinkSipSessions(javax.servlet.sip.SipSession)
+	/**
+	 * 
+	 * @param session
+	 * @param checkSession
 	 */
 	public void unlinkSipSessionsInternal(SipSession session, boolean checkSession) {		
 		if ( session == null) { 
@@ -609,8 +611,17 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			this.sessionMap.remove(value);
 		}
 		this.sessionMap.remove(sipSessionKey);
-		this.originalRequestMap.remove(sipSessionKey);
+		unlinkOriginalRequestInternal(sipSessionKey);
 		dumpLinkedSessions();
+	}
+	
+	/**
+	 * 
+	 * @param session
+	 * @param checkSession
+	 */
+	public void unlinkOriginalRequestInternal(SipSessionKey sipSessionKey) {
+		this.originalRequestMap.remove(sipSessionKey);
 	}
 	
 	/**

@@ -925,8 +925,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				final Transaction transaction = getTransaction();
 				final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
 				session.removeOngoingTransaction(transaction);
-				tad.cleanUp(true);
+				tad.cleanUp();
 				transaction.setApplicationData(null);
+				final B2buaHelperImpl b2buaHelperImpl = sipSession.getB2buaHelper();
+				if(b2buaHelperImpl != null) {
+					// we unlink the originalRequest early to avoid keeping the messages in mem for too long
+					b2buaHelperImpl.unlinkOriginalRequestInternal(session.getKey());
+				}
 				return;
 			}
 			//Added for initial requests only (that are not REGISTER) not for subsequent requests 

@@ -202,21 +202,21 @@ public class TransactionApplicationData implements Serializable {
 		return modifier;
 	}
 	
-	public void cleanUp(boolean cleanUpSipServletMessage) {
+	public void cleanUp() {
 		if(logger.isDebugEnabled()) {
 			logger.debug("cleaning up the application data");
 		}
 		initialPoppedRoute = null;
 		proxyBranch = null;
-		// cannot nullify because of noAckReceived needs it
-		if(cleanUpSipServletMessage && sipServletMessage != null) {
-			sipServletMessage.cleanUp();
-			if(sipServletMessage instanceof SipServletRequestImpl) {
-				((SipServletRequestImpl)sipServletMessage).cleanUpLastResponses();
-			}
-			sipSessionKey = sipServletMessage.getSipSessionKey();
-			sipServletMessage = null;
-		}
+		// cannot nullify because of noAckReceived needs it and TCK SipApplicationSessionListenerTest
+//		if(cleanUpSipServletMessage && sipServletMessage != null) {
+//			sipServletMessage.cleanUp();
+//			if(sipServletMessage instanceof SipServletRequestImpl) {
+//				((SipServletRequestImpl)sipServletMessage).cleanUpLastResponses();
+//			}
+//			sipSessionKey = sipServletMessage.getSipSessionKey();
+//			sipServletMessage = null;
+//		}
 		if(sipServletResponses != null) {
 			sipServletResponses.clear();
 			sipServletResponses = null;
