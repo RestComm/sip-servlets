@@ -63,7 +63,7 @@ input.login {
 
 .content {
 	margin: 0 auto;
-	width: 780px;
+	width: 1024px;
 	background-color: #FFFFFF;
 
 }
@@ -210,7 +210,7 @@ input.login {
 
 .left {
 	float: left;
-	width: 63%;
+	width: 78%;
 	margin: 0 0 10px 0;
 }
 
@@ -285,7 +285,7 @@ input.login {
 		
 .right {
 	float: right;	
-	width: 35%;
+	width: 20%;
 	background-image:url(bkg_home_2ndcol.gif);
 	background-repeat:repeat-y;	
 }
