@@ -27,7 +27,7 @@ h1 a, h2 a { text-decoration: none; }
 h1 a:hover, h2 a:hover { color: #FF6600; background: inherit; }
 h2 { margin: 10px 0 5px 0; padding: 0; font: bold 1.2em Arial, Sans-Serif; letter-spacing: -1px; }
 h2 { font-size: 1.2em; margin-bottom: 5px; color: #000; background: inherit; }
-img { border: 0; }
+img { border: 0; position: relative; z-index: +1;}
 p {	margin: 0 0 5px 0; }
 
 form { 	margin: 0; }
@@ -234,6 +234,7 @@ input.login {
 	background-image:url(H3_hdrbkg2.gif);
 	background-repeat:repeat-x;
 }
+
 #h3_3 {
 	clear: both;
 	color: #3B4E65;
@@ -283,7 +284,7 @@ input.login {
 /* ------------------- Right side content layout ---------------------- */
 		
 .right {
-	float: right;
+	float: right;	
 	width: 35%;
 	background-image:url(bkg_home_2ndcol.gif);
 	background-repeat:repeat-y;	
@@ -296,11 +297,10 @@ input.login {
 	color: #FFF;
 	padding: 7px 0 7px 5px;
 	font: bold 1 em Tahoma, Arial, Sans-Serif;
-	margin: 0 0 3px 0;
+	margin: 0 0 3px 0;	
 }
 
-.right_articles {
-	
+.right_articles {	
 	padding: 10px;	
 	margin: 0 0 3px 0;
 }
@@ -308,6 +308,8 @@ input.login {
 .image {
 	float: left;
 	margin: 0 9px 5px 0;
+	position: relative;
+	z-index: +1;
 }
 
 .sponsors {
@@ -422,10 +424,12 @@ input.login {
 }
 
 .source {
-  padding: 12px;
-  margin: 1em 7px 1em 7px;
+/*  padding: 12px;
+  margin: 1em 7px 1em 7px;*/
 }
 .source pre {
-  margin: 0px;
-  padding: 0px;
+  /*margin: 0px;
+  padding: 0px;*/
+  position: relative;
+  z-index: +1;
 }

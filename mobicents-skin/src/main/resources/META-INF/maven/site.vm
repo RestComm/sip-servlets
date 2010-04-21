@@ -111,9 +111,9 @@
       #if ( ! ( $item.img.toLowerCase().startsWith("http") || $item.img.toLowerCase().startsWith("https") ) )
         #set ( $src = $PathTool.calculateLink( $item.img, $relativePath ) )
         #set ( $src = $src.replaceAll( "\\", "/" ) )
-        <img src="$src"/>
+        <img  src="$src"/>
       #else
-        <img src="$item.img" align="absbottom" style="border-width: 0"/>
+        <img  src="$item.img" align="absbottom" style="border-width: 0"/>
       #end
     #end
     #if ( $alignedFileName == $currentItemHref )
@@ -347,7 +347,7 @@ Search
 </div>
 
 <div id="logo">
-<h1><a href="http://www.mobicents.org-a.googlepages.com/"
+<h1><a href="http://www.mobicents.org/"
 	title="Mobicents">Mobicents</a></h1>
 </div>
 </div>
@@ -356,14 +356,14 @@ Search
 <ul>
 	<li class="browse_category">Select Category:</li>
 
-	<li><a href="index.html" accesskey="h">Home</a></li>
-	<li class="active"><a href="products.html" accesskey="p">Products</a></li>
-	<li><a href="services.html" accesskey="s">Services</a></li>
+	<li><a href="http://www.mobicents.org/index.html" accesskey="h">Home</a></li>
+	<li class="active"><a href="http://www.mobicents.org/products.html" accesskey="p">Products</a></li>
+	<li><a href="http://www.mobicents.org/services.html" accesskey="s">Services</a></li>
 
-	<li><a href="community.html" accesskey="c">Community</a></li>
-	<li><a href="faq.html" accesskey="c">FAQ</a></li>
+	<li><a href="http://www.mobicents.org/community.html" accesskey="c">Community</a></li>
+	<li><a href="http://www.mobicents.org/faq.html" accesskey="c">FAQ</a></li>
 
-	<li><a href="about.html" accesskey="a">About Us</a></li>
+	<li><a href="http://www.mobicents.org/about.html" accesskey="a">About Us</a></li>
 
 </ul>
 </div>
@@ -386,7 +386,7 @@ $bodyContent
   </div>
   <div id="footer">
     <div>
-      <div align="center"><a href="http://www.redhat.com/"><img src="logo_rh_home.png" alt=" Red Hat" border="0" height="31" width="96" /></a><br />
+      <div align="center"><a href="http://www.redhat.com/"><img  src="logo_rh_home.png" alt=" Red Hat" border="0" height="31" width="96" /></a><br />
       </div>
     </div>
     <div align="center">&copy; 2008 Red Hat Middleware, LLC. All rights reserved. <a href="http://www.jboss.com/privacy_policy">Privacy Policy</a></div> </div>
