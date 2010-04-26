@@ -1,0 +1,105 @@
+package org.mobicents.servlet.sip.conference.server.media;
+
+import java.net.URI;
+
+import javax.media.mscontrol.MediaSession;
+import javax.media.mscontrol.MsControlException;
+import javax.media.mscontrol.join.Joinable.Direction;
+import javax.media.mscontrol.mediagroup.MediaGroup;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mobicents.servlet.sip.conference.server.MsControlObjects;
+
+public class AnnouncementConferenceParticipant extends ConferenceParticipant {
+	private static Log logger = LogFactory.getLog(AnnouncementConferenceParticipant.class);
+	private String url;
+	private MediaGroup mg;
+	private MediaSession session;
+	
+	public AnnouncementConferenceParticipant(String name, String url) {
+		try {
+			this.name = name;
+			this.url = url;
+			this.session = MsControlObjects.msControlFactory.createMediaSession();
+			this.mg = this.session.createMediaGroup(MediaGroup.PLAYER);
+		} catch (MsControlException e) {
+			logger.error(e);
+		}
+		
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.conference.ConferenceLeg#getEndpoint()
+	 */
+	public MediaGroup getMediaGroup() {
+		return mg;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.conference.ConferenceLeg#getSession()
+	 */
+	public MediaSession getSession() {
+		return session;
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.conference.ConferenceLeg#join(org.mobicents.servlet.sip.conference.Conference)
+	 */
+	@SuppressWarnings("serial")
+	public void join(final Conference conference) {
+		join(conference, Direction.DUPLEX);
+		try {
+			Thread.sleep(800);
+			mg.getPlayer().play(URI.create(url), null, null);
+		} catch (Exception e) {
+			logger.error(e);
+		}
+	}
+	
+	private void join(final Conference conference, Direction direction) {
+		//provider.addNotificationListener(this);
+		try {
+			mg.joinInitiate(direction, conference.getMixer(), null);
+		} catch (MsControlException e) {
+			logger.error(e);
+		}
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.conference.ConferenceLeg#leave(org.mobicents.servlet.sip.conference.Conference)
+	 */
+	public void leave(Conference conference) {
+		try {
+			mg.release();
+		} catch (Exception e) {
+			logger.error(e);
+		}
+	}
+
+	@Override
+	public void kick(Conference conference) {
+		leave(conference);
+		
+	}
+
+	@Override
+	public void mute(Conference conference) {
+		try {
+			mg.joinInitiate(Direction.RECV, conference.getMixer(), null);
+		} catch (MsControlException e) {
+			logger.error(e);
+		}
+		muted = true;
+	}
+
+	@Override
+	public void unmute(Conference conference) {
+		try {
+			mg.joinInitiate(Direction.DUPLEX, conference.getMixer(), null);
+		} catch (MsControlException e) {
+			logger.error(e);
+		}
+		muted = false;
+	}
+}
