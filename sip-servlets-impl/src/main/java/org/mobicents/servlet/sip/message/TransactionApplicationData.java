@@ -39,7 +39,7 @@ public class TransactionApplicationData implements Serializable {
 	private static final Logger logger = Logger.getLogger(TransactionApplicationData.class);
 	private transient ProxyBranchImpl proxyBranch;	
 	private SipServletMessageImpl sipServletMessage;
-	private SipSessionKey sipSessionKey;
+//	private SipSessionKey sipSessionKey;
 	private transient Set<SipServletResponseImpl> sipServletResponses;
 	private transient Transaction transaction;
 	private transient String initialRemoteHostAddress;
@@ -225,13 +225,13 @@ public class TransactionApplicationData implements Serializable {
 		rseqNumber = null;
 	}
 
-	/**
-	 * @return the sipSessionKey
-	 */
-	public SipSessionKey getSipSessionKey() {
-		if(sipServletMessage != null) {
-			return sipServletMessage.getSipSessionKey();
-		}
-		return sipSessionKey;
-	}	
+//	/**
+//	 * @return the sipSessionKey
+//	 */
+//	public SipSessionKey getSipSessionKey() {
+//		if(sipServletMessage != null) {
+//			return sipServletMessage.getSipSessionKey();
+//		}
+//		return sipSessionKey;
+//	}	
 }

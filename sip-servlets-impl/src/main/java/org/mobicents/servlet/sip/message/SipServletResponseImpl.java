@@ -17,6 +17,8 @@
 package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.DialogExt;
+import gov.nist.javax.sip.stack.SIPClientTransaction;
+import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -168,7 +170,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 */
 	@SuppressWarnings("unchecked")
 	public SipServletRequest createAck() {
-		if(!Request.INVITE.equals(getTransaction().getRequest().getMethod()) || (response.getStatusCode() >= 100 && response.getStatusCode() < 200) || isAckGenerated) {
+		if(!Request.INVITE.equals(((SIPTransaction)getTransaction()).getMethod()) || (response.getStatusCode() >= 100 && response.getStatusCode() < 200) || isAckGenerated) {
 			throw new IllegalStateException("the transaction state is such that it doesn't allow an ACK to be sent now, e.g. the original request was not an INVITE, or this response is provisional only, or an ACK has already been generated");
 		}
 		final MobicentsSipSession session = getSipSession();
@@ -639,7 +641,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			}
 		}
 		//the message is an incoming final response received by a servlet acting as a UAC for a Non INVITE transaction
-		if(getTransaction() instanceof ClientTransaction && getStatus() >= 200 && getStatus() <= 999 && !Request.INVITE.equals(getTransaction().getRequest().getMethod())) {
+		if(getTransaction() instanceof ClientTransaction && getStatus() >= 200 && getStatus() <= 999 && !Request.INVITE.equals(((SIPClientTransaction)getTransaction()).getMethod())) {
 			if(this.proxyBranch == null) { // Make sure this is not a proxy. Proxies are allowed to modify headers.
 				return true;
 			} else {
@@ -698,7 +700,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	
 	@Override
 	public void cleanUp() {		
-		super.cleanUp();
+//		super.cleanUp();
 		originalRequest = null;
 		proxyBranch = null;		
 		response =null;

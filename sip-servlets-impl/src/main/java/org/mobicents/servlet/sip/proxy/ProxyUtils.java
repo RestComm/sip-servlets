@@ -20,6 +20,7 @@ import gov.nist.javax.sip.header.HeaderFactoryExt;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.MessageExt;
 import gov.nist.javax.sip.message.SIPMessage;
+import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.util.Iterator;
 
@@ -231,7 +232,7 @@ public class ProxyUtils {
 		final Transaction transaction = sipServetResponse.getTransaction();
 		final int status = response.getStatusCode();
 		// 1. Update timer C for provisional non retransmission responses
-		if(transaction != null && transaction.getRequest().getMethod().equals(Request.INVITE)) {
+		if(transaction != null && ((SIPTransaction)transaction).getMethod().equals(Request.INVITE)) {
 			if(Response.TRYING < status && status < Response.OK) {
 				proxyBranch.updateTimer();
 			} else if(status >= Response.OK) {

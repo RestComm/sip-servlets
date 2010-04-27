@@ -18,7 +18,6 @@ package org.mobicents.servlet.sip.core;
 
 import gov.nist.javax.sip.DialogTimeoutEvent;
 import gov.nist.javax.sip.DialogTimeoutEvent.Reason;
-import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -761,16 +760,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		boolean appDataFound = false;
 		TransactionApplicationData dialogAppData = (TransactionApplicationData) dialog.getApplicationData();
 		TransactionApplicationData txAppData = null; 
-		if(dialogAppData != null) {
-			final SipSessionKey sipSessionKey = dialogAppData.getSipSessionKey();
-			if(sipSessionKey == null) {
+		if(dialogAppData != null) {						
+			if(dialogAppData.getSipServletMessage() == null) {
 				Transaction transaction = dialogAppData.getTransaction();
 				if(transaction != null && transaction.getApplicationData() != null) {
 					txAppData = (TransactionApplicationData) transaction.getApplicationData();
 					txAppData.cleanUp();
 				}
-			} else {				
-				tryToInvalidateSession(sipSessionKey, false);
+			} else {
+				SipServletMessageImpl sipServletMessageImpl = dialogAppData.getSipServletMessage();
+				SipSessionKey sipSessionKey = sipServletMessageImpl.getSipSessionKey();
+				tryToInvalidateSession(sipSessionKey, false);				
 			}
 			dialogAppData.cleanUp();
 //			dialog.setApplicationData(null);
@@ -1033,45 +1033,34 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			logger.info("transaction " + transaction + " terminated => " + transaction.getRequest().toString());
 		}		
 		
-		final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();		
-		if(tad != null) {
-			final SipSessionKey sipSessionKey = tad.getSipSessionKey();
-				if(sipSessionKey != null) {
-				final SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());
-				if(sipContext != null) {							
-					boolean cleanUp = true;
-					final MobicentsSipSession sipSession = sipContext.getSipManager().getSipSession(sipSessionKey, false, sipFactoryImpl, null);
-					if(sipSession != null) {
-						final B2buaHelperImpl b2buaHelperImpl = sipSession.getB2buaHelper();
-						if(b2buaHelperImpl != null) {
-							if(Request.INVITE.equals(((SIPTransaction)transaction).getMethod()) && !sipSession.isAckReceived()) {
-								// Issue 1333 : B2buaHelper.getPendingMessages(linkedSession, UAMode.UAC) returns empty list
-								// don't remove the transaction on terminated state for INVITE Tx because it won't be possible
-								// to create the ACK on second leg for B2BUA apps
-								 if(transaction instanceof ClientTransaction) {
-									 cleanUp = false;
-								 }
-							} else {
-								// we unlink the originalRequest early to avoid keeping the messages in mem for too long
-								b2buaHelperImpl.unlinkOriginalRequestInternal(sipSessionKey);
-							}
-						}
-					}
-					// If it is a client transaction, do not kill the proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
-					tryToInvalidateSession(sipSessionKey, transactionTerminatedEvent.isServerTransaction());				
-					if(cleanUp) {
-						if(Request.INVITE.equals(((SIPTransaction)transaction).getMethod()) && sipSession != null && !sipSession.isAckReceived()) {
-							tad.cleanUp();
-						} else {
-							tad.cleanUp();
-							transaction.setApplicationData(null);
-						}		
-						if(sipSession!= null) {
-							sipSession.removeOngoingTransaction(transaction);
-						}
-					}
-				}
+		TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
+		if(tad != null && tad.getSipServletMessage() != null) {
+			SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
+			SipSessionKey sipSessionKey = sipServletMessageImpl.getSipSessionKey();
+			MobicentsSipSession sipSession = sipServletMessageImpl.getSipSession();
+			B2buaHelperImpl b2buaHelperImpl = null;
+			if(sipSession != null) {
+				b2buaHelperImpl = sipSession.getB2buaHelper();
 			}
+			if(sipSessionKey == null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("no sip session were returned for this key " + sipServletMessageImpl.getSipSessionKey() + " and message " + sipServletMessageImpl);
+				}
+			} else {
+				// If it is a client transaction, do not kill the proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
+				tryToInvalidateSession(sipSessionKey, transactionTerminatedEvent.isServerTransaction());				
+//				sipSessionImpl.removeOngoingTransaction(transaction);
+			}			
+			
+			// Issue 1333 : B2buaHelper.getPendingMessages(linkedSession, UAMode.UAC) returns empty list
+			// don't remove the transaction on terminated state for INVITE Tx because it won't be possible
+			// to create the ACK on second leg for B2BUA apps
+			if(sipSession != null && 
+					(b2buaHelperImpl == null && transaction instanceof ClientTransaction && !Request.INVITE.equals(sipServletMessageImpl.getMethod()))) {
+				sipSession.removeOngoingTransaction(transaction);
+				tad.cleanUp();
+				transaction.setApplicationData(null);
+			}			
 		} else {
 			if(logger.isDebugEnabled()) {
 				logger.debug("TransactionApplicationData not available on the following request " + transaction.getRequest().toString());

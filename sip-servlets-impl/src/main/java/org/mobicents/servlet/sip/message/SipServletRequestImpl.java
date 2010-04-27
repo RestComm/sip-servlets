@@ -261,7 +261,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 		}
 		try {
-			final Request request = transaction.getRequest();
+			final Request request = (Request) this.getMessage();
 			final Response response = SipFactories.messageFactory.createResponse(
 					statusCode, request);			
 			if(reasonPhrase!=null) {
@@ -1620,7 +1620,12 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	}
 	
 	public void cleanUp() {
-		super.cleanUp();
+//		super.cleanUp();
+		if(transactionApplicationData != null) {
+			transactionApplicationData.cleanUp();
+			transactionApplicationData = null;
+		}
+		setTransaction(null);
 		poppedRoute =null;
 		poppedRouteHeader = null;
 		routingDirective =null;

@@ -821,7 +821,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(ongoingTransactions != null) {
 			for(Transaction transaction : ongoingTransactions) {
 				if(!TransactionState.TERMINATED.equals(transaction.getState())) {
-//					((TransactionApplicationData)transaction.getApplicationData()).cleanUp(true);
+					((TransactionApplicationData)transaction.getApplicationData()).cleanUp();
 					try {
 						transaction.terminate();
 					} catch (ObjectInUseException e) {
@@ -860,7 +860,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		if(sessionCreatingTransactionRequest != null) {
 //			sessionCreatingTransaction.setApplicationData(null);
-//			sessionCreatingTransactionRequest.cleanUp();
+			sessionCreatingTransactionRequest.cleanUp();
 			sessionCreatingTransactionRequest = null;
 		}
 		if(proxy != null) {
@@ -1263,16 +1263,15 @@ public class SipSessionImpl implements MobicentsSipSession {
 			this.ongoingTransactions.remove(transaction);
 		}
 		
-		if(sessionCreatingTransactionRequest != null && sessionCreatingTransactionRequest.getMessage() != null && JainSipUtils.DIALOG_CREATING_METHODS.contains(sessionCreatingTransactionRequest.getMethod())) {
-			sessionCreatingTransactionRequest = null;
-		}
-		
-		// don't cleanup since the TCK SipApplicationSessionListenerTest.testSessionExpired001
-//		if(sessionCreatingTransactionRequest != null && 
-//				sessionCreatingTransactionRequest.getTransaction()!= null && 
-//				sessionCreatingTransactionRequest.getTransaction().equals(transaction)) {
-//			sessionCreatingTransactionRequest.cleanUp();
+//		if(sessionCreatingTransactionRequest != null && sessionCreatingTransactionRequest.getMessage() != null && JainSipUtils.DIALOG_CREATING_METHODS.contains(sessionCreatingTransactionRequest.getMethod())) {
+//			sessionCreatingTransactionRequest = null;
 //		}
+				
+		if(sessionCreatingTransactionRequest != null && 
+				sessionCreatingTransactionRequest.getTransaction()!= null && 
+				sessionCreatingTransactionRequest.getTransaction().equals(transaction)) {
+			sessionCreatingTransactionRequest.cleanUp();
+		}
 			
 		
 		if(logger.isDebugEnabled()) {

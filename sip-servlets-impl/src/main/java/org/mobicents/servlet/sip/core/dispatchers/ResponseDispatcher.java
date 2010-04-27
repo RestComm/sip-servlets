@@ -202,11 +202,11 @@ public class ResponseDispatcher extends MessageDispatcher {
 					try {
 						try {														
 							// we store the request only if the dialog is null and the method is not a dialog creating one
-							if(dialog == null) {
+//							if(dialog == null) {
 								session.setSessionCreatingTransactionRequest(sipServletResponse);
-							} else {
+//							} else {
 								session.setSessionCreatingDialog(dialog);
-							}
+//							}
 							if(originalRequest != null) {				
 								originalRequest.setResponse(sipServletResponse);					
 							}

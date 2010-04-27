@@ -90,7 +90,13 @@ public class StandardSasTimerTask extends TimerTask implements SipApplicationSes
 			sipContext.exitSipApp(getSipApplicationSession(), null);
 			setSipApplicationSession(null);
 		}
-	}				
+	}			
+	
+	@Override
+	public boolean cancel() {
+		sipApplicationSession = null;
+		return super.cancel();
+	}
 	
 	public long getDelay() {
 		return sipApplicationSession.getExpirationTimeInternal() - System.currentTimeMillis();

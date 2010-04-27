@@ -107,7 +107,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	private Map<SipSessionKey, SipSessionKey> sessionMap = null;	
 
 	//Map to handle responses to original request and cancel on original request
-	private transient Map<SipSessionKey, SipServletRequest> originalRequestMap = null;
+	private transient Map<SipSessionKey, SipServletRequestImpl> originalRequestMap = null;
 
 	private transient SipFactoryImpl sipFactoryImpl;
 	
@@ -115,7 +115,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 
 	public B2buaHelperImpl() {
 		sessionMap = new ConcurrentHashMap<SipSessionKey, SipSessionKey>();
-		originalRequestMap = new ConcurrentHashMap<SipSessionKey, SipServletRequest>();
+		originalRequestMap = new ConcurrentHashMap<SipSessionKey, SipServletRequestImpl>();
 	}
 	
 	/*
@@ -227,7 +227,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 				}
 			}
 			
-			originalRequestMap.put(originalSession.getKey(), origRequest);
+			originalRequestMap.put(originalSession.getKey(), origRequestImpl);
 			originalRequestMap.put(session.getKey(), newSipServletRequest);
 			
 			if (linked) {
@@ -304,7 +304,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 				logger.debug("newSubsequentServletRequest = " + newSubsequentServletRequest);
 			}			
 			
-			originalRequestMap.put(originalSession.getKey(), origRequest);
+			originalRequestMap.put(originalSession.getKey(), origRequestImpl);
 			originalRequestMap.put(((MobicentsSipSession)session).getKey(), newSubsequentServletRequest);
 			
 			sessionMap.put(originalSession.getKey(), sessionImpl.getKey());
@@ -621,7 +621,10 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	 * @param checkSession
 	 */
 	public void unlinkOriginalRequestInternal(SipSessionKey sipSessionKey) {
-		this.originalRequestMap.remove(sipSessionKey);
+		SipServletRequestImpl sipServletRequestImpl = this.originalRequestMap.remove(sipSessionKey);
+		if(sipServletRequestImpl != null){
+			sipServletRequestImpl.cleanUp();
+		}
 	}
 	
 	/**
@@ -687,7 +690,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			sessionMap.put(session.getKey(), originalSession.getKey());	
 			dumpLinkedSessions();
 
-			originalRequestMap.put(originalSession.getKey(), origRequest);
+			originalRequestMap.put(originalSession.getKey(), origRequestImpl);
 			originalRequestMap.put(session.getKey(), newSipServletRequest);						
 			
 			session.setB2buaHelper(this);

@@ -75,9 +75,9 @@ import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.core.timers.DefaultSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.FaultTolerantSasTimerService;
 import org.mobicents.servlet.sip.core.timers.FaultTolerantTimerServiceImpl;
-import org.mobicents.servlet.sip.core.timers.StandardSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
@@ -172,7 +172,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if(idleTime <= 0) {
 			idleTime = 1;
 		}
-		sasTimerService = new StandardSipApplicationSessionTimerService();
+//		sasTimerService = new StandardSipApplicationSessionTimerService();
+		sasTimerService = new DefaultSipApplicationSessionTimerService(4);
 		isMainServlet = false;
 	}
 

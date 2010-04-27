@@ -144,7 +144,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			if(sipContextTimeout > 0) {				
 				sipApplicationSessionTimeout = sipContextTimeout * 60 * 1000L;				
 				expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(this);				
-				sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sipApplicationSessionTimeout, TimeUnit.MILLISECONDS);
+				expirationTimerTask = sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sipApplicationSessionTimeout, TimeUnit.MILLISECONDS);
 //				expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sipApplicationSessionTimeout, TimeUnit.MILLISECONDS);
 			} else {
 				if(logger.isDebugEnabled()) {
@@ -846,7 +846,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 //				expirationTimerFuture = null;
 			}
 			expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(this);
-			sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, deltaMilliseconds, TimeUnit.MILLISECONDS);
+			expirationTimerTask = sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, deltaMilliseconds, TimeUnit.MILLISECONDS);
 
 			return deltaMinutes;
 		}				

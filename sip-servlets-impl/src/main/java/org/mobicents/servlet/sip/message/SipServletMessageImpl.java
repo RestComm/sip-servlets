@@ -1671,31 +1671,32 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		}
 	}
 	
-	public void cleanUp() {
-		if(logger.isDebugEnabled()) {
-			logger.debug("cleaning up the message " + message);
-		}
-		if(attributes != null) {
-			attributes.clear();
-			attributes = null;
-		}
-		currentApplicationName = null;
-		dialog = null;
-		headerForm= null;
-		message= null;
-		
-		remoteAddr = null;
-//		sessionKey = null;
-//		sipFactoryImpl = null;		
-		sipSession = null;
-		method = null;
-		
-//		if(transactionApplicationData != null) {
-//			transactionApplicationData.cleanUp(false);
-			transactionApplicationData = null;
+	public abstract void cleanUp();
+//	public void cleanUp() {
+//		if(logger.isDebugEnabled()) {
+//			logger.debug("cleaning up the message " + message);
 //		}
-		transaction = null;
-		transport= null;
-		userPrincipal= null;
-	}
+//		if(attributes != null) {
+//			attributes.clear();
+//			attributes = null;
+//		}
+//		currentApplicationName = null;
+//		dialog = null;
+//		headerForm= null;
+//		message= null;
+//		
+//		remoteAddr = null;
+////		sessionKey = null;
+////		sipFactoryImpl = null;		
+//		sipSession = null;
+//		method = null;
+//		
+////		if(transactionApplicationData != null) {
+////			transactionApplicationData.cleanUp(false);
+//			transactionApplicationData = null;
+////		}
+//		transaction = null;
+//		transport= null;
+//		userPrincipal= null;
+//	}
 }
