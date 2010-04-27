@@ -17,27 +17,15 @@
     <description>A plugin for managing Mobicents Sip Servlets servers</description>
     <repositories>        
         <repository>
-            <id>JbossRepository</id>
-            <name>Jboss Repository</name>
-            <url>http://repository.jboss.org/maven2</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-        <repository>
-            <id>jboss-snapshots</id>
-            <name>JBoss Snapshot Repository</name>
-            <url>http://snapshots.jboss.org/maven2</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
+	      <id>jboss-releases-repository</id>
+	      <name>JBoss Releases Repository</name>
+	      <url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</url>
+	    </repository>
+	    <snapshotRepository>
+	      <id>jboss-snapshots-repository</id>
+	      <name>JBoss Snapshots Repository</name>
+	      <url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
+	    </snapshotRepository>
     </repositories>
 	
     <properties>
