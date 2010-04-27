@@ -542,8 +542,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public void processRequest(RequestEvent requestEvent) {
 		if((rejectSipMessages || memoryToHigh) && CongestionControlPolicy.DropMessage.equals(congestionControlPolicy)) {
-			logger.error("dropping request, memory is too high or too many messages present in queues");
-			return;
+			String method = requestEvent.getRequest().getMethod();
+			boolean goodMethod = method.equals(Request.ACK) || method.equals(Request.PRACK) || method.equals(Request.BYE) || method.equals(Request.CANCEL);
+			if(!goodMethod) {
+				logger.error("dropping request, memory is too high or too many messages present in queues");
+				return;
+			}
 		}	
 		final SipProvider sipProvider = (SipProvider)requestEvent.getSource();
 		ServerTransaction requestTransaction =  requestEvent.getServerTransaction();
@@ -618,8 +622,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			try {
 				if(rejectSipMessages || memoryToHigh) {
 					if(!Request.ACK.equals(requestMethod) && !Request.PRACK.equals(requestMethod)) {
-						MessageDispatcher.sendErrorResponse(Response.SERVICE_UNAVAILABLE, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
-						return;
+						String method = requestEvent.getRequest().getMethod();
+						boolean goodMethod = method.equals(Request.BYE) || method.equals(Request.CANCEL);
+						if(!goodMethod) {
+							MessageDispatcher.sendErrorResponse(Response.SERVICE_UNAVAILABLE, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
+							return;
+						}
 					}
 				}
 				messageDispatcherFactory.getRequestDispatcher(sipServletRequest, this).
@@ -710,10 +718,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @see javax.sip.SipListener#processResponse(javax.sip.ResponseEvent)
 	 */
 	public void processResponse(ResponseEvent responseEvent) {
-		if((rejectSipMessages || memoryToHigh) && CongestionControlPolicy.DropMessage.equals(congestionControlPolicy)) {
-			logger.error("dropping response, memory is too high or too many messages present in queues");
-			return;
-		}
 		if(logger.isDebugEnabled()) {
 			logger.debug("Response " + responseEvent.getResponse().toString());
 		}
