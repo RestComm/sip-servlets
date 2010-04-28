@@ -622,9 +622,11 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	 */
 	public void unlinkOriginalRequestInternal(SipSessionKey sipSessionKey) {
 		SipServletRequestImpl sipServletRequestImpl = this.originalRequestMap.remove(sipSessionKey);
-		if(sipServletRequestImpl != null){
-			sipServletRequestImpl.cleanUp();
-		}
+		// Makes TCK B2buaHelperTest.testLinkUnlinkSipSessions001 && B2buaHelperTest.testB2buaHelper 
+		// fails because it cleans up the tx and the response cannot thus be created
+//		if(sipServletRequestImpl != null){
+//			sipServletRequestImpl.cleanUp();
+//		}
 	}
 	
 	/**
