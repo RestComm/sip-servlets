@@ -156,7 +156,10 @@
 										<copy verbose="true" file="docs/log4j.xml" todir="${CATALINA_HOME}/lib" />
 										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${CATALINA_HOME}/conf" />
                                         <copy todir="${CATALINA_HOME}">
-                                            <fileset file="LICENSES/*" />
+                                            <fileset dir="LICENSES" casesensitive="yes">
+                                            	<include name="**/*"/>
+  												<exclude name="GPL-LICENSE.TXT"/>
+                                            </fileset>
                                         </copy>
 									</tasks>
 								</configuration>
@@ -207,7 +210,10 @@
 										<copy verbose="true" file="docs/log4j.xml" todir="${env.CATALINA_HOME}/lib" />
 										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${CATALINA_HOME}/conf" />
                                         <copy todir="${env.CATALINA_HOME}">
-                                            <fileset file="LICENSES/*" />
+                                            <fileset dir="LICENSES" casesensitive="yes">
+                                            	<include name="**/*"/>
+  												<exclude name="GPL-LICENSE.TXT"/>
+                                            </fileset>
                                         </copy>
 									</tasks>
 								</configuration>
