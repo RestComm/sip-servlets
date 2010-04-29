@@ -133,7 +133,11 @@ public final class JainSipUtils {
 	
 	static {		
 		CONTACT_HEADER_METHODS.add(Request.INVITE);
-		CONTACT_HEADER_METHODS.add(Request.REGISTER);
+		// Issue 1412 http://code.google.com/p/mobicents/issues/detail?id=1412 
+		// Contact header is added to REGISTER request by container but javadoc says
+		// "The container is responsible for assigning the request appropriate Call-ID and CSeq 
+		// headers, as well as Contact header if the method is not REGISTER." so commenting out
+//		CONTACT_HEADER_METHODS.add(Request.REGISTER);
 		CONTACT_HEADER_METHODS.add(Request.SUBSCRIBE);
 		CONTACT_HEADER_METHODS.add(Request.NOTIFY);
 		CONTACT_HEADER_METHODS.add(Request.REFER);

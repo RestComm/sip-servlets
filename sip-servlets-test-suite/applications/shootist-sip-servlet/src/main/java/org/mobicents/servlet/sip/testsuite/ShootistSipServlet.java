@@ -199,34 +199,40 @@ public class ShootistSipServlet
 			toURI.setParameter("toParam", toParam);
 		}
 		
+		String method = ce.getServletContext().getInitParameter("method");
+		if(method == null) {
+			method = "INVITE";
+		}
 		SipServletRequest sipServletRequest = null;
 		if(ce.getServletContext().getInitParameter("useStringFactory") != null) {
 			try {
-				sipServletRequest =	sipFactory.createRequest(sipApplicationSession, "INVITE", "sip:LittleGuy@there.com", userName);
+				sipServletRequest =	sipFactory.createRequest(sipApplicationSession, method, "sip:LittleGuy@there.com", userName);
 				if(!sipServletRequest.getTo().toString().contains(userName)) {
 					logger.error("To Address and username should match!");
 					return; 
 				}
 			} catch (ServletParseException e) {
-				logger.error("Impossible to create the INVITE request ", e);
+				logger.error("Impossible to create the " + method + " request ", e);
 				return;
 			}
 		} else {
-			sipServletRequest =	sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);
+			sipServletRequest =	sipFactory.createRequest(sipApplicationSession, method, fromURI, toURI);
 		}
-		Address addr = null;
-		try {
-			addr = sipServletRequest.getAddressHeader("Contact");
-		} catch (ServletParseException e1) {
+		if(!method.equalsIgnoreCase("REGISTER")) {
+			Address addr = null;
+			try {
+				addr = sipServletRequest.getAddressHeader("Contact");
+			} catch (ServletParseException e1) {
+			}
+			if(addr == null) return; // Fail the test, we need that header
+			String prack = ce.getServletContext().getInitParameter("prack");
+			if(prack != null) {
+				sipServletRequest.addHeader("Require", "100rel");
+			}
+			addr.setParameter("headerparam1", "headervalue1");
+			addr.setParameter("param5", "ffff");
+			addr.getURI().setParameter("uriparam", "urivalue");
 		}
-		if(addr == null) return; // Fail the test, we need that header
-		String prack = ce.getServletContext().getInitParameter("prack");
-		if(prack != null) {
-			sipServletRequest.addHeader("Require", "100rel");
-		}
-		addr.setParameter("headerparam1", "headervalue1");
-		addr.setParameter("param5", "ffff");
-		addr.getURI().setParameter("uriparam", "urivalue");
 		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
 		if(ce.getServletContext().getInitParameter("encodeRequestURI") != null) {
 			sipApplicationSession.encodeURI(requestURI);

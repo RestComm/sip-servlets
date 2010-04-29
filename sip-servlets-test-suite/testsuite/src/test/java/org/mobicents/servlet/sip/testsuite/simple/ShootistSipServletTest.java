@@ -392,7 +392,28 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		assertTrue(receiver.getByeReceived());
 		ContactHeader contactHeader = (ContactHeader) receiver.getInviteRequest().getHeader(ContactHeader.NAME);	
 		assertFalse(((SipURI)contactHeader.getAddress().getURI()).toString().contains("transport=udp"));
-	}	
+	}
+	
+	/**
+	 * non regression test for Issue 1412 http://code.google.com/p/mobicents/issues/detail?id=1412
+	 * Contact header is added to REGISTER request by container
+	 */
+	public void testShootistRegister() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		deployApplication("method", "REGISTER");
+		Thread.sleep(TIMEOUT);		
+		assertNull(receiver.getRegisterReceived().getHeader(ContactHeader.NAME));		
+	}
 
 	@Override
 	protected void tearDown() throws Exception {					
