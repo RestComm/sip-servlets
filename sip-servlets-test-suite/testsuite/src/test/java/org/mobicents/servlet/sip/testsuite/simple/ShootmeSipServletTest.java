@@ -186,8 +186,14 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 	}
 	
 	/**
-	 * non regression test for Issue 1004 http://code.google.com/p/mobicents/issues/detail?id=1004
+	 * non regression test for Issue 1104 http://code.google.com/p/mobicents/issues/detail?id=1104
 	 * Cannot find the corresponding sip session to this subsequent request
+	 * 
+	 * In conflict with Issue 1401 http://code.google.com/p/mobicents/issues/detail?id=1401
+	 * ACK request sent by sip client after receiving 488/reINVITE is passed to sip application
+	 * Forbidden by SIP Spec "11.2.2 Receiving ACK" :
+	 * "Applications are not notified of incoming ACKs for non-2xx final responses to INVITE."
+	 * 
 	 */
 	public void testShootmeErrorResponse() throws Exception {
 		String fromName = "testErrorResponse";
@@ -204,7 +210,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isFinalResponseReceived());
 		assertEquals(486, sender.getFinalResponseStatus());
-		assertTrue(sender.getAllMessagesContent().contains("ackReceived"));
+		assertTrue(!sender.getAllMessagesContent().contains("ackReceived"));
 	}
 	
 	public void testShootmeRegisterNoContact() throws Exception {

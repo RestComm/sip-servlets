@@ -257,7 +257,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				|| transaction instanceof ClientTransaction) {
 			if(validate) {
 				throw new IllegalStateException(
-					"Cannot create a response - not a server transaction");
+					"Cannot create a response - not a server transaction " + transaction);
 			}
 		}
 		try {

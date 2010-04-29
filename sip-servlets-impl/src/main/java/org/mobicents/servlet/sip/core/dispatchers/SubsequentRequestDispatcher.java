@@ -49,6 +49,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
+import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -270,12 +271,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			try {
 				if(!Request.ACK.equalsIgnoreCase(requestMethod)) {
 					sipSession.addOngoingTransaction(sipServletRequest.getTransaction());
-				}
-				// JSR 289 Section 6.2.1 :
-				// any state transition caused by the reception of a SIP message, 
-				// the state change must be accomplished by the container before calling 
-				// the service() method of any SipServlet to handle the incoming message.
-				sipSession.updateStateOnSubsequentRequest(sipServletRequest, true);
+				}				
 				try {
 					// RFC 3265 : If a matching NOTIFY request contains a "Subscription-State" of "active" or "pending", it creates
 					// a new subscription and a new dialog (unless they have already been
@@ -296,6 +292,11 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					if(proxy != null) {
 						final ProxyBranchImpl finalBranch = proxy.getFinalBranchForSubsequentRequests();
 						boolean isPrack = requestMethod.equalsIgnoreCase(Request.PRACK);
+						// JSR 289 Section 6.2.1 :
+						// any state transition caused by the reception of a SIP message, 
+						// the state change must be accomplished by the container before calling 
+						// the service() method of any SipServlet to handle the incoming message.
+						sipSession.updateStateOnSubsequentRequest(sipServletRequest, true);
 						if(finalBranch != null) {								
 							proxy.setAckReceived(requestMethod.equalsIgnoreCase(Request.ACK));
 							proxy.setOriginalRequest(sipServletRequest);
@@ -322,8 +323,26 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						}
 					}
 					// If it's not for a proxy then it's just an AR, so go to the next application
-					else {							
-						callServlet(sipServletRequest);				
+					else {	
+						// Issue 1401 http://code.google.com/p/mobicents/issues/detail?id=1401
+						// JSR 289 Section 11.2.2 Receiving ACK : 
+						// "Applications are not notified of incoming ACKs for non-2xx final responses to INVITE."
+						final SipServletResponse lastFinalResponse = ((SipServletRequestImpl)sipSession.getSessionCreatingTransactionRequest()).getLastFinalResponse();
+						boolean callServlet = true;
+						if(Request.ACK.equalsIgnoreCase(requestMethod) && lastFinalResponse != null && lastFinalResponse.getStatus() >= 300) {
+							callServlet = false;
+							if(logger.isDebugEnabled()) {
+								logger.debug("not calling the servlet since this is an ACK for a final error response");
+							}
+						}
+						// JSR 289 Section 6.2.1 :
+						// any state transition caused by the reception of a SIP message, 
+						// the state change must be accomplished by the container before calling 
+						// the service() method of any SipServlet to handle the incoming message.
+						sipSession.updateStateOnSubsequentRequest(sipServletRequest, true);
+						if(callServlet) {
+							callServlet(sipServletRequest);
+						}
 					}						
 				} catch (ServletException e) {
 					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
