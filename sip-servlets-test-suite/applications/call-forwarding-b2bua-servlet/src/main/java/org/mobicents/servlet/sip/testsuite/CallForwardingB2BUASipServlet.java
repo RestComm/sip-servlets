@@ -130,35 +130,43 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
 		
-		logger.info("Got INVITE: " + request.toString());
-		logger.info(request.getFrom().getURI().toString());
-		String[] forwardingUri = forwardingUris.get(request.getFrom().getURI().toString());
-		if(((SipURI)request.getTo().getURI()).getUser().contains("forward-samesipsession")) {
-			request.getSession().setAttribute(ACT_AS_UAS, Boolean.TRUE);
-			if(request.getSession().getAttribute("originalRequest") == null) {
-				if(((SipURI)request.getTo().getURI()).getUser().contains("cancel")) {
-					request.createResponse(SipServletResponse.SC_RINGING).send();
-				} else if(((SipURI)request.getTo().getURI()).getUser().contains("error")) {
-					request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "expected error").send();
+		if(request.isInitial()) {
+			logger.info("Got INVITE: " + request.toString());
+			logger.info(request.getFrom().getURI().toString());
+			String[] forwardingUri = forwardingUris.get(request.getFrom().getURI().toString());
+			if(((SipURI)request.getTo().getURI()).getUser().contains("forward-samesipsession")) {
+				request.getSession().setAttribute(ACT_AS_UAS, Boolean.TRUE);
+				if(request.getSession().getAttribute("originalRequest") == null) {
+					if(((SipURI)request.getTo().getURI()).getUser().contains("cancel")) {
+						request.createResponse(SipServletResponse.SC_RINGING).send();
+					} else if(((SipURI)request.getTo().getURI()).getUser().contains("error")) {
+						request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "expected error").send();
+					} else {
+						request.createResponse(SipServletResponse.SC_RINGING).send();
+						request.createResponse(SipServletResponse.SC_OK).send();
+					}
 				} else {
-					request.createResponse(SipServletResponse.SC_RINGING).send();
-					request.createResponse(SipServletResponse.SC_OK).send();
+					request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "same sip session").send();
+				}
+				return ;
+			}
+			
+			
+			if(forwardingUri != null && forwardingUri.length > 0) {
+				if(((SipURI)request.getTo().getURI()).getUser().contains("factory")) {
+					forwardInviteUsingSipFactory(request, forwardingUri);
+				} else {
+					forwardInviteUsingB2BUAHelper(request, forwardingUri);
 				}
 			} else {
-				request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "same sip session").send();
-			}
-			return ;
-		}
-		
-		
-		if(forwardingUri != null && forwardingUri.length > 0) {
-			if(((SipURI)request.getTo().getURI()).getUser().contains("factory")) {
-				forwardInviteUsingSipFactory(request, forwardingUri);
-			} else {
-				forwardInviteUsingB2BUAHelper(request, forwardingUri);
+				logger.info("INVITE has not been forwarded.");
 			}
 		} else {
-			logger.info("INVITE has not been forwarded.");
+			// deals with reinvite requests
+			B2buaHelper b2buaHelper = request.getB2buaHelper();
+			SipSession origSession = b2buaHelper.getLinkedSession(request.getSession());
+			origSession.setAttribute("originalRequest", request);
+			b2buaHelper.createRequest(origSession, request, null).send();
 		}
 	}	
 	

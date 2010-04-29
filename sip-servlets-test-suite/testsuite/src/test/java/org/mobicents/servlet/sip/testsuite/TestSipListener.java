@@ -1176,7 +1176,10 @@ public class TestSipListener implements SipListener {
 				sendBye(replacesDialog);
 			}
 			if(sendReinvite && !reinviteSent) {
-				sendInDialogSipRequest("INVITE", null, null, null, null);
+				List<Header> headers = new ArrayList<Header>();
+				Header reinviteHeader = protocolObjects.headerFactory.createHeader("ReInvite", "true");
+				headers.add(reinviteHeader);
+				sendInDialogSipRequest("INVITE", null, null, null, headers);
 				reinviteSent = true;
 				return;
 			}
@@ -1252,9 +1255,11 @@ public class TestSipListener implements SipListener {
 					// If the caller is supposed to send the bye
 					if(sendReinvite && !reinviteSent) {
 						List<Header> headers = new ArrayList<Header>();
+						Header reinviteHeader = protocolObjects.headerFactory.createHeader("ReInvite", "true");
+						headers.add(reinviteHeader);
 						if(prackSent) {							
 							headers.add(protocolObjects.headerFactory.createHeader(RequireHeader.NAME, "100rel"));
-						} 
+						} 						
 						sendInDialogSipRequest("INVITE", null, null, null, headers);
 						
 						reinviteSent = true;

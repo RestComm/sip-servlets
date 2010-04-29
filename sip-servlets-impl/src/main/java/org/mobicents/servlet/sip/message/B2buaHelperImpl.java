@@ -56,6 +56,7 @@ import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
+import javax.sip.message.Message;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
@@ -268,8 +269,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			final MobicentsSipSession sessionImpl = (MobicentsSipSession) session;
 
 			final SipServletRequestImpl newSubsequentServletRequest = (SipServletRequestImpl) session.createRequest(origRequest.getMethod());
-			
-			
+						
 			//For non-REGISTER requests, the Contact header field is not copied 
 			//but is populated by the container as usual
 			
@@ -304,6 +304,9 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 				logger.debug("newSubsequentServletRequest = " + newSubsequentServletRequest);
 			}			
 			
+			// Added for Issue 1409 http://code.google.com/p/mobicents/issues/detail?id=1409
+			copyNonSystemHeaders(origRequestImpl, newSubsequentServletRequest);
+			
 			originalRequestMap.put(originalSession.getKey(), origRequestImpl);
 			originalRequestMap.put(((MobicentsSipSession)session).getKey(), newSubsequentServletRequest);
 			
@@ -318,6 +321,28 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			logger.error("Unexpected exception ", ex);
 			throw new IllegalArgumentException(
 					"Illegal arg ecnountered while creatigng b2bua", ex);
+		}
+	}
+
+	/**
+	 * Copies all the non system headers from the original request into the new subsequent request
+	 * (Not needed for initial requests since a clone of the request is done)
+	 * 
+	 * Added for Issue 1409 http://code.google.com/p/mobicents/issues/detail?id=1409
+	 */
+	private void copyNonSystemHeaders(SipServletRequestImpl origRequestImpl,
+			SipServletRequestImpl newSubsequentServletRequest) {
+		final Message origMessage = origRequestImpl.getMessage();
+		ListIterator<String> headerNames = origMessage.getHeaderNames();
+		while (headerNames.hasNext()) {
+			String headerName = headerNames.next();
+			if(!JainSipUtils.SYSTEM_HEADERS.contains(headerName) && !headerName.equalsIgnoreCase(ContactHeader.NAME)) {
+				Header origHeader = origMessage.getHeader(headerName);
+				newSubsequentServletRequest.getMessage().addHeader(((Header)origHeader.clone()));
+				if(logger.isDebugEnabled()) {
+					logger.debug("original header " + origHeader + " copied in the new subsequent request");
+				}
+			}
 		}
 	}
 
