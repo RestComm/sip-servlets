@@ -32,6 +32,7 @@ import org.jboss.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.jboss.metadata.sip.spec.Sip11MetaData;
 import org.jboss.metadata.sip.spec.SipAnnotationMergedView;
 import org.jboss.metadata.sip.spec.SipMetaData;
+import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.AnnotationMergedView;
 import org.jboss.metadata.web.spec.Web25MetaData;
 import org.jboss.metadata.web.spec.WebMetaData;
@@ -146,5 +147,10 @@ public class MergedJBossConvergedSipMetaDataDeployer extends
 
 	      // Output the merged JBossConvergedSipMetaData
 	      unit.getTransientManagedObjects().addAttachment(JBossConvergedSipMetaData.class, mergedMetaData);
+	      if(unit.getAttachment(JBossWebMetaData.class) != null) {
+		      // Fix for Issue 1398 to overcome web service problems, we put the merged meta data in place of the JBossWebMetaData
+		      // so that jboss web service aspects do their modification on the converged
+		      unit.getTransientManagedObjects().addAttachment(JBossWebMetaData.class, mergedMetaData);
+	      }
 	   }
 }

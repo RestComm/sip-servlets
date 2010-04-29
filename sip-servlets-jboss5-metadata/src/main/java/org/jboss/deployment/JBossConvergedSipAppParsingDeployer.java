@@ -96,9 +96,15 @@ public class JBossConvergedSipAppParsingDeployer extends SchemaResolverDeployer<
       mergedMetaData.merge(metaData, specMetaData);
       mergedMetaData.merge(metaData, sipMetaData);
       // Set the merged as the output
-      unit.getTransientManagedObjects().addAttachment(JBossConvergedSipMetaData.class, mergedMetaData);
+      unit.getTransientManagedObjects().addAttachment(JBossConvergedSipMetaData.class, mergedMetaData);      
       // Keep the raw parsed metadata as well
       unit.addAttachment("Raw"+JBossConvergedSipMetaData.class.getName(), mergedMetaData, JBossConvergedSipMetaData.class);
+      if(unit.getAttachment(JBossWebMetaData.class) != null) {
+	      // Fix for Issue 1398 to overcome web service problems, we put the merged meta data in place of the JBossWebMetaData
+	      // so that jboss web service aspects do their modification on the converged
+	      unit.getTransientManagedObjects().addAttachment(JBossWebMetaData.class, mergedMetaData);
+	      unit.addAttachment("Raw"+JBossWebMetaData.class.getName(), mergedMetaData, JBossWebMetaData.class);
+      }
    }
 
    /**
