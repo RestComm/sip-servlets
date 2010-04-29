@@ -227,10 +227,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	@Override
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {		
-		logger.info("Got BYE: " + request.toString());
-		//we send the OK directly to the first call leg
-		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
-		sipServletResponse.send();
+		logger.info("Got BYE: " + request.toString());		
 		if(request.getSession().getAttribute(ACT_AS_UAS) == null) {
 			//we forward the BYE
 			SipSession session = request.getSession();		
@@ -255,6 +252,9 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			logger.info("forkedRequest = " + forkedRequest);			
 			forkedRequest.send();
 		}
+		//we send the OK to the first call leg after as sending the response may trigger session invalidation
+		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+		sipServletResponse.send();
 	}	
 	
 	@Override
