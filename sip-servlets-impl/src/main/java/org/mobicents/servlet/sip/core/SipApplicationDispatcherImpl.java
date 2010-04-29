@@ -385,7 +385,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(sipApplication == null) {
 			throw new IllegalArgumentException("Something when wrong while initializing the following application " + sipApplicationName);
 		}
-		
+		// Issue 1417 http://code.google.com/p/mobicents/issues/detail?id=1417
+		// Deploy 2 applications with the same app-name should fail
+		SipContext app = applicationDeployed.get(sipApplicationName);
+		if(app != null) {
+			logger.error("An application with the app name " + sipApplicationName + " is already deployed under the following context " + app.getPath());
+			throw new IllegalStateException("An application with the app name " + sipApplicationName + " is already deployed under the following context " + app.getPath());
+		}
 		//if the application has not set any concurrency control mode, we default to the container wide one
 		if(sipApplication.getConcurrencyControlMode() == null) {			
 			sipApplication.setConcurrencyControlMode(concurrencyControlMode);

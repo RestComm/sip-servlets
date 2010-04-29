@@ -57,10 +57,13 @@ public class DeploymentTest extends SipServletTestCase {
 				"sip-test-context", "sip-test"));
 	}
 	
-	public void deployShootmeApplication() {
+	public void deployShootmeApplication(String webContextName) {
+		if(webContextName == null) {
+			webContextName = "sip-test";
+		}
 		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/simple-sip-servlet/src/main/sipapp",
-				"sip-test-context", "sip-test"));
+			projectHome + "/sip-servlets-test-suite/applications/simple-sip-servlet/src/main/sipapp",
+			"sip-test-context", webContextName));
 	}
 	
 	@Override
@@ -86,7 +89,7 @@ public class DeploymentTest extends SipServletTestCase {
 	
 	public void testBlankSpaceInDarPath() throws Exception {
 		tomcat.startTomcat();
-		deployShootmeApplication();
+		deployShootmeApplication(null);
 		senderProtocolObjects =new ProtocolObjects(
 				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
 		
@@ -122,7 +125,7 @@ public class DeploymentTest extends SipServletTestCase {
 	 */
 	public void testBYEOnSipServletDestroy() throws Exception {
 		tomcat.startTomcat();
-		deployShootmeApplication();
+		deployShootmeApplication(null);
 		senderProtocolObjects =new ProtocolObjects(
 				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
 		
@@ -151,6 +154,22 @@ public class DeploymentTest extends SipServletTestCase {
 		assertTrue(sender.getByeReceived());		
 		
 		senderProtocolObjects.destroy();	
+	}
+	
+	/**
+	 * Issue 1417 http://code.google.com/p/mobicents/issues/detail?id=1417
+	 * Deploy 2 applications with the same app-name should fail
+	 * @throws Exception
+	 */
+	public void testDeploy2AppsWithSameAppName() throws Exception {
+		tomcat.startTomcat();
+		deployShootmeApplication(null);
+		try {
+			deployShootmeApplication("second-test-app");
+			fail("Should see an illegalStateException saying that an app of that app-name is already deployed");
+		} catch (IllegalStateException e) {
+			logger.info(e.getMessage());
+		}
 	}
 
 	@Override
