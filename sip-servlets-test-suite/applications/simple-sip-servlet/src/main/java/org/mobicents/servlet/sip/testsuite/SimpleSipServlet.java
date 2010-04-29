@@ -68,11 +68,13 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	private static final String TEST_IS_SEND_REINVITE_PRACK = "prackisendreinvite";
 	private static final String TEST_IS_SIP_SERVLET_SEND_BYE = "SSsendBye";
 	private static final String TEST_CANCEL_USERNAME = "cancel";
+	private static final String TEST_BYE_ON_DESTROY = "testByeOnDestroy";
 	@Resource
 	SipFactory sipFactory;
 	@Resource
 	TimerService timerService;
 	SipSession registerSipSession;
+	SipSession inviteSipSession;
 		
 	@Override
 	protected void doBranchResponse(SipServletResponse resp)
@@ -100,8 +102,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 			IOException {
 		logger.info("from : " + request.getFrom());
 		logger.info("Got request: "
-				+ request.getMethod());
-		
+				+ request.getMethod());		
 		if(request.getParameterableHeader("additionalParameterableHeader") != null) {
 			request.getParameterableHeader("additionalParameterableHeader").setParameter("dsfds", "value");
 			boolean error = false;
@@ -120,6 +121,9 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		request.createResponse(SipServletResponse.SC_TRYING).send();
 		
 		String fromString = request.getFrom().toString();
+		if(fromString.contains(TEST_BYE_ON_DESTROY)) {
+			inviteSipSession = request.getSession();
+		}
 		if(fromString.contains(TEST_ERROR_RESPONSE)) {			
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_BUSY_HERE);
 			sipServletResponse.send();
@@ -587,5 +591,17 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		} catch (IOException e) {
 			logger.error("Exception occured while sending the request",e);			
 		}
+	}
+	
+	@Override
+	public void destroy() {
+		if(inviteSipSession != null) {
+			try {
+				inviteSipSession.createRequest("BYE").send();
+			} catch (IOException e) {
+				logger.error("Exception occured while sending the request",e);			
+			}
+		}
+		super.destroy();
 	}
 }

@@ -114,6 +114,44 @@ public class DeploymentTest extends SipServletTestCase {
 		
 		senderProtocolObjects.destroy();	
 	}
+	
+	/**
+	 * Issue 1411 http://code.google.com/p/mobicents/issues/detail?id=1411
+	 * Sip Connectors should be removed after removing all Sip Servlets
+	 * @throws Exception
+	 */
+	public void testBYEOnSipServletDestroy() throws Exception {
+		tomcat.startTomcat();
+		deployShootmeApplication();
+		senderProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+		
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();			
+		
+		senderProvider.addSipListener(sender);
+		
+		senderProtocolObjects.start();		
+		
+		String fromName = "testByeOnDestroy";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		tomcat.stopTomcat();
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getByeReceived());		
+		
+		senderProtocolObjects.destroy();	
+	}
 
 	@Override
 	protected void tearDown() throws Exception {					
@@ -122,7 +160,6 @@ public class DeploymentTest extends SipServletTestCase {
 
 	@Override
 	protected void deployApplication() {
-		// TODO Auto-generated method stub
 		
 	}
 

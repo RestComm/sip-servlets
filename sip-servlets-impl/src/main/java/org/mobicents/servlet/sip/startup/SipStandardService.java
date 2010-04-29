@@ -292,7 +292,13 @@ public class SipStandardService extends StandardService implements SipService {
 
 	@Override
 	public void stop() throws LifecycleException {
+		if(!connectorsStartedExternally) {
+			sipApplicationDispatcher.stop();
+		}	
+		super.stop();
 		//Tomcat specific unloading case
+		// Issue 1411 http://code.google.com/p/mobicents/issues/detail?id=1411
+		// Sip Connectors should be removed after removing all Sip Servlets to allow them to send BYE to terminate cleanly
 		synchronized (connectors) {
 			for (Connector connector : connectors) {
 				ExtendedListeningPoint extendedListeningPoint = (ExtendedListeningPoint)
@@ -302,11 +308,7 @@ public class SipStandardService extends StandardService implements SipService {
 					sipApplicationDispatcher.getSipNetworkInterfaceManager().removeExtendedListeningPoint(extendedListeningPoint);
 				}
 			}
-		}
-		if(!connectorsStartedExternally) {
-			sipApplicationDispatcher.stop();
-		}	
-		super.stop();
+		}		
 	}
 	
 	/**
