@@ -75,7 +75,8 @@ import org.jboss.web.tomcat.service.session.notification.IgnoreUndeployLegacyClu
 import org.mobicents.cache.MobicentsCache;
 import org.mobicents.cluster.DefaultMobicentsCluster;
 import org.mobicents.cluster.MobicentsCluster;
-import org.mobicents.cluster.election.SimpleSingletonElector;
+import org.mobicents.cluster.cache.DefaultClusteredCacheDataIndexingHandler;
+import org.mobicents.cluster.election.DefaultClusterElector;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -3645,7 +3646,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		super.startExtensions();		
 		
 		mobicentsCache = new MobicentsCache(getDistributedCacheConvergedSipManager().getJBossCache(), null);
-		mobicentsCluster = new DefaultMobicentsCluster(mobicentsCache, null, new SimpleSingletonElector());
+		mobicentsCluster = new DefaultMobicentsCluster(mobicentsCache, null, new DefaultClusterElector());
 		if(logger.isDebugEnabled()) {
 			logger.debug("Mobicents Sip Servlets Default Mobicents Cluster " + mobicentsCluster + " created");
 		}
