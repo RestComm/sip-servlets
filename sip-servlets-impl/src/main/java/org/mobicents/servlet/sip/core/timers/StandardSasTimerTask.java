@@ -94,7 +94,10 @@ public class StandardSasTimerTask extends TimerTask implements SipApplicationSes
 	
 	@Override
 	public boolean cancel() {
-		sipApplicationSession = null;
+		// can cause NPE on race condition where a task has been cancelled
+		// See Issue 1419 NullPointerException in StandardSasTimerTask
+		// http://code.google.com/p/mobicents/issues/detail?id=1419
+//		sipApplicationSession = null;
 		return super.cancel();
 	}
 	

@@ -23,6 +23,7 @@ package org.mobicents.servlet.sip.core.timers;
 
 import java.util.Timer;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -38,7 +39,7 @@ public class StandardSipApplicationSessionTimerService extends
 
 	private static final Logger logger = Logger.getLogger(StandardSipApplicationSessionTimerService.class
 			.getName());
-	
+	private AtomicBoolean started = new AtomicBoolean(true);
 	/**
 	 * @param corePoolSize
 	 */
@@ -73,12 +74,23 @@ public class StandardSipApplicationSessionTimerService extends
 		return expirationTimerTask;
 	}
 
-	public void stop() {
+	public void stop() {		
+		started.set(false);
 		super.cancel();
+		if(logger.isInfoEnabled()) {
+			logger.info("Stopped timer service "+ this);
+		}
 	}
 
-	public void start() {
-		
+	public void start() {	
+		started.set(true);
+		if(logger.isInfoEnabled()) {
+			logger.info("Started timer service "+ this);
+		}
+	}
+
+	public boolean isStarted() {
+		return started.get();
 	}
 
 }

@@ -22,6 +22,7 @@
 package org.mobicents.servlet.sip.core.timers;
 
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.jboss.web.tomcat.service.session.ClusteredSipManager;
@@ -50,6 +51,7 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 	private FaultTolerantScheduler scheduledExecutor;
 	private ClusteredSipManager<? extends OutgoingDistributableSessionData> sipManager;
 	private int corePoolSize;
+	private AtomicBoolean started = new AtomicBoolean(true);
 	
 	public FaultTolerantSasTimerService(DistributableSipManager sipManager, int corePoolSize) {
 		this.corePoolSize = corePoolSize;
@@ -110,7 +112,11 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 	public void stop() {
 //		return super.shutdownNow();
 		// method not exposed by Mobicents FaultTolerantScheduler
+		started.set(false);
 		getScheduler().shutdownNow();
+		if(logger.isInfoEnabled()) {
+			logger.info("Stopped timer service "+ this);
+		}
 	}
 	
 	private FaultTolerantScheduler getScheduler() {
@@ -125,9 +131,17 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 	 * (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.SipApplicationSessionTimerService#init()
 	 */
-	public void start() {
+	public void start() {		
 		// we need to start the scheduler upon init so that the local listener gets registered and can failover timers
 		getScheduler();
+		started.set(true);
+		if(logger.isInfoEnabled()) {
+			logger.info("Started timer service "+ this);
+		}
+	}
+
+	public boolean isStarted() {
+		return started.get();
 	}
 
 }

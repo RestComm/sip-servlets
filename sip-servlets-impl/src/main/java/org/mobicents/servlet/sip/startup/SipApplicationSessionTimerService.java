@@ -43,5 +43,7 @@ public interface SipApplicationSessionTimerService {
 	void stop();
 
 	void start();
+	
+	boolean isStarted();
 
 }

@@ -287,9 +287,9 @@ public class SipCacheListener extends AbstractCacheListener
          {
             // Need to invalidate the loaded session
         	 sipApplicationSession.setOutdatedVersion(version.intValue());
-            if(log_.isTraceEnabled())
+            if(log_.isDebugEnabled())
             {
-               log_.trace("nodeDirty(): session in-memory data is " +
+               log_.debug("nodeDirty(): session in-memory data is " +
                           "invalidated with id: " + sessId + " and version: " +
                           version.intValue());
             }
@@ -337,9 +337,9 @@ public class SipCacheListener extends AbstractCacheListener
 		         {
 		            // Need to invalidate the loaded session
 		            session.setOutdatedVersion(version.intValue());
-		            if(log_.isTraceEnabled())
+		            if(log_.isDebugEnabled())
 		            {
-		               log_.trace("nodeDirty(): session in-memory data is " +
+		               log_.debug("nodeDirty(): session in-memory data is " +
 		                          "invalidated with id: " + sipSessionId + " and version: " +
 		                          version.intValue());
 		            }

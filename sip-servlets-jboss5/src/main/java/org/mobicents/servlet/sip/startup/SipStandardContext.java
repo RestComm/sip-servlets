@@ -75,9 +75,9 @@ import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
-import org.mobicents.servlet.sip.core.timers.DefaultSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.FaultTolerantSasTimerService;
 import org.mobicents.servlet.sip.core.timers.FaultTolerantTimerServiceImpl;
+import org.mobicents.servlet.sip.core.timers.StandardSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
@@ -172,8 +172,6 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if(idleTime <= 0) {
 			idleTime = 1;
 		}
-//		sasTimerService = new StandardSipApplicationSessionTimerService();
-		sasTimerService = new DefaultSipApplicationSessionTimerService(4);
 		isMainServlet = false;
 	}
 
@@ -221,9 +219,15 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					logger.info("Using the Fault Tolerant Timer Service to schedule fault tolerant timers in a distributed environment");
 				}
 				timerService = new FaultTolerantTimerServiceImpl((DistributableSipManager)getSipManager());
-				sasTimerService = new FaultTolerantSasTimerService((DistributableSipManager)getSipManager(), 4);				
 			} else {
 				timerService = new TimerServiceImpl();
+			}
+		}
+		if(sasTimerService == null || !sasTimerService.isStarted()) {
+			if(getDistributable() && hasDistributableManager) {
+				sasTimerService = new FaultTolerantSasTimerService((DistributableSipManager)getSipManager(), 4);
+			} else {
+				sasTimerService = new StandardSipApplicationSessionTimerService();
 			}
 		}
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
@@ -480,6 +484,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				logger.error("the application name is null for the following context : " + name);
 			}
 		}	
+		sasTimerService.stop();
 		logger.info("sip context stopped");
 	}
 
@@ -1088,18 +1093,20 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	
 	public boolean notifySipContextListeners(SipContextEvent event) {
 		boolean ok = true;
+		if(logger.isDebugEnabled()) {
+			logger.debug(childrenMap.size() + " container to notify of " + event.getEventType());
+		}
 		if(event.getEventType() == SipContextEventType.SERVLET_INITIALIZED) {
 			// we need to make sure the scheduler are created to be able to fail over fault tolerant timers
 			// we can't create it before because the mobicents cluster is not yet initialized
 			if(getDistributable() && hasDistributableManager) {
-				((FaultTolerantTimerServiceImpl)timerService).getScheduler();
-				sasTimerService.start();
+				((FaultTolerantTimerServiceImpl)timerService).getScheduler();				
 			}	
+			if(!sasTimerService.isStarted()) {
+				sasTimerService.start();
+			}
 		}
-		
-		if(logger.isDebugEnabled()) {
-			logger.debug(childrenMap.size() + " container to notify of " + event.getEventType());
-		}
+				
 		enterSipApp(null, null);
 		enterSipAppHa(true);
 		try {

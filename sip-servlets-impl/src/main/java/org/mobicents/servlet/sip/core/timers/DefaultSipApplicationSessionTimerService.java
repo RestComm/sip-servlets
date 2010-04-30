@@ -134,10 +134,20 @@ public class DefaultSipApplicationSessionTimerService extends
 
 	public void start() {
 		prestartAllCoreThreads();
+		if(logger.isInfoEnabled()) {
+			logger.info("Started timer service "+ this);
+		}
 	}
 	
-	public void stop() {
+	public void stop() {		
 		super.shutdownNow();
+		if(logger.isInfoEnabled()) {
+			logger.info("Stopped timer service "+ this);
+		}
+	}
+
+	public boolean isStarted() {
+		return super.isTerminated();
 	}
 
 }

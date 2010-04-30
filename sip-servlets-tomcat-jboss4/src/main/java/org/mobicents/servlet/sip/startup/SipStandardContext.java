@@ -65,6 +65,7 @@ import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.annotations.SipAnnotationProcessor;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipContextEvent;
+import org.mobicents.servlet.sip.core.SipContextEventType;
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -169,8 +170,6 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			idleTime = 1;
 		}
 		hasDistributableManager = false;
-//		sasTimerService = new DefaultSipApplicationSessionTimerService(4);
-		sasTimerService = new StandardSipApplicationSessionTimerService();
 	}
 
 	@Override
@@ -210,6 +209,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}
 		if(timerService == null) {			
 			timerService = new TimerServiceImpl();			
+		}
+		if(sasTimerService == null || !sasTimerService.isStarted()) {
+			sasTimerService = new StandardSipApplicationSessionTimerService();
 		}
 		//needed when restarting applications through the tomcat manager 
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,
@@ -534,6 +536,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			}
 		}
 		sipJNDIContextLoaded = false;
+		sasTimerService.stop();
 		// not needed since the JNDI will be destroyed automatically
 //		if(isUseNaming()) {
 //			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_FACTORY_REMOVED_EVENT, sipFactoryFacade);
@@ -554,7 +557,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 //				//we are stopping anyway
 ////				logger.error("Impossible to get the naming context ", e);				
 //			}	        	
-//        }
+//        }		
 		logger.info("sip context stopped");
 	}
 
@@ -1001,9 +1004,13 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 */
 	public boolean notifySipContextListeners(SipContextEvent event) {
 		boolean ok = true;
-		
 		if(logger.isDebugEnabled()) {
 			logger.debug(childrenMap.size() + " container to notify of " + event.getEventType());
+		}
+		if(event.getEventType() == SipContextEventType.SERVLET_INITIALIZED) {
+			if(!sasTimerService.isStarted()) {
+				sasTimerService.start();
+			}
 		}
 		enterSipApp(null, null);
 		enterSipAppHa(true);
