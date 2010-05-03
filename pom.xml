@@ -87,7 +87,8 @@
 		<mobicents.cluster.version>1.3-SNAPSHOT</mobicents.cluster.version>
 		<mobicents.balancer.version>1.0.CR2-SNAPSHOT</mobicents.balancer.version>
 		<mobicents.jain.sip.ha.version>0.8-SNAPSHOT</mobicents.jain.sip.ha.version>
-		<tomcat.version>6.0.20</tomcat.version>		
+		<tomcat.version>6.0.20</tomcat.version>	
+		<jain-sip-ri.version>1.2.X.PERF-SNAPSHOT</jain-sip-ri.version>	
 	</properties>
 	
 	<dependencies>
@@ -214,10 +215,7 @@
 			<id>tomcat</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<jain-sip-ri.version>1.2.X.PERF-SNAPSHOT</jain-sip-ri.version>
-			</properties>	
+			</activation>			
 			<modules>				
 				<module>sip-servlets-tomcat-jboss4</module>				
 			</modules>			
@@ -229,10 +227,7 @@
 			</modules>			
 		</profile>
 		<profile>			
-			<id>jboss-5</id>
-			<properties>
-				<jain-sip-ri.version>1.2.X.PERF-SNAPSHOT</jain-sip-ri.version>
-			</properties>
+			<id>jboss-5</id>			
 			<modules>		
 				<module>sip-servlets-jboss5-metadata</module>	
 				<module>sip-servlets-jboss5-deployer</module>					
@@ -241,10 +236,7 @@
 			</modules>			
 		</profile>
 		<profile>			
-			<id>tomcat-distro</id>
-			<properties>
-				<jain-sip-ri.version>1.2.X.PERF-SNAPSHOT</jain-sip-ri.version>
-			</properties>	
+			<id>tomcat-distro</id>			
 			<modules>				
 				<module>sip-servlets-tomcat-jboss4</module>				
 			</modules>			
@@ -256,10 +248,7 @@
 			</modules>			
 		</profile>
 		<profile>			
-			<id>jboss-5-distro</id>
-			<properties>
-				<jain-sip-ri.version>1.2.X.PERF-SNAPSHOT</jain-sip-ri.version>
-			</properties>	
+			<id>jboss-5-distro</id>			
 			<modules>
 				<module>sip-servlets-jboss5-metadata</module>	
 				<module>sip-servlets-jboss5-deployer</module>					
