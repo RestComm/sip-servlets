@@ -346,7 +346,7 @@
 			<arg line="clean install -U -P set-svn-revision,jboss-distro,jboss-cluster-distro -DJBOSS_HOME=${jboss.home} -Dnode=${jboss.config}" />
 		</exec>
 		
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
+		<!--exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
 			<arg line="clean install -U -P set-svn-revision"/>
 		</exec>
 		
@@ -354,7 +354,7 @@
 			<fileset dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/target/" includes="simple-sip-servlet-distributable-*.war" />
 		</copy>
 		
-		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${jboss.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" />
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${jboss.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" /-->
 	</target>
 	
 	<target name="release-jboss-5-node-ha" if="ha.capable">
@@ -370,14 +370,16 @@
 			<arg line="clean install -U -P set-svn-revision,jboss-5-distro,jboss-5-cluster-distro -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
 		</exec>
 		
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
+		<!--exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
 			<arg line="clean install -U -P set-svn-revision"/>
 		</exec>
 			
 		<copy tofile="${mss.home}/server/${jboss.config}/deploy/simple-distributable.war">
 			<fileset dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/target/" includes="simple-sip-servlet-distributable-*.war" />
 		</copy>						
-			
+		
+		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${mss.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" /-->
+		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click2call-distributable">
 			<arg line="clean install -U -P set-svn-revision" />
 		</exec>
@@ -385,8 +387,7 @@
 		<copy tofile="${mss.home}/server/all/deploy/click2call-distributable.war">
 			<fileset dir="${base.path}/../../sip-servlets-examples/click2call-distributable/target/" includes="click2call-distributable-*.war" />
 		</copy>
-		
-		<copy overwrite="true" file="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties" tofile="${mss.home}/server/${jboss.config}/conf/dars/mobicents-dar.properties" />
+				
 	</target>
 	
 	<!-- MSS Management Console -->
