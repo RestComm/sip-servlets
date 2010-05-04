@@ -8,7 +8,7 @@
 	</parent>
 	<artifactId>sip-servlets-client</artifactId>
 	<packaging>jar</packaging>
-	<name>Mobicents Sip Servlets Client API</name>
+	<name>Mobicents Sip Servlets Client</name>
 	<url>http://www.mobicents.org/products_sip_servlets.html</url>
 	<dependencies>
 		<!-- sip servlet spec dependency -->
