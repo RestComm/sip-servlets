@@ -5,6 +5,68 @@
 <title>Package</title>
 </head>
 <body>
-Mobicents SIP Servlets Extensions for applications or external systems to interact with the container
+Mobicents SIP Servlets Extensions for applications or external systems to interact with the container :
+
+<ol>
+  		<li>
+  			Notification to the applications when a sip connector is added or removed 
+  		</li>
+</ol>
+
+Here is some sample code to show how it can be used :
+
+<pre>
+	import java.io.IOException;
+	import java.util.ArrayList;
+	
+	import javax.servlet.ServletException;
+	import javax.servlet.sip.Proxy;
+	import javax.servlet.sip.ProxyBranch;
+	import javax.servlet.sip.SipFactory;
+	import javax.servlet.sip.SipServlet;
+	import javax.servlet.sip.SipServletRequest;
+	import javax.servlet.sip.URI;
+	
+	import org.mobicents.servlet.sip.SipConnector;
+	import org.mobicents.servlet.sip.listener.SipConnectorListener;
+	
+	public class ProxySipServlet extends SipServlet implements SipConnectorListener {
+			
+	protected void doInvite(SipServletRequest request) throws ServletException,
+			IOException {
+
+		if(!request.isInitial()){
+			return;
+		}
+			
+		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+		Proxy proxy = request.getProxy();
+		proxy.setParallel(false);
+		proxy.setRecordRoute(true);
+		ArrayList<URI> uris = new ArrayList<URI>();
+		URI uri1 = sipFactory.createAddress("sip:receiver@127.0.0.1:5057").getURI();		
+		URI uri2 = sipFactory.createAddress("sip:second-receiver@127.0.0.1:5056").getURI();
+		uris.add(uri2);
+		uris.add(uri1);
+	
+		proxy.proxyTo(uris);		
+	}
+	
+	/**
+	 * Application notified that a connector has been added
+	 */
+	public void sipConnectorAdded(SipConnector connector) {
+		// logger.info(connector + " added" );		
+	}
+
+	/**
+	 * Application notified that a connector has been removed
+	 */
+	public void sipConnectorRemoved(SipConnector connector) {
+		// logger.info(connector + " removed" );	
+	}
+
+</pre>
+
 </body>
 </html>
