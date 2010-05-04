@@ -35,7 +35,7 @@ package org.mobicents.javax.servlet.sip;
  * @author jean.deruelle@gmail.com
  * @since 1.3
  */
-public interface Proxy {
+public interface ProxyExt {
 	/**
 	 * This is the amount of time, in seconds, the container waits for an informational response when proxying.</br>
 	 * <ul>

@@ -35,18 +35,18 @@ package org.mobicents.javax.servlet.sip;
  * @author jean.deruelle@gmail.com
  * @since 1.3
  */
-public interface ProxyBranch {
+public interface ProxyBranchExt {
 	/**
 	 * Sets the search timeout value for this ProxyBranch object for 1xx responses.
 	 * This is the amount of time, in seconds, the container waits for an informational response when proxying on this branch.</br>
-	 * This method can be used to override the default timeout the branch obtains from the {@link Proxy#setProxy1xxTimeout(int)} object
+	 * This method can be used to override the default timeout the branch obtains from the {@link ProxyExt#setProxy1xxTimeout(int)} object
 	 * <ul>
 	 * 	<li> 
 	 * 		If the proxy is sequential, when the timer expires and no 1xx response nor final response has been received,
 	 * 		the container CANCELs the current branch and proxies to the next element in the target set.
 	 * 	</li>
 	 *  <li> 
-	 * 		In case the proxy is a parallel proxy then this can only set the timeout value of this branch to a value lower than the value in the proxy {@link Proxy#getProxy1xxTimeout()} 
+	 * 		In case the proxy is a parallel proxy then this can only set the timeout value of this branch to a value lower than the value in the proxy {@link ProxyExt#getProxy1xxTimeout()} 
 	 * 		The effect of expiry of this timeout in case of parallel proxy is just to cancel this branch as if an explicit call to cancel() has been made 
 	 * 		if no 1xx response nor final response has been received.
 	 * 	</li>
@@ -59,7 +59,7 @@ public interface ProxyBranch {
 	public void setProxyBranch1xxTimeout(int timeout);
 	/**
 	 * Returns the current value of the search 1xx timeout associated with this ProxyBranch object. 
-	 * If this value is not explicitly set using the {@link ProxyBranch#setProxyBranch1xxTimeout(int)} then the value is inherited from the Proxy setting.
+	 * If this value is not explicitly set using the {@link ProxyBranchExt#setProxyBranch1xxTimeout(int)} then the value is inherited from the Proxy setting.
 	 * The current value of the overall proxy 1xx timeout value. This is measured in seconds.
 	 * @return the search timeout value in seconds.
 	 * @since 1.3
