@@ -10,6 +10,14 @@
 	<packaging>jar</packaging>
 	<name>Mobicents Sip Servlets Client API</name>
 	<url>http://www.mobicents.org/products_sip_servlets.html</url>
+	<dependencies>
+		<!-- sip servlet spec dependency -->
+		<dependency>
+			<groupId>org.mobicents.servlet.sip</groupId>
+			<artifactId>sip-servlets-spec</artifactId>
+			<version>1.1.13-SNAPSHOT</version>			
+		</dependency>
+	</dependencies>
 	<build>
 		<plugins>		
 			<plugin>
