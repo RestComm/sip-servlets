@@ -16,6 +16,7 @@
 		<menu name="Documentation">
 			<item name="Community User Guide" href="./user_guides/sip_servlets/index.html"/>
 			<item name="SIP Servlets 1.1 Javadoc" href="./mss/jsr289/javadocs/index.html"/>
+			<item name="Mobicents SIP Servlets Extensions Javadoc" href="./mss/jsr289/extensions/index.html"/>
 		</menu>
 		<menu name="Examples">
 			<item name="Examples" href="examples.html" collapse="true">
