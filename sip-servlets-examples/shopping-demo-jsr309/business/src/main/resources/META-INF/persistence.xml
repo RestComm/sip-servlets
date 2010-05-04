@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Persistence deployment descriptor for dev profile -->
+<persistence xmlns="http://java.sun.com/xml/ns/persistence" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd" 
+             version="1.0">
+             
+   <persistence-unit name="ShoppingDemo">
+      <provider>org.hibernate.ejb.HibernatePersistence</provider>
+      <jta-data-source>java:/ShoppingDemoDatasource</jta-data-source>
+      <properties>
+         <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
+         <property name="hibernate.cache.use_query_cache" value="true"/>
+         <property name="hibernate.show_sql" value="false"/>
+         
+         <property name="hibernate.cache.provider_class" 
+            value="org.hibernate.cache.HashtableCacheProvider"/>
+         
+         <!-- use a file system based index -->
+         <property name="hibernate.search.default.directory_provider" 
+            value="org.hibernate.search.store.FSDirectoryProvider"/>
+         <!-- directory where the indexes will be stored -->
+         <property name="hibernate.search.default.indexBase" value="./shoppingdemoindexes"/>  
+         <!-- Not needed with HA 3.3 -->
+         <property name="hibernate.ejb.event.post-insert" value="org.hibernate.search.event.FullTextIndexEventListener"/>
+         <property name="hibernate.ejb.event.post-update" value="org.hibernate.search.event.FullTextIndexEventListener"/>
+         <property name="hibernate.ejb.event.post-delete" value="org.hibernate.search.event.FullTextIndexEventListener"/>         
+         <property name="jboss.entity.manager.factory.jndi.name" value="java:/ShoppingDemoEntityManagerFactory"/>
+      </properties>
+   </persistence-unit>
+    
+</persistence>

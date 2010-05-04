@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE datasources
+    PUBLIC "-//JBoss//DTD JBOSS JCA Config 1.5//EN"
+    "http://www.jboss.org/j2ee/dtd/jboss-ds_1_5.dtd">
+    
+<datasources>
+   
+   <local-tx-datasource>
+      <jndi-name>ShoppingDemoDatasource</jndi-name>
+      <connection-url>jdbc:hsqldb:${jboss.server.data.dir}${/}hypersonic${/}dvd</connection-url>     
+      <driver-class>org.hsqldb.jdbcDriver</driver-class>
+      <user-name>sa</user-name>
+      <password></password>
+   </local-tx-datasource>
+   
+   <mbean code="org.jboss.jdbc.HypersonicDatabase" name="jboss:service=Hypersonic,database=dvd">
+      <attribute name="Database">dvd</attribute>
+      <attribute name="InProcessMode">true</attribute>
+   </mbean>  
+    
+</datasources>
+

@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:s="http://jboss.com/products/seam/taglib">
+<body>
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="topnav">
+            <ui:include src="/WEB-INF/incl/admin_nav.xhtml">
+                <ui:param name="page" value="admin" />
+            </ui:include>
+        </ui:define>
+
+        <ui:define name="sidebar">
+            <ui:include src="/WEB-INF/incl/login.xhtml" />
+            <ui:include src="/WEB-INF/incl/stats.xhtml" />
+            <ui:include src="/WEB-INF/incl/processmenu.xhtml" />
+        </ui:define>
+        
+        <ui:define name="body">
+            <h1>Order Management</h1>
+            
+            <p>
+                Pending orders are shown here on the order management
+                screen for the store manager to process.  Rather than
+                being data-driven, order management is process-driven.
+                A JBoss jBPM process assigns fulfillment tasks to the
+                manager based on the version of the process loaded.
+                The manager can change the version of the process at
+                any time using the admin options box to the right.  
+            </p>
+
+            <ul>
+                <li>
+                <a onclick="window.open('../img/ordermanagement1.html','flowimg','height=560,width=300,toolbar=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no'); return false;"
+                   href="img/ordermanagement1.html">Order process 1</a> 
+                sends orders immediately to shipping, where the manager should ship 
+                the order and record the tracking number for the user to see.
+                </li>
+                <li>
+                <a onclick="window.open('../img/ordermanagement2.html','flowimg','height=600,width=420,toolbar=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no'); return false;"
+                   href="img/ordermanagement2.html">Order process 2</a>
+                adds an approval step where the manager is first given the chance to 
+                approve the order before sending it to shipping.  In each case, the 
+                status of the order is shown in the customer's order list.
+                </li>
+                <li>
+                <a onclick="window.open('../img/ordermanagement3.html','flowimg','height=660,width=470,toolbar=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no'); return false;"
+                   href="img/ordermanagement3.html">Order process 3</a> 
+                introduces a decision node.  Only orders over $100.00 need to be 
+                accepted.  Smaller orders are automatically approved for shipping.
+                </li>
+            </ul>
+            
+            <h2>Task Assignment</h2>
+
+            <f:subview id="no_pooled_tasks" rendered="#{empty pooledTaskInstanceList}">
+                <p>There are no pooled tasks to be assigned.</p>
+            </f:subview>
+            
+            <h:dataTable rendered="#{not empty pooledTaskInstanceList}"
+                         value="#{pooledTaskInstanceList}"
+                         var="task" 
+                         styleClass="dvdtable" 
+                         headerClass="dvdtablehead"
+                         rowClasses="dvdtableodd,dvdtableeven"
+                         columnClasses="dvdtablecol">
+                <h:column>
+                    <f:facet name="header">Order Id</f:facet>
+                    #{task.variables['orderId']}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Task</f:facet>
+                    <h:outputText value="#{task.description}" />
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Order Amount</f:facet>
+                    <h:outputText value="#{task.variables['amount']}">
+                        <f:convertNumber type="currency" currencySymbol="$" />
+                    </h:outputText>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Customer</f:facet>
+                    <h:outputText value="#{task.variables['customer']}" />
+                </h:column>
+                <h:column>
+                    <s:button action="#{pooledTask.assignToCurrentActor}" taskInstance="#{task}"
+                              value="Assign"/>
+                </h:column>
+            </h:dataTable>
+            
+            
+            <h2>Order Acceptance</h2>
+            <f:subview id="no_orders" rendered="#{empty taskInstanceListForType['approve']}">
+                <p>There are no orders to be accepted.</p>
+            </f:subview>
+
+            <h:dataTable rendered="#{not empty taskInstanceListForType['approve']}"
+                         value="#{taskInstanceListForType['approve']}"
+                         var="task" 
+                         styleClass="dvdtable" 
+                         headerClass="dvdtablehead"
+                         rowClasses="dvdtableodd,dvdtableeven"
+                         columnClasses="dvdtablecol">
+                <h:column>
+                    <f:facet name="header">Order Id</f:facet>
+                    #{task.variables['orderId']}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Order Amount</f:facet>
+                    <h:outputText value="#{task.variables['amount']}">
+                        <f:convertNumber type="currency" currencySymbol="$" />
+                    </h:outputText>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Customer</f:facet>
+                    <h:outputText value="#{task.variables['customer']}" />
+                </h:column>
+                <h:column>
+                    <s:button action="#{accept.viewTask}" taskInstance="#{task}" 
+                              value="Review"/>
+                </h:column>
+            </h:dataTable>
+            
+            <h2>Shipping</h2>
+            <f:subview id="no_shipping" rendered="#{empty taskInstanceListForType['ship']}">
+                <p>There are no orders to be shipped.</p>
+            </f:subview>
+            <h:dataTable rendered="#{not empty taskInstanceListForType['ship']}"
+                         value="#{taskInstanceListForType['ship']}"
+                         var="task" 
+                         styleClass="dvdtable" 
+                         headerClass="dvdtablehead"
+                         rowClasses="dvdtableodd,dvdtableeven"
+                         columnClasses="dvdtablecol">
+                <h:column>
+                    <f:facet name="header">Order Id</f:facet>
+                    #{task.variables['orderId']}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Order Amount</f:facet>
+                    <h:outputText value="#{task.variables['amount']}">
+                        <f:convertNumber type="currency" currencySymbol="$" />
+                    </h:outputText>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Customer</f:facet>
+                    <h:outputText value="#{task.variables['customer']}" />
+                </h:column>
+                <h:column>
+                    <s:button action="#{ship.viewTask}" taskInstance="#{task}" 
+                              value="Ship"/>
+                </h:column>               
+            </h:dataTable>
+        </ui:define>
+    </ui:composition>
+</body>
+</html>
+
+
+
+

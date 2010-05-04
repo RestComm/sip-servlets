@@ -1,0 +1,65 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:s="http://jboss.com/products/seam/taglib">
+<body>
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="topnav">
+            <ui:include src="/WEB-INF/incl/admin_nav.xhtml">
+                <ui:param name="page" value="process" />
+            </ui:include>
+        </ui:define>
+        
+        <ui:define name="sidebar">
+            <ui:include src="/WEB-INF/incl/login.xhtml" />
+            <ui:include src="/WEB-INF/incl/stats.xhtml" />
+            <ui:include src="/WEB-INF/incl/processmenu.xhtml" />
+        </ui:define>
+        
+        <ui:define name="body">
+            <h2>Active Process Status</h2>
+            
+            <f:subview id="no_processes" rendered="#{empty processInstanceList}">
+                <p>There are no active processes.</p>
+            </f:subview>
+                    
+            <h:dataTable value="#{processInstanceList}" 
+                         var="process"
+                         styleClass="dvdtable"
+                         headerClass="dvdtablehead"
+                         rowClasses="dvdtableodd,dvdtableeven"
+                         columnClasses="dvdtablecol"
+                         rendered="#{not empty processInstanceList}">
+                <h:column>
+                    <f:facet name="header">Process Definition</f:facet>
+                    #{process.processDefinition.name}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Process Start</f:facet>
+                    <h:outputText value="#{process.start}">
+                        <s:convertDateTime type="both"/>
+                    </h:outputText>
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Current Node</f:facet>
+                    #{process.rootToken.node.name}
+                </h:column>
+                <h:column>
+                    <f:facet name="header">Current Node Enter</f:facet>
+                    <h:outputText value="#{process.rootToken.nodeEnter}">
+                        <s:convertDateTime type="both"/>
+                    </h:outputText>
+                </h:column>
+            </h:dataTable>
+            
+        </ui:define>
+    </ui:composition>
+</body>
+</html>
+
+
+
+

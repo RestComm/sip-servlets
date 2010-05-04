@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:s="http://jboss.com/products/seam/taglib"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+<body>
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="topnav">
+            <ui:include src="/WEB-INF/incl/store_nav.xhtml">
+                <ui:param name="page" value="home" />
+            </ui:include>
+        </ui:define>
+
+        <ui:define name="sidebar">
+            <ui:include src="/WEB-INF/incl/login.xhtml" />
+        </ui:define>
+       
+        <ui:define name="body">
+            <f:subview id="loggedIn" rendered="#{identity.loggedIn}">
+                <h1>Welcome to the DVD Store</h1>
+
+                <p>Your account has been created, and you have been automatically logged in.
+                  You can     <s:link view="/browse.xhtml">start shopping</s:link> immediately.
+                </p>
+            </f:subview>
+
+            <f:subview id="logInError" rendered="#{!identity.loggedIn}">
+                <h1>Sorry</h1>
+
+                <p>
+                    We're sorry.  We encountered an unexpected problem in creating
+                    your account.  Please try again later.
+                </p>
+            </f:subview>
+
+        </ui:define>
+    </ui:composition>
+</body>
+</html>

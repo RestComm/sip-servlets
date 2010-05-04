@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<components xmlns="http://jboss.com/products/seam/components"
+            xmlns:core="http://jboss.com/products/seam/core"
+            xmlns:persistence="http://jboss.com/products/seam/persistence"
+            xmlns:framework="http://jboss.com/products/seam/framework"
+            xmlns:bpm="http://jboss.com/products/seam/bpm"
+            xmlns:security="http://jboss.com/products/seam/security"            
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation=
+                "http://jboss.com/products/seam/core http://jboss.com/products/seam/core-2.0.xsd 
+                 http://jboss.com/products/seam/persistence http://jboss.com/products/seam/persistence-2.0.xsd 
+                 http://jboss.com/products/seam/drools http://jboss.com/products/seam/drools-2.0.xsd
+                 http://jboss.com/products/seam/bpm http://jboss.com/products/seam/bpm-2.0.xsd
+                 http://jboss.com/products/seam/security http://jboss.com/products/seam/security-2.0.xsd
+                 http://jboss.com/products/seam/mail http://jboss.com/products/seam/mail-2.0.xsd
+                 http://jboss.com/products/seam/components http://jboss.com/products/seam/components-2.0.xsd">
+
+   <core:init debug="true" jndi-pattern="shopping-demo/#{ejbName}/local"/>
+     
+    <!-- 120 second conversation timeout -->
+    <core:manager conversation-timeout="120000"/>
+    
+    <bpm:jbpm>
+        <bpm:process-definitions>
+            <value>ordermanagement3.jpdl.xml</value>
+        </bpm:process-definitions>
+        <bpm:pageflow-definitions>
+            <value>checkout.jpdl.xml</value>
+            <value>newuser.jpdl.xml</value>
+        </bpm:pageflow-definitions>
+    </bpm:jbpm>
+    
+    <security:identity authenticate-method="#{authenticator.authenticate}"/>
+    
+    
+   <persistence:managed-persistence-context name="entityManager"
+                                     auto-create="true"
+                      persistence-unit-jndi-name="java:/ShoppingDemoEntityManagerFactory"/>
+
+    <factory name="order" 
+        value="#{orderHome.instance}" 
+        scope="stateless" 
+        auto-create="true"/>
+    <framework:entity-home name="orderHome" 
+        entity-class="org.jboss.mobicents.seam.model.Order" 
+        scope="conversation" 
+        auto-create="true">
+        <framework:id>#{orderId}</framework:id>
+    </framework:entity-home>
+    
+    
+    <framework:entity-query name="allCategories"
+        ejbql="select c from Category c"
+        order="c.name">
+        <!--  waiting for hibernate issue EJB-277
+            <framework:hints>
+            <key>org.hibernate.cacheable</key>
+            <value>true</value>
+            </framework:hints>
+        -->
+    </framework:entity-query>    
+    
+    
+    <factory name="topProducts" 
+        value="#{topQuery.resultList}" />
+    <framework:entity-query name="topQuery"
+        ejbql="select p from Product p"
+        order="p.inventory.sales desc" 
+        max-results="8" />    
+      
+</components>

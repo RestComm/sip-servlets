@@ -1,0 +1,106 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:s="http://jboss.com/products/seam/taglib">
+<body>
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="topnav">
+            <ui:include src="/WEB-INF/incl/admin_nav.xhtml" />
+        </ui:define>
+
+        <ui:define name="sidebar">
+            <ui:include src="/WEB-INF/incl/login.xhtml" />
+            <ui:include src="/WEB-INF/incl/stats.xhtml" />
+            <ui:include src="/WEB-INF/incl/processmenu.xhtml" />
+        </ui:define>
+        
+        <ui:define name="body">
+            <h1>Order Shipping</h1>
+
+            <p>Please enter the tracking number below.</p>
+
+            <div class="cntInfo">
+                <h:form>
+                    <h:panelGrid columns="2">
+                        <h:outputText value="Order Number:" />
+                        <h:outputText value="#{order.orderId}" />
+                        
+                        <h:outputText value="Order date:" />
+                        <h:outputText value="#{order.orderDate}">
+                            <s:convertDateTime type="both" dateStyle="full"/> 
+                        </h:outputText>
+                        
+                        <h:outputText value="Net Amount:" />
+                        <h:outputText value="#{order.netAmount}">
+                            <f:convertNumber type="currency" currencySymbol="$" />
+                        </h:outputText>
+                        
+                        <h:outputText value="Tax:" />
+                        <h:outputText value="#{order.tax}">
+                            <f:convertNumber type="currency" currencySymbol="$" />
+                        </h:outputText>
+                        
+                        <h:outputText value="Total Amount:" />
+                        <h:outputText value="#{order.totalAmount}">
+                            <f:convertNumber type="currency" currencySymbol="$" />
+                        </h:outputText>
+                        
+                        <h:outputText value="Tracking number:" />
+                        <h:panelGroup>
+                            <!-- required, min length=4 -->
+                            <h:inputText id="trackingNumber" value="#{ship.track}" required="true"/> 
+
+                            <h:message for="trackingNumber" styleClass="cntError" />
+                        </h:panelGroup>
+                    </h:panelGrid>
+                    
+                    <div class="cntInfo">
+                        <h:dataTable value="#{order.orderLines}" 
+                                     var="item"
+                                     styleClass="dvdtable" 
+                                     headerClass="dvdtablehead"
+                                     rowClasses="dvdtableodd,dvdtableeven"
+                                     columnClasses="dvdtablecol">
+                            <h:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{messages.cartQuantityColumn}" />
+                                </f:facet>
+                                <h:outputText value="#{item.quantity}"/>
+                            </h:column>                        
+                            <h:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{messages.cartTitleColumn}" />
+                                </f:facet>
+                                <h:outputText value="#{item.product.title}" />
+                            </h:column>                        
+                            <h:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{messages.cartActorColumn}" />
+                                </f:facet>
+                                <h:outputText value="#{item.product.actors[0].name}" />
+                            </h:column>                        
+                            
+                            <h:column>
+                                <f:facet name="header">
+                                    <h:outputText value="#{messages.cartPriceColumn}" />
+                                </f:facet>
+                                <h:outputText value="#{item.product.price}">
+                                    <f:convertNumber type="currency" currencySymbol="$" />
+                                </h:outputText>
+                            </h:column>                        
+                        </h:dataTable>
+                    </div>
+                    <h:commandButton action="#{ship.ship}" value="Ship" /> 
+                </h:form>
+            </div>
+        </ui:define>
+    </ui:composition>
+</body>
+</html>
+
+
+
+

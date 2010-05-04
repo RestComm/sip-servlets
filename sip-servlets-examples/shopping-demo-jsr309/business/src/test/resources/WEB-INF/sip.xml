@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>shopping-demo</app-name>
+	<display-name>Shopping Demo Sip Servlet</display-name>
+	<description>Shopping Demo Sip Servlet</description>
+	
+	<servlet-selection>
+		<main-servlet>
+			ShoppingSipServlet
+		</main-servlet>
+	</servlet-selection>
+
+	<servlet>
+		<servlet-name>ShoppingSipServlet</servlet-name>
+		<display-name>ShoppingSipServlet</display-name>
+		<description>Shopping SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.example.ShoppingSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+	
+	<!--context-param>
+      <param-name>audio.files.path</param-name>
+      <param-value>file:///home/dereuelle/workspaces/sip-servlets/sip-servlets-examples/shopping-demo/resources/audio/</param-value>
+    </context-param-->
+    
+    <context-param>
+      <param-name>order.approval.waitingtime</param-name>
+      <param-value>30000</param-value>
+    </context-param>
+    
+    <context-param>
+      <param-name>admin.sip</param-name>
+      <param-value>sip:admin@shopping-demo.com</param-value>
+    </context-param>
+    
+    <context-param>
+      <param-name>admin.sip.default.contact</param-name>
+      <param-value>sip:admin@127.0.0.1:5055</param-value>
+    </context-param>
+    
+    <context-param>
+      <param-name>caller.domain</param-name>
+      <param-value>callwithus.com</param-value>
+    </context-param>    
+    
+    <context-param>
+      <param-name>caller.sip</param-name>
+      <param-value>650390127</param-value>
+    </context-param>
+    
+    <context-param>
+      <param-name>caller.password</param-name>
+      <param-value>311578</param-value>
+    </context-param>
+    
+    <listener>
+		<listener-class>
+			org.mobicents.servlet.sip.example.ShoppingSipServlet
+		</listener-class>
+	</listener>
+</sip-app>

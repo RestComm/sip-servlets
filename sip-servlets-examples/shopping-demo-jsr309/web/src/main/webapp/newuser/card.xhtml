@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:s="http://jboss.com/products/seam/taglib"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+<body>
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="topnav">
+            <ui:include src="/WEB-INF/incl/store_nav.xhtml">
+                <ui:param name="page" value="home" />
+            </ui:include>
+        </ui:define>
+
+        <ui:define name="sidebar">
+            <ui:include src="/WEB-INF/incl/login.xhtml" />
+        </ui:define>
+       
+        <ui:define name="body">
+            <h2><h:outputText value="#{messages.newCustomerHeader}" /></h2>
+            
+            <p><em><h:outputText value="#{messages.newCustomerInfo}" /></em></p>
+            
+            <h:form>
+                <table border="0">
+                    <tr>
+                        <td>#{messages.newCustomerCCT}</td>
+                        <td>
+                            <h:selectOneMenu value="#{customer.creditCardType}">
+                                <f:selectItems value="#{editCustomer.creditCardTypes}" />
+                            </h:selectOneMenu> 
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>#{messages.newCustomerCCN}</td>
+                        <td>
+                            <h:inputText id="creditCard" required="true" 
+                                         value="#{customer.creditCard}" />
+                            <f:verbatim>*</f:verbatim>
+                            <h:message for="creditCard" styleClass="cntError" />
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>#{messages.newCustomerCCE}</td>
+                        <td>
+                            <h:selectOneMenu value="#{customer.creditCardMonth}">
+                                <f:selectItem itemValue="1" itemLabel="#{messages.mo_1}" />
+                                <f:selectItem itemValue="2" itemLabel="#{messages.mo_2}" />
+                                <f:selectItem itemValue="3" itemLabel="#{messages.mo_3}" />
+                                <f:selectItem itemValue="4" itemLabel="#{messages.mo_4}" />
+                                <f:selectItem itemValue="5" itemLabel="#{messages.mo_5}" />
+                                <f:selectItem itemValue="6" itemLabel="#{messages.mo_6}" />
+                                <f:selectItem itemValue="7" itemLabel="#{messages.mo_7}" />
+                                <f:selectItem itemValue="8" itemLabel="#{messages.mo_8}" />
+                                <f:selectItem itemValue="9" itemLabel="#{messages.mo_9}" />
+                                <f:selectItem itemValue="10" itemLabel="#{messages.mo_10}" />
+                                <f:selectItem itemValue="11" itemLabel="#{messages.mo_11}" />
+                                <f:selectItem itemValue="12" itemLabel="#{messages.mo_12}" />
+                            </h:selectOneMenu> 
+                            
+                            <h:selectOneMenu value="#{customer.creditCardYear}">
+                                <f:selectItem itemValue="2005" />
+                                <f:selectItem itemValue="2006" />
+                                <f:selectItem itemValue="2007" />
+                                <f:selectItem itemValue="2008" />
+                                <f:selectItem itemValue="2009" />
+                                <f:selectItem itemValue="2010" />
+                            </h:selectOneMenu>
+                        </td>
+                    </tr>
+                </table>
+                
+                <h:commandButton action="next" value="#{messages.newCustomerSubmit}" />
+            </h:form>
+
+        </ui:define>
+    </ui:composition>
+</body>
+</html>

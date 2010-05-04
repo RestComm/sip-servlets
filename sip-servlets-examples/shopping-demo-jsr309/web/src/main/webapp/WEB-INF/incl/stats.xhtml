@@ -1,0 +1,27 @@
+<div  xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:s="http://jboss.com/products/seam/taglib"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+    
+    <f:subview id="statsdetails" rendered="#{s:hasRole('admin')}">
+        <div class="menu">
+            <dl>
+                <dt class="menuHeader">Statistics</dt>
+                <dd class="menuSection">
+                    <dl>
+                        <dt>Inventory</dt>
+                        <dd>#{stats.unitsSold} sold, #{stats.totalInventory} in stock</dd>
+                        <dt>Sales</dt>
+                        <dd>
+                            <h:outputText value="#{stats.totalSales}">
+                                <f:convertNumber type="currency" currencySymbol="$" />
+                            </h:outputText>
+                            from #{stats.numberOrders} orders
+                        </dd>
+                    </dl>
+                </dd>
+            </dl>
+        </div>
+    </f:subview>
+</div>

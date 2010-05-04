@@ -1,0 +1,129 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:s="http://jboss.com/products/seam/taglib"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+<body>
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="topnav">
+            <ui:include src="/WEB-INF/incl/store_nav.xhtml">
+                <ui:param name="page" value="home" />
+            </ui:include>
+        </ui:define>
+
+        <ui:define name="sidebar">
+            <ui:include src="/WEB-INF/incl/login.xhtml" />
+        </ui:define>
+       
+        <ui:define name="body">
+            <h2><h:outputText value="#{messages.newCustomerHeader}" /></h2>
+            
+            <p><em><h:outputText value="#{messages.newCustomerInfo}" /></em></p>
+            
+            <h:form>
+                <s:validateAll>
+                    <table border="0">
+                        <tr>
+                            <td class="cntForm">#{messages.newCustomerFN}</td>
+                            <td class="cntForm">
+                                <h:inputText id="firstName" required="true"
+                                             value="#{customer.firstName}" /> *
+                            </td>
+                            <td><h:message for="firstName" styleClass="cntError" /></td>
+                        </tr>
+
+                        <tr>
+                            <td>#{messages.newCustomerLN}</td>
+                            <td>
+                                <h:inputText id="lastName" required="true"
+                                             value="#{customer.lastName}" /> *
+                            </td>
+                            <td><h:message for="lastName" styleClass="cntError" /></td>
+                        </tr>
+
+                        <tr>
+                            <td>#{messages.newCustomerA1}</td>
+                            <td>
+                                <h:inputText id="address1" required="true"
+                                             value="#{customer.address1}" /> *
+                            </td>
+                            <td>
+                            <h:message for="address1" styleClass="cntError" />
+                            </td>
+                        </tr>
+
+                        
+                        <tr>
+                            <td>#{messages.newCustomerA2}</td>
+                            <td>
+                                <h:inputText value="#{customer.address2}" />
+                            </td>
+                            <td>&nbsp;</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>#{messages.newCustomerCY}</td>
+                            <td>
+                                <h:inputText id="city" required="true" 
+                                             value="#{customer.city}" /> *
+                            </td>
+                            <td>
+                                <h:message for="city" styleClass="cntError" />
+                            </td>
+                        </tr>
+
+                        
+                        <tr>
+                            <td>#{messages.newCustomerST}</td>
+                            <td>
+                                <h:inputText id="state" required="true" 
+                                             value="#{customer.state}" /> *
+                            </td>
+                            <td>
+                                <h:message for="state" styleClass="cntError" />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>#{messages.newCustomerZP}</td>
+                            <td>
+                                <h:inputText id="zip" required="true" 
+                                             value="#{customer.zip}" /> *
+                            </td>
+                            <td>
+                                <h:message for="zip" styleClass="cntError" />
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>#{messages.newCustomerEM}</td>
+                            <td>
+                                <h:inputText id="email" value="#{customer.email}" required="true"/> *
+                            </td>
+                            <td>
+                                <h:message for="email" styleClass="cntError" />
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td>#{messages.newCustomerPH}</td>
+                            <td>
+                                <h:inputText id="phone" value="#{customer.phone}" />
+                            </td>
+                            <td>
+                                <h:message for="phone" styleClass="cntError" />
+                            </td>
+                        </tr>
+                    </table>
+                </s:validateAll>
+
+                <ui:remove><h:commandButton action="prev" value="Back" /></ui:remove>
+                <h:commandButton action="next" value="Continue" />
+            </h:form>
+
+        </ui:define>
+    </ui:composition>
+</body>
+</html>

@@ -1,0 +1,24 @@
+<f:subview xmlns="http://www.w3.org/1999/xhtml"
+           xmlns:ui="http://java.sun.com/jsf/facelets"
+           xmlns:f="http://java.sun.com/jsf/core"
+           xmlns:h="http://java.sun.com/jsf/html"
+           xmlns:s="http://jboss.com/products/seam/taglib"
+           id="help">
+    <div class="menu">
+    	<dl>
+    		<dt class="menuHeader">Need Help ?</dt>
+    		<div class="bestimage">
+            	<img src="./img/help.jpg" />
+            </div>
+            Enter your phone number below and click the button, we will call you back instantly to help you out for free !
+            <dd class="menuForm"><h:form>
+                <dd>
+                	<dt><h:outputText value="Your Phone Number (+33655443322)" /></dt>
+                    <dd><h:inputText value="#{help.phoneNumber}" size="16" /></dd>
+                    <h:commandButton action="#{help.call}" value="Call" 
+                                     styleClass="formButton" style="width: 166px;" />
+                </dd>
+            </h:form></dd>
+        </dl>
+    </div>
+</f:subview>

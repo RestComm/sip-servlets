@@ -1,0 +1,40 @@
+<div class="menu" 
+     xmlns="http://www.w3.org/1999/xhtml"
+	 xmlns:ui="http://java.sun.com/jsf/facelets"
+	 xmlns:s="http://jboss.com/products/seam/taglib"
+	 xmlns:f="http://java.sun.com/jsf/core"
+	 xmlns:h="http://java.sun.com/jsf/html">
+<dl>
+    <dt class="menuHeader">#{messages.browseSearchHeader}</dt>
+    <dd class="menuForm"><h:form>
+        <dl>
+            <ui:remove>
+                <dt><h:outputText value="#{messages.searchCategory}"/></dt>
+                <dd>
+                    <h:selectOneMenu value="#{search.category}">
+                        <s:convertEntity />
+                        <s:selectItems value="#{allCategories.resultList}" 
+                                       var="category"
+                                       label="#{category.name}"/>
+                    </h:selectOneMenu>
+                </dd>
+            </ui:remove>
+            
+            <dt><h:outputText value="#{messages.searchTerm}" /></dt>
+            <dd><h:inputText value="#{search.searchQuery}" size="15" /></dd>
+            
+            <dt><h:outputText value="#{messages.searchPageSize}" /></dt>
+            <dd><h:selectOneMenu value="#{search.pageSize}">
+                <f:selectItem itemLabel="10" itemValue="10" />
+                <f:selectItem itemLabel="15" itemValue="15" />
+                <f:selectItem itemLabel="20" itemValue="20" />
+                <f:selectItem itemLabel="30" itemValue="30" />
+            </h:selectOneMenu></dd>
+            
+            <dd><h:commandButton action="#{search.doSearch}"
+            value="#{messages.searchButton}" styleClass="formButton"
+            style="width: 166px;" /></dd>
+        </dl>
+    </h:form></dd>
+</dl>
+</div>

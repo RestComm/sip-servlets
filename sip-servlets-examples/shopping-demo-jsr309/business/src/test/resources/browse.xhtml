@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:s="http://jboss.com/products/seam/taglib"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions">
+
+<body>
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="topnav">
+            <ui:include src="/WEB-INF/incl/store_nav.xhtml">
+                <ui:param name="page" value="shop" />
+            </ui:include>
+        </ui:define>
+        
+        <ui:define name="sidebar">
+            <ui:include src="/WEB-INF/incl/login.xhtml" />
+            <ui:include src="/WEB-INF/incl/searchbox.xhtml" />
+            <ui:include src="/WEB-INF/incl/cart.xhtml" />
+        </ui:define>
+        
+        <ui:define name="body">
+            <f:subview id="noresults" rendered="#{searchResults==null}">
+                <p> This is the Furniture search screen.  Use the search box
+                to the right to search for Furniture's.  The search component
+                is a conversational Seam component.  You can perform
+                multiple searches in multiple windows, and Seam will
+                keep them all separate.  The shopping cart, of course,
+                is shared, allowing the customer to place items in the
+                car from any of the search screens.</p>
+            
+                <div class="bestouter">
+                    <ui:repeat value="#{topProducts}" var="item">
+                        <div class="bestinner">
+                            <div class="besttitle">
+                                <s:link view="/dvd.xhtml">
+                                    #{fn:length(item.title) gt 14 ? fn:substring(item.title,0,13) : item.title}
+                                    <f:param name="id" value="#{item.productId}"/>
+                                </s:link>
+                            </div>
+                            <div class="bestimage">
+                                <s:link view="/dvd.xhtml">
+                                    <f:param name="id" value="#{item.productId}"/>
+                                    <img src="#{item.imageURL}" />
+                                </s:link>
+                            </div>
+                        </div>
+                    </ui:repeat>
+                </div>
+            </f:subview>
+            
+            <f:subview id="searchresults" rendered="#{searchResults.rowCount == 0}">
+                <h2>
+                    <h:outputText value="#{messages.noSearchResultsHeader}" />
+                </h2>
+            </f:subview>
+                
+            <h:form rendered="#{searchResults.rowCount > 0}">
+                <div class="controlBar">
+                    <div class="buttonbox">
+                        <div class="button">
+                            <h:commandLink action="#{search.nextPage}" rendered="#{!search.lastPage}">
+                                <img src="img/arrow-r.png" />
+                            </h:commandLink>
+                            &#160;
+                        </div>
+                        <div class="button">
+                            <h:commandLink action="#{search.prevPage}" rendered="#{!search.firstPage}">
+                                <img src="img/arrow-l.png" />
+                            </h:commandLink>
+                            &#160;
+                        </div>
+                    </div>
+                    
+                    <div class="message">#{messages.searchResultsHeader}</div>
+                </div>
+                
+                <h:dataTable value="#{searchResults}" 
+                             var="product" 
+                             styleClass="dvdtable" 
+                             headerClass="dvdtablehead"
+                             rowClasses="results"
+                             columnClasses="dvdtablecol">
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{messages.searchResultsAdd}" />
+                        </f:facet>
+                        <h:selectBooleanCheckbox value="#{searchSelections[product]}"/>
+                    </h:column>
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{messages.searchResultsTitle}" />
+                        </f:facet>
+                        
+                        <s:link view="/dvd.xhtml" value="#{product.title}">
+                            <f:param name="id" value="#{product.productId}"/>
+                        </s:link>
+                    </h:column>                        
+                    
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="Starring" />
+                        </f:facet>
+                        <h:outputText value="#{product.actors[0].name}" />
+                    </h:column>                        
+                    
+                    <h:column>
+                        <f:facet name="header">
+                            <h:outputText value="#{messages.searchResultsPrice}" />
+                        </f:facet>
+                        <h:outputText value="#{product.price}">
+                            <f:convertNumber type="currency" currencySymbol="$" />
+                        </h:outputText>
+                    </h:column>                        
+                </h:dataTable>
+                
+                <h:commandButton action="#{search.addAllToCart}" 
+                                 value="#{messages.searchUpdateButton}"/>
+                
+            </h:form>        
+        </ui:define>
+    </ui:composition>
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<pageflow-definition
+	xmlns="http://jboss.com/products/seam/pageflow"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation=
+	    "http://jboss.com/products/seam/pageflow http://jboss.com/products/seam/pageflow-2.0.xsd"
+ 	name="checkout">
+    <start-state name="start">
+        <transition to="confirm"/>
+    </start-state>
+
+    <page name="confirm" view-id="/confirm.xhtml" no-conversation-view-id="/checkout.xhtml">
+        <redirect/>
+        <transition name="cancel"   to="cancel"/> 
+        <transition name="purchase" to="complete">
+            <action expression="#{checkout.submitOrder}" />
+        </transition>
+    </page>
+    
+    <page name="complete" view-id="/complete.xhtml">
+        <end-conversation/>
+        <redirect/>
+    </page>    
+
+    <page name="cancel" view-id="/browse.xhtml">
+	    <end-conversation before-redirect="true"/>
+        <redirect/>    
+    </page>
+
+</pageflow-definition>

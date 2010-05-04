@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+<body>
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="topnav">
+            <ui:include src="/WEB-INF/incl/store_nav.xhtml">
+                <ui:param name="page" value="cart" />
+            </ui:include>
+        </ui:define>
+
+        <ui:define name="sidebar">
+            <ui:include src="/WEB-INF/incl/login.xhtml" />
+        </ui:define>
+
+        <ui:define name="body">
+            <h1>Shopping Cart</h1>
+
+            <p>
+                The checkout wizard uses a 
+                <a onclick="window.open('img/checkout.html','flowimg','height=330,width=370,toolbar=no,directories=no,status=no,menubar=no,scrollbars=no,resizable=no'); return false;"
+                   href="img/checkout.html">pageflow</a>
+                to define the flow of the user interaction.
+            </p>
+        
+            <f:subview id="emptycart" rendered="#{empty cart.cart}">
+                <p>Your cart is empty.</p>
+
+                <h:form>
+                    <h:commandButton action="browse" value="Continue Shopping" />
+                </h:form>
+            </f:subview>
+
+            <f:subview id="cartdetails" rendered="#{not empty cart.cart}">
+                <h:form>
+                    <h:dataTable value="#{cart.cart}" var="item"
+                                 styleClass="dvdtable" 
+                                 headerClass="dvdtablehead"
+                                 rowClasses="dvdtableodd,dvdtableeven"
+                                 columnClasses="dvdtablecol">
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{messages.cartRemoveColumn}" />
+                            </f:facet>
+                            <h:selectBooleanCheckbox value="#{cart.cartSelection[item]}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{messages.cartTitleColumn}" />
+                            </f:facet>
+                            <h:outputText value="#{item.product.title}" />
+                        </h:column>                        
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{messages.cartActorColumn}" />
+                            </f:facet>
+                                <h:outputText value="#{item.product.actors[0].name}" />
+                        </h:column>                        
+                        
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{messages.cartPriceColumn}" />
+                            </f:facet>
+                            <h:outputText value="#{item.product.price}">
+                                <f:convertNumber type="currency" currencySymbol="$" />
+                            </h:outputText>
+                        </h:column>                        
+                        <h:column>
+                            <f:facet name="header">
+                                <h:outputText value="#{messages.cartQuantityColumn}" />
+                            </f:facet>
+                            <h:inputText value="#{item.quantity}" size="6" />
+                        </h:column>                        
+                    </h:dataTable>
+                    <h:commandButton action="browse"  
+                                     value="Continue Shopping" />
+                    &#160;
+                    <h:commandButton action="#{cart.resetCart}"  
+                                     value="Empty Cart"  />
+                    &#160;
+                    <h:commandButton action="#{cart.updateCart}" 
+                                     value="#{messages.checkoutUpdateButton}" />
+                </h:form>
+                
+                <div style="width: 100%;">
+                    <div class="cntInfo" style="float:right;">
+                        <h:panelGrid columns="2">
+                            <h:outputText value="#{messages.checkoutSubtotal}" />
+                            <h:outputText value="#{cart.subtotal}">
+                                <f:convertNumber type="currency" currencySymbol="$" />
+                            </h:outputText>
+                            
+                            <h:outputText value="#{messages.checkoutTax}" />
+                            <h:outputText value="#{cart.tax}">
+                                <f:convertNumber type="currency" currencySymbol="$" />
+                            </h:outputText>
+                            
+                            <h:outputText value="#{messages.checkoutTotal}" />
+                            <h:outputText value="#{cart.total}">
+                                <f:convertNumber type="currency" currencySymbol="$" />
+                            </h:outputText>
+                        </h:panelGrid>
+                        
+                        
+                        <f:subview id="purchaseaction" rendered="#{identity.loggedIn}">
+                            <h:form>
+                                <h:commandButton action="#{checkout.createOrder}"  
+                                                 value="#{messages.checkoutPurchaseButton}"  />
+                            </h:form>
+                        </f:subview>
+                    </div>
+                    
+                    <f:subview id="notloggedin" rendered="#{!identity.loggedIn}">
+                        <p class="warning">You must be logged in to place an order</p>
+                    </f:subview>
+                </div>
+            </f:subview>
+        </ui:define>
+    </ui:composition>
+</body>
+</html>

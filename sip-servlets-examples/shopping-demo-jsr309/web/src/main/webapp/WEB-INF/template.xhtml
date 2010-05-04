@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core">
+<head>   
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <title>Mobicents Seam Furniture Store</title>    
+    <link href="#{facesContext.externalContext.requestContextPath}/screen.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body id="pgMainMenu">
+    <div id="document"> 
+        <div id="header"><span>Mobicents Seam Furniture Store</span></div>
+        <div id="nav"> 
+            <ui:insert name="topnav">
+                TOPNAV
+            </ui:insert>
+        </div>
+
+        <div id="container">
+            <div id="sidebar">
+                <ui:insert name="sidebar">
+                    SIDEBAR
+                </ui:insert>
+            </div>
+
+            <div id="errors">
+                <ui:insert name="errors">
+                    <h:messages globalOnly="true" 
+                                layout="table" 
+                                styleClass="cntError" />
+                </ui:insert>
+            </div>
+
+            <div id="content">
+                <ui:debug hotkey="D"/>
+                <ui:insert name="body">
+                    PAGE BODY
+                </ui:insert>
+            </div>
+        </div>       
+    </div>
+</body>
+</html>

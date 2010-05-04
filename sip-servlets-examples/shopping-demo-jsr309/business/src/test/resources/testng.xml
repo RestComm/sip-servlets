@@ -1,0 +1,27 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="DVD Store" verbose="2" parallel="false">
+    <test name="DVD Store: Model Unit Tests">
+        <classes>
+            <class name="org.jboss.mobicents.seam.test.ProductUnitTest" />
+        </classes>
+    </test>
+
+    <test name="DVD Store: Store Beans">
+        <classes>
+            <class name="org.jboss.mobicents.seam.test.SearchTest"/>
+            <class name="org.jboss.mobicents.seam.test.BestSellersTest"/>
+        </classes>
+    </test>
+    
+    <test name="DVD Store: Admin Beans">
+        <classes>
+            <class name="org.jboss.mobicents.seam.test.StoreManagerTest"/>
+        </classes>
+    </test>
+
+    <test name="DVD Store: Order">
+    	<classes>
+    		<class name="org.jboss.mobicents.seam.test.OrderTest" />
+    	</classes>
+    </test>
+</suite>

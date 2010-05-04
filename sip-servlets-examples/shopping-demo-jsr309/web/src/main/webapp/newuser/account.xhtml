@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:s="http://jboss.com/products/seam/taglib"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html">
+<body>
+    <ui:composition template="/WEB-INF/template.xhtml">
+        <ui:define name="topnav">
+            <ui:include src="/WEB-INF/incl/store_nav.xhtml">
+                <ui:param name="page" value="home" />
+            </ui:include>
+        </ui:define>
+
+        <ui:define name="sidebar">
+            <ui:include src="/WEB-INF/incl/login.xhtml" />
+        </ui:define>
+        
+        <ui:define name="body">
+            <h2><h:outputText value="#{messages.newCustomerHeader}" /></h2>
+            
+            <p><em><h:outputText value="#{messages.newCustomerInfo}" /></em></p>
+            
+
+            <p>
+                The user registration wizard uses a 
+                <a onclick="window.open('../img/newuser.html','flowimg','height=580,width=510,toolbar=no,status=no,directories=no,menubar=no,scrollbars=no,resizable=no'); return false;"
+                   href="img/newuser.html">pageflow</a>
+                to define the flow of the user interaction.
+            </p>
+        
+            <div class="cntInfo">
+                <h:form>
+                    <table border="0">
+                        <tr>
+                            <td class="cntForm">#{messages.newCustomerUN}</td>
+                            <td class="cntForm">
+                                <h:inputText id="userName" required="true"
+                                             value="#{customer.userName}">
+                                    <s:validate />
+                                </h:inputText> *
+                            </td>
+                            <td><h:message for="userName" styleClass="cntError" /></td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="cntForm">#{messages.newCustomerPW}</td>
+                            <td class="cntForm">
+                                <h:inputSecret id="password" required="true"
+                                               value="#{customer.password}">
+                                    <s:validate />
+                                </h:inputSecret> *
+                            </td>
+                            <td><h:message for="password" styleClass="cntError" /></td>
+                        </tr>
+                        
+                        <tr>
+                            <td class="cntForm">#{messages.newCustomerP2}</td>
+                            <td class="cntForm">
+                                <h:inputSecret id="passwordVerify"
+                                               value="#{editCustomer.passwordVerify}">
+                                </h:inputSecret> * 
+                            </td>
+                            <td><h:message for="passwordVerify" styleClass="cntError" /></td>
+                        </tr>
+                    </table>
+
+                    <h:commandButton action="next" value="Continue" />
+                </h:form>
+            </div>
+        </ui:define>
+    </ui:composition>
+</body>
+</html>
