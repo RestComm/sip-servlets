@@ -27,6 +27,9 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Proxy;
+import javax.servlet.sip.ProxyBranch;
+import javax.servlet.sip.ServletParseException;
+import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
@@ -35,17 +38,22 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.sip.ListeningPoint;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.ProxyBranchListener;
+import org.mobicents.javax.servlet.sip.ProxyExt;
+import org.mobicents.javax.servlet.sip.ResponseType;
 
-public class ProxySipServlet extends SipServlet implements SipErrorListener {
+public class ProxySipServlet extends SipServlet implements SipErrorListener, ProxyBranchListener {
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(ProxySipServlet.class);
 	String host = "127.0.0.1";
 	private static String USE_HOSTNAME = "useHostName";
 	private static String CHECK_URI = "check_uri";
 	private static String NON_RECORD_ROUTING = "nonRecordRouting";
-
+	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
+	
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the proxy sip servlet has been started");
@@ -79,22 +87,29 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener {
 		URI uri2 = sipFactory.createAddress("sip:cutme@" + host + ":5056").getURI();
 		URI uri3 = sipFactory.createAddress("sip:nonexist@" + host + ":5856").getURI();
 
-		if(request.getFrom().getURI().toString().contains("sequential")) {
+		final String from = request.getFrom().getURI().toString();
+		if(from.contains("sequential")) {
 			Proxy proxy = request.getProxy();
 			proxy.setParallel(false);
 			proxy.setProxyTimeout(5);
+			if(from.contains("1xxResponseTimeout")) {
+				((ProxyExt)proxy).setProxy1xxTimeout(1);				
+			}
+			if(from.contains("finalResponseTimeout")) {				
+				proxy.setProxyTimeout(2);				
+			}
 			proxy.setRecordRoute(true);
 			ArrayList<URI> uris = new ArrayList<URI>();
-			if(request.getFrom().getURI().toString().contains("sequential-reverse")) {
+			if(from.contains("sequential-reverse")) {
 				uris.add(uri1);
-				if(!request.getFrom().getURI().toString().contains("sequential-reverse-one")) {
+				if(!from.contains("sequential-reverse-one")) {
 					uris.add(uri2);
 				}
-			} else if(request.getFrom().getURI().toString().contains("sequential-three")) {
+			} else if(from.contains("sequential-three")) {
 				uris.add(uri3);
 				uris.add(uri2);
 				uris.add(uri1);
-			} else if(request.getFrom().getURI().toString().contains("sequential-cut")) {
+			} else if(from.contains("sequential-cut")) {
 				uris.add(uri2);
 			}
 			else {
@@ -247,4 +262,33 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener {
     	logger.error("CANCEL seen at proxy " + req);
     }
 
+	public void onProxyBranchResponseTimeout(ResponseType responseType,
+			ProxyBranch proxyBranch) {
+		logger.info("onProxyBranchResponseTimeout callback was called. responseType = " + responseType + " , branch = " + proxyBranch + ", request " + proxyBranch.getRequest() + ", response " + proxyBranch.getResponse());
+		sendMessage(responseType.toString());
+	}
+
+	/**
+	 * @param sipApplicationSession
+	 * @param storedFactory
+	 */
+	private void sendMessage(String content) {
+		try {
+			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+			SipServletRequest sipServletRequest = sipFactory.createRequest(
+					sipFactory.createApplicationSession(), 
+					"MESSAGE", 
+					"sip:sender@sip-servlets.com", 
+					"sip:receiver@sip-servlets.com");
+			SipURI sipUri = sipFactory.createSipURI("receiver", "127.0.0.1:5080");			
+			sipServletRequest.setRequestURI(sipUri);
+			sipServletRequest.setContentLength(content.length());
+			sipServletRequest.setContent(content, CONTENT_TYPE);
+			sipServletRequest.send();
+		} catch (ServletParseException e) {
+			logger.error("Exception occured while parsing the addresses",e);
+		} catch (IOException e) {
+			logger.error("Exception occured while sending the request",e);			
+		}
+	}
 }
