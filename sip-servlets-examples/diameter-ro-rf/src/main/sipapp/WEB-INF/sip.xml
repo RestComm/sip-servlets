@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.example.DiameterRoRfApplication</app-name>
+	<display-name>Diameter Ro/Rf Sip Servlet</display-name>
+	<description>Diameter Ro/Rf Sip Servlet</description>
+	
+	<servlet-selection>
+		<main-servlet>
+			DiameterRoRfSipServlet
+		</main-servlet>
+	</servlet-selection>
+	
+	<session-config>
+        	<session-timeout>4</session-timeout>
+    </session-config>
+	
+	<servlet>
+		<servlet-name>DiameterRoRfSipServlet</servlet-name>
+		<display-name>DiameterRoRfSipServlet</display-name>
+		<description>Diameter Ro/Rf SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.example.DiameterRoRfSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>	
+</sip-app>
