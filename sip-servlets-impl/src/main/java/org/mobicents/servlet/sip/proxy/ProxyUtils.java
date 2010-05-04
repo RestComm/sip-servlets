@@ -233,10 +233,14 @@ public class ProxyUtils {
 		final int status = response.getStatusCode();
 		// 1. Update timer C for provisional non retransmission responses
 		if(transaction != null && ((SIPTransaction)transaction).getMethod().equals(Request.INVITE)) {
+			if(Response.TRYING == status) {
+				proxyBranch.cancel1xxTimer();
+			}
 			if(Response.TRYING < status && status < Response.OK) {
-				proxyBranch.updateTimer();
+				proxyBranch.updateTimer(true);
 			} else if(status >= Response.OK) {
 				//remove it if response is final
+				proxyBranch.cancel1xxTimer();
 				proxyBranch.cancelTimer();
 			}
 		}

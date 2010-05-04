@@ -315,11 +315,20 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 								}
 							}
 						} else {
-							logger.warn("Final branch is null, enable debug for more information.");
-							if(logger.isDebugEnabled()) {
-								logger.debug("Final branch is null, this will probably result in a lost call or request. Here is the request:\n" + request, new
-										RuntimeException("Final branch is null"));
+							// this can happen on a branch that timed out and the proxy sent a 408
+							// This would be the ACK to the 408 
+							if(!Request.ACK.equalsIgnoreCase(requestMethod)) {
+								logger.warn("Final branch is null, enable debug for more information.");
+								if(logger.isDebugEnabled()) {
+									logger.debug("Final branch is null, this will probably result in a lost call or request. Here is the request:\n" + request, new
+											RuntimeException("Final branch is null"));
+								}
+							} else {
+								if(logger.isDebugEnabled()) {
+									logger.debug("Final branch is null, Here is the request:\n" + request);
+								}
 							}
+							
 						}
 					}
 					// If it's not for a proxy then it's just an AR, so go to the next application

@@ -50,6 +50,7 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.ProxyExt;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
@@ -63,7 +64,7 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
  * @author root
  *
  */
-public class ProxyImpl implements Proxy, Externalizable {
+public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -74,6 +75,7 @@ public class ProxyImpl implements Proxy, Externalizable {
 	private transient ProxyBranchImpl bestBranch;
 	private boolean recurse = true;
 	private int proxyTimeout;
+	private int proxy1xxTimeout;
 	private int seqSearchTimeout;
 	private boolean supervised = true; 
 	private boolean recordRoutingEnabled;
@@ -111,6 +113,7 @@ public class ProxyImpl implements Proxy, Externalizable {
 		this.sipFactoryImpl = sipFactoryImpl;
 		this.proxyBranches = new LinkedHashMap<URI, ProxyBranchImpl> ();		
 		this.proxyTimeout = 180; // 180 secs default
+		this.proxy1xxTimeout = -1; // not activated by default
 		String outboundInterfaceStringified = ((MobicentsSipSession)request.getSession()).getOutboundInterface();
 		if(outboundInterfaceStringified != null) {
 			try {
@@ -841,6 +844,22 @@ public class ProxyImpl implements Proxy, Externalizable {
 		out.writeObject(finalBranchForSubsequentRequests);
 		out.writeObject(previousNode);
 		out.writeUTF(callerFromHeader);
+	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.javax.servlet.sip.ProxyExt#getProxy1xxTimeout()
+	 */
+	public int getProxy1xxTimeout() {
+		return proxy1xxTimeout;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.javax.servlet.sip.ProxyExt#setProxy1xxTimeout(int)
+	 */
+	public void setProxy1xxTimeout(int timeout) {
+		proxy1xxTimeout = timeout;
+		
 	}
 
 }

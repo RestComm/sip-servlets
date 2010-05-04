@@ -38,6 +38,7 @@ import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.annotation.SipServlet;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.ProxyBranchListener;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
@@ -57,6 +58,7 @@ public class SipListenersHolder {
 	private List<SipServletListener> sipServletsListeners;
 	private List<SipErrorListener> sipErrorListeners;
 	private List<SipConnectorListener> sipConnectorListeners;
+	private List<ProxyBranchListener> proxyBranchListeners;
 	private List<ServletContextListener> servletContextListeners;
 	private Map<EventListener, SipServletImpl> listenerServlets;
 	// There may be at most one TimerListener defined.
@@ -81,6 +83,7 @@ public class SipListenersHolder {
 		this.sipErrorListeners = new ArrayList<SipErrorListener>();
 		this.servletContextListeners = new ArrayList<ServletContextListener>();		
 		this.sipConnectorListeners = new ArrayList<SipConnectorListener>();
+		this.proxyBranchListeners = new ArrayList<ProxyBranchListener>();
 		listenerServlets = new HashMap<EventListener, SipServletImpl>();
 	}
 	
@@ -188,6 +191,11 @@ public class SipListenersHolder {
 			this.addListener((SipConnectorListener) listener);
 			added = true;
 		}
+		
+		if (listener instanceof ProxyBranchListener) {
+			this.addListener((ProxyBranchListener) listener);
+			added = true;
+		}
 
 		if(!added) {
 			throw new IllegalArgumentException("Wrong type of LISTENER!!!["
@@ -252,6 +260,10 @@ public class SipListenersHolder {
 	public void addListener(SipConnectorListener listener) {
 		this.sipConnectorListeners.add(listener);
 	}
+	
+	public void addListener(ProxyBranchListener listener) {
+		this.proxyBranchListeners.add(listener);
+	}
 
 	public void setTimerListener(TimerListener listener) {
 		if(this.timerListener != null) {
@@ -310,6 +322,10 @@ public class SipListenersHolder {
 		return sipConnectorListeners;
 	}
 	
+	public List<ProxyBranchListener> getProxyBranchListeners() {
+		return proxyBranchListeners;
+	}
+	
 	public TimerListener getTimerListener() {
 		return timerListener;
 	}
@@ -352,6 +368,9 @@ public class SipListenersHolder {
 		for(SipConnectorListener sipConnectorListener : sipConnectorListeners) {
 			checkDeallocateServlet(sipConnectorListener);
 		}
+		for(ProxyBranchListener proxyListener : proxyBranchListeners) {
+			checkDeallocateServlet(proxyListener);
+		}
 		checkDeallocateServlet(timerListener);
 	}
 	
@@ -372,6 +391,7 @@ public class SipListenersHolder {
 		this.sipErrorListeners.clear();
 		this.servletContextListeners.clear();
 		this.sipConnectorListeners.clear();
+		this.proxyBranchListeners.clear();
 		this.listenerServlets.clear();
 		this.timerListener = null;
 	}

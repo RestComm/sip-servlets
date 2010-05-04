@@ -49,6 +49,9 @@ import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.ProxyBranchExt;
+import org.mobicents.javax.servlet.sip.ProxyBranchListener;
+import org.mobicents.javax.servlet.sip.ResponseType;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
@@ -64,7 +67,7 @@ import org.mobicents.servlet.sip.message.TransactionApplicationData;
  * @author root
  *
  */
-public class ProxyBranchImpl implements ProxyBranch, Externalizable {
+public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externalizable {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(ProxyBranchImpl.class);
@@ -82,8 +85,11 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 	private boolean started;
 	private boolean timedOut;
 	private int proxyBranchTimeout;
+	private int proxyBranch1xxTimeout;
 	private transient ProxyBranchTimerTask proxyTimeoutTask;
+	private transient ProxyBranchTimerTask proxy1xxTimeoutTask;
 	private transient boolean proxyBranchTimerStarted;
+	private transient boolean proxyBranch1xxTimerStarted;
 	private transient Object cTimerLock;
 	private boolean canceled;
 	private boolean isAddToPath;
@@ -109,6 +115,7 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 			this.recordRouteURI = (SipURI)((SipURIImpl)recordRouteURI).clone();			
 		}
 		this.proxyBranchTimeout = proxy.getProxyTimeout();
+		this.proxyBranch1xxTimeout = proxy.getProxy1xxTimeout();
 		this.canceled = false;
 		this.recursedBranches = new ArrayList<ProxyBranch>();
 		proxyBranchTimerStarted = false;
@@ -275,7 +282,7 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		}
 		
 		this.proxyBranchTimeout = seconds;
-		if(this.started) updateTimer();
+		if(this.started) updateTimer(false);
 	}
 	
 	/**
@@ -297,7 +304,7 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		}
 		
 		// Initialize these here for efficiency.
-		updateTimer();
+		updateTimer(false);		
 		
 		SipURI recordRoute = null;
 		
@@ -321,7 +328,16 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		//since it has been proxied
 		originalRequest.setRoutingState(RoutingState.PROXIED);
 		
-		forwardRequest(cloned, false);					
+		if(logger.isDebugEnabled()) {
+			logger.debug("Proxy Branch 1xx Timeout set to " + proxyBranch1xxTimeout);
+		}
+		if(proxyBranch1xxTimeout > 0) {
+			proxy1xxTimeoutTask = new ProxyBranchTimerTask(this, ResponseType.INFORMATIONAL);				
+			timer.schedule(proxy1xxTimeoutTask, proxyBranch1xxTimeout * 1000L);
+			proxyBranch1xxTimerStarted = true;
+		}
+		
+		forwardRequest(cloned, false);		
 		started = true;
 	}
 	
@@ -402,8 +418,13 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		}
 
 		// We have already sent TRYING, don't send another one
-		if(status == 100)
+		if(status == 100) {
+			if(logger.isDebugEnabled() && proxyBranch1xxTimerStarted) {
+				logger.debug("1xx received, cancelling 1xx timer ");
+			}
+			cancel1xxTimer();
 			return;
+		}
 		
 		// Send informational responses back immediately
 		if((status > 100 && status < 200) || (status == 200 && Request.PRACK.equals(response.getMethod())))
@@ -645,11 +666,20 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 	 * establishing the dialog.
 	 *
 	 */
-	public void onTimeout()
+	public void onTimeout(ResponseType responseType)
 	{
 		if(!proxy.getAckReceived()) {
 			this.cancel();
+			if(responseType == ResponseType.FINAL) {
+				cancel1xxTimer();
+			}
 			this.timedOut = true;
+			List<ProxyBranchListener> proxyBranchListeners = originalRequest.getSipSession().getSipApplicationSession().getSipContext().getListeners().getProxyBranchListeners();
+			if(proxyBranchListeners != null) {
+				for (ProxyBranchListener proxyBranchListener : proxyBranchListeners) {
+					proxyBranchListener.onProxyBranchResponseTimeout(responseType, this);
+				}
+			}
 			// Just do a timeout response
 			proxy.onBranchTimeOut(this);
 		} else {
@@ -662,13 +692,16 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 	 * party is still online.
 	 *
 	 */
-	void updateTimer() {
-		cancelTimer();			
+	void updateTimer(boolean cancel1xxTimer) {
+		if(cancel1xxTimer) {
+			cancel1xxTimer();
+		}
+		cancelTimer();		
 		if(proxyBranchTimeout > 0) {			
 			synchronized (cTimerLock) {
 				if(!proxyBranchTimerStarted) {
 					try {
-						final ProxyBranchTimerTask timerCTask = new ProxyBranchTimerTask(this);
+						final ProxyBranchTimerTask timerCTask = new ProxyBranchTimerTask(this, ResponseType.FINAL);
 						if(logger.isDebugEnabled()) {
 							logger.debug("Proxy Branch Timeout set to " + proxyBranchTimeout);
 						}
@@ -686,16 +719,25 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 	/**
 	 * Stop the C Timer.
 	 */
-	public void cancelTimer()
-	{		
+	public void cancelTimer() {
 		synchronized (cTimerLock) {
-			if(proxyTimeoutTask != null && proxyBranchTimerStarted)
-			{			
+			if (proxyTimeoutTask != null && proxyBranchTimerStarted) {
 				proxyTimeoutTask.cancel();
 				proxyTimeoutTask = null;
-				proxyBranchTimerStarted = false;		
-			}	
-		}		
+				proxyBranchTimerStarted = false;
+			}
+		}
+	}
+
+	/**
+	 * Stop the Extension Timer for 1xx.
+	 */
+	public void cancel1xxTimer() {
+		if (proxy1xxTimeoutTask != null && proxyBranch1xxTimerStarted) {
+			proxy1xxTimeoutTask.cancel();
+			proxy1xxTimeoutTask = null;
+			proxyBranch1xxTimerStarted = false;
+		}
 	}
 
 	public boolean isCanceled() {
@@ -826,6 +868,7 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		started = in.readBoolean();
 		timedOut = in.readBoolean();
 		proxyBranchTimeout = in.readInt();
+		proxyBranch1xxTimeout = in.readInt();
 		canceled = in.readBoolean();
 		isAddToPath = in.readBoolean();
 		waitingForPrack = in.readBoolean();
@@ -837,9 +880,27 @@ public class ProxyBranchImpl implements ProxyBranch, Externalizable {
 		out.writeBoolean(started);
 		out.writeBoolean(timedOut);
 		out.writeInt(proxyBranchTimeout);
+		out.writeInt(proxyBranch1xxTimeout);
 		out.writeBoolean(canceled);
 		out.writeBoolean(isAddToPath);
 		out.writeBoolean(waitingForPrack);
 	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.javax.servlet.sip.ProxyBranchExt#getProxyBranch1xxTimeout()
+	 */
+	public int getProxyBranch1xxTimeout() {
+		return proxyBranch1xxTimeout;
+	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.javax.servlet.sip.ProxyBranchExt#setProxyBranch1xxTimeout(int)
+	 */
+	public void setProxyBranch1xxTimeout(int timeout) {
+		proxyBranch1xxTimeout= timeout;
+		
+	}
+	
 }
