@@ -90,6 +90,28 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 		assertEquals(2, sender.getAllMessagesContent().size());
 		assertTrue(sender.getAllMessagesContent().contains(ResponseType.INFORMATIONAL.toString()));
 		assertTrue(sender.getAllMessagesContent().contains(ResponseType.FINAL.toString()));
+	}
+	
+	/**
+	 * It will proxy to 1 locations that will send a final response that will stop the 1xx and final response timer 
+	 * @throws Exception
+	 */
+	public void testProxyNoTimeout() throws Exception {
+		String fromName = "sequential-reverse-NoResponseTimeout";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "proxy-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		receiver.setProvisionalResponsesToSend(new ArrayList<Integer>());		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);		
+		assertTrue(sender.isAckSent());
+		assertEquals(0, sender.getAllMessagesContent().size());		
 	}	
 
 	@Override

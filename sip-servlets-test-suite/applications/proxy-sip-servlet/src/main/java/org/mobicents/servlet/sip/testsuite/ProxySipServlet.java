@@ -22,14 +22,12 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.ServletParseException;
-import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
@@ -38,7 +36,6 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
-import javax.sip.ListeningPoint;
 
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.ProxyBranchListener;
@@ -111,8 +108,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 				uris.add(uri1);
 			} else if(from.contains("sequential-cut")) {
 				uris.add(uri2);
-			}
-			else {
+			} else {
 				uris.add(uri2);
 				uris.add(uri1);
 			}
@@ -265,7 +261,9 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 	public void onProxyBranchResponseTimeout(ResponseType responseType,
 			ProxyBranch proxyBranch) {
 		logger.info("onProxyBranchResponseTimeout callback was called. responseType = " + responseType + " , branch = " + proxyBranch + ", request " + proxyBranch.getRequest() + ", response " + proxyBranch.getResponse());
-		sendMessage(responseType.toString());
+		if(proxyBranch.getRequest() != null && proxyBranch.getRequest().getFrom().getURI().toString().contains("ResponseTimeout")) {
+			sendMessage(responseType.toString());
+		}
 	}
 
 	/**
