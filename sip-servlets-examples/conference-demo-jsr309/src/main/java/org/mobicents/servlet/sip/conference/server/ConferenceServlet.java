@@ -75,7 +75,7 @@ public class ConferenceServlet extends SipServlet implements SipServletListener 
 	 */
 	public static final String LOCAL_ADDRESS = System.getProperty(
 			"jboss.bind.address", "127.0.0.1");
-	protected static final String CA_PORT = "2727";
+	protected static final String CA_PORT = "2728";
 
 	public static final String PEER_ADDRESS = System.getProperty(
 			"jboss.bind.address", "127.0.0.1");
@@ -152,13 +152,16 @@ public class ConferenceServlet extends SipServlet implements SipServletListener 
 			if(response.getStatus() == 200) {
 				Object sdpObj = response.getContent();
 				byte[] sdpBytes = (byte[]) sdpObj;
-				String sdp = new String(sdpBytes); 
 				try {
 					ConferenceConnectionListener listener = 
 						new ConferenceConnectionListener(response);
-					//connection.addConnectionListener(listener);
-					//connection.modify("$", sdp);
+					MediaSession mediaSession = MsControlObjects.msControlFactory.createMediaSession();
+					NetworkConnection conn = mediaSession
+					.createNetworkConnection(NetworkConnection.BASIC);
 
+					SdpPortManager sdpManag = conn.getSdpPortManager();
+					sdpManag.addListener(listener);
+					sdpManag.processSdpOffer(sdpBytes);
 				} catch (Exception e) {
 					logger.error(e);
 				}

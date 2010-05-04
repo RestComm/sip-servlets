@@ -3,6 +3,9 @@ package org.mobicents.servlet.sip.conference.server;
 import java.util.Iterator;
 
 import javax.annotation.Resource;
+import javax.media.mscontrol.MediaSession;
+import javax.media.mscontrol.networkconnection.NetworkConnection;
+import javax.media.mscontrol.networkconnection.SdpPortManager;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
@@ -75,6 +78,7 @@ public class ConferenceServiceImpl extends RemoteServiceServlet implements Confe
 			Address from = sipFactory.createAddress("sip:sip-servlets-conference@sip-servlets.com");
 			Address to = sipFactory.createAddress(url);
 			SipServletRequest request = sipFactory.createRequest(appSession, "INVITE", from, to);
+
 			request.send();
 		} catch (Exception e) {
 			e.printStackTrace();
