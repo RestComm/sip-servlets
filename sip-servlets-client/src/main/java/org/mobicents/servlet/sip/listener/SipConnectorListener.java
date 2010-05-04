@@ -28,6 +28,7 @@ import org.mobicents.servlet.sip.SipConnector;
 /**
  * Interface to implement by the class to be notified of sip connector management events.
  * 
+ * @apiviz.uses org.mobicents.servlet.sip.SipConnector
  * @author jean.deruelle@gmail.com
  *
  */

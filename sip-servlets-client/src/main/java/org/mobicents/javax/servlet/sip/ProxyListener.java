@@ -21,13 +21,16 @@
  */
 package org.mobicents.javax.servlet.sip;
 
+import java.util.EventListener;
+
 /**
  * Interface Extension that adds extra features to the JSR 289 Proxy capabilities.</br>
  * 
+ * @apiviz.uses org.mobicents.javax.servlet.sip.ResponseType
  * @author jean.deruelle@gmail.com
  *
  */
-public interface ProxyListener {
+public interface ProxyListener extends EventListener {
 
 	/**
 	 * When a search timeout timer expires in the proxy, either on final responses or 1xx response, 

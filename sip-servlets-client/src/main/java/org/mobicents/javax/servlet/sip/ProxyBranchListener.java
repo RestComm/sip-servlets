@@ -21,15 +21,19 @@
  */
 package org.mobicents.javax.servlet.sip;
 
+import java.util.EventListener;
+
 import javax.servlet.sip.ProxyBranch;
 
 /**
  * Interface Extension that adds extra features to the JSR 289 ProxyBranch capabilities.</br>
  * 
+ * @apiviz.uses org.mobicents.javax.servlet.sip.ResponseType
+ * @apiviz.uses javax.servlet.sip.ProxyBranch 
  * @author jean.deruelle@gmail.com
- *
+ * 
  */
-public interface ProxyBranchListener {
+public interface ProxyBranchListener extends EventListener {
 
 	/**
 	 * When a search timeout timer expires on a proxy branch, either on final responses or 1xx response, 

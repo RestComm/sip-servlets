@@ -34,6 +34,34 @@
 					<eclipseProjectName>sip-servlets-client</eclipseProjectName>
 				</configuration>
 			</plugin>
+			<plugin>
+        		<artifactId>maven-javadoc-plugin</artifactId>
+        		<!-- Note: Older versions will not work. -->
+        		<version>2.6.1</version>        	
+        			<configuration>
+					    <doclet>org.jboss.apiviz.APIviz</doclet>
+						<docletArtifact>
+							<groupId>org.jboss.apiviz</groupId>
+							<artifactId>apiviz</artifactId>
+							<version>1.3.1.GA</version>
+						</docletArtifact>
+						<useStandardDocletOptions>true</useStandardDocletOptions>
+						<charset>UTF-8</charset>
+						<encoding>UTF-8</encoding>
+						<docencoding>UTF-8</docencoding>
+						<breakiterator>true</breakiterator>
+						<version>true</version>
+						<author>true</author>
+						<keywords>true</keywords>
+						<additionalparam>
+							-sourceclasspath ${project.build.outputDirectory}
+					          </additionalparam>
+ 				         <stylesheetfile>${basedir}/src/javadoc/stylesheet.css</stylesheetfile>
+          				 <javadocDirectory>${basedir}/src/javadoc</javadocDirectory>
+          				 <docfilessubdirs>true</docfilessubdirs>
+          				 <overview>${basedir}/src/javadoc/overview.html</overview>
+			        </configuration>
+      		</plugin>
 		</plugins>
 	</build>			
 	<profiles>
