@@ -73,8 +73,8 @@
 	</scm>
 	<modules>
 		<module>sip-servlets-bootstrap</module>
-		<module>sip-servlets-client</module>
 		<module>sip-servlets-spec</module>
+		<module>sip-servlets-client</module>		
 		<module>sip-servlets-jruby</module>
 		<module>sip-servlets-impl</module>
 		<module>sip-servlets-application-router</module>
