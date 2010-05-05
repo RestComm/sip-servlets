@@ -27,7 +27,8 @@
 	
 	<property name="diameter.version" value="1.1.0.GA" />
 	<property name="diameter.download.url" value="http://repository.jboss.com/maven2/org/mobicents/servers/diameter/mobicents-diameter-mux-sar-jboss-4/${diameter.version}/mobicents-diameter-mux-sar-jboss-4-${diameter.version}.sar" />
-	<property name="diameter-jboss-5.download.url" value="http://repository.jboss.com/maven2/org/mobicents/servers/diameter/mobicents-diameter-mux-sar-jboss-5/${diameter.version}/mobicents-diameter-mux-sar-jboss-5-${diameter.version}.sar" />
+	<property name="diameter-jboss-5.name" value="mobicents-diameter-mux-sar-jboss-5-${diameter.version}.sar"/>
+	<property name="diameter-jboss-5.download.url" value="http://repository.jboss.com/maven2/org/mobicents/servers/diameter/mobicents-diameter-mux-sar-jboss-5/${diameter.version}/${diameter-jboss-5.name}" />
 	<property name="diameter.distro.path" value="${base.path}/mobicents-diameter-jboss-4-${diameter.version}.sar" />
 	<property name="diameter-jboss-5.distro.path" value="${base.path}/mobicents-diameter-jboss-5-${diameter.version}.sar" />
 	
@@ -159,6 +160,7 @@
 				</ant>				
 			</sequential>
 		</for>
+		<!-- include Diameter -->
 		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-jboss-5">
 			<property name="mss.home" value="${jboss-5.home}"/>
 			<property name="jboss.config" value="default"/>
@@ -496,7 +498,7 @@
 	</target>
 	
 	<target name="build-mobicents-diameter-jboss-5" depends="get-mobicents-diameter-jboss-5">		
-		<copy verbose="true" todir="${mss.home}/server/${jboss.config}/deploy/" file="${diameter-jboss-5.distro.path}"/>			
+		<unzip dest="${mss.home}/server/${jboss.config}/deploy/${diameter-jboss-5.name}" src="${diameter-jboss-5.distro.path}"/>			
 	</target>
 	
 	<available file="${diameter.distro.path}" property="got.mobicents-diameter" />
