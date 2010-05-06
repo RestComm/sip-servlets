@@ -142,7 +142,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 				+ "org/mobicents/servlet/sip/testsuite/callcontroller/call-forwarding-b2bua-servlet-dar.properties";
 	}
 	
-	public void deployShootistApplication(SipEmbedded sipEmbedded, boolean reInvite) {
+	public void deployShootistApplication(SipEmbedded sipEmbedded, boolean reInvite, boolean encodeRequestURI) {
 		SipStandardContext context = new SipStandardContext();
 		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp");
 		context.setName("sip-test-context");
@@ -150,9 +150,11 @@ public class BasicFailoverTest extends SipServletTestCase {
 		context.addLifecycleListener(new SipContextConfig());
 		context.setManager(new SipStandardManager());
 		ApplicationParameter applicationParameter = new ApplicationParameter();
-		applicationParameter.setName("encodeRequestURI");
-		applicationParameter.setValue("true");
-		context.addApplicationParameter(applicationParameter);
+		if(encodeRequestURI) {
+			applicationParameter.setName("encodeRequestURI");
+			applicationParameter.setValue("true");
+			context.addApplicationParameter(applicationParameter);
+		}		
 		if(reInvite) {
 			ApplicationParameter applicationParameter2 = new ApplicationParameter();
 			applicationParameter2.setName("username");
@@ -247,7 +249,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		secondTomcatServer = setupAndStartTomcat(SECOND_SERVER_NAME, getDarConfigurationFileShootist(), getTomcatBackupHomePath(), 5071);
 		//first test
 		Thread.sleep(TIMEOUT);
-		deployShootistApplication(tomcat, false);
+		deployShootistApplication(tomcat, false, false);
 		Thread.sleep(TIMEOUT);
 		
 		assertTrue(receiver.getByeReceived());
@@ -255,7 +257,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		tomcat.stopTomcat();
 		tomcat = null;
 		receiver.setByeReceived(false);
-		deployShootistApplication(secondTomcatServer, false);	
+		deployShootistApplication(secondTomcatServer, false, false);	
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());
 		secondTomcatServer.stopTomcat();
@@ -280,7 +282,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		secondTomcatServer = setupAndStartTomcat(SECOND_SERVER_NAME, getDarConfigurationFileShootist(), getTomcatBackupHomePath(), 5071);		
 		//first test
 		Thread.sleep(TIMEOUT);
-		deployShootistApplication(tomcat, false);
+		deployShootistApplication(tomcat, false, true);
 		Thread.sleep(TIMEOUT);
 		
 		assertTrue(receiver.getOkToByeReceived());
@@ -288,7 +290,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		tomcat.stopTomcat();
 		tomcat = null;
 		receiver.setOkToByeReceived(false);
-		deployShootistApplication(secondTomcatServer, false);	
+		deployShootistApplication(secondTomcatServer, false, true);	
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getOkToByeReceived());
 		secondTomcatServer.stopTomcat();
@@ -312,7 +314,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		secondTomcatServer = setupAndStartTomcat(SECOND_SERVER_NAME, getDarConfigurationFileShootist(), getTomcatBackupHomePath(), 5071);
 		//first test
 		Thread.sleep(TIMEOUT);
-		deployShootistApplication(tomcat, true);
+		deployShootistApplication(tomcat, true, false);
 		Thread.sleep(TIMEOUT);
 		
 		assertTrue(receiver.getByeReceived());
@@ -320,7 +322,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		tomcat.stopTomcat();
 		tomcat = null;
 		receiver.setByeReceived(false);
-		deployShootistApplication(secondTomcatServer, true);	
+		deployShootistApplication(secondTomcatServer, true, false);	
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());
 		secondTomcatServer.stopTomcat();
