@@ -195,7 +195,27 @@ public class ClassFileScanner {
     	processListenerAnnotation(clazz);
 		processServletAnnotation(clazz);
 		processSipApplicationKeyAnnotation(clazz);
-		processConcurrencyAnnotation(clazz);    	
+		processConcurrencyAnnotation(clazz);   
+		if(clazz.getSimpleName().equals("package-info")) {
+			Package pack = clazz.getPackage();
+			String packageName = pack.getName();
+
+			SipApplication appData = getApplicationAnnotation(pack);
+			if (appData != null) {
+				if (this.parsedAnnotatedPackage != null
+						&& !this.parsedAnnotatedPackage.equals(packageName)) {
+					throw new IllegalStateException(
+							"Cant have two different applications in a single context - "
+									+ packageName + " and "
+									+ this.parsedAnnotatedPackage);
+				}
+				
+				if (this.parsedAnnotatedPackage == null) {
+					this.parsedAnnotatedPackage = packageName;
+					parseSipApplication(appData, packageName);
+				}								
+			}
+		}
 	}
 
 	protected void processListenerAnnotation(Class<?> clazz) {
