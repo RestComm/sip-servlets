@@ -23,7 +23,7 @@
 	<property name="mms.zip.path" value="${base.path}/mobicents-media-server.zip" />
 	
 	<property name="embjopr.version" value="1.2.0.CR-JBAS4" />
-	<property name="embjopr.download.url" value="http://downloads.sourceforge.net/rhq/embedded-jopr-${embjopr.version}.zip" />
+	<property name="embjopr.download.url" value="http://downloads.sourceforge.net/project/rhq/embedded-jopr/embedded-jopr-1.2.0.CR/embedded-jopr-${embjopr.version}.zip" />
 	
 	<property name="diameter.version" value="1.2.1.GA" />
 	<property name="diameter.download.url" value="https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servers/diameter/mobicents-diameter-mux-sar-jboss-4/${diameter.version}/mobicents-diameter-mux-sar-jboss-4-${diameter.version}.sar" />
