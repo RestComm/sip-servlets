@@ -2,10 +2,12 @@ package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 
 import javax.media.mscontrol.MediaEventListener;
 import javax.media.mscontrol.MediaSession;
 import javax.media.mscontrol.MsControlException;
+import javax.media.mscontrol.Parameters;
 import javax.media.mscontrol.join.JoinEvent;
 import javax.media.mscontrol.join.JoinEventListener;
 import javax.media.mscontrol.join.Joinable.Direction;
@@ -195,7 +197,12 @@ public class PromptAndCollectServlet extends PlayerServlet {
 					+ dtmf);
 		}
 
-		player.play(prompt, null, null);
+		Parameters p = player.getMediaSession().createParameters();
+		p.put(Player.BEHAVIOUR_IF_BUSY, Player.STOP_IF_BUSY);
+		player.play(prompt, null, p);
+		SignalDetector sg = player.getContainer().getSignalDetector();
+		sg.addListener(new SignalDetectorListener());
+		player.getContainer().getSignalDetector().receiveSignals(1, null, null, null);
 	}
 
 	private class MyJoinEventListener implements JoinEventListener {
@@ -214,11 +221,15 @@ public class PromptAndCollectServlet extends PlayerServlet {
 						Player player = mg.getPlayer();
 						player.addListener(new PlayerListener());
 
-						URI prompt = URI.create(WELCOME_MSG);
+						URI prompt = getPrompt();
+						Parameters p = player.getMediaSession().createParameters();
+						p.put(Player.BEHAVIOUR_IF_BUSY, Player.STOP_IF_BUSY);
+						player.play(prompt, null, p);
+						SignalDetector sg = mg.getSignalDetector();
+						sg.addListener(new SignalDetectorListener());
+						mg.getSignalDetector().receiveSignals(1, null, null, null);
 
-						player.play(prompt, null, null);
-
-					} catch (MsControlException e) {
+					} catch (Exception e) {
 						logger.error(e);
 					}
 				} else if (JoinEvent.UNJOINED == event.getEventType()) {
@@ -233,29 +244,39 @@ public class PromptAndCollectServlet extends PlayerServlet {
 		}
 
 	}
+	
+	protected URI getPrompt() throws Exception{
+		return URI.create(WELCOME_MSG);
+	}
 
 	private class PlayerListener implements MediaEventListener<PlayerEvent> {
 
 		public void onEvent(PlayerEvent event) {
-			logger.info("PlayerListener Received event " + event);
-			Player player = event.getSource();
-			MediaGroup mg = player.getContainer();
-			if (!isBye) {
-				if (event.isSuccessful()
-						&& (PlayerEvent.PLAY_COMPLETED == event.getEventType())) {
-					logger.info("Received PlayComplete event");
-					try {
-						SignalDetector sg = mg.getSignalDetector();
-						sg.addListener(new SignalDetectorListener());
-						sg.receiveSignals(1, null, null, null);
-					} catch (MsControlException e) {
-						logger.error(e);
+			try {
+				logger.info("PlayerListener Received event " + isBye + " " + event.getEventType() + "Event: "+ event);
+				Player player = event.getSource();
+				MediaGroup mg = player.getContainer();
+				if (!isBye) {
+					logger.info("Is not BYE " + event.isSuccessful() + " " + event.getEventType());
+					if (event.isSuccessful()
+							&& (PlayerEvent.PLAY_COMPLETED == event.getEventType())) {
+						logger.info("Received PlayComplete event");
+						try {
+							SignalDetector sg = mg.getSignalDetector();
+							sg.addListener(new SignalDetectorListener());
+							sg.receiveSignals(1, null, null, null);
+						} catch (MsControlException e) {
+							logger.error(e);
+						}
+					} else {
+						logger.error("Player didn't complete successfully ");
 					}
-				} else {
-					logger.error("Player didn't complete successfully ");
 				}
-			}
 
+			}
+			catch (Exception e) {
+				logger.error("Broken", e);
+			}
 		}
 
 	}
@@ -271,14 +292,14 @@ public class PromptAndCollectServlet extends PlayerServlet {
 				sg.removeListener(this);
 
 				if (event.isSuccessful()
-						&& (SignalDetectorEvent.SIGNAL_DETECTED == event
+						&& (SignalDetectorEvent.RECEIVE_SIGNALS_COMPLETED == event
 								.getEventType())) {
 					String seq = event.getSignalString();
 
 					playDTMF(mg.getPlayer(), seq);
 
 				} else {
-					logger.error("DTMF detection failed ");
+					logger.error("DTMF detection failed " + event.getSignalString());
 				}
 			} catch (MsControlException e) {
 				e.printStackTrace();

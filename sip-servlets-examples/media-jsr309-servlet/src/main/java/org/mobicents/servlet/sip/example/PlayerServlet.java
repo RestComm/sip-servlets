@@ -39,6 +39,7 @@ import javax.servlet.sip.SipSession;
 import org.apache.log4j.Logger;
 
 import org.mobicents.javax.media.mscontrol.MsControlFactoryImpl;
+import org.mobicents.jsr309.mgcp.MgcpStackFactory;
 
 /**
  * This example shows a simple usage of JSR 309.
@@ -266,6 +267,7 @@ public class PlayerServlet extends SipServlet implements ServletContextListener 
 		}
 
 	}
+	Properties properties = null;
 
 	public void contextDestroyed(ServletContextEvent event) {
 		//This happens automatically. No need to force it
@@ -275,30 +277,25 @@ public class PlayerServlet extends SipServlet implements ServletContextListener 
 //			DriverManager.deregisterDriver(driver);
 //			drivers = DriverManager.getDrivers();
 //		}
-		MsControlFactoryImpl msControlFactoryImpl = (MsControlFactoryImpl)event.getServletContext().getAttribute(MS_CONTROL_FACTORY);
-		if(msControlFactoryImpl != null) {
-			msControlFactoryImpl.clearMgcpStackProvider();
-		} else{
-			logger.warn("couldn't find the MsControlFactoryImpl");
-		}
+		MgcpStackFactory.getInstance().clearMgcpStackProvider(properties);
 		
 		
 	}
 
 	public void contextInitialized(ServletContextEvent event) {
 		if(event.getServletContext().getAttribute(MS_CONTROL_FACTORY) == null) {
-			Properties property = new Properties();
-			property.setProperty(MGCP_STACK_NAME, "SipServlets");
-			property.setProperty(MGCP_PEER_IP, PEER_ADDRESS);
-			property.setProperty(MGCP_PEER_PORT, MGW_PORT);
+			properties = new Properties();
+			properties.setProperty(MGCP_STACK_NAME, "SipServlets");
+			properties.setProperty(MGCP_PEER_IP, PEER_ADDRESS);
+			properties.setProperty(MGCP_PEER_PORT, MGW_PORT);
 	
-			property.setProperty(MGCP_STACK_IP, LOCAL_ADDRESS);
-			property.setProperty(MGCP_STACK_PORT, CA_PORT);
+			properties.setProperty(MGCP_STACK_IP, LOCAL_ADDRESS);
+			properties.setProperty(MGCP_STACK_PORT, CA_PORT);
 	
 			try {
 				// create the Media Session Factory
 				MsControlFactory msControlFactory = DriverManager.getDrivers().next().getFactory(
-						property);
+						properties);
 				event.getServletContext().setAttribute(MS_CONTROL_FACTORY, msControlFactory);
 				logger.info("started MGCP Stack on " + LOCAL_ADDRESS + "and port " + CA_PORT);
 			} catch (Exception e) {
