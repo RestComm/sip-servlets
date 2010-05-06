@@ -26,9 +26,9 @@
 	<property name="embjopr.download.url" value="http://downloads.sourceforge.net/rhq/embedded-jopr-${embjopr.version}.zip" />
 	
 	<property name="diameter.version" value="1.2.1.GA" />
-	<property name="diameter.download.url" value="http://repository.jboss.com/maven2/org/mobicents/servers/diameter/mobicents-diameter-mux-sar-jboss-4/${diameter.version}/mobicents-diameter-mux-sar-jboss-4-${diameter.version}.sar" />
+	<property name="diameter.download.url" value="https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servers/diameter/mobicents-diameter-mux-sar-jboss-4/${diameter.version}/mobicents-diameter-mux-sar-jboss-4-${diameter.version}.sar" />
 	<property name="diameter-jboss-5.name" value="mobicents-diameter-mux-sar-jboss-5-${diameter.version}.sar"/>
-	<property name="diameter-jboss-5.download.url" value="http://repository.jboss.com/maven2/org/mobicents/servers/diameter/mobicents-diameter-mux-sar-jboss-5/${diameter.version}/${diameter-jboss-5.name}" />
+	<property name="diameter-jboss-5.download.url" value="https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servers/diameter/mobicents-diameter-mux-sar-jboss-5/${diameter.version}/${diameter-jboss-5.name}" />
 	<property name="diameter.distro.path" value="${base.path}/mobicents-diameter-jboss-4-${diameter.version}.sar" />
 	<property name="diameter-jboss-5.distro.path" value="${base.path}/mobicents-diameter-jboss-5-${diameter.version}.sar" />
 	
