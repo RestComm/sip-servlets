@@ -914,20 +914,22 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(tad != null && tad.getSipServletMessage() != null) {
 			SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
 			SipSessionKey sipSessionKey = sipServletMessage.getSipSessionKey();
-			MobicentsSipSession sipSession = sipServletMessage.getSipSession();
-			if(sipServletMessage instanceof SipServletRequestImpl) {
-				try {
-					SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipServletMessage;
-					sipServletMessage.setTransaction(transaction);
-					SipServletResponseImpl response = (SipServletResponseImpl) sipServletRequestImpl.createResponse(408, null, false);
-
-					MessageDispatcher.callServlet(response);
-				} catch (Throwable t) {
-					logger.error("Failed to deliver 408 response on transaction timeout" + transaction, t);
-				}
-			}
+			MobicentsSipSession sipSession = sipServletMessage.getSipSession();					
 			boolean appNotifiedOfPrackNotReceived = false;
-			if(sipSession != null) {							
+			if(sipSession != null) {
+				// session can be null if a message was sent outside of the container by the container itself during Initial request dispatching
+				// but the external host doesn't send any response so we call out to the applicationonly if the session is not null
+				if(sipServletMessage instanceof SipServletRequestImpl) {
+					try {
+						SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipServletMessage;
+						sipServletMessage.setTransaction(transaction);
+						SipServletResponseImpl response = (SipServletResponseImpl) sipServletRequestImpl.createResponse(408, null, false);
+
+						MessageDispatcher.callServlet(response);
+					} catch (Throwable t) {
+						logger.error("Failed to deliver 408 response on transaction timeout" + transaction, t);
+					}
+				}
 				checkForAckNotReceived(sipServletMessage);
 				appNotifiedOfPrackNotReceived = checkForPrackNotReceived(sipServletMessage);
 				sipSession.removeOngoingTransaction(transaction);
@@ -1556,7 +1558,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public void setCongestionControlPolicy(CongestionControlPolicy congestionControlPolicy) {
 		this.congestionControlPolicy = congestionControlPolicy;
 		if(logger.isInfoEnabled()) {
-			logger.info("Congestion Control policy set to " + congestionControlPolicy.toString());
+			logger.info("Congestion Control policy set to " + this.congestionControlPolicy.toString());
 		}
 	}
 
@@ -1564,7 +1566,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public void setCongestionControlPolicyByName(String congestionControlPolicy) {
 		this.congestionControlPolicy = CongestionControlPolicy.valueOf(congestionControlPolicy);
 		if(logger.isInfoEnabled()) {
-			logger.info("Congestion Control policy set to " + congestionControlPolicy.toString());
+			logger.info("Congestion Control policy set to " + this.congestionControlPolicy.toString());
 		}
 	}	
 
@@ -1581,7 +1583,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public void setMemoryThreshold(int memoryThreshold) {
 		this.memoryThreshold = memoryThreshold;
 		if(logger.isInfoEnabled()) {
-			logger.info("Memory threshold set to " + memoryThreshold +"%");
+			logger.info("Memory threshold set to " + this.memoryThreshold +"%");
 		}
 	}
 
@@ -1612,7 +1614,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public void setBypassRequestExecutor(boolean bypassRequestExecutor) {
 		this.bypassRequestExecutor = bypassRequestExecutor;
 		if(logger.isInfoEnabled()) {
-			logger.info("Bypass Request Executor enabled ?" + bypassRequestExecutor);
+			logger.info("Bypass Request Executor enabled ?" + this.bypassRequestExecutor);
 		}
 	}
 
@@ -1629,7 +1631,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public void setBypassResponseExecutor(boolean bypassResponseExecutor) {
 		this.bypassResponseExecutor = bypassResponseExecutor;
 		if(logger.isInfoEnabled()) {
-			logger.info("Bypass Response Executor enabled ?" + bypassRequestExecutor);
+			logger.info("Bypass Response Executor enabled ?" + this.bypassResponseExecutor);
 		}
 	}
 
@@ -1649,7 +1651,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 		this.baseTimerInterval = baseTimerInterval;
 		if(logger.isInfoEnabled()) {
-			logger.info("Base Timer Interval set to " + baseTimerInterval +"ms");
+			logger.info("Base Timer Interval set to " + this.baseTimerInterval +"ms");
 		}
 	}
 
