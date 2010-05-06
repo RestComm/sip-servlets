@@ -18,7 +18,7 @@
 	<property name="tomcat.version" value="6.0.20" />
 	<property name="tomcat.download.url" value="http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip" />
 	
-	<property name="mms.version" value="2.0.0.CR2" />
+	<property name="mms.version" value="2.0.0.CR1" />
 	<property name="mms.download.url" value="http://downloads.sourceforge.net/project/mobicents/Mobicents%20Media%20Server/${mms.version}/mms-standalone-${mms.version}.zip" />
 	<property name="mms.zip.path" value="${base.path}/mobicents-media-server.zip" />
 	
@@ -61,7 +61,7 @@
 	
 	<!-- Release target -->
 	
-	<target name="release" depends="clean,release-jboss-5,release-jboss-5-jdk6,release-tomcat,release-jboss,make-src-zip,clean" />
+	<target name="release" depends="clean,release-jboss-5,release-jboss-5-jdk6,release-tomcat,release-jboss,make-src-zip" />
 	
 	<!-- Tomcat version -->
 	
@@ -677,6 +677,9 @@
 		<delete dir="${jboss.home}" />
 		<delete dir="${tomcat.home}" />
 		<delete dir="${release.path}"/>
+		<delete>
+		    <fileset dir="${base.path}" includes="mss-${mss.release.version}*.zip"/>
+		</delete>
 	</target>
 	
 	<!-- Download and dependency building -->
