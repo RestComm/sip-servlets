@@ -264,6 +264,8 @@ public class TestSipListener implements SipListener {
 
 	private boolean setTransport=true;
 
+	private boolean serviceUnavailableReceived = false;
+
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
 		private EventHeader eventHeader;
@@ -1207,6 +1209,9 @@ public class TestSipListener implements SipListener {
 		if(response.getStatusCode() >= 400 && response.getStatusCode() < 999) {
 			this.serverErrorReceived = true;
 		}		
+		if(response.getStatusCode() == 503) {
+			this.serviceUnavailableReceived  = true;
+		}
 		if(response.toString().toLowerCase().contains("info")) {
 			lastInfoResponseTime = System.currentTimeMillis();
 		}
@@ -2552,6 +2557,13 @@ public class TestSipListener implements SipListener {
 	 */
 	public long getTimeToWaitBeforeAck() {
 		return timeToWaitBeforeAck;
+	}
+	
+	/**
+	 * @return the serviceUnavailableReceived
+	 */
+	public boolean isServiceUnavailableReceived() {
+		return serviceUnavailableReceived;
 	}
 
 }
