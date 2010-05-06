@@ -29,6 +29,7 @@ import javax.management.ObjectName;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.ServerFactory;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
@@ -252,12 +253,13 @@ public class SipEmbedded {
 	 */
 	public void stopTomcat() {
 		// Stop the embedded server
-		if(sipService != null) {
+		if(sipService != null) {			
 			try {
 				sipService.stop();
 			} catch (LifecycleException e) {
 				log.error("SipService already stopped ", e);
 			}		
+			ServerFactory.getServer().removeService(sipService);
 		}
 	}
 
