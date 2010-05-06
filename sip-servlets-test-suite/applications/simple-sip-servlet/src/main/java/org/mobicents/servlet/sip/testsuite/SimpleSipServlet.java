@@ -58,6 +58,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 	private static final String TEST_EXTERNAL_ROUTING = "testExternalRouting";
 	private static final String TEST_EXTERNAL_ROUTING_NO_INFO = "testExternalRoutingNoInfo";
 	private static final String TEST_NON_EXISTING_HEADER = "TestNonExistingHeader";
+	private static final String TEST_NON_EXISTING_HEADER_LIST = "TestNonExistingHeaderList";
 	private static final String TEST_ALLOW_HEADER = "TestAllowHeader";
 	private static final String TEST_TO_TAG = "TestToTag";
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
@@ -180,7 +181,8 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		request.getHeaders(TEST_NON_EXISTING_HEADER);
 		request.setHeader(TEST_NON_EXISTING_HEADER,"true");
 		request.removeHeader(TEST_NON_EXISTING_HEADER);
-		request.addHeader(TEST_NON_EXISTING_HEADER,"true");
+		request.addHeader(TEST_NON_EXISTING_HEADER,"true");		
+		request.addHeader(TEST_NON_EXISTING_HEADER_LIST,"true,false,maybe");
 		request.getParameterableHeader("Reply-To");
 		request.getParameterableHeaders("Reply-To");
 		// Test register cseq issue http://groups.google.com/group/mobicents-public/browse_thread/thread/70f472ca111baccf
@@ -266,6 +268,15 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 					return;
 				}
 			}
+			sipServletResponse.getAddressHeader(TEST_NON_EXISTING_HEADER);
+			sipServletResponse.getHeader(TEST_NON_EXISTING_HEADER);		
+			sipServletResponse.getHeaders(TEST_NON_EXISTING_HEADER);
+			sipServletResponse.setHeader(TEST_NON_EXISTING_HEADER,"true");
+			sipServletResponse.removeHeader(TEST_NON_EXISTING_HEADER);
+			sipServletResponse.addHeader(TEST_NON_EXISTING_HEADER,"true");		
+			sipServletResponse.addHeader(TEST_NON_EXISTING_HEADER_LIST,"true,false,maybe");
+			sipServletResponse.getParameterableHeader("Reply-To");
+			
 			sipServletResponse.send();
 		} else {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);			
