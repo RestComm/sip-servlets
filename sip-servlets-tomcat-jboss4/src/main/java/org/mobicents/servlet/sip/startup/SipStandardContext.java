@@ -73,6 +73,7 @@ import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.core.timers.SipServletTimerService;
 import org.mobicents.servlet.sip.core.timers.StandardSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
@@ -154,7 +155,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	// timer service used to schedule sip application session expiration timer
     protected transient SipApplicationSessionTimerService sasTimerService = null;
     // timer service used to schedule sip servlet originated timer tasks
-    protected transient TimerService timerService = null;
+    protected transient SipServletTimerService timerService = null;
 	/**
 	 * 
 	 */
@@ -537,6 +538,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}
 		sipJNDIContextLoaded = false;
 		sasTimerService.stop();
+		timerService.stop();
 		// not needed since the JNDI will be destroyed automatically
 //		if(isUseNaming()) {
 //			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_FACTORY_REMOVED_EVENT, sipFactoryFacade);
@@ -1008,6 +1010,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			logger.debug(childrenMap.size() + " container to notify of " + event.getEventType());
 		}
 		if(event.getEventType() == SipContextEventType.SERVLET_INITIALIZED) {
+			if(!timerService.isStarted()) {
+				timerService.start();
+			}
 			if(!sasTimerService.isStarted()) {
 				sasTimerService.start();
 			}

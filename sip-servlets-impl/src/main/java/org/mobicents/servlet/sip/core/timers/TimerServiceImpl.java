@@ -29,19 +29,18 @@ import javax.servlet.sip.TimerService;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 
-public class TimerServiceImpl implements TimerService, Serializable {
+public class TimerServiceImpl implements SipServletTimerService {
 	
 	private static final long serialVersionUID = 1L;
-//	private static final Logger logger = Logger.getLogger(TimerServiceImpl.class
-//			.getName());
+	private static final Logger logger = Logger.getLogger(TimerServiceImpl.class
+			.getName());
 	
-	public static final int SCHEDULER_THREAD_POOL_DEFAULT_SIZE = 10;
+	public static final int SCHEDULER_THREAD_POOL_DEFAULT_SIZE = 4;
 	
 	private transient ScheduledThreadPoolExecutor scheduledExecutor;
 	
 	public TimerServiceImpl() {		
 		scheduledExecutor = new ScheduledThreadPoolExecutor(SCHEDULER_THREAD_POOL_DEFAULT_SIZE);;
-		scheduledExecutor.prestartAllCoreThreads();
 	}
 	
 	/*
@@ -155,6 +154,21 @@ public class TimerServiceImpl implements TimerService, Serializable {
 	private void persist(ServletTimerImpl st) {
 		// TODO - implement persistance
 		
+	}
+	
+	public void stop() {
+		scheduledExecutor.shutdownNow();
+		if(logger.isInfoEnabled()) {
+			logger.info("Stopped timer service "+ this);
+		}
+	}
+
+	public void start() {
+		scheduledExecutor.prestartAllCoreThreads();		
+	}
+
+	public boolean isStarted() {		
+		return scheduledExecutor.isTerminated();
 	}
 	
 }

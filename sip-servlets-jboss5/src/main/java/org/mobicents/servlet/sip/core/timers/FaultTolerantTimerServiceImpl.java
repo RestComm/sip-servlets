@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.core.timers;
 
 import java.io.Serializable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
@@ -39,7 +40,7 @@ import org.mobicents.timers.TimerTaskFactory;
  * @author jean.deruelle@gmail.com
  *
  */
-public class FaultTolerantTimerServiceImpl implements TimerService, Serializable {
+public class FaultTolerantTimerServiceImpl implements SipServletTimerService {
 	
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(FaultTolerantTimerServiceImpl.class
@@ -47,6 +48,7 @@ public class FaultTolerantTimerServiceImpl implements TimerService, Serializable
 	public static final int SCHEDULER_THREAD_POOL_DEFAULT_SIZE = 10;
 	public static final String NAME = "MSS_FT_Timers";
 	
+	private AtomicBoolean started = new AtomicBoolean(true);
 	private FaultTolerantScheduler scheduledExecutor;
 	private ClusteredSipManager<? extends OutgoingDistributableSessionData> sipManager;
 	
@@ -171,6 +173,22 @@ public class FaultTolerantTimerServiceImpl implements TimerService, Serializable
 			scheduledExecutor = new FaultTolerantScheduler(NAME + ((SipContext)sipManager.getContainer()).getApplicationNameHashed(), SCHEDULER_THREAD_POOL_DEFAULT_SIZE, this.sipManager.getMobicentsCluster(), (byte) 1, null, timerTaskFactory);
 		}
 		return scheduledExecutor;
+	}
+	
+	public void stop() {
+		started.set(false);
+		getScheduler().stop();		
+	}
+	
+	public void start() {
+		// we need to make sure the scheduler are created to be able to fail over fault tolerant timers
+		// we can't create it before because the mobicents cluster is not yet initialized
+		getScheduler();
+		started.set(true);
+	}
+
+	public boolean isStarted() {
+		return started.get();
 	}
 	
 }
