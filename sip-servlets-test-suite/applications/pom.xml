@@ -9,6 +9,7 @@
 	<packaging>pom</packaging>
 	<name>Sip Servlets Test Suite Applications Parent Pom</name>
 	<modules>
+		<module>annotated-servlet</module>
 		<module>simple-sip-servlet</module>
 		<module>shootme-sip-servlet-auth</module>
 		<module>shootist-sip-servlet</module>
@@ -25,8 +26,7 @@
 		<module>listeners-sip-servlet</module>
 		<module>timers-sip-servlet</module>
 		<module>session-state-uas</module>
-		<module>session-state-uac</module>
-		<module>annotated-servlet</module>
+		<module>session-state-uac</module>		
 		<module>servlet-mapping-servlet</module>
 		<module>notifier-servlet</module>
 		<module>subscriber-servlet</module>
