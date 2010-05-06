@@ -336,12 +336,17 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						// Issue 1401 http://code.google.com/p/mobicents/issues/detail?id=1401
 						// JSR 289 Section 11.2.2 Receiving ACK : 
 						// "Applications are not notified of incoming ACKs for non-2xx final responses to INVITE."
-						final SipServletResponse lastFinalResponse = ((SipServletRequestImpl)sipSession.getSessionCreatingTransactionRequest()).getLastFinalResponse();
 						boolean callServlet = true;
-						if(Request.ACK.equalsIgnoreCase(requestMethod) && lastFinalResponse != null && lastFinalResponse.getStatus() >= 300) {
-							callServlet = false;
-							if(logger.isDebugEnabled()) {
-								logger.debug("not calling the servlet since this is an ACK for a final error response");
+						SipServletRequestImpl sessionCreatingTransactionRequest = ((SipServletRequestImpl)sipSession.getSessionCreatingTransactionRequest());
+						// checking if the sessionCreatingTransactionRequest is not null, it can happen on failover, in this case it is fine, since we support
+						// dialog established failover only.
+						if(sessionCreatingTransactionRequest != null) {
+							final SipServletResponse lastFinalResponse = sessionCreatingTransactionRequest.getLastFinalResponse();
+							if(Request.ACK.equalsIgnoreCase(requestMethod) && lastFinalResponse != null && lastFinalResponse.getStatus() >= 300) {
+								callServlet = false;
+								if(logger.isDebugEnabled()) {
+									logger.debug("not calling the servlet since this is an ACK for a final error response");
+								}
 							}
 						}
 						// JSR 289 Section 6.2.1 :
