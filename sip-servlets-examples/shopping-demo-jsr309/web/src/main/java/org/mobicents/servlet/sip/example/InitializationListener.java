@@ -142,6 +142,8 @@ public class InitializationListener implements ServletContextListener {
 				servletContextEvent.getServletContext().setAttribute(MS_CONTROL_FACTORY, msControlFactory);
 				
 				MMSUtil.msControlFactory = MsControlObjects.msControlFactory;
+				String pathToAudioDirectory = (String)servletContextEvent.getServletContext().getAttribute("audioFilePath");
+				MMSUtil.audioFilePath = pathToAudioDirectory;
 				logger.info("started MGCP Stack on " + LOCAL_ADDRESS + "and port " + CA_PORT + " obj: " + MsControlObjects.msControlFactory);
 			} catch (Exception e) {
 				logger.error("couldn't start the underlying MGCP Stack", e);

@@ -32,12 +32,12 @@
     
     <context-param>
       <param-name>admin.sip.default.contact</param-name>
-      <param-value>sip:admin@127.0.0.1:5055</param-value>
+      <param-value>sip:vralev@127.0.0.1:5060</param-value>
     </context-param>
     
     <context-param>
       <param-name>call.center.contact</param-name>
-      <param-value>sip:call-center@127.0.0.1:5090</param-value>
+      <param-value>sip:call-center@127.0.0.1:5060</param-value>
     </context-param>
     
     <context-param>

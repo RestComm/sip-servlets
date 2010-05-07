@@ -113,49 +113,6 @@
 			</exclusions>
 			<type>jar</type>
 		</dependency>		
-		<dependency>
-			<groupId>org.mobicents.external.freetts</groupId>
-			<artifactId>freetts</artifactId>
-			<version>${freetts.version}</version>
-			<type>jar</type>
-		</dependency>
-		<dependency>
-			<groupId>org.mobicents.external.freetts</groupId>
-			<artifactId>cmu_time_awb</artifactId>
-			<version>1.0</version>
-			<type>jar</type>
-		</dependency>
-		<dependency>
-			<groupId>org.mobicents.external.freetts</groupId>
-			<artifactId>cmu_us_kal</artifactId>
-			<version>1.0</version>
-			<type>jar</type>
-		</dependency>
-		<dependency>
-			<groupId>org.mobicents.external.freetts</groupId>
-			<artifactId>cmudict04</artifactId>
-			<version>1.0</version>
-			<type>jar</type>
-		</dependency>
-		<dependency>
-			<groupId>org.mobicents.external.freetts</groupId>
-			<artifactId>en_us</artifactId>
-			<version>1.0</version>
-			<type>jar</type>
-		</dependency>
-		<dependency>
-			<groupId>org.mobicents.external.freetts</groupId>
-			<artifactId>cmulex</artifactId>
-			<version>1.0</version>
-			<type>jar</type>
-		</dependency>
-		<dependency>
-			<groupId>org.mobicents.external.freetts</groupId>
-			<artifactId>cmutimelex</artifactId>
-			<version>1.0</version>
-			<type>jar</type>
-		</dependency>
-				
 
 		<dependency>
 			<groupId>org.mobicents.external.jsr309</groupId>
@@ -217,55 +174,7 @@
 							<bundleDir>APP-INF/lib</bundleDir>
 							<includeInApplicationXml>true</includeInApplicationXml>
 						</jarModule>				
-						<jarModule>
-							<groupId>org.mobicents.external.freetts</groupId>
-							<artifactId>freetts</artifactId>
-							<bundleDir>APP-INF/lib</bundleDir>
-							<bundleFileName>freetts.jar</bundleFileName>
-							<includeInApplicationXml>true</includeInApplicationXml>
-						</jarModule>
-						<jarModule>
-							<groupId>org.mobicents.external.freetts</groupId>
-							<artifactId>cmu_time_awb</artifactId>
-							<bundleDir>APP-INF/lib</bundleDir>
-							<bundleFileName>cmu_time_awb.jar</bundleFileName>
-							<includeInApplicationXml>true</includeInApplicationXml>
-						</jarModule>
-						<jarModule>
-							<groupId>org.mobicents.external.freetts</groupId>
-							<artifactId>cmu_us_kal</artifactId>
-							<bundleDir>APP-INF/lib</bundleDir>
-							<bundleFileName>cmu_us_kal.jar</bundleFileName>
-							<includeInApplicationXml>true</includeInApplicationXml>
-						</jarModule>
-						<jarModule>
-							<groupId>org.mobicents.external.freetts</groupId>
-							<artifactId>cmudict04</artifactId>
-							<bundleDir>APP-INF/lib</bundleDir>
-							<bundleFileName>cmudict04.jar</bundleFileName>
-							<includeInApplicationXml>true</includeInApplicationXml>
-						</jarModule>
-						<jarModule>
-							<groupId>org.mobicents.external.freetts</groupId>
-							<artifactId>en_us</artifactId>
-							<bundleDir>APP-INF/lib</bundleDir>
-							<bundleFileName>en_us.jar</bundleFileName>
-							<includeInApplicationXml>true</includeInApplicationXml>
-						</jarModule>
-						<jarModule>
-							<groupId>org.mobicents.external.freetts</groupId>
-							<artifactId>cmulex</artifactId>
-							<bundleDir>APP-INF/lib</bundleDir>
-							<bundleFileName>cmulex.jar</bundleFileName>
-							<includeInApplicationXml>true</includeInApplicationXml>
-						</jarModule>
-						<jarModule>
-							<groupId>org.mobicents.external.freetts</groupId>
-							<artifactId>cmutimelex</artifactId>
-							<bundleDir>APP-INF/lib</bundleDir>
-							<bundleFileName>cmutimelex.jar</bundleFileName>
-							<includeInApplicationXml>true</includeInApplicationXml>
-						</jarModule>
+
 						<jarModule>
 							<groupId>org.hibernate</groupId>
 							<artifactId>

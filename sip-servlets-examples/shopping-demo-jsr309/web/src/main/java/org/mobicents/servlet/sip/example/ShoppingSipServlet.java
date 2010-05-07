@@ -5,6 +5,7 @@ package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -12,6 +13,7 @@ import java.util.Map.Entry;
 import javax.annotation.Resource;
 import javax.media.mscontrol.MediaSession;
 import javax.media.mscontrol.MsControlException;
+import javax.media.mscontrol.join.Joinable.Direction;
 import javax.media.mscontrol.mediagroup.MediaGroup;
 import javax.media.mscontrol.networkconnection.NetworkConnection;
 import javax.media.mscontrol.networkconnection.SdpPortManager;
@@ -35,9 +37,9 @@ import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 import org.jboss.mobicents.seam.actions.OrderManager;
+import org.jboss.mobicents.seam.listeners.DTMFListener;
 import org.jboss.mobicents.seam.listeners.MediaConnectionListener;
 import org.jboss.mobicents.seam.util.MMSUtil;
-import org.jboss.mobicents.seam.util.TTSUtils;
 
 /**
  * Sip Servlet handling responses to call initiated due to actions made on the web shopping demo
@@ -253,8 +255,16 @@ public class ShoppingSipServlet
 		logger.info("Got bye " + request);
 		NetworkConnection connection = (NetworkConnection)request.getSession().getAttribute("connection");
 		MediaGroup mg =(MediaGroup)request.getSession().getAttribute("mediaGroup");
+		MediaSession session =(MediaSession)request.getSession().getAttribute("mediaSession");
 	
+		session.release();
 		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		SipServletResponse ok = request
 				.createResponse(SipServletResponse.SC_OK);
 		ok.send();
@@ -265,17 +275,6 @@ public class ShoppingSipServlet
 			SipServletRequest bye = linkedSession.createRequest("BYE");
 			logger.info("Sending bye to " + linkedSession.getRemoteParty());
 			bye.send();
-		}
-		
-		if(connection != null) {
-			connection.release();
-		} else {
-			logger.info("connection not created");
-		}
-		if(mg != null) {
-			mg.release();	
-		} else {
-			logger.info("link not created");
 		}
 	}
 	
@@ -329,6 +328,10 @@ public class ShoppingSipServlet
 			BigDecimal amount = (BigDecimal) attributes.get("amountOrder");
 			String customerPhone = (String) attributes.get("customerPhone");
 			String customerContact = (String) attributes.get("customerContact");
+			Address toAddress = sipFactory.createAddress(customerPhone);									
+			logger.info("preparing to call : "+ toAddress);
+			SipServletRequest sipServletRequest = 
+				sipFactory.createRequest(sipApplicationSession, "INVITE", fromAddress, toAddress);
 			if(attributes.get("adminApproval") != null) {
 				logger.info("preparing speech for admin approval");
 				customerContact = (String) attributes.get("adminContactAddress");
@@ -338,13 +341,12 @@ public class ShoppingSipServlet
 				stringBuffer.append(" has placed an order of $");
 				stringBuffer.append(amount);
 				stringBuffer.append(". Press 1 to approve and 2 to reject.");				
+				sipServletRequest.getSession().setAttribute("speechUri",
+						java.net.URI.create("data:" + URLEncoder.encode("ts("+ stringBuffer +")", "UTF-8")));
 				
-				TTSUtils.buildAudio(stringBuffer.toString(), "adminspeech.wav");
 			}			
-			Address toAddress = sipFactory.createAddress(customerPhone);									
-			logger.info("preparing to call : "+ toAddress);
-			SipServletRequest sipServletRequest = 
-				sipFactory.createRequest(sipApplicationSession, "INVITE", fromAddress, toAddress);
+			
+
 			URI requestURI = sipFactory.createURI(customerContact);			
 			sipServletRequest.setRequestURI(requestURI);
 							
@@ -362,9 +364,19 @@ public class ShoppingSipServlet
 			.createNetworkConnection(NetworkConnection.BASIC);
 
 			SdpPortManager sdpManag = conn.getSdpPortManager();
-
-
-			byte[] sdpOffer = sdpManag.getMediaServerSessionDescription();
+			
+			sdpManag.generateSdpOffer();
+			
+			byte[] sdpOffer = null;
+			int numTimes = 0;
+			while(sdpOffer == null && numTimes<10) {
+				sdpOffer = sdpManag.getMediaServerSessionDescription();
+				Thread.sleep(500);
+				numTimes++;
+			}
+			MediaGroup mg = mediaSession.createMediaGroup(MediaGroup.PLAYER_SIGNALDETECTOR);
+			sipServletRequest.getSession().setAttribute("mediaGroup", mg);
+			sipServletRequest.getSession().setAttribute("mediaSession", mediaSession);
 			sipServletRequest.setContentLength(sdpOffer.length);
 			sipServletRequest.setContent(sdpOffer, "application/sdp");	
 			MediaConnectionListener listener = new MediaConnectionListener();
@@ -372,6 +384,8 @@ public class ShoppingSipServlet
 //			provider.addConnectionListener(listener);
 			sipServletRequest.getSession().setAttribute("connection", conn);
 			sipServletRequest.send();
+			mg.getSignalDetector().addListener(new DTMFListener(mg, sipServletRequest.getSession(), MMSUtil.audioFilePath));
+			conn.join(Direction.DUPLEX, mg);
 			logger.info("waiting to get the SDP from Media Server before sending the INVITE to " + callerAddress + "@" + callerDomain);
 		} catch (Exception e) {
 			logger.error("An unexpected exception occured while creating the request for delivery date", e);
