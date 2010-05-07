@@ -8,6 +8,7 @@ package org.jboss.mobicents.seam.actions;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,6 +34,7 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
+import org.jboss.mobicents.seam.listeners.DTMFListener;
 import org.jboss.mobicents.seam.listeners.MediaConnectionListener;
 import org.jboss.mobicents.seam.model.Customer;
 import org.jboss.mobicents.seam.model.Inventory;
@@ -40,7 +42,6 @@ import org.jboss.mobicents.seam.model.Order;
 import org.jboss.mobicents.seam.model.OrderLine;
 import org.jboss.mobicents.seam.model.Product;
 import org.jboss.mobicents.seam.util.MMSUtil;
-import org.jboss.mobicents.seam.util.TTSUtils;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.annotations.Begin;
 import org.jboss.seam.annotations.End;
@@ -191,7 +192,9 @@ public class CheckoutAction implements Checkout, Serializable {
 			stringBuffer.append(ammount); 
 			stringBuffer.append(". Press 1 to confirm and 2 to decline.");				
 			
-			TTSUtils.buildAudio(stringBuffer.toString(), "speech.wav");
+			sipServletRequest.getSession().setAttribute("speechUri",
+					java.net.URI.create("data:" + URLEncoder.encode("ts("+ stringBuffer +")", "UTF-8")));
+			
 			Thread.sleep(300);
 			//Media Server Control Creation
 			MediaSession mediaSession = MMSUtil.getMsControl().createMediaSession();
@@ -229,7 +232,7 @@ public class CheckoutAction implements Checkout, Serializable {
 			sipServletRequest.getSession().setAttribute("callerDomain", (String)Contexts.getApplicationContext().get("caller.domain"));
 			sipServletRequest.getSession().setAttribute("callerPassword", (String)Contexts.getApplicationContext().get("caller.password"));
 			sipServletRequest.send();
-			
+			mg.getSignalDetector().addListener(new DTMFListener(mg, sipServletRequest.getSession(), MMSUtil.audioFilePath));
 			conn.join(Direction.DUPLEX, mg);
 		} catch (UnsupportedOperationException uoe) {
 			log.error("An unexpected exception occurred while trying to create the request for checkout confirmation", uoe);

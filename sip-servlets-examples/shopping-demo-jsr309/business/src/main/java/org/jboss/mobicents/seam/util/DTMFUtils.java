@@ -18,6 +18,7 @@ package org.jboss.mobicents.seam.util;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URLEncoder;
 
 import javax.media.mscontrol.MsControlException;
 import javax.media.mscontrol.mediagroup.MediaGroup;
@@ -52,6 +53,12 @@ public class DTMFUtils {
 			
 			playFileInResponseToDTMFInfo(session, audioFile);
 		}
+		MediaGroup mg = (MediaGroup)session.getAttribute("mediaGroup");
+		try {
+			mg.getPlayer().addListener(new EndCallWhenPlaybackCompletedListener(session));
+		} catch (MsControlException e) {
+			logger.error("Error", e);
+		}
 	}
 
 	public static void orderApproval(SipSession session, String signal, String pathToAudioDirectory) {
@@ -83,6 +90,12 @@ public class DTMFUtils {
 			} catch (NamingException e) {
 				logger.error("An exception occured while retrieving the EJB OrderManager",e);
 			}					
+		}
+		MediaGroup mg = (MediaGroup)session.getAttribute("mediaGroup");
+		try {
+			mg.getPlayer().addListener(new EndCallWhenPlaybackCompletedListener(session));
+		} catch (MsControlException e) {
+			logger.error("Error", e);
 		}
 	}
 
@@ -222,12 +235,14 @@ public class DTMFUtils {
 				}				
 				logger.info(stringBuffer.toString());
 				try {
-					TTSUtils.buildAudio(stringBuffer.toString(), "deliveryDate.wav");
+					URI delieryDateSummary = java.net.URI.create("data:" + URLEncoder.encode("ts("+ stringBuffer +")", "UTF-8"));
+					session.setAttribute("speechUri",
+							delieryDateSummary);
 					java.io.File speech = new File("deliveryDate.wav");
-					logger.info("Playing delivery date summary : " + "file://" + speech.getAbsolutePath());
+					logger.info("Playing delivery date summary : " + "TTS:" + stringBuffer);
 								
 					MediaGroup mg = (MediaGroup) session.getAttribute("mediaGroup");
-					mg.getPlayer().play(URI.create("file://"+ speech.getAbsolutePath()), null, null);
+					mg.getPlayer().play(delieryDateSummary, null, null);
 					logger.info("delivery Date summary played. not waiting for DTMF anymore");
 					return true;
 				} catch (Exception e) {

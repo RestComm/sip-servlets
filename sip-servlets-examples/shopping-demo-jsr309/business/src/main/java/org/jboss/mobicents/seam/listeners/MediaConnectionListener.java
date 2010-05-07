@@ -43,28 +43,26 @@ public class MediaConnectionListener implements MediaEventListener<SdpPortManage
 	public static void playAnnouncement(MediaGroup mg, SipSession sipSession, String pathToAudioDirectory) {
 
 		try {
+			java.net.URI uri = (java.net.URI) sipSession.getAttribute("speechUri");
 			if(sipSession.getAttribute("orderApproval") != null) {
-				java.io.File speech = new File("speech.wav");
-				if(sipSession.getAttribute("adminApproval") != null) {
-					speech = new File("adminspeech.wav");	
-				}			
-				logger.info("Playing confirmation announcement : " + "file:///" + speech.getAbsolutePath());
+		
+				logger.info("Playing confirmation announcement : " + uri);
 
-				mg.getPlayer().play(URI.create("file:///"+ speech.getAbsolutePath().replace('\\', '/')), null, null);
-
+				mg.getPlayer().play(uri, null, null);
+				mg.getSignalDetector().receiveSignals(1, null, null, null);
 
 				logger.info("Waiting for DTMF at the same time..");
 			} else if (sipSession.getAttribute("deliveryDate") != null) {			
-				String announcementFile = pathToAudioDirectory + "OrderDeliveryDate.wav";
-				logger.info("Playing Delivery Date Announcement : " + announcementFile);
-				mg.getPlayer().play(URI.create(announcementFile.replace('\\', '/')), null, null);
+				logger.info("Playing Delivery Date Announcement : " + uri);
+				mg.getPlayer().play(uri, null, null);
+				mg.getSignalDetector().receiveSignals(1, null, null, null);
 
 				logger.info("Waiting for DTMF at the same time..");
 			} else if (sipSession.getAttribute("shipping") != null) {			
-				java.io.File speech = new File("shipping.wav");
-				logger.info("Playing shipping announcement : " + "file:///" + speech.getAbsolutePath().replace('\\', '/'));
+				logger.info("Playing shipping announcement : " + uri);
 
-				mg.getPlayer().play(URI.create("file:///"+ speech.getAbsolutePath().replace('\\', '/')), null, null);
+				mg.getPlayer().play(uri, null, null);
+				mg.getSignalDetector().receiveSignals(1, null, null, null);
 
 				logger.info("shipping announcement played. tearing down the call");
 			}		

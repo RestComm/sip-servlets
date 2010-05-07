@@ -2,11 +2,14 @@ package org.jboss.mobicents.seam.actions;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.media.mscontrol.MediaSession;
+import javax.media.mscontrol.join.Joinable.Direction;
+import javax.media.mscontrol.mediagroup.MediaGroup;
 import javax.media.mscontrol.networkconnection.NetworkConnection;
 import javax.media.mscontrol.networkconnection.SdpPortManager;
 import javax.servlet.sip.Address;
@@ -16,6 +19,7 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
+import org.jboss.mobicents.seam.listeners.DTMFListener;
 import org.jboss.mobicents.seam.listeners.MediaConnectionListener;
 import org.jboss.mobicents.seam.util.MMSUtil;
 import org.jboss.seam.annotations.In;
@@ -80,24 +84,36 @@ public class OrderApprovalAction implements OrderApproval, Serializable {
 			MediaSession mediaSession = MMSUtil.getMsControl().createMediaSession();
 			NetworkConnection conn = mediaSession
 			.createNetworkConnection(NetworkConnection.BASIC);
-
 			SdpPortManager sdpManag = conn.getSdpPortManager();
+			sdpManag.generateSdpOffer();
 
 
-			byte[] sdpOffer = sdpManag.getMediaServerSessionDescription();
+			byte[] sdpOffer = null;
+			int numTimes = 0;
+			while(sdpOffer == null && numTimes<10) {
+				sdpOffer = sdpManag.getMediaServerSessionDescription();
+				Thread.sleep(500);
+				numTimes++;
+			}
+			
 			sipServletRequest.setContentLength(sdpOffer.length);
 			sipServletRequest.setContent(sdpOffer, "application/sdp");	
-			
+			MediaGroup mg = mediaSession.createMediaGroup(MediaGroup.PLAYER_SIGNALDETECTOR);
+			sipServletRequest.getSession().setAttribute("mediaGroup", mg);
+			sipServletRequest.getSession().setAttribute("mediaSession", mediaSession);
 			sipServletRequest.getSession().setAttribute("customerName", customerfullname);
 			sipServletRequest.getSession().setAttribute("customerPhone", cutomerphone);
 			sipServletRequest.getSession().setAttribute("amountOrder", amount);
 			sipServletRequest.getSession().setAttribute("orderId", orderId);
 			sipServletRequest.getSession().setAttribute("connection", conn);			
 			sipServletRequest.getSession().setAttribute("deliveryDate", true);
+			sipServletRequest.getSession().setAttribute("speechUri", java.net.URI.create("data:"+URLEncoder.encode("ts(Enter 10 digit delivery date)", "UTF-8")));
 			sipServletRequest.getSession().setAttribute("caller", (String)Contexts.getApplicationContext().get("caller.sip"));
 			sipServletRequest.getSession().setAttribute("callerDomain", (String)Contexts.getApplicationContext().get("caller.domain"));
 			sipServletRequest.getSession().setAttribute("callerPassword", (String)Contexts.getApplicationContext().get("caller.password"));
 			sipServletRequest.send();
+			mg.getSignalDetector().addListener(new DTMFListener(mg, sipServletRequest.getSession(), MMSUtil.audioFilePath));
+			conn.join(Direction.DUPLEX, mg);
 		} catch (UnsupportedOperationException uoe) {
 			log.error("An unexpected exception occurred while trying to create the request for delivery date", uoe);
 		} catch (Exception e) {

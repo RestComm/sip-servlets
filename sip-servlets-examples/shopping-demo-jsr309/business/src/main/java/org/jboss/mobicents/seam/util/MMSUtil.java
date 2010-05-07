@@ -6,6 +6,7 @@ import javax.naming.NamingException;
 
 public class MMSUtil {
 	public static MsControlFactory msControlFactory;
+	public static String audioFilePath;
 	public static MsControlFactory getMsControl() {
 		try {
 			return msControlFactory;

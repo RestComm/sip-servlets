@@ -2,12 +2,15 @@ package org.jboss.mobicents.seam.actions;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.net.URLEncoder;
 import java.sql.Timestamp;
 import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.ejb.Stateless;
 import javax.media.mscontrol.MediaSession;
+import javax.media.mscontrol.join.Joinable.Direction;
+import javax.media.mscontrol.mediagroup.MediaGroup;
 import javax.media.mscontrol.networkconnection.NetworkConnection;
 import javax.media.mscontrol.networkconnection.SdpPortManager;
 import javax.servlet.sip.Address;
@@ -17,10 +20,9 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
-import org.jboss.mobicents.seam.listeners.MediaConnectionListener;
+import org.jboss.mobicents.seam.listeners.DTMFListener;
 import org.jboss.mobicents.seam.model.Order;
 import org.jboss.mobicents.seam.util.MMSUtil;
-import org.jboss.mobicents.seam.util.TTSUtils;
 import org.jboss.seam.annotations.In;
 import org.jboss.seam.annotations.Logger;
 import org.jboss.seam.annotations.Name;
@@ -150,7 +152,8 @@ public class AfterShippingAction implements AfterShipping, Serializable {
 			stringBuffer.append(orderDate.getMinutes());
 			stringBuffer.append(" minute. Thank you. Bye.");				
 			
-			TTSUtils.buildAudio(stringBuffer.toString(), "shipping.wav");
+			sipServletRequest.getSession().setAttribute("speechUri",
+					java.net.URI.create("data:" + URLEncoder.encode("ts("+ stringBuffer +")", "UTF-8")));
 			Thread.sleep(300);
 			//Media Server Control Creation
 			MediaSession mediaSession = MMSUtil.getMsControl().createMediaSession();
@@ -159,11 +162,22 @@ public class AfterShippingAction implements AfterShipping, Serializable {
 
 			SdpPortManager sdpManag = conn.getSdpPortManager();
 
+			sdpManag.generateSdpOffer();
 
-			byte[] sdpOffer = sdpManag.getMediaServerSessionDescription();
+
+			byte[] sdpOffer = null;
+			int numTimes = 0;
+			while(sdpOffer == null && numTimes<10) {
+				sdpOffer = sdpManag.getMediaServerSessionDescription();
+				Thread.sleep(500);
+				numTimes++;
+			}
+			
 			sipServletRequest.setContentLength(sdpOffer.length);
 			sipServletRequest.setContent(sdpOffer, "application/sdp");	
-
+			MediaGroup mg = mediaSession.createMediaGroup(MediaGroup.PLAYER_SIGNALDETECTOR);
+			sipServletRequest.getSession().setAttribute("mediaGroup", mg);
+			sipServletRequest.getSession().setAttribute("mediaSession", mediaSession);
 			sipServletRequest.getSession().setAttribute("customerName", customerfullname);
 			sipServletRequest.getSession().setAttribute("customerPhone", cutomerphone);
 			sipServletRequest.getSession().setAttribute("amountOrder", amount);
@@ -171,6 +185,8 @@ public class AfterShippingAction implements AfterShipping, Serializable {
 			sipServletRequest.getSession().setAttribute("connection", conn);
 			sipServletRequest.getSession().setAttribute("shipping", true);
 			sipServletRequest.send();
+			mg.getSignalDetector().addListener(new DTMFListener(mg, sipServletRequest.getSession(), MMSUtil.audioFilePath));
+			conn.join(Direction.DUPLEX, mg);
 		} catch (UnsupportedOperationException uoe) {
 			log.error("An unexpected exception occurred while trying to create the request for shipping call", uoe);
 		} catch (Exception e) {
