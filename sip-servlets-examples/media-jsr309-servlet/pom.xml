@@ -37,13 +37,13 @@
 		<dependency>
 			<groupId>org.mobicents.external.jsr309</groupId>
 			<artifactId>mscontrol</artifactId>
-			<version>${jsr309.mscontrol.version}</version>
+			<version>1.0</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mobicents.jsr309</groupId>
 			<artifactId>mobicents-jsr309-impl</artifactId>
-			<version>${jsr309.version}</version>
+			<version>2.0.0.BETA4-SNAPSHOT</version>
 		</dependency>
 
 		<!-- j2ee dependencies -->
