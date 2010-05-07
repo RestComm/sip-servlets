@@ -24,7 +24,7 @@ public class AnnouncementConferenceParticipant extends ConferenceParticipant {
 			this.session = MsControlObjects.msControlFactory.createMediaSession();
 			this.mg = this.session.createMediaGroup(MediaGroup.PLAYER);
 		} catch (MsControlException e) {
-			logger.error(e);
+			logger.error("Error", e);
 		}
 		
 	}
@@ -53,7 +53,7 @@ public class AnnouncementConferenceParticipant extends ConferenceParticipant {
 			Thread.sleep(800);
 			mg.getPlayer().play(URI.create(url), null, null);
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error("Error", e);
 		}
 	}
 	
@@ -62,7 +62,7 @@ public class AnnouncementConferenceParticipant extends ConferenceParticipant {
 		try {
 			mg.joinInitiate(direction, conference.getMixer(), null);
 		} catch (MsControlException e) {
-			logger.error(e);
+			logger.error("Error", e);
 		}
 	}
 	
@@ -73,7 +73,7 @@ public class AnnouncementConferenceParticipant extends ConferenceParticipant {
 		try {
 			mg.release();
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error("Error", e);
 		}
 	}
 
@@ -88,7 +88,7 @@ public class AnnouncementConferenceParticipant extends ConferenceParticipant {
 		try {
 			mg.joinInitiate(Direction.RECV, conference.getMixer(), null);
 		} catch (MsControlException e) {
-			logger.error(e);
+			logger.error("Error", e);
 		}
 		muted = true;
 	}
@@ -98,7 +98,7 @@ public class AnnouncementConferenceParticipant extends ConferenceParticipant {
 		try {
 			mg.joinInitiate(Direction.DUPLEX, conference.getMixer(), null);
 		} catch (MsControlException e) {
-			logger.error(e);
+			logger.error("Error", e);
 		}
 		muted = false;
 	}

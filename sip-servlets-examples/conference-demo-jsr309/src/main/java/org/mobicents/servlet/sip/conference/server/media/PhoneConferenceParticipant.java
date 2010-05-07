@@ -58,8 +58,7 @@ public class PhoneConferenceParticipant extends ConferenceParticipant {
 		try {
 			nc.joinInitiate(direction, conference.getMixer(), null);
 		} catch (MsControlException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error", e);
 		}
 	}
 	
@@ -70,7 +69,7 @@ public class PhoneConferenceParticipant extends ConferenceParticipant {
 		try {
 			nc.release();
 		} catch (Exception e) {
-			logger.error(e);
+			logger.error("Error", e);
 		}
 	}
 
@@ -80,7 +79,7 @@ public class PhoneConferenceParticipant extends ConferenceParticipant {
 		try {
 			message.getSession().createRequest("BYE").send();
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error("Error", e);
 		}
 		
 	}
@@ -90,8 +89,7 @@ public class PhoneConferenceParticipant extends ConferenceParticipant {
 		try {
 			nc.joinInitiate(Direction.RECV, conference.getMixer(), null);
 		} catch (MsControlException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error", e);
 		}
 		muted = true;
 	}
@@ -101,8 +99,7 @@ public class PhoneConferenceParticipant extends ConferenceParticipant {
 		try {
 			nc.joinInitiate(Direction.DUPLEX, conference.getMixer(), null);
 		} catch (MsControlException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error", e);
 		}
 		muted = false;
 	}

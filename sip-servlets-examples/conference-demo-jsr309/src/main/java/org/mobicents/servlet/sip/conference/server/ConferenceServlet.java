@@ -75,7 +75,7 @@ public class ConferenceServlet extends SipServlet implements SipServletListener 
 	 */
 	public static final String LOCAL_ADDRESS = System.getProperty(
 			"jboss.bind.address", "127.0.0.1");
-	protected static final String CA_PORT = "2728";
+	protected static final String CA_PORT = "2921";
 
 	public static final String PEER_ADDRESS = System.getProperty(
 			"jboss.bind.address", "127.0.0.1");
