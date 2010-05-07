@@ -196,7 +196,7 @@ public class ClassFileScanner {
 		processServletAnnotation(clazz);
 		processSipApplicationKeyAnnotation(clazz);
 		processConcurrencyAnnotation(clazz);   
-		if(clazz.getSimpleName().equals("package-info")) {
+		if(clazz.toString().contains("package-info.class")) {
 			Package pack = clazz.getPackage();
 			String packageName = pack.getName();
 
