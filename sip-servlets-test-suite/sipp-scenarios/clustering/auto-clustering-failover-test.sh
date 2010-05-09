@@ -6,6 +6,14 @@ export KILL_PARAMS="-9"
 export FULLSTARTSLEEP=82
 export HALFSTARTSLEEP=60
 
+if [ "x$1" != "x" ]; then
+    export FULLSTARTSLEEP=$1
+fi
+
+if [ "x$2" != "x" ]; then
+    export HALFSTARTSLEEP=$2
+fi
+
 export EXIT_CODE=0;
 
 rm -rf result.txt
