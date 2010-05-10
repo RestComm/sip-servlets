@@ -197,6 +197,9 @@ public class ClassFileScanner {
 		processSipApplicationKeyAnnotation(clazz);
 		processConcurrencyAnnotation(clazz);   
 		if(clazz.toString().contains("package-info")) {
+			if(logger.isDebugEnabled()) {
+	    		logger.debug("scanning " + clazz.getCanonicalName() + " for @SipApplication annotation");
+	    	}
 			Package pack = clazz.getPackage();
 			String packageName = pack.getName();
 
@@ -214,6 +217,10 @@ public class ClassFileScanner {
 					this.parsedAnnotatedPackage = packageName;
 					parseSipApplication(appData, packageName);
 				}								
+			} else {
+				if(logger.isDebugEnabled()) {
+		    		logger.debug("no @SipApplication annotation in " + clazz.getCanonicalName());
+		    	}
 			}
 		}
 	}
