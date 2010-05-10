@@ -426,6 +426,17 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 											applicationNameSubcontext,
 											TIMER_SERVICE_JNDI_NAME,
 											timerService);
+							
+							// Backward compatibility for global JNDI MSS names from AS 4 http://code.google.com/p/mobicents/issues/detail?id=1439
+							{
+								InitialContext iniCtx = new InitialContext();
+								Context globalEnvCtx = (Context) iniCtx.lookup("java:/");
+								Context globalSipSubcontext = globalEnvCtx.createSubcontext(SIP_SUBCONTEXT);
+								Context globaApplicationNameSubcontext = globalSipSubcontext.createSubcontext(convergedMetaData.getApplicationName());			
+								NonSerializableFactory.rebind(globaApplicationNameSubcontext,SIP_FACTORY_JNDI_NAME, sipFactoryFacade);
+								NonSerializableFactory.rebind(globaApplicationNameSubcontext, SIP_SESSIONS_UTIL_JNDI_NAME, sipSessionsUtil);
+								NonSerializableFactory.rebind(globaApplicationNameSubcontext,TIMER_SERVICE_JNDI_NAME, timerService);
+							}
 							if (log.isDebugEnabled()) {
 								log
 										.debug("Sip Objects made available to global JNDI under following conetxt : java:comp/env/sip/"
