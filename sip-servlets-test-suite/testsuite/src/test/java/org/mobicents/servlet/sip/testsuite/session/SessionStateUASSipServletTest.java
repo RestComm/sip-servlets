@@ -28,6 +28,7 @@ import javax.sip.SipProvider;
 import javax.sip.TransactionDoesNotExistException;
 import javax.sip.TransactionUnavailableException;
 import javax.sip.address.SipURI;
+import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -49,7 +50,7 @@ public class SessionStateUASSipServletTest extends SipServletTestCase {
 	private List<String> send_1xx_4xx_sessionStateList;
 	private List<String> send_4xx_sessionStateList;
 	private List<String> send_2xx_sessionStateList;
-	//1 sec
+	private List<String> send_subsequent_487_sessionStateList;
 	private static final int TIMEOUT = 20000;
 	
 	TestSipListener sender;
@@ -106,6 +107,12 @@ public class SessionStateUASSipServletTest extends SipServletTestCase {
 		send_4xx_sessionStateList = new ArrayList<String>();
 		send_4xx_sessionStateList.add(SipSession.State.INITIAL.toString());		
 		send_4xx_sessionStateList.add(SipSession.State.TERMINATED.toString());
+		
+		send_subsequent_487_sessionStateList = new ArrayList<String>();
+		send_subsequent_487_sessionStateList.add(SipSession.State.INITIAL.toString());
+		send_subsequent_487_sessionStateList.add(SipSession.State.CONFIRMED.toString());
+		send_subsequent_487_sessionStateList.add(SipSession.State.CONFIRMED.toString());
+		send_subsequent_487_sessionStateList.add(SipSession.State.TERMINATED.toString());
 	}
 	
 	public void testSessionStateUAS_1xx_2xx() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
@@ -167,6 +174,43 @@ public class SessionStateUASSipServletTest extends SipServletTestCase {
 			assertTrue(sender.getAllMessagesContent().contains(send_4xx_sessionStateList.get(i)));
 		}	
 	}
+	
+	/**
+	 * http://code.google.com/p/mobicents/issues/detail?id=1438
+	 * Sip Session become TERMINATED after receiving 487 response to subsequent request
+	 */
+	public void testSessionStateUAS_SubsequentRequest_FinalResponse() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		createAndExecuteCall(SEND_2XX, false);
+		
+		sender.sendInDialogSipRequest(Request.REFER, null, null, null, null);	
+		
+		Thread.sleep(TIMEOUT);
+		sender.sendBye();
+		Thread.sleep(TIMEOUT);
+		
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();		
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}		
+		
+		int numberOfTerminated = 0; 
+		int numberOfConfirmed = 0;
+		assertEquals(send_subsequent_487_sessionStateList.size(), sender.getAllMessagesContent().size());		
+		for (int i = 0; i < send_subsequent_487_sessionStateList.size(); i++) {
+			String messageContent = sender.getAllMessagesContent().get(i);
+			assertTrue(sender.getAllMessagesContent().contains(messageContent));
+			if(messageContent.equalsIgnoreCase(SipSession.State.CONFIRMED.toString())) {
+				numberOfConfirmed++;
+			}
+			if(messageContent.equalsIgnoreCase(SipSession.State.TERMINATED.toString())) {
+				numberOfTerminated++;
+			}
+		}	
+		assertEquals(2, numberOfConfirmed);
+		assertEquals(1, numberOfTerminated);
+	}
+	
 	/**
 	 * @param sendBye TODO
 	 * @throws ParseException

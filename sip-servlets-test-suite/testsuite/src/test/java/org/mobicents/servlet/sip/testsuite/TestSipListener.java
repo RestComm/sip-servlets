@@ -181,7 +181,7 @@ public class TestSipListener implements SipListener {
 
 	private boolean finalResponseReceived;
 	
-	private int finalResponseToSend;
+	private int finalResponseToSend = -1;
 	
 	public int ackCount = 0;
 	
@@ -265,6 +265,10 @@ public class TestSipListener implements SipListener {
 	private boolean setTransport=true;
 
 	private boolean serviceUnavailableReceived = false;
+
+	private int referResponseToSend = 202;
+
+	private boolean sendNotifyForRefer = true;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -411,41 +415,43 @@ public class TestSipListener implements SipListener {
 			logger.info("Shootme: dialog = " + dialog);
 			
 			Response response = protocolObjects.messageFactory.createResponse(
-					Response.ACCEPTED, request);
+						referResponseToSend, request);
 			sipETag = Integer.toString(new Random().nextInt(10000000));
 			st.sendResponse(response);
 			this.transactionCount++;
-			logger.info("shootist:  Sending ACCEPTED.");			
+			logger.info("shootist:  Sending " + referResponseToSend);			
 			
 			List<Header> headers = new ArrayList<Header>();
 			EventHeader eventHeader = (EventHeader) 
 				protocolObjects.headerFactory.createHeader(EventHeader.NAME, "Refer");
 			headers.add(eventHeader);
 			
-			if(!referReceived) {
-				referReceived = true;
-								
-				SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
-					protocolObjects.headerFactory.createHeader(SubscriptionStateHeader.NAME, "active;expires=3600");
-				headers.add(subscriptionStateHeader);
-				allMessagesContent.add("SIP/2.0 100 Trying");
-				sendInDialogSipRequest(Request.NOTIFY, "SIP/2.0 100 Trying", "message", "sipfrag;version=2.0", headers);
-				Thread.sleep(1000);
-				headers.remove(subscriptionStateHeader);
-				subscriptionStateHeader = (SubscriptionStateHeader) 
-					protocolObjects.headerFactory.createHeader(SubscriptionStateHeader.NAME, "terminated;reason=noresource");
-				headers.add(subscriptionStateHeader);
-				if(inviteRequest == null) {
-					ExtensionHeader extensionHeader = (ExtensionHeader) protocolObjects.headerFactory.createHeader("Out-Of-Dialog", "true");
-					headers.add(extensionHeader);
+			if(sendNotifyForRefer) {
+				if(!referReceived) {
+					referReceived = true;
+									
+					SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
+						protocolObjects.headerFactory.createHeader(SubscriptionStateHeader.NAME, "active;expires=3600");
+					headers.add(subscriptionStateHeader);
+					allMessagesContent.add("SIP/2.0 100 Trying");
+					sendInDialogSipRequest(Request.NOTIFY, "SIP/2.0 100 Trying", "message", "sipfrag;version=2.0", headers);
+					Thread.sleep(1000);
+					headers.remove(subscriptionStateHeader);
+					subscriptionStateHeader = (SubscriptionStateHeader) 
+						protocolObjects.headerFactory.createHeader(SubscriptionStateHeader.NAME, "terminated;reason=noresource");
+					headers.add(subscriptionStateHeader);
+					if(inviteRequest == null) {
+						ExtensionHeader extensionHeader = (ExtensionHeader) protocolObjects.headerFactory.createHeader("Out-Of-Dialog", "true");
+						headers.add(extensionHeader);
+					}
+					allMessagesContent.add("SIP/2.0 200 OK");
+					sendInDialogSipRequest(Request.NOTIFY, "SIP/2.0 200 OK", "message", "sipfrag;version=2.0", headers);
+				} else {
+					SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
+						protocolObjects.headerFactory.createHeader(SubscriptionStateHeader.NAME, "active;expires=3600");
+					headers.add(subscriptionStateHeader);
+					sendInDialogSipRequest(Request.NOTIFY, "SIP/2.0 100 Subsequent", "message", "sipfrag;version=2.0", headers);
 				}
-				allMessagesContent.add("SIP/2.0 200 OK");
-				sendInDialogSipRequest(Request.NOTIFY, "SIP/2.0 200 OK", "message", "sipfrag;version=2.0", headers);
-			} else {
-				SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
-					protocolObjects.headerFactory.createHeader(SubscriptionStateHeader.NAME, "active;expires=3600");
-				headers.add(subscriptionStateHeader);
-				sendInDialogSipRequest(Request.NOTIFY, "SIP/2.0 100 Subsequent", "message", "sipfrag;version=2.0", headers);
 			}
 			
 		} catch (Exception ex) {
@@ -2564,6 +2570,24 @@ public class TestSipListener implements SipListener {
 	 */
 	public boolean isServiceUnavailableReceived() {
 		return serviceUnavailableReceived;
+	}
+
+	public void setReferResponseToSend(int referResponseToSend) {
+		this.referResponseToSend  = referResponseToSend;
+	}
+
+	/**
+	 * @param sendNotifyForRefer the sendNotifyForRefer to set
+	 */
+	public void setSendNotifyForRefer(boolean sendNotifyForRefer) {
+		this.sendNotifyForRefer = sendNotifyForRefer;
+	}
+
+	/**
+	 * @return the sendNotifyForRefer
+	 */
+	public boolean isSendNotifyForRefer() {
+		return sendNotifyForRefer;
 	}
 
 }

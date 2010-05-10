@@ -1361,30 +1361,38 @@ public class SipSessionImpl implements MobicentsSipSession {
 				}
 			}						
 		}
-		if(((State.CONFIRMED.equals(state) || State.TERMINATED.equals(state)) && response.getStatus() == 200 && Request.BYE.equals(method)) || response.getStatus() == 487) {
+		if(((State.CONFIRMED.equals(state) || State.TERMINATED.equals(state)) && response.getStatus() == 200 && Request.BYE.equals(method))
+				// http://code.google.com/p/mobicents/issues/detail?id=1438
+				// Sip Session become TERMINATED after receiving 487 response to subsequent request => !confirmed clause added
+				|| (!State.CONFIRMED.equals(state) && response.getStatus() == 487)) {
 			boolean hasOngoingSubscriptions = false;
 			if(subscriptions != null) {				
 				if(subscriptions.size() > 0) {
 					hasOngoingSubscriptions = true;
+				}
+				if(logger.isDebugEnabled()) {
+					logger.debug("the following sip session " + getKey() + " has " + subscriptions.size() + " subscriptions");
 				}
 				if(!hasOngoingSubscriptions) {
 					if(sessionCreatingDialog != null) {
 						sessionCreatingDialog.delete();
 					}
 				}
-			}	
+			}				
 			if(!hasOngoingSubscriptions) {
 				if(getProxy() == null || response.getStatus() != 487) {
 					setState(State.TERMINATED);
 					setReadyToInvalidate(true);
+					if(logger.isDebugEnabled()) {
+						logger.debug("the following sip session " + getKey() + " has its state updated to " + state);
+						logger.debug("the following sip session " + getKey() + " is ready to be invalidated ");
+					}
 				}
 			}
-			okToByeSentOrReceived = true;
-			
 			if(logger.isDebugEnabled()) {
 				logger.debug("the following sip session " + getKey() + " has its state updated to " + state);
-				logger.debug("the following sip session " + getKey() + " is ready to be invalidated ");
 			}
+			okToByeSentOrReceived = true;						
 		}
 	}
 	

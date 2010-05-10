@@ -24,8 +24,12 @@ import javax.servlet.sip.SipSession;
 import javax.sip.SipProvider;
 import javax.sip.message.Response;
 
+import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.startup.SipContextConfig;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -35,15 +39,9 @@ public class SessionStateUACSipServletTest extends SipServletTestCase {
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final String SEND_1XX_2XX = "send1xx_2xx";
-	private static final String SEND_1XX_4XX = "send1xx_4xx";
-	private static final String SEND_4XX = "send4xx";
-	private static final String SEND_2XX = "send2xx";
 	
-	private List<String> send_1xx_2xx_sessionStateList;
 	private List<String> send_1xx_4xx_sessionStateList;
-	private List<String> send_4xx_sessionStateList;
-	private List<String> send_2xx_sessionStateList;
+	private List<String> send_subsequent_487_sessionStateList;
 
 	private static final int TIMEOUT = 35000;
 	
@@ -51,16 +49,30 @@ public class SessionStateUACSipServletTest extends SipServletTestCase {
 	
 	ProtocolObjects receiverProtocolObjects;	
 
-	public SessionStateUACSipServletTest(String name) {
+	public SessionStateUACSipServletTest(String name) {		
 		super(name);
+		autoDeployOnStartup = false;
 	}
 
 	@Override
-	public void deployApplication() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/session-state-uac/src/main/sipapp",
-				"sip-test-context",
-				"sip-test"));		
+	protected void deployApplication() {
+		deployApplication(null, null);
+	}
+	
+	public void deployApplication(String name, String value) {
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/session-state-uac/src/main/sipapp");
+		context.setName("sip-test-context");
+		context.setPath("sip-test");
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		if(name != null) {
+			ApplicationParameter applicationParameter = new ApplicationParameter();
+			applicationParameter.setName(name);
+			applicationParameter.setValue(value);
+			context.addApplicationParameter(applicationParameter);
+		}		
+		assertTrue(tomcat.deployContext(context));			
 	}
 
 	@Override
@@ -76,6 +88,17 @@ public class SessionStateUACSipServletTest extends SipServletTestCase {
 		send_1xx_4xx_sessionStateList.add(SipSession.State.EARLY.toString());
 		send_1xx_4xx_sessionStateList.add(SipSession.State.INITIAL.toString());
 		
+		send_subsequent_487_sessionStateList = new ArrayList<String>();
+		send_subsequent_487_sessionStateList.add(SipSession.State.INITIAL.toString());
+		send_subsequent_487_sessionStateList.add(SipSession.State.EARLY.toString());		
+		send_subsequent_487_sessionStateList.add(SipSession.State.CONFIRMED.toString());
+		send_subsequent_487_sessionStateList.add(SipSession.State.CONFIRMED.toString());
+		send_subsequent_487_sessionStateList.add(SipSession.State.TERMINATED.toString());				
+		
+		super.setUp();																							
+	}
+	
+	public void testSessionStateUAC_1xx_4xx() throws Exception {	
 		receiverProtocolObjects =new ProtocolObjects(
 				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
 					
@@ -85,16 +108,12 @@ public class SessionStateUACSipServletTest extends SipServletTestCase {
 		provisionalResponsesToSend.add(Response.RINGING);	
 		receiver.setFinalResponseToSend(Response.FORBIDDEN);
 		
-		SipProvider senderProvider = receiver.createProvider();			
-		
-		senderProvider.addSipListener(receiver);
-		
+		SipProvider receiverProvider = receiver.createProvider();			
+		receiverProvider.addSipListener(receiver);
 		receiverProtocolObjects.start();
 		
-		super.setUp();																							
-	}
-	
-	public void testSessionStateUAC_1xx_4xx() throws Exception {		
+		deployApplication();
+		
 		Thread.sleep(TIMEOUT);
 		
 		Iterator<String> allMessagesIterator = receiver.getAllMessagesContent().iterator();		
@@ -103,14 +122,78 @@ public class SessionStateUACSipServletTest extends SipServletTestCase {
 			logger.info(message);
 		}		
 		
-		assertEquals(send_1xx_4xx_sessionStateList.size() + 1, receiver.getAllMessagesContent().size()); // +1 because we check for tx termination as well		
+		assertEquals(send_1xx_4xx_sessionStateList.size(), receiver.getAllMessagesContent().size());		
 		for (int i = 0; i < send_1xx_4xx_sessionStateList.size(); i++) {
 			assertTrue(receiver.getAllMessagesContent().contains(send_1xx_4xx_sessionStateList.get(i)));
 		}	
+	}
+	
+	/**
+	 * http://code.google.com/p/mobicents/issues/detail?id=1438
+	 * Sip Session become TERMINATED after receiving 487 response to subsequent request
+	 */
+	public void testSessionStateUAC_Subsequent_487() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"Subsequent_487", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		List<Integer> provisionalResponsesToSend = receiver.getProvisionalResponsesToSend();
+		provisionalResponsesToSend.clear();
+		provisionalResponsesToSend.add(Response.RINGING);	
+		receiver.setFinalResponseToSend(Response.OK);
+		receiver.setReferResponseToSend(487);
+		receiver.setSendNotifyForRefer(false);
+		
+		SipProvider receiverProvider = receiver.createProvider();			
+		receiverProvider.addSipListener(receiver);
+		receiverProtocolObjects.start();
+		
+		deployApplication();
+		
+		Thread.sleep(TIMEOUT);	
+		receiver.sendBye();
+		Thread.sleep(5000);
+		
+		Iterator<String> allMessagesIterator = receiver.getAllMessagesContent().iterator();		
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}		
+		
+		int numberOfTerminated = 0; 
+		int numberOfConfirmed = 0;
+		assertEquals(send_subsequent_487_sessionStateList.size(), receiver.getAllMessagesContent().size());		
+		for (int i = 0; i < send_subsequent_487_sessionStateList.size(); i++) {
+			String messageContent = receiver.getAllMessagesContent().get(i);
+			assertTrue(receiver.getAllMessagesContent().contains(messageContent));
+			if(messageContent.equalsIgnoreCase(SipSession.State.CONFIRMED.toString())) {
+				numberOfConfirmed++;
+			}
+			if(messageContent.equalsIgnoreCase(SipSession.State.TERMINATED.toString())) {
+				numberOfTerminated++;
+			}
+		}	
+		assertEquals(2, numberOfConfirmed);
+		assertEquals(1, numberOfTerminated);
 	}	
 	
 	// Test for SS spec 11.1.6 transaction timeout notification
-	public void testTransactionTimeoutResponse() throws Exception {		
+	public void testTransactionTimeoutResponse() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		List<Integer> provisionalResponsesToSend = receiver.getProvisionalResponsesToSend();
+		provisionalResponsesToSend.clear();
+		provisionalResponsesToSend.add(Response.RINGING);	
+		receiver.setFinalResponseToSend(Response.FORBIDDEN);
+		
+		SipProvider receiverProvider = receiver.createProvider();			
+		receiverProvider.addSipListener(receiver);
+		receiverProtocolObjects.start();
+		
+		deployApplication("testTimeout", "true");
+		
 		Thread.sleep(TIMEOUT);
 		
 		Iterator<String> allMessagesIterator = receiver.getAllMessagesContent().iterator();		

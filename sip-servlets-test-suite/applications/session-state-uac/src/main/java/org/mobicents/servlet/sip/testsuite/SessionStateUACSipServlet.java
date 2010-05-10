@@ -35,6 +35,7 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 
 
 public class SessionStateUACSipServlet
@@ -69,8 +70,8 @@ public class SessionStateUACSipServlet
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			sendMessage(sipFactory, sipServletResponse.getSession().getState().toString());		
 		}
-		if(sipServletResponse.getStatus() == 408) {
-			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+		if(sipServletResponse.getStatus() == 408) {			
 			try {
 				Properties jndiProps = new Properties();			
 				Context initCtx = new InitialContext(jndiProps);
@@ -81,7 +82,30 @@ public class SessionStateUACSipServlet
 				throw new ServletException("Uh oh -- JNDI problem !", e);			
 			}
 		}
-	}	
+		if(sipServletResponse.getStatus() == 200 && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
+			sipServletResponse.createAck().send();			
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			SipServletRequest refer =sipServletResponse.getSession().createRequest("REFER");
+			refer.addHeader("Refer-To", "sip:refer-to@nist.gov");
+			refer.send();
+		}		
+		if(sipServletResponse.getStatus() >= 200 && "REFER".equalsIgnoreCase(sipServletResponse.getMethod())) {
+			sendMessage(sipFactory, sipServletResponse.getSession().getState().toString());		
+		}
+	}
+	
+	@Override
+	protected void doBye(SipServletRequest req) throws ServletException,
+			IOException {
+		req.createResponse(200).send();
+		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+		sendMessage(sipFactory, req.getSession().getState().toString());
+	}
 
 	// SipServletListener methods
 	/*
@@ -105,7 +129,9 @@ public class SessionStateUACSipServlet
 			logger.error("An Io exception occured while trying to set the content or send the request", e);
 		}		
 		sendMessage(sipFactory, sipServletRequest.getSession().getState().toString());
-		sendMessage(sipFactory, "This request must timeout", "sip:timeout@127.0.0.1:4794");
+		if(getServletContext().getInitParameter("testTimeout") != null) {
+			sendMessage(sipFactory, "This request must timeout", "sip:timeout@127.0.0.1:4794");
+		}
 	}
 	
 	/**

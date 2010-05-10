@@ -143,6 +143,16 @@ public class SessionStateUASSipServlet
 			}
 		}
 	}
+	
+	@Override
+	protected void doRefer(SipServletRequest request) throws ServletException,
+			IOException {
+		SipServletResponse finalResponse = request.createResponse(SipServletResponse.SC_REQUEST_TERMINATED);
+		finalResponse.send();
+		
+		// send message precising the current session state
+		sendMessage(request.getSession().getState().toString());
+	}
 
 	/**
 	 * {@inheritDoc}
