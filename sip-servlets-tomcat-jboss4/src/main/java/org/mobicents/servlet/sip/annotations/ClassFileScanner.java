@@ -370,7 +370,10 @@ public class ClassFileScanner {
     }
     
     protected SipApplication getApplicationAnnotation(Package pack) {
-    	if(pack == null) return null;
+    	if(logger.isDebugEnabled()) {
+			logger.debug("Analyzing " + pack + " for @SipApplication annotations");
+    	}
+    	if(pack == null) return null;    	    	
     	
     	SipApplication sipApp = (SipApplication) pack.getAnnotation(SipApplication.class);
     	if(sipApp != null) {
