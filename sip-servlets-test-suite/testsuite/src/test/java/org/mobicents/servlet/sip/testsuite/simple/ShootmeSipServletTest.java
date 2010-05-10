@@ -36,6 +36,7 @@ import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.management.FullThreadDump;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -423,6 +424,9 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		registerRecieverProtocolObjects.destroy();
 		logger.info("Test completed");
 		super.tearDown();
+		Thread.sleep(4000);
+//		FullThreadDump fullThreadDump = new FullThreadDump("127.0.0.1", 1090);
+//        fullThreadDump.dump();
 	}
 
 

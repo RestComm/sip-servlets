@@ -234,10 +234,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		hostNames = new CopyOnWriteArraySet<String>();
 		sipNetworkInterfaceManager = new SipNetworkInterfaceManager(this);
 		maxMemory = Runtime.getRuntime().maxMemory() / (double) 1024;
-		congestionControlPolicy = CongestionControlPolicy.ErrorResponse;
-		congestionControlThreadPool = new ScheduledThreadPoolExecutor(2,
-				new ThreadPoolExecutor.CallerRunsPolicy());
-		congestionControlThreadPool.prestartAllCoreThreads();		
+		congestionControlPolicy = CongestionControlPolicy.ErrorResponse;		
 	}
 	
 	/**
@@ -302,6 +299,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			logger.info("bypassResponseExecutor ? " + bypassResponseExecutor);
 		}
 		messageDispatcherFactory = new MessageDispatcherFactory(this);
+		congestionControlThreadPool = new ScheduledThreadPoolExecutor(2,
+				new ThreadPoolExecutor.CallerRunsPolicy());
+		congestionControlThreadPool.prestartAllCoreThreads();		
 		asynchronousExecutor = new ThreadPoolExecutor(StaticServiceHolder.sipStandardService.getDispatcherThreadPoolSize(), 64, 90, TimeUnit.SECONDS,
 				new LinkedBlockingQueue<Runnable>());
 		logger.info("AsynchronousThreadPoolExecutor size is " + StaticServiceHolder.sipStandardService.getDispatcherThreadPoolSize());
@@ -366,6 +366,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		} finally {
 			statusLock.unlock();
 		}
+		congestionControlThreadPool.shutdownNow();
+		asynchronousExecutor.shutdownNow();
 		sipApplicationRouter.destroy();		
 		if(oname != null) {
 			Registry.getRegistry(null, null).unregisterComponent(oname);
