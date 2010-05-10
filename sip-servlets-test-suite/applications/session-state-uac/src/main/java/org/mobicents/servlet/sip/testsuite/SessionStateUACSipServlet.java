@@ -35,7 +35,6 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 
 
 public class SessionStateUACSipServlet
