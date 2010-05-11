@@ -1,0 +1,182 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+  <head>
+    <title>Sip-Servlets - </title>
+    <style type="text/css" media="all">
+      @import url("../css/maven-base.css");
+      @import url("../css/maven-theme.css");
+      @import url("../css/site.css");
+    </style>
+    <link rel="stylesheet" href="../css/print.css" type="text/css" media="print" />
+    <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+  </head>
+  <body class="composite">
+    <!-- TODO: move this into JavaScript to patch the skin
+      <div class="xright">  </div>
+    -->
+    <div id="leftColumn">
+      <div id="navcolumn">
+        <dl class=navgroup>
+          <dd>
+            <ul>
+              <li class="none">
+                <a href="../index.html">Introduction</a>
+              </li>
+              <li class="collapsed">
+                <a href="../installation.html">Installation</a>
+              </li>
+              <li class="expanded">
+                <a href="../examples/examples.html">Examples</a>
+                <ul>                  
+                  <li class="none">
+                    <a href="../examples/call_blocking.html">Call Blocking</a>
+                  </li>
+                  <li class="none">
+                    <strong>Call Forwarding</strong>
+                  </li>
+                  <li class="none">
+                    <a href="../examples/call_controller.html">Call Controller</a>
+                  </li>
+                  <li class="none">
+                    <a href="../examples/speed_dial.html">Speed Dial</a>
+                  </li>
+                  <li class="none">
+                    <a href="../examples/location_service.html">Location Service</a>
+                  </li>
+                  <li class="none">
+                    <a href="../examples/speeddial_locationservice.html">Speed Dial/Location Service</a>
+                  </li>
+                  <li class="none">
+                    <a href="../examples/click2call.html">Click to Call</a>
+                  </li>
+                  <li class="none">
+                    <a href="../examples/chatserver.html">Chat Server</a>
+                  </li>
+                  <li class="none">
+                    <a href="../examples/media-demo.html">Media Demo</a>
+                  </li>
+                  <li class="none">
+                    <a href="../examples/shopping-demo.html">Shopping Demo</a>
+                  </li>
+                </ul>
+              </li>
+              <li class="none">
+                <a href="../media.html">Media support</a>
+              </li>
+              <li class="none">
+                <a href="../security.html">Security</a>
+              </li>
+              <li class="none">
+                <a href="../stun.html">STUN suport</a>
+              </li>
+              <li class="none">
+                <a href="../ssmc/sip-servlets-managment.htm">Management Console</a>
+              </li>
+              <li class="none">
+                <a href="../roadmap.html">Roadmap</a>
+              </li>
+              <li class="none">
+                <a href="../license.html">License</a>
+              </li>
+              <li class="none">
+                <a href="https://hudson.jboss.org/hudson/job/MobicentsSipServlets/">QA</a>
+              </li>
+              <li class="none">
+                <a href="../feedback.html">Feedback</a>
+              </li>
+              <li class="none">
+                <a href="../servlets/ProjectMailingListList">Mailing lists</a>
+              </li>
+              <li class="none">
+                <a href="../source/browse/sip-servlets/">Source code</a>
+              </li>
+              <li class="none">
+                <a href="../servlets/ProjectIssues">Issues</a>
+              </li>
+            </ul>
+          </dd>
+        </dl>
+        <dl class=navgroup>
+          <dt>Project Documentation</dt>
+          <dd>
+            <ul>
+              <li class="collapsed">
+                <a href="../project-info.html">Project Information</a>
+              </li>
+            </ul>
+          </dd>
+        </dl>
+      </div>
+      <script>
+        // replace the java.net project tools with the navigation bar from Maven.
+        // also get rid of "Get Involved" thingie too, while we are at it
+        var pt = document.getElementById("projecttools");
+        var nv = document.getElementById("navcolumn");
+        
+        while(pt.previousSibling!=null)
+          pt.parentNode.removeChild(pt.previousSibling);
+        
+        pt.parentNode.insertBefore(nv,pt);
+        pt.parentNode.removeChild(pt);
+      </script>
+      <script>
+        // kill "description" h3 bar
+        var ld = document.getElementById("longdescription");
+        if(ld!=null) {
+          for( n=ld.firstChild; n!=null; n=n.nextSibling ) {
+            if(n.nodeType==1 && n.innerHTML=="Description" ) {
+              n.parentNode.removeChild(n);
+              break;
+            }
+          }
+        }
+      </script>
+    </div>
+    <div id="bodyColumn">
+      <div id="contentBox">
+        <div class="section"><h2>Diameter Ro/Rf</h2>
+          <div class="section"><h3>Service Description</h3>
+            <p>When an INVITE is received, the Diameter Ro/Rf service checks if the caller has enough balance to establish the call, by sending an Diameter Credit-Control-Request with Cc-Request-Type AVP set to 'INITIAL_REQUEST' to the Online Charging Server (OCS) to reserve initial units. If the user is not provisioned in the OCS or has insufficient funds, a 402 (Payment Required) message is sent back to the caller and the call is cancelled; if the user has enough funds to proceed, an initial amount of credit is reserved and the call establishment proceeds.</p>
+            <p>If the callee does not answer the call the reserved units are returned back to the OCS. If the call is answered and correctly established the actual call charging starts: the initially reserved units (10 by default, corresponding to 10 seconds) start being consumed. Once those units are consumed, a new Credit-Control-Request is sent to OCS with Cc-Request-Type AVP set to 'UPDATE_REQUEST' in order to grant a new amount of units (10 by default). This is repeated whenever needed during the call.</p>
+            <p>Once the call is terminated, the amount of unused units are returned to the OCS by sending a Credit-Control-Request with Cc-Request-Type AVP set to 'TERMINATION_REQUEST'. If the balance is exhausted before the user hangs up, the call is terminated by the Ro/Rf service.</p>
+            <p>The following scenarios for 3GPP TS 32.260 (Rel 9.10) are implemented in this example, with the S-CSCF being discarded for simplicity and the AS playing both roles:</p>
+            <p><img src="DiameterRoExample-initiate.jpg"></p>
+            <p><img src="DiameterRoExample-terminate.jpg"></p>
+          </div>
+          <div class="section"><h3>How to activate it</h3>
+            <div class="section"><h4>From the binary</h4>
+              <p>You can find the war file corresponding to this example <a href="http://???" class="externalLink">here</a>.<br />
+                 Drop the downloaded war file into your <tt>tomcat_home/webapps</tt> directory or <tt>jboss_home/server/default/deploy</tt> directory </p>
+              <p>Get the corresponding <a href="/darfiles/diameter-ro-rf-servlet-dar.properties">dar configuration file</a>.<br />
+                 Drop it in your <tt>jboss_home/server/default/conf/dars</tt> directory.<br />
+                 To use this dar file for this service, specify in the Service xml tag, darConfigurationFileLocation attribute of the <tt>jboss_home/server/default/deploy/jbossweb.sar/server.xml</tt>, the following :<br />
+                 <tt>conf/dars/diameter-ro-rf-servlet-dar.properties</tt></p>
+              <p>You can now run your container (JBoss).</p>
+            </div>
+            <div class="section"><h4>From the source</h4>
+              <p>Please check out the diameter-ro-rf example located under this <a href="http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-examples/diameter-ro-rf/" class="externalLink">location</a> from the svn repository. Follow the instructions in the README.txt to build and run the example.</p>
+            </div>
+          </div>
+          <div class="section"><h3>How to play with it</h3>
+            <p>Download the Mobicents Diameter Charging Server Simulator from <a href="http://???" class="externalLink">here</a>.
+            <p>Configure it if needed and start it with <tt>java -jar &lt;filename.jar&gt;</tt>.
+            <p>Run your container (JBoss AS)</tt>.
+            <p>Start two SIP Phones of your choice such as one of the accounts is provisioned at the Charging Server (eg: sip:alexandre@mobicents.org).</p>
+            <p>The SIP phones don't have to be registered.</p>
+            <p>From the provisioned account, make a call to the other phone. You can play with it by accepting the call and see the balance being deducted or cancelling/rejecting the call and see the balance being returned.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="clear">
+      <hr/>
+    </div>
+    <div id="footer">
+      <div class="xright">&#169; 2010 &nbsp;| Last Published: 05/10/2010 &nbsp;| Version: 0.1</div>
+      <div class="clear">
+        <hr/>
+      </div>
+    </div>
+  </body>
+</html>
