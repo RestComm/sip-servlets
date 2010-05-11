@@ -105,6 +105,47 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());
 		assertTrue(sender.getOkToByeReceived());
+	}
+	
+	/**
+	 * Non Regression test for 
+	 * http://code.google.com/p/mobicents/issues/detail?id=1445
+	 * "Bad Request Method. CANCEL" during sending CANCEL to re-INVITE
+	 */
+	public void testCallForwardingCallerReInviteCancel() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);		
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());		
+		receiver.setWaitForCancel(true);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null);
+		Thread.sleep(500);
+		sender.sendCancel();		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isCancelOkReceived());
+		assertTrue(sender.isRequestTerminatedReceived());
+		assertTrue(receiver.isCancelReceived());
 	}	
 	
 	@Override

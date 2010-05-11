@@ -1287,15 +1287,15 @@ public class TestSipListener implements SipListener {
 					okToByeReceived = true;
 				} else if (cseq.getMethod().equals(Request.CANCEL)) {
 					this.cancelOkReceived = true;
-					if (tid.getDialog().getState() == DialogState.CONFIRMED) {
-						// oops cancel went in too late. Need to hang up the
-						// dialog.
-						logger.info("Sending BYE -- cancel went in too late !!");
-						Request byeRequest = dialog.createRequest(Request.BYE);
-						ClientTransaction ct = sipProvider
-								.getNewClientTransaction(byeRequest);
-						tid.getDialog().sendRequest(ct);
-					} 
+//					if (tid.getDialog().getState() == DialogState.CONFIRMED) {
+//						// oops cancel went in too late. Need to hang up the
+//						// dialog.
+//						logger.info("Sending BYE -- cancel went in too late !!");
+//						Request byeRequest = dialog.createRequest(Request.BYE);
+//						ClientTransaction ct = sipProvider
+//								.getNewClientTransaction(byeRequest);
+//						tid.getDialog().sendRequest(ct);
+//					} 
 				} else if (cseq.getMethod().equals(Request.PUBLISH)) {
 					SIPETagHeader sipTagHeader = (SIPETagHeader)response.getHeader(SIPETag.NAME);
 					sipETag = sipTagHeader.getETag();
@@ -2105,6 +2105,9 @@ public class TestSipListener implements SipListener {
 		addSpecificHeaders(method, message);
 		message.removeHeader(ViaHeader.NAME);
 		ClientTransaction clientTransaction = sipProvider.getNewClientTransaction(message);
+		if(method.equals("INVITE")) {
+			inviteClientTid = clientTransaction;
+		}
 		dialog.sendRequest(clientTransaction);
 	}
 	

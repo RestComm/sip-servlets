@@ -268,8 +268,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	@Override
 	protected void doCancel(SipServletRequest request) throws ServletException,
 			IOException {
-		if(!((SipURI)request.getTo().getURI()).getUser().equals("cancel-forward-samesipsession")) {
-			logger.info("Got CANCEL: " + request.toString());
+		logger.info("Got CANCEL: " + request.toString());
+		if(!((SipURI)request.getTo().getURI()).getUser().equals("cancel-forward-samesipsession")) {			
 			SipSession session = request.getSession();
 			B2buaHelper b2buaHelper = request.getB2buaHelper();
 			SipSession linkedSession = b2buaHelper.getLinkedSession(session);
