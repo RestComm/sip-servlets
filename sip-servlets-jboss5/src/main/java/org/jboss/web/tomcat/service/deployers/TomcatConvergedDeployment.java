@@ -428,11 +428,31 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 											timerService);
 							
 							// Backward compatibility for global JNDI MSS names from AS 4 http://code.google.com/p/mobicents/issues/detail?id=1439
+							// Since this is the global JNDI, It is critical to do this is a safe way to handle redeployment, so repeated lookups must go well.
+							// Also it should be able to handle multiple apps.
 							{
 								InitialContext iniCtx = new InitialContext();
 								Context globalEnvCtx = (Context) iniCtx.lookup("java:/");
-								Context globalSipSubcontext = globalEnvCtx.createSubcontext(SIP_SUBCONTEXT);
-								Context globaApplicationNameSubcontext = globalSipSubcontext.createSubcontext(convergedMetaData.getApplicationName());			
+								Context globalSipSubcontext = null;
+								try {
+									globalSipSubcontext = (Context) globalEnvCtx.lookup(SIP_SUBCONTEXT);
+								} catch (Exception e) {
+									log.debug("Couldn't look up the SIP_SUBCONTEXT. Possibly this is the first application. So we will try to bind again");
+								}
+								if(globalSipSubcontext == null) {
+									globalSipSubcontext = globalEnvCtx.createSubcontext(SIP_SUBCONTEXT);
+								}
+								Context globaApplicationNameSubcontext = null;
+								try {
+									globaApplicationNameSubcontext = (Context) globalSipSubcontext.lookup(convergedMetaData.getApplicationName());
+								} catch (Exception e) {
+									log.debug("Couldn't look up the app name" + convergedMetaData.getApplicationName() + ". Possibly this is the first attempt. So we will try to bind again");
+								}
+								if(globaApplicationNameSubcontext == null) {
+									globaApplicationNameSubcontext = globalSipSubcontext.createSubcontext(convergedMetaData.getApplicationName());	
+								}
+								
+								//It is critical to rebind for redeploy
 								NonSerializableFactory.rebind(globaApplicationNameSubcontext,SIP_FACTORY_JNDI_NAME, sipFactoryFacade);
 								NonSerializableFactory.rebind(globaApplicationNameSubcontext, SIP_SESSIONS_UTIL_JNDI_NAME, sipSessionsUtil);
 								NonSerializableFactory.rebind(globaApplicationNameSubcontext,TIMER_SERVICE_JNDI_NAME, timerService);
