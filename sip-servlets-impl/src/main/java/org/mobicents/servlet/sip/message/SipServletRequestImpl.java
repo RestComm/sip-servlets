@@ -1114,7 +1114,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			if(session.getProxy() != null) dialog = null;
 			// If dialog does not exist or has no state.
 			if (dialog == null || dialog.getState() == null
-					|| (dialog.getState() == DialogState.EARLY && !Request.PRACK.equals(requestMethod))) {
+					|| (dialog.getState() == DialogState.EARLY && !Request.PRACK.equals(requestMethod)) || Request.CANCEL.equals(requestMethod)) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Sending the request " + request);
 				}
