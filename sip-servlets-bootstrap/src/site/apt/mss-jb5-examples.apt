@@ -6,7 +6,11 @@ JBoss 5.x only Examples
 		
 		* {{{mss-pure-jruby-telco.html}Pure JRuby on Rails Telco Example}} : a pure JRuby on Rails application that can make and receive phone calls
 		
-		* {{{mss-jsr309-demo.html}Media JSR-309 Demo}} : a sip servlet application showing how to use media capabilities defined in JSR 309 (Announcements, Recording, DTMF detection).
+		* {{{mss-jsr309-demo.html}Media JSR-309 Demo}} : a sip servlet application showing how to use media capabilities defined in JSR 309 (Announcements, TTS, Recording, DTMF detection).
+
+		* {{{shopping-demo-jsr309.html}Shopping Demo JSR-309}} : a Converged JEE Application showing SEAM integration, JEE, Media integration with TTS and DTMF support.
+
+		* {{{conference-demo-jsr309.html}Conference Demo JSR-309}} : a conference media server demo application built on GWT with server-push updates
 
 	You can play with most of our examples in 2 differents ways. 
 	From the binary or right from the source like a true hacker :-)

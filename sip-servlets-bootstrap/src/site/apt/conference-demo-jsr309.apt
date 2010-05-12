@@ -1,4 +1,4 @@
-	<<JSR-309 version :>> <This example is also available in JSR-309 based {{{conference-demo-jsr309.html}Conference Demo}} version. The JSR-309 example can run in both JBoss 4 and JBoss 5 >
+	<<Older version :>> <This example is a modified version of the older JBoss 4.2-only MSC API based {{{conference-demo.html}Conference Demo}}. This example can run in both JBoss 4 and JBoss 5 >
 
 Sip Servlets Conference Demo
 

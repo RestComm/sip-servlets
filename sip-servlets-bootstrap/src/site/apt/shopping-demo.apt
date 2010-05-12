@@ -5,6 +5,8 @@
 	It is a Converged JEE Application showing SEAM & JEE integration and Media integration with TTS and DTMF support.\
 	This application only works on a full JEE Container, in other words it will only work on top of Jboss AS and not Tomcat.>
 
+	<<JSR-309 version :>> <This example is also available in JSR-309 based {{{shopping-demo-jsr309.html}Shopping Demo}} version. The JSR-309 example can run in both JBoss 4 and JBoss 5 >
+
 Shopping Demo
 
 * Service Description
@@ -71,7 +73,7 @@ Shopping Demo
 	
 	The DAR file for this example can be found at the root of the project.
 	Use this as a DAR file (Service tag/darConfigurationFileLocation attribute in the jboss's server.xml):
-	file:///E:/workspaces/sip-servlets/sip-servlets-examplesl/shopping-demo/shopping-demo-dar.properties  
+	file:///E:/workspaces/sip-servlets/sip-servlets-examples/shopping-demo/shopping-demo-dar.properties  
 
 * How to play with it
 

@@ -27,7 +27,7 @@ Media Example
 
 	<Part I> 
 	
-		[[1]] Dial 1010 from you SIP Phone
+		[[1]] Dial 1010 from you SIP Phone (or you can dial 1010tts to test the TTS version of the demo)
 	
 		[[2]] You will hear an announcement (show casing the announcement capability)
 	
