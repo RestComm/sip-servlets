@@ -21,6 +21,7 @@
 		<module>click2call-distributable</module>
 		<module>click-to-call</module>
 		<module>conference-demo</module>
+		<module>conference-demo-jsr309</module>
 		<module>diameter-event-charging</module>
 		<module>diameter-openims</module>
 		<module>facebook-c2c</module>
@@ -33,6 +34,7 @@
 		<module>shootist-sip-servlet</module>
 		<module>shootist-sip-servlet-distributable</module>
 		<module>shopping-demo</module>
+		<module>shopping-demo-jsr309</module>
 		<module>simple-sip-servlet</module>
 		<module>simple-sip-servlet-distributable</module>
 		<module>speed-dial</module>
