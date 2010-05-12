@@ -107,7 +107,8 @@ public class OrderApprovalAction implements OrderApproval, Serializable {
 			sipServletRequest.getSession().setAttribute("orderId", orderId);
 			sipServletRequest.getSession().setAttribute("connection", conn);			
 			sipServletRequest.getSession().setAttribute("deliveryDate", true);
-			sipServletRequest.getSession().setAttribute("speechUri", java.net.URI.create("data:"+URLEncoder.encode("ts(Enter 10 digit delivery date)", "UTF-8")));
+			String announcementFile = MMSUtil.audioFilePath + "/OrderDeliveryDate.wav";
+			sipServletRequest.getSession().setAttribute("speechUri", java.net.URI.create(announcementFile));
 			sipServletRequest.getSession().setAttribute("caller", (String)Contexts.getApplicationContext().get("caller.sip"));
 			sipServletRequest.getSession().setAttribute("callerDomain", (String)Contexts.getApplicationContext().get("caller.domain"));
 			sipServletRequest.getSession().setAttribute("callerPassword", (String)Contexts.getApplicationContext().get("caller.password"));

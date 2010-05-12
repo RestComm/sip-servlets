@@ -357,6 +357,14 @@ public class ShoppingSipServlet
 						.next();
 				sipServletRequest.getSession().setAttribute(entry.getKey(), entry.getValue());
 			}
+			SipSession sipSession = sipServletRequest.getSession();
+			
+			if (sipSession.getAttribute("deliveryDate") != null) {			
+				String announcementFile = MMSUtil.audioFilePath + "/OrderDeliveryDate.wav";
+				sipServletRequest.getSession().setAttribute("speechUri",
+				java.net.URI.create(announcementFile));
+				logger.info("Preparing to play Delivery Date Announcement : " + announcementFile);
+			} 
 			
 			//Media Server Control Creation
 			MediaSession mediaSession = MMSUtil.getMsControl().createMediaSession();
