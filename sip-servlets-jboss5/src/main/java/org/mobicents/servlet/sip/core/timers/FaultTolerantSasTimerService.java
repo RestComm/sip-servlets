@@ -113,7 +113,9 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 //		return super.shutdownNow();
 		// method not exposed by Mobicents FaultTolerantScheduler
 		started.set(false);
-		getScheduler().shutdownNow();
+		if(scheduledExecutor != null) {
+			scheduledExecutor.shutdownNow();
+		}
 		if(logger.isInfoEnabled()) {
 			logger.info("Stopped timer service "+ this);
 		}

@@ -177,7 +177,9 @@ public class FaultTolerantTimerServiceImpl implements SipServletTimerService {
 	
 	public void stop() {
 		started.set(false);
-		getScheduler().stop();		
+		if(scheduledExecutor != null) {
+			scheduledExecutor.stop();		
+		}
 	}
 	
 	public void start() {
