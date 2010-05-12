@@ -821,7 +821,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(ongoingTransactions != null) {
 			for(Transaction transaction : ongoingTransactions) {
 				if(!TransactionState.TERMINATED.equals(transaction.getState())) {
-					((TransactionApplicationData)transaction.getApplicationData()).cleanUp();
+					if(transaction.getApplicationData() != null) {
+						((TransactionApplicationData)transaction.getApplicationData()).cleanUp();
+					}
 					try {
 						transaction.terminate();
 					} catch (ObjectInUseException e) {
