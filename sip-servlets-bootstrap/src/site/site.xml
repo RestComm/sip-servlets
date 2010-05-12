@@ -32,18 +32,21 @@
 			</item>
 			<item name="JBoss 4.x only Examples" href="mss-jb4-examples.html" collapse="true">
 				<item name="Alerting Application" href="alerting-app.html" />
-				<item name="Media Demo" href="media-demo.html" />
+				<!--item name="Media Demo" href="media-demo.html" />
 				<item name="Conference Demo" href="conference-demo.html" />				
-				<item name="Shopping Demo" href="shopping-demo.html" />
+				<item name="Shopping Demo" href="shopping-demo.html" /-->
 				<item name="JSLEE/Sip Servlets Interop Demo" href="jslee-sips-interop-demo.html" />
-				<item name="Media PBX" href="mss-ipbx.html" />
-				<item name="Diameter Event Charging" href="diameter_event_charging.html"/>
-				<item name="Diameter Sh OpenIMS Integration" href="mss-diameter_sh.html"/>				
+				<item name="Media PBX" href="mss-ipbx.html" />						
 			</item>
 			<item name="JBoss 5.x only Examples" href="mss-jb5-examples.html" collapse="true">
 				<item name="JRuby/Rails Sip Servlets Example" href="mss-jruby-example.html"/>
 				<item name="Pure JRuby/Rails Telco Example" href="mss-pure-jruby-telco.html"/>
-				<item name="Media JSR309 Demo" href="mss-jsr309-demo.html" />				
+				<item name="Media JSR 309 Demo" href="mss-jsr309-demo.html" />
+				<item name="Conference Demo" href="conference-demo-jsr309.html" />				
+				<item name="Shopping Demo" href="shopping-demo-jsr309.html" />
+				<item name="Diameter Event Charging" href="diameter_event_charging.html"/>
+				<item name="Diameter Sh OpenIMS Integration" href="mss-diameter_sh.html"/>
+				<item name="Diameter Ro/Rf example" href="mss-diameter_rorf.html"/>						
 			</item>
 		</menu>		
 		<menu name="Contribute">			
