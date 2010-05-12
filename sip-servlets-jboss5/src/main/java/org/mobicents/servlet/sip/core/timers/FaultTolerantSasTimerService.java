@@ -51,7 +51,7 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 	private FaultTolerantScheduler scheduledExecutor;
 	private ClusteredSipManager<? extends OutgoingDistributableSessionData> sipManager;
 	private int corePoolSize;
-	private AtomicBoolean started = new AtomicBoolean(true);
+	private AtomicBoolean started = new AtomicBoolean(false);
 	
 	public FaultTolerantSasTimerService(DistributableSipManager sipManager, int corePoolSize) {
 		this.corePoolSize = corePoolSize;
@@ -117,7 +117,7 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 			scheduledExecutor.shutdownNow();
 		}
 		if(logger.isInfoEnabled()) {
-			logger.info("Stopped timer service "+ this);
+			logger.info("Stopped Sip Application Session Expiration Timer Service for application " + ((SipContext)sipManager.getContainer()).getApplicationName());
 		}
 	}
 	
@@ -138,7 +138,7 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 		getScheduler();
 		started.set(true);
 		if(logger.isInfoEnabled()) {
-			logger.info("Started timer service "+ this);
+			logger.info("Started Sip Application Session Expiration Timer Service for application " + ((SipContext)sipManager.getContainer()).getApplicationName());
 		}
 	}
 

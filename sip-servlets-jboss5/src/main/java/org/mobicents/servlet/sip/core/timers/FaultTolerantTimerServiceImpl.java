@@ -48,7 +48,7 @@ public class FaultTolerantTimerServiceImpl implements SipServletTimerService {
 	public static final int SCHEDULER_THREAD_POOL_DEFAULT_SIZE = 10;
 	public static final String NAME = "MSS_FT_Timers";
 	
-	private AtomicBoolean started = new AtomicBoolean(true);
+	private AtomicBoolean started = new AtomicBoolean(false);
 	private FaultTolerantScheduler scheduledExecutor;
 	private ClusteredSipManager<? extends OutgoingDistributableSessionData> sipManager;
 	
@@ -180,6 +180,9 @@ public class FaultTolerantTimerServiceImpl implements SipServletTimerService {
 		if(scheduledExecutor != null) {
 			scheduledExecutor.stop();		
 		}
+		if(logger.isInfoEnabled()) {
+			logger.info("Stopped Sip Servlets Timer Service for application " + ((SipContext)sipManager.getContainer()).getApplicationName());			
+		}
 	}
 	
 	public void start() {
@@ -187,6 +190,9 @@ public class FaultTolerantTimerServiceImpl implements SipServletTimerService {
 		// we can't create it before because the mobicents cluster is not yet initialized
 		getScheduler();
 		started.set(true);
+		if(logger.isInfoEnabled()) {
+			logger.info("Started Sip Servlets Timer Service for application " + ((SipContext)sipManager.getContainer()).getApplicationName());			
+		}
 	}
 
 	public boolean isStarted() {

@@ -39,7 +39,7 @@ public class StandardSipApplicationSessionTimerService extends
 
 	private static final Logger logger = Logger.getLogger(StandardSipApplicationSessionTimerService.class
 			.getName());
-	private AtomicBoolean started = new AtomicBoolean(true);
+	private AtomicBoolean started = new AtomicBoolean(false);
 	/**
 	 * @param corePoolSize
 	 */

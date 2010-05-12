@@ -485,8 +485,12 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				logger.error("the application name is null for the following context : " + name);
 			}
 		}	
-		sasTimerService.stop();
-		timerService.stop();
+		if(sasTimerService != null && sasTimerService.isStarted()) {
+			sasTimerService.stop();
+		}
+		if(timerService != null && timerService.isStarted()) {
+			timerService.stop();
+		}
 		logger.info("sip context stopped");
 	}
 
