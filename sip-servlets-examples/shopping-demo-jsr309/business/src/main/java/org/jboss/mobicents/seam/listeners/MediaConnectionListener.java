@@ -14,6 +14,7 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
 
 import org.apache.log4j.Logger;
+import org.jboss.mobicents.seam.util.EndCallWhenPlaybackCompletedListener;
 import org.jboss.mobicents.seam.util.MMSUtil;
 
 /**
@@ -62,7 +63,7 @@ public class MediaConnectionListener implements MediaEventListener<SdpPortManage
 				logger.info("Playing shipping announcement : " + uri);
 
 				mg.getPlayer().play(uri, null, null);
-				mg.getSignalDetector().receiveSignals(1, null, null, null);
+				mg.getPlayer().addListener(new EndCallWhenPlaybackCompletedListener(sipSession));
 
 				logger.info("shipping announcement played. tearing down the call");
 			}		

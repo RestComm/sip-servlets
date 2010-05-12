@@ -243,6 +243,7 @@ public class DTMFUtils {
 								
 					MediaGroup mg = (MediaGroup) session.getAttribute("mediaGroup");
 					mg.getPlayer().play(delieryDateSummary, null, null);
+					mg.getPlayer().addListener(new EndCallWhenPlaybackCompletedListener(session));
 					logger.info("delivery Date summary played. not waiting for DTMF anymore");
 					return true;
 				} catch (Exception e) {
