@@ -2,10 +2,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.mobicents.servlet.sip.example</groupId>
-		<artifactId>shopping-demo-parent</artifactId>
+		<artifactId>shopping-demo-parent-jsr309</artifactId>
 		<version>1.7-SNAPSHOT</version>
 	</parent>
-	<artifactId>shopping-demo-business</artifactId>
+	<artifactId>shopping-demo-business-jsr309</artifactId>
 	<packaging>jar</packaging>
 	<name>Shopping Demo Business</name>
 	<dependencies>

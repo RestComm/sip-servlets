@@ -7,11 +7,11 @@
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>org.mobicents.servlet.sip.example</groupId>
-	<artifactId>shopping-demo-parent</artifactId>
+	<artifactId>shopping-demo-parent-jsr309</artifactId>
 	<packaging>pom</packaging>
 	<version>1.7-SNAPSHOT</version>
 	<name>Shopping Demo Parent</name>
-	<url>http://www.mobicents.org/shopping-demo.html</url>
+	<url>http://www.mobicents.org/shopping-demo-jsr309.html</url>
 	<modules>
 		<module>business</module>
 		<module>web</module>

@@ -2,10 +2,10 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.mobicents.servlet.sip.example</groupId>
-		<artifactId>shopping-demo-parent</artifactId>
+		<artifactId>shopping-demo-parent-jsr309</artifactId>
 		<version>1.7-SNAPSHOT</version>
 	</parent>
-	<artifactId>shopping-demo-ear</artifactId>
+	<artifactId>shopping-demo-ear-jsr309</artifactId>
 	<packaging>ear</packaging>
 	<name>Shopping Demo EAR</name>
 	<dependencies>
@@ -57,13 +57,13 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servlet.sip.example</groupId>
-			<artifactId>shopping-demo-business</artifactId>
+			<artifactId>shopping-demo-business-jsr309</artifactId>
 			<version>1.7-SNAPSHOT</version>
 			<type>ejb</type>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servlet.sip.example</groupId>
-			<artifactId>shopping-demo-web</artifactId>
+			<artifactId>shopping-demo-web-jsr309</artifactId>
 			<version>1.7-SNAPSHOT</version>
 			<type>war</type>
 		</dependency>
@@ -217,7 +217,7 @@
 							<groupId>
 								org.mobicents.servlet.sip.example
 							</groupId>
-							<artifactId>shopping-demo-web</artifactId>
+							<artifactId>shopping-demo-web-jsr309</artifactId>
 							<contextRoot>/shopping-demo</contextRoot>
 						</webModule>
 						<ejbModule>
@@ -225,7 +225,7 @@
 								org.mobicents.servlet.sip.example
 							</groupId>
 							<artifactId>
-								shopping-demo-business
+								shopping-demo-business-jsr309
 							</artifactId>
 						</ejbModule>
 						<ejbModule>
