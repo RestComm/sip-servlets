@@ -79,8 +79,9 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 		if(logger.isInfoEnabled()) {
 			logger.info("Got INVITE: " + request.toString());
 			logger.info(request.getFrom().getURI().toString());
+			logger.info("OUTBOUND INTERFACES  " + getServletContext().getAttribute("javax.servlet.sip.outboundInterfaces"));
 		}
-		logger.error("OUTBOUNDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD  " + getServletContext().getAttribute("javax.servlet.sip.outboundInterfaces"));
+		
 		String[] forwardingUri = forwardingUris.get(request.getTo().getURI().toString());
 		if(forwardingUri != null && forwardingUri.length > 0) {
 			helper = request.getB2buaHelper();						
