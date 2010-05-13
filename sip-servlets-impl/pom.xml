@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip</groupId>
 		<artifactId>sip-servlets-bootstrap</artifactId>
-		<version>1.3-SNAPSHOT</version>
+		<version>1.3</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>sip-servlets-impl</artifactId>
@@ -15,25 +15,25 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-spec</artifactId>
-			<version>1.1.13-SNAPSHOT</version>			
+			<version>1.1.13</version>			
 		</dependency>		
 
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-annotations</artifactId>
-			<version>1.3-SNAPSHOT</version>			
+			<version>1.3</version>			
 		</dependency>
 
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-client</artifactId>
-			<version>1.3-SNAPSHOT</version>			
+			<version>1.3</version>			
 		</dependency>
 		
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-jruby</artifactId>
-			<version>1.3-SNAPSHOT</version>			
+			<version>1.3</version>			
 		</dependency>
 		
 		<!-- logging dependency -->
@@ -157,8 +157,8 @@
 										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${CATALINA_HOME}/conf" />
                                         <copy todir="${CATALINA_HOME}">
                                             <fileset dir="LICENSES" casesensitive="yes">
-                                            	<include name="**/*"/>
-  												<exclude name="GPL-LICENSE.TXT"/>
+                                            	<include name="**/*" />
+  												<exclude name="GPL-LICENSE.TXT" />
                                             </fileset>
                                         </copy>
 									</tasks>
@@ -211,8 +211,8 @@
 										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${CATALINA_HOME}/conf" />
                                         <copy todir="${env.CATALINA_HOME}">
                                             <fileset dir="LICENSES" casesensitive="yes">
-                                            	<include name="**/*"/>
-  												<exclude name="GPL-LICENSE.TXT"/>
+                                            	<include name="**/*" />
+  												<exclude name="GPL-LICENSE.TXT" />
                                             </fileset>
                                         </copy>
 									</tasks>
