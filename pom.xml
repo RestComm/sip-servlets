@@ -67,22 +67,10 @@
 		</license>
 	</licenses>
 	<scm>
-		<connection>scm:svn:http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets</connection>
+		<connection>scm:svn:https://mobicents.googlecode.com/svn/trunk/servers/sip-servlets</connection>
 		<developerConnection>scm:svn:https://mobicents.googlecode.com/svn/trunk/servers/sip-servlets</developerConnection>
 		<url>http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets</url>
 	</scm>
-<distributionManagement>
-    <repository>
-      <id>jboss-releases-repository</id>
-      <name>JBoss Releases Repository</name>
-      <url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</url>
-    </repository>
-    <snapshotRepository>
-      <id>jboss-snapshots-repository</id>
-      <name>JBoss Snapshots Repository</name>
-      <url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
-    </snapshotRepository>
-  </distributionManagement>
 	<modules>
 		<module>sip-servlets-bootstrap</module>
 		<module>sip-servlets-spec</module>
@@ -193,12 +181,16 @@
 							</execution>
 						</executions>
 					</plugin>
-        <plugin>
-          <artifactId>maven-release-plugin</artifactId>
-          <configuration>
-          		https://mobicents.googlecode.com/svn/tags/servers/sip-servlets/
-          </configuration>
-        </plugin>
+        				<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-release-plugin</artifactId>
+						<configuration>
+							<autoVersionSubmodules>true</autoVersionSubmodules>
+							<tagBase>https://mobicents.googlecode.com/svn/tags/servers/sip-servlets
+							</tagBase>
+							<arguments>-Dmaven.test.skip</arguments>
+						</configuration>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
