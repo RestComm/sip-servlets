@@ -28,7 +28,7 @@ Chat Server
 ** From the binary
 
 	You can find the war file corresponding to this example
- 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/chatroom-servlet/1.6/chatroom-servlet-1.6.war}here}}.\
+ 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/chatroom-servlet/1.7/chatroom-servlet-1.7.war}here}}.\
  	Drop the downloaded war file into your <<<tomcat_home/webapps>>> directory or <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/chatserver-dar.properties}dar configuration file}}.\

@@ -24,7 +24,7 @@ Diameter Sh OpenIMS Core Integration Service
 ** From the binary
 
 	You can find the war file corresponding to this example
- 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/diameter-openims/1.6/diameter-openims-1.6.war}here}}.\
+ 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/diameter-openims/1.7/diameter-openims-1.7.war}here}}.\
  	Drop the downloaded war file into your <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/diameteropenims-dar.properties}dar configuration file}}.\

@@ -48,7 +48,7 @@ Shopping Demo
 ** From the binary
 
 	You can find the ear file corresponding to this example
- 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/shopping-demo-ear-jsr309/}here}}.\
+ 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/shopping-demo-ear-jsr309/1.7/shopping-demo-ear-jsr309-1.7.ear}here}}.\
  	It's working with the Mobicents Media Server 2.0.0.CR2 or later.\
  	Rename it to shopping-demo.ear\
  	Drop the renamed shopping-demo.ear file into your <<<jboss_home/server/default/deploy>>> directory. 	 

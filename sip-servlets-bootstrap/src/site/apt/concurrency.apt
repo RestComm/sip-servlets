@@ -26,7 +26,7 @@ Mobicents Sip Servlets Concurrency
 	*   In your application, in a package-info.java class by using the annotation 
 		@ConcurrencyControl(mode=ConcurrencyControlMode.SipApplicationSession).
 		See an example of {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-test-suite/applications/annotated-servlet/src/main/java/org/mobicents/servlet/sip/testsuite}package-info.java}} from one of our testsuite applications. 
-		You must also import the corresponding {{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/sip-servlets-annotations/0.9/sip-servlets-annotations-0.9.jar}sip-servlets-annotations-0.9.jar}} into your application so that it can find the class.
+		You must also import the corresponding {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/sip-servlets-annotations/1.3/sip-servlets-annotations-1.3.jar}sip-servlets-annotations-1.3.jar}} into your application so that it can find the class.
 
 	*	From server.xml in the Service tag you can add concurrencyControlMode attributes like this:
     

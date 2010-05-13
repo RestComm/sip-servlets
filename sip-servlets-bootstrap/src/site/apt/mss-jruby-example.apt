@@ -12,7 +12,7 @@ JRuby on Rails Sip Servlets application that can make phone calls
 ** From the binary
 
 	You can find the war file corresponding to this example
- 	{{{http://repository.jboss.org/maven2/org/mobicents/servlet/sip/example/jruby-demo-sip-servlet/1.0/jruby-demo-sip-servlet-1.0.war}here}}.\
+ 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/jruby-demo-sip-servlet/1.0/jruby-demo-sip-servlet-1.0.war}here}}.\
  	Drop the downloaded war file into your <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/jruby-sips-demo.properties}dar configuration file}}.\
