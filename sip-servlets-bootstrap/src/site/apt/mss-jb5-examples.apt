@@ -12,6 +12,13 @@ JBoss 5.x only Examples
 
 		* {{{conference-demo-jsr309.html}Conference Demo JSR-309}} : a conference media server demo application built on GWT with server-push updates
 
+		* {{{diameter_event_charging.html}Diameter Example}} : a Diameter Event Charging service based on Location Service that performs call charging at a fixed-rate (event charging)
+		
+		* {{{mss-diameter_sh.html}Diameter Sh OpenIMS Integration Example}} : a Diameter Sh service showing integration between Mobicents Sip Servlets acting as a SIP Application Server in {{{http://www.openimscore.org/}OpenIMS Core}}, using the Diameter Sh interface to receive profile updates and SIP.
+	
+		* {{{mss-diameter_rorf.html}Diameter Ro RfExample}} : a Diameter Ro/Rf service that performs online call charging.
+	
+
 	You can play with most of our examples in 2 differents ways. 
 	From the binary or right from the source like a true hacker :-)
 	
