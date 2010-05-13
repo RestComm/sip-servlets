@@ -54,6 +54,8 @@ Version 1.3 is out !
 			
 		* Move all MSS Media Examples to JSR 309
 		
+		* {{{http://www.mobicents.org/mss/jsr289/extensions/index.html}New Extensions for features outside the JSR 289}}
+		
 		* {{{mss-diameter_rorf.html}New Diameter Example Showcasing the usage of Ro/Rf}}  	
 		
 		* Mobicents SIP/Converged Balancer reached 1.0.0.FINAL
