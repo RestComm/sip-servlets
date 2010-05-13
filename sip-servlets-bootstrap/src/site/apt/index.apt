@@ -64,7 +64,7 @@ Version 1.3 is out !
 
 	The other highlights of this release are :
 		
-		* {{{./products_media_server.html}Move to Mobicents Media Server 2.0 CR2}}		
+		* {{{http://www.mobicents.org/mms/mms-main.html}Move to Mobicents Media Server 2.0 CR2}}		
 		
 		* {{{http://code.google.com/p/mobicents/issues/detail?id=1424}Move To Mobicents Diameter 1.2.1}}
 		
@@ -84,7 +84,7 @@ Version 1.3 is out !
 		
 		* Diameter event charging example : {{{diameter_event_charging.html}Diameter Event Charging}}
 			
-		* For JBoss 5.1.0 only, {{{./products_media_server.html}Mobicents Media Server 2.0.0.CR2}}, {{{http://groups.google.com/group/mobicents-public/web/mobicents-diameter}Mobicents Diameter 1.2.1.GA}}, {{{./user_guides/sip_servlets/index.html#sslb-MSS_Load_Balancer}the Mobicents SIP load Balancer 1.0.FINAL}} and 'all' profile in JBoss with predeployed click to call distributable application 
+		* For JBoss 5.1.0 only, {{{http://www.mobicents.org/mms/mms-main.html}Mobicents Media Server 2.0.0.CR2}}, {{{http://groups.google.com/group/mobicents-public/web/mobicents-diameter}Mobicents Diameter 1.2.1.GA}}, {{{./user_guides/sip_servlets/index.html#sslb-MSS_Load_Balancer}the Mobicents SIP load Balancer 1.0.FINAL}} and 'all' profile in JBoss with predeployed click to call distributable application 
 		to test clustering and mid call failover.				  
   
 Try it !
