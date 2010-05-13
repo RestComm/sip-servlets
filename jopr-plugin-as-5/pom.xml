@@ -26,7 +26,25 @@
 	      <url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
 	    </repository>
 	</repositories>
-	
+
+<scm>
+		<connection>scm:svn:http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets</connection>
+		<developerConnection>scm:svn:https://mobicents.googlecode.com/svn/trunk/servers/sip-servlets</developerConnection>
+		<url>http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets</url>
+	</scm>
+<distributionManagement>
+    <repository>
+      <id>jboss-releases-repository</id>
+      <name>JBoss Releases Repository</name>
+      <url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</url>
+    </repository>
+    <snapshotRepository>
+      <id>jboss-snapshots-repository</id>
+      <name>JBoss Snapshots Repository</name>
+      <url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>	
+
 	<properties>
 		<jopr-version>2.2.0.GA</jopr-version>
 		<rhq-version>1.2.0.GA</rhq-version>
