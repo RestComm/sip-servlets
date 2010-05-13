@@ -6,7 +6,7 @@
     <parent>
         <artifactId>mobicents</artifactId>
         <groupId>org.mobicents</groupId>
-        <version>1.16</version>
+        <version>1.19</version>
     </parent>
     <groupId>org.mobicents.servlet.sip</groupId>
     <artifactId>jopr-mobicents-sip-servlets-plugin</artifactId>
