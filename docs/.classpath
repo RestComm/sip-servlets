@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="sources/src/main/resources/en-US"/>
-	<classpathentry kind="lib" path="sources-jbcp/target/sip-servlets-docs-sources-jbcp-1.2-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="sources-mobicents/target/sip-servlets-docs-sources-mobicents-1.2-SNAPSHOT.jar"/>
-	<classpathentry kind="lib" path="sources/target/sip-servlets-docs-sources-1.2-SNAPSHOT.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
