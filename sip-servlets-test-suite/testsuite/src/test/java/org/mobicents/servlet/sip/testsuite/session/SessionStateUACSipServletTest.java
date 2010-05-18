@@ -181,6 +181,7 @@ public class SessionStateUACSipServletTest extends SipServletTestCase {
 	}	
 	
 	// Test for SS spec 11.1.6 transaction timeout notification
+	// Also Tests Issue 1470 http://code.google.com/p/mobicents/issues/detail?id=1470
 	public void testTransactionTimeoutResponse() throws Exception {
 		receiverProtocolObjects =new ProtocolObjects(
 				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
