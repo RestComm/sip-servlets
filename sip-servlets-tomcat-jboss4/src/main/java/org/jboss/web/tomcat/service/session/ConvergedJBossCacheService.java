@@ -886,6 +886,46 @@ public class ConvergedJBossCacheService extends JBossCacheService
       
       return keys;
    }
+   
+   /**
+    * Obtain the keys associated with this fqn. Note that it is not the fqn children.
+    *
+    */
+   public Set getSipSessionAttributeKeys(String id, String realId)
+   {
+      Set keys = null;
+      Fqn fqn = getSipSessionAttributeFqn(id, realId);
+      try
+      {
+         keys = proxy_.getKeys(fqn);
+      }
+      catch (CacheException e)
+      {
+         log_.error("getAttributeKeys(): Exception getting keys for sip session " + realId, e);
+      }
+      
+      return keys;
+   }
+   
+   /**
+    * Obtain the keys associated with this fqn. Note that it is not the fqn children.
+    *
+    */
+   public Set getSipApplicationSessionAttributeKeys(String realId)
+   {
+      Set keys = null;
+      Fqn fqn = getSipApplicationSessionAttributeFqn(realId);
+      try
+      {
+         keys = proxy_.getKeys(fqn);
+      }
+      catch (CacheException e)
+      {
+         log_.error("getAttributeKeys(): Exception getting keys for sip session " + realId, e);
+      }
+      
+      return keys;
+   }
 
    /**
     * Return all attributes associated with this session id.
@@ -922,7 +962,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
       if (realId == null || realId.length() == 0) return new HashMap();
       
       Map map = new HashMap();
-      Set set = getAttributeKeys(realId);
+      Set set = getSipApplicationSessionAttributeKeys(realId);
       if(set != null)
       {
          for (Iterator it = set.iterator(); it.hasNext();)
@@ -946,7 +986,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
       if (realId == null || realId.length() == 0) return new HashMap();
       
       Map map = new HashMap();
-      Set set = getAttributeKeys(realId);
+      Set set = getSipSessionAttributeKeys(id, realId);
       if(set != null)
       {
          for (Iterator it = set.iterator(); it.hasNext();)

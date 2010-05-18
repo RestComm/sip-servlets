@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 
@@ -119,8 +120,8 @@ public class AttributeBasedClusteredSipApplicationSession extends JBossCacheClus
 		}
 		final String sipAppSessionKey = getHaId();
 		if(isNew) {
-			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "ct", creationTime);
-			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "ip", invalidationPolicy);
+			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, CREATION_TIME, creationTime);
+			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, INVALIDATION_POLICY, invalidationPolicy);
 			isNew = false;
 		}
 		if(sessionMetadataDirty) {			
@@ -130,11 +131,11 @@ public class AttributeBasedClusteredSipApplicationSession extends JBossCacheClus
 			metaDataModifiedMap.clear();									
 		}		
 		if(sipSessionsMapModified) {					
-			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "sipSessions", sipSessions);
+			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, SIP_SESSIONS, sipSessions.toArray(new SipSessionKey[sipSessions.size()]));
 			sipSessionsMapModified = false;
 		}		
 		if(httpSessionsMapModified) {			
-			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, "httpSessions", httpSessions);
+			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, HTTP_SESSIONS, httpSessions.toArray(new String[httpSessions.size()]));
 			httpSessionsMapModified = false;
 		}
 		this.incrementVersion();
@@ -145,6 +146,10 @@ public class AttributeBasedClusteredSipApplicationSession extends JBossCacheClus
 		if (getSessionAttributesDirty()) {
 			// Go thru the modified attr list first
 			int modCount = attrModifiedMap_.size();
+			if (logger.isDebugEnabled()) {
+				logger.debug("processSessionRepl(): session attributes are dirty. modified map size "
+						+ modCount);
+			}
 			if (modCount == 1) {
 				for (Iterator it = attrModifiedMap_.entrySet().iterator(); it
 						.hasNext();) {

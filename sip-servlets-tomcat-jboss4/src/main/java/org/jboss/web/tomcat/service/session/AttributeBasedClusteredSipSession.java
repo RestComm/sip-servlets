@@ -130,6 +130,9 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 			isNew = false;
 		}
 		if(sessionMetadataDirty) {			
+			if (logger.isDebugEnabled()) {
+				logger.debug("processSessionRepl(): session metadata is dirty.");
+			}
 			for (Entry<String, Object> entry : metaModifiedMap_.entrySet()) {
 				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, entry.getKey(), entry.getValue());
 			}
@@ -142,14 +145,17 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 			if(b2buaHelper != null) {
 				final Map<SipSessionKey, SipSessionKey> sessionMap = b2buaHelper.getSessionMap();
 				final int size = sessionMap.size();
-				String[][] sessionArray = new String[2][size];
+				final String[][] sessionArray = new String[2][size];
 				int i = 0;
 				for (Entry<SipSessionKey, SipSessionKey> entry : sessionMap.entrySet()) {
 					sessionArray [0][i] = entry.getKey().toString(); 
 					sessionArray [1][i] = entry.getValue().toString();
 					i++;
 				}
-				proxy_.putSipSessionAttribute(sipAppSessionKey, sipSessionKey,B2B_SESSION_SIZE, size);
+				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey,B2B_SESSION_SIZE, size);
+				if(logger.isDebugEnabled()) {
+					logger.debug("storing b2bua session array " + sessionArray);
+				}
 				proxy_.putSipSessionMetaData(sipAppSessionKey, sipSessionKey, B2B_SESSION_MAP, sessionArray);
 			}
 		}
@@ -158,9 +164,13 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 
 		// Go thru the attribute change list
 
-		if (getSessionAttributesDirty()) {
+		if (getSessionAttributesDirty()) {			
 			// Go thru the modified attr list first
 			int modCount = attrModifiedMap_.size();
+			if (logger.isDebugEnabled()) {
+				logger.debug("processSessionRepl(): session attributes are dirty. modified map size "
+						+ modCount);
+			}
 			if (modCount == 1) {
 				for (Iterator it = attrModifiedMap_.entrySet().iterator(); it
 						.hasNext();) {
