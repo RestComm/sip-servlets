@@ -938,11 +938,11 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					// but this could lead to deadlocks in certain cases, if it occurs
 					// it is recommended to upgrade to SipApplicationSession concurrency control mode
 					Iterator<MobicentsSipSession> sipSessionIt = (Iterator<MobicentsSipSession>) 
-						sipApplicationSession.getSessions(Protocol.SIP.toString());
+						sipApplicationSession.getSipSessions().iterator();
 					while (sipSessionIt.hasNext()) {
 						MobicentsSipSession childSipSession = sipSessionIt
 								.next();
-						final Semaphore semaphore = sipSession.getSemaphore();
+						final Semaphore semaphore = childSipSession.getSemaphore();
 						if(semaphore != null) {
 							semaphore.acquireUninterruptibly();
 						}
@@ -1007,11 +1007,11 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					}
 				} else if (sipApplicationSession != null) {
 					Iterator<MobicentsSipSession> sipSessionIt = (Iterator<MobicentsSipSession>) 
-						sipApplicationSession.getSessions(Protocol.SIP.toString());
+						sipApplicationSession.getSipSessions().iterator();
 					while (sipSessionIt.hasNext()) {
 						MobicentsSipSession childSipSession = sipSessionIt
 								.next();
-						final Semaphore semaphore = sipSession.getSemaphore();
+						final Semaphore semaphore = childSipSession.getSemaphore();
 						if(semaphore != null) {
 							semaphore.release();
 						}

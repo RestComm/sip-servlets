@@ -26,6 +26,8 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipApplicationSessionEvent;
+import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletContextEvent;
@@ -39,7 +41,7 @@ import org.apache.log4j.Logger;
 
 public class SessionStateUACSipServlet
 		extends SipServlet 
-		implements SipServletListener {
+		implements SipServletListener, SipApplicationSessionListener {
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(SessionStateUACSipServlet.class);
 	
@@ -113,23 +115,24 @@ public class SessionStateUACSipServlet
 	 */
 	public void servletInitialized(SipServletContextEvent ce) {
 		SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);
-		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
-		SipURI fromURI = sipFactory.createSipURI("BigGuy", "here.com");			
-		SipURI toURI = sipFactory.createSipURI("LittleGuy", "there.com");
-		SipServletRequest sipServletRequest = 
-			sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);
-		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
-		sipServletRequest.setRequestURI(requestURI);
-		sipServletRequest.setContentLength(SEND_1XX_4XX.length());
-		try {
-			sipServletRequest.setContent(SEND_1XX_4XX, CONTENT_TYPE);
-			sipServletRequest.send();			
-		} catch (IOException e) {
-			logger.error("An Io exception occured while trying to set the content or send the request", e);
-		}		
-		sendMessage(sipFactory, sipServletRequest.getSession().getState().toString());
 		if(getServletContext().getInitParameter("testTimeout") != null) {
 			sendMessage(sipFactory, "This request must timeout", "sip:timeout@127.0.0.1:4794");
+		}else {
+			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
+			SipURI fromURI = sipFactory.createSipURI("BigGuy", "here.com");			
+			SipURI toURI = sipFactory.createSipURI("LittleGuy", "there.com");
+			SipServletRequest sipServletRequest = 
+				sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);
+			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
+			sipServletRequest.setRequestURI(requestURI);
+			sipServletRequest.setContentLength(SEND_1XX_4XX.length());
+			try {
+				sipServletRequest.setContent(SEND_1XX_4XX, CONTENT_TYPE);
+				sipServletRequest.send();			
+			} catch (IOException e) {
+				logger.error("An Io exception occured while trying to set the content or send the request", e);
+			}		
+			sendMessage(sipFactory, sipServletRequest.getSession().getState().toString());
 		}
 	}
 	
@@ -159,7 +162,7 @@ public class SessionStateUACSipServlet
 	
 	public void sendMessage(SipFactory sipFactory, String messageContent, String addr) {
 		try {
-			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
+			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();			
 			SipServletRequest sipServletRequest = sipFactory.createRequest(
 					sipApplicationSession, 
 					"MESSAGE", 
@@ -170,11 +173,32 @@ public class SessionStateUACSipServlet
 			sipServletRequest.setContentLength(messageContent.length());
 			sipServletRequest.setContent(messageContent, CONTENT_TYPE);
 			sipServletRequest.send();
+			sipApplicationSession.setExpires(1);
 		} catch (ServletParseException e) {
 			logger.error("Exception occured while parsing the addresses",e);
 		} catch (IOException e) {
 			logger.error("Exception occured while sending the request",e);			
 		}
+	}
+
+	public void sessionCreated(SipApplicationSessionEvent ev) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionDestroyed(SipApplicationSessionEvent ev) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionExpired(SipApplicationSessionEvent ev) {
+		SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
+		sendMessage(sipFactory, "sessionExpired");
+	}
+
+	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -422,7 +422,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 	}
 	
-	protected Set<MobicentsSipSession> getSipSessions() {
+	public Set<MobicentsSipSession> getSipSessions() {
 		Set<MobicentsSipSession> retSipSessions = new HashSet<MobicentsSipSession>();
 		if(sipSessions != null) {
 			for(SipSessionKey sipSessionKey : sipSessions) {

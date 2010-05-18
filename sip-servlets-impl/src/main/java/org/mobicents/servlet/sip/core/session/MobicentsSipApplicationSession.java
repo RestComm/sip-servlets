@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
+import java.util.Iterator;
+import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Semaphore;
 
@@ -80,4 +82,6 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession {
 
 	void setExpirationTimerTask(SipApplicationSessionTimerTask expirationTimerTask);
 //	void setExpirationTimerFuture(ScheduledFuture<MobicentsSipApplicationSession> schedule);
+
+	Set<MobicentsSipSession> getSipSessions();
 }
