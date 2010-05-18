@@ -1,0 +1,5 @@
+<jboss-web>
+    <replication-config>
+        <replication-granularity>SESSION</replication-granularity>
+    </replication-config>
+</jboss-web>
