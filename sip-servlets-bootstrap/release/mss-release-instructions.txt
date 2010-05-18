@@ -1,7 +1,7 @@
 Doing a Release : 
 
 Release JSIP first
-Release Mobicents Parent with the new JSIP
+Release Mobicents Parent 1 and 2 with the new JSIP
 Release Sip Balancer
 Release Mobicents Cluster
 Release Mobicents JAIN SIP HA
