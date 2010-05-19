@@ -248,6 +248,18 @@ public class ShootistSipServlet
 		} catch (IOException e) {
 			logger.error("Unexpected exception while sending the INVITE request",e);
 		}		
+		if(ce.getServletContext().getInitParameter("cancel") != null) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+			try {
+				sipServletRequest.createCancel().send();
+			} catch (IOException e) {
+				logger.error(e);
+			}
+		}
 	}
 
 	public void timeout(ServletTimer timer) {

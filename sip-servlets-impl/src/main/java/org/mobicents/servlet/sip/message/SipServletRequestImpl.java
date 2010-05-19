@@ -55,7 +55,6 @@ import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
-import javax.sip.ListeningPoint;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
@@ -217,19 +216,12 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			throw new IllegalStateException("final response already sent!");
 		}
 		
-		try {
-			Request request = (Request) super.message;
-			String transport = JainSipUtils.findTransport(request);
-			SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false).getSipProvider();					
-			
+		try {			
 			Request cancelRequest = ((ClientTransaction) getTransaction())
 					.createCancel();
-			ClientTransaction clientTransaction = sipProvider
-					.getNewClientTransaction(cancelRequest);
-			clientTransaction.setRetransmitTimer(sipFactoryImpl.getSipApplicationDispatcher().getBaseTimerInterval());
 			SipServletRequest newRequest = new SipServletRequestImpl(
 					cancelRequest, sipFactoryImpl, getSipSession(),
-					clientTransaction, getTransaction().getDialog(), false);
+					null, getTransaction().getDialog(), false);
 
 			return newRequest;
 		} catch (SipException ex) {

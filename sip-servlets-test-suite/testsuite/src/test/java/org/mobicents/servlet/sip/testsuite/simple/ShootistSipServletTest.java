@@ -136,6 +136,24 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		assertTrue(receiver.getByeReceived());		
 	}
 	
+	public void testShootistCancel() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setWaitForCancel(true);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		deployApplication("cancel", "true");
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isCancelReceived());		
+	}
+	
 	public void testShootistSetContact() throws Exception {
 //		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(
