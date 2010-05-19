@@ -52,6 +52,13 @@
 	     signalingTransport="udp"
 	     sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
 
+	<!-- Define the default TCP SIP Connector -->
+    <Connector port="5081" 
+	     ipAddress = "${jboss.bind.address}"
+	     protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
+	     signalingTransport="tcp" 
+    	 sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
+
       <Engine name="jboss.web" defaultHost="localhost" className="org.mobicents.servlet.sip.startup.SipStandardEngine" jvmRoute="node2">
 
          <!-- The JAAS based authentication and authorization realm implementation
