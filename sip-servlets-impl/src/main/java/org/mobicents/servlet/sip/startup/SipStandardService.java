@@ -707,6 +707,18 @@ public class SipStandardService extends StandardService implements SipService {
 		return connectorToRemove;
 	}
 	
+	public SipConnector findSipConnector(String transport) {
+		List<SipConnector> sipConnectors = new ArrayList<SipConnector>();
+		for (Connector connector : connectors) {
+			final ProtocolHandler protocolHandler = connector.getProtocolHandler();
+			if(protocolHandler instanceof SipProtocolHandler) {
+				SipConnector sc =  (((SipProtocolHandler)protocolHandler).getSipConnector());
+				if(sc.getTransport().equalsIgnoreCase(transport)) return sc;
+			}
+		}
+		return null;
+	}
+	
 	public SipConnector[] findSipConnectors() {
 		List<SipConnector> sipConnectors = new ArrayList<SipConnector>();
 		for (Connector connector : connectors) {

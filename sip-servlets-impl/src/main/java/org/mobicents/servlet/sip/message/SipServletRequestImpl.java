@@ -55,6 +55,7 @@ import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
+import javax.sip.ListeningPoint;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
@@ -77,12 +78,14 @@ import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
+import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
@@ -95,6 +98,7 @@ import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.security.AuthInfoEntry;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
 import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
+import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
@@ -870,6 +874,39 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		return routingDirective;
 	}
 
+	public static void optimizeRouteHeaderAddressForInternalRoutingrequest(SipConnector sipConnector, Request request, MobicentsSipSession session,  SipFactoryImpl sipFactoryImpl, String transport) {
+		SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
+		RouteHeader rh = (RouteHeader) request.getHeader(RouteHeader.NAME);
+		if(rh != null) {
+			javax.sip.address.URI uri = rh.getAddress().getURI();
+			if(uri.isSipURI()) {
+				try {
+					javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
+					boolean isExternal = sipFactoryImpl.getSipApplicationDispatcher().isExternal(sipUri.getHost(), sipUri.getPort(), transport);
+					if(!isExternal) {
+						if(logger.isDebugEnabled()) {
+							logger.debug("The request is going internally due to RR = " + rh);
+						}
+						ExtendedListeningPoint lp = null;
+						if(session.getOutboundInterface() != null) {
+
+							javax.sip.address.SipURI outboundInterfaceURI = (javax.sip.address.SipURI) SipFactories.addressFactory.createURI(session.getOutboundInterface());
+							lp = sipNetworkInterfaceManager.findMatchingListeningPoint(outboundInterfaceURI, false);
+						} else {
+							lp = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
+						}
+
+						sipUri.setHost(lp.getHost(false));
+						sipUri.setPort(lp.getPort());
+					}
+				} catch (ParseException e) {
+					logger.error("AR optimization error", e);
+				}
+
+			}
+		}
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -919,6 +956,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    if(logger.isDebugEnabled()) {
 		    	logger.debug("The found transport for sending request is '" + transport + "'");
 		    }
+		    
 		    final String requestMethod = getMethod();
 			if(Request.ACK.equals(requestMethod)) {
 				session.getSessionCreatingDialog().sendAck(request);
@@ -934,6 +972,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				}
 				return;
 			}
+			
+			SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);
+			
 			//Added for initial requests only (that are not REGISTER) not for subsequent requests 
 			if(isInitial() && !Request.REGISTER.equalsIgnoreCase(requestMethod)) {
 				// Additional checks for https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=29
@@ -980,7 +1021,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				getSipSession().getSipApplicationSession().getSipContext().getSipManager().dumpSipSessions();
 			}
 			if (super.getTransaction() == null) {				
-				
+
 				ContactHeader contactHeader = (ContactHeader)request.getHeader(ContactHeader.NAME);
 				if(contactHeader == null && !Request.REGISTER.equalsIgnoreCase(requestMethod) && JainSipUtils.CONTACT_HEADER_METHODS.contains(requestMethod) && proxy == null) {
 					final FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
@@ -991,23 +1032,70 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					}
 					// Create the contact name address.						
 					contactHeader = 
-						JainSipUtils.createContactHeader(sipNetworkInterfaceManager, request, fromName, session.getOutboundInterface());										
+						JainSipUtils.createContactHeader(sipNetworkInterfaceManager, request, fromName, session.getOutboundInterface());	
 					request.addHeader(contactHeader);
 				}
-				
+				if(sipConnector.isUseStaticAddress()) {
+					if(proxy == null && contactHeader != null) {
+						boolean sipURI = contactHeader.getAddress().getURI().isSipURI();
+						if(sipURI) {
+							javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) contactHeader.getAddress().getURI();
+							sipUri.setHost(sipConnector.getStaticServerAddress());
+							sipUri.setPort(sipConnector.getStaticServerPort());
+						}
+					}
+				}
+
 				if(logger.isDebugEnabled()) {
 					logger.debug("Getting new Client Tx for request " + request);
 				}
 				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
 						transport, false).getSipProvider();
+				
+				
+				/* 
+				 * If we the next hop is in this container we optimize the traffic by directing it here instead of going through load balancers.
+				 * This is must be done before creating the transaction, otherwise it will go to the host/port specified prior to the changes here.
+				 */
+				if(!isInitial() && // Initial requests already use local address in RouteHeader.
+						sipConnector.isUseStaticAddress()) {
+					optimizeRouteHeaderAddressForInternalRoutingrequest(sipConnector, request, session, sipFactoryImpl, transport);
+				}
+				
 				final ClientTransaction ctx = sipProvider
-						.getNewClientTransaction(request);				
+				.getNewClientTransaction(request);				
 				ctx.setRetransmitTimer(sipFactoryImpl.getSipApplicationDispatcher().getBaseTimerInterval());								
-				
+
 				Dialog dialog = ctx.getDialog();
+
+				if(session.getProxy() != null) {
+					// no dialogs in proxy
+					dialog = null;
+					
+					// take care of the RRH
+					if(isInitial() && sipConnector.isUseStaticAddress()) {
+						if(session.getProxy().getRecordRoute()) {
+							RecordRouteHeader rrh = (RecordRouteHeader) request.getHeader(RecordRouteHeader.NAME);
+							if(rrh == null) {
+								if(logger.isDebugEnabled()) {
+									logger.debug("Unexpected RRH = null for this request" + request);
+								}
+							} else {
+								javax.sip.address.URI uri = rrh.getAddress().getURI();
+								if(uri.isSipURI()) {
+									javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
+									sipUri.setHost(sipConnector.getStaticServerAddress());
+									sipUri.setPort(sipConnector.getStaticServerPort());
+									if(logger.isDebugEnabled()) {
+										logger.debug("Updated the RRH with static server address " + sipUri);
+									}
+								}
+							}
+						}
+					}
+				}
 				
-				if(session.getProxy() != null) dialog = null;
-				
+
 				if (dialog == null && this.createDialog) {					
 					dialog = sipProvider.getNewDialog(ctx);
 					((DialogExt)dialog).disableSequenceNumberValidation();
@@ -1191,7 +1279,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @throws ParseException if anything goes wrong while creating the record route header
 	 * @throws SipException 
 	 * @throws NullPointerException 
-	 */
+	 
 	public void addAppCompositionRRHeader()
 			throws ParseException, SipException {
 		final Request request = (Request) super.message;
@@ -1208,7 +1296,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
         RecordRouteHeader recordRouteHeader = 
                 SipFactories.headerFactory.createRecordRouteHeader(recordRouteAddress);
         request.addFirst(recordRouteHeader);
-	}
+	}*/
 
 	public void setLinkedRequest(SipServletRequestImpl linkedRequest) {
 		this.linkedRequest = linkedRequest;

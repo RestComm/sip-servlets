@@ -53,15 +53,18 @@ import org.mobicents.javax.servlet.sip.ProxyBranchExt;
 import org.mobicents.javax.servlet.sip.ProxyBranchListener;
 import org.mobicents.javax.servlet.sip.ResponseType;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
+import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
+import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
  * @author root
@@ -568,8 +571,17 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 					sipApplicationSession.access();
 				}
 				final String transport = JainSipUtils.findTransport(clonedRequest);
+				SipFactoryImpl sipFactoryImpl = proxy.getSipFactoryImpl();
+				SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
 				final SipProvider sipProvider = proxy.getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(
 						transport, false).getSipProvider();
+				SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);
+				
+				// Optimizing the routing for AR (if any)
+				if(sipConnector.isUseStaticAddress()) {
+					SipServletRequestImpl.optimizeRouteHeaderAddressForInternalRoutingrequest(
+							sipConnector, clonedRequest, sipSession, sipFactoryImpl, transport);
+				}
 				sipProvider.sendRequest(clonedRequest);
 			}
 			else {				

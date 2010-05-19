@@ -730,6 +730,46 @@ public class SipFactoryImpl implements Externalizable {
 			throw new IllegalArgumentException("Impossible to set the Load Balancer Route Header !", e);
 		}
 	}
+	
+	public void addIpLoadBalancerRouteHeader(Request request, String lbhost, int lbport) {
+		try {
+			String host = null;
+			int port = -1; 
+			String proxy = StaticServiceHolder.sipStandardService.getOutboundProxy();
+			if(proxy == null) {
+				host = lbhost;
+				port = lbport;
+			} else {
+				int separatorIndex = proxy.indexOf(":");
+				if(separatorIndex>0) {
+					host = proxy.substring(0, separatorIndex);
+					port = Integer.parseInt(proxy.substring(separatorIndex + 1));
+				}
+			}
+			javax.sip.address.SipURI sipUri = SipFactories.addressFactory.createSipURI(null, host);
+			sipUri.setPort(port);
+			sipUri.setLrParam();
+			String transport = JainSipUtils.findTransport(request);
+			sipUri.setTransportParam(transport);
+			ExtendedListeningPoint listeningPoint = 
+				getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);
+			sipUri.setParameter(MessageDispatcher.ROUTE_PARAM_NODE_HOST, 
+					listeningPoint.getHost(JainSipUtils.findUsePublicAddress(getSipNetworkInterfaceManager(), request, listeningPoint)));
+			sipUri.setParameter(MessageDispatcher.ROUTE_PARAM_NODE_PORT, 
+					"" + listeningPoint.getPort());
+			javax.sip.address.Address routeAddress = 
+				SipFactories.addressFactory.createAddress(sipUri);
+			RouteHeader routeHeader = 
+				SipFactories.headerFactory.createRouteHeader(routeAddress);
+			request.addFirst(routeHeader);			
+		} catch (ParseException e) {
+			//this should never happen
+			throw new IllegalArgumentException("Impossible to set the Load Balancer Route Header !", e);
+		} catch (SipException e) {
+			//this should never happen
+			throw new IllegalArgumentException("Impossible to set the Load Balancer Route Header !", e);
+		}
+	}
 
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {

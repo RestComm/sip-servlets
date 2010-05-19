@@ -1135,7 +1135,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public final boolean isExternal(String host, int port, String transport) {
 		boolean isExternal = true;
 		ExtendedListeningPoint listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(host, port, transport);		
-		if((hostNames.contains(host) || listeningPoint != null)) {
+		if((hostNames.contains(host) || hostNames.contains(host+":" + port) || listeningPoint != null)) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("hostNames.contains(host)=" + 
 						hostNames.contains(host) +

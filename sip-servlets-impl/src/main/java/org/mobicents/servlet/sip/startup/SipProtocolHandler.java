@@ -418,13 +418,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 //				listeningPoint.setSentBy(globalIpAddress + ":" + globalPort);
 				listeningPoint.setSentBy(globalIpAddress + ":" + port);
 			}
-			final boolean useStaticAddress = sipConnector.isUseStaticAddress();
-			final String staticServerAddress = sipConnector.getStaticServerAddress();
-			final int staticServerPort = sipConnector.getStaticServerPort();
-			if(useStaticAddress) {
-				// TODO: (ISSUE-CONFUSION) Check what is the confusion here as above
-				listeningPoint.setSentBy(staticServerAddress + ":" + globalPort);
-			}
+
 			SipProvider sipProvider = sipStack.createSipProvider(listeningPoint);
 			
 			SipApplicationDispatcher sipApplicationDispatcher = (SipApplicationDispatcher)
@@ -436,19 +430,9 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			
 			//creating the extended listening point
 			extendedListeningPoint = new ExtendedListeningPoint(sipProvider, listeningPoint, sipConnector);
-			extendedListeningPoint.setUseStaticAddress(useStaticAddress);
+			extendedListeningPoint.setUseStaticAddress(false);
 			
-			if(useStaticAddress) {
-				extendedListeningPoint.setGlobalIpAddress(staticServerAddress);
-				extendedListeningPoint.setGlobalPort(staticServerPort);
-				
-				// TODO: (ISSUE-CONFUSION) This is a bit of a hack related to the same issue
-				extendedListeningPoint.setPort(staticServerPort);
-				if(logger.isInfoEnabled()) {
-					logger.info("Using static server address: " + staticServerAddress 
-							+ " and port: " + staticServerPort);
-				}
-			} else {
+			{
 				extendedListeningPoint.setGlobalIpAddress(globalIpAddress);
 				extendedListeningPoint.setGlobalPort(globalPort);
 			}
@@ -460,6 +444,15 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			setAttribute(ExtendedListeningPoint.class.getSimpleName(), extendedListeningPoint);
 			//Jboss specific loading case
 			if(sipApplicationDispatcher != null) {
+				// Let's add it to hostnames, so that IP load balancer appears as localhost. Otherwise requestst addressed there will
+				// get forwarded and especially in case of failover this might be severe error.
+				if(sipConnector.getStaticServerAddress() != null) {
+					sipApplicationDispatcher.addHostName(sipConnector.getStaticServerAddress() + ":" + sipConnector.getStaticServerPort());
+					if(logger.isDebugEnabled()) {
+						logger.debug("Adding hostname for IP load balancer " + sipConnector.getStaticServerAddress());
+					}
+				}
+				
 				if(logger.isDebugEnabled()) {
 					logger.debug("Adding the Sip Application Dispatcher as a sip listener for connector listening on port " + port);
 				}
