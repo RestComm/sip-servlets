@@ -22,12 +22,15 @@ import javax.sip.address.SipURI;
 import org.apache.catalina.connector.Connector;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.UDPPacketForwarder;
 import org.mobicents.servlet.sip.startup.SipProtocolHandler;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletTestCase {
 	
+	private static final int IPLB_ADDRESS = 5005;
+
 	private static transient Logger logger = Logger.getLogger(SpeedDialLocationServiceStaticServerAddressTest.class);
 
 	private static final String TRANSPORT = "udp";
@@ -39,6 +42,8 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 	TestSipListener receiver;
 	ProtocolObjects senderProtocolObjects;
 	ProtocolObjects	receiverProtocolObjects;
+	
+	UDPPacketForwarder ipBalancer;
 
 	public SpeedDialLocationServiceStaticServerAddressTest(String name) {
 		super(name);
@@ -102,7 +107,7 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 		udpProtocolHandler.setSipStackProperties(null);
 		udpProtocolHandler.setUseStaticAddress(true);
 		udpProtocolHandler.setStaticServerAddress("127.0.0.1");
-		udpProtocolHandler.setStaticServerPort(33);
+		udpProtocolHandler.setStaticServerPort(IPLB_ADDRESS);
 		tomcat.getSipService().addConnector(udpSipConnector);
 		try {
 			tomcat.startTomcat();
@@ -119,6 +124,11 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 				"gov.nist", TRANSPORT, AUTODIALOG, null);			
 	}
 	
+	private void startLoadBalancer() {	
+		ipBalancer = new UDPPacketForwarder(IPLB_ADDRESS, 5070, "127.0.0.1");
+		ipBalancer.start();
+	}
+	
 	public void testSpeedDialLocationServiceCallerSendBye() throws Exception {		
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
@@ -127,6 +137,8 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
+
+		startLoadBalancer();
 
 		receiverProvider.addSipListener(receiver);
 		senderProvider.addSipListener(sender);
@@ -158,6 +170,8 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
+		
+		startLoadBalancer();
 
 		receiverProvider.addSipListener(receiver);
 		senderProvider.addSipListener(sender);
@@ -188,6 +202,8 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
+		
+		startLoadBalancer();
 
 		receiverProvider.addSipListener(receiver);
 		senderProvider.addSipListener(sender);
@@ -215,6 +231,8 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
+		
+		startLoadBalancer();
 
 		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
 		receiver.setRecordRoutingProxyTesting(true);
@@ -247,9 +265,12 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 	}
 
 	public void testRemoteAddrPortAndTransport() throws Exception {		
+		startLoadBalancer();
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
+		
+		
 
 		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
@@ -280,7 +301,8 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 	@Override
 	protected void tearDown() throws Exception {	
 		senderProtocolObjects.destroy();
-		receiverProtocolObjects.destroy();			
+		receiverProtocolObjects.destroy();	
+		ipBalancer.stop();
 		logger.info("Test completed");
 		super.tearDown();
 	}

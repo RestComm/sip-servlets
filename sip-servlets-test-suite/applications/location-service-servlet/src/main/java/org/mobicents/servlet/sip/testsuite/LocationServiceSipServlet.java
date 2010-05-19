@@ -150,7 +150,8 @@ public class LocationServiceSipServlet extends SipServlet {
 			throws ServletException, IOException {
 		logger.info("Got response " + resp);
 		if(((SipURI)resp.getFrom().getURI()).getUser().equalsIgnoreCase(TEST_USER_REMOTE)) {
-			
+			String npecause = resp.getTransport();
+			npecause = resp.getInitialTransport();
 			if(resp.getRemoteAddr().equals(REMOTE_LOCALHOST_ADDR) && resp.getRemotePort() == REMOTE_PORT && resp.getTransport().equalsIgnoreCase(REMOTE_TRANSPORT)) {
 				logger.info("remote information is correct");
 			} else {
