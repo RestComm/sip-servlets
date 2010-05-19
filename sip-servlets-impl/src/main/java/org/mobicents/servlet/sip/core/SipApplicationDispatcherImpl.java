@@ -928,6 +928,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						SipServletResponseImpl response = (SipServletResponseImpl) sipServletRequestImpl.createResponse(408, null, false);
 
 						MessageDispatcher.callServlet(response);
+						sipSession.updateStateOnResponse(response, true);
 					} catch (Throwable t) {
 						logger.error("Failed to deliver 408 response on transaction timeout" + transaction, t);
 					}
@@ -954,7 +955,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			((SipServletRequestImpl)sipServletMessage).getLastFinalResponse();
 		final ProxyImpl proxy = sipSession.getProxy();
 		if(logger.isDebugEnabled()) {
-			logger.debug("last Final Response" + lastFinalResponse);
+			logger.debug("checkForAckNotReceived : last Final Response " + lastFinalResponse);
 		}		
 		boolean notifiedApplication = false;
 		if(sipServletMessage instanceof SipServletRequestImpl &&
@@ -997,7 +998,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			((SipServletRequestImpl)sipServletMessage).getLastInformationalResponse();
 		final ProxyImpl proxy = sipSession.getProxy();
 		if(logger.isDebugEnabled()) {
-			logger.debug("last Informational Response" + lastInfoResponse);
+			logger.debug("checkForPrackNotReceived : last Informational Response " + lastInfoResponse);
 		}
 		boolean notifiedApplication = false;
 		if(sipServletMessage instanceof SipServletRequestImpl &&
