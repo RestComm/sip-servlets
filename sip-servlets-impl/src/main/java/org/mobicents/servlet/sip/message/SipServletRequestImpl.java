@@ -1027,7 +1027,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						JainSipUtils.createContactHeader(sipNetworkInterfaceManager, request, fromName, session.getOutboundInterface());	
 					request.addHeader(contactHeader);
 				}
-				if(sipConnector.isUseStaticAddress()) {
+				if(sipConnector != null && sipConnector.isUseStaticAddress()) {
 					if(proxy == null && contactHeader != null) {
 						boolean sipURI = contactHeader.getAddress().getURI().isSipURI();
 						if(sipURI) {
@@ -1044,18 +1044,16 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
 						transport, false).getSipProvider();
 				
-				
 				/* 
 				 * If we the next hop is in this container we optimize the traffic by directing it here instead of going through load balancers.
 				 * This is must be done before creating the transaction, otherwise it will go to the host/port specified prior to the changes here.
 				 */
-				if(!isInitial() && // Initial requests already use local address in RouteHeader.
+				if(!isInitial() && sipConnector != null && // Initial requests already use local address in RouteHeader.
 						sipConnector.isUseStaticAddress()) {
 					optimizeRouteHeaderAddressForInternalRoutingrequest(sipConnector, request, session, sipFactoryImpl, transport);
 				}
 				
-				final ClientTransaction ctx = sipProvider
-				.getNewClientTransaction(request);				
+				final ClientTransaction ctx = sipProvider.getNewClientTransaction(request);				
 				ctx.setRetransmitTimer(sipFactoryImpl.getSipApplicationDispatcher().getBaseTimerInterval());								
 
 				Dialog dialog = ctx.getDialog();
@@ -1065,7 +1063,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					dialog = null;
 					
 					// take care of the RRH
-					if(isInitial() && sipConnector.isUseStaticAddress()) {
+					if(isInitial() && sipConnector != null && sipConnector.isUseStaticAddress()) {
 						if(session.getProxy().getRecordRoute()) {
 							RecordRouteHeader rrh = (RecordRouteHeader) request.getHeader(RecordRouteHeader.NAME);
 							if(rrh == null) {
@@ -1088,7 +1086,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				}
 				
 
-				if (dialog == null && this.createDialog) {					
+				if (dialog == null && this.createDialog && JainSipUtils.DIALOG_CREATING_METHODS.contains(getMethod())) {					
 					dialog = sipProvider.getNewDialog(ctx);
 					((DialogExt)dialog).disableSequenceNumberValidation();
 					session.setSessionCreatingDialog(dialog);
