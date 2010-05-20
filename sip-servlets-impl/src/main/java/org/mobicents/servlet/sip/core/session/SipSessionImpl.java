@@ -424,40 +424,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		    				sipNetworkInterfaceManager, request, branch, outboundInterface);
 		    		request.addHeader(viaHeader);
 					
-					try {
-						ClientTransaction retryTran = sipProvider
-							.getNewClientTransaction(request);
-						retryTran.setRetransmitTimer(sipApplicationDispatcher.getBaseTimerInterval());
-						
-						sipServletRequest = new SipServletRequestImpl(
-								request, this.sipFactory, this, retryTran, retryTran.getDialog(),
-								true);
-						
-						// SIP Request is ALWAYS pointed to by the client tx.
-						// Notice that the tx appplication data is cached in the request
-						// copied over to the tx so it can be quickly accessed when response
-						// arrives.
-						retryTran.setApplicationData(sipServletRequest.getTransactionApplicationData());
-						
-						Dialog dialog = retryTran.getDialog();
-						if (dialog == null && JainSipUtils.DIALOG_CREATING_METHODS.contains(sipServletRequest.getMethod())) {					
-							dialog = sipProvider.getNewDialog(retryTran);
-							((DialogExt)dialog).disableSequenceNumberValidation();
-							dialog.setApplicationData(sipServletRequest.getTransactionApplicationData());
-							if(logger.isDebugEnabled()) {
-								logger.debug("new Dialog for request " + sipServletRequest + ", ref = " + dialog);
-							}
-						}													
-						sessionCreatingDialog = dialog;
-						
-						sipServletRequest.setTransaction(retryTran);					
-					} catch (TransactionUnavailableException e) {
-						logger.error("Cannot get a new transaction for the newly created susbequent request " + sipServletRequest,e);
-						throw new IllegalArgumentException("Cannot get a new transaction for the newly created susbequent request " + sipServletRequest,e);
-					} catch (SipException e) {
-						logger.error("Cannot get a new dialog for the the newly created susbequent request " + sipServletRequest,e);
-						throw new IllegalArgumentException("Cannot get a new dialog for the newly created subsequent request " + sipServletRequest,e);
-					}
+					sipServletRequest = new SipServletRequestImpl(
+							request, this.sipFactory, this, null, sessionCreatingDialog,
+							true);
 				} else {
 					if(logger.isDebugEnabled()) {
 						logger.debug("orignal tx for creating susbequent request " + method + " on session " + key +" was a Server Tx");
