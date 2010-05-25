@@ -369,7 +369,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				session.setSessionCreatingDialog(dialog);
 				dialog.setApplicationData( this.transactionApplicationData);				
 			}			
-			if(JainSipUtils.DIALOG_CREATING_METHODS.contains(method)) {
+			if(JainSipUtils.DIALOG_CREATING_METHODS.contains(getMethod())) {
 				this.createDialog = true; // flag that we want to create a dialog for outgoing request.
 			}
 			session.setB2buaHelper(b2buaHelper);
@@ -1158,7 +1158,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					linkedRequest.setRoutingState(RoutingState.RELAYED);
 				}
 			}		
-			if(!Request.ACK.equals(method)) {				
+			if(!Request.ACK.equals(getMethod())) {				
 				session.addOngoingTransaction(getTransaction());
 			}
 			// Update Session state
