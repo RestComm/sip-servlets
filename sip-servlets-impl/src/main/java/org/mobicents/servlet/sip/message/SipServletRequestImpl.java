@@ -890,6 +890,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 						sipUri.setHost(lp.getHost(false));
 						sipUri.setPort(lp.getPort());
+						sipUri.setTransportParam(lp.getTransport());
 					}
 				} catch (ParseException e) {
 					logger.error("AR optimization error", e);
@@ -1076,6 +1077,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 									javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
 									sipUri.setHost(sipConnector.getStaticServerAddress());
 									sipUri.setPort(sipConnector.getStaticServerPort());
+									sipUri.setTransportParam(transport);
 									if(logger.isDebugEnabled()) {
 										logger.debug("Updated the RRH with static server address " + sipUri);
 									}
@@ -1148,6 +1150,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				ctx.setApplicationData(this.transactionApplicationData);
 				
 				setTransaction(ctx);
+			} else {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Transaction is not null, where was it created? " + getTransaction());
+				}
 			}
 
 			//tells the application dispatcher to stop routing the linked request
