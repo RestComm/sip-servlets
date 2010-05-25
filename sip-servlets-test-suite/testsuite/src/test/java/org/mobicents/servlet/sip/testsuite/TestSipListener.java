@@ -270,6 +270,8 @@ public class TestSipListener implements SipListener {
 
 	private boolean sendNotifyForRefer = true;
 
+	private boolean sendNotify = true;
+
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
 		private EventHeader eventHeader;
@@ -572,7 +574,7 @@ public class TestSipListener implements SipListener {
 				// subscribe dialogs do not terminate on bye.
 				this.dialog.terminateOnBye(false);
 			} else {
-				response = protocolObjects.messageFactory.createResponse(200, request);
+				response = protocolObjects.messageFactory.createResponse(202, request);
 				this.dialog = st.getDialog();
 				// subscribe dialogs do not terminate on bye.
 				this.dialog.terminateOnBye(false);
@@ -611,44 +613,45 @@ public class TestSipListener implements SipListener {
 			 * subscription at this time. The "terminated" value indicates that
 			 * the subscription is not active.
 			 */
-		
-			Request notifyRequest = dialog.createRequest( "NOTIFY" );
-			
-			
-			// Mark the contact header, to check that the remote contact is updated
-//			((SipURI)contactHeader.getAddress().getURI()).setParameter("id","not");
-			
-			// Initial state is pending, second time we assume terminated (Expires==0)		
-			SubscriptionStateHeader sstate = protocolObjects.headerFactory.createSubscriptionStateHeader(
-					expires.getExpires() != 0 ? SubscriptionStateHeader.PENDING : SubscriptionStateHeader.TERMINATED );
-			allSubscriptionStates.add(sstate.getState().toLowerCase());
-			
-			
-			// Need a reason for terminated
-			if ( sstate.getState().equalsIgnoreCase("terminated") ) {
-				sstate.setReasonCode( "deactivated" );
-			}
-			
-			notifyRequest.addHeader(sstate);
-			notifyRequest.setHeader(eventHeader);
-			notifyRequest.setHeader(contactHeader);
-			// notifyRequest.setHeader(routeHeader);
-			ClientTransaction ct = sipProvider.getNewClientTransaction(notifyRequest);
-
-			if(sstate.getState().equals(SubscriptionStateHeader.TERMINATED)) {
-				Thread.sleep(timeToWaitBetweenSubsNotify);
-			}
-			// Let the other side know that the tx is pending acceptance
-			//
-			dialog.sendRequest(ct);
-			logger.info("NOTIFY Branch ID " +
-				((ViaHeader)request.getHeader(ViaHeader.NAME)).getParameter("branch"));
-			logger.info("Dialog " + dialog);
-			logger.info("Dialog state after pending NOTIFY: " + dialog.getState());
-			
-			if (expires.getExpires() != 0) {
-				Thread myEventSource = new Thread(new MyEventSource(this,eventHeader));
-				myEventSource.start();
+			if(sendNotify ) {
+				Request notifyRequest = dialog.createRequest( "NOTIFY" );
+				
+				
+				// Mark the contact header, to check that the remote contact is updated
+	//			((SipURI)contactHeader.getAddress().getURI()).setParameter("id","not");
+				
+				// Initial state is pending, second time we assume terminated (Expires==0)		
+				SubscriptionStateHeader sstate = protocolObjects.headerFactory.createSubscriptionStateHeader(
+						expires.getExpires() != 0 ? SubscriptionStateHeader.PENDING : SubscriptionStateHeader.TERMINATED );
+				allSubscriptionStates.add(sstate.getState().toLowerCase());
+				
+				
+				// Need a reason for terminated
+				if ( sstate.getState().equalsIgnoreCase("terminated") ) {
+					sstate.setReasonCode( "deactivated" );
+				}
+				
+				notifyRequest.addHeader(sstate);
+				notifyRequest.setHeader(eventHeader);
+				notifyRequest.setHeader(contactHeader);
+				// notifyRequest.setHeader(routeHeader);
+				ClientTransaction ct = sipProvider.getNewClientTransaction(notifyRequest);
+	
+				if(sstate.getState().equals(SubscriptionStateHeader.TERMINATED)) {
+					Thread.sleep(timeToWaitBetweenSubsNotify);
+				}
+				// Let the other side know that the tx is pending acceptance
+				//
+				dialog.sendRequest(ct);
+				logger.info("NOTIFY Branch ID " +
+					((ViaHeader)request.getHeader(ViaHeader.NAME)).getParameter("branch"));
+				logger.info("Dialog " + dialog);
+				logger.info("Dialog state after pending NOTIFY: " + dialog.getState());
+				
+				if (expires.getExpires() != 0) {
+					Thread myEventSource = new Thread(new MyEventSource(this,eventHeader));
+					myEventSource.start();
+				}
 			}
 		} catch (Throwable ex) {
 			logger.info(ex.getMessage(), ex);
@@ -1241,6 +1244,7 @@ public class TestSipListener implements SipListener {
 
 		try {			
 			if(response.getStatusCode() >= 200 && response.getStatusCode() < 700) {
+				logger.info("final response received : status code " + response.getStatusCode());
 				finalResponseReceived = true;
 				setFinalResponseStatus(response.getStatusCode());
 				setFinalResponse(response);
@@ -2591,6 +2595,20 @@ public class TestSipListener implements SipListener {
 	 */
 	public boolean isSendNotifyForRefer() {
 		return sendNotifyForRefer;
+	}
+
+	/**
+	 * @param sendNotify the sendNotify to set
+	 */
+	public void setSendNotify(boolean sendNotify) {
+		this.sendNotify = sendNotify;
+	}
+
+	/**
+	 * @return the sendNotify
+	 */
+	public boolean isSendNotify() {
+		return sendNotify;
 	}
 
 }

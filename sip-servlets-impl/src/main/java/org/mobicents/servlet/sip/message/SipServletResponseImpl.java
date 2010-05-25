@@ -458,7 +458,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			session.updateStateOnResponse(this, false);						
 			// RFC 3265 : If a 200-class response matches such a SUBSCRIBE request,
 			// it creates a new subscription and a new dialog.
-			if(Request.SUBSCRIBE.equals(getMethod()) && statusCode >= 200 && statusCode <= 300) {					
+			// Issue 1481 http://code.google.com/p/mobicents/issues/detail?id=1481
+			// proxy should not add or remove subscription since there is no dialog associated with it
+			if(Request.SUBSCRIBE.equals(getMethod()) && statusCode >= 200 && statusCode <= 300 && session.getProxy() == null) {					
 				session.addSubscription(this);
 			}
 			// RFC 3262 Section 3 UAS Behavior

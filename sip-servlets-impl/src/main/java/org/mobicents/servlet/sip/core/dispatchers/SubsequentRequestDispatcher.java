@@ -275,8 +275,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				try {
 					// RFC 3265 : If a matching NOTIFY request contains a "Subscription-State" of "active" or "pending", it creates
 					// a new subscription and a new dialog (unless they have already been
-					// created by a matching response, as described above).								
-					if(Request.NOTIFY.equals(requestMethod)) {
+					// created by a matching response, as described above).	
+					// Issue 1481 http://code.google.com/p/mobicents/issues/detail?id=1481
+					// proxy should not add or remove subscription since there is no dialog associated with it
+					if(Request.NOTIFY.equals(requestMethod) && sipSession.getProxy() == null) {
 						final SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
 							sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);
 					 						
@@ -367,8 +369,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				} 	 
 			} finally {
 				// A subscription is destroyed when a notifier sends a NOTIFY request
-				// with a "Subscription-State" of "terminated".			
-				if(Request.NOTIFY.equals(requestMethod)) {
+				// with a "Subscription-State" of "terminated".		
+				// Issue 1481 http://code.google.com/p/mobicents/issues/detail?id=1481
+				// proxy should not add or remove subscription since there is no dialog associated with it
+				if(Request.NOTIFY.equals(requestMethod) && sipSession.getProxy() == null) {
 					final SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
 						sipServletRequest.getMessage().getHeader(SubscriptionStateHeader.NAME);
 				

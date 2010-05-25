@@ -49,6 +49,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 	private static String USE_HOSTNAME = "useHostName";
 	private static String CHECK_URI = "check_uri";
 	private static String NON_RECORD_ROUTING = "nonRecordRouting";
+	private static String RECORD_ROUTING = "recordRouting";
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	
 	@Override
@@ -237,10 +238,17 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
     @Override
     protected void doSubscribe(SipServletRequest req) throws ServletException, IOException 
     {
-        SipURI uri = (SipURI)req.getRequestURI().clone();
-        uri.setPort(5057);
-        req.pushRoute(uri);
-        req.getProxy(true).proxyTo(req.getRequestURI());
+    	if(req.isInitial()) {
+	        SipURI uri = (SipURI)req.getRequestURI().clone();
+	        uri.setPort(5057);
+	        req.pushRoute(uri);
+	        Proxy proxy = req.getProxy(true);
+	        final String from = req.getFrom().getURI().toString();
+			if(from.contains(RECORD_ROUTING)) {
+				proxy.setRecordRoute(true);
+			}
+	        proxy.proxyTo(req.getRequestURI());
+    	}
     }
 
     @Override

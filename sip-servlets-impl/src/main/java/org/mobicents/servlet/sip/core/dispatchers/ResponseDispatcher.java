@@ -213,7 +213,9 @@ public class ResponseDispatcher extends MessageDispatcher {
 							final int status = sipServletResponse.getStatus();
 							// RFC 3265 : If a 200-class response matches such a SUBSCRIBE or REFER request,
 							// it creates a new subscription and a new dialog.
-							if(Request.SUBSCRIBE.equals(sipServletResponse.getMethod()) && status >= 200 && status <= 300) {					
+							// Issue 1481 http://code.google.com/p/mobicents/issues/detail?id=1481
+							// proxy should not add or remove subscription since there is no dialog associated with it
+							if(Request.SUBSCRIBE.equals(sipServletResponse.getMethod()) && status >= 200 && status <= 300 && session.getProxy() == null) {					
 								session.addSubscription(sipServletResponse);
 							}
 							// See if this is a response to a proxied request

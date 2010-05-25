@@ -1168,8 +1168,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				session.addOngoingTransaction(getTransaction());
 			}
 			// Update Session state
-			session.updateStateOnSubsequentRequest(this, false);			
-			if(Request.NOTIFY.equals(getMethod())) {
+			session.updateStateOnSubsequentRequest(this, false);
+			// Issue 1481 http://code.google.com/p/mobicents/issues/detail?id=1481
+			// proxy should not add or remove subscription since there is no dialog associated with it
+			if(Request.NOTIFY.equals(getMethod()) && session.getProxy() == null) {
 				final SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
 					getMessage().getHeader(SubscriptionStateHeader.NAME);		
 			
