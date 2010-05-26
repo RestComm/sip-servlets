@@ -15,17 +15,21 @@
 	<name>Jopr Mobicents Sip Servlets Plugin For JBoss 5</name>
 	<description>A plugin for managing Mobicents Sip Servlets on JBoss 5 servers</description>
 	<repositories>
-		<repository>
-	      <id>jboss-releases-repository</id>
-	      <name>JBoss Releases Repository</name>
-	      <url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</url>
-	    </repository>
-	    <repository>
-	      <id>jboss-snapshots-repository</id>
-	      <name>JBoss Snapshots Repository</name>
-	      <url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
-	    </repository>
-	</repositories>
+              <repository>
+                      <id>jboss-public-repository-group</id>
+                      <name>JBoss Public Maven Repository Group</name>
+                      <url>https://repository.jboss.org/nexus/content/groups/public</url>
+                      <layout>default</layout>
+                      <releases>
+                              <enabled>true</enabled>
+                              <updatePolicy>never</updatePolicy>
+                      </releases>
+                      <snapshots>
+                              <enabled>true</enabled>
+                              <updatePolicy>never</updatePolicy>
+                      </snapshots>
+              </repository>
+      </repositories>
 
 <scm>
 		<connection>scm:svn:http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets</connection>
