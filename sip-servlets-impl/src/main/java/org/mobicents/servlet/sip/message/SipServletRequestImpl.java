@@ -309,10 +309,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				    ContactHeader contactHeader = JainSipUtils.createContactHeader(
 			    			super.sipFactoryImpl.getSipNetworkInterfaceManager(), request, null, outboundInterface);
 				    String transport = "udp";
-				    if(session.getTransport() != null) transport = session.getTransport();
+				    if(session != null && session.getTransport() != null) transport = session.getTransport();
 					SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);
-					if(sipConnector.isUseStaticAddress()) {
-						if(session.getProxy() == null) {
+					if(sipConnector != null && sipConnector.isUseStaticAddress()) {
+						if(session != null && session.getProxy() == null) {
 							boolean sipURI = contactHeader.getAddress().getURI().isSipURI();
 							if(sipURI) {
 								javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) contactHeader.getAddress().getURI();
