@@ -269,6 +269,8 @@ public class TestSipListener implements SipListener {
 	private int referResponseToSend = 202;
 
 	private boolean sendNotifyForRefer = true;
+	
+	private Response inviteOkResponse;
 
 	private boolean sendNotify = true;
 
@@ -937,6 +939,15 @@ public class TestSipListener implements SipListener {
 		        dsam = new DigestServerAuthenticationMethod();
 		        dsam.initialize(); // it should read values from file, now all static
 		        if ( !checkProxyAuthorization(request) ) {
+		        	 Thread.sleep(600);
+		        	Response response180 = protocolObjects.messageFactory.createResponse(100,request);
+		        	 if (serverTransaction!=null)
+			                serverTransaction.sendResponse(response180);
+			            else 
+			                sipProvider.sendResponse(response180);
+		        	 
+		        	 Thread.sleep(600);
+		    		
 		            Response responseauth = protocolObjects.messageFactory.createResponse(Response.PROXY_AUTHENTICATION_REQUIRED,request);
 		
 		            ProxyAuthenticateHeader proxyAuthenticate = 
@@ -1252,6 +1263,7 @@ public class TestSipListener implements SipListener {
 			if (response.getStatusCode() == Response.OK) {
 				logger.info("response = " + response);
 				if (cseq.getMethod().equals(Request.INVITE) && sendAck) {
+					inviteOkResponse = response;
 					Request ackRequest = tid.getDialog().createAck(cseq.getSeqNumber());
 					if (useToURIasRequestUri) {
 						ackRequest.setRequestURI(requestURI);	
@@ -2259,6 +2271,10 @@ public class TestSipListener implements SipListener {
 	public void setTimeToWaitBetweenProvisionnalResponse(
 			long timeToWaitBetweenProvisionnalResponse) {
 		this.timeToWaitBetweenProvisionnalResponse = timeToWaitBetweenProvisionnalResponse;
+	}
+	
+	public Response getInviteOkResponse() {
+		return inviteOkResponse;
 	}
 
 	/**

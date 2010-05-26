@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.testsuite.composition;
 
+import gov.nist.javax.sip.header.Contact;
+
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
@@ -152,6 +154,9 @@ public class LocationServiceB2BUAStaticServerAddressTest extends SipServletTestC
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
+		Contact contact = (Contact) sender.getInviteOkResponse().getHeader(Contact.NAME);
+		SipURI sipURI = (SipURI) contact.getAddress().getURI();
+		assertTrue(sipURI.getPort() == 5005);
 	}
 
 	
