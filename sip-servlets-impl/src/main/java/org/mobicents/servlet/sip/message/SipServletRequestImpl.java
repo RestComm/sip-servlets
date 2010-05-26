@@ -305,9 +305,22 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					if(session != null) {
 						outboundInterface = session.getOutboundInterface();
 					}		
-				    // Add the contact header for the dialog.					    
-				    final ContactHeader contactHeader = JainSipUtils.createContactHeader(
-				    		super.sipFactoryImpl.getSipNetworkInterfaceManager(), request, null, outboundInterface);
+				    // Add the contact header for the dialog.				    
+				    ContactHeader contactHeader = JainSipUtils.createContactHeader(
+			    			super.sipFactoryImpl.getSipNetworkInterfaceManager(), request, null, outboundInterface);
+				    String transport = "udp";
+				    if(session.getTransport() != null) transport = session.getTransport();
+					SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);
+					if(sipConnector.isUseStaticAddress()) {
+						if(session.getProxy() == null) {
+							boolean sipURI = contactHeader.getAddress().getURI().isSipURI();
+							if(sipURI) {
+								javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) contactHeader.getAddress().getURI();
+								sipUri.setHost(sipConnector.getStaticServerAddress());
+								sipUri.setPort(sipConnector.getStaticServerPort());
+							}
+						}
+					}
 				    if(logger.isDebugEnabled()) {
 				    	logger.debug("We're adding this contact header to our new response: '" + contactHeader + ", transport=" + JainSipUtils.findTransport(request));
 				    }
