@@ -146,6 +146,16 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		assertTrue(sender.isCancelOkReceived());
 		assertTrue(sender.isRequestTerminatedReceived());
 		assertTrue(receiver.isCancelReceived());
+		sender.setCancelOkReceived(false);
+		sender.setRequestTerminatedReceived(false);
+		receiver.setCancelReceived(false);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null);
+		Thread.sleep(500);
+		sender.sendCancel();		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isCancelOkReceived());
+		assertTrue(sender.isRequestTerminatedReceived());
+		assertTrue(receiver.isCancelReceived());
 	}	
 	
 	@Override

@@ -2028,6 +2028,12 @@ public class TestSipListener implements SipListener {
 	}
 
 	/**
+	 */
+	public void setCancelReceived(boolean cancelReceived) {
+		this.cancelReceived = cancelReceived;
+	}
+	
+	/**
 	 * @return the cancelOkReceived
 	 */
 	public boolean isCancelOkReceived() {

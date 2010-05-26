@@ -41,6 +41,7 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.UAMode;
 import javax.servlet.sip.URI;
+import javax.servlet.sip.SipSession.State;
 import javax.sip.header.ContactHeader;
 
 import org.apache.log4j.Logger;
@@ -129,7 +130,14 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	@Override
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
-		
+		// Issue 1484 : http://code.google.com/p/mobicents/issues/detail?id=1484
+		// check the state of the session it shouldn't be Terminated
+		request.getSession().getAttribute("Foo");
+		State state = request.getSession().getState();
+		logger.info("session state : " + state);
+		if(state == State.TERMINATED) {
+			throw new IllegalStateException("It shouldn't be in TERMINATED state");
+		}
 		if(request.isInitial()) {
 			logger.info("Got INVITE: " + request.toString());
 			logger.info(request.getFrom().getURI().toString());

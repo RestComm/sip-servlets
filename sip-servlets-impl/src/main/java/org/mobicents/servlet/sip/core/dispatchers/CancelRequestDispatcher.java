@@ -155,7 +155,11 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 		//JSR 289 Section 6.2.1.1 Cancel Message Processing : since receiving a CANCEL request causes the UAS 
 		// to respond to an ongoing INVITE transaction with a non-2XX (specifically, 487) response, the SipSession state 
 		// normally becomes TERMINATED as a result of the non-2XX final response sent back to the UAC.
-		inviteRequest.getSipSession().setState(State.TERMINATED);
+		// Issue 1484 : http://code.google.com/p/mobicents/issues/detail?id=1484
+		// we terminate the session only for initial requests
+		if(inviteRequest.isInitial()) {
+			inviteRequest.getSipSession().setState(State.TERMINATED);
+		}
 		try {
 			Response requestTerminatedResponse = (Response) inviteResponse.getMessage();
 			((ServerTransaction)inviteTransaction).sendResponse(requestTerminatedResponse);				

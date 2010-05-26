@@ -1385,7 +1385,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 			TransactionApplicationData inviteAppData = (TransactionApplicationData) 
 				inviteTransaction.getApplicationData();			
 			SipServletRequestImpl inviteRequest = (SipServletRequestImpl)inviteAppData.getSipServletMessage();
-			if((inviteRequest != null && inviteRequest.getLastFinalResponse() == null) || 
+			// Issue 1484 : http://code.google.com/p/mobicents/issues/detail?id=1484
+			// we terminate the session only for initial requests
+			if((inviteRequest != null && inviteRequest.isInitial() && inviteRequest.getLastFinalResponse() == null) || 
 						(proxy != null && proxy.getBestResponse() == null))  {
 				this.setState(State.TERMINATED);
 				if(logger.isDebugEnabled()) {
