@@ -363,33 +363,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		B2buaHelperImpl b2buaHelper = session.getB2buaHelper();
 		if (b2buaHelper != null)
 			return b2buaHelper;
-		try {
-			b2buaHelper = new B2buaHelperImpl();
-			b2buaHelper.setSipFactoryImpl(sipFactoryImpl);
-			b2buaHelper.setSipManager(session.getSipApplicationSession().getSipContext().getSipManager());
-			Request request = (Request) super.message;
-			if (this.getTransaction() != null
-					&& this.getTransaction().getDialog() == null
-					&& JainSipUtils.DIALOG_CREATING_METHODS.contains(request.getMethod())) {
-				
-				String transport = JainSipUtils.findTransport(request);
-				SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
-						transport, false).getSipProvider();
-				
-				Dialog dialog = sipProvider.getNewDialog(this
-						.getTransaction());
-				((DialogExt)dialog).disableSequenceNumberValidation();
-				session.setSessionCreatingDialog(dialog);
-				dialog.setApplicationData( this.transactionApplicationData);				
-			}			
-			if(JainSipUtils.DIALOG_CREATING_METHODS.contains(getMethod())) {
-				this.createDialog = true; // flag that we want to create a dialog for outgoing request.
-			}
-			session.setB2buaHelper(b2buaHelper);
-			return b2buaHelper;
-		} catch (SipException ex) {
-			throw new IllegalStateException("Cannot get B2BUAHelper", ex);
+		b2buaHelper = new B2buaHelperImpl();
+		b2buaHelper.setSipFactoryImpl(sipFactoryImpl);
+		b2buaHelper.setSipManager(session.getSipApplicationSession().getSipContext().getSipManager());
+		if(JainSipUtils.DIALOG_CREATING_METHODS.contains(getMethod())) {
+			this.createDialog = true; // flag that we want to create a dialog for outgoing request.
 		}
+		session.setB2buaHelper(b2buaHelper);
+		return b2buaHelper;
 	}		
 
 	public ServletInputStream getInputStream() throws IOException {
