@@ -1031,17 +1031,19 @@ public class ConvergedJBossCacheService extends JBossCacheService
     *         (with any jvmRoute removed) or <code>null</code> if there
     *         are no sessions in the cache.
     */
-   public Map getSipSessionIds(Set sipApplicationSessionIds, Object owner) throws CacheException
-   {
-	   Map result = new HashMap();
-	  for (Object object : sipApplicationSessionIds) {
-          Set ids = proxy_.getChildrenNames(getSipApplicationSessionFqn((String)object, (String)owner));
-          storeSessionOwners(ids, owner, result);
-	      
-	  }
-	  return result;
-      
-   }
+	public Map getSipSessionIds(Set sipApplicationSessionIds, Object owner)
+			throws CacheException {
+		Map result = new HashMap();
+		if (sipApplicationSessionIds != null) {
+			for (Object object : sipApplicationSessionIds) {
+				Set ids = proxy_.getChildrenNames(getSipApplicationSessionFqn(
+						(String) object, (String) owner));
+				storeSessionOwners(ids, owner, result);
+			}
+		}
+		return result;
+
+	}
    
    /**
     * Gets the ids of all sessions in the underlying cache.
