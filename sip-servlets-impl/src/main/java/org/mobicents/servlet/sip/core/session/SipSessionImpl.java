@@ -16,7 +16,6 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
-import gov.nist.javax.sip.DialogExt;
 import gov.nist.javax.sip.ServerTransactionExt;
 import gov.nist.javax.sip.message.MessageExt;
 import gov.nist.javax.sip.message.SIPMessage;
@@ -59,7 +58,6 @@ import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
-import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
 import javax.sip.InvalidArgumentException;
@@ -70,7 +68,6 @@ import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
 import javax.sip.TransactionState;
-import javax.sip.TransactionUnavailableException;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
@@ -826,11 +823,26 @@ public class SipSessionImpl implements MobicentsSipSession {
 		sipSessionAttributeMap = null;
 //		key = null;
 		if(sessionCreatingDialog != null) {
+			// terminating dialog to make sure there is not retention, if the app didn't send a BYE for invite tx by example
+			if(!DialogState.TERMINATED.equals(sessionCreatingDialog.getState())) {
+				sessionCreatingDialog.delete();
+			}
 //			sessionCreatingDialog.setApplicationData(null);
 			sessionCreatingDialog = null;
 		}
 		if(sessionCreatingTransactionRequest != null) {
 //			sessionCreatingTransaction.setApplicationData(null);
+			Transaction sessionCreatingTransaction = sessionCreatingTransactionRequest.getTransaction();
+			if(sessionCreatingTransaction != null) {
+				// terminating transaction to make sure there is not retention
+				if(!TransactionState.TERMINATED.equals(sessionCreatingTransaction.getState())) {
+					try {
+						sessionCreatingTransaction.terminate();
+					} catch (ObjectInUseException e) {
+						// never thrown by jain sip and anyway there is nothing we can do about it
+					}
+				}
+			}
 			sessionCreatingTransactionRequest.cleanUp();
 			sessionCreatingTransactionRequest = null;
 		}
