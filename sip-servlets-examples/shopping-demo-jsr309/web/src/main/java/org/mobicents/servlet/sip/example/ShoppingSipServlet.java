@@ -228,20 +228,32 @@ public class ShoppingSipServlet
 						response.getRequest().getMethod());
 				
 				challengeRequest.addAuthHeader(response, authInfo);
-				/*
-				MsConnection connection =  (MsConnection) 
+				
+				NetworkConnection connection =  (NetworkConnection) 
 					sipSession.getAttribute("connection");
 				if(connection != null) {
-					String sdp = connection.getLocalDescriptor();
 					try {
-						challengeRequest.setContentLength(sdp.length());
-						challengeRequest.setContent(sdp.getBytes(), "application/sdp");						
+						SdpPortManager sdpManag = connection.getSdpPortManager();
+						sdpManag.generateSdpOffer();
+		
+		
+						byte[] sdpOffer = null;
+						int numTimes = 0;
+						while(sdpOffer == null && numTimes<10) {
+							sdpOffer = sdpManag.getMediaServerSessionDescription();
+							Thread.sleep(500);
+							numTimes++;
+						}
+						challengeRequest.setContentLength(sdpOffer.length);
+						challengeRequest.setContent(sdpOffer, "application/sdp");						
 					} catch (IOException e) {
 						logger.error("An unexpected exception occured while sending the request", e);
-					}
+					} catch (Exception e) {
+						logger.error("An unexpected exception occured while creating the request", e);
+					} 
 				}
 				logger.info("sending challenge request " + challengeRequest);
-				challengeRequest.send();*/
+				challengeRequest.send();
 			}
 		} else {					
 			super.doErrorResponse(response);
