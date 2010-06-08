@@ -75,7 +75,6 @@ import org.jboss.web.tomcat.service.session.notification.IgnoreUndeployLegacyClu
 import org.mobicents.cache.MobicentsCache;
 import org.mobicents.cluster.DefaultMobicentsCluster;
 import org.mobicents.cluster.MobicentsCluster;
-import org.mobicents.cluster.cache.DefaultClusteredCacheDataIndexingHandler;
 import org.mobicents.cluster.election.DefaultClusterElector;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -2939,8 +2938,10 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		container_ = container;
 		sipManagerDelegate.setContainer(container);
 		DistributedCacheConvergedSipManager<? extends OutgoingDistributableSessionData> distributedCacheConvergedSipManager = getDistributedCacheConvergedSipManager();
-		distributedCacheConvergedSipManager.setApplicationName(((SipContext)getContainer()).getApplicationName());
-		distributedCacheConvergedSipManager.setApplicationNameHashed(((SipContext)getContainer()).getApplicationNameHashed());
+		if(container instanceof SipContext) {
+			distributedCacheConvergedSipManager.setApplicationName(((SipContext)getContainer()).getApplicationName());
+			distributedCacheConvergedSipManager.setApplicationNameHashed(((SipContext)getContainer()).getApplicationNameHashed());
+		}
 	}
 
 	/**
