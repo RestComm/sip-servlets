@@ -507,7 +507,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			setStarted(true);
 		} catch (Exception ex) {			
 			logger.error(
-					"Bad shit happened -- check server.xml for tomcat. ", ex);						
+					"A problem occured while setting up SIP Connector " + ipAddress + ":" + port + "/" + signalingTransport + "-- check server.xml for tomcat. ", ex);						
 		} finally {
 			if(!isStarted()) {
 				destroy();
