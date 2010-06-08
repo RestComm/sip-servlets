@@ -61,7 +61,7 @@
 	
 	<!-- Release target -->
 	
-	<target name="release" depends="clean,release-jboss-5,release-jboss-5-jdk6,release-tomcat,release-jboss,make-src-zip" />
+	<target name="release" depends="clean,release-jboss-5,release-jboss-5-jdk6,release-tomcat,make-src-zip" />
 	
 	<!-- Tomcat version -->
 	
@@ -319,9 +319,10 @@
 			<param name="management.deploy.folder" value="${mss.home}/server/${jboss.config}/deploy" />
 		</antcall>
 		
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../jopr-plugin-as-5">
+		<!-- commented out due to recurring wrong rhq files on hudson -->
+		<!--exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../jopr-plugin-as-5">
 			<arg line="clean install -U -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
-		</exec>
+		</exec-->
 		
 		<condition property="ha.capable">
 			<or>
