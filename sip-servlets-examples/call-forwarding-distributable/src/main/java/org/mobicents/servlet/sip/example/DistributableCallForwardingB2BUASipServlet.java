@@ -82,35 +82,43 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 			logger.info("OUTBOUND INTERFACES  " + getServletContext().getAttribute("javax.servlet.sip.outboundInterfaces"));
 		}
 		
-		String[] forwardingUri = forwardingUris.get(request.getTo().getURI().toString());
-		if(forwardingUri != null && forwardingUri.length > 0) {
-			helper = request.getB2buaHelper();						
-			request.getSession().setAttribute("INVITE", RECEIVED);
-			request.getApplicationSession().setAttribute("INVITE", RECEIVED);			
-			
-			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
-					SIP_FACTORY);
-			
-			Map<String, List<String>> headers=new HashMap<String, List<String>>();
-			List<String> toHeaderSet = new ArrayList<String>();
-			toHeaderSet.add(forwardingUri[0]);
-			headers.put("To", toHeaderSet);
-			
-			SipServletRequest forkedRequest = helper.createRequest(request, true,
-					headers);
-			SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1]);		
-			forkedRequest.setRequestURI(sipUri);						
-			if(logger.isInfoEnabled()) {
-				logger.info("forkedRequest = " + forkedRequest);
+		if(request.isInitial()) {
+			String[] forwardingUri = forwardingUris.get(request.getTo().getURI().toString());
+			if(forwardingUri != null && forwardingUri.length > 0) {
+				helper = request.getB2buaHelper();						
+				request.getSession().setAttribute("INVITE", RECEIVED);
+				request.getApplicationSession().setAttribute("INVITE", RECEIVED);			
+				
+				SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
+						SIP_FACTORY);
+				
+				Map<String, List<String>> headers=new HashMap<String, List<String>>();
+				List<String> toHeaderSet = new ArrayList<String>();
+				toHeaderSet.add(forwardingUri[0]);
+				headers.put("To", toHeaderSet);
+				
+				SipServletRequest forkedRequest = helper.createRequest(request, true,
+						headers);
+				SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1]);		
+				forkedRequest.setRequestURI(sipUri);						
+				if(logger.isInfoEnabled()) {
+					logger.info("forkedRequest = " + forkedRequest);
+				}
+				forkedRequest.getSession().setAttribute("originalRequest", request);
+				forkedRequest.getSession().setAttribute("INVITE", RECEIVED);
+				
+				forkedRequest.send();
+			} else {
+				if(logger.isInfoEnabled()) {
+					logger.info("INVITE has not been forwarded.");
+				}
 			}
-			forkedRequest.getSession().setAttribute("originalRequest", request);
-			forkedRequest.getSession().setAttribute("INVITE", RECEIVED);
-			
-			forkedRequest.send();
 		} else {
-			if(logger.isInfoEnabled()) {
-				logger.info("INVITE has not been forwarded.");
-			}
+			// deals with reinvite requests
+			B2buaHelper b2buaHelper = request.getB2buaHelper();
+			SipSession origSession = b2buaHelper.getLinkedSession(request.getSession());
+			origSession.setAttribute("originalRequest", request);
+			b2buaHelper.createRequest(origSession, request, null).send();
 		}
 	}	
 	
