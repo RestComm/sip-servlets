@@ -542,9 +542,9 @@
 	<target name="build-documentation" depends="get-documentation">
 		<echo>Building documentation</echo>
 		
-		<exec executable="${mvn.executable}" dir="${docs.stage.dir}/media/">
+		<!--exec executable="${mvn.executable}" dir="${docs.stage.dir}/media/">
 			<arg line="clean compile" />
-		</exec>
+		</exec-->
 		<exec executable="${mvn.executable}" dir="${docs.stage.dir}/sip-servlets/">
 			<arg line="clean install" />
 		</exec>

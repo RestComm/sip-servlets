@@ -13,7 +13,7 @@
         <checkout.username>mobicents-read-only</checkout.username>
         <checkout.password></checkout.password>
         
-        <media.docs.connectionURL>scm:svn:https://svn.devel.redhat.com/repos/ecs/JBoss_Communications_Platform/1.2.0/Media_Server_User_Guide</media.docs.connectionURL>
+        <!--media.docs.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/media/2.x.y/core/mms-core-2.0.0.CR2/docs</media.docs.connectionURL-->
         <!--sipservlets.docs.connectionURL>scm:svn:https://svn.devel.redhat.com/repos/ecs/JBoss_Communications_Platform/1.2.0/SIP_Servlets_Server_User_Guide</sipservlets.docs.connectionURL-->        
         <sipservlets.docs.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/docs</sipservlets.docs.connectionURL>
         
@@ -30,7 +30,7 @@
                         <artifactId>maven-scm-plugin</artifactId>
                         <inherited>false</inherited>
                         <executions>
-                            <execution>
+                            <!--execution>
                                 <id>media-docs-checkout</id>
                                 <goals>
                                     <goal>checkout</goal>
@@ -41,11 +41,9 @@
                                     <scmVersionType>revision</scmVersionType>
                                     <skipCheckoutIfExists>true</skipCheckoutIfExists>
                                     <checkoutDirectory>${checkout.basedir}/media</checkoutDirectory>
-                                    <connectionUrl>${media.docs.connectionURL}</connectionUrl>
-                                    <username>${checkout.username}</username>
-                                    <password>${checkout.password}</password>
+                                    <connectionUrl>${media.docs.connectionURL}</connectionUrl>                                    
                                 </configuration>
-                            </execution>
+                            </execution-->
                             <execution>
                                 <id>sipservlets-docs-checkout</id>
                                 <goals>
@@ -75,7 +73,7 @@
                         <artifactId>maven-scm-plugin</artifactId>
                         <inherited>false</inherited>
                         <executions>
-                            <execution>
+                            <!--execution>
                                 <id>media-docs-update</id>
                                 <goals>
                                     <goal>update</goal>
@@ -85,11 +83,9 @@
                                     <basedir>${checkout.basedir}/media</basedir>
                                     <scmVersion>HEAD</scmVersion>
                                     <scmVersionType>revision</scmVersionType>
-                                    <connectionUrl>${media.docs.connectionURL}</connectionUrl>
-                                    <username>${checkout.username}</username>
-                                    <password>${checkout.password}</password>
+                                    <connectionUrl>${media.docs.connectionURL}</connectionUrl>                                    
                                 </configuration>
-                            </execution>
+                            </execution-->
                             <execution>
                                 <id>sipservlets-docs-update</id>
                                 <goals>
