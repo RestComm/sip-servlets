@@ -2938,6 +2938,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		container_ = container;
 		sipManagerDelegate.setContainer(container);
 		DistributedCacheConvergedSipManager<? extends OutgoingDistributableSessionData> distributedCacheConvergedSipManager = getDistributedCacheConvergedSipManager();
+		// Issue 1514: http://code.google.com/p/mobicents/issues/detail?id=1514	
+		// only set this up if the application is a SIP or converged application	
 		if(container instanceof SipContext) {
 			distributedCacheConvergedSipManager.setApplicationName(((SipContext)getContainer()).getApplicationName());
 			distributedCacheConvergedSipManager.setApplicationNameHashed(((SipContext)getContainer()).getApplicationNameHashed());
