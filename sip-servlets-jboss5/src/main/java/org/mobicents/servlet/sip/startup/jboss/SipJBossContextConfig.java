@@ -107,6 +107,9 @@ public class SipJBossContextConfig extends JBossContextConfig {
 	protected void processWebMetaData(JBossWebMetaData metaData) {
 		if(metaData instanceof JBossConvergedSipMetaData && context instanceof SipContext) {			
 			processSipMetaData((JBossConvergedSipMetaData)metaData);
+			// Issue 1522 http://code.google.com/p/mobicents/issues/detail?id=1522 : 
+			// when converged distributable app deployed is missing distributable in one of the Deployment descriptor
+			// throw a better exception
 			if (metaData.getDistributable() != null && metaData.getReplicationConfig() == null) {
 				throw new SipDeploymentException("the <distributable/> element should be present in both web.xml and sip.xml so that the application can be correctly clustered");
 			}
