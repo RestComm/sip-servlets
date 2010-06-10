@@ -107,8 +107,12 @@ public class SipJBossContextConfig extends JBossContextConfig {
 	protected void processWebMetaData(JBossWebMetaData metaData) {
 		if(metaData instanceof JBossConvergedSipMetaData && context instanceof SipContext) {			
 			processSipMetaData((JBossConvergedSipMetaData)metaData);
+			if (metaData.getDistributable() != null && metaData.getReplicationConfig() == null) {
+				throw new SipDeploymentException("the <distributable/> element should be present in both web.xml and sip.xml so that the application can be correctly clustered");
+			}
 		}
-		super.processWebMetaData(metaData);					
+		super.processWebMetaData(metaData);
+		
 	}
 
 	/**
