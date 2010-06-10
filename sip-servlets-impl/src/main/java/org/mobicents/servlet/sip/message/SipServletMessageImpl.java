@@ -113,7 +113,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	protected transient MobicentsSipSession sipSession;
 
 	protected Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
-	private Transaction transaction;
+	// Made it transient for Issue 1523 : http://code.google.com/p/mobicents/issues/detail?id=1523
+	// NotSerializableException happens if a message is stored in the sip session during HA
+	private transient Transaction transaction;
 	protected TransactionApplicationData transactionApplicationData;		
 
 	protected HeaderForm headerForm = HeaderForm.DEFAULT;
@@ -133,8 +135,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	protected transient Principal userPrincipal;
 	
 	protected boolean isMessageSent;
-	
-	protected Dialog dialog;
+	// Made it transient for Issue 1523 : http://code.google.com/p/mobicents/issues/detail?id=1523
+	// NotSerializableException happens if a message is stored in the sip session during HA
+	protected transient Dialog dialog;
 	
 	protected transient String method;
 	
