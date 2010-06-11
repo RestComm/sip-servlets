@@ -3649,7 +3649,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		super.startExtensions();		
 		
 		mobicentsCache = new MobicentsCache(getDistributedCacheConvergedSipManager().getJBossCache(), null);
-		mobicentsCluster = new DefaultMobicentsCluster(mobicentsCache, null, new DefaultClusterElector());
+		mobicentsCluster = new DefaultMobicentsCluster(mobicentsCache, getDistributedCacheConvergedSipManager().getJBossCache().getConfiguration().getRuntimeConfig().getTransactionManager(), new DefaultClusterElector());
 		if(logger.isDebugEnabled()) {
 			logger.debug("Mobicents Sip Servlets Default Mobicents Cluster " + mobicentsCluster + " created");
 		}
