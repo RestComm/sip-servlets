@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.testsuite.reinvite;
 
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.header.MaxForwardsHeader;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -101,10 +102,20 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isInviteReceived());
 		assertNotNull(sender.getInviteRequest().getHeader("ReInvite"));
+		MaxForwardsHeader maxForwardsHeader = (MaxForwardsHeader) receiver.getInviteRequest().getHeader(MaxForwardsHeader.NAME);
+		assertNotNull(maxForwardsHeader);
+		// Non Regression test for http://code.google.com/p/mobicents/issues/detail?id=1490
+		// B2buaHelper.createRequest does not decrement Max-forwards
+		assertEquals(69, maxForwardsHeader.getMaxForwards());
 		sender.sendInDialogSipRequest("BYE", null, null, null, null);
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());
 		assertTrue(sender.getOkToByeReceived());
+		maxForwardsHeader = (MaxForwardsHeader) receiver.getByeRequestReceived().getHeader(MaxForwardsHeader.NAME);
+		assertNotNull(maxForwardsHeader);
+		// Non Regression test for http://code.google.com/p/mobicents/issues/detail?id=1490
+		// B2buaHelper.createRequest does not decrement Max-forwards
+		assertEquals(69, maxForwardsHeader.getMaxForwards());
 	}
 	
 	/**
@@ -156,7 +167,7 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		assertTrue(sender.isCancelOkReceived());
 		assertTrue(sender.isRequestTerminatedReceived());
 		assertTrue(receiver.isCancelReceived());
-	}	
+	}		
 	
 	@Override
 	protected void tearDown() throws Exception {	

@@ -42,6 +42,7 @@ import javax.servlet.sip.UAMode;
 import javax.servlet.sip.SipSession.State;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.sip.ClientTransaction;
+import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
 import javax.sip.ServerTransaction;
 import javax.sip.Transaction;
@@ -52,6 +53,7 @@ import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
+import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
@@ -152,6 +154,15 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			// Remove the record route headers. This is a new call leg.
 			newRequest.removeHeader(RecordRouteHeader.NAME);			
 	
+			// Issue 1490 : http://code.google.com/p/mobicents/issues/detail?id=1490 
+			// B2buaHelper.createRequest does not decrement Max-forwards
+			MaxForwardsHeader maxForwardsHeader = (MaxForwardsHeader) newRequest.getHeader(MaxForwardsHeader.NAME);
+			try {
+				maxForwardsHeader.setMaxForwards(maxForwardsHeader.getMaxForwards() -1);
+			} catch (InvalidArgumentException e) {
+				throw new IllegalArgumentException(e);
+			}
+			
 			//Creating new call id
 			final Iterator<ExtendedListeningPoint> listeningPointsIterator = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints();				
 			if(!listeningPointsIterator.hasNext()) {				
@@ -289,6 +300,16 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			//then relevant portions of Contact header is to be used in the request created, 
 			//in accordance with section 4.1.3 of the specification.
 			Request subsequentRequest = (Request)newSubsequentServletRequest.getMessage();
+			
+			// Issue 1490 : http://code.google.com/p/mobicents/issues/detail?id=1490 
+			// B2buaHelper.createRequest does not decrement Max-forwards
+			MaxForwardsHeader maxForwardsHeader = (MaxForwardsHeader) subsequentRequest.getHeader(MaxForwardsHeader.NAME);
+			try {
+				maxForwardsHeader.setMaxForwards(maxForwardsHeader.getMaxForwards() -1);
+			} catch (InvalidArgumentException e) {
+				throw new IllegalArgumentException(e);
+			}
+			
 			ContactHeader contactHeader = (ContactHeader) subsequentRequest.getHeader(ContactHeader.NAME);
 			if(contactHeader != null && contactHeaderSet.size() > 0) {
 				setContactHeaders(contactHeaderSet, newSubsequentServletRequest, contactHeader);
@@ -320,7 +341,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		} catch (Exception ex) {
 			logger.error("Unexpected exception ", ex);
 			throw new IllegalArgumentException(
-					"Illegal arg ecnountered while creatigng b2bua", ex);
+					"Illegal arg encountered while creating b2bua", ex);
 		}
 	}
 
