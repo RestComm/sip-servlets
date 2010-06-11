@@ -179,7 +179,7 @@ echo "================================"
 ./auto-start-jboss-server-jboss-5.sh $config1 $config1.pid $ports1 1 uac
 ./auto-start-jboss-server-jboss-5.sh $config2 $config2.pid $ports2 2 uac
 #Wait to boot
-sleep 20
+sleep $FULLSTARTSLEEP
 ./auto-run-test.sh uac result.txt
 
 #Kill the app servers
