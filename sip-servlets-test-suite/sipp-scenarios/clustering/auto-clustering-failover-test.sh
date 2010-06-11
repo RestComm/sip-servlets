@@ -76,7 +76,7 @@ echo "================================"
 ./auto-start-jboss-server.sh $config1 $config1.pid 0 uac
 ./auto-start-jboss-server.sh $config2 $config2.pid 1 uac
 #Wait to boot
-sleep 20
+sleep $FULLSTARTSLEEP
 ./auto-run-test.sh uac result.txt
 
 #Kill the app servers
