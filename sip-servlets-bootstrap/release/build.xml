@@ -151,7 +151,8 @@
 	
 	<!-- JBoss 5 version -->
 	
-	<target name="release-jboss-5" depends="extract-jboss-5,extract-jboss-5-torquebox-deployer">
+	<!--target name="release-jboss-5" depends="extract-jboss-5,extract-jboss-5-torquebox-deployer"-->
+	<target name="release-jboss-5" depends="extract-jboss-5">
 		<for delimiter="," param="jboss.config" list="${mss.release.configurations.jboss5}">
 			<sequential>
 				<ant dir="${base.path}" antfile="build.xml" target="release-jboss-5-node">
@@ -203,7 +204,8 @@
 	
 	<!-- JBoss 5 jdk6 version -->
 		
-	<target name="release-jboss-5-jdk6" depends="extract-jboss-5-jdk6,extract-jboss-5-torquebox-deployer-for-jdk6">
+	<!--target name="release-jboss-5-jdk6" depends="extract-jboss-5-jdk6,extract-jboss-5-torquebox-deployer-for-jdk6"-->
+	<target name="release-jboss-5-jdk6" depends="extract-jboss-5-jdk6">
 		<for delimiter="," param="jboss.config" list="${mss.release.configurations.jboss5}">
 			<sequential>
 				<ant dir="${base.path}" antfile="build.xml" target="release-jboss-5-node">
@@ -298,7 +300,7 @@
 			<arg line="clean install -U -P set-svn-revision,jboss-5-distro,docs -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
 		</exec>
 		
-		<delete file="${mss.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-annotations.jar" />
+		<!--delete file="${mss.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-annotations.jar" />
 		<delete file="${mss.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-impl.jar" />
 		<delete file="${mss.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-spec.jar" />
 		<delete file="${mss.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-jboss5-metadata.jar" />
@@ -313,7 +315,7 @@
 		</copy>
 		<copy tofile="${mss.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-jboss5-metadata.jar">
 			<fileset dir="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/" includes="sip-servlets-jboss5-metadata-*.jar" />
-		</copy>				
+		</copy-->				
 				
 		<antcall target="deploy-mgmnt" >
 			<param name="management.deploy.folder" value="${mss.home}/server/${jboss.config}/deploy" />
