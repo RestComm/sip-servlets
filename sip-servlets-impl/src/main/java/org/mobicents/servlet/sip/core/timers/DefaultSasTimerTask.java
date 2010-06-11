@@ -54,13 +54,12 @@ public class DefaultSasTimerTask implements SipApplicationSessionTimerTask {
 			logger.debug("initial kick off of SipApplicationSessionTimerTask running for sip application session " + sipApplicationSession.getId());
 		}
 					
-		long now = System.currentTimeMillis();
-		if(sipApplicationSession.getExpirationTimeInternal() > now) {
+		long sleep = getDelay();
+		if(sleep > 0) {
 			// if the session has been accessed since we started it, put it to sleep
-			long sleep =  getDelay();
 			if(logger.isDebugEnabled()) {
 				logger.debug("expirationTime is " + sipApplicationSession.getExpirationTimeInternal() + 
-						", now is " + now + 
+						", now is " + System.currentTimeMillis() + 
 						" sleeping for " + sleep / 1000L + " seconds");
 			}
 			final SipContext sipContext = sipApplicationSession.getSipContext();
