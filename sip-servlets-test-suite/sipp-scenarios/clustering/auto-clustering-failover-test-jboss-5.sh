@@ -60,26 +60,6 @@ sleep $HALFSTARTSLEEP
 sleep 10
 
 ##################################
-# Test UAC
-##################################
-echo "Test UAC"
-echo "================================"
-./auto-prepare-example.sh uac $config1 -Dsend.on.init=true
-./auto-prepare-example.sh uac $config2 -Dsend.on.init=false
-
-./auto-start-jboss-server-jboss-5.sh $config1 $config1.pid $ports1 1 uac
-./auto-start-jboss-server-jboss-5.sh $config2 $config2.pid $ports2 2 uac
-#Wait to boot
-sleep 20
-./auto-run-test.sh uac result.txt
-
-#Kill the app servers
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
-
-sleep 10
-
-##################################
 # Test b2bua
 ##################################
 echo "Test b2bua"
@@ -181,6 +161,26 @@ sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh uas-sas-timer result.txt
 
+
+#Kill the app servers
+./auto-kill-process-tree.sh `cat $config1.pid` $config1
+./auto-kill-process-tree.sh `cat $config2.pid` $config2
+
+sleep 10
+
+##################################
+# Test UAC
+##################################
+echo "Test UAC"
+echo "================================"
+./auto-prepare-example.sh uac $config1 -Dsend.on.init=true
+./auto-prepare-example.sh uac $config2 -Dsend.on.init=false
+
+./auto-start-jboss-server-jboss-5.sh $config1 $config1.pid $ports1 1 uac
+./auto-start-jboss-server-jboss-5.sh $config2 $config2.pid $ports2 2 uac
+#Wait to boot
+sleep 20
+./auto-run-test.sh uac result.txt
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat $config1.pid` $config1
