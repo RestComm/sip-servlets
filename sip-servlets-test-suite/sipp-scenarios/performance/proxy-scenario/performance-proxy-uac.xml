@@ -56,7 +56,7 @@
     ]]>
   </send>
 
-<pause milliseconds="29000" /> 
+<pause milliseconds="59000" /> 
  <recv request="BYE" timeout="30000"/>
 <send retrans="2000">
 
