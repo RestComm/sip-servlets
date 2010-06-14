@@ -1825,7 +1825,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}		
 		if(localCseq > remoteCseq) {				
 			if(!isAck) {
-				logger.error("CSeq out of order for the following request");
+				logger.error("CSeq out of order for the following request " + sipServletRequest);
 				final SipServletResponse response = sipServletRequest.createResponse(Response.SERVER_INTERNAL_ERROR, "CSeq out of order");
 				try {
 					response.send();
