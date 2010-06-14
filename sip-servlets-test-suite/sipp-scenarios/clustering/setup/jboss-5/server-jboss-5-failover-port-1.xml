@@ -12,6 +12,7 @@
   		sipPathName="org.mobicents.ha"
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
   		concurrencyControlMode="None"
+  		congestionControlCheckingInterval="-1"
   		darConfigurationFileLocation="conf/dars/distributable-dar.properties">
 
       <!-- A HTTP/1.1 Connector on port 8080 -->
