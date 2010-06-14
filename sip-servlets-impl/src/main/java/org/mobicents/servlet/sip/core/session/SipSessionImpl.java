@@ -1808,7 +1808,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		final long localCseq = cseq;		
 		final long remoteCseq =  ((CSeqHeader) request.getHeader(CSeqHeader.NAME)).getSeqNumber();
 		final String method = request.getMethod();
-		final boolean isAck = Request.ACK.equalsIgnoreCase(method);		
+		final boolean isAck = Request.ACK.equalsIgnoreCase(method);
+		final boolean isPrackCancel= Request.PRACK.equalsIgnoreCase(method) || Request.CANCEL.equalsIgnoreCase(method);
 		final boolean isAckRetranmission = isAckReceived() && isAck;			
 		
 		if(isAck) {
@@ -1824,7 +1825,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 			return false;
 		}		
 		if(localCseq > remoteCseq) {				
-			if(!isAck) {
+			if(!isAck && !isPrackCancel) {
 				logger.error("CSeq out of order for the following request " + sipServletRequest);
 				final SipServletResponse response = sipServletRequest.createResponse(Response.SERVER_INTERNAL_ERROR, "CSeq out of order");
 				try {
