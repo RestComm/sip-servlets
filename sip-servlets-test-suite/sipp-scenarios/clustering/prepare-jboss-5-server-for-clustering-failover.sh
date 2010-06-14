@@ -9,14 +9,15 @@
 rm -rf $JBOSS_HOME/server/port-1
 rm -rf $JBOSS_HOME/server/port-2
 
-mvn clean install  -f ../../../pom.xml -P jboss-5,jboss-5-cluster -Dnode=all
+mvn clean install -f ../../../pom.xml -P jboss-5,jboss-5-cluster -Dnode=all
 
-cp setup/jboss-5/mss-sip-stack-jboss.properties $JBOSS_HOME/server/all/conf/mss-sip-stack.properties
+cp setup/jboss-5/performance/mss-sip-stack-jboss.properties $JBOSS_HOME/server/all/conf/mss-sip-stack.properties
 cp setup/jboss-5/context-jboss-5.xml $JBOSS_HOME/server/all/deploy/jbossweb.sar/context.xml
 cp setup/jboss-5/jboss-beans.xml $JBOSS_HOME/server/all/deploy/jbossweb.sar/META-INF/jboss-beans.xml
 cp setup/jboss-5/metadata-deployer-jboss-beans.xml $JBOSS_HOME/server/all/deployers/metadata-deployer-jboss-beans.xml
 cp setup/jboss-5/war-deployers-jboss-beans.xml $JBOSS_HOME/server/all/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml
 cp setup/jboss-5/log4j.xml $JBOSS_HOME/server/all/conf/jboss-log4j.xml
+cp setup/jboss-5/jboss-cache-manager-jboss-beans.xml $JBOSS_HOME/server/all/deploy/cluster/jboss-cache-manager.sar/META-INF/jboss-cache-manager-jboss-beans.xml
 
 cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-1
 cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-2
@@ -45,6 +46,16 @@ if [ $# -ne 0 ]; then
 				cp ../../../sip-servlets-examples/call-forwarding-distributable/target/call-forwarding-distributable-*.war $JBOSS_HOME/server/port-2/deploy
 				cp ../../../sip-servlets-examples/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/port-1/conf/dars/distributable-dar.properties
 				cp ../../../sip-servlets-examples/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties
+	            ;;
+	    custom-b2bua)
+	            echo "Distributed example used is b2bua"
+	    		mvn clean install -o -f ../../../sip-servlets-examples/custom-call-forwarding-distributable/pom.xml
+				rm -rf $JBOSS_HOME/server/port-1/deploy/custom-call-forwarding-distributable-*.war
+				rm -rf $JBOSS_HOME/server/port-2/deploy/custom-call-forwarding-distributable-*.war
+				cp ../../../sip-servlets-examples/custom-call-forwarding-distributable/target/custom-call-forwarding-distributable-*.war $JBOSS_HOME/server/port-1/deploy
+				cp ../../../sip-servlets-examples/custom-call-forwarding-distributable/target/custom-call-forwarding-distributable-*.war $JBOSS_HOME/server/port-2/deploy
+				cp ../../../sip-servlets-examples/custom-call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/port-1/conf/dars/distributable-dar.properties
+				cp ../../../sip-servlets-examples/custom-call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties
 	            ;;
 	    c2c)
 	    		echo "Distributed example used is Click To call"
