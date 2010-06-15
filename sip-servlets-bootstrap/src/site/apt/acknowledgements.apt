@@ -37,5 +37,16 @@ Acknowledgements
 		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1015}Issue 1015}} and contributed a fix for it.		
 		
 		* contributed a fix for {{{http://code.google.com/p/mobicents/issues/detail?id=1010}Issue 1010}}.
+		
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1503}Issue 1503}} and contributed a fix for it.
 	
 	* Eric Cheung and Tom Smith from AT&T ECharts team for making sure E4SS is working continuously on Mobicents Sip Servlets and for their excellent bug reports.
+	
+	* Nick Semergey from {{{http://www.codeminders.com}Codeminders}} : 
+	
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1521}Issue 1521}} and contributed a fix for it
+	
+	* Miha Polak and Jernej Krmelj both from {{{http://www.iskratel.com}Iskratel Slovenia}} : 
+		
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1493}Issue 1493}} and help tremendously with heavy profiling, testing, insights and applying changes back and forth to help nailing it down
+	
