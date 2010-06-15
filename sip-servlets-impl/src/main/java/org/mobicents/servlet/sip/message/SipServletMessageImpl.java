@@ -1012,7 +1012,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		// See Issue 1294 http://code.google.com/p/mobicents/issues/detail?id=1294
 		// but it will not be persisted to avoid unecessary replication if the message is persisted
 		this.sipSession = session;
-		this.sessionKey = session.getKey();		
+        if (session != null){
+            this.sessionKey = session.getKey();
+        } else {
+            this.sessionKey = null;
+        }
 	}
 
 	/**

@@ -23,8 +23,10 @@ import java.util.concurrent.ExecutorService;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.sip.ObjectInUseException;
 import javax.sip.ServerTransaction;
 import javax.sip.SipProvider;
+import javax.sip.Transaction;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -40,6 +42,7 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
+import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.security.SipSecurityUtils;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -256,6 +259,26 @@ public abstract class MessageDispatcher {
 			}
 		} else {
 			logger.error("no handler found for sip session " + session.getKey() + " and request " + request);
+			// Issue 1493 : under some race condition the transaction might not be added to the sip session
+			// and in this particular condition no response will be generated back to the UA (we don't want to since this 
+			// can be a retransmission here) so the stack will hold the ref to the transaction, so terminating the transaction
+			// if it is present and cleaning up all related data
+            Transaction transaction = request.getTransaction();
+            if(transaction != null) {
+                TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
+                if(tad != null) {
+                    tad.cleanUp();
+                }
+                transaction.setApplicationData(null);
+
+                try {
+                    transaction.terminate();
+                } catch (ObjectInUseException e) {
+                    logger.error("transaction " + transaction.getBranchId() + " for request " + request + " couldn't be terminated");
+                }
+            }
+
+            request.setSipSession(null);
 		}
 	}
 	
