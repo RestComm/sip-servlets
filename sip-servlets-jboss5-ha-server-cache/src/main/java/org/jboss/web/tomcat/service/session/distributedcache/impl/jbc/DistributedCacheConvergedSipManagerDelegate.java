@@ -22,14 +22,18 @@
 package org.jboss.web.tomcat.service.session.distributedcache.impl.jbc;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.jboss.cache.Fqn;
 import org.jboss.cache.Node;
 import org.jboss.cache.pojo.impl.InternalConstant;
 import org.jboss.logging.Logger;
+import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipApplicationSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheConvergedSipManager;
@@ -144,6 +148,31 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 			return null;
 		}
 
+		if (log_.isDebugEnabled()) {
+			for(Entry<Object, Object> entry : sessionData.entrySet()) {
+				log_.debug("getSipSessionData(): fqn " + fqn + " key=" + entry.getKey() + ", value=" + entry.getValue());
+			}
+		}
+		
+		Map<Object, Object> sessionMetaData = jBossCacheService.cacheWrapper_.getData(Fqn.fromString(fqn.toString() + "/" + SIP_SERVLETS_METADATA_KEY), true);
+		Map<String, Object> sipSessionMetaData = new java.util.concurrent.ConcurrentHashMap<String, Object>();
+		if(sessionMetaData != null) {
+			for(Entry<Object, Object> entry : sessionMetaData.entrySet()) {
+				if (log_.isDebugEnabled()) {
+					log_.debug("getSipSessionData(): fqn " + Fqn.fromString(fqn.toString() + "/" + SIP_SERVLETS_METADATA_KEY) + " key=" + entry.getKey() + ", value=" + entry.getValue());
+				}
+				sipSessionMetaData.put((String)entry.getKey(), entry.getValue());
+			}
+		}
+		
+		Map<Object, Object> sessionAttributesData =
+			jBossCacheService.cacheWrapper_.getData(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), true);
+		if (sessionAttributesData != null && log_.isDebugEnabled()) {
+			for(Entry<Object, Object> entry : sessionAttributesData.entrySet()) {
+				log_.debug("getSipSessionData(): fqn " + Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY) + " key=" + entry.getKey() + ", value=" + entry.getValue());
+			}
+		}
+				
 		if (initialLoad) {
 			jBossCacheService.setupSessionRegion(fqn);
 		}
@@ -151,14 +180,13 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 		IncomingDistributableSessionData dsd = null;
 
 		try {
-			dsd = jBossCacheService.getDistributableSessionData(key, sessionData, true);
+			dsd = getDistributableSipSessionData(key, sessionData, sessionAttributesData);
 			// From Sip Session
-			DistributableSipSessionMetadata metaData = (DistributableSipSessionMetadata)dsd.getMetadata();
-			Map<String, Object> sipAppMetaData = (Map<String, Object>) sessionData.get(SIP_SERVLETS_METADATA_KEY);			
-			metaData.setMetaData(sipAppMetaData);
+			DistributableSipSessionMetadata metaData = (DistributableSipSessionMetadata)jBossCacheService.getUnMarshalledValue(dsd.getMetadata());
+			metaData.setMetaData(sipSessionMetaData);
 		} catch (Exception e) {
 			log_.warn("Problem accessing sip session data : " + e.getClass() + " "
-					+ e.getLocalizedMessage());
+					+ e);
 			// Clean up
 			removeSipSessionLocal(sipAppSessionKey, key);
 			return null;
@@ -191,7 +219,30 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 			// Requested session is no longer in the cache; return null
 			return null;
 		}
-
+		if (log_.isDebugEnabled()) {
+			for(Entry<Object, Object> entry : sessionData.entrySet()) {
+				log_.debug("getSipApplicationSessionData(): fqn " + fqn + " key=" + entry.getKey() + ", value=" + entry.getValue());
+			}
+		}
+		
+		Map<Object, Object> sessionMetaData = jBossCacheService.cacheWrapper_.getData(Fqn.fromString(fqn.toString() + "/" + SIP_SERVLETS_METADATA_KEY), true);
+		Map<String, Object> sipAppSessionMetaData = new HashMap<String, Object>();
+		if(sessionMetaData != null) {
+			for(Entry<Object, Object> entry : sessionMetaData.entrySet()) {
+				if (log_.isDebugEnabled()) {
+					log_.debug("getSipApplicationSessionData(): fqn " + Fqn.fromString(fqn.toString() + "/" + SIP_SERVLETS_METADATA_KEY) + " key=" + entry.getKey() + ", value=" + entry.getValue());
+				}
+				sipAppSessionMetaData.put((String)entry.getKey(), entry.getValue());
+			}
+		}
+		
+		Map<Object, Object> sessionAttributesData =
+				jBossCacheService.cacheWrapper_.getData(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), true);
+		if (sessionAttributesData != null && log_.isDebugEnabled()) {
+			for(Entry<Object, Object> entry : sessionAttributesData.entrySet()) {
+				log_.debug("getSipApplicationSessionData(): fqn " + Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY) + " key=" + entry.getKey() + ", value=" + entry.getValue());
+			}
+		}
 		if (initialLoad) {
 			jBossCacheService.setupSessionRegion(fqn);
 		}
@@ -199,20 +250,38 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 		IncomingDistributableSessionData dsd = null;
 
 		try {
-			dsd = jBossCacheService.getDistributableSessionData(key, sessionData, true);			
+			dsd = getDistributableSipSessionData(key, sessionData, sessionAttributesData);			
 			// From Sip Application Session
-			DistributableSipApplicationSessionMetadata metaData = (DistributableSipApplicationSessionMetadata)dsd.getMetadata();
-			Map<String, Object> sipAppMetaData = (Map<String, Object>) sessionData.get(SIP_SERVLETS_METADATA_KEY);			
-			metaData.setMetaData(sipAppMetaData);
+			DistributableSipApplicationSessionMetadata metaData = (DistributableSipApplicationSessionMetadata)jBossCacheService.getUnMarshalledValue(dsd.getMetadata());
+			metaData.setMetaData(sipAppSessionMetaData);
 		} catch (Exception e) {
 			log_.warn("Problem accessing sip application session data : " + e.getClass() + " "
-					+ e.getLocalizedMessage());
+					+ e);
 			// Clean up
 			removeSipApplicationSessionLocal(key);
 			return null;
 		}
 
 		return dsd;
+	}
+	
+	/**
+	 * Extracts the contents of <code>distributedCacheData</code>.
+	 * 
+	 * <strong>Note:</strong> This operation may alter the contents of the
+	 * passed in map. If this is unacceptable, pass in a defensive copy.
+	 */
+	protected IncomingDistributableSessionData getDistributableSipSessionData(
+			String realId, Map<Object, Object> distributedCacheData,
+			Map<Object, Object> attrs) {
+		Integer version = (Integer) distributedCacheData.get(AbstractJBossCacheService.VERSION_KEY.toString());
+		Long timestamp = (Long) distributedCacheData.get(AbstractJBossCacheService.TIMESTAMP_KEY.toString());
+		DistributableSessionMetadata metadata = (DistributableSessionMetadata) distributedCacheData
+				.get(AbstractJBossCacheService.METADATA_KEY.toString());
+		Map<String, Object> attributes = jBossCacheService.getSessionAttributes(realId, attrs);
+		
+		return new IncomingDistributableSessionDataImpl(version, timestamp,
+				metadata, attributes == null ? Collections.EMPTY_MAP : attributes);
 	}
 
 	public IncomingDistributableSessionData getSipApplicationSessionData(
@@ -436,22 +505,43 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 		Fqn<String> fqn = getSipApplicationSessionFqn(jBossCacheService.combinedPath_, fqnId);
 
 		Map<Object, Object> map = new HashMap<Object, Object>();
-		map.put(jBossCacheService.VERSION_KEY, Integer.valueOf(sipApplicationSessionData.getVersion()));
+		
+		storeSipApplicationSessionMetaData(fqn, sipApplicationSessionData);
+		((DistributedCacheConvergedSipManager)jBossCacheService).storeSipApplicationSessionAttributes(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), sipApplicationSessionData);
+	}
+
+	public  void storeSipApplicationSessionMetaData(
+			Fqn<String> fqn,
+			OutgoingDistributableSipApplicationSessionData sipApplicationSessionData) {
+		
+		jBossCacheService.cacheWrapper_.put(fqn, AbstractJBossCacheService.VERSION_KEY.toString(), sipApplicationSessionData.getVersion());
 
 		DistributableSipApplicationSessionMetadata dsm = (DistributableSipApplicationSessionMetadata)sipApplicationSessionData.getMetadata();
 		if (dsm != null && sipApplicationSessionData.isSessionMetaDataDirty()) {
-			map.put(jBossCacheService.METADATA_KEY, dsm);
-			map.put(SIP_SERVLETS_METADATA_KEY, dsm.getMetaData());
+			// no need to update it if it isn't new
+			if (log_.isDebugEnabled()) {
+				log_.debug("storeSipApplicationSessionMetaData(): isNew " + dsm.isNew());
+			}
+			if(dsm.isNew()) {
+				jBossCacheService.cacheWrapper_.put(fqn, AbstractJBossCacheService.METADATA_KEY.toString(), dsm);
+			}
+			if(dsm.getMetaData() != null) {				
+				for(Entry<String, Object> entry : dsm.getMetaData().entrySet()) {
+					if (log_.isDebugEnabled()) {
+						log_.debug("storeSipApplicationSessionMetaData(): metadata to replicate key = " + entry.getKey() + " value = "  + entry.getValue());
+					}
+					jBossCacheService.cacheWrapper_.put(Fqn.fromString(fqn.toString() + "/" + SIP_SERVLETS_METADATA_KEY ), entry.getKey(), entry.getValue());
+				}			
+			}			
 		}
 
 		Long timestamp = sipApplicationSessionData.getTimestamp();
 		if (timestamp != null) {
-			map.put(jBossCacheService.TIMESTAMP_KEY, timestamp);
+			if (log_.isDebugEnabled()) {
+				log_.debug("storeSipApplicationSessionMetaData(): storing timestamp " + timestamp);
+			}
+			jBossCacheService.cacheWrapper_.put(fqn, AbstractJBossCacheService.TIMESTAMP_KEY.toString(), timestamp.longValue());
 		}
-
-		((DistributedCacheConvergedSipManager)jBossCacheService).storeSipApplicationSessionAttributes(map, sipApplicationSessionData);
-
-		jBossCacheService.cacheWrapper_.put(fqn, map);
 	}
 
 	public void storeSipSessionData(
@@ -460,26 +550,43 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 		String sessionKey = sipSessionData.getSipSessionKey();
 
 		if (log_.isDebugEnabled()) {
-			log_.debug("putSipSession(): putting sip session " + sessionKey.toString());
+			log_.debug("storeSipSessionData(): putting sip session " + sessionKey.toString());
 		}
 
 		Fqn<String> fqn = getSipSessionFqn(jBossCacheService.combinedPath_, sipApplicationSessionKey, sessionKey);
 
-		Map<Object, Object> map = new HashMap<Object, Object>();
-		map.put(jBossCacheService.VERSION_KEY, sipSessionData.getVersion());
+		storeSipSessionMetaData(fqn, sipSessionData);
+		((DistributedCacheConvergedSipManager)jBossCacheService).storeSipSessionAttributes(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), sipSessionData);
+	}
+
+	public void storeSipSessionMetaData(Fqn<String> fqn, OutgoingDistributableSipSessionData sipSessionData) {
+		jBossCacheService.cacheWrapper_.put(fqn, AbstractJBossCacheService.VERSION_KEY.toString(), sipSessionData.getVersion());
 
 		DistributableSipSessionMetadata dsm = (DistributableSipSessionMetadata)sipSessionData.getMetadata();
-		if (dsm != null && sipSessionData.isSessionMetaDataDirty()) {			
-			map.put(jBossCacheService.METADATA_KEY, dsm);
-			map.put(SIP_SERVLETS_METADATA_KEY, dsm.getMetaData());
+		if (dsm != null && sipSessionData.isSessionMetaDataDirty()) {
+			// no need to update it if it isn't new
+			if (log_.isDebugEnabled()) {
+				log_.debug("storeSipSessionMetaData(): isNew " + dsm.isNew());
+			}
+			if(dsm.isNew()) {
+				jBossCacheService.cacheWrapper_.put(fqn, AbstractJBossCacheService.METADATA_KEY.toString(), dsm);
+			}
+			if(dsm.getMetaData() != null) {				
+				for(Entry<String, Object> entry : dsm.getMetaData().entrySet()) {
+					if (log_.isDebugEnabled()) {
+						log_.debug("storeSipSessionMetaData(): metadata to replicate key = " + entry.getKey() + " value = "  + entry.getValue());
+					}
+					jBossCacheService.cacheWrapper_.put(Fqn.fromString(fqn.toString() + "/" + SIP_SERVLETS_METADATA_KEY ), entry.getKey(), entry.getValue());
+				}			
+			}
 		}
 
 		Long timestamp = sipSessionData.getTimestamp();
 		if (timestamp != null) {
-			map.put(jBossCacheService.TIMESTAMP_KEY, timestamp);
-		}		
-		((DistributedCacheConvergedSipManager)jBossCacheService).storeSipSessionAttributes(map, sipSessionData);
-
-		jBossCacheService.cacheWrapper_.put(fqn, map);
+			if (log_.isDebugEnabled()) {
+				log_.debug("storeSipSessionMetaData(): storing timestamp " + timestamp);
+			}
+			jBossCacheService.cacheWrapper_.put(fqn, AbstractJBossCacheService.TIMESTAMP_KEY.toString(), timestamp.longValue());
+		}
 	} 
 }

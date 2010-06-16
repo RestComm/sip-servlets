@@ -21,10 +21,12 @@
  */
 package org.jboss.web.tomcat.service.session.distributedcache.impl.jbc;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
 import org.jboss.cache.Cache;
+import org.jboss.cache.Fqn;
 import org.jboss.metadata.web.jboss.ReplicationGranularity;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.ClusteringNotSupportedException;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheConvergedSipManager;
@@ -158,25 +160,27 @@ public class SessionBasedJBossCacheConvergedSipService extends
 				.storeSipSessionData((OutgoingDistributableSipSessionData) sipSessionData);
 	}
 
-	public void storeSipApplicationSessionAttributes(
-			Map<Object, Object> dataMap,
+	public void storeSipApplicationSessionAttributes(Fqn<String> fqn,
 			OutgoingSessionGranularitySessionData sessionData) {
-		if (sessionData.getSessionAttributes() != null && log_.isDebugEnabled()) {
-			log_
+		if(sessionData.getSessionAttributes() != null) {
+			if (log_.isDebugEnabled()) {
+				log_
 					.debug("storeSipApplicationSessionAttributes(): putting sip app session attributes "
 							+ sessionData.getSessionAttributes());
+			}
+			cacheWrapper_.put(fqn, ATTRIBUTE_KEY.toString(), getMarshalledValue(sessionData.getSessionAttributes()));
 		}
-		this.storeSessionAttributes(dataMap, sessionData);
 	}
 
-	public void storeSipSessionAttributes(Map<Object, Object> dataMap,
+	public void storeSipSessionAttributes(Fqn<String> fqn,
 			OutgoingSessionGranularitySessionData sessionData) {
-		if (sessionData.getSessionAttributes() != null && log_.isDebugEnabled()) {
-			log_
-					.debug("storeSipSessionAttributes(): putting sip session attributes "
-							+ sessionData.getSessionAttributes());
+		if(sessionData.getSessionAttributes() != null) {
+			if (log_.isDebugEnabled()) {
+				log_.debug("storeSipSessionAttributes(): putting sip session attributes "
+								+ sessionData.getSessionAttributes());
+			}
+			cacheWrapper_.put(fqn, ATTRIBUTE_KEY.toString(), getMarshalledValue(sessionData.getSessionAttributes()));
 		}
-		this.storeSessionAttributes(dataMap, sessionData);
 	}
 
 	public void sipApplicationSessionCreated(String key) {
@@ -284,5 +288,15 @@ public class SessionBasedJBossCacheConvergedSipService extends
 
 	public void setApplicationNameHashed(String applicationNameHashed) {
 		delegate.setApplicationNameHashed(applicationNameHashed);
+	}
+	
+	@Override
+	protected Map<String, Object> getSessionAttributes(String realId,
+			Map<Object, Object> distributedCacheData) {
+		Map<String, Object> result = null;
+		if(distributedCacheData != null) {
+			result = (Map<String, Object>) getUnMarshalledValue(distributedCacheData.get(ATTRIBUTE_KEY.toString()));
+		}
+	    return result == null ? Collections.EMPTY_MAP : result;
 	}
 }

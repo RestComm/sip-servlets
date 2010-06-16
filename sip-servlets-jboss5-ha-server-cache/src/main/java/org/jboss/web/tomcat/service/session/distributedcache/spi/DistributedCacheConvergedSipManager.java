@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jboss.cache.Cache;
+import org.jboss.cache.Fqn;
 
 /**
  * @author jean.deruelle@gmail.com
@@ -95,7 +96,7 @@ public interface DistributedCacheConvergedSipManager<T extends OutgoingDistribut
 	 * @param session
 	 *            the sip session
 	 */
-	void storeSipSessionAttributes(Map<Object, Object> map, T sipSessionData);
+	void storeSipSessionAttributes(Fqn<String> fqn, T sipSessionData);
 
 	/**
 	 * Store or update a sip application session in the distributed cache.
@@ -103,7 +104,7 @@ public interface DistributedCacheConvergedSipManager<T extends OutgoingDistribut
 	 * @param session
 	 *            the sip application session
 	 */
-	void storeSipApplicationSessionAttributes(Map<Object, Object> map,
+	void storeSipApplicationSessionAttributes(Fqn<String> fqn, 
 			T sipApplicationSessionData);
 
 	/**
@@ -485,5 +486,5 @@ public interface DistributedCacheConvergedSipManager<T extends OutgoingDistribut
 
 	void setApplicationName(String applicationName);
 
-	void setApplicationNameHashed(String applicationNameHashed);	
+	void setApplicationNameHashed(String applicationNameHashed);
 }

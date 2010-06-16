@@ -68,9 +68,9 @@ public interface ClusteredSipManager<O extends OutgoingDistributableSessionData>
 	 */
 	public void removeLocal(SipApplicationSession session);
 
-	boolean storeSipSession(SipSession session);
+	boolean storeSipSession(ClusteredSipSession<? extends OutgoingDistributableSessionData> session);
 
-	boolean storeSipApplicationSession(SipApplicationSession session);
+	boolean storeSipApplicationSession(ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session);
 	
 	SnapshotSipManager getSnapshotSipManager();
 

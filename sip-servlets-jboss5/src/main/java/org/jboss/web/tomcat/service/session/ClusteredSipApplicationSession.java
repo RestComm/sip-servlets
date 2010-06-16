@@ -226,7 +226,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	 * so we can store it in JBoss Cache w/o concern that a transaction rollback
 	 * will revert the cached ref to an older object.
 	 */
-	private volatile transient DistributableSipApplicationSessionMetadata metadata = new DistributableSipApplicationSessionMetadata();
+	private volatile transient DistributableSipApplicationSessionMetadata metadata;
 
 	/**
 	 * The last version that was passed to {@link #setDistributedVersion} or
@@ -301,10 +301,13 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 			this.invalidationPolicy = this.manager.getReplicationTrigger();
 		}	
 		this.useJK = useJK;
+		this.isNew = true;
 		this.firstAccess = true;
 		accessCount = ACTIVITY_CHECK ? new AtomicInteger() : null;
 		// it starts with true so that it gets replicated when first created
 		sessionMetadataDirty = true;
+		metadata = new DistributableSipApplicationSessionMetadata();
+		metadata.setNew(isNew);
 //		checkAlwaysReplicateMetadata();
 	}
 
@@ -598,13 +601,9 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	}
 
 	public boolean getMustReplicateTimestamp() {
-		// If the access times are the same, access() was never called
-		// on the session
-		boolean touched = this.thisAccessedTime != this.lastAccessedTime;
-		boolean exceeds = alwaysReplicateTimestamp && touched;
+		boolean exceeds = alwaysReplicateTimestamp;
 
-		if (!exceeds && touched && maxUnreplicatedInterval > 0) // -1 means
-																// ignore
+		if (!exceeds && maxUnreplicatedInterval > 0) // -1 means ignore
 		{
 			long unrepl = System.currentTimeMillis() - lastReplicated;
 			exceeds = (unrepl >= maxUnreplicatedInterval);
@@ -755,12 +754,14 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		}
 		version.incrementAndGet();
 
-		O outgoingData = getOutgoingSipApplicationSessionData();
+		O outgoingData = getOutgoingSipApplicationSessionData();		
 		distributedCacheManager.storeSipApplicationSessionData(outgoingData);
 
 		sessionAttributesDirty = false;
 		sessionMetadataDirty = false;
-
+		isNew = false;
+		metadata.setNew(isNew);		
+		
 		lastReplicated = System.currentTimeMillis();
 	}
 

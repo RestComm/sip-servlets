@@ -170,7 +170,7 @@ public class FaultTolerantTimerServiceImpl implements SipServletTimerService {
 	public FaultTolerantScheduler getScheduler() {
 		if(scheduledExecutor == null) {
 			TimerTaskFactory timerTaskFactory = new TimerServiceTaskFactory(this.sipManager);
-			scheduledExecutor = new FaultTolerantScheduler(NAME + ((SipContext)sipManager.getContainer()).getApplicationNameHashed(), SCHEDULER_THREAD_POOL_DEFAULT_SIZE, this.sipManager.getMobicentsCluster(), (byte) 1, null, timerTaskFactory);
+			scheduledExecutor = new FaultTolerantScheduler(NAME + ((SipContext)sipManager.getContainer()).getApplicationNameHashed(), SCHEDULER_THREAD_POOL_DEFAULT_SIZE, this.sipManager.getMobicentsCluster(), (byte) 1, this.sipManager.getMobicentsCluster().getMobicentsCache().getJBossCache().getConfiguration().getRuntimeConfig().getTransactionManager(), timerTaskFactory);
 		}
 		return scheduledExecutor;
 	}

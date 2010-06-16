@@ -179,10 +179,9 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 	}
 
 	public void storeSipApplicationSessionAttributes(
-			Map<Object, Object> dataMap,
+			Fqn<String> fqn, 
 			OutgoingAttributeGranularitySessionData sessionData) {
-		Fqn<String> fqn = null;
-		Map<String, Object> map = sessionData.getModifiedSessionAttributes();
+		Map<String, Object> map = sessionData.getModifiedSessionAttributes();		
 		if (map != null) {
 			// Duplicate the map with marshalled values
 			Map<Object, Object> marshalled = new HashMap<Object, Object>(map
@@ -191,28 +190,19 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 				marshalled.put(entry.getKey(), getMarshalledValue(entry
 						.getValue()));
 			}
-			fqn = delegate.getSipApplicationSessionFqn(combinedPath_,
-					((OutgoingDistributableSipSessionData) sessionData)
-							.getSipApplicationSessionKey());
 			cacheWrapper_.put(fqn, marshalled);
 		}
 
 		Set<String> removed = sessionData.getRemovedSessionAttributes();
 		if (removed != null) {
-			if (fqn == null) {
-				fqn = delegate.getSipApplicationSessionFqn(combinedPath_,
-						((OutgoingDistributableSipSessionData) sessionData)
-								.getSipApplicationSessionKey());
-			}
 			for (String key : removed) {
 				cacheWrapper_.remove(fqn, key);
 			}
 		}
 	}
 
-	public void storeSipSessionAttributes(Map<Object, Object> dataMap,
+	public void storeSipSessionAttributes(Fqn<String> fqn,
 			OutgoingAttributeGranularitySessionData sessionData) {
-		Fqn<String> fqn = null;
 		Map<String, Object> map = sessionData.getModifiedSessionAttributes();
 		if (map != null) {
 			// Duplicate the map with marshalled values
@@ -222,24 +212,11 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 				marshalled.put(entry.getKey(), getMarshalledValue(entry
 						.getValue()));
 			}
-
-			fqn = delegate.getSipSessionFqn(combinedPath_,
-					((OutgoingDistributableSipSessionData) sessionData)
-							.getSipApplicationSessionKey().toString(),
-					((OutgoingDistributableSipSessionData) sessionData)
-							.getSipSessionKey().toString());
 			cacheWrapper_.put(fqn, marshalled);
 		}
 
 		Set<String> removed = sessionData.getRemovedSessionAttributes();
 		if (removed != null) {
-			if (fqn == null) {
-				fqn = delegate.getSipSessionFqn(combinedPath_,
-						((OutgoingDistributableSipSessionData) sessionData)
-								.getSipApplicationSessionKey().toString(),
-						((OutgoingDistributableSipSessionData) sessionData)
-								.getSipSessionKey().toString());
-			}
 			for (String key : removed) {
 				cacheWrapper_.remove(fqn, key);
 			}
@@ -254,7 +231,7 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 			String sipApplicationSessionKey, String key) {
 		Fqn<String> fqn = delegate.getSipApplicationSessionFqn(combinedPath_,
 				sipApplicationSessionKey);
-		return getUnMarshalledValue(cacheWrapper_.get(fqn, key));
+		return getUnMarshalledValue(cacheWrapper_.get(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), key));
 	}
 
 	public Set<String> getSipApplicationSessionAttributeKeys(
@@ -263,7 +240,7 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 		Fqn<String> fqn = delegate.getSipApplicationSessionFqn(combinedPath_,
 				sipApplicationSessionKey);
 		try {
-			Node<Object, Object> node = getCache().getRoot().getChild(fqn);
+			Node<Object, Object> node = getCache().getRoot().getChild(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY));
 			if (node != null) {
 				keys = node.getKeys();
 				keys.removeAll(INTERNAL_KEYS);
@@ -288,7 +265,7 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 		Fqn<String> fqn = delegate.getSipApplicationSessionFqn(combinedPath_,
 				sipApplicationSessionKey);
 
-		Node<Object, Object> node = getCache().getRoot().getChild(fqn);
+		Node<Object, Object> node = getCache().getRoot().getChild(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY));
 		Map<Object, Object> rawData = node.getData();
 
 		return getSessionAttributes(rawData);
@@ -318,7 +295,7 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 			String key, Object value) {
 		Fqn<String> fqn = delegate.getSipApplicationSessionFqn(combinedPath_,
 				sipApplicationSessionKey);
-		cacheWrapper_.put(fqn, key, getMarshalledValue(value));
+		cacheWrapper_.put(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), key, getMarshalledValue(value));
 	}
 
 	public void putSipApplicationSessionAttribute(String sipApplicationSessionKey,
@@ -332,7 +309,7 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 
 		Fqn<String> fqn = delegate.getSipApplicationSessionFqn(combinedPath_,
 				sipApplicationSessionKey);
-		cacheWrapper_.put(fqn, marshalled);
+		cacheWrapper_.put(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), marshalled);
 	}
 
 	public Object removeSipApplicationSessionAttribute(
@@ -340,10 +317,10 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 		Fqn<String> fqn = delegate.getSipApplicationSessionFqn(combinedPath_,
 				sipApplicationSessionKey);
 		if (log_.isTraceEnabled()) {
-			log_.trace("Remove attribute from distributed store. Fqn: " + fqn
+			log_.trace("Remove attribute from distributed store. Fqn: " + Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY)
 					+ " key: " + key);
 		}
-		return getUnMarshalledValue(cacheWrapper_.remove(fqn, key));
+		return getUnMarshalledValue(cacheWrapper_.remove(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), key));
 	}
 
 	public void removeSipApplicationSessionAttributeLocal(
@@ -351,10 +328,10 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 		Fqn<String> fqn = delegate.getSipApplicationSessionFqn(combinedPath_,
 				sipApplicationSessionKey);
 		if (log_.isTraceEnabled()) {
-			log_.trace("Remove attribute from distributed store. Fqn: " + fqn
+			log_.trace("Remove attribute from distributed store. Fqn: " + Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY)
 					+ " key: " + key);
 		}
-		cacheWrapper_.removeLocal(fqn, key);
+		cacheWrapper_.removeLocal(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), key);
 	}
 
 	public void removeSipApplicationSession(String sipApplicationSessionKey) {
@@ -372,7 +349,7 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 			String sipSessionKey, String key) {
 		Fqn<String> fqn = delegate.getSipSessionFqn(combinedPath_,
 				sipApplicationSessionKey, sipSessionKey);
-		return getUnMarshalledValue(cacheWrapper_.get(fqn, key));
+		return getUnMarshalledValue(cacheWrapper_.get(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), key));
 	}
 
 	public Set<String> getSipSessionAttributeKeys(
@@ -382,7 +359,7 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 		Fqn<String> fqn = delegate.getSipSessionFqn(combinedPath_,
 				sipApplicationSessionKey, sipSessionKey);
 		try {
-			Node<Object, Object> node = getCache().getRoot().getChild(fqn);
+			Node<Object, Object> node = getCache().getRoot().getChild(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY));
 			if (node != null) {
 				keys = node.getKeys();
 				keys.removeAll(INTERNAL_KEYS);
@@ -408,7 +385,7 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 		Fqn<String> fqn = delegate.getSipSessionFqn(combinedPath_,
 				sipApplicationSessionKey, sipSessionKey);
 
-		Node<Object, Object> node = getCache().getRoot().getChild(fqn);
+		Node<Object, Object> node = getCache().getRoot().getChild(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY));
 		Map<Object, Object> rawData = node.getData();
 
 		return getSessionAttributes(rawData);
@@ -418,7 +395,7 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 			String sipSessionKey, String key, Object value) {
 		Fqn<String> fqn = delegate.getSipSessionFqn(combinedPath_,
 				sipApplicationSessionKey, sipSessionKey);
-		cacheWrapper_.put(fqn, key, getMarshalledValue(value));
+		cacheWrapper_.put(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), key, getMarshalledValue(value));
 	}
 
 	public void putSipSessionAttribute(String sipApplicationSessionKey,
@@ -432,7 +409,7 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 
 		Fqn<String> fqn = delegate.getSipSessionFqn(combinedPath_,
 				sipApplicationSessionKey, sipSessionKey);
-		cacheWrapper_.put(fqn, marshalled);
+		cacheWrapper_.put(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), marshalled);
 	}
 
 	public Object removeSipSessionAttribute(
@@ -441,10 +418,10 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 		Fqn<String> fqn = delegate.getSipSessionFqn(combinedPath_,
 				sipApplicationSessionKey, sipSessionKey);
 		if (log_.isTraceEnabled()) {
-			log_.trace("Remove attribute from distributed store. Fqn: " + fqn
+			log_.trace("Remove attribute from distributed store. Fqn: " + Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY)
 					+ " key: " + key);
 		}
-		return getUnMarshalledValue(cacheWrapper_.remove(fqn, key));
+		return getUnMarshalledValue(cacheWrapper_.remove(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), key));
 	}
 
 	public void removeSipSessionAttributeLocal(
@@ -453,10 +430,10 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 		Fqn<String> fqn = delegate.getSipSessionFqn(combinedPath_,
 				sipApplicationSessionKey, sipSessionKey);
 		if (log_.isTraceEnabled()) {
-			log_.trace("Remove attribute from distributed store. Fqn: " + fqn
+			log_.trace("Remove attribute from distributed store. Fqn: " + Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY)
 					+ " key: " + key);
 		}
-		cacheWrapper_.removeLocal(fqn, key);
+		cacheWrapper_.removeLocal(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), key);
 	}
 
 	public void setApplicationName(String applicationName) {

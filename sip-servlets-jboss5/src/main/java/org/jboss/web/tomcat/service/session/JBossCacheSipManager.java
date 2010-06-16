@@ -1550,10 +1550,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
    }
    
    
-	public boolean storeSipSession(SipSession baseSession) {
+	public boolean storeSipSession(ClusteredSipSession session) {
 		boolean stored = false;
-		if (baseSession != null && started_) {
-			ClusteredSipSession<? extends OutgoingDistributableSessionData> session = uncheckedCastSipSession(baseSession);
+		if (session != null && started_) {			
 
 			synchronized (session) {
 				if (logger.isDebugEnabled()) {
@@ -1564,10 +1563,10 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 				if (session.isValidInternal()
 						&& (session.isSessionDirty() || session
 								.getMustReplicateTimestamp()) && State.CONFIRMED.equals(session.getState())) {
-					if(logger.isInfoEnabled()) {
-						logger.info("replicating following sip session " + session.getId());
-					}
-					String realId = session.getId();
+					final String realId = session.getId();
+					if(logger.isDebugEnabled()) {
+						logger.debug("replicating following sip session " + session.getId());
+					}					
 
 					// Notify all session attributes that they get serialized
 					// (SRV 7.7.2)
@@ -1589,11 +1588,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		return stored;
 	}
 	
-	public boolean storeSipApplicationSession(SipApplicationSession baseSession) {
+	public boolean storeSipApplicationSession(ClusteredSipApplicationSession session) {
 		boolean stored = false;
-		if (baseSession != null && started_) {
-			ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session = uncheckedCastSipApplicationSession(baseSession);			
-
+		if (session != null && started_) {					
 			synchronized (session) {
 				if (logger.isDebugEnabled()) {
 					log_.debug("check to see if needs to store and replicate "
@@ -1603,10 +1600,10 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 				if (session.isValidInternal()
 						&& (session.isSessionDirty() || session
 								.getMustReplicateTimestamp())) {
-					if(logger.isInfoEnabled()) {
-						logger.info("replicating following sip application session " + session.getId());
+					final String realId = session.getId();
+					if(logger.isDebugEnabled()) {
+						logger.debug("replicating following sip application session " + session.getId());
 					}
-					String realId = session.getId();
 
 					// Notify all session attributes that they get serialized
 					// (SRV 7.7.2)

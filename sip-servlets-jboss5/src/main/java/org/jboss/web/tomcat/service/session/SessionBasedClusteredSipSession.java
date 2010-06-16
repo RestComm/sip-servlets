@@ -73,7 +73,7 @@ public class SessionBasedClusteredSipSession extends
 	@Override
 	protected OutgoingSessionGranularitySessionData getOutgoingSipSessionData() {
 		Map<String, Object> attrs = isSessionAttributeMapDirty() ? getSessionAttributeMap() : null;
-		DistributableSipSessionMetadata metadata = (DistributableSipSessionMetadata) getSessionMetadata();
+		DistributableSipSessionMetadata metadata = isSessionMetadataDirty() ? (DistributableSipSessionMetadata) getSessionMetadata() : null;
 		Long timestamp = attrs != null || metadata != null
 				|| getMustReplicateTimestamp() ? Long
 				.valueOf(getSessionTimestamp()) : null;

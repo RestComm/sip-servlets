@@ -173,14 +173,14 @@ public void removeSipApplicationSessionLocal(String key,
 	}
 
 	public void storeSipApplicationSessionAttributes(
-			Map<Object, Object> dataMap,
+			Fqn<String> fqn,
 			OutgoingDistributableSessionData sessionData) {
-		this.storeSessionAttributes(dataMap, sessionData);
+		// no-op; attributes are stored individually    
 	}
 
-	public void storeSipSessionAttributes(Map<Object, Object> dataMap,
+	public void storeSipSessionAttributes(Fqn<String> fqn,
 			OutgoingDistributableSessionData sessionData) {
-		this.storeSessionAttributes(dataMap, sessionData);
+		// no-op; attributes are stored individually    
 	}
 
 	public void sipApplicationSessionCreated(String key) {

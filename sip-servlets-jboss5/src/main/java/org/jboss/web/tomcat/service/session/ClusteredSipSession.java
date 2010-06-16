@@ -57,7 +57,6 @@ import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
 import org.jboss.metadata.web.jboss.ReplicationTrigger;
-import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheConvergedSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheManager;
@@ -245,7 +244,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	 * so we can store it in JBoss Cache w/o concern that a transaction rollback
 	 * will revert the cached ref to an older object.
 	 */
-	private volatile transient DistributableSipSessionMetadata metadata = new DistributableSipSessionMetadata();
+	private volatile transient DistributableSipSessionMetadata metadata;
 
 	/**
 	 * The last version that was passed to {@link #setDistributedVersion} or
@@ -326,11 +325,17 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			setManager((ClusteredSipManager)mobicentsSipApplicationSession.getSipContext().getSipManager());
 			this.invalidationPolicy = this.manager.getReplicationTrigger();
 		}		
+		this.isNew = true;
 		this.useJK = useJK;
 		this.firstAccess = true;
 		accessCount = ACTIVITY_CHECK ? new AtomicInteger() : null;
 		// it starts with true so that it gets replicated when first created
-		sessionMetadataDirty = true;		
+		sessionMetadataDirty = true;
+		metadata = new DistributableSipSessionMetadata();
+		this.metadata.setCreationTime(creationTime);
+		this.metadata.setNew(isNew);
+		this.metadata.setMaxInactiveInterval(maxInactiveInterval);	
+		
 //		checkAlwaysReplicateMetadata();
 	}
 
@@ -397,9 +402,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 
 		// JBAS-3528. If it's not the first access, make sure
 		// the 'new' flag is correct
-		if (!firstAccess && isNew) {
-			setNew(false);
-		}
+//		if (!firstAccess && isNew) {
+//			setNew(false);
+//		}
 	}		
 
 	public void setNew(boolean isNew) {
@@ -737,13 +742,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	}
 
 	public boolean getMustReplicateTimestamp() {
-		// If the access times are the same, access() was never called
-		// on the session
-		boolean touched = this.thisAccessedTime != this.lastAccessedTime;
-		boolean exceeds = alwaysReplicateTimestamp && touched;
+		boolean exceeds = alwaysReplicateTimestamp;
 
-		if (!exceeds && touched && maxUnreplicatedInterval > 0) // -1 means
-																// ignore
+		if (!exceeds && maxUnreplicatedInterval > 0) // -1 means ignore
 		{
 			long unrepl = System.currentTimeMillis() - lastReplicated;
 			exceeds = (unrepl >= maxUnreplicatedInterval);
@@ -761,9 +762,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		return sessionMetadataDirty;
 	}
 
-	protected DistributableSessionMetadata getSessionMetadata() {		
-		this.metadata.setCreationTime(creationTime);
-		this.metadata.setMaxInactiveInterval(maxInactiveInterval);			
+	protected DistributableSipSessionMetadata getSessionMetadata() {						
 		
 		return this.metadata;
 	}
@@ -917,32 +916,36 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		version.incrementAndGet();
 
 		O outgoingData = getOutgoingSipSessionData();
-		Map<String, Object> metaData = ((DistributableSipSessionMetadata)outgoingData.getMetadata()).getMetaData();
-		if(proxy != null) {											
-			metaData.put(PROXY, proxy);
-		}
-		
-		if(b2buaHelper != null) {
-			final Map<SipSessionKey, SipSessionKey> sessionMap = b2buaHelper.getSessionMap();
-			final int size = sessionMap.size();
-			final String[][] sessionArray = new String[2][size];
-			int i = 0;
-			for (Entry<SipSessionKey, SipSessionKey> entry : sessionMap.entrySet()) {
-				sessionArray [0][i] = entry.getKey().toString(); 
-				sessionArray [1][i] = entry.getValue().toString();
-				i++;
+		if(sessionMetadataDirty) {
+			Map<String, Object> metaData = ((DistributableSipSessionMetadata)outgoingData.getMetadata()).getMetaData();
+			if(proxy != null) {											
+				metaData.put(PROXY, proxy);
 			}
-			metaData.put(B2B_SESSION_SIZE, size);
-			if(logger.isDebugEnabled()) {
-				logger.debug("storing b2bua session array " + sessionArray);
-			}
-			metaData.put(B2B_SESSION_MAP, sessionArray);
+			
+			if(b2buaHelper != null) {
+				final Map<SipSessionKey, SipSessionKey> sessionMap = b2buaHelper.getSessionMap();
+				final int size = sessionMap.size();
+				final String[][] sessionArray = new String[2][size];
+				int i = 0;
+				for (Entry<SipSessionKey, SipSessionKey> entry : sessionMap.entrySet()) {
+					sessionArray [0][i] = entry.getKey().toString(); 
+					sessionArray [1][i] = entry.getValue().toString();
+					i++;
+				}
+				metaData.put(B2B_SESSION_SIZE, size);
+				if(logger.isDebugEnabled()) {
+					logger.debug("storing b2bua session array " + sessionArray);
+				}
+				metaData.put(B2B_SESSION_MAP, sessionArray);
+			}			
 		}
 		distributedCacheManager.storeSipSessionData(outgoingData);
-
+		
 		sessionAttributesDirty = false;
 		sessionMetadataDirty = false;
-
+		isNew = false;
+		metadata.setNew(isNew);
+		metadata.getMetaData().clear();
 		lastReplicated = System.currentTimeMillis();
 	}
 
@@ -1092,7 +1095,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		// Notify interested session event listeners
 //		fireSessionEvent(Session.SESSION_PASSIVATED_EVENT, null);
 
-		if (hasActivationListener != Boolean.FALSE) {
+		if (hasActivationListener != null && hasActivationListener != Boolean.FALSE) {
 			boolean hasListener = false;
 
 			// Notify ActivationListeners
@@ -1474,7 +1477,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 
 	private void sessionMetadataDirty() {
 //		if (!sessionMetadataDirty && !isNew && log.isTraceEnabled())
+		if(log.isDebugEnabled()) {
 			log.debug("Marking session metadata dirty " + key);
+		}
 		sessionMetadataDirty = true;
 		ConvergedSessionReplicationContext.bindSipSession(this, manager.getSnapshotSipManager());
 	}	
@@ -1521,9 +1526,12 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	
 	@Override
 	public void setCseq(long cseq) {
+		long oldCSeq = getCseq();
 		super.setCseq(cseq);
-		sessionMetadataDirty();
-		metadata.getMetaData().put(CSEQ, cseq);
+		if(oldCSeq != cseq) {
+			sessionMetadataDirty();
+			metadata.getMetaData().put(CSEQ, cseq);
+		}
 	}
 	
 	@Override
@@ -1542,9 +1550,12 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 
 	@Override
 	protected void setReadyToInvalidate(boolean readyToInvalidate) {
+		boolean oldReadyToInvalidate = this.readyToInvalidate;
 		super.setReadyToInvalidate(readyToInvalidate);
-		sessionMetadataDirty();
-		metadata.getMetaData().put(READY_TO_INVALIDATE, readyToInvalidate);
+		if(oldReadyToInvalidate != readyToInvalidate) {
+			sessionMetadataDirty();
+			metadata.getMetaData().put(READY_TO_INVALIDATE, readyToInvalidate);
+		}
 	}
 	
 	@Override
@@ -1555,11 +1566,26 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	}
 	
 	@Override
-	public void setSessionCreatingDialog(Dialog dialog) {
+	public void setSessionCreatingDialog(Dialog dialog) {						
+		if(log.isDebugEnabled()) {			
+			if(super.sessionCreatingDialog != null) {
+				log.debug(" oldDialogId " + sessionCreatingDialogId);
+			}
+		}
 		super.setSessionCreatingDialog(dialog);
-		if(dialog != null && dialog.getDialogId() != null) {
+		if(log.isDebugEnabled()) {
+			log.debug(" dialog " + dialog);
+			if(dialog != null) {
+				log.debug(" dialogId " + dialog.getDialogId());
+			}			
+		}
+		if(dialog != null && dialog.getDialogId() != null && !dialog.getDialogId().equals(sessionCreatingDialogId)) {			
+			if(dialog != null) {
+				log.debug("DialogId set to " + dialog.getDialogId());
+			}
 			sessionMetadataDirty();
 			metadata.getMetaData().put(DIALOG_ID, dialog.getDialogId() );
+			sessionCreatingDialogId = dialog.getDialogId();
 		}
 	}
 	
