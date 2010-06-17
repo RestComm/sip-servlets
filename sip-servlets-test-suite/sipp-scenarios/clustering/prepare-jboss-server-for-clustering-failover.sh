@@ -36,6 +36,14 @@ if [ $# -ne 0 ]; then
 				cp ../../../sip-servlets-examples/call-forwarding-distributable/target/call-forwarding-distributable-*.war $JBOSS_HOME/server/all/deploy
 				cp ../../../sip-servlets-examples/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/all/conf/dars/distributable-dar.properties
 	            ;;
+	    custom-b2bua)
+	            echo "Distributed example used is b2bua"
+	    		mvn clean install -f ../../../sip-servlets-examples/custom-call-forwarding-distributable/pom.xml
+				rm -rf $JBOSS_HOME/server/port-1/deploy/custom-call-forwarding-distributable-*.war
+				rm -rf $JBOSS_HOME/server/port-2/deploy/custom-call-forwarding-distributable-*.war
+				cp ../../../sip-servlets-examples/custom-call-forwarding-distributable/target/custom-call-forwarding-distributable-*.war $JBOSS_HOME/server/all/deploy				
+				cp ../../../sip-servlets-examples/custom-call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/all/conf/dars/distributable-dar.properties
+	            ;;
 	    c2c)
 	    		echo "Distributed example used is Click To call"
 	    		mvn clean install -f ../../../sip-servlets-examples/click2call-distributable/pom.xml
