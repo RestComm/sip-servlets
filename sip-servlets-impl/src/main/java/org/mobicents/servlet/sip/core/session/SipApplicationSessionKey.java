@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.core.session;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 /**
  * <p>
@@ -42,7 +43,8 @@ public class SipApplicationSessionKey implements Serializable {
 	public SipApplicationSessionKey(String id, String applicationName) {
 		super();
 		if(id == null) {
-			this.uuid = "" + System.nanoTime();
+			// Issue 1551 : SipApplicationSessionKey is not unique
+			this.uuid = "" + UUID.randomUUID();
 		} else {
 			this.uuid = id;
 		}		
