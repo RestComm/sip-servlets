@@ -46,8 +46,7 @@
   <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/lucene/lucene-core/2.2.0/lucene-core-2.2.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/mobicents/protocols/mgcp/mgcp-impl/2.0.0.RC7/mgcp-impl-2.0.0.RC7.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/mobicents/jsr309/mobicents-jsr309-impl/2.0.0.BETA4-SNAPSHOT/mobicents-jsr309-impl-2.0.0.BETA4-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/mobicents/jsr309/mobicents-jsr309-impl/2.0.0.BETA4/mobicents-jsr309-impl-2.0.0.BETA4.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/mobicents/external/jsr309/mscontrol/1.0/mscontrol-1.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.13-SNAPSHOT/sip-servlets-spec-1.1.13-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/testng/testng/5.8/testng-5.8-jdk15.jar"/>

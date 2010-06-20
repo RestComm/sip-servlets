@@ -1,12 +1,6 @@
 package org.jboss.mobicents.seam.listeners;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-
 import javax.media.mscontrol.MediaEventListener;
-import javax.media.mscontrol.MediaSession;
-import javax.media.mscontrol.join.Joinable.Direction;
 import javax.media.mscontrol.mediagroup.MediaGroup;
 import javax.media.mscontrol.networkconnection.NetworkConnection;
 import javax.media.mscontrol.networkconnection.SdpPortManagerEvent;
@@ -15,7 +9,6 @@ import javax.servlet.sip.SipSession;
 
 import org.apache.log4j.Logger;
 import org.jboss.mobicents.seam.util.EndCallWhenPlaybackCompletedListener;
-import org.jboss.mobicents.seam.util.MMSUtil;
 
 /**
  * This class is registered in the media server to be notified on media connection
