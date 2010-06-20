@@ -19,6 +19,12 @@ package org.mobicents.servlet.sip.alerting;
 import java.io.IOException;
 import java.util.HashMap;
 
+import javax.media.mscontrol.MediaSession;
+import javax.media.mscontrol.MsControlException;
+import javax.media.mscontrol.mediagroup.MediaGroup;
+import javax.media.mscontrol.networkconnection.NetworkConnection;
+import javax.media.mscontrol.networkconnection.SdpPortManager;
+import javax.media.mscontrol.networkconnection.SdpPortManagerException;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
@@ -30,12 +36,10 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 
 import org.apache.log4j.Logger;
-import org.mobicents.mscontrol.MsConnection;
-import org.mobicents.mscontrol.MsConnectionState;
-import org.mobicents.mscontrol.MsLink;
 import org.mobicents.servlet.sip.alerting.util.DTMFListener;
 import org.mobicents.servlet.sip.alerting.util.DTMFUtils;
-import org.mobicents.servlet.sip.alerting.util.MediaLinkListener;
+import org.mobicents.servlet.sip.alerting.util.MMSUtil;
+import org.mobicents.servlet.sip.alerting.util.MediaConnectionListener;
 
 public class PhoneCallSipServlet extends SipServlet {
 	private static final long serialVersionUID = 1L;
@@ -70,10 +74,13 @@ public class PhoneCallSipServlet extends SipServlet {
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.getStatus() + " "
 				+ sipServletResponse.getMethod());
+		logger.info("Got : " + sipServletResponse.getStatus() + " "
+				+ sipServletResponse.getMethod());
 		int status = sipServletResponse.getStatus();
-		
+		Boolean isHelpCall = (Boolean) sipServletResponse.getSession().getAttribute("HelpCall");
 		if (status == SipServletResponse.SC_SESSION_PROGRESS && 
-				INVITE.equalsIgnoreCase(sipServletResponse.getMethod())) {
+				"INVITE".equalsIgnoreCase(sipServletResponse.getMethod()) && 
+				(isHelpCall == null || Boolean.FALSE.equals(isHelpCall))) {
 			//creates the connection
 			Object sdpObj = sipServletResponse.getContent();
 			byte[] sdpBytes = (byte[]) sdpObj;
@@ -81,8 +88,16 @@ public class PhoneCallSipServlet extends SipServlet {
 			logger.info("Creating the end to end media connection");
 			sipServletResponse.getSession().setAttribute("playAnnouncement", Boolean.FALSE);
 			sipServletResponse.getSession().setAttribute("audioFilePath", (String)getServletContext().getAttribute("audioFilePath"));
-			MsConnection connection = (MsConnection)sipServletResponse.getSession().getAttribute("connection");
-			connection.modify("$", sdp);			
+			NetworkConnection connection = (NetworkConnection)sipServletResponse.getSession().getAttribute("connection");
+			try {
+				connection.getSdpPortManager().processSdpAnswer(sdpBytes);
+			} catch (SdpPortManagerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (MsControlException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -101,21 +116,25 @@ public class PhoneCallSipServlet extends SipServlet {
 			Object sdpObj = sipServletResponse.getContent();
 			byte[] sdpBytes = (byte[]) sdpObj;
 			String sdp = new String(sdpBytes);					
-			MsConnection connection = (MsConnection)sipServletResponse.getSession().getAttribute("connection");
-			if(!connection.getState().equals(MsConnectionState.OPEN)) {
-				logger.info("Creating the end to end media connection");
-				sipServletResponse.getSession().setAttribute("playAnnouncement", Boolean.TRUE);
-				connection.modify("$", sdp);				
-			} else {
-				logger.info("Not Creating the end to end media connection, connection already opened");
-				MediaLinkListener.playAnnouncement(
-						connection, 
-						(MsLink)sipServletResponse.getSession().getAttribute("link"), 
-						sipServletResponse.getSession(), 
-						(String)sipServletResponse.getSession().getAttribute("fileName"),
-						(String)sipServletResponse.getSession().getAttribute("alertId"),
-						(String)getServletContext().getAttribute("alert.feedback.url"));
-			}						
+			NetworkConnection connection = (NetworkConnection)sipServletResponse.getSession().getAttribute("connection");
+			try {
+				connection.getSdpPortManager().processSdpAnswer(sdpBytes);
+				Thread.sleep(400);
+			} catch (SdpPortManagerException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (MsControlException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			MediaGroup mg =(MediaGroup)sipServletResponse.getSession().getAttribute("mediaGroup");
+			if(mg != null) {
+				logger.info("Playing Alerting TTS");
+				MediaConnectionListener.playAnnouncement(mg, sipServletResponse.getSession());
+			}								
 		}
 	}
 	
@@ -144,24 +163,35 @@ public class PhoneCallSipServlet extends SipServlet {
 				
 				challengeRequest.addAuthHeader(response, authInfo);
 				
-				MsConnection connection =  (MsConnection) 
+				NetworkConnection connection =  (NetworkConnection) 
 					sipSession.getAttribute("connection");
 				if(connection != null) {
-					String sdp = connection.getLocalDescriptor();
 					try {
-						challengeRequest.setContentLength(sdp.length());
-						challengeRequest.setContent(sdp.getBytes(), "application/sdp");						
+						SdpPortManager sdpManag = connection.getSdpPortManager();
+						sdpManag.generateSdpOffer();
+		
+		
+						byte[] sdpOffer = null;
+						int numTimes = 0;
+						while(sdpOffer == null && numTimes<10) {
+							sdpOffer = sdpManag.getMediaServerSessionDescription();
+							Thread.sleep(500);
+							numTimes++;
+						}
+						challengeRequest.setContentLength(sdpOffer.length);
+						challengeRequest.setContent(sdpOffer, "application/sdp");						
 					} catch (IOException e) {
 						logger.error("An unexpected exception occured while sending the request", e);
-					}
+					} catch (Exception e) {
+						logger.error("An unexpected exception occured while creating the request", e);
+					} 
 				}
 				logger.info("sending challenge request " + challengeRequest);
 				challengeRequest.send();
 			}
 		} else {					
 			super.doErrorResponse(response);
-		}
-		
+		}	
 	}
 
 	@Override
@@ -193,22 +223,28 @@ public class PhoneCallSipServlet extends SipServlet {
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {
 		logger.info("Got bye " + request);
-		MsConnection connection = (MsConnection)request.getSession().getAttribute("connection");
-		MsLink link = (MsLink)request.getSession().getAttribute("link");
+		NetworkConnection connection = (NetworkConnection)request.getSession().getAttribute("connection");
+		MediaGroup mg =(MediaGroup)request.getSession().getAttribute("mediaGroup");
+		MediaSession session =(MediaSession)request.getSession().getAttribute("mediaSession");
+	
+		session.release();
 		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		SipServletResponse ok = request
 				.createResponse(SipServletResponse.SC_OK);
-		ok.send();				
+		ok.send();
 		
-		if(connection != null) {
-			connection.release();
-		} else {
-			logger.info("connection not created");
-		}
-		if(link != null) {
-			link.release();	
-		} else {
-			logger.info("link not created");
+		SipSession linkedSession = (SipSession) request.getSession()
+				.getAttribute("LinkedSession");
+		if (linkedSession != null) {
+			SipServletRequest bye = linkedSession.createRequest("BYE");
+			logger.info("Sending bye to " + linkedSession.getRemoteParty());
+			bye.send();
 		}
 	}
 	

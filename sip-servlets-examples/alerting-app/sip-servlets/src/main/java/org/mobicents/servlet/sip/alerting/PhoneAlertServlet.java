@@ -18,8 +18,14 @@ package org.mobicents.servlet.sip.alerting;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URLEncoder;
 
 import javax.annotation.Resource;
+import javax.media.mscontrol.MediaSession;
+import javax.media.mscontrol.join.Joinable.Direction;
+import javax.media.mscontrol.mediagroup.MediaGroup;
+import javax.media.mscontrol.networkconnection.NetworkConnection;
+import javax.media.mscontrol.networkconnection.SdpPortManager;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,13 +39,8 @@ import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
-import org.mobicents.mscontrol.MsConnection;
-import org.mobicents.mscontrol.MsPeer;
-import org.mobicents.mscontrol.MsPeerFactory;
-import org.mobicents.mscontrol.MsProvider;
-import org.mobicents.mscontrol.MsSession;
-import org.mobicents.servlet.sip.alerting.util.MediaConnectionListener;
-import org.mobicents.servlet.sip.alerting.util.TTSUtils;
+import org.mobicents.servlet.sip.alerting.util.DTMFListener;
+import org.mobicents.servlet.sip.alerting.util.MMSUtil;
 
 public class PhoneAlertServlet extends HttpServlet
 { 	
@@ -74,22 +75,7 @@ public class PhoneAlertServlet extends HttpServlet
 	        	logger.info("Got an alert : \n alertID : " + alertId + " \n tel : " + tel + " \n text : " +alertText);
 	        }
         }
-        // TTS creation
-        String pathToAudioDirectory = (String)getServletContext().getAttribute("audioFilePath");
-        String fileName= pathToAudioDirectory + System.nanoTime() + "-monitoring-alert-" + alertId;
-//        String fileName= System.nanoTime() + "-monitoring-alert-" + alertId;
-        try {
-			TTSUtils.buildAudio(alertText, fileName);
-			fileName = fileName+ ".wav";
-			logger.info("Speech created at " + fileName);
-		} catch (Exception e) {
-			logger.error("Unexpected exception while creating the text to speech file", e);
-			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			String errorBody = "<HTML><BODY>Phone Alert not Sent, could not generate the Text to Speech file !</BODY></HTML>";
-			sendHttpResponse(response, errorBody);
-			return;
-		}		                
-        
+        alertText = "Hello Admin; the server 0.0.0.0:2999 you're monitoring is running out of memory";
 		// Create app session and request
         SipApplicationSession appSession = 
         	((ConvergedHttpSession)request.getSession()).getApplicationSession();
@@ -98,15 +84,29 @@ public class PhoneAlertServlet extends HttpServlet
         SipServletRequest sipServletRequest = sipFactory.createRequest(appSession, INVITE, fromURI, toURI);        
         sipServletRequest.setRequestURI(toURI);
 		
+        sipServletRequest.getSession().setAttribute("speechUri",
+				java.net.URI.create("data:" + URLEncoder.encode("ts("+ alertText +")", "UTF-8")));
 		try {
 			// Media Server Control Creation
-			MsPeer peer = MsPeerFactory.getPeer("org.mobicents.mscontrol.impl.MsPeerImpl");
-			MsProvider provider = peer.getProvider();
-			MsSession session = provider.createSession();
-			MsConnection connection = session.createNetworkConnection(MediaConnectionListener.PR_JNDI_NAME);
-			MediaConnectionListener listener = new MediaConnectionListener();
-			listener.setInviteRequest(sipServletRequest);
-			connection.addConnectionListener(listener);
+			MediaSession mediaSession = MMSUtil.getMsControl().createMediaSession();
+			NetworkConnection connection = mediaSession
+			.createNetworkConnection(NetworkConnection.BASIC);
+
+			SdpPortManager sdpManag = connection.getSdpPortManager();
+			sdpManag.generateSdpOffer();
+			
+			byte[] sdpOffer = null;
+			int numTimes = 0;
+			while(sdpOffer == null && numTimes<10) {
+				sdpOffer = sdpManag.getMediaServerSessionDescription();
+				Thread.sleep(500);
+				numTimes++;
+			}
+			
+			sipServletRequest.setContentLength(sdpOffer.length);
+			sipServletRequest.setContent(sdpOffer, "application/sdp");	
+			
+			MediaGroup mg = mediaSession.createMediaGroup(MediaGroup.PLAYER_SIGNALDETECTOR);
 			
 			// storing helpful info for later during the call
 			SipSession sipSession = sipServletRequest.getSession();
@@ -114,16 +114,16 @@ public class PhoneAlertServlet extends HttpServlet
 			sipSession.setAttribute("alertId", alertId);
 			sipSession.setAttribute("tel", tel);
 			sipSession.setAttribute("alertText", alertText);
-			sipSession.setAttribute("fileName", fileName);
+			sipSession.setAttribute("connection", connection);
+			sipSession.setAttribute("mediaGroup", mg);
+			sipSession.setAttribute("mediaSession", mediaSession);
 			sipSession.setAttribute("feedbackUrl", (String)getServletContext().getAttribute("alert.feedback.url"));
-			
-			if(logger.isInfoEnabled()) {
-				logger.info("waiting to get the SDP from Media Server before sending the INVITE to " + tel);
-			}
-			connection.modify("$", null);
-		} catch (ClassNotFoundException e) {
+			sipServletRequest.send();
+			mg.getSignalDetector().addListener(new DTMFListener(alertId, (String)getServletContext().getAttribute("alert.feedback.url")));
+			connection.join(Direction.DUPLEX, mg);
+		} catch (Exception e) {
 			// Should not happen
-			logger.error("Unexpected exception while trying to get the Media Peer Factory", e);
+			logger.error("Unexpected exception while trying to send the SIP Request", e);
 			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			String errorBody = "<HTML><BODY>Phone Alert not Sent, could not find Media Libraries !</BODY></HTML>";
 			sendHttpResponse(response, errorBody);

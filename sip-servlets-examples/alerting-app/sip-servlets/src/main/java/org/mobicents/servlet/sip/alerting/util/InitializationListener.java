@@ -24,12 +24,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Properties;
 
+import javax.media.mscontrol.MsControlFactory;
+import javax.media.mscontrol.spi.DriverManager;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.media.mscontrol.spi.DriverImpl;
+import org.mobicents.jsr309.mgcp.MgcpStackFactory;
 
 /**
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
@@ -41,12 +46,44 @@ public class InitializationListener implements ServletContextListener {
 	private static final String FILE_PROTOCOL = "file://";
 	private static final String[] AUDIO_FILES = new String[] {};
 
+	Properties properties = null;
+	
+	private static final String MS_CONTROL_FACTORY = "MsControlFactory";
+	public static final String PR_JNDI_NAME = "media/trunk/PacketRelay/$";
+	
+	// Property key for the Unique MGCP stack name for this application
+	public static final String MGCP_STACK_NAME = "mgcp.stack.name";
+
+	// Property key for the IP address where CA MGCP Stack (SIP Servlet
+	// Container) is bound
+	public static final String MGCP_STACK_IP = "mgcp.stack.ip";
+
+	// Property key for the port where CA MGCP Stack is bound
+	public static final String MGCP_STACK_PORT = "mgcp.stack.port";
+
+	// Property key for the IP address where MGW MGCP Stack (MMS) is bound
+	public static final String MGCP_PEER_IP = "mgcp.stack.peer.ip";
+
+	// Property key for the port where MGW MGCP Stack is bound
+	public static final String MGCP_PEER_PORT = "mgcp.stack.peer.port";
+	/**
+	 * In this case MGW and CA are on same local host
+	 */
+	public static final String LOCAL_ADDRESS = System.getProperty(
+			"jboss.bind.address", "127.0.0.1");
+	protected static final String CA_PORT = "2828";
+
+	public static final String PEER_ADDRESS = System.getProperty(
+			"jboss.bind.address", "127.0.0.1");
+	protected static final String MGW_PORT = "2427";
+	
 	/*
 	 * (non-Javadoc)
 	 * 
 	 * @see javax.servlet.ServletContextListener#contextDestroyed(javax.servlet.ServletContextEvent)
 	 */	
-	public void contextDestroyed(ServletContextEvent arg0) {
+	public void contextDestroyed(ServletContextEvent event) {
+		MgcpStackFactory.getInstance().clearMgcpStackProvider(properties);
 	}
 
 	/*
@@ -82,6 +119,30 @@ public class InitializationListener implements ServletContextListener {
 		}
 		// map acting as a registrar
 		servletContext.setAttribute("registeredUsersMap", new HashMap<String, String>());
+		
+		if(servletContextEvent.getServletContext().getAttribute(MS_CONTROL_FACTORY) == null) {
+			DriverImpl d = new DriverImpl();
+			properties = new Properties();
+			properties.setProperty(MGCP_STACK_NAME, "SipServlets");
+			properties.setProperty(MGCP_PEER_IP, PEER_ADDRESS);
+			properties.setProperty(MGCP_PEER_PORT, MGW_PORT);
+	
+			properties.setProperty(MGCP_STACK_IP, LOCAL_ADDRESS);
+			properties.setProperty(MGCP_STACK_PORT, CA_PORT);
+	
+			try {
+				// create the Media Session Factory
+				MsControlFactory msControlFactory = DriverManager.getDrivers().next().getFactory(
+						properties);
+				MMSUtil.msControlFactory = msControlFactory;
+				servletContextEvent.getServletContext().setAttribute(MS_CONTROL_FACTORY, msControlFactory);
+				logger.info("started MGCP Stack on " + LOCAL_ADDRESS + "and port " + CA_PORT + " obj: " + MMSUtil.msControlFactory);
+			} catch (Exception e) {
+				logger.error("couldn't start the underlying MGCP Stack", e);
+			}
+		} else {
+			logger.info("MGCP Stack already started on " + LOCAL_ADDRESS + "and port " + CA_PORT);
+		}
 	}
 
 	private void copyToTempDir(InputStream is, File tempWriteDir,

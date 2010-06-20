@@ -1,13 +1,10 @@
 package org.mobicents.servlet.sip.alerting.util;
+import javax.media.mscontrol.MediaEventListener;
+import javax.media.mscontrol.mediagroup.signals.SignalDetectorEvent;
+
 import org.apache.log4j.Logger;
-import org.mobicents.mscontrol.MsNotificationListener;
-import org.mobicents.mscontrol.MsNotifyEvent;
-import org.mobicents.mscontrol.events.MsEventIdentifier;
-import org.mobicents.mscontrol.events.dtmf.MsDtmfNotifyEvent;
-import org.mobicents.mscontrol.events.pkg.DTMF;
 
-public class DTMFListener implements MsNotificationListener {
-
+public class DTMFListener implements MediaEventListener<SignalDetectorEvent>{
 	private static final long serialVersionUID = 1L;
 	public static final int DTMF_SESSION_STARTED = 1;
 	public static final int DTMF_SESSION_STOPPED = 2;
@@ -19,26 +16,9 @@ public class DTMFListener implements MsNotificationListener {
 		this.alertId = alertId;
 		this.feedbackUrl = feedbackUrl;
 	}
-	
-	public void update(MsNotifyEvent event) {
-		MsEventIdentifier identifier = event.getEventID();
-		logger.info("event FQN " + identifier.getFqn());		
-        if (identifier.equals(DTMF.TONE)) {
-            MsDtmfNotifyEvent dtmfEvent = (MsDtmfNotifyEvent) event;
-            String signal = dtmfEvent.getSequence();
-			
-			DTMFUtils.answerBack(alertId, signal, feedbackUrl);		
-        }       
+
+	public void onEvent(SignalDetectorEvent event) {
+		String signal = event.getSignalString();
+		DTMFUtils.answerBack(alertId, signal, feedbackUrl);		
 	}
-
-	public void resourceCreated(MsNotifyEvent event) {
-
-		
-	}
-
-	public void resourceInvalid(MsNotifyEvent event) {
-		// TODO Auto-generated method stub
-		
-	}
-
 }
