@@ -2,6 +2,8 @@ JBoss 5.x only Examples
 
 	Here is our list of examples showcasing Media (JSR 309 based) and JRuby integration that will work only on Mobicents Sip Servlets for JBoss 5.x version :
 		
+		* {{{alerting-app.html}Alerting Application}} : a sip servlet application showing how to use media capabilities (Media playback, Text to Speech, DTMF detection) and SMS sending through a Provider
+		
 		* {{{mss-jruby-example.html}JRuby on Rails Sip Servlets Example}} : a JRuby on Rails multi language application that can make phone calls
 		
 		* {{{mss-pure-jruby-telco.html}Pure JRuby on Rails Telco Example}} : a pure JRuby on Rails application that can make and receive phone calls
