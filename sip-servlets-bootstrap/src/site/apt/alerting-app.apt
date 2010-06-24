@@ -29,7 +29,7 @@ Alerting Application
 ** From the binary
 
 	You can find the war file corresponding to this example
- 	{{{http://repository.jboss.com/maven2/org/mobicents/servlet/sip/example/alerting-app/1.6/alerting-app-1.6.war}here}}.\
+ 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/alerting-app/1.8-SNAPSHOT/alerting-app-1.8-20100620.205459-1.war}here}}.\
  	Drop the downloaded war file into your <<<tomcat_home/webapps>>> directory or <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/alerting-app-dar.properties}dar configuration file}}.\

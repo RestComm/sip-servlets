@@ -26,13 +26,13 @@ Acknowledgements
 	
 	* Joel Soderstrom from {{{http://www.telmi.se/}Telmi Communication}} : reported {{{http://code.google.com/p/mobicents/issues/detail?id=481}Issue 481}} and contributed a fix for it.
 	
-	* Alexandre Sova from {{{http://www.codeminders.com}Codeminders}} : 
+	* Alexandre Sova from {{{http://www.codeminders.com}Codeminders}}; commissioned by {{{http://www.avistar.com/}Avistar Communications Corp}} : 
 	
 		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=568}Issue 568}} and contributed a fix for it.
 		
 		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=585}Issue 585}} and contributed a fix for it.
 
-	* Alexander Kozlov from {{{http://www.codeminders.com}Codeminders}} : 
+	* Alexander Kozlov from {{{http://www.codeminders.com}Codeminders}}; commissioned by {{{http://www.avistar.com/}Avistar Communications Corp}} : 
 	
 		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1015}Issue 1015}} and contributed a fix for it.		
 		
@@ -42,7 +42,7 @@ Acknowledgements
 	
 	* Eric Cheung and Tom Smith from AT&T ECharts team for making sure E4SS is working continuously on Mobicents Sip Servlets and for their excellent bug reports.
 	
-	* Nick Semergey from {{{http://www.codeminders.com}Codeminders}} : 
+	* Nick Semergey from {{{http://www.codeminders.com}Codeminders}}; commissioned by {{{http://www.avistar.com/}Avistar Communications Corp}} : 
 	
 		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1521}Issue 1521}} and contributed a fix for it
 	
