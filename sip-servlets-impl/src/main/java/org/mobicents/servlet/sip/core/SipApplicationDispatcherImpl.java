@@ -845,24 +845,24 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 								sipSessionKey.getApplicationName(), 
 								sipSessionKey.getApplicationSessionId());
 						sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
-						
-						if(sipApplicationSession != null) {
-							if(logger.isDebugEnabled()) {
-								logger.debug("sip app session " + sipApplicationSessionKey + " is valid ? :" + sipApplicationSession.isValidInternal());
-								if(sipApplicationSession.isValidInternal()) {
-									logger.debug("Sip app session " + sipApplicationSessionKey + " is ready to be invalidated ? :" + sipApplicationSession.isReadyToInvalidate());
-								}
-							}
-							if(sipApplicationSession.isValidInternal() && sipApplicationSession.isReadyToInvalidate()) {
-								sipContext.enterSipApp(sipApplicationSession, sipSessionImpl);
-								try {
-									sipApplicationSession.tryToInvalidate();
-								} finally {
-									sipContext.exitSipApp(sipApplicationSession, sipSessionImpl);
-								}
-							}							
-						}
 					}
+					if(sipApplicationSession != null) {
+						if(logger.isDebugEnabled()) {
+							logger.debug("sip app session " + sipApplicationSession.getKey() + " is valid ? :" + sipApplicationSession.isValidInternal());
+							if(sipApplicationSession.isValidInternal()) {
+								logger.debug("Sip app session " + sipApplicationSession.getKey() + " is ready to be invalidated ? :" + sipApplicationSession.isReadyToInvalidate());
+							}
+						}
+						if(sipApplicationSession.isValidInternal() && sipApplicationSession.isReadyToInvalidate()) {
+							sipContext.enterSipApp(sipApplicationSession, sipSessionImpl);
+							try {
+								sipApplicationSession.tryToInvalidate();
+							} finally {
+								sipContext.exitSipApp(sipApplicationSession, sipSessionImpl);
+							}
+						}							
+					}
+
 				} finally {
 					Thread.currentThread().setContextClassLoader(oldClassLoader);
 				}
