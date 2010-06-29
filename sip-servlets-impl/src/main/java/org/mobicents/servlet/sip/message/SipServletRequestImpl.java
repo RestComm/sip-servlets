@@ -914,6 +914,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			((MessageExt)message).setApplicationData(session.getTransport());			
 			
 			ViaHeader viaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
+		
 			//Issue 112 fix by folsson
 		    if(!getMethod().equalsIgnoreCase(Request.CANCEL) && viaHeader == null) {
 		    	boolean addViaHeader = false;
@@ -944,6 +945,28 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    	logger.debug("The found transport for sending request is '" + transport + "'");
 		    }
 		    
+		    SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);
+		    
+		    // Bypass the load balancer for outgoing requests by removing the route header for them
+		    if(sipConnector != null && sipConnector.isUseStaticAddress()) {
+		    	RouteHeader rh = (RouteHeader) request.getHeader(RouteHeader.NAME);
+		    	if(logger.isDebugEnabled()) {
+		    		logger.debug("We are looking at route header " + rh + " and SC is" + sipConnector.getStaticServerAddress() + ":" + sipConnector.getStaticServerPort());
+		    	}
+		    	if(rh != null) {
+		    		if(rh.getAddress().getURI().isSipURI()) {
+		    			javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI)rh.getAddress().getURI();
+		    			if(sipUri.getHost().equals(sipConnector.getStaticServerAddress())) {
+		    				int port = sipUri.getPort();
+		    				if(port <= 0) port = 5060;
+		    				if(port == sipConnector.getStaticServerPort()) {
+		    					request.removeHeader(RouteHeader.NAME);
+		    				}
+		    			}
+		    		}
+		    	}
+		    }
+		    
 		    final String requestMethod = getMethod();
 			if(Request.ACK.equals(requestMethod)) {
 				session.getSessionCreatingDialog().sendAck(request);
@@ -960,7 +983,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				return;
 			}
 			
-			SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);
+			
 			
 			//Added for initial requests only (that are not REGISTER) not for subsequent requests 
 			if(isInitial() && !Request.REGISTER.equalsIgnoreCase(requestMethod)) {
@@ -1058,7 +1081,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					dialog = null;
 					
 					// take care of the RRH
-					if(isInitial() && sipConnector != null && sipConnector.isUseStaticAddress()) {
+					if(isInitial()) {
 						if(session.getProxy().getRecordRoute()) {
 							RecordRouteHeader rrh = (RecordRouteHeader) request.getHeader(RecordRouteHeader.NAME);
 							if(rrh == null) {
@@ -1069,8 +1092,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 								javax.sip.address.URI uri = rrh.getAddress().getURI();
 								if(uri.isSipURI()) {
 									javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
-									sipUri.setHost(sipConnector.getStaticServerAddress());
-									sipUri.setPort(sipConnector.getStaticServerPort());
+									if(sipConnector != null && sipConnector.isUseStaticAddress()) {
+										sipUri.setHost(sipConnector.getStaticServerAddress());
+										sipUri.setPort(sipConnector.getStaticServerPort());
+									}
 									sipUri.setTransportParam(transport);
 									if(logger.isDebugEnabled()) {
 										logger.debug("Updated the RRH with static server address " + sipUri);

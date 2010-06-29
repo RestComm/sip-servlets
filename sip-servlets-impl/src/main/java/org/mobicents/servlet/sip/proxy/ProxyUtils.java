@@ -171,6 +171,9 @@ public class ProxyUtils {
 				} else {
 					rrURI = ((SipURIImpl) proxy.getOutboundInterface()).getSipURI();
 				}
+				
+				if(originalRequest.getTransport() != null) rrURI.setTransportParam(originalRequest.getTransport());
+				
 				final Iterator<String> paramNames = routeRecord.getParameterNames();
 				
 				// Copy the parameters set by the user
