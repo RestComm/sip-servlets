@@ -103,7 +103,12 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 			IOException {
 		logger.info("from : " + request.getFrom());
 		logger.info("Got request: "
-				+ request.getMethod());		
+				+ request.getMethod());	
+		if(!request.getApplicationSession().getInvalidateWhenReady()) {
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+			sipServletResponse.send();
+			return;
+		}
 		if(request.getParameterableHeader("additionalParameterableHeader") != null) {
 			request.getParameterableHeader("additionalParameterableHeader").setParameter("dsfds", "value");
 			boolean error = false;
