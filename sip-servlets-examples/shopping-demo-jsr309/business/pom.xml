@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.example</groupId>
 		<artifactId>shopping-demo-parent-jsr309</artifactId>
-		<version>1.8-SNAPSHOT</version>
+		<version>1.7.1</version>
 	</parent>
 	<artifactId>shopping-demo-business-jsr309</artifactId>
 	<packaging>jar</packaging>
