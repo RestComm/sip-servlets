@@ -50,9 +50,20 @@
         <url-pattern>/sms</url-pattern>
     </servlet-mapping>
     
+    
     <context-param>
       <param-name>esendexAccountRef</param-name>
-      <param-value>EX0059334</param-value>
+      <param-value>XXXXXX</param-value>
+    </context-param>
+    
+    <context-param>
+      <param-name>esendexUserName</param-name>
+      <param-value>XXXXX</param-value>
+    </context-param>
+    
+    <context-param>
+      <param-name>esendexPassword</param-name>
+      <param-value>XXXXX</param-value>
     </context-param>
     
          
