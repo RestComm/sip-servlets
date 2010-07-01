@@ -328,10 +328,12 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
 			sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
 			sipStackProperties.setProperty(PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");
-			if(sipStackProperties.get(TCP_POST_PARSING_THREAD_POOL_SIZE) == null) {
-				sipStackProperties.setProperty(TCP_POST_PARSING_THREAD_POOL_SIZE, "30");
-			}
 		}
+		
+		if(sipStackProperties.get(TCP_POST_PARSING_THREAD_POOL_SIZE) == null) {
+			sipStackProperties.setProperty(TCP_POST_PARSING_THREAD_POOL_SIZE, "30");
+		}
+		
 		String serverHeaderValue = sipStackProperties.getProperty(SERVER_HEADER);
 		if(serverHeaderValue != null) {
 			List<String> serverHeaderList = new ArrayList<String>();
