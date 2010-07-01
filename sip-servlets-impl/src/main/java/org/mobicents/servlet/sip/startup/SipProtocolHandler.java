@@ -46,7 +46,6 @@ import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.sip.ListeningPoint;
-import javax.sip.PeerUnavailableException;
 import javax.sip.SipProvider;
 import javax.sip.SipStack;
 import javax.sip.header.ServerHeader;
