@@ -144,7 +144,7 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener 
 			if(resp.getRemoteAddr().equals(LOCAL_LOCALHOST_ADDR) && resp.getRemotePort() == LOCAL_PORT && resp.getTransport().equalsIgnoreCase(LOCAL_TRANSPORT)) {			
 				logger.info("remote information is correct");
 			} else {
-				if(resp.getRemotePort()!=5005){ // 5005 is for the static server address testing
+				if(resp.getRemotePort()!=5090){ // 5090 is the remote client
 					logger.error("remote information is incorrect");
 					logger.error("remote addr " + resp.getRemoteAddr());
 					logger.error("remote port " + resp.getRemotePort());
