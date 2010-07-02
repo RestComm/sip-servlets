@@ -62,9 +62,9 @@ public class ParallelProxyTelURLWithRecordRouteTest extends SipServletTestCase i
 	}
 
 	public void testProxy() {
-		this.shootme.init("stackName");
-		this.cutme.init();
-		this.shootist.init("useHostName", true);
+		this.shootme.init("stackName", null);
+		this.cutme.init(null);
+		this.shootist.init("useHostName", true, null);
 		for (int q = 0; q < 20; q++) {
 			if (shootist.ended == false && cutme.canceled == false)
 				try {

@@ -18,7 +18,9 @@ package org.mobicents.servlet.sip.testsuite.proxy;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -79,7 +81,7 @@ public class Shootist implements SipListener {
 
 	private ContactHeader contactHeader;
 
-	private ListeningPoint udpListeningPoint;
+	private ListeningPoint listeningPoint;
 
 	private ClientTransaction inviteTid;
 
@@ -109,6 +111,12 @@ public class Shootist implements SipListener {
 	public Request request;
 	
 	public Response lastResponse;
+	
+	private static final String TEXT_CONTENT_TYPE = "text";
+	
+	private String lastMessageContent;
+	
+	private List<String> allMessagesContent = new ArrayList<String>();
 
 	class ByeTask  extends TimerTask {
 		Dialog dialog;
@@ -156,8 +164,11 @@ public class Shootist implements SipListener {
 				+ " with server transaction id " + serverTransactionId);
 
 		// We are the UAC so the only request we get is the BYE.
-		if (request.getMethod().equals(Request.BYE))
+		if (request.getMethod().equals(Request.BYE)) {
 			processBye(request, serverTransactionId);
+		} else if (request.getMethod().equals(Request.MESSAGE)) {
+			processMessage(request, serverTransactionId);
+		}
 		else {
 			try {
 				serverTransactionId.sendResponse( messageFactory.createResponse(202,request) );
@@ -175,6 +186,44 @@ public class Shootist implements SipListener {
 
 	}
 
+	private void processMessage(Request request,
+			ServerTransaction serverTransactionId) {
+		ServerTransaction serverTransaction = null;
+
+        try {
+            serverTransaction = 
+            	(serverTransactionId == null? 
+            			sipProvider.getNewServerTransaction(request): 
+            				serverTransactionId);
+        } catch (javax.sip.TransactionAlreadyExistsException ex) {
+            ex.printStackTrace();
+            return;
+        } catch (javax.sip.TransactionUnavailableException ex1) {
+            ex1.printStackTrace();
+            return;
+        }
+		
+		ContentTypeHeader contentTypeHeader = (ContentTypeHeader) 
+			request.getHeader(ContentTypeHeader.NAME);
+		if(contentTypeHeader != null) {
+			this.lastMessageContent = new String(request.getRawContent());
+			allMessagesContent.add(new String(lastMessageContent));				
+		} 
+		try {
+			Response okResponse = messageFactory.createResponse(
+					Response.OK, request);			
+			ToHeader toHeader = (ToHeader) okResponse.getHeader(ToHeader.NAME);
+			if (toHeader.getTag() == null) {
+				toHeader.setTag(Integer.toString(new Random().nextInt(10000000)));
+			}
+//			okResponse.addHeader(contactHeader);
+			serverTransaction.sendResponse(okResponse);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			logger.error("error sending OK response to message", ex);
+		}			
+	}
+	
 	public void processBye(Request request,
 			ServerTransaction serverTransactionId) {
 		try {
@@ -335,17 +384,18 @@ public class Shootist implements SipListener {
 	}
 
 	public void init() {
-		init("BigGuy", false);
+		init("BigGuy", false, null);
 	}
 	
-	public void init(String fromName, boolean useTelURL) {
+	public void init(String fromName, boolean useTelURL, String transport) {
+		if(transport == null) {
+			transport = ListeningPoint.UDP;
+		}
 		SipFactory sipFactory = null;
 		sipStack = null;
 		sipFactory = SipFactory.getInstance();
 		sipFactory.setPathName("gov.nist");
-		Properties properties = new Properties();
-		// If you want to try TCP transport change the following to
-		String transport = "udp";
+		Properties properties = new Properties();		
 		String peerHostPort = "127.0.0.1:5070";
 		if(outboundProxy) {
 			properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort + "/"
@@ -389,8 +439,8 @@ public class Shootist implements SipListener {
 			headerFactory = sipFactory.createHeaderFactory();
 			addressFactory = sipFactory.createAddressFactory();
 			messageFactory = sipFactory.createMessageFactory();
-			udpListeningPoint = sipStack.createListeningPoint("127.0.0.1", 5058, "udp");
-			sipProvider = sipStack.createSipProvider(udpListeningPoint);
+			listeningPoint = sipStack.createListeningPoint("127.0.0.1", 5058, transport);
+			sipProvider = sipStack.createSipProvider(listeningPoint);
 			Shootist listener = this;
 			sipProvider.addSipListener(listener);
 			
@@ -430,7 +480,7 @@ public class Shootist implements SipListener {
 			// Create ViaHeaders
 
 			ArrayList<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
-			String ipAddress = udpListeningPoint.getIPAddress();
+			String ipAddress = listeningPoint.getIPAddress();
 			ViaHeader viaHeader = headerFactory.createViaHeader(ipAddress,
 					sipProvider.getListeningPoint(transport).getPort(),
 					transport, null);
@@ -468,7 +518,7 @@ public class Shootist implements SipListener {
 			String host = "127.0.0.1";
 
 			SipURI contactUrl = addressFactory.createSipURI(fromName, host);
-			contactUrl.setPort(udpListeningPoint.getPort());
+			contactUrl.setPort(listeningPoint.getPort());
 			contactUrl.setLrParam();
 
 			// Create the contact name address.
@@ -615,4 +665,19 @@ public class Shootist implements SipListener {
 	public boolean isOutboundProxy() {
 		return outboundProxy;
 	}
+	
+	/**
+	 * @return the lastMessageContent
+	 */
+	public String getLastMessageContent() {		
+		return lastMessageContent;
+	}
+
+	/**
+	 * @return the allMessagesContent
+	 */
+	public List<String> getAllMessagesContent() {
+		return allMessagesContent;
+	}
+
 }

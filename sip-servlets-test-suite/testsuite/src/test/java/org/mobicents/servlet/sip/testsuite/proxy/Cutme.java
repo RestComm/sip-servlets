@@ -252,7 +252,10 @@ public class Cutme implements SipListener {
 		System.out.println("Transaction Time out");
 	}
 
-	public void init() {
+	public void init(String transport) {
+		if(transport == null) {
+			transport = ListeningPoint.UDP;
+		}
 		SipFactory sipFactory = null;
 		sipStack = null;
 		sipFactory = SipFactory.getInstance();
@@ -285,7 +288,7 @@ public class Cutme implements SipListener {
 		try {
 			messageFactory = sipFactory.createMessageFactory();
 			ListeningPoint lp = sipStack.createListeningPoint("127.0.0.1",
-					myPort, "udp");
+					myPort, transport);
 
 			Cutme listener = this;
 

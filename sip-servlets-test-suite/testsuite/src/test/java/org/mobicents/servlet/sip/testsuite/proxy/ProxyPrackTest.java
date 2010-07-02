@@ -64,9 +64,9 @@ public class ProxyPrackTest extends SipServletTestCase implements SipListener {
 	}
 
 	public void testPrackProxying() {
-		this.shootme.init("stackName");
+		this.shootme.init("stackName", null);
 		//this.cutme.init();
-		this.shootist.init("useHostName",false);
+		this.shootist.init("useHostName",false, null);
 		for (int q = 0; q < 20; q++) {
 			if (shootist.ended == false && cutme.canceled == false)
 				try {

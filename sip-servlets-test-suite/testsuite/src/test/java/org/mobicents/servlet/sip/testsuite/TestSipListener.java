@@ -2175,12 +2175,7 @@ public class TestSipListener implements SipListener {
 	 * @return the lastMessageContent
 	 */
 	public String getLastMessageContent() {
-		String content = null;
-		if(lastMessageContent != null) {
-			content = new String(lastMessageContent);
-			lastMessageContent = null;
-		}
-		return content;
+		return lastMessageContent;
 	}
 
 	/**

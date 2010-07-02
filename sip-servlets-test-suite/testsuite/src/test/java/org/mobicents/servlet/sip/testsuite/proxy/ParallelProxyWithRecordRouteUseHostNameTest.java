@@ -62,8 +62,8 @@ public class ParallelProxyWithRecordRouteUseHostNameTest extends SipServletTestC
 	}
 
 	public void testProxy() {
-		this.shootme.init("stackName");
-		this.cutme.init();
+		this.shootme.init("stackName", null);
+		this.cutme.init(null);
 		this.shootist.init();
 		for (int q = 0; q < 20; q++) {
 			if (shootist.ended == false && cutme.canceled == false)

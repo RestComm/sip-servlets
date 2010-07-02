@@ -70,8 +70,8 @@ public class ProxySubsequentPublishRequestTest extends SipServletTestCase implem
 	}
 
 	public void testProxyPublish() {
-		this.shootme.init("stackName");
-		this.cutme.init();
+		this.shootme.init("stackName", null);
+		this.cutme.init(null);
 		this.shootist.init();
 		for (int q = 0; q < 20; q++) {
 			try {

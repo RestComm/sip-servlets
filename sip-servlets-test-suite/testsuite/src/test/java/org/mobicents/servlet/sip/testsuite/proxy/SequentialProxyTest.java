@@ -44,9 +44,9 @@ public class SequentialProxyTest extends SipServletTestCase {
 	}
 	
 	public void testTreePhonesSecondAnswer() {
-		this.shootme.init("stackName");
-		this.cutme.init();
-		this.shootist.init("sequential-three", false);
+		this.shootme.init("stackName", null);
+		this.cutme.init(null);
+		this.shootist.init("sequential-three", false, null);
 		for (int q = 0; q < 30; q++) {
 			if (shootist.ended == false || cutme.canceled == false)
 				try {
@@ -66,9 +66,9 @@ public class SequentialProxyTest extends SipServletTestCase {
 		new Thread() {
 			public void run() {
 				shootist.pauseBeforeBye = 20000;
-				shootme.init("stackName");
-				cutme.init();
-				shootist.init("sequential", false);
+				shootme.init("stackName", null);
+				cutme.init(null);
+				shootist.init("sequential", false, null);
 			}
 		}.start();
 		for (int q = 0; q < 8; q++) {
@@ -91,9 +91,9 @@ public class SequentialProxyTest extends SipServletTestCase {
 	public void testSingleTargetCancel() {
 		new Thread() {
 			public void run() {
-				shootme.init("stackName");
-				cutme.init();
-				shootist.init("sequential-cut", false);
+				shootme.init("stackName", null);
+				cutme.init(null);
+				shootist.init("sequential-cut", false, null);
 			}
 		}.start();
 		for (int q = 0; q < 8; q++) {
@@ -111,9 +111,9 @@ public class SequentialProxyTest extends SipServletTestCase {
 
 	// Here we want to test if the seq proxy will continue to check next branches
 	public void testFirstTargetResponds() {
-		this.shootme.init("stackName");
-		this.cutme.init();
-		this.shootist.init("sequential-reverse", false);
+		this.shootme.init("stackName", null);
+		this.cutme.init(null);
+		this.shootist.init("sequential-reverse", false, null);
 		for (int q = 0; q < 20; q++) {
 			if (shootist.ended == false || cutme.canceled == false)
 				try {
@@ -131,11 +131,11 @@ public class SequentialProxyTest extends SipServletTestCase {
 	
 	public void testOKRetransmissionsReachApplication() {
 		shootme.retrans = 0;
-		this.shootme.init("stackName");
-		this.cutme.init();
+		this.shootme.init("stackName", null);
+		this.cutme.init(null);
 		this.shootist.pauseBeforeAck = 40;
 		shootist.pauseBeforeBye = 10000;
-		this.shootist.init("sequential-retransmission", false);
+		this.shootist.init("sequential-retransmission", false, null);
 		for (int q = 0; q < 2; q++) {
 			if (shootist.ended == false || cutme.canceled == false)
 				try {
@@ -152,12 +152,12 @@ public class SequentialProxyTest extends SipServletTestCase {
 	public void testOKRetransmissionsReachApplicationScrambleResponses() {
 		shootme.retrans = 0;
 		shootme.scrambleResponses = true;
-		this.shootme.init("stackName");
-		this.cutme.init();
+		this.shootme.init("stackName", null);
+		this.cutme.init(null);
 		this.shootist.pauseBeforeAck = 40;
 		shootist.pauseBeforeBye = 10000;
 		
-		this.shootist.init("sequential-retransmission", false);
+		this.shootist.init("sequential-retransmission", false, null);
 		for (int q = 0; q < 2; q++) {
 			if (shootist.ended == false || cutme.canceled == false)
 				try {
@@ -173,9 +173,9 @@ public class SequentialProxyTest extends SipServletTestCase {
 	
 	public void testFirstTargetRespondsBusy() {
 		this.shootme.inviteResponseCode = 483;
-		this.shootme.init("stackName");
-		this.cutme.init();
-		this.shootist.init("sequential-reverse-one", false);
+		this.shootme.init("stackName", null);
+		this.cutme.init(null);
+		this.shootist.init("sequential-reverse-one", false, null);
 		for (int q = 0; q <6; q++) {
 			if (shootist.ended == false)
 				try {

@@ -373,7 +373,10 @@ public class Shootme implements SipListener {
 		System.out.println("Transaction Time out");
 	}
 
-	public void init(String stackName) {
+	public void init(String stackName, String transport) {
+		if(transport == null) {
+			transport = ListeningPoint.UDP;
+		}
 		SipFactory sipFactory = null;
 		sipStack = null;
 		sipFactory = SipFactory.getInstance();
@@ -408,7 +411,7 @@ public class Shootme implements SipListener {
 			addressFactory = sipFactory.createAddressFactory();
 			messageFactory = sipFactory.createMessageFactory();
 			ListeningPoint lp = sipStack.createListeningPoint("127.0.0.1",
-					myPort, "udp");
+					myPort, transport);
 
 			Shootme listener = this;
 

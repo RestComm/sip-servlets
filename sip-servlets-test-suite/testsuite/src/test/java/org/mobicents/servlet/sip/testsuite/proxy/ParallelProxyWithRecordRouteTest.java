@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.testsuite.proxy;
 
+import javax.sip.ListeningPoint;
+
 import org.mobicents.servlet.sip.SipServletTestCase;
 
 public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
@@ -27,16 +29,22 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 	protected Cutme cutme;
 
 	private static final int TIMEOUT = 10000;
+	private static final int TIMEOUT_READY_TO_INVALIDTE = 70000;
 
 	public ParallelProxyWithRecordRouteTest(String name) {
 		super(name);
 
 		this.sipIpAddress="0.0.0.0";
+		startTomcatOnStartup = false;
+		autoDeployOnStartup = false;
 	}
 
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP, null);
+		tomcat.startTomcat();
+		deployApplication();
 		this.shootist = new Shootist(false);
 		shootist.setOutboundProxy(false);
 		this.shootme = new Shootme(5057);
@@ -44,11 +52,11 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 	}
 	
 	public void testProxyCalleeSendsBye() {
-		this.shootme.init("stackName");
+		this.shootme.init("stackName", null);
 		this.shootme.callerSendsBye = false;
 		try {
-		this.cutme.init();
-		this.shootist.init("useHostName",false);
+		this.cutme.init(null);
+		this.shootist.init("useHostName",false, null);
 		for (int q = 0; q < 20; q++) {
 			if (shootist.ended == false && cutme.canceled == false)
 				try {
@@ -68,9 +76,9 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 	
 
 	public void testProxy() {
-		this.shootme.init("stackName");
-		this.cutme.init();
-		this.shootist.init("useHostName",false);
+		this.shootme.init("stackName", null);
+		this.cutme.init(null);
+		this.shootist.init("useHostName",false, null);
 		for (int q = 0; q < 20; q++) {
 			if (shootist.ended == false && cutme.canceled == false)
 				try {
@@ -86,14 +94,56 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 			fail("The party that was supposed to be cancelled didn't cancel.");
 	}
 	
+	public void testProxyReadyToInvalidate() {
+		this.shootme.init("stackName", null);
+		this.cutme.init(null);
+		this.shootist.init("check_rti",false, null);
+		for (int q = 0; q < 20; q++) {
+			if (shootist.ended == false && cutme.canceled == false)
+				try {
+					Thread.sleep(TIMEOUT_READY_TO_INVALIDTE);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+		if (shootist.ended == false)
+			fail("Conversation not complete!");
+		if (cutme.canceled == false)
+			fail("The party that was supposed to be cancelled didn't cancel.");
+		assertNotNull(shootist.getLastMessageContent());	
+		assertEquals("sessionReadyToInvalidate", shootist.getLastMessageContent());
+	}
+	
+	public void testProxyReadyToInvalidateTCP() {
+		this.shootme.init("stackName", "tcp");
+		this.cutme.init("tcp");
+		this.shootist.init("check_rti",false, "tcp");
+		for (int q = 0; q < 20; q++) {
+			if (shootist.ended == false && cutme.canceled == false)
+				try {
+					Thread.sleep(TIMEOUT_READY_TO_INVALIDTE);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+		if (shootist.ended == false)
+			fail("Conversation not complete!");
+		if (cutme.canceled == false)
+			fail("The party that was supposed to be cancelled didn't cancel.");
+		assertNotNull(shootist.getLastMessageContent());	
+		assertEquals("sessionReadyToInvalidate", shootist.getLastMessageContent());
+	}
+	
 	/**
 	 * Non regression test for  Issue 747 : Non Record Routing Proxy is adding Record Route on informational response
 	 * http://code.google.com/p/mobicents/issues/detail?id=747
 	 */
 	public void testProxyNonRecordRouting() {
-		this.shootme.init("stackName");
-		this.cutme.init();
-		this.shootist.init("nonRecordRouting",false);
+		this.shootme.init("stackName", null);
+		this.cutme.init(null);
+		this.shootist.init("nonRecordRouting",false, null);
 		for (int q = 0; q < 20; q++) {
 			if (shootist.ended == false && cutme.canceled == false)
 				try {
@@ -114,9 +164,9 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 	 * http://code.google.com/p/mobicents/issues/detail?id=851
 	 */
 	public void testProxyURIParams() {
-		this.shootme.init("stackName");
-		this.cutme.init();
-		this.shootist.init("check_uri",false);
+		this.shootme.init("stackName", null);
+		this.cutme.init(null);
+		this.shootist.init("check_uri",false, null);
 		for (int q = 0; q < 20; q++) {
 			if (shootist.ended == false && cutme.canceled == false)
 				try {
