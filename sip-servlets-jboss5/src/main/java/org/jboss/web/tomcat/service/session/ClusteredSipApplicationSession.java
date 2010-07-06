@@ -670,9 +670,12 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 			setValid(valid);
 		} 
 		sipSessions.clear();
-		for (SipSessionKey sipSessionKey : (SipSessionKey[])md.getMetaData().get(SIP_SESSIONS)) {			
-			sipSessions.add(sipSessionKey);							
-		}	
+		SipSessionKey[] sipSessionKeys = (SipSessionKey[])md.getMetaData().get(SIP_SESSIONS);
+		if(sipSessionKeys != null && sipSessionKeys.length > 0) {
+			for (SipSessionKey sipSessionKey : sipSessionKeys) {			
+				sipSessions.add(sipSessionKey);							
+			}	
+		}
 		String[] httpSessionIds = (String[])md.getMetaData().get(HTTP_SESSIONS);
 		if(httpSessionIds != null && httpSessionIds.length > 0) {
 			if(httpSessions == null) {
