@@ -5,7 +5,7 @@
 	<property name="base.path" location="${ant.file.mobicents.sipservlets.release}/.." />
 	<property name="docs.stage.dir" location="${ant.file.mobicents.sipservlets.release}/../documentation" />
 	
-	<property name="mss.release.version" value="1.3.1" />
+	<property name="mss.release.version" value="1.4-SNAPSHOT" />
 	<property name="mss.release.configurations" value="all,default" />
 	<property name="mss.release.configurations.jboss5" value="all,default" />
 	
@@ -48,6 +48,8 @@
 	<property name="embjopr.war" value="admin-console.war" />
 	<property name="embjopr.home" value="${release.path}/${embjopr.war}" />
 	<property name="embjopr.home.contents" value="${release.path}/embedded-jopr.war-contents" />
+	<property name="mss.jopr-plugin-5.version" value="1.5.1"/>
+	<property name="mss.jopr-plugin-5.url" value="https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/jopr-mobicents-sip-servlets-as-5-plugin/${mss.jopr-plugin-5.version}/jopr-mobicents-sip-servlets-as-5-plugin-${mss.jopr-plugin-5.version}.jar"/>
 	
 	<condition property="mvn.executable" value="${sys.M2_HOME}\bin\mvn.bat" else="mvn">
 		<os family="windows"/>
@@ -321,10 +323,11 @@
 			<param name="management.deploy.folder" value="${mss.home}/server/${jboss.config}/deploy" />
 		</antcall>
 		
-		<!-- commented out due to recurring wrong rhq files on hudson -->
+		<!-- commented out due to recurring wrong rhq files on hudson -->		
 		<!--exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../jopr-plugin-as-5">
 			<arg line="clean install -U -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
 		</exec-->
+		<antcall target="deploy-mss-jopr-plugin-5"/>
 		
 		<condition property="ha.capable">
 			<or>
@@ -403,6 +406,12 @@
 			<arg line="clean install -U -P set-svn-revision" />
 		</exec>
 		<copy file="${management.home}/target/sip-servlets-management-${mss.release.version}.war" tofile="${management.deploy.folder}/sip-servlets-management.war"/>
+	</target>
+	
+	<target name="deploy-mss-jopr-plugin-5">
+		<echo message="MSS_HOME= ${mss.home}"/>
+		<move verbose="true" failonerror="false" file="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins/jopr-jboss-as-5-plugin-2.3.0.EmbJopr.1.2.0-1.jar" tofile="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins/jopr-jboss-as-5-plugin-2.3.0.EmbJopr.1.2.0-1.jar.bak" />
+		<get dest="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins" src="${mss.jopr-plugin-5.url}"/>		
 	</target>
 	
 	<!-- Get dependencies -->
