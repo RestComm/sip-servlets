@@ -13,6 +13,7 @@
    <Service name="jboss.web" 
       className="org.mobicents.servlet.sip.startup.SipStandardService" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+  		sipPathName="org.mobicents.ha" 
   		concurrencyControlMode="None"
   		darConfigurationFileLocation="conf/dars/mobicents-dar.properties">
 

@@ -350,9 +350,10 @@
 		<copy overwrite="true" file="${base.path}/../../sip-servlets-impl/docs/jboss-service-all.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/jboss-service.xml" />
 		<copy overwrite="true" file="${base.path}/webserver-xmbean.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml" />
 				
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
+		<!-- Not needed anymore since jboss maven profile copies the ha stack as well now for JMX management -->
+		<!--exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
 			<arg line="clean install -U -P set-svn-revision,jboss-distro,jboss-cluster-distro -DJBOSS_HOME=${jboss.home} -Dnode=${jboss.config}" />
-		</exec>
+		</exec-->
 		
 		<!--exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
 			<arg line="clean install -U -P set-svn-revision"/>
@@ -373,10 +374,11 @@
 		<copy overwrite="true" file="${base.path}/jboss-beans.xml" tofile="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/META-INF/jboss-beans.xml" />
 		<copy overwrite="true" file="${base.path}/metadata-deployer-jboss-beans.xml" tofile="${mss.home}/server/${jboss.config}/deployers/metadata-deployer-jboss-beans.xml" />
 		<copy overwrite="true" file="${base.path}/failover-war-deployers-jboss-beans.xml" tofile="${mss.home}/server/${jboss.config}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml" />
-						
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
+				
+		<!-- Not needed anymore since jboss maven profile copies the ha stack as well now for JMX management -->
+		<!--exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
 			<arg line="clean install -U -P set-svn-revision,jboss-5-distro,jboss-5-cluster-distro -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
-		</exec>
+		</exec-->
 		
 		<!--exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/simple-sip-servlet-distributable">
 			<arg line="clean install -U -P set-svn-revision"/>
@@ -409,9 +411,9 @@
 	</target>
 	
 	<target name="deploy-mss-jopr-plugin-5">
-		<echo message="MSS_HOME= ${mss.home}"/>
+		<echo message="MSS_HOME=${mss.home}"/>
 		<move verbose="true" failonerror="false" file="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins/jopr-jboss-as-5-plugin-2.3.0.EmbJopr.1.2.0-1.jar" tofile="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins/jopr-jboss-as-5-plugin-2.3.0.EmbJopr.1.2.0-1.jar.bak" />
-		<get dest="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins" src="${mss.jopr-plugin-5.url}"/>		
+		<get dest="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins/jopr-mobicents-sip-servlets-as-5-plugin-${mss.jopr-plugin-5.version}.jar" src="${mss.jopr-plugin-5.url}"/>		
 	</target>
 	
 	<!-- Get dependencies -->

@@ -14,6 +14,7 @@
       className="org.mobicents.servlet.sip.startup.SipStandardService" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
   		concurrencyControlMode="None"
+  		sipPathName="org.mobicents.ha" 
   		congestionControlCheckingInterval="-1" 
   		darConfigurationFileLocation="conf/dars/mobicents-dar.properties">
 

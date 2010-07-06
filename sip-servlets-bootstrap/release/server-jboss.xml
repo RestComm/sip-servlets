@@ -11,7 +11,8 @@
    connectors.
    -->
    <Service name="jboss.web" 
-      className="org.mobicents.servlet.sip.startup.SipStandardService" 
+      className="org.mobicents.servlet.sip.startup.SipStandardService"
+      sipPathName="org.mobicents.ha"  
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"  		
 		concurrencyControlMode="None" 
   		darConfigurationFileLocation="conf/dars/mobicents-dar.properties">
