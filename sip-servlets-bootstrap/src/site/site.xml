@@ -18,6 +18,13 @@
 			<item name="SIP Servlets 1.1 Javadoc" href="./mss/jsr289/javadocs/index.html"/>
 			<item name="Mobicents SIP Servlets Extensions Javadoc" href="./mss/jsr289/extensions/index.html"/>
 		</menu>
+		<menu name="Frameworks">
+			<item name="Seam Telco Framework" href="http://groups.google.com/group/mobicents-public/web/seam-telco-framework-for-sip-servlets"/>
+			<item name="SSF" href="./mss-ssf.html" collapse="true">
+				<item name="SSF" href="./mss/ssf/sf-api/site/en/index.html"/> 
+				<item name="SSF Flow API" href="./mss/ssf/sf-flow-api/en/index.html"/>
+			</item>			
+		</menu>
 		<menu name="Examples">
 			<item name="Examples" href="examples.html" collapse="true">
 				<item name="Call Blocking" href="call_blocking.html" />

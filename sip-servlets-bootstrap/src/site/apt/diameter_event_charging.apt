@@ -26,7 +26,7 @@ Diameter Event Charging Service
 ** From the binary
 
 	You can find the war file corresponding to this example
- 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/diameter-event-charging/1.7/diameter-event-charging-1.7.war}here}}.\
+ 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/diameter-event-charging/1.7.1/diameter-event-charging-1.7.1.war}here}}.\
  	Drop the downloaded war file into your <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/diametereventcharging-dar.properties}dar configuration file}}.\

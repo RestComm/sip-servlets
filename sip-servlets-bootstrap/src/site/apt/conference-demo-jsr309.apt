@@ -16,7 +16,7 @@ Sip Servlets Conference Demo
 ** From the binary
 
 	You can find the war file corresponding to this example
- 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/examples/conference-demo/1.6/conference-demo-1.6.war}here}}.\
+ 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/examples/conference-demo/1.6.1/conference-demo-1.6.1.war}here}}.\
  	Drop the downloaded war file into your <<<tomcat_home/webapps>>> directory or <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/conference-demo-dar.properties}dar configuration file}}.\

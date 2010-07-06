@@ -40,7 +40,28 @@ Goals
 		 
 		 * {{{./user_guides/sip_servlets/index.html#ssds-Diameter_Support}Diameter}} and {{{./user_guides/sip_servlets/index.html#saimse-SIP_and_IMS_Extensions}IMS}} Support
 		 
-		 * {{{./user_guides/sip_servlets/index.html#ss_jslee_interop}SIP Servlets/JAIN SLEE Interoperability}}	
+		 * {{{./user_guides/sip_servlets/index.html#ss_jslee_interop}SIP Servlets/JAIN SLEE Interoperability}}
+		 
+		 
+OKI contributes their SIP Servlets Framework to Mobicents !
+
+	We are delighted to announce that {{{http://www.oki.com/}OKI Japan}} has become a Mobicents contributor and chosen Mobicents as a Platform to open source their Spring SIP Servlets application framework
+	that will allow SIP Servlets application developers to easily add VoIP features to their existing Spring applications.
+	
+	By doing so OKI has taken one first great of many steps towards open sourcing their high expertise and experience to help develop stable and powerful convergent applications quickly.
+
+	Read about {{{http://www.oki.com/en/press/2010/06/z10009e.html}the press release}}
+	
+	Check out the {{{./mss-ssf.html}documentation}}
+		 	
+
+Version 1.3.1 is out !
+
+	We are proud to announce our {{{./mss-downloads.html}Mobicents Sip Servlets 1.3.1 version}}, certified against the {{{http://jcp.org/en/jsr/detail?id=289}Sip Servlets 1.1 specification}} and working on top of <Tomcat 6.0.20> and <JBoss AS 5.1.0.GA>. 		
+	
+	This release is a bug fix and performance fix release. {{{http://code.google.com/p/mobicents/issues/list?can=1&q=label:Version-1.3.1+Component:Sip-Servlets&colspec=ID+Priority+Component+Milestone+Version+Release+Type+Status+Owner+Summary&cells=tiles}Here is the list of bug fixes included in this release}}
+	
+	Get it from {{{./mss-downloads.html}here}} and follow the {{{./user_guides/sip_servlets/index.html#sssicar-SIP_Servlets_Server-Installing_Configuring_and_Running}Installation Instructions}} to setup it up.
 
 Version 1.3 is out !
 

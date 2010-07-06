@@ -15,8 +15,8 @@ Speed Dial - Location Service : a Composed Application
 ** From the binary
 
 	You can find the war files corresponding to this example
- 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/speed-dial/1.7/speed-dial-1.7.war}here}} and 
- 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/location-service/1.7/location-service-1.7.war}here}}.\
+ 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/speed-dial/1.7.1/speed-dial-1.7.1.war}here}} and 
+ 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/location-service/1.7.1/location-service-1.7.1.war}here}}.\
  	Drop the downloaded war file into your <<<tomcat_home/webapps>>> directory or <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/speeddial-locationservice-dar.properties}dar configuration file}}.\
