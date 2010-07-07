@@ -1681,7 +1681,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 		this.t2Interval = t2Interval;
 		if(logger.isInfoEnabled()) {
-			logger.info("SIP Timer T2 Interval set to " + this.baseTimerInterval +"ms");
+			logger.info("SIP Timer T2 Interval set to " + this.t2Interval +"ms");
 		}
 	}
 
@@ -1703,7 +1703,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 		this.t4Interval = t4Interval;
 		if(logger.isInfoEnabled()) {
-			logger.info("SIP Timer T4 Interval set to " + this.baseTimerInterval +"ms");
+			logger.info("SIP Timer T4 Interval set to " + this.t4Interval +"ms");
 		}
 	}
 
@@ -1728,7 +1728,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 		this.timerDInterval = timerDInterval;
 		if(logger.isInfoEnabled()) {
-			logger.info("SIP Timer D Interval set to " + this.baseTimerInterval +"ms");
+			logger.info("SIP Timer D Interval set to " + this.timerDInterval +"ms");
 		}
 	}
 
