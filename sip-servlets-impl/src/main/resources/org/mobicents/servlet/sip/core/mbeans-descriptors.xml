@@ -37,6 +37,18 @@
 			description="JAIN SIP Timer Interval"
 			type="int" />
 			
+		<attribute name="t2Interval"
+			description="JAIN SIP Timer T2 Interval"
+			type="int" />
+			
+		<attribute name="t4Interval"
+			description="JAIN SIP Timer T4 Interval"
+			type="int" />
+			
+			<attribute name="timerDInterval"
+			description="JAIN SIP Timer D Interval"
+			type="int" />
+			
 		<attribute name="memoryThreshold"
 			description="Percentage of memory to be used by the container before applying the congestion control policy"
 			type="int" />
