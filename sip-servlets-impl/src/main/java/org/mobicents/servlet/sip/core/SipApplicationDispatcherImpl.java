@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.core;
 
 import gov.nist.javax.sip.DialogTimeoutEvent;
+import gov.nist.javax.sip.TransactionExt;
 import gov.nist.javax.sip.DialogTimeoutEvent.Reason;
 
 import java.io.Serializable;
@@ -212,6 +213,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	private boolean bypassResponseExecutor = true;
 	private boolean bypassRequestExecutor = true;			
 	private int baseTimerInterval = 500; // base timer interval for jain sip tx
+	private int t2Interval = 4000; // t2 timer interval for jain sip tx
+	private int t4Interval = 5000; // t4 timer interval for jain sip tx
+	private int timerDInterval = 32000; // timer D interval for jain sip tx
 	private ConcurrencyControlMode concurrencyControlMode;
 	
 	// This executor is used for async things that don't need to wait on session executors, like CANCEL requests
@@ -574,6 +578,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					}
 				    requestTransaction = sipProvider.getNewServerTransaction(request);
 				    requestTransaction.setRetransmitTimer(baseTimerInterval);
+				    ((TransactionExt)requestTransaction).setTimerT2(t2Interval);
+				    ((TransactionExt)requestTransaction).setTimerT4(t4Interval);
+				    ((TransactionExt)requestTransaction).setTimerD(timerDInterval);
 				} catch ( TransactionUnavailableException tae) {
 					logger.error("cannot get a new Server transaction for this request " + request, tae);
 					// Sends a 500 Internal server error and stops processing.				
@@ -1663,6 +1670,53 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public int getBaseTimerInterval() {
 		return baseTimerInterval;
+	}
+	
+	/**
+	 * @param t2Interval the t2Interval to set
+	 */
+	public void setT2Interval(int t2Interval) {
+		this.t2Interval = t2Interval;
+	}
+
+
+	/**
+	 * @return the t2Interval
+	 */
+	public int getT2Interval() {
+		return t2Interval;
+	}
+
+
+	/**
+	 * @param t4Interval the t4Interval to set
+	 */
+	public void setT4Interval(int t4Interval) {
+		this.t4Interval = t4Interval;
+	}
+
+
+	/**
+	 * @return the t4Interval
+	 */
+	public int getT4Interval() {
+		return t4Interval;
+	}
+
+
+	/**
+	 * @param timerDInterval the timerDInterval to set
+	 */
+	public void setTimerDInterval(int timerDInterval) {
+		this.timerDInterval = timerDInterval;
+	}
+
+
+	/**
+	 * @return the timerDInterval
+	 */
+	public int getTimerDInterval() {
+		return timerDInterval;
 	}
 
 	public String[] getExtensionsSupported() {

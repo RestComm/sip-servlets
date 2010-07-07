@@ -181,6 +181,13 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 	public void setBaseTimerInterval(int baseTimerInterval);
 	public int getBaseTimerInterval();
 
+	public void setT2Interval(int t2Interval);
+	public int getT2Interval();
+	public void setT4Interval(int t4Interval);
+	public int getT4Interval();
+	public void setTimerDInterval(int timerDInterval);
+	public int getTimerDInterval();
+	
 	String[] getExtensionsSupported();
 	String[] getRfcSupported();
 		

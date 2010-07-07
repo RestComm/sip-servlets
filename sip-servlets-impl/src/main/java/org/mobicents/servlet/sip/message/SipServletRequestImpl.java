@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.DialogExt;
+import gov.nist.javax.sip.TransactionExt;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.MessageExt;
 import gov.nist.javax.sip.stack.SIPTransaction;
@@ -1072,7 +1073,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				}
 				
 				final ClientTransaction ctx = sipProvider.getNewClientTransaction(request);				
-				ctx.setRetransmitTimer(sipFactoryImpl.getSipApplicationDispatcher().getBaseTimerInterval());								
+				ctx.setRetransmitTimer(sipFactoryImpl.getSipApplicationDispatcher().getBaseTimerInterval());
+			    ((TransactionExt)ctx).setTimerT2(sipFactoryImpl.getSipApplicationDispatcher().getT2Interval());
+			    ((TransactionExt)ctx).setTimerT4(sipFactoryImpl.getSipApplicationDispatcher().getT4Interval());
+			    ((TransactionExt)ctx).setTimerD(sipFactoryImpl.getSipApplicationDispatcher().getTimerDInterval());
 
 				Dialog dialog = ctx.getDialog();
 
@@ -1149,6 +1153,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
 						transport, false).getSipProvider();				
 				final ClientTransaction ctx = sipProvider.getNewClientTransaction(request);
+				ctx.setRetransmitTimer(sipFactoryImpl.getSipApplicationDispatcher().getBaseTimerInterval());
+			    ((TransactionExt)ctx).setTimerT2(sipFactoryImpl.getSipApplicationDispatcher().getT2Interval());
+			    ((TransactionExt)ctx).setTimerT4(sipFactoryImpl.getSipApplicationDispatcher().getT4Interval());
+			    ((TransactionExt)ctx).setTimerD(sipFactoryImpl.getSipApplicationDispatcher().getTimerDInterval());
 				//Keeping the transactions mapping in application data for CANCEL handling
 				if(linkedRequest != null) {
 					//keeping the client transaction in the server transaction's application data

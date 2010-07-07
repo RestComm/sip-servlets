@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.core.dispatchers;
 
+import gov.nist.javax.sip.TransactionExt;
 import gov.nist.javax.sip.message.SIPMessage;
 
 import java.text.ParseException;
@@ -172,6 +173,9 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 			if(transaction == null || transaction instanceof ServerTransaction) {
 				ClientTransaction ctx = sipProvider.getNewClientTransaction(clonedRequest);
 				ctx.setRetransmitTimer(sipApplicationDispatcher.getBaseTimerInterval());
+				((TransactionExt)ctx).setTimerT2(sipApplicationDispatcher.getT2Interval());
+			    ((TransactionExt)ctx).setTimerT4(sipApplicationDispatcher.getT4Interval());
+			    ((TransactionExt)ctx).setTimerD(sipApplicationDispatcher.getTimerDInterval());
 				//keeping the server transaction in the client transaction's application data
 				TransactionApplicationData appData = new TransactionApplicationData(sipServletRequest);					
 				appData.setTransaction(serverTransaction);
@@ -254,6 +258,10 @@ public abstract class RequestDispatcher extends MessageDispatcher {
             	                    
             ClientTransaction clientTransaction =
             	sipProvider.getNewClientTransaction(dialogRequest);
+            clientTransaction.setRetransmitTimer(sipApplicationDispatcher.getBaseTimerInterval());
+			((TransactionExt)clientTransaction).setTimerT2(sipApplicationDispatcher.getT2Interval());
+		    ((TransactionExt)clientTransaction).setTimerT4(sipApplicationDispatcher.getT4Interval());
+		    ((TransactionExt)clientTransaction).setTimerD(sipApplicationDispatcher.getTimerDInterval());
             //keeping the server transaction in the client transaction's application data
 			TransactionApplicationData appData = new TransactionApplicationData(sipServletRequest);
 			appData.setNoAppReturned(noAppReturned);

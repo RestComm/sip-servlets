@@ -79,6 +79,9 @@ public class SipStandardService extends StandardService implements SipService {
 	protected long congestionControlCheckingInterval = 30000;
 	// base timer interval for jain sip tx 
 	private int baseTimerInterval = 500;
+	private int t2Interval = 4000;
+	private int t4Interval = 5000;
+	private int timerDInterval = 32000;
 	
 	protected int dispatcherThreadPoolSize = 4;
 	
@@ -206,6 +209,9 @@ public class SipStandardService extends StandardService implements SipService {
 			throw new LifecycleException("It's forbidden to set the Base Timer Interval to a non positive value");		
 		}
 		sipApplicationDispatcher.setBaseTimerInterval(baseTimerInterval);
+		sipApplicationDispatcher.setT2Interval(t2Interval);
+		sipApplicationDispatcher.setT4Interval(t4Interval);
+		sipApplicationDispatcher.setTimerDInterval(timerDInterval);
 		sipApplicationDispatcher.setMemoryThreshold(getMemoryThreshold());
 		sipApplicationDispatcher.setBackToNormalMemoryThreshold(backToNormalMemoryThreshold);
 		sipApplicationDispatcher.setCongestionControlCheckingInterval(getCongestionControlCheckingInterval());
@@ -758,5 +764,53 @@ public class SipStandardService extends StandardService implements SipService {
 		 ObjectName _oname = new ObjectName(domain + ":type=" + type + ",port="
 		         + connector.getPort() + ",transport=" + connector.getProperty("transport") + addSuffix);
 		 return _oname;
+	}
+
+
+	/**
+	 * @param t2Interval the t2Interval to set
+	 */
+	public void setT2Interval(int t2Interval) {
+		this.t2Interval = t2Interval;
+	}
+
+
+	/**
+	 * @return the t2Interval
+	 */
+	public int getT2Interval() {
+		return t2Interval;
+	}
+
+
+	/**
+	 * @param t4Interval the t4Interval to set
+	 */
+	public void setT4Interval(int t4Interval) {
+		this.t4Interval = t4Interval;
+	}
+
+
+	/**
+	 * @return the t4Interval
+	 */
+	public int getT4Interval() {
+		return t4Interval;
+	}
+
+
+	/**
+	 * @param timerDInterval the timerDInterval to set
+	 */
+	public void setTimerDInterval(int timerDInterval) {
+		this.timerDInterval = timerDInterval;
+	}
+
+
+	/**
+	 * @return the timerDInterval
+	 */
+	public int getTimerDInterval() {
+		return timerDInterval;
 	}
 }

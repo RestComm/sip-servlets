@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.proxy;
 
+import gov.nist.javax.sip.TransactionExt;
 import gov.nist.javax.sip.message.SIPMessage;
 import gov.nist.javax.sip.stack.SIPClientTransaction;
 import gov.nist.javax.sip.stack.SIPTransaction;
@@ -662,6 +663,9 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 			ClientTransaction ctx = sipProvider
 				.getNewClientTransaction(clonedRequest);			
 			ctx.setRetransmitTimer(sipApplicationDispatcher.getBaseTimerInterval());
+		    ((TransactionExt)ctx).setTimerT2(sipApplicationDispatcher.getT2Interval());
+		    ((TransactionExt)ctx).setTimerT4(sipApplicationDispatcher.getT4Interval());
+		    ((TransactionExt)ctx).setTimerD(sipApplicationDispatcher.getTimerDInterval());
 			
 			TransactionApplicationData appData = (TransactionApplicationData) request.getTransactionApplicationData();
 			appData.setProxyBranch(this);
