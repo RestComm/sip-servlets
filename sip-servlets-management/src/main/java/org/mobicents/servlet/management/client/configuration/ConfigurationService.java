@@ -30,4 +30,10 @@ public interface ConfigurationService extends RemoteService {
 	public void setCongestionControlCheckingInterval(long interval);
 	void setBaseTimerInterval(int baseTimerInterval);
 	int getBaseTimerInterval();
+	void setT2Interval(int t2Interval);
+	int getT2Interval();
+	void setT4Interval(int t4Interval);
+	int getT4Interval();
+	void setTimerDInterval(int timerDInterval);
+	int getTimerDInterval();
 }

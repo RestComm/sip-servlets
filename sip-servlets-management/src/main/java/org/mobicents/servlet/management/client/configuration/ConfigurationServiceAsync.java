@@ -17,4 +17,10 @@ public interface ConfigurationServiceAsync {
 	void getCongestionControlCheckingInterval(AsyncCallback<Long> callback);
 	void setBaseTimerInterval(int baseTimerInterval, AsyncCallback<Void> callback);
 	void getBaseTimerInterval(AsyncCallback<Integer> callback);
+	void setT2Interval(int t2Interval, AsyncCallback<Void> callback);
+	void getT2Interval(AsyncCallback<Integer> callback);
+	void setT4Interval(int t4Interval, AsyncCallback<Void> callback);
+	void getT4Interval(AsyncCallback<Integer> callback);
+	void setTimerDInterval(int timerDInterval, AsyncCallback<Void> callback);
+	void getTimerDInterval(AsyncCallback<Integer> callback);
 }

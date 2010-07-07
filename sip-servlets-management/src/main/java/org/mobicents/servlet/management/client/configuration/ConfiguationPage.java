@@ -36,6 +36,9 @@ public class ConfiguationPage extends Panel {
 	TextField memoryThreshold;
 	TextField congestionControlCheckingInterval;
 	TextField baseTimerInterval;
+	TextField t2Interval;
+	TextField t4Interval;
+	TextField timerDInterval;
 	
 	private ComboBox makeCombo(Store store, String field, ComboBoxListenerAdapter listener, String defaultValue) {
 		final ComboBox box;
@@ -96,6 +99,21 @@ public class ConfiguationPage extends Panel {
 		baseTimerInterval.setAllowBlank(false); 
 		baseTimerInterval.setHideLabel(true);
 		addLabeledControl("JAIN SIP Base Timer Interval:", baseTimerInterval, formPanel);
+		
+		t2Interval = new TextField();  
+		t2Interval.setAllowBlank(false); 
+		t2Interval.setHideLabel(true);
+		addLabeledControl("JAIN SIP Timer T2 Interval:", t2Interval, formPanel);
+		
+		t4Interval = new TextField();  
+		t4Interval.setAllowBlank(false); 
+		t4Interval.setHideLabel(true);
+		addLabeledControl("JAIN SIP Timer T4 Interval:", t4Interval, formPanel);
+		
+		timerDInterval = new TextField();  
+		timerDInterval.setAllowBlank(false); 
+		timerDInterval.setHideLabel(true);
+		addLabeledControl("JAIN SIP Timer D Interval:", timerDInterval, formPanel);
 		
 		//Concurrency control modes selector
 		final Store ccmsStore = new SimpleStore(new String[]{"ccms"}, concurrencyControlModes);  
@@ -174,6 +192,45 @@ public class ConfiguationPage extends Panel {
 							
 						});
 				
+				ConfigurationService.Util.getInstance().setT4Interval(
+						Integer.parseInt(t4Interval.getValueAsString()), new AsyncCallback<Void>() {
+
+							public void onFailure(Throwable caught) {
+								Console.error("Error while trying to set the SIP Timer T4 Interval.");
+							}
+
+							public void onSuccess(Void result) {
+								result = result;
+							}
+							
+						});
+				
+				ConfigurationService.Util.getInstance().setT2Interval(
+						Integer.parseInt(t2Interval.getValueAsString()), new AsyncCallback<Void>() {
+
+							public void onFailure(Throwable caught) {
+								Console.error("Error while trying to set the SIP Timer T2 Interval.");
+							}
+
+							public void onSuccess(Void result) {
+								result = result;
+							}
+							
+						});
+				
+				ConfigurationService.Util.getInstance().setTimerDInterval(
+						Integer.parseInt(timerDInterval.getValueAsString()), new AsyncCallback<Void>() {
+
+							public void onFailure(Throwable caught) {
+								Console.error("Error while trying to set the SIP Timer D Interval.");
+							}
+
+							public void onSuccess(Void result) {
+								result = result;
+							}
+							
+						});
+				
 				ConfigurationService.Util.getInstance().setMemoryThreshold(
 						Integer.parseInt(memoryThreshold.getValueAsString()), new AsyncCallback<Void>() {
 
@@ -230,6 +287,42 @@ public class ConfiguationPage extends Panel {
 
 					public void onSuccess(Integer result) {
 						baseTimerInterval.setValue(result.toString());
+					}
+					
+				});
+				
+				ConfigurationService.Util.getInstance().getT2Interval(new AsyncCallback<Integer>() {
+
+					public void onFailure(Throwable caught) {
+						Console.error("Error while trying to get the SIP Timer T2 interval.");
+					}
+
+					public void onSuccess(Integer result) {
+						t2Interval.setValue(result.toString());
+					}
+					
+				});
+				
+				ConfigurationService.Util.getInstance().getT4Interval(new AsyncCallback<Integer>() {
+
+					public void onFailure(Throwable caught) {
+						Console.error("Error while trying to get the SIP Timer T4 interval.");
+					}
+
+					public void onSuccess(Integer result) {
+						t4Interval.setValue(result.toString());
+					}
+					
+				});
+				
+				ConfigurationService.Util.getInstance().getTimerDInterval(new AsyncCallback<Integer>() {
+
+					public void onFailure(Throwable caught) {
+						Console.error("Error while trying to get the SIP Timer D interval.");
+					}
+
+					public void onSuccess(Integer result) {
+						timerDInterval.setValue(result.toString());
 					}
 					
 				});

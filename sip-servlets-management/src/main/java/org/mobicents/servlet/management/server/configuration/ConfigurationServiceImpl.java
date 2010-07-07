@@ -66,6 +66,45 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 			throw new RuntimeException("Error", t);
 		}
 	}
+	
+	public int getT2Interval() {
+		try {
+			ObjectName dispatcherName = getApplicationDispatcher();
+			
+			String size = 
+				mserver.getAttribute(
+						dispatcherName, "t2Interval").toString();
+			return Integer.parseInt(size);
+		} catch (Throwable t) {
+			throw new RuntimeException("Error", t);
+		}
+	}
+	
+	public int getT4Interval() {
+		try {
+			ObjectName dispatcherName = getApplicationDispatcher();
+			
+			String size = 
+				mserver.getAttribute(
+						dispatcherName, "t4Interval").toString();
+			return Integer.parseInt(size);
+		} catch (Throwable t) {
+			throw new RuntimeException("Error", t);
+		}
+	}
+	
+	public int getTimerDInterval() {
+		try {
+			ObjectName dispatcherName = getApplicationDispatcher();
+			
+			String size = 
+				mserver.getAttribute(
+						dispatcherName, "timerDInterval").toString();
+			return Integer.parseInt(size);
+		} catch (Throwable t) {
+			throw new RuntimeException("Error", t);
+		}
+	}
 
 	public void setConcurrencyControlMode(String mode) {
 		try {
@@ -91,6 +130,40 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 		try {
 			ObjectName dispatcherName = getApplicationDispatcher();
 			Attribute att = new Attribute("baseTimerInterval", new Integer(baseTimerInterval));
+			mserver.setAttribute(dispatcherName, att);
+		} catch (Throwable t) {
+			throw new RuntimeException("Error", t);
+		}
+		
+	}
+	
+	public void setT2Interval(int t2Interval) {
+		try {
+			ObjectName dispatcherName = getApplicationDispatcher();
+			Attribute att = new Attribute("t2Interval", new Integer(t2Interval));
+			mserver.setAttribute(dispatcherName, att);
+		} catch (Throwable t) {
+			throw new RuntimeException("Error", t);
+		}
+		
+	}
+	
+	public void setT4Interval(int t4Interval) {
+		try {
+			ObjectName dispatcherName = getApplicationDispatcher();
+			Attribute att = new Attribute("t4Interval", new Integer(t4Interval));
+			mserver.setAttribute(dispatcherName, att);
+		} catch (Throwable t) {
+			throw new RuntimeException("Error", t);
+		}
+		
+	}
+	
+	
+	public void setTimerDInterval(int timerDInterval) {
+		try {
+			ObjectName dispatcherName = getApplicationDispatcher();
+			Attribute att = new Attribute("timerDInterval", new Integer(timerDInterval));
 			mserver.setAttribute(dispatcherName, att);
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
