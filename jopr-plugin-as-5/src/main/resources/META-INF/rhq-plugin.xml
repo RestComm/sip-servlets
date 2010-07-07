@@ -879,6 +879,9 @@
         	<c:simple-property name="backToNormalMemoryThreshold" type="integer" description="if the Percentage of memory be used by the container drops below this threshold, the container starts processing messages again" defaultValue="90"/>
         	<c:simple-property name="congestionControlCheckingInterval" type="long" description="Congestion control interval specifies at which interval (in millisecs) runs the statistics for congestion control" defaultValue="30000"/>
         	<c:simple-property name="baseTimerInterval" type="integer" description="JAIN SIP Base Timer Interval (in millisecs)." defaultValue="500"/>
+        	<c:simple-property name="t2Interval" type="integer" description="JAIN SIP Timer T2 Interval (in millisecs)." defaultValue="5000"/>
+        	<c:simple-property name="t4Interval" type="integer" description="JAIN SIP Timer T4 Interval (in millisecs)." defaultValue="5000"/>
+        	<c:simple-property name="timerDInterval" type="integer" description="JAIN SIP Timer D Interval (in millisecs)." defaultValue="32000"/>
         	<c:simple-property name="gatherStatistics" type="boolean" description="Whether to collect statistics or not." defaultValue="true"/>
         </resource-configuration>
     </service>
