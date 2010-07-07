@@ -1657,11 +1657,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public void setBaseTimerInterval(int baseTimerInterval) {
 		if(baseTimerInterval < 1) {
-			logger.error("It's forbidden to set the Base Timer Interval to a non positive value");
+			throw new IllegalArgumentException("It's forbidden to set the Base Timer Interval to a non positive value");
 		}
 		this.baseTimerInterval = baseTimerInterval;
 		if(logger.isInfoEnabled()) {
-			logger.info("Base Timer Interval set to " + this.baseTimerInterval +"ms");
+			logger.info("SIP Base Timer Interval set to " + this.baseTimerInterval +"ms");
 		}
 	}
 
@@ -1676,7 +1676,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @param t2Interval the t2Interval to set
 	 */
 	public void setT2Interval(int t2Interval) {
+		if(t2Interval < 1) {
+			throw new IllegalArgumentException("It's forbidden to set the SIP Timer T2 Interval to a non positive value");
+		}
 		this.t2Interval = t2Interval;
+		if(logger.isInfoEnabled()) {
+			logger.info("SIP Timer T2 Interval set to " + this.baseTimerInterval +"ms");
+		}
 	}
 
 
@@ -1692,7 +1698,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @param t4Interval the t4Interval to set
 	 */
 	public void setT4Interval(int t4Interval) {
+		if(t4Interval < 1) {
+			throw new IllegalArgumentException("It's forbidden to set the SIP Timer T4 Interval to a non positive value");
+		}
 		this.t4Interval = t4Interval;
+		if(logger.isInfoEnabled()) {
+			logger.info("SIP Timer T4 Interval set to " + this.baseTimerInterval +"ms");
+		}
 	}
 
 
@@ -1708,7 +1720,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @param timerDInterval the timerDInterval to set
 	 */
 	public void setTimerDInterval(int timerDInterval) {
+		if(timerDInterval < 1) {
+			throw new IllegalArgumentException("It's forbidden to set the SIP Timer TD Interval to a non positive value");
+		}
+		if(timerDInterval > 32000) {
+			throw new IllegalArgumentException("It's forbidden to set the SIP Timer TD Interval to a value lower than 32s");
+		}
 		this.timerDInterval = timerDInterval;
+		if(logger.isInfoEnabled()) {
+			logger.info("SIP Timer D Interval set to " + this.baseTimerInterval +"ms");
+		}
 	}
 
 
