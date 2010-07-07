@@ -340,8 +340,8 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 			proxyBranch1xxTimerStarted = true;
 		}
 		
-		forwardRequest(cloned, false);		
 		started = true;
+		forwardRequest(cloned, false);		
 	}
 	
 	/**
