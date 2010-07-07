@@ -1723,7 +1723,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		if(timerDInterval < 1) {
 			throw new IllegalArgumentException("It's forbidden to set the SIP Timer TD Interval to a non positive value");
 		}
-		if(timerDInterval > 32000) {
+		if(timerDInterval < 32000) {
 			throw new IllegalArgumentException("It's forbidden to set the SIP Timer TD Interval to a value lower than 32s");
 		}
 		this.timerDInterval = timerDInterval;
