@@ -50,6 +50,7 @@ import org.apache.catalina.Session;
 import org.apache.catalina.Valve;
 import org.apache.catalina.core.ContainerBase;
 import org.jboss.logging.Logger;
+import org.jboss.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.jboss.ReplicationGranularity;
 import org.jboss.metadata.web.jboss.SnapshotMode;
@@ -2554,7 +2555,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	protected void processSipApplicationSessionRepl(ClusteredSipApplicationSession session) {
 		// If we are using SESSION granularity, we don't want to initiate a TX
 		// for a single put
-		boolean notSession = (getReplicationGranularity() != ReplicationGranularity.SESSION);
+//		boolean notSession = (getReplicationGranularity() != ReplicationGranularity.SESSION);
+		boolean notSession = true;
 		boolean doTx = false;
 		BatchingManager batchingManager = getDistributedCacheConvergedSipManager().getBatchingManager();
 		try {
@@ -2562,15 +2564,15 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	         // Don't do anything if there is already transaction context
 	         // associated with this thread.
 	         if(notSession && batchingManager.isBatchInProgress() == false)
-	         {
+	         {	        	 
 	            batchingManager.startBatch();
 	            doTx = true;
 	         }
-
+	         
 			 session.processSipApplicationSessionReplication();
 		} catch (Exception ex) {
 			if (log_.isDebugEnabled())
-				log_.debug("processSessionRepl(): failed with exception", ex);
+				log_.debug("processSipApplicationSessionRepl(): failed with exception", ex);
 
 			try {
 				// if(doTx)
@@ -2587,7 +2589,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 				throw (RuntimeException) ex;
 
 			throw new RuntimeException(
-					"JBossCacheManager.processSessionRepl(): "
+					"JBossCacheSipManager.processSipApplicationSessionRepl(): "
 							+ "failed to replicate session.", ex);
 		} finally {
 			if (doTx)
@@ -2937,8 +2939,12 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		DistributedCacheConvergedSipManager<? extends OutgoingDistributableSessionData> distributedCacheConvergedSipManager = getDistributedCacheConvergedSipManager();
 		// Issue 1514: http://code.google.com/p/mobicents/issues/detail?id=1514	
 		// only set this up if the application is a SIP or converged application	
-		if(container instanceof SipContext) {
-			distributedCacheConvergedSipManager.setApplicationName(((SipContext)getContainer()).getApplicationName());
+		if(container instanceof SipContext) {			
+			applicationName = ((SipContext)getContainer()).getApplicationName();
+			if(logger.isDebugEnabled()) {
+				logger.debug("Setting Application Name " + applicationName + " for Manager " + this + " for context " + container.getName());
+			}
+			distributedCacheConvergedSipManager.setApplicationName(applicationName);
 			distributedCacheConvergedSipManager.setApplicationNameHashed(((SipContext)getContainer()).getApplicationNameHashed());
 		}
 	}
@@ -3184,14 +3190,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	 */
 	public void notifyRemoteSipApplicationSessionInvalidation(String realId) {
 		// Remove the session from our local map
-		SipApplicationSessionKey key = null;
-		try {
-			key = SessionManagerUtil.parseSipApplicationSessionKey(realId);
-		} catch (ParseException e) {
-			//should never happen
-			logger.error("An unexpected exception happened on parsing the following sip application session key " + realId, e);
-			return;
-		}
+		SipApplicationSessionKey key = new SipApplicationSessionKey(realId, applicationName);
 		ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session = (ClusteredSipApplicationSession)sipManagerDelegate
 				.removeSipApplicationSession(key);
 		if (session == null) {
@@ -3333,17 +3332,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	 */
 	public void notifySipApplicationSessionLocalAttributeModification(
 			String realId) {
-		SipApplicationSessionKey key = null;
-		try {
-			key = SessionManagerUtil.parseSipApplicationSessionKey(realId);
-		} catch (ParseException e) {
-			// should never happen
-			logger
-					.error(
-							"An unexpected exception happened on parsing the following sip application session key "
-									+ realId, e);
-			return;
-		}
+		SipApplicationSessionKey key = new SipApplicationSessionKey(realId, applicationName);
 		ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session = (ClusteredSipApplicationSession) sipManagerDelegate
 				.getSipApplicationSession(key, false);
 		if (session != null) {
@@ -3405,17 +3394,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			String realId, String dataOwner, int distributedVersion,
 			long timestamp, DistributableSessionMetadata metadata) {
 		boolean updated = true;
-		SipApplicationSessionKey key = null;
-		try {
-			key = SessionManagerUtil.parseSipApplicationSessionKey(realId);
-		} catch (ParseException e) {
-			// should never happen
-			logger
-					.error(
-							"An unexpected exception happened on parsing the following sip application session key "
-									+ realId, e);
-			return false;
-		}
+		SipApplicationSessionKey key = new SipApplicationSessionKey(realId, applicationName);
+		
 		ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session = findLocalSipApplicationSession(
 				key, false);
 		if (session != null) {
@@ -3424,26 +3404,31 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			updated = session
 					.setVersionFromDistributedCache(distributedVersion);
 			if (updated && log_.isDebugEnabled()) {
-				log_.debug("session in-memory data is invalidated for id: "
+				log_.debug("sip app session in-memory data is invalidated for id: "
 						+ realId + " new version: " + distributedVersion);
 			}
 		} else {
-			int maxLife = metadata == null ? getMaxInactiveInterval()
-					: metadata.getMaxInactiveInterval();
-
-			Object existing = unloadedSipApplicationSessions_
-					.put(key.getId(), new OwnedSessionUpdate(dataOwner, timestamp,
-							maxLife, false));
-			if (existing == null) {
-				calcActiveSessions();
-				if (log_.isDebugEnabled()) {
-					log_.debug("New session " + realId
-							+ " added to unloaded session map");
-				}
-			} else if (trace_) {
-				log_.trace("Updated timestamp for unloaded session " + realId);
-			}
+			log_.debug("sip app session not found locally for : "
+					+ key + " new version: " + distributedVersion);
 		}
+		// unloadedSipApplicationSessions_ is not currently supported
+//		else {
+//			int maxLife = metadata == null ? getMaxInactiveInterval()
+//					: metadata.getMaxInactiveInterval();
+//
+//			Object existing = unloadedSipApplicationSessions_
+//					.put(key.getId(), new OwnedSessionUpdate(dataOwner, timestamp,
+//							maxLife, false));
+//			if (existing == null) {
+//				calcActiveSessions();
+//				if (log_.isDebugEnabled()) {
+//					log_.debug("New session " + realId
+//							+ " added to unloaded session map");
+//				}
+//			} else if (trace_) {
+//				log_.trace("Updated timestamp for unloaded session " + realId);
+//			}
+//		}
 
 		return updated;
 	}
@@ -3492,17 +3477,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			String sipAppSessionId, String sipSessionId, String dataOwner, int distributedVersion,
 			long timestamp, DistributableSessionMetadata metadata) {
 		boolean updated = true;
-		SipApplicationSessionKey sipAppSessionKey = null;
-		try {
-			sipAppSessionKey = SessionManagerUtil.parseSipApplicationSessionKey(sipAppSessionId);
-		} catch (ParseException e) {
-			// should never happen
-			logger
-					.error(
-							"An unexpected exception happened on parsing the following sip application session key "
-									+ sipAppSessionId, e);
-			return false;
-		}
+		SipApplicationSessionKey sipAppSessionKey = new SipApplicationSessionKey(sipAppSessionId, applicationName);
 		SipSessionKey key = null;
 		try {
 			key = SessionManagerUtil.parseSipSessionKey(sipSessionId);
@@ -3526,22 +3501,27 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 						+ sipSessionId + " new version: " + distributedVersion);
 			}
 		} else {
-			int maxLife = metadata == null ? getMaxInactiveInterval()
-					: metadata.getMaxInactiveInterval();
-
-			Object existing = unloadedSipSessions_
-					.put(new ClusteredSipSessionKey(key, sipAppSessionKey), new OwnedSessionUpdate(dataOwner, timestamp,
-							maxLife, false));
-			if (existing == null) {
-				calcActiveSessions();
-				if (trace_) {
-					log_.trace("New session " + sipSessionId
-							+ " added to unloaded session map");
-				}
-			} else if (trace_) {
-				log_.trace("Updated timestamp for unloaded session " + sipSessionId);
-			}
+			log_.debug("sip session not found locally for : "
+					+ key + " new version: " + distributedVersion);
 		}
+		// unloadedSipSessions_ is not currently supported
+//		else {
+//			int maxLife = metadata == null ? getMaxInactiveInterval()
+//					: metadata.getMaxInactiveInterval();
+//
+//			Object existing = unloadedSipSessions_
+//					.put(new ClusteredSipSessionKey(key, sipAppSessionKey), new OwnedSessionUpdate(dataOwner, timestamp,
+//							maxLife, false));
+//			if (existing == null) {
+//				calcActiveSessions();
+//				if (trace_) {
+//					log_.trace("New session " + sipSessionId
+//							+ " added to unloaded session map");
+//				}
+//			} else if (trace_) {
+//				log_.trace("Updated timestamp for unloaded session " + sipSessionId);
+//			}
+//		}
 
 		return updated;
 	}

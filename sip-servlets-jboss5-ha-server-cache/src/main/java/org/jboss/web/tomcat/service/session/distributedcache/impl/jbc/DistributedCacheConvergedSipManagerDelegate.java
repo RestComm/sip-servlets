@@ -512,9 +512,7 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 
 	public  void storeSipApplicationSessionMetaData(
 			Fqn<String> fqn,
-			OutgoingDistributableSipApplicationSessionData sipApplicationSessionData) {
-		
-		jBossCacheService.cacheWrapper_.put(fqn, AbstractJBossCacheService.VERSION_KEY.toString(), sipApplicationSessionData.getVersion());
+			OutgoingDistributableSipApplicationSessionData sipApplicationSessionData) {			
 
 		DistributableSipApplicationSessionMetadata dsm = (DistributableSipApplicationSessionMetadata)sipApplicationSessionData.getMetadata();
 		if (dsm != null && sipApplicationSessionData.isSessionMetaDataDirty()) {
@@ -542,6 +540,8 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 			}
 			jBossCacheService.cacheWrapper_.put(fqn, AbstractJBossCacheService.TIMESTAMP_KEY.toString(), timestamp.longValue());
 		}
+		
+		jBossCacheService.cacheWrapper_.put(fqn, AbstractJBossCacheService.VERSION_KEY.toString(), sipApplicationSessionData.getVersion());
 	}
 
 	public void storeSipSessionData(
@@ -559,8 +559,7 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 		((DistributedCacheConvergedSipManager)jBossCacheService).storeSipSessionAttributes(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), sipSessionData);
 	}
 
-	public void storeSipSessionMetaData(Fqn<String> fqn, OutgoingDistributableSipSessionData sipSessionData) {
-		jBossCacheService.cacheWrapper_.put(fqn, AbstractJBossCacheService.VERSION_KEY.toString(), sipSessionData.getVersion());
+	public void storeSipSessionMetaData(Fqn<String> fqn, OutgoingDistributableSipSessionData sipSessionData) {		
 
 		DistributableSipSessionMetadata dsm = (DistributableSipSessionMetadata)sipSessionData.getMetadata();
 		if (dsm != null && sipSessionData.isSessionMetaDataDirty()) {
@@ -588,5 +587,7 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 			}
 			jBossCacheService.cacheWrapper_.put(fqn, AbstractJBossCacheService.TIMESTAMP_KEY.toString(), timestamp.longValue());
 		}
+		
+		jBossCacheService.cacheWrapper_.put(fqn, AbstractJBossCacheService.VERSION_KEY.toString(), sipSessionData.getVersion());
 	} 
 }

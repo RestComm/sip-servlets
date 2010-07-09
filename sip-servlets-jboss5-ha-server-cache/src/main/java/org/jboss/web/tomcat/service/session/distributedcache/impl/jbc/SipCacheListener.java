@@ -97,6 +97,7 @@ public class SipCacheListener extends CacheListenerBase
    private String sipApplicationName;
    private boolean fieldBased_;
    private boolean attributeBased_;
+   private JBossCacheWrapper wrapper; 
    
    SipCacheListener(JBossCacheWrapper wrapper,
 			LocalDistributableSessionManager manager, String contextHostPath,
@@ -114,8 +115,8 @@ public class SipCacheListener extends CacheListenerBase
    {   
       try
       {
-         if (sipApplicationName.equals(fqn.get(isBuddy ? BUDDY_BACKUP_ROOT_OWNER_SIZE + SIPAPPNAME_FQN_INDEX : SIPAPPNAME_FQN_INDEX))
-               && AbstractJBossCacheService.SESSION.equals(fqn.get(isBuddy ? BUDDY_BACKUP_ROOT_OWNER_SIZE + SIPSESSION_FQN_INDEX : SIPSESSION_FQN_INDEX)))
+    	 String appName = (String) fqn.get(isBuddy ? BUDDY_BACKUP_ROOT_OWNER_SIZE + SIPAPPNAME_FQN_INDEX : SIPAPPNAME_FQN_INDEX);
+         if (sipApplicationNameHashed.equals(appName))               
             return true;
       }
       catch (IndexOutOfBoundsException e)
@@ -184,8 +185,7 @@ public class SipCacheListener extends CacheListenerBase
    }
    
    @NodeModified
-   public void nodeModified(NodeModifiedEvent event)
-   {      
+   public void nodeModified(NodeModifiedEvent event) {      
       if (event.isPre())
          return;
       
@@ -200,80 +200,89 @@ public class SipCacheListener extends CacheListenerBase
       boolean isBuddy = isBuddyFqn(fqn);      
       
       if (!local 
-             &&isFqnSessionRootSized(fqn.size(), isBuddy)
-             &&isFqnForOurSipapp(fqn, isBuddy))
-      {
-         // Query if we have version value in the distributed cache. 
-         // If we have a version value, compare the version and invalidate if necessary.
-         @SuppressWarnings("unchecked")
-         Map<Object, Object> data = event.getData();
-         Integer version = (Integer) data.get(AbstractJBossCacheService.VERSION_KEY);
-         if(version != null)
-         {
-        	 String sipAppSessionId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
-        	 String sipSessionId = null;
-        	 boolean isSipApplicationSession = true;
- 	      	if(!isFqnSipApplicationSessionRootSized(fqn.size(), isBuddy)) {
- 	      		sipSessionId = getSipSessionIdFromFqn(fqn, isBuddy);
- 	      		isSipApplicationSession = false;
- 	      	}              
-            String owner = isBuddy ? getBuddyOwner(fqn) : null;
-            Long timestamp = (Long) data.get(AbstractJBossCacheService.TIMESTAMP_KEY);
-            if (timestamp == null)
-            {
-               log_.warn("No timestamp attribute found in " + fqn);
-            }
-            else
-            {
-            	boolean updated = false;
-            	if(isSipApplicationSession) {
-            		// Notify the manager that a session has been updated
-            		updated = ((LocalDistributableConvergedSessionManager) manager_).sipApplicationSessionChangedInDistributedCache(sipAppSessionId, owner, 
+             && isFqnSessionRootSized(fqn.size(), isBuddy)
+             && isFqnForOurSipapp(fqn, isBuddy)) {
+    	  // Query if we have version value in the distributed cache. 
+    	  // If we have a version value, compare the version and invalidate if necessary.
+    	  @SuppressWarnings("unchecked")
+    	  Map<Object, Object> data = event.getData();
+    	  Integer version = (Integer) data.get(AbstractJBossCacheService.VERSION_KEY.toString());
+    	  if(version != null) {
+    		  if(log_.isDebugEnabled()) {
+    			  log_.debug("version attribute found " + version + " in " + fqn );
+    		  }
+    		  String sipAppSessionId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
+    		  String sipSessionId = null;
+    		  boolean isSipApplicationSession = true;
+    		  if(!isFqnSipApplicationSessionRootSized(fqn.size(), isBuddy)) {
+ 	      			sipSessionId = getSipSessionIdFromFqn(fqn, isBuddy);
+ 	      			isSipApplicationSession = false;
+    		  }
+    		  if(log_.isDebugEnabled()) {
+    			  log_.debug("isSipAppSession " + isSipApplicationSession + " in " + fqn);
+    		  }
+    		  String owner = null;
+//    		  String owner = isBuddy ? getBuddyOwner(fqn) : null;    		  
+//    		  @SuppressWarnings("unchecked")
+//    		  Fqn<String> ancestor = fqn.getAncestor(1);
+    		  Long timestamp = Long.valueOf(-1);
+//    		  Long timestamp = (Long) wrapper.get(ancestor, AbstractJBossCacheService.TIMESTAMP_KEY.toString());
+//    		  if (timestamp == null) {
+//               log_.warn("No timestamp attribute found in " + fqn);
+//    		  } else {
+    			  boolean updated = false;
+    			  if(isSipApplicationSession) {
+    				  // Notify the manager that a session has been updated
+    				  updated = ((LocalDistributableConvergedSessionManager) manager_).sipApplicationSessionChangedInDistributedCache(sipAppSessionId, owner, 
                                                   version.intValue(), 
-                                                  timestamp.longValue(), 
-                                                  (DistributableSessionMetadata) data.get(AbstractJBossCacheService.METADATA_KEY));
-            	} else {
-            		// Notify the manager that a session has been updated
-            		updated = ((LocalDistributableConvergedSessionManager) manager_).sipSessionChangedInDistributedCache(sipAppSessionId, sipSessionId, owner, 
+                                                  timestamp,
+                                                  null);
+//                                                  timestamp.longValue(), 
+//                                                  (DistributableSessionMetadata)  wrapper.get(ancestor, AbstractJBossCacheService.METADATA_KEY.toString()));
+    			  } else {
+    				  // Notify the manager that a session has been updated
+    				  updated = ((LocalDistributableConvergedSessionManager) manager_).sipSessionChangedInDistributedCache(sipAppSessionId, sipSessionId, owner, 
                                                   version.intValue(), 
-                                                  timestamp.longValue(), 
-                                                  (DistributableSessionMetadata) data.get(AbstractJBossCacheService.METADATA_KEY));
-            	}
-               if (!updated && !isBuddy)
-               {
+                                                  timestamp,
+                                                  null);
+//                                                  timestamp.longValue(), 
+//                                                  (DistributableSessionMetadata)  wrapper.get(ancestor, AbstractJBossCacheService.METADATA_KEY.toString()));
+    			  }
+    			  if (!updated && !isBuddy) {
                   log_.warn("Possible concurrency problem: Replicated version id " + 
                             version + " is less than or equal to in-memory version for session app id " + sipAppSessionId + " and session id " + sipSessionId); 
-               }
-               /*else 
-               {
-                  We have a local session but got a modification for the buddy tree.
-                  This means another node is in the process of taking over the session;
-                  we don't worry about it
-               }
-                */
-            }
-         }
-         else if (!attributeBased_) // other granularities can modify attributes only
-         {
-            log_.warn("No version attribute found in " + fqn);
-         }
+    			  }
+	               /*else 
+	               {
+	                  We have a local session but got a modification for the buddy tree.
+	                  This means another node is in the process of taking over the session;
+	                  we don't worry about it
+	               }
+	                */
+//    		  }
+    	  }
+    	  // commented out since this is not true, due to optimizations for better perf and
+    	  // network data replication version, timestamp, metadata and attributes are serialized
+    	  // separately
+//    	  else if (!attributeBased_) {// other granularities can modify attributes only 
+//    		  log_.debug("No version attribute found in " + fqn);
+//    	  }
       }
       else if (local && !isBuddy
             && (isPossibleSipApplicationSessionInternalPojoFqn(fqn) || isPossibleSipSessionInternalPojoFqn(fqn)) 
-            && isFqnForOurSipapp(fqn, isBuddy))
-      {
-         // One of our sessions' pojos is modified; need to inform
-         // the manager so it can mark the session dirty
-			String sessId = null;
-			if (isFqnSipApplicationSessionRootSized(fqn.size(), isBuddy)) {
-				sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
-				((LocalDistributableConvergedSessionManager) manager_)
+            && isFqnForOurSipapp(fqn, isBuddy)) {
+    	  // One of our sessions' pojos is modified; need to inform
+    	  // the manager so it can mark the session dirty
+    	  String sessId = null;
+		  if (isFqnSipApplicationSessionRootSized(fqn.size(), isBuddy)) {
+			  sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
+			  ((LocalDistributableConvergedSessionManager) manager_)
 						.notifySipApplicationSessionLocalAttributeModification(sessId);
-			} else {
-				sessId = getSipSessionIdFromFqn(fqn, isBuddy);
-				((LocalDistributableConvergedSessionManager) manager_)
+		  } else {
+			  sessId = getSipSessionIdFromFqn(fqn, isBuddy);
+			  ((LocalDistributableConvergedSessionManager) manager_)
 						.notifySipSessionLocalAttributeModification(sessId);
-			}  
+		  }  
       }
    }       
    
