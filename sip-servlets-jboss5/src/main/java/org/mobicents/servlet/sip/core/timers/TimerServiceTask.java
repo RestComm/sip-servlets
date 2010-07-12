@@ -72,7 +72,7 @@ public class TimerServiceTask extends TimerTask implements ServletTimer {
 	 * @see org.mobicents.timers.TimerTask#run()
 	 */
 	@Override
-	public void run() {		
+	public void runTask() {		
 		servletTimer.run();
 	}
 

@@ -167,9 +167,9 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-spec"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-jboss5-metadata"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-client"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/cluster/core/1.3-SNAPSHOT/core-1.3-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/cluster/cache/1.3-SNAPSHOT/cache-1.3-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/cluster/timers/1.3-SNAPSHOT/timers-1.3-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/cluster/core/1.6-SNAPSHOT/core-1.6-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/cluster/cache/1.6-SNAPSHOT/cache-1.6-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/cluster/timers/1.6-SNAPSHOT/timers-1.6-SNAPSHOT.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-jboss5-ha-server-cache"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-jruby"/>
 	<classpathentry kind="output" path="target/classes"/>

@@ -112,10 +112,15 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 	public void stop() {
 //		return super.shutdownNow();
 		// method not exposed by Mobicents FaultTolerantScheduler
+		if(logger.isInfoEnabled()) {
+			logger.info("Sip Application Session Expiration Timer Tasks remaining in the FaultTolerantScheduler " + 
+					scheduledExecutor.getLocalRunningTasks().size() + " for application " + 
+					((SipContext)sipManager.getContainer()).getApplicationName());
+		}
 		started.set(false);
 		if(scheduledExecutor != null) {
 			scheduledExecutor.shutdownNow();
-		}
+		}		
 		if(logger.isInfoEnabled()) {
 			logger.info("Stopped Sip Application Session Expiration Timer Service for application " + ((SipContext)sipManager.getContainer()).getApplicationName());
 		}

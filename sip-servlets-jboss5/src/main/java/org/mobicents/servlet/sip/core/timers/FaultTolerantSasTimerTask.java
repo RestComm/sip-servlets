@@ -61,7 +61,7 @@ public class FaultTolerantSasTimerTask extends TimerTask implements SipApplicati
 	}
 
 	@Override
-	public void run() {
+	public void runTask() {
 		sipApplicationSessionTimerTask.run();
 	}
 
