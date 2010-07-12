@@ -132,6 +132,7 @@ public class IntervalConvergedSnapshotManager extends IntervalSnapshotManager im
 	 */
 	protected void processSipApplicationSessions() {
 		Set<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>> toProcess = null;
+		// Naoki : Fix for Issue 1620 : Invalid synchronization in IntervalConvergedSnapshotManager		
 		synchronized (sipApplicationSessions) {
 			toProcess = new HashSet<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>>(sipApplicationSessions);			
 			sipApplicationSessions.clear();
