@@ -1294,7 +1294,9 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 
 	private void sessionMetadataDirty() {
 //		if (!sessionMetadataDirty && !isNew && log.isTraceEnabled())
+		if(logger.isDebugEnabled()) {
 			log.debug("Marking session metadata dirty " + key);
+		}
 		sessionMetadataDirty = true;
 		ConvergedSessionReplicationContext.bindSipApplicationSession(this, manager.getSnapshotSipManager());
 	}
