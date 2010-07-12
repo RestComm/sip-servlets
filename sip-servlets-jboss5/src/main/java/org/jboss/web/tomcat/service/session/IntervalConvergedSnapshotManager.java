@@ -132,9 +132,9 @@ public class IntervalConvergedSnapshotManager extends IntervalSnapshotManager im
 	 */
 	protected void processSipApplicationSessions() {
 		Set<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>> toProcess = null;
-		synchronized (sipSessions) {
+		synchronized (sipApplicationSessions) {
 			toProcess = new HashSet<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>>(sipApplicationSessions);			
-			sipSessions.clear();
+			sipApplicationSessions.clear();
 		}
 
 		ClusteredSipManager<OutgoingDistributableSessionData> mgr = (ClusteredSipManager) getManager();
