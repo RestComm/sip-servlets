@@ -132,7 +132,9 @@ public class SipCacheListener extends CacheListenerBase
    @NodeCreated
    public void nodeCreated(NodeCreatedEvent event)
    {
-	   logger.info("following node created " + event.getFqn().toString());
+	   if(logger.isDebugEnabled()) {
+		   logger.debug("following node created " + event.getFqn().toString());
+	   }
    }
    
    
@@ -142,7 +144,9 @@ public class SipCacheListener extends CacheListenerBase
       if (event.isPre())
          return;
       
-      logger.info("following node removed " + event.getFqn().toString());
+      if(logger.isDebugEnabled()) {
+    	  logger.debug("following node removed " + event.getFqn().toString());
+      }
       
       boolean local = event.isOriginLocal();
       if (!fieldBased_ && local)
@@ -189,7 +193,9 @@ public class SipCacheListener extends CacheListenerBase
       if (event.isPre())
          return;
       
-      logger.info("following node modified " + event.getFqn().toString());
+      if(logger.isDebugEnabled()) {
+    	  logger.debug("following node modified " + event.getFqn().toString());
+      }
       
       boolean local = event.isOriginLocal();
       if (!fieldBased_ && local)
@@ -208,8 +214,8 @@ public class SipCacheListener extends CacheListenerBase
     	  Map<Object, Object> data = event.getData();
     	  Integer version = (Integer) data.get(AbstractJBossCacheService.VERSION_KEY.toString());
     	  if(version != null) {
-    		  if(log_.isDebugEnabled()) {
-    			  log_.debug("version attribute found " + version + " in " + fqn );
+    		  if(logger.isDebugEnabled()) {
+    			  logger.debug("version attribute found " + version + " in " + fqn );
     		  }
     		  String sipAppSessionId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
     		  String sipSessionId = null;
@@ -218,8 +224,8 @@ public class SipCacheListener extends CacheListenerBase
  	      			sipSessionId = getSipSessionIdFromFqn(fqn, isBuddy);
  	      			isSipApplicationSession = false;
     		  }
-    		  if(log_.isDebugEnabled()) {
-    			  log_.debug("isSipAppSession " + isSipApplicationSession + " in " + fqn);
+    		  if(logger.isDebugEnabled()) {
+    			  logger.debug("isSipAppSession " + isSipApplicationSession + " in " + fqn);
     		  }
     		  String owner = null;
 //    		  String owner = isBuddy ? getBuddyOwner(fqn) : null;    		  
@@ -249,7 +255,7 @@ public class SipCacheListener extends CacheListenerBase
 //                                                  (DistributableSessionMetadata)  wrapper.get(ancestor, AbstractJBossCacheService.METADATA_KEY.toString()));
     			  }
     			  if (!updated && !isBuddy) {
-                  log_.warn("Possible concurrency problem: Replicated version id " + 
+    				  logger.warn("Possible concurrency problem: Replicated version id " + 
                             version + " is less than or equal to in-memory version for session app id " + sipAppSessionId + " and session id " + sipSessionId); 
     			  }
 	               /*else 
