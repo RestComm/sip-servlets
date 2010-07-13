@@ -46,11 +46,13 @@ public class SessionStateUASSipServlet
 	private static final String SEND_1XX_4XX = "send1xx_4xx";
 	private static final String SEND_4XX = "send4xx";
 	private static final String SEND_2XX = "send2xx";
+	private static final String TEST_TIMEOUT = "test_timeout";
+	private static final String STX_408_RECEIVED = "408 received on STX";
 	//TODO externalize in sip.xml and specify it from test if needed
 	private static final int TIMEOUT = 10000;
 	
 	private SipFactory sipFactory;	
-	
+		
 	
 	/** Creates a new instance of SessionStateUASSipServlet */
 	public SessionStateUASSipServlet() {
@@ -81,12 +83,19 @@ public class SessionStateUASSipServlet
 		logger.info("Got request: "
 				+ request.getMethod());		
 		
-		// send message precising the current session state
-		sendMessage(request.getSession().getState().toString());
-		
-		String message = (String)request.getContent();
+		String message = (String)request.getContent();				
+				
 		//checking state machines for UAS mode,  sending session state after each response sent
-		if(message != null && message.length() > 0) {			
+		if(message != null && message.length() > 0) {
+			if(TEST_TIMEOUT.equals(message)) {	
+				SipServletResponse response = request.createResponse(SipServletResponse.SC_BAD_REQUEST);
+				response.send();
+				
+				return;
+			}
+			// send message precising the current session state
+			sendMessage(request.getSession().getState().toString());
+
 			if(SEND_1XX_2XX.equals(message)) {	
 				SipServletResponse ringingResponse = request.createResponse(SipServletResponse.SC_RINGING);
 				ringingResponse.send();
@@ -169,6 +178,14 @@ public class SessionStateUASSipServlet
 		sendMessage(request.getSession().getState().toString());
 	}	
 
+	@Override
+	protected void doErrorResponse(SipServletResponse resp)
+			throws ServletException, IOException {
+		if(resp.getStatus() == 408 && resp.getMethod().equalsIgnoreCase("INVITE")) {
+			sendMessage(STX_408_RECEIVED);
+		}
+	}
+	
 	/**
 	 * Utility method to send a message out of dialog
 	 * @param messageContent messageContent

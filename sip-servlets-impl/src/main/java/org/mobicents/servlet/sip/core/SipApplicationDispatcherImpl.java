@@ -928,7 +928,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			if(sipSession != null) {
 				// session can be null if a message was sent outside of the container by the container itself during Initial request dispatching
 				// but the external host doesn't send any response so we call out to the applicationonly if the session is not null
-				if(sipServletMessage instanceof SipServletRequestImpl) {
+				// naoki : Fix for Issue 1618 http://code.google.com/p/mobicents/issues/detail?id=1618 on Timeout don't do the 408 processing for Server Transactions
+				if(sipServletMessage instanceof SipServletRequestImpl && !timeoutEvent.isServerTransaction()) {
 					try {
 						SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipServletMessage;
 						sipServletMessage.setTransaction(transaction);

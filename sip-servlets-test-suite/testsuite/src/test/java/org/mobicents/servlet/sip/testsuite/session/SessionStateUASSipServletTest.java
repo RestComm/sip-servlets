@@ -45,6 +45,8 @@ public class SessionStateUASSipServletTest extends SipServletTestCase {
 	private static final String SEND_1XX_4XX = "send1xx_4xx";
 	private static final String SEND_4XX = "send4xx";
 	private static final String SEND_2XX = "send2xx";
+	private static final String TEST_TIMEOUT = "test_timeout";
+	private static final String STX_408_RECEIVED = "408 received on STX";
 	
 	private List<String> send_1xx_2xx_sessionStateList;
 	private List<String> send_1xx_4xx_sessionStateList;
@@ -52,10 +54,13 @@ public class SessionStateUASSipServletTest extends SipServletTestCase {
 	private List<String> send_2xx_sessionStateList;
 	private List<String> send_subsequent_487_sessionStateList;
 	private static final int TIMEOUT = 20000;
+	private static final int TIMEOUT_EXPIRATION = 70000;
 	
 	TestSipListener sender;
-	
 	ProtocolObjects senderProtocolObjects;	
+	
+	TestSipListener receiver;
+	ProtocolObjects receiverProtocolObjects;	
 
 	public SessionStateUASSipServletTest(String name) {
 		super(name);
@@ -245,6 +250,42 @@ public class SessionStateUASSipServletTest extends SipServletTestCase {
 			assertTrue(sender.isFinalResponseReceived());
 		}
 	}
+	
+	// Test for SS spec 11.1.6 transaction timeout notification
+	// Also Tests Issue 1618 http://code.google.com/p/mobicents/issues/detail?id=1618
+	public void testTransactionTimeoutResponse() throws Exception {		
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setSendAck(false);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, TEST_TIMEOUT, null, false);
+		senderProtocolObjects.destroy();
+		
+		receiverProtocolObjects =new ProtocolObjects(
+				"receiver", "gov.nist", TRANSPORT, AUTODIALOG, null);
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();			
+		receiverProvider.addSipListener(receiver);
+		receiverProtocolObjects.start();
+		
+		Thread.sleep(TIMEOUT_EXPIRATION);	
+		
+		Iterator<String> allMessagesIterator = receiver.getAllMessagesContent().iterator();		
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+			
+		}
+		assertFalse(receiver.getAllMessagesContent().contains(STX_408_RECEIVED));
+		receiverProtocolObjects.destroy();
+	}	
 
 	@Override
 	protected void tearDown() throws Exception {					
