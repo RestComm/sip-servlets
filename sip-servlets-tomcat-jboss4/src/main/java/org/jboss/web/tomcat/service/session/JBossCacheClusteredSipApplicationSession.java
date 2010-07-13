@@ -119,12 +119,14 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 		}
 		sipSessions.clear();
 		SipSessionKey[] sipSessionKeys = (SipSessionKey[]) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, SIP_SESSIONS);
-		for (SipSessionKey sipSessionKey : sipSessionKeys) {
-			sipSessionKey.setApplicationName(proxy_.getSipApplicationName());
-			sipSessionKey.setApplicationName(sipAppSessionId);
-			sipSessionKey.computeToString();
-			sipSessions.add(sipSessionKey);
-		}		
+		if(sipSessionKeys != null && sipSessionKeys.length > 0) {
+			for (SipSessionKey sipSessionKey : sipSessionKeys) {
+				sipSessionKey.setApplicationName(proxy_.getSipApplicationName());
+				sipSessionKey.setApplicationName(sipAppSessionId);
+				sipSessionKey.computeToString();
+				sipSessions.add(sipSessionKey);
+			}		
+		}
 		String[] httpSessionIds = (String[]) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, HTTP_SESSIONS);
 		if(httpSessionIds != null && httpSessionIds.length > 0) {
 			if(httpSessions == null) {
