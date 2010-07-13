@@ -281,13 +281,15 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 	protected Map<String, Object> getSessionAttributes(
 			Map<Object, Object> distributedCacheData) {
 		Map<String, Object> attrs = new HashMap<String, Object>();
-		for (Map.Entry<Object, Object> entry : distributedCacheData.entrySet()) {
-			if (entry.getKey() instanceof String) {
-				attrs.put((String) entry.getKey(), getUnMarshalledValue(entry
-						.getValue()));
+		// fix for Issue 1621 http://code.google.com/p/mobicents/issues/detail?id=1621
+		if(distributedCacheData != null) {
+			for (Map.Entry<Object, Object> entry : distributedCacheData.entrySet()) {
+				if (entry.getKey() instanceof String) {
+					attrs.put((String) entry.getKey(), getUnMarshalledValue(entry
+							.getValue()));
+				}
 			}
 		}
-
 		return attrs;
 	}
 
