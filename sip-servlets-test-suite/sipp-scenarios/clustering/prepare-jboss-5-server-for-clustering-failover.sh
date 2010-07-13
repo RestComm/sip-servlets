@@ -9,7 +9,7 @@
 rm -rf $JBOSS_HOME/server/port-1
 rm -rf $JBOSS_HOME/server/port-2
 
-mvn clean install -f ../../../pom.xml -P jboss-5,jboss-5-cluster -Dnode=all
+mvn clean install -f ../../../pom.xml -P jboss-5 -Dnode=all
 
 cp setup/jboss-5/performance/mss-sip-stack-jboss.properties $JBOSS_HOME/server/all/conf/mss-sip-stack.properties
 cp setup/jboss-5/context-jboss-5.xml $JBOSS_HOME/server/all/deploy/jbossweb.sar/context.xml
