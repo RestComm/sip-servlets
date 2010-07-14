@@ -995,11 +995,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	 * Retrieve the sip session implementation
 	 * @return the sip session implementation
 	 */
-	public final MobicentsSipSession getSipSession() {		
+	public final MobicentsSipSession getSipSession() {	
 		if(sipSession == null && sessionKey != null) {
 			final String applicationName = sessionKey.getApplicationName(); 
-			final SipContext sipContext = sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(applicationName); 
-			sipSession = sipContext.getSipManager().getSipSession(sessionKey, false, sipFactoryImpl, null);	
+			final SipContext sipContext = sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(applicationName);
+			SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessionKey.getApplicationSessionId(), sessionKey.getApplicationName());
+			MobicentsSipApplicationSession sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
+			sipSession = sipContext.getSipManager().getSipSession(sessionKey, false, sipFactoryImpl, sipApplicationSession);	
 		} 
 		return sipSession; 
 	}
