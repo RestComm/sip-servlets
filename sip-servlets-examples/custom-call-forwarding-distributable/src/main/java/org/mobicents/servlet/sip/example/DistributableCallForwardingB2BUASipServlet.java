@@ -90,6 +90,9 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 		}
 		if(!request.isInitial()) {
 			// REINVITE within the same session
+			SipServletResponse resp = (SipServletResponse) request.getApplicationSession().getAttribute("resp");
+			resp.getSession().getAttribute("justTestForNPE");
+			resp.getApplicationSession().getAttribute("testForNPE");
 			Composite composite = (Composite) request.getSession().getAttribute("timerRequest");
 			Composite composite2 = (Composite) request.getSession().getAttribute("timerRequest2");
 			if(composite2 == null) logger.info("timerRequest2=null, this is normal because it is from unmanaged timer.");
@@ -235,6 +238,7 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 //		    helper.getLinkedSession(sipServletResponse.getSession());		
 		//if this is a response to an INVITE we ack it and forward the OK 
 		if("INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
+			sipServletResponse.getApplicationSession().setAttribute("resp", sipServletResponse);
 			SipServletRequest ackRequest = sipServletResponse.createAck();
 			if(logger.isInfoEnabled()) {
 				logger.info("Sending " +  ackRequest);
