@@ -20,12 +20,15 @@ import gov.nist.javax.sip.DialogTimeoutEvent;
 import gov.nist.javax.sip.TransactionExt;
 import gov.nist.javax.sip.DialogTimeoutEvent.Reason;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -331,8 +334,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			started = Boolean.TRUE;
 		} finally {
 			statusLock.unlock();
-		}
-		
+		}		
 		congestionControlTimerTask = new CongestionControlTimerTask();
 		if(congestionControlTimerFuture == null && congestionControlCheckingInterval > 0) { 
 				congestionControlTimerFuture = congestionControlThreadPool.scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
@@ -344,8 +346,21 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		 		logger.info("No Congestion control background task started since the checking interval is equals to " + congestionControlCheckingInterval + " milliseconds.");
 		 	}
 		}
-		if(logger.isDebugEnabled()) {
-			logger.debug("Sip Application Dispatcher started");
+		if(logger.isInfoEnabled()) {
+			Properties versionProperties = new Properties();
+			try {
+				InputStream in = SipApplicationDispatcherImpl.class.getResourceAsStream("version.properties");
+				versionProperties.load(in);
+				in.close();
+				String version = versionProperties.getProperty("release.version");
+				if(version != null) {
+					logger.info("Mobicents Sip Servlets " + version + " started." );
+				} else {
+					logger.warn("Unable to extract the version of Mobicents Sip Servlets currently running");
+				}
+			} catch (IOException e) {
+				logger.warn("Unable to extract the version of Mobicents Sip Servlets currently running", e);
+			}		
 		}
 		// outbound interfaces set here and not in sipstandardcontext because
 		// depending on jboss or tomcat context can be started before or after

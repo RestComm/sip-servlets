@@ -119,7 +119,30 @@
 	</dependencies>
 	
 	<build>
-		<plugins>		
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>		
+		<plugins>	
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.0-beta-4</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<buildNumberPropertiesFileLocation>${basedir}/src/main/resources/org/mobicents/servlet/sip/core</buildNumberPropertiesFileLocation>					
+					<revisionOnScmFailure>no-revision</revisionOnScmFailure>
+				</configuration>
+			</plugin>	
 			<plugin>
 				<artifactId>maven-eclipse-plugin</artifactId>
    				<groupId>org.mobicents.tools</groupId>

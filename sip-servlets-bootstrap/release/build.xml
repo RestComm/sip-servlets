@@ -77,7 +77,7 @@
 		<copy file="${base.path}/mss-sip-stack.properties" tofile="${tomcat.home}/conf/mss-sip-stack.properties" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -U -P set-svn-revision -DCATALINA_HOME=${tomcat.home} -P tomcat-distro,docs" />
+			<arg line="clean buildnumber:create install -U -P set-svn-revision -DCATALINA_HOME=${tomcat.home} -P tomcat-distro,docs" />
 		</exec>
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
@@ -267,7 +267,7 @@
 		<copy file="${base.path}/webserver-xmbean.xml" tofile="${jboss.home}/server/${jboss.config}/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -U -P set-svn-revision,jboss-distro,docs -DJBOSS_HOME=${jboss.home} -Dnode=${jboss.config}" />
+			<arg line="clean buildnumber:create install -U -P set-svn-revision,jboss-distro,docs -DJBOSS_HOME=${jboss.home} -Dnode=${jboss.config}" />
 		</exec>
 				
 		<antcall target="deploy-mgmnt" >
@@ -299,7 +299,7 @@
 		<copy file="${base.path}/context-jboss-5.xml" overwrite="true" tofile="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/context.xml" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean install -U -P set-svn-revision,jboss-5-distro,docs -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
+			<arg line="clean buildnumber:create install -U -P set-svn-revision,jboss-5-distro,docs -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
 		</exec>
 		
 		<!--delete file="${mss.home}/server/${jboss.config}/deployers/torquebox.deployer/lib/dependencies/sip-servlets-annotations.jar" />
