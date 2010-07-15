@@ -50,7 +50,6 @@ import org.apache.catalina.Session;
 import org.apache.catalina.Valve;
 import org.apache.catalina.core.ContainerBase;
 import org.jboss.logging.Logger;
-import org.jboss.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.jboss.ReplicationGranularity;
 import org.jboss.metadata.web.jboss.SnapshotMode;
@@ -3257,16 +3256,16 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	 * @param realId
 	 *            the session id excluding any jvmRoute
 	 */
-	public void notifyRemoteSipSessionInvalidation(String realId) {
-		// Remove the session from our local map
+	public void notifyRemoteSipSessionInvalidation(String sipAppSessionId,
+			String sipSessionId) {
 		SipSessionKey key = null;
 		try {
-			key = SessionManagerUtil.parseSipSessionKey(realId);
+			key = SessionManagerUtil.parseHaSipSessionKey(sipSessionId, sipAppSessionId, applicationName);
 		} catch (ParseException e) {
-			//should never happen
-			logger.error("An unexpected exception happened on parsing the following sip session key " + realId, e);
-			return;
+			logger.error("Unexpected exception while parsing the following sip session key " + sipSessionId, e);
+			return ;
 		}
+		// Remove the session from our local map		
 		ClusteredSipSession<? extends OutgoingDistributableSessionData> session = (ClusteredSipSession)sipManagerDelegate
 				.removeSipSession(key);
 		if (session == null) {
@@ -3280,7 +3279,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 
 			// If session has failed over and has been passivated here,
 			// session will be null, but we'll have a TimeStatistic to clean up
-			stats_.removeStats(realId);
+			stats_.removeStats(key.toString());
 		} else {
 			// Expire the session
 			// DON'T SYNCHRONIZE ON SESSION HERE -- isValid() and
@@ -3313,7 +3312,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 				ConvergedSessionInvalidationTracker.resume();
 
 				// Remove any stats for this session
-				stats_.removeStats(realId);
+				stats_.removeStats(key.toString());
 
 //				if (switcher != null) {
 //					switcher.reset();
@@ -3352,24 +3351,22 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	 *            the session id excluding any jvmRoute
 	 */
 	public void notifySipSessionLocalAttributeModification(
-			String realId) {
+			String sipAppSessionId,
+			String sipSessionId) {		
 		SipSessionKey key = null;
 		try {
-			key = SessionManagerUtil.parseSipSessionKey(realId);
+			key = SessionManagerUtil.parseHaSipSessionKey(sipSessionId, sipAppSessionId, applicationName);
 		} catch (ParseException e) {
-			// should never happen
-			logger
-					.error(
-							"An unexpected exception happened on parsing the following sip session key "
-									+ realId, e);
-			return;
+			logger.error("Unexpected exception while parsing the following sip session key " + sipSessionId, e);
+			return ;
 		}
+		
 		ClusteredSipSession<? extends OutgoingDistributableSessionData> session = (ClusteredSipSession) sipManagerDelegate
 				.getSipSession(key, false, null, null);
 		if (session != null) {
 			session.sessionAttributesDirty();
 		} else {
-			log_.warn("Received local attribute notification for " + realId
+			log_.warn("Received local attribute notification for " + key.toString()
 					+ " but session is not locally active");
 		}
 	}
@@ -3474,21 +3471,20 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	 *            the session's metadata per the distributed cache
 	 */
 	public boolean sipSessionChangedInDistributedCache(
-			String sipAppSessionId, String sipSessionId, String dataOwner, int distributedVersion,
+			String sipAppSessionId,
+			String sipSessionId, String dataOwner, int distributedVersion,
 			long timestamp, DistributableSessionMetadata metadata) {
-		boolean updated = true;
-		SipApplicationSessionKey sipAppSessionKey = new SipApplicationSessionKey(sipAppSessionId, applicationName);
+		
 		SipSessionKey key = null;
 		try {
-			key = SessionManagerUtil.parseSipSessionKey(sipSessionId);
+			key = SessionManagerUtil.parseHaSipSessionKey(sipSessionId, sipAppSessionId, applicationName);
 		} catch (ParseException e) {
-			// should never happen
-			logger
-					.error(
-							"An unexpected exception happened on parsing the following sip session key "
-									+ sipSessionId, e);
+			logger.error("Unexpected exception while parsing the following sip session key " + sipSessionId, e);
 			return false;
-		}
+		}  
+		
+		boolean updated = true;
+		
 		ClusteredSipSession<? extends OutgoingDistributableSessionData> session = findLocalSipSession(
 				key, false, null);
 		if (session != null) {
@@ -3498,7 +3494,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 					.setVersionFromDistributedCache(distributedVersion);
 			if (updated && trace_) {
 				log_.trace("session in-memory data is invalidated for id: "
-						+ sipSessionId + " new version: " + distributedVersion);
+						+ key.toString() + " new version: " + distributedVersion);
 			}
 		} else {
 			log_.debug("sip session not found locally for : "

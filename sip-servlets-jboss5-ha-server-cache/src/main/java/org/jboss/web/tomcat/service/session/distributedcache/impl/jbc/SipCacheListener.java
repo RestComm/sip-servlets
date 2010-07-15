@@ -33,7 +33,6 @@ import org.jboss.cache.notifications.event.NodeModifiedEvent;
 import org.jboss.cache.notifications.event.NodeRemovedEvent;
 import org.jboss.logging.Logger;
 import org.jboss.metadata.web.jboss.ReplicationGranularity;
-import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.LocalDistributableConvergedSessionManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.LocalDistributableSessionManager;
 
@@ -162,28 +161,28 @@ public class SipCacheListener extends CacheListenerBase
       {
     	  	// A session has been invalidated from another node;
     	  	// need to inform manager
+    	    String sipAppSessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
     	  	String sessId = null;
 	      	if(isFqnSipApplicationSessionRootSized(fqn.size(), isBuddy)) {
-	      		sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
-	      		((LocalDistributableConvergedSessionManager)manager_).notifyRemoteSipApplicationSessionInvalidation(sessId);
+	      		((LocalDistributableConvergedSessionManager)manager_).notifyRemoteSipApplicationSessionInvalidation(sipAppSessId);
 	      	} else {
 	      		sessId = getSipSessionIdFromFqn(fqn, isBuddy);
-	      		((LocalDistributableConvergedSessionManager)manager_).notifyRemoteSipSessionInvalidation(sessId);
+	      		((LocalDistributableConvergedSessionManager)manager_).notifyRemoteSipSessionInvalidation(sipAppSessId, sessId);
 	      	}          
       }
       else if (local && !isBuddy
                   && (isPossibleSipApplicationSessionInternalPojoFqn(fqn) || isPossibleSipSessionInternalPojoFqn(fqn)) 
                   && isFqnForOurSipapp(fqn, isBuddy))
       {
+    	  	String sipAppSessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
     	  	String sessId = null;
-			if (isFqnSipApplicationSessionRootSized(fqn.size(), isBuddy)) {
-				sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
+			if (isFqnSipApplicationSessionRootSized(fqn.size(), isBuddy)) {				
 				((LocalDistributableConvergedSessionManager) manager_)
-						.notifySipApplicationSessionLocalAttributeModification(sessId);
+						.notifySipApplicationSessionLocalAttributeModification(sipAppSessId);
 			} else {
 				sessId = getSipSessionIdFromFqn(fqn, isBuddy);
 				((LocalDistributableConvergedSessionManager) manager_)
-						.notifySipSessionLocalAttributeModification(sessId);
+						.notifySipSessionLocalAttributeModification(sipAppSessId, sessId);
 			}                   
       }
    }
@@ -279,15 +278,15 @@ public class SipCacheListener extends CacheListenerBase
             && isFqnForOurSipapp(fqn, isBuddy)) {
     	  // One of our sessions' pojos is modified; need to inform
     	  // the manager so it can mark the session dirty
+    	  String sipAppSessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
     	  String sessId = null;
 		  if (isFqnSipApplicationSessionRootSized(fqn.size(), isBuddy)) {
-			  sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
 			  ((LocalDistributableConvergedSessionManager) manager_)
-						.notifySipApplicationSessionLocalAttributeModification(sessId);
+						.notifySipApplicationSessionLocalAttributeModification(sipAppSessId);
 		  } else {
 			  sessId = getSipSessionIdFromFqn(fqn, isBuddy);
 			  ((LocalDistributableConvergedSessionManager) manager_)
-						.notifySipSessionLocalAttributeModification(sessId);
+						.notifySipSessionLocalAttributeModification(sipAppSessId, sessId);
 		  }  
       }
    }       

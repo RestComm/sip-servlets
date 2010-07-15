@@ -21,6 +21,7 @@
  */
 package org.jboss.web.tomcat.service.session.distributedcache.spi;
 
+
 /**
  * Callback interface to allow the distributed caching layer to invoke upon the
  * local session manager.
@@ -31,11 +32,13 @@ package org.jboss.web.tomcat.service.session.distributedcache.spi;
 public interface LocalDistributableConvergedSessionManager {
 	void notifyRemoteSipApplicationSessionInvalidation(String sessId);
 
-	void notifyRemoteSipSessionInvalidation(String sessId);
+	void notifyRemoteSipSessionInvalidation(String sipAppSessionId,
+			String sipSessionId);
 
 	void notifySipApplicationSessionLocalAttributeModification(String sessId);
 
-	void notifySipSessionLocalAttributeModification(String sessId);
+	void notifySipSessionLocalAttributeModification(String sipAppSessionId,
+			String sipSessionId);
 
 	boolean sipApplicationSessionChangedInDistributedCache(String realId,
 			String owner, int intValue, long longValue,

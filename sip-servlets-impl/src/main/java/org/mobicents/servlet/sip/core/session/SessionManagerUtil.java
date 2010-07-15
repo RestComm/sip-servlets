@@ -165,8 +165,8 @@ public class SessionManagerUtil {
 			throw new ParseException("The right parenthesis could not be found in the following key " + sipSessionKey, 0);
 		}
 		String sipSessionKeyToParse = sipSessionKey.substring(indexOfLeftParenthesis+1, indexOfRightParenthesis);
-		if(logger.isInfoEnabled()) {
-			logger.info("sipSession key to parse " + sipSessionKeyToParse );
+		if(logger.isDebugEnabled()) {
+			logger.debug("sipSession key to parse " + sipSessionKeyToParse );
 		}
 		StringTokenizer stringTokenizer = new StringTokenizer(sipSessionKeyToParse, SESSION_KEY_SEPARATOR);
 		String fromTag = stringTokenizer.nextToken();
@@ -188,8 +188,8 @@ public class SessionManagerUtil {
 	public static SipSessionKey parseHaSipSessionKey(
 			String sipSessionKey, String sipAppSessionId, String sipApplicationName) throws ParseException {
 		
-		if(logger.isInfoEnabled()) {
-			logger.info("sipSession key to parse " + sipSessionKey );
+		if(logger.isDebugEnabled()) {
+			logger.debug("sipSession key to parse " + sipSessionKey );
 		}
 		StringTokenizer stringTokenizer = new StringTokenizer(sipSessionKey, SESSION_KEY_SEPARATOR);
 		String fromTag = stringTokenizer.nextToken();
