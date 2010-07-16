@@ -144,13 +144,16 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 	/**
 	 * Increment our version and place ourself in the cache.
 	 */
-	public void processSessionRepl() {
+	public synchronized void processSessionRepl() {
 		// Replicate the session.
 		if (logger.isDebugEnabled()) {
 			logger.debug("processSessionRepl(): session is dirty. Will increment "
 					+ "version from: " + getVersion() + " and replicate.");
 		}
 		final String sipAppSessionKey = getHaId();
+		if (logger.isDebugEnabled()) {
+			logger.debug("processSessionRepl(): replicating sip app session " + sipAppSessionKey);
+		}
 		if(isNew) {
 			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, CREATION_TIME, creationTime);
 			proxy_.putSipApplicationSessionMetaData(sipAppSessionKey, INVALIDATION_POLICY, invalidationPolicy);
