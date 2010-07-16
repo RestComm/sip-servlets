@@ -49,4 +49,16 @@ Acknowledgements
 	* Miha Polak and Jernej Krmelj both from {{{http://www.iskratel.com}Iskratel Slovenia}} : 
 		
 		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1493}Issue 1493}} and help tremendously with heavy profiling, testing, insights and applying changes back and forth to help nailing it down
+		
+	* Naoki Nishihara from {{{http://www.oki.com}OKI}} : 
+		
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1612}Issue 1612}} and contributed a fix for it
+		
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1618}Issue 1618}} and contributed a fix for it
+		
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1620}Issue 1620}} and contributed a fix for it
+		
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1621}Issue 1621}} and contributed a fix for it
+		
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1627}Issue 1627}} and contributed a fix for it
 	
