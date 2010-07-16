@@ -294,6 +294,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 				SipSessionEvent sipSessionEvent = new SipSessionEvent(this.getSession());
 				for (SipSessionListener sipSessionListener : sipSessionListeners) {
 					try {
+						if(logger.isDebugEnabled()) {
+							logger.debug("notifying sip application session listener " + sipSessionListener.getClass().getName() + " of context " + 
+									key.getApplicationName() + " of following event " + sipSessionEventType);
+						}
 						if(SipSessionEventType.CREATION.equals(sipSessionEventType)) {
 							sipSessionListener.sessionCreated(sipSessionEvent);
 						} else if (SipSessionEventType.DELETION.equals(sipSessionEventType)) {

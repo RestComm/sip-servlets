@@ -16,8 +16,11 @@
  */
 package org.mobicents.servlet.sip.testsuite.callcontroller;
 
+import java.util.Iterator;
+
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -96,6 +99,14 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
+		Thread.sleep(TIMEOUT*2);
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		assertEquals(1, sender.getAllMessagesContent().size());
+		assertTrue(sender.getAllMessagesContent().contains("sipSessionReadyToBeInvalidated"));
 	}
 
 	public void testCallForwardingCalleeSendBye() throws Exception {
@@ -221,6 +232,46 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		assertTrue(receiver.isAckReceived());
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
+	}
+	
+	public void testCallForwardingUpdateCallerSendBye() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT * 3);
+		sender.sendInDialogSipRequest(Request.UPDATE, null, null, null, null);		
+		sender.sendInDialogSipRequest(Request.UPDATE, null, null, null, null);
+		Thread.sleep(TIMEOUT * 2);
+		sender.sendInDialogSipRequest(Request.BYE, null, null, null, null);
+		Thread.sleep(TIMEOUT * 6);
+		assertTrue(sender.getOkToByeReceived());
+		assertTrue(receiver.getByeReceived());		
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		assertEquals(0, sender.getAllMessagesContent().size());		
 	}
 	
 	@Override

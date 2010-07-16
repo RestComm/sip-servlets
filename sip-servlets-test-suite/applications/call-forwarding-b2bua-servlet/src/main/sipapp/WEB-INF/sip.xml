@@ -16,14 +16,14 @@
 		<display-name>CallForwardingB2BUASipServlet</display-name>
 		<description>Call Forwarding B2BUA Sip Servlet</description>
 		<servlet-class>
-			org.mobicents.servlet.sip.testsuite.CallForwardingB2BUASipServlet
+			org.mobicents.servlet.sip.testsuite.b2bua.CallForwardingB2BUASipServlet
 		</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 
 	<listener>
 		<listener-class>
-			org.mobicents.servlet.sip.testsuite.CallForwardingB2BUASipServlet
+			org.mobicents.servlet.sip.testsuite.b2bua.CallForwardingB2BUASipServlet
 		</listener-class>
 	</listener>
 </sip-app>

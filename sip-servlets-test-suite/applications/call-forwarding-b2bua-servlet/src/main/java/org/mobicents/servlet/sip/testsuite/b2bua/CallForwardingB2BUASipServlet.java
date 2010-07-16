@@ -14,7 +14,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.mobicents.servlet.sip.testsuite;
+package org.mobicents.servlet.sip.testsuite.b2bua;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -29,6 +29,8 @@ import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.B2buaHelper;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipApplicationSessionEvent;
+import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
@@ -47,7 +49,9 @@ import javax.sip.header.ContactHeader;
 import org.apache.log4j.Logger;
 
 
-public class CallForwardingB2BUASipServlet extends SipServlet implements SipErrorListener {
+public class CallForwardingB2BUASipServlet extends SipServlet implements SipErrorListener, SipApplicationSessionListener {
+	private static final String TEST_SIP_APP_SESSION_READY_TO_BE_INVALIDATED = "testSipAppSessionReadyToBeInvalidated";
+	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final long serialVersionUID = 1L;
 	private static final String ACT_AS_UAS = "actAsUas";
 	private static transient Logger logger = Logger.getLogger(CallForwardingB2BUASipServlet.class);
@@ -141,6 +145,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		if(request.isInitial()) {
 			logger.info("Got INVITE: " + request.toString());
 			logger.info(request.getFrom().getURI().toString());
+			request.getApplicationSession().setAttribute(TEST_SIP_APP_SESSION_READY_TO_BE_INVALIDATED, Integer.valueOf(0));
 			String[] forwardingUri = forwardingUris.get(request.getFrom().getURI().toString());
 			if(((SipURI)request.getTo().getURI()).getUser().contains("forward-samesipsession")) {
 				request.getSession().setAttribute(ACT_AS_UAS, Boolean.TRUE);
@@ -342,13 +347,14 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		SipSession originalSession =   
 		    sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
 		String cSeqValue = sipServletResponse.getHeader("CSeq");
-		if ("PRACK".equals(sipServletResponse.getMethod())) {            
+		if ("PRACK".equals(sipServletResponse.getMethod()) || "UPDATE".equals(sipServletResponse.getMethod())) {            
             List<SipServletMessage> pendingMessages = sipServletResponse.getRequest().getB2buaHelper().getPendingMessages(originalSession, UAMode.UAS);
             SipServletRequest prackPendingMessage =null; 
             logger.info("pending messages : ");
             for(SipServletMessage pendingMessage : pendingMessages) {
             	logger.info("\t pending message : " + pendingMessage);
-            	if(((SipServletRequest) pendingMessage).getMethod().equals("PRACK")) {
+            	if(((SipServletRequest) pendingMessage).getMethod().equals("PRACK") || 
+            			((SipServletRequest) pendingMessage).getMethod().equals("UPDATE")) {
             		prackPendingMessage = (SipServletRequest) pendingMessage;
             		break;
             	}
@@ -457,6 +463,56 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	 */
 	public void noPrackReceived(SipErrorEvent ee) {
 		logger.error("noPrackReceived.");
+	}
+
+	public void sessionCreated(SipApplicationSessionEvent ev) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionDestroyed(SipApplicationSessionEvent ev) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionExpired(SipApplicationSessionEvent ev) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
+		Integer nbTimesCalled = (Integer) ev.getApplicationSession().getAttribute(TEST_SIP_APP_SESSION_READY_TO_BE_INVALIDATED);
+		if(nbTimesCalled != null) {
+			ev.getApplicationSession().setAttribute(TEST_SIP_APP_SESSION_READY_TO_BE_INVALIDATED, Integer.valueOf(nbTimesCalled.intValue() + 1));
+			logger.info("sipApplicationSessionReadyToBeInvalidated");
+			if(nbTimesCalled.intValue() > 1) {
+				sendMessage(ev.getApplicationSession(), (SipFactory) getServletContext().getAttribute(SIP_FACTORY), "sipApplicationSessionReadyToBeInvalidated called multiple times");
+			}
+		}
+	}
+	
+	/**
+	 * @param sipApplicationSession
+	 * @param sipFactory
+	 */
+	private void sendMessage(SipApplicationSession sipApplicationSession,
+			SipFactory sipFactory, String content) {
+		try {
+			SipServletRequest sipServletRequest = sipFactory.createRequest(
+					sipApplicationSession, 
+					"MESSAGE", 
+					"sip:sender@sip-servlets.com", 
+					"sip:receiver@sip-servlets.com");
+			SipURI sipUri=sipFactory.createSipURI("receiver", "127.0.0.1:5080");
+			sipServletRequest.setRequestURI(sipUri);
+			sipServletRequest.setContentLength(content.length());
+			sipServletRequest.setContent(content, CONTENT_TYPE);
+			sipServletRequest.send();
+		} catch (ServletParseException e) {
+			logger.error("Exception occured while parsing the addresses",e);
+		} catch (IOException e) {
+			logger.error("Exception occured while sending the request",e);			
+		}
 	}
 
 }

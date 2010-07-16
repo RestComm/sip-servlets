@@ -820,7 +820,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 //			this.expirationTime = -1;
 			if(expirationTimerTask != null) {
 				cancelExpirationTimer();
-				expirationTimerTask = null;				
+				expirationTimerTask = null;	
+//				sipApplicationSessionTimeout = deltaMinutes;
 			}		
 			return Integer.MAX_VALUE;
 		} else {
@@ -833,6 +834,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				//the app session was scheduled to never expire and now an expiration time is set
 //				deltaMilliseconds = deltaMinutes * 1000L * 60;
 //			}
+//			sipApplicationSessionTimeout = deltaMilliseconds;
 			if(expirationTimerTask != null) {				
 				expirationTime = System.currentTimeMillis() + deltaMilliseconds;				
 				if(logger.isDebugEnabled()) {
@@ -1034,38 +1036,53 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				}
 			}
 		} else {
-			if(logger.isDebugEnabled()) {
+			if(logger.isDebugEnabled() && !isValidInternal()) {
 				logger.debug("Sip application session already invalidated "+ key);
 			}
 			this.readyToInvalidate = true;
 		}
 	}
 	
-	public void tryToInvalidate() {
-		if(isValidInternal() && invalidateWhenReady) {
-			notifySipApplicationSessionListeners(SipApplicationSessionEventType.READYTOINVALIDATE);
-			if(readyToInvalidate) {
-				boolean allSipSessionsInvalidated = true;
-				for(MobicentsSipSession sipSession : getSipSessions()) {
-					if(sipSession.isValidInternal()) {
-						allSipSessionsInvalidated = false;
-						break;
-					}
+	public void tryToInvalidate() {		
+		if(logger.isDebugEnabled()) {
+			logger.debug("tryToInvalidate:[isValidInternal=" + this.isValidInternal() + 
+					",readyToInvalidate=" + this.readyToInvalidate + 
+					",invalidateWhenReady=" + invalidateWhenReady + "]");
+		}
+		// we try to invalidate only when the session is still valid (not invalidated yet) and is ready to be invalidated
+		// and if the invalidateWhenReady flag is true
+		if(isValidInternal() && readyToInvalidate && invalidateWhenReady) {						
+			boolean allSipSessionsInvalidated = true;
+			for(MobicentsSipSession sipSession : getSipSessions()) {
+				if(sipSession.isValidInternal()) {
+					allSipSessionsInvalidated = false;
+					break;
 				}
-				boolean allHttpSessionsInvalidated = true;
-				for(HttpSession httpSession : getHttpSessions()) {
-					ConvergedSession convergedSession = (ConvergedSession) httpSession;
-					if(convergedSession.isValid()) {
-						allHttpSessionsInvalidated = false;
-						break;
-					}
+			}
+			boolean allHttpSessionsInvalidated = true;
+			for(HttpSession httpSession : getHttpSessions()) {
+				ConvergedSession convergedSession = (ConvergedSession) httpSession;
+				if(convergedSession.isValid()) {
+					allHttpSessionsInvalidated = false;
+					break;
 				}
-				if(allSipSessionsInvalidated && allHttpSessionsInvalidated) {
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("tryToInvalidate:[allSipSessionInvalidated=" + allSipSessionsInvalidated + "," 
+						+ "allHttpSessionsInvalidated=" + allHttpSessionsInvalidated  +"]");
+			}
+			if(allSipSessionsInvalidated && allHttpSessionsInvalidated) {
+				// An application willing to invalidate a SipApplicationSession cleanly could use the callback mechanism 
+				// to perform any application clean up before the SipApplicationSession gets invalidated by the container
+				notifySipApplicationSessionListeners(SipApplicationSessionEventType.READYTOINVALIDATE);
+				// Applications may also use the callback to call setInvalidateWhenReady(false) 
+				// to indicate to the container to not observe this SipApplicationSession anymore. 
+				// In this case, the containers MUST not invalidate the SipApplicationSession after the callback
+				if(invalidateWhenReady) {
 					this.invalidate(true);
 				}
 			}
 		}
-		
 	}
 
 	/**
