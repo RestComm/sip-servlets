@@ -268,7 +268,7 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 		Node<Object, Object> node = getCache().getRoot().getChild(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY));
 		Map<Object, Object> rawData = node.getData();
 
-		return getSessionAttributes(rawData);
+		return getSessionAttributes(null, rawData);
 	}
 
 	/**
@@ -278,8 +278,9 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 	 * <strong>Note:</strong> This operation may alter the contents of the
 	 * passed in map. If this is unacceptable, pass in a defensive copy.
 	 */
+	@Override
 	protected Map<String, Object> getSessionAttributes(
-			Map<Object, Object> distributedCacheData) {
+			String realId, Map<Object, Object> distributedCacheData) {
 		Map<String, Object> attrs = new HashMap<String, Object>();
 		// fix for Issue 1621 http://code.google.com/p/mobicents/issues/detail?id=1621
 		if(distributedCacheData != null) {
@@ -390,7 +391,7 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 		Node<Object, Object> node = getCache().getRoot().getChild(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY));
 		Map<Object, Object> rawData = node.getData();
 
-		return getSessionAttributes(rawData);
+		return getSessionAttributes(null, rawData);
 	}
 
 	public void putSipSessionAttribute(String sipApplicationSessionKey,

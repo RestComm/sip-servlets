@@ -186,7 +186,7 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 			metaData.setMetaData(sipSessionMetaData);
 		} catch (Exception e) {
 			log_.warn("Problem accessing sip session data : " + e.getClass() + " "
-					+ e);
+					+ e, e);
 			// Clean up
 			removeSipSessionLocal(sipAppSessionKey, key);
 			return null;
@@ -256,7 +256,7 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 			metaData.setMetaData(sipAppSessionMetaData);
 		} catch (Exception e) {
 			log_.warn("Problem accessing sip application session data : " + e.getClass() + " "
-					+ e);
+					+ e, e);
 			// Clean up
 			removeSipApplicationSessionLocal(key);
 			return null;
