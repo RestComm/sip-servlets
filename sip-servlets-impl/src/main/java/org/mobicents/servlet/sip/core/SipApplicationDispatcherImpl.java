@@ -1093,11 +1093,20 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			// Issue 1333 : B2buaHelper.getPendingMessages(linkedSession, UAMode.UAC) returns empty list
 			// don't remove the transaction on terminated state for INVITE Tx because it won't be possible
 			// to create the ACK on second leg for B2BUA apps
-			if(sipSession != null && 
-					(b2buaHelperImpl == null && transaction instanceof ClientTransaction && !Request.INVITE.equals(sipServletMessageImpl.getMethod()))) {
-				sipSession.removeOngoingTransaction(transaction);
-				tad.cleanUp();
-				transaction.setApplicationData(null);
+			if(sipSession != null) {
+				boolean removeTx = true;
+				if(b2buaHelperImpl != null && transaction instanceof ClientTransaction && Request.INVITE.equals(sipServletMessageImpl.getMethod())) {
+					removeTx = false;
+				}
+				if(removeTx) {
+					sipSession.removeOngoingTransaction(transaction);
+					tad.cleanUp();
+					transaction.setApplicationData(null);
+				} else {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Transaction " + transaction + " not removed from session " + sipSessionKey + " because the B2BUA might still need it to create the ACK");
+					}
+				}
 			}			
 		} else {
 			if(logger.isDebugEnabled()) {
