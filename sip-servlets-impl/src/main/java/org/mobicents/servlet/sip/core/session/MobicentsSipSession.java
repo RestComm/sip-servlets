@@ -34,6 +34,7 @@ import javax.sip.SipException;
 import javax.sip.Transaction;
 import javax.sip.message.Request;
 
+import org.mobicents.javax.servlet.sip.SipSessionExt;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.MobicentsSipSessionFacade;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
@@ -46,7 +47,7 @@ import org.mobicents.servlet.sip.proxy.ProxyImpl;
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
-public interface MobicentsSipSession extends SipSession {
+public interface MobicentsSipSession extends SipSession, SipSessionExt {
 
 	/**
 	 * get the internal Mobicents Sip Session Key

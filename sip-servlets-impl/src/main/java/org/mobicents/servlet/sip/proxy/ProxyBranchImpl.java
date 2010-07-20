@@ -808,9 +808,20 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	 * {@inheritDoc}
 	 */
 	public void setOutboundInterface(InetAddress inetAddress) {
-		//TODO check against our defined outbound interfaces
 		checkSessionValidity();
 		String address = inetAddress.getHostAddress();
+		
+		List<SipURI> list = proxy.getSipFactoryImpl().getSipNetworkInterfaceManager().getOutboundInterfaces();
+		SipURI networkInterface = null;
+		for(SipURI networkInterfaceURI : list) {
+			if(networkInterfaceURI.toString().contains(address)) {
+				networkInterface = networkInterfaceURI;
+				break;
+			}
+		}
+		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
+				outboundInterface + " not found");	
+		
 		outboundInterface = proxy.getSipFactoryImpl().createSipURI(null, address);		
 	}
 
@@ -818,10 +829,45 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	 * {@inheritDoc}
 	 */
 	public void setOutboundInterface(InetSocketAddress inetSocketAddress) {
-		//TODO check against our defined outbound interfaces		
 		checkSessionValidity();
 		String address = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
+		
+		List<SipURI> list = proxy.getSipFactoryImpl().getSipNetworkInterfaceManager().getOutboundInterfaces();
+		SipURI networkInterface = null;
+		for(SipURI networkInterfaceURI : list) {
+			if(networkInterfaceURI.toString().contains(address)) {
+				networkInterface = networkInterfaceURI;
+				break;
+			}
+		}
+		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
+				outboundInterface + " not found");	
+		
 		outboundInterface = proxy.getSipFactoryImpl().createSipURI(null, address);		
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.javax.servlet.sip.ProxyExt#setOutboundInterface(javax.servlet.sip.SipURI)
+	 */
+	public void setOutboundInterface(SipURI outboundInterface) {
+		checkSessionValidity();
+		if(outboundInterface == null) {
+			throw new NullPointerException("outbound Interface param shouldn't be null");
+		}
+		List<SipURI> list = proxy.getSipFactoryImpl().getSipNetworkInterfaceManager().getOutboundInterfaces();
+		SipURI networkInterface = null;
+		for(SipURI networkInterfaceURI : list) {
+			if(networkInterfaceURI.equals(outboundInterface)) {
+				networkInterface = networkInterfaceURI;
+				break;
+			}
+		}
+		
+		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
+				outboundInterface + " not found");		
+		
+		this.outboundInterface = networkInterface;
 	}
 
 	/**

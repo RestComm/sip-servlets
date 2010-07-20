@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
+import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.ContactHeader;
@@ -406,6 +407,29 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5071, "tcp", null);
 		tomcat.startTomcat();
 		deployApplication();
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());
+		ContactHeader contactHeader = (ContactHeader) receiver.getInviteRequest().getHeader(ContactHeader.NAME);	
+		assertFalse(((SipURI)contactHeader.getAddress().getURI()).toString().contains("transport=udp"));
+	}
+	
+	/**
+	 * non regression test for Issue 1150 http://code.google.com/p/mobicents/issues/detail?id=1150
+	 * 	Contact header contains "transport" parameter even when there are two connectors (UDP and TCP)
+	 */
+	public void testShootistOutboundInterfaceTransport() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", ListeningPoint.TCP, AUTODIALOG, null);				
+		
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5071, "tcp", null);
+		tomcat.startTomcat();
+		deployApplication("outboundInterface", "tcp");
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());
 		ContactHeader contactHeader = (ContactHeader) receiver.getInviteRequest().getHeader(ContactHeader.NAME);	

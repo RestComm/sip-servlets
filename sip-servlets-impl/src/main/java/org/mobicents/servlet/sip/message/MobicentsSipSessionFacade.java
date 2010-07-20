@@ -158,6 +158,10 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public void setOutboundInterface(InetSocketAddress arg0) {
 		getSipSession().setOutboundInterface(arg0);
 	}
+	
+	public void setOutboundInterface(SipURI arg0) {
+		getSipSession().setOutboundInterface(arg0);
+	}
 
 //	public void readExternal(ObjectInput in) throws IOException,
 //			ClassNotFoundException {		

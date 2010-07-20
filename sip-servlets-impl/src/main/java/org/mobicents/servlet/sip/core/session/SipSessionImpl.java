@@ -56,6 +56,7 @@ import javax.servlet.sip.SipSessionBindingEvent;
 import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
+import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
@@ -1577,8 +1578,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		invalidateWhenReady = arg0;
 	}
 	
-	/**
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#setOutboundInterface(java.net.InetAddress)
 	 */
 	public void setOutboundInterface(InetAddress inetAddress) {
 		if(!isValid()) {
@@ -1586,9 +1588,19 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		if(inetAddress == null) {
 			throw new NullPointerException("parameter is null");
-		}
-		//TODO check against our defined outbound interfaces
+		}		
 		String address = inetAddress.getHostAddress();
+		List<SipURI> list = sipFactory.getSipNetworkInterfaceManager().getOutboundInterfaces();
+		SipURI networkInterface = null;
+		for(SipURI networkInterfaceURI : list) {
+			if(networkInterfaceURI.toString().contains(address)) {
+				networkInterface = networkInterfaceURI;
+				break;
+			}
+		}
+		
+		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
+				address + " not found");		
 		try {
 			outboundInterface = new SipURIImpl(SipFactories.addressFactory.createSipURI(null, address)).toString();
 		} catch (ParseException e) {
@@ -1598,8 +1610,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipSession#setOutboundInterface(java.net.InetSocketAddress)
 	 */
 	public void setOutboundInterface(InetSocketAddress inetSocketAddress) {
 		if(!isValid()) {
@@ -1607,9 +1620,19 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		if(inetSocketAddress == null) {
 			throw new NullPointerException("parameter is null");
-		}
-		//TODO check against our defined outbound interfaces		
+		}		
 		String address = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
+		List<SipURI> list = sipFactory.getSipNetworkInterfaceManager().getOutboundInterfaces();
+		SipURI networkInterface = null;
+		for(SipURI networkInterfaceURI : list) {
+			if(networkInterfaceURI.toString().contains(address)) {
+				networkInterface = networkInterfaceURI;
+				break;
+			}
+		}
+		
+		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
+				address + " not found");
 		try {
 			outboundInterface = new SipURIImpl(SipFactories.addressFactory.createSipURI(null, address)).toString();
 		} catch (ParseException e) {
@@ -1617,6 +1640,31 @@ public class SipSessionImpl implements MobicentsSipSession {
 					+ "] HOST[" + address + "]", e);
 			throw new IllegalArgumentException("Could not create SIP URI user = " + null + " host = " + address);
 		}
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.javax.servlet.sip.SipSessionExt#setOutboundInterface(javax.servlet.sip.SipURI)
+	 */
+	public void setOutboundInterface(SipURI outboundInterface) {
+		if(!isValid()) {
+			throw new IllegalStateException("the session has been invalidated");
+		}
+		if(outboundInterface == null) {
+			throw new NullPointerException("parameter is null");
+		}				
+		List<SipURI> list = sipFactory.getSipNetworkInterfaceManager().getOutboundInterfaces();
+		SipURI networkInterface = null;
+		for(SipURI networkInterfaceURI : list) {
+			if(networkInterfaceURI.equals(outboundInterface)) {
+				networkInterface = networkInterfaceURI;
+				break;
+			}
+		}
+		
+		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
+				outboundInterface + " not found");
+		this.outboundInterface = outboundInterface.toString();		
 	}
 	
 	/**

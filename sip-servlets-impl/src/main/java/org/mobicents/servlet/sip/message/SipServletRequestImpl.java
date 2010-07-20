@@ -928,14 +928,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    	} else if(proxy.getFinalBranchForSubsequentRequests() != null && proxy.getFinalBranchForSubsequentRequests().getRecordRoute()) {
 		    		addViaHeader = true;
 		    	}
-		    	if(addViaHeader) {
-		    		if(logger.isDebugEnabled()) {
-				    	logger.debug("Adding via Header");
-				    }
+		    	if(addViaHeader) {		    		
 		    		// Issue 					
 		    		viaHeader = JainSipUtils.createViaHeader(
 		    				sipNetworkInterfaceManager, request, null, session.getOutboundInterface());
 		    		message.addHeader(viaHeader);
+		    		if(logger.isDebugEnabled()) {
+				    	logger.debug("Added via Header" + viaHeader);
+				    }
 			    }
 		    }
 			final String transport = JainSipUtils.findTransport(request);

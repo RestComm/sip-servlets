@@ -18,6 +18,9 @@ package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
@@ -39,6 +42,7 @@ import javax.servlet.sip.TimerService;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.SipSessionExt;
 
 public class ShootistSipServlet 
 		extends SipServlet 
@@ -202,7 +206,7 @@ public class ShootistSipServlet
 		String method = ce.getServletContext().getInitParameter("method");
 		if(method == null) {
 			method = "INVITE";
-		}
+		}		
 		SipServletRequest sipServletRequest = null;
 		if(ce.getServletContext().getInitParameter("useStringFactory") != null) {
 			try {
@@ -217,6 +221,22 @@ public class ShootistSipServlet
 			}
 		} else {
 			sipServletRequest =	sipFactory.createRequest(sipApplicationSession, method, fromURI, toURI);
+		}
+		String outboundInterface = ce.getServletContext().getInitParameter("outboundInterface");
+		if(outboundInterface != null) {
+			List<SipURI> outboundInterfaces = (List<SipURI>)getServletContext().getAttribute(OUTBOUND_INTERFACES);
+
+			if(outboundInterfaces == null) throw new NullPointerException("Outbound interfaces should not be null");
+
+			for(SipURI uri:outboundInterfaces) {
+				logger.info("checking following outboudinterface"  + uri +" against transport" + outboundInterface);
+				if(uri.toString().contains(outboundInterface)) {
+					logger.info("using following outboudinterface"  + uri);
+					// pick the lo interface, since its universal on all machines
+					((SipSessionExt)sipServletRequest.getSession()).setOutboundInterface(uri);					
+					break;
+				}
+			}
 		}
 		if(!method.equalsIgnoreCase("REGISTER")) {
 			Address addr = null;

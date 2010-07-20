@@ -740,10 +740,14 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		this.sipFactoryImpl = sipFactoryImpl;
 	}
 
-	/**
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.Proxy#setOutboundInterface(java.net.InetAddress)
 	 */
 	public void setOutboundInterface(InetAddress inetAddress) {
+		if(outboundInterface == null) {
+			throw new NullPointerException("outbound Interface param shouldn't be null");
+		}
 		String address = inetAddress.getHostAddress();
 		List<SipURI> list = this.sipFactoryImpl.getSipNetworkInterfaceManager().getOutboundInterfaces();
 		SipURI networkInterface = null;
@@ -760,10 +764,14 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		outboundInterface = networkInterface;
 	}
 
-	/**
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.Proxy#setOutboundInterface(java.net.InetSocketAddress)
 	 */
 	public void setOutboundInterface(InetSocketAddress inetSocketAddress) {
+		if(outboundInterface == null) {
+			throw new NullPointerException("outbound Interface param shouldn't be null");
+		}
 		String address = inetSocketAddress.getAddress().getHostAddress()
 			+ ":" + inetSocketAddress.getPort();
 		List<SipURI> list = this.sipFactoryImpl.getSipNetworkInterfaceManager().getOutboundInterfaces();
@@ -780,6 +788,29 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		
 		outboundInterface = networkInterface;
 	}	
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.javax.servlet.sip.ProxyExt#setOutboundInterface(javax.servlet.sip.SipURI)
+	 */
+	public void setOutboundInterface(SipURI outboundInterface) {
+		if(outboundInterface == null) {
+			throw new NullPointerException("outbound Interface param shouldn't be null");
+		}
+		List<SipURI> list = this.sipFactoryImpl.getSipNetworkInterfaceManager().getOutboundInterfaces();
+		SipURI networkInterface = null;
+		for(SipURI networkInterfaceURI : list) {
+			if(networkInterfaceURI.equals(outboundInterface)) {
+				networkInterface = networkInterfaceURI;
+				break;
+			}
+		}
+		
+		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
+				outboundInterface + " not found");		
+		
+		this.outboundInterface = networkInterface;
+	}
 	
 	public void setAckReceived(boolean received) {
 		this.ackReceived = received;
@@ -861,5 +892,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		proxy1xxTimeout = timeout;
 		
 	}
+
+	
 
 }

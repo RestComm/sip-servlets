@@ -484,10 +484,10 @@ public final class JainSipUtils {
 	 * @return
 	 */
 	public static ViaHeader createViaHeader(
-			SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String branch, String outboundInterface) {
-		String transport = findTransport(request);
+			SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String branch, String outboundInterface) {		
 		ExtendedListeningPoint listeningPoint = null;
 		if(outboundInterface == null) {
+			String transport = findTransport(request);
 			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
 		} else {
 			javax.sip.address.SipURI outboundInterfaceURI = null;			
@@ -520,10 +520,10 @@ public final class JainSipUtils {
 	 * @param transport
 	 * @return
 	 */
-	public static ContactHeader createContactHeader(SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String displayName, String outboundInterface) {
-		String transport = findTransport(request);
+	public static ContactHeader createContactHeader(SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String displayName, String outboundInterface) {		
 		ExtendedListeningPoint listeningPoint = null;
 		if(outboundInterface == null) {
+			String transport = findTransport(request);
 			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
 		} else {
 			javax.sip.address.SipURI outboundInterfaceURI = null;			
