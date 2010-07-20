@@ -206,4 +206,34 @@ public interface JBossCacheSipManagerMBean extends JBossCacheManagerMBean {
 	 */
 	public void setExpiredSipApplicationSessions(
 			int expiredSipApplicationSessions);
+	
+	/**
+	 * Text report of the local session statistics. No remote sessions are shown here.
+	 * @return
+	 */
+	public String reportLocalSessionStatisticsAsString();
+	
+	/**
+	 * Text report of all local and remote sessions.
+	 * @return
+	 */
+	public String reportCacheSessionStatisticsAsString();
+	
+	/**
+	 * Displays the number of replicated bytes. This is only accurate for Session based
+	 * replication, because it only counts the based on externalizeSession methods. Individual
+	 * attribute or field changes are not counted here.
+	 * 
+	 * @return
+	 */
+	public Long reportReplicatedSipSessionBytesSessionBasedReplication();
+	
+	/**
+	 * Displays the number of replicated bytes. This is only accurate for Session based
+	 * replication, because it only counts the based on externalizeSession methods. Individual
+	 * attribute or field changes are not counted here.
+	 * 
+	 * @return
+	 */
+	public Long reportTotalReplicatedBytes();
 }

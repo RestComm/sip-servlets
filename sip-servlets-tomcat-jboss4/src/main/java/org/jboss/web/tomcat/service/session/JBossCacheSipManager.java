@@ -18,6 +18,7 @@ package org.jboss.web.tomcat.service.session;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -25,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -82,6 +84,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
     protected static final String info = "JBossCacheSipManager/1.0";
     
 	protected static Logger logger = Logger.getLogger(JBossCacheSipManager.class);
+	
+	public AtomicLong totalSipSessionBytesReplicatedFromThisNode = new AtomicLong();
+	public AtomicLong totalBytesReplicatedFromThisNode = new AtomicLong();
 	
 	private SipManagerDelegate sipManagerDelegate;
 
@@ -3236,4 +3241,69 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 	public void updateStats() {
 		sipManagerDelegate.updateStats();
 	}
+	
+	public String reportLocalSessionStatisticsAsString()
+	{
+		String result = "";
+		try {
+			Iterator<MobicentsSipApplicationSession> appSessions = getAllSipApplicationSessions();
+			while(appSessions.hasNext()) {
+				MobicentsSipApplicationSession appSession = appSessions.next();
+
+				result += "[APPLICATION SESSION] ID = " + appSession.getId() + ", Handler = " + appSession.getCurrentRequestHandler() + "\n"+ "([APPLICATION SESSION])\n";
+				Iterator<String> attribNames = appSession.getAttributeNames();
+				while(attribNames.hasNext()) {
+					String attrib = attribNames.next();
+					result += "   ATTRIBUTE(" + attrib + ") -> " + appSession.getAttribute(attrib) + "\n";
+				}
+				Set<MobicentsSipSession> sipSessions = appSession.getSipSessions();
+				for(MobicentsSipSession sipSession : sipSessions) {
+					Enumeration<String> attributeNames = sipSession.getAttributeNames();
+					result += "   [SIP SESSION] ID = " + sipSession.getId() + "\n";
+					while(attributeNames.hasMoreElements()) {
+						String attribName = attributeNames.nextElement();
+						result += "      ATTRIBUTE(" + attribName + ") -> " + sipSession.getAttribute(attribName) + "\n";
+					}
+				}
+				
+				proxy_.getSipApplicationSessionIds().keySet();
+			}
+		} catch (Exception ex) {
+			result = "ERROR occured. See log for exception.";
+			logger.error("Error while gathering stats. This is not a critical error.", ex);
+		}
+		return result;
+	}
+	
+	
+	public String reportCacheSessionStatisticsAsString()
+	{
+		String result = "";
+		try {
+			for(Object obj:proxy_.getSipApplicationSessionIds().keySet()) {
+				result += "APPLICATION SESSION (" + obj + ")\n";
+				for(Object sip : proxy_.getSipApplicationSessionAttributes((String) obj).keySet()) {
+					result += "ATTRIBUTE(" + sip + ")" + proxy_.getSipApplicationSessionAttribute((String)obj, (String)sip) + "\n";
+				}
+				Set<Object> appSid = new HashSet<Object>();
+				appSid.add(obj);
+				for(Object sip:proxy_.getSipSessionIds(appSid, "").keySet()) {
+					result += sip + "\n";
+				}
+			}
+		} catch (Exception ex) {
+			result = "ERROR occured. See log for exception.";
+			logger.error("Error while gathering stats. This is not a critical error.", ex);
+		}
+		return result;
+	}
+
+	public Long reportTotalReplicatedBytes() {
+		return totalBytesReplicatedFromThisNode.get();
+	}
+
+	public Long reportReplicatedSipSessionBytesSessionBasedReplication() {
+		return totalSipSessionBytesReplicatedFromThisNode.get();
+	}
+
 }

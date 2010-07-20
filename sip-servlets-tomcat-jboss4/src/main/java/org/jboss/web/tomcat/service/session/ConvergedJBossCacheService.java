@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -557,6 +558,9 @@ public class ConvergedJBossCacheService extends JBossCacheService
       
       if (session.getReplicateSessionBody())
       {
+    	  if(log_.isDebugEnabled()) {
+    		  log_.debug("Session is dirty or new and is being fully replicated " + session.toString());
+    	  }
          Map map = new HashMap();
 //         if (useTreeCacheMarshalling_)
 //            map.put(realId, session);
@@ -568,6 +572,9 @@ public class ConvergedJBossCacheService extends JBossCacheService
       }
       else
       {
+    	  if(log_.isDebugEnabled()) {
+    		  log_.debug("Session is not being replicated right now, but the version is being updated and remote nodes will pull it on demand when they notice or other event forces full replication. Only the version field is updated now. " + session.toString());
+    	  }
          // Invalidate the remote caches
          cacheWrapper_.put(fqn, VERSION_KEY, new Integer(session.getVersion()));
       }
@@ -1927,6 +1934,7 @@ public class ConvergedJBossCacheService extends JBossCacheService
          try
          {
             MarshalledValue mv = new MarshalledValue(value);
+            manager_.totalBytesReplicatedFromThisNode.addAndGet(mv.size());
             if (log_.isTraceEnabled())
             {
                log_.trace("marshalled object to size " + mv.size() + " bytes");
@@ -2021,9 +2029,32 @@ public class ConvergedJBossCacheService extends JBossCacheService
          
          byte[] bytes = baos.toByteArray();
          
+         manager_.totalBytesReplicatedFromThisNode.addAndGet(bytes.length);
+         manager_.totalSipSessionBytesReplicatedFromThisNode.addAndGet(bytes.length);
+         
          if (log_.isDebugEnabled())
          {
             log_.debug("marshalled object to size " + bytes.length + " bytes");
+            String result = "";
+            String rawSerializaedString = "";
+            try {
+            	Enumeration<String> attributeNames = session.getAttributeNames();
+            	result += "[SIP SESSION] ID = " + session.getId() + "\n";
+            	while(attributeNames.hasMoreElements()) {
+            		String attribName = attributeNames.nextElement();
+            		result += "   ATTRIBUTE(" + attribName + ") -> " + session.getAttribute(attribName) + "\n";
+            	}
+            } catch (Exception ex) {
+            	result = "ERROR occured. See log for exception.";
+    			log_.debug("Error while gathering stats. This is not a critical error.", ex);
+    		}
+            try {
+            	rawSerializaedString = new String(bytes);
+            } catch (Exception ex) {
+            	rawSerializaedString = "Error converting bytes to string. This is not a critical error.";
+            }
+            log_.debug(result);
+            log_.debug(rawSerializaedString);
          }
 
          return bytes;
@@ -2047,12 +2078,35 @@ public class ConvergedJBossCacheService extends JBossCacheService
          MarshalledValueOutputStream oos = new MarshalledValueOutputStream(baos);
          session.writeExternal(oos);
          oos.close(); // flushes bytes to baos
-         
+
          byte[] bytes = baos.toByteArray();
          
+         manager_.totalBytesReplicatedFromThisNode.addAndGet(bytes.length);
+
          if (log_.isTraceEnabled())
          {
-            log_.trace("marshalled object to size " + bytes.length + " bytes");
+        	 log_.trace("marshalled object to size " + bytes.length + " bytes");
+        	 String result = "";
+        	 String rawSerializaedString = "";
+        	 try {
+        		 result += "[APPLICATION SESSION] APPNAME " + session.getApplicationName() + " ID = " + session.getId() + ", Handler = " + session.getCurrentRequestHandler() + "\n"+ "([APPLICATION SESSION])\n";
+        		 Iterator<String> attribNames = session.getAttributeNames();
+        		 while(attribNames.hasNext()) {
+        			 String attrib = attribNames.next();
+        			 result += "   ATTRIBUTE(" + attrib + ") -> " + session.getAttribute(attrib) + "\n";
+        		 }
+        	 } catch (Exception ex) {
+             	result = "ERROR occured. See log for exception.";
+     			log_.debug("Error while gathering stats. This is not a critical error.", ex);
+        	 }
+        	 
+        	 try {
+        		 rawSerializaedString = new String(bytes);
+        	 } catch (Exception e) {
+        		 rawSerializaedString = "Error creating a String from raw bytes";
+        	 }
+        	 log_.trace(result);
+        	 log_.trace(rawSerializaedString);
          }
 
          return bytes;
