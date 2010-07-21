@@ -745,7 +745,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 	 * @see javax.servlet.sip.Proxy#setOutboundInterface(java.net.InetAddress)
 	 */
 	public void setOutboundInterface(InetAddress inetAddress) {
-		if(outboundInterface == null) {
+		if(inetAddress == null) {
 			throw new NullPointerException("outbound Interface param shouldn't be null");
 		}
 		String address = inetAddress.getHostAddress();
@@ -769,7 +769,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 	 * @see javax.servlet.sip.Proxy#setOutboundInterface(java.net.InetSocketAddress)
 	 */
 	public void setOutboundInterface(InetSocketAddress inetSocketAddress) {
-		if(outboundInterface == null) {
+		if(inetSocketAddress == null) {
 			throw new NullPointerException("outbound Interface param shouldn't be null");
 		}
 		String address = inetSocketAddress.getAddress().getHostAddress()

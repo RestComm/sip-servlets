@@ -808,6 +808,9 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	 * {@inheritDoc}
 	 */
 	public void setOutboundInterface(InetAddress inetAddress) {
+		if(inetAddress == null) {
+			throw new NullPointerException("outbound Interface param shouldn't be null");
+		}
 		checkSessionValidity();
 		String address = inetAddress.getHostAddress();
 		
@@ -829,6 +832,9 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	 * {@inheritDoc}
 	 */
 	public void setOutboundInterface(InetSocketAddress inetSocketAddress) {
+		if(inetSocketAddress == null) {
+			throw new NullPointerException("outbound Interface param shouldn't be null");
+		}
 		checkSessionValidity();
 		String address = inetSocketAddress.getAddress().getHostAddress() + ":" + inetSocketAddress.getPort();
 		
