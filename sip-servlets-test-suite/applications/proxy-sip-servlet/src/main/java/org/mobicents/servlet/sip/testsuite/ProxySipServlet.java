@@ -45,6 +45,7 @@ import org.mobicents.javax.servlet.sip.ProxyExt;
 import org.mobicents.javax.servlet.sip.ResponseType;
 
 public class ProxySipServlet extends SipServlet implements SipErrorListener, ProxyBranchListener, SipApplicationSessionListener {
+	private static final String ERROR = "ERROR";
 	private static final String SIP_APPLICATION_SESSION_TIMEOUT = "sipApplicationSessionTimeout";
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(ProxySipServlet.class);
@@ -70,8 +71,14 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			IOException {
 
 		logger.info("Got request:\n" + request.getMethod());
+		String error = (String) request.getApplicationSession().getAttribute(ERROR);
+		if(error != null) {
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, error);
+			sipServletResponse.send();
+			return;
+		}
 		final String from = request.getFrom().getURI().toString();
-		SipURI fromURI = ((SipURI)request.getFrom().getURI());
+		SipURI fromURI = ((SipURI)request.getFrom().getURI());		
 		logger.info("invalidate when ready "
 				+ request.getApplicationSession().getInvalidateWhenReady());
 		if(fromURI.getUser().equals(CHECK_READY_TO_INVALIDATE)) {
@@ -81,7 +88,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 				return;
 			}
 		}
-		if(fromURI.getUser().equals(SIP_APPLICATION_SESSION_TIMEOUT)) {
+		if(fromURI.getUser().equals(SIP_APPLICATION_SESSION_TIMEOUT)) {			
 			logger.info("testing session expiration, setting invalidateWhenReady to false");
 			request.getApplicationSession().setAttribute(SIP_APPLICATION_SESSION_TIMEOUT, "true");
 			request.getApplicationSession().setInvalidateWhenReady(false);
@@ -337,7 +344,13 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		String expires = getServletContext().getInitParameter(SIP_APPLICATION_SESSION_TIMEOUT);
 		if(expires != null) {
 			logger.info("setting expires to " +  expires);
+			long now = System.currentTimeMillis();
 			ev.getApplicationSession().setExpires(Integer.valueOf(expires));
+			long expirationTime = ev.getApplicationSession().getExpirationTime();
+			logger.info("expirationTime " +  expirationTime);
+			if(expirationTime < (now + (Integer.valueOf(expires) * 60 * 1000L))) {
+				ev.getApplicationSession().setAttribute(ERROR, "sip App Sesion getExpirationTime() returns incorrect value");
+			}
 		}
 	}
 

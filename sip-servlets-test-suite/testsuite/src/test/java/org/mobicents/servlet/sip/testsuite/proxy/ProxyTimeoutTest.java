@@ -124,6 +124,7 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 	
 	/**
 	 * Test Issue 1678 : SipApplicationSession.setExpires() doesn't work sometimes
+	 * Test Issue 1676 : SipApplicationSession.getExpirationTime() is incorrect
 	 */
 	public void testProxySipApplicationSessionTimeout() throws Exception {
 		deployApplication("sipApplicationSessionTimeout", "1");
