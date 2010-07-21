@@ -172,15 +172,15 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 					SIPClientTransaction tx = (SIPClientTransaction) outgoingRequest.getTransaction();
 
 					Method disableRetransmissionTimer = SIPTransaction.class.getDeclaredMethod("disableRetransmissionTimer");
-					Method disableTimeoutTimer = SIPTransaction.class.getDeclaredMethod("disableTimeoutTimer");
+					//Method disableTimeoutTimer = SIPTransaction.class.getDeclaredMethod("disableTimeoutTimer");
 					disableRetransmissionTimer.setAccessible(true);
-					disableTimeoutTimer.setAccessible(true);
+					//disableTimeoutTimer.setAccessible(true);
 					disableRetransmissionTimer.invoke(tx);
-					disableTimeoutTimer.invoke(tx);
+					//disableTimeoutTimer.invoke(tx);
 					/*
 					try {
 						//tx.terminate();
-						// Do not terminate the tx here, because ProxyCancel test is failing. If the tx
+						// Do not terminate the tx here, because com.bea.sipservlet.tck.agents.spec.ProxyTest.testProxyCancel test is failing. If the tx
 						// is terminated 100 Trying is dropped at JSIP.
 					} catch(Exception e2) {
 						logger.error("Can not terminate transaction", e2);
