@@ -142,6 +142,9 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 				uris.add(uri1);
 			} else if(from.contains("sequential-cut")) {
 				uris.add(uri2);
+			} else if(from.contains("nonexist")) {
+				uris.add(uri3);
+				proxy.setProxyTimeout(40);
 			} else {
 				uris.add(uri2);
 				uris.add(uri1);

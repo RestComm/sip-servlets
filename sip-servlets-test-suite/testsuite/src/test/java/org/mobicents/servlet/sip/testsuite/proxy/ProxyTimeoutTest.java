@@ -37,9 +37,11 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 	private static transient Logger logger = Logger.getLogger(ProxyTimeoutTest.class);
 	private static final boolean AUTODIALOG = true;
 	TestSipListener sender;
+	TestSipListener neutral;
 	TestSipListener receiver;
 	ProtocolObjects senderProtocolObjects;
 	ProtocolObjects	receiverProtocolObjects;
+	ProtocolObjects neutralProto;
 
 
 	private static final int TIMEOUT = 20000;
@@ -56,6 +58,8 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null);
 		receiverProtocolObjects = new ProtocolObjects("proxy-receiver",
 				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null);
+		neutralProto = new ProtocolObjects("neutral",
+				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null);
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
@@ -63,12 +67,18 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 		receiver = new TestSipListener(5057, 5070, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
+		
+		neutral = new TestSipListener(5058, 5070, neutralProto, false);
+		neutral.setRecordRoutingProxyTesting(true);
+		SipProvider neutralProvider = neutral.createProvider();
 
 		receiverProvider.addSipListener(receiver);
 		senderProvider.addSipListener(sender);
+		neutralProvider.addSipListener(neutral);
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
+		neutralProto.start();
 	}
 
 	/**
@@ -151,11 +161,29 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 		assertTrue(sender.getAllMessagesContent().contains("sessionExpired"));
 			
 	}	
+	
+	public void testNonExistLegTimeout() throws Exception {
+		String fromName = "sequential-nonexist";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "proxy-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		receiver.setProvisionalResponsesToSend(new ArrayList<Integer>());		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(50000);		
+		assertTrue(neutral.getMessageRequest() != null);		
+	}
 
 	@Override
 	public void tearDown() throws Exception {
 		senderProtocolObjects.destroy();
-		receiverProtocolObjects.destroy();			
+		receiverProtocolObjects.destroy();		
+		neutralProto.destroy();
 		logger.info("Test completed");
 		super.tearDown();
 	}
