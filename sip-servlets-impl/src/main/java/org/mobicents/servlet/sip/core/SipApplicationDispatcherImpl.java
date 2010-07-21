@@ -350,11 +350,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			Properties versionProperties = new Properties();
 			try {
 				InputStream in = SipApplicationDispatcherImpl.class.getResourceAsStream("version.properties");
-				versionProperties.load(in);
-				in.close();
-				String version = versionProperties.getProperty("release.version");
-				if(version != null) {
-					logger.info("Mobicents Sip Servlets " + version + " started." );
+				if(in != null) {
+					versionProperties.load(in);
+					in.close();
+					String version = versionProperties.getProperty("release.version");
+					if(version != null) {
+						logger.info("Mobicents Sip Servlets " + version + " started." );
+					} else {
+						logger.warn("Unable to extract the version of Mobicents Sip Servlets currently running");
+					}
 				} else {
 					logger.warn("Unable to extract the version of Mobicents Sip Servlets currently running");
 				}
