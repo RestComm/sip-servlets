@@ -36,10 +36,14 @@ echo "================================"
 ./auto-prepare-example.sh custom-b2bua $config2
 
 ./auto-start-jboss-server.sh $config2 $config2.pid 1 custom-b2bua
+
+#Wait to boot
+sleep $HALFSTARTSLEEP
+
 ./auto-start-jboss-server.sh $config1 $config1.pid 0 custom-b2bua
 
 #Wait to boot
-sleep $FULLSTARTSLEEP
+sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh custom-b2bua result.txt
 
@@ -73,8 +77,12 @@ echo "================================"
 ./auto-prepare-example.sh uac $config1 -Dsend.on.init=true
 ./auto-prepare-example.sh uac $config2 -Dsend.on.init=false
 
-./auto-start-jboss-server.sh $config1 $config1.pid 0 uac
 ./auto-start-jboss-server.sh $config2 $config2.pid 1 uac
+
+#Wait to boot
+sleep $HALFSTARTSLEEP
+
+./auto-start-jboss-server.sh $config1 $config1.pid 0 uac
 
 # SIPp should be running by the time JBoss finishes the startup, ence we use half start time here.
 
@@ -96,10 +104,14 @@ echo "================================"
 ./auto-prepare-example.sh b2bua $config2
 
 ./auto-start-jboss-server.sh $config2 $config2.pid 1 b2bua
+
+#Wait to boot
+sleep $HALFSTARTSLEEP
+
 ./auto-start-jboss-server.sh $config1 $config1.pid 0 b2bua
 
 #Wait to boot
-sleep $FULLSTARTSLEEP
+sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh b2bua result.txt
 
@@ -132,10 +144,14 @@ echo "================================"
 ./auto-prepare-example.sh proxy $config2
 
 ./auto-start-jboss-server.sh $config2 $config2.pid 1 proxy
+
+#Wait to boot
+sleep $HALFSTARTSLEEP
+
 ./auto-start-jboss-server.sh $config1 $config1.pid 0 proxy
 
 #Wait to boot
-sleep $FULLSTARTSLEEP
+sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh proxy result.txt
 
@@ -161,10 +177,14 @@ echo "================================"
 ./auto-prepare-example.sh uas $config2
 
 ./auto-start-jboss-server.sh $config2 $config2.pid 1 uas
+
+#Wait to boot
+sleep $HALFSTARTSLEEP
+
 ./auto-start-jboss-server.sh $config1 $config1.pid 0 uas
 
 #Wait to boot
-sleep $FULLSTARTSLEEP
+sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh uas result.txt
 
