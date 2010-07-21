@@ -955,6 +955,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						SipServletResponseImpl response = (SipServletResponseImpl) sipServletRequestImpl.createResponse(408, null, false);
 
 						MessageDispatcher.callServlet(response);
+						if(tad.getProxyBranch() != null) {
+							tad.getProxyBranch().setResponse(response);
+							tad.getProxyBranch().onResponse(response, response.getStatus());
+						}
 						sipSession.updateStateOnResponse(response, true);
 					} catch (Throwable t) {
 						logger.error("Failed to deliver 408 response on transaction timeout" + transaction, t);

@@ -857,6 +857,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 			sessionCreatingTransactionRequest = null;
 		}
 		if(proxy != null) {
+			try {
+				proxy.cancel();
+			} catch (Exception e) {
+				logger.debug("Problem cancelling proxy. We just try our best. This is not a critical error.", e);
+			}
 			proxy.getTransactionMap().clear();
 			proxy.getProxyBranchesMap().clear();
 			proxy = null;
