@@ -190,6 +190,13 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 				marshalled.put(entry.getKey(), getMarshalledValue(entry
 						.getValue()));
 			}
+			if(log_.isDebugEnabled()) {
+				String attribLog = "\n";
+				for(String name : sessionData.getModifiedSessionAttributes().keySet()) {
+					attribLog += "ATTRIBUTE(" + name + ") -> " + sessionData.getModifiedSessionAttributes().get(name) + "\n";
+				}
+				log_.debug(attribLog);
+			}
 			cacheWrapper_.put(fqn, marshalled);
 		}
 
@@ -211,6 +218,14 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 			for (Map.Entry<String, Object> entry : map.entrySet()) {
 				marshalled.put(entry.getKey(), getMarshalledValue(entry
 						.getValue()));
+			}
+
+			if(log_.isDebugEnabled()) {
+				String attribLog = "\n";
+				for(String name : sessionData.getModifiedSessionAttributes().keySet()) {
+					attribLog += "ATTRIBUTE(" + name + ") -> " + sessionData.getModifiedSessionAttributes().get(name) + "\n";
+				}
+				log_.debug(attribLog);
 			}
 			cacheWrapper_.put(fqn, marshalled);
 		}

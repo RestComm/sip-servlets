@@ -167,6 +167,11 @@ public class SessionBasedJBossCacheConvergedSipService extends
 				log_
 					.debug("storeSipApplicationSessionAttributes(): putting sip app session attributes "
 							+ sessionData.getSessionAttributes());
+				String attribLog = "\n";
+				for(String name : sessionData.getSessionAttributes().keySet()) {
+					attribLog += "ATTRIBUTE(" + name + ") -> " + sessionData.getSessionAttributes().get(name) + "\n";
+				}
+				log_.debug(attribLog);
 			}
 			cacheWrapper_.put(fqn, ATTRIBUTE_KEY.toString(), getMarshalledValue(sessionData.getSessionAttributes()));
 		}
@@ -178,6 +183,11 @@ public class SessionBasedJBossCacheConvergedSipService extends
 			if (log_.isDebugEnabled()) {
 				log_.debug("storeSipSessionAttributes(): putting sip session attributes "
 								+ sessionData.getSessionAttributes());
+				String attribLog = "\n";
+				for(String name : sessionData.getSessionAttributes().keySet()) {
+					attribLog += "ATTRIBUTE(" + name + ") -> " + sessionData.getSessionAttributes().get(name) + "\n";
+				}
+				log_.debug(attribLog);
 			}
 			cacheWrapper_.put(fqn, ATTRIBUTE_KEY.toString(), getMarshalledValue(sessionData.getSessionAttributes()));
 		}
