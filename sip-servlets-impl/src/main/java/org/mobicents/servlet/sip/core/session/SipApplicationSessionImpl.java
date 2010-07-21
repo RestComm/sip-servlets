@@ -366,10 +366,19 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 
 	
 	private void setLastAccessedTime(long lastAccessTime) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("lastAccessedTime set to "+ lastAccessTime);
+		}
 		this.lastAccessedTime = lastAccessTime;
 		//JSR 289 Section 6.3 : starting the sip app session expiry timer anew 
 		if(sipApplicationSessionTimeout > 0) {
-			expirationTime = lastAccessedTime + sipApplicationSessionTimeout;			
+			expirationTime = lastAccessedTime + sipApplicationSessionTimeout;
+			if(logger.isDebugEnabled()) {
+				logger.debug("Re-Scheduling sip application session "+ key +" to expire in " + sipApplicationSessionTimeout / 60 / 1000L + " minutes");
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTimeInMillis(expirationTime);
+				logger.debug("sip application session "+ key +" will expires at " + new SimpleDateFormat().format(calendar.getTime()));
+			}
 		}
 	}
 	
@@ -821,7 +830,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			if(expirationTimerTask != null) {
 				cancelExpirationTimer();
 				expirationTimerTask = null;	
-//				sipApplicationSessionTimeout = deltaMinutes;
+				sipApplicationSessionTimeout = deltaMinutes;
 			}		
 			return Integer.MAX_VALUE;
 		} else {
@@ -834,7 +843,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				//the app session was scheduled to never expire and now an expiration time is set
 //				deltaMilliseconds = deltaMinutes * 1000L * 60;
 //			}
-//			sipApplicationSessionTimeout = deltaMilliseconds;
+			sipApplicationSessionTimeout = deltaMilliseconds;
 			if(expirationTimerTask != null) {				
 				expirationTime = System.currentTimeMillis() + deltaMilliseconds;				
 				if(logger.isDebugEnabled()) {
