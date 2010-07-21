@@ -337,14 +337,14 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		if(expirationTimerTask == null) {
 			return 0;
 		}
-		long expirationTime = expirationTimerTask.getDelay();
-		if(expirationTime <= 0) {
+		long delay = expirationTimerTask.getDelay();
+		if(delay <= 0) {
 			return 0;
 		}
 		if(expired) {
 			return Long.MIN_VALUE;
 		}
-		return expirationTime;
+		return this.expirationTime;
 	}
 	
 	
