@@ -45,6 +45,7 @@ import org.mobicents.javax.servlet.sip.ProxyExt;
 import org.mobicents.javax.servlet.sip.ResponseType;
 
 public class ProxySipServlet extends SipServlet implements SipErrorListener, ProxyBranchListener, SipApplicationSessionListener {
+	private static final String SIP_APPLICATION_SESSION_TIMEOUT = "sipApplicationSessionTimeout";
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(ProxySipServlet.class);
 	String host = "127.0.0.1";
@@ -80,7 +81,11 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 				return;
 			}
 		}
-		
+		if(fromURI.getUser().equals(SIP_APPLICATION_SESSION_TIMEOUT)) {
+			logger.info("testing session expiration, setting invalidateWhenReady to false");
+			request.getApplicationSession().setAttribute(SIP_APPLICATION_SESSION_TIMEOUT, "true");
+			request.getApplicationSession().setInvalidateWhenReady(false);
+		}
 		if(!request.isInitial()){
 			return;
 		}
@@ -329,6 +334,11 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 
 	public void sessionCreated(SipApplicationSessionEvent ev) {
 		logger.info("sessionCreated " +  ev.getApplicationSession().getId());
+		String expires = getServletContext().getInitParameter(SIP_APPLICATION_SESSION_TIMEOUT);
+		if(expires != null) {
+			logger.info("setting expires to " +  expires);
+			ev.getApplicationSession().setExpires(Integer.valueOf(expires));
+		}
 	}
 
 	public void sessionDestroyed(SipApplicationSessionEvent ev) {
@@ -337,6 +347,9 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 
 	public void sessionExpired(SipApplicationSessionEvent ev) {
 		logger.info("sessionExpired " +  ev.getApplicationSession().getId());
+		if(ev.getApplicationSession().getAttribute(SIP_APPLICATION_SESSION_TIMEOUT) != null) {
+			sendMessage("sessionExpired", 5080, (String) ev.getApplicationSession().getAttribute("transport"));
+		}
 	}
 
 	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {

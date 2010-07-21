@@ -830,6 +830,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			if(expirationTimerTask != null) {
 				cancelExpirationTimer();
 				expirationTimerTask = null;	
+				// Fix for Issue 1678 : SipApplicationSession.setExpires() doesn't work sometimes
+				// the global sipApplicationSessionTimeout needs to be reset as well
 				sipApplicationSessionTimeout = deltaMinutes;
 			}		
 			return Integer.MAX_VALUE;
@@ -843,6 +845,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				//the app session was scheduled to never expire and now an expiration time is set
 //				deltaMilliseconds = deltaMinutes * 1000L * 60;
 //			}
+			// Fix for Issue 1678 : SipApplicationSession.setExpires() doesn't work sometimes
+			// the global sipApplicationSessionTimeout needs to be reset as well
 			sipApplicationSessionTimeout = deltaMilliseconds;
 			if(expirationTimerTask != null) {				
 				expirationTime = System.currentTimeMillis() + deltaMilliseconds;				
