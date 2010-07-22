@@ -149,6 +149,7 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		receiver.setProvisionalResponsesToSend(new ArrayList<Integer>());		
+		sender.setSendBye(true);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(70000);		
 		assertTrue(sender.isAckSent());
@@ -157,8 +158,9 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 			String message = (String) allMessagesIterator.next();
 			logger.info(message);
 		}
-		assertEquals(1, sender.getAllMessagesContent().size());
+		assertEquals(2, sender.getAllMessagesContent().size());
 		assertTrue(sender.getAllMessagesContent().contains("sessionExpired"));
+		assertTrue(sender.getAllMessagesContent().contains("sessionReadyToInvalidate"));
 			
 	}	
 	

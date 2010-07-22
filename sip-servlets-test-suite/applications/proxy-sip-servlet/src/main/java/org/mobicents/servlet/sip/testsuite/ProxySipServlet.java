@@ -88,10 +88,12 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 				return;
 			}
 		}
+		Address contactAddress = request.getAddressHeader("Contact");
+		int contactPort = ((SipURI)contactAddress.getURI()).getPort();
+		request.getApplicationSession().setAttribute("contactPort", contactPort);
 		if(fromURI.getUser().equals(SIP_APPLICATION_SESSION_TIMEOUT)) {			
 			logger.info("testing session expiration, setting invalidateWhenReady to false");
-			request.getApplicationSession().setAttribute(SIP_APPLICATION_SESSION_TIMEOUT, "true");
-			request.getApplicationSession().setInvalidateWhenReady(false);
+			request.getApplicationSession().setAttribute(SIP_APPLICATION_SESSION_TIMEOUT, "true");			
 		}
 		if(!request.isInitial()){
 			return;
@@ -364,12 +366,15 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 	public void sessionExpired(SipApplicationSessionEvent ev) {
 		logger.info("sessionExpired " +  ev.getApplicationSession().getId());
 		if(ev.getApplicationSession().getAttribute(SIP_APPLICATION_SESSION_TIMEOUT) != null) {
-			sendMessage("sessionExpired", 5080, (String) ev.getApplicationSession().getAttribute("transport"));
+			sendMessage("sessionExpired", (Integer) ev.getApplicationSession().getAttribute("contactPort"), (String) ev.getApplicationSession().getAttribute("transport"));
 		}
 	}
 
 	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
 		logger.info("sessionReadyToInvalidate " +  ev.getApplicationSession().getId());
-		sendMessage("sessionReadyToInvalidate", 5058, (String) ev.getApplicationSession().getAttribute("transport"));
+		sendMessage("sessionReadyToInvalidate", (Integer) ev.getApplicationSession().getAttribute("contactPort"), (String) ev.getApplicationSession().getAttribute("transport"));
+		if(ev.getApplicationSession().getAttribute(SIP_APPLICATION_SESSION_TIMEOUT) != null) {
+			ev.getApplicationSession().setInvalidateWhenReady(false);
+		}
 	}
 }
