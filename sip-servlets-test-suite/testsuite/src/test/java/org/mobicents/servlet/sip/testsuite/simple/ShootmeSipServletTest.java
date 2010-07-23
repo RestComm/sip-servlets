@@ -212,6 +212,11 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertTrue(sender.isFinalResponseReceived());
 		assertEquals(486, sender.getFinalResponseStatus());
 		assertTrue(!sender.getAllMessagesContent().contains("ackReceived"));
+		Thread.sleep(DIALOG_TIMEOUT);
+		List<String> allMessagesContent = sender.getAllMessagesContent();
+		assertEquals(2,allMessagesContent.size());
+		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
+		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));
 	}
 	
 	public void testShootmeRegisterNoContact() throws Exception {

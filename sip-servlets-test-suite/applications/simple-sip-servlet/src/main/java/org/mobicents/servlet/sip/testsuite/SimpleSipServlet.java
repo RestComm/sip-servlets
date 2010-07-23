@@ -28,6 +28,8 @@ import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipApplicationSessionEvent;
+import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
@@ -35,6 +37,8 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipSessionEvent;
+import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
@@ -45,7 +49,10 @@ import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
 
-public class SimpleSipServlet extends SipServlet implements SipErrorListener, TimerListener, SipConnectorListener {
+public class SimpleSipServlet 
+		extends SipServlet 
+		implements SipErrorListener, TimerListener, SipConnectorListener, SipSessionListener, SipApplicationSessionListener {
+	
 	private static transient Logger logger = Logger.getLogger(SimpleSipServlet.class);
 	private static final long serialVersionUID = 1L;
 	private static final String TEST_PRACK = "prack";
@@ -130,7 +137,8 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 		if(fromString.contains(TEST_BYE_ON_DESTROY)) {
 			inviteSipSession = request.getSession();
 		}
-		if(fromString.contains(TEST_ERROR_RESPONSE)) {			
+		if(fromString.contains(TEST_ERROR_RESPONSE)) {	
+			request.getApplicationSession().setAttribute(TEST_ERROR_RESPONSE, "true");
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_BUSY_HERE);
 			sipServletResponse.send();
 			return;
@@ -619,5 +627,56 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener, Ti
 			}
 		}
 		super.destroy();
+	}
+
+
+
+	public void sessionCreated(SipSessionEvent se) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	public void sessionDestroyed(SipSessionEvent se) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	public void sessionReadyToInvalidate(SipSessionEvent se) {
+		if(se.getSession().getApplicationSession().getAttribute(TEST_ERROR_RESPONSE) != null) {
+			sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipSessionReadyToInvalidate", null);
+		}
+	}
+
+
+
+	public void sessionCreated(SipApplicationSessionEvent ev) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	public void sessionDestroyed(SipApplicationSessionEvent ev) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	public void sessionExpired(SipApplicationSessionEvent ev) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
+		if(ev.getApplicationSession().getAttribute(TEST_ERROR_RESPONSE) != null) {
+			sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipAppSessionReadyToInvalidate", null);
+		}
 	}
 }
