@@ -168,6 +168,7 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 	}	
 	
 	public void testNonExistLegTimeout() throws Exception {
+		deployApplication();
 		String fromName = "sequential-nonexist";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -181,7 +182,7 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 		receiver.setProvisionalResponsesToSend(new ArrayList<Integer>());		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(50000);		
-		assertTrue(neutral.getMessageRequest() != null);		
+		assertTrue(sender.getMessageRequest() != null);		
 	}
 
 	@Override
