@@ -145,7 +145,9 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		if(request.isInitial()) {
 			logger.info("Got INVITE: " + request.toString());
 			logger.info(request.getFrom().getURI().toString());
-			request.getApplicationSession().setAttribute(TEST_SIP_APP_SESSION_READY_TO_BE_INVALIDATED, Integer.valueOf(0));
+			if(request.getTo().getURI().toString().contains(TEST_SIP_APP_SESSION_READY_TO_BE_INVALIDATED)) {
+				request.getApplicationSession().setAttribute(TEST_SIP_APP_SESSION_READY_TO_BE_INVALIDATED, Integer.valueOf(0));
+			}
 			String[] forwardingUri = forwardingUris.get(request.getFrom().getURI().toString());
 			if(((SipURI)request.getTo().getURI()).getUser().contains("forward-samesipsession")) {
 				request.getSession().setAttribute(ACT_AS_UAS, Boolean.TRUE);
@@ -488,6 +490,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			if(nbTimesCalled.intValue() > 1) {
 				sendMessage(ev.getApplicationSession(), (SipFactory) getServletContext().getAttribute(SIP_FACTORY), "sipApplicationSessionReadyToBeInvalidated called multiple times");
 			}
+		} else {
+			sendMessage(ev.getApplicationSession(), (SipFactory) getServletContext().getAttribute(SIP_FACTORY), "sipApplicationSessionReadyToBeInvalidated");
 		}
 	}
 	

@@ -106,7 +106,7 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 			logger.info(message);
 		}
 		assertEquals(1, sender.getAllMessagesContent().size());
-		assertTrue(sender.getAllMessagesContent().contains("sipSessionReadyToBeInvalidated"));
+		assertTrue(sender.getAllMessagesContent().contains("sipApplicationSessionReadyToBeInvalidated"));
 	}
 
 	public void testCallForwardingCalleeSendBye() throws Exception {
@@ -253,7 +253,7 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 				fromName, fromSipAddress);
 		
 		String toSipAddress = "sip-servlets.com";
-		String toUser = "receiver";
+		String toUser = "testSipAppSessionReadyToBeInvalidated";
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
