@@ -795,6 +795,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		sipApplicationSession.getSipContext().getSipSessionsUtil().removeCorrespondingSipSession(key);
 		sipApplicationSession.onSipSessionReadyToInvalidate(this);
 		if(ongoingTransactions != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug(ongoingTransactions.size() + " ongoing transactions still present in the following sip session " + key + " on invalidation");
+			}
 			for(Transaction transaction : ongoingTransactions) {
 				if(!TransactionState.TERMINATED.equals(transaction.getState())) {
 					if(transaction.getApplicationData() != null) {
@@ -1758,8 +1761,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		} else {
 			eventHeader =  (EventHeader) sipServletMessageImpl.getMessage().getHeader(EventHeader.NAME);
 		}
-		if(logger.isInfoEnabled()) {
-			logger.info("adding subscription " + eventHeader + " to sip session " + getId());
+		if(logger.isDebugEnabled()) {
+			logger.debug("adding subscription " + eventHeader + " to sip session " + getId());
 		}
 		if(subscriptions == null) {
 			this.subscriptions = new CopyOnWriteArraySet<EventHeader>();
@@ -1780,8 +1783,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void removeSubscription(SipServletMessageImpl sipServletMessageImpl) {
 		EventHeader eventHeader =  (EventHeader) sipServletMessageImpl.getMessage().getHeader(EventHeader.NAME);
-		if(logger.isInfoEnabled()) {
-			logger.info("removing subscription " + eventHeader + " to sip session " + getId());
+		if(logger.isDebugEnabled()) {
+			logger.debug("removing subscription " + eventHeader + " to sip session " + getId());
 		}
 		boolean hasOngoingSubscriptions = false;
 		if(subscriptions != null) {
@@ -1799,8 +1802,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 			}
 		}
 		if(isReadyToInvalidateInternal()) {
-			if(logger.isInfoEnabled()) {
-				logger.info("no more subscriptions in session " + getId());
+			if(logger.isDebugEnabled()) {
+				logger.debug("no more subscriptions in session " + getId());
 			}
 			if(sessionCreatingDialog != null) {
 				sessionCreatingDialog.delete();
