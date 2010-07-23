@@ -136,6 +136,26 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 	}
 	
+	public void testB2BUASipUnitCancelNoResponse() throws Exception {
+		setupPhones("sip:sender@nist.gov", "sip:aa@nist.gov");
+		SipCall callA = sipPhoneA.createSipCall();
+		SipCall callB = sipPhoneB.createSipCall();
+		
+		callB.listenForIncomingCall();
+		Thread.sleep(300);
+		callA.initiateOutgoingCall("sip:cancel-no-response@nist.gov", null);
+		//sipunit doesn't succeed to send the ACK since it tries to do it with 
+		//Dialog.createRequest(Request.ACK)
+		//assertTrue(callA.sendInviteOkAck());
+		callA.sendInviteOkAck();				
+		
+		sipPhoneA.dispose();
+		sipPhoneB.dispose();
+		sipStackA.dispose();
+		sipStackB.dispose();
+		Thread.sleep(TIMEOUT);
+	}
+	
 	public void testB2BUASipUnitGenerateResponses() throws Exception {
 		senderProtocolObjects = new ProtocolObjects("generateResponses",
 				"gov.nist", TRANSPORT, AUTODIALOG, null);
