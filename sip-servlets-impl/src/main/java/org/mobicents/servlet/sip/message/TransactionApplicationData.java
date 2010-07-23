@@ -52,6 +52,7 @@ public class TransactionApplicationData implements Serializable {
 	private transient String appNotDeployed = null;
 	private transient boolean noAppReturned = false;
 	private transient String modifier = null;	
+	private transient boolean canceled = false;
 	
 	public TransactionApplicationData(SipServletMessageImpl sipServletMessage ) {		
 		this.sipServletMessage = sipServletMessage;
@@ -202,6 +203,14 @@ public class TransactionApplicationData implements Serializable {
 		return modifier;
 	}
 	
+	public boolean isCanceled() {
+		return canceled;
+	}
+
+	public void setCanceled(boolean canceled) {
+		this.canceled = canceled;
+	}
+
 	public void cleanUp() {
 		if(logger.isDebugEnabled()) {
 			logger.debug("cleaning up the application data");

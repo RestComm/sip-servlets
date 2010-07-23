@@ -85,6 +85,7 @@ import javax.sip.message.Response;
 import org.apache.catalina.Container;
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.log4j.Logger;
+import org.apache.log4j.Priority;
 import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
@@ -1394,6 +1395,19 @@ public class SipSessionImpl implements MobicentsSipSession {
 				logger.debug("the following sip session " + getKey() + " has its state updated to " + state);
 			}
 			okToByeSentOrReceived = true;						
+		}
+		if(response.getTransactionApplicationData().isCanceled()) {
+			SipServletRequest request = (SipServletRequest) response.getTransactionApplicationData().getSipServletMessage();
+			try {
+				request.createCancel().send();
+			} catch (IOException e) {
+				if(logger.isEnabledFor(Priority.WARN)) {
+				logger.warn("Couldn't send CANCEL for a transaction that has been CANCELLED but " +
+						"CANCEL was not sent because there was no response from the other side. We" +
+						" just stopped the retransmissions." + response + "\nThe transaction" + 
+						response.getTransaction(), e);
+				}
+			}
 		}
 	}
 	

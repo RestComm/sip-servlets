@@ -25,6 +25,7 @@ import gov.nist.javax.sip.stack.SIPTransaction;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -156,6 +157,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	
 	private transient boolean isReadOnly;		
 	
+	// This field is only used in CANCEL requests where we need the INVITe transaction
+	private transient Transaction inviteTransactionToCancel;
+	
 	public SipServletRequestImpl(Request request, SipFactoryImpl sipFactoryImpl,
 			MobicentsSipSession sipSession, Transaction transaction, Dialog dialog,
 			boolean createDialog) {
@@ -220,10 +224,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		try {			
 			Request cancelRequest = ((ClientTransaction) getTransaction())
 					.createCancel();
-			SipServletRequest newRequest = new SipServletRequestImpl(
+			SipServletRequestImpl newRequest = new SipServletRequestImpl(
 					cancelRequest, sipFactoryImpl, getSipSession(),
 					null, getTransaction().getDialog(), false);
-
+			newRequest.inviteTransactionToCancel = super.getTransaction();
 			return newRequest;
 		} catch (SipException ex) {
 			throw new IllegalStateException("Could not create cancel", ex);
@@ -937,6 +941,26 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				    	logger.debug("Added via Header" + viaHeader);
 				    }
 			    }
+		    } else {
+		    	if(getMethod().equalsIgnoreCase(Request.CANCEL)) {
+		    		if(getSipSession().getState().equals(State.INITIAL)) {
+		    			Transaction tx = inviteTransactionToCancel;
+		    			if(tx != null) {
+		    				logger.debug("Can not send CANCEL. Will try to STOP retransmissions");
+		    				// We still haven't received any response on this call, so we can not send CANCEL,
+		    				// we will just stop the retransmissions
+		    				StaticServiceHolder.disableRetransmissionTimer.invoke(tx);
+		    				if(tx.getApplicationData() instanceof TransactionApplicationData) {
+		    					TransactionApplicationData tad = (TransactionApplicationData) tx.getApplicationData();
+		    					tad.setCanceled(true);
+		    				}
+		    				return;
+		    			} else {
+		    				logger.debug("Can not send CANCEL because noe response arrived. " +
+		    						"Can not stop retransmissions. The transaction is null");
+		    			}
+		    		}
+		    	}
 		    }
 			final String transport = JainSipUtils.findTransport(request);
 			if(session.getTransport() == null) {

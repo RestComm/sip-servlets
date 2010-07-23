@@ -172,12 +172,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 					SIPClientTransaction tx = (SIPClientTransaction) outgoingRequest.getTransaction();
 					
 					if(tx != null) {
-
-						Method disableRetransmissionTimer = SIPTransaction.class.getDeclaredMethod("disableRetransmissionTimer");
-						//Method disableTimeoutTimer = SIPTransaction.class.getDeclaredMethod("disableTimeoutTimer");
-						disableRetransmissionTimer.setAccessible(true);
-						//disableTimeoutTimer.setAccessible(true);
-						disableRetransmissionTimer.invoke(tx);
+						StaticServiceHolder.disableRetransmissionTimer.invoke(tx);
 						//disableTimeoutTimer.invoke(tx);
 					} else {
 						logger.warn("Transaction is null. Can not stop retransmission, they are already dead in the branch.");
