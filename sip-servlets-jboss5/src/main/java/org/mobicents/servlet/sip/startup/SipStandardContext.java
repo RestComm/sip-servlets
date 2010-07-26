@@ -494,6 +494,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}	
 		// Issue 1478 : nullify the ref to avoid reusing it
 		timerService = null;
+		getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE, null);
 		logger.info("sip context stopped");
 	}
 
