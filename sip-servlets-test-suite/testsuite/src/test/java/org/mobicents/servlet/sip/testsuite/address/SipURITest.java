@@ -1,5 +1,6 @@
 package org.mobicents.servlet.sip.testsuite.address;
 
+import javax.servlet.sip.Address;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
@@ -88,5 +89,15 @@ public class SipURITest extends junit.framework.TestCase {
 		uri.setParameter("Key", "val");
 		String s = uri.toString();
 		assertEquals("sip:127.0.0.1:5080;Key=val", s);
+	}
+	
+	public void testBrackets() throws Exception {
+		String uriString = "<sip:1004@172.16.0.99;user=phone>";
+		URI requestURI = sipFactory.createURI(uriString);
+		System.out.println(requestURI);
+		assertEquals(uriString, requestURI.toString());
+		Address requestAddress = sipFactory.createAddress(requestURI);
+		System.out.println(requestAddress);
+		assertEquals(uriString, requestAddress.toString());		
 	}
 }
