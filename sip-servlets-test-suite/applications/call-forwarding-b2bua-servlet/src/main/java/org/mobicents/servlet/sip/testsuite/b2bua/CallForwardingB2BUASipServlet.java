@@ -22,9 +22,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.sip.Address;
 import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.B2buaHelper;
 import javax.servlet.sip.ServletParseException;
@@ -50,6 +53,7 @@ import org.apache.log4j.Logger;
 
 
 public class CallForwardingB2BUASipServlet extends SipServlet implements SipErrorListener, SipApplicationSessionListener {
+	private static final String CHECK_CONTACT = "checkContact";
 	private static final String TEST_SIP_APP_SESSION_READY_TO_BE_INVALIDATED = "testSipAppSessionReadyToBeInvalidated";
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final long serialVersionUID = 1L;
@@ -147,6 +151,24 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			logger.info(request.getFrom().getURI().toString());
 			if(request.getTo().getURI().toString().contains(TEST_SIP_APP_SESSION_READY_TO_BE_INVALIDATED)) {
 				request.getApplicationSession().setAttribute(TEST_SIP_APP_SESSION_READY_TO_BE_INVALIDATED, Integer.valueOf(0));
+			}
+			if(request.getTo().getURI().toString().contains(CHECK_CONTACT)) {
+				Address contactAddress = request.getAddressHeader("Contact");
+				Set<Entry<String, String>> params = contactAddress.getParameters();
+				Entry<String, String> entry = params.iterator().next();
+				String paramValue = entry.getValue();
+				logger.info("checkcontact address " + contactAddress.toString());			
+				logger.info("checkcontact param value " + paramValue);
+				// http://code.google.com/p/mobicents/issues/detail?id=1477
+				// Address parameters become un-quoted
+				if(!contactAddress.toString().equals("<sip:127.0.0.1:5056>;+sip.instance=\"<urn:uuid:some-xxxx>\"")) {
+					request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "bad contact address").send();
+					return;
+				}
+				if(!paramValue.equals("\"<urn:uuid:some-xxxx>\"")) {
+					request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "bad contact param value").send();
+					return;
+				}
 			}
 			String[] forwardingUri = forwardingUris.get(request.getFrom().getURI().toString());
 			if(((SipURI)request.getTo().getURI()).getUser().contains("forward-samesipsession")) {

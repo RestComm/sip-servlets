@@ -137,6 +137,34 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		assertTrue(receiver.getOkToByeReceived());
 		assertTrue(sender.getByeReceived());		
 	}
+	
+	public void testCallForwardingCheckContact() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "checkContact";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Contact"}, new String[] {"<sip:127.0.0.1:5056>;+sip.instance=\"<urn:uuid:some-xxxx>\""});		
+		Thread.sleep(TIMEOUT);
+		assertEquals(200, sender.getFinalResponseStatus());		
+	}
 
 	public void testCancelCallForwarding() throws Exception {
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
