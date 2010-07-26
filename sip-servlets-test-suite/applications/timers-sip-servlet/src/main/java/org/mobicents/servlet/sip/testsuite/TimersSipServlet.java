@@ -99,12 +99,18 @@ public class TimersSipServlet
 		okResponse.send();
 		request.getApplicationSession().setAttribute("sipFactory", sipFactory);
 		request.getApplicationSession().setInvalidateWhenReady(true);
-		//create a timer to test the feature				
-		TimerService timerService = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);
-		timerService.createTimer(request.getApplicationSession(), 1000, false, null);
-		//create a recurring timer to test the feature					
-		timerService.createTimer(request.getApplicationSession(), 3000, 3000, true, false, RECURRING);
-		request.getApplicationSession().setAttribute(RECURRING_TIME, Integer.valueOf(0));
+		String fromString = request.getFrom().toString();
+		if(fromString.contains("checkReload")) {
+			TimerService timerService = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);
+			timerService.createTimer(request.getApplicationSession(), 1000, false, null);
+		} else {
+			//create a timer to test the feature				
+			TimerService timerService = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);
+			timerService.createTimer(request.getApplicationSession(), 1000, false, null);
+			//create a recurring timer to test the feature					
+			timerService.createTimer(request.getApplicationSession(), 3000, 3000, true, false, RECURRING);
+			request.getApplicationSession().setAttribute(RECURRING_TIME, Integer.valueOf(0));
+		}
 	}
 	
 	@Override
@@ -192,7 +198,11 @@ public class TimersSipServlet
 		}
 		SipApplicationSession sipApplicationSession = timer.getApplicationSession();
 		Integer recurringTime = (Integer) sipApplicationSession.getAttribute(RECURRING_TIME);
-		logger.info("timer expired " +  timer.getId() + " , info " + timer.getInfo() + " , recurring Time " + recurringTime.intValue());		
+		if(recurringTime != null) {
+			logger.info("timer expired " +  timer.getId() + " , info " + timer.getInfo() + " , recurring Time " + recurringTime.intValue());
+		} else {
+			logger.info("timer expired " +  timer.getId() + " , info " + timer.getInfo());
+		}
 		SipFactory storedFactory = (SipFactory)sipApplicationSession.getAttribute("sipFactory");
 		if(timer.getInfo() == null) {
 			sendMessage(sipApplicationSession, storedFactory, TIMER_EXPIRED);

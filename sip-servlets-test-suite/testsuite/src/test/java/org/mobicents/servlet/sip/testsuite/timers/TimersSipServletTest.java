@@ -62,14 +62,15 @@ public class TimersSipServletTest extends SipServletTestCase {
 	
 	ProtocolObjects senderProtocolObjects;	
 
-	
+	SipStandardContext context = null; 
+		
 	public TimersSipServletTest(String name) {
 		super(name);
 	}
 
 	@Override
 	public void deployApplication() {
-		SipStandardContext context = new SipStandardContext();
+		context = new SipStandardContext();
 		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/timers-sip-servlet/src/main/sipapp");
 		context.setName("sip-test-context");
 		context.setPath("sip-test");
@@ -132,6 +133,34 @@ public class TimersSipServletTest extends SipServletTestCase {
 		for (int i = 0; i < TIMERS_TO_TEST.length; i++) {
 			assertTrue(sender.getAllMessagesContent().contains(TIMERS_TO_TEST[i]));
 		}	
+	}
+	
+	// Issue 1478 : http://code.google.com/p/mobicents/issues/detail?id=1478
+	// Attempting to use the TimerService after reloading a servlet throws a RejectedExecutionException
+	public void testTimerReloading() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "checkReload";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);	
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());	
+		assertTrue(sender.getAllMessagesContent().contains("timerExpired"));
+		
+		tomcat.undeployContext(context);
+		tomcat.deployContext(context);
+		
+		sender.getAllMessagesContent().clear();
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);	
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());	
+		assertTrue(sender.getAllMessagesContent().contains("timerExpired"));
 	}
 
 	@Override
