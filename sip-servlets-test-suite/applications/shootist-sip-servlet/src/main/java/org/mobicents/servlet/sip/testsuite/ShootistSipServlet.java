@@ -222,6 +222,15 @@ public class ShootistSipServlet
 		} else {
 			sipServletRequest =	sipFactory.createRequest(sipApplicationSession, method, fromURI, toURI);
 		}
+		
+		String authHeader = ce.getServletContext().getInitParameter("auth-header");
+		if(authHeader != null) {
+			// test Issue 1547 : can't add a Proxy-Authorization using SipServletMessage.addHeader
+			// please note that addAuthHeader is not used here
+			sipServletRequest.addHeader("Proxy-Authorization", authHeader);
+			sipServletRequest.addHeader("Proxy-Authenticate", authHeader);
+		}
+		
 		String outboundInterface = ce.getServletContext().getInitParameter("outboundInterface");
 		if(outboundInterface != null) {
 			List<SipURI> outboundInterfaces = (List<SipURI>)getServletContext().getAttribute(OUTBOUND_INTERFACES);

@@ -24,6 +24,8 @@ import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.ProxyAuthenticateHeader;
+import javax.sip.header.ProxyAuthorizationHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.UserAgentHeader;
 import javax.sip.message.Request;
@@ -455,6 +457,28 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		deployApplication("method", "REGISTER");
 		Thread.sleep(TIMEOUT);		
 		assertNull(receiver.getRegisterReceived().getHeader(ContactHeader.NAME));		
+	}
+	
+	/**
+	 * non regression test for Issue 1547 http://code.google.com/p/mobicents/issues/detail?id=1547
+	 * Can't add a Proxy-Authorization using SipServletMessage.addHeader
+	 */
+	public void testShootistProxyAuthorization() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		deployApplication("auth-header", "Digest username=\"1001\", realm=\"172.16.0.37\", algorithm=MD5, uri=\"sip:66621@172.16.0.37;user=phone\", qop=auth, nc=00000001, cnonce=\"b70b470bedf75db7\", nonce=\"1276678944:394f0b0b049fbbda8c94ae28d08f2301\", response=\"561389d4ce5cb38020749b8a27798343\"");
+		Thread.sleep(TIMEOUT);		
+		assertNotNull(receiver.getInviteRequest().getHeader(ProxyAuthorizationHeader.NAME));		
+		assertNotNull(receiver.getInviteRequest().getHeader(ProxyAuthenticateHeader.NAME));
 	}
 
 	@Override

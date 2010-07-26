@@ -392,8 +392,11 @@ public final class JainSipUtils {
 		SINGLETON_HEADER_NAMES.add(TimeStampHeader.NAME);
 		SINGLETON_HEADER_NAMES.add(UserAgentHeader.NAME);
 		SINGLETON_HEADER_NAMES.add(WWWAuthenticateHeader.NAME);
-		SINGLETON_HEADER_NAMES.add(ProxyAuthenticateHeader.NAME);
-		//TODO are there any other singleton headers ?
+		// Fix by andrew miller 
+		// Issue 1547 : Can't add a Proxy-Authorization using SipServletMessage.addHeader
+		// those headers are singleton headers not list headers
+		SINGLETON_HEADER_NAMES.add(ProxyAuthenticateHeader.NAME);		
+		SINGLETON_HEADER_NAMES.add(ProxyAuthorizationHeader.NAME);
 	}	
 	
 	// we don't have any other choice as to maintain a static list of multi value headers
@@ -415,8 +418,6 @@ public final class JainSipUtils {
 		LIST_HEADER_NAMES.add(ContentLanguageHeader.NAME);
 		LIST_HEADER_NAMES.add(ErrorInfoHeader.NAME);
 		LIST_HEADER_NAMES.add(InReplyToHeader.NAME);
-		LIST_HEADER_NAMES.add(ProxyAuthenticateHeader.NAME);
-		LIST_HEADER_NAMES.add(ProxyAuthorizationHeader.NAME);
 		LIST_HEADER_NAMES.add(ProxyRequireHeader.NAME);
 		LIST_HEADER_NAMES.add(ReasonHeader.NAME);
 		LIST_HEADER_NAMES.add(RecordRouteHeader.NAME);
