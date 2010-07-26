@@ -37,12 +37,12 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
+import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.TimerService;
-import javax.servlet.sip.SipApplicationSession.Protocol;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
@@ -537,8 +537,17 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			}
 		}
 		sipJNDIContextLoaded = false;
-		sasTimerService.stop();
-		timerService.stop();
+		if(sasTimerService != null && sasTimerService.isStarted()) {
+			sasTimerService.stop();			
+		}		
+		// Issue 1478 : nullify the ref to avoid reusing it
+		sasTimerService = null;
+		if(timerService != null && timerService.isStarted()) {
+			timerService.stop();
+		}
+		// Issue 1478 : nullify the ref to avoid reusing it
+		timerService = null;
+		getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE, null);
 		// not needed since the JNDI will be destroyed automatically
 //		if(isUseNaming()) {
 //			fireContainerEvent(SipNamingContextListener.NAMING_CONTEXT_SIP_FACTORY_REMOVED_EVENT, sipFactoryFacade);

@@ -41,7 +41,6 @@ import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.TimerService;
-import javax.servlet.sip.SipApplicationSession.Protocol;
 
 import org.apache.AnnotationProcessor;
 import org.apache.catalina.Container;
@@ -486,11 +485,15 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			}
 		}	
 		if(sasTimerService != null && sasTimerService.isStarted()) {
-			sasTimerService.stop();
+			sasTimerService.stop();			
 		}
+		// Issue 1478 : nullify the ref to avoid reusing it
+		sasTimerService = null;
 		if(timerService != null && timerService.isStarted()) {
 			timerService.stop();
-		}
+		}	
+		// Issue 1478 : nullify the ref to avoid reusing it
+		timerService = null;
 		logger.info("sip context stopped");
 	}
 
