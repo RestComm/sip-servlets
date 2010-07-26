@@ -156,7 +156,14 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		if(sipSession != null) {
 			this.sessionKey = sipSession.getKey();
 		}
-		this.transactionApplicationData = new TransactionApplicationData(this);
+		if(transaction != null) {
+			if(transaction.getApplicationData() != null) {
+				this.transactionApplicationData = (TransactionApplicationData) transaction.getApplicationData();
+			}
+		} 
+		if(transactionApplicationData == null){
+			this.transactionApplicationData = new TransactionApplicationData(this);
+		}
 		isMessageSent = false;
 		this.dialog = dialog;
 		
@@ -1524,11 +1531,6 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	@Override
 	public String toString() {
 		return this.message.toString();
-	}
-
-	protected void setTransactionApplicationData(
-			TransactionApplicationData applicationData) {
-		this.transactionApplicationData = applicationData;
 	}
 
 	public TransactionApplicationData getTransactionApplicationData() {
