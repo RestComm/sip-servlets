@@ -1218,7 +1218,7 @@ public class TestSipListener implements SipListener {
 		RecordRouteHeader recordRouteHeader = (RecordRouteHeader)response.getHeader(RecordRouteHeader.NAME);
 		if(!recordRoutingProxyTesting && recordRouteHeader != null) {
 			abortProcessing = true;
-			throw new IllegalArgumentException("we received a record route header in a  response !");			
+			throw new IllegalArgumentException("we received a record route header in a response !");			
 		}
 		ContactHeader contactHeader = (ContactHeader)response.getHeader(ContactHeader.NAME);
 		if(contactHeader != null && "0.0.0.0".equals(((SipURI)contactHeader.getAddress().getURI()).getHost())) {

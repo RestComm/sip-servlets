@@ -55,6 +55,7 @@ import org.apache.log4j.Logger;
 public class CallForwardingB2BUASipServlet extends SipServlet implements SipErrorListener, SipApplicationSessionListener {
 	private static final String CHECK_CONTACT = "checkContact";
 	private static final String TEST_SIP_APP_SESSION_READY_TO_BE_INVALIDATED = "testSipAppSessionReadyToBeInvalidated";
+	private static final String TEST_USE_LINKED_REQUEST = "useLinkedRequest";
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final long serialVersionUID = 1L;
 	private static final String ACT_AS_UAS = "actAsUas";
@@ -111,7 +112,9 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		if(request.getTo().toString().contains("b2bua@sip-servlet")) {
 			session.createRequest("MESSAGE").send();
 		}
-		if(request.getFrom().getURI().toString().contains("pending") || request.getFrom().getURI().toString().contains("factory")) {
+		if(request.getFrom().getURI().toString().contains("pending") || 
+				request.getFrom().getURI().toString().contains("factory") ||
+				request.getApplicationSession().getAttribute(TEST_USE_LINKED_REQUEST) != null) {
 			B2buaHelper helper = request.getB2buaHelper();
 	        SipSession peerSession = helper.getLinkedSession(request.getSession());
 			List<SipServletMessage> pendingMessages = helper.getPendingMessages(peerSession, UAMode.UAC);
@@ -152,6 +155,9 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			if(request.getTo().getURI().toString().contains(TEST_SIP_APP_SESSION_READY_TO_BE_INVALIDATED)) {
 				request.getApplicationSession().setAttribute(TEST_SIP_APP_SESSION_READY_TO_BE_INVALIDATED, Integer.valueOf(0));
 			}
+			if(request.getTo().getURI().toString().contains(TEST_USE_LINKED_REQUEST)) {
+				request.getApplicationSession().setAttribute(TEST_USE_LINKED_REQUEST, Boolean.TRUE);
+			}			
 			if(request.getTo().getURI().toString().contains(CHECK_CONTACT)) {
 				Address contactAddress = request.getAddressHeader("Contact");
 				Set<Entry<String, String>> params = contactAddress.getParameters();
@@ -368,59 +374,70 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.toString());
 		
+		B2buaHelper b2buaHelper = sipServletResponse.getRequest().getB2buaHelper();
+		
 		SipSession originalSession =   
 		    sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
-		String cSeqValue = sipServletResponse.getHeader("CSeq");
-		if ("PRACK".equals(sipServletResponse.getMethod()) || "UPDATE".equals(sipServletResponse.getMethod())) {            
-            List<SipServletMessage> pendingMessages = sipServletResponse.getRequest().getB2buaHelper().getPendingMessages(originalSession, UAMode.UAS);
-            SipServletRequest prackPendingMessage =null; 
-            logger.info("pending messages : ");
-            for(SipServletMessage pendingMessage : pendingMessages) {
-            	logger.info("\t pending message : " + pendingMessage);
-            	if(((SipServletRequest) pendingMessage).getMethod().equals("PRACK") || 
-            			((SipServletRequest) pendingMessage).getMethod().equals("UPDATE")) {
-            		prackPendingMessage = (SipServletRequest) pendingMessage;
-            		break;
-            	}
-            }
-            prackPendingMessage.createResponse(sipServletResponse.getStatus()).send();
-            return;
-        } 
-		//if this is a response to an INVITE we ack it and forward the OK 
-		if(originalSession!= null && cSeqValue.indexOf("INVITE") != -1) {			
-			//create and sends OK for the first call leg							
-			SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
-			boolean sendAck = true;
-			if(sipServletResponse.getFrom().getURI().toString().contains("pending") || sipServletResponse.getFrom().getURI().toString().contains("factory")) {
-				sendAck= false;
-				if (logger.isDebugEnabled()) {
-					logger.debug("testing pending messages so not sending ACK");
+		
+		if(sipServletResponse.getApplicationSession().getAttribute(TEST_USE_LINKED_REQUEST) != null) {
+			logger.info("using linkedRequest to send the response: ");
+			SipServletRequest otherReq = b2buaHelper.getLinkedSipServletRequest(sipServletResponse.getRequest());
+			SipServletResponse other = otherReq.createResponse(sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
+			other.send();
+		} else {
+		
+			String cSeqValue = sipServletResponse.getHeader("CSeq");
+			if ("PRACK".equals(sipServletResponse.getMethod()) || "UPDATE".equals(sipServletResponse.getMethod())) {            
+	            List<SipServletMessage> pendingMessages = sipServletResponse.getRequest().getB2buaHelper().getPendingMessages(originalSession, UAMode.UAS);
+	            SipServletRequest prackPendingMessage =null; 
+	            logger.info("pending messages : ");
+	            for(SipServletMessage pendingMessage : pendingMessages) {
+	            	logger.info("\t pending message : " + pendingMessage);
+	            	if(((SipServletRequest) pendingMessage).getMethod().equals("PRACK") || 
+	            			((SipServletRequest) pendingMessage).getMethod().equals("UPDATE")) {
+	            		prackPendingMessage = (SipServletRequest) pendingMessage;
+	            		break;
+	            	}
+	            }
+	            prackPendingMessage.createResponse(sipServletResponse.getStatus()).send();
+	            return;
+	        } 
+			//if this is a response to an INVITE we ack it and forward the OK 
+			if(originalSession!= null && cSeqValue.indexOf("INVITE") != -1) {			
+				//create and sends OK for the first call leg							
+				SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
+				boolean sendAck = true;
+				if(sipServletResponse.getFrom().getURI().toString().contains("pending") || sipServletResponse.getFrom().getURI().toString().contains("factory")) {
+					sendAck= false;
+					if (logger.isDebugEnabled()) {
+						logger.debug("testing pending messages so not sending ACK");
+					}
+				} 
+				if(originalRequest.getHeader("Require") == null) {
+					if(sendAck) {
+						// we send the ACK directly only in non PRACK scenario
+						SipServletRequest ackRequest = sipServletResponse.createAck();
+						logger.info("Sending " +  ackRequest);
+						ackRequest.send();
+					}
+					SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
+					logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);			
+					responseToOriginalRequest.setContentLength(sipServletResponse.getContentLength());
+					//responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
+					responseToOriginalRequest.send();
+				} else {
+				    SipSession peerSession = sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
+				    SipServletResponse responseToOriginalRequest = sipServletResponse.getRequest().getB2buaHelper().createResponseToOriginalRequest(peerSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
+				    responseToOriginalRequest.send();
+				    //
+				    if(sendAck) {
+					    SipServletRequest ackRequest = sipServletResponse.createAck();
+						logger.info("Sending " +  ackRequest);
+						ackRequest.send();
+				    }
 				}
-			} 
-			if(originalRequest.getHeader("Require") == null) {
-				if(sendAck) {
-					// we send the ACK directly only in non PRACK scenario
-					SipServletRequest ackRequest = sipServletResponse.createAck();
-					logger.info("Sending " +  ackRequest);
-					ackRequest.send();
-				}
-				SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
-				logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);			
-				responseToOriginalRequest.setContentLength(sipServletResponse.getContentLength());
-				//responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
-				responseToOriginalRequest.send();
-			} else {
-			    SipSession peerSession = sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
-			    SipServletResponse responseToOriginalRequest = sipServletResponse.getRequest().getB2buaHelper().createResponseToOriginalRequest(peerSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
-			    responseToOriginalRequest.send();
-			    //
-			    if(sendAck) {
-				    SipServletRequest ackRequest = sipServletResponse.createAck();
-					logger.info("Sending " +  ackRequest);
-					ackRequest.send();
-			    }
-			}
-		}			
+			}	
+		}
 	}
 	
 	@Override

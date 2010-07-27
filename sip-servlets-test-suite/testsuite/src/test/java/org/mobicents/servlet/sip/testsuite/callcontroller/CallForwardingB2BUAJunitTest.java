@@ -302,6 +302,47 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		assertEquals(0, sender.getAllMessagesContent().size());		
 	}
 	
+	// non regression test for Issue 1550 http://code.google.com/p/mobicents/issues/detail?id=1550
+	// IllegalStateException: Cannot create a response - not a server transaction gov.nist.javax.sip.stack.SIPClientTransaction
+	public void testCallForwardingLinkedRequestCallerSendBye() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "useLinkedRequest";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT * 3);
+		assertEquals(200, sender.getFinalResponseStatus());
+		sender.setFinalResponse(null);
+		sender.setFinalResponseStatus(-1);
+		sender.sendInDialogSipRequest(Request.UPDATE, null, null, null, null);
+		receiver.sendInDialogSipRequest(Request.UPDATE, null, null, null, null);
+		Thread.sleep(TIMEOUT * 3);
+		assertEquals(200, receiver.getFinalResponseStatus());
+		assertEquals(200, sender.getFinalResponseStatus());
+		sender.sendInDialogSipRequest(Request.BYE, null, null, null, null);
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getOkToByeReceived());
+		assertTrue(receiver.getByeReceived());					
+	}
+	
 	@Override
 	protected void tearDown() throws Exception {	
 		senderProtocolObjects.destroy();
