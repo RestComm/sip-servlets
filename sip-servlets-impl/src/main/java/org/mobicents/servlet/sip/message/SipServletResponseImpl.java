@@ -49,9 +49,7 @@ import javax.sip.header.ContactHeader;
 import javax.sip.header.Header;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.RecordRouteHeader;
-import javax.sip.header.RequireHeader;
 import javax.sip.header.RouteHeader;
-import javax.sip.header.SupportedHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.header.WWWAuthenticateHeader;
 import javax.sip.message.Request;
@@ -75,9 +73,6 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		SipServletResponse {
 	
 	private static final long serialVersionUID = 1L;
-
-	public static final String REL100_OPTION_TAG = "100rel";
-
 	private static final Logger logger = Logger.getLogger(SipServletResponseImpl.class);
 	
 	Response response;
@@ -331,8 +326,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		}
 		if(!Request.INVITE.equals(originalRequest.getMethod())) {
 			throw new Rel100Exception(Rel100Exception.NOT_INVITE);
-		}
-		if(!REL100_OPTION_TAG.equals(originalRequest.getHeader(RequireHeader.NAME)) && !REL100_OPTION_TAG.equals(originalRequest.getHeader(SupportedHeader.NAME))) {
+		}		
+		if(!containsRel100(originalRequest)) {
 			throw new Rel100Exception(Rel100Exception.NO_REQ_SUPPORT);
 		}
 		send(true);

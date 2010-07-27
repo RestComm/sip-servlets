@@ -110,6 +110,30 @@ public class ShootmePrackSipServletTest extends SipServletTestCase {
 		assertTrue(sender.isOkToPrackReceived());
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());		
+	}
+	
+	// non regression test for Issue 1552 http://code.google.com/p/mobicents/issues/detail?id=1552
+	// Container does not recognise 100rel if there are other extensions on the Require or Supported line
+	public void testShootmePrackMultipleRequire() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "prack";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		String[] headerNames = new String[]{"Require", "Require"};
+		String[] headerValues = new String[]{"timer", "100rel"};
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isPrackSent());
+		assertTrue(sender.isOkToPrackReceived());
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());		
 	}		
 	
 	public void testShootmePrackReinvite() throws InterruptedException, SipException, ParseException, InvalidArgumentException {

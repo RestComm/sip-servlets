@@ -66,6 +66,8 @@ import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.HeaderAddress;
 import javax.sip.header.Parameters;
+import javax.sip.header.RequireHeader;
+import javax.sip.header.SupportedHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.message.Message;
 import javax.sip.message.Request;
@@ -104,6 +106,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	private static final String MULTIPART_START = "start";
 	private static final String MULTIPART_BOUNDARY_DELIM = "--";
 	private static final String LINE_RETURN_DELIM = "\n";
+	public static final String REL100_OPTION_TAG = "100rel";
 //	private static final String HCOLON = " : ";
 	
 	protected Message message;
@@ -1684,6 +1687,28 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 			final ExtendedListeningPoint listeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);		
 			return listeningPoint.getPort();
 		}
+	}
+	// Fix for Issue 1552 http://code.google.com/p/mobicents/issues/detail?id=1552
+	// Container does not recognise 100rel if there are other extensions on the Require or Supported line
+	// we check all the values of Require and Supported headers to make sure the 100rel is present	
+	protected boolean containsRel100(SipServletMessageImpl message) {
+		ListIterator<String> requireHeaders = message.getHeaders(RequireHeader.NAME);
+		if(requireHeaders != null) {
+			while (requireHeaders.hasNext()) {
+				if(REL100_OPTION_TAG.equals(requireHeaders.next())) {
+					return true;
+				}
+			}
+		}
+		ListIterator<String> supportedHeaders = message.getHeaders(SupportedHeader.NAME);
+		if(supportedHeaders != null) {
+			while (supportedHeaders.hasNext()) {
+				if(REL100_OPTION_TAG.equals(supportedHeaders.next())) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	public abstract void cleanUp();

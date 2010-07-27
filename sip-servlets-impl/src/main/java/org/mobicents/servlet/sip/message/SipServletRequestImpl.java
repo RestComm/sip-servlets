@@ -25,7 +25,6 @@ import gov.nist.javax.sip.stack.SIPTransaction;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
 import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -68,7 +67,6 @@ import javax.sip.header.FromHeader;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.RecordRouteHeader;
-import javax.sip.header.RequireHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
@@ -1495,13 +1493,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	/**
 	 * @param finalResponse the finalResponse to set
 	 */
-	public void setResponse(SipServletResponse response) {		
+	public void setResponse(SipServletResponseImpl response) {		
 		if(response.getStatus() >= 200 && 
 				(lastFinalResponse == null || lastFinalResponse.getStatus() < response.getStatus())) {
 			this.lastFinalResponse = response;
 		}
 		// we keep the last informational response for noPrackReceived only
-		if(SipServletResponseImpl.REL100_OPTION_TAG.equals(response.getHeader(RequireHeader.NAME)) && (response.getStatus() > 100 && response.getStatus() < 200) && 
+		if(containsRel100(response) && (response.getStatus() > 100 && response.getStatus() < 200) && 
 				(lastInformationalResponse == null || lastInformationalResponse.getStatus() < response.getStatus())) {
 			this.lastInformationalResponse = response;
 		}
