@@ -110,7 +110,10 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	private Map<SipSessionKey, SipSessionKey> sessionMap = null;	
 
 	//Map to handle responses to original request and cancel on original request
-	private transient Map<SipSessionKey, SipServletRequestImpl> originalRequestMap = null;
+	// Issue 1550 http://code.google.com/p/mobicents/issues/detail?id=1550
+	// IllegalStateException: Cannot create a response - not a server transaction gov.nist.javax.sip.stack.SIPClientTransaction
+	// this map should be able to handle multiple linked requests at the same time
+	private transient Map<SipServletRequestImpl, SipServletRequestImpl> originalRequestMap = null;
 
 	private transient SipFactoryImpl sipFactoryImpl;
 	
@@ -118,7 +121,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 
 	public B2buaHelperImpl() {
 		sessionMap = new ConcurrentHashMap<SipSessionKey, SipSessionKey>();
-		originalRequestMap = new ConcurrentHashMap<SipSessionKey, SipServletRequestImpl>();
+		originalRequestMap = new ConcurrentHashMap<SipServletRequestImpl, SipServletRequestImpl>();
 	}
 	
 	/*
@@ -239,8 +242,8 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 				}
 			}
 			
-			originalRequestMap.put(originalSession.getKey(), origRequestImpl);
-			originalRequestMap.put(session.getKey(), newSipServletRequest);
+			originalRequestMap.put(newSipServletRequest, origRequestImpl);
+			originalRequestMap.put(origRequestImpl, newSipServletRequest);
 			
 			if (linked) {
 				sessionMap.put(originalSession.getKey(), session.getKey());
@@ -328,8 +331,8 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			// Added for Issue 1409 http://code.google.com/p/mobicents/issues/detail?id=1409
 			copyNonSystemHeaders(origRequestImpl, newSubsequentServletRequest);
 			
-			originalRequestMap.put(originalSession.getKey(), origRequestImpl);
-			originalRequestMap.put(((MobicentsSipSession)session).getKey(), newSubsequentServletRequest);
+			originalRequestMap.put(newSubsequentServletRequest, origRequestImpl);
+			originalRequestMap.put(origRequestImpl, newSubsequentServletRequest);
 			
 			sessionMap.put(originalSession.getKey(), sessionImpl.getKey());
 			sessionMap.put(sessionImpl.getKey(), originalSession.getKey());
@@ -532,17 +535,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		if ( req == null) { 
 			throw new NullPointerException("the argument is null");
 		}
-		final MobicentsSipSession mobicentsSipSession = (MobicentsSipSession)req.getSession();
-		final SipSessionKey sipSessionKey = this.sessionMap.get(mobicentsSipSession.getKey());
-		if(sipSessionKey == null) {
-			return null;
-		}
-		final MobicentsSipSession linkedSipSession = sipManager.getSipSession(sipSessionKey, false, null, mobicentsSipSession.getSipApplicationSession());
-		if(linkedSipSession == null) {
-			return null;
-		}
-		final SipServletRequest linkedSipServletRequest = originalRequestMap.get(linkedSipSession.getKey());
-		return linkedSipServletRequest;
+		return originalRequestMap.get(req);
 	}
 	
 	/*
@@ -667,7 +660,27 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	 * @param checkSession
 	 */
 	public void unlinkOriginalRequestInternal(SipSessionKey sipSessionKey) {
-		SipServletRequestImpl sipServletRequestImpl = this.originalRequestMap.remove(sipSessionKey);
+		for (Entry<SipServletRequestImpl, SipServletRequestImpl> linkedRequests : originalRequestMap.entrySet()) {
+			if(linkedRequests.getKey().getSipSessionKey().equals(sipSessionKey) || linkedRequests.getValue().getSipSessionKey().equals(sipSessionKey)) {
+				unlinkOriginalRequestInternal(linkedRequests.getKey());
+				unlinkOriginalRequestInternal(linkedRequests.getValue());
+			}
+		}				
+	}
+	
+	/**
+	 * 
+	 * @param session
+	 * @param checkSession
+	 */
+	public void unlinkOriginalRequestInternal(SipServletRequestImpl sipServletRequestImpl) {
+		SipServletRequestImpl linkedRequest = this.originalRequestMap.remove(sipServletRequestImpl);		
+		if(linkedRequest != null) {
+			this.originalRequestMap.remove(linkedRequest);
+			if(logger.isDebugEnabled()) {
+				logger.debug("following linked request " + linkedRequest + " unlinked from " + sipServletRequestImpl);
+			}
+		}
 		// Makes TCK B2buaHelperTest.testLinkUnlinkSipSessions001 && B2buaHelperTest.testB2buaHelper 
 		// fails because it cleans up the tx and the response cannot thus be created
 //		if(sipServletRequestImpl != null){
@@ -738,8 +751,8 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			sessionMap.put(session.getKey(), originalSession.getKey());	
 			dumpLinkedSessions();
 
-			originalRequestMap.put(originalSession.getKey(), origRequestImpl);
-			originalRequestMap.put(session.getKey(), newSipServletRequest);						
+			originalRequestMap.put(newSipServletRequest, origRequestImpl);
+			originalRequestMap.put(origRequestImpl, newSipServletRequest);
 			
 			session.setB2buaHelper(this);
 			originalSession.setB2buaHelper(this);
@@ -756,11 +769,16 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	 * {@inheritDoc}
 	 */
 	public SipServletRequest createCancel(SipSession session) {
-		final SipServletRequest sipServletRequest = originalRequestMap.get(((MobicentsSipSession)session).getKey());
-		
-		final SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl)sipServletRequest.createCancel();
-		((MobicentsSipSession)sipServletRequestImpl.getSession()).setB2buaHelper(this);
-		return sipServletRequestImpl;
+		for (SipServletRequestImpl linkedRequest : originalRequestMap.keySet()) {
+			if(linkedRequest.getSipSessionKey().equals(((MobicentsSipSession) session).getKey()) && 
+					linkedRequest.getMethod().equalsIgnoreCase(Request.INVITE) && 
+					!linkedRequest.isFinalResponseGenerated()) {
+				final SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl)linkedRequest.createCancel();
+				((MobicentsSipSession)sipServletRequestImpl.getSession()).setB2buaHelper(this);
+				return sipServletRequestImpl;
+			}
+		}
+		return null;
 	}
 
 	/**

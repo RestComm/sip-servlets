@@ -1107,6 +1107,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					removeTx = false;
 				}
 				if(removeTx) {
+					if(b2buaHelperImpl != null && tad.getSipServletMessage() instanceof SipServletRequestImpl) {
+						b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage());
+					}
 					sipSession.removeOngoingTransaction(transaction);
 					tad.cleanUp();
 					transaction.setApplicationData(null);

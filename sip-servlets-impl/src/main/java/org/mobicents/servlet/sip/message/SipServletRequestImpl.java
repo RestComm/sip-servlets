@@ -997,14 +997,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				session.getSessionCreatingDialog().sendAck(request);
 				final Transaction transaction = getTransaction();
 				final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
-				session.removeOngoingTransaction(transaction);
-				tad.cleanUp();
-				transaction.setApplicationData(null);
 				final B2buaHelperImpl b2buaHelperImpl = sipSession.getB2buaHelper();
 				if(b2buaHelperImpl != null) {
 					// we unlink the originalRequest early to avoid keeping the messages in mem for too long
-					b2buaHelperImpl.unlinkOriginalRequestInternal(session.getKey());
-				}
+					b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage());
+				}				
+				session.removeOngoingTransaction(transaction);
+				tad.cleanUp();
+				transaction.setApplicationData(null);
 				return;
 			}
 			
