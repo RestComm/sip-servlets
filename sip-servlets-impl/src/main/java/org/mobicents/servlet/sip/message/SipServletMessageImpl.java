@@ -1691,19 +1691,19 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	// Fix for Issue 1552 http://code.google.com/p/mobicents/issues/detail?id=1552
 	// Container does not recognise 100rel if there are other extensions on the Require or Supported line
 	// we check all the values of Require and Supported headers to make sure the 100rel is present	
-	protected boolean containsRel100(SipServletMessageImpl message) {
-		ListIterator<String> requireHeaders = message.getHeaders(RequireHeader.NAME);
+	protected boolean containsRel100(Message message) {
+		ListIterator<SIPHeader> requireHeaders = message.getHeaders(RequireHeader.NAME);
 		if(requireHeaders != null) {
 			while (requireHeaders.hasNext()) {
-				if(REL100_OPTION_TAG.equals(requireHeaders.next())) {
+				if(REL100_OPTION_TAG.equals(requireHeaders.next().getValue())) {
 					return true;
 				}
 			}
 		}
-		ListIterator<String> supportedHeaders = message.getHeaders(SupportedHeader.NAME);
+		ListIterator<SIPHeader> supportedHeaders = message.getHeaders(SupportedHeader.NAME);
 		if(supportedHeaders != null) {
 			while (supportedHeaders.hasNext()) {
-				if(REL100_OPTION_TAG.equals(supportedHeaders.next())) {
+				if(REL100_OPTION_TAG.equals(supportedHeaders.next().getValue())) {
 					return true;
 				}
 			}

@@ -226,8 +226,11 @@ public class SimpleSipServlet
 			sendRegister();
 			return;
 		}
-		if(fromString.contains(TEST_PRACK)) {
+		if(fromString.contains(TEST_PRACK)) {			
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
+			if(fromString.contains("require-present")) {
+				sipServletResponse.addHeader("Require", "100rel");
+			}
 			sipServletResponse.sendReliably();
 			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 			sipServletResponse.getSession().setAttribute("okResponse", sipServletResponse);

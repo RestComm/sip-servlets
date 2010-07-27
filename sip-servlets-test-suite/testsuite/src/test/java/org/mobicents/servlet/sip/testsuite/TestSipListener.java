@@ -169,6 +169,8 @@ public class TestSipListener implements SipListener {
 	
 	private Response finalResponse;
 	
+	private Response informationalResponse;
+	
 	private boolean cancelSent;
 
 	private boolean waitForCancel;
@@ -1254,6 +1256,9 @@ public class TestSipListener implements SipListener {
 		}
 
 		try {			
+			if(response.getStatusCode() > 100 && response.getStatusCode() < 200) {
+				informationalResponse = response;
+			}
 			if(response.getStatusCode() >= 200 && response.getStatusCode() < 700) {
 				logger.info("final response received : status code " + response.getStatusCode());
 				finalResponseReceived = true;
@@ -2626,6 +2631,20 @@ public class TestSipListener implements SipListener {
 	 */
 	public boolean isSendNotify() {
 		return sendNotify;
+	}
+
+	/**
+	 * @param informationalResponse the informationalResponse to set
+	 */
+	public void setInformationalResponse(Response informationalResponse) {
+		this.informationalResponse = informationalResponse;
+	}
+
+	/**
+	 * @return the informationalResponse
+	 */
+	public Response getInformationalResponse() {
+		return informationalResponse;
 	}
 
 }

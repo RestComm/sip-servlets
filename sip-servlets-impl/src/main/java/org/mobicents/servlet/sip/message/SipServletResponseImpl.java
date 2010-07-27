@@ -327,7 +327,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		if(!Request.INVITE.equals(originalRequest.getMethod())) {
 			throw new Rel100Exception(Rel100Exception.NOT_INVITE);
 		}		
-		if(!containsRel100(originalRequest)) {
+		if(!containsRel100(originalRequest.getMessage())) {
 			throw new Rel100Exception(Rel100Exception.NO_REQ_SUPPORT);
 		}
 		send(true);
@@ -463,8 +463,13 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			}
 			// RFC 3262 Section 3 UAS Behavior
 			if(sendReliably) {
-				final Header requireHeader = SipFactories.headerFactory.createRequireHeader(REL100_OPTION_TAG);
-				response.addHeader(requireHeader);
+				// fix for Issue 1564 : http://code.google.com/p/mobicents/issues/detail?id=1564
+				// Send reliably can add a duplicate 100rel to the requires line
+				// don't add it if it is already present (the app can add it)
+				if(!containsRel100(response)) {
+					final Header requireHeader = SipFactories.headerFactory.createRequireHeader(REL100_OPTION_TAG);
+					response.addHeader(requireHeader);
+				}
 				final Header rseqHeader = SipFactories.headerFactory.createRSeqHeader(getTransactionApplicationData().getRseqNumber().getAndIncrement());
 				response.addHeader(rseqHeader);
 			}

@@ -1499,7 +1499,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			this.lastFinalResponse = response;
 		}
 		// we keep the last informational response for noPrackReceived only
-		if(containsRel100(response) && (response.getStatus() > 100 && response.getStatus() < 200) && 
+		if(containsRel100(response.getMessage()) && (response.getStatus() > 100 && response.getStatus() < 200) && 
 				(lastInformationalResponse == null || lastInformationalResponse.getStatus() < response.getStatus())) {
 			this.lastInformationalResponse = response;
 		}
