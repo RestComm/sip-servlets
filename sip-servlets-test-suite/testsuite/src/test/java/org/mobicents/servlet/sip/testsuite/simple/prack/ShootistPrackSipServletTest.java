@@ -64,6 +64,25 @@ public class ShootistPrackSipServletTest extends SipServletTestCase {
 		assertTrue(tomcat.deployContext(context));
 		return context;
 	}	
+	
+	public SipStandardContext deployApplicationPrackCancel() {
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp");
+		context.setName("sip-test-context");
+		context.setPath("sip-test");
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		ApplicationParameter applicationParameter = new ApplicationParameter();
+		applicationParameter.setName("prack");
+		applicationParameter.setValue("true");
+		context.addApplicationParameter(applicationParameter);
+		applicationParameter = new ApplicationParameter();
+		applicationParameter.setName("cancel");
+		applicationParameter.setValue("true");
+		context.addApplicationParameter(applicationParameter);
+		assertTrue(tomcat.deployContext(context));
+		return context;
+	}	
 
 	@Override
 	protected String getDarConfigurationFile() {
@@ -92,7 +111,25 @@ public class ShootistPrackSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.isPrackReceived());
 		assertTrue(receiver.getByeReceived());		
-	}		
+	}	
+	
+	public void testShootistPrackCancel() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		deployApplicationPrackCancel();
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isPrackReceived());
+		assertTrue(receiver.isCancelReceived());		
+	}	
 	
 	public void testShootistPrackCallerSendsBye() throws Exception {
 //		receiver.sendInvite();
