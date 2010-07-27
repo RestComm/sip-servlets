@@ -116,6 +116,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	// Made it transient for Issue 1523 : http://code.google.com/p/mobicents/issues/detail?id=1523
 	// NotSerializableException happens if a message is stored in the sip session during HA
 	private transient Transaction transaction;
+	
+	// We need this object separate from transaction.getApplicationData, because the actualy transaction
+	// may be create later and we still need to accumulate useful data. Also the transaction might be
+	// cleaned up earlier. The transaction and this object have different lifecycle.
 	protected TransactionApplicationData transactionApplicationData;		
 
 	protected HeaderForm headerForm = HeaderForm.DEFAULT;

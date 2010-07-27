@@ -946,7 +946,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    		if(getSipSession().getState().equals(State.INITIAL)) {
 		    			Transaction tx = inviteTransactionToCancel;
 		    			if(tx != null) {
-		    				logger.debug("Can not send CANCEL. Will try to STOP retransmissions");
+		    				logger.debug("Can not send CANCEL. Will try to STOP retransmissions " + tx);
 		    				// We still haven't received any response on this call, so we can not send CANCEL,
 		    				// we will just stop the retransmissions
 		    				StaticServiceHolder.disableRetransmissionTimer.invoke(tx);

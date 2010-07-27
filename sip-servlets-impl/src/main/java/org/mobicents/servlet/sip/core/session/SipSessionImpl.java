@@ -1316,6 +1316,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 			}
 		}
 		// Mapping to the sip session state machine
+		// We will transition from INITIAL to EARLY here for 100 Trying (not clear from the spec)
+		// Figure 6-1 The SIP Dialog State Machine
+		// and Figure 6-2 The SipSession State Machine
 		if( State.INITIAL.equals(state) && response.getStatus() >= 100 && response.getStatus() < 200 ) {
 			this.setState(State.EARLY);
 			if(logger.isDebugEnabled()) {

@@ -288,6 +288,10 @@ public class ResponseDispatcher extends MessageDispatcher {
 							else {
 								//if this is a trying response, the response is dropped
 								if(Response.TRYING == status) {
+									// We will transition from INITIAL to EARLY here (not clear from the spec)
+									// Figure 6-1 The SIP Dialog State Machine
+									// and Figure 6-2 The SipSession State Machine
+									session.updateStateOnResponse(sipServletResponse, true);
 									if(logger.isDebugEnabled()) {
 										logger.debug("the response is dropped accordingly to JSR 289 " +
 												"since this a 100 for a non proxy application");
