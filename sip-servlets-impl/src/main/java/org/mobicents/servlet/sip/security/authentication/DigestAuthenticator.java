@@ -501,7 +501,7 @@ public class DigestAuthenticator
         catch (ParseException ex)
         {
             throw new SecurityException(
-                "Failed to create an authorization header!");
+                "Failed to create an authorization header!", ex);
         }
 
         return authorization;
