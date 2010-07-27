@@ -769,6 +769,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	 * {@inheritDoc}
 	 */
 	public SipServletRequest createCancel(SipSession session) {
+		if(session == null) throw new NullPointerException("The session for createCancel cannot be null");
 		for (SipServletRequestImpl linkedRequest : originalRequestMap.keySet()) {
 			if(linkedRequest.getSipSessionKey().equals(((MobicentsSipSession) session).getKey()) && 
 					linkedRequest.getMethod().equalsIgnoreCase(Request.INVITE) && 
