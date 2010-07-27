@@ -171,6 +171,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	@SuppressWarnings("unchecked")
 	public SipServletRequest createAck() {
 		if(!Request.INVITE.equals(((SIPTransaction)getTransaction()).getMethod()) || (response.getStatusCode() >= 100 && response.getStatusCode() < 200) || isAckGenerated) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("transaction state " + ((SIPTransaction)getTransaction()).getMethod() + " status code " + response.getStatusCode() + " isAckGenerated " + isAckGenerated);
+			}
 			throw new IllegalStateException("the transaction state is such that it doesn't allow an ACK to be sent now, e.g. the original request was not an INVITE, or this response is provisional only, or an ACK has already been generated");
 		}
 		final MobicentsSipSession session = getSipSession();
@@ -669,6 +672,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	}
 
 	public void setOriginalRequest(SipServletRequestImpl originalRequest) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("original request set to " + originalRequest + " for response " + message);
+		}
 		this.originalRequest = originalRequest;
 	}
 

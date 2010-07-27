@@ -160,7 +160,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 		if(sipSession != null) {
 			this.sessionKey = sipSession.getKey();
 		}
-		if(transaction != null) {
+		if(transaction != null && getMethod().equals(Request.INVITE)) {
 			if(transaction.getApplicationData() != null) {
 				this.transactionApplicationData = (TransactionApplicationData) transaction.getApplicationData();
 			}
