@@ -420,11 +420,13 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 						logger.info("Sending " +  ackRequest);
 						ackRequest.send();
 					}
-					SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
-					logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);			
-					responseToOriginalRequest.setContentLength(sipServletResponse.getContentLength());
-					//responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
-					responseToOriginalRequest.send();
+					if(!originalRequest.isCommitted()) {
+						SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
+						logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);			
+						responseToOriginalRequest.setContentLength(sipServletResponse.getContentLength());
+						//responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
+						responseToOriginalRequest.send();
+					}
 				} else {
 				    SipSession peerSession = sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
 				    SipServletResponse responseToOriginalRequest = sipServletResponse.getRequest().getB2buaHelper().createResponseToOriginalRequest(peerSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
@@ -480,14 +482,16 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	protected void doProvisionalResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
 		SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
-		SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
-		if(logger.isInfoEnabled()) {
-			logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
-		}
-		if(sipServletResponse.getHeader("Require") != null) {
-			responseToOriginalRequest.sendReliably();
-		} else {
-			responseToOriginalRequest.send();
+		if(!originalRequest.isCommitted()) {
+			SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
+			if(logger.isInfoEnabled()) {
+				logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
+			}
+			if(sipServletResponse.getHeader("Require") != null) {
+				responseToOriginalRequest.sendReliably();
+			} else {
+				responseToOriginalRequest.send();
+			}
 		}
 	}	
 	
