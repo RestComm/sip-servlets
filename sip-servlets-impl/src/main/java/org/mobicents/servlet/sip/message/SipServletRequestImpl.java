@@ -913,8 +913,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				proxy = session.getProxy();
 			}
 			final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
-			 
-			((MessageExt)message).setApplicationData(session.getTransport());			
+			final String sessionTransport = session.getTransport();
+			if(logger.isDebugEnabled()) {
+		    	logger.debug("session transport is " + sessionTransport);
+		    }
+			((MessageExt)message).setApplicationData(sessionTransport);			
 			
 			ViaHeader viaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
 		
@@ -961,7 +964,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    	}
 		    }
 			final String transport = JainSipUtils.findTransport(request);
-			if(session.getTransport() == null) {
+			if(sessionTransport == null) {
 				session.setTransport(transport);
 			}
 		    if(logger.isDebugEnabled()) {
