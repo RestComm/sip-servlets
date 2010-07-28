@@ -629,37 +629,42 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletMessage#isCommitted()
 	 */
 	public boolean isCommitted() {
-		//the message is an incoming non-reliable provisional response received by a servlet acting as a UAC
-		if(getTransaction() instanceof ClientTransaction && getStatus() >= 101 && getStatus() <= 199 && getHeader("RSeq") == null) {
-			if(this.proxyBranch == null) { // Make sure this is not a proxy. Proxies are allowed to modify headers.
-				return true;
-			} else {
-				return false;
+		Transaction tx = getTransaction();
+		// Issue 1571 : http://code.google.com/p/mobicents/issues/detail?id=1571 
+		// NullPointerException in SipServletResponseImpl.isCommitted
+		if(tx != null) {
+			//the message is an incoming non-reliable provisional response received by a servlet acting as a UAC
+			if(tx instanceof ClientTransaction && getStatus() >= 101 && getStatus() <= 199 && getHeader("RSeq") == null) {
+				if(this.proxyBranch == null) { // Make sure this is not a proxy. Proxies are allowed to modify headers.
+					return true;
+				} else {
+					return false;
+				}
 			}
-		}
-		//the message is an incoming reliable provisional response for which PRACK has already been generated. (Note that this scenario applies to containers that support the 100rel extension.)
-		if(getTransaction() instanceof ClientTransaction && getStatus() >= 101 && getStatus() <= 199 && getHeader("RSeq") != null && TransactionState.TERMINATED.equals(getTransaction().getState())) {
-			if(this.proxyBranch == null) { // Make sure this is not a proxy. Proxies are allowed to modify headers.
-				return true;
-			} else {
-				return false;
+			//the message is an incoming reliable provisional response for which PRACK has already been generated. (Note that this scenario applies to containers that support the 100rel extension.)
+			if(tx instanceof ClientTransaction && getStatus() >= 101 && getStatus() <= 199 && getHeader("RSeq") != null && TransactionState.TERMINATED.equals(tx.getState())) {
+				if(this.proxyBranch == null) { // Make sure this is not a proxy. Proxies are allowed to modify headers.
+					return true;
+				} else {
+					return false;
+				}
 			}
-		}
-		//the message is an incoming final response received by a servlet acting as a UAC for a Non INVITE transaction
-		if(getTransaction() instanceof ClientTransaction && getStatus() >= 200 && getStatus() <= 999 && !Request.INVITE.equals(((SIPClientTransaction)getTransaction()).getMethod())) {
-			if(this.proxyBranch == null) { // Make sure this is not a proxy. Proxies are allowed to modify headers.
-				return true;
-			} else {
-				return false;
+			//the message is an incoming final response received by a servlet acting as a UAC for a Non INVITE transaction
+			if(tx instanceof ClientTransaction && getStatus() >= 200 && getStatus() <= 999 && !Request.INVITE.equals(((SIPClientTransaction)tx).getMethod())) {
+				if(this.proxyBranch == null) { // Make sure this is not a proxy. Proxies are allowed to modify headers.
+					return true;
+				} else {
+					return false;
+				}
 			}
-		}
-		//the message is a response which has been forwarded upstream
-		if(isResponseForwardedUpstream) {
-			return true;
-		}
-		//message is an incoming final response to an INVITE transaction and an ACK has been generated
-		if(getTransaction() instanceof ClientTransaction && getStatus() >= 200 && getStatus() <= 999 && TransactionState.TERMINATED.equals(getTransaction().getState()) && isAckGenerated) {
-			return true;
+			//the message is a response which has been forwarded upstream
+			if(isResponseForwardedUpstream) {
+				return true;
+			}
+			//message is an incoming final response to an INVITE transaction and an ACK has been generated
+			if(tx instanceof ClientTransaction && getStatus() >= 200 && getStatus() <= 999 && TransactionState.TERMINATED.equals(tx.getState()) && isAckGenerated) {
+				return true;
+			}
 		}
 		return false;
 	}
