@@ -404,7 +404,19 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 						}
 						try {
 							Context envCtx = (Context)ejbContainer.getEnc().lookup("env");
-							Context sipSubcontext = envCtx.createSubcontext(SIP_SUBCONTEXT);
+							// Issue 1607 http://code.google.com/p/mobicents/issues/detail?id=1607
+							// Error on deploying converged SipServlet 
+							// check if SIP_SUBCONTEXT is already present before creating it.
+							Context sipSubcontext = null;
+							try {
+								sipSubcontext = (Context) envCtx.lookup(SIP_SUBCONTEXT);
+							} catch (NamingException e) {
+								// means the sip sub context is not present yet
+								log.debug("Couldn't look up the SIP_SUBCONTEXT. Possibly this is the first application. So we will try to bind again");
+							}
+							if(sipSubcontext == null) {
+								sipSubcontext = envCtx.createSubcontext(SIP_SUBCONTEXT);
+							}
 							Context applicationNameSubcontext = sipSubcontext.createSubcontext(convergedMetaData.getApplicationName());						
 							
 							SipFactoryFacade sipFactoryFacade = (SipFactoryFacade) sipContext.getSipFactoryFacade();
