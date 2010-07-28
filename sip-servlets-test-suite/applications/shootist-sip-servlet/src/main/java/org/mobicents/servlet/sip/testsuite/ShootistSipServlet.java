@@ -18,8 +18,6 @@ package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -93,8 +91,13 @@ public class ShootistSipServlet
 				request.send();
 			}  else {
 				if(sipServletResponse.getApplicationSession().getAttribute(ENCODE_URI) == null) {
+					String timeToWaitForBye = getServletContext().getInitParameter("timeToWaitForBye");
+					int delay = 2000;
+					if(timeToWaitForBye != null) {
+						delay = Integer.parseInt(timeToWaitForBye);
+					}
 					SipServletRequest sipServletRequest = sipServletResponse.getSession().createRequest("BYE");
-					ServletTimer timer = timerService.createTimer(sipServletResponse.getApplicationSession(), 2000, false, (Serializable)sipServletRequest);
+					ServletTimer timer = timerService.createTimer(sipServletResponse.getApplicationSession(), delay, false, (Serializable)sipServletRequest);
 					sipServletResponse.getApplicationSession().setAttribute("timer", timer);
 				}
 			}
@@ -229,6 +232,16 @@ public class ShootistSipServlet
 			// please note that addAuthHeader is not used here
 			sipServletRequest.addHeader("Proxy-Authorization", authHeader);
 			sipServletRequest.addHeader("Proxy-Authenticate", authHeader);
+		}
+		
+		String routeHeader = ce.getServletContext().getInitParameter("route");
+		if(routeHeader != null) {
+			try {
+				sipServletRequest.pushRoute((SipURI) sipFactory.createURI(routeHeader));
+			} catch (ServletParseException e) {
+				logger.error("Couldn't create Route Header from " + routeHeader);
+				return; 
+			}
 		}
 		
 		String outboundInterface = ce.getServletContext().getInitParameter("outboundInterface");
