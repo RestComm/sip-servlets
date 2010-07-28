@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.address;
 
+import gov.nist.javax.sip.header.ParametersExt;
+
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -367,7 +369,14 @@ public class AddressImpl extends ParameterableImpl implements Address {
 		Iterator<String> parameterNames = headerParams.getParameterNames();			
 		while (parameterNames.hasNext()) {
 			String name = (String) parameterNames.next();
-			String value = headerParams.getParameter(name);
+			String value = null;
+			// Fix for Issue 1477 http://code.google.com/p/mobicents/issues/detail?id=1477
+			// Address parameters become un-quoted after coping from address			
+			if(headerParams instanceof ParametersExt) {
+				value = ((ParametersExt)headerParams).getParameter(name, false);
+			} else {
+				value = headerParams.getParameter(name);
+			}
 			params.put(name, value);
 		}
 		return params;

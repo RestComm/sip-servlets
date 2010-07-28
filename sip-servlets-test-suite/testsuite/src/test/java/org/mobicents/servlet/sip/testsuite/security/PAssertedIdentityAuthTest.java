@@ -119,7 +119,7 @@ public class PAssertedIdentityAuthTest extends SipServletTestCase {
 		String[] headerContents = new String[] {"\"User One\" <sip:user@localhost.com>"};
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null,
-				false, headerNames, headerContents);
+				false, headerNames, headerContents, true);
 		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());

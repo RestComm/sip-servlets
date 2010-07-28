@@ -135,7 +135,7 @@ public class RegexApplicationRoutingTest extends SipServletTestCase {
 		ok = false;
 		createTomcat();
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"additionalParameterableHeader","nonParameterableHeader"}, new String[] {"none","none"});		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"additionalParameterableHeader","nonParameterableHeader"}, new String[] {"none","none"}, true);		
 		Thread.sleep(TIMEOUT);
 		assertEquals(404,sender.getFinalResponseStatus());
 	}	

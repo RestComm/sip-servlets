@@ -95,7 +95,7 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 		String[] headerNames = new String[]{"require"};
 		String[] headerValues = new String[]{"100rel"};
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
@@ -127,7 +127,7 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 		String[] headerNames = new String[]{"require"};
 		String[] headerValues = new String[]{"100rel"};
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getOkToByeReceived());
 		assertTrue(sender.getByeReceived());		

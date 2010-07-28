@@ -817,7 +817,7 @@ public class TestSipListener implements SipListener {
 						toUser, toHost);
 				String[] headerNames = new String[] {"Join"};
 				String[] headerContents = new String[] {lastMessageContent};
-				sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerContents);
+				sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerContents, true);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				logger.error("error sending INVITE with Join", ex);
@@ -836,7 +836,7 @@ public class TestSipListener implements SipListener {
 						toUser, toHost);
 				String[] headerNames = new String[] {"Replaces"};
 				String[] headerContents = new String[] {lastMessageContent};
-				sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerContents);
+				sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerContents, true);
 			} catch (Exception ex) {
 				ex.printStackTrace();
 				logger.error("error sending INVITE with Join", ex);
@@ -1672,10 +1672,10 @@ public class TestSipListener implements SipListener {
 	}
 
 	public Request sendSipRequest(String method, URI fromURI, URI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri) throws SipException, ParseException, InvalidArgumentException {
-		return sendSipRequest(method, fromURI, toURI, messageContent, route, useToURIasRequestUri, null, null);
+		return sendSipRequest(method, fromURI, toURI, messageContent, route, useToURIasRequestUri, null, null, true);
 	}
 
-	public Request sendSipRequest(String method, URI fromURI, URI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri, String[] headerNames, String[] headerContents) throws SipException, ParseException, InvalidArgumentException {
+	public Request sendSipRequest(String method, URI fromURI, URI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri, String[] headerNames, String[] headerContents, boolean setHeader) throws SipException, ParseException, InvalidArgumentException {
 		this.useToURIasRequestUri = useToURIasRequestUri;
 		// create >From Header
 		Address fromNameAddress = protocolObjects.addressFactory
@@ -1793,7 +1793,11 @@ public class TestSipListener implements SipListener {
 		if(headerNames != null) {
 			for(int q=0; q<headerNames.length; q++) {
 				Header h = protocolObjects.headerFactory.createHeader(headerNames[q], headerContents[q]);
-				request.addHeader(h);
+				if(setHeader) {
+					request.setHeader(h);
+				} else {
+					request.addHeader(h);
+				}
 			}
 		}
 		addSpecificHeaders(method, request);

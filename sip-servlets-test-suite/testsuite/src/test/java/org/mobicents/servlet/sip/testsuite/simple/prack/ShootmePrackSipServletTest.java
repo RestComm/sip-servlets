@@ -107,7 +107,7 @@ public class ShootmePrackSipServletTest extends SipServletTestCase {
 		String[] headerNames = new String[]{"require"};
 		String[] headerValues = new String[]{"100rel"};
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isPrackSent());
 		assertTrue(sender.isOkToPrackReceived());
@@ -131,7 +131,7 @@ public class ShootmePrackSipServletTest extends SipServletTestCase {
 		String[] headerNames = new String[]{"Require", "Require"};
 		String[] headerValues = new String[]{"timer", "100rel"};
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isPrackSent());
 		assertTrue(sender.isOkToPrackReceived());
@@ -155,7 +155,7 @@ public class ShootmePrackSipServletTest extends SipServletTestCase {
 		String[] headerNames = new String[]{"Require"};
 		String[] headerValues = new String[]{"100rel"};
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isPrackSent());
 		assertTrue(sender.isOkToPrackReceived());
@@ -186,7 +186,7 @@ public class ShootmePrackSipServletTest extends SipServletTestCase {
 		
 		sender.setSendReinvite(true);
 		sender.setSendBye(true);
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isPrackSent());
 		assertTrue(sender.isOkToPrackReceived());
@@ -203,7 +203,7 @@ public class ShootmePrackSipServletTest extends SipServletTestCase {
 		String[] headerNames = new String[]{"require"};
 		String[] headerValues = new String[]{"100rel"};
 		
-		sender.sendSipRequest("INVITE", fromAddress, fromAddress, null, null, false, headerNames, headerValues);
+		sender.sendSipRequest("INVITE", fromAddress, fromAddress, null, null, false, headerNames, headerValues, true);
 		sender.setSendAck(false);
 		Thread.sleep(TIMEOUT);
 		assertEquals( 200, sender.getFinalResponseStatus());

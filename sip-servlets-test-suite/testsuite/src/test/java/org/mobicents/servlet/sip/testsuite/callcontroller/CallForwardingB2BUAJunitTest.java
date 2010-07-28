@@ -161,7 +161,7 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Contact"}, new String[] {"<sip:127.0.0.1:5056>;+sip.instance=\"<urn:uuid:some-xxxx>\""});		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Contact"}, new String[] {"<sip:127.0.0.1:5056>;+sip.instance=\"<urn:uuid:some-xxxx>\""}, true);		
 		Thread.sleep(TIMEOUT);
 		assertEquals(200, sender.getFinalResponseStatus());		
 	}
