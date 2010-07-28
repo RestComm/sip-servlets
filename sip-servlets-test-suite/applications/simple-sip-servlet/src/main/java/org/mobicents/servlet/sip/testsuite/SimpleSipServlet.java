@@ -77,6 +77,8 @@ public class SimpleSipServlet
 	private static final String TEST_IS_SIP_SERVLET_SEND_BYE = "SSsendBye";
 	private static final String TEST_CANCEL_USERNAME = "cancel";
 	private static final String TEST_BYE_ON_DESTROY = "testByeOnDestroy";
+	private static final String TEST_NO_ACK_RECEIVED = "noAckReceived";
+	
 	@Resource
 	SipFactory sipFactory;
 	@Resource
@@ -108,14 +110,20 @@ public class SimpleSipServlet
 	 */
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
-		logger.info("from : " + request.getFrom());
+		String fromString = request.getFrom().toString();
+		// case for http://code.google.com/p/mobicents/issues/detail?id=1681
+		if(fromString.contains(TEST_NO_ACK_RECEIVED)) {
+			request.createResponse(SipServletResponse.SC_OK).send();
+			return;
+		}		
+		logger.info("from : " + fromString);
 		logger.info("Got request: "
 				+ request.getMethod());	
 		if(!request.getApplicationSession().getInvalidateWhenReady()) {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
 			sipServletResponse.send();
 			return;
-		}
+		}		
 		if(request.getParameterableHeader("additionalParameterableHeader") != null) {
 			request.getParameterableHeader("additionalParameterableHeader").setParameter("dsfds", "value");
 			boolean error = false;
@@ -129,11 +137,9 @@ public class SimpleSipServlet
 				request.createResponse(200).send();
 			}
 			return;
-		}
-		
+		}		
 		request.createResponse(SipServletResponse.SC_TRYING).send();
-		
-		String fromString = request.getFrom().toString();
+				
 		if(fromString.contains(TEST_BYE_ON_DESTROY)) {
 			inviteSipSession = request.getSession();
 		}

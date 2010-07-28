@@ -32,7 +32,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
-import javax.sip.DialogState;
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
 import javax.sip.InvalidArgumentException;
@@ -275,6 +274,9 @@ public class TestSipListener implements SipListener {
 	private Response inviteOkResponse;
 
 	private boolean sendNotify = true;
+	
+	private boolean countRetrans = false;	
+	private int nbRetrans = 0;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -1215,7 +1217,7 @@ public class TestSipListener implements SipListener {
 		if(abortProcessing) {
 			logger.error("Processing aborted");
 			return ;
-		}
+		}		
 		Response response = (Response) responseReceivedEvent.getResponse();
 		RecordRouteHeader recordRouteHeader = (RecordRouteHeader)response.getHeader(RecordRouteHeader.NAME);
 		if(!recordRoutingProxyTesting && recordRouteHeader != null) {
@@ -1244,6 +1246,9 @@ public class TestSipListener implements SipListener {
 				+ response.getStatusCode() + " " + cseq);
 		// not dropping in PRACK case on REINVITE the ClientTx can be null it seems		
 		if (tid == null && !prackSent) {
+			if(countRetrans) {
+				nbRetrans++;
+			}
 			logger.info("Stray response -- dropping ");
 			return;
 		}
@@ -2649,6 +2654,34 @@ public class TestSipListener implements SipListener {
 	 */
 	public Response getInformationalResponse() {
 		return informationalResponse;
+	}
+
+	/**
+	 * @param countRetrans the countRetrans to set
+	 */
+	public void setCountRetrans(boolean countRetrans) {
+		this.countRetrans = countRetrans;
+	}
+
+	/**
+	 * @return the countRetrans
+	 */
+	public boolean isCountRetrans() {
+		return countRetrans;
+	}
+
+	/**
+	 * @param nbRetrans the nbRetrans to set
+	 */
+	public void setNbRetrans(int nbRetrans) {
+		this.nbRetrans = nbRetrans;
+	}
+
+	/**
+	 * @return the nbRetrans
+	 */
+	public int getNbRetrans() {
+		return nbRetrans;
 	}
 
 }

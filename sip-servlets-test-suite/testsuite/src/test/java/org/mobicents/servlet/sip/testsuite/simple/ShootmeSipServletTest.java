@@ -370,18 +370,24 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 	}
 	
 	// test for http://code.google.com/p/mobicents/issues/detail?id=1061
+	// Also test http://code.google.com/p/mobicents/issues/detail?id=1681
 	public void testNoAckReceived() throws Exception {
 		String fromName = "noAckReceived";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);		
-		
-		sender.sendSipRequest("INVITE", fromAddress, fromAddress, null, null, false);
+				
 		sender.setSendAck(false);
+		sender.setCountRetrans(true);
+		sender.sendSipRequest("INVITE", fromAddress, fromAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertEquals( 200, sender.getFinalResponseStatus());
 		assertFalse(sender.isAckSent());
 		Thread.sleep(DIALOG_TIMEOUT);
+		// test http://code.google.com/p/mobicents/issues/detail?id=1681
+		// Make sure we get the 10 retrans for 200 to INVITE when no ACK is sent
+		// corresponding to Timer G
+		assertEquals( 10, sender.getNbRetrans());
 		List<String> allMessagesContent = sender.getAllMessagesContent();
 		assertEquals(1,allMessagesContent.size());
 		assertEquals("noAckReceived", allMessagesContent.get(0));
