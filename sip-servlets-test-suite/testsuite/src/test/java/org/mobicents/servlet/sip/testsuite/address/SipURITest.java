@@ -1,6 +1,7 @@
 package org.mobicents.servlet.sip.testsuite.address;
 
 import javax.servlet.sip.Address;
+import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
@@ -92,12 +93,11 @@ public class SipURITest extends junit.framework.TestCase {
 	}
 	
 	public void testBrackets() throws Exception {
-		String uriString = "<sip:1004@172.16.0.99;user=phone>";
-		URI requestURI = sipFactory.createURI(uriString);
-		System.out.println(requestURI);
-		assertEquals(uriString, requestURI.toString());
-		Address requestAddress = sipFactory.createAddress(requestURI);
-		System.out.println(requestAddress);
-		assertEquals(uriString, requestAddress.toString());		
+		try {
+			String uriString = "<sip:1004@172.16.0.99;user=phone>";
+			sipFactory.createURI(uriString);
+			fail(uriString + " should throw a ServletParseException because the angle brackets are not allowed");
+		} catch (ServletParseException e) {
+		}				
 	}
 }
