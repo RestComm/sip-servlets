@@ -681,8 +681,8 @@ public abstract class SipManagerDelegate {
 	}
 
 	public void updateStats() {
-		if(logger.isDebugEnabled()) {
-			logger.debug("updating sip manager " + container.getName() + " statistics");
+		if(logger.isTraceEnabled()) {
+			logger.trace("updating sip manager " + container.getName() + " statistics");
 		}
 		long now = System.currentTimeMillis();
 		// Updating the number of Sip Application Session Creation Per Seconds
@@ -694,10 +694,10 @@ public abstract class SipManagerDelegate {
 		}
 		lastUpdatedSasCreationCounter = sipApplicationSessionCounter;
 		lastSipApplicationSessionUpdatedTime = now;
-		if(logger.isDebugEnabled()) {
-			logger.debug("elapsedNumberOfSasCreationCounter "+ elapsedNumberOfSasCreationCounter);
-			logger.debug("lastUpdatedSasCreationCounter "+ lastUpdatedSasCreationCounter);
-			logger.debug("lastSipApplicationSessionUpdatedTime "+ lastSipApplicationSessionUpdatedTime);
+		if(logger.isTraceEnabled()) {
+			logger.trace("elapsedNumberOfSasCreationCounter "+ elapsedNumberOfSasCreationCounter);
+			logger.trace("lastUpdatedSasCreationCounter "+ lastUpdatedSasCreationCounter);
+			logger.trace("lastSipApplicationSessionUpdatedTime "+ lastSipApplicationSessionUpdatedTime);
 		}
 		// Updating the number of Sip Application Session Creation Per Seconds
 		int elapsedNumberOfSsCreationCounter = sipSessionCounter - lastUpdatedSsCreationCounter;
@@ -708,10 +708,10 @@ public abstract class SipManagerDelegate {
 		}
 		lastUpdatedSsCreationCounter = sipSessionCounter;
 		lastSipSessionUpdatedTime = now;
-		if(logger.isDebugEnabled()) {
-			logger.debug("elapsedNumberOfSsCreationCounter "+ elapsedNumberOfSsCreationCounter);
-			logger.debug("lastUpdatedSsCreationCounter "+ lastUpdatedSsCreationCounter);
-			logger.debug("lastSipSessionUpdatedTime "+ lastSipSessionUpdatedTime);
+		if(logger.isTraceEnabled()) {
+			logger.trace("elapsedNumberOfSsCreationCounter "+ elapsedNumberOfSsCreationCounter);
+			logger.trace("lastUpdatedSsCreationCounter "+ lastUpdatedSsCreationCounter);
+			logger.trace("lastSipSessionUpdatedTime "+ lastSipSessionUpdatedTime);
 		}
 	}
 }
