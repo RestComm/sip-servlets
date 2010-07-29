@@ -383,7 +383,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertEquals( 200, sender.getFinalResponseStatus());
 		assertFalse(sender.isAckSent());
-		Thread.sleep(DIALOG_TIMEOUT);
+		Thread.sleep(DIALOG_TIMEOUT + TIMEOUT);
 		// test http://code.google.com/p/mobicents/issues/detail?id=1681
 		// Make sure we get the 10 retrans for 200 to INVITE when no ACK is sent
 		// corresponding to Timer G
