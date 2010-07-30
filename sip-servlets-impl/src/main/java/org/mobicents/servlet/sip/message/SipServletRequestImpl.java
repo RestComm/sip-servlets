@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.DialogExt;
+import gov.nist.javax.sip.SipStackImpl;
 import gov.nist.javax.sip.TransactionExt;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.MessageExt;
@@ -1005,7 +1006,12 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				}				
 				session.removeOngoingTransaction(transaction);
 				tad.cleanUp();
-				transaction.setApplicationData(null);
+				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
+						transport, false).getSipProvider();	
+				// Issue 1468 : to handle forking, we shouldn't cleanup the app data since it is needed for the forked responses
+				if(((SipStackImpl)sipProvider.getSipStack()).getMaxForkTime() == 0) {
+					transaction.setApplicationData(null);
+				}
 				return;
 			}
 			

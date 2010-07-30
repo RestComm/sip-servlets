@@ -80,6 +80,7 @@ import org.mobicents.servlet.sip.testsuite.simple.ShootistSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootistTelURLSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootmeSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.ShootmeTelURLSipServletTest;
+import org.mobicents.servlet.sip.testsuite.simple.forking.ShootistSipServletForkingTest;
 import org.mobicents.servlet.sip.testsuite.simple.prack.ShootistPrackSipServletTest;
 import org.mobicents.servlet.sip.testsuite.simple.prack.ShootmePrackSipServletTest;
 import org.mobicents.servlet.sip.testsuite.subsnotify.InDialogNotifierSipServletTest;
@@ -166,6 +167,7 @@ public class AllTests {
 		suite.addTestSuite(DeploymentTest.class);
 		suite.addTestSuite(SameInstanceServletTest.class);
 		suite.addTestSuite(DistributableServletTest.class);
+		suite.addTestSuite(ShootistSipServletForkingTest.class);
 		suite.addTestSuite(BasicFailoverTest.class);
 		suite.addTestSuite(SipURITest.class);
 		suite.addTestSuite(AddressTest.class);

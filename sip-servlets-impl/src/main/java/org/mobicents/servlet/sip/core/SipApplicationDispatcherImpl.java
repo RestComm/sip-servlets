@@ -16,7 +16,10 @@
  */
 package org.mobicents.servlet.sip.core;
 
+import gov.nist.javax.sip.ClientTransactionExt;
 import gov.nist.javax.sip.DialogTimeoutEvent;
+import gov.nist.javax.sip.ResponseEventExt;
+import gov.nist.javax.sip.SipStackImpl;
 import gov.nist.javax.sip.TransactionExt;
 import gov.nist.javax.sip.DialogTimeoutEvent.Reason;
 
@@ -767,8 +770,27 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 
 		updateResponseStatistics(response);
-		final ClientTransaction clientTransaction = responseEvent.getClientTransaction();		
+		ClientTransaction clientTransaction = responseEvent.getClientTransaction();		
 		final Dialog dialog = responseEvent.getDialog();
+		final boolean isForkedResponse = ((ResponseEventExt)responseEvent).isForkedResponse();
+		final ClientTransactionExt originalTransaction = ((ResponseEventExt)responseEvent).getOriginalTransaction();
+		if(logger.isDebugEnabled()) {
+			logger.debug("is Forked Response " + isForkedResponse);
+			logger.debug("Client Transaction " + clientTransaction);
+			logger.debug("Original Transaction " + originalTransaction);
+			logger.debug("Dialog " + dialog);
+		}
+		// Issue 1468 : Handling forking 
+		if(isForkedResponse && originalTransaction != null) {
+			final Dialog defaultDialog = originalTransaction.getDefaultDialog();
+			final Dialog orginalTransactionDialog = originalTransaction.getDialog();
+			if(logger.isDebugEnabled()) {				
+				logger.debug("Original Transaction Dialog " + orginalTransactionDialog);
+				logger.debug("Original Transaction Default Dialog " + defaultDialog);
+			}
+			clientTransaction = originalTransaction;			
+		}
+		
 		// Transate the response to SipServletResponse
 		final SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
 				response, 
@@ -1112,7 +1134,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					}
 					sipSession.removeOngoingTransaction(transaction);
 					tad.cleanUp();
-					transaction.setApplicationData(null);
+					// Issue 1468 : to handle forking, we shouldn't cleanup the app data since it is needed for the forked responses
+					boolean nullifyAppData = true;					
+					if(((SipStackImpl)((SipProvider)transactionTerminatedEvent.getSource()).getSipStack()).getMaxForkTime() > 0 && Request.INVITE.equals(sipServletMessageImpl.getMethod())) {
+						nullifyAppData = false;
+					}
+					if(nullifyAppData) {
+						transaction.setApplicationData(null);
+					}
 				} else {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Transaction " + transaction + " not removed from session " + sipSessionKey + " because the B2BUA might still need it to create the ACK");

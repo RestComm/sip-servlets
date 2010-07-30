@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
+import javax.servlet.sip.SipSession.State;
 
 import org.apache.catalina.Container;
 import org.apache.log4j.Logger;
@@ -325,8 +326,9 @@ public abstract class SipManagerDelegate {
 		}
 //		sipSessionImpl.setRoutingRegion(parentSipSession.getRegion());
 		// dialog will be set when the response will be associated with this session
-//		sipSessionImpl.sessionCreatingDialog = dialog;
-		sipSessionImpl.setState(parentSipSession.getState());
+//		sipSessionImpl.sessionCreatingDialog = dialog;		
+		// the state should be different than the parent on forking
+		sipSessionImpl.setState(State.INITIAL);
 		sipSessionImpl.setStateInfo(parentSipSession.getStateInfo());
 		sipSessionImpl.setProxy(parentSipSession.getProxy());
 		if(parentSipSession.getSipSubscriberURI() != null) {

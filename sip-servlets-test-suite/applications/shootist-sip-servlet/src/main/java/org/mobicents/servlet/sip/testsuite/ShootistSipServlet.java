@@ -275,12 +275,12 @@ public class ShootistSipServlet
 			addr.setParameter("param5", "ffff");
 			addr.getURI().setParameter("uriparam", "urivalue");
 		}
-		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
-		if(ce.getServletContext().getInitParameter("encodeRequestURI") != null) {
-			sipApplicationSession.encodeURI(requestURI);
-			sipApplicationSession.setAttribute(ENCODE_URI, "true");
-		}
-		sipServletRequest.setRequestURI(requestURI);
+//		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
+//		if(ce.getServletContext().getInitParameter("encodeRequestURI") != null) {
+//			sipApplicationSession.encodeURI(requestURI);
+//			sipApplicationSession.setAttribute(ENCODE_URI, "true");
+//		}
+//		sipServletRequest.setRequestURI(requestURI);
 		if(sipServletRequest.getTo().getParameter("tag") != null) {
 			logger.error("the ToTag should be empty, not sending the request");
 			return;

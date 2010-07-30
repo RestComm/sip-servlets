@@ -1549,11 +1549,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	}
 
 	public Dialog getDialog() {
-		if (this.dialog != null) return dialog;
-		if (this.transaction != null)
+		if (this.dialog != null) {
+			return dialog;
+		}
+		if (this.transaction != null) {
 			return this.transaction.getDialog();
-		else
-			return null;
+		}
+		return null;
 	}
 
 	/**

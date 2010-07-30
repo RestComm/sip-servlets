@@ -16,7 +16,6 @@
  */
 package org.mobicents.servlet.sip.testsuite.simple.forking;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -29,12 +28,12 @@ import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
 
-public class ShootistSipServletTest extends SipServletTestCase {
-	private static transient Logger logger = Logger.getLogger(ShootistSipServletTest.class);		
+public class ShootistSipServletForkingTest extends SipServletTestCase {
+	private static transient Logger logger = Logger.getLogger(ShootistSipServletForkingTest.class);		
 	private static final int TIMEOUT = 30000;	
 //	private static final int TIMEOUT = 100000000;
 	
-	public ShootistSipServletTest(String name) {
+	public ShootistSipServletForkingTest(String name) {
 		super(name);
 		startTomcatOnStartup = false;
 		autoDeployOnStartup = false;
