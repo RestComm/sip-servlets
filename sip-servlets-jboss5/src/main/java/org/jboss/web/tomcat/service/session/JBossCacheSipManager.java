@@ -2960,12 +2960,45 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			String realId = clusterSess.getId();
 
 			if (log_.isDebugEnabled()) {
-				log_.debug("Removing session from store with id: " + realId);
+				log_.debug("Removing sip session from store with id: " + realId);
 			}
-
+			boolean notSession = true;
+			boolean doTx = false;
+			BatchingManager batchingManager = getDistributedCacheConvergedSipManager().getBatchingManager();
 			try {
+				// We need transaction so all the replication are sent in batch.
+		         // Don't do anything if there is already transaction context
+		         // associated with this thread.
+		         if(notSession && batchingManager.isBatchInProgress() == false)
+		         {	        	 
+		            batchingManager.startBatch();
+		            doTx = true;
+		         }
 				clusterSess.removeMyself();
+			} catch (Exception ex) {
+				if (log_.isDebugEnabled())
+					log_.debug("removeSipSession(): failed with exception", ex);
+
+				try {
+					// if(doTx)
+					// Let's setRollbackOnly no matter what.
+					// (except if there's no tx due to SESSION (JBAS-3840))
+					if (notSession)
+						batchingManager.setBatchRollbackOnly();
+				} catch (Exception exn) {
+					log_.error("Caught exception rolling back transaction", exn);
+				}
+
+				// We will need to alert Tomcat of this exception.
+				if (ex instanceof RuntimeException)
+					throw (RuntimeException) ex;
+
+				throw new RuntimeException(
+						"JBossCacheManager.removeSipSession(): "
+								+ "failed to remove session.", ex);
 			} finally {
+				if (doTx)
+					batchingManager.endBatch();
 				// We don't want to replicate this session at the end
 				// of the request; the removal process took care of that
 				ConvergedSessionReplicationContext.sipSessionExpired(clusterSess,
@@ -3000,12 +3033,46 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			String realId = clusterSess.getId();
 
 			if (log_.isDebugEnabled()) {
-				log_.debug("Removing session from store with id: " + realId);
+				log_.debug("Removing sip app session from store with id: " + realId);
 			}
 
+			boolean notSession = true;
+			boolean doTx = false;
+			BatchingManager batchingManager = getDistributedCacheConvergedSipManager().getBatchingManager();
 			try {
+				// We need transaction so all the replication are sent in batch.
+		         // Don't do anything if there is already transaction context
+		         // associated with this thread.
+		         if(notSession && batchingManager.isBatchInProgress() == false)
+		         {	        	 
+		            batchingManager.startBatch();
+		            doTx = true;
+		         }
 				clusterSess.removeMyself();
+			} catch (Exception ex) {
+				if (log_.isDebugEnabled())
+					log_.debug("removeSipApplicationSession(): failed with exception", ex);
+
+				try {
+					// if(doTx)
+					// Let's setRollbackOnly no matter what.
+					// (except if there's no tx due to SESSION (JBAS-3840))
+					if (notSession)
+						batchingManager.setBatchRollbackOnly();
+				} catch (Exception exn) {
+					log_.error("Caught exception rolling back transaction", exn);
+				}
+
+				// We will need to alert Tomcat of this exception.
+				if (ex instanceof RuntimeException)
+					throw (RuntimeException) ex;
+
+				throw new RuntimeException(
+						"JBossCacheManager.removeSipApplicationSession(): "
+								+ "failed to remove session.", ex);
 			} finally {
+				if (doTx)
+					batchingManager.endBatch();
 				// We don't want to replicate this session at the end
 				// of the request; the removal process took care of that
 				ConvergedSessionReplicationContext.sipApplicationSessionExpired(clusterSess,
