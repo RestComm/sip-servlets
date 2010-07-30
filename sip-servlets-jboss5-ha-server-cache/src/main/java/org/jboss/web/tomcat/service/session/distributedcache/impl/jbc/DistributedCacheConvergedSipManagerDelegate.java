@@ -185,7 +185,7 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 			DistributableSipSessionMetadata metaData = (DistributableSipSessionMetadata)jBossCacheService.getUnMarshalledValue(dsd.getMetadata());
 			metaData.setMetaData(sipSessionMetaData);
 		} catch (Exception e) {
-			log_.warn("Problem accessing sip session data : " + e.getClass() + " "
+			log_.warn("Problem accessing sip session " + key + " data : " + e.getClass() + " "
 					+ e, e);
 			// Clean up
 			removeSipSessionLocal(sipAppSessionKey, key);
@@ -255,7 +255,7 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 			DistributableSipApplicationSessionMetadata metaData = (DistributableSipApplicationSessionMetadata)jBossCacheService.getUnMarshalledValue(dsd.getMetadata());
 			metaData.setMetaData(sipAppSessionMetaData);
 		} catch (Exception e) {
-			log_.warn("Problem accessing sip application session data : " + e.getClass() + " "
+			log_.warn("Problem accessing sip application session " + key + " data : " + e.getClass() + " "
 					+ e, e);
 			// Clean up
 			removeSipApplicationSessionLocal(key);
