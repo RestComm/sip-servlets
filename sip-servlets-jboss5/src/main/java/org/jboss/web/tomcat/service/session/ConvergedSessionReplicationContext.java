@@ -23,20 +23,14 @@ package org.jboss.web.tomcat.service.session;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import javax.servlet.sip.SipApplicationSession;
-import javax.servlet.sip.SipSession;
-import javax.servlet.sip.SipApplicationSession.Protocol;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.jboss.logging.Logger;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -586,7 +580,7 @@ public final class ConvergedSessionReplicationContext
 		// }
 		// else
 	   if(logger.isDebugEnabled()){
-		   logger.info("Binding following sip session " + session.getKey());
+		   logger.debug("Binding following sip session " + session.getKey());
 	   }
 		if (soleSipManager == null) {
 			// First one bound
@@ -656,7 +650,9 @@ public final class ConvergedSessionReplicationContext
       boolean store = manager.equals(soleSipManager);
       if (store)
       {
-    	  logger.info("Unbinding following sip session " + session.getKey());
+    	  if(logger.isDebugEnabled()){
+    		  logger.debug("Unbinding following sip session " + session.getKey());
+    	  }
     	  soleSipManager = null;
     	  sipSessions.remove(session);
       }      
@@ -667,7 +663,9 @@ public final class ConvergedSessionReplicationContext
       boolean store = manager.equals(soleSipManager);
       if (store)
       {
-    	  logger.info("Unbinding following sip app session " + session.getKey());
+    	  if(logger.isDebugEnabled()){
+    		  logger.debug("Unbinding following sip app session " + session.getKey());
+    	  }
     	  soleSipManager = null;
     	  sipApplicationSessions.remove(session);
       }      
