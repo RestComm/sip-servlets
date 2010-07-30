@@ -3094,60 +3094,71 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		return clusterSess;
 	}
 
-	/**
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.SipManager#getSipApplicationSession(org.mobicents.servlet.sip.core.session.SipApplicationSessionKey, boolean)
 	 */
 	public MobicentsSipApplicationSession getSipApplicationSession(
 			final SipApplicationSessionKey key, final boolean create) {
+		return getSipApplicationSession(key, create, false);		
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.DistributableSipManager#getSipApplicationSession(org.mobicents.servlet.sip.core.session.SipApplicationSessionKey, boolean, boolean)
+	 */
+	public MobicentsSipApplicationSession getSipApplicationSession(
+			final SipApplicationSessionKey key, final boolean create, final boolean localOnly) {
 		// Find it from the local store first
 		ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session = findLocalSipApplicationSession(key, false);
 
-		// If we didn't find it locally, only check the distributed cache
-		// if we haven't previously handled this session id on this request.
-		// If we handled it previously but it's no longer local, that means
-		// it's been invalidated. If we request an invalidated session from
-		// the distributed cache, it will be missing from the local cache but
-		// may still exist on other nodes (i.e. if the invalidation hasn't
-		// replicated yet because we are running in a tx). With buddy
-		// replication,
-		// asking the local cache for the session will cause the out-of-date
-		// session from the other nodes to be gravitated, thus resuscitating
-		// the session.
-		if (session == null
-				&& !ConvergedSessionInvalidationTracker.isSipApplicationSessionInvalidated(key, this)) {
-			if (logger.isDebugEnabled())
-				log_.debug("Checking for sip app session " + key
-						+ " in the distributed cache");
-
-			session = loadSipApplicationSession(key, create);
-//			if (session != null) {
-//				add(session);
-//				Iterator<ClusteredSipSession<OutgoingDistributableSessionData>> sipSessionIt = 
-//					(Iterator<ClusteredSipSession<OutgoingDistributableSessionData>>)
-//						((MobicentsSipApplicationSession)session).getSessions("SIP");
-//				if(logger.isDebugEnabled()) {
-//					logger.debug("loading the underlying sip sessions from the cache");
-//				}
-//				while (sipSessionIt.hasNext()) {						
-//					ClusteredSipSession sipSession = (ClusteredSipSession) sipSessionIt
-//							.next();
-//					if(logger.isDebugEnabled()) {
-//						logger.debug("loading the underlying sip session from the cache " + sipSession.getKey());
-//					}
-//					getSipSession(sipSession.getKey(), false, null, session);
-//				}	
-//				// TODO should we advise of a new session?
-//				// tellNew();
-//			}
-		} else if (session != null && session.isOutdated()) {
-			if (logger.isDebugEnabled())
-				log_.debug("Updating sip app session " + key
-						+ " from the distributed cache");
-
-			// Need to update it from the cache
-			loadSipApplicationSession(key, create);
+		if(!localOnly) {
+			// If we didn't find it locally, only check the distributed cache
+			// if we haven't previously handled this session id on this request.
+			// If we handled it previously but it's no longer local, that means
+			// it's been invalidated. If we request an invalidated session from
+			// the distributed cache, it will be missing from the local cache but
+			// may still exist on other nodes (i.e. if the invalidation hasn't
+			// replicated yet because we are running in a tx). With buddy
+			// replication,
+			// asking the local cache for the session will cause the out-of-date
+			// session from the other nodes to be gravitated, thus resuscitating
+			// the session.
+			if (session == null
+					&& !ConvergedSessionInvalidationTracker.isSipApplicationSessionInvalidated(key, this)) {
+				if (logger.isDebugEnabled())
+					log_.debug("Checking for sip app session " + key
+							+ " in the distributed cache");
+	
+				session = loadSipApplicationSession(key, create);
+	//			if (session != null) {
+	//				add(session);
+	//				Iterator<ClusteredSipSession<OutgoingDistributableSessionData>> sipSessionIt = 
+	//					(Iterator<ClusteredSipSession<OutgoingDistributableSessionData>>)
+	//						((MobicentsSipApplicationSession)session).getSessions("SIP");
+	//				if(logger.isDebugEnabled()) {
+	//					logger.debug("loading the underlying sip sessions from the cache");
+	//				}
+	//				while (sipSessionIt.hasNext()) {						
+	//					ClusteredSipSession sipSession = (ClusteredSipSession) sipSessionIt
+	//							.next();
+	//					if(logger.isDebugEnabled()) {
+	//						logger.debug("loading the underlying sip session from the cache " + sipSession.getKey());
+	//					}
+	//					getSipSession(sipSession.getKey(), false, null, session);
+	//				}	
+	//				// TODO should we advise of a new session?
+	//				// tellNew();
+	//			}
+			} else if (session != null && session.isOutdated()) {
+				if (logger.isDebugEnabled())
+					log_.debug("Updating sip app session " + key
+							+ " from the distributed cache");
+	
+				// Need to update it from the cache
+				loadSipApplicationSession(key, create);
+			}
 		}
-
 		if (session != null) {			
 			// Add this session to the set of those potentially needing
 			// replication
@@ -3164,16 +3175,26 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		return session;
 	}
 
-	/**
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.SipManager#getSipSession(org.mobicents.servlet.sip.core.session.SipSessionKey, boolean, org.mobicents.servlet.sip.message.SipFactoryImpl, org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession)
 	 */
 	public MobicentsSipSession getSipSession(final SipSessionKey key,
 			final boolean create, final SipFactoryImpl sipFactoryImpl,
 			final MobicentsSipApplicationSession sipApplicationSessionImpl) {
+		return getSipSession(key, create, sipFactoryImpl, sipApplicationSessionImpl, false);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.DistributableSipManager#getSipSession(org.mobicents.servlet.sip.core.session.SipSessionKey, boolean, org.mobicents.servlet.sip.message.SipFactoryImpl, org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession, boolean)
+	 */
+	public MobicentsSipSession getSipSession(final SipSessionKey key,
+			final boolean create, final SipFactoryImpl sipFactoryImpl,
+			final MobicentsSipApplicationSession sipApplicationSessionImpl, final boolean localOnly) {
 		
 		// Find it from the local store first
 		ClusteredSipSession<? extends OutgoingDistributableSessionData> session = findLocalSipSession(key, false, sipApplicationSessionImpl);
-
 		if(session == null) {
 			if (logger.isDebugEnabled()) {
 				logger.debug("sip session " + key
@@ -3184,48 +3205,51 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 				logger.debug("sip session " + key
 						+ " found in the local store " + session);
 			}
-		}
-		boolean isSipSessionInvalidated = ConvergedSessionInvalidationTracker.isSipSessionInvalidated(key, this);
-		if (logger.isDebugEnabled()) {
-			logger.debug("sip session " + key
-					+ " invalidated ? " + isSipSessionInvalidated);
-		}
-		// If we didn't find it locally, only check the distributed cache
-		// if we haven't previously handled this session id on this request.
-		// If we handled it previously but it's no longer local, that means
-		// it's been invalidated. If we request an invalidated session from
-		// the distributed cache, it will be missing from the local cache but
-		// may still exist on other nodes (i.e. if the invalidation hasn't
-		// replicated yet because we are running in a tx). With buddy
-		// replication,
-		// asking the local cache for the session will cause the out-of-date
-		// session from the other nodes to be gravitated, thus resuscitating
-		// the session.
-		if (session == null
-				&& !isSipSessionInvalidated) {
-			if (logger.isDebugEnabled())
-				logger.debug("Checking for sip session " + key
-						+ " in the distributed cache");
+		}		
+		
+		if(!localOnly) {			
+			boolean isSipSessionInvalidated = ConvergedSessionInvalidationTracker.isSipSessionInvalidated(key, this);
+			if (logger.isDebugEnabled()) {
+				logger.debug("sip session " + key
+						+ " invalidated ? " + isSipSessionInvalidated);
+			}
+			// If we didn't find it locally, only check the distributed cache
+			// if we haven't previously handled this session id on this request.
+			// If we handled it previously but it's no longer local, that means
+			// it's been invalidated. If we request an invalidated session from
+			// the distributed cache, it will be missing from the local cache but
+			// may still exist on other nodes (i.e. if the invalidation hasn't
+			// replicated yet because we are running in a tx). With buddy
+			// replication,
+			// asking the local cache for the session will cause the out-of-date
+			// session from the other nodes to be gravitated, thus resuscitating
+			// the session.
+			if (session == null
+					&& !isSipSessionInvalidated) {
+				if (logger.isDebugEnabled())
+					logger.debug("Checking for sip session " + key
+							+ " in the distributed cache");
+	
+				session = loadSipSession(key, create, sipFactoryImpl, sipApplicationSessionImpl);
+	//			if (session != null)
+	//		    {
+	//		          add(session);
+	////		          // We now notify, since we've added a policy to allow listeners 
+	////		          // to discriminate. But the default policy will not allow the 
+	////		          // notification to be emitted for FAILOVER, so the standard
+	////		          // behavior is unchanged.
+	////		          session.tellNew(ClusteredSessionNotificationCause.FAILOVER);
+	//		    }
+			} else if (session != null && session.isOutdated()) {
+				if (logger.isDebugEnabled())
+					logger.debug("Updating sip session " + key
+							+ " from the distributed cache");
+	
+				// Need to update it from the cache
+				loadSipSession(key, create, sipFactoryImpl, sipApplicationSessionImpl);
+			}
 
-			session = loadSipSession(key, create, sipFactoryImpl, sipApplicationSessionImpl);
-//			if (session != null)
-//		    {
-//		          add(session);
-////		          // We now notify, since we've added a policy to allow listeners 
-////		          // to discriminate. But the default policy will not allow the 
-////		          // notification to be emitted for FAILOVER, so the standard
-////		          // behavior is unchanged.
-////		          session.tellNew(ClusteredSessionNotificationCause.FAILOVER);
-//		    }
-		} else if (session != null && session.isOutdated()) {
-			if (logger.isDebugEnabled())
-				logger.debug("Updating sip session " + key
-						+ " from the distributed cache");
-
-			// Need to update it from the cache
-			loadSipSession(key, create, sipFactoryImpl, sipApplicationSessionImpl);
 		}
-
 		if (session != null) {			
 			// Add this session to the set of those potentially needing
 			// replication

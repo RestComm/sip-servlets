@@ -96,6 +96,7 @@ import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcherFactory;
+import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -853,10 +854,26 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				try {
 					final ClassLoader cl = sipContext.getLoader().getClassLoader();
 					Thread.currentThread().setContextClassLoader(cl);
-									
-					MobicentsSipSession sipSessionImpl = sipContext.getSipManager().getSipSession(sipSessionKey, false, sipFactoryImpl, null);
-	
+					final SipManager sipManager = sipContext.getSipManager();					
+					final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
+							sipSessionKey.getApplicationName(), 
+							sipSessionKey.getApplicationSessionId());
+					
+					MobicentsSipSession sipSessionImpl = null;
 					MobicentsSipApplicationSession sipApplicationSession = null;
+					if(sipManager instanceof DistributableSipManager) {
+						// we check only locally if the sessions are present, no need to check in the cache since
+						// what triggered this method call was either a transaction or a dialog terminating or timeout
+						// so the sessions should be present locally, if they are not it means that it has already been invalidated
+						// perf optimization and fix for Issue 1688 : MSS HA on AS5 : Version is null Exception occurs sometimes
+						DistributableSipManager distributableSipManager = (DistributableSipManager) sipManager;
+						sipApplicationSession = distributableSipManager.getSipApplicationSession(sipApplicationSessionKey, false, true);
+						sipSessionImpl = distributableSipManager.getSipSession(sipSessionKey, false, sipFactoryImpl, sipApplicationSession, true);						
+					} else {						
+						sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
+						sipSessionImpl = sipManager.getSipSession(sipSessionKey, false, sipFactoryImpl, sipApplicationSession);
+					}									
+															
 					if(sipSessionImpl != null) {
 						if(sipSessionImpl.getProxy() != null) {
 							// If this is a client transaction no need to invalidate proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
@@ -873,8 +890,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 							if(sipSessionImpl.isValidInternal()) {
 								logger.debug("Sip session " + sipSessionKey + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
 							}
-						}
-						sipApplicationSession = sipSessionImpl.getSipApplicationSession();
+						}						
 						if(sipSessionImpl.isValidInternal() && sipSessionImpl.isReadyToInvalidate()) {
 							sipContext.enterSipApp(sipApplicationSession, sipSessionImpl);
 							try {
@@ -887,13 +903,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						if(logger.isDebugEnabled()) {
 							logger.debug("sip session already invalidated" + sipSessionKey);
 						}
-					}										
-					if(sipApplicationSession == null) {
-						final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
-								sipSessionKey.getApplicationName(), 
-								sipSessionKey.getApplicationSessionId());
-						sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
-					}
+					}															
 					if(sipApplicationSession != null) {
 						if(logger.isDebugEnabled()) {
 							logger.debug("sip app session " + sipApplicationSession.getKey() + " is valid ? :" + sipApplicationSession.isValidInternal());

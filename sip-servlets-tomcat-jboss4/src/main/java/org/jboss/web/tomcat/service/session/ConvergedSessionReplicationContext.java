@@ -23,22 +23,19 @@ package org.jboss.web.tomcat.service.session;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import javax.servlet.sip.SipApplicationSession;
-import javax.servlet.sip.SipSession;
-import javax.servlet.sip.SipApplicationSession.Protocol;
-
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
-import org.mobicents.servlet.sip.core.session.SipManager;
+import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 
 public final class ConvergedSessionReplicationContext
 {
+	private static final Logger logger = Logger.getLogger(ConvergedSessionReplicationContext.class);
+	
    private static final ThreadLocal replicationContext = new ThreadLocal();
    private static final ThreadLocal sipReplicationContext = new ThreadLocal();
    
@@ -588,6 +585,9 @@ public final class ConvergedSessionReplicationContext
 //      else 
     	  if (soleManager == null)
       {
+    		  if(logger.isDebugEnabled()) {
+        		  logger.debug("setting snapshot manager " + mgr + " and adding sip  session " + session.getKey() + " to the set of sip sessions to replicate");
+        		 }
          // First one bound
          soleManager = mgr;
          sipSessions.add(session);
@@ -603,6 +603,9 @@ public final class ConvergedSessionReplicationContext
 //      }
       else
       {
+    	  if(logger.isDebugEnabled()) {
+    		  logger.debug("adding sip app session " + session.getKey() + " to the set of sip app sessions to replicate");
+    		 }
     	  sipSessions.add(session);
       }
    }
@@ -614,8 +617,11 @@ public final class ConvergedSessionReplicationContext
 //         crossCtxSipApplicationSessions.put(session, mgr);
 //      }
 //      else 
-    	  if (soleManager == null)
+    	  if (soleManager == null)    		  
       {
+    		 if(logger.isDebugEnabled()) {
+    		  logger.debug("setting snapshot manager " + mgr + " and adding sip app session " + session.getKey() + " to the set of sip app sessions to replicate");
+    		 }
          // First one bound
          soleManager = mgr;
          sipApplicationSessions.add(session);
@@ -631,6 +637,9 @@ public final class ConvergedSessionReplicationContext
 //      }
       else
       {
+    	  if(logger.isDebugEnabled()) {
+    		  logger.debug("adding sip app session " + session.getKey() + " to the set of sip app sessions to replicate");
+    		 }
     	  sipApplicationSessions.add(session);
       }
    }
