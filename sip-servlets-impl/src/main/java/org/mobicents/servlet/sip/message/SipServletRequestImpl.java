@@ -299,8 +299,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					}
 				}
 				// Following restrictions in JSR 289 Section 4.1.3 Contact Header Field
+				// + constraints from Issue 1687 : Contact Header is present in SIP Message where it shouldn't
 				boolean setContactHeader = true;
-				if ((statusCode >= 300 && statusCode < 400) || statusCode == 485 || Request.REGISTER.equals(requestMethod) || Request.OPTIONS.equals(requestMethod)) {
+				if ((statusCode >= 300 && statusCode < 400) || statusCode == 485 
+						|| Request.REGISTER.equals(requestMethod) || Request.OPTIONS.equals(requestMethod)
+						|| Request.BYE.equals(requestMethod) || Request.CANCEL.equals(requestMethod)
+						|| Request.PRACK.equals(requestMethod) || Request.MESSAGE.equals(requestMethod)
+						|| Request.PUBLISH.equals(requestMethod)) {
 					// don't set the contact header in those case
 					setContactHeader = false;					
 				} 				

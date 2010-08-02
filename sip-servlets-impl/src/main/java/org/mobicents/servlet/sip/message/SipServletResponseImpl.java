@@ -143,7 +143,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		//Killer condition, see comment above for meaning
 		if (method.equals(Request.REGISTER)
 				|| (Response.MULTIPLE_CHOICES <= sipResponse.getStatusCode() && sipResponse.getStatusCode() < Response.BAD_REQUEST)
-				|| sipResponse.getStatusCode() == Response.AMBIGUOUS
+				|| (sipResponse.getStatusCode() == Response.AMBIGUOUS && !method.equals(Request.PRACK))
 				|| (sipResponse.getStatusCode() == Response.OK && method.equals(Request.OPTIONS))) {
 			isContactSystem = false;
 		} else {

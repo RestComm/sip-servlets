@@ -117,7 +117,10 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());
-		assertTrue(sender.getOkToByeReceived());		
+		assertTrue(sender.getOkToByeReceived());	
+		// test non regression for Issue 1687 : Contact Header is present in SIP Message where it shouldn't
+		Response response = sender.getFinalResponse();
+		assertNull(response.getHeader(ContactHeader.NAME));
 	}
 	
 	public void testShootmeSendBye() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
