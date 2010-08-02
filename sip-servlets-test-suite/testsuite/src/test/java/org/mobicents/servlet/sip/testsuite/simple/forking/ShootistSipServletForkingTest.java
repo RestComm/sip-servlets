@@ -123,6 +123,7 @@ public class ShootistSipServletForkingTest extends SipServletTestCase {
 		Map<String, String> params= new HashMap<String, String>();
 		params.put("route", "sip:127.0.0.1:5070");
 		params.put("timeToWaitForBye", "20000");
+		params.put("dontSetRURI", "true");
 		deployApplication(params);
 		Thread.sleep(TIMEOUT);
 		proxy.stop();
