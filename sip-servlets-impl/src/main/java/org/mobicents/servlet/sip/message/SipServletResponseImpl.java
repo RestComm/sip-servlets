@@ -142,8 +142,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				.getMethod();
 		//Killer condition, see comment above for meaning
 		if (method.equals(Request.REGISTER)
-				|| (Response.MULTIPLE_CHOICES <= sipResponse.getStatusCode() && sipResponse.getStatusCode() < Response.BAD_REQUEST)
-				|| (sipResponse.getStatusCode() == Response.AMBIGUOUS && !method.equals(Request.PRACK))
+				|| ((Response.MULTIPLE_CHOICES <= sipResponse.getStatusCode() && sipResponse.getStatusCode() < Response.BAD_REQUEST) && !method.equals(Request.CANCEL))
+				|| (sipResponse.getStatusCode() == Response.AMBIGUOUS && !method.equals(Request.PRACK) && !method.equals(Request.CANCEL))
 				|| (sipResponse.getStatusCode() == Response.OK && method.equals(Request.OPTIONS))) {
 			isContactSystem = false;
 		} else {
