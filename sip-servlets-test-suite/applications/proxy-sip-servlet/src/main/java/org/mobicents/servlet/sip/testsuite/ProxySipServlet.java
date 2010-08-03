@@ -36,6 +36,8 @@ import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSessionEvent;
+import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
@@ -44,7 +46,7 @@ import org.mobicents.javax.servlet.sip.ProxyBranchListener;
 import org.mobicents.javax.servlet.sip.ProxyExt;
 import org.mobicents.javax.servlet.sip.ResponseType;
 
-public class ProxySipServlet extends SipServlet implements SipErrorListener, ProxyBranchListener, SipApplicationSessionListener {
+public class ProxySipServlet extends SipServlet implements SipErrorListener, ProxyBranchListener, SipSessionListener, SipApplicationSessionListener {
 	private static final String ERROR = "ERROR";
 	private static final String SIP_APPLICATION_SESSION_TIMEOUT = "sipApplicationSessionTimeout";
 	private static final long serialVersionUID = 1L;
@@ -156,7 +158,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		} else {
 			ArrayList<URI> uris = new ArrayList<URI>();
 			uris.add(uri1);
-			if(!fromURI.getUser().equals("unique-location")) {
+			if(!fromURI.getUser().contains("unique-location")) {
 				uris.add(uri2);
 			}
 			Proxy proxy = request.getProxy();
@@ -178,7 +180,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			if(obi == null) throw new NullPointerException("No loopback interface found.");
 
 			boolean recordRoute = true;
-			if(NON_RECORD_ROUTING.equals(fromURI.getUser())) {		
+			if(fromURI.getUser().contains(NON_RECORD_ROUTING)) {		
 				recordRoute = false;
 				logger.info("not record routing");
 			}
@@ -376,5 +378,20 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		if(ev.getApplicationSession().getAttribute(SIP_APPLICATION_SESSION_TIMEOUT) != null) {
 			ev.getApplicationSession().setInvalidateWhenReady(false);
 		}
+	}
+
+	public void sessionCreated(SipSessionEvent se) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionDestroyed(SipSessionEvent se) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionReadyToInvalidate(SipSessionEvent se) {
+		logger.info("sipSessionReadyToInvalidate " +  se.getSession().getId());
+		sendMessage("sipSessionReadyToInvalidate", (Integer) se.getSession().getAttribute("contactPort"), (String) se.getSession().getAttribute("transport"));
 	}
 }
