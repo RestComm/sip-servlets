@@ -33,6 +33,7 @@ import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
@@ -103,6 +104,9 @@ public class TimersSipServlet
 		if(fromString.contains("checkReload")) {
 			TimerService timerService = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);
 			timerService.createTimer(request.getApplicationSession(), 1000, false, null);
+		} else if(fromString.contains("expExtInDialog")) {
+			request.getApplicationSession().setAttribute("expExtInDialog", "true");
+			request.getApplicationSession().setAttribute("sipSessionId", request.getSession().getId());
 		} else {
 			//create a timer to test the feature				
 			TimerService timerService = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);
@@ -119,6 +123,8 @@ public class TimersSipServlet
 
 		if("MESSAGE".equals(resp.getMethod())) {
 			resp.getSession().invalidate();
+		} else if("INVITE".equals(resp.getMethod())) {
+			resp.createAck().send();
 		}
 	}
 
@@ -144,28 +150,44 @@ public class TimersSipServlet
 			logger.error("ClassLoader " + cl);
 			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
 		}
-		if(!ev.getApplicationSession().isReadyToInvalidate() && ev.getApplicationSession().getAttribute(ALREADY_EXTENDED) == null) {
-			logger.info("extending lifetime of sip app session" +  ev.getApplicationSession());
-			ev.getApplicationSession().setExpires(1);
-			ev.getApplicationSession().setAttribute(ALREADY_EXTENDED, Boolean.TRUE);
+		boolean sendMessage = true;
+		if(ev.getApplicationSession().getAttribute("expExtInDialog") == null) {
+			if(!ev.getApplicationSession().isReadyToInvalidate() && ev.getApplicationSession().getAttribute(ALREADY_EXTENDED) == null) {
+				logger.info("extending lifetime of sip app session" +  ev.getApplicationSession());
+				ev.getApplicationSession().setExpires(1);
+				ev.getApplicationSession().setAttribute(ALREADY_EXTENDED, Boolean.TRUE);
+			}						
+		} else {
+			if(ev.getApplicationSession().getAttribute("reInviteSent") == null) {
+				SipSession sipSession = ev.getApplicationSession().getSipSession((String) ev.getApplicationSession().getAttribute("sipSessionId"));
+				ev.getApplicationSession().setAttribute("reInviteSent", "true");
+				try {
+					sipSession.createRequest("INVITE").send();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				sendMessage = false;
+			}
 		}
-		
-		SipFactory storedFactory = (SipFactory)ev.getApplicationSession().getAttribute("sipFactory");		
-		try {
-			SipServletRequest sipServletRequest = storedFactory.createRequest(
-					ev.getApplicationSession(), 
-					"MESSAGE", 
-					"sip:sender@sip-servlets.com", 
-					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
-			sipServletRequest.setRequestURI(sipUri);
-			sipServletRequest.setContentLength(SIP_APP_SESSION_EXPIRED.length());
-			sipServletRequest.setContent(SIP_APP_SESSION_EXPIRED, CONTENT_TYPE);
-			sipServletRequest.send();
-		} catch (ServletParseException e) {
-			logger.error("Exception occured while parsing the addresses",e);
-		} catch (IOException e) {
-			logger.error("Exception occured while sending the request",e);			
+		if(sendMessage) {
+			SipFactory storedFactory = (SipFactory)ev.getApplicationSession().getAttribute("sipFactory");		
+			try {
+				SipServletRequest sipServletRequest = storedFactory.createRequest(
+						ev.getApplicationSession(), 
+						"MESSAGE", 
+						"sip:sender@sip-servlets.com", 
+						"sip:receiver@sip-servlets.com");
+				SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+				sipServletRequest.setRequestURI(sipUri);
+				sipServletRequest.setContentLength(SIP_APP_SESSION_EXPIRED.length());
+				sipServletRequest.setContent(SIP_APP_SESSION_EXPIRED, CONTENT_TYPE);
+				sipServletRequest.send();
+			} catch (ServletParseException e) {
+				logger.error("Exception occured while parsing the addresses",e);
+			} catch (IOException e) {
+				logger.error("Exception occured while sending the request",e);			
+			}
 		}
 	}
 	

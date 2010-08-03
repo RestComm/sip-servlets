@@ -64,7 +64,6 @@ public class DefaultSasTimerTask implements SipApplicationSessionTimerTask {
 			}
 			final SipContext sipContext = sipApplicationSession.getSipContext();
 			final SipApplicationSessionTimerTask expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(sipApplicationSession);
-//			sipContext.getSipApplicationSessionTimerService().cancel(expirationTimerTask);
 			sipApplicationSession.setExpirationTimerTask(expirationTimerTask);					
 			expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sleep, TimeUnit.MILLISECONDS);
 		} else {
@@ -77,14 +76,30 @@ public class DefaultSasTimerTask implements SipApplicationSessionTimerTask {
 		sipContext.enterSipApp(getSipApplicationSession(), null);
 		sipContext.enterSipAppHa(true);
 		try {
+			getSipApplicationSession().setExpirationTimerTask(null);
 			getSipApplicationSession().notifySipApplicationSessionListeners(SipApplicationSessionEventType.EXPIRATION);
 			//It is possible that the application grant an extension to the lifetime of the session, thus the sip application
 			//should not be treated as expired.
 			if(getDelay() <= 0) {
-				
 				getSipApplicationSession().setExpired(true);
 				if(getSipApplicationSession().isValidInternal()) {			
 					getSipApplicationSession().invalidate();				
+				}
+			} else {
+				if(getSipApplicationSession().getExpirationTimerTask() == null) {					
+					long sleep = sipApplicationSession.getExpirationTimeInternal() - System.currentTimeMillis();
+					if(logger.isDebugEnabled()) {
+						logger.debug("expiration timer task is null so the application has extended the session lifetime indirectly by sending an indialog request, rescheduling the sip app session " + sipApplicationSession.getId() + "to expire in " + sleep + " ms");
+					}
+					if(sleep > 0) {
+						final SipApplicationSessionTimerTask expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(sipApplicationSession);
+						sipApplicationSession.setExpirationTimerTask(expirationTimerTask);					
+						expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sleep, TimeUnit.MILLISECONDS);
+					}
+				} else {
+					if(logger.isDebugEnabled()) {
+						logger.debug("expiration timer task is non null so the application has extended the session lifetime directly through setExpires");
+					}
 				}
 			}
 		} finally {							

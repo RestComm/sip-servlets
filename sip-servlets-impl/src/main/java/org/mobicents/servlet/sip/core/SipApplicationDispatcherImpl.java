@@ -888,11 +888,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 								logger.debug("don't Invalidate Proxy session");
 							}
 							return;
-						} else {
-							if(logger.isDebugEnabled()) {
-								logger.debug("Proxy session is being invalidated on server transaction termination " + sipSessionKey);
-							}
-						}
+						} 
 						if(logger.isDebugEnabled()) {
 							logger.debug("sip session " + sipSessionKey + " is valid ? :" + sipSessionImpl.isValidInternal());
 							if(sipSessionImpl.isValidInternal()) {

@@ -30,7 +30,6 @@ import java.text.ParseException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Semaphore;
 
 import javax.servlet.http.HttpSession;
@@ -315,6 +314,10 @@ public class MobicentsSipApplicationSessionFacade implements
 
 	public Set<MobicentsSipSession> getSipSessions() {
 		return sipApplicationSession.getSipSessions();
+	}
+
+	public SipApplicationSessionTimerTask getExpirationTimerTask() {
+		return sipApplicationSession.getExpirationTimerTask();
 	}
 
 }

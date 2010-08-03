@@ -135,6 +135,32 @@ public class TimersSipServletTest extends SipServletTestCase {
 		}	
 	}
 	
+	public void testTimerExpirationExtensionByInDialogRequest() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "expExtInDialog";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);	
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());			
+		Thread.sleep(APP_SESSION_TIMEOUT);
+		assertTrue(sender.isInviteReceived());	
+		assertFalse(sender.getAllMessagesContent().contains("sipAppSessionExpired"));
+		Thread.sleep(APP_SESSION_TIMEOUT);
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		assertTrue(sender.getAllMessagesContent().contains("sipAppSessionExpired"));	
+	}
+	
 	// Issue 1478 : http://code.google.com/p/mobicents/issues/detail?id=1478
 	// Attempting to use the TimerService after reloading a servlet throws a RejectedExecutionException
 	public void testTimerReloading() throws InterruptedException, SipException, ParseException, InvalidArgumentException {

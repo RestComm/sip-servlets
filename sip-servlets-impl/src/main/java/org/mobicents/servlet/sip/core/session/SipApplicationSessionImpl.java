@@ -651,7 +651,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 
 	private void cancelExpirationTimer() {
-		sipContext.getSipApplicationSessionTimerService().cancel(expirationTimerTask);		
+		sipContext.getSipApplicationSessionTimerService().cancel(expirationTimerTask);
+		expirationTimerTask = null;
 	}
 
 	/*
@@ -829,7 +830,6 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 //			this.expirationTime = -1;
 			if(expirationTimerTask != null) {
 				cancelExpirationTimer();
-				expirationTimerTask = null;	
 				// Fix for Issue 1678 : SipApplicationSession.setExpires() doesn't work sometimes
 				// the global sipApplicationSessionTimeout needs to be reset as well
 				sipApplicationSessionTimeout = deltaMinutes;
@@ -857,7 +857,6 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 					logger.debug("sip application session "+ key +" will expires at " + new SimpleDateFormat().format(calendar.getTime()));
 				}
 				cancelExpirationTimer();
-				expirationTimerTask = null;
 //				expirationTimerFuture = null;
 			}
 			expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(this);
@@ -1192,6 +1191,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		this.expirationTimerTask = expirationTimerTask;
 	}
 
+	public SipApplicationSessionTimerTask getExpirationTimerTask() {
+		return this.expirationTimerTask;
+	}
+
+	
 	public void setExpired(boolean hasExpired) {
 		expired = hasExpired;
 	}
