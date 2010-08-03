@@ -135,6 +135,9 @@ public class TimersSipServletTest extends SipServletTestCase {
 		}	
 	}
 	
+	// Test Issue 1698 : http://code.google.com/p/mobicents/issues/detail?id=1698
+	// SipApplicationSession Expiration Timer is not reset and so does not fire if 
+	// an indialog request is sent from within sessionExpired callback
 	public void testTimerExpirationExtensionByInDialogRequest() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		String fromName = "expExtInDialog";
 		String fromSipAddress = "sip-servlets.com";
