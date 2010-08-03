@@ -5,7 +5,7 @@
 ]>
 <section id="stf-Seam_Telco_Framework">
     <title>Seam Telco Framework</title>
-      <para>The Seam Telco Framework (STF) is a telecommunications application framework based on the JSR-289 specification, and JBoss Seam.  The framework plugs the SIP Servlets 1.1 stack and the Media Server Control API into new or existing JBoss Seam applications.  This allows Seam components to implement both the Web and telecommunication logic of the applications.</para>
+      <para>The Seam Telco Framework (STF) is a telecommunications application framework based on the JSR-289 specification, and JBoss Seam.  The framework plugs the SIP Servlets 1.1 stack into new or existing JBoss Seam applications. Media is achieved through JSR-309. This allows Seam components to implement both the Web and telecommunication logic of the applications.</para>
       <para>The primary goals of the STF are to: </para>
       <itemizedlist>
         <listitem><para>Unify Web, SIP, and media telecommunication applications.</para></listitem>

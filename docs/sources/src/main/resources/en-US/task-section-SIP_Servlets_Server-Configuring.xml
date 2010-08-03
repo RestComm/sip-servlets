@@ -115,6 +115,9 @@ ipAddress="127.0.0.1"
             <listitem>
               <para>gov.nist.javax.sip.REENTRANT_LISTENER=true</para>
             </listitem>
+            <listitem>
+              <para>gov.nist.javax.sip.MAX_FORK_TIME_SECONDS=1. If set to a value lower than or equal to 0. Dialog Forking will not be supported by Mobicents Sip Servlets.</para>
+            </listitem>            
           </itemizedlist>
           <para>&PLATFORM_NAME; SIP Servlets also adds its own properties to allow for even more configuration and flexibility :</para>
           <itemizedlist>
@@ -163,7 +166,13 @@ ipAddress="127.0.0.1"
  className="org.mobicents.servlet.sip.startup.SipStandardService"
  sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
  additionalParameterableHeaders="Header1,Header2" 
- baseTimerInterval="500" dispatcherThreadPoolSize="4"
+ bypassResponseExecutor="false" 
+ bypassRequestExecutor="false" 
+ baseTimerInterval="500"
+ t2Interval="4000"
+ t4Interval="5000"
+ timerDInterval="32000"
+ dispatcherThreadPoolSize="4"
  darConfigurationFileLocation="file:///home/silas/workspaces/mobicents-sip-servlets/
  sip-servlets-examples/reinvite-demo/reinvite-dar.properties">]]>
  </programlisting>
@@ -196,11 +205,42 @@ ipAddress="127.0.0.1"
         </listitem>
       </varlistentry>
       <varlistentry>
+        <term>bypassRequestExecutor/bypassResponseExecutor</term>
+        <listitem>
+          <para>If set to false, the SIP Servlets server uses a ThreadPoolExecutor linked to a LinkedBlockingQueue to dispatch the request/response threads. The container can thus handles two different responses (for example a 180 Ringing and a 200 OK) concurrently, but a race condition can occur where the second response overtakes the first one (200 OK dispatched to the application before the 180 Ringing) on UDP.</para>
+          <para>So those flags are true by default thus using jain sip serializing per transaction to ensure such race conditions don't occur. </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
         <term>baseTimerInterval</term>
         <listitem>
           <para>Specifies the <literal>T1</literal> Base Timer Interval, which allows the SIP Servlets Container to adjust its timers depending on network conditions.  The default interval is 500 (milliseconds).</para>
           <para>For more information about  available timers, refer to  <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
-          <para>Most of the timers present in the tables depend on <literal>T1</literal>,  except for <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal> (for the client transactions). The underlying SIP Servlets JAIN SLEE stack places further conditions on <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal> through  <literal>baseTimerInterval</literal>.</para>
+		  <para>All of the timers present in the tables depend on <literal>T1</literal>, <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal> </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>t2Interval</term>
+        <listitem>
+          <para>Specifies the <literal>T2</literal> Interval, which allows the SIP Servlets Container to adjust its timers depending on network conditions.  The default interval is 4000 (milliseconds).</para>
+          <para>For more information about available timers, refer to  <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
+          <para>All of the timers present in the tables depend on <literal>T1</literal>, <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal> </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>t4Interval</term>
+        <listitem>
+          <para>Specifies the <literal>T4</literal> Interval, which allows the SIP Servlets Container to adjust its timers depending on network conditions.  The default interval is 5000 (milliseconds).</para>
+          <para>For more information about available timers, refer to  <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
+          <para>All of the timers present in the tables depend on <literal>T1</literal>, <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal> </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>timerDInterval</term>
+        <listitem>
+          <para>Specifies the <literal>Timer D</literal> Interval, which allows the SIP Servlets Container to adjust its timers depending on network conditions.  The default interval is 32000 (milliseconds).</para>
+          <para>For more information about available timers, refer to  <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
+          <para>All of the timers present in the tables depend on <literal>T1</literal>, <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal> </para>
         </listitem>
       </varlistentry>
       <varlistentry>
@@ -222,5 +262,16 @@ ipAddress="127.0.0.1"
         <para>Logging of the NIST SIP stack, which is configured in the <literal>Connector</literal> element of the container&apos;s <filename>server.xml</filename> configuration file.</para>
       </listitem>
     </itemizedlist>
+    <para>You can setup the logging so that the NIST SIP Stack will log into the container logs</para>
+	<para>To use LOG4J in NIST SIP Stack use the following, You need to define a category in <filename>JBOSS_HOME/server/default/conf/jboss-log4j.xml</filename> and set it to <literal>off</literal></para>
+	<example id="bsssc-Configuring_the_Stack_Logs_in_the_Container_log4j.xml">
+		<title>Configuring the NIST SIP Stack to log into the Container&apos;s logs</title>
+		<programlisting linenumbering="unnumbered" role="XML"><![CDATA[
+			<category name="gov.nist">
+			<priority value="OFF"/>
+			</category>]]>
+	 	</programlisting>
+ 	</example>
+	<para>So that this category is used in MSS you need to specify it in <filename>JBOSS_HOME/server/default/conf/mss-sip-stack.properties</filename> as well by adding this property <literal>gov.nist.javax.sip.LOG4J_LOGGER_NAME=gov.nist</literal> and setting this property <literal>gov.nist.javax.sip.TRACE_LEVEL=LOG4J</literal></para>
   </section>
 </section>

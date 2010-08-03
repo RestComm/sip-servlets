@@ -33,21 +33,7 @@ I've changed them for you so you can see how the nesting is better.
       Default Application Router located in
       <literal>TOMCAT_HOME/lib/sip-servlets-application-router-*.jar</literal></para>
       </step>
-    </procedure>
-    <procedure>
-      <title>Installing DFCAR on JBoss 4.2.x</title>
-      <step>
-        <title>Deploy the DFCAR</title>
-        <para>Drop the <filename>dfcar.jar</filename> from the ECharts distribution package in
-      <literal>JBOSS_HOME/server/default/deploy/jboss-web.deployer</literal>
-      directory.</para>
-      </step>
-      <step>
-        <title>Remove the DAR</title>
-        <para>Remove the &PLATFORM_NAME; Default Application Router located in
-      <literal>JBOSS_HOME/server/default/deploy/jboss-web.deployer/sip-servlets-application-router-*.jar</literal></para>
-      </step>
-    </procedure>
+    </procedure>    
     <procedure>
       <title>Installing DFCAR on JBoss 5.1.x</title>
       <step>

@@ -56,7 +56,7 @@
 	</itemizedlist>
 	<para>
 		Naturally, if you installed the <application>&PLATFORM_NAME; Platform</application> or one of the &PLATFORM_NAME; server binary releases which <emphasis>do not</emphasis> bundle <application>JBoss AS</application>, yet requires it to run, then you should <ulink
-			url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Installation_Guide/4/html/index.html">install <application>JBoss AS</application>
+			url="http://docs.jboss.org/jbossas/docs/Installation_And_Getting_Started_Guide/5/html_single/index.html">install <application>JBoss AS</application>
 		</ulink> before setting <envar>JBOSS_HOME</envar> or proceeding with anything else.
 	</para>
 	<formalpara>

@@ -16,13 +16,13 @@
   </formalpara>
   <itemizedlist>
     <listitem>
-      <para>The <filename>server/default/deploy</filename> directory contains both HTTP and SIP Servlet applications (WAR and SAR2 files).</para>
+      <para>The <filename>server/default/deploy</filename> directory contains both HTTP and SIP Servlet applications.</para>
     </listitem>
     <listitem>
-      <para>The <filename>server/default/deploy/jboss-web.deployer</filename> and <filename>server/default/deploy/jbossweb.sar</filename> units have been modified to provide extended classes to the standard JBoss container classes, in order to allow SIP applications to be loaded and the SIP stack to be started.</para>
+      <para>The <filename>server/default/deploy/jbossweb.sar</filename> units have been modified to provide extended classes to the standard JBoss container classes, in order to allow SIP applications to be loaded and the SIP stack to be started.</para>
     </listitem>
     <listitem>
-      <para>The <filename>server/default/deploy/jboss-web.deployer</filename> and <filename>server/default/deploy/jbossweb.sar</filename> <filename>context.xml</filename> files have been modified to allow the extended manager to manage SIP sessions and SIP application sessions in addition to HTTP sessions.</para>
+      <para>The <filename>server/default/deploy/jbossweb.sar</filename> <filename>context.xml</filename> files have been modified to allow the extended manager to manage SIP sessions and SIP application sessions in addition to HTTP sessions.</para>
     </listitem>
     <listitem>
       <para>The <filename>server/default/deploy/jbossweb.sar/</filename> <filename>server.xml</filename> file has been modified to provide extended classes to common JBoss Web containers.  The classes allow SIP applications to be loaded, and the SIP stack to be started.</para>
@@ -34,13 +34,13 @@
       <para>The <filename>server/default/deployers/</filename> <filename>metadata-deployer-jboss-beans.xml</filename> file has been modified to allow JBoss to parse sip.xml deployment descriptors and SIP metadata annotations.</para>
     </listitem>
     <listitem>
-      <para>The <filename>server/default/deploy/jboss-web.deployer/META-INF/jboss-service.xml</filename> file and the <filename>server/default/deploy/jboss-web.deployer/META-INF/webserver-xmbean.xml</filename> file have been modified so that it is now possible for JBoss containers to correctly deploy SIP servlets and converged applications.</para>
+      <para>The <filename>server/default/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml</filename> file have been modified so that it is now possible for JBoss containers to correctly deploy SIP servlets and converged applications.</para>
     </listitem>
     <listitem>
       <para>A <filename>dars</filename> directory containing all of the Default Application Router (DAR) properties files for using the various SIP Servlets applications (which come bundled with the release) has been added to the <filename>server/default/conf</filename> directory.</para>
     </listitem>
     <listitem>
-      <para>Additional JAR files have been added to enable SIP Servlet functionality; these are located in the <filename>server/default/deploy/jboss-web.deployer/</filename> and <filename>server/default/deploy/jbossweb.sar/</filename> directories.</para>
+      <para>Additional JAR files have been added to enable SIP Servlet functionality; these are located in the <filename>server/default/deploy/jbossweb.sar/</filename>, <filename>server/default/deployers/jbossweb.deployer/</filename> and <filename>common/lib</filename>directories.</para>
     </listitem>
   </itemizedlist>
 <!--<bridgehead id="bssswjicar-Installing_the_Java_Development_Kit">Installing the Java Development Kit</bridgehead>-->  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="Common_Content/Java_Development_Kit-Installing_Configuring_and_Running.xml"/>
@@ -164,8 +164,8 @@
   </section>
   <section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Running">
     <title>Running</title>
-    <para>To start the server, execute one of the startup scripts in the <filename>bin</filename> directory (on Linux or Windows), or by double-clicking the <filename>run.bat</filename> executable batch file in that same directory (on Windows only).  It is recommended that the JBoss Application Server is started using the terminal or Command Prompt because the messages displayed during startup can be used to debug, and subsequently correct, any problems.  In the Linux terminal or Command Prompt, a successfully started server will return the following information (ending with &quot;Started in 23s:648ms&quot;):</para>
-    <programlisting><![CDATA[17:48:01,247 INFO  [Server] JBoss (MX MicroKernel) [4.2.2.GA (build: SVNTag=JBoss_4_2_2_GA date=200710221139)] Started in 20s:861ms]]></programlisting>
+    <para>To start the server, execute one of the startup scripts in the <filename>bin</filename> directory (on Linux or Windows), or by double-clicking the <filename>run.bat</filename> executable batch file in that same directory (on Windows only).  It is recommended that the JBoss Application Server is started using the terminal or Command Prompt because the messages displayed during startup can be used to debug, and subsequently correct, any problems.  In the Linux terminal or Command Prompt, a successfully started server will return the following information :</para>
+    <programlisting><![CDATA[22:39:07,598 INFO  [SipApplicationDispatcherImpl] Mobicents Sip Servlets <version> - revision <rev number> started.]]></programlisting>
     <para>Detailed instructions are given below, arranged by platform.</para>
     <procedure>
       <title>Running &SHORT_PLATFORM_NAME; for JBoss on Linux</title>

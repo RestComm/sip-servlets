@@ -16,8 +16,8 @@
 		<short.platform.name>MSS</short.platform.name>
 		<cmd.platform.name>mss</cmd.platform.name>
 		<home.link>mobicents-all-1.2.1.GA-jboss-4.2.3.GA/jboss/</home.link>
-		<mss4j.release.zip>mss-1.0-jboss-4.2.3.GA-0904221307.zip</mss4j.release.zip>
-		<mss4t.release.zip>mss-1.0.GA-apache-tomcat-6.0.14-0904221257.zip</mss4t.release.zip>	
+		<mss4j.release.zip>mss-1.3.1-jboss-jdk6-5.1.0.GA-1007051519.zip</mss4j.release.zip>
+		<mss4t.release.zip>mss-1.3.1-apache-tomcat-6.0.20-1007051527.zip</mss4t.release.zip>	
 		<author.email.ivelin>ivelin.atanasoff.ivanov (at) gmail.com</author.email.ivelin>
 		<author.email.jean>jean.deruelle (at) gmail.com</author.email.jean>
 		<author.email.vlad>vladimir.ralev (at) gmail.com</author.email.vlad>

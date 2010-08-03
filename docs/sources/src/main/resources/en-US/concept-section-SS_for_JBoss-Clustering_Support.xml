@@ -44,40 +44,7 @@
   </section>-->    <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Configuring">
       <title>Configuring</title>
       <para>Once installed, the &SHORT_PLATFORM_NAME; for JBoss binary distribution requires only minor configuration in order to enable clustering. </para>
-      <para>SIP, and HTTP session state clustering is  pre-configured straight out of the binary distribution. However, to enable session replication in a node, you must tag it as <literal>&lt;distributable/&gt;</literal> in the <filename>web.xml</filename> descriptor. This can be done either individually per application or globally for all applications.</para>
-      <important id="ssfjcs-You_Must_Use_the_all_Server_Configuration_Profile">
-        <title>You Must Use the &quot;all&quot; Server Configuration Profile</title>
-        <para>You will notice that the following instructions modify one or more properties in the configuration files for the &quot;all&quot; Server Configuration Profile. This is evident in the path names given below. When we start each &SHORT_PLATFORM_NAME; for JBoss node, we will invoke <filename>run.sh</filename> (or <filename>run.bat</filename>) with the <option>-c all</option> option, which activates the clustering capabilities for that node. The server will then consult the configuration files under the <filename>&lt;topmost_directory&gt;/server/all/</filename> directory, and <emphasis>not</emphasis> in the the <filename>&lt;topmost_directory&gt;/server/default/</filename> subdirectories. Therefore, it is important to modify the correct files.</para>
-      </important>
-      <para>To change the correct profile, open the <filename>web.xml</filename> configuration file, which is stored in the <filename>&lt;install_directory&gt;/server/all/deploy/jboss-web.deployer/conf/</filename> directory, </para>
-      <para>Add the empty element <literal>&lt;distributable/&gt;</literal> as a child of the  root element &lt;<literal>web-app&gt;.</literal></para>
-      <para>This one configuration change is sufficient for enabling clustering capabilities in &SHORT_PLATFORM_NAME; for JBoss servers for all applications. For further information on session replication and clustering with JBoss, refer to <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Clustering_Guide/beta422/html/clustering-http-app.html">Enabling session replication in your application</ulink> in the <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Getting_Started_Guide/beta422/html/index.html">JBoss Application Server Getting Started Guide</ulink>.</para>
-      <example id="ssfjcs-Enabling_Node_Session_Replication_in_the_web.xml_Deployer">
-        <title>Enabling Node Session Replication in the Default web.xml Descriptor</title>
-        <programlisting linenumbering="unnumbered" role="XML"><![CDATA[<?xml version="1.0" encoding="utf-8"?><?xml version="1.0" encoding="ISO-8859-1"?>
-<web-app
- xmlns="http://java.sun.com/xml/ns/j2ee"
- xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"
- version="2.4">
-  <!-- ======================== Introduction ============================== -->
-  <!-- This document defines default values for *all* web applications      -->
-  <!-- loaded into this instance of Tomcat.  As each application is         -->
-  <!-- deployed, this file is processed, followed by the                    -->
-  <!-- "/WEB-INF/web.xml" deployment descriptor from your own               -->
-  <!-- applications.                                                        -->
-  <!--                                                                      -->
-  <!-- WARNING:  Do not configure application-specific resources here!      -->
-  <!-- They should go in the "/WEB-INF/web.xml" file in your application.   -->
-  <!-- =========== Common Context Params ================================== -->
-  <!-- JBossInjectionProvider provides resource injection for managed beans. -->
-  <!-- See JSF 1.2 spec section 5.4 for details.                             -->
-  <distributable/>
- <context-param>
-  <param-name>com.sun.faces.injectionProvider</param-name>
-  <param-value>org.jboss.web.jsf.integration.injection.JBossInjectionProvider</param-value>
- </context-param>]]></programlisting>
-      </example>
+      <para>SIP, and HTTP session state clustering is  pre-configured straight out of the binary distribution. However, to enable session replication in a node, you must tag it as <literal>&lt;distributable/&gt;</literal> both in the <filename>web.xml</filename> and <filename>sip.xml</filename> descriptors. This can be done only individually (per application).</para>
     </section>
     <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Running">
       <title>Running</title>
@@ -100,6 +67,7 @@
       <programlisting role="XML">&lt;Service name=&quot;jboss.web&quot; 
       className=&quot;org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService&quot;
   balancers=&quot;127.0.0.1&quot;  
+  sipPathName=&quot;org.mobicents.ha&quot;  
   sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
 concurrencyControlMode=&quot;None&quot; 
   darConfigurationFileLocation=&quot;conf/dars/mobicents-dar.properties&quot;&gt;

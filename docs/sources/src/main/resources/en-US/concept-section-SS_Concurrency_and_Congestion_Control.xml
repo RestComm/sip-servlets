@@ -33,8 +33,9 @@
     <para>The JSR 289 expert group does not specify how concurrency control should be implemented.  </para>
   </formalpara>
   <para>&PLATFORM_NAME; SIP Servlets for JBoss and &PLATFORM_NAME; SIP Servlets for Tomcat have concurrency control implemented as
-    a configurable mode, which defines the way in which the SIP Servlets Server
-    processes messages.  The following modes are provided, and cater for the particular setup required in an implementation:</para>
+    a configurable mode, which defines the way in which the SIP Servlets Server processes messages.</para>
+    <para>It has to be noted that this concurrency control mechanism is not cluster aware and will work per node only, it is not a cluster wide lock.</para> 
+    <para>The following modes are provided, and cater for the particular setup required in an implementation:</para>
   <variablelist>
     <varlistentry>
       <term>None</term>
@@ -210,9 +211,11 @@
  darConfigurationFileLocation=&quot;conf/dars/mobicents-dar.properties&quot;
  concurrencyControlMode=&quot;SipApplicationSession&quot;
  sipMessageQueueSize=&quot;1600&quot;
+ backToNormalSipMessageQueueSize=&quot;1300&quot;
  congestionControlCheckingInterval=&quot;2000&quot;
  congestionControlPolicy=&quot;DropMessage&quot;
- memoryThreshold=&quot;80&quot;&gt;</programlisting>
+ memoryThreshold=&quot;95&quot;
+ backToNormalMemoryThreshold=&quot;90&quot;&gt;</programlisting>
             </example>
             <para>Possible values for the
             <literal>concurrencyControlMode</literal> attribute include:
@@ -228,15 +231,19 @@
             <para>The following  default values for the concurrency and congestion control parameters are used regardless of whether the attributes are defined in the <filename>server.xml</filename> file:</para>
             <itemizedlist>
               <listitem>
-                <para>
-            sipMessageQueueSize =
-            &quot;1500&quot;</para>
+                <para>sipMessageQueueSize=&quot;1500&quot;</para>
+              </listitem>
+              <listitem>
+                <para>backToNormalSipMessageQueueSize=&quot;1300&quot;</para>
               </listitem>
               <listitem>
                 <para>congestionControlCheckingInterval=&quot;30000&quot; (30 seconds, in milliseconds)</para>
               </listitem>
               <listitem>
-                <para>memoryThreshold=&quot;90&quot; (in percentage)</para>
+                <para>memoryThreshold=&quot;95&quot; (in percentage)</para>
+              </listitem>
+               <listitem>
+                <para>backToNormalMemoryThreshold=&quot;90&quot; (in percentage)</para>
               </listitem>
               <listitem>
                 <para>congestionControlPolicy=&quot;ErrorResponse&quot;</para>
@@ -272,15 +279,19 @@
             <para>The following  default values for the concurrency and congestion control parameters are used regardless of whether the attributes are defined in the <filename>server.xml</filename> file:</para>
             <itemizedlist>
               <listitem>
-                <para>
-            sipMessageQueueSize =
-            &quot;1500&quot;</para>
+                <para>sipMessageQueueSize=&quot;1500&quot;</para>
+              </listitem>
+              <listitem>
+                <para>backToNormalSipMessageQueueSize=&quot;1300&quot;</para>
               </listitem>
               <listitem>
                 <para>congestionControlCheckingInterval=&quot;30000&quot; (30 seconds, in milliseconds)</para>
               </listitem>
               <listitem>
-                <para>memoryThreshold=&quot;90&quot; (in percentage)</para>
+                <para>memoryThreshold=&quot;95&quot; (in percentage)</para>
+              </listitem>
+               <listitem>
+                <para>backToNormalMemoryThreshold=&quot;90&quot; (in percentage)</para>
               </listitem>
               <listitem>
                 <para>congestionControlPolicy=&quot;ErrorResponse&quot;</para>
