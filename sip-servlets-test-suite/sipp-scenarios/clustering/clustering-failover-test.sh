@@ -95,6 +95,11 @@ if [ $# -eq 4 ]; then
 	            echo "Distributed example used is uas";
 	    		./sipp $MSS_IP:5080 -s NoAttributes -sf uas/clustering-uac-no-attrs.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
 	    		;;
+	    uas-remove-attributes)
+	    		rm ./uas/*.log
+	            echo "Distributed example used is uas";
+	    		./sipp $MSS_IP:5080 -s reinvite-RemoveAttributes -sf uas/clustering-reinvite-uac.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
+	    		;;
 	    uas-timer)
 	    		rm ./uas/*.log
 	            echo "Distributed example used is uas";

@@ -41,7 +41,6 @@ import javax.servlet.sip.SipSessionListener;
 import javax.sip.Dialog;
 
 import org.apache.catalina.Globals;
-import org.apache.catalina.session.StandardSession;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
@@ -615,6 +614,22 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 		}
 	}
 
+	public void removeAttribute(String name, boolean byPassValidCheck) {
+		// Name cannot be null
+		if (name == null)
+			throw new IllegalArgumentException(sm
+					.getString("clusteredSession.setAttribute.namenull"));
+
+		// Validate our current state
+		if (!isValid())
+			throw new IllegalStateException(sm
+					.getString("clusteredSession.setAttribute.ise"));
+		
+		// Replace or add this attribute
+		removeAttributeInternal(name, true);		
+	}
+
+	
 	/**
 	 * Returns whether the attribute's type is one that can be replicated.
 	 * 
@@ -1212,7 +1227,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			boolean localOnly, boolean notify) {
 
 		// Remove this attribute from our collection
-		Object value = removeAttributeInternal(name, localCall, localOnly);
+		Object value = removeJBossInternalAttribute(name, localCall, localOnly);
 
 		// Do we need to do valueUnbound() and attributeRemoved() notification?
 		if (!notify || (value == null)) {
@@ -1254,25 +1269,6 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 
 	}
 
-	/**
-	 * Exists in this class solely to act as an API-compatible bridge to the
-	 * deprecated {@link #removeJBossInternalAttribute(String)}.
-	 * JBossCacheClusteredSession subclasses will override this to call their
-	 * own methods that make use of localCall and localOnly
-	 * 
-	 * @param name
-	 * @param localCall
-	 * @param localOnly
-	 * @return
-	 * 
-	 * @deprecated will be replaced by removeJBossInternalAttribute(String,
-	 *             boolean, boolean)
-	 */
-	protected Object removeAttributeInternal(String name, boolean localCall,
-			boolean localOnly) {
-		return removeJBossInternalAttribute(name);
-	}
-
 	protected Object getAttributeInternal(String name) {
 		return getJBossInternalAttribute(name);
 	}
@@ -1291,12 +1287,8 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	// ------------------------------------------ JBoss internal abstract method
 
 	protected abstract Object getJBossInternalAttribute(String name);
-
-	/**
-	 * @deprecated will be replaced by removeJBossInternalAttribute(String,
-	 *             boolean, boolean)
-	 */
-	protected abstract Object removeJBossInternalAttribute(String name);
+	
+	protected abstract Object removeJBossInternalAttribute(String name, boolean localCall, boolean localOnly);
 
 	protected abstract Map getJBossInternalAttributes();
 

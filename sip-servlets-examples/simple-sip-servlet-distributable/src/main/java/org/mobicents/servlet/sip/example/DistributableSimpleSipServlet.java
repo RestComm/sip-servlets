@@ -54,6 +54,7 @@ public class DistributableSimpleSipServlet
 	private static final String SAS_TIMER_SEND_BYE = "sastimersendbye";
 	
 	private static final String NO_ATTRIBUTES = "NoAttributes";
+	private static final String REMOVE_ATTRIBUTES = "RemoveAttributes";
 	
 	//60 sec
 	private static final int DEFAULT_BYE_DELAY = 60000;
@@ -97,12 +98,22 @@ public class DistributableSimpleSipServlet
 	//			request.getSession().setAttribute("sipSessionActivationListener", new SipSessionActivationListenerAttribute());
 				request.getApplicationSession().setAttribute("INVITE", RECEIVED);
 	//			request.getSession().setAttribute("sipAppSessionActivationListener", new SipApplicationSessionActivationListenerAttribute());
-				if("reinvite".equals(((SipURI)request.getTo().getURI()).getUser())) {
+				if(((SipURI)request.getTo().getURI()).getUser().contains("reinvite")) {
+					if(logger.isInfoEnabled()) {			
+						logger.info("Distributable Simple Servlet: setting isReINVITE");
+					}
 					request.getSession().setAttribute("ISREINVITE", RECEIVED);
-				}
+				}				
 			} else {
-				request.getSession().setAttribute("REINVITE", RECEIVED);			
-				request.getApplicationSession().setAttribute("REINVITE", RECEIVED);
+				if((((SipURI)request.getTo().getURI()).getUser()).contains(REMOVE_ATTRIBUTES)) {
+					if(logger.isInfoEnabled()) {			
+						logger.info("Distributable Simple Servlet: removing isReINVITE");
+					}
+					request.getSession().removeAttribute("ISREINVITE");
+				} else {
+					request.getSession().setAttribute("REINVITE", RECEIVED);			
+					request.getApplicationSession().setAttribute("REINVITE", RECEIVED);
+				}
 			}
 		}
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
@@ -138,7 +149,19 @@ public class DistributableSimpleSipServlet
 		if(!(((SipURI)request.getFrom().getURI()).getUser()).contains(NO_ATTRIBUTES)) {
 			if(sipSessionInviteAttribute != null  && sipApplicationSessionInviteAttribute != null 				
 					&& RECEIVED.equalsIgnoreCase(sipSessionInviteAttribute) 
-					&& RECEIVED.equalsIgnoreCase(sipApplicationSessionInviteAttribute)) {			
+					&& RECEIVED.equalsIgnoreCase(sipApplicationSessionInviteAttribute)) {	
+				
+				if((((SipURI)request.getTo().getURI()).getUser()).contains(REMOVE_ATTRIBUTES)) {
+					if(logger.isInfoEnabled()) {			
+						logger.info("Distributable Simple Servlet: checking if isReINVITE present in removeattributes case");
+					}
+					if(request.getSession().getAttribute("ISREINVITE") !=null) {
+						SipServletResponse sipServletResponse = request.createResponse(500, "isReinvite attribute should have been removed");
+						sipServletResponse.send();
+						return;
+					}
+				}
+				
 				if(request.getSession().getAttribute("ISREINVITE") !=null && sipSessionReInviteAttribute != null  && sipApplicationSessionReInviteAttribute != null 				
 						&& RECEIVED.equalsIgnoreCase(sipSessionReInviteAttribute) 
 						&& RECEIVED.equalsIgnoreCase(sipApplicationSessionReInviteAttribute)) {
