@@ -15,7 +15,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package org.mobicents.servlet.sip.testsuite.simple;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
@@ -29,6 +31,7 @@ import javax.sip.header.ProxyAuthorizationHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.UserAgentHeader;
 import javax.sip.message.Request;
+import javax.sip.message.Response;
 
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
@@ -45,6 +48,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
 	private static final int TIMEOUT = 10000;	
+	private static final int DIALOG_TIMEOUT = 40000;
 //	private static final int TIMEOUT = 100000000;
 	
 	TestSipListener receiver;
@@ -479,6 +483,27 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);		
 		assertNotNull(receiver.getInviteRequest().getHeader(ProxyAuthorizationHeader.NAME));		
 		assertNotNull(receiver.getInviteRequest().getHeader(ProxyAuthenticateHeader.NAME));
+	}
+	
+	public void testShootistErrorResponse() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setProvisionalResponsesToSend(new ArrayList<Integer>());
+		receiver.setFinalResponseToSend(Response.SERVER_INTERNAL_ERROR);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();		
+		deployApplication("testErrorResponse", "true");
+		Thread.sleep(DIALOG_TIMEOUT);
+		List<String> allMessagesContent = receiver.getAllMessagesContent();
+		assertEquals(2,allMessagesContent.size());
+		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
+		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));
 	}
 
 	@Override

@@ -27,30 +27,38 @@ import javax.servlet.sip.Address;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipApplicationSessionEvent;
+import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSessionEvent;
+import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TelURL;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 import javax.servlet.sip.URI;
+import javax.sip.ListeningPoint;
 
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.SipSessionExt;
 
 public class ShootistSipServlet 
 		extends SipServlet 
-		implements SipServletListener,TimerListener {
+		implements SipServletListener,TimerListener, SipSessionListener, SipApplicationSessionListener {
 	private static final long serialVersionUID = 1L;
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final String ENCODE_URI = "encodedURI";
+	private static final String TEST_ERROR_RESPONSE = "testErrorResponse";
 	private static transient Logger logger = Logger.getLogger(ShootistSipServlet.class);	
 	@Resource
 	TimerService timerService;
+	@Resource
+	SipFactory sipFactory;
 	
 	/** Creates a new instance of ShootistSipServlet */
 	public ShootistSipServlet() {
@@ -284,6 +292,10 @@ public class ShootistSipServlet
 			}
 			sipServletRequest.setRequestURI(requestURI);
 		}
+		String testErrorResponse = ce.getServletContext().getInitParameter(TEST_ERROR_RESPONSE);
+		if(testErrorResponse != null) {
+			sipServletRequest.getApplicationSession().setAttribute(TEST_ERROR_RESPONSE, "true");
+		}		
 		if(sipServletRequest.getTo().getParameter("tag") != null) {
 			logger.error("the ToTag should be empty, not sending the request");
 			return;
@@ -341,6 +353,74 @@ public class ShootistSipServlet
 			} else {
 				sipServletRequest.setContentLength(0);
 			}
+			sipServletRequest.send();
+		} catch (ServletParseException e) {
+			logger.error("Exception occured while parsing the addresses",e);
+		} catch (IOException e) {
+			logger.error("Exception occured while sending the request",e);			
+		}
+	}
+
+	public void sessionCreated(SipSessionEvent se) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionDestroyed(SipSessionEvent se) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionReadyToInvalidate(SipSessionEvent se) {
+		if(se.getSession().getApplicationSession().getAttribute(TEST_ERROR_RESPONSE) != null) {
+			sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipSessionReadyToInvalidate", null);
+		}
+	}
+
+	public void sessionCreated(SipApplicationSessionEvent ev) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionDestroyed(SipApplicationSessionEvent ev) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionExpired(SipApplicationSessionEvent ev) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
+		if(ev.getApplicationSession().getAttribute(TEST_ERROR_RESPONSE) != null) {
+			sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipAppSessionReadyToInvalidate", null);
+		}
+	}
+	
+	/**
+	 * @param sipApplicationSession
+	 * @param storedFactory
+	 */
+	private void sendMessage(SipApplicationSession sipApplicationSession,
+			SipFactory storedFactory, String content, String transport) {
+		try {
+			SipServletRequest sipServletRequest = storedFactory.createRequest(
+					sipApplicationSession, 
+					"MESSAGE", 
+					"sip:sender@sip-servlets.com", 
+					"sip:receiver@sip-servlets.com");
+			sipServletRequest.addHeader("Ext", "Test 1, 2 ,3");
+			SipURI sipUri = storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+			if(transport != null) {
+				if(transport.equalsIgnoreCase(ListeningPoint.TCP)) {
+					sipUri = storedFactory.createSipURI("receiver", "127.0.0.1:5081");
+				}
+				sipUri.setTransportParam(transport);
+			}
+			sipServletRequest.setRequestURI(sipUri);
+			sipServletRequest.setContentLength(content.length());
+			sipServletRequest.setContent(content, CONTENT_TYPE);
 			sipServletRequest.send();
 		} catch (ServletParseException e) {
 			logger.error("Exception occured while parsing the addresses",e);
