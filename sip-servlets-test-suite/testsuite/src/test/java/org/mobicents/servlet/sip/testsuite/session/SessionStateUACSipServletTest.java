@@ -182,6 +182,7 @@ public class SessionStateUACSipServletTest extends SipServletTestCase {
 	
 	// Test for SS spec 11.1.6 transaction timeout notification
 	// Also Tests Issue 1470 http://code.google.com/p/mobicents/issues/detail?id=1470
+	// Also Tests Issue 1693 http://code.google.com/p/mobicents/issues/detail?id=1693
 	public void testTransactionTimeoutResponse() throws Exception {
 		receiverProtocolObjects =new ProtocolObjects(
 				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
@@ -198,7 +199,7 @@ public class SessionStateUACSipServletTest extends SipServletTestCase {
 		
 		deployApplication("testTimeout", "true", ConcurrencyControlMode.SipSession);
 		
-		Thread.sleep(TIMEOUT_EXPIRATION);
+		Thread.sleep(TIMEOUT);
 		
 		Iterator<String> allMessagesIterator = receiver.getAllMessagesContent().iterator();		
 		while (allMessagesIterator.hasNext()) {
@@ -206,7 +207,8 @@ public class SessionStateUACSipServletTest extends SipServletTestCase {
 			logger.info(message);
 			
 		}
-		assertTrue(receiver.getAllMessagesContent().contains("sessionExpired"));
+		assertTrue(receiver.getAllMessagesContent().contains("sipSessionReadyToInvalidate"));
+		assertTrue(receiver.getAllMessagesContent().contains("sipAppSessionReadyToInvalidate"));
 		assertTrue(receiver.txTimeoutReceived);
 	}	
 

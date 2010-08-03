@@ -142,7 +142,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());		
 	}
-	
+	// Also Tests Issue 1693 http://code.google.com/p/mobicents/issues/detail?id=1693
 	public void testShootistCancel() throws Exception {
 //		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(
@@ -157,8 +157,12 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		receiverProtocolObjects.start();
 		tomcat.startTomcat();
 		deployApplication("cancel", "true");
-		Thread.sleep(TIMEOUT);
-		assertTrue(receiver.isCancelReceived());		
+		Thread.sleep(DIALOG_TIMEOUT + TIMEOUT);
+		assertTrue(receiver.isCancelReceived());	
+		List<String> allMessagesContent = receiver.getAllMessagesContent();
+		assertEquals(2,allMessagesContent.size());
+		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
+		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));
 	}
 	
 	public void testShootistSetContact() throws Exception {
@@ -485,6 +489,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		assertNotNull(receiver.getInviteRequest().getHeader(ProxyAuthenticateHeader.NAME));
 	}
 	
+	// Tests Issue 1693 http://code.google.com/p/mobicents/issues/detail?id=1693
 	public void testShootistErrorResponse() throws Exception {
 		receiverProtocolObjects =new ProtocolObjects(
 				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
@@ -499,7 +504,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		receiverProtocolObjects.start();
 		tomcat.startTomcat();		
 		deployApplication("testErrorResponse", "true");
-		Thread.sleep(DIALOG_TIMEOUT);
+		Thread.sleep(DIALOG_TIMEOUT + TIMEOUT);
 		List<String> allMessagesContent = receiver.getAllMessagesContent();
 		assertEquals(2,allMessagesContent.size());
 		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));

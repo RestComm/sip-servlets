@@ -34,6 +34,8 @@ import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSessionEvent;
+import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
 
 import org.apache.log4j.Logger;
@@ -41,7 +43,7 @@ import org.apache.log4j.Logger;
 
 public class SessionStateUACSipServlet
 		extends SipServlet 
-		implements SipServletListener, SipApplicationSessionListener {
+		implements SipServletListener, SipApplicationSessionListener, SipSessionListener {
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(SessionStateUACSipServlet.class);
 	
@@ -197,8 +199,27 @@ public class SessionStateUACSipServlet
 	}
 
 	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
+		SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
+		if(getServletContext().getInitParameter("testTimeout") != null) {
+			sendMessage(sipFactory, "sipAppSessionReadyToInvalidate");
+		}
+	}
+
+	public void sessionCreated(SipSessionEvent se) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public void sessionDestroyed(SipSessionEvent se) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void sessionReadyToInvalidate(SipSessionEvent se) {
+		SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
+		if(getServletContext().getInitParameter("testTimeout") != null) {
+			sendMessage(sipFactory, "sipSessionReadyToInvalidate");
+		}
 	}
 
 }

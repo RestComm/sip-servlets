@@ -93,6 +93,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		Address contactAddress = request.getAddressHeader("Contact");
 		int contactPort = ((SipURI)contactAddress.getURI()).getPort();
 		request.getApplicationSession().setAttribute("contactPort", contactPort);
+		request.getSession().setAttribute("contactPort", contactPort);
 		if(fromURI.getUser().equals(SIP_APPLICATION_SESSION_TIMEOUT)) {			
 			logger.info("testing session expiration, setting invalidateWhenReady to false");
 			request.getApplicationSession().setAttribute(SIP_APPLICATION_SESSION_TIMEOUT, "true");			
@@ -119,8 +120,10 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			((SipURI)uri2).setTransportParam("tcp");
 			((SipURI)uri3).setTransportParam("tcp");
 			request.getApplicationSession().setAttribute("transport", "tcp");
+			request.getSession().setAttribute("transport", "tcp");
 		} else {
 			request.getApplicationSession().setAttribute("transport", "udp");
+			request.getSession().setAttribute("transport", "udp");
 		}
 		
 		if(from.contains("sequential")) {
@@ -374,9 +377,11 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 
 	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
 		logger.info("sessionReadyToInvalidate " +  ev.getApplicationSession().getId());
-		sendMessage("sessionReadyToInvalidate", (Integer) ev.getApplicationSession().getAttribute("contactPort"), (String) ev.getApplicationSession().getAttribute("transport"));
-		if(ev.getApplicationSession().getAttribute(SIP_APPLICATION_SESSION_TIMEOUT) != null) {
-			ev.getApplicationSession().setInvalidateWhenReady(false);
+		if(ev.getApplicationSession().getAttribute("contactPort") != null) {
+			sendMessage("sessionReadyToInvalidate", (Integer) ev.getApplicationSession().getAttribute("contactPort"), (String) ev.getApplicationSession().getAttribute("transport"));
+			if(ev.getApplicationSession().getAttribute(SIP_APPLICATION_SESSION_TIMEOUT) != null) {
+				ev.getApplicationSession().setInvalidateWhenReady(false);
+			}
 		}
 	}
 
@@ -392,6 +397,8 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 
 	public void sessionReadyToInvalidate(SipSessionEvent se) {
 		logger.info("sipSessionReadyToInvalidate " +  se.getSession().getId());
-		sendMessage("sipSessionReadyToInvalidate", (Integer) se.getSession().getAttribute("contactPort"), (String) se.getSession().getAttribute("transport"));
+		if(se.getSession().getAttribute("contactPort") != null) {
+			sendMessage("sipSessionReadyToInvalidate", (Integer) se.getSession().getAttribute("contactPort"), (String) se.getSession().getAttribute("transport"));
+		}
 	}
 }

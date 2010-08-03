@@ -63,7 +63,7 @@ public class ProxyNonRecordRouteTest extends SipServletTestCase {
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
 	}
-
+	// Tests Issue 1693 http://code.google.com/p/mobicents/issues/detail?id=1693
 	public void testProxyCallerSendBye() throws Exception {
 		String fromName = "unique-location-nonRecordRouting";
 		String fromSipAddress = "sip-servlets.com";
@@ -85,7 +85,7 @@ public class ProxyNonRecordRouteTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());
 		assertTrue(sender.getOkToByeReceived());
-		List<String> allMessagesContent = receiver.getAllMessagesContent();
+		List<String> allMessagesContent = sender.getAllMessagesContent();
 		assertEquals(2,allMessagesContent.size());
 		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
 		assertTrue("sessionReadyToInvalidate", allMessagesContent.contains("sessionReadyToInvalidate"));

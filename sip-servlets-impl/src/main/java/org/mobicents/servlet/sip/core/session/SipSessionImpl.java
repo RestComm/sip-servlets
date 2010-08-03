@@ -60,6 +60,7 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
+import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
 import javax.sip.InvalidArgumentException;
@@ -1278,8 +1279,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 		
 		if(logger.isDebugEnabled()) {
 			logger.debug("transaction "+ transaction +" has been removed from sip session's ongoingTransactions" );
-		}		
+		}	
+		
+		updateReadyToInvalidate(transaction);
 	}
+	
 	
 	public Set<Transaction> getOngoingTransactions() {
 		return this.ongoingTransactions;
@@ -1307,8 +1311,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if( (State.INITIAL.equals(state) || State.EARLY.equals(state)) && 
 				response.getStatus() >= 200 && response.getStatus() < 300 && 
 				!JainSipUtils.DIALOG_TERMINATING_METHODS.contains(method)) {
-			this.setState(State.CONFIRMED);
-			if(this.proxy != null && this.proxy.getFinalBranchForSubsequentRequests() != null && !this.proxy.getFinalBranchForSubsequentRequests().getRecordRoute()) {
+			this.setState(State.CONFIRMED);			
+			if(this.proxy != null && response.getProxyBranch() != null && !response.getProxyBranch().getRecordRoute()) {
+				// Section 6.2.4.1.2 Invalidate When Ready Mechanism :
+		    	// "The container determines the SipSession to be in the ready-to-invalidate state under any of the following conditions:
+		    	// 2. A SipSession transitions to the CONFIRMED state when it is acting as a non-record-routing proxy."
 				setReadyToInvalidate(true);
 			}
 			if(logger.isDebugEnabled()) {
@@ -1451,6 +1458,20 @@ public class SipSessionImpl implements MobicentsSipSession {
 		
 	}
     
+    
+    private void updateReadyToInvalidate(Transaction transaction) {
+    	// Section 6.2.4.1.2 Invalidate When Ready Mechanism :
+    	// "The container determines the SipSession to be in the ready-to-invalidate state under any of the following conditions:
+    	// 3. A SipSession acting as a UAC transitions from the EARLY state back to 
+    	// the INITIAL state on account of receiving a non-2xx final response (6.2.1 Relationship to SIP Dialogs, point 4)
+    	// and has not initiated any new requests (does not have any pending transactions)."
+    	if(!readyToInvalidate && (ongoingTransactions == null || ongoingTransactions.isEmpty()) && 
+    			transaction instanceof ClientTransaction && getProxy() == null && 
+    			state != null && state.equals(State.INITIAL) ) {
+    		setReadyToInvalidate(true);
+    	}
+	}
+    
     /**
      * This method is called immediately when the conditions for read to invalidate
      * session are met
@@ -1589,6 +1610,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @param readyToInvalidate the readyToInvalidate to set
 	 */
 	protected void setReadyToInvalidate(boolean readyToInvalidate) {
+		if(logger.isDebugEnabled()) {
+    		logger.debug("readyToInvalidate flag is set to " + readyToInvalidate);
+    	}
 		this.readyToInvalidate = readyToInvalidate;
 	}
 

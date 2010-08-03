@@ -312,6 +312,7 @@ public class ShootistSipServlet
 				Thread.currentThread().interrupt();
 			}
 			try {
+				sipServletRequest.getApplicationSession().setAttribute(TEST_ERROR_RESPONSE, "true");
 				sipServletRequest.createCancel().send();
 			} catch (IOException e) {
 				logger.error(e);

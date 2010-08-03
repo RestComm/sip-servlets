@@ -875,14 +875,22 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					}									
 															
 					if(sipSessionImpl != null) {
-						if(sipSessionImpl.getProxy() != null) {
-							// If this is a client transaction no need to invalidate proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
-							if(!invalidateProxySession) {
-								return;
-							} else {
-								if(logger.isDebugEnabled()) {
-									logger.debug("Proxy session is being invalidated on server transaction termination " + sipSessionKey);
-								}
+						final ProxyImpl proxy = sipSessionImpl.getProxy();
+						if(!invalidateProxySession && (proxy == null || (proxy != null && proxy.getFinalBranchForSubsequentRequests() != null && !proxy.getFinalBranchForSubsequentRequests().getRecordRoute()))) {
+							if(logger.isDebugEnabled()) {
+								logger.debug("try to Invalidate Proxy session if it is non record routing " + sipSessionKey);
+							}
+							invalidateProxySession = true;
+						}
+						// If this is a client transaction no need to invalidate proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
+						if(!invalidateProxySession) {
+							if(logger.isDebugEnabled()) {
+								logger.debug("don't Invalidate Proxy session");
+							}
+							return;
+						} else {
+							if(logger.isDebugEnabled()) {
+								logger.debug("Proxy session is being invalidated on server transaction termination " + sipSessionKey);
 							}
 						}
 						if(logger.isDebugEnabled()) {
@@ -1124,10 +1132,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				if(logger.isDebugEnabled()) {
 					logger.debug("no sip session were returned for this key " + sipServletMessageImpl.getSipSessionKey() + " and message " + sipServletMessageImpl);
 				}
-			} else {
-				// If it is a client transaction, do not kill the proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
-				tryToInvalidateSession(sipSessionKey, transactionTerminatedEvent.isServerTransaction());				
-//				sipSessionImpl.removeOngoingTransaction(transaction);
 			}			
 			
 			// Issue 1333 : B2buaHelper.getPendingMessages(linkedSession, UAMode.UAC) returns empty list
@@ -1157,6 +1161,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						logger.debug("Transaction " + transaction + " not removed from session " + sipSessionKey + " because the B2BUA might still need it to create the ACK");
 					}
 				}
+				// If it is a client transaction, do not kill the proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
+				tryToInvalidateSession(sipSessionKey, transactionTerminatedEvent.isServerTransaction());				
+
 			}			
 		} else {
 			if(logger.isDebugEnabled()) {
