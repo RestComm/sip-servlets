@@ -848,14 +848,14 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			// Fix for Issue 1678 : SipApplicationSession.setExpires() doesn't work sometimes
 			// the global sipApplicationSessionTimeout needs to be reset as well
 			sipApplicationSessionTimeout = deltaMilliseconds;
-			if(expirationTimerTask != null) {				
-				expirationTime = System.currentTimeMillis() + deltaMilliseconds;				
-				if(logger.isDebugEnabled()) {
-					logger.debug("Re-Scheduling sip application session "+ key +" to expire in " + deltaMinutes + " minutes");
-					Calendar calendar = Calendar.getInstance();
-					calendar.setTimeInMillis(expirationTime);
-					logger.debug("sip application session "+ key +" will expires at " + new SimpleDateFormat().format(calendar.getTime()));
-				}
+			expirationTime = System.currentTimeMillis() + deltaMilliseconds;				
+			if(logger.isDebugEnabled()) {
+				logger.debug("Re-Scheduling sip application session "+ key +" to expire in " + deltaMinutes + " minutes");
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTimeInMillis(expirationTime);
+				logger.debug("sip application session "+ key +" will expires at " + new SimpleDateFormat().format(calendar.getTime()));
+			}
+			if(expirationTimerTask != null) {								
 				cancelExpirationTimer();
 //				expirationTimerFuture = null;
 			}
