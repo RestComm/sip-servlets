@@ -293,8 +293,7 @@ public class AttributeBasedJBossCacheConvergedSipService extends
 	 * <strong>Note:</strong> This operation may alter the contents of the
 	 * passed in map. If this is unacceptable, pass in a defensive copy.
 	 */
-	@Override
-	protected Map<String, Object> getSessionAttributes(
+	public Map<String, Object> getConvergedSessionAttributes(
 			String realId, Map<Object, Object> distributedCacheData) {
 		Map<String, Object> attrs = new HashMap<String, Object>();
 		// fix for Issue 1621 http://code.google.com/p/mobicents/issues/detail?id=1621

@@ -24,6 +24,7 @@ package org.jboss.web.tomcat.service.session.distributedcache.impl.jbc;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.jboss.cache.Cache;
 import org.jboss.cache.Fqn;
@@ -300,13 +301,28 @@ public class SessionBasedJBossCacheConvergedSipService extends
 		delegate.setApplicationNameHashed(applicationNameHashed);
 	}
 	
-	@Override
-	protected Map<String, Object> getSessionAttributes(String realId,
+	public Map<String, Object> getConvergedSessionAttributes(String realId,
 			Map<Object, Object> distributedCacheData) {
 		Map<String, Object> result = null;
 		if(distributedCacheData != null) {
 			result = (Map<String, Object>) getUnMarshalledValue(distributedCacheData.get(ATTRIBUTE_KEY.toString()));
 		}
 	    return result == null ? Collections.EMPTY_MAP : result;
+	}
+	
+	@Override
+	protected void storeSessionAttributes(Map<Object, Object> dataMap,
+			OutgoingSessionGranularitySessionData sessionData) {
+		if(log_.isTraceEnabled()) {
+			Map<String, Object> attrs = sessionData.getSessionAttributes();
+			if(attrs != null) {
+				for (Entry<String, Object> entry : attrs.entrySet()) {
+					log_.trace("attribute key " + entry.getKey() + ", value=" + entry.getValue());
+				}
+			} else {
+				log_.trace("attributes null, not replicating");
+			}
+		}		
+		super.storeSessionAttributes(dataMap, sessionData);
 	}
 }

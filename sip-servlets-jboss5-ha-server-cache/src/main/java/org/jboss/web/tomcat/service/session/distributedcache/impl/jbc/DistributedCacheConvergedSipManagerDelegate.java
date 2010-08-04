@@ -278,7 +278,7 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 		Long timestamp = (Long) distributedCacheData.get(AbstractJBossCacheService.TIMESTAMP_KEY.toString());
 		DistributableSessionMetadata metadata = (DistributableSessionMetadata) distributedCacheData
 				.get(AbstractJBossCacheService.METADATA_KEY.toString());
-		Map<String, Object> attributes = jBossCacheService.getSessionAttributes(realId, attrs);
+		Map<String, Object> attributes = ((DistributedCacheConvergedSipManager)jBossCacheService).getConvergedSessionAttributes(realId, attrs);
 		
 		return new IncomingDistributableSessionDataImpl(version, timestamp,
 				metadata, attributes == null ? Collections.EMPTY_MAP : attributes);

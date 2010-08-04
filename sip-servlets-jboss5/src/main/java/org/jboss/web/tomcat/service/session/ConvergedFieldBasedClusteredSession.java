@@ -124,4 +124,11 @@ public class ConvergedFieldBasedClusteredSession extends
 			sipApplicationSession.access();
 		}
 	}
+	
+	@Override
+	public boolean isOutdated() {
+		// if creationTime == 0 we've neither been synced with the
+		// distributed cache nor had creation time set (i.e. brand new session)
+		return super.isOutdated() || this.getCreationTimeInternal() == 0;
+	}
 }

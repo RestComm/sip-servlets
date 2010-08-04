@@ -466,4 +466,12 @@ public void removeSipApplicationSessionLocal(String key,
 	public void setApplicationNameHashed(String applicationNameHashed) {
 		delegate.setApplicationNameHashed(applicationNameHashed);
 	}
+
+	/**
+	 * Overrides the superclass to pull in attributes via PojoCache API.
+	 */
+	public Map<String, Object> getConvergedSessionAttributes(String realId,
+			Map<Object, Object> distributedCacheData) {
+		return getAttributes(realId);
+	}
 }

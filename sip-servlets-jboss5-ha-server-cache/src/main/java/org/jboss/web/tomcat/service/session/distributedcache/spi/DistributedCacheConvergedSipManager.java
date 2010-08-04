@@ -372,6 +372,8 @@ public interface DistributedCacheConvergedSipManager<T extends OutgoingDistribut
 	Map<String, Object> getSipApplicationSessionAttributes(
 			String sipApplicationSessionKey);
 
+	
+	Map<String, Object> getConvergedSessionAttributes(String realId, Map<Object, Object> distributedCacheData);
 	/**
 	 * Get the value of the attribute with the given key from the given session.
 	 * 

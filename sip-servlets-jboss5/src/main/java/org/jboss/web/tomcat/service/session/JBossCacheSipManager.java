@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -133,6 +134,13 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	 */
 	private Map<String, OwnedSessionUpdate> unloadedSessions_ = new ConcurrentHashMap<String, OwnedSessionUpdate>();
 	
+	/** 
+	 * Sessions that have been created but not yet loaded. Used to ensure
+	 * concurrent threads trying to load the same session
+	 */
+	private final ConcurrentMap<String, ClusteredSession<? extends OutgoingDistributableSessionData>> embryonicSessions = 
+		new ConcurrentHashMap<String, ClusteredSession<? extends OutgoingDistributableSessionData>>();
+	
 	/** Number of passivated sip sessions */
 	private AtomicInteger sipSessionPassivatedCount_ = new AtomicInteger();
 
@@ -161,6 +169,10 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	private static final int TOTAL_PERMITS = Integer.MAX_VALUE;
 	private Semaphore semaphore = new Semaphore(TOTAL_PERMITS, true);
 	private Lock valveLock = new SemaphoreLock(this.semaphore);
+
+	private OutdatedSessionChecker outdatedSessionChecker;
+	   
+	private volatile boolean stopping;
 	
 	/** Are we running embedded in JBoss? */
 	private boolean embedded_ = false;
@@ -293,17 +305,50 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
       return (DistributedCacheConvergedSipManager) getDistributedCacheManager();
    }
    
+   protected OutdatedSessionChecker initOutdatedSessionChecker()
+   {
+      return new AskSessionOutdatedSessionChecker();      
+   }
    
    // Satisfy the Manager interface.  Internally we use
    // createEmptyClusteredSession to avoid a cast
    public Session createEmptySession()
    {
-      if (trace_)
+      Session session = null;
+      try
       {
-         log_.trace("Creating an empty ClusteredSession");
+         // [JBAS-7123] Make sure we're either in the call stack where LockingValve has
+         // a lock, or that we acquire one ourselves
+         boolean inLockingValve = SessionReplicationContext.isLocallyActive();
+         if (inLockingValve || this.valveLock.tryLock(0, TimeUnit.SECONDS))
+         {
+            try
+            {
+               if (trace_)
+               {
+                  log_.trace("Creating an empty ClusteredSession");
+               }
+               session = createEmptyConvergedClusteredSession();
+            }
+            finally
+            {
+               if (!inLockingValve)
+               {
+                  this.valveLock.unlock();
+               }
+            }
+         }
+         else if (trace_)
+         {
+            log_.trace("createEmptySession(): Manager is not handling requests; returning null");
+         }
+      }
+      catch (InterruptedException e)
+      {
+         Thread.currentThread().interrupt();
       }
       
-      return createEmptyConvergedClusteredSession();
+      return session;
    }
    
    private ClusteredSession<? extends OutgoingDistributableSessionData> createEmptyConvergedClusteredSession()
@@ -348,6 +393,44 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
     * {@inheritDoc}
     */
    public Session createSession(String sessionId)
+   {  
+      Session session = null;
+      try
+      {
+         // [JBAS-7123] Make sure we're either in the call stack where LockingValve has
+         // a lock, or that we acquire one ourselves
+         boolean inLockingValve = SessionReplicationContext.isLocallyActive();
+         if (inLockingValve || this.valveLock.tryLock(0, TimeUnit.SECONDS))
+         {
+            try
+            {
+               session = createSessionInternal(sessionId);
+            }
+            finally
+            {
+               if (!inLockingValve)
+               {
+                  this.valveLock.unlock();
+               }
+            }
+         }
+         else if (trace_)
+         {
+            log_.trace("createEmptySession(): Manager is not handling requests; returning null");
+         }
+      }
+      catch (InterruptedException e)
+      {
+         Thread.currentThread().interrupt();
+      }
+      
+      return session;
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   private Session createSessionInternal(String sessionId)
    {      
       // First check if we've reached the max allowed sessions, 
       // then try to expire/passivate sessions to free memory
@@ -381,53 +464,56 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 
       ClusteredSession<? extends OutgoingDistributableSessionData> session = createEmptyConvergedClusteredSession();
 
-      session.setNew(true);
-      session.setCreationTime(System.currentTimeMillis());
-      session.setMaxInactiveInterval(this.maxInactiveInterval_);
-      session.setValid(true);
-
-      String clearInvalidated = null; // see below
-      
-      if (sessionId == null)
+      if (session != null)
       {
-          sessionId = this.getNextId();
-
-          // We are using mod_jk for load balancing. Append the JvmRoute.
-          if (getUseJK())
-          {
-              if (trace_)
-              {
-                  log_.trace("createSession(): useJK is true. Will append JvmRoute: " + this.getJvmRoute());
-              }
-              sessionId += "." + this.getJvmRoute();
-          }
-      }
-      else
-      {
-         clearInvalidated = sessionId;
-      }
-
-      session.setId(sessionId); // Setting the id leads to a call to add()
-      
-      getDistributedCacheManager().sessionCreated(session.getRealId());
-      
-      session.tellNew(ClusteredSessionNotificationCause.CREATE);
-
-      if (trace_)
-      {
-         log_.trace("Created a ClusteredSession with id: " + sessionId);
-      }
-
-      createdCounter_.incrementAndGet(); // the call to add() handles the other counters 
-      
-      // Add this session to the set of those potentially needing replication
-      ConvergedSessionReplicationContext.bindSession(session, getSnapshotManager());
-      
-      if (clearInvalidated != null)
-      {
-         // We no longer need to track any earlier session w/ same id 
-         // invalidated by this thread
-         SessionInvalidationTracker.clearInvalidatedSession(clearInvalidated, this);
+	      session.setNew(true);
+	      session.setCreationTime(System.currentTimeMillis());
+	      session.setMaxInactiveInterval(this.maxInactiveInterval_);
+	      session.setValid(true);
+	
+	      String clearInvalidated = null; // see below
+	      
+	      if (sessionId == null)
+	      {
+	          sessionId = this.getNextId();
+	
+	          // We are using mod_jk for load balancing. Append the JvmRoute.
+	          if (getUseJK())
+	          {
+	              if (trace_)
+	              {
+	                  log_.trace("createSession(): useJK is true. Will append JvmRoute: " + this.getJvmRoute());
+	              }
+	              sessionId += "." + this.getJvmRoute();
+	          }
+	      }
+	      else
+	      {
+	         clearInvalidated = sessionId;
+	      }
+	
+	      session.setId(sessionId); // Setting the id leads to a call to add()
+	      
+	      getDistributedCacheManager().sessionCreated(session.getRealId());
+	      
+	      session.tellNew(ClusteredSessionNotificationCause.CREATE);
+	
+	      if (trace_)
+	      {
+	         log_.trace("Created a ClusteredSession with id: " + sessionId);
+	      }
+	
+	      createdCounter_.incrementAndGet(); // the call to add() handles the other counters 
+	      
+	      // Add this session to the set of those potentially needing replication
+	      ConvergedSessionReplicationContext.bindSession(session, getSnapshotManager());
+	      
+	      if (clearInvalidated != null)
+	      {
+	         // We no longer need to track any earlier session w/ same id 
+	         // invalidated by this thread
+	         SessionInvalidationTracker.clearInvalidatedSession(clearInvalidated, this);
+	      }
       }
       
       return session;
@@ -451,126 +537,209 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
       {
          return null;
       }
-
-      long begin = System.currentTimeMillis();
-      boolean mustAdd = false;
-      boolean passivated = false;
+      ClusteredSession<? extends OutgoingDistributableSessionData> session = null;
       
-      ClusteredSession<? extends OutgoingDistributableSessionData> session = sessions_.get(realId);
-      boolean initialLoad = false;
-      if (session == null)
-      {                 
-         initialLoad = true;
-         // This is either the first time we've seen this session on this
-         // server, or we previously expired it and have since gotten
-         // a replication message from another server
-         mustAdd = true;
-         session = createEmptyConvergedClusteredSession();
-         
-         OwnedSessionUpdate osu = unloadedSessions_.get(realId);
-         passivated = (osu != null && osu.passivated);
-      }
-
-      synchronized (session)
+      try
       {
-         ContextClassLoaderSwitcher.SwitchContext switcher = null; 
-         boolean doTx = false; 
-         try
-         {
-            // We need transaction so any data gravitation replication 
-            // is sent in batch.
-            // Don't do anything if there is already transaction context
-            // associated with this thread.
-            if (getDistributedCacheConvergedSipManager().getBatchingManager().isBatchInProgress() == false)
-            {
-            	getDistributedCacheConvergedSipManager().getBatchingManager().startBatch();
-               doTx = true;
-            }
-            
-            // Tomcat calls Manager.findSession before setting the tccl,
-            // so we need to do it :(
-            switcher = getContextClassLoaderSwitcher().getSwitchContext();
-            switcher.setClassLoader(getApplicationClassLoader());
-                        
-            IncomingDistributableSessionData data = getDistributedCacheManager().getSessionData(realId, initialLoad);
-            if (data != null)
-            {
-               session.update(data);
-            }
-            else
-            {
-               // Clunky; we set the session variable to null to indicate
-               // no data so move on
-               session = null;
-            }
-            
-            if (session != null)
-            {
-               ClusteredSessionNotificationCause cause = passivated ? ClusteredSessionNotificationCause.ACTIVATION 
-                                                                    : ClusteredSessionNotificationCause.FAILOVER;
-               session.notifyDidActivate(cause);
-            }
-         }
-         catch (Exception ex)
+         // [JBAS-7123] Make sure we're either in the call stack where LockingValve has
+         // a lock, or that we acquire one ourselves
+         boolean inLockingValve = SessionReplicationContext.isLocallyActive();
+         if (inLockingValve || this.valveLock.tryLock(0, TimeUnit.SECONDS))
          {
             try
             {
-//                  if(doTx)
-               // Let's set it no matter what.
-            	getDistributedCacheConvergedSipManager().getBatchingManager().setBatchRollbackOnly();
-            }
-            catch (Exception exn)
-            {
-               log_.error("Caught exception rolling back transaction", exn);
-            }
-            // We will need to alert Tomcat of this exception.
-            if (ex instanceof RuntimeException)
-               throw (RuntimeException) ex;
-            
-            throw new RuntimeException("loadSession(): failed to load session " +
-                                       realId, ex);
-         }
-         finally
-         {
-            try {
-               if(doTx)
-               {
-            	   getDistributedCacheConvergedSipManager().getBatchingManager().endBatch();
-               }
-            }
-            finally {
-               if (switcher != null)
-               {
-                  switcher.reset();
-               }
-            }
-         }
+               long begin = System.currentTimeMillis();
+               boolean mustAdd = false;
+               boolean passivated = false;
+               
+               session = sessions_.get(realId);
+               boolean initialLoad = false;
+               if (session == null)
+               {                 
+                  initialLoad = true;
+                  // This is either the first time we've seen this session on this
+                  // server, or we previously expired it and have since gotten
+                  // a replication message from another server
+                  mustAdd = true;
+                  session = createEmptyConvergedClusteredSession();
 
-         if (session != null)
-         {            
-            if (mustAdd)
-            {
-               add(session, false); // don't replicate
-               if (!passivated)
+                  // JBAS-7379 Ensure concurrent threads trying to load same session id
+                  // use the same session
+                  ClusteredSession<? extends OutgoingDistributableSessionData> embryo = 
+                     this.embryonicSessions.putIfAbsent(realId, session);
+                  if (embryo != null)
+                  {
+                     session = embryo;
+                  }
+                  
+                  OwnedSessionUpdate osu = unloadedSessions_.get(realId);
+                  passivated = (osu != null && osu.isPassivated());
+               }
+  
+               synchronized (session)
                {
-                  session.tellNew(ClusteredSessionNotificationCause.FAILOVER);
+                  // JBAS-7379 check if we lost the race to the sync block
+                  // and another thread has already loaded this session
+                  if (initialLoad && session.isOutdated() == false)
+                  {
+                	  if (log_.isDebugEnabled())
+                      {
+                         log_.debug("loadSession(): id= " + realId + ", session=" + session + "session.isOutdated() " + session.isOutdated());
+                      }
+                     // some one else loaded this
+                     return session;
+                  }
+
+                  ContextClassLoaderSwitcher.SwitchContext switcher = null; 
+                  boolean doTx = false; 
+                  boolean loadCompleted = false;
+                  try
+                  {
+                     // We need transaction so any data gravitation replication 
+                     // is sent in batch.
+                     // Don't do anything if there is already transaction context
+                     // associated with this thread.
+                     if (getDistributedCacheConvergedSipManager().getBatchingManager().isBatchInProgress() == false)
+                     {
+                    	 getDistributedCacheConvergedSipManager().getBatchingManager().startBatch();
+                        doTx = true;
+                     }
+                     
+                     // Tomcat calls Manager.findSession before setting the tccl,
+                     // so we need to do it :(
+                     switcher = getContextClassLoaderSwitcher().getSwitchContext();
+                     switcher.setClassLoader(getApplicationClassLoader());
+                                 
+                     IncomingDistributableSessionData data = getDistributedCacheManager().getSessionData(realId, initialLoad);
+                     if (data != null)
+                     {
+                        session.update(data);
+                     }
+                     else
+                     {
+                    	 if (log_.isDebugEnabled())
+                         {
+                            log_.debug("loadSession(): id= " + realId + ", session=" + session + " : no data setting to null ");
+                         }
+                        // Clunky; we set the session variable to null to indicate
+                        // no data so move on
+                        session = null;
+                     }
+                     
+                     if (session != null)
+                     {
+                        ClusteredSessionNotificationCause cause = passivated ? ClusteredSessionNotificationCause.ACTIVATION 
+                                                                             : ClusteredSessionNotificationCause.FAILOVER;
+                        session.notifyDidActivate(cause);
+                     }
+                     
+                     loadCompleted = true;
+                  }
+                  catch (Exception ex)
+                  {
+                     try
+                     {
+  //                  if(doTx)
+                        // Let's set it no matter what.
+                    	 getDistributedCacheConvergedSipManager().getBatchingManager().setBatchRollbackOnly();
+                     }
+                     catch (Exception exn)
+                     {
+                        log_.error("Caught exception rolling back transaction", exn);
+                     }
+                     // We will need to alert Tomcat of this exception.
+                     if (ex instanceof RuntimeException)
+                        throw (RuntimeException) ex;
+                     
+                     throw new RuntimeException("loadSession(): failed to load session " +
+                                                realId, ex);
+                  }
+                  finally
+                  {
+                     try {
+                        if(doTx)
+                        {
+                           try
+                           {
+                        	   getDistributedCacheConvergedSipManager().getBatchingManager().endBatch();
+                           }
+                           catch (Exception e)
+                           {
+                              if (loadCompleted)
+                              {
+                                 // We read the data successfully but then failed in commit?
+                                 // That indicates a JBC data gravitation where the replication of
+                                 // the gravitated data to our buddy failed. We can ignore that
+                                 // and count on this request updating the cache.                               // 
+                                 log_.warn("Problem ending batch after loading session " + realId + " -- " + e.getLocalizedMessage() + " However session data was successful loaded.");
+                                 log_.debug("Failure cause", e);
+                              }
+                              else
+                              {
+                                 if (e instanceof RuntimeException)
+                                    throw (RuntimeException) e;
+                                 
+                                 throw new RuntimeException("loadSession(): failed to load session " +
+                                                            realId, e);
+                              }
+                           }
+                        }
+                     }
+                     finally {
+                        if (switcher != null)
+                        {
+                           switcher.reset();
+                        }
+                     }
+                  }
+  
+                  if (session != null)
+                  {            
+                     if (mustAdd)
+                     {
+                        add(session, false); // don't replicate
+                        if (!passivated)
+                        {
+                           session.tellNew(ClusteredSessionNotificationCause.FAILOVER);
+                        }
+                     }
+                     long elapsed = System.currentTimeMillis() - begin;
+                     stats_.updateLoadStats(realId, elapsed);
+  
+                     if (log_.isDebugEnabled())
+                     {
+                        log_.debug("loadSession(): id= " + realId + ", session=" + session);
+                     }
+                  }
+                  else if (log_.isDebugEnabled())
+                  {
+                     log_.debug("loadSession(): session " + realId +
+                                " not found in distributed cache");
+                  }
+                  
+                  if (initialLoad)
+                  {                     
+                     // The session is now in the regular map, or the session
+                     // doesn't exist in the distributed cache. either way
+                     // it's now safe to stop tracking this embryonic session
+                     embryonicSessions.remove(realId);
+                  }
                }
             }
-            long elapsed = System.currentTimeMillis() - begin;
-            stats_.updateLoadStats(realId, elapsed);
-
-            if (trace_)
+            finally
             {
-               log_.trace("loadSession(): id= " + realId + ", session=" + session);
+               if (!inLockingValve)
+               {
+                  this.valveLock.unlock();
+               }
             }
-         }
-         else if (trace_)
-         {
-            log_.trace("loadSession(): session " + realId +
-                       " not found in distributed cache");
          }
       }
-
+      catch (InterruptedException e)
+      {
+         Thread.currentThread().interrupt();
+      }
+      
       return session;
    }
 
@@ -589,7 +758,34 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
                session.getClass().getName());
       }
 
-      add(uncheckedCastSession(session), false); // wait to replicate until req end
+      try
+      {
+         // [JBAS-7123] Make sure we're either in the call stack where LockingValve has
+         // a lock, or that we acquire one ourselves
+         boolean inLockingValve = SessionReplicationContext.isLocallyActive();
+         if (inLockingValve || this.valveLock.tryLock(0, TimeUnit.SECONDS))
+         {
+            try
+            {
+               add(uncheckedCastSession(session), false); // wait to replicate until req end
+            }
+            finally
+            {
+               if (!inLockingValve)
+               {
+                  this.valveLock.unlock();
+               }
+            }
+         }
+         else if (trace_)
+         {
+            log_.trace("add(): ignoring add -- Manager is not actively handling requests");
+         }
+      }
+      catch (InterruptedException e)
+      {
+         Thread.currentThread().interrupt();
+      }
    }
    
    /**
@@ -605,14 +801,14 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
    {
       // TODO -- why are we doing this check? The request checks session 
       // validity and will expire the session; this seems redundant
-      if (!session.isValid())
-      {
-         // Not an error; this can happen if a failover request pulls in an
-         // outdated session from the distributed cache (see TODO above)
-         log_.debug("Cannot add session with id=" + session.getIdInternal() +
-                    " because it is invalid");
-         return;
-      }
+//      if (!session.isValid())
+//      {
+//         // Not an error; this can happen if a failover request pulls in an
+//         // outdated session from the distributed cache (see TODO above)
+//         log_.debug("Cannot add session with id=" + session.getIdInternal() +
+//                    " because it is invalid");
+//         return;
+//      }
 
       String realId = session.getRealId();
       Object existing = sessions_.put(realId, session);
@@ -653,23 +849,49 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
     */
    public Session[] findSessions()
    {
-      // Need to load all the unloaded sessions
-      if(unloadedSessions_.size() > 0)
+      Session[] sessions = null;
+      try
       {
-         // Make a thread-safe copy of the new id list to work with
-         Set<String> ids = new HashSet<String>(unloadedSessions_.keySet());
-
-         if(trace_) {
-            log_.trace("findSessions: loading sessions from distributed cache: " + ids);
-         }
-
-         for(String id :  ids) {
-            loadSession(id);
+         // [JBAS-7123] Make sure we're either in the call stack where LockingValve has
+         // a lock, or that we acquire one ourselves
+         boolean inLockingValve = SessionReplicationContext.isLocallyActive();
+         if (inLockingValve || this.valveLock.tryLock(0, TimeUnit.SECONDS))
+         {
+            try
+            {
+               // Need to load all the unloaded sessions
+               if(unloadedSessions_.size() > 0)
+               {
+                  // Make a thread-safe copy of the new id list to work with
+                  Set<String> ids = new HashSet<String>(unloadedSessions_.keySet());
+  
+                  if(trace_) {
+                     log_.trace("findSessions: loading sessions from distributed cache: " + ids);
+                  }
+  
+                  for(String id :  ids) {
+                     loadSession(id);
+                  }
+               }
+  
+               // All sessions are now "local" so just return the local sessions
+               sessions = findLocalSessions();
+            }
+            finally
+            {
+               if (!inLockingValve)
+               {
+                  this.valveLock.unlock();
+               }
+            }
          }
       }
-
-      // All sessions are now "local" so just return the local sessions
-      return findLocalSessions();
+      catch (InterruptedException e)
+      {
+         Thread.currentThread().interrupt();
+      }
+      
+      return sessions;
    }
    
    /**
@@ -704,8 +926,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
       if (session == null 
             && !SessionInvalidationTracker.isSessionInvalidated(realId, this))
       {
-         if (trace_)
-            log_.trace("Checking for session " + realId + " in the distributed cache");
+         if (log_.isDebugEnabled())
+            log_.debug("Checking for session " + realId + " in the distributed cache");
          
          session = loadSession(realId);
 //       if (session != null)
@@ -718,13 +940,21 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 //          session.tellNew(ClusteredSessionNotificationCause.FAILOVER);
 //       }
       }
-      else if (session != null && session.isOutdated())
+      else if (session != null && this.outdatedSessionChecker.isSessionOutdated(session))
       {
-         if (trace_)
-            log_.trace("Updating session " + realId + " from the distributed cache");
+         if (log_.isDebugEnabled())
+            log_.debug("Updating session " + realId + " from the distributed cache");
          
          // Need to update it from the cache
-         loadSession(realId);
+         session = loadSession(realId);
+         if (session == null)
+         {
+            // We have a session locally but it's no longer available
+            // from the distributed store; i.e. it's been invalidated elsewhere
+            // So we need to clean up
+            // TODO what about notifications?
+            this.sessions_.remove(realId);
+         }
       }
 
       if (session != null)
@@ -788,6 +1018,12 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
       super.resetStats();
       
       this.maxPassivatedCount_.set(this.passivatedCount_.get());
+   }
+   
+   protected Map<String, OwnedSessionUpdate> getUnloadedSessions()
+   {
+      Map<String, OwnedSessionUpdate> unloaded = new HashMap<String, OwnedSessionUpdate>(unloadedSessions_);
+      return unloaded;
    }
    
    /**
@@ -1012,6 +1248,11 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
          ClusteredSession<? extends OutgoingDistributableSessionData> sessions[] = findLocalSessions();
          for (int i = 0; i < sessions.length; ++i)
          {
+            if (!backgroundProcessAllowed.get())
+            {
+               return;
+            }
+            
             try
             {
                ClusteredSession<? extends OutgoingDistributableSessionData> session = sessions[i];
@@ -1026,7 +1267,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
                   // JBAS-2403. Check for outdated sessions where we think
                   // the local copy has timed out.  If found, refresh the
                   // session from the cache in case that might change the timeout
-                  if (session.isOutdated() && !(session.isValid(false)))
+                  if (this.outdatedSessionChecker.isSessionOutdated(session) && !(session.isValid(false)))
                   {
                      // FIXME in AS 5 every time we get a notification from the distributed
                      // cache of an update, we get the latest timestamp. So
@@ -1063,6 +1304,11 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
                           ex, ex);
             }
          }
+         
+         if (!backgroundProcessAllowed.get())
+         {
+            return;
+         }
 
          // Next, handle any unloaded sessions
 
@@ -1071,22 +1317,27 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
          // that occurred w/in maxUnreplicatedInterval_ of the previous
          // request. So we add a grace period to avoid flushing a session early
          // and permanently losing part of its node structure in JBoss Cache.
-         long maxUnrep = getMaxUnreplicatedInterval() < 0 ? 60 : getMaxUnreplicatedInterval();
+         long maxUnrep = getMaxUnreplicatedInterval() < 0 ? 60 :  getMaxUnreplicatedInterval();
          
-         Map<String, OwnedSessionUpdate> unloaded = new HashMap<String, OwnedSessionUpdate>(unloadedSessions_);
+         Map<String, OwnedSessionUpdate> unloaded = getUnloadedSessions();
          for (Map.Entry<String, OwnedSessionUpdate> entry : unloaded.entrySet())
-         {
+         {            
+            if (!backgroundProcessAllowed.get())
+            {
+               return;
+            }
+            
             String realId = entry.getKey();
             OwnedSessionUpdate osu = entry.getValue();
             
             long now = System.currentTimeMillis();
-            long elapsed = (now - osu.updateTime);
+            long elapsed = (now - osu.getUpdateTime());
             try
             {
-               if (expire && osu.maxInactive >= 1 && elapsed >= (osu.maxInactive + maxUnrep) * 1000L)
+               if (expire && osu.getMaxInactive() >= 1 && elapsed >= (osu.getMaxInactive() + maxUnrep) * 1000L)
                {
                   //if (osu.passivated && osu.owner == null)
-                  if (osu.passivated)
+                  if (osu.isPassivated())
                   {
                      // Passivated session needs to be expired. A call to 
                      // findSession will bring it out of passivation
@@ -1101,12 +1352,12 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
                   // If we get here either !osu.passivated, or we don't own
                   // the session or the session couldn't be reactivated (invalidated by user). 
                   // Either way, do a cleanup
-                  getDistributedCacheManager().removeSessionLocal(realId, osu.owner);
+                  getDistributedCacheManager().removeSessionLocal(realId, osu.getOwner());
                   unloadedSessions_.remove(realId);
                   stats_.removeStats(realId);
                   
                }
-               else if (passivate && !osu.passivated)
+               else if (passivate && !osu.isPassivated())
                {  
                   // we now have a valid session; store it so we can check later
                   // if we need to passivate it
@@ -1244,8 +1495,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
          log_.trace("Passivating session with id: " + realId);
       }
 
-      getDistributedCacheManager().evictSession(realId, osu.owner);
-      osu.passivated = true;
+      getDistributedCacheManager().evictSession(realId, osu.getOwner());
+      osu.setPassivated(true);
       sessionPassivated();      
    }
    
@@ -1335,10 +1586,10 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
             {
                OwnedSessionUpdate osu = entry.getValue();
                // Ignore the marker entries for our passivated sessions
-               if (!osu.passivated)
+               if (!osu.isPassivated())
                {
             	 //FIXME uncomment when problem with cahce on stop is resolved
-//                  getDistributedCacheManager().evictSession(realId, osu.owner);
+                  getDistributedCacheManager().evictSession(realId, osu.getOwner());
                }
             }
             else
@@ -3712,6 +3963,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	protected void startExtensions() {
 		super.startExtensions();		
 		
+		this.outdatedSessionChecker = initOutdatedSessionChecker();
 		mobicentsCache = new MobicentsCache(getDistributedCacheConvergedSipManager().getJBossCache(), null);
 		mobicentsCluster = new DefaultMobicentsCluster(mobicentsCache, getDistributedCacheConvergedSipManager().getJBossCache().getConfiguration().getRuntimeConfig().getTransactionManager(), new DefaultClusterElector());
 		if(logger.isDebugEnabled()) {
@@ -4289,6 +4541,31 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	         this.maxInactive = maxInactive;
 	         this.passivated = passivated;
 	      }
+	      
+	      public boolean isPassivated()
+	      {
+	         return passivated;
+	      }
+
+	      void setPassivated(boolean passivated)
+	      {
+	         this.passivated = passivated;
+	      }
+
+	      public String getOwner()
+	      {
+	         return owner;
+	      }
+
+	      public long getUpdateTime()
+	      {
+	         return updateTime;
+	      }
+
+	      public int getMaxInactive()
+	      {
+	         return maxInactive;
+	      }
 	   }
 
 	public ClusteredSipApplicationSessionNotificationPolicy getSipApplicationSessionNotificationPolicy() {
@@ -4391,7 +4668,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	      
 	      private long getLastUpdate()
 	      {
-	         return osu == null ? session.getLastAccessedTimeInternal() : osu.updateTime;
+	         return osu == null ? session.getLastAccessedTimeInternal() : osu.getUpdateTime();
 	      }
 	      
 	      private void passivate()
@@ -4428,5 +4705,27 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	public MobicentsCluster getMobicentsCluster() {		
 		return mobicentsCluster;
 	}
-	   
+
+	public class AlwaysTrueOutdatedSessionChecker implements
+			OutdatedSessionChecker {
+		public boolean isSessionOutdated(
+				ClusteredSession<? extends OutgoingDistributableSessionData> session) {
+			return true;
+		}
+
+	}
+
+	public class AskSessionOutdatedSessionChecker implements
+			OutdatedSessionChecker {
+		public boolean isSessionOutdated(
+				ClusteredSession<? extends OutgoingDistributableSessionData> session) {
+			return session.isOutdated();
+		}
+
+	}
+
+	public interface OutdatedSessionChecker {
+		boolean isSessionOutdated(
+				ClusteredSession<? extends OutgoingDistributableSessionData> session);
+	}
 }
