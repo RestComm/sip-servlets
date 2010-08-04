@@ -105,6 +105,7 @@ public class NotifierSipServlet extends SipServlet implements SipSessionListener
 		logger.info("Got Subscribe: "
 				+ request.getMethod());
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+		request.getApplicationSession().setAttribute("sendMessage", "true");
 		sipServletResponse.addHeader("Expires", request.getHeader("Expires"));
 		sipServletResponse.addHeader("Event", request.getHeader("Event"));
 		sipServletResponse.send();		
@@ -137,21 +138,23 @@ public class NotifierSipServlet extends SipServlet implements SipSessionListener
 	}
 
 	public void sessionReadyToInvalidate(SipSessionEvent se) {
-		logger.info("sip session expired " +  se.getSession());
+		logger.info("sip session ready To Invalidate " +  se.getSession());
 		
-		try {
-			SipServletRequest sipServletRequest = sipFactory.createRequest(
-					sipFactory.createApplicationSession(), 
-					"MESSAGE", 
-					se.getSession().getLocalParty(), 
-					se.getSession().getRemoteParty());
-			SipURI sipUri=sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
-			sipServletRequest.setRequestURI(sipUri);
-			sipServletRequest.setContentLength(SIP_SESSION_READY_TO_BE_INVALIDATED.length());
-			sipServletRequest.setContent(SIP_SESSION_READY_TO_BE_INVALIDATED, CONTENT_TYPE);
-			sipServletRequest.send();
-		} catch (IOException e) {
-			logger.error("Exception occured while sending the request",e);			
+		if(se.getSession().getApplicationSession().getAttribute("sendMessage") != null) {
+			try {
+				SipServletRequest sipServletRequest = sipFactory.createRequest(
+						sipFactory.createApplicationSession(), 
+						"MESSAGE", 
+						se.getSession().getLocalParty(), 
+						se.getSession().getRemoteParty());
+				SipURI sipUri=sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
+				sipServletRequest.setRequestURI(sipUri);
+				sipServletRequest.setContentLength(SIP_SESSION_READY_TO_BE_INVALIDATED.length());
+				sipServletRequest.setContent(SIP_SESSION_READY_TO_BE_INVALIDATED, CONTENT_TYPE);
+				sipServletRequest.send();
+			} catch (IOException e) {
+				logger.error("Exception occured while sending the request",e);			
+			}
 		}
 	}
 }

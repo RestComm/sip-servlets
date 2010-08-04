@@ -149,6 +149,7 @@ public class SubscriberSipServlet
 			IOException {
 		logger.info("Got notify : "
 				+ request.getMethod());			
+		request.getApplicationSession().setAttribute("sendMessage", "true");
 		String state = request.getHeader("Subscription-State");
 		logger.info("state " + state);
 		logger.info("session id " + request.getSession().getId());
@@ -287,9 +288,10 @@ public class SubscriberSipServlet
 	}
 
 	public void sessionReadyToInvalidate(SipSessionEvent se) {
-		logger.info("sip session expired " +  se.getSession());
-		
-		sendMessage(se.getSession(), SIP_SESSION_READY_TO_BE_INVALIDATED);
+		logger.info("sip session ready to Invalidate  " +  se.getSession());
+		if(se.getSession().getApplicationSession().getAttribute("sendMessage") != null) {
+			sendMessage(se.getSession(), SIP_SESSION_READY_TO_BE_INVALIDATED);
+		}
 	}
 
 	/**

@@ -36,6 +36,7 @@ import org.mobicents.servlet.sip.testsuite.TestSipListener;
 public class ProxyTimeoutTest extends SipServletTestCase {	
 	private static final String SESSION_EXPIRED = "sessionExpired";
 	private static final String SESSION_READY_TO_INVALIDATE = "sessionReadyToInvalidate";
+	private static final String SIP_SESSION_READY_TO_INVALIDATE = "sipSessionReadyToInvalidate";
 	private static transient Logger logger = Logger.getLogger(ProxyTimeoutTest.class);
 	private static final boolean AUTODIALOG = true;
 	TestSipListener sender;
@@ -106,10 +107,11 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertEquals(0,receiver.getFinalResponseStatus());
 		assertTrue(!sender.isAckSent());
-		assertEquals(3, sender.getAllMessagesContent().size());
+		assertEquals(4, sender.getAllMessagesContent().size());
 		assertTrue(sender.getAllMessagesContent().contains(ResponseType.INFORMATIONAL.toString()));
 		assertTrue(sender.getAllMessagesContent().contains(ResponseType.FINAL.toString()));
 		assertTrue(sender.getAllMessagesContent().contains(SESSION_READY_TO_INVALIDATE));
+		assertTrue(sender.getAllMessagesContent().contains(SIP_SESSION_READY_TO_INVALIDATE));
 	}
 	
 	/**
@@ -161,9 +163,10 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 			String message = (String) allMessagesIterator.next();
 			logger.info(message);
 		}
-		assertEquals(2, sender.getAllMessagesContent().size());
+		assertEquals(3, sender.getAllMessagesContent().size());
 		assertTrue(sender.getAllMessagesContent().contains(SESSION_EXPIRED));
 		assertTrue(sender.getAllMessagesContent().contains(SESSION_READY_TO_INVALIDATE));
+		assertTrue(sender.getAllMessagesContent().contains(SIP_SESSION_READY_TO_INVALIDATE));
 			
 	}	
 	
