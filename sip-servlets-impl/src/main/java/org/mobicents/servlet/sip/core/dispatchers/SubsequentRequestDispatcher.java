@@ -28,7 +28,6 @@ import javax.servlet.sip.SipServletResponse;
 import javax.sip.Dialog;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
-import javax.sip.header.CSeqHeader;
 import javax.sip.header.Parameters;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SubscriptionStateHeader;
@@ -49,7 +48,6 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
-import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -344,11 +342,27 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						// dialog established failover only.
 						if(sessionCreatingTransactionRequest != null) {
 							final SipServletResponse lastFinalResponse = sessionCreatingTransactionRequest.getLastFinalResponse();
-							if(Request.ACK.equalsIgnoreCase(requestMethod) && lastFinalResponse != null && lastFinalResponse.getStatus() >= 300) {
-								callServlet = false;
-								if(logger.isDebugEnabled()) {
-									logger.debug("not calling the servlet since this is an ACK for a final error response");
-								}
+							if(logger.isDebugEnabled()) {
+                                logger.debug("last final response " + lastFinalResponse);
+                            }						
+							if(Request.ACK.equalsIgnoreCase(requestMethod)) {
+							    if(lastFinalResponse != null && lastFinalResponse.getStatus() >= 300) {
+							    	callServlet = false;
+    								if(logger.isDebugEnabled()) {
+    									logger.debug("not calling the servlet since this is an ACK for a final error response");
+    								}
+							    }
+							    // Issue 1494 : http://code.google.com/p/mobicents/issues/detail?id=1494
+                                // Only the first ACK makes it up to the application, in case the sip stack 
+							    // generates an error response the last final response will be null
+                                // for the corresponding ACK and it should not be passed to the app
+							    if(lastFinalResponse == null) {							        
+                                    if(logger.isDebugEnabled()) {
+                                        logger.debug("not calling the servlet since this is an ACK for a null last final response, which means the ACK was for a sip stack generated error response");
+                                    }
+                                    callServlet = false;
+                                    sipSession.setAckReceived(false);
+							    }							 
 							}
 						}
 						// JSR 289 Section 6.2.1 :
