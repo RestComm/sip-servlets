@@ -7,7 +7,7 @@
 <!--                                                                       -->
 <!-- ===================================================================== -->
 
-<!-- $Id: log4j.xml 64096 2007-07-17 14:36:23Z stan.silvert@jboss.com $ -->
+<!-- $Id: jboss-log4j.xml 87678 2009-04-22 16:47:08Z bstansberry@jboss.com $ -->
 
 <!--
    | For more configuration information and examples see the Jakarta Log4j
@@ -24,14 +24,13 @@
    <appender name="FILE" class="org.jboss.logging.appender.DailyRollingFileAppender">
       <errorHandler class="org.jboss.logging.util.OnlyOnceErrorHandler"/>
       <param name="File" value="${jboss.server.log.dir}/server.log"/>
-      <param name="Append" value="false"/>
-      <!-- 
-         Set the threshold via a system property. Note this is parsed by log4j,
-         so the full JBoss system property format is not supported; e.g.
-         setting a default via ${jboss.server.log.threshold:WARN} will not work.         
-       -->
+      <param name="Append" value="true"/>
+      <!-- In AS 5.0.x the server log threshold was set by a system
+           property. In 5.1 and later we are instead using the system
+           property to set the priority on the root logger (see <root/> below)
       <param name="Threshold" value="${jboss.server.log.threshold}"/>
-
+      -->
+      
       <!-- Rollover at midnight each day -->
       <param name="DatePattern" value="'.'yyyy-MM-dd"/>
 
@@ -182,19 +181,19 @@
       <priority value="INFO"/>
    </category>
    
-   <!-- Limit JSF logging to DEBUG.  FINER and FINEST will not be logged -->
-   <category name="javax.enterprise.resource.webcontainer.jsf">
-     <priority value="DEBUG" />
-   </category>
-
    <!-- Limit the jacorb category to WARN as its INFO is verbose -->
    <category name="jacorb">
       <priority value="WARN"/>
    </category>
    
-   <!-- Set the logging level of the JSF implementation -->
+   <!-- Set the logging level of the JSF implementation that uses
+      | java.util.logging. The jdk logging levels can be controlled
+      | through the org.jboss.logging.log4j.JDKLevel class that
+      | in addition to the standard log4j levels it adds support for
+      | SEVERE, WARNING, CONFIG, FINE, FINER, FINEST
+   -->
    <category name="javax.enterprise.resource.webcontainer.jsf">
-     <priority value="INFO" />
+     <priority value="INFO" class="org.jboss.logging.log4j.JDKLevel"/>
    </category>
    
    <!-- Limit the org.jgroups category to WARN as its INFO is verbose -->
@@ -207,17 +206,66 @@
       <priority value="INFO"/>
    </category>
    
+   <!-- Limit the com.sun category to INFO as its FINE is verbose -->
+   <category name="com.sun">
+      <priority value="INFO"/>
+   </category>
+   
+   <!-- Limit the sun category to INFO as its FINE is verbose -->
+   <category name="sun">
+      <priority value="INFO"/>
+   </category>
+   
+   <!-- Limit the javax.xml.bind category to INFO as its FINE is verbose -->
+   <category name="javax.xml.bind">
+      <priority value="INFO"/>
+   </category>
+   
    <!-- Limit JBoss categories
    <category name="org.jboss">
       <priority value="INFO"/>
    </category>
    -->
+	
+   <!-- Limit Mobicents categories -->
+   <category name="org.mobicents">
+      <priority value="INFO"/>
+   </category>
+   
+   <category name="org.jboss.web.tomcat.service.session">
+      <priority value="INFO"/>
+   </category>
+   
+   <!-- Limit NIST SIP Stack categories -->
+   <category name="gov.nist">
+      <priority value="INFO"/>
+   </category>
 
    <!-- Limit the JSR77 categories -->
    <category name="org.jboss.management">
       <priority value="INFO"/>
    </category>
 
+   <!-- Limit the verbose facelets compiler -->
+   <category name="facelets.compiler">
+      <priority value="WARN"/>
+   </category>
+   
+   <!-- Limit the verbose ajax4jsf cache initialization -->
+   <category name="org.ajax4jsf.cache">
+      <priority value="WARN"/>
+   </category>
+   
+   <!-- Limit the verbose embedded jopr categories -->
+   <category name="org.rhq">
+      <priority value="WARN"/>
+   </category>
+   
+   <!-- Limit the verbose seam categories -->
+   <category name="org.jboss.seam">
+      <priority value="WARN"/>
+   </category>
+   
    <!-- Show the evolution of the DataSource pool in the logs [inUse/Available/Max]
    <category name="org.jboss.resource.connectionmanager.JBossManagedConnectionPool">
      <priority value="TRACE"/>
@@ -329,6 +377,12 @@
    <!-- ======================= -->
 
    <root>
+      <!-- 
+         Set the root logger priority via a system property. Note this is parsed by log4j,
+         so the full JBoss system property format is not supported; e.g.
+         setting a default via ${jboss.server.log.threshold:WARN} will not work.         
+       -->
+      <priority value="${jboss.server.log.threshold}"/>
       <appender-ref ref="CONSOLE"/>
       <appender-ref ref="FILE"/>
    </root>
