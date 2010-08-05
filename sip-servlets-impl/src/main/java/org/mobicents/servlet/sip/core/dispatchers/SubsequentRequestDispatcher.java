@@ -117,7 +117,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				final int port = sipRequestUri.getPort();
 				final String transport = JainSipUtils.findTransport(request);
 				final boolean isAnotherDomain = sipApplicationDispatcher.isExternal(host, port, transport);
-				//Issue 823 (http://code.google.com/p/mobicents/issues/detail?id=823) : 
+				// Issue 823 (http://code.google.com/p/mobicents/issues/detail?id=823) : 
 				// Container should proxy statelessly subsequent requests not targeted at itself
 				if(isAnotherDomain) {					
 					// Some UA are misbehaving and don't follow the non record proxy so they sent subsequent requests to the container (due to oubound proxy set probably) instead of directly to the UA
@@ -268,6 +268,13 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			final String requestMethod = sipServletRequest.getMethod();
 			try {
 				if(!Request.ACK.equalsIgnoreCase(requestMethod)) {
+					// Issue 1494 : http://code.google.com/p/mobicents/issues/detail?id=1494
+                    // Only the first ACK makes it up to the application
+					// resetting the creating transaction request to the current one is needed to
+					// avoid a null final response on a reinvite while checking for the ACK below
+					if(!Request.PRACK.equalsIgnoreCase(requestMethod)) {
+						sipSession.setSessionCreatingTransactionRequest(sipServletRequest);
+					}
 					sipSession.addOngoingTransaction(sipServletRequest.getTransaction());
 				}				
 				try {
