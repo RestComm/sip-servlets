@@ -577,10 +577,11 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 			}
 		}
 	}
-
-	public void removeAttribute(String name) {
+	
+	@Override
+	public void removeAttribute(String name, boolean byPassValidCheck) {
 		// Validate our current state
-		if (!isValid())
+		if (!byPassValidCheck && !isValid())
 			throw new IllegalStateException(sm
 					.getString("clusteredSession.removeAttribute.ise"));
 
