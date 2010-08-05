@@ -621,7 +621,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 					.getString("clusteredSession.setAttribute.namenull"));
 
 		// Validate our current state
-		if (!isValid())
+		if (!byPassValidCheck && !isValid())
 			throw new IllegalStateException(sm
 					.getString("clusteredSession.setAttribute.ise"));
 		
