@@ -243,11 +243,18 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that
 		// the tx serialization is preserved		
 		sipContext.enterSipApp(sipApplicationSession, sipSession);
+		
 		// if the flag is set we bypass the executor. This flag should be made deprecated 
 		if(sipApplicationDispatcher.isBypassRequestExecutor() || ConcurrencyControlMode.Transaction.equals((sipContext.getConcurrencyControlMode()))) {
 			dispatchTask.dispatchAndHandleExceptions();
 		} else {
+			if(logger.isDebugEnabled()) {
+				logger.debug("We are just before executor with sipAppSession=" + sipApplicationSession + " and sipSession=" + sipSession + " for " + sipServletMessage);
+			}
 			getConcurrencyModelExecutorService(sipContext, sipServletMessage).execute(dispatchTask);
+			if(logger.isDebugEnabled()) {
+				logger.debug("We are just after executor with sipAppSession=" + sipApplicationSession + " and sipSession=" + sipSession + " for " + sipServletMessage);
+			}
 		}
 	}	
 
