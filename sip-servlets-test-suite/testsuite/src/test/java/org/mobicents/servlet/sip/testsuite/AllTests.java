@@ -50,6 +50,7 @@ import org.mobicents.servlet.sip.testsuite.failover.BasicFailoverTest;
 import org.mobicents.servlet.sip.testsuite.join.JoinSipServletTest;
 import org.mobicents.servlet.sip.testsuite.listeners.ListenersSipServletTest;
 import org.mobicents.servlet.sip.testsuite.mapping.ServletMappingSipServletTest;
+import org.mobicents.servlet.sip.testsuite.proxy.ForkingProxyDerivedSessions;
 import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyTelURLWithRecordRouteTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyWithRecordRouteTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ParallelProxyWithRecordRouteUseHostNameTest;
@@ -127,6 +128,7 @@ public class AllTests {
 		suite.addTestSuite(ParallelProxyTelURLWithRecordRouteTest.class);
 		suite.addTestSuite(ParallelProxyWithRecordRouteUseHostNameTest.class);
 		suite.addTestSuite(ProxyPrackTest.class);
+		suite.addTestSuite(ForkingProxyDerivedSessions.class);
 		suite.addTestSuite(ProxyNonRecordRouteTest.class);
 		suite.addTestSuite(ShootmePrackSipServletTest.class);
 		suite.addTestSuite(ShootistPrackSipServletTest.class);
