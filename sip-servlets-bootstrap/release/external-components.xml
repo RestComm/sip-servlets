@@ -15,8 +15,8 @@
         <!--media.core.2.x.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/media/2.x.y/core/mms-core-2.0.0.BETA3</media.core.2.x.connectionURL-->
         <!--diameter.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/diameter/core/mux/mobicents-diameter-mux-1.1.0.GA/</diameter.connectionURL-->        
         <!--sip.balancer.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/tools/sip-balancer/sip-balancer-1.0.BETA7</sip.balancer.connectionURL-->
-        <!--sip.balancer.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/tools/sip-balancer/sip-balancer-1.0.BETA13</sip.balancer.connectionURL-->
-		<sip.balancer.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/trunk/tools/sip-balancer</sip.balancer.connectionURL>
+        <sip.balancer.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/tools/sip-balancer/sip-balancer-1.0.1</sip.balancer.connectionURL>
+		<!--sip.balancer.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/trunk/tools/sip-balancer</sip.balancer.connectionURL-->
     </properties>
     <profiles>
         <profile>
