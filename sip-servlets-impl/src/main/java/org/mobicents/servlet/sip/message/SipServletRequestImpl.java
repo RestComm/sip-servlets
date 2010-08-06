@@ -1005,12 +1005,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				final Transaction transaction = getTransaction();
 				final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
 				final B2buaHelperImpl b2buaHelperImpl = sipSession.getB2buaHelper();
-				if(b2buaHelperImpl != null) {
+				if(b2buaHelperImpl != null && tad != null) {
 					// we unlink the originalRequest early to avoid keeping the messages in mem for too long
 					b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage());
 				}				
-				session.removeOngoingTransaction(transaction);
-				tad.cleanUp();
+				session.removeOngoingTransaction(transaction);	
+				if(tad != null) {
+					tad.cleanUp();
+				}
 				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
 						transport, false).getSipProvider();	
 				// Issue 1468 : to handle forking, we shouldn't cleanup the app data since it is needed for the forked responses
