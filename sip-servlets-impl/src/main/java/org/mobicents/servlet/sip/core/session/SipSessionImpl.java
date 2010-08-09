@@ -1909,7 +1909,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		this.cseq = cseq;
 	}
 	//CSeq validation should only be done for non proxy applications
-	public synchronized boolean validateCSeq(SipServletRequestImpl sipServletRequest) {
+	public boolean validateCSeq(SipServletRequestImpl sipServletRequest) {
 		final Request request = (Request) sipServletRequest.getMessage();
 		final long localCseq = cseq;		
 		final long remoteCseq =  ((CSeqHeader) request.getHeader(CSeqHeader.NAME)).getSeqNumber();
@@ -1917,9 +1917,13 @@ public class SipSessionImpl implements MobicentsSipSession {
 		final boolean isAck = Request.ACK.equalsIgnoreCase(method);
 		final boolean isPrackCancel= Request.PRACK.equalsIgnoreCase(method) || Request.CANCEL.equalsIgnoreCase(method);
 		final boolean isAckRetranmission = isAckReceived() && isAck;			
+		boolean resetLocalCSeq = true;
 		
 		if(isAck) {
-			setAckReceived(true);
+			// Issue 1714 : don't set the flag if the cseq are not equals 
+			if(localCseq == remoteCseq) {
+				setAckReceived(true);
+			}
 		} 		
 		if(isAckRetranmission) {
 			// Filter out ACK retransmissions for JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
@@ -1940,6 +1944,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 					logger.error("Can not send error response", e);
 				}
 				return false;
+			} else {
+				// Issue 1714 : if the local cseq is greater then the remote one don't reset the local cseq
+				resetLocalCSeq= false;
 			}
 		}
 		if(Request.INVITE.equalsIgnoreCase(method)){			
@@ -1949,7 +1956,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 				logger.debug("resetting the ack retransmission flag on the sip session " + getKey() + " because following reINVITE has been received " + request);
 			}
 		}
-		setCseq(remoteCseq);
+		if(resetLocalCSeq) {
+			setCseq(remoteCseq);
+		}
 		return true;
 	}
 	public String getTransport() {
