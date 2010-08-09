@@ -21,6 +21,8 @@ import gov.nist.javax.sip.stack.SIPClientTransaction;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.io.PrintWriter;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -63,6 +65,7 @@ import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 /**
@@ -75,7 +78,6 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(SipServletResponseImpl.class);
 	
-	Response response;
 	SipServletRequestImpl originalRequest;
 	ProxyBranch proxyBranch;
 
@@ -104,7 +106,6 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			boolean hasBeenReceived) {
 		
 		super(response, sipFactoryImpl, transaction, session, dialog);
-		this.response = response;	
 		setProxiedResponse(false);
 		isResponseForwardedUpstream = false;
 		isAckGenerated = false;
@@ -115,7 +116,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 * @return the response
 	 */
 	public Response getResponse() {
-		return response;
+		return (Response) message;
 	}
 	
 	@Override
@@ -165,6 +166,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 */
 	@SuppressWarnings("unchecked")
 	public SipServletRequest createAck() {
+		final Response response = getResponse();
 		if(!Request.INVITE.equals(((SIPTransaction)getTransaction()).getMethod()) || (response.getStatusCode() >= 100 && response.getStatusCode() < 200) || isAckGenerated) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("transaction state " + ((SIPTransaction)getTransaction()).getMethod() + " status code " + response.getStatusCode() + " isAckGenerated " + isAckGenerated);
@@ -215,6 +217,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	}
 
 	public SipServletRequest createPrack() throws Rel100Exception {
+		final Response response = getResponse();
 		if((response.getStatusCode() == 100 && response.getStatusCode() >= 200) || isPrackGenerated) {
 			throw new IllegalStateException("the transaction state is such that it doesn't allow a PRACK to be sent now, or this response is provisional only, or a PRACK has already been generated");
 		}
@@ -287,7 +290,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletResponse#getReasonPhrase()
 	 */
 	public String getReasonPhrase() {
-		return response.getReasonPhrase();
+		return getResponse().getReasonPhrase();
 	}
 
 	/*
@@ -303,7 +306,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletResponse#getStatus()
 	 */
 	public int getStatus() {
-		return response.getStatusCode();
+		return getResponse().getStatusCode();
 	}
 
 	/*
@@ -339,7 +342,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 */
 	public void setStatus(int statusCode) {
 		try {
-			response.setStatusCode(statusCode);
+			getResponse().setStatusCode(statusCode);
 		} catch (ParseException e) {
 			throw new IllegalArgumentException(e);
 		}
@@ -352,6 +355,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 */
 	public void setStatus(int statusCode, String reasonPhrase) {
 		try {
+			final Response response = getResponse();
 			response.setStatusCode(statusCode);
 			response.setReasonPhrase(reasonPhrase);
 		} catch (ParseException e) {
@@ -423,6 +427,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			throw new IllegalStateException("this response was received from downstream");
 		}
 		try {	
+			final Response response = getResponse();
 			final int statusCode = response.getStatusCode();
 			final MobicentsSipSession session = getSipSession();
 			final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();
@@ -588,6 +593,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 */
 	public Iterator<String> getChallengeRealms() {
 		List<String> realms = new ArrayList<String>();
+		final Response response = getResponse();
 		if(response.getStatusCode() == SipServletResponse.SC_UNAUTHORIZED) {
 			WWWAuthenticateHeader authenticateHeader = (WWWAuthenticateHeader) 
 				response.getHeader(WWWAuthenticateHeader.NAME);
@@ -715,7 +721,59 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	public void cleanUp() {		
 //		super.cleanUp();
 		originalRequest = null;
-		proxyBranch = null;		
-		response =null;
+		proxyBranch = null;				
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
+	 */
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		super.readExternal(in);
+		String messageString = in.readUTF();
+		try {
+			message = SipFactories.messageFactory.createResponse(messageString);
+		} catch (ParseException e) {
+			throw new IllegalArgumentException("Message " + messageString + " previously serialized could not be reparsed", e);
+		}
+		boolean isOriginalRequestSerialized = in.readBoolean();
+		if (isOriginalRequestSerialized) {
+			originalRequest = (SipServletRequestImpl) in.readObject();
+		}
+		boolean isProxyBranchSerialized = in.readBoolean();
+		if (isProxyBranchSerialized) {
+			proxyBranch = (ProxyBranchImpl) in.readObject();
+		}
+		isProxiedResponse = in.readBoolean();
+		isResponseForwardedUpstream = in.readBoolean();
+		isAckGenerated = in.readBoolean();
+		isPrackGenerated = in.readBoolean();
+		hasBeenReceived = in.readBoolean();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
+	 */
+	public void writeExternal(ObjectOutput out) throws IOException {
+		super.writeExternal(out);
+		if(originalRequest == null) {
+			out.writeBoolean(false);
+		} else {
+			out.writeBoolean(true);
+			out.writeObject(originalRequest);
+		}
+		if(proxyBranch == null) {
+			out.writeBoolean(false);
+		} else {
+			out.writeBoolean(true);
+			out.writeObject(proxyBranch);
+		}
+		out.writeBoolean(isProxiedResponse);
+		out.writeBoolean(isResponseForwardedUpstream);
+		out.writeBoolean(isAckGenerated);
+		out.writeBoolean(isPrackGenerated);
+		out.writeBoolean(hasBeenReceived);
 	}
 }

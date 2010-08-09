@@ -19,8 +19,10 @@ package org.mobicents.servlet.sip.message;
 import gov.nist.javax.sip.header.SIPHeader;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
+import java.io.Externalizable;
 import java.io.IOException;
-import java.io.Serializable;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.security.Principal;
@@ -36,6 +38,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.DataHandler;
@@ -93,7 +96,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * @author mranga
  * 
  */
-public abstract class SipServletMessageImpl implements SipServletMessage, Serializable {
+public abstract class SipServletMessageImpl implements SipServletMessage, Externalizable {
 
 	
 	private static final long serialVersionUID = 1L;
@@ -1714,6 +1717,66 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Serial
 	}
 	
 	public abstract void cleanUp();
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
+	 */
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		sipFactoryImpl = (SipFactoryImpl) in.readObject();
+		String sessionKeyString = in.readUTF();
+		try {
+			sessionKey = SessionManagerUtil.parseSipSessionKey(sessionKeyString);
+		} catch (ParseException e) {
+			throw new IllegalArgumentException("SIP Sesion Key " + sessionKeyString + " previously serialized could not be reparsed", e);
+		}
+		Object[][] attributesArray = (Object[][] )in.readObject();
+		attributes = new ConcurrentHashMap<String, Object>();
+		for (int i = 0; i < attributesArray.length; i++) {
+			String key = (String) attributesArray[0][i];
+			Object value = attributesArray[1][i];
+			attributes.put(key, value);
+		}
+		transactionApplicationData = (TransactionApplicationData) in.readObject();
+		headerForm = HeaderForm.valueOf(in.readUTF());
+		currentApplicationName = in.readUTF();
+		if(currentApplicationName.equals("")) {
+			currentApplicationName = null;
+		}
+		isMessageSent = in.readBoolean();
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
+	 */
+	public void writeExternal(ObjectOutput out) throws IOException {
+		out.writeObject(sipFactoryImpl);
+		if(sessionKey != null) {
+			out.writeUTF(sessionKey.toString());
+		} else {
+			out.writeUTF(sipSession.getId());
+		}
+		
+		Object[][] attributesArray = new Object[2][attributes.size()];
+		int i = 0;
+		for (Entry<String, Object> entry : attributes.entrySet()) {
+			attributesArray [0][i] = entry.getKey(); 
+			attributesArray [1][i] = entry.getValue();
+			i++;
+		}
+		out.writeObject(attributesArray);
+		out.writeObject(transactionApplicationData);
+		out.writeUTF(headerForm.toString());
+		if(currentApplicationName != null) {
+			out.writeUTF(currentApplicationName);
+		} else {
+			out.writeUTF("");
+		}
+		out.writeBoolean(isMessageSent);
+		out.writeUTF(message.toString());		
+	}
 //	public void cleanUp() {
 //		if(logger.isDebugEnabled()) {
 //			logger.debug("cleaning up the message " + message);
