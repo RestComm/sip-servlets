@@ -339,13 +339,13 @@ public class Shootme implements SipListener {
 		Request request = requestEvent.getRequest();
 		try {
 			System.out.println("shootme:  got a cancel.");
+			cancelled = true;
 			if (serverTransactionId == null) {
 				System.out.println("shootme:  null tid.");
 				return;
 			}
 			Response response = messageFactory.createResponse(487, request);
-			serverTransactionId.sendResponse(response);
-			cancelled = true;
+			serverTransactionId.sendResponse(response);			
 			if (dialog.getState() != DialogState.CONFIRMED) {
 				response = messageFactory.createResponse(
 						Response.REQUEST_TERMINATED, inviteRequest);
