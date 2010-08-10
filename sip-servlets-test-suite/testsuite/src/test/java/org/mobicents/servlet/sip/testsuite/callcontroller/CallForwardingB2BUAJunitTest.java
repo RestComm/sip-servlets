@@ -94,9 +94,10 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		String toUser = "receiver";
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
-		
+				
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isAckReceived());
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
 		Thread.sleep(TIMEOUT*2);
@@ -341,6 +342,40 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());					
+	}
+	
+	// non regression test for issue 1716 http://code.google.com/p/mobicents/issues/detail?id=1716
+	// The same response is routed to SipServlet twice
+	public void testCallForwardingCallerCheckRetransmissionIsNotAForkedResponse() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "factory-sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setTimeToWaitBeforeAck(6000);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Require"}, new String[] {"Nothing"}, false);		
+		Thread.sleep(TIMEOUT*2);
+		assertTrue(sender.isAckSent());
+		assertTrue(receiver.isAckReceived());
+		assertTrue(sender.getOkToByeReceived());
+		assertTrue(receiver.getByeReceived());
 	}
 	
 	@Override

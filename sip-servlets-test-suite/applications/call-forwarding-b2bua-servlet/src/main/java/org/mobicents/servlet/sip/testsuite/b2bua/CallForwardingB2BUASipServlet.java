@@ -429,8 +429,14 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 					}
 				} else {
 				    SipSession peerSession = sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
-				    SipServletResponse responseToOriginalRequest = sipServletResponse.getRequest().getB2buaHelper().createResponseToOriginalRequest(peerSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
-				    responseToOriginalRequest.send();
+				    try {
+				    	SipServletResponse responseToOriginalRequest = sipServletResponse.getRequest().getB2buaHelper().createResponseToOriginalRequest(peerSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
+				    	responseToOriginalRequest.send();
+				    }catch (Exception e) {
+				    	logger.error("exception happened while trying to forward the response to the other side", e);
+				    	peerSession.createRequest("BYE").send();
+				    	sipServletResponse.getSession().createRequest("BYE").send();
+					}
 				    //
 				    if(sendAck) {
 					    SipServletRequest ackRequest = sipServletResponse.createAck();
