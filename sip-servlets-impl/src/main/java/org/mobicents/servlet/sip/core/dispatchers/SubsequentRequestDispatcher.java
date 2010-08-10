@@ -248,7 +248,6 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}
 		// END of validation for http://code.google.com/p/mobicents/issues/detail?id=766
 		
-		
 		// if the flag is set we bypass the executor. This flag should be made deprecated 
 		if(sipApplicationDispatcher.isBypassRequestExecutor() || ConcurrencyControlMode.Transaction.equals((sipContext.getConcurrencyControlMode()))) {
 			dispatchTask.dispatchAndHandleExceptions();
