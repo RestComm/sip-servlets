@@ -326,7 +326,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			sipStackProperties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
 			sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
 			sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
-			sipStackProperties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "0");
+			sipStackProperties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "1");
 			sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
 			sipStackProperties.setProperty(PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");
 		}
