@@ -5,6 +5,28 @@
 <web-app>
 	<display-name>Sample</display-name>	
 	
+	<!-- Uncomment if you want to secure the management console 
+	 <security-constraint>
+     <web-resource-collection>
+       <web-resource-name>HtmlAdaptor</web-resource-name>
+       <description>MSS admin security
+       </description>
+       <url-pattern>/*</url-pattern>
+     </web-resource-collection>
+     <auth-constraint>
+       <role-name>JBossAdmin</role-name>
+     </auth-constraint>
+   </security-constraint>
+
+   <login-config>
+      <auth-method>BASIC</auth-method>
+      <realm-name>Sip Servlets Management Console</realm-name>
+   </login-config>
+
+   <security-role>
+      <role-name>JBossAdmin</role-name>
+   </security-role>-->
+	
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>

@@ -20,3 +20,8 @@ Just add apps, drag and drop apps or groups of apps. You can view the DAR config
 with "View source" and you can save the configuration with "Save". The configuration will be 
 persisted to the default location of your dar file if possible (if the file is accessible for
 writing).
+
+Security
+--------
+To secure the console you must read WEB-INF/web.xml and Uncomment the security constraints declaration.
+After that you can use the same username and password you use with JMX console.
