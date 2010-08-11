@@ -87,7 +87,7 @@
 		<mobicents.cluster.version>1.6</mobicents.cluster.version>
 		<mobicents.balancer.version>1.0.1</mobicents.balancer.version>
 		<mobicents.jain.sip.ha.version>0.11</mobicents.jain.sip.ha.version>
-		<tomcat.version>6.0.20</tomcat.version>	
+		<tomcat.version>6.0.29</tomcat.version>	
 	</properties>
 	
 	<dependencies>
