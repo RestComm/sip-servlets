@@ -1,5 +1,5 @@
 /*
- * This is free software; you can redistribute it and/or modify it
+r * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
@@ -1815,9 +1815,18 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			linkedRequest = (SipServletRequestImpl) in.readObject();
 		}
 		createDialog = in.readBoolean();
-		routingDirective = SipApplicationRoutingDirective.valueOf(in.readUTF());
-		routingState = RoutingState.valueOf(in.readUTF());
-		routingRegion = (SipApplicationRoutingRegion) in.readObject();
+		String routingDirectiveString = in.readUTF();
+		if(!routingDirectiveString.equals("")) {
+			routingDirective = SipApplicationRoutingDirective.valueOf(routingDirectiveString);
+		}
+		String routingStateString = in.readUTF();
+		if(!routingStateString.equals("")) {
+			routingState = RoutingState.valueOf(routingStateString);
+		}
+		boolean isRoutingRegionSet = in.readBoolean();
+		if(isRoutingRegionSet) {
+			routingRegion = (SipApplicationRoutingRegion) in.readObject();
+		}
 		isInitial = in.readBoolean();
 		isFinalResponseGenerated = in.readBoolean();
 		is1xxResponseGenerated = in.readBoolean();		
@@ -1836,9 +1845,22 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			out.writeObject(linkedRequest);
 		}
 		out.writeBoolean(createDialog);
-		out.writeUTF(routingDirective.toString());
-		out.writeUTF(routingState.toString());
-		out.writeObject(routingRegion);
+		if(routingDirective != null) {
+			out.writeUTF(routingDirective.toString());
+		} else {
+			out.writeUTF("");
+		}
+		if(routingState != null) {
+			out.writeUTF(routingState.toString());
+		} else {
+			out.writeUTF("");
+		}
+		if(routingRegion != null) {
+			out.writeBoolean(true);
+			out.writeObject(routingRegion);
+		} else {
+			out.writeBoolean(false);
+		}
 		out.writeBoolean(isInitial);
 		out.writeBoolean(isFinalResponseGenerated);
 		out.writeBoolean(is1xxResponseGenerated);	
