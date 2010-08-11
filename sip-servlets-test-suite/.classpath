@@ -44,13 +44,13 @@
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="lib" path="testsuite/lib/sipunit.jar" sourcepath="/sipunit/src"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/catalina/6.0.20/catalina-6.0.20.jar" sourcepath="/TOMCAT_HOME/java"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/coyote/6.0.20/coyote-6.0.20.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/servlet-api/6.0.20/servlet-api-6.0.20.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/jsp-api/6.0.20/jsp-api-6.0.20.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/el-api/6.0.20/el-api-6.0.20.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/jasper/6.0.20/jasper-6.0.20.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.20/annotations-api-6.0.20.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/catalina/6.0.29/catalina-6.0.29.jar" sourcepath="/TOMCAT_HOME/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/coyote/6.0.29/coyote-6.0.29.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/servlet-api/6.0.29/servlet-api-6.0.29.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/jsp-api/6.0.29/jsp-api-6.0.29.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/el-api/6.0.29/el-api-6.0.29.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/jasper/6.0.29/jasper-6.0.29.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.29/annotations-api-6.0.29.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-application-router"/>
 	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.12/log4j-1.2.12.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-tomcat-jboss4"/>

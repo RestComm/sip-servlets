@@ -120,7 +120,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-server/5.1.0.GA/jboss-as-server-5.1.0.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-system-jmx/5.1.0.GA/jboss-as-system-jmx-5.1.0.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-system/5.1.0.GA/jboss-as-system-5.1.0.GA.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-tomcat/5.1.0.GA/jboss-as-tomcat-5.1.0.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-as-tomcat/5.1.0.GA/jboss-as-tomcat-5.1.0.GA.jar" sourcepath="/JBOSS-5/tomcat/src/main"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossas/jboss-server-manager/1.0.2.GA/jboss-server-manager-1.0.2.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jbossxb/2.0.1.GA/jbossxb-2.0.1.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jpa/jboss-jpa-deployers/1.0.0-CR1/jboss-jpa-deployers-1.0.0-CR1.jar"/>

@@ -3328,4 +3328,14 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		return totalSipSessionBytesReplicatedFromThisNode.get();
 	}
 
+	/**
+     * Change the session ID of the current session to a new randomly generated
+     * session ID.
+     * 
+     * @param session   The session to change the session ID for
+     */
+    public void changeSessionId(Session session) {
+    	//added for tomcat 6.0.29 compatibility but not needed in JBoss AS 4
+//        session.setId(generateSessionId());
+    }
 }
