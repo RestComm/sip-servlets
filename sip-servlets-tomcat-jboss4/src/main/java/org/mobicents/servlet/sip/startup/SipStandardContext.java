@@ -1129,8 +1129,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					if(semaphore != null) {
 						if(logger.isDebugEnabled()) {
 							logger.debug("SipSession: Before semaphore acquire for sipApplicationSession=" + sipApplicationSession +
-									" sipSession=" + sipSession + " semaphore=" + semaphore,
-									new RuntimeException("Just recording the stack trace here in the log"));
+									" sipSession=" + sipSession + " semaphore=" + semaphore);
 						}
 						semaphore.acquireUninterruptibly();
 						if(logger.isDebugEnabled()) {
@@ -1152,8 +1151,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 						if(semaphore != null) {
 							if(logger.isDebugEnabled()) {
 								logger.debug("Child SipSession: Before semaphore acquire for sipApplicationSession=" + sipApplicationSession +
-										" sipSession=" + sipSession + " semaphore=" + semaphore,
-										new RuntimeException("Just recording the stack trace here in the log"));
+										" sipSession=" + sipSession + " semaphore=" + semaphore);
 							}
 							semaphore.acquireUninterruptibly();
 							if(logger.isDebugEnabled()) {
@@ -1170,8 +1168,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					if(semaphore != null) {
 						if(logger.isDebugEnabled()) {
 							logger.debug("SipAppSession: Before semaphore acquire for sipApplicationSession=" + sipApplicationSession +
-									" sipSession=" + sipSession + " semaphore=" + semaphore,
-									new RuntimeException("Just recording the stack trace here in the log"));
+									" sipSession=" + sipSession + " semaphore=" + semaphore);
 						}
 						semaphore.acquireUninterruptibly();
 						if(logger.isDebugEnabled()) {
@@ -1195,8 +1192,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 						semaphore.release();
 						if(logger.isDebugEnabled()) {
 							logger.debug("SipSession: Semaphore released for sipApplicationSession=" + sipApplicationSession +
-									" sipSession=" + sipSession + " semaphore=" + semaphore,
-									new RuntimeException("Just recording the stack trace here in the log"));
+									" sipSession=" + sipSession + " semaphore=" + semaphore);
 						}
 					}
 				} else if (sipApplicationSession != null) {
@@ -1210,8 +1206,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 							semaphore.release();
 							if(logger.isDebugEnabled()) {
 								logger.debug("Child SipSession: Semaphore released for sipApplicationSession=" + sipApplicationSession +
-										" sipSession=" + sipSession + " semaphore=" + semaphore,
-										new RuntimeException("Just recording the stack trace here in the log"));
+										" sipSession=" + sipSession + " semaphore=" + semaphore);
 							}
 						}
 					}
@@ -1222,14 +1217,12 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					sipApplicationSession.getSemaphore().release();
 					if(logger.isDebugEnabled()) {
 						logger.debug("SipAppSession: Semaphore released for sipApplicationSession=" + sipApplicationSession +
-								" sipSession=" + sipSession + " semaphore=" + sipApplicationSession.getSemaphore(),
-								new RuntimeException("Just recording the stack trace here in the log"));
+								" sipSession=" + sipSession + " semaphore=" + sipApplicationSession.getSemaphore());
 					}
 				} else {
 					if(logger.isDebugEnabled()) {
 						logger.debug("SipSession semaphore: NOT RELEASING semaphore on exit sipApplicationSession=" + sipApplicationSession +
-								" sipSession=" + sipSession + " semaphore=null",
-								new RuntimeException("Just recording the stack trace here in the log"));
+								" sipSession=" + sipSession + " semaphore=null");
 					}
 				}
 				break;

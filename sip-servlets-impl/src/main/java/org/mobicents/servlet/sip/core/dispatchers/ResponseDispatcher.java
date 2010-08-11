@@ -336,6 +336,10 @@ public class ResponseDispatcher extends MessageDispatcher {
 							//				JainSipUtils.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, clientTransaction, request, sipProvider);
 						}
 					} finally {
+						// exitSipAppHa completes the replication task. It might block for a while if the state is too big
+						// We should never call exitAipApp before exitSipAppHa, because exitSipApp releases the lock on the
+						// Application of SipSession (concurrency control lock). If this happens a new request might arrive
+						// and modify the state during Serialization or other non-thread safe operation in the serialization
 						sipContext.exitSipAppHa(null, sipServletResponse);
 						sipContext.exitSipApp(session.getSipApplicationSession(), session);						
 					}
