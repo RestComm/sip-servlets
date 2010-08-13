@@ -161,6 +161,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	// This field is only used in CANCEL requests where we need the INVITe transaction
 	private transient Transaction inviteTransactionToCancel;
 	
+	// needed for externalizable
+	public SipServletRequestImpl () {}
+	
 	public SipServletRequestImpl(Request request, SipFactoryImpl sipFactoryImpl,
 			MobicentsSipSession sipSession, Transaction transaction, Dialog dialog,
 			boolean createDialog) {

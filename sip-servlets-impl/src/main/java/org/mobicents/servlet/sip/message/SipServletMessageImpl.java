@@ -151,6 +151,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	
 	protected transient String method;
 	
+	// needed for externalizable
+	public SipServletMessageImpl () {}
+	
 	protected SipServletMessageImpl(Message message,
 			SipFactoryImpl sipFactoryImpl, Transaction transaction,
 			MobicentsSipSession sipSession, Dialog dialog) {

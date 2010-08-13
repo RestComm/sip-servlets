@@ -88,6 +88,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	//Added for TCK test SipServletResponseTest.testSend101
 	private boolean hasBeenReceived;
 	
+	// needed for externalizable
+	public SipServletResponseImpl () {}
+	
 	/**
 	 * Constructor
 	 * @param response
