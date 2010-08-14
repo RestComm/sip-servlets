@@ -1734,9 +1734,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		} catch (ParseException e) {
 			throw new IllegalArgumentException("SIP Sesion Key " + sessionKeyString + " previously serialized could not be reparsed", e);
 		}
+		int attributesSize = in.readInt();
 		Object[][] attributesArray = (Object[][] )in.readObject();
 		attributes = new ConcurrentHashMap<String, Object>();
-		for (int i = 0; i < attributesArray.length; i++) {
+		for (int i = 0; i <attributesSize; i++) {
 			String key = (String) attributesArray[0][i];
 			Object value = attributesArray[1][i];
 			attributes.put(key, value);
@@ -1761,7 +1762,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		} else {
 			out.writeUTF(sipSession.getId());
 		}
-		
+		out.writeInt(attributes.size());
 		Object[][] attributesArray = new Object[2][attributes.size()];
 		int i = 0;
 		for (Entry<String, Object> entry : attributes.entrySet()) {
