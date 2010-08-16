@@ -82,9 +82,8 @@ public class SipConnector implements Serializable {
 	/**
 	 * @param transport
 	 *            the transport to set
-	 * @throws Exception
 	 */
-	public void setTransport(String transport) throws Exception {
+	public void setTransport(String transport) {
 		this.transport = transport;
 	}
 
