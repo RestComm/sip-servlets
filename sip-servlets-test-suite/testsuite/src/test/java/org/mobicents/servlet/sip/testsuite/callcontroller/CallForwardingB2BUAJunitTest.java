@@ -369,7 +369,7 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.setTimeToWaitBeforeAck(6000);
+		sender.setTimeToWaitBeforeAck(4000);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Require"}, new String[] {"Nothing"}, false);		
 		Thread.sleep(TIMEOUT*2);
 		assertTrue(sender.isAckSent());
