@@ -1,0 +1,2 @@
+<scanning xmlns="urn:jboss:scanning:1.0"/>  
+<!-- removes the scanning of annotations -->

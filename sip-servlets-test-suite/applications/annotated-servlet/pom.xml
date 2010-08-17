@@ -9,13 +9,13 @@
 	<packaging>war</packaging>
 	<version>1.4-SNAPSHOT</version>
 	<name>Annoatated Sip Servlet Example</name>
-	<build>
+	<build>		
 		<plugins>
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<webXml>
-						${basedir}/src/main/sipapp/WEB-INF/sip.xml
+						${basedir}/src/main/sipapp/WEB-INF/web.xml
 					</webXml>
 					<warSourceDirectory>
 						${basedir}/src/main/sipapp
