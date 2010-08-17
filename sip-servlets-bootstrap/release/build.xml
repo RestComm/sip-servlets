@@ -50,6 +50,7 @@
 	<property name="embjopr.home.contents" value="${release.path}/embedded-jopr.war-contents" />
 	<property name="mss.jopr-plugin-5.version" value="1.5.1"/>
 	<property name="mss.jopr-plugin-5.url" value="https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/jopr-mobicents-sip-servlets-as-5-plugin/${mss.jopr-plugin-5.version}/jopr-mobicents-sip-servlets-as-5-plugin-${mss.jopr-plugin-5.version}.jar"/>
+	<property name="jopr-jmx-plugin-5.url" value="https://repository.jboss.org/nexus/content/groups/public/org/rhq/rhq-jmx-plugin/1.2.0.GA/rhq-jmx-plugin-1.2.0.GA.jar"/>
 	
 	<condition property="mvn.executable" value="${sys.M2_HOME}\bin\mvn.bat" else="mvn">
 		<os family="windows"/>
@@ -414,6 +415,7 @@
 		<echo message="MSS_HOME=${mss.home}"/>
 		<move verbose="true" failonerror="false" file="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins/jopr-jboss-as-5-plugin-2.3.0.EmbJopr.1.2.0-1.jar" tofile="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins/jopr-jboss-as-5-plugin-2.3.0.EmbJopr.1.2.0-1.jar.bak" />
 		<get dest="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins/jopr-mobicents-sip-servlets-as-5-plugin-${mss.jopr-plugin-5.version}.jar" src="${mss.jopr-plugin-5.url}"/>		
+		<get dest="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins/rhq-jmx-plugin-1.2.0.GA.jar" src="${jopr-jmx-plugin-5.url}"/>
 	</target>
 	
 	<!-- Get dependencies -->
