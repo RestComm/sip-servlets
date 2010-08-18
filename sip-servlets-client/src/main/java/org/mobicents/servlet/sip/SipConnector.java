@@ -203,6 +203,13 @@ public class SipConnector implements Serializable {
 		return sipStackPropertiesFileLocation;
 	}
 	
+	/*
+	 * Cleans up all cached TCP sockets in case they are stalled. You should not call this method on
+	 * UDP connector, it has no effect.
+	 * 
+	 * After closing the sockets when needed new sockets will be created for the same dialog or
+	 * transaction as required by the SIP specification.
+	 */
 	public void closeAllSockets() {
 		if(transport.equalsIgnoreCase("udp")) {
 			logger.warn("Cannot close TCP sockets on UDP connector");
