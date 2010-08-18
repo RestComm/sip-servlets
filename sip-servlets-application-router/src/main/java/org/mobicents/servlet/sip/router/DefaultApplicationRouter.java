@@ -406,8 +406,9 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.ar.SipApplicationRouter#init(java.util.Properties)
 	 */
 	public void init(Properties properties) {
 		init();		
