@@ -6,8 +6,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.media.mscontrol.MediaSession;
 import javax.media.mscontrol.MsControlException;
+import javax.media.mscontrol.Parameters;
 import javax.media.mscontrol.mixer.MediaMixer;
+import javax.media.mscontrol.resource.enums.ParameterEnum;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -81,7 +84,10 @@ public class Conference {
 	public synchronized MediaMixer getMixer() {
 		if(mixer == null) {
 			try {
-				mixer = MsControlObjects.msControlFactory.createMediaSession().createMediaMixer(MediaMixer.AUDIO);
+				MediaSession createMediaSession = MsControlObjects.msControlFactory.createMediaSession();
+				Parameters createParameters = createMediaSession.createParameters();
+				createParameters.put(ParameterEnum.MAX_PORTS, 100);
+				mixer = createMediaSession.createMediaMixer(MediaMixer.AUDIO, createParameters);
 			} catch (MsControlException e) {
 				logger.error(e);
 			}
