@@ -22,6 +22,13 @@
 package org.mobicents.servlet.sip;
 
 import java.io.Serializable;
+import java.util.Set;
+
+import javax.management.MBeanServer;
+import javax.management.MBeanServerFactory;
+import javax.management.ObjectName;
+
+import org.apache.log4j.Logger;
 
 /**
  * Represents a Mobicents Sip Servlets SIP connector and its various attributes
@@ -32,6 +39,8 @@ import java.io.Serializable;
 public class SipConnector implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	
+	private static Logger logger = Logger.getLogger(SipConnector.class);
 
 	/**
 	 * the sip stack signaling transport
@@ -192,6 +201,32 @@ public class SipConnector implements Serializable {
 	 */
 	public String getSipStackPropertiesFileLocation() {
 		return sipStackPropertiesFileLocation;
+	}
+	
+	public void closeAllSockets() {
+		if(transport.equalsIgnoreCase("udp")) {
+			logger.warn("Cannot close TCP sockets on UDP connector");
+			return;
+		}
+		MBeanServer mbeanServer = MBeanServerFactory.findMBeanServer(null).iterator().next();
+		try {
+			if(logger.isDebugEnabled()) {
+				logger.debug("MBean Server = " + mbeanServer);
+			}
+			Set<ObjectName> queryNames = mbeanServer.queryNames(new ObjectName("jboss.web:type=GlobalRequestProcessor,*"), null);
+			for(ObjectName objectName : queryNames) {
+				if(objectName.getCanonicalName().toLowerCase().contains("sip-tcp") ||
+						objectName.getCanonicalName().toLowerCase().contains("sip-tls")) {
+					// TODO: we may want to check the IP address if it matches this.ipAddress
+					if(logger.isInfoEnabled()) {
+						logger.info("Invoking closeAllTcpSockets()");
+					}
+					mbeanServer.invoke(objectName, "closeAllTcpSockets", null, null);
+				}
+			}
+		} catch (Exception e) {
+			logger.error("Error closing the TCP sockets", e);
+		}
 	}
 
 	/* (non-Javadoc)

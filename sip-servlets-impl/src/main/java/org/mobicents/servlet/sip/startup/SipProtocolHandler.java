@@ -756,7 +756,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
                 encodedAddr = encodedAddr.substring(1);
             encodedAddr = URLEncoder.encode(encodedAddr) + "-";
         }
-        return ("sip-" + encodedAddr + getPort());
+        return ("sip-" + getTransport() + "-" + encodedAddr + getPort());
     }
     
     // -------------------- JMX related methods --------------------

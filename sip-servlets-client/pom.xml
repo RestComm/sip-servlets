@@ -17,6 +17,13 @@
 			<artifactId>sip-servlets-spec</artifactId>
 			<version>1.1.14-SNAPSHOT</version>			
 		</dependency>
+		<!-- logging dependency -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>${log4j.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>		
