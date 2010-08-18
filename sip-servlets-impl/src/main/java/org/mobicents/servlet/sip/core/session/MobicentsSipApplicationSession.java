@@ -23,6 +23,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 
+import org.mobicents.javax.servlet.sip.SipApplicationSessionExt;
 import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
 import org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -32,7 +33,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
-public interface MobicentsSipApplicationSession extends SipApplicationSession {
+public interface MobicentsSipApplicationSession extends SipApplicationSession, SipApplicationSessionExt {
 	public static final String SIP_APPLICATION_KEY_PARAM_NAME = "org.mobicents.servlet.sip.ApplicationSessionKey";
 	
 	boolean addHttpSession(HttpSession httpSession);

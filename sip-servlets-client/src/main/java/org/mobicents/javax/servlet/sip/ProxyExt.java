@@ -36,7 +36,58 @@ import javax.servlet.sip.SipURI;
  * 		</li>
  * </ul>
  * 
+ * Here is some sample code to show how it can be used :
  * 
+ * <pre>
+ * 	import java.io.IOException;
+ * 	import java.util.ArrayList;
+ * 	import javax.servlet.ServletException;
+ * 	import javax.servlet.sip.Proxy;
+ * 	import javax.servlet.sip.ProxyBranch;
+ * 	import javax.servlet.sip.SipFactory;
+ * 	import javax.servlet.sip.SipServlet;
+ * 	import javax.servlet.sip.SipServletRequest;
+ * 	import javax.servlet.sip.URI;
+ * 	
+ * 	import org.mobicents.javax.servlet.sip.ProxyBranchListener;
+ * 	import org.mobicents.javax.servlet.sip.ProxyExt;
+ * 	import org.mobicents.javax.servlet.sip.ResponseType;
+ * 
+ * 	public class ProxySipServlet extends SipServlet implements ProxyBranchListener {
+ *  
+ * 	protected void doInvite(SipServletRequest request) throws ServletException,
+ * 			IOException {
+ * 
+ * 		if(!request.isInitial()){
+ * 			return;
+ * 		}
+ * 			
+ * 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+ * 		Proxy proxy = request.getProxy();
+ * 		proxy.setParallel(false);
+ * 		// set the timeout for receiving a final response
+ * 		proxy.setProxyTimeout(5);
+ * 		// set the timeout for receiving a 1xx response
+ * 		((ProxyExt)proxy).setProxy1xxTimeout(1);				
+ * 		proxy.setRecordRoute(true);
+ * 		ArrayList<URI> uris = new ArrayList<URI>();
+ * 		URI uri1 = sipFactory.createAddress("sip:receiver@127.0.0.1:5057").getURI();		
+ * 		URI uri2 = sipFactory.createAddress("sip:second-receiver@127.0.0.1:5056").getURI();
+ * 		uris.add(uri2);
+ * 		uris.add(uri1);
+ *  
+ * 		proxy.proxyTo(uris);		
+ *  }
+ * 	
+ * 	/**
+ * 	 * Called if no 1xx and no final response has been received with a response type of INFORMATIONAL
+ * 	 * Called if no 2xx response has been received with a response type of FINAL
+ * 	 *\/
+ * 	public void onProxyBranchResponseTimeout(ResponseType responseType,
+ * 			ProxyBranch proxyBranch) {
+ * 		logger.info("onProxyBranchResponseTimeout callback was called. responseType = " + responseType + " , branch = " + proxyBranch + ", request " + proxyBranch.getRequest() + ", response " + proxyBranch.getResponse());
+ * 	}
+ * </pre>
  * @author jean.deruelle@gmail.com
  * @since 1.3
  */

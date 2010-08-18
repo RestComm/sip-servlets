@@ -24,6 +24,7 @@ import javax.sip.SipException;
 import javax.sip.Transaction;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.SipSessionAsynchronousWork;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
@@ -445,5 +446,9 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 
 	public void setTransport(String transport) {
 		sipSession.setTransport(transport);
+	}
+
+	public void scheduleAsynchronousWork(SipSessionAsynchronousWork work) {
+		sipSession.scheduleAsynchronousWork(work);
 	}
 }

@@ -88,6 +88,7 @@ import org.apache.catalina.security.SecurityUtil;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Priority;
 import org.mobicents.ha.javax.sip.SipLoadBalancer;
+import org.mobicents.javax.servlet.sip.SipSessionAsynchronousWork;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
@@ -1966,5 +1967,13 @@ public class SipSessionImpl implements MobicentsSipSession {
 	}
 	public void setTransport(String transport) {
 		this.transport = transport;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.javax.servlet.sip.SipSessionExt#scheduleAsynchronousWork(org.mobicents.javax.servlet.sip.SipSessionAsynchronousWork)
+	 */
+	public void scheduleAsynchronousWork(SipSessionAsynchronousWork work) {
+		sipFactory.getSipApplicationDispatcher().getAsynchronousExecutor().execute(new SipSessionAsyncTask(key, work, sipFactory));
 	}
 }

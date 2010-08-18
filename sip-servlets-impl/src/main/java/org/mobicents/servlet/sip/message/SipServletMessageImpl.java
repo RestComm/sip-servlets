@@ -1737,7 +1737,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		int attributesSize = in.readInt();
 		Object[][] attributesArray = (Object[][] )in.readObject();
 		attributes = new ConcurrentHashMap<String, Object>();
-		for (int i = 0; i <attributesSize; i++) {
+		for (int i = 0; i < attributesSize; i++) {
 			String key = (String) attributesArray[0][i];
 			Object value = attributesArray[1][i];
 			attributes.put(key, value);

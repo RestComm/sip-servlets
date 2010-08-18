@@ -38,6 +38,7 @@ import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.SipApplicationSessionAsynchronousWork;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -318,6 +319,11 @@ public class MobicentsSipApplicationSessionFacade implements
 
 	public SipApplicationSessionTimerTask getExpirationTimerTask() {
 		return sipApplicationSession.getExpirationTimerTask();
+	}
+
+	public void scheduleAsynchronousWork(
+			SipApplicationSessionAsynchronousWork work) {
+		sipApplicationSession.scheduleAsynchronousWork(work);
 	}
 
 }

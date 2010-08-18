@@ -86,15 +86,68 @@ public class Click2DialSipServlet extends SipServlet implements SipApplicationSe
 	@Override
 	protected void doInvite(SipServletRequest req) throws ServletException,
 			IOException {
-		logger.info("Click2Dial don't handle INVITE. Here's the one we got :  " + req.toString());
-		
+		if(!req.getFrom().getURI().toString().contains("asyncWork")) {
+			logger.info("Click2Dial don't handle INVITE. Here's the one we got :  " + req.toString());
+		} else {
+			// Expected to receive INVITE for for Async work tests
+			SipServletResponse response = req.createResponse(SipServletResponse.SC_OK);
+			response.setContent(req.getApplicationSession().getId(), "text/plain;charset=UTF-8");
+			response.send();
+		}
 	}
 	
 	@Override
 	protected void doOptions(SipServletRequest req) throws ServletException,
 			IOException {
 		logger.info("Got :  " + req.toString());
-		req.createResponse(SipServletResponse.SC_OK).send();
+		if(!req.getFrom().getURI().toString().contains("asyncWork")) {
+			req.createResponse(SipServletResponse.SC_OK).send();
+		} else {
+			String mode = req.getFrom().getURI().getParameter("mode");
+			if(mode.equalsIgnoreCase("SipSession")) {
+				String content = (String) req.getContent();
+				req.getSession().setAttribute("mutable", content);
+				logger.info("doOptions beforeSleep " + content);
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				String mutableAttr = (String) req.getSession().getAttribute("mutable");
+				logger.info("doOptions afterSleep " + mutableAttr + " vs " + content);
+				int response = SipServletResponse.SC_OK;
+				if(!content.equals(mutableAttr))
+					response = SipServletResponse.SC_SERVER_INTERNAL_ERROR;
+				
+				req.getSession().setAttribute("mutable", content);
+				logger.info("doOptions afterSleep set " + content);
+				
+				SipServletResponse resp = req.createResponse(response);
+				resp.send();
+			} else{
+				String content = (String) req.getContent();
+				req.getSession().getApplicationSession().setAttribute("mutable", content);
+				logger.info("doOptions beforeSleep " + content);
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				String mutableAttr = (String) req.getSession().getApplicationSession().getAttribute("mutable");
+				logger.info("doOptions afterSleep " + mutableAttr + " vs " + content);
+				int response = SipServletResponse.SC_OK;
+				if(!content.equals(mutableAttr))
+					response = SipServletResponse.SC_SERVER_INTERNAL_ERROR;
+				
+				req.getSession().getApplicationSession().setAttribute("mutable", content);
+				logger.info("doOptions afterSleep set " + content);
+				
+				SipServletResponse resp = req.createResponse(response);
+				resp.send();
+			}
+		}
 	}
 	
 	@Override

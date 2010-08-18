@@ -31,7 +31,38 @@ import javax.servlet.sip.SipURI;
  * 		<li>
  * 			Allows for applications to set the outbound interface based on SipURI, to allow routing based on transport protocol as well.
  * 		</li>
+ * 		<li>
+ * 			Allows for applications to schedule work asynchronously against a SipSession in a thread-safe manner if used in conjunction with the Mobicents Concurrency Control Mechanism
+ * 		</li>
  * </ul>
+ * 
+ * Here is some sample code to show how the asynchronous work can be used :
+ * 
+ * ((SipSessionExt)sipSession).scheduleAsynchronousWork(new SipSessionAsynchronousWork() {
+ * 		private static final long serialVersionUID = 1L;
+ * 
+ * 		public void doAsynchronousWork(SipSession sipSession) {				
+ * 			
+ * 			String textMessageToSend = (String) sipSession.getAttribute("textMessageToSend"); 					
+ * 			
+ *			try {
+ *				SipServletRequest sipServletRequest = sipFactory.createRequest(
+ *						sipSession.getSipApplicationSession(), 
+ *						"MESSAGE", 
+ *						"sip:sender@sip-servlets.com", 
+ *						"sip:receiver@sip-servlets.com");
+ *				SipURI sipUri = sipFactory.createSipURI("receiver", "127.0.0.1:5060");
+ *				sipServletRequest.setRequestURI(sipUri);
+ *				sipServletRequest.setContentLength(content.length());
+ *				sipServletRequest.setContent(content, "text/plain;charset=UTF-8");
+ *				sipServletRequest.send();
+ *			} catch (ServletParseException e) {
+ *				logger.error("Exception occured while parsing the addresses",e);
+ *			} catch (IOException e) {
+ *				logger.error("Exception occured while sending the request",e);			
+ *			}
+ * 		}
+ * 	});
  * 
  * 
  * @author jean.deruelle@gmail.com
@@ -48,4 +79,19 @@ public interface SipSessionExt {
      * @throws IllegalArgumentException if the sip uri is not understood by the container as one of its outbound interface 
      */
     void setOutboundInterface(SipURI outboundInterface);
+    /**
+	 * This method allows an application to access a SipSession in an asynchronous manner. 
+	 * This method is useful for accessing the SipSession from Web or EJB modules in a converged application 
+	 * or from unmanaged threads started by the application itself.
+	 * 
+     * When this API is used in conjunction with the Mobicents Concurrency Control in SipSession mode, 
+     * the container guarantees that the business logic contained within the SipSessionAsynchronousWork
+     * will be executed in a thread-safe manner. 
+     * 
+     * It has to be noted that the work may never execute if the session gets invalidated in the meantime
+     * and the work will be executed locally on the node on a cluster.
+     * 
+	 * @param work the work to be performed on this SipSession. 
+	 */
+    void scheduleAsynchronousWork(SipSessionAsynchronousWork work);
 }

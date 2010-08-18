@@ -34,7 +34,6 @@ import org.apache.catalina.Wrapper;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -369,7 +368,6 @@ public abstract class MessageDispatcher {
 	 */
 	public final ExecutorService getConcurrencyModelExecutorService(
 			SipContext sipContext, SipServletMessageImpl sipServletMessage) {
-			return ((SipApplicationDispatcherImpl) this.sipApplicationDispatcher)
-					.getAsynchronousExecutor();
+			return this.sipApplicationDispatcher.getAsynchronousExecutor();
 	}
 }

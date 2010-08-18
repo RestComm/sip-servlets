@@ -21,6 +21,7 @@ import gov.nist.javax.sip.SipListenerExt;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.ar.SipApplicationRouter;
@@ -199,4 +200,6 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 	
 	void setBackToNormalQueueSize(int backToNormalQueueSize);
 	int getBackToNormalQueueSize();
+
+	ExecutorService getAsynchronousExecutor();
 }

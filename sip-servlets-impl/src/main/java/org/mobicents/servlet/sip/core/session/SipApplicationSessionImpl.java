@@ -49,6 +49,7 @@ import javax.servlet.sip.URI;
 
 import org.apache.catalina.security.SecurityUtil;
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.SipApplicationSessionAsynchronousWork;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
 import org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade;
@@ -1202,5 +1203,14 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 
 	public long getExpirationTimeInternal() {		
 		return expirationTime;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.javax.servlet.sip.SipApplicationSessionExt#scheduleAsynchronousWork(org.mobicents.javax.servlet.sip.SipApplicationSessionAsynchronousWork)
+	 */
+	public void scheduleAsynchronousWork(
+			SipApplicationSessionAsynchronousWork work) {
+		sipContext.getSipApplicationDispatcher().getAsynchronousExecutor().execute(new SipApplicationSessionAsyncTask(key, work, sipContext.getSipApplicationDispatcher().getSipFactory()));
 	}
 }

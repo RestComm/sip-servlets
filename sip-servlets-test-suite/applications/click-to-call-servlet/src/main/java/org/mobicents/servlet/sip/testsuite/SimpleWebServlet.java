@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Iterator;
 import java.util.Properties;
 
 import javax.annotation.Resource;
@@ -30,19 +31,32 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.sip.ConvergedHttpSession;
+import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipSessionsUtil;
+import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.servlet.sip.SipApplicationSession.Protocol;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.SipApplicationSessionAsynchronousWork;
+import org.mobicents.javax.servlet.sip.SipApplicationSessionExt;
+import org.mobicents.javax.servlet.sip.SipSessionAsynchronousWork;
+import org.mobicents.javax.servlet.sip.SipSessionExt;
 
 public class SimpleWebServlet extends HttpServlet { 	
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(SimpleWebServlet.class);
+	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
+	
 	@Resource
 	private SipFactory sipFactory;
+	@Resource
+	private SipSessionsUtil sipSessionsUtil;
 	
 	@Override
 	public void init(ServletConfig config) throws ServletException {		
@@ -84,6 +98,12 @@ public class SimpleWebServlet extends HttpServlet {
         String toAddr = request.getParameter("to");
         String fromAddr = request.getParameter("from");
         String invalidateHttpSession = request.getParameter("invalidateHttpSession");
+        String asyncWorkMode = request.getParameter("asyncWorkMode");
+        String asyncWorkSasId = request.getParameter("asyncWorkSasId");
+        if(asyncWorkMode != null && asyncWorkSasId != null) {
+        	doAsyncWork(asyncWorkMode, asyncWorkSasId, response);
+        	return;
+        }
         
         URI to = sipFactory.createAddress(toAddr).getURI();
         URI from = sipFactory.createAddress(fromAddr).getURI();              
@@ -122,4 +142,93 @@ public class SimpleWebServlet extends HttpServlet {
         out.println("</BODY></HTML>");
         out.close();
     }
+	private void doAsyncWork(String asyncWorkMode, String asyncWorkSasId, HttpServletResponse response) throws IOException {
+		final SipApplicationSession sipApplicationSession = sipSessionsUtil.getApplicationSessionById(asyncWorkSasId);
+		
+		if(asyncWorkMode.equals("SipSession")) {
+			
+			Iterator<SipSession> sipSessionIterator = (Iterator<SipSession>) sipApplicationSession.getSessions(Protocol.SIP.toString());
+			SipSession sipSession = sipSessionIterator.next();
+			((SipSessionExt)sipSession).scheduleAsynchronousWork(new SipSessionAsynchronousWork() {
+				private static final long serialVersionUID = 1L;
+	
+				public void doAsynchronousWork(SipSession sipSession) {				
+					String content = "web";
+					sipSession.setAttribute("mutable", content);
+					logger.info("doAsynchronousWork beforeSleep " + content);
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					String mutableAttr = (String) sipSession.getAttribute("mutable");
+					logger.info("doAsyncWork afterSleep " + mutableAttr + " vs " + content);
+					String response = "OK";
+					if(!content.equals(mutableAttr))
+						response = "KO";
+					
+					sendMessage(sipApplicationSession, sipFactory, response);
+				}
+			});
+			
+		} else {
+		
+			((SipApplicationSessionExt)sipApplicationSession).scheduleAsynchronousWork(new SipApplicationSessionAsynchronousWork() {
+				private static final long serialVersionUID = 1L;
+	
+				public void doAsynchronousWork(SipApplicationSession sipApplicationSession) {				
+					String content = "web";
+					sipApplicationSession.setAttribute("mutable", content);
+					logger.info("doAsynchronousWork beforeSleep " + content);
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					String mutableAttr = (String) sipApplicationSession.getAttribute("mutable");
+					logger.info("doAsyncWork afterSleep " + mutableAttr + " vs " + content);
+					String response = "OK";
+					if(!content.equals(mutableAttr))
+						response = "KO";
+					
+					sendMessage(sipApplicationSession, sipFactory, response);
+				}
+			});
+		}
+		PrintWriter	out;
+        response.setContentType("text/html");
+        out = response.getWriter();
+        out.println("<HTML><HEAD><TITLE>");
+        out.println("Click to call - converger sip servlet");
+        out.println("</TITLE></HEAD><BODY>");
+        out.println("OK");        
+        out.println("</BODY></HTML>");
+        out.close();
+	}
+	
+	/**
+	 * @param sipApplicationSession
+	 * @param storedFactory
+	 */
+	private static void sendMessage(SipApplicationSession sipApplicationSession,
+			SipFactory storedFactory, String content) {
+		try {
+			SipServletRequest sipServletRequest = storedFactory.createRequest(
+					sipApplicationSession, 
+					"MESSAGE", 
+					"sip:sender@sip-servlets.com", 
+					"sip:receiver@sip-servlets.com");
+			SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+			sipServletRequest.setRequestURI(sipUri);
+			sipServletRequest.setContentLength(content.length());
+			sipServletRequest.setContent(content, CONTENT_TYPE);
+			sipServletRequest.send();
+		} catch (ServletParseException e) {
+			logger.error("Exception occured while parsing the addresses",e);
+		} catch (IOException e) {
+			logger.error("Exception occured while sending the request",e);			
+		}
+	}
 }
