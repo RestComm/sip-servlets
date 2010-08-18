@@ -33,6 +33,7 @@ package org.mobicents.javax.servlet.sip;
  * 
  * Here is some sample code to show how the asynchronous work can be used :
  * 
+ * <pre>
  * ((SipApplicationSessionExt)sipApplicationSession).scheduleAsynchronousWork(new SipApplicationSessionAsynchronousWork() {
  * 		private static final long serialVersionUID = 1L;
  * 
@@ -58,7 +59,7 @@ package org.mobicents.javax.servlet.sip;
  *			}
  * 		}
  * 	});
- * 
+ * </pre>
  * 
  * @author jean.deruelle@gmail.com
  * @since 1.4

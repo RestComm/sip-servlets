@@ -38,6 +38,7 @@ import javax.servlet.sip.SipURI;
  * 
  * Here is some sample code to show how the asynchronous work can be used :
  * 
+ *  <pre>
  * ((SipSessionExt)sipSession).scheduleAsynchronousWork(new SipSessionAsynchronousWork() {
  * 		private static final long serialVersionUID = 1L;
  * 
@@ -63,7 +64,7 @@ import javax.servlet.sip.SipURI;
  *			}
  * 		}
  * 	});
- * 
+ * </pre>
  * 
  * @author jean.deruelle@gmail.com
  * @since 1.4
