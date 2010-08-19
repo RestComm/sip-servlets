@@ -72,6 +72,8 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener 
 		dialNumberToSipUriMapping.put("6", "sip:receiver-failover@sip-servlets.com");
 		dialNumberToSipUriMapping.put("b2bua", "sip:fromProxy@sip-servlets.com");
 		dialNumberToSipUriMapping.put("9", "sip:receiver@127.0.0.1:5090");
+		dialNumberToSipUriMapping.put("forward-pending-sender", "sip:forward-pending-sender@127.0.0.1:5080");
+		dialNumberToSipUriMapping.put("factory-sender", "sip:factory-sender@127.0.0.1:5080");		
 		String initParam = servletConfig.getServletContext().getInitParameter("record_route");
 		if(initParam != null && initParam.equals("false")) {
 			isRecordRoute = false;
@@ -85,56 +87,57 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener 
 
 		logger.info("Got request:\n" + request.toString());
 		logger.info(request.getRequestURI().toString());
-		
-		if(((SipURI)request.getFrom().getURI()).getUser().equalsIgnoreCase(TEST_USER_REMOTE)) {
-			if(request.getRemoteAddr().equals(REMOTE_LOCALHOST_ADDR) && request.getRemotePort() == REMOTE_PORT && request.getTransport().equalsIgnoreCase(REMOTE_TRANSPORT)) {
-				logger.info("remote information is correct");
+		if(request.isInitial()) {
+			if(((SipURI)request.getFrom().getURI()).getUser().equalsIgnoreCase(TEST_USER_REMOTE)) {
+				if(request.getRemoteAddr().equals(REMOTE_LOCALHOST_ADDR) && request.getRemotePort() == REMOTE_PORT && request.getTransport().equalsIgnoreCase(REMOTE_TRANSPORT)) {
+					logger.info("remote information is correct");
+				} else {
+					logger.error("remote information is incorrect");
+					logger.error("remote addr " + request.getRemoteAddr());
+					logger.error("remote port " + request.getRemotePort());
+					logger.error("remote transport " + request.getTransport());
+					SipServletResponse sipServletResponse = 
+						request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "Incorrect remote information");
+					sipServletResponse.send();
+					return;
+				}
+				if(request.getInitialRemoteAddr().equals(REMOTE_LOCALHOST_ADDR) && request.getInitialRemotePort() == REMOTE_PORT && request.getInitialTransport().equalsIgnoreCase(REMOTE_TRANSPORT)) {			
+					logger.info("Initial remote information is correct");
+				} else {
+					logger.error("Initial remote information is incorrect");
+					logger.error("Initial remote addr " + request.getInitialRemoteAddr());
+					logger.error("Initial remote port " + request.getInitialRemotePort());
+					logger.error("Initial remote transport " + request.getInitialTransport());
+					throw new IllegalArgumentException("initial remote information is incorrect");
+				}
+				if(request.getLocalAddr().equals(LOCAL_LOCALHOST_ADDR) && request.getLocalPort() == LOCAL_PORT && request.getTransport().equalsIgnoreCase(LOCAL_TRANSPORT)) {			
+					logger.info("local information is correct");
+				} else {
+					logger.error("local information is incorrect");
+					logger.error("local addr " + request.getLocalAddr());
+					logger.error("local port " + request.getLocalPort());
+					logger.error("local transport " + request.getTransport());
+					throw new IllegalArgumentException("local information is incorrect");
+				}
+			}
+			
+			String dialNumber = ((SipURI)request.getRequestURI()).getUser();
+			String mappedUri = dialNumberToSipUriMapping.get(dialNumber);	
+			if(mappedUri != null) {
+				SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);			
+				Proxy proxy = request.getProxy();
+				proxy.setProxyTimeout(120);
+				proxy.setRecordRoute(isRecordRoute);
+				proxy.setParallel(false);
+				proxy.setSupervised(true);
+				logger.info("proxying to " + mappedUri);
+				proxy.proxyTo(sipFactory.createURI(mappedUri));				
 			} else {
-				logger.error("remote information is incorrect");
-				logger.error("remote addr " + request.getRemoteAddr());
-				logger.error("remote port " + request.getRemotePort());
-				logger.error("remote transport " + request.getTransport());
 				SipServletResponse sipServletResponse = 
-					request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "Incorrect remote information");
-				sipServletResponse.send();
-				return;
-			}
-			if(request.getInitialRemoteAddr().equals(REMOTE_LOCALHOST_ADDR) && request.getInitialRemotePort() == REMOTE_PORT && request.getInitialTransport().equalsIgnoreCase(REMOTE_TRANSPORT)) {			
-				logger.info("Initial remote information is correct");
-			} else {
-				logger.error("Initial remote information is incorrect");
-				logger.error("Initial remote addr " + request.getInitialRemoteAddr());
-				logger.error("Initial remote port " + request.getInitialRemotePort());
-				logger.error("Initial remote transport " + request.getInitialTransport());
-				throw new IllegalArgumentException("initial remote information is incorrect");
-			}
-			if(request.getLocalAddr().equals(LOCAL_LOCALHOST_ADDR) && request.getLocalPort() == LOCAL_PORT && request.getTransport().equalsIgnoreCase(LOCAL_TRANSPORT)) {			
-				logger.info("local information is correct");
-			} else {
-				logger.error("local information is incorrect");
-				logger.error("local addr " + request.getLocalAddr());
-				logger.error("local port " + request.getLocalPort());
-				logger.error("local transport " + request.getTransport());
-				throw new IllegalArgumentException("local information is incorrect");
-			}
+					request.createResponse(SipServletResponse.SC_NOT_ACCEPTABLE_HERE, "No mapping for " + dialNumber);
+				sipServletResponse.send();			
+			}		
 		}
-		
-		String dialNumber = ((SipURI)request.getRequestURI()).getUser();
-		String mappedUri = dialNumberToSipUriMapping.get(dialNumber);	
-		if(mappedUri != null) {
-			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);			
-			Proxy proxy = request.getProxy();
-			proxy.setProxyTimeout(120);
-			proxy.setRecordRoute(isRecordRoute);
-			proxy.setParallel(false);
-			proxy.setSupervised(true);
-			logger.info("proxying to " + mappedUri);
-			proxy.proxyTo(sipFactory.createURI(mappedUri));				
-		} else {
-			SipServletResponse sipServletResponse = 
-				request.createResponse(SipServletResponse.SC_NOT_ACCEPTABLE_HERE, "No mapping for " + dialNumber);
-			sipServletResponse.send();			
-		}		
 	}
 	
 	protected void doSuccessResponse(SipServletResponse resp)

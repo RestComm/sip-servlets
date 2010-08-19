@@ -617,7 +617,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 		request.setRoutingState(RoutingState.PROXIED);
 		this.prackOriginalRequest = request;
 		
-		URI targetURI = this.targetURI;
+//		URI targetURI = this.targetURI;
 		
 		// Determine the direction of the request. Either it's from the dialog initiator (the caller)
 		// or from the callee
@@ -628,7 +628,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 		
 //		ProxyParams params = new ProxyParams(targetURI, null, null, null);
 		Request clonedRequest = 
-			ProxyUtils.createProxiedRequest(request, this, targetURI, null, null, null);
+			ProxyUtils.createProxiedRequest(request, this, null, null, null, null);
 
 		ViaHeader viaHeader = (ViaHeader) clonedRequest.getHeader(ViaHeader.NAME);
 		try {
