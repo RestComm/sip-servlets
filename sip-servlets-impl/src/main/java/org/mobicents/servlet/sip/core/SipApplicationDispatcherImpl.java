@@ -989,7 +989,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipServletMessage;
 						sipServletMessage.setTransaction(transaction);
 						SipServletResponseImpl response = (SipServletResponseImpl) sipServletRequestImpl.createResponse(408, null, false);
-
+						// Fix for Issue 1734
+						sipServletRequestImpl.setResponse(response);
+						
 						MessageDispatcher.callServlet(response);
 						if(tad.getProxyBranch() != null) {
 							tad.getProxyBranch().setResponse(response);
@@ -1025,7 +1027,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			logger.debug("checkForAckNotReceived : last Final Response " + lastFinalResponse);
 		}		
 		boolean notifiedApplication = false;
-		if(sipServletMessage instanceof SipServletRequestImpl &&
+		if(sipServletMessage instanceof SipServletRequestImpl && Request.INVITE.equals(sipServletMessage.getMethod()) &&
 				proxy == null &&
 				lastFinalResponse != null) {
 			final SipContext sipContext = sipSession.getSipApplicationSession().getSipContext();
@@ -1068,7 +1070,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			logger.debug("checkForPrackNotReceived : last Informational Response " + lastInfoResponse);
 		}
 		boolean notifiedApplication = false;
-		if(sipServletMessage instanceof SipServletRequestImpl &&
+		if(sipServletMessage instanceof SipServletRequestImpl && Request.INVITE.equals(sipServletMessage.getMethod()) &&
 				proxy == null &&
 				 lastInfoResponse != null) {
 			final SipContext sipContext = sipSession.getSipApplicationSession().getSipContext();

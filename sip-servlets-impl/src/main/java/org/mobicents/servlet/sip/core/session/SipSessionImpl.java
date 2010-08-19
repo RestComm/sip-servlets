@@ -1468,7 +1468,11 @@ public class SipSessionImpl implements MobicentsSipSession {
     	// and has not initiated any new requests (does not have any pending transactions)."
     	if(!readyToInvalidate && (ongoingTransactions == null || ongoingTransactions.isEmpty()) && 
     			transaction instanceof ClientTransaction && getProxy() == null && 
-    			state != null && state.equals(State.INITIAL) ) {
+    			state != null && state.equals(State.INITIAL) && 
+    			// Fix for Issue 1734
+    			sessionCreatingTransactionRequest != null && 
+    			sessionCreatingTransactionRequest.getLastFinalResponse() != null && 
+    			sessionCreatingTransactionRequest.getLastFinalResponse().getStatus() >= 300) {
     		setReadyToInvalidate(true);
     	}
 	}
