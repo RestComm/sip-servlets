@@ -366,21 +366,9 @@ public class SimpleSipServlet
 		if(resp.getMethod().equalsIgnoreCase("REGISTER") && !fromString.contains(TEST_REGISTER_NO_CONTACT)) {
 			int cseq = Integer.parseInt(resp.getRequest().getHeader("CSeq").substring(0,1));
 			if(cseq < 4) {
-				try {
-					// Put some delay as per http://groups.google.com/group/mobicents-public/browse_thread/thread/70f472ca111baccf
-					Thread.sleep(15000);
-				} catch (InterruptedException e) {
-					logger.error("Unexpected exception", e);
-				}
-				// Check if the session remains in INITIAL state, if not, the test will fail for missing registers
-				if(resp.getSession().getState().equals(State.INITIAL)) {					
-					if(fromString.contains(TEST_REGISTER_SAVED_SESSION)) {
-//						registerSipSession = resp.getSession();
-						sendRegister();
-					} else {
-						sendRegister(resp.getSession(), false);
-					}					
-				}
+				SipApplicationSession appSession = sipFactory.createApplicationSession();
+				// Put some delay as per http://groups.google.com/group/mobicents-public/browse_thread/thread/70f472ca111baccf
+				timerService.createTimer(appSession, 15000L, false, (Serializable) resp);								
 			}
 			return;
 		}
@@ -526,10 +514,39 @@ public class SimpleSipServlet
 		Serializable info = timer.getInfo();
 		if(info instanceof SipServletResponse) {
 			SipServletResponse sipServletResponse = (SipServletResponse)timer.getInfo();
-			try {
-				sipServletResponse.send();
-			} catch (IOException e) {
-				logger.error("Unexpected exception while sending the OK", e);
+			if(sipServletResponse.getMethod().equals("REGISTER")) {
+				// Check if the session remains in INITIAL state, if not, the test will fail for missing registers
+				if(sipServletResponse.getSession().getState().equals(State.INITIAL)) {	
+//					String fromString = sipServletResponse.getFrom().toString();
+//					if(fromString.contains(TEST_REGISTER_SAVED_SESSION)) {
+////						registerSipSession = resp.getSession();
+//						try {
+//							sendRegister();
+//						} catch (ServletParseException e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						} catch (IOException e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						}
+//					} else {
+						try {
+							sendRegister(sipServletResponse.getSession(), false);
+						} catch (ServletParseException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+//					}					
+				}
+			} else {
+				try {
+					sipServletResponse.send();
+				} catch (IOException e) {
+					logger.error("Unexpected exception while sending the OK", e);
+				}
 			}
 		} else {
 			try {
