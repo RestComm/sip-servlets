@@ -474,7 +474,10 @@ public class ConvergedSipResourceHandler<X extends RemoteEnvironment> extends We
           }
           catch(ClassNotFoundException e)
           {
-             throw new EJBException(e);
+        	  if(log.isDebugEnabled()) {
+        		  log.debug("ClassNotFoundException while trying to inject Resource. We can ignore this error. Other handlers will signal if something is wrong." + resTypeName);
+        	  }
+        	  return;
           }
           
           String encName = "env/" + envRef.getResourceEnvRefName();
