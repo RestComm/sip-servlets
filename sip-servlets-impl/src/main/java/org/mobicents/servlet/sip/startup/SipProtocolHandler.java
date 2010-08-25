@@ -334,6 +334,9 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 		if(sipStackProperties.get(TCP_POST_PARSING_THREAD_POOL_SIZE) == null) {
 			sipStackProperties.setProperty(TCP_POST_PARSING_THREAD_POOL_SIZE, "30");
 		}
+		if(sipStackProperties.get("gov.nist.javax.sip.AUTOMATIC_DIALOG_ERROR_HANDLING") == null) {
+			sipStackProperties.setProperty("gov.nist.javax.sip.AUTOMATIC_DIALOG_ERROR_HANDLING", "false");
+		}
 		
 		String serverHeaderValue = sipStackProperties.getProperty(SERVER_HEADER);
 		if(serverHeaderValue != null) {
