@@ -23,6 +23,7 @@
 			<item name="SSF" href="./mss-ssf.html" collapse="true">
 				<item name="SSF" href="./mss/ssf/sf-api/site/en/index.html"/> 
 				<item name="SSF Flow API" href="./mss/ssf/sf-flow-api/en/index.html"/>
+				<item name="SSF on JBoss 5" href="./mss/ssf/sf-jboss5/en/index.html"/>
 			</item>			
 		</menu>
 		<menu name="Examples">
