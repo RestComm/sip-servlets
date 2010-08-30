@@ -329,10 +329,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 					"Can not create ACK, PRACK or CANCEL requests with this method");
 		}
 		if(!isValid()) {
-			throw new IllegalStateException("cannot create a request because the session is invalid");
+			throw new IllegalStateException("cannot create a request because the session " + key + " is invalid");
 		}
 		if(State.TERMINATED.equals(state)) {
-			throw new IllegalStateException("cannot create a request because the session is in TERMINATED state");
+			throw new IllegalStateException("cannot create a request because the session " + key + " is in TERMINATED state");
 		}
 //		if((State.INITIAL.equals(state) && hasOngoingTransaction())) {
 //			throw new IllegalStateException("cannot create a request because the session is in INITIAL state with ongoing transactions");
