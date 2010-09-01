@@ -145,6 +145,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 	
 	public void testShootmeExceptionOnExpirationCount() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		new File("expirationFailure.tmp").delete();
+		assertFalse(new File("expirationFailure.tmp").exists());
 		String fromName = "exceptionOnExpire";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
