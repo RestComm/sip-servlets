@@ -80,8 +80,7 @@
               because we are using asynchronous replication. -->
          <property name="multiplexerStack">${jboss.default.jgroups.stack:udp}</property>
          <property name="fetchInMemoryState">true</property>
-         
-         <property name="nodeLockingScheme">PESSIMISTIC</property>
+         <property name="nodeLockingScheme">MVCC</property>
          <property name="isolationLevel">REPEATABLE_READ</property>
          <property name="useLockStriping">false</property>
          <property name="cacheMode">REPL_ASYNC</property>
