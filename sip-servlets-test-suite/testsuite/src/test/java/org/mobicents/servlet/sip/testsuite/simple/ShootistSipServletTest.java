@@ -128,18 +128,18 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	
 	public void testShootist() throws Exception {
 //		receiver.sendInvite();
-		receiverProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+		//receiverProtocolObjects =new ProtocolObjects(
+		//		"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
 					
-		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
-		SipProvider senderProvider = receiver.createProvider();			
+		//receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		//SipProvider senderProvider = receiver.createProvider();			
 		
-		senderProvider.addSipListener(receiver);
+		//senderProvider.addSipListener(receiver);
 		
-		receiverProtocolObjects.start();
+		//receiverProtocolObjects.start();
 		tomcat.startTomcat();
 		deployApplication();
-		Thread.sleep(TIMEOUT);
+		Thread.sleep(80000);
 		assertTrue(receiver.getByeReceived());		
 	}
 	// Also Tests Issue 1693 http://code.google.com/p/mobicents/issues/detail?id=1693

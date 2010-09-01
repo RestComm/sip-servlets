@@ -278,6 +278,18 @@ public class SipEmbedded {
 		host.addChild(context);
 		return context.getAvailable();			
 	}
+	public boolean deployContext(String docBase, String name, String path, int appSessionTimeout) {
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(docBase);
+		context.setName(name);
+		context.setPath(path);
+		context.setParent(host);
+		context.setSipApplicationSessionTimeout(appSessionTimeout);
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		host.addChild(context);
+		return context.getAvailable();			
+	}
 	
 	public boolean deployContext(SipStandardContext context) {
 		context.setParent(host);

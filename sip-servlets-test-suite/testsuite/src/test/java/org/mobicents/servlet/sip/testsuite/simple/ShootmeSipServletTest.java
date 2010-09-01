@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.testsuite.simple;
 
+import java.io.File;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,7 +68,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 	public void deployApplication() {
 		assertTrue(tomcat.deployContext(
 				projectHome + "/sip-servlets-test-suite/applications/simple-sip-servlet/src/main/sipapp",
-				"sip-test-context", "sip-test"));
+				"sip-test-context", "sip-test", 1));
 	}
 
 	@Override
@@ -120,6 +121,44 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		// test non regression for Issue 1687 : Contact Header is present in SIP Message where it shouldn't
 		Response response = sender.getFinalResponse();
 		assertNull(response.getHeader(ContactHeader.NAME));
+	}
+	
+	public void testShootmeSendByeOnExpire() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "byeOnExpire";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setSendBye(false);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);	
+		Thread.sleep(5000);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null);
+		Thread.sleep(70000);
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getByeReceived());
+	}
+	
+	public void testShootmeExceptionOnExpirationCount() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		new File("expirationFailure.tmp").delete();
+		String fromName = "exceptionOnExpire";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setSendBye(false);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);	
+		Thread.sleep(150000);
+		assertFalse(new File("expirationFailure.tmp").exists());
 	}
 	
 	public void testShootmeSendBye() throws InterruptedException, SipException, ParseException, InvalidArgumentException {

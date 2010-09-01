@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.testsuite;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 
@@ -53,6 +54,8 @@ public class SimpleSipServlet
 		extends SipServlet 
 		implements SipErrorListener, TimerListener, SipConnectorListener, SipSessionListener, SipApplicationSessionListener {
 	
+	private static final String TEST_EXCEPTION_ON_EXPIRE = "exceptionOnExpire";
+	private static final String TEST_BYE_ON_EXPIRE = "byeOnExpire";
 	private static transient Logger logger = Logger.getLogger(SimpleSipServlet.class);
 	private static final long serialVersionUID = 1L;
 	private static final String TEST_PRACK = "prack";
@@ -102,6 +105,7 @@ public class SimpleSipServlet
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the simple sip servlet has been started");
+		new File("expirationFailure.tmp").delete();
 		super.init(servletConfig);
 	}
 
@@ -142,6 +146,14 @@ public class SimpleSipServlet
 				
 		if(fromString.contains(TEST_BYE_ON_DESTROY)) {
 			inviteSipSession = request.getSession();
+		}
+		if(fromString.contains(TEST_BYE_ON_EXPIRE)) {
+			inviteSipSession = request.getSession();
+			inviteSipSession.setAttribute(TEST_BYE_ON_EXPIRE, true);
+		}
+		if(fromString.contains(TEST_EXCEPTION_ON_EXPIRE)) {
+			inviteSipSession = request.getSession();
+			inviteSipSession.setAttribute(TEST_EXCEPTION_ON_EXPIRE, true);
 		}
 		if(fromString.contains(TEST_ERROR_RESPONSE)) {	
 			request.getApplicationSession().setAttribute(TEST_ERROR_RESPONSE, "true");
@@ -349,6 +361,16 @@ public class SimpleSipServlet
 				req.getSession().setAttribute("nbAcks", nbOfAcks);
 			} else if(TEST_IS_SIP_SERVLET_SEND_BYE.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {				
 				timerService.createTimer(req.getApplicationSession(), 10000, false, (Serializable)req.getSession());
+			} else if(TEST_EXCEPTION_ON_EXPIRE.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {
+				try {
+					Thread.sleep(1000);
+					SipServletRequest r = req.getSession().createRequest("INVITE");
+					r.send();
+
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} 
 			}
 		}
 		String fromString = req.getFrom().toString();
@@ -459,7 +481,7 @@ public class SimpleSipServlet
 			logger.error("Exception occured while sending the request",e);			
 		}
 	}
-
+	
 	@Override
 	protected void doRegister(SipServletRequest req) throws ServletException,
 			IOException {
@@ -472,6 +494,7 @@ public class SimpleSipServlet
 		}
 		SipServletResponse resp = req.createResponse(response);
 		resp.send();
+		
 	}
 	
 	@Override
@@ -693,9 +716,44 @@ public class SimpleSipServlet
 
 
 
-	public void sessionExpired(SipApplicationSessionEvent ev) {
-		// TODO Auto-generated method stub
-		
+	public void sessionExpired(SipApplicationSessionEvent event) {
+		if(logger.isInfoEnabled()) {
+			logger.info("Distributable Simple Servlet: sip app session " + event.getApplicationSession().getId() + " expired");
+		}
+		if(logger.isInfoEnabled()) {
+			logger.info("Distributable Simple Servlet: timer expired\n");
+		}
+		SipSession sipSession = (SipSession)event.getApplicationSession().getSessions("SIP").next();
+		if(sipSession != null && sipSession.getAttribute(TEST_BYE_ON_EXPIRE)!=null)
+		{
+			if(sipSession != null && sipSession.isValid() && !State.TERMINATED.equals(sipSession.getState())) {
+				try {
+					sipSession.createRequest("BYE").send();
+				} catch (IOException e) {
+					logger.error("An unexpected exception occured while sending the BYE", e);
+				}				
+			}
+		} 
+		if(sipSession != null && sipSession.getAttribute(TEST_EXCEPTION_ON_EXPIRE)!=null) {
+			Integer expirations = (Integer) sipSession.getAttribute("expirations");
+			if(expirations == null) expirations = 1;
+			sipSession.setAttribute("expirations", expirations + 1);
+			if(expirations>1) {
+				logger.fatal("TOO MANY EXPIRATIONS");
+				try {
+					new File("expirationFailure.tmp").createNewFile();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			try {
+				sipSession.createRequest("BYE").send();
+			} catch (IOException e) {
+				logger.error("An unexpected exception occured while sending the BYE", e);
+			}
+			throw new IllegalStateException();
+		}
 	}
 
 
