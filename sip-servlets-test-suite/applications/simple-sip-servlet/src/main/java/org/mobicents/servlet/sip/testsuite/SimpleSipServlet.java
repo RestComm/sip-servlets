@@ -668,7 +668,7 @@ public class SimpleSipServlet
 	
 	@Override
 	public void destroy() {
-		if(inviteSipSession != null) {
+		if(inviteSipSession != null && inviteSipSession.isValid()) {
 			try {
 				inviteSipSession.createRequest("BYE").send();
 			} catch (IOException e) {
