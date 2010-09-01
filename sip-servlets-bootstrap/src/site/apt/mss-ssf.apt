@@ -49,10 +49,9 @@ This framework requires the following knowledge :
 
 	You can create the maven project using core libraries of ssf  with the following command.
 
-	------
- 	$ mvn archetype:create -DarchetypeGroupId=org.mobicents.ssf -DarchetypeArtifactId=sf-core-archetype \
-     -DarchetypeVersion=1.0.0-SNAPSHOT -DgroupId=<your groupId> -DartifactId=<your artifactId>
-	------
+	
+ 	<<<$ mvn archetype:create -DarchetypeGroupId=org.mobicents.ssf -DarchetypeArtifactId=sf-core-archetype \
+     -DarchetypeVersion=1.0.0-SNAPSHOT -DgroupId=\<your groupId\> -DartifactId=\<your artifactId\>>>>	
 
  	This project includes SpringFramework Context for SIP, SIP annotations, and other libraries.
 
@@ -61,10 +60,8 @@ This framework requires the following knowledge :
 
 	You can create the maven project using state management of ssf with the following command.
 
-	------
- 	$ mvn archetype:create -DarchetypeGroupId=org.mobicents.ssf -DarchetypeArtifactId=sf-flow-archetype \
-     -DarchetypeVersion=1.0.0-SNAPSHOT -DgroupId=<your groupId> -DartifactId=<your artifactId>
-	------
+	<<<$ mvn archetype:create -DarchetypeGroupId=org.mobicents.ssf -DarchetypeArtifactId=sf-flow-archetype \
+     -DarchetypeVersion=1.0.0-SNAPSHOT -DgroupId=\<your groupId\> -DartifactId=\<your artifactId\>>>>
 
 	This project includes state management, annotation libraries, ant other libraries.
 
@@ -73,6 +70,5 @@ This framework requires the following knowledge :
 
 	You can get the sample sources with the following command.
 
-	----
- 	$ svn co http://mobicents.googlecode.com/svn/trunk/frameworks/sip-servlets/ssf/sf-examples
-	---
+ 	<<<$ svn co http://mobicents.googlecode.com/svn/trunk/frameworks/sip-servlets/ssf/sf-examples>>>
+	
