@@ -110,7 +110,7 @@ public class NotifierSipServletTest extends SipServletTestCase {
 		for (String subscriptionState : SUBSCRIPTION_STATES) {
 			assertTrue(subscriptionState + " not present",sender.getAllSubscriptionState().contains(subscriptionState));	
 		}				
-		Thread.sleep(TIMEOUT * 110000);
+		Thread.sleep(TIMEOUT);
 		assertEquals(1, sender.getAllMessagesContent().size());
 		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));		
 	}
