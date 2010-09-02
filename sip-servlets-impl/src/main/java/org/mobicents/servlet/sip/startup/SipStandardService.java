@@ -19,17 +19,28 @@ package org.mobicents.servlet.sip.startup;
 
 import gov.nist.core.net.AddressResolver;
 import gov.nist.javax.sip.SipStackExt;
+import gov.nist.javax.sip.message.MessageFactoryExt;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+import java.util.StringTokenizer;
 import java.util.TooManyListenersException;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 import javax.sip.SipStack;
+import javax.sip.header.ServerHeader;
+import javax.sip.header.UserAgentHeader;
 
 import org.apache.catalina.Engine;
 import org.apache.catalina.LifecycleException;
@@ -38,11 +49,16 @@ import org.apache.catalina.core.StandardService;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.modeler.Registry;
+import org.mobicents.ha.javax.sip.ClusteredSipStack;
+import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingListener;
+import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingService;
+import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingServiceImpl;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.CongestionControlPolicy;
+import org.mobicents.servlet.sip.core.DNSAddressResolver;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 
@@ -61,6 +77,15 @@ public class SipStandardService extends StandardService implements SipService {
 	//the logger
 	private static final Logger logger = Logger.getLogger(SipStandardService.class);
 	private static final String DEFAULT_SIP_PATH_NAME = "gov.nist";
+	private static final String PASS_INVITE_NON_2XX_ACK_TO_LISTENER = "gov.nist.javax.sip.PASS_INVITE_NON_2XX_ACK_TO_LISTENER";
+	private static final String TCP_POST_PARSING_THREAD_POOL_SIZE = "gov.nist.javax.sip.TCP_POST_PARSING_THREAD_POOL_SIZE";
+	private static final String AUTOMATIC_DIALOG_SUPPORT_STACK_PROP = "javax.sip.AUTOMATIC_DIALOG_SUPPORT";
+	private static final String LOOSE_DIALOG_VALIDATION = "gov.nist.javax.sip.LOOSE_DIALOG_VALIDATION";
+	private static final String SERVER_LOG_STACK_PROP = "gov.nist.javax.sip.SERVER_LOG";
+	private static final String DEBUG_LOG_STACK_PROP = "gov.nist.javax.sip.DEBUG_LOG";	
+	private static final String SERVER_HEADER = "org.mobicents.servlet.sip.SERVER_HEADER";
+	private static final String USER_AGENT_HEADER = "org.mobicents.servlet.sip.USER_AGENT_HEADER";
+	private static final String JVM_ROUTE = "jvmRoute";
 	/**
      * The descriptive information string for this implementation.
      */
@@ -105,6 +130,13 @@ public class SipStandardService extends StandardService implements SipService {
 	 * use Pretty Encoding
 	 */
 	private boolean usePrettyEncoding = true;
+
+	private SipStack sipStack;
+	// defining sip stack properties
+	private Properties sipStackProperties;	
+	private String sipStackPropertiesFileLocation;
+
+	private String addressResolverClass = DNSAddressResolver.class.getName();
 	
 	//the balancers to send heartbeat to and our health info
 	@Deprecated
@@ -131,6 +163,7 @@ public class SipStandardService extends StandardService implements SipService {
 		ProtocolHandler protocolHandler = connector.getProtocolHandler();
 		if(protocolHandler instanceof SipProtocolHandler) {
 			connector.setPort(((SipProtocolHandler)protocolHandler).getPort());
+			((SipProtocolHandler)protocolHandler).setSipStack(sipStack);
 			protocolHandler.setAttribute(SipApplicationDispatcher.class.getSimpleName(), sipApplicationDispatcher);
 			if(balancers != null) {
 				protocolHandler.setAttribute("balancers", balancers);
@@ -223,10 +256,11 @@ public class SipStandardService extends StandardService implements SipService {
 		sipApplicationDispatcher.setBypassRequestExecutor(bypassRequestExecutor);
 		sipApplicationDispatcher.setBypassResponseExecutor(bypassResponseExecutor);		
 		sipApplicationDispatcher.init();
+		startSipStack();
 	}
 	
 	@Override
-	public void start() throws LifecycleException {
+	public void start() throws LifecycleException {		
 		super.start();		
 		synchronized (connectors) {
 			for (Connector connector : connectors) {
@@ -240,12 +274,10 @@ public class SipStandardService extends StandardService implements SipService {
 							connector.getPort());
 					}
 					protocolHandler.setAttribute(SipApplicationDispatcher.class.getSimpleName(), sipApplicationDispatcher);
+					((SipProtocolHandler)protocolHandler).setSipStack(sipStack);
 					if(balancers != null) {
 						protocolHandler.setAttribute("balancers", balancers);
-					}
-					if ((this.container != null) && (this.container instanceof Engine) && ((Engine)container).getJvmRoute() != null) {			            
-						protocolHandler.setAttribute("jvmRoute", ((Engine)container).getJvmRoute());
-					}
+					}					
 					connectorsStartedExternally = true;
 				} 
 				//Tomcat specific loading case
@@ -254,11 +286,10 @@ public class SipStandardService extends StandardService implements SipService {
 				SipStack sipStack = (SipStack)
 					protocolHandler.getAttribute(SipStack.class.getSimpleName());
 				if(extendedListeningPoint != null && sipStack != null) {
-					// for nist sip stack set the DNS Address resolver allowing to make DNS SRV lookups
-					String dnsAddressResolverClass = ((SipProtocolHandler)protocolHandler).getAddressResolverClass();
-					if(sipStack instanceof SipStackExt && dnsAddressResolverClass != null && dnsAddressResolverClass.trim().length() > 0) {
+					// for nist sip stack set the DNS Address resolver allowing to make DNS SRV lookups					
+					if(sipStack instanceof SipStackExt && addressResolverClass != null && addressResolverClass.trim().length() > 0) {
 						if(logger.isDebugEnabled()) {
-							logger.debug("Sip Stack " + sipStack.getStackName() +" will be using " + dnsAddressResolverClass + " as AddressResolver");
+							logger.debug("Sip Stack " + sipStack.getStackName() +" will be using " + addressResolverClass + " as AddressResolver");
 						}
 						try {
 							extendedListeningPoint.getSipProvider().addSipListener(sipApplicationDispatcher);
@@ -268,7 +299,7 @@ public class SipStandardService extends StandardService implements SipService {
 				            // get constructor of AddressResolver in order to instantiate
 				            Class[] paramTypes = new Class[1];
 				            paramTypes[0] = SipApplicationDispatcher.class;
-				            Constructor addressResolverConstructor = Class.forName(dnsAddressResolverClass).getConstructor(
+				            Constructor addressResolverConstructor = Class.forName(addressResolverClass).getConstructor(
 				                    paramTypes);
 				            // Wrap properties object in order to pass to constructor of AddressResolver
 				            Object[] conArgs = new Object[1];
@@ -277,7 +308,7 @@ public class SipStandardService extends StandardService implements SipService {
 				            AddressResolver addressResolver = (AddressResolver) addressResolverConstructor.newInstance(conArgs);
 				            ((SipStackExt) sipStack).setAddressResolver(addressResolver);				            
 				        } catch (Exception e) {
-				            throw new LifecycleException("Couldn't set the AddressResolver " + dnsAddressResolverClass, e);
+				            throw new LifecycleException("Couldn't set the AddressResolver " + addressResolverClass, e);
 				        }				        
 					} else {
 						if(logger.isInfoEnabled()) {
@@ -296,13 +327,211 @@ public class SipStandardService extends StandardService implements SipService {
 
 	}
 
+	private void startSipStack() throws LifecycleException {
+		try {	
+			if(logger.isDebugEnabled()) {
+				logger.debug("Starting a sip protocol handler");
+			}						
+			
+			// This simply puts HTTP and SSL port numbers in JVM properties menat to be read by jsip ha when sending heart beats with Node description.
+			StaticServiceHolder.sipStandardService.initializeSystemPortProperties();
+			
+			String catalinaHome = System.getProperty("catalina.home");
+	        if (catalinaHome == null) {
+	        	catalinaHome = System.getProperty("catalina.base");
+	        }
+	        if(catalinaHome == null) {
+	        	catalinaHome = ".";
+	        }
+	        if(sipStackPropertiesFileLocation != null && !sipStackPropertiesFileLocation.startsWith("file:///")) {
+				sipStackPropertiesFileLocation = "file:///" + catalinaHome.replace(File.separatorChar, '/') + "/" + sipStackPropertiesFileLocation;
+	 		}
+	        boolean isPropsLoaded = false;
+	        if(sipStackProperties == null) {
+	        	sipStackProperties = new Properties();
+	        } else {
+	        	isPropsLoaded = true;
+	        }
+	        
+			if (logger.isDebugEnabled()) {
+				logger.debug("Loading SIP stack properties from following file : " + sipStackPropertiesFileLocation);
+			}
+			if(sipStackPropertiesFileLocation != null) {
+				//hack to get around space char in path see http://weblogs.java.net/blog/kohsuke/archive/2007/04/how_to_convert.html, 
+				// we create a URL since it's permissive enough
+				File sipStackPropertiesFile = null;
+				URL url = null;
+				try {
+					url = new URL(sipStackPropertiesFileLocation);
+				} catch (MalformedURLException e) {
+					logger.fatal("Cannot find the sip stack properties file ! ",e);
+					throw new IllegalArgumentException("The Default Application Router file Location : "+sipStackPropertiesFileLocation+" is not valid ! ",e);
+				}
+				try {
+					sipStackPropertiesFile = new File(new URI(sipStackPropertiesFileLocation));
+				} catch (URISyntaxException e) {
+					//if the uri contains space this will fail, so getting the path will work
+					sipStackPropertiesFile = new File(url.getPath());
+				}		
+				FileInputStream sipStackPropertiesInputStream = null;
+				try {
+					sipStackPropertiesInputStream = new FileInputStream(sipStackPropertiesFile);
+					sipStackProperties.load(sipStackPropertiesInputStream);
+				} catch (Exception e) {
+					logger.warn("Could not find or problem when loading the sip stack properties file : " + sipStackPropertiesFileLocation, e);		
+				} finally {			
+					if(sipStackPropertiesInputStream != null) {
+						try {
+							sipStackPropertiesInputStream.close();
+						} catch (IOException e) {
+							logger.error("fail to close the following file " + sipStackPropertiesFile.getAbsolutePath(), e);
+						}
+					}
+				}	
+					
+				String debugLog = sipStackProperties.getProperty(DEBUG_LOG_STACK_PROP);
+				if(debugLog != null && debugLog.length() > 0 && !debugLog.startsWith("file:///")) {				
+					sipStackProperties.setProperty(DEBUG_LOG_STACK_PROP,
+						catalinaHome + "/" + debugLog);
+				}
+				String serverLog = sipStackProperties.getProperty(SERVER_LOG_STACK_PROP);
+				if(serverLog != null && serverLog.length() > 0 && !serverLog.startsWith("file:///")) {
+					sipStackProperties.setProperty(SERVER_LOG_STACK_PROP,
+						catalinaHome + "/" + serverLog);
+				}
+				// The whole MSS is built upon those assumptions, so those properties are not overrideable
+				sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");
+				sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
+				sipStackProperties.setProperty(PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");
+				isPropsLoaded = true;
+			} else {
+				logger.warn("no sip stack properties file defined ");		
+			}	
+			if(!isPropsLoaded) {
+				logger.warn("loading default Mobicents Sip Servlets sip stack properties");
+				// Silently set default values
+				sipStackProperties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT",
+						"true");
+				sipStackProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
+						"32");
+				sipStackProperties.setProperty(DEBUG_LOG_STACK_PROP,
+						catalinaHome + "/" + "mss-jsip-" + getName() +"-debug.txt");
+				sipStackProperties.setProperty(SERVER_LOG_STACK_PROP,
+						catalinaHome + "/" + "mss-jsip-" + getName() +"-messages.xml");
+				sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-" + getName());
+				sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");		
+				sipStackProperties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
+				sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
+				sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
+				sipStackProperties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "1");
+				sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
+				sipStackProperties.setProperty(PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");
+			}
+			
+			if(sipStackProperties.get(TCP_POST_PARSING_THREAD_POOL_SIZE) == null) {
+				sipStackProperties.setProperty(TCP_POST_PARSING_THREAD_POOL_SIZE, "30");
+			}
+			if(sipStackProperties.get("gov.nist.javax.sip.AUTOMATIC_DIALOG_ERROR_HANDLING") == null) {
+				sipStackProperties.setProperty("gov.nist.javax.sip.AUTOMATIC_DIALOG_ERROR_HANDLING", "false");
+			}
+			
+			String serverHeaderValue = sipStackProperties.getProperty(SERVER_HEADER);
+			if(serverHeaderValue != null) {
+				List<String> serverHeaderList = new ArrayList<String>();
+				StringTokenizer stringTokenizer = new StringTokenizer(serverHeaderValue, ",");
+				while(stringTokenizer.hasMoreTokens()) {
+					serverHeaderList.add(stringTokenizer.nextToken());
+				}
+				ServerHeader serverHeader = SipFactories.headerFactory.createServerHeader(serverHeaderList);
+				((MessageFactoryExt)SipFactories.messageFactory).setDefaultServerHeader(serverHeader);
+			}
+			String userAgent = sipStackProperties.getProperty(USER_AGENT_HEADER);
+			if(userAgent != null) {
+				List<String> userAgentList = new ArrayList<String>();
+				StringTokenizer stringTokenizer = new StringTokenizer(userAgent, ",");
+				while(stringTokenizer.hasMoreTokens()) {
+					userAgentList.add(stringTokenizer.nextToken());
+				}
+				UserAgentHeader userAgentHeader = SipFactories.headerFactory.createUserAgentHeader(userAgentList);
+				((MessageFactoryExt)SipFactories.messageFactory).setDefaultUserAgentHeader(userAgentHeader);
+			}
+			if(logger.isInfoEnabled()) {
+				logger.info("Mobicents Sip Servlets sip stack properties : " + sipStackProperties);
+			}
+	//		final String balancers = (String)getAttribute(BALANCERS);
+			if(balancers != null) {
+				if(sipStackProperties.get(LoadBalancerHeartBeatingService.LB_HB_SERVICE_CLASS_NAME) == null) {
+					sipStackProperties.put(LoadBalancerHeartBeatingService.LB_HB_SERVICE_CLASS_NAME, LoadBalancerHeartBeatingServiceImpl.class.getCanonicalName());
+				}
+				if(sipStackProperties.get(LoadBalancerHeartBeatingService.BALANCERS) == null) {
+					sipStackProperties.put(LoadBalancerHeartBeatingService.BALANCERS, balancers);
+				}
+			}		
+			sipStackProperties.put("org.mobicents.ha.javax.sip.REPLICATION_STRATEGY", "ConfirmedDialogNoApplicationData");
+			// Create SipStack object
+			sipStack = SipFactories.sipFactory.createSipStack(sipStackProperties);		
+			LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = null;
+			if(sipStack instanceof ClusteredSipStack) {
+				loadBalancerHeartBeatingService = ((ClusteredSipStack) sipStack).getLoadBalancerHeartBeatingService();
+				if ((this.container != null) && (this.container instanceof Engine) && ((Engine)container).getJvmRoute() != null) {
+					final String jvmRoute = ((Engine)container).getJvmRoute();
+					if(jvmRoute != null) {
+						loadBalancerHeartBeatingService.setJvmRoute(jvmRoute);
+					}
+				}
+			}
+			if(sipApplicationDispatcher != null && loadBalancerHeartBeatingService != null && sipApplicationDispatcher instanceof LoadBalancerHeartBeatingListener) {
+				loadBalancerHeartBeatingService.addLoadBalancerHeartBeatingListener((LoadBalancerHeartBeatingListener)sipApplicationDispatcher);
+			}
+			// for nist sip stack set the DNS Address resolver allowing to make DNS SRV lookups
+			if(sipStack instanceof SipStackExt && addressResolverClass != null && addressResolverClass.trim().length() > 0) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Sip Stack " + sipStack.getStackName() +" will be using " + addressResolverClass + " as AddressResolver");
+				}
+				try {
+		            // create parameters argument to identify constructor
+		            Class[] paramTypes = new Class[1];
+		            paramTypes[0] = SipApplicationDispatcher.class;
+		            // get constructor of AddressResolver in order to instantiate
+		            Constructor addressResolverConstructor = Class.forName(addressResolverClass).getConstructor(
+		                    paramTypes);
+		            // Wrap properties object in order to pass to constructor of AddressResolver
+		            Object[] conArgs = new Object[1];
+		            conArgs[0] = sipApplicationDispatcher;
+		            // Creates a new instance of AddressResolver Class with the supplied sipApplicationDispatcher.
+		            AddressResolver addressResolver = (AddressResolver) addressResolverConstructor.newInstance(conArgs);
+		            ((SipStackExt) sipStack).setAddressResolver(addressResolver);
+		        } catch (Exception e) {
+		            logger.error("Couldn't set the AddressResolver " + addressResolverClass, e);
+		            throw e;
+		        }
+			} else {
+				if(logger.isInfoEnabled()) {
+					logger.info("no AddressResolver will be used since none has been specified.");
+				}
+			}
+			sipStack.start();
+		} catch (Exception ex) {			
+			throw new LifecycleException("A problem occured while starting the SIP Stack", ex);
+		}
+	}
+
+	private void stopSipStack() {
+		// stopping the sip stack	
+		if(sipStack != null) {
+			sipStack.stop();
+			sipStack = null;
+			logger.info("Sip stack stopped");
+		}
+	}
+
 	@Override
 	public void stop() throws LifecycleException {
 		if(!connectorsStartedExternally) {
 			sipApplicationDispatcher.stop();
 		}	
 		super.stop();
-		//Tomcat specific unloading case
+		// Tomcat specific unloading case
 		// Issue 1411 http://code.google.com/p/mobicents/issues/detail?id=1411
 		// Sip Connectors should be removed after removing all Sip Servlets to allow them to send BYE to terminate cleanly
 		synchronized (connectors) {
@@ -314,7 +543,8 @@ public class SipStandardService extends StandardService implements SipService {
 					sipApplicationDispatcher.getSipNetworkInterfaceManager().removeExtendedListeningPoint(extendedListeningPoint);
 				}
 			}
-		}		
+		}	
+		stopSipStack();
 	}
 	
 	/**
@@ -651,6 +881,7 @@ public class SipStandardService extends StandardService implements SipService {
 			SipProtocolHandler sipProtocolHandler = (SipProtocolHandler) connector
 					.getProtocolHandler();
 			sipProtocolHandler.setSipConnector(sipConnector);		
+			sipProtocolHandler.setSipStack(sipStack);
 			connector.setService(this);
 			connector.setContainer(container);
 			connector.init();		
@@ -812,5 +1043,47 @@ public class SipStandardService extends StandardService implements SipService {
 	 */
 	public int getTimerDInterval() {
 		return timerDInterval;
+	}
+	
+	/**
+	 * @param sipStackPropertiesFile the sipStackPropertiesFile to set
+	 */
+	public void setSipStackPropertiesFile(String sipStackPropertiesFile) {
+		sipStackPropertiesFileLocation =  sipStackPropertiesFile;
+	}
+
+	/**
+	 * @return the sipStackProperties
+	 */
+	public Properties getSipStackProperties() {
+		return sipStackProperties;
+	}
+	
+	/**
+	 * @param sipStackProperties the sipStackProperties to set
+	 */
+	public void setSipStackProperties(Properties sipStackProperties) {
+		this.sipStackProperties = sipStackProperties;
+	}
+
+	/**
+	 * @return the sipStackPropertiesFile
+	 */
+	public String getSipStackPropertiesFile() {
+		return sipStackPropertiesFileLocation;
+	}
+	
+	/**
+	 * @param dnsAddressResolverClass the dnsAddressResolverClass to set
+	 */
+	public void setAddressResolverClass(String dnsAddressResolverClass) {
+		this.addressResolverClass = dnsAddressResolverClass;
+	}
+
+	/**
+	 * @return the dnsAddressResolverClass
+	 */
+	public String getAddressResolverClass() {
+		return addressResolverClass;
 	}
 }

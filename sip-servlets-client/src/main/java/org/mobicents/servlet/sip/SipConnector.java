@@ -76,10 +76,6 @@ public class SipConnector implements Serializable {
 	private String staticServerAddress;
 	private int staticServerPort;
 	private boolean useStaticAddress;
-
-	// sip stack attributes defined by the server.xml
-	private String sipStackPropertiesFileLocation;
-	
 	
 	/**
 	 * @return the Transport
@@ -187,20 +183,6 @@ public class SipConnector implements Serializable {
 
 	public void setUseStaticAddress(boolean useStaticAddress) {
 		this.useStaticAddress = useStaticAddress;
-	}
-
-	/**
-	 * @param sipStackPropertiesFile the sipStackPropertiesFile to set
-	 */
-	public void setSipStackPropertiesFileLocation(String sipStackPropertiesFile) {
-		this.sipStackPropertiesFileLocation = sipStackPropertiesFile;
-	}
-
-	/**
-	 * @return the sipStackPropertiesFile
-	 */
-	public String getSipStackPropertiesFileLocation() {
-		return sipStackPropertiesFileLocation;
 	}
 	
 	/*
