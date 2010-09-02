@@ -25,6 +25,7 @@
 		<module>custom-call-forwarding-distributable</module>
 		<module>diameter-event-charging</module>
 		<module>diameter-openims</module>
+		<module>diameter-ro-rf</module>
 		<module>facebook-c2c</module>
 		<module>jslee-sips-interop</module>
 		<module>location-service</module>
