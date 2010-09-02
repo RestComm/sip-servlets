@@ -44,7 +44,8 @@
   		className="org.mobicents.servlet.sip.startup.SipStandardService" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"  		
 		concurrencyControlMode="None" 
-  		darConfigurationFileLocation="conf/dars/mobicents-dar.properties">
+  		darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
+  		sipStackPropertiesFile="conf/mss-sip-stack.properties">
   		<!--darConfigurationFileLocation="conf/dars/dar.properties"-->
   		<!--darConfigurationFileLocation="conf/dars/call-blocking-servlet-dar.properties"-->  		
   		<!--darConfigurationFileLocation="conf/dars/call-forwarding-b2bua-servlet-dar.properties"-->
@@ -118,22 +119,19 @@
     <Connector port="5080" 
 	ipAddress = "127.0.0.1"
 	protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
-	signalingTransport="udp" 
-    sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
+	signalingTransport="udp"/>
 	
 	<!-- Define the default TCP SIP Connector -->
     <Connector port="5080" 
 	     ipAddress = "127.0.0.1"
 	     protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
-	     signalingTransport="tcp" 
-    	 sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
+	     signalingTransport="tcp"/>
     	 
     <!-- Define the default TLS SIP Connector -->
     <Connector port="5081" 
 	     ipAddress = "127.0.0.1"
 	     protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
-	     signalingTransport="tls" 
-    	 sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
+	     signalingTransport="tls"/>
 	
     <!-- An Engine represents the entry point (within Catalina) that processes
          every request.  The Engine implementation for Tomcat stand alone
