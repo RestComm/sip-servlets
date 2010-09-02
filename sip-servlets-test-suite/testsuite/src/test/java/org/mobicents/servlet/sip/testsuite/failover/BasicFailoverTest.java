@@ -840,7 +840,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		logger.info("Log4j path is : " + tomcatServer.getLoggingFilePath());
 		tomcatServer.setDarConfigurationFilePath(darConfigurationFile);		
 		tomcatServer.initTomcat(specificTomcatBasePath);						
-		tomcatServer.addSipConnector(serverName, sipIpAddress, sipConnectorPort, ListeningPoint.UDP, null);
+		tomcatServer.addSipConnector(serverName, sipIpAddress, sipConnectorPort, ListeningPoint.UDP);
 		((SipStandardBalancerNodeService)tomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
 		tomcatServer.startTomcat();
 		return tomcatServer;

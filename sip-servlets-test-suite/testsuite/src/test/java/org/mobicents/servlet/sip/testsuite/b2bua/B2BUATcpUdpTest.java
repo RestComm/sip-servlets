@@ -78,7 +78,7 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 	protected void setUp() throws Exception {		
 		super.setUp();
 
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP, null);
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
 		tomcat.startTomcat();
 		deployApplication();
 		

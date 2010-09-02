@@ -104,7 +104,7 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		udpProtocolHandler.setSipStackProperties(null);
+		tomcat.getSipService().setSipStackProperties(null);
 		udpProtocolHandler.setUseStaticAddress(true);
 		udpProtocolHandler.setStaticServerAddress("127.0.0.1");
 		udpProtocolHandler.setStaticServerPort(IPLB_ADDRESS);

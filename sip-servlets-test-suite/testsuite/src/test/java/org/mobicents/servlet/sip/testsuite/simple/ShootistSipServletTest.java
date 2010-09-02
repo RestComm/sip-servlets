@@ -128,18 +128,16 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	
 	public void testShootist() throws Exception {
 //		receiver.sendInvite();
-		//receiverProtocolObjects =new ProtocolObjects(
-		//		"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
 					
-		//receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
-		//SipProvider senderProvider = receiver.createProvider();			
-		
-		//senderProvider.addSipListener(receiver);
-		
-		//receiverProtocolObjects.start();
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();			
+		receiverProvider.addSipListener(receiver);
+		receiverProtocolObjects.start();
 		tomcat.startTomcat();
 		deployApplication();
-		Thread.sleep(80000);
+		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());		
 	}
 	// Also Tests Issue 1693 http://code.google.com/p/mobicents/issues/detail?id=1693
@@ -376,6 +374,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		
 		receiverProtocolObjects.start();
 		tomcat.removeConnector(sipConnector);
+		tomcat.stopTomcat();
 		Properties sipStackProperties = new Properties();
 		sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-"
 				+ sipIpAddress + "-" + 5070);
@@ -389,8 +388,11 @@ public class ShootistSipServletTest extends SipServletTestCase {
 				"true");
 		sipStackProperties.setProperty("org.mobicents.servlet.sip.USER_AGENT_HEADER",
 			"MobicentsSipServletsUserAgent");
-		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport, sipStackProperties);
-		tomcat.startTomcat();
+		tomcat.getSipService().setSipStackPropertiesFile(null);
+		tomcat.getSipService().setSipStackProperties(sipStackProperties);
+		tomcat.getSipService().init();
+		tomcat.restartTomcat();
+		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
 		deployApplication();
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());	
@@ -414,7 +416,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		senderProvider.addSipListener(receiver);
 		
 		receiverProtocolObjects.start();
-		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5071, "tcp", null);
+		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5071, ListeningPoint.TCP);
 		tomcat.startTomcat();
 		deployApplication();
 		Thread.sleep(TIMEOUT);
@@ -437,7 +439,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		senderProvider.addSipListener(receiver);
 		
 		receiverProtocolObjects.start();
-		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5071, "tcp", null);
+		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5071, ListeningPoint.TCP);
 		tomcat.startTomcat();
 		deployApplication("outboundInterface", "tcp");
 		Thread.sleep(TIMEOUT);

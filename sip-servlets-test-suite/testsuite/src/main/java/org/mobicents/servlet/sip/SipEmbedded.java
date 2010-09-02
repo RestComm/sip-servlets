@@ -28,6 +28,7 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
 import org.apache.catalina.Container;
+import org.apache.catalina.Engine;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.ServerFactory;
 import org.apache.catalina.connector.Connector;
@@ -217,16 +218,24 @@ public class SipEmbedded {
 	}
 
 	/**
+	 * This method Starts the Tomcat server.
 	 */
-	public Connector addSipConnector(String connectorName, String ipAddress, int port, String transport, Properties sipStackProperties) throws Exception {
+	public void restartTomcat() throws Exception {
+		// Start the embedded server
+		host.start();
+		sipService.start();		
+	}
+
+	/**
+	 */
+	public Connector addSipConnector(String connectorName, String ipAddress, int port, String transport) throws Exception {
 		Connector udpSipConnector = new Connector(
 				SipProtocolHandler.class.getName());
 		SipProtocolHandler udpProtocolHandler = (SipProtocolHandler) udpSipConnector
 				.getProtocolHandler();
 		udpProtocolHandler.setPort(port);
 		udpProtocolHandler.setIpAddress(ipAddress);
-		udpProtocolHandler.setSignalingTransport(transport);
-		udpProtocolHandler.setSipStackProperties(sipStackProperties);
+		udpProtocolHandler.setSignalingTransport(transport);		
 
 		sipService.addConnector(udpSipConnector);
 		return udpSipConnector;

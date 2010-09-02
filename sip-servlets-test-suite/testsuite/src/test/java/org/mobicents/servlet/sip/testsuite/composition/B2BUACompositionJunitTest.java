@@ -83,7 +83,7 @@ public class B2BUACompositionJunitTest extends SipServletTestCase {
 	protected void setUp() throws Exception {		
 		super.setUp();
 
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP, null);
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
 		tomcat.startTomcat();		
 		
 		senderProtocolObjects = new ProtocolObjects(FROM_NAME,

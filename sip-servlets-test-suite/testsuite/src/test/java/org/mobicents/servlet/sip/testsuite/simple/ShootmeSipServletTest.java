@@ -35,8 +35,13 @@ import javax.sip.header.ServerHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
+import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.SipContextConfig;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -56,6 +61,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 	TestSipListener sender;
 	SipProvider senderProvider = null;
 	TestSipListener registerReciever;
+	SipContext sipContext;
 	
 	ProtocolObjects senderProtocolObjects;	
 	ProtocolObjects registerRecieverProtocolObjects;	
@@ -446,6 +452,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		tomcat.removeConnector(sipConnector);
+		tomcat.stopTomcat();		
 		Properties sipStackProperties = new Properties();
 		sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-"
 				+ sipIpAddress + "-" + 5070);
@@ -459,7 +466,11 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 				"true");
 		sipStackProperties.setProperty("org.mobicents.servlet.sip.SERVER_HEADER",
 			"MobicentsSipServletsServer");
-		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport, sipStackProperties);
+		tomcat.getSipService().setSipStackProperties(sipStackProperties);
+		tomcat.getSipService().init();
+		tomcat.restartTomcat();
+		deployApplication();
+		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());

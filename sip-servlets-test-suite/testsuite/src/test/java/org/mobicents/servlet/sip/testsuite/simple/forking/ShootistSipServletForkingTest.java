@@ -118,7 +118,7 @@ public class ShootistSipServletForkingTest extends SipServletTestCase {
 		SipProvider provider = proxy.createSipProvider();
         provider.addSipListener(proxy);
 
-        sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5060, listeningPointTransport, null);
+        sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5060, listeningPointTransport);
 		tomcat.startTomcat();
 		Map<String, String> params= new HashMap<String, String>();
 		params.put("route", "sip:127.0.0.1:5070");

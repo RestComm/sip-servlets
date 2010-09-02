@@ -42,7 +42,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP, null);
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
 		tomcat.startTomcat();
 		deployApplication();
 		this.shootist = new Shootist(false);
