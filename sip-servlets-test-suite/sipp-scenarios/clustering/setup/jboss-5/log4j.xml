@@ -168,6 +168,10 @@
       <priority value="DEBUG"/>
    </category>
    
+   <category name="gov.nist">
+      <priority value="DEBUG"/>
+   </category>
+   
    <category name="org.jboss">
       <priority value="ERROR"/>
    </category>
