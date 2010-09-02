@@ -16,7 +16,8 @@
   		concurrencyControlMode="None"
   		sipPathName="org.mobicents.ha" 
   		congestionControlCheckingInterval="-1" 
-  		darConfigurationFileLocation="conf/dars/mobicents-dar.properties">
+  		darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
+  		sipStackPropertiesFile="conf/mss-sip-stack.properties">
 
     <!-- A "Connector" represents an endpoint by which requests are received
          and responses are returned. Documentation at :
@@ -49,8 +50,7 @@
     <Connector port="5080" 
 	     ipAddress = "${jboss.bind.address}"
 	     protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
-	     signalingTransport="udp"
-	     sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
+	     signalingTransport="udp"/>
 
       <Engine name="jboss.web" defaultHost="localhost" className="org.mobicents.servlet.sip.startup.SipStandardEngine">
 

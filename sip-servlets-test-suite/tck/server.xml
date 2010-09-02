@@ -13,7 +13,8 @@
    <Service name="jboss.web" 
       	className="org.mobicents.servlet.sip.startup.SipStandardService"
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-  		darConfigurationFileLocation="conf/dars/shopping-demo-dar.properties">
+  		darConfigurationFileLocation="conf/dars/shopping-demo-dar.properties"
+  		sipStackPropertiesFile="conf/mss-sip-stack.properties">
 
     <!-- A "Connector" represents an endpoint by which requests are received
          and responses are returned. Documentation at :
@@ -46,14 +47,7 @@
     <Connector port="5080" 
 	     ipAddress = "${jboss.bind.address}"
 	     protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
-	     signalingTransport="udp"
-	     threadPoolSize="64"
-		 isReentrantListener="true"  
-	    	 logLevel="INFO"
-		debugLog = "log/jsip-5070-debug.txt" 
-		     serverLog = "log/jsip-5070-server.txt"
-	     sipStackName="SIP-Servlet-Jboss-Server" 
-	     sipPathName="gov.nist"/>
+	     signalingTransport="udp"/>
 
       <Engine name="jboss.web" defaultHost="localhost" className="org.mobicents.servlet.sip.startup.SipStandardEngine">
 

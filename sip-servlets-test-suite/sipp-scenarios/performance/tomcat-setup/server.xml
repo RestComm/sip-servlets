@@ -49,7 +49,8 @@
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
   		concurrencyControlMode="None" 
   		congestionControlCheckingInterval="-1" 
-  		darConfigurationFileLocation="conf/dars/mobicents-dar.properties">
+  		darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
+  		sipStackPropertiesFile="conf/mss-sip-stack.properties">
   		<!--darConfigurationFileLocation="conf/dars/dar.properties"-->
   		<!--darConfigurationFileLocation="conf/dars/call-blocking-servlet-dar.properties"-->  		
   		<!--darConfigurationFileLocation="conf/dars/call-forwarding-b2bua-servlet-dar.properties"-->
@@ -123,8 +124,7 @@
     <Connector port="5080" 
 	ipAddress = "127.0.0.1"
 	protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
-	signalingTransport="udp"
-	sipStackPropertiesFile="conf/mss-sip-stack.properties"/>
+	signalingTransport="udp"/>
 	
 	<!-- Define a SIP Connector -->
     <!--Connector port="5081" 
