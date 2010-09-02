@@ -156,7 +156,8 @@
  name=&quot;jboss.web&quot;
  className=&quot;org.mobicents.servlet.sip.startup.SipStandardService&quot;
  sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
- darConfigurationFileLocation=&quot;conf/dars/locationservice-dar.properties&quot;&gt;</programlisting>
+ darConfigurationFileLocation=&quot;conf/dars/locationservice-dar.properties&quot;
+ sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;&gt;</programlisting>
             </example>
             <para>Make sure that the configuration file only contains one
             <literal>darConfigurationFileLocation</literal> attribute: your
@@ -178,7 +179,8 @@
  name=&quot;Sip-Servlets&quot;
  className=&quot;org.mobicents.servlet.sip.startup.SipStandardService&quot;
  sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
- darConfigurationFileLocation=&quot;conf/dars/locationservice-dar.properties&quot;&gt;</programlisting>
+ darConfigurationFileLocation=&quot;conf/dars/locationservice-dar.properties&quot;
+ sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;&gt;</programlisting>
             </example>
             <para>Make sure that the configuration file only contains one
             <literal>darConfigurationFileLocation</literal> attribute: your
@@ -395,7 +397,8 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
       className=&quot;org.mobicents.servlet.sip.startup.SipStandardService&quot;
     sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
     sipApplicationRouterClassName=&quot;org.mobicents.servlet.sip.router.DefaultApplicationRouter&quot;
-    darConfigurationFileLocation=&quot;conf/dars/mobicents-dar.properties&quot;&gt;
+    darConfigurationFileLocation=&quot;conf/dars/mobicents-dar.properties&quot;
+	sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;&gt;
 
 ...
 </programlisting>
@@ -650,7 +653,8 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
  name=&quot;jboss.web&quot;
  className=&quot;org.mobicents.servlet.sip.startup.SipStandardService&quot;
  sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
- darConfigurationFileLocation=&quot;conf/dars/call-blocking-servlet-dar.properties&quot;&gt;</programlisting>
+ darConfigurationFileLocation=&quot;conf/dars/call-blocking-servlet-dar.properties&quot;
+ sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;&gt;</programlisting>
             </example>
             <para>Make sure that the configuration file only contains one
             <literal>darConfigurationFileLocation</literal> attribute: your
@@ -672,7 +676,8 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
  name=&quot;Sip-Servlets&quot;
  className=&quot;org.mobicents.servlet.sip.startup.SipStandardService&quot;
  sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
- darConfigurationFileLocation=&quot;conf/dars/call-blocking-servlet-dar.properties&quot;&gt;</programlisting>
+ darConfigurationFileLocation=&quot;conf/dars/call-blocking-servlet-dar.properties&quot;
+ sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;&gt;</programlisting>
             </example>
             <para>Make sure that the configuration file only contains one
             <literal>darConfigurationFileLocation</literal> attribute: your
@@ -860,7 +865,8 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
  name=&quot;jboss.web&quot;
  className=&quot;org.mobicents.servlet.sip.startup.SipStandardService&quot;
  sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
- darConfigurationFileLocation=&quot;conf/dars/call-forwarding-b2bua-servlet-dar.properties&quot;&gt;</programlisting>
+ darConfigurationFileLocation=&quot;conf/dars/call-forwarding-b2bua-servlet-dar.properties&quot;
+ sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;&gt;</programlisting>
             </example>
             <para>Make sure that the configuration file only contains one
             <literal>darConfigurationFileLocation</literal> attribute: your
@@ -882,7 +888,8 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
  name=&quot;Sip-Servlets&quot;
  className=&quot;org.mobicents.servlet.sip.startup.SipStandardService&quot;
  sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
- darConfigurationFileLocation=&quot;conf/dars/call-forwarding-b2bua-servlet-dar.properties&quot;&gt;</programlisting>
+ darConfigurationFileLocation=&quot;conf/dars/call-forwarding-b2bua-servlet-dar.properties&quot;
+ sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;&gt;</programlisting>
             </example>
             <para>Make sure that the configuration file only contains one
             <literal>darConfigurationFileLocation</literal> attribute: your
@@ -1089,7 +1096,8 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
  name=&quot;jboss.web&quot;
  className=&quot;org.mobicents.servlet.sip.startup.SipStandardService&quot;
  sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
- darConfigurationFileLocation=&quot;conf/dars/call-controller-servlet-dar.properties &quot;&gt;</programlisting>
+ darConfigurationFileLocation=&quot;conf/dars/call-controller-servlet-dar.properties &quot;
+ sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;&gt;</programlisting>
             </example>
             <para>Make sure that the configuration file only contains one
             <literal>darConfigurationFileLocation</literal> attribute: your
@@ -1111,7 +1119,8 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
  name=&quot;Sip-Servlets&quot;
  className=&quot;org.mobicents.servlet.sip.startup.SipStandardService&quot;
  sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
- darConfigurationFileLocation=&quot;conf/dars/call-controller-servlet-dar.properties &quot;&gt;</programlisting>
+ darConfigurationFileLocation=&quot;conf/dars/call-controller-servlet-dar.properties &quot;
+ sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;&gt;</programlisting>
             </example>
             <para>Make sure that the configuration file only contains one
             <literal>darConfigurationFileLocation</literal> attribute: your

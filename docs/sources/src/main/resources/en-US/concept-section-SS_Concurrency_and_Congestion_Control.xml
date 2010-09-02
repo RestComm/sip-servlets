@@ -208,13 +208,15 @@
  name=&quot;jboss.web&quot;
  className=&quot;org.mobicents.servlet.sip.startup.SipStandardService&quot;
  sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
+ usePrettyEncoding=&quot;false&quot;
+ sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;
  darConfigurationFileLocation=&quot;conf/dars/mobicents-dar.properties&quot;
  concurrencyControlMode=&quot;SipApplicationSession&quot;
  sipMessageQueueSize=&quot;1600&quot;
  backToNormalSipMessageQueueSize=&quot;1300&quot;
  congestionControlCheckingInterval=&quot;2000&quot;
  congestionControlPolicy=&quot;DropMessage&quot;
- memoryThreshold=&quot;95&quot;
+ memoryThreshold=&quot;95&quot; 
  backToNormalMemoryThreshold=&quot;90&quot;&gt;</programlisting>
             </example>
             <para>Possible values for the

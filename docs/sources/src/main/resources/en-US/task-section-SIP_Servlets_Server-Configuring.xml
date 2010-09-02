@@ -18,14 +18,12 @@
 ipAddress="127.0.0.1"
  protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
  signalingTransport="udp"
- usePrettyEncoding="false"
  useStun="false"
  stunServerAddress="stun01.sipphone.com"
  stunServerPort="3478"
  staticServerAddress="122.122.122.122" 
  staticServerPort="44"
- useStaticAddress="true"
- sipStackPropertiesFile="conf/mss-sip-stack.properties"/>]]></programlisting>
+ useStaticAddress="true"/>]]></programlisting>
     </example>
     <variablelist>
       <title>SIP &lt;connector&gt; Attributes</title>
@@ -52,13 +50,7 @@ ipAddress="127.0.0.1"
         <listitem>
           <para>Specifies the transport on which the container will be able to receive SIP messages.  For example, &quot;udp&quot;.</para>
         </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>usePrettyEncoding</term>
-        <listitem>
-          <para>Allows Via, Route, and RecordRoute header field information to be split into multiple lines, rather than each header field being separating with a comma.  The attribute defaults to &quot;true&quot;.  Leaving this attribute at the default setting may assist in debugging non-RFC3261 compliant SIP servers.</para>
-        </listitem>
-      </varlistentry>
+      </varlistentry>      
       <varlistentry>
         <term>useStun</term>
         <listitem>
@@ -84,6 +76,75 @@ ipAddress="127.0.0.1"
         </listitem>
       </varlistentry>      
       <varlistentry>
+        <term>useStaticAddress</term>
+        <listitem>
+          <para>Specifies  whether the settings in staticServerAddress and staticServerPort are activated.  The default value is &quot;false&quot; (deactivated).</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>staticServerAddress</term>
+        <listitem>
+          <para>Specifies what load-balancer server address is insterted in Contact/Via headers for server-created requests. This parameter  is useful for  cluster configurations where  requests should  be bound to a load-balancer address, rather than  a specific node address.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>staticServerPort</term>
+        <listitem>
+          <para>Specifies the port of the load-balancer specified in staticServerAddress . This parameter is useful in cluster configurations where requests should be bound to a load-balancer address rather than a specific node address.</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+    <note>
+      <para>A comprehensive list of implementing classes for the SIP Stack is available from the <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html">Interface Sip Stack page on nist.gov</ulink>.  For a comprehensive list of properties associated with the SIP Stack implementation, refer to <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html">Class SipStackImpl page on nist.gov</ulink>.</para>
+    </note>
+  </section>
+  <section id="bsssc-binary-SIP_Servlets_Server-Configuring_Application_Routing">
+    <title>Application Routing and Service Configuration</title>
+    <para>The application router is called by the container—whether JBoss or Tomcat—to select a SIP Servlet application to service an initial request. It embodies the logic used to choose which applications to invoke. An application router is required for a container to function, but it is a separate logical entity from the container. The application router is solely responsible for application selection and must not implement application logic. For example, the application router cannot modify a request or send a response.</para>
+    <para>For more information about the application router, refer to the following sections of the JSR 289 specification: Application Router Packaging and Deployment, Application Selection Process, and Appendix C.
+   </para>
+    <para>In order to configure the application router, you should edit the <literal>Service</literal> element in the container&apos;s <filename>server.xml</filename> configuration file:</para>
+    <example id="bsssc-Configuring_the_Service_Element_in_the_Containers_server.xml">
+      <title>Configuring the Service Element in the Container&apos;s server.xml</title>
+      <programlisting linenumbering="unnumbered" role="XML"><![CDATA[
+  <Service name="Sip-Servlets"
+ className="org.mobicents.servlet.sip.startup.SipStandardService"
+ sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
+ usePrettyEncoding="false" 
+ additionalParameterableHeaders="Header1,Header2" 
+ bypassResponseExecutor="false" 
+ bypassRequestExecutor="false" 
+ baseTimerInterval="500"
+ t2Interval="4000"
+ t4Interval="5000"
+ timerDInterval="32000"
+ dispatcherThreadPoolSize="4"
+ darConfigurationFileLocation="file:///home/silas/workspaces/mobicents-sip-servlets/
+ sip-servlets-examples/reinvite-demo/reinvite-dar.properties"
+ sipStackPropertiesFile="conf/mss-sip-stack.properties">]]>
+ </programlisting>
+    </example>
+    <para>Provided here is a description of the SIP Service element&apos;s attributes:</para>
+    <variablelist>
+      <varlistentry>
+        <term>className</term>
+        <listitem>
+          <para>This attribute specifies that the servlet container is a <emphasis>converged</emphasis> (i.e. SIP + HTTP) servlet container. This attribute can also be used to handle load-balancing and failover.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>sipApplicationDispatcherClassName</term>
+        <listitem>
+          <para>This attribute specifies the class name of the <literal>org.mobicents.servlet.sip.core.SipApplicationDispatcher</literal> implementation to use. The routing algorithm and application selection process is performed in that class.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>darConfigurationFileLocation</term>
+        <listitem>
+          <para>The default application router file location. This is used by the default application router to determine the application selection logic. Refer to Appendix C of the JSR 289 specification for more details.</para>
+        </listitem>
+      </varlistentry>
+       <varlistentry>
         <term>sipStackPropertiesFile</term>
         <listitem>
           <para>Specifies the location of the file containing key-value pairs corresponding to the SIP stack configuration properties.  This attribute is used to further tune the JAIN SIP Stack.  If this property is omitted, the following default values are assumed:</para>
@@ -131,70 +192,9 @@ ipAddress="127.0.0.1"
         </listitem>
       </varlistentry>
       <varlistentry>
-        <term>useStaticAddress</term>
+        <term>usePrettyEncoding</term>
         <listitem>
-          <para>Specifies  whether the settings in staticServerAddress and staticServerPort are activated.  The default value is &quot;false&quot; (deactivated).</para>
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>staticServerAddress</term>
-        <listitem>
-          <para>Specifies what load-balancer server address is insterted in Contact/Via headers for server-created requests. This parameter  is useful for  cluster configurations where  requests should  be bound to a load-balancer address, rather than  a specific node address.</para>
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>staticServerPort</term>
-        <listitem>
-          <para>Specifies the port of the load-balancer specified in staticServerAddress . This parameter is useful in cluster configurations where requests should be bound to a load-balancer address rather than a specific node address.</para>
-        </listitem>
-      </varlistentry>
-    </variablelist>
-    <note>
-      <para>A comprehensive list of implementing classes for the SIP Stack is available from the <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html">Interface Sip Stack page on nist.gov</ulink>.  For a comprehensive list of properties associated with the SIP Stack implementation, refer to <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html">Class SipStackImpl page on nist.gov</ulink>.</para>
-    </note>
-  </section>
-  <section id="bsssc-binary-SIP_Servlets_Server-Configuring_Application_Routing">
-    <title>Application Routing and Service Configuration</title>
-    <para>The application router is called by the container—whether JBoss or Tomcat—to select a SIP Servlet application to service an initial request. It embodies the logic used to choose which applications to invoke. An application router is required for a container to function, but it is a separate logical entity from the container. The application router is solely responsible for application selection and must not implement application logic. For example, the application router cannot modify a request or send a response.</para>
-    <para>For more information about the application router, refer to the following sections of the JSR 289 specification: Application Router Packaging and Deployment, Application Selection Process, and Appendix C.
-   </para>
-    <para>In order to configure the application router, you should edit the <literal>Service</literal> element in the container&apos;s <filename>server.xml</filename> configuration file:</para>
-    <example id="bsssc-Configuring_the_Service_Element_in_the_Containers_server.xml">
-      <title>Configuring the Service Element in the Container&apos;s server.xml</title>
-      <programlisting linenumbering="unnumbered" role="XML"><![CDATA[
-  <Service name="Sip-Servlets"
- className="org.mobicents.servlet.sip.startup.SipStandardService"
- sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
- additionalParameterableHeaders="Header1,Header2" 
- bypassResponseExecutor="false" 
- bypassRequestExecutor="false" 
- baseTimerInterval="500"
- t2Interval="4000"
- t4Interval="5000"
- timerDInterval="32000"
- dispatcherThreadPoolSize="4"
- darConfigurationFileLocation="file:///home/silas/workspaces/mobicents-sip-servlets/
- sip-servlets-examples/reinvite-demo/reinvite-dar.properties">]]>
- </programlisting>
-    </example>
-    <para>Provided here is a description of the SIP Service element&apos;s attributes:</para>
-    <variablelist>
-      <varlistentry>
-        <term>className</term>
-        <listitem>
-          <para>This attribute specifies that the servlet container is a <emphasis>converged</emphasis> (i.e. SIP + HTTP) servlet container. This attribute can also be used to handle load-balancing and failover.</para>
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>sipApplicationDispatcherClassName</term>
-        <listitem>
-          <para>This attribute specifies the class name of the <literal>org.mobicents.servlet.sip.core.SipApplicationDispatcher</literal> implementation to use. The routing algorithm and application selection process is performed in that class.</para>
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-        <term>darConfigurationFileLocation</term>
-        <listitem>
-          <para>The default application router file location. This is used by the default application router to determine the application selection logic. Refer to Appendix C of the JSR 289 specification for more details.</para>
+          <para>Allows Via, Route, and RecordRoute header field information to be split into multiple lines, rather than each header field being separating with a comma.  The attribute defaults to &quot;true&quot;.  Leaving this attribute at the default setting may assist in debugging non-RFC3261 compliant SIP servers.</para>
         </listitem>
       </varlistentry>
       <varlistentry>

@@ -70,7 +70,8 @@
   sipPathName=&quot;org.mobicents.ha&quot;  
   sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
 concurrencyControlMode=&quot;None&quot; 
-  darConfigurationFileLocation=&quot;conf/dars/mobicents-dar.properties&quot;&gt;
+  darConfigurationFileLocation=&quot;conf/dars/mobicents-dar.properties&quot;
+  sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;&gt;
 </programlisting>
       <para>Multiple load balancers can be specified and all of them will be updated on the health status of the node. The complete syntax for the balancers string is the following:</para>
       <programlisting role="XML">&lt;Service name=&quot;jboss.web&quot; 
