@@ -114,16 +114,18 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		URI uri2 = sipFactory.createAddress("sip:cutme@" + host + ":5056").getURI();
 		URI uri3 = sipFactory.createAddress("sip:nonexist@" + host + ":5856").getURI();
 		String via = request.getHeader("Via");
-		if(via.contains("TCP")) {
-			logger.info("setting transport param to tcp ");
-			((SipURI)uri1).setTransportParam("tcp");
-			((SipURI)uri2).setTransportParam("tcp");
-			((SipURI)uri3).setTransportParam("tcp");
-			request.getApplicationSession().setAttribute("transport", "tcp");
-			request.getSession().setAttribute("transport", "tcp");
+		String transport = "udp";
+		if(via.contains("TCP") || via.contains("tcp")) {
+			transport = "tcp";
+			logger.info("setting transport param to " + transport);
+			((SipURI)uri1).setTransportParam(transport);
+			((SipURI)uri2).setTransportParam(transport);
+			((SipURI)uri3).setTransportParam(transport);
+			request.getApplicationSession().setAttribute("transport", transport);
+			request.getSession().setAttribute("transport", transport);			
 		} else {
-			request.getApplicationSession().setAttribute("transport", "udp");
-			request.getSession().setAttribute("transport", "udp");
+			request.getApplicationSession().setAttribute("transport", transport);
+			request.getSession().setAttribute("transport", transport);
 		}
 		
 		if(from.contains("sequential")) {
@@ -172,7 +174,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			SipURI obi = null;
 
 			for(SipURI uri:outboundInterfaces) {
-				if(uri.toString().indexOf("127.0.0.1")>0) {
+				if(uri.toString().indexOf("127.0.0.1")>0 && uri.getTransportParam().equalsIgnoreCase(transport)) {
 					// pick the lo interface, since its universal on all machines
 					proxy.setOutboundInterface(new InetSocketAddress(InetAddress.getByName(uri.getHost()),uri.getPort()));
 					obi = uri;

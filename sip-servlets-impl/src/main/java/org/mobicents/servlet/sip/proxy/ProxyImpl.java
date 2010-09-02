@@ -407,7 +407,12 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 			throw new IllegalStateException("Cannot set a record route on an already started proxy");
 		}
 		if(rr) {
-			this.recordRouteURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipNetworkInterfaceManager(), null));
+			Message message = null;
+			if(originalRequest != null) {
+				message = originalRequest.getMessage();
+			}
+			// record route should be based on the original received message
+			this.recordRouteURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipNetworkInterfaceManager(), message));
 			if(logger.isDebugEnabled()) {
 				logger.debug("Record routing enabled for proxy, Record Route used will be : " + recordRouteURI.toString());
 			}

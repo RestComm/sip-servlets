@@ -1142,11 +1142,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 									if(sipConnector != null && sipConnector.isUseStaticAddress()) {
 										sipUri.setHost(sipConnector.getStaticServerAddress());
 										sipUri.setPort(sipConnector.getStaticServerPort());
-									}
-									sipUri.setTransportParam(transport);
-									if(logger.isDebugEnabled()) {
-										logger.debug("Updated the RRH with static server address " + sipUri);
-									}
+										sipUri.setTransportParam(transport);
+										if(logger.isDebugEnabled()) {
+											logger.debug("Updated the RRH with static server address " + sipUri);
+										}
+									}																		
 								}
 							}
 						}
