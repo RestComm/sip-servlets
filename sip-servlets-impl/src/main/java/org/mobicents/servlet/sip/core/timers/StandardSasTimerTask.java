@@ -85,21 +85,29 @@ public class StandardSasTimerTask extends TimerTask implements SipApplicationSes
 					getSipApplicationSession().invalidate();				
 				}
 			} else {
-				if(getSipApplicationSession().getExpirationTimerTask() == null) {					
-					long sleep = sipApplicationSession.getExpirationTimeInternal() - System.currentTimeMillis();
+				// Issue 1773 : http://code.google.com/p/mobicents/issues/detail?id=1773 
+				// this has been commented out because of JSR 289, Section 6.1.2 SipApplicationSession Lifetime :
+				// "Servlets can register for application session timeout notifications using the SipApplicationSessionListener interface. 
+				// In the sessionExpired() callback method, the application may request an extension of the application session lifetime 
+				// by invoking setExpires() on the timed out SipApplicationSession giving as an argument the number of minutes until the session expires again"
+				// Even sending a message out will not start the expiration timer anew indirectly otherwise it makes some TCK tests fail
+//				if(getSipApplicationSession().getExpirationTimerTask() == null) {					
+//					long sleep = sipApplicationSession.getExpirationTimeInternal() - System.currentTimeMillis();
+//					if(logger.isDebugEnabled()) {
+//						logger.debug("expiration timer task is null so the application has extended the session lifetime indirectly by sending an indialog request, rescheduling the sip app session " + sipApplicationSession.getId() + "to expire in " + sleep + " ms");
+//					}
+//					if(sleep > 0) {
+//						final SipApplicationSessionTimerTask expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(sipApplicationSession);
+//						sipApplicationSession.setExpirationTimerTask(expirationTimerTask);					
+//						sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sleep, TimeUnit.MILLISECONDS);
+//					}
+//				} else {
 					if(logger.isDebugEnabled()) {
-						logger.debug("expiration timer task is null so the application has extended the session lifetime indirectly by sending an indialog request, rescheduling the sip app session " + sipApplicationSession.getId() + "to expire in " + sleep + " ms");
+						if(getSipApplicationSession().getExpirationTimerTask() != null) {
+							logger.debug("expiration timer task is non null so the application has extended the session lifetime directly through setExpires");
+						}
 					}
-					if(sleep > 0) {
-						final SipApplicationSessionTimerTask expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(sipApplicationSession);
-						sipApplicationSession.setExpirationTimerTask(expirationTimerTask);					
-						sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sleep, TimeUnit.MILLISECONDS);
-					}
-				} else {
-					if(logger.isDebugEnabled()) {
-						logger.debug("expiration timer task is non null so the application has extended the session lifetime directly through setExpires");
-					}
-				}
+//				}
 			}
 		} finally {							
 			sipContext.exitSipAppHa(null, null);
