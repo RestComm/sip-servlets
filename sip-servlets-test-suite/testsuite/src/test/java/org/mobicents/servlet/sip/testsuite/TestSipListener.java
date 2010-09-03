@@ -1119,7 +1119,7 @@ public class TestSipListener implements SipListener {
 			logger.info("Dialog State = " + dialog.getState());
 			Response response = protocolObjects.messageFactory.createResponse(
 					200, request);
-			//serverTransactionId.sendResponse(response);
+			serverTransactionId.sendResponse(response);
 			this.transactionCount++;
 			logger.info("shootist:  Sending OK.");
 			logger.info("Dialog State = " + dialog.getState());
