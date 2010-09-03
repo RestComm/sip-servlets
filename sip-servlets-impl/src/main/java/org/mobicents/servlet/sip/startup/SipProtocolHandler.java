@@ -195,6 +195,10 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	
 	public void start() throws Exception {
 		
+		if(logger.isDebugEnabled()) {
+			logger.debug("Starting a sip protocol handler");
+		}
+		
 		final String ipAddress = sipConnector.getIpAddress();
 		final int port = sipConnector.getPort();
 		final String signalingTransport = sipConnector.getTransport();

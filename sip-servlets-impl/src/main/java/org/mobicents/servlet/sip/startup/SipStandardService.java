@@ -332,7 +332,7 @@ public class SipStandardService extends StandardService implements SipService {
 	private void startSipStack() throws LifecycleException {
 		try {	
 			if(logger.isDebugEnabled()) {
-				logger.debug("Starting a sip protocol handler");
+				logger.debug("Starting the SIP stack");
 			}						
 			
 			// This simply puts HTTP and SSL port numbers in JVM properties menat to be read by jsip ha when sending heart beats with Node description.
@@ -513,6 +513,9 @@ public class SipStandardService extends StandardService implements SipService {
 				}
 			}
 			sipStack.start();
+			if(logger.isInfoEnabled()) {
+				logger.info("SIP stack started");
+			}
 		} catch (Exception ex) {			
 			throw new LifecycleException("A problem occured while starting the SIP Stack", ex);
 		}
@@ -523,7 +526,9 @@ public class SipStandardService extends StandardService implements SipService {
 		if(sipStack != null) {
 			sipStack.stop();
 			sipStack = null;
-			logger.info("Sip stack stopped");
+			if(logger.isInfoEnabled()) {
+				logger.info("SIP stack stopped");
+			}
 		}
 	}
 
