@@ -16,31 +16,16 @@
  */
 package org.mobicents.servlet.sip.startup;
 
-import gov.nist.core.net.AddressResolver;
-import gov.nist.javax.sip.SipStackExt;
-import gov.nist.javax.sip.message.MessageFactoryExt;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.SocketException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
-import java.util.StringTokenizer;
 
 import javax.management.MBeanRegistration;
 import javax.management.MBeanServer;
@@ -48,8 +33,6 @@ import javax.management.ObjectName;
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.SipStack;
-import javax.sip.header.ServerHeader;
-import javax.sip.header.UserAgentHeader;
 
 import net.java.stun4j.StunAddress;
 import net.java.stun4j.client.NetworkConfigurationDiscoveryProcess;
@@ -59,14 +42,8 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.modeler.Registry;
-import org.mobicents.ha.javax.sip.ClusteredSipStack;
-import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingListener;
-import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingService;
-import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingServiceImpl;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
-import org.mobicents.servlet.sip.SipFactories;
-import org.mobicents.servlet.sip.core.DNSAddressResolver;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 

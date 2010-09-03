@@ -47,6 +47,7 @@ import javax.servlet.sip.SipSession.State;
 import javax.sip.ListeningPoint;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.SipSessionExt;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
 
@@ -115,6 +116,7 @@ public class SimpleSipServlet
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
 		String fromString = request.getFrom().toString();
+		
 		// case for http://code.google.com/p/mobicents/issues/detail?id=1681
 		if(fromString.contains(TEST_NO_ACK_RECEIVED)) {
 			request.createResponse(SipServletResponse.SC_OK).send();
@@ -361,7 +363,7 @@ public class SimpleSipServlet
 				}
 				req.getSession().setAttribute("nbAcks", nbOfAcks);
 			} else if(TEST_IS_SIP_SERVLET_SEND_BYE.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {				
-				timerService.createTimer(req.getApplicationSession(), 10000, false, (Serializable)req.getSession());
+				timerService.createTimer(req.getApplicationSession(), 15000, false, (Serializable)req.getSession());
 			} else if(TEST_EXCEPTION_ON_EXPIRE.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {
 				try {
 					Thread.sleep(1000);
@@ -502,17 +504,21 @@ public class SimpleSipServlet
 	protected void doInfo(SipServletRequest req) throws ServletException,
 			IOException {
 		String content = (String) req.getContent();
-		req.getSession().setAttribute("mutable", content);
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		int response = SipServletResponse.SC_OK;
-		if(!content.equals(req.getSession().getAttribute("mutable")))
-			response = SipServletResponse.SC_SERVER_INTERNAL_ERROR;
-		
+		if(content != null) {
+			req.getSession().setAttribute("mutable", content);
+			try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}			
+			if(!content.equals(req.getSession().getAttribute("mutable")))
+				response = SipServletResponse.SC_SERVER_INTERNAL_ERROR;
+		} else {
+			SipURI outboundInterface = (SipURI) sipFactory.createURI("sip:" + req.getInitialRemoteAddr()+ ":" + req.getLocalPort() + ";transport=" + req.getTransport());
+			((SipSessionExt)req.getSession()).setOutboundInterface(outboundInterface);
+		}
 		SipServletResponse resp = req.createResponse(response);
 		resp.send();
 	}
@@ -576,7 +582,6 @@ public class SimpleSipServlet
 			try {
 				((SipSession)info).createRequest("BYE").send();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

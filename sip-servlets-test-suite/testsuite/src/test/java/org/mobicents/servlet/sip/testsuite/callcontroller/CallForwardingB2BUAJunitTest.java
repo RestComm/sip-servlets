@@ -288,10 +288,10 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT * 3);
-		sender.sendInDialogSipRequest(Request.UPDATE, null, null, null, null);		
-		sender.sendInDialogSipRequest(Request.UPDATE, null, null, null, null);
+		sender.sendInDialogSipRequest(Request.UPDATE, null, null, null, null, null);		
+		sender.sendInDialogSipRequest(Request.UPDATE, null, null, null, null, null);
 		Thread.sleep(TIMEOUT * 2);
-		sender.sendInDialogSipRequest(Request.BYE, null, null, null, null);
+		sender.sendInDialogSipRequest(Request.BYE, null, null, null, null, null);
 		Thread.sleep(TIMEOUT * 6);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());		
@@ -333,12 +333,12 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		assertEquals(200, sender.getFinalResponseStatus());
 		sender.setFinalResponse(null);
 		sender.setFinalResponseStatus(-1);
-		sender.sendInDialogSipRequest(Request.UPDATE, null, null, null, null);
-		receiver.sendInDialogSipRequest(Request.UPDATE, null, null, null, null);
+		sender.sendInDialogSipRequest(Request.UPDATE, null, null, null, null, null);
+		receiver.sendInDialogSipRequest(Request.UPDATE, null, null, null, null, null);
 		Thread.sleep(TIMEOUT * 3);
 		assertEquals(200, receiver.getFinalResponseStatus());
 		assertEquals(200, sender.getFinalResponseStatus());
-		sender.sendInDialogSipRequest(Request.BYE, null, null, null, null);
+		sender.sendInDialogSipRequest(Request.BYE, null, null, null, null, null);
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());					

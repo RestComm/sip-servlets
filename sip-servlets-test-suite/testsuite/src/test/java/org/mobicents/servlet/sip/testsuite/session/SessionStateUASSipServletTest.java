@@ -187,7 +187,7 @@ public class SessionStateUASSipServletTest extends SipServletTestCase {
 	public void testSessionStateUAS_SubsequentRequest_FinalResponse() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		createAndExecuteCall(SEND_2XX, false);
 		
-		sender.sendInDialogSipRequest(Request.REFER, null, null, null, null);	
+		sender.sendInDialogSipRequest(Request.REFER, null, null, null, null, null);	
 		
 		Thread.sleep(TIMEOUT);
 		sender.sendBye();

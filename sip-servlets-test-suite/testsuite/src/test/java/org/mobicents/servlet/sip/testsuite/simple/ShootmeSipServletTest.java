@@ -143,7 +143,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		sender.setSendBye(false);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);	
 		Thread.sleep(5000);
-		sender.sendInDialogSipRequest("INVITE", null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
 		Thread.sleep(70000);
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getByeReceived());

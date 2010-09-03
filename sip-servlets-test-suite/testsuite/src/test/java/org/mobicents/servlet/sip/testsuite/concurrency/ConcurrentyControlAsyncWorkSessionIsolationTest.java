@@ -110,9 +110,9 @@ public class ConcurrentyControlAsyncWorkSessionIsolationTest extends SipServletT
 		String sasId = new String(sender.getFinalResponse().getRawContent());
 		String CLICK2DIAL_PARAMS = "?asyncWorkMode=" + ConcurrencyControlMode.SipSession + "&asyncWorkSasId="+ sasId;
 //		long startTime = System.currentTimeMillis();
-		sender.sendInDialogSipRequest("OPTIONS", "1", "text", "plain", null);
+		sender.sendInDialogSipRequest("OPTIONS", "1", "text", "plain", null, null);
 		Thread.sleep(100);
-		sender.sendInDialogSipRequest("OPTIONS", "2", "text", "plain", null);
+		sender.sendInDialogSipRequest("OPTIONS", "2", "text", "plain", null, null);
 		Thread.sleep(100);
 		logger.info("Trying to reach url : " + CLICK2DIAL_URL
 				+ CLICK2DIAL_PARAMS);
@@ -126,7 +126,7 @@ public class ConcurrentyControlAsyncWorkSessionIsolationTest extends SipServletT
 		for (int q = 0; q < len; q++)
 			httpResponse += (char) buffer[q];
 		logger.info("Received the follwing HTTP response: " + httpResponse);
-		sender.sendInDialogSipRequest("OPTIONS", "3", "text", "plain", null);
+		sender.sendInDialogSipRequest("OPTIONS", "3", "text", "plain", null, null);
 		Thread.sleep(100);
 		sender.sendBye();
 		Thread.sleep(20000);
@@ -162,9 +162,9 @@ public class ConcurrentyControlAsyncWorkSessionIsolationTest extends SipServletT
 		String sasId = new String(sender.getFinalResponse().getRawContent());
 		String CLICK2DIAL_PARAMS = "?asyncWorkMode=" + ConcurrencyControlMode.SipSession + "&asyncWorkSasId="+ sasId;
 //		long startTime = System.currentTimeMillis();
-		sender.sendInDialogSipRequest("OPTIONS", "1", "text", "plain", null);
+		sender.sendInDialogSipRequest("OPTIONS", "1", "text", "plain", null, null);
 		Thread.sleep(100);
-		sender.sendInDialogSipRequest("OPTIONS", "2", "text", "plain", null);
+		sender.sendInDialogSipRequest("OPTIONS", "2", "text", "plain", null, null);
 		Thread.sleep(100);
 		logger.info("Trying to reach url : " + CLICK2DIAL_URL
 				+ CLICK2DIAL_PARAMS);
@@ -178,7 +178,7 @@ public class ConcurrentyControlAsyncWorkSessionIsolationTest extends SipServletT
 		for (int q = 0; q < len; q++)
 			httpResponse += (char) buffer[q];
 		logger.info("Received the follwing HTTP response: " + httpResponse);
-		sender.sendInDialogSipRequest("OPTIONS", "3", "text", "plain", null);
+		sender.sendInDialogSipRequest("OPTIONS", "3", "text", "plain", null, null);
 		Thread.sleep(100);
 		sender.sendBye();
 		Thread.sleep(20000);
@@ -213,9 +213,9 @@ public class ConcurrentyControlAsyncWorkSessionIsolationTest extends SipServletT
 		String sasId = new String(sender.getFinalResponse().getRawContent());
 		String CLICK2DIAL_PARAMS = "?asyncWorkMode=" + ConcurrencyControlMode.None + "&asyncWorkSasId="+ sasId;
 //		long startTime = System.currentTimeMillis();
-		sender.sendInDialogSipRequest("OPTIONS", "1", "text", "plain", null);
+		sender.sendInDialogSipRequest("OPTIONS", "1", "text", "plain", null, null);
 		Thread.sleep(100);
-		sender.sendInDialogSipRequest("OPTIONS", "2", "text", "plain", null);
+		sender.sendInDialogSipRequest("OPTIONS", "2", "text", "plain", null, null);
 		Thread.sleep(100);
 		logger.info("Trying to reach url : " + CLICK2DIAL_URL
 				+ CLICK2DIAL_PARAMS);
@@ -229,7 +229,7 @@ public class ConcurrentyControlAsyncWorkSessionIsolationTest extends SipServletT
 		for (int q = 0; q < len; q++)
 			httpResponse += (char) buffer[q];
 		logger.info("Received the follwing HTTP response: " + httpResponse);
-		sender.sendInDialogSipRequest("OPTIONS", "3", "text", "plain", null);
+		sender.sendInDialogSipRequest("OPTIONS", "3", "text", "plain", null, null);
 		Thread.sleep(100);
 		sender.sendBye();
 		Thread.sleep(20000);

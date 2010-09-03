@@ -110,7 +110,7 @@ public class InDialogNotifierSipServletTest extends SipServletTestCase {
 		assertTrue(sender.isAckSent());
 		
 		sender.setSendByeBeforeTerminatingNotify(true);
-		sender.sendInDialogSipRequest(Request.SUBSCRIBE, null, null, null, null);		
+		sender.sendInDialogSipRequest(Request.SUBSCRIBE, null, null, null, null, null);		
 		Thread.sleep(TIMEOUT*2);
 		assertTrue(sender.getOkToByeReceived());
 		for (String subscriptionState : sender.getAllSubscriptionState()) {
@@ -151,7 +151,7 @@ public class InDialogNotifierSipServletTest extends SipServletTestCase {
 		assertTrue(sender.isAckSent());
 		
 		sender.setSendByeAfterTerminatingNotify(true);
-		sender.sendInDialogSipRequest(Request.SUBSCRIBE, null, null, null, null);		
+		sender.sendInDialogSipRequest(Request.SUBSCRIBE, null, null, null, null, null);		
 		Thread.sleep(TIMEOUT*2);
 		assertTrue(sender.getOkToByeReceived());
 		for (String subscriptionState : sender.getAllSubscriptionState()) {

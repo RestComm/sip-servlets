@@ -145,15 +145,15 @@ public class ProxyB2BUACompositionTest extends SipServletTestCase {
 		assertEquals(200, sender.getFinalResponseStatus());
 		sender.setFinalResponseStatus(-1);
 		
-		receiver.sendInDialogSipRequest("INVITE", null, null, null, null);
+		receiver.sendInDialogSipRequest("INVITE", null, null, null, null, null);
 		Thread.sleep(TIMEOUT);
 		assertEquals(200, receiver.getFinalResponseStatus());
 		
-		sender.sendInDialogSipRequest("INVITE", null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
 		Thread.sleep(TIMEOUT);
 		assertEquals(200, sender.getFinalResponseStatus());
 		
-		sender.sendInDialogSipRequest("BYE", null, null, null, null);
+		sender.sendInDialogSipRequest("BYE", null, null, null, null, null);
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
@@ -192,9 +192,9 @@ public class ProxyB2BUACompositionTest extends SipServletTestCase {
 		sender.setFinalResponseStatus(-1);
 		Thread.sleep(3000);
 		//receiver.sendInDialogSipRequest("INVITE", null, null, null, null);
-		sender.sendInDialogSipRequest("INVITE", null, null, null, null);
-		sender.sendInDialogSipRequest("INVITE", null, null, null, null);
-		sender.sendInDialogSipRequest("BYE", null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		sender.sendInDialogSipRequest("BYE", null, null, null, null, null);
 		Thread.sleep(TIMEOUT);
 		assertEquals(sender.getFinalResponseStatus(),491);
 	}
@@ -231,10 +231,10 @@ public class ProxyB2BUACompositionTest extends SipServletTestCase {
 		assertEquals(200, sender.getFinalResponseStatus());
 		sender.setFinalResponseStatus(-1);
 		Thread.sleep(3000);
-		receiver.sendInDialogSipRequest("INVITE", null, null, null, null);
-		sender.sendInDialogSipRequest("INVITE", null, null, null, null);
-		sender.sendInDialogSipRequest("INVITE", null, null, null, null);
-		sender.sendInDialogSipRequest("BYE", null, null, null, null);
+		receiver.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		sender.sendInDialogSipRequest("BYE", null, null, null, null, null);
 		Thread.sleep(TIMEOUT);
 		assertEquals(sender.getFinalResponseStatus(),491);
 		assertEquals(receiver.getFinalResponseStatus(),491);

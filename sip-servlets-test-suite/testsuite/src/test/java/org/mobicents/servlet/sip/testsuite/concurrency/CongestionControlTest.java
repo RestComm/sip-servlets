@@ -109,7 +109,7 @@ public class CongestionControlTest extends SipServletTestCase {
 		// For this test the queue size is 3, so we feed 40 messages asap and watch for error response.
 		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
 		for(int q=0; q<40; q++) {
-			sender.sendInDialogSipRequest("INFO", Integer.valueOf(q).toString(), "text", "plain", null);
+			sender.sendInDialogSipRequest("INFO", Integer.valueOf(q).toString(), "text", "plain", null, null);
 			Thread.sleep(100);
 		}
 		Thread.sleep(TIMEOUT);	
@@ -139,7 +139,7 @@ public class CongestionControlTest extends SipServletTestCase {
 		// For this test the queue size is 3, so we feed 40 messages asap and watch for error response.
 		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
 		for(int q=0; q<40; q++) {
-			sender.sendInDialogSipRequest("INFO", Integer.valueOf(q).toString(), "text", "plain", null);
+			sender.sendInDialogSipRequest("INFO", Integer.valueOf(q).toString(), "text", "plain", null, null);
 			Thread.sleep(100);
 		}
 		Thread.sleep(TIMEOUT);	
@@ -167,7 +167,7 @@ public class CongestionControlTest extends SipServletTestCase {
 		// For this test the queue size is 3, so we feed 40 messages asap and watch for error response.
 		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
 		for(int q=0; q<40; q++) {
-			sender.sendInDialogSipRequest("INFO", Integer.valueOf(q).toString(), "text", "plain", null);
+			sender.sendInDialogSipRequest("INFO", Integer.valueOf(q).toString(), "text", "plain", null, null);
 			Thread.sleep(100);
 		}
 		Thread.sleep(TIMEOUT);	
@@ -195,7 +195,7 @@ public class CongestionControlTest extends SipServletTestCase {
 		// For this test the queue size is 3, so we feed 40 messages asap and watch for error response.
 		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
 		for(int q=0; q<40; q++) {			
-			sender.sendInDialogSipRequest("INFO", Integer.valueOf(q).toString(), "text", "plain", null);
+			sender.sendInDialogSipRequest("INFO", Integer.valueOf(q).toString(), "text", "plain", null, null);
 			Thread.sleep(100);
 		}
 		Thread.sleep(TIMEOUT);	

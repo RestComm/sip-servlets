@@ -107,7 +107,7 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		// Non Regression test for http://code.google.com/p/mobicents/issues/detail?id=1490
 		// B2buaHelper.createRequest does not decrement Max-forwards
 		assertEquals(69, maxForwardsHeader.getMaxForwards());
-		sender.sendInDialogSipRequest("BYE", null, null, null, null);
+		sender.sendInDialogSipRequest("BYE", null, null, null, null, null);
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());
 		assertTrue(sender.getOkToByeReceived());
@@ -150,7 +150,7 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());		
 		receiver.setWaitForCancel(true);
-		sender.sendInDialogSipRequest("INVITE", null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
 		Thread.sleep(500);
 		sender.sendCancel();		
 		Thread.sleep(TIMEOUT);
@@ -160,7 +160,7 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		sender.setCancelOkReceived(false);
 		sender.setRequestTerminatedReceived(false);
 		receiver.setCancelReceived(false);
-		sender.sendInDialogSipRequest("INVITE", null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
 		Thread.sleep(500);
 		sender.sendCancel();		
 		Thread.sleep(TIMEOUT);

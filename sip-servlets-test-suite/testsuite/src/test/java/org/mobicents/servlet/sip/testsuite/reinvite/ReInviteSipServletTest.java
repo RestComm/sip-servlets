@@ -19,9 +19,11 @@ package org.mobicents.servlet.sip.testsuite.reinvite;
 import java.text.ParseException;
 
 import javax.sip.InvalidArgumentException;
+import javax.sip.ListeningPoint;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -50,6 +52,7 @@ public class ReInviteSipServletTest extends SipServletTestCase {
 	
 	public ReInviteSipServletTest(String name) {
 		super(name);
+		autoDeployOnStartup = false;
 	}
 
 	@Override
@@ -66,27 +69,22 @@ public class ReInviteSipServletTest extends SipServletTestCase {
 	}
 	
 	@Override
-	protected void setUp() {
-		try {
-			super.sipIpAddress="0.0.0.0";
-			super.setUp();						
-			
-			senderProtocolObjects =new ProtocolObjects(
-					"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null);
-						
-			sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
-			SipProvider senderProvider = sender.createProvider();			
-			
-			senderProvider.addSipListener(sender);
-			
-			senderProtocolObjects.start();			
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			fail("unexpected exception ");
-		}
+	protected void setUp() throws Exception {
+		super.sipIpAddress="0.0.0.0";
+		super.setUp();									
 	}
 	
-	public void testReInvite() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+	public void testReInvite() throws Exception {
+		senderProtocolObjects =new ProtocolObjects(
+				"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();			
+		
+		senderProvider.addSipListener(sender);
+		
+		senderProtocolObjects.start();			
+		
 		String fromName = "reinvite";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -97,12 +95,26 @@ public class ReInviteSipServletTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
+		deployApplication();
+		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getByeReceived());		
 	}
 	
-	public void testReInviteSending() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+	public void testReInviteSending() throws Exception {
+		senderProtocolObjects =new ProtocolObjects(
+				"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();			
+		
+		senderProvider.addSipListener(sender);
+		
+		senderProtocolObjects.start();			
+		
+		deployApplication();
+		
 		String fromName = "isendreinvite";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -118,6 +130,46 @@ public class ReInviteSipServletTest extends SipServletTestCase {
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());		
+	}
+	
+	/*
+	 * Non regression test for Issue 1456 http://code.google.com/p/mobicents/issues/detail?id=1456
+	 * 	java.lang.RuntimeException: Unexpected internal error FIXME!! Cannot create ACK - no ListeningPoint for transport towards next hop found:UDP
+	 * Test comment 18 of the Issue
+	 */
+	public void testReInviteTCPSending() throws Exception {
+		senderProtocolObjects =new ProtocolObjects(
+				"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		sender = new TestSipListener(5081, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();			
+		
+		senderProvider.addSipListener(sender);						
+		
+		tomcat.addSipConnector(serverName, super.sipIpAddress, 5070, ListeningPoint.TCP);
+		String fromName = "SSsendBye";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.addListeningPoint("127.0.0.1", 5081, ListeningPoint.TCP);
+		senderProtocolObjects.start();
+		
+		sender.setSendBye(false);
+		sender.setTransport(false);
+		
+		deployApplication();
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		sender.sendInDialogSipRequest(Request.INFO, null, null, null, null, ListeningPoint.TCP);
+		Thread.sleep(TIMEOUT * 2);
+		assertTrue(sender.getByeReceived());		
 	}
 
 	@Override

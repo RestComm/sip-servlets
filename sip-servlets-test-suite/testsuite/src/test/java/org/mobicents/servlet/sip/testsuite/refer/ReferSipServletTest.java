@@ -178,7 +178,7 @@ public class ReferSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());
 		
-		sender.sendInDialogSipRequest(Request.REFER, null, null, null, null);		
+		sender.sendInDialogSipRequest(Request.REFER, null, null, null, null, null);		
 		Thread.sleep(TIMEOUT);		
 		assertTrue(referTo.isAckReceived());
 		logger.info("all messages received : ");
@@ -193,7 +193,7 @@ public class ReferSipServletTest extends SipServletTestCase {
 		}
 		assertTrue(referTo.getOkToByeReceived());
 		sender.getAllMessagesContent().clear();
-		sender.sendInDialogSipRequest(Request.REFER, null, null, null, null);
+		sender.sendInDialogSipRequest(Request.REFER, null, null, null, null, null);
 		Thread.sleep(TIMEOUT);
 		logger.info("all messages received : ");
 		allMessagesIterator = sender.getAllMessagesContent().iterator();
@@ -234,7 +234,7 @@ public class ReferSipServletTest extends SipServletTestCase {
 		assertTrue(sender.isAckSent());
 		
 		sender.setSendByeBeforeTerminatingNotify(true);
-		sender.sendInDialogSipRequest(Request.REFER, null, null, null, null);		
+		sender.sendInDialogSipRequest(Request.REFER, null, null, null, null, null);		
 		Thread.sleep(TIMEOUT*2);		
 		assertTrue(referTo.isAckReceived());
 		logger.info("all messages received : ");

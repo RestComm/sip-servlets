@@ -442,7 +442,7 @@ public class TestSipListener implements SipListener {
 						protocolObjects.headerFactory.createHeader(SubscriptionStateHeader.NAME, "active;expires=3600");
 					headers.add(subscriptionStateHeader);
 					allMessagesContent.add("SIP/2.0 100 Trying");
-					sendInDialogSipRequest(Request.NOTIFY, "SIP/2.0 100 Trying", "message", "sipfrag;version=2.0", headers);
+					sendInDialogSipRequest(Request.NOTIFY, "SIP/2.0 100 Trying", "message", "sipfrag;version=2.0", headers, null);
 					Thread.sleep(1000);
 					headers.remove(subscriptionStateHeader);
 					subscriptionStateHeader = (SubscriptionStateHeader) 
@@ -453,12 +453,12 @@ public class TestSipListener implements SipListener {
 						headers.add(extensionHeader);
 					}
 					allMessagesContent.add("SIP/2.0 200 OK");
-					sendInDialogSipRequest(Request.NOTIFY, "SIP/2.0 200 OK", "message", "sipfrag;version=2.0", headers);
+					sendInDialogSipRequest(Request.NOTIFY, "SIP/2.0 200 OK", "message", "sipfrag;version=2.0", headers, null);
 				} else {
 					SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
 						protocolObjects.headerFactory.createHeader(SubscriptionStateHeader.NAME, "active;expires=3600");
 					headers.add(subscriptionStateHeader);
-					sendInDialogSipRequest(Request.NOTIFY, "SIP/2.0 100 Subsequent", "message", "sipfrag;version=2.0", headers);
+					sendInDialogSipRequest(Request.NOTIFY, "SIP/2.0 100 Subsequent", "message", "sipfrag;version=2.0", headers, null);
 				}
 			}
 			
@@ -1205,7 +1205,7 @@ public class TestSipListener implements SipListener {
 				List<Header> headers = new ArrayList<Header>();
 				Header reinviteHeader = protocolObjects.headerFactory.createHeader("ReInvite", "true");
 				headers.add(reinviteHeader);
-				sendInDialogSipRequest("INVITE", null, null, null, headers);
+				sendInDialogSipRequest("INVITE", null, null, null, headers, null);
 				reinviteSent = true;
 				return;
 			}
@@ -1297,7 +1297,7 @@ public class TestSipListener implements SipListener {
 						if(prackSent) {							
 							headers.add(protocolObjects.headerFactory.createHeader(RequireHeader.NAME, "100rel"));
 						} 						
-						sendInDialogSipRequest("INVITE", null, null, null, headers);
+						sendInDialogSipRequest("INVITE", null, null, null, headers, null);
 						
 						reinviteSent = true;
 						return;
@@ -1674,6 +1674,13 @@ public class TestSipListener implements SipListener {
 				.createSipProvider(listeningPoint);
 		return sipProvider;
 
+	}
+	
+	public void addListeningPoint(String ipAddress, int port, String transport) throws Exception {
+		logger.info("Shootist: addListeningPoint()");
+		ListeningPoint listeningPoint = protocolObjects.sipStack.createListeningPoint(
+				"127.0.0.1", port, transport);
+		sipProvider.addListeningPoint(listeningPoint);
 	}
 
 	public Request sendSipRequest(String method, URI fromURI, URI toURI, String messageContent, SipURI route, boolean useToURIasRequestUri) throws SipException, ParseException, InvalidArgumentException {
@@ -2116,13 +2123,19 @@ public class TestSipListener implements SipListener {
 
 	/**
 	 * 
+	 * @param transport TODO
 	 * @param messageToSend
 	 * @throws SipException
 	 * @throws InvalidArgumentException
 	 * @throws ParseException
 	 */ 
-	public void sendInDialogSipRequest(String method, String content, String contentType, String subContentType, List<Header> headers) throws SipException, InvalidArgumentException, ParseException {		
+	public void sendInDialogSipRequest(String method, String content, String contentType, String subContentType, List<Header> headers, String transport) throws SipException, InvalidArgumentException, ParseException {
+		
 		Request message = dialog.createRequest(method);
+		if(transport !=null) {
+			((SipURI)message.getRequestURI()).setTransportParam(transport);
+		}
+
 		if(content != null) {
 			ContentLengthHeader contentLengthHeader = 
 				protocolObjects.headerFactory.createContentLengthHeader(content.length());

@@ -105,7 +105,7 @@ public class LocationServiceReInviteSipServletTest extends SipServletTestCase {
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);			
 		assertTrue(sender.isInviteReceived());
-		sender.sendInDialogSipRequest("BYE", null, null, null, null);
+		sender.sendInDialogSipRequest("BYE", null, null, null, null, null);
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());
 		assertTrue(sender.getOkToByeReceived());

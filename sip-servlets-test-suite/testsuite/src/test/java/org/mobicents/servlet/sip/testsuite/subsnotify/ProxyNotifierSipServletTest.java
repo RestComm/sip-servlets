@@ -132,7 +132,7 @@ public class ProxyNotifierSipServletTest extends SipServletTestCase {
 		sender.sendSipRequest(Request.INVITE, fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());		
-		sender.sendInDialogSipRequest(Request.SUBSCRIBE, null, null, null, null);
+		sender.sendInDialogSipRequest(Request.SUBSCRIBE, null, null, null, null, null);
 		Thread.sleep(TIMEOUT);
 		assertEquals(202, sender.getFinalResponseStatus());					
 	}
