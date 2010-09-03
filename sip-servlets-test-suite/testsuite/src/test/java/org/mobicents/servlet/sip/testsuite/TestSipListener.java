@@ -188,6 +188,8 @@ public class TestSipListener implements SipListener {
 	
 	public int notifyCount = 0;
 	
+	public int numberOf491s = 0;
+	
 	private List<Integer> provisionalResponsesToSend;
 
 	private boolean useToURIasRequestUri;
@@ -1117,7 +1119,7 @@ public class TestSipListener implements SipListener {
 			logger.info("Dialog State = " + dialog.getState());
 			Response response = protocolObjects.messageFactory.createResponse(
 					200, request);
-			serverTransactionId.sendResponse(response);
+			//serverTransactionId.sendResponse(response);
 			this.transactionCount++;
 			logger.info("shootist:  Sending OK.");
 			logger.info("Dialog State = " + dialog.getState());
@@ -1219,6 +1221,7 @@ public class TestSipListener implements SipListener {
 			return ;
 		}		
 		Response response = (Response) responseReceivedEvent.getResponse();
+		if(response.getStatusCode() == 491) numberOf491s++;
 		RecordRouteHeader recordRouteHeader = (RecordRouteHeader)response.getHeader(RecordRouteHeader.NAME);
 		if(!recordRoutingProxyTesting && recordRouteHeader != null) {
 			abortProcessing = true;

@@ -49,6 +49,7 @@ public class ProxyB2BUACompositionTest extends SipServletTestCase {
 	}
 
 	private void deployCallForwarding() {
+		tomcat.getSipService().setDialogPendingRequestChecking(true);
 		assertTrue(tomcat.deployContext(
 				projectHome + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
 				"call-forwarding-b2bua-context", 
@@ -191,12 +192,17 @@ public class ProxyB2BUACompositionTest extends SipServletTestCase {
 		assertEquals(200, sender.getFinalResponseStatus());
 		sender.setFinalResponseStatus(-1);
 		Thread.sleep(3000);
-		//receiver.sendInDialogSipRequest("INVITE", null, null, null, null);
 		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+
+		try {
+			Thread.sleep(300);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
-		sender.sendInDialogSipRequest("BYE", null, null, null, null, null);
 		Thread.sleep(TIMEOUT);
-		assertEquals(sender.getFinalResponseStatus(),491);
+		assertEquals(1, sender.numberOf491s);
 	}
 	
 	public void test491ResponseTough() throws Exception {		
@@ -232,12 +238,14 @@ public class ProxyB2BUACompositionTest extends SipServletTestCase {
 		sender.setFinalResponseStatus(-1);
 		Thread.sleep(3000);
 		receiver.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		receiver.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
 		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
 		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
 		sender.sendInDialogSipRequest("BYE", null, null, null, null, null);
 		Thread.sleep(TIMEOUT);
-		assertEquals(sender.getFinalResponseStatus(),491);
-		assertEquals(receiver.getFinalResponseStatus(),491);
+		assertEquals(2, sender.numberOf491s);
+		assertEquals(2, receiver.numberOf491s);
 	}
 	
 	@Override

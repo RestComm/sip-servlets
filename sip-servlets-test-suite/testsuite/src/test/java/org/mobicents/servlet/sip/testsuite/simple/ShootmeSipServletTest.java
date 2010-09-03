@@ -72,6 +72,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 
 	@Override
 	public void deployApplication() {
+		tomcat.getSipService().setDialogPendingRequestChecking(true);
 		assertTrue(tomcat.deployContext(
 				projectHome + "/sip-servlets-test-suite/applications/simple-sip-servlet/src/main/sipapp",
 				"sip-test-context", "sip-test", 1));
@@ -166,6 +167,58 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);	
 		Thread.sleep(150000);
 		assertFalse(new File("expirationFailure.tmp").exists());
+	}
+	
+	public void testShootme491() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "exceptionOnExpire";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setSendBye(false);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);	
+		Thread.sleep(2500);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		Thread.sleep(6000);
+		assertTrue(sender.numberOf491s>0);
+	}
+	
+	public void testShootme491withRetrans() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "exceptionOnExpire";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setSendBye(false);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);	
+		Thread.sleep(2500);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		Thread.sleep(6000);
+		int current = sender.numberOf491s;
+		assertTrue(sender.numberOf491s>2);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		Thread.sleep(1000);
+		assertEquals(current, sender.numberOf491s);
 	}
 	
 	public void testShootmeSendBye() throws InterruptedException, SipException, ParseException, InvalidArgumentException {

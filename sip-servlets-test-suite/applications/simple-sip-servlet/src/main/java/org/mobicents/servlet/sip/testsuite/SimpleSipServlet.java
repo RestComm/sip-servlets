@@ -753,11 +753,7 @@ public class SimpleSipServlet
 					e.printStackTrace();
 				}
 			}
-			try {
-				sipSession.createRequest("BYE").send();
-			} catch (IOException e) {
-				logger.error("An unexpected exception occured while sending the BYE", e);
-			}
+			
 			throw new IllegalStateException();
 		}
 	}
