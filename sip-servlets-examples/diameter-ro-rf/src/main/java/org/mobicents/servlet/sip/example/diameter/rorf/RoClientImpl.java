@@ -711,4 +711,8 @@ public class RoClientImpl extends CreditControlSessionFactory implements Network
   private void switchStateMachine(int newState) {
     this.currentState = newState;
   }
+
+  public void stateChanged(Object source, Enum oldState, Enum newState) {
+    stateChanged(oldState, newState);
+  }
 }

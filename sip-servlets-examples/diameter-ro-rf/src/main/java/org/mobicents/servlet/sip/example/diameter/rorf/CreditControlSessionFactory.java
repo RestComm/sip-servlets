@@ -72,10 +72,10 @@ public abstract class CreditControlSessionFactory implements IAppSessionFactory,
         ClientCCASessionImpl clientSession = null;
         if(args != null && args.length>1 && args[0] instanceof Request) {
           Request request = (Request) args[0];
-          clientSession = new ClientCCASessionImpl(request.getSessionId(),this,sessionFactory,this);
+          clientSession = new ClientCCASessionImpl(request.getSessionId(), this, sessionFactory, this, this, this);
         }
         else {
-          clientSession = new ClientCCASessionImpl(sessionId,this,sessionFactory,this);
+          clientSession = new ClientCCASessionImpl(sessionId, this, sessionFactory, this, this, this);
         }
         clientSession.addStateChangeNotification(this);
         
@@ -86,10 +86,10 @@ public abstract class CreditControlSessionFactory implements IAppSessionFactory,
         if (args !=  null && args.length > 1 && args[0] instanceof Request) {
           // This shouldn't happen but just in case
           Request request = (Request) args[0];
-          serverSession = new ServerCCASessionImpl(request.getSessionId(), this, sessionFactory, this);
+          serverSession = new ServerCCASessionImpl(request.getSessionId(), this, sessionFactory, this, this, this);
         }
         else {
-          serverSession = new ServerCCASessionImpl(sessionId, this, sessionFactory, this);
+          serverSession = new ServerCCASessionImpl(sessionId, this, sessionFactory, this, this, this);
         }
         serverSession.addStateChangeNotification(this);
 
