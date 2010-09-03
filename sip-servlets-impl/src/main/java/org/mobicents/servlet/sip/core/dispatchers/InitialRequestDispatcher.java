@@ -398,6 +398,9 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		sipServletRequest.setRoutingRegion(applicationRouterInfo.getRoutingRegion());		
 		sipSessionImpl.setSipSubscriberURI(sipServletRequest.getSubscriberURI().toString());
 		sipSessionImpl.setCseq(((CSeqHeader)request.getHeader(CSeqHeader.NAME)).getSeqNumber());
+		if(request.getMethod().equals(Request.INVITE)) {
+			sipSessionImpl.setRequestsPending(sipSessionImpl.getRequestsPending() + 1);
+		}
 		final InitialDispatchTask dispatchTask = new InitialDispatchTask(sipServletRequest, sipProvider);
 		// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that
 		// the tx serialization is preserved		

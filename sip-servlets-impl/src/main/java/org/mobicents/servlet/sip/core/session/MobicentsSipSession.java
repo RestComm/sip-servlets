@@ -172,4 +172,8 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	String getTransport();
 	
 	void setTransport(String transport);
+	
+	int getRequestsPending();
+	
+	void setRequestsPending(int requests);
 }

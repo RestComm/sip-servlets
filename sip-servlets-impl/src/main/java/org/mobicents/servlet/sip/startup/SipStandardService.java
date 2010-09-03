@@ -122,6 +122,8 @@ public class SipStandardService extends StandardService implements SipService {
 	//
 	protected boolean connectorsStartedExternally = false;
 	
+	protected boolean dialogPendingRequestChecking = false;
+	
 	/**
 	 * the sip stack path name. Since the sip factory is per classloader it should be set here for all underlying stacks
 	 */
@@ -1085,5 +1087,24 @@ public class SipStandardService extends StandardService implements SipService {
 	 */
 	public String getAddressResolverClass() {
 		return addressResolverClass;
+	}
+	
+	/**
+	 * Whether we check for pending requests and return 491 response if there are any
+	 * 
+	 * @return the flag value
+	 */
+	public boolean isDialogPendingRequestChecking() {
+		return dialogPendingRequestChecking;
+	}
+
+	/**
+	 *
+	 * Whether we check for pending requests and return 491 response if there are any
+	 *
+	 * @param dialogPendingRequestChecking
+	 */
+	public void setDialogPendingRequestChecking(boolean dialogPendingRequestChecking) {
+		this.dialogPendingRequestChecking = dialogPendingRequestChecking;
 	}
 }

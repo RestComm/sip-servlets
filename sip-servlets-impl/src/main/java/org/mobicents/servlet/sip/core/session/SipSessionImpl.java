@@ -140,6 +140,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 	protected ProxyImpl proxy;
 	
 	protected B2buaHelperImpl b2buaHelper;
+	
+	protected transient int requestsPending;
 
 	volatile protected Map<String, Object> sipSessionAttributeMap;
 	
@@ -1979,5 +1981,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void scheduleAsynchronousWork(SipSessionAsynchronousWork work) {
 		sipFactory.getSipApplicationDispatcher().getAsynchronousExecutor().execute(new SipSessionAsyncTask(key, work, sipFactory));
+	}
+	public int getRequestsPending() {
+		return requestsPending;
+	}
+	public void setRequestsPending(int requests) {
+		requestsPending = requests;
 	}
 }

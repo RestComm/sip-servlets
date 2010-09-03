@@ -931,9 +931,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			((MessageExt)message).setApplicationData(sessionTransport);			
 			
 			ViaHeader viaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
-		
+			
+			boolean isCancel = getMethod().equalsIgnoreCase(Request.CANCEL);
+			if(isCancel) {
+	    		getSipSession().setRequestsPending(0);
+			}
 			//Issue 112 fix by folsson
-		    if(!getMethod().equalsIgnoreCase(Request.CANCEL) && viaHeader == null) {
+		    if(!isCancel && viaHeader == null) {
 		    	boolean addViaHeader = false;
 		    	if(proxy == null) {
 		    		addViaHeader = true;
@@ -954,7 +958,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				    }
 			    }
 		    } else {
-		    	if(getMethod().equalsIgnoreCase(Request.CANCEL)) {
+		    	if(isCancel) {
 		    		if(getSipSession().getState().equals(State.INITIAL)) {
 		    			Transaction tx = inviteTransactionToCancel;
 		    			if(tx != null) {
@@ -1007,6 +1011,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    final String requestMethod = getMethod();
 			if(Request.ACK.equals(requestMethod)) {
 				session.getSessionCreatingDialog().sendAck(request);
+				session.setRequestsPending(session.getRequestsPending()-1);
 				final Transaction transaction = getTransaction();
 				final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
 				final B2buaHelperImpl b2buaHelperImpl = sipSession.getB2buaHelper();
@@ -1284,6 +1289,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				dialog.sendRequest((ClientTransaction) getTransaction());
 			}			
 			isMessageSent = true;
+			
+			if(method.equals(Request.INVITE)) {
+				session.setRequestsPending(session.getRequestsPending()+1);
+			}
 		} catch (Exception ex) {			
 			throw new IllegalStateException("Error sending request " + request,ex);
 		}

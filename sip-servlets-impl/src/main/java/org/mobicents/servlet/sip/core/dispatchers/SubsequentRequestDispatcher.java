@@ -28,6 +28,7 @@ import javax.servlet.sip.SipServletResponse;
 import javax.sip.Dialog;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
+import javax.sip.Transaction;
 import javax.sip.header.Parameters;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SubscriptionStateHeader;
@@ -51,6 +52,7 @@ import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
  * This class is responsible for routing and dispatching subsequent request to applications according to JSR 289 Section 
@@ -227,7 +229,24 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}			
 		
 		final MobicentsSipSession sipSession = tmpSipSession;
-		sipServletRequest.setSipSession(sipSession);						
+		sipServletRequest.setSipSession(sipSession);
+		if(request.getMethod().equals(Request.ACK)) {
+			sipSession.setRequestsPending(sipSession.getRequestsPending() - 1);
+		} else if(request.getMethod().equals(Request.INVITE)){
+			if(logger.isDebugEnabled()) {
+				logger.debug("INVITE requests pending " + sipSession.getRequestsPending());
+			}
+			if(StaticServiceHolder.sipStandardService.isDialogPendingRequestChecking() && 
+					sipSession.getProxy() == null && sipSession.getRequestsPending() > 0) {
+				try {
+					sipServletRequest.createResponse(491).send();
+					return;
+				} catch (IOException e) {
+					logger.error("Problem sending 491 response");
+				}
+			}
+			sipSession.setRequestsPending(sipSession.getRequestsPending() + 1);
+		}
 		
 		final SubsequentDispatchTask dispatchTask = new SubsequentDispatchTask(sipServletRequest, sipProvider);
 		// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that

@@ -451,4 +451,13 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public void scheduleAsynchronousWork(SipSessionAsynchronousWork work) {
 		sipSession.scheduleAsynchronousWork(work);
 	}
+
+	public int getRequestsPending() {
+		return sipSession.getRequestsPending();
+	}
+
+	public void setRequestsPending(int requests) {
+		sipSession.setRequestsPending(requests);
+	}
+
 }

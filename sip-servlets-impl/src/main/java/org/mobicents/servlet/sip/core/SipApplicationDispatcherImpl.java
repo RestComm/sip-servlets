@@ -1005,6 +1005,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				checkForAckNotReceived(sipServletMessage);
 				appNotifiedOfPrackNotReceived = checkForPrackNotReceived(sipServletMessage);
 				sipSession.removeOngoingTransaction(transaction);
+				sipSession.setRequestsPending(0);
 				// don't invalidate here because if the application sends a final response on the noPrack received
 				// the ACK to this final response won't be able to get routed since the sip session would have been invalidated
 				if(!appNotifiedOfPrackNotReceived) {
