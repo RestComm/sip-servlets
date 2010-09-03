@@ -121,7 +121,8 @@ ipAddress="127.0.0.1"
  dispatcherThreadPoolSize="4"
  darConfigurationFileLocation="file:///home/silas/workspaces/mobicents-sip-servlets/
  sip-servlets-examples/reinvite-demo/reinvite-dar.properties"
- sipStackPropertiesFile="conf/mss-sip-stack.properties">]]>
+ sipStackPropertiesFile="conf/mss-sip-stack.properties"
+ dialogPendingRequestChecking="false">]]>
  </programlisting>
     </example>
     <para>Provided here is a description of the SIP Service element&apos;s attributes:</para>
@@ -247,6 +248,12 @@ ipAddress="127.0.0.1"
         <term>dispatcherThreadPoolSize</term>
         <listitem>
           <para>The number of threads used for processing  SIP messages inside the Sip Servlets container by the dispatcher. The default value is 4.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>dialogPendingRequestChecking</term>
+        <listitem>
+          <para>This property enables and disables error checking when SIP transactions overlap. If within a single dialog an INVITE request arrives while there is antoher transaction proceeding, the container will send a 491 error response. The default value is false.</para>
         </listitem>
       </varlistentry>
     </variablelist>
