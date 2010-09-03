@@ -270,6 +270,7 @@ public class SimpleSipServlet
 					logger.error("an IllegalArgumentException should be thrown when trying to set the Contact Header on a 2xx response");
 					sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
 					sipServletResponse.send();
+					return;
 				} catch (IllegalArgumentException e) {
 					logger.info("Contact Header is not set-able for the 2XX response to an INVITE");
 				}				
