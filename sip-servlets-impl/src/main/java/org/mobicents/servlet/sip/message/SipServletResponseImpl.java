@@ -498,8 +498,10 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				}
 			}
 			if(logger.isDebugEnabled()) {
-				logger.debug("original req method "+ originalRequest.getMethod());
-				logger.debug("original req routing state "+ originalRequest.getRoutingState());
+				logger.debug("original req "+ originalRequest);
+				if(originalRequest != null) {					
+					logger.debug("original req routing state "+ originalRequest.getRoutingState());
+				}
 				if(transaction != null) {
 					logger.debug("transaction dialog "+ transaction.getDialog());
 				}
