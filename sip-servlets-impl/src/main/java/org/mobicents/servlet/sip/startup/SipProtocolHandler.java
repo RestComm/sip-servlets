@@ -198,6 +198,18 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Starting a sip protocol handler");
 		}
+		Integer portFromConfig = sipConnector.getPort();
+		String set = System.getProperty("jboss.service.binding.set");
+		int setIncrememt = 0;
+		if(set != null) {
+			int setNumber = set.charAt(set.length() - 1) - '0';
+			if(setNumber>0 && setNumber<10) {
+				setIncrememt = (setNumber) * 100; // don't attempt to compute if the port set is custom outside that range
+			}
+			logger.info("Computed port increment for MSS SIP ports is " + setIncrememt + " from " + set);
+		}
+		portFromConfig += setIncrememt;
+	    sipConnector.setPort(portFromConfig);
 		
 		final String ipAddress = sipConnector.getIpAddress();
 		final int port = sipConnector.getPort();
