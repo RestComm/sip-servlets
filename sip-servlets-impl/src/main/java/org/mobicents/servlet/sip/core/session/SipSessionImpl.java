@@ -1986,6 +1986,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		return requestsPending;
 	}
 	public void setRequestsPending(int requests) {
+		// Sometimes the count might not match due to retransmissing of ACK after OK is missing or CANCEL, 
+		// we should never go negative here
+		if(requests < 0) requests = 0;
 		requestsPending = requests;
 	}
 }
