@@ -243,6 +243,7 @@ public class SipStandardService extends StandardService implements SipService {
 		if(baseTimerInterval < 1) {
 			throw new LifecycleException("It's forbidden to set the Base Timer Interval to a non positive value");		
 		}
+		initSipStack();
 		sipApplicationDispatcher.setBaseTimerInterval(baseTimerInterval);
 		sipApplicationDispatcher.setT2Interval(t2Interval);
 		sipApplicationDispatcher.setT4Interval(t4Interval);
@@ -257,8 +258,8 @@ public class SipStandardService extends StandardService implements SipService {
 		sipApplicationDispatcher.setConcurrencyControlMode(ConcurrencyControlMode.valueOf(getConcurrencyControlMode()));		
 		sipApplicationDispatcher.setBypassRequestExecutor(bypassRequestExecutor);
 		sipApplicationDispatcher.setBypassResponseExecutor(bypassResponseExecutor);		
-		sipApplicationDispatcher.init();
-		startSipStack();
+		sipApplicationDispatcher.setSipStack(sipStack);
+		sipApplicationDispatcher.init();		
 	}
 	
 	@Override
@@ -329,10 +330,10 @@ public class SipStandardService extends StandardService implements SipService {
 
 	}
 
-	private void startSipStack() throws LifecycleException {
+	protected void initSipStack() throws LifecycleException {
 		try {	
 			if(logger.isDebugEnabled()) {
-				logger.debug("Starting the SIP stack");
+				logger.debug("Initializing SIP stack");
 			}						
 			
 			// This simply puts HTTP and SSL port numbers in JVM properties menat to be read by jsip ha when sending heart beats with Node description.
@@ -511,32 +512,17 @@ public class SipStandardService extends StandardService implements SipService {
 				if(logger.isInfoEnabled()) {
 					logger.info("no AddressResolver will be used since none has been specified.");
 				}
-			}
-			sipStack.start();
+			}			
 			if(logger.isInfoEnabled()) {
-				logger.info("SIP stack started");
+				logger.info("SIP stack initialized");
 			}
 		} catch (Exception ex) {			
-			throw new LifecycleException("A problem occured while starting the SIP Stack", ex);
+			throw new LifecycleException("A problem occured while initializing the SIP Stack", ex);
 		}
-	}
-
-	private void stopSipStack() {
-		// stopping the sip stack	
-		if(sipStack != null) {
-			sipStack.stop();
-			sipStack = null;
-			if(logger.isInfoEnabled()) {
-				logger.info("SIP stack stopped");
-			}
-		}
-	}
+	}	
 
 	@Override
 	public void stop() throws LifecycleException {
-		if(!connectorsStartedExternally) {
-			sipApplicationDispatcher.stop();
-		}	
 		super.stop();
 		// Tomcat specific unloading case
 		// Issue 1411 http://code.google.com/p/mobicents/issues/detail?id=1411
@@ -551,7 +537,9 @@ public class SipStandardService extends StandardService implements SipService {
 				}
 			}
 		}	
-		stopSipStack();
+		if(!connectorsStartedExternally) {
+			sipApplicationDispatcher.stop();
+		}	
 	}
 	
 	/**

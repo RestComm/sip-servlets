@@ -66,7 +66,9 @@ import javax.sip.ListeningPoint;
 import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
 import javax.sip.ServerTransaction;
+import javax.sip.SipException;
 import javax.sip.SipProvider;
+import javax.sip.SipStack;
 import javax.sip.TimeoutEvent;
 import javax.sip.Transaction;
 import javax.sip.TransactionAlreadyExistsException;
@@ -181,6 +183,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	private Boolean started = Boolean.FALSE;
 	private Lock statusLock = new ReentrantLock();
 
+	protected SipStack sipStack;
 	private SipNetworkInterfaceManager sipNetworkInterfaceManager;
 	
 	// stats
@@ -374,6 +377,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		// depending on jboss or tomcat context can be started before or after
 		// connectors
 		resetOutboundInterfaces();
+		
+		// Starting the SIP Stack right before we notify the apps that the container is ready
+		// to serve and dispatch SIP Messages. 
+		// In addition, the LB Heartbeat will be started only when apps are ready
+		try {
+			startSipStack();
+		} catch (Exception e) {
+			throw new IllegalStateException("The SIP Stack couldn't be started " , e);
+		}
+		
 		//JSR 289 Section 2.1.1 Step 4.If present invoke SipServletListener.servletInitialized() on each of initialized Servlet's listeners.
 		for (SipContext sipContext : applicationDeployed.values()) {
 			sipContext.notifySipContextListeners(new SipContextEvent(SipContextEventType.SERVLET_INITIALIZED, null));
@@ -394,8 +407,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			statusLock.unlock();
 		}
 		congestionControlThreadPool.shutdownNow();
-		asynchronousExecutor.shutdownNow();
-		sipApplicationRouter.destroy();		
+		asynchronousExecutor.shutdownNow();						
+		sipApplicationRouter.destroy();
+		
+		stopSipStack();
+		
 		if(oname != null) {
 			Registry.getRegistry(null, null).unregisterComponent(oname);
 		}		
@@ -1453,7 +1469,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	// -------------------- JMX and Registration  --------------------
     protected String domain;
     protected ObjectName oname;
-    protected MBeanServer mserver;
+    protected MBeanServer mserver;	
 
     public ObjectName getObjectName() {
         return oname;
@@ -1921,5 +1937,34 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 */
 	public int getBackToNormalQueueSize() {
 		return backToNormalQueueSize;
+	}
+
+	public SipStack getSipStack() {
+		return sipStack;
+	}
+
+	public void setSipStack(SipStack sipStack) {
+		this.sipStack = sipStack;		
+	}
+	
+	protected void startSipStack() throws SipException {
+		// stopping the sip stack	
+		if(sipStack != null) {
+			sipStack.start();
+			if(logger.isInfoEnabled()) {
+				logger.info("SIP stack started");
+			}
+		}
+	}
+	
+	protected void stopSipStack() {
+		// stopping the sip stack	
+		if(sipStack != null) {
+			sipStack.stop();
+			sipStack = null;
+			if(logger.isInfoEnabled()) {
+				logger.info("SIP stack stopped");
+			}
+		}
 	}
 }

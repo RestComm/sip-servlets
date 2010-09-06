@@ -1,13 +1,13 @@
 /*
  * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
+ * under the terms of the GNU Lesser General License as
  * published by the Free Software Foundation; either version 2.1 of
  * the License, or (at your option) any later version.
  *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * Lesser General License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this software; if not, write to the Free
@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutorService;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.ar.SipApplicationRouter;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
+import javax.sip.SipStack;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 
@@ -40,7 +41,6 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * Classes implementing this interface can be used in the SipService Class to
  * be the central point getting the sip messages from the different stacks and
  * dispatching them to sip applications. 
- *
  */
 public interface SipApplicationDispatcher extends SipListenerExt {	
 	/**
@@ -150,43 +150,43 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 	// should be in a seperate HA interface, but this may become deprecated in the future
 	void sendSwitchoverInstruction(String fromJvmRoute, String toJvmRoute);
 	
-	public String getApplicationNameFromHash(String hash);
-	public String getHashFromApplicationName(String appName);
+	String getApplicationNameFromHash(String hash);
+	String getHashFromApplicationName(String appName);
 	
-	public ConcurrencyControlMode getConcurrencyControlMode();
-	public void setConcurrencyControlMode(ConcurrencyControlMode concurrencyControlMode);
-	public void setConcurrencyControlModeByName(String concurrencyControlMode);
+	ConcurrencyControlMode getConcurrencyControlMode();
+	void setConcurrencyControlMode(ConcurrencyControlMode concurrencyControlMode);
+	void setConcurrencyControlModeByName(String concurrencyControlMode);
 
-	public int getQueueSize();
-	public void setQueueSize(int queueSize);
+	int getQueueSize();
+	void setQueueSize(int queueSize);
 	
-	public void setMemoryThreshold(int memoryThreshold);
-	public int getMemoryThreshold();
+	void setMemoryThreshold(int memoryThreshold);
+	int getMemoryThreshold();
 	
-	public void setCongestionControlCheckingInterval(long interval);
-	public long getCongestionControlCheckingInterval();
+	void setCongestionControlCheckingInterval(long interval);
+	long getCongestionControlCheckingInterval();
 		
-	public CongestionControlPolicy getCongestionControlPolicy();
-	public void setCongestionControlPolicy(CongestionControlPolicy congestionControlPolicy);
-	public void setCongestionControlPolicyByName(String congestionControlPolicy);
+	CongestionControlPolicy getCongestionControlPolicy();
+	void setCongestionControlPolicy(CongestionControlPolicy congestionControlPolicy);
+	void setCongestionControlPolicyByName(String congestionControlPolicy);
 	
-	public int getNumberOfMessagesInQueue();
-	public double getPercentageOfMemoryUsed();
+	int getNumberOfMessagesInQueue();
+	double getPercentageOfMemoryUsed();
 	
-	public void setBypassRequestExecutor(boolean bypassRequestExecutor);
-	public boolean isBypassRequestExecutor();
+	void setBypassRequestExecutor(boolean bypassRequestExecutor);
+	boolean isBypassRequestExecutor();
 
-	public void setBypassResponseExecutor(boolean bypassResponseExecutor);
-	public boolean isBypassResponseExecutor();
+	void setBypassResponseExecutor(boolean bypassResponseExecutor);
+	boolean isBypassResponseExecutor();
 	
-	public void setBaseTimerInterval(int baseTimerInterval);
-	public int getBaseTimerInterval();
-	public void setT2Interval(int t2Interval);
-	public int getT2Interval();
-	public void setT4Interval(int t4Interval);
-	public int getT4Interval();
-	public void setTimerDInterval(int timerDInterval);
-	public int getTimerDInterval();
+	void setBaseTimerInterval(int baseTimerInterval);
+	int getBaseTimerInterval();
+	void setT2Interval(int t2Interval);
+	int getT2Interval();
+	void setT4Interval(int t4Interval);
+	int getT4Interval();
+	void setTimerDInterval(int timerDInterval);
+	int getTimerDInterval();
 	
 	String[] getExtensionsSupported();
 	String[] getRfcSupported();
@@ -202,4 +202,7 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 	int getBackToNormalQueueSize();
 
 	ExecutorService getAsynchronousExecutor();
+
+	void setSipStack(SipStack sipStack);
+	SipStack getSipStack();
 }

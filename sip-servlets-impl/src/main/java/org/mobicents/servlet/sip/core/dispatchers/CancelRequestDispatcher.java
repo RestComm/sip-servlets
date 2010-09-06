@@ -140,7 +140,7 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 		DispatchTask dispatchTask = new CancelDispatchTask(sipServletRequest, sipProvider);
 		// Execute CANCEL without waiting for previous requests because if we wait for an INVITE to complete
 		// all responses will be already sent by the time the CANCEL is out of the queue.
-		((SipApplicationDispatcherImpl)this.sipApplicationDispatcher).getAsynchronousExecutor().execute(dispatchTask);
+		this.sipApplicationDispatcher.getAsynchronousExecutor().execute(dispatchTask);
 	}
 
 	/**
