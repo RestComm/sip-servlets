@@ -1376,7 +1376,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				}
 			}						
 		}
-		if(((State.CONFIRMED.equals(state) || State.TERMINATED.equals(state)) && response.getStatus() == 200 && Request.BYE.equals(method))
+		if(((State.CONFIRMED.equals(state) || State.TERMINATED.equals(state)) && response.getStatus() >= 200 && Request.BYE.equals(method))
 				// http://code.google.com/p/mobicents/issues/detail?id=1438
 				// Sip Session become TERMINATED after receiving 487 response to subsequent request => !confirmed clause added
 				|| (!State.CONFIRMED.equals(state) && response.getStatus() == 487)) {
