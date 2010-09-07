@@ -234,10 +234,7 @@ public class DistributableSimpleSipServlet
 	public void sessionExpired(SipApplicationSessionEvent event) {
 		if(logger.isInfoEnabled()) {
 			logger.info("Distributable Simple Servlet: sip app session " + event.getApplicationSession().getId() + " expired");
-		}
-		if(logger.isInfoEnabled()) {
-			logger.info("Distributable Simple Servlet: timer expired\n");
-		}
+		}		
 		SipSession sipSession = (SipSession)event.getApplicationSession().getSessions("SIP").next();
 		if(sipSession != null && sipSession.isValid() && !State.TERMINATED.equals(sipSession.getState())) {
 			try {
