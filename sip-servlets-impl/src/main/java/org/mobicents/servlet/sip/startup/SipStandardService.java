@@ -166,10 +166,7 @@ public class SipStandardService extends StandardService implements SipService {
 		if(protocolHandler instanceof SipProtocolHandler) {
 			connector.setPort(((SipProtocolHandler)protocolHandler).getPort());
 			((SipProtocolHandler)protocolHandler).setSipStack(sipStack);
-			protocolHandler.setAttribute(SipApplicationDispatcher.class.getSimpleName(), sipApplicationDispatcher);
-			if(balancers != null) {
-				protocolHandler.setAttribute("balancers", balancers);
-			}
+			protocolHandler.setAttribute(SipApplicationDispatcher.class.getSimpleName(), sipApplicationDispatcher);			
 			registerSipConnector(connector);
 		}		
 		super.addConnector(connector);
@@ -277,10 +274,7 @@ public class SipStandardService extends StandardService implements SipService {
 							connector.getPort());
 					}
 					protocolHandler.setAttribute(SipApplicationDispatcher.class.getSimpleName(), sipApplicationDispatcher);
-					((SipProtocolHandler)protocolHandler).setSipStack(sipStack);
-					if(balancers != null) {
-						protocolHandler.setAttribute("balancers", balancers);
-					}					
+					((SipProtocolHandler)protocolHandler).setSipStack(sipStack);	
 					connectorsStartedExternally = true;
 				} 
 				//Tomcat specific loading case
@@ -436,7 +430,6 @@ public class SipStandardService extends StandardService implements SipService {
 			if(logger.isInfoEnabled()) {
 				logger.info("Mobicents Sip Servlets sip stack properties : " + sipStackProperties);
 			}
-	//		final String balancers = (String)getAttribute(BALANCERS);
 			if(balancers != null) {
 				if(sipStackProperties.get(LoadBalancerHeartBeatingService.LB_HB_SERVICE_CLASS_NAME) == null) {
 					sipStackProperties.put(LoadBalancerHeartBeatingService.LB_HB_SERVICE_CLASS_NAME, LoadBalancerHeartBeatingServiceImpl.class.getCanonicalName());
