@@ -107,7 +107,6 @@ public class SipStandardService extends StandardService implements SipService {
 	private int t2Interval = 4000;
 	private int t4Interval = 5000;
 	private int timerDInterval = 32000;
-	
 	protected int dispatcherThreadPoolSize = 4;
 	
 	protected String concurrencyControlMode = ConcurrencyControlMode.None.toString();
@@ -117,16 +116,14 @@ public class SipStandardService extends StandardService implements SipService {
 	protected boolean bypassRequestExecutor = true;
 	//this should be made available to the application router as a system prop
 	protected String darConfigurationFileLocation;
-	//
 	protected boolean connectorsStartedExternally = false;
-	
 	protected boolean dialogPendingRequestChecking = false;
 	
 	/**
 	 * the sip stack path name. Since the sip factory is per classloader it should be set here for all underlying stacks
 	 */
 	private String sipPathName;
-	/*
+	/**
 	 * use Pretty Encoding
 	 */
 	private boolean usePrettyEncoding = true;
@@ -135,7 +132,6 @@ public class SipStandardService extends StandardService implements SipService {
 	// defining sip stack properties
 	private Properties sipStackProperties;	
 	private String sipStackPropertiesFileLocation;
-
 	private String addressResolverClass = DNSAddressResolver.class.getName();
 	
 	//the balancers to send heartbeat to and our health info
@@ -146,30 +142,30 @@ public class SipStandardService extends StandardService implements SipService {
     public String getInfo() {
         return (INFO);
     }
-
 	
 	@Override
 	public void addConnector(Connector connector) {
-		ExtendedListeningPoint extendedListeningPoint = (ExtendedListeningPoint)
-			connector.getProtocolHandler().getAttribute(ExtendedListeningPoint.class.getSimpleName());
-		if(extendedListeningPoint != null) {
-			try {
-				extendedListeningPoint.getSipProvider().addSipListener(sipApplicationDispatcher);
-				sipApplicationDispatcher.getSipNetworkInterfaceManager().addExtendedListeningPoint(extendedListeningPoint);
-			} catch (TooManyListenersException e) {
-				logger.error("Connector.initialize", e);
-			}			
+		if(initialized) {
+			ExtendedListeningPoint extendedListeningPoint = (ExtendedListeningPoint)
+				connector.getProtocolHandler().getAttribute(ExtendedListeningPoint.class.getSimpleName());
+			if(extendedListeningPoint != null) {
+				try {
+					extendedListeningPoint.getSipProvider().addSipListener(sipApplicationDispatcher);
+					sipApplicationDispatcher.getSipNetworkInterfaceManager().addExtendedListeningPoint(extendedListeningPoint);
+				} catch (TooManyListenersException e) {
+					logger.error("Connector.initialize", e);
+				}			
+			}
+			ProtocolHandler protocolHandler = connector.getProtocolHandler();
+			if(protocolHandler instanceof SipProtocolHandler) {
+				connector.setPort(((SipProtocolHandler)protocolHandler).getPort());
+				((SipProtocolHandler)protocolHandler).setSipStack(sipStack);
+				protocolHandler.setAttribute(SipApplicationDispatcher.class.getSimpleName(), sipApplicationDispatcher);			
+				registerSipConnector(connector);
+			}		
 		}
-		ProtocolHandler protocolHandler = connector.getProtocolHandler();
-		if(protocolHandler instanceof SipProtocolHandler) {
-			connector.setPort(((SipProtocolHandler)protocolHandler).getPort());
-			((SipProtocolHandler)protocolHandler).setSipStack(sipStack);
-			protocolHandler.setAttribute(SipApplicationDispatcher.class.getSimpleName(), sipApplicationDispatcher);			
-			registerSipConnector(connector);
-		}		
 		super.addConnector(connector);
 	}
-
 
 	/**
 	 * Register the sip connector under a different name than HTTP Connector and we add the transport to avoid clashing with 2 connectors having the same port and address
@@ -198,6 +194,13 @@ public class SipStandardService extends StandardService implements SipService {
 			sipApplicationDispatcher.getSipNetworkInterfaceManager().removeExtendedListeningPoint(extendedListeningPoint);
 		}
 		super.removeConnector(connector);
+	}
+	
+	@Override
+	public void init() {
+		if(logger.isDebugEnabled())
+		    logger.debug("SipStandardService Init********************************");
+		super.init();
 	}
 	
 	@Override
@@ -254,7 +257,20 @@ public class SipStandardService extends StandardService implements SipService {
 		sipApplicationDispatcher.setBypassRequestExecutor(bypassRequestExecutor);
 		sipApplicationDispatcher.setBypassResponseExecutor(bypassResponseExecutor);		
 		sipApplicationDispatcher.setSipStack(sipStack);
-		sipApplicationDispatcher.init();		
+		sipApplicationDispatcher.init();
+		// Tomcat specific loading case where the connectors are added even before the service is initialized
+		// so we need to set the sip stack before it starts
+		synchronized (connectors) {
+			for (Connector connector : connectors) {				
+				ProtocolHandler protocolHandler = connector.getProtocolHandler();
+				if(protocolHandler instanceof SipProtocolHandler) {
+					connector.setPort(((SipProtocolHandler)protocolHandler).getPort());
+					((SipProtocolHandler)protocolHandler).setSipStack(sipStack);
+					protocolHandler.setAttribute(SipApplicationDispatcher.class.getSimpleName(), sipApplicationDispatcher);			
+					registerSipConnector(connector);
+				}		
+			}
+		}
 	}
 	
 	@Override

@@ -1,34 +1,85 @@
-<Server>
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!-- Note:  A "Server" is not itself a "Container", so you may not
+     define subcomponents such as "Valves" at this level.
+     Documentation at /docs/config/server.html
+ -->
+<Server port="8005" shutdown="SHUTDOWN">
 
   <!--APR library loader. Documentation at /docs/apr.html -->
   <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
   <!--Initialize Jasper prior to webapps are loaded. Documentation at /docs/jasper-howto.html -->
   <Listener className="org.apache.catalina.core.JasperListener" />
+  <!-- Prevent memory leaks due to use of particular java/javax APIs-->
+  <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
+  <!-- JMX Support for the Tomcat server. Documentation at /docs/non-existent.html -->
+  <Listener className="org.apache.catalina.mbeans.ServerLifecycleListener" />
+  <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
 
-   <!-- Use a custom version of StandardService that allows the
-   connectors to be started independent of the normal lifecycle
-   start to allow web apps to be deployed before starting the
-   connectors.
+  <!-- Global JNDI resources
+       Documentation at /docs/jndi-resources-howto.html
+  -->
+  <GlobalNamingResources>
+    <!-- Editable user database that can also be used by
+         UserDatabaseRealm to authenticate users
+    -->
+    <Resource name="UserDatabase" auth="Container"
+              type="org.apache.catalina.UserDatabase"
+              description="User database that can be updated and saved"
+              factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
+              pathname="conf/tomcat-users.xml" />
+  </GlobalNamingResources>
+
+  <!-- A "Service" is a collection of one or more "Connectors" that share
+       a single "Container" Note:  A "Service" is not itself a "Container", 
+       so you may not define subcomponents such as "Valves" at this level.
+       Documentation at /docs/config/service.html
    -->
-   <Service name="jboss.web" 
-      	className="org.mobicents.servlet.sip.startup.SipStandardService"
-  		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-  		darConfigurationFileLocation="conf/dars/shopping-demo-dar.properties"
+  <Service name="Sip-Servlets" 
+  		className="org.mobicents.servlet.sip.startup.SipStandardService" 
+  		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"  		
+		concurrencyControlMode="None" 
+  		darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
   		sipStackPropertiesFile="conf/mss-sip-stack.properties">
+  		
+	<!--The connectors can use a shared executor, you can define one or more named thread pools-->
+    <!--
+    <Executor name="tomcatThreadPool" namePrefix="catalina-exec-" 
+        maxThreads="150" minSpareThreads="4"/>
+    -->
 
-    <!-- A "Connector" represents an endpoint by which requests are received
+     <!-- A "Connector" represents an endpoint by which requests are received
          and responses are returned. Documentation at :
          Java HTTP Connector: /docs/config/http.html (blocking & non-blocking)
          Java AJP  Connector: /docs/config/ajp.html
          APR (HTTP/AJP) Connector: /docs/apr.html
          Define a non-SSL HTTP/1.1 Connector on port 8080
     -->
-    <Connector port="8080" address="${jboss.bind.address}"    
-         maxThreads="250" maxHttpHeaderSize="8192"
-         emptySessionPath="true" protocol="HTTP/1.1"
-         enableLookups="false" redirectPort="8443" acceptCount="100"
-         connectionTimeout="20000" disableUploadTimeout="true" />
-
+    <Connector port="8080" protocol="HTTP/1.1" 
+               connectionTimeout="20000" 
+               redirectPort="8443" />
+    <!-- A "Connector" using the shared thread pool-->
+    <!--
+    <Connector executor="tomcatThreadPool"
+               port="8080" protocol="HTTP/1.1" 
+               connectionTimeout="20000" 
+               redirectPort="8443" />
+    -->           
     <!-- Define a SSL HTTP/1.1 Connector on port 8443
          This connector uses the JSSE configuration, when using APR, the 
          connector should be using the OpenSSL style configuration
@@ -40,148 +91,79 @@
     -->
 
     <!-- Define an AJP 1.3 Connector on port 8009 -->
-    <Connector port="8009" address="${jboss.bind.address}" protocol="AJP/1.3"
-         emptySessionPath="true" enableLookups="false" redirectPort="8443" />
+    <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
 
-	<!-- Define a SIP Connector -->
+	<!-- Define a SIP Connector on port 5080 -->
     <Connector port="5080" 
-	     ipAddress = "${jboss.bind.address}"
+	ipAddress = "127.0.0.1"
+	protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
+	signalingTransport="udp"/>
+	
+	<!-- Define the default TCP SIP Connector -->
+    <Connector port="5080" 
+	     ipAddress = "127.0.0.1"
 	     protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
-	     signalingTransport="udp"/>
+	     signalingTransport="tcp"/>
+    	 
+    <!-- Define the default TLS SIP Connector -->
+    <Connector port="5081" 
+	     ipAddress = "127.0.0.1"
+	     protocol="org.mobicents.servlet.sip.startup.SipProtocolHandler"
+	     signalingTransport="tls"/>
+	
+    <!-- An Engine represents the entry point (within Catalina) that processes
+         every request.  The Engine implementation for Tomcat stand alone
+         analyzes the HTTP headers included with the request, and passes them
+         on to the appropriate Host (virtual host).
+         Documentation at /docs/config/engine.html -->
 
-      <Engine name="jboss.web" defaultHost="localhost" className="org.mobicents.servlet.sip.startup.SipStandardEngine">
-
-         <!-- The JAAS based authentication and authorization realm implementation
-         that is compatible with the jboss 3.2.x realm implementation.
-         - certificatePrincipal : the class name of the
-         org.jboss.security.auth.certs.CertificatePrincipal impl
-         used for mapping X509[] cert chains to a Princpal.
-         - allRolesMode : how to handle an auth-constraint with a role-name=*,
-         one of strict, authOnly, strictAuthOnly
-           + strict = Use the strict servlet spec interpretation which requires
-           that the user have one of the web-app/security-role/role-name
-           + authOnly = Allow any authenticated user
-           + strictAuthOnly = Allow any authenticated user only if there are no
-           web-app/security-roles
-         -->
-         <Realm className="org.jboss.web.tomcat.security.JBossSecurityMgrRealm"
-            certificatePrincipal="org.jboss.security.auth.certs.SubjectDNMapping"
-            allRolesMode="authOnly"
-            />
-         <!-- A subclass of JBossSecurityMgrRealm that uses the authentication
-         behavior of JBossSecurityMgrRealm, but overrides the authorization
-         checks to use JACC permissions with the current java.security.Policy
-         to determine authorized access.
-         - allRolesMode : how to handle an auth-constraint with a role-name=*,
-         one of strict, authOnly, strictAuthOnly
-           + strict = Use the strict servlet spec interpretation which requires
-           that the user have one of the web-app/security-role/role-name
-           + authOnly = Allow any authenticated user
-           + strictAuthOnly = Allow any authenticated user only if there are no
-           web-app/security-roles
-         <Realm className="org.jboss.web.tomcat.security.JaccAuthorizationRealm"
-            certificatePrincipal="org.jboss.security.auth.certs.SubjectDNMapping"
-            allRolesMode="authOnly"
-            />
-         -->
-        
-        <Host name="localhost"
-           autoDeploy="false" deployOnStartup="false" deployXML="false"
-           hostConfigClass="org.mobicents.servlet.sip.startup.SipHostConfig"
-           configClass="org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig"
-           xmlNamespaceAware="true">
-           <!-- 
-                configClass="org.jboss.web.tomcat.security.config.JBossContextConfig"
-                configClass="org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig" 
-            -->
-
-
-           <!--Context name="click2-call-context" path="/click2call" docBase="click-to-call" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig">
-			       <Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						
-		   </Context-->
-
-            <!-- Uncomment to enable request dumper. This Valve "logs interesting 
-                 contents from the specified Request (before processing) and the 
-                 corresponding Response (after processing). It is especially useful 
-                 in debugging problems related to headers and cookies."
-            -->
-            <!--
-            <Valve className="org.apache.catalina.valves.RequestDumperValve" />
-            -->
- 
-            <!-- Access logger -->
-            <!--
-            <Valve className="org.apache.catalina.valves.AccessLogValve"
-                prefix="localhost_access_log." suffix=".log"
-                pattern="common" directory="${jboss.server.home.dir}/log" 
-                resolveHosts="false" />
-            -->
-
-            <!-- Uncomment to enable single sign-on across web apps
-                deployed to this host. Does not provide SSO across a cluster.     
-            
-                If this valve is used, do not use the JBoss ClusteredSingleSignOn 
-                valve shown below. 
-                
-                A new configuration attribute is available beginning with
-                release 4.0.4:
-                
-                cookieDomain  configures the domain to which the SSO cookie
-                              will be scoped (i.e. the set of hosts to
-                              which the cookie will be presented).  By default
-                              the cookie is scoped to "/", meaning the host
-                              that presented it.  Set cookieDomain to a
-                              wider domain (e.g. "xyz.com") to allow an SSO
-                              to span more than one hostname.
-             -->
-            <!--
-            <Valve className="org.apache.catalina.authenticator.SingleSignOn" />
-            -->
-
-            <!-- Uncomment to enable single sign-on across web apps
-               deployed to this host AND to all other hosts in the cluster.
-            
-               If this valve is used, do not use the standard Tomcat SingleSignOn
-               valve shown above.
-            
-               Valve uses a JBossCache instance to support SSO credential 
-               caching and replication across the cluster.  The JBossCache 
-               instance must be configured separately.  By default, the valve 
-               shares a JBossCache with the service that supports HttpSession 
-               replication.  See the "jboss-web-cluster-service.xml" file in the 
-               server/all/deploy directory for cache configuration details.
-            
-               Besides the attributes supported by the standard Tomcat
-               SingleSignOn valve (see the Tomcat docs), this version also 
-               supports the following attributes:
-            
-               cookieDomain   see above
-            
-               treeCacheName  JMX ObjectName of the JBossCache MBean used to 
-                              support credential caching and replication across
-                              the cluster. If not set, the default value is 
-                              "jboss.cache:service=TomcatClusteringCache", the 
-                              standard ObjectName of the JBossCache MBean used 
-                              to support session replication.
-            -->
-            <!--
-            <Valve className="org.jboss.web.tomcat.service.sso.ClusteredSingleSignOn" />
-            -->
+    <!-- You should set jvmRoute to support load-balancing via AJP ie :
+    <Engine name="Standalone" defaultHost="localhost" jvmRoute="jvm1">         
+    --> 
          
-            <!-- Check for unclosed connections and transaction terminated checks
-                 in servlets/jsps.
-                 
-                 Important: The dependency on the CachedConnectionManager
-                 in META-INF/jboss-service.xml must be uncommented, too
-            -->
-            <Valve className="org.jboss.web.tomcat.service.jca.CachedConnectionValve"
-                cachedConnectionManagerObjectName="jboss.jca:service=CachedConnectionManager"
-                transactionManagerObjectName="jboss:service=TransactionManager" />
+    <!-- Define the top level container in our container hierarchy -->
+    <Engine defaultHost="localhost" name="Sip-Servlets" className="org.mobicents.servlet.sip.startup.SipStandardEngine">
+    
+	  <!--For clustering, please take a look at documentation at:
+          /docs/cluster-howto.html  (simple how to)
+          /docs/config/cluster.html (reference documentation) -->
+      <!--
+      <Cluster className="org.apache.catalina.ha.tcp.SimpleTcpCluster"/>
+      --> 
+	 
+      <!-- The request dumper valve dumps useful debugging information about
+           the request and response data received and sent by Tomcat.
+           Documentation at: /docs/config/valve.html -->
+      <!--
+      <Valve className="org.apache.catalina.valves.RequestDumperValve"/>
+      -->
 
-         </Host>
+      <!-- This Realm uses the UserDatabase configured in the global JNDI
+           resources under the key "UserDatabase".  Any edits
+           that are performed against this UserDatabase are immediately
+           available for use by the Realm.  -->
+      <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+             resourceName="UserDatabase"/>
 
-      </Engine>
+      <!-- Define the default virtual host
+           Note: XML Schema validation will not work with Xerces 2.2.
+       -->      
+      <Host className="org.mobicents.servlet.sip.startup.SipStandardHost" appBase="webapps" autoDeploy="true" name="localhost" unpackWARs="true" xmlNamespaceAware="true" xmlValidation="false" configClass="org.mobicents.servlet.sip.startup.SipContextConfig">			 
 
-   </Service>
+        <!-- SingleSignOn valve, share authentication between web applications
+             Documentation at: /docs/config/valve.html -->
+        <!--
+        <Valve className="org.apache.catalina.authenticator.SingleSignOn" />
+        -->
+        
+        <!-- Access log processes all example.
+             Documentation at: /docs/config/valve.html -->
+        <!--
+        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"  
+               prefix="localhost_access_log." suffix=".txt" pattern="common" resolveHosts="false"/>
+        -->
 
+      </Host>
+    </Engine>
+  </Service>
 </Server>
