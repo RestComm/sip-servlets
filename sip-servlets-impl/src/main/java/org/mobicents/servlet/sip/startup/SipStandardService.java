@@ -197,13 +197,6 @@ public class SipStandardService extends StandardService implements SipService {
 	}
 	
 	@Override
-	public void init() {
-		if(logger.isDebugEnabled())
-		    logger.debug("SipStandardService Init********************************");
-		super.init();
-	}
-	
-	@Override
 	public void initialize() throws LifecycleException {
 		//load the sip application disptacher from the class name specified in the server.xml file
 		//and initializes it
