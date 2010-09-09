@@ -252,6 +252,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 					logger.info("Stun report = " + report);
 					addressDiscovery.shutDown();
 				}
+				//TODO add it as a listener for global ip address changes if STUN rediscover a new addess at some point
 			}
 			
 			ListeningPoint listeningPoint = sipStack.createListeningPoint(ipAddress,
@@ -287,10 +288,8 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			extendedListeningPoint.setGlobalIpAddress(globalIpAddress);
 			extendedListeningPoint.setGlobalPort(globalPort);
 		
-			//TODO add it as a listener for global ip address changes if STUN rediscover a new addess at some point
 			
-			//made the sip stack and the extended listening Point available to the service implementation
-			setAttribute(SipStack.class.getSimpleName(), sipStack);					
+			//make the extended listening Point available to the service implementation			
 			setAttribute(ExtendedListeningPoint.class.getSimpleName(), extendedListeningPoint);
 			SipApplicationDispatcher sipApplicationDispatcher = (SipApplicationDispatcher)
 				getAttribute(SipApplicationDispatcher.class.getSimpleName());

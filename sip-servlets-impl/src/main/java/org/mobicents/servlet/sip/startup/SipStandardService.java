@@ -285,39 +285,16 @@ public class SipStandardService extends StandardService implements SipService {
 				} 
 				//Tomcat specific loading case
 				ExtendedListeningPoint extendedListeningPoint = (ExtendedListeningPoint)
-					protocolHandler.getAttribute(ExtendedListeningPoint.class.getSimpleName());
-				SipStack sipStack = (SipStack)
-					protocolHandler.getAttribute(SipStack.class.getSimpleName());
-				if(extendedListeningPoint != null && sipStack != null) {
-					// for nist sip stack set the DNS Address resolver allowing to make DNS SRV lookups					
-					if(sipStack instanceof SipStackExt && addressResolverClass != null && addressResolverClass.trim().length() > 0) {
-						if(logger.isDebugEnabled()) {
-							logger.debug("Sip Stack " + sipStack.getStackName() +" will be using " + addressResolverClass + " as AddressResolver");
-						}
-						try {
-							extendedListeningPoint.getSipProvider().addSipListener(sipApplicationDispatcher);
-				        	sipApplicationDispatcher.getSipNetworkInterfaceManager().addExtendedListeningPoint(extendedListeningPoint);
-				        	connectorsStartedExternally = false;
-				        	//setting up the Address Resolver :
-				            // get constructor of AddressResolver in order to instantiate
-				            Class[] paramTypes = new Class[1];
-				            paramTypes[0] = SipApplicationDispatcher.class;
-				            Constructor addressResolverConstructor = Class.forName(addressResolverClass).getConstructor(
-				                    paramTypes);
-				            // Wrap properties object in order to pass to constructor of AddressResolver
-				            Object[] conArgs = new Object[1];
-				            conArgs[0] = sipApplicationDispatcher;
-				            // Creates a new instance of AddressResolver Class with the supplied sipApplicationDispatcher.
-				            AddressResolver addressResolver = (AddressResolver) addressResolverConstructor.newInstance(conArgs);
-				            ((SipStackExt) sipStack).setAddressResolver(addressResolver);				            
-				        } catch (Exception e) {
-				            throw new LifecycleException("Couldn't set the AddressResolver " + addressResolverClass, e);
-				        }				        
-					} else {
-						if(logger.isInfoEnabled()) {
-							logger.info("no AddressResolver will be used since none has been specified.");
-						}
-					}	
+					protocolHandler.getAttribute(ExtendedListeningPoint.class.getSimpleName());				
+				if(extendedListeningPoint != null && sipStack != null) {					
+					try {
+						extendedListeningPoint.getSipProvider().addSipListener(sipApplicationDispatcher);
+						sipApplicationDispatcher.getSipNetworkInterfaceManager().addExtendedListeningPoint(extendedListeningPoint);
+			        	connectorsStartedExternally = false;	
+					} catch (TooManyListenersException e) {
+						throw new LifecycleException("Couldn't add the sip application dispatcher " 
+								+ sipApplicationDispatcher + " as a listener to the following listening point provider " + extendedListeningPoint, e);
+					}		        				        		
 				}
 			}
 		}
@@ -326,7 +303,7 @@ public class SipStandardService extends StandardService implements SipService {
 		}
 		
 		if(this.getSipMessageQueueSize() <= 0)
-			throw new IllegalArgumentException("Message queue size can not be 0 or less");
+			throw new LifecycleException("Message queue size can not be 0 or less");
 
 	}
 
@@ -570,21 +547,6 @@ public class SipStandardService extends StandardService implements SipService {
 			SipApplicationDispatcher sipApplicationDispatcher) {
 		this.sipApplicationDispatcher = sipApplicationDispatcher;
 	}
-
-//	/**
-//	 * @return the sipApplicationRouterClassName
-//	 */
-//	public String getSipApplicationRouterClassName() {
-//		return sipApplicationRouterClassName;
-//	}
-//
-//	/**
-//	 * @param sipApplicationRouterClassName the sipApplicationRouterClassName to set
-//	 */
-//	public void setSipApplicationRouterClassName(
-//			String sipApplicationRouterClassName) {
-//		this.sipApplicationRouterClassName = sipApplicationRouterClassName;
-//	}
 
 	/**
 	 * @return the darConfigurationFileLocation
