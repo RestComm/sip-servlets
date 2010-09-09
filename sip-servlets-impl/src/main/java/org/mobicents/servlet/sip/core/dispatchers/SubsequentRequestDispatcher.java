@@ -196,6 +196,13 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			}
 		}
 		
+		if(StaticServiceHolder.sipStandardService.isHttpFollowsSip()) {
+			String jvmRoute = StaticServiceHolder.sipStandardService.getJvmRoute();
+			if(jvmRoute == null) {
+				sipApplicationSession.setJvmRoute(jvmRoute);
+			}
+		}
+		
 		SipSessionKey key = SessionManagerUtil.getSipSessionKey(sipApplicationSession.getKey().getId(), applicationName, request, inverted);
 		if(logger.isDebugEnabled()) {
 			logger.debug("Trying to find the corresponding sip session with key " + key + " to this subsequent request " + request +

@@ -72,6 +72,7 @@ import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
 
 /**
@@ -367,6 +368,13 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 					sipContext, sipServletRequest, nextApplicationName);
 			sipApplicationSession = sipManager.getSipApplicationSession(
 					sipApplicationSessionKey, true);
+
+			if(StaticServiceHolder.sipStandardService.isHttpFollowsSip()) {
+				String jvmRoute = StaticServiceHolder.sipStandardService.getJvmRoute();
+				if(jvmRoute == null) {
+					sipApplicationSession.setJvmRoute(jvmRoute);
+				}
+			}
 		}	
 		
 		//sip application session association

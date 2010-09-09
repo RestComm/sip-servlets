@@ -119,6 +119,10 @@ public class SipStandardService extends StandardService implements SipService {
 	protected boolean connectorsStartedExternally = false;
 	protected boolean dialogPendingRequestChecking = false;
 	
+	protected boolean httpFollowsSip = false;
+	
+	protected String jvmRoute;
+	
 	/**
 	 * the sip stack path name. Since the sip factory is per classloader it should be set here for all underlying stacks
 	 */
@@ -307,6 +311,14 @@ public class SipStandardService extends StandardService implements SipService {
 			throw new LifecycleException("Message queue size can not be 0 or less");
 
 	}
+	
+	public String getJvmRoute() {
+		return this.jvmRoute;
+	}
+	
+	public void setJvmRoute(String jvmRoute) {
+		this.jvmRoute = jvmRoute;
+	}
 
 	protected void initSipStack() throws LifecycleException {
 		try {	
@@ -455,6 +467,7 @@ public class SipStandardService extends StandardService implements SipService {
 					final String jvmRoute = ((Engine)container).getJvmRoute();
 					if(jvmRoute != null) {
 						loadBalancerHeartBeatingService.setJvmRoute(jvmRoute);
+						setJvmRoute(jvmRoute);
 					}
 				}
 			}
@@ -1059,5 +1072,15 @@ public class SipStandardService extends StandardService implements SipService {
 	 */
 	public void setDialogPendingRequestChecking(boolean dialogPendingRequestChecking) {
 		this.dialogPendingRequestChecking = dialogPendingRequestChecking;
+	}
+
+
+	public boolean isHttpFollowsSip() {
+		return httpFollowsSip;
+	}
+
+
+	public void setHttpFollowsSip(boolean httpFollowsSip) {
+		this.httpFollowsSip = httpFollowsSip;
 	}
 }

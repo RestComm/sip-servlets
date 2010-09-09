@@ -202,6 +202,13 @@ public class SipFactoryImpl implements Externalizable {
 				null);		
 		MobicentsSipApplicationSession sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(
 				sipApplicationSessionKey, true);
+		
+		if(StaticServiceHolder.sipStandardService.isHttpFollowsSip()) {
+			String jvmRoute = StaticServiceHolder.sipStandardService.getJvmRoute();
+			if(jvmRoute == null) {
+				sipApplicationSession.setJvmRoute(jvmRoute);
+			}
+		}
 			
 		return sipApplicationSession.getSession();
 	}
