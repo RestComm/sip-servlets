@@ -115,8 +115,6 @@ public class SipStandardService extends StandardService implements SipService {
 	protected String additionalParameterableHeaders;
 	protected boolean bypassResponseExecutor = true;
 	protected boolean bypassRequestExecutor = true;
-	//the sip application router class name defined in the server.xml
-//	private String sipApplicationRouterClassName;
 	//this should be made available to the application router as a system prop
 	protected String darConfigurationFileLocation;
 	//
