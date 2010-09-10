@@ -28,12 +28,12 @@ import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
+import javax.sip.TransactionState;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.RoutingState;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
@@ -122,25 +122,37 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 		ServerTransaction cancelTransaction = 
 			(ServerTransaction) sipServletRequest.getTransaction();
 		
-		try {
-			// First we need to send OK ASAP because of retransmissions both for 
-			//proxy or app			
-			SipServletResponseImpl cancelResponse = (SipServletResponseImpl) 
-				sipServletRequest.createResponse(200, "Canceling");
-			Response cancelJsipResponse = (Response) cancelResponse.getMessage();
-			cancelTransaction.sendResponse(cancelJsipResponse);
-		} catch (SipException e) {
-			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Impossible to send the ok to the CANCEL", e);
-		} catch (InvalidArgumentException e) {
-			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Impossible to send the ok to the CANCEL", e);
+		if(cancelTransaction != null && !TransactionState.TERMINATED.equals(cancelTransaction.getState())) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Sending 200 to Cancel " + sipServletRequest);
+			}
+			try {
+				// First we need to send OK ASAP because of retransmissions both for 
+				//proxy or app			
+				SipServletResponseImpl cancelResponse = (SipServletResponseImpl) 
+					sipServletRequest.createResponse(200, "Canceling");
+				Response cancelJsipResponse = (Response) cancelResponse.getMessage();
+				cancelTransaction.sendResponse(cancelJsipResponse);
+			} catch (SipException e) {
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Impossible to send the ok to the CANCEL", e);
+			} catch (InvalidArgumentException e) {
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Impossible to send the ok to the CANCEL", e);
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("checking what to do with the CANCEL " + sipServletRequest);
+			}								
+			DispatchTask dispatchTask = new CancelDispatchTask(sipServletRequest, sipProvider);
+			// Execute CANCEL without waiting for previous requests because if we wait for an INVITE to complete
+			// all responses will be already sent by the time the CANCEL is out of the queue.
+			this.sipApplicationDispatcher.getAsynchronousExecutor().execute(dispatchTask);
+		} else {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Retransmission received for CANCEL " + sipServletRequest + ", transaction " + cancelTransaction);
+				if(cancelTransaction != null) {
+					logger.debug("Cancel Transaction state " + cancelTransaction.getState()); 
+				}
+			}
 		}
-		if(logger.isDebugEnabled()) {
-			logger.debug("checking what to do with the CANCEL " + sipServletRequest);
-		}								
-		DispatchTask dispatchTask = new CancelDispatchTask(sipServletRequest, sipProvider);
-		// Execute CANCEL without waiting for previous requests because if we wait for an INVITE to complete
-		// all responses will be already sent by the time the CANCEL is out of the queue.
-		this.sipApplicationDispatcher.getAsynchronousExecutor().execute(dispatchTask);
 	}
 
 	/**
@@ -182,10 +194,18 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 			final ServerTransaction inviteTransaction = ((ServerTransactionExt) sipServletRequest.getTransaction()).getCanceledInviteTransaction();
 			
 			if(inviteTransaction == null) {
-				logger.error("couldn't find the original invite transaction for this cancel " + request);
+				if(logger.isDebugEnabled()) {
+					logger.debug("couldn't find the original invite transaction for this cancel " + request + ", it may be a retransmission and the transaction has already been terminated");
+				}
 				return;
 			}
 			final TransactionApplicationData inviteAppData = (TransactionApplicationData)inviteTransaction.getApplicationData();
+			if(inviteAppData == null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("couldn't find the original transaction app data for this cancel " + request + ", it may be a retransmission and the transaction has already been terminated or is being cleaned up");
+				}
+				return;
+			}
 			final SipServletRequestImpl inviteRequest = (SipServletRequestImpl)
 				inviteAppData.getSipServletMessage();
 			final MobicentsSipSession sipSession = inviteRequest.getSipSession();			
