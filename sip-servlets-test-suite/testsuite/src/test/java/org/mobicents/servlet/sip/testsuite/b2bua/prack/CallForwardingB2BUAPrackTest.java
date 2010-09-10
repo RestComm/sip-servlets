@@ -30,7 +30,7 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 10000;	
+	private static final int TIMEOUT = 20000;	
 //	private static final int TIMEOUT = 100000000;
 	
 	TestSipListener sender;
@@ -106,6 +106,7 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 		SipProvider senderProvider = sender.createProvider();
 
 		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
+		receiver.setTimeToWaitBetweenProvisionnalResponse(1000);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
@@ -127,10 +128,16 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 		String[] headerNames = new String[]{"require"};
 		String[] headerValues = new String[]{"100rel"};
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);		
-		Thread.sleep(TIMEOUT);
+		for (int i = 0; i < 3; i++) {
+			sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);
+		}			
+		Thread.sleep(TIMEOUT * 3);
 		assertTrue(receiver.getOkToByeReceived());
-		assertTrue(sender.getByeReceived());		
+		assertTrue(sender.getByeReceived());	
+
+		if(sender.getAllMessagesContent() != null) {
+			assertFalse(sender.getAllMessagesContent().contains("KO"));
+		}
 	}	
 	
 	@Override

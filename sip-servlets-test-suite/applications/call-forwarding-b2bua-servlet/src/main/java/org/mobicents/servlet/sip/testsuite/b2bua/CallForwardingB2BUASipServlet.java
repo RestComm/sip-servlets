@@ -494,7 +494,14 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
 			}
 			if(sipServletResponse.getHeader("Require") != null) {
-				responseToOriginalRequest.sendReliably();
+				try {
+					responseToOriginalRequest.sendReliably();
+				} catch(IllegalStateException e) {
+					logger.error("could send the response reliably " + responseToOriginalRequest, e);
+					SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
+							SIP_FACTORY);
+					sendMessage(sipFactory.createApplicationSession(), sipFactory, "KO");
+				}
 			} else {
 				responseToOriginalRequest.send();
 			}

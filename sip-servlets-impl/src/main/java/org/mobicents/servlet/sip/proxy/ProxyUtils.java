@@ -275,7 +275,8 @@ public class ProxyUtils {
 					originalRequest.getTransaction(),
 					originalRequest.getSipSession(),
 					sipServetResponse.getDialog(),
-					false);
+					false,
+					sipServetResponse.isRetransmission());
 		} else {
 			// retransmission case
 			newServletResponseImpl = new SipServletResponseImpl(clonedResponse,		
@@ -283,7 +284,8 @@ public class ProxyUtils {
 					null,
 					sipServetResponse.getSipSession(),
 					sipServetResponse.getDialog(),
-					false);
+					false,
+					sipServetResponse.isRetransmission());
 		}
 		newServletResponseImpl.setOriginalRequest(originalRequest);
 		newServletResponseImpl.setProxiedResponse(true);

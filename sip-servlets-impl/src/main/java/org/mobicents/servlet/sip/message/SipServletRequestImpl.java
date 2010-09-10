@@ -352,7 +352,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 //			}
 			
 			final SipServletResponseImpl newSipServletResponse = new SipServletResponseImpl(response, super.sipFactoryImpl,
-					validate ? (ServerTransaction) transaction : transaction, session, getDialog(), false);
+					validate ? (ServerTransaction) transaction : transaction, session, getDialog(), false, false);
 			newSipServletResponse.setOriginalRequest(this);
 			if(!Request.PRACK.equals(requestMethod) && statusCode >= Response.OK && 
 					statusCode <= Response.SESSION_NOT_ACCEPTABLE) {	

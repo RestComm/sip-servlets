@@ -1005,6 +1005,7 @@ public class TestSipListener implements SipListener {
 			}
 				
 			for (int provisionalResponseToSend : provisionalResponsesToSend) {
+				Thread.sleep(getTimeToWaitBetweenProvisionnalResponse());
 				Response response = protocolObjects.messageFactory.createResponse(
 						provisionalResponseToSend, request);
 				if(provisionalResponseToSend >= Response.TRYING && provisionalResponseToSend < Response.OK) {
@@ -1020,8 +1021,7 @@ public class TestSipListener implements SipListener {
 						dialog.sendReliableProvisionalResponse(response);
 					}  else {						
 						st.sendResponse(response);
-					}
-					Thread.sleep(getTimeToWaitBetweenProvisionnalResponse());
+					}					
 				}
 			}										
 			if(respondWithError != null && !sendReliably) {

@@ -779,10 +779,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @see javax.sip.SipListener#processResponse(javax.sip.ResponseEvent)
 	 */
 	public void processResponse(ResponseEvent responseEvent) {
+		final ResponseEventExt responseEventExt = (ResponseEventExt) responseEvent;		
+		final Response response = responseEventExt.getResponse();
+		
 		if(logger.isDebugEnabled()) {
-			logger.debug("Response " + responseEvent.getResponse().toString());
+			logger.debug("Response " + response.toString());
 		}
-		final Response response = responseEvent.getResponse();
+		
 		final CSeqHeader cSeqHeader = (CSeqHeader)response.getHeader(CSeqHeader.NAME);
 		//if this is a response to a cancel, the response is dropped
 		if(Request.CANCEL.equalsIgnoreCase(cSeqHeader.getMethod())) {
@@ -794,18 +797,20 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		}
 
 		updateResponseStatistics(response);
-		ClientTransaction clientTransaction = responseEvent.getClientTransaction();		
-		final Dialog dialog = responseEvent.getDialog();
-		final boolean isForkedResponse = ((ResponseEventExt)responseEvent).isForkedResponse();
-		final ClientTransactionExt originalTransaction = ((ResponseEventExt)responseEvent).getOriginalTransaction();
+		ClientTransaction clientTransaction = responseEventExt.getClientTransaction();		
+		final Dialog dialog = responseEventExt.getDialog();
+		final boolean isForkedResponse = responseEventExt.isForkedResponse();
+		final boolean isRetransmission = responseEventExt.isRetransmission();
+		final ClientTransactionExt originalTransaction = responseEventExt.getOriginalTransaction();
 		if(logger.isDebugEnabled()) {
 			logger.debug("is Forked Response " + isForkedResponse);
+			logger.debug("is Retransmission " + isRetransmission);
 			logger.debug("Client Transaction " + clientTransaction);
 			logger.debug("Original Transaction " + originalTransaction);
 			logger.debug("Dialog " + dialog);
 		}
 		// Issue 1468 : Handling forking 
-		if(isForkedResponse && originalTransaction != null) {
+		if(isForkedResponse && originalTransaction != null && !responseEventExt.isRetransmission()) {
 			final Dialog defaultDialog = originalTransaction.getDefaultDialog();
 			final Dialog orginalTransactionDialog = originalTransaction.getDialog();
 			if(logger.isDebugEnabled()) {				
@@ -822,7 +827,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				clientTransaction, 
 				null, 
 				dialog,
-				true);
+				true,
+				isRetransmission);
 		try {		
 			messageDispatcherFactory.getResponseDispatcher(sipServletResponse, this).
 				dispatchMessage(((SipProvider)responseEvent.getSource()), sipServletResponse);

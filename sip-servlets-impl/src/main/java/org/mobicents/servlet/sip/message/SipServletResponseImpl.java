@@ -87,6 +87,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	private boolean isPrackGenerated;
 	//Added for TCK test SipServletResponseTest.testSend101
 	private boolean hasBeenReceived;
+	private boolean isRetransmission;
 	
 	// needed for externalizable
 	public SipServletResponseImpl () {}
@@ -106,13 +107,15 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			Transaction transaction, 
 			MobicentsSipSession session, 
 			Dialog dialog,
-			boolean hasBeenReceived) {
+			boolean hasBeenReceived,
+			boolean isRetransmission) {
 		
 		super(response, sipFactoryImpl, transaction, session, dialog);
 		setProxiedResponse(false);
 		isResponseForwardedUpstream = false;
 		isAckGenerated = false;
 		this.hasBeenReceived = hasBeenReceived;
+		this.isRetransmission = isRetransmission;
 	}
 	
 	/**
@@ -780,5 +783,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		out.writeBoolean(isAckGenerated);
 		out.writeBoolean(isPrackGenerated);
 		out.writeBoolean(hasBeenReceived);
+	}
+
+	public boolean isRetransmission() {		
+		return isRetransmission;
 	}
 }
