@@ -310,6 +310,9 @@ public class SipStandardService extends StandardService implements SipService {
 		if(this.getSipMessageQueueSize() <= 0)
 			throw new LifecycleException("Message queue size can not be 0 or less");
 
+		if(logger.isInfoEnabled()) {
+			logger.info("SIP Standard Service Started.");
+		}
 	}
 	
 	public String getJvmRoute() {
@@ -528,6 +531,9 @@ public class SipStandardService extends StandardService implements SipService {
 		if(!connectorsStartedExternally) {
 			sipApplicationDispatcher.stop();
 		}	
+		if(logger.isInfoEnabled()) {
+			logger.info("SIP Standard Service Stopped.");
+		}
 	}
 	
 	/**

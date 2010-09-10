@@ -390,7 +390,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		//JSR 289 Section 2.1.1 Step 4.If present invoke SipServletListener.servletInitialized() on each of initialized Servlet's listeners.
 		for (SipContext sipContext : applicationDeployed.values()) {
 			sipContext.notifySipContextListeners(new SipContextEvent(SipContextEventType.SERVLET_INITIALIZED, null));
-		}		
+		}
+		
+		if(logger.isInfoEnabled()) {
+			logger.info("SipApplicationDispatcher Started");
+		}	
 	}	
 	
 	/**
@@ -410,11 +414,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		asynchronousExecutor.shutdownNow();						
 		sipApplicationRouter.destroy();
 		
-		stopSipStack();
+		stopSipStack();				
 		
 		if(oname != null) {
 			Registry.getRegistry(null, null).unregisterComponent(oname);
 		}		
+		if(logger.isInfoEnabled()) {
+			logger.info("SipApplicationDispatcher Stopped");
+		}
 	}
 	
 	/**

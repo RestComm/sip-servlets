@@ -37,7 +37,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
-import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
@@ -544,7 +543,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}		
 		// Issue 1478 : nullify the ref to avoid reusing it
 		sasTimerService = null;
-		if(timerService != null && timerService.isStarted()) {
+		// Issue 1791 : don't check is the service is started it makes the stop
+		// of tomcat hang
+		if(timerService != null) {
 			timerService.stop();
 		}
 		// Issue 1478 : nullify the ref to avoid reusing it
