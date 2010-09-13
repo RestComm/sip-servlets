@@ -1068,6 +1068,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 										break;
 									}
 									case SIP_CONNECTOR_ADDED : {
+										// reload the outbound interfaces if they have changed
+										this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
+												sipApplicationDispatcher.getOutboundInterfaces());	
+										
 										List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
 										if(logger.isDebugEnabled()) {
 											logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector addition");
@@ -1078,6 +1082,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 										break;
 									}
 									case SIP_CONNECTOR_REMOVED : {
+										// reload the outbound interfaces if they have changed
+										this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
+												sipApplicationDispatcher.getOutboundInterfaces());	
+										
 										List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
 										if(logger.isDebugEnabled()) {
 											logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector removal");

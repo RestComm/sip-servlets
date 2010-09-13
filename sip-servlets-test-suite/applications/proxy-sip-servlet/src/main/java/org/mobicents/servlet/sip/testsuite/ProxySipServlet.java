@@ -174,6 +174,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			SipURI obi = null;
 
 			for(SipURI uri:outboundInterfaces) {
+				logger.info("Outbound interface : " + uri);
 				if(uri.toString().indexOf("127.0.0.1")>0 && uri.getTransportParam().equalsIgnoreCase(transport)) {
 					// pick the lo interface, since its universal on all machines
 					proxy.setOutboundInterface(new InetSocketAddress(InetAddress.getByName(uri.getHost()),uri.getPort()));

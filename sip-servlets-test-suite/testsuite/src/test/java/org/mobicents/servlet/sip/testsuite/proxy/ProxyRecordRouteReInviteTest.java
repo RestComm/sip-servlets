@@ -16,9 +16,13 @@
  */
 package org.mobicents.servlet.sip.testsuite.proxy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -42,27 +46,11 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 
 	@Override
 	public void setUp() throws Exception {
-		super.setUp();
-		senderProtocolObjects = new ProtocolObjects("proxy-sender",
-				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null);
-		receiverProtocolObjects = new ProtocolObjects("proxy-receiver",
-				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null);
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
-		sender.setRecordRoutingProxyTesting(true);
-		SipProvider senderProvider = sender.createProvider();
-
-		receiver = new TestSipListener(5057, 5070, receiverProtocolObjects, false);
-		receiver.setRecordRoutingProxyTesting(true);
-		SipProvider receiverProvider = receiver.createProvider();
-
-		receiverProvider.addSipListener(receiver);
-		senderProvider.addSipListener(sender);
-
-		senderProtocolObjects.start();
-		receiverProtocolObjects.start();
+		super.setUp();				
 	}
 
 	public void testProxyCallerSendBye() throws Exception {
+		setupPhones(ListeningPoint.UDP);
 		String fromName = "unique-location";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -96,6 +84,7 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 	}
 	
 	public void testProxyCalleeSendBye() throws Exception {
+		setupPhones(ListeningPoint.UDP);
 		String fromName = "unique-location";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -127,7 +116,58 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 		assertTrue(sender.getByeReceived());
 		assertTrue(receiver.getOkToByeReceived());		
 	}
+	
+	/*
+	 * Non regression test for Issue 1792
+	 */
+	public void testProxyCancelTCP() throws Exception {
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
+		setupPhones(ListeningPoint.TCP);
+		String fromName = "unique-location";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "proxy-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		List<Integer> provisionalResponsesToSend = new ArrayList<Integer>();
+		provisionalResponsesToSend.add(Response.TRYING);
+		provisionalResponsesToSend.add(Response.RINGING);
+		receiver.setProvisionalResponsesToSend(provisionalResponsesToSend);
+		
+		receiver.setWaitForCancel(true);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+		Thread.sleep(1000);
+		sender.sendCancel();
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isCancelReceived());
+		assertTrue(sender.isCancelOkReceived());		
+		assertTrue(sender.isRequestTerminatedReceived());			
+	}
 
+	public void setupPhones(String transport) throws Exception {
+		senderProtocolObjects = new ProtocolObjects("proxy-sender",
+				"gov.nist", transport, AUTODIALOG, null);
+		receiverProtocolObjects = new ProtocolObjects("proxy-receiver",
+				"gov.nist", transport, AUTODIALOG, null);
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		sender.setRecordRoutingProxyTesting(true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5057, 5070, receiverProtocolObjects, false);
+		receiver.setRecordRoutingProxyTesting(true);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+	}
+	
 	@Override
 	public void tearDown() throws Exception {
 		senderProtocolObjects.destroy();
