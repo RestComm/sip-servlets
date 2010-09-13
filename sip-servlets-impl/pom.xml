@@ -116,6 +116,13 @@
 			<version>${mobicents.jain.sip.ha.version}</version>	
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>			
+			<groupId>org.mobicents.javax.sip</groupId>
+			<artifactId>mobicents-jain-sip-ext</artifactId>
+			<version>${mobicents.jain.sip.ext.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	
 	<build>
@@ -203,7 +210,7 @@
 										<goal> copy-dependencies </goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,activation,mail,mobicents-jain-sip-ha-core</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,activation,mail,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext</includeArtifactIds>
 					    			<outputDirectory>${CATALINA_HOME}/lib</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
@@ -257,7 +264,7 @@
 										<goal> copy-dependencies </goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,mobicents-jain-sip-ha-core</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext</includeArtifactIds>
 					    			<outputDirectory>${env.CATALINA_HOME}/lib</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
@@ -304,7 +311,7 @@
 										<goal>copy-dependencies</goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-ha-core</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext</includeArtifactIds>
 					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
@@ -350,7 +357,7 @@
 										<goal> copy-dependencies </goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-ha-core</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext</includeArtifactIds>
 					    			<outputDirectory>${JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer/</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
@@ -397,7 +404,7 @@
 										<goal>copy-dependencies</goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-ha-core</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext</includeArtifactIds>
 					    			<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>
@@ -443,7 +450,7 @@
 										<goal>copy-dependencies</goal>
 		 	            			</goals>
 		 	            			<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-ha-core</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext</includeArtifactIds>
 					    			<outputDirectory>${JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
 		 	            			</configuration>
 		 	          		</execution>

@@ -7,6 +7,7 @@
    <Listener className="org.apache.catalina.core.JasperListener" />
 
    <Service name="jboss.web"
+   		sipPathName="org.mobicents.ha" 
 		className="org.mobicents.servlet.sip.startup.SipStandardService"  		
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
   		concurrencyControlMode="None"
