@@ -972,7 +972,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    				}
 		    				return;
 		    			} else {
-		    				logger.debug("Can not send CANCEL because noe response arrived. " +
+		    				logger.debug("Can not send CANCEL because no responses arrived. " +
 		    						"Can not stop retransmissions. The transaction is null");
 		    			}
 		    		}

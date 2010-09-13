@@ -1409,8 +1409,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 			}
 			okToByeSentOrReceived = true;						
 		}
-		if(response.getTransactionApplicationData().isCanceled()) {
-			SipServletRequest request = (SipServletRequest) response.getTransactionApplicationData().getSipServletMessage();
+		// we send the CANCEL only for 1xx responses
+		if(response.getTransactionApplicationData().isCanceled() && response.getStatus() < 200) {
+			SipServletRequestImpl request = (SipServletRequestImpl) response.getTransactionApplicationData().getSipServletMessage();
 			try {
 				request.createCancel().send();
 			} catch (IOException e) {
