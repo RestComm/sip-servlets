@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
-import org.mobicents.servlet.sip.startup.SipApplicationSessionTimerService;
 
 /**
  * @author jean.deruelle@gmail.com

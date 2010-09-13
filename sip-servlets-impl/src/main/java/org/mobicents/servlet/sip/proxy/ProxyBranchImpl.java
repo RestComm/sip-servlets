@@ -19,19 +19,16 @@ package org.mobicents.servlet.sip.proxy;
 import gov.nist.javax.sip.TransactionExt;
 import gov.nist.javax.sip.message.SIPMessage;
 import gov.nist.javax.sip.stack.SIPClientTransaction;
-import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.lang.reflect.Method;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.Proxy;
@@ -100,8 +97,6 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	private transient List<ProxyBranch> recursedBranches;
 	private boolean waitingForPrack;
 	public transient ViaHeader viaHeader;
-	
-	private static transient Timer timer = new Timer();
 	
 	// empty constructor used only for Externalizable interface
 	public ProxyBranchImpl() {}
@@ -337,7 +332,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 		}
 		if(proxyBranch1xxTimeout > 0) {
 			proxy1xxTimeoutTask = new ProxyBranchTimerTask(this, ResponseType.INFORMATIONAL);				
-			timer.schedule(proxy1xxTimeoutTask, proxyBranch1xxTimeout * 1000L);
+			proxy.getProxyTimerService().schedule(proxy1xxTimeoutTask, proxyBranch1xxTimeout * 1000L);
 			proxyBranch1xxTimerStarted = true;
 		}
 		
@@ -721,7 +716,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 						if(logger.isDebugEnabled()) {
 							logger.debug("Proxy Branch Timeout set to " + proxyBranchTimeout);
 						}
-						timer.schedule(timerCTask, proxyBranchTimeout * 1000L);
+						proxy.getProxyTimerService().schedule(timerCTask, proxyBranchTimeout * 1000L);
 						proxyTimeoutTask = timerCTask;
 						proxyBranchTimerStarted = true;
 					} catch (IllegalStateException e) {

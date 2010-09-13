@@ -72,6 +72,9 @@ import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.core.timers.ProxyTimerService;
+import org.mobicents.servlet.sip.core.timers.ProxyTimerServiceImpl;
+import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.SipServletTimerService;
 import org.mobicents.servlet.sip.core.timers.StandardSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
@@ -155,6 +158,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
     protected transient SipApplicationSessionTimerService sasTimerService = null;
     // timer service used to schedule sip servlet originated timer tasks
     protected transient SipServletTimerService timerService = null;
+    // timer service used to schedule proxy timer tasks
+    protected transient ProxyTimerService proxyTimerService = null; 
+    
 	/**
 	 * 
 	 */
@@ -210,6 +216,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if(timerService == null) {			
 			timerService = new TimerServiceImpl();			
 		}
+		if(proxyTimerService == null) {			
+			proxyTimerService = new ProxyTimerServiceImpl();			
+		}
+		
 		if(sasTimerService == null || !sasTimerService.isStarted()) {
 			sasTimerService = new StandardSipApplicationSessionTimerService();
 		}
@@ -548,6 +558,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if(timerService != null) {
 			timerService.stop();
 		}
+		if(proxyTimerService != null) {
+			proxyTimerService.stop();
+		}
 		// Issue 1478 : nullify the ref to avoid reusing it
 		timerService = null;
 		getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE, null);
@@ -884,6 +897,13 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	}
 	
 	/**
+	 * @return the proxyTimerService
+	 */
+	public ProxyTimerService getProxyTimerService() {
+		return proxyTimerService;
+	}
+	
+	/**
      * Get naming context full name.
      */
     private String getNamingContextName() {    	
@@ -1024,6 +1044,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		if(event.getEventType() == SipContextEventType.SERVLET_INITIALIZED) {
 			if(!timerService.isStarted()) {
 				timerService.start();
+			}
+			if(!proxyTimerService.isStarted()) {
+				proxyTimerService.start();
 			}
 			if(!sasTimerService.isStarted()) {
 				sasTimerService.start();

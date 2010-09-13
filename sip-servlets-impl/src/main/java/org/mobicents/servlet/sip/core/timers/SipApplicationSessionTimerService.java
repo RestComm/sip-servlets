@@ -19,12 +19,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.mobicents.servlet.sip.startup;
+package org.mobicents.servlet.sip.core.timers;
 
 import java.util.concurrent.TimeUnit;
 
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
-import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
 
 /**
  * @author jean.deruelle@gmail.com

@@ -34,6 +34,8 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
+import org.mobicents.servlet.sip.core.timers.ProxyTimerService;
+import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -159,8 +161,8 @@ public interface SipContext extends Context {
 	
 	SipSessionsUtilImpl getSipSessionsUtil();
 	
-	TimerService getTimerService();
-	
+	TimerService getTimerService();	
+	ProxyTimerService getProxyTimerService();
 	SipApplicationSessionTimerService getSipApplicationSessionTimerService();
 
 	void setConcurrencyControlMode(ConcurrencyControlMode mode);

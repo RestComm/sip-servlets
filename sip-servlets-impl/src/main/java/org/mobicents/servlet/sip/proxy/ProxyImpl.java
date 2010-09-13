@@ -24,7 +24,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -52,10 +51,11 @@ import javax.sip.message.Response;
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.ProxyExt;
 import org.mobicents.servlet.sip.JainSipUtils;
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.timers.ProxyTimerService;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -103,12 +103,15 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 	// The From-header of the initiator of the request. Used to determine the direction of the request.
 	// Caller -> Callee or Caller <- Callee
 	private String callerFromHeader;
+	// Issue 1791 : using a timer service created outside the application loader to avoid leaks on startup/shutdown
+	private transient ProxyTimerService proxyTimerService;
 
 	// empty constructor used only for Externalizable interface
 	public ProxyImpl() {}
 	
 	public ProxyImpl(SipServletRequestImpl request, SipFactoryImpl sipFactoryImpl)
 	{
+		this.proxyTimerService = ((MobicentsSipApplicationSession)request.getApplicationSession(false)).getSipContext().getProxyTimerService();
 		this.originalRequest = request;
 		this.sipFactoryImpl = sipFactoryImpl;
 		this.proxyBranches = new LinkedHashMap<URI, ProxyBranchImpl> ();		
@@ -896,6 +899,12 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 	public void setProxy1xxTimeout(int timeout) {
 		proxy1xxTimeout = timeout;
 		
+	}
+	/**
+	 * @return the proxyTimerService
+	 */
+	public ProxyTimerService getProxyTimerService() {
+		return proxyTimerService;
 	}
 
 	

@@ -29,7 +29,6 @@ import org.jboss.web.tomcat.service.session.ClusteredSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
-import org.mobicents.servlet.sip.startup.SipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.timers.FaultTolerantScheduler;
 import org.mobicents.timers.TimerTask;

@@ -562,35 +562,44 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			//updating the last accessed times 
 			session.access();
 			sipApplicationSession.access();
-			if(transaction == null) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("Sending response statelessly " + message);
+			// Issue 1791 : using a different classloader created outside the application loader 
+			// to avoid leaks on startup/shutdown
+			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+			try {
+				final ClassLoader cl = sipApplicationSession.getSipContext().getClass().getClassLoader();
+				Thread.currentThread().setContextClassLoader(cl);
+				if(transaction == null) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Sending response statelessly " + message);
+					}
+					final String transport = JainSipUtils.findTransport(((SipServletRequestImpl)this.getRequest()).getMessage());
+					final SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
+							transport, false).getSipProvider();
+					sipProvider.sendResponse((Response)this.message);
+				} else if(sendReliably) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Sending response reliably " + message);
+					}
+					dialog.sendReliableProvisionalResponse((Response)this.message);
+				} else {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Sending response " + message + " through tx " + transaction);
+					}
+					transaction.sendResponse( (Response)this.message );
+					if(dialog != null) {
+						// we need to set the dialog again because it's possible that when the dialog
+						// was created it was in null state thus no dialog id so we need to reset it to trigger
+						// replication of the dialog id since the dialog id is computed only after the response has been sent
+						session.setSessionCreatingDialog(dialog);
+					}
 				}
-				final String transport = JainSipUtils.findTransport(((SipServletRequestImpl)this.getRequest()).getMessage());
-				final SipProvider sipProvider = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
-						transport, false).getSipProvider();
-				sipProvider.sendResponse((Response)this.message);
-			} else if(sendReliably) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("Sending response reliably " + message);
-				}
-				dialog.sendReliableProvisionalResponse((Response)this.message);
-			} else {
-				if(logger.isDebugEnabled()) {
-					logger.debug("Sending response " + message + " through tx " + transaction);
-				}
-				transaction.sendResponse( (Response)this.message );
-				if(dialog != null) {
-					// we need to set the dialog again because it's possible that when the dialog
-					// was created it was in null state thus no dialog id so we need to reset it to trigger
-					// replication of the dialog id since the dialog id is computed only after the response has been sent
-					session.setSessionCreatingDialog(dialog);
-				}
+				isMessageSent = true;
+				if(isProxiedResponse) {
+					isResponseForwardedUpstream = true;
+				}		
+			} finally {
+				Thread.currentThread().setContextClassLoader(oldClassLoader);
 			}
-			isMessageSent = true;
-			if(isProxiedResponse) {
-				isResponseForwardedUpstream = true;
-			}			
 		} catch (Exception e) {			
 			throw new IllegalStateException("an exception occured when sending the response", e);
 		}

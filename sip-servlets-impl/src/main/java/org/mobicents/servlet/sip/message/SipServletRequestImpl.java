@@ -1007,29 +1007,39 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    		}
 		    	}
 		    }
-		    
+		    final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();
 		    final String requestMethod = getMethod();
 			if(Request.ACK.equals(requestMethod)) {
-				session.getSessionCreatingDialog().sendAck(request);
-				session.setRequestsPending(session.getRequestsPending()-1);
-				final Transaction transaction = getTransaction();
-				final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
-				final B2buaHelperImpl b2buaHelperImpl = sipSession.getB2buaHelper();
-				if(b2buaHelperImpl != null && tad != null) {
-					// we unlink the originalRequest early to avoid keeping the messages in mem for too long
-					b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage());
-				}				
-				session.removeOngoingTransaction(transaction);	
-				if(tad != null) {
-					tad.cleanUp();
+				// Issue 1791 : using a different classloader created outside the application loader 
+				// to avoid leaks on startup/shutdown
+				final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+				try {
+					final ClassLoader cl = sipApplicationSession.getSipContext().getClass().getClassLoader();
+					Thread.currentThread().setContextClassLoader(cl);
+					
+					session.getSessionCreatingDialog().sendAck(request);
+					session.setRequestsPending(session.getRequestsPending()-1);
+					final Transaction transaction = getTransaction();
+					final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
+					final B2buaHelperImpl b2buaHelperImpl = sipSession.getB2buaHelper();
+					if(b2buaHelperImpl != null && tad != null) {
+						// we unlink the originalRequest early to avoid keeping the messages in mem for too long
+						b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage());
+					}				
+					session.removeOngoingTransaction(transaction);	
+					if(tad != null) {
+						tad.cleanUp();
+					}
+					final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
+							transport, false).getSipProvider();	
+					// Issue 1468 : to handle forking, we shouldn't cleanup the app data since it is needed for the forked responses
+					if(((SipStackImpl)sipProvider.getSipStack()).getMaxForkTime() == 0) {
+						transaction.setApplicationData(null);
+					}
+					return;
+				} finally {
+					Thread.currentThread().setContextClassLoader(oldClassLoader);
 				}
-				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
-						transport, false).getSipProvider();	
-				// Issue 1468 : to handle forking, we shouldn't cleanup the app data since it is needed for the forked responses
-				if(((SipStackImpl)sipProvider.getSipStack()).getMaxForkTime() == 0) {
-					transaction.setApplicationData(null);
-				}
-				return;
 			}
 			
 			
@@ -1070,8 +1080,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						}
 					}
 				}
-			}
-			final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();
+			}			
 			if(viaHeader.getBranch() == null) {
 				final String branch = JainSipUtils.createBranch(sipApplicationSession.getKey().getId(),  sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));			
 				viaHeader.setBranch(branch);
@@ -1273,25 +1282,34 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			sipApplicationSession.access();
 			Dialog dialog = getDialog();
 			if(session.getProxy() != null) dialog = null;
-			// If dialog does not exist or has no state.
-			if (dialog == null || dialog.getState() == null
-					|| (dialog.getState() == DialogState.EARLY && !Request.PRACK.equals(requestMethod)) || Request.CANCEL.equals(requestMethod)) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("Sending the request " + request);
+			// Issue 1791 : using a different classloader created outside the application loader 
+			// to avoid leaks on startup/shutdown
+			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+			try {
+				final ClassLoader cl = sipApplicationSession.getSipContext().getClass().getClassLoader();
+				Thread.currentThread().setContextClassLoader(cl);
+				// If dialog does not exist or has no state.
+				if (dialog == null || dialog.getState() == null
+						|| (dialog.getState() == DialogState.EARLY && !Request.PRACK.equals(requestMethod)) || Request.CANCEL.equals(requestMethod)) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Sending the request " + request);
+					}
+					((ClientTransaction) super.getTransaction()).sendRequest();
+				} else {
+					// This is a subsequent (an in-dialog) request. 
+					// we don't redirect it to the container for now
+					if(logger.isDebugEnabled()) {
+						logger.debug("Sending the in dialog request " + request);
+					}
+					dialog.sendRequest((ClientTransaction) getTransaction());
+				}			
+				isMessageSent = true;
+				
+				if(method.equals(Request.INVITE)) {
+					session.setRequestsPending(session.getRequestsPending()+1);
 				}
-				((ClientTransaction) super.getTransaction()).sendRequest();
-			} else {
-				// This is a subsequent (an in-dialog) request. 
-				// we don't redirect it to the container for now
-				if(logger.isDebugEnabled()) {
-					logger.debug("Sending the in dialog request " + request);
-				}
-				dialog.sendRequest((ClientTransaction) getTransaction());
-			}			
-			isMessageSent = true;
-			
-			if(method.equals(Request.INVITE)) {
-				session.setRequestsPending(session.getRequestsPending()+1);
+			} finally {
+				Thread.currentThread().setContextClassLoader(oldClassLoader);
 			}
 		} catch (Exception ex) {			
 			throw new IllegalStateException("Error sending request " + request,ex);
