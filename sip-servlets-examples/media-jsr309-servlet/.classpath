@@ -8,6 +8,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/external/jsr309/mscontrol/0.3/mscontrol-0.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.1.11-SNAPSHOT/sip-servlets-spec-1.1.11-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/jsr309/mobicents-jsr309-impl/2.0.0.BETA3-SNAPSHOT/mobicents-jsr309-impl-2.0.0.BETA3-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/jsr309/mobicents-jsr309-impl/2.0.0.BETA4/mobicents-jsr309-impl-2.0.0.BETA4.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
