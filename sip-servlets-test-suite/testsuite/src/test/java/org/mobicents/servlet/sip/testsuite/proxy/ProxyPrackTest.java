@@ -49,8 +49,7 @@ public class ProxyPrackTest extends SipServletTestCase implements SipListener {
 
 	public ProxyPrackTest(String name) {
 		super(name);
-
-		this.sipIpAddress="0.0.0.0";
+		this.sipIpAddress = "0.0.0.0";
 	}
 
 	@Override
@@ -65,8 +64,8 @@ public class ProxyPrackTest extends SipServletTestCase implements SipListener {
 
 	public void testPrackProxying() {
 		this.shootme.init("stackName", null);
-		//this.cutme.init();
-		this.shootist.init("useHostName",false, null);
+//		this.cutme.init(listeningPointTransport);
+		this.shootist.init("prack-useHostName",false, null);
 		for (int q = 0; q < 20; q++) {
 			if (shootist.ended == false && cutme.canceled == false)
 				try {

@@ -15,6 +15,8 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package org.mobicents.servlet.sip.testsuite.proxy;
+import gov.nist.javax.sip.ResponseEventExt;
+
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -97,7 +99,7 @@ public class Shootist implements SipListener {
 	
 	public boolean okToInviteRecevied = false;
 	
-	public int pauseBeforeBye = 3000;
+	public int pauseBeforeBye = 10000;
 	public int pauseBeforeAck = 0;
 	
 	int count = 0;
@@ -352,7 +354,7 @@ public class Shootist implements SipListener {
 				} else if(cseq.getMethod().equals(Request.PRACK)) {
 					prackOkReceived = true;
 				}
-			} else if(response.getStatusCode() == 180) {
+			} else if(response.getStatusCode() == 180 && !((ResponseEventExt)responseReceivedEvent).isRetransmission()) {
 				if(usePrack) {
 					Request prackRequest = dialog.createPrack(response);
 					ClientTransaction ct = sipProvider.getNewClientTransaction(prackRequest);
