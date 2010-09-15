@@ -988,25 +988,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    
 		    SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);
 		    
-		    // Bypass the load balancer for outgoing requests by removing the route header for them
-		    if(sipConnector != null && sipConnector.isUseStaticAddress()) {
-		    	RouteHeader rh = (RouteHeader) request.getHeader(RouteHeader.NAME);
-		    	if(logger.isDebugEnabled()) {
-		    		logger.debug("We are looking at route header " + rh + " and SC is" + sipConnector.getStaticServerAddress() + ":" + sipConnector.getStaticServerPort());
-		    	}
-		    	if(rh != null) {
-		    		if(rh.getAddress().getURI().isSipURI()) {
-		    			javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI)rh.getAddress().getURI();
-		    			if(sipUri.getHost().equals(sipConnector.getStaticServerAddress())) {
-		    				int port = sipUri.getPort();
-		    				if(port <= 0) port = 5060;
-		    				if(port == sipConnector.getStaticServerPort()) {
-		    					request.removeHeader(RouteHeader.NAME);
-		    				}
-		    			}
-		    		}
-		    	}
-		    }
 		    final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();
 		    final String requestMethod = getMethod();
 			if(Request.ACK.equals(requestMethod)) {
