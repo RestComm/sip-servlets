@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.testsuite.b2bua;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -111,6 +112,22 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		SipSession session = request.getSession();
 		if(request.getTo().toString().contains("b2bua@sip-servlet")) {
 			session.createRequest("MESSAGE").send();
+		}
+		if(new File("proxy-b2bua.case.flag").exists()) {
+			try {
+				Thread.sleep(200);
+				SipServletRequest r = session.createRequest("INVITE");
+				String rheaderBefore = r.getHeader("Route");
+				r.send();
+				String rheaderAfter = r.getHeader("Route");
+				if(rheaderBefore == null || rheaderAfter == null || rheaderBefore.equals(rheaderAfter)) {
+					// we expect the sent request to used update Route header without IP LB address due to optimization
+					new File("proxy-b2bua.failure.flag").createNewFile();
+				}
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		if(request.getFrom().getURI().toString().contains("pending") || 
 				request.getFrom().getURI().toString().contains("factory") ||

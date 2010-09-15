@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.testsuite.composition;
 
+import java.io.File;
+
 import gov.nist.javax.sip.header.Contact;
 
 import javax.sip.SipProvider;
@@ -122,41 +124,52 @@ public class LocationServiceB2BUAStaticServerAddressTest extends SipServletTestC
 				"gov.nist", TRANSPORT, AUTODIALOG, null);			
 	}
 	
-	public void testLocationServiceCallForwardingCallerSendBye() throws Exception {		
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
-		sender.setRecordRoutingProxyTesting(true);
-		SipProvider senderProvider = sender.createProvider();
+	public void testLocationServiceCallForwardingCallerSendBye() throws Exception {	
+		try {
+			new File("proxy-b2bua.failure.flag").delete();
+			new File("proxy-b2bua.case.flag").delete();
+			new File("proxy-b2bua.case.flag").createNewFile();
+			assertFalse(new File("proxy-b2bua.failure.flag").exists());
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
-		receiver.setRecordRoutingProxyTesting(true);
-		SipProvider receiverProvider = receiver.createProvider();
-		
-		ipBalancer = new UDPPacketForwarder(5005, 5070, "127.0.0.1");
-		ipBalancer.start();
+			sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+			sender.setRecordRoutingProxyTesting(true);
+			SipProvider senderProvider = sender.createProvider();
 
-		receiverProvider.addSipListener(receiver);
-		senderProvider.addSipListener(sender);
+			receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+			receiver.setRecordRoutingProxyTesting(true);
+			SipProvider receiverProvider = receiver.createProvider();
 
-		senderProtocolObjects.start();
-		receiverProtocolObjects.start();
+			ipBalancer = new UDPPacketForwarder(5005, 5070, "127.0.0.1");
+			ipBalancer.start();
 
-		String fromName = "forward-sender";
-		String fromHost = "sip-servlets.com";
-		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
-				fromName, fromHost);
-				
-		String toUser = "proxy-b2bua";
-		String toHost = "127.0.0.1:5070";
-		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-				toUser, toHost);
-		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
-		Thread.sleep(TIMEOUT);
-		assertTrue(sender.getOkToByeReceived());
-		assertTrue(receiver.getByeReceived());
-		Contact contact = (Contact) sender.getInviteOkResponse().getHeader(Contact.NAME);
-		SipURI sipURI = (SipURI) contact.getAddress().getURI();
-		assertTrue(sipURI.getPort() == 5005);
+			receiverProvider.addSipListener(receiver);
+			senderProvider.addSipListener(sender);
+
+			senderProtocolObjects.start();
+			receiverProtocolObjects.start();
+
+			String fromName = "forward-sender";
+			String fromHost = "sip-servlets.com";
+			SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+					fromName, fromHost);
+
+			String toUser = "proxy-b2bua";
+			String toHost = "127.0.0.1:5070";
+			SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+					toUser, toHost);
+
+			sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+			Thread.sleep(TIMEOUT);
+			assertTrue(sender.getOkToByeReceived());
+			assertTrue(receiver.getByeReceived());
+			Contact contact = (Contact) sender.getInviteOkResponse().getHeader(Contact.NAME);
+			SipURI sipURI = (SipURI) contact.getAddress().getURI();
+			assertTrue(sipURI.getPort() == 5005);
+			assertFalse(new File("proxy-b2bua.failure.flag").exists());
+		} finally {
+			new File("proxy-b2bua.case.flag").delete();
+			new File("proxy-b2bua.failure.flag").delete();
+		}
 	}
 
 	
