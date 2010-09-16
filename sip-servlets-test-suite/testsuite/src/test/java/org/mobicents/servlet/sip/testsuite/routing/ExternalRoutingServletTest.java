@@ -121,7 +121,7 @@ public class ExternalRoutingServletTest extends SipUnitServletTestCase {
 				File.separatorChar + "resources" + File.separatorChar);
 		logger.info("Log4j path is : " + closestTomcat.getLoggingFilePath());
 		closestTomcat.setDarConfigurationFilePath(getDarConfigurationFileForClosestServer());
-		closestTomcat.initTomcat(tomcatBasePath);						
+		closestTomcat.initTomcat(tomcatBasePath, null);						
 		closestTomcat.addSipConnector("SIP-Servlet-Closest-Tomcat-Server", sipIpAddress, 5069, ListeningPoint.UDP);						
 		closestTomcat.startTomcat();		
 		Thread.sleep(TIMEOUT);

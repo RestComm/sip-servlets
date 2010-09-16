@@ -1001,15 +1001,18 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					session.getSessionCreatingDialog().sendAck(request);
 					session.setRequestsPending(session.getRequestsPending()-1);
 					final Transaction transaction = getTransaction();
-					final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
-					final B2buaHelperImpl b2buaHelperImpl = sipSession.getB2buaHelper();
-					if(b2buaHelperImpl != null && tad != null) {
-						// we unlink the originalRequest early to avoid keeping the messages in mem for too long
-						b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage());
-					}				
-					session.removeOngoingTransaction(transaction);	
-					if(tad != null) {
-						tad.cleanUp();
+					// transaction can be null in case of forking
+					if(transaction != null) {
+						final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
+						final B2buaHelperImpl b2buaHelperImpl = sipSession.getB2buaHelper();
+						if(b2buaHelperImpl != null && tad != null) {
+							// we unlink the originalRequest early to avoid keeping the messages in mem for too long
+							b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage());
+						}				
+						session.removeOngoingTransaction(transaction);					
+						if(tad != null) {
+							tad.cleanUp();
+						}
 					}
 					final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
 							transport, false).getSipProvider();	

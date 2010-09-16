@@ -108,7 +108,28 @@ public class ShootistPrackSipServletTest extends SipServletTestCase {
 		receiverProtocolObjects.start();
 		tomcat.startTomcat();
 		deployApplicationPrack();
-		Thread.sleep(TIMEOUT);
+		Thread.sleep(TIMEOUT);		
+		assertTrue(receiver.isPrackReceived());
+		assertTrue(receiver.getByeReceived());		
+	}
+	
+	public void testShootistPrackIsAnyLocalAddress() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.removeConnector(sipConnector);
+		sipIpAddress = "0.0.0.0";
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
+		tomcat.startTomcat();
+		deployApplicationPrack();
+		Thread.sleep(TIMEOUT);		
 		assertTrue(receiver.isPrackReceived());
 		assertTrue(receiver.getByeReceived());		
 	}	

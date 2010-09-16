@@ -97,7 +97,8 @@ public abstract class SipServletTestCase extends TestCase {
 		String darConfigurationFile = getDarConfigurationFile();
 		tomcat.setDarConfigurationFilePath(darConfigurationFile);
 		if(initTomcatOnStartup) {
-			tomcat.initTomcat(tomcatBasePath);
+			Properties sipStackProperties = getSipStackProperties(); 
+			tomcat.initTomcat(tomcatBasePath, sipStackProperties);
 			tomcat.addHttpConnector(8080);
 			/*
 			 * <Connector debugLog="../logs/debuglog.txt" ipAddress="0.0.0.0"
@@ -118,6 +119,10 @@ public abstract class SipServletTestCase extends TestCase {
 		}
 	}
 	
+	protected Properties getSipStackProperties() {
+		return null;
+	}
+
 	@Override
 	protected void tearDown() throws Exception {
 		if(createTomcatOnStartup)

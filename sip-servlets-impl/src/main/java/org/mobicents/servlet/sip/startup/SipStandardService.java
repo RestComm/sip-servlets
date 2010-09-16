@@ -76,16 +76,16 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 public class SipStandardService extends StandardService implements SipService {
 	//the logger
 	private static final Logger logger = Logger.getLogger(SipStandardService.class);
-	private static final String DEFAULT_SIP_PATH_NAME = "gov.nist";
-	private static final String PASS_INVITE_NON_2XX_ACK_TO_LISTENER = "gov.nist.javax.sip.PASS_INVITE_NON_2XX_ACK_TO_LISTENER";
-	private static final String TCP_POST_PARSING_THREAD_POOL_SIZE = "gov.nist.javax.sip.TCP_POST_PARSING_THREAD_POOL_SIZE";
-	private static final String AUTOMATIC_DIALOG_SUPPORT_STACK_PROP = "javax.sip.AUTOMATIC_DIALOG_SUPPORT";
-	private static final String LOOSE_DIALOG_VALIDATION = "gov.nist.javax.sip.LOOSE_DIALOG_VALIDATION";
-	private static final String SERVER_LOG_STACK_PROP = "gov.nist.javax.sip.SERVER_LOG";
-	private static final String DEBUG_LOG_STACK_PROP = "gov.nist.javax.sip.DEBUG_LOG";	
-	private static final String SERVER_HEADER = "org.mobicents.servlet.sip.SERVER_HEADER";
-	private static final String USER_AGENT_HEADER = "org.mobicents.servlet.sip.USER_AGENT_HEADER";
-	private static final String JVM_ROUTE = "jvmRoute";
+	public static final String DEFAULT_SIP_PATH_NAME = "gov.nist";
+	public static final String PASS_INVITE_NON_2XX_ACK_TO_LISTENER = "gov.nist.javax.sip.PASS_INVITE_NON_2XX_ACK_TO_LISTENER";
+	public static final String TCP_POST_PARSING_THREAD_POOL_SIZE = "gov.nist.javax.sip.TCP_POST_PARSING_THREAD_POOL_SIZE";
+	public static final String AUTOMATIC_DIALOG_SUPPORT_STACK_PROP = "javax.sip.AUTOMATIC_DIALOG_SUPPORT";
+	public static final String LOOSE_DIALOG_VALIDATION = "gov.nist.javax.sip.LOOSE_DIALOG_VALIDATION";
+	public static final String SERVER_LOG_STACK_PROP = "gov.nist.javax.sip.SERVER_LOG";
+	public static final String DEBUG_LOG_STACK_PROP = "gov.nist.javax.sip.DEBUG_LOG";	
+	public static final String SERVER_HEADER = "org.mobicents.servlet.sip.SERVER_HEADER";
+	public static final String USER_AGENT_HEADER = "org.mobicents.servlet.sip.USER_AGENT_HEADER";
+	public  static final String JVM_ROUTE = "jvmRoute";
 	/**
      * The descriptive information string for this implementation.
      */
@@ -419,7 +419,7 @@ public class SipStandardService extends StandardService implements SipService {
 				sipStackProperties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
 				sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
 				sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
-				sipStackProperties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "1");
+				sipStackProperties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "0");
 				sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
 				sipStackProperties.setProperty(PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");
 			}

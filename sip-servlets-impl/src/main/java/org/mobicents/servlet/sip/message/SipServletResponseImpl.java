@@ -173,7 +173,15 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	@SuppressWarnings("unchecked")
 	public SipServletRequest createAck() {
 		final Response response = getResponse();
-		if(!Request.INVITE.equals(((SIPTransaction)getTransaction()).getMethod()) || (response.getStatusCode() >= 100 && response.getStatusCode() < 200) || isAckGenerated) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("transaction " + getTransaction());
+			logger.debug("originalRequest " + originalRequest);
+		}
+		// transaction can be null in case of forking
+		if(((getTransaction() == null && originalRequest != null && !Request.INVITE.equals(getMethod()) && !Request.INVITE.equals(originalRequest.getMethod()))) || 
+				(getTransaction() != null && !Request.INVITE.equals(((SIPTransaction)getTransaction()).getMethod())) || 
+				(response.getStatusCode() >= 100 && response.getStatusCode() < 200) || 
+				isAckGenerated) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("transaction state " + ((SIPTransaction)getTransaction()).getMethod() + " status code " + response.getStatusCode() + " isAckGenerated " + isAckGenerated);
 			}

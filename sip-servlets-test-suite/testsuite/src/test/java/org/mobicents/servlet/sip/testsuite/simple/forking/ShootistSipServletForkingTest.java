@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.testsuite.simple.forking;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Map.Entry;
 
 import javax.sip.SipProvider;
@@ -27,6 +28,7 @@ import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
+import org.mobicents.servlet.sip.startup.SipStandardService;
 
 public class ShootistSipServletForkingTest extends SipServletTestCase {
 	private static transient Logger logger = Logger.getLogger(ShootistSipServletForkingTest.class);		
@@ -135,6 +137,27 @@ public class ShootistSipServletForkingTest extends SipServletTestCase {
 		assertTrue(shootme1.checkBye());		
 	}
 	
+	@Override
+	protected Properties getSipStackProperties() {
+		Properties sipStackProperties = new Properties();
+		sipStackProperties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT",
+		"true");
+		sipStackProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
+				"32");
+		sipStackProperties.setProperty(SipStandardService.DEBUG_LOG_STACK_PROP, 
+				tomcatBasePath + "/" + "mss-jsip-" + getName() +"-debug.txt");
+		sipStackProperties.setProperty(SipStandardService.SERVER_LOG_STACK_PROP,
+				tomcatBasePath + "/" + "mss-jsip-" + getName() +"-messages.xml");
+		sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-" + getName());
+		sipStackProperties.setProperty(SipStandardService.AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");		
+		sipStackProperties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
+		sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
+		sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
+		sipStackProperties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "2");
+		sipStackProperties.setProperty(SipStandardService.LOOSE_DIALOG_VALIDATION, "true");
+		sipStackProperties.setProperty(SipStandardService.PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");
+		return sipStackProperties;
+	}
 	
 	@Override
 	protected void tearDown() throws Exception {					

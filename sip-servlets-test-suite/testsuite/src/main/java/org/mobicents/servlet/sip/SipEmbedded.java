@@ -28,7 +28,6 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 
 import org.apache.catalina.Container;
-import org.apache.catalina.Engine;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.ServerFactory;
 import org.apache.catalina.connector.Connector;
@@ -113,9 +112,10 @@ public class SipEmbedded {
 	/**
 	 * Init the tomcat server
 	 * @param tomcatBasePath the base path of the server
+	 * @param sipStackProperties 
 	 * @throws Exception
 	 */
-	public void initTomcat(String tomcatBasePath) throws Exception {
+	public void initTomcat(String tomcatBasePath, Properties sipStackProperties) throws Exception {
 		setPath(tomcatBasePath);
 		// Set the home directory
 //		System.setProperty("CATALINA_HOME", getPath());
@@ -156,6 +156,7 @@ public class SipEmbedded {
 		// Create an embedded server		
 		sipService = (SipStandardService) Class.forName(serviceFullClassName).newInstance();
 		sipService.setName(serverName);
+		sipService.setSipStackProperties(sipStackProperties);
 		sipService.setSipApplicationDispatcherClassName(SipApplicationDispatcherImpl.class.getName());
 //		sipService.setSipApplicationRouterClassName(DefaultApplicationRouter.class.getName());		
 		sipService.setDarConfigurationFileLocation(darConfigurationFilePath);

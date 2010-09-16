@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.testsuite.callcontroller;
 
 import java.util.Iterator;
+import java.util.Properties;
 
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
@@ -24,6 +25,7 @@ import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.startup.SipStandardService;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -376,6 +378,28 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		assertTrue(receiver.isAckReceived());
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
+	}
+	
+	@Override
+	protected Properties getSipStackProperties() {
+		Properties sipStackProperties = new Properties();
+		sipStackProperties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT",
+		"true");
+		sipStackProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
+				"32");
+		sipStackProperties.setProperty(SipStandardService.DEBUG_LOG_STACK_PROP, 
+				tomcatBasePath + "/" + "mss-jsip-" + getName() +"-debug.txt");
+		sipStackProperties.setProperty(SipStandardService.SERVER_LOG_STACK_PROP,
+				tomcatBasePath + "/" + "mss-jsip-" + getName() +"-messages.xml");
+		sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-" + getName());
+		sipStackProperties.setProperty(SipStandardService.AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");		
+		sipStackProperties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
+		sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
+		sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
+		sipStackProperties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "1");
+		sipStackProperties.setProperty(SipStandardService.LOOSE_DIALOG_VALIDATION, "true");
+		sipStackProperties.setProperty(SipStandardService.PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");
+		return sipStackProperties;
 	}
 	
 	@Override

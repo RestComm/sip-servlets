@@ -105,7 +105,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		//This is a proxying sample.
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			
-		if(USE_HOSTNAME.equals(fromURI.getUser())) {		
+		if(fromURI.getUser().contains(USE_HOSTNAME)) {		
 			host = "localhost";
 			logger.info("using Host Name for proxy test");
 		}
@@ -163,7 +163,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		} else {
 			ArrayList<URI> uris = new ArrayList<URI>();
 			uris.add(uri1);
-			if(!fromURI.getUser().contains("unique-location")) {
+			if(!fromURI.getUser().contains("unique-location") && !fromURI.getUser().contains("prack")) {
 				uris.add(uri2);
 			}
 			Proxy proxy = request.getProxy();

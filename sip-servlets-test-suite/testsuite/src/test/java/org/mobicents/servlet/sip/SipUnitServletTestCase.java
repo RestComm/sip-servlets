@@ -93,7 +93,7 @@ public abstract class SipUnitServletTestCase extends SipTestCase {
 			String darConfigurationFile = getDarConfigurationFile();
 			tomcat.setDarConfigurationFilePath(darConfigurationFile);
 			if(initTomcatOnStartup) {
-				tomcat.initTomcat(tomcatBasePath);
+				tomcat.initTomcat(tomcatBasePath, null);
 				tomcat.addHttpConnector(8080);
 				/*
 				 * <Connector debugLog="../logs/debuglog.txt" ipAddress="0.0.0.0"

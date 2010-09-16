@@ -613,7 +613,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 		this.prackOriginalRequest = request;
 				
 		URI targetURI = null; 
-		if(request.getMethod().equals(Request.PRACK)) {
+		if(request.getMethod().equals(Request.PRACK) || request.getMethod().equals(Request.ACK)) {
 			targetURI = this.targetURI;
 		}
 		

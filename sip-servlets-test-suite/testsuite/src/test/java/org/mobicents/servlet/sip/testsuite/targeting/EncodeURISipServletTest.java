@@ -95,7 +95,7 @@ public class EncodeURISipServletTest extends SipServletTestCase {
 	 * @throws Exception
 	 */
 	public void testEncodeURI() throws Exception {
-		tomcat.initTomcat(tomcatBasePath);
+		tomcat.initTomcat(tomcatBasePath, null);
 		tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
 		tomcat.startTomcat();
 		deployApplication();
