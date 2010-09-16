@@ -16,7 +16,7 @@
 		<menu name="Documentation">
 			<item name="Community User Guide" href="http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets/index.html"/>
 			<item name="SIP Servlets 1.1 Javadoc" href="http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/api-docs/jsr289/javadocs/index.html"/>
-			<item name="Mobicents SIP Servlets Extensions Javadoc" href="http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/api-docs/jsr289/extensions/index.html/index.html"/>
+			<item name="Mobicents SIP Servlets Extensions Javadoc" href="http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/api-docs/jsr289/extensions/index.html"/>
 		</menu>
 		<menu name="Frameworks">
 			<item name="Seam Telco Framework" href="http://groups.google.com/group/mobicents-public/web/seam-telco-framework-for-sip-servlets"/>
