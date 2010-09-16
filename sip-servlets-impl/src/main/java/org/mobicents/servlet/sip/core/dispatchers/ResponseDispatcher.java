@@ -109,7 +109,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 						tmpOriginalRequest = (SipServletRequestImpl)applicationData.getSipServletMessage();
 					}
 					final ProxyBranchImpl proxyBranch = applicationData.getProxyBranch();
-					if(proxyBranch == null) {
+					if(proxyBranch == null && sipServletResponse.isRetransmission()) {
 						if(logger.isDebugEnabled()) {
 							logger.debug("retransmission received for a non proxy application, dropping the response " + response);
 						}
