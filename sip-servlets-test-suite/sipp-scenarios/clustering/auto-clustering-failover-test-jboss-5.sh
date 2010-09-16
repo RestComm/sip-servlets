@@ -169,6 +169,28 @@ sleep $HALFSTARTSLEEP
 sleep 10
 
 ##################################
+# Test UAS bound to 0.0.0.0
+##################################
+echo "Test UAS with servers bound to 0.0.0.0"
+echo "================================"
+./auto-prepare-example.sh uas $config1
+./auto-prepare-example.sh uas $config2
+
+./auto-start-jboss-server-jboss-5-0.0.0.0.sh $config2 $config2.pid $ports2 2 uas
+./auto-start-jboss-server-jboss-5-0.0.0.0.sh $config1 $config1.pid $ports1 1 uas
+
+#Wait to boot
+sleep $FULLSTARTSLEEP
+
+./auto-run-test.sh uas result.txt
+
+#Kill the app servers
+./auto-kill-process-tree.sh `cat $config1.pid` $config1
+./auto-kill-process-tree.sh `cat $config2.pid` $config2
+
+sleep 10
+
+##################################
 # Test UAC
 ##################################
 echo "Test UAC"
