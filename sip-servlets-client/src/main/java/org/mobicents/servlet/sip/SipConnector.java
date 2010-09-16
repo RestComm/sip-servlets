@@ -197,7 +197,7 @@ public class SipConnector implements Serializable {
 			logger.warn("Cannot close TCP sockets on UDP connector");
 			return;
 		}
-		MBeanServer mbeanServer = MBeanServerFactory.findMBeanServer(null).iterator().next();
+		MBeanServer mbeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).iterator().next();
 		try {
 			if(logger.isDebugEnabled()) {
 				logger.debug("MBean Server = " + mbeanServer);
