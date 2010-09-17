@@ -48,24 +48,28 @@ public class StandardSasTimerTask extends TimerTask implements SipApplicationSes
 	
 	@SuppressWarnings("unchecked")
 	public void run() {	
-		if(logger.isDebugEnabled()) {
-			logger.debug("initial kick off of SipApplicationSessionTimerTask running for sip application session " + sipApplicationSession.getId());
-		}
-					
-		long sleep = getDelay();
-		if(sleep > 0) {
-			// if the session has been accessed since we started it, put it to sleep
+		try {
 			if(logger.isDebugEnabled()) {
-				logger.debug("expirationTime is " + sipApplicationSession.getExpirationTimeInternal() + 
-						", now is " + System.currentTimeMillis() +
-						" sleeping for " + sleep / 1000L + " seconds");
+				logger.debug("initial kick off of SipApplicationSessionTimerTask running for sip application session " + sipApplicationSession.getId());
 			}
-			final SipContext sipContext = sipApplicationSession.getSipContext();
-			final SipApplicationSessionTimerTask expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(sipApplicationSession);			
-			sipApplicationSession.setExpirationTimerTask(expirationTimerTask);					
-			sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sleep, TimeUnit.MILLISECONDS);
-		} else {
-			tryToExpire();
+
+			long sleep = getDelay();
+			if(sleep > 0) {
+				// if the session has been accessed since we started it, put it to sleep
+				if(logger.isDebugEnabled()) {
+					logger.debug("expirationTime is " + sipApplicationSession.getExpirationTimeInternal() + 
+							", now is " + System.currentTimeMillis() +
+							" sleeping for " + sleep / 1000L + " seconds");
+				}
+				final SipContext sipContext = sipApplicationSession.getSipContext();
+				final SipApplicationSessionTimerTask expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(sipApplicationSession);			
+				sipApplicationSession.setExpirationTimerTask(expirationTimerTask);					
+				sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sleep, TimeUnit.MILLISECONDS);
+			} else {
+				tryToExpire();
+			}
+		} catch (Throwable t) {
+			logger.error("Timer problem", t);
 		}
 	}
 
