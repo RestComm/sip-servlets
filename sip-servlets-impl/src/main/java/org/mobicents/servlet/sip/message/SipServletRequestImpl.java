@@ -997,7 +997,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				try {
 					final ClassLoader cl = sipApplicationSession.getSipContext().getClass().getClassLoader();
 					Thread.currentThread().setContextClassLoader(cl);
-					
+					if(sipConnector != null && // Initial requests already use local address in RouteHeader.
+							sipConnector.isUseStaticAddress()) {
+						optimizeRouteHeaderAddressForInternalRoutingrequest(sipConnector, request, session, sipFactoryImpl, transport);
+					}
 					session.getSessionCreatingDialog().sendAck(request);
 					session.setRequestsPending(session.getRequestsPending()-1);
 					final Transaction transaction = getTransaction();
