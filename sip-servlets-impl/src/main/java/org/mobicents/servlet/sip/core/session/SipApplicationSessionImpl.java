@@ -146,7 +146,6 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				sipApplicationSessionTimeout = sipContextTimeout * 60 * 1000L;				
 				expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(this);				
 				expirationTimerTask = sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sipApplicationSessionTimeout, TimeUnit.MILLISECONDS);
-//				expirationTimerFuture = (ScheduledFuture<MobicentsSipApplicationSession>) sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sipApplicationSessionTimeout, TimeUnit.MILLISECONDS);
 			} else {
 				if(logger.isDebugEnabled()) {
 					logger.debug("The sip application session "+ key +" will never expire ");
