@@ -193,8 +193,8 @@ public class SipAnnotationMergedView {
 	         merged.setDistributable(xml.getDistributable());
 	      
 	      //Session Config
-	      if(xml.getSessionConfig() != null)
-	         merged.setSessionConfig(xml.getSessionConfig());
+	      if(xml.getSipSessionConfig() != null)
+	         merged.setSipSessionConfig(xml.getSipSessionConfig());
 	      
 	      //Listener meta data
 	      if(xml.getListeners() != null)

@@ -74,7 +74,7 @@ public abstract class SipMetaData  extends IdMetaDataImplWithDescriptionGroup
    private ServletSelectionMetaData servletSelection;   
    private ProxyConfigMetaData proxyConfig;
    private ServletsMetaData servlets;
-   private SessionConfigMetaData sessionConfig;   
+   private SessionConfigMetaData sipSessionConfig;   
    private List<SipSecurityConstraintMetaData> sipSecurityContraints;
    private SipLoginConfigMetaData sipLoginConfig;           
    private SecurityRolesMetaData securityRoles;   
@@ -153,13 +153,14 @@ public abstract class SipMetaData  extends IdMetaDataImplWithDescriptionGroup
    {
       this.distributable = distributable;
    }
-   public SessionConfigMetaData getSessionConfig()
+   public SessionConfigMetaData getSipSessionConfig()
    {
-      return sessionConfig;
+      return sipSessionConfig;
    }
-   public void setSessionConfig(SessionConfigMetaData sessionConfig)
+   @XmlElement(name="session-config")
+   public void setSipSessionConfig(SessionConfigMetaData sessionConfig)
    {
-      this.sessionConfig = sessionConfig;
+      this.sipSessionConfig = sessionConfig;
    }
    
    public List<ParamValueMetaData> getContextParams() {

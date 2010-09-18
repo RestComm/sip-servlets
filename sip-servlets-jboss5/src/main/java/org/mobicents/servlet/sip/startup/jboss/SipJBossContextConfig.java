@@ -155,8 +155,8 @@ public class SipJBossContextConfig extends JBossContextConfig {
 			convergedContext.setProxyTimeout(convergedMetaData.getProxyConfig().getProxyTimeout());
 		}
 		//sip session config
-		if(convergedMetaData.getSessionConfig() != null) {
-			convergedContext.setSipApplicationSessionTimeout(convergedMetaData.getSessionConfig().getSessionTimeout());
+		if(convergedMetaData.getSipSessionConfig() != null) {
+			convergedContext.setSipApplicationSessionTimeout(convergedMetaData.getSipSessionConfig().getSessionTimeout());
 		}
 
 		//sip security contstraints

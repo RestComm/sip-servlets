@@ -56,7 +56,7 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
 	private ServletSelectionMetaData servletSelection;
 	private ProxyConfigMetaData proxyConfig;	  
 	private List<SipSecurityConstraintMetaData> sipSecurityContraints;
-	private SessionConfigMetaData sipSessionConfig;
+	private SessionConfigMetaData sipSessionConfig;	
 	private SipLoginConfigMetaData sipLoginConfig;     
 	private List<? extends ParamValueMetaData> sipContextParams;
 	private List<ListenerMetaData> sipListeners;
@@ -103,14 +103,16 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
        else if(original != null && original.getVersion() != null)
           setServletVersion(original.getVersion());
 
-       if(override != null && override.getSessionConfig()!= null)
-          setSessionConfig(override.getSessionConfig());
-       else if(original != null && original.getSessionConfig() != null) {
-    	   org.jboss.metadata.web.spec.SessionConfigMetaData sessionConfigMetaData = new org.jboss.metadata.web.spec.SessionConfigMetaData();
-    	   sessionConfigMetaData.setSessionTimeout(original.getSessionConfig().getSessionTimeout());
-    	   setSessionConfig(sessionConfigMetaData); 
+       if(override != null && override.getSipSessionConfig()!= null)
+          setSipSessionConfig(override.getSipSessionConfig());
+       else if(original != null && original.getSipSessionConfig() != null) {
+    	   SessionConfigMetaData sessionConfigMetaData = new SessionConfigMetaData();
+    	   sessionConfigMetaData.setSessionTimeout(original.getSipSessionConfig().getSessionTimeout());
+    	   setSipSessionConfig(sessionConfigMetaData); 
        }
-          
+       
+       if(override != null && override.getSessionConfig()!= null)
+           setSessionConfig(override.getSessionConfig());        
        
        if(override != null && override.getFilters()!= null)
           setFilters(override.getFilters());
@@ -244,8 +246,8 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
       
       if(override != null && override.sipSessionConfig!= null)
           setSipSessionConfig(override.sipSessionConfig);
-       else if(original != null && original.getSessionConfig() != null)
-          setSipSessionConfig(original.getSessionConfig());
+       else if(original != null && original.getSipSessionConfig() != null)
+          setSipSessionConfig(original.getSipSessionConfig());
       
       if(override != null && override.sipLoginConfig!= null)
          setSipLoginConfig(override.sipLoginConfig);

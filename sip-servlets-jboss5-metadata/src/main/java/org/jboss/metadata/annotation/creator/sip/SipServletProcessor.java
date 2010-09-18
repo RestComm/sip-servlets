@@ -139,10 +139,10 @@ public class SipServletProcessor extends
 			sipMetaData.setProxyConfig(new ProxyConfigMetaData());
 		}
 		sipMetaData.getProxyConfig().setProxyTimeout(appData.proxyTimeout());
-		if(sipMetaData.getSessionConfig() == null) {
-			sipMetaData.setSessionConfig(new SessionConfigMetaData());
+		if(sipMetaData.getSipSessionConfig() == null) {
+			sipMetaData.setSipSessionConfig(new SessionConfigMetaData());
 		}
-    	sipMetaData.getSessionConfig().setSessionTimeout(appData.sessionTimeout());
+    	sipMetaData.getSipSessionConfig().setSessionTimeout(appData.sessionTimeout());
     	
     	if(appData.name() == null || appData.name().equals(""))
     		sipMetaData.setApplicationName(packageName);
