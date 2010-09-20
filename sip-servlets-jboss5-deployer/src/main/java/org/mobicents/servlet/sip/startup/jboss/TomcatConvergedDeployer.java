@@ -21,20 +21,32 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.management.ObjectName;
 import javax.servlet.sip.annotation.SipApplication;
 
 import org.jboss.deployers.spi.DeploymentException;
 import org.jboss.deployers.spi.annotations.AnnotationEnvironment;
+import org.jboss.deployers.spi.deployer.managed.ManagedObjectCreator;
 import org.jboss.deployers.structure.spi.DeploymentUnit;
 import org.jboss.deployers.vfs.spi.structure.VFSDeploymentUnit;
 import org.jboss.kernel.plugins.bootstrap.basic.KernelConstants;
 import org.jboss.logging.Logger;
+import org.jboss.managed.api.ManagedObject;
+import org.jboss.managed.api.annotation.ManagementComponent;
+import org.jboss.managed.api.annotation.ManagementObject;
+import org.jboss.managed.api.annotation.ManagementProperty;
+import org.jboss.managed.api.annotation.ManagementPropertyFactory;
+import org.jboss.managed.api.annotation.ViewUse;
+import org.jboss.managed.api.factory.ManagedObjectFactory;
+import org.jboss.managed.plugins.ManagedPropertyImpl;
 import org.jboss.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.jboss.metadata.web.jboss.JBoss50WebMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.Web25MetaData;
+import org.jboss.metatype.api.values.SimpleValueSupport;
 import org.jboss.security.plugins.JaasSecurityManagerServiceMBean;
 import org.jboss.system.metadata.ServiceAttributeMetaData;
 import org.jboss.system.metadata.ServiceConstructorMetaData;
@@ -55,7 +67,7 @@ import org.jboss.xb.builder.JBossXBBuilder;
  * @author jean.deruelle
  *
  */
-public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deployers.TomcatDeployer {
+public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deployers.TomcatDeployer implements ManagedObjectCreator {
 	private static final Logger log = Logger.getLogger(TomcatConvergedDeployer.class);
 	
 	public static final String SIP_CONTEXT_CLASS = "org.mobicents.servlet.sip.startup.SipStandardContext";
@@ -175,7 +187,7 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 		if(isSipServletApplication(unit, metaData)) { 
 			className = (getDeploymentClass() == null) ? "org.jboss.web.tomcat.service.deployers.TomcatConvergedDeployment"
 					: getDeploymentClass();
-			config.setContextClassName(SIP_CONTEXT_CLASS);			
+			config.setContextClassName(SIP_CONTEXT_CLASS);					
 		}else {			
 			config.setContextClassName(contextClassName);
 		}
@@ -377,5 +389,43 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 			throw DeploymentException.rethrowAsDeploymentException(
 					"Error creating rar deployment " + unit.getName(), e);
 		}		
+	}		
+	
+	@ManagementObject(name = "SipApplicationNameMO", componentType = @ManagementComponent(type = "WAR", subtype = "Context"))
+	public static class SipApplicationNameMO {
+		@ManagementPropertyFactory(ManagedPropertyImpl.class)
+		@ManagementProperty(use = { ViewUse.RUNTIME }, readOnly = true)
+		public String getSipApplicationName() {
+			return null;
+		}
+	}
+
+	@Override
+	public void build(DeploymentUnit unit, Set<String> outputs,
+			Map<String, ManagedObject> managedObjects)
+			throws DeploymentException {
+		if(log.isDebugEnabled()) {
+			log.debug("Creating Managed Object for sip servlet application ? " + unit.getName());
+		}		
+		super.build(unit, outputs, managedObjects);
+		
+		JBossConvergedSipMetaData convergedMeta = unit.getAttachment(JBossConvergedSipMetaData.class);
+		if (convergedMeta == null)
+			return;
+		
+		if(log.isDebugEnabled()) {
+			log.debug("Creating Managed Object for sip servlet application ? " + convergedMeta.getApplicationName());
+		}
+		
+		if(convergedMeta.getApplicationName() != null) {
+			ManagedObject sipAppNameMo = ManagedObjectFactory.getInstance()
+				.createManagedObject(SipApplicationNameMO.class);
+			if (sipAppNameMo == null)
+				throw new DeploymentException("could not create managed object");
+			
+			sipAppNameMo.getProperty("sipApplicationName").setValue(
+					SimpleValueSupport.wrap(convergedMeta.getApplicationName()));
+			managedObjects.put("SipApplicationNameMO", sipAppNameMo);
+		}
 	}
 }
