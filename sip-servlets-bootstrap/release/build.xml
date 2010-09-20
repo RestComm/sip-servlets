@@ -298,6 +298,7 @@
 		<copy file="${base.path}/jboss-beans.xml" overwrite="true" tofile="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/META-INF/jboss-beans.xml" />
 		<copy file="${base.path}/metadata-deployer-jboss-beans.xml" overwrite="true" tofile="${mss.home}/server/${jboss.config}/deployers/metadata-deployer-jboss-beans.xml" />
 		<copy file="${base.path}/war-deployers-jboss-beans.xml" overwrite="true" tofile="${mss.home}/server/${jboss.config}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml" />
+		<copy file="${base.path}/profileservice-jboss-beans.xml" overwrite="true" tofile="${mss.home}/server/${jboss.config}/deploy/profileservice-jboss-beans.xml" />
 		<copy file="${base.path}/context-jboss-5.xml" overwrite="true" tofile="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/context.xml" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
