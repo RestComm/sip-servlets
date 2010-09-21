@@ -979,7 +979,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				if(sipSession != null) {
 					checkForAckNotReceived(sipServletMessage);
 					checkForPrackNotReceived(sipServletMessage);
-					dialog.delete();
+					// Issue 1822 http://code.google.com/p/mobicents/issues/detail?id=1822
+					// don't delete the dialog so that the app can send the BYE even after the noAckReceived has been called
+//					dialog.delete();
 					tryToInvalidateSession(sipSessionKey, false);
 				}
 				tad.cleanUp();					
@@ -1054,7 +1056,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			((SipServletRequestImpl)sipServletMessage).getLastFinalResponse();
 		final ProxyImpl proxy = sipSession.getProxy();
 		if(logger.isDebugEnabled()) {
-			logger.debug("checkForAckNotReceived : last Final Response " + lastFinalResponse);
+			logger.debug("checkForAckNotReceived : request " + sipServletMessage + " last Final Response " + lastFinalResponse);
 		}		
 		boolean notifiedApplication = false;
 		if(sipServletMessage instanceof SipServletRequestImpl && Request.INVITE.equals(sipServletMessage.getMethod()) &&
@@ -1085,6 +1087,22 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			} finally {
 				sipContext.exitSipApp(sipSession.getSipApplicationSession(), sipSession);
 				Thread.currentThread().setContextClassLoader(oldClassLoader);
+			}
+			if(!notifiedApplication) {
+				// Issue 1822 http://code.google.com/p/mobicents/issues/detail?id=1822
+				// RFC 3261 Section 13.3.1.4 The INVITE is Accepted
+				// "If the server retransmits the 2xx response for 64*T1 seconds without receiving an ACK, 
+				// the dialog is confirmed, but the session SHOULD be terminated.  
+				// This is accomplished with a BYE, as described in Section 15."
+				SipServletRequest bye = sipSession.createRequest(Request.BYE);
+				if(logger.isDebugEnabled()) {
+					logger.debug("no applications called for ACK not received, sending BYE " + bye);
+				}
+				try {
+					bye.send();
+				} catch (IOException e) {
+					logger.error("Couldn't send the BYE " + bye, e);
+				}
 			}
 		}
 		return notifiedApplication;

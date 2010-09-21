@@ -16,17 +16,17 @@
  */
 package org.mobicents.servlet.sip.testsuite.reinvite;
 
-import java.text.ParseException;
-
-import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
-import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.message.Request;
 
+import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.startup.SipContextConfig;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -55,6 +55,21 @@ public class ReInviteSipServletTest extends SipServletTestCase {
 		autoDeployOnStartup = false;
 	}
 
+	public SipStandardContext deployApplication(String name, String value) {
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/simple-sip-servlet/src/main/sipapp");
+		context.setName("sip-test-context");
+		context.setPath("sip-test");
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		ApplicationParameter applicationParameter = new ApplicationParameter();
+		applicationParameter.setName(name);
+		applicationParameter.setValue(value);
+		context.addApplicationParameter(applicationParameter);
+		assertTrue(tomcat.deployContext(context));
+		return context;
+	}
+	
 	@Override
 	public void deployApplication() {
 		assertTrue(tomcat.deployContext(
@@ -169,6 +184,46 @@ public class ReInviteSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		sender.sendInDialogSipRequest(Request.INFO, null, null, null, null, ListeningPoint.TCP);
 		Thread.sleep(TIMEOUT * 2);
+		assertTrue(sender.getByeReceived());		
+	}
+	
+	/*
+	 * Non regression test for Issue 1822 
+	 * http://code.google.com/p/mobicents/issues/detail?id=1822
+	 */
+	public void testNoAckOnReInvite() throws Exception {
+		senderProtocolObjects =new ProtocolObjects(
+				"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();			
+		
+		senderProvider.addSipListener(sender);						
+				
+		String fromName = "SSsendBye";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+				
+		senderProtocolObjects.start();
+		
+		sender.setSendBye(false);
+		sender.setTransport(false);
+		
+		deployApplication("byeDelay", "50000");
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertEquals(sender.getFinalResponseStatus(), 200);
+		sender.setSendAck(false);
+		sender.sendInDialogSipRequest(Request.INVITE, null, null, null, null, ListeningPoint.UDP);
+		Thread.sleep(TIMEOUT * 6);
+		assertTrue(sender.getAllMessagesContent().contains("noAckReceived"));
 		assertTrue(sender.getByeReceived());		
 	}
 

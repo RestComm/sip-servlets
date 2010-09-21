@@ -549,10 +549,13 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			final Dialog dialog  = transaction == null ? null:transaction.getDialog();
 			//keeping track of application data and transaction in the dialog
 			if(dialog != null) {
-				if(dialog.getApplicationData() == null) {
-					dialog.setApplicationData(
-							originalRequest.getTransactionApplicationData());	
-				}				
+				// Issue 1822 : we need to reset the application data even if dialg appdata is null otherwise the app is not invoked for noAckReceived on re INVITE
+//				if(dialog.getApplicationData() == null) {
+				final TransactionApplicationData originalRequestAppData = originalRequest.getTransactionApplicationData();
+				if(originalRequestAppData != null) {
+					dialog.setApplicationData(originalRequestAppData);
+				}
+//				}				
 				((TransactionApplicationData)dialog.getApplicationData()).
 					setTransaction(transaction);				
 			}

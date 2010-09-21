@@ -35,6 +35,8 @@ import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
+import javax.servlet.sip.SipServletContextEvent;
+import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
@@ -53,7 +55,7 @@ import org.mobicents.servlet.sip.listener.SipConnectorListener;
 
 public class SimpleSipServlet 
 		extends SipServlet 
-		implements SipErrorListener, TimerListener, SipConnectorListener, SipSessionListener, SipApplicationSessionListener {
+		implements SipErrorListener, TimerListener, SipConnectorListener, SipSessionListener, SipApplicationSessionListener, SipServletListener {
 	
 	private static final String TEST_EXCEPTION_ON_EXPIRE = "exceptionOnExpire";
 	private static final String TEST_BYE_ON_EXPIRE = "byeOnExpire";
@@ -90,6 +92,8 @@ public class SimpleSipServlet
 	SipSession registerSipSession;
 	SipSession inviteSipSession;
 		
+	int timeout = 15000;
+	
 	@Override
 	protected void doBranchResponse(SipServletResponse resp)
 			throws ServletException, IOException {
@@ -115,7 +119,7 @@ public class SimpleSipServlet
 	 */
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
-		String fromString = request.getFrom().toString();
+		String fromString = request.getFrom().toString();				
 		
 		// case for http://code.google.com/p/mobicents/issues/detail?id=1681
 		if(fromString.contains(TEST_NO_ACK_RECEIVED)) {
@@ -363,7 +367,7 @@ public class SimpleSipServlet
 				}
 				req.getSession().setAttribute("nbAcks", nbOfAcks);
 			} else if(TEST_IS_SIP_SERVLET_SEND_BYE.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {				
-				timerService.createTimer(req.getApplicationSession(), 15000, false, (Serializable)req.getSession());
+				timerService.createTimer(req.getApplicationSession(), timeout, false, (Serializable)req.getSession());
 			} else if(TEST_EXCEPTION_ON_EXPIRE.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {
 				try {
 					Thread.sleep(1000);
@@ -763,6 +767,15 @@ public class SimpleSipServlet
 	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
 		if(ev.getApplicationSession().getAttribute(TEST_ERROR_RESPONSE) != null) {
 			sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipAppSessionReadyToInvalidate", null);
+		}
+	}
+
+
+
+	public void servletInitialized(SipServletContextEvent ce) {
+		String byeDelayString = getServletContext().getInitParameter("byeDelay");
+		if(byeDelayString != null) {
+			timeout= Integer.parseInt(byeDelayString);
 		}
 	}
 }

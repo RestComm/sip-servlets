@@ -1531,11 +1531,17 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public void setResponse(SipServletResponseImpl response) {		
 		if(response.getStatus() >= 200 && 
 				(lastFinalResponse == null || lastFinalResponse.getStatus() < response.getStatus())) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("last final response " + response + " set on " + this);
+			}
 			this.lastFinalResponse = response;
 		}
 		// we keep the last informational response for noPrackReceived only
 		if(containsRel100(response.getMessage()) && (response.getStatus() > 100 && response.getStatus() < 200) && 
 				(lastInformationalResponse == null || lastInformationalResponse.getStatus() < response.getStatus())) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("last informational response " + lastInformationalResponse + " set on " + this);
+			}
 			this.lastInformationalResponse = response;
 		}
 	}
@@ -1810,6 +1816,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	}
 	
 	public void cleanUpLastResponses() {
+		if(logger.isDebugEnabled()) {
+			logger.debug("cleaning up last responses on " + this);
+		}
 		lastFinalResponse = null;
 		lastInformationalResponse = null;
 	}
