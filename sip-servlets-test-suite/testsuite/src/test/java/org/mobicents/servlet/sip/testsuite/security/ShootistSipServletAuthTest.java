@@ -21,8 +21,12 @@ import java.util.List;
 import javax.sip.SipProvider;
 import javax.sip.message.Response;
 
+import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.startup.SipContextConfig;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -50,6 +54,21 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 				projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet-auth/src/main/sipapp",
 				"sip-test-context", "sip-test"));
 	}
+	
+	public SipStandardContext deployApplication(String name, String value) {
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet-auth/src/main/sipapp");
+		context.setName("sip-test-context");
+		context.setPath("sip-test");
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		ApplicationParameter applicationParameter = new ApplicationParameter();
+		applicationParameter.setName(name);
+		applicationParameter.setValue(value);
+		context.addApplicationParameter(applicationParameter);
+		assertTrue(tomcat.deployContext(context));
+		return context;
+	}
 
 	@Override
 	protected String getDarConfigurationFile() {
@@ -59,8 +78,11 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 	
 	@Override
 	protected void setUp() throws Exception {
-		super.setUp();						
-		
+		super.setUp();									
+	}
+	
+	public void testShootist() throws Exception {
+//		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(
 				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
 					
@@ -75,16 +97,104 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 		
 		senderProvider.addSipListener(receiver);
 		
-		receiverProtocolObjects.start();			
-	}
-	
-	public void testShootist() throws Exception {
-//		receiver.sendInvite();
+		receiverProtocolObjects.start();		
+		
 		tomcat.startTomcat();
 		deployApplication();
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.isAckReceived());
 		assertTrue(receiver.getByeReceived());
+	}
+	
+	/*
+	 * Non regression test for Issue 1836 
+	 * http://code.google.com/p/mobicents/issues/detail?id=1836
+	 * Exception thrown when creating a cancel after a "Proxy Authentication required" response
+	 */
+	public void testShootistCancelChallengeOn1xx() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"cancelChallenge", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setChallengeRequests(true);
+		receiver.setWaitForCancel(true);
+		List<Integer> provisionalResponsesToSend = new ArrayList<Integer>();
+		provisionalResponsesToSend.add(Response.TRYING);
+		provisionalResponsesToSend.add(Response.SESSION_PROGRESS);		
+		receiver.setProvisionalResponsesToSend(provisionalResponsesToSend);
+		receiver.setTimeToWaitBetweenProvisionnalResponse(TIME_TO_WAIT_BETWEEN_PROV_RESPONSES);
+		SipProvider receiverProvider = receiver.createProvider();			
+		
+		receiverProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();		
+		
+		tomcat.startTomcat();
+		deployApplication("from", "cancelChallenge");
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isCancelReceived());			
+	}
+	
+	/*
+	 * Non regression test for Issue 1836 
+	 * http://code.google.com/p/mobicents/issues/detail?id=1836
+	 * Exception thrown when creating a cancel after a "Proxy Authentication required" response
+	 */
+	public void testShootistCancelChallengeBefore1xx() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"cancelChallengeBefore1xx", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setChallengeRequests(true);
+		receiver.setWaitForCancel(true);
+		List<Integer> provisionalResponsesToSend = new ArrayList<Integer>();
+		provisionalResponsesToSend.add(Response.TRYING);
+		provisionalResponsesToSend.add(Response.SESSION_PROGRESS);		
+		receiver.setProvisionalResponsesToSend(provisionalResponsesToSend);
+		receiver.setTimeToWaitBetweenProvisionnalResponse(TIME_TO_WAIT_BETWEEN_PROV_RESPONSES);
+		SipProvider receiverProvider = receiver.createProvider();			
+		
+		receiverProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();		
+		
+		tomcat.startTomcat();
+		deployApplication("from", "cancelChallengeBefore1xx");
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isCancelReceived());			
+	}
+	
+	/*
+	 * Non regression test for Issue 1836 
+	 * http://code.google.com/p/mobicents/issues/detail?id=1836
+	 * Exception thrown when creating a cancel after a "Proxy Authentication required" response
+	 */
+	public void testShootistReInviteCancel() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setChallengeRequests(true);
+		List<Integer> provisionalResponsesToSend = new ArrayList<Integer>();
+		provisionalResponsesToSend.add(Response.TRYING);
+		provisionalResponsesToSend.add(Response.SESSION_PROGRESS);		
+		receiver.setProvisionalResponsesToSend(provisionalResponsesToSend);
+		receiver.setTimeToWaitBetweenProvisionnalResponse(TIME_TO_WAIT_BETWEEN_PROV_RESPONSES);
+		SipProvider receiverProvider = receiver.createProvider();			
+		
+		receiverProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();		
+		
+		tomcat.startTomcat();
+		deployApplication("from", "reinvite");
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isAckReceived());		
+		receiver.setWaitForCancel(true);
+		receiver.setChallengeRequests(false);
+		receiver.sendInDialogSipRequest("INFO", null, null, null, null, null);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isCancelReceived());		
 	}
 
 	@Override

@@ -94,6 +94,7 @@ import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
@@ -1410,16 +1411,28 @@ public class SipSessionImpl implements MobicentsSipSession {
 			okToByeSentOrReceived = true;						
 		}
 		// we send the CANCEL only for 1xx responses
-		if(response.getTransactionApplicationData().isCanceled() && response.getStatus() < 200) {
+		if(response.getTransactionApplicationData().isCanceled() && response.getStatus() < 200 && !response.getMethod().equals(Request.CANCEL)) {
 			SipServletRequestImpl request = (SipServletRequestImpl) response.getTransactionApplicationData().getSipServletMessage();
-			try {
-				request.createCancel().send();
-			} catch (IOException e) {
-				if(logger.isEnabledFor(Priority.WARN)) {
-				logger.warn("Couldn't send CANCEL for a transaction that has been CANCELLED but " +
-						"CANCEL was not sent because there was no response from the other side. We" +
-						" just stopped the retransmissions." + response + "\nThe transaction" + 
-						response.getTransaction(), e);
+			if(logger.isDebugEnabled()) {
+				logger.debug("request to cancel " + request + " routingstate " + request.getRoutingState() + 
+						" requestCseq " + ((MessageExt)request.getMessage()).getCSeqHeader().getSeqNumber() + 
+						" responseCseq " + ((MessageExt)response.getMessage()).getCSeqHeader().getSeqNumber());
+			}
+			if(!request.getRoutingState().equals(RoutingState.CANCELLED) && 
+					((MessageExt)request.getMessage()).getCSeqHeader().getSeqNumber() == 
+					((MessageExt)response.getMessage()).getCSeqHeader().getSeqNumber()) {
+				if(response.getStatus() > 100) {
+					request.setRoutingState(RoutingState.CANCELLED);
+				}
+				try {
+					request.createCancel().send();					
+				} catch (IOException e) {
+					if(logger.isEnabledFor(Priority.WARN)) {
+					logger.warn("Couldn't send CANCEL for a transaction that has been CANCELLED but " +
+							"CANCEL was not sent because there was no response from the other side. We" +
+							" just stopped the retransmissions." + response + "\nThe transaction" + 
+							response.getTransaction(), e);
+					}
 				}
 			}
 		}

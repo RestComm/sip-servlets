@@ -63,6 +63,7 @@ import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
+import javax.sip.TransactionState;
 import javax.sip.address.TelURL;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.ContactHeader;
@@ -959,10 +960,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			    }
 		    } else {
 		    	if(isCancel) {
-		    		if(getSipSession().getState().equals(State.INITIAL)) {
-		    			Transaction tx = inviteTransactionToCancel;
-		    			if(tx != null) {
-		    				logger.debug("Can not send CANCEL. Will try to STOP retransmissions " + tx);
+		    		Transaction tx = inviteTransactionToCancel;
+	    			if(tx != null) {
+	    				// we rely on the transaction state to know if we send the cancel or not
+	    				if(tx.getState() == null || tx.getState().equals(TransactionState.CALLING) || tx.getState().equals(TransactionState.TRYING)) {
+		    				logger.debug("Can not send CANCEL. Will try to STOP retransmissions " + tx + " tx state " + tx.getState());
 		    				// We still haven't received any response on this call, so we can not send CANCEL,
 		    				// we will just stop the retransmissions
 		    				StaticServiceHolder.disableRetransmissionTimer.invoke(tx);
@@ -971,11 +973,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    					tad.setCanceled(true);
 		    				}
 		    				return;
-		    			} else {
-		    				logger.debug("Can not send CANCEL because no responses arrived. " +
-		    						"Can not stop retransmissions. The transaction is null");
-		    			}
-		    		}
+	    				}
+	    			} else {
+	    				logger.debug("Can not send CANCEL because no responses arrived. " +
+	    						"Can not stop retransmissions. The transaction is null");
+	    			}
 		    	}
 		    }
 			final String transport = JainSipUtils.findTransport(request);
@@ -1412,6 +1414,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		}
 		if(routingState.equals(RoutingState.SUBSEQUENT)) {
 			isInitial = false;
+		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("setting routing state to " + routingState);
 		}
 		this.routingState = routingState;	
 	}

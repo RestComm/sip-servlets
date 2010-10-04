@@ -67,11 +67,33 @@ public class ShootistSipServletAuth
 						response.getRequest().getMethod());
 				challengeRequest.addAuthHeader(response, authInfo);
 				challengeRequest.send();
-			}
+				String fromString = response.getFrom().getURI().toString();
+				if(fromString.contains("cancelChallenge")) {
+					if(fromString.contains("Before1xx")) {
+						try {
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {				
+							logger.error("unexpected exception", e);
+						}
+						challengeRequest.createCancel().send();
+					} else {
+						response.getSession().setAttribute("cancelChallenge", challengeRequest);
+					}
+				}
+			}			
 		}
 		
 		logger.info("Got response: " + response);	
 		
+	}
+	
+	@Override
+	protected void doProvisionalResponse(SipServletResponse resp)
+			throws ServletException, IOException {
+		SipServletRequest servletRequest = (SipServletRequest) resp.getSession().getAttribute("cancelChallenge");
+		if(servletRequest != null && resp.getStatus() > 100) {
+			servletRequest.createCancel().send();
+		}
 	}
 	
 	@Override
@@ -80,6 +102,7 @@ public class ShootistSipServletAuth
 		logger.info("Got : " + sipServletResponse.getStatus() + " "
 				+ sipServletResponse.getMethod());
 		int status = sipServletResponse.getStatus();
+		String fromString = sipServletResponse.getFrom().getURI().toString();
 		if (status == SipServletResponse.SC_OK && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
 			SipServletRequest ackRequest = sipServletResponse.createAck();
 			ackRequest.send();
@@ -88,9 +111,27 @@ public class ShootistSipServletAuth
 			} catch (InterruptedException e) {				
 				logger.error("unexpected exception", e);
 			}
-			SipServletRequest sipServletRequest = sipServletResponse.getSession().createRequest("BYE");
-			sipServletRequest.send();
+			if(!fromString.contains("reinvite")) {
+				SipServletRequest sipServletRequest = sipServletResponse.getSession().createRequest("BYE");
+				sipServletRequest.send();
+			}
 		}
+	}
+	
+	@Override
+	protected void doInfo(SipServletRequest req) throws ServletException,
+			IOException {
+		req.createResponse(200).send();
+		SipServletRequest reInvite = req.getSession().createRequest("INVITE");
+		reInvite.send();
+		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {				
+			logger.error("unexpected exception", e);
+		}
+		
+		reInvite.createCancel().send();
 	}
 
 	// SipServletListener methods
@@ -101,7 +142,11 @@ public class ShootistSipServletAuth
 	public void servletInitialized(SipServletContextEvent ce) {
 		SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);
 		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
-		SipURI fromURI = sipFactory.createSipURI("BigGuy", "here.com");			
+		String from = ce.getServletContext().getInitParameter("from");
+		if(from == null) {
+			from = "BigGuy";
+		}
+		SipURI fromURI = sipFactory.createSipURI(from, "here.com");			
 		SipURI toURI = sipFactory.createSipURI("LittleGuy", "there.com");
 		SipServletRequest sipServletRequest = 
 			sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);
