@@ -35,6 +35,7 @@ public class Click2CallBasicTest extends SipServletTestCase {
 
 	private static final String CLICK2DIAL_URL = "http://127.0.0.1:8080/click2call/call";
 	private static final String RESOURCE_LEAK_URL = "http://127.0.0.1:8080/click2call/index.html";
+	private static final String EXPIRATION_TIME_PARAMS = "?expirationTime";
 	private static final String CLICK2DIAL_PARAMS = "?from=sip:from@127.0.0.1:5056&to=sip:to@127.0.0.1:5057";
 	private static transient Logger logger = Logger.getLogger(Click2CallBasicTest.class);
 
@@ -207,5 +208,27 @@ public class Click2CallBasicTest extends SipServletTestCase {
 		logger.info("Received the follwing HTTP response: " + httpResponse);
 		
 		assertEquals(sessionsNumber, manager.getActiveSessions());
+	}
+	
+	/**
+	 * http://code.google.com/p/mobicents/issues/detail?id=1853 
+	 * SipApplicationSession.getExpirationTime() returns 0 in converged app
+	 */
+	public void testClickToCallExpirationTime()
+		throws Exception {				
+		
+		logger.info("Trying to reach url : " + CLICK2DIAL_URL + EXPIRATION_TIME_PARAMS);
+		
+		URL url = new URL(CLICK2DIAL_URL + EXPIRATION_TIME_PARAMS);
+		InputStream in = url.openConnection().getInputStream();
+		
+		byte[] buffer = new byte[10000];
+		int len = in.read(buffer);
+		String httpResponse = "";
+		for (int q = 0; q < len; q++)
+			httpResponse += (char) buffer[q];
+		logger.info("Received the follwing HTTP response: " + httpResponse);
+		
+		assertFalse("0".equals(httpResponse.trim()));
 	}
 }

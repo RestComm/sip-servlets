@@ -128,8 +128,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	@SuppressWarnings(value="unchecked")
 	protected SipApplicationSessionImpl(SipApplicationSessionKey key, SipContext sipContext) {
 		sipSessions = new CopyOnWriteArraySet<SipSessionKey>();	
-		this.key = key;			
-		lastAccessedTime = creationTime = System.currentTimeMillis();
+		this.key = key;
+		creationTime = System.currentTimeMillis();		
 		expired = false;
 		isValid = true;
 		isValidInternal = new AtomicBoolean(true);		
@@ -157,6 +157,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			}
 			notifySipApplicationSessionListeners(SipApplicationSessionEventType.CREATION);
 		}
+		// Last Accessed Time set here instead of at the same time as creationTime
+		// Contribution from Naoki Nishihara from OKI 
+		// Fix for Issue 1853  http://code.google.com/p/mobicents/issues/detail?id=1853 
+		// SipApplicationSession.getExpirationTime() returns 0 in converged app
+		setLastAccessedTime(creationTime);
 	}
 	
 	/**

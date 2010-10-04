@@ -95,6 +95,16 @@ public class SimpleWebServlet extends HttpServlet {
             	   HttpServletResponse response)
     throws ServletException, IOException
     {
+    	
+    	if(request.getParameter("expirationTime") != null) {
+    		PrintWriter	out;
+            response.setContentType("text/html");
+            out = response.getWriter();
+            out.println("" + ((javax.servlet.sip.ConvergedHttpSession)request.getSession()).getApplicationSession().getExpirationTime() );
+            out.close();
+            return;
+    	}
+    	
         String toAddr = request.getParameter("to");
         String fromAddr = request.getParameter("from");
         String invalidateHttpSession = request.getParameter("invalidateHttpSession");
