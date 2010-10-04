@@ -4,7 +4,7 @@
 	</properties>
 	<body>
 		<p>
-			<b><i>This page is obsolete : More detailed and better looking installation instructions are available from the <a href="./user_guides/sip_servlets/index.html#stf-Seam_Telco_Framework">Mobicents Sip Servlets User Guide</a></i></b>
+			<b><i>This page is obsolete : More detailed and better looking installation instructions are available from the <a href="http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets/index.html#stf-Seam_Telco_Framework">Mobicents Sip Servlets User Guide</a></i></b>
 		</p>
 			<section name="The Seam Telco Framework (STF)">
 			<p>On top of <a href="http://www.seamframework.org/">JBoss Seam</a>, Sip Servlets and MSC API (from Mobicents Media Server), we have built another framework that

@@ -1,6 +1,6 @@
 Mobicents Sip Servlets Concurrency
 
-<This page is obsolete : More detailed and better looking installation instructions are available from the {{{./user_guides/sip_servlets/index.html#sscacc-MSS_Concurrency_and_Congestion_Control}Mobicents Sip Servlets User Guide}}>
+<This page is obsolete : More detailed and better looking installation instructions are available from the {{{http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets/index.html#sscacc-MSS_Concurrency_and_Congestion_Control}Mobicents Sip Servlets User Guide}}>
 
 * Description
 	

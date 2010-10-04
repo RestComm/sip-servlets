@@ -1,6 +1,6 @@
 JRuby on Rails integration or How to make phone calls from a JRuby on Rails application
 
-<This page is obsolete : More detailed and better looking installation instructions are available from the {{{./user_guides/sip_servlets/index.html#jruby-telco-integration}Mobicents Sip Servlets User Guide}}>
+<This page is obsolete : More detailed and better looking installation instructions are available from the {{{http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets/index.html#jruby-telco-integration}Mobicents Sip Servlets User Guide}}>
 
 * Description
 
