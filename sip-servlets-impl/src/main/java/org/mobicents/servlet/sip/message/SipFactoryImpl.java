@@ -43,6 +43,7 @@ import javax.sip.SipException;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.ContentDispositionHeader;
 import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
@@ -580,7 +581,14 @@ public class SipFactoryImpl implements Externalizable {
 				Header header = SipFactories.headerFactory.createHeader(ContentTypeHeader.NAME, value);
 				return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()));
 			} catch (ParseException pe) {
-				throw new ServletParseException("Impossible to parse the following parameterable "+ value , pe);
+				// Contribution from Nishihara, Naoki from Japan for Issue http://code.google.com/p/mobicents/issues/detail?id=1856
+				// Cannot create a parameterable header for Session-Expires
+				try {
+					Header header = SipFactories.headerFactory.createHeader(ContentDispositionHeader.NAME, value);
+					return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()));
+				} catch (ParseException pe2) {
+					throw new ServletParseException("Impossible to parse the following parameterable "+ value , pe2);
+				}
 			}
 		} 		
 	}	
