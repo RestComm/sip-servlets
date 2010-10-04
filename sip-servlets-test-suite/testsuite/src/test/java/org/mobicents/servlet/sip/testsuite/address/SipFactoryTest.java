@@ -10,9 +10,6 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
  * 
  */
 public class SipFactoryTest extends junit.framework.TestCase {
-
-	
-	
 	private SipFactoryImpl sipFactory;
 	
 	public void setUp() {
