@@ -3183,8 +3183,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	 * @param container
 	 *            the container to set
 	 */
-	public void setContainer(Container container) {		
-		container_ = container;
+	@Override
+	public void setContainer(Container container) {
+		super.setContainer(container);		
 		sipManagerDelegate.setContainer(container);
 		DistributedCacheConvergedSipManager<? extends OutgoingDistributableSessionData> distributedCacheConvergedSipManager = getDistributedCacheConvergedSipManager();
 		// Issue 1514: http://code.google.com/p/mobicents/issues/detail?id=1514	
