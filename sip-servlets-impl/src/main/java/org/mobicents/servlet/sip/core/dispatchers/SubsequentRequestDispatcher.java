@@ -195,10 +195,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			}
 			if(sipApplicationSession == null) {
 				if(poppedRouteHeader != null) {
-					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip application session to this subsequent request " + request +
+					throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "Cannot find the corresponding sip application session to this subsequent request " + request +
 							" with the following popped route header " + sipServletRequest.getPoppedRoute() + ", it may already have been invalidated or timed out");
 				} else {
-					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip application session to this subsequent request " + request +
+					throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "Cannot find the corresponding sip application session to this subsequent request " + request +
 							", it may already have been invalidated or timed out");					
 				}
 			}
@@ -231,10 +231,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		if(tmpSipSession == null) {
 			sipManager.dumpSipSessions();
 			if(poppedRouteHeader != null) {
-				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip session to this subsequent request " + request +
+				throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "Cannot find the corresponding sip session to this subsequent request " + request +
 						" with the following popped route header " + sipServletRequest.getPoppedRoute() + ", it may already have been invalidated or timed out");
 			} else {
-				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Cannot find the corresponding sip session to this subsequent request " + request +
+				throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "Cannot find the corresponding sip session to this subsequent request " + request +
 						", it may already have been invalidated or timed out");					
 			}			
 		} else {
