@@ -29,5 +29,6 @@ public interface ConvergedSession
 	
 	public MobicentsSipApplicationSession getApplicationSession(boolean create);
 	
-	boolean isValid();
+	// cannot reuse the isvalidInternal because it is protected in jboss 4
+	boolean isValidIntern();
 }

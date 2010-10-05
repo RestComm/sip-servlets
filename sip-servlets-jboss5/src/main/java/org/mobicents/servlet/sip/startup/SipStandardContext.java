@@ -336,6 +336,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			if(logger.isInfoEnabled()) {
 				logger.info("sip application session timeout for this context is " + sipApplicationSessionTimeout + " minutes");
 			}
+			
+			if(logger.isInfoEnabled()) {
+				logger.info("http session timeout for this context is " + getSessionTimeout() + " minutes");
+			}
 			if(logger.isInfoEnabled()) {
 				logger.info("sip context started");
 			}

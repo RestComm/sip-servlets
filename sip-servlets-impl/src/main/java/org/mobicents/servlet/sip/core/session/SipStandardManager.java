@@ -164,7 +164,7 @@ public class SipStandardManager extends StandardManager implements SipManager {
         if ((this.container != null) && (this.container instanceof Context))
             ((Context) this.container).removePropertyChangeListener(this);
 
-        this.container = container;
+        this.container = container;        
 		sipManagerDelegate.setContainer(container);
 
         // Register with the new Container (if any)

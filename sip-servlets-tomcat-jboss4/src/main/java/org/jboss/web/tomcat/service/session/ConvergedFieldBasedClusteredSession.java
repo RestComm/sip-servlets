@@ -102,7 +102,7 @@ public class ConvergedFieldBasedClusteredSession extends
 		return convergedSessionDelegate.getApplicationSession(create);
 	}
 	
-	public boolean isValid() {
+	public boolean isValidIntern() {
 		return isValidInternal();
 	}
 	

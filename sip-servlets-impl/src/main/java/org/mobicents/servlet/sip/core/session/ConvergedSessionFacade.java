@@ -204,7 +204,7 @@ public class ConvergedSessionFacade implements ConvergedSession {
 		return session.getApplicationSession(create);
 	}
 
-	public boolean isValid() {
-		return session.isValid();
+	public boolean isValidIntern() {
+		return session.isValidIntern();
 	}
 }

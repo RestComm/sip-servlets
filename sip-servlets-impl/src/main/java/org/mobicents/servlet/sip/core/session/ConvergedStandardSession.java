@@ -23,6 +23,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipApplicationSession;
 
 import org.apache.catalina.security.SecurityUtil;
+import org.apache.log4j.Logger;
 
 /**
  * Extension of the Tomcat StandardSession class so that applications
@@ -34,7 +35,7 @@ import org.apache.catalina.security.SecurityUtil;
 public class ConvergedStandardSession 
 		extends org.apache.catalina.session.StandardSession 
 		implements ConvergedSession {
-
+	private static final Logger logger = Logger.getLogger(ConvergedStandardSession.class);
 	/**
 	 * 
 	 */
@@ -101,7 +102,7 @@ public class ConvergedStandardSession
 		return convergedSessionDelegate.getApplicationSession(create);
 	}
 	
-	public boolean isValid() {
+	public boolean isValidIntern() {
 		return isValidInternal();
 	}
 	
@@ -121,6 +122,12 @@ public class ConvergedStandardSession
 		if(sipApplicationSession != null) {
 			sipApplicationSession.access();
 		}
+	}
+	
+	@Override
+	public void setMaxInactiveInterval(int interval) {
+		logger.info("maxInactiveInterval = " + interval);
+		super.setMaxInactiveInterval(interval);
 	}
 
 }

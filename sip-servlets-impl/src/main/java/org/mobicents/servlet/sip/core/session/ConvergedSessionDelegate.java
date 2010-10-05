@@ -136,7 +136,7 @@ public class ConvergedSessionDelegate {
 		//First check if the http session has the app session id in its attributes		
 		SipApplicationSessionKey key = null;
 		// need to check if the session is still valid
-		if(httpSession.isValid()) {
+		if(httpSession.isValidIntern()) {	
 			key = (SipApplicationSessionKey) httpSession.getAttribute(APPLICATION_SESSION_ID_ATTRIBUTE_NAME); 
 		}
 		if(key != null) {

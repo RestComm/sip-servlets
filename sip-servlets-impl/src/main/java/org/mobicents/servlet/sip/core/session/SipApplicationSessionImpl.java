@@ -567,7 +567,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		for(HttpSession session: getHttpSessions()) {
 			if(session instanceof ConvergedSession) {
 				ConvergedSession convergedSession = (ConvergedSession) session;
-				if(convergedSession.isValid()) {
+				if(convergedSession.isValidIntern()) {
 					convergedSession.invalidate();
 				}
 			} else {
@@ -1033,7 +1033,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			for(HttpSession httpSession: getHttpSessions()) {				
 				if(httpSession instanceof ConvergedSession) {
 					ConvergedSession convergedSession = (ConvergedSession) httpSession;
-					if(convergedSession.isValid()) {
+					if(convergedSession.isValidIntern()) {
 						if(logger.isDebugEnabled()) {
 							logger.debug("Http Session not ready to be invalidated : " + convergedSession.getId());
 						}
@@ -1079,7 +1079,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			boolean allHttpSessionsInvalidated = true;
 			for(HttpSession httpSession : getHttpSessions()) {
 				ConvergedSession convergedSession = (ConvergedSession) httpSession;
-				if(convergedSession.isValid()) {
+				if(convergedSession.isValidIntern()) {
 					allHttpSessionsInvalidated = false;
 					break;
 				}

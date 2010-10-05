@@ -97,7 +97,7 @@ public class ConvergedAttributeBasedClusteredSession extends
 		return convergedSessionDelegate.getApplicationSession(create);
 	}
 	
-	public boolean isValid() {
+	public boolean isValidIntern() {
 		return isValidInternal();
 	}
 	
