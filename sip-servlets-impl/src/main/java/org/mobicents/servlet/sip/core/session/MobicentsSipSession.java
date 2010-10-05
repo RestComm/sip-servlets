@@ -79,25 +79,19 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	String getHandler();
 
 	Dialog getSessionCreatingDialog();
-
 	void setSessionCreatingDialog(Dialog dialog);
 	
 	SipServletMessageImpl getSessionCreatingTransactionRequest();
-
 	void setSessionCreatingTransactionRequest(SipServletMessageImpl message);
 
 	Set<Transaction> getOngoingTransactions();
-	
 	void removeOngoingTransaction(Transaction transaction);
-	
 	void addOngoingTransaction(Transaction transaction);
 
 	Serializable getStateInfo();
-
 	void setStateInfo(Serializable stateInfo);
 		
 	Principal getUserPrincipal();
-
 	void setUserPrincipal(Principal principal);
 	
 	void setRoutingRegion(SipApplicationRoutingRegion routingRegion);

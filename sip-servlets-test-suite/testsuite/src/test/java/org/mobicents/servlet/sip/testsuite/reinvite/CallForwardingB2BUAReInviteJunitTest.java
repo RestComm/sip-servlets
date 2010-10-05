@@ -101,6 +101,7 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isInviteReceived());
+		assertTrue(sender.isAckReceived());
 		assertNotNull(sender.getInviteRequest().getHeader("ReInvite"));
 		MaxForwardsHeader maxForwardsHeader = (MaxForwardsHeader) receiver.getInviteRequest().getHeader(MaxForwardsHeader.NAME);
 		assertNotNull(maxForwardsHeader);
@@ -167,6 +168,42 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		assertTrue(sender.isCancelOkReceived());
 		assertTrue(sender.isRequestTerminatedReceived());
 		assertTrue(receiver.isCancelReceived());
+	}
+	
+	/**
+	 * Non Regression test for 
+	 * http://code.google.com/p/mobicents/issues/detail?id=1837
+	 * ACK was received by JAIN-SIP but was not routed to application 
+	 */
+	public void testCallForwardingCallerReInviteAckRaceInfo() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);		
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-pending-sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setTimeToWaitBeforeAck(9000);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(8000);
+		receiver.sendInDialogSipRequest("UPDATE", null, null, null, null, null);
+		Thread.sleep(5000);
+		assertTrue(receiver.isAckReceived());			
 	}		
 	
 	@Override
