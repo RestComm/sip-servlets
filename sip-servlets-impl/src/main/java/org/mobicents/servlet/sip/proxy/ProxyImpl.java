@@ -59,6 +59,7 @@ import org.mobicents.servlet.sip.core.timers.ProxyTimerService;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
+import org.mobicents.servlet.sip.proxy.ProxyBranchImpl.TransactionRequest;
 
 /**
  * @author root
@@ -186,9 +187,12 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 	}
 
 	public void cancelAllExcept(ProxyBranch except, String[] protocol, int[] reasonCode, String[] reasonText, boolean throwExceptionIfCannotCancel) {
-		if(ackReceived) throw new IllegalStateException("There has been an ACK received on this branch. Can not cancel.");
 		for(ProxyBranch proxyBranch : proxyBranches.values()) {		
 			if(!proxyBranch.equals(except)) {
+				// Do not make this check in the beginning of the method, because in case of reINVITE etc, we already have a single brnch nd this method
+				// would have no actual effect, no need to fail it just because we've already seen ACK. Only throw exception if there are other branches.
+				if(ackReceived) 
+					throw new IllegalStateException("There has been an ACK received. Can not cancel more brnaches, the INVITE tx has finished.");
 				try {
 					proxyBranch.cancel(protocol, reasonCode, reasonText);
 				} catch (IllegalStateException e) {
@@ -683,6 +687,17 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 					logger.debug("Response was dropped because getProxyUtils().createProxiedResponse(response, proxyBranch) returned null");
 			// non retransmission case
 			try {
+				String branch = ((Via)proxiedResponse.getMessage().getHeader(Via.NAME)).getBranch();
+				synchronized(proxyBranch.ongoingTransactions) {
+					for(TransactionRequest tr : proxyBranch.ongoingTransactions) {
+
+						if(tr.branchId.equals(branch)) {
+							((SipServletResponseImpl)proxiedResponse).setTransaction(tr.request.getTransaction());
+							((SipServletResponseImpl)proxiedResponse).setOriginalRequest(tr.request);
+							break;
+						}
+					}
+				}
 				proxiedResponse.send();
 				if(logger.isDebugEnabled())
 					logger.debug("Sending out proxied final response with existing transaction");
