@@ -107,6 +107,8 @@ import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 public class SipServletRequestImpl extends SipServletMessageImpl implements
 		SipServletRequest {
 
+	private static final String STALE = "stale";
+
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = Logger.getLogger(SipServletRequestImpl.class);
@@ -1440,16 +1442,22 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		while(authHeaderIterator.hasNext()) {
 			WWWAuthenticateHeader wwwAuthHeader = 
 				(WWWAuthenticateHeader) authHeaderIterator.next();
-//			String uri = wwwAuthHeader.getParameter("uri");
-			AuthInfoEntry authInfoEntry = authInfoImpl.getAuthInfo(wwwAuthHeader.getRealm());
-			
-			if(authInfoEntry == null) throw new SecurityException(
-					"Cannot add authorization header. No credentials for the following realm: " + wwwAuthHeader.getRealm());
-			
-			addChallengeResponse(wwwAuthHeader,
-					authInfoEntry.getUserName(),
-					authInfoEntry.getPassword(),
-					this.getRequestURI().toString());
+			// Fix for Issue 1832 : http://code.google.com/p/mobicents/issues/detail?id=1832 
+			// Authorization header is growing when nonce become stale, don't take into account stale headers
+			// in the challenge request
+			String stale = wwwAuthHeader.getParameter(STALE);
+			if(stale == null || stale.equalsIgnoreCase(Boolean.FALSE.toString())) {
+//				String uri = wwwAuthHeader.getParameter("uri");
+				AuthInfoEntry authInfoEntry = authInfoImpl.getAuthInfo(wwwAuthHeader.getRealm());
+				
+				if(authInfoEntry == null) throw new SecurityException(
+						"Cannot add authorization header. No credentials for the following realm: " + wwwAuthHeader.getRealm());
+				
+				addChallengeResponse(wwwAuthHeader,
+						authInfoEntry.getUserName(),
+						authInfoEntry.getPassword(),
+						this.getRequestURI().toString());
+			}
 		}
 		
 		// Now check for Proxy-Authentication
@@ -1458,16 +1466,22 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		while(authHeaderIterator.hasNext()) {
 			ProxyAuthenticateHeader wwwAuthHeader = 
 				(ProxyAuthenticateHeader) authHeaderIterator.next();
-//			String uri = wwwAuthHeader.getParameter("uri");
-			AuthInfoEntry authInfoEntry = authInfoImpl.getAuthInfo(wwwAuthHeader.getRealm());
-			
-			if(authInfoEntry == null) throw new SecurityException(
-					"No credentials for the following realm: " + wwwAuthHeader.getRealm());
-			
-			addChallengeResponse(wwwAuthHeader,
-					authInfoEntry.getUserName(),
-					authInfoEntry.getPassword(),
-					this.getRequestURI().toString());
+			String stale = wwwAuthHeader.getParameter(STALE);
+			// Fix for Issue 1832 : http://code.google.com/p/mobicents/issues/detail?id=1832 
+			// Authorization header is growing when nonce become stale, don't take into account stale headers
+			// in the challenge request
+			if(stale == null || stale.equalsIgnoreCase(Boolean.FALSE.toString())) {
+//				String uri = wwwAuthHeader.getParameter("uri");
+				AuthInfoEntry authInfoEntry = authInfoImpl.getAuthInfo(wwwAuthHeader.getRealm());
+				
+				if(authInfoEntry == null) throw new SecurityException(
+						"No credentials for the following realm: " + wwwAuthHeader.getRealm());
+				
+				addChallengeResponse(wwwAuthHeader,
+						authInfoEntry.getUserName(),
+						authInfoEntry.getPassword(),
+						this.getRequestURI().toString());
+			}
 		}
 		
 	}

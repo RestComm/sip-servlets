@@ -205,6 +205,7 @@ public class TestSipListener implements SipListener {
 	private boolean referReceived;
 
 	private boolean challengeRequests;
+	private boolean multipleChallengeInResponse;
 	
 	private static Logger logger = Logger.getLogger(TestSipListener.class);
 	
@@ -280,7 +281,7 @@ public class TestSipListener implements SipListener {
 	private boolean sendNotify = true;
 	
 	private boolean countRetrans = false;	
-	private int nbRetrans = 0;
+	private int nbRetrans = 0;	
 	
 	public Request firstRequest;
 
@@ -972,6 +973,18 @@ public class TestSipListener implements SipListener {
 		            proxyAuthenticate.setParameter("stale","FALSE");
 		            proxyAuthenticate.setParameter("algorithm",dsam.getAlgorithm());
 		            responseauth.setHeader(proxyAuthenticate);
+		            
+		            if(multipleChallengeInResponse) {
+		            	proxyAuthenticate = 
+			            	protocolObjects.headerFactory.createProxyAuthenticateHeader(dsam.getScheme());
+			            proxyAuthenticate.setParameter("realm",dsam.getRealm(null));
+			            proxyAuthenticate.setParameter("nonce",dsam.generateNonce());
+			            //proxyAuthenticateImpl.setParameter("domain",authenticationMethod.getDomain());
+			            proxyAuthenticate.setParameter("opaque","");
+			            proxyAuthenticate.setParameter("stale","true");
+			            proxyAuthenticate.setParameter("algorithm",dsam.getAlgorithm());
+			            responseauth.addHeader(proxyAuthenticate);
+		            }
 		
 		            if (serverTransaction!=null)
 		                serverTransaction.sendResponse(responseauth);
@@ -2719,6 +2732,10 @@ public class TestSipListener implements SipListener {
 	 */
 	public Request getPrackRequestReceived() {
 		return prackRequestReceived;
+	}
+
+	public void setMultipleChallengeInResponse(boolean multipleChallengeInResponse) {
+		this.multipleChallengeInResponse = multipleChallengeInResponse;
 	}
 
 }

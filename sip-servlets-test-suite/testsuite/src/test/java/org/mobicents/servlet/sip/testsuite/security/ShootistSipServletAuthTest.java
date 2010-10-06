@@ -17,8 +17,12 @@
 package org.mobicents.servlet.sip.testsuite.security;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.sip.SipProvider;
+import javax.sip.header.Header;
+import javax.sip.header.ProxyAuthenticateHeader;
+import javax.sip.header.ProxyAuthorizationHeader;
 import javax.sip.message.Response;
 
 import org.apache.catalina.deploy.ApplicationParameter;
@@ -104,6 +108,42 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.isAckReceived());
 		assertTrue(receiver.getByeReceived());
+	}
+	/*
+	 * Non regression test for Issue 1832 : http://code.google.com/p/mobicents/issues/detail?id=1832 
+     * Authorization header is growing when nonce become stale
+     */
+	public void testShootistReinviteChallengeStale() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender-app-send-reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setChallengeRequests(true);
+		receiver.setMultipleChallengeInResponse(true);
+		List<Integer> provisionalResponsesToSend = new ArrayList<Integer>();
+		provisionalResponsesToSend.add(Response.TRYING);
+		provisionalResponsesToSend.add(Response.SESSION_PROGRESS);		
+		receiver.setProvisionalResponsesToSend(provisionalResponsesToSend);
+		receiver.setTimeToWaitBetweenProvisionnalResponse(TIME_TO_WAIT_BETWEEN_PROV_RESPONSES);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();		
+		
+		tomcat.startTomcat();
+		deployApplication();
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isAckReceived());
+		assertTrue(receiver.getByeReceived());
+		ListIterator<Header>  proxyAuthHeaders = receiver.getInviteRequest().getHeaders(ProxyAuthorizationHeader.NAME);
+		int i= 0; 
+		while (proxyAuthHeaders.hasNext()) {
+			proxyAuthHeaders.next();
+			i++;			
+		}
+		assertEquals("The stale auth header should not be taken into account", 1, i);
 	}
 	
 	/*
