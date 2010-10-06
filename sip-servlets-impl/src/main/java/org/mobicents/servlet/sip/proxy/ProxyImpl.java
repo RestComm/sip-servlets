@@ -175,6 +175,8 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 	 * @see javax.servlet.sip.Proxy#cancel()
 	 */
 	public void cancel() {
+		if(ackReceived) 
+			throw new IllegalStateException("There has been an ACK received. Can not cancel more brnaches, the INVITE tx has finished.");
 		cancelAllExcept(null, null, null, null, true);
 	}
 	
@@ -183,6 +185,8 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 	 * @see javax.servlet.sip.Proxy#cancel(java.lang.String[], int[], java.lang.String[])
 	 */
 	public void cancel(String[] protocol, int[] reasonCode, String[] reasonText) {
+		if(ackReceived) 
+			throw new IllegalStateException("There has been an ACK received. Can not cancel more brnaches, the INVITE tx has finished.");
 		cancelAllExcept(null, protocol, reasonCode, reasonText, true);
 	}
 
@@ -191,8 +195,6 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 			if(!proxyBranch.equals(except)) {
 				// Do not make this check in the beginning of the method, because in case of reINVITE etc, we already have a single brnch nd this method
 				// would have no actual effect, no need to fail it just because we've already seen ACK. Only throw exception if there are other branches.
-				if(ackReceived) 
-					throw new IllegalStateException("There has been an ACK received. Can not cancel more brnaches, the INVITE tx has finished.");
 				try {
 					proxyBranch.cancel(protocol, reasonCode, reasonText);
 				} catch (IllegalStateException e) {
