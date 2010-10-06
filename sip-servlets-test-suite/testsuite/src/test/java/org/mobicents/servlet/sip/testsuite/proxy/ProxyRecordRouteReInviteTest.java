@@ -147,6 +147,24 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 		assertTrue(sender.isCancelOkReceived());		
 		assertTrue(sender.isRequestTerminatedReceived());			
 	}
+	
+	// Issue http://code.google.com/p/mobicents/issues/detail?id=1847
+	public void testProxyExtraRouteNoRewrite() throws Exception {
+		setupPhones(ListeningPoint.UDP);
+		String fromName = "unique-location";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "proxy-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress,null,null, false, new String[] {"Route"}, new String[] {"sip:extra-route@127.0.0.1:5057;lr"}, false);		
+		Thread.sleep(TIMEOUT/2);
+		assertTrue(receiver.firstRequest.getRequestURI().toString().contains("extra-route"));
+	}
 
 	public void setupPhones(String transport) throws Exception {
 		senderProtocolObjects = new ProtocolObjects("proxy-sender",

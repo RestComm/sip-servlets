@@ -281,6 +281,8 @@ public class TestSipListener implements SipListener {
 	
 	private boolean countRetrans = false;	
 	private int nbRetrans = 0;
+	
+	public Request firstRequest;
 
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -329,6 +331,8 @@ public class TestSipListener implements SipListener {
 		}
 		
 		Request request = requestReceivedEvent.getRequest();
+
+		if(firstRequest == null) firstRequest = request;
 		ServerTransaction serverTransactionId = requestReceivedEvent
 				.getServerTransaction();
 
