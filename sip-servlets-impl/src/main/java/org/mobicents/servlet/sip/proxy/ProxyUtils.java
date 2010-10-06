@@ -29,6 +29,7 @@ import javax.servlet.sip.URI;
 import javax.sip.ListeningPoint;
 import javax.sip.Transaction;
 import javax.sip.address.Address;
+import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.ViaHeader;
@@ -68,8 +69,23 @@ public class ProxyUtils {
 				if(logger.isDebugEnabled()){
 					logger.debug("request URI on the request to proxy : " + destination);
 				}
-				//this way everything is copied even the port but might not work for TelURI...
-				clonedRequest.setRequestURI(((URIImpl)destination).getURI());
+				//only set the request URI if the request has no Route headers
+				//see RFC3261 16.12
+				Header route = clonedRequest.getHeader("Route");
+				if(route == null)
+				{
+					if(logger.isDebugEnabled()){
+						logger.debug("setting request uri as cloned request has no Route headers: " + destination);
+					}
+					//this way everything is copied even the port but might not work for TelURI...
+					clonedRequest.setRequestURI(((URIImpl)destination).getURI());
+				}
+				else
+				{
+					if(logger.isDebugEnabled()){
+						logger.debug("NOT setting request uri as cloned request has at least one Route header: " + route);
+					}
+				}
 				
 //				// Add route header
 //				javax.sip.address.SipURI routeUri = SipFactories.addressFactory.createSipURI(
