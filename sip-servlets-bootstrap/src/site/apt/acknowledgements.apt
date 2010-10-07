@@ -1,4 +1,4 @@
-Acknowledgements
+Mobicents Sip Servlets' Hall Of Fame
 
 	Bug Reports, enhancements or features for Mobicents Sip Servlets were contributed by the following people/companies:
 	
@@ -76,5 +76,9 @@ Acknowledgements
 		
 	* Yukinobu Imai from {{{http://www.oki.com}OKI}} : 
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1805}Issue 1805}} and contributed a fix for it	
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1805}Issue 1805}} and contributed a fix for it
+		
+	* Horaci Macias from {{{http://www.avaya.com/}Avaya}} :
+	
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1847}Issue 1847}} and contributed a fix for it
 	
