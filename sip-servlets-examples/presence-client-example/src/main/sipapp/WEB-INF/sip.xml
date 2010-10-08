@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>CallBlockingPresenceApplication</app-name>	
+
+ 	<context-param>
+      <param-name>xdms.provider.url</param-name>
+      <param-value>jnp://127.0.0.1:1099</param-value>
+    </context-param>
+        
+    <context-param>
+      <param-name>xdms.ip.address</param-name>
+      <param-value>127.0.0.1</param-value>
+    </context-param>    
+    
+    <context-param>
+      <param-name>xdms.port</param-name>
+      <param-value>8080</param-value>
+    </context-param>    
+    
+    <context-param>
+      <param-name>xdms.xcap.root</param-name>
+      <param-value>/mobicents</param-value>
+    </context-param>
+    
+    <context-param>
+      <param-name>username</param-name>
+      <param-value>john.doe</param-value>
+    </context-param>        
+    
+    <context-param>
+      <param-name>password</param-name>
+      <param-value>john.doe</param-value>
+    </context-param>
+    
+    <context-param>
+      <param-name>blocked.users</param-name>
+      <param-value>sip:perf-receiver@sip-servlets.com</param-value>
+    </context-param>
+</sip-app>
