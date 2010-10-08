@@ -33,6 +33,7 @@
 		<module>media-jsr309-servlet</module>
 		<module>media-playback-servlet</module>
 		<module>pure-jruby-telco</module>
+		<module>presence-client-example</module>
 		<module>shootist-sip-servlet</module>
 		<module>shootist-sip-servlet-distributable</module>
 		<module>shopping-demo</module>
