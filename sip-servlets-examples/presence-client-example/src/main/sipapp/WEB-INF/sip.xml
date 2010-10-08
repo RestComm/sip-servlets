@@ -5,7 +5,7 @@
 
  	<context-param>
       <param-name>xdms.provider.url</param-name>
-      <param-value>jnp://127.0.0.1:1099</param-value>
+      <param-value>jnp://127.0.0.1:1199</param-value>
     </context-param>
         
     <context-param>
@@ -15,7 +15,7 @@
     
     <context-param>
       <param-name>xdms.port</param-name>
-      <param-value>8080</param-value>
+      <param-value>8180</param-value>
     </context-param>    
     
     <context-param>

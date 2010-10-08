@@ -38,7 +38,6 @@ import javax.servlet.sip.annotation.SipListener;
 
 import org.apache.log4j.Logger;
 import org.jboss.jmx.adaptor.rmi.RMIAdaptor;
-import org.mobicents.slee.enabler.userprofile.jpa.jmx.UserProfileControlManagementMBean;
 import org.mobicents.xcap.client.XcapClient;
 import org.mobicents.xcap.client.XcapResponse;
 import org.mobicents.xcap.client.auth.Credentials;
@@ -143,7 +142,7 @@ public class CallBlockingPresenceSipServlet extends SipServlet implements SipSer
         try {
 	        InitialContext ctx = new InitialContext(env);
 	        RMIAdaptor rmiAdaptor = (RMIAdaptor) ctx.lookup("jmx/rmi/RMIAdaptor");
-	        ObjectName userProfileMBeanObjectName = new ObjectName(UserProfileControlManagementMBean.MBEAN_NAME);
+	        ObjectName userProfileMBeanObjectName = new ObjectName("org.mobicents.slee:userprofile=UserProfileControl");
 	        
 	        String users = (String) rmiAdaptor.invoke(userProfileMBeanObjectName, "listUsersAsString", new String[]{}, new String[]{});
 	        if(!users.contains(username)) {
