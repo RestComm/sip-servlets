@@ -884,15 +884,12 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			if(container instanceof Engine) {
 				Service service = ((Engine)container).getService();
 				if(service instanceof SipService) {
-					Connector[] connectors = service.findConnectors();
-					for (Connector connector : connectors) {
-						SipStack sipStack = (SipStack)
-							connector.getProtocolHandler().getAttribute(SipStack.class.getSimpleName());
-						if(sipStack != null) {
-							sessionCreatingDialog = ((SipStackImpl)sipStack).getDialog(sessionCreatingDialogId); 
-							if(logger.isDebugEnabled()) {
-								logger.debug("dialog injected " + sessionCreatingDialog);
-							}
+					SipService sipService = (SipService) service;
+					SipStack sipStack = sipService.getSipStack();					
+					if(sipStack != null) {
+						sessionCreatingDialog = ((SipStackImpl)sipStack).getDialog(sessionCreatingDialogId); 
+						if(logger.isDebugEnabled()) {
+							logger.debug("dialog injected " + sessionCreatingDialog);
 						}
 					}
 				}

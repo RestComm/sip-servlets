@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.startup;
 
+import javax.sip.SipStack;
+
 import org.apache.catalina.Service;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 
@@ -42,4 +44,9 @@ public interface SipService extends Service {
 	 * @param sipApplicationDispatcher the sip application dispatcher associated with this service
 	 */
 	public void setSipApplicationDispatcher(SipApplicationDispatcher sipApplicationDispatcher);
+	/**
+	 * *Get the underlying SIP Stack handling the incoming and outgoing SIP Messages
+	 * @return the underlying SIP Stack handling the incoming and outgoing SIP Messages
+	 */
+	public SipStack getSipStack();
 }
