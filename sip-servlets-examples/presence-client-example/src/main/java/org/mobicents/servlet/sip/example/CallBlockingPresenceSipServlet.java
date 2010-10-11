@@ -83,7 +83,7 @@ public class CallBlockingPresenceSipServlet extends SipServlet implements SipSer
 		String elementSelector = new ElementSelectorBuilder()
 	        .appendStepByName("resource-lists")
 	        .appendStepByAttr("list","name","blocked")
-	        .appendStepByAttr("entry","uri", toUri)
+	        .appendStepByAttr("entry","uri", fromUri)
 	        .toPercentEncodedString();
 		try {			
 			URI elementURI = uriBuilder.setElementSelector(elementSelector).toURI();
@@ -95,11 +95,11 @@ public class CallBlockingPresenceSipServlet extends SipServlet implements SipSer
 				isBlocked = true;
 			}
 			if(isBlocked) {
-				logger.info(toUri + " has been blocked !");
+				logger.info(fromUri + " has been blocked !");
 				SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_FORBIDDEN);
 				sipServletResponse.send();		
 			} else {
-				logger.info(toUri + " has not been blocked, we proxy the request");
+				logger.info(fromUri + " has not been blocked, we proxy the request");
 				Proxy proxy = request.getProxy();
 				proxy.setRecordRoute(true);
 				proxy.proxyTo(request.getRequestURI());

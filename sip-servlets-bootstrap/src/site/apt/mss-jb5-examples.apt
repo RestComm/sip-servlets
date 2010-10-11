@@ -18,7 +18,9 @@ JBoss 5.x only Examples
 		
 		* {{{mss-diameter_sh.html}Diameter Sh OpenIMS Integration Example}} : a Diameter Sh service showing integration between Mobicents Sip Servlets acting as a SIP Application Server in {{{http://www.openimscore.org/}OpenIMS Core}}, using the Diameter Sh interface to receive profile updates and SIP.
 	
-		* {{{mss-diameter_rorf.html}Diameter Ro RfExample}} : a Diameter Ro/Rf service that performs online call charging.
+		* {{{mss-diameter_rorf.html}Diameter Ro Rf Example}} : a Diameter Ro/Rf service that performs online call charging.
+		
+		* {{{mss-presence-client-example.html}Presence Client Example}} : a Call Blocking application interoperating with the SIP Presence Service to fetch the blocked contacts through XCAP
 	
 
 	You can play with most of our examples in 2 differents ways. 

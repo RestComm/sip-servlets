@@ -35,6 +35,6 @@
     
     <context-param>
       <param-name>blocked.users</param-name>
-      <param-value>sip:perf-receiver@sip-servlets.com</param-value>
+      <param-value>sip:blocked-sender@sip-servlets.com,sip:darth-vader@mobicents.org</param-value>
     </context-param>
 </sip-app>
