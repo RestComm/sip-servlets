@@ -48,6 +48,8 @@ Presence Client Example
 	Extract it locally to a directory that we will reference as $MOBICENTS_PRESENCE_XDMS
 	
 	Start it with the following command <<<sh $MOBICENTS_PRESENCE_XDMS/bin/run.sh -Djboss.service.binding.set=ports-01>>> 
+	
+	When the Mobicents XDMS Server is completely started, start Mobicents Sip Servlets with <<<sh $MOBICENTS_SIP_SERVLETS/bin/run.sh>>> 
 
 	Start a SIP Phone of your choice such as the account name should be sip:blocked-sender@sip-servlets.com or sip:darth-vader@mobicents.org.	
    	The From Header should be one of the following addresses : sip:blocked-sender@sip-servlets.com or sip:darth-vader@mobicents.org.
