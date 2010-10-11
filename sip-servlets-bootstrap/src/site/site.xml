@@ -55,6 +55,7 @@
 				<item name="Diameter Event Charging" href="diameter_event_charging.html"/>
 				<item name="Diameter Sh OpenIMS Integration" href="mss-diameter_sh.html"/>
 				<item name="Diameter Ro/Rf example" href="mss-diameter_rorf.html"/>						
+				<item name="Presence Client example" href="mss-presence-client-example.html"/>
 			</item>
 		</menu>		
 		<menu name="Contribute">			
