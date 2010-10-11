@@ -23,7 +23,8 @@ ipAddress="127.0.0.1"
  stunServerPort="3478"
  staticServerAddress="122.122.122.122" 
  staticServerPort="44"
- useStaticAddress="true"/>]]></programlisting>
+ useStaticAddress="true"
+ httpFollowsSip="false"/>]]></programlisting>
     </example>
     <variablelist>
       <title>SIP &lt;connector&gt; Attributes</title>
@@ -84,13 +85,19 @@ ipAddress="127.0.0.1"
       <varlistentry>
         <term>staticServerAddress</term>
         <listitem>
-          <para>Specifies what load-balancer server address is insterted in Contact/Via headers for server-created requests. This parameter  is useful for  cluster configurations where  requests should  be bound to a load-balancer address, rather than  a specific node address.</para>
+          <para>Specifies what load-balancer server address is inserted in Contact/Via headers for server-created requests. This parameter  is useful for  cluster configurations where  requests should  be bound to a load-balancer address, rather than  a specific node address.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
         <term>staticServerPort</term>
         <listitem>
           <para>Specifies the port of the load-balancer specified in staticServerAddress . This parameter is useful in cluster configurations where requests should be bound to a load-balancer address rather than a specific node address.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>httpFollowsSip</term>
+        <listitem>
+          <para>This flag makes the application server aware of how the SIP load balancers assign request affinity and stores this information in the application session. When HTTP load balancer sends HTTP request not associated with this application session the application server will force this HTTP request to be repeated to land on the correct node.</para>
         </listitem>
       </varlistentry>
     </variablelist>

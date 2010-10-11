@@ -399,7 +399,8 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
       <note>
         <title>Configuration File Locations</title>
         <para>On &SHORT_PLATFORM_NAME; for Tomcat server installations, <filename>server.xml</filename> is located in <filename>&lt;install_directory&gt;/conf</filename>.</para>
-        <para>On &SHORT_PLATFORM_NAME; for JBoss server installations, the default <filename>server.xml</filename> configuration file is located in <filename>server/default/deploy/jboss-web.deployer</filename>.</para>
+        <para>On &SHORT_PLATFORM_NAME; for JBoss server installations, the default <filename>server.xml</filename> configuration file is located
+         in <filename>server/default/deploy/jboss-web.sar</filename> (or <filename>server/default/deploy/jboss-web.deployer</filename> for JBoss Application Server 4.x and EAP 4.x).</para>
         <para>On &SHORT_PLATFORM_NAME; for JBoss installations, with JBoss clustering support enabled, the &quot;all&quot; <filename>server.xml</filename> file must be configured.  It is located in <filename>server/all/deploy/jboss-web.deployer</filename>.</para>
         <para>To determine what profile should be altered for each &SHORT_PLATFORM_NAME; for JBoss installation, refer to <xref linkend="ssfjcs-SS_for_JBoss-Clustering_Support"/>.</para>
       </note>
@@ -425,8 +426,35 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
         <title>Converged Load Balancing</title>
         <section>
           <title>Apache HTTP load balancer</title>
-          <para>The &SHORT_PLATFORM_NAME; SIP load balancer can work in concert  with HTTP load balancers such as  <literal>mod_jk</literal>. Whenever an HTTP session is bound to a particular node, an instruction is sent to the SIP load balancer to direct the SIP calls from the same application session to the same node. </para>
-          <para>It is sufficient to configure <literal>mod_jk</literal> to work for HTTP in JBoss in order to enable cooperative load balancing. &SHORT_PLATFORM_NAME; will read the configuration and will use it without any extra configuration. You can read more about configuring <literal>mod_jk</literal> with JBoss in your JBoss Application Server documentation.</para>
+          <para>The &SHORT_PLATFORM_NAME; SIP load balancer can work in concert  with HTTP load balancers such as  <literal>mod_jk</literal> and <literal>mod_proxy</literal> in two different ways. 
+          By default whenever an HTTP session is bound to a particular node, an instruction is sent to the SIP load balancer to direct the SIP calls from the same application 
+          session to the same node.</para>
+          <para>It is sufficient to configure <literal>mod_jk</literal> to work for HTTP in JBoss in order to enable cooperative load balancing. &SHORT_PLATFORM_NAME; will read the
+           configuration and will use it without any extra configuration. You can read more about configuring <literal>mod_jk</literal> with JBoss in your JBoss Application Server 
+           documentation.</para>
+          <para>Alternatively you may disable this behaviour and make the HTTP load balancer follow the decisions made by the SIP load balancer with the httpFollowsSip flag. This is 
+          achieved by changing the jvmRoute part of the session ID cookie used internally by <literal>mod_jk</literal>.</para>
+          
+          <section>
+          <title>The httpFollowsSip flag</title>
+          <para>The <literal>httpFollowsSip</literal> flag in the service configuration makes the application server aware of how different mod_jk and SIP load balancers have assigned 
+          request affinity for each application session. The application servers assign exactly one node to each Sip Servlets application session and this node is the node where the
+           last SIP request associated with the application session has landed (decised by the SIP load balancer). Then the application server will actively update the session ID
+            cookie (the jvmRoute part) of any HTTP request that arrives at 
+          the wrong node. The application server will do so with a specially composed HTTP redirect response or with a HTML refresh hint. As a backup strategy, if the request is bound to seek
+           non-existing node forever and it will let the request be served by a new node. This avoids having a client stuck reloading the same page over and over.</para>
+           <para>One problem with this flag is that if you have two or more SIP sessions associated with the same application session and the load balancer has decided to send SIP requests
+           to different nodes, which might happend if you use Call-ID based affinity, then the application server will have to change the jvmRoute very often for every SIP request resulting
+            in significant overhead. It is generally not adviced to enable this flag if you have more than 1 SIP session per application session and the means to guarantee all SIP sessions
+            from the application session will land on the same node.</para>
+            <para>This is an example how to enable the option. It is disabled by default.</para>
+                  <programlisting>&lt;Connector port=&quot;5080&quot; 
+     ipAddress = &quot;${jboss.bind.address}&quot;
+     ...
+     httpFollowsSip=&quot;true&quot; /&gt;
+</programlisting>
+           </section>
+          
         </section>
         <section>
           <title>Integrated HTTP load balancer</title>
@@ -469,7 +497,7 @@ INFO: Node registry started</screen>
           <para>The <filename>server.xml</filename> file specifies the nodes used.  Because there is more then one client node specified, unique listener ports must be specified for each node to monitor HTTP and/or SIP connections.  <xref linkend="sslb-Changing_the_SIP_Connector_Port_for_Servlet_Server_Nodes"/> describes the affected element in the <filename>server.xml</filename> file.</para>
           <note>
             <title>Configuration File Location</title>
-            <para>For the JBoss SIP Servlets Server binary distribution, <filename>server.xml</filename> is located in the <filename>&lt;install_directory&gt;/server/all/deploy/jboss-web.deployer/</filename> directory.  For the Tomcat binary distribution, <filename>server.xml</filename> is located in the <filename>&lt;install_directory&gt;/conf/</filename> directory.</para>
+            <para>For the JBoss SIP Servlets Server binary distribution, <filename>server.xml</filename> is located in the  <filename>&lt;install_directory&gt;/server/all/deploy/jboss-web.deployer/</filename> directory (for JBoss Application Server 4.x or EAP 4.x <filename>&lt;install_directory&gt;/server/all/deploy/jboss-web.deployer/</filename>).  For the Tomcat binary distribution, <filename>server.xml</filename> is located in the <filename>&lt;install_directory&gt;/conf/</filename> directory.</para>
           </note>
           <example id="sslb-Changing_the_SIP_Connector_Port_for_Servlet_Server_Nodes">
             <title>Changing the SIP Connector Port for Servlet Server Nodes in server.xml</title>
@@ -552,7 +580,13 @@ INFO: Stopping the sip forwarder</screen>
       </warning>
     </section>
     <section>
-      <para>First you need to remove the SIP load balancers from any configuration in &SHORT_PLATFORM_NAME;. In particular the <literal>balancers</literal> attribute in <filename>server.xml</filename>.   and edit the jboss.web  engine tag. You should remove the balancers attribute from the Service tag of jboss.web service. This simply removes the default load balancer from the system and the traffic bypasses the SIP load-balancer. Next you must configure &SHORT_PLATFORM_NAME; to put the IP load balancer IP address in the <literal>Via</literal>, <literal>Contact</literal> and other system headers where the IP address of the server machine is required. This will ensure that any responses or subsequent SIP requests follow the same path, but always hit the load balancer instead of particular cluster node that may fail.  To specify the IP load balancer address in &SHORT_PLATFORM_NAME; your should edit this file <filename>JBOSS_HOME/server/all/deploy/jboss-web.deployer/server.xml</filename> and specify <literal>staticServerAddress</literal> such as: </para>
+      <para>First you need to remove the SIP load balancers from any configuration in &SHORT_PLATFORM_NAME;. In particular the <literal>balancers</literal> 
+      attribute in <filename>server.xml</filename>.   and edit the jboss.web  engine tag. You should remove the balancers attribute from the Service tag of 
+      jboss.web service. This simply removes the default load balancer from the system and the traffic bypasses the SIP load-balancer. Next you must configure
+       &SHORT_PLATFORM_NAME; to put the IP load balancer IP address in the <literal>Via</literal>, <literal>Contact</literal> and other system headers where 
+       the IP address of the server machine is required. This will ensure that any responses or subsequent SIP requests follow the same path, but always hit 
+       the load balancer instead of particular cluster node that may fail.  To specify the IP load balancer address in &SHORT_PLATFORM_NAME; your should edit
+        this file <filename>JBOSS_HOME/server/all/deploy/jboss-web.deployer/server.xml</filename> and specify <literal>staticServerAddress</literal> such as: </para>
       <programlisting>&lt;Connector port=&quot;5080&quot; 
      ipAddress = &quot;${jboss.bind.address}&quot;
      ...
