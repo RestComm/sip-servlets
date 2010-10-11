@@ -426,8 +426,7 @@ public class SipStandardService extends StandardService implements SipService {
 			
 			if(sipStackProperties.get(TCP_POST_PARSING_THREAD_POOL_SIZE) == null) {
 				sipStackProperties.setProperty(TCP_POST_PARSING_THREAD_POOL_SIZE, "30");
-			}
-			sipStackProperties.setProperty("gov.nist.javax.sip.AUTOMATIC_DIALOG_ERROR_HANDLING", "true");
+			}			
 			
 			String serverHeaderValue = sipStackProperties.getProperty(SERVER_HEADER);
 			if(serverHeaderValue != null) {
