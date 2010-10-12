@@ -1005,6 +1005,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 							sipConnector.isUseStaticAddress()) {
 						optimizeRouteHeaderAddressForInternalRoutingrequest(sipConnector, request, session, sipFactoryImpl, transport);
 					}
+					// Workaround wrong UA stack for Issue 1802 
+					if(viaHeader.getBranch() == null) {
+						final String branch = JainSipUtils.createBranch(sipApplicationSession.getKey().getId(),  sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));			
+						viaHeader.setBranch(branch);
+					}
+					if(logger.isDebugEnabled()) {
+						logger.debug("Sending the ACK request " + request);
+					}
 					session.getSessionCreatingDialog().sendAck(request);
 					session.setRequestsPending(session.getRequestsPending()-1);
 					final Transaction transaction = getTransaction();

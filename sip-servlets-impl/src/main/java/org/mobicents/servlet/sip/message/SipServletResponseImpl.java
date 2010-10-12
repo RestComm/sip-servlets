@@ -196,6 +196,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				logger.debug("dialog to create the ack Request " + dialog);
 			}
 			Request ackRequest = dialog.createAck(cSeqHeader.getSeqNumber());
+			// Workaround wrong UA stack for Issue 1802 
+			ackRequest.removeHeader(ViaHeader.NAME);
 			if(logger.isInfoEnabled()) {
 				logger.info("ackRequest just created " + ackRequest);
 			}
