@@ -148,9 +148,21 @@ public class ResponseDispatcher extends MessageDispatcher {
 			}
 			final String branch = viaHeader.getBranch();
 			String strippedBranchId = branch.substring(BRANCH_MAGIC_COOKIE.length());
-			final String appId = strippedBranchId.substring(0, strippedBranchId.indexOf("_"));			
-			strippedBranchId = strippedBranchId.substring(strippedBranchId.indexOf("_") + 1);
-			final String appNameHashed = strippedBranchId.substring(0, strippedBranchId.indexOf("_"));			
+			int indexOfUnderscore = strippedBranchId.indexOf("_");
+			if(indexOfUnderscore == -1) {
+				throw new DispatcherException("the via header branch " + branch + " for the response is wrong the response does not reuse the one from the original request");
+			}
+			final String appId = strippedBranchId.substring(0, indexOfUnderscore);
+			indexOfUnderscore = strippedBranchId.indexOf("_");			
+			if(indexOfUnderscore == -1) {
+				throw new DispatcherException("the via header branch " + branch + " for the response is wrong the response does not reuse the one from the original request");
+			}
+			strippedBranchId = strippedBranchId.substring(indexOfUnderscore + 1);
+			indexOfUnderscore = strippedBranchId.indexOf("_");
+			if(indexOfUnderscore == -1) {
+				throw new DispatcherException("the via header branch " + branch + " for the response is wrong the response does not reuse the one from the original request");
+			}
+			final String appNameHashed = strippedBranchId.substring(0, indexOfUnderscore);			
 			final String appName = sipApplicationDispatcher.getApplicationNameFromHash(appNameHashed);
 			if(appName == null) {
 				throw new DispatcherException("the via header branch " + branch + " for the response is missing the appname previsouly set by the container");
