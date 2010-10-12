@@ -64,7 +64,13 @@ public class DistributableClick2CallSipServlet
 	protected void doInvite(SipServletRequest req) throws ServletException,
 			IOException {
 		logger.info("Click2Dial don't handle INVITE. Here's the one we got :  " + req.toString());
-		
+		SipSession linkedSession = (SipSession) req.getSession().getAttribute("LinkedSession");
+		SipServletRequest r = linkedSession.createRequest("INVITE");
+		Object content = req.getContent();
+		if(content != null) {
+			r.setContent(content, req.getContentType());
+		}
+		r.send();
 	}
 	
 	@Override
@@ -99,8 +105,8 @@ public class DistributableClick2CallSipServlet
 						+ secondPartyAddress);
 
 				String contentType = resp.getContentType();
-				if (contentType != null && contentType.trim().equals("application/sdp")) {
-					invite.setContent(resp.getContent(), "application/sdp");
+				if (contentType != null) {
+					invite.setContent(resp.getContent(), contentType);
 				}
 
 				session.setAttribute("LinkedSession", invite.getSession());
@@ -123,11 +129,11 @@ public class DistributableClick2CallSipServlet
 					SipServletRequest firstPartyAck = (SipServletRequest) resp
 							.getSession().getAttribute("FirstPartyAck");
 	
-					if (resp.getContentType() != null && resp.getContentType().equals("application/sdp")) {
+					if (resp.getContentType() != null) {
 						firstPartyAck.setContent(resp.getContent(),
-								"application/sdp");
+								resp.getContentType());
 						secondPartyAck.setContent(resp.getSession().getAttribute("FirstPartyContent"),
-								"application/sdp");
+								resp.getContentType());
 					}
 	
 					session.setAttribute("LinkedSession", firstPartyAck.getSession());
