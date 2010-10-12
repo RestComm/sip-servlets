@@ -86,10 +86,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 
 	@Override
 	public void deployApplication() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/simple-sip-servlet/src/main/sipapp",
-				"simple-service-context", 
-				"simple-service"));		
+		
 	}
 
 	public void deployApplication(SipEmbedded sipEmbedded) {
@@ -829,7 +826,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 	 * @throws Exception
 	 */
 	private SipEmbedded setupAndStartTomcat(String serverName, String darConfigurationFile, String specificTomcatBasePath, int sipConnectorPort) throws IOException, Exception {
-		SipEmbedded tomcatServer = new SipEmbedded(serverName, SIP_SERVICE_CLASS_NAME);
+		SipEmbedded tomcatServer = new SipEmbedded(serverName, serviceFullClassName);
 		tomcatServer.setHA(true);
 		tomcatServer.setLoggingFilePath(  
 				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
@@ -839,10 +836,10 @@ public class BasicFailoverTest extends SipServletTestCase {
 				File.separatorChar + "resources" + File.separatorChar);
 		logger.info("Log4j path is : " + tomcatServer.getLoggingFilePath());
 		tomcatServer.setDarConfigurationFilePath(darConfigurationFile);		
-		tomcatServer.initTomcat(specificTomcatBasePath, null);						
-		tomcatServer.addSipConnector(serverName, sipIpAddress, sipConnectorPort, ListeningPoint.UDP);
-		((SipStandardBalancerNodeService)tomcatServer.getSipService()).setBalancers(balancerAddress.getHostAddress());
+		tomcatServer.initTomcat(specificTomcatBasePath, null);								
+		tomcatServer.getSipService().setBalancers(balancerAddress.getHostAddress());
 		tomcatServer.startTomcat();
+		tomcatServer.addSipConnector(serverName, sipIpAddress, sipConnectorPort, ListeningPoint.UDP);
 		return tomcatServer;
 	}
 	
@@ -885,6 +882,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 		properties.setProperty("host", "127.0.0.1");
 		properties.setProperty("internalPort", "" + BALANCER_INTERNAL_PORT);
 		properties.setProperty("externalPort", "" + BALANCER_EXTERNAL_PORT);
+		properties.setProperty("useIpLoadBalancerAddressInViaHeaders", "false");
 		CallIDAffinityBalancerAlgorithm balancerAlgorithm = new CallIDAffinityBalancerAlgorithm();
 		BalancerContext.balancerContext.balancerAlgorithm = balancerAlgorithm;
 		balancerAlgorithm.setProperties(properties);
