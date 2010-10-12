@@ -1349,7 +1349,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 
 	public void setConcurrencyControlMode(ConcurrencyControlMode mode) {
 		this.concurrencyControlMode = mode;
-		if(logger.isInfoEnabled()) {
+		if(concurrencyControlMode != null && logger.isInfoEnabled()) {
 			logger.info("Concurrency Control set to " + concurrencyControlMode.toString() + " for application " + applicationName);
 		}
 	}
