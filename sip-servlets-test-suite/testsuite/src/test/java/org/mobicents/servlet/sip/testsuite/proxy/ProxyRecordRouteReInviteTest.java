@@ -17,11 +17,14 @@
 package org.mobicents.servlet.sip.testsuite.proxy;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.header.Header;
+import javax.sip.header.RouteHeader;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
@@ -161,9 +164,15 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress,null,null, false, new String[] {"Route"}, new String[] {"sip:extra-route@127.0.0.1:5057;lr"}, false);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+		Header rh = senderProtocolObjects.headerFactory.createHeader("Route", "sip:extra-route@127.0.0.1:5057;lr");
+		LinkedList<Header> hh = new LinkedList<Header>();
+		hh.add(rh);
+		Thread.sleep(TIMEOUT/4);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, hh, "udp");
 		Thread.sleep(TIMEOUT/2);
-		assertTrue(receiver.firstRequest.getRequestURI().toString().contains("extra-route"));
+		
+		assertTrue(receiver.getInviteRequest().getRequestURI().toString().contains("extra-route"));
 	}
 
 	public void setupPhones(String transport) throws Exception {
