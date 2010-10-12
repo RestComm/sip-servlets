@@ -422,6 +422,7 @@ public class SipStandardService extends StandardService implements SipService {
 				sipStackProperties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "0");
 				sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
 				sipStackProperties.setProperty(PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");
+				sipStackProperties.setProperty("gov.nist.javax.sip.AUTOMATIC_DIALOG_ERROR_HANDLING", "false");
 			}
 			
 			if(sipStackProperties.get(TCP_POST_PARSING_THREAD_POOL_SIZE) == null) {
