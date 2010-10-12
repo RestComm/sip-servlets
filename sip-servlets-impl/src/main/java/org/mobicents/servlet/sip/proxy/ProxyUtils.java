@@ -69,10 +69,14 @@ public class ProxyUtils {
 				if(logger.isDebugEnabled()){
 					logger.debug("request URI on the request to proxy : " + destination);
 				}
-				//only set the request URI if the request has no Route headers
-				//see RFC3261 16.12
+				// only set the request URI if the request has no Route headers
+				// see RFC3261 16.12
+				// see http://code.google.com/p/mobicents/issues/detail?id=1847
 				Header route = clonedRequest.getHeader("Route");
-				if(route == null)
+				if(route == null || 
+						// it was decided that initial requests
+						// should have their RURI changed to pass TCK testGetAddToPath001
+						originalRequest.isInitial()) 
 				{
 					if(logger.isDebugEnabled()){
 						logger.debug("setting request uri as cloned request has no Route headers: " + destination);
