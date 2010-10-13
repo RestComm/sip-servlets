@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.util.Properties;
 
-import javax.servlet.sip.SipFactory;
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
@@ -34,13 +33,11 @@ import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
-import org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 import org.mobicents.tools.sip.balancer.BalancerContext;
 import org.mobicents.tools.sip.balancer.CallIDAffinityBalancerAlgorithm;
 import org.mobicents.tools.sip.balancer.NodeRegisterImpl;
-import org.mobicents.tools.sip.balancer.RouterImpl;
 import org.mobicents.tools.sip.balancer.SIPBalancerForwarder;
 
 /**
@@ -887,7 +884,6 @@ public class BasicFailoverTest extends SipServletTestCase {
 		BalancerContext.balancerContext.balancerAlgorithm = balancerAlgorithm;
 		balancerAlgorithm.setProperties(properties);
 		reg.startRegistry(2000);
-		RouterImpl.setRegister(reg);
 		BalancerContext.balancerContext.balancerAlgorithm = balancerAlgorithm;
 		fwd=new SIPBalancerForwarder(properties,reg);
 		fwd.start();
