@@ -198,14 +198,14 @@ sleep $HALFSTARTSLEEP
 if [ "x$3" == "xjboss-5" ]; then
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server-jboss-5.sh $config1 $config1.pid $ports1 1 uas-timer
+./auto-start-jboss-server.sh $config1 $config1.pid 1 uas-timer
 
 sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh uas-timer result.txt
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server-jboss-5.sh $config1 $config1.pid $ports1 1 uas-sas-timer
+./auto-start-jboss-server.sh $config1 $config1.pid 1 uas-sas-timer
 
 sleep $HALFSTARTSLEEP
 
