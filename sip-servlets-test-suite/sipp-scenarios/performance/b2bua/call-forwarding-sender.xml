@@ -76,8 +76,9 @@
     ]]>
   </send>
 
-  <recv response="200" crlf="true">
-  </recv>
+  <recv response="200" optional="false"/>
 
+  <pause milliseconds="10000" />
+  
 </scenario>
 
