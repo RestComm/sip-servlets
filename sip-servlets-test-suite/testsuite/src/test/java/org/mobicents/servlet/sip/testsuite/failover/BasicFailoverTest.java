@@ -53,9 +53,7 @@ import org.mobicents.tools.sip.balancer.SIPBalancerForwarder;
  */
 public class BasicFailoverTest extends SipServletTestCase {
 	
-	private static final String SECOND_SERVER_NAME = "SIP-Servlet-Second-Tomcat-Server";
-
-	private static final String SIP_SERVICE_CLASS_NAME = "org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService";
+	private static final String SECOND_SERVER_NAME = "SIP-Servlet-Second-Tomcat-Server";	
 
 	private static transient Logger logger = Logger.getLogger(BasicFailoverTest.class);
 	
@@ -172,8 +170,7 @@ public class BasicFailoverTest extends SipServletTestCase {
 				File.separatorChar + "src" +
 				File.separatorChar + "test" + 
 				File.separatorChar + "resources" + File.separatorChar + "logging.properties");
-		serverName = "SIP-Servlet-First-Tomcat-Server";
-		serviceFullClassName = SIP_SERVICE_CLASS_NAME;
+		serverName = "SIP-Servlet-First-Tomcat-Server";		
 		super.setUp();
 		balancerAddress=InetAddress.getByName("127.0.0.1");				
 	}
