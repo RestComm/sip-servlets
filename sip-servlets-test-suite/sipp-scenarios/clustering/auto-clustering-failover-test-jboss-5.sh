@@ -152,6 +152,20 @@ sleep $HALFSTARTSLEEP
 
 sleep $HALFSTARTSLEEP
 
+./auto-run-test.sh uas-remove-attributes result.txt
+
+#The test killed server 1, so we start it again
+./auto-start-jboss-server-jboss-5.sh $config1 $config1.pid $ports1 1 uas-timer
+
+sleep $HALFSTARTSLEEP
+
+./auto-run-test.sh uas-no-attributes result.txt
+
+#The test killed server 1, so we start it again
+./auto-start-jboss-server-jboss-5.sh $config1 $config1.pid $ports1 1 uas-timer
+
+sleep $HALFSTARTSLEEP
+
 ./auto-run-test.sh uas-timer result.txt
 
 #The test killed server 1, so we start it again
@@ -182,7 +196,7 @@ echo "================================"
 #Wait to boot
 sleep $FULLSTARTSLEEP
 
-./auto-run-test.sh uas result.txt
+./auto-run-test.sh uas-0.0.0.0 result.txt
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat $config1.pid` $config1
