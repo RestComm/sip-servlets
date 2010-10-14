@@ -248,7 +248,7 @@ externalTransport=UDP
 #If a node doesnt check in within that time (in ms), it is considered dead
 nodeTimeout=5100
 #The consistency of the above condition is checked every heartbeatInterval milliseconds
-heartbeatInterval=5000
+heartbeatInterval=150
 
 
 #JSIP stack configuration.....
@@ -352,7 +352,7 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
             <varlistentry>
               <term>heartbeatInterval</term>
               <listitem>
-                <para>In milliseconds. Default value is 5000 milliseonds. The hearbeat interval  must be the same or close to the interval specified  in the   JAIN SIP property on the server machines - <literal>org.mobicents.ha.javax.sip.HEARTBEAT_INTERVAL</literal></para>
+                <para>In milliseconds. Default value is 150 milliseonds. The hearbeat interval  must be much smaller than the interval specified  in the   JAIN SIP property on the server machines - <literal>org.mobicents.ha.javax.sip.HEARTBEAT_INTERVAL</literal></para>
               </listitem>
             </varlistentry>
           </variablelist>
