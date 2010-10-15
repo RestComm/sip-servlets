@@ -1512,8 +1512,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		while(authHeaderIterator.hasNext()) {
 			WWWAuthenticateHeader wwwAuthHeader = 
 				(WWWAuthenticateHeader) authHeaderIterator.next();
-//			String uri = wwwAuthHeader.getParameter("uri");
-			addChallengeResponse(wwwAuthHeader, username, password, this.getRequestURI().toString());
+			// Fix for Issue 1832 : http://code.google.com/p/mobicents/issues/detail?id=1832 
+			// Authorization header is growing when nonce become stale, don't take into account stale headers
+			// in the challenge request
+			String stale = wwwAuthHeader.getParameter(STALE);
+			if(stale == null || stale.equalsIgnoreCase(Boolean.FALSE.toString())) {
+//				String uri = wwwAuthHeader.getParameter("uri");
+				addChallengeResponse(wwwAuthHeader, username, password, this.getRequestURI().toString());
+			}
 		}
 		
 		
@@ -1523,9 +1529,15 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		while(authHeaderIterator.hasNext()) {
 			ProxyAuthenticateHeader wwwAuthHeader = 
 				(ProxyAuthenticateHeader) authHeaderIterator.next();
-			String uri = wwwAuthHeader.getParameter("uri");
-			if(uri == null) uri = this.getRequestURI().toString();
-			addChallengeResponse(wwwAuthHeader, username, password, uri);
+			// Fix for Issue 1832 : http://code.google.com/p/mobicents/issues/detail?id=1832 
+			// Authorization header is growing when nonce become stale, don't take into account stale headers
+			// in the challenge request
+			String stale = wwwAuthHeader.getParameter(STALE);
+			if(stale == null || stale.equalsIgnoreCase(Boolean.FALSE.toString())) {
+				String uri = wwwAuthHeader.getParameter("uri");
+				if(uri == null) uri = this.getRequestURI().toString();
+				addChallengeResponse(wwwAuthHeader, username, password, uri);
+			}
 		}
 	}
 	
