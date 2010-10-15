@@ -49,7 +49,7 @@
 	<property name="embjopr.war" value="admin-console.war" />
 	<property name="embjopr.home" value="${release.path}/${embjopr.war}" />
 	<property name="embjopr.home.contents" value="${release.path}/embedded-jopr.war-contents" />
-	<property name="mss.jopr-plugin-5.version" value="1.5.1"/>
+	<property name="mss.jopr-plugin-5.version" value="1.6"/>
 	<property name="mss.jopr-plugin-5.url" value="https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/jopr-mobicents-sip-servlets-as-5-plugin/${mss.jopr-plugin-5.version}/jopr-mobicents-sip-servlets-as-5-plugin-${mss.jopr-plugin-5.version}.jar"/>
 	<property name="jopr-jmx-plugin-5.url" value="https://repository.jboss.org/nexus/content/groups/public/org/rhq/rhq-jmx-plugin/1.2.0.GA/rhq-jmx-plugin-1.2.0.GA.jar"/>
 	
