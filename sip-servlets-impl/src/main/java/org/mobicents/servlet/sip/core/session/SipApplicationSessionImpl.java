@@ -370,7 +370,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 
 	
-	private void setLastAccessedTime(long lastAccessTime) {
+	protected void setLastAccessedTime(long lastAccessTime) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("lastAccessedTime set to "+ lastAccessTime);
 		}

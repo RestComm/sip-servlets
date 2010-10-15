@@ -81,6 +81,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	protected static final String IS_VALID = "iv";
 	protected static final String INVALIDATION_POLICY = "ip";	
 	protected static final String CREATION_TIME = "ct";
+	protected static final String SIP_APPLICATION_SESSION_TIMEOUT = "sast";
 	
 	protected static final boolean ACTIVITY_CHECK = 
 	      Globals.STRICT_SERVLET_COMPLIANCE
@@ -121,7 +122,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	 * The string manager for this package.
 	 */
 	protected static final StringManager sm = StringManager
-			.getManager(ClusteredSession.class.getPackage().getName());
+			.getManager(ClusteredSession.class.getPackage().getName());	
 
 	// ----------------------------------------------------- Instance Variables
 
@@ -663,10 +664,20 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		this.version.set(sessionData.getVersion());
 
 		long ts = sessionData.getTimestamp();
-		this.lastAccessedTime = this.thisAccessedTime = ts;
-		this.timestamp.set(ts);
+		this.thisAccessedTime = ts;
 
 		DistributableSipApplicationSessionMetadata md = (DistributableSipApplicationSessionMetadata)sessionData.getMetadata();
+		// Fix for Issue 1974 When app call setExpires, it is not propagated to the failover node
+		Long sasTimeout = (Long) md.getMetaData().get(SIP_APPLICATION_SESSION_TIMEOUT);
+		if(sasTimeout != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("setExpires was previously called with the following value " + sasTimeout + " so setting sipApplicationSessionTimeout to its value");
+			}
+			sipApplicationSessionTimeout = sasTimeout;
+		}
+		setLastAccessedTime(ts);
+		this.timestamp.set(ts);
+		
 		// TODO -- get rid of these field and delegate to metadata
 		this.creationTime = md.getCreationTime();
 		this.maxInactiveInterval = md.getMaxInactiveInterval();
@@ -1349,7 +1360,15 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		super.setValid(isValid);
 		sessionMetadataDirty();
 		metadata.getMetaData().put(IS_VALID, isValid);
-	}			
+	}		
+	
+	@Override
+	public int setExpires(int deltaMinutes) {		
+		int expires = super.setExpires(deltaMinutes);
+		sessionMetadataDirty();
+		metadata.getMetaData().put(SIP_APPLICATION_SESSION_TIMEOUT, sipApplicationSessionTimeout);
+		return expires;
+	}
 	
 	@Override
 	public boolean addSipSession(MobicentsSipSession mobicentsSipSession) {
