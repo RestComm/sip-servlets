@@ -1,3 +1,4 @@
+export JAVA_OPTS="-server -Xms2548m -Xmx2548m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode"
 if [ "0" = $3 ]; then
   echo "Port configuration is 0. Using default command. No need for hacks."
   $JBOSS_HOME/bin/run.sh -Djboss.server.log.threshold=DEBUG -c $1 &> "jboss-$1-$4.out"&
