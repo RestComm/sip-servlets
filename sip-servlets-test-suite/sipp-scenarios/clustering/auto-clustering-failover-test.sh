@@ -226,7 +226,7 @@ sleep $HALFSTARTSLEEP
 ./auto-run-test.sh uas-sas-timer result.txt
 
 #End JBoss5-specific
-fi
+#fi
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat $config2.pid` $config2
