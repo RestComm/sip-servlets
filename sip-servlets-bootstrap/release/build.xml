@@ -300,6 +300,7 @@
 		<copy file="${base.path}/war-deployers-jboss-beans.xml" overwrite="true" tofile="${mss.home}/server/${jboss.config}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml" />
 		<copy file="${base.path}/profileservice-jboss-beans.xml" overwrite="true" tofile="${mss.home}/server/${jboss.config}/deploy/profileservice-jboss-beans.xml" />
 		<copy file="${base.path}/context-jboss-5.xml" overwrite="true" tofile="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/context.xml" />
+		<copy file="${base.path}/jboss-5-log4j.xml" overwrite="true" tofile="${mss.home}/server/${jboss.config}/conf/jboss-log4j.xml" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
 			<arg line="clean buildnumber:create install -U -P set-svn-revision,jboss-5-distro,docs -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
