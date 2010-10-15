@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
 import org.jboss.mobicents.seam.actions.OrderManager;
 import org.jboss.mobicents.seam.listeners.DTMFListener;
 import org.jboss.mobicents.seam.listeners.MediaConnectionListener;
+import org.jboss.mobicents.seam.util.DTMFUtils;
 import org.jboss.mobicents.seam.util.MMSUtil;
 
 /**
@@ -411,4 +412,40 @@ public class ShoppingSipServlet
 			logger.error("An unexpected exception occured while creating the request for delivery date", e);
 		}
 	}
+	
+	@Override
+	protected void doInfo(SipServletRequest request) throws ServletException,
+			IOException {
+		//sending OK
+		SipServletResponse ok = request.createResponse(SipServletResponse.SC_OK);
+		ok.send();
+		//Getting the message content
+		String messageContent = new String( (byte[]) request.getContent());
+		logger.info("got INFO request with following content " + messageContent);
+		int signalIndex = messageContent.indexOf("Signal=");
+		
+		//Playing file only if the DTMF session has been started
+		if(DTMFListener.DTMF_SESSION_STARTED == (Integer) request.getSession().getAttribute("DTMFSession")) {
+			logger.info("DTMF session in started state, parsing message content");
+			if(messageContent != null && messageContent.length() > 0 && signalIndex != -1) {
+				String signal = messageContent.substring("Signal=".length(),"Signal=".length()+1).trim();
+				String pathToAudioDirectory = (String)getServletContext().getAttribute("audioFilePath");
+				logger.info("Signal received " + signal );													
+				
+				if(request.getSession().getAttribute("orderApproval") != null) {
+					if(request.getSession().getAttribute("adminApproval") != null) {
+						logger.info("customer approval in progress.");
+						DTMFUtils.adminApproval(request.getSession(), signal, pathToAudioDirectory);
+					} else {
+						logger.info("customer approval in progress.");
+						DTMFUtils.orderApproval(request.getSession(), signal, pathToAudioDirectory);
+					}
+				} else if(request.getSession().getAttribute("deliveryDate") != null) {
+					DTMFUtils.updateDeliveryDate(request.getSession(), signal);
+				} 
+			}
+		} else {
+			logger.info("DTMF session in stopped state, not parsing message content");
+		}
+	}	
 }

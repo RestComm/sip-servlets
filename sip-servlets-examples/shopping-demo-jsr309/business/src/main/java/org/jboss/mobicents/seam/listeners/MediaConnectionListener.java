@@ -44,13 +44,13 @@ public class MediaConnectionListener implements MediaEventListener<SdpPortManage
 
 				mg.getPlayer().play(uri, null, null);
 				mg.getSignalDetector().receiveSignals(1, null, null, null);
-
-				logger.info("Waiting for DTMF at the same time..");
+				sipSession.setAttribute("DTMFSession", DTMFListener.DTMF_SESSION_STARTED);
+				logger.info("Waiting for DTMF at the same time..");				
 			} else if (sipSession.getAttribute("deliveryDate") != null) {			
 				logger.info("Playing Delivery Date Announcement : " + uri);
 				mg.getPlayer().play(uri, null, null);
 				mg.getSignalDetector().receiveSignals(1, null, null, null);
-
+				sipSession.setAttribute("DTMFSession", DTMFListener.DTMF_SESSION_STARTED);
 				logger.info("Waiting for DTMF at the same time..");
 			} else if (sipSession.getAttribute("shipping") != null) {			
 				logger.info("Playing shipping announcement : " + uri);
