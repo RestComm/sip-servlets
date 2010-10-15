@@ -247,6 +247,8 @@ echo "================================"
 
 #Wait to boot
 sleep $FULLSTARTSLEEP
+#takes a bit more time to boot on 0.0.0.0
+sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh uas-0.0.0.0 result.txt
 
