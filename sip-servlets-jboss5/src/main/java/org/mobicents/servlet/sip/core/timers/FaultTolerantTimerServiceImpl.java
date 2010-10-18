@@ -176,13 +176,13 @@ public class FaultTolerantTimerServiceImpl implements SipServletTimerService {
 	}
 	
 	public void stop() {
-		started.set(false);
-		if(logger.isInfoEnabled()) {
-			logger.info("Sip Servlet Timer Tasks remaining in the FaultTolerantScheduler " + 
-					scheduledExecutor.getLocalRunningTasks().size() + " for application " + 
-					((SipContext)sipManager.getContainer()).getApplicationName());
-		}
+		started.set(false);		
 		if(scheduledExecutor != null) {
+			if(logger.isInfoEnabled()) {
+				logger.info("Sip Servlet Timer Tasks remaining in the FaultTolerantScheduler " + 
+						scheduledExecutor.getLocalRunningTasks().size() + " for application " + 
+						((SipContext)sipManager.getContainer()).getApplicationName());
+			}
 			scheduledExecutor.stop();		
 		}		
 		if(logger.isInfoEnabled()) {
