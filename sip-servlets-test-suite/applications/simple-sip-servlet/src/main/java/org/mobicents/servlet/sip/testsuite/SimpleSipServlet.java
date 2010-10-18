@@ -22,6 +22,8 @@ import java.io.Serializable;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContextEvent;
+import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.AuthInfo;
@@ -762,15 +764,11 @@ public class SimpleSipServlet
 		}
 	}
 
-
-
 	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
 		if(ev.getApplicationSession().getAttribute(TEST_ERROR_RESPONSE) != null) {
 			sendMessage(sipFactory.createApplicationSession(), sipFactory, "sipAppSessionReadyToInvalidate", null);
 		}
 	}
-
-
 
 	public void servletInitialized(SipServletContextEvent ce) {
 		String byeDelayString = getServletContext().getInitParameter("byeDelay");

@@ -24,7 +24,7 @@
 	<listener>
 		<listener-class>
 			org.mobicents.servlet.sip.testsuite.ShootmeSipServletAuth
-		</listener-class>
+		</listener-class>		
 	</listener>
 	
 	<security-constraint>

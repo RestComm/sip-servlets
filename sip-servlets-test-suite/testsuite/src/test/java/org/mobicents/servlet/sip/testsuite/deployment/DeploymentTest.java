@@ -19,8 +19,13 @@ package org.mobicents.servlet.sip.testsuite.deployment;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
+import org.apache.catalina.deploy.ApplicationParameter;
+import org.apache.catalina.realm.MemoryRealm;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.startup.SipContextConfig;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 /**
@@ -64,6 +69,31 @@ public class DeploymentTest extends SipServletTestCase {
 		assertTrue(tomcat.deployContext(
 			projectHome + "/sip-servlets-test-suite/applications/simple-sip-servlet/src/main/sipapp",
 			"sip-test-context", webContextName));
+	}
+	
+	public void deployShootmeAuthApplication(String webContextName) {
+		if(webContextName == null) {
+			webContextName = "sip-auth-test";
+		}
+		SipStandardContext context = new SipStandardContext();
+		context
+				.setDocBase(projectHome
+						+ "/sip-servlets-test-suite/applications/shootme-sip-servlet-auth/src/main/sipapp");
+		context.setName("sip-test-context");
+		context.setPath(webContextName);
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		ApplicationParameter applicationParameter = new ApplicationParameter();
+		applicationParameter.setName("testContextApplicationParameter");
+		applicationParameter.setValue("OK");
+		context.addApplicationParameter(applicationParameter);
+		MemoryRealm realm = new MemoryRealm();
+		realm
+				.setPathname(projectHome
+						+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
+						+ "org/mobicents/servlet/sip/testsuite/security/tomcat-users.xml");
+		context.setRealm(realm);
+		assertTrue(tomcat.deployContext(context));
 	}
 	
 	@Override
@@ -170,6 +200,13 @@ public class DeploymentTest extends SipServletTestCase {
 		} catch (IllegalStateException e) {
 			logger.info(e.getMessage());
 		}
+	}
+	
+	public void testDeployServletContextDestroyed() throws Exception {
+		tomcat.startTomcat();
+		deployShootmeApplication(null);
+		deployShootmeAuthApplication(null);
+		tomcat.stopTomcat();
 	}
 
 	@Override

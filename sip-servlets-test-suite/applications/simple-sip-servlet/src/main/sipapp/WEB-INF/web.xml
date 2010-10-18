@@ -5,4 +5,9 @@
 	<display-name>Simple Sip Servlet</display-name>
 	<description>Simple Sip Servlet</description>
 		
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.testsuite.SimpleSipServletContextListener
+		</listener-class>
+	</listener>
 </web-app>

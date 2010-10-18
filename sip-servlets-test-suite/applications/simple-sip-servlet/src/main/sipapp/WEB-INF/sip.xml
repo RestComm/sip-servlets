@@ -22,6 +22,6 @@
 	<listener>
 		<listener-class>
 			org.mobicents.servlet.sip.testsuite.SimpleSipServlet
-		</listener-class>
+		</listener-class>		
 	</listener>
 </sip-app>
