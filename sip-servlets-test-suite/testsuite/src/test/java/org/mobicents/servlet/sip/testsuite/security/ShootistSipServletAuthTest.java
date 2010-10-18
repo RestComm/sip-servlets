@@ -120,12 +120,7 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		receiver.setChallengeRequests(true);
-		receiver.setMultipleChallengeInResponse(true);
-		List<Integer> provisionalResponsesToSend = new ArrayList<Integer>();
-		provisionalResponsesToSend.add(Response.TRYING);
-		provisionalResponsesToSend.add(Response.SESSION_PROGRESS);		
-		receiver.setProvisionalResponsesToSend(provisionalResponsesToSend);
-		receiver.setTimeToWaitBetweenProvisionnalResponse(TIME_TO_WAIT_BETWEEN_PROV_RESPONSES);
+//		receiver.setMultipleChallengeInResponse(true);		
 		SipProvider senderProvider = receiver.createProvider();			
 		
 		senderProvider.addSipListener(receiver);
@@ -133,17 +128,15 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 		receiverProtocolObjects.start();		
 		
 		tomcat.startTomcat();
-		deployApplication();
+		deployApplication("METHOD", "REGISTER");
 		Thread.sleep(TIMEOUT);
-		assertTrue(receiver.isAckReceived());
-		assertTrue(receiver.getByeReceived());
-		ListIterator<Header>  proxyAuthHeaders = receiver.getInviteRequest().getHeaders(ProxyAuthorizationHeader.NAME);
-		int i= 0; 
+		ListIterator<Header>  proxyAuthHeaders = receiver.getRegisterReceived().getHeaders(ProxyAuthorizationHeader.NAME);
+		int proxyAuthHeaderNumber = 0; 
 		while (proxyAuthHeaders.hasNext()) {
 			proxyAuthHeaders.next();
-			i++;			
+			proxyAuthHeaderNumber++;			
 		}
-		assertEquals("The stale auth header should not be taken into account", 1, i);
+		assertEquals("The stale auth header should not be taken into account", 1, proxyAuthHeaderNumber);
 	}
 	
 	/*

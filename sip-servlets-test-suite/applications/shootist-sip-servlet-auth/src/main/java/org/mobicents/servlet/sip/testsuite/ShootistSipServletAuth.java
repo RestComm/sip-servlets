@@ -116,6 +116,19 @@ public class ShootistSipServletAuth
 				sipServletRequest.send();
 			}
 		}
+		if("REGISTER".equalsIgnoreCase(sipServletResponse.getMethod())) {
+			try {
+				Thread.sleep(4000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			if(!sipServletResponse.getHeader("CSeq").contains("10")) {
+				getServletContext().setAttribute("FirstResponseRecieved", "false");
+				SipServletRequest register = sipServletResponse.getSession().createRequest(sipServletResponse.getMethod());
+				register.send();
+			}
+		}
 	}
 	
 	@Override
@@ -141,6 +154,11 @@ public class ShootistSipServletAuth
 	 */
 	public void servletInitialized(SipServletContextEvent ce) {
 		SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);
+		String method = ce.getServletContext().getInitParameter("METHOD");
+		if(method == null) {
+			method = "INVITE";
+		}
+		
 		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 		String from = ce.getServletContext().getInitParameter("from");
 		if(from == null) {
@@ -149,7 +167,7 @@ public class ShootistSipServletAuth
 		SipURI fromURI = sipFactory.createSipURI(from, "here.com");			
 		SipURI toURI = sipFactory.createSipURI("LittleGuy", "there.com");
 		SipServletRequest sipServletRequest = 
-			sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);
+			sipFactory.createRequest(sipApplicationSession, method, fromURI, toURI);
 		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
 		sipServletRequest.setRequestURI(requestURI);
 		try {			

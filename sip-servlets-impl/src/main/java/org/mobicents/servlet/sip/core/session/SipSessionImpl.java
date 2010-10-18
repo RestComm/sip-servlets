@@ -536,45 +536,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 			}
 		}
 		
-		removeStaleAuthHeaders(request);
-		
 		return sipServletRequest;
 	}
 
-	/*
-	 * Fix for Issue 1832 : http://code.google.com/p/mobicents/issues/detail?id=1832
-	 * Authorization header is growing when nonce become stale, don't take into account stale headers
-	 * in the subsequent request
-	 */
-	protected void removeStaleAuthHeaders(Request request) {
-		ListIterator authHeaderIterator = 
-			request.getHeaders(WWWAuthenticateHeader.NAME);
-		if(authHeaderIterator.hasNext()) {
-			request.removeHeader(WWWAuthenticateHeader.NAME);
-			while(authHeaderIterator.hasNext()) {
-				WWWAuthenticateHeader wwwAuthHeader = 
-					(WWWAuthenticateHeader) authHeaderIterator.next();
-				String stale = wwwAuthHeader.getParameter(SipServletRequestImpl.STALE);
-				if(stale == null || stale.equalsIgnoreCase(Boolean.FALSE.toString())) {
-					request.addHeader(wwwAuthHeader);
-				}
-			}
-		}
-		
-		authHeaderIterator = 
-			request.getHeaders(ProxyAuthenticateHeader.NAME);
-		if(authHeaderIterator.hasNext()) {
-			request.removeHeader(ProxyAuthenticateHeader.NAME);
-			while(authHeaderIterator.hasNext()) {
-				ProxyAuthenticateHeader proxyAuthHeader = 
-					(ProxyAuthenticateHeader) authHeaderIterator.next();				
-				String stale = proxyAuthHeader.getParameter(SipServletRequestImpl.STALE);
-				if(stale == null || stale.equalsIgnoreCase(Boolean.FALSE.toString())) {
-					request.addHeader(proxyAuthHeader);
-				}
-			}	
-		}
-	}
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipSession#getApplicationSession()

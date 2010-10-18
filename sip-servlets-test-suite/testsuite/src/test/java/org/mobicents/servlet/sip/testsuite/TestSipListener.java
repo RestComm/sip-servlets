@@ -27,6 +27,7 @@ import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -864,6 +865,7 @@ public class TestSipListener implements SipListener {
         	ServerTransaction serverTransaction = serverTransactionId == null? sipProvider.getNewServerTransaction(request) : serverTransactionId;
         	
         	System.out.println("challenge Requests ? " +  challengeRequests);
+        	lastRegisterCSeqNumber = ((CSeqHeader)request.getHeader("CSeq")).getSeqNumber();
         	if(challengeRequests) {
 				// Verify AUTHORIZATION !!!!!!!!!!!!!!!!
 		        dsam = new DigestServerAuthenticationMethod();
@@ -877,7 +879,7 @@ public class TestSipListener implements SipListener {
 		            proxyAuthenticate.setParameter("nonce",dsam.generateNonce());
 		            //proxyAuthenticateImpl.setParameter("domain",authenticationMethod.getDomain());
 		            proxyAuthenticate.setParameter("opaque","");
-		            proxyAuthenticate.setParameter("stale","FALSE");
+		            
 		            proxyAuthenticate.setParameter("algorithm",dsam.getAlgorithm());
 		            responseauth.setHeader(proxyAuthenticate);
 		            // alexander kozlov : Adding the to tag to 407 as well 
@@ -893,9 +895,49 @@ public class TestSipListener implements SipListener {
 		
 		            System.out.println("RequestValidation: 407 PROXY_AUTHENTICATION_REQUIRED replied:\n"+responseauth.toString());
 		            return;
-		        }		        
-			}        	
-        	lastRegisterCSeqNumber = ((CSeqHeader)request.getHeader("CSeq")).getSeqNumber();
+		        } else if(lastRegisterCSeqNumber > 2 && lastRegisterCSeqNumber % 2 == 1) {
+		        	Response responseauth = protocolObjects.messageFactory.createResponse(Response.PROXY_AUTHENTICATION_REQUIRED,request);
+		     		
+//		        	ListIterator<Header> proxyAuthHeaders = request.getHeaders(ProxyAuthorizationHeader.NAME);
+//		        	while (proxyAuthHeaders.hasNext()) {
+//		        		ProxyAuthorizationHeader header = (ProxyAuthorizationHeader) proxyAuthHeaders.next();
+//		        		ProxyAuthenticateHeader proxyAuthenticate = 
+//			            	protocolObjects.headerFactory.createProxyAuthenticateHeader(dsam.getScheme());
+//		        		proxyAuthenticate.setAlgorithm(header.getAlgorithm());		        		
+//		        		proxyAuthenticate.setNonce(header.getNonce());
+//		        		proxyAuthenticate.setRealm(header.getRealm());
+//		        		proxyAuthenticate.setParameter("username", header.getParameter("username"));
+//		        		proxyAuthenticate.setParameter("uri", header.getParameter("uri"));
+//		        		proxyAuthenticate.setParameter("response", header.getParameter("response"));
+//		        		proxyAuthenticate.setStale(false);
+//						logger.debug("Adding auth header to challenge response " + proxyAuthenticate); 
+//						responseauth.addLast(proxyAuthenticate);
+//					}
+//		        	
+		            ProxyAuthenticateHeader proxyAuthenticate = 
+		            	protocolObjects.headerFactory.createProxyAuthenticateHeader(dsam.getScheme());
+		            proxyAuthenticate.setParameter("realm",dsam.getRealm(null));
+		            proxyAuthenticate.setParameter("nonce",dsam.generateNonce());
+		            //proxyAuthenticateImpl.setParameter("domain",authenticationMethod.getDomain());
+		            proxyAuthenticate.setParameter("opaque","");
+		            proxyAuthenticate.setStale(true);
+		            
+		            proxyAuthenticate.setParameter("algorithm",dsam.getAlgorithm());
+		            responseauth.addHeader(proxyAuthenticate);
+		            // alexander kozlov : Adding the to tag to 407 as well 
+		            ToHeader toHeader = (ToHeader) responseauth.getHeader(ToHeader.NAME);
+					if (toHeader.getTag() == null) {
+						toHeader.setTag(Integer.toString(new Random().nextInt(10000000)));
+					}
+					
+		            if (serverTransaction!=null)
+		                serverTransaction.sendResponse(responseauth);
+		            else 
+		                sipProvider.sendResponse(responseauth);
+		
+		            System.out.println("RequestValidation: 407 PROXY_AUTHENTICATION_REQUIRED replied:\n"+responseauth.toString());
+	        	}
+			}        	        	
             
 			Response okResponse = protocolObjects.messageFactory.createResponse(
 					Response.OK, request);			

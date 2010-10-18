@@ -68,8 +68,10 @@ import javax.sip.address.TelURL;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.FromHeader;
+import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.ProxyAuthenticateHeader;
+import javax.sip.header.ProxyAuthorizationHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SubscriptionStateHeader;
@@ -1453,19 +1455,17 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			// Fix for Issue 1832 : http://code.google.com/p/mobicents/issues/detail?id=1832 
 			// Authorization header is growing when nonce become stale, don't take into account stale headers
 			// in the challenge request
-			String stale = wwwAuthHeader.getParameter(STALE);
-			if(stale == null || stale.equalsIgnoreCase(Boolean.FALSE.toString())) {
-//				String uri = wwwAuthHeader.getParameter("uri");
-				AuthInfoEntry authInfoEntry = authInfoImpl.getAuthInfo(wwwAuthHeader.getRealm());
-				
-				if(authInfoEntry == null) throw new SecurityException(
-						"Cannot add authorization header. No credentials for the following realm: " + wwwAuthHeader.getRealm());
-				
-				addChallengeResponse(wwwAuthHeader,
-						authInfoEntry.getUserName(),
-						authInfoEntry.getPassword(),
-						this.getRequestURI().toString());
-			}
+			removeStaleAuthHeaders(wwwAuthHeader);
+//			String uri = wwwAuthHeader.getParameter("uri");
+			AuthInfoEntry authInfoEntry = authInfoImpl.getAuthInfo(wwwAuthHeader.getRealm());
+			
+			if(authInfoEntry == null) throw new SecurityException(
+					"Cannot add authorization header. No credentials for the following realm: " + wwwAuthHeader.getRealm());
+			
+			addChallengeResponse(wwwAuthHeader,
+					authInfoEntry.getUserName(),
+					authInfoEntry.getPassword(),
+					this.getRequestURI().toString());
 		}
 		
 		// Now check for Proxy-Authentication
@@ -1474,22 +1474,20 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		while(authHeaderIterator.hasNext()) {
 			ProxyAuthenticateHeader proxyAuthHeader = 
 				(ProxyAuthenticateHeader) authHeaderIterator.next();
-			String stale = proxyAuthHeader.getParameter(STALE);
 			// Fix for Issue 1832 : http://code.google.com/p/mobicents/issues/detail?id=1832 
 			// Authorization header is growing when nonce become stale, don't take into account stale headers
 			// in the challenge request
-			if(stale == null || stale.equalsIgnoreCase(Boolean.FALSE.toString())) {
-//				String uri = wwwAuthHeader.getParameter("uri");
-				AuthInfoEntry authInfoEntry = authInfoImpl.getAuthInfo(proxyAuthHeader.getRealm());
-				
-				if(authInfoEntry == null) throw new SecurityException(
-						"No credentials for the following realm: " + proxyAuthHeader.getRealm());
-				
-				addChallengeResponse(proxyAuthHeader,
-						authInfoEntry.getUserName(),
-						authInfoEntry.getPassword(),
-						this.getRequestURI().toString());
-			}
+			removeStaleAuthHeaders(proxyAuthHeader);
+//			String uri = wwwAuthHeader.getParameter("uri");
+			AuthInfoEntry authInfoEntry = authInfoImpl.getAuthInfo(proxyAuthHeader.getRealm());
+			
+			if(authInfoEntry == null) throw new SecurityException(
+					"No credentials for the following realm: " + proxyAuthHeader.getRealm());
+			
+			addChallengeResponse(proxyAuthHeader,
+					authInfoEntry.getUserName(),
+					authInfoEntry.getPassword(),
+					this.getRequestURI().toString());
 		}
 		
 	}
@@ -1505,7 +1503,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			(SipServletResponseImpl) challengeResponse;
 		
 		Response response = (Response) challengeResponseImpl.getMessage();
-		ListIterator authHeaderIterator = 
+		ListIterator<Header> authHeaderIterator = 
 			response.getHeaders(WWWAuthenticateHeader.NAME);
 		
 		// First
@@ -1515,11 +1513,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			// Fix for Issue 1832 : http://code.google.com/p/mobicents/issues/detail?id=1832 
 			// Authorization header is growing when nonce become stale, don't take into account stale headers
 			// in the challenge request
-			String stale = wwwAuthHeader.getParameter(STALE);
-			if(stale == null || stale.equalsIgnoreCase(Boolean.FALSE.toString())) {
-//				String uri = wwwAuthHeader.getParameter("uri");
-				addChallengeResponse(wwwAuthHeader, username, password, this.getRequestURI().toString());
-			}
+			removeStaleAuthHeaders(wwwAuthHeader);
+//			String uri = wwwAuthHeader.getParameter("uri");
+			addChallengeResponse(wwwAuthHeader, username, password, this.getRequestURI().toString());
 		}
 		
 		
@@ -1532,14 +1528,60 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			// Fix for Issue 1832 : http://code.google.com/p/mobicents/issues/detail?id=1832 
 			// Authorization header is growing when nonce become stale, don't take into account stale headers
 			// in the challenge request
-			String stale = proxyAuthHeader.getParameter(STALE);
-			if(stale == null || stale.equalsIgnoreCase(Boolean.FALSE.toString())) {
-				String uri = proxyAuthHeader.getParameter("uri");
-				if(uri == null) uri = this.getRequestURI().toString();
-				addChallengeResponse(proxyAuthHeader, username, password, uri);
-			}
+			removeStaleAuthHeaders(proxyAuthHeader);
+			String uri = proxyAuthHeader.getParameter("uri");
+			if(uri == null) uri = this.getRequestURI().toString();
+			addChallengeResponse(proxyAuthHeader, username, password, uri);
 		}
 	}
+	
+	/*
+	 * Fix for Issue 1832 : http://code.google.com/p/mobicents/issues/detail?id=1832
+	 * Authorization header is growing when nonce become stale, don't take into account stale headers
+	 * in the subsequent request
+	 * 
+	 * From RFC 2617 : stale
+     * A flag, indicating that the previous request from the client was
+     * rejected because the nonce value was stale. If stale is TRUE
+     * (case-insensitive), the client may wish to simply retry the request
+     * with a new encrypted response, without reprompting the user for a
+     * new username and password. The server should only set stale to TRUE
+     * if it receives a request for which the nonce is invalid but with a
+     * valid digest for that nonce (indicating that the client knows the
+     * correct username/password). If stale is FALSE, or anything other
+     * than TRUE, or the stale directive is not present, the username
+     * and/or password are invalid, and new values must be obtained.
+	 */
+	protected void removeStaleAuthHeaders(WWWAuthenticateHeader responseAuthHeader) {
+		String realm = responseAuthHeader.getRealm();
+		
+		ListIterator<Header> authHeaderIterator = 
+			message.getHeaders(AuthorizationHeader.NAME);
+		if(authHeaderIterator.hasNext()) {
+			message.removeHeader(AuthorizationHeader.NAME);
+			while(authHeaderIterator.hasNext()) {
+				AuthorizationHeader wwwAuthHeader = 
+					(AuthorizationHeader) authHeaderIterator.next();
+				if(realm != null && !realm.equalsIgnoreCase(wwwAuthHeader.getRealm())) {
+					message.addHeader(wwwAuthHeader);
+				}
+			}
+		}
+		
+		authHeaderIterator = 
+			message.getHeaders(ProxyAuthorizationHeader.NAME);
+		if(authHeaderIterator.hasNext()) {
+			message.removeHeader(ProxyAuthorizationHeader.NAME);
+			while(authHeaderIterator.hasNext()) {
+				ProxyAuthorizationHeader proxyAuthHeader = 
+					(ProxyAuthorizationHeader) authHeaderIterator.next();
+				if(realm != null && !realm.equalsIgnoreCase(proxyAuthHeader.getRealm())) {
+					message.addHeader(proxyAuthHeader);
+				}
+			}	
+		}
+	}
+	
 	
 	private void addChallengeResponse(
 			WWWAuthenticateHeader wwwAuthHeader,
