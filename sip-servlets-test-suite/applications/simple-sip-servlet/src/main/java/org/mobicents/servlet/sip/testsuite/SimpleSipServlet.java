@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.testsuite;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Iterator;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
@@ -731,36 +732,36 @@ public class SimpleSipServlet
 	public void sessionExpired(SipApplicationSessionEvent event) {
 		if(logger.isInfoEnabled()) {
 			logger.info("Distributable Simple Servlet: sip app session " + event.getApplicationSession().getId() + " expired");
-		}
-		if(logger.isInfoEnabled()) {
-			logger.info("Distributable Simple Servlet: timer expired\n");
-		}
-		SipSession sipSession = (SipSession)event.getApplicationSession().getSessions("SIP").next();
-		if(sipSession != null && sipSession.getAttribute(TEST_BYE_ON_EXPIRE)!=null)
-		{
-			if(sipSession != null && sipSession.isValid() && !State.TERMINATED.equals(sipSession.getState())) {
-				try {
-					sipSession.createRequest("BYE").send();
-				} catch (IOException e) {
-					logger.error("An unexpected exception occured while sending the BYE", e);
-				}				
-			}
-		} 
-		if(sipSession != null && sipSession.getAttribute(TEST_EXCEPTION_ON_EXPIRE)!=null) {
-			Integer expirations = (Integer) sipSession.getAttribute("expirations");
-			if(expirations == null) expirations = 1;
-			sipSession.setAttribute("expirations", expirations + 1);
-			if(expirations>1) {
-				logger.fatal("TOO MANY EXPIRATIONS");
-				try {
-					new File("expirationFailure.tmp").createNewFile();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+		}		
+		Iterator<SipSession> sipSessionsIt = (Iterator<SipSession>) event.getApplicationSession().getSessions("SIP");
+		if(sipSessionsIt.hasNext()) {
+			SipSession sipSession = sipSessionsIt.next();
+			if(sipSession != null && sipSession.getAttribute(TEST_BYE_ON_EXPIRE)!=null)
+			{
+				if(sipSession != null && sipSession.isValid() && !State.TERMINATED.equals(sipSession.getState())) {
+					try {
+						sipSession.createRequest("BYE").send();
+					} catch (IOException e) {
+						logger.error("An unexpected exception occured while sending the BYE", e);
+					}				
 				}
+			} 
+			if(sipSession != null && sipSession.getAttribute(TEST_EXCEPTION_ON_EXPIRE)!=null) {
+				Integer expirations = (Integer) sipSession.getAttribute("expirations");
+				if(expirations == null) expirations = 1;
+				sipSession.setAttribute("expirations", expirations + 1);
+				if(expirations>1) {
+					logger.fatal("TOO MANY EXPIRATIONS");
+					try {
+						new File("expirationFailure.tmp").createNewFile();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+				
+				throw new IllegalStateException();
 			}
-			
-			throw new IllegalStateException();
 		}
 	}
 

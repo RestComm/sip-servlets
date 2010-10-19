@@ -120,7 +120,7 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		receiver.setChallengeRequests(true);
-//		receiver.setMultipleChallengeInResponse(true);		
+		receiver.setMultipleChallengeInResponse(true);		
 		SipProvider senderProvider = receiver.createProvider();			
 		
 		senderProvider.addSipListener(receiver);

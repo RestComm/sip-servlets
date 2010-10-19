@@ -895,7 +895,7 @@ public class TestSipListener implements SipListener {
 		
 		            System.out.println("RequestValidation: 407 PROXY_AUTHENTICATION_REQUIRED replied:\n"+responseauth.toString());
 		            return;
-		        } else if(lastRegisterCSeqNumber > 2 && lastRegisterCSeqNumber % 2 == 1) {
+		        } else if(multipleChallengeInResponse && lastRegisterCSeqNumber > 2 && lastRegisterCSeqNumber % 2 == 1) {
 		        	Response responseauth = protocolObjects.messageFactory.createResponse(Response.PROXY_AUTHENTICATION_REQUIRED,request);
 		     		
 //		        	ListIterator<Header> proxyAuthHeaders = request.getHeaders(ProxyAuthorizationHeader.NAME);

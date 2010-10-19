@@ -356,7 +356,9 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);
-		registerReciever.setChallengeRequests(true);		
+		registerReciever.setChallengeRequests(true);
+		registerReciever.setSendBye(false);
+		sender.setSendBye(false);
 		sender.sendSipRequest("INVITE", fromAddress, fromAddress, null, null, false);		
 		Thread.sleep(TIMEOUT_CSEQ_INCREASE);
 		assertTrue(registerReciever.getLastRegisterCSeqNumber() == 4);
