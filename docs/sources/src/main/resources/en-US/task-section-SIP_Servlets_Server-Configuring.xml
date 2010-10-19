@@ -102,7 +102,7 @@ ipAddress="127.0.0.1"
       </varlistentry>
     </variablelist>
     <note>
-      <para>A comprehensive list of implementing classes for the SIP Stack is available from the <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/javax/sip/SipStack.html">Interface Sip Stack page on nist.gov</ulink>.  For a comprehensive list of properties associated with the SIP Stack implementation, refer to <ulink url="http://snad.ncsl.nist.gov/proj/iptel/jain-sip-1.2/javadoc/gov/nist/javax/sip/SipStackImpl.html">Class SipStackImpl page on nist.gov</ulink>.</para>
+      <para>A comprehensive list of implementing classes for the SIP Stack is available from the <ulink url="http://hudson.jboss.org/hudson/job/jain-sip/lastSuccessfulBuild/artifact/javadoc/javax/sip/SipStack.html">Class SipStackImpl page on nist.gov</ulink>.</para>
     </note>
   </section>
   <section id="bsssc-binary-SIP_Servlets_Server-Configuring_Application_Routing">
@@ -137,7 +137,7 @@ ipAddress="127.0.0.1"
       <varlistentry>
         <term>className</term>
         <listitem>
-          <para>This attribute specifies that the servlet container is a <emphasis>converged</emphasis> (i.e. SIP + HTTP) servlet container. This attribute can also be used to handle load-balancing and failover.</para>
+          <para>This attribute specifies that the servlet container is a <emphasis>converged</emphasis> (i.e. SIP + HTTP) servlet container.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
@@ -185,7 +185,10 @@ ipAddress="127.0.0.1"
               <para>gov.nist.javax.sip.REENTRANT_LISTENER=true</para>
             </listitem>
             <listitem>
-              <para>gov.nist.javax.sip.MAX_FORK_TIME_SECONDS=1. If set to a value lower than or equal to 0. Dialog Forking will not be supported by Mobicents Sip Servlets.</para>
+              <para>gov.nist.javax.sip.MAX_FORK_TIME_SECONDS=0. Dialog forking is not enabled by default as it has an impact on memory. If set to a value greater than 0, Dialog Forking will be enabled on Mobicents Sip Servlets.</para>
+            </listitem>            
+            <listitem>
+              <para>gov.nist.javax.sip.AUTOMATIC_DIALOG_ERROR_HANDLING=false. Merged requests Loop Detection is turned off by default</para>
             </listitem>            
           </itemizedlist>
           <para>&PLATFORM_NAME; SIP Servlets also adds its own properties to allow for even more configuration and flexibility :</para>
@@ -216,7 +219,7 @@ ipAddress="127.0.0.1"
         <term>bypassRequestExecutor/bypassResponseExecutor</term>
         <listitem>
           <para>If set to false, the SIP Servlets server uses a ThreadPoolExecutor linked to a LinkedBlockingQueue to dispatch the request/response threads. The container can thus handles two different responses (for example a 180 Ringing and a 200 OK) concurrently, but a race condition can occur where the second response overtakes the first one (200 OK dispatched to the application before the 180 Ringing) on UDP.</para>
-          <para>So those flags are true by default thus using jain sip serializing per transaction to ensure such race conditions don't occur. </para>
+          <para>So those flags are true by default thus using jain sip serializing per transaction to ensure such race conditions don't occur in Mobicents Sip Servlets even though they can still happen on UDP at jain sip level. </para>
         </listitem>
       </varlistentry>
       <varlistentry>
