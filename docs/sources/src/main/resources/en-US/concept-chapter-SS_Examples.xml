@@ -68,15 +68,15 @@
         </row>
         <row>
           <entry>
-            <ulink url="http://www.mobicents.org/media-demo.html">Media</ulink>
+            <ulink url="http://www.mobicents.org/mss-jsr309-demo.html">Media JSR 309 Example</ulink>
           </entry>
-          <entry>Demonstrates how the media playback SIP Servlet can build a media file customized with the name of the user, based on the information in the FROM header. This example is only compatible with JBoss AS. The solution is know to work with Ekiga and linphone SIP soft-phones.</entry>
+          <entry>Demonstrates how the Sip Servlets Application Developers can leverage JSR-309 API which provides to application developers,  multimedia capabilities with a generic media server (MS) abstraction interface This example is only compatible with JBoss AS 5. The solution is know to work with Twinkle and linphone SIP soft-phones.</entry>
         </row>
         <row>
           <entry>
-            <ulink url="http://www.mobicents.org/shopping-demo.html">Shopping</ulink>
+            <ulink url="http://www.mobicents.org/shopping-demo-jsr309.html">Shopping</ulink>
           </entry>
-          <entry>Demonstrates integration with Seam and Java Enterprise Edition (JEE), and Media integration with text to speech (TTS) and dual-tone multi-frequency (DTMF) tones. The demonstration builds on the Converged Demo example, and adds support for the SIP Servlets v1.1 specification.</entry>
+          <entry>Demonstrates integration with Seam and Java Enterprise Edition (JEE), and JSR 309 Media integration with text to speech (TTS) and dual-tone multi-frequency (DTMF) tones. The demonstration builds on the Converged Demo example, and adds support for the SIP Servlets v1.1 specification.</entry>
         </row>
         <row>
           <entry>
@@ -104,9 +104,15 @@
         </row>
         <row>
           <entry>
-            <ulink url="http://www.mobicents.org/conference-demo.html">Conference</ulink>
+            <ulink url="http://www.mobicents.org/mss-diameter_rorf.html">Diameter Ro/Rf IIntegration</ulink>
           </entry>
-          <entry>Demonstrates the capabilities of the Media Server, such as endpoint composition and conferencing, as well as proving that SIP Servlets are capable of working seamlessly with any third-party web framework, without repackaging or modifying the deployment descriptors. The demonstration uses Google&apos;s GWT Ajax framework with server-push updates to provide a desktop-like user interface experience. </entry>
+          <entry>a Diameter Ro/Rf service that performs online call charging</entry>
+        </row>
+        <row>
+          <entry>
+            <ulink url="http://www.mobicents.org/conference-demo-jsr309.html">Conference</ulink>
+          </entry>
+          <entry>Demonstrates the capabilities of the Media Server, such as endpoint composition and conferencing, as well as proving that SIP Servlets are capable of working seamlessly with any third-party web framework, without repackaging or modifying the deployment descriptors. The demonstration uses Google&apos;s GWT Ajax framework with server-push updates to provide a desktop-like user interface experience and JSR 309 for Media Control. </entry>
         </row>
         <row>
           <entry>
@@ -125,6 +131,18 @@
             <ulink url="http://www.mobicents.org/mss-pure-jruby-telco.html">Pure JRuby on Rails Telco</ulink>
           </entry>
           <entry>Builds on the JRuby on Rails SIP Servlets demonstration, but adds the ability to call the application rather that initially interact through the web portal. The application has the ability to set up and tear down the call.</entry>
+        </row>
+        <row>
+          <entry>
+            <ulink url="http://www.mobicents.org/alerting-app.html">Alerting Application</ulink>
+          </entry>
+          <entry>This application was developped so that the JBoss RHQ/Jopr Enterprise Management Solution would be able to notify system administrators when a monitoring alert is fired by Jopr/RHQ.</entry>
+        </row>
+        <row>
+          <entry>
+            <ulink url="http://www.mobicents.org/mss-presence-client-example.html">Alerting Application</ulink>
+          </entry>
+          <entry>A Call Blocking application interoperating with the Mobicents SIP Presence Service to fetch the blocked contacts through XCAP.</entry>
         </row>
       </tbody>
     </tgroup>
