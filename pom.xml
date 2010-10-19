@@ -10,7 +10,7 @@
 	<version>1.4-SNAPSHOT</version>
 	<packaging>pom</packaging>	
 	<name>Mobicents Sip Servlets</name>
-	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
+	<url>http://www.mobicents.org/products_sip_servlets.html</url>
 	<ciManagement>
 		<system>Hudson</system>
 		<url>https://hudson.jboss.org/hudson/job/MobicentsSipServlets/</url>
