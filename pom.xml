@@ -200,9 +200,7 @@
 				<module>sip-servlets-management</module>
 				<module>sip-servlets-examples</module>
 				<module>sip-servlets-test-suite</module>
-				<module>docs</module>
-				<module>jopr-plugin</module>
-				<module>jopr-plugin-as-5</module>
+				<module>docs</module>				
 			</modules>
 			<properties>
 				 <maven.test.skip>true</maven.test.skip>
