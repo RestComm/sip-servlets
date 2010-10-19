@@ -7,7 +7,7 @@
     	</parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-bootstrap</artifactId>
-	<version>1.4-SNAPSHOT</version>
+	<version>1.4.0.FINAL</version>
 	<packaging>pom</packaging>	
 	<name>Mobicents Sip Servlets</name>
 	<url>http://www.mobicents.org/products_sip_servlets.html</url>
@@ -67,9 +67,9 @@
 		</license>
 	</licenses>
 	<scm>
-		<connection>scm:svn:https://mobicents.googlecode.com/svn/trunk/servers/sip-servlets</connection>
-		<developerConnection>scm:svn:https://mobicents.googlecode.com/svn/trunk/servers/sip-servlets</developerConnection>
-		<url>http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets</url>
+		<connection>scm:svn:https://mobicents.googlecode.com/svn/tags/servers/sip-servlets/release-1.4.0.FINAL</connection>
+		<developerConnection>scm:svn:https://mobicents.googlecode.com/svn/tags/servers/sip-servlets/release-1.4.0.FINAL</developerConnection>
+		<url>http://code.google.com/p/mobicents/source/browse/tags/servers/sip-servlets/release-1.4.0.FINAL</url>
 	</scm>
 	<modules>
 		<module>sip-servlets-bootstrap</module>

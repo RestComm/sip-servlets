@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.example</groupId>
 		<artifactId>sip-servlets-examples-parent</artifactId>
-		<version>1.8-SNAPSHOT</version>
+		<version>1.4.0.FINAL</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>org.mobicents.servlet.sip.example</groupId>
 	<artifactId>diameter-ro-rf</artifactId>
 	<packaging>war</packaging>
-	<version>1.8-SNAPSHOT</version>
+	<version>1.4.0.FINAL</version>
 	<name>Diameter Ro/Rf Sip Servlet Example</name>
 	<url>http://www.mobicents.org/mss/diameter_ro_rf.html</url>
 	

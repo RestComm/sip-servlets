@@ -3,13 +3,13 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.example</groupId>
 		<artifactId>sip-servlets-examples-parent</artifactId>
-		<version>1.8-SNAPSHOT</version>
+		<version>1.4.0.FINAL</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<artifactId>media-jsr309-servlet</artifactId>
 	<packaging>war</packaging>
-	<version>1.8-SNAPSHOT</version>
+	<version>1.4.0.FINAL</version>
 	<name>Simple Media JSR309 Servlet Example</name>
 	<url>http://www.mobicents.org/media-demo.html</url>
 	<dependencies>
