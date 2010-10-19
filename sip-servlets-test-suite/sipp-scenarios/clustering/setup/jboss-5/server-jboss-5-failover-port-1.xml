@@ -7,7 +7,7 @@
    <Listener className="org.apache.catalina.core.JasperListener" />
 
    <Service name="jboss.web"
-		className="org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService"
+		className="org.mobicents.servlet.sip.startup.SipStandardService"
   		balancers="127.0.0.1"  
   		sipPathName="org.mobicents.ha"
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
