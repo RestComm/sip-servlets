@@ -74,8 +74,21 @@
 	<listitem>
           <para><emphasis>gov.nist.javax.sip.RECEIVE_UDP_BUFFER_SIZE=65536 and gov.nist.javax.sip.SEND_UDP_BUFFER_SIZE=65536</emphasis>
           </para>
-          <para><emphasis>Default value: 8192</emphasis>. </para>
+          <para><emphasis>Default value: 65536</emphasis>. </para>
           <para>Those properties control the size of the UDP buffer used for SIP messages. Under load, if the buffer capacity is overflown the messages are dropped causing retransmissions, further increasing the load and causing even more retransmissions</para>
+        </listitem>
+        <listitem>
+          <para><emphasis>gov.nist.javax.sip.MAX_MESSAGE_SIZE=65536</emphasis>
+          </para>
+          <para><emphasis>Default value: 65536</emphasis>. </para>
+          <para>This property control the maximum size of content that can be read for a SIP Message on UDP.  Default is 65536. The average UDP message size is quite lower than this so reducing this property will benefit memory usage since a byte buffer of this size is created for every message received</para> 
+          <para>It also defines the maximum size of content that a TCP connection can read. Must be at least 4K. Default is "infinity" -- ie. no limit. This is to prevent DOS attacks launched by writing to a TCP connection until the server chokes.</para>
+        </listitem>
+        <listitem>
+          <para><emphasis>gov.nist.javax.sip.TCP_POST_PARSING_THREAD_POOL_SIZE=30</emphasis>
+          </para>
+          <para><emphasis>Default value: 30</emphasis>. </para>
+          <para>Use 0 or do not set this option to disable it. When using TCP your phones/clients usually connect independently creating their own TCP sockets. Sometimes however SIP devices are allowed to tunnel multiple calls over a single socket. This can also be simulated with SIPP by running "sipp -t t1". In the stack each TCP socket has it's own thread. When all calls are using the same socket they all use a single thread, which leads to severe performance penalty, especially on multi-core machines. This option instructs the SIP stack to use a thread pool and split the CPU load between many threads. The number of the threads is specified in this parameter. The processing is split immediately after the parsing of the message. It cannot be split before the parsing because in TCP the SIP message size is in the Content-Length header of the message and the access to the TCP network stream has to be synchronized. Additionally in TCP the message size can be larger. This causes most of the parsing for all calls to occur in a single thread, which may have impact on the performance in trivial applications using a single socket for all calls. In most applications it doesn't have performance impact. If the phones/clients use separate TCP sockets for each call this option doesn't have much impact, except the slightly increased memory footprint caused by the thread pool. It is recommended to disable this option in this case by setting it 0 or not setting it at all. You can simulate multi-socket mode with "sipp -t t0". With this option also we avoid closing the TCP socket when something fails, because we must keep processing other messages for other calls. Note: This option relies on accurate Content-Length headers in the SIP messages. It cannot recover once a malformed message is processed, because the stream iterator will not be aligned any more. Eventually the connection will be closed.</para>
         </listitem>
       </itemizedlist>
       <para>The full list of JAIN SIP stack properties is available from
