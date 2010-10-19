@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 public class ShootmeSipServletAuthServletContextListener implements
 		ServletContextListener {
 	private static Logger logger = Logger
-			.getLogger(SimpleSipServletContextListener.class);
+			.getLogger(ShootmeSipServletAuthServletContextListener.class);
 
 	public void contextDestroyed(ServletContextEvent event) {
 		logger.info("Context Destroyed !");
