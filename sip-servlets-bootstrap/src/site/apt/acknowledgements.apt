@@ -81,4 +81,8 @@ Mobicents Sip Servlets' Hall Of Fame
 	* Horaci Macias from {{{http://www.avaya.com/}Avaya}} :
 	
 		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1847}Issue 1847}} and contributed a fix for it
+		
+	* Andrew Miller from {{{http://www.telsis.com/}Telsis}} :
+	
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1547}Issue 1547}} and contributed a fix for it
 	
