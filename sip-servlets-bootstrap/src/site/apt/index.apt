@@ -79,7 +79,7 @@ Version 1.4.0.FINAL is out !
 		
 		* {{{http://www.mobicents.org/mms/mms-main.html}Move to Mobicents Media Server 2.0.0.GA}}		
 		
-		* {{{http://code.google.com/p/mobicents/issues/detail?id=1424}Move To Mobicents Diameter 1.3.1} to be able to use HA features}
+		* {{{http://code.google.com/p/mobicents/issues/detail?id=1424}Move To Mobicents Diameter 1.3.1 to be able to use HA features}}
 		
 		* {{{http://code.google.com/p/mobicents/issues/list?can=1&q=label:Version-1.4.00+Component:Sip-Servlets&colspec=ID+Priority+Component+Milestone+Version+Release+Type+Status+Owner+Summary&cells=tiles}45 bug fixes}}
  
