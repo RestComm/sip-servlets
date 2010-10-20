@@ -83,6 +83,33 @@ Version 1.4.0.FINAL is out !
 		
 		* {{{http://code.google.com/p/mobicents/issues/list?can=1&q=label:Version-1.4.00+Component:Sip-Servlets&colspec=ID+Priority+Component+Milestone+Version+Release+Type+Status+Owner+Summary&cells=tiles}45 bug fixes}}
  
+ 	
+ 	Special Thanks to the ever growing community and customers for their contributions, especially to :
+ 		
+ 		* Naoki Nishihara from {{{http://www.oki.com}OKI}} : 	
+		
+			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=1806}Issue 1806}} and contributed a fix for it
+			
+			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=1818}Issue 1818}} and contributed a fix for it
+			
+			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=1853}Issue 1853}} and contributed a fix for it
+			
+			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=1856}Issue 1856}} and contributed a fix for it
+			
+			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=1869}Issue 1869}} and contributed a fix for it
+			
+		* Yukinobu Imai from {{{http://www.oki.com}OKI}} : 
+			
+			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=1805}Issue 1805}} and contributed a fix for it
+			
+		* Horaci Macias from {{{http://www.avaya.com/}Avaya}} :
+		
+			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=1847}Issue 1847}} and contributed a fix for it
+			
+		* Andrew Miller from {{{http://www.telsis.com/}Telsis}} :
+		
+			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=1547}Issue 1547}} and contributed a fix for it
+ 
 	Check the complete Roadmap to see {{{mss-roadmap.html} the feature details and the usual round of bug fixes}} and what's cooking ahead.
 	
 	To get started checkout the {{{http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets//index.html}Mobicents Sip Servlets User Guide}}.  
