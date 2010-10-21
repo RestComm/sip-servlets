@@ -4,7 +4,7 @@
 %BOOK_ENTITIES;
 ]>
 <!-- chapter id nickname: afotsss --><chapter id="afotsss-Advanced_Features_of_the_SIP_Servlets_Server">
-  <title>Advanced Features of the SIP Servlets Server</title>
+  <title>Advanced Features of the SIP Servlets Awesome Server</title>
   <para>The advanced features of &PLATFORM_NAME; SIP Servlets include Concurrency and 
 Congestion Control, Load Balancing with the &PLATFORM_NAME; Load Balancer, and, exclusively for &SHORT_PLATFORM_NAME; for JBoss, clustering and failover support.</para>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_Media_Support.xml"/>
