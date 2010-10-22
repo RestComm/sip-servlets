@@ -199,7 +199,7 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 		
@@ -221,8 +221,18 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toHost);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
-		Thread.sleep(TIMEOUT);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);	
+		Thread.sleep(7000);
+		receiver.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		Thread.sleep(7000);
+		receiver.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		Thread.sleep(7000);
+		receiver.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		Thread.sleep(7000);
+		receiver.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		Thread.sleep(7000);
+		receiver.sendInDialogSipRequest("BYE", null, null, null, null, null);
+		Thread.sleep(7000);
 		assertTrue(receiver.getOkToByeReceived());
 		assertTrue(sender.getByeReceived());		
 	}

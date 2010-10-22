@@ -679,50 +679,57 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 			ProxyUtils.createProxiedResponse(response, proxyBranch);
 		
 
-		if(proxiedResponse.getMessage() == null) {
+		if(proxiedResponse == null || proxiedResponse.getMessage() == null) {
+			if(logger.isDebugEnabled())
+				logger.debug("Response was dropped because getProxyUtils().createProxiedResponse(response, proxyBranch) returned null");
 			return;// drop out of order message
 		}
-		
-		
-		if(originalRequest != null && proxiedResponse.getRequest() != null) {
-			if(logger.isDebugEnabled())
-					logger.debug("Response was dropped because getProxyUtils().createProxiedResponse(response, proxyBranch) returned null");
-			// non retransmission case
-			try {
-				String branch = ((Via)proxiedResponse.getMessage().getHeader(Via.NAME)).getBranch();
-				synchronized(proxyBranch.ongoingTransactions) {
-					for(TransactionRequest tr : proxyBranch.ongoingTransactions) {
 
-						if(tr.branchId.equals(branch)) {
-							((SipServletResponseImpl)proxiedResponse).setTransaction(tr.request.getTransaction());
-							((SipServletResponseImpl)proxiedResponse).setOriginalRequest(tr.request);
-							break;
+		try {
+
+			if(originalRequest != null && proxiedResponse.getRequest() != null) {
+				
+				// non retransmission case
+				try {
+					String branch = ((Via)proxiedResponse.getMessage().getHeader(Via.NAME)).getBranch();
+					synchronized(proxyBranch.ongoingTransactions) {
+						for(TransactionRequest tr : proxyBranch.ongoingTransactions) {
+
+							if(tr.branchId.equals(branch)) {
+								((SipServletResponseImpl)proxiedResponse).setTransaction(tr.request.getTransaction());
+								((SipServletResponseImpl)proxiedResponse).setOriginalRequest(tr.request);
+								break;
+							}
 						}
 					}
+					proxiedResponse.send();
+					if(logger.isDebugEnabled())
+						logger.debug("Sending out proxied final response with existing transaction");
+					proxyBranches.clear();
+					originalRequest = null;
+					bestBranch = null;
+					bestResponse = null;
+				} catch (Exception e) {
+					logger.error("A problem occured while proxying the final response", e);
 				}
-				proxiedResponse.send();
-				if(logger.isDebugEnabled())
-					logger.debug("Sending out proxied final response with existing transaction");
-				proxyBranches.clear();
-				originalRequest = null;
-				bestBranch = null;
-				bestResponse = null;
-			} catch (Exception e) {
-				logger.error("A problem occured while proxying the final response", e);
+			} else {
+				// retransmission case, RFC3261 specifies that the retrans should be proxied statelessly
+				final Message message = proxiedResponse.getMessage();
+				String transport = JainSipUtils.findTransport(message);
+				SipProvider sipProvider = getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(
+						transport, false).getSipProvider();
+				try {
+					if(logger.isDebugEnabled())
+						logger.debug("Sending out proxied final response retransmission " + proxiedResponse);
+					sipProvider.sendResponse((Response)message);
+				} catch (SipException e) {
+					logger.error("A problem occured while proxying the final response retransmission", e);
+				}
 			}
-		} else {
-			// retransmission case, RFC3261 specifies that the retrans should be proxied statelessly
-			final Message message = proxiedResponse.getMessage();
-			String transport = JainSipUtils.findTransport(message);
-			SipProvider sipProvider = getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(
-					transport, false).getSipProvider();
-			try {
-				if(logger.isDebugEnabled())
-					logger.debug("Sending out proxied final response retransmission " + proxiedResponse);
-				sipProvider.sendResponse((Response)message);
-			} catch (SipException e) {
-				logger.error("A problem occured while proxying the final response retransmission", e);
-			}
+		} finally {
+			// This cleanup will eliminate this issues where a retrans leaves unclean branch http://code.google.com/p/mobicents/issues/detail?id=1986
+			bestBranch = null;
+			bestResponse = null;
 		}
 	}		
 

@@ -529,7 +529,8 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 		if(status >= 200 && !recursed)
 		{
 			
-			if(outgoingRequest != null && outgoingRequest.isInitial()) {
+			if(proxy.getFinalBranchForSubsequentRequests() == null ||
+					(outgoingRequest != null && outgoingRequest.isInitial())) {
 				if(logger.isDebugEnabled())
 					logger.debug("Handling final response for initial request");
 				this.proxy.onFinalResponse(this);

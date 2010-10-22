@@ -108,14 +108,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 					if(applicationData.getSipServletMessage() instanceof SipServletRequestImpl) {
 						tmpOriginalRequest = (SipServletRequestImpl)applicationData.getSipServletMessage();
 					}
-					final ProxyBranchImpl proxyBranch = applicationData.getProxyBranch();
-					if(proxyBranch == null && sipServletResponse.isRetransmission()) {
-						if(logger.isDebugEnabled()) {
-							logger.debug("retransmission received for a non proxy application, dropping the response " + response);
-						}
-	//					forwardResponseStatefully(sipServletResponse);
-						return ;
-					}
+					// Retrans drop logic removed from here due to AR case Proxy-B2bua for http://code.google.com/p/mobicents/issues/detail?id=1986
 				} else {
 					// Issue 1468 : Dropping response in case of forked response and max fork time property stack == 0 to
 					// Guard against exceptions that will arise later if we don't drop it since the support for it is not enabled
@@ -200,7 +193,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 				if(tmpSession == null) {
 					sipManager.dumpSipSessions();
 				}
-			}					
+			}	
 			
 			if(tmpSession == null) {
 				if(logger.isDebugEnabled()) {
@@ -208,6 +201,13 @@ public class ResponseDispatcher extends MessageDispatcher {
 				}
 				return ;
 			} else {
+				// This piece of code move here due to Proxy-B2bua case for http://code.google.com/p/mobicents/issues/detail?id=1986
+				if(tmpSession.getProxy() == null && sipServletResponse.isRetransmission()) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("retransmission received for a non proxy application, dropping the response " + response);
+					}
+					return ;
+				}
 				sipServletResponse.setSipSession(tmpSession);					
 			}			
 			
