@@ -81,6 +81,14 @@ public class SipSecurityCollection extends SecurityCollection {
 		return false;
 	}
 	
+	public boolean findMethod(String method) {
+		for(String declaredMethods:sipMethods) {
+			if(method.equals(declaredMethods))
+				return true;
+		}
+		return false;
+	}
+	
 	public String[] findServletNames() {
 		String[] ret = new String[servletNames.size()];
 		servletNames.toArray(ret);
