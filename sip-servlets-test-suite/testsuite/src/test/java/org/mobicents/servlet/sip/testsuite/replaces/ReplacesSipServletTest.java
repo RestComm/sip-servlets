@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.testsuite.replaces;
 
+import gov.nist.javax.sip.header.extensions.ReplacesHeader;
+
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
@@ -136,6 +138,35 @@ public class ReplacesSipServletTest extends SipServletTestCase {
 		assertFalse(receiver.isServerErrorReceived());
 		assertTrue(receiver.getByeReceived());
 		assertTrue(sender.getByeReceived());
+	}
+	
+	/*
+	 * Non regression test for Issue 2048
+	 */
+	public void testSipServletReceivesReplacesNoDialog() throws Exception {		
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		sender.setRecordRoutingProxyTesting(true);
+		SipProvider senderProvider = sender.createProvider();		
+
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+
+		String fromName = "sender";
+		String fromHost = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromHost);
+				
+		String toUser = "replaces-no-dialog";
+		String toHost = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toHost);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {ReplacesHeader.NAME}, new String[] {"YWJiMDVhYWQ5ZmRmNDdmMGZmZjU4MDE0MzY0ODRlZWQ.;from-tag=61190912_4d8055f4_51b2ad2b-94d2-4b51-bfbe-fc8381cf5857;to-tag=243e7a12"}, true);		
+		Thread.sleep(TIMEOUT);				
+		assertTrue(sender.isFinalResponseReceived());
+		assertFalse(sender.isServerErrorReceived());		
+		assertTrue(sender.getOkToByeReceived());
 	}
 	
 	@Override

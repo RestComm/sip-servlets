@@ -50,6 +50,9 @@ public class DispatchReplacesMainSipServlet extends SipServlet {
 		          getServletContext().getNamedDispatcher("ReplacesReceiverSipServlet");
 		      dispatcher.forward(request,null);
 		}
+		if("replaces-no-dialog".equalsIgnoreCase(((SipURI)request.getRequestURI()).getUser())) {
+			request.createResponse(200).send();
+		}
 	}
 	
 	@Override
@@ -70,5 +73,11 @@ public class DispatchReplacesMainSipServlet extends SipServlet {
 		          getServletContext().getNamedDispatcher("ReplacesSenderSipServlet");
 		      dispatcher.forward(null,response);
 		}
+	}
+	
+	@Override
+	protected void doBye(SipServletRequest request) throws ServletException,
+			IOException {
+		request.createResponse(200).send();
 	}
 }
