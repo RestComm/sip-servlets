@@ -87,7 +87,7 @@ public class PAssertedIdentityAuthTest extends SipServletTestCase {
 			super.setUp();
 
 			senderProtocolObjects = new ProtocolObjects("sender", "gov.nist",
-					TRANSPORT, AUTODIALOG, null);
+					TRANSPORT, AUTODIALOG, null, null, null);
 
 			sender = new TestSipListener(5080, 5070, senderProtocolObjects,
 					true);

@@ -103,7 +103,7 @@ public class SessionStateUACSipServletTest extends SipServletTestCase {
 	
 	public void testSessionStateUAC_1xx_4xx() throws Exception {	
 		receiverProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		List<Integer> provisionalResponsesToSend = receiver.getProvisionalResponsesToSend();
@@ -137,7 +137,7 @@ public class SessionStateUACSipServletTest extends SipServletTestCase {
 	 */
 	public void testSessionStateUAC_Subsequent_487() throws Exception {
 		receiverProtocolObjects =new ProtocolObjects(
-				"Subsequent_487", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"Subsequent_487", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		List<Integer> provisionalResponsesToSend = receiver.getProvisionalResponsesToSend();
@@ -185,7 +185,7 @@ public class SessionStateUACSipServletTest extends SipServletTestCase {
 	// Also Tests Issue 1693 http://code.google.com/p/mobicents/issues/detail?id=1693
 	public void testTransactionTimeoutResponse() throws Exception {
 		receiverProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		List<Integer> provisionalResponsesToSend = receiver.getProvisionalResponsesToSend();

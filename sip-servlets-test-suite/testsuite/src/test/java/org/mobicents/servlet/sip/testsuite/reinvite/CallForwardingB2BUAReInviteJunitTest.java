@@ -68,9 +68,9 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		super.setUp();
 
 		senderProtocolObjects = new ProtocolObjects("forward-sender",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);
+				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		receiverProtocolObjects = new ProtocolObjects("receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);
+				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 			
 	}
 	
@@ -179,13 +179,14 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);		
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		receiver.setDisableSequenceNumberValidation(true);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
 		senderProvider.addSipListener(sender);
-
-		senderProtocolObjects.start();
+		
+		senderProtocolObjects.start();		
 		receiverProtocolObjects.start();
 
 		String fromName = "forward-pending-sender";
@@ -202,7 +203,7 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(8000);
 		receiver.sendInDialogSipRequest("UPDATE", null, null, null, null, null);
-		Thread.sleep(5000);
+		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.isAckReceived());			
 	}		
 	

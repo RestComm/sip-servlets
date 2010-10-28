@@ -80,9 +80,9 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 		super.setUp();
 
 		senderProtocolObjects = new ProtocolObjects("sender",
-				"gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5070");
+				"gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5070", null, null);
 		receiverProtocolObjects = new ProtocolObjects("receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);			
+				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);			
 	}
 	
 	public void testSpeedDialCallerSendBye() throws Exception {

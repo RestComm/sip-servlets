@@ -82,7 +82,7 @@ public class MultiHomeUACTest extends SipServletTestCase {
 	public void testShootist() throws Exception {
 //		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		SipProvider senderProvider = receiver.createProvider();			

@@ -119,9 +119,9 @@ public class LocationServiceB2BUAStaticServerAddressTest extends SipServletTestC
 		
 		deployApplication();
 		senderProtocolObjects = new ProtocolObjects("sender",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);
+				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		receiverProtocolObjects = new ProtocolObjects("receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);			
+				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);			
 	}
 	
 	public void testLocationServiceCallForwardingCallerSendBye() throws Exception {	

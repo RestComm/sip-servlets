@@ -79,7 +79,7 @@ public class SameSipSessionB2BUACompositionJunitTest extends SipServletTestCase 
 		super.setUp();
 
 		senderProtocolObjects = new ProtocolObjects(FROM_NAME,
-				"gov.nist", TRANSPORT, AUTODIALOG, null);
+				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 	}
 	
 	public void testSameSipSessionCallerSendBye() throws Exception {

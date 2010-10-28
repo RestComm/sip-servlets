@@ -158,9 +158,9 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 	
 	public void testB2BUASipUnitGenerateResponses() throws Exception {
 		senderProtocolObjects = new ProtocolObjects("generateResponses",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);
+				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		receiverProtocolObjects = new ProtocolObjects("aa",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);								
+				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);								
 		
 		String fromName = "generateResponses";
 		String fromSipAddress = "nist.gov";

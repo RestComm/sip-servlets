@@ -73,7 +73,7 @@ public class ShootmePrackSipServletTest extends SipServletTestCase {
 		super.setUp();						
 		
 		senderProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, "true");
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		senderProvider = sender.createProvider();			
 		senderProvider.addSipListener(sender);
@@ -123,7 +123,7 @@ public class ShootmePrackSipServletTest extends SipServletTestCase {
 		
 		String[] headerNames = new String[]{"require"};
 		String[] headerValues = new String[]{"100rel"};
-		
+				
 		sender.setSendBye(false);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, false);
 		sender.setTimeToWaitBeforeAck(1000);

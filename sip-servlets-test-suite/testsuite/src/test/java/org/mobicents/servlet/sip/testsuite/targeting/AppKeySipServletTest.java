@@ -70,7 +70,7 @@ public class AppKeySipServletTest extends SipServletTestCase {
 		super.setUp();						
 		
 		receiverProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, true);
 		SipProvider senderProvider = receiver.createProvider();			

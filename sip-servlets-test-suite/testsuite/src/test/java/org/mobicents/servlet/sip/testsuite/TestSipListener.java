@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.testsuite;
 
+import gov.nist.javax.sip.DialogExt;
 import gov.nist.javax.sip.address.SipUri;
 import gov.nist.javax.sip.header.HeaderFactoryExt;
 import gov.nist.javax.sip.header.SIPETag;
@@ -27,7 +28,6 @@ import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -286,6 +286,8 @@ public class TestSipListener implements SipListener {
 	
 	public Request firstRequest;
 
+	private boolean disableSequenceNumberValidation = false;
+	
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
 		private EventHeader eventHeader;
@@ -1057,7 +1059,9 @@ public class TestSipListener implements SipListener {
 			}						
 			
 			logger.info("Shootme: dialog = " + dialog);
-			
+			if(dialog != null && disableSequenceNumberValidation) {
+				((DialogExt)dialog).disableSequenceNumberValidation();
+			}
 			this.inviteRequest = request;
 			
 			boolean sendReliably = false;
@@ -2784,6 +2788,21 @@ public class TestSipListener implements SipListener {
 
 	public void setMultipleChallengeInResponse(boolean multipleChallengeInResponse) {
 		this.multipleChallengeInResponse = multipleChallengeInResponse;
+	}
+
+	/**
+	 * @param disableSequenceNumberValidation the disableSequenceNumberValidation to set
+	 */
+	public void setDisableSequenceNumberValidation(
+			boolean disableSequenceNumberValidation) {
+		this.disableSequenceNumberValidation = disableSequenceNumberValidation;
+	}
+
+	/**
+	 * @return the disableSequenceNumberValidation
+	 */
+	public boolean isDisableSequenceNumberValidation() {
+		return disableSequenceNumberValidation;
 	}
 
 }

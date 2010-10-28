@@ -85,7 +85,7 @@ public class SipConnectorTestManagement extends SipServletTestCase {
 		super.setUp();						
 		
 		receiverProtocolObjects =new ProtocolObjects(
-				"receiver", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"receiver", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, true);
 		SipProvider receiverProvider = receiver.createProvider();			
@@ -93,7 +93,7 @@ public class SipConnectorTestManagement extends SipServletTestCase {
 		receiverProtocolObjects.start();
 		
 		receiverTcpProtocolObjects =new ProtocolObjects(
-				"receiverTcp", "gov.nist", ListeningPoint.TCP, AUTODIALOG, null);
+				"receiverTcp", "gov.nist", ListeningPoint.TCP, AUTODIALOG, null, null, null);
 		
 		receiverTcp = new TestSipListener(5081, 5070, receiverTcpProtocolObjects, true);
 		SipProvider receiverTcpProvider = receiverTcp.createProvider();			

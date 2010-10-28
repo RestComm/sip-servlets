@@ -75,9 +75,9 @@ public class LocationServiceB2BUACompositionTest extends SipServletTestCase {
 		super.setUp();
 
 		senderProtocolObjects = new ProtocolObjects("sender",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);
+				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		receiverProtocolObjects = new ProtocolObjects("receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);			
+				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);			
 	}
 	
 	public void testLocationServiceCallForwardingCallerSendBye() throws Exception {		

@@ -91,7 +91,7 @@ public class ReInviteSipServletTest extends SipServletTestCase {
 	
 	public void testReInvite() throws Exception {
 		senderProtocolObjects =new ProtocolObjects(
-				"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();			
@@ -119,7 +119,7 @@ public class ReInviteSipServletTest extends SipServletTestCase {
 	
 	public void testReInviteSending() throws Exception {
 		senderProtocolObjects =new ProtocolObjects(
-				"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();			
@@ -154,7 +154,7 @@ public class ReInviteSipServletTest extends SipServletTestCase {
 	 */
 	public void testReInviteTCPSending() throws Exception {
 		senderProtocolObjects =new ProtocolObjects(
-				"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		sender = new TestSipListener(5081, 5070, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();			
@@ -193,7 +193,7 @@ public class ReInviteSipServletTest extends SipServletTestCase {
 	 */
 	public void testNoAckOnReInvite() throws Exception {
 		senderProtocolObjects =new ProtocolObjects(
-				"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();			

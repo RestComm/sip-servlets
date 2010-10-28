@@ -73,9 +73,9 @@ public class LocationServiceReInviteSipServletTest extends SipServletTestCase {
 		super.setUp();						
 		
 		senderProtocolObjects =new ProtocolObjects(
-				"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null);		
+				"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);		
 		receiverProtocolObjects = new ProtocolObjects("receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);		
+				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);		
 					
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true); 

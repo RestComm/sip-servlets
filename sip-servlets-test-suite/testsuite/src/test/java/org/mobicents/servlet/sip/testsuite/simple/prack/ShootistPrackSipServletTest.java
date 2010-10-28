@@ -98,7 +98,7 @@ public class ShootistPrackSipServletTest extends SipServletTestCase {
 	public void testShootistPrack() throws Exception {
 //		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		SipProvider senderProvider = receiver.createProvider();			
@@ -116,7 +116,7 @@ public class ShootistPrackSipServletTest extends SipServletTestCase {
 	public void testShootistPrackIsAnyLocalAddress() throws Exception {
 //		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		SipProvider senderProvider = receiver.createProvider();			
@@ -137,7 +137,7 @@ public class ShootistPrackSipServletTest extends SipServletTestCase {
 	public void testShootistPrackCancel() throws Exception {
 //		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		SipProvider senderProvider = receiver.createProvider();			
@@ -155,7 +155,7 @@ public class ShootistPrackSipServletTest extends SipServletTestCase {
 	public void testShootistPrackCallerSendsBye() throws Exception {
 //		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, true);
 		SipProvider senderProvider = receiver.createProvider();			

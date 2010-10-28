@@ -84,13 +84,13 @@ public class SessionKeyTargetingSipServletTest extends SipServletTestCase {
 		super.setUp();						
 		
 		sender1Chat1ProtocolObjects =new ProtocolObjects(
-				"sender1Chat1", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender1Chat1", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		sender2Chat1ProtocolObjects =new ProtocolObjects(
-				"sender2Chat1", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender2Chat1", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		sender3Chat1ProtocolObjects =new ProtocolObjects(
-				"sender3Chat1", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender3Chat1", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		sender1Chat2ProtocolObjects =new ProtocolObjects(
-				"sender1Chat2", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender1Chat2", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		sender1Chat1 = new TestSipListener(5071, CONTAINER_PORT, sender1Chat1ProtocolObjects, false);
 		SipProvider senderProvider = sender1Chat1.createProvider();			

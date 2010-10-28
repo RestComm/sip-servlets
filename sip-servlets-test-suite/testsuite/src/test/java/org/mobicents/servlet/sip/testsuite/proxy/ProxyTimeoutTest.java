@@ -58,11 +58,11 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 	public void setUp() throws Exception {
 		super.setUp();
 		senderProtocolObjects = new ProtocolObjects("proxy-sender",
-				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null);
+				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
 		receiverProtocolObjects = new ProtocolObjects("proxy-receiver",
-				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null);
+				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
 		neutralProto = new ProtocolObjects("neutral",
-				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null);
+				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();

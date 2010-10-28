@@ -119,9 +119,9 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 		deployApplication();
 
 		senderProtocolObjects = new ProtocolObjects("sender",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);
+				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		receiverProtocolObjects = new ProtocolObjects("receiver",
-				"gov.nist", TRANSPORT, AUTODIALOG, null);			
+				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);			
 	}
 	
 	private void startLoadBalancer() {	

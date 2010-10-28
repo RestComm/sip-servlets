@@ -49,11 +49,11 @@ public abstract class ScenarioHarness extends TestCase implements SipListener {
 	public void setUp() throws Exception {
 		
 			this.shootistProtocolObjects = new ProtocolObjects(
-					"shootist", "gov.nist", transport, autoDialog, null);
+					"shootist", "gov.nist", transport, autoDialog, null, null, null);
 
 			this.shootmeProtocolObjects = new ProtocolObjects(
 					"shootme" , "gov.nist",
-					transport, autoDialog, null);
+					transport, autoDialog, null, null, null);
 			/*
 			 * if (!getImplementationPath().equals("gov.nist"))
 			 * this.riProtocolObjects = new ProtocolObjects( super.getName(),

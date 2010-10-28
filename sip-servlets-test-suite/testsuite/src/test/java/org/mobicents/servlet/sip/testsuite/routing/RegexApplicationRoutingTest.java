@@ -81,7 +81,7 @@ public class RegexApplicationRoutingTest extends SipServletTestCase {
 		super.setUp();						
 		
 		senderProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();			
@@ -92,7 +92,7 @@ public class RegexApplicationRoutingTest extends SipServletTestCase {
 		
 		
 		registerRecieverProtocolObjects =new ProtocolObjects(
-				"registerReciever", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"registerReciever", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		
 		registerReciever = new TestSipListener(5058, 5070, registerRecieverProtocolObjects, true);
 		SipProvider registerRecieverProvider = registerReciever.createProvider();			

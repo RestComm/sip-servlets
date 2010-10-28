@@ -85,14 +85,14 @@ public class ReferSipServletTest extends SipServletTestCase {
 		super.setUp();						
 		
 		senderProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();			
 		senderProvider.addSipListener(sender);
 		senderProtocolObjects.start();
 		
 		referToProtocolObjects =new ProtocolObjects(
-				"referTo", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"referTo", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		referTo = new TestSipListener(5090, 5070, referToProtocolObjects, true);
 		SipProvider referToProvider = referTo.createProvider();			
 		referToProvider.addSipListener(referTo);

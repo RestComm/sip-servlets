@@ -85,7 +85,7 @@ public class SessionStateUASSipServletTest extends SipServletTestCase {
 		super.setUp();						
 		
 		senderProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();			
@@ -269,7 +269,7 @@ public class SessionStateUASSipServletTest extends SipServletTestCase {
 		senderProtocolObjects.destroy();
 		
 		receiverProtocolObjects =new ProtocolObjects(
-				"receiver", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"receiver", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		SipProvider receiverProvider = receiver.createProvider();			
 		receiverProvider.addSipListener(receiver);

@@ -88,7 +88,7 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 	public void testShootist() throws Exception {
 //		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		receiver.setChallengeRequests(true);
@@ -116,7 +116,7 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 	public void testShootistReinviteChallengeStale() throws Exception {
 //		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(
-				"sender-app-send-reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"sender-app-send-reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		receiver.setChallengeRequests(true);
@@ -146,7 +146,7 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 	 */
 	public void testShootistCancelChallengeOn1xx() throws Exception {
 		receiverProtocolObjects =new ProtocolObjects(
-				"cancelChallenge", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"cancelChallenge", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		receiver.setChallengeRequests(true);
@@ -175,7 +175,7 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 	 */
 	public void testShootistCancelChallengeBefore1xx() throws Exception {
 		receiverProtocolObjects =new ProtocolObjects(
-				"cancelChallengeBefore1xx", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"cancelChallengeBefore1xx", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		receiver.setChallengeRequests(true);
@@ -204,7 +204,7 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 	 */
 	public void testShootistReInviteCancel() throws Exception {
 		receiverProtocolObjects =new ProtocolObjects(
-				"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null);
+				"reinvite", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		receiver.setChallengeRequests(true);

@@ -83,9 +83,9 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		deployApplication();
 		
 		senderProtocolObjects = new ProtocolObjects("forward-udp-sender",
-				"gov.nist", TRANSPORT_UDP, AUTODIALOG, null);
+				"gov.nist", TRANSPORT_UDP, AUTODIALOG, null, null, null);
 		receiverProtocolObjects = new ProtocolObjects("forward-tcp-receiver",
-				"gov.nist", TRANSPORT_TCP, AUTODIALOG, null);
+				"gov.nist", TRANSPORT_TCP, AUTODIALOG, null, null, null);
 			
 	}
 	

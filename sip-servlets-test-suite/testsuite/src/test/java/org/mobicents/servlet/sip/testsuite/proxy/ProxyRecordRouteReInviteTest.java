@@ -177,9 +177,9 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 
 	public void setupPhones(String transport) throws Exception {
 		senderProtocolObjects = new ProtocolObjects("proxy-sender",
-				"gov.nist", transport, AUTODIALOG, null);
+				"gov.nist", transport, AUTODIALOG, null, null, null);
 		receiverProtocolObjects = new ProtocolObjects("proxy-receiver",
-				"gov.nist", transport, AUTODIALOG, null);
+				"gov.nist", transport, AUTODIALOG, null, null, null);
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
