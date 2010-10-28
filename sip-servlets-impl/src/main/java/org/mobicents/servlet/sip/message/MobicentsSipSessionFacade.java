@@ -394,13 +394,9 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 		getSipSession().setNextSipApplicationRouterInfo(routerInfo);
 	}
 
-	public void setAckReceived(boolean ackReceived) {
-		getSipSession().setAckReceived(ackReceived);
-	}
-
-	public boolean isAckReceived() {
-		return getSipSession().isAckReceived();
-	}
+	public void setAckReceived(long cSeq, boolean ackReceived) {
+		getSipSession().setAckReceived(cSeq, ackReceived);
+	}	
 
 	public void setCseq(long cseq) {
 		getSipSession().setCseq(cseq);

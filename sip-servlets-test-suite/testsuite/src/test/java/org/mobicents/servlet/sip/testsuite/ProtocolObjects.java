@@ -83,7 +83,8 @@ public class ProtocolObjects {
 		// Dont use the router for all requests.
 //		properties.setProperty("javax.sip.USE_ROUTER_FOR_ALL_URIS", "false");
 
-		properties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "1");
+		properties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "4");
+		properties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
 
 		// Set to 0 in your production code for max speed.
 		// You need 16 for logging traces. 32 for debug + traces.

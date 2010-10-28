@@ -149,13 +149,9 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	MobicentsSipSessionFacade getSession();
 
 	void setNextSipApplicationRouterInfo(SipApplicationRouterInfo routerInfo);
-	SipApplicationRouterInfo getNextSipApplicationRouterInfo();
-
-	public boolean isAckReceived();
+	SipApplicationRouterInfo getNextSipApplicationRouterInfo();	
 
 	public boolean isValidInternal();
-	
-	public void setAckReceived(boolean ackReceived);
 
 	public long getCseq();
 
@@ -170,4 +166,6 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	int getRequestsPending();
 	
 	void setRequestsPending(int requests);
+
+	void setAckReceived(long cSeq, boolean ackReceived);
 }

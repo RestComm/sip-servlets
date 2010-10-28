@@ -29,6 +29,7 @@ import java.security.AccessController;
 import java.security.Principal;
 import java.security.PrivilegedAction;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -77,11 +78,9 @@ import javax.sip.header.ContactHeader;
 import javax.sip.header.EventHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Parameters;
-import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
-import javax.sip.header.WWWAuthenticateHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -151,8 +150,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 	protected transient SipSessionKey key;
 	
 	protected transient Principal userPrincipal;
-	
-	protected transient boolean ackReceived;
 	
 	protected long cseq = -1;
 	
@@ -266,6 +263,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 	protected transient Semaphore semaphore;
 	
 	protected transient MobicentsSipSessionFacade facade = null;
+	
+	protected transient ConcurrentHashMap<Long, Boolean> acksReceived = new ConcurrentHashMap<Long, Boolean>(2);
 	
 	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession) {
 		this.key = key;
@@ -825,6 +824,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(subscriptions != null) {
 			subscriptions.clear();
 		}
+		if(acksReceived != null) {
+			acksReceived.clear();
+		}
 //		executorService.shutdown();
 		parentSession = null;
 		userPrincipal = null;		
@@ -886,6 +888,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		stateInfo = null;
 		subscriberURI = null;
 		subscriptions = null;
+		acksReceived = null;
 		// don't release or nullify the semaphore, it should be done externally
 		// see Issue http://code.google.com/p/mobicents/issues/detail?id=1294
 //		if(semaphore != null) {
@@ -1921,47 +1924,102 @@ public class SipSessionImpl implements MobicentsSipSession {
 			SipApplicationRouterInfo routerInfo) {
 		this.nextSipApplicationRouterInfo = routerInfo;
 	}
-	public boolean isAckReceived() {
+	
+	/**
+	 * Setting ackReceived for CSeq to specified value in second param.
+	 * if the second param is true it will try to cleanup earlier cseq as well to save on memory
+	 * @param cSeq cseq to set the ackReceived
+	 * @param ackReceived whether or not the ack has been received for this cseq
+	 */
+	public void setAckReceived(long cSeq, boolean ackReceived) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("setting AckReceived to : " + ackReceived + " for CSeq " + cSeq);
+		}
+		acksReceived.put(cSeq, ackReceived);
+		if(ackReceived) {
+			cleanupAcksReceived(cSeq);
+		}
+	}
+	
+	/**
+	 * check if the ack has been received for the cseq in param
+	 * it may happen that the ackReceived has been removed already if that's the case it will return true
+	 * @param cSeq CSeq number to check if the ack has already been received
+	 * @return
+	 */
+	protected boolean isAckReceived(long cSeq) {
+		Boolean ackReceived = acksReceived.get(cSeq);
+		if(logger.isDebugEnabled()) {
+			logger.debug("isAckReceived for CSeq " + cSeq +" : " + ackReceived);
+		}
+		if(ackReceived == null) {
+			// if there is no value for it it means that it is a retransmission 
+			return true;
+		}
 		return ackReceived;
 	}
-	public void setAckReceived(boolean ackReceived) {
-		this.ackReceived = ackReceived;
+	
+	/**
+	 * We clean up the stored acks received when the remoteCSeq in param is greater and
+	 * that the ackReceived is true
+	 * @param remoteCSeq remoteCSeq the basis CSeq for cleaning up earlier (lower CSeq) stored ackReceived
+	 */
+	protected void cleanupAcksReceived(long remoteCSeq) {
+		List<Long> toBeRemoved = new ArrayList<Long>();
+		final Iterator<Entry<Long, Boolean>> cSeqs = acksReceived.entrySet().iterator();
+		while (cSeqs.hasNext()) {
+			final Entry<Long, Boolean> entry = cSeqs.next();
+			final long cSeq = entry.getKey();
+			final boolean ackReceived = entry.getValue();
+			if(ackReceived && cSeq < remoteCSeq) {
+				toBeRemoved.add(cSeq);
+			}
+		}
+		for(Long cSeq: toBeRemoved) {			
+			acksReceived.remove(cSeq);
+			if(logger.isDebugEnabled()) {
+				logger.debug("removed ackReceived for CSeq " + cSeq);
+			}
+		}
 	}
+	
 	public long getCseq() {
 		return cseq;
 	}
 	public void setCseq(long cseq) {
-		this.cseq = cseq;
+		this.cseq = cseq;		
 	}
 	//CSeq validation should only be done for non proxy applications
 	public boolean validateCSeq(SipServletRequestImpl sipServletRequest) {
 		final Request request = (Request) sipServletRequest.getMessage();
 		final long localCseq = cseq;		
-		final long remoteCseq =  ((CSeqHeader) request.getHeader(CSeqHeader.NAME)).getSeqNumber();
+		final long remoteCSeq =  ((CSeqHeader) request.getHeader(CSeqHeader.NAME)).getSeqNumber();
 		final String method = request.getMethod();
 		final boolean isAck = Request.ACK.equalsIgnoreCase(method);
 		final boolean isPrackCancel= Request.PRACK.equalsIgnoreCase(method) || Request.CANCEL.equalsIgnoreCase(method);
-		final boolean isAckRetranmission = isAckReceived() && isAck;			
 		boolean resetLocalCSeq = true;
-		
-		if(isAck) {
-			// Issue 1714 : don't set the flag if the cseq are not equals 
-			if(localCseq == remoteCseq) {
-				setAckReceived(true);
-			}
-		} 		
-		if(isAckRetranmission) {
+				
+		if(isAck && isAckReceived(remoteCSeq)) {
 			// Filter out ACK retransmissions for JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
 			logger.debug("ACK filtered out as a retransmission. This Sip Session already has been ACKed.");
 			return false;
 		}
-		if(localCseq == remoteCseq && !isAck) {
+		if(isAck) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("localCSeq : " + localCseq + ", remoteCSeq : " + remoteCSeq);
+			}
+			setAckReceived(remoteCSeq, true);			
+		} 	
+		if(localCseq == remoteCSeq && !isAck) {
 			logger.debug("dropping retransmission " + request + " since it matches the current sip session cseq " + localCseq);
 			return false;
 		}		
-		if(localCseq > remoteCseq) {				
+		if(localCseq > remoteCSeq) {				
 			if(!isAck && !isPrackCancel) {
 				logger.error("CSeq out of order for the following request " + sipServletRequest);
+				if(Request.INVITE.equalsIgnoreCase(method)) {
+					setAckReceived(remoteCSeq, false);
+				}
 				final SipServletResponse response = sipServletRequest.createResponse(Response.SERVER_INTERNAL_ERROR, "CSeq out of order");
 				try {
 					response.send();
@@ -1969,23 +2027,23 @@ public class SipSessionImpl implements MobicentsSipSession {
 					logger.error("Can not send error response", e);
 				}
 				return false;
-			} else {
+			} else {				
 				// Issue 1714 : if the local cseq is greater then the remote one don't reset the local cseq
 				resetLocalCSeq= false;
 			}
-		}
-		if(Request.INVITE.equalsIgnoreCase(method)){			
-			//if it's a reinvite, we reset the ACK retransmission flag
-			setAckReceived(false);
-			if(logger.isDebugEnabled()) {
-				logger.debug("resetting the ack retransmission flag on the sip session " + getKey() + " because following reINVITE has been received " + request);
-			}
+		}		
+		if(logger.isDebugEnabled()) {
+			logger.debug("resetLocalCSeq : " + resetLocalCSeq);
 		}
 		if(resetLocalCSeq) {
-			setCseq(remoteCseq);
-		}
+			setCseq(remoteCSeq);
+			if(Request.INVITE.equalsIgnoreCase(method)) {
+				setAckReceived(remoteCSeq, false);
+			}
+		}		
 		return true;
 	}
+	
 	public String getTransport() {
 		return transport;
 	}

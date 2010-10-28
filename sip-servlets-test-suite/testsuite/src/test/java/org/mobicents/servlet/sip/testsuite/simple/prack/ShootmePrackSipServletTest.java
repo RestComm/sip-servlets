@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.testsuite.simple.prack;
 import gov.nist.javax.sip.header.SIPHeader;
 
 import java.text.ParseException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -45,10 +46,10 @@ public class ShootmePrackSipServletTest extends SipServletTestCase {
 	
 	TestSipListener sender;
 	SipProvider senderProvider = null;
-	TestSipListener registerReciever;
+	ProtocolObjects senderProtocolObjects;
 	
-	ProtocolObjects senderProtocolObjects;	
-	ProtocolObjects registerRecieverProtocolObjects;	
+//	TestSipListener registerReciever;	
+//	ProtocolObjects registerRecieverProtocolObjects;	
 	
 	public ShootmePrackSipServletTest(String name) {
 		super(name);
@@ -73,24 +74,18 @@ public class ShootmePrackSipServletTest extends SipServletTestCase {
 		
 		senderProtocolObjects =new ProtocolObjects(
 				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null);
-		
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		senderProvider = sender.createProvider();			
-		
 		senderProvider.addSipListener(sender);
-		
 		senderProtocolObjects.start();		
 		
 		
-		registerRecieverProtocolObjects =new ProtocolObjects(
-				"registerReciever", "gov.nist", TRANSPORT, AUTODIALOG, null);
-		
-		registerReciever = new TestSipListener(5058, 5070, registerRecieverProtocolObjects, true);
-		SipProvider registerRecieverProvider = registerReciever.createProvider();			
-		
-		registerRecieverProvider.addSipListener(registerReciever);
-		
-		registerRecieverProtocolObjects.start();		
+//		registerRecieverProtocolObjects =new ProtocolObjects(
+//				"registerReciever", "gov.nist", TRANSPORT, AUTODIALOG, null);
+//		registerReciever = new TestSipListener(5058, 5070, registerRecieverProtocolObjects, true);
+//		SipProvider registerRecieverProvider = registerReciever.createProvider();			
+//		registerRecieverProvider.addSipListener(registerReciever);
+//		registerRecieverProtocolObjects.start();		
 	}
 	
 	public void testShootmePrack() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
@@ -113,6 +108,37 @@ public class ShootmePrackSipServletTest extends SipServletTestCase {
 		assertTrue(sender.isOkToPrackReceived());
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());		
+	}
+	
+	public void testShootmePrackAckReceivedTwice() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "prack-test2xACK";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		String[] headerNames = new String[]{"require"};
+		String[] headerValues = new String[]{"100rel"};
+		
+		sender.setSendBye(false);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, false);
+		sender.setTimeToWaitBeforeAck(1000);
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isPrackSent());
+		assertTrue(sender.isOkToPrackReceived());
+		assertTrue(sender.isAckSent());
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		assertEquals(1, sender.getAllMessagesContent().size());
+//		assertTrue(sender.getOkToByeReceived());		
+		
 	}
 	
 	// non regression test for Issue 1552 http://code.google.com/p/mobicents/issues/detail?id=1552
@@ -217,7 +243,7 @@ public class ShootmePrackSipServletTest extends SipServletTestCase {
 	@Override
 	protected void tearDown() throws Exception {					
 		senderProtocolObjects.destroy();	
-		registerRecieverProtocolObjects.destroy();
+//		registerRecieverProtocolObjects.destroy();
 		logger.info("Test completed");
 		super.tearDown();
 	}

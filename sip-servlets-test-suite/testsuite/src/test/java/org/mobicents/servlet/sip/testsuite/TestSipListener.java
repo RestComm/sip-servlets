@@ -1305,6 +1305,12 @@ public class TestSipListener implements SipListener {
 			lastInfoResponseTime = System.currentTimeMillis();
 		}
 		ClientTransaction tid = responseReceivedEvent.getClientTransaction();
+		Dialog responseDialog = null;
+		if(tid != null) {
+			responseDialog = tid.getDialog();
+		} else {
+			responseDialog = responseReceivedEvent.getDialog();
+		}
 		CSeqHeader cseq = (CSeqHeader) response.getHeader(CSeqHeader.NAME);
 
 		logger.info("Response received : Status Code = "
@@ -1317,12 +1323,12 @@ public class TestSipListener implements SipListener {
 			logger.info("Stray response -- dropping ");
 			return;
 		}
+		logger.info("Dialog = " + responseDialog);
+		if(responseDialog != null) {
+			logger.info("Dialog State is " + responseDialog.getState());
+		}
 		if(tid !=null) {
-			logger.info("transaction state is " + tid.getState());
-			logger.info("Dialog = " + tid.getDialog());
-			if(tid.getDialog() != null) {
-				logger.info("Dialog State is " + tid.getDialog().getState());
-			}
+			logger.info("transaction state is " + tid.getState());						
 		}
 
 		try {			
@@ -1339,7 +1345,7 @@ public class TestSipListener implements SipListener {
 				logger.info("response = " + response);
 				if (cseq.getMethod().equals(Request.INVITE) && sendAck) {
 					inviteOkResponse = response;
-					Request ackRequest = tid.getDialog().createAck(cseq.getSeqNumber());
+					Request ackRequest = responseDialog.createAck(cseq.getSeqNumber());
 					if (useToURIasRequestUri) {
 						ackRequest.setRequestURI(requestURI);	
 					}			
@@ -1348,7 +1354,7 @@ public class TestSipListener implements SipListener {
 					}
 					logger.info("Sending ACK " + ackRequest);					
 					if(!sendSubsequentRequestsThroughSipProvider) {
-						tid.getDialog().sendAck(ackRequest);
+						responseDialog.sendAck(ackRequest);
 					} else {
 						sipProvider.sendRequest(ackRequest);
 					}
@@ -1372,7 +1378,7 @@ public class TestSipListener implements SipListener {
 						sendBye();
 					}
 					if(sendByeAfterTerminatingNotify) {
-						 tid.getDialog().terminateOnBye(false);
+						responseDialog.terminateOnBye(false);
 					}
 				} else if(cseq.getMethod().equals(Request.BYE)) {
 					okToByeReceived = true;

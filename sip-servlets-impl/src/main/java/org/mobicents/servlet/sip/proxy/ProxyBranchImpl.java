@@ -588,9 +588,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 		if(request.getMethod().equalsIgnoreCase("INVITE")) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Proxying reinvite request " + request);
-			}
-			// reset the ack received flag for reINVITE
-			request.getSipSession().setAckReceived(false);
+			}			
 			proxyDialogStateless(request);
 			return;
 		}

@@ -23,8 +23,6 @@ import java.util.Iterator;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.AuthInfo;
@@ -66,6 +64,7 @@ public class SimpleSipServlet
 	private static final long serialVersionUID = 1L;
 	private static final String TEST_PRACK = "prack";
 	private static final String TEST_ERROR_RESPONSE = "testErrorResponse";
+	private static final String TEST_2X_ACK = "test2xACK";	
 	private static final String TEST_REGISTER_C_SEQ = "testRegisterCSeq";
 	private static final String TEST_REGISTER_NO_CONTACT = "testRegisterNoContact";
 	private static final String TEST_REGISTER_SAVED_SESSION = "testRegisterSavedSession";
@@ -384,7 +383,7 @@ public class SimpleSipServlet
 			}
 		}
 		String fromString = req.getFrom().toString();
-		if(fromString.contains(TEST_ERROR_RESPONSE)) {			
+		if(fromString.contains(TEST_ERROR_RESPONSE) || fromString.contains(TEST_2X_ACK)) {			
 			sendMessage(req.getApplicationSession(), sipFactory, "ackReceived", null);
 			return;
 		}
