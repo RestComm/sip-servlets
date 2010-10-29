@@ -52,7 +52,7 @@ public class ProtocolObjects {
 	private boolean isStarted;
 
 	public ProtocolObjects(String stackname, String pathname, String transport,
-			boolean autoDialog, String outboundProxy, String threadPoolSize, String reentrantLister) {
+			boolean autoDialog, String outboundProxy, String threadPoolSize, String reentrantListener) {
 
 		this.transport = transport;
 		SipFactory sipFactory = SipFactory.getInstance();
@@ -84,7 +84,7 @@ public class ProtocolObjects {
 //		properties.setProperty("javax.sip.USE_ROUTER_FOR_ALL_URIS", "false");
 
 		properties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", threadPoolSize == null ? "1" : threadPoolSize);
-		properties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", reentrantLister == null ? "false" : reentrantLister);
+		properties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", reentrantListener == null ? "false" : reentrantListener);
 
 		// Set to 0 in your production code for max speed.
 		// You need 16 for logging traces. 32 for debug + traces.
