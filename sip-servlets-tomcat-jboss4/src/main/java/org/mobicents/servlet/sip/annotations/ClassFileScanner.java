@@ -347,7 +347,7 @@ public class ClassFileScanner {
     protected void parseSipApplication(SipApplication appData, String packageName) {
     	sipContext.setMainServlet(appData.mainServlet());
     	sipContext.setProxyTimeout(appData.proxyTimeout());
-    	sipContext.setSessionTimeout(appData.sessionTimeout());
+    	sipContext.setSipApplicationSessionTimeout(appData.sessionTimeout());
     	
     	if(appData.name() == null || appData.name().equals(""))
     		sipContext.setApplicationName(packageName);
