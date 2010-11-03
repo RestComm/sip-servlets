@@ -47,7 +47,6 @@ import org.mobicents.servlet.sip.testsuite.deployment.DeploymentTest;
 import org.mobicents.servlet.sip.testsuite.deployment.DistributableServletTest;
 import org.mobicents.servlet.sip.testsuite.deployment.NoApplicationDeployedTest;
 import org.mobicents.servlet.sip.testsuite.deployment.SameInstanceServletTest;
-import org.mobicents.servlet.sip.testsuite.failover.BasicFailoverTest;
 import org.mobicents.servlet.sip.testsuite.join.JoinSipServletTest;
 import org.mobicents.servlet.sip.testsuite.listeners.ListenersSipServletTest;
 import org.mobicents.servlet.sip.testsuite.mapping.ServletMappingSipServletTest;
@@ -173,8 +172,7 @@ public class AllTests {
 		suite.addTestSuite(DeploymentTest.class);
 		suite.addTestSuite(SameInstanceServletTest.class);
 		suite.addTestSuite(DistributableServletTest.class);
-		suite.addTestSuite(ShootistSipServletForkingTest.class);
-		suite.addTestSuite(BasicFailoverTest.class);
+		suite.addTestSuite(ShootistSipServletForkingTest.class);		
 		suite.addTestSuite(SipURITest.class);
 		suite.addTestSuite(AddressTest.class);
 		suite.addTestSuite(TelURLTest.class);
