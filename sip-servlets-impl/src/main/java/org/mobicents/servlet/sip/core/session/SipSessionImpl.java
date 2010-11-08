@@ -1358,6 +1358,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 			// cause the SipSession state to return to INITIAL rather than going to TERMINATED.
 			if(receive) {
 				if(proxy == null) {
+					// Fix for issue http://code.google.com/p/mobicents/issues/detail?id=2083
 					if(logger.isDebugEnabled()) {
 						logger.debug("resetting the to tag since a non 2xx response has been received for non proxy session in state " + state);
 					}
