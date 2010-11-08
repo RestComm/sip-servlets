@@ -1030,6 +1030,9 @@ public class TestSipListener implements SipListener {
 			            responseauth.addHeader(proxyAuthenticate);
 		            }
 		
+		            ToHeader toHeader = (ToHeader) responseauth.getHeader(ToHeader.NAME);
+		            toHeader.setTag(TO_TAG + 10000); // Application is supposed to set.
+		            
 		            if (serverTransaction!=null)
 		                serverTransaction.sendResponse(responseauth);
 		            else 

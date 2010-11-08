@@ -1357,7 +1357,13 @@ public class SipSessionImpl implements MobicentsSipSession {
 			// final responses received from downstream in the EARLY or INITIAL states 
 			// cause the SipSession state to return to INITIAL rather than going to TERMINATED.
 			if(receive) {
-				setState(State.INITIAL);
+				if(proxy == null) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("resetting the to tag since a non 2xx response has been received for non proxy session in state " + state);
+					}
+					key.setToTag(null);
+				}
+				setState(State.INITIAL);				
 //				readyToInvalidate = true; 
 				if(logger.isDebugEnabled()) {
 					logger.debug("the following sip session " + getKey() + " has its state updated to " + state);

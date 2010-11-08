@@ -296,10 +296,17 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {		
 		logger.info("Got BYE: " + request.toString());		
+		
 		if(request.getSession().getAttribute(ACT_AS_UAS) == null) {
 			//we forward the BYE
 			SipSession session = request.getSession();		
 			SipSession linkedSession = request.getB2buaHelper().getLinkedSession(session);
+			logger.info("Incoming side session state : " + request.getSession().getState());
+			logger.info("outgoing side session state : " + linkedSession.getState());
+			if(!linkedSession.getState().equals(State.CONFIRMED)) {
+				request.createResponse(500, "outgoing session state should be CONFIRMED and it is " + linkedSession.getState()).send();
+				return;
+			}
 			Map<String, List<String>> headers=new HashMap<String, List<String>>();
 			
 			List<String> userAgentHeaderList = new ArrayList<String>();
