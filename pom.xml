@@ -85,7 +85,7 @@
 		<!-- MOBICENTS TOOL VERSIONS -->
 		<mobicents.tools.mavenplugin.eclipse.version>1.0.0.BETA2</mobicents.tools.mavenplugin.eclipse.version>
 		<mobicents.cluster.version>1.6</mobicents.cluster.version>
-		<mobicents.balancer.version>1.0.5.FINAL</mobicents.balancer.version>
+		<mobicents.balancer.version>1.1-SNAPSHOT</mobicents.balancer.version>
 		<mobicents.jain.sip.ha.version>0.14-SNAPSHOT</mobicents.jain.sip.ha.version>
 		<mobicents.jain.sip.ext.version>1.0.BETA1</mobicents.jain.sip.ext.version>
 		<tomcat.version>6.0.29</tomcat.version>	
