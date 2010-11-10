@@ -938,14 +938,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						}
 					}															
 					if(sipApplicationSession != null) {
-						if(logger.isDebugEnabled()) {
-							logger.debug("sip app session " + sipApplicationSession.getKey() + " is valid ? :" + sipApplicationSession.isValidInternal());
-							if(sipApplicationSession.isValidInternal()) {
-								logger.debug("Sip app session " + sipApplicationSession.getKey() + " is ready to be invalidated ? :" + sipApplicationSession.isReadyToInvalidate());
-							}
-						}
 						sipContext.enterSipApp(sipApplicationSession, sipSessionImpl);
 						try {
+							if(logger.isDebugEnabled()) {
+								logger.debug("sip app session " + sipApplicationSession.getKey() + " is valid ? :" + sipApplicationSession.isValidInternal());
+								if(sipApplicationSession.isValidInternal()) {
+									logger.debug("Sip app session " + sipApplicationSession.getKey() + " is ready to be invalidated ? :" + sipApplicationSession.isReadyToInvalidate());
+								}
+							}												
 							if(sipApplicationSession.isValidInternal() && sipApplicationSession.isReadyToInvalidate()) {							
 								sipApplicationSession.tryToInvalidate();
 							}
