@@ -27,6 +27,7 @@ import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -98,6 +99,8 @@ public class TestSipListener implements SipListener {
 	private static final String APPLICATION_CONTENT_TYPE = "application";
 
 	private boolean sendBye;
+	
+	public int bindings;
 	
 	private boolean sendJoinMessage;
 	
@@ -285,6 +288,7 @@ public class TestSipListener implements SipListener {
 	private int nbRetrans = 0;	
 	
 	public Request firstRequest;
+	public Request lastInvite;
 
 	private boolean disableSequenceNumberValidation = false;
 	
@@ -1099,8 +1103,15 @@ public class TestSipListener implements SipListener {
 				st.sendResponse(response);
 				return;
 			}
+		
 			
 			ContactHeader contactHeader = (ContactHeader)request.getHeader(ContactHeader.NAME);
+			if(contactHeader != null) {
+				Iterator it = request.getHeaders(ContactHeader.NAME);
+				int c=0;
+				while(it.hasNext()) {c++;it.next();}
+				bindings = c;
+			}
 			if(contactHeader != null && "0.0.0.0".equals(((SipURI)contactHeader.getAddress().getURI()).getHost())) {
 				abortProcessing = true;
 				throw new IllegalArgumentException("we received a contact header with 0.0.0.0 in an INVITE !");
@@ -1825,7 +1836,7 @@ public class TestSipListener implements SipListener {
 				fromHeader, toHeader, viaHeaders, maxForwards);
 		// Create contact headers
 		String host = "127.0.0.1";
-
+		request.setHeader(protocolObjects.headerFactory.createHeader("REM", "RRRREM"));
 		URI contactUrl = null;
 		if(fromURI instanceof SipURI) {
 			contactUrl = protocolObjects.addressFactory.createSipURI(

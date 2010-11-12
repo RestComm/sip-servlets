@@ -226,7 +226,15 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			B2buaHelper b2buaHelper = request.getB2buaHelper();
 			SipSession origSession = b2buaHelper.getLinkedSession(request.getSession());
 			origSession.setAttribute("originalRequest", request);
-			b2buaHelper.createRequest(origSession, request, null).send();
+			Map<String, List<String>> headers=new HashMap<String, List<String>>();
+			List<String> contactHeaderList = new ArrayList<String>();
+			if(request.getHeader(ContactHeader.NAME).contains("transport=tcp")) {
+				contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@127.0.0.1:5070;q=0.1;lr;transport=tcp;test>;test");
+			} else {
+				contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@127.0.0.1:5070;q=0.1;lr;transport=udp;test>;test");
+			}
+			headers.put("Contact", contactHeaderList);
+			b2buaHelper.createRequest(origSession, request, headers).send();
 		}
 	}	
 	

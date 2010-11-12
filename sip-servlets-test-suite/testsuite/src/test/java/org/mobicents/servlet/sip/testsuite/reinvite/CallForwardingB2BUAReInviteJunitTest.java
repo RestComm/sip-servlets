@@ -112,6 +112,7 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());
 		assertTrue(sender.getOkToByeReceived());
+		assertEquals(1,sender.bindings); //http://code.google.com/p/mobicents/issues/detail?id=2100
 		maxForwardsHeader = (MaxForwardsHeader) receiver.getByeRequestReceived().getHeader(MaxForwardsHeader.NAME);
 		assertNotNull(maxForwardsHeader);
 		// Non Regression test for http://code.google.com/p/mobicents/issues/detail?id=1490
