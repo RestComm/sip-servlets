@@ -315,6 +315,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			
 			ContactHeader contactHeader = (ContactHeader) subsequentRequest.getHeader(ContactHeader.NAME);
 			if(contactHeader != null && contactHeaderSet.size() > 0) {
+				subsequentRequest.removeHeader(ContactHeader.NAME);
 				setContactHeaders(contactHeaderSet, newSubsequentServletRequest, contactHeader);
 			}
 			
