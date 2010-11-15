@@ -2482,30 +2482,36 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			if(session == null) {
 				initialLoad = true;
 			}
-            IncomingDistributableSessionData data = getDistributedCacheConvergedSipManager().getSipSessionData(applicationSessionKey.getId(), SessionManagerUtil.getSipSessionHaKey(key), initialLoad);
-            if (data != null)
-            {
-            	if(logger.isDebugEnabled()) {
-        			logger.debug("data for sip session " + key + " found in the distributed cache");
-        		}
-            	if (session == null && sipApplicationSessionImpl != null) {
-        			// This is either the first time we've seen this session on this
-        			// server, or we previously expired it and have since gotten
-        			// a replication message from another server
-        			mustAdd = true;
-        			initialLoad = true;
-        			session = (ClusteredSipSession<? extends OutgoingDistributableSessionData>) sipManagerDelegate.getSipSession(key, true, sipFactory, sipApplicationSessionImpl);
-        			OwnedSessionUpdate osu = unloadedSipSessions_.get(key);
-        	        passivated = (osu != null && osu.passivated);
-        		}
-            	if(session != null) {
-            		session.update(data);
-            	}
-            } else {
-            	if(logger.isDebugEnabled()) {
-        			logger.debug("no data for sip session " + key + " in the distributed cache");
-        		}
-            }
+			// Swap in/out the webapp classloader so we can deserialize
+	         // attributes whose classes are only available to the webapp
+			ClassLoader prevTCL = Thread.currentThread().getContextClassLoader();
+			Thread.currentThread().setContextClassLoader(getApplicationClassLoader());
+			try {
+	            IncomingDistributableSessionData data = getDistributedCacheConvergedSipManager().getSipSessionData(applicationSessionKey.getId(), SessionManagerUtil.getSipSessionHaKey(key), initialLoad);
+	            if (data != null)
+	            {
+	            	if(logger.isDebugEnabled()) {
+	        			logger.debug("data for sip session " + key + " found in the distributed cache");
+	        		}
+	            	if (session == null && sipApplicationSessionImpl != null) {
+	        			// This is either the first time we've seen this session on this
+	        			// server, or we previously expired it and have since gotten
+	        			// a replication message from another server
+	        			mustAdd = true;
+	        			initialLoad = true;
+	        			session = (ClusteredSipSession<? extends OutgoingDistributableSessionData>) sipManagerDelegate.getSipSession(key, true, sipFactory, sipApplicationSessionImpl);
+	        			OwnedSessionUpdate osu = unloadedSipSessions_.get(key);
+	        	        passivated = (osu != null && osu.passivated);
+	        		}
+	            	if(session != null) {	            		
+						session.update(data);						
+	            	}
+	            } else if(logger.isDebugEnabled()) {
+	        		logger.debug("no data for sip session " + key + " in the distributed cache");
+	            }
+			} finally {
+				Thread.currentThread().setContextClassLoader(prevTCL);
+			}
 //            else if(mustAdd)
 //            {
 //               // Clunky; we set the session variable to null to indicate
@@ -2615,25 +2621,35 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			if(session == null) {
 				initialLoad = true;
 			}
-			IncomingDistributableSessionData data = 
-				getDistributedCacheConvergedSipManager().getSipApplicationSessionData(key.getId(), initialLoad);
-			if (data != null) {
-				if (session == null) {
-					// This is either the first time we've seen this session on
-					// this
-					// server, or we previously expired it and have since gotten
-					// a replication message from another server
-					mustAdd = true;
-					initialLoad = true;
-					session = (ClusteredSipApplicationSession) 
-						sipManagerDelegate.getSipApplicationSession(key, true);
-					OwnedSessionUpdate osu = unloadedSipApplicationSessions_.get(key);
-					passivated = (osu != null && osu.passivated);
-				}
-				if(session != null) {
-					session.update(data);
-				}
-			} 
+			 // Swap in/out the webapp classloader so we can deserialize
+	         // attributes whose classes are only available to the webapp
+			ClassLoader prevTCL = Thread.currentThread().getContextClassLoader();
+			Thread.currentThread().setContextClassLoader(getApplicationClassLoader());
+			try {
+				IncomingDistributableSessionData data = 
+					getDistributedCacheConvergedSipManager().getSipApplicationSessionData(key.getId(), initialLoad);
+				if (data != null) {
+					if (session == null) {
+						// This is either the first time we've seen this session on
+						// this
+						// server, or we previously expired it and have since gotten
+						// a replication message from another server
+						mustAdd = true;
+						initialLoad = true;
+						session = (ClusteredSipApplicationSession) 
+							sipManagerDelegate.getSipApplicationSession(key, true);
+						OwnedSessionUpdate osu = unloadedSipApplicationSessions_.get(key);
+						passivated = (osu != null && osu.passivated);
+					}
+					if(session != null) {					
+						session.update(data);					
+					}
+				} else if(logger.isDebugEnabled()) {
+        			logger.debug("no data for sip application session " + key + " in the distributed cache");
+        		}
+			} finally {
+				Thread.currentThread().setContextClassLoader(prevTCL);
+			}
 //			else if (mustAdd) {
 //				// Clunky; we set the session variable to null to indicate
 //				// no data so move on
