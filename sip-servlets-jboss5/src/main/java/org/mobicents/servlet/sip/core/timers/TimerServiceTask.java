@@ -58,7 +58,9 @@ public class TimerServiceTask extends TimerTask implements ServletTimer {
 				} 			
 				this.servletTimer = new ServletTimerImpl(data.getData(), data.getDelay(), sipApplicationSession.getSipContext().getListeners().getTimerListener(), sipApplicationSession);
 			} else {
-				logger.debug("sip application session for key " + data.getKey() + " was not found neither locally or in the cache, sip servlet timer recreation will be problematic");				
+				if(logger.isDebugEnabled()) {
+					logger.debug("sip application session for key " + data.getKey() + " was not found neither locally or in the cache, sip servlet timer recreation will be problematic");
+				}
 			}
 		} else {
 			this.servletTimer = servletTimerImpl;

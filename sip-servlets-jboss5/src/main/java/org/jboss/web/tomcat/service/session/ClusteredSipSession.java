@@ -65,6 +65,7 @@ import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistrib
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionManagementStatus;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionNotificationCause;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipSessionNotificationPolicy;
+import org.mobicents.ha.javax.sip.ClusteredSipStack;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
@@ -75,6 +76,7 @@ import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipService;
+import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
  * Abstract base class for sip session clustering based on SipSessionImpl. Different session
@@ -887,7 +889,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 					SipService sipService = (SipService) service;
 					SipStack sipStack = sipService.getSipStack();					
 					if(sipStack != null) {
-						sessionCreatingDialog = ((SipStackImpl)sipStack).getDialog(sessionCreatingDialogId); 
+						sessionCreatingDialog = ((ClusteredSipStack)sipStack).getDialog(sessionCreatingDialogId); 
 						if(logger.isDebugEnabled()) {
 							logger.debug("dialog injected " + sessionCreatingDialog);
 						}
@@ -1596,5 +1598,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	
 	public String getHaId() {
 		return haId;
+	}
+
+	public void processDialogPassivation() {
+		((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).passivateDialog(sessionCreatingDialogId);
 	}
 }

@@ -1537,7 +1537,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
                   // JBAS-2403. Check for outdated sessions where we think
                   // the local copy has timed out.  If found, refresh the
                   // session from the cache in case that might change the timeout
-                  if (this.outdatedSipSessionChecker.isSessionOutdated(session) && session.isValid())
+                  if (this.outdatedSipSessionChecker.isSessionOutdated(session) && session.isValidInternal())
                   {
                      // FIXME in AS 5 every time we get a notification from the distributed
                      // cache of an update, we get the latest timestamp. So
@@ -1556,7 +1556,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
                   // expire() are meant to be multi-threaded and synchronize
                   // properly internally; synchronizing externally can lead
                   // to deadlocks!!
-                  if (!session.isValid()) continue;
+                  if (!session.isValidInternal()) continue;
                }
                 
                // we now have a valid session; store it so we can check later
@@ -1712,7 +1712,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
                   // expire() are meant to be multi-threaded and synchronize
                   // properly internally; synchronizing externally can lead
                   // to deadlocks!!
-                  if (!session.isValid()) continue;
+                  if (!session.isValidInternal()) continue;
                }
                 
                // we now have a valid session; store it so we can check later
@@ -1791,11 +1791,11 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
       if (trace_)
       { 
          log_.trace("processSipApplicationSessionExpirationPassivation(): Completed ...");
-         log_.trace("processSipApplicationSessionExpirationPassivation(): active sessions = " + calcActiveSessions());
-         log_.trace("processSipApplicationSessionExpirationPassivation(): expired sessions = " + expiredCounter_);
+         log_.trace("processSipApplicationSessionExpirationPassivation(): active sessions = " + calcActiveSipApplicationSessions());
+         log_.trace("processSipApplicationSessionExpirationPassivation(): expired sessions = " + expiredSipApplicationSessionCounter_);
          if (passivate)
          {
-            log_.trace("processSipApplicationSessionExpirationPassivation(): passivated count = " + getPassivatedSessionCount());
+            log_.trace("processSipApplicationSessionExpirationPassivation(): passivated count = " + getPassivatedSipApplicationSessionCount());
          }
       }
    }
@@ -2808,18 +2808,19 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		// if it's already unloaded session (session == null) don't do anything,
 		if (session != null) {
 			synchronized (session) {
-				if (trace_) {
-					log_.trace("Passivating session with id: " + key);
+				if (logger.isDebugEnabled()) {
+					logger.debug("Passivating session with id: " + key);
 				}
 
 				session
 						.notifyWillPassivate(ClusteredSessionNotificationCause.PASSIVATION);
+				session.processDialogPassivation();
 				getDistributedCacheConvergedSipManager().evictSipSession(session.getSipApplicationSession().getKey().getId(), SessionManagerUtil.getSipSessionHaKey(key));
 				sipSessionPassivated();
 				sipManagerDelegate.removeSipSession(key);
 			}
-		} else if (trace_) {
-			log_.trace("processSipSessionPassivation():  could not find sip session "
+		} else if (logger.isDebugEnabled()) {
+			logger.debug("processSipSessionPassivation():  could not find sip session "
 					+ key);
 		}
 	}
@@ -2837,8 +2838,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		// if it's already unloaded session (session == null) don't do anything,
 		if (session != null) {
 			synchronized (session) {
-				if (trace_) {
-					log_.trace("Passivating session with id: " + key);
+				if (logger.isDebugEnabled()) {
+					logger.debug("Passivating session with id: " + key);
 				}
 
 				session
@@ -2847,8 +2848,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 				sipApplicationSessionPassivated();				
 				sipManagerDelegate.removeSipApplicationSession(key);
 			}
-		} else if (trace_) {
-			log_.trace("processSipApplicationSessionPassivation():  could not find sip application session "
+		} else if (logger.isDebugEnabled()) {
+			logger.debug("processSipApplicationSessionPassivation():  could not find sip application session "
 					+ key);
 		}
 	}

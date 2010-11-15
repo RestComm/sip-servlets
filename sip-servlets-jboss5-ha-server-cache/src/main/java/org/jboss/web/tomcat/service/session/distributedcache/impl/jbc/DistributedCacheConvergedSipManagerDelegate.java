@@ -114,9 +114,9 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 		Fqn<String> fqn = dataOwner == null ? getSipSessionFqn(jBossCacheService.combinedPath_,
 				sipAppSessionKey, key) : getBuddyBackupSipSessionFqn(dataOwner, jBossCacheService.combinedPath_,
 				sipAppSessionKey, key);
-		if (log_.isTraceEnabled()) {
+		if (log_.isDebugEnabled()) {
 			log_
-					.trace("evictSession(): evicting session from my distributed store. Fqn: "
+					.debug("evictSession(): evicting sip session from my distributed store. Fqn: "
 							+ fqn);
 		}
 		jBossCacheService.cacheWrapper_.evictSubtree(fqn);
@@ -126,9 +126,9 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 		Fqn<String> fqn = dataOwner == null ? getSipApplicationSessionFqn(jBossCacheService.combinedPath_,
 				key) : getBuddyBackupSipApplicationSessionFqn(dataOwner, jBossCacheService.combinedPath_,
 						key);
-		if (log_.isTraceEnabled()) {
+		if (log_.isDebugEnabled()) {
 			log_
-					.trace("evictSession(): evicting session from my distributed store. Fqn: "
+					.debug("evictSession(): evicting sip application session from my distributed store. Fqn: "
 							+ fqn);
 		}
 		jBossCacheService.cacheWrapper_.evictSubtree(fqn);
