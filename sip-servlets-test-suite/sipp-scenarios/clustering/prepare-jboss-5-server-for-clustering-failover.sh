@@ -8,26 +8,31 @@
 
 rm -rf $JBOSS_HOME/server/port-1
 rm -rf $JBOSS_HOME/server/port-2
+#rm -rf $JBOSS_HOME/server/port-3
 
 mvn clean install -f ../../../pom.xml -P jboss-5 -Dnode=all
 
-cp setup/jboss-5/performance/mss-sip-stack-jboss.properties $JBOSS_HOME/server/all/conf/mss-sip-stack.properties
+cp setup/jboss-5/mss-sip-stack-jboss.properties $JBOSS_HOME/server/all/conf/mss-sip-stack.properties
+cp setup/jboss-5/performance/log4j.xml $JBOSS_HOME/server/all/conf/jboss-log4j.xml
+cp setup/jboss-5/log4j.xml $JBOSS_HOME/server/all/conf/jboss-log4j.xml
 cp setup/jboss-5/context-jboss-5.xml $JBOSS_HOME/server/all/deploy/jbossweb.sar/context.xml
 cp setup/jboss-5/jboss-beans.xml $JBOSS_HOME/server/all/deploy/jbossweb.sar/META-INF/jboss-beans.xml
 cp setup/jboss-5/metadata-deployer-jboss-beans.xml $JBOSS_HOME/server/all/deployers/metadata-deployer-jboss-beans.xml
 cp setup/jboss-5/war-deployers-jboss-beans.xml $JBOSS_HOME/server/all/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml
-cp setup/jboss-5/log4j.xml $JBOSS_HOME/server/all/conf/jboss-log4j.xml
 cp setup/jboss-5/jboss-cache-manager-jboss-beans.xml $JBOSS_HOME/server/all/deploy/cluster/jboss-cache-manager.sar/META-INF/jboss-cache-manager-jboss-beans.xml
 
 cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-1
 cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-2
+#cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-3
 
 cp setup/jboss-5/server-jboss-5-failover-port-1.xml $JBOSS_HOME/server/port-1/deploy/jbossweb.sar/server.xml
 cp setup/jboss-5/server-jboss-5-failover-port-2.xml $JBOSS_HOME/server/port-2/deploy/jbossweb.sar/server.xml
+#cp setup/jboss-5/server-jboss-5-failover-port-3.xml $JBOSS_HOME/server/port-3/deploy/jbossweb.sar/server.xml
 
 
 mkdir $JBOSS_HOME/server/port-1/conf/dars
 mkdir $JBOSS_HOME/server/port-2/conf/dars
+#mkdir $JBOSS_HOME/server/port-3/conf/dars
 
 if [ $# -ne 0 ]; then
 	case $1 in	
@@ -73,6 +78,16 @@ if [ $# -ne 0 ]; then
 				cp ../../../sip-servlets-examples/shootist-sip-servlet-distributable/target/shootist-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-2/deploy
 				cp ../../../sip-servlets-examples/shootist-sip-servlet-distributable/distributable-shootist-dar.properties $JBOSS_HOME/server/port-1/conf/dars/distributable-dar.properties
 				cp ../../../sip-servlets-examples/shootist-sip-servlet-distributable/distributable-shootist-dar.properties $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties
+	            ;;
+	    uas-passivation)
+	            echo "Distributed example used is uas"
+	    		mvn clean install -f ../../../sip-servlets-examples/simple-sip-servlet-distributable/pom.xml
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-1/deploy
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-2/deploy
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/port-1/conf/dars/distributable-dar.properties
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties
+				cp setup/jboss-5/war-deployers-jboss-beans-passivation-enabled.xml $JBOSS_HOME/server/port-1/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml
+				cp setup/jboss-5/war-deployers-jboss-beans-passivation-enabled.xml $JBOSS_HOME/server/port-2/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml
 	            ;;
 	    *)
 	            echo "Distributed example used is uas"
