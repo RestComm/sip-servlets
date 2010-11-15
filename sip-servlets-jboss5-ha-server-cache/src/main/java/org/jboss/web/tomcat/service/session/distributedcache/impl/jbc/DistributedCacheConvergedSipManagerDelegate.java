@@ -506,8 +506,16 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 
 		Map<Object, Object> map = new HashMap<Object, Object>();
 		
-		storeSipApplicationSessionMetaData(fqn, sipApplicationSessionData);
-		((DistributedCacheConvergedSipManager)jBossCacheService).storeSipApplicationSessionAttributes(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), sipApplicationSessionData);
+		// Swap in/out the webapp classloader so we can deserialize
+        // attributes whose classes are only available to the webapp
+		ClassLoader prevTCL = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(manager.getApplicationClassLoader());
+		try {
+			storeSipApplicationSessionMetaData(fqn, sipApplicationSessionData);
+			((DistributedCacheConvergedSipManager)jBossCacheService).storeSipApplicationSessionAttributes(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), sipApplicationSessionData);
+		} finally {
+			Thread.currentThread().setContextClassLoader(prevTCL);
+		}
 	}
 
 	public  void storeSipApplicationSessionMetaData(
@@ -555,8 +563,16 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 
 		Fqn<String> fqn = getSipSessionFqn(jBossCacheService.combinedPath_, sipApplicationSessionKey, sessionKey);
 
-		storeSipSessionMetaData(fqn, sipSessionData);
-		((DistributedCacheConvergedSipManager)jBossCacheService).storeSipSessionAttributes(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), sipSessionData);
+		// Swap in/out the webapp classloader so we can deserialize
+        // attributes whose classes are only available to the webapp
+		ClassLoader prevTCL = Thread.currentThread().getContextClassLoader();
+		Thread.currentThread().setContextClassLoader(manager.getApplicationClassLoader());
+		try {
+			storeSipSessionMetaData(fqn, sipSessionData);
+			((DistributedCacheConvergedSipManager)jBossCacheService).storeSipSessionAttributes(Fqn.fromString(fqn.toString() + "/" + AbstractJBossCacheService.ATTRIBUTE_KEY), sipSessionData);
+		} finally {
+			Thread.currentThread().setContextClassLoader(prevTCL);
+		}
 	}
 
 	public void storeSipSessionMetaData(Fqn<String> fqn, OutgoingDistributableSipSessionData sipSessionData) {		
