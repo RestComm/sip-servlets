@@ -100,6 +100,8 @@ public class CallForwardingB2BUAAuthTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
+		// Non Regression test for http://code.google.com/p/mobicents/issues/detail?id=2094
+		// B2b re-invite for authentication will duplicate Remote-Party-ID header
 		ListIterator<Header> it = receiver.getInviteRequest().getHeaders("Remote-Party-ID");
 		int nbHeaders= 0;
 		while (it.hasNext()) {

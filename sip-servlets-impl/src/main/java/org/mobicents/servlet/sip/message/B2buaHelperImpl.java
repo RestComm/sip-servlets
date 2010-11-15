@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.message;
 
+import gov.nist.javax.sip.header.HeaderExt;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.SIPMessage;
 
@@ -358,14 +359,29 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	private void copyNonSystemHeaders(SipServletRequestImpl origRequestImpl,
 			SipServletRequestImpl newSubsequentServletRequest) {
 		final Message origMessage = origRequestImpl.getMessage();
+		final Message subsequentMessage = newSubsequentServletRequest.getMessage();		
 		ListIterator<String> headerNames = origMessage.getHeaderNames();
 		while (headerNames.hasNext()) {
 			String headerName = headerNames.next();
 			if(!JainSipUtils.SYSTEM_HEADERS.contains(headerName) && !headerName.equalsIgnoreCase(ContactHeader.NAME)) {
-				Header origHeader = origMessage.getHeader(headerName);
-				newSubsequentServletRequest.getMessage().addHeader(((Header)origHeader.clone()));
-				if(logger.isDebugEnabled()) {
-					logger.debug("original header " + origHeader + " copied in the new subsequent request");
+				HeaderExt origHeader = (HeaderExt) origMessage.getHeader(headerName);
+				ListIterator<Header> subsHeaderIt = subsequentMessage.getHeaders(headerName);
+				// Issue http://code.google.com/p/mobicents/issues/detail?id=2094
+				// B2b re-invite for authentication will duplicate Remote-Party-ID header
+				// checking if the subsequent request and original request share the same header name and value
+				// before copying to avoid duplicating the headers
+				boolean headerNameValueAlreadyPresent = false;
+				while (subsHeaderIt.hasNext() && !headerNameValueAlreadyPresent) {
+					HeaderExt subsHeader = (HeaderExt) subsHeaderIt.next();
+					if(origHeader.getValue().equals(subsHeader.getValue())) {
+						headerNameValueAlreadyPresent = true;
+					}
+				}
+				if(!headerNameValueAlreadyPresent) {
+					subsequentMessage.addHeader(((Header)origHeader.clone()));
+					if(logger.isDebugEnabled()) {
+						logger.debug("original header " + origHeader + " copied in the new subsequent request");
+					}
 				}
 			}
 		}
