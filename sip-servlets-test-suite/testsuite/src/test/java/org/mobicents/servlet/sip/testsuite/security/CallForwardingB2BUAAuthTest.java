@@ -16,8 +16,11 @@
  */
 package org.mobicents.servlet.sip.testsuite.security;
 
+import java.util.ListIterator;
+
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.header.Header;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -92,11 +95,18 @@ public class CallForwardingB2BUAAuthTest extends SipServletTestCase {
 		String toUser = "receiver";
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
-		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+				
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Remote-Party-ID"}, new String[] {"<sip:test@127.0.0.1:5080>;screen=yes;privacy=off;party=calling;-call-initiator=5016;-call-initiator-location=int;-redirected-by;-int-ext=5016;-ent-name=Acro;-direction=ext;-call-id=55665"}, true);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
+		ListIterator<Header> it = receiver.getInviteRequest().getHeaders("Remote-Party-ID");
+		int nbHeaders= 0;
+		while (it.hasNext()) {
+			Header header = it.next();
+			nbHeaders++;
+		}
+		assertEquals(1, nbHeaders);
 	}
 	
 	@Override
