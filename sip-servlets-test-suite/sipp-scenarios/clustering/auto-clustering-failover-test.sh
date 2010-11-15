@@ -220,7 +220,7 @@ echo "================================"
 ./auto-start-jboss-server-0.0.0.0.sh $config1 $config1.pid $ports1 1 uas-0.0.0.0
 
 #Wait to boot
-sleep $FULLSTARTSLEEP
+sleep $HALFSTARTSLEEP
 #takes a bit more time to boot on 0.0.0.0
 sleep $HALFSTARTSLEEP
 
@@ -231,6 +231,33 @@ sleep $HALFSTARTSLEEP
 ./auto-kill-process-tree.sh `cat $config2.pid` $config2
 
 sleep 10
+
+##################################
+# Test UAS reinvite passivation
+##################################
+echo "Test UAS Reinvite Passivation"
+echo "================================"
+./auto-prepare-example.sh uas-passivation $config1
+./auto-prepare-example.sh uas-passivation $config2
+
+./auto-start-jboss-server.sh $config2 $config2.pid 1 uas-reinvite-passivation
+
+#Wait to boot
+sleep $HALFSTARTSLEEP
+
+./auto-start-jboss-server.sh $config1 $config1.pid 0 uas-reinvite-passivation
+
+#Wait to boot
+sleep $HALFSTARTSLEEP
+
+./auto-run-test.sh uas-reinvite-passivation result.txt
+
+#Kill the app servers
+./auto-kill-process-tree.sh `cat $config1.pid` $config1
+./auto-kill-process-tree.sh `cat $config2.pid` $config2
+
+sleep 10
+
 
 ##################################
 # Test UAC
@@ -247,7 +274,7 @@ sleep $HALFSTARTSLEEP
 
 ./auto-start-jboss-server.sh $config1 $config1.pid 0 uac
 
-# SIPp should be running by the time JBoss finishes the startup, ence we use half start time here.
+# SIPp should be running by the time JBoss finishes the startup, hence we use half start time here.
 
 sleep $HALFSTARTSLEEP
 ./auto-run-test.sh uac result.txt

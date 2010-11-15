@@ -102,8 +102,8 @@ if [ $# -eq 4 ]; then
 	    		;;
 	    uas-reinvite-passivation)
 	    		rm ./uas/*.log
-	            echo "Distributed example used is uas reinvite passivation";
-	    		./sipp $MSS_IP:5080 -s reinvite -sf uas/clustering-reinvite-uac.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
+	            echo "Distributed example used is uas reinvite passivation make sure to make at least 2 calls to the same node so that it gets activated";
+	    		./sipp $MSS_IP:5080 -s reinvite -sf uas/clustering-reinvite-uac-passivation.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;			    
 	    uas-timer)
 	    		rm ./uas/*.log
