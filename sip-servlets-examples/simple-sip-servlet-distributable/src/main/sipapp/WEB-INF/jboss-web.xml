@@ -2,4 +2,5 @@
     <replication-config>
         <replication-granularity>SESSION</replication-granularity>
     </replication-config>
+    <max-active-sessions>1</max-active-sessions>
 </jboss-web>
