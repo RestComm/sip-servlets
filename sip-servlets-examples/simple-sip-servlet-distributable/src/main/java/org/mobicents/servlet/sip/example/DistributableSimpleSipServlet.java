@@ -236,15 +236,17 @@ public class DistributableSimpleSipServlet
 		if(logger.isInfoEnabled()) {
 			logger.info("Distributable Simple Servlet: sip app session " + event.getApplicationSession().getId() + " expired");
 		}		
-		Iterator<SipSession> sipSessionsIt = (Iterator<SipSession>) event.getApplicationSession().getSessions("SIP");
-		if(sipSessionsIt.hasNext()) {
-			SipSession sipSession = sipSessionsIt.next();
-			if(sipSession != null && sipSession.isValid() && !State.TERMINATED.equals(sipSession.getState())) {
-				try {
-					sipSession.createRequest("BYE").send();
-				} catch (IOException e) {
-					logger.error("An unexpected exception occured while sending the BYE", e);
-				}				
+		if(event.getApplicationSession().isValid()) {
+			Iterator<SipSession> sipSessionsIt = (Iterator<SipSession>) event.getApplicationSession().getSessions("SIP");
+			if(sipSessionsIt.hasNext()) {
+				SipSession sipSession = sipSessionsIt.next();
+				if(sipSession != null && sipSession.isValid() && !State.TERMINATED.equals(sipSession.getState())) {
+					try {
+						sipSession.createRequest("BYE").send();
+					} catch (IOException e) {
+						logger.error("An unexpected exception occured while sending the BYE", e);
+					}				
+				}
 			}
 		}
 	}

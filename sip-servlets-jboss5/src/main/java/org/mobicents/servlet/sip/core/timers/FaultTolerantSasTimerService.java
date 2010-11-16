@@ -63,7 +63,7 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 	 */
 	public SipApplicationSessionTimerTask createSipApplicationSessionTimerTask(
 			MobicentsSipApplicationSession sipApplicationSession) {
-		return new FaultTolerantSasTimerTask(sipApplicationSession);
+		return new FaultTolerantSasTimerTask(sipManager, sipApplicationSession);
 	}
 	
 	public SipApplicationSessionTimerTask schedule(SipApplicationSessionTimerTask expirationTimerTask, 

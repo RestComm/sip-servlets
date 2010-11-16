@@ -22,6 +22,8 @@
 package org.mobicents.servlet.sip.core.timers;
 
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.timers.TimerTask;
 import org.mobicents.timers.TimerTaskData;
 
@@ -38,13 +40,15 @@ import org.mobicents.timers.TimerTaskData;
  */
 public class FaultTolerantSasTimerTask extends TimerTask implements SipApplicationSessionTimerTask {
 	protected SipApplicationSessionTimerTask sipApplicationSessionTimerTask;
-	private MobicentsSipApplicationSession sipApplicationSession;
+	private SipApplicationSessionKey sipApplicationSessionKey;
+	private SipManager manager;
 	
-	public FaultTolerantSasTimerTask(
+	public FaultTolerantSasTimerTask(SipManager sipManager,
 			MobicentsSipApplicationSession mobicentsSipApplicationSession) {		
 		super(init(mobicentsSipApplicationSession));
 		sipApplicationSessionTimerTask = new DefaultSasTimerTask(mobicentsSipApplicationSession);
-		sipApplicationSession = mobicentsSipApplicationSession;
+		sipApplicationSessionKey = mobicentsSipApplicationSession.getKey();
+		this.manager = sipManager;
 	}
 
 	public FaultTolerantSasTimerTask(
@@ -52,7 +56,7 @@ public class FaultTolerantSasTimerTask extends TimerTask implements SipApplicati
 			SipApplicationSessionTaskData sasData) {
 		super(sasData);
 		sipApplicationSessionTimerTask = new DefaultSasTimerTask(mobicentsSipApplicationSession);
-		sipApplicationSession = mobicentsSipApplicationSession;
+		sipApplicationSessionKey = mobicentsSipApplicationSession.getKey();
 	}
 
 	private static TimerTaskData init(MobicentsSipApplicationSession sipApplicationSession) {
@@ -62,15 +66,26 @@ public class FaultTolerantSasTimerTask extends TimerTask implements SipApplicati
 
 	@Override
 	public void runTask() {
+		if(sipApplicationSessionTimerTask.getSipApplicationSession() == null) {
+			// The task has been passivated
+			((DefaultSasTimerTask)sipApplicationSessionTimerTask).setSipApplicationSession(getSipApplicationSession());
+		}
 		sipApplicationSessionTimerTask.run();
 	}
 
 	public MobicentsSipApplicationSession getSipApplicationSession() {
-		return sipApplicationSession;
+		MobicentsSipApplicationSession sipApplicationSession = sipApplicationSessionTimerTask.getSipApplicationSession();
+		if(sipApplicationSession != null) {
+			return sipApplicationSession;
+		}
+		return manager.getSipApplicationSession(sipApplicationSessionKey, false);
 	}
 
 	public long getDelay() {
 		return sipApplicationSessionTimerTask.getDelay();
 	}
 
+	public void passivate() {
+		((DefaultSasTimerTask)sipApplicationSessionTimerTask).setSipApplicationSession(null);
+	}
 }

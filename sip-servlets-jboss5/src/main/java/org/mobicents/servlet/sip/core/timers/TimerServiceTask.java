@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.jboss.web.tomcat.service.session.ClusteredSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.timers.TimerTask;
 
 /**
@@ -43,6 +44,7 @@ public class TimerServiceTask extends TimerTask implements ServletTimer {
 	private static Logger logger = Logger.getLogger(TimerServiceTask.class);
 	ServletTimerImpl servletTimer;	
 	TimerServiceTaskData data;
+	SipManager sipManager;
 	
 	/**
 	 * @param data
@@ -50,6 +52,7 @@ public class TimerServiceTask extends TimerTask implements ServletTimer {
 	public TimerServiceTask(ClusteredSipManager<? extends OutgoingDistributableSessionData> sipManager, ServletTimerImpl servletTimerImpl, TimerServiceTaskData data) {
 		super(data);
 		this.data = data;
+		this.sipManager = sipManager;
 		if(servletTimerImpl == null) {
 			MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(data.getKey(), false);
 			if(sipApplicationSession != null) {
@@ -74,7 +77,10 @@ public class TimerServiceTask extends TimerTask implements ServletTimer {
 	 * @see org.mobicents.timers.TimerTask#run()
 	 */
 	@Override
-	public void runTask() {		
+	public void runTask() {	
+		if(getApplicationSession() == null) {
+			servletTimer.setApplicationSession(sipManager.getSipApplicationSession(data.getKey(), false));
+		}
 		servletTimer.run();
 	}
 
@@ -82,7 +88,7 @@ public class TimerServiceTask extends TimerTask implements ServletTimer {
 		servletTimer.cancel();
 	}
 
-	public SipApplicationSession getApplicationSession() {		
+	public SipApplicationSession getApplicationSession() {				
 		return servletTimer.getApplicationSession();
 	}
 
@@ -107,4 +113,8 @@ public class TimerServiceTask extends TimerTask implements ServletTimer {
 	public long scheduledExecutionTime() {
 		return servletTimer.scheduledExecutionTime();
 	}	
+	
+	public void passivate() {
+		servletTimer.setApplicationSession(null);
+	}
 }

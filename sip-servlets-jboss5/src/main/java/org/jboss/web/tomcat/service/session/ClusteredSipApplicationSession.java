@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
+import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSessionActivationListener;
 import javax.servlet.sip.SipApplicationSessionAttributeListener;
 import javax.servlet.sip.SipApplicationSessionBindingEvent;
@@ -63,6 +64,8 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.core.timers.FaultTolerantSasTimerTask;
+import org.mobicents.servlet.sip.core.timers.TimerServiceTask;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
@@ -922,6 +925,17 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		Set<String> keySet = getAttributesInternal().keySet();
 		return ((String[]) keySet.toArray(new String[keySet.size()]));
 	}
+	
+	@Override
+	public void passivate() {
+		notifyWillPassivate(ClusteredSessionNotificationCause.PASSIVATION);
+		((FaultTolerantSasTimerTask)expirationTimerTask).passivate();
+		if(servletTimers != null) {
+			for (ServletTimer servletTimer : servletTimers.values()) {
+				((TimerServiceTask) servletTimer).passivate();
+			}
+		}
+	}	
 	
 	/**
 	 * Inform any HttpSessionActivationListener that the session will passivate.

@@ -206,10 +206,18 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 		return this.period;
 	}
 
-	public SipApplicationSession getApplicationSession() {
+	public MobicentsSipApplicationSession getApplicationSession() {
 
 		synchronized (TIMER_LOCK) {
 			return this.appSession;
+		}
+
+	}
+	
+	public void setApplicationSession(MobicentsSipApplicationSession sipApplicationSession) {
+
+		synchronized (TIMER_LOCK) {
+			this.appSession = sipApplicationSession;
 		}
 
 	}
