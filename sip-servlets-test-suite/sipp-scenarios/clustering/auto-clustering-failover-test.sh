@@ -258,6 +258,57 @@ sleep $HALFSTARTSLEEP
 
 sleep 10
 
+##################################
+# Test UAS SAS Expiration Timer passivation
+##################################
+echo "Test UAS SAS Expiration Timer Passivation"
+echo "================================"
+./auto-prepare-example.sh uas-passivation $config1
+./auto-prepare-example.sh uas-passivation $config2
+
+./auto-start-jboss-server.sh $config2 $config2.pid 1 uas-sas-timer-passivation
+
+#Wait to boot
+sleep $HALFSTARTSLEEP
+
+./auto-start-jboss-server.sh $config1 $config1.pid 0 uas-sas-timer-passivation
+
+#Wait to boot
+sleep $HALFSTARTSLEEP
+
+./auto-run-test.sh uas-sas-timer-passivation result.txt
+
+#Kill the app servers
+./auto-kill-process-tree.sh `cat $config1.pid` $config1
+./auto-kill-process-tree.sh `cat $config2.pid` $config2
+
+sleep 10
+
+##################################
+# Test UAS Servlet Timer passivation
+##################################
+echo "Test UAS Servlet Timer Passivation"
+echo "================================"
+./auto-prepare-example.sh uas-passivation $config1
+./auto-prepare-example.sh uas-passivation $config2
+
+./auto-start-jboss-server.sh $config2 $config2.pid 1 uas-timer-passivation
+
+#Wait to boot
+sleep $HALFSTARTSLEEP
+
+./auto-start-jboss-server.sh $config1 $config1.pid 0 uas-timer-passivation
+
+#Wait to boot
+sleep $HALFSTARTSLEEP
+
+./auto-run-test.sh uas-timer-passivation result.txt
+
+#Kill the app servers
+./auto-kill-process-tree.sh `cat $config1.pid` $config1
+./auto-kill-process-tree.sh `cat $config2.pid` $config2
+
+sleep 10
 
 ##################################
 # Test UAC
