@@ -110,10 +110,21 @@ if [ $# -eq 4 ]; then
 	            echo "Distributed example used is uas timer";
 	    		./sipp $MSS_IP:5080 -s yousendbye -sf uas/clustering-uac-timer.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
+	    uas-timer-passivation)
+	    		rm ./uas/*.log
+	            echo "Distributed example used is uas timer passivation";
+	    		./sipp $MSS_IP:5080 -s yousendbye -sf uas/clustering-uac-timer.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
+	            ;;
 	    uas-sas-timer)
 	    		# kill first node after the ACK
 	    		rm ./uas/*.log
 	            echo "Distributed example used is uas sas timer";
+	    		./sipp $MSS_IP:5080 -s sastimersendbye -sf uas/clustering-uac-timer.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error  		
+	            ;;
+	    uas-sas-timer-passivation)
+	    		# kill first node after the ACK
+	    		rm ./uas/*.log
+	            echo "Distributed example used is uas sas timer passivation";
 	    		./sipp $MSS_IP:5080 -s sastimersendbye -sf uas/clustering-uac-timer.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error  		
 	            ;;
 		uas-reinvite-sas-timer)
