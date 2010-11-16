@@ -120,7 +120,7 @@ public class FaultTolerantTimerServiceImpl implements SipServletTimerService {
 		final TimerServiceTask timerServiceTask = new TimerServiceTask(sipManager, servletTimer, timerTaskData);
 		
 		getScheduler().schedule(timerServiceTask);				
-		sipApplicationSession.addServletTimer(servletTimer);
+		sipApplicationSession.addServletTimer(timerServiceTask);
 		if (isPersistent) {
 			persist(servletTimer);
 		} 
@@ -151,7 +151,7 @@ public class FaultTolerantTimerServiceImpl implements SipServletTimerService {
 		final TimerServiceTask timerServiceTask = new TimerServiceTask(sipManager, servletTimer, timerTaskData);
 				
 		getScheduler().schedule(timerServiceTask);			
-		sipApplicationSession.addServletTimer(servletTimer);
+		sipApplicationSession.addServletTimer(timerServiceTask);
 		if (isPersistent) {			
 			persist(servletTimer);
 		} 
