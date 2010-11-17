@@ -2828,10 +2828,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 				if (logger.isDebugEnabled()) {
 					logger.debug("Passivating session with id: " + key);
 				}
-
-				session
-						.notifyWillPassivate(ClusteredSessionNotificationCause.PASSIVATION);
-				session.processDialogPassivation();
+				
+				session.passivate();
 				getDistributedCacheConvergedSipManager().evictSipSession(session.getSipApplicationSession().getKey().getId(), SessionManagerUtil.getSipSessionHaKey(key));
 				sipSessionPassivated();
 				sipManagerDelegate.removeSipSession(key);

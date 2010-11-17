@@ -66,6 +66,7 @@ import org.jboss.web.tomcat.service.session.notification.ClusteredSessionManagem
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionNotificationCause;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipSessionNotificationPolicy;
 import org.mobicents.ha.javax.sip.ClusteredSipStack;
+import org.mobicents.ha.javax.sip.HASipDialog;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
@@ -74,6 +75,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipService;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
@@ -1599,8 +1601,25 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	public String getHaId() {
 		return haId;
 	}
+	
+	@Override
+	public void passivate() {
+		notifyWillPassivate(ClusteredSessionNotificationCause.PASSIVATION);
+		processDialogPassivation();
+		sipApplicationSession = null;
+	}
 
 	public void processDialogPassivation() {
-		((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).passivateDialog(sessionCreatingDialogId);
+		((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).passivateDialog((HASipDialog)sessionCreatingDialog);		
+		if(sessionCreatingDialog != null) {
+			TransactionApplicationData  applicationData = ((TransactionApplicationData)sessionCreatingDialog.getApplicationData());
+			if(applicationData != null) {
+				applicationData.cleanUp();
+				applicationData.getSipServletMessage().cleanUp();
+				applicationData.getSipServletMessage().setSipSession(null);
+				sessionCreatingDialog.setApplicationData(null);
+			}
+		}
+		sessionCreatingDialog = null;
 	}
 }
