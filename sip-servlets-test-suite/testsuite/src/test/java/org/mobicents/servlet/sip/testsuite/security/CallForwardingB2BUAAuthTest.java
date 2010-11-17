@@ -111,6 +111,10 @@ public class CallForwardingB2BUAAuthTest extends SipServletTestCase {
 		assertEquals(1, nbHeaders);
 	}
 	
+	/*
+	 * Non regression test for Issue http://code.google.com/p/mobicents/issues/detail?id=2114
+	 * In B2b servlet, after re-INVITE, and try to create CANCEL will get "final response already sent!" exception.
+	 */
 	public void testCallForwardingAuthCancel() throws Exception {
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		sender.setSendCancelOn1xx(true);

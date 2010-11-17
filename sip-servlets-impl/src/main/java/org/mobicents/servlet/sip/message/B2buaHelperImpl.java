@@ -797,7 +797,10 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		for (SipServletRequestImpl linkedRequest : originalRequestMap.keySet()) {
 			if(linkedRequest.getSipSessionKey().equals(((MobicentsSipSession) session).getKey()) && 
 					linkedRequest.getMethod().equalsIgnoreCase(Request.INVITE) && 
-					!linkedRequest.isFinalResponseGenerated()) {
+					!linkedRequest.isFinalResponseGenerated() &&
+					// Fix for Issue http://code.google.com/p/mobicents/issues/detail?id=2114
+					// 	In B2b servlet, after re-INVITE, and try to create CANCEL will get "final response already sent!" exception.
+					linkedRequest.getLastFinalResponse() == null) {
 				final SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl)linkedRequest.createCancel();
 				((MobicentsSipSession)sipServletRequestImpl.getSession()).setB2buaHelper(this);
 				return sipServletRequestImpl;

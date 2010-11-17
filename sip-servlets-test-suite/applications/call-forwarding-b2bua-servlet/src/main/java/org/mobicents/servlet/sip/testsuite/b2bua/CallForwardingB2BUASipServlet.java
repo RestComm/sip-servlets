@@ -348,14 +348,15 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			SipSession session = request.getSession();
 			B2buaHelper b2buaHelper = request.getB2buaHelper();
 			SipSession linkedSession = b2buaHelper.getLinkedSession(session);
-			SipServletRequest originalRequest = (SipServletRequest)linkedSession.getAttribute("originalRequest");
-			if(originalRequest != null) {
-				SipServletRequest  cancelRequest = b2buaHelper.getLinkedSipServletRequest(originalRequest).createCancel();				
+//			SipServletRequest originalRequest = (SipServletRequest)linkedSession.getAttribute("originalRequest");
+//			if(originalRequest != null) {
+//				SipServletRequest  cancelRequest = b2buaHelper.getLinkedSipServletRequest(originalRequest).createCancel();				
+			SipServletRequest  cancelRequest = b2buaHelper.createCancel(linkedSession);
 				logger.info("forkedRequest = " + cancelRequest);			
 				cancelRequest.send();
-			} else {
-				logger.info("no invite to cancel, it hasn't been forwarded");
-			}
+//			} else {
+//				logger.info("no invite to cancel, it hasn't been forwarded");
+//			}
 		}
 	}
 	
@@ -500,10 +501,11 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				authInfo.addAuthInfo(sipServletResponse.getStatus(), "sip-servlets-realm", "user", "pass");
 				SipServletRequest req2 = sipServletResponse.getRequest();
 				B2buaHelper helper = req2.getB2buaHelper();
-//				SipServletRequest req1 = helper.getLinkedSipServletRequest(req2);
+				SipServletRequest req1 = helper.getLinkedSipServletRequest(req2);				
 				SipServletRequest challengeRequest = helper.createRequest(sipServletResponse.getSession(), req2,
 				null);
 				challengeRequest.addAuthHeader(sipServletResponse, authInfo);
+				req1.getSession().setAttribute("originalRequest", challengeRequest);
 				challengeRequest.send();
 			}
 		} else {
