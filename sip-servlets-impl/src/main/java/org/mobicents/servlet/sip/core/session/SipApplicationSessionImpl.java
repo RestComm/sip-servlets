@@ -143,9 +143,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			//scheduling the timer for session expiration
 			final int sipContextTimeout = sipContext.getSipApplicationSessionTimeout();
 			if(sipContextTimeout > 0) {				
-				sipApplicationSessionTimeout = sipContextTimeout * 60 * 1000L;				
-				expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(this);				
-				expirationTimerTask = sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sipApplicationSessionTimeout, TimeUnit.MILLISECONDS);
+				sipApplicationSessionTimeout = sipContextTimeout * 60 * 1000L;								
 			} else {
 				if(logger.isDebugEnabled()) {
 					logger.debug("The sip application session "+ key +" will never expire ");
@@ -154,8 +152,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				// never starts for the SipApplicationSession object and the container does 
 				// not consider the object to ever have expired
 //				expirationTime = -1;
-			}
-			notifySipApplicationSessionListeners(SipApplicationSessionEventType.CREATION);
+			}			
 		}
 		// Last Accessed Time set here instead of at the same time as creationTime
 		// Contribution from Naoki Nishihara from OKI 
@@ -1200,6 +1197,12 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		return this.expirationTimerTask;
 	}
 
+	/**
+	 * @return the sipApplicationSessionTimeout
+	 */
+	public long getSipApplicationSessionTimeout() {
+		return sipApplicationSessionTimeout;
+	}
 	
 	public void setExpired(boolean hasExpired) {
 		expired = hasExpired;
@@ -1216,5 +1219,5 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	public void scheduleAsynchronousWork(
 			SipApplicationSessionAsynchronousWork work) {
 		sipContext.getSipApplicationDispatcher().getAsynchronousExecutor().execute(new SipApplicationSessionAsyncTask(key, work, sipContext.getSipApplicationDispatcher().getSipFactory()));
-	}
+	}	
 }

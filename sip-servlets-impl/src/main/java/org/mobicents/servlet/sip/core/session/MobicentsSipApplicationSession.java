@@ -83,5 +83,7 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession, S
 	SipApplicationSessionTimerTask getExpirationTimerTask();
 //	void setExpirationTimerFuture(ScheduledFuture<MobicentsSipApplicationSession> schedule);
 
+	long getSipApplicationSessionTimeout();
+	
 	Set<MobicentsSipSession> getSipSessions();
 }

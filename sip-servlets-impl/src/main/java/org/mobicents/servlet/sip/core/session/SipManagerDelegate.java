@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
@@ -27,6 +28,7 @@ import javax.servlet.sip.SipSession.State;
 
 import org.apache.catalina.Container;
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -225,6 +227,21 @@ public abstract class SipManagerDelegate {
             }
         }		
 		return sipApplicationSessionImpl;
+	}
+	
+	protected void scheduleExpirationTimer(MobicentsSipApplicationSession sipApplicationSession) {
+		// Sip Application Session Timer Task moved out of the SipApplicationSession constructor
+		// as for clustering it might not be needed to reschedule them on recreation
+		final SipContext sipContext = sipApplicationSession.getSipContext();
+		if(sipContext != null) {
+			if(sipContext.getSipApplicationSessionTimeout() > 0) {		
+				SipApplicationSessionTimerTask expirationTimerTask = sipContext.getSipApplicationSessionTimerService().createSipApplicationSessionTimerTask(sipApplicationSession);				
+				expirationTimerTask = sipContext.getSipApplicationSessionTimerService().schedule(expirationTimerTask, sipApplicationSession.getSipApplicationSessionTimeout(), TimeUnit.MILLISECONDS);
+				sipApplicationSession.setExpirationTimerTask(expirationTimerTask);
+			} 
+			
+			sipApplicationSession.notifySipApplicationSessionListeners(SipApplicationSessionEventType.CREATION);
+		}
 	}
 
 	/**

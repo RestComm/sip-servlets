@@ -326,4 +326,8 @@ public class MobicentsSipApplicationSessionFacade implements
 		sipApplicationSession.scheduleAsynchronousWork(work);
 	}
 
+	public long getSipApplicationSessionTimeout() {		
+		return sipApplicationSession.getSipApplicationSessionTimeout();
+	}
+
 }

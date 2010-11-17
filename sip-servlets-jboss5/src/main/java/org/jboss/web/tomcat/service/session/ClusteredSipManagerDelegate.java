@@ -59,6 +59,11 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 	@Override
 	protected MobicentsSipApplicationSession getNewMobicentsSipApplicationSession(
 			SipApplicationSessionKey key, SipContext sipContext) {
+		return getNewMobicentsSipApplicationSession(key, sipContext, true);
+	}
+	
+	protected MobicentsSipApplicationSession getNewMobicentsSipApplicationSession(
+			SipApplicationSessionKey key, SipContext sipContext, boolean scheduleTimer) {
 		ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session = null;
 		
 		if (replicationGranularity.equals(ReplicationGranularity.ATTRIBUTE)) {
@@ -70,6 +75,9 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 		}
 		clusteredSipManager.getDistributedCacheConvergedSipManager().sipApplicationSessionCreated(key.getId());
 		session.setNew(true);
+		if(scheduleTimer) {
+			scheduleExpirationTimer(session);
+		}
 		return session;
 	}
 
