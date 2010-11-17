@@ -292,6 +292,8 @@ public class TestSipListener implements SipListener {
 
 	private boolean disableSequenceNumberValidation = false;
 	
+	private boolean sendCancelOn1xx = false;
+	
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
 		private EventHeader eventHeader;
@@ -1352,6 +1354,10 @@ public class TestSipListener implements SipListener {
 		try {			
 			if(response.getStatusCode() > 100 && response.getStatusCode() < 200) {
 				informationalResponse = response;
+				if(sendCancelOn1xx) {
+					sendCancel();
+					return;
+				}
 			}
 			if(response.getStatusCode() >= 200 && response.getStatusCode() < 700) {
 				logger.info("final response received : status code " + response.getStatusCode());
@@ -2817,6 +2823,20 @@ public class TestSipListener implements SipListener {
 	 */
 	public boolean isDisableSequenceNumberValidation() {
 		return disableSequenceNumberValidation;
+	}
+
+	/**
+	 * @param sendCancelOn1xx the sendCancelOn1xx to set
+	 */
+	public void setSendCancelOn1xx(boolean sendCancelOn1xx) {
+		this.sendCancelOn1xx = sendCancelOn1xx;
+	}
+
+	/**
+	 * @return the sendCancelOn1xx
+	 */
+	public boolean isSendCancelOn1xx() {
+		return sendCancelOn1xx;
 	}
 
 }

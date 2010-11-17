@@ -111,6 +111,39 @@ public class CallForwardingB2BUAAuthTest extends SipServletTestCase {
 		assertEquals(1, nbHeaders);
 	}
 	
+	public void testCallForwardingAuthCancel() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		sender.setSendCancelOn1xx(true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		receiver.setChallengeRequests(true);
+		receiver.setWaitForCancel(true);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+				
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Remote-Party-ID"}, new String[] {"<sip:test@127.0.0.1:5080>;screen=yes;privacy=off;party=calling;-call-initiator=5016;-call-initiator-location=int;-redirected-by;-int-ext=5016;-ent-name=Acro;-direction=ext;-call-id=55665"}, true);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isCancelOkReceived());
+		assertTrue(sender.isRequestTerminatedReceived());
+		assertTrue(receiver.isCancelReceived());
+	}
+	
 	@Override
 	protected void tearDown() throws Exception {	
 		senderProtocolObjects.destroy();
