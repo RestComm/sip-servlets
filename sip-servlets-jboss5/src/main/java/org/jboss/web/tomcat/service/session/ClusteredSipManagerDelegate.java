@@ -66,6 +66,8 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 			SipApplicationSessionKey key, SipContext sipContext, boolean scheduleTimer) {
 		ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session = null;
 		
+		clusteredSipManager.checkSipApplicationSessionPassivation(key);
+		
 		if (replicationGranularity.equals(ReplicationGranularity.ATTRIBUTE)) {
 			session = new AttributeBasedClusteredSipApplicationSession(key,sipContext, useJK);
 		} else if (replicationGranularity.equals(ReplicationGranularity.FIELD)) {
@@ -89,6 +91,9 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 			SipFactoryImpl sipFactoryImpl,
 			MobicentsSipApplicationSession mobicentsSipApplicationSession) {
 		ClusteredSipSession<? extends OutgoingDistributableSessionData> session = null;
+		
+		clusteredSipManager.checkSipSessionPassivation(key);
+		
 		if (replicationGranularity.equals(ReplicationGranularity.ATTRIBUTE)) {
 			session = new AttributeBasedClusteredSipSession(key, sipFactoryImpl, mobicentsSipApplicationSession, useJK);
 		} else if (replicationGranularity.equals(ReplicationGranularity.FIELD)) {

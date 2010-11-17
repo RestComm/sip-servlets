@@ -30,6 +30,8 @@ import org.jboss.web.tomcat.service.session.notification.ClusteredSipApplication
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipSessionNotificationPolicy;
 import org.mobicents.cluster.MobicentsCluster;
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
 
 /**
  * @author jean.deruelle@gmail.com
@@ -77,4 +79,7 @@ public interface ClusteredSipManager<O extends OutgoingDistributableSessionData>
 	public DistributedCacheConvergedSipManager getDistributedCacheConvergedSipManager();
 
 	MobicentsCluster getMobicentsCluster();
+
+	void checkSipApplicationSessionPassivation(SipApplicationSessionKey key);
+	void checkSipSessionPassivation(SipSessionKey key);
 }

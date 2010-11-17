@@ -141,6 +141,10 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	private final ConcurrentMap<String, ClusteredSession<? extends OutgoingDistributableSessionData>> embryonicSessions = 
 		new ConcurrentHashMap<String, ClusteredSession<? extends OutgoingDistributableSessionData>>();
 	
+	/** number of sessions rejected because the number active sip sessions exceeds maxActive */
+	protected AtomicInteger rejectedSipSessionCounter_ = new AtomicInteger();
+	/** number of sessions rejected because the number active sip application sessions exceeds maxActive */
+	protected AtomicInteger rejectedSipApplicationSessionCounter_ = new AtomicInteger();
 	/** Number of passivated sip sessions */
 	private AtomicInteger passivatedSipSessionCount_ = new AtomicInteger();
 	/** Maximum number of concurrently passivated sip sessions */
@@ -470,7 +474,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
                        " and max allowed sessions = " + maxActiveAllowed_);
          }
          
-         processExpirationPassivation();
+         processHttpSessionExpirationPassivation();
          
          if (calcActiveSessions() >= maxActiveAllowed_)
          {
@@ -1037,12 +1041,14 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
    
    protected int getTotalActiveSipApplicationSessions()
    {
-      return localActiveSipApplicationSessionCounter_.get() + unloadedSipApplicationSessions_.size() - passivatedSipApplicationSessionCount_.get();
+//      return localActiveSipApplicationSessionCounter_.get() + unloadedSipApplicationSessions_.size() - passivatedSipApplicationSessionCount_.get();
+	   return localActiveSipApplicationSessionCounter_.get() + unloadedSipApplicationSessions_.size();
    }
    
    protected int getTotalActiveSipSessions()
    {
-      return localActiveSipSessionCounter_.get() + unloadedSipSessions_.size() - passivatedSipSessionCount_.get();
+//      return localActiveSipSessionCounter_.get() + unloadedSipSessions_.size() - passivatedSipSessionCount_.get();
+      return localActiveSipSessionCounter_.get() + unloadedSipSessions_.size();
    }
    
    @Override
@@ -1499,13 +1505,13 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
       long passivationMax = passivationMaxIdleTime_ * 1000L;
       long passivationMin = passivationMinIdleTime_ * 1000L;
 
-      if (trace_)
-      { 
+      if (trace_) { 
          log_.trace("processSipSessionExpirationPassivation(): Looking for sip sessions that have expired ...");
+         log_.trace("processSipSessionExpirationPassivation(): passivation Max = " + passivationMax);
+         log_.trace("processSipSessionExpirationPassivation(): passivation Min = " + passivationMin);
          log_.trace("processSipSessionExpirationPassivation(): active sip sessions = " + calcActiveSipSessions());
          log_.trace("processSipSessionExpirationPassivation(): expired sip sessions = " + expiredSipSessionCounter_);
-         if (passivate)
-         {
+         if (passivate) {
             log_.trace("processSipSessionExpirationPassivation(): passivated count = " + getPassivatedSipSessionCount());
          }
       }
@@ -1590,6 +1596,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
                {
                   long timeNow = System.currentTimeMillis();
                   long timeIdle = timeNow - passivationCheck.getLastUpdate();
+                  log_.debug("Time now " + timeNow + ", Time Idle " + timeIdle);
                   // if maxIdle time configured, means that we need to passivate sessions that have
                   // exceeded the max allowed idle time
                   if (passivationMax >= 0 
@@ -1632,13 +1639,11 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
          ConvergedSessionInvalidationTracker.resume();
       }
       
-      if (trace_)
-      { 
+      if (trace_) { 
          log_.trace("processSipSessionExpirationPassivation(): Completed ...");
          log_.trace("processSipSessionExpirationPassivation(): active sip sessions = " + calcActiveSipSessions());
          log_.trace("processSipSessionExpirationPassivation(): expired sip sessions = " + expiredSipSessionCounter_);
-         if (passivate)
-         {
+         if (passivate) {
             log_.trace("processSipSessionExpirationPassivation(): passivated count = " + getPassivatedSipSessionCount());
          }
       }
@@ -4773,5 +4778,53 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	public interface OutdatedSipApplicationSessionChecker {
 		boolean isSessionOutdated(
 				ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session);
+	}
+
+	public void checkSipApplicationSessionPassivation(SipApplicationSessionKey key) {
+		if (maxActiveAllowed_ > 0
+				&& calcActiveSipApplicationSessions() >= maxActiveAllowed_) {
+			if (trace_) {
+				log_.trace("checkSipApplicationSessionPassivation(): active sip application sessions = "
+						+ calcActiveSipApplicationSessions() + " and max allowed sessions = "
+						+ maxActiveAllowed_);
+			}
+
+			processSipApplicationSessionExpirationPassivation();
+
+			if (calcActiveSipApplicationSessions() >= maxActiveAllowed_) {
+				// Exceeds limit. We need to reject it.
+				rejectedSipApplicationSessionCounter_.incrementAndGet();
+				// Catalina api does not specify what happens
+				// but we will throw a runtime exception for now.				
+//				throw new IllegalStateException("checkSipApplicationSessionPassivation(): number of "
+//						+ "active sip application sessions exceeds the maximum limit: "
+//						+ maxActiveAllowed_ + " when trying to create sip application session "
+//						+ key);
+			}
+		}		
+	}
+	
+	public void checkSipSessionPassivation(SipSessionKey key) {
+		if (maxActiveAllowed_ > 0
+				&& calcActiveSipSessions() >= maxActiveAllowed_) {
+			if (trace_) {
+				log_.trace("checkSipSessionPassivation(): active sip sessions = "
+						+ calcActiveSipSessions() + " and max allowed sessions = "
+						+ maxActiveAllowed_);
+			}
+
+			processSipSessionExpirationPassivation();
+
+			if (calcActiveSipSessions() >= maxActiveAllowed_) {
+				// Exceeds limit. We need to reject it.
+				rejectedSipSessionCounter_.incrementAndGet();
+				// Catalina api does not specify what happens
+				// but we will throw a runtime exception for now.
+//				throw new IllegalStateException("checkSipSessionPassivation(): number of "
+//						+ "active sip sessions exceeds the maximum limit: "
+//						+ maxActiveAllowed_ + " when trying to create sip session "
+//						+ key);
+			}
+		}		
 	}
 }
