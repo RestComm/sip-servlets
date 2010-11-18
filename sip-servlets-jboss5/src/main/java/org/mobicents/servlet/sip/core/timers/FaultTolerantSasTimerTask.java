@@ -86,6 +86,16 @@ public class FaultTolerantSasTimerTask extends TimerTask implements SipApplicati
 	}
 
 	public void passivate() {
-		((DefaultSasTimerTask)sipApplicationSessionTimerTask).setSipApplicationSession(null);
+		sipApplicationSessionTimerTask.setSipApplicationSession(null);
 	}
+
+	public void setSipApplicationSession(
+			MobicentsSipApplicationSession sipApplicationSession) {
+		sipApplicationSessionTimerTask.setSipApplicationSession(sipApplicationSession);
+		if(sipApplicationSession == null) {
+			sipApplicationSessionKey = null;
+		}
+	}
+	
+	
 }

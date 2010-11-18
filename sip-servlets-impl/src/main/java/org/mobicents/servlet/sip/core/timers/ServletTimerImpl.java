@@ -21,7 +21,6 @@ import java.util.UUID;
 import java.util.concurrent.ScheduledFuture;
 
 import javax.servlet.sip.ServletTimer;
-import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.TimerListener;
 
 import org.apache.log4j.Logger;
@@ -184,8 +183,9 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 			}
 		}
 		if (appSessionToCancelThisTimersFrom != null) {
-			appSessionToCancelThisTimersFrom.removeServletTimer(this);
+			appSessionToCancelThisTimersFrom.removeServletTimer(this);			
 		}
+		appSession = null;
 	}
 
 	/**

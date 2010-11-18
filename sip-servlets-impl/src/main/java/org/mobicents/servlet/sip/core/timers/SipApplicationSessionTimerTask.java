@@ -36,6 +36,12 @@ public interface SipApplicationSessionTimerTask extends Runnable {
 	 * @return the sip application session
 	 */
 	MobicentsSipApplicationSession getSipApplicationSession();
+	
+	/**
+	 * Set the sip application Session associated with the timer task
+	 * @param sipApplicationSession the sip application session to set
+	 */
+	void setSipApplicationSession(MobicentsSipApplicationSession sipApplicationSession);
 
 	/**
 	 * Returns the delay in milliseconds before the session is due to expire or a negative value
