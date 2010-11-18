@@ -166,7 +166,15 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		// Upon receiving an initial request for processing, a container MUST check the topmost Route header and 
 		// Request-URI (in that order) to see if it contains an encoded URI. 
 		// If it does, the container MUST use the encoded URI to locate the targeted SipApplicationSession object
-		String targetedApplicationKey = ((Parameters)request.getRequestURI()).getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
+		URI requestURI = request.getRequestURI();
+		// From horacimacias : Fix for Issue 2115 MSS unable to handle GenericURI URIs
+		// check the URI is an instance of Parameters. GenericURI doesn't implement Parameters
+		String targetedApplicationKey;
+		if(requestURI instanceof Parameters) {
+			targetedApplicationKey = ((Parameters)requestURI).getParameter(MobicentsSipApplicationSession.SIP_APPLICATION_KEY_PARAM_NAME);
+		} else {
+			targetedApplicationKey = null;
+		}
 		MobicentsSipApplicationSession encodeURISipApplicationSession = retrieveTargetedApplication(targetedApplicationKey);
 		SipTargetedRequestInfo targetedRequestInfo = null;
 		if(encodeURISipApplicationSession != null) {

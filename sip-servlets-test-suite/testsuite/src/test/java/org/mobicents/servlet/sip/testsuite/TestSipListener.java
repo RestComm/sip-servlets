@@ -2839,4 +2839,18 @@ public class TestSipListener implements SipListener {
 		return sendCancelOn1xx;
 	}
 
+	/**
+	 * @param useToURIasRequestUri the useToURIasRequestUri to set
+	 */
+	public void setUseToURIasRequestUri(boolean useToURIasRequestUri) {
+		this.useToURIasRequestUri = useToURIasRequestUri;
+	}
+
+	/**
+	 * @return the useToURIasRequestUri
+	 */
+	public boolean isUseToURIasRequestUri() {
+		return useToURIasRequestUri;
+	}
+
 }
