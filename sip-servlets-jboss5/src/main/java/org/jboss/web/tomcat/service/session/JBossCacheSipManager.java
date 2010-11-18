@@ -2504,7 +2504,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	        			// a replication message from another server
 	        			mustAdd = true;
 	        			initialLoad = true;
-	        			session = (ClusteredSipSession<? extends OutgoingDistributableSessionData>) sipManagerDelegate.getSipSession(key, true, sipFactory, sipApplicationSessionImpl);
+	        			session = (ClusteredSipSession<? extends OutgoingDistributableSessionData>) 
+	        					((ClusteredSipManagerDelegate)sipManagerDelegate).getNewMobicentsSipSession(key, sipFactory, sipApplicationSessionImpl, true);
 	        			OwnedSessionUpdate osu = unloadedSipSessions_.get(key);
 	        	        passivated = (osu != null && osu.passivated);
 	        		}
@@ -2643,7 +2644,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 						initialLoad = true;
 						//since the session has to be recreated we don't recreate the sas timer since it is fault tolerant and has been failed over as well
 						session = (ClusteredSipApplicationSession) 
-							((ClusteredSipManagerDelegate)sipManagerDelegate).getNewMobicentsSipApplicationSession(key, ((SipContext)getContainer()), false);
+							((ClusteredSipManagerDelegate)sipManagerDelegate).getNewMobicentsSipApplicationSession(key, ((SipContext)getContainer()), true);
 						OwnedSessionUpdate osu = unloadedSipApplicationSessions_.get(key);
 						passivated = (osu != null && osu.passivated);
 					}

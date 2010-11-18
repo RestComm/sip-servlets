@@ -1609,9 +1609,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		sipApplicationSession = null;
 	}
 
-	public void processDialogPassivation() {
-		((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).passivateDialog((HASipDialog)sessionCreatingDialog);		
+	public void processDialogPassivation() {				
 		if(sessionCreatingDialog != null) {
+			((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).passivateDialog((HASipDialog)sessionCreatingDialog);
 			TransactionApplicationData  applicationData = ((TransactionApplicationData)sessionCreatingDialog.getApplicationData());
 			if(applicationData != null) {
 				applicationData.cleanUp();

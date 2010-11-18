@@ -59,14 +59,16 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 	@Override
 	protected MobicentsSipApplicationSession getNewMobicentsSipApplicationSession(
 			SipApplicationSessionKey key, SipContext sipContext) {
-		return getNewMobicentsSipApplicationSession(key, sipContext, true);
+		return getNewMobicentsSipApplicationSession(key, sipContext, false);
 	}
 	
 	protected MobicentsSipApplicationSession getNewMobicentsSipApplicationSession(
-			SipApplicationSessionKey key, SipContext sipContext, boolean scheduleTimer) {
-		ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session = null;
+			SipApplicationSessionKey key, SipContext sipContext, boolean recreate) {
+		ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session = null;				
 		
-		clusteredSipManager.checkSipApplicationSessionPassivation(key);
+		if(!recreate) {
+			clusteredSipManager.checkSipApplicationSessionPassivation(key);
+		}
 		
 		if (replicationGranularity.equals(ReplicationGranularity.ATTRIBUTE)) {
 			session = new AttributeBasedClusteredSipApplicationSession(key,sipContext, useJK);
@@ -77,7 +79,7 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 		}
 		clusteredSipManager.getDistributedCacheConvergedSipManager().sipApplicationSessionCreated(key.getId());
 		session.setNew(true);
-		if(scheduleTimer) {
+		if(!recreate) {
 			scheduleExpirationTimer(session);
 		}
 		return session;
@@ -90,9 +92,17 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 	protected MobicentsSipSession getNewMobicentsSipSession(SipSessionKey key,
 			SipFactoryImpl sipFactoryImpl,
 			MobicentsSipApplicationSession mobicentsSipApplicationSession) {
+		return getNewMobicentsSipSession(key, sipFactoryImpl, mobicentsSipApplicationSession, false);
+	}
+	
+	protected MobicentsSipSession getNewMobicentsSipSession(SipSessionKey key,
+			SipFactoryImpl sipFactoryImpl,
+			MobicentsSipApplicationSession mobicentsSipApplicationSession, boolean recreate) {
 		ClusteredSipSession<? extends OutgoingDistributableSessionData> session = null;
 		
-		clusteredSipManager.checkSipSessionPassivation(key);
+		if(!recreate) {
+			clusteredSipManager.checkSipSessionPassivation(key);
+		}
 		
 		if (replicationGranularity.equals(ReplicationGranularity.ATTRIBUTE)) {
 			session = new AttributeBasedClusteredSipSession(key, sipFactoryImpl, mobicentsSipApplicationSession, useJK);
