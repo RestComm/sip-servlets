@@ -354,15 +354,21 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		 	}
 		}
 		if(logger.isInfoEnabled()) {
-			Properties versionProperties = new Properties();
+			Properties releaseProperties = new Properties();
 			try {
-				InputStream in = SipApplicationDispatcherImpl.class.getResourceAsStream("version.properties");
+				InputStream in = SipApplicationDispatcherImpl.class.getResourceAsStream("release.properties");
 				if(in != null) {
-					versionProperties.load(in);
+					releaseProperties.load(in);
 					in.close();
-					String version = versionProperties.getProperty("release.version");
-					if(version != null) {
-						logger.info("Mobicents Sip Servlets " + version + " started." );
+					String releaseVersion = releaseProperties.getProperty("release.version");
+					String releaseName = releaseProperties.getProperty("release.name");
+					String releaseDate = releaseProperties.getProperty("release.date");
+					String releaseRevision = releaseProperties.getProperty("release.revision");
+					if(releaseVersion != null) {
+						// Follow the EAP Convention 
+						// Release ID: JBoss [EAP] 5.0.1 (build: SVNTag=JBPAPP_5_0_1 date=201003301050)
+						logger.info("Release ID: (" + releaseName + ") Sip Servlets " + releaseVersion + " (build: SVNTag=" + releaseRevision + " date=" + releaseDate);
+						logger.info(releaseName + " Sip Servlets " + releaseVersion + " (build: revision=" + releaseRevision + " date=" + releaseDate + " Started.");
 					} else {
 						logger.warn("Unable to extract the version of Mobicents Sip Servlets currently running");
 					}

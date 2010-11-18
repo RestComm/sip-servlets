@@ -9,7 +9,14 @@
 	<artifactId>sip-servlets-impl</artifactId>
 	<packaging>jar</packaging>
 	<name>Sip Servlets Implementation</name>
-	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
+	<url>http://www.mobicents.org/products_sip_servlets.html</url>
+	
+	<properties>
+		<mobicents.name>Mobicents</mobicents.name>
+		<maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
+		<release.timestamp>${maven.build.timestamp}</release.timestamp>
+	</properties>
+	
 	<dependencies>
 		<!-- sip servlet spec dependency -->
 		<dependency>
