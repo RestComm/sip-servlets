@@ -1596,7 +1596,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
                {
                   long timeNow = System.currentTimeMillis();
                   long timeIdle = timeNow - passivationCheck.getLastUpdate();
-                  log_.debug("Time now " + timeNow + ", Time Idle " + timeIdle);
+                  if(trace_) {
+                	  log_.trace("Time now " + timeNow + ", Time Idle " + timeIdle);
+                  }
                   // if maxIdle time configured, means that we need to passivate sessions that have
                   // exceeded the max allowed idle time
                   if (passivationMax >= 0 
