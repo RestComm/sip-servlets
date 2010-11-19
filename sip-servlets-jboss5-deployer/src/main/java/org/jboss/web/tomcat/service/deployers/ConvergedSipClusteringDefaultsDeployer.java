@@ -42,7 +42,15 @@ public class ConvergedSipClusteringDefaultsDeployer extends
 	 * property isn't already configured.
 	 */
 	public void deploy(DeploymentUnit unit) throws DeploymentException {
-		super.deploy(unit);
+		JBossWebMetaData metaData = unit.getAttachment(JBossWebMetaData.class);
+	    if( metaData != null && metaData.getDistributable() != null ) {
+	    	if (metaData.getDistributable() != null) {
+	            addReplicationConfigDefaults(metaData);
+	            
+	            addPassivationConfigDefaults(metaData);
+	        }
+	    }
+	   
 		JBossConvergedSipMetaData convergedMetaData = (JBossConvergedSipMetaData) unit.getAttachment(JBossConvergedSipMetaData.class);
 		if (convergedMetaData != null && convergedMetaData.getDistributable() != null) {
 			if (convergedMetaData.getDistributable() != null) {
@@ -71,7 +79,7 @@ public class ConvergedSipClusteringDefaultsDeployer extends
 		if (passCfg.getPassivationMinIdleTime() == null)
 			passCfg.setPassivationMinIdleTime(new Integer(
 					this.getPassivationMinIdleTime()));
-		if (passCfg.getPassivationMinIdleTime() == null)
+		if (passCfg.getPassivationMaxIdleTime() == null)
 			passCfg.setPassivationMaxIdleTime(new Integer(
 					this.getPassivationMaxIdleTime()));
 	}

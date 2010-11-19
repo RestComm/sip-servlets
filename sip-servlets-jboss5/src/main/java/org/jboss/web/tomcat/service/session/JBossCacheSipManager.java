@@ -1497,8 +1497,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
    /**
     * {@inheritDoc}
     */
-   protected void processSipSessionExpirationPassivation()
-   {      
+   protected void processSipSessionExpirationPassivation() {      
       boolean expire = maxInactiveInterval_ >= 0;
       boolean passivate = isPassivationEnabled();
       
@@ -1520,31 +1519,24 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
       // sorted by last acccessed time
       TreeSet<SipSessionPassivationCheck> passivationChecks = new TreeSet<SipSessionPassivationCheck>();
       
-      try
-      {
+      try {
          // Don't track sessions invalidated via this method as if they
          // were going to be re-requested by the thread
          ConvergedSessionInvalidationTracker.suspend();
          
          // First, handle the sessions we are actively managing
          ClusteredSipSession<? extends OutgoingDistributableSessionData> sessions[] = findLocalSipSessions();
-         for (ClusteredSipSession<? extends OutgoingDistributableSessionData> session : sessions)
-         {
-            if (!backgroundProcessAllowed.get())
-            {
+         for (ClusteredSipSession<? extends OutgoingDistributableSessionData> session : sessions) {
+            if (!backgroundProcessAllowed.get()) {
                return;
             }
             
-            try
-            {
-
-               if (expire)
-               {
+            try {
+               if (expire) {
                   // JBAS-2403. Check for outdated sessions where we think
                   // the local copy has timed out.  If found, refresh the
                   // session from the cache in case that might change the timeout
-                  if (this.outdatedSipSessionChecker.isSessionOutdated(session) && session.isValidInternal())
-                  {
+                  if (this.outdatedSipSessionChecker.isSessionOutdated(session) && session.isValidInternal()) {
                      // FIXME in AS 5 every time we get a notification from the distributed
                      // cache of an update, we get the latest timestamp. So
                      // we shouldn't need to do a full session load here. A load
@@ -1555,7 +1547,6 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
                      // the session has been removed from the cache
                      loadSipSession(session.getKey(), false, sipManagerDelegate.getSipFactoryImpl(), session.getSipApplicationSession());
                   }
-   
                   // Do a normal invalidation check that will expire the
                   // session if it has timed out
                   // DON'T SYNCHRONIZE on session here -- isValid() and
@@ -1567,33 +1558,26 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
                 
                // we now have a valid session; store it so we can check later
                // if we need to passivate it
-               if (passivate)
-               {
+               if (passivate) {
                   passivationChecks.add(new SipSessionPassivationCheck(session));
                }
-               
             }
-            catch (Exception ex)
-            {
+            catch (Exception ex) {
                log_.error("processSipSessionExpirationPassivation(): failed handling " + 
                           session.getKey() + " with exception: " + 
                           ex, ex);
             }
          }
          
-         if (!backgroundProcessAllowed.get())
-         {
+         if (!backgroundProcessAllowed.get()) {
             return;
          }
 
          // Now, passivations
-         if (passivate)
-         {
+         if (passivate) {
             // Iterate through sessions, earliest lastAccessedTime to latest
-            for (SipSessionPassivationCheck passivationCheck : passivationChecks)
-            {               
-               try
-               {
+            for (SipSessionPassivationCheck passivationCheck : passivationChecks) {               
+               try {
                   long timeNow = System.currentTimeMillis();
                   long timeIdle = timeNow - passivationCheck.getLastUpdate();
                   if(trace_) {
@@ -1601,9 +1585,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
                   }
                   // if maxIdle time configured, means that we need to passivate sessions that have
                   // exceeded the max allowed idle time
-                  if (passivationMax >= 0 
-                        && timeIdle > passivationMax)
-                  {
+                  if (passivationMax >= 0  && timeIdle > passivationMax) {
                      passivationCheck.passivate();
                   }
                   // If the session didn't exceed the passivationMaxIdleTime_, see   
@@ -1612,19 +1594,15 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
                   else if (maxActiveAllowed_ > 0 
                               && passivationMin > 0 
                               && calcActiveSipSessions() >= maxActiveAllowed_ 
-                              && timeIdle > passivationMin)
-                  {
+                              && timeIdle > passivationMin) {
                      passivationCheck.passivate();
-                  }
-                  else
-                  {
+                  } else {
                      // the entries are ordered by lastAccessed, so once
                      // we don't passivate one, we won't passivate any
                      break;
                   }
                }
-               catch (Exception e)
-               {
+               catch (Exception e) {
                   String unloadMark = passivationCheck.isUnloaded() ? "unloaded " : "";
                   log_.error("processSipSessionExpirationPassivation(): failed passivating " + unloadMark + "session " + 
                         passivationCheck.getKey(), e);
@@ -1632,12 +1610,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
             }
          }
       }
-      catch (Exception ex)
-      {
+      catch (Exception ex) {
          log_.error("processSipSessionExpirationPassivation(): failed with exception: " + ex, ex);
-      }
-      finally
-      {
+      } finally {
          ConvergedSessionInvalidationTracker.resume();
       }
       
