@@ -367,8 +367,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					if(releaseVersion != null) {
 						// Follow the EAP Convention 
 						// Release ID: JBoss [EAP] 5.0.1 (build: SVNTag=JBPAPP_5_0_1 date=201003301050)
-						logger.info("Release ID: (" + releaseName + ") Sip Servlets " + releaseVersion + " (build: SVNTag=" + releaseRevision + " date=" + releaseDate);
-						logger.info(releaseName + " Sip Servlets " + releaseVersion + " (build: revision=" + releaseRevision + " date=" + releaseDate + " Started.");
+						logger.info("Release ID: (" + releaseName + ") Sip Servlets " + releaseVersion + " (build: SVNTag=" + releaseRevision + " date=" + releaseDate + ")");
+						logger.info(releaseName + " Sip Servlets " + releaseVersion + " (build: revision=" + releaseRevision + " date=" + releaseDate + ") Started.");
 					} else {
 						logger.warn("Unable to extract the version of Mobicents Sip Servlets currently running");
 					}
