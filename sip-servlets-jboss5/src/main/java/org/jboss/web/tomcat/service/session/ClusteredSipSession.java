@@ -1551,7 +1551,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	}
 
 	@Override
-	protected void setReadyToInvalidate(boolean readyToInvalidate) {
+	public void setReadyToInvalidate(boolean readyToInvalidate) {
 		boolean oldReadyToInvalidate = this.readyToInvalidate;
 		super.setReadyToInvalidate(readyToInvalidate);
 		if(oldReadyToInvalidate != readyToInvalidate) {
@@ -1561,7 +1561,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	}
 	
 	@Override
-	protected void setValid(boolean isValid) {
+	public void setValid(boolean isValid) {
 		super.setValid(isValid);
 		sessionMetadataDirty();
 		metadata.getMetaData().put(IS_VALID, isValid);
