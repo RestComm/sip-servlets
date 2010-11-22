@@ -16,10 +16,7 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
-import java.util.concurrent.TimeUnit;
-
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -38,8 +35,7 @@ public class SipStandardManagerDelegate extends SipManagerDelegate {
             throw new IllegalStateException
                 ("could not create a new sip session because there is currently too many active sip sessions");
 		}
-		sipSessionCounter++;
-		scheduleExpirationTimer(mobicentsSipApplicationSession);
+		sipSessionCounter++;		
 		return new SipSessionImpl(key, sipFactoryImpl, mobicentsSipApplicationSession);
 	}
 
@@ -53,6 +49,7 @@ public class SipStandardManagerDelegate extends SipManagerDelegate {
 		}
 		sipApplicationSessionCounter++;		
 		MobicentsSipApplicationSession sipApplicationSession = new SipApplicationSessionImpl(key, sipContext);
+		scheduleExpirationTimer(sipApplicationSession);
 		
 		return sipApplicationSession;
 	}
