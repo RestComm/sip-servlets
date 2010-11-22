@@ -1394,14 +1394,14 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	}
 
 	@Override
-	protected void setReadyToInvalidate(boolean readyToInvalidate) {
+	public void setReadyToInvalidate(boolean readyToInvalidate) {
 		super.setReadyToInvalidate(readyToInvalidate);
 		sessionMetadataDirty();
 		metaModifiedMap_.put(READY_TO_INVALIDATE, readyToInvalidate);
 	}
 	
 	@Override
-	protected void setValid(boolean isValid) {
+	public void setValid(boolean isValid) {
 		super.setValid(isValid);
 		sessionMetadataDirty();
 		metaModifiedMap_.put(IS_VALID, isValid);
@@ -1418,5 +1418,13 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	
 	public String getHaId() {
 		return haId;
+	}
+	
+	public void setReadyToInvalidateInternal(boolean readyToInvalidate) {
+		super.setReadyToInvalidate(readyToInvalidate);
+	}
+
+	public void setValidInternal(boolean isValid) {
+		super.setValid(isValid);
 	}
 }

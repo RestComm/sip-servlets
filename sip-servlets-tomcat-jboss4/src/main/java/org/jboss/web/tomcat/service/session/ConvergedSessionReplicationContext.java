@@ -23,12 +23,18 @@ package org.jboss.web.tomcat.service.session;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+
+import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipApplicationSession.Protocol;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 
@@ -58,6 +64,8 @@ public final class ConvergedSessionReplicationContext
    private Map expiredSipApplicationSessions;
    private Request outerRequest;
    private Response outerResponse;
+   private static final ThreadLocal<Map> trulyExpiredSessions = new ThreadLocal<Map>();
+
 //   private SipServletRequestImpl outerSipRequest;
 //   private SipServletResponseImpl outerSipResponse;
    
@@ -138,6 +146,9 @@ public final class ConvergedSessionReplicationContext
    public static void enterSipapp(SipServletRequestImpl request, SipServletResponseImpl response, boolean startCacheActivity)
    {
       ConvergedSessionReplicationContext ctx = getCurrentSipContext();
+      if(logger.isDebugEnabled()) {
+    	  logger.debug("enterSipApp and ctx is " + ctx);
+      }
       if (ctx == null)
       {
          ctx = new ConvergedSessionReplicationContext();
@@ -247,6 +258,9 @@ public final class ConvergedSessionReplicationContext
    public static ConvergedSessionReplicationContext exitSipapp()
    {
       ConvergedSessionReplicationContext ctx = getCurrentSipContext();
+      if(logger.isDebugEnabled()) {
+    	  logger.debug("exitSipApp and ctx is " + ctx + " ");
+      }
       if (ctx != null)
       {
          ctx.sipappCount--;
@@ -261,7 +275,7 @@ public final class ConvergedSessionReplicationContext
             
 //            if (ctx.sipActivityCount < 1)
 //               sipReplicationContext.set(null);
-            
+            trulyExpiredSessions.set(null);
             return ctx;
          }
       }
@@ -319,9 +333,46 @@ public final class ConvergedSessionReplicationContext
       }      
    }
    
+   static public void addTrulyExipredSession(Object session, SnapshotManager manager)
+   {
+	   ConvergedSessionReplicationContext ctx = getCurrentContext();
+
+	   if(logger.isDebugEnabled()) {
+		   logger.debug("addTrulyExpiredSession " + session + " mgr=" + manager + "ctx=" + ctx);
+	   }
+
+	   if (trulyExpiredSessions.get() == null)
+	   {
+		   trulyExpiredSessions.set(new HashMap());
+	   }
+	   ctx.trulyExpiredSessions.get().put(session, manager);
+
+   }
+
+   public static boolean isTrulyExpired(Object session) {
+	   ConvergedSessionReplicationContext ctx = getCurrentContext();
+
+	   if(logger.isDebugEnabled()) {
+		   logger.debug("isTrulyExpiredSession" +
+				   "Session " + session + "ctx=" + ctx);
+	   }
+	   if(trulyExpiredSessions.get() != null) {
+		   logger.debug("notnull");
+		   for(Object o:trulyExpiredSessions.get().keySet().toArray()) {
+			   logger.error(o+" ");
+		   }
+		   return trulyExpiredSessions.get().get(session)!=null;
+	   }
+
+	   return false;
+   }
+   
    public static void sipSessionExpired(ClusteredSipSession session, String realId, SnapshotManager manager)
    {
       ConvergedSessionReplicationContext ctx = getCurrentSipContext();
+      if(logger.isDebugEnabled()) {
+    	  logger.debug("enterSipApp and ctx is " + ctx);
+      }
       if (ctx != null && ctx.sipappCount > 0)
       {
          ctx.addExpiredSipSession(session, manager);
@@ -331,6 +382,9 @@ public final class ConvergedSessionReplicationContext
    public static void sipApplicationSessionExpired(ClusteredSipApplicationSession session, String realId, SnapshotManager manager)
    {
       ConvergedSessionReplicationContext ctx = getCurrentSipContext();
+      if(logger.isDebugEnabled()) {
+    	  logger.debug("enterSipApp and ctx is " + ctx);
+      }
       if (ctx != null && ctx.sipappCount > 0)
       {
          ctx.addExpiredSipApplicationSession(session, manager);
@@ -648,6 +702,9 @@ public final class ConvergedSessionReplicationContext
    private void addExpiredSession(ClusteredSession session, SnapshotManager manager)
    {
       boolean store = manager.equals(soleManager);
+      if(logger.isDebugEnabled()) {
+    	  logger.debug("addExpiredSession " + session + " mgr=" + manager + "store=" + store + "cross=" + crossCtxSessions);
+      }
       if (store)
       {
          soleManager = null;
@@ -666,6 +723,9 @@ public final class ConvergedSessionReplicationContext
             expiredSessions = new HashMap();
          }
          expiredSessions.put(manager, session.getRealId());      
+      }
+      if(logger.isDebugEnabled()) {
+    	  logger.debug("addExpiredSession " + session + " mgr=" + manager + "store=" + store);
       }
    }
    
@@ -748,5 +808,8 @@ public final class ConvergedSessionReplicationContext
       return result;
    }
 
+   	public String toString() {
+   		return super.toString() + "[sipActivityCount" + sipActivityCount + ", sipAppCount=" + this.sipappCount + "]";
+   	}
    
 }

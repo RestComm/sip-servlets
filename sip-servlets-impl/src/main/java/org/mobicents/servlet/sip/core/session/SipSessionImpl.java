@@ -965,7 +965,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	/**
 	 * @param isValid the isValid to set
 	 */
-	protected void setValid(boolean isValid) {
+	public void setValid(boolean isValid) {
 		this.isValidInternal.set(isValid);
 	}
 	/*
@@ -1644,7 +1644,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	/**
 	 * @param readyToInvalidate the readyToInvalidate to set
 	 */
-	protected void setReadyToInvalidate(boolean readyToInvalidate) {
+	public void setReadyToInvalidate(boolean readyToInvalidate) {
 		if(logger.isDebugEnabled()) {
     		logger.debug("readyToInvalidate flag is set to " + readyToInvalidate);
     	}

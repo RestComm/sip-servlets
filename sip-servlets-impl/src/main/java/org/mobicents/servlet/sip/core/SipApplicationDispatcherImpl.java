@@ -116,6 +116,8 @@ import org.mobicents.servlet.sip.router.ManageableApplicationRouter;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
+import com.sun.tools.javac.comp.Enter;
+
 /**
  * Implementation of the SipApplicationDispatcher interface.
  * Central point getting the sip messages from the different stacks for a Tomcat Service(Engine), 
@@ -917,6 +919,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 															
 					if(sipSessionImpl != null) {
 						sipContext.enterSipApp(sipApplicationSession, sipSessionImpl);
+						sipContext.enterSipAppHa(true);
 						try {
 							final ProxyImpl proxy = sipSessionImpl.getProxy();
 							if(!invalidateProxySession && (proxy == null || (proxy != null && proxy.getFinalBranchForSubsequentRequests() != null && !proxy.getFinalBranchForSubsequentRequests().getRecordRoute()))) {
@@ -942,6 +945,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 									sipSessionImpl.onTerminatedState();
 							} 
 						} finally {
+							sipContext.exitSipAppHa(null, null);
 							sipContext.exitSipApp(sipApplicationSession, sipSessionImpl);
 						}							
 					} else {

@@ -2056,7 +2056,9 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					.getContextClassLoader();
 			try {
 				Thread.currentThread().setContextClassLoader(tcl_);
-				session.expire(notify, localCall, localOnly);
+				//session.expire(notify, localCall, localOnly);
+				session.cancelAllTimers();
+				logger.info("SipApplicationSession invalidated by remote node " + session);
 			} finally {
 				Thread.currentThread().setContextClassLoader(prevTcl);
 			}
@@ -2105,7 +2107,11 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 					.getContextClassLoader();
 			try {
 				Thread.currentThread().setContextClassLoader(tcl_);
-				session.expire(notify, localCall, localOnly);
+				session.setReadyToInvalidateInternal(true);
+				session.setValidInternal(false);
+				//session.expire(notify, localCall, localOnly);
+				//session.invalidate();
+				logger.info("SipSession invalidated by remote node (forcing local invalidation without triggering events)" + session);
 			} finally {
 				Thread.currentThread().setContextClassLoader(prevTcl);
 			}
@@ -2912,11 +2918,20 @@ public class JBossCacheSipManager extends JBossCacheManager implements
 		
 		if(!localOnly) {
 			boolean isSipSessionBoundAndExpired = ConvergedSessionReplicationContext
-			 	.isSipSessionBoundAndExpired(key.toString(), snapshotManager_);
+		 	.isSipSessionBoundAndExpired(key.toString(), snapshotManager_);
+		if (logger.isDebugEnabled()) {
+			logger.debug("sip session " + key
+					+ " bound and expired ? " + isSipSessionBoundAndExpired);
+		}
+		// Vlad: ... we use this instead
+		if(!isSipSessionBoundAndExpired) {
+			isSipSessionBoundAndExpired = ConvergedSessionReplicationContext
+			.isTrulyExpired(key);
 			if (logger.isDebugEnabled()) {
 				logger.debug("sip session " + key
-						+ " bound and expired ? " + isSipSessionBoundAndExpired);
+						+ " truly expired ? " + isSipSessionBoundAndExpired);
 			}
+		}
 			// If we didn't find it locally, only check the distributed cache
 			// if we haven't previously handled this session id on this request.
 			// If we handled it previously but it's no longer local, that means

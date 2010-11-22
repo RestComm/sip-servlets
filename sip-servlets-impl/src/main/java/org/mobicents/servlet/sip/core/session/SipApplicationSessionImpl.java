@@ -213,6 +213,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	public SipSessionKey removeSipSession (MobicentsSipSession mobicentsSipSession) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("Trying to remove sip session " + mobicentsSipSession);
+		}
 		final SipSessionKey key = mobicentsSipSession.getKey();
 		if(sipSessions != null) {			
 			boolean wasPresent = this.sipSessions.remove(key);
@@ -650,6 +653,15 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 //			semaphore = null;
 //		}
 		facade = null;
+	}
+	
+	public void cancelAllTimers() {
+		cancelExpirationTimer();
+		if(this.servletTimers != null) {
+			for(ServletTimer timer:this.servletTimers.values()) {
+				timer.cancel();
+			}
+		}
 	}
 
 	private void cancelExpirationTimer() {
