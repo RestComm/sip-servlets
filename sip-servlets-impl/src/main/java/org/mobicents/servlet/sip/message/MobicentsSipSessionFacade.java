@@ -382,7 +382,7 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 
 	@Override
 	public String toString() {
-		return getSipSession().toString();
+		return sipSessionKey.toString();
 	}
 
 	public SipApplicationRouterInfo getNextSipApplicationRouterInfo() {
