@@ -16,6 +16,7 @@
  */
 package org.jboss.web.tomcat.service.session;
 
+import org.apache.log4j.Logger;
 import org.jboss.metadata.web.jboss.ReplicationGranularity;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -32,7 +33,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  *
  */
 public class ClusteredSipManagerDelegate extends SipManagerDelegate {
-
+	private static final Logger logger = Logger.getLogger(ClusteredSipManagerDelegate.class);
 	/**
      * The descriptive information about this implementation.
      */
@@ -79,10 +80,22 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 		}
 		clusteredSipManager.getDistributedCacheConvergedSipManager().sipApplicationSessionCreated(key.getId());
 		session.setNew(true);
+		MobicentsSipApplicationSession sipApplicationSessionImpl = sipApplicationSessions.putIfAbsent(key, session);
+		if (sipApplicationSessionImpl == null) {
+			// put succeeded, use new value
+			if(logger.isDebugEnabled()) {
+				logger.debug("Adding a recreated sip application session with the key : " + key);
+			}
+            sipApplicationSessionImpl = session;
+            final String appGeneratedKey = key.getAppGeneratedKey(); 
+    		if(appGeneratedKey != null) {    		
+            	sipApplicationSessionsByAppGeneratedKey.putIfAbsent(appGeneratedKey, sipApplicationSessionImpl);
+            }
+        }
 		if(!recreate) {
-			scheduleExpirationTimer(session);
-		}
-		return session;
+			scheduleExpirationTimer(sipApplicationSessionImpl);
+		}		
+		return sipApplicationSessionImpl;
 	}
 
 	/* (non-Javadoc)
@@ -113,7 +126,15 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 		}
 		clusteredSipManager.getDistributedCacheConvergedSipManager().sipSessionCreated(mobicentsSipApplicationSession.getKey().getId(), SessionManagerUtil.getSipSessionHaKey(key));
 		session.setNew(true);
-		return session;
+		MobicentsSipSession sipSessionImpl = sipSessions.putIfAbsent(key, session);
+		if(sipSessionImpl == null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Adding a recreated sip session with the key : " + key);
+			}
+			// put succeeded, use new value
+            sipSessionImpl = session;
+		}
+		return sipSessionImpl;
 	}
 
 	public ClusteredSipSession putSipSession(SipSessionKey key, ClusteredSipSession session) {
