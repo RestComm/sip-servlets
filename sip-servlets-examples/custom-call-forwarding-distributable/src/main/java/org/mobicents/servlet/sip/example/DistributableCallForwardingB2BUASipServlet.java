@@ -334,7 +334,7 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 	public void sessionDestroyed(SipApplicationSessionEvent arg0) {
 		if(logger.isInfoEnabled()) {
 			logger.info("CB2BUA DESTROYED " + arg0.getApplicationSession());
-			if(new File("cb2buadestryed.flag").exists()) {
+			if(!new File("cb2buadestryed.flag").exists()) {
 				try {
 					new File("cb2buadestryed.flag").createNewFile();
 				} catch (IOException e) {

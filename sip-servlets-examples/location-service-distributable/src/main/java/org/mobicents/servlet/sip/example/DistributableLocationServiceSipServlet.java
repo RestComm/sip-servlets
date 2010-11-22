@@ -181,7 +181,7 @@ public class DistributableLocationServiceSipServlet extends SipServlet implement
 	public void sessionDestroyed(SipApplicationSessionEvent arg0) {
 		if(logger.isInfoEnabled()) {
 			logger.info("LSS DESTROYED " + arg0.getApplicationSession());
-			if(new File("lssdestryed.flag").exists()) {
+			if(!new File("lssdestryed.flag").exists()) {
 				try {
 					new File("lssdestryed.flag").createNewFile();
 				} catch (IOException e) {
