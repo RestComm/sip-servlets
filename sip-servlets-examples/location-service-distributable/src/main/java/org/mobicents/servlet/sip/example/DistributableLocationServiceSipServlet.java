@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.example;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +27,8 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Proxy;
+import javax.servlet.sip.SipApplicationSessionEvent;
+import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
@@ -41,7 +44,7 @@ import org.apache.log4j.Logger;
  * @author Jean Deruelle
  *
  */
-public class DistributableLocationServiceSipServlet extends SipServlet {
+public class DistributableLocationServiceSipServlet extends SipServlet implements SipApplicationSessionListener{
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(DistributableLocationServiceSipServlet.class);
 	private static final String CONTACT_HEADER = "Contact";
@@ -167,6 +170,38 @@ public class DistributableLocationServiceSipServlet extends SipServlet {
 //				sipApplicationSession.invalidate();
 //			}			
 //		}
+	}
+	
+	public void sessionCreated(SipApplicationSessionEvent arg0) {
+		if(logger.isInfoEnabled()) {
+			logger.info("LSS CREATED " + arg0.getApplicationSession());
+		}
+	}
+
+	public void sessionDestroyed(SipApplicationSessionEvent arg0) {
+		if(logger.isInfoEnabled()) {
+			logger.info("LSS DESTROYED " + arg0.getApplicationSession());
+			if(new File("lssdestryed.flag").exists()) {
+				try {
+					new File("lssdestryed.flag").createNewFile();
+				} catch (IOException e) {
+					logger.error("Error flagging", e);
+				}
+			}
+		}
+	}
+
+	public void sessionExpired(SipApplicationSessionEvent arg0) {
+		if(logger.isInfoEnabled()) {
+			logger.info("LSS EXPIRED " + arg0.getApplicationSession());
+		}
+		
+	}
+
+	public void sessionReadyToInvalidate(SipApplicationSessionEvent arg0) {
+		if(logger.isInfoEnabled()) {
+			logger.info("LSS READY " + arg0.getApplicationSession());
+		}
 	}
 	
 }

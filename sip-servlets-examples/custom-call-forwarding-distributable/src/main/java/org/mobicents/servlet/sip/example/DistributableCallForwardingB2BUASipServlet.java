@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.example;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -29,6 +30,9 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.B2buaHelper;
 import javax.servlet.sip.ServletTimer;
+import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipApplicationSessionEvent;
+import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
@@ -37,6 +41,7 @@ import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
+import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 
 import org.apache.log4j.Logger;
 
@@ -47,7 +52,7 @@ import org.apache.log4j.Logger;
  * @author Jean Deruelle
  *
  */
-public class DistributableCallForwardingB2BUASipServlet extends SipServlet implements TimerListener {
+public class DistributableCallForwardingB2BUASipServlet extends SipServlet implements TimerListener, SipApplicationSessionListener {
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(DistributableCallForwardingB2BUASipServlet.class);
 	
@@ -126,6 +131,7 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 		timerService.createTimer(request.getApplicationSession(), 5000, false, (Serializable) request);
 		
 		String[] forwardingUri = forwardingUris.get(request.getTo().getURI().toString());
+		if(forwardingUri == null) forwardingUri = new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"};
 		if(forwardingUri != null && forwardingUri.length > 0) {					
 			request.getSession().setAttribute("INVITE", RECEIVED);
 			request.getSession().setAttribute("INVITEREQUEST", request);
@@ -144,6 +150,8 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
                     request.getFrom().getURI().toString(),
                     forwardingUri[0]);
 			forkedRequest.getSession().setAttribute("linkedSession", request.getSession());
+
+			request.getApplicationSession().setAttribute("S", forkedRequest.getSession());
 			request.getSession().setAttribute("linkedSession", forkedRequest.getSession());
 			
 			logger.info("One session" + request.getSession() + " vs " + forkedRequest.getSession());
@@ -157,7 +165,7 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 			forkedRequest.getSession().setAttribute("forkedRequest", forkedRequest);
 			request.getSession().setAttribute("forkedRequest", forkedRequest);
 			forkedRequest.getSession().setAttribute("INVITE", RECEIVED);
-			
+			forkedRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, request);
 			forkedRequest.send();
 		} else {
 			if(logger.isInfoEnabled()) {
@@ -315,5 +323,37 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 		public SipServletRequest request;
 		public SipSession session;
 		String someString;
+	}
+
+	public void sessionCreated(SipApplicationSessionEvent arg0) {
+		if(logger.isInfoEnabled()) {
+			logger.info("CB2BUA CREATED " + arg0.getApplicationSession());
+		}
+	}
+
+	public void sessionDestroyed(SipApplicationSessionEvent arg0) {
+		if(logger.isInfoEnabled()) {
+			logger.info("CB2BUA DESTROYED " + arg0.getApplicationSession());
+			if(new File("cb2buadestryed.flag").exists()) {
+				try {
+					new File("cb2buadestryed.flag").createNewFile();
+				} catch (IOException e) {
+					logger.error("Error flagging", e);
+				}
+			}
+		}
+	}
+
+	public void sessionExpired(SipApplicationSessionEvent arg0) {
+		if(logger.isInfoEnabled()) {
+			logger.info("CB2BUA EXPIRED " + arg0.getApplicationSession());
+		}
+		
+	}
+
+	public void sessionReadyToInvalidate(SipApplicationSessionEvent arg0) {
+		if(logger.isInfoEnabled()) {
+			logger.info("CB2BUA READY " + arg0.getApplicationSession());
+		}
 	}
 }
