@@ -307,7 +307,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		this.useJK = useJK;
 		this.isNew = true;
 		this.firstAccess = true;
-		this.thisAccessedTime = System.currentTimeMillis();
+		updateThisAccessedTime();
 		accessCount = ACTIVITY_CHECK ? new AtomicInteger() : null;
 		// it starts with true so that it gets replicated when first created
 		sessionMetadataDirty = true;
@@ -399,6 +399,10 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	@Override
 	public long getLastAccessedTime() {
 		return this.thisAccessedTime;
+	}
+	
+	public void updateThisAccessedTime() {
+		thisAccessedTime = System.currentTimeMillis();
 	}
 
 	public void setNew(boolean isNew) {

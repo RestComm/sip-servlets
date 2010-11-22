@@ -332,7 +332,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		this.isNew = true;
 		this.useJK = useJK;
 		this.firstAccess = true;
-		this.thisAccessedTime = System.currentTimeMillis();
+		updateThisAccessedTime();		
 		accessCount = ACTIVITY_CHECK ? new AtomicInteger() : null;
 		// it starts with true so that it gets replicated when first created
 		sessionMetadataDirty = true;
@@ -762,6 +762,10 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	protected long getSessionTimestamp() {
 		this.timestamp.set(this.thisAccessedTime);
 		return this.timestamp.get();
+	}
+	
+	public void updateThisAccessedTime() {
+		thisAccessedTime = System.currentTimeMillis();
 	}
 
 	protected boolean isSessionMetadataDirty() {

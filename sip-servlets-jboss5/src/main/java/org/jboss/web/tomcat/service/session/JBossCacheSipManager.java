@@ -2463,6 +2463,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
             }
 			if(session == null) {
 				initialLoad = true;
+			} else {
+				session.updateThisAccessedTime();
 			}
 			// Swap in/out the webapp classloader so we can deserialize
 	         // attributes whose classes are only available to the webapp
@@ -2603,6 +2605,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			}
 			if(session == null) {
 				initialLoad = true;
+			} else {
+				session.updateThisAccessedTime();
 			}
 			 // Swap in/out the webapp classloader so we can deserialize
 	         // attributes whose classes are only available to the webapp
@@ -3321,6 +3325,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 					log_.debug("Updating sip app session " + key
 							+ " from the distributed cache");
 	
+				
 				// Need to update it from the cache
 				loadSipApplicationSession(key, create);
 			}
