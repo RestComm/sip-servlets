@@ -77,6 +77,8 @@ import org.mobicents.servlet.sip.startup.SipContext;
  */
 public abstract class ClusteredSipApplicationSession<O extends OutgoingDistributableSessionData> extends SipApplicationSessionImpl {
 
+	private static final String JVM_ROUTE = "jv";
+
 	private static transient Logger logger = Logger.getLogger(ClusteredSipApplicationSession.class);
 	
 	protected static final String HTTP_SESSIONS = "hs";
@@ -687,6 +689,10 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		this.isNew = md.isNew();
 		this.setValid(md.isValid());
 		this.metadata = md;
+		
+		String jvmRoute = (String) md.getMetaData().get(JVM_ROUTE);
+		setJvmRoute(jvmRoute);
+		
 		
 		// From Sip Application Session
 		Boolean valid = (Boolean) md.getMetaData().get(IS_VALID);
@@ -1421,6 +1427,13 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 			metadata.setHttpSessionsMapModified(true);
 		}
 		return wasPresent;
+	}
+	
+	@Override
+	public void setJvmRoute(String jvmRoute) {
+		super.setJvmRoute(jvmRoute);
+		sessionMetadataDirty();
+		metadata.getMetaData().put(JVM_ROUTE, jvmRoute);
 	}
 	
 	public String getHaId() {
