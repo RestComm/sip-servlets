@@ -307,6 +307,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		this.useJK = useJK;
 		this.isNew = true;
 		this.firstAccess = true;
+		this.thisAccessedTime = System.currentTimeMillis();
 		accessCount = ACTIVITY_CHECK ? new AtomicInteger() : null;
 		// it starts with true so that it gets replicated when first created
 		sessionMetadataDirty = true;
@@ -1359,7 +1360,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		}
 	}
 
-	private final void clearOutdated() {
+	public final void clearOutdated() {
 		// Only overwrite the access time if access() hasn't been called
 		// since setOutdatedVersion() was called
 		if (outdatedTime > thisAccessedTime) {

@@ -78,8 +78,7 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 		} else {
 			session = new SessionBasedClusteredSipApplicationSession(key,sipContext, useJK);
 		}
-		clusteredSipManager.getDistributedCacheConvergedSipManager().sipApplicationSessionCreated(key.getId());
-		session.setNew(true);
+		clusteredSipManager.getDistributedCacheConvergedSipManager().sipApplicationSessionCreated(key.getId());		
 		MobicentsSipApplicationSession sipApplicationSessionImpl = sipApplicationSessions.putIfAbsent(key, session);
 		if (sipApplicationSessionImpl == null) {
 			// put succeeded, use new value
@@ -91,6 +90,8 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
     		if(appGeneratedKey != null) {    		
             	sipApplicationSessionsByAppGeneratedKey.putIfAbsent(appGeneratedKey, sipApplicationSessionImpl);
             }
+    		session.setNew(true);
+    		((ClusteredSipApplicationSession<OutgoingDistributableSessionData>)session).clearOutdated();
         }
 		if(!recreate) {
 			scheduleExpirationTimer(sipApplicationSessionImpl);
