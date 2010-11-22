@@ -54,5 +54,14 @@ if [ $# -ne 0 ]; then
 				cp $EXAMPLES_HOME/shootist-sip-servlet-distributable/target/shootist-sip-servlet-distributable-*.war $JBOSS_HOME/server/$config/deploy
 				cp $EXAMPLES_HOME/shootist-sip-servlet-distributable/distributable-shootist-dar.properties $JBOSS_HOME/server/$config/conf/dars/mobicents-dar.properties
 	            ;;
+        proxy-b2bua-ar)
+	            echo "Distributed example used is proxy-b2bua-ar"
+	    		mvn clean install -f $EXAMPLES_HOME/custom-call-forwarding-distributable/pom.xml
+				rm -rf $JBOSS_HOME/server/$config/deploy/custom-call-forwarding-distributable-*.war
+				cp $EXAMPLES_HOME/custom-call-forwarding-distributable/target/custom-call-forwarding-distributable-*.war $JBOSS_HOME/server/$config/deploy
+                mvn clean install -f $EXAMPLES_HOME/location-service-distributable/pom.xml
+				rm -rf $JBOSS_HOME/server/$config/deploy/location-service-distributable-*.war
+				cp $EXAMPLES_HOME/location-service-distributable/target/location-service-distributable-*.war $JBOSS_HOME/server/$config/deploy
+				cp ar/proxy-b2bua-ar-dar.properties $JBOSS_HOME/server/$config/conf/dars/mobicents-dar.properties
     esac
 fi

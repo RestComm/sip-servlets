@@ -143,6 +143,12 @@ if [ $# -eq 4 ]; then
 	            echo "Distributed example used is uas-0.0.0.0";
 	    		./sipp $MSS_IP:5080 -s isendbye -sf uas/clustering-uac.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
+	    proxy-b2bua-ar)
+	    		rm ./ar/*.log
+	    		echo "Distributed example used is proxy-b2bua-ar";
+	    		$NOHUP ./sipp $MSS_IP:5060 -sf proxy-b2bua-ar-receiver.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
+	    		./sipp $MSS_IP:5060 -s receiver-failover -sf proxy/proxy-b2bua-ar-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
+	            ;;
     esac
 else
 echo "Syntax is command SCENARIO TIMEOUT CALL_RATE NUMBER_OF_CALLS"
