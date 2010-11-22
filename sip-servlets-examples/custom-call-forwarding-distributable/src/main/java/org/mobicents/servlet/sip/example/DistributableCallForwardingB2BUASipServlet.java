@@ -128,7 +128,7 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet imple
 		}
 
 		TimerService timerService = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);
-		timerService.createTimer(request.getApplicationSession(), 5000, false, (Serializable) request);
+		timerService.createTimer(request.getApplicationSession(), 400, false, (Serializable) request);
 		
 		String[] forwardingUri = forwardingUris.get(request.getTo().getURI().toString());
 		if(forwardingUri == null) forwardingUri = new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"};
