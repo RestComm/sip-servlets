@@ -107,6 +107,11 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertEquals(0,receiver.getFinalResponseStatus());
 		assertTrue(!sender.isAckSent());
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
 		assertEquals(4, sender.getAllMessagesContent().size());
 		assertTrue(sender.getAllMessagesContent().contains(ResponseType.INFORMATIONAL.toString()));
 		assertTrue(sender.getAllMessagesContent().contains(ResponseType.FINAL.toString()));
