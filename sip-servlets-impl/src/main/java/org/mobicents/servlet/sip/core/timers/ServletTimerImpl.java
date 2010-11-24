@@ -25,12 +25,15 @@ import javax.servlet.sip.TimerListener;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.startup.SipContext;
 
 public class ServletTimerImpl implements ServletTimer, Runnable {
 	private static final Logger logger = Logger.getLogger(ServletTimerImpl.class);
 	
-	private MobicentsSipApplicationSession appSession;
+	private SipApplicationSessionKey appSessionKey;
+	private SipManager sipManager;
 	/**
 	 * Logger for this class
 	 */
@@ -152,7 +155,8 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 		this.fixedDelay = fixedDelay;
 		this.period = period;
 		this.listener = listener;
-		this.appSession = appSession;
+		this.appSessionKey = appSession.getKey();
+		this.sipManager= appSession.getSipContext().getSipManager();
 	}
 
 	public void cancel() {
@@ -178,14 +182,13 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 				// kan be kept in production code since object should
 				// be due for gc anyway....
 				isCanceled = Boolean.valueOf(res);
-				appSessionToCancelThisTimersFrom = appSession;
+				appSessionToCancelThisTimersFrom = getApplicationSession();
 				future = null;
 			}
 		}
 		if (appSessionToCancelThisTimersFrom != null) {
 			appSessionToCancelThisTimersFrom.removeServletTimer(this);			
 		}
-		appSession = null;
 	}
 
 	/**
@@ -209,15 +212,16 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 	public MobicentsSipApplicationSession getApplicationSession() {
 
 		synchronized (TIMER_LOCK) {
-			return this.appSession;
+			return sipManager.getSipApplicationSession(appSessionKey, false);
 		}
 
 	}
 	
 	public void setApplicationSession(MobicentsSipApplicationSession sipApplicationSession) {
-
-		synchronized (TIMER_LOCK) {
-			this.appSession = sipApplicationSession;
+		if(sipApplicationSession != null) {
+			synchronized (TIMER_LOCK) {
+				this.appSessionKey = sipApplicationSession.getKey();
+			}
 		}
 
 	}
@@ -258,7 +262,7 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 				.append('\n');
 		sb.append("Time now = ").append(System.currentTimeMillis())
 				.append('\n');
-		sb.append("SipApplicationSession = ").append(appSession).append('\n');
+		sb.append("SipApplicationSession = ").append(appSessionKey).append('\n');
 		sb.append("ScheduledFuture = ").append(future).append('\n');
 		sb.append("Delay = ").append(delay).append('\n');
 		return sb.toString();
@@ -269,20 +273,21 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 	 */
 	public void run() {
 
-		SipContext sipContext = appSession.getSipContext();
+		final MobicentsSipApplicationSession sipApplicationSession = getApplicationSession();
+		SipContext sipContext = sipApplicationSession.getSipContext();
 		
 		ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 		try {
 			ClassLoader cl = sipContext.getLoader().getClassLoader();
 			Thread.currentThread().setContextClassLoader(cl);
-			sipContext.enterSipApp(appSession, null);
+			sipContext.enterSipApp(sipApplicationSession, null);
 			sipContext.enterSipAppHa(true);
 			listener.timeout(this);
 		} catch(Throwable t) {
 			logger.error("An unexpected exception happened in the timer callback!",t);
 		} finally {
 			sipContext.exitSipAppHa(null, null);
-			sipContext.exitSipApp(appSession, null);
+			sipContext.exitSipApp(sipApplicationSession, null);
 			Thread.currentThread().setContextClassLoader(oldClassLoader);
 			if (isRepeatingTimer) {
 				estimateNextExecution();

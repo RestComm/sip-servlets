@@ -103,8 +103,11 @@ public class TimerServiceImpl implements SipServletTimerService {
 	private ServletTimerImpl createTimerLocaly(TimerListener listener, long delay,
 			boolean isPersistent, Serializable info, MobicentsSipApplicationSession sipApplicationSession) {				
 		ServletTimerImpl servletTimer = new ServletTimerImpl(info, delay, listener, sipApplicationSession);
-		// logger.log(Level.FINE, "starting timer
-		// at:"+System.currentTimeMillis());
+		
+		if(logger.isDebugEnabled()) {
+			logger.debug("Scheduling Timer "+ servletTimer.getId() +" to expire in " + delay + " ms");
+		}
+		
 		ScheduledFuture<?> future = scheduledExecutor.schedule(servletTimer, delay, TimeUnit.MILLISECONDS);
 		servletTimer.setFuture(future);
 //		sipApplicationSession.timerScheduled(st);
@@ -132,9 +135,17 @@ public class TimerServiceImpl implements SipServletTimerService {
 				info, delay, fixedDelay, period, listener, sipApplicationSession);
 		ScheduledFuture<?> future = null;
 		if (fixedDelay) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Scheduling Timer "+ servletTimer.getId() +" to expire in " + delay + " ms" + " with fixed delay of " + period);
+			}
+			
 			future = scheduledExecutor.scheduleWithFixedDelay(servletTimer, delay, period,
 					TimeUnit.MILLISECONDS);
 		} else {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Scheduling Timer "+ servletTimer.getId() +" to expire in " + delay + " ms" + " at fixed rate of " + period);
+			}
+			
 			future = scheduledExecutor.scheduleAtFixedRate(servletTimer, delay, period,
 					TimeUnit.MILLISECONDS);
 		}
