@@ -430,8 +430,8 @@
 	<target name="make-final-zip-jboss-5-jdk6-lgpl" depends="set-time-stamp">
 		<delete dir="${jboss-5-jdk6.home}/mobicents-media-server"/>
 		<delete dir="${jboss-5-jdk6.home}/server/default/deploy/${diameter-jboss-5.name}"/>		
-		<delete dir="${jboss-5-jdk6.home}/server/default/deploy/diameter-event-charging.war"/>
-		<delete dir="${jboss-5-jdk6.home}/server/default/deploy/media-jsr309-servlet.war"/>
+		<delete file="${jboss-5-jdk6.home}/server/default/deploy/diameter-event-charging.war"/>
+		<delete file="${jboss-5-jdk6.home}/server/default/deploy/media-jsr309-servlet.war"/>
 		<delete file="${jboss-5-jdk6.home}/docs/licenses/GPL-LICENSE.TXT"/>
 		<fixcrlf srcdir="${jboss-5-jdk6.home}/bin" includes="*.sh" eol="lf" eof="remove" />		
 		<zip destfile="${base.path}/mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}-${time.stamp}-LGPL.zip" filesonly="false">
