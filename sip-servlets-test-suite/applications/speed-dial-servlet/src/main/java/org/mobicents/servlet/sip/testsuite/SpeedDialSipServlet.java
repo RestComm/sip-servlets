@@ -88,56 +88,115 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener 
 		logger.info("Got request:\n" + request.toString());
 		logger.info(request.getRequestURI().toString());
 		if(request.isInitial()) {
-			if(((SipURI)request.getFrom().getURI()).getUser().equalsIgnoreCase(TEST_USER_REMOTE)) {
-				if(request.getRemoteAddr().equals(REMOTE_LOCALHOST_ADDR) && request.getRemotePort() == REMOTE_PORT && request.getTransport().equalsIgnoreCase(REMOTE_TRANSPORT)) {
-					logger.info("remote information is correct");
+			if(request.isInitial()) {
+				String user = ((SipURI)request.getFrom().getURI()).getUser();
+				if(user.contains(TEST_USER_REMOTE)) {
+					String transport ="udp";
+					if(user.contains("tcp")) {
+						transport="tcp";
+					}
+					if(!checkRequestAddressPortTransport(request, transport)) {
+						return ;
+					}
+				}
+				
+				String dialNumber = ((SipURI)request.getRequestURI()).getUser();
+				String mappedUri = dialNumberToSipUriMapping.get(dialNumber);	
+				if(mappedUri != null) {
+					SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);			
+					Proxy proxy = request.getProxy();
+					proxy.setProxyTimeout(120);
+					proxy.setRecordRoute(isRecordRoute);
+					proxy.setParallel(false);
+					proxy.setSupervised(true);
+					logger.info("proxying to " + mappedUri);
+					proxy.proxyTo(sipFactory.createURI(mappedUri));				
 				} else {
-					logger.error("remote information is incorrect");
-					logger.error("remote addr " + request.getRemoteAddr());
-					logger.error("remote port " + request.getRemotePort());
-					logger.error("remote transport " + request.getTransport());
 					SipServletResponse sipServletResponse = 
-						request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "Incorrect remote information");
-					sipServletResponse.send();
-					return;
+						request.createResponse(SipServletResponse.SC_NOT_ACCEPTABLE_HERE, "No mapping for " + dialNumber);
+					sipServletResponse.send();			
 				}
-				if(request.getInitialRemoteAddr().equals(REMOTE_LOCALHOST_ADDR) && request.getInitialRemotePort() == REMOTE_PORT && request.getInitialTransport().equalsIgnoreCase(REMOTE_TRANSPORT)) {			
-					logger.info("Initial remote information is correct");
-				} else {
-					logger.error("Initial remote information is incorrect");
-					logger.error("Initial remote addr " + request.getInitialRemoteAddr());
-					logger.error("Initial remote port " + request.getInitialRemotePort());
-					logger.error("Initial remote transport " + request.getInitialTransport());
-					throw new IllegalArgumentException("initial remote information is incorrect");
-				}
-				if(request.getLocalAddr().equals(LOCAL_LOCALHOST_ADDR) && request.getLocalPort() == LOCAL_PORT && request.getTransport().equalsIgnoreCase(LOCAL_TRANSPORT)) {			
-					logger.info("local information is correct");
-				} else {
-					logger.error("local information is incorrect");
-					logger.error("local addr " + request.getLocalAddr());
-					logger.error("local port " + request.getLocalPort());
-					logger.error("local transport " + request.getTransport());
-					throw new IllegalArgumentException("local information is incorrect");
-				}
-			}
-			
-			String dialNumber = ((SipURI)request.getRequestURI()).getUser();
-			String mappedUri = dialNumberToSipUriMapping.get(dialNumber);	
-			if(mappedUri != null) {
-				SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);			
-				Proxy proxy = request.getProxy();
-				proxy.setProxyTimeout(120);
-				proxy.setRecordRoute(isRecordRoute);
-				proxy.setParallel(false);
-				proxy.setSupervised(true);
-				logger.info("proxying to " + mappedUri);
-				proxy.proxyTo(sipFactory.createURI(mappedUri));				
-			} else {
-				SipServletResponse sipServletResponse = 
-					request.createResponse(SipServletResponse.SC_NOT_ACCEPTABLE_HERE, "No mapping for " + dialNumber);
-				sipServletResponse.send();			
-			}		
+			}						
 		}
+	}
+	
+	private boolean checkRequestAddressPortTransport(SipServletRequest request, String transport) throws IOException {
+		boolean isCorrect = false;
+		if(request.getRemoteAddr().equals(REMOTE_LOCALHOST_ADDR) && request.getTransport().equalsIgnoreCase(transport)) {				
+			if(transport.equalsIgnoreCase("tcp")) {
+				logger.info("remote tcp information is correct");
+				isCorrect =true;
+			} else {
+				if(request.getRemotePort() == REMOTE_PORT){
+					logger.info("remote udp information is correct");
+				}
+				isCorrect =true;
+			}			
+		}
+		if(request.getRemoteAddr() == null) {
+			isCorrect = false;
+		}
+		if(!isCorrect){
+			logger.error("remote information is incorrect");
+			logger.error("remote addr " + request.getRemoteAddr());
+			logger.error("remote port " + request.getRemotePort());
+			logger.error("remote transport " + request.getTransport());
+			SipServletResponse sipServletResponse = 
+				request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "Incorrect remote information");
+			sipServletResponse.send();
+			return false;
+		}
+		isCorrect = false;
+		if(request.getInitialRemoteAddr().equals(REMOTE_LOCALHOST_ADDR) && request.getInitialTransport().equalsIgnoreCase(transport)) {				
+			if(transport.equalsIgnoreCase("tcp")) {
+				logger.info("initial remote tcp information is correct");
+				isCorrect =true;
+			} else {
+				if(request.getInitialRemotePort() == REMOTE_PORT){
+					logger.info("initial remote udp information is correct");
+				}
+				isCorrect =true;
+			}			
+		}
+		if(request.getInitialRemoteAddr() == null) {
+			isCorrect = false;
+		}
+		if(!isCorrect){
+			logger.error("initial remote information is incorrect");
+			logger.error("initial remote addr " + request.getInitialRemoteAddr());
+			logger.error("initial remote port " + request.getInitialRemotePort());
+			logger.error("initial remote transport " + request.getInitialTransport());
+			SipServletResponse sipServletResponse = 
+				request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "Incorrect initial remote information");
+			sipServletResponse.send();
+			return false;
+		}
+		isCorrect = false;
+		if(request.getLocalAddr().equals(LOCAL_LOCALHOST_ADDR) && request.getTransport().equalsIgnoreCase(transport)) {				
+			if(transport.equalsIgnoreCase("tcp")) {
+				logger.info("local tcp information is correct");
+				isCorrect =true;
+			} else {
+				if(request.getLocalPort() == LOCAL_PORT){
+					logger.info("local udp information is correct");
+				}
+				isCorrect =true;
+			}			
+		}	
+		if(request.getLocalAddr() == null) {
+			isCorrect = false;
+		}
+		if(!isCorrect){
+			logger.error("local information is incorrect");
+			logger.error("local addr " + request.getLocalAddr());
+			logger.error("local port " + request.getLocalPort());
+			logger.error("local transport " + request.getTransport());
+			SipServletResponse sipServletResponse = 
+				request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "Incorrect local information");
+			sipServletResponse.send();
+			return false;
+		}
+		return true;
 	}
 	
 	protected void doSuccessResponse(SipServletResponse resp)

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<web-app>
-	<app-name>org.mobicents.servlet.sip.testsuite.ProxyApplication</app-name>
-	<display-name>Proxy Sip Servlet</display-name>
-	<description>Proxy Sip Servlet</description>
-	
-</web-app>

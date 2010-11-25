@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<web-app>
-	<display-name>Distributable Location Service Sip Servlet</display-name>
-	<description>Distributable Location Service Sip Servlet</description>
-	<distributable/>
-		
-</web-app>

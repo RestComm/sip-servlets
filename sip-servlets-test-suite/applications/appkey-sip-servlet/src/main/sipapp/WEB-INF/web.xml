@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<web-app>
-	<app-name>org.mobicents.servlet.sip.testsuite.AppKeyApplication</app-name>
-	<display-name>AppKey Sip Servlet</display-name>
-	<description>AppKey Sip Servlet</description>
-		
-</web-app>

@@ -27,10 +27,10 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>${war.plugin.version}</version> 
 				<configuration>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
 					<warSourceDirectory>
 						${basedir}/src/main/sipapp
 					</warSourceDirectory>					
-					<failOnMissingWebXml>false</failOnMissingWebXml>
 				</configuration>
 			</plugin>
 		</plugins>		

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<web-app>
-	<app-name>org.mobicents.servlet.sip.testsuite.SpeedDialApplication</app-name>
-	<display-name>Speed Dial Sip Servlet</display-name>
-	<description>Speed Dial Sip Servlet</description>
-		
-</web-app>

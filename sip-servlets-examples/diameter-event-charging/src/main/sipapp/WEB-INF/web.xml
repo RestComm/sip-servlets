@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<web-app>
-	<display-name>Diameter Event Charging Sip Servlet</display-name>
-	<description>Diameter Event Charging Sip Servlet</description>	
-</web-app>

@@ -20,9 +20,7 @@
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
-					<webXml>
-						${basedir}/src/main/sipapp/WEB-INF/sip.xml
-					</webXml>
+					<failOnMissingWebXml>false</failOnMissingWebXml>
 					<warSourceDirectory>
 						${basedir}/src/main/sipapp
 					</warSourceDirectory>

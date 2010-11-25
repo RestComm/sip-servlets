@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<web-app>
-	<app-name>org.mobicents.servlet.sip.testsuite.CallForwardingApplication</app-name>
-	<display-name>Call Forwarding Sip Servlet</display-name>
-	<description>Call Forwarding Sip Servlet</description>
-		
-</web-app>

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<web-app>
-	<app-name>org.mobicents.servlet.sip.testsuite.CallBlockingApplication</app-name>
-	<display-name>Call Blocking Sip Servlet</display-name>
-	<description>Call Blocking Sip Servlet</description>
-	
-</web-app>
