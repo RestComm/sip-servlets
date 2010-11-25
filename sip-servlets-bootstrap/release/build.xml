@@ -564,7 +564,7 @@
 			<arg line="clean compile" />
 		</exec-->
 		<exec executable="${mvn.executable}" dir="${docs.stage.dir}/sip-servlets/">
-			<arg line="clean install" />
+			<arg line="clean install -P mobicents" />
 		</exec>
 		
 		<!--copy overwrite="true" todir="${jboss.home}/docs/mobicents-media-server">
