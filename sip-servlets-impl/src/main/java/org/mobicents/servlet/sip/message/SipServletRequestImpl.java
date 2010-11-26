@@ -86,6 +86,7 @@ import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
+import org.mobicents.servlet.sip.address.GenericURIImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
@@ -497,8 +498,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		else if (request.getRequestURI() instanceof javax.sip.address.TelURL)
 			return new TelURLImpl((javax.sip.address.TelURL) request
 					.getRequestURI());
-		else
-			throw new UnsupportedOperationException("Unsupported scheme");
+		else 
+			// From horacimacias : Fix for Issue 2115 MSS unable to handle GenericURI URIs
+			return new GenericURIImpl(request.getRequestURI());
 	}
 
 	/**

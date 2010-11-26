@@ -46,6 +46,7 @@ import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
+import javax.servlet.sip.URI;
 import javax.servlet.sip.SipSession.State;
 import javax.sip.ListeningPoint;
 
@@ -121,6 +122,11 @@ public class SimpleSipServlet
 	 */
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
+		
+		// From horacimacias : Non regression test for Issue 2115 MSS unable to handle GenericURI URIs
+		URI requestURI = request.getRequestURI();
+		logger.info("request URI : " + requestURI);
+		
 		String fromString = request.getFrom().toString();				
 		
 		// case for http://code.google.com/p/mobicents/issues/detail?id=1681
