@@ -44,20 +44,16 @@ public class ConvergedSipClusteringDefaultsDeployer extends
 	public void deploy(DeploymentUnit unit) throws DeploymentException {
 		JBossWebMetaData metaData = unit.getAttachment(JBossWebMetaData.class);
 	    if( metaData != null && metaData.getDistributable() != null ) {
-	    	if (metaData.getDistributable() != null) {
-	            addReplicationConfigDefaults(metaData);
-	            
-	            addPassivationConfigDefaults(metaData);
-	        }
+            addReplicationConfigDefaults(metaData);
+            
+            addPassivationConfigDefaults(metaData);
 	    }
 	   
 		JBossConvergedSipMetaData convergedMetaData = (JBossConvergedSipMetaData) unit.getAttachment(JBossConvergedSipMetaData.class);
 		if (convergedMetaData != null && convergedMetaData.getDistributable() != null) {
-			if (convergedMetaData.getDistributable() != null) {
-				addReplicationConfigDefaults(convergedMetaData);
+			addReplicationConfigDefaults(convergedMetaData);
 
-				addPassivationConfigDefaults(convergedMetaData);
-			}
+			addPassivationConfigDefaults(convergedMetaData);
 		}
 	}
 

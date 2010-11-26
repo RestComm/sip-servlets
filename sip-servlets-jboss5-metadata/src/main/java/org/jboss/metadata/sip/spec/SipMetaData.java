@@ -144,11 +144,12 @@ public abstract class SipMetaData  extends IdMetaDataImplWithDescriptionGroup
    {
       return version != null && version.equals("1.1");
    }
-
+   @XmlElement(name="distributable")
    public EmptyMetaData getDistributable()
    {
       return distributable;
    }
+   @XmlElement(name="distributable")
    public void setDistributable(EmptyMetaData distributable)
    {
       this.distributable = distributable;

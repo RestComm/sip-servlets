@@ -66,6 +66,248 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
 	private Method sipApplicationKeyMethod;
 	private ConcurrencyControlMode concurrencyControlMode;		
 	
+	public void merge(JBossWebMetaData override, SipMetaData original) {
+		this.merge(override, original, "jboss-web.xml", "sip.xml", false);
+	}
+
+	public void merge(JBossWebMetaData override, SipMetaData original,
+         String overrideFile, String overridenFile, boolean mustOverride)
+   {
+      super.merge(override, original);
+
+      if(override != null && override.getDistributable()!= null)
+          setDistributable(override.getDistributable());
+       else if(original != null && original.getDistributable() != null)
+          setDistributable(original.getDistributable());
+      
+      if(override != null && override.isMetadataComplete() != false)
+          setMetadataComplete(override.isMetadataComplete());
+       else if(original != null && (original instanceof Sip11MetaData) )
+       {
+          Sip11MetaData sip11MD = (Sip11MetaData) original;
+          setMetadataComplete(sip11MD.isMetadataComplete());
+       } 
+       else if(original != null && (original instanceof JBossSip11MetaData) )
+       {
+    	   JBossSip11MetaData sip11MD = (JBossSip11MetaData) original;
+           setMetadataComplete(sip11MD.isMetadataComplete());
+        }
+      
+      if(original != null && original.getContextParams() != null)
+          setSipContextParams(original.getContextParams());       
+      
+      if(override != null && override.getServletVersion()!= null)
+          setServletVersion(override.getServletVersion());
+       else if(original != null && original.getVersion() != null)
+          setServletVersion(original.getVersion());
+
+       if(original != null && original.getSipSessionConfig() != null) {
+    	   SessionConfigMetaData sessionConfigMetaData = new SessionConfigMetaData();
+    	   sessionConfigMetaData.setSessionTimeout(original.getSipSessionConfig().getSessionTimeout());
+    	   setSipSessionConfig(sessionConfigMetaData); 
+       }
+       
+       if(override != null && override.getSessionConfig()!= null)
+           setSessionConfig(override.getSessionConfig());        
+       
+       if(override != null && override.getFilters()!= null)
+          setFilters(override.getFilters());
+       
+       if(override != null && override.getFilterMappings()!= null)
+          setFilterMappings(override.getFilterMappings());
+       
+       if(override != null && override.getErrorPages()!= null)
+          setErrorPages(override.getErrorPages());
+       
+       if(override != null && override.getJspConfig()!= null)
+          setJspConfig(override.getJspConfig());       
+       
+       if(override != null && override.getLoginConfig()!= null)
+          setLoginConfig(override.getLoginConfig());
+       
+       if(override != null && override.getMimeMappings()!= null)
+          setMimeMappings(override.getMimeMappings());
+       
+       if(override != null && override.getServletMappings()!= null)
+          setServletMappings(override.getServletMappings());
+       
+       if(override != null && override.getSecurityContraints()!= null)
+          setSecurityContraints(override.getSecurityContraints());
+       
+       if(override != null && override.getWelcomeFileList()!= null)
+          setWelcomeFileList(override.getWelcomeFileList());
+       
+       if(override != null && override.getLocalEncodings()!= null)
+          setLocalEncodings(override.getLocalEncodings());
+       
+       if(override != null && override.isJaccAllStoreRole())
+          setJaccAllStoreRole(override.isJaccAllStoreRole());
+       
+       if(override != null && override.getVersion()!= null)
+          setVersion(override.getVersion());
+       else if(original != null && original.getVersion() != null)
+          setVersion(original.getVersion());
+       
+       if(override != null && override.getContextRoot()!= null)
+          setContextRoot(override.getContextRoot());
+       
+       if(override != null && override.getAlternativeDD()!= null)
+          setAlternativeDD(override.getAlternativeDD());
+       
+       if(override != null && override.getSecurityDomain()!= null)
+          setSecurityDomain(override.getSecurityDomain());
+       
+       if(override != null && override.getJaccContextID()!= null)
+          setJaccContextID(override.getJaccContextID());
+       
+       if(override != null && override.getClassLoading()!= null)
+          setClassLoading(override.getClassLoading());
+       
+       if(override != null && override.getDepends()!= null)
+          setDepends(override.getDepends());
+       
+       if(override != null && override.getRunAsIdentity()!= null)
+          setRunAsIdentity(override.getRunAsIdentity());
+
+       if(getSipSecurityRoles() == null)
+          setSipSecurityRoles(new SecurityRolesMetaData());
+       SecurityRolesMetaData overrideRoles = null;
+       SecurityRolesMetaData originalRoles = null;
+       if(original != null)
+          originalRoles = original.getSecurityRoles();
+       getSipSecurityRoles().merge(overrideRoles, originalRoles);
+
+       MessageDestinationsMetaData overrideMsgDests = null;
+       MessageDestinationsMetaData originalMsgDests = null;
+       if(original != null && original.getMessageDestinations() != null)
+          originalMsgDests = original.getMessageDestinations();
+       setSipMessageDestinations(MessageDestinationsMetaData.merge(overrideMsgDests,
+             originalMsgDests, overridenFile, overrideFile));
+
+       if(this.getJndiEnvironmentRefsGroup() == null)
+    	   setJndiEnvironmentRefsGroup(new JBossEnvironmentRefsGroupMetaData());
+        Environment env = null;
+        JBossEnvironmentRefsGroupMetaData jenv = null;
+        if( override != null )
+           jenv = (JBossEnvironmentRefsGroupMetaData) override.getJndiEnvironmentRefsGroup();
+        if(original != null)
+           env = original.getJndiEnvironmentRefsGroup();
+        ((JBossEnvironmentRefsGroupMetaData)getJndiEnvironmentRefsGroup()).merge(jenv, env, null, overrideFile, overridenFile, mustOverride);
+        
+       if(override != null && override.getVirtualHosts()!= null)
+          setVirtualHosts(override.getVirtualHosts());
+       
+       if(override != null && override.isFlushOnSessionInvalidation())
+          setFlushOnSessionInvalidation(override.isFlushOnSessionInvalidation());
+       
+       if(override != null && override.isUseSessionCookies())
+          setUseSessionCookies(override.isUseSessionCookies());
+       
+       if(override != null && override.getReplicationConfig()!= null)
+          setReplicationConfig(override.getReplicationConfig());
+       
+       if(override != null && override.getPassivationConfig()!= null)
+          setPassivationConfig(override.getPassivationConfig());
+       
+       if(override != null && override.getWebserviceDescriptions()!= null)
+          setWebserviceDescriptions(override.getWebserviceDescriptions());
+       
+       if(override != null && override.getArbitraryMetadata()!= null)
+          setArbitraryMetadata(override.getArbitraryMetadata());
+       
+       if(override != null && override.getMaxActiveSessions() != null)
+          setMaxActiveSessions(override.getMaxActiveSessions());
+       
+       if(override != null && override.getSessionCookies() != -1)
+          setSessionCookies(override.getSessionCookies());       
+      
+      if(original != null && original.getApplicationName() != null)
+         setApplicationName(original.getApplicationName());
+
+      if(original != null && original.getServletSelection() != null)
+    	  setServletSelection(original.getServletSelection());
+
+      if(original != null && original.getProxyConfig() != null)
+    	 setProxyConfig(original.getProxyConfig());
+      
+      if(original != null && original.getSipSessionConfig() != null)
+          setSipSessionConfig(original.getSipSessionConfig());
+      
+      if(original != null && original.getSipLoginConfig() != null)
+         setSipLoginConfig(original.getSipLoginConfig());
+      
+      if(original != null && original.getSipSecurityContraints() != null)
+         setSipSecurityContraints(original.getSipSecurityContraints());
+
+      if(original != null && original.getContextParams() != null)
+          setSipContextParams(original.getContextParams());
+      
+      if(original != null && original.getListeners() != null)
+          setSipListeners(original.getListeners());
+      
+      JBossServletsMetaData soverride = null;
+      ServletsMetaData soriginal = null;
+      if(original != null) {
+    	  if(original instanceof Sip11MetaData) {
+    		  soriginal = ((Sip11MetaData)original).getServlets();
+    	  }
+    	  if(original instanceof JBossSip11MetaData) {
+    		  soriginal = ((JBossSip11MetaData)original).getServlets();
+    	  }
+      }
+      sipServlets = JBossServletsMetaData.merge(soverride, soriginal);
+
+
+//      if(sipContextParams != null) {
+//	      List<ParamValueMetaData> mergedContextParams = new ArrayList<ParamValueMetaData>(sipContextParams);
+//	      if(override != null && override.getContextParams() != null) {
+//	    	  mergedContextParams.addAll(override.getContextParams());
+//	      }
+//	      setContextParams(mergedContextParams);
+//      }      
+      
+      if(original != null && original.getSipApplicationKeyMethod() != null)
+          setSipApplicationKeyMethod(original.getSipApplicationKeyMethod());
+      
+      if(original != null && original.getConcurrencyControlMode() != null)
+          setConcurrencyControlMode(original.getConcurrencyControlMode());
+      
+      //listeners should not be merged because they have a special treatment when loading the context
+      
+   // Update run-as indentity for a run-as-principal
+      if(sipServlets != null)
+      {
+         for(JBossServletMetaData servlet : sipServlets)
+         {
+            String servletName = servlet.getServletName();
+            String principalName = servlet.getRunAsPrincipal();
+            // Get the sip.xml run-as primary role
+            String sipXmlRunAs = null;
+            if(servlet.getRunAs() != null)
+               sipXmlRunAs = servlet.getRunAs().getRoleName();
+            if (principalName != null)
+            {
+               // Update the run-as indentity to use the principal name
+               if (sipXmlRunAs == null)
+               {
+                  //Needs to be merged from Annotations
+                  sipXmlRunAs = "PLACEHOLDER_FOR_ANNOTATION";
+                  //throw new IllegalStateException("run-as-principal: " + principalName + " found in jboss-web.xml but there was no run-as in web.xml");
+               }
+               // See if there are any additional roles for this principal
+               Set<String> extraRoles = getSecurityRoles().getSecurityRoleNamesByPrincipal(principalName);
+               RunAsIdentityMetaData runAsId = new RunAsIdentityMetaData(sipXmlRunAs, principalName, extraRoles);
+               getRunAsIdentity().put(servletName, runAsId);
+            }
+            else if (sipXmlRunAs != null)
+            {
+               RunAsIdentityMetaData runAsId = new RunAsIdentityMetaData(sipXmlRunAs, null);
+               getRunAsIdentity().put(servletName, runAsId);
+            }
+         }
+      }
+   }
+	
 	public void merge(JBossConvergedSipMetaData override, SipMetaData original)
 	{
 		this.merge(override, original, "jboss-web.xml", "sip.xml", false);
