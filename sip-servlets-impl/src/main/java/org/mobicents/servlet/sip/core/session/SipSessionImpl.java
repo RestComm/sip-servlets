@@ -128,11 +128,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  */
 public class SipSessionImpl implements MobicentsSipSession {
-	
-	protected static enum SipSessionEventType {
-		CREATION, DELETION, READYTOINVALIDATE;
-	}
-	
+		
 	private static final Logger logger = Logger.getLogger(SipSessionImpl.class);
 	
 	protected transient SipApplicationSessionKey sipApplicationSessionKey;			
@@ -277,17 +273,13 @@ public class SipSessionImpl implements MobicentsSipSession {
 		this.ongoingTransactions = new CopyOnWriteArraySet<Transaction>();
 		if(mobicentsSipApplicationSession.getSipContext() != null && ConcurrencyControlMode.SipSession.equals(mobicentsSipApplicationSession.getSipContext().getConcurrencyControlMode())) {
 			semaphore = new Semaphore(1);		
-		}
-		// the sip context can be null if the AR returned an application that was not deployed
-		if(mobicentsSipApplicationSession.getSipContext() != null) {
-			notifySipSessionListeners(SipSessionEventType.CREATION);
-		}
+		}		
 	}
 	/**
 	 * Notifies the listeners that a lifecycle event occured on that sip session 
 	 * @param sipSessionEventType the type of event that happened
 	 */
-	private void notifySipSessionListeners(SipSessionEventType sipSessionEventType) {
+	public void notifySipSessionListeners(SipSessionEventType sipSessionEventType) {
 		MobicentsSipApplicationSession sipApplicationSession = getSipApplicationSession();
 		if(sipApplicationSession != null) {
 			SipContext sipContext = sipApplicationSession.getSipContext(); 							
@@ -1273,8 +1265,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void removeOngoingTransaction(Transaction transaction) {
 
+		boolean removed = false;
 		if(this.ongoingTransactions != null) {
-			this.ongoingTransactions.remove(transaction);
+			removed = this.ongoingTransactions.remove(transaction);
 		}
 		
 //		if(sessionCreatingTransactionRequest != null && sessionCreatingTransactionRequest.getMessage() != null && JainSipUtils.DIALOG_CREATING_METHODS.contains(sessionCreatingTransactionRequest.getMethod())) {
@@ -1287,9 +1280,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 			sessionCreatingTransactionRequest.cleanUp();
 		}
 			
-		
 		if(logger.isDebugEnabled()) {
-			logger.debug("transaction "+ transaction +" has been removed from sip session's ongoingTransactions" );
+			logger.debug("transaction "+ transaction +" has been removed from sip session's ongoingTransactions ? " + removed );
 		}	
 		
 		updateReadyToInvalidate(transaction);
@@ -1316,6 +1308,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 		// that are dialog terminating according to the appropriate RFC rules relating to the kind of dialog.		
 		if(!JainSipUtils.DIALOG_CREATING_METHODS.contains(method) &&
 				!JainSipUtils.DIALOG_TERMINATING_METHODS.contains(method)) {
+			if(getSessionCreatingDialog() == null && proxy == null) {
+				// Fix for issue http://code.google.com/p/mobicents/issues/detail?id=2116
+				// avoid creating derived sessions for non dialogcreating requests
+				if(logger.isDebugEnabled()) {
+					logger.debug("resetting the to tag since a response to a non dialog creating and terminating method has been received for non proxy session with no dialog in state " + state);
+				}
+				key.setToTag(null);
+			}
 			return;
 		}
 		// Mapping to the sip session state machine (proxy is covered here too)
@@ -1758,15 +1758,16 @@ public class SipSessionImpl implements MobicentsSipSession {
 		return getSipApplicationSession().getSipContext().getServletContext();
 	}
 	
-	/**
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.MobicentsSipSession#removeDerivedSipSession(java.lang.String)
 	 */
 	public MobicentsSipSession removeDerivedSipSession(String toTag) {
 		return derivedSipSessions.remove(toTag);
 	}
-	
-	/**
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.MobicentsSipSession#findDerivedSipSession(java.lang.String)
 	 */
 	public MobicentsSipSession findDerivedSipSession(String toTag) {
 		if(derivedSipSessions != null) {
@@ -1775,8 +1776,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		return null;
 	}
 	
-	/**
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.MobicentsSipSession#getDerivedSipSessions()
 	 */
 	public Iterator<MobicentsSipSession> getDerivedSipSessions() {
 		if(derivedSipSessions != null) {
@@ -1785,22 +1787,25 @@ public class SipSessionImpl implements MobicentsSipSession {
 		return new HashMap<String, MobicentsSipSession>().values().iterator();
 	}
 	
-	/**
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.MobicentsSipSession#setParentSession(org.mobicents.servlet.sip.core.session.MobicentsSipSession)
 	 */
 	public void setParentSession(MobicentsSipSession mobicentsSipSession) {
 		parentSession = mobicentsSipSession;
 	}
 	
-	/**
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.MobicentsSipSession#setSipSessionAttributeMap(java.util.Map)
 	 */
 	public void setSipSessionAttributeMap(
 			Map<String, Object> sipSessionAttributeMap) {
 		this.sipSessionAttributeMap = sipSessionAttributeMap;
 	}
-	/**
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.MobicentsSipSession#addDerivedSipSessions(org.mobicents.servlet.sip.core.session.MobicentsSipSession)
 	 */
 	public void addDerivedSipSessions(MobicentsSipSession derivedSession) {
 		if(derivedSipSessions == null) {
@@ -1808,20 +1813,23 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		derivedSipSessions.putIfAbsent(derivedSession.getKey().getToTag(), derivedSession);
 	}
-	/**
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.MobicentsSipSession#getSipSessionAttributeMap()
 	 */
 	public Map<String, Object> getSipSessionAttributeMap() {
 		return getAttributeMap();
 	}
-	/**
-	 * @param localParty the localParty to set
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.MobicentsSipSession#setLocalParty(javax.servlet.sip.Address)
 	 */
 	public void setLocalParty(Address localParty) {
 		this.localParty = localParty;
 	}
-	/**
-	 * @param remoteParty the remoteParty to set
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.MobicentsSipSession#setRemoteParty(javax.servlet.sip.Address)
 	 */
 	public void setRemoteParty(Address remoteParty) {
 		this.remoteParty = remoteParty;

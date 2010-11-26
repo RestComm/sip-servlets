@@ -16,12 +16,15 @@
  */
 package org.mobicents.servlet.sip.testsuite.security;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.sip.SipProvider;
 import javax.sip.header.Header;
-import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.ProxyAuthorizationHeader;
 import javax.sip.message.Response;
 
@@ -59,17 +62,19 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 				"sip-test-context", "sip-test"));
 	}
 	
-	public SipStandardContext deployApplication(String name, String value) {
+	public SipStandardContext deployApplication(Map<String, String> params) {
 		SipStandardContext context = new SipStandardContext();
 		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet-auth/src/main/sipapp");
 		context.setName("sip-test-context");
 		context.setPath("sip-test");
 		context.addLifecycleListener(new SipContextConfig());
 		context.setManager(new SipStandardManager());
-		ApplicationParameter applicationParameter = new ApplicationParameter();
-		applicationParameter.setName(name);
-		applicationParameter.setValue(value);
-		context.addApplicationParameter(applicationParameter);
+		for (Entry<String, String> entry : params.entrySet()) {
+			ApplicationParameter applicationParameter = new ApplicationParameter();
+			applicationParameter.setName(entry.getKey());
+			applicationParameter.setValue(entry.getValue());
+			context.addApplicationParameter(applicationParameter);
+		}
 		assertTrue(tomcat.deployContext(context));
 		return context;
 	}
@@ -128,7 +133,9 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 		receiverProtocolObjects.start();		
 		
 		tomcat.startTomcat();
-		deployApplication("METHOD", "REGISTER");
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("METHOD", "REGISTER");
+		deployApplication(params);
 		Thread.sleep(TIMEOUT);
 		ListIterator<Header>  proxyAuthHeaders = receiver.getRegisterReceived().getHeaders(ProxyAuthorizationHeader.NAME);
 		int proxyAuthHeaderNumber = 0; 
@@ -163,7 +170,9 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 		receiverProtocolObjects.start();		
 		
 		tomcat.startTomcat();
-		deployApplication("from", "cancelChallenge");
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("from", "cancelChallenge");
+		deployApplication(params);
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.isCancelReceived());			
 	}
@@ -192,7 +201,9 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 		receiverProtocolObjects.start();		
 		
 		tomcat.startTomcat();
-		deployApplication("from", "cancelChallengeBefore1xx");
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("from", "cancelChallengeBefore1xx");
+		deployApplication(params);
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.isCancelReceived());			
 	}
@@ -220,7 +231,9 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 		receiverProtocolObjects.start();		
 		
 		tomcat.startTomcat();
-		deployApplication("from", "reinvite");
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("from", "reinvite");
+		deployApplication(params);
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.isAckReceived());		
 		receiver.setWaitForCancel(true);
@@ -228,6 +241,38 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 		receiver.sendInDialogSipRequest("INFO", null, null, null, null, null);
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.isCancelReceived());		
+	}
+	
+	/*
+	 * Non regression test for Issue 2116
+	 * http://code.google.com/p/mobicents/issues/detail?id=2116
+	 * Making sure no derived sessions are created
+	 */
+	public void testShootistReREGISTER() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"reregister", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setChallengeRequests(true);
+		receiver.setMultipleChallengeInResponse(true);	
+		SipProvider receiverProvider = receiver.createProvider();			
+		receiverProvider.addSipListener(receiver);
+		receiverProtocolObjects.start();		
+		
+		tomcat.startTomcat();
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("METHOD", "REGISTER");
+		params.put("from", "reregister");
+		params.put("nbSubsequentReq", "4");		
+		deployApplication(params);
+		
+		Thread.sleep(TIMEOUT);
+		Iterator<String> allMessagesIterator = receiver.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		assertEquals(0, receiver.getAllMessagesContent().size());
 	}
 
 	@Override

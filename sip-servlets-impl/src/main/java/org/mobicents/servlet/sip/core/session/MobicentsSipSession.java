@@ -25,14 +25,11 @@ import java.util.concurrent.Semaphore;
 
 import javax.servlet.sip.Address;
 import javax.servlet.sip.SipSession;
-import javax.servlet.sip.SipURI;
-import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.sip.Dialog;
 import javax.sip.SipException;
 import javax.sip.Transaction;
-import javax.sip.message.Request;
 
 import org.mobicents.javax.servlet.sip.SipSessionExt;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
@@ -168,4 +165,6 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	void setRequestsPending(int requests);
 
 	void setAckReceived(long cSeq, boolean ackReceived);
+
+	void notifySipSessionListeners(SipSessionEventType creation);
 }

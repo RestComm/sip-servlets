@@ -29,6 +29,7 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
+import org.mobicents.servlet.sip.core.session.SipSessionEventType;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -454,6 +455,10 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 
 	public void setRequestsPending(int requests) {
 		sipSession.setRequestsPending(requests);
+	}
+
+	public void notifySipSessionListeners(SipSessionEventType creation) {
+		sipSession.notifySipSessionListeners(creation);		
 	}
 
 }
