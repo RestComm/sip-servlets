@@ -1289,6 +1289,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			sipApplicationSession.access();
 			Dialog dialog = getDialog();
 			if(session.getProxy() != null) dialog = null;
+			if(request.getMethod().equals(Request.CANCEL)) dialog = null;
 			// Issue 1791 : using a different classloader created outside the application loader 
 			// to avoid leaks on startup/shutdown
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
