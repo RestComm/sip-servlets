@@ -52,6 +52,16 @@ if [ $# -ne 0 ]; then
 				cp ../../../sip-servlets-examples/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/port-1/conf/dars/distributable-dar.properties
 				cp ../../../sip-servlets-examples/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties
 	            ;;
+	    b2bua-early)
+	            echo "Distributed example used is b2bua with early dialog"
+	    		mvn clean install -f ../../../sip-servlets-examples/call-forwarding-distributable/pom.xml
+				cp ../../../sip-servlets-examples/call-forwarding-distributable/target/call-forwarding-distributable-*.war $JBOSS_HOME/server/port-1/deploy
+				cp ../../../sip-servlets-examples/call-forwarding-distributable/target/call-forwarding-distributable-*.war $JBOSS_HOME/server/port-2/deploy
+				cp ../../../sip-servlets-examples/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/port-1/conf/dars/distributable-dar.properties
+				cp ../../../sip-servlets-examples/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties
+				cp setup/jboss-5/mss-sip-stack-jboss-early-failover.properties $JBOSS_HOME/server/port-1/conf/mss-sip-stack.properties
+				cp setup/jboss-5/mss-sip-stack-jboss-early-failover.properties $JBOSS_HOME/server/port-2/conf/mss-sip-stack.properties
+	            ;;
 	    custom-b2bua)
 	            echo "Distributed example used is b2bua"
 	    		mvn clean install -o -f ../../../sip-servlets-examples/custom-call-forwarding-distributable/pom.xml
