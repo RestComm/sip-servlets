@@ -27,10 +27,12 @@ import javax.servlet.ServletException;
 import javax.servlet.sip.B2buaHelper;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
+import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.UAMode;
 
 import org.apache.log4j.Logger;
 
@@ -63,6 +65,13 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
 		forwardingUris.put("sip:receiver@127.0.0.1:5080", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+		
+		forwardingUris.put("sip:receiver-fwd-ack@sip-servlets.com", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+		forwardingUris.put("sip:receiver-fwd-ack@127.0.0.1", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+		forwardingUris.put("sip:receiver-fwd-ack@127.0.0.1:5080", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
 	}
 	
 	@Override
@@ -71,6 +80,21 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 		if(logger.isInfoEnabled()) {
 			logger.info("Got : " + request.toString());
 		}
+		if(request.getFrom().getURI().toString().contains("fwd-ack")) {
+			B2buaHelper helper = request.getB2buaHelper();
+	        SipSession peerSession = helper.getLinkedSession(request.getSession());
+			List<SipServletMessage> pendingMessages = helper.getPendingMessages(peerSession, UAMode.UAC);
+	        SipServletResponse invitePendingResponse = null;
+	        logger.info("pending messages : ");
+	        for(SipServletMessage pendingMessage : pendingMessages) {
+	        	logger.info("\t pending message : " + pendingMessage);
+	        	if(((SipServletResponse)pendingMessage).getStatus() == 200) {
+	        		invitePendingResponse = (SipServletResponse)pendingMessage;
+	        		break;
+	        	}
+	        }
+	        invitePendingResponse.createAck().send();
+		}	
 	}
 
 	@Override
@@ -191,11 +215,13 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 //		    helper.getLinkedSession(sipServletResponse.getSession());		
 		//if this is a response to an INVITE we ack it and forward the OK 
 		if("INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
-			SipServletRequest ackRequest = sipServletResponse.createAck();
-			if(logger.isInfoEnabled()) {
-				logger.info("Sending " +  ackRequest);
+			if(sipServletResponse.getFrom().getURI().toString().contains("fwd-ack")) {
+				SipServletRequest ackRequest = sipServletResponse.createAck();
+				if(logger.isInfoEnabled()) {
+					logger.info("Sending " +  ackRequest);
+				}
+				ackRequest.send();
 			}
-			ackRequest.send();
 			//create and sends OK for the first call leg							
 			SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
 			SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
