@@ -16,10 +16,6 @@
  */
 package org.mobicents.servlet.sip.core.session;
 
-import gov.nist.core.Separators;
-import gov.nist.javax.sip.address.Authority;
-import gov.nist.javax.sip.address.SipUri;
-
 import java.text.ParseException;
 import java.util.StringTokenizer;
 

@@ -53,6 +53,7 @@ import org.mobicents.ha.javax.sip.ClusteredSipStack;
 import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingListener;
 import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingService;
 import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingServiceImpl;
+import org.mobicents.ha.javax.sip.ReplicationStrategy;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.SipFactories;
@@ -448,10 +449,7 @@ public class SipStandardService extends StandardService implements SipService {
 				}
 				UserAgentHeader userAgentHeader = SipFactories.headerFactory.createUserAgentHeader(userAgentList);
 				((MessageFactoryExt)SipFactories.messageFactory).setDefaultUserAgentHeader(userAgentHeader);
-			}
-			if(logger.isInfoEnabled()) {
-				logger.info("Mobicents Sip Servlets sip stack properties : " + sipStackProperties);
-			}
+			}			
 			if(balancers != null) {
 				if(sipStackProperties.get(LoadBalancerHeartBeatingService.LB_HB_SERVICE_CLASS_NAME) == null) {
 					sipStackProperties.put(LoadBalancerHeartBeatingService.LB_HB_SERVICE_CLASS_NAME, LoadBalancerHeartBeatingServiceImpl.class.getCanonicalName());
@@ -460,7 +458,19 @@ public class SipStandardService extends StandardService implements SipService {
 					sipStackProperties.put(LoadBalancerHeartBeatingService.BALANCERS, balancers);
 				}
 			}		
-			sipStackProperties.put("org.mobicents.ha.javax.sip.REPLICATION_STRATEGY", "ConfirmedDialogNoApplicationData");
+			String replicationStrategy = sipStackProperties.getProperty(ClusteredSipStack.REPLICATION_STRATEGY_PROPERTY);
+			if(replicationStrategy == null) {				
+				replicationStrategy = ReplicationStrategy.ConfirmedDialog.toString();
+			}			
+			boolean replicateApplicationData = false;
+			if(replicationStrategy.equals(ReplicationStrategy.EarlyDialog.toString())) {
+				replicateApplicationData = true;
+			}			
+			sipStackProperties.put(ClusteredSipStack.REPLICATION_STRATEGY_PROPERTY, replicationStrategy);
+			sipStackProperties.put(ClusteredSipStack.REPLICATE_APPLICATION_DATA, Boolean.valueOf(replicateApplicationData).toString());
+			if(logger.isInfoEnabled()) {
+				logger.info("Mobicents Sip Servlets sip stack properties : " + sipStackProperties);
+			}
 			// Create SipStack object
 			sipStack = SipFactories.sipFactory.createSipStack(sipStackProperties);		
 			LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = null;

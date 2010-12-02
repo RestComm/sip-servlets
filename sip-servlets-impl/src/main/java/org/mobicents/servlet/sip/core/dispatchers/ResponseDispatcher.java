@@ -37,8 +37,11 @@ import javax.sip.message.Response;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.core.session.DistributableSipManager;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -176,17 +179,26 @@ public class ResponseDispatcher extends MessageDispatcher {
 			SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(appId, appName, response, inverted);
 			if(logger.isDebugEnabled()) {
 				logger.debug("Trying to find session with following session key " + sessionKey);
-			}			
+			}		
+			final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
+					appName, 
+					appId);
+			
+			MobicentsSipApplicationSession sipApplicationSession = null;
+			// needed only for failover (early) dialog recovery
+			if(sipManager instanceof DistributableSipManager) {
+				sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
+			}
 			MobicentsSipSession tmpSession = null;
 
-			tmpSession = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, null);
+			tmpSession = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, sipApplicationSession);
 			//needed in the case of RE-INVITE by example
 			if(tmpSession == null) {
 				sessionKey = SessionManagerUtil.getSipSessionKey(appId, appName, response, !inverted);
 				if(logger.isDebugEnabled()) {
 					logger.debug("Trying to find session with following session key " + sessionKey);
 				}
-				tmpSession = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, null);				
+				tmpSession = sipManager.getSipSession(sessionKey, false, sipFactoryImpl, sipApplicationSession);				
 			}
 			if(logger.isDebugEnabled()) {
 				logger.debug("session found is " + tmpSession);

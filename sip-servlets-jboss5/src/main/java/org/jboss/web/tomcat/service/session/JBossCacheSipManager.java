@@ -77,6 +77,8 @@ import org.mobicents.cache.MobicentsCache;
 import org.mobicents.cluster.DefaultMobicentsCluster;
 import org.mobicents.cluster.MobicentsCluster;
 import org.mobicents.cluster.election.DefaultClusterElector;
+import org.mobicents.ha.javax.sip.ClusteredSipStack;
+import org.mobicents.ha.javax.sip.ReplicationStrategy;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -85,6 +87,7 @@ import org.mobicents.servlet.sip.core.session.SipManagerDelegate;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
  * Implementation of a converged clustered session manager for
@@ -2155,12 +2158,15 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			synchronized (session) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("check to see if needs to store and replicate "
-							+ "session with id " + session.getId());
+							+ "session with id " + session.getId() + " isValid " + session.isValidInternal() +
+							" getMustReplicateTimestamp " + session.getMustReplicateTimestamp() + 
+							" session state " + session.getState());
 				}
 
 				if (session.isValidInternal()
-						&& (session.isSessionDirty() || session
-								.getMustReplicateTimestamp()) && State.CONFIRMED.equals(session.getState())) {
+						&& (session.isSessionDirty() || session.getMustReplicateTimestamp()) && 
+								(State.CONFIRMED.equals(session.getState()) ||
+										(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy().equals(ReplicationStrategy.EarlyDialog) && State.EARLY.equals(session.getState())))) {
 					final String realId = session.getId();
 					if(logger.isDebugEnabled()) {
 						logger.debug("replicating following sip session " + session.getId());
@@ -2477,18 +2483,27 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	            	if(logger.isDebugEnabled()) {
 	        			logger.debug("data for sip session " + key + " found in the distributed cache");
 	        		}
-	            	if (session == null && sipApplicationSessionImpl != null) {
-	        			// This is either the first time we've seen this session on this
-	        			// server, or we previously expired it and have since gotten
-	        			// a replication message from another server
-	        			mustAdd = true;
-	        			initialLoad = true;
-	        			session = (ClusteredSipSession<? extends OutgoingDistributableSessionData>) 
-	        					((ClusteredSipManagerDelegate)sipManagerDelegate).getNewMobicentsSipSession(key, sipFactory, sipApplicationSessionImpl, true);
-	        			OwnedSessionUpdate osu = unloadedSipSessions_.get(key);
-	        	        passivated = (osu != null && osu.passivated);
-	        		}
-	            	if(session != null) {	            		
+	            	if (session == null) {
+	            		if(sipApplicationSessionImpl != null) {
+	            			if(logger.isDebugEnabled()) {
+	    	        			logger.debug("parent sip application is " + sipApplicationSessionImpl.getId());
+	    	        		}	            			
+		        			// This is either the first time we've seen this session on this
+		        			// server, or we previously expired it and have since gotten
+		        			// a replication message from another server
+		        			mustAdd = true;
+		        			initialLoad = true;
+		        			session = (ClusteredSipSession<? extends OutgoingDistributableSessionData>) 
+		        					((ClusteredSipManagerDelegate)sipManagerDelegate).getNewMobicentsSipSession(key, sipFactory, sipApplicationSessionImpl, true);
+		        			OwnedSessionUpdate osu = unloadedSipSessions_.get(key);
+		        	        passivated = (osu != null && osu.passivated);
+	            		} else {
+	            			if(logger.isDebugEnabled()) {
+	    	        			logger.debug("beware null parent sip application for session " + key);
+	    	        		}
+	            		}
+	            	} 
+	            	if(session!= null) {
 						session.update(data);						
 	            	}
 	            } else if(logger.isDebugEnabled()) {

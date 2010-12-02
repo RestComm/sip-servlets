@@ -16,8 +16,6 @@
  */
 package org.jboss.web.tomcat.service.session;
 
-import gov.nist.javax.sip.SipStackImpl;
-
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -52,7 +50,6 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
 import org.apache.catalina.Service;
-import org.apache.catalina.connector.Connector;
 import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;

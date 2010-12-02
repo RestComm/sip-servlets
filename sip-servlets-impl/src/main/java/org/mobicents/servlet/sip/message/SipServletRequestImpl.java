@@ -1040,7 +1040,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
 							transport, false).getSipProvider();	
 					// Issue 1468 : to handle forking, we shouldn't cleanup the app data since it is needed for the forked responses
-					if(((SipStackImpl)sipProvider.getSipStack()).getMaxForkTime() == 0) {
+					if(((SipStackImpl)sipProvider.getSipStack()).getMaxForkTime() == 0 && transaction != null) {
 						transaction.setApplicationData(null);
 					}
 					return;

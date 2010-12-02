@@ -56,6 +56,7 @@ import javax.servlet.sip.SipSession;
 import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
+import javax.sip.ServerTransaction;
 import javax.sip.SipFactory;
 import javax.sip.Transaction;
 import javax.sip.header.AcceptLanguageHeader;
@@ -77,6 +78,8 @@ import javax.sip.message.Request;
 
 import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.log4j.Logger;
+import org.mobicents.ha.javax.sip.ClusteredSipStack;
+import org.mobicents.ha.javax.sip.ReplicationStrategy;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
@@ -89,6 +92,7 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
  * Implementation of SipServletMessage
@@ -1726,7 +1730,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	 * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
 	 */
 	public void readExternal(ObjectInput in) throws IOException,
-			ClassNotFoundException {
+			ClassNotFoundException {		
 		sipFactoryImpl = (SipFactoryImpl) in.readObject();
 		String sessionKeyString = in.readUTF();
 		try {
@@ -1749,6 +1753,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 			currentApplicationName = null;
 		}
 		isMessageSent = in.readBoolean();
+		if(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
+			String transactionId = in.readUTF();
+			if(transactionId != null) {
+				boolean isServerTx = in.readBoolean();
+				transaction = ((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).findTransaction(transactionId, isServerTx);
+			}
+		}
 	}
 	
 	/*
@@ -1756,6 +1767,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	 * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
 	 */
 	public void writeExternal(ObjectOutput out) throws IOException {
+		if (logger.isDebugEnabled()) {
+			logger.debug("sipServletMessage.writeExternal");
+		}
 		out.writeObject(sipFactoryImpl);
 		if(sessionKey != null) {
 			out.writeUTF(sessionKey.toString());
@@ -1779,6 +1793,14 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 			out.writeUTF("");
 		}
 		out.writeBoolean(isMessageSent);
+		if(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
+			if(transaction == null) {
+				out.writeUTF("");
+			} else {
+				out.writeUTF(transaction.getBranchId());
+				out.writeBoolean(transaction instanceof ServerTransaction);
+			}
+		}
 		out.writeUTF(message.toString());		
 	}
 //	public void cleanUp() {
