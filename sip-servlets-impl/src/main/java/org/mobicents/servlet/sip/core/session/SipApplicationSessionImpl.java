@@ -666,8 +666,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 
 	private void cancelExpirationTimer() {
 		sipContext.getSipApplicationSessionTimerService().cancel(expirationTimerTask);
-		expirationTimerTask.setSipApplicationSession(null);
-		expirationTimerTask = null;
+		if(expirationTimerTask != null) {
+			expirationTimerTask.setSipApplicationSession(null);
+			expirationTimerTask = null;
+		}
 	}
 
 	/*

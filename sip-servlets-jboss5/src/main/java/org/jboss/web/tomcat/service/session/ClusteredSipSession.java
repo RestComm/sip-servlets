@@ -43,7 +43,9 @@ import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
 import javax.sip.Dialog;
+import javax.sip.ServerTransaction;
 import javax.sip.SipStack;
+import javax.sip.Transaction;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -64,6 +66,7 @@ import org.jboss.web.tomcat.service.session.notification.ClusteredSessionNotific
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipSessionNotificationPolicy;
 import org.mobicents.ha.javax.sip.ClusteredSipStack;
 import org.mobicents.ha.javax.sip.HASipDialog;
+import org.mobicents.ha.javax.sip.ReplicationStrategy;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
@@ -90,6 +93,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 
 	protected static final String B2B_SESSION_MAP = "b2bsm";
 	protected static final String B2B_SESSION_SIZE = "b2bss";
+	protected static final String TXS_SIZE = "txm";
+	protected static final String TXS_IDS= "txid";
+	protected static final String TXS_TYPE= "txt";
 	protected static final String PROXY = "prox";
 	protected static final String DIALOG_ID = "did";
 	protected static final String READY_TO_INVALIDATE = "rti";
@@ -877,7 +883,28 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 				b2buaHelper.setSipManager(getManager());
 			}
 			b2buaHelper.setSessionMap(sessionMap);
-		}	
+		}
+		if(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
+			Integer txsSize = (Integer) metaData.get(TXS_SIZE);
+			if(txsSize != null) {
+				String[] txIds = (String[])metaData.get(TXS_IDS);
+				Boolean[] txTypes = (Boolean[])metaData.get(TXS_TYPE);
+				if(logger.isDebugEnabled()) {
+					logger.debug("tx array size = " + txsSize + ", value = " + txIds);
+				}
+				if(txsSize != null && txIds != null) {
+					for (int i = 0; i < txsSize; i++) {
+						String txId = txIds[i];
+						Boolean txType = txTypes[i];
+						if(logger.isDebugEnabled()) {
+							logger.debug("trying to find tx with id = " + txId + ", type = " + txType + " locally or in the distributed cache");
+						}
+						Transaction transaction = ((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).findTransaction(txId, txType);					
+						addOngoingTransaction(transaction);
+					}				
+				}
+			}
+		}
 		if(logger.isDebugEnabled()) {
 			logger.debug("dialog to inject " + sessionCreatingDialogId);
 			if(sessionCreatingDialogId != null) {
@@ -941,7 +968,28 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 					logger.debug("storing b2bua session array " + sessionArray);
 				}
 				metaData.put(B2B_SESSION_MAP, sessionArray);
-			}			
+			}	
+			if(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
+				final Set<Transaction> ongoingTransactions = getOngoingTransactions();
+				final int size = ongoingTransactions.size();
+				final String[] txIdArray = new String[size];
+				final Boolean[] txTypeArray = new Boolean[size];
+				int i = 0;
+				for (Transaction transaction : ongoingTransactions) {
+					txIdArray[i] = transaction.getBranchId(); 
+					txTypeArray[i] = transaction instanceof ServerTransaction ? Boolean.TRUE : Boolean.FALSE;
+					i++;
+				}
+				metaData.put(TXS_SIZE, size);
+				if(logger.isDebugEnabled()) {
+					logger.debug("storing transaction ids array " + txIdArray);
+				}
+				metaData.put(TXS_IDS, txIdArray);
+				if(logger.isDebugEnabled()) {
+					logger.debug("storing transaction type array " + txTypeArray);
+				}
+				metaData.put(TXS_TYPE, txTypeArray);
+			}
 		}
 		distributedCacheManager.storeSipSessionData(outgoingData);
 		

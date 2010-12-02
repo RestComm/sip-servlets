@@ -37,7 +37,7 @@ public class TransactionApplicationData implements Serializable {
 
 	private static final long serialVersionUID = 9170581635026591070L;
 	private static final Logger logger = Logger.getLogger(TransactionApplicationData.class);
-	private transient ProxyBranchImpl proxyBranch;	
+	private ProxyBranchImpl proxyBranch;	
 	private SipServletMessageImpl sipServletMessage;
 //	private SipSessionKey sipSessionKey;
 	private transient Set<SipServletResponseImpl> sipServletResponses;
