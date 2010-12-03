@@ -185,7 +185,7 @@ public class SessionManagerUtil {
 			String sipSessionKey, String sipAppSessionId, String sipApplicationName) throws ParseException {
 		
 		if(logger.isDebugEnabled()) {
-			logger.debug("sipSession key to parse " + sipSessionKey );
+			logger.debug("sipSession ha key to parse " + sipSessionKey );
 		}
 		StringTokenizer stringTokenizer = new StringTokenizer(sipSessionKey, SESSION_KEY_SEPARATOR);
 		String fromTag = stringTokenizer.nextToken();

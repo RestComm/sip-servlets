@@ -574,7 +574,11 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				originalRequest.setRoutingState(RoutingState.FINAL_RESPONSE_SENT);				
 			}
 			if(originalRequest != null) {				
-				originalRequest.setResponse(this);					
+				originalRequest.setResponse(this);
+				if(originalRequest.getTransaction() !=  null && originalRequest.getTransaction().getApplicationData() != null && ((TransactionApplicationData)originalRequest.getTransaction().getApplicationData()).getSipServletMessage() != null) {
+					// used for early dialog failover purposes
+					((SipServletRequestImpl)((TransactionApplicationData)originalRequest.getTransaction().getApplicationData()).getSipServletMessage()).setResponse(this);
+				}				
 			}
 			//updating the last accessed times 
 			session.access();

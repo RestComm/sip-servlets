@@ -126,6 +126,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	// Made it transient for Issue 1523 : http://code.google.com/p/mobicents/issues/detail?id=1523
 	// NotSerializableException happens if a message is stored in the sip session during HA
 	private transient Transaction transaction;
+	// used for failover to recover the transaction
+	private String transactionId;
+	private boolean transactionType;
 	
 	// We need this object separate from transaction.getApplicationData, because the actualy transaction
 	// may be create later and we still need to accumulate useful data. Also the transaction might be
@@ -773,7 +776,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		// AddressImpl enforces immutability!!
 		FromHeader from = (FromHeader) this.message
 				.getHeader(getCorrectHeaderName(FromHeader.NAME));
-		AddressImpl address = new AddressImpl(from.getAddress(), AddressImpl.getParameters((Parameters)from), transaction == null ? true : false);
+		AddressImpl address = new AddressImpl(from.getAddress(), AddressImpl.getParameters((Parameters)from), getTransaction() == null ? true : false);
 		return address;
 	}
 	
@@ -1066,7 +1069,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	public Address getTo() {
 		ToHeader to = (ToHeader) this.message
 			.getHeader(getCorrectHeaderName(ToHeader.NAME));
-		return new AddressImpl(to.getAddress(), AddressImpl.getParameters((Parameters)to), transaction == null ? true : false);
+		return new AddressImpl(to.getAddress(), AddressImpl.getParameters((Parameters)to), getTransaction() == null ? true : false);
 	}
 	
 	/*
@@ -1534,6 +1537,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	}
 
 	public Transaction getTransaction() {
+		if(transaction == null && transactionId != null) {            
+			// used for early dialog failover purposes, lazily load the transaction
+            setTransaction(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).findTransaction(transactionId, transactionType));
+            transactionApplicationData = (TransactionApplicationData) transaction.getApplicationData();
+        }
 		return this.transaction;
 	}
 
@@ -1568,8 +1576,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		if (this.dialog != null) {
 			return dialog;
 		}
-		if (this.transaction != null) {
-			return this.transaction.getDialog();
+		if (this.getTransaction() != null) {
+			return this.getTransaction().getDialog();
 		}
 		return null;
 	}
@@ -1579,6 +1587,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	 *            the transaction to set
 	 */
 	public void setTransaction(Transaction transaction) {
+		if (logger.isDebugEnabled())
+			logger.debug("Setting transaction " + transaction + " on message " + this);
 		this.transaction = transaction;
 	}
 
@@ -1760,10 +1770,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		}
 		isMessageSent = in.readBoolean();
 		if(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
-			String transactionId = in.readUTF();
+			transactionId = in.readUTF();
 			if(transactionId != null) {
-				boolean isServerTx = in.readBoolean();
-				transaction = ((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).findTransaction(transactionId, isServerTx);
+				if(transactionId.equals("")) {
+					transactionId = null;
+				} else { 
+					transactionType = in.readBoolean();
+				}
 			}
 		}
 	}
@@ -1773,9 +1786,6 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	 * @see java.io.Externalizable#writeExternal(java.io.ObjectOutput)
 	 */
 	public void writeExternal(ObjectOutput out) throws IOException {
-		if (logger.isDebugEnabled()) {
-			logger.debug("sipServletMessage.writeExternal");
-		}
 		out.writeObject(sipFactoryImpl);
 		if(sessionKey != null) {
 			out.writeUTF(sessionKey.toString());

@@ -414,7 +414,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 												SipServletRequestImpl correspondingInviteRequest = (SipServletRequestImpl)sipServletMessage;
 												final SipServletResponse lastFinalResponse = correspondingInviteRequest.getLastFinalResponse();
 												if(logger.isDebugEnabled()) {
-					                                logger.debug("last final response " + lastFinalResponse);
+					                                logger.debug("last final response " + lastFinalResponse + " for original request " + correspondingInviteRequest);
 					                            }
 												
 											    if(lastFinalResponse != null && lastFinalResponse.getStatus() >= 300) {

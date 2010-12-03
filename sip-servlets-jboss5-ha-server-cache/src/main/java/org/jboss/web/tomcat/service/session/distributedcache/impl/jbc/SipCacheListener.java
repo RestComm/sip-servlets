@@ -43,7 +43,7 @@ import org.jboss.web.tomcat.service.session.distributedcache.spi.LocalDistributa
  * @author Brian Stansberry
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  */
-@org.jboss.cache.notifications.annotation.CacheListener
+@org.jboss.cache.notifications.annotation.CacheListener(sync=false)
 public class SipCacheListener extends CacheListenerBase
 {
 	protected static Logger logger = Logger.getLogger(SipCacheListener.class);
@@ -190,11 +190,7 @@ public class SipCacheListener extends CacheListenerBase
    @NodeModified
    public void nodeModified(NodeModifiedEvent event) {      
       if (event.isPre())
-         return;
-      
-      if(logger.isDebugEnabled()) {
-    	  logger.debug("following node modified " + event.getFqn().toString());
-      }
+         return;            
       
       boolean local = event.isOriginLocal();
       if (!fieldBased_ && local)
@@ -209,78 +205,83 @@ public class SipCacheListener extends CacheListenerBase
              && isFqnForOurSipapp(fqn, isBuddy)) {
     	  // Query if we have version value in the distributed cache. 
     	  // If we have a version value, compare the version and invalidate if necessary.
-    	  @SuppressWarnings("unchecked")
-    	  Map<Object, Object> data = event.getData();
-    	  Integer version = (Integer) data.get(AbstractJBossCacheService.VERSION_KEY.toString());
-    	  if(version != null) {
+    	  if((fqn.size() == 6 && fqn.get(5).toString().equals(AbstractJBossCacheService.VERSION_KEY.toString())) || (fqn.size() == 5 && fqn.get(4).toString().equals(AbstractJBossCacheService.VERSION_KEY.toString()))) {
     		  if(logger.isDebugEnabled()) {
-    			  logger.debug("version attribute found " + version + " in " + fqn );
-    		  }
-    		  String sipAppSessionId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
-    		  String sipSessionId = null;
-    		  boolean isSipApplicationSession = true;
-    		  if(!isFqnSipApplicationSessionRootSized(fqn.size(), isBuddy)) {
- 	      			sipSessionId = getSipSessionIdFromFqn(fqn, isBuddy);
- 	      			isSipApplicationSession = false;
-    		  }
-    		  if(logger.isDebugEnabled()) {
-    			  logger.debug("isSipAppSession " + isSipApplicationSession + " in " + fqn);
-    		  }
-    		  String owner = null;
-//    		  String owner = isBuddy ? getBuddyOwner(fqn) : null;    		  
-//    		  @SuppressWarnings("unchecked")
-//    		  Fqn<String> ancestor = fqn.getAncestor(1);
-    		  Long timestamp = Long.valueOf(-1);
-//    		  Long timestamp = (Long) wrapper.get(ancestor, AbstractJBossCacheService.TIMESTAMP_KEY.toString());
-//    		  if (timestamp == null) {
-//               log_.warn("No timestamp attribute found in " + fqn);
-//    		  } else {
-    			  boolean updated = false;
-    			  if(isSipApplicationSession) {
-    				  // Notify the manager that a session has been updated
-    				  updated = ((LocalDistributableConvergedSessionManager) manager_).sipApplicationSessionChangedInDistributedCache(sipAppSessionId, owner, 
-                                                  version.intValue(), 
-                                                  timestamp,
-                                                  null);
-//                                                  timestamp.longValue(), 
-//                                                  (DistributableSessionMetadata)  wrapper.get(ancestor, AbstractJBossCacheService.METADATA_KEY.toString()));
-    			  } else {
-    				  // Notify the manager that a session has been updated
-    				  updated = ((LocalDistributableConvergedSessionManager) manager_).sipSessionChangedInDistributedCache(sipAppSessionId, sipSessionId, owner, 
-                                                  version.intValue(), 
-                                                  timestamp,
-                                                  null);
-//                                                  timestamp.longValue(), 
-//                                                  (DistributableSessionMetadata)  wrapper.get(ancestor, AbstractJBossCacheService.METADATA_KEY.toString()));
-    			  }
-    			  if (!updated && !isBuddy) {
-    				  logger.warn("Possible concurrency problem: Replicated version id " + 
-                            version + " is less than or equal to in-memory version for session app id " + sipAppSessionId + " and session id " + sipSessionId); 
-    			  }
-	               /*else 
-	               {
-	                  We have a local session but got a modification for the buddy tree.
-	                  This means another node is in the process of taking over the session;
-	                  we don't worry about it
-	               }
-	                */
-//    		  }
+    	    	  logger.debug("following node modified " + event.getFqn().toString());
+    	      }
+	    	  @SuppressWarnings("unchecked")
+	    	  Map<Object, Object> data = event.getData();
+	    	  Integer version = (Integer) data.get(AbstractJBossCacheService.VERSION_KEY.toString());
+	    	  if(version != null) {
+	    		  if(logger.isDebugEnabled()) {
+	    			  logger.debug("version attribute found " + version + " in " + fqn + " using parent fqn " + fqn.getParent());
+	    		  }
+	    		  String sipAppSessionId = getSipApplicationSessionIdFromFqn(fqn.getParent(), isBuddy);
+	    		  String sipSessionId = null;
+	    		  boolean isSipApplicationSession = true;
+	    		  if(!isFqnSipApplicationSessionRootSized(fqn.getParent().size(), isBuddy)) {
+	 	      			sipSessionId = getSipSessionIdFromFqn(fqn.getParent(), isBuddy);
+	 	      			isSipApplicationSession = false;
+	    		  }
+	    		  if(logger.isDebugEnabled()) {
+	    			  logger.debug("isSipAppSession " + isSipApplicationSession + " in " + fqn.getParent());
+	    		  }
+	    		  String owner = null;
+	//    		  String owner = isBuddy ? getBuddyOwner(fqn) : null;    		  
+	//    		  @SuppressWarnings("unchecked")
+	//    		  Fqn<String> ancestor = fqn.getAncestor(1);
+	    		  Long timestamp = Long.valueOf(-1);
+	//    		  Long timestamp = (Long) wrapper.get(ancestor, AbstractJBossCacheService.TIMESTAMP_KEY.toString());
+	//    		  if (timestamp == null) {
+	//               log_.warn("No timestamp attribute found in " + fqn);
+	//    		  } else {
+	    			  boolean updated = false;
+	    			  if(isSipApplicationSession) {
+	    				  // Notify the manager that a session has been updated
+	    				  updated = ((LocalDistributableConvergedSessionManager) manager_).sipApplicationSessionChangedInDistributedCache(sipAppSessionId, owner, 
+	                                                  version.intValue(), 
+	                                                  timestamp,
+	                                                  null);
+	//                                                  timestamp.longValue(), 
+	//                                                  (DistributableSessionMetadata)  wrapper.get(ancestor, AbstractJBossCacheService.METADATA_KEY.toString()));
+	    			  } else {
+	    				  // Notify the manager that a session has been updated
+	    				  updated = ((LocalDistributableConvergedSessionManager) manager_).sipSessionChangedInDistributedCache(sipAppSessionId, sipSessionId, owner, 
+	                                                  version.intValue(), 
+	                                                  timestamp,
+	                                                  null);
+	//                                                  timestamp.longValue(), 
+	//                                                  (DistributableSessionMetadata)  wrapper.get(ancestor, AbstractJBossCacheService.METADATA_KEY.toString()));
+	    			  }
+	    			  if (!updated && !isBuddy) {
+	    				  logger.warn("Possible concurrency problem: Replicated version id " + 
+	                            version + " is less than or equal to in-memory version for session app id " + sipAppSessionId + " and session id " + sipSessionId); 
+	    			  }
+		               /*else 
+		               {
+		                  We have a local session but got a modification for the buddy tree.
+		                  This means another node is in the process of taking over the session;
+		                  we don't worry about it
+		               }
+		                */
+	//    		  }
+	    	  }
+	    	  // commented out since this is not true, due to optimizations for better perf and
+	    	  // network data replication version, timestamp, metadata and attributes are serialized
+	    	  // separately
+	//    	  else if (!attributeBased_) {// other granularities can modify attributes only 
+	//    		  log_.debug("No version attribute found in " + fqn);
+	//    	  }
     	  }
-    	  // commented out since this is not true, due to optimizations for better perf and
-    	  // network data replication version, timestamp, metadata and attributes are serialized
-    	  // separately
-//    	  else if (!attributeBased_) {// other granularities can modify attributes only 
-//    		  log_.debug("No version attribute found in " + fqn);
-//    	  }
       }
       else if (local && !isBuddy
             && (isPossibleSipApplicationSessionInternalPojoFqn(fqn) || isPossibleSipSessionInternalPojoFqn(fqn)) 
-            && isFqnForOurSipapp(fqn, isBuddy)) {
+            && isFqnForOurSipapp(fqn, isBuddy)) {    	  
     	  // One of our sessions' pojos is modified; need to inform
     	  // the manager so it can mark the session dirty
     	  String sipAppSessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
     	  String sessId = null;
-		  if (isFqnSipApplicationSessionRootSized(fqn.size(), isBuddy)) {
+		  if (isFqnSipApplicationSessionRootSized(fqn.size(), isBuddy)) {			  
 			  ((LocalDistributableConvergedSessionManager) manager_)
 						.notifySipApplicationSessionLocalAttributeModification(sipAppSessId);
 		  } else {

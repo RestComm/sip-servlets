@@ -25,7 +25,6 @@ import javax.servlet.sip.Address;
 import javax.sip.Transaction;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 
 /**
@@ -40,7 +39,7 @@ public class TransactionApplicationData implements Serializable {
 	private ProxyBranchImpl proxyBranch;	
 	private SipServletMessageImpl sipServletMessage;
 //	private SipSessionKey sipSessionKey;
-	private transient Set<SipServletResponseImpl> sipServletResponses;
+	private Set<SipServletResponseImpl> sipServletResponses;
 	private transient Transaction transaction;
 	private transient String initialRemoteHostAddress;
 	private transient int initialRemotePort;
@@ -233,6 +232,42 @@ public class TransactionApplicationData implements Serializable {
 		transaction = null;
 		rseqNumber = null;
 	}
+
+//	public void readExternal(ObjectInput in) throws IOException,
+//			ClassNotFoundException {
+//		sipServletMessage = (SipServletMessageImpl) in.readObject();
+//		if(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
+//			boolean proxyBranchSerialized = in.readBoolean();
+//			if(proxyBranchSerialized) {
+//				proxyBranch = (ProxyBranchImpl) in.readObject();
+//			}
+//			int size = in.readInt();
+//			if(size > 0) {
+//				SipServletResponseImpl[] sipServletResponseImpls = (SipServletResponseImpl[])in.readObject();
+//				for (SipServletResponseImpl sipServletResponseImpl : sipServletResponseImpls) {
+//					addSipServletResponse(sipServletResponseImpl);
+//				}
+//			}
+//		}
+//	}
+//
+//	public void writeExternal(ObjectOutput out) throws IOException {
+//		out.writeObject(sipServletMessage);
+//		if(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
+//			if(proxyBranch != null) {
+//				out.writeBoolean(true);
+//				out.writeObject(proxyBranch);
+//			} else {
+//				out.writeBoolean(false);
+//			}
+//			if(sipServletResponses != null) {
+//				out.writeInt(sipServletResponses.size());
+//				out.writeObject(sipServletResponses.toArray(new SipServletResponseImpl[sipServletResponses.size()]));
+//			} else {
+//				out.writeInt(0);
+//			}
+//		}
+//	}
 
 //	/**
 //	 * @return the sipSessionKey
