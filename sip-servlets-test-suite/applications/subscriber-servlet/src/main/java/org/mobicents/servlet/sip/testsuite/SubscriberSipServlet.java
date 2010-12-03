@@ -24,6 +24,7 @@ import javax.mail.BodyPart;
 import javax.mail.Header;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletTimer;
@@ -182,13 +183,34 @@ public class SubscriberSipServlet
 				sipServletRequest.send();		
 			}
 		}
-		if(getServletContext().getInitParameter("testMultipart") != null) {
+		if(getServletContext().getInitParameter("testMultipart") != null ) {
 			Multipart multipart = (Multipart) request.getContent();
 			try {
 				int count = multipart.getCount();
 				logger.info("mulitpart count " + count);
 				sendMessage(request.getSession(), "" + count);
 				BodyPart bodyPart = multipart.getBodyPart(0);					
+				logger.info("body part 0 's content type " + bodyPart.getContentType());
+				logger.info("body part 0 's content " + bodyPart.getContent());
+				Enumeration headers = bodyPart.getAllHeaders();
+				while (headers.hasMoreElements()) {
+					Header header = (Header) headers.nextElement();
+					logger.info("body part 0 's headers: name = " + header.getName() + ", value = " + header.getValue());
+				}
+			} catch (MessagingException e) {
+				logger.error("couldn't get count ", e);
+				SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+				sipServletResponse.send();
+				return;
+			}						
+		}
+		if(getServletContext().getInitParameter("testMimeMultipartWhitespaces") != null) {
+			MimeMultipart multipart = (MimeMultipart) request.getContent();
+			try {
+				BodyPart bodyPart = multipart.getBodyPart("<317A166E4BEB17EA1A24F417@telecomsys.com>");
+				int count = multipart.getCount();
+				logger.info("mulitpart count " + count);
+				sendMessage(request.getSession(), "" + count);				
 				logger.info("body part 0 's content type " + bodyPart.getContentType());
 				logger.info("body part 0 's content " + bodyPart.getContent());
 				Enumeration headers = bodyPart.getAllHeaders();
@@ -235,7 +257,7 @@ public class SubscriberSipServlet
 			} catch (IOException e) {
 				logger.error("Unexpected exception while sending the INVITE request",e);
 			}					
-		} else if (ce.getServletContext().getInitParameter("testMultipart") == null){
+		} else if (ce.getServletContext().getInitParameter("testMultipart") == null && ce.getServletContext().getInitParameter("testMimeMultipartWhitespaces") == null){
 			SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);
 			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 			TimerService timerService = (TimerService)ce.getServletContext().getAttribute(TIMER_SERVICE);

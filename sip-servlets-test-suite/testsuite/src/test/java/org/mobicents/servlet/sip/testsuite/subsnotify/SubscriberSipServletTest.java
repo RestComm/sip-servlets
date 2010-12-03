@@ -143,6 +143,43 @@ public class SubscriberSipServletTest extends SipServletTestCase {
 		assertTrue(receiver.getAllMessagesContent().size() > 0);
 		assertTrue(receiver.getAllMessagesContent().contains("3"));
 	}
+	
+	// http://code.google.com/p/mobicents/issues/detail?id=2182
+	public void testSipServletsReceiveNotifyMimeMultipartWhitespace() throws Exception {
+		deployApplication("testMimeMultipartWhitespaces", "testMimeMultipartWhitespaces");
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = receiverProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = receiverProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+
+		String content = "--1A713B7EE42ABF467A11E416\r\n" + "Content-Type: application/pidf+xml\r\n"
+		+ "Content-ID: <317A166E4BEB17EA1A24F417@telecomsys.com>\r\n" + "\r\n"
+		+ "<presence xmlns=\"urn:ietf:params:xml:ns:pidf\"\r\n"
+		+ "xmlns:gp=\"urn:ietf:params:xml:ns:pidf:geopriv10\"\r\n"
+		+ "xmlns:ca=\"urn:ietf:params:xml:ns:pidf:geopriv10:civicAddr\"\r\n"
+		+ "xmlns:gml=\"http://www.opengis.net/gml\"\r\n" + "entity=\"pres:www.telecomsys.com\">\r\n"
+		+ "<tuple id=\"TCS_SLDB\">\r\n" + "<status>\r\n" + "<gp:geopriv>\r\n" + "<gp:location-info>\r\n"
+		+ "<gml:Point xmlns:gml=\"http://www.opengis.net/gml\" srsName=\"urn:ogc:def:crs:EPSG::4326\">\r\n"
+		+ "<gml:pos>30.8686739957541 -97.0195399766783</gml:pos>\r\n" + "</gml:Point>\r\n"
+		+ "</gp:location-info>\r\n" + "<gp:usage-rules>\r\n"
+		+ "<gp:retransmission-allowed>yes</gp:retransmission-allowed>\r\n" + "</gp:usage-rules>\r\n"
+		+ "<gp:method>Derived</gp:method>\r\n" + "<gp:provided-by>www.telecomsys.com</gp:provided-by>\r\n"
+		+ "</gp:geopriv>\r\n" + "</status>\r\n" + "<timestamp>2010-05-17T17:20:55Z</timestamp>\r\n"
+		+ "</tuple>\r\n" + "</presence>\r\n" + "--1A713B7EE42ABF467A11E416\r\n"
+		+ "Content-Type: application/sdp\r\n" + "\r\n" + "v=0\r\n"
+		+ "o=user1 53655765 2353687637 IN IP4 10.15.90.101\r\n" + "s=-\r\n" + "c=IN IP4 10.15.90.101\r\n"
+		+ "t=0 0\r\n" + "m=audio 6001 RTP/AVP 0\r\n" + "a=rtpmap:0 PCMU/8000\r\n";
+		receiver.sendSipRequest(Request.NOTIFY, fromAddress, toAddress, content, null, false, new String[] {ContentTypeHeader.NAME, SubscriptionStateHeader.NAME, EventHeader.NAME}, new String[]{"multipart/related;type=\"application/rlmi+xml\";boundary=\"1A713B7EE42ABF467A11E416\"", "pending", "presence"}, true);
+		Thread.sleep(TIMEOUT);
+		assertEquals(200, receiver.getFinalResponseStatus());
+		assertTrue(receiver.getAllMessagesContent().size() > 0);
+		assertTrue(receiver.getAllMessagesContent().contains("2"));
+	}
 
 	@Override
 	protected void tearDown() throws Exception {					
