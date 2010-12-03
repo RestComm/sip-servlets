@@ -16,6 +16,9 @@
  */
 package org.jboss.web.tomcat.service.session;
 
+import gov.nist.javax.sip.message.RequestExt;
+import gov.nist.javax.sip.stack.SIPServerTransaction;
+
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -46,6 +49,8 @@ import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
 import javax.sip.SipStack;
 import javax.sip.Transaction;
+import javax.sip.TransactionState;
+import javax.sip.message.Request;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -96,6 +101,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	protected static final String TXS_SIZE = "txm";
 	protected static final String TXS_IDS= "txid";
 	protected static final String TXS_TYPE= "txt";
+	protected static final String ACKS_RECEIVED_SIZE = "ars";
+	protected static final String ACKS_RECEIVED_CSEQ = "arc";
+	protected static final String ACKS_RECEIVED_VALUE= "arv";
 	protected static final String PROXY = "prox";
 	protected static final String DIALOG_ID = "did";
 	protected static final String READY_TO_INVALIDATE = "rti";
@@ -886,23 +894,25 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		}
 		if(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
 			Integer txsSize = (Integer) metaData.get(TXS_SIZE);
-			if(txsSize != null) {
-				String[] txIds = (String[])metaData.get(TXS_IDS);
-				Boolean[] txTypes = (Boolean[])metaData.get(TXS_TYPE);
-				if(logger.isDebugEnabled()) {
-					logger.debug("tx array size = " + txsSize + ", value = " + txIds);
-				}
-				if(txsSize != null && txIds != null) {
-					for (int i = 0; i < txsSize; i++) {
-						String txId = txIds[i];
-						Boolean txType = txTypes[i];
-						if(logger.isDebugEnabled()) {
-							logger.debug("trying to find tx with id = " + txId + ", type = " + txType + " locally or in the distributed cache");
-						}
-						Transaction transaction = ((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).findTransaction(txId, txType);					
-						addOngoingTransaction(transaction);
-					}				
-				}
+			String[] txIds = (String[])metaData.get(TXS_IDS);
+			Boolean[] txTypes = (Boolean[])metaData.get(TXS_TYPE);
+			if(logger.isDebugEnabled()) {
+				logger.debug("tx array size = " + txsSize + ", value = " + txIds);
+			}
+			if(txsSize != null && txIds != null) {
+				for (int i = 0; i < txsSize; i++) {
+					String txId = txIds[i];
+					Boolean txType = txTypes[i];
+					if(logger.isDebugEnabled()) {
+						logger.debug("trying to find tx with id = " + txId + ", type = " + txType + " locally or in the distributed cache");
+					}
+					Transaction transaction = ((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).findTransaction(txId, txType);					
+					addOngoingTransaction(transaction);
+					if(transaction != null && transaction instanceof ServerTransaction && Request.INVITE.equalsIgnoreCase((((SIPServerTransaction)transaction).getMethod())) 
+							&& (transaction.getState() == null || (transaction.getState() != null && transaction.getState().equals(TransactionState.PROCEEDING) || transaction.getState().equals(TransactionState.TRYING)))) {
+						acksReceived.put(((RequestExt)transaction.getRequest()).getCSeqHeader().getSeqNumber(), false);
+					}
+				}				
 			}
 		}
 		if(logger.isDebugEnabled()) {
@@ -975,7 +985,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 				final String[] txIdArray = new String[size];
 				final Boolean[] txTypeArray = new Boolean[size];
 				int i = 0;
-				for (Transaction transaction : ongoingTransactions) {
+				for (Transaction transaction : ongoingTransactions) {					
 					txIdArray[i] = transaction.getBranchId(); 
 					txTypeArray[i] = transaction instanceof ServerTransaction ? Boolean.TRUE : Boolean.FALSE;
 					i++;
