@@ -627,7 +627,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 			}
 			return content;
 		} else if(contentTypeHeader!= null && CONTENT_TYPE_MULTIPART.equals(contentTypeHeader.getContentType())) {
-			return getContentAsMimeMultipart(contentTypeHeader, message.getRawContent());
+			try {
+				return new MimeMultipart(new ByteArrayDataSource(message.getRawContent(), 
+						contentTypeHeader.toString().replaceAll(ContentTypeHeader.NAME+": ", "")));
+			} catch (MessagingException e) {
+				logger.warn("Problem with multipart message.", e);
+				return this.message.getRawContent();
+			}
 		} else {
 			return this.message.getRawContent();
 		}
