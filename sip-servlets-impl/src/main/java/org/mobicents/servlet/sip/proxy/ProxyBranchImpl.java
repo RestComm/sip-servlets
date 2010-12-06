@@ -44,7 +44,6 @@ import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.sip.ClientTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
-import javax.sip.Transaction;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
@@ -80,7 +79,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	private transient SipServletRequestImpl prackOriginalRequest;
 	private transient SipServletRequestImpl outgoingRequest;
 	private transient SipServletResponseImpl lastResponse;
-	private transient URI targetURI;
+	private URI targetURI;
 	private transient SipURI outboundInterface;
 	private transient SipURI recordRouteURI;
 	private boolean recordRoutingEnabled;
@@ -1027,6 +1026,48 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	public void setProxyBranch1xxTimeout(int timeout) {
 		proxyBranch1xxTimeout= timeout;
 		
+	}
+
+	/**
+	 * @param outgoingRequest the outgoingRequest to set
+	 */
+	public void setOutgoingRequest(SipServletRequestImpl outgoingRequest) {
+		this.outgoingRequest = outgoingRequest;
+	}
+
+	/**
+	 * @return the outgoingRequest
+	 */
+	public SipServletRequestImpl getOutgoingRequest() {
+		return outgoingRequest;
+	}
+
+	/**
+	 * @param originalRequest the originalRequest to set
+	 */
+	public void setOriginalRequest(SipServletRequestImpl originalRequest) {
+		this.originalRequest = originalRequest;
+	}
+
+	/**
+	 * @return the originalRequest
+	 */
+	public SipServletRequestImpl getOriginalRequest() {
+		return originalRequest;
+	}
+
+	/**
+	 * @param targetURI the targetURI to set
+	 */
+	public void setTargetURI(URI targetURI) {
+		this.targetURI = targetURI;
+	}
+
+	/**
+	 * @return the targetURI
+	 */
+	public URI getTargetURI() {
+		return targetURI;
 	}
 	
 }

@@ -1540,7 +1540,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		if(transaction == null && transactionId != null) {            
 			// used for early dialog failover purposes, lazily load the transaction
             setTransaction(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).findTransaction(transactionId, transactionType));
-            transactionApplicationData = (TransactionApplicationData) transaction.getApplicationData();
+            if(transaction != null) {
+            	transactionApplicationData = (TransactionApplicationData) transaction.getApplicationData();
+            }
         }
 		return this.transaction;
 	}

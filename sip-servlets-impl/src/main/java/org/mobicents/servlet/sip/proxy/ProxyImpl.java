@@ -931,6 +931,13 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		return proxyTimerService;
 	}
 
+	public void addProxyBranch(ProxyBranchImpl proxyBranchImpl) {
+		if(proxyBranches == null) {
+			this.proxyBranches = new LinkedHashMap<URI, ProxyBranchImpl> ();
+		}
+		this.proxyBranches.put(proxyBranchImpl.getTargetURI(), proxyBranchImpl);
+	}
+
 	
 
 }

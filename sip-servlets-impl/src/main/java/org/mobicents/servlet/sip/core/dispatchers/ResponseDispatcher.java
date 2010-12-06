@@ -301,7 +301,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 								session.updateStateOnResponse(sipServletResponse, true);
 								proxyBranch.setResponse(sipServletResponse);
 
-								final ProxyImpl proxy = (ProxyImpl) proxyBranch.getProxy();
+								final ProxyImpl proxy = (ProxyImpl) session.getProxy();
 								// Notfiy the servlet
 								if(logger.isDebugEnabled()) {
 									logger.debug("Is Supervised enabled for this proxy branch ? " + proxy.getSupervised());
