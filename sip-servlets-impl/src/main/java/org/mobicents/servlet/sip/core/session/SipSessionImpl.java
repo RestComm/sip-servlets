@@ -832,7 +832,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 			b2buaHelper= null;	
 		}
 		derivedSipSessions = null;
-		handlerServlet = null;
+		// not collecting it here to avoid race condition from 
+		// http://code.google.com/p/mobicents/issues/detail?id=2130#c19
+//		handlerServlet = null;
 		localParty = null;
 		ongoingTransactions = null;
 		originalMethod = null;
