@@ -17,7 +17,6 @@
 package org.jboss.web.tomcat.service.session;
 
 import gov.nist.javax.sip.message.RequestExt;
-import gov.nist.javax.sip.stack.SIPServerTransaction;
 
 import java.beans.PropertyChangeSupport;
 import java.io.Serializable;
@@ -49,8 +48,6 @@ import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
 import javax.sip.SipStack;
 import javax.sip.Transaction;
-import javax.sip.TransactionState;
-import javax.sip.message.Request;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -80,7 +77,9 @@ import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
+import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipService;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
@@ -908,9 +907,31 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 					}
 					Transaction transaction = ((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).findTransaction(txId, txType);					
 					addOngoingTransaction(transaction);
-					if(transaction != null && transaction instanceof ServerTransaction && Request.INVITE.equalsIgnoreCase((((SIPServerTransaction)transaction).getMethod())) 
-							&& (transaction.getState() == null || (transaction.getState() != null && transaction.getState().equals(TransactionState.PROCEEDING) || transaction.getState().equals(TransactionState.TRYING)))) {
-						acksReceived.put(((RequestExt)transaction.getRequest()).getCSeqHeader().getSeqNumber(), false);
+					if(transaction != null) {
+						if(transaction instanceof ServerTransaction) { 
+							acksReceived.put(((RequestExt)transaction.getRequest()).getCSeqHeader().getSeqNumber(), false);								
+						} else if(proxy != null) {
+							final TransactionApplicationData transactionApplicationData = (TransactionApplicationData) transaction.getApplicationData();
+							if(logger.isDebugEnabled()) {
+								logger.debug("transaction application data from tx id " + txId + " is " + transactionApplicationData);
+							}
+							if(transactionApplicationData != null) {
+								if(logger.isDebugEnabled()) {
+									logger.debug("populating proxy from the transaction application data");
+								}
+								proxy.getTransactionMap().put(txId, transactionApplicationData);
+								ProxyBranchImpl proxyBranchImpl = transactionApplicationData.getProxyBranch();
+								if(proxyBranchImpl != null) {
+									if(logger.isDebugEnabled()) {
+										logger.debug("populating branch from the transaction application data");
+									}
+									proxyBranchImpl.setOutgoingRequest((SipServletRequestImpl)transactionApplicationData.getSipServletMessage());
+									proxyBranchImpl.setOriginalRequest((SipServletRequestImpl)proxy.getOriginalRequest());
+									proxyBranchImpl.setProxy(proxy);
+									proxy.addProxyBranch(proxyBranchImpl);
+								}
+							}
+						}
 					}
 				}				
 			}
