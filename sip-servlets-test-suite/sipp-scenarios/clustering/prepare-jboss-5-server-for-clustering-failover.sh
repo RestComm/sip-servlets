@@ -44,6 +44,16 @@ if [ $# -ne 0 ]; then
 				cp ../../../sip-servlets-examples/location-service-distributable/distributable-location-service-dar.properties $JBOSS_HOME/server/port-1/conf/dars/distributable-dar.properties
 				cp ../../../sip-servlets-examples/location-service-distributable/distributable-location-service-dar.properties $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties
 	            ;;
+	    proxy-early)
+	    		echo "Distributed example used is proxy with early failure"
+	    		mvn clean install -f ../../../sip-servlets-examples/location-service-distributable/pom.xml
+				cp ../../../sip-servlets-examples/location-service-distributable/target/location-service-distributable-*.war $JBOSS_HOME/server/port-1/deploy
+				cp ../../../sip-servlets-examples/location-service-distributable/target/location-service-distributable-*.war $JBOSS_HOME/server/port-2/deploy
+				cp ../../../sip-servlets-examples/location-service-distributable/distributable-location-service-dar.properties $JBOSS_HOME/server/port-1/conf/dars/distributable-dar.properties
+				cp ../../../sip-servlets-examples/location-service-distributable/distributable-location-service-dar.properties $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties
+				cp setup/jboss-5/mss-sip-stack-jboss-early-failover.properties $JBOSS_HOME/server/port-1/conf/mss-sip-stack.properties
+				cp setup/jboss-5/mss-sip-stack-jboss-early-failover.properties $JBOSS_HOME/server/port-2/conf/mss-sip-stack.properties
+	            ;;
 	    b2bua)
 	            echo "Distributed example used is b2bua"
 	    		mvn clean install -f ../../../sip-servlets-examples/call-forwarding-distributable/pom.xml

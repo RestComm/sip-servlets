@@ -5,7 +5,7 @@
 
 <scenario name="UAC for SIP-Servlets Tests - location-service-c">
 
-  <recv request="INVITE" rrs="true" timeout="10000" />
+  <recv request="INVITE" rrs="true" timeout="5000"/>
 
   <send>
     <![CDATA[
@@ -17,7 +17,7 @@
       [last_Call-ID:]
       [last_CSeq:]
       [last_Record-Route:]
-      Contact: sip:receiver-failover@[local_ip]:[local_port]
+      Contact: <sip:[local_ip]:[local_port];transport=[transport]>
       Content-Length: 0
 
     ]]>
@@ -35,7 +35,7 @@
       [last_Call-ID:]
       [last_CSeq:]
       [last_Record-Route:]
-      Contact: sip:receiver-failover@[local_ip]:[local_port]
+      Contact: <sip:[local_ip]:[local_port];transport=[transport]>
       Content-Type: application/sdp
       Content-Length: [len]
 
@@ -49,57 +49,10 @@
 
     ]]>
   </send>
-  
-  <recv request="ACK" >
-<!--action><exec command="./killserver.sh all.pid 2 &"/>
-</action-->
-  </recv>
 
-  <recv request="UPDATE" timeout="20000" rtd="true">
-  </recv>
+  <recv request="ACK"/>
 
-  <!-- send 200 OK / UPDATE -->
-
-  <send>
-    <![CDATA[
-
-      SIP/2.0 200 OK
-      [last_Via:]
-      [last_From:]
-      [last_To:]
-      [last_Call-ID:]
-      [last_CSeq:]
-      Contact: <sip:[local_ip]:[local_port];transport=[transport]>
-      Content-Type: application/sdp
-      Content-Length: 0
-
-    ]]>
-  </send>
-
-  <recv request="UPDATE"timeout="10000" rtd="true">
-  </recv>
-
-  <!-- send 200 OK / UPDATE -->
-
-  <send>
-    <![CDATA[
-
-      SIP/2.0 200 OK
-      [last_Via:]
-      [last_From:]
-      [last_To:]
-      [last_Call-ID:]
-      [last_CSeq:]
-      Contact: <sip:[local_ip]:[local_port];transport=[transport]>
-      Content-Type: application/sdp
-      Content-Length: 0
-
-    ]]>
-  </send>
-
-  <pause milliseconds="20000"/>
-
-  <recv request="BYE" timeout="10000" />
+  <recv request="BYE" timeout="30000" />
 
   <send>
     <![CDATA[
@@ -116,6 +69,6 @@
 
     ]]>
   </send>
-   
+
 </scenario>
 

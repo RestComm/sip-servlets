@@ -23,6 +23,12 @@ if [ $# -eq 4 ]; then
 	    		$NOHUP ./sipp $MSS_IP:5080 -sf proxy/location-service-receiver.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
 	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
+	    proxy-early)
+	    		rm ./proxy/*.log
+	    		echo "Distributed example used is proxy early dialog failover";
+	    		$NOHUP ./sipp $MSS_IP:5080 -sf proxy/location-service-receiver-early.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
+	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-sender-early.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
+	            ;;
 	    proxy-remote-send-bye)
 	    		rm ./proxy/*.log
 	    		echo "Distributed example used is proxy remote send bye";
