@@ -80,7 +80,7 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 		if(logger.isInfoEnabled()) {
 			logger.info("Got : " + request.toString());
 		}
-		if(request.getFrom().getURI().toString().contains("fwd-ack")) {
+		if(request.getTo().getURI().toString().contains("fwd-ack")) {
 			B2buaHelper helper = request.getB2buaHelper();
 	        SipSession peerSession = helper.getLinkedSession(request.getSession());
 			List<SipServletMessage> pendingMessages = helper.getPendingMessages(peerSession, UAMode.UAC);
