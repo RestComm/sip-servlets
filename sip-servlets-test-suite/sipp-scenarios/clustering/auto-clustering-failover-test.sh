@@ -4,7 +4,7 @@ export config1="all"
 export config2="port-1"
 export KILL_PARAMS="-9"
 export FULLSTARTSLEEP=82
-export HALFSTARTSLEEP=60
+export HALFSTARTSLEEP=80
 
 if [ "x$1" != "x" ]; then
     export FULLSTARTSLEEP=$1
