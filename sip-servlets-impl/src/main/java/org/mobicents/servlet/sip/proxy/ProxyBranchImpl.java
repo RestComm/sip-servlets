@@ -716,9 +716,9 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 		if(sipAppSession != null) {
 			sipAppSession.access();
 		}
-		try {
-			ClientTransaction ctx = sipProvider
-				.getNewClientTransaction(clonedRequest);			
+		ClientTransaction ctx = null;	
+		try {				
+			ctx = sipProvider.getNewClientTransaction(clonedRequest);
 			ctx.setRetransmitTimer(sipApplicationDispatcher.getBaseTimerInterval());
 		    ((TransactionExt)ctx).setTimerT2(sipApplicationDispatcher.getT2Interval());
 		    ((TransactionExt)ctx).setTimerT4(sipApplicationDispatcher.getT4Interval());
@@ -730,7 +730,9 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 			
 			ctx.sendRequest();
 		} catch (SipException e) {
-			logger.error("A problem occured while proxying a request in a dialog-stateless transaction", e);
+			logger.error("A problem occured while proxying a request " + request + " in a dialog-stateless transaction", e);
+		} finally {
+			JainSipUtils.terminateTransaction(ctx);
 		}
 	}
 	

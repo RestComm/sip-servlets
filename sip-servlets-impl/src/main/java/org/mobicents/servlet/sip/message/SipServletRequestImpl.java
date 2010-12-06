@@ -1329,18 +1329,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		} catch (Exception ex) {			
 			throw new IllegalStateException("Error sending request " + request,ex);
 		} finally {
-			// Issue 2130 (http://code.google.com/p/mobicents/issues/detail?id=2130) : Memory leak in Sip stack when INFO message is used 
-			// fail before the ctx is created to avoid mem leaks
-			if(getTransaction() != null) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("terminating client transaction " + getTransaction().getBranchId() + " since the request couldn't be sent " + request);
-				}
-				try {
-					getTransaction().terminate();
-				} catch (ObjectInUseException e) {
-					logger.error("Couldn't terminate the  client transaction " + getTransaction().getBranchId());
-				}
-			}
+			JainSipUtils.terminateTransaction(getTransaction());
 		}
 
 	}

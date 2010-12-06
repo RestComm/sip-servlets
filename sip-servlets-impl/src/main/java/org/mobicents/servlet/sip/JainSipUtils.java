@@ -40,6 +40,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.sip.ListeningPoint;
+import javax.sip.ObjectInUseException;
+import javax.sip.Transaction;
 import javax.sip.address.SipURI;
 import javax.sip.address.URI;
 import javax.sip.header.AcceptEncodingHeader;
@@ -100,6 +102,7 @@ import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
+import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl.NamesComparator;
 
 /**
@@ -110,6 +113,7 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl.NamesComparator;
  * @author Jean Deruelle
  */
 public final class JainSipUtils {
+	private static final Logger logger = Logger.getLogger(JainSipUtils.class);
 	
 	/**
      * The maximum int value that could correspond to a port nubmer.
@@ -661,5 +665,20 @@ public final class JainSipUtils {
 				return true;
 		}
 		return false;
+	}
+
+	public static void terminateTransaction(Transaction transaction) {
+		// Issue 2130 (http://code.google.com/p/mobicents/issues/detail?id=2130) : Memory leak in Sip stack when INFO message is used 
+		// fail before the ctx is created to avoid mem leaks
+		if(transaction != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("terminating transaction " + transaction + " with transaction id "+ transaction.getBranchId());
+			}
+			try {
+				transaction.terminate();
+			} catch (ObjectInUseException e) {
+				logger.error("Couldn't terminate the transaction " + transaction + " with transaction id "+ transaction.getBranchId());
+			}
+		}
 	}	
 }

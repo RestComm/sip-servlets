@@ -187,8 +187,12 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 				((TransactionApplicationData)serverTransaction.getApplicationData()).setTransaction(ctx);
 				if(logger.isInfoEnabled()) {
 					logger.info("Sending the request through a new client transaction " + clonedRequest);
-				}				
-				ctx.sendRequest();												
+				}	
+				try {
+					ctx.sendRequest();
+				} finally {
+					JainSipUtils.terminateTransaction(ctx);
+				}
 			} else {				
 				TransactionApplicationData appData = (TransactionApplicationData) transaction.getApplicationData();
 				if(appData == null) {
