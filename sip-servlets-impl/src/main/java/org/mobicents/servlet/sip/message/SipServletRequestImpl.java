@@ -59,6 +59,7 @@ import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
+import javax.sip.ObjectInUseException;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
@@ -1136,6 +1137,12 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					optimizeRouteHeaderAddressForInternalRoutingrequest(sipConnector, request, session, sipFactoryImpl, transport);
 				}
 				
+				if(getDialog() != null && getDialog().getState() != null && getDialog().getState().equals(DialogState.TERMINATED)) {
+					// Issue 2130 (http://code.google.com/p/mobicents/issues/detail?id=2130) : Memory leak in Sip stack when INFO message is used 
+					// fail before the ctx is created to avoid mem leaks
+					throw new IllegalStateException("Error sending request " + request + " dialog " + dialog.getDialogId() + " already in TERMINATED state");
+				}
+				
 				final ClientTransaction ctx = sipProvider.getNewClientTransaction(request);				
 				ctx.setRetransmitTimer(sipFactoryImpl.getSipApplicationDispatcher().getBaseTimerInterval());
 			    ((TransactionExt)ctx).setTimerT2(sipFactoryImpl.getSipApplicationDispatcher().getT2Interval());
@@ -1321,6 +1328,19 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 		} catch (Exception ex) {			
 			throw new IllegalStateException("Error sending request " + request,ex);
+		} finally {
+			// Issue 2130 (http://code.google.com/p/mobicents/issues/detail?id=2130) : Memory leak in Sip stack when INFO message is used 
+			// fail before the ctx is created to avoid mem leaks
+			if(getTransaction() != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("terminating client transaction " + getTransaction().getBranchId() + " since the request couldn't be sent " + request);
+				}
+				try {
+					getTransaction().terminate();
+				} catch (ObjectInUseException e) {
+					logger.error("Couldn't terminate the  client transaction " + getTransaction().getBranchId());
+				}
+			}
 		}
 
 	}
