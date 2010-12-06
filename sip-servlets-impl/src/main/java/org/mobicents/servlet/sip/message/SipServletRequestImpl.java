@@ -1327,10 +1327,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				Thread.currentThread().setContextClassLoader(oldClassLoader);
 			}
 		} catch (Exception ex) {			
-			throw new IllegalStateException("Error sending request " + request,ex);
-		} finally {
 			JainSipUtils.terminateTransaction(getTransaction());
-		}
+			throw new IllegalStateException("Error sending request " + request,ex);
+		} 
 
 	}
 	

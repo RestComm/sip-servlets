@@ -731,9 +731,8 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 			ctx.sendRequest();
 		} catch (SipException e) {
 			logger.error("A problem occured while proxying a request " + request + " in a dialog-stateless transaction", e);
-		} finally {
 			JainSipUtils.terminateTransaction(ctx);
-		}
+		} 
 	}
 	
 	/**

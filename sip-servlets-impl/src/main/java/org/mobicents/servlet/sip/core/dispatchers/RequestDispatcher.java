@@ -190,8 +190,9 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 				}	
 				try {
 					ctx.sendRequest();
-				} finally {
+				} catch(SipException e) {
 					JainSipUtils.terminateTransaction(ctx);
+					throw e;
 				}
 			} else {				
 				TransactionApplicationData appData = (TransactionApplicationData) transaction.getApplicationData();
