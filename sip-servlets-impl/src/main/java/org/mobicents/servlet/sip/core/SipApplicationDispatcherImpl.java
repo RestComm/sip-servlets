@@ -872,7 +872,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						tryToInvalidateSession(sipSessionKey, false);				
 					}
 					dialogAppData.cleanUp();
-//					dialog.setApplicationData(null);
+					// since the stack doesn't nullify the app data, we need to do it to let go of the refs					
+					dialog.setApplicationData(null);
 				}		
 				if(!appDataFound && logger.isDebugEnabled()) {
 					logger.debug("no application data for this dialog " + dialog.getDialogId());
