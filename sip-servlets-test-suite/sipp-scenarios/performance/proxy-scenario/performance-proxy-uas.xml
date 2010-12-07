@@ -73,7 +73,7 @@
 
   <recv response="200" optional="false"/>
 
-  <pause milliseconds="10000" />
+  <!--pause milliseconds="10000" /-->
   
 </scenario>
 
