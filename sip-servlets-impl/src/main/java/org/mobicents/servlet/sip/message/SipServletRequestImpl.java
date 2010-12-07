@@ -1135,13 +1135,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				if(!isInitial() && sipConnector != null && // Initial requests already use local address in RouteHeader.
 						sipConnector.isUseStaticAddress()) {
 					optimizeRouteHeaderAddressForInternalRoutingrequest(sipConnector, request, session, sipFactoryImpl, transport);
-				}
-				
-				if(getDialog() != null && getDialog().getState() != null && getDialog().getState().equals(DialogState.TERMINATED)) {
-					// Issue 2130 (http://code.google.com/p/mobicents/issues/detail?id=2130) : Memory leak in Sip stack when INFO message is used 
-					// fail before the ctx is created to avoid mem leaks
-					throw new IllegalStateException("Error sending request " + request + " dialog " + dialog.getDialogId() + " already in TERMINATED state");
-				}
+				}								
 				
 				final ClientTransaction ctx = sipProvider.getNewClientTransaction(request);				
 				ctx.setRetransmitTimer(sipFactoryImpl.getSipApplicationDispatcher().getBaseTimerInterval());
