@@ -137,6 +137,16 @@ public class SimpleSipServlet
 		logger.info("from : " + fromString);
 		logger.info("Got request: "
 				+ request.getMethod());	
+		
+		request.setAttribute("test", "test");
+		String requestAttribute = (String)request.getAttribute("test");
+		request.removeAttribute("test");
+		if(!requestAttribute.equalsIgnoreCase("test")) {
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+			sipServletResponse.send();
+			return;
+		}		
+		
 		if(!request.getApplicationSession().getInvalidateWhenReady()) {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
 			sipServletResponse.send();

@@ -122,7 +122,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	//lazy loaded and not serialized to avoid unecessary replication
 	protected transient MobicentsSipSession sipSession;
 
-	protected Map<String, Object> attributes = new ConcurrentHashMap<String, Object>();
+	protected Map<String, Object> attributes;
 	// Made it transient for Issue 1523 : http://code.google.com/p/mobicents/issues/detail?id=1523
 	// NotSerializableException happens if a message is stored in the sip session during HA
 	private transient Transaction transaction;
@@ -563,7 +563,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	public Object getAttribute(String name) {
 		if (name == null)
 			throw new NullPointerException("Attribute name can not be null.");
-		return this.attributes.get(name);
+		return this.getAttributeMap().get(name);
 	}
 
 	/*
@@ -571,7 +571,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	 * @see javax.servlet.sip.SipServletMessage#getAttributeNames()
 	 */
 	public Enumeration<String> getAttributeNames() {
-		Vector<String> names = new Vector<String>(this.attributes.keySet());
+		Vector<String> names = new Vector<String>(this.getAttributeMap().keySet());
 		return names.elements();
 	}
 
@@ -1113,7 +1113,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	 * @see javax.servlet.sip.SipServletMessage#removeAttribute(java.lang.String)
 	 */
 	public void removeAttribute(String name) {
-		this.attributes.remove(name);
+		if(attributes  != null) {
+			this.attributes.remove(name);
+		}
 	}
 	
 	/*
@@ -1218,7 +1220,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	public void setAttribute(String name, Object o) {
 		if (name == null)
 			throw new NullPointerException("Attribute name can not be null.");
-		this.attributes.put(name, o);
+		this.getAttributeMap().put(name, o);
 	}
 
 	/*
@@ -1743,6 +1745,13 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	
 	public abstract void cleanUp();
 	
+	protected Map<String, Object> getAttributeMap() {
+		if(this.attributes == null) {
+			this.attributes = new ConcurrentHashMap<String, Object>();
+		}
+		return this.attributes;
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
@@ -1757,12 +1766,14 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 			throw new IllegalArgumentException("SIP Sesion Key " + sessionKeyString + " previously serialized could not be reparsed", e);
 		}
 		int attributesSize = in.readInt();
-		Object[][] attributesArray = (Object[][] )in.readObject();
-		attributes = new ConcurrentHashMap<String, Object>();
-		for (int i = 0; i < attributesSize; i++) {
-			String key = (String) attributesArray[0][i];
-			Object value = attributesArray[1][i];
-			attributes.put(key, value);
+		if(attributesSize > 0) {
+			Object[][] attributesArray = (Object[][] )in.readObject();
+			attributes = new ConcurrentHashMap<String, Object>();
+			for (int i = 0; i < attributesSize; i++) {
+				String key = (String) attributesArray[0][i];
+				Object value = attributesArray[1][i];
+				attributes.put(key, value);
+			}
 		}
 		transactionApplicationData = (TransactionApplicationData) in.readObject();
 		headerForm = HeaderForm.valueOf(in.readUTF());
@@ -1794,15 +1805,19 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		} else {
 			out.writeUTF(sipSession.getId());
 		}
-		out.writeInt(attributes.size());
-		Object[][] attributesArray = new Object[2][attributes.size()];
-		int i = 0;
-		for (Entry<String, Object> entry : attributes.entrySet()) {
-			attributesArray [0][i] = entry.getKey(); 
-			attributesArray [1][i] = entry.getValue();
-			i++;
+		if(attributes != null) {
+			out.writeInt(attributes.size());
+			Object[][] attributesArray = new Object[2][attributes.size()];
+			int i = 0;
+			for (Entry<String, Object> entry : attributes.entrySet()) {
+				attributesArray [0][i] = entry.getKey(); 
+				attributesArray [1][i] = entry.getValue();
+				i++;
+			}		
+			out.writeObject(attributesArray);
+		} else {
+			out.writeInt(0);
 		}
-		out.writeObject(attributesArray);
 		out.writeObject(transactionApplicationData);
 		out.writeUTF(headerForm.toString());
 		if(currentApplicationName != null) {
