@@ -67,11 +67,11 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
 		
 		forwardingUris.put("sip:receiver-fwd-ack@sip-servlets.com", 
-				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+				new String[]{"sip:forward-receiver-fwd-ack@sip-servlets.com", "sip:forward-receiver-fwd-ack@127.0.0.1:5090"});
 		forwardingUris.put("sip:receiver-fwd-ack@127.0.0.1", 
-				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+				new String[]{"sip:forward-receiver-fwd-ack@sip-servlets.com", "sip:forward-receiver-fwd-ack@127.0.0.1:5090"});
 		forwardingUris.put("sip:receiver-fwd-ack@127.0.0.1:5080", 
-				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+				new String[]{"sip:forward-receiver-fwd-ack@sip-servlets.com", "sip:forward-receiver-fwd-ack@127.0.0.1:5090"});
 	}
 	
 	@Override
@@ -215,7 +215,7 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 //		    helper.getLinkedSession(sipServletResponse.getSession());		
 		//if this is a response to an INVITE we ack it and forward the OK 
 		if("INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
-			if(sipServletResponse.getFrom().getURI().toString().contains("fwd-ack")) {
+			if(!sipServletResponse.getTo().getURI().toString().contains("fwd-ack")) {
 				SipServletRequest ackRequest = sipServletResponse.createAck();
 				if(logger.isInfoEnabled()) {
 					logger.info("Sending " +  ackRequest);
