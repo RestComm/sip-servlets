@@ -622,7 +622,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				Thread.currentThread().setContextClassLoader(oldClassLoader);
 			}
 		} catch (Exception e) {			
-			throw new IllegalStateException("an exception occured when sending the response", e);
+			throw new IllegalStateException("an exception occured when sending the response " + message, e);
 		}
 	}
 	/*
