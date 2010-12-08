@@ -30,6 +30,7 @@ import gov.nist.javax.sip.header.ims.SecurityServerHeader;
 import gov.nist.javax.sip.header.ims.SecurityVerifyHeader;
 import gov.nist.javax.sip.header.ims.ServiceRouteHeader;
 import gov.nist.javax.sip.message.SIPMessage;
+import gov.nist.javax.sip.stack.SIPClientTransaction;
 
 import java.text.ParseException;
 import java.util.HashMap;
@@ -670,7 +671,7 @@ public final class JainSipUtils {
 	public static void terminateTransaction(Transaction transaction) {
 		// Issue 2130 (http://code.google.com/p/mobicents/issues/detail?id=2130) : Memory leak in Sip stack when INFO message is used 
 		// fail before the ctx is created to avoid mem leaks
-		if(transaction != null) {
+		if(transaction != null && transaction instanceof SIPClientTransaction) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("terminating transaction " + transaction + " with transaction id "+ transaction.getBranchId());
 			}
