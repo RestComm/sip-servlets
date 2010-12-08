@@ -63,7 +63,7 @@ public class SipSessionAsyncTask implements Runnable {
 				try {
 					ClassLoader cl = sipContext.getLoader().getClassLoader();
 					Thread.currentThread().setContextClassLoader(cl);
-					sipContext.enterSipApp(sipApplicationSession, null);
+					sipContext.enterSipApp(sipApplicationSession, sipSession);
 					sipContext.enterSipAppHa(true);
 					
 					work.doAsynchronousWork(sipSession);
@@ -71,7 +71,7 @@ public class SipSessionAsyncTask implements Runnable {
 					logger.error("An unexpected exception happened in the SipSessionAsynchronousWork callback on sip session " + key, t);
 				} finally {
 					sipContext.exitSipAppHa(null, null);
-					sipContext.exitSipApp(sipApplicationSession, null);
+					sipContext.exitSipApp(sipApplicationSession, sipSession);
 					Thread.currentThread().setContextClassLoader(oldClassLoader);					
 				}
 			} else {

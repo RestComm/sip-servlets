@@ -561,7 +561,20 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		//doing the invalidation
 		for(MobicentsSipSession session: getSipSessions()) {
 			if(session.isValidInternal()) {
-				session.invalidate();
+				boolean lockSession = false;
+				if(bypassCheck && sipContext.getConcurrencyControlMode() == ConcurrencyControlMode.SipSession) {
+					lockSession = true;
+				}
+				try {
+					if(lockSession) {
+						sipContext.enterSipApp(this, session);
+					}
+					session.invalidate();
+				} finally {
+					if(lockSession) {
+						sipContext.exitSipApp(this, session);
+					}
+				}
 			}
 		}
 		for(HttpSession session: getHttpSessions()) {

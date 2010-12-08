@@ -953,7 +953,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						}
 					}															
 					if(sipApplicationSession != null) {
-						sipContext.enterSipApp(sipApplicationSession, sipSessionImpl);
+						sipContext.enterSipApp(sipApplicationSession, null);
 						try {
 							if(logger.isDebugEnabled()) {
 								logger.debug("sip app session " + sipApplicationSession.getKey() + " is valid ? :" + sipApplicationSession.isValidInternal());
@@ -965,7 +965,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 								sipApplicationSession.tryToInvalidate();
 							}
 						} finally {
-							sipContext.exitSipApp(sipApplicationSession, sipSessionImpl);
+							sipContext.exitSipApp(sipApplicationSession, null);
 						}							
 					}
 

@@ -86,7 +86,7 @@ public class StandardSasTimerTask extends TimerTask implements SipApplicationSes
 				
 				getSipApplicationSession().setExpired(true);
 				if(getSipApplicationSession().isValidInternal()) {			
-					getSipApplicationSession().invalidate();				
+					getSipApplicationSession().invalidate(true);				
 				}
 			} else {
 				// Issue 1773 : http://code.google.com/p/mobicents/issues/detail?id=1773 

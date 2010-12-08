@@ -1171,30 +1171,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 									" sipSession=" + sipSession + " semaphore=" + semaphore);
 						}
 					}
-				} else if (sipApplicationSession != null) {
-					// if the sip session is null but not the sip app session,
-					// we try to acquire the semaphore of all the underlying sip sessions
-					// but this could lead to deadlocks in certain cases, if it occurs
-					// it is recommended to upgrade to SipApplicationSession concurrency control mode
-					Iterator<MobicentsSipSession> sipSessionIt = (Iterator<MobicentsSipSession>) 
-						sipApplicationSession.getSipSessions().iterator();
-					while (sipSessionIt.hasNext()) {
-						MobicentsSipSession childSipSession = sipSessionIt
-								.next();
-						final Semaphore semaphore = childSipSession.getSemaphore();
-						if(semaphore != null) {
-							if(logger.isDebugEnabled()) {
-								logger.debug("Child SipSession: Before semaphore acquire for sipApplicationSession=" + sipApplicationSession +
-										" sipSession=" + sipSession + " semaphore=" + semaphore);
-							}
-							semaphore.acquireUninterruptibly();
-							if(logger.isDebugEnabled()) {
-								logger.debug("Child SipSession: After semaphore acquire for sipApplicationSession=" + sipApplicationSession +
-										" sipSession=" + sipSession + " semaphore=" + semaphore);
-							}
-						}
-					}
-				}
+				} 
 				break;
 			case SipApplicationSession:
 				if(sipApplicationSession != null) {
@@ -1229,22 +1206,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 									" sipSession=" + sipSession + " semaphore=" + semaphore);
 						}
 					}
-				} else if (sipApplicationSession != null) {
-					Iterator<MobicentsSipSession> sipSessionIt = (Iterator<MobicentsSipSession>) 
-						sipApplicationSession.getSipSessions().iterator();
-					while (sipSessionIt.hasNext()) {
-						MobicentsSipSession childSipSession = sipSessionIt
-								.next();
-						final Semaphore semaphore = childSipSession.getSemaphore();
-						if(semaphore != null) {
-							semaphore.release();
-							if(logger.isDebugEnabled()) {
-								logger.debug("Child SipSession: Semaphore released for sipApplicationSession=" + sipApplicationSession +
-										" sipSession=" + sipSession + " semaphore=" + semaphore);
-							}
-						}
-					}
-				}
+				} 
 				break;
 			case SipApplicationSession:
 				if(sipApplicationSession != null && sipApplicationSession.getSemaphore() != null) {

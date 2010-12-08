@@ -330,4 +330,8 @@ public class MobicentsSipApplicationSessionFacade implements
 		return sipApplicationSession.getSipApplicationSessionTimeout();
 	}
 
+	public void invalidate(boolean bypassCheck) {
+		sipApplicationSession.invalidate(true);
+	}
+
 }

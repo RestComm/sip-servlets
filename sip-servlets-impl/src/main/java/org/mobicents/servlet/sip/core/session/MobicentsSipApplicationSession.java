@@ -86,4 +86,6 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession, S
 	long getSipApplicationSessionTimeout();
 	
 	Set<MobicentsSipSession> getSipSessions();
+
+	void invalidate(boolean bypassCheck);
 }
