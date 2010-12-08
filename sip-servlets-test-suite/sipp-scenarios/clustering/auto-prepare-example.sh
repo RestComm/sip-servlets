@@ -11,6 +11,14 @@ if [ $# -ne 0 ]; then
 				cp $EXAMPLES_HOME/location-service-distributable/target/location-service-distributable-*.war $JBOSS_HOME/server/$config/deploy
 				cp $EXAMPLES_HOME/location-service-distributable/distributable-location-service-dar.properties $JBOSS_HOME/server/$config/conf/dars/mobicents-dar.properties
 	            ;;
+	    proxy-early)
+	    		echo "Distributed example used is proxy early failover"
+	    		mvn clean install -f $EXAMPLES_HOME/location-service-distributable/pom.xml
+				rm -rf $JBOSS_HOME/server/$config/deploy/location-service-distributable-*.war
+				cp $EXAMPLES_HOME/location-service-distributable/target/location-service-distributable-*.war $JBOSS_HOME/server/$config/deploy
+				cp $EXAMPLES_HOME/location-service-distributable/distributable-location-service-dar.properties $JBOSS_HOME/server/$config/conf/dars/mobicents-dar.properties
+				cp setup/jboss-5/mss-sip-stack-jboss-early-failover.properties $JBOSS_HOME/server/$config/conf/mss-sip-stack.properties				
+	            ;;
 	    b2bua)
 	            echo "Distributed example used is b2bua"
 	    		mvn clean install -f $EXAMPLES_HOME/call-forwarding-distributable/pom.xml
@@ -18,12 +26,28 @@ if [ $# -ne 0 ]; then
 				cp $EXAMPLES_HOME/call-forwarding-distributable/target/call-forwarding-distributable-*.war $JBOSS_HOME/server/$config/deploy
 				cp $EXAMPLES_HOME/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/$config/conf/dars/mobicents-dar.properties
 	            ;;
+	    b2bua-early)
+	            echo "Distributed example used is b2bua early failover"
+	    		mvn clean install -f $EXAMPLES_HOME/call-forwarding-distributable/pom.xml
+				rm -rf $JBOSS_HOME/server/$config/deploy/call-forwarding-distributable-*.war
+				cp $EXAMPLES_HOME/call-forwarding-distributable/target/call-forwarding-distributable-*.war $JBOSS_HOME/server/$config/deploy
+				cp $EXAMPLES_HOME/call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/$config/conf/dars/mobicents-dar.properties
+				cp setup/jboss-5/mss-sip-stack-jboss-early-failover.properties $JBOSS_HOME/server/$config/conf/mss-sip-stack.properties
+	            ;;
 	    custom-b2bua)
-	            echo "Distributed example used is b2bua"
+	            echo "Distributed example used is custom b2bua"
 	    		mvn clean install -f $EXAMPLES_HOME/custom-call-forwarding-distributable/pom.xml
 				rm -rf $JBOSS_HOME/server/$config/deploy/custom-call-forwarding-distributable-*.war
 				cp $EXAMPLES_HOME/custom-call-forwarding-distributable/target/custom-call-forwarding-distributable-*.war $JBOSS_HOME/server/$config/deploy
 				cp $EXAMPLES_HOME/custom-call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/$config/conf/dars/mobicents-dar.properties
+	            ;;
+	    custom-b2bua-early)
+	            echo "Distributed example used is custom b2bua early failover"
+	    		mvn clean install -f $EXAMPLES_HOME/custom-call-forwarding-distributable/pom.xml
+				rm -rf $JBOSS_HOME/server/$config/deploy/custom-call-forwarding-distributable-*.war
+				cp $EXAMPLES_HOME/custom-call-forwarding-distributable/target/custom-call-forwarding-distributable-*.war $JBOSS_HOME/server/$config/deploy
+				cp $EXAMPLES_HOME/custom-call-forwarding-distributable/distributable-call-forwarding-dar.properties $JBOSS_HOME/server/$config/conf/dars/mobicents-dar.properties
+				cp setup/jboss-5/mss-sip-stack-jboss-early-failover.properties $JBOSS_HOME/server/$config/conf/mss-sip-stack.properties
 	            ;;
 	    c2c)
 	    		echo "Distributed example used is Click To call"

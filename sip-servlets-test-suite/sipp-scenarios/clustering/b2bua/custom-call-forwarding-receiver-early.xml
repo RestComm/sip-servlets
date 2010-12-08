@@ -23,6 +23,9 @@
     ]]>
   </send>
 
+<action>
+<exec command="./killserver.sh all.pid 2 &"/>
+</action>
   <pause milliseconds="6000"/>
 
   <send retrans="500">
