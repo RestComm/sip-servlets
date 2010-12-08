@@ -244,10 +244,12 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
 		// Fix for http://code.google.com/p/mobicents/issues/detail?id=1386 : 
 		// Ensure SipApplicationSession concurrency control on converged HTTP apps
 		context.enterSipApp(sipApplicationSessionImpl, null);
-		
-        wrapper.getPipeline().getFirst().invoke(request, response);
-        context.exitSipApp(sipApplicationSessionImpl, null);
-        context.exitSipAppHa(null, null);
+		try {
+			wrapper.getPipeline().getFirst().invoke(request, response);
+		} finally {
+	        context.exitSipApp(sipApplicationSessionImpl, null);
+	        context.exitSipAppHa(null, null);
+		}
         // Fix for Issue 882 :remove the http session from the thread local to avoid any leaking of the session
         context.getSipFactoryFacade().removeHttpSession();
         
