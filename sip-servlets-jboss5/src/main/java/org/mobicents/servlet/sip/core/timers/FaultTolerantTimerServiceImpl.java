@@ -213,17 +213,24 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 		TimerTask timerTask = getScheduler().getLocalRunningTask(timerId);
 		if(timerTask == null) {
 			TimerServiceTaskData timerTaskData = (TimerServiceTaskData) getScheduler().getTimerTaskData(timerId);
-			if(timerTaskData == null) {
+			// we recreate the task locally 
+			ServletTimerImpl servletTimerImpl = new ServletTimerImpl(timerTaskData.getData(), timerTaskData.getDelay(), sipApplicationSession.getSipContext().getListeners().getTimerListener(), sipApplicationSession);
+			TimerServiceTask timerServiceTask = new TimerServiceTask(sipManager, servletTimerImpl, timerTaskData);
+			
+			if(timerTaskData != null) {
 				if(logger.isInfoEnabled()) {
 					logger.info("Task " + timerId + " is not present locally, but on another node, rescheduling it locally.");
 				}
 				// we cancel it, this will cause the remote owner node to remove it and cancel its local task 
-				getScheduler().cancel(timerId);
-				// we recreate the task locally 
-				ServletTimerImpl servletTimerImpl = new ServletTimerImpl(timerTaskData.getData(), timerTaskData.getDelay(), sipApplicationSession.getSipContext().getListeners().getTimerListener(), sipApplicationSession);
-				TimerServiceTask timerServiceTask = new TimerServiceTask(sipManager, servletTimerImpl, timerTaskData);
+				getScheduler().cancel(timerId);				
 				// and reset its start time to the correct one
 				timerServiceTask.beforeRecover();				
+				// and reschedule it locally
+				getScheduler().schedule(timerServiceTask);
+			} else {
+				if(logger.isInfoEnabled()) {
+					logger.info("Task " + timerId + " is not present locally, nor on another node, rescheduling it.");
+				}
 				// and reschedule it locally
 				getScheduler().schedule(timerServiceTask);
 			}

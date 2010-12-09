@@ -23,6 +23,9 @@ package org.mobicents.servlet.sip.core.timers;
 
 import org.jboss.web.tomcat.service.session.ClusteredSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.timers.TimerTask;
 import org.mobicents.timers.TimerTaskData;
 import org.mobicents.timers.TimerTaskFactory;
@@ -44,8 +47,12 @@ public class TimerServiceTaskFactory implements TimerTaskFactory {
 	/* (non-Javadoc)
 	 * @see org.mobicents.timers.TimerTaskFactory#newTimerTask(org.mobicents.timers.TimerTaskData)
 	 */
-	public TimerTask newTimerTask(TimerTaskData data) {		
-		return new TimerServiceTask(sipManager, null, (TimerServiceTaskData)data);
+	public TimerTask newTimerTask(TimerTaskData data) {
+		MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(((TimerServiceTaskData)data).getKey(), false);
+		if(((SipContext)sipManager.getContainer()).getConcurrencyControlMode() != ConcurrencyControlMode.SipApplicationSession) {
+			return new TimerServiceTask(sipManager, null, (TimerServiceTaskData)data);
+		}
+		return null;
 	}
 
 }

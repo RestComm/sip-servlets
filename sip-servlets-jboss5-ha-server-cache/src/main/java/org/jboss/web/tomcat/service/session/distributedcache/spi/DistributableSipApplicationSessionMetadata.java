@@ -33,6 +33,7 @@ public class DistributableSipApplicationSessionMetadata extends
 		DistributableSessionMetadata {
 	private transient boolean sipSessionsMapModified;
 	private transient boolean httpSessionsMapModified;
+	private transient boolean servletTimersMapModified;
 
 	// map to store meta data changes for replication.
 	private transient Map<String, Object> metaData = new HashMap<String, Object>();
@@ -78,5 +79,19 @@ public class DistributableSipApplicationSessionMetadata extends
 	 */
 	public boolean isHttpSessionsMapModified() {
 		return httpSessionsMapModified;
+	}
+
+	/**
+	 * @param servletTimersMapModified the servletTimersMapModified to set
+	 */
+	public void setServletTimersMapModified(boolean servletTimersMapModified) {
+		this.servletTimersMapModified = servletTimersMapModified;
+	}
+
+	/**
+	 * @return the servletTimersMapModified
+	 */
+	public boolean isServletTimersMapModified() {
+		return servletTimersMapModified;
 	}
 }
