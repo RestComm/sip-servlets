@@ -1448,11 +1448,13 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 
 	public void rescheduleTimersLocally() {		
 		((ClusteredSipApplicationSessionTimerService)sipContext.getSipApplicationSessionTimerService()).rescheduleTimerLocally(this);
-		if(logger.isInfoEnabled()) {
-			logger.info("SipApplicationSession " + key + " number of servletTimers to reschedule locally " + servletTimers.size());
-		}
-		for(String key : servletTimers.keySet()) {
-			((ClusteredSipServletTimerService)sipContext.getTimerService()).rescheduleTimerLocally(this, key);
+		if(servletTimers != null) {
+			if(logger.isInfoEnabled()) {
+				logger.info("SipApplicationSession " + key + " number of servletTimers to reschedule locally " + servletTimers.size());
+			}
+			for(String key : servletTimers.keySet()) {
+				((ClusteredSipServletTimerService)sipContext.getTimerService()).rescheduleTimerLocally(this, key);
+			}
 		}
 	}
 }

@@ -8,7 +8,7 @@
 
 rm -rf $JBOSS_HOME/server/port-1
 rm -rf $JBOSS_HOME/server/port-2
-#rm -rf $JBOSS_HOME/server/port-3
+rm -rf $JBOSS_HOME/server/port-3
 
 mvn clean install -f ../../../pom.xml -P jboss-5 -Dnode=all
 
@@ -23,16 +23,12 @@ cp setup/jboss-5/jboss-cache-manager-jboss-beans.xml $JBOSS_HOME/server/all/depl
 
 cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-1
 cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-2
-#cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-3
 
 cp setup/jboss-5/server-jboss-5-failover-port-1.xml $JBOSS_HOME/server/port-1/deploy/jbossweb.sar/server.xml
 cp setup/jboss-5/server-jboss-5-failover-port-2.xml $JBOSS_HOME/server/port-2/deploy/jbossweb.sar/server.xml
-#cp setup/jboss-5/server-jboss-5-failover-port-3.xml $JBOSS_HOME/server/port-3/deploy/jbossweb.sar/server.xml
-
 
 mkdir $JBOSS_HOME/server/port-1/conf/dars
 mkdir $JBOSS_HOME/server/port-2/conf/dars
-#mkdir $JBOSS_HOME/server/port-3/conf/dars
 
 if [ $# -ne 0 ]; then
 	case $1 in	
@@ -120,6 +116,20 @@ if [ $# -ne 0 ]; then
 				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties
 				cp setup/jboss-5/war-deployers-jboss-beans-passivation-enabled.xml $JBOSS_HOME/server/port-1/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml
 				cp setup/jboss-5/war-deployers-jboss-beans-passivation-enabled.xml $JBOSS_HOME/server/port-2/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml
+	            ;;
+	    uas-timer-colocation)
+	            echo "Distributed example used is uas timer colocation"
+	            cp -rf $JBOSS_HOME/server/all $JBOSS_HOME/server/port-3
+	            cp setup/jboss-5/server-jboss-5-failover-cc-sas-port-1.xml $JBOSS_HOME/server/port-1/deploy/jbossweb.sar/server.xml
+	            cp setup/jboss-5/server-jboss-5-failover-cc-sas-port-2.xml $JBOSS_HOME/server/port-2/deploy/jbossweb.sar/server.xml
+	            cp setup/jboss-5/server-jboss-5-failover-cc-sas-port-3.xml $JBOSS_HOME/server/port-3/deploy/jbossweb.sar/server.xml
+	    		mvn clean install -f ../../../sip-servlets-examples/simple-sip-servlet-distributable/pom.xml
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-1/deploy
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-2/deploy
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/target/simple-sip-servlet-distributable-*.war $JBOSS_HOME/server/port-3/deploy
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/port-1/conf/dars/distributable-dar.properties
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/port-2/conf/dars/distributable-dar.properties
+				cp ../../../sip-servlets-examples/simple-sip-servlet-distributable/distributable-simple-dar.properties $JBOSS_HOME/server/port-3/conf/dars/distributable-dar.properties
 	            ;;
 	    *)
 	            echo "Distributed example used is uas"
