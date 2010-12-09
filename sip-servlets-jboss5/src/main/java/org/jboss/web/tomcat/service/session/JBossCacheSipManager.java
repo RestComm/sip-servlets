@@ -79,6 +79,7 @@ import org.mobicents.cluster.MobicentsCluster;
 import org.mobicents.cluster.election.DefaultClusterElector;
 import org.mobicents.ha.javax.sip.ClusteredSipStack;
 import org.mobicents.ha.javax.sip.ReplicationStrategy;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -2646,6 +2647,13 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 					}
 					if(session != null) {					
 						session.update(data);					
+					}
+					if(mustAdd && ((SipContext)getContainer()).getConcurrencyControlMode() == ConcurrencyControlMode.SipApplicationSession) {
+						if(logger.isInfoEnabled()) {
+							logger.info("SipApplicationSession " + key + " has just been recreated and concurrency control is set to SipApplicationSession, colocating the timers here to ensure no concurrent access across the cluster");
+						}
+						// if the session has been recreated, reschedule the FT timers locally if they are not local already
+						((ClusteredSipApplicationSession) session).rescheduleTimersLocally();
 					}
 				} else if(logger.isDebugEnabled()) {
         			logger.debug("no data for sip application session " + key + " in the distributed cache");

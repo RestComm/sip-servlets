@@ -64,6 +64,7 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.core.timers.ClusteredSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.FaultTolerantSasTimerTask;
 import org.mobicents.servlet.sip.core.timers.TimerServiceTask;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -1443,5 +1444,15 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	
 	public String getHaId() {
 		return key.getId();
+	}
+
+	public void rescheduleTimersLocally() {		
+		((ClusteredSipApplicationSessionTimerService)sipContext.getSipApplicationSessionTimerService()).rescheduleTimerLocally(this);
+		if(logger.isInfoEnabled()) {
+			logger.info("SipApplicationSession " + key + " number of servletTimers to reschedule locally " + servletTimers.size());
+		}
+		for(String key : servletTimers.keySet()) {
+			((ClusteredSipServletTimerService)sipContext.getTimerService()).rescheduleTimerLocally(this, key);
+		}
 	}
 }

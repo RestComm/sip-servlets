@@ -22,16 +22,17 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.TimerListener;
-import javax.servlet.sip.TimerService;
 
 import org.apache.log4j.Logger;
 import org.jboss.web.tomcat.service.session.ClusteredSipManager;
+import org.jboss.web.tomcat.service.session.ClusteredSipServletTimerService;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.timers.FaultTolerantScheduler;
 import org.mobicents.timers.PeriodicScheduleStrategy;
+import org.mobicents.timers.TimerTask;
 import org.mobicents.timers.TimerTaskFactory;
 
 /**
@@ -40,7 +41,7 @@ import org.mobicents.timers.TimerTaskFactory;
  * @author jean.deruelle@gmail.com
  *
  */
-public class FaultTolerantTimerServiceImpl implements SipServletTimerService {
+public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerService {
 	
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(FaultTolerantTimerServiceImpl.class
@@ -202,6 +203,35 @@ public class FaultTolerantTimerServiceImpl implements SipServletTimerService {
 
 	public boolean isStarted() {
 		return started.get();
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.jboss.web.tomcat.service.session.ClusteredSipServletTimerService#rescheduleTimerLocally(org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession, java.lang.String)
+	 */
+	public void rescheduleTimerLocally(MobicentsSipApplicationSession sipApplicationSession, String timerId) {		
+		TimerTask timerTask = getScheduler().getLocalRunningTask(timerId);
+		if(timerTask == null) {
+			TimerServiceTaskData timerTaskData = (TimerServiceTaskData) getScheduler().getTimerTaskData(timerId);
+			if(timerTaskData == null) {
+				if(logger.isInfoEnabled()) {
+					logger.info("Task " + timerId + " is not present locally, but on another node, rescheduling it locally.");
+				}
+				// we cancel it, this will cause the remote owner node to remove it and cancel its local task 
+				getScheduler().cancel(timerId);
+				// we recreate the task locally 
+				ServletTimerImpl servletTimerImpl = new ServletTimerImpl(timerTaskData.getData(), timerTaskData.getDelay(), sipApplicationSession.getSipContext().getListeners().getTimerListener(), sipApplicationSession);
+				TimerServiceTask timerServiceTask = new TimerServiceTask(sipManager, servletTimerImpl, timerTaskData);
+				// and reset its start time to the correct one
+				timerServiceTask.beforeRecover();				
+				// and reschedule it locally
+				getScheduler().schedule(timerServiceTask);
+			}
+		} else {
+			if(logger.isInfoEnabled()) {
+				logger.info("Task " + timerId + " is already present locally no need to reschedule it.");
+			}
+		}
 	}
 	
 }

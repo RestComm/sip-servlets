@@ -167,9 +167,9 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-spec"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-jboss5-metadata"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-client"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/cluster/core/1.6-SNAPSHOT/core-1.6-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/cluster/cache/1.6-SNAPSHOT/cache-1.6-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/cluster/timers/1.6-SNAPSHOT/timers-1.6-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/cluster/core/1.7-SNAPSHOT/core-1.7-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/cluster/cache/1.7-SNAPSHOT/cache-1.7-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/cluster/timers/1.7-SNAPSHOT/timers-1.7-SNAPSHOT.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-jboss5-ha-server-cache"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-jruby"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/ha/javax/sip/mobicents-jain-sip-ha-core/0.14-SNAPSHOT/mobicents-jain-sip-ha-core-0.14-SNAPSHOT.jar"/>

@@ -32,6 +32,7 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.timers.FaultTolerantScheduler;
 import org.mobicents.timers.TimerTask;
+import org.mobicents.timers.TimerTaskData;
 import org.mobicents.timers.TimerTaskFactory;
 
 /**
@@ -41,7 +42,7 @@ import org.mobicents.timers.TimerTaskFactory;
  * @author jean.deruelle@gmail.com
  *
  */
-public class FaultTolerantSasTimerService implements SipApplicationSessionTimerService {
+public class FaultTolerantSasTimerService implements ClusteredSipApplicationSessionTimerService {
 
 	private static final Logger logger = Logger.getLogger(FaultTolerantSasTimerService.class
 			.getName());
@@ -66,6 +67,10 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 		return new FaultTolerantSasTimerTask(sipManager, sipApplicationSession);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerService#schedule(org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask, long, java.util.concurrent.TimeUnit)
+	 */
 	public SipApplicationSessionTimerTask schedule(SipApplicationSessionTimerTask expirationTimerTask, 
             long delay, 
             TimeUnit unit) {			
@@ -88,6 +93,10 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 		throw new IllegalArgumentException("the task to schedule is not an instance of FaultTolerantSasTimerTask");
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerService#cancel(org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask)
+	 */
 	public boolean cancel(SipApplicationSessionTimerTask expirationTimerTask) {
 		if(expirationTimerTask instanceof FaultTolerantSasTimerTask) {
 			TimerTask cancelledTask = getScheduler().cancel(((FaultTolerantSasTimerTask)expirationTimerTask).getData().getTaskID());
@@ -108,6 +117,10 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 		// method not exposed by Mobicents FaultTolerantScheduler
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerService#stop()
+	 */
 	public void stop() {
 //		return super.shutdownNow();
 		// method not exposed by Mobicents FaultTolerantScheduler
@@ -146,8 +159,41 @@ public class FaultTolerantSasTimerService implements SipApplicationSessionTimerS
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerService#isStarted()
+	 */
 	public boolean isStarted() {
 		return started.get();
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.timers.ClusteredSipApplicationSessionTimerService#rescheduleTimerLocally(org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession)
+	 */
+	public void rescheduleTimerLocally(MobicentsSipApplicationSession sipApplicationSession) {
+		final String taskId = sipApplicationSession.getId();
+		TimerTask timerTask = getScheduler().getLocalRunningTask(taskId);
+		if(timerTask == null) {
+			SipApplicationSessionTaskData timerTaskData = (SipApplicationSessionTaskData) getScheduler().getTimerTaskData(taskId);
+			if(timerTaskData == null) {
+				if(logger.isInfoEnabled()) {
+					logger.info("Task for sip application session " + taskId + " is not present locally, but on another node, rescheduling it locally.");
+				}
+				// we cancel it, this will cause the remote owner node to remove it and cancel its local task 
+				getScheduler().cancel(taskId);
+				// we recreate the task locally 
+				FaultTolerantSasTimerTask faultTolerantSasTimerTask = new FaultTolerantSasTimerTask(sipApplicationSession, timerTaskData);
+				// and reset its start time to the correct one
+				faultTolerantSasTimerTask.beforeRecover();
+				sipApplicationSession.setExpirationTimerTask(faultTolerantSasTimerTask);
+				// and reschedule it locally
+				getScheduler().schedule(faultTolerantSasTimerTask);
+			}
+		} else {
+			if(logger.isInfoEnabled()) {
+				logger.info("Task for sip application session " + taskId + " is already present locally no need to reschedule it.");
+			}
+		}
+	}
 }
