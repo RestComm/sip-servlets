@@ -17,7 +17,6 @@
 package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.DialogExt;
-import gov.nist.javax.sip.message.ResponseExt;
 import gov.nist.javax.sip.stack.SIPClientTransaction;
 import gov.nist.javax.sip.stack.SIPTransaction;
 

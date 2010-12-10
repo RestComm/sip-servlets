@@ -45,6 +45,7 @@ import javax.servlet.sip.URI;
 import javax.sip.ListeningPoint;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.SipServletRequestExt;
 import org.mobicents.javax.servlet.sip.SipSessionExt;
 
 public class ShootistSipServlet 
@@ -139,9 +140,17 @@ public class ShootistSipServlet
 			IOException {
 		String requestURIStringified = req.getRequestURI().toString();
 		logger.info(requestURIStringified);
+		if(req.getTo().getURI().toString().contains("nonrecordrouteeinvite"))  {
+			req.createResponse(200).send();
+			return;
+		}
+		if(req.getTo().getURI().toString().contains("recordrouteeinvite"))  {
+			((SipServletRequestExt) req).createResponse(200, null, true).send();
+			return;
+		}
 		if(!requestURIStringified.startsWith("sip:mss@sip-servlets.com;org.mobicents.servlet.sip.ApplicationSessionKey=%28") && !requestURIStringified.endsWith("%3Aorg.mobicents.servlet.sip.testsuite.ShootistApplication%29")) {
 			req.createResponse(500, "SipURI.toString() does not escape charachters according to RFC2396.").send();
-		}
+		}				
 		if(((SipURI)req.getFrom().getURI()).getUser().equalsIgnoreCase(ENCODE_URI)) {
 			if(req.getApplicationSession().getAttribute(ENCODE_URI) != null) {
 				req.createResponse(200).send();
@@ -150,7 +159,7 @@ public class ShootistSipServlet
 			}
 		} else {
 			req.createResponse(500, "received a request using the encodeURI mechanism but not the same sip application session").send();
-		}
+		}			
 	}
 	
 	@Override

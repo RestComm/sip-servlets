@@ -82,6 +82,7 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.SipServletRequestExt;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.SipFactories;
@@ -108,7 +109,7 @@ import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
-		SipServletRequest {
+		SipServletRequestExt {
 
 	public static final String STALE = "stale";
 
@@ -255,14 +256,26 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletRequest#createResponse(int)
 	 */
 	public SipServletResponse createResponse(int statusCode) {
-		return createResponse(statusCode, null);
+		return createResponse(statusCode, null, false, true);
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletRequest#createResponse(int, java.lang.String)
+	 */
 	public SipServletResponse createResponse(final int statusCode, final String reasonPhrase) {
-		return createResponse(statusCode, reasonPhrase, true);
+		return createResponse(statusCode, reasonPhrase, false, true);
 	}
-
-	public SipServletResponse createResponse(final int statusCode, final String reasonPhrase, boolean validate) {
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.javax.servlet.sip.SipServletRequestExt#createResponse(int, java.lang.String, boolean)
+	 */
+	public SipServletResponse createResponse(final int statusCode, final String reasonPhrase, boolean copyRecordRouteHeaders) {
+		return createResponse(statusCode, reasonPhrase, copyRecordRouteHeaders, true);
+	}
+	
+	public SipServletResponse createResponse(final int statusCode, final String reasonPhrase, boolean copyRecordRouteHeaders, boolean validate) {
 		checkReadOnly();
 		final Transaction transaction = getTransaction();
 		if(RoutingState.CANCELLED.equals(routingState)) {
@@ -360,6 +373,16 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 //				RouteHeader routeHeader = SipFactories.headerFactory.createRouteHeader(recordRouteHeader.getAddress());
 //				response.addHeader(routeHeader);
 //			}
+			
+			if(copyRecordRouteHeaders && !isInitial() && requestMethod.equals(Request.INVITE)) {
+				// Miss Record-Route in Response for non compliant Server in reINVITE http://code.google.com/p/mobicents/issues/detail?id=2066
+				final ListIterator<RecordRouteHeader> recordRouteHeaders = request.getHeaders(RecordRouteHeader.NAME);
+				while (recordRouteHeaders.hasNext()) {
+					RecordRouteHeader recordRouteHeader = (RecordRouteHeader) recordRouteHeaders
+							.next();
+					response.addHeader(recordRouteHeader);
+				}
+			}
 			
 			final SipServletResponseImpl newSipServletResponse = new SipServletResponseImpl(response, super.sipFactoryImpl,
 					validate ? (ServerTransaction) transaction : transaction, session, getDialog(), false, false);
