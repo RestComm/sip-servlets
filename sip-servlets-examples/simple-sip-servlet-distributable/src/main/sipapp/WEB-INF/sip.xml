@@ -6,6 +6,10 @@
 	<description>Distributable Simple Sip Servlet</description>
 	<distributable/>
 	
+	<session-config>
+		<session-timeout>3</session-timeout>
+	</session-config>
+	
 	<servlet-selection>
 		<main-servlet>
 			DistributableSimpleSipServlet
