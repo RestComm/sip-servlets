@@ -22,7 +22,7 @@ public class UserInterface extends VerticalPanel{
 		TabPanel tabPanel = new TabPanel();
 		tabPanel.add(getRouterConfigPage());
 		tabPanel.add(getConfigurationPage());
-		tabPanel.add(getDeploymentPage());
+		//tabPanel.add(getDeploymentPage());
 		tabPanel.setResizeTabs(true);  
 		tabPanel.setMinTabWidth(115);  
 		tabPanel.setTabWidth(135);  
