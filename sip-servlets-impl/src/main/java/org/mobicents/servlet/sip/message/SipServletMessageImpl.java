@@ -461,6 +461,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 			} else {
 				Parameterable parametrable = createParameterable(first, first.getName());
 				try {
+					logger.debug("parametrable Value " + parametrable.getValue());
 					if(this.isCommitted()) {
 						return new AddressImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), false);
 					} else {
@@ -1613,9 +1614,23 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		
 		Map<String, String> paramMap = new HashMap<String, String>();
 		String value = stringHeader;
+		String displayName = null;
+		// Issue 2201 : javax.servlet.sip.ServletParseException: Impossible to parse the following header Remote-Party-ID as an address.
+		// Need to handle the display name
+		if(stringHeader.trim().indexOf("\"") == 0) {
+			String displayNameString = stringHeader.substring(1);
+			int nextIndexOfDoubleQuote = displayNameString.indexOf("\"");
+			displayName = stringHeader.substring(0, nextIndexOfDoubleQuote + 2);
+			stringHeader = stringHeader.substring(nextIndexOfDoubleQuote + 2).trim();			
+		}
 		
+		boolean hasLaRaQuotes = false;
 		if(stringHeader.trim().indexOf("<") == 0) {
+			
 			stringHeader = stringHeader.substring(1);
+			if(stringHeader.indexOf(">") != -1) {
+				hasLaRaQuotes = true;
+			}
 			String[] split = stringHeader.split(">");
 			value = split[0];			
 			
@@ -1662,6 +1677,16 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 				}
 			}
 		}		
+		
+		// quotes are parts of the value as well as the display Name
+		if(hasLaRaQuotes) {
+			value = "<" + value + ">";
+		}
+		
+		// if a display name is present then we need add the quote back
+		if(displayName != null) {
+			value = displayName.concat(value);
+		}
 
 		boolean isNotModifiable = JainSipUtils.SYSTEM_HEADERS.contains(header.getName());
 		ParameterableHeaderImpl parameterable = new ParameterableHeaderImpl(

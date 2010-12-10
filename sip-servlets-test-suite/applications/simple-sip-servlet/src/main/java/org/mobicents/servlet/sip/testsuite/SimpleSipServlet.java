@@ -231,6 +231,46 @@ public class SimpleSipServlet
 			}
 		}				
 		
+		if(fromString.contains("RemotePartyId")) {
+			Address remotePID = request.getAddressHeader("Remote-Party-ID");
+			Address remotePID2 = request.getAddressHeader("Remote-Party-ID2");
+			Address remotePID3 = request.getAddressHeader("Remote-Party-ID3");
+			Address remotePID4 = request.getAddressHeader("Remote-Party-ID4");
+			Address remotePID5 = request.getAddressHeader("Remote-Party-ID5");
+			boolean sendErrorResponse = false;
+			logger.info("Remote-Party-ID value is " + remotePID);
+			logger.info("Remote-Party-ID2 value is " + remotePID2);
+			logger.info("Remote-Party-ID3 value is " + remotePID3);
+			logger.info("Remote-Party-ID4 value is " + remotePID4);
+			logger.info("Remote-Party-ID5 value is " + remotePID5);
+			
+			if(!remotePID.toString().trim().equals("\"KATE SMITH\" <sip:4162375543@47.135.223.88;user=phone>; screen=yes; party=calling; privacy=off")) {
+				sendErrorResponse = true;
+				logger.info("Remote-Party-ID Sending Error Response ");
+			}
+			if(!remotePID2.toString().trim().equals("sip:4162375543@47.135.223.88;user=phone; screen=yes; party=calling; privacy=off")) {
+				sendErrorResponse = true;
+				logger.info("Remote-Party-ID2 Sending Error Response ");								
+			}
+			if(!remotePID3.toString().trim().equals("<sip:4162375543@47.135.223.88;user=phone>; screen=yes; party=calling; privacy=off")) {
+				sendErrorResponse = true;
+				logger.info("Remote-Party-ID3 Sending Error Response ");
+			}
+			if(!remotePID4.toString().trim().equals("\"KATE SMITH\" <sip:4162375543@47.135.223.88>; screen=yes; party=calling; privacy=off")) {
+				sendErrorResponse = true;
+				logger.info("Remote-Party-ID4 Sending Error Response ");
+			}
+			if(!remotePID5.toString().trim().equals("<sip:4162375543@47.135.223.88>; screen=yes; party=calling; privacy=off")) {
+				sendErrorResponse = true;
+				logger.info("Remote-Party-ID5 Sending Error Response ");
+			}		
+			if(sendErrorResponse) {
+				SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+				sipServletResponse.send();
+				return;
+			}
+		}
+		
 		request.getAddressHeader(TEST_NON_EXISTING_HEADER);
 		request.getHeader(TEST_NON_EXISTING_HEADER);		
 		request.getHeaders(TEST_NON_EXISTING_HEADER);

@@ -298,6 +298,26 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertTrue(sender.getOkToByeReceived());		
 	}
 	
+	/**
+	 * Non Regression Test for Issue http://code.google.com/p/mobicents/issues/detail?id=2201
+	 * javax.servlet.sip.ServletParseException: Impossible to parse the following header Remote-Party-ID as an address.
+	 */
+	public void testShootmeRemotePartyID() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "RemotePartyId";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Remote-Party-ID", "Remote-Party-ID2", "Remote-Party-ID3", "Remote-Party-ID4", "Remote-Party-ID5"}, new String[] {"\"KATE SMITH\"<sip:4162375543@47.135.223.88;user=phone>; party=calling; privacy=off; screen=yes", "sip:4162375543@47.135.223.88;user=phone; party=calling; privacy=off; screen=yes", "<sip:4162375543@47.135.223.88;user=phone>; party=calling; privacy=off; screen=yes", "\"KATE SMITH\"<sip:4162375543@47.135.223.88>; party=calling; privacy=off; screen=yes", "<sip:4162375543@47.135.223.88>; party=calling; privacy=off; screen=yes"}, true);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());		
+	}
+	
 	public void testShootmeRegister() throws Exception {
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
