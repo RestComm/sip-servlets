@@ -21,6 +21,8 @@
  */
 package org.jboss.web.tomcat.service.session;
 
+import javax.servlet.sip.ServletTimer;
+
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.timers.SipServletTimerService;
 
@@ -30,6 +32,6 @@ import org.mobicents.servlet.sip.core.timers.SipServletTimerService;
  */
 public interface ClusteredSipServletTimerService extends SipServletTimerService {
 
-	void rescheduleTimerLocally(MobicentsSipApplicationSession sipApplicationSession, String timerId);
+	ServletTimer rescheduleTimerLocally(MobicentsSipApplicationSession sipApplicationSession, String timerId);
 
 }

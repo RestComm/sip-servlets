@@ -180,8 +180,8 @@ public class FaultTolerantSasTimerService implements ClusteredSipApplicationSess
 			FaultTolerantSasTimerTask faultTolerantSasTimerTask = new FaultTolerantSasTimerTask(sipApplicationSession, timerTaskData);
 			sipApplicationSession.setExpirationTimerTask(faultTolerantSasTimerTask);
 			if(timerTaskData != null) {
-				if(logger.isInfoEnabled()) {
-					logger.info("Task for sip application session " + taskId + " is not present locally, but on another node, rescheduling it locally.");
+				if(logger.isDebugEnabled()) {
+					logger.debug("Task for sip application session " + taskId + " is not present locally, but on another node, cancelling the remote one and rescheduling it locally.");
 				}
 				// we cancel it, this will cause the remote owner node to remove it and cancel its local task 
 				getScheduler().cancel(taskId);
@@ -190,10 +190,9 @@ public class FaultTolerantSasTimerService implements ClusteredSipApplicationSess
 				// and reschedule it locally
 				getScheduler().schedule(faultTolerantSasTimerTask);
 			} else {
-				if(logger.isInfoEnabled()) {
-					logger.info("Task for sip application session " + taskId + " is not present locally, nor on another node, rescheduling it.");
+				if(logger.isDebugEnabled()) {
+					logger.debug("Task for sip application session " + taskId + " is not present locally, nor on another node, nothing can be done.");
 				}
-				getScheduler().schedule(faultTolerantSasTimerTask);
 			}
 		} else {
 			if(logger.isInfoEnabled()) {

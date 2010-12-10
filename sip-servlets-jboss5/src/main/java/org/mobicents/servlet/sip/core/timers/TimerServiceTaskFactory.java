@@ -49,9 +49,12 @@ public class TimerServiceTaskFactory implements TimerTaskFactory {
 	 */
 	public TimerTask newTimerTask(TimerTaskData data) {
 		MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(((TimerServiceTaskData)data).getKey(), false);
-		if(((SipContext)sipManager.getContainer()).getConcurrencyControlMode() != ConcurrencyControlMode.SipApplicationSession) {
-			return new TimerServiceTask(sipManager, null, (TimerServiceTaskData)data);
+		if(sipApplicationSession.getTimer((String)data.getTaskID()) == null) {
+			if(((SipContext)sipManager.getContainer()).getConcurrencyControlMode() != ConcurrencyControlMode.SipApplicationSession) {
+				return new TimerServiceTask(sipManager, null, (TimerServiceTaskData)data);
+			}
 		}
+		// returning null to avoid recovery since it was already recovered above
 		return null;
 	}
 

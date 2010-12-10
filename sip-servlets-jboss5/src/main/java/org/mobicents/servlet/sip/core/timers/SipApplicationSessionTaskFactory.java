@@ -53,20 +53,23 @@ public class SipApplicationSessionTaskFactory implements TimerTaskFactory {
 	public TimerTask newTimerTask(TimerTaskData data) {	
 		SipApplicationSessionTaskData sasData = (SipApplicationSessionTaskData)data;
 		MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(sasData.getKey(), false);
-		if(((SipContext)sipManager.getContainer()).getConcurrencyControlMode() != ConcurrencyControlMode.SipApplicationSession) {
-			if(logger.isDebugEnabled()) {
-				if(sipApplicationSession == null) {
-					logger.debug("sip application session for key " + sasData.getKey() + " was not found neither locally or in the cache, sas expiration timer recreation will be problematic");
-				} else {
-					logger.debug("sip application session for key " + sasData.getKey() + " was found");
+		if(sipApplicationSession.getExpirationTimerTask() == null) {
+			if(((SipContext)sipManager.getContainer()).getConcurrencyControlMode() != ConcurrencyControlMode.SipApplicationSession) {
+				if(logger.isDebugEnabled()) {
+					if(sipApplicationSession == null) {
+						logger.debug("sip application session for key " + sasData.getKey() + " was not found neither locally or in the cache, sas expiration timer recreation will be problematic");
+					} else {
+						logger.debug("sip application session for key " + sasData.getKey() + " was found");
+					}
 				}
-			}
-			FaultTolerantSasTimerTask faultTolerantSasTimerTask = new FaultTolerantSasTimerTask(sipApplicationSession, sasData);
-			if(sipApplicationSession != null) {
-				sipApplicationSession.setExpirationTimerTask(faultTolerantSasTimerTask);
-			}
-			return faultTolerantSasTimerTask;
-		} 
+				FaultTolerantSasTimerTask faultTolerantSasTimerTask = new FaultTolerantSasTimerTask(sipApplicationSession, sasData);
+				if(sipApplicationSession != null) {
+					sipApplicationSession.setExpirationTimerTask(faultTolerantSasTimerTask);
+				}
+				return faultTolerantSasTimerTask;
+			} 
+		}
+		// returning null to avoid recovery since it was already recovered above
 		return null;
 	}
 

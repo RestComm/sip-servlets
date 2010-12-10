@@ -209,7 +209,7 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 	 * (non-Javadoc)
 	 * @see org.jboss.web.tomcat.service.session.ClusteredSipServletTimerService#rescheduleTimerLocally(org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession, java.lang.String)
 	 */
-	public void rescheduleTimerLocally(MobicentsSipApplicationSession sipApplicationSession, String timerId) {		
+	public ServletTimer rescheduleTimerLocally(MobicentsSipApplicationSession sipApplicationSession, String timerId) {		
 		TimerTask timerTask = getScheduler().getLocalRunningTask(timerId);
 		if(timerTask == null) {
 			TimerServiceTaskData timerTaskData = (TimerServiceTaskData) getScheduler().getTimerTaskData(timerId);
@@ -218,8 +218,8 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 			TimerServiceTask timerServiceTask = new TimerServiceTask(sipManager, servletTimerImpl, timerTaskData);
 			
 			if(timerTaskData != null) {
-				if(logger.isInfoEnabled()) {
-					logger.info("Task " + timerId + " is not present locally, but on another node, rescheduling it locally.");
+				if(logger.isDebugEnabled()) {
+					logger.debug("Task " + timerId + " is not present locally, but on another node, cancelling the remote one and rescheduling it locally.");
 				}
 				// we cancel it, this will cause the remote owner node to remove it and cancel its local task 
 				getScheduler().cancel(timerId);				
@@ -228,16 +228,18 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 				// and reschedule it locally
 				getScheduler().schedule(timerServiceTask);
 			} else {
-				if(logger.isInfoEnabled()) {
-					logger.info("Task " + timerId + " is not present locally, nor on another node, rescheduling it.");
+				if(logger.isDebugEnabled()) {
+					logger.debug("Task " + timerId + " is not present locally, nor on another node, rescheduling it.");
 				}
 				// and reschedule it locally
 				getScheduler().schedule(timerServiceTask);
 			}
+			return timerServiceTask;
 		} else {
 			if(logger.isInfoEnabled()) {
 				logger.info("Task " + timerId + " is already present locally no need to reschedule it.");
 			}
+			return null;
 		}
 	}
 	
