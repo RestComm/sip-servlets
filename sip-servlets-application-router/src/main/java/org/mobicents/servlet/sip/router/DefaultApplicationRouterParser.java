@@ -190,8 +190,8 @@ public class DefaultApplicationRouterParser {
 			public int compare(DefaultSipApplicationRouterInfo arg0,
 					DefaultSipApplicationRouterInfo arg1) {
 				if(arg0.getOrder()==arg1.getOrder()) return 0;
-				if(arg0.getOrder()>arg1.getOrder()) return -1;
-				return 1;
+				if(arg0.getOrder()>arg1.getOrder()) return 1;
+				return -1;
 			}
 			
 		});
