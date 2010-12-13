@@ -1638,6 +1638,24 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			throw new RuntimeException("This application router is not manageable");
 		}
 	}
+	
+	public Serializable retrieveApplicationRouterConfigurationString() {
+		if(this.sipApplicationRouter instanceof ManageableApplicationRouter) {
+			ManageableApplicationRouter router = (ManageableApplicationRouter) this.sipApplicationRouter;
+			return (Serializable) router.getCurrentConfiguration();
+		} else {
+			throw new RuntimeException("This application router is not manageable");
+		}
+	}
+	
+	public void updateApplicationRouterConfiguration(Serializable configuration) {
+		if(this.sipApplicationRouter instanceof ManageableApplicationRouter) {
+			ManageableApplicationRouter router = (ManageableApplicationRouter) this.sipApplicationRouter;
+			router.configure(configuration);
+		} else {
+			throw new RuntimeException("This application router is not manageable");
+		}
+	}
 
 	public ConcurrencyControlMode getConcurrencyControlMode() {
 		return concurrencyControlMode;

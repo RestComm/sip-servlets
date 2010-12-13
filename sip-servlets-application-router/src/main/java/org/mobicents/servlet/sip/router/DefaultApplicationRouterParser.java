@@ -27,6 +27,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -178,9 +180,21 @@ public class DefaultApplicationRouterParser {
 				sipApplicationRouterInfosStringified.substring(indexOfLeftParenthesis, indexOfRightParenthesis +1);
 			DefaultSipApplicationRouterInfo sipApplicationRouterInfo = parseSipApplicationRouterInfo(sipApplicationRouterInfoStringified);
 			//get the index order from the default application router properties file			
-			sipApplicationRouterInfos.add(sipApplicationRouterInfo.getOrder(),sipApplicationRouterInfo);
+			sipApplicationRouterInfos.add(sipApplicationRouterInfo);
 			sipApplicationRouterInfosStringified = sipApplicationRouterInfosStringified.substring(indexOfRightParenthesis + 1);
 		}
+		
+		// Sort based on the app number
+		Collections.sort(sipApplicationRouterInfos, new Comparator<DefaultSipApplicationRouterInfo>() {
+
+			public int compare(DefaultSipApplicationRouterInfo arg0,
+					DefaultSipApplicationRouterInfo arg1) {
+				if(arg0.getOrder()==arg1.getOrder()) return 0;
+				if(arg0.getOrder()>arg1.getOrder()) return -1;
+				return 1;
+			}
+			
+		});
 		return sipApplicationRouterInfos;
 	}
 
