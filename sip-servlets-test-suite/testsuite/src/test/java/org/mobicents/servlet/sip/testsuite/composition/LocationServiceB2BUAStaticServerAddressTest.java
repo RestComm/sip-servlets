@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.testsuite.composition;
 import java.io.File;
 
 import gov.nist.javax.sip.header.Contact;
+import gov.nist.javax.sip.header.Via;
 
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
@@ -33,6 +34,12 @@ import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class LocationServiceB2BUAStaticServerAddressTest extends SipServletTestCase {
 	
+	private static final String HOST = "127.0.0.1";
+
+	private static final int MSS_PORT = 5070;
+
+	private static final int IP_LOAD_BALANCER_PORT = 5005;
+
 	private static transient Logger logger = Logger.getLogger(LocationServiceB2BUAStaticServerAddressTest.class);
 
 	private static final String TRANSPORT = "udp";
@@ -97,8 +104,8 @@ public class LocationServiceB2BUAStaticServerAddressTest extends SipServletTestC
 		SipProtocolHandler udpProtocolHandler = (SipProtocolHandler) udpSipConnector
 				.getProtocolHandler();
 		try {
-			udpProtocolHandler.setPort(5070);
-			udpProtocolHandler.setIpAddress("127.0.0.1");
+			udpProtocolHandler.setPort(MSS_PORT);
+			udpProtocolHandler.setIpAddress(HOST);
 
 			udpProtocolHandler.setSignalingTransport("udp");
 		} catch (Exception e) {
@@ -107,8 +114,8 @@ public class LocationServiceB2BUAStaticServerAddressTest extends SipServletTestC
 		}
 		tomcat.getSipService().setSipStackProperties(null);
 		udpProtocolHandler.setUseStaticAddress(true);
-		udpProtocolHandler.setStaticServerAddress("127.0.0.1");
-		udpProtocolHandler.setStaticServerPort(5005);
+		udpProtocolHandler.setStaticServerAddress(HOST);
+		udpProtocolHandler.setStaticServerPort(IP_LOAD_BALANCER_PORT);
 		tomcat.getSipService().addConnector(udpSipConnector);
 		try {
 			tomcat.startTomcat();
@@ -131,15 +138,15 @@ public class LocationServiceB2BUAStaticServerAddressTest extends SipServletTestC
 			new File("proxy-b2bua.case.flag").createNewFile();
 			assertFalse(new File("proxy-b2bua.failure.flag").exists());
 
-			sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+			sender = new TestSipListener(5080, IP_LOAD_BALANCER_PORT, senderProtocolObjects, true);
 			sender.setRecordRoutingProxyTesting(true);
 			SipProvider senderProvider = sender.createProvider();
 
-			receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+			receiver = new TestSipListener(5090, IP_LOAD_BALANCER_PORT, receiverProtocolObjects, false);
 			receiver.setRecordRoutingProxyTesting(true);
 			SipProvider receiverProvider = receiver.createProvider();
 
-			ipBalancer = new UDPPacketForwarder(5005, 5070, "127.0.0.1");
+			ipBalancer = new UDPPacketForwarder(IP_LOAD_BALANCER_PORT, MSS_PORT, HOST);
 			ipBalancer.start();
 
 			receiverProvider.addSipListener(receiver);
@@ -154,18 +161,38 @@ public class LocationServiceB2BUAStaticServerAddressTest extends SipServletTestC
 					fromName, fromHost);
 
 			String toUser = "proxy-b2bua";
-			String toHost = "127.0.0.1:5070";
+			String toHost = HOST+":"+MSS_PORT;
 			SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 					toUser, toHost);
 
 			sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 			Thread.sleep(TIMEOUT);
+			int byes = 0;
+			
+			assertTrue(
+					receiver.getByeRequestReceived().getHeader(Via.NAME).toString().contains(":"+IP_LOAD_BALANCER_PORT));
+		
+			for(String message:ipBalancer.sipMessageWithoutRetrans) {
+				if(message.contains("BYE ")) {
+					byes++;
+				}
+			}
+			assertEquals(1, byes);
+			
+			for(String message:ipBalancer.sipMessages) {
+				if(message.contains("BYE " + "sip:" + HOST+":"+IP_LOAD_BALANCER_PORT)) {
+					fail("Proxied request is going though IP LB. We should bypass it");
+				}
+			}
+			
 			assertTrue(sender.getOkToByeReceived());
 			assertTrue(receiver.getByeReceived());
 			Contact contact = (Contact) sender.getInviteOkResponse().getHeader(Contact.NAME);
 			SipURI sipURI = (SipURI) contact.getAddress().getURI();
-			assertTrue(sipURI.getPort() == 5005);
+			assertTrue(sipURI.getPort() == IP_LOAD_BALANCER_PORT);
 			assertFalse(new File("proxy-b2bua.failure.flag").exists());
+			
+			
 		} finally {
 			new File("proxy-b2bua.case.flag").delete();
 			new File("proxy-b2bua.failure.flag").delete();

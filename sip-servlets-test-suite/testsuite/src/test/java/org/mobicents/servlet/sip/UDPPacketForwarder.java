@@ -3,10 +3,9 @@ package org.mobicents.servlet.sip;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Inet4Address;
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 public class UDPPacketForwarder {
 	int fromPort;
@@ -15,10 +14,14 @@ public class UDPPacketForwarder {
 	boolean running;
 	DatagramSocket fromSocket;
 	Thread worker;
+	public LinkedList<String> sipMessages;
+	public HashSet<String> sipMessageWithoutRetrans;
 	public UDPPacketForwarder(int fromPort, int toPort, String bind) {
 		this.fromPort = fromPort;
 		this.toPort = toPort;
 		this.bindAddress = bind;
+		sipMessages = new LinkedList<String>();
+		sipMessageWithoutRetrans = new HashSet<String>();
 	}
 	
 	public void start() {
@@ -32,6 +35,9 @@ public class UDPPacketForwarder {
 						DatagramPacket packet = new DatagramPacket(new byte[3000], 3000);
 						try {
 							fromSocket.receive(packet);
+							String sipMessage = new String(packet.getData());
+							sipMessages.add(sipMessage);
+							sipMessageWithoutRetrans.add(sipMessage);
 							packet.setPort(toPort);
 							fromSocket.send(packet);
 						} catch (IOException e) {
