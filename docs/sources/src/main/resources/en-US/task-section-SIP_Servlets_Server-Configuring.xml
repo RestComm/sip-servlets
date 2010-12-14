@@ -198,7 +198,7 @@ ipAddress="127.0.0.1"
             </listitem>
             <listitem>
               <para>If the property <literal>org.mobicents.servlet.sip.USER_AGENT_HEADER</literal> is set, A Server header will be added to all SIP Requests leaving the container.</para>
-            </listitem>            
+            </listitem>                            
            </itemizedlist>
         </listitem>
       </varlistentry>

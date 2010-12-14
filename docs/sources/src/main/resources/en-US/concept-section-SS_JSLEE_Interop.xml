@@ -78,7 +78,7 @@
             </entry>
           </row>
           <row>
-            <entry align="center">SIP and HTTP</entry>
+            <entry align="center">SIP, HTTP and Media (JSR 309)</entry>
             <entry align="center">Protocol agnostic. Consistent event model, regardless of protocol/resource</entry>
           </row>
           <row>

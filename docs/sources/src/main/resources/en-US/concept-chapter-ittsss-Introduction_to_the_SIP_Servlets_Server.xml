@@ -19,13 +19,16 @@
       <para>the first <emphasis>certified</emphasis> SIP Servlet v1.1 (JSR 289) implementation</para>
     </listitem>
     <listitem>
-      <para>a current call rate of 100 calls per second over a 24-hour duration: 8,640,000 total calls</para>
+      <para>carrier grade performance</para>
     </listitem>
     <listitem>
       <para>load balancing, cluster and failover support</para>
     </listitem>
     <listitem>
-      <para>merged SIP and HTTP session management</para>
+      <para>converged SIP and HTTP session management</para>
+    </listitem>
+    <listitem>
+      <para>Media and Diameter support</para>
     </listitem>
     <listitem>
       <para>a browser-based Management Console</para>
