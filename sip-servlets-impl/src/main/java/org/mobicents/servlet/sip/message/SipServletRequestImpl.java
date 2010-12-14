@@ -1304,8 +1304,26 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					session.removeSubscription(this);
 				}
 			}					
-			
+
 			updateContactHeaderTransport(transport);
+
+			if(sipConnector != null && sipConnector.isUseStaticAddress()) {
+				javax.sip.address.URI uri = request.getRequestURI();
+				RouteHeader route = (RouteHeader) request.getHeader(RouteHeader.NAME);
+				if(route != null) {
+					uri = route.getAddress().getURI();
+				}
+				if(uri.isSipURI()) {
+					javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
+					String host = sipUri.getHost();
+					int port = sipUri.getPort();
+					if(sipFactoryImpl.getSipApplicationDispatcher().isExternal(host, port, transport)) {
+						viaHeader.setHost(sipConnector.getStaticServerAddress());
+						viaHeader.setPort(sipConnector.getStaticServerPort());
+					}
+				}
+			}
+
 
 			//updating the last accessed times 
 			session.access();
