@@ -33,15 +33,7 @@
         </varlistentry>
       </variablelist>
     </section>
-<!-- <section
-  id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Downloading">
-  <title>Downloading</title>
-  <para>&nbsp;</para>
- </section> --><!--<section
-   id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Installing">
-   <title>Installing</title>
-   <para>&nbsp;</para>
-  </section>-->    <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Configuring">
+   <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Configuring">
       <title>Configuring</title>
       <para>Once installed, the &SHORT_PLATFORM_NAME; for JBoss binary distribution requires only minor configuration in order to enable clustering. </para>
       <para>SIP, and HTTP session state clustering is  pre-configured straight out of the binary distribution. However, to enable session replication in a node, you must tag it as <literal>&lt;distributable/&gt;</literal> both in the <filename>web.xml</filename> and <filename>sip.xml</filename> descriptors. This can be done only individually (per application).</para>
@@ -94,11 +86,7 @@ outboundProxy=&quot;127.0.0.1:5500&quot;
       <para>In this example configuration all outbound requests will go through 127.0.0.1:5500, while the node will perform the health checks against two SIP load balancers. If the 127.0.0.1:5500 machine is an IP load balancer it should be configured to spray the  SIP load balancers and they will route the requests outside the cluster reliably.</para>
       <para>The <literal>outboundProxy</literal> attribute overrides the default effect of specifying a SIP port for SIP load balancers in the <literal>balancers</literal> string.</para>
     </section>
-<!--<section
-   id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Using">
-   <title>Using</title>
-   <para>&nbsp;</para>
-  </section>-->    <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Stopping">
+<section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Stopping">
       <title>Stopping</title>
       <para>Individual nodes in the cluster should be stopped one-by-one, followed by the SIP load balancer. Refer to:</para>
       <itemizedlist>
@@ -132,4 +120,185 @@ outboundProxy=&quot;127.0.0.1:5500&quot;
       <para>Uninstalling a SIP Servlets Cluster would entail deleting the Mobicents SIP Servlets Servers directories, the SIP Load Balancer directory, and possibly removing the unused <envar>JBOSS_HOME</envar> environment variable.</para>
     </section>
   </section>
+  <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-SIP-Passivation">
+    <title>SIP Sessions Passivation/Activation</title>
+    <para>&nbsp;</para>
+     <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-SIP-Passivation-Description">
+    <title>Description of SIP Sessions passivation</title>
+    <para>
+    	Passivation is the process of controlling memory usage by removing relatively unused sessions from memory while storing them in persistent storage. 
+    	If a passivated session is requested by a client, it can be "activated" back into memory and removed from the persistent store. 
+    	Mobicents Sip Servlets  supports passivation of SipSessions (and by extension SIP Dialogs) and SipApplicationSessions  sipapps whose sip.xml includes the <literal>distributable</literal> tag (i.e. clustered sipapps).
+ </para>
+ <para>
+		Passivation occurs at 2 points during the lifecycle of a sip application:
+</para>
+ <itemizedlist>
+ 	<listitem><para>
+When the container requests the creation of a new SIP Session or SIP Application Session. 
+If the number of currently active session exceeds a configurable limit, an attempt is made to passivate sessions to make room in memory .
+</para>
+ </listitem>
+ <listitem><para>
+Periodically (by default every ten seconds) as the JBoss Web background thread runs.
+</para>
+ </listitem>
+ </itemizedlist>
+ <para>
+A session will be passivated if one of the following holds true:
+</para>
+ <itemizedlist>
+ 	<listitem><para>
+The session hasn't been used in greater than a configurable maximum idle time.
+</para>
+ </listitem>
+ <listitem><para>
+The number of active sessions exceeds a configurable maximum and the session hasn't been used in greater than a configurable minimum idle time.
+</para>
+ </listitem>
+ </itemizedlist>
+ <para> 
+In both cases, sessions are passivated on a Least Recently Used (LRU) basis.
+    </para>
+    </section>
+     <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-SIP-Passivation-Configuration">
+		    <title>Configuring Distributable SIP Session Passivation in your SIP Application</title>
+		    <para>
+		    &nbsp;
+		    </para>
+		     <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-SIP-Passivation-Configuration-Step1">
+			    <title>Step 1 : Add the following to jboss-web.xml for your sip application</title>
+			    <para>&nbsp;</para>
+			    <programlisting role="XML">
+				   &lt;max-active-sessions&gt;20&lt;/max-active-sessions&gt;
+				   &lt;passivation-config&gt;
+				      &lt;use-session-passivation&gt;true&lt;/use-session-passivation&gt;
+				      &lt;passivation-min-idle-time&gt;60&lt;/passivation-min-idle-time&gt;
+				      &lt;passivation-max-idle-time&gt;600&lt;/passivation-max-idle-time&gt;
+				   &lt;/passivation-config&gt;
+				</programlisting>
+				<itemizedlist>
+				 	<listitem>
+				 		<para>
+							<literal>max-active-sessions</literal>  Determines the maximum number of active sessions allowed. If the number of sessions managed by the the session manager exceeds this value and passivation is enabled, the excess will be passivated based on the configured passivation-min-idle-time. If after passivation is completed (or if passivation is disabled), the number of active sessions still exceeds this limit, attempts to create new sessions will be rejected. If set to -1 (the default), there is no limit
+						</para>
+				 	</listitem>
+				 	<listitem>
+				 		<para>
+							<literal>passivation-min-idle-time</literal>  Determines the minimum time (in seconds) that a session must have been inactive before the container will consider passivating it in order to reduce the active session count below max-active-sessions.  A value of -1 (the default) disables passivating sessions before passivation-max-idle-time.  Neither a value of -1 nor a high value are recommended if max-active-sessions is set.
+						</para>
+				 	</listitem>
+				 	<listitem>
+				 		<para>
+							<literal>passivation-max-idle-time</literal> Determines the maximum time (in seconds) that a session can be inactive before the container should attempt to passivate it to save memory. Passivation of such sessions will take place regardless of whether the active session count exceeds max-active-sessions.  Should be less than the sip.xml session-timeout setting. A value of -1 (the default) disables passivation based on maximum inactivity.
+						</para>
+				 	</listitem>
+				 	<listitem>
+				 		<para>
+							<literal>use-session-passivation</literal>  Determines whether session passivation will be enabled for the web application. Default is false.
+						</para>
+				 	</listitem>
+				 </itemizedlist>
+		    </section>
+		    <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-SIP-Passivation-Configuration-Step2">
+			    <title>Step 2 : Configure the JBoss Cache cache loader</title>
+			    <para>In most cases you don't need to do anything for Step 2; the standard JBoss AS configuration for distributable session caching should suit your needs.  The following is a bit more detail in case you're interested or want to change from the defaults.</para>
+			    <para>SIP Session passivation relies on JBoss Cache's Cache Loader passivation for storing and retrieving the passivated sessions. 
+			    Therefore the cache instance used by your sipapps clustered session manager must be configured to enable Cache Loader passivaton.
+			    
+				The Cache Loader configuration for the <literal>standard-session-cache</literal> config is as follows:</para>
+			    <programlisting role="XML">
+					   &lt;property name=&quot;cacheLoaderConfig&quot;&gt;
+			             &lt;bean class=&quot;org.jboss.cache.config.CacheLoaderConfig&quot;&gt;
+			                    &lt;!-- Do not change these --&gt;
+			                    &lt;property name=&quot;passivation&quot;&gt;true &lt;/property&gt;			                   
+			                    &lt;property name=&quot;shared&quot;&gt;false &lt;/property&gt;
+			                   
+			                    &lt;property name=&quot;individualCacheLoaderConfigs&quot;&gt;
+			                      &lt;list&gt;
+			                         &lt;bean class=&quot;org.jboss.cache.loader.FileCacheLoaderConfig&quot;&gt;
+			                            &lt;!-- Where passivated sessions are stored --&gt;
+			                            &lt;property name=&quot;location&quot;&gt;${jboss.server.data.dir}${/}session &lt;/property&gt;
+			                            &lt;!-- Do not change these --&gt;
+			                            &lt;property name=&quot;async&quot;&gt;false &lt;/property&gt;
+			                            &lt;property name=&quot;fetchPersistentState&quot;&gt;true &lt;/property&gt;
+			                            &lt;property name=&quot;purgeOnStartup&quot;&gt;true &lt;/property&gt;
+			                            &lt;property name=&quot;ignoreModifications&quot;&gt;false &lt;/property&gt;
+			                            &lt;property name=&quot;checkCharacterPortability&quot;&gt;false &lt;/property&gt;
+			                         &lt;/bean&gt;
+			                      &lt;/list&gt;
+			                    &lt;/property&gt;
+			             &lt;/bean&gt;
+			          &lt;/property&gt;
+				</programlisting>
+				<itemizedlist>
+				 	<listitem>
+				 		<para>
+							<literal>passivation</literal> property MUST be true
+						</para>
+				 	</listitem>
+				 	<listitem>
+				 		<para>
+							<literal>shared</literal>  property MUST be false. Do not passivate sessions to a shared persistent store, otherwise if another node activates the session, it will be gone from the persistent store and also gone from memory on other nodes that have passivated it. Backup copies will be lost.
+						</para>
+				 	</listitem>
+				 	<listitem>
+				 		<para>
+							<literal>individualCacheLoaderConfigs</literal> property accepts a list of Cache Loader configurations. JBC allows you to chain cache loaders; see the JBC docs. For the session passivation use case a single cache loader is sufficient.
+						</para>
+				 	</listitem>
+				 	<listitem>
+				 		<para>
+							<literal>class</literal>  attribute on a cache loader config bean MUST refer to the configuration class for a cache loader implementation (e.g. org.jboss.cache.loader.FileCacheLoaderConfig, org.jboss.cache.loader.JDBCCacheLoaderConfig). See the JBoss Cache documentation for more on the available CacheLoader implementations. If you wish to use JDBCCacheLoader (to persist to a database rather than the filesystem used by FileCacheLoader) note the comment above about the shared property.  Don't use a shared database, or at least not a shared table in the database.  Each node in the cluster must have its own storage location.
+						</para>
+				 	</listitem>
+				 	<listitem>
+				 		<para>
+							<literal>location</literal>  property for FileCacheLoaderConfig defines the root node of the filesystem tree where passivated session should be stored. The default is to store them in your JBoss AS configuration's data directory.
+						</para>
+				 	</listitem>
+				 	<listitem>
+				 		<para>
+							<literal>async</literal>  MUST be false to ensure passivated sessions are promptly written to the persistent store.
+						</para>
+				 	</listitem>
+				 	<listitem>
+				 		<para>
+							<literal>fetchPersistentState</literal>  MUST be true to ensure passivated sessions are included in the set of session backup copies transferred over from other nodes when the cache starts.
+						</para>
+				 	</listitem>
+				 	<listitem>
+				 		<para>
+							<literal>purgeOnStartup</literal>  should be true to ensure out-of-date session data left over from a previous shutdown of a server doesn't pollute the current data set.
+						</para>
+				 	</listitem>
+				 	<listitem>
+				 		<para>
+							<literal>ignoreModifications</literal>  should be false.
+						</para>
+				 	</listitem>
+				 	<listitem>
+				 		<para>
+							<literal>checkCharacterPortability</literal>   should be false as a minor performance optimization.
+						</para>
+				 	</listitem>
+				 </itemizedlist>
+				 <para>Refer to the JBossCache documentation for further details about Cache Loader configuration.</para>
+		    </section>
+    </section>
+     <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-SIP-Passivation-Server-Wide-Configuration">
+		    <title>Configuring Server-Wide Passivation Defaults</title>
+		    <para>
+		    The section on jboss-web.xml configuration above described how to configure passivation on a sipapp-by-sipapp basis.
+		     If you are deploying several sipapps and each uses the same set of passivation configurations, you may wish to skip the jboss-web.xml configuration and just change the server-wide defaults.  This can be done by uncommenting the following section in the $JBOSS_HOME/server/xxx/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml file's WebAppClusteringDefaultsDeployer and setting the values you desire:
+		    </para>
+		     <programlisting role="XML">
+						  &lt;!--
+					       &lt;property name=&quot;useSessionPassivation&quot;&gt;false &lt;/property&gt;
+					       &lt;property name=&quot;passivationMaxIdleTime&quot;&gt;-1 &lt;/property&gt;
+					       &lt;property name=&quot;passivationMinIdleTime&quot;&gt;-1 &lt;/property&gt;
+					      --&gt;
+				</programlisting>
+	</section>
+    </section>
 </section>
