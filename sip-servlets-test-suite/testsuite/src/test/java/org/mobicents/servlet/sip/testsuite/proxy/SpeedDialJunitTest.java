@@ -149,6 +149,38 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isServerErrorReceived());
 	}
+	
+	public void testSpeedDialDeclineErrorResponse() throws Exception {	
+		deploySpeedDial("record_route", "false");
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		sender.setSendSubsequentRequestsThroughSipProvider(true);
+		sender.setRecordRoutingProxyTesting(true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		receiver.setRecordRoutingProxyTesting(true);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+		receiver.setRespondWithError(603);
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "sender-expect-603";
+		String fromHost = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromHost);
+				
+		String toUser = "9";
+		String toHost = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toHost);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isServerErrorReceived());
+	}
 
 	public void testSpeedDialCalleeSendBye() throws Exception {
 		deploySpeedDial("record_route", "false");
