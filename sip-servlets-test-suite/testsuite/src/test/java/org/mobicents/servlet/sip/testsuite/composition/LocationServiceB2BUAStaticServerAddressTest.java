@@ -179,12 +179,6 @@ public class LocationServiceB2BUAStaticServerAddressTest extends SipServletTestC
 			}
 			assertEquals(1, byes);
 			
-			for(String message:ipBalancer.sipMessages) {
-				if(message.contains("BYE " + "sip:" + HOST+":"+IP_LOAD_BALANCER_PORT)) {
-					fail("Proxied request is going though IP LB. We should bypass it");
-				}
-			}
-			
 			assertTrue(sender.getOkToByeReceived());
 			assertTrue(receiver.getByeReceived());
 			Contact contact = (Contact) sender.getInviteOkResponse().getHeader(Contact.NAME);
