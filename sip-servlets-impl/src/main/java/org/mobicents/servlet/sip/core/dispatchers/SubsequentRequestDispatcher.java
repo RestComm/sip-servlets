@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.core.dispatchers;
 import gov.nist.javax.sip.header.extensions.JoinHeader;
 import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 import gov.nist.javax.sip.message.MessageExt;
+import gov.nist.javax.sip.stack.SIPServerTransaction;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.IOException;
@@ -27,9 +28,7 @@ import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.ProxyBranch;
-import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipServletResponse;
-import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
@@ -55,7 +54,6 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
-import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
@@ -130,12 +128,12 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				// Issue 823 (http://code.google.com/p/mobicents/issues/detail?id=823) : 
 				// Container should proxy statelessly subsequent requests not targeted at itself
 				if(isAnotherDomain) {	
-					if(Request.ACK.equals(method)) {
+					if(Request.ACK.equals(method) && sipServletRequest.getTransaction() != null && ((SIPServerTransaction)sipServletRequest.getTransaction()).getLastResponseStatusCode() >= 300) {
 						// Issue 2213 (http://code.google.com/p/mobicents/issues/detail?id=2213) :
 						// ACK for final error response are proxied statelessly for proxy applications
 						//Means that this is an ACK to a container generated error response, so we can drop it
 						if(logger.isDebugEnabled()) {
-							logger.debug("The popped Route, application Id and name are null for an ACK, so this is an ACK to a container generated error response, so it is dropped");
+							logger.debug("The popped Route, application Id and name are null for an ACK, and this is an ACK for an error response, so it is dropped");
 						}				
 						return ;
 					} 
