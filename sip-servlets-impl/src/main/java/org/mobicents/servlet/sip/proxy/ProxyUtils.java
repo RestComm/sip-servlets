@@ -133,7 +133,7 @@ public class ProxyUtils {
 				}
 				
 				SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(outboundTransport);
-				if(sipConnector.isUseStaticAddress()) {
+				if(sipConnector != null && sipConnector.isUseStaticAddress()) {
 					
 					// This is needed because otherwise we have the IP LB address here. If there is no route header
 					// this means the request will go to the IP LB. For outbound requests we must bypass the IP LB.
