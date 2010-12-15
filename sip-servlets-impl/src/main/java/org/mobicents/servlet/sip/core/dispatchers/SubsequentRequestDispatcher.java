@@ -129,7 +129,16 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				final boolean isAnotherDomain = sipApplicationDispatcher.isExternal(host, port, transport);
 				// Issue 823 (http://code.google.com/p/mobicents/issues/detail?id=823) : 
 				// Container should proxy statelessly subsequent requests not targeted at itself
-				if(isAnotherDomain) {					
+				if(isAnotherDomain) {	
+					if(Request.ACK.equals(method)) {
+						// Issue 2213 (http://code.google.com/p/mobicents/issues/detail?id=2213) :
+						// ACK for final error response are proxied statelessly for proxy applications
+						//Means that this is an ACK to a container generated error response, so we can drop it
+						if(logger.isDebugEnabled()) {
+							logger.debug("The popped Route, application Id and name are null for an ACK, so this is an ACK to a container generated error response, so it is dropped");
+						}				
+						return ;
+					} 
 					// Some UA are misbehaving and don't follow the non record proxy so they sent subsequent requests to the container (due to oubound proxy set probably) instead of directly to the UA
 					// so we proxy statelessly those requests
 					if(logger.isDebugEnabled()) {
