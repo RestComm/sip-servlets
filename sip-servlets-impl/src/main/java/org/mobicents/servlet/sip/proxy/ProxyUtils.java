@@ -38,6 +38,7 @@ import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
@@ -46,6 +47,7 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
+import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 /**
  * TODO: Use outbound interface from ProxyParams.outboundInterface when adding local
  * listening point addresses.
@@ -63,6 +65,22 @@ public class ProxyUtils {
 			final SipFactoryImpl sipFactoryImpl = proxy.getSipFactoryImpl();
 			((SIPMessage)clonedRequest).setApplicationData(null);
 
+			
+			String outboundTransport = JainSipUtils.findTransport(clonedRequest);
+			
+			if(proxy.getOutboundInterface() != null) {
+				outboundTransport = proxy.getOutboundInterface().getTransportParam();
+				if(outboundTransport == null) {
+					if(proxy.getOutboundInterface().isSecure()) {
+						outboundTransport =  ListeningPoint.TCP;
+					} else {
+						outboundTransport =  ListeningPoint.UDP;
+					}
+				}
+			}
+			if(outboundTransport == null) outboundTransport = originalRequest.getSipSession().getTransport();
+			if(outboundTransport == null) outboundTransport = ListeningPoint.UDP;
+			
 			// The target is null when proxying subsequent requests (the Route header is already there)
 			if(destination != null)
 			{				
@@ -89,6 +107,7 @@ public class ProxyUtils {
 					if(logger.isDebugEnabled()){
 						logger.debug("NOT setting request uri as cloned request has at least one Route header: " + route);
 					}
+
 				}
 				
 //				// Add route header
@@ -111,6 +130,18 @@ public class ProxyUtils {
 				if (method.equals(Request.CANCEL)) {
 					clonedRequest.removeHeader(ViaHeader.NAME);
 					clonedRequest.removeHeader(RecordRouteHeader.NAME);
+				}
+				
+				SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(outboundTransport);
+				if(sipConnector.isUseStaticAddress()) {
+					
+					// This is needed because otherwise we have the IP LB address here. If there is no route header
+					// this means the request will go to the IP LB. For outbound requests we must bypass the IP LB.
+					// http://code.google.com/p/mobicents/issues/detail?id=2210
+					clonedRequest.setRequestURI(((URIImpl)(proxyBranch).getTargetURI()).getURI());
+					if(logger.isDebugEnabled()){
+						logger.debug("setting request uri as cloned request has no Route headers and is using static address: " + destination);
+					}
 				}
 			}
 
@@ -146,14 +177,7 @@ public class ProxyUtils {
 							sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest, branchId, null);
 				} else { 
 					//If outbound interface is specified use it
-					String outboundTransport = proxy.getOutboundInterface().getTransportParam();
-					if(outboundTransport == null) {
-						if(proxy.getOutboundInterface().isSecure()) {
-							outboundTransport =  ListeningPoint.TCP;
-						} else {
-							outboundTransport =  ListeningPoint.UDP;
-						}
-					}
+					
 					String branchId = null;
 
 					if(Request.ACK.equals(method) && proxyBranchRequest != null && proxyBranchRequest.getTransaction() != null) {
