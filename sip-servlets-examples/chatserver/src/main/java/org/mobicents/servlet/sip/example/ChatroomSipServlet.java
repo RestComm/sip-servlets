@@ -42,6 +42,8 @@ public class ChatroomSipServlet extends SipServlet {
 	/** Context attribute key to store user list. */
     public final static String USER_LIST="userList";
     
+    private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
+    
     /** Init parameter key to retrieve the chatroom's address. */
     public final static String CHATROOM_SERVER_NAME="chatroomservername";
 
@@ -72,7 +74,7 @@ public class ChatroomSipServlet extends SipServlet {
 	@Override
 	public void destroy() {
 		try {
-            sendToAll(serverAddress, "Server is shutting down -- goodbye!");
+            sendToAll(serverAddress, "Server is shutting down -- goodbye!", CONTENT_TYPE);
         } catch (Throwable e) { 
         	//ignore all errors when shutting down.
             e.printStackTrace();
@@ -86,11 +88,13 @@ public class ChatroomSipServlet extends SipServlet {
 
         request.createResponse(SipServletResponse.SC_OK).send();            
 
-        String message = request.getContent().toString();
-        String from = request.getFrom().toString();
+        Object message = request.getContent();
+        String from = request.getFrom().getURI().toString();
+        
+        logger.info("from is "+ from);
         
         //A user asked to quit.
-        if(message.equalsIgnoreCase("/quit")) {
+        if(message.toString().equalsIgnoreCase("/quit")) {
             sendToUser(from, "Bye");
             removeUser(from);
             return;
@@ -103,26 +107,26 @@ public class ChatroomSipServlet extends SipServlet {
             addUser(from);
         }
 
-        if(message.equalsIgnoreCase("/who")) {
+        if(message.toString().equalsIgnoreCase("/who")) {
             String users = "List of users:\n";
             List<String> list = (List<String>)getServletContext().getAttribute(USER_LIST);
             for (String user : list) {
                 users += user + "\n";
             }
             sendToUser(from, users);
-            removeUser(from);
+//            removeUser(from);
             return;
         }
 
         //If the user is joining the chatroom silently, no message 
         //to broadcast, return. 
-        if(message.equalsIgnoreCase("/join")) {
+        if(message.toString().equalsIgnoreCase("/join")) {
             return;
         }
         
         //We could implement more IRC commands here, 
         //see http://www.mirc.com/cmds.html
-        sendToAll(from, message);
+        sendToAll(from, message, request.getHeader("Content-Type"));
 	}
 
     /** 
@@ -147,18 +151,24 @@ public class ChatroomSipServlet extends SipServlet {
         response.getApplicationSession().invalidate();  
     }
 
-    private void sendToAll(String from, String message)  
+    private void sendToAll(String from, Object message, String contentType)  
     	    throws ServletParseException, IOException {        
 
         List<String> list = (List<String>)getServletContext().getAttribute(USER_LIST);
         for (String user : list) {
-        	SipApplicationSession session = 
-                factory.createApplicationSession();
-            SipServletRequest request = factory.createRequest(session, 
-                    "MESSAGE", serverAddress, user);
-            String msg = from + " sent message: \n" + message;
-            request.setContent(msg.getBytes(), "text/plain");
-            request.send();            
+        	if(!user.equals(from)) {
+	        	SipApplicationSession session = 
+	                factory.createApplicationSession();
+	            SipServletRequest request = factory.createRequest(session, 
+	                    "MESSAGE", serverAddress, user);
+	            if(contentType.contains("text/plain")) {
+	            	String msg = from + " sent message: \n" + message;
+	            	request.setContent(msg, contentType);
+	            } else {
+	            	request.setContent(message, contentType);
+	            }            
+	            request.send();    
+        	}
         }
     }
 
@@ -168,7 +178,7 @@ public class ChatroomSipServlet extends SipServlet {
         SipApplicationSession session = factory.createApplicationSession();
         SipServletRequest request = factory.createRequest(session, 
                 "MESSAGE", serverAddress, to);
-        request.setContent(message.getBytes(), "text/plain");
+        request.setContent(message.getBytes(), CONTENT_TYPE);
         request.send();
     }
 
