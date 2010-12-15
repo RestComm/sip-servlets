@@ -124,7 +124,7 @@ public class InDialogNotifierSipServletTest extends SipServletTestCase {
 		for (String message : sender.getAllMessagesContent()) {
 			logger.info("Message :" + message);	
 		}
-		assertEquals(1, sender.getAllMessagesContent().size());
+		assertTrue(sender.getAllMessagesContent().size() >= 1);
 		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));		
 		
 	}
@@ -162,7 +162,7 @@ public class InDialogNotifierSipServletTest extends SipServletTestCase {
 			assertTrue(subscriptionState + " not present",sender.getAllSubscriptionState().contains(subscriptionState));	
 		}				
 		Thread.sleep(TIMEOUT);
-		assertEquals(1, sender.getAllMessagesContent().size());
+		assertTrue(sender.getAllMessagesContent().size() >= 1);
 		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));		
 		
 	}
