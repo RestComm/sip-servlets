@@ -158,7 +158,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		Thread.sleep(DIALOG_TIMEOUT + TIMEOUT);
 		assertTrue(receiver.isCancelReceived());	
 		List<String> allMessagesContent = receiver.getAllMessagesContent();
-		assertEquals(2,allMessagesContent.size());
+		assertTrue(allMessagesContent.size() >= 2);
 		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
 		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));
 	}
