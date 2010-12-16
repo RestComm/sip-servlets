@@ -1,0 +1,472 @@
+<project name="SIP Servlet 1.1 API Technology Compatibility Kit (TCK)"
+	default="usage" basedir=".">
+
+	<property name="jsr289.dir" value=".."/>
+	<property name="sipunit.dir" value="${jsr289.dir}/sipunit"/>
+	<property name="applications.dir" value="${basedir}/applications"/>
+	<property file="${applications.dir}/applications.properties"/>
+	<property name="apiapp.dir" value="${applications.dir}/apitestapp"/>
+	<property name="tck.zip" value="${jsr289.dir}/sipservlet-1_1-tck.zip"/>
+	<property name="lib" value="${basedir}/lib"/>
+	<property name="src" value="${basedir}/src"/>
+	<property name="conf" value="${basedir}/conf"/>
+	<property name="log4j" value="${conf}/log4j.properties"/>
+	<property name="build" value="${basedir}/build"/>
+	<property name="classes" value="${build}/classes"/>
+	<property name="report" value="${basedir}/report"/>
+	<property name="api.report" value="${report}/api_report"/>
+	<property name="spec.report" value="${report}/spec_report"/>
+	<property name="dist.dir" value="${basedir}/dist"/>
+	<property name="approuter.src" value="com/bea/sipservlet/tck/ar"/>
+	<property name="ar.build" value="${build}/ar-build"/>
+	<property name="ar.appname" value="${dist.dir}/tck-approuter.jar"/>
+	<property name="tck.earname" value="${dist.dir}/tck-apps.ear"/>
+	<property name="signature.property" value="${conf}/signature.properties"/>
+	<property name="signaturefile" value="jsr289_api.sig"/>
+	<property name="signature.report" value="${report}/sig_report"/>
+	<property name="signature.report.filename" value="jsr289SignatureReport.txt"/>
+
+	<path id="tck.lib">
+		<fileset dir="${lib}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<path id="sipunit.lib">
+		<fileset dir="${sipunit.dir}/lib">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath location="${lib}/ant-contrib-1.0b3.jar" />
+	</taskdef>
+
+	<target name="usage">
+		<echo message="Usage: ant target [options]"/>
+		<echo message=""/>
+		<echo message=" build-all : Build all apps to tck-apps.ear."/>
+		<echo message="             which located in tck/dist directory."/>
+		<echo message="             Build the application router to tck-approuter.jar."/>
+		<echo message="             which located in tck/dist directory."/>
+		<echo message="             Build all tests."/>
+		<echo message="             which located in tck/build."/>
+		<echo message=" clean-all : Clean the tck-apps.ear, tck-approuter.jar, all tests classes"/>
+		<echo message="             and all reports."/>
+		<echo message=" test-all  : Run the signature Test,API Assertion Tests and the SPEC Assertion Tests"/>
+		<echo message="             and generate the reports."/>
+		<echo message="             All reports are located in tck/report."/>
+		<echo message="             The Signature Test report are located in tck/report/sig_report."/>
+		<echo message="             The API Assertion Tests report are located in tck/report/api_report."/>
+		<echo message="             The SPEC Assertion Tests report are located in tck/report/spec_report."/>
+	</target>
+
+	<!--**************************** Main targets ****************************-->
+	<!--Build the approuter(tck-approuter.jar),all apps(include the ear) -->
+	<!--and client tests-->
+	<target name="build-all">
+		<antcall target="build-ar"/>
+		<antcall target="build-ear"/>
+		<antcall target="build-tests"/>
+	</target>
+
+	<!--Clean the approuter(tck-approuter.jar),all apps(include the ear)-->
+	<!--client tests and all reports-->
+	<target name="clean-all">
+		<antcall target="clean-ar" />
+		<antcall target="clean-ear" />
+		<antcall target="clean-tests" />
+		<antcall target="clean-reports"/>
+	</target>
+
+	<!--Run API test, SPEC test, Signature test and generate the reports-->
+	<target name="test-all">
+		<antcall target="run-tck"/>
+		<antcall target="run-signature-test"/>
+	</target>
+	<!--**********************************************************************-->
+
+
+
+	<!--**************************** Utility targets for Main *****************-->
+	<target name="build-ar">
+		<mkdir dir="${ar.build}" />
+		<javac destdir="${ar.build}" 
+			srcdir="${src}" 
+			includes="${approuter.src}/**" 
+			debug="true" 
+			source="1.5" 
+			target="1.5">
+			<classpath>
+				<path refid="tck.lib" />
+			</classpath>
+			<compilerarg value="-Xlint:deprecation" />
+		</javac>
+		<delete file="${ar.appname}"/>
+		<copy toDir="${ar.build}/META-INF">
+			<fileset dir="${src}/META-INF" />
+		</copy>
+		<jar destfile="${ar.appname}" basedir="${ar.build}" update="true"/>
+	</target>
+
+	<target name="build-ear" depends="build-api-app,build-spec-apps">
+		<for list="${applications.src.dir}" param="app">
+			<sequential>
+				<copy todir="${applications.dir}">
+					<fileset dir="@{app}">
+						<include name="*.sar"/>
+					</fileset>
+				</copy>
+			</sequential>
+		</for>
+		<copy todir="${applications.dir}">
+			<fileset dir="${apiapp.dir}">
+				<include name="*.sar"/>
+			</fileset>
+		</copy>
+		<delete file="${tck.earname}"/>
+		<ear destfile="${tck.earname}" update="true" 
+   	  appxml="${applications.dir}/META-INF/application.xml">
+			<fileset dir="${applications.dir}" includes="*.sar"/>
+		</ear>
+		<delete>
+			<fileset dir="${applications.dir}" includes="*.sar"/>
+		</delete>
+	</target>
+	
+	<target name="build-apps">
+		<antcall target="build-spec-apps" />
+		<antcall target="build-api-app" />
+	</target>
+
+	<target name="build-tests">
+		<antcall target="build-spec-tests"/>
+		<antcall target="build-api-tests"/>
+	</target>
+
+	<target name="clean-ar">
+		<delete dir="${ar.build}"/>
+		<delete file="${ar.appname}" />
+	</target>
+		
+	<target name="clean-ear">
+		<antcall target="clean-apps" />
+		<delete file="${tck.earname}" />
+	</target>
+
+	<target name="clean-apps">
+		<antcall target="clean-spec-apps" />
+		<antcall target="clean-api-app" />
+	</target>
+
+	<target name="clean-tests">
+		<delete dir="${build}"/>
+	</target>
+
+	<target name="clean-reports">
+		<delete dir="${report}"/>
+	</target>
+
+	<target name="run-tck">
+		<antcall target="run-api-tests" />
+		<antcall target="run-spec-tests" />
+	</target>
+
+	<target name="init">
+		<!--property environment="env" /-->
+		<property name="ant.home" value="${ANT_HOME}"/>
+		<echo message="ANT_HOME=${ANT_HOME}"/>
+		<echo message="ANT_HOME=${ant.home}"/>
+		<antcall target="check-tckjunit"/>
+		<antcall target="check-junit"/>
+	</target>
+
+	<target name="check-tckjunit">
+		<available classname="com.bea.wcp.ant.ext.junit.TckJUnitTask" 
+			property="tck-junit.jar.present"/>
+		<fail message="The tck-junit.jar is not present in system CLASSPATH. Please add them into system CLASSPATH. The jar files can be found in tck/lib" 
+            unless="tck-junit.jar.present" />
+	</target>
+
+	<target name="check-junit">
+		<available classname="junit.framework.Test" property="junit.jar.present"/>
+		<fail message="The junit.jar is not present in system CLASSPATH. Please add them into system CLASSPATH." unless="junit.jar.present"/>
+	</target>
+
+
+
+	<target name="zip">
+		<delete file="${tck.zip}" />
+		<property name="temp.dir" value="${jsr289.dir}/temp" />
+		<property name="temp.dir.sipunit" value="${temp.dir}/sipunit" />
+		<property name="temp.dir.tck" value="${temp.dir}/tck" />
+		<mkdir dir="${temp.dir}" />
+		<mkdir dir="${temp.dir.sipunit}" />
+		<mkdir dir="${temp.dir.tck}" />
+		<copy todir="${temp.dir.sipunit}">
+			<fileset dir="${jsr289.dir}/sipunit" />
+		</copy>
+		<copy todir="${temp.dir.tck}">
+			<fileset dir="${jsr289.dir}/tck" />
+		</copy>
+		<zip destfile="${tck.zip}">
+			<fileset dir="${temp.dir}" />
+		</zip>
+		<delete dir="${temp.dir}" />
+	</target>
+
+
+	<!-- ******************** JSR289 SPEC TCK Test targets ********************-->
+	<target name="build-spec-apps" depends="init,clean-spec-apps">
+		<for list="${applications.src.dir}" param="app">
+			<sequential>
+				<ant antfile="build.xml" target="build-all" dir="@{app}" />
+				<copy todir="${dist.dir}">
+					<fileset dir="@{app}">
+						<include name="*.sar"/>
+					</fileset>
+				</copy>
+			</sequential>
+		</for>
+	</target>
+
+	<target name="clean-spec-apps">
+		<for list="${applications.src.dir}" param="app">
+			<sequential>
+				<ant antfile="build.xml" target="clean-all" dir="@{app}" />
+			</sequential>
+		</for>
+	  <delete>
+	    <fileset dir="${dist.dir}" includes="*.sar" excludes="apitestapp.sar"/>
+	  </delete>
+	</target>
+
+	<target name="build-spec-tests" depends="init,clean-spec-tests">
+		<mkdir dir="${classes}" />
+		<javac destdir="${classes}" srcdir="${src}" 
+			includes="com/bea/sipservlet/tck/agents/**/*.java,
+			          com/bea/sipservlet/tck/common/*.java,
+			          com/bea/sipservlet/tck/utils/*.java" 
+			excludes="com/bea/sipservlet/tck/agents/api/**/*.java" 
+			debug="true" 
+			source="1.5">
+			<classpath>
+				<path refid="tck.lib" />
+				<path refid="sipunit.lib" />
+			</classpath>
+			<compilerarg value="-Xlint:deprecation" />
+		</javac>
+		<copy file="${log4j}" todir="${classes}" />
+		<copy toDir="${build}/lib">
+			<fileset dir="${lib}">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="${sipunit.dir}/lib">
+				<include name="*.jar" />
+			</fileset>
+		</copy>
+		<copy toDir="${build}/conf">
+			<fileset dir="${conf}">
+				<exclude name="signature.properties" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="clean-spec-tests">
+		<delete dir="${build}/classes/com/bea/sipservlet/tck/agents/spec"/>
+	</target>
+
+	<target name="run-spec-tests" depends="init,clean-spec-reports,build-spec-tests" >
+		<mkdir dir="${spec.report}"/>
+		<taskdef name="tckjunit" classname="com.bea.wcp.ant.ext.junit.TckJUnitTask"/>
+		<tckjunit printsummary="yes" haltonfailure="no">
+			<classpath>
+				<path refid="tck.lib"/>
+				<path refid="sipunit.lib"/>
+				<pathelement location="${classes}"/>
+			</classpath>
+			<batchtest fork="yes" todir="${spec.report}">
+				<formatter classname="com.bea.wcp.ant.ext.junit.TckXMLFormatter"/>
+				<fileset dir="${classes}">
+					<include name="**/agents/spec/**/*Test.class"/>
+				</fileset>
+			</batchtest>
+		</tckjunit>
+		<antcall target="report-spec-tests" />
+	</target>
+
+	<target name="run-spec-testcase" depends="init,build-spec-tests">
+		<echo message="Target Test-Case=[${case}]" />
+		<mkdir dir="${spec.report}" />
+		<taskdef name="tckjunit" classname="com.bea.wcp.ant.ext.junit.TckJUnitTask" />
+		<tckjunit printsummary="yes" haltonfailure="no">
+			<classpath>
+				<path refid="tck.lib" />
+				<path refid="sipunit.lib" />
+				<pathelement location="${classes}" />
+			</classpath>
+			<batchtest fork="yes" todir="${spec.report}">
+				<formatter classname="com.bea.wcp.ant.ext.junit.TckXMLFormatter" />
+				<fileset dir="${classes}">
+					<include name="**/agents/spec/**/${case}.class" />
+				</fileset>
+			</batchtest>
+		</tckjunit>
+		<antcall target="report-spec-tests" />
+	</target>
+
+	<target name="clean-spec-reports">
+		<delete dir="${spec.report}" />
+	</target>
+
+	<target name="report-spec-tests" depends="init">
+		<taskdef name="tckjunitreport" classname="com.bea.wcp.ant.ext.junit.TckXMLResultAggregator" />
+		<tckjunitreport todir="${spec.report}">
+			<fileset dir="${spec.report}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="frames" todir="${spec.report}" />
+		</tckjunitreport>
+	</target>
+
+
+	<!-- ******************** JSR289 API Assertion Test targets ***************-->
+	<target name="build-api-app" depends="init,clean-api-app">
+		<ant antfile="build.xml" target="build-all" dir="${apiapp.dir}" />
+		<copy todir="${dist.dir}">
+			<fileset dir="${apiapp.dir}">
+				<include name="*.sar"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="clean-api-app">
+		<ant antfile="build.xml" target="clean-all" dir="${apiapp.dir}" />
+		<delete file="${dist.dir}/apitestapp.sar"/>
+	</target>
+
+	<target name="build-api-tests" depends="init,clean-api-tests">
+		<mkdir dir="${classes}"/>
+		<javac destdir="${classes}" 
+           srcdir="${src}"
+           includes="com/bea/sipservlet/tck/agents/**/*.java,
+	                   com/bea/sipservlet/tck/common/*.java,
+	                   com/bea/sipservlet/tck/utils/*.java"
+    	     excludes="com/bea/sipservlet/tck/agents/spec/**/*.java"
+           debug="true" 
+           source="1.5">
+			<classpath>
+				<path refid="tck.lib"/>
+				<path refid="sipunit.lib"/>
+			</classpath>
+			<compilerarg value="-Xlint:deprecation"/>
+		</javac>
+		<copy file="${log4j}" todir="${classes}"/>
+		<copy toDir="${build}/lib">
+			<fileset dir="${lib}">
+				<include name="*.jar"/>
+			</fileset>
+			<fileset dir="${sipunit.dir}/lib">
+				<include name="*.jar"/>
+			</fileset>
+		</copy>
+		<copy toDir="${build}/conf">
+			<fileset dir="${basedir}/conf">
+				<exclude name="signature.properties"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="clean-api-tests">
+		<delete dir="${build}/classes/com/bea/sipservlet/tck/agents/api" />
+	</target>
+
+	<target name="run-api-tests" depends="init,clean-api-reports,build-api-tests">
+		<mkdir dir="${api.report}" />
+		<taskdef name="tckjunit" classname="com.bea.wcp.ant.ext.junit.TckJUnitTask" />
+		<tckjunit printsummary="yes" haltonfailure="no">
+			<classpath>
+				<path refid="tck.lib" />
+				<path refid="sipunit.lib" />
+				<pathelement location="${classes}" />
+			</classpath>
+			<batchtest fork="yes" todir="${api.report}">
+				<formatter classname="com.bea.wcp.ant.ext.junit.TckXMLFormatter" />
+				<fileset dir="${classes}">
+					<include name="**/agents/api/**/*Test.class" />
+				</fileset>
+			</batchtest>
+		</tckjunit>
+		<antcall target="report-api-tests" />
+	</target>
+
+	<target name="run-api-testcase" depends="init,build-api-tests">
+		<echo message="Target Test-Case=[${case}]" />
+		<mkdir dir="${api.report}" />
+		<taskdef name="tckjunit" classname="com.bea.wcp.ant.ext.junit.TckJUnitTask" />
+		<tckjunit printsummary="yes" haltonfailure="no">
+			<classpath>
+				<path refid="tck.lib" />
+				<path refid="sipunit.lib" />
+				<pathelement location="${classes}" />
+			</classpath>
+			<batchtest fork="yes" todir="${api.report}">
+				<formatter classname="com.bea.wcp.ant.ext.junit.TckXMLFormatter" />
+				<fileset dir="${classes}">
+					<include name="**/agents/api/**/${case}.class" />
+					<exclude name="**/javax_servlet_sip/ProxyTest$1.class" />
+					<exclude name="**/javax_servlet_sip/ProxyTest$2.class" />
+					<exclude name="**/javax_servlet_sip/ProxyTest$SipRequestAssertionOutboundInterface.class" />
+				</fileset>
+			</batchtest>
+		</tckjunit>
+		<antcall target="report-api-tests" />
+	</target>
+
+	<target name="clean-api-reports">
+		<delete dir="${api.report}"/>
+	</target>
+
+	<target name="report-api-tests" depends="init">
+		<taskdef name="tckjunitreport" classname="com.bea.wcp.ant.ext.junit.TckXMLResultAggregator" />
+		<tckjunitreport todir="${api.report}">
+			<fileset dir="${api.report}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="frames" todir="${api.report}" />
+		</tckjunitreport>
+	</target>
+
+
+
+	<!-- ******************** JSR289 Signature Test ************************** -->
+	<target name="run-signature-test">
+		<loadproperties>
+			<file file="${signature.property}" />
+		</loadproperties>
+		<if>
+			<available file="${Referenced_JSR289API_JAR}" property="reference.jar.present" />
+			<then>
+				<echo message="Referenced_JSR289API_JAR=${Referenced_JSR289API_JAR}" />
+				<delete dir="${signature.report}" />
+				<mkdir dir="${signature.report}" />
+				<java fork="yes" failonerror="yes" classname="com.sun.tdk.signaturetest.SignatureTest">
+					<arg line=" -FileName bin/${signaturefile} 
+				      	      -debug
+				      	      -apiVersion 2.0
+				       	      -out ${signature.report}/${signature.report.filename}
+				       	      -package javax.servlet.sip" />
+					<classpath>
+						<pathelement location="${lib}/sigtest.jar" />
+						<pathelement location="${lib}/servlet-2_5-api.jar" />
+						<pathelement path="${Referenced_JSR289API_JAR}" />
+					</classpath>
+				</java>
+			</then>
+			<else>
+				<echo message="The ${Referenced_JSR289API_JAR} does not exist." />
+			</else>
+		</if>
+	</target>
+
+</project>
