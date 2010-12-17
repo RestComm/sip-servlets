@@ -175,7 +175,7 @@ sleep $HALFSTARTSLEEP
 ./auto-run-test.sh uas-remove-attributes result.txt
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 1 uas-no-attributes
+./auto-start-jboss-server.sh $config1 $config1.pid 0 uas-no-attributes
 
 sleep $HALFSTARTSLEEP
 
