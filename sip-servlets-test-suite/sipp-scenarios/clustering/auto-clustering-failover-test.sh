@@ -82,7 +82,7 @@ echo "================================"
 ./auto-prepare-example.sh b2bua $config1
 ./auto-prepare-example.sh b2bua $config2
 
-./auto-start-jboss-server.sh $config2 $config2.pid 0 b2bua
+./auto-start-jboss-server.sh $config2 $config2.pid 1 b2bua
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
