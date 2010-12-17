@@ -28,6 +28,7 @@ import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -74,6 +75,7 @@ import javax.sip.header.SIPIfMatchHeader;
 import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
+import javax.sip.message.Message;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -89,6 +91,9 @@ import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
 
 public class TestSipListener implements SipListener {
 	private static final String TO_TAG = "5432";
+	
+	public List<Request> allRequests = new LinkedList<Request>();
+	public List<Response> allResponses = new LinkedList<Response>();
 
 	private static final String PLAIN_UTF8_CONTENT_SUBTYPE = "plain;charset=UTF-8";
 
@@ -340,8 +345,9 @@ public class TestSipListener implements SipListener {
 			return ;
 		}
 		
+		
 		Request request = requestReceivedEvent.getRequest();
-
+		allRequests.add(request);
 		if(firstRequest == null) firstRequest = request;
 		ServerTransaction serverTransactionId = requestReceivedEvent
 				.getServerTransaction();
@@ -1303,6 +1309,7 @@ public class TestSipListener implements SipListener {
 			return ;
 		}		
 		Response response = (Response) responseReceivedEvent.getResponse();
+		allResponses.add(response);
 		if(response.getStatusCode() == 491) numberOf491s++;
 		RecordRouteHeader recordRouteHeader = (RecordRouteHeader)response.getHeader(RecordRouteHeader.NAME);
 		if(!recordRoutingProxyTesting && recordRouteHeader != null) {

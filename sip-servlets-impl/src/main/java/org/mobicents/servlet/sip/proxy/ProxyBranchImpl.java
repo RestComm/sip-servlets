@@ -695,13 +695,6 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 		} catch (ParseException pe) {
 			logger.error("A problem occured while setting the via branch while proxying a request", pe);
 		}
-		
-		RouteHeader routeHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
-		if(routeHeader != null) {
-			if(!sipApplicationDispatcher.isRouteExternal(routeHeader)) {
-				//clonedRequest.removeFirst(RouteHeader.NAME);	
-			}
-		}	
 	
 		String transport = JainSipUtils.findTransport(clonedRequest);
 		SipProvider sipProvider =sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(

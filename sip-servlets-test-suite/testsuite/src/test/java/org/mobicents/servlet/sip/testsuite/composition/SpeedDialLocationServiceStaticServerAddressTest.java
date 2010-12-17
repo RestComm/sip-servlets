@@ -21,6 +21,7 @@ import java.util.ListIterator;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.ViaHeader;
+import javax.sip.message.Response;
 
 import org.apache.catalina.connector.Connector;
 import org.apache.log4j.Logger;
@@ -239,12 +240,26 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 		int count = 0;
 		ListIterator viaHeaders = sender.getInviteRequest().getHeaders(ViaHeader.NAME);
 		while(viaHeaders.hasNext()) {viaHeaders.next(); count++;}
+		
+
 		assertEquals(3, count); // must see exactly 3 via headers in the callee->caller direction
 		assertTrue(ipBalancer.sipMessageWithoutRetrans.size()<=27); // More than 26 messages means the something that should be bypassing is going through it
 		assertTrue(receiver.isAckReceived()); // is the ACK working in the callee->caller direction
 		assertTrue(sender.isAckReceived()); // is the ACK working in the caller->callee direction
+	
 		assertTrue(receiver.getOkToByeReceived());
-		assertTrue(sender.getByeReceived());		
+		assertTrue(sender.getByeReceived());	
+		
+		for(Response message : sender.allResponses) {
+			if(message.getStatusCode()>200) {
+				fail("We don't expect errors. This is error: " + message);
+			}
+		}
+		for(Response message : receiver.allResponses) {
+			if(message.getStatusCode()>200) {
+				fail("We don't expect errors. This is error: " + message);
+			}
+		}
 	}
 
 	public void testCancelSpeedDialLocationService() throws Exception {
