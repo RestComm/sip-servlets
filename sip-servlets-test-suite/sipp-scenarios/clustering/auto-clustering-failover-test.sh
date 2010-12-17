@@ -409,12 +409,12 @@ echo "SIP LB $SIPLB"
 ./auto-prepare-example.sh proxy-b2bua-ar $config1
 ./auto-prepare-example.sh proxy-b2bua-ar $config2
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1 uac
+./auto-start-jboss-server.sh $config2 $config2.pid 1 proxy-b2bua-ar
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-start-jboss-server.sh $config1 $config1.pid 0 uac
+./auto-start-jboss-server.sh $config1 $config1.pid 0 proxy-b2bua-ar
 
 # SIPp should be running by the time JBoss finishes the startup, hence we use half start time here.
 
