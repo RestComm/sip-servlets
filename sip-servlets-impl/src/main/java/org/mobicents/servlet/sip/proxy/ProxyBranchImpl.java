@@ -699,7 +699,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 		RouteHeader routeHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
 		if(routeHeader != null) {
 			if(!sipApplicationDispatcher.isRouteExternal(routeHeader)) {
-				clonedRequest.removeFirst(RouteHeader.NAME);	
+				//clonedRequest.removeFirst(RouteHeader.NAME);	
 			}
 		}	
 	
@@ -715,8 +715,29 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 		if(sipAppSession != null) {
 			sipAppSession.access();
 		}
+
+	    SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);
+
 		ClientTransaction ctx = null;	
-		try {				
+		try {	
+			if(sipConnector != null && sipConnector.isUseStaticAddress()) {
+				javax.sip.address.URI uri = clonedRequest.getRequestURI();
+				RouteHeader route = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
+				if(route != null) {
+					uri = route.getAddress().getURI();
+				}
+				if(uri.isSipURI()) {
+					javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
+					String host = sipUri.getHost();
+					int port = sipUri.getPort();
+					if(sipFactoryImpl.getSipApplicationDispatcher().isExternal(host, port, transport)) {
+						viaHeader.setHost(sipConnector.getStaticServerAddress());
+						viaHeader.setPort(sipConnector.getStaticServerPort());
+					}
+				}
+				SipServletRequestImpl.optimizeRouteHeaderAddressForInternalRoutingrequest(sipConnector,
+						clonedRequest, sipSession, sipFactoryImpl, transport);
+			}
 			ctx = sipProvider.getNewClientTransaction(clonedRequest);
 			ctx.setRetransmitTimer(sipApplicationDispatcher.getBaseTimerInterval());
 		    ((TransactionExt)ctx).setTimerT2(sipApplicationDispatcher.getT2Interval());
@@ -728,7 +749,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 			ctx.setApplicationData(appData);
 			
 			ctx.sendRequest();
-		} catch (SipException e) {
+		} catch (Exception e) {
 			logger.error("A problem occured while proxying a request " + request + " in a dialog-stateless transaction", e);
 			JainSipUtils.terminateTransaction(ctx);
 		} 

@@ -138,7 +138,9 @@ public class ProxyUtils {
 					// This is needed because otherwise we have the IP LB address here. If there is no route header
 					// this means the request will go to the IP LB. For outbound requests we must bypass the IP LB.
 					// http://code.google.com/p/mobicents/issues/detail?id=2210
-					clonedRequest.setRequestURI(((URIImpl)(proxyBranch).getTargetURI()).getURI());
+					//clonedRequest.setRequestURI(((URIImpl)(proxyBranch).getTargetURI()).getURI());
+					SipServletRequestImpl.optimizeRequestUriHeaderAddressForInternalRoutingrequest(sipConnector,
+							clonedRequest, originalRequest.getSipSession(), sipFactoryImpl, outboundTransport);
 					if(logger.isDebugEnabled()){
 						logger.debug("setting request uri as cloned request has no Route headers and is using static address: " + destination);
 					}
@@ -163,7 +165,7 @@ public class ProxyUtils {
 			final String appName = sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());
 			final SipServletRequestImpl proxyBranchRequest = (SipServletRequestImpl) proxyBranch.getRequest();
 			//Add via header
-			ViaHeader viaHeader = proxyBranch.viaHeader;
+			ViaHeader viaHeader = null;//proxyBranch.viaHeader;
 			if(viaHeader == null) {
 				if(proxy.getOutboundInterface() == null) {
 					String branchId = null;

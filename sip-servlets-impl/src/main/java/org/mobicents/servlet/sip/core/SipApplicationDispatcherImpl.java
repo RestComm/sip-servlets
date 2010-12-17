@@ -111,6 +111,7 @@ import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
+import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.router.ManageableApplicationRouter;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -1058,6 +1059,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 								// naoki : Fix for Issue 1618 http://code.google.com/p/mobicents/issues/detail?id=1618 on Timeout don't do the 408 processing for Server Transactions
 								if(sipServletMessage instanceof SipServletRequestImpl && !timeoutEvent.isServerTransaction()) {
 									try {
+										boolean finalizedProxy = false;
+										ProxyBranchImpl proxyBranchImpl = tad.getProxyBranch();
+										if(proxyBranchImpl != null) {
+											ProxyImpl proxy = (ProxyImpl) proxyBranchImpl.getProxy();
+											if(proxy.getFinalBranchForSubsequentRequests() != null) {
+												tad.cleanUp();				
+												transaction.setApplicationData(null);
+												return;
+											}
+										}
 										SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipServletMessage;
 										sipServletMessage.setTransaction(transaction);
 										SipServletResponseImpl response = (SipServletResponseImpl) sipServletRequestImpl.createResponse(408, null, false, false);
@@ -1076,9 +1087,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 								}
 								checkForAckNotReceived(sipServletMessage);
 								appNotifiedOfPrackNotReceived = checkForPrackNotReceived(sipServletMessage);
+							} finally {
 								sipSession.removeOngoingTransaction(transaction);
 								sipSession.setRequestsPending(0);
-							} finally {
 								sipContext.exitSipApp(sipSession.getSipApplicationSession(), sipSession);
 							}
 							// don't invalidate here because if the application sends a final response on the noPrack received

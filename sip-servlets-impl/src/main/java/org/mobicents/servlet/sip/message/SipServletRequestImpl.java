@@ -941,7 +941,40 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 		}
 	}
-	
+
+	public static void optimizeRequestUriHeaderAddressForInternalRoutingrequest(SipConnector sipConnector, Request request, MobicentsSipSession session,  SipFactoryImpl sipFactoryImpl, String transport) {
+		SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
+
+		javax.sip.address.URI uri =request.getRequestURI();
+		if(uri.isSipURI()) {
+			try {
+				javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
+				boolean isExternal = sipFactoryImpl.getSipApplicationDispatcher().isExternal(sipUri.getHost(), sipUri.getPort(), transport);
+				if(!isExternal) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("The request is going internally due to RURI = " + uri);
+					}
+					ExtendedListeningPoint lp = null;
+					if(session.getOutboundInterface() != null) {
+
+						javax.sip.address.SipURI outboundInterfaceURI = (javax.sip.address.SipURI) SipFactories.addressFactory.createURI(session.getOutboundInterface());
+						lp = sipNetworkInterfaceManager.findMatchingListeningPoint(outboundInterfaceURI, false);
+					} else {
+						lp = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
+					}
+
+					sipUri.setHost(lp.getHost(false));
+					sipUri.setPort(lp.getPort());
+					sipUri.setTransportParam(lp.getTransport());
+				}
+			} catch (ParseException e) {
+				logger.error("AR optimization error", e);
+			}
+
+		}
+
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
