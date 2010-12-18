@@ -54,6 +54,17 @@ OKI contributes their SIP Servlets Framework to Mobicents !
 	
 	Check out the {{{./mss-ssf.html}documentation}}
 		 	
+Version 2.0.0.ALPHA1 is out !
+
+	We are proud to announce our {{{./mss-downloads.html}Mobicents Sip Servlets 2.0.0.ALPHA1 version}}, certified against the {{{http://jcp.org/en/jsr/detail?id=289}Sip Servlets 1.1 specification}} and working on top of <Tomcat 7.0.5>.
+	
+	This release is the first step in our march towards creating Mobicents Sip Servlets 2.0 whose goal will be Java EE 6 and CDI integration as well as integrating and evolving the SIP Servlets specification with the HTTP Servlets 3.0 specification.
+	
+	You can play wiht it by trying {{{http://www.mobicents.org/examples.html}the following examples}}.
+	
+	A <BIG> Thanks to {{{http://blog.devrealm.org/}Georges Vagenas}} who has been contributing this first ALPHA release that will allow you to create Converged SIP/HTTP Applications benefiting from the new HTTP Servlet 3.0 features such as Asynchronous Support.
+		
+	Check the complete Roadmap to see {{{mss-roadmap.html} what's cooking ahead}} .			 	
 
 Version 1.4.0.FINAL is out !
 

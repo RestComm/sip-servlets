@@ -20,7 +20,11 @@ Call Blocking
 ** From the binary
 
 	You can find the war file corresponding to this example
- 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/call-blocking/1.4.0.FINAL/call-blocking-1.4.0.FINAL.war}here}}.\
+	
+	* Mobicents Sip Servlets 2.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/call-blocking/2.0.0.ALPHA1/call-blocking-2.0.0.ALPHA1.war}here}}.
+	
+	* Mobicents Sip Servlets 1.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/call-blocking/1.4.0.FINAL/call-blocking-1.4.0.FINAL.war}here}}.
+	
  	Drop the downloaded war file into your <<<tomcat_home/webapps>>> directory or <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/call-blocking-servlet-dar.properties}dar configuration file}}.\ 
@@ -34,8 +38,12 @@ Call Blocking
 
 ** From the source
 
-	Please check out the call-blocking example located under this 
-	{{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-examples/call-blocking}location}} 
+	Please check out the call-blocking example located under 
+	
+	* Mobicents Sip Servlets 2.X : {{{http://code.google.com/p/mobicents/source/browse/tags/servers/sip-servlets/release-2.0.0.ALPHA1/sip-servlets-examples/call-blocking}location}}
+	
+	* Mobicents Sip Servlets 1.X : {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-examples/call-blocking}location}}
+		 
 	from the svn repository.
 	Follow the instructions in the README.txt to build and run the example.  
 
