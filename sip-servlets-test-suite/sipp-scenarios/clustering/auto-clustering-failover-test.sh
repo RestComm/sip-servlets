@@ -391,6 +391,32 @@ sleep 50
 sleep 10
 
 ##################################
+# Test proxy early failover
+##################################
+echo "Test proxy early failover"
+echo "================================"
+./auto-prepare-example.sh proxy-early $config1
+./auto-prepare-example.sh proxy-early $config2
+
+./auto-start-jboss-server.sh $config2 $config2.pid 1 proxy-early
+
+#Wait to boot
+sleep $HALFSTARTSLEEP
+
+./auto-start-jboss-server.sh $config1 $config1.pid 0 proxy-early
+
+#Wait to boot
+sleep $HALFSTARTSLEEP
+
+./auto-run-test.sh proxy-early result.txt
+
+#Kill the app servers
+./auto-kill-process-tree.sh `cat $config1.pid` $config1
+./auto-kill-process-tree.sh `cat $config2.pid` $config2
+
+sleep 10
+
+##################################
 # Test Custom B2BUA Early Dialog Failover
 ##################################
 echo "Test Custom B2BUA Early Dialog Failover"
@@ -459,32 +485,6 @@ sleep $HALFSTARTSLEEP
 sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh b2bua-early-fwd-ack result.txt
-
-#Kill the app servers
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
-
-sleep 10
-
-##################################
-# Test proxy early failover
-##################################
-echo "Test proxy aerly failover"
-echo "================================"
-./auto-prepare-example.sh proxy-early $config1
-./auto-prepare-example.sh proxy-early $config2
-
-./auto-start-jboss-server.sh $config2 $config2.pid 1 proxy-early
-
-#Wait to boot
-sleep $HALFSTARTSLEEP
-
-./auto-start-jboss-server.sh $config1 $config1.pid 0 proxy-early
-
-#Wait to boot
-sleep $HALFSTARTSLEEP
-
-./auto-run-test.sh proxy-early result.txt
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat $config1.pid` $config1
