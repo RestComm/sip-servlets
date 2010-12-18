@@ -87,5 +87,6 @@ if [ $# -ne 0 ]; then
 				rm -rf $JBOSS_HOME/server/$config/deploy/location-service-distributable-*.war
 				cp $EXAMPLES_HOME/location-service-distributable/target/location-service-distributable-*.war $JBOSS_HOME/server/$config/deploy
 				cp ar/proxy-b2bua-ar-dar.properties $JBOSS_HOME/server/$config/conf/dars/mobicents-dar.properties
+				cp setup/jboss-5/mss-sip-stack-jboss.properties $JBOSS_HOME/server/$config/conf/mss-sip-stack.properties
     esac
 fi
