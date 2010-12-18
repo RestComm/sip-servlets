@@ -316,55 +316,6 @@ sleep $HALFSTARTSLEEP
 sleep 10
 
 ##################################
-# Test AR
-##################################
-echo "Test Proxy-B2bua AR"
-echo "================================"
-
-#We must kill the LB here and make it use worstcase affinity
-./auto-kill-process-tree.sh $SIPLB siplb
-./auto-startlb-worst.sh > siplb.out &
-export SIPLB=$!
-echo "SIP LB $SIPLB"
-
-./auto-prepare-example.sh proxy-b2bua-ar $config1
-./auto-prepare-example.sh proxy-b2bua-ar $config2
-
-./auto-start-jboss-server.sh $config2 $config2.pid 1 proxy-b2bua-ar
-
-#Wait to boot
-sleep $HALFSTARTSLEEP
-
-./auto-start-jboss-server.sh $config1 $config1.pid 0 proxy-b2bua-ar
-
-# SIPp should be running by the time JBoss finishes the startup, hence we use half start time here.
-
-#cleanup flag files for this test
-rm -rf *.flag
-
-sleep $HALFSTARTSLEEP
-./auto-run-test.sh proxy-b2bua-ar result-ignore.txt
-
-sleep 20
-if [ -f lssdestryed.flag -a -f cb2buadestryed.flag ]; then
-    #success if both flags are present
-    echo "proxy-b2bua-ar 0" >> result.txt
-else
-    #failure is one of the flags is missing
-    echo "proxy-b2bua-ar 1" >> result.txt
-fi
-
-#some debug info
-cat result.txt
-ls
-
-#Kill the app servers
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
-
-sleep 10
-
-##################################
 # Test proxy early failover
 ##################################
 echo "Test proxy early failover"
@@ -459,6 +410,55 @@ sleep $HALFSTARTSLEEP
 sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh b2bua-early-fwd-ack result.txt
+
+#Kill the app servers
+./auto-kill-process-tree.sh `cat $config1.pid` $config1
+./auto-kill-process-tree.sh `cat $config2.pid` $config2
+
+sleep 10
+
+##################################
+# Test AR
+##################################
+echo "Test Proxy-B2bua AR"
+echo "================================"
+
+#We must kill the LB here and make it use worstcase affinity
+./auto-kill-process-tree.sh $SIPLB siplb
+./auto-startlb-worst.sh > siplb.out &
+export SIPLB=$!
+echo "SIP LB $SIPLB"
+
+./auto-prepare-example.sh proxy-b2bua-ar $config1
+./auto-prepare-example.sh proxy-b2bua-ar $config2
+
+./auto-start-jboss-server.sh $config2 $config2.pid 1 proxy-b2bua-ar
+
+#Wait to boot
+sleep $HALFSTARTSLEEP
+
+./auto-start-jboss-server.sh $config1 $config1.pid 0 proxy-b2bua-ar
+
+# SIPp should be running by the time JBoss finishes the startup, hence we use half start time here.
+
+#cleanup flag files for this test
+rm -rf *.flag
+
+sleep $HALFSTARTSLEEP
+./auto-run-test.sh proxy-b2bua-ar result-ignore.txt
+
+sleep 20
+if [ -f lssdestryed.flag -a -f cb2buadestryed.flag ]; then
+    #success if both flags are present
+    echo "proxy-b2bua-ar 0" >> result.txt
+else
+    #failure is one of the flags is missing
+    echo "proxy-b2bua-ar 1" >> result.txt
+fi
+
+#some debug info
+cat result.txt
+ls
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat $config1.pid` $config1
