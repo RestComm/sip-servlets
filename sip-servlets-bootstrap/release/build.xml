@@ -218,6 +218,7 @@
 		<copy overwrite="true" file="${base.path}/context-jboss-5.xml" tofile="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/context.xml" />
 		<copy overwrite="true" file="${base.path}/jboss-beans.xml" tofile="${mss.home}/server/${jboss.config}/deploy/jbossweb.sar/META-INF/jboss-beans.xml" />
 		<copy overwrite="true" file="${base.path}/metadata-deployer-jboss-beans.xml" tofile="${mss.home}/server/${jboss.config}/deployers/metadata-deployer-jboss-beans.xml" />
+		<copy overwrite="true" file="${base.path}/jboss-cache-manager-jboss-beans.xml" tofile="${mss.home}/server/${jboss.config}/deploy/cluster/jboss-cache-manager.sar/META-INF/jboss-cache-manager-jboss-beans.xml" />
 		<copy overwrite="true" file="${base.path}/failover-war-deployers-jboss-beans.xml" tofile="${mss.home}/server/${jboss.config}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml" />
 				
 		<!-- Not needed anymore since jboss maven profile copies the ha stack as well now for JMX management -->
