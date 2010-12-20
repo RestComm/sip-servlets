@@ -302,6 +302,8 @@ public class TestSipListener implements SipListener {
 
 	private boolean testNextNonce =false;
 	
+	private String nextNonce = null;
+	
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
 		private EventHeader eventHeader;
@@ -960,7 +962,8 @@ public class TestSipListener implements SipListener {
 					Response.OK, request);			
 			if(testNextNonce) {
 				AuthenticationInfoHeader authenticationInfoHeader = protocolObjects.headerFactory.createAuthenticationInfoHeader("");
-				authenticationInfoHeader.setNextNonce(dsam.generateNonce());
+				nextNonce = dsam.generateNonce();
+				authenticationInfoHeader.setNextNonce(nextNonce);
 				authenticationInfoHeader.removeParameter(ParameterNames.RESPONSE_AUTH);
 				okResponse.addHeader(authenticationInfoHeader);
 			}
@@ -1148,7 +1151,8 @@ public class TestSipListener implements SipListener {
 				}
 				if(testNextNonce) {
 					AuthenticationInfoHeader authenticationInfoHeader = protocolObjects.headerFactory.createAuthenticationInfoHeader("");
-					authenticationInfoHeader.setNextNonce(dsam.generateNonce());
+					nextNonce = dsam.generateNonce();
+					authenticationInfoHeader.setNextNonce(nextNonce);					
 					authenticationInfoHeader.removeParameter(ParameterNames.RESPONSE_AUTH);
 					getFinalResponse().addHeader(authenticationInfoHeader);
 				}
@@ -1178,21 +1182,25 @@ public class TestSipListener implements SipListener {
 	
 	public boolean checkProxyAuthorization(Request request) {
         // Let Acks go through unchallenged.
-        boolean retorno;
         ProxyAuthorizationHeader proxyAuthorization=
                 (ProxyAuthorizationHeader)request.getHeader(ProxyAuthorizationHeader.NAME);
 
        if (proxyAuthorization==null) {
-           System.out.println("Authentication failed: ProxyAuthorization header missing!");     
+    	   logger.error("Authentication failed: ProxyAuthorization header missing!");     
            return false;
        }else{
+    	   
+    	   if(nextNonce != null && !proxyAuthorization.getNonce().equals(nextNonce)) {
+    		   throw new IllegalArgumentException("Authentication failed: ProxyAuthorization nonce " + proxyAuthorization.getNonce() + " is different from the nextnonce  previously generated " + nextNonce);         		   
+    	   }
+    	   
            String username=proxyAuthorization.getParameter("username");
            //String password=proxyAuthorization.getParameter("password");
    
            try{
                 boolean res=dsam.doAuthenticate(username,proxyAuthorization,request);
-                if (res) System.out.println("Authentication passed for user: "+username);
-                else System.out.println("Authentication failed for user: "+username); 
+                if (res) logger.info("Authentication passed for user: "+username);
+                else logger.error("Authentication failed for user: "+username); 
                 return res;
            }
            catch(Exception e) {

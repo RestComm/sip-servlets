@@ -171,7 +171,8 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 		params.put("nbSubsequentReq","4");
 		params.put("METHOD", "REGISTER");
 		deployApplication(params);
-		Thread.sleep(TIMEOUT);		
+		Thread.sleep(TIMEOUT);	
+		assertEquals(4, receiver.getLastRegisterCSeqNumber());
 	}
 	
 	/*
