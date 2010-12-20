@@ -1050,6 +1050,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    
 		    final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();
 		    final String requestMethod = getMethod();
+			ExtendedListeningPoint matchingListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(
+					transport, false);
 			if(Request.ACK.equals(requestMethod)) {
 				// Issue 1791 : using a different classloader created outside the application loader 
 				// to avoid leaks on startup/shutdown
@@ -1085,8 +1087,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 							tad.cleanUp();
 						}
 					}
-					final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
-							transport, false).getSipProvider();	
+					final SipProvider sipProvider = matchingListeningPoint.getSipProvider();	
 					// Issue 1468 : to handle forking, we shouldn't cleanup the app data since it is needed for the forked responses
 					if(((SipStackImpl)sipProvider.getSipStack()).getMaxForkTime() == 0 && transaction != null) {
 						transaction.setApplicationData(null);
@@ -1145,8 +1146,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 			if (super.getTransaction() == null) {				
 
-				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
-						transport, false).getSipProvider();
+				final SipProvider sipProvider = matchingListeningPoint.getSipProvider();
 				
 				ContactHeader contactHeader = (ContactHeader)request.getHeader(ContactHeader.NAME);
 				if(contactHeader == null && !Request.REGISTER.equalsIgnoreCase(requestMethod) && JainSipUtils.CONTACT_HEADER_METHODS.contains(requestMethod) && proxy == null) {
@@ -1170,8 +1170,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 							sipUri.setHost(sipConnector.getStaticServerAddress());
 							sipUri.setPort(sipConnector.getStaticServerPort());
 						} else {
-							sipUri.setHost(sipConnector.getIpAddress());
-							sipUri.setPort(sipConnector.getPort());
+							boolean usePublicAddress = JainSipUtils.findUsePublicAddress(
+									sipNetworkInterfaceManager, request, matchingListeningPoint);
+							sipUri.setHost(matchingListeningPoint.getIpAddress(usePublicAddress));
+							sipUri.setPort(matchingListeningPoint.getPort());
 							
 						}
 						sipUri.setTransportParam(transport);
@@ -1271,8 +1273,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				session.setSessionCreatingTransactionRequest(this);
 
 			} else if (Request.PRACK.equals(request.getMethod())) {
-				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
-						transport, false).getSipProvider();				
+				final SipProvider sipProvider = matchingListeningPoint.getSipProvider();				
 				final ClientTransaction ctx = sipProvider.getNewClientTransaction(request);
 				ctx.setRetransmitTimer(sipFactoryImpl.getSipApplicationDispatcher().getBaseTimerInterval());
 			    ((TransactionExt)ctx).setTimerT2(sipFactoryImpl.getSipApplicationDispatcher().getT2Interval());
