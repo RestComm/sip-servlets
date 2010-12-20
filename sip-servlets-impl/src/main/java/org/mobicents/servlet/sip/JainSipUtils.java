@@ -609,7 +609,36 @@ public final class JainSipUtils {
 				URI uri = route.getAddress().getURI();
 				if(uri instanceof SipURI) {
 					SipURI sipURI = (SipURI) uri;
-					String transportParam = sipURI.getTransportParam();
+					if(sipURI.isSecure()) {
+						transport = ListeningPoint.TLS;
+					} else {
+						String transportParam = sipURI.getTransportParam();
+
+						if (transportParam != null
+								&& transportParam.equalsIgnoreCase(ListeningPoint.TLS)) {
+							transport = ListeningPoint.TLS;
+						}
+						//Fix by Filip Olsson for Issue 112
+						else if ((transportParam != null
+								&& transportParam.equalsIgnoreCase(ListeningPoint.TCP)) || 
+								request.getContentLength().getContentLength() > 4096) {
+							transport = ListeningPoint.TCP;
+						}
+					}
+				}
+			}
+		}
+
+		if(transport == null && message instanceof Request) {
+			transport = ListeningPoint.UDP;
+			Request request = (Request)message;
+			URI ruri = request.getRequestURI();
+			if(ruri instanceof SipURI) {
+				SipURI sruri = ((javax.sip.address.SipURI) ruri);
+				if(sruri.isSecure()) {
+					transport = ListeningPoint.TLS;
+				} else {
+					String transportParam = sruri.getTransportParam();
 
 					if (transportParam != null
 							&& transportParam.equalsIgnoreCase(ListeningPoint.TLS)) {
@@ -621,27 +650,6 @@ public final class JainSipUtils {
 							request.getContentLength().getContentLength() > 4096) {
 						transport = ListeningPoint.TCP;
 					}
-				}
-			}
-		}
-
-		if(transport == null && message instanceof Request) {
-			transport = ListeningPoint.UDP;
-			Request request = (Request)message;
-
-			if(request.getRequestURI() instanceof SipURI) {
-				String transportParam = ((javax.sip.address.SipURI) request
-					.getRequestURI()).getTransportParam();
-				
-				if (transportParam != null
-						&& transportParam.equalsIgnoreCase(ListeningPoint.TLS)) {
-					transport = ListeningPoint.TLS;
-				}
-				//Fix by Filip Olsson for Issue 112
-				else if ((transportParam != null
-					&& transportParam.equalsIgnoreCase(ListeningPoint.TCP)) || 
-					request.getContentLength().getContentLength() > 4096) {
-					transport = ListeningPoint.TCP;
 				}
 			}
 		}

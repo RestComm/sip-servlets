@@ -296,6 +296,7 @@ public class ShootistSipServlet
 		String dontSetRURI = ce.getServletContext().getInitParameter("dontSetRURI");
 		if(dontSetRURI == null) {
 			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
+			requestURI.setSecure(ce.getServletContext().getInitParameter("secureRURI")!=null);
 			if(ce.getServletContext().getInitParameter("encodeRequestURI") != null) {
 				sipApplicationSession.encodeURI(requestURI);
 				sipApplicationSession.setAttribute(ENCODE_URI, "true");

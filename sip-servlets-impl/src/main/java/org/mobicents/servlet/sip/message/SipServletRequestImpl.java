@@ -1145,6 +1145,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 			if (super.getTransaction() == null) {				
 
+				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
+						transport, false).getSipProvider();
+				
 				ContactHeader contactHeader = (ContactHeader)request.getHeader(ContactHeader.NAME);
 				if(contactHeader == null && !Request.REGISTER.equalsIgnoreCase(requestMethod) && JainSipUtils.CONTACT_HEADER_METHODS.contains(requestMethod) && proxy == null) {
 					final FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
@@ -1158,23 +1161,29 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						JainSipUtils.createContactHeader(sipNetworkInterfaceManager, request, fromName, session.getOutboundInterface());	
 					request.addHeader(contactHeader);
 				}
-				if(sipConnector != null && sipConnector.isUseStaticAddress()) {
-					if(proxy == null && contactHeader != null) {
-						boolean sipURI = contactHeader.getAddress().getURI().isSipURI();
-						if(sipURI) {
-							javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) contactHeader.getAddress().getURI();
+
+				if(proxy == null && contactHeader != null) {
+					boolean sipURI = contactHeader.getAddress().getURI().isSipURI();
+					if(sipURI) {
+						javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) contactHeader.getAddress().getURI();
+						if(sipConnector != null && sipConnector.isUseStaticAddress()) {
 							sipUri.setHost(sipConnector.getStaticServerAddress());
 							sipUri.setPort(sipConnector.getStaticServerPort());
+						} else {
+							sipUri.setHost(sipConnector.getIpAddress());
+							sipUri.setPort(sipConnector.getPort());
+							
 						}
-					}
-				}
+						sipUri.setTransportParam(transport);
+						if(transport.equalsIgnoreCase("tls")) {
+							sipUri.setSecure(true);
+						}
+					} 
+				} 
 
 				if(logger.isDebugEnabled()) {
 					logger.debug("Getting new Client Tx for request " + request);
 				}
-				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
-						transport, false).getSipProvider();
-				
 				/* 
 				 * If we the next hop is in this container we optimize the traffic by directing it here instead of going through load balancers.
 				 * This is must be done before creating the transaction, otherwise it will go to the host/port specified prior to the changes here.
@@ -1183,7 +1192,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						sipConnector.isUseStaticAddress()) {
 					optimizeRouteHeaderAddressForInternalRoutingrequest(sipConnector, request, session, sipFactoryImpl, transport);
 				}								
-				
+
 				final ClientTransaction ctx = sipProvider.getNewClientTransaction(request);				
 				ctx.setRetransmitTimer(sipFactoryImpl.getSipApplicationDispatcher().getBaseTimerInterval());
 			    ((TransactionExt)ctx).setTimerT2(sipFactoryImpl.getSipApplicationDispatcher().getT2Interval());
@@ -1330,7 +1339,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				}
 			}					
 
-			updateContactHeaderTransport(transport);
 
 			if(sipConnector != null && sipConnector.isUseStaticAddress()) {
 				javax.sip.address.URI uri = request.getRequestURI();
@@ -1390,22 +1398,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			throw new IllegalStateException("Error sending request " + request,ex);
 		} 
 
-	}
-	
-	protected void updateContactHeaderTransport(String transport) throws ParseException {
-		ContactHeader contactHeader = (ContactHeader)message.getHeader(ContactHeader.NAME);
-		if(contactHeader != null) {
-			// We need to update the originally created contact header if the request changed the transport
-			javax.sip.address.URI uri = contactHeader.getAddress().getURI();
-			if(uri.isSipURI()) {
-				javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
-
-				// It is always UDP by default, so we only need to modify it if it is different that UDP
-				if(!transport.equalsIgnoreCase("udp")) {
-					sipUri.setTransportParam(transport);
-				}
-			}
-		}
 	}
 
 	/**
