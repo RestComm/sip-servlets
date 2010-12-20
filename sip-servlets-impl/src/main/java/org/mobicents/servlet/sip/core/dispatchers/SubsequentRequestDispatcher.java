@@ -264,7 +264,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					sipServletRequest.createResponse(491).send();
 					return;
 				} catch (IOException e) {
-					logger.error("Problem sending 491 response");
+					logger.error("Problem sending 491 response to " + sipServletRequest, e);
 				}
 			}
 			sipSession.setRequestsPending(sipSession.getRequestsPending() + 1);

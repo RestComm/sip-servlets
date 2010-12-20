@@ -1071,7 +1071,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 										}
 										SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipServletMessage;
 										sipServletMessage.setTransaction(transaction);
-										SipServletResponseImpl response = (SipServletResponseImpl) sipServletRequestImpl.createResponse(408, null, false, false);
+										SipServletResponseImpl response = (SipServletResponseImpl) sipServletRequestImpl.createResponse(408, null, false);
 										// Fix for Issue 1734
 										sipServletRequestImpl.setResponse(response);
 										

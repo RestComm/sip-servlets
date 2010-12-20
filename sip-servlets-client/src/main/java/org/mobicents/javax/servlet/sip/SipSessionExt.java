@@ -34,6 +34,10 @@ import javax.servlet.sip.SipURI;
  * 		<li>
  * 			Allows for applications to schedule work asynchronously against a SipSession in a thread-safe manner if used in conjunction with the Mobicents Concurrency Control Mechanism
  * 		</li>
+ * 		<li>
+ * 			Allows for applications to copy the record route headers on the responses to subsequent INVITE requests 
+ * where the dialog route set shouldn't normally be changed to cope with non compliant RFC 3261 servers. 
+ * 		</li> 
  * </ul>
  * 
  * Here is some sample code to show how the asynchronous work can be used :
@@ -95,4 +99,18 @@ public interface SipSessionExt {
 	 * @param work the work to be performed on this SipSession. 
 	 */
     void scheduleAsynchronousWork(SipSessionAsynchronousWork work);
+    /**
+     * Allows for applications to copy the record route headers on the responses to subsequent INVITE requests 
+     * where the dialog route set shouldn't normally be changed to cope with non compliant RFC 3261 servers.
+     *  
+     * @param copyRecordRouteHeadersOnSubsequentResponses false by default, if true will exhibit the behavior described above 
+     */
+    void setCopyRecordRouteHeadersOnSubsequentResponses(boolean copyRecordRouteHeadersOnSubsequentResponses);    
+    /**
+     * Allows for applications to copy the record route headers on the responses to subsequent INVITE requests 
+     * where the dialog route set shouldn't normally be changed to cope with non compliant RFC 3261 servers.
+     *  
+     * @param copyRecordRouteHeadersOnSubsequentResponses true if the session currently exhibit the behavior described above 
+     */
+    boolean getCopyRecordRouteHeadersOnSubsequentResponses();
 }

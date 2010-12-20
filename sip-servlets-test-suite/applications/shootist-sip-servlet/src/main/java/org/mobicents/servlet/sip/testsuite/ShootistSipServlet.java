@@ -145,7 +145,8 @@ public class ShootistSipServlet
 			return;
 		}
 		if(req.getTo().getURI().toString().contains("recordrouteeinvite"))  {
-			((SipServletRequestExt) req).createResponse(200, null, true).send();
+			((SipSessionExt)req.getSession()).setCopyRecordRouteHeadersOnSubsequentResponses(true);
+			req.createResponse(200).send();
 			return;
 		}
 		if(!requestURIStringified.startsWith("sip:mss@sip-servlets.com;org.mobicents.servlet.sip.ApplicationSessionKey=%28") && !requestURIStringified.endsWith("%3Aorg.mobicents.servlet.sip.testsuite.ShootistApplication%29")) {

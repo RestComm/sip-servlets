@@ -22,7 +22,6 @@
 package org.mobicents.javax.servlet.sip;
 
 import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipServletResponse;
 
 
 /**
@@ -31,8 +30,7 @@ import javax.servlet.sip.SipServletResponse;
  * 
  * <ul> 		
  * 		<li>
- * 			Allows for applications to copy the record route headers on the responses to subsequent INVITE requests 
- * where the dialog route set shouldn't normally be changed to cope with non compliant RFC 3261 servers. 
+ * 			
  * 		</li> 		
  * </ul>
  * 
@@ -40,15 +38,5 @@ import javax.servlet.sip.SipServletResponse;
  * @since 1.5
  */
 public interface SipServletRequestExt extends SipServletRequest {
-	/**
-	 * Creates a response for this request with the specified status code and reason phrase.
-	 * @param statusCode the status code for the response
-	 * @param reasonPhrase reason phrase to appear in response line
-	 * @param copyRecordRouteHeaders whether or not to copy the record route headers on the response to a subsequent INVITE request
-	 * @return response object with specified status code and reason phrase and eventually the record route from the request copied in the response
-	 * 
-	 * @throws IllegalArgumentException if the statuscode is not a valid SIP status code
-	 * @throws IllegalStateException if this request has already been responded to with a final status code
-	 */
-	SipServletResponse createResponse(int statusCode, String reasonPhrase, boolean copyRecordRouteHeaders);
+	
 }

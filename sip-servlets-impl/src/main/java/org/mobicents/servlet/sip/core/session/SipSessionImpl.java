@@ -256,6 +256,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 	//original transaction that started this session is stored so that we know if the session should end when all subscriptions have terminated or when the BYE has come
 	protected transient String originalMethod = null;
 	protected transient boolean okToByeSentOrReceived = false;
+	// Issue 2066 Miss Record-Route in Response To Subsequent Requests for non RFC3261 compliant servers
+	protected transient boolean copyRecordRouteHeadersOnSubsequentResponses = false;
+	
 	protected transient Semaphore semaphore;
 	
 	protected transient MobicentsSipSessionFacade facade = null;
@@ -2083,5 +2086,21 @@ public class SipSessionImpl implements MobicentsSipSession {
 		// we should never go negative here
 		if(requests < 0) requests = 0;
 		requestsPending = requests;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.javax.servlet.sip.SipSessionExt#setCopyRecordRouteHeadersOnSubsequentResponses(boolean)
+	 */
+	public void setCopyRecordRouteHeadersOnSubsequentResponses(
+			boolean copyRecordRouteHeadersOnSubsequentResponses) {
+		this.copyRecordRouteHeadersOnSubsequentResponses = copyRecordRouteHeadersOnSubsequentResponses;
+	}
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.javax.servlet.sip.SipSessionExt#getCopyRecordRouteHeadersOnSubsequentResponses()
+	 */
+	public boolean getCopyRecordRouteHeadersOnSubsequentResponses() {
+		return copyRecordRouteHeadersOnSubsequentResponses;
 	}
 }

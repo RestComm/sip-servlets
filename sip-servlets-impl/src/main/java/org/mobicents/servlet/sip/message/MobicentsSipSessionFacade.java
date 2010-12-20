@@ -461,4 +461,13 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 		sipSession.notifySipSessionListeners(creation);		
 	}
 
+	public void setCopyRecordRouteHeadersOnSubsequentResponses(
+			boolean copyRecordRouteHeadersOnSubsequentResponses) {
+		sipSession.setCopyRecordRouteHeadersOnSubsequentResponses(copyRecordRouteHeadersOnSubsequentResponses);
+	}
+
+	public boolean getCopyRecordRouteHeadersOnSubsequentResponses() {
+		return sipSession.getCopyRecordRouteHeadersOnSubsequentResponses();
+	}
+
 }

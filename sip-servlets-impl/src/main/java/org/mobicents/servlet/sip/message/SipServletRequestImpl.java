@@ -256,7 +256,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletRequest#createResponse(int)
 	 */
 	public SipServletResponse createResponse(int statusCode) {
-		return createResponse(statusCode, null, false, true);
+		return createResponse(statusCode, null, true);
 	}
 	
 	/*
@@ -264,18 +264,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @see javax.servlet.sip.SipServletRequest#createResponse(int, java.lang.String)
 	 */
 	public SipServletResponse createResponse(final int statusCode, final String reasonPhrase) {
-		return createResponse(statusCode, reasonPhrase, false, true);
-	}
+		return createResponse(statusCode, reasonPhrase, true);
+	}		
 	
-	/*
-	 * (non-Javadoc)
-	 * @see org.mobicents.javax.servlet.sip.SipServletRequestExt#createResponse(int, java.lang.String, boolean)
-	 */
-	public SipServletResponse createResponse(final int statusCode, final String reasonPhrase, boolean copyRecordRouteHeaders) {
-		return createResponse(statusCode, reasonPhrase, copyRecordRouteHeaders, true);
-	}
-	
-	public SipServletResponse createResponse(final int statusCode, final String reasonPhrase, boolean copyRecordRouteHeaders, boolean validate) {
+	public SipServletResponse createResponse(final int statusCode, final String reasonPhrase, boolean validate) {
 		checkReadOnly();
 		final Transaction transaction = getTransaction();
 		if(RoutingState.CANCELLED.equals(routingState)) {
@@ -374,7 +366,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 //				response.addHeader(routeHeader);
 //			}
 			
-			if(copyRecordRouteHeaders && !isInitial() && requestMethod.equals(Request.INVITE)) {
+			if(session.getCopyRecordRouteHeadersOnSubsequentResponses() && !isInitial() && requestMethod.equals(Request.INVITE)) {
 				// Miss Record-Route in Response for non compliant Server in reINVITE http://code.google.com/p/mobicents/issues/detail?id=2066
 				final ListIterator<RecordRouteHeader> recordRouteHeaders = request.getHeaders(RecordRouteHeader.NAME);
 				while (recordRouteHeaders.hasNext()) {
