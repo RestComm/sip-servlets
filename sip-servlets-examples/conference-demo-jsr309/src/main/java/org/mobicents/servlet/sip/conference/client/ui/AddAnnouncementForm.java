@@ -14,6 +14,7 @@ public class AddAnnouncementForm extends HorizontalPanel {
 	public AddAnnouncementForm(final String confName) {
 		final Label status = new Label("");
 		final TextBox urlText = new TextBox();
+		urlText.setText("http://mobicents.googlecode.com/svn/branches/servers/media/1.x.y/examples/mms-demo/web/src/main/webapp/audio/cnfannouncement.wav");
 		add(urlText);
 		Button addButton = new Button("Play file");
 		addButton.addClickListener(new ClickListener() {
