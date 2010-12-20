@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.testsuite;
 import gov.nist.javax.sip.DialogExt;
 import gov.nist.javax.sip.address.SipUri;
 import gov.nist.javax.sip.header.HeaderFactoryExt;
+import gov.nist.javax.sip.header.ParameterNames;
 import gov.nist.javax.sip.header.SIPETag;
 import gov.nist.javax.sip.header.SIPHeaderNames;
 import gov.nist.javax.sip.header.WWWAuthenticate;
@@ -52,6 +53,7 @@ import javax.sip.address.Address;
 import javax.sip.address.SipURI;
 import javax.sip.address.TelURL;
 import javax.sip.address.URI;
+import javax.sip.header.AuthenticationInfoHeader;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
@@ -75,7 +77,6 @@ import javax.sip.header.SIPIfMatchHeader;
 import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
-import javax.sip.message.Message;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -298,6 +299,8 @@ public class TestSipListener implements SipListener {
 	private boolean disableSequenceNumberValidation = false;
 	
 	private boolean sendCancelOn1xx = false;
+
+	private boolean testNextNonce =false;
 	
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -955,6 +958,12 @@ public class TestSipListener implements SipListener {
             
 			Response okResponse = protocolObjects.messageFactory.createResponse(
 					Response.OK, request);			
+			if(testNextNonce) {
+				AuthenticationInfoHeader authenticationInfoHeader = protocolObjects.headerFactory.createAuthenticationInfoHeader("");
+				authenticationInfoHeader.setNextNonce(dsam.generateNonce());
+				authenticationInfoHeader.removeParameter(ParameterNames.RESPONSE_AUTH);
+				okResponse.addHeader(authenticationInfoHeader);
+			}
 			ToHeader toHeader = (ToHeader) okResponse.getHeader(ToHeader.NAME);
 			if (toHeader.getTag() == null) {
 				toHeader.setTag(Integer.toString(new Random().nextInt(10000000)));
@@ -1136,6 +1145,12 @@ public class TestSipListener implements SipListener {
 				if(testAckViaParam) {
 					ViaHeader viaHeader = (ViaHeader)getFinalResponse().getHeader(ViaHeader.NAME);
 					viaHeader.setParameter("testAckViaParam", "true");
+				}
+				if(testNextNonce) {
+					AuthenticationInfoHeader authenticationInfoHeader = protocolObjects.headerFactory.createAuthenticationInfoHeader("");
+					authenticationInfoHeader.setNextNonce(dsam.generateNonce());
+					authenticationInfoHeader.removeParameter(ParameterNames.RESPONSE_AUTH);
+					getFinalResponse().addHeader(authenticationInfoHeader);
 				}
 				ToHeader toHeader = (ToHeader) getFinalResponse().getHeader(ToHeader.NAME);
 				if(toHeader.getTag() == null) {
@@ -1602,7 +1617,9 @@ public class TestSipListener implements SipListener {
 					((WWWAuthenticate) (response
 							.getHeader(SIPHeaderNames.WWW_AUTHENTICATE))),
 					"user",
-					"pass");
+					"pass",
+					((WWWAuthenticate) (response
+							.getHeader(SIPHeaderNames.WWW_AUTHENTICATE))).getNonce());
 			
 			requestauth.addHeader(authorization);
 		} catch (ParseException pa) {
@@ -2858,6 +2875,10 @@ public class TestSipListener implements SipListener {
 	 */
 	public boolean isUseToURIasRequestUri() {
 		return useToURIasRequestUri;
+	}
+
+	public void setTestNextNonce(boolean b) {
+		this.testNextNonce  = b;
 	}
 
 }

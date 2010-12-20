@@ -36,6 +36,7 @@ import javax.servlet.sip.SipURI;
 import javax.sip.ListeningPoint;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.SipServletRequestExt;
 
 public class ShootistSipServletAuth 
 		extends SipServlet 
@@ -65,14 +66,21 @@ public class ShootistSipServletAuth
 			// Avoid re-sending if the auth repeatedly fails.
 			if(!"true".equals(getServletContext().getAttribute("FirstResponseRecieved")))
 			{
+				String fromString = response.getFrom().getURI().toString();
+				
 				getServletContext().setAttribute("FirstResponseRecieved", "true");
 				AuthInfo authInfo = sipFactory.createAuthInfo();
 				authInfo.addAuthInfo(response.getStatus(), "sip-servlets-realm", "user", "pass");
 				SipServletRequest challengeRequest = response.getSession().createRequest(
 						response.getRequest().getMethod());
-				challengeRequest.addAuthHeader(response, authInfo);
+				boolean cacheCredentials = false;
+				if(fromString.contains("cache-credentials")) {
+					cacheCredentials = true;
+				}
+				logger.info("cache Credentials : " + cacheCredentials);	
+				((SipServletRequestExt)challengeRequest).addAuthHeader(response, authInfo, cacheCredentials);
 				challengeRequest.send();
-				String fromString = response.getFrom().getURI().toString();
+				
 				if(fromString.contains("cancelChallenge")) {
 					if(fromString.contains("Before1xx")) {
 						try {

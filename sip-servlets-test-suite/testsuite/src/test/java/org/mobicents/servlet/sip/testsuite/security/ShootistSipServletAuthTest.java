@@ -147,6 +147,34 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 	}
 	
 	/*
+	 * Non regression test for Issue 2173 
+	 * http://code.google.com/p/mobicents/issues/detail?id=2173
+	 * Handle Header [Authentication-Info: nextnonce="xyz"] in sip authorization responses
+	 */
+	public void testShootistReinviteNextNonce() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender-app-send-reinvite-cache-credentials", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setChallengeRequests(true);
+		receiver.setTestNextNonce(true);		
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();		
+		
+		tomcat.startTomcat();
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("from", "sender-app-send-reinvite-cache-credentials");
+		params.put("nbSubsequentReq","4");
+		params.put("METHOD", "REGISTER");
+		deployApplication(params);
+		Thread.sleep(TIMEOUT);		
+	}
+	
+	/*
 	 * Non regression test for Issue 1836 
 	 * http://code.google.com/p/mobicents/issues/detail?id=1836
 	 * Exception thrown when creating a cancel after a "Proxy Authentication required" response
