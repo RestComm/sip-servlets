@@ -44,8 +44,6 @@ import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
-import test.tck.msgflow.callflows.tls.TlsTest;
-
 public class ShootistSipServletTest extends SipServletTestCase {
 	private static transient Logger logger = Logger.getLogger(ShootistSipServletTest.class);		
 	private static final String TRANSPORT = "udp";
@@ -127,8 +125,8 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	@Override
 	protected void setUp() throws Exception {
 
-        System.setProperty( "javax.net.ssl.keyStore",  TlsTest.class.getResource("testkeys").getPath() );
-        System.setProperty( "javax.net.ssl.trustStore", TlsTest.class.getResource("testkeys").getPath() );
+        System.setProperty( "javax.net.ssl.keyStore",  ShootistSipServletTest.class.getResource("testkeys").getPath() );
+        System.setProperty( "javax.net.ssl.trustStore", ShootistSipServletTest.class.getResource("testkeys").getPath() );
         System.setProperty( "javax.net.ssl.keyStorePassword", "passphrase" );
         System.setProperty( "javax.net.ssl.keyStoreType", "jks" );
 		super.setUp();												
