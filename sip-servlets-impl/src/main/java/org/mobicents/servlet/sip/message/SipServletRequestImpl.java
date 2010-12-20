@@ -29,10 +29,12 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
@@ -366,7 +368,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 //				response.addHeader(routeHeader);
 //			}
 			
-			if(session.getCopyRecordRouteHeadersOnSubsequentResponses() && !isInitial() && requestMethod.equals(Request.INVITE)) {
+			if(session != null && session.getCopyRecordRouteHeadersOnSubsequentResponses() && !isInitial() && Request.INVITE.equals(requestMethod)) {
 				// Miss Record-Route in Response for non compliant Server in reINVITE http://code.google.com/p/mobicents/issues/detail?id=2066
 				final ListIterator<RecordRouteHeader> recordRouteHeaders = request.getHeaders(RecordRouteHeader.NAME);
 				while (recordRouteHeaders.hasNext()) {
@@ -1506,6 +1508,24 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 */
 	public void addAuthHeader(SipServletResponse challengeResponse,
 			AuthInfo authInfo) {
+		addAuthHeader(challengeResponse, authInfo, false);
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.SipServletRequest#addAuthHeader(javax.servlet.sip.SipServletResponse, java.lang.String, java.lang.String)
+	 */
+	public void addAuthHeader(SipServletResponse challengeResponse,
+			String username, String password) {
+		addAuthHeader(challengeResponse, username, password, false);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.javax.servlet.sip.SipServletRequestExt#addAuthHeader(javax.servlet.sip.SipServletResponse, javax.servlet.sip.AuthInfo, boolean)
+	 */
+	public void addAuthHeader(SipServletResponse challengeResponse,
+			AuthInfo authInfo, boolean cacheCredentials) {
 		checkReadOnly();
 		AuthInfoImpl authInfoImpl = (AuthInfoImpl) authInfo;
 		
@@ -1533,6 +1553,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					authInfoEntry.getUserName(),
 					authInfoEntry.getPassword(),
 					this.getRequestURI().toString());
+			
+			if(cacheCredentials) {
+				getSipSession().getSipSessionSecurity().addCachedAuthInfo(wwwAuthHeader.getRealm(), authInfoEntry);
+			}
 		}
 		
 		// Now check for Proxy-Authentication
@@ -1555,16 +1579,19 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					authInfoEntry.getUserName(),
 					authInfoEntry.getPassword(),
 					this.getRequestURI().toString());
+			
+			if(cacheCredentials) {
+				getSipSession().getSipSessionSecurity().addCachedAuthInfo(proxyAuthHeader.getRealm(), authInfoEntry);
+			}
 		}
-		
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see javax.servlet.sip.SipServletRequest#addAuthHeader(javax.servlet.sip.SipServletResponse, java.lang.String, java.lang.String)
+	 * @see org.mobicents.javax.servlet.sip.SipServletRequestExt#addAuthHeader(javax.servlet.sip.SipServletResponse, java.lang.String, java.lang.String, boolean)
 	 */
 	public void addAuthHeader(SipServletResponse challengeResponse,
-			String username, String password) {
+			String username, String password, boolean cacheCredentials) {
 		checkReadOnly();
 		SipServletResponseImpl challengeResponseImpl = 
 			(SipServletResponseImpl) challengeResponse;
@@ -1583,6 +1610,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			removeStaleAuthHeaders(wwwAuthHeader);
 //			String uri = wwwAuthHeader.getParameter("uri");
 			addChallengeResponse(wwwAuthHeader, username, password, this.getRequestURI().toString());
+			
+			if(cacheCredentials) {
+				getSipSession().getSipSessionSecurity().addCachedAuthInfo(wwwAuthHeader.getRealm(), new AuthInfoEntry(response.getStatusCode(), username, password));
+			}
 		}
 		
 		
@@ -1599,6 +1630,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			String uri = proxyAuthHeader.getParameter("uri");
 			if(uri == null) uri = this.getRequestURI().toString();
 			addChallengeResponse(proxyAuthHeader, username, password, uri);
+			
+			if(cacheCredentials) {
+				getSipSession().getSipSessionSecurity().addCachedAuthInfo(proxyAuthHeader.getRealm(), new AuthInfoEntry(response.getStatusCode(), username, password));
+			}
 		}
 	}
 	
@@ -1661,7 +1696,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				"", // TODO: What is this entity-body?
 				wwwAuthHeader,
 				username,
-				password);
+				password,
+				wwwAuthHeader.getNonce());
 		
 		message.addHeader(authorization);
 	}
@@ -2039,4 +2075,73 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		out.writeBoolean(isFinalResponseGenerated);
 		out.writeBoolean(is1xxResponseGenerated);	
 	}
+
+	/**
+	 * Added for Issue 2173 http://code.google.com/p/mobicents/issues/detail?id=2173
+	 * Handle Header [Authentication-Info: nextnonce="xyz"] in sip authorization responses
+	 */
+	public void updateAuthorizationHeadersWithNextNonce() {
+		if(logger.isDebugEnabled()) {
+			logger.debug("Updating authorization headers with nextnonce " + getSipSession().getSipSessionSecurity().getNextNonce());
+		}
+		List<Header> authorizationHeaders = new ArrayList<Header>();
+		
+		// First check for WWWAuthentication headers
+		ListIterator authHeaderIterator = 
+			message.getHeaders(AuthorizationHeader.NAME);
+		while(authHeaderIterator.hasNext()) {
+			AuthorizationHeader wwwAuthHeader = 
+				(AuthorizationHeader) authHeaderIterator.next();
+			AuthInfoEntry authInfoEntry = getSipSession().getSipSessionSecurity().getCachedAuthInfos().get(wwwAuthHeader.getRealm());
+			
+			if(authInfoEntry != null) {
+				
+				AuthorizationHeader authorization = DigestAuthenticator.getAuthorizationHeader(
+						getMethod(),
+						this.getRequestURI().toString(),
+						"", // TODO: What is this entity-body?
+						wwwAuthHeader,
+						authInfoEntry.getUserName(),
+						authInfoEntry.getPassword(),
+						getSipSession().getSipSessionSecurity().getNextNonce());
+
+				authorizationHeaders.add(authorization);
+			} else {
+				authorizationHeaders.add(wwwAuthHeader);
+			}
+		}
+		
+		// Now check for Proxy-Authentication
+		authHeaderIterator = 
+			message.getHeaders(ProxyAuthorizationHeader.NAME);
+		while(authHeaderIterator.hasNext()) {
+			ProxyAuthorizationHeader proxyAuthHeader = 
+				(ProxyAuthorizationHeader) authHeaderIterator.next();
+//			String uri = wwwAuthHeader.getParameter("uri");
+			AuthInfoEntry authInfoEntry = getSipSession().getSipSessionSecurity().getCachedAuthInfos().get(proxyAuthHeader.getRealm());
+			
+			if(authInfoEntry != null) { 
+					
+				AuthorizationHeader authorization = DigestAuthenticator.getAuthorizationHeader(
+						getMethod(),
+						this.getRequestURI().toString(),
+						"", // TODO: What is this entity-body?
+						proxyAuthHeader,
+						authInfoEntry.getUserName(),
+						authInfoEntry.getPassword(),
+						getSipSession().getSipSessionSecurity().getNextNonce());
+
+				authorizationHeaders.add(authorization);
+			} else {
+				authorizationHeaders.add(proxyAuthHeader);
+			}
+		}
+		
+		message.removeHeader(AuthorizationHeader.NAME);
+		message.removeHeader(ProxyAuthorizationHeader.NAME);
+		
+		for(Header header : authorizationHeaders) {
+			message.addHeader(header);
+		}
+	}	
 }

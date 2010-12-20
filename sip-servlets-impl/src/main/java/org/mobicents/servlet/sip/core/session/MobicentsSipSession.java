@@ -38,6 +38,7 @@ import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
+import org.mobicents.servlet.sip.security.AuthInfoEntry;
 
 /**
  * 
@@ -151,20 +152,19 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	public boolean isValidInternal();
 
 	public long getCseq();
-
 	public void setCseq(long cseq);
-
 	boolean validateCSeq(SipServletRequestImpl sipServletRequestImpl);
 	
 	String getTransport();
-	
 	void setTransport(String transport);
 	
 	int getRequestsPending();
-	
 	void setRequestsPending(int requests);
 
 	void setAckReceived(long cSeq, boolean ackReceived);
 
 	void notifySipSessionListeners(SipSessionEventType creation);
+	
+	void setSipSessionSecurity(SipSessionSecurity sipSessionSecurity);
+	SipSessionSecurity getSipSessionSecurity();
 }

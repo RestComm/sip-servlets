@@ -24,8 +24,10 @@ import java.text.ParseException;
 import java.util.StringTokenizer;
 
 import javax.sip.header.AuthorizationHeader;
+import javax.sip.header.Header;
 import javax.sip.header.HeaderFactory;
 import javax.sip.header.ProxyAuthenticateHeader;
+import javax.sip.header.ProxyAuthorizationHeader;
 import javax.sip.header.WWWAuthenticateHeader;
 
 import org.apache.catalina.Realm;
@@ -423,73 +425,102 @@ public class DigestAuthenticator
                 String                method,
                 String                uri,
                 String                requestBody,
-                WWWAuthenticateHeader authHeader,
+                Header 				  authHeader,
                 String       		  username,
-                String 				  password)
+                String 				  password,
+                String 				  nonce)
     {
         String response = null;
         HeaderFactory headerFactory = SipFactories.headerFactory;
+        boolean isResponseHeader = true;
+        WWWAuthenticateHeader wwwAuthenticateHeader = null;
+        if(authHeader instanceof WWWAuthenticateHeader) {
+        	wwwAuthenticateHeader = (WWWAuthenticateHeader) authHeader;
+        }
+        
+        AuthorizationHeader authorizationHeader = null;
+        if(authHeader instanceof AuthorizationHeader) {
+        	authorizationHeader =  (AuthorizationHeader) authHeader;
+        	isResponseHeader = false;
+        }
         
         // JvB: authHeader.getQop() is a quoted _list_ of qop values 
         // (e.g. "auth,auth-int") Client is supposed to pick one
-        String qopList = authHeader.getQop();
+        String qopList = null;
+        if(isResponseHeader) {
+        	qopList = wwwAuthenticateHeader.getQop();	
+        } else {
+        	qopList = authorizationHeader.getQop();
+        }
+        String algorithm = null;
+        if(isResponseHeader) {
+        	algorithm = wwwAuthenticateHeader.getAlgorithm();	
+        } else {
+        	algorithm = authorizationHeader.getAlgorithm();
+        }
+        String realm = null;
+        if(isResponseHeader) {
+        	realm = wwwAuthenticateHeader.getRealm();	
+        } else {
+        	realm = authorizationHeader.getRealm();
+        }
+        String scheme = null;
+        if(isResponseHeader) {
+        	scheme = wwwAuthenticateHeader.getScheme();	
+        } else {
+        	scheme = authorizationHeader.getScheme();
+        }
+        String opaque = null;
+        if(isResponseHeader) {
+        	opaque = wwwAuthenticateHeader.getOpaque();	
+        } else {
+        	opaque = authorizationHeader.getOpaque();
+        }
         String qop = (qopList != null) ? "auth" : null;
         String nc_value = "00000001";
         String cnonce = "xyz";
 
-        try
-        {
+        try {
             response = MessageDigestResponseAlgorithm.calculateResponse(
-                authHeader.getAlgorithm(),
+                algorithm,
                 username,
-                authHeader.getRealm(),
+                realm,
                 password,
-                authHeader.getNonce(),
+                nonce,
                 nc_value, // JvB added
                 cnonce,   // JvB added
                 method,
                 uri,
                 requestBody,
                 qop);//jvb changed
-        }
-        catch (NullPointerException exc)
-        {
+        } catch (NullPointerException exc) {
             throw new IllegalStateException(
                 "The authenticate header was malformatted", exc);
         }
 
         AuthorizationHeader authorization = null;
-        try
-        {
-            if (authHeader instanceof ProxyAuthenticateHeader)
-            {
-                authorization = headerFactory.createProxyAuthorizationHeader(
-                    authHeader.getScheme());
-            }
-            else
-            {
-                authorization = headerFactory.createAuthorizationHeader(
-                    authHeader.getScheme());
+        try {
+            if (authHeader instanceof ProxyAuthenticateHeader || authHeader instanceof ProxyAuthorizationHeader) {
+                authorization = headerFactory.createProxyAuthorizationHeader(scheme);
+            } else {
+                authorization = headerFactory.createAuthorizationHeader(scheme);
             }
 
             authorization.setUsername(username);
-            authorization.setRealm(authHeader.getRealm());
-            authorization.setNonce(authHeader.getNonce());
+            authorization.setRealm(realm);
+            authorization.setNonce(nonce);
             authorization.setParameter("uri", uri);
             authorization.setResponse(response);
-            if (authHeader.getAlgorithm() != null)
-            {
-                authorization.setAlgorithm(authHeader.getAlgorithm());
+            if (algorithm != null) {
+                authorization.setAlgorithm(algorithm);
             }
 
-            if (authHeader.getOpaque() != null && authHeader.getOpaque().length() > 0)
-            {
-                authorization.setOpaque(authHeader.getOpaque());
+            if (opaque != null && opaque.length() > 0) {
+                authorization.setOpaque(opaque);
             }
 
             // jvb added
-            if (qop!=null) 
-            {
+            if (qop!=null) {
                 authorization.setQop(qop);
                 authorization.setCNonce(cnonce);
                 authorization.setNonceCount( Integer.parseInt(nc_value) );
@@ -498,8 +529,7 @@ public class DigestAuthenticator
             authorization.setResponse(response);
 
         }
-        catch (ParseException ex)
-        {
+        catch (ParseException ex) {
             throw new SecurityException(
                 "Failed to create an authorization header!", ex);
         }

@@ -72,6 +72,7 @@ import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
 import javax.sip.TransactionState;
+import javax.sip.header.AuthenticationInfoHeader;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
@@ -264,6 +265,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 	protected transient MobicentsSipSessionFacade facade = null;
 	
 	protected transient ConcurrentHashMap<Long, Boolean> acksReceived = new ConcurrentHashMap<Long, Boolean>(2);
+	// Added for Issue 2173 http://code.google.com/p/mobicents/issues/detail?id=2173
+    // Handle Header [Authentication-Info: nextnonce="xyz"] in sip authorization responses
+	protected transient SipSessionSecurity sipSessionSecurity;
 	
 	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession) {
 		this.key = key;
@@ -498,6 +502,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 						throw new IllegalArgumentException("Problem setting param on the newly created susbequent request " + sipServletRequest,e);
 					}					
 				}
+
+				if(sipSessionSecurity != null && sipSessionSecurity.getNextNonce() != null) {
+					sipServletRequest.updateAuthorizationHeadersWithNextNonce();
+				}	
 				
 				return sipServletRequest;
 			} else {
@@ -529,6 +537,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 				request.addHeader(routeHeader);
 			}
 		}
+		
+		if(sipSessionSecurity != null && sipSessionSecurity.getNextNonce() != null) {
+			sipServletRequest.updateAuthorizationHeadersWithNextNonce();
+		}		
 		
 		return sipServletRequest;
 	}
@@ -822,6 +834,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(acksReceived != null) {
 			acksReceived.clear();
 		}
+		if(sipSessionSecurity != null) {
+			sipSessionSecurity.getCachedAuthInfos().clear();
+		}
 //		executorService.shutdown();
 		parentSession = null;
 		userPrincipal = null;		
@@ -886,6 +901,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		subscriberURI = null;
 		subscriptions = null;
 		acksReceived = null;
+		sipSessionSecurity = null;
 		// don't release or nullify the semaphore, it should be done externally
 		// see Issue http://code.google.com/p/mobicents/issues/detail?id=1294
 //		if(semaphore != null) {
@@ -1305,6 +1321,20 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void updateStateOnResponse(SipServletResponseImpl response, boolean receive) {
 		final String method = response.getMethod();
+		
+		if(sipSessionSecurity != null && response.getStatus() >= 200 && response.getStatus() < 300) {
+			// Issue 2173 http://code.google.com/p/mobicents/issues/detail?id=2173
+			// it means some credentials were cached need to check if we need to store the nextnonce if the response have one
+			AuthenticationInfoHeader authenticationInfoHeader = (AuthenticationInfoHeader)response.getMessage().getHeader(AuthenticationInfoHeader.NAME);
+			if(authenticationInfoHeader != null) {
+				String nextNonce = authenticationInfoHeader.getNextNonce();
+				if(logger.isDebugEnabled()) {
+					logger.debug("Storing nextNonce " + nextNonce + " for session " + key);
+				}
+				sipSessionSecurity.setNextNonce(nextNonce);			
+			}
+			
+		}
 		// JSR 289 Section 6.2.1 Point 2 of rules governing the state of SipSession
 		// In general, whenever a non-dialog creating request is sent or received, 
 		// the SipSession state remains unchanged. Similarly, a response received 
@@ -2103,4 +2133,19 @@ public class SipSessionImpl implements MobicentsSipSession {
 	public boolean getCopyRecordRouteHeadersOnSubsequentResponses() {
 		return copyRecordRouteHeadersOnSubsequentResponses;
 	}
+	/**
+	 * @param sipSessionSecurity the sipSessionSecurity to set
+	 */
+	public void setSipSessionSecurity(SipSessionSecurity sipSessionSecurity) {
+		this.sipSessionSecurity = sipSessionSecurity;
+	}
+	/**
+	 * @return the sipSessionSecurity
+	 */
+	public SipSessionSecurity getSipSessionSecurity() {
+		if(sipSessionSecurity == null) {
+			sipSessionSecurity = new SipSessionSecurity();
+		}
+		return sipSessionSecurity;
+	}		
 }

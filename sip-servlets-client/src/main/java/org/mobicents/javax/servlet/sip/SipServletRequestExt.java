@@ -21,7 +21,9 @@
  */
 package org.mobicents.javax.servlet.sip;
 
+import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipServletResponse;
 
 
 /**
@@ -38,5 +40,26 @@ import javax.servlet.sip.SipServletRequest;
  * @since 1.5
  */
 public interface SipServletRequestExt extends SipServletRequest {
+	/**
+	 * This method allows the addition of the appropriate authentication header(s) to the request that was challenged with a challenge response.<br/>
+	 * It allows also to cache the credentials so that if a response containing an Authentication-Info header with a nextnonce, the credentials can be reused
+	 * to generate the correct header
+	 * @param challengeResponse The challenge response (401/407) receieved from a UAS/Proxy.
+	 * @param authInfo The AuthInfo object that will add the Authentication headers to the request.
+	 * @param cacheCredentials true if the user's credentials should be cached
+	 */
+	void addAuthHeader(SipServletResponse challengeResponse, AuthInfo authInfo, boolean cacheCredentials);
 	
+	/**
+	 * This method allows the addition of the appropriate authentication header(s) to the request that was challenged with a challenge response without needing 
+	 * the creation and/or maintenance of the AuthInfo object.<br/>
+	 * It allows also to cache the credentials so that if a response containing an Authentication-Info header with a nextnonce, the credentials can be reused
+	 * to generate the correct header 
+	 * 
+	 * @param challengeResponse the challenge response (401/407) receieved from a UAS/Proxy.
+	 * @param username username
+	 * @param password password
+	 * @param cacheCredentials true if the user's credentials should be cached for that realm
+	 */
+	void addAuthHeader(SipServletResponse challengeResponse, String username, String password, boolean cacheCredentials);
 }

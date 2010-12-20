@@ -31,6 +31,7 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionEventType;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.core.session.SipSessionSecurity;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
@@ -468,6 +469,14 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 
 	public boolean getCopyRecordRouteHeadersOnSubsequentResponses() {
 		return sipSession.getCopyRecordRouteHeadersOnSubsequentResponses();
+	}
+
+	public SipSessionSecurity getSipSessionSecurity() {
+		return sipSession.getSipSessionSecurity();
+	}
+
+	public void setSipSessionSecurity(SipSessionSecurity sipSessionSecurity) {
+		sipSession.setSipSessionSecurity(sipSessionSecurity);
 	}
 
 }

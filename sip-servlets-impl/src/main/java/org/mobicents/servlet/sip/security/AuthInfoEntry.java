@@ -49,4 +49,12 @@ public class AuthInfoEntry {
 	public void setStatusCode(int statusCode) {
 		this.statusCode = statusCode;
 	}
+
+	@Override
+	public String toString() {
+		return "AuthInfoEntry [password=" + password + ", statusCode="
+				+ statusCode + ", userName=" + userName + "]";
+	}
+	
+	
 }
