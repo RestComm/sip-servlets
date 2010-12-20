@@ -27,6 +27,12 @@ echo "#!/bin/sh" > auto-startlb-worst.sh
 echo "java -server -Xms1536m -Xmx1536m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -jar $JBOSS_HOME/sip-balancer/sip-balancer-jar-with-dependencies.jar -mobicents-balancer-config=ar/worstcase-affinity-lb-configuration.properties" >> auto-startlb-worst.sh
 chmod +x auto-startlb-worst.sh
 
+# Uncomment this if you want to keep the original affinity testing.
+# The following code tests worst base affinity per request
+echo "#!/bin/sh" > auto-startlb.sh
+echo "java -server -Xms1536m -Xmx1536m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -jar $JBOSS_HOME/sip-balancer/sip-balancer-jar-with-dependencies.jar -mobicents-balancer-config=ar/worstcase-affinity-lb-configuration.properties" >> auto-startlb.sh
+chmod +x auto-startlb.sh
+
 
 ./auto-startlb.sh > siplb.out &
 export SIPLB=$!
@@ -445,15 +451,15 @@ sleep $HALFSTARTSLEEP
 rm -rf *.flag
 
 sleep $HALFSTARTSLEEP
-./auto-run-test.sh proxy-b2bua-ar result-ignore.txt
+./auto-run-test.sh proxy-b2bua-ar result.txt
 
 sleep 20
 if [ -f lssdestryed.flag -a -f cb2buadestryed.flag ]; then
     #success if both flags are present
-    echo "proxy-b2bua-ar 0" >> result.txt
+    echo "proxy-b2bua-ar-invalidation 0" >> result.txt
 else
     #failure is one of the flags is missing
-    echo "proxy-b2bua-ar 1" >> result.txt
+    echo "proxy-b2bua-ar-invalidation 1" >> result.txt
 fi
 
 #some debug info
