@@ -104,7 +104,7 @@ public class ExtendedListeningPoint {
 	/**
 	 *
 	 */
-	protected String getIpAddress(boolean usePublicAddress) {
+	public String getIpAddress(boolean usePublicAddress) {
 		// Making use of the global ip address discovered by STUN if it is present		
 		if(usePublicAddress && globalIpAddress != null) {
 			return globalIpAddress;
