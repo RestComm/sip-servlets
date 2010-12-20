@@ -29,9 +29,9 @@ chmod +x auto-startlb-worst.sh
 
 # Uncomment this if you want to keep the original affinity testing.
 # The following code tests worst base affinity per request
-echo "#!/bin/sh" > auto-startlb.sh
-echo "java -server -Xms1536m -Xmx1536m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -jar $JBOSS_HOME/sip-balancer/sip-balancer-jar-with-dependencies.jar -mobicents-balancer-config=ar/worstcase-affinity-lb-configuration.properties" >> auto-startlb.sh
-chmod +x auto-startlb.sh
+#echo "#!/bin/sh" > auto-startlb.sh
+#echo "java -server -Xms1536m -Xmx1536m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -jar $JBOSS_HOME/sip-balancer/sip-balancer-jar-with-dependencies.jar -mobicents-balancer-config=ar/worstcase-affinity-lb-configuration.properties" >> auto-startlb.sh
+#chmod +x auto-startlb.sh
 
 
 ./auto-startlb.sh > siplb.out &
@@ -517,6 +517,8 @@ kill $KILL_PARAMS `cat $config2.pid`
 #echo "Exit status for JBOSS2 $JBOSS2: $?"
 kill $KILL_PARAMS $SIPLB
 #echo "Exit status for SIPLB $SIPLB: $?"
+
+cat result.txt
 
 ./auto-generate-junit-test-report.sh result.txt report.xml
 
