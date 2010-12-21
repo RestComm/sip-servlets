@@ -3,7 +3,7 @@
 	<parent>
         	<artifactId>mobicents</artifactId>
         	<groupId>org.mobicents</groupId>
-        	<version>1.24-SNAPSHOT</version>
+        	<version>1.25</version>
     	</parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-bootstrap</artifactId>
@@ -84,9 +84,9 @@
 	<properties>
 		<!-- MOBICENTS TOOL VERSIONS -->
 		<mobicents.tools.mavenplugin.eclipse.version>1.0.0.BETA2</mobicents.tools.mavenplugin.eclipse.version>
-		<mobicents.cluster.version>1.7-SNAPSHOT</mobicents.cluster.version>
-		<mobicents.balancer.version>1.1-SNAPSHOT</mobicents.balancer.version>
-		<mobicents.jain.sip.ha.version>0.14-SNAPSHOT</mobicents.jain.sip.ha.version>
+		<mobicents.cluster.version>1.7</mobicents.cluster.version>
+		<mobicents.balancer.version>1.1</mobicents.balancer.version>
+		<mobicents.jain.sip.ha.version>1.0.0.FINAL</mobicents.jain.sip.ha.version>
 		<mobicents.jain.sip.ext.version>1.0.BETA1</mobicents.jain.sip.ext.version>
 		<tomcat.version>6.0.29</tomcat.version>	
 	</properties>
