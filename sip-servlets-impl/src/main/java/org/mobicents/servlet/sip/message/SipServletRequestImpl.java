@@ -1178,8 +1178,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 							sipUri.setPort(matchingListeningPoint.getPort());
 							
 						}
-						sipUri.setTransportParam(transport);
-						if(transport.equalsIgnoreCase("tls")) {
+						// http://code.google.com/p/mobicents/issues/detail?id=1150 only set transport if not udp
+						if(!"udp".equalsIgnoreCase(transport)) {
+							sipUri.setTransportParam(transport);
+						}
+						if("tls".equalsIgnoreCase(transport)) {
 							sipUri.setSecure(true);
 						}
 					} 
