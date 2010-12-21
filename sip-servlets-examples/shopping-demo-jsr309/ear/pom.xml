@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.example</groupId>
 		<artifactId>shopping-demo-parent-jsr309</artifactId>
-		<version>1.5.0.FINAL</version>
+		<version>1.6.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>shopping-demo-ear-jsr309</artifactId>
 	<packaging>ear</packaging>
@@ -58,13 +58,13 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip.example</groupId>
 			<artifactId>shopping-demo-business-jsr309</artifactId>
-			<version>1.5.0.FINAL</version>
+			<version>1.6.0-SNAPSHOT</version>
 			<type>ejb</type>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servlet.sip.example</groupId>
 			<artifactId>shopping-demo-web-jsr309</artifactId>
-			<version>1.5.0.FINAL</version>
+			<version>1.6.0-SNAPSHOT</version>
 			<type>war</type>
 		</dependency>
 		<dependency>

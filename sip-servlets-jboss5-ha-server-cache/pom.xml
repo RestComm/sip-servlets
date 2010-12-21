@@ -3,12 +3,12 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip</groupId>
 		<artifactId>sip-servlets-bootstrap</artifactId>
-		<version>1.5.0.FINAL</version>
+		<version>1.6.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-jboss5-ha-server-cache</artifactId>
-	<version>1.5.0.FINAL</version>
+	<version>1.6.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Sip Servlets JBoss 5 HA Server Cache SPI and Impl</name>
 	<url>http://www.mobicents.org/products_sip_servlets.html</url>
