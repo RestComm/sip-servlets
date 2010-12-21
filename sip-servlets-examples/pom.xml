@@ -20,7 +20,6 @@
 		<module>chatserver</module>
 		<module>click2call-distributable</module>
 		<module>click-to-call</module>
-		<module>conference-demo</module>
 		<module>conference-demo-jsr309</module>
 		<module>custom-call-forwarding-distributable</module>
 		<module>diameter-event-charging</module>
@@ -31,12 +30,10 @@
 		<module>location-service</module>
 		<module>location-service-distributable</module>
 		<module>media-jsr309-servlet</module>
-		<module>media-playback-servlet</module>
 		<module>pure-jruby-telco</module>
 		<module>presence-client-example</module>
 		<module>shootist-sip-servlet</module>
 		<module>shootist-sip-servlet-distributable</module>
-		<module>shopping-demo</module>
 		<module>shopping-demo-jsr309</module>
 		<module>simple-sip-servlet</module>
 		<module>simple-sip-servlet-distributable</module>
