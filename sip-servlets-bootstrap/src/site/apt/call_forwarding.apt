@@ -29,7 +29,7 @@ Call Forwarding
 	
 	* Mobicents Sip Servlets 2.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/call-forwarding/2.0.0.ALPHA1/call-forwarding-2.0.0.ALPHA1.war}here}}.
 	
-	* Mobicents Sip Servlets 1.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/call-forwarding/1.4.0.FINAL/call-forwarding-1.4.0.FINAL.war}here}}.
+	* Mobicents Sip Servlets 1.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/call-forwarding/1.5.0.FINAL/call-forwarding-1.5.0.FINAL.war}here}}.
 	 	
  	Drop the downloaded war file into your <<<tomcat_home/webapps>>> directory or <<<jboss_home/server/default/deploy>>> directory  
  	

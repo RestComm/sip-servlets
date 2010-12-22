@@ -23,8 +23,8 @@ Presence Client Example
 ** From the binary
 
 	You can find the war files corresponding to this example
- 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/call-blocking-presence/1.4.0.FINAL/call-blocking-presence-1.4.0.FINAL.war}here}} and 
- 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/location-service/1.4.0.FINAL/location-service-1.4.0.FINAL.war}here}}.\
+ 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/call-blocking-presence/1.5.0.FINAL/call-blocking-presence-1.5.0.FINAL.war}here}} and 
+ 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/location-service/1.5.0.FINAL/location-service-1.5.0.FINAL.war}here}}.\
  	Drop the downloaded war files into your <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/presence-client-example-dar.properties}dar configuration file}}.\ 

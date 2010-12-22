@@ -48,7 +48,7 @@ Media Example
 ** From the binary
 
 	You can find the war file corresponding to this example
- 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/media-jsr309-servlet/1.4.0.FINAL/media-jsr309-servlet-1.4.0.FINAL.war}here}}.\
+ 	{{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/media-jsr309-servlet/1.5.0.FINAL/media-jsr309-servlet-1.5.0.FINAL.war}here}}.\
  	Drop the downloaded war file into your <<<jboss_home/server/default/deploy>>> directory  
  	
  	Get the corresponding {{{/media-jsr309-dar.properties}dar configuration file}}.\

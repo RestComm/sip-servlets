@@ -66,60 +66,39 @@ Version 2.0.0.ALPHA1 is out !
 		
 	Check the complete Roadmap to see {{{mss-roadmap.html} what's cooking ahead}} .			 	
 
-Version 1.4.0.FINAL is out !
+Version 1.5.0.FINAL is out !
 
-	We are proud to announce our {{{./mss-downloads.html}Mobicents Sip Servlets 1.4.0.FINAL version}}, certified against the {{{http://jcp.org/en/jsr/detail?id=289}Sip Servlets 1.1 specification}} and working on top of <Tomcat 6.0.29> and <JBoss AS 5.1.0.GA>. 
+	We are proud to announce our {{{./mss-downloads.html}Mobicents Sip Servlets 1.5.0.FINAL version}}, certified against the {{{http://jcp.org/en/jsr/detail?id=289}Sip Servlets 1.1 specification}} and working on top of <Tomcat 6.0.29> and <JBoss AS 5.1.0.GA>. 
 	
-	This release has a mixed focus of Production usage improvements, SIP Presence integration and JSR 289 improvements :
-	
-		* {{{http://code.google.com/p/mobicents/issues/detail?id=1047}XCAP Support}} with a {{{http://www.mobicents.org/mss-presence-client-example.html}shiny new Presence Example}} showcasing integration with {{{http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-presence/index.html}Mobicents SIP Presence Service}}
-	
-		* {{{http://code.google.com/p/mobicents/issues/detail?id=1430}Concurrency Control API for concurrent access to the SIP Sessions from unmanaged threads}}
+	This release has a focus of HA usage improvements :		  		
 				
-		* {{{http://code.google.com/p/mobicents/issues/detail?id=1473}Pluggable Congestion Control at SIP Stack level}}
+		* {{{http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets/index.html#ssfjfs-binary-Failover_Capabilities}Early Dialog Failover}}
 		
-		* {{{http://code.google.com/p/mobicents/issues/detail?id=958}Improved HTTP Convergence}} and {{{http://code.google.com/p/mobicents/issues/detail?id=1440}Buddy Group support}} for the Load Balancer		
+		* {{{http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets/index.html#ssfjcs-binary-SIP_Servlets_Server_Cluster-SIP-Passivation}Long Lived SIP Calls Passivation}}				
 		
-		* Single SIP Stack for the whole container
-	
-		* Updated JAIN SIP Stack with better support for forking
-
+		* {{{http://code.google.com/p/mobicents/issues/detail?id=1871}N nodes clusters (domains) linear scalability}}		
+		
+		* {{{http://code.google.com/p/mobicents/issues/detail?id=2086}Load Balancer support for Early Dialog Failover}}
+		
 	The other highlights of this release are :
 		
-		* Move to Apache Tomcat version 6.0.29 which brings the JRE Memory Leak Prevention Listener to Tomcat version of MSS.
+		* {{{http://www.mobicents.org/mms/mms-main.html}Move to Mobicents Media Server 2.1.0.BETA1}} with enhanced quality.	
 		
-		* {{{http://www.mobicents.org/mms/mms-main.html}Move to Mobicents Media Server 2.0.0.GA}}		
+		* {{{http://www.mobicents.org/diameter/index.html}Move To Mobicents Diameter 1.3.3}} with enhanced performance and Gx support.
 		
-		* {{{http://code.google.com/p/mobicents/issues/detail?id=1424}Move To Mobicents Diameter 1.3.1 to be able to use HA features}}
-		
-		* {{{http://code.google.com/p/mobicents/issues/list?can=1&q=label:Version-1.4.00+Component:Sip-Servlets&colspec=ID+Priority+Component+Milestone+Version+Release+Type+Status+Owner+Summary&cells=tiles}45 bug fixes}}
+		* {{{http://code.google.com/p/mobicents/issues/list?can=1&q=label%3AMSS-1.5.0.FINAL&colspec=ID+Priority+Component+Milestone+MSPS+SLEE+SubComponent+Version+Release+Type+Status+Owner+Summary&cells=tiles}50 bug fixes}}
  
  	
- 	Special Thanks to the ever growing community and customers for their contributions, especially to :
+ 	Special Thanks to the community and customers for their contributions to this release, especially to :
  		
  		* Naoki Nishihara from {{{http://www.oki.com}OKI}} : 	
 		
-			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=1806}Issue 1806}} and contributed a fix for it
-			
-			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=1818}Issue 1818}} and contributed a fix for it
-			
-			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=1853}Issue 1853}} and contributed a fix for it
-			
-			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=1856}Issue 1856}} and contributed a fix for it
-			
-			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=1869}Issue 1869}} and contributed a fix for it
-			
-		* Yukinobu Imai from {{{http://www.oki.com}OKI}} : 
-			
-			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=1805}Issue 1805}} and contributed a fix for it
+			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=2216}Issue 2216}} and contributed a fix for it
 			
 		* Horaci Macias from {{{http://www.avaya.com/}Avaya}} :
 		
-			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=1847}Issue 1847}} and contributed a fix for it
-			
-		* Andrew Miller from {{{http://www.telsis.com/}Telsis}} :
-		
-			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=1547}Issue 1547}} and contributed a fix for it
+			** reported {{{http://code.google.com/p/mobicents/issues/detail?id=2115}Issue 2115}} and contributed a fix for it
+					
  
 	Check the complete Roadmap to see {{{mss-roadmap.html} the feature details and the usual round of bug fixes}} and what's cooking ahead.
 	
@@ -135,7 +114,7 @@ Version 1.4.0.FINAL is out !
 		
 		* Diameter event charging example : {{{diameter_event_charging.html}Diameter Event Charging}}
 			
-		* For JBoss 5.1.0 only, {{{http://www.mobicents.org/mms/mms-main.html}Mobicents Media Server 2.0.0.GA}}, {{{http://groups.google.com/group/mobicents-public/web/mobicents-diameter}Mobicents Diameter 1.3.1.GA}}, {{{http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets//index.html#sslb-MSS_Load_Balancer}the Mobicents SIP load Balancer 1.0.5.FINAL}} and 'all' profile in JBoss with predeployed click to call distributable application 
+		* For JBoss 5.1.0 only, {{{http://www.mobicents.org/mms/mms-main.html}Mobicents Media Server 2.1.0.BETA1}}, {{{http://www.mobicents.org/diameter/index.html}Mobicents Diameter 1.3.3.GA}}, {{{http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets//index.html#sslb-MSS_Load_Balancer}the Mobicents SIP load Balancer 1.1.0.FINAL}} and 'all' profile in JBoss with predeployed click to call distributable application 
 		to test clustering and mid call failover.				  
   
 Try it !
