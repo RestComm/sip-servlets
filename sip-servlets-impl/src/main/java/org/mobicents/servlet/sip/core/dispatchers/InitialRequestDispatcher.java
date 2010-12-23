@@ -330,7 +330,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		// subscriber URI should be set before calling makeAppSessionKey method, see Issue 750
 		// http://code.google.com/p/mobicents/issues/detail?id=750
 		try {
-			URI subscriberUri = SipFactories.addressFactory.createURI(applicationRouterInfo.getSubscriberURI());
+			URI subscriberUri = SipFactories.addressFactory.createAddress(applicationRouterInfo.getSubscriberURI()).getURI();
 			javax.servlet.sip.URI jainSipSubscriberUri = null; 
 			if(subscriberUri instanceof javax.sip.address.SipURI) {
 				jainSipSubscriberUri= new SipURIImpl((javax.sip.address.SipURI)subscriberUri);
