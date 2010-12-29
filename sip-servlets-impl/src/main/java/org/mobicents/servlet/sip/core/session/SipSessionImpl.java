@@ -355,11 +355,18 @@ public class SipSessionImpl implements MobicentsSipSession {
 					// so that the subsequent requests can be failed over
 					try {
 						ContactHeader contactHeader = null;
+						FromHeader from = (FromHeader) methodRequest.getHeader(FromHeader.NAME);
+						String displayName = from.getAddress().getDisplayName();
+						String userName = null;
+						javax.sip.address.URI uri = from.getAddress().getURI();
+						if(uri.isSipURI()) {
+							userName = ((javax.sip.address.SipURI)uri).getUser();
+						}
 						if(sipFactory.isUseLoadBalancer()) {
 							SipLoadBalancer loadBalancerToUse = sipFactory.getLoadBalancerToUse();
-							javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI("", loadBalancerToUse.getAddress().getHostAddress());
+							javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(userName, loadBalancerToUse.getAddress().getHostAddress());
 							sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
-							sipURI.setPort(loadBalancerToUse.getSipPort());	
+							sipURI.setPort(loadBalancerToUse.getSipPort());
 
 							// TODO: Is this enough or we must specify the transport somewhere?
 							// We can leave it like this. It will be updated if needed in the send() method
@@ -367,8 +374,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 							
 							javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);
 							contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);													
-						} else {														
-							contactHeader = JainSipUtils.createContactHeader(sipFactory.getSipNetworkInterfaceManager(), methodRequest, "", outboundInterface);
+						} else {											
+
+							contactHeader = JainSipUtils.createContactHeader(sipFactory.getSipNetworkInterfaceManager(), methodRequest, displayName, userName, outboundInterface);
 						}
 						methodRequest.setHeader(contactHeader);
 					} catch (Exception e) {
