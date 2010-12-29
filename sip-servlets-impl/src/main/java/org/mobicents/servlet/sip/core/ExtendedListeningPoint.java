@@ -121,11 +121,11 @@ public class ExtendedListeningPoint {
 	 * @param displayName the display name to use
 	 * @return the Contact header 
 	 */
-	public ContactHeader createContactHeader(String displayName, boolean usePublicAddress) {
+	public ContactHeader createContactHeader(String displayName, String userName, boolean usePublicAddress) {
 		try {
 			// FIXME : the SIP URI can be cached to improve performance 
 			String host = getIpAddress(usePublicAddress);
-			javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(null, host);
+			javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(userName, host);
 			sipURI.setHost(host);
 			sipURI.setPort(port);		
 			// Issue 1150 : we assume that if the transport match the default protocol of the transport protocol used it is not added

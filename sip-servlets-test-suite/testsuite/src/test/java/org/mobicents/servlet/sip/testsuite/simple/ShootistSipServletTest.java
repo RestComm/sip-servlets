@@ -429,6 +429,9 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		assertTrue(receiver.getByeReceived());
 		ContactHeader contactHeader = (ContactHeader) receiver.getInviteRequest().getHeader(ContactHeader.NAME);	
 		assertFalse(((SipURI)contactHeader.getAddress().getURI()).toString().contains("transport=udp"));
+		String contact = contactHeader.getAddress().toString();
+		assertTrue(contact.contains("BigGuy@"));
+		assertTrue(contact.contains("from display"));
 	}
 	
 	public void testShootistContactTlsTransport() throws Exception {

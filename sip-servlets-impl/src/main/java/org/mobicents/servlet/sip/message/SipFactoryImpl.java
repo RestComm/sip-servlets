@@ -519,6 +519,7 @@ public class SipFactoryImpl implements Externalizable {
 			//Adding default contact header for specific methods only
 			if(JainSipUtils.CONTACT_HEADER_METHODS.contains(method)) {				
 				String fromName = null;
+				String displayName = fromHeader.getAddress().getDisplayName();
 				if(fromHeader.getAddress().getURI() instanceof javax.sip.address.SipURI) {
 					fromName = ((javax.sip.address.SipURI)fromHeader.getAddress().getURI()).getUser();
 				}										
@@ -532,12 +533,12 @@ public class SipFactoryImpl implements Externalizable {
 					sipURI.setPort(loadBalancerToUse.getSipPort());			
 					sipURI.setTransportParam(transport);
 					javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);
-					if(fromName != null && fromName.length() > 0) {
-						contactAddress.setDisplayName(fromName);
+					if(displayName != null && displayName.length() > 0) {
+						contactAddress.setDisplayName(displayName);
 					}
 					contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);													
 				} else {
-					contactHeader = JainSipUtils.createContactHeader(getSipNetworkInterfaceManager(), requestToWrap, fromName, null);
+					contactHeader = JainSipUtils.createContactHeader(getSipNetworkInterfaceManager(), requestToWrap, displayName, fromName, null);
 				}
 			}
 			// Add all headers		

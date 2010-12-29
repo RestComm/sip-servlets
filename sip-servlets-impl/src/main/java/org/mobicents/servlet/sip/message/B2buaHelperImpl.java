@@ -215,6 +215,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 				//Creating container contact header
 				ContactHeader contactHeader = null;
 				String fromName = null;
+				String diaplayName = newFromHeader.getAddress().getDisplayName();
 				if(newFromHeader.getAddress().getURI() instanceof javax.sip.address.SipURI) {
 					fromName = ((javax.sip.address.SipURI) newFromHeader.getAddress().getURI()).getUser();
 				}										
@@ -227,12 +228,12 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 					sipURI.setPort(loadBalancerToUse.getSipPort());			
 					sipURI.setTransportParam(ListeningPoint.UDP);
 					javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);
-					if(fromName != null && fromName.length() > 0) {
-						contactAddress.setDisplayName(fromName);
+					if(diaplayName != null && diaplayName.length() > 0) {
+						contactAddress.setDisplayName(diaplayName);
 					}
 					contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);													
 				} else {					
-					contactHeader = JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, fromName, session.getOutboundInterface());
+					contactHeader = JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, diaplayName, fromName, session.getOutboundInterface());
 				}	
 				if(contactHeaderSet.size() > 0) {
 					// if the set is not empty then we adjust the values of the set to match the host and port + forbidden params of the container

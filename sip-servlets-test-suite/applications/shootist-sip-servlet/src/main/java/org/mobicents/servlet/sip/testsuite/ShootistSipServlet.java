@@ -241,7 +241,7 @@ public class ShootistSipServlet
 				return;
 			}
 		} else {
-			sipServletRequest =	sipFactory.createRequest(sipApplicationSession, method, fromURI, toURI);
+			sipServletRequest =	sipFactory.createRequest(sipApplicationSession, method, sipFactory.createAddress(fromURI, "from display"), sipFactory.createAddress(toURI,"to display"));
 		}
 		
 		String authHeader = ce.getServletContext().getInitParameter("auth-header");

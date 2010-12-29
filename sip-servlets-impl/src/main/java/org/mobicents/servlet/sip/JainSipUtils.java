@@ -524,7 +524,7 @@ public final class JainSipUtils {
 	 * @param transport
 	 * @return
 	 */
-	public static ContactHeader createContactHeader(SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String displayName, String outboundInterface) {		
+	public static ContactHeader createContactHeader(SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String displayName, String userName, String outboundInterface) {		
 		ExtendedListeningPoint listeningPoint = null;
 		if(outboundInterface == null) {
 			String transport = findTransport(request);
@@ -540,7 +540,7 @@ public final class JainSipUtils {
 		}
 		boolean usePublicAddress = findUsePublicAddress(
 				sipNetworkInterfaceManager, request, listeningPoint);
-		return listeningPoint.createContactHeader(displayName, usePublicAddress);
+		return listeningPoint.createContactHeader(displayName, userName, usePublicAddress);
 	}
 
 	/**

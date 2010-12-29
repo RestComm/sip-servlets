@@ -338,7 +338,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					}		
 				    // Add the contact header for the dialog.				    
 				    ContactHeader contactHeader = JainSipUtils.createContactHeader(
-			    			super.sipFactoryImpl.getSipNetworkInterfaceManager(), request, null, outboundInterface);
+			    			super.sipFactoryImpl.getSipNetworkInterfaceManager(), request, null, null, outboundInterface);
 				    String transport = "udp";
 				    if(session != null && session.getTransport() != null) transport = session.getTransport();
 					SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);
@@ -1155,12 +1155,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					final FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
 					final javax.sip.address.URI fromUri = fromHeader.getAddress().getURI();
 					String fromName = null;
+					String displayName = fromHeader.getAddress().getDisplayName();
 					if(fromUri instanceof javax.sip.address.SipURI) {
 						fromName = ((javax.sip.address.SipURI)fromUri).getUser();
 					}
 					// Create the contact name address.						
 					contactHeader = 
-						JainSipUtils.createContactHeader(sipNetworkInterfaceManager, request, fromName, session.getOutboundInterface());	
+						JainSipUtils.createContactHeader(sipNetworkInterfaceManager, request, displayName, fromName, session.getOutboundInterface());	
 					request.addHeader(contactHeader);
 				}
 
