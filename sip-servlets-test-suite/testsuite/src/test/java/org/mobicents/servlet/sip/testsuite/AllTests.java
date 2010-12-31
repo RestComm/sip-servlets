@@ -23,6 +23,7 @@ import org.mobicents.servlet.sip.testsuite.address.AddressTest;
 import org.mobicents.servlet.sip.testsuite.address.SipURITest;
 import org.mobicents.servlet.sip.testsuite.address.TelURLTest;
 import org.mobicents.servlet.sip.testsuite.annotations.AnnotationTest;
+import org.mobicents.servlet.sip.testsuite.b2bua.B2BUASessionCallbackTest;
 import org.mobicents.servlet.sip.testsuite.b2bua.B2BUASipUnitTest;
 import org.mobicents.servlet.sip.testsuite.b2bua.B2BUATcpUdpTest;
 import org.mobicents.servlet.sip.testsuite.b2bua.prack.CallForwardingB2BUAPrackTest;
@@ -109,6 +110,7 @@ public class AllTests {
 		suite.addTestSuite(ShootistSipServletAuthTest.class);
 		suite.addTestSuite(B2BUASipUnitTest.class);
 		suite.addTestSuite(B2BUATcpUdpTest.class);
+		suite.addTestSuite(B2BUASessionCallbackTest.class);
 		suite.addTestSuite(CallBlockingTest.class);
 		suite.addTestSuite(CallForwardingJunitTest.class);
 		suite.addTestSuite(CallForwardingSipUnitTest.class);

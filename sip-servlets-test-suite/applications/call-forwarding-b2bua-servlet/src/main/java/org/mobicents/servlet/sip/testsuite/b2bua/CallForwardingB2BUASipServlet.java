@@ -158,7 +158,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	@Override
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
-		// Issue 1484 : http://code.google.com/p/mobicents/issues/detail?id=1484
+		request.getApplicationSession().setAttribute("double-callback-test", request.getHeader("DOUBLE")!=null);
+			// Issue 1484 : http://code.google.com/p/mobicents/issues/detail?id=1484
 		// check the state of the session it shouldn't be Terminated
 		request.getSession().getAttribute("Foo");
 		State state = request.getSession().getState();
@@ -573,6 +574,28 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	}
 
 	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
+		// Issue http://code.google.com/p/mobicents/issues/detail?id=2246
+		String fromName = ev.getApplicationSession().getAttribute("double-callback-test").toString();
+		if(fromName.contains("true")) {
+			boolean doubleCallback = ev.getApplicationSession().getAttribute("double") != null;
+			if(doubleCallback) {
+				try {
+					new File("b2buaSessionDoubleCallbackTest").createNewFile();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				ev.getApplicationSession().setAttribute("double","");
+			}
+			try {
+				Thread.sleep(1000*5);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			logger.info("ev" + ev.getApplicationSession(), new RuntimeException());
+		}
 		Integer nbTimesCalled = (Integer) ev.getApplicationSession().getAttribute(TEST_SIP_APP_SESSION_READY_TO_BE_INVALIDATED);
 		if(nbTimesCalled != null) {
 			ev.getApplicationSession().setAttribute(TEST_SIP_APP_SESSION_READY_TO_BE_INVALIDATED, Integer.valueOf(nbTimesCalled.intValue() + 1));
