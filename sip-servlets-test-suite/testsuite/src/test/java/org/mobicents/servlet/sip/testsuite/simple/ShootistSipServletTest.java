@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.testsuite.simple;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -164,6 +165,37 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		Thread.sleep(DIALOG_TIMEOUT + TIMEOUT);
 		assertTrue(receiver.isCancelReceived());	
 		List<String> allMessagesContent = receiver.getAllMessagesContent();
+		assertTrue(allMessagesContent.size() >= 2);
+		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
+		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));
+	}
+	
+	public void testShootistEarlyMediaChange() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		LinkedList<Integer> responses = new LinkedList<Integer>();
+		responses.add(180);
+		responses.add(183);
+		responses.add(183);
+		responses.add(183);
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+
+		receiver.setProvisionalResponsesToSend(responses);
+		receiver.setWaitForCancel(true);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		deployApplication("cancel", "true");
+		Thread.sleep(DIALOG_TIMEOUT + TIMEOUT);
+		assertTrue(receiver.isCancelReceived());	
+		List<String> allMessagesContent = receiver.getAllMessagesContent();
+		
+		assertTrue("earlyMedia", receiver.getMessageRequest().getHeader("EarlyMediaResponses").toString().contains("3"));
 		assertTrue(allMessagesContent.size() >= 2);
 		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
 		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));

@@ -479,4 +479,12 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 		sipSession.setSipSessionSecurity(sipSessionSecurity);
 	}
 
+	public void setLast183Response(String last183Response) {
+		sipSession.setLast183Response(last183Response);
+	}
+
+	public String getLast183Response() {
+		return sipSession.getLast183Response();
+	}
+
 }

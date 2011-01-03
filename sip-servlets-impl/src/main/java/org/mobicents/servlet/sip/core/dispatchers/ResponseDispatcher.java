@@ -143,6 +143,8 @@ public class ResponseDispatcher extends MessageDispatcher {
 				}		
 			}
 			final String branch = viaHeader.getBranch();
+
+			final int status = sipServletResponse.getStatus();
 			String strippedBranchId = branch.substring(BRANCH_MAGIC_COOKIE.length());
 			int indexOfUnderscore = strippedBranchId.indexOf("_");
 			if(indexOfUnderscore == -1) {
@@ -215,10 +217,16 @@ public class ResponseDispatcher extends MessageDispatcher {
 			} else {
 				// This piece of code move here due to Proxy-B2bua case for http://code.google.com/p/mobicents/issues/detail?id=1986
 				if(tmpSession.getProxy() == null && sipServletResponse.isRetransmission()) {
-					if(logger.isDebugEnabled()) {
-						logger.debug("retransmission received for a non proxy application, dropping the response " + response);
+					if(status == 183 && !response.toString().equals(tmpSession.getLast183Response())) {
+						if(logger.isDebugEnabled()) {
+							logger.debug("early media changed http://code.google.com/p/mobicents/issues/detail?id=2251 , not a retransmission " + response);
+						}
+					} else {
+						if(logger.isDebugEnabled()) {
+							logger.debug("retransmission received for a non proxy application, dropping the response " + response);
+						}
+						return ;
 					}
-					return ;
 				}
 				sipServletResponse.setSipSession(tmpSession);					
 			}			
@@ -245,7 +253,6 @@ public class ResponseDispatcher extends MessageDispatcher {
 							if(originalRequest != null) {				
 								originalRequest.setResponse(sipServletResponse);					
 							}
-							final int status = sipServletResponse.getStatus();
 							// RFC 3265 : If a 200-class response matches such a SUBSCRIBE or REFER request,
 							// it creates a new subscription and a new dialog.
 							// Issue 1481 http://code.google.com/p/mobicents/issues/detail?id=1481
@@ -325,10 +332,16 @@ public class ResponseDispatcher extends MessageDispatcher {
 								// This issue showed that retransmissions of 180 Ringing were passed
 								// to the application so we make sure to drop them in case of UAC/UAS
 								if(sipServletResponse.isRetransmission()) {
-									if(logger.isDebugEnabled()) {
-										logger.debug("the following response is dropped since this is a retransmission " + response);	
+									if(status == 183 && !response.toString().equals(session.getLast183Response())) {
+										if(logger.isDebugEnabled()) {
+											logger.debug("the following response is not dropped to recover early media changes, see http://code.google.com/p/mobicents/issues/detail?id=2251 :" + response);	
+										}
+									} else {
+										if(logger.isDebugEnabled()) {
+											logger.debug("the following response is dropped since this is a retransmission " + response);	
+										}
+										return;
 									}
-									return;
 								}
 								//if this is a trying response, the response is dropped
 								if(Response.TRYING == status) {
@@ -354,6 +367,12 @@ public class ResponseDispatcher extends MessageDispatcher {
 
 								callServlet(sipServletResponse);
 								forwardResponseStatefully(sipServletResponse);
+
+								if(status == 183) {
+									session.setLast183Response(response.toString());
+								} else if(status >= 200) {
+									session.setLast183Response(null); // cleanup after the final response, 183 is no longer needed to find retransmissions
+								}
 							}
 						} catch (ServletException e) {				
 							throw new DispatcherException("Unexpected servlet exception while processing the response : " + response, e);

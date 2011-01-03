@@ -167,4 +167,8 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	
 	void setSipSessionSecurity(SipSessionSecurity sipSessionSecurity);
 	SipSessionSecurity getSipSessionSecurity();
+
+	public String getLast183Response();
+
+	public void setLast183Response(String last183Response);
 }

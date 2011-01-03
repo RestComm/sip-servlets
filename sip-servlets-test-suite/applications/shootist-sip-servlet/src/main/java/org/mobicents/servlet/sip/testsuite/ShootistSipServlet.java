@@ -55,7 +55,10 @@ public class ShootistSipServlet
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final String ENCODE_URI = "encodedURI";
 	private static final String TEST_ERROR_RESPONSE = "testErrorResponse";
-	private static transient Logger logger = Logger.getLogger(ShootistSipServlet.class);	
+	private static transient Logger logger = Logger.getLogger(ShootistSipServlet.class);
+	
+	int numberOf183Responses = 0;
+	
 	@Resource
 	TimerService timerService;
 	@Resource
@@ -73,7 +76,8 @@ public class ShootistSipServlet
 	
 	@Override
 	protected void doProvisionalResponse(SipServletResponse resp)
-			throws ServletException, IOException {		
+			throws ServletException, IOException {	
+		if(resp.getStatus() == 183) numberOf183Responses++;
 		if(resp.getHeader("require") != null) {
 			SipServletRequest prack = resp.createPrack();
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
@@ -433,6 +437,8 @@ public class ShootistSipServlet
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(content.length());
 			sipServletRequest.setContent(content, CONTENT_TYPE);
+			sipServletRequest.setHeader("EarlyMediaResponses", new Integer(numberOf183Responses).toString());
+			
 			sipServletRequest.send();
 		} catch (ServletParseException e) {
 			logger.error("Exception occured while parsing the addresses",e);
