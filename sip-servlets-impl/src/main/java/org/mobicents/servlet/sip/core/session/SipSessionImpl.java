@@ -269,9 +269,6 @@ public class SipSessionImpl implements MobicentsSipSession {
     // Handle Header [Authentication-Info: nextnonce="xyz"] in sip authorization responses
 	protected transient SipSessionSecurity sipSessionSecurity;
 	
-	// http://code.google.com/p/mobicents/issues/detail?id=2251
-	protected String last183Response = null;
-	
 	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession) {
 		this.key = key;
 		setSipApplicationSession(mobicentsSipApplicationSession);
@@ -2158,11 +2155,5 @@ public class SipSessionImpl implements MobicentsSipSession {
 			sipSessionSecurity = new SipSessionSecurity();
 		}
 		return sipSessionSecurity;
-	}
-	public String getLast183Response() {
-		return last183Response;
-	}
-	public void setLast183Response(String last183Response) {
-		this.last183Response = last183Response;
 	}		
 }
