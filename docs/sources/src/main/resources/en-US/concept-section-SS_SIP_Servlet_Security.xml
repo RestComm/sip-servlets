@@ -5,8 +5,8 @@
 ]>
 <section id="sss-SIP_Servlet_Security">
   <title>SIP Servlets Application Security</title>
-  <para>The information present in SIP requests often contains sensitive user information.  To protect user information, SIP Security can be enabled on the server, and within the SIP application to mitigate the risk of unauthorised access to the information.</para>
-  <para>Application security varies depending on the server type used.  The following procedures describe how to configure the JBoss Application Server, and the Tomcat server.</para>
+  <para>The information present in SIP requests often contains sensitive user information. To protect user information, SIP Security can be enabled on the server, and within the SIP application to mitigate the risk of unauthorised access to the information.</para>
+  <para>Application security varies depending on the server type used. The following procedures describe how to configure the JBoss Application Server, and the Tomcat server.</para>
   <procedure>
     <title>Enable SIP Application Security in JBoss Application Server</title>
     <step>
@@ -69,7 +69,7 @@
       </orderedlist>
     </step>
     <step>
-      <title>Update SIP Server Roles File</title>
+      <title>Update the SIP Server Roles File</title>
       <orderedlist>
         <listitem>
           <para>Open a terminal and navigate to the /props directory:</para>
@@ -93,7 +93,7 @@ admin=caller,role1,role2,..
           <para>Open the <literal>jboss-web.xml</literal> file for the SIP application to which security is required.</para>
         </listitem>
         <listitem>
-          <para>Add the  <markup>&lt;security-domain&gt;</markup> element as a child of the <markup>&lt;jboss-web&gt;</markup> element:</para>
+          <para>Add the <markup>&lt;security-domain&gt;</markup> element as a child of the <markup>&lt;jboss-web&gt;</markup> element:</para>
           <programlisting role="XML">
 <![CDATA[<jboss-web >
 <!--Uncomment the security-domain to enable security. You will need to edit the htmladaptor-->
@@ -111,7 +111,7 @@ admin=caller,role1,role2,..
           <para>Open the <literal>sip.xml</literal> file for the SIP application.</para>
         </listitem>
         <listitem>
-          <para>Add  the <markup>&lt;security-domain&gt;</markup> element as a child of   the <markup>&lt;jboss-web&gt;</markup> element:</para>
+          <para>Add the <markup>&lt;security-domain&gt;</markup> element as a child of the <markup>&lt;jboss-web&gt;</markup> element:</para>
           <programlisting role="XML"><![CDATA[
 <security-constraint>
   <display-name>REGISTER Method Security Constraint</display-name>
@@ -165,7 +165,7 @@ admin=caller,role1,role2,..
           <para>Open the <literal>sip.xml</literal> file for the SIP application to which security is required.</para>
         </listitem>
         <listitem>
-          <para>Add the <markup>&lt;security-domain&gt;</markup> child element  to the <markup>&lt;jboss-web&gt;</markup> element:</para>
+          <para>Add the <markup>&lt;security-domain&gt;</markup> child element to the <markup>&lt;jboss-web&gt;</markup> element:</para>
           <programlisting role="XML"><![CDATA[
 <security-constraint>
   <display-name>REGISTER Method Security Constraint</display-name>

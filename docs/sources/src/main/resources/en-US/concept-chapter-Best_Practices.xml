@@ -5,17 +5,17 @@
 ]>
 <chapter id="bp-Best_Practices">
   <title>Best Practices</title>
-  <para>This chapter discusses Best Practices related to  &PLATFORM_NAME;
+  <para>This chapter discusses Best Practices related to &PLATFORM_NAME;
   SIP Servlets usage in real world deployments.</para>
   <section id="bp-Best_Practices_Perf_Tips">
     <title>&PLATFORM_NAME; SIP Servlets Performance Tips</title>
-    <para>Because the default profile of &PLATFORM_NAME; SIP Servlets  is targeted at a
-    development environment,  some tuning is required to make the server performance  suitable for a  production environment.</para>
+    <para>Because the default profile of &PLATFORM_NAME; SIP Servlets is targeted at a
+    development environment, some tuning is required to make the server performance suitable for a  production environment.</para>
     <section>
       <title>Tuning JBoss</title>
-      <para>To ensure the server is finely tuned for a production envirionment, certain configuration must be changed.  Visit the   <ulink url="http://wiki.jboss.org/wiki/Wiki.jsp?page=JBossASTuningSliming">JBoss Application Server Tuning</ulink> wiki page to learn about optimization techniques.
+      <para>To ensure the server is finely tuned for a production envirionment, certain configuration must be changed. Visit the <ulink url="http://wiki.jboss.org/wiki/Wiki.jsp?page=JBossASTuningSliming">JBoss Application Server Tuning</ulink> wiki page to learn about optimization techniques.
        </para>
-      <para>While it is preferrable to have a fast Application Server,  most of the information doesn&apos;t apply to &PLATFORM_NAME;.  In summary, the most important optimization technique is to remove logs, leaving only what is required.</para>
+      <para>While it is preferable to have a fast Application Server, most of the information doesn&apos;t apply to &PLATFORM_NAME;. In summary, the most important optimization technique is to remove logs, leaving only what is required.</para>
       <para> Check the log configuration file in
       the following location and review the information.</para>
       <para><filename>$JBOSS_HOME/server/default/conf/jboss-log4j.xml</filename></para>
@@ -24,11 +24,11 @@
       <title>Tuning &PLATFORM_NAME; SIP Servlets</title>
 <!--Issue #838 Editor Comment - consider using a <variablelist> here.  You can put headings such as "Congestion Control" in the <term> element, and describe the tuning recommendations in a <listitem><para> element.-->      <itemizedlist>
         <listitem>
-          <para><emphasis>Congestion Control</emphasis> : It is recommended that this feature is enabled to avoid overload of the server and that the <emphasis>sipMessageQueueSize</emphasis> and <emphasis>memoryThreshold</emphasis> parameters are tuned according to <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
+          <para><emphasis>Congestion Control</emphasis>: It is recommended that this feature is enabled to avoid overload of the server and that the <emphasis>sipMessageQueueSize</emphasis> and <emphasis>memoryThreshold</emphasis> parameters are tuned according to <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/>.</para>
         </listitem>
         <listitem>
           <para><emphasis>Concurrency</emphasis> :
-          <emphasis>Default Value : None.</emphasis>  For better performance, it is recommended to leave  this value set to <userinput>None</userinput>.</para>
+          <emphasis>Default Value: None.</emphasis>  For better performance, it is recommended to leave this value set to <userinput>None</userinput>.</para>
         </listitem>
       </itemizedlist>
     </section>
@@ -39,13 +39,13 @@
         <listitem>
           <para><emphasis>gov.nist.javax.sip.THREAD_POOL_SIZE</emphasis>
           </para>
-          <para><emphasis>Default value: 64</emphasis> </para>
+          <para><emphasis>Default value: 64</emphasis></para>
           <para>This thread pool is
           responsible for parsing SIP messages received from socket messages into
-          objects.  </para>
+          objects.</para>
           <para>A smaller value will make the stack less responsive, since
           new messages have to wait in a queue for free threads. In UDP, this
-          can lead to more retransmissions. </para>
+          can lead to more retransmissions.</para>
           <para>Large thread pool sizes result in allocating resources
           that are otherwise not required.</para>
         </listitem>
@@ -63,7 +63,7 @@
           <para><emphasis>gov.nist.javax.sip.LOG_MESSAGE_CONTENT</emphasis>
           </para>
           <para><emphasis>Default value: true</emphasis></para>
-          <para>Set the parameter to  <userinput>false</userinput> to disable message logging.</para>
+          <para>Set the parameter to <userinput>false</userinput> to disable message logging.</para>
         </listitem>
         <listitem>
           <para><emphasis>gov.nist.javax.sip.TRACE_LEVEL=0</emphasis>
@@ -75,20 +75,23 @@
           <para><emphasis>gov.nist.javax.sip.RECEIVE_UDP_BUFFER_SIZE=65536 and gov.nist.javax.sip.SEND_UDP_BUFFER_SIZE=65536</emphasis>
           </para>
           <para><emphasis>Default value: 65536</emphasis>. </para>
-          <para>Those properties control the size of the UDP buffer used for SIP messages. Under load, if the buffer capacity is overflown the messages are dropped causing retransmissions, further increasing the load and causing even more retransmissions</para>
+          <para>Those properties control the size of the UDP buffer used for SIP messages. Under load, if the buffer capacity is overflown the messages are dropped causing retransmissions, further increasing the load and causing even more retransmissions.</para>
         </listitem>
         <listitem>
           <para><emphasis>gov.nist.javax.sip.MAX_MESSAGE_SIZE=65536</emphasis>
           </para>
           <para><emphasis>Default value: 65536</emphasis>. </para>
-          <para>This property control the maximum size of content that can be read for a SIP Message on UDP.  Default is 65536. The average UDP message size is quite lower than this so reducing this property will benefit memory usage since a byte buffer of this size is created for every message received</para> 
+          <para>This property controls the maximum size of content that can be read for a SIP Message on UDP.  The default is 65536. The average UDP message size is quite lower than this so reducing this property will benefit memory usage since a byte buffer of this size is created for every message received.</para> 
           <para>It also defines the maximum size of content that a TCP connection can read. Must be at least 4K. Default is "infinity" -- ie. no limit. This is to prevent DOS attacks launched by writing to a TCP connection until the server chokes.</para>
         </listitem>
         <listitem>
           <para><emphasis>gov.nist.javax.sip.TCP_POST_PARSING_THREAD_POOL_SIZE=30</emphasis>
           </para>
           <para><emphasis>Default value: 30</emphasis>. </para>
-          <para>Use 0 or do not set this option to disable it. When using TCP your phones/clients usually connect independently creating their own TCP sockets. Sometimes however SIP devices are allowed to tunnel multiple calls over a single socket. This can also be simulated with SIPP by running "sipp -t t1". In the stack each TCP socket has it's own thread. When all calls are using the same socket they all use a single thread, which leads to severe performance penalty, especially on multi-core machines. This option instructs the SIP stack to use a thread pool and split the CPU load between many threads. The number of the threads is specified in this parameter. The processing is split immediately after the parsing of the message. It cannot be split before the parsing because in TCP the SIP message size is in the Content-Length header of the message and the access to the TCP network stream has to be synchronized. Additionally in TCP the message size can be larger. This causes most of the parsing for all calls to occur in a single thread, which may have impact on the performance in trivial applications using a single socket for all calls. In most applications it doesn't have performance impact. If the phones/clients use separate TCP sockets for each call this option doesn't have much impact, except the slightly increased memory footprint caused by the thread pool. It is recommended to disable this option in this case by setting it 0 or not setting it at all. You can simulate multi-socket mode with "sipp -t t0". With this option also we avoid closing the TCP socket when something fails, because we must keep processing other messages for other calls. Note: This option relies on accurate Content-Length headers in the SIP messages. It cannot recover once a malformed message is processed, because the stream iterator will not be aligned any more. Eventually the connection will be closed.</para>
+          <para>Use 0 or do not set this option to disable it. When using TCP, your phones/clients usually connect independently, creating their own TCP sockets. Sometimes however SIP devices are allowed to tunnel multiple calls over a single socket. This can also be simulated with SIPP by running "sipp -t t1".</para>
+          <para>In the stack, each TCP socket has it's own thread. When all calls are using the same socket they all use a single thread, which leads to severe performance penalty, especially on multi-core machines. This option instructs the SIP stack to use a thread pool and split the CPU load between many threads. The number of the threads is specified in this parameter.</para>
+          <para>The processing is split immediately after the parsing of the message. It cannot be split before the parsing because in TCP the SIP message size is in the Content-Length header of the message and the access to the TCP network stream has to be synchronized.</para>
+          <para>Additionally, in TCP the message size can be larger. This causes most of the parsing for all calls to occur in a single thread, which may have impact on the performance in trivial applications using a single socket for all calls. In most applications it doesn't have performance impact. If the phones/clients use separate TCP sockets for each call, this option doesn't have much impact, except the slightly increased memory footprint caused by the thread pool. It is recommended to disable this option in this case by setting it 0 or not setting it at all. You can simulate multi-socket mode with "sipp -t t0". With this option also we avoid closing the TCP socket when something fails, because we must keep processing other messages for other calls. Note: This option relies on accurate Content-Length headers in the SIP messages. It cannot recover once a malformed message is processed, because the stream iterator will not be aligned any more. Eventually the connection will be closed.</para>
         </listitem>
       </itemizedlist>
       <para>The full list of JAIN SIP stack properties is available from
@@ -98,10 +101,10 @@
     </section>
     <section>
       <title>Tuning The JVM</title>
-      <para>The following tuning information applies to Sun JDK 1.6, however  the information should also apply
-      to Sun JDK 1.5.  </para>
+      <para>The following tuning information applies to Sun JDK 1.6, however the information should also apply
+      to Sun JDK 1.5.</para>
       <note>
-        <para>For more information on performance, refer to  the <ulink url="http://java.sun.com/performance/reference/whitepapers/6_performance.html">Performance White Paper</ulink>.</para>
+        <para>For more information on performance, refer to the <ulink url="http://java.sun.com/performance/reference/whitepapers/6_performance.html">Performance White Paper</ulink>.</para>
       </note>
       <para>To pass arguments to the JVM, change
       <filename>$JBOSS_HOME/bin/run.conf</filename> (Linux) or <filename>$JBOSS_HOME/bin/run.bat</filename> (Windows).</para>
@@ -111,11 +114,11 @@
           <para>JVM
           ergonomics automatically attempt to select the best garbage collector. The
           default behaviour is to select the throughput collector, however a disadvantage of the throughput collector is that it can have long pauses times, which
-          ultimately blocks  JVM processing. </para>
-          <para>For low-load implementations, consider using  the incremental, low-pause, garbage collector
+          ultimately blocks JVM processing. </para>
+          <para>For low-load implementations, consider using the incremental, low-pause, garbage collector
           (activated by specifying <emphasis>
               <userinput>-XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode</userinput>
-            </emphasis>). Many SIP applications can benefit from this garbage collector type because  it reduces the retransmission amount. </para>
+            </emphasis>). Many SIP applications can benefit from this garbage collector type because it reduces the retransmission amount. </para>
           <para>For more
           information please read: <ulink url="http://java.sun.com/javase/technologies/hotspot/gc/gc_tuning_6.html">Garbage Collector Tuning </ulink></para>
         </listitem>
@@ -123,23 +126,23 @@
           <para><emphasis role="bold">Heap</emphasis> <emphasis role="bold">Size</emphasis> </para>
           <para>Heap size is an important consideration for
           garbage collection. Having an unnecessarily large heap can stop the JVM for
-          seconds, to perform garbage collection. </para>
+          seconds, to perform garbage collection.</para>
           <para>Small heap sizes are not
-          recommended either, because they put unnecessary pressure on the  garbage
-          collection system.  </para>
+          recommended either, because they put unnecessary pressure on the garbage
+          collection system. </para>
         </listitem>
       </itemizedlist>
     </section>
     <section>
       <title>Tuning The Operating System</title>
-      <para>The following tuning information is provided for Red Hat Enterprise Linux (RHEL) servers that are running high-load configurations.   The tuning information  should also apply to other Linux distributions.</para>
-      <para>After you have configured RHEL with the tuning information, you must restart the operating system.   You should see improvements in I/O response times. With SIP, the
-      performance improvement can be as high as  20%. </para>
+      <para>The following tuning information is provided for Red Hat Enterprise Linux (RHEL) servers that are running high-load configurations. The tuning information should also apply to other Linux distributions.</para>
+      <para>After you have configured RHEL with the tuning information, you must restart the operating system. You should see improvements in I/O response times. With SIP, the
+      performance improvement can be as high as 20%. </para>
       <itemizedlist>
         <listitem>
           <para><emphasis role="bold">Large Memory Pages</emphasis> </para>
           <para>Setting large memory pages
-          can reduce CPU utilization by up to  5%. </para>
+          can reduce CPU utilization by up to 5%. </para>
           <para>Ensure that  the option
           <emphasis>
               <userinput>-XX:+UseLargePages</userinput>
@@ -184,19 +187,19 @@
   </section>
   <section id="bp-Best_Practices_NAT">
     <title>NAT Traversal</title>
-    <para>In a production environment,  it is common to see SIP and Media
-    data passing through different kinds of Network Address Translation (NAT)  to reach the
+    <para>In a production environment, it is common to see SIP and Media
+    data passing through different kinds of Network Address Translation (NAT) to reach the
     required endpoints. Because NAT Traversal is a complex topic, refer to the following information to help determine the most effective method to handle NAT issues.</para>
     <section>
       <title>STUN</title>
       <para>STUN (Session Traversal Utilities for NAT) is not generally
       considered a viable solution for enterprises because STUN cannot be used
-      with symmetric NATs. </para>
+      with symmetric NATs.</para>
       <para>Most enterprise-grade
-      firewalls are symmetric, therefore STUN support must be provided  in the SIP Clients themselves.  
+      firewalls are symmetric, therefore STUN support must be provided in the SIP Clients themselves.
       </para>
       <para>Most of the proxy and media gateways installed by VoIP providers 
-      recognize the public IP address the packets have originated from.   When both SIP end points are behind a NAT, they can act as
+      recognize the public IP address the packets have originated from. When both SIP end points are behind a NAT, they can act as
       gateways to clients behind NAT.</para>
     </section>
     <section>
@@ -204,15 +207,15 @@
       <para>TURN (Traversal Using Relay NAT) is an IETF standard, which
       implements media relays for SIP end-points. The standard overcomes the problems of
       clients behind symmetric NATs which cannot rely on STUN to solve NAT
-      traversal. </para>
+      traversal.</para>
       <para>TURN connects clients behind a NAT to a single peer, providing the same protection offered by symmetric NATs and
       firewalls. The TURN server acts as a relay; any data received is
       forwarded. </para>
       <para>This type of implementation is not ideal. It assumes the clients
-      have a trust relationship with a TURN server,  and a request session
+      have a trust relationship with a TURN server, and a request session
       allocation based on shared credentials. </para>
       <para>This can result in scalability issues,
-      and requires changes in the SIP clients.  It is also impossible to determine
+      and requires changes in the SIP clients. It is also impossible to determine
       when a direct, or TURN, connection is appropriate.</para>
     </section>
     <section>
@@ -225,12 +228,12 @@
       devices, it is quite possible that the devices can initiate and maintain communication
       end-to-end, without any intermediary media relay.</para>
       <para>Additionally, ICE can
-      detect cases where direct communication is impossible and automatically initiate  fall-back to a media relay. </para>
-      <para>ICE is not currently in  widespread  use in SIP devices, because ICE capability must be embedded within 
+      detect cases where direct communication is impossible and automatically initiate fall-back to a media relay. </para>
+      <para>ICE is not currently in widespread use in SIP devices, because ICE capability must be embedded within 
       the SIP devices. </para>
       <para>Depending
-      on the negotiated connection, a  reINVITE may be required during a session, which adds more
-      load to the SIP network and more latency to the call. </para>
+      on the negotiated connection, a reINVITE may be required during a session, which adds more
+      load to the SIP network and more latency to the call.</para>
       <para>If the
       initiating ICE client attempts to call a non-ICE client, then the call
       setup-process will revert to a conventional SIP call requiring NAT

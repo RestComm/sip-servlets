@@ -14,16 +14,16 @@
   <para>STUN support is provided at the SIP connector level, using the <ulink url="https://stun4j.dev.java.net/">STUN for Java</ulink> project. The STUN
   for Java project provides a Java implementation of the STUN Protocol (RFC
   3489), which allows each SIP connector to select whether it should use STUN
-  to discover a public IP address, and use this address in the SIP messages
+  to discover a public IP address, and then use this address in the SIP messages
   sent through the connector.</para>
   <para>To make a SIP connector STUN-enabled, three attributes must be
   appended to the <markup>&lt;connector&gt;</markup> child element in the <filename>server.xml</filename>
-  file. The properties are: <itemizedlist>
+  file. The properties are:<itemizedlist>
       <listitem>
         <para>useStun=&quot;true&quot;</para>
         <para>Enables STUN support for this connector. Ensure that the
         <literal>ipAddress</literal> attribute is not set to
-        <literal>127.0.0.1</literal></para>
+        <literal>127.0.0.1</literal>.</para>
       </listitem>
       <listitem>
         <para>stunServerAddress=&quot;&lt;Public_STUN_Server&gt;&quot;</para>
@@ -112,6 +112,6 @@
     </tgroup>
   </table>
   <note>
-    <para>For more information about NAT traversal best practices, refer to  <xref linkend="bp-Best_Practices_NAT"/></para>
+    <para>For more information about NAT traversal best practices, refer to <xref linkend="bp-Best_Practices_NAT"/>.</para>
   </note>
 </section>

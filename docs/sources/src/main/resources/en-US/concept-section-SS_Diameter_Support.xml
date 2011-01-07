@@ -5,6 +5,6 @@
 ]>
 <section id="ssds-Diameter_Support">
   <title>Diameter Support</title>
-  <para>The Diameter Protocol (<ulink url="http://www.ietf.org/rfc/rfc3588.txt">RFC 3588</ulink>) is a computer networking protocol for Authentication, Authorization, and Accounting (AAA). the Diameter version included in &PLATFORM_NAME; SIP Servlets currently support Base, Sh, Ro and Rf.</para>
-  <para>For more information regarding Diameter support, refer to the <ulink url="http://groups.google.com/group/mobicents-public/web/mobicents-diameter">Diameter Home Page</ulink>.  For a list of Diameter examples, refer to <xref linkend="ssea-SIP_Servlet_Example_Applications"/>.</para>
+  <para>The Diameter Protocol (<ulink url="http://www.ietf.org/rfc/rfc3588.txt">RFC 3588</ulink>) is a computer networking protocol for Authentication, Authorization, and Accounting (AAA). The Diameter version included in &PLATFORM_NAME; SIP Servlets currently support Base, Sh, Ro and Rf.</para>
+  <para>For more information regarding Diameter support, refer to the <ulink url="http://groups.google.com/group/mobicents-public/web/mobicents-diameter">Diameter Home Page</ulink>. For a list of Diameter examples, refer to <xref linkend="ssea-SIP_Servlet_Example_Applications"/>.</para>
 </section>

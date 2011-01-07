@@ -5,18 +5,18 @@
 ]>
 <section id="jruby-telco-integration">
   <title>JRuby/Rails Integration with Torquebox Telco Framework</title>
-  <para>&PLATFORM_NAME; Sip Servlets is compatible with  the <ulink url="http://torquebox.org/">Torquebox</ulink> Telco Framework  JRuby on
-  Rails integration.  The framework allows you to create powerful, pure or converged VoIP JRuby
+  <para>&PLATFORM_NAME; Sip Servlets is compatible with the <ulink url="http://torquebox.org/">Torquebox</ulink> Telco Framework JRuby on
+  Rails integration. The framework allows you to create powerful, pure or converged VoIP JRuby
   on Rails applications.</para>
   <para>JRuby features a powerful and well
-  deployed scripting language that allows  you to modify your application at
+  deployed scripting language that allows you to modify your application at
   runtime (this is true even for the SIP and Media part that &PLATFORM_NAME; SIP
-  Servlets offer) without restarting the server.  In addition, TorqueBox is a new kind of Ruby application
+  Servlets offer) without restarting the server. In addition, TorqueBox is a new kind of Ruby application
   platform that integrates popular technologies such as Ruby-on-Rails, while
   extending the footprint of Ruby applications to include support for Job
   Scheduling, Task Queues, SOAP Handling, and other capabilities.</para>
   <para>To obtain more information about building pure JRuby-Rails applications that 
-  leverage &PLATFORM_NAME; SIP Servlets SIP and mediat capabilities, refer to the <ulink url="http://torquebox.org/documentation/browse/LATEST/telecom.html">Torquebox User Documentation</ulink>.</para>
+  leverage &PLATFORM_NAME; SIP Servlets SIP and media capabilities, refer to the <ulink url="http://torquebox.org/documentation/browse/LATEST/telecom.html">Torquebox User Documentation</ulink>.</para>
   <para>Check this <ulink url="http://jeanderuelle.blogspot.com/2009/03/my-jruby-rails-app-on-jboss-can-make.html">blog post</ulink> to help you create your first pure Torquebox JRuby Telco
   application and our <ulink url="http://www.mobicents.org/mss-pure-jruby-telco.html">pure JRuby on Rails TorqueBox Telco example</ulink> showcasing this integration.</para>
 </section>

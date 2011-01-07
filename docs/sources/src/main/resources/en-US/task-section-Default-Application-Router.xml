@@ -12,20 +12,18 @@
     <title>Role of the Application Router</title>
     <para>An Application Router is required for a container to function, but
     it is a separate logical entity from the container. The Application Router
-    is solely responsible for application selection and does not implement
+    is responsible for application selection and does not implement
     application logic. For example, the Application Router cannot modify a
     request or send a response.</para>
     <para>There is no direct interaction between the Application Router and
     applications, only between the SIP Servlets Container and the Application
     Router.</para>
     <para>The
-    SIP Servlets container is responsible for passing the required information  to the Application Router within the initial request so  the Application Router can make informed routing decisions. Except for  the information passed by the
-    container, the Application Router is free to make use of any other
-    information or data stores. It is up to the individual implementation how the Application Router makes use of the information or data stores.</para>
+    SIP Servlets container is responsible for passing the required information to the Application Router within the initial request so the Application Router can make informed routing decisions. The Application Router is free to make use of any information or data stores, except for the information passed by the container. It is up to the individual implementation how the Application Router makes use of the information or data stores.</para>
     <para>The
     deployer in a SIP Servlet environment controls application composition by
-    defining and deploying the Application Router implementation.  Giving the
-    deployer control over application composition is desirable because the deployer is solely  responsible for the services available to subscribers. </para>
+    defining and deploying the Application Router implementation. Giving the
+    deployer control over application composition is desirable because the deployer is solely responsible for the services available to subscribers.</para>
     <para>Furthermore, the SIP Servlets
     specification intentionally allows the Application Router implementation
     to consult arbitrary information or data stores. This is because the
@@ -35,26 +33,26 @@
   <section id="tsdar-Mobicents-Default-Application-Router">
     <title>&PLATFORM_NAME; Default Application Router</title>
     <para>&PLATFORM_NAME; SIP Servlets provides an implementation of the Default
-    Application Router (DAR) as defined in the  SIP Servlets 1.1 specification,
+    Application Router (DAR) as defined in the SIP Servlets 1.1 specification,
     Appendix C.</para>
     <section id="tsdar-DAR-Configuration-File">
       <title>The DAR Configuration File</title>
-      <para>The Default Application Router (DAR) obtains its operational parameters from  a 
-      configuration text file that  is modeled as a Java properties file. <!--Issue #814 Editor Comment - So what is the name of the properties file, and what path location does it reside in?-->The configuration file 
+      <para>The Default Application Router (DAR) obtains its operational parameters from a 
+      configuration text file that is modeled as a Java properties file. <!--Issue #814 Editor Comment - So what is the name of the properties file, and what path location does it reside in?-->The configuration file 
       contains the information needed by the Application Router to select
       which SIP Servlet application will handle an incoming initial request.
        </para>
       <para>In the case of &PLATFORM_NAME;
-          SIP Servlets, it is also possible to configure the DAR  through the
-          <filename>server.xml</filename> configuration file (see  <xref linkend="bsssc-Configuring_the_Service_Element_in_the_Containers_server.xml"/> and  <xref linkend="wwtssmc-Working_with_the_SIP_Servlets_Management_Console"/>).</para>
+          SIP Servlets, it is also possible to configure the DAR through the
+          <filename>server.xml</filename> configuration file (see <xref linkend="bsssc-Configuring_the_Service_Element_in_the_Containers_server.xml"/> and  <xref linkend="wwtssmc-Working_with_the_SIP_Servlets_Management_Console"/>).</para>
       <para>The properties file has the following characteristics and requirements:</para>
       <itemizedlist>
         <listitem>
-          <para>It must  be made available to the DAR.  </para>
+          <para>It must be made available to the DAR.</para>
         </listitem>
         <listitem>
           <para>It must allow the contents and file structure to be accessible from a hierarchical
-          URI  supplied as a system property
+          URI supplied as a system property
           <filename>javax.servlet.sip.ar.dar.configuration</filename>.</para>
         </listitem>
         <listitem>
@@ -64,29 +62,29 @@
         </listitem>
         <listitem>
           <para>It has a simple format in which the name of
-          the property is the SIP method and the value is a  comma-separated string value for the <literal>SipApplicationRouterInfo</literal>
+          the property is the SIP method and the value is a comma-separated string value for the <literal>SipApplicationRouterInfo</literal>
           object.</para>
           <screen>INVITE: (sip-router-info-1), (sip-router-info-2)..
 SUBSCRIBE: (sip-router-info-3), (sip-router-info-4)..
 ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
           <para>&PLATFORM_NAME; SIP Servlets defines a new keyword called <literal>ALL</literal>.  The keyword 
         allows mapping between the sip-router-info data, and all methods
-        supported by the container (for example, INVITE, REGISTER, SUBSCRIBE).  This maping  can 
+        supported by the container (for example, INVITE, REGISTER, SUBSCRIBE). This mapping can 
         save time when configuring an application that listens to all
         incoming methods. </para>
         </listitem>
       </itemizedlist>
       <note>
-        <para>If   <literal>ALL</literal>, and a specific method are defined in
-        the DAR file, the specific method takes precedence over  <literal>ALL</literal>.  When the specific method no longer has applications to serve, <literal>ALL</literal> is enabled again. </para>
+        <para>If <literal>ALL</literal>, and a specific method are defined in
+        the DAR file, the specific method takes precedence over <literal>ALL</literal>. When the specific method no longer has applications to serve, <literal>ALL</literal> is enabled again. </para>
       </note>
       <para>The sip-router-info data specified in the properties file is a
       string value version of the <literal>SipApplicationRouterInfo</literal> object. It consists
       of the following information:</para>
       <itemizedlist>
         <listitem>
-          <para>The name of the application as known to the container.  The application name can be obtained from the  <markup>&lt;app-name&gt;</markup> element of the <filename>sip.xml</filename> deployment
-          descriptor of the application,  or the <literal>@SipApplication</literal>
+          <para>The name of the application as known to the container. The application name can be obtained from the <markup>&lt;app-name&gt;</markup> element of the <filename>sip.xml</filename> deployment
+          descriptor of the application, or the <literal>@SipApplication</literal>
           annotation.</para>
         </listitem>
         <listitem>
@@ -131,7 +129,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
 						The <literal>DIRECTION</literal> parameter specifies whether an application serves external(INBOUND) requests or initiates (OUTBOUND) requests.
 					</para>
 					<para>
-						If an application is marked <literal>DIRECTION=INBOUND</literal>, it will not be called for requests initiated by applications behaving as UAC. To mark an application as UAC, specify <literal>DIRECTION=INBOUND</literal> in the optinal parameters in the DAR.
+						If an application is marked <literal>DIRECTION=INBOUND</literal>, it will not be called for requests initiated by applications behaving as UAC. To mark an application as UAC, specify <literal>DIRECTION=INBOUND</literal> in the optional parameters in the DAR.
 					</para>
 					<para>
 						Applications that do not exist in the DAR list for the container are assumed to be <literal>OUTBOUND</literal>. Because undefined applications are incapable of serving external requests, they must have self-initiated the request. The Sip Servlets Management Console can be used to specify the <literal>DIRECTION</literal> parameter.
@@ -142,10 +140,10 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
 						The <literal>REGEX</literal> parameter specifies a regular expression to be matched against the initial request passed to the Application Router.
 					</para>
           			<para>
-          				If the regular expression matches a part of the initial request, the application is called otherwise it is skipped.
+          				If the regular expression matches a part of the initial request, the application is called. If it does not, it is skipped.
           			</para>
           			<para>
-          				By example in the following sip-router-info data : <screen>INVITE: ("org.mobicents.servlet.sip.testsuite.SimpleApplication", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0", "REGEX=From:.*sip:.*@sip-servlets\.com")</screen>, only incoming initial requests having a From Header whose the SIP URI belongs to the sip-servlets.com domain will be passed to the SimpleApplication.
+          				For example, in the following sip-router-info data: <screen>INVITE - ("org.mobicents.servlet.sip.testsuite.SimpleApplication", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0", "REGEX=From:.*sip:.*@sip-servlets\.com")</screen> - only incoming initial requests with a From Header with a SIP URI that belongs to the sip-servlets.com domain will be passed to the SimpleApplication.
            			</para>		
           			</listitem>	
          			</itemizedlist>		
@@ -165,15 +163,15 @@ INVITE: (&quot;org.mobicents.servlet.sip.testsuite.Click2DialApplication&quot;, 
 &quot;ORIGINATING&quot;, &quot;&quot;, &quot;NO_ROUTE&quot;, &quot;0&quot;, &quot;DIRECTION=OUTBOUND&quot;), \
 (&quot;org.mobicents.servlet.sip.testsuite.LocationServiceApplication&quot;, &quot;DAR\:From&quot;,
 &quot;ORIGINATING&quot;, &quot;&quot;, &quot;NO_ROUTE&quot;, &quot;0&quot;, &quot;DIRECTION=INBOUND&quot;)</screen>
-        <para>This type of configuration is useful in cases where different application must be responsible for both requests initited by the container,  and external requests received by the container.
+        <para>This type of configuration is useful in cases where different application must be responsible for both requests initiated by the container,  and external requests received by the container.
   </para>
       </example>
       <example>
         <title>ORIGINATING/TERMINATING DAR Example</title>
         <para>In this example, the DAR is configured to invoke two applications on
-      receipt of an INVITE request; one each in the originating and the terminating halves.  The applications are identified by their application deployment descriptor names.</para>
+      receipt of an INVITE request; one each in the originating and the terminating halves. The applications are identified by their application deployment descriptor names.</para>
         <screen>INVITE: (&quot;OriginatingCallWaiting&quot;, &quot;DAR:From&quot;, &quot;ORIGINATING&quot;, &quot;&quot;, &quot;NO_ROUTE&quot;, &quot;0&quot;), (&quot;CallForwarding&quot;, &quot;DAR:To&quot;, &quot;TERMINATING&quot;, &quot;&quot;,&quot;NO_ROUTE&quot;, &quot;1&quot;) </screen>
-        <para>For this example, the returned subscriber identity  is the URI from each application&apos;s 
+        <para>For this example, the returned subscriber identity is the URI from each application&apos;s 
       <literal>From</literal> and <literal>To</literal> headers respectively.  The DAR does
       not return any route to the container, and maintains the invocation state
       in the <literal>stateInfo</literal> as the index of the last application in the
@@ -201,15 +199,15 @@ Any questions regarding this, give me a yell and we can work through it.-->     
         15.4.1 Procedure for Routing an Initial Request.</para>
         <note>
           <para>There are
-        some other corner cases that apply to initial requests. Refer to  Appendix B Definition of an Initial Request in the SIP Servlets 1.1
+        some other corner cases that apply to initial requests. Refer to Appendix B, Definition of an Initial Request in the SIP Servlets 1.1
         specification. </para>
         </note>
 <!--Issue #814 Editor Comment - to show you how to structure an example in a different way, I have taken the time to restructure the original section.  You can put quite a bit of formatting into an Example, not just a code snippet for example.  Check it out.-->        <example>
           <title>INVITE Routing</title>
-          <para>The following example describes how the DAR routes an INVITE to two applications  deployed in a container.  The applications in this example are a
+          <para>The following example describes how the DAR routes an INVITE to two applications  deployed in a container. The applications in this example are a
         Location Service and a Call Blocking application.</para>
           <para>In the example, the assumption of a request coming to the server is described. However, applications can act as a UAC, and  generate initial requests
-          on their own.   For routing purposes, it is not necessary for 
+          on their own. For routing purposes, it is not necessary for 
           the specified application initiating the request to have an  entry in the DAR file.</para>
           <para>The DAR file  contains the required information for the  two
         applications to be invoked in the correct order.</para>
@@ -267,30 +265,27 @@ Any questions regarding this, give me a yell and we can work through it.-->     
             </listitem>
           </orderedlist>
           <para>The path  the <literal>INVITE</literal> has taken (that is, LocationService to 
-        CallBlocking) is called the application path.  The Routing of the
+        CallBlocking) is called the application path.  The routing of the
         responses will now occur as explained in the next section.</para>
         </example>
       </section>
       <section>
         <title>Response Routing</title>
         <para>Responses always follow the reverse of the path taken by the
-        corresponding request. In our case the Forbidden response will first
-        go back to LocationService then back to the caller. This is true for
+        corresponding request. In our case, the Forbidden response will first
+        go back to the LocationService, and then back to the caller. This is true for
         responses to both initial and subsequent requests. The application
         path is a logical concept and as such may or may not be explicitly
         represented within containers.</para>
         <para>Another possible outcome could have been that the Call Blocking
-        application instead of sending a Forbidden response, allowed the call
+        application, instead of sending a Forbidden response, allowed the call
         and proxied the INVITE to the same Request URI chosen by the Location
         Service. Then when the callee sends back the 200 OK Response, this
         response goes back the same way through the application path (so in
         the present case Call Blocking, then Location Service, then back to
         the caller).</para>
         <note>
-          <para>An important note here with regard to that second scenario
-          that according to the SIP Servlets 1.1 specification, Sections
-          15.1.2 The Role of Applications and 15.1.4 Application Independence,
-          the Call Blocking application cannot just do nothing with the
+          <para>The Call Blocking application cannot just do nothing with the
           request and expect the container to route the request in its place
           (either to a next application in chain if another one is present or
           to the outside world if none is present). The Application has to do
@@ -301,11 +296,11 @@ Any questions regarding this, give me a yell and we can work through it.-->     
         <title>Subsequent Requests</title>
         <para>Subsequent requests are all requests that are not
         Initial.</para>
-        <para>The second scenario where the Call Blocking application allowed
-        the call will be used in this section to showcase subsequent requests.
-        So the caller has received the 200 OK response back. Now according to
+        <para>The second scenario, where the Call Blocking application allowed
+        the call, will be used in this section to showcase subsequent requests.
+        The caller has received the 200 OK response back. Now, according to
         the SIP specification (RFC 3261), it sends an ACK. The ACK arrives at
-        the container and is not a dialog creating request and is already part
+        the container, and is not a dialog creating request and is already part
         of an ongoing dialog (early dialog) so the request is detected as a
         Subsequent request and will follow the application path created by the
         initial request. The ACK will go through Location Service, Call

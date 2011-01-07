@@ -6,17 +6,15 @@
 <!-- chapter id nickname: ssfjfs --><section id="ssfjfs-SS_for_JBoss-Failover_Support">
   <title>&PLATFORM_NAME; SIP Servlets for JBoss: Transparent Failover</title>
   <para>A &PLATFORM_NAME; SIP Servlets Server for JBoss cluster does not employ any standby nodes. 
-  Typically, therefore, proxies and registrars must share the user location table by using a database cluster.</para>
-  <para>The &PLATFORM_NAME; SIP load balancer, which is a SIP Call ID-aware load balancer, is used as the intermediary. 
-  The SIP load balancer forwards stateful transaction requests to cluster nodes based on its provisioning algorithm. 
-  The SIP load balancer acts as an entry-point to the cluster and distributes the incoming requests between nodes. 
+  Typically, proxies and registrars must share the user location table by using a database cluster.</para>
+  <para>The &PLATFORM_NAME; SIP Load Balancer, which is a SIP Call ID-aware load balancer, is used as the intermediary. 
+  The SIP Load Balancer forwards stateful transaction requests to cluster nodes based on its provisioning algorithm. 
+  The SIP Load Balancer acts as an entry-point to the cluster, and distributes the incoming requests between nodes. 
   It is always advised to use a SIP load balancer or an IP load balancer in a cluster configuration. </para>
-  <formalpara>
     <para>This choice of implementation has many benefits:</para>
-  </formalpara>
   <itemizedlist>
     <listitem>
-      <para>There is no need for standby nodes, because the remaining nodes in a degraded cluster automatically and transparently (to the user) take on the load of the failed node. This can be done because both the SIP load balancer and SIP Servlet-enabled JBoss Application Servers support mid-call or call setup failover (respectively Established SIP Dialog and Early SIP Dialog).</para>
+      <para>There is no need for standby nodes, because the remaining nodes in a degraded cluster automatically and transparently (to the user) take on the load of the failed node. This can be done because both the SIP Load Balancer and SIP Servlet-enabled JBoss Application Servers support mid-call or call setup failover (respectively Established SIP Dialog and Early SIP Dialog).</para>
     </listitem>
     <listitem>
       <para>There is no need to ensure that requests are directed to the correct node, because in a SIP Servlets-enabled JBoss Application Server (or &PLATFORM_NAME; JAIN SLEE server) cluster, any node can serve any request to any User Agent (UA).</para>
@@ -31,10 +29,10 @@
   
    <section id="ssfjfs-binary-Failover_Capabilities">
     <title>&PLATFORM_NAME; Failover Capabilities</title>
-      <para>The SIP Stack used by the &PLATFORM_NAME; SIP Servlets for JBoss supports two modes :  </para>
+      <para>The SIP Stack used by the &PLATFORM_NAME; SIP Servlets for JBoss supports two modes:</para>
   <itemizedlist>
   	<listitem>
-     	 <para><literal>ESTABLISHED SIP DIALOG</literal> failover. This means that failover can occur only on established calls (SIP Dialogs which are in the CONFIRMED state as per RFC 3261) and calls that are in the process of being setup will not be failed over (SIP Dialogs which are in the EARLY state as per RFC 3261)</para>
+     	 <para><literal>ESTABLISHED SIP DIALOG</literal> failover. This means that failover can occur only on established calls (SIP Dialogs which are in the CONFIRMED state as per RFC 3261) and calls that are in the process of being setup will not be failed over (SIP Dialogs which are in the EARLY state as per RFC 3261).</para>
      	 <figure>
               <title>Established Dialog Failover</title>
               <mediaobject>
@@ -47,12 +45,12 @@
    <important>
 			<title>Optimization Note</title>
 			<para>
-				 To maximize performance it is recommended to use a Load Balancer with SIP affinity enabled so that all messages related to the same call go to the same node even though Mobicents Sip Servlets supports the case where SIP transactions for a given SIP Dialog go to different nodes.
+				 To maximize performance it is recommended to use a load balancer with SIP affinity enabled, so that all messages related to the same call go to the same node even though Mobicents Sip Servlets supports the case where SIP transactions for a given SIP Dialog go to different nodes.
 			</para>
   </important>
    </listitem>
-   <listitem>  	 
-     	 <para><literal>EARLY SIP DIALOG</literal> failover. This means that failover can occur after an informational response (1xx) is received with a To Tag ie calls that are in the process of being setup will be failed over (SIP Dialogs which are in the EARLY state as per RFC 3261).</para>
+   <listitem>
+     	 <para><literal>EARLY SIP DIALOG</literal> failover. This means that failover can occur after an informational response (1xx) is received with a To Tag. For example, calls that are in the process of being setup will be failed over (SIP Dialogs which are in the EARLY state as per RFC 3261).</para>
      	 <figure>
               <title>Early Dialog Failover</title>
               <mediaobject>
@@ -62,7 +60,7 @@
               </mediaobject>
             </figure>
              <para>
-  		As Early Dialog failover means replicating some transaction state as well it can introduce some overhead in terms of network replication, the failover granularity is configurable to best fit applications on their usage and optimize the performance. So  the following property <literal>org.mobicents.ha.javax.sip.REPLICATION_STRATEGY=EarlyDialog</literal> needs to be added to the SIP Stack Stack properties, defined in the external properties file specified by the <emphasis>sipStackPropertiesFile</emphasis> attribute as described in <xref linkend="bsssc-binary-SIP_Servlets_Server-Adding_SIP_Connectors"/>.		
+  		As Early Dialog failover means replicating some transaction states, it can introduce some overhead in terms of network replication as well. The failover granularity is configurable to best fit applications on their usage and optimize the performance. The following property, <literal>org.mobicents.ha.javax.sip.REPLICATION_STRATEGY=EarlyDialog</literal>, needs to be added to the SIP Stack Stack properties, defined in the external properties file specified by the <emphasis>sipStackPropertiesFile</emphasis> attribute as described in <xref linkend="bsssc-binary-SIP_Servlets_Server-Adding_SIP_Connectors"/>.		
   </para>
   <important>
 			<title>Optimization Note</title>
@@ -138,7 +136,7 @@ Limitations
 &PLATFORM_NAME; Sip Servlets doesn't currently support mid call failover for converged applications only pure sip applications (Uas, Uac, B2BUA, Proxy).
 </remark>-->  <section id="ssfjfs-binary-Testing_SS_for_JBoss_Cluster_Failover--Installing_Configuring_and_Running">
     <title>&SHORT_PLATFORM_NAME; for JBoss Cluster: Installing, Configuring and Running</title>
-    <para>There are a number of options you can specify for &SHORT_PLATFORM_NAME; clustering. By default most of them are configured in the &quot;all&quot; server configuration, which is ready to use. In this chapter we will cover the most common configuration options you might need.</para>
+    <para>There are a number of options you can specify for &SHORT_PLATFORM_NAME; clustering. By default, most of them are configured in the &quot;all&quot; server configuration, which is ready to use. In this chapter we will cover the most common configuration options you might need.</para>
     <section id="ssfjfs-binary-Testing_SS_for_JBoss_Cluster_Failover-Downloading">
       <title>Downloading</title>
       <para>&nbsp;</para>

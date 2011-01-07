@@ -71,9 +71,9 @@ concurrencyControlMode=&quot;None&quot;
   balancers=&quot;ipAddress1:sipPort1:rmiPort1;ipAddress2:sipPort2:rmiPort2;..3...4..&quot;  
   ...&gt;
 </programlisting>
-      <para>If the RMI port is omitted port 2000 is assumed, and if the SIP port is omitted 5065 is assumed.</para>
+      <para>If the RMI port is omitted, port 2000 is assumed, and if the SIP port is omitted, 5065 is assumed.</para>
       <warning>
-        <para>The SIP port  specified in the balancers string for each balancer refers to the internal SIP port of the SIP balancer. That is because the internal port faces the cluster nodes directly. Requests coming through the internal port will go to the external port and vice versa. If you put the external port in the <literal>balancers</literal> string, then the SIP LB will assume that the requests comes from outside the cluster and it will route it back to some cluster node instead of routing it outside the cluster as expected. Always use the SIP internal port in the <literal>balancers</literal> string. Exception to this rule is when a single port is used for internal and external ports in the SIP load balancer. In that case the direction analysis is done based on <literal>Via</literal> headers and the requests are routed correctly without extra settings.</para>
+        <para>The SIP port  specified in the balancers string for each balancer refers to the internal SIP port of the SIP balancer. That is because the internal port faces the cluster nodes directly. Requests coming through the internal port will go to the external port and vice versa. If you put the external port in the <literal>balancers</literal> string, then the SIP LB will assume that the requests comes from outside the cluster and it will route it back to some cluster node instead of routing it outside the cluster as expected. Always use the SIP internal port in the <literal>balancers</literal> string. The exception to this rule is when a single port is used for internal and external ports in the SIP load balancer. In that case, the direction analysis is done based on <literal>Via</literal> headers and the requests are routed correctly without extra settings.</para>
         <para/>
       </warning>
       <para>When multiple SIP load balancers are specified, the outgoing requests will always go through the first one, or an IP load balancer can be used and the requests will be distributed based on the IP balancer policy. To route the outgoing requests to a particular IP address (the IP load balancer address for example) the <literal>outboundProxy</literal> property can be used:</para>
@@ -83,7 +83,7 @@ concurrencyControlMode=&quot;None&quot;
 outboundProxy=&quot;127.0.0.1:5500&quot;
   ...&gt;
 </programlisting>
-      <para>In this example configuration all outbound requests will go through 127.0.0.1:5500, while the node will perform the health checks against two SIP load balancers. If the 127.0.0.1:5500 machine is an IP load balancer it should be configured to spray the  SIP load balancers and they will route the requests outside the cluster reliably.</para>
+      <para>In this example configuration, all outbound requests will go through 127.0.0.1:5500, while the node will perform the health checks against two SIP load balancers. If the 127.0.0.1:5500 machine is an IP load balancer, it should be configured to spray the  SIP load balancers, and they will route the requests outside the cluster reliably.</para>
       <para>The <literal>outboundProxy</literal> attribute overrides the default effect of specifying a SIP port for SIP load balancers in the <literal>balancers</literal> string.</para>
     </section>
 <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Stopping">
@@ -136,11 +136,11 @@ outboundProxy=&quot;127.0.0.1:5500&quot;
  <itemizedlist>
  	<listitem><para>
 When the container requests the creation of a new SIP Session or SIP Application Session. 
-If the number of currently active session exceeds a configurable limit, an attempt is made to passivate sessions to make room in memory .
+If the number of currently active session exceeds a configurable limit, an attempt is made to passivate sessions to make room in memory.
 </para>
  </listitem>
  <listitem><para>
-Periodically (by default every ten seconds) as the JBoss Web background thread runs.
+Periodically (by default, every ten seconds) as the JBoss Web background thread runs.
 </para>
  </listitem>
  </itemizedlist>
@@ -167,7 +167,7 @@ In both cases, sessions are passivated on a Least Recently Used (LRU) basis.
 		    &nbsp;
 		    </para>
 		     <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-SIP-Passivation-Configuration-Step1">
-			    <title>Step 1 : Add the following to jboss-web.xml for your sip application</title>
+			    <title>Step 1: Add the following to jboss-web.xml for your sip application</title>
 			    <para>&nbsp;</para>
 			    <programlisting role="XML">
 				   &lt;max-active-sessions&gt;20&lt;/max-active-sessions&gt;
@@ -180,12 +180,12 @@ In both cases, sessions are passivated on a Least Recently Used (LRU) basis.
 				<itemizedlist>
 				 	<listitem>
 				 		<para>
-							<literal>max-active-sessions</literal>  Determines the maximum number of active sessions allowed. If the number of sessions managed by the the session manager exceeds this value and passivation is enabled, the excess will be passivated based on the configured passivation-min-idle-time. If after passivation is completed (or if passivation is disabled), the number of active sessions still exceeds this limit, attempts to create new sessions will be rejected. If set to -1 (the default), there is no limit
+							<literal>max-active-sessions</literal>  Determines the maximum number of active sessions allowed. If the number of sessions managed by the session manager exceeds this value and passivation is enabled, the excess will be passivated based on the configured passivation-min-idle-time. If after passivation is completed (or if passivation is disabled), the number of active sessions still exceeds this limit, attempts to create new sessions will be rejected. If set to -1 (the default), there is no limit.
 						</para>
 				 	</listitem>
 				 	<listitem>
 				 		<para>
-							<literal>passivation-min-idle-time</literal>  Determines the minimum time (in seconds) that a session must have been inactive before the container will consider passivating it in order to reduce the active session count below max-active-sessions.  A value of -1 (the default) disables passivating sessions before passivation-max-idle-time.  Neither a value of -1 nor a high value are recommended if max-active-sessions is set.
+							<literal>passivation-min-idle-time</literal>  Determines the minimum time (in seconds) that a session must have been inactive before the container will consider passivating it in order to reduce the active session count below max-active-sessions. A value of -1 (the default) disables passivating sessions before passivation-max-idle-time.  Neither a value of -1 nor a high value are recommended if max-active-sessions is set.
 						</para>
 				 	</listitem>
 				 	<listitem>
@@ -234,12 +234,12 @@ In both cases, sessions are passivated on a Least Recently Used (LRU) basis.
 				<itemizedlist>
 				 	<listitem>
 				 		<para>
-							<literal>passivation</literal> property MUST be true
+							<literal>passivation</literal> property MUST be true.
 						</para>
 				 	</listitem>
 				 	<listitem>
 				 		<para>
-							<literal>shared</literal>  property MUST be false. Do not passivate sessions to a shared persistent store, otherwise if another node activates the session, it will be gone from the persistent store and also gone from memory on other nodes that have passivated it. Backup copies will be lost.
+							<literal>shared</literal> property MUST be false. Do not passivate sessions to a shared persistent store, otherwise if another node activates the session, it will be gone from the persistent store and also gone from memory on other nodes that have passivated it. Backup copies will be lost.
 						</para>
 				 	</listitem>
 				 	<listitem>
@@ -249,12 +249,12 @@ In both cases, sessions are passivated on a Least Recently Used (LRU) basis.
 				 	</listitem>
 				 	<listitem>
 				 		<para>
-							<literal>class</literal>  attribute on a cache loader config bean MUST refer to the configuration class for a cache loader implementation (e.g. org.jboss.cache.loader.FileCacheLoaderConfig, org.jboss.cache.loader.JDBCCacheLoaderConfig). See the JBoss Cache documentation for more on the available CacheLoader implementations. If you wish to use JDBCCacheLoader (to persist to a database rather than the filesystem used by FileCacheLoader) note the comment above about the shared property.  Don't use a shared database, or at least not a shared table in the database.  Each node in the cluster must have its own storage location.
+							<literal>class</literal> attribute on a cache loader config bean MUST refer to the configuration class for a cache loader implementation (e.g. org.jboss.cache.loader.FileCacheLoaderConfig, org.jboss.cache.loader.JDBCCacheLoaderConfig). See the JBoss Cache documentation for more on the available CacheLoader implementations. If you wish to use JDBCCacheLoader (to persist to a database rather than the filesystem used by FileCacheLoader) note the comment above about the shared property.  Don't use a shared database, or at least not a shared table in the database.  Each node in the cluster must have its own storage location.
 						</para>
 				 	</listitem>
 				 	<listitem>
 				 		<para>
-							<literal>location</literal>  property for FileCacheLoaderConfig defines the root node of the filesystem tree where passivated session should be stored. The default is to store them in your JBoss AS configuration's data directory.
+							<literal>location</literal>  property for FileCacheLoaderConfig defines the root node of the filesystem tree where the passivated session should be stored. The default is to store them in your JBoss AS configuration's data directory.
 						</para>
 				 	</listitem>
 				 	<listitem>
@@ -279,7 +279,7 @@ In both cases, sessions are passivated on a Least Recently Used (LRU) basis.
 				 	</listitem>
 				 	<listitem>
 				 		<para>
-							<literal>checkCharacterPortability</literal>   should be false as a minor performance optimization.
+							<literal>checkCharacterPortability</literal> should be false as a minor performance optimization.
 						</para>
 				 	</listitem>
 				 </itemizedlist>

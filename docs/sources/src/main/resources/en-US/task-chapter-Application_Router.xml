@@ -8,8 +8,8 @@
   <title>Application Router</title>
   <para>Application Routing is
   performed within the &PLATFORM_NAME; Sip Servlets container by the Default
-  Application Router.  The following sections describe the Default Application Router, and how other Application Router implementations
-  compliant with the JSR 289 specification can be installed.</para>
+  Application Router. The following sections describe the Default Application Router, and how other JSR 289 compliant Application Router implementations
+  can be installed.</para>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="task-section-Default-Application-Router.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="task-section-echarts-Application-Router.xml"/>
 </chapter>

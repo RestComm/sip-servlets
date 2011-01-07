@@ -6,25 +6,25 @@
 <!-- chapter id nickname: sscacc -->
 <section id="sscacc-MSS_Concurrency_and_Congestion_Control">
   <title>Concurrency and Congestion Control</title>
-  <para>Concurrency and Congestion control refer to settings  that
-  define the way in which messages are processed under heavy load.  The way &PLATFORM_NAME; SIP Servlets Server processes messages in a production environment is crucial to ensure quality of service for customers. </para>
-  <para>Concurrency control mode tuning affects  the way in which
-  the SIP Servlets Server processes messages, whereas Congestion Control tuning affects the point at which   the server
+  <para>Concurrency and Congestion control refer to settings that
+  define the way in which messages are processed under heavy load. The way &PLATFORM_NAME; SIP Servlets Server processes messages in a production environment is crucial to ensure quality of service for customers.</para>
+  <para>Concurrency control mode tuning affects the way in which
+  the SIP Servlets Server processes messages, whereas Congestion Control tuning affects the point at which the server
   begins rejecting new requests. Both of these parameters can be set using the following methods: </para>
   <para><itemizedlist>
       <listitem>
-        <para>through the SIP Servlets Management Console.</para>
+        <para>Through the SIP Servlets Management Console.</para>
       </listitem>
       <listitem>
-        <para>editing
+        <para>Editing
   the server&apos;s <filename>server.xml</filename> configuration file.</para>
       </listitem>
       <listitem>
-        <para>from the
+        <para>From the
   <literal>dispatcher</literal> MBean.</para>
       </listitem>
       <listitem>
-        <para>from the Embedded Jopr integrated
+        <para>From the Embedded Jopr integrated
   management platform.</para>
       </listitem>
     </itemizedlist></para>
@@ -41,9 +41,9 @@
       <term>None</term>
       <listitem>
         <para>All SIP messages are processed as soon as possible in a thread
-        from the global thread pool. </para>
+        from the global thread pool.</para>
         <para>When two messages
-        belong  to the same <literal>SipSession</literal>,  they can be concurrently processed.  Ensure that SIP Messages that access shared resources (such as the session attribute) concurrently  are synchronized in a
+        belong to the same <literal>SipSession</literal>, they can be concurrently processed. Ensure that SIP Messages that access shared resources (such as the session attribute) concurrently are synchronized in a
         thread-safe manner.</para>
       </listitem>
     </varlistentry>
@@ -58,15 +58,15 @@
     <varlistentry>
       <term>SipSession</term>
       <listitem>
-        <para>SIP messages are processed as soon as possible except for messages originating from the same <literal>SipSession</literal>. These messages are  excluded from any simultaneous processing. </para>
+        <para>SIP messages are processed as soon as possible except for messages originating from the same <literal>SipSession</literal>. These messages are excluded from any simultaneous processing. </para>
         <para>Messages from the same
         <literal>SipSession</literal> are processed sequentially, in the order they  originally arrived. </para>
         <para>Two (or more) messages from different
         <literal>SipSession</literal> instances in the same
         <literal>SipApplicationSession</literal> may be processed
-        simultaneously.  For this reason,  ensure that SIP Messages which  access shared resources (such as the session attribute) concurrently  are synchronized in a
+        simultaneously. For this reason, ensure that SIP Messages that access shared resources (such as the session attribute) concurrently  are synchronized in a
         thread-safe manner. </para>
-        <para>Thread-safety is particularly important in  Back-to-Back User Agent (B2BUA) cases,  where each communication leg of the
+        <para>Thread-safety is particularly important in Back-to-Back User Agent (B2BUA) cases,  where each communication leg of the
         B2BUA consists of a different <literal>SipSession</literal> in the
         same <literal>SipApplicationSession</literal>.</para>
       </listitem>
@@ -88,7 +88,7 @@
   <formalpara>
     <title>Congestion Control</title>
     <para>&PLATFORM_NAME; Sip Servlets currently provides the following  congestion
-    control mechanisms :</para>
+    control mechanisms:</para>
   </formalpara>
   <itemizedlist>
     <listitem>
@@ -120,7 +120,7 @@
         </listitem>
         <listitem>
           <para>Dropping  incoming
-      messages (according to the specified  congestion control policy)  .</para>
+      messages (according to the specified  congestion control policy).</para>
         </listitem>
       </itemizedlist>
     </listitem>
@@ -145,18 +145,18 @@
   </formalpara>
   <para><itemizedlist>
       <listitem>
-        <para>through the SIP Servlets Management Console.</para>
+        <para>Through the SIP Servlets Management Console.</para>
       </listitem>
       <listitem>
-        <para>editing
+        <para>Editing
   the server&apos;s <filename>server.xml</filename> configuration file.</para>
       </listitem>
       <listitem>
-        <para>from the
+        <para>From the
   <literal>dispatcher</literal> MBean.</para>
       </listitem>
       <listitem>
-        <para>from the Embedded Jopr integrated
+        <para>From the Embedded Jopr integrated
   management platform.</para>
       </listitem>
     </itemizedlist></para>
@@ -166,7 +166,7 @@
       <listitem>
         <para>The easiest way to configure the <guilabel>SIP Message Queue Size</guilabel> and <guilabel>Concurrency Control Mode</guilabel>
         tunable parameters is to open the <literal>SIP Servlets Management Console</literal> in your browser (by going to <ulink url="http://localhost:8080/sip-servlets-management"/>), making
-        your changes, and then <guibutton>Apply</guibutton>ing them. </para>
+        your changes, and then clicking <guibutton>Apply</guibutton>. </para>
         <figure>
           <title>SIP Servlets Management Console Concurrency and Congestion Control Tuning Parameters</title>
           <mediaobject id="sscacc-sas-MSSSManagementConsole-ss-ServerSettings-1">
@@ -177,7 +177,7 @@
         </figure>
         <important>
           <title>Persistent Settings</title>
-          <para>Concurrency and congestion control settings altered through the SIP Servlets Management console are not saved to the <filename>server.xml</filename> configuration file.  </para>
+          <para>Concurrency and congestion control settings altered through the SIP Servlets Management Console are not saved to the <filename>server.xml</filename> configuration file.  </para>
           <para>To make settings persistent, append the settings to  the <filename>server.xml</filename> file directly.  </para>
         </important>
       </listitem>

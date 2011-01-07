@@ -12,24 +12,24 @@
   extension model.</para>
   <para>It provides support for monitoring base operating system information
   on six operating systems as well as management of Apache, JBoss Application
-  Server (JBoss AS) and other related projects. See the <ulink url="http://www.jboss.org/jopr">Jopr website</ulink> for more information or
-  see the <ulink url="http://www.jboss.org/embjopr">Jopr embedded website</ulink></para>
+  Server (JBoss AS) and other related projects. See the <ulink url="http://www.jboss.org/jopr">Jopr website</ulink> or
+  the <ulink url="http://www.jboss.org/embjopr">Jopr embedded website</ulink> for more information.</para>
   <section>
     <title>&PLATFORM_NAME; SIP Servlets Monitoring and Management</title>
     <para>This chapter provides information on how to enable the management of
     &PLATFORM_NAME; SIP Servlets Servers through Jopr with our custom Jopr plug in.
-    Two versions of Jopr are available: an  embedded version, which is 
+    Two versions of Jopr are available: an embedded version, which is 
     better suited to development environments; and a full version, which is better suited to
     production environments.</para>
-    <para>The &PLATFORM_NAME; SIP Servlet Jopr plug in provides a facility to view
+    <para>The &PLATFORM_NAME; SIP Servlet Jopr plugin provides a facility to view
     metrics related to the deployed applications, metrics related to the SIP
-    Servlets Server.  Additionally, the plugin provides the option to manage the various configuration settings of the
+    Servlets Server. Additionally, the plugin provides the option to manage the various configuration settings of the
     SIP Servlets Server such as Congestion and Concurrency control.</para>
     <section>
       <title>Installation of the Enterprise Monitoring and Management Console</title>
       <section>
         <title>Jopr for Development</title>
-        <para>The Embedded Jopr (also known as the  JBoss Administration Console) is
+        <para>The Embedded Jopr (also known as the JBoss Administration Console) is
          pre-installed as an application deployed in the &PLATFORM_NAME; SIP
         Servlets Server.</para>
       </section>
@@ -43,8 +43,7 @@
             <para>Stop the Jopr server and agent if they are running.</para>
           </listitem>
           <listitem>
-            <para>Get the &PLATFORM_NAME; SIP Servlets Jopr Plug in from here :
-            <ulink url="http://repository.jboss.com/maven2/org/mobicents/servlet/sip/jopr-mobicents-sip-servlets-plugin/1.3/jopr-mobicents-sip-servlets-plugin-1.3.jar">http://repository.jboss.com/maven2/org/mobicents/servlet/sip/jopr-mobicents-sip-servlets-plugin/1.3/jopr-mobicents-sip-servlets-plugin-1.3.jar</ulink></para>
+            <para>Get the &PLATFORM_NAME; SIP Servlets Jopr Plug in from <ulink url="http://repository.jboss.com/maven2/org/mobicents/servlet/sip/jopr-mobicents-sip-servlets-plugin/1.3/jopr-mobicents-sip-servlets-plugin-1.3.jar">jboss.com</ulink>.</para>
           </listitem>
           <listitem>
             <para>Copy the jopr-mobicents-sip-servlets-plugin-1.3.jar just
@@ -56,7 +55,7 @@
             <para>Start the Jopr server then the agent.</para>
           </listitem>
           <listitem>
-            <para>Start the  &PLATFORM_NAME; SIP Servlets Server on JBoss, and ensure the binding address is specified </para>
+            <para>Start the &PLATFORM_NAME; SIP Servlets Server on JBoss, and ensure the binding address is specified.</para>
             <para>
             <userinput>sh run.sh -b 192.168.0.10</userinput> (the Server will
             not get recognized on localhost)</para>
@@ -75,7 +74,7 @@
           </listitem>
           <listitem>
             <para>From the tree on the left side of the screen, under Services
-            , click on <guimenuitem>MobicentsSipServlets</guimenuitem> link, then click on the
+            , click on the <guimenuitem>MobicentsSipServlets</guimenuitem> link, then click on the
             <guimenuitem>jboss.web:type=SipApplicationDispatcher</guimenuitem> link to view the incoming metrics.</para>
 <!--Issue #706 Editor note - I have converted  all screenshots from <mediaobjects> to <figures> for you :)  I've also set the width attribute to 700 (<imagedata width="700") (usually, the limit for good formatting in HTML is 450).  The images, due to their size, were scaling off the html page.  For massive screenshots like this, consider capturing only the section of the screen that you are discussing in each step.  It will mean the information in the screenshot is more useful to the reader.-->            <figure>
               <title>Mobicents SIP Servlets Server Metrics</title>
@@ -99,7 +98,7 @@
             </figure>
           </listitem>
           <listitem>
-            <para>Click on the <guilabel>Control Tab</guilabel> to  set the Concurrency
+            <para>Click on the <guilabel>Control Tab</guilabel> to set the Concurrency
             Control Mode and Congestion Control Policy as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
             <figure>
               <title>SIP Application Dispatcher Congestion Control Parameters Configuration</title>
@@ -112,7 +111,7 @@
           </listitem>
           <listitem>
             <para>To begin metrics collection, and see them on the monitoring
-            application, you must use an example application (such as
+            application, you must use an example application (such as the
             location service) so that the SIP Servlets Server processes SIP
             Messages.</para>
             <figure>
@@ -154,7 +153,7 @@
         <title>Jopr For Production</title>
 <!--Issue #706 Editor Comment - make the step wording the same as Jopr for Development (for consistency)-->        <itemizedlist>
           <listitem>
-            <para>Log in to the Jopr console on <ulink url="http://localhost:7080/" type="">http://localhost:7080</ulink> </para>
+            <para>Log in to the Jopr console on <ulink url="http://localhost:7080/" type="">http://localhost:7080</ulink>.</para>
             <para>From the <guilabel>Dashboard</guilabel> tab, in the Auto Discovery portlet, import your
             server (for example, deruelle-laptop JBossAS 4.2.3.GA default
             (192.168.0.12:1099)) from under localhost.</para>
@@ -203,7 +202,7 @@
             </figure>
           </listitem>
           <listitem>
-            <para>Click on the <guilabel>Configuration</guilabel> tab to  tune the
+            <para>Click on the <guilabel>Configuration</guilabel> tab to tune the
             Container configuration parameters such as Concurrency and Congestion as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
             <figure>
               <title>SIP Application Dispatcher Configuration</title>
@@ -216,7 +215,7 @@
           </listitem>
           <listitem>
             <para>Click on the Control Tab to be able to set the Concurrency
-            Control Mode and Congestion Control Policy as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/></para>
+            Control Mode and Congestion Control Policy as defined in <xref linkend="sscacc-MSS_Concurrency_and_Congestion_Control"/>.</para>
             <figure>
               <title>SIP Application Dispatcher Congestion Control Parameters Configuration</title>
               <mediaobject>
@@ -276,7 +275,7 @@
             </figure>
           </listitem>
           <listitem>
-            <para>Select the <guilabel>MetaData</guilabel> tab to  see the metrics
+            <para>Select the <guilabel>MetaData</guilabel> tab to see the metrics
             of your application.</para>
             <figure>
               <title>Selected Application Metrics Detail</title>
@@ -308,11 +307,11 @@
           <para>Stop the Jopr server and agent if they are running.</para>
         </listitem>
         <listitem>
-          <para>Get the &PLATFORM_NAME; SIP Load Balancer Jopr Plug in from JBoss
+          <para>Get the &PLATFORM_NAME; SIP Load Balancer Jopr plugin from the JBoss
           maven repository at <ulink url="http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer-jopr-plugin/1.0/sip-balancer-jopr-plugin-1.0.jar">http://repository.jboss.org/maven2/org/mobicents/tools/sip-balancer-jopr-plugin/1.0/sip-balancer-jopr-plugin-1.0.jar</ulink></para>
         </listitem>
         <listitem>
-          <para>Copy the &PLATFORM_NAME; SIP Load Balancer Jopr Plug in jar to the
+          <para>Copy the &PLATFORM_NAME; SIP Load Balancer Jopr plugin jar to the
           following directory:</para>
           <para><filename>jopr-server/jbossas/server/default/deploy/rhq.ear/rhq-downloads/rhq-plugins/</filename></para>
         </listitem>
@@ -332,7 +331,7 @@
         <listitem>
           <para>Log in to the Jopr console from the <guilabel>Dashboard</guilabel> tab, in
           the Auto Discovery portlet and import your &PLATFORM_NAME; SIP Load Balancer
-          (by example &PLATFORM_NAME; SIP Load Balancer 1.0-SNAPSHOT) from under
+          (for example, &PLATFORM_NAME; SIP Load Balancer 1.0-SNAPSHOT) from under
           localhost.</para>
           <figure>
             <title/>

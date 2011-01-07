@@ -5,7 +5,7 @@
 ]>
 <!-- chapter id nickname: afotsss --><chapter id="ssea-SIP_Servlet_Example_Applications">
   <title>SIP Servlet Example Applications</title>
-  <para>The SIP Servlet server has a selection of examples which demonstrate particular capabilities of the server.  <xref linkend="tab-ssea-SIP_Servlet_Example_Applications"/> lists the available examples, their location, and a brief description about the functionality each example demonstrates.  The examples can also provide a useful starting point for developing SIP Applications, therefore it is encouraged to experiment and adapt the base examples.  Each example is available in both binary and source formats.</para>
+  <para>The SIP Servlet Server has a selection of examples that demonstrate particular capabilities of the server. <xref linkend="tab-ssea-SIP_Servlet_Example_Applications"/> lists the available examples, their location, and a brief description about the functionality each example demonstrates. The examples can also provide a useful starting point for developing SIP Applications, therefore it is encouraged to experiment and adapt the base examples. Each example is available in both binary and source formats.</para>
   <table frame="all" id="tab-ssea-SIP_Servlet_Example_Applications">
     <title>Available Examples</title>
     <tgroup cols="2" colsep="1" rowsep="1" align="left">
@@ -70,7 +70,7 @@
           <entry>
             <ulink url="http://www.mobicents.org/mss-jsr309-demo.html">Media JSR 309 Example</ulink>
           </entry>
-          <entry>Demonstrates how the Sip Servlets Application Developers can leverage JSR-309 API which provides to application developers,  multimedia capabilities with a generic media server (MS) abstraction interface This example is only compatible with JBoss AS 5. The solution is know to work with Twinkle and linphone SIP soft-phones.</entry>
+          <entry>Demonstrates how the Sip Servlets Application Developers can leverage the JSR-309 API, which provides to application developers multimedia capabilities with a generic media server (MS) abstraction interface. This example is only compatible with JBoss AS5. The solution is know to work with Twinkle and linphone SIP soft-phones.</entry>
         </row>
         <row>
           <entry>
@@ -106,7 +106,7 @@
           <entry>
             <ulink url="http://www.mobicents.org/mss-diameter_rorf.html">Diameter Ro/Rf IIntegration</ulink>
           </entry>
-          <entry>a Diameter Ro/Rf service that performs online call charging</entry>
+          <entry>A Diameter Ro/Rf service that performs online call charging.</entry>
         </row>
         <row>
           <entry>
@@ -136,7 +136,7 @@
           <entry>
             <ulink url="http://www.mobicents.org/alerting-app.html">Alerting Application</ulink>
           </entry>
-          <entry>This application was developped so that the JBoss RHQ/Jopr Enterprise Management Solution would be able to notify system administrators when a monitoring alert is fired by Jopr/RHQ.</entry>
+          <entry>This application was developed so that the JBoss RHQ/Jopr Enterprise Management Solution would be able to notify system administrators when a monitoring alert is fired by Jopr/RHQ.</entry>
         </row>
         <row>
           <entry>

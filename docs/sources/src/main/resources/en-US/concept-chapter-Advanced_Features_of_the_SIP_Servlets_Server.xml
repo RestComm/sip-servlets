@@ -5,8 +5,8 @@
 ]>
 <!-- chapter id nickname: afotsss --><chapter id="afotsss-Advanced_Features_of_the_SIP_Servlets_Server">
   <title>Advanced Features of the SIP Servlets Server</title>
-  <para>The advanced features of &PLATFORM_NAME; SIP Servlets include Concurrency and 
-Congestion Control, Load Balancing with the &PLATFORM_NAME; Load Balancer, and, exclusively for &SHORT_PLATFORM_NAME; for JBoss, clustering and failover support.</para>
+  <para>The advanced features of SIP Servlets include Concurrency and 
+Congestion Control, load balancing with the &PLATFORM_NAME; Load Balancer, and, exclusively for &SHORT_PLATFORM_NAME; for JBoss, clustering and failover support.</para>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_Media_Support.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_Concurrency_and_Congestion_Control.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_SIP_Servlet_Security.xml"/>
@@ -18,28 +18,30 @@ Congestion Control, Load Balancing with the &PLATFORM_NAME; Load Balancer, and, 
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_JSLEE_Interop.xml"/>
   <section>
     <title>Eclipse IDE Tools</title>
-    <para>The &PLATFORM_NAME; SIP Servlets Eclipse Tools assist developers in creating JSR 289 applications with &PLATFORM_NAME;. You can use the Dynamic Web Project wizard for Converged Applications to get started with an empty project and then you can test your application with a real SIP Phone right from the IDE.</para>
-    <mediaobject>
-      <imageobject>
-        <imagedata fileref="images/mss-ide-screen.png"/>
-      </imageobject>
-      <caption>SIP Servlets Eclipse IDE Tools</caption>
-    </mediaobject>
+    <para>The SIP Servlets Eclipse tools assist developers in creating JSR-289 applications with &PLATFORM_NAME;. You can use the Dynamic Web Project wizard for converged applications to get started with an empty project, and then test your application with a real SIP Phone right from the IDE.</para>
+    <figure>
+      <title>SIP Servlets Eclipse IDE Tools</title>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="images/mss-ide-screen.png"/>
+        </imageobject>
+      </mediaobject>
+    </figure>
     <section>
       <title>Pre-Install requirements</title>
       <para>Eclipse 3.4 is required.</para>
     </section>
     <section>
       <title>Installation</title>
-      <para>The standard Eclipse Update Site installation mechanism is leveraged. The &PLATFORM_NAME; Update Site is at the following location: <ulink url="http://mobicents.googlecode.com/svn/downloads/sip-servlets-eclipse-update-site">http://mobicents.googlecode.com/svn/downloads/sip-servlets-eclipse-update-site</ulink> After adding this update site to Eclipse you can proceed with regular Eclipse Plug-in Installation. If you need help the process is demonstrated in <ulink url="http://www.youtube.com/watch?v=LZOmLEC2IeQ">this video</ulink>.</para>
+      <para>The standard Eclipse update site installation mechanism is leveraged. The &PLATFORM_NAME; Update Site is at the following location: <ulink url="http://mobicents.googlecode.com/svn/downloads/sip-servlets-eclipse-update-site">http://mobicents.googlecode.com/svn/downloads/sip-servlets-eclipse-update-site</ulink>. After adding this update site to Eclipse you can proceed with the regular Eclipse Plug-in Installation. If you need help, the process is demonstrated in <ulink url="http://www.youtube.com/watch?v=LZOmLEC2IeQ">this video</ulink>.</para>
     </section>
     <section>
       <title>SIP Servlets Core Plug-in</title>
-      <para>This Plug-in allows you to create Dynamic Web Projects with  SIP Facet. There are a number of new Dynamic Web Project configurations for Converged applications. It&apos;s best to use the ones marked as &quot;recommended&quot;. After you complete the wizards a complete converged project  skeleton will be generated. Working with this type of project is similar to working with normal Web projects. You can see a demo <ulink url="http://people.redhat.com/vralev/mss-eclipse-plugin-demo/mss-eclipse.htm">here</ulink>.</para>
+      <para>This plug-in allows you to create Dynamic Web Projects with the SIP Facet. There are a number of new Dynamic Web Project configurations for Converged applications. It is best to use the ones marked as &quot;recommended&quot;. After you complete the wizard, a complete converged project skeleton will be generated. Working with this type of project is similar to working with normal Web projects. You can see a demo <ulink url="http://people.redhat.com/vralev/mss-eclipse-plugin-demo/mss-eclipse.htm">here</ulink>.</para>
     </section>
     <section>
       <title>SIP Phone Plug-in</title>
-      <para>The SIP Phone plug-in integrates a SIP phone inside your Eclipse IDE. You can use the phone to test your SIP or Media applications. The Phone uses the Microphone and the Speakers on your computer and allows to simulate real-world scenarios.</para>
+      <para>The SIP Phone plug-in integrates a SIP phone inside your Eclipse IDE. You can use the phone to test your SIP or Media applications. The phone uses the microphone and speakers on your computer and allows you to simulate real-world scenarios.</para>
     </section>
   </section>
 </chapter>

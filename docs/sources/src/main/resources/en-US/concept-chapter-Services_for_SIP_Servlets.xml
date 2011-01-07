@@ -194,7 +194,7 @@
         directories, and the JBoss Application Server or Tomcat Servlet
         Container knows where to find them (which you specified in a
         <filename>server.xml</filename> file), then you should go ahead and
-        run SIP Servlets Server.</para>
+        run the SIP Servlets Server.</para>
       </formalpara>
       <para>To learn how to run the SIP Servlets-enabled JBoss Application
       Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Running"/>.</para>
@@ -209,7 +209,7 @@
         <title/>
         <step>
           <para>Start two SIP soft-phones. The first phone should be set up as
-          <userinput>sip:receiver@sip-servlets.com</userinput> at IP address
+          <userinput>sip:receiver@sip-servlets.com</userinput> at the IP address
           <userinput>127.0.0.1</userinput> on port
           <userinput>5090</userinput>. The second phone can be set up in any
           way you like. Note that the SIP phones do not have to be
@@ -267,7 +267,7 @@
         servlet container then invokes the location service.</para>
       </step>
       <step>
-<!--* The location service determines, using non-SIP means, where the callee (receiver) is registered with two locations, identified by, say, two SIP URIs (sip:receiver@127.0.0.1:5090 and sip:receiver@127.0.0.1:6090).-->        <para>the Location Service determines, without using the SIP protocol
+<!--* The location service determines, using non-SIP means, where the callee (receiver) is registered with two locations, identified by, say, two SIP URIs (sip:receiver@127.0.0.1:5090 and sip:receiver@127.0.0.1:6090).-->        <para>The Location Service determines, without using the SIP protocol
         itself, where the callee—or receiver—is registered. The callee may be
         registered at two locations identified by two SIP URIs:
         <literal>sip:receiver@127.0.0.1:5090</literal> and
@@ -275,7 +275,7 @@
       </step>
       <step>
 <!--* The service proxies to those two destinations in parallel, without record-routing, and without the supervised mode.-->        <para>The Location Service proxies to those two destinations
-        simultaneously, without record-routing and without using supervised
+        simultaneously, without record-routing and without using the supervised
         mode.</para>
       </step>
       <step>
@@ -283,11 +283,11 @@
         so the container cancels the other.</para>
       </step>
       <step>
-<!--* The 200 is forwarded upstream to Alice and the call setup is completed as per usual.-->        <para>The <literal>200 (OK)</literal> is forwarded upstream to Alice
+<!--* The 200 is forwarded upstream to Alice and the call setup is completed as per usual.-->        <para>The <literal>200 (OK)</literal> is forwarded upstream to Alice,
         and the call setup is carried out as usual.</para>
       </step>
       <step>
-<!--* If none of the destinations accepts the call, a Diameter Accounting-Request for refund is sent to the Diameter Charging Server in order to credit the 10.0 euros debited.-->        <para>If neither or none of the registered destinations accepts the
+<!--* If none of the destinations accepts the call, a Diameter Accounting-Request for refund is sent to the Diameter Charging Server in order to credit the 10.0 euros debited.-->        <para>If none of the registered destinations accepts the
         call, a Diameter Accounting-Request for refund is sent to the Diameter
         Charging Server in order to debit the already-credited €10.00</para>
       </step>
@@ -352,11 +352,8 @@
         <step>
           <para>Place the <filename>diameter-event-charging-1.0.war</filename>
           WAR archive into the
-          <filename>jboss_home/server/&lt;profile&gt;/deploy</filename>
-          directory, where <filename>&lt;deploy&gt;</filename> is your
-          Configuration Profile, whether &quot;default&quot; or
-          &quot;all&quot; (the latter if you are using &SHORT_PLATFORM_NAME; for JBoss&apos;s
-          clustering capabilities).</para>
+          <filename>$JBOSS_HOME/server/&lt;profile&gt;/deploy</filename>
+          directory.</para>
         </step>
         <step>
           <para>Place the
@@ -447,14 +444,11 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
               <imageobject>
                 <imagedata width="440" align="center" fileref="images/mss-DiameterEventChanging-ss-ChargingEmulatorConfig.png" format="PNG"/>
               </imageobject>
-              <caption>
-                <para>Configuring the Charging Emulator</para>
-              </caption>
             </mediaobject>
           </figure>
           <orderedlist>
             <listitem>
-              <para>Set the <literal>Peer Id</literal> to:
+              <para>Set the <literal>Peer ID</literal> to:
               <userinput>aaa://127.0.0.1:21812</userinput></para>
             </listitem>
             <listitem>
@@ -480,15 +474,14 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
               <guimenu>Config</guimenu>
               <guimenuitem>Options</guimenuitem>
             </menuchoice> dialog window, as shown in the image.</para>
-          <mediaobject id="sfss-mss-DiameterEventChanging-ss-ChargingAccountConfig">
-            <imageobject>
-              <imagedata width="440" align="center" fileref="images/mss-DiameterEventChanging-ss-ChargingAccountConfig.png" format="PNG"/>
-            </imageobject>
-            <caption>
-              <para>Configuring Accounts in the Charging
-            Emulator</para>
-            </caption>
-          </mediaobject>
+          <figure>
+            <title>Configuring Accounts in the Charging Emulator</title>
+            <mediaobject id="sfss-mss-DiameterEventChanging-ss-ChargingAccountConfig">
+              <imageobject>
+                <imagedata width="440" align="center" fileref="images/mss-DiameterEventChanging-ss-ChargingAccountConfig.png" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure>
 <!--<para>You can see the user balance in the emulator: in the menu Config > Account > Click on "00001000-Klas Svensson" and watch the balance. Stretch the window down to see the history.</para>-->          <para>In the <guilabel>Account Configuration</guilabel> window of
           the Charging Emulator, you can see the user&apos;s balances. Select a
           user to watch the balance. You can also stretch the window
@@ -510,7 +503,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
           refund the initial amount charged by the call. On the other hand, if
           the call is accepted, nothing else related to Diameter happens, and
           no second request takes place.</para>
-          <para>Please not that this is not the truly-correct way to do
+          <para>Please note that this is not the correct way to do
           charging, as Diameter provides other means, such as unit
           reservation. However, for the purpose of a demonstration it is
           sufficient to show the debit and follow-up credit working. Also,
@@ -691,7 +684,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         directories, and the JBoss Application Server or Tomcat Servlet
         Container knows where to find them (which you specified in a
         <filename>server.xml</filename> file), then you should go ahead and
-        run SIP Servlets Server.</para>
+        run the SIP Servlets Server.</para>
       </formalpara>
       <para>To learn how to run the SIP Servlets-enabled JBoss Application
       Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Running"/>.</para>
@@ -903,7 +896,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         directories, and the JBoss Application Server or Tomcat Servlet
         Container knows where to find them (which you specified in a
         <filename>server.xml</filename> file), then you should go ahead and
-        run SIP Servlets Server.</para>
+        run the SIP Servlets Server.</para>
       </formalpara>
       <para>To learn how to run the SIP Servlets-enabled JBoss Application
       Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Running"/>.</para>
@@ -1134,7 +1127,7 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
         directories, and the JBoss Application Server or Tomcat Servlet
         Container knows where to find them (which you specified in a
         <filename>server.xml</filename> file), then you should go ahead and
-        run SIP Servlets Server.</para>
+        run the SIP Servlets Server.</para>
       </formalpara>
       <para>To learn how to run the SIP Servlets-enabled JBoss Application
       Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Running"/>.</para>

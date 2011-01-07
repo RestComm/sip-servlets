@@ -8,11 +8,25 @@
   <para>&nbsp;</para>
   <section id="bsssc-binary-SIP_Servlets_Server-Adding_SIP_Connectors">
     <title>Configuring SIP Connectors</title>
-    <para>SIP Connectors are added in the same way as HTTP Connectors: by adding a <literal>&lt;Connector&gt;</literal> element under the <literal>&lt;Service&gt;</literal> element in the container&apos;s <filename>server.xml</filename> configuration file.</para>
-    <para>&PLATFORM_NAME; SIP Servlets has three SIP Connectors configured by default : UDP And TCP are running on the binding IP Address of the container and port 5080 and TLS is running on the binding IP Address of the container and port 5081</para>
-    <para>For example, to add a SIP Connector on the IP address <literal>127.0.0.1</literal>, on port <literal>5080</literal>, using the UDP transport protocol, you should insert the following XML element:</para>
+    <para>SIP Connectors are added by adding a <emphasis>&lt;Connector&gt;</emphasis> element under the <emphasis>&lt;Service&gt;</emphasis> element in the container's <filename>server.xml</filename> configuration file.</para>
+    <para>Three SIP Connectors are configured for SIP Servlets:</para>
+    <itemizedlist>
+      <listitem>
+        <para>
+        UDP and TCP are running on the binding IP Address of the container and port 5080.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+        TLS is running on the binding IP Address of the container and port 5081.
+        </para>
+      </listitem>
+    </itemizedlist>
     <example>
       <title>Adding a SIP Connector to server.xml</title>
+      <para>
+      To add a SIP Connector on the IP address <literal>127.0.0.1</literal>, on port <literal>5080</literal>, using the UDP transport protocol, you should insert the following XML element:
+      </para>
       <programlisting linenumbering="unnumbered" role="XML"><![CDATA[
   <Connector port="5080" 
 ipAddress="127.0.0.1"
@@ -37,31 +51,31 @@ ipAddress="127.0.0.1"
       <varlistentry>
         <term>ipAddress</term>
         <listitem>
-          <para>The IP address at which the container will be able to receive SIP messages.  The container can be configured to listen to all available IP addresses by setting <parameter>ipAddress</parameter> to <userinput>0.0.0.0 &lt;sipPathName&gt;</userinput>.</para>
+          <para>The IP address at which the container will be able to receive SIP messages. The container can be configured to listen to all available IP addresses by setting <parameter>ipAddress</parameter> to <userinput>0.0.0.0 &lt;sipPathName&gt;</userinput>.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
         <term>protocol</term>
         <listitem>
-          <para>Specifies the connector is a SIP Connector and not an HTTP Connector.  There is no need to change this property.</para>
+          <para>Specifies the connector is a SIP Connector and not an HTTP Connector. There is no need to change this property.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
         <term>signalingTransport</term>
         <listitem>
-          <para>Specifies the transport on which the container will be able to receive SIP messages.  For example, &quot;udp&quot;.</para>
+          <para>Specifies the transport on which the container will be able to receive SIP messages. For example, &quot;udp&quot;.</para>
         </listitem>
       </varlistentry>      
       <varlistentry>
         <term>useStun</term>
         <listitem>
-          <para>Enables Session Traversal Utilities for NAT (STUN) support for this Connector.  The attribute defaults to &quot;false&quot;.  If set to &quot;true&quot;, ensure that the <literal>ipAddress</literal> attribute is <emphasis>not</emphasis> set to <literal>127.0.0.1</literal>.  Refer to <xref linkend="mssstun-MSS_STUN"/> for more information about STUN.</para>
+          <para>Enables Session Traversal Utilities for NAT (STUN) support for this Connector. The attribute defaults to &quot;false&quot;. If set to &quot;true&quot;, ensure that the <literal>ipAddress</literal> attribute is <emphasis>not</emphasis> set to <literal>127.0.0.1</literal>. Refer to <xref linkend="mssstun-MSS_STUN"/> for more information about STUN.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
         <term>stunServerAddress</term>
         <listitem>
-          <para>Specifies the STUN server address used to discover the public IP address of the SIP Connector.  This attribute is only required if the <literal>useStun</literal> attribute is set to &quot;true&quot;. Refer to <xref linkend="mssstun-MSS_STUN"/> for more information about STUN and public STUN servers.</para>
+          <para>Specifies the STUN server address used to discover the public IP address of the SIP Connector. This attribute is only required if the <literal>useStun</literal> attribute is set to &quot;true&quot;. Refer to <xref linkend="mssstun-MSS_STUN"/> for more information about STUN and public STUN servers.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
@@ -73,13 +87,13 @@ ipAddress="127.0.0.1"
       <varlistentry>
         <term>addressResolverClass</term>
         <listitem>
-          <para>Specifies the <literal>gov.nist.core.net.AddressResolver</literal> implementation class that will be used by the container to perform DNS lookups. The default class used by the container is <literal>org.mobicents.servlet.sip.core.DNSAddressResolver</literal> but any class implementing <literal>gov.nist.core.net.AddressResolver</literal> NIST SIP Stack interface and having a Constructor with a <literal>org.mobicents.servlet.sip.core.SipApplicationDispatcher</literal> param can be used. To disable DNS lookups, this attribute should be left empty..</para>
+          <para>Specifies the <classname>gov.nist.core.net.AddressResolver</classname> implementation class that will be used by the container to perform DNS lookups. The default class used by the container is <classname>org.mobicents.servlet.sip.core.DNSAddressResolver</classname>, but any class implementing the <classname>gov.nist.core.net.AddressResolver</classname> NIST SIP Stack interface and having a constructor with a <classname>org.mobicents.servlet.sip.core.SipApplicationDispatcher</classname> parameter can be used. To disable DNS lookups, this attribute should be left empty.</para>
         </listitem>
       </varlistentry>      
       <varlistentry>
         <term>useStaticAddress</term>
         <listitem>
-          <para>Specifies  whether the settings in staticServerAddress and staticServerPort are activated.  The default value is &quot;false&quot; (deactivated).</para>
+          <para>Specifies whether the settings in staticServerAddress and staticServerPort are activated. The default value is &quot;false&quot; (deactivated).</para>
         </listitem>
       </varlistentry>
       <varlistentry>
@@ -91,13 +105,18 @@ ipAddress="127.0.0.1"
       <varlistentry>
         <term>staticServerPort</term>
         <listitem>
-          <para>Specifies the port of the load-balancer specified in staticServerAddress . This parameter is useful in cluster configurations where requests should be bound to a load-balancer address rather than a specific node address.</para>
+          <para>Specifies the port of the load-balancer specified in staticServerAddress. This parameter is useful in cluster configurations where requests should be bound to a load-balancer address rather than a specific node address.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
         <term>httpFollowsSip</term>
         <listitem>
-          <para>This flag makes the application server aware of how the SIP load balancers assign request affinity and stores this information in the application session. When HTTP load balancer sends HTTP request not associated with this application session the application server will force this HTTP request to be repeated to land on the correct node.</para>
+          <para>
+          Makes the application server aware of how the SIP Load Balancers assign request affinity, and stores this information in the application session.
+          </para>
+          <para>
+          When the HTTP Load Balancer sends HTTP requests that are not associated with the application session, the application server will force the HTTP request to be repeated until it lands on the correct node.
+          </para>
         </listitem>
       </varlistentry>
     </variablelist>
@@ -107,10 +126,11 @@ ipAddress="127.0.0.1"
   </section>
   <section id="bsssc-binary-SIP_Servlets_Server-Configuring_Application_Routing">
     <title>Application Routing and Service Configuration</title>
-    <para>The application router is called by the container—whether JBoss or Tomcat—to select a SIP Servlet application to service an initial request. It embodies the logic used to choose which applications to invoke. An application router is required for a container to function, but it is a separate logical entity from the container. The application router is solely responsible for application selection and must not implement application logic. For example, the application router cannot modify a request or send a response.</para>
-    <para>For more information about the application router, refer to the following sections of the JSR 289 specification: Application Router Packaging and Deployment, Application Selection Process, and Appendix C.
+    <para>The application router is called by the container to select a SIP Servlet application to service an initial request. It embodies the logic used to choose which applications to invoke. An application router is required for a container to function, but it is a separate logical entity from the container.</para>
+    <para>The application router is responsible for application selection and must not implement application logic. For example, the application router cannot modify a request or send a response.</para>
+    <para>For more information about the application router, refer to the following sections of the <ulink url="http://jcp.org/en/jsr/detail?id=289">JSR 289 specification</ulink>: Application Router Packaging and Deployment, Application Selection Process, and Appendix C.
    </para>
-    <para>In order to configure the application router, you should edit the <literal>Service</literal> element in the container&apos;s <filename>server.xml</filename> configuration file:</para>
+    <para>In order to configure the application router, you should edit the <literal>Service</literal> element in the container's <filename>server.xml</filename> configuration file:</para>
     <example id="bsssc-Configuring_the_Service_Element_in_the_Containers_server.xml">
       <title>Configuring the Service Element in the Container&apos;s server.xml</title>
       <programlisting linenumbering="unnumbered" role="XML"><![CDATA[
@@ -132,8 +152,8 @@ ipAddress="127.0.0.1"
  dialogPendingRequestChecking="false">]]>
  </programlisting>
     </example>
-    <para>Provided here is a description of the SIP Service element&apos;s attributes:</para>
     <variablelist>
+      <title>SIP Service element attributes</title>
       <varlistentry>
         <term>className</term>
         <listitem>
@@ -155,7 +175,7 @@ ipAddress="127.0.0.1"
        <varlistentry>
         <term>sipStackPropertiesFile</term>
         <listitem>
-          <para>Specifies the location of the file containing key-value pairs corresponding to the SIP stack configuration properties.  This attribute is used to further tune the JAIN SIP Stack.  If this property is omitted, the following default values are assumed:</para>
+          <para>Specifies the location of the file containing key value pairs corresponding to the SIP Stack configuration properties. This attribute is used to further tune the JAIN SIP Stack. If this property is omitted, the following default values are assumed:</para>
           <itemizedlist>
             <listitem>
               <para>gov.nist.javax.sip.LOG_MESSAGE_CONTENT=true</para>
@@ -186,18 +206,18 @@ ipAddress="127.0.0.1"
             </listitem>
             <listitem>
               <para>gov.nist.javax.sip.MAX_FORK_TIME_SECONDS=0. Dialog forking is not enabled by default as it has an impact on memory. If set to a value greater than 0, Dialog Forking will be enabled on Mobicents Sip Servlets.</para>
-            </listitem>            
+            </listitem>
             <listitem>
               <para>gov.nist.javax.sip.AUTOMATIC_DIALOG_ERROR_HANDLING=false. Merged requests Loop Detection is turned off by default</para>
             </listitem>            
           </itemizedlist>
-          <para>&PLATFORM_NAME; SIP Servlets also adds its own properties to allow for even more configuration and flexibility :</para>
+          <para>SIP Servlets also adds its own properties to allow for even more configuration and flexibility:</para>
           <itemizedlist>
             <listitem>
-              <para>If the property <literal>org.mobicents.servlet.sip.SERVER_HEADER</literal> is set, A Server header will be added to all SIP Responses leaving the container.</para>
+              <para>If the property <literal>org.mobicents.servlet.sip.SERVER_HEADER</literal> is set, a server header will be added to all SIP Responses leaving the container.</para>
             </listitem>
             <listitem>
-              <para>If the property <literal>org.mobicents.servlet.sip.USER_AGENT_HEADER</literal> is set, A Server header will be added to all SIP Requests leaving the container.</para>
+              <para>If the property <literal>org.mobicents.servlet.sip.USER_AGENT_HEADER</literal> is set, a server header will be added to all SIP Requests leaving the container.</para>
             </listitem>                            
            </itemizedlist>
         </listitem>
@@ -205,59 +225,59 @@ ipAddress="127.0.0.1"
       <varlistentry>
         <term>usePrettyEncoding</term>
         <listitem>
-          <para>Allows Via, Route, and RecordRoute header field information to be split into multiple lines, rather than each header field being separating with a comma.  The attribute defaults to &quot;true&quot;.  Leaving this attribute at the default setting may assist in debugging non-RFC3261 compliant SIP servers.</para>
+          <para>Allows Via, Route, and RecordRoute header field information to be split into multiple lines, rather than each header field being separating with a comma. The attribute defaults to &quot;true&quot;. Leaving this attribute at the default setting may assist in debugging non-RFC3261 compliant SIP servers.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
         <term>additionalParameterableHeaders</term>
         <listitem>
-          <para>Comma-separated list of header names that are treated as Parameterable by the container.  The specified headers are classed as valid, in addition to the standard Parameterable headers defined in the Sip Servlets 1.1 Specification. </para>
-          <para>Setting and getting parameters is allowed for the standard, and additional parameters.  Parameters that are not specified in <literal>additionalParameterableHeaders</literal> will result in a ServletParseException error.</para>
+          <para>Comma separated list of header names that are treated as parameterable by the container. The specified headers are classed as valid, in addition to the standard parameterable headers defined in the Sip Servlets 1.1 Specification.</para>
+          <para>Setting and getting parameters is allowed for both the standard and the additional parameters. Parameters that are not specified in <literal>additionalParameterableHeaders</literal> will result in a ServletParseException error.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
         <term>bypassRequestExecutor/bypassResponseExecutor</term>
         <listitem>
-          <para>If set to false, the SIP Servlets server uses a ThreadPoolExecutor linked to a LinkedBlockingQueue to dispatch the request/response threads. The container can thus handles two different responses (for example a 180 Ringing and a 200 OK) concurrently, but a race condition can occur where the second response overtakes the first one (200 OK dispatched to the application before the 180 Ringing) on UDP.</para>
-          <para>So those flags are true by default thus using jain sip serializing per transaction to ensure such race conditions don't occur in Mobicents Sip Servlets even though they can still happen on UDP at jain sip level. </para>
+          <para>If set to false, the SIP Servlets server uses a ThreadPoolExecutor linked to a LinkedBlockingQueue to dispatch the request/response threads. The container can then handle two different responses (for example a 180 Ringing and a 200 OK) concurrently. However, a race condition can occur where the second response overtakes the first one (200 OK dispatched to the application before the 180 Ringing) on UDP.</para>
+          <para>These flags are set to true by defauilt, Jain sip serializing is used per transaction to ensure such race conditions don't occur in Mobicents Sip Servlets even though they can still happen on UDP at jain sip level.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
         <term>baseTimerInterval</term>
         <listitem>
-          <para>Specifies the <literal>T1</literal> Base Timer Interval, which allows the SIP Servlets Container to adjust its timers depending on network conditions.  The default interval is 500 (milliseconds).</para>
-          <para>For more information about  available timers, refer to  <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
-		  <para>All of the timers present in the tables depend on <literal>T1</literal>, <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal> </para>
+          <para>Specifies the <literal>T1</literal> Base Timer Interval, which allows the SIP Servlets container to adjust its timers depending on network conditions. The default interval is 500 (milliseconds).</para>
+          <para>For more information about available timers, refer to the <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
+		  <para>All of the timers present in the tables depend on <literal>T1</literal>, <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal>.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
         <term>t2Interval</term>
         <listitem>
-          <para>Specifies the <literal>T2</literal> Interval, which allows the SIP Servlets Container to adjust its timers depending on network conditions.  The default interval is 4000 (milliseconds).</para>
-          <para>For more information about available timers, refer to  <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
-          <para>All of the timers present in the tables depend on <literal>T1</literal>, <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal> </para>
+          <para>Specifies the <literal>T2</literal> Interval, which allows the SIP Servlets container to adjust its timers depending on network conditions. The default interval is 4000 (milliseconds).</para>
+          <para>For more information about available timers, refer to the <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
+          <para>All of the timers present in the tables depend on <literal>T1</literal>, <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal>.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
         <term>t4Interval</term>
         <listitem>
-          <para>Specifies the <literal>T4</literal> Interval, which allows the SIP Servlets Container to adjust its timers depending on network conditions.  The default interval is 5000 (milliseconds).</para>
-          <para>For more information about available timers, refer to  <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
-          <para>All of the timers present in the tables depend on <literal>T1</literal>, <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal> </para>
+          <para>Specifies the <literal>T4</literal> Interval, which allows the SIP Servlets container to adjust its timers depending on network conditions. The default interval is 5000 (milliseconds).</para>
+          <para>For more information about available timers, refer to the <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
+          <para>All of the timers present in the tables depend on <literal>T1</literal>, <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal>.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
         <term>timerDInterval</term>
         <listitem>
-          <para>Specifies the <literal>Timer D</literal> Interval, which allows the SIP Servlets Container to adjust its timers depending on network conditions.  The default interval is 32000 (milliseconds).</para>
-          <para>For more information about available timers, refer to  <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
-          <para>All of the timers present in the tables depend on <literal>T1</literal>, <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal> </para>
+          <para>Specifies the <literal>Timer D</literal> Interval, which allows the SIP Servlets container to adjust its timers depending on network conditions. The default interval is 32000 (milliseconds).</para>
+          <para>For more information about available timers, refer to the <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
+          <para>All of the timers present in the tables depend on <literal>T1</literal>, <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal>.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
         <term>dispatcherThreadPoolSize</term>
         <listitem>
-          <para>The number of threads used for processing  SIP messages inside the Sip Servlets container by the dispatcher. The default value is 4.</para>
+          <para>The number of threads used for processing SIP messages inside the Sip Servlets container by the dispatcher. The default value is 4.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
@@ -273,14 +293,14 @@ ipAddress="127.0.0.1"
     <para>There are two separate levels of logging:</para>
     <itemizedlist>
       <listitem>
-        <para>Logging at the container level, which can be configured using the <filename>log4j.xml</filename> configuration file, which is usually located in the container&apos;s <filename>lib</filename> directory.</para>
+        <para>Logging at the container level, which can be configured using the <filename>log4j.xml</filename> configuration file, usually located in the container&apos;s <filename>lib</filename> directory.</para>
       </listitem>
       <listitem>
         <para>Logging of the NIST SIP stack, which is configured in the <literal>Connector</literal> element of the container&apos;s <filename>server.xml</filename> configuration file.</para>
       </listitem>
     </itemizedlist>
-    <para>You can setup the logging so that the NIST SIP Stack will log into the container logs</para>
-	<para>To use LOG4J in NIST SIP Stack use the following, You need to define a category in <filename>JBOSS_HOME/server/default/conf/jboss-log4j.xml</filename> and set it to <literal>off</literal></para>
+    <para>You can setup the logging so that the NIST SIP Stack will log into the container logs.</para>
+	<para>To use LOG4J in NIST SIP Stack, you need to define a category in <filename>JBOSS_HOME/server/default/conf/jboss-log4j.xml</filename> and set it to <literal>off</literal>.</para>
 	<example id="bsssc-Configuring_the_Stack_Logs_in_the_Container_log4j.xml">
 		<title>Configuring the NIST SIP Stack to log into the Container&apos;s logs</title>
 		<programlisting linenumbering="unnumbered" role="XML"><![CDATA[
@@ -289,6 +309,6 @@ ipAddress="127.0.0.1"
 			</category>]]>
 	 	</programlisting>
  	</example>
-	<para>So that this category is used in MSS you need to specify it in <filename>JBOSS_HOME/server/default/conf/mss-sip-stack.properties</filename> as well by adding this property <literal>gov.nist.javax.sip.LOG4J_LOGGER_NAME=gov.nist</literal> and setting this property <literal>gov.nist.javax.sip.TRACE_LEVEL=LOG4J</literal></para>
+	<para>For this category to be used in MSS, you need to specify it in <filename>JBOSS_HOME/server/default/conf/mss-sip-stack.properties</filename>, add the <literal>gov.nist.javax.sip.LOG4J_LOGGER_NAME=gov.nist</literal> property, and set the <literal>gov.nist.javax.sip.TRACE_LEVEL=LOG4J</literal> property.</para>
   </section>
 </section>

@@ -5,7 +5,6 @@
 ]>
 <preface>
 	<title>Preface</title>
-	<para>&nbsp;</para>
 	<xi:include href="Common_Content/Conventions.xml" xmlns:xi="http://www.w3.org/2001/XInclude">
 		<xi:fallback xmlns:xi="http://www.w3.org/2001/XInclude">
 			<xi:include href="fallback_content/Conventions.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
