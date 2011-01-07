@@ -85,12 +85,6 @@ ipAddress="127.0.0.1"
         </listitem>
       </varlistentry>
       <varlistentry>
-        <term>addressResolverClass</term>
-        <listitem>
-          <para>Specifies the <classname>gov.nist.core.net.AddressResolver</classname> implementation class that will be used by the container to perform DNS lookups. The default class used by the container is <classname>org.mobicents.servlet.sip.core.DNSAddressResolver</classname>, but any class implementing the <classname>gov.nist.core.net.AddressResolver</classname> NIST SIP Stack interface and having a constructor with a <classname>org.mobicents.servlet.sip.core.SipApplicationDispatcher</classname> parameter can be used. To disable DNS lookups, this attribute should be left empty.</para>
-        </listitem>
-      </varlistentry>      
-      <varlistentry>
         <term>useStaticAddress</term>
         <listitem>
           <para>Specifies whether the settings in staticServerAddress and staticServerPort are activated. The default value is &quot;false&quot; (deactivated).</para>
@@ -286,6 +280,12 @@ ipAddress="127.0.0.1"
           <para>This property enables and disables error checking when SIP transactions overlap. If within a single dialog an INVITE request arrives while there is antoher transaction proceeding, the container will send a 491 error response. The default value is false.</para>
         </listitem>
       </varlistentry>
+      <varlistentry>
+        <term>addressResolverClass</term>
+        <listitem>
+          <para>Specifies the <classname>gov.nist.core.net.AddressResolver</classname> implementation class that will be used by the container to perform DNS lookups. The default class used by the container is <classname>org.mobicents.servlet.sip.core.DNSAddressResolver</classname>, but any class implementing the <classname>gov.nist.core.net.AddressResolver</classname> NIST SIP Stack interface and having a constructor with a <classname>org.mobicents.servlet.sip.core.SipApplicationDispatcher</classname> parameter can be used. To disable DNS lookups, this attribute should be left empty.</para>
+        </listitem>
+      </varlistentry>      
     </variablelist>
   </section>
   <section id="bsssc-binary-SIP_Servlets_Server-Configuring_Logging">
