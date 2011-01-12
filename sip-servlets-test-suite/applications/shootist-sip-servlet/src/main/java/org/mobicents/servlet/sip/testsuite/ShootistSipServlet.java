@@ -305,6 +305,9 @@ public class ShootistSipServlet
 				sipApplicationSession.encodeURI(requestURI);
 				sipApplicationSession.setAttribute(ENCODE_URI, "true");
 			}
+			if(ce.getServletContext().getInitParameter("tlsRURI")!=null) {
+				requestURI.setTransportParam("tls");
+			}
 			sipServletRequest.setRequestURI(requestURI);
 		}
 		String testErrorResponse = ce.getServletContext().getInitParameter(TEST_ERROR_RESPONSE);

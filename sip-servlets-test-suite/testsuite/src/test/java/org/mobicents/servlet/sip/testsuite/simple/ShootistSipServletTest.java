@@ -492,6 +492,35 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	}
 	
 	/**
+	 * non regression test for Issue 2269 http://code.google.com/p/mobicents/issues/detail?id=2269
+	 * Wrong Contact header scheme URI in case TLS call with 'sip:' scheme
+	 */
+	public void testShootistContactNonSecureURITlsTransport() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"tls_receiver", "gov.nist", "TLS", AUTODIALOG, null, null, null);				
+		
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5071, ListeningPoint.TCP);
+		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5072, ListeningPoint.TLS);
+		tomcat.startTomcat();
+		deployApplication("tlsRURI", "true");
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());
+		ContactHeader contactHeader = (ContactHeader) receiver.getInviteRequest().getHeader(ContactHeader.NAME);	
+		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().contains("sip:"));
+		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().contains("5072"));
+		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().toLowerCase().contains("transport=tls"));
+		String viaString = receiver.getInviteRequest().getHeader(ViaHeader.NAME).toString();
+		assertTrue(viaString.toLowerCase().contains("tls"));
+		assertTrue(viaString.toLowerCase().contains("5072"));
+	}
+	
+	/**
 	 * non regression test for Issue 1150 http://code.google.com/p/mobicents/issues/detail?id=1150
 	 * 	Contact header contains "transport" parameter even when there are two connectors (UDP and TCP)
 	 */
