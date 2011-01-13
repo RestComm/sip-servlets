@@ -276,11 +276,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		if(RoutingState.CANCELLED.equals(routingState)) {
 			throw new IllegalStateException("Cannot create a response for the invite, a CANCEL has been received and the INVITE was replied with a 487!");
 		}
-		if (transaction == null
-				|| transaction instanceof ClientTransaction) {
-			if(validate) {
+		if(validate) {
+			if (transaction == null) {
 				throw new IllegalStateException(
-					"Cannot create a response - not a server transaction " + transaction);
+					"Cannot create a response for request " + message + " transaction is null, a final error response has probably already been sent");
+			}
+			if(transaction instanceof ClientTransaction) {
+				throw new IllegalStateException(
+					"Cannot create a response for request " + message + " not a server transaction " + transaction);
 			}
 		}
 		try {

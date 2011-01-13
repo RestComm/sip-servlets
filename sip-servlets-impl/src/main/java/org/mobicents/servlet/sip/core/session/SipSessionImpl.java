@@ -333,10 +333,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 					"Can not create ACK, PRACK or CANCEL requests with this method");
 		}
 		if(!isValid()) {
-			throw new IllegalStateException("cannot create a request because the session " + key + " is invalid");
+			throw new IllegalStateException("cannot create a subsequent request because the session " + key + " is invalid");
 		}
 		if(State.TERMINATED.equals(state)) {
-			throw new IllegalStateException("cannot create a request because the session " + key + " is in TERMINATED state");
+			throw new IllegalStateException("cannot create a subsequent request because the session " + key + " is in TERMINATED state");
 		}
 //		if((State.INITIAL.equals(state) && hasOngoingTransaction())) {
 //			throw new IllegalStateException("cannot create a request because the session is in INITIAL state with ongoing transactions");
@@ -346,7 +346,12 @@ public class SipSessionImpl implements MobicentsSipSession {
 					sessionCreatingDialog);
 		}
 		SipServletRequestImpl sipServletRequest = null;
-		if(this.sessionCreatingDialog != null && !DialogState.TERMINATED.equals(sessionCreatingDialog.getState())) {
+		if(this.sessionCreatingDialog != null) {			
+			if(!DialogState.TERMINATED.equals(sessionCreatingDialog.getState())) {
+				// Fix for Issue http://code.google.com/p/mobicents/issues/detail?id=2230 BYE is routed to unexpected IP
+				// MSS should throw an IllegalStateException when a subsequent request is being created on a TERMINATED dialog
+				throw new IllegalStateException("cannot create a subsequent request because the dialog " + sessionCreatingDialog + " for session " + key + " is in TERMINATED state");
+			}
 			try {
 				final Request methodRequest = this.sessionCreatingDialog.createRequest(method);
 
