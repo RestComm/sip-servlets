@@ -18,6 +18,7 @@ package org.mobicents.servlet.sip.testsuite.b2bua;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,6 +33,7 @@ import javax.servlet.sip.Address;
 import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.B2buaHelper;
 import javax.servlet.sip.ServletParseException;
+import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipApplicationSessionEvent;
 import javax.servlet.sip.SipApplicationSessionListener;
@@ -44,16 +46,19 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.TimerListener;
+import javax.servlet.sip.TimerService;
 import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.UAMode;
 import javax.servlet.sip.URI;
 import javax.servlet.sip.SipSession.State;
 import javax.sip.header.ContactHeader;
+import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
 
 
-public class CallForwardingB2BUASipServlet extends SipServlet implements SipErrorListener, SipApplicationSessionListener {
+public class CallForwardingB2BUASipServlet extends SipServlet implements SipErrorListener, SipApplicationSessionListener, TimerListener {
 	private static final String CHECK_CONTACT = "checkContact";
 	private static final String TEST_SIP_APP_SESSION_READY_TO_BE_INVALIDATED = "testSipAppSessionReadyToBeInvalidated";
 	private static final String TEST_USE_LINKED_REQUEST = "useLinkedRequest";
@@ -66,6 +71,10 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	static {
 		forwardingUris = new HashMap<String, String[]>();
 		forwardingUris.put("sip:forward-sender@sip-servlets.com", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+		forwardingUris.put("sip:forward-sender-408@sip-servlets.com", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+		forwardingUris.put("sip:forward-sender-408-new-thread@sip-servlets.com", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
 		forwardingUris.put("sip:factory-sender@sip-servlets.com", 
 				new String[]{"sip:factory-receiver@sip-servlets.com", "sip:factory-receiver@127.0.0.1:5090"});
@@ -235,7 +244,12 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@127.0.0.1:5070;q=0.1;lr;transport=udp;test>;test");
 			}
 			headers.put("Contact", contactHeaderList);
-			b2buaHelper.createRequest(origSession, request, headers).send();
+			SipServletRequest forkedRequest = b2buaHelper.createRequest(origSession, request, headers);
+			String method = request.getHeader("Method");
+			if(method != null) {
+				forkedRequest.getSession().setAttribute("method", method);
+			}
+			forkedRequest.send();
 		}
 	}	
 	
@@ -305,6 +319,12 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {		
 		logger.info("Got BYE: " + request.toString());		
+		
+		if(request.getFrom().toString().contains("408")) {
+			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+			sipServletResponse.send();
+			return;
+		}
 		
 		if(request.getSession().getAttribute(ACT_AS_UAS) == null) {
 			//we forward the BYE
@@ -510,12 +530,20 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				challengeRequest.send();
 			}
 		} else {
+			if(sipServletResponse.getStatus() == SipServletResponse.SC_REQUEST_TIMEOUT) {
+				if(sipServletResponse.getFrom().toString().contains("new-thread")) {					
+					((TimerService)getServletContext().getAttribute(TIMER_SERVICE)).createTimer(sipServletResponse.getApplicationSession(), 35000, false, (Serializable)sipServletResponse.getSession());
+				} else {
+					sendSubsequentRequestTo408(sipServletResponse.getSession(), "BYE");
+				}
+				return;
+			}
 			if(sipServletResponse.getStatus() != SipServletResponse.SC_REQUEST_TERMINATED) {
 				SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
 				SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
 				logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
 				responseToOriginalRequest.send();
-			}
+			}			
 		}
 	}
 	
@@ -629,6 +657,28 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			logger.error("Exception occured while parsing the addresses",e);
 		} catch (IOException e) {
 			logger.error("Exception occured while sending the request",e);			
+		}
+	}
+
+	public void timeout(ServletTimer timer) {
+		SipSession sipSession = (SipSession)timer.getInfo();
+		sendSubsequentRequestTo408(sipSession, (String)sipSession.getAttribute("method"));
+	}
+	
+	public void sendSubsequentRequestTo408(SipSession sipSession, String method) {
+		try {
+			sipSession.createRequest(method).send();		
+			SipServletRequest originalRequest = (SipServletRequest) sipSession.getAttribute("originalRequest");
+			originalRequest.createResponse(200).send();
+		} catch (IOException e) {
+			logger.error("Error while creating subsequent BYE", e);
+		} catch (IllegalStateException e) {
+			if(method.equals(Request.BYE)) {
+				logger.error("Error while creating subsequent BYE", e);
+			} else {
+				SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+				sendMessage(sipFactory.createApplicationSession(), sipFactory, "IllegalStateException");
+			}
 		}
 	}
 

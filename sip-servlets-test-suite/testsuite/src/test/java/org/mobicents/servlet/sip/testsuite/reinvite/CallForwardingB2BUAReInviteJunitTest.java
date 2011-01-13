@@ -16,9 +16,15 @@
  */
 package org.mobicents.servlet.sip.testsuite.reinvite;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
+import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -118,6 +124,171 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		// Non Regression test for http://code.google.com/p/mobicents/issues/detail?id=1490
 		// B2buaHelper.createRequest does not decrement Max-forwards
 		assertEquals(69, maxForwardsHeader.getMaxForwards());
+	}
+	
+	/**
+	 * Non Regression test for 
+	 * http://code.google.com/p/mobicents/issues/detail?id=2230
+	 * BYE is routed to unexpected IP
+	 */
+	public void testCallForwardingCallerSendBye408onReinvite() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-sender-408";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isInviteReceived());
+		assertTrue(receiver.isAckReceived());
+		MaxForwardsHeader maxForwardsHeader = (MaxForwardsHeader) receiver.getInviteRequest().getHeader(MaxForwardsHeader.NAME);
+		assertNotNull(maxForwardsHeader);
+		receiver.setFinalResponseToSend(Response.REQUEST_TIMEOUT);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isInviteReceived());
+		assertTrue(receiver.isAckReceived());
+		
+		// Non Regression test for http://code.google.com/p/mobicents/issues/detail?id=1490
+		// B2buaHelper.createRequest does not decrement Max-forwards
+		assertEquals(69, maxForwardsHeader.getMaxForwards());
+		sender.sendInDialogSipRequest("BYE", null, null, null, null, null);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());
+		assertTrue(sender.getOkToByeReceived());
+	}
+	
+	/**
+	 * Non Regression test for 
+	 * http://code.google.com/p/mobicents/issues/detail?id=2230
+	 * 	BYE is routed to unexpected IP
+	 */
+	public void testCallForwardingCallerSendBye408onReinviteBYENewThread() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-sender-408-new-thread";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isInviteReceived());
+		assertTrue(receiver.isAckReceived());
+		MaxForwardsHeader maxForwardsHeader = (MaxForwardsHeader) receiver.getInviteRequest().getHeader(MaxForwardsHeader.NAME);
+		assertNotNull(maxForwardsHeader);
+		receiver.setProvisionalResponsesToSend(new ArrayList<Integer>());
+		receiver.setFinalResponseToSend(Response.REQUEST_TIMEOUT);
+		Header methodHeader = receiverProtocolObjects.headerFactory.createHeader("Method", "BYE");
+		List<Header> headers = new ArrayList<Header>();
+		headers.add(methodHeader);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, headers, null);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isInviteReceived());
+		assertTrue(receiver.isAckReceived());
+		
+		receiver.sendInDialogSipRequest("UPDATE", null, null, null, null, null);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isInviteReceived());
+		assertTrue(receiver.isAckReceived());
+		
+		sender.sendInDialogSipRequest("BYE", null, null, null, null, null);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());
+		assertTrue(sender.getOkToByeReceived());
+	}
+	
+	/**
+	 * Non Regression test for 
+	 * http://code.google.com/p/mobicents/issues/detail?id=2230
+	 * 	BYE is routed to unexpected IP
+	 */
+	public void testCallForwardingCallerSendBye408onReinviteUPDATENewThread() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-sender-408-new-thread";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isInviteReceived());
+		assertTrue(receiver.isAckReceived());
+		MaxForwardsHeader maxForwardsHeader = (MaxForwardsHeader) receiver.getInviteRequest().getHeader(MaxForwardsHeader.NAME);
+		assertNotNull(maxForwardsHeader);
+		receiver.setProvisionalResponsesToSend(new ArrayList<Integer>());
+		receiver.setFinalResponseToSend(Response.REQUEST_TIMEOUT);
+		Header methodHeader = receiverProtocolObjects.headerFactory.createHeader("Method", "UPDATE");
+		List<Header> headers = new ArrayList<Header>();
+		headers.add(methodHeader);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, headers, null);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isInviteReceived());
+		assertTrue(receiver.isAckReceived());
+		
+		receiver.sendInDialogSipRequest("UPDATE", null, null, null, null, null);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isInviteReceived());
+		assertTrue(receiver.isAckReceived());
+		
+		sender.sendInDialogSipRequest("BYE", null, null, null, null, null);
+		Thread.sleep(TIMEOUT);		
+		assertTrue(sender.getOkToByeReceived());
+	
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		assertTrue(sender.getAllMessagesContent().contains("IllegalStateException"));
 	}
 	
 	/**
