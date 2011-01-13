@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.core.session;
 
 import gov.nist.javax.sip.ServerTransactionExt;
+import gov.nist.javax.sip.address.SipUri;
 import gov.nist.javax.sip.message.MessageExt;
 import gov.nist.javax.sip.message.SIPMessage;
 import gov.nist.javax.sip.message.SIPRequest;
@@ -346,12 +347,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 					sessionCreatingDialog);
 		}
 		SipServletRequestImpl sipServletRequest = null;
-		if(this.sessionCreatingDialog != null) {			
-			if(!DialogState.TERMINATED.equals(sessionCreatingDialog.getState())) {
-				// Fix for Issue http://code.google.com/p/mobicents/issues/detail?id=2230 BYE is routed to unexpected IP
-				// MSS should throw an IllegalStateException when a subsequent request is being created on a TERMINATED dialog
-				throw new IllegalStateException("cannot create a subsequent request because the dialog " + sessionCreatingDialog + " for session " + key + " is in TERMINATED state");
-			}
+		if(sessionCreatingDialog != null && !DialogState.TERMINATED.equals(sessionCreatingDialog.getState()) && !method.equalsIgnoreCase(Request.BYE)) {
+			// Fix for Issue http://code.google.com/p/mobicents/issues/detail?id=2230 BYE is routed to unexpected IP
+			// MSS should throw an IllegalStateException when a subsequent request is being created on a TERMINATED dialog
+			// don't do it on the BYE method as a 408 within a dialog could have make the dialog TERMINATED and MSS should allow the app to create the subsequent BYE from any thread
+			throw new IllegalStateException("cannot create a subsequent request because the dialog " + sessionCreatingDialog + " for session " + key + " is in TERMINATED state");
+		}
+		if(this.sessionCreatingDialog != null && !DialogState.TERMINATED.equals(sessionCreatingDialog.getState())) {				
+			
 			try {
 				final Request methodRequest = this.sessionCreatingDialog.createRequest(method);
 
@@ -454,6 +457,15 @@ public class SipSessionImpl implements MobicentsSipSession {
 					sipServletRequest = new SipServletRequestImpl(
 							request, this.sipFactory, this, null, sessionCreatingDialog,
 							true);
+					
+					if(sessionCreatingDialog != null && sessionCreatingDialog.getRemoteTarget() != null) {
+						SipUri sipUri = (SipUri) sessionCreatingDialog.getRemoteTarget().getURI().clone();
+						sipUri.clearUriParms();
+						if(logger.isDebugEnabled()) {
+							logger.debug("setting request uri to " + sipUri);
+						}
+						request.setRequestURI(sipUri);
+					}
 				} else {
 					if(logger.isDebugEnabled()) {
 						logger.debug("orignal tx for creating susbequent request " + method + " on session " + key +" was a Server Tx");
@@ -511,6 +523,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 							}
 							newFrom.setParameter(toParameter.getKey(),  value);
 						}	
+						if(sessionCreatingDialog != null && sessionCreatingDialog.getRemoteTarget() != null) {
+							SipUri sipUri = (SipUri) sessionCreatingDialog.getRemoteTarget().getURI().clone();
+							sipUri.clearUriParms();
+							if(logger.isDebugEnabled()) {
+								logger.debug("setting request uri to " + sipUri);
+							}
+							request.setRequestURI(sipUri);
+						}
 					} catch (ParseException e) {
 						throw new IllegalArgumentException("Problem setting param on the newly created susbequent request " + sipServletRequest,e);
 					}					
