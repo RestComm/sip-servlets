@@ -45,7 +45,6 @@ import javax.servlet.sip.URI;
 import javax.sip.ListeningPoint;
 
 import org.apache.log4j.Logger;
-import org.mobicents.javax.servlet.sip.SipServletRequestExt;
 import org.mobicents.javax.servlet.sip.SipSessionExt;
 
 public class ShootistSipServlet 
@@ -210,11 +209,25 @@ public class ShootistSipServlet
 		}
 		URI fromURI = sipFactory.createSipURI(userName, "here.com");
 		URI toURI = null;
-		if(ce.getServletContext().getInitParameter("urlType") != null && ce.getServletContext().getInitParameter("urlType").equalsIgnoreCase("tel")) {
-			try {
-				toURI = sipFactory.createURI("tel:+358-555-1234567");
-			} catch (ServletParseException e) {
-				logger.error("Impossible to create the tel URL", e);
+		if(ce.getServletContext().getInitParameter("urlType") != null) {
+			if(ce.getServletContext().getInitParameter("urlType").equalsIgnoreCase("tel")) {
+				try {
+					toURI = sipFactory.createURI("tel:+358-555-1234567");
+				} catch (ServletParseException e) {
+					logger.error("Impossible to create the tel URL", e);
+				}
+			} else if(ce.getServletContext().getInitParameter("urlType").equalsIgnoreCase("telAsSip")) {
+				try {
+					toURI = sipFactory.createURI("sip:+34666777888@192.168.0.20:5080");
+				} catch (ServletParseException e) {
+					logger.error("Impossible to create the tel URL as SIP", e);
+				}
+				
+				try {
+					toURI = sipFactory.createAddress("<sip:+34666777888@192.168.0.20:5080>").getURI();
+				} catch (ServletParseException e) {
+					logger.error("Impossible to create the tel URL as SIP", e);
+				}
 			}
 		} else {
 			toURI = sipFactory.createSipURI("LittleGuy", "there.com");

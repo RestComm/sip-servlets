@@ -44,7 +44,12 @@ public class ShootistTelURLSipServletTest extends SipServletTestCase {
 	}
 
 	@Override
-	public void deployApplication() {
+	protected void deployApplication() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void deployApplication(String urlType) {
 		SipStandardContext context = new SipStandardContext();
 		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp");
 		context.setName("sip-test-context");
@@ -53,7 +58,7 @@ public class ShootistTelURLSipServletTest extends SipServletTestCase {
 		context.setManager(new SipStandardManager());
 		ApplicationParameter applicationParameter = new ApplicationParameter();
 		applicationParameter.setName("urlType");
-		applicationParameter.setValue("tel");
+		applicationParameter.setValue(urlType);
 		context.addApplicationParameter(applicationParameter);
 		assertTrue(tomcat.deployContext(context));
 	}
@@ -79,10 +84,18 @@ public class ShootistTelURLSipServletTest extends SipServletTestCase {
 		receiverProtocolObjects.start();			
 	}
 	
-	public void testShootist() throws Exception {
+	public void testShootistTelURL() throws Exception {
 //		receiver.sendInvite();
 		tomcat.startTomcat();
-		deployApplication();
+		deployApplication("tel");
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());		
+	}
+	
+	public void testShootistTelURLAsSIP() throws Exception {
+//		receiver.sendInvite();
+		tomcat.startTomcat();
+		deployApplication("telAsSip");
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());		
 	}
