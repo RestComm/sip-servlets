@@ -31,7 +31,6 @@ import java.util.Set;
 
 import org.apache.catalina.Context;
 import org.jboss.deployers.structure.spi.DeploymentUnit;
-import org.jboss.deployers.vfs.spi.structure.VFSDeploymentUnit;
 import org.jboss.deployment.MappedReferenceMetaDataResolverDeployer;
 import org.jboss.deployment.dependency.ContainerDependencyMetaData;
 import org.jboss.deployment.spi.DeploymentEndpointResolver;
