@@ -345,13 +345,20 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(logger.isDebugEnabled()) {
 			logger.debug("dialog associated with this session to create the new request " + method + " within that dialog "+
 					sessionCreatingDialog);
+			if(sessionCreatingDialog != null) {
+				logger.debug("dialog state " + sessionCreatingDialog.getState() + " for that dialog "+ sessionCreatingDialog);
+			}
 		}
 		SipServletRequestImpl sipServletRequest = null;
+		// Fix for Issue http://code.google.com/p/mobicents/issues/detail?id=2230 BYE is routed to unexpected IP
+		// MSS should throw an IllegalStateException when a subsequent request is being created on a TERMINATED dialog
+		// don't do it on the BYE method as a 408 within a dialog could have make the dialog TERMINATED and MSS should allow the app to create the subsequent BYE from any thread
 		if(sessionCreatingDialog != null && DialogState.TERMINATED.equals(sessionCreatingDialog.getState()) && !method.equalsIgnoreCase(Request.BYE)) {
-			// Fix for Issue http://code.google.com/p/mobicents/issues/detail?id=2230 BYE is routed to unexpected IP
-			// MSS should throw an IllegalStateException when a subsequent request is being created on a TERMINATED dialog
-			// don't do it on the BYE method as a 408 within a dialog could have make the dialog TERMINATED and MSS should allow the app to create the subsequent BYE from any thread
-			throw new IllegalStateException("cannot create a subsequent request " + method + " because the dialog " + sessionCreatingDialog + " for session " + key + " is in TERMINATED state");
+			// don't do it for authentication as the dialog will go back to TERMINATED state, so we should allow to create challenge requests
+			if(sessionCreatingTransactionRequest == null || sessionCreatingTransactionRequest.getLastFinalResponse() == null ||
+					(sessionCreatingTransactionRequest.getLastFinalResponse().getStatus() != 401 && sessionCreatingTransactionRequest.getLastFinalResponse().getStatus() != 407)) {				
+				throw new IllegalStateException("cannot create a subsequent request " + method + " because the dialog " + sessionCreatingDialog + " for session " + key + " is in TERMINATED state");
+			}
 		}
 		if(this.sessionCreatingDialog != null && !DialogState.TERMINATED.equals(sessionCreatingDialog.getState())) {				
 			if(logger.isDebugEnabled()) {
