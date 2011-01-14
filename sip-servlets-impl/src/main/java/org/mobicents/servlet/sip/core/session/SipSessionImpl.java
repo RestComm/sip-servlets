@@ -358,7 +358,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 				throw new IllegalStateException("cannot create a subsequent request " + method + " because the dialog " + sessionCreatingDialog + " for session " + key + " is in TERMINATED state");
 			}
 		}
-		if(this.sessionCreatingDialog != null && !DialogState.TERMINATED.equals(sessionCreatingDialog.getState())) {				
+		// Issue http://code.google.com/p/mobicents/issues/detail?id=2230 BYE is routed to unexpected IP BYE can be sent on a TERMINATED Dialog
+		if(this.sessionCreatingDialog != null && 
+				(!DialogState.TERMINATED.equals(sessionCreatingDialog.getState()) || 
+						(DialogState.TERMINATED.equals(sessionCreatingDialog.getState()) && method.equalsIgnoreCase(Request.BYE)))) {
+			
 			if(logger.isDebugEnabled()) {
 				logger.debug("dialog " + sessionCreatingDialog + " used to create the new request " + method);			
 			}
