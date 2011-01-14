@@ -19,7 +19,6 @@ package org.mobicents.servlet.sip.proxy;
 import gov.nist.javax.sip.header.HeaderFactoryExt;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.MessageExt;
-import gov.nist.javax.sip.message.SIPMessage;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.util.Iterator;
@@ -63,7 +62,7 @@ public class ProxyUtils {
 			final String method = clonedRequest.getMethod();
 			final ProxyImpl proxy = (ProxyImpl) proxyBranch.getProxy(); 
 			final SipFactoryImpl sipFactoryImpl = proxy.getSipFactoryImpl();
-			((SIPMessage)clonedRequest).setApplicationData(null);
+			((MessageExt)clonedRequest).setApplicationData(null);
 
 			
 			String outboundTransport = JainSipUtils.findTransport(clonedRequest);

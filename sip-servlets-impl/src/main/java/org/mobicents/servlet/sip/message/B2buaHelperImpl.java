@@ -18,7 +18,7 @@ package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.header.HeaderExt;
 import gov.nist.javax.sip.header.ims.PathHeader;
-import gov.nist.javax.sip.message.SIPMessage;
+import gov.nist.javax.sip.message.MessageExt;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -143,7 +143,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		try {
 			final SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
 			Request newRequest = (Request) origRequestImpl.message.clone();
-			((SIPMessage)newRequest).setApplicationData(null);
+			((MessageExt)newRequest).setApplicationData(null);
 			//content should be copied too, so commented out
 //		 	newRequest.removeContent();				
 			//removing the via header from original request
@@ -722,7 +722,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		try {
 			final SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
 			final Request newRequest = (Request) origRequestImpl.message.clone();
-			((SIPMessage)newRequest).setApplicationData(null);
+			((MessageExt)newRequest).setApplicationData(null);
 			//removing the via header from original request
 			newRequest.removeHeader(ViaHeader.NAME);	
 			

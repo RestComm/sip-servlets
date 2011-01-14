@@ -17,11 +17,10 @@
 package org.mobicents.servlet.sip.core.dispatchers;
 
 import gov.nist.javax.sip.TransactionExt;
-import gov.nist.javax.sip.message.SIPMessage;
+import gov.nist.javax.sip.message.MessageExt;
 
 import java.text.ParseException;
 
-import javax.servlet.sip.SipURI;
 import javax.servlet.sip.ar.SipRouteModifier;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -77,7 +76,7 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 		
 		//Add via header
 		String transport = JainSipUtils.findTransport(clonedRequest);
-		((SIPMessage)clonedRequest).setApplicationData(null);
+		((MessageExt)clonedRequest).setApplicationData(null);
 		MobicentsSipSession session = sipServletRequest.getSipSession();
 		String outboundInterface = null;
 		if(session != null) {

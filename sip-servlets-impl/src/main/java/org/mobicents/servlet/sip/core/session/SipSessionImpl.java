@@ -19,8 +19,6 @@ package org.mobicents.servlet.sip.core.session;
 import gov.nist.javax.sip.ServerTransactionExt;
 import gov.nist.javax.sip.address.SipUri;
 import gov.nist.javax.sip.message.MessageExt;
-import gov.nist.javax.sip.message.SIPMessage;
-import gov.nist.javax.sip.message.SIPRequest;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -429,9 +427,13 @@ public class SipSessionImpl implements MobicentsSipSession {
 					Request request = (Request) sessionCreatingTransactionRequest.getMessage().clone();
 					// Issue 1524 :	Caused by: java.text.ParseException: CSEQ method mismatch with Request-Line
 					javax.sip.address.URI requestUri = (javax.sip.address.URI) request.getRequestURI().clone();					
-					((SIPRequest)request).setMethod(method);
-					((SIPRequest)request).setRequestURI(requestUri);
-					((SIPMessage)request).setApplicationData(null);
+					try {
+						request.setMethod(method);
+					} catch (ParseException e) {
+						throw new IllegalArgumentException("Unexpected exception happened on setting method " + method, e);
+					}
+					request.setRequestURI(requestUri);
+					((MessageExt)request).setApplicationData(null);
 					
 					final CSeqHeader cSeqHeader = (CSeqHeader) request.getHeader((CSeqHeader.NAME));					
 					try {

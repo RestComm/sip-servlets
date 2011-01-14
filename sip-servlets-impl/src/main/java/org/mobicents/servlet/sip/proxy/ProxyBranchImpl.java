@@ -18,7 +18,7 @@ package org.mobicents.servlet.sip.proxy;
 
 import gov.nist.javax.sip.TransactionExt;
 import gov.nist.javax.sip.header.Via;
-import gov.nist.javax.sip.message.SIPMessage;
+import gov.nist.javax.sip.message.MessageExt;
 import gov.nist.javax.sip.stack.SIPClientTransaction;
 
 import java.io.Externalizable;
@@ -145,7 +145,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 		// will clone this request (with it's custome headers and routes), but we will override
 		// the modified RR and Path parameters (as defined in the spec).
 		Request cloned = (Request)originalRequest.getMessage().clone();
-		((SIPMessage)cloned).setApplicationData(null);
+		((MessageExt)cloned).setApplicationData(null);
 		this.outgoingRequest = new SipServletRequestImpl(
 				cloned,
 				proxy.getSipFactoryImpl(),
