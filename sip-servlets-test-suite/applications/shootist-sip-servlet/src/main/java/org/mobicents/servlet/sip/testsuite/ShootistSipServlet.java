@@ -320,6 +320,9 @@ public class ShootistSipServlet
 			}
 			if(ce.getServletContext().getInitParameter("tlsRURI")!=null) {
 				requestURI.setTransportParam("tls");
+				if(method.equalsIgnoreCase("REGISTER")) {
+					sipServletRequest.addHeader("Contact", "sips:LittleGuy@127.0.0.1:5080");
+				}
 			}
 			sipServletRequest.setRequestURI(requestURI);
 		}

@@ -1172,27 +1172,30 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				if(proxy == null && contactHeader != null) {
 					boolean sipURI = contactHeader.getAddress().getURI().isSipURI();
 					if(sipURI) {
-						javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) contactHeader.getAddress().getURI();
+						javax.sip.address.SipURI contactSipUri = (javax.sip.address.SipURI) contactHeader.getAddress().getURI();
 						if(sipConnector != null && sipConnector.isUseStaticAddress()) {
-							sipUri.setHost(sipConnector.getStaticServerAddress());
-							sipUri.setPort(sipConnector.getStaticServerPort());
+							contactSipUri.setHost(sipConnector.getStaticServerAddress());
+							contactSipUri.setPort(sipConnector.getStaticServerPort());
 						} else {
 							boolean usePublicAddress = JainSipUtils.findUsePublicAddress(
 									sipNetworkInterfaceManager, request, matchingListeningPoint);
-							sipUri.setHost(matchingListeningPoint.getIpAddress(usePublicAddress));
-							sipUri.setPort(matchingListeningPoint.getPort());
+							contactSipUri.setHost(matchingListeningPoint.getIpAddress(usePublicAddress));
+							contactSipUri.setPort(matchingListeningPoint.getPort());
 							
 						}
 						// http://code.google.com/p/mobicents/issues/detail?id=1150 only set transport if not udp
 						if(!ListeningPoint.UDP.equalsIgnoreCase(transport)) {
-							sipUri.setTransportParam(transport);
+							contactSipUri.setTransportParam(transport);
 						}						
 						if(ListeningPoint.TLS.equalsIgnoreCase(transport)) {
 							final javax.sip.address.URI requestURI = request.getRequestURI();
 							// make the contact uri secure only if the request uri is secure to cope with issue http://code.google.com/p/mobicents/issues/detail?id=2269
 							// Wrong Contact header scheme URI in case TLS call with 'sip:' scheme
 							if(requestURI.isSipURI() && ((javax.sip.address.SipURI)requestURI).isSecure()) {
-								sipUri.setSecure(true);
+								contactSipUri.setSecure(true);
+							} else if(requestURI.isSipURI() && !((javax.sip.address.SipURI)requestURI).isSecure() && contactSipUri.isSecure()) {
+								// if the Request URI is non secure but the contact is make sure to move it back to non secure to handle Microsoft OCS interop 
+								contactSipUri.setSecure(false);
 							}
 						}
 					} 

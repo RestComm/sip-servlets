@@ -565,6 +565,37 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	}
 	
 	/**
+	 * non regression test for Issue 2269 http://code.google.com/p/mobicents/issues/detail?id=2269
+	 * Wrong Contact header scheme URI in case TLS call with request URI 'sip:' scheme and contact is uri is secure with "sips"
+	 */
+	public void testShootistRegisterContactNonSecureURITlsTransport() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"tls_receiver", "gov.nist", "TLS", AUTODIALOG, null, null, null);				
+		
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5071, ListeningPoint.TCP);
+		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5072, ListeningPoint.TLS);
+		tomcat.startTomcat();
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("tlsRURI", "true");
+		params.put("method", "REGISTER");
+		deployApplication(params);
+		tomcat.startTomcat();
+		Thread.sleep(TIMEOUT);
+		ContactHeader contactHeader = (ContactHeader) receiver.getRegisterReceived().getHeader(ContactHeader.NAME);
+		assertNotNull(contactHeader);	
+		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().contains("sip:"));
+		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().contains("5072"));
+		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().toLowerCase().contains("transport=tls"));
+	}
+	
+	/**
 	 * non regression test for Issue 1547 http://code.google.com/p/mobicents/issues/detail?id=1547
 	 * Can't add a Proxy-Authorization using SipServletMessage.addHeader
 	 */
