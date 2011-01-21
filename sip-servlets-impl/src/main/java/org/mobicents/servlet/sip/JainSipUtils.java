@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip;
 
 
+import gov.nist.javax.sip.TransactionExt;
 import gov.nist.javax.sip.header.extensions.ReferredByHeader;
 import gov.nist.javax.sip.header.extensions.SessionExpiresHeader;
 import gov.nist.javax.sip.header.ims.PAssertedIdentityHeader;
@@ -99,9 +100,13 @@ import javax.sip.message.Message;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl.NamesComparator;
 
 /**
@@ -515,7 +520,7 @@ public final class JainSipUtils {
 	 * @return
 	 */
 	public static String createBranch(String appSessionId, String appname) {
-		return MessageDispatcher.BRANCH_MAGIC_COOKIE + appSessionId + "_" + appname + "_" + System.nanoTime();		
+		return MessageDispatcher.BRANCH_MAGIC_COOKIE + appSessionId + "_" + appname + "_" + ApplicationRoutingHeaderComposer.randomString();		
     }
 	 
 	/**
@@ -687,5 +692,48 @@ public final class JainSipUtils {
 				logger.error("Couldn't terminate the transaction " + transaction + " with transaction id "+ transaction.getBranchId());
 			}
 		}
-	}	
+	}
+	
+	public static void setTransactionTimers(TransactionExt transaction, SipApplicationDispatcher sipApplicationDispatcher) {
+		transaction.setRetransmitTimer(sipApplicationDispatcher.getBaseTimerInterval());
+	    ((TransactionExt)transaction).setTimerT2(sipApplicationDispatcher.getT2Interval());
+	    ((TransactionExt)transaction).setTimerT4(sipApplicationDispatcher.getT4Interval());
+	    ((TransactionExt)transaction).setTimerD(sipApplicationDispatcher.getTimerDInterval());
+	}
+	
+	public static void optimizeRouteHeaderAddressForInternalRoutingrequest(SipConnector sipConnector, Request request, MobicentsSipSession session,  SipFactoryImpl sipFactoryImpl, String transport) {
+		RouteHeader rh = (RouteHeader) request.getHeader(RouteHeader.NAME);
+		if(rh != null) {
+			javax.sip.address.URI uri = rh.getAddress().getURI();
+			if(uri.isSipURI()) {
+				javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
+				optimizeUriForInternalRoutingRequest(sipConnector, sipUri, session, sipFactoryImpl, transport);
+			}
+		}
+	}
+
+	public static void optimizeUriForInternalRoutingRequest(SipConnector sipConnector, javax.sip.address.SipURI sipUri, MobicentsSipSession session,  SipFactoryImpl sipFactoryImpl, String transport) {
+		SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
+
+		try {
+			boolean isExternal = sipFactoryImpl.getSipApplicationDispatcher().isExternal(sipUri.getHost(), sipUri.getPort(), transport);
+			if(!isExternal) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("The request is going internally due to sipUri = " + sipUri);
+				}
+				ExtendedListeningPoint lp = null;
+				if(session.getOutboundInterface() != null) {
+					javax.sip.address.SipURI outboundInterfaceURI = (javax.sip.address.SipURI) SipFactories.addressFactory.createURI(session.getOutboundInterface());
+					lp = sipNetworkInterfaceManager.findMatchingListeningPoint(outboundInterfaceURI, false);
+				} else {
+					lp = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
+				}
+				sipUri.setHost(lp.getHost(false));
+				sipUri.setPort(lp.getPort());
+				sipUri.setTransportParam(lp.getTransport());
+			}
+		} catch (ParseException e) {
+			logger.error("AR optimization error", e);
+		}
+	}
 }
