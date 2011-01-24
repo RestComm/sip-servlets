@@ -171,10 +171,7 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 					serverTransaction.getApplicationData()).getSipServletMessage().getTransaction();
 			if(transaction == null || transaction instanceof ServerTransaction) {
 				ClientTransaction ctx = sipProvider.getNewClientTransaction(clonedRequest);
-				ctx.setRetransmitTimer(sipApplicationDispatcher.getBaseTimerInterval());
-				((TransactionExt)ctx).setTimerT2(sipApplicationDispatcher.getT2Interval());
-			    ((TransactionExt)ctx).setTimerT4(sipApplicationDispatcher.getT4Interval());
-			    ((TransactionExt)ctx).setTimerD(sipApplicationDispatcher.getTimerDInterval());
+				JainSipUtils.setTransactionTimers((TransactionExt) ctx, sipApplicationDispatcher);
 				//keeping the server transaction in the client transaction's application data
 				TransactionApplicationData appData = new TransactionApplicationData(sipServletRequest);					
 				appData.setTransaction(serverTransaction);
@@ -262,10 +259,7 @@ public abstract class RequestDispatcher extends MessageDispatcher {
             	                    
             ClientTransaction clientTransaction =
             	sipProvider.getNewClientTransaction(dialogRequest);
-            clientTransaction.setRetransmitTimer(sipApplicationDispatcher.getBaseTimerInterval());
-			((TransactionExt)clientTransaction).setTimerT2(sipApplicationDispatcher.getT2Interval());
-		    ((TransactionExt)clientTransaction).setTimerT4(sipApplicationDispatcher.getT4Interval());
-		    ((TransactionExt)clientTransaction).setTimerD(sipApplicationDispatcher.getTimerDInterval());
+            JainSipUtils.setTransactionTimers((TransactionExt) clientTransaction, sipApplicationDispatcher);
             //keeping the server transaction in the client transaction's application data
 			TransactionApplicationData appData = new TransactionApplicationData(sipServletRequest);
 			appData.setNoAppReturned(noAppReturned);

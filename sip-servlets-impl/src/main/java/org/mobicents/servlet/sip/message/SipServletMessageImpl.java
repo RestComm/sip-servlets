@@ -1164,7 +1164,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#send()
 	 */
-	public abstract void send();
+	public abstract void send() throws IOException;
 
 	/*
 	 * (non-Javadoc)

@@ -61,6 +61,7 @@ import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.DialogState;
+import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
@@ -906,144 +907,51 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		return routingDirective;
 	}
 
-	public static void optimizeRouteHeaderAddressForInternalRoutingrequest(SipConnector sipConnector, Request request, MobicentsSipSession session,  SipFactoryImpl sipFactoryImpl, String transport) {
-		SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
-		RouteHeader rh = (RouteHeader) request.getHeader(RouteHeader.NAME);
-		if(rh != null) {
-			javax.sip.address.URI uri = rh.getAddress().getURI();
-			if(uri.isSipURI()) {
-				try {
-					javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
-					boolean isExternal = sipFactoryImpl.getSipApplicationDispatcher().isExternal(sipUri.getHost(), sipUri.getPort(), transport);
-					if(!isExternal) {
-						if(logger.isDebugEnabled()) {
-							logger.debug("The request is going internally due to RR = " + rh);
-						}
-						ExtendedListeningPoint lp = null;
-						if(session.getOutboundInterface() != null) {
-
-							javax.sip.address.SipURI outboundInterfaceURI = (javax.sip.address.SipURI) SipFactories.addressFactory.createURI(session.getOutboundInterface());
-							lp = sipNetworkInterfaceManager.findMatchingListeningPoint(outboundInterfaceURI, false);
-						} else {
-							lp = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
-						}
-
-						sipUri.setHost(lp.getHost(false));
-						sipUri.setPort(lp.getPort());
-						sipUri.setTransportParam(lp.getTransport());
-					}
-				} catch (ParseException e) {
-					logger.error("AR optimization error", e);
-				}
-
-			}
-		}
-	}
-
-	public static void optimizeRequestUriHeaderAddressForInternalRoutingrequest(SipConnector sipConnector, Request request, MobicentsSipSession session,  SipFactoryImpl sipFactoryImpl, String transport) {
-		SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
-
-		javax.sip.address.URI uri =request.getRequestURI();
-		if(uri.isSipURI()) {
-			try {
-				javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
-				boolean isExternal = sipFactoryImpl.getSipApplicationDispatcher().isExternal(sipUri.getHost(), sipUri.getPort(), transport);
-				if(!isExternal) {
-					if(logger.isDebugEnabled()) {
-						logger.debug("The request is going internally due to RURI = " + uri);
-					}
-					ExtendedListeningPoint lp = null;
-					if(session.getOutboundInterface() != null) {
-
-						javax.sip.address.SipURI outboundInterfaceURI = (javax.sip.address.SipURI) SipFactories.addressFactory.createURI(session.getOutboundInterface());
-						lp = sipNetworkInterfaceManager.findMatchingListeningPoint(outboundInterfaceURI, false);
-					} else {
-						lp = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
-					}
-
-					sipUri.setHost(lp.getHost(false));
-					sipUri.setPort(lp.getPort());
-					sipUri.setTransportParam(lp.getTransport());
-				}
-			} catch (ParseException e) {
-				logger.error("AR optimization error", e);
-			}
-
-		}
-
-	}
-
 	/*
 	 * (non-Javadoc)
-	 * 
 	 * @see org.mobicents.servlet.sip.message.SipServletMessageImpl#send()
 	 */
 	@Override
-	public void send() {
+	public void send() throws IOException {
 		checkReadOnly();
-		final Request request = (Request) super.message;			
+		final Request request = (Request) super.message;
+		final String requestMethod = getMethod();
 		final MobicentsSipSession session = getSipSession();
-		try {			
-			ProxyImpl proxy = null;
-			if(session != null) {
-				proxy = session.getProxy();
-			}
-			final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
-			final String sessionTransport = session.getTransport();
+		final String sessionTransport = session.getTransport();
+		final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
+		final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();
+		
+		try {
 			if(logger.isDebugEnabled()) {
 		    	logger.debug("session transport is " + sessionTransport);
 		    }
-			((MessageExt)message).setApplicationData(sessionTransport);			
-			
-			ViaHeader viaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
-			
-			boolean isCancel = getMethod().equalsIgnoreCase(Request.CANCEL);
-			if(isCancel) {
-	    		getSipSession().setRequestsPending(0);
-			}
-			//Issue 112 fix by folsson
-		    if(!isCancel && viaHeader == null) {
-		    	boolean addViaHeader = false;
-		    	if(proxy == null) {
-		    		addViaHeader = true;
-		    	} else if(isInitial) {
-		    		if(proxy.getRecordRoute()) {
-		    			addViaHeader = true;
-		    		}
-		    	} else if(proxy.getFinalBranchForSubsequentRequests() != null && proxy.getFinalBranchForSubsequentRequests().getRecordRoute()) {
-		    		addViaHeader = true;
-		    	}
-		    	if(addViaHeader) {		    		
-		    		// Issue 					
-		    		viaHeader = JainSipUtils.createViaHeader(
-		    				sipNetworkInterfaceManager, request, null, session.getOutboundInterface());
-		    		message.addHeader(viaHeader);
-		    		if(logger.isDebugEnabled()) {
-				    	logger.debug("Added via Header" + viaHeader);
-				    }
-			    }
-		    } else {
-		    	if(isCancel) {
-		    		Transaction tx = inviteTransactionToCancel;
-	    			if(tx != null) {
-	    				// we rely on the transaction state to know if we send the cancel or not
-	    				if(tx.getState() == null || tx.getState().equals(TransactionState.CALLING) || tx.getState().equals(TransactionState.TRYING)) {
-		    				logger.debug("Can not send CANCEL. Will try to STOP retransmissions " + tx + " tx state " + tx.getState());
-		    				// We still haven't received any response on this call, so we can not send CANCEL,
-		    				// we will just stop the retransmissions
-		    				StaticServiceHolder.disableRetransmissionTimer.invoke(tx);
-		    				if(tx.getApplicationData() instanceof TransactionApplicationData) {
-		    					TransactionApplicationData tad = (TransactionApplicationData) tx.getApplicationData();
-		    					tad.setCanceled(true);
-		    				}
-		    				return;
+			((MessageExt)message).setApplicationData(sessionTransport);									
+						
+			if(Request.CANCEL.equals(requestMethod)) {
+				getSipSession().setRequestsPending(0);
+	    		Transaction tx = inviteTransactionToCancel;
+    			if(tx != null) {
+    				// we rely on the transaction state to know if we send the cancel or not
+    				if(tx.getState() == null || tx.getState().equals(TransactionState.CALLING) || tx.getState().equals(TransactionState.TRYING)) {
+	    				logger.debug("Can not send CANCEL. Will try to STOP retransmissions " + tx + " tx state " + tx.getState());
+	    				// We still haven't received any response on this call, so we can not send CANCEL,
+	    				// we will just stop the retransmissions
+	    				StaticServiceHolder.disableRetransmissionTimer.invoke(tx);
+	    				if(tx.getApplicationData() instanceof TransactionApplicationData) {
+	    					TransactionApplicationData tad = (TransactionApplicationData) tx.getApplicationData();
+	    					tad.setCanceled(true);
 	    				}
-	    			} else {
-	    				logger.debug("Can not send CANCEL because no responses arrived. " +
-	    						"Can not stop retransmissions. The transaction is null");
-	    			}
-		    	}
-		    }
+	    				return;
+    				}
+    			} else {
+    				logger.debug("Can not send CANCEL because no responses arrived. " +
+    						"Can not stop retransmissions. The transaction is null");
+    			}
+	    	} 
+			
+			// adding via header and update via branch if null
+			checkViaHeaderAddition();
+						
 			final String transport = JainSipUtils.findTransport(request);
 			if(sessionTransport == null) {
 				session.setTransport(transport);
@@ -1051,74 +959,21 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		    if(logger.isDebugEnabled()) {
 		    	logger.debug("The found transport for sending request is '" + transport + "'");
 		    }
-		    
-		    SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);
-		    
-		    final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();
-		    final String requestMethod = getMethod();
+		    		    
+		    SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);		    		    		   
 			ExtendedListeningPoint matchingListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(
-					transport, false);
+					transport, false);					
+			
+			//we update the via header after the sip connector has been found for the correct transport
+			checkViaHeaderUpdateForStaticExternalAddressUsage(sipConnector);
+			
 			if(Request.ACK.equals(requestMethod)) {
-				// Issue 1791 : using a different classloader created outside the application loader 
-				// to avoid leaks on startup/shutdown
-				final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-				try {
-					final ClassLoader cl = sipApplicationSession.getSipContext().getClass().getClassLoader();
-					Thread.currentThread().setContextClassLoader(cl);
-					if(sipConnector != null && // Initial requests already use local address in RouteHeader.
-							sipConnector.isUseStaticAddress()) {
-						optimizeRouteHeaderAddressForInternalRoutingrequest(sipConnector, request, session, sipFactoryImpl, transport);
-					}
-					// Workaround wrong UA stack for Issue 1802 
-					if(viaHeader.getBranch() == null) {
-						final String branch = JainSipUtils.createBranch(sipApplicationSession.getKey().getId(),  sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));			
-						viaHeader.setBranch(branch);
-					}
-					if(logger.isDebugEnabled()) {
-						logger.debug("Sending the ACK request " + request);
-					}
-					session.getSessionCreatingDialog().sendAck(request);
-					session.setRequestsPending(session.getRequestsPending()-1);
-					final Transaction transaction = getTransaction();
-					// transaction can be null in case of forking
-					if(transaction != null) {
-						final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
-						final B2buaHelperImpl b2buaHelperImpl = sipSession.getB2buaHelper();
-						if(b2buaHelperImpl != null && tad != null) {
-							// we unlink the originalRequest early to avoid keeping the messages in mem for too long
-							b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage());
-						}				
-						session.removeOngoingTransaction(transaction);					
-						if(tad != null) {
-							tad.cleanUp();
-						}
-					}
-					final SipProvider sipProvider = matchingListeningPoint.getSipProvider();	
-					// Issue 1468 : to handle forking, we shouldn't cleanup the app data since it is needed for the forked responses
-					if(((SipStackImpl)sipProvider.getSipStack()).getMaxForkTime() == 0 && transaction != null) {
-						transaction.setApplicationData(null);
-					}
-					return;
-				} finally {
-					Thread.currentThread().setContextClassLoader(oldClassLoader);
-				}
-			}
-			
-			
+				sendAck(transport, sipConnector, matchingListeningPoint);
+				return;
+			}						
 			
 			//Added for initial requests only (that are not REGISTER) not for subsequent requests 
 			if(isInitial() && !Request.REGISTER.equalsIgnoreCase(requestMethod)) {
-				// Additional checks for https://sip-servlets.dev.java.net/issues/show_bug.cgi?id=29
-//				if(session.getProxy() != null &&
-//						session.getProxy().getRecordRoute()) // If the app is proxying it already does that
-//				{
-//					if(logger.isDebugEnabled()) {
-//						logger.debug("Add a record route header for app composition ");
-//					}
-//					getSipSession().getSipApplicationSession().getSipContext().getSipManager().dumpSipSessions();
-//					//Add a record route header for app composition		
-//					addAppCompositionRRHeader();	
-//				}
 				final SipApplicationRouterInfo routerInfo = sipFactoryImpl.getNextInterestedApplication(this);
 				if(routerInfo.getNextApplicationName() != null) {
 					if(logger.isDebugEnabled()) {
@@ -1142,89 +997,28 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						}
 					}
 				}
-			}			
-			if(viaHeader.getBranch() == null) {
-				final String branch = JainSipUtils.createBranch(sipApplicationSession.getKey().getId(),  sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));			
-				viaHeader.setBranch(branch);
 			}
 			if(logger.isDebugEnabled()) {
 				getSipSession().getSipApplicationSession().getSipContext().getSipManager().dumpSipSessions();
 			}
 			if (super.getTransaction() == null) {				
-
 				final SipProvider sipProvider = matchingListeningPoint.getSipProvider();
-				
-				ContactHeader contactHeader = (ContactHeader)request.getHeader(ContactHeader.NAME);
-				if(contactHeader == null && !Request.REGISTER.equalsIgnoreCase(requestMethod) && JainSipUtils.CONTACT_HEADER_METHODS.contains(requestMethod) && proxy == null) {
-					final FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
-					final javax.sip.address.URI fromUri = fromHeader.getAddress().getURI();
-					String fromName = null;
-					String displayName = fromHeader.getAddress().getDisplayName();
-					if(fromUri instanceof javax.sip.address.SipURI) {
-						fromName = ((javax.sip.address.SipURI)fromUri).getUser();
-					}
-					// Create the contact name address.						
-					contactHeader = 
-						JainSipUtils.createContactHeader(sipNetworkInterfaceManager, request, displayName, fromName, session.getOutboundInterface());	
-					request.addHeader(contactHeader);
-				}
-
-				if(proxy == null && contactHeader != null) {
-					boolean sipURI = contactHeader.getAddress().getURI().isSipURI();
-					if(sipURI) {
-						javax.sip.address.SipURI contactSipUri = (javax.sip.address.SipURI) contactHeader.getAddress().getURI();
-						if(sipConnector != null && sipConnector.isUseStaticAddress()) {
-							contactSipUri.setHost(sipConnector.getStaticServerAddress());
-							contactSipUri.setPort(sipConnector.getStaticServerPort());
-						} else {
-							boolean usePublicAddress = JainSipUtils.findUsePublicAddress(
-									sipNetworkInterfaceManager, request, matchingListeningPoint);
-							contactSipUri.setHost(matchingListeningPoint.getIpAddress(usePublicAddress));
-							contactSipUri.setPort(matchingListeningPoint.getPort());
-							
-						}
-						// http://code.google.com/p/mobicents/issues/detail?id=1150 only set transport if not udp
-						if(!ListeningPoint.UDP.equalsIgnoreCase(transport)) {
-							contactSipUri.setTransportParam(transport);
-						}						
-						if(ListeningPoint.TLS.equalsIgnoreCase(transport)) {
-							final javax.sip.address.URI requestURI = request.getRequestURI();
-							// make the contact uri secure only if the request uri is secure to cope with issue http://code.google.com/p/mobicents/issues/detail?id=2269
-							// Wrong Contact header scheme URI in case TLS call with 'sip:' scheme
-							if(requestURI.isSipURI() && ((javax.sip.address.SipURI)requestURI).isSecure()) {
-								contactSipUri.setSecure(true);
-							} else if(requestURI.isSipURI() && !((javax.sip.address.SipURI)requestURI).isSecure() && contactSipUri.isSecure()) {
-								// if the Request URI is non secure but the contact is make sure to move it back to non secure to handle Microsoft OCS interop 
-								contactSipUri.setSecure(false);
-							}
-						}
-					} 
-				} 
-
-				if(logger.isDebugEnabled()) {
-					logger.debug("Getting new Client Tx for request " + request);
-				}
+				setSystemContactHeader(sipConnector, matchingListeningPoint, transport); 
 				/* 
 				 * If we the next hop is in this container we optimize the traffic by directing it here instead of going through load balancers.
 				 * This is must be done before creating the transaction, otherwise it will go to the host/port specified prior to the changes here.
 				 */
 				if(!isInitial() && sipConnector != null && // Initial requests already use local address in RouteHeader.
 						sipConnector.isUseStaticAddress()) {
-					optimizeRouteHeaderAddressForInternalRoutingrequest(sipConnector, request, session, sipFactoryImpl, transport);
+					JainSipUtils.optimizeRouteHeaderAddressForInternalRoutingrequest(sipConnector, request, session, sipFactoryImpl, transport);
 				}								
-
+				if(logger.isDebugEnabled()) {
+					logger.debug("Getting new Client Tx for request " + request);
+				}
 				final ClientTransaction ctx = sipProvider.getNewClientTransaction(request);				
-				ctx.setRetransmitTimer(sipFactoryImpl.getSipApplicationDispatcher().getBaseTimerInterval());
-			    ((TransactionExt)ctx).setTimerT2(sipFactoryImpl.getSipApplicationDispatcher().getT2Interval());
-			    ((TransactionExt)ctx).setTimerT4(sipFactoryImpl.getSipApplicationDispatcher().getT4Interval());
-			    ((TransactionExt)ctx).setTimerD(sipFactoryImpl.getSipApplicationDispatcher().getTimerDInterval());
-
-				Dialog dialog = ctx.getDialog();
-
+				JainSipUtils.setTransactionTimers((TransactionExt) ctx, sipFactoryImpl.getSipApplicationDispatcher());
+				Dialog dialog = null;
 				if(session.getProxy() != null) {
-					// no dialogs in proxy
-					dialog = null;
-					
 					// take care of the RRH
 					if(isInitial()) {
 						if(session.getProxy().getRecordRoute()) {
@@ -1249,9 +1043,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 							}
 						}
 					}
+				} else {
+					// no dialogs in proxy
+					dialog = ctx.getDialog();
 				}
 				
-
 				if (dialog == null && this.createDialog && JainSipUtils.DIALOG_CREATING_METHODS.contains(getMethod())) {					
 					dialog = sipProvider.getNewDialog(ctx);
 					((DialogExt)dialog).disableSequenceNumberValidation();
@@ -1261,20 +1057,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					}
 				}
 
-				//Keeping the transactions mapping in application data for CANCEL handling
 				if(linkedRequest != null) {
-					final Transaction linkedTransaction = linkedRequest.getTransaction();
-					final Dialog linkedDialog = linkedRequest.getDialog();
-					//keeping the client transaction in the server transaction's application data
-					((TransactionApplicationData)linkedTransaction.getApplicationData()).setTransaction(ctx);
-					if(linkedDialog != null && linkedDialog.getApplicationData() != null) {
-						((TransactionApplicationData)linkedDialog.getApplicationData()).setTransaction(ctx);
-					}
-					//keeping the server transaction in the client transaction's application data
-					this.transactionApplicationData.setTransaction(linkedTransaction);
-					if(dialog!= null && dialog.getApplicationData() != null) {
-						((TransactionApplicationData)dialog.getApplicationData()).setTransaction(linkedTransaction);
-					}
+					updateLinkedRequestAppDataMapping(ctx, dialog);
 				}
 				// Make the dialog point here so that when the dialog event
 				// comes in we can find the session quickly.
@@ -1293,29 +1077,16 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			} else if (Request.PRACK.equals(request.getMethod())) {
 				final SipProvider sipProvider = matchingListeningPoint.getSipProvider();				
 				final ClientTransaction ctx = sipProvider.getNewClientTransaction(request);
-				ctx.setRetransmitTimer(sipFactoryImpl.getSipApplicationDispatcher().getBaseTimerInterval());
-			    ((TransactionExt)ctx).setTimerT2(sipFactoryImpl.getSipApplicationDispatcher().getT2Interval());
-			    ((TransactionExt)ctx).setTimerT4(sipFactoryImpl.getSipApplicationDispatcher().getT4Interval());
-			    ((TransactionExt)ctx).setTimerD(sipFactoryImpl.getSipApplicationDispatcher().getTimerDInterval());
-				//Keeping the transactions mapping in application data for CANCEL handling
+				JainSipUtils.setTransactionTimers((TransactionExt) ctx, sipFactoryImpl.getSipApplicationDispatcher());
+				
 				if(linkedRequest != null) {
-					//keeping the client transaction in the server transaction's application data
-					((TransactionApplicationData)linkedRequest.getTransaction().getApplicationData()).setTransaction(ctx);
-					if(linkedRequest.getDialog() != null && linkedRequest.getDialog().getApplicationData() != null) {
-						((TransactionApplicationData)linkedRequest.getDialog().getApplicationData()).setTransaction(ctx);
-					}
-					//keeping the server transaction in the client transaction's application data
-					this.transactionApplicationData.setTransaction(linkedRequest.getTransaction());
-					if(dialog!= null && dialog.getApplicationData() != null) {
-						((TransactionApplicationData)dialog.getApplicationData()).setTransaction(linkedRequest.getTransaction());
-					}
+					updateLinkedRequestAppDataMapping(ctx, dialog);
 				}
 				// SIP Request is ALWAYS pointed to by the client tx.
 				// Notice that the tx appplication data is cached in the request
 				// copied over to the tx so it can be quickly accessed when response
 				// arrives.				
 				ctx.setApplicationData(this.transactionApplicationData);
-				
 				setTransaction(ctx);
 			} else {
 				if(logger.isDebugEnabled()) {
@@ -1331,51 +1102,12 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					linkedRequest.setRoutingState(RoutingState.RELAYED);
 				}
 			}		
-			if(!Request.ACK.equals(getMethod())) {				
-				session.addOngoingTransaction(getTransaction());
-			}
+			session.addOngoingTransaction(getTransaction());
 			// Update Session state
 			session.updateStateOnSubsequentRequest(this, false);
 			// Issue 1481 http://code.google.com/p/mobicents/issues/detail?id=1481
 			// proxy should not add or remove subscription since there is no dialog associated with it
-			if(Request.NOTIFY.equals(getMethod()) && session.getProxy() == null) {
-				final SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
-					getMessage().getHeader(SubscriptionStateHeader.NAME);		
-			
-				// RFC 3265 : If a matching NOTIFY request contains a "Subscription-State" of "active" or "pending", it creates
-				// a new subscription and a new dialog (unless they have already been
-				// created by a matching response, as described above).
-				if (subscriptionStateHeader != null && 
-									(SubscriptionStateHeader.ACTIVE.equalsIgnoreCase(subscriptionStateHeader.getState()) ||
-									SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState()))) {					
-					session.addSubscription(this);
-				}
-				// A subscription is destroyed when a notifier sends a NOTIFY request
-				// with a "Subscription-State" of "terminated".
-				if (subscriptionStateHeader != null && 
-									SubscriptionStateHeader.TERMINATED.equalsIgnoreCase(subscriptionStateHeader.getState())) {
-					session.removeSubscription(this);
-				}
-			}					
-
-
-			if(sipConnector != null && sipConnector.isUseStaticAddress()) {
-				javax.sip.address.URI uri = request.getRequestURI();
-				RouteHeader route = (RouteHeader) request.getHeader(RouteHeader.NAME);
-				if(route != null) {
-					uri = route.getAddress().getURI();
-				}
-				if(uri.isSipURI()) {
-					javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
-					String host = sipUri.getHost();
-					int port = sipUri.getPort();
-					if(sipFactoryImpl.getSipApplicationDispatcher().isExternal(host, port, transport)) {
-						viaHeader.setHost(sipConnector.getStaticServerAddress());
-						viaHeader.setPort(sipConnector.getStaticServerPort());
-					}
-				}
-			}
-
+			checkSubscriptionStateHeaders(session);								
 
 			//updating the last accessed times 
 			session.access();
@@ -1383,6 +1115,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			Dialog dialog = getDialog();
 			if(session.getProxy() != null) dialog = null;
 			if(request.getMethod().equals(Request.CANCEL)) dialog = null;
+						
 			// Issue 1791 : using a different classloader created outside the application loader 
 			// to avoid leaks on startup/shutdown
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
@@ -1414,9 +1147,259 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 		} catch (Exception ex) {			
 			JainSipUtils.terminateTransaction(getTransaction());
+			if(ex.getCause() != null && ex.getCause() instanceof IOException) {
+				throw (IOException) ex.getCause();
+			}
 			throw new IllegalStateException("Error sending request " + request,ex);
 		} 
+	}
 
+	/**
+	 * 
+	 */
+	private void checkViaHeaderAddition() throws ParseException {
+		final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();		
+		final Request request = (Request) super.message;
+		final MobicentsSipSession session = getSipSession();
+		final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();
+		final ProxyImpl proxy = session.getProxy();
+		ViaHeader viaHeader = (ViaHeader) request.getHeader(ViaHeader.NAME);
+		
+		if(!request.getMethod().equals(Request.CANCEL) && viaHeader == null) {
+			//Issue 112 fix by folsson
+			boolean addViaHeader = false;
+			if(proxy == null) {
+				addViaHeader = true;
+			} else if(isInitial) {
+				if(proxy.getRecordRoute()) {
+					addViaHeader = true;
+				}
+			} else if(proxy.getFinalBranchForSubsequentRequests() != null && proxy.getFinalBranchForSubsequentRequests().getRecordRoute()) {
+				addViaHeader = true;
+			}
+			if(addViaHeader) {		    		
+				// Issue 					
+				viaHeader = JainSipUtils.createViaHeader(
+						sipNetworkInterfaceManager, request, null, session.getOutboundInterface());
+				message.addHeader(viaHeader);
+				if(logger.isDebugEnabled()) {
+			    	logger.debug("Added via Header" + viaHeader);
+			    }
+		    }
+		}
+		if(viaHeader.getBranch() == null) {
+			final String branch = JainSipUtils.createBranch(sipApplicationSession.getKey().getId(),  sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));			
+			viaHeader.setBranch(branch);
+		}
+	}
+
+	/**
+	 * 
+	 * @param sipConnector
+	 * @throws ParseException
+	 * @throws InvalidArgumentException
+	 */
+	private void checkViaHeaderUpdateForStaticExternalAddressUsage(final SipConnector sipConnector)
+			throws ParseException, InvalidArgumentException {
+		
+		final Request request = (Request) super.message;	
+		ViaHeader viaHeader = (ViaHeader) request.getHeader(ViaHeader.NAME);
+				
+		if(sipConnector != null && sipConnector.isUseStaticAddress()) {
+			javax.sip.address.URI uri = request.getRequestURI();
+			RouteHeader route = (RouteHeader) request.getHeader(RouteHeader.NAME);
+			if(route != null) {
+				uri = route.getAddress().getURI();
+			}
+			if(uri.isSipURI()) {
+				javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
+				String host = sipUri.getHost();
+				int port = sipUri.getPort();
+				if(sipFactoryImpl.getSipApplicationDispatcher().isExternal(host, port, transport)) {
+					viaHeader.setHost(sipConnector.getStaticServerAddress());
+					viaHeader.setPort(sipConnector.getStaticServerPort());
+				}
+			}
+		}		
+	}
+	
+	/**
+	 * Keeping the transactions mapping in application data for CANCEL handling
+	 * 
+	 * @param ctx
+	 * @param dialog
+	 */
+	private void updateLinkedRequestAppDataMapping(final ClientTransaction ctx,
+			Dialog dialog) {
+		final Transaction linkedTransaction = linkedRequest.getTransaction();
+		final Dialog linkedDialog = linkedRequest.getDialog();
+		//keeping the client transaction in the server transaction's application data
+		((TransactionApplicationData)linkedTransaction.getApplicationData()).setTransaction(ctx);
+		if(linkedDialog != null && linkedDialog.getApplicationData() != null) {
+			((TransactionApplicationData)linkedDialog.getApplicationData()).setTransaction(ctx);
+		}
+		//keeping the server transaction in the client transaction's application data
+		this.transactionApplicationData.setTransaction(linkedTransaction);
+		if(dialog!= null && dialog.getApplicationData() != null) {
+			((TransactionApplicationData)dialog.getApplicationData()).setTransaction(linkedTransaction);
+		}
+	}
+
+	/**
+	 * @param session
+	 * @throws SipException
+	 */
+	private void checkSubscriptionStateHeaders(final MobicentsSipSession session)
+			throws SipException {
+		if(Request.NOTIFY.equals(getMethod()) && session.getProxy() == null) {
+			final SubscriptionStateHeader subscriptionStateHeader = (SubscriptionStateHeader) 
+				getMessage().getHeader(SubscriptionStateHeader.NAME);		
+		
+			// RFC 3265 : If a matching NOTIFY request contains a "Subscription-State" of "active" or "pending", it creates
+			// a new subscription and a new dialog (unless they have already been
+			// created by a matching response, as described above).
+			if (subscriptionStateHeader != null && 
+								(SubscriptionStateHeader.ACTIVE.equalsIgnoreCase(subscriptionStateHeader.getState()) ||
+								SubscriptionStateHeader.PENDING.equalsIgnoreCase(subscriptionStateHeader.getState()))) {					
+				session.addSubscription(this);
+			}
+			// A subscription is destroyed when a notifier sends a NOTIFY request
+			// with a "Subscription-State" of "terminated".
+			if (subscriptionStateHeader != null && 
+								SubscriptionStateHeader.TERMINATED.equalsIgnoreCase(subscriptionStateHeader.getState())) {
+				session.removeSubscription(this);
+			}
+		}
+	}
+
+	/**
+	 * @param request
+	 * @param requestMethod
+	 * @param session
+	 * @param proxy
+	 * @param sipNetworkInterfaceManager
+	 * @param transport
+	 * @param sipConnector
+	 * @param matchingListeningPoint
+	 * @throws ParseException
+	 */
+	private void setSystemContactHeader(final SipConnector sipConnector,
+			final ExtendedListeningPoint matchingListeningPoint, String transportForRequest)
+			throws ParseException {
+		
+		final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
+		final Request request = (Request) super.message;
+		final String requestMethod = getMethod();
+		final MobicentsSipSession session = getSipSession();
+		final ProxyImpl proxy = session.getProxy();
+		
+		ContactHeader contactHeader = (ContactHeader)request.getHeader(ContactHeader.NAME);
+		if(contactHeader == null && !Request.REGISTER.equalsIgnoreCase(requestMethod) && JainSipUtils.CONTACT_HEADER_METHODS.contains(requestMethod) && proxy == null) {
+			final FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
+			final javax.sip.address.URI fromUri = fromHeader.getAddress().getURI();
+			String fromName = null;
+			String displayName = fromHeader.getAddress().getDisplayName();
+			if(fromUri instanceof javax.sip.address.SipURI) {
+				fromName = ((javax.sip.address.SipURI)fromUri).getUser();
+			}
+			// Create the contact name address.						
+			contactHeader = 
+				JainSipUtils.createContactHeader(sipNetworkInterfaceManager, request, displayName, fromName, session.getOutboundInterface());	
+			request.addHeader(contactHeader);
+		}
+
+		if(proxy == null && contactHeader != null) {
+			boolean sipURI = contactHeader.getAddress().getURI().isSipURI();
+			if(sipURI) {
+				javax.sip.address.SipURI contactSipUri = (javax.sip.address.SipURI) contactHeader.getAddress().getURI();
+				if(sipConnector != null && sipConnector.isUseStaticAddress()) {
+					contactSipUri.setHost(sipConnector.getStaticServerAddress());
+					contactSipUri.setPort(sipConnector.getStaticServerPort());
+				} else {
+					boolean usePublicAddress = JainSipUtils.findUsePublicAddress(
+							sipNetworkInterfaceManager, request, matchingListeningPoint);
+					contactSipUri.setHost(matchingListeningPoint.getIpAddress(usePublicAddress));
+					contactSipUri.setPort(matchingListeningPoint.getPort());
+					
+				}
+				// http://code.google.com/p/mobicents/issues/detail?id=1150 only set transport if not udp
+				if(transportForRequest != null) {
+					if(!ListeningPoint.UDP.equalsIgnoreCase(transportForRequest)) {
+						contactSipUri.setTransportParam(transportForRequest);
+					}						
+					if(ListeningPoint.TLS.equalsIgnoreCase(transportForRequest)) {
+						final javax.sip.address.URI requestURI = request.getRequestURI();
+						// make the contact uri secure only if the request uri is secure to cope with issue http://code.google.com/p/mobicents/issues/detail?id=2269
+						// Wrong Contact header scheme URI in case TLS call with 'sip:' scheme
+						if(requestURI.isSipURI() && ((javax.sip.address.SipURI)requestURI).isSecure()) {
+							contactSipUri.setSecure(true);
+						} else if(requestURI.isSipURI() && !((javax.sip.address.SipURI)requestURI).isSecure() && contactSipUri.isSecure()) {
+							// if the Request URI is non secure but the contact is make sure to move it back to non secure to handle Microsoft OCS interop 
+							contactSipUri.setSecure(false);
+						}
+					}
+				}
+			} 
+		}
+	}
+
+	/**
+	 * @param request
+	 * @param session
+	 * @param viaHeader
+	 * @param transport
+	 * @param sipConnector
+	 * @param sipApplicationSession
+	 * @param matchingListeningPoint
+	 * @throws ParseException
+	 * @throws SipException
+	 */
+	private void sendAck(final String transport, final SipConnector sipConnector,			
+			final ExtendedListeningPoint matchingListeningPoint)
+			throws ParseException, SipException {
+		
+		final Request request = (Request) super.message;			
+		final MobicentsSipSession session = getSipSession();
+		final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();
+		
+		// Issue 1791 : using a different classloader created outside the application loader 
+		// to avoid leaks on startup/shutdown
+		final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+		try {
+			final ClassLoader cl = sipApplicationSession.getSipContext().getClass().getClassLoader();
+			Thread.currentThread().setContextClassLoader(cl);
+			if(sipConnector != null && // Initial requests already use local address in RouteHeader.
+					sipConnector.isUseStaticAddress()) {
+				JainSipUtils.optimizeRouteHeaderAddressForInternalRoutingrequest(sipConnector, request, session, sipFactoryImpl, transport);
+			}			
+			if(logger.isDebugEnabled()) {
+				logger.debug("Sending the ACK request " + request);
+			}
+			session.getSessionCreatingDialog().sendAck(request);
+			session.setRequestsPending(session.getRequestsPending()-1);
+			final Transaction transaction = getTransaction();
+			// transaction can be null in case of forking
+			if(transaction != null) {
+				final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
+				final B2buaHelperImpl b2buaHelperImpl = sipSession.getB2buaHelper();
+				if(b2buaHelperImpl != null && tad != null) {
+					// we unlink the originalRequest early to avoid keeping the messages in mem for too long
+					b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage());
+				}				
+				session.removeOngoingTransaction(transaction);					
+				if(tad != null) {
+					tad.cleanUp();
+				}
+			}
+			final SipProvider sipProvider = matchingListeningPoint.getSipProvider();	
+			// Issue 1468 : to handle forking, we shouldn't cleanup the app data since it is needed for the forked responses
+			if(((SipStackImpl)sipProvider.getSipStack()).getMaxForkTime() == 0 && transaction != null) {
+				transaction.setApplicationData(null);
+			}
+			return;
+		} finally {
+			Thread.currentThread().setContextClassLoader(oldClassLoader);
+		}
 	}
 
 	/**
@@ -1426,7 +1409,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @throws SipException 
 	 * @throws NullPointerException 
 	 */
-	public void addInfoForRoutingBackToContainer(SipApplicationRouterInfo routerInfo, String applicationSessionId, String applicationName) throws ParseException, SipException {		
+	private void addInfoForRoutingBackToContainer(SipApplicationRouterInfo routerInfo, String applicationSessionId, String applicationName) throws ParseException, SipException {		
 		final Request request = (Request) super.message;
 		final javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
 				sipFactoryImpl.getSipNetworkInterfaceManager(), 
@@ -1454,30 +1437,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		final MobicentsSipSession session = getSipSession();
 		session.setNextSipApplicationRouterInfo(routerInfo);
 	}
-
-	/**
-	 * Add a record route header for app composition
-	 * @throws ParseException if anything goes wrong while creating the record route header
-	 * @throws SipException 
-	 * @throws NullPointerException 
-	 
-	public void addAppCompositionRRHeader()
-			throws ParseException, SipException {
-		final Request request = (Request) super.message;
-		final MobicentsSipSession session = getSipSession();
-		
-        javax.sip.address.SipURI sipURI = JainSipUtils.createRecordRouteURI(
-                        sipFactoryImpl.getSipNetworkInterfaceManager(), 
-                        request);
-        sipURI.setParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME, session.getKey().getApplicationName());
-        
-        sipURI.setLrParam();
-        javax.sip.address.Address recordRouteAddress = 
-                SipFactories.addressFactory.createAddress(sipURI);
-        RecordRouteHeader recordRouteHeader = 
-                SipFactories.headerFactory.createRecordRouteHeader(recordRouteAddress);
-        request.addFirst(recordRouteHeader);
-	}*/
 
 	public void setLinkedRequest(SipServletRequestImpl linkedRequest) {
 		this.linkedRequest = linkedRequest;

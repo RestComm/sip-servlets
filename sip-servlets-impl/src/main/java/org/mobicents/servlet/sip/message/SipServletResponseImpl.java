@@ -352,7 +352,12 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		if(!containsRel100(originalRequest.getMessage())) {
 			throw new Rel100Exception(Rel100Exception.NO_REQ_SUPPORT);
 		}
-		send(true);
+		try {
+			send(true);
+		} catch (IOException e) {
+			// sendReliably doesn't throw IOException where send() does...
+			throw new IllegalStateException(e);
+		}
 	}
 	
 	/*
@@ -434,11 +439,11 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	}
 	
 	@Override
-	public void send()  {
+	public void send() throws IOException  {
 		send(false);
 	}
 
-	public void send(boolean sendReliably) {
+	public void send(boolean sendReliably) throws IOException {
 		if(isMessageSent) {
 			throw new IllegalStateException("message already sent");
 		}
@@ -621,6 +626,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				Thread.currentThread().setContextClassLoader(oldClassLoader);
 			}
 		} catch (Exception e) {			
+			if(e.getCause() != null && e.getCause() instanceof IOException) {
+				throw (IOException) e.getCause();
+			}
 			throw new IllegalStateException("an exception occured when sending the response " + message, e);
 		}
 	}

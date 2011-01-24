@@ -630,10 +630,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					    request.setHeader(SipFactories.headerFactory.createMaxForwardsHeader(70));
 					}
 				    requestTransaction = sipProvider.getNewServerTransaction(request);
-				    requestTransaction.setRetransmitTimer(baseTimerInterval);
-				    ((TransactionExt)requestTransaction).setTimerT2(t2Interval);
-				    ((TransactionExt)requestTransaction).setTimerT4(t4Interval);
-				    ((TransactionExt)requestTransaction).setTimerD(timerDInterval);
+				    JainSipUtils.setTransactionTimers(((TransactionExt)requestTransaction), this);				    
 				} catch ( TransactionUnavailableException tae) {
 					logger.error("cannot get a new Server transaction for this request " + request, tae);
 					// Sends a 500 Internal server error and stops processing.				

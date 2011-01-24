@@ -413,7 +413,11 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 			clonedRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, originalRequest);
 		}
 		clonedRequest.getTransactionApplicationData().setProxyBranch(this);			
-		clonedRequest.send();
+		try {
+			clonedRequest.send();
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
 		String txid = ((ViaHeader) clonedRequest.getMessage().getHeader(ViaHeader.NAME)).getBranch();
 		if(clonedRequest.getTransactionApplicationData() != null) {
 			proxy.transactionMap.put(txid, clonedRequest.getTransactionApplicationData());
@@ -628,13 +632,13 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 				final String transport = JainSipUtils.findTransport(clonedRequest);
 				SipFactoryImpl sipFactoryImpl = proxy.getSipFactoryImpl();
 				SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
-				final SipProvider sipProvider = proxy.getSipFactoryImpl().getSipNetworkInterfaceManager().findMatchingListeningPoint(
+				final SipProvider sipProvider = sipNetworkInterfaceManager.findMatchingListeningPoint(
 						transport, false).getSipProvider();
 				SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);
 				
 				// Optimizing the routing for AR (if any)
 				if(sipConnector.isUseStaticAddress()) {
-					SipServletRequestImpl.optimizeRouteHeaderAddressForInternalRoutingrequest(
+					JainSipUtils.optimizeRouteHeaderAddressForInternalRoutingrequest(
 							sipConnector, clonedRequest, sipSession, sipFactoryImpl, transport);
 				}
 				sipProvider.sendRequest(clonedRequest);
@@ -728,14 +732,11 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 						viaHeader.setPort(sipConnector.getStaticServerPort());
 					}
 				}
-				SipServletRequestImpl.optimizeRouteHeaderAddressForInternalRoutingrequest(sipConnector,
+				JainSipUtils.optimizeRouteHeaderAddressForInternalRoutingrequest(sipConnector,
 						clonedRequest, sipSession, sipFactoryImpl, transport);
 			}
 			ctx = sipProvider.getNewClientTransaction(clonedRequest);
-			ctx.setRetransmitTimer(sipApplicationDispatcher.getBaseTimerInterval());
-		    ((TransactionExt)ctx).setTimerT2(sipApplicationDispatcher.getT2Interval());
-		    ((TransactionExt)ctx).setTimerT4(sipApplicationDispatcher.getT4Interval());
-		    ((TransactionExt)ctx).setTimerD(sipApplicationDispatcher.getTimerDInterval());
+			JainSipUtils.setTransactionTimers((TransactionExt) ctx, sipApplicationDispatcher);
 			
 			TransactionApplicationData appData = (TransactionApplicationData) request.getTransactionApplicationData();
 			appData.setProxyBranch(this);
