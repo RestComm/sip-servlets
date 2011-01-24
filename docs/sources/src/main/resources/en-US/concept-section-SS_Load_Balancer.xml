@@ -34,7 +34,7 @@
   </section>
   <section><title>Pluggable balancer algorithms</title><para>The SIP/HTTP load balancer exposes an interface to allow users to customize the routing decision making for special purposes. By default there are three built-in algorithms. Only one algorithm is active at any time and it is specified with the <literal>algorithmClass</literal> property in the configuration file.</para><para>It is completely up to the algorithm how and whether to support distributed architecture or how to store the information needed for session affinity. The algorithms will be called for every SIP and HTTP request and other significant events to make more informed decisions.</para><note>
       <para>Users must be aware that, bydefault requests explicitly addressed to a live server node passing through the load balancer will be forwarded directly to the server node. This allows for pre-specified routing use-cases, where the target node is known by the SIP client through other means. If the target node is dead, then the  node selection algorithm is used to route the request to an available node.</para>
-    </note>The following is a list o the built-in algorithms:<para><variablelist>
+    </note><para>The following is a list o the built-in algorithms:</para><variablelist>
         <varlistentry>
           <term>org.mobicents.tools.sip.balancer.CallIDAffinityBalancerAlgorithm </term>
           <listitem>
@@ -53,7 +53,7 @@
             <para>This algorithm is distributable and is similar to the previous algorithm, but it attempts to keep session affinity even when the cluster nodes are removed or added, which would normally cause hash values to point to different nodes.</para>
           </listitem>
         </varlistentry>
-      </variablelist></para></section>
+      </variablelist></section>
   <section>
     <title>Distributed load balancing</title>
     <para>When the capacity of a single load balancer is exceeded, multiple load balancers can be used. With the help of an IP load balancer the traffic can be distributed between all SIP/HTTP load balancers based on some IP rules or round-robin. With consistent hash and <literal>jvmRoute</literal>-based balancer algorithms it doesn&apos;t matter which SIP/HTTP load balancer will process the request, because they would all make the same decisions based on information in the requests (headers, parameters or cookies) and the list of available nodes. With consistent hash algorithms there is no state to be preserved in the SIP/HTTP balancers.</para>
@@ -394,6 +394,7 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
           </itemizedlist>
         </step-->
       </procedure>
+      <section>
       <title>Configuring Logging</title>
       <para>the SIP load balancer uses <ulink url="http://java.sun.com/j2se/1.4.2/docs/guide/util/logging/overview.html">Java Logging as a logging mechanism</ulink>. As such you cna configure it through a property file and specify the property file to be used by using the following command <literal>-Djava.util.logging.config.file=./lb-logging.properties</literal>. Please refer to JDK logging for more informationon how to configure the Java logging.</para>
       <note>
@@ -408,7 +409,9 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
         <title>Easy Node Configuration with JMX</title>
         <para>Both SIP Servlet-enabled JBoss and Tomcat have <acronym>JMX</acronym> (Java Management Extensions) interfaces that allow for easy server configuration. The JMX Console is available once the server has been started by navigating to <ulink url="http://localhost:8080/jmx-console/"/>.  </para>
       </formalpara>
-      <para>Both the <literal>balancers</literal> and <literal>heartBeatInterval</literal> attribute values are available under <literal>serviceName=jboss.web,type=Service</literal> in the JMX Console.<variablelist>
+      <para>Both the <literal>balancers</literal> and <literal>heartBeatInterval</literal> attribute values are available under <literal>serviceName=jboss.web,type=Service</literal> in the JMX Console.
+      </para>
+      <variablelist>
           <varlistentry>
             <term>balancers</term>
             <listitem>
@@ -421,7 +424,8 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
               <para>Interval at which each heartbeat is sent to the SIP load balancer(s).</para>
             </listitem>
           </varlistentry>
-        </variablelist> </para>
+        </variablelist>
+      </section>
       <section>
         <title>Converged Load Balancing</title>
         <section>
@@ -580,6 +584,7 @@ INFO: Stopping the sip forwarder</screen>
       </warning>
     </section>
     <section>
+      <title></title>
       <para>First you need to remove the SIP load balancers from any configuration in &SHORT_PLATFORM_NAME;. In particular the <literal>balancers</literal> 
       attribute in <filename>server.xml</filename>.   and edit the jboss.web  engine tag. You should remove the balancers attribute from the Service tag of 
       jboss.web service. This simply removes the default load balancer from the system and the traffic bypasses the SIP load-balancer. Next you must configure

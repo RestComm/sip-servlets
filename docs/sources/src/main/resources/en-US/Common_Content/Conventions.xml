@@ -120,7 +120,7 @@ books_tests  Desktop1  downloads      images  notes  scripts  svgs
 			Source-code listings are also set in <computeroutput>Mono-spaced Roman</computeroutput> but are presented and highlighted as follows:
 		</para>
 		
-<programlisting language="java">
+<programlisting language="Java">
 package org.jboss.book.jca.ex1;
 
 import javax.naming.InitialContext;

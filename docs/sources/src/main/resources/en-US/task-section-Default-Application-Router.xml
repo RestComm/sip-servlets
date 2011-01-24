@@ -114,7 +114,7 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
         <listitem>
 			<para>
 				An optional string that contains &PLATFORM_NAME;-specific parameters. Currently, only the <literal>DIRECTION</literal> and <literal>REGEX</literal> parameters are supported.
-			</para>.
+			</para>
 			<note>
 				<para>
 					The field can contain unsupported <literal>key=value</literal> properties that may be supported in future releases. The unsupported properties will be ignored during parsing, until support for the attributes is provided.
