@@ -49,6 +49,8 @@ import org.apache.catalina.core.StandardService;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.modeler.Registry;
+import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
+import org.mobicents.ext.javax.sip.dns.DefaultDNSServerLocator;
 import org.mobicents.ha.javax.sip.ClusteredSipStack;
 import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingListener;
 import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingService;
@@ -59,7 +61,6 @@ import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.CongestionControlPolicy;
-import org.mobicents.servlet.sip.core.DNSAddressResolver;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 
@@ -137,7 +138,9 @@ public class SipStandardService extends StandardService implements SipService {
 	// defining sip stack properties
 	private Properties sipStackProperties;	
 	private String sipStackPropertiesFileLocation;
-	private String addressResolverClass = DNSAddressResolver.class.getName();
+	@Deprecated
+	private String addressResolverClass = null;
+	private String dnsServerLocatorClass = DefaultDNSServerLocator.class.getName();
 	
 	//the balancers to send heartbeat to and our health info
 	@Deprecated
@@ -513,7 +516,32 @@ public class SipStandardService extends StandardService implements SipService {
 				if(logger.isInfoEnabled()) {
 					logger.info("no AddressResolver will be used since none has been specified.");
 				}
-			}			
+			}
+			// set the DNSServerLocator allowing to support RFC 3263 and do DNS lookups to resolve uris
+			if(sipStack instanceof SipStackExt && dnsServerLocatorClass != null && dnsServerLocatorClass.trim().length() > 0) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Sip Stack " + sipStack.getStackName() +" will be using " + dnsServerLocatorClass + " as DNSServerLocator");
+				}
+				try {
+		            // create parameters argument to identify constructor
+		            Class[] paramTypes = new Class[0];
+		            // get constructor of AddressResolver in order to instantiate
+		            Constructor dnsServerLocatorConstructor = Class.forName(dnsServerLocatorClass).getConstructor(
+		                    paramTypes);
+		            // Wrap properties object in order to pass to constructor of AddressResolver
+		            Object[] conArgs = new Object[0];
+		            // Creates a new instance of AddressResolver Class with the supplied sipApplicationDispatcher.
+		            DNSServerLocator dnsServerLocator = (DNSServerLocator) dnsServerLocatorConstructor.newInstance(conArgs);
+		            sipApplicationDispatcher.setDNSServerLocator(dnsServerLocator);
+		        } catch (Exception e) {
+		            logger.error("Couldn't set the AddressResolver " + addressResolverClass, e);
+		            throw e;
+		        }
+			} else {
+				if(logger.isInfoEnabled()) {
+					logger.info("no AddressResolver will be used since none has been specified.");
+				}
+			}	
 			if(logger.isInfoEnabled()) {
 				logger.info("SIP stack initialized");
 			}
@@ -1060,6 +1088,7 @@ public class SipStandardService extends StandardService implements SipService {
 	/**
 	 * @param dnsAddressResolverClass the dnsAddressResolverClass to set
 	 */
+	@Deprecated
 	public void setAddressResolverClass(String dnsAddressResolverClass) {
 		this.addressResolverClass = dnsAddressResolverClass;
 	}
@@ -1067,6 +1096,7 @@ public class SipStandardService extends StandardService implements SipService {
 	/**
 	 * @return the dnsAddressResolverClass
 	 */
+	@Deprecated
 	public String getAddressResolverClass() {
 		return addressResolverClass;
 	}
@@ -1105,5 +1135,19 @@ public class SipStandardService extends StandardService implements SipService {
 	 */
 	public SipStack getSipStack() {
 		return sipStack;
+	}
+
+	/**
+	 * @param dnsServerLocatorClass the dnsServerLocatorClass to set
+	 */
+	public void setDnsServerLocatorClass(String dnsServerLocatorClass) {
+		this.dnsServerLocatorClass = dnsServerLocatorClass;
+	}
+
+	/**
+	 * @return the dnsServerLocatorClass
+	 */
+	public String getDnsServerLocatorClass() {
+		return dnsServerLocatorClass;
 	}
 }

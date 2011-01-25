@@ -131,8 +131,7 @@ public class Shootist implements SipListener {
 			   ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
 			   dialog.sendRequest(ct);
 			} catch (Exception ex) {
-				ex.printStackTrace();
-				System.exit(0);
+				ex.printStackTrace();				
 			}
 
 		}
@@ -150,9 +149,7 @@ public class Shootist implements SipListener {
 
 
 	private static void usage() {
-		System.out.println(usageString);
-		System.exit(0);
-
+		System.out.println(usageString);		
 	}
 
 
@@ -243,8 +240,6 @@ public class Shootist implements SipListener {
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			System.exit(0);
-
 		}
 	}
 
@@ -333,7 +328,6 @@ public class Shootist implements SipListener {
 							   dialog.sendRequest(ct);
 							} catch (Exception ex) {
 								ex.printStackTrace();
-								System.exit(0);
 							}
 					}
 					okToInviteRecevied = true;
@@ -363,7 +357,6 @@ public class Shootist implements SipListener {
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
-			System.exit(0);
 		}
 
 	}
@@ -434,7 +427,6 @@ public class Shootist implements SipListener {
 			// in the classpath
 			e.printStackTrace();
 			System.err.println(e.getMessage());
-			System.exit(0);
 		}
 
 		try {

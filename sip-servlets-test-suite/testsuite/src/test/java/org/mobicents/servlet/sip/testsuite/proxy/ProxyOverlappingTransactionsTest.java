@@ -16,16 +16,9 @@
  */
 package org.mobicents.servlet.sip.testsuite.proxy;
 
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
-import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
-import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;

@@ -43,7 +43,7 @@ public class ParallelProxyTelURLWithRecordRouteTest extends SipServletTestCase i
 
 	protected Hashtable providerTable = new Hashtable();
 
-	private static final int TIMEOUT = 5000;
+	private static final int TIMEOUT = 15000;
 
 	private static final int receiversCount = 1;
 

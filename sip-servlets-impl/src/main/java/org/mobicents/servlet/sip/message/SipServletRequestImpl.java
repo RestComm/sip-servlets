@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
@@ -68,6 +69,7 @@ import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
 import javax.sip.TransactionState;
+import javax.sip.address.Hop;
 import javax.sip.address.TelURL;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.ContactHeader;
@@ -86,6 +88,7 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.javax.servlet.sip.SipServletRequestExt;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
@@ -98,6 +101,7 @@ import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.RoutingState;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -916,6 +920,46 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		checkReadOnly();
 		final Request request = (Request) super.message;
 		final String requestMethod = getMethod();
+		final SipApplicationDispatcher sipApplicationDispatcher = sipFactoryImpl.getSipApplicationDispatcher();
+		final MobicentsSipSession session = getSipSession();
+		final DNSServerLocator dnsServerLocator = sipApplicationDispatcher.getDNSServerLocator();
+		Hop hop = null;
+		// RFC 3263 support
+		if(dnsServerLocator != null) {
+			if(Request.CANCEL.equals(requestMethod)) {
+				// RFC 3263 Section 4 : a CANCEL for a particular SIP request MUST be sent to the same SIP 
+				// server that the SIP request was delivered to.
+				TransactionApplicationData inviteTxAppData = ((TransactionApplicationData)inviteTransactionToCancel.getApplicationData());
+				if(inviteTxAppData != null && inviteTxAppData.getHops() != null) {
+					hop = inviteTxAppData.getHops().peek();
+				}
+			} else {
+				javax.sip.address.URI uriToResolve =  request.getRequestURI();
+				RouteHeader routeHeader = (RouteHeader) request.getHeader(RouteHeader.NAME);
+				if(routeHeader != null) {
+					uriToResolve = routeHeader.getAddress().getURI();
+				}
+				if(session.getTransport() != null && uriToResolve.isSipURI() && ((javax.sip.address.SipURI)uriToResolve).getTransportParam() == null) {					
+					try {
+						((javax.sip.address.SipURI)uriToResolve).setTransportParam(session.getTransport());
+					} catch (ParseException e) {
+						// nothing to do here, will never happen
+					}
+				}
+				Queue<Hop> hops = dnsServerLocator.locateHops(uriToResolve);
+				if(hops.size() > 0) {
+					// RFC 3263 support don't remove the current hop, it will be the one to reuse for CANCEL and ACK to non 2xx transactions
+					hop = hops.peek();
+					transactionApplicationData.setHops(hops);
+				}
+			}
+		}
+		send(hop);
+	}
+	
+	public void send(Hop hop) throws IOException {
+		final Request request = (Request) super.message;
+		final String requestMethod = getMethod();
 		final MobicentsSipSession session = getSipSession();
 		final String sessionTransport = session.getTransport();
 		final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
@@ -925,8 +969,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			if(logger.isDebugEnabled()) {
 		    	logger.debug("session transport is " + sessionTransport);
 		    }
-			((MessageExt)message).setApplicationData(sessionTransport);									
-						
+			((MessageExt)message).setApplicationData(sessionTransport);			
+			
 			if(Request.CANCEL.equals(requestMethod)) {
 				getSipSession().setRequestsPending(0);
 	    		Transaction tx = inviteTransactionToCancel;
@@ -948,6 +992,23 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
     						"Can not stop retransmissions. The transaction is null");
     			}
 	    	} 
+			
+			if(hop != null && sipFactoryImpl.getSipApplicationDispatcher().isExternal(hop.getHost(), hop.getPort(), hop.getTransport())) {
+				javax.sip.address.SipURI nextHopUri = SipFactories.addressFactory.createSipURI(null, hop.getHost());
+				nextHopUri.setLrParam();
+				nextHopUri.setPort(hop.getPort());
+				if(hop.getTransport() != null) {
+					nextHopUri.setTransportParam(hop.getTransport());
+				}
+				final javax.sip.address.Address nextHopRouteAddress = 
+					SipFactories.addressFactory.createAddress(nextHopUri);
+				final RouteHeader nextHopRouteHeader = 
+					SipFactories.headerFactory.createRouteHeader(nextHopRouteAddress);
+				if(logger.isDebugEnabled()) {
+			    	logger.debug("Adding next hop found by RFC 3263 lookups as route header" + nextHopRouteHeader);			    	
+			    }
+				request.addFirst(nextHopRouteHeader);
+			}
 			
 			// adding via header and update via branch if null
 			checkViaHeaderAddition();

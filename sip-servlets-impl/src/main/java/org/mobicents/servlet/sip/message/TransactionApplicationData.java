@@ -17,12 +17,14 @@
 package org.mobicents.servlet.sip.message;
 
 import java.io.Serializable;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.sip.Address;
 import javax.sip.Transaction;
+import javax.sip.address.Hop;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
@@ -52,6 +54,8 @@ public class TransactionApplicationData implements Serializable {
 	private transient boolean noAppReturned = false;
 	private transient String modifier = null;	
 	private transient boolean canceled = false;
+	// Used for RFC 3263
+	private transient Queue<Hop> hops = null;
 	
 	public TransactionApplicationData(SipServletMessageImpl sipServletMessage ) {		
 		this.sipServletMessage = sipServletMessage;
@@ -231,6 +235,24 @@ public class TransactionApplicationData implements Serializable {
 		}
 		transaction = null;
 		rseqNumber = null;
+		if(hops != null) {
+			hops.clear();
+			hops = null;
+		}
+	}
+
+	/**
+	 * @param hops the hops to set
+	 */
+	public void setHops(Queue<Hop> hops) {
+		this.hops = hops;
+	}
+
+	/**
+	 * @return the hops
+	 */
+	public Queue<Hop> getHops() {
+		return hops;
 	}
 
 //	public void readExternal(ObjectInput in) throws IOException,

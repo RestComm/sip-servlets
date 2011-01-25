@@ -28,7 +28,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 	
 	protected Cutme cutme;
 
-	private static final int TIMEOUT = 10000;
+	private static final int TIMEOUT = 15000;
 	private static final int TIMEOUT_READY_TO_INVALIDTE = 70000;
 
 	public ParallelProxyWithRecordRouteTest(String name) {

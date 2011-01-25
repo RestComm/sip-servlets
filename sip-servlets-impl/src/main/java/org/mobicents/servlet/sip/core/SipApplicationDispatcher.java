@@ -31,6 +31,7 @@ import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 
 import org.apache.catalina.LifecycleException;
+import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -205,4 +206,7 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 
 	void setSipStack(SipStack sipStack);
 	SipStack getSipStack();
+
+	void setDNSServerLocator(DNSServerLocator dnsServerLocator);
+	DNSServerLocator getDNSServerLocator();
 }

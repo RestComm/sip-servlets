@@ -1833,7 +1833,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 		
 		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
 				outboundInterface + " not found");
-		this.outboundInterface = outboundInterface.toString();		
+		this.outboundInterface = outboundInterface.toString();
+		if(outboundInterface.getTransportParam() != null) {
+			this.transport = outboundInterface.getTransportParam();
+		}
 	}
 	
 	/**

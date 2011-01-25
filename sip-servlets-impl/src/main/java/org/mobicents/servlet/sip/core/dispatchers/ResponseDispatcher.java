@@ -94,6 +94,10 @@ public class ResponseDispatcher extends MessageDispatcher {
 				applicationData = (TransactionApplicationData)clientTransaction.getApplicationData();
 				if(applicationData.getSipServletMessage() instanceof SipServletRequestImpl) {
 					tmpOriginalRequest = (SipServletRequestImpl)applicationData.getSipServletMessage();
+					// clearing the hops found by RFC 3263
+					if(applicationData.getHops() != null) {
+						applicationData.getHops().clear();
+					}
 				}
 				//add the response for access from B2BUAHelper.getPendingMessages
 				applicationData.addSipServletResponse(sipServletResponse);

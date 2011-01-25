@@ -88,6 +88,7 @@ import javax.sip.message.Response;
 import org.apache.catalina.LifecycleException;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.modeler.Registry;
+import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingListener;
 import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.servlet.sip.GenericUtils;
@@ -186,6 +187,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 
 	protected SipStack sipStack;
 	private SipNetworkInterfaceManager sipNetworkInterfaceManager;
+	private DNSServerLocator dnsServerLocator;
 	
 	// stats
 	private boolean gatherStatistics = true;
@@ -1417,6 +1419,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			logger.debug("Adding hostname "+ hostName);
 		}
 		hostNames.add(hostName);
+		if(dnsServerLocator != null) {
+			dnsServerLocator.addLocalHostName(hostName);
+		}
 	}
 
 	/*
@@ -1436,6 +1441,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			logger.debug("Removing hostname "+ hostName);
 		}
 		hostNames.remove(hostName);
+		if(dnsServerLocator != null) {
+			dnsServerLocator.removeLocalHostName(hostName);
+		}
 	}
 
 	/**
@@ -1564,12 +1572,20 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	public SipContext findSipApplication(String applicationName) {
 		return applicationDeployed.get(applicationName);
 	}
+	
+	public DNSServerLocator getDNSServerLocator() {		
+		return dnsServerLocator;
+	}
+
+	public void setDNSServerLocator(DNSServerLocator dnsServerLocator) {
+		this.dnsServerLocator = dnsServerLocator;
+	}
 
 	
 	// -------------------- JMX and Registration  --------------------
     protected String domain;
     protected ObjectName oname;
-    protected MBeanServer mserver;	
+    protected MBeanServer mserver;		
 
     public ObjectName getObjectName() {
         return oname;

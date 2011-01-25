@@ -126,6 +126,9 @@ public class SipNetworkInterfaceManager {
 			transportMappingCacheMap.get(extendedListeningPoint.getTransport().toLowerCase());
 	    boolean added = extendedListeningPoints.add(extendedListeningPoint);
 	    if(added) {
+	    	if(sipApplicationDispatcher.getDNSServerLocator() != null) {
+	    		sipApplicationDispatcher.getDNSServerLocator().addSupportedTransport(extendedListeningPoint.getTransport());
+	    	}
 		    // Adding private ipaddress to the triplet cache map
 		    for(String ipAddress : extendedListeningPoint.getIpAddresses()) {
 		    	extendedListeningPointsCacheMap.put(ipAddress + "/" + extendedListeningPoint.getPort() + ":" + extendedListeningPoint.getTransport().toLowerCase(), extendedListeningPoint);
@@ -135,6 +138,7 @@ public class SipNetworkInterfaceManager {
 		    	extendedListeningPointsCacheMap.put(extendedListeningPoint.getGlobalIpAddress() + "/" + extendedListeningPoint.getPort() + ":" + extendedListeningPoint.getTransport().toLowerCase(), extendedListeningPoint);
 		    	extendedListeningPointsCacheMap.put(extendedListeningPoint.getGlobalIpAddress() + "/" + extendedListeningPoint.getGlobalPort() + ":" + extendedListeningPoint.getTransport().toLowerCase(), extendedListeningPoint);
 		    }
+		    
 		    Iterator<SipContext> sipContextIterator = sipApplicationDispatcher.findSipApplications();
 		    while (sipContextIterator.hasNext()) {
 				SipContext sipContext = (SipContext) sipContextIterator.next();
@@ -161,6 +165,9 @@ public class SipNetworkInterfaceManager {
 			Set<ExtendedListeningPoint> extendedListeningPoints = 
 				transportMappingCacheMap.get(extendedListeningPoint.getTransport().toLowerCase());
 		    extendedListeningPoints.remove(extendedListeningPoint);
+		    if(sipApplicationDispatcher.getDNSServerLocator() != null) {
+		    	sipApplicationDispatcher.getDNSServerLocator().removeSupportedTransport(extendedListeningPoint.getTransport());
+		    }
 		    // Removing private ipaddress from the triplet cache map for listening point
 		    for(String ipAddress : extendedListeningPoint.getIpAddresses()) {
 		    	extendedListeningPointsCacheMap.remove(ipAddress + "/" + extendedListeningPoint.getPort() + ":" + extendedListeningPoint.getTransport().toLowerCase());
