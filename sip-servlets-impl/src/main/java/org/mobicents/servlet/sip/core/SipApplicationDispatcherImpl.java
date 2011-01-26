@@ -524,7 +524,22 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 	 * @see javax.sip.SipListener#processIOException(javax.sip.IOExceptionEvent)
 	 */
 	public void processIOException(IOExceptionEvent event) {
-		logger.error("An IOException occured on " + event.getHost() + ":" + event.getPort() + "/" + event.getTransport() + " for provider " + event.getSource());
+		
+		if(dnsServerLocator != null && event.getSource() instanceof ClientTransaction) {			
+			ClientTransaction ioExceptionTx = (ClientTransaction) event.getSource();
+			if(ioExceptionTx.getApplicationData() != null) {
+				SipServletMessageImpl sipServletMessageImpl = ((TransactionApplicationData)ioExceptionTx.getApplicationData()).getSipServletMessage();
+				if(sipServletMessageImpl != null && sipServletMessageImpl instanceof SipServletRequestImpl) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("An IOException occured on " + event.getHost() + ":" + event.getPort() + "/" + event.getTransport() + " for source " + event.getSource() + ", trying to visit next hop as per RFC3263");
+					}
+					if(((SipServletRequestImpl)sipServletMessageImpl).visitNextHop()) {
+						return;
+					}
+				}
+			}
+		} 
+		logger.error("An IOException occured on " + event.getHost() + ":" + event.getPort() + "/" + event.getTransport() + " for source " + event.getSource());
 	}
 	
 	/*
@@ -1068,6 +1083,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 											}
 										}
 										SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipServletMessage;
+										if(sipServletRequestImpl.visitNextHop()) {
+											return;
+										}
 										sipServletMessage.setTransaction(transaction);
 										SipServletResponseImpl response = (SipServletResponseImpl) sipServletRequestImpl.createResponse(408, null, false);
 										// Fix for Issue 1734
@@ -1100,7 +1118,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 					// don't clean up for the same reason we don't invalidate the sip session right above
 					tad.cleanUp();				
 					transaction.setApplicationData(null);
-				}						
+				}
 			});
 		}
 	}

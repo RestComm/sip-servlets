@@ -950,7 +950,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				if(hops.size() > 0) {
 					// RFC 3263 support don't remove the current hop, it will be the one to reuse for CANCEL and ACK to non 2xx transactions
 					hop = hops.peek();
-					transactionApplicationData.setHops(hops);
+					transactionApplicationData.setHops(hops);				
 				}
 			}
 		}
@@ -1208,7 +1208,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 		} catch (Exception ex) {			
 			JainSipUtils.terminateTransaction(getTransaction());
-			if(ex.getCause() != null && ex.getCause() instanceof IOException) {
+			// cleaning up the request to make sure it canbe resent with some modifications in case of exception
+			if(transactionApplicationData.getHops() != null && transactionApplicationData.getHops().size() > 0) {
+				request.removeFirst(RouteHeader.NAME);
+			}
+			request.removeFirst(ViaHeader.NAME);
+			setTransaction(null);
+			message = (Request) request.clone();
+			if(ex.getCause() != null && ex.getCause() instanceof IOException) {				
 				throw (IOException) ex.getCause();
 			}
 			throw new IllegalStateException("Error sending request " + request,ex);
@@ -1402,6 +1409,43 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				}
 			} 
 		}
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean visitNextHop() {
+		if(transactionApplicationData != null) {
+			Queue<Hop> nextHops = transactionApplicationData.getHops();
+			if(sipFactoryImpl.getSipApplicationDispatcher().getDNSServerLocator() != null && nextHops != null && nextHops.size() > 1) {
+				nextHops.remove();
+				Hop nextHop = nextHops.peek();
+				if(nextHop != null) {
+					// If a failure occurs, the client SHOULD create a new request, 
+					// which is identical to the previous, but
+					getMessage().removeFirst(RouteHeader.NAME);
+					// has a different value of the Via branch ID than the previous (and
+					// therefore constitutes a new SIP transaction).  
+					ViaHeader viaHeader = (ViaHeader) getMessage().getHeader(ViaHeader.NAME);
+					viaHeader.removeParameter("branch");
+					if(logger.isDebugEnabled()) {
+						logger.debug("sending request " + getMessage() + " to next hop " + nextHop + "discovered through RFC3263 mechanisms.");
+					}
+					setTransaction(null);
+					// That request is sent to the next element in the list as specified by RFC 2782.
+					try {
+						send(nextHop);
+					} catch (IOException e) {
+						logger.error("unexpected IOException on sending " + getMessage() + " to next hop " + nextHop + "discovered through RFC3263 mechanisms.");
+						return false;
+					}
+					return true;
+				}
+			}
+		}
+		return false;
+		
 	}
 
 	/**
