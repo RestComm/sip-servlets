@@ -565,6 +565,29 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	}
 	
 	/**
+	 * non regression test for http://code.google.com/p/mobicents/issues/detail?id=2288
+	 * SipServletRequest.send() throws IllegalStateException instead of IOException
+	 */
+	public void testShootistIOException() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		deployApplication("testIOException", "example.com");
+		Thread.sleep(TIMEOUT);		
+		List<String> allMessagesContent = receiver.getAllMessagesContent();
+		assertEquals(1,allMessagesContent.size());
+		assertTrue("IOException not thrown", allMessagesContent.contains("IOException thrown"));		
+	}
+	
+	/**
 	 * non regression test for Issue 2269 http://code.google.com/p/mobicents/issues/detail?id=2269
 	 * Wrong Contact header scheme URI in case TLS call with request URI 'sip:' scheme and contact is uri is secure with "sips"
 	 */

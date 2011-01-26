@@ -312,7 +312,11 @@ public class ShootistSipServlet
 		}
 		String dontSetRURI = ce.getServletContext().getInitParameter("dontSetRURI");
 		if(dontSetRURI == null) {
-			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
+			String host = "127.0.0.1:5080";
+			if(ce.getServletContext().getInitParameter("testIOException") != null) {
+				host = ce.getServletContext().getInitParameter("testIOException");
+			}
+			SipURI requestURI = sipFactory.createSipURI("LittleGuy", host);
 			requestURI.setSecure(ce.getServletContext().getInitParameter("secureRURI")!=null);
 			if(ce.getServletContext().getInitParameter("encodeRequestURI") != null) {
 				sipApplicationSession.encodeURI(requestURI);
@@ -337,7 +341,19 @@ public class ShootistSipServlet
 		try {			
 			sipServletRequest.send();
 		} catch (IOException e) {
-			logger.error("Unexpected exception while sending the INVITE request",e);
+			if(ce.getServletContext().getInitParameter("testIOException") != null) {
+				logger.info("expected exception thrown" + e);
+				((SipURI)sipServletRequest.getRequestURI()).setHost("127.0.0.1");
+				((SipURI)sipServletRequest.getRequestURI()).setPort(5080);
+				try {
+					sipServletRequest.send();
+					sendMessage(sipApplicationSession, sipFactory, "IOException thrown");
+				} catch (IOException e1) {
+					logger.error("Unexpected exception while sending the INVITE request",e1);
+				}					
+			} else {
+				logger.error("Unexpected exception while sending the INVITE request",e);
+			}
 		}		
 		if(ce.getServletContext().getInitParameter("cancel") != null) {
 			try {
