@@ -17,6 +17,7 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.sip.ObjectInUseException;
@@ -52,8 +53,7 @@ public class ProtocolObjects {
 	private boolean isStarted;
 
 	public ProtocolObjects(String stackname, String pathname, String transport,
-			boolean autoDialog, String outboundProxy, String threadPoolSize, String reentrantListener) {
-
+			boolean autoDialog, String outboundProxy, String threadPoolSize, String reentrantListener, Map<String, String> additionalProperties) {
 		this.transport = transport;
 		SipFactory sipFactory = SipFactory.getInstance();
 		sipFactory.resetFactory();
@@ -92,6 +92,10 @@ public class ProtocolObjects {
 		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", Integer.valueOf(
 				logLevel).toString());
 
+		if(additionalProperties != null) {
+			properties.putAll(additionalProperties);
+		}
+		
 		try {
 			// Create SipStack object
 			sipStack = sipFactory.createSipStack(properties);
@@ -113,6 +117,12 @@ public class ProtocolObjects {
 			ex.printStackTrace();
 			throw new RuntimeException(ex);
 		}
+	}
+	
+	public ProtocolObjects(String stackname, String pathname, String transport,
+			boolean autoDialog, String outboundProxy, String threadPoolSize, String reentrantListener) {
+
+		this(stackname, pathname, transport, autoDialog, outboundProxy, threadPoolSize, reentrantListener, null);
 	}
 
 	public synchronized void destroy() {

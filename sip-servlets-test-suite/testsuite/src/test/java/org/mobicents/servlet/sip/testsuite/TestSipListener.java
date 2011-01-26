@@ -303,6 +303,8 @@ public class TestSipListener implements SipListener {
 	private boolean testNextNonce =false;
 	
 	private String nextNonce = null;
+
+	private boolean dropRequest = false;
 	
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -567,7 +569,6 @@ public class TestSipListener implements SipListener {
 			this.transactionCount++;
 			logger.info("shootist:  Sending OK.");
 			logger.info("Dialog State = " + dialog.getState());
-		
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -1015,6 +1016,10 @@ public class TestSipListener implements SipListener {
 		Request request = requestEvent.getRequest();
 		inviteRequest = request;
 		logger.info("shootme: got an Invite " + request);
+		if(dropRequest) {
+			logger.warn("dropping " + request);
+			return;
+		}
 		try {
 			if(challengeRequests) {
 				// Verify AUTHORIZATION !!!!!!!!!!!!!!!!
@@ -1115,7 +1120,7 @@ public class TestSipListener implements SipListener {
 						Header rseqHeader = protocolObjects.headerFactory.createRSeqHeader(rseqNumber.getAndIncrement());
 						response.addHeader(rseqHeader);
 						dialog.sendReliableProvisionalResponse(response);
-					}  else {						
+					}  else {
 						st.sendResponse(response);
 					}					
 				}
@@ -1541,6 +1546,7 @@ public class TestSipListener implements SipListener {
 				}
 			} else if(response.getStatusCode() == Response.RINGING && sendUpdateOn180) {
 				Request updateRequest = dialog.createRequest(Request.UPDATE);
+								
 				ClientTransaction ct = sipProvider
 						.getNewClientTransaction(updateRequest);
 				dialog.sendRequest(ct);
@@ -2890,6 +2896,20 @@ public class TestSipListener implements SipListener {
 
 	public void setTestNextNonce(boolean b) {
 		this.testNextNonce  = b;
+	}
+
+	/**
+	 * @param dropRequest the dropRequest to set
+	 */
+	public void setDropRequest(boolean dropRequest) {
+		this.dropRequest = dropRequest;
+	}
+
+	/**
+	 * @return the dropRequest
+	 */
+	public boolean isDropRequest() {
+		return dropRequest;
 	}
 
 }

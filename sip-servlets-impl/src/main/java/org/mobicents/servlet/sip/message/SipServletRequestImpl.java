@@ -84,6 +84,7 @@ import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.header.WWWAuthenticateHeader;
+import javax.sip.message.Message;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -1429,8 +1430,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					// therefore constitutes a new SIP transaction).  
 					ViaHeader viaHeader = (ViaHeader) getMessage().getHeader(ViaHeader.NAME);
 					viaHeader.removeParameter("branch");
+					message = (Message) message.clone();
 					if(logger.isDebugEnabled()) {
-						logger.debug("sending request " + getMessage() + " to next hop " + nextHop + "discovered through RFC3263 mechanisms.");
+						logger.debug("sending request " + getMessage() + " to next hop " + nextHop + " discovered through RFC3263 mechanisms.");
 					}
 					setTransaction(null);
 					// That request is sent to the next element in the list as specified by RFC 2782.
