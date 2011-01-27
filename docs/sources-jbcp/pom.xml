@@ -69,6 +69,7 @@
                  <tasks>
                    <copy file="mkbk" todir="src/main/resources/" />
 			<copy file="Makefile" todir="src/main/resources/" />
+      <copy file="publican.cfg" todir="src/main/resources/" />
                  </tasks>
                </configuration>
              </execution>
