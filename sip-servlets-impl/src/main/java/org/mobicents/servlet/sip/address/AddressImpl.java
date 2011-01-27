@@ -161,7 +161,9 @@ public class AddressImpl extends ParameterableImpl implements Address {
 			return new SipURIImpl((javax.sip.address.SipURI) getAddress().getURI());
 		else if (getAddress().getURI() instanceof javax.sip.address.TelURL)
 			return new TelURLImpl((javax.sip.address.TelURL) getAddress().getURI());
-		else
+		else if (getAddress().getURI() instanceof javax.sip.address.URI)
+			return new GenericURIImpl((javax.sip.address.URI) getAddress().getURI());
+		else		
 			throw new IllegalArgumentException("unsupported operation - unknown scheme");
 	}
 	/*
