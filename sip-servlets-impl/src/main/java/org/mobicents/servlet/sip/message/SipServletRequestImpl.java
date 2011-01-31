@@ -940,7 +940,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				if(routeHeader != null) {
 					uriToResolve = routeHeader.getAddress().getURI();
 				}
-				if(session.getTransport() != null && uriToResolve.isSipURI() && ((javax.sip.address.SipURI)uriToResolve).getTransportParam() == null) {					
+				if(session.getTransport() != null && uriToResolve.isSipURI() && ((javax.sip.address.SipURI)uriToResolve).getTransportParam() == null &&
+						// no need to modify the Request URI for UDP which is the default transport
+						!session.getTransport().equalsIgnoreCase(ListeningPoint.UDP)) {					
 					try {
 						((javax.sip.address.SipURI)uriToResolve).setTransportParam(session.getTransport());
 					} catch (ParseException e) {
@@ -1209,7 +1211,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 		} catch (Exception ex) {			
 			JainSipUtils.terminateTransaction(getTransaction());
-			// cleaning up the request to make sure it canbe resent with some modifications in case of exception
+			// cleaning up the request to make sure it can be resent with some modifications in case of exception
 			if(transactionApplicationData.getHops() != null && transactionApplicationData.getHops().size() > 0) {
 				request.removeFirst(RouteHeader.NAME);
 			}
