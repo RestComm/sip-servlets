@@ -273,6 +273,7 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 	@Override
 	protected void tearDown() throws Exception {					
 		receiverProtocolObjects.destroy();			
+		badReceiverProtocolObjects.destroy();
 		logger.info("Test completed");
 		super.tearDown();
 	}
