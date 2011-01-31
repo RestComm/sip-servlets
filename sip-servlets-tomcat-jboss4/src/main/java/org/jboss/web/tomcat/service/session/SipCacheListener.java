@@ -285,14 +285,21 @@ public class SipCacheListener extends AbstractCacheListener
          }
          else if (sipApplicationSession.isNewData(version.intValue()))
          {
-            // Need to invalidate the loaded session
+        	 // Need to invalidate the loaded session
         	 sipApplicationSession.setOutdatedVersion(version.intValue());
-            if(log_.isDebugEnabled())
-            {
-               log_.debug("nodeDirty(): session in-memory data is " +
-                          "invalidated with id: " + sessId + " and version: " +
-                          version.intValue());
-            }
+        	 if(isSipApplicationSession) {
+        		 if(log_.isDebugEnabled()) {
+        			 log_.debug("Refreshing sip application session that was loaded on this node but modified on remote node (update expiration timer too) " + sipApplicationSession);
+        		 }
+        		 manager_.loadSipApplicationSession(key, false);
+        	 }
+
+        	 if(log_.isDebugEnabled())
+        	 {
+        		 log_.debug("nodeDirty(): session in-memory data is " +
+        				 "invalidated with id: " + sessId + " and version: " +
+        				 version.intValue());
+        	 }
          }
          else if (isBuddy)
          {
