@@ -84,6 +84,19 @@ public class ShootistSipServlet
 			prack.setRequestURI(requestURI);
 			prack.send();
 		}
+		if(getServletContext().getInitParameter("cancelOn1xx") != null) {
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+			try {
+				resp.getRequest().getApplicationSession().setAttribute(TEST_ERROR_RESPONSE, "true");
+				resp.getRequest().createCancel().send();
+			} catch (IOException e) {
+				logger.error(e);
+			}
+		}
 	}
 	
 	@Override
@@ -315,6 +328,9 @@ public class ShootistSipServlet
 			String host = "127.0.0.1:5080";
 			if(ce.getServletContext().getInitParameter("testIOException") != null) {
 				host = ce.getServletContext().getInitParameter("testIOException");
+			}
+			if(ce.getServletContext().getInitParameter("host") != null) {
+				host = ce.getServletContext().getInitParameter("host");
 			}
 			SipURI requestURI = sipFactory.createSipURI("LittleGuy", host);
 			requestURI.setSecure(ce.getServletContext().getInitParameter("secureRURI")!=null);
