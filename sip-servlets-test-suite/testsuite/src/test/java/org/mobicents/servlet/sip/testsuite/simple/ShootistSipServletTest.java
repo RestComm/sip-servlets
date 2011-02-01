@@ -508,7 +508,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5071, ListeningPoint.TCP);
 		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5072, ListeningPoint.TLS);
 		tomcat.startTomcat();
-		deployApplication("tlsRURI", "true");
+		deployApplication("transportRURI", "tls");
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());
 		ContactHeader contactHeader = (ContactHeader) receiver.getInviteRequest().getHeader(ContactHeader.NAME);	
@@ -581,6 +581,33 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		receiverProtocolObjects.start();
 		tomcat.startTomcat();
 		deployApplication("testIOException", "example.com");
+		Thread.sleep(TIMEOUT);		
+		List<String> allMessagesContent = receiver.getAllMessagesContent();
+		assertEquals(1,allMessagesContent.size());
+		assertTrue("IOException not thrown", allMessagesContent.contains("IOException thrown"));		
+	}
+	
+	/**
+	 * non regression test for http://code.google.com/p/mobicents/issues/detail?id=2288
+	 * SipServletRequest.send() throws IllegalStateException instead of IOException
+	 */
+	public void testShootistIOExceptionTransportChange() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
+		tomcat.startTomcat();
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("transportRURI", "tcp");
+		params.put("testIOException", "localhost");
+		deployApplication(params);
 		Thread.sleep(TIMEOUT);		
 		List<String> allMessagesContent = receiver.getAllMessagesContent();
 		assertEquals(1,allMessagesContent.size());

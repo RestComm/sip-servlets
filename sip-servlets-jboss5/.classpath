@@ -174,5 +174,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-jruby"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/ha/javax/sip/mobicents-jain-sip-ha-core/0.14-SNAPSHOT/mobicents-jain-sip-ha-core-0.14-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/ha/javax/sip/mobicents-jain-sip-jboss5/0.14-SNAPSHOT/mobicents-jain-sip-jboss5-0.14-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/javax/sip/mobicents-jain-sip-ext/1.0-SNAPSHOT/mobicents-jain-sip-ext-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

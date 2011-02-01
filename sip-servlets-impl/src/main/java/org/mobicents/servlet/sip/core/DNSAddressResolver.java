@@ -30,6 +30,7 @@ import org.xbill.DNS.Type;
  * @author J. Deruelle
  *
  */
+@Deprecated
 public class DNSAddressResolver implements AddressResolver {
 	private static final Logger logger = Logger.getLogger(DNSAddressResolver.class);
 	//the sip factory implementation to be able

@@ -78,6 +78,7 @@ import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.SipServletTimerService;
 import org.mobicents.servlet.sip.core.timers.StandardSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
+import org.mobicents.servlet.sip.dns.MobicentsDNSResolver;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -239,6 +240,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				sipApplicationDispatcher.getOutboundInterfaces());	
 		this.getServletContext().setAttribute("org.mobicents.servlet.sip.SIP_CONNECTORS",
 				StaticServiceHolder.sipStandardService.findSipConnectors());
+		this.getServletContext().setAttribute("org.mobicents.servlet.sip.DNS_RESOLVER",
+				new MobicentsDNSResolver(sipApplicationDispatcher.getDNSServerLocator()));
 	}
 
 	/**

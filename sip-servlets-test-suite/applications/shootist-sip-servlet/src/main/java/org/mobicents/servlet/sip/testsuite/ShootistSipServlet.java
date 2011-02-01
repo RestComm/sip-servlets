@@ -45,7 +45,9 @@ import javax.servlet.sip.URI;
 import javax.sip.ListeningPoint;
 
 import org.apache.log4j.Logger;
+import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.javax.servlet.sip.SipSessionExt;
+import org.mobicents.javax.servlet.sip.dns.DNSResolver;
 
 public class ShootistSipServlet 
 		extends SipServlet 
@@ -229,6 +231,10 @@ public class ShootistSipServlet
 				} catch (ServletParseException e) {
 					logger.error("Impossible to create the tel URL", e);
 				}
+				if(ce.getServletContext().getInitParameter("enum") != null) {
+					DNSResolver dnsResolver = (DNSResolver) getServletContext().getAttribute("org.mobicents.servlet.sip.DNS_RESOLVER");
+					toURI = dnsResolver.getSipURI(toURI);
+				}
 			} else if(ce.getServletContext().getInitParameter("urlType").equalsIgnoreCase("telAsSip")) {
 				try {
 					toURI = sipFactory.createURI("sip:+34666777888@192.168.0.20:5080");
@@ -338,13 +344,16 @@ public class ShootistSipServlet
 				sipApplicationSession.encodeURI(requestURI);
 				sipApplicationSession.setAttribute(ENCODE_URI, "true");
 			}
-			if(ce.getServletContext().getInitParameter("tlsRURI")!=null) {
-				requestURI.setTransportParam("tls");
+			if(ce.getServletContext().getInitParameter("transportRURI") != null) {
+				requestURI.setTransportParam(ce.getServletContext().getInitParameter("transportRURI"));
 				if(method.equalsIgnoreCase("REGISTER")) {
 					sipServletRequest.addHeader("Contact", "sips:LittleGuy@127.0.0.1:5080");
 				}
-			}
+			}			
 			sipServletRequest.setRequestURI(requestURI);
+			if(ce.getServletContext().getInitParameter("enum") != null) {
+				sipServletRequest.setRequestURI(toURI);
+			}
 		}
 		String testErrorResponse = ce.getServletContext().getInitParameter(TEST_ERROR_RESPONSE);
 		if(testErrorResponse != null) {
@@ -361,6 +370,7 @@ public class ShootistSipServlet
 				logger.info("expected exception thrown" + e);
 				((SipURI)sipServletRequest.getRequestURI()).setHost("127.0.0.1");
 				((SipURI)sipServletRequest.getRequestURI()).setPort(5080);
+				((SipURI)sipServletRequest.getRequestURI()).setTransportParam("udp");
 				try {
 					sipServletRequest.send();
 					sendMessage(sipApplicationSession, sipFactory, "IOException thrown");
