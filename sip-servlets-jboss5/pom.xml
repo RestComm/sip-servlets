@@ -192,6 +192,13 @@
 					<version>${mobicents.balancer.version}</version>
 					<scope>provided</scope>
 				</dependency>
+				
+				<dependency>			
+			<groupId>org.mobicents.javax.sip</groupId>
+			<artifactId>mobicents-jain-sip-ext</artifactId>
+			<version>${mobicents.jain.sip.ext.version}</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	
 	<repositories>
