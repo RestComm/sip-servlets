@@ -356,32 +356,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		 		logger.info("No Congestion control background task started since the checking interval is equals to " + congestionControlCheckingInterval + " milliseconds.");
 		 	}
 		}
-		if(logger.isInfoEnabled()) {
-			Properties releaseProperties = new Properties();
-			try {
-				InputStream in = SipApplicationDispatcherImpl.class.getResourceAsStream("release.properties");
-				if(in != null) {
-					releaseProperties.load(in);
-					in.close();
-					String releaseVersion = releaseProperties.getProperty("release.version");
-					String releaseName = releaseProperties.getProperty("release.name");
-					String releaseDate = releaseProperties.getProperty("release.date");
-					String releaseRevision = releaseProperties.getProperty("release.revision");
-					if(releaseVersion != null) {
-						// Follow the EAP Convention 
-						// Release ID: JBoss [EAP] 5.0.1 (build: SVNTag=JBPAPP_5_0_1 date=201003301050)
-						logger.info("Release ID: (" + releaseName + ") Sip Servlets " + releaseVersion + " (build: SVNTag=" + releaseRevision + " date=" + releaseDate + ")");
-						logger.info(releaseName + " Sip Servlets " + releaseVersion + " (build: revision=" + releaseRevision + " date=" + releaseDate + ") Started.");
-					} else {
-						logger.warn("Unable to extract the version of Mobicents Sip Servlets currently running");
-					}
-				} else {
-					logger.warn("Unable to extract the version of Mobicents Sip Servlets currently running");
-				}
-			} catch (IOException e) {
-				logger.warn("Unable to extract the version of Mobicents Sip Servlets currently running", e);
-			}		
-		}
+		Version.printVersion();
 		// outbound interfaces set here and not in sipstandardcontext because
 		// depending on jboss or tomcat context can be started before or after
 		// connectors
@@ -2134,5 +2109,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				logger.info("SIP stack stopped");
 			}
 		}
+	}
+
+	public String getVersion() {
+		return Version.getVersion();
 	}
 }

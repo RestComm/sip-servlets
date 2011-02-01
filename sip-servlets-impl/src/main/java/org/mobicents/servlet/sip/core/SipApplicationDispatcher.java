@@ -209,4 +209,6 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 
 	void setDNSServerLocator(DNSServerLocator dnsServerLocator);
 	DNSServerLocator getDNSServerLocator();
+	
+	String getVersion();
 }

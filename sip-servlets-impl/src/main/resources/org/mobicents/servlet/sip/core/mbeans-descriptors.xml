@@ -90,6 +90,11 @@
 			description="Percentage of memory to be used by the container before applying the congestion control policy."
 			type="int"
 			writeable="false" />
+			
+		<attribute name="version"
+			description="Full release version string"
+			type="java.lang.String"
+			writeable="false" />
 
 		<operation name="findInstalledSipApplications"
 			description="Enumerate applications"
@@ -107,6 +112,19 @@
 			<parameter name="configuration"
 				description="the configuration (AR specific)"
 				type="java.lang.Object" />
+		</operation>
+		
+		<operation name="retrieveApplicationRouterConfigurationString"
+			description="get router configuration remotely ith serialization of string"
+			impact="ACTION" returnType="java.io.Serializable">
+		</operation>
+		
+		<operation name="updateApplicationRouterConfiguration"
+			description="set router configuration remotely"
+			impact="ACTION" returnType="void">
+			<parameter name="serializable configuration"
+				description="the configuration (AR specific)"
+				type="java.io.Serializable" />
 		</operation>
 		
 		<operation name="setConcurrencyControlModeByName"
