@@ -45,7 +45,6 @@ import javax.servlet.sip.URI;
 import javax.sip.ListeningPoint;
 
 import org.apache.log4j.Logger;
-import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.javax.servlet.sip.SipSessionExt;
 import org.mobicents.javax.servlet.sip.dns.DNSResolver;
 

@@ -73,9 +73,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.dnsjava</groupId>
+			<groupId>dnsjava</groupId>
 			<artifactId>dnsjava</artifactId>
-			<version>2.0.6</version>
+			<version>2.1.0</version>
 			<scope>provided</scope>
 		</dependency>
 		
