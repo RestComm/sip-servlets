@@ -237,7 +237,10 @@ public class ResponseDispatcher extends MessageDispatcher {
 			final DispatchTask dispatchTask = new DispatchTask(sipServletResponse, sipProvider) {
 
 				public void dispatch() throws DispatcherException {
-					sipContext.enterSipAppHa(true);
+					final int status = sipServletResponse.getStatus();
+					if(status != Response.TRYING) {
+						sipContext.enterSipAppHa(true);
+					}
 					try {
 						try {														
 							// we store the request only if the dialog is null and the method is not a dialog creating one
@@ -249,7 +252,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 							if(originalRequest != null) {				
 								originalRequest.setResponse(sipServletResponse);					
 							}
-							final int status = sipServletResponse.getStatus();
+							
 							// RFC 3265 : If a 200-class response matches such a SUBSCRIBE or REFER request,
 							// it creates a new subscription and a new dialog.
 							// Issue 1481 http://code.google.com/p/mobicents/issues/detail?id=1481
@@ -377,7 +380,9 @@ public class ResponseDispatcher extends MessageDispatcher {
 						// We should never call exitAipApp before exitSipAppHa, because exitSipApp releases the lock on the
 						// Application of SipSession (concurrency control lock). If this happens a new request might arrive
 						// and modify the state during Serialization or other non-thread safe operation in the serialization
-						sipContext.exitSipAppHa(null, sipServletResponse);
+						if(status != Response.TRYING) {
+							sipContext.exitSipAppHa(null, sipServletResponse);
+						}
 						sipContext.exitSipApp(session.getSipApplicationSession(), session);						
 					}
 				}
