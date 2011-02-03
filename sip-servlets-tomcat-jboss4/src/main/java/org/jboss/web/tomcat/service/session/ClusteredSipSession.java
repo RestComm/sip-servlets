@@ -1070,6 +1070,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			version = in.readInt();
 			
 			transport = in.readUTF();
+			if(transport.equals("")) transport = null;
 
 			// Get our id without any jvmRoute appended
 //			parseRealId(id);
@@ -1134,7 +1135,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 			// From ClusteredSession			
 			out.writeInt(version);
 			
-			out.writeUTF(transport);
+			out.writeUTF(transport==null?"":transport);
 
 			// TODO uncomment when work on JBAS-1900 is completed
 			// // Session notes -- for FORM auth apps, allow replicated session
