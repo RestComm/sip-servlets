@@ -678,8 +678,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 
 	private void cancelExpirationTimer() {
-		sipContext.getSipApplicationSessionTimerService().cancel(expirationTimerTask);
 		if(expirationTimerTask != null) {
+			// http://code.google.com/p/mobicents/issues/detail?id=2322 : NullPointerException in StandardSipApplicationSessionTimerService
+			// moving it within the check 
+			sipContext.getSipApplicationSessionTimerService().cancel(expirationTimerTask);
 			expirationTimerTask.setSipApplicationSession(null);
 			expirationTimerTask = null;
 		}
