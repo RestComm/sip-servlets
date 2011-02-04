@@ -16,6 +16,7 @@
  */
 package org.mobicents.servlet.sip.address;
 
+import gov.nist.javax.sip.address.AddressFactoryImpl;
 import gov.nist.javax.sip.header.ParametersExt;
 
 import java.text.ParseException;
@@ -25,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.Address;
+import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.URI;
 import javax.sip.address.SipURI;
 import javax.sip.header.ContactHeader;
@@ -157,12 +159,17 @@ public class AddressImpl extends ParameterableImpl implements Address {
 	 * @see javax.servlet.sip.Address#getURI()
 	 */
 	public URI getURI() {
-		if (getAddress().getURI() instanceof javax.sip.address.SipURI)
-			return new SipURIImpl((javax.sip.address.SipURI) getAddress().getURI());
-		else if (getAddress().getURI() instanceof javax.sip.address.TelURL)
-			return new TelURLImpl((javax.sip.address.TelURL) getAddress().getURI());
-		else if (getAddress().getURI() instanceof javax.sip.address.URI)
-			return new GenericURIImpl((javax.sip.address.URI) getAddress().getURI());
+		final javax.sip.address.URI localUri = getAddress().getURI();
+		if (localUri instanceof javax.sip.address.SipURI)
+			return new SipURIImpl((javax.sip.address.SipURI) localUri);
+		else if (localUri instanceof javax.sip.address.TelURL)
+			return new TelURLImpl((javax.sip.address.TelURL) localUri);
+		else if (localUri instanceof javax.sip.address.URI) {			
+			URI uri = new GenericURIImpl((javax.sip.address.URI) localUri);
+			// setting the value to make sure jain sip runs scheme validation on it
+			((Parameterable)uri).setValue(localUri.toString());
+			return uri;
+		}
 		else		
 			throw new IllegalArgumentException("unsupported operation - unknown scheme");
 	}
