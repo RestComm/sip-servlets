@@ -551,8 +551,15 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		//that the state of the SipApplicationSession object will be unchanged from its state prior to the invalidate() 
 		//method call. Even session objects that were eligible for invalidation will not have been invalidated.
 		boolean wasValid = isValidInternal.compareAndSet(true, false);
-		if(!bypassCheck && !wasValid) {
-			throw new IllegalStateException("SipApplicationSession already invalidated !");
+		if(!wasValid) {
+			if(!bypassCheck) {
+				throw new IllegalStateException("SipApplicationSession already invalidated !");
+			} else {
+				if(logger.isInfoEnabled()) {
+					logger.info("sip application session " + key + " already invalidated, doing nothing");
+					return;
+				}
+			}
 		}
 		if(logger.isInfoEnabled()) {
 			logger.info("Invalidating the following sip application session " + key);
@@ -679,9 +686,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 
 	private void cancelExpirationTimer() {
 		if(expirationTimerTask != null) {
-			// http://code.google.com/p/mobicents/issues/detail?id=2322 : NullPointerException in StandardSipApplicationSessionTimerService
-			// moving it within the check 
+			// http://code.google.com/p/mobicents/issues/detail?id=2322 : Race condition can occur so making sure the expiration timer task is not null
 			sipContext.getSipApplicationSessionTimerService().cancel(expirationTimerTask);
+		}
+		if(expirationTimerTask != null) {
+			// http://code.google.com/p/mobicents/issues/detail?id=2322 : expiration Timer task can be null after calling cancel above due to Race condition 
 			expirationTimerTask.setSipApplicationSession(null);
 			expirationTimerTask = null;
 		}
