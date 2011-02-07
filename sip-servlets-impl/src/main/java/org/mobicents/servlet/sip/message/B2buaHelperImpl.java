@@ -701,11 +701,13 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	 * @param checkSession
 	 */
 	public void unlinkOriginalRequestInternal(SipServletRequestImpl sipServletRequestImpl) {
-		SipServletRequestImpl linkedRequest = this.originalRequestMap.remove(sipServletRequestImpl);		
-		if(linkedRequest != null) {
-			this.originalRequestMap.remove(linkedRequest);
-			if(logger.isDebugEnabled()) {
-				logger.debug("following linked request " + linkedRequest + " unlinked from " + sipServletRequestImpl);
+		if(sipServletRequestImpl != null) {
+			SipServletRequestImpl linkedRequest = this.originalRequestMap.remove(sipServletRequestImpl);		
+			if(linkedRequest != null) {
+				this.originalRequestMap.remove(linkedRequest);
+				if(logger.isDebugEnabled()) {
+					logger.debug("following linked request " + linkedRequest + " unlinked from " + sipServletRequestImpl);
+				}
 			}
 		}
 		// Makes TCK B2buaHelperTest.testLinkUnlinkSipSessions001 && B2buaHelperTest.testB2buaHelper 
