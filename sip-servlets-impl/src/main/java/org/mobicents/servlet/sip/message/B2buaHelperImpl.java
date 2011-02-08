@@ -688,9 +688,15 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	 */
 	public void unlinkOriginalRequestInternal(SipSessionKey sipSessionKey) {
 		for (Entry<SipServletRequestImpl, SipServletRequestImpl> linkedRequests : originalRequestMap.entrySet()) {
-			if(linkedRequests.getKey().getSipSessionKey().equals(sipSessionKey) || linkedRequests.getValue().getSipSessionKey().equals(sipSessionKey)) {
-				unlinkOriginalRequestInternal(linkedRequests.getKey());
-				unlinkOriginalRequestInternal(linkedRequests.getValue());
+			SipServletRequestImpl request1 = linkedRequests.getKey();
+			SipServletRequestImpl request2 = linkedRequests.getValue();
+			if(request1 != null && request2 != null) {
+				SipSessionKey key1 = request1.getSipSessionKey();
+				SipSessionKey key2 = request2.getSipSessionKey();
+				if((key1!=null&&key1.equals(sipSessionKey)) || (key2!=null&&key2.equals(sipSessionKey))) {
+					unlinkOriginalRequestInternal(linkedRequests.getKey());
+					unlinkOriginalRequestInternal(linkedRequests.getValue());
+				}
 			}
 		}				
 	}
