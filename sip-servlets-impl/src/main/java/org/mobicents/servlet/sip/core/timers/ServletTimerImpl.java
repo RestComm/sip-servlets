@@ -20,7 +20,6 @@ import java.io.Serializable;
 import java.util.UUID;
 import java.util.concurrent.ScheduledFuture;
 
-import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.TimerListener;
 
 import org.apache.log4j.Logger;
@@ -29,7 +28,7 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.startup.SipContext;
 
-public class ServletTimerImpl implements ServletTimer, Runnable {
+public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 	private static final Logger logger = Logger.getLogger(ServletTimerImpl.class);
 	
 	private SipApplicationSessionKey appSessionKey;
@@ -160,7 +159,7 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 	}
 
 	public void cancel() {
-		cancel(false);
+		cancel(false, true);
 	}
 
 	/**
@@ -169,9 +168,11 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 	 * thread pool) running the task. Note that interupting the thread may have
 	 * undesired consequences.
 	 * 
-	 * @param mayInterruptIfRunning
+	 * @param mayInterruptIfRunning 
+	 * @param updateAppSessionReadyToInvalidateState boolean to update or not the readyToInvalidateState upon removing a servlet Timer,
+	 * this is useful when we process a remoteInvalidation to make sure we don't load and update the sip session from the cache
 	 */
-	public void cancel(boolean mayInterruptIfRunning) {
+	public void cancel(boolean mayInterruptIfRunning, boolean updateAppSessionReadyToInvalidateState) {
 		MobicentsSipApplicationSession appSessionToCancelThisTimersFrom = null;
 		synchronized (TIMER_LOCK) {
 			if (future != null) {
@@ -186,8 +187,8 @@ public class ServletTimerImpl implements ServletTimer, Runnable {
 				future = null;
 			}
 		}
-		if (appSessionToCancelThisTimersFrom != null) {
-			appSessionToCancelThisTimersFrom.removeServletTimer(this);			
+		if (appSessionToCancelThisTimersFrom != null && updateAppSessionReadyToInvalidateState) {
+			appSessionToCancelThisTimersFrom.removeServletTimer(this, updateAppSessionReadyToInvalidateState);			
 		}
 	}
 

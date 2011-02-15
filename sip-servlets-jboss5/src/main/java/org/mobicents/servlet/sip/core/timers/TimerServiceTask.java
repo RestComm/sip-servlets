@@ -24,7 +24,6 @@ package org.mobicents.servlet.sip.core.timers;
 import java.io.Serializable;
 import java.util.concurrent.ScheduledFuture;
 
-import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 
 import org.apache.log4j.Logger;
@@ -40,7 +39,7 @@ import org.mobicents.timers.TimerTask;
  * @author jean.deruelle@gmail.com
  *
  */
-public class TimerServiceTask extends TimerTask implements ServletTimer {
+public class TimerServiceTask extends TimerTask implements MobicentsServletTimer {
 	private static Logger logger = Logger.getLogger(TimerServiceTask.class);
 	ServletTimerImpl servletTimer;	
 	TimerServiceTaskData data;
@@ -86,6 +85,10 @@ public class TimerServiceTask extends TimerTask implements ServletTimer {
 
 	public void cancel() {
 		servletTimer.cancel();
+	}
+	
+	public void cancel(boolean mayInterruptIfRunning, boolean updateAppSessionReadyToInvalidateState) {
+		servletTimer.cancel(mayInterruptIfRunning, updateAppSessionReadyToInvalidateState);
 	}
 
 	public SipApplicationSession getApplicationSession() {				

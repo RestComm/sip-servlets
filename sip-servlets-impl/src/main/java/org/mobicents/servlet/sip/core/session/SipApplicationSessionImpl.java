@@ -51,6 +51,7 @@ import org.apache.catalina.security.SecurityUtil;
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.SipApplicationSessionAsynchronousWork;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.core.timers.MobicentsServletTimer;
 import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
 import org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade;
 import org.mobicents.servlet.sip.startup.SipContext;
@@ -530,11 +531,13 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 * Remove a servlet timer from this application session
 	 * @param servletTimer the servlet timer to remove
 	 */
-	public void removeServletTimer(ServletTimer servletTimer){
+	public void removeServletTimer(ServletTimer servletTimer, boolean updateAppSessionReadyToInvalidateState){
 		if(servletTimers != null) {
 			servletTimers.remove(servletTimer.getId());
 		}
-		updateReadyToInvalidateState();
+		if(updateAppSessionReadyToInvalidateState) {
+			updateReadyToInvalidateState();
+		}
 	}
 	
 	/*
@@ -679,7 +682,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		cancelExpirationTimer();
 		if(this.servletTimers != null) {
 			for(ServletTimer timer:this.servletTimers.values()) {
-				timer.cancel();
+				((MobicentsServletTimer)timer).cancel(false, false);
 			}
 		}
 	}

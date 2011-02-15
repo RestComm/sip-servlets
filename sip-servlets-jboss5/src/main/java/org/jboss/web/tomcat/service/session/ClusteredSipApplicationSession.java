@@ -1432,8 +1432,8 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	}
 	
 	@Override
-	public void removeServletTimer(ServletTimer servletTimer) {
-		super.removeServletTimer(servletTimer);
+	public void removeServletTimer(ServletTimer servletTimer, boolean updateAppSessionReadyToInvalidateState) {
+		super.removeServletTimer(servletTimer, updateAppSessionReadyToInvalidateState);
 		metadata.setServletTimersMapModified(true);
 	}
 	

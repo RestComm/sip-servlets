@@ -138,8 +138,8 @@ public class MobicentsSipApplicationSessionFacade implements
 		return this.sipApplicationSession.removeHttpSession(httpSession);
 	}
 
-	public void removeServletTimer(ServletTimer servletTimer) {
-		this.sipApplicationSession.removeServletTimer(servletTimer);
+	public void removeServletTimer(ServletTimer servletTimer, boolean updateAppSessionReadyToInvalidateState) {
+		this.sipApplicationSession.removeServletTimer(servletTimer, updateAppSessionReadyToInvalidateState);
 	}
 
 	public void setCurrentRequestHandler(String currentRequestHandler) {
