@@ -92,7 +92,24 @@
   </formalpara>
   <itemizedlist>
     <listitem>
-      <para>All SIP messages which cannot be processed immediately are put
+      <para>Congestion control is largely application-specific and it is implemented in a pipeline. 
+      First messages arrive in the JAIN SIP message queue where they will wait on the locks needed 
+      before they can be processed. To avoid keeping too many messages in the queue and potentially
+       running out of memory, older messages are discarded without any error indication. This prevents
+        spam and flood DoS attacks to accumulate large backlog and render the server unresponsive. It also
+         guranatees flood recovery time of 20 seconds or less, in the mean time retransmissions are
+          already queuing so that normal SIP calls can continue without dropping them. After the request has passed the first 
+          queue it enters the SIP transaction layer where there is a customizable optional congestion control logic.
+          There is one packaged congestion control algorithm which can be enabled by setting the following property
+           <literal>gov.nist.javax.sip.SIP_MESSAGE_VALVE=gov.nist.javax.sip.stack.CongestionControlMessageValve</literal>.
+           For this algorithm you can set the limit value by the following property
+          <literal>gov.nist.javax.sip.MAX_SERVER_TRANSACTIONS=2000</literal>. 
+          You can also implement your own algorithm and change the class name in <literal>gov.nist.javax.sip.SIP_MESSAGE_VALVE</literal> to activate it.</para><para>
+          
+          There is also another optional legacy congestion
+           control stage with another queue where messages can be discarded based on dynamic parameters
+            such as available JVM heap memory or number of messages in the queue. This method will be deprecated and is not recommended. All SIP messages which
+             cannot be processed immediately are put
       into a queue, and  wait for either a free thread or for the lock
       on their session to be released. The  size of the  SIP message
       queue is a tunable parameter, which defaults to
