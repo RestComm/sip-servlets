@@ -1088,8 +1088,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 									// Guard only invite tx should check that, otherwise proxy might become null http://code.google.com/p/mobicents/issues/detail?id=2350
 									if(Request.INVITE.equals(sipServletMessage.getMethod())) {
 										checkForAckNotReceived(sipServletMessage);
+										appNotifiedOfPrackNotReceived = checkForPrackNotReceived(sipServletMessage);
 									}
-									appNotifiedOfPrackNotReceived = checkForPrackNotReceived(sipServletMessage);
 								} finally {
 									sipSession.removeOngoingTransaction(transaction);
 									sipSession.setRequestsPending(0);
