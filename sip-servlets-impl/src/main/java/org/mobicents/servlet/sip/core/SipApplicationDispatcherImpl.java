@@ -1085,7 +1085,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 											logger.error("Failed to deliver 408 response on transaction timeout" + transaction, t);
 										}
 									}
-									checkForAckNotReceived(sipServletMessage);
+									// Guard only invite tx should check that, otherwise proxy might become null http://code.google.com/p/mobicents/issues/detail?id=2350
+									if(Request.INVITE.equals(sipServletMessage.getMethod())) {
+										checkForAckNotReceived(sipServletMessage);
+									}
 									appNotifiedOfPrackNotReceived = checkForPrackNotReceived(sipServletMessage);
 								} finally {
 									sipSession.removeOngoingTransaction(transaction);
