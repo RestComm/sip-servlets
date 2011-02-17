@@ -33,6 +33,8 @@ import gov.nist.javax.sip.header.ims.ServiceRouteHeader;
 import gov.nist.javax.sip.message.SIPMessage;
 import gov.nist.javax.sip.stack.SIPClientTransaction;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -108,6 +110,7 @@ import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl.NamesComparator;
+import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
  * 
@@ -545,7 +548,46 @@ public final class JainSipUtils {
 		}
 		boolean usePublicAddress = findUsePublicAddress(
 				sipNetworkInterfaceManager, request, listeningPoint);
-		return listeningPoint.createContactHeader(displayName, userName, usePublicAddress);
+		ContactHeader ch = listeningPoint.createContactHeader(displayName, userName, usePublicAddress);
+		if(StaticServiceHolder.sipStandardService.isMd5ContactUserPart()) {
+			CallIdHeader callId = (CallIdHeader)request.getHeader(CallIdHeader.NAME);
+			String username = getHash(callId.getCallId().getBytes());
+			SipURI uri = (SipURI)ch.getAddress().getURI();
+			try {
+				uri.setUser(username);
+				ch.getAddress().setDisplayName(null);
+			} catch (ParseException e) {
+				throw new IllegalStateException("Can't create contact header user part with MD5", e);
+			}
+		}
+		
+		return ch;
+	}
+	
+	private static ThreadLocal<MessageDigest> localDigest = new ThreadLocal<MessageDigest>();
+	private static String getHash(byte[] b) {
+		MessageDigest md = localDigest.get();
+		if(md == null) {
+			try {
+				md = MessageDigest.getInstance("MD5");
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			localDigest.set(md);
+		}
+		md.reset();
+		md.update(b);
+		
+	    byte[] hash = md.digest();
+	    StringBuilder sb = new StringBuilder();
+	    for(int i=0; i<hash.length; i++) {
+	      sb.append(Integer.toHexString( (hash[i]>> 4) & 0x0F ) );
+	      sb.append(Integer.toHexString( hash[i] & 0x0F ) );
+	    }
+	    String rv = sb.toString();
+	    System.out.println("length:" + rv.length());
+	    return rv;
 	}
 
 	/**

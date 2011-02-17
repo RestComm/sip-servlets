@@ -82,6 +82,7 @@ public class SipStandardService extends StandardService implements SipService {
 	public static final String PASS_INVITE_NON_2XX_ACK_TO_LISTENER = "gov.nist.javax.sip.PASS_INVITE_NON_2XX_ACK_TO_LISTENER";
 	public static final String TCP_POST_PARSING_THREAD_POOL_SIZE = "gov.nist.javax.sip.TCP_POST_PARSING_THREAD_POOL_SIZE";
 	public static final String AUTOMATIC_DIALOG_SUPPORT_STACK_PROP = "javax.sip.AUTOMATIC_DIALOG_SUPPORT";
+	
 	public static final String LOOSE_DIALOG_VALIDATION = "gov.nist.javax.sip.LOOSE_DIALOG_VALIDATION";
 	public static final String SERVER_LOG_STACK_PROP = "gov.nist.javax.sip.SERVER_LOG";
 	public static final String DEBUG_LOG_STACK_PROP = "gov.nist.javax.sip.DEBUG_LOG";	
@@ -110,6 +111,7 @@ public class SipStandardService extends StandardService implements SipService {
 	private int t4Interval = 5000;
 	private int timerDInterval = 32000;
 	protected int dispatcherThreadPoolSize = 4;
+	private boolean md5ContactUserPart = false;
 	
 	protected String concurrencyControlMode = ConcurrencyControlMode.None.toString();
 	protected String congestionControlPolicy = CongestionControlPolicy.ErrorResponse.toString();
@@ -808,6 +810,16 @@ public class SipStandardService extends StandardService implements SipService {
 	public void setBypassRequestExecutor(boolean bypassRequestExecutor) {
 		this.bypassRequestExecutor = bypassRequestExecutor;
 	}
+
+	public boolean isMd5ContactUserPart() {
+		return md5ContactUserPart;
+	}
+
+
+	public void setMd5ContactUserPart(boolean md5ContactUserPart) {
+		this.md5ContactUserPart = md5ContactUserPart;
+	}
+
 
 	/**
 	 * @param usePrettyEncoding the usePrettyEncoding to set
