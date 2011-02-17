@@ -72,6 +72,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		forwardingUris = new HashMap<String, String[]>();
 		forwardingUris.put("sip:forward-sender@sip-servlets.com", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+		forwardingUris.put("sip:forward-sender-factory-same-callID@sip-servlets.com", 
+				new String[]{"sip:forward-receiver-factory-same-callID@sip-servlets.com", "sip:forward-receiver-factory-same-callID@127.0.0.1:5090"});
 		forwardingUris.put("sip:forward-sender-408@sip-servlets.com", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
 		forwardingUris.put("sip:forward-sender-408-new-thread@sip-servlets.com", 
@@ -223,7 +225,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			
 			
 			if(forwardingUri != null && forwardingUri.length > 0) {
-				if(((SipURI)request.getTo().getURI()).getUser().contains("factory")) {
+				if(((SipURI)request.getFrom().getURI()).getUser().contains("factory")) {
 					forwardInviteUsingSipFactory(request, forwardingUri);
 				} else {
 					forwardInviteUsingB2BUAHelper(request, forwardingUri);
@@ -307,11 +309,23 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
         URI from = origReq.getTo().getURI();
         URI to= sipFactory.createURI(forwardingUri[1]);
         SipApplicationSession appSession = origReq.getApplicationSession();
-        SipServletRequest newRequest = sipFactory.createRequest(appSession, "INVITE", from, to);
-        newRequest.setContent(origReq.getContent(), origReq.getContentType());
+        SipServletRequest newRequest = null;
+        if(((SipURI)origReq.getFrom().getURI()).getUser().contains("same-callID")) {
+        	newRequest = sipFactory.createRequest(origReq, true);   
+        	newRequest.setRequestURI(to);
+        } else {
+        	newRequest = sipFactory.createRequest(appSession, "INVITE", from, to);
+        }
+        if(origReq.getContent() != null) {
+        	newRequest.setContent(origReq.getContent(), origReq.getContentType());
+        }
         newRequest.setHeader("Allow", "INVITE, ACK, CANCEL, BYE, REFER, UPDATE, INFO");
         b2buaHelper.linkSipSessions(origReq.getSession(), newRequest.getSession()); //Linking sessions!
         origReq.getSession().setAttribute("originalRequest", origReq);
+        logger.info("forkedRequest = " + newRequest);
+        newRequest.getSession().setAttribute("originalRequest", origReq);
+        newRequest.getB2buaHelper().linkSipSessions(origReq.getSession(), newRequest.getSession()); //Linking sessions!
+		
         newRequest.send();        
 	}
 

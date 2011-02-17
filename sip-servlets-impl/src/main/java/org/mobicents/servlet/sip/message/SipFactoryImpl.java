@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.message;
 
+import gov.nist.javax.sip.message.MessageExt;
+
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -38,6 +40,7 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
+import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.sip.ListeningPoint;
 import javax.sip.SipException;
 import javax.sip.header.CSeqHeader;
@@ -48,8 +51,10 @@ import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
+import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
@@ -314,10 +319,84 @@ public class SipFactoryImpl implements Externalizable {
 			logger.debug("Creating SipServletRequest from original request["
 					+ origRequest + "] with same call id[" + sameCallId + "]");
 		}
-
-	    return origRequest.getB2buaHelper().createRequest(origRequest);
+	    
+		final SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
+		final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
+		final MobicentsSipApplicationSession originalAppSession = originalSession
+				.getSipApplicationSession();				
+		
+		
+		final Request newRequest = (Request) origRequestImpl.message.clone();
+		((MessageExt)newRequest).setApplicationData(null);
+		//removing the via header from original request
+		newRequest.removeHeader(ViaHeader.NAME);	
+		
+		final FromHeader newFromHeader = (FromHeader) newRequest.getHeader(FromHeader.NAME); 
+		
+		//assign a new from tag
+		newFromHeader.removeParameter("tag");
+		//remove the to tag
+		((ToHeader) newRequest.getHeader(ToHeader.NAME))
+				.removeParameter("tag");
+		// Remove the route header ( will point to us ).
+		// commented as per issue 649
+//		newRequest.removeHeader(RouteHeader.NAME);
+		
+		// Remove the record route headers. This is a new call leg.
+		newRequest.removeHeader(RecordRouteHeader.NAME);
+		
+		//For non-REGISTER requests, the Contact header field is not copied 
+		//but is populated by the container as usual
+		if(!Request.REGISTER.equalsIgnoreCase(origRequest.getMethod())) {
+			newRequest.removeHeader(ContactHeader.NAME);
+		}		
+		try {
+			if(!sameCallId) {
+				//Creating new call id
+				final Iterator<ExtendedListeningPoint> listeningPointsIterator = getSipNetworkInterfaceManager().getExtendedListeningPoints();				
+				if(!listeningPointsIterator.hasNext()) {				
+					throw new IllegalStateException("There is no SIP connectors available to create the request");
+				}
+				final ExtendedListeningPoint extendedListeningPoint = listeningPointsIterator.next();
+				final CallIdHeader callIdHeader = SipFactories.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
+				newRequest.setHeader(callIdHeader);
+				if(logger.isDebugEnabled()) {
+					logger.debug("not reusing same call id, new call id is " + callIdHeader);
+				}
+			} else {
+				if(logger.isDebugEnabled()) {
+					logger.debug("reusing same call id = " + origRequestImpl.getCallId());
+				}
+			}
+									
+			newFromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(getSipApplicationDispatcher(), originalSession.getKey().getApplicationName(), originalAppSession.getKey().getId()));
+			
+			final SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalAppSession.getKey().getId(), originalSession.getKey().getApplicationName(), newRequest, false);
+			final MobicentsSipSession session = ((SipManager)originalAppSession.getSipContext().getManager()).getSipSession(key, true, this, originalAppSession);			
+			session.setHandler(originalSession.getHandler());
+			
+			final SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
+					newRequest,
+					this,					
+					session, 
+					null, 
+					null, 
+					JainSipUtils.DIALOG_CREATING_METHODS.contains(newRequest.getMethod()));			
+			//JSR 289 Section 15.1.6
+			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);
+			
+			if(logger.isDebugEnabled()) {
+				logger.debug("newSipServletRequest = " + newSipServletRequest);
+			}	
+			
+			return newSipServletRequest;
+		} catch (Exception ex) {
+			logger.error("Unexpected exception ", ex);
+			throw new IllegalArgumentException(
+					"Illegal arg ecnountered while creatigng b2bua", ex);
+		}			
 	}
-
+	
 	/*
 	 * (non-Javadoc)
 	 * 

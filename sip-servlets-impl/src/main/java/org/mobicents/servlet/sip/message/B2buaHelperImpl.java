@@ -723,81 +723,28 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 //		}
 	}
 	
-	/**
-	 * {@inheritDoc}
+	/*
+	 * (non-Javadoc)
+	 * @see javax.servlet.sip.B2buaHelper#createRequest(javax.servlet.sip.SipServletRequest)
 	 */
 	public SipServletRequest createRequest(SipServletRequest origRequest) {
-		try {
-			final SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
-			final Request newRequest = (Request) origRequestImpl.message.clone();
-			((MessageExt)newRequest).setApplicationData(null);
-			//removing the via header from original request
-			newRequest.removeHeader(ViaHeader.NAME);	
+		final SipServletRequestImpl newSipServletRequest = (SipServletRequestImpl) sipFactoryImpl.createRequest(origRequest, false);
+		final SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
+		
+		final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
+		final MobicentsSipSession session = newSipServletRequest.getSipSession();
 			
-			final FromHeader newFromHeader = (FromHeader) newRequest.getHeader(FromHeader.NAME); 
-			
-			//assign a new from tag
-			newFromHeader.removeParameter("tag");
-			//remove the to tag
-			((ToHeader) newRequest.getHeader(ToHeader.NAME))
-					.removeParameter("tag");
-			// Remove the route header ( will point to us ).
-			// commented as per issue 649
-//			newRequest.removeHeader(RouteHeader.NAME);
-			
-			// Remove the record route headers. This is a new call leg.
-			newRequest.removeHeader(RecordRouteHeader.NAME);
-			
-			//For non-REGISTER requests, the Contact header field is not copied 
-			//but is populated by the container as usual
-			if(!Request.REGISTER.equalsIgnoreCase(origRequest.getMethod())) {
-				newRequest.removeHeader(ContactHeader.NAME);
-			}
-			//Creating new call id
-			final Iterator<ExtendedListeningPoint> listeningPointsIterator = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints();				
-			if(!listeningPointsIterator.hasNext()) {				
-				throw new IllegalStateException("There is no SIP connectors available to create the request");
-			}
-			final ExtendedListeningPoint extendedListeningPoint = listeningPointsIterator.next();
-			final CallIdHeader callIdHeader = SipFactories.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
-			newRequest.setHeader(callIdHeader);
-			
-			final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
-			final MobicentsSipApplicationSession originalAppSession = originalSession
-					.getSipApplicationSession();				
-						
-			newFromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(), originalSession.getKey().getApplicationName(), originalAppSession.getKey().getId()));
-			
-			final SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalAppSession.getKey().getId(), originalSession.getKey().getApplicationName(), newRequest, false);
-			final MobicentsSipSession session = ((SipManager)originalAppSession.getSipContext().getManager()).getSipSession(key, true, sipFactoryImpl, originalAppSession);			
-			session.setHandler(originalSession.getHandler());
-			
-			final SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
-					newRequest,
-					sipFactoryImpl,					
-					session, 
-					null, 
-					null, 
-					JainSipUtils.DIALOG_CREATING_METHODS.contains(newRequest.getMethod()));			
-			//JSR 289 Section 15.1.6
-			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);			
-			
-			sessionMap.put(originalSession.getKey(), session.getKey());
-			sessionMap.put(session.getKey(), originalSession.getKey());	
-			dumpLinkedSessions();
+		sessionMap.put(originalSession.getKey(), session.getKey());
+		sessionMap.put(session.getKey(), originalSession.getKey());	
+		dumpLinkedSessions();
 
-			originalRequestMap.put(newSipServletRequest, origRequestImpl);
-			originalRequestMap.put(origRequestImpl, newSipServletRequest);
-			
-			session.setB2buaHelper(this);
-			originalSession.setB2buaHelper(this);
-			
-			return newSipServletRequest;
-		} catch (Exception ex) {
-			logger.error("Unexpected exception ", ex);
-			throw new IllegalArgumentException(
-					"Illegal arg ecnountered while creatigng b2bua", ex);
-		}
+		originalRequestMap.put(newSipServletRequest, origRequestImpl);
+		originalRequestMap.put(origRequestImpl, newSipServletRequest);
+		
+		session.setB2buaHelper(this);
+		originalSession.setB2buaHelper(this);
+		
+		return newSipServletRequest;		
 	}
 
 	/**
