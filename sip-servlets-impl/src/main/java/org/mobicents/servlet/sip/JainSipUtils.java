@@ -586,7 +586,6 @@ public final class JainSipUtils {
 	      sb.append(Integer.toHexString( hash[i] & 0x0F ) );
 	    }
 	    String rv = sb.toString();
-	    System.out.println("length:" + rv.length());
 	    return rv;
 	}
 
