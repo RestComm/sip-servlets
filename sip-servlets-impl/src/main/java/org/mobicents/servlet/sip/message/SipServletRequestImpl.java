@@ -1305,7 +1305,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		final Transaction linkedTransaction = linkedRequest.getTransaction();
 		final Dialog linkedDialog = linkedRequest.getDialog();
 		//keeping the client transaction in the server transaction's application data
-		((TransactionApplicationData)linkedTransaction.getApplicationData()).setTransaction(ctx);
+		if(linkedTransaction != null && linkedTransaction.getApplicationData() != null) {
+			((TransactionApplicationData)linkedTransaction.getApplicationData()).setTransaction(ctx);
+		}
 		if(linkedDialog != null && linkedDialog.getApplicationData() != null) {
 			((TransactionApplicationData)linkedDialog.getApplicationData()).setTransaction(ctx);
 		}
