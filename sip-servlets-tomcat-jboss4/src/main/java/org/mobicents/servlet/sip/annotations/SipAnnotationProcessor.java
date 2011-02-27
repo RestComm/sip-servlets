@@ -48,7 +48,10 @@ public class SipAnnotationProcessor extends DefaultAnnotationProcessor {
 	        }
 	        
 	        // Initialize fields annotations
-	        Field[] fields = instance.getClass().getDeclaredFields();
+	        Class<?> clazz = instance.getClass();
+	        
+	        while (clazz != null) {
+	        Field[] fields = clazz.getDeclaredFields();
 	        for (int i = 0; i < fields.length; i++) {
 	            if (fields[i].isAnnotationPresent(Resource.class)) {
 	                Resource annotation = (Resource) fields[i].getAnnotation(Resource.class);
@@ -74,6 +77,8 @@ public class SipAnnotationProcessor extends DefaultAnnotationProcessor {
 	                    (PersistenceUnit) fields[i].getAnnotation(PersistenceUnit.class);
 	                lookupFieldResource(context, instance, fields[i], annotation.name());
 	            }
+	        }
+	        clazz = clazz.getSuperclass();
 	        }
 	}
 		
