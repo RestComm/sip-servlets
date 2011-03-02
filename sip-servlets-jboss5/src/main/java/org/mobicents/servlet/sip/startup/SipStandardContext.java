@@ -987,6 +987,19 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				}
 			}
 		}
+		if(semaphore.availablePermits()<0) {
+			logger.warn("About to release semaphore but we expected permits = 0. We will adjust to normal " 
+					+ semaphore + " app session=" + sipApplicationSession + " sipSession=" +
+					sipApplicationSession);
+			while(semaphore.availablePermits()<0) {
+				try {
+					semaphore.release();
+				} catch (Exception e) {
+				}
+			}
+		}	
+		
+		semaphore.release();
 	}
 
     public void enterSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession) {		
