@@ -110,7 +110,7 @@ public class SipStandardService extends StandardService implements SipService {
 	private int t2Interval = 4000;
 	private int t4Interval = 5000;
 	private int timerDInterval = 32000;
-	protected int dispatcherThreadPoolSize = 4;
+	protected int dispatcherThreadPoolSize = 15;
 	private boolean md5ContactUserPart = false;
 	
 	protected String concurrencyControlMode = ConcurrencyControlMode.None.toString();
