@@ -992,12 +992,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 								SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());					
 								//the context can be null if the server is being shutdown
 								if(sipContext != null) {
+									MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
 									try {
-										sipContext.enterSipApp(sipSession.getSipApplicationSession(), sipSession);
+										sipContext.enterSipApp(sipApplicationSession, sipSession);
 										checkForAckNotReceived(sipServletMessage);
 										checkForPrackNotReceived(sipServletMessage);
 									} finally {
-										sipContext.exitSipApp(sipSession.getSipApplicationSession(), sipSession);
+										sipContext.exitSipApp(sipApplicationSession, sipSession);
 									}
 									// Issue 1822 http://code.google.com/p/mobicents/issues/detail?id=1822
 									// don't delete the dialog so that the app can send the BYE even after the noAckReceived has been called
@@ -1052,8 +1053,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 							SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());					
 							//the context can be null if the server is being shutdown
 							if(sipContext != null) {
+								MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
 								try {
-									sipContext.enterSipApp(sipSession.getSipApplicationSession(), sipSession);
+									sipContext.enterSipApp(sipApplicationSession, sipSession);
 									// naoki : Fix for Issue 1618 http://code.google.com/p/mobicents/issues/detail?id=1618 on Timeout don't do the 408 processing for Server Transactions
 									if(sipServletMessage instanceof SipServletRequestImpl && !timeoutEvent.isServerTransaction()) {
 										try {
@@ -1093,7 +1095,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 								} finally {
 									sipSession.removeOngoingTransaction(transaction);
 									sipSession.setRequestsPending(0);
-									sipContext.exitSipApp(sipSession.getSipApplicationSession(), sipSession);
+									sipContext.exitSipApp(sipApplicationSession, sipSession);
 								}
 								// don't invalidate here because if the application sends a final response on the noPrack received
 								// the ACK to this final response won't be able to get routed since the sip session would have been invalidated
@@ -1260,8 +1262,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 								SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());					
 								//the context can be null if the server is being shutdown
 								if(sipContext != null) {
+									MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
 									try {
-										sipContext.enterSipApp(sipSession.getSipApplicationSession(), sipSession);
+										sipContext.enterSipApp(sipApplicationSession, sipSession);
 										if(b2buaHelperImpl != null && tad.getSipServletMessage() instanceof SipServletRequestImpl) {
 											b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage());
 										}
@@ -1276,7 +1279,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 											transaction.setApplicationData(null);
 										}
 									} finally {
-										sipContext.exitSipApp(sipSession.getSipApplicationSession(), sipSession);
+										sipContext.exitSipApp(sipApplicationSession, sipSession);
 									}
 								}
 							} else {
