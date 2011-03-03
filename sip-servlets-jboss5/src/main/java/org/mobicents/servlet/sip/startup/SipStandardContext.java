@@ -1068,8 +1068,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				} 
 				break;
 			case SipApplicationSession:
-			Semaphore semaphore = sipApplicationSession.getSemaphore();
-			if(sipApplicationSession != null && semaphore != null) {
+			
+			if(sipApplicationSession != null && sipApplicationSession.getSemaphore() != null) {
+				Semaphore semaphore = sipApplicationSession.getSemaphore();
 					release(semaphore, sipSession, sipApplicationSession);
 					if(logger.isDebugEnabled()) {
 						logger.debug("SipAppSession: Semaphore released for sipApplicationSession=" + sipApplicationSession +
