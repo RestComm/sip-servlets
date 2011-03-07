@@ -1210,16 +1210,20 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				Thread.currentThread().setContextClassLoader(oldClassLoader);
 			}
 		} catch (Exception ex) {			
-			JainSipUtils.terminateTransaction(getTransaction());
-			// cleaning up the request to make sure it can be resent with some modifications in case of exception
-			if(transactionApplicationData.getHops() != null && transactionApplicationData.getHops().size() > 0) {
-				request.removeFirst(RouteHeader.NAME);
-			}
-			request.removeFirst(ViaHeader.NAME);
-			setTransaction(null);
-			message = (Request) request.clone();
-			if(ex.getCause() != null && ex.getCause() instanceof IOException) {				
-				throw (IOException) ex.getCause();
+			// The second condition for SipExcpetion is to cover com.bea.sipservlet.tck.agents.spec.ProxyBranchTest.testCreatingBranchParallel() where they send a request twice, the second
+			// time it does a "Request already sent" jsip exception but the tx is going on and must not be destryed
+			if(getTransaction() instanceof ClientTransaction && !(ex instanceof SipException)) {
+				JainSipUtils.terminateTransaction(getTransaction());
+				// cleaning up the request to make sure it can be resent with some modifications in case of exception
+				if(transactionApplicationData.getHops() != null && transactionApplicationData.getHops().size() > 0) {
+					request.removeFirst(RouteHeader.NAME);
+				}
+				request.removeFirst(ViaHeader.NAME);
+				setTransaction(null);
+				message = (Request) request.clone();
+				if(ex.getCause() != null && ex.getCause() instanceof IOException) {				
+					throw (IOException) ex.getCause();
+				}
 			}
 			throw new IllegalStateException("Error sending request " + request,ex);
 		} 

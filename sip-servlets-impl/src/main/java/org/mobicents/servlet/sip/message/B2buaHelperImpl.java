@@ -709,10 +709,12 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	public void unlinkOriginalRequestInternal(SipServletRequestImpl sipServletRequestImpl) {
 		if(sipServletRequestImpl != null) {
 			SipServletRequestImpl linkedRequest = this.originalRequestMap.remove(sipServletRequestImpl);		
-			if(linkedRequest != null) {
-				this.originalRequestMap.remove(linkedRequest);
-				if(logger.isDebugEnabled()) {
-					logger.debug("following linked request " + linkedRequest + " unlinked from " + sipServletRequestImpl);
+			if(sipServletRequestImpl != null) {
+				if(linkedRequest != null) {
+					this.originalRequestMap.remove(linkedRequest);
+					if(logger.isDebugEnabled()) {
+						logger.debug("following linked request " + linkedRequest + " unlinked from " + sipServletRequestImpl);
+					}
 				}
 			}
 		}

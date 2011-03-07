@@ -300,7 +300,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		if(proxyBranch != null) {
 			return proxyBranch.getProxy();
 		} else {
-			return null;
+			return getSipSession().getProxy();
 		}
 	}
 
