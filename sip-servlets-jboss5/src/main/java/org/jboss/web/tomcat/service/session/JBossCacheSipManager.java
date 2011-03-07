@@ -42,13 +42,17 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSession.State;
+import javax.sip.SipStack;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
+import org.apache.catalina.Engine;
 import org.apache.catalina.Host;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Service;
 import org.apache.catalina.Session;
 import org.apache.catalina.Valve;
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.ContainerBase;
 import org.jboss.logging.Logger;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
@@ -88,6 +92,7 @@ import org.mobicents.servlet.sip.core.session.SipManagerDelegate;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.SipService;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
@@ -3515,8 +3520,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 //				switcher = getContextClassLoaderSwitcher().getSwitchContext();
 //				switcher.setClassLoader(tcl_);
 //				session.invalidate(notify, localCall, localOnly,
-//						ClusteredSessionNotificationCause.INVALIDATE);
-				session.invalidate();
+//						ClusteredSessionNotificationCause.INVALIDATE);				
+				logger.info("SipApplicationSession invalidated by remote node " + session);
 			} finally {
 				ConvergedSessionInvalidationTracker.resume();
 
@@ -3566,6 +3571,31 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			// session will be null, but we'll have a TimeStatistic to clean up
 			stats_.removeStats(key.toString());
 		} else {
+			//remove the dialog from the local stacks 
+			if(session.getSessionCreatingDialog() != null) {
+				final String sessionCreatingDialogId = session.getSessionCreatingDialog().getDialogId();
+				if(sessionCreatingDialogId != null && sessionCreatingDialogId.length() > 0) {
+					Container context = getContainer();
+					Container container = context.getParent().getParent();
+					if(container instanceof Engine) {
+						Service service = ((Engine)container).getService();
+						if(service instanceof SipService) {
+							Connector[] connectors = service.findConnectors();
+							for (Connector connector : connectors) {
+								SipStack sipStack = (SipStack)
+									connector.getProtocolHandler().getAttribute(SipStack.class.getSimpleName());
+								if(sipStack != null) {
+									if (logger.isDebugEnabled()) {
+										logger.debug("deleting local dialog " + sessionCreatingDialogId + " on remote invalidation of the sip session " + key);
+									}
+									((ClusteredSipStack)sipStack).remoteDialogRemoval(sessionCreatingDialogId); 									
+								}
+							}
+						}
+					}
+				}				
+			}
+			
 			// Expire the session
 			// DON'T SYNCHRONIZE ON SESSION HERE -- isValid() and
 			// expire() are meant to be multi-threaded and synchronize
@@ -3592,7 +3622,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 //				switcher.setClassLoader(tcl_);
 //				session.expire(notify, localCall, localOnly,
 //						ClusteredSessionNotificationCause.INVALIDATE);
-				session.invalidate();
+				//session.invalidate();
+				logger.info("SipSession invalidated by remote node (forcing local invalidation without triggering events)" + session);
 			} finally {
 				ConvergedSessionInvalidationTracker.resume();
 
