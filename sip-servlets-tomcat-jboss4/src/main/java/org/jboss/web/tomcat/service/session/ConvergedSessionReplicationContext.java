@@ -357,9 +357,11 @@ public final class ConvergedSessionReplicationContext
 				   "Session " + session + "ctx=" + ctx);
 	   }
 	   if(trulyExpiredSessions.get() != null) {
-		   logger.debug("notnull");
-		   for(Object o:trulyExpiredSessions.get().keySet().toArray()) {
-			   logger.error(o+" ");
+		   if(logger.isDebugEnabled()) {
+			   logger.debug("notnull");
+			   for(Object o:trulyExpiredSessions.get().keySet().toArray()) {
+				   logger.debug(o+" ");
+			   }
 		   }
 		   return trulyExpiredSessions.get().get(session)!=null;
 	   }
