@@ -633,7 +633,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5072, ListeningPoint.TLS);
 		tomcat.startTomcat();
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("tlsRURI", "true");
+		params.put("transportRURI", "tls");
 		params.put("method", "REGISTER");
 		deployApplication(params);
 		tomcat.startTomcat();
