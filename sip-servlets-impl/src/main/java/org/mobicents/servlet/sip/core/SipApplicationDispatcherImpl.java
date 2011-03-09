@@ -24,14 +24,12 @@ import gov.nist.javax.sip.TransactionExt;
 import gov.nist.javax.sip.DialogTimeoutEvent.Reason;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -1056,6 +1054,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 								MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
 								try {
 									sipContext.enterSipApp(sipApplicationSession, sipSession);
+									B2buaHelperImpl b2buaHelperImpl = sipSession.getB2buaHelper();
+
+									if(b2buaHelperImpl != null && tad.getSipServletMessage() instanceof SipServletRequestImpl) {
+										b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
+									}
 									// naoki : Fix for Issue 1618 http://code.google.com/p/mobicents/issues/detail?id=1618 on Timeout don't do the 408 processing for Server Transactions
 									if(sipServletMessage instanceof SipServletRequestImpl && !timeoutEvent.isServerTransaction()) {
 										try {
@@ -1257,17 +1260,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 							boolean removeTx = true;
 							if(b2buaHelperImpl != null && transaction instanceof ClientTransaction && Request.INVITE.equals(sipServletMessageImpl.getMethod())) {
 								removeTx = false;
-							}
-							if(removeTx) {
-								SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());					
-								//the context can be null if the server is being shutdown
-								if(sipContext != null) {
-									MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
-									try {
-										sipContext.enterSipApp(sipApplicationSession, sipSession);
-										if(b2buaHelperImpl != null && tad.getSipServletMessage() instanceof SipServletRequestImpl) {
-											b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage());
-										}
+							}							
+							SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());					
+							//the context can be null if the server is being shutdown
+							if(sipContext != null) {
+								MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
+								try {
+									sipContext.enterSipApp(sipApplicationSession, sipSession);
+									if(b2buaHelperImpl != null && tad.getSipServletMessage() instanceof SipServletRequestImpl) {
+										b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
+									}
+									if(removeTx) {
 										sipSession.removeOngoingTransaction(transaction);
 										tad.cleanUp();
 										// Issue 1468 : to handle forking, we shouldn't cleanup the app data since it is needed for the forked responses
@@ -1278,15 +1281,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 										if(nullifyAppData) {
 											transaction.setApplicationData(null);
 										}
-									} finally {
-										sipContext.exitSipApp(sipApplicationSession, sipSession);
+									} else {
+										if(logger.isDebugEnabled()) {
+											logger.debug("Transaction " + transaction + " not removed from session " + sipSessionKey + " because the B2BUA might still need it to create the ACK");
+										}
 									}
-								}
-							} else {
-								if(logger.isDebugEnabled()) {
-									logger.debug("Transaction " + transaction + " not removed from session " + sipSessionKey + " because the B2BUA might still need it to create the ACK");
+								} finally {
+									sipContext.exitSipApp(sipApplicationSession, sipSession);
 								}
 							}
+							
 							// If it is a client transaction, do not kill the proxy session http://code.google.com/p/mobicents/issues/detail?id=1024
 							tryToInvalidateSession(sipSessionKey, transactionTerminatedEvent.isServerTransaction());				
 

@@ -56,6 +56,7 @@ import javax.sip.header.ContactHeader;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 
 
 public class CallForwardingB2BUASipServlet extends SipServlet implements SipErrorListener, SipApplicationSessionListener, TimerListener {
@@ -141,8 +142,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			}
 		}
 		if(request.getFrom().getURI().toString().contains("pending") || 
-				request.getFrom().getURI().toString().contains("factory") ||
-				request.getApplicationSession().getAttribute(TEST_USE_LINKED_REQUEST) != null) {
+				request.getFrom().getURI().toString().contains("factory")) {
 			B2buaHelper helper = request.getB2buaHelper();
 	        SipSession peerSession = helper.getLinkedSession(request.getSession());
 			List<SipServletMessage> pendingMessages = helper.getPendingMessages(peerSession, UAMode.UAC);
@@ -341,6 +341,10 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		}
 		
 		if(request.getSession().getAttribute(ACT_AS_UAS) == null) {
+			if(getServletContext().getInitParameter("checkOriginalRequestMapSize") != null && ((B2buaHelperImpl)request.getB2buaHelper()).getOriginalRequestMap().size() != 0) {
+				logger.error("originalRequestMap size is wrong " + ((B2buaHelperImpl)request.getB2buaHelper()).getOriginalRequestMap().size());
+				return;
+			}
 			//we forward the BYE
 			SipSession session = request.getSession();		
 			SipSession linkedSession = request.getB2buaHelper().getLinkedSession(session);
@@ -369,7 +373,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 //			SipServletRequest forkedRequest = linkedSession.createRequest("BYE");			
 			logger.info("forkedRequest = " + forkedRequest);			
 			forkedRequest.send();
-		}
+		}		
 		//we send the OK to the first call leg after as sending the response may trigger session invalidation
 		SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
@@ -441,20 +445,36 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	protected void doSuccessResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.toString());
-		
+		String cSeqValue = sipServletResponse.getHeader("CSeq");
 		B2buaHelper b2buaHelper = sipServletResponse.getRequest().getB2buaHelper();
 		
 		SipSession originalSession =   
 		    sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
 		
 		if(sipServletResponse.getApplicationSession().getAttribute(TEST_USE_LINKED_REQUEST) != null) {
+			if(getServletContext().getInitParameter("checkOriginalRequestMapSize") != null && ((B2buaHelperImpl)b2buaHelper).getOriginalRequestMap().size() != 2 && cSeqValue.indexOf("INVITE") != -1) {
+				logger.error("originalRequestMap size is wrong " + ((B2buaHelperImpl)b2buaHelper).getOriginalRequestMap().size());
+				return;
+			}
+			boolean sendAck = true;
+			if((sipServletResponse.getFrom().getURI().toString().contains("pending") || sipServletResponse.getFrom().getURI().toString().contains("factory"))) {
+				sendAck= false;
+				if (logger.isDebugEnabled()) {
+					logger.debug("testing pending messages so not sending ACK");
+				}
+			} 
+			if(sendAck && cSeqValue.indexOf("INVITE") != -1) {
+				// we send the ACK directly only in non PRACK scenario
+				SipServletRequest ackRequest = sipServletResponse.createAck();
+				logger.info("Sending " +  ackRequest);
+				ackRequest.send();
+			}
 			logger.info("using linkedRequest to send the response: ");
 			SipServletRequest otherReq = b2buaHelper.getLinkedSipServletRequest(sipServletResponse.getRequest());
 			SipServletResponse other = otherReq.createResponse(sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
 			other.send();
 		} else {
-		
-			String cSeqValue = sipServletResponse.getHeader("CSeq");
+					
 			if ("PRACK".equals(sipServletResponse.getMethod()) || "UPDATE".equals(sipServletResponse.getMethod())) {            
 	            List<SipServletMessage> pendingMessages = sipServletResponse.getRequest().getB2buaHelper().getPendingMessages(originalSession, UAMode.UAS);
 	            SipServletRequest prackPendingMessage =null; 

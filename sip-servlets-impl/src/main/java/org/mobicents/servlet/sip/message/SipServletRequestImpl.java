@@ -1499,7 +1499,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				final B2buaHelperImpl b2buaHelperImpl = sipSession.getB2buaHelper();
 				if(b2buaHelperImpl != null && tad != null) {
 					// we unlink the originalRequest early to avoid keeping the messages in mem for too long
-					b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage());
+					b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
 				}				
 				session.removeOngoingTransaction(transaction);					
 				if(tad != null) {
