@@ -66,15 +66,15 @@ public class ParallelProxyWithRecordRouteUseHostNameTest extends SipServletTestC
 		this.cutme.init(null);
 		this.shootist.init();
 		for (int q = 0; q < 20; q++) {
-			if (shootist.ended == false && cutme.canceled == false)
+			if (shootme.ended == false && cutme.canceled == false)
 				try {
-					Thread.sleep(5000);
+					Thread.sleep(10000);
 				} catch (InterruptedException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		}
-		if (shootist.ended == false)
+		if (shootme.ended == false)
 			fail("Conversation not complete!");
 		if (cutme.canceled == false)
 			fail("The party that was supposed to be cancelled didn't cancel.");

@@ -227,6 +227,7 @@ public class Shootist implements SipListener {
 			ServerTransaction serverTransactionId) {
 		try {
 			System.out.println("shootist:  got a bye .");
+			ended = true;
 			if (serverTransactionId == null) {
 				System.out.println("shootist:  null TID.");
 				return;
