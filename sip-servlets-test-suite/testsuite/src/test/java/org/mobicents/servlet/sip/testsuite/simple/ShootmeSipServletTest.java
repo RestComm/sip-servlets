@@ -536,7 +536,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		List<String> allMessagesContent = sender.getAllMessagesContent();
 		assertEquals(1,allMessagesContent.size());
 		assertEquals("noAckReceived", allMessagesContent.get(0));
-		assertEquals( 10, sender.getNbRetrans());
+		assertTrue( sender.getNbRetrans() >= 9);
 	}
 
 	public void testShootmeServerHeader() throws Exception {
