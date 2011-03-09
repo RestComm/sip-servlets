@@ -457,7 +457,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				return;
 			}
 			boolean sendAck = true;
-			if((sipServletResponse.getFrom().getURI().toString().contains("pending") || sipServletResponse.getFrom().getURI().toString().contains("factory"))) {
+			if(sipServletResponse.getFrom().getURI().toString().contains("pending") || sipServletResponse.getFrom().getURI().toString().contains("factory")
+						|| sipServletResponse.getTo().getURI().toString().contains("pending") || sipServletResponse.getTo().getURI().toString().contains("factory")) {
 				sendAck= false;
 				if (logger.isDebugEnabled()) {
 					logger.debug("testing pending messages so not sending ACK");
@@ -495,7 +496,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				//create and sends OK for the first call leg							
 				SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
 				boolean sendAck = true;
-				if(sipServletResponse.getFrom().getURI().toString().contains("pending") || sipServletResponse.getFrom().getURI().toString().contains("factory")) {
+				if(sipServletResponse.getFrom().getURI().toString().contains("pending") || sipServletResponse.getFrom().getURI().toString().contains("factory")
+						|| sipServletResponse.getTo().getURI().toString().contains("pending") || sipServletResponse.getTo().getURI().toString().contains("factory")) {
 					sendAck= false;
 					if (logger.isDebugEnabled()) {
 						logger.debug("testing pending messages so not sending ACK");
