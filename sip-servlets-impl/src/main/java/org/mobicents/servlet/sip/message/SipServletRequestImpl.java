@@ -89,6 +89,7 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.ext.javax.sip.dns.DNSAwareRouter;
 import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.javax.servlet.sip.SipServletRequestExt;
 import org.mobicents.servlet.sip.JainSipUtils;
@@ -996,13 +997,15 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
     			}
 	    	} 
 			
-			if(hop != null && sipFactoryImpl.getSipApplicationDispatcher().isExternal(hop.getHost(), hop.getPort(), hop.getTransport())) {
+			if(hop != null && sipFactoryImpl.getSipApplicationDispatcher().isExternal(hop.getHost(), hop.getPort(), hop.getTransport())) {				
 				javax.sip.address.SipURI nextHopUri = SipFactories.addressFactory.createSipURI(null, hop.getHost());
 				nextHopUri.setLrParam();
 				nextHopUri.setPort(hop.getPort());
 				if(hop.getTransport() != null) {
 					nextHopUri.setTransportParam(hop.getTransport());
 				}
+				// Deal with http://code.google.com/p/mobicents/issues/detail?id=2346
+				nextHopUri.setParameter(DNSAwareRouter.DNS_ROUTE, Boolean.TRUE.toString());
 				final javax.sip.address.Address nextHopRouteAddress = 
 					SipFactories.addressFactory.createAddress(nextHopUri);
 				final RouteHeader nextHopRouteHeader = 
@@ -1010,6 +1013,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				if(logger.isDebugEnabled()) {
 			    	logger.debug("Adding next hop found by RFC 3263 lookups as route header" + nextHopRouteHeader);			    	
 			    }
+			
 				request.addFirst(nextHopRouteHeader);
 			}
 			

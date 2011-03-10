@@ -49,6 +49,7 @@ import org.apache.catalina.core.StandardService;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.modeler.Registry;
+import org.mobicents.ext.javax.sip.dns.DNSAwareRouter;
 import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.ext.javax.sip.dns.DefaultDNSServerLocator;
 import org.mobicents.ha.javax.sip.ClusteredSipStack;
@@ -433,7 +434,36 @@ public class SipStandardService extends StandardService implements SipService {
 			
 			if(sipStackProperties.get(TCP_POST_PARSING_THREAD_POOL_SIZE) == null) {
 				sipStackProperties.setProperty(TCP_POST_PARSING_THREAD_POOL_SIZE, "30");
-			}			
+			}	
+			
+			// set the DNSServerLocator allowing to support RFC 3263 and do DNS lookups to resolve uris
+			if(dnsServerLocatorClass != null && dnsServerLocatorClass.trim().length() > 0) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Sip Stack " + sipStackProperties.getProperty("javax.sip.STACK_NAME") +" will be using " + dnsServerLocatorClass + " as DNSServerLocator");
+				}
+				try {
+		            // create parameters argument to identify constructor
+		            Class[] paramTypes = new Class[0];
+		            // get constructor of AddressResolver in order to instantiate
+		            Constructor dnsServerLocatorConstructor = Class.forName(dnsServerLocatorClass).getConstructor(
+		                    paramTypes);
+		            // Wrap properties object in order to pass to constructor of AddressResolver
+		            Object[] conArgs = new Object[0];
+		            // Creates a new instance of AddressResolver Class with the supplied sipApplicationDispatcher.
+		            DNSServerLocator dnsServerLocator = (DNSServerLocator) dnsServerLocatorConstructor.newInstance(conArgs);
+		            sipApplicationDispatcher.setDNSServerLocator(dnsServerLocator);
+		            if(sipStackProperties.getProperty("javax.sip.ROUTER_PATH") == null) {
+		            	sipStackProperties.setProperty("javax.sip.ROUTER_PATH", DNSAwareRouter.class.getCanonicalName());
+		            }
+		        } catch (Exception e) {
+		            logger.error("Couldn't set the AddressResolver " + addressResolverClass, e);
+		            throw e;
+		        }
+			} else {
+				if(logger.isInfoEnabled()) {
+					logger.info("no DNSServerLocator will be used since none has been specified.");
+				}
+			}	
 			
 			String serverHeaderValue = sipStackProperties.getProperty(SERVER_HEADER);
 			if(serverHeaderValue != null) {
@@ -518,32 +548,7 @@ public class SipStandardService extends StandardService implements SipService {
 				if(logger.isInfoEnabled()) {
 					logger.info("no AddressResolver will be used since none has been specified.");
 				}
-			}
-			// set the DNSServerLocator allowing to support RFC 3263 and do DNS lookups to resolve uris
-			if(sipStack instanceof SipStackExt && dnsServerLocatorClass != null && dnsServerLocatorClass.trim().length() > 0) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("Sip Stack " + sipStack.getStackName() +" will be using " + dnsServerLocatorClass + " as DNSServerLocator");
-				}
-				try {
-		            // create parameters argument to identify constructor
-		            Class[] paramTypes = new Class[0];
-		            // get constructor of AddressResolver in order to instantiate
-		            Constructor dnsServerLocatorConstructor = Class.forName(dnsServerLocatorClass).getConstructor(
-		                    paramTypes);
-		            // Wrap properties object in order to pass to constructor of AddressResolver
-		            Object[] conArgs = new Object[0];
-		            // Creates a new instance of AddressResolver Class with the supplied sipApplicationDispatcher.
-		            DNSServerLocator dnsServerLocator = (DNSServerLocator) dnsServerLocatorConstructor.newInstance(conArgs);
-		            sipApplicationDispatcher.setDNSServerLocator(dnsServerLocator);
-		        } catch (Exception e) {
-		            logger.error("Couldn't set the AddressResolver " + addressResolverClass, e);
-		            throw e;
-		        }
-			} else {
-				if(logger.isInfoEnabled()) {
-					logger.info("no AddressResolver will be used since none has been specified.");
-				}
-			}	
+			}			
 			if(logger.isInfoEnabled()) {
 				logger.info("SIP stack initialized");
 			}
