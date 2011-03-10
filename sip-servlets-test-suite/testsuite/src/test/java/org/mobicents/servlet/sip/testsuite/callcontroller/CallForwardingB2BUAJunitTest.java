@@ -358,7 +358,7 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		sender.setTimeToWaitBeforeBye(TIMEOUT*2);
 		sender.setTimeToWaitBeforeAck(6000);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
-		Thread.sleep(TIMEOUT*3);
+		Thread.sleep(TIMEOUT*4);
 		assertTrue(sender.isAckSent());
 		assertTrue(receiver.isAckReceived());
 		assertTrue(sender.getOkToByeReceived());
@@ -474,7 +474,7 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		sender.setTimeToWaitBeforeBye(TIMEOUT*2);
 		sender.setTimeToWaitBeforeAck(4000);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Require"}, new String[] {"Nothing"}, false);		
-		Thread.sleep(TIMEOUT*3);
+		Thread.sleep(TIMEOUT*4);
 		assertTrue(sender.isAckSent());
 		assertTrue(receiver.isAckReceived());
 		assertTrue(sender.getOkToByeReceived());
