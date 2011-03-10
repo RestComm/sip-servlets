@@ -23,11 +23,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
 import javax.sip.SipProvider;
+import javax.sip.header.RouteHeader;
 import javax.sip.message.Response;
 
 import org.apache.catalina.deploy.ApplicationParameter;
@@ -163,6 +165,36 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 		assertFalse(badReceiver.getByeReceived());
 		assertTrue(receiver.getByeReceived());
 	}
+	
+	/*
+	 * Non Regression test for Issue http://code.google.com/p/mobicents/issues/detail?id=2346
+	 */
+	public void testShootistRouteCheck() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"receiver", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();			
+		receiverProvider.addSipListener(receiver);
+		receiverProtocolObjects.start();
+				
+		String host = "mobicents.org";
+		
+		tomcat.startTomcat();
+		
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("host", host);
+		params.put("route", "sip:127.0.0.1:5080;lr");
+		deployApplication(params);
+		
+		Thread.sleep(TIMEOUT/4);
+		ListIterator<RouteHeader> routeHeaders = receiver.getInviteRequest().getHeaders(RouteHeader.NAME);
+		assertNotNull(routeHeaders);
+		RouteHeader routeHeader = routeHeaders.next();
+		assertFalse(routeHeaders.hasNext());
+		assertEquals("sip:127.0.0.1:5080;lr;transport=udp", routeHeader.getAddress().getURI().toString());
+		assertTrue(receiver.getByeReceived());
+	}
 
 	private void mockDNSLookup(String host) throws TextParseException {
 		DNSLookupPerformer dnsLookupPerformer = mock(DefaultDNSLookupPerformer.class);
@@ -272,8 +304,10 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 
 	@Override
 	protected void tearDown() throws Exception {					
-		receiverProtocolObjects.destroy();			
-		badReceiverProtocolObjects.destroy();
+		receiverProtocolObjects.destroy();	
+		if(badReceiverProtocolObjects != null) {
+			badReceiverProtocolObjects.destroy();
+		}
 		logger.info("Test completed");
 		super.tearDown();
 	}
