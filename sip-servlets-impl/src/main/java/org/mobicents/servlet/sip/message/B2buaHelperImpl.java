@@ -529,6 +529,9 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		final SipSessionKey sipSessionKey = this.sessionMap.get(mobicentsSipSession.getKey());
 		if(sipSessionKey == null) {
 			dumpLinkedSessions();
+			if(logger.isDebugEnabled()) {
+				logger.debug("No Linked Session found for this session " + session.getId());
+			}
 			return null;
 		}
 		final MobicentsSipSession linkedSession = sipManager.getSipSession(sipSessionKey, false, null, mobicentsSipSession.getSipApplicationSession());
