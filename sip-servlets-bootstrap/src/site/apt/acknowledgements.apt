@@ -95,4 +95,6 @@ Mobicents Sip Servlets' Hall Of Fame
 	* Ivan Dubrov from {{{http://www.axmor.com}Axmor Software}} :
 	 
 		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2321}Issue 2321}} and contributed a fix for it 
+		
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2420}Issue 2420}} and contributed a fix for it
 	
