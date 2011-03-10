@@ -232,9 +232,9 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.setTimeToWaitBeforeBye(TIMEOUT*2);
+		receiver.setTimeToWaitBeforeBye(TIMEOUT*2);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
-		Thread.sleep(TIMEOUT*3);
+		Thread.sleep(TIMEOUT*4);
 		assertTrue(receiver.getOkToByeReceived());
 		assertTrue(sender.getByeReceived());		
 	}
