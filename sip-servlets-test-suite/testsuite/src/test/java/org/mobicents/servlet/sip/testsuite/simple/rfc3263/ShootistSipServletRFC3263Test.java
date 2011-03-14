@@ -162,6 +162,8 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 		
 		deployApplication("host", host);
 		Thread.sleep(TIMEOUT);
+		RouteHeader routeHeader = (RouteHeader) receiver.getInviteRequest().getHeader(RouteHeader.NAME);
+		assertNull(routeHeader);
 		assertFalse(badReceiver.getByeReceived());
 		assertTrue(receiver.getByeReceived());
 	}
@@ -192,7 +194,7 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 		assertNotNull(routeHeaders);
 		RouteHeader routeHeader = routeHeaders.next();
 		assertFalse(routeHeaders.hasNext());
-		assertEquals("sip:127.0.0.1:5080;lr;transport=udp", routeHeader.getAddress().getURI().toString());
+		assertEquals("sip:127.0.0.1:5080;lr", routeHeader.getAddress().getURI().toString());
 		assertTrue(receiver.getByeReceived());
 	}
 
@@ -251,6 +253,8 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 		Thread.sleep(DIALOG_TIMEOUT + TIMEOUT);
 		assertFalse(badReceiver.getByeReceived());
 		assertFalse(badReceiver.isCancelReceived());
+		RouteHeader routeHeader = (RouteHeader) receiver.getInviteRequest().getHeader(RouteHeader.NAME);
+		assertNull(routeHeader);
 		assertTrue(receiver.isCancelReceived());	
 		List<String> allMessagesContent = receiver.getAllMessagesContent();
 		assertTrue(allMessagesContent.size() >= 2);
@@ -296,6 +300,8 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 		Thread.sleep(DIALOG_TIMEOUT + TIMEOUT);
 		assertFalse(badReceiver.isAckReceived());
 		assertTrue(receiver.isAckReceived());	
+		RouteHeader routeHeader = (RouteHeader) receiver.getInviteRequest().getHeader(RouteHeader.NAME);
+		assertNull(routeHeader);
 		List<String> allMessagesContent = receiver.getAllMessagesContent();
 		assertEquals(2,allMessagesContent.size());
 		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
