@@ -46,6 +46,7 @@ import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipListener;
 import javax.sip.SipProvider;
+import javax.sip.TransactionAlreadyExistsException;
 import javax.sip.TransactionDoesNotExistException;
 import javax.sip.TransactionTerminatedEvent;
 import javax.sip.TransactionUnavailableException;
@@ -303,8 +304,20 @@ public class TestSipListener implements SipListener {
 	private boolean testNextNonce =false;
 	
 	private String nextNonce = null;
-
+	
 	private boolean dropRequest = false;
+
+	private long waitBeforeFinalResponse = 0;
+
+	private boolean sendUpdate;
+
+	private boolean updateReceived;
+
+	private boolean sendUpdateAfterUpdate = false;
+	
+	private boolean sendUpdateAfterPrack = false;
+
+	private boolean sendUpdateAfterProvisionalResponses;
 	
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -421,15 +434,27 @@ public class TestSipListener implements SipListener {
 			prackRequestReceived = request;
 			ServerTransaction st = serverTransactionId;			
 			if (st == null) {
-				st = sipProvider.getNewServerTransaction(request);
+				try {
+					st = sipProvider.getNewServerTransaction(request);
+				} catch ( TransactionAlreadyExistsException taex ) {
+					// This is a retransmission so just return.
+					return;				
+				} 
 			}
 			Response response = protocolObjects.messageFactory.createResponse(
 					200, request);
+			Address address = protocolObjects.addressFactory
+			.createAddress("Shootme <sip:127.0.0.1:" + myPort
+					+";transport="+protocolObjects.transport
+					+ ">");
+			contactHeader = protocolObjects.headerFactory.createContactHeader(address);
+			response.addHeader(contactHeader);
 			st.sendResponse(response);
 			
 			Thread.sleep(200);
 			
-			inviteServerTid.sendResponse(getFinalResponse());
+			if(!sendUpdateAfterUpdate)
+				inviteServerTid.sendResponse(getFinalResponse());
 		} catch(Exception e) {
 			logger.error("Unexpected exception while trying to send the 200 to PRACK " + request, e);
 		}
@@ -569,6 +594,28 @@ public class TestSipListener implements SipListener {
 			this.transactionCount++;
 			logger.info("shootist:  Sending OK.");
 			logger.info("Dialog State = " + dialog.getState());
+			updateReceived = true;
+			if (sendUpdateAfterUpdate) {
+				Request updateRequest = dialog.createRequest(Request.UPDATE);
+
+				if (recordRoutingProxyTesting){				
+					ContactHeader contHdr = (ContactHeader) request.getHeader(ContactHeader.NAME);
+					SipURI sipUri = (SipURI)contHdr.getAddress().getURI();
+					updateRequest.setRequestURI(sipUri);
+				}
+
+				long seqNo = (((CSeqHeader) request.getHeader(CSeqHeader.NAME)).getSeqNumber());
+				CSeqHeader cseqNew = protocolObjects.headerFactory.createCSeqHeader(++seqNo, "UPDATE"); 
+				updateRequest.setHeader(cseqNew);
+				
+				ClientTransaction ct = sipProvider
+					.getNewClientTransaction(updateRequest);
+				ct.sendRequest();
+				sendUpdate = true;
+				if(!prackReceived) {
+					sendUpdateAfterUpdate = false;
+				}
+			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -1119,12 +1166,42 @@ public class TestSipListener implements SipListener {
 						response.addHeader(requireHeader);
 						Header rseqHeader = protocolObjects.headerFactory.createRSeqHeader(rseqNumber.getAndIncrement());
 						response.addHeader(rseqHeader);
+						Address address = protocolObjects.addressFactory
+						.createAddress("Shootme <sip:127.0.0.1:" + myPort
+								+";transport="+protocolObjects.transport
+								+ ">");
+						contactHeader = protocolObjects.headerFactory.createContactHeader(address);
+						response.addHeader(contactHeader);
 						dialog.sendReliableProvisionalResponse(response);
 					}  else {
+						Address address = protocolObjects.addressFactory
+						.createAddress("Shootme <sip:127.0.0.1:" + myPort
+								+";transport="+protocolObjects.transport
+								+ ">");
+						contactHeader = protocolObjects.headerFactory.createContactHeader(address);
+						response.addHeader(contactHeader);
 						st.sendResponse(response);
 					}					
 				}
-			}										
+			}
+			
+			if (sendUpdateAfterProvisionalResponses) {
+				Request updateRequest = dialog.createRequest(Request.UPDATE);
+
+				if (recordRoutingProxyTesting){				
+					ContactHeader contHdr = (ContactHeader) request.getHeader(ContactHeader.NAME);
+					SipURI sipUri = (SipURI)contHdr.getAddress().getURI();
+					updateRequest.setRequestURI(sipUri);
+				}
+
+				long seqNo = (((CSeqHeader) request.getHeader(CSeqHeader.NAME)).getSeqNumber());
+				CSeqHeader cseqNew = protocolObjects.headerFactory.createCSeqHeader(++seqNo, "UPDATE"); 
+				updateRequest.setHeader(cseqNew);
+				
+				sipProvider.sendRequest(updateRequest);
+				sendUpdate = true;
+			}
+			
 			if(respondWithError != null && !sendReliably) {
 				Response response = protocolObjects.messageFactory.createResponse(
 						respondWithError, request);
@@ -1153,8 +1230,9 @@ public class TestSipListener implements SipListener {
 				contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
 				setFinalResponse(protocolObjects.messageFactory
 						.createResponse(finalResponseToSend, request));
+				Response response = getFinalResponse();
 				if(testAckViaParam) {
-					ViaHeader viaHeader = (ViaHeader)getFinalResponse().getHeader(ViaHeader.NAME);
+					ViaHeader viaHeader = (ViaHeader)response.getHeader(ViaHeader.NAME);
 					viaHeader.setParameter("testAckViaParam", "true");
 				}
 				if(testNextNonce) {
@@ -1162,15 +1240,22 @@ public class TestSipListener implements SipListener {
 					nextNonce = dsam.generateNonce();
 					authenticationInfoHeader.setNextNonce(nextNonce);					
 					authenticationInfoHeader.removeParameter(ParameterNames.RESPONSE_AUTH);
-					getFinalResponse().addHeader(authenticationInfoHeader);
+					response.addHeader(authenticationInfoHeader);
 				}
-				ToHeader toHeader = (ToHeader) getFinalResponse().getHeader(ToHeader.NAME);
+				ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
 				if(toHeader.getTag() == null) {
 					toHeader.setTag(TO_TAG); // Application is supposed to set.
 				}
 				getFinalResponse().addHeader(contactHeader);
-				if(!sendReliably) {
-					st.sendResponse(getFinalResponse());
+				if(!sendReliably) {					
+					Thread.sleep(waitBeforeFinalResponse);
+					logger.debug("sending back response " + response);
+					st.sendResponse(response);
+				}
+				
+				if(sendUpdateAfterPrack){
+					Thread.sleep(waitBeforeFinalResponse);
+//					st.sendResponse(getFinalResponse());
 				}
 			} else {
 				logger.info("Waiting for CANCEL, stopping the INVITE processing ");
@@ -1254,6 +1339,7 @@ public class TestSipListener implements SipListener {
 			logger.info("shootist:  got a " + request);
 			logger.info("shootist:  got an ACK. ServerTxId = " + serverTransactionId);
 			ackReceived = true;
+			
 			//we don't count retransmissions
 			if(serverTransactionId != null) {
 				ackCount ++;
@@ -1323,6 +1409,7 @@ public class TestSipListener implements SipListener {
 				sendBye(replacesDialog);
 			}
 			if(sendReinvite && !reinviteSent) {
+				prackSent = false;
 				List<Header> headers = new ArrayList<Header>();
 				Header reinviteHeader = protocolObjects.headerFactory.createHeader("ReInvite", "true");
 				headers.add(reinviteHeader);
@@ -1374,13 +1461,13 @@ public class TestSipListener implements SipListener {
 		logger.info("Response received : Status Code = "
 				+ response.getStatusCode() + " " + cseq);
 		// not dropping in PRACK case on REINVITE the ClientTx can be null it seems		
-		if (tid == null && !prackSent) {
+		if (tid == null && responseDialog == null && !prackSent) {
 			if(countRetrans) {
 				nbRetrans++;
 			}
 			logger.info("Stray response -- dropping ");
 			return;
-		}
+		}		
 		logger.info("Dialog = " + responseDialog);
 		if(responseDialog != null) {
 			logger.info("Dialog State is " + responseDialog.getState());
@@ -1429,7 +1516,8 @@ public class TestSipListener implements SipListener {
 						headers.add(reinviteHeader);
 						if(prackSent) {							
 							headers.add(protocolObjects.headerFactory.createHeader(RequireHeader.NAME, "100rel"));
-						} 						
+						} 					
+						prackSent = false;
 						sendInDialogSipRequest("INVITE", null, null, null, headers, null);
 						
 						reinviteSent = true;
@@ -1460,6 +1548,33 @@ public class TestSipListener implements SipListener {
 					sipETag = sipTagHeader.getETag();
 				} else if (cseq.getMethod().equals(Request.PRACK)) {
 					okToPrackReceived = true;
+					if (sendUpdateAfterPrack){
+						Request updateRequest = dialog.createRequest(Request.UPDATE);
+						
+						if (recordRoutingProxyTesting){				
+							ContactHeader contHdr = (ContactHeader) response.getHeader(ContactHeader.NAME);
+							SipURI sipUri = (SipURI)contHdr.getAddress().getURI();
+							updateRequest.setRequestURI(sipUri);
+							}
+						ClientTransaction ct = sipProvider
+								.getNewClientTransaction(updateRequest);
+						dialog.sendRequest(ct);
+						sendUpdate = true;
+					}
+				} else if(cseq.getMethod().equals(Request.UPDATE) && sendUpdateAfterUpdate && prackReceived) {
+					Address address = protocolObjects.addressFactory
+					.createAddress("Shootme <sip:127.0.0.1:" + myPort
+							+";transport="+protocolObjects.transport
+							+ ">");
+					contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
+					setFinalResponse(protocolObjects.messageFactory
+							.createResponse(finalResponseToSend, inviteRequest));					
+					ToHeader toHeader = (ToHeader) getFinalResponse().getHeader(ToHeader.NAME);
+					if(toHeader.getTag() == null) {
+						toHeader.setTag(TO_TAG); // Application is supposed to set.
+					}
+					getFinalResponse().addHeader(contactHeader);
+					inviteServerTid.sendResponse(getFinalResponse());
 				}
 			} else if  (response.getStatusCode() == Response.MOVED_TEMPORARILY) {
 				// Dialog dies as soon as you get an error response.
@@ -1547,9 +1662,18 @@ public class TestSipListener implements SipListener {
 			} else if(response.getStatusCode() == Response.RINGING && sendUpdateOn180) {
 				Request updateRequest = dialog.createRequest(Request.UPDATE);
 								
+				if (recordRoutingProxyTesting){				
+					ContactHeader contHdr = (ContactHeader) response.getHeader(ContactHeader.NAME);
+					SipURI sipUri = (SipURI)contHdr.getAddress().getURI();
+					updateRequest.setRequestURI(sipUri);
+					}
+				
+				
 				ClientTransaction ct = sipProvider
 						.getNewClientTransaction(updateRequest);
 				dialog.sendRequest(ct);
+				sendUpdate = true;
+
 			} else if (response.getStatusCode() == Response.PROXY_AUTHENTICATION_REQUIRED
 					|| response.getStatusCode() == Response.UNAUTHORIZED) {
 				URI uriReq = tid.getRequest().getRequestURI();
@@ -1560,13 +1684,14 @@ public class TestSipListener implements SipListener {
 				System.out
 						.println("INVITE AUTHORIZATION sent:\n" + authrequest);
 			} else if (response.getStatusCode() > Response.TRYING && response.getStatusCode() < Response.OK) {
-				RequireHeader requireHeader = (RequireHeader) response.getHeader(RequireHeader.NAME);				
-				if(requireHeader != null && "100rel".equalsIgnoreCase(requireHeader.getOptionTag().trim())) {
+				RequireHeader requireHeader = (RequireHeader) response.getHeader(RequireHeader.NAME);
+				logger.debug("prackSent ? " + prackSent);
+				if(requireHeader != null && "100rel".equalsIgnoreCase(requireHeader.getOptionTag().trim()) && !prackSent) {
+					prackSent = true;
 					Request prack = dialog.createPrack(response);
 					ClientTransaction ct = sipProvider
 						.getNewClientTransaction(prack);
-					dialog.sendRequest(ct);
-					prackSent = true;
+					dialog.sendRequest(ct);					
 				}
 			}
 			/**
@@ -2912,4 +3037,31 @@ public class TestSipListener implements SipListener {
 		return dropRequest;
 	}
 
+	public void setWaitBeforeFinalResponse(long waitBeforeFinalResponse) {
+		this.waitBeforeFinalResponse = waitBeforeFinalResponse;
+	}
+
+	public boolean isSendUpdate() {
+		return sendUpdate;
+	}
+
+	public boolean isUpdateReceived() {
+		return updateReceived;
+	}
+
+	public void setSendUpdateAfterUpdate(boolean sendUpdateAfterUpdate) {
+		this.sendUpdateAfterUpdate = sendUpdateAfterUpdate;
+	}
+
+	public boolean isSendUpdateAfterUpdate() {
+		return sendUpdateAfterUpdate;
+	}
+
+	public void setSendUpdateAfterPrack(boolean sendUpdateAfterPrack) {
+		this.sendUpdateAfterPrack = sendUpdateAfterPrack;
+	}
+
+	public void setSendUpdateAfterProvisionalResponses(boolean sendUpdateAfterProvisonalResponses) {
+		this.sendUpdateAfterProvisionalResponses = sendUpdateAfterProvisonalResponses;
+	}
 }

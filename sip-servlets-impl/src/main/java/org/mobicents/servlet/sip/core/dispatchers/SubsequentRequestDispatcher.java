@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.core.dispatchers;
 import gov.nist.javax.sip.header.extensions.JoinHeader;
 import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 import gov.nist.javax.sip.message.MessageExt;
+import gov.nist.javax.sip.message.RequestExt;
 import gov.nist.javax.sip.stack.SIPServerTransaction;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
@@ -54,6 +55,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
+import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
@@ -349,8 +351,10 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					// See if the subsequent request should go directly to the proxy
 					final ProxyImpl proxy = sipSession.getProxy();
 					if(proxy != null) {
-						final ProxyBranchImpl finalBranch = proxy.getFinalBranchForSubsequentRequests();
+						ProxyBranchImpl finalBranch = proxy.getFinalBranchForSubsequentRequests();
+						
 						boolean isPrack = requestMethod.equalsIgnoreCase(Request.PRACK);
+						boolean isUpdate = requestMethod.equalsIgnoreCase(Request.UPDATE);
 						// JSR 289 Section 6.2.1 :
 						// any state transition caused by the reception of a SIP message, 
 						// the state change must be accomplished by the container before calling 
@@ -363,14 +367,37 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 								callServlet(sipServletRequest);
 
 							finalBranch.proxySubsequentRequest(sipServletRequest);
-						} else if(isPrack) {
+						} else if(isPrack || isUpdate) {
 							callServlet(sipServletRequest);
 							final List<ProxyBranch> branches = proxy.getProxyBranches();
 							for(ProxyBranch pb : branches) {
 								final ProxyBranchImpl proxyBranch = (ProxyBranchImpl) pb;
-								if(proxyBranch.isWaitingForPrack()) {
+								if(proxyBranch.isWaitingForPrack() && isPrack) {
 									proxyBranch.proxyDialogStateless(sipServletRequest);
 									proxyBranch.setWaitingForPrack(false);
+								} else {
+									//Issue: https://code.google.com/p/mobicents/issues/detail?id=2264
+									if(logger.isDebugEnabled()){
+										logger.debug("Checking request's To header tag against proxyBranch's From tag and To tag" +
+												"in order to identify the proxyBranch for this request ");
+									}
+									String requestToTag = ((RequestExt)request).getToHeader().getTag();
+
+									SipServletResponseImpl proxyResponse = (SipServletResponseImpl)(proxyBranch.getResponse());									
+									String proxyToTag = ((MessageExt)proxyResponse.getMessage()).getToHeader().getTag();
+									String proxyFromTag = ((MessageExt)proxyResponse.getMessage()).getFromHeader().getTag();
+
+									if (proxyToTag.equals(requestToTag) || proxyFromTag.equals(requestToTag) ) { 
+										finalBranch = proxyBranch;
+										finalBranch.proxySubsequentRequest(sipServletRequest);
+									} 
+								}
+							}
+							if (finalBranch == null && isUpdate){
+								logger.warn("Final branch is null, enable debug for more information.");
+								if(logger.isDebugEnabled()) {
+									logger.debug("Final branch is null, this will probably result in a lost call or request. Here is the request:\n" + request, new
+											RuntimeException("Final branch is null"));
 								}
 							}
 						} else {

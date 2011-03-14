@@ -206,7 +206,11 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 				logger.info("doInvite: uri = " + uri);
 				proxy.setParallel(false);
 			}
-			proxy.setProxyTimeout(4);
+			if (from.contains("update")){
+				proxy.setProxyTimeout(40);
+			} else {
+				proxy.setProxyTimeout(4);
+			}
 			proxy.proxyTo(uris);
 		}
 	}
@@ -403,5 +407,10 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		if(se.getSession().getAttribute("contactPort") != null) {
 			sendMessage("sipSessionReadyToInvalidate", (Integer) se.getSession().getAttribute("contactPort"), (String) se.getSession().getAttribute("transport"));
 		}
+	}
+	
+	@Override
+	protected void doUpdate(SipServletRequest req) throws ServletException, IOException {
+		logger.info("Got request:\n "+req);
 	}
 }

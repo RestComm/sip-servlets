@@ -454,7 +454,8 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 		}
 		
 		// Send informational responses back immediately
-		if((status > 100 && status < 200) || (status == 200 && Request.PRACK.equals(response.getMethod())))
+		if((status > 100 && status < 200) || (status == 200 &&
+				(Request.PRACK.equals(response.getMethod()) || Request.UPDATE.equals(response.getMethod()))))
 		{
 			// Deterimine if the response is reliable. We just look at RSeq, because
 			// every such response is required to have it.
@@ -488,6 +489,10 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 					logger.debug("Proxy response sent out sucessfully");
 			} catch (Exception e) {
 				logger.error("A problem occured while proxying a response", e);
+			}
+			if(status == 200 &&
+				(Request.PRACK.equals(response.getMethod()) || Request.UPDATE.equals(response.getMethod()))) {
+				updateTimer(true);
 			}
 			
 			if(logger.isDebugEnabled())
@@ -528,7 +533,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 					throw new IllegalArgumentException("Can not parse contact header", e);
 				}
 			}
-		}
+		}		
 		if(status >= 200 && !recursed)
 		{
 			
@@ -770,6 +775,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 			}
 			// Just do a timeout response
 			proxy.onBranchTimeOut(this);
+			logger.warn("Proxy branch has timed out");
 		} else {
 			logger.debug("ACKed proxybranch has timeout");
 		}
