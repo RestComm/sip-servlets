@@ -1807,7 +1807,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 			currentApplicationName = null;
 		}
 		isMessageSent = in.readBoolean();
-		if(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
+		if(StaticServiceHolder.sipStandardService.getSipStack() instanceof ClusteredSipStack && 
+				((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {		
 			transactionId = in.readUTF();
 			if(transactionId != null) {
 				if(transactionId.equals("")) {
@@ -1830,7 +1831,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		} else {
 			out.writeUTF(sipSession.getId());
 		}
-		if(attributes != null) {
+		if(attributes != null && attributes.size() > 0) {
 			out.writeInt(attributes.size());
 			Object[][] attributesArray = new Object[2][attributes.size()];
 			int i = 0;
@@ -1851,7 +1852,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 			out.writeUTF("");
 		}
 		out.writeBoolean(isMessageSent);
-		if(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
+		if(StaticServiceHolder.sipStandardService.getSipStack() instanceof ClusteredSipStack && 
+				((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
 			if(transaction == null) {
 				out.writeUTF("");
 			} else {

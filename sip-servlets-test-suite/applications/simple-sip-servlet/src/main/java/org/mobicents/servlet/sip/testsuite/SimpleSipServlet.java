@@ -17,7 +17,11 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Iterator;
 
@@ -87,6 +91,7 @@ public class SimpleSipServlet
 	private static final String TEST_CANCEL_USERNAME = "cancel";
 	private static final String TEST_BYE_ON_DESTROY = "testByeOnDestroy";
 	private static final String TEST_NO_ACK_RECEIVED = "noAckReceived";
+	private static final String TEST_SERIALIZATION = "serialization";
 	
 	@Resource
 	SipFactory sipFactory;
@@ -318,9 +323,57 @@ public class SimpleSipServlet
 			sipServletResponse.getSession().setAttribute("okResponse", sipServletResponse);
 			
 			return;
-		}
+		}		
 		if(!TEST_CANCEL_USERNAME.equalsIgnoreCase(((SipURI)request.getFrom().getURI()).getUser())) {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_RINGING);
+			if(fromString.contains(TEST_SERIALIZATION)) {		
+				FileOutputStream fos =
+				     new FileOutputStream("val.ser");
+				ObjectOutputStream oos = new ObjectOutputStream(fos);					 
+				oos.writeObject(request);
+				oos.close();
+				fos.close();
+				FileInputStream fis = 
+				      new FileInputStream("val.ser");
+				ObjectInputStream ois = new ObjectInputStream(fis);
+				try {
+					SipServletRequest deserializedRequest = (SipServletRequest) ois.readObject();
+					if(!deserializedRequest.toString().equals(request.toString())) {
+						logger.error("deserializedRequest " + deserializedRequest + " different from received request " + request);
+						sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+						sipServletResponse.send();
+						return;
+					}
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				} finally {
+					ois.close();
+					fis.close();
+				}
+				
+				fos =new FileOutputStream("val.ser");
+				oos = new ObjectOutputStream(fos);					 
+				oos.writeObject(sipServletResponse);
+				oos.close();
+				fos.close();
+				fis = new FileInputStream("val.ser");
+				ois = new ObjectInputStream(fis);
+				try {
+					SipServletResponse deserializedResponse = (SipServletResponse) ois.readObject();
+					if(!deserializedResponse.toString().equals(sipServletResponse.toString())) {
+						logger.error("deserializedResponse " + deserializedResponse + " different from response " + sipServletResponse);
+						sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+						sipServletResponse.send();
+						return;
+					}
+				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
+				} finally {
+					ois.close();	
+					fis.close();
+				}
+						
+			}
 			if(sipServletResponse.getParameterableHeader("Contact") == null) {
 				logger.error("the Contact Header on a non 3xx or 485 response should be set");
 				sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);

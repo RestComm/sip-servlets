@@ -538,6 +538,24 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertEquals("noAckReceived", allMessagesContent.get(0));
 		assertTrue( sender.getNbRetrans() >= 9);
 	}
+	
+	// test for http://code.google.com/p/mobicents/issues/detail?id=2427
+	public void testShootmeSerializationDeserialization() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "serialization";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());	
+	}
 
 	public void testShootmeServerHeader() throws Exception {
 		String fromName = "sender";
