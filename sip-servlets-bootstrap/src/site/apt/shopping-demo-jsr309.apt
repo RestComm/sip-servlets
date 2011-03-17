@@ -67,7 +67,7 @@ Shopping Demo
 	Setup your Jboss AS to become a converged container as explained {{{/installation-jboss.html}here}}.
 
 	Please check out the shopping demo example located under this 
-	{{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-examples/shopping-demo}location}} 
+	{{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-examples/shopping-demo-jsr309}location}} 
 	from the svn repository.
 	Follow the instructions in the README.txt to build and run the example.
 	

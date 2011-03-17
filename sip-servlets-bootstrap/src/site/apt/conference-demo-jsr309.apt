@@ -32,7 +32,7 @@ Sip Servlets Conference Demo
 
 	You can get the source code by executing the following command:
 	
-	<<<svn co http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-examples/conference-demo>>>
+	<<<svn co http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/sip-servlets-examples/conference-demo-jsr309>>>
 	
 	To build it you need Maven 2. If you set the JBOSS_HOME environment variable to a location with Mobicents Sip Servlets server the following command will build and deploy the application:
 	
