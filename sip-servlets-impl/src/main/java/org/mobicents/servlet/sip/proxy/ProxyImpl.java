@@ -40,6 +40,8 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
+import javax.sip.Transaction;
+import javax.sip.TransactionState;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.Header;
 import javax.sip.header.RecordRouteHeader;
@@ -686,22 +688,25 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		}
 
 		try {
+			String branch = ((Via)proxiedResponse.getMessage().getHeader(Via.NAME)).getBranch();
+			Transaction transaction = null;
+			synchronized(proxyBranch.ongoingTransactions) {
+				for(TransactionRequest tr : proxyBranch.ongoingTransactions) {
 
-			if(originalRequest != null && proxiedResponse.getRequest() != null) {
-				
+					if(tr.branchId.equals(branch)) {
+						transaction = tr.request.getTransaction();
+						((SipServletResponseImpl)proxiedResponse).setTransaction(transaction);
+						((SipServletResponseImpl)proxiedResponse).setOriginalRequest(tr.request);
+						break;
+					}
+				}
+			}
+			if(transaction != null // If the server transaction has been responded to before then UDP sets it to COMPLETED while TCP sets it to TERMINATED so we got to watch out for these
+					&& !transaction.getState().equals(TransactionState.COMPLETED)
+					&& !transaction.getState().equals(TransactionState.TERMINATED)) {	
 				// non retransmission case
 				try {
-					String branch = ((Via)proxiedResponse.getMessage().getHeader(Via.NAME)).getBranch();
-					synchronized(proxyBranch.ongoingTransactions) {
-						for(TransactionRequest tr : proxyBranch.ongoingTransactions) {
-
-							if(tr.branchId.equals(branch)) {
-								((SipServletResponseImpl)proxiedResponse).setTransaction(tr.request.getTransaction());
-								((SipServletResponseImpl)proxiedResponse).setOriginalRequest(tr.request);
-								break;
-							}
-						}
-					}
+					
 					proxiedResponse.send();
 					if(logger.isDebugEnabled())
 						logger.debug("Sending out proxied final response with existing transaction");

@@ -590,7 +590,9 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	public void proxySubsequentRequest(SipServletRequestImpl request) {		
 		if(!request.getMethod().equalsIgnoreCase("ACK") && !request.getMethod().equalsIgnoreCase("PRACK")) {
 			String branch = ((Via)request.getMessage().getHeader(Via.NAME)).getBranch();
-			this.ongoingTransactions.add(new TransactionRequest(branch, request));
+			synchronized (this.ongoingTransactions) {
+				this.ongoingTransactions.add(new TransactionRequest(branch, request));
+			}
 		}
 		// A re-INVITE needs special handling without goind through the dialog-stateful methods
 		if(request.getMethod().equalsIgnoreCase("INVITE")) {
