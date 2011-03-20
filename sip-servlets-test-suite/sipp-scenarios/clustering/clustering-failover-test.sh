@@ -6,7 +6,7 @@ export LB_IP=$TEST_IP
 export SIPP_IP=$TEST_IP
 #export SIPP_OPTIONS="-t t1"
 export ACTIVE_TIMEOUT=$2
-export BACKGROUNDMETHOD="-bg"
+#export BACKGROUNDMETHOD="-bg"
 
 export RATE=$3
 export CALLS=$4
@@ -20,73 +20,73 @@ if [ $# -eq 4 ]; then
 	    proxy)
 	    		rm ./proxy/*.log
 	    		echo "Distributed example used is proxy";
-	    		$NOHUP ./sipp $MSS_IP:5080 -sf proxy/location-service-receiver.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
+	    		echo""| ./sipp $MSS_IP:5080 -sf proxy/location-service-receiver.xml -i $SIPP_IP -p 5090 -nd >sipp-uas-log-$1.txt 2&>1 &
 	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 	    proxy-early)
 	    		rm ./proxy/*.log
 	    		echo "Distributed example used is proxy early dialog failover";
-	    		$NOHUP ./sipp $MSS_IP:5080 -sf proxy/location-service-receiver-early.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
+	    		echo""| ./sipp $MSS_IP:5080 -sf proxy/location-service-receiver-early.xml -i $SIPP_IP -p 5090 -nd >sipp-uas-log-$1.txt 2&>1 &
 	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-sender-early.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 	    proxy-remote-send-bye)
 	    		rm ./proxy/*.log
 	    		echo "Distributed example used is proxy remote send bye";
-	    		$NOHUP ./sipp $MSS_IP:5080 -sf proxy/location-service-receiver-sends-bye.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
+	    		echo""| ./sipp $MSS_IP:5080 -sf proxy/location-service-receiver-sends-bye.xml -i $SIPP_IP -p 5090 -nd >sipp-uas-log-$1.txt 2&>1 &
 	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-sender-receives-bye.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;    
 	    custom-b2bua)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is custom b2bua";
-	            ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 $BACKGROUNDMETHOD
+	            echo""| ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 >sipp-uas-log-$1.txt 2&>1 &
 	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/custom-call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 	    custom-b2bua-early)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is custom b2bua early dialog failover";
-	            ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver-early.xml -i $SIPP_IP -p 5090 $BACKGROUNDMETHOD
+	            echo""| ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver-early.xml -i $SIPP_IP -p 5090 >sipp-uas-log-$1.txt 2&>1 &
 	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/custom-call-forwarding-sender-early.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 	    custom-b2bua-udp-tcp)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is custom b2bua udp tcp";
-	            $NOHUP ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -t t1 $BACKGROUNDMETHOD
+	            echo""| ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -t t1 >sipp-uas-log-$1.txt 2&>1 &
 	    		./sipp $MSS_IP:5080 -s receiver-tcp -sf b2bua/custom-call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 	    custom-b2bua-tcp-tcp)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is custom b2bua tcp tcp";
-	            $NOHUP ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -t t1 $BACKGROUNDMETHOD
+	            echo""| ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -t t1 >sipp-uas-log-$1.txt 2&>1 &
 	    		./sipp $MSS_IP:5080 -s receiver-tcp -sf b2bua/custom-call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -t t1 -timeout_error
 	            ;;
 	    b2bua)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is b2bua";
-	            $NOHUP ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
+	            echo""| ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver.xml -i $SIPP_IP -p 5090 -nd >sipp-uas-log-$1.txt 2&>1 &
 	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT $SIPP_OPTIONS -timeout_error
 	            ;;
 	    b2bua-early)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is b2bua early dialog failover";
-	            $NOHUP ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver-early.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
+	            echo""| ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver-early.xml -i $SIPP_IP -p 5090 -nd >sipp-uas-log-$1.txt 2&>1 &
 	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/call-forwarding-sender-early.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT $SIPP_OPTIONS -timeout_error
 	            ;;
 	    b2bua-early-fwd-ack)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is b2bua early dialog failover";
-	            $NOHUP ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver-early.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
+	            echo""| ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver-early.xml -i $SIPP_IP -p 5090 -nd >sipp-uas-log-$1.txt 2&>1 &
 	    		./sipp $MSS_IP:5080 -s receiver-fwd-ack -sf b2bua/call-forwarding-sender-early.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT $SIPP_OPTIONS -timeout_error
 	            ;;
 	    b2bua-remote-send-bye)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is b2bua-remote-send-bye";
-	            $NOHUP ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver-sends-bye.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
+	            echo""| ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver-sends-bye.xml -i $SIPP_IP -p 5090 -nd >sipp-uas-log-$1.txt 2&>1 &
 	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/call-forwarding-sender-receives-bye.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 	    b2bua-remote-send-bye-no-ring)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is b2bua-remote-send-bye-no-ring";
-	            $NOHUP ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver-sends-bye-no-ring.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
+	            echo""| ./sipp $MSS_IP:5080 -sf b2bua/call-forwarding-receiver-sends-bye-no-ring.xml -i $SIPP_IP -p 5090 -nd >sipp-uas-log-$1.txt 2&>1 &
 	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/call-forwarding-sender-receives-bye.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 		uac)
@@ -170,7 +170,7 @@ if [ $# -eq 4 ]; then
 	    proxy-b2bua-ar)
 	    		rm ./ar/*.log
 	    		echo "Distributed example used is proxy-b2bua-ar";
-	    		$NOHUP ./sipp $MSS_IP:5060 -sf ar/proxy-b2bua-ar-receiver.xml -i $SIPP_IP -p 5090 -nd $BACKGROUNDMETHOD
+	    		echo""| ./sipp $MSS_IP:5060 -sf ar/proxy-b2bua-ar-receiver.xml -i $SIPP_IP -p 5090 -nd >sipp-uas-log-$1.txt 2&>1 &
 	    		./sipp $MSS_IP:5060 -s receiver-failover -sf ar/proxy-b2bua-ar-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
     esac

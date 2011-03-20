@@ -1,6 +1,6 @@
 #Start tests for the current configuration with 80 sec timeout
 export TERM=vt100
-./clustering-failover-test.sh $1 80 100 5
+./clustering-failover-test.sh $1 120 120 5
 #Keep track of the status
 export CURRENT_CODE=$?
 echo "$1 $CURRENT_CODE" >> $2
