@@ -18,6 +18,9 @@ export EXIT_CODE=0;
 
 rm -rf result.txt
 
+echo "Updating the all.pid reference in the sipp scenarios to ehatever the config name is. Needed for JBCP where 'all' is 'sipservlets-production' or etc
+grep -rl Ôall.pidÕ *.*|xargs sed -i Òs/all.pid/ssddafra.pid/gÓ
+
 # Start SIP LB
 echo "#!/bin/sh" > auto-startlb.sh
 echo "java -server -Xms1536m -Xmx1536m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -jar $JBOSS_HOME/sip-balancer/sip-balancer-jar-with-dependencies.jar -mobicents-balancer-config=$JBOSS_HOME/sip-balancer/lb-configuration.properties" >> auto-startlb.sh
