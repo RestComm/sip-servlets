@@ -19,7 +19,7 @@ export EXIT_CODE=0;
 rm -rf result.txt
 
 echo "Updating the all.pid reference in the sipp scenarios to ehatever the config name is. Needed for JBCP where 'all' is 'sipservlets-production' or etc
-grep -rl Ôall.pidÕ *.*|xargs sed -i Òs/all.pid/ssddafra.pid/gÓ
+grep -rl Ôall.pidÕ *.xml|xargs sed -i Òs/all.pid/ssddafra.pid/gÓ
 
 # Start SIP LB
 echo "#!/bin/sh" > auto-startlb.sh
