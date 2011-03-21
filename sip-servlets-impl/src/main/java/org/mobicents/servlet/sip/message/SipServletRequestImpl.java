@@ -1229,6 +1229,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					request.removeFirst(RouteHeader.NAME);
 				}
 				request.removeFirst(ViaHeader.NAME);
+				request.removeFirst(ContactHeader.NAME);
 				setTransaction(null);
 				message = (Request) request.clone();
 				if(ex.getCause() != null && ex.getCause() instanceof IOException) {				
