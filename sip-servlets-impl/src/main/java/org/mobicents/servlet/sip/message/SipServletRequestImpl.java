@@ -21,7 +21,9 @@ import gov.nist.javax.sip.SipStackImpl;
 import gov.nist.javax.sip.TransactionExt;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.MessageExt;
+import gov.nist.javax.sip.stack.IllegalTransactionStateException;
 import gov.nist.javax.sip.stack.SIPTransaction;
+import gov.nist.javax.sip.stack.IllegalTransactionStateException.Reason;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -1216,7 +1218,11 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		} catch (Exception ex) {			
 			// The second condition for SipExcpetion is to cover com.bea.sipservlet.tck.agents.spec.ProxyBranchTest.testCreatingBranchParallel() where they send a request twice, the second
 			// time it does a "Request already sent" jsip exception but the tx is going on and must not be destryed
-			if(getTransaction() instanceof ClientTransaction && !(ex instanceof SipException)) {
+			boolean skipTxTermination = false;
+			if((ex instanceof IllegalTransactionStateException && ((IllegalTransactionStateException)ex).getReason().equals(Reason.RequestAlreadySent)) || !(getTransaction() instanceof ClientTransaction)) {
+				skipTxTermination = true;
+			}
+			if(!skipTxTermination) {				
 				JainSipUtils.terminateTransaction(getTransaction());
 				// cleaning up the request to make sure it can be resent with some modifications in case of exception
 				if(transactionApplicationData.getHops() != null && transactionApplicationData.getHops().size() > 0) {
