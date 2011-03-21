@@ -57,6 +57,7 @@ import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.SipDeploymentException;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
+import org.mobicents.servlet.sip.startup.loading.SipSecurityCollection;
 import org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
@@ -177,23 +178,24 @@ public class SipJBossContextConfig extends JBossContextConfig {
 				SipResourceCollectionsMetaData srcs = sipConstraintMetaData.getResourceCollections();
 				if (srcs != null) {
 					for (SipResourceCollectionMetaData src : srcs) {
-						org.apache.catalina.deploy.SecurityCollection securityCollection = new org.apache.catalina.deploy.SecurityCollection();
+						SipSecurityCollection securityCollection = new SipSecurityCollection();
 						securityCollection.setName(src.getName());
 						List<String> methods = src.getSipMethods();
 						if (methods != null) {
 							for (String method : src.getSipMethods()) {
-								securityCollection.addMethod(method);
+								securityCollection.addSipMethod(method);
 							}
 						}
 						List<String> servletNames = src.getServletNames();
 						if (servletNames != null) {
 							for (String servletName : servletNames) {
-								securityCollection.addPattern(servletName);
+								securityCollection.addServletName(servletName);
 							}
 						}
 						sipSecurityConstraint.addCollection(securityCollection);
 					}
 				}
+				convergedContext.addConstraint(sipSecurityConstraint);
 			}
 		}
 		//sip login config
