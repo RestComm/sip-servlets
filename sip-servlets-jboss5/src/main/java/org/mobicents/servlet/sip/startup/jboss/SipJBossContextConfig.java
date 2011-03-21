@@ -202,7 +202,9 @@ public class SipJBossContextConfig extends JBossContextConfig {
 			SipLoginConfig sipLoginConfig2 = new SipLoginConfig();
 			sipLoginConfig2.setAuthMethod(sipLoginConfig.getAuthMethod());
 			sipLoginConfig2.setRealmName(sipLoginConfig.getRealmName());
-			sipLoginConfig2.addIdentityAssertion(sipLoginConfig.getIdentityAssertion().getIdentityAssertionScheme(), sipLoginConfig.getIdentityAssertion().getIdentityAssertionSupport());				
+			if(sipLoginConfig.getIdentityAssertion() != null) {
+				sipLoginConfig2.addIdentityAssertion(sipLoginConfig.getIdentityAssertion().getIdentityAssertionScheme(), sipLoginConfig.getIdentityAssertion().getIdentityAssertionSupport());
+			}
 			convergedContext.setSipLoginConfig(sipLoginConfig2);
 		}
 		//Sip Listeners
