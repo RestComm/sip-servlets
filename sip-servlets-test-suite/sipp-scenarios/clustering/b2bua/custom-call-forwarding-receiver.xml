@@ -51,7 +51,7 @@
   </send>
   
   <recv request="ACK" >
-<action><exec command="./killserver.sh all.pid 6 &"/>
+<action><exec command="./killserver.sh config1.pid 6 &"/>
 </action>
   </recv>
 

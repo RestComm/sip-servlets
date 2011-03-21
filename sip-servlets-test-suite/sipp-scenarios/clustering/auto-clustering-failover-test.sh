@@ -18,9 +18,6 @@ export EXIT_CODE=0;
 
 rm -rf result.txt
 
-echo "Updating the all.pid reference in the sipp scenarios to ehatever the config name is. Needed for JBCP where 'all' is 'sipservlets-production' or etc
-grep -rl Ôall.pidÕ *.xml|xargs sed -i Òs/all.pid/ssddafra.pid/gÓ
-
 # Start SIP LB
 echo "#!/bin/sh" > auto-startlb.sh
 echo "java -server -Xms1536m -Xmx1536m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -jar $JBOSS_HOME/sip-balancer/sip-balancer-jar-with-dependencies.jar -mobicents-balancer-config=$JBOSS_HOME/sip-balancer/lb-configuration.properties" >> auto-startlb.sh
@@ -49,12 +46,12 @@ echo "================================"
 ./auto-prepare-example.sh custom-b2bua $config1
 ./auto-prepare-example.sh custom-b2bua $config2
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1 custom-b2bua
+./auto-start-jboss-server.sh $config2 config2.pid 1 custom-b2bua
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-start-jboss-server.sh $config1 $config1.pid 0 custom-b2bua
+./auto-start-jboss-server.sh $config1 config1.pid 0 custom-b2bua
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
@@ -63,7 +60,7 @@ sleep $HALFSTARTSLEEP
 
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 0 custom-b2bua-udp-tcp
+./auto-start-jboss-server.sh $config1 config1.pid 0 custom-b2bua-udp-tcp
 
 sleep $HALFSTARTSLEEP
 
@@ -71,15 +68,15 @@ sleep $HALFSTARTSLEEP
 
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 0 custom-b2bua-tcp-tcp
+./auto-start-jboss-server.sh $config1 config1.pid 0 custom-b2bua-tcp-tcp
 
 sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh custom-b2bua-tcp-tcp result.txt
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
+./auto-kill-process-tree.sh `cat config1.pid` $config1
+./auto-kill-process-tree.sh `cat config2.pid` $config2
 
 sleep 10
 
@@ -91,12 +88,12 @@ echo "================================"
 ./auto-prepare-example.sh b2bua $config1
 ./auto-prepare-example.sh b2bua $config2
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1 b2bua
+./auto-start-jboss-server.sh $config2 config2.pid 1 b2bua
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-start-jboss-server.sh $config1 $config1.pid 0 b2bua
+./auto-start-jboss-server.sh $config1 config1.pid 0 b2bua
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
@@ -104,22 +101,22 @@ sleep $HALFSTARTSLEEP
 ./auto-run-test.sh b2bua result.txt
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 0 b2bua-remote-send-bye
+./auto-start-jboss-server.sh $config1 config1.pid 0 b2bua-remote-send-bye
 
 sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh b2bua-remote-send-bye result.txt
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 0 b2bua-remote-send-bye-no-ring
+./auto-start-jboss-server.sh $config1 config1.pid 0 b2bua-remote-send-bye-no-ring
 
 sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh b2bua-remote-send-bye-no-ring result.txt
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
+./auto-kill-process-tree.sh `cat config1.pid` $config1
+./auto-kill-process-tree.sh `cat config2.pid` $config2
 
 sleep 10
 
@@ -131,12 +128,12 @@ echo "================================"
 ./auto-prepare-example.sh proxy $config1
 ./auto-prepare-example.sh proxy $config2
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1 proxy
+./auto-start-jboss-server.sh $config2 config2.pid 1 proxy
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-start-jboss-server.sh $config1 $config1.pid 0 proxy
+./auto-start-jboss-server.sh $config1 config1.pid 0 proxy
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
@@ -144,15 +141,15 @@ sleep $HALFSTARTSLEEP
 ./auto-run-test.sh proxy result.txt
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 0 proxy-remote-send-bye
+./auto-start-jboss-server.sh $config1 config1.pid 0 proxy-remote-send-bye
 
 sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh proxy-remote-send-bye result.txt
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
+./auto-kill-process-tree.sh `cat config1.pid` $config1
+./auto-kill-process-tree.sh `cat config2.pid` $config2
 
 sleep 10
 
@@ -164,12 +161,12 @@ echo "================================"
 ./auto-prepare-example.sh uas $config1
 ./auto-prepare-example.sh uas $config2
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1 uas
+./auto-start-jboss-server.sh $config2 config2.pid 1 uas
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-start-jboss-server.sh $config1 $config1.pid 0 uas
+./auto-start-jboss-server.sh $config1 config1.pid 0 uas
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
@@ -177,21 +174,21 @@ sleep $HALFSTARTSLEEP
 ./auto-run-test.sh uas result.txt
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 0 uas-remove-attributes
+./auto-start-jboss-server.sh $config1 config1.pid 0 uas-remove-attributes
 
 sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh uas-remove-attributes result.txt
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 0 uas-no-attributes
+./auto-start-jboss-server.sh $config1 config1.pid 0 uas-no-attributes
 
 sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh uas-no-attributes result.txt
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 0 uas-reinvite
+./auto-start-jboss-server.sh $config1 config1.pid 0 uas-reinvite
 
 sleep $HALFSTARTSLEEP
 
@@ -200,14 +197,14 @@ sleep $HALFSTARTSLEEP
 #if [ "x$3" == "xjboss-5" ]; then
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 0 uas-timer
+./auto-start-jboss-server.sh $config1 config1.pid 0 uas-timer
 
 sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh uas-timer result.txt
 
 #The test killed server 1, so we start it again
-./auto-start-jboss-server.sh $config1 $config1.pid 0 uas-sas-timer
+./auto-start-jboss-server.sh $config1 config1.pid 0 uas-sas-timer
 
 sleep $HALFSTARTSLEEP
 
@@ -217,8 +214,8 @@ sleep $HALFSTARTSLEEP
 #fi
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
+./auto-kill-process-tree.sh `cat config2.pid` $config2
+./auto-kill-process-tree.sh `cat config1.pid` $config1
 
 sleep 10
 
@@ -230,8 +227,8 @@ echo "================================"
 ./auto-prepare-example.sh uas $config1
 ./auto-prepare-example.sh uas $config2
 
-./auto-start-jboss-server-0.0.0.0.sh $config2 $config2.pid $ports2 2 uas-0.0.0.0
-./auto-start-jboss-server-0.0.0.0.sh $config1 $config1.pid $ports1 1 uas-0.0.0.0
+./auto-start-jboss-server-0.0.0.0.sh $config2 config2.pid $ports2 2 uas-0.0.0.0
+./auto-start-jboss-server-0.0.0.0.sh $config1 config1.pid $ports1 1 uas-0.0.0.0
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
@@ -241,8 +238,8 @@ sleep $HALFSTARTSLEEP
 ./auto-run-test.sh uas-0.0.0.0 result.txt
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
+./auto-kill-process-tree.sh `cat config1.pid` $config1
+./auto-kill-process-tree.sh `cat config2.pid` $config2
 
 sleep 10
 
@@ -254,12 +251,12 @@ echo "================================"
 ./auto-prepare-example.sh uas-passivation $config1
 ./auto-prepare-example.sh uas-passivation $config2
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1 uas-reinvite-passivation
+./auto-start-jboss-server.sh $config2 config2.pid 1 uas-reinvite-passivation
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-start-jboss-server.sh $config1 $config1.pid 0 uas-reinvite-passivation
+./auto-start-jboss-server.sh $config1 config1.pid 0 uas-reinvite-passivation
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
@@ -267,8 +264,8 @@ sleep $HALFSTARTSLEEP
 ./auto-run-test.sh uas-reinvite-passivation result.txt
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
+./auto-kill-process-tree.sh `cat config1.pid` $config1
+./auto-kill-process-tree.sh `cat config2.pid` $config2
 
 sleep 10
 
@@ -280,12 +277,12 @@ echo "================================"
 ./auto-prepare-example.sh uas-passivation $config1
 ./auto-prepare-example.sh uas-passivation $config2
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1 uas-sas-timer-passivation
+./auto-start-jboss-server.sh $config2 config2.pid 1 uas-sas-timer-passivation
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-start-jboss-server.sh $config1 $config1.pid 0 uas-sas-timer-passivation
+./auto-start-jboss-server.sh $config1 config1.pid 0 uas-sas-timer-passivation
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
@@ -293,8 +290,8 @@ sleep $HALFSTARTSLEEP
 ./auto-run-test.sh uas-sas-timer-passivation result.txt
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
+./auto-kill-process-tree.sh `cat config1.pid` $config1
+./auto-kill-process-tree.sh `cat config2.pid` $config2
 
 sleep 10
 
@@ -306,12 +303,12 @@ echo "================================"
 ./auto-prepare-example.sh uas-passivation $config1
 ./auto-prepare-example.sh uas-passivation $config2
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1 uas-timer-passivation
+./auto-start-jboss-server.sh $config2 config2.pid 1 uas-timer-passivation
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-start-jboss-server.sh $config1 $config1.pid 0 uas-timer-passivation
+./auto-start-jboss-server.sh $config1 config1.pid 0 uas-timer-passivation
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
@@ -319,8 +316,8 @@ sleep $HALFSTARTSLEEP
 ./auto-run-test.sh uas-timer-passivation result.txt
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
+./auto-kill-process-tree.sh `cat config1.pid` $config1
+./auto-kill-process-tree.sh `cat config2.pid` $config2
 
 sleep 10
 
@@ -332,12 +329,12 @@ echo "================================"
 ./auto-prepare-example.sh proxy-early $config1
 ./auto-prepare-example.sh proxy-early $config2
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1 proxy-early
+./auto-start-jboss-server.sh $config2 config2.pid 1 proxy-early
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-start-jboss-server.sh $config1 $config1.pid 0 proxy-early
+./auto-start-jboss-server.sh $config1 config1.pid 0 proxy-early
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
@@ -345,8 +342,8 @@ sleep $HALFSTARTSLEEP
 ./auto-run-test.sh proxy-early result.txt
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
+./auto-kill-process-tree.sh `cat config1.pid` $config1
+./auto-kill-process-tree.sh `cat config2.pid` $config2
 
 sleep 10
 
@@ -358,12 +355,12 @@ echo "================================"
 ./auto-prepare-example.sh custom-b2bua-early $config1
 ./auto-prepare-example.sh custom-b2bua-early $config2
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1 custom-b2bua-early
+./auto-start-jboss-server.sh $config2 config2.pid 1 custom-b2bua-early
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-start-jboss-server.sh $config1 $config1.pid 0 custom-b2bua-early
+./auto-start-jboss-server.sh $config1 config1.pid 0 custom-b2bua-early
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
@@ -371,8 +368,8 @@ sleep $HALFSTARTSLEEP
 ./auto-run-test.sh custom-b2bua-early result.txt
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
+./auto-kill-process-tree.sh `cat config1.pid` $config1
+./auto-kill-process-tree.sh `cat config2.pid` $config2
 
 sleep 10
 
@@ -384,12 +381,12 @@ echo "================================"
 ./auto-prepare-example.sh b2bua-early $config1
 ./auto-prepare-example.sh b2bua-early $config2
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1 b2bua-early
+./auto-start-jboss-server.sh $config2 config2.pid 1 b2bua-early
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-start-jboss-server.sh $config1 $config1.pid 0 b2bua-early
+./auto-start-jboss-server.sh $config1 config1.pid 0 b2bua-early
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
@@ -397,8 +394,8 @@ sleep $HALFSTARTSLEEP
 ./auto-run-test.sh b2bua-early result.txt
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
+./auto-kill-process-tree.sh `cat config1.pid` $config1
+./auto-kill-process-tree.sh `cat config2.pid` $config2
 
 sleep 10
 
@@ -408,12 +405,12 @@ sleep 10
 echo "Test b2bua early dialog failover Forward Ack"
 echo "================================"
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1 b2bua-early-fwd-ack
+./auto-start-jboss-server.sh $config2 config2.pid 1 b2bua-early-fwd-ack
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-start-jboss-server.sh $config1 $config1.pid 0 b2bua-early-fwd-ack
+./auto-start-jboss-server.sh $config1 config1.pid 0 b2bua-early-fwd-ack
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
@@ -421,8 +418,8 @@ sleep $HALFSTARTSLEEP
 ./auto-run-test.sh b2bua-early-fwd-ack result.txt
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
+./auto-kill-process-tree.sh `cat config1.pid` $config1
+./auto-kill-process-tree.sh `cat config2.pid` $config2
 
 sleep 10
 
@@ -441,12 +438,12 @@ echo "SIP LB $SIPLB"
 ./auto-prepare-example.sh proxy-b2bua-ar $config1
 ./auto-prepare-example.sh proxy-b2bua-ar $config2
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1 proxy-b2bua-ar
+./auto-start-jboss-server.sh $config2 config2.pid 1 proxy-b2bua-ar
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-start-jboss-server.sh $config1 $config1.pid 0 proxy-b2bua-ar
+./auto-start-jboss-server.sh $config1 config1.pid 0 proxy-b2bua-ar
 
 # SIPp should be running by the time JBoss finishes the startup, hence we use half start time here.
 
@@ -470,8 +467,8 @@ cat result.txt
 ls
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
+./auto-kill-process-tree.sh `cat config1.pid` $config1
+./auto-kill-process-tree.sh `cat config2.pid` $config2
 
 sleep 10
 
@@ -484,12 +481,12 @@ echo "================================"
 ./auto-prepare-example.sh uac $config1 -Dsend.on.init=true
 ./auto-prepare-example.sh uac $config2 -Dsend.on.init=false
 
-./auto-start-jboss-server.sh $config2 $config2.pid 1 uac
+./auto-start-jboss-server.sh $config2 config2.pid 1 uac
 
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-start-jboss-server.sh $config1 $config1.pid 0 uac
+./auto-start-jboss-server.sh $config1 config1.pid 0 uac
 
 # SIPp should be running by the time JBoss finishes the startup, hence we use half start time here.
 
@@ -497,8 +494,8 @@ sleep 50
 ./auto-run-test.sh uac result.txt
 
 #Kill the app servers
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
+./auto-kill-process-tree.sh `cat config1.pid` $config1
+./auto-kill-process-tree.sh `cat config2.pid` $config2
 
 sleep 10
 
@@ -509,14 +506,14 @@ sleep 10
 ##################################
 
 #Kill all processes
-./auto-kill-process-tree.sh `cat $config1.pid` $config1
-./auto-kill-process-tree.sh `cat $config2.pid` $config2
+./auto-kill-process-tree.sh `cat config1.pid` $config1
+./auto-kill-process-tree.sh `cat config2.pid` $config2
 ./auto-kill-process-tree.sh $SIPLB siplb
 
 
-kill $KILL_PARAMS `cat $config1.pid`
+kill $KILL_PARAMS `cat config1.pid`
 #echo "Exit status for JBOSS1 $JBOSS1: $?"
-kill $KILL_PARAMS `cat $config2.pid`
+kill $KILL_PARAMS `cat config2.pid`
 #echo "Exit status for JBOSS2 $JBOSS2: $?"
 kill $KILL_PARAMS $SIPLB
 #echo "Exit status for SIPLB $SIPLB: $?"
