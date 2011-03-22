@@ -35,6 +35,7 @@ import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
+import javax.sip.address.SipURI;
 import javax.sip.header.Parameters;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SubscriptionStateHeader;
@@ -121,12 +122,22 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, e);
 			}
 			if(applicationId == null && applicationName == null) {
-				javax.sip.address.SipURI sipRequestUri = (javax.sip.address.SipURI)request.getRequestURI();
+				//gvag Issue 2337 & 2327
+				javax.sip.address.URI requestURI = request.getRequestURI();
 				
-				final String host = sipRequestUri.getHost();
-				final int port = sipRequestUri.getPort();
-				final String transport = JainSipUtils.findTransport(request);
-				final boolean isAnotherDomain = sipApplicationDispatcher.isExternal(host, port, transport);
+				boolean isAnotherDomain = false;
+				
+				if(requestURI.isSipURI()){
+					final String host = ((SipURI) requestURI).getHost();
+					final int port = ((SipURI) requestURI).getPort();
+					final String transport = JainSipUtils.findTransport(request);
+					isAnotherDomain = sipApplicationDispatcher.isExternal(host, port, transport);
+				} else {
+					if(logger.isDebugEnabled()) {
+						logger.debug("The Request URI " + requestURI + " is not a SIP URI and the Route Header was null or didn't contain information about an application to call (which would be incorrect) so we assume the request is an ACK for a container generated error response or misrouted");
+					}	
+				}
+				
 				// Issue 823 (http://code.google.com/p/mobicents/issues/detail?id=823) : 
 				// Container should proxy statelessly subsequent requests not targeted at itself
 				if(isAnotherDomain) {	

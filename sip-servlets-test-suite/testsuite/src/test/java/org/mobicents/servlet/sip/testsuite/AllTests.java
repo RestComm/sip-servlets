@@ -60,6 +60,7 @@ import org.mobicents.servlet.sip.testsuite.proxy.ProxyNonRecordRouteTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ProxyPrackTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ProxyRecordRouteReInviteTest;
 import org.mobicents.servlet.sip.testsuite.proxy.ProxyRecordRouteUpdateTest;
+import org.mobicents.servlet.sip.testsuite.proxy.ProxyURNTest;
 import org.mobicents.servlet.sip.testsuite.proxy.SpeedDialJunitTest;
 import org.mobicents.servlet.sip.testsuite.publish.PublishSipServletTest;
 import org.mobicents.servlet.sip.testsuite.refer.ReferSipServletTest;
@@ -132,6 +133,7 @@ public class AllTests {
 		suite.addTestSuite(ParallelProxyTelURLWithRecordRouteTest.class);
 		suite.addTestSuite(ParallelProxyWithRecordRouteUseHostNameTest.class);
 		suite.addTestSuite(ProxyPrackTest.class);
+		suite.addTestSuite(ProxyURNTest.class);
 		suite.addTestSuite(ForkingProxyDerivedSessions.class);
 		suite.addTestSuite(ProxyNonRecordRouteTest.class);
 		suite.addTestSuite(ShootmePrackSipServletTest.class);

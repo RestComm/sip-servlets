@@ -345,7 +345,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 			if(!JainSipUtils.checkScheme(uri.toString())) {
 				throw new IllegalArgumentException("Scheme " + uri.getScheme() + " is not supported");
 			}
-			final ProxyBranchImpl branch = new ProxyBranchImpl((SipURI) uri, this);
+			final ProxyBranchImpl branch = new ProxyBranchImpl((URI) uri, this);
 			branch.setRecordRoute(recordRoutingEnabled);
 			branch.setRecurse(recurse);
 			this.proxyBranches.put(uri, branch);
