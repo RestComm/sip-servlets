@@ -548,9 +548,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		invalidate(false);
 	}
 	
-	// this method is made synchronized to avoid if SipApplicationSession concurrency control mode is not set
-	// concurrency on the application and the container trying to invalidate at the same time
-	public synchronized void invalidate(boolean bypassCheck) {
+	public void invalidate(boolean bypassCheck) {
 		//JSR 289 Section 6.1.2.2.1
 		//When the IllegalStateException is thrown, the application is guaranteed 
 		//that the state of the SipApplicationSession object will be unchanged from its state prior to the invalidate() 
@@ -561,9 +559,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				throw new IllegalStateException("SipApplicationSession already invalidated !");
 			} else {
 				if(logger.isInfoEnabled()) {
-					logger.info("sip application session " + key + " already invalidated, doing nothing");
-					return;
+					logger.info("sip application session " + key + " already invalidated, doing nothing");					
 				}
+				return;
 			}
 		}
 		if(logger.isInfoEnabled()) {
