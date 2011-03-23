@@ -16,6 +16,8 @@
  */
 package org.mobicents.servlet.sip.testsuite.proxy;
 
+import gov.nist.javax.sip.message.MessageExt;
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +26,6 @@ import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.Header;
-import javax.sip.header.RouteHeader;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
@@ -64,10 +65,17 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
+		// part of non regression test for Issue http://code.google.com/p/mobicents/issues/detail?id=2359
+		// allow to check if ACK retrans keep the same different branch id
+		sender.setTimeToWaitBeforeAck(2000);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());
 		assertTrue(receiver.isAckReceived());
+		// non regression test for Issue http://code.google.com/p/mobicents/issues/detail?id=2359	
+		String inviteBranch = ((MessageExt)receiver.getInviteRequest()).getTopmostViaHeader().getBranch();
+		String ackBranch = ((MessageExt)receiver.getAckRequest()).getTopmostViaHeader().getBranch();
+		assertFalse(inviteBranch.equals(ackBranch));
 		receiver.setAckReceived(false);
 		sender.setAckSent(false);
 		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);		
@@ -75,7 +83,9 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 		assertTrue(sender.isAckSent());
 		assertTrue(receiver.isAckReceived());
 		receiver.setAckReceived(false);
-		sender.setAckSent(false);		
+		receiver.setAckSent(false);
+		sender.setAckSent(false);
+		sender.setAckReceived(false);
 		receiver.sendInDialogSipRequest("INVITE", null, null, null, null, null);
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.isAckSent());

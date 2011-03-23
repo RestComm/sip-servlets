@@ -27,6 +27,7 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.sip.ListeningPoint;
 import javax.sip.Transaction;
+import javax.sip.TransactionState;
 import javax.sip.address.Address;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
@@ -172,7 +173,10 @@ public class ProxyUtils {
 				if(proxy.getOutboundInterface() == null) {
 					String branchId = null;
 
-					if(Request.ACK.equals(method) && proxyBranchRequest != null && proxyBranchRequest.getTransaction() != null) {
+					// http://code.google.com/p/mobicents/issues/detail?id=2359
+					// ivan dubrov : TERMINATED state checking to avoid reusing the branchid for ACK to 200 
+					if(Request.ACK.equals(method) && proxyBranchRequest != null && proxyBranchRequest.getTransaction() != null
+							&& proxyBranchRequest.getTransaction().getState() != TransactionState.TERMINATED) {
 						branchId = proxyBranchRequest.getTransaction().getBranchId();
 						logger.debug("reusing original branch id " + branchId);
 					}
@@ -184,7 +188,10 @@ public class ProxyUtils {
 					
 					String branchId = null;
 
-					if(Request.ACK.equals(method) && proxyBranchRequest != null && proxyBranchRequest.getTransaction() != null) {
+					// http://code.google.com/p/mobicents/issues/detail?id=2359
+					// ivan dubrov : TERMINATED state checking to avoid reusing the branchid for ACK to 200
+					if(Request.ACK.equals(method) && proxyBranchRequest != null && proxyBranchRequest.getTransaction() != null
+							&& proxyBranchRequest.getTransaction().getState() != TransactionState.TERMINATED) {
 						branchId = proxyBranchRequest.getTransaction().getBranchId();
 						logger.debug("reusing original branch id " + branchId);
 					}
@@ -199,7 +206,10 @@ public class ProxyUtils {
 			} else {
 				String branchId = null;
 				viaHeader = (ViaHeader) viaHeader.clone();
-				if(Request.ACK.equals(method) && proxyBranchRequest != null && proxyBranchRequest.getTransaction() != null) {
+				// http://code.google.com/p/mobicents/issues/detail?id=2359
+				// ivan dubrov : TERMINATED state checking to avoid reusing the branchid for ACK to 200
+				if(Request.ACK.equals(method) && proxyBranchRequest != null && proxyBranchRequest.getTransaction() != null
+						&& proxyBranchRequest.getTransaction().getState() != TransactionState.TERMINATED) {
 					branchId = proxyBranchRequest.getTransaction().getBranchId();
 					logger.debug("reusing original branch id " + branchId);
 				} else {
