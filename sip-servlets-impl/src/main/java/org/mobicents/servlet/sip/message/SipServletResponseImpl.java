@@ -60,6 +60,7 @@ import javax.sip.message.Response;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -126,7 +127,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	}
 	
 	@Override
-	public boolean isSystemHeader(String headerName) {
+	public ModifiableRule getModifiableRule(String headerName) {
 		String hName = getFullHeaderName(headerName);
 
 		/*
@@ -139,31 +140,26 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		boolean isSystemHeader = JainSipUtils.SYSTEM_HEADERS.contains(hName);
 
 		if (isSystemHeader) {
-			return isSystemHeader;
+			return ModifiableRule.NotModifiable;
 		}
 
-		boolean isContactSystem = false;
-		Response sipResponse = (Response) this.message;
-
-		String method = ((CSeqHeader) sipResponse.getHeader(CSeqHeader.NAME))
-				.getMethod();
-		//Killer condition, see comment above for meaning
-		if (method.equals(Request.REGISTER)
-				|| ((Response.MULTIPLE_CHOICES <= sipResponse.getStatusCode() && sipResponse.getStatusCode() < Response.BAD_REQUEST) && !method.equals(Request.CANCEL))
-				|| (sipResponse.getStatusCode() == Response.AMBIGUOUS && !method.equals(Request.PRACK) && !method.equals(Request.CANCEL))
-				|| (sipResponse.getStatusCode() == Response.OK && method.equals(Request.OPTIONS))) {
-			isContactSystem = false;
+		if(hName.equals(ContactHeader.NAME)) {
+			Response sipResponse = (Response) this.message;
+	
+			String method = ((CSeqHeader) sipResponse.getHeader(CSeqHeader.NAME))
+					.getMethod();
+			//Killer condition, see comment above for meaning		
+			if (method.equals(Request.REGISTER)
+					|| ((Response.MULTIPLE_CHOICES <= sipResponse.getStatusCode() && sipResponse.getStatusCode() < Response.BAD_REQUEST) && !method.equals(Request.CANCEL))
+					|| (sipResponse.getStatusCode() == Response.AMBIGUOUS && !method.equals(Request.PRACK) && !method.equals(Request.CANCEL))
+					|| (sipResponse.getStatusCode() == Response.OK && method.equals(Request.OPTIONS))) {
+				return ModifiableRule.ContactNotSystem;
+			} else {
+				return ModifiableRule.ContactSystem;
+			}			
 		} else {
-			isContactSystem = true;
-		}
-
-		if (isContactSystem && hName.equals(ContactHeader.NAME)) {
-			isSystemHeader = true;
-		} else {
-			isSystemHeader = false;
-		}
-
-		return isSystemHeader;
+			return ModifiableRule.Modifiable;
+		}				
 	}
 	
 	/*

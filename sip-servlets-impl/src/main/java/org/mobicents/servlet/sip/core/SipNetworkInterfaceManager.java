@@ -44,6 +44,7 @@ import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.utils.Inet6Util;
 
@@ -335,7 +336,7 @@ public class SipNetworkInterfaceManager {
 							null, ipAddress);
 					jainSipURI.setPort(extendedListeningPoint.getPort());
 					jainSipURI.setTransportParam(extendedListeningPoint.getTransport());
-					SipURI sipURI = new SipURIImpl(jainSipURI);
+					SipURI sipURI = new SipURIImpl(jainSipURI, ModifiableRule.NotModifiable);
 					newlyComputedOutboundInterfaces.add(sipURI);
 					if(logger.isDebugEnabled()) {
 						logger.debug("Outbound Interface : " + jainSipURI);

@@ -29,6 +29,8 @@ import javax.servlet.sip.Parameterable;
 import javax.sip.header.Header;
 import javax.sip.header.Parameters;
 
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
+
 
 /**
  * Implementation of the parameterable interface.
@@ -48,7 +50,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	
 	protected transient Parameters header = null;
 	
-	protected boolean isModifiable = true;
+	protected ModifiableRule isModifiable = ModifiableRule.Modifiable;
 	
 	protected ParameterableImpl() {
 		this.parameters = new ConcurrentHashMap<String, String>();	
@@ -59,7 +61,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	 * @param value - initial value of parametrable value
 	 * @param parameters - parameter map - it can be null;
 	 */
-	public ParameterableImpl(Header header, Map<String, String> params, boolean isModifiable) {
+	public ParameterableImpl(Header header, Map<String, String> params, ModifiableRule isModifiable) {
 		this.isModifiable = isModifiable;
 		if(header instanceof Parameters) {
 			this.header = (Parameters) header;
@@ -106,7 +108,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		if(name == null) {
 			throw new NullPointerException("parameter name is null ! ");
 		}
-		if(!isModifiable) {
+		if(isModifiable == ModifiableRule.NotModifiable) {
 			throw new IllegalStateException("it is forbidden to modify the parameters");
 		}
 		this.parameters.remove(name);
@@ -128,7 +130,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 			removeParameter(name);
 			return;
 		}
-		if(!isModifiable) {
+		if(isModifiable == ModifiableRule.NotModifiable) {
 			throw new IllegalStateException("it is forbidden to modify the parameters");
 		}
 		//Fix from abondar for Issue 494 and angelo.marletta for Issue 502      

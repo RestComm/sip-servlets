@@ -28,6 +28,7 @@ import javax.sip.header.Parameters;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 
 /**
  * Implementation of the SipURI interface. This is just a thin wrapper on the
@@ -45,9 +46,11 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	protected static final String USER = "user";
 	protected static final String TRANSPORT = "transport";
 	private final static Logger logger = Logger.getLogger(SipURIImpl.class.getCanonicalName()); 
-
-	public SipURIImpl(javax.sip.address.SipURI sipUri) {
+	protected ModifiableRule isModifiable = ModifiableRule.Modifiable;
+	
+	public SipURIImpl(javax.sip.address.SipURI sipUri, ModifiableRule isModifiable) {		
 		super(sipUri);
+		this.isModifiable = isModifiable;
 	}
 
 	public javax.sip.address.SipURI getSipURI() {
@@ -170,6 +173,9 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 * @see javax.servlet.sip.SipURI#setHost(java.lang.String)
 	 */
 	public void setHost(String host) {
+		if(isModifiable == ModifiableRule.ContactSystem || isModifiable == ModifiableRule.NotModifiable) {
+			throw new IllegalArgumentException("Host part of the URI is not modifiable");
+		}
 		try {
 			getSipURI().setHost(host);
 		} catch (ParseException e) {
@@ -183,6 +189,9 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 * @see javax.servlet.sip.SipURI#setLrParam(boolean)
 	 */
 	public void setLrParam(boolean flag) {
+		if(isModifiable == ModifiableRule.NotModifiable) {
+			throw new IllegalArgumentException("lr param of the URI is not modifiable and must not be set by the application");
+		}
 		if (flag) {
 			getSipURI().setLrParam();
 			super.parameters.put(LR_PARAM, "");
@@ -197,6 +206,9 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 * @see javax.servlet.sip.SipURI#setMAddrParam(java.lang.String)
 	 */
 	public void setMAddrParam(String maddr) {
+		if(isModifiable == ModifiableRule.NotModifiable) {
+			throw new IllegalArgumentException("maddr param of the URI is not modifiable and must not be set by the application");
+		}
 		try {
 			getSipURI().setMAddrParam(maddr);
 			super.parameters.put(MADDR, maddr);
@@ -211,6 +223,9 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 * @see javax.servlet.sip.SipURI#setMethodParam(java.lang.String)
 	 */
 	public void setMethodParam(String method) {
+		if(isModifiable == ModifiableRule.NotModifiable) {
+			throw new IllegalArgumentException("method param of the URI is not modifiable and must not be set by the application");
+		}
 		try {
 			getSipURI().setMethodParam(method);
 			super.parameters.put(METHOD, method);
@@ -225,6 +240,9 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 * @see javax.servlet.sip.SipURI#setPort(int)
 	 */
 	public void setPort(int port) {
+		if(isModifiable == ModifiableRule.NotModifiable) {
+			throw new IllegalArgumentException("port of the URI is not modifiable");
+		}
 		getSipURI().setPort(port);
 	}
 
@@ -267,6 +285,9 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 * @see javax.servlet.sip.SipURI#setUser(java.lang.String)
 	 */
 	public void setUser(String user) {
+		if(isModifiable == ModifiableRule.NotModifiable) {
+			throw new IllegalArgumentException("not allowed to set user part, the URI is not modifiable");
+		}
 		try {
 			getSipURI().setUser(user);			
 		} catch (ParseException e) {
@@ -356,7 +377,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 */
 	@Override
 	public SipURI clone() {
-		return new SipURIImpl((javax.sip.address.SipURI) this.getSipURI().clone());
+		return new SipURIImpl((javax.sip.address.SipURI) this.getSipURI().clone(), isModifiable);
 	}
 
 	/*
@@ -370,6 +391,9 @@ public class SipURIImpl extends URIImpl implements SipURI {
 
 	@Override
 	public void setParameter(String name, String value) {
+		if(isModifiable == ModifiableRule.NotModifiable) {
+			throw new IllegalArgumentException("not allowed to set parameter, the URI is not modifiable");
+		}
 		//Special case to pass Addressing spec test from 289 TCK
 		if(LR_PARAM.equals(name)) {
 			if(value == null || value.length()<1) {
@@ -388,6 +412,9 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	
 	@Override
 	public void removeParameter(String name) {
+		if(isModifiable == ModifiableRule.NotModifiable) {
+			throw new IllegalArgumentException("not allowed to set parameter, the URI is not modifiable");
+		}
 		super.removeParameter(name);
 		((Parameters)getSipURI()).removeParameter(name);
 	}

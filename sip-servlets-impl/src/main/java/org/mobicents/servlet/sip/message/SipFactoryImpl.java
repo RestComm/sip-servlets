@@ -66,6 +66,7 @@ import org.mobicents.servlet.sip.address.GenericURIImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
@@ -158,7 +159,7 @@ public class SipFactoryImpl implements Externalizable {
 		}
 		URIImpl uriImpl = (URIImpl) uri;
 		return new AddressImpl(SipFactories.addressFactory
-				.createAddress(uriImpl.getURI()), null, true);
+				.createAddress(uriImpl.getURI()), null, ModifiableRule.Modifiable);
 	}
 
 	/*
@@ -177,7 +178,7 @@ public class SipFactoryImpl implements Externalizable {
 			javax.sip.address.Address address = SipFactories.addressFactory
 					.createAddress(((URIImpl) uri).getURI());
 			address.setDisplayName(displayName);
-			return new AddressImpl(address, null, true);
+			return new AddressImpl(address, null, ModifiableRule.Modifiable);
 
 		} catch (ParseException e) {
 			throw new IllegalArgumentException(e);
@@ -410,7 +411,7 @@ public class SipFactoryImpl implements Externalizable {
 		}
 		try {
 			return new SipURIImpl(SipFactories.addressFactory.createSipURI(
-					user, host));
+					user, host), ModifiableRule.Modifiable);
 		} catch (ParseException e) {
 			logger.error("couldn't parse the SipURI from USER[" + user
 					+ "] HOST[" + host + "]", e);
@@ -428,7 +429,7 @@ public class SipFactoryImpl implements Externalizable {
 					.createURI(uri);
 			if (jainUri instanceof javax.sip.address.SipURI) {
 				return new SipURIImpl(
-						(javax.sip.address.SipURI) jainUri);
+						(javax.sip.address.SipURI) jainUri, ModifiableRule.Modifiable);
 			} else if (jainUri instanceof javax.sip.address.TelURL) {
 				return new TelURLImpl(
 						(javax.sip.address.TelURL) jainUri);
@@ -636,8 +637,8 @@ public class SipFactoryImpl implements Externalizable {
 			MobicentsSipSession session = ((SipManager)mobicentsSipApplicationSession.getSipContext().getManager()).
 				getSipSession(key, true, this, mobicentsSipApplicationSession);
 			session.setHandler(handler);
-			session.setLocalParty(new AddressImpl(fromAddress, null, false));
-			session.setRemoteParty(new AddressImpl(toAddress, null, false));
+			session.setLocalParty(new AddressImpl(fromAddress, null, ModifiableRule.NotModifiable));
+			session.setRemoteParty(new AddressImpl(toAddress, null, ModifiableRule.NotModifiable));
 			
 			SipServletRequest retVal = new SipServletRequestImpl(
 					requestToWrap, this, session, null, null,

@@ -84,6 +84,7 @@ import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.ParameterableHeaderImpl;
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -252,8 +253,8 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 //			throw new IllegalArgumentException("Header[" + hName
 //					+ "] is not of an address type");
 //		}
-
-		if (isSystemHeader(hName)) {
+		
+		if (isSystemHeader(getModifiableRule(hName))) {
 			logger.error("Error, can't add system header [" + hName + "]");
 			throw new IllegalArgumentException("Header[" + hName
 					+ "] is system header, cant add, modify it!!!");
@@ -280,7 +281,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		if (logger.isDebugEnabled())
 			logger.debug("Adding header under name [" + hName + "]");
 
-		if (!bypassSystemHeaderCheck && isSystemHeader(hName)) {
+		if (!bypassSystemHeaderCheck && isSystemHeader(getModifiableRule(hName))) {
 
 			logger.error("Cant add system header [" + hName + "]");
 
@@ -322,7 +323,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		if(value == null) {
 			throw new NullPointerException ("value parameter is null");
 		}
-		if(!bypassSystemHeaderCheck && isSystemHeader(name)) {
+		if(!bypassSystemHeaderCheck && isSystemHeader(getModifiableRule(name))) {
 			throw new IllegalArgumentException(name + " is a system header !");
 		}		
 		
@@ -451,9 +452,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 			if (first instanceof HeaderAddress) {
 				try {
 					if(this.isCommitted()) {
-						return new AddressImpl((HeaderAddress) first, false);
+						return new AddressImpl((HeaderAddress) first, ModifiableRule.NotModifiable);
 					} else {
-						return new AddressImpl((HeaderAddress) first, true);
+						return new AddressImpl((HeaderAddress) first, getModifiableRule(hName));
 					}
 				} catch (ParseException e) {
 					throw new ServletParseException("Bad address " + first);
@@ -461,11 +462,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 			} else {
 				Parameterable parametrable = createParameterable(first, first.getName());
 				try {
-					logger.debug("parametrable Value " + parametrable.getValue());
+					logger.debug("parametrable Value " + parametrable.getValue());					
 					if(this.isCommitted()) {
-						return new AddressImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), false);
+						return new AddressImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), ModifiableRule.NotModifiable);
 					} else {
-						return new AddressImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), false);
+						return new AddressImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), getModifiableRule(hName));
 					}
 				} catch (ParseException e) {
 					throw new ServletParseException("Impossible to parse the following header " + name + " as an address.", e);
@@ -501,7 +502,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 				HeaderAddress aph = (HeaderAddress) header;
 				try {
 					AddressImpl addressImpl = new AddressImpl(
-							aph, true);
+							aph, getModifiableRule(hName));
 					retval.add(addressImpl);
 				} catch (ParseException ex) {
 					throw new ServletParseException("Bad header", ex);
@@ -509,7 +510,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 			}  else {
 				Parameterable parametrable = createParameterable(header, header.getName());
 				try {
-					AddressImpl addressImpl = new AddressImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), false);
+					AddressImpl addressImpl = new AddressImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), getModifiableRule(hName));
 					retval.add(addressImpl);
 				} catch (ParseException e) {
 					throw new ServletParseException("Impossible to parse the following header " + name + " as an address.", e);
@@ -777,7 +778,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		// AddressImpl enforces immutability!!
 		FromHeader from = (FromHeader) this.message
 				.getHeader(getCorrectHeaderName(FromHeader.NAME));
-		AddressImpl address = new AddressImpl(from.getAddress(), AddressImpl.getParameters((Parameters)from), getTransaction() == null ? true : false);
+		AddressImpl address = new AddressImpl(from.getAddress(), AddressImpl.getParameters((Parameters)from), getTransaction() == null ? ModifiableRule.Modifiable : ModifiableRule.NotModifiable);
 		return address;
 	}
 	
@@ -1070,7 +1071,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	public Address getTo() {
 		ToHeader to = (ToHeader) this.message
 			.getHeader(getCorrectHeaderName(ToHeader.NAME));
-		return new AddressImpl(to.getAddress(), AddressImpl.getParameters((Parameters)to), getTransaction() == null ? true : false);
+		return new AddressImpl(to.getAddress(), AddressImpl.getParameters((Parameters)to), getTransaction() == null ? ModifiableRule.Modifiable : ModifiableRule.NotModifiable);
 	}
 	
 	/*
@@ -1127,7 +1128,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		checkCommitted();
 		String hName = getFullHeaderName(name);
 
-		if (isSystemHeader(hName)) {
+		if (isSystemHeader(getModifiableRule(hName))) {
 			throw new IllegalArgumentException("Cant remove system header["
 					+ hName + "]");
 		}
@@ -1144,7 +1145,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		if (logger.isDebugEnabled())
 			logger.debug("Removing header under name [" + hName + "]");
 
-		if (!bypassSystemHeaderCheck && isSystemHeader(hName)) {
+		if (!bypassSystemHeaderCheck && isSystemHeader(getModifiableRule(hName))) {
 
 			logger.error("Cant remove system header [" + hName + "]");
 
@@ -1190,7 +1191,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 			logger.debug("Setting address header [" + name + "] to value ["
 					+ addr + "]");
 
-		if (isSystemHeader(hName)) {
+		if (isSystemHeader(getModifiableRule(hName))) {
 			logger.error("Error, cant remove system header [" + hName + "]");
 			throw new IllegalArgumentException(
 					"Cant set system header, it is maintained by container!!");
@@ -1361,7 +1362,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		if(value == null) {
 			throw new NullPointerException ("value parameter is null");
 		}
-		if(isSystemHeader(name)) {
+		if(isSystemHeader(getModifiableRule(name))) {
 			throw new IllegalArgumentException(name + " is a system header !");
 		}
 		checkCommitted();
@@ -1421,7 +1422,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	 */
 	public void setParameterableHeader(String name, Parameterable param) {
 		checkCommitted();
-		if(isSystemHeader(name)) {
+		if(isSystemHeader(getModifiableRule(name))) {
 			throw new IllegalArgumentException(name + " is a system header !");
 		}
 		try {
@@ -1449,8 +1450,34 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	 *            either long or compact header name
 	 * @return
 	 */
-	public abstract boolean isSystemHeader(String headerName);
+	public abstract ModifiableRule getModifiableRule(String headerName);
 
+	/**
+	 * Applications must not add, delete, or modify so-called "system" headers.
+	 * These are header fields that the servlet container manages: From, To,
+	 * Call-ID, CSeq, Via, Route (except through pushRoute), Record-Route.
+	 * Contact is a system header field in messages other than REGISTER requests
+	 * and responses, 3xx and 485 responses, and 200/OPTIONS responses.
+	 * Additionally, for containers implementing the reliable provisional
+	 * responses extension, RAck and RSeq are considered system headers also.
+	 * 
+	 * This method should return true if passed name - full or compact is name
+	 * of system header in context of this message. Each subclass has to
+	 * implement it in the manner that it conforms to semantics of wrapping
+	 * class
+	 * 
+	 * @param headerName -
+	 *            either long or compact header name
+	 * @return
+	 */
+	public static boolean isSystemHeader(ModifiableRule modifiableRule) {
+		if (modifiableRule == ModifiableRule.NotModifiable || modifiableRule == ModifiableRule.ContactSystem || modifiableRule == ModifiableRule.ProxyRecordRouteNotModifiable) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
 	/**
 	 * This method checks if passed name is name of address type header -
 	 * according to rfc 3261
@@ -1689,8 +1716,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		}
 
 		boolean isNotModifiable = JainSipUtils.SYSTEM_HEADERS.contains(header.getName());
+		
 		ParameterableHeaderImpl parameterable = new ParameterableHeaderImpl(
-				header, value, paramMap, isNotModifiable);
+				header, value, paramMap, isNotModifiable ? ModifiableRule.NotModifiable : ModifiableRule.Modifiable);
 		return parameterable;
 	}
 

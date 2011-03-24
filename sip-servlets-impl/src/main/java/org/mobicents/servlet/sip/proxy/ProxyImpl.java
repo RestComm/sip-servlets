@@ -55,6 +55,7 @@ import org.mobicents.javax.servlet.sip.ProxyExt;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.timers.ProxyTimerService;
@@ -149,7 +150,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 			RecordRouteHeader rrh = (RecordRouteHeader) request.getMessage().getHeader(RecordRouteHeader.NAME);
 			if(rrh != null) {
 				javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) rrh.getAddress().getURI();
-				uri = new SipURIImpl(sipUri);
+				uri = new SipURIImpl(sipUri, ModifiableRule.NotModifiable);
 			} else { 
 				// If no record route is found then use the last via (the originating endpoint)
 				ListIterator<ViaHeader> viaHeaders = request.getMessage().getHeaders(ViaHeader.NAME);
@@ -379,7 +380,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 			throw new IllegalStateException("Cannot set a record route on an already started proxy");
 		}
 		if(this.pathURI == null) {
-			this.pathURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipNetworkInterfaceManager(), null));
+			this.pathURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipNetworkInterfaceManager(), null), ModifiableRule.NotModifiable);
 		}		
 		addToPath = p;
 
@@ -423,7 +424,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 				message = originalRequest.getMessage();
 			}
 			// record route should be based on the original received message
-			this.recordRouteURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipNetworkInterfaceManager(), message));
+			this.recordRouteURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipNetworkInterfaceManager(), message), ModifiableRule.ProxyRecordRouteNotModifiable);
 			if(logger.isDebugEnabled()) {
 				logger.debug("Record routing enabled for proxy, Record Route used will be : " + recordRouteURI.toString());
 			}
@@ -537,7 +538,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 				URI contactURI = null;
 				if (addressURI instanceof javax.sip.address.SipURI) {
 					contactURI = new SipURIImpl(
-							(javax.sip.address.SipURI) addressURI);
+							(javax.sip.address.SipURI) addressURI, ModifiableRule.NotModifiable);
 				} else if (addressURI instanceof javax.sip.address.TelURL) {
 					contactURI = new TelURLImpl(
 							(javax.sip.address.TelURL) addressURI);

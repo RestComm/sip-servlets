@@ -536,6 +536,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		List<String> allMessagesContent = sender.getAllMessagesContent();
 		assertEquals(1,allMessagesContent.size());
 		assertEquals("noAckReceived", allMessagesContent.get(0));
+		logger.info("nb retrans received " + sender.getNbRetrans());
 		assertTrue( sender.getNbRetrans() >= 9);
 	}
 	
@@ -555,6 +556,25 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());	
+	}
+	
+	// test for http://code.google.com/p/mobicents/issues/detail?id=2361
+	public void testShootmeSystemHeaderModification() throws Exception {
+		String fromName = "systemHeaderModification";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertEquals(200, sender.getFinalResponseStatus());
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());
 	}
 
 	public void testShootmeServerHeader() throws Exception {

@@ -59,6 +59,7 @@ import org.mobicents.servlet.sip.address.GenericURIImpl;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.SipSessionRoutingType;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -333,7 +334,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			URI subscriberUri = SipFactories.addressFactory.createAddress(applicationRouterInfo.getSubscriberURI()).getURI();
 			javax.servlet.sip.URI jainSipSubscriberUri = null; 
 			if(subscriberUri instanceof javax.sip.address.SipURI) {
-				jainSipSubscriberUri= new SipURIImpl((javax.sip.address.SipURI)subscriberUri);
+				jainSipSubscriberUri= new SipURIImpl((javax.sip.address.SipURI)subscriberUri, ModifiableRule.NotModifiable);
 			} else if (subscriberUri instanceof javax.sip.address.TelURL) {
 				jainSipSubscriberUri = new TelURLImpl((javax.sip.address.TelURL)subscriberUri);
 			} else {

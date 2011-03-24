@@ -28,6 +28,7 @@ import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.javax.servlet.sip.dns.DNSResolver;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 
 /**
  * @author jean.deruelle@gmail.com
@@ -46,7 +47,7 @@ public class MobicentsDNSResolver implements DNSResolver {
 	 */
 	public SipURI getSipURI(URI uri) {
 		javax.sip.address.SipURI jainSipURI = dnsServerLocator.getSipURI(((URIImpl)uri).getURI());
-		SipURI sipURI = new SipURIImpl(jainSipURI);
+		SipURI sipURI = new SipURIImpl(jainSipURI, ModifiableRule.NotModifiable);
 		return sipURI;
 	}
 

@@ -91,6 +91,7 @@ public class SimpleSipServlet
 	private static final String TEST_CANCEL_USERNAME = "cancel";
 	private static final String TEST_BYE_ON_DESTROY = "testByeOnDestroy";
 	private static final String TEST_NO_ACK_RECEIVED = "noAckReceived";
+	private static final String TEST_SYSTEM_HEADER_MODIFICATION = "systemHeaderModification";
 	private static final String TEST_SERIALIZATION = "serialization";
 	
 	@Resource
@@ -138,10 +139,39 @@ public class SimpleSipServlet
 		if(fromString.contains(TEST_NO_ACK_RECEIVED)) {
 			request.createResponse(SipServletResponse.SC_OK).send();
 			return;
-		}		
+		}				
+			
 		logger.info("from : " + fromString);
 		logger.info("Got request: "
 				+ request.getMethod());	
+		
+		if(fromString.contains(TEST_SYSTEM_HEADER_MODIFICATION)) {
+			SipServletResponse res = request.createResponse(SipServletResponse.SC_OK);
+			Address contact = res.getAddressHeader("Contact");
+			SipURI uri = (SipURI)contact.getURI();
+			// Illegal Operation 1
+			try {
+				uri.setHost("foo.com");
+				logger.error("can modify host of the Contact URI, this shouldn't be allowed");
+				request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR).send();
+				return;
+			} catch (IllegalArgumentException e) {
+				// good 
+			}
+			
+			// IllegalOperation 2
+			try {
+				SipURI from = (SipURI)res.getAddressHeader("From").getURI();
+				from.setHost("bar.com");
+				logger.error("can modify host of the From URI, this shouldn't be allowed");
+				request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR).send();
+				return;
+			} catch (IllegalArgumentException e) {
+				// good 
+			}			
+			res.send();
+			return;
+		}
 		
 		request.setAttribute("test", "test");
 		String requestAttribute = (String)request.getAttribute("test");

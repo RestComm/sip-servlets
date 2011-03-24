@@ -16,7 +16,6 @@
  */
 package org.mobicents.servlet.sip.address;
 
-import gov.nist.javax.sip.address.AddressFactoryImpl;
 import gov.nist.javax.sip.header.ParametersExt;
 
 import java.text.ParseException;
@@ -34,6 +33,7 @@ import javax.sip.header.HeaderAddress;
 import javax.sip.header.Parameters;
 
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 
 /**
  * Implementation of Servlet Address specification.
@@ -44,16 +44,16 @@ import org.mobicents.servlet.sip.SipFactories;
  */
 public class AddressImpl extends ParameterableImpl implements Address {
 	
-//	private static Log logger = LogFactory.getLog(AddressImpl.class
-//			.getCanonicalName());
-	
-
 	private static final long serialVersionUID = 1L;
 	private static final String Q_PARAM_NAME = "q";
 	private static final String EXPIRES_PARAM_NAME = "expires";
 	private static final String PARAM_SEPARATOR = ";";
 	private static final String PARAM_NAME_VALUE_SEPARATOR = "=";
-	private javax.sip.address.Address address;	
+	private javax.sip.address.Address address;
+	
+	public enum ModifiableRule {
+		NotModifiable, ProxyRecordRouteNotModifiable, ContactSystem, ContactNotSystem, Modifiable;
+	}
 		
 	public javax.sip.address.Address getAddress() {
 		return address;
@@ -62,7 +62,7 @@ public class AddressImpl extends ParameterableImpl implements Address {
 	public AddressImpl() {}
 	
 	@SuppressWarnings("unchecked")
-	public AddressImpl (javax.sip.address.Address address, Map<String, String> parameters, boolean isModifiable) {
+	public AddressImpl (javax.sip.address.Address address, Map<String, String> parameters, ModifiableRule isModifiable) {
 		super();
 		super.isModifiable = isModifiable;
 		this.address = address;				
@@ -108,7 +108,7 @@ public class AddressImpl extends ParameterableImpl implements Address {
 	 *            </b>
 	 * @throws ParseException
 	 */
-	public AddressImpl(HeaderAddress header, boolean modifiable) throws ParseException {
+	public AddressImpl(HeaderAddress header, ModifiableRule modifiable) throws ParseException {
 		if(header instanceof Parameters) {
 			super.header = (Parameters) header;
 		}
@@ -161,7 +161,7 @@ public class AddressImpl extends ParameterableImpl implements Address {
 	public URI getURI() {
 		final javax.sip.address.URI localUri = getAddress().getURI();
 		if (localUri instanceof javax.sip.address.SipURI)
-			return new SipURIImpl((javax.sip.address.SipURI) localUri);
+			return new SipURIImpl((javax.sip.address.SipURI) localUri, isModifiable);
 		else if (localUri instanceof javax.sip.address.TelURL)
 			return new TelURLImpl((javax.sip.address.TelURL) localUri);
 		else if (localUri instanceof javax.sip.address.URI) {			
@@ -186,7 +186,7 @@ public class AddressImpl extends ParameterableImpl implements Address {
 	 * @see javax.servlet.sip.Address#setDisplayName(java.lang.String)
 	 */
 	public void setDisplayName(String name) {
-		if(!isModifiable) {
+		if(SipServletMessageImpl.isSystemHeader(isModifiable)) {
 			throw new IllegalStateException("this Address is used in a context where it cannot be modified");
 		}
 		try {
@@ -249,7 +249,7 @@ public class AddressImpl extends ParameterableImpl implements Address {
 	 * @see javax.servlet.sip.Address#setURI(javax.servlet.sip.URI)
 	 */
 	public void setURI(URI uri) {
-		if(!isModifiable) {
+		if(SipServletMessageImpl.isSystemHeader(isModifiable)) {
 			throw new IllegalStateException("this Address is used in a context where it cannot be modified");
 		}
 		this.getAddress().setURI(((URIImpl) uri).uri);

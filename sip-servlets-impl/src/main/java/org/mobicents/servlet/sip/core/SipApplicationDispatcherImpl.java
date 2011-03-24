@@ -93,6 +93,7 @@ import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
@@ -666,7 +667,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				if(transaction != null) {
 					TransactionApplicationData transactionApplicationData = (TransactionApplicationData)transaction.getApplicationData();
 					if(transactionApplicationData != null && transactionApplicationData.getInitialPoppedRoute() == null) {				
-						transactionApplicationData.setInitialPoppedRoute(new AddressImpl(routeHeader.getAddress(), null, false));
+						transactionApplicationData.setInitialPoppedRoute(new AddressImpl(routeHeader.getAddress(), null, ModifiableRule.NotModifiable));
 					}
 				}
 			}							

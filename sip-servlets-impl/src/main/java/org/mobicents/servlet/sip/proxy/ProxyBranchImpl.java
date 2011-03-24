@@ -55,6 +55,7 @@ import org.mobicents.javax.servlet.sip.ResponseType;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.address.SipURIImpl;
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
@@ -879,7 +880,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 			throw new IllegalStateException("Cannot set a record route on an already started proxy");
 		}
 		if(this.pathURI == null) {
-			this.pathURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( proxy.getSipFactoryImpl().getSipNetworkInterfaceManager(), null));
+			this.pathURI = new SipURIImpl (JainSipUtils.createRecordRouteURI( proxy.getSipFactoryImpl().getSipNetworkInterfaceManager(), null), ModifiableRule.NotModifiable);
 		}		
 		this.isAddToPath = isAddToPath;
 	}

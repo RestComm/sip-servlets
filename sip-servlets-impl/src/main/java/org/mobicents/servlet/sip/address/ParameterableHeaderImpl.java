@@ -23,6 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.sip.header.Header;
 import javax.sip.header.Parameters;
 
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
+
 /**
  * This class is impl of Parameterable object returned
  * 
@@ -37,9 +39,9 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 		super();
 	}
 
-	public ParameterableHeaderImpl(Header header, String value, Map<String, String> params, boolean isNotModifiable) {
+	public ParameterableHeaderImpl(Header header, String value, Map<String, String> params, ModifiableRule isModifiable) {
 		// General form of parametrable header
-		super(header, params, !isNotModifiable);
+		super(header, params, isModifiable);
 		this.value = value;
 	}
 
@@ -60,7 +62,7 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 		if(value == null) {
 			throw new NullPointerException("value is null ! ");
 		}
-		if(!isModifiable) {
+		if(isModifiable == ModifiableRule.NotModifiable) {
 			throw new IllegalStateException("it is forbidden for an application to set the From Header");
 		}
 		this.value = value;

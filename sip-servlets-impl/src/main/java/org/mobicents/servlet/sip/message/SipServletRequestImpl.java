@@ -102,6 +102,7 @@ import org.mobicents.servlet.sip.address.GenericURIImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.RoutingState;
@@ -196,7 +197,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	}
 
 	@Override
-	public boolean isSystemHeader(String headerName) {
+	public ModifiableRule getModifiableRule(String headerName) {
 
 		String hName = getFullHeaderName(headerName);
 
@@ -208,26 +209,22 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		 */
 		boolean isSystemHeader = JainSipUtils.SYSTEM_HEADERS.contains(hName);
 
-		if (isSystemHeader)
-			return isSystemHeader;
-
-		boolean isContactSystem = false;
-		Request request = (Request) this.message;
-
-		String method = request.getMethod();
-		if (method.equals(Request.REGISTER)) {
-			isContactSystem = false;
-		} else {
-			isContactSystem = true;
+		if (isSystemHeader) {
+			return ModifiableRule.NotModifiable;
 		}
 
-		if (isContactSystem && hName.equals(ContactHeader.NAME)) {
-			isSystemHeader = true;
+		if(hName.equals(ContactHeader.NAME)) {
+			Request request = (Request) this.message;
+	
+			String method = request.getMethod();
+			if (method.equals(Request.REGISTER)) {
+				return ModifiableRule.ContactNotSystem;
+			} else {
+				return ModifiableRule.ContactSystem;
+			}				
 		} else {
-			isSystemHeader = false;
+			return ModifiableRule.Modifiable;
 		}
-
-		return isSystemHeader;
 	}
 
 	public SipServletRequest createCancel() {
@@ -444,7 +441,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	public Address getPoppedRoute() {
 		if((this.poppedRoute == null && poppedRouteHeader != null) ||
 				(poppedRoute != null && poppedRouteHeader != null && !poppedRoute.getAddress().equals(poppedRouteHeader.getAddress()))) {
-			this.poppedRoute = new AddressImpl(poppedRouteHeader.getAddress(), null, getTransaction() == null ? true : false);
+			this.poppedRoute = new AddressImpl(poppedRouteHeader.getAddress(), null, getTransaction() == null ? ModifiableRule.Modifiable : ModifiableRule.NotModifiable);
 		}
 		return poppedRoute;
 	}
@@ -524,7 +521,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		Request request = (Request) super.message;
 		if (request.getRequestURI() instanceof javax.sip.address.SipURI)
 			return new SipURIImpl((javax.sip.address.SipURI) request
-					.getRequestURI());
+					.getRequestURI(), ModifiableRule.Modifiable);
 		else if (request.getRequestURI() instanceof javax.sip.address.TelURL)
 			return new TelURLImpl((javax.sip.address.TelURL) request
 					.getRequestURI());
