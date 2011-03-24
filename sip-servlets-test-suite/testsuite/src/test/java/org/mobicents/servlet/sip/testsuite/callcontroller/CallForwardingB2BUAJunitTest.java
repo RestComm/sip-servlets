@@ -81,7 +81,7 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		super.setUp();
 
 		senderProtocolObjects = new ProtocolObjects("forward-sender",
-				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+				"gov.nist", TRANSPORT, AUTODIALOG, null, "32", "true");
 		receiverProtocolObjects = new ProtocolObjects("receiver",
 				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 			
