@@ -143,7 +143,7 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 		for (int i = 0; i < 3; i++) {
 			sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);
 		}			
-		Thread.sleep(TIMEOUT * 4);
+		Thread.sleep(TIMEOUT * 5);
 		assertTrue(receiver.getOkToByeReceived());
 		assertTrue(sender.getByeReceived());	
 
