@@ -645,6 +645,15 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	
 	@Override
 	public void addChild(Container container) {
+		if(container instanceof Wrapper) {
+			// Added for Issue http://code.google.com/p/mobicents/issues/detail?id=2382
+			Wrapper wrapper = (Wrapper) container;
+			SipServletImpl sipServletImpl = (SipServletImpl) childrenMap.get(container.getName());
+			if(sipServletImpl != null && !sipServletImpl.getServletClass().equals(wrapper.getServletClass())) {
+				throw new SipDeploymentException("Trying to add a servlet with name " + container.getName() + " and servlet class " + wrapper.getServletClass() + 
+						" while there is already a SIP Servlet with the same name and a different servlet class " + sipServletImpl.getServletClass());
+			}
+		}
 		if(children.get(container.getName()) == null) {
 			super.addChild(container);
 		} else {
