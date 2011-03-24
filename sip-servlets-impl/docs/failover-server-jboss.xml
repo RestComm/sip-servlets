@@ -9,7 +9,7 @@
 	This custom service allows for sip/web connectors and it will ping the balancer(s) defined in its balancers attribute
    -->
    <Service name="jboss.web" 
-      	className="org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService"
+      	className="org.mobicents.servlet.sip.startup.SipStandardService"
   		balancers="127.0.0.1"  
   		sipPathName="org.mobicents.ha" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"

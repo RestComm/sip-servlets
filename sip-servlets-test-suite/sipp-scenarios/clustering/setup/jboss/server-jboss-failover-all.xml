@@ -11,7 +11,7 @@
    connectors.
    -->
    <Service name="jboss.web" 
-      	className="org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService"
+      	className="org.mobicents.servlet.sip.startup.SipStandardService"
   		balancers="192.168.0.10"
   		sipPathName="org.mobicents.ha"   
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"

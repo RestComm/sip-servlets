@@ -45,7 +45,7 @@
   
    -->
   <Service name="Catalina" 
-  		className="org.mobicents.servlet.sip.startup.failover.SipStandardBalancerNodeService"
+  		className="org.mobicents.servlet.sip.startup.SipStandardService"
   		balancers="127.0.0.1" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
   		darConfigurationFileLocation="conf/dars/simple-dar.properties">
