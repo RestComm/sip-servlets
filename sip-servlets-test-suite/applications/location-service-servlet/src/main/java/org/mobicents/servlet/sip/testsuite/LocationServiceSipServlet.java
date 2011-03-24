@@ -62,7 +62,7 @@ public class LocationServiceSipServlet extends SipServlet {
 
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
-		logger.info("the locationb service sip servlet has been started");
+		logger.info("the location service sip servlet has been started");
 		super.init(servletConfig);
 		SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
 		registeredUsers = new HashMap<String, List<URI>>();
