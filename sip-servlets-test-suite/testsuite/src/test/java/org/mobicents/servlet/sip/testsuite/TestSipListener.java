@@ -1463,11 +1463,11 @@ public class TestSipListener implements SipListener {
 
 		logger.info("Response received : Status Code = "
 				+ response.getStatusCode() + " " + cseq);
+		if (tid == null && countRetrans) {
+			nbRetrans++;
+		}
 		// not dropping in PRACK case on REINVITE the ClientTx can be null it seems		
 		if (tid == null && responseDialog == null && !prackSent) {
-			if(countRetrans) {
-				nbRetrans++;
-			}
 			logger.info("Stray response -- dropping ");
 			return;
 		}		
