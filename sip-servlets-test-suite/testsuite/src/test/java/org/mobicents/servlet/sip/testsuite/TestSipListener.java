@@ -318,6 +318,8 @@ public class TestSipListener implements SipListener {
 	private boolean sendUpdateAfterPrack = false;
 
 	private boolean sendUpdateAfterProvisionalResponses;
+
+	private Request ackRequest;
 	
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -1339,6 +1341,7 @@ public class TestSipListener implements SipListener {
 			logger.info("shootist:  got a " + request);
 			logger.info("shootist:  got an ACK. ServerTxId = " + serverTransactionId);
 			ackReceived = true;
+			ackRequest = request;
 			
 			//we don't count retransmissions
 			if(serverTransactionId != null) {
@@ -3063,5 +3066,12 @@ public class TestSipListener implements SipListener {
 
 	public void setSendUpdateAfterProvisionalResponses(boolean sendUpdateAfterProvisonalResponses) {
 		this.sendUpdateAfterProvisionalResponses = sendUpdateAfterProvisonalResponses;
+	}
+
+	/**
+	 * @return the ackRequest
+	 */
+	public Request getAckRequest() {
+		return ackRequest;
 	}
 }
