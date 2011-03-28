@@ -119,6 +119,8 @@ public class Shootist implements SipListener {
 	private String lastMessageContent;
 	
 	private List<String> allMessagesContent = new ArrayList<String>();
+	
+	private int numberOfTryingReceived = 0;
 
 	class ByeTask  extends TimerTask {
 		Dialog dialog;
@@ -257,6 +259,10 @@ public class Shootist implements SipListener {
 		
 		System.out.println("Response received : Status Code = "
 				+ response.getStatusCode() + " " + cseq);
+		
+		if(response.getStatusCode() == 100) {
+			numberOfTryingReceived++;
+		}
 		
 		SipURI fromUri = (SipURI)((FromHeader)response.getHeader(FromHeader.NAME)).getAddress().getURI();
 		RecordRouteHeader recordRouteHeader = (RecordRouteHeader)response.getHeader(RecordRouteHeader.NAME);
@@ -673,6 +679,13 @@ public class Shootist implements SipListener {
 	 */
 	public List<String> getAllMessagesContent() {
 		return allMessagesContent;
+	}
+
+	/**
+	 * @return the numberOfTryingReceived
+	 */
+	public int getNumberOfTryingReceived() {
+		return numberOfTryingReceived;
 	}
 
 }

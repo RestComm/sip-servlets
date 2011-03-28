@@ -52,12 +52,14 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(ProxySipServlet.class);
 	String host = "127.0.0.1";
-	private static String USE_HOSTNAME = "useHostName";
+	private static String USE_HOSTNAME = "useHostName";	
 	private static String CHECK_URI = "check_uri";
 	private static String TEST_2_TRYING = "test_2_trying";
 	private static String CHECK_READY_TO_INVALIDATE = "check_rti";
 	private static String NON_RECORD_ROUTING = "nonRecordRouting";
 	private static String RECORD_ROUTING = "recordRouting";
+	private static String TEST_CREATE_SUBSEQUENT_REQUEST = "test_create_subsequent_request";
+	
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	
 	@Override
@@ -232,6 +234,17 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			IOException {
 
 		logger.info("Got BYE request:\n" + request);
+		SipURI fromURI = ((SipURI)request.getFrom().getURI());
+		
+		if(fromURI.toString().contains(TEST_CREATE_SUBSEQUENT_REQUEST)) {
+			try {
+				request.getSession().createRequest("BYE");
+			} catch(IllegalStateException ise) {
+				logger.error("Got expected IllegalStateException on trying to create a subsequent request on a proxy session", ise);
+				throw ise;
+			}
+		}
+		
 		SipServletResponse sipServletResponse = request.createResponse(200);
 		
 		// If the branchResponse callback was called we are good otherwise fail by
@@ -240,7 +253,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		if("true".equals(doBranchRespValue))
 			sipServletResponse.send();
 		
-		SipURI fromURI = ((SipURI)request.getFrom().getURI());
+
 		logger.info("invalidate when ready "
 				+ request.getApplicationSession().getInvalidateWhenReady());
 		if(fromURI.getUser().equals(CHECK_READY_TO_INVALIDATE)) {

@@ -209,6 +209,27 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 			fail("We got " + shootist.getNumberOfTryingReceived() +" Trying, we should have received one !");
 		}
 	}
+	
+	/**
+	 * Non regression test for Issue 2440 : SipSession.createRequest on proxy SipSession does not throw IllegalStateException
+	 * http://code.google.com/p/mobicents/issues/detail?id=2440
+	 */
+	public void testProxyCreateSubsequent() {
+		this.shootme.init("stackName", null);
+		this.cutme.init(null);
+		this.shootist.init("test_create_subsequent_request",false, null);
+		for (int q = 0; q < 20; q++) {
+			if (shootist.ended == false && cutme.canceled == false)
+				try {
+					Thread.sleep(TIMEOUT);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+		if (shootist.ended == true)
+			fail("Conversation complete where it shouldn't be since the createSubsequentRequest should have thrown an IllegalStateException!");				
+	}
 
 	@Override
 	public void tearDown() throws Exception {

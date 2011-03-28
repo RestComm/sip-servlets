@@ -338,6 +338,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(State.TERMINATED.equals(state)) {
 			throw new IllegalStateException("cannot create a subsequent request " + method + " because the session " + key + " is in TERMINATED state");
 		}
+		// Issue 2440 : http://code.google.com/p/mobicents/issues/detail?id=2440
+		// SipSession.createRequest on proxy SipSession does not throw IllegalStateException
+		if(proxy != null) {
+			throw new IllegalStateException("cannot create a subsequent request " + method + " because the session " + key + " has been used for proxying. See JSR289 Section 6.2.2.1.");
+		}
 //		if((State.INITIAL.equals(state) && hasOngoingTransaction())) {
 //			throw new IllegalStateException("cannot create a request because the session is in INITIAL state with ongoing transactions");
 //		}
