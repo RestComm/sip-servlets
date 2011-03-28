@@ -72,6 +72,9 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 			fail("Conversation not complete!");
 		if (cutme.canceled == false)
 			fail("The party that was supposed to be cancelled didn't cancel.");
+		if(shootist.getNumberOfTryingReceived() != 1) {
+			fail("We got " + shootist.getNumberOfTryingReceived() +" Trying, we should have received one !");
+		}
 	}
 	
 
@@ -178,6 +181,33 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 		}
 		if (shootist.ended == false)
 			fail("Conversation not complete!");		
+	}
+	
+	/**
+	 * Non regression test for Issue 2417 : Two 100 Trying responses sent if Proxy decision is delayed. 
+	 * http://code.google.com/p/mobicents/issues/detail?id=2417
+	 */
+	public void testProxy2Trying() {
+		this.shootme.init("stackName", null);
+		this.cutme.init(null);
+		this.shootist.init("test_2_trying",false, null);
+		for (int q = 0; q < 20; q++) {
+			if (shootist.ended == false && cutme.canceled == false)
+				try {
+					Thread.sleep(TIMEOUT);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+		if (shootist.ended == false)
+			fail("Conversation not complete!");		
+		if(shootist.getNumberOfTryingReceived() > 1) {
+			fail("We got " + shootist.getNumberOfTryingReceived() +" Trying, we should have received only one !");
+		}
+		if(shootist.getNumberOfTryingReceived() != 1) {
+			fail("We got " + shootist.getNumberOfTryingReceived() +" Trying, we should have received one !");
+		}
 	}
 
 	@Override

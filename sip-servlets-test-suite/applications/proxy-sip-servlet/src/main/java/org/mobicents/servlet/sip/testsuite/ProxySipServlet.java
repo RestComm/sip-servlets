@@ -54,6 +54,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 	String host = "127.0.0.1";
 	private static String USE_HOSTNAME = "useHostName";
 	private static String CHECK_URI = "check_uri";
+	private static String TEST_2_TRYING = "test_2_trying";
 	private static String CHECK_READY_TO_INVALIDATE = "check_rti";
 	private static String NON_RECORD_ROUTING = "nonRecordRouting";
 	private static String RECORD_ROUTING = "recordRouting";
@@ -211,6 +212,15 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			} else {
 				proxy.setProxyTimeout(4);
 			}
+			if(TEST_2_TRYING.equals(fromURI.getUser())) {
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
 			proxy.proxyTo(uris);
 		}
 	}

@@ -482,13 +482,22 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 			// We must send only one TRYING no matter how many branches we spawn later.
 			// This is needed for tests like testProxyBranchRecurse
 			tryingSent = true;
-			logger.info("Sending 100 Trying to the source");
-			SipServletResponse trying =
-				originalRequest.createResponse(100);			
-			try {
-				trying.send();
-			} catch (IOException e) { 
-				logger.error("Cannot send the 100 Trying",e);
+			TransactionState transactionState = null;
+			if(originalRequest.getTransaction() != null) {
+				transactionState = originalRequest.getTransaction().getState();
+			}
+			// Fix for Issue http://code.google.com/p/mobicents/issues/detail?id=2417
+			// Two 100 Trying responses sent if Proxy decision is delayed.
+			if (transactionState == null || transactionState == TransactionState.TRYING) {
+				if(originalRequest.getTransaction().getState() == null )
+				logger.info("Sending 100 Trying to the source");
+				SipServletResponse trying =
+					originalRequest.createResponse(100);			
+				try {
+					trying.send();
+				} catch (IOException e) { 
+					logger.error("Cannot send the 100 Trying",e);
+				}
 			}
 		}
 		
