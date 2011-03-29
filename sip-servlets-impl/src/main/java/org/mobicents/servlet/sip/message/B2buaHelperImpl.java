@@ -647,6 +647,9 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		}
 		this.sessionMap.put(((MobicentsSipSession)session1).getKey(), ((MobicentsSipSession)session2).getKey());
 		this.sessionMap.put(((MobicentsSipSession)session2).getKey(), ((MobicentsSipSession) session1).getKey());
+		if(logger.isDebugEnabled()) {
+			logger.debug("sipsession " + ((MobicentsSipSession)session1).getKey() + " linked to sip session " + ((MobicentsSipSession)session2).getKey());
+		}
 		dumpLinkedSessions();
 	}
 	
@@ -676,11 +679,13 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 				throw new IllegalArgumentException("the session is not currently linked to another session or it has been terminated");
 			}		
 		}
-		final SipSessionKey value  = this.sessionMap.get(sipSessionKey);
+		final SipSessionKey value  = this.sessionMap.remove(sipSessionKey);
 		if (value != null) {
 			this.sessionMap.remove(value);
 		}
-		this.sessionMap.remove(sipSessionKey);
+		if(logger.isDebugEnabled()) {
+			logger.debug("sipsession " + sipSessionKey + " unlinked from sip session " + value);
+		}
 		unlinkOriginalRequestInternal(sipSessionKey, !checkSession);
 		dumpLinkedSessions();
 	}
