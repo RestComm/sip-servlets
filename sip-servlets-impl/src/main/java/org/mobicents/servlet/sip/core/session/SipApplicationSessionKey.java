@@ -49,7 +49,7 @@ public class SipApplicationSessionKey implements Serializable {
 			this.uuid = id;
 		}		
 		this.applicationName = applicationName;
-		toString = "(" + uuid + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName +	")";
+		toString = uuid + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName;
 	}
 	/**
 	 * @return the Id
@@ -71,6 +71,11 @@ public class SipApplicationSessionKey implements Serializable {
 	}
 	public void setAppGeneratedKey(String appGeneratedKey) {
 		this.appGeneratedKey = appGeneratedKey;
+		// "While processing the initial request after selecting the application, the 
+		// container MUST look for this annotated static method within the application. 
+		// If found, the container MUST call the method to get the key and generate an 
+		// application-session-id by appending some unique identifier
+		toString = appGeneratedKey + SessionManagerUtil.SESSION_KEY_SEPARATOR + uuid + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName;
 	}
 	
 	/* (non-Javadoc)

@@ -122,24 +122,28 @@ public class SessionManagerUtil {
 	 */
 	public static SipApplicationSessionKey parseSipApplicationSessionKey(
 			String sipApplicationKey) throws ParseException {
-		
-		int indexOfLeftParenthesis = sipApplicationKey.indexOf("(");
+				
 		int indexOfComma = sipApplicationKey.indexOf(SESSION_KEY_SEPARATOR);
-		int indexOfRightParenthesis = sipApplicationKey.indexOf(")");
-		if(indexOfLeftParenthesis == -1) {
-			throw new ParseException("The left parenthesis could not be found in the following key " + sipApplicationKey, 0);
-		}
 		if(indexOfComma == -1) {
 			throw new ParseException("The comma could not be found in the following key " + sipApplicationKey, 0);
 		}
-		if(indexOfRightParenthesis == -1) {
-			throw new ParseException("The right parenthesis could not be found in the following key " + sipApplicationKey, 0);
-		}
 		
-		String uuid = sipApplicationKey.substring(indexOfLeftParenthesis + 1, indexOfComma);
-		String applicationName = sipApplicationKey.substring(indexOfComma + 1, indexOfRightParenthesis);
-		
-		return getSipApplicationSessionKey(applicationName, uuid);			
+		String appGeneratedKey = null;
+		String uuid = sipApplicationKey.substring(0, indexOfComma);
+		String leftover = sipApplicationKey.substring(indexOfComma + 1, sipApplicationKey.length());
+		indexOfComma = leftover.indexOf(SESSION_KEY_SEPARATOR);
+		SipApplicationSessionKey sipApplicationSessionKey = null;
+		if(indexOfComma != -1) {
+			appGeneratedKey = uuid;
+			uuid = leftover.substring(0, indexOfComma);
+			String applicationName = leftover.substring(indexOfComma + 1, leftover.length());
+			sipApplicationSessionKey = getSipApplicationSessionKey(applicationName, uuid);
+			sipApplicationSessionKey.setAppGeneratedKey(appGeneratedKey);
+		} else {
+			String applicationName = leftover;
+			sipApplicationSessionKey = getSipApplicationSessionKey(applicationName, uuid);
+		}	
+		return sipApplicationSessionKey;
 	}
 	
 	/**

@@ -198,9 +198,15 @@ public abstract class SipManagerDelegate {
 		//first we check if the app session can be found by its app generated key
 		final String appGeneratedKey = key.getAppGeneratedKey();
 		if(appGeneratedKey != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("trying to find sip application session with generated key " + appGeneratedKey);
+			}
 			sipApplicationSessionImpl = sipApplicationSessionsByAppGeneratedKey.get(appGeneratedKey);
 		}
 		if(sipApplicationSessionImpl == null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("trying to find sip application session with key " + key);
+			}
 			sipApplicationSessionImpl = sipApplicationSessions.get(key);
 		}
 		if(sipApplicationSessionImpl == null && create) {
