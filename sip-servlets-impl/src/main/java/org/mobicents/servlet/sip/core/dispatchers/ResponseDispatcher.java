@@ -80,8 +80,10 @@ public class ResponseDispatcher extends MessageDispatcher {
 		final Response response = sipServletResponse.getResponse();
 		final ListIterator<ViaHeader> viaHeaders = response.getHeaders(ViaHeader.NAME);				
 		final ViaHeader viaHeader = viaHeaders.next();
+		final String branch = viaHeader.getBranch();
 		if(logger.isDebugEnabled()) {
 			logger.debug("viaHeader = " + viaHeader.toString());
+			logger.debug("viaHeader branch = " + branch);
 		}
 		//response meant for the container
 		if(!sipApplicationDispatcher.isViaHeaderExternal(viaHeader)) {
@@ -103,8 +105,12 @@ public class ResponseDispatcher extends MessageDispatcher {
 				applicationData.addSipServletResponse(sipServletResponse);
 				//
 				ViaHeader nextViaHeader = null;
-				if(viaHeaders.hasNext()) {
+				if(viaHeaders.hasNext()) {					
 					nextViaHeader = viaHeaders.next();
+					if(logger.isDebugEnabled()) {
+						logger.debug("nextViaHeader = " + nextViaHeader.toString());
+						logger.debug("viaHeader branch = " + nextViaHeader.getBranch());
+					}
 				}
 				checkInitialRemoteInformation(sipServletMessage, nextViaHeader);
 			} //there is no client transaction associated with it, it means that this is a retransmission
@@ -132,21 +138,29 @@ public class ResponseDispatcher extends MessageDispatcher {
 			if(applicationData != null) {
 				final String appNameNotDeployed = applicationData.getAppNotDeployed();
 				if(appNameNotDeployed != null && appNameNotDeployed.length() > 0) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("appNameNotDeployed = " + appNameNotDeployed + " forwarding the response.");
+					}
 					forwardResponseStatefully(sipServletResponse);
 					return ;
 				}
 				final boolean noAppReturned = applicationData.isNoAppReturned();
 				if(noAppReturned) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("isNoAppReturned forwarding the response.");
+					}
 					forwardResponseStatefully(sipServletResponse);
 					return ;
 				}
 				final String modifier = applicationData.getModifier();
 				if(modifier != null && modifier.length() > 0) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("modifier = " + modifier + " forwarding the response.");
+					}
 					forwardResponseStatefully(sipServletResponse);
 					return ;
 				}		
 			}
-			final String branch = viaHeader.getBranch();
 			String strippedBranchId = branch.substring(BRANCH_MAGIC_COOKIE.length());
 			int indexOfUnderscore = strippedBranchId.indexOf("_");
 			if(indexOfUnderscore == -1) {
