@@ -817,10 +817,22 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see javax.servlet.sip.SipSession#invalidate()
 	 */
 	public void invalidate() {
+		invalidate(false);
+	}
+	
+	public void invalidate(boolean bypassCheck) {						
+		boolean wasValid = isValidInternal.compareAndSet(true, false);
+		if(!wasValid) {
+			if(!bypassCheck) {
+				throw new IllegalStateException("SipSession " + key + " already invalidated !");
+			} else {
+				if(logger.isInfoEnabled()) {
+					logger.info("SipSession " + key + " already invalidated, doing nothing");					
+				}
+				return;
+			}
+		}
 		
-		if(!isValidInternal.compareAndSet(true, false)) {
-			throw new IllegalStateException("SipSession already invalidated !");
-		}		
 		if(logger.isInfoEnabled()) {
 			logger.info("Invalidating the sip session " + key);
 		}
@@ -1614,7 +1626,7 @@ public class SipSessionImpl implements MobicentsSipSession {
     		//If the application does not explicitly invalidate the session in the callback or has not defined a listener, 
         	//the container will invalidate the session. 
         	if(isValid()) {
-        		invalidate();
+        		invalidate(true);
         	}
     	}    	    	
     }
