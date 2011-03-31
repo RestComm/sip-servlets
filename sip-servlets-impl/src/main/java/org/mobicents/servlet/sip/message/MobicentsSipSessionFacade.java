@@ -8,7 +8,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Semaphore;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -243,11 +242,6 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 		return getSipSession().getRegionInternal();
 	}
 
-	public Semaphore getSemaphore() {
-		
-		return getSipSession().getSemaphore();
-	}
-
 	public Dialog getSessionCreatingDialog() {
 		
 		return getSipSession().getSessionCreatingDialog();
@@ -478,5 +472,14 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public void setSipSessionSecurity(SipSessionSecurity sipSessionSecurity) {
 		sipSession.setSipSessionSecurity(sipSessionSecurity);
 	}
+	
+	public void acquire() {
+		sipSession.acquire();
+	}
+
+	public void release() {
+		sipSession.release();
+	}
+
 
 }

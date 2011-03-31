@@ -19,6 +19,7 @@ package org.mobicents.servlet.sip.testsuite;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
@@ -57,6 +58,8 @@ public class ShootistSipServlet
 	private static final String TEST_ERROR_RESPONSE = "testErrorResponse";
 	private static transient Logger logger = Logger.getLogger(ShootistSipServlet.class);
 	
+	public static AtomicBoolean isAlreadyAccessed = new AtomicBoolean(false);
+	
 	int numberOf183Responses = 0;
 	
 	@Resource
@@ -77,56 +80,72 @@ public class ShootistSipServlet
 	@Override
 	protected void doProvisionalResponse(SipServletResponse resp)
 			throws ServletException, IOException {	
-		if(resp.getStatus() == 183) numberOf183Responses++;
-		if(resp.getHeader("require") != null) {
-			SipServletRequest prack = resp.createPrack();
-			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
-			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
-			prack.setRequestURI(requestURI);
-			prack.send();
-		}
-		if(getServletContext().getInitParameter("cancelOn1xx") != null) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
+		try {
+			access();
+			if(resp.getStatus() == 183) numberOf183Responses++;
+			if(resp.getHeader("require") != null) {
+				SipServletRequest prack = resp.createPrack();
+				SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+				SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
+				prack.setRequestURI(requestURI);
+				prack.send();
 			}
-			try {
-				resp.getRequest().getApplicationSession().setAttribute(TEST_ERROR_RESPONSE, "true");
-				resp.getRequest().createCancel().send();
-			} catch (IOException e) {
-				logger.error(e);
+			if(getServletContext().getInitParameter("cancelOn1xx") != null) {
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
+				try {
+					resp.getRequest().getApplicationSession().setAttribute(TEST_ERROR_RESPONSE, "true");
+					resp.getRequest().createCancel().send();
+				} catch (IOException e) {
+					logger.error(e);
+				}
 			}
+			if(resp.getStatus() == 180 && getServletContext().getInitParameter("cancel") != null) {					
+				String timeToWaitString = getServletContext().getInitParameter("servletTimer");
+				if(timeToWaitString != null && !timeToWaitString.equals("0")) {
+					SipServletRequest cancelRequest = resp.getRequest().createCancel();
+					timerService.createTimer(resp.getRequest().getApplicationSession(), 500, false, (Serializable) cancelRequest);
+				} 			
+			}
+		} finally {
+			release();
 		}
 	}
 	
 	@Override
 	protected void doSuccessResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
-		
-		logger.info("Got : " + sipServletResponse.getStatus() + " "
-				+ sipServletResponse.getMethod());
-		int status = sipServletResponse.getStatus();
-		if (status == SipServletResponse.SC_OK && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
-			SipServletRequest ackRequest = sipServletResponse.createAck();
-			ackRequest.send();
-			
-			if(sipServletResponse.getRequest().isInitial() && !(sipServletResponse.getFrom().getURI() instanceof TelURL) && !(sipServletResponse.getTo().getURI() instanceof TelURL) &&
-					(((SipURI)sipServletResponse.getFrom().getURI()).getUser().equals("reinvite") || ((SipURI)sipServletResponse.getTo().getURI()).getUser().equals("reinvite"))) {
-				SipServletRequest request=sipServletResponse.getSession().createRequest("INVITE");				
-				request.send();
-			}  else {
-				if(sipServletResponse.getApplicationSession().getAttribute(ENCODE_URI) == null) {
-					String timeToWaitForBye = getServletContext().getInitParameter("timeToWaitForBye");
-					int delay = 2000;
-					if(timeToWaitForBye != null) {
-						delay = Integer.parseInt(timeToWaitForBye);
+		try {
+			access();
+			logger.info("Got : " + sipServletResponse.getStatus() + " "
+					+ sipServletResponse.getMethod());
+			int status = sipServletResponse.getStatus();
+			if (status == SipServletResponse.SC_OK && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
+				SipServletRequest ackRequest = sipServletResponse.createAck();
+				ackRequest.send();
+				
+				if(sipServletResponse.getRequest().isInitial() && !(sipServletResponse.getFrom().getURI() instanceof TelURL) && !(sipServletResponse.getTo().getURI() instanceof TelURL) &&
+						(((SipURI)sipServletResponse.getFrom().getURI()).getUser().equals("reinvite") || ((SipURI)sipServletResponse.getTo().getURI()).getUser().equals("reinvite"))) {
+					SipServletRequest request=sipServletResponse.getSession().createRequest("INVITE");				
+					request.send();
+				}  else {
+					if(sipServletResponse.getApplicationSession().getAttribute(ENCODE_URI) == null) {
+						String timeToWaitForBye = getServletContext().getInitParameter("timeToWaitForBye");
+						int delay = 2000;
+						if(timeToWaitForBye != null) {
+							delay = Integer.parseInt(timeToWaitForBye);
+						}
+						SipServletRequest sipServletRequest = sipServletResponse.getSession().createRequest("BYE");
+						ServletTimer timer = timerService.createTimer(sipServletResponse.getApplicationSession(), delay, false, (Serializable)sipServletRequest);
+						sipServletResponse.getApplicationSession().setAttribute("timer", timer);
 					}
-					SipServletRequest sipServletRequest = sipServletResponse.getSession().createRequest("BYE");
-					ServletTimer timer = timerService.createTimer(sipServletResponse.getApplicationSession(), delay, false, (Serializable)sipServletRequest);
-					sipServletResponse.getApplicationSession().setAttribute("timer", timer);
 				}
 			}
+		} finally {
+			release();
 		}
 	}
 
@@ -155,40 +174,67 @@ public class ShootistSipServlet
 	@Override
 	protected void doInvite(SipServletRequest req) throws ServletException,
 			IOException {
-		String requestURIStringified = req.getRequestURI().toString();
-		logger.info(requestURIStringified);
-		if(req.getTo().getURI().toString().contains("nonrecordrouteeinvite"))  {
-			req.createResponse(200).send();
-			return;
-		}
-		if(req.getTo().getURI().toString().contains("recordrouteeinvite"))  {
-			((SipSessionExt)req.getSession()).setCopyRecordRouteHeadersOnSubsequentResponses(true);
-			req.createResponse(200).send();
-			return;
-		}
-		if(!requestURIStringified.startsWith("sip:mss@sip-servlets.com;org.mobicents.servlet.sip.ApplicationSessionKey=") && !requestURIStringified.endsWith("%3Aorg.mobicents.servlet.sip.testsuite.ShootistApplication")) {
-			req.createResponse(500, "SipURI.toString() does not escape charachters according to RFC2396.").send();
-		}				
-		if(((SipURI)req.getFrom().getURI()).getUser().equalsIgnoreCase(ENCODE_URI)) {
-			if(req.getApplicationSession().getAttribute(ENCODE_URI) != null) {
+		try {
+			access();
+			String requestURIStringified = req.getRequestURI().toString();
+			logger.info(requestURIStringified);
+			if(req.getTo().getURI().toString().contains("nonrecordrouteeinvite"))  {
 				req.createResponse(200).send();
+				return;
+			}
+			if(req.getTo().getURI().toString().contains("recordrouteeinvite"))  {
+				((SipSessionExt)req.getSession()).setCopyRecordRouteHeadersOnSubsequentResponses(true);
+				req.createResponse(200).send();
+				return;
+			}
+			if(!requestURIStringified.startsWith("sip:mss@sip-servlets.com;org.mobicents.servlet.sip.ApplicationSessionKey=") && !requestURIStringified.endsWith("%3Aorg.mobicents.servlet.sip.testsuite.ShootistApplication")) {
+				req.createResponse(500, "SipURI.toString() does not escape charachters according to RFC2396.").send();
+			}				
+			if(((SipURI)req.getFrom().getURI()).getUser().equalsIgnoreCase(ENCODE_URI)) {
+				if(req.getApplicationSession().getAttribute(ENCODE_URI) != null) {
+					req.createResponse(200).send();
+				} else {
+					req.createResponse(500, "received a request using the encodeURI mechanism but not the same sip application session").send();
+				}
 			} else {
 				req.createResponse(500, "received a request using the encodeURI mechanism but not the same sip application session").send();
+			}			
+		} finally {
+			release();
+		}
+	}
+	
+	@Override
+	protected void doErrorResponse(SipServletResponse sipServletResponse)
+			throws ServletException, IOException {
+		try {
+			access();
+			logger.info("Got : " + sipServletResponse.getStatus());
+			if(	getServletContext().getInitParameter("cancel") != null) {
+				long now = System.currentTimeMillis(); 
+				long timeSent = (Long) sipServletResponse.getApplicationSession().getAttribute("timeSent");
+				if(now - timeSent > 30000) {
+					sendMessage(sipFactory.createApplicationSession(), sipFactory, "30 sec passed");
+				}
 			}
-		} else {
-			req.createResponse(500, "received a request using the encodeURI mechanism but not the same sip application session").send();
-		}			
+		} finally {
+			release();
+		}
 	}
 	
 	@Override
 	protected void doBye(SipServletRequest req) throws ServletException,
 			IOException {
-				
-		ServletTimer timer = (ServletTimer) req.getApplicationSession().getAttribute("timer");
-		if(timer != null) {
-			timer.cancel();
+		try {
+			access();
+			ServletTimer timer = (ServletTimer) req.getApplicationSession().getAttribute("timer");
+			if(timer != null) {
+				timer.cancel();
+			}
+			req.createResponse(SipServletResponse.SC_OK).send();
+		} finally {
+			release();
 		}
-		req.createResponse(SipServletResponse.SC_OK).send();
 	}
 	
 	// SipServletListener methods
@@ -197,216 +243,250 @@ public class ShootistSipServlet
 	 * @see javax.servlet.sip.SipServletListener#servletInitialized(javax.servlet.sip.SipServletContextEvent)
 	 */
 	public void servletInitialized(SipServletContextEvent ce) {
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();		
-		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
-			logger.error("ClassLoader " + cl);			
-			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
-		}
-		SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);
-		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
-		
-		String testServletListener = ce.getServletContext().getInitParameter("testServletListener");
-		if(testServletListener != null) {
-			logger.error("servlet initialized " + this);
-			sendMessage(sipApplicationSession, sipFactory, "testServletListener");
-			return;
-		}
-		String testContentLength = ce.getServletContext().getInitParameter("testContentLength");
-		if(testContentLength != null) {
-			sendMessage(sipApplicationSession, sipFactory, null);
-			return;
-		}
-		
-		String userName = ce.getServletContext().getInitParameter("username");
-		if(userName == null || userName.length() < 1) {
-			userName = "BigGuy";
-		}
-		URI fromURI = sipFactory.createSipURI(userName, "here.com");
-		URI toURI = null;
-		if(ce.getServletContext().getInitParameter("urlType") != null) {
-			if(ce.getServletContext().getInitParameter("urlType").equalsIgnoreCase("tel")) {
-				try {
-					toURI = sipFactory.createURI("tel:+358-555-1234567");
-				} catch (ServletParseException e) {
-					logger.error("Impossible to create the tel URL", e);
-				}
-				if(ce.getServletContext().getInitParameter("enum") != null) {
-					DNSResolver dnsResolver = (DNSResolver) getServletContext().getAttribute("org.mobicents.servlet.sip.DNS_RESOLVER");
-					toURI = dnsResolver.getSipURI(toURI);
-				}
-			} else if(ce.getServletContext().getInitParameter("urlType").equalsIgnoreCase("telAsSip")) {
-				try {
-					toURI = sipFactory.createURI("sip:+34666777888@192.168.0.20:5080");
-				} catch (ServletParseException e) {
-					logger.error("Impossible to create the tel URL as SIP", e);
-				}
-				
-				try {
-					toURI = sipFactory.createAddress("<sip:+34666777888@192.168.0.20:5080>").getURI();
-				} catch (ServletParseException e) {
-					logger.error("Impossible to create the tel URL as SIP", e);
-				}
+		try {
+			access();
+			ClassLoader cl = Thread.currentThread().getContextClassLoader();		
+			if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+				logger.error("ClassLoader " + cl);			
+				throw new IllegalArgumentException("Bad Context Classloader : " + cl);
 			}
-		} else {
-			toURI = sipFactory.createSipURI("LittleGuy", "there.com");
-		}
-		String toTag = ce.getServletContext().getInitParameter("toTag");
-		if(toTag != null) {
-			toURI.setParameter("tag", toTag);
-		}
-		String toParam = ce.getServletContext().getInitParameter("toParam");
-		if(toParam != null) {
-			toURI.setParameter("toParam", toParam);
-		}
-		
-		String method = ce.getServletContext().getInitParameter("method");
-		if(method == null) {
-			method = "INVITE";
-		}		
-		SipServletRequest sipServletRequest = null;
-		if(ce.getServletContext().getInitParameter("useStringFactory") != null) {
-			try {
-				sipServletRequest =	sipFactory.createRequest(sipApplicationSession, method, "sip:LittleGuy@there.com", userName);
-				if(!sipServletRequest.getTo().toString().contains(userName)) {
-					logger.error("To Address and username should match!");
-					return; 
-				}
-			} catch (ServletParseException e) {
-				logger.error("Impossible to create the " + method + " request ", e);
+			SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);
+			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
+			
+			String testServletListener = ce.getServletContext().getInitParameter("testServletListener");
+			if(testServletListener != null) {
+				logger.error("servlet initialized " + this);
+				sendMessage(sipApplicationSession, sipFactory, "testServletListener");
 				return;
 			}
-		} else {
-			sipServletRequest =	sipFactory.createRequest(sipApplicationSession, method, sipFactory.createAddress(fromURI, "from display"), sipFactory.createAddress(toURI,"to display"));
-		}
-		
-		String authHeader = ce.getServletContext().getInitParameter("auth-header");
-		if(authHeader != null) {
-			// test Issue 1547 : can't add a Proxy-Authorization using SipServletMessage.addHeader
-			// please note that addAuthHeader is not used here
-			sipServletRequest.addHeader("Proxy-Authorization", authHeader);
-			sipServletRequest.addHeader("Proxy-Authenticate", authHeader);
-		}
-		
-		String routeHeader = ce.getServletContext().getInitParameter("route");
-		if(routeHeader != null) {
-			try {
-				sipServletRequest.pushRoute((SipURI) sipFactory.createURI(routeHeader));
-			} catch (ServletParseException e) {
-				logger.error("Couldn't create Route Header from " + routeHeader);
-				return; 
+			String testContentLength = ce.getServletContext().getInitParameter("testContentLength");
+			if(testContentLength != null) {
+				sendMessage(sipApplicationSession, sipFactory, null);
+				return;
 			}
-		}
-		
-		String outboundInterface = ce.getServletContext().getInitParameter("outboundInterface");
-		if(outboundInterface != null) {
-			List<SipURI> outboundInterfaces = (List<SipURI>)getServletContext().getAttribute(OUTBOUND_INTERFACES);
-
-			if(outboundInterfaces == null) throw new NullPointerException("Outbound interfaces should not be null");
-
-			for(SipURI uri:outboundInterfaces) {
-				logger.info("checking following outboudinterface"  + uri +" against transport" + outboundInterface);
-				if(uri.toString().contains(outboundInterface)) {
-					logger.info("using following outboudinterface"  + uri);
-					// pick the lo interface, since its universal on all machines
-					((SipSessionExt)sipServletRequest.getSession()).setOutboundInterface(uri);					
-					break;
+			
+			String userName = ce.getServletContext().getInitParameter("username");
+			if(userName == null || userName.length() < 1) {
+				userName = "BigGuy";
+			}
+			URI fromURI = sipFactory.createSipURI(userName, "here.com");
+			URI toURI = null;
+			if(ce.getServletContext().getInitParameter("urlType") != null) {
+				if(ce.getServletContext().getInitParameter("urlType").equalsIgnoreCase("tel")) {
+					try {
+						toURI = sipFactory.createURI("tel:+358-555-1234567");
+					} catch (ServletParseException e) {
+						logger.error("Impossible to create the tel URL", e);
+					}
+					if(ce.getServletContext().getInitParameter("enum") != null) {
+						DNSResolver dnsResolver = (DNSResolver) getServletContext().getAttribute("org.mobicents.servlet.sip.DNS_RESOLVER");
+						toURI = dnsResolver.getSipURI(toURI);
+					}
+				} else if(ce.getServletContext().getInitParameter("urlType").equalsIgnoreCase("telAsSip")) {
+					try {
+						toURI = sipFactory.createURI("sip:+34666777888@192.168.0.20:5080");
+					} catch (ServletParseException e) {
+						logger.error("Impossible to create the tel URL as SIP", e);
+					}
+					
+					try {
+						toURI = sipFactory.createAddress("<sip:+34666777888@192.168.0.20:5080>").getURI();
+					} catch (ServletParseException e) {
+						logger.error("Impossible to create the tel URL as SIP", e);
+					}
 				}
-			}
-		}
-		if(!method.equalsIgnoreCase("REGISTER")) {
-			Address addr = null;
-			try {
-				addr = sipServletRequest.getAddressHeader("Contact");
-			} catch (ServletParseException e1) {
-			}
-			if(addr == null) return; // Fail the test, we need that header
-			String prack = ce.getServletContext().getInitParameter("prack");
-			if(prack != null) {
-				sipServletRequest.addHeader("Require", "100rel");
-			}
-			addr.setParameter("headerparam1", "headervalue1");
-			addr.setParameter("param5", "ffff");
-			addr.getURI().setParameter("uriparam", "urivalue");
-		}
-		String dontSetRURI = ce.getServletContext().getInitParameter("dontSetRURI");
-		if(dontSetRURI == null) {
-			String host = "127.0.0.1:5080";
-			if(ce.getServletContext().getInitParameter("testIOException") != null) {
-				host = ce.getServletContext().getInitParameter("testIOException");
-			}
-			if(ce.getServletContext().getInitParameter("host") != null) {
-				host = ce.getServletContext().getInitParameter("host");
-			}
-			SipURI requestURI = sipFactory.createSipURI("LittleGuy", host);
-			requestURI.setSecure(ce.getServletContext().getInitParameter("secureRURI")!=null);
-			if(ce.getServletContext().getInitParameter("encodeRequestURI") != null) {
-				sipApplicationSession.encodeURI(requestURI);
-				sipApplicationSession.setAttribute(ENCODE_URI, "true");
-			}
-			if(ce.getServletContext().getInitParameter("transportRURI") != null) {
-				requestURI.setTransportParam(ce.getServletContext().getInitParameter("transportRURI"));
-				if(method.equalsIgnoreCase("REGISTER")) {
-					sipServletRequest.addHeader("Contact", "sips:LittleGuy@127.0.0.1:5080");
-				}
-			}			
-			sipServletRequest.setRequestURI(requestURI);
-			if(ce.getServletContext().getInitParameter("enum") != null) {
-				sipServletRequest.setRequestURI(toURI);
-			}
-		}
-		String testErrorResponse = ce.getServletContext().getInitParameter(TEST_ERROR_RESPONSE);
-		if(testErrorResponse != null) {
-			sipServletRequest.getApplicationSession().setAttribute(TEST_ERROR_RESPONSE, "true");
-		}		
-		if(sipServletRequest.getTo().getParameter("tag") != null) {
-			logger.error("the ToTag should be empty, not sending the request");
-			return;
-		}
-		try {			
-			sipServletRequest.send();
-		} catch (IOException e) {
-			if(ce.getServletContext().getInitParameter("testIOException") != null) {
-				logger.info("expected exception thrown" + e);
-				((SipURI)sipServletRequest.getRequestURI()).setHost("127.0.0.1");
-				((SipURI)sipServletRequest.getRequestURI()).setPort(5080);
-				((SipURI)sipServletRequest.getRequestURI()).setTransportParam("udp");
-				try {
-					sipServletRequest.send();
-					sendMessage(sipApplicationSession, sipFactory, "IOException thrown");
-				} catch (IOException e1) {
-					logger.error("Unexpected exception while sending the INVITE request",e1);
-				}					
 			} else {
-				logger.error("Unexpected exception while sending the INVITE request",e);
+				toURI = sipFactory.createSipURI("LittleGuy", "there.com");
 			}
-		}		
-		if(ce.getServletContext().getInitParameter("cancel") != null) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
+			String toTag = ce.getServletContext().getInitParameter("toTag");
+			if(toTag != null) {
+				toURI.setParameter("tag", toTag);
 			}
-			try {
+			String toParam = ce.getServletContext().getInitParameter("toParam");
+			if(toParam != null) {
+				toURI.setParameter("toParam", toParam);
+			}
+			
+			String method = ce.getServletContext().getInitParameter("method");
+			if(method == null) {
+				method = "INVITE";
+			}		
+			SipServletRequest sipServletRequest = null;
+			if(ce.getServletContext().getInitParameter("useStringFactory") != null) {
+				try {
+					sipServletRequest =	sipFactory.createRequest(sipApplicationSession, method, "sip:LittleGuy@there.com", userName);
+					if(!sipServletRequest.getTo().toString().contains(userName)) {
+						logger.error("To Address and username should match!");
+						return; 
+					}
+				} catch (ServletParseException e) {
+					logger.error("Impossible to create the " + method + " request ", e);
+					return;
+				}
+			} else {
+				sipServletRequest =	sipFactory.createRequest(sipApplicationSession, method, sipFactory.createAddress(fromURI, "from display"), sipFactory.createAddress(toURI,"to display"));
+			}
+			
+			String authHeader = ce.getServletContext().getInitParameter("auth-header");
+			if(authHeader != null) {
+				// test Issue 1547 : can't add a Proxy-Authorization using SipServletMessage.addHeader
+				// please note that addAuthHeader is not used here
+				sipServletRequest.addHeader("Proxy-Authorization", authHeader);
+				sipServletRequest.addHeader("Proxy-Authenticate", authHeader);
+			}
+			
+			String routeHeader = ce.getServletContext().getInitParameter("route");
+			if(routeHeader != null) {
+				try {
+					sipServletRequest.pushRoute((SipURI) sipFactory.createURI(routeHeader));
+				} catch (ServletParseException e) {
+					logger.error("Couldn't create Route Header from " + routeHeader);
+					return; 
+				}
+			}
+			
+			String outboundInterface = ce.getServletContext().getInitParameter("outboundInterface");
+			if(outboundInterface != null) {
+				List<SipURI> outboundInterfaces = (List<SipURI>)getServletContext().getAttribute(OUTBOUND_INTERFACES);
+	
+				if(outboundInterfaces == null) throw new NullPointerException("Outbound interfaces should not be null");
+	
+				for(SipURI uri:outboundInterfaces) {
+					logger.info("checking following outboudinterface"  + uri +" against transport" + outboundInterface);
+					if(uri.toString().contains(outboundInterface)) {
+						logger.info("using following outboudinterface"  + uri);
+						// pick the lo interface, since its universal on all machines
+						((SipSessionExt)sipServletRequest.getSession()).setOutboundInterface(uri);					
+						break;
+					}
+				}
+			}
+			if(!method.equalsIgnoreCase("REGISTER")) {
+				Address addr = null;
+				try {
+					addr = sipServletRequest.getAddressHeader("Contact");
+				} catch (ServletParseException e1) {
+				}
+				if(addr == null) return; // Fail the test, we need that header
+				String prack = ce.getServletContext().getInitParameter("prack");
+				if(prack != null) {
+					sipServletRequest.addHeader("Require", "100rel");
+				}
+				addr.setParameter("headerparam1", "headervalue1");
+				addr.setParameter("param5", "ffff");
+				addr.getURI().setParameter("uriparam", "urivalue");
+			}
+			String dontSetRURI = ce.getServletContext().getInitParameter("dontSetRURI");
+			if(dontSetRURI == null) {
+				String host = "127.0.0.1:5080";
+				if(ce.getServletContext().getInitParameter("testIOException") != null) {
+					host = ce.getServletContext().getInitParameter("testIOException");
+				}
+				if(ce.getServletContext().getInitParameter("host") != null) {
+					host = ce.getServletContext().getInitParameter("host");
+				}
+				SipURI requestURI = sipFactory.createSipURI("LittleGuy", host);
+				requestURI.setSecure(ce.getServletContext().getInitParameter("secureRURI")!=null);
+				if(ce.getServletContext().getInitParameter("encodeRequestURI") != null) {
+					sipApplicationSession.encodeURI(requestURI);
+					sipApplicationSession.setAttribute(ENCODE_URI, "true");
+				}
+				if(ce.getServletContext().getInitParameter("transportRURI") != null) {
+					requestURI.setTransportParam(ce.getServletContext().getInitParameter("transportRURI"));
+					if(method.equalsIgnoreCase("REGISTER")) {
+						sipServletRequest.addHeader("Contact", "sips:LittleGuy@127.0.0.1:5080");
+					}
+				}			
+				sipServletRequest.setRequestURI(requestURI);
+				if(ce.getServletContext().getInitParameter("enum") != null) {
+					sipServletRequest.setRequestURI(toURI);
+				}
+			}
+			String testErrorResponse = ce.getServletContext().getInitParameter(TEST_ERROR_RESPONSE);
+			if(testErrorResponse != null) {
 				sipServletRequest.getApplicationSession().setAttribute(TEST_ERROR_RESPONSE, "true");
-				sipServletRequest.createCancel().send();
-			} catch (IOException e) {
-				logger.error(e);
+			}		
+			if(sipServletRequest.getTo().getParameter("tag") != null) {
+				logger.error("the ToTag should be empty, not sending the request");
+				return;
 			}
+			try {			
+				sipServletRequest.send();
+			} catch (IOException e) {
+				if(ce.getServletContext().getInitParameter("testIOException") != null) {
+					logger.info("expected exception thrown" + e);
+					((SipURI)sipServletRequest.getRequestURI()).setHost("127.0.0.1");
+					((SipURI)sipServletRequest.getRequestURI()).setPort(5080);
+					((SipURI)sipServletRequest.getRequestURI()).setTransportParam("udp");
+					try {
+						sipServletRequest.send();
+						sendMessage(sipApplicationSession, sipFactory, "IOException thrown");
+					} catch (IOException e1) {
+						logger.error("Unexpected exception while sending the INVITE request",e1);
+					}					
+				} else {
+					logger.error("Unexpected exception while sending the INVITE request",e);
+				}
+			}
+			if(ce.getServletContext().getInitParameter("cancel") != null) {
+				SipServletRequest cancelRequest = sipServletRequest.createCancel();
+				sipServletRequest.getApplicationSession().setAttribute(TEST_ERROR_RESPONSE, "true");
+				String timeToWaitString = ce.getServletContext().getInitParameter("servletTimer");
+				if(timeToWaitString == null) {
+					try {
+						Thread.sleep(500);
+						cancelRequest.send();
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+					} catch (IOException e) {
+						logger.error(e);
+					}
+				} else if(timeToWaitString.equals("0")) {
+					if(getServletContext().getInitParameter("servletTimer") != null) {
+						timerService.createTimer(sipServletRequest.getApplicationSession(), 0, false, (Serializable) cancelRequest);
+						try {
+							Thread.sleep(2000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					} 								
+				}
+			}	
+		} finally {
+			release();
 		}
 	}
 
 	public void timeout(ServletTimer timer) {
-		ClassLoader cl = Thread.currentThread().getContextClassLoader();
-		if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
-			logger.error("ClassLoader " + cl);
-			throw new IllegalArgumentException("Bad Context Classloader : " + cl);
-		}
-		SipServletRequest sipServletRequest = (SipServletRequest) timer.getInfo();
 		try {
-			sipServletRequest.send();
-		} catch (IOException e) {
-			logger.error("Unexpected exception while sending the BYE request",e);
+			access();
+			ClassLoader cl = Thread.currentThread().getContextClassLoader();
+			if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
+				logger.error("ClassLoader " + cl);
+				throw new IllegalArgumentException("Bad Context Classloader : " + cl);
+			}
+			SipServletRequest sipServletRequest = (SipServletRequest) timer.getInfo();
+			sipServletRequest.getApplicationSession().setAttribute("timeSent", Long.valueOf(System.currentTimeMillis()));
+			try {
+				sipServletRequest.send();
+			} catch (IOException e) {
+				logger.error("Unexpected exception while sending the BYE request",e);
+			}
+			timer.cancel();
+		} finally {
+			release();
 		}
+	}
+	
+	public void access() {
+		if(!isAlreadyAccessed.compareAndSet(false, true)) {
+			sendMessage(sipFactory.createApplicationSession(), sipFactory, "servlet is already being accessed !", null);
+		}
+	}
+	
+	public void release() {
+		isAlreadyAccessed.set(false);
 	}
 	
 	/**

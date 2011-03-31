@@ -139,9 +139,13 @@ public class ConvergedSessionDelegate {
 		if(httpSession.isValidIntern()) {	
 			key = (SipApplicationSessionKey) httpSession.getAttribute(APPLICATION_SESSION_ID_ATTRIBUTE_NAME); 
 		}
+		SipContext sipContext = (SipContext)sipManager.getContainer();
 		if(key != null) {
 			MobicentsSipApplicationSession sipAppSession = sipManager.getSipApplicationSession(key, false);
 			if (sipAppSession != null) {
+				// make sure to acquire this app session and add it to the set of app sessions we monitor in the context of the application
+				// to release them all when we exit application code
+				sipContext.enterSipApp(sipAppSession, null);
 				return sipAppSession;
 			} else {
 				if(logger.isDebugEnabled()) {
@@ -161,10 +165,9 @@ public class ConvergedSessionDelegate {
 			
 			//not needed anymore since the sipappsesionkey is not a callid anymore but a rnadom uuid
 //			ExtendedListeningPoint listeningPoint = 
-//				sipNetworkInterfaceManager.getExtendedListeningPoints().next();			
-//			
+//				sipNetworkInterfaceManager.getExtendedListeningPoints().next();						
 			SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
-					((SipContext)sipManager.getContainer()).getApplicationName(), 
+					sipContext.getApplicationName(), 
 					null);
 			
 			sipApplicationSession = 
@@ -173,9 +176,12 @@ public class ConvergedSessionDelegate {
 			// Store the App Session ID in the HTTP sessions to recover it from there when it's transfered to a new node.
 			httpSession.setAttribute(APPLICATION_SESSION_ID_ATTRIBUTE_NAME, 
 					sipApplicationSession.getKey());
-			sipApplicationSession.addHttpSession(httpSession);
+			sipApplicationSession.addHttpSession(httpSession);			
 		}
 		if(sipApplicationSession != null) {
+			// make sure to acquire this app session and add it to the set of app sessions we monitor in the context of the application
+			// to release them all when we exit application code
+			sipContext.enterSipApp(sipApplicationSession, null);
 			return sipApplicationSession.getSession();
 		} else {
 			return null;

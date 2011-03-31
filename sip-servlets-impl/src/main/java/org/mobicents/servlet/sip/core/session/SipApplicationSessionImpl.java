@@ -1262,4 +1262,62 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			SipApplicationSessionAsynchronousWork work) {
 		sipContext.getSipApplicationDispatcher().getAsynchronousExecutor().execute(new SipApplicationSessionAsyncTask(key, work, sipContext.getSipApplicationDispatcher().getSipFactory()));
 	}	
+	
+	public void acquire() {
+		if(semaphore != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Before semaphore acquire for sipApplicationSession=" + this + " semaphore=" + semaphore);
+			}
+			try {
+				while(!semaphore.tryAcquire(30000, TimeUnit.MILLISECONDS)){
+					logger.warn("Failed to acquire session semaphore " + 
+							semaphore + " for 30 secs. We will unlock the " +
+							"semaphore no matter what because the " +
+							"transaction is about to timeout. THIS " +
+							"MIGHT ALSO BE CONCURRENCY CONTROL RISK." +						 
+							" app Session is" + this);
+					semaphore.release();
+				}
+			} catch (InterruptedException e) {
+				logger.error("Problem acquiring semaphore on app session " + this, e);
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("After semaphore acquire for sipApplicationSession=" + this + " semaphore=" + semaphore);
+			}
+		}
+	}
+	
+	public void release() {
+		if(semaphore != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Before Semaphore released for sipApplicationSession=" + this + " semaphore=" + semaphore);
+			}
+			//equalize the semaphore permits to the expected number for binary semaphore
+			if(semaphore.availablePermits()>0) {
+				logger.warn("About to release semaphore but we expected permits = 0. We will adjust to normal "
+						+ semaphore + " app session=" + this);
+				while(semaphore.availablePermits()>0) {
+					try {
+						semaphore.acquire();
+					} catch (Exception e) {
+					}
+				}
+			}
+			if(semaphore.availablePermits()<0) {
+				logger.warn("About to release semaphore but we expected permits = 0. We will adjust to normal " 
+						+ semaphore + " app session=" + this);
+				while(semaphore.availablePermits()<0) {
+					try {
+						semaphore.release();
+					} catch (Exception e) {
+					}
+				}
+			}	
+			
+			semaphore.release();
+			if(logger.isDebugEnabled()) {
+				logger.debug("After Semaphore released for sipApplicationSession=" + this + " semaphore=" + semaphore);
+			}
+		}
+	}
 }

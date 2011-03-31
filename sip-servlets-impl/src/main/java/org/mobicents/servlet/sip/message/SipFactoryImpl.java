@@ -199,7 +199,7 @@ public class SipFactoryImpl implements Externalizable {
 	 * @param sipContext
 	 * @return
 	 */
-	public SipApplicationSession createApplicationSession(SipContext sipContext) {
+	public MobicentsSipApplicationSession createApplicationSession(SipContext sipContext) {
 		if (logger.isDebugEnabled()) {
 			logger.debug("Creating new application session for sip context "+ sipContext.getApplicationName());
 		}
@@ -693,8 +693,13 @@ public class SipFactoryImpl implements Externalizable {
 		SipContext sipContext = sipApplicationDispatcher.findSipApplication(sipAppName);
 		if(sipContext == null) {
 			throw new IllegalArgumentException("The specified application "+sipAppName+" is not currently deployed");
-		}
-		return createApplicationSession(sipContext);
+		}		
+		MobicentsSipApplicationSession sipApplicationSession = createApplicationSession(sipContext);
+		// make sure to acquire this app session and add it to the set of app sessions we monitor in the context of the application
+		// to release them all when we exit application code
+		sipContext.enterSipApp(sipApplicationSession, null);
+		
+		return sipApplicationSession;
 	}
 
 	/*
@@ -718,7 +723,11 @@ public class SipFactoryImpl implements Externalizable {
 			throw new IllegalArgumentException("The specified application "+sipApplicationSessionKey.getApplicationName()+" is not currently deployed");
 		}
 		MobicentsSipApplicationSession sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(
-				sipApplicationSessionKey, true);		
+				sipApplicationSessionKey, true);
+		// make sure to acquire this app session and add it to the set of app sessions we monitor in the context of the application
+		// to release them all when we exit application code
+		sipContext.enterSipApp(sipApplicationSession, null);
+		
 		return sipApplicationSession.getSession();
 	}
 

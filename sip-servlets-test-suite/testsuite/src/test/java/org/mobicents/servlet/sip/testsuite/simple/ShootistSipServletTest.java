@@ -39,6 +39,7 @@ import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
@@ -77,6 +78,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		context.setPath("sip-test");
 		context.addLifecycleListener(new SipContextConfig());
 		context.setManager(new SipStandardManager());
+		context.setConcurrencyControlMode(ConcurrencyControlMode.SipApplicationSession);
 		ApplicationParameter applicationParameter = new ApplicationParameter();
 		applicationParameter.setName(name);
 		applicationParameter.setValue(value);
@@ -91,7 +93,29 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		context.setName("sip-test-context");
 		context.setPath("sip-test");
 		context.addLifecycleListener(new SipContextConfig());
+		context.setConcurrencyControlMode(ConcurrencyControlMode.SipApplicationSession);
 		context.setManager(new SipStandardManager());
+		for (Entry<String, String> param : params.entrySet()) {
+			ApplicationParameter applicationParameter = new ApplicationParameter();
+			applicationParameter.setName(param.getKey());
+			applicationParameter.setValue(param.getValue());
+			context.addApplicationParameter(applicationParameter);
+		}
+		assertTrue(tomcat.deployContext(context));
+		return context;
+	}
+	
+
+	public SipStandardContext deployApplication(Map<String, String> params,ConcurrencyControlMode concurrencyControlMode) {
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp");
+		context.setName("sip-test-context");
+		context.setPath("sip-test");
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		if(concurrencyControlMode != null) {
+			context.setConcurrencyControlMode(concurrencyControlMode);
+		}
 		for (Entry<String, String> param : params.entrySet()) {
 			ApplicationParameter applicationParameter = new ApplicationParameter();
 			applicationParameter.setName(param.getKey());
@@ -168,6 +192,63 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		assertTrue(allMessagesContent.size() >= 2);
 		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
 		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));
+	}
+	
+	public void testShootistCancelServletTimerCancelConcurrency() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setWaitForCancel(true);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("cancel", "true");
+		params.put("servletTimer", "500");
+		deployApplication(params, ConcurrencyControlMode.SipApplicationSession);
+		
+		Thread.sleep(DIALOG_TIMEOUT + TIMEOUT);
+		assertTrue(receiver.isCancelReceived());	
+		List<String> allMessagesContent = receiver.getAllMessagesContent();
+		assertEquals(2,allMessagesContent.size());
+		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
+		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));		
+	}
+	
+	/*
+	 * Non regression test for Issue http://code.google.com/p/mobicents/issues/detail?id=2450
+	 */	
+	public void testShootistCancelServletTimerConcurrency() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setWaitForCancel(true);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("cancel", "true");
+		params.put("servletTimer", "0");
+		deployApplication(params, ConcurrencyControlMode.SipApplicationSession);
+		
+		Thread.sleep(DIALOG_TIMEOUT + TIMEOUT);
+		assertTrue(receiver.isCancelReceived());	
+		List<String> allMessagesContent = receiver.getAllMessagesContent();
+		assertEquals(2,allMessagesContent.size());
+		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
+		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));		
 	}
 	
 	public void testShootistEarlyMediaChange() throws Exception {

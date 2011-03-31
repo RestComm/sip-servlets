@@ -27,8 +27,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.TimeUnit;
 
 import javax.naming.NamingException;
 import javax.servlet.Servlet;
@@ -70,6 +68,7 @@ import org.mobicents.servlet.sip.core.SipContextEventType;
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.session.SipApplicationSessionCreationThreadLocal;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
@@ -163,7 +162,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
     protected transient SipServletTimerService timerService = null;
     // timer service used to schedule proxy timer tasks
     protected transient ProxyTimerService proxyTimerService = null;  
-    
+    // information in 
+    private transient ThreadLocal<SipApplicationSessionCreationThreadLocal> sipApplicationSessionsAccessedThreadLocal = new ThreadLocal<SipApplicationSessionCreationThreadLocal>();
 	/**
 	 * 
 	 */
@@ -965,82 +965,32 @@ public class SipStandardContext extends StandardContext implements SipContext {
         }
         
     }
-    
-	private void acquire(Semaphore semaphore, MobicentsSipSession sipSession, MobicentsSipApplicationSession sipApplicationSession) {
-		try {
-			while(!semaphore.tryAcquire(30000, TimeUnit.MILLISECONDS)){
-				logger.warn("Failed to acquire session semaphore " + 
-						semaphore + " for 30 secs. We will unlock the " +
-						"semaphore no matter what because the " +
-						"transaction is about to timeout. THIS " +
-						"MIGHT ALSO BE CONCURRENCY CONTROL RISK." +
-						" SipSession is " + sipSession + 
-						" app Session is" + sipApplicationSession);
-				semaphore.release();
-			}
-		} catch (InterruptedException e) {
-			logger.error("Problem acquiring semaphore", e);
-		}
-	}
-	
-	private void release(Semaphore semaphore, MobicentsSipSession sipSession, MobicentsSipApplicationSession sipApplicationSession) {
-		//equalize the semaphore permits to the expected number for binary semaphore
-		if(semaphore.availablePermits()>0) {
-			logger.warn("About to release semaphore but we expected permits = 0. We will adjust to normal "
-					+ semaphore + " app session=" + sipApplicationSession + " sipSession=" +
-					sipApplicationSession);
-			while(semaphore.availablePermits()>0) {
-				try {
-					semaphore.acquire();
-				} catch (Exception e) {
-				}
-			}
-		}
-		if(semaphore.availablePermits()<0) {
-			logger.warn("About to release semaphore but we expected permits = 0. We will adjust to normal " 
-					+ semaphore + " app session=" + sipApplicationSession + " sipSession=" +
-					sipApplicationSession);
-			while(semaphore.availablePermits()<0) {
-				try {
-					semaphore.release();
-				} catch (Exception e) {
-				}
-			}
-		}	
-		
-		semaphore.release();
-	}
 
     public void enterSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession) {		
 		switch (concurrencyControlMode) {
 			case SipSession:				
 				if(sipSession != null) {
-					final Semaphore semaphore = sipSession.getSemaphore();
-					if(semaphore != null) {
-						if(logger.isDebugEnabled()) {
-							logger.debug("SipSession: Before semaphore acquire for sipApplicationSession=" + sipApplicationSession +
-									" sipSession=" + sipSession + " semaphore=" + semaphore);
-						}
-						acquire(semaphore, sipSession, sipApplicationSession);
-						if(logger.isDebugEnabled()) {
-							logger.debug("SipSession: After semaphore acquire for sipApplicationSession=" + sipApplicationSession +
-									" sipSession=" + sipSession + " semaphore=" + semaphore);
-						}
-					}
+					sipSession.acquire();					
 				} 
 				break;
 			case SipApplicationSession:
-				if(sipApplicationSession != null) {
-					final Semaphore semaphore = sipApplicationSession.getSemaphore();
-					if(semaphore != null) {
+				if(sipApplicationSession != null) {									
+					SipApplicationSessionCreationThreadLocal sipApplicationSessionCreationThreadLocal = sipApplicationSessionsAccessedThreadLocal.get();
+					if(sipApplicationSessionCreationThreadLocal == null) {
+						sipApplicationSessionCreationThreadLocal = new SipApplicationSessionCreationThreadLocal();
+						sipApplicationSessionsAccessedThreadLocal.set(sipApplicationSessionCreationThreadLocal);
+					}
+					boolean notPresent = sipApplicationSessionCreationThreadLocal.getSipApplicationSessions().add(sipApplicationSession);
+					if(notPresent) {
 						if(logger.isDebugEnabled()) {
-							logger.debug("SipAppSession: Before semaphore acquire for sipApplicationSession=" + sipApplicationSession +
-									" sipSession=" + sipSession + " semaphore=" + semaphore);
+							logger.debug("acquiring sipApplicationSession=" + sipApplicationSession +
+									" since it is not present in our local thread of accessed sip application sessions " );
 						}
-						acquire(semaphore, sipSession, sipApplicationSession);
+						sipApplicationSession.acquire();
+					} else {
 						if(logger.isDebugEnabled()) {
-							logger.debug("SipAppSession: After semaphore acquire for sipApplicationSession=" + sipApplicationSession +
-									" sipSession=" + sipSession + " semaphore=" + semaphore);
+							logger.debug("not acquiring sipApplicationSession=" + sipApplicationSession +
+									" since it is present in our local thread of accessed sip application sessions ");
 						}
 					}
 				}
@@ -1048,7 +998,49 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			case None:
 				break;
 		}		
-	}    
+	} 
+    
+	public void exitSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession) {
+		switch (concurrencyControlMode) {
+			case SipSession:
+				if(sipSession != null) {
+					sipSession.release();
+				} else {
+					if(logger.isDebugEnabled()) {
+						logger.debug("NOT RELEASING SipSession on exit sipApplicationSession=" + sipApplicationSession +
+								" sipSession=" + sipSession + " semaphore=null");
+					}
+				}
+				break;
+			case SipApplicationSession:
+				boolean wasSessionReleased = false;
+				SipApplicationSessionCreationThreadLocal sipApplicationSessionCreationThreadLocal = sipApplicationSessionsAccessedThreadLocal.get();
+				if(sipApplicationSessionCreationThreadLocal != null) {					
+					for(MobicentsSipApplicationSession sipApplicationSessionAccessed : sipApplicationSessionsAccessedThreadLocal.get().getSipApplicationSessions()) {
+						sipApplicationSessionAccessed.release();
+						if(sipApplicationSessionAccessed.equals(sipApplicationSession)) {
+							wasSessionReleased = true;
+						}
+					}		
+					sipApplicationSessionsAccessedThreadLocal.get().getSipApplicationSessions().clear();
+					sipApplicationSessionsAccessedThreadLocal.set(null);
+					sipApplicationSessionsAccessedThreadLocal.remove();
+				}
+				if(!wasSessionReleased) {
+					if(sipApplicationSession != null) {
+						sipApplicationSession.release();
+					} else {
+						if(logger.isDebugEnabled()) {
+							logger.debug("NOT RELEASING SipApplicationSession on exit sipApplicationSession=" + sipApplicationSession +
+									" sipSession=" + sipSession + " semaphore=null");
+						}
+					}
+				}
+				break;
+			case None:
+				break;
+		}		
+	}   
     
     public void enterSipAppHa(boolean startCacheActivity) {
 		if(getDistributable() && hasDistributableManager) {
@@ -1060,41 +1052,6 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				ConvergedSessionReplicationContext.enterSipapp(null, null, startCacheActivity);
 //			}
 		}
-	}
-    
-	public void exitSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession) {
-		switch (concurrencyControlMode) {
-			case SipSession:
-				if(sipSession != null) {
-					final Semaphore semaphore = sipSession.getSemaphore();
-					if(semaphore != null) {
-						release(semaphore, sipSession, sipApplicationSession);
-						if(logger.isDebugEnabled()) {
-							logger.debug("SipSession: Semaphore released for sipApplicationSession=" + sipApplicationSession +
-									" sipSession=" + sipSession + " semaphore=" + semaphore);
-						}
-					}
-				} 
-				break;
-			case SipApplicationSession:
-			
-			if(sipApplicationSession != null && sipApplicationSession.getSemaphore() != null) {
-				Semaphore semaphore = sipApplicationSession.getSemaphore();
-					release(semaphore, sipSession, sipApplicationSession);
-					if(logger.isDebugEnabled()) {
-						logger.debug("SipAppSession: Semaphore released for sipApplicationSession=" + sipApplicationSession +
-								" sipSession=" + sipSession + " semaphore=" + semaphore);
-					}
-				} else {
-					if(logger.isDebugEnabled()) {
-						logger.debug("SipSession semaphore: NOT RELEASING semaphore on exit sipApplicationSession=" + sipApplicationSession +
-								" sipSession=" + sipSession + " semaphore=null");
-					}
-				}
-				break;
-			case None:
-				break;
-		}		
 	}
 	
 	public void exitSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response) {		
@@ -1140,7 +1097,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			}
 		}
 	}
-
+	
 	private boolean startBatchTransaction() {
 		DistributedCacheConvergedSipManager distributedConvergedManager = ((ClusteredSipManager) manager)
 				.getDistributedCacheConvergedSipManager();
@@ -1290,7 +1247,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			}
 		} finally {
 			exitSipAppHa(null, null);
-			exitSipApp(null, null);			
+			exitSipApp(null, null);	
 		}
 		return ok;
 	}

@@ -72,7 +72,8 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession, S
 	
 	void tryToInvalidate();
 	
-	Semaphore getSemaphore();
+	void acquire();
+	void release();
 	
 	MobicentsSipApplicationSessionFacade getSession();
 	

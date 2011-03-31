@@ -137,7 +137,8 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 
 	SipApplicationRoutingRegion getRegionInternal();
 	
-	Semaphore getSemaphore();
+	void acquire();
+	void release();
 	
 	//RFC 3265
 	void addSubscription(SipServletMessageImpl sipServletMessage) throws SipException;

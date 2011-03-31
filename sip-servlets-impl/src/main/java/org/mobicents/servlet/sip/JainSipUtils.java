@@ -450,7 +450,7 @@ public final class JainSipUtils {
 		LIST_HEADER_NAMES.add(ServiceRouteHeader.NAME);
 	}	
 
-	private static final String[] ALLOWED_ADDRESS_SCHEMES = {"sip","sips","http","https","tel","tels","mailto"};
+	private static final String[] ALLOWED_ADDRESS_SCHEMES = {"sip","sips","tel","tels"};
 	
 	public static final int MAX_FORWARD_HEADER_VALUE = 70;
 

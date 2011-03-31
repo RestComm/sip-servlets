@@ -30,7 +30,6 @@ import java.text.ParseException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.concurrent.Semaphore;
 
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.ServletTimer;
@@ -104,10 +103,6 @@ public class MobicentsSipApplicationSessionFacade implements
 
 	public SipApplicationSessionKey getKey() {
 		return this.sipApplicationSession.getKey();
-	}
-
-	public Semaphore getSemaphore() {
-		return this.sipApplicationSession.getSemaphore();
 	}
 
 	public SipContext getSipContext() {
@@ -332,6 +327,14 @@ public class MobicentsSipApplicationSessionFacade implements
 
 	public void invalidate(boolean bypassCheck) {
 		sipApplicationSession.invalidate(true);
+	}
+
+	public void acquire() {
+		sipApplicationSession.acquire();
+	}
+
+	public void release() {
+		sipApplicationSession.release();
 	}
 
 }

@@ -75,6 +75,9 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 			if(sipApplicationSession == null) {
 				return null;
 			} else {
+				// make sure to acquire this app session and add it to the set of app sessions we monitor in the context of the application
+				// to release them all when we exit application code
+				sipContext.enterSipApp(sipApplicationSession, null);
 				return sipApplicationSession.getSession();
 			}
 		} else {
@@ -99,6 +102,9 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 		if(sipApplicationSession == null) {
 			return null;
 		} else {
+			// make sure to acquire this app session and add it to the set of app sessions we monitor in the context of the application
+			// to release them all when we exit application code
+			sipContext.enterSipApp(sipApplicationSession, null);
 			return sipApplicationSession.getSession();
 		}
 	}

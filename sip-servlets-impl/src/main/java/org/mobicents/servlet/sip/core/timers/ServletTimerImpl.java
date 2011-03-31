@@ -188,6 +188,9 @@ public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 			}
 		}
 		if (appSessionToCancelThisTimersFrom != null && updateAppSessionReadyToInvalidateState) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("removing servlet timer " + id + " from sip application session " + appSessionToCancelThisTimersFrom + " and updating its ready to invalidate state " + updateAppSessionReadyToInvalidateState);
+			}
 			appSessionToCancelThisTimersFrom.removeServletTimer(this, updateAppSessionReadyToInvalidateState);			
 		}
 	}
@@ -277,6 +280,10 @@ public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 		final MobicentsSipApplicationSession sipApplicationSession = getApplicationSession();
 		SipContext sipContext = sipApplicationSession.getSipContext();
 		
+		if(logger.isDebugEnabled()) {
+			logger.debug("running Servlet Timer " + id + " for sip application session " + sipApplicationSession);
+		}
+		
 		ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 		try {
 			ClassLoader cl = sipContext.getLoader().getClassLoader();
@@ -297,6 +304,9 @@ public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 				// and should not be included in the list of active timers
 				// The application may already have canceled() the timer though
 				cancel(); // dont bother about return value....
+			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("Servlet Timer " + id + " for sip application session " + sipApplicationSession + " ended");
 			}
 		}
 
