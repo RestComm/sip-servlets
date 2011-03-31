@@ -166,7 +166,7 @@ public class ShootistSipServlet
 			req.createResponse(200).send();
 			return;
 		}
-		if(!requestURIStringified.startsWith("sip:mss@sip-servlets.com;org.mobicents.servlet.sip.ApplicationSessionKey=%28") && !requestURIStringified.endsWith("%3Aorg.mobicents.servlet.sip.testsuite.ShootistApplication%29")) {
+		if(!requestURIStringified.startsWith("sip:mss@sip-servlets.com;org.mobicents.servlet.sip.ApplicationSessionKey=") && !requestURIStringified.endsWith("%3Aorg.mobicents.servlet.sip.testsuite.ShootistApplication")) {
 			req.createResponse(500, "SipURI.toString() does not escape charachters according to RFC2396.").send();
 		}				
 		if(((SipURI)req.getFrom().getURI()).getUser().equalsIgnoreCase(ENCODE_URI)) {
