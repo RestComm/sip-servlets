@@ -144,6 +144,7 @@
 			<scope>provided</scope>
 		</dependency>
 
+	<!--  Introduced because of https://issues.apache.org/bugzilla/show_bug.cgi?id=50604, should be removed when we move away from Tomcat's version 6.0.32 -->
 		<dependency>
 			<groupId>org.eclipse.jdt.core.compiler</groupId>
 			<artifactId>ecj</artifactId>
