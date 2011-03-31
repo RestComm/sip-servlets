@@ -13,7 +13,6 @@
   		balancers="127.0.0.1"  
   		sipPathName="org.mobicents.ha" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-		concurrencyControlMode="None" 
   		darConfigurationFileLocation="conf/dars/mobicents-dar.properties">
 
     <!-- A "Connector" represents an endpoint by which requests are received

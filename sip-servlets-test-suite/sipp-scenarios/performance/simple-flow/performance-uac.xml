@@ -34,7 +34,7 @@
   <recv response="100" optional="true">
   </recv>
 
-  <recv response="180" optional="true">
+  <recv response="180" rtd="true" optional="true">
   </recv>
 
   <recv response="200" rtd="true" rrs="true">

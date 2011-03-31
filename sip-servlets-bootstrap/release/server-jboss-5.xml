@@ -9,8 +9,7 @@
    <Service name="jboss.web"
         className="org.mobicents.servlet.sip.startup.SipStandardService"
         sipPathName="org.mobicents.ha"  
-  		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-  		concurrencyControlMode="None"
+  		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"  		
   		congestionControlCheckingInterval="-1"
   		darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
   		sipStackPropertiesFile="conf/mss-sip-stack.properties">

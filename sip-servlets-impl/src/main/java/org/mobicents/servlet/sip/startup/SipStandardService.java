@@ -114,7 +114,7 @@ public class SipStandardService extends StandardService implements SipService {
 	protected int dispatcherThreadPoolSize = 15;
 	private boolean md5ContactUserPart = false;
 	
-	protected String concurrencyControlMode = ConcurrencyControlMode.None.toString();
+	protected String concurrencyControlMode = ConcurrencyControlMode.SipApplicationSession.toString();
 	protected String congestionControlPolicy = CongestionControlPolicy.ErrorResponse.toString();
 	protected String additionalParameterableHeaders;
 	protected boolean bypassResponseExecutor = true;

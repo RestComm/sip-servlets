@@ -53,7 +53,6 @@
   <Service name="Sip-Servlets" 
   		className="org.mobicents.servlet.sip.startup.SipStandardService" 
   		sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"  		
-		concurrencyControlMode="None" 
 		balancers="127.0.0.1"
   		darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
   		sipStackPropertiesFile="conf/mss-sip-stack.properties">
