@@ -145,6 +145,13 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.eclipse.jdt.core.compiler</groupId>
+			<artifactId>ecj</artifactId>
+			<version>3.5.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
 			<groupId>comp.java.cafesip</groupId>
 			<artifactId>sipunit</artifactId>
 			<version>0.0.6-BETA</version>
