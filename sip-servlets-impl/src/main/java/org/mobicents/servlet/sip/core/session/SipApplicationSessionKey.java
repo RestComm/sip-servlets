@@ -75,7 +75,9 @@ public class SipApplicationSessionKey implements Serializable {
 		// container MUST look for this annotated static method within the application. 
 		// If found, the container MUST call the method to get the key and generate an 
 		// application-session-id by appending some unique identifier
-		toString = appGeneratedKey + SessionManagerUtil.SESSION_KEY_SEPARATOR + uuid + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName;
+		if(appGeneratedKey != null) {
+			toString = appGeneratedKey + SessionManagerUtil.SESSION_KEY_SEPARATOR + uuid + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName;
+		}
 	}
 	
 	/* (non-Javadoc)
