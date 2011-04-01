@@ -179,8 +179,9 @@ public final class JainSipUtils {
 	public static final Set<String> SYSTEM_HEADERS = new HashSet<String>();
 	static {
 
-		SYSTEM_HEADERS.add(FromHeader.NAME);
-		SYSTEM_HEADERS.add(ToHeader.NAME);
+		// From and To are not system header in requests except for their tag 
+//		SYSTEM_HEADERS.add(FromHeader.NAME);
+//		SYSTEM_HEADERS.add(ToHeader.NAME);
 		SYSTEM_HEADERS.add(CallIdHeader.NAME);
 		SYSTEM_HEADERS.add(CSeqHeader.NAME);
 		SYSTEM_HEADERS.add(ViaHeader.NAME);

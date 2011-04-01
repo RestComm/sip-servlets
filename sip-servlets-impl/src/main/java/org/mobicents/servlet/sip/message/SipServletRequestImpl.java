@@ -212,7 +212,23 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		if (isSystemHeader) {
 			return ModifiableRule.NotModifiable;
 		}
-
+		// Issue http://code.google.com/p/mobicents/issues/detail?id=2467
+		// From and to Header are modifiable except the Tag parameter in a request that is not committed
+		if(headerName.equalsIgnoreCase(FromHeader.NAME)) {
+			if(!isCommitted()) {
+				return ModifiableRule.From;
+			} else {
+				return ModifiableRule.NotModifiable;
+			}
+		}
+		if(headerName.equalsIgnoreCase(ToHeader.NAME)) {
+			if (!isCommitted()) {
+				return ModifiableRule.To;
+			} else {
+				return ModifiableRule.NotModifiable;
+			}
+		}
+		
 		if(hName.equals(ContactHeader.NAME)) {
 			Request request = (Request) this.message;
 	

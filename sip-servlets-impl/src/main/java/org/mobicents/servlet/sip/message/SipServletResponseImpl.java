@@ -48,10 +48,12 @@ import javax.sip.TransactionState;
 import javax.sip.address.SipURI;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.header.WWWAuthenticateHeader;
 import javax.sip.message.Request;
@@ -140,6 +142,15 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		boolean isSystemHeader = JainSipUtils.SYSTEM_HEADERS.contains(hName);
 
 		if (isSystemHeader) {
+			return ModifiableRule.NotModifiable;
+		}
+		
+		// Issue http://code.google.com/p/mobicents/issues/detail?id=2467
+		// From and to Header are not modifiable in a response
+		if(headerName.equalsIgnoreCase(FromHeader.NAME)) {
+			return ModifiableRule.NotModifiable;
+		}
+		if(headerName.equalsIgnoreCase(ToHeader.NAME)) {
 			return ModifiableRule.NotModifiable;
 		}
 

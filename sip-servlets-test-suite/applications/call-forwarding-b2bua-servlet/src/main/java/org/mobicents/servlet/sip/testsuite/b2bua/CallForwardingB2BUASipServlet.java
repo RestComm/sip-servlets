@@ -247,6 +247,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			}
 			headers.put("Contact", contactHeaderList);
 			SipServletRequest forkedRequest = b2buaHelper.createRequest(origSession, request, headers);
+			forkedRequest.getAddressHeader("From").setDisplayName("display name set correctly");
 			String method = request.getHeader("Method");
 			if(method != null) {
 				forkedRequest.getSession().setAttribute("method", method);
@@ -293,6 +294,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		
 		SipServletRequest forkedRequest = helper.createRequest(request, true,
 				headers);
+		forkedRequest.getAddressHeader("From").setDisplayName("display name set correctly");
 		SipURI sipUri = (SipURI) sipFactory.createURI(forwardingUri[1]);
 		forkedRequest.setRequestURI(sipUri);						
 		

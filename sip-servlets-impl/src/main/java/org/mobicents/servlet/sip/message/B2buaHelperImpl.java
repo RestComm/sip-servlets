@@ -365,7 +365,8 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		ListIterator<String> headerNames = origMessage.getHeaderNames();
 		while (headerNames.hasNext()) {
 			String headerName = headerNames.next();
-			if(!JainSipUtils.SYSTEM_HEADERS.contains(headerName) && !headerName.equalsIgnoreCase(ContactHeader.NAME)) {
+			if(!JainSipUtils.SYSTEM_HEADERS.contains(headerName) && !headerName.equalsIgnoreCase(ContactHeader.NAME)
+					&& !headerName.equalsIgnoreCase(FromHeader.NAME) && !headerName.equalsIgnoreCase(ToHeader.NAME)) {
 				HeaderExt origHeader = (HeaderExt) origMessage.getHeader(headerName);
 				ListIterator<Header> subsHeaderIt = subsequentMessage.getHeaders(headerName);
 				// Issue http://code.google.com/p/mobicents/issues/detail?id=2094

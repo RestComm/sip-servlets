@@ -460,7 +460,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 					throw new ServletParseException("Bad address " + first);
 				}
 			} else {
-				Parameterable parametrable = createParameterable(first, first.getName());
+				Parameterable parametrable = createParameterable(first, first.getName(), message instanceof Request);
 				try {
 					logger.debug("parametrable Value " + parametrable.getValue());					
 					if(this.isCommitted()) {
@@ -508,7 +508,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 					throw new ServletParseException("Bad header", ex);
 				}
 			}  else {
-				Parameterable parametrable = createParameterable(header, header.getName());
+				Parameterable parametrable = createParameterable(header, header.getName(), message instanceof Request);
 				try {
 					AddressImpl addressImpl = new AddressImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), getModifiableRule(hName));
 					retval.add(addressImpl);
@@ -874,7 +874,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 			return null;
 		}
 		
-		return createParameterable(h, getFullHeaderName(name));
+		return createParameterable(h, getFullHeaderName(name), message instanceof Request);
 	}
 
 	/*
@@ -891,7 +891,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 
 		while (headers != null && headers.hasNext())
 			result.add(createParameterable(headers.next(),
-					getFullHeaderName(name)));
+					getFullHeaderName(name), message instanceof Request));
 
 		if(!isParameterable(name)) {
 			throw new ServletParseException(name + " header is not parameterable !");
@@ -1628,7 +1628,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		this.transport = transport;
 	}
 
-	protected static Parameterable createParameterable(Header header, String hName)
+	protected static Parameterable createParameterable(Header header, String hName, boolean isRequest)
 			throws ServletParseException {
 		String whole = header.toString();
 		if (logger.isDebugEnabled())
@@ -1714,11 +1714,28 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		if(displayName != null) {
 			value = displayName.concat(value);
 		}
-
-		boolean isNotModifiable = JainSipUtils.SYSTEM_HEADERS.contains(header.getName());
-		
+		final String headerName = header.getName();
+		final boolean isNotModifiable = JainSipUtils.SYSTEM_HEADERS.contains(headerName);
+		ModifiableRule modifiableRule = isNotModifiable ? ModifiableRule.NotModifiable : ModifiableRule.Modifiable;
+		if(headerName.equalsIgnoreCase(FromHeader.NAME)) {
+			if(isRequest) {
+				modifiableRule = ModifiableRule.From;
+			} else {
+				modifiableRule = ModifiableRule.NotModifiable;
+			}
+		}
+		if(headerName.equalsIgnoreCase(ToHeader.NAME)) {
+			if(isRequest) {
+				modifiableRule = ModifiableRule.To;
+			} else {
+				modifiableRule = ModifiableRule.NotModifiable;
+			}
+		}
+		if (logger.isDebugEnabled())
+			logger.debug("modifiableRule for [" + hName + "] from ["
+					+ whole + "] is " + modifiableRule);
 		ParameterableHeaderImpl parameterable = new ParameterableHeaderImpl(
-				header, value, paramMap, isNotModifiable ? ModifiableRule.NotModifiable : ModifiableRule.Modifiable);
+				header, value, paramMap, modifiableRule);
 		return parameterable;
 	}
 

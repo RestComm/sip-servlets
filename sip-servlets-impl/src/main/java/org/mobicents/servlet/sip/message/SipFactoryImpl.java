@@ -656,17 +656,17 @@ public class SipFactoryImpl implements Externalizable {
 	public Parameterable createParameterable(String value) throws ServletParseException {
 		try {			 
 			Header header = SipFactories.headerFactory.createHeader(ContactHeader.NAME, value);
-			return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()));
+			return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true);
 		} catch (ParseException e) {
 			try {
 				Header header = SipFactories.headerFactory.createHeader(ContentTypeHeader.NAME, value);
-				return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()));
+				return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true);
 			} catch (ParseException pe) {
 				// Contribution from Nishihara, Naoki from Japan for Issue http://code.google.com/p/mobicents/issues/detail?id=1856
 				// Cannot create a parameterable header for Session-Expires
 				try {
 					Header header = SipFactories.headerFactory.createHeader(ContentDispositionHeader.NAME, value);
-					return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()));
+					return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true);
 				} catch (ParseException pe2) {
 					throw new ServletParseException("Impossible to parse the following parameterable "+ value , pe2);
 				}
