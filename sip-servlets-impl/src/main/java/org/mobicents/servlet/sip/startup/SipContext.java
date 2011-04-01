@@ -149,8 +149,10 @@ public interface SipContext extends Context {
 	void enterSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession);
 	void exitSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession);
 	
-	void enterSipAppHa(boolean startCacheActivity);
-	void exitSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response);
+	//Issue http://code.google.com/p/mobicents/issues/detail?id=2452
+	// Returning boolean vlaue and new parameter batchStarted to decide whether or not to end the batch
+	boolean enterSipAppHa(boolean startCacheActivity);
+	void exitSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response, boolean batchStarted);
 	
 	SipFactoryFacade getSipFactoryFacade();
 	

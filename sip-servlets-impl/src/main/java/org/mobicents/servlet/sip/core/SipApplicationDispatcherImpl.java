@@ -923,10 +923,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 								logger.debug("don't Invalidate Proxy session");
 							}
 							return;
-						} 												
+						} 
+						boolean batchStarted = false;
 						try {
 							sipContext.enterSipApp(sipApplicationSession, sipSessionImpl);
-							sipContext.enterSipAppHa(true);
+							batchStarted = sipContext.enterSipAppHa(true);
 							if(logger.isDebugEnabled()) {
 								logger.debug("sip session " + sipSessionKey + " is valid ? :" + sipSessionImpl.isValidInternal());
 								if(sipSessionImpl.isValidInternal()) {
@@ -937,7 +938,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 								sipSessionImpl.onTerminatedState();							
 							}
 						} finally {
-							sipContext.exitSipAppHa(null, null);
+							sipContext.exitSipAppHa(null, null, batchStarted);
 							sipContext.exitSipApp(sipApplicationSession, sipSessionImpl);
 						}
 					} else {

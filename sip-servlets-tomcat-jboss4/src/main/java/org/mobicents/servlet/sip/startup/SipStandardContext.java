@@ -1065,7 +1065,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			}
 		}
 		enterSipApp(null, null);
-		enterSipAppHa(true);
+		boolean batchStarted = enterSipAppHa(true);
 		try {
 			for (Container container : childrenMap.values()) {
 				if(logger.isDebugEnabled()) {
@@ -1161,7 +1161,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				}
 			}
 		} finally {
-			exitSipAppHa(null, null);
+			exitSipAppHa(null, null, batchStarted);
 			exitSipApp(null, null);
 		}
 		return ok;
@@ -1263,7 +1263,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 //		}
 //	}
 	
-	public void enterSipAppHa(boolean startCacheActivity) {
+	public boolean enterSipAppHa(boolean startCacheActivity) {
 		if(getDistributable() && hasDistributableManager) {
 //			if(bindSessions) {
 //				ConvergedSessionReplicationContext.enterSipappAndBindSessions(sipApplicationSession,
@@ -1272,10 +1272,11 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				ConvergedSessionReplicationContext.enterSipapp(null, null, startCacheActivity);
 //			}
 		}
+		return false;
 	}
 
 	
-	public void exitSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response) {			
+	public void exitSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response, boolean batchStarted) {			
 		if (getDistributable() && hasDistributableManager) {
 			if(logger.isDebugEnabled()) {
 				if(request != null) {

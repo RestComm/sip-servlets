@@ -198,7 +198,7 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
                 }
             }
         }
-        context.enterSipAppHa(false);
+        boolean batchStarted = context.enterSipAppHa(false);
         
     	//the line below was replaced by the whole bunch of code because getting the parameter from the request is causing
     	//JRuby-Rails persistence to fail, go figure...
@@ -248,7 +248,7 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
 			wrapper.getPipeline().getFirst().invoke(request, response);
 		} finally {
 	        context.exitSipApp(sipApplicationSessionImpl, null);
-	        context.exitSipAppHa(null, null);
+	        context.exitSipAppHa(null, null, batchStarted);
 		}
         // Fix for Issue 882 :remove the http session from the thread local to avoid any leaking of the session
         context.getSipFactoryFacade().removeHttpSession();

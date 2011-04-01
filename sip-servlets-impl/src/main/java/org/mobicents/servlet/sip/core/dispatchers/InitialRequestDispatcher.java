@@ -686,7 +686,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			final SipContext sipContext = appSession.getSipContext();
 			final Request request = (Request) sipServletRequest.getMessage();
 			
-			sipContext.enterSipAppHa(true);
+			boolean batchStarted = sipContext.enterSipAppHa(true);
 			try {
 				sipSessionImpl.setSessionCreatingTransactionRequest(sipServletRequest);
 				
@@ -744,7 +744,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				// We should never call exitAipApp before exitSipAppHa, because exitSipApp releases the lock on the
 				// Application of SipSession (concurrency control lock). If this happens a new request might arrive
 				// and modify the state during Serialization or other non-thread safe operation in the serialization
-				sipContext.exitSipAppHa(sipServletRequest, null);
+				sipContext.exitSipAppHa(sipServletRequest, null, batchStarted);
 				sipContext.exitSipApp(appSession, sipSessionImpl);				
 			}
 			//nothing more needs to be done, either the app acted as UA, PROXY or B2BUA. in any case we stop routing							

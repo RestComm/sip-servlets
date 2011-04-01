@@ -1042,9 +1042,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}		
 	}   
     
-    public void enterSipAppHa(boolean startCacheActivity) {
+    public boolean enterSipAppHa(boolean startCacheActivity) {
+    	boolean batchStarted = false;
 		if(getDistributable() && hasDistributableManager) {
-			startBatchTransaction();
+			batchStarted = startBatchTransaction();
 //			if(bindSessions) {
 //				ConvergedSessionReplicationContext.enterSipappAndBindSessions(sipApplicationSession,
 //				getSipManager(), startCacheActivity);
@@ -1052,9 +1053,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				ConvergedSessionReplicationContext.enterSipapp(null, null, startCacheActivity);
 //			}
 		}
+		return batchStarted;
 	}
 	
-	public void exitSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response) {		
+	public void exitSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response, boolean batchStarted) {		
 		if (getDistributable() && hasDistributableManager) {
 			if(logger.isInfoEnabled()) {
 				if(request != null) {
@@ -1084,7 +1086,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					}
 				} 
 			} finally {
-				endBatchTransaction();
+				endBatchTransaction(batchStarted);
 				if(logger.isDebugEnabled()) {
 					if(request != null) {
 						logger.debug("We are now after the replication finishCacheActivity for request " + request + ", We replicate no matter what " );
@@ -1118,12 +1120,12 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		return started;
 	}
 	
-	private void endBatchTransaction() {
+	private void endBatchTransaction(boolean wasStarted) {
 		DistributedCacheConvergedSipManager<? extends OutgoingDistributableSessionData> distributedConvergedManager = ((ClusteredSipManager) manager)
 				.getDistributedCacheConvergedSipManager();
 		BatchingManager tm = distributedConvergedManager.getBatchingManager();
 		try {
-			if (tm != null && tm.isBatchInProgress() == true) {
+			if (tm != null && tm.isBatchInProgress() == true && wasStarted) {
 				tm.endBatch();
 			}
 		} catch (Exception e) {
@@ -1150,7 +1152,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}
 				
 		enterSipApp(null, null);
-		enterSipAppHa(true);
+		boolean batchStarted = enterSipAppHa(true);
 		try {
 			for (Container container : childrenMap.values()) {
 				if(logger.isDebugEnabled()) {
@@ -1246,7 +1248,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				}
 			}
 		} finally {
-			exitSipAppHa(null, null);
+			exitSipAppHa(null, null, batchStarted);
 			exitSipApp(null, null);	
 		}
 		return ok;

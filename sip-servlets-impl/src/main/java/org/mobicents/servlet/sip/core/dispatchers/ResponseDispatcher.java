@@ -252,8 +252,9 @@ public class ResponseDispatcher extends MessageDispatcher {
 
 				public void dispatch() throws DispatcherException {
 					final int status = sipServletResponse.getStatus();
+					boolean batchStarted = false;
 					if(status != Response.TRYING) {
-						sipContext.enterSipAppHa(true);
+						batchStarted = sipContext.enterSipAppHa(true);
 					}
 					try {
 						try {														
@@ -395,7 +396,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 						// Application of SipSession (concurrency control lock). If this happens a new request might arrive
 						// and modify the state during Serialization or other non-thread safe operation in the serialization
 						if(status != Response.TRYING) {
-							sipContext.exitSipAppHa(null, sipServletResponse);
+							sipContext.exitSipAppHa(null, sipServletResponse, batchStarted);
 						}
 						sipContext.exitSipApp(session.getSipApplicationSession(), session);						
 					}
