@@ -15,6 +15,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package org.mobicents.servlet.sip.testsuite.simple.prack;
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.sip.SipProvider;
 
 import org.apache.catalina.deploy.ApplicationParameter;
@@ -30,7 +33,8 @@ public class ShootistPrackSipServletTest extends SipServletTestCase {
 	private static transient Logger logger = Logger.getLogger(ShootistPrackSipServletTest.class);		
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 10000;	
+	private static final int TIMEOUT = 10000;
+	private static final int DIALOG_TIMEOUT = 40000;
 //	private static final int TIMEOUT = 100000000;
 	
 	TestSipListener receiver;
@@ -59,6 +63,25 @@ public class ShootistPrackSipServletTest extends SipServletTestCase {
 		context.setManager(new SipStandardManager());
 		ApplicationParameter applicationParameter = new ApplicationParameter();
 		applicationParameter.setName("prack");
+		applicationParameter.setValue("true");
+		context.addApplicationParameter(applicationParameter);
+		assertTrue(tomcat.deployContext(context));
+		return context;
+	}
+	
+	public SipStandardContext deployApplicationPrackErrorResponse() {
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp");
+		context.setName("sip-test-context");
+		context.setPath("sip-test");
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		ApplicationParameter applicationParameter = new ApplicationParameter();
+		applicationParameter.setName("prack");
+		applicationParameter.setValue("true");
+		context.addApplicationParameter(applicationParameter);
+		applicationParameter = new ApplicationParameter();
+		applicationParameter.setName("testErrorResponse");
 		applicationParameter.setValue("true");
 		context.addApplicationParameter(applicationParameter);
 		assertTrue(tomcat.deployContext(context));
@@ -111,6 +134,39 @@ public class ShootistPrackSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);		
 		assertTrue(receiver.isPrackReceived());
 		assertTrue(receiver.getByeReceived());		
+	}
+	
+	public void testShootistPrackEarlyMediaChange() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setTimeToWaitBeforeBye(DIALOG_TIMEOUT);
+		LinkedList<Integer> responses = new LinkedList<Integer>();
+		responses.add(180);
+		responses.add(180);
+		responses.add(183);
+		responses.add(183);
+		responses.add(183);
+		receiver.setProvisionalResponsesToSend(responses);		
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		deployApplicationPrackErrorResponse();
+		Thread.sleep(DIALOG_TIMEOUT + TIMEOUT);
+		assertTrue(receiver.isPrackReceived());
+		List<String> allMessagesContent = receiver.getAllMessagesContent();
+		
+		assertNotNull(receiver.getMessageRequest());
+		assertTrue("earlyMedia", receiver.getMessageRequest().getHeader("EarlyMediaResponses").toString().contains("3"));
+		assertTrue("earlyMedia", receiver.getMessageRequest().getHeader("EarlyMedia180Responses").toString().contains("2"));
+		assertTrue(allMessagesContent.size() >= 2);
+		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
+		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));
 	}
 	
 	public void testShootistPrackIsAnyLocalAddress() throws Exception {

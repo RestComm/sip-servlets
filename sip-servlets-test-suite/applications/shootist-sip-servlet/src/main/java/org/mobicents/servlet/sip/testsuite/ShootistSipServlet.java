@@ -61,6 +61,7 @@ public class ShootistSipServlet
 	public static AtomicBoolean isAlreadyAccessed = new AtomicBoolean(false);
 	
 	int numberOf183Responses = 0;
+	int numberOf180Responses = 0;
 	
 	@Resource
 	TimerService timerService;
@@ -83,6 +84,7 @@ public class ShootistSipServlet
 		try {
 			access();
 			if(resp.getStatus() == 183) numberOf183Responses++;
+			if(resp.getStatus() == 180) numberOf180Responses++;
 			if(resp.getHeader("require") != null) {
 				SipServletRequest prack = resp.createPrack();
 				SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
@@ -578,6 +580,7 @@ public class ShootistSipServlet
 			sipServletRequest.setContentLength(content.length());
 			sipServletRequest.setContent(content, CONTENT_TYPE);
 			sipServletRequest.setHeader("EarlyMediaResponses", new Integer(numberOf183Responses).toString());
+			sipServletRequest.setHeader("EarlyMedia180Responses", new Integer(numberOf180Responses).toString());
 			
 			sipServletRequest.send();
 		} catch (ServletParseException e) {
