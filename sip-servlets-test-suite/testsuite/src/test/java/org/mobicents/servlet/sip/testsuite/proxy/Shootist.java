@@ -121,6 +121,8 @@ public class Shootist implements SipListener {
 	private List<String> allMessagesContent = new ArrayList<String>();
 	
 	private int numberOfTryingReceived = 0;
+	
+	private boolean sendCancelOn180;
 
 	class ByeTask  extends TimerTask {
 		Dialog dialog;
@@ -361,6 +363,10 @@ public class Shootist implements SipListener {
 					ClientTransaction ct = sipProvider.getNewClientTransaction(prackRequest);
 					dialog.sendRequest(ct);
 				}
+				if(sendCancelOn180) {
+					System.out.println("received 180 sending cancel");
+					sendCancel();
+				}
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -374,9 +380,9 @@ public class Shootist implements SipListener {
 	}
 
 	public void sendCancel() {
-		try {
-			System.out.println("Sending cancel");
+		try {			
 			Request cancelRequest = inviteTid.createCancel();
+			System.out.println("Sending cancel " + cancelRequest);
 			ClientTransaction cancelTid = sipProvider
 					.getNewClientTransaction(cancelRequest);
 			cancelTid.sendRequest();
@@ -580,7 +586,7 @@ public class Shootist implements SipListener {
 			dialog = inviteTid.getDialog();
 			
 			if(!outboundProxy) {
-				Address address = addressFactory.createAddress(peerHostPort);
+				Address address = addressFactory.createAddress("sip:" + peerHostPort);
 				RouteHeader routeHeader = headerFactory.createRouteHeader(address);
 				request.addHeader(routeHeader);
 			} 
@@ -686,6 +692,22 @@ public class Shootist implements SipListener {
 	 */
 	public int getNumberOfTryingReceived() {
 		return numberOfTryingReceived;
+	}
+
+
+	/**
+	 * @param sendCancelOn180 the sendCancelOn180 to set
+	 */
+	public void setSendCancelOn180(boolean sendCancelOn180) {
+		this.sendCancelOn180 = sendCancelOn180;
+	}
+
+
+	/**
+	 * @return the sendCancelOn180
+	 */
+	public boolean isSendCancelOn180() {
+		return sendCancelOn180;
 	}
 
 }

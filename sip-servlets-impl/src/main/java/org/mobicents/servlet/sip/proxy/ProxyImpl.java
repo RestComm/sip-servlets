@@ -638,7 +638,9 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		
 		for(final ProxyBranchImpl pbi: this.proxyBranches.values())
 		{			
-			if(!pbi.isStarted())
+			// Issue http://code.google.com/p/mobicents/issues/detail?id=2461
+			// don't start the branch is it has been cancelled already
+			if(!pbi.isStarted() && !pbi.isCanceled())
 			{
 				pbi.start();
 				return;
@@ -653,7 +655,8 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 			final SipServletResponse response = pbi.getResponse();
 			
 			// The unstarted branches still haven't got a chance to get response
-			if(!pbi.isStarted()) { 
+			// Issue http://code.google.com/p/mobicents/issues/detail?id=2461 adding !isCancelled
+			if(!pbi.isStarted() && !pbi.isCanceled()) { 
 				return false;
 			}
 			

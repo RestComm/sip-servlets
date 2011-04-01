@@ -108,6 +108,28 @@ public class SequentialProxyTest extends SipServletTestCase {
 		if (cutme.canceled == false)
 			fail("The party that was supposed to be cancelled didn't cancel.");
 	}
+	
+	public void testTreePhonesCancel() {
+		this.shootme.init("stackName", null);
+		this.cutme.init(null);
+		this.shootist.setSendCancelOn180(true);
+		this.shootist.init("sequential-three", false, null);
+		for (int q = 0; q < 30; q++) {
+			if (cutme.canceled == false)
+				try {
+					Thread.sleep(TIMEOUT);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		}
+//		if (shootist.ended == false)
+//			fail("Conversation not complete!");
+		if (cutme.canceled == false)
+			fail("The party that was supposed to be cancelled didn't cancel.");
+		if (shootme.inviteTid != null)
+			fail("This party wasn't supposed to be called.");
+	}
 
 	// Here we want to test if the seq proxy will continue to check next branches
 	public void testFirstTargetResponds() {
