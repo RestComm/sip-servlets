@@ -40,8 +40,10 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 	 
 	TestSipListener sender;
 	TestSipListener receiver;
+	TestSipListener receiver2;
 	ProtocolObjects senderProtocolObjects;
 	ProtocolObjects	receiverProtocolObjects;
+	ProtocolObjects	receiver2ProtocolObjects;
 
 	public SpeedDialJunitTest(String name) {
 		super(name);
@@ -83,6 +85,8 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 				"gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5070", null, null);
 		receiverProtocolObjects = new ProtocolObjects("receiver",
 				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);			
+		receiver2ProtocolObjects = new ProtocolObjects("receiver2",
+				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 	}
 	
 	public void testSpeedDialCallerSendBye() throws Exception {
@@ -148,6 +152,45 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isServerErrorReceived());
+	}
+	
+	public void testSpeedDialOKAndErrorResponse() throws Exception {	
+		deploySpeedDial("record_route", "false");
+		
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		sender.setSendSubsequentRequestsThroughSipProvider(true);
+		sender.setRecordRoutingProxyTesting(true);
+		SipProvider senderProvider = sender.createProvider();
+		senderProvider.addSipListener(sender);
+		senderProtocolObjects.start();
+		
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		receiver.setRecordRoutingProxyTesting(true);
+		SipProvider receiverProvider = receiver.createProvider();
+		receiverProvider.addSipListener(receiver);		
+		receiver.setRespondWithError(408);		
+		receiverProtocolObjects.start();
+		
+		receiver2 = new TestSipListener(5091, 5070, receiver2ProtocolObjects, false);
+		receiver2.setRecordRoutingProxyTesting(true);
+		SipProvider receiver2Provider = receiver2.createProvider();
+		receiver2Provider.addSipListener(receiver2);						
+		receiver2ProtocolObjects.start();
+		receiver2.setWaitBeforeFinalResponse(1000);
+
+		String fromName = "sender-expect-408";
+		String fromHost = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromHost);
+				
+		String toUser = "9-multiple";
+		String toHost = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toHost);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertEquals(200, sender.getFinalResponseStatus());
 	}
 	
 	public void testSpeedDialDeclineErrorResponse() throws Exception {	
@@ -255,7 +298,10 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 	@Override
 	protected void tearDown() throws Exception {	
 		senderProtocolObjects.destroy();
-		receiverProtocolObjects.destroy();			
+		receiverProtocolObjects.destroy();	
+		if(receiver2ProtocolObjects != null) {
+			receiver2ProtocolObjects.destroy();
+		}
 		logger.info("Test completed");
 		super.tearDown();
 	}

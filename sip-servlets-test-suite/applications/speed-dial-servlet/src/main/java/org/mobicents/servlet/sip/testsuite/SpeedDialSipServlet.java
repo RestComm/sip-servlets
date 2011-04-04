@@ -17,10 +17,12 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
-import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Proxy;
@@ -31,6 +33,7 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 
@@ -72,6 +75,7 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener 
 		dialNumberToSipUriMapping.put("6", "sip:receiver-failover@sip-servlets.com");
 		dialNumberToSipUriMapping.put("b2bua", "sip:fromProxy@sip-servlets.com");
 		dialNumberToSipUriMapping.put("9", "sip:receiver@127.0.0.1:5090");
+		dialNumberToSipUriMapping.put("9-multiple", "sip:receiver@127.0.0.1:5090,sip:receiver@127.0.0.1:5091");
 		dialNumberToSipUriMapping.put("forward-pending-sender", "sip:forward-pending-sender@127.0.0.1:5080");
 		dialNumberToSipUriMapping.put("factory-sender", "sip:factory-sender@127.0.0.1:5080");		
 		String initParam = servletConfig.getServletContext().getInitParameter("record_route");
@@ -103,14 +107,24 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener 
 				String dialNumber = ((SipURI)request.getRequestURI()).getUser();
 				String mappedUri = dialNumberToSipUriMapping.get(dialNumber);	
 				if(mappedUri != null) {
-					SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);			
+					SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 					Proxy proxy = request.getProxy();
 					proxy.setProxyTimeout(120);
 					proxy.setRecordRoute(isRecordRoute);
 					proxy.setParallel(false);
 					proxy.setSupervised(true);
 					logger.info("proxying to " + mappedUri);
-					proxy.proxyTo(sipFactory.createURI(mappedUri));				
+					if(mappedUri.contains(",")) {
+						List<URI> uris = new ArrayList<URI>();
+						StringTokenizer stringTokenizer = new StringTokenizer(mappedUri, ",");
+						while (stringTokenizer.hasMoreTokens()) {
+							String uri = stringTokenizer.nextToken();
+							uris.add(sipFactory.createURI(uri));
+						}
+						proxy.proxyTo(uris);
+					} else {
+						proxy.proxyTo(sipFactory.createURI(mappedUri));
+					}
 				} else {
 					SipServletResponse sipServletResponse = 
 						request.createResponse(SipServletResponse.SC_NOT_ACCEPTABLE_HERE, "No mapping for " + dialNumber);
@@ -199,9 +213,22 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener 
 		return true;
 	}
 	
+	@Override
+	protected void doResponse(SipServletResponse resp) throws ServletException,
+			IOException {
+		logger.info("Got response " + resp);
+		if(resp.getTo().toString().contains("9-multiple")) {
+			resp.getApplicationSession().setAttribute("errorResponseReceivedAtAppLevel", "true");
+		} 
+		if(resp.getApplicationSession().getAttribute("errorResponseReceivedAtAppLevel") != null) {
+			throw new IllegalStateException("Error Response Received at Application Level but we should only see the best final response");
+		}
+		super.doResponse(resp);
+	}
+	
 	protected void doSuccessResponse(SipServletResponse resp)
 		throws ServletException, IOException {
-		logger.info("Got response " + resp);
+		logger.info("Got Success response " + resp);
 		if(((SipURI)resp.getFrom().getURI()).getUser().equalsIgnoreCase(TEST_USER_REMOTE)) {
 			if(resp.getRemoteAddr().equals(LOCAL_LOCALHOST_ADDR) && resp.getRemotePort() == LOCAL_PORT && resp.getTransport().equalsIgnoreCase(LOCAL_TRANSPORT)) {			
 				logger.info("remote information is correct");
