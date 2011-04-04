@@ -25,6 +25,7 @@ import gov.nist.javax.sip.header.SIPHeaderNames;
 import gov.nist.javax.sip.header.WWWAuthenticate;
 import gov.nist.javax.sip.header.extensions.JoinHeader;
 import gov.nist.javax.sip.header.extensions.ReplacesHeader;
+import gov.nist.javax.sip.message.MessageExt;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -442,7 +443,7 @@ public class TestSipListener implements SipListener {
 					// This is a retransmission so just return.
 					return;				
 				} 
-			}
+			}						
 			Response response = protocolObjects.messageFactory.createResponse(
 					200, request);
 			Address address = protocolObjects.addressFactory
@@ -454,6 +455,26 @@ public class TestSipListener implements SipListener {
 			st.sendResponse(response);
 			
 			Thread.sleep(200);
+			
+			RequireHeader requireHeader = (RequireHeader) request.getHeader(RequireHeader.NAME);				
+			if(provisionalResponsesToSend.size() > 0) {
+				response = protocolObjects.messageFactory.createResponse(
+						provisionalResponsesToSend.get(0), inviteRequest);
+				requireHeader = protocolObjects.headerFactory.createRequireHeader("100rel");
+				response.addHeader(requireHeader);
+				Header rseqHeader = protocolObjects.headerFactory.createRSeqHeader(rseqNumber.getAndIncrement());
+				response.addHeader(rseqHeader);
+				((MessageExt)response).getToHeader().setTag(((MessageExt) request).getToHeader().getTag());
+				address = protocolObjects.addressFactory
+				.createAddress("Shootme <sip:127.0.0.1:" + myPort
+						+";transport="+protocolObjects.transport
+						+ ">");
+				contactHeader = protocolObjects.headerFactory.createContactHeader(address);
+				response.addHeader(contactHeader);
+				dialog.sendReliableProvisionalResponse(response);
+				provisionalResponsesToSend.remove(0);
+				return;
+			} 
 			
 			if(!sendUpdateAfterUpdate)
 				inviteServerTid.sendResponse(getFinalResponse());
@@ -1175,6 +1196,8 @@ public class TestSipListener implements SipListener {
 						contactHeader = protocolObjects.headerFactory.createContactHeader(address);
 						response.addHeader(contactHeader);
 						dialog.sendReliableProvisionalResponse(response);
+						provisionalResponsesToSend.remove(0);	
+						break;
 					}  else {
 						Address address = protocolObjects.addressFactory
 						.createAddress("Shootme <sip:127.0.0.1:" + myPort
