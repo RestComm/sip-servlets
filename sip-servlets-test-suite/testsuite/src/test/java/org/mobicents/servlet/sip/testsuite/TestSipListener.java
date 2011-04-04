@@ -458,6 +458,7 @@ public class TestSipListener implements SipListener {
 			
 			RequireHeader requireHeader = (RequireHeader) request.getHeader(RequireHeader.NAME);				
 			if(provisionalResponsesToSend.size() > 0) {
+				logger.info("shootme: Creating provisional response with status code " + provisionalResponsesToSend.get(0));
 				response = protocolObjects.messageFactory.createResponse(
 						provisionalResponsesToSend.get(0), inviteRequest);
 				requireHeader = protocolObjects.headerFactory.createRequireHeader("100rel");
@@ -1172,19 +1173,24 @@ public class TestSipListener implements SipListener {
 				sendReliably = true;
 			}
 				
-			for (int provisionalResponseToSend : provisionalResponsesToSend) {
+			Iterator<Integer> provisionalResponseIt = provisionalResponsesToSend.iterator();
+			while (provisionalResponseIt.hasNext()) {
+				int provisionalResponseToSend = provisionalResponseIt.next();
 				Thread.sleep(getTimeToWaitBetweenProvisionnalResponse());
+				logger.info("shootme: Creating provisional response with status code " + provisionalResponseToSend);
 				Response response = protocolObjects.messageFactory.createResponse(
 						provisionalResponseToSend, request);
 				if(response.getStatusCode() == 183) {
 					response.setReasonPhrase("different" + System.nanoTime());
-				}
+				}				
 				if(provisionalResponseToSend >= Response.TRYING && provisionalResponseToSend < Response.OK) {
 					ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
 					if(provisionalResponseToSend != Response.TRYING && toHeader.getTag() == null) {
 						toHeader.setTag(TO_TAG); // Application is supposed to set.
 					}
 					if(sendReliably && provisionalResponseToSend != Response.TRYING) {
+						provisionalResponsesToSend.remove(0);
+						provisionalResponseIt = provisionalResponsesToSend.iterator();
 						requireHeader = protocolObjects.headerFactory.createRequireHeader("100rel");
 						response.addHeader(requireHeader);
 						Header rseqHeader = protocolObjects.headerFactory.createRSeqHeader(rseqNumber.getAndIncrement());
@@ -1195,10 +1201,13 @@ public class TestSipListener implements SipListener {
 								+ ">");
 						contactHeader = protocolObjects.headerFactory.createContactHeader(address);
 						response.addHeader(contactHeader);
-						dialog.sendReliableProvisionalResponse(response);
-						provisionalResponsesToSend.remove(0);	
+						dialog.sendReliableProvisionalResponse(response);							
 						break;
 					}  else {
+						if(provisionalResponseToSend == Response.TRYING) {
+							provisionalResponsesToSend.remove(0);
+							provisionalResponseIt = provisionalResponsesToSend.iterator();
+						}
 						Address address = protocolObjects.addressFactory
 						.createAddress("Shootme <sip:127.0.0.1:" + myPort
 								+";transport="+protocolObjects.transport
