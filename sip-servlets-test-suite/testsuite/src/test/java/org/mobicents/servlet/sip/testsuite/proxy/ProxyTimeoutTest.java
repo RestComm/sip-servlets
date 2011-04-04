@@ -104,7 +104,7 @@ public class ProxyTimeoutTest extends SipServletTestCase {
 		receiver.setProvisionalResponsesToSend(new ArrayList<Integer>());
 		receiver.setWaitForCancel(true);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
-		Thread.sleep(TIMEOUT);
+		Thread.sleep(TIMEOUT*3);
 		assertEquals(0,receiver.getFinalResponseStatus());
 		assertTrue(!sender.isAckSent());
 		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
