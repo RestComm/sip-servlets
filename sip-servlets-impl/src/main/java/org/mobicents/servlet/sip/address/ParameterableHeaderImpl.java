@@ -64,6 +64,9 @@ public class ParameterableHeaderImpl extends ParameterableImpl {
 		}
 		if(isModifiable == ModifiableRule.NotModifiable) {
 			throw new IllegalStateException("it is forbidden for an application to set the From Header");
+		}		
+		if(isModifiable == ModifiableRule.From || isModifiable == ModifiableRule.To) {
+			throw new IllegalStateException("it is forbidden for an application to set the From or To Header");
 		}
 		this.value = value;
 	}

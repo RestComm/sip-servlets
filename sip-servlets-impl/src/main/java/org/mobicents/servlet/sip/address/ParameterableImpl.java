@@ -107,9 +107,12 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 	public void removeParameter(String name) {
 		if(name == null) {
 			throw new NullPointerException("parameter name is null ! ");
-		}
+		}		
 		if(isModifiable == ModifiableRule.NotModifiable) {
 			throw new IllegalStateException("it is forbidden to modify the parameters");
+		}
+		if(name.equalsIgnoreCase("tag") && (isModifiable == ModifiableRule.From || isModifiable == ModifiableRule.To)) {
+			throw new IllegalStateException("it is forbidden to remove the tag parameter on To or From Header");
 		}
 		this.parameters.remove(name);
 		if(header != null) {
@@ -134,7 +137,7 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 			throw new IllegalStateException("it is forbidden to modify the parameters");
 		}
 		if(name.equalsIgnoreCase("tag") && (isModifiable == ModifiableRule.From || isModifiable == ModifiableRule.To)) {
-			throw new IllegalStateException("it is forbidden the tag parameter on To or From Header");
+			throw new IllegalStateException("it is forbidden to set the tag parameter on To or From Header");
 		}
 		//Fix from abondar for Issue 494 and angelo.marletta for Issue 502      
 		this.parameters.put(name.toLowerCase(), value);
