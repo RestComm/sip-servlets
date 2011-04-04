@@ -59,6 +59,7 @@ import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
+import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -429,8 +430,9 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	 * A callback. Here we receive all responses from the proxied requests we have sent.
 	 * 
 	 * @param response
+	 * @throws DispatcherException 
 	 */
-	public void onResponse(final SipServletResponseImpl response, final int status)
+	public void onResponse(final SipServletResponseImpl response, final int status) throws DispatcherException
 	{
 		// If we are canceled but still receiving provisional responses try to cancel them
 		if(canceled && status < 200) {
@@ -545,7 +547,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 				this.proxy.onFinalResponse(this);
 			} else {
 				if(logger.isDebugEnabled())
-					logger.debug("Handling final response for non-initial request");
+					logger.debug("Handling final response for non-initial request");				
 				this.proxy.sendFinalResponse(response, this);
 			}
 		}
@@ -760,9 +762,10 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	/**
 	 * This callback is called when the remote side has been idle too long while
 	 * establishing the dialog.
+	 * @throws DispatcherException 
 	 *
 	 */
-	public void onTimeout(ResponseType responseType)
+	public void onTimeout(ResponseType responseType) throws DispatcherException
 	{
 		if(!proxy.getAckReceived()) {
 			this.cancel();

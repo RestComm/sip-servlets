@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import javax.servlet.ServletException;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.ServletParseException;
@@ -56,6 +57,8 @@ import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
+import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
+import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.timers.ProxyTimerService;
@@ -518,7 +521,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		return outboundInterface;
 	}
 	
-	public void onFinalResponse(ProxyBranchImpl branch) {
+	public void onFinalResponse(ProxyBranchImpl branch) throws DispatcherException {
 		//Get the final response
 		final SipServletResponseImpl response = (SipServletResponseImpl) branch.getResponse();
 		final int status = response.getStatus(); 
@@ -585,9 +588,9 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		
 		// Check if we are waiting for more response
 		if(parallel && allResponsesHaveArrived()) {
-			finalBranchForSubsequentRequests = bestBranch;
+			finalBranchForSubsequentRequests = bestBranch;			
 			if(logger.isDebugEnabled())
-					logger.debug("All responses have arrived, sending final response for parallel proxy" );
+				logger.debug("All responses have arrived, sending final response for parallel proxy" );
 			sendFinalResponse(bestResponse, bestBranch);
 		} else if (!parallel) {
 			final int bestResponseStatus = bestResponse.getStatus();
@@ -612,7 +615,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 
 	}
 	
-	public void onBranchTimeOut(ProxyBranchImpl branch)
+	public void onBranchTimeOut(ProxyBranchImpl branch) throws DispatcherException
 	{
 		if(this.bestBranch == null) this.bestBranch = branch;
 		if(allResponsesHaveArrived())
@@ -672,14 +675,27 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 	}
 	
 	public void sendFinalResponse(SipServletResponseImpl response,
-			ProxyBranchImpl proxyBranch)
-	{
+			ProxyBranchImpl proxyBranch) throws DispatcherException {		
+		
 		// If we didn't get any response and only a timeout just return a timeout
 		if(proxyBranch.isTimedOut()) {
 			try {
-				originalRequest.createResponse(Response.REQUEST_TIMEOUT).send();
+				SipServletResponseImpl timeoutResponse = (SipServletResponseImpl) originalRequest.createResponse(Response.REQUEST_TIMEOUT);
 				if(logger.isDebugEnabled())
 					logger.debug("Proxy branch has timed out");
+				// Issue 2474 & 2475
+				if(logger.isDebugEnabled())
+					logger.debug("All responses have arrived, sending final response for parallel proxy" );
+				try {
+					MessageDispatcher.callServlet(timeoutResponse);
+				} catch (ServletException e) {				
+					throw new DispatcherException("Unexpected servlet exception while processing the response : " + response, e);					
+				} catch (IOException e) {				
+					throw new DispatcherException("Unexpected io exception while processing the response : " + response, e);
+				} catch (Throwable e) {				
+					throw new DispatcherException("Unexpected exception while processing response : " + response, e);
+				}
+				timeoutResponse.send();
 				return;
 			} catch (IOException e) {
 				throw new IllegalStateException("Failed to send a timeout response", e);
@@ -689,11 +705,24 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		if(logger.isDebugEnabled())
 					logger.debug("Proxy branch has NOT timed out");
 
+		// Issue 2474 & 2475
+		if(logger.isDebugEnabled())
+			logger.debug("All responses have arrived, sending final response for parallel proxy" );
+		try {
+			response.setBranchResponse(false);
+			MessageDispatcher.callServlet(response);
+		} catch (ServletException e) {				
+			throw new DispatcherException("Unexpected servlet exception while processing the response : " + response, e);					
+		} catch (IOException e) {				
+			throw new DispatcherException("Unexpected io exception while processing the response : " + response, e);
+		} catch (Throwable e) {				
+			throw new DispatcherException("Unexpected exception while processing response : " + response, e);
+		}
+		
 		//Otherwise proceed with proxying the response
 		final SipServletResponseImpl proxiedResponse = 
 			ProxyUtils.createProxiedResponse(response, proxyBranch);
 		
-
 		if(proxiedResponse == null || proxiedResponse.getMessage() == null) {
 			if(logger.isDebugEnabled())
 				logger.debug("Response was dropped because getProxyUtils().createProxiedResponse(response, proxyBranch) returned null");

@@ -16,11 +16,14 @@
  */
 package org.mobicents.servlet.sip.testsuite.proxy;
 
+import java.util.Iterator;
+
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.ResponseType;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
@@ -153,9 +156,12 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isServerErrorReceived());
 	}
-	
-	public void testSpeedDialOKAndErrorResponse() throws Exception {	
-		deploySpeedDial("record_route", "false");
+	/**
+	 * Assert compliance with JSR 289 Section 10.2.4.2 Correlating responses to proxy branches
+	 * Issue 2474 and 2475
+	 */
+	public void testDoBranchResponseAndDoResponseCallBacks() throws Exception {	
+		deploySpeedDial("record_route", "true");
 		
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		sender.setSendSubsequentRequestsThroughSipProvider(true);
@@ -183,14 +189,21 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromHost);
 				
-		String toUser = "9-multiple";
+		String toUser = "test-callResponseBacks";
 		String toHost = "sip-servlets.com";
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toHost);
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
-		Thread.sleep(TIMEOUT);
+		Thread.sleep(TIMEOUT*2);
 		assertEquals(200, sender.getFinalResponseStatus());
+		logger.info("all messages received :");
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}		
+		assertTrue(sender.getAllMessagesContent().contains("allResponsesReceivedCorrectlyOnEachCallBack"));
 	}
 	
 	public void testSpeedDialDeclineErrorResponse() throws Exception {	

@@ -23,9 +23,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Proxy;
+import javax.servlet.sip.ServletParseException;
+import javax.servlet.sip.SipApplicationSession;
+import javax.servlet.sip.SipApplicationSessionEvent;
+import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipFactory;
@@ -34,13 +39,16 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.sip.ListeningPoint;
 
 import org.apache.log4j.Logger;
 
 
-public class SpeedDialSipServlet extends SipServlet implements SipErrorListener {
+public class SpeedDialSipServlet extends SipServlet implements SipErrorListener, SipApplicationSessionListener {
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(SpeedDialSipServlet.class);
+	
+	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";	
 	private static final String REMOTE_TRANSPORT = "udp";
 	private static final int REMOTE_PORT = 5080;
 	private static final String REMOTE_LOCALHOST_ADDR = "127.0.0.1";
@@ -58,6 +66,9 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener 
 	private static boolean isRecordRoute = true;
 	
 	Map<String, String> dialNumberToSipUriMapping = null;
+	
+	@Resource
+	SipFactory sipFactory;
 
 	/** Creates a new instance of SpeedDialSipServlet */
 	public SpeedDialSipServlet() {}
@@ -75,7 +86,7 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener 
 		dialNumberToSipUriMapping.put("6", "sip:receiver-failover@sip-servlets.com");
 		dialNumberToSipUriMapping.put("b2bua", "sip:fromProxy@sip-servlets.com");
 		dialNumberToSipUriMapping.put("9", "sip:receiver@127.0.0.1:5090");
-		dialNumberToSipUriMapping.put("9-multiple", "sip:receiver@127.0.0.1:5090,sip:receiver@127.0.0.1:5091");
+		dialNumberToSipUriMapping.put("test-callResponseBacks", "sip:receiver@127.0.0.1:5090,sip:receiver@127.0.0.1:5091");
 		dialNumberToSipUriMapping.put("forward-pending-sender", "sip:forward-pending-sender@127.0.0.1:5080");
 		dialNumberToSipUriMapping.put("factory-sender", "sip:factory-sender@127.0.0.1:5080");		
 		String initParam = servletConfig.getServletContext().getInitParameter("record_route");
@@ -214,21 +225,40 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener 
 	}
 	
 	@Override
-	protected void doResponse(SipServletResponse resp) throws ServletException,
-			IOException {
-		logger.info("Got response " + resp);
-		if(resp.getTo().toString().contains("9-multiple")) {
+	protected void doErrorResponse(SipServletResponse resp)
+			throws ServletException, IOException {
+		logger.info("Got Error response " + resp);
+		if(resp.getTo().toString().contains("test-callResponseBacks")) {
 			resp.getApplicationSession().setAttribute("errorResponseReceivedAtAppLevel", "true");
 		} 
 		if(resp.getApplicationSession().getAttribute("errorResponseReceivedAtAppLevel") != null) {
 			throw new IllegalStateException("Error Response Received at Application Level but we should only see the best final response");
 		}
-		super.doResponse(resp);
+	}
+	
+	@Override
+	protected void doBranchResponse(SipServletResponse resp)
+			throws ServletException, IOException {	
+		logger.info("Got Branch response " + resp);
+		if(resp.getTo().toString().contains("test-callResponseBacks")) {
+			if(resp.getStatus() >= 400) {
+				resp.getApplicationSession().setAttribute("doBranchErrorResponseReceivedAtAppLevel", "true");
+			}
+			if(resp.getStatus() >= 200) {
+				resp.getApplicationSession().setAttribute("doBranchSuccessResponseReceivedAtAppLevel", "true");
+			}
+		} 
 	}
 	
 	protected void doSuccessResponse(SipServletResponse resp)
 		throws ServletException, IOException {
 		logger.info("Got Success response " + resp);
+		if(resp.getApplicationSession().getAttribute("errorResponseReceivedAtAppLevel") != null) {
+			throw new IllegalStateException("Error Response Received at Application Level but we should only see the best final response");
+		}
+		if(resp.getTo().toString().contains("test-callResponseBacks") && !resp.isBranchResponse()) {
+			resp.getApplicationSession().setAttribute("doSuccessResponseReceivedAtAppLevel", "true");
+		}
 		if(((SipURI)resp.getFrom().getURI()).getUser().equalsIgnoreCase(TEST_USER_REMOTE)) {
 			if(resp.getRemoteAddr().equals(LOCAL_LOCALHOST_ADDR) && resp.getRemotePort() == LOCAL_PORT && resp.getTransport().equalsIgnoreCase(LOCAL_TRANSPORT)) {			
 				logger.info("remote information is correct");
@@ -283,4 +313,56 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener 
 		logger.error("noPrackReceived.");
 	}
 
+	
+	
+	/**
+	 * @param sipApplicationSession
+	 * @param storedFactory
+	 */
+	private void sendMessage(SipApplicationSession sipApplicationSession,
+			SipFactory storedFactory, String content, String transport) {
+		try {
+			SipServletRequest sipServletRequest = storedFactory.createRequest(
+					sipApplicationSession, 
+					"MESSAGE", 
+					"sip:sender@sip-servlets.com", 
+					"sip:receiver@sip-servlets.com");
+			sipServletRequest.addHeader("Ext", "Test 1, 2 ,3");
+			SipURI sipUri = storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+			if(transport != null) {
+				if(transport.equalsIgnoreCase(ListeningPoint.TCP)) {
+					sipUri = storedFactory.createSipURI("receiver", "127.0.0.1:5081");
+				}
+				sipUri.setTransportParam(transport);
+			}
+			sipServletRequest.setRequestURI(sipUri);
+			sipServletRequest.setContentLength(content.length());
+			sipServletRequest.setContent(content, CONTENT_TYPE);
+			sipServletRequest.send();
+		} catch (ServletParseException e) {
+			logger.error("Exception occured while parsing the addresses",e);
+		} catch (IOException e) {
+			logger.error("Exception occured while sending the request",e);			
+		}
+	}
+
+	public void sessionCreated(SipApplicationSessionEvent ev) {
+		
+	}
+
+	public void sessionDestroyed(SipApplicationSessionEvent ev) {
+		
+	}
+
+	public void sessionExpired(SipApplicationSessionEvent ev) {
+		
+	}
+
+	public void sessionReadyToInvalidate(SipApplicationSessionEvent ev) {
+		if(ev.getApplicationSession().getAttribute("doSuccessResponseReceivedAtAppLevel") != null && 
+			ev.getApplicationSession().getAttribute("doBranchErrorResponseReceivedAtAppLevel") != null &&
+			ev.getApplicationSession().getAttribute("doBranchSuccessResponseReceivedAtAppLevel") != null) {
+			sendMessage(sipFactory.createApplicationSession(), sipFactory, "allResponsesReceivedCorrectlyOnEachCallBack", null);
+		}
+	}
 }

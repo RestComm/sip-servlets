@@ -91,6 +91,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	//Added for TCK test SipServletResponseTest.testSend101
 	private boolean hasBeenReceived;
 	private boolean isRetransmission;
+	// Issue 2474 & 2475
+	private boolean branchResponse;
 	
 	// needed for externalizable
 	public SipServletResponseImpl () {}
@@ -672,14 +674,24 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 */
 	public void setProxyBranch(ProxyBranch proxyBranch) {
 		this.proxyBranch = proxyBranch;
+		// doBranchResponse is only called for intermediate branch final responses
+		if(proxyBranch != null && getStatus() >= 200) {
+			this.branchResponse = true;
+		}
 	}
-
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public boolean isBranchResponse() {		
-		return this.proxyBranch != null;
+		return this.branchResponse;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public void setBranchResponse(boolean branchResponse) {		
+		this.branchResponse = branchResponse;
 	}
 
 	/*
