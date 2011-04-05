@@ -706,19 +706,26 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 					logger.debug("Proxy branch has NOT timed out");
 
 		// Issue 2474 & 2475
-		if(logger.isDebugEnabled())
-			logger.debug("All responses have arrived, sending final response for parallel proxy" );
-		try {
-			response.setBranchResponse(false);
-			MessageDispatcher.callServlet(response);
-		} catch (ServletException e) {				
-			throw new DispatcherException("Unexpected servlet exception while processing the response : " + response, e);					
-		} catch (IOException e) {				
-			throw new DispatcherException("Unexpected io exception while processing the response : " + response, e);
-		} catch (Throwable e) {				
-			throw new DispatcherException("Unexpected exception while processing response : " + response, e);
+		if(supervised) {
+			try {
+				response.setBranchResponse(false);
+				MessageDispatcher.callServlet(response);
+			} catch (ServletException e) {				
+				throw new DispatcherException("Unexpected servlet exception while processing the response : " + response, e);					
+			} catch (IOException e) {				
+				throw new DispatcherException("Unexpected io exception while processing the response : " + response, e);
+			} catch (Throwable e) {				
+				throw new DispatcherException("Unexpected exception while processing response : " + response, e);
+			}
 		}
 		
+		if(!allResponsesHaveArrived()) {
+			if(logger.isDebugEnabled())
+				logger.debug("The application has started new branches so we are waiting for responses on those" );
+			return;
+		}
+		if(logger.isDebugEnabled())
+			logger.debug("All responses have arrived, sending final response for parallel proxy" );
 		//Otherwise proceed with proxying the response
 		final SipServletResponseImpl proxiedResponse = 
 			ProxyUtils.createProxiedResponse(response, proxyBranch);
