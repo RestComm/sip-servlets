@@ -949,8 +949,10 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	@Override
 	public void passivate() {
 		notifyWillPassivate(ClusteredSessionNotificationCause.PASSIVATION);
-		((FaultTolerantSasTimerTask)expirationTimerTask).passivate();
-		expirationTimerTask = null;
+		if(expirationTimerTask != null) {
+			((FaultTolerantSasTimerTask)expirationTimerTask).passivate();
+			expirationTimerTask = null;
+		}
 		if(servletTimers != null) {
 			for (ServletTimer servletTimer : servletTimers.values()) {
 				((TimerServiceTask) servletTimer).passivate();
