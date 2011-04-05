@@ -124,6 +124,10 @@ public class Shootist implements SipListener {
 	
 	private boolean sendCancelOn180;
 
+	private String remotePort = "5070";
+	
+	private String fromHost;
+
 	class ByeTask  extends TimerTask {
 		Dialog dialog;
 		public ByeTask(Dialog dialog)  {
@@ -147,8 +151,9 @@ public class Shootist implements SipListener {
 			+ ">>>> is your class path set to the root?";
 
 	
-	public Shootist(boolean forkingProxy) {
+	public Shootist(boolean forkingProxy, String remotePort) {
 		this.forkingProxy = forkingProxy;
+		this.remotePort = remotePort;
 	}
 
 
@@ -308,7 +313,7 @@ public class Shootist implements SipListener {
 						// Proxy will fork. I will accept the second dialog
 						// but not the first. 
 						logger.info("count = " + count);
-//						if (count == 1) {
+//						if (count == 0) {
 							//assertTrue(dialog != this.dialog);
 							logger.info("Sending ACK");
 							dialog.sendAck(ackRequest);	
@@ -404,7 +409,7 @@ public class Shootist implements SipListener {
 		sipFactory = SipFactory.getInstance();
 		sipFactory.setPathName("gov.nist");
 		Properties properties = new Properties();		
-		String peerHostPort = "127.0.0.1:5070";
+		String peerHostPort = "127.0.0.1:" + remotePort;
 		if(outboundProxy) {
 			properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort + "/"
 				+ transport);
@@ -452,6 +457,9 @@ public class Shootist implements SipListener {
 			sipProvider.addSipListener(listener);
 			
 			String fromSipAddress = "here.com";
+			if(fromHost != null) {
+				fromSipAddress = fromHost;
+			}
 			String fromDisplayName = "The Master Blaster";
 
 			String toSipAddress = "there.com";
@@ -708,6 +716,22 @@ public class Shootist implements SipListener {
 	 */
 	public boolean isSendCancelOn180() {
 		return sendCancelOn180;
+	}
+
+
+	/**
+	 * @param fromHost the fromHost to set
+	 */
+	public void setFromHost(String fromHost) {
+		this.fromHost = fromHost;
+	}
+
+
+	/**
+	 * @return the fromHost
+	 */
+	public String getFromHost() {
+		return fromHost;
 	}
 
 }

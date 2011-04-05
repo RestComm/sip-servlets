@@ -51,7 +51,7 @@ public class ForkingProxyDerivedSessions extends SipServletTestCase {
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		this.shootist = new Shootist(true);
+		this.shootist = new Shootist(true, null);
 		this.ua1 = new Shootme(5057);
 		this.ua2 = new Shootme(5056);
 	}

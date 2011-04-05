@@ -316,6 +316,7 @@ public abstract class SipManagerDelegate {
 					logger.debug("Original session " + key + " with To Tag " + toTag + 
 							" creates new derived session with following to Tag " + currentKeyToTag );
 				}
+				key.setToTag(currentKeyToTag);
 				derivedSipSession = createDerivedSipSession(sipSession, key);
 			} else {
 				if(logger.isDebugEnabled()) {

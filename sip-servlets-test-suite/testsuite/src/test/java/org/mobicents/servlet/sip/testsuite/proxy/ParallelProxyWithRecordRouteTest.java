@@ -45,7 +45,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
 		tomcat.startTomcat();
 		deployApplication();
-		this.shootist = new Shootist(false);
+		this.shootist = new Shootist(false, null);
 		shootist.setOutboundProxy(false);
 		this.shootme = new Shootme(5057);
 		this.cutme = new Cutme();

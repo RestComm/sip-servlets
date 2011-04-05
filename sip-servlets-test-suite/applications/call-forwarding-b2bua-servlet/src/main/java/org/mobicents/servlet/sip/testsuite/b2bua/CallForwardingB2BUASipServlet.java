@@ -56,6 +56,7 @@ import javax.sip.header.ContactHeader;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 
 
@@ -73,6 +74,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		forwardingUris = new HashMap<String, String[]>();
 		forwardingUris.put("sip:forward-sender@sip-servlets.com", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+		forwardingUris.put("sip:forward-sender-forking-pending@sip-servlets.com", 
+				new String[]{"sip:forward-receiver-forking-pending@sip-servlets.com", "sip:forward-receiver-forking-pending@127.0.0.1:5070"});
 		forwardingUris.put("sip:forward-sender-factory-same-callID@sip-servlets.com", 
 				new String[]{"sip:forward-receiver-factory-same-callID@sip-servlets.com", "sip:forward-receiver-factory-same-callID@127.0.0.1:5090"});
 		forwardingUris.put("sip:forward-sender-408@sip-servlets.com", 
@@ -111,6 +114,10 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				new String[]{"sip:error-forward-samesipsession@127.0.0.1:5070", "sip:error-forward-samesipsession@127.0.0.1:5070"});
 	}
 
+	SipSession incomingSession;
+	SipSession outgoingSession;
+	int okReceived = 0;
+	
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the call forwarding B2BUA sip servlet has been started");
@@ -173,6 +180,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			// Issue 1484 : http://code.google.com/p/mobicents/issues/detail?id=1484
 		// check the state of the session it shouldn't be Terminated
 		request.getSession().getAttribute("Foo");
+		incomingSession = request.getSession();
 		State state = request.getSession().getState();
 		logger.info("session state : " + state);
 		if(state == State.TERMINATED) {
@@ -299,6 +307,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		forkedRequest.setRequestURI(sipUri);						
 		
 		logger.info("forkedRequest = " + forkedRequest);
+		outgoingSession = forkedRequest.getSession();
 		forkedRequest.getSession().setAttribute("originalRequest", request);
 		
 		forkedRequest.send();
@@ -327,7 +336,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
         logger.info("forkedRequest = " + newRequest);
         newRequest.getSession().setAttribute("originalRequest", origReq);
         newRequest.getB2buaHelper().linkSipSessions(origReq.getSession(), newRequest.getSession()); //Linking sessions!
-		
+        outgoingSession = newRequest.getSession();
+        
         newRequest.send();        
 	}
 
@@ -448,7 +458,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.toString());
 		String cSeqValue = sipServletResponse.getHeader("CSeq");
-		B2buaHelper b2buaHelper = sipServletResponse.getRequest().getB2buaHelper();
+		B2buaHelper b2buaHelper = sipServletResponse.getRequest().getB2buaHelper();			
 		
 		SipSession originalSession =   
 		    sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
@@ -498,8 +508,10 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				//create and sends OK for the first call leg							
 				SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
 				boolean sendAck = true;
-				if(sipServletResponse.getFrom().getURI().toString().contains("pending") || sipServletResponse.getFrom().getURI().toString().contains("factory")
-						|| sipServletResponse.getTo().getURI().toString().contains("pending") || sipServletResponse.getTo().getURI().toString().contains("factory")) {
+				String fromURI = sipServletResponse.getFrom().getURI().toString();
+				String toURI = sipServletResponse.getTo().getURI().toString();
+				if(fromURI.contains("pending") || fromURI.contains("factory")
+						|| toURI.contains("pending") || toURI.contains("factory")) {
 					sendAck= false;
 					if (logger.isDebugEnabled()) {
 						logger.debug("testing pending messages so not sending ACK");
@@ -512,17 +524,56 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 						logger.info("Sending " +  ackRequest);
 						ackRequest.send();
 					}
-					if(!originalRequest.isCommitted()) {
+					if(!originalRequest.isCommitted() && !fromURI.contains("forking") && !toURI.contains("forking")) {
 						SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
 						logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);			
 						responseToOriginalRequest.setContentLength(sipServletResponse.getContentLength());
 						//responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
 						responseToOriginalRequest.send();
+					} else {
+						okReceived++;
+						logger.info("Number of OK Received is " + okReceived);
+						logger.info("Original Session " + originalSession);
+						logger.info("Incoming Session " + incomingSession);
+						logger.info("Response Session " + sipServletResponse.getSession());
+						logger.info("Outgoing Session " + outgoingSession);
+						// checks for Issue http://code.google.com/p/mobicents/issues/detail?id=2365
+						// making sure the forked sessions are not equals to the non forked sessions
+						if(okReceived == 1) {							
+							if(!originalSession.equals(incomingSession)) {
+								throw new IllegalStateException("original Session is not equals to the incoming session");
+							}
+							if(!sipServletResponse.getSession().equals(outgoingSession)) {
+								throw new IllegalStateException("response's Session is not equals to the outgoing session");
+							}
+						}
+						if(okReceived == 2) {
+							if(originalSession.equals(incomingSession)) {
+								throw new IllegalStateException("forked original Session is equals to the incoming session");
+							}
+							if(sipServletResponse.getSession().equals(outgoingSession)) {
+								throw new IllegalStateException("response's forked Session is equals to the outgoing session");
+							}
+							SipSession originalForkedSession = sipServletResponse.getRequest().getApplicationSession().getSipSession(originalSession.getId());
+							if(!originalSession.equals(originalForkedSession)) {
+								throw new IllegalStateException("forked original Session retrieved through the application session is not equals to the original session");
+							}							
+						}						
+						try {				    	
+					    	SipServletResponse responseToOriginalRequest = sipServletResponse.getRequest().getB2buaHelper().createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
+					    	logger.info("Forking case Created response " + responseToOriginalRequest + " to original request " +  sipServletResponse.getRequest());
+					    	responseToOriginalRequest.send();
+					    }catch (Exception e) {
+					    	logger.error("exception happened while trying to forward the response to the other side", e);
+					    	originalSession.createRequest("BYE").send();
+					    	sipServletResponse.getSession().createRequest("BYE").send();
+						}
 					}
 				} else {
 				    SipSession peerSession = sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
-				    try {
+				    try {				    	
 				    	SipServletResponse responseToOriginalRequest = sipServletResponse.getRequest().getB2buaHelper().createResponseToOriginalRequest(peerSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
+				    	logger.info("Created response " + responseToOriginalRequest + " to original request " +  sipServletResponse.getRequest());
 				    	responseToOriginalRequest.send();
 				    }catch (Exception e) {
 				    	logger.error("exception happened while trying to forward the response to the other side", e);

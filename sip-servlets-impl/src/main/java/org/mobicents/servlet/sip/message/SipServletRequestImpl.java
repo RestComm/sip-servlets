@@ -326,8 +326,19 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					// if a dialog has already been created
 					// reuse local tag
 					final Dialog dialog = transaction.getDialog();
-					if(dialog != null && dialog.getLocalTag() != null && dialog.getLocalTag().length() > 0) {																	
-						toHeader.setTag(dialog.getLocalTag());						
+					if(dialog != null && dialog.getLocalTag() != null && dialog.getLocalTag().length() > 0) {
+						// Issue 2364 : still waiting on jsip response
+//						if((session != null && !dialog.getLocalTag().equals(session.getKey().getToTag()))) {
+//							if(logger.isDebugEnabled()) {
+//						    	logger.debug("setting session ToTag: " + session.getKey().getToTag());
+//						    }
+//							toHeader.setTag(session.getKey().getToTag());
+//						} else {
+//							if(logger.isDebugEnabled()) {
+//						    	logger.debug("setting dialog LocalTag: " + dialog.getLocalTag());
+//						    }
+							toHeader.setTag(dialog.getLocalTag());
+//						}
 					} else if(session != null && session.getSipApplicationSession() != null) {						
 						final SipApplicationSessionKey sipAppSessionKey = session.getSipApplicationSession().getKey();
 						final SipSessionKey sipSessionKey = session.getKey();
@@ -2257,5 +2268,15 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		for(Header header : authorizationHeaders) {
 			message.addHeader(header);
 		}
-	}	
+	}
+	
+	// Issue 2364 : still waiting on jsip response
+//	public Object clone() {
+//		SipServletRequestImpl sipServletRequestImpl = new SipServletRequestImpl((Request)message, sipFactoryImpl, sipSession, getTransaction(), null, createDialog);
+//		sipServletRequestImpl.setLinkedRequest(linkedRequest);
+//		sipServletRequestImpl.setPoppedRoute(poppedRouteHeader);
+//		sipServletRequestImpl.setSubscriberURI(subscriberURI);
+//		sipServletRequestImpl.setAttributeMap(getAttributeMap());
+//		return sipServletRequestImpl;
+//	}
 }

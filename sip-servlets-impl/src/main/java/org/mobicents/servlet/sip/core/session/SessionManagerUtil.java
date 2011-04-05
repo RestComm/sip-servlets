@@ -168,13 +168,18 @@ public class SessionManagerUtil {
 		if(logger.isDebugEnabled()) {
 			logger.debug("sipSession key to parse " + sipSessionKeyToParse );
 		}
-		StringTokenizer stringTokenizer = new StringTokenizer(sipSessionKeyToParse, SESSION_KEY_SEPARATOR);
+		StringTokenizer stringTokenizer = new StringTokenizer(sipSessionKeyToParse, SESSION_KEY_SEPARATOR);		
 		String fromTag = stringTokenizer.nextToken();
+		String toTag = null;
+		if(stringTokenizer.countTokens() == 4) {
+			// Issue 2365 : to tag needed for getApplicationSession().getSipSession(<sessionId>) to return forked session and not the parent one
+			toTag = stringTokenizer.nextToken();
+		}
 		String callId = stringTokenizer.nextToken();
 		String applicationSessionId = stringTokenizer.nextToken();
 		String applicationName = stringTokenizer.nextToken();
 		
-		return new SipSessionKey(fromTag, null, callId, applicationSessionId, applicationName);
+		return new SipSessionKey(fromTag, toTag, callId, applicationSessionId, applicationName);
 	}
 	
 	

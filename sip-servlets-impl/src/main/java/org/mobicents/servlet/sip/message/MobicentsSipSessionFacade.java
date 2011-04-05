@@ -310,6 +310,10 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public void setParentSession(MobicentsSipSession mobicentsSipSession) {
 		getSipSession().setParentSession(mobicentsSipSession);
 	}
+	
+	public MobicentsSipSession getParentSession() {
+		return getSipSession().getParentSession();
+	}
 
 	public void setProxy(ProxyImpl proxy) {
 		getSipSession().setProxy(proxy);

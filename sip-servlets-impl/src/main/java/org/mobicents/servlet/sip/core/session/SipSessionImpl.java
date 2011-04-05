@@ -1904,6 +1904,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 	
 	/*
 	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.MobicentsSipSession#getParentSession()
+	 */
+	public MobicentsSipSession getParentSession() {
+		return parentSession;
+	}
+	
+	/*
+	 * (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.session.MobicentsSipSession#setSipSessionAttributeMap(java.util.Map)
 	 */
 	public void setSipSessionAttributeMap(
@@ -2027,7 +2035,20 @@ public class SipSessionImpl implements MobicentsSipSession {
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof MobicentsSipSession) {
-			return ((MobicentsSipSession)obj).getKey().equals(getKey());
+			MobicentsSipSession sipSession = (MobicentsSipSession)obj;
+			if(sipSession.getKey().equals(getKey())) {
+				// Issue 2365 : Derived Sessions should be equal only if their to tag is equal
+				if(sipSession.getKey().getToTag() == null && getKey().getToTag() == null) {
+					return true;
+				}				
+				if(sipSession.getKey().getToTag() != null && getKey().getToTag() != null && sipSession.getKey().getToTag().equals(getKey().getToTag())) {
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
 		}
 		return false;
 	}

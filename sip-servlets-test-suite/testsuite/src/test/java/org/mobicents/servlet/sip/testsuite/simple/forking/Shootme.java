@@ -1,9 +1,6 @@
 package org.mobicents.servlet.sip.testsuite.simple.forking;
 
-import gov.nist.javax.sip.SipStackImpl;
-
 import java.util.Hashtable;
-import java.util.Properties;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -16,8 +13,6 @@ import javax.sip.ListeningPoint;
 import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
 import javax.sip.ServerTransaction;
-import javax.sip.SipException;
-import javax.sip.SipFactory;
 import javax.sip.SipListener;
 import javax.sip.SipProvider;
 import javax.sip.SipStack;

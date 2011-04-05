@@ -63,7 +63,7 @@ public class ProxySubsequentPublishRequestTest extends SipServletTestCase implem
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		this.shootist = new Shootist(false);
+		this.shootist = new Shootist(false, null);
 		this.shootme = new Shootme(5057);
 		this.cutme = new Cutme();
 		this.shootist.requestMethod = Request.PUBLISH;

@@ -125,6 +125,7 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 
 	String getSipSubscriberURI();
 	
+	MobicentsSipSession getParentSession();
 	void setParentSession(MobicentsSipSession mobicentsSipSession);
 
 	Map<String, Object> getSipSessionAttributeMap();	

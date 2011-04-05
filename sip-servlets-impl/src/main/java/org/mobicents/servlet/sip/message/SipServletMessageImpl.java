@@ -1579,16 +1579,6 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 
 	/*
 	 * (non-Javadoc)
-	 * @see java.lang.Object#clone()
-	 */
-	@Override
-	protected Object clone() throws CloneNotSupportedException {
-		// FIXME
-		return super.clone();
-	}
-
-	/*
-	 * (non-Javadoc)
 	 * @see java.lang.Object#toString()
 	 */
 	@Override
@@ -1822,6 +1812,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		return this.attributes;
 	}
 	
+	// Issue 2364 : still waiting on jsip response
+//	protected void setAttributeMap(Map<String, Object> atttributes) {
+//		this.attributes = atttributes;
+//	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see java.io.Externalizable#readExternal(java.io.ObjectInput)
@@ -1908,6 +1903,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		}
 		out.writeUTF(message.toString());		
 	}
+
 //	public void cleanUp() {
 //		if(logger.isDebugEnabled()) {
 //			logger.debug("cleaning up the message " + message);

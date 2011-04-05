@@ -150,6 +150,10 @@ public class SipSessionKey implements Serializable {
 	 */
 	public void setToTag(String toTag) {
 		this.toTag = toTag;
+		if(toTag != null) {
+			// Issue 2365 : to tag needed for getApplicationSession().getSipSession(<sessionId>) to return forked session and not the parent one
+			computeToString();
+		}
 	}
 	/**
 	 * @param applicationSessionId the applicationSessionId to set
@@ -173,7 +177,12 @@ public class SipSessionKey implements Serializable {
 	 * @return the toString
 	 */
 	public void computeToString() {
-		toString = "(" + fromTag + SessionManagerUtil.SESSION_KEY_SEPARATOR + callId + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationSessionId +SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName + ")";
+		if(toTag != null) {
+			// Issue 2365 : to tag needed for getApplicationSession().getSipSession(<sessionId>) to return forked session and not the parent one
+			toString = "(" + fromTag + SessionManagerUtil.SESSION_KEY_SEPARATOR + toTag + SessionManagerUtil.SESSION_KEY_SEPARATOR + callId + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationSessionId +SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName + ")";
+		} else {
+			toString = "(" + fromTag + SessionManagerUtil.SESSION_KEY_SEPARATOR + callId + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationSessionId +SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName + ")";
+		}
 	}	
 	
 }
