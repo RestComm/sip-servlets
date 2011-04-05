@@ -261,11 +261,11 @@ public abstract class SipServlet extends javax.servlet.GenericServlet{
      */
     protected void doResponse(javax.servlet.sip.SipServletResponse resp) throws javax.servlet.ServletException, java.io.IOException{
     	int status = resp.getStatus();
-    	if(resp.isBranchResponse()) {
-			doBranchResponse(resp);
+		if (status < 200) {
+			doProvisionalResponse(resp);
 		} else {
-			if (status < 200) {
-				doProvisionalResponse(resp);
+			if(resp.isBranchResponse()) {
+				doBranchResponse(resp);
 			} else {
 				if (status < 300) {
 					doSuccessResponse(resp);
