@@ -164,8 +164,8 @@
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/cluster/timers/1.7/timers-1.7.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-jboss5-ha-server-cache"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-jruby"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/ha/javax/sip/mobicents-jain-sip-ha-core/1.1.0-SNAPSHOT/mobicents-jain-sip-ha-core-1.1.0-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/ha/javax/sip/mobicents-jain-sip-jboss5/1.1.0-SNAPSHOT/mobicents-jain-sip-jboss5-1.1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/ha/javax/sip/mobicents-jain-sip-ha-core/1.2.0-SNAPSHOT/mobicents-jain-sip-ha-core-1.2.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/ha/javax/sip/mobicents-jain-sip-jboss5/1.2.0-SNAPSHOT/mobicents-jain-sip-jboss5-1.2.0-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/javax/sip/mobicents-jain-sip-ext/1.0-SNAPSHOT/mobicents-jain-sip-ext-1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
