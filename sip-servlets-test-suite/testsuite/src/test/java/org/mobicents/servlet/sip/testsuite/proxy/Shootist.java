@@ -153,7 +153,9 @@ public class Shootist implements SipListener {
 	
 	public Shootist(boolean forkingProxy, String remotePort) {
 		this.forkingProxy = forkingProxy;
-		this.remotePort = remotePort;
+		if(remotePort != null) {
+			this.remotePort = remotePort;
+		}
 	}
 
 
