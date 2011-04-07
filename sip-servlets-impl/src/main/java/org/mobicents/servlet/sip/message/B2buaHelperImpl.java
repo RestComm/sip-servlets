@@ -512,9 +512,9 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			throw new IllegalStateException("session creating transaction message is not a request !");
 		}
 		final SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipServletMessageImpl;
-//		if(RoutingState.FINAL_RESPONSE_SENT.equals(sipServletRequestImpl.getRoutingState())) {
-//			throw new IllegalStateException("subsequent response is inconsistent with an already sent response. a Final response has already been sent ! ");
-//		}
+		if(RoutingState.FINAL_RESPONSE_SENT.equals(sipServletRequestImpl.getRoutingState())) {
+			throw new IllegalStateException("subsequent response is inconsistent with an already sent response. a Final response has already been sent ! ");
+		}
 		if(logger.isDebugEnabled()) {
 			logger.debug("creating response to original request " + sipServletRequestImpl + " on session " + session);
 		}

@@ -348,7 +348,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 							String toTag = sipSessionKey.getToTag();
 							if(toTag == null) {
 								toTag = ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(),sipSessionKey.getApplicationName(), sipAppSessionKey.getId());
-								session.getKey().setToTag(toTag);
+								session.getKey().setToTag(toTag, false);
 							}											
 							toHeader.setTag(toTag);	
 						}						

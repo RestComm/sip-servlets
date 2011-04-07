@@ -303,7 +303,7 @@ public abstract class SipManagerDelegate {
 		final SipSessionKey existingKey = sipSession.getKey();
 		final String toTag = existingKey.getToTag();
 		if(toTag == null && currentKeyToTag != null) {
-			existingKey.setToTag(currentKeyToTag );
+			existingKey.setToTag(currentKeyToTag, false);
 			if(logger.isDebugEnabled()) {
 				logger.debug("Setting the To tag " + currentKeyToTag + 
 						" to the session " + key);
@@ -316,7 +316,7 @@ public abstract class SipManagerDelegate {
 					logger.debug("Original session " + key + " with To Tag " + toTag + 
 							" creates new derived session with following to Tag " + currentKeyToTag );
 				}
-				key.setToTag(currentKeyToTag);
+				key.setToTag(currentKeyToTag, true);
 				derivedSipSession = createDerivedSipSession(sipSession, key);
 			} else {
 				if(logger.isDebugEnabled()) {

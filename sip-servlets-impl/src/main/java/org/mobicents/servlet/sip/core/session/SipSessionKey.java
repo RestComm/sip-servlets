@@ -146,11 +146,17 @@ public class SipSessionKey implements Serializable {
 		return toString;
 	}
 	/**
+	 * Sets the to tag on the key when we receive a response.
+	 * We recompute the session id only for derived session otherwise the id will change
+	 * when the a request is received or sent and the response is sent back or received which should not happen
+	 * See TCK test SipSessionListenerTest.testSessionDestroyed001
+	 * 
 	 * @param toTag the toTag to set
+	 * @param recomputeSessionId check if the sessionid need to be recomputed
 	 */
-	public void setToTag(String toTag) {
+	public void setToTag(String toTag, boolean recomputeSessionId) {
 		this.toTag = toTag;
-		if(toTag != null) {
+		if(toTag != null && recomputeSessionId) {
 			// Issue 2365 : to tag needed for getApplicationSession().getSipSession(<sessionId>) to return forked session and not the parent one
 			computeToString();
 		}
