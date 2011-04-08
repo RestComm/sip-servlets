@@ -17,8 +17,8 @@
 package org.mobicents.servlet.sip.testsuite.b2bua.forking;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Properties;
 import java.util.Map.Entry;
+import java.util.Properties;
 
 import javax.sip.SipProvider;
 
@@ -112,10 +112,10 @@ public class B2BUASipServletForkingTest extends SipServletTestCase {
 	
 	// non regression test for Issue 2354 http://code.google.com/p/mobicents/issues/detail?id=2354
 	public void testB2BUAForking() throws Exception {		
-        Shootme shootme1 = new Shootme(5080, false, 500);
+        Shootme shootme1 = new Shootme(5080, true, 1500);
         SipProvider shootmeProvider = shootme1.createProvider();
         shootmeProvider.addSipListener(shootme1);
-        Shootme shootme2 = new Shootme(5081, false, 1500);
+        Shootme shootme2 = new Shootme(5081, true, 2500);
         SipProvider shootme2Provider = shootme2.createProvider();
         shootme2Provider.addSipListener(shootme2);
 		Proxy proxy = new Proxy(5070,2);
@@ -131,7 +131,7 @@ public class B2BUASipServletForkingTest extends SipServletTestCase {
 		params.put("route", "sip:127.0.0.1:5070");
 		params.put("timeToWaitForBye", "20000");
 		params.put("dontSetRURI", "true");
-		deployApplication(params);
+		SipStandardContext sipContext = deployApplication(params);
 		shootist.init("forward-sender-forking-pending", false, null);
 		Thread.sleep(TIMEOUT);
 		proxy.stop();
@@ -139,8 +139,11 @@ public class B2BUASipServletForkingTest extends SipServletTestCase {
 		shootme2.stop();
 		assertTrue(shootme1.isAckSeen());		
 		assertTrue(shootme1.checkBye());
-//		assertTrue(shootme2.isAckSeen());
-//		assertTrue(shootme2.checkBye());		
+		assertTrue(shootme2.isAckSeen());
+		assertTrue(shootme2.checkBye());	
+		assertEquals(0, sipContext.getSipManager().getActiveSessions());
+		assertEquals(0, sipContext.getSipManager().getActiveSipApplicationSessions());
+		
 	}
 	
 	@Override

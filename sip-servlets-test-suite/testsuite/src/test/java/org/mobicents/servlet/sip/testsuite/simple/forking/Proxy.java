@@ -222,7 +222,7 @@ public class Proxy implements SipListener {
     public Proxy(int myPort, int ntargets) {
         this.port = myPort;
         this.ntargets = ntargets;
-        SipObjects sipObjects = new SipObjects(myPort, "proxy","off");
+        SipObjects sipObjects = new SipObjects(myPort, "proxy","off", true);
         addressFactory = sipObjects.addressFactory;
         messageFactory = sipObjects.messageFactory;
         headerFactory = sipObjects.headerFactory;

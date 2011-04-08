@@ -21,7 +21,7 @@ public class SipObjects {
     AddressFactory addressFactory;
     MessageFactory messageFactory;
 
-    public SipObjects(int myPort, String stackName, String automaticDialog) {
+    public SipObjects(int myPort, String stackName, String automaticDialog, boolean reentrant) {
         SipFactory sipFactory = SipFactory.getInstance();
         sipFactory.resetFactory();
         sipFactory.setPathName("gov.nist");
@@ -51,6 +51,10 @@ public class SipObjects {
         properties.setProperty("gov.nist.javax.sip.SERVER_LOG", msgLogFile);
         properties.setProperty("gov.nist.javax.sip.LOG_MESSAGE_CONTENT", "true");
         
+        if(reentrant) {
+        	properties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "4");
+    		properties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
+        }
 
         try {
             // Create SipStack object

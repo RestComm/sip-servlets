@@ -24,8 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -45,18 +45,17 @@ import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipSession.State;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.UAMode;
 import javax.servlet.sip.URI;
-import javax.servlet.sip.SipSession.State;
 import javax.sip.header.ContactHeader;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 
 
@@ -531,41 +530,13 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 						//responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
 						responseToOriginalRequest.send();
 					} else {
-						okReceived++;
-						logger.info("Number of OK Received is " + okReceived);
-						logger.info("Original Session " + originalSession);
-						logger.info("Incoming Session " + incomingSession);
-						logger.info("Response Session " + sipServletResponse.getSession());
-						logger.info("Outgoing Session " + outgoingSession);
-						// checks for Issue http://code.google.com/p/mobicents/issues/detail?id=2365
-						// making sure the forked sessions are not equals to the non forked sessions
-						if(okReceived == 1) {							
-							if(!originalSession.equals(incomingSession)) {
-								throw new IllegalStateException("original Session is not equals to the incoming session");
-							}
-							if(!sipServletResponse.getSession().equals(outgoingSession)) {
-								throw new IllegalStateException("response's Session is not equals to the outgoing session");
-							}
-						}
-						if(okReceived == 2) {
-							if(originalSession.equals(incomingSession)) {
-								throw new IllegalStateException("forked original Session is equals to the incoming session");
-							}
-							if(sipServletResponse.getSession().equals(outgoingSession)) {
-								throw new IllegalStateException("response's forked Session is equals to the outgoing session");
-							}
-							SipSession originalForkedSession = sipServletResponse.getRequest().getApplicationSession().getSipSession(originalSession.getId());
-							if(!originalSession.equals(originalForkedSession)) {
-								throw new IllegalStateException("forked original Session retrieved through the application session is not equals to the original session");
-							}							
-						}						
 						try {				    	
 					    	SipServletResponse responseToOriginalRequest = sipServletResponse.getRequest().getB2buaHelper().createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
 					    	logger.info("Forking case Created response " + responseToOriginalRequest + " to original request " +  sipServletResponse.getRequest());
 					    	responseToOriginalRequest.send();
-					    }catch (Exception e) {
-					    	logger.error("exception happened while trying to forward the response to the other side", e);
-					    	originalSession.createRequest("BYE").send();
+					    }catch (IllegalStateException e) {
+					    	logger.warn("200 OK already forwarded to the other side from a different leg so acking and bye-ing this session");
+					    	sipServletResponse.createAck().send();
 					    	sipServletResponse.getSession().createRequest("BYE").send();
 						}
 					}
@@ -639,8 +610,12 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	@Override
 	protected void doProvisionalResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
+		logger.info("Got : " + sipServletResponse.toString());
 		SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
-		if(!originalRequest.isCommitted()) {
+		String fromURI = sipServletResponse.getFrom().getURI().toString();
+		String toURI = sipServletResponse.getTo().getURI().toString();
+		
+		if(!originalRequest.isCommitted() && !fromURI.contains("forking") && !toURI.contains("forking")) {
 			SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
 			if(logger.isInfoEnabled()) {
 				logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
@@ -656,6 +631,17 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				}
 			} else {
 				responseToOriginalRequest.send();
+			}
+		} else {
+			SipSession originalSession =   
+			    sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
+			checkForkedSession(originalSession, sipServletResponse);
+			try {				    	
+		    	SipServletResponse responseToOriginalRequest = sipServletResponse.getRequest().getB2buaHelper().createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
+		    	logger.info("Forking case Created response " + responseToOriginalRequest + " to original request " +  sipServletResponse.getRequest());
+		    	responseToOriginalRequest.send();
+		    } catch (IllegalStateException e) {
+		    	logger.error("problem while trying to create response to original request ", e);
 			}
 		}
 	}	
@@ -721,6 +707,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				sendMessage(ev.getApplicationSession(), (SipFactory) getServletContext().getAttribute(SIP_FACTORY), "sipApplicationSessionReadyToBeInvalidated called multiple times");
 			}
 		} else {
+//			incomingSession.getB
 			sendMessage(ev.getApplicationSession(), (SipFactory) getServletContext().getAttribute(SIP_FACTORY), "sipApplicationSessionReadyToBeInvalidated");
 		}
 	}
@@ -770,5 +757,37 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			}
 		}
 	}
-
+	
+	void checkForkedSession(SipSession originalSession, SipServletResponse sipServletResponse) {
+		SipSession responseSession = sipServletResponse.getSession();
+		okReceived++;
+		logger.info("Number of OK Received is " + okReceived);
+		logger.info("Original Session " + originalSession);
+		logger.info("Incoming Session " + incomingSession);
+		logger.info("Response Session " + responseSession);
+		logger.info("Outgoing Session " + outgoingSession);
+		// checks for Issue http://code.google.com/p/mobicents/issues/detail?id=2365
+		// making sure the forked sessions are not equals to the non forked sessions
+		if(okReceived == 1) {							
+			if(!originalSession.equals(incomingSession)) {
+				throw new IllegalStateException("original Session is not equals to the incoming session");
+			}
+			if(!responseSession.equals(outgoingSession)) {
+				throw new IllegalStateException("response's Session is not equals to the outgoing session");
+			}
+		}
+		if(okReceived == 2) {
+			if(originalSession.equals(incomingSession)) {
+				throw new IllegalStateException("forked original Session is equals to the incoming session");
+			}
+			if(responseSession.equals(outgoingSession)) {
+				throw new IllegalStateException("response's forked Session is equals to the outgoing session");
+			}
+			SipSession originalForkedSession = sipServletResponse.getRequest().getApplicationSession().getSipSession(originalSession.getId());
+			if(!originalSession.equals(originalForkedSession)) {
+				throw new IllegalStateException("forked original Session retrieved through the application session is not equals to the original session");
+			}							
+		}		
+	}
+	
 }

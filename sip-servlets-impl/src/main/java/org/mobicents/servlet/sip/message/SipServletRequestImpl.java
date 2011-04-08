@@ -327,18 +327,19 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					// reuse local tag
 					final Dialog dialog = transaction.getDialog();
 					if(dialog != null && dialog.getLocalTag() != null && dialog.getLocalTag().length() > 0) {
-						// Issue 2364 : still waiting on jsip response
-//						if((session != null && !dialog.getLocalTag().equals(session.getKey().getToTag()))) {
-//							if(logger.isDebugEnabled()) {
-//						    	logger.debug("setting session ToTag: " + session.getKey().getToTag());
-//						    }
-//							toHeader.setTag(session.getKey().getToTag());
-//						} else {
-//							if(logger.isDebugEnabled()) {
-//						    	logger.debug("setting dialog LocalTag: " + dialog.getLocalTag());
-//						    }
+						if((session != null && !dialog.getLocalTag().equals(session.getKey().getToTag()))) {
+							// Issue 2354 : if the dialog to tag is different than the  session to tag use the session to tag
+							// so that we send the forked response out with the correct to tag
+							if(logger.isDebugEnabled()) {
+						    	logger.debug("setting session ToTag: " + session.getKey().getToTag());
+						    }
+							toHeader.setTag(session.getKey().getToTag());
+						} else {
+							if(logger.isDebugEnabled()) {
+						    	logger.debug("setting dialog LocalTag: " + dialog.getLocalTag());
+						    }
 							toHeader.setTag(dialog.getLocalTag());
-//						}
+						}
 					} else if(session != null && session.getSipApplicationSession() != null) {						
 						final SipApplicationSessionKey sipAppSessionKey = session.getSipApplicationSession().getKey();
 						final SipSessionKey sipSessionKey = session.getKey();
@@ -2270,13 +2271,13 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		}
 	}
 	
-	// Issue 2364 : still waiting on jsip response
-//	public Object clone() {
-//		SipServletRequestImpl sipServletRequestImpl = new SipServletRequestImpl((Request)message, sipFactoryImpl, sipSession, getTransaction(), null, createDialog);
-//		sipServletRequestImpl.setLinkedRequest(linkedRequest);
-//		sipServletRequestImpl.setPoppedRoute(poppedRouteHeader);
-//		sipServletRequestImpl.setSubscriberURI(subscriberURI);
-//		sipServletRequestImpl.setAttributeMap(getAttributeMap());
-//		return sipServletRequestImpl;
-//	}
+	// Issue 2354 : need to clone the original request to create the forked response
+	public Object clone() {
+		SipServletRequestImpl sipServletRequestImpl = new SipServletRequestImpl((Request)message, sipFactoryImpl, sipSession, getTransaction(), null, createDialog);
+		sipServletRequestImpl.setLinkedRequest(linkedRequest);
+		sipServletRequestImpl.setPoppedRoute(poppedRouteHeader);
+		sipServletRequestImpl.setSubscriberURI(subscriberURI);
+		sipServletRequestImpl.setAttributeMap(getAttributeMap());
+		return sipServletRequestImpl;
+	}
 }

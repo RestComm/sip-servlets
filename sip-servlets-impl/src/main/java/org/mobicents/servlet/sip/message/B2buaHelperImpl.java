@@ -513,6 +513,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		}
 		final SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipServletMessageImpl;
 		if(RoutingState.FINAL_RESPONSE_SENT.equals(sipServletRequestImpl.getRoutingState())) {
+			// checked by TCK test com.bea.sipservlet.tck.agents.api.javax_servlet_sip.B2buaHelperTest.testCreateResponseToOriginalRequest101 
 			throw new IllegalStateException("subsequent response is inconsistent with an already sent response. a Final response has already been sent ! ");
 		}
 		if(logger.isDebugEnabled()) {
@@ -556,7 +557,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			if(logger.isDebugEnabled()) {
 				logger.debug(mobicentsSipSession + " has a parent session, it means we need to handle a forked case");
 			}
-			// handling of forking
+			// Issue 2354 handling of forking
 			String linkedDerivedSessionId = derivedSessionMap.get(mobicentsSipSession.getId());
 			if(linkedDerivedSessionId == null) {	
 				SipServletRequestImpl originalSipServletRequestImpl = (SipServletRequestImpl) linkedSession.getSessionCreatingTransactionRequest();
@@ -568,11 +569,11 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 				sipSessionKey = new SipSessionKey(sipSessionKey.getFromTag(), newToTag, sipSessionKey.getCallId(), sipSessionKey.getApplicationSessionId(), sipSessionKey.getApplicationName());
 				linkedSession = sipManager.getSipSession(sipSessionKey, false, null, mobicentsSipSession.getSipApplicationSession());
 				
-//				SipServletRequestImpl clonedOriginalRequest = (SipServletRequestImpl)originalSipServletRequestImpl.clone();
-//				clonedOriginalRequest.setSipSession(linkedSession);
-//				linkedSession.setSessionCreatingDialog(null);
-//				linkedSession.setSessionCreatingTransactionRequest(clonedOriginalRequest);
-				linkedSession.setSessionCreatingTransactionRequest(originalSipServletRequestImpl);
+				// need to clone the original request to create the forked response
+				SipServletRequestImpl clonedOriginalRequest = (SipServletRequestImpl)originalSipServletRequestImpl.clone();
+				clonedOriginalRequest.setSipSession(linkedSession);
+				linkedSession.setSessionCreatingDialog(null);
+				linkedSession.setSessionCreatingTransactionRequest(clonedOriginalRequest);
 				
 				derivedSessionMap.put(mobicentsSipSession.getId(), linkedSession.getId());
 				derivedSessionMap.put(linkedSession.getId(), mobicentsSipSession.getId());

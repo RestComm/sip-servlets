@@ -177,9 +177,9 @@ public class Shootme   implements SipListener {
 
             // Add a random sleep to stagger the two OK's for the benifit of implementations
             // that may not be too good about handling re-entrancy.
-            int timeToSleep = (int) ( Math.random() * 1000);
-
-            Thread.sleep(timeToSleep);
+//            int timeToSleep = (int) ( Math.random() * 1000);
+//
+//            Thread.sleep(timeToSleep);
 
             st.sendResponse(response);
 
@@ -188,7 +188,7 @@ public class Shootme   implements SipListener {
             ContactHeader contactHeader = headerFactory.createContactHeader(address);
             response.addHeader(contactHeader);
             ToHeader toHeader = (ToHeader) ringingResponse.getHeader(ToHeader.NAME);
-            String toTag =  new Integer(new Random().nextInt()).toString();
+            String toTag =  "" + System.nanoTime();
             toHeader.setTag(toTag);
             if ( sendRinging ) {
                 ringingResponse.addHeader(contactHeader);
@@ -334,7 +334,7 @@ public class Shootme   implements SipListener {
         this.delay = delay;
         this.sendRinging = sendRinging;
 
-        SipObjects sipObjects = new SipObjects(myPort, "shootme","on");
+        SipObjects sipObjects = new SipObjects(myPort, "shootme","on", true);
         addressFactory = sipObjects.addressFactory;
         messageFactory = sipObjects.messageFactory;
         headerFactory = sipObjects.headerFactory;

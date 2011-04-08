@@ -1812,10 +1812,10 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		return this.attributes;
 	}
 	
-	// Issue 2364 : still waiting on jsip response
-//	protected void setAttributeMap(Map<String, Object> atttributes) {
-//		this.attributes = atttributes;
-//	}
+	// Issue 2354
+	protected void setAttributeMap(Map<String, Object> atttributes) {
+		this.attributes = atttributes;
+	}
 	
 	/*
 	 * (non-Javadoc)
