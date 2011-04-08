@@ -719,11 +719,21 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 			}
 		}
 		
-		if(!allResponsesHaveArrived()) {
-			if(logger.isDebugEnabled())
-				logger.debug("The application has started new branches so we are waiting for responses on those" );
-			return;
+		if(parallel) {
+			if(!allResponsesHaveArrived()) {
+				if(logger.isDebugEnabled())
+					logger.debug("The application has started new branches so we are waiting for responses on those" );
+				return;
+			}
+		} else {
+			final int bestResponseStatus = response.getStatus();
+			if((bestResponseStatus < 200 || bestResponseStatus >= 300) && !allResponsesHaveArrived()) {
+				if(logger.isDebugEnabled())
+					logger.debug("The application has started new branches so we are waiting for responses on those" );
+				return;
+			}
 		}
+		
 		if(logger.isDebugEnabled())
 			logger.debug("All responses have arrived, sending final response for parallel proxy" );
 		//Otherwise proceed with proxying the response

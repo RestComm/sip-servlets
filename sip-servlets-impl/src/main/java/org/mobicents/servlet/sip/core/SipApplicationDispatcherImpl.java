@@ -1157,7 +1157,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			} finally {				
 				Thread.currentThread().setContextClassLoader(oldClassLoader);
 			}
-			if(!notifiedApplication) {
+			if(!notifiedApplication && sipSession.getProxy() ==null) {
 				// Issue 1822 http://code.google.com/p/mobicents/issues/detail?id=1822
 				// RFC 3261 Section 13.3.1.4 The INVITE is Accepted
 				// "If the server retransmits the 2xx response for 64*T1 seconds without receiving an ACK, 
