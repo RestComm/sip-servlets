@@ -19,6 +19,7 @@ package org.jboss.web.tomcat.service.session;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.jboss.logging.Logger;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
@@ -30,8 +31,8 @@ import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistrib
 public class IntervalConvergedSnapshotManager extends IntervalSnapshotManager implements SnapshotSipManager {
 	protected static Logger logger = Logger.getLogger(IntervalConvergedSnapshotManager.class);
 	// the modified sessions
-	protected Set<ClusteredSipSession<? extends OutgoingDistributableSessionData>> sipSessions = new LinkedHashSet<ClusteredSipSession<? extends OutgoingDistributableSessionData>>();
-	protected Set<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>> sipApplicationSessions = new LinkedHashSet<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>>();
+	protected Set<ClusteredSipSession<? extends OutgoingDistributableSessionData>> sipSessions = new CopyOnWriteArraySet<ClusteredSipSession<? extends OutgoingDistributableSessionData>>();
+	protected Set<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>> sipApplicationSessions = new CopyOnWriteArraySet<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>>();
 
 	// the interval in ms
 	private int interval = 1000;
@@ -68,10 +69,7 @@ public class IntervalConvergedSnapshotManager extends IntervalSnapshotManager im
 	 */
 	public void snapshot(ClusteredSipSession<? extends OutgoingDistributableSessionData> session) {
 		try {
-			// Don't hold a ref to the session for a long time
-			synchronized (sipSessions) {
-				sipSessions.add(session);
-			}
+			sipSessions.add(session);
 			if(logger.isDebugEnabled()){
 				logger.debug("queued sip session " + session.getKey() + " for replication");
 			}
@@ -87,10 +85,7 @@ public class IntervalConvergedSnapshotManager extends IntervalSnapshotManager im
 	 */
 	public void snapshot(ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session) {
 		try {
-			// Don't hold a ref to the session for a long time
-			synchronized (sipApplicationSessions) {
-				sipApplicationSessions.add(session);
-			}
+			sipApplicationSessions.add(session);
 			if(logger.isDebugEnabled()){
 				logger.debug("queued sip app session " + session.getKey() + " for replication");
 			}
@@ -105,11 +100,9 @@ public class IntervalConvergedSnapshotManager extends IntervalSnapshotManager im
 	 * Distribute all modified sessions
 	 */
 	protected void processSipSessions() {
-		Set<ClusteredSipSession<? extends OutgoingDistributableSessionData>> toProcess = null;
-		synchronized (sipSessions) {
-			toProcess = new HashSet<ClusteredSipSession<? extends OutgoingDistributableSessionData>>(sipSessions);			
-			sipSessions.clear();
-		}
+		Set<ClusteredSipSession<? extends OutgoingDistributableSessionData>> toProcess = 
+			new HashSet<ClusteredSipSession<? extends OutgoingDistributableSessionData>>(sipSessions);			
+		sipSessions.clear();
 
 		ClusteredSipManager<OutgoingDistributableSessionData> mgr = (ClusteredSipManager) getManager();
 		for (ClusteredSipSession<? extends OutgoingDistributableSessionData> session : toProcess) {
@@ -131,12 +124,9 @@ public class IntervalConvergedSnapshotManager extends IntervalSnapshotManager im
 	 * Distribute all modified sessions
 	 */
 	protected void processSipApplicationSessions() {
-		Set<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>> toProcess = null;
-		// Naoki : Fix for Issue 1620 : Invalid synchronization in IntervalConvergedSnapshotManager		
-		synchronized (sipApplicationSessions) {
-			toProcess = new HashSet<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>>(sipApplicationSessions);			
-			sipApplicationSessions.clear();
-		}
+		Set<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>> toProcess = 
+			new HashSet<ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>>(sipApplicationSessions);			
+		sipApplicationSessions.clear();
 
 		ClusteredSipManager<OutgoingDistributableSessionData> mgr = (ClusteredSipManager) getManager();
 		for (ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session : toProcess) {
@@ -168,12 +158,8 @@ public class IntervalConvergedSnapshotManager extends IntervalSnapshotManager im
 	public void stop() {
 		processingAllowed = false;
 		stopThread();
-		synchronized (sipSessions) {
-			sipSessions.clear();
-		}
-		synchronized (sipApplicationSessions) {
-			sipApplicationSessions.clear();
-		}
+		sipSessions.clear();
+		sipApplicationSessions.clear();
 	}
 
 	/**

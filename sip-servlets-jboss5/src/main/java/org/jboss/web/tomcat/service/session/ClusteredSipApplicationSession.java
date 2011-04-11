@@ -790,7 +790,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	/**
 	 * Increment our version and propagate ourself to the distributed cache.
 	 */
-	public synchronized void processSipApplicationSessionReplication() {
+	public void processSipApplicationSessionReplication() {
 		// Replicate the session.
 		if (log.isDebugEnabled()) {
 			log

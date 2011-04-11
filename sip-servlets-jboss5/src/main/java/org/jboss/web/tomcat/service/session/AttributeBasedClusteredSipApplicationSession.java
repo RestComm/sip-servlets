@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.apache.log4j.Logger;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipApplicationSessionMetadata;
@@ -58,10 +60,13 @@ public class AttributeBasedClusteredSipApplicationSession extends
 	 */
 	protected static final String info = "AttributeBasedClusteredSipApplicationSession/1.0";
 
+	// Issue 2450 : Deadlock when replicating application session/executing transaction that uses it
+	// moved those structures to concurrent ones to avoid synchronization on the full session
+	
 	// Transient map to store attr changes for replication.
-	private transient Map<String, Object> attrModifiedMap_ = new HashMap<String, Object>();
+	private transient Map<String, Object> attrModifiedMap_ = new ConcurrentHashMap<String, Object>();
 	// Transient set to store attr removals for replication
-	private transient Set<String> attrRemovedSet_ = new HashSet<String>();
+	private transient Set<String> attrRemovedSet_ = new CopyOnWriteArraySet<String>();
 
 	protected AttributeBasedClusteredSipApplicationSession(
 			SipApplicationSessionKey key, SipContext sipContext, boolean useJK) {
@@ -145,7 +150,7 @@ public class AttributeBasedClusteredSipApplicationSession extends
 
 	// ------------------------------------------------------- Private Methods
 
-	private synchronized void attributeChanged(String key, Object value,
+	private void attributeChanged(String key, Object value,
 			boolean removal) {
 		if (removal) {
 			if (attrModifiedMap_.containsKey(key)) {
@@ -161,7 +166,7 @@ public class AttributeBasedClusteredSipApplicationSession extends
 		sessionAttributesDirty();
 	}
 
-	private synchronized void clearAttrChangedMaps() {
+	private void clearAttrChangedMaps() {
 		attrRemovedSet_.clear();
 		attrModifiedMap_.clear();
 	}

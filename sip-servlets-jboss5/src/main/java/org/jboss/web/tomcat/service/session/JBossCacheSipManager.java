@@ -2160,8 +2160,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	public boolean storeSipSession(ClusteredSipSession session) {
 		boolean stored = false;
 		if (session != null && started_) {			
-
-			synchronized (session) {
+			// Issue 2450 : Deadlock when replicating application session/executing transaction that uses it
+//			synchronized (session) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("check to see if needs to store and replicate "
 							+ "session with id " + session.getId() + " isValid " + session.isValidInternal() +
@@ -2192,7 +2192,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 					stored = true;
 					stats_.updateReplicationStats(realId, elapsed);
 				}
-			}
+//			}
 		}
 
 		return stored;
@@ -2200,8 +2200,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	
 	public boolean storeSipApplicationSession(ClusteredSipApplicationSession session) {
 		boolean stored = false;
-		if (session != null && started_) {					
-			synchronized (session) {
+		if (session != null && started_) {	
+			// Issue 2450 : Deadlock when replicating application session/executing transaction that uses it
+//			synchronized (session) {
 				if (logger.isDebugEnabled()) {
 					log_.debug("check to see if needs to store and replicate "
 							+ "session with id " + session.getId());
@@ -2229,7 +2230,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 					stored = true;
 					stats_.updateReplicationStats(realId, elapsed);
 				}
-			}
+//			}
 		}
 
 		return stored;
@@ -2839,7 +2840,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		// Remove actively managed session and add to the unloaded sessions
 		// if it's already unloaded session (session == null) don't do anything,
 		if (session != null) {
-			synchronized (session) {
+			// Issue 2450 : Deadlock when replicating application session/executing transaction that uses it
+//			synchronized (session) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Passivating session with id: " + key);
 				}
@@ -2848,7 +2850,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 				getDistributedCacheConvergedSipManager().evictSipSession(session.getSipApplicationSession().getKey().getId(), SessionManagerUtil.getSipSessionHaKey(key));
 				sipSessionPassivated();
 				sipManagerDelegate.removeSipSession(key);
-			}
+//			}
 		} else if (logger.isDebugEnabled()) {
 			logger.debug("processSipSessionPassivation():  could not find sip session "
 					+ key);
@@ -2867,7 +2869,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		// Remove actively managed session and add to the unloaded sessions
 		// if it's already unloaded session (session == null) don't do anything,
 		if (session != null) {
-			synchronized (session) {
+//			synchronized (session) {
 				if (logger.isDebugEnabled()) {
 					logger.debug("Passivating session with id: " + key);
 				}
@@ -2876,7 +2878,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 				getDistributedCacheConvergedSipManager().evictSipApplicationSession(key.getId());
 				sipApplicationSessionPassivated();				
 				sipManagerDelegate.removeSipApplicationSession(key);
-			}
+//			}
 		} else if (logger.isDebugEnabled()) {
 			logger.debug("processSipApplicationSessionPassivation():  could not find sip application session "
 					+ key);
@@ -3154,7 +3156,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		if(clusterSess == null) {
 			return null;
 		}
-		synchronized (clusterSess) {
+		// Issue 2450 : Deadlock when replicating application session/executing transaction that uses it
+//		synchronized (clusterSess) {
 			String realId = clusterSess.getId();
 
 			if (log_.isDebugEnabled()) {
@@ -3214,7 +3217,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 //	            int timeAlive = (int) ((System.currentTimeMillis() - clusterSess.getCreationTimeInternal())/1000);
 //	            sipSessionExpired(timeAlive);
 			}
-		}
+//		}
 		return clusterSess;
 	}
 
@@ -3227,7 +3230,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		if(clusterSess == null) {
 			return null;
 		}
-		synchronized (clusterSess) {
+		// Issue 2450 : Deadlock when replicating application session/executing transaction that uses it
+//		synchronized (clusterSess) {
 			String realId = clusterSess.getId();
 
 			if (log_.isDebugEnabled()) {
@@ -3288,7 +3292,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 //	            int timeAlive = (int) ((System.currentTimeMillis() - clusterSess.getCreationTimeInternal())/1000);
 //	            sipApplicationSessionExpired(timeAlive);
 			}
-		}
+//		}
 		return clusterSess;
 	}
 
