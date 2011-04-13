@@ -73,6 +73,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		forwardingUris = new HashMap<String, String[]>();
 		forwardingUris.put("sip:forward-sender@sip-servlets.com", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+		forwardingUris.put("sip:forward-sender@127.0.0.1:5070", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
 		forwardingUris.put("sip:forward-sender-forking-pending@sip-servlets.com", 
 				new String[]{"sip:forward-receiver-forking-pending@sip-servlets.com", "sip:forward-receiver-forking-pending@127.0.0.1:5070"});
 		forwardingUris.put("sip:forward-sender-factory-same-callID@sip-servlets.com", 
@@ -111,6 +113,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				new String[]{"sip:cancel-forward-samesipsession@127.0.0.1:5070", "sip:cancel-forward-samesipsession@127.0.0.1:5070"});
 		forwardingUris.put("sip:error-samesipsession@sip-servlets.com", 
 				new String[]{"sip:error-forward-samesipsession@127.0.0.1:5070", "sip:error-forward-samesipsession@127.0.0.1:5070"});
+		forwardingUris.put("sip:forward-myself@sip-servlets.com", 
+				new String[]{"sip:forward-sender@127.0.0.1:5070", "sip:forward-sender@127.0.0.1:5070"});
 	}
 
 	SipSession incomingSession;
@@ -254,7 +258,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			}
 			headers.put("Contact", contactHeaderList);
 			SipServletRequest forkedRequest = b2buaHelper.createRequest(origSession, request, headers);
-			forkedRequest.getAddressHeader("From").setDisplayName("display name set correctly");
+			forkedRequest.getAddressHeader("From").setDisplayName("display name set correctly");			
 			String method = request.getHeader("Method");
 			if(method != null) {
 				forkedRequest.getSession().setAttribute("method", method);
@@ -308,6 +312,9 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		logger.info("forkedRequest = " + forkedRequest);
 		outgoingSession = forkedRequest.getSession();
 		forkedRequest.getSession().setAttribute("originalRequest", request);
+		if(request.getFrom().getURI().toString().contains("myself")) {
+			((SipURI)forkedRequest.getAddressHeader("From").getURI()).setUser("forward-sender");
+		}
 		
 		forkedRequest.send();
 	}
@@ -336,6 +343,10 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
         newRequest.getSession().setAttribute("originalRequest", origReq);
         newRequest.getB2buaHelper().linkSipSessions(origReq.getSession(), newRequest.getSession()); //Linking sessions!
         outgoingSession = newRequest.getSession();
+        
+        if(origReq.getFrom().getURI().toString().contains("myself")) {
+			((SipURI)newRequest.getAddressHeader("From").getURI()).setUser("forward-sender");
+		}
         
         newRequest.send();        
 	}

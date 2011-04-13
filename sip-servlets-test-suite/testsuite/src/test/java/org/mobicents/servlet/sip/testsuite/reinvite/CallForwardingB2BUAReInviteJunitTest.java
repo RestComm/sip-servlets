@@ -124,6 +124,57 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		// Non Regression test for http://code.google.com/p/mobicents/issues/detail?id=1490
 		// B2buaHelper.createRequest does not decrement Max-forwards
 		assertEquals(69, maxForwardsHeader.getMaxForwards());
+	}	
+
+	// Issue 2500 http://code.google.com/p/mobicents/issues/detail?id=2500
+	// B2buaHelper.createRequest() throws a NullPointerException if the request contains an empty header
+	public void testCallForwardingCallerSendReInviteSendBye() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isInviteReceived());
+		assertTrue(receiver.isAckReceived());
+		MaxForwardsHeader maxForwardsHeader = (MaxForwardsHeader) receiver.getInviteRequest().getHeader(MaxForwardsHeader.NAME);
+		assertNotNull(maxForwardsHeader);
+		// Non Regression test for http://code.google.com/p/mobicents/issues/detail?id=1490
+		// B2buaHelper.createRequest does not decrement Max-forwards
+		assertEquals(69, maxForwardsHeader.getMaxForwards());
+
+		Header methodHeader = receiverProtocolObjects.headerFactory.createHeader("Supported", "");
+		List<Header> headers = new ArrayList<Header>();
+		headers.add(methodHeader);
+		
+		sender.sendInDialogSipRequest("INVITE", null, null, null, headers, null);
+		receiver.setInviteReceived(false);
+		receiver.setAckReceived(false);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isInviteReceived());
+		assertTrue(receiver.isAckReceived());
+		sender.sendInDialogSipRequest("BYE", null, null, null, null, null);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());
+		assertTrue(sender.getOkToByeReceived());
 	}
 	
 	/**

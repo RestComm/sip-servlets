@@ -2717,6 +2717,14 @@ public class TestSipListener implements SipListener {
 		return inviteReceived;
 	}
 
+	/**
+	 * @return the inviteReceived
+	 */
+	public void setInviteReceived(boolean inviteReceived) {
+		this.inviteReceived = inviteReceived;
+	}
+
+	
 	public void setSendReinvite(boolean b) {
 		sendReinvite = b;
 	}

@@ -384,9 +384,24 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 					}
 				}
 				if(!headerNameValueAlreadyPresent) {
-					subsequentMessage.addHeader(((Header)origHeader.clone()));
-					if(logger.isDebugEnabled()) {
-						logger.debug("original header " + origHeader + " copied in the new subsequent request");
+					if(origHeader != null) {
+						subsequentMessage.addHeader(((Header)origHeader.clone()));
+						if(logger.isDebugEnabled()) {
+							logger.debug("original header " + origHeader + " copied in the new subsequent request");
+						}
+					} else {
+						// Issue 2500 http://code.google.com/p/mobicents/issues/detail?id=2500
+						// B2buaHelper.createRequest() throws a NullPointerException if the request contains an empty header
+						if(logger.isDebugEnabled()) {
+							logger.debug("trying to copy original header name " + headerName + " into the new subsequent request with an empty value");
+						}
+						try {
+							subsequentMessage.addHeader(SipFactories.headerFactory.createHeader(headerName, ""));
+						} catch (ParseException e) {
+							if(logger.isDebugEnabled()) {
+								logger.debug("couldn't copy original header name " + headerName + " into the new subsequent request with an empty value");
+							}
+						}
 					}
 				}
 			}
