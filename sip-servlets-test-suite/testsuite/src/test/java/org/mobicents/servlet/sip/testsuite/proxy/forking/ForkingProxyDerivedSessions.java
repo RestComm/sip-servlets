@@ -14,13 +14,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.mobicents.servlet.sip.testsuite.proxy;
+package org.mobicents.servlet.sip.testsuite.proxy.forking;
 
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.startup.SipStandardService;
+import org.mobicents.servlet.sip.testsuite.proxy.Shootist;
+import org.mobicents.servlet.sip.testsuite.proxy.Shootme;
 
 /**
  * This tests aims to fork to 2 differents destinations each one returning a 200 OK

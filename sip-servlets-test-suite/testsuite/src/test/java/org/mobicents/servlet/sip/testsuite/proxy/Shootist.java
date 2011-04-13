@@ -15,7 +15,9 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package org.mobicents.servlet.sip.testsuite.proxy;
+import gov.nist.javax.sip.ClientTransactionExt;
 import gov.nist.javax.sip.ResponseEventExt;
+import gov.nist.javax.sip.SipStackImpl;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -127,6 +129,12 @@ public class Shootist implements SipListener {
 	private String remotePort = "5070";
 	
 	private String fromHost;
+	
+	// Save the created ACK request, to respond to retransmitted 2xx
+    private Request ackRequest;
+
+	private boolean forkedResponseReceived;
+
 
 	class ByeTask  extends TimerTask {
 		Dialog dialog;
@@ -255,20 +263,27 @@ public class Shootist implements SipListener {
 		}
 	}
 
-       // Save the created ACK request, to respond to retransmitted 2xx
-       private Request ackRequest;
-
-	public void processResponse(ResponseEvent responseReceivedEvent) {
-		System.out.println("Got a response");
+	public void processResponse(ResponseEvent responseReceivedEvent) {		
+		ResponseEventExt responseEventExt = (ResponseEventExt) responseReceivedEvent;
 		Response response = (Response) responseReceivedEvent.getResponse();
+		((SipStackImpl)sipStack).getStackLogger().logInfo("Got a response " + response);
+		if(responseEventExt.isForkedResponse()) {
+			forkedResponseReceived = true;
+		}
+		ClientTransaction clientTransaction = responseEventExt.getClientTransaction();		
+		final Dialog dialog = responseEventExt.getDialog();
+		final boolean isForkedResponse = responseEventExt.isForkedResponse();
+		final boolean isRetransmission = responseEventExt.isRetransmission();
+		final ClientTransactionExt originalTransaction = responseEventExt.getOriginalTransaction();
+		((SipStackImpl)sipStack).getStackLogger().logInfo("is Forked Response " + isForkedResponse);
+		((SipStackImpl)sipStack).getStackLogger().logInfo("is Retransmission " + isRetransmission);
+		((SipStackImpl)sipStack).getStackLogger().logInfo("Client Transaction " + clientTransaction);
+		((SipStackImpl)sipStack).getStackLogger().logInfo("Original Transaction " + originalTransaction);
+		((SipStackImpl)sipStack).getStackLogger().logInfo("Dialog " + dialog);
 		this.lastResponse = response;
 		ClientTransaction tid = responseReceivedEvent.getClientTransaction();
 		CSeqHeader cseq = (CSeqHeader) response.getHeader(CSeqHeader.NAME);
-		Dialog dialog = responseReceivedEvent.getDialog();
-		
-		System.out.println("Response received : Status Code = "
-				+ response.getStatusCode() + " " + cseq);
-		
+			
 		if(response.getStatusCode() == 100) {
 			numberOfTryingReceived++;
 		}
@@ -418,6 +433,8 @@ public class Shootist implements SipListener {
 		}
 		// If you want to use UDP then uncomment this.
 		properties.setProperty("javax.sip.STACK_NAME", "shootist");
+		
+		properties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "10");
 
 		// The following properties are specific to nist-sip
 		// and are not necessarily part of any other jain-sip
@@ -734,6 +751,22 @@ public class Shootist implements SipListener {
 	 */
 	public String getFromHost() {
 		return fromHost;
+	}
+
+
+	/**
+	 * @param forkedResponseReceived the forkedResponseReceived to set
+	 */
+	public void setForkedResponseReceived(boolean forkedResponseReceived) {
+		this.forkedResponseReceived = forkedResponseReceived;
+	}
+
+
+	/**
+	 * @return the forkedResponseReceived
+	 */
+	public boolean isForkedResponseReceived() {
+		return forkedResponseReceived;
 	}
 
 }

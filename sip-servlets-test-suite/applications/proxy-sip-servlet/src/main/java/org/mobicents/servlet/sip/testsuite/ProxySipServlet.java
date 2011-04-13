@@ -131,6 +131,17 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			request.getSession().setAttribute("transport", transport);
 		}
 		
+		if(from.contains("forward-sender-downstream-proxy")) {
+			URI uri = sipFactory.createAddress("sip:receiver@" + host + ":5070").getURI();
+			Proxy proxy = request.getProxy();
+			proxy.setParallel(false);
+			proxy.setRecordRoute(true);
+			proxy.setProxyTimeout(5);
+			logger.info("proxying to downstream proxy" + uri);
+			proxy.proxyTo(uri);
+			return;
+		}
+		
 		if(from.contains("sequential")) {
 			Proxy proxy = request.getProxy();
 			proxy.setParallel(false);
