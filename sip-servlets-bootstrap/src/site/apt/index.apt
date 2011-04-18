@@ -30,7 +30,9 @@ Goals
 		 
 		 * Development Frameworks to enhance your productivity :
 		 
-		 	** {{{http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets/index.html#stf-Seam_Telco_Framework}Seam Telco Framework}}
+		 	** {{{mss/ctf/mss-ctf.hmlt}CDI Telco Framework}}
+		 	
+		 	** {{{mss-ssf.hmlt}Springs SipServlets Framework}}
 		 	
 		 	** {{{http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets/index.html#jruby-telco-integration}JRuby Torquebox Telco Framework}}
 		 	
@@ -42,17 +44,6 @@ Goals
 		 
 		 * {{{http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets/index.html#ss_jslee_interop}SIP Servlets/JAIN SLEE Interoperability}}
 		 
-		 
-OKI contributes their SIP Servlets Framework to Mobicents !
-
-	We are delighted to announce that {{{http://www.oki.com/}OKI Japan}} has become a Mobicents contributor and chosen Mobicents as a Platform to open source their Spring SIP Servlets application framework
-	that will allow SIP Servlets application developers to easily add VoIP features to their existing Spring applications.
-	
-	By doing so OKI has taken one first great of many steps towards open sourcing their high expertise and experience to help develop stable and powerful convergent applications quickly.
-
-	Read about {{{http://www.oki.com/en/press/2010/06/z10009e.html}the press release}}
-	
-	Check out the {{{./mss-ssf.html}documentation}}
 		 	
 Version 2.0.0.ALPHA1 is out !
 
