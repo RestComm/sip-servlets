@@ -18,13 +18,14 @@
 			<item name="SIP Servlets 1.1 Javadoc" href="http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/api-docs/jsr289/javadocs/index.html"/>
 			<item name="Mobicents SIP Servlets Extensions Javadoc" href="http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/api-docs/jsr289/extensions/index.html"/>
 		</menu>
-		<menu name="Frameworks">
-			<item name="Seam Telco Framework" href="http://groups.google.com/group/mobicents-public/web/seam-telco-framework-for-sip-servlets"/>
+		<menu name="Frameworks">			
+			<item name="CDI Telco Framework" href="./mss/ctf/mss-ctf.html"/>
 			<item name="SSF" href="./mss-ssf.html" collapse="true">
 				<item name="SSF" href="./mss/ssf/sf-api/site/en/index.html"/> 
 				<item name="SSF Flow API" href="./mss/ssf/sf-flow-api/en/index.html"/>
 				<item name="SSF on JBoss 5" href="./mss/ssf/sf-jboss5/en/index.html"/>
 			</item>			
+			<item name="Seam Telco Framework (Deprecated)" href="http://groups.google.com/group/mobicents-public/web/seam-telco-framework-for-sip-servlets"/>
 		</menu>
 		<menu name="Examples">
 			<item name="Examples" href="examples.html" collapse="true">
