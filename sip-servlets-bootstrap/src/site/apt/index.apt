@@ -51,7 +51,7 @@ Version 2.0.0.ALPHA2 is out !
 	
 	This release goes a step further in our march towards creating Mobicents Sip Servlets 2.0 by adding :
 	
-		* CDI integration with our new framework : {{{Converged}CDI Telco Framework (CTF)}}. CTF mission statement is to simplify SipServlets development by introducing a component based programming model, ease of development by making available SIP utilities out of the box, and finally providing dependency injection and contextual lifecycle management to the SipServlets. 
+		* CDI integration with our new framework : {{{./mss/ctf/mss-ctf.html}Converged CDI Telco Framework (CTF)}}. CTF mission statement is to simplify SipServlets development by introducing a component based programming model, ease of development by making available SIP utilities out of the box, and finally providing dependency injection and contextual lifecycle management to the SipServlets. 
 	
 		* Better Servlet 3.0 integration : Check out our {{{./click2call-async-servlet-3.0.html}Converged Click2Call Async Servlet 3.0}} application that leverages the new Async (Server Push) features from the Servlet 3.0 specification integrated to the Sip Servlets specification		 
 	
