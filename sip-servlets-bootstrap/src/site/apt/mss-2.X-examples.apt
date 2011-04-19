@@ -1,0 +1,13 @@
+JBoss 5.x only Examples
+
+	Here is our list of examples that will work only on Mobicents Sip Servlets 2.X version because it leverages unique features of Servlet 3.0 and Java EE 6 specifications :
+		
+		* {{{click2call-async-servlet-3.0.html}Click to Call Async Servlet 3.0}} : Revised the click to call application by integrating Servlet 3.0 Async features.	
+
+	You can play with most of our examples in 2 differents ways. 
+	From the binary or right from the source like a true hacker :-)
+	
+	For testing against the examples you'll need to use some SIP softphones.
+	We tested most of the examples with WengoPhone, 3CX VoIP Client, SJ Phone 1.65, Ekiga, linphone and XLite.
+	Most of the examples uses the 5090 port for one of the SIP softphone 
+	to be contacted so please make sure, it is configured that way.

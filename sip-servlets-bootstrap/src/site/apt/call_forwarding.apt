@@ -27,7 +27,7 @@ Call Forwarding
 
 	You can find the war file corresponding to this example
 	
-	* Mobicents Sip Servlets 2.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/call-forwarding/2.0.0.ALPHA1/call-forwarding-2.0.0.ALPHA1.war}here}}.
+	* Mobicents Sip Servlets 2.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/call-forwarding/2.0.0.ALPHA2/call-forwarding-2.0.0.ALPHA2.war}here}}.
 	
 	* Mobicents Sip Servlets 1.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/call-forwarding/1.5.0.FINAL/call-forwarding-1.5.0.FINAL.war}here}}.
 	 	
@@ -46,7 +46,7 @@ Call Forwarding
 
 	Please check out the call-forwarding example located under
 	
-	* Mobicents Sip Servlets 2.X : {{{http://code.google.com/p/mobicents/source/browse/tags/servers/sip-servlets/release-2.0.0.ALPHA1/sip-servlets-examples/call-forwarding}location}}
+	* Mobicents Sip Servlets 2.X : {{{http://code.google.com/p/mobicents/source/browse/tags/servers/sip-servlets/release-2.0.0.ALPHA2/sip-servlets-examples/call-forwarding}location}}
 	
 	* Mobicents Sip Servlets 1.X : {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-examples/call-forwarding}this location}}
 	 

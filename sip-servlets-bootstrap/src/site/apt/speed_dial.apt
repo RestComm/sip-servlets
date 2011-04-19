@@ -29,7 +29,7 @@ Speed Dial
 
 	You can find the war file corresponding to this example
 	
-	* Mobicents Sip Servlets 2.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/speed-dial/2.0.0.ALPHA1/speed-dial-2.0.0.ALPHA1.war}here}}.
+	* Mobicents Sip Servlets 2.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/speed-dial/2.0.0.ALPHA2/speed-dial-2.0.0.ALPHA2.war}here}}.
 	
 	* Mobicents Sip Servlets 1.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/speed-dial/1.5.0.FINAL/speed-dial-1.5.0.FINAL.war}here}}.
 	 	
@@ -48,7 +48,7 @@ Speed Dial
 
 	Please check out the speed dial example located under this 
 	
-	* Mobicents Sip Servlets 2.X : {{{http://code.google.com/p/mobicents/source/browse/tags/servers/sip-servlets/release-2.0.0.ALPHA1/sip-servlets-examples/speed-dial}location}}
+	* Mobicents Sip Servlets 2.X : {{{http://code.google.com/p/mobicents/source/browse/tags/servers/sip-servlets/release-2.0.0.ALPHA2/sip-servlets-examples/speed-dial}location}}
 	
 	* Mobicents Sip Servlets 1.X : {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-examples/speed-dial}location}}
 		 

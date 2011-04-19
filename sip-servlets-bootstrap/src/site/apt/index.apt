@@ -45,15 +45,17 @@ Goals
 		 * {{{http://hudson.jboss.org/hudson/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets/index.html#ss_jslee_interop}SIP Servlets/JAIN SLEE Interoperability}}
 		 
 		 	
-Version 2.0.0.ALPHA1 is out !
+Version 2.0.0.ALPHA2 is out !
 
-	We are proud to announce our {{{./mss-downloads.html}Mobicents Sip Servlets 2.0.0.ALPHA1 version}}, certified against the {{{http://jcp.org/en/jsr/detail?id=289}Sip Servlets 1.1 specification}} and working on top of <Tomcat 7.0.5>.
+	We are proud to announce our {{{./mss-downloads.html}Mobicents Sip Servlets 2.0.0.ALPHA2 version}}, certified against the {{{http://jcp.org/en/jsr/detail?id=289}Sip Servlets 1.1 specification}} and working on top of <Tomcat 7.0.8>.
 	
-	This release is the first step in our march towards creating Mobicents Sip Servlets 2.0 whose goal will be Java EE 6 and CDI integration as well as integrating and evolving the SIP Servlets specification with the HTTP Servlets 3.0 specification.
+	This release goes a step further in our march towards creating Mobicents Sip Servlets 2.0 by adding :
 	
-	You can play wiht it by trying {{{http://www.mobicents.org/examples.html}the following examples}}.
+		* CDI integration with our new framework : {{{Converged}CDI Telco Framework (CTF)}}. CTF mission statement is to simplify SipServlets development by introducing a component based programming model, ease of development by making available SIP utilities out of the box, and finally providing dependency injection and contextual lifecycle management to the SipServlets. 
 	
-	A <BIG> Thanks to {{{http://blog.devrealm.org/}Georges Vagenas}} who has been contributing this first ALPHA release that will allow you to create Converged SIP/HTTP Applications benefiting from the new HTTP Servlet 3.0 features such as Asynchronous Support.
+		* Better Servlet 3.0 integration : Check out our {{{./click2call-async-servlet-3.0.html}Converged Click2Call Async Servlet 3.0}} application that leverages the new Async (Server Push) features from the Servlet 3.0 specification integrated to the Sip Servlets specification		 
+	
+	Again a <BIG> Thanks to {{{http://blog.devrealm.org/}Georges Vagenas}} who does it again and contribute this second ALPHA release along with the CDI Telco Framework that will allow you to create Converged SIP/HTTP Applications benefiting from the new HTTP Servlet 3.0 features such as Asynchronous Support and benefit from Java EE 6 with a better component based model for SIP Applications.
 		
 	Check the complete Roadmap to see {{{mss-roadmap.html} what's cooking ahead}} .			 	
 

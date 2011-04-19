@@ -28,7 +28,7 @@ Click To Call
 
 	It is bundled as a default example with the binary but you can also find the war file corresponding to this example
 	
-	* Mobicents Sip Servlets 2.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/click-to-call-servlet/2.0.0.ALPHA1/click-to-call-servlet-2.0.0.ALPHA1.war}here}}.
+	* Mobicents Sip Servlets 2.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/click-to-call-servlet/2.0.0.ALPHA2/click-to-call-servlet-2.0.0.ALPHA2.war}here}}.
 	
 	* Mobicents Sip Servlets 1.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/click-to-call-servlet/1.5.0.FINAL/click-to-call-servlet-1.5.0.FINAL.war}here}}.
 		 	
@@ -47,7 +47,7 @@ Click To Call
 
 	Please check out the speed dial example located under this 
 	
-	* Mobicents Sip Servlets 2.X : {{{http://code.google.com/p/mobicents/source/browse/tags/servers/sip-servlets/release-2.0.0.ALPHA1/sip-servlets-examples/click-to-call}location}}
+	* Mobicents Sip Servlets 2.X : {{{http://code.google.com/p/mobicents/source/browse/tags/servers/sip-servlets/release-2.0.0.ALPHA2/sip-servlets-examples/click-to-call}location}}
 	
 	* Mobicents Sip Servlets 1.X : {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-examples/click-to-call}location}}
 		 

@@ -35,7 +35,7 @@ Location Service
 
 	You can find the war file corresponding to this example
  	
- 	* Mobicents Sip Servlets 2.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/location-service/2.0.0.ALPHA1/location-service-2.0.0.ALPHA1.war}here}}.
+ 	* Mobicents Sip Servlets 2.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/location-service/2.0.0.ALPHA2/location-service-2.0.0.ALPHA2.war}here}}.
 	
 	* Mobicents Sip Servlets 1.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/location-service/1.5.0.FINAL/location-service-1.5.0.FINAL.war}here}}.
 		
@@ -54,7 +54,7 @@ Location Service
 
 	Please check out the location service example located under this 
 	
-	* Mobicents Sip Servlets 2.X : {{{http://code.google.com/p/mobicents/source/browse/tags/servers/sip-servlets/release-2.0.0.ALPHA1/sip-servlets-examples/location-service}location}}
+	* Mobicents Sip Servlets 2.X : {{{http://code.google.com/p/mobicents/source/browse/tags/servers/sip-servlets/release-2.0.0.ALPHA2/sip-servlets-examples/location-service}location}}
 	
 	* Mobicents Sip Servlets 1.X : {{{http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets/sip-servlets-examples/location-service}location}}
 		

@@ -58,6 +58,9 @@
 				<item name="Diameter Ro/Rf example" href="mss-diameter_rorf.html"/>						
 				<item name="Presence Client example" href="mss-presence-client-example.html"/>
 			</item>
+			<item name="MSS 2.X only Examples" href="mss-2.X-examples.html" collapse="true">
+				<item name="Click to Call Async Servlet 3.0" href="click2call-async-servlet-3.0.html" />
+			</item>
 		</menu>		
 		<menu name="Contribute">			
 			<item name="How to Contribute" href="contributor.html" />
