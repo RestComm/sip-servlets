@@ -56,12 +56,20 @@ public class ProxyBranchTimeoutTest extends SipServletTestCase {
 
 	@Override
 	public void tearDown() throws Exception {
-		sipPhoneSender.dispose();
-		for (SipPhone sp : sipPhoneReceivers)
-			sp.dispose();
-		sipStackSender.dispose();
-		for (SipStack ss : sipStackReceivers)
-			ss.dispose();
+		if(sipPhoneSender != null) {
+			sipPhoneSender.dispose();
+		}
+		if(sipPhoneReceivers != null) {
+			for (SipPhone sp : sipPhoneReceivers)
+				sp.dispose();
+		}
+		if(sipStackSender != null) {
+			sipStackSender.dispose();
+		}
+		if(sipStackReceivers != null) {
+			for (SipStack ss : sipStackReceivers)
+				ss.dispose();
+		}
 		super.tearDown();
 	}
 

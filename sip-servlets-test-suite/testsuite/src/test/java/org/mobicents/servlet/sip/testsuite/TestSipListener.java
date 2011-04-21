@@ -1723,10 +1723,10 @@ public class TestSipListener implements SipListener {
 				logger.debug("prackSent ? " + prackSent);
 				if(requireHeader != null && "100rel".equalsIgnoreCase(requireHeader.getOptionTag().trim()) && !prackSent) {
 					prackSent = true;
-					Request prack = dialog.createPrack(response);
+					Request prack = responseDialog.createPrack(response);
 					ClientTransaction ct = sipProvider
 						.getNewClientTransaction(prack);
-					dialog.sendRequest(ct);					
+					responseDialog.sendRequest(ct);					
 				}
 			}
 			/**

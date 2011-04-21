@@ -323,6 +323,7 @@ public class Shootist implements SipListener {
 		try {
 			if (response.getStatusCode() == Response.OK) {
 				if (cseq.getMethod().equals(Request.INVITE)) {
+					okToInviteRecevied = true;
 					Thread.sleep(pauseBeforeAck);
 					ackRequest = dialog.createAck(cseq.getSeqNumber());
 					if(forkingProxy) {
@@ -361,7 +362,7 @@ public class Shootist implements SipListener {
 								ex.printStackTrace();
 							}
 					}
-					okToInviteRecevied = true;
+					
 				} else if (cseq.getMethod().equals(Request.CANCEL)) {
 					if (dialog.getState() == DialogState.CONFIRMED) {
 						// oops cancel went in too late. Need to hang up the
