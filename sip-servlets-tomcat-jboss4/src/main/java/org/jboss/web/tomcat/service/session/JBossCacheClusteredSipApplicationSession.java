@@ -121,8 +121,8 @@ public abstract class JBossCacheClusteredSipApplicationSession extends Clustered
 		SipSessionKey[] sipSessionKeys = (SipSessionKey[]) proxy_.getSipApplicationSessionMetaData(sipAppSessionId, SIP_SESSIONS);
 		if(sipSessionKeys != null && sipSessionKeys.length > 0) {
 			for (SipSessionKey sipSessionKey : sipSessionKeys) {
-				sipSessionKey.setApplicationName(proxy_.getSipApplicationName());
-				sipSessionKey.setApplicationSessionId(sipAppSessionId);
+//				sipSessionKey.setApplicationName(proxy_.getSipApplicationName());
+//				sipSessionKey.setApplicationSessionId(sipAppSessionId);
 				sipSessionKey.computeToString();
 				sipSessions.add(sipSessionKey);
 			}		

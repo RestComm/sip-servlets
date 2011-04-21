@@ -23,8 +23,11 @@ package org.mobicents.servlet.sip.testsuite.targeting;
 
 import java.text.ParseException;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
 
 import junit.framework.TestCase;
 
@@ -88,5 +91,9 @@ public class SipApplicationSessionKeyParsingTest extends TestCase {
 		sipApplicationSessionKeyDifferentAppGeneratedKey.setAppGeneratedKey("myDifferentGeneratedKey");
 		System.out.println(sipApplicationSessionKeyDifferentAppGeneratedKey);				
 		assertFalse(sipApplicationSessionKeyDifferentAppGeneratedKey.toString().equals(sipApplicationSessionKeyParsed.toString()));	
+	}
+	
+	public void testEquals() {
+		EqualsVerifier.forClass(SipApplicationSessionKey.class).verify();
 	}
 }

@@ -32,15 +32,15 @@ import java.io.Serializable;
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  *
  */
-public class SipSessionKey implements Serializable {
+public final class SipSessionKey implements Serializable {
 	private static final long serialVersionUID = 1L;
-	private String fromTag;
+	private final String fromTag;
 	private String toTag;
-	private String callId; 
-	private String applicationName;
+	private final String callId; 
+	private final String applicationName;
 	// Issue 790 : 1 SipSession should not be used in 2 different app session (http://code.google.com/p/mobicents/issues/detail?id=790)
 	// so we add the app session id in the key as well
-	private String applicationSessionId;
+	private final String applicationSessionId;
 	private String toString;
 	/**
 	 * @param fromAddress
@@ -161,18 +161,7 @@ public class SipSessionKey implements Serializable {
 			computeToString();
 		}
 	}
-	/**
-	 * @param applicationSessionId the applicationSessionId to set
-	 */
-	public void setApplicationSessionId(String applicationSessionId) {
-		this.applicationSessionId = applicationSessionId;
-	}
-	/**
-	 * @param applicationName the applicationName to set
-	 */
-	public void setApplicationName(String applicationName) {
-		this.applicationName = applicationName;
-	}
+	
 	/**
 	 * @param toString the toString to set
 	 */

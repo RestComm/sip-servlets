@@ -65,5 +65,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-client"/>
 	<classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1.1/activation-1.1.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/nl/jqno/equalsverifier/equalsverifier/1.0.1/equalsverifier-1.0.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/objenesis/objenesis/1.1/objenesis-1.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/cglib/cglib-nodep/2.2/cglib-nodep-2.2.jar"/>
 	<classpathentry kind="output" path="testsuite/target/test-classes"/>
 </classpath>

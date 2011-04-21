@@ -28,12 +28,12 @@ import java.util.UUID;
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  *
  */
-public class SipApplicationSessionKey implements Serializable {
+public final class SipApplicationSessionKey implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private String uuid;
+	private final String uuid;
 	private String appGeneratedKey;
-	private String applicationName;
+	private final String applicationName;
 	private String toString;
 	
 	/**

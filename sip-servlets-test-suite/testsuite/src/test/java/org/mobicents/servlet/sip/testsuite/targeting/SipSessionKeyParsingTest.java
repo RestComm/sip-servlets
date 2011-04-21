@@ -29,6 +29,8 @@ import java.util.UUID;
 
 import junit.framework.TestCase;
 
+import nl.jqno.equalsverifier.EqualsVerifier;
+
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
@@ -101,5 +103,9 @@ public class SipSessionKeyParsingTest extends TestCase {
 		assertTrue(sipSessionKeyNoToTag.equals(sipSessionKeySameFromTagAndToTag));
 		assertTrue(sipSessionKeySameFromTagAndDifferentToTag.equals(sipSessionKeySameFromTagAndToTag));
 				
+	}
+	
+	public void testEquals() {
+		EqualsVerifier.forClass(SipSessionKey.class).verify();
 	}
 }
