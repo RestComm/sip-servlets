@@ -435,7 +435,9 @@ public class Shootist implements SipListener {
 		properties.setProperty("javax.sip.STACK_NAME", "shootist");
 		
 		properties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "10");
-
+		properties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "4");
+		properties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
+		
 		// The following properties are specific to nist-sip
 		// and are not necessarily part of any other jain-sip
 		// implementation.

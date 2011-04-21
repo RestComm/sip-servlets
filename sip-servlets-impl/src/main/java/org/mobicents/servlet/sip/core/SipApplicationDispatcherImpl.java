@@ -681,7 +681,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 						String method = requestEvent.getRequest().getMethod();
 						boolean goodMethod = method.equals(Request.BYE) || method.equals(Request.CANCEL);
 						if(!goodMethod) {
-							MessageDispatcher.sendErrorResponse(Response.SERVICE_UNAVAILABLE, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
+							MessageDispatcher.sendErrorResponse(Response.SERVICE_UNAVAILABLE, sipServletRequest, sipProvider);
 							return;
 						}
 					}
@@ -692,14 +692,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 				logger.error("Unexpected exception while processing request " + request,e);
 				// Sends an error response if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
 				if(!Request.ACK.equalsIgnoreCase(requestMethod)) {
-					MessageDispatcher.sendErrorResponse(e.getErrorCode(), (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
+					MessageDispatcher.sendErrorResponse(e.getErrorCode(), sipServletRequest, sipProvider);
 				}
 				return;
 			} catch (Throwable e) {
 				logger.error("Unexpected exception while processing request " + request,e);
 				// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
 				if(!Request.ACK.equalsIgnoreCase(requestMethod)) {
-					MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
+					MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, sipServletRequest, sipProvider);
 				}
 				return;
 			}

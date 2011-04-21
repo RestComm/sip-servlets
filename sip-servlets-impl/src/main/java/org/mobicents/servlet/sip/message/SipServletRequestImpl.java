@@ -647,14 +647,19 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * Pushes a route header on initial request based on the jain sip sipUri given on parameter
 	 * @param sipUri the jain sip sip uri to use to construct the route header to push on the request
 	 */
-	private void pushRoute(javax.sip.address.SipURI sipUri) {		
-		if(isInitial()) {
+	private void pushRoute(javax.sip.address.SipURI sipUri) {
+		if(!isInitial() && getSipSession().getProxy() == null) {
+			//as per JSR 289 Section 11.1.3 Pushing Route Header Field Values
+			// pushRoute can only be done on the initial requests. 
+			// Subsequent requests within a dialog follow the route set. 
+			// Any attempt to do a pushRoute on a subsequent request in a dialog 
+			// MUST throw and IllegalStateException.
+			throw new IllegalStateException("Cannot push route on subsequent requests, only intial ones");
+		} else {
 			if (logger.isDebugEnabled())
-				logger.debug("Pushing route into message of value [" + sipUri
-						+ "]");
+				logger.debug("Pushing route into message of value [" + sipUri + "]");
 			
 			sipUri.setLrParam();
-	
 			try {
 				javax.sip.header.Header p = SipFactories.headerFactory
 						.createRouteHeader(SipFactories.addressFactory
@@ -664,13 +669,6 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				logger.error("Error while pushing route [" + sipUri + "]");
 				throw new IllegalArgumentException("Error pushing route ", e);
 			}
-		} else {
-			//as per JSR 289 Section 11.1.3 Pushing Route Header Field Values
-			// pushRoute can only be done on the initial requests. 
-			// Subsequent requests within a dialog follow the route set. 
-			// Any attempt to do a pushRoute on a subsequent request in a dialog 
-			// MUST throw and IllegalStateException.
-			throw new IllegalStateException("Cannot push route on subsequent requests, only intial ones");
 		}
 	}
 	

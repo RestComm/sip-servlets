@@ -149,7 +149,7 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 				maxForwardsHeader.setMaxForwards(maxForwardsHeader.getMaxForwards() - 1);
 			} else {
 				//Max forward header equals to 0, thus sending too many hops response
-				sendErrorResponse(Response.TOO_MANY_HOPS, serverTransaction, (Request) sipServletRequest.getMessage(), sipProvider);
+				sendErrorResponse(Response.TOO_MANY_HOPS, sipServletRequest, sipProvider);
 				return;
 			}
 		}		

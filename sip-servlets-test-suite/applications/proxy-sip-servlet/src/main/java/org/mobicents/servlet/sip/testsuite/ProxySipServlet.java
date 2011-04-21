@@ -142,6 +142,19 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			return;
 		}
 		
+		if(from.contains("unique-location-urn")) {
+			Proxy proxy = request.getProxy();
+			proxy.setParallel(false);
+			proxy.setRecordRoute(true);
+			proxy.setProxyTimeout(5);
+			logger.info("proxying to downstream proxy" + request.getRequestURI());
+			if(from.contains("route")) {
+				request.pushRoute((SipURI)uri1);
+			}
+			proxy.proxyTo(request.getRequestURI());
+			return;
+		}
+		
 		if(from.contains("sequential")) {
 			Proxy proxy = request.getProxy();
 			proxy.setParallel(false);
@@ -238,6 +251,18 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		}
 	}
 
+	@Override
+	protected void doAck(SipServletRequest request) throws ServletException,
+			IOException {
+		SipURI fromURI = ((SipURI)request.getFrom().getURI());
+		String from = fromURI.toString();
+		if(from.contains("unique-location-urn-route")) {
+			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+			URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();
+			request.pushRoute((SipURI)uri1);			
+		}
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -246,6 +271,12 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 
 		logger.info("Got BYE request:\n" + request);
 		SipURI fromURI = ((SipURI)request.getFrom().getURI());
+		String from = fromURI.toString();
+		if(from.contains("unique-location-urn-route")) {
+			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+			URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();
+			request.pushRoute((SipURI)uri1);			
+		}
 		
 		if(fromURI.toString().contains(TEST_CREATE_SUBSEQUENT_REQUEST)) {
 			try {

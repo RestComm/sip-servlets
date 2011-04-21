@@ -96,6 +96,13 @@ public abstract class MessageDispatcher {
 //		this.sipApplicationDispatcher = sipApplicationDispatcher;
 //	}
 	
+	public static void sendErrorResponse(int errorCode, SipServletRequestImpl sipServletRequest, SipProvider sipProvider) {
+		MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
+		if(sipServletRequest.getSipSession() != null) {
+			sipServletRequest.getSipSession().updateStateOnResponse((SipServletResponseImpl)sipServletRequest.createResponse(SipServletResponseImpl.SC_SERVER_INTERNAL_ERROR), false);
+		}
+	}
+	
 	/**
 	 * 
 	 * @param errorCode

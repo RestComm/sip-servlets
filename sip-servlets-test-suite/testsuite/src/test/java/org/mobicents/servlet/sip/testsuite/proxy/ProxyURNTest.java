@@ -41,7 +41,7 @@ public class ProxyURNTest extends SipServletTestCase {
 	//https://code.google.com/p/mobicents/issues/detail?id=2337
 	public void testProxySendInviteToURN() throws Exception {
 		setupPhones(ListeningPoint.UDP);
-		String fromName = "unique-location-urn";
+		String fromName = "unique-location";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);		
@@ -60,6 +60,42 @@ public class ProxyURNTest extends SipServletTestCase {
 		assertTrue(sender.isServerErrorReceived());
 		assertTrue(sender.getAllMessagesContent().contains(SESSION_READY_TO_INVALIDATE));
 		assertTrue(sender.getAllMessagesContent().contains(SIP_SESSION_READY_TO_INVALIDATE));
+	}
+	
+	public void testProxySendInviteToURNWithoutRoute() throws Exception {
+		setupPhones(ListeningPoint.UDP);
+		String fromName = "unique-location-urn";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		URI toURNAddress = senderProtocolObjects.addressFactory.createURI("urn:service:sos");
+		
+		sender.sendSipRequest("INVITE", fromAddress, toURNAddress, null, null, true);
+		sender.setUseToURIasRequestUri(true);
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isServerErrorReceived());
+		assertTrue(sender.getAllMessagesContent().contains(SESSION_READY_TO_INVALIDATE));
+		assertTrue(sender.getAllMessagesContent().contains(SIP_SESSION_READY_TO_INVALIDATE));
+	}
+	
+	public void testProxySendInviteToURNWithRoute() throws Exception {
+		setupPhones(ListeningPoint.UDP);
+		String fromName = "unique-location-urn-route";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		URI toURNAddress = senderProtocolObjects.addressFactory.createURI("urn:service:sos");
+		
+		sender.setSendBye(true);
+		sender.sendSipRequest("INVITE", fromAddress, toURNAddress, null, null, true);
+		sender.setUseToURIasRequestUri(true);
+		Thread.sleep(TIMEOUT*2);
+		assertFalse(sender.isServerErrorReceived());
+		assertTrue(sender.getAllMessagesContent().contains(SESSION_READY_TO_INVALIDATE));
+		assertTrue(sender.getAllMessagesContent().contains(SIP_SESSION_READY_TO_INVALIDATE));
+		assertTrue(sender.getOkToByeReceived());
 	}
 	
 	public void setupPhones(String transport) throws Exception {

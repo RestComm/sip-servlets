@@ -16,7 +16,6 @@
  */
 package org.mobicents.servlet.sip.core.dispatchers;
 
-import javax.sip.ServerTransaction;
 import javax.sip.SipProvider;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -60,7 +59,7 @@ public abstract class DispatchTask implements Runnable {
 				SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
 				if(!Request.ACK.equalsIgnoreCase(sipServletRequest.getMethod()) &&
 						!Request.PRACK.equalsIgnoreCase(sipServletRequest.getMethod())) {
-					MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
+					MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, sipServletRequest, sipProvider);					
 				}
 			}
 		}		

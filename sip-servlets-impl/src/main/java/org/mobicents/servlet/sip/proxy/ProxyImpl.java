@@ -46,6 +46,7 @@ import javax.sip.TransactionState;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.Header;
 import javax.sip.header.RecordRouteHeader;
+import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Message;
 import javax.sip.message.Request;
@@ -365,7 +366,11 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 			throw new NullPointerException("URI can't be null");
 		}
 		if(!JainSipUtils.checkScheme(uri.toString())) {
-			throw new IllegalArgumentException("Scheme " + uri.getScheme() + " is not supported");
+			// Fix for Issue http://code.google.com/p/mobicents/issues/detail?id=2327, checking the route header
+			RouteHeader routeHeader = (RouteHeader) originalRequest.getMessage().getHeader(RouteHeader.NAME);
+			if(routeHeader == null || (routeHeader != null && !JainSipUtils.checkScheme(routeHeader.getAddress().getURI().toString()))) {
+				throw new IllegalArgumentException("Scheme " + uri.getScheme() + " is not supported");
+			}			
 		}
 		final ProxyBranchImpl branch = new ProxyBranchImpl(uri, this);
 		branch.setRecordRoute(recordRoutingEnabled);

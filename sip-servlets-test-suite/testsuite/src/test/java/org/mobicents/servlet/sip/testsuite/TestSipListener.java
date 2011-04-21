@@ -1296,10 +1296,10 @@ public class TestSipListener implements SipListener {
 				return ;
 			}
 			
-			if(("join").equalsIgnoreCase(((SipUri)request.getRequestURI()).getUser())) {
+			if(request.getRequestURI() instanceof SipURI && ("join").equalsIgnoreCase(((SipUri)request.getRequestURI()).getUser())) {
 				sendJoinMessage = true;
 			}
-			if(("replaces").equalsIgnoreCase(((SipUri)request.getRequestURI()).getUser())) {
+			if(request.getRequestURI() instanceof SipURI && ("replaces").equalsIgnoreCase(((SipUri)request.getRequestURI()).getUser())) {
 				sendReplacesMessage = true;
 			}
 		} catch (Exception ex) {

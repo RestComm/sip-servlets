@@ -706,7 +706,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 						SipServletMapping sipServletMapping = sipContext.findSipServletMappings(sipServletRequest);
 						if(sipServletMapping == null && sipContext.getSipRubyController() == null) {
 							logger.error("Sending 404 because no matching servlet found for this request ");
-							sendErrorResponse(Response.NOT_FOUND, (ServerTransaction) sipServletRequest.getTransaction(), request, sipProvider);
+							sendErrorResponse(Response.NOT_FOUND, sipServletRequest, sipProvider);
 							return;
 						} else if(sipServletMapping != null) {							
 							sipSessionHandlerName = sipServletMapping.getServletName();

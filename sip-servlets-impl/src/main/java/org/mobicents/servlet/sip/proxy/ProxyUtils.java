@@ -185,7 +185,6 @@ public class ProxyUtils {
 							sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest, branchId, null);
 				} else { 
 					//If outbound interface is specified use it
-					
 					String branchId = null;
 
 					// http://code.google.com/p/mobicents/issues/detail?id=2359
@@ -203,20 +202,21 @@ public class ProxyUtils {
 							branchId);
 				}
 				proxyBranch.viaHeader = viaHeader;
-			} else {
-				String branchId = null;
-				viaHeader = (ViaHeader) viaHeader.clone();
-				// http://code.google.com/p/mobicents/issues/detail?id=2359
-				// ivan dubrov : TERMINATED state checking to avoid reusing the branchid for ACK to 200
-				if(Request.ACK.equals(method) && proxyBranchRequest != null && proxyBranchRequest.getTransaction() != null
-						&& proxyBranchRequest.getTransaction().getState() != TransactionState.TERMINATED) {
-					branchId = proxyBranchRequest.getTransaction().getBranchId();
-					logger.debug("reusing original branch id " + branchId);
-				} else {
-					branchId = JainSipUtils.createBranch(sipAppKey.getId(), appName);
-				}
-				viaHeader.setBranch(branchId);
 			}
+//			else {
+//				String branchId = null;
+//				viaHeader = (ViaHeader) viaHeader.clone();
+//				// http://code.google.com/p/mobicents/issues/detail?id=2359
+//				// ivan dubrov : TERMINATED state checking to avoid reusing the branchid for ACK to 200
+//				if(Request.ACK.equals(method) && proxyBranchRequest != null && proxyBranchRequest.getTransaction() != null
+//						&& proxyBranchRequest.getTransaction().getState() != TransactionState.TERMINATED) {
+//					branchId = proxyBranchRequest.getTransaction().getBranchId();
+//					logger.debug("reusing original branch id " + branchId);
+//				} else {
+//					branchId = JainSipUtils.createBranch(sipAppKey.getId(), appName);
+//				}
+//				viaHeader.setBranch(branchId);
+//			}
 
 			clonedRequest.addHeader(viaHeader);				
 			
