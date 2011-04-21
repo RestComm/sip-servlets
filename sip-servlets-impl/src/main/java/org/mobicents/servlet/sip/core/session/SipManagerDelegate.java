@@ -210,28 +210,44 @@ public abstract class SipManagerDelegate {
 			sipApplicationSessionImpl = sipApplicationSessions.get(key);
 		}
 		if(sipApplicationSessionImpl == null && create) {
-			sipApplicationSessionImpl =  createSipApplicationSession(key, create);						
+			sipApplicationSessionImpl =  createSipApplicationSession(key);						
 		}
 		return sipApplicationSessionImpl;
 	}	
 
-	protected MobicentsSipApplicationSession createSipApplicationSession(final SipApplicationSessionKey key, final boolean create) {
+	protected MobicentsSipApplicationSession createSipApplicationSession(final SipApplicationSessionKey key) {
 		//http://dmy999.com/article/34/correct-use-of-concurrenthashmap
 		MobicentsSipApplicationSession sipApplicationSessionImpl = null;
 		final MobicentsSipApplicationSession newSipApplicationSessionImpl = 
 			getNewMobicentsSipApplicationSession(key, (SipContext) container);
-		sipApplicationSessionImpl = sipApplicationSessions.putIfAbsent(key, newSipApplicationSessionImpl);		
-		if (sipApplicationSessionImpl == null) {
-			// put succeeded, use new value
-			if(logger.isDebugEnabled()) {
-				logger.debug("Adding a sip application session with the key : " + key);
-			}
-            sipApplicationSessionImpl = newSipApplicationSessionImpl;
-            final String appGeneratedKey = key.getAppGeneratedKey(); 
-    		if(appGeneratedKey != null) {    		
-            	sipApplicationSessionsByAppGeneratedKey.putIfAbsent(appGeneratedKey, sipApplicationSessionImpl);
+		final String appGeneratedKey = key.getAppGeneratedKey(); 
+		// Fix for Issue http://code.google.com/p/mobicents/issues/detail?id=2521
+		// in case od appGeneratedKey use the sipApplicationSessionsByAppGeneratedKey to ensure uniqueness
+		if(appGeneratedKey != null) {    		
+			// gurantees uniqueness on the appgeneratedkey
+        	sipApplicationSessionImpl = sipApplicationSessionsByAppGeneratedKey.putIfAbsent(appGeneratedKey, newSipApplicationSessionImpl);
+        	if (sipApplicationSessionImpl == null) {
+    			sipApplicationSessions.putIfAbsent(key, newSipApplicationSessionImpl);
+    			scheduleExpirationTimer(newSipApplicationSessionImpl);
+    			// put succeeded, use new value
+    			if(logger.isDebugEnabled()) {
+    				logger.debug("Adding a sip application session with the key : " + key);
+    			}
+                sipApplicationSessionImpl = newSipApplicationSessionImpl;                
             }
-        }		
+        } else {        	
+    		sipApplicationSessionImpl = sipApplicationSessions.putIfAbsent(key, newSipApplicationSessionImpl);
+    		if (sipApplicationSessionImpl == null) {
+    			scheduleExpirationTimer(newSipApplicationSessionImpl);
+    			// put succeeded, use new value
+    			if(logger.isDebugEnabled()) {
+    				logger.debug("Adding a sip application session with the key : " + key);
+    			}
+                sipApplicationSessionImpl = newSipApplicationSessionImpl;
+                
+            }
+        }
+				
 		return sipApplicationSessionImpl;
 	}
 	

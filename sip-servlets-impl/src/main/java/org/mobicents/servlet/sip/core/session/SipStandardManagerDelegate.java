@@ -48,8 +48,7 @@ public class SipStandardManagerDelegate extends SipManagerDelegate {
                 ("could not create a new sip application session because there is currently too many active sip application sessions");
 		}
 		sipApplicationSessionCounter++;		
-		MobicentsSipApplicationSession sipApplicationSession = new SipApplicationSessionImpl(key, sipContext);
-		scheduleExpirationTimer(sipApplicationSession);
+		MobicentsSipApplicationSession sipApplicationSession = new SipApplicationSessionImpl(key, sipContext);		
 		
 		return sipApplicationSession;
 	}
