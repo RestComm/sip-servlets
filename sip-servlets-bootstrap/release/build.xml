@@ -8,6 +8,7 @@
 	<property name="mss.release.version" value="1.6.0-SNAPSHOT" />
 	<property name="mss.release.configurations" value="all,default" />
 	<property name="mss.release.configurations.jboss5" value="all,default" />
+	<property name="mss.release.configurations.jboss5.excluded" value="minimal,standard,web" />
 	
 	<property name="jboss.version" value="4.2.3.GA" />
 	<property name="jboss-5.version" value="5.1.0.GA" />	
@@ -503,11 +504,10 @@
 			<fileset dir="${jboss-5-jdk6.home.temp}/jboss-${jboss-5.version}"/>
 		</move>
 		
-		<propertyregex input="${mss.release.configurations.jboss5}" regexp="(\w+)" global="true" replace="**/\1/**" property="used.configurations.jboss5" />
-		<echo>Included profiles: ${mss.release.configurations.jboss5} -&gt; Excludes list: ${used.configurations.jboss5}</echo>
+		<echo>Included profiles: ${mss.release.configurations.jboss5} -&gt; Excludes list: ${mss.release.configurations.jboss5.excluded}</echo>
 		
 		<delete includeemptydirs="true" failonerror="false" verbose="false">
-			<fileset dir="${jboss-5-jdk6.home}/server" excludes="${used.configurations.jboss5}" />
+			<fileset dir="${jboss-5-jdk6.home}/server" excludes="${mss.release.configurations.jboss5.excluded}" />
 		</delete>
 	</target>
 	
