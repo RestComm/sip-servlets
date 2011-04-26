@@ -260,8 +260,10 @@
 	<target name="deploy-mss-jopr-plugin-5">
 		<echo message="MSS_HOME=${mss.home}"/>
 		<move verbose="true" failonerror="false" file="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins/jopr-jboss-as-5-plugin-2.3.0.EmbJopr.1.2.0-1.jar" tofile="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins/jopr-jboss-as-5-plugin-2.3.0.EmbJopr.1.2.0-1.jar.bak" />
-		<get dest="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins/jopr-mobicents-sip-servlets-as-5-plugin-${mss.jopr-plugin-5.version}.jar" src="${mss.jopr-plugin-5.url}"/>		
-		<get dest="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins/rhq-jmx-plugin-1.2.0.GA.jar" src="${jopr-jmx-plugin-5.url}"/>
+		<get dest="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins/" src="${mss.jopr-plugin-5.url}"/>		
+		<get dest="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins/" src="${jopr-jmx-plugin-5.url}"/>
+		<!--get dest="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins/jopr-mobicents-sip-servlets-as-5-plugin-${mss.jopr-plugin-5.version}.jar" src="${mss.jopr-plugin-5.url}"/>		
+		<get dest="${mss.home}/server/${jboss.config}/deploy/admin-console.war/plugins/rhq-jmx-plugin-1.2.0.GA.jar" src="${jopr-jmx-plugin-5.url}"/-->
 	</target>
 	
 	<!-- Get dependencies -->
