@@ -58,6 +58,7 @@ import javax.servlet.sip.ar.SipRouteModifier;
 import javax.servlet.sip.ar.spi.SipApplicationRouterProvider;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
+import javax.sip.DialogState;
 import javax.sip.DialogTerminatedEvent;
 import javax.sip.IOExceptionEvent;
 import javax.sip.ListeningPoint;
@@ -983,7 +984,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			final TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
 			if(tad != null && tad.getSipServletMessage() != null) {
 				getAsynchronousExecutor().execute(new Runnable() {
-					public void run() {					
+					public void run() {			
+						if(logger.isDebugEnabled()) {
+							logger.info("Running process dialog timeout " + dialog + " reason => " + timeoutEvent.getReason());
+						}	
 						try {
 							final SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
 							final SipSessionKey sipSessionKey = sipServletMessage.getSipSessionKey();
@@ -1043,6 +1047,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			getAsynchronousExecutor().execute(new Runnable() {
 				public void run() {
 					try {
+						if(logger.isDebugEnabled()) {
+							logger.debug("transaction " + transaction + " timed out => " + transaction.getRequest().toString());
+						}
 						SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
 						SipSessionKey sipSessionKey = sipServletMessage.getSipSessionKey();
 						MobicentsSipSession sipSession = sipServletMessage.getSipSession();					
@@ -1093,7 +1100,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 										}
 									}
 									// Guard only invite tx should check that, otherwise proxy might become null http://code.google.com/p/mobicents/issues/detail?id=2350
-									if(Request.INVITE.equals(sipServletMessage.getMethod())) {
+									// Should check only Server Tx for ack or prack not received http://code.google.com/p/mobicents/issues/detail?id=2525
+									if(Request.INVITE.equals(sipServletMessage.getMethod()) && timeoutEvent.isServerTransaction()) {
 										checkForAckNotReceived(sipServletMessage);
 										appNotifiedOfPrackNotReceived = checkForPrackNotReceived(sipServletMessage);
 									}
@@ -1157,7 +1165,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			} finally {				
 				Thread.currentThread().setContextClassLoader(oldClassLoader);
 			}
-			if(!notifiedApplication && sipSession.getProxy() ==null) {
+			final Dialog dialog = sipSession.getSessionCreatingDialog();
+			if(!notifiedApplication && sipSession.getProxy() == null &&
+					// Fix for http://code.google.com/p/mobicents/issues/detail?id=2525 BYE is being sent to a not yet established dialog
+					dialog != null && dialog.getState() != null && !dialog.getState().equals(DialogState.TERMINATED)) {
 				// Issue 1822 http://code.google.com/p/mobicents/issues/detail?id=1822
 				// RFC 3261 Section 13.3.1.4 The INVITE is Accepted
 				// "If the server retransmits the 2xx response for 64*T1 seconds without receiving an ACK, 
