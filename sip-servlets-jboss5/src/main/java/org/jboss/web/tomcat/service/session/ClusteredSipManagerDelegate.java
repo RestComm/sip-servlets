@@ -92,10 +92,7 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
             }
     		session.setNew(true);
     		((ClusteredSipApplicationSession<OutgoingDistributableSessionData>)session).clearOutdated();
-        }
-		if(!recreate) {
-			scheduleExpirationTimer(sipApplicationSessionImpl);
-		}		
+        }				
 		return sipApplicationSessionImpl;
 	}
 
