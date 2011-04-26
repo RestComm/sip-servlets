@@ -506,9 +506,9 @@
 		
 		<echo>Included profiles: ${mss.release.configurations.jboss5} -&gt; Excludes list: ${used.configurations.jboss5}</echo>
 		
-		<delete includeemptydirs="true" failonerror="false" verbose="false">
-			<fileset dir="${jboss-5-jdk6.home}/server" excludes="${mss.release.configurations.jboss5}" />
-		</delete>
+		<delete dir="${jboss-5-jdk6.home}/server/minimal" includeemptydirs="true" failonerror="false" verbose="false"/>			
+		<delete dir="${jboss-5-jdk6.home}/server/web" includeemptydirs="true" failonerror="false" verbose="false"/>
+		<delete dir="${jboss-5-jdk6.home}/server/standard" includeemptydirs="true" failonerror="false" verbose="false"/>
 	</target>
 	
 	<target name="extract-mms" depends="get-mms">
