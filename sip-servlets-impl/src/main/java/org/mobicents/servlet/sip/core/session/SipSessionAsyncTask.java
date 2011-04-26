@@ -64,7 +64,7 @@ public class SipSessionAsyncTask implements Runnable {
 				try {
 					ClassLoader cl = sipContext.getLoader().getClassLoader();
 					Thread.currentThread().setContextClassLoader(cl);
-					sipContext.enterSipApp(sipApplicationSession, sipSession);
+					sipContext.enterSipApp(sipApplicationSession, sipSession, false);
 					batchStarted = sipContext.enterSipAppHa(true);
 					
 					work.doAsynchronousWork(sipSession);

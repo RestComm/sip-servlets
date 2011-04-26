@@ -160,8 +160,11 @@ public class SipStandardContext extends StandardContext implements SipContext {
     protected transient SipServletTimerService timerService = null;
     // timer service used to schedule proxy timer tasks
     protected transient ProxyTimerService proxyTimerService = null; 
-    // information in
-    private transient ThreadLocal<SipApplicationSessionCreationThreadLocal> sipApplicationSessionsAccessedThreadLocal = new ThreadLocal<SipApplicationSessionCreationThreadLocal>();    
+    // http://code.google.com/p/mobicents/issues/detail?id=2450
+    private transient ThreadLocal<SipApplicationSessionCreationThreadLocal> sipApplicationSessionsAccessedThreadLocal = new ThreadLocal<SipApplicationSessionCreationThreadLocal>();
+    // http://code.google.com/p/mobicents/issues/detail?id=2534 && http://code.google.com/p/mobicents/issues/detail?id=2526
+    private transient ThreadLocal<Boolean> isManagedThread = new ThreadLocal<Boolean>();
+    
 	/**
 	 * 
 	 */
@@ -1064,7 +1067,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				sasTimerService.start();
 			}
 		}
-		enterSipApp(null, null);
+		enterSipApp(null, null, false);
 		boolean batchStarted = enterSipAppHa(true);
 		try {
 			for (Container container : childrenMap.values()) {
@@ -1167,7 +1170,11 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		return ok;
 	}
 	
-	public void enterSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession) {		
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#enterSipApp(org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession, org.mobicents.servlet.sip.core.session.MobicentsSipSession, boolean)
+	 */
+	public void enterSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession, boolean checkIsManagedThread) {		
 		switch (concurrencyControlMode) {
 			case SipSession:				
 				if(sipSession != null) {
@@ -1175,24 +1182,38 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				} 
 				break;
 			case SipApplicationSession:
-				if(sipApplicationSession != null) {									
-					SipApplicationSessionCreationThreadLocal sipApplicationSessionCreationThreadLocal = sipApplicationSessionsAccessedThreadLocal.get();
-					if(sipApplicationSessionCreationThreadLocal == null) {
-						sipApplicationSessionCreationThreadLocal = new SipApplicationSessionCreationThreadLocal();
-						sipApplicationSessionsAccessedThreadLocal.set(sipApplicationSessionCreationThreadLocal);
+				if(logger.isDebugEnabled()) {
+					logger.debug("checkIsManagedThread " + checkIsManagedThread + " , isManagedThread " + isManagedThread.get());
+				}
+				// http://code.google.com/p/mobicents/issues/detail?id=2534 && http://code.google.com/p/mobicents/issues/detail?id=2526
+				if(!checkIsManagedThread || (checkIsManagedThread && Boolean.TRUE.equals(isManagedThread.get()))) {
+					if(isManagedThread.get() == null) {
+						isManagedThread.set(Boolean.TRUE);
 					}
-					boolean notPresent = sipApplicationSessionCreationThreadLocal.getSipApplicationSessions().add(sipApplicationSession);
-					if(notPresent) {
-						if(logger.isDebugEnabled()) {
-							logger.debug("acquiring sipApplicationSession=" + sipApplicationSession +
-									" since it is not present in our local thread of accessed sip application sessions " );
+					if(sipApplicationSession != null) {									
+						SipApplicationSessionCreationThreadLocal sipApplicationSessionCreationThreadLocal = sipApplicationSessionsAccessedThreadLocal.get();
+						if(sipApplicationSessionCreationThreadLocal == null) {
+							sipApplicationSessionCreationThreadLocal = new SipApplicationSessionCreationThreadLocal();
+							sipApplicationSessionsAccessedThreadLocal.set(sipApplicationSessionCreationThreadLocal);
 						}
-						sipApplicationSession.acquire();
-					} else {
-						if(logger.isDebugEnabled()) {
-							logger.debug("not acquiring sipApplicationSession=" + sipApplicationSession +
-									" since it is present in our local thread of accessed sip application sessions ");
+						boolean notPresent = sipApplicationSessionCreationThreadLocal.getSipApplicationSessions().add(sipApplicationSession);
+						if(notPresent) {
+							if(logger.isDebugEnabled()) {
+								logger.debug("acquiring sipApplicationSession=" + sipApplicationSession +
+										" since it is not present in our local thread of accessed sip application sessions " );
+							}
+							sipApplicationSession.acquire();
+						} else {
+							if(logger.isDebugEnabled()) {
+								logger.debug("not acquiring sipApplicationSession=" + sipApplicationSession +
+										" since it is present in our local thread of accessed sip application sessions ");
+							}
 						}
+					}
+				} else {
+					if(logger.isDebugEnabled()) {
+						logger.debug("not acquiring sipApplicationSession=" + sipApplicationSession +
+								" since isManagedThread is " + isManagedThread.get());
 					}
 				}
 				break;
@@ -1201,6 +1222,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}		
 	} 
     
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#exitSipApp(org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession, org.mobicents.servlet.sip.core.session.MobicentsSipSession)
+	 */
 	public void exitSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession) {
 		switch (concurrencyControlMode) {
 			case SipSession:
@@ -1227,6 +1252,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 					sipApplicationSessionsAccessedThreadLocal.set(null);
 					sipApplicationSessionsAccessedThreadLocal.remove();
 				}
+				isManagedThread.set(null);
+				isManagedThread.remove();
 				if(!wasSessionReleased) {
 					if(sipApplicationSession != null) {
 						sipApplicationSession.release();
@@ -1243,26 +1270,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		}		
 	}
 	
-//	public void enterSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response, boolean startCacheActivity, boolean bindSessions) {				
-//		if(getDistributable() && hasDistributableManager) {
-//			if(bindSessions) {
-//				ConvergedSessionReplicationContext.enterSipappAndBindSessions(request, response, getSipManager(), startCacheActivity);
-//			} else {
-//				ConvergedSessionReplicationContext.enterSipapp(request, response, startCacheActivity);
-//			}
-//		}
-//	}
-//	public void enterSipAppHa(MobicentsSipApplicationSession sipApplicationSession, boolean startCacheActivity, boolean bindSessions) {
-//		if(getDistributable() && hasDistributableManager) {
-//			if(bindSessions) {
-//				ConvergedSessionReplicationContext.enterSipappAndBindSessions(sipApplicationSession,
-//				getSipManager(), startCacheActivity);
-//			} else {
-//				ConvergedSessionReplicationContext.enterSipapp(null, null, startCacheActivity);
-//			}
-//		}
-//	}
-	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#enterSipAppHa(boolean)
+	 */
 	public boolean enterSipAppHa(boolean startCacheActivity) {
 		if(getDistributable() && hasDistributableManager) {
 //			if(bindSessions) {
@@ -1275,7 +1286,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		return false;
 	}
 
-	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.startup.SipContext#exitSipAppHa(org.mobicents.servlet.sip.message.SipServletRequestImpl, org.mobicents.servlet.sip.message.SipServletResponseImpl, boolean)
+	 */
 	public void exitSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response, boolean batchStarted) {			
 		if (getDistributable() && hasDistributableManager) {
 			if(logger.isDebugEnabled()) {

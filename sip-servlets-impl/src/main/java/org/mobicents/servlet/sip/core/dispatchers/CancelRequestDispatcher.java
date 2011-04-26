@@ -230,7 +230,7 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 			final MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
 			final SipContext sipContext = sipApplicationSession.getSipContext();
 			try {
-				sipContext.enterSipApp(sipApplicationSession, sipSession);		
+				sipContext.enterSipApp(sipApplicationSession, sipSession, false);		
 				final Proxy proxy = sipSession.getProxy();
 				if(proxy != null) {
 					if(logger.isDebugEnabled()) {

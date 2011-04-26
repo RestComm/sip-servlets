@@ -160,7 +160,7 @@ public class ConcurrentyControlAsyncWorkSessionIsolationTest extends SipServletT
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
 		Thread.sleep(3000);
 		String sasId = new String(sender.getFinalResponse().getRawContent());
-		String CLICK2DIAL_PARAMS = "?asyncWorkMode=" + ConcurrencyControlMode.SipSession + "&asyncWorkSasId="+ sasId;
+		String CLICK2DIAL_PARAMS = "?asyncWorkMode=" + ConcurrencyControlMode.SipApplicationSession + "&asyncWorkSasId="+ sasId;
 //		long startTime = System.currentTimeMillis();
 		sender.sendInDialogSipRequest("OPTIONS", "1", "text", "plain", null, null);
 		Thread.sleep(100);
@@ -187,6 +187,58 @@ public class ConcurrentyControlAsyncWorkSessionIsolationTest extends SipServletT
 		assertTrue(!sender.isServerErrorReceived());
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		assertTrue(sender.getAllMessagesContent().contains("OK"));	
+	}
+	
+	public void testElapsedTimeAndSipApplicationSessionDeadlock() throws Exception {
+		deployApplication(ConcurrencyControlMode.SipApplicationSession);
+		String fromName = "Thread";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		fromAddress.setParameter("mode", ConcurrencyControlMode.SipApplicationSession.toString());
+		
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+//		sender.setSendBye(false);
+//		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+//		Thread.sleep(3000);
+//		String sasId = new String(sender.getFinalResponse().getRawContent());
+		String CLICK2DIAL_PARAMS = "?asyncWorkMode=Thread&asyncWorkSasId=test";
+//		long startTime = System.currentTimeMillis();
+//		sender.sendInDialogSipRequest("OPTIONS", "1", "text", "plain", null, null);
+//		Thread.sleep(100);
+//		sender.sendInDialogSipRequest("OPTIONS", "2", "text", "plain", null, null);
+//		Thread.sleep(100);
+		logger.info("Trying to reach url : " + CLICK2DIAL_URL
+				+ CLICK2DIAL_PARAMS);
+
+		URL url = new URL(CLICK2DIAL_URL + CLICK2DIAL_PARAMS);
+		InputStream in = url.openConnection().getInputStream();
+
+		byte[] buffer = new byte[10000];
+		int len = in.read(buffer);
+		String httpResponse = "";
+		for (int q = 0; q < len; q++)
+			httpResponse += (char) buffer[q];
+		logger.info("Received the follwing HTTP response: " + httpResponse);
+//		sender.sendInDialogSipRequest("OPTIONS", "3", "text", "plain", null, null);
+//		Thread.sleep(100);
+//		sender.sendBye();
+		Thread.sleep(10000);
+//		long elapsedTime = sender.getLastInfoResponseTime() - startTime;
+//		assertTrue(elapsedTime>15000);
+//		assertTrue(!sender.isServerErrorReceived());
+//		assertTrue(sender.isAckSent());
+//		assertTrue(sender.getOkToByeReceived());
 		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
 		while (allMessagesIterator.hasNext()) {
 			String message = (String) allMessagesIterator.next();

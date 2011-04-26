@@ -211,6 +211,9 @@ public class Click2DialSipServlet extends SipServlet implements SipApplicationSe
 				}
 			}
 		}
+		if(resp.getStatus() == SipServletResponse.SC_OK && resp.getMethod().equals("MESSAGE") && resp.getApplicationSession().getAttribute("testThread") != null) {			
+			sendMessage(sipFactory.createApplicationSession(), sipFactory, "OK");
+		}
 	}
 
 	@Override
@@ -289,4 +292,27 @@ public class Click2DialSipServlet extends SipServlet implements SipApplicationSe
 		
 	}
 
+	/**
+	 * @param sipApplicationSession
+	 * @param storedFactory
+	 */
+	private static void sendMessage(SipApplicationSession sipApplicationSession,
+			SipFactory storedFactory, String content) {
+		try {
+			SipServletRequest sipServletRequest = storedFactory.createRequest(
+					sipApplicationSession, 
+					"MESSAGE", 
+					"sip:sender@sip-servlets.com", 
+					"sip:receiver@sip-servlets.com");
+			SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+			sipServletRequest.setRequestURI(sipUri);
+			sipServletRequest.setContentLength(content.length());
+			sipServletRequest.setContent(content, CONTENT_TYPE);
+			sipServletRequest.send();
+		} catch (ServletParseException e) {
+			logger.error("Exception occured while parsing the addresses",e);
+		} catch (IOException e) {
+			logger.error("Exception occured while sending the request",e);			
+		}
+	}
 }

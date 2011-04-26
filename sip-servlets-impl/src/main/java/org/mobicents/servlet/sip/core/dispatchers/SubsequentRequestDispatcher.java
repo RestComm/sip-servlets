@@ -286,7 +286,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		final SubsequentDispatchTask dispatchTask = new SubsequentDispatchTask(sipServletRequest, sipProvider);
 		// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that
 		// the tx serialization is preserved		
-		sipContext.enterSipApp(sipApplicationSession, sipSession);
+		sipContext.enterSipApp(sipApplicationSession, sipSession, false);
 		
 		// Issue 1714 : do the validation after lock acquisition to avoid conccurency on CSeq validation 
 		// if a concurrency control mode is used

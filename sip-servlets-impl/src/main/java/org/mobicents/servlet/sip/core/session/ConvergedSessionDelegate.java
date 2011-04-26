@@ -145,7 +145,7 @@ public class ConvergedSessionDelegate {
 			if (sipAppSession != null) {
 				// make sure to acquire this app session and add it to the set of app sessions we monitor in the context of the application
 				// to release them all when we exit application code
-				sipContext.enterSipApp(sipAppSession, null);
+				sipContext.enterSipApp(sipAppSession, null, true);
 				return sipAppSession;
 			} else {
 				if(logger.isDebugEnabled()) {
@@ -181,7 +181,7 @@ public class ConvergedSessionDelegate {
 		if(sipApplicationSession != null) {
 			// make sure to acquire this app session and add it to the set of app sessions we monitor in the context of the application
 			// to release them all when we exit application code
-			sipContext.enterSipApp(sipApplicationSession, null);
+			sipContext.enterSipApp(sipApplicationSession, null, true);
 			return sipApplicationSession.getSession();
 		} else {
 			return null;

@@ -146,7 +146,20 @@ public interface SipContext extends Context {
 	
 	boolean notifySipContextListeners(SipContextEvent event);
 	
-	void enterSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession);
+	/**
+	 * notify the application that we are going to access it with the sipapplicationsession and sip session in parameter and tells whether or not to check
+	 * if we are in a managed thread to check if we should lock the session or not
+	 * @param sipApplicationSession the sip application session that is accessing the application, it can be null
+	 * @param sipSession the sip session that is accessing the application, it can be null
+	 * @param checkIsManagedThread need to check if the access is done within a managed Thread or not to lock or not the session depending on the concurrency control 
+	 */
+	void enterSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession, boolean checkIsManagedThread);
+	/**
+	 * notify the application that we are going to exit it with the sipapplicationsession and sip session in parameter 
+	 * @param sipApplicationSession the sip application session that is exiting the application, it can be null
+	 * @param sipSession the sip session that is exiting the application, it can be null
+	 * 
+	 */
 	void exitSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession);
 	
 	//Issue http://code.google.com/p/mobicents/issues/detail?id=2452

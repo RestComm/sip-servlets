@@ -75,7 +75,7 @@ public class StandardSasTimerTask extends TimerTask implements SipApplicationSes
 
 	private void tryToExpire() {
 		final SipContext sipContext = getSipApplicationSession().getSipContext();
-		sipContext.enterSipApp(getSipApplicationSession(), null);
+		sipContext.enterSipApp(getSipApplicationSession(), null, false);
 		boolean batchStarted = sipContext.enterSipAppHa(true);
 		try {
 			getSipApplicationSession().setExpirationTimerTask(null);

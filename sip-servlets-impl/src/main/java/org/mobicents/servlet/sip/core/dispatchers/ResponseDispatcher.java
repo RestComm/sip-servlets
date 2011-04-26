@@ -404,7 +404,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 			};
 			// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that
 			// the tx serialization is preserved
-			sipContext.enterSipApp(session.getSipApplicationSession(), session);
+			sipContext.enterSipApp(session.getSipApplicationSession(), session, false);
 			// if the flag is set we bypass the executor, the bypassExecutor flag should be made deprecated 
 			if(sipApplicationDispatcher.isBypassResponseExecutor() || ConcurrencyControlMode.Transaction.equals((sipContext.getConcurrencyControlMode()))) {
 				dispatchTask.dispatchAndHandleExceptions();

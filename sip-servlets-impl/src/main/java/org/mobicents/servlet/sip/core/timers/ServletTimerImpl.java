@@ -289,7 +289,7 @@ public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 		try {
 			ClassLoader cl = sipContext.getLoader().getClassLoader();
 			Thread.currentThread().setContextClassLoader(cl);
-			sipContext.enterSipApp(sipApplicationSession, null);
+			sipContext.enterSipApp(sipApplicationSession, null, false);
 			batchStarted = sipContext.enterSipAppHa(true);
 			listener.timeout(this);
 		} catch(Throwable t) {

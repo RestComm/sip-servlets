@@ -577,7 +577,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				}
 				try {
 					if(lockSession) {
-						sipContext.enterSipApp(this, session);
+						sipContext.enterSipApp(this, session, false);
 					}
 					session.invalidate();
 				} finally {

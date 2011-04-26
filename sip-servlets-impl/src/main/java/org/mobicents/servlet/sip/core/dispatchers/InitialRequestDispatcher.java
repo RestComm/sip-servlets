@@ -423,7 +423,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		final InitialDispatchTask dispatchTask = new InitialDispatchTask(sipServletRequest, sipProvider);
 		// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that
 		// the tx serialization is preserved		
-		sipContext.enterSipApp(sipApplicationSession, sipSessionImpl);
+		sipContext.enterSipApp(sipApplicationSession, sipSessionImpl, false);
 		
 		// We are using only one priover per LP and per transport so this is safe
 		sipSessionImpl.setTransport(sipProvider.getListeningPoints()[0].getTransport());

@@ -697,7 +697,7 @@ public class SipFactoryImpl implements Externalizable {
 		MobicentsSipApplicationSession sipApplicationSession = createApplicationSession(sipContext);
 		// make sure to acquire this app session and add it to the set of app sessions we monitor in the context of the application
 		// to release them all when we exit application code
-		sipContext.enterSipApp(sipApplicationSession, null);
+		sipContext.enterSipApp(sipApplicationSession, null, true);
 		
 		return sipApplicationSession;
 	}
@@ -726,7 +726,7 @@ public class SipFactoryImpl implements Externalizable {
 				sipApplicationSessionKey, true);
 		// make sure to acquire this app session and add it to the set of app sessions we monitor in the context of the application
 		// to release them all when we exit application code
-		sipContext.enterSipApp(sipApplicationSession, null);
+		sipContext.enterSipApp(sipApplicationSession, null, true);
 		
 		return sipApplicationSession.getSession();
 	}

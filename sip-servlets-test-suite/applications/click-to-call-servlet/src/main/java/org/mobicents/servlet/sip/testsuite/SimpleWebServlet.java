@@ -16,10 +16,16 @@
  */
 package org.mobicents.servlet.sip.testsuite;
 
+import gov.nist.core.ServerLogger;
+import gov.nist.javax.sip.message.SIPMessage;
+import gov.nist.javax.sip.stack.RawMessageChannel;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
 import java.util.Properties;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import javax.annotation.Resource;
 import javax.naming.Context;
@@ -152,11 +158,19 @@ public class SimpleWebServlet extends HttpServlet {
         out.println("</BODY></HTML>");
         out.close();
     }
-	private void doAsyncWork(String asyncWorkMode, String asyncWorkSasId, HttpServletResponse response) throws IOException {
-		final SipApplicationSession sipApplicationSession = sipSessionsUtil.getApplicationSessionById(asyncWorkSasId);
-		
-		if(asyncWorkMode.equals("SipSession")) {
-			
+	private void doAsyncWork(String asyncWorkMode, String asyncWorkSasId, HttpServletResponse response) throws IOException {			
+		if(asyncWorkMode.equals("Thread")) {			
+			Runnable processMessageTask = new Runnable() {
+                public void run() {
+                	SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();                	
+                	String response = "testThread";					
+                	sipApplicationSession.setAttribute(response, "true");
+					sendMessage(sipApplicationSession, sipFactory, response);
+                }
+            };
+            Executors.newFixedThreadPool(4).execute(processMessageTask);            
+		} else if(asyncWorkMode.equals("SipSession")) {
+			final SipApplicationSession sipApplicationSession = sipSessionsUtil.getApplicationSessionById(asyncWorkSasId);
 			Iterator<SipSession> sipSessionIterator = (Iterator<SipSession>) sipApplicationSession.getSessions(Protocol.SIP.toString());
 			SipSession sipSession = sipSessionIterator.next();
 			((SipSessionExt)sipSession).scheduleAsynchronousWork(new SipSessionAsynchronousWork() {
@@ -183,7 +197,7 @@ public class SimpleWebServlet extends HttpServlet {
 			});
 			
 		} else {
-		
+			final SipApplicationSession sipApplicationSession = sipSessionsUtil.getApplicationSessionById(asyncWorkSasId);
 			((SipApplicationSessionExt)sipApplicationSession).scheduleAsynchronousWork(new SipApplicationSessionAsynchronousWork() {
 				private static final long serialVersionUID = 1L;
 	
