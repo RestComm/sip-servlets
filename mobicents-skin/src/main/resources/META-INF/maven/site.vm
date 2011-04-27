@@ -352,21 +352,54 @@ Search
 </div>
 </div>
 
-<div class="bar">
-<ul>
-	<li class="browse_category">Select Category:</li>
+<div
+	class="bar">
+	<ul>
+		<li
+			class="browse_category">Select Category:</li>
+		<li>
+			<a
+				href="index.html"
+				accesskey="h">Home</a>
 
-	<li><a href="http://www.mobicents.org/index.html" accesskey="h">Home</a></li>
-	<li class="active"><a href="http://www.mobicents.org/products.html" accesskey="p">Products</a></li>
-	<li><a href="http://www.mobicents.org/services.html" accesskey="s">Services</a></li>
+		</li>
+		<li
+			class="active">
+			<a
+				href="products.html"
+				accesskey="p">Products</a>
+		</li>
+		<li>
+			<a
+				href="services.html"
+				accesskey="s">Services</a>
+		</li>
+		<li>
 
-	<li><a href="http://www.mobicents.org/community.html" accesskey="c">Community</a></li>
-	<li><a href="http://www.mobicents.org/faq.html" accesskey="c">FAQ</a></li>
+			<a
+				href="community.html"
+				accesskey="c">Community</a>
+		</li>
+		<li>
+			<a
+				href="partners.html"
+				accesskey="r">Partners</a>
+		</li>
+		<li>
+			<a
+				href="faq.html"
+				accesskey="c">FAQ</a>
 
-	<li><a href="http://www.mobicents.org/about.html" accesskey="a">About Us</a></li>
-
-</ul>
+		</li>
+		<li><a href="http://www.mobicents.org/incubator.html" accesskey="i">Incubator</a></li>
+		<li>
+			<a
+				href="about.html"
+				accesskey="a">About Us</a>
+		</li>
+	</ul>
 </div>
+
 <div class="contentwrapper"><div class="left">
 <h3 id="h3_2">$decoration.name</h3>
 $bodyContent
