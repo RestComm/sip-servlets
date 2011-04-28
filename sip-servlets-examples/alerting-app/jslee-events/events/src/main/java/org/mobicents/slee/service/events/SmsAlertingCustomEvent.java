@@ -1,13 +1,3 @@
-/*
- * ***************************************************
- *                                                 *
- *  Mobicents: The Open Source JSLEE Platform      *
- *                                                 *
- *  Distributable under LGPL license.              *
- *  See terms of license at gnu.org.               *
- *                                                 *
- ***************************************************
- */
 package org.mobicents.slee.service.events;
 
 import java.io.Serializable;
