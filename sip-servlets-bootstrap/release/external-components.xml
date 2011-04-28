@@ -16,6 +16,7 @@
         <!--diameter.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/diameter/core/mux/mobicents-diameter-mux-1.1.0.GA/</diameter.connectionURL-->               
         <!--sip.balancer.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/tools/sip-balancer/sip-balancer-1.1</sip.balancer.connectionURL-->
 		<sip.balancer.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/trunk/tools/sip-balancer</sip.balancer.connectionURL>
+		<sglc.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/trunk/tools/simple-global-logging-configuration</sglc.connectionURL>
     </properties>
     <profiles>
         <profile>
@@ -83,6 +84,20 @@
                                     <password>${checkout.password}</password>
                                 </configuration>
                             </execution-->
+                             <execution>
+                                <id>sglc-checkout</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>checkout</goal>
+                                </goals>
+                                <configuration>
+                                    <checkoutDirectory>${checkout.basedir}/sglc</checkoutDirectory>
+                                    <skipCheckoutIfExists>true</skipCheckoutIfExists>
+                                    <connectionUrl>${sglc.connectionURL}</connectionUrl>
+                                    <username>${checkout.username}</username>
+                                    <password>${checkout.password}</password>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>
@@ -157,6 +172,21 @@
                                     <password>${checkout.password}</password>
                                 </configuration>
                             </execution-->
+                            <execution>
+                                <id>sglc-update</id>
+                                <goals>
+                                    <goal>update</goal>
+                                </goals>
+                                <phase>validate</phase>
+                                <configuration>
+                                    <basedir>${checkout.basedir}/sglc</basedir>
+                                    <scmVersion>HEAD</scmVersion>
+                                    <scmVersionType>revision</scmVersionType>
+                                    <connectionUrl>${sglc.connectionURL}</connectionUrl>
+                                    <username>${checkout.username}</username>
+                                    <password>${checkout.password}</password>
+                                </configuration>
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>

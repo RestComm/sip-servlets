@@ -1,5 +1,8 @@
 package org.mobicents.servlet.management.server.configuration;
 
+import java.util.Iterator;
+import java.util.Set;
+
 import javax.management.Attribute;
 import javax.management.MBeanServer;
 import javax.management.ObjectInstance;
@@ -28,6 +31,18 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 		}
 	}
 	
+	private ObjectName getSglcMBean() {
+		try {
+			ObjectName dispatcherQuery = new ObjectName("*:service=SimpleGlobalLoggingConfiguration");
+			ObjectInstance sglcInstance = (ObjectInstance) 
+			mserver.queryMBeans(dispatcherQuery, null).iterator().next();
+			ObjectName sglcName = sglcInstance.getObjectName();
+			return sglcName;
+		} catch (Throwable t) {
+			throw new RuntimeException(t);
+		}
+	}
+	
 	public String getConcurrencyControlMode() {
 		try {
 			ObjectName dispatcherName = getApplicationDispatcher();
@@ -35,6 +50,18 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 			ConcurrencyControlMode mode = 
 				(ConcurrencyControlMode) mserver.getAttribute(
 						dispatcherName, "concurrencyControlMode");
+			return mode.toString();
+		} catch (Throwable t) {
+			throw new RuntimeException("Error", t);
+		}
+	}
+	
+	public String getLoggingMode() {
+		try {
+			ObjectName sglcName = getSglcMBean();
+			
+			String mode = 
+				(String) mserver.invoke(sglcName, "getCurrentProfile", new Object[]{}, new String[]{});
 			return mode.toString();
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
@@ -110,6 +137,36 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 		try {
 			ObjectName dispatcherName = getApplicationDispatcher();
 			mserver.invoke(dispatcherName, "setConcurrencyControlModeByName", new Object[]{mode}, new String[]{"java.lang.String"});
+		} catch (Throwable t) {
+			throw new RuntimeException("Error", t);
+		}
+	}
+	
+	public void setLoggingMode(String mode) {
+		try {
+			ObjectName sglcName = getSglcMBean();
+			mserver.invoke(sglcName, "switchLoggingConfiguration", new Object[]{mode}, new String[]{"java.lang.String"});
+		} catch (Throwable t) {
+			throw new RuntimeException("Error", t);
+		}
+	}
+	
+	public String[] listLoggingProfiles() {
+		try {
+			ObjectName sglcName = getSglcMBean();
+			Set<String> profiles = (Set<String>) mserver.invoke(sglcName, "listProfiles", new Object[]{}, new String[]{});
+			String[] sglcModes = new String[0];
+			if(profiles != null) {
+				Iterator<String> profilesIt = profiles.iterator();
+				sglcModes = new String[profiles.size()];
+				int i = 0;
+				while (profilesIt.hasNext()) {
+					String profile = profilesIt.next();
+					sglcModes[i] = profile;
+					i++;
+				}
+			}
+			return sglcModes;
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
 		}

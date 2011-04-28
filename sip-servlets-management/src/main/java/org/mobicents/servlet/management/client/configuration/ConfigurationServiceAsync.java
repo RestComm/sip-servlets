@@ -23,4 +23,7 @@ public interface ConfigurationServiceAsync {
 	void getT4Interval(AsyncCallback<Integer> callback);
 	void setTimerDInterval(int timerDInterval, AsyncCallback<Void> callback);
 	void getTimerDInterval(AsyncCallback<Integer> callback);
+	void getLoggingMode(AsyncCallback<String> callback);
+	void setLoggingMode(String loggingMode, AsyncCallback<Void> callback);
+	void listLoggingProfiles(AsyncCallback<String[]> callback);
 }

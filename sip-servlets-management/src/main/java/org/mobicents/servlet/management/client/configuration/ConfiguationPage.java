@@ -30,8 +30,16 @@ public class ConfiguationPage extends Panel {
 		new Object[]{"ErrorResponse"}
 	};
 	
+	private static Object[][] sglcModes= new Object[][]{
+		new Object[]{"trace"},
+		new Object[]{"debug"},  
+		new Object[]{"default"},
+		new Object[]{"production"}		
+	};;
+	
 	ComboBox ccms;
 	ComboBox ccps;
+	ComboBox sglc;
 	TextField queueSize;
 	TextField memoryThreshold;
 	TextField congestionControlCheckingInterval;
@@ -136,6 +144,33 @@ public class ConfiguationPage extends Panel {
 		}, (String)congestionControlPolicies[1][0]);
 		addLabeledControl("Congestion control policy:", ccps, formPanel);
 		
+//		int indexLoggingMode = 0;
+//		String[] profiles = ConfigurationService.Util.getSyncInstance().listLoggingProfiles();
+//		String currentProfile = ConfigurationService.Util.getSyncInstance().getLoggingMode();
+//		if(profiles.length > 0) {
+//			sglcModes = new Object[profiles.length][1];
+//			
+//			int i = 0;
+//			for (String profile : profiles) {
+//				sglcModes[i] = new Object[] {profile};
+//				if(profile.equalsIgnoreCase(currentProfile)) {
+//					indexLoggingMode = i;
+//				}
+//				i++;
+//			}
+//		}
+//		if(sglcModes != null) {
+			final Store sglcStore = new SimpleStore(new String[]{"sglc"}, sglcModes);  
+			sglcStore.load();  
+			sglc = makeCombo(sglcStore, "sglc", 
+					new ComboBoxListenerAdapter() {  
+				public void onSelect(ComboBox comboBox, com.gwtext.client.data.Record record, int index) {  
+					System.out.println("Logging Mode::onSelect('" + record.getAsString("sglc") + "')");  
+				}  
+			}, (String)sglcModes[2][0]);
+			addLabeledControl("Logging Mode: ", sglc, formPanel);
+//		}
+		
 		//Save button
 		Button save = new Button("Apply", new ButtonListenerAdapter(){
 
@@ -165,6 +200,21 @@ public class ConfiguationPage extends Panel {
 							}
 							
 						});
+				
+				if(sglc != null) {
+					ConfigurationService.Util.getInstance().setLoggingMode(
+							sglc.getValue(), new AsyncCallback<Void>() {
+	
+								public void onFailure(Throwable caught) {
+									Console.error("Error while trying to set Logging Mode.");
+								}
+	
+								public void onSuccess(Void result) {
+									result = result;
+								}
+								
+						});
+				}
 				
 				ConfigurationService.Util.getInstance().setQueueSize(
 						Integer.parseInt(queueSize.getValueAsString()), new AsyncCallback<Void>() {
@@ -377,6 +427,19 @@ public class ConfiguationPage extends Panel {
 							}
 							
 						});
+				
+					ConfigurationService.Util.getInstance().getLoggingMode(
+							new AsyncCallback<String>() {
+	
+								public void onFailure(Throwable caught) {
+									Console.error("Error while trying to get logging mode.");
+								}
+	
+								public void onSuccess(String result) {
+									sglc.setValue(result.toString());
+								}
+								
+							});
 			}
 			
 		});

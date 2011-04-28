@@ -15,8 +15,18 @@ public interface ConfigurationService extends RemoteService {
 			target.setServiceEntryPoint(GWT.getModuleBaseURL() + SERVICE_URI);
 			return instance;
 		}
+		
+		public static ConfigurationService getSyncInstance() {
+
+			ConfigurationService instance = (ConfigurationService) GWT
+					.create(ConfigurationService.class);
+			ServiceDefTarget target = (ServiceDefTarget) instance;
+			target.setServiceEntryPoint(GWT.getModuleBaseURL() + SYNC_SERVICE_URI);
+			return instance;
+		}
 	}
 	public static final String SERVICE_URI = "/ConfigurationService";
+	public static final String SYNC_SERVICE_URI = "/ConfigurationServiceSync";
 	
 	void setQueueSize(int queueSize);
 	int getQueueSize();
@@ -36,4 +46,7 @@ public interface ConfigurationService extends RemoteService {
 	int getT4Interval();
 	void setTimerDInterval(int timerDInterval);
 	int getTimerDInterval();
+	String getLoggingMode();
+	void setLoggingMode(String loggingMode);
+	String[] listLoggingProfiles();
 }
