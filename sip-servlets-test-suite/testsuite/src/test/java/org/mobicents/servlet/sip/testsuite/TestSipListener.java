@@ -309,8 +309,10 @@ public class TestSipListener implements SipListener {
 	private boolean sendCancelOn1xx = false;
 
 	private boolean testNextNonce =false;
+	private boolean testNC =false;
 	
 	private String nextNonce = null;
+	private int nc;
 	
 	private boolean dropRequest = false;
 
@@ -978,6 +980,9 @@ public class TestSipListener implements SipListener {
 		            proxyAuthenticate.setParameter("opaque","");
 		            
 		            proxyAuthenticate.setParameter("algorithm",dsam.getAlgorithm());
+		            if(testNC) {
+		            	proxyAuthenticate.setQop("auth");
+		            }
 		            responseauth.setHeader(proxyAuthenticate);
 		            // alexander kozlov : Adding the to tag to 407 as well 
 		            ToHeader toHeader = (ToHeader) responseauth.getHeader(ToHeader.NAME);
@@ -1121,8 +1126,8 @@ public class TestSipListener implements SipListener {
 		            //proxyAuthenticateImpl.setParameter("domain",authenticationMethod.getDomain());
 		            proxyAuthenticate.setParameter("opaque","");
 		            proxyAuthenticate.setParameter("stale","FALSE");
-		            proxyAuthenticate.setParameter("algorithm",dsam.getAlgorithm());
-		            responseauth.setHeader(proxyAuthenticate);
+		            proxyAuthenticate.setParameter("algorithm",dsam.getAlgorithm());		           
+		            responseauth.setHeader(proxyAuthenticate);		            
 		            
 		            if(multipleChallengeInResponse) {
 		            	proxyAuthenticate = 
@@ -1132,7 +1137,7 @@ public class TestSipListener implements SipListener {
 			            //proxyAuthenticateImpl.setParameter("domain",authenticationMethod.getDomain());
 			            proxyAuthenticate.setParameter("opaque","");
 			            proxyAuthenticate.setParameter("stale","true");
-			            proxyAuthenticate.setParameter("algorithm",dsam.getAlgorithm());
+			            proxyAuthenticate.setParameter("algorithm",dsam.getAlgorithm());			            
 			            responseauth.addHeader(proxyAuthenticate);
 		            }
 		
@@ -1325,6 +1330,10 @@ public class TestSipListener implements SipListener {
     	   
     	   if(nextNonce != null && !proxyAuthorization.getNonce().equals(nextNonce)) {
     		   throw new IllegalArgumentException("Authentication failed: ProxyAuthorization nonce " + proxyAuthorization.getNonce() + " is different from the nextnonce  previously generated " + nextNonce);         		   
+    	   }
+    	   
+    	   if(nc > 0 && proxyAuthorization.getNonceCount() != nc) {
+    		   throw new IllegalArgumentException("Authentication failed: ProxyAuthorization nonceCount " + proxyAuthorization.getNonceCount() + " is different from the nextnonce  previously generated " + nc);
     	   }
     	   
            String username=proxyAuthorization.getParameter("username");
@@ -1802,7 +1811,8 @@ public class TestSipListener implements SipListener {
 					"user",
 					"pass",
 					((WWWAuthenticate) (response
-							.getHeader(SIPHeaderNames.WWW_AUTHENTICATE))).getNonce());
+							.getHeader(SIPHeaderNames.WWW_AUTHENTICATE))).getNonce(),
+					1);
 			
 			requestauth.addHeader(authorization);
 		} catch (ParseException pa) {
@@ -3070,6 +3080,10 @@ public class TestSipListener implements SipListener {
 
 	public void setTestNextNonce(boolean b) {
 		this.testNextNonce  = b;
+	}
+	
+	public void setTestNC(boolean b) {
+		this.testNC  = b;
 	}
 
 	/**

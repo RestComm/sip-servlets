@@ -75,12 +75,13 @@ public class MessageDigestResponseAlgorithm
                                     String entity_body,
                                     String qop_value)
     {
-    	logger.debug("trying to authenticate using : " + algorithm + ", "
+    	if(logger.isDebugEnabled()) {
+    		logger.debug("trying to authenticate using : " + algorithm + ", "
     			+ username_value + ", " + realm_value + ", " + (passwd != null
 				&& passwd.trim().length() > 0) + ", " + nonce_value + ", "
 				+ nc_value + ", " + cnonce_value + ", " + method + ", "
 				+ digest_uri_value + ", " + entity_body + ", " + qop_value); 
-    	
+    	}
         if (username_value == null || realm_value == null || passwd == null
             || method == null || digest_uri_value == null || nonce_value == null)
             throw new NullPointerException(
@@ -134,11 +135,18 @@ public class MessageDigestResponseAlgorithm
                                           + ":" + qop_value
                                           + ":" + H(A2)
                               );
-
+            if(logger.isDebugEnabled()) {
+            	logger.debug("H(A1) " + H(A1));
+            	logger.debug("H(A2) " + H(A2));
+            	logger.debug("request digest with auth " + request_digest);
+            }
         }
         else
         {
             request_digest = KD(H(A1), nonce_value + ":" + H(A2));
+            if(logger.isDebugEnabled()) {
+            	logger.debug("request digest " + request_digest);
+            }
         }
 
         return request_digest;

@@ -567,8 +567,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 				}
 
 				if(sipSessionSecurity != null && sipSessionSecurity.getNextNonce() != null) {
-					sipServletRequest.updateAuthorizationHeadersWithNextNonce();
+					sipServletRequest.updateAuthorizationHeaders(true);
 				}	
+				else if (sipSessionSecurity != null) {
+					sipServletRequest.updateAuthorizationHeaders(false);
+				}
 				
 				return sipServletRequest;
 			} else {
@@ -602,8 +605,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		
 		if(sipSessionSecurity != null && sipSessionSecurity.getNextNonce() != null) {
-			sipServletRequest.updateAuthorizationHeadersWithNextNonce();
-		}		
+			sipServletRequest.updateAuthorizationHeaders(true);
+		}	
+		else if (sipSessionSecurity != null) {
+			sipServletRequest.updateAuthorizationHeaders(false);
+		}	
 		
 		return sipServletRequest;
 	}

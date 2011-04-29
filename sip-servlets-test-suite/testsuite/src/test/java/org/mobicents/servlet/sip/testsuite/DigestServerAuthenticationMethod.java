@@ -194,22 +194,22 @@ public class DigestServerAuthenticationMethod implements AuthenticationMethod {
 		}
 		System.out
 				.println("DEBUG, DigestAuthenticationMethod, doAuthenticate(), username:"
-						+ username + "!");
+						+ username);
 		System.out
 				.println("DEBUG, DigestAuthenticationMethod, doAuthenticate(), realm:"
-						+ realm + "!");
+						+ realm);
 		System.out
 				.println("DEBUG, DigestAuthenticationMethod, doAuthenticate(), password:"
-						+ PASS_AUTH + "!");
+						+ PASS_AUTH);
 		System.out
 				.println("DEBUG, DigestAuthenticationMethod, doAuthenticate(), uri:"
-						+ uri + "!");
+						+ uri);
 		System.out
 				.println("DEBUG, DigestAuthenticationMethod, doAuthenticate(), nonce:"
-						+ nonce + "!");
+						+ nonce);
 		System.out
 				.println("DEBUG, DigestAuthenticationMethod, doAuthenticate(), method:"
-						+ request.getMethod() + "!");
+						+ request.getMethod());
 
 		String A1 = username + ":" + realm + ":" + PASS_AUTH;
 		String A2 = request.getMethod().toUpperCase() + ":" + uri.toString();
@@ -218,16 +218,28 @@ public class DigestServerAuthenticationMethod implements AuthenticationMethod {
 
 		System.out
 				.println("DEBUG, DigestAuthenticationMethod, doAuthenticate(), HA1:"
-						+ HA1 + "!");
+						+ HA1);
 		mdbytes = messageDigest.digest(A2.getBytes());
 		String HA2 = toHexString(mdbytes);
+		String KD = HA1 + ":" + nonce;
 		System.out
 				.println("DEBUG, DigestAuthenticationMethod, doAuthenticate(), HA2:"
-						+ HA2 + "!");
+						+ HA2);
+		String nonceCount = authHeader.getParameter("nc");			
 		String cnonce = authHeader.getCNonce();
-		String KD = HA1 + ":" + nonce;
-		if (cnonce != null) {
-			KD += ":" + cnonce;
+		String qop = authHeader.getQop();
+		if (cnonce != null && nonceCount != null && qop != null && (qop.equalsIgnoreCase("auth") 
+                || qop.equalsIgnoreCase("auth-int"))) {
+			System.out.println("DEBUG, DigestAuthenticationMethod, doAuthenticate(), cnonce:"
+					+ cnonce);
+			System.out.println("DEBUG, DigestAuthenticationMethod, doAuthenticate(), nonceCount:"
+					+ nonceCount);	
+			System.out.println("DEBUG, DigestAuthenticationMethod, doAuthenticate(), qop:"
+					+ qop);
+			
+			KD += ":" + nonceCount;
+			KD += ":" + cnonce;			
+			KD += ":" + qop;
 		}
 		KD += ":" + HA2;
 		mdbytes = messageDigest.digest(KD.getBytes());

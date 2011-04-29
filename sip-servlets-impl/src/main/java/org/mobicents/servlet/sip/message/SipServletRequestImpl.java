@@ -92,6 +92,7 @@ import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.header.WWWAuthenticateHeader;
+import javax.sip.header.CSeqHeader;
 import javax.sip.message.Message;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -1820,6 +1821,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			String username,
 			String password,
 			String uri) {
+		
+		int nc = generateNcFromMessage(message);
+
 		AuthorizationHeader authorization = DigestAuthenticator.getAuthorizationHeader(
 				getMethod(),
 				uri,
@@ -1827,7 +1831,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				wwwAuthHeader,
 				username,
 				password,
-				wwwAuthHeader.getNonce());
+				wwwAuthHeader.getNonce(),
+				nc);
 		
 		message.addHeader(authorization);
 	}
@@ -2206,14 +2211,25 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		out.writeBoolean(is1xxResponseGenerated);	
 	}
 
+	private static int generateNcFromMessage(Message message) {
+		int nc = 1;
+		CSeqHeader cseq = (CSeqHeader) message.getHeader(CSeqHeader.NAME);
+		if (cseq != null) {
+			nc = (int) (cseq.getSeqNumber() % Integer.MAX_VALUE);
+		}
+		return nc;
+	}
+
 	/**
 	 * Added for Issue 2173 http://code.google.com/p/mobicents/issues/detail?id=2173
 	 * Handle Header [Authentication-Info: nextnonce="xyz"] in sip authorization responses
 	 */
-	public void updateAuthorizationHeadersWithNextNonce() {
+	public void updateAuthorizationHeaders(boolean useNextNonce) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Updating authorization headers with nextnonce " + getSipSession().getSipSessionSecurity().getNextNonce());
 		}
+		int nc = -1; 
+			
 		List<Header> authorizationHeaders = new ArrayList<Header>();
 		
 		// First check for WWWAuthentication headers
@@ -2226,6 +2242,16 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			
 			if(authInfoEntry != null) {
 				
+				if(nc < 0) {
+					nc = generateNcFromMessage(message);
+				}
+				String nextNonce = null;
+				if(useNextNonce) {
+					nextNonce = getSipSession().getSipSessionSecurity().getNextNonce();
+				} else {
+					nextNonce = wwwAuthHeader.getNonce();
+				}
+				
 				AuthorizationHeader authorization = DigestAuthenticator.getAuthorizationHeader(
 						getMethod(),
 						this.getRequestURI().toString(),
@@ -2233,7 +2259,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						wwwAuthHeader,
 						authInfoEntry.getUserName(),
 						authInfoEntry.getPassword(),
-						getSipSession().getSipSessionSecurity().getNextNonce());
+						nextNonce,
+						nc);
 
 				authorizationHeaders.add(authorization);
 			} else {
@@ -2251,7 +2278,16 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			AuthInfoEntry authInfoEntry = getSipSession().getSipSessionSecurity().getCachedAuthInfos().get(proxyAuthHeader.getRealm());
 			
 			if(authInfoEntry != null) { 
-					
+				
+				if(nc < 0) {
+					nc = generateNcFromMessage(message);
+				}
+				String nextNonce = null;
+				if(useNextNonce) {
+					nextNonce = getSipSession().getSipSessionSecurity().getNextNonce();
+				} else {
+					nextNonce = proxyAuthHeader.getNonce();
+				}
 				AuthorizationHeader authorization = DigestAuthenticator.getAuthorizationHeader(
 						getMethod(),
 						this.getRequestURI().toString(),
@@ -2259,7 +2295,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						proxyAuthHeader,
 						authInfoEntry.getUserName(),
 						authInfoEntry.getPassword(),
-						getSipSession().getSipSessionSecurity().getNextNonce());
+						nextNonce,
+						nc);
 
 				authorizationHeaders.add(authorization);
 			} else {
@@ -2274,7 +2311,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			message.addHeader(header);
 		}
 	}
-	
+
 	// Issue 2354 : need to clone the original request to create the forked response
 	public Object clone() {
 		SipServletRequestImpl sipServletRequestImpl = new SipServletRequestImpl((Request)message, sipFactoryImpl, sipSession, getTransaction(), null, createDialog);

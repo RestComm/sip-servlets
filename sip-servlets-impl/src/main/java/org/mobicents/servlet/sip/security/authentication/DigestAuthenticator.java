@@ -434,7 +434,8 @@ public class DigestAuthenticator
                 Header 				  authHeader,
                 String       		  username,
                 String 				  password,
-                String 				  nonce)
+                String 				  nonce,
+                int 				  nc)
     {
         String response = null;
         HeaderFactory headerFactory = SipFactories.headerFactory;
@@ -483,8 +484,16 @@ public class DigestAuthenticator
         	opaque = authorizationHeader.getOpaque();
         }
         String qop = (qopList != null) ? "auth" : null;
-        String nc_value = "00000001";
-        String cnonce = "xyz";
+        //String nc_value = "00000001";
+        String nc_value = String.format("%08x", nc);
+        //String cnonce = "xyz";
+        long currentTime = System.currentTimeMillis();
+        String nOnceValue = currentTime + ":" + "mobicents" + response;
+        byte[] buffer = null;
+        synchronized (md5Helper) {
+            buffer = md5Helper.digest(nOnceValue.getBytes());
+        }
+        String cnonce = MD5_ECNODER.encode(buffer);
 
         try {
             response = MessageDigestResponseAlgorithm.calculateResponse(
@@ -529,7 +538,7 @@ public class DigestAuthenticator
             if (qop!=null) {
                 authorization.setQop(qop);
                 authorization.setCNonce(cnonce);
-                authorization.setNonceCount( Integer.parseInt(nc_value) );
+                authorization.setNonceCount( Integer.parseInt(nc_value, 16) );
             }
 
             authorization.setResponse(response);

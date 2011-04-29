@@ -180,6 +180,37 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);	
 		assertEquals(4, receiver.getLastRegisterCSeqNumber());
 	}
+
+	/*
+	 * Non regression test for Issue 2505
+	 * http://code.google.com/p/mobicents/issues/detail?id=2505
+	 * update nc in Authorization header for subsequent requests
+	 */
+	public void testShootistReinviteNextNonceAndNc() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender-app-send-reinvite-cache-credentials", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setChallengeRequests(true);
+		receiver.setTestNextNonce(true);		
+		receiver.setTestNC(true);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();		
+		
+		tomcat.startTomcat();
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("from", "sender-app-send-reinvite-cache-credentials");
+		params.put("nbSubsequentReq","4");
+		params.put("METHOD", "REGISTER");
+		deployApplication(params);
+		Thread.sleep(TIMEOUT);	
+		assertEquals(4, receiver.getLastRegisterCSeqNumber());
+	}
+	
 	
 	/*
 	 * Non regression test for Issue 1836 
