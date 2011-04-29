@@ -43,6 +43,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -324,10 +325,19 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		messageDispatcherFactory = new MessageDispatcherFactory(this);
 		congestionControlThreadPool = new ScheduledThreadPoolExecutor(2,
 				new ThreadPoolExecutor.CallerRunsPolicy());
-		congestionControlThreadPool.prestartAllCoreThreads();		
+		congestionControlThreadPool.prestartAllCoreThreads();	
+		logger.info("AsynchronousThreadPoolExecutor size is " + StaticServiceHolder.sipStandardService.getDispatcherThreadPoolSize());		
 		asynchronousExecutor = new ThreadPoolExecutor(StaticServiceHolder.sipStandardService.getDispatcherThreadPoolSize(), 64, 90, TimeUnit.SECONDS,
-				new LinkedBlockingQueue<Runnable>());
-		logger.info("AsynchronousThreadPoolExecutor size is " + StaticServiceHolder.sipStandardService.getDispatcherThreadPoolSize());
+				new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
+		            private int threadCount = 0;
+		
+		            public Thread newThread(Runnable pRunnable) {
+		            	Thread thread = new Thread(pRunnable, String.format("%s-%d",
+		                                "MSS-Executor-Thread", threadCount++));
+		            	thread.setPriority(((SipStackImpl)sipStack).getThreadPriority());
+		            	return thread;
+		            }
+        });		
 		asynchronousExecutor.setRejectedExecutionHandler(new RejectedExecutionHandler(){
 
 			public void rejectedExecution(Runnable r,
