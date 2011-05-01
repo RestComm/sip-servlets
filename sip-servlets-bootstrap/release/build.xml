@@ -286,7 +286,7 @@
 		<echo>Building Mobicents Simple Global Logging Configuration</echo>
 		<echo message="jboss.home= ${mss.home}"/>
 		<echo message="node= ${node}"/>
-		<copy overwrite="true" force="true" verbose="true" todir="${base.path}/target/dependencies/sglc/sar/target/mobicents-sglc/log4j-templates">
+		<copy overwrite="true" verbose="true" todir="${base.path}/target/dependencies/sglc/sar/target/mobicents-sglc/log4j-templates">
 		    <fileset dir="${base.path}/sglc-templates">
 		      <include name="**/*.xml.*"/>
 		    </fileset>
