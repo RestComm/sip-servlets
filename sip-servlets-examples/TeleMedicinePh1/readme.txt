@@ -9,21 +9,19 @@ Alternatively you can add a context entry in the tomcat's server.xml like this
 	<Context 
 	className="org.mobicents.servlet.sip.startup.SipStandardContext" 
 	configClass="org.mobicents.servlet.sip.startup.SipContextConfig" 
-	docBase="E:\workspaces\sip-servlets\sip-servlets-examples\tmph1\target\tmph1-1.0" 
+	docBase="E:\workspaces\sip-servlets\sip-servlets-examples\tmph1\TeleMedicinePh1\tmph1-1.0" 
 	name="tmph1-context" 
 	path="/tmph1">
 		<Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						
 	</Context> 
 
-use this as a DAR file (Service tag/darConfigurationFileLocation attribute in the tomcat's server.xml):
-file:///E:/workspaces/sip-servlets/sip-servlets-examples/tmph1/call-forwarding-b2bua-servlet-dar.properties
+
 
 To use:
 You can now run Tomcat or Jboss.
 Start two SIP Phones.
-One phone should be setup as forward-receiver on ip address 127.0.0.1 and port 5090   
+One phone should be setup as Doctor on with username receiver    
    
-The SIP phone doesn't have to be registered.
-We recommend using 3CX Phone, SJ Phone or WengoPhone. 
 
-From the first phone, make a call to sip:receiver@sip-servlets.com you should have the other phone ringing.
+
+From the first phone, make a call to sip:doctor you should have the other phone ringing.
