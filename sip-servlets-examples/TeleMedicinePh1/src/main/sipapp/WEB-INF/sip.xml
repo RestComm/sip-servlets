@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>org.mobicents.servlet.sip.example.TmPh1B2BUAApplication
+	</app-name>
+	<display-name>TeleMedicine Phase I B2BUA Sip Servlet</display-name>
+	<description>TeleMedicine Phase I B2BUA Sip Servlet</description>
+
+	<servlet-selection>
+		<main-servlet>
+			TmPh1B2BUASipServlet
+		</main-servlet>
+	</servlet-selection>
+
+	<session-config>
+		<session-timeout>4</session-timeout>
+	</session-config>
+
+	<servlet>
+		<servlet-name>TmPh1B2BUASipServlet</servlet-name>
+		<display-name>TmPh1B2BUASipServlet</display-name>
+		<description>TeleMedicine Phase B2BUA SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.example.TmPh1B2BUASipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+</sip-app>
