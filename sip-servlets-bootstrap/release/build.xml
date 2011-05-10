@@ -80,11 +80,11 @@
 		<copy file="${base.path}/mss-sip-stack.properties" tofile="${tomcat.home}/conf/mss-sip-stack.properties" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean buildnumber:create install -U -P set-svn-revision -DCATALINA_HOME=${tomcat.home} -P tomcat-distro,docs" />
+			<arg line="clean buildnumber:create install -U -P set-svn-revision,validate-source-headers -DCATALINA_HOME=${tomcat.home} -P tomcat-distro,docs" />
 		</exec>
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
-			<arg line="clean install -U -P set-svn-revision" />
+			<arg line="clean install -U -P set-svn-revision,validate-source-headers" />
 		</exec>
 		
 		<copy tofile="${tomcat.home}/webapps/click2call.war">
@@ -117,7 +117,7 @@
 			<property name="jboss.config" value="default"/>
 		</ant>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/diameter-event-charging">
-			<arg line="clean install -U -P set-svn-revision" />
+			<arg line="clean install -U -P set-svn-revision,validate-source-headers" />
 		</exec>		
 		<copy tofile="${jboss-5-jdk6.home}/server/default/deploy/diameter-event-charging.war">
 			<fileset dir="${base.path}/../../sip-servlets-examples/diameter-event-charging/target/" includes="diameter-event-charging-*.war" />
@@ -128,7 +128,7 @@
 		</antcall>
 		<!-- include JSR309 media example -->
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet">
-			<arg line="clean install -U -P set-svn-revision" />
+			<arg line="clean install -U -P set-svn-revision,validate-source-headers" />
 		</exec>
 		<copy tofile="${jboss-5-jdk6.home}/server/default/deploy/media-jsr309-servlet.war">
 			<fileset dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet/target/" includes="media-jsr309-servlet.war" />
@@ -142,7 +142,7 @@
 		</antcall>
 		<!-- include Click to Call example -->
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
-			<arg line="clean install -U -P set-svn-revision" />
+			<arg line="clean install -U -P set-svn-revision,validate-source-headers" />
 		</exec>
 				
 		<copy tofile="${jboss-5-jdk6.home}/server/default/deploy/click2call.war">
@@ -167,7 +167,7 @@
 		<copy file="${base.path}/jboss-5-log4j.xml" overwrite="true" tofile="${mss.home}/server/${jboss.config}/conf/jboss-log4j.xml" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean buildnumber:create install -U -P set-svn-revision,jboss-5-distro,docs -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
+			<arg line="clean buildnumber:create install -U -P set-svn-revision,validate-source-headers,jboss-5-distro,docs -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
 		</exec>		
 		
 		<antcall target="build-mobicents-sglc">
@@ -209,7 +209,7 @@
 		<copy overwrite="true" file="${base.path}/failover-war-deployers-jboss-beans.xml" tofile="${mss.home}/server/${jboss.config}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click2call-distributable">
-			<arg line="clean install -U -P set-svn-revision" />
+			<arg line="clean install -U -P set-svn-revision,validate-source-headers" />
 		</exec>
 									
 		<copy tofile="${mss.home}/server/all/deploy/click2call-distributable.war">
@@ -223,7 +223,7 @@
 	<target name="deploy-mgmnt">
 		<property name="management.home" location="${base.path}/../../sip-servlets-management/"/>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${management.home}">
-			<arg line="clean install -U -P set-svn-revision" />
+			<arg line="clean install -U -P set-svn-revision,validate-source-headers" />
 		</exec>
 		<copy file="${management.home}/target/sip-servlets-management-${mss.release.version}.war" tofile="${management.deploy.folder}/sip-servlets-management.war"/>
 	</target>
@@ -266,10 +266,10 @@
 	<target name="build-mobicents-sip-load-balancer" depends="get-deps">
 		<echo>Building Mobicents SIP Load Balancer</echo>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/sip-balancer/jar">
-			<arg line="clean install -P set-svn-revision -Dmaven.test.skip=true" />
+			<arg line="clean install -P set-svn-revision,validate-source-headers -Dmaven.test.skip=true" />
 		</exec>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/sip-balancer/docs">
-			<arg line="clean install -P set-svn-revision,maven-release -Dmaven.test.skip=true" />
+			<arg line="clean install -P set-svn-revision,validate-source-headers,maven-release -Dmaven.test.skip=true" />
 		</exec>
 		<copy tofile="${mss.home}/sip-balancer/sip-balancer-jar-with-dependencies.jar">
 			<fileset dir="${base.path}/target/dependencies/sip-balancer/jar/target/" includes="sip-balancer-*-jar-with-dependencies.jar" />
@@ -292,7 +292,7 @@
 		    </fileset>
 		  </copy>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/sglc">
-			<arg line="clean install -P set-svn-revision -Dmaven.test.skip=true -Djboss.home=${mss.home} -Dnode=${node}" />
+			<arg line="clean install -P set-svn-revision,validate-source-headers -Dmaven.test.skip=true -Djboss.home=${mss.home} -Dnode=${node}" />
 		</exec>			
 	</target>
 	
