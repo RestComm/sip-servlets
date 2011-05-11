@@ -175,7 +175,7 @@ public class SubscriberSipServlet
 				logger.error(e);
 			}	
 		}
-		if(state != null && state.contains("Terminated") && request.getSession().getAttribute(TEST_SAME_CONTAINER_USER_NAME) != null) {
+		if(state != null && state.contains("terminated") && request.getSession().getAttribute(TEST_SAME_CONTAINER_USER_NAME) != null) {
 			if(request.getSession().getAttribute("byeReceived") == null) {
 				request.getSession().createRequest("BYE").send();
 				SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
