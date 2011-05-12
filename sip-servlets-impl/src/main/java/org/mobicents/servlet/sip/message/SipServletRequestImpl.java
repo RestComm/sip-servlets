@@ -1027,27 +1027,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
     				logger.debug("Can not send CANCEL because no responses arrived. " +
     						"Can not stop retransmissions. The transaction is null");
     			}
-	    	} 
-			
-			if(hop != null && sipFactoryImpl.getSipApplicationDispatcher().isExternal(hop.getHost(), hop.getPort(), hop.getTransport())) {				
-				javax.sip.address.SipURI nextHopUri = SipFactories.addressFactory.createSipURI(null, hop.getHost());
-				nextHopUri.setLrParam();
-				nextHopUri.setPort(hop.getPort());
-				if(hop.getTransport() != null) {
-					nextHopUri.setTransportParam(hop.getTransport());
-				}
-				// Deal with http://code.google.com/p/mobicents/issues/detail?id=2346
-				nextHopUri.setParameter(DNSAwareRouter.DNS_ROUTE, Boolean.TRUE.toString());
-				final javax.sip.address.Address nextHopRouteAddress = 
-					SipFactories.addressFactory.createAddress(nextHopUri);
-				final RouteHeader nextHopRouteHeader = 
-					SipFactories.headerFactory.createRouteHeader(nextHopRouteAddress);
-				if(logger.isDebugEnabled()) {
-			    	logger.debug("Adding next hop found by RFC 3263 lookups as route header" + nextHopRouteHeader);			    	
-			    }
-			
-				request.addFirst(nextHopRouteHeader);
-			}
+	    	} 						
 			
 			// adding via header and update via branch if null
 			checkViaHeaderAddition();
@@ -1068,10 +1048,15 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			checkViaHeaderUpdateForStaticExternalAddressUsage(sipConnector);
 			
 			if(Request.ACK.equals(requestMethod)) {
+				// DNS Route need to be added for ACK
+				// See RFC 3263 : "Because the ACK request for 2xx responses to INVITE constitutes a
+				// different transaction, there is no requirement that it be delivered
+				// to the same server that received the original request"
+				addDnsRoute(hop, request);
 				sendAck(transport, sipConnector, matchingListeningPoint);
 				return;
 			}						
-			
+			boolean addDNSRoute = true;
 			//Added for initial requests only (that are not REGISTER) not for subsequent requests 
 			if(isInitial() && !Request.REGISTER.equalsIgnoreCase(requestMethod)) {
 				final SipApplicationRouterInfo routerInfo = sipFactoryImpl.getNextInterestedApplication(this);
@@ -1083,6 +1068,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					//add a route header to direct the request back to the container 
 					//to check if there is any other apps interested in it
 					addInfoForRoutingBackToContainer(routerInfo, session.getSipApplicationSession().getKey().getId(), session.getKey().getApplicationName());
+					addDNSRoute = false;
 				} else {
 					if(logger.isDebugEnabled()) {
 						logger.debug("routing outside the container " +
@@ -1091,6 +1077,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					//Adding Route Header for LB if we are in a HA configuration
 					if(sipFactoryImpl.isUseLoadBalancer() && isInitial) {
 						sipFactoryImpl.addLoadBalancerRouteHeader(request);
+						addDNSRoute = false;
 						if(logger.isDebugEnabled()) {
 							logger.debug("adding route to Load Balancer since we are in a HA configuration " +
 									" and no more apps are interested.");
@@ -1098,6 +1085,12 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					}
 				}
 			}
+			
+			if(addDNSRoute) {
+				// we add the DNS Route only if we don't redirect back to the container or if there is no outgoing load balancer defined
+				addDnsRoute(hop, request);
+			}
+			
 			if(logger.isDebugEnabled()) {
 				getSipSession().getSipApplicationSession().getSipContext().getSipManager().dumpSipSessions();
 			}
@@ -1268,6 +1261,34 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 			throw new IllegalStateException("Error sending request " + request,ex);
 		} 
+	}
+
+	/**
+	 * 
+	 * @param hop
+	 * @param request	
+	 */
+	private void addDnsRoute(Hop hop, final Request request)
+			throws ParseException, SipException {
+		if(hop != null && sipFactoryImpl.getSipApplicationDispatcher().isExternal(hop.getHost(), hop.getPort(), hop.getTransport())) {	
+			javax.sip.address.SipURI nextHopUri = SipFactories.addressFactory.createSipURI(null, hop.getHost());
+			nextHopUri.setLrParam();
+			nextHopUri.setPort(hop.getPort());
+			if(hop.getTransport() != null) {
+				nextHopUri.setTransportParam(hop.getTransport());
+			}
+			// Deal with http://code.google.com/p/mobicents/issues/detail?id=2346
+			nextHopUri.setParameter(DNSAwareRouter.DNS_ROUTE, Boolean.TRUE.toString());
+			final javax.sip.address.Address nextHopRouteAddress = 
+				SipFactories.addressFactory.createAddress(nextHopUri);
+			final RouteHeader nextHopRouteHeader = 
+				SipFactories.headerFactory.createRouteHeader(nextHopRouteAddress);
+			if(logger.isDebugEnabled()) {
+				logger.debug("Adding next hop found by RFC 3263 lookups as route header" + nextHopRouteHeader);			    	
+			}
+	
+			request.addFirst(nextHopRouteHeader);
+		}
 	}
 
 	/**
