@@ -71,6 +71,8 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 	
 	protected MobicentsSipApplicationSession getNewMobicentsSipApplicationSession(
 			SipApplicationSessionKey key, SipContext sipContext, boolean recreate) {
+		MobicentsSipApplicationSession sipApplicationSessionImpl = null;
+		
 		ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session = null;				
 		
 		if(!recreate) {
@@ -84,21 +86,42 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 		} else {
 			session = new SessionBasedClusteredSipApplicationSession(key,sipContext, useJK);
 		}
-		clusteredSipManager.getDistributedCacheConvergedSipManager().sipApplicationSessionCreated(key.getId());		
-		MobicentsSipApplicationSession sipApplicationSessionImpl = sipApplicationSessions.putIfAbsent(key, session);
-		if (sipApplicationSessionImpl == null) {
-			// put succeeded, use new value
-			if(logger.isDebugEnabled()) {
-				logger.debug("Adding a recreated sip application session with the key : " + key);
-			}
-            sipApplicationSessionImpl = session;
-            final String appGeneratedKey = key.getAppGeneratedKey(); 
-    		if(appGeneratedKey != null) {    		
-            	sipApplicationSessionsByAppGeneratedKey.putIfAbsent(appGeneratedKey, sipApplicationSessionImpl);
+		clusteredSipManager.getDistributedCacheConvergedSipManager().sipApplicationSessionCreated(key.getId());
+		final String appGeneratedKey = key.getAppGeneratedKey(); 
+		// Fix for Issue http://code.google.com/p/mobicents/issues/detail?id=2521
+		// in case od appGeneratedKey use the sipApplicationSessionsByAppGeneratedKey to ensure uniqueness
+		if(appGeneratedKey != null) {    		
+			// gurantees uniqueness on the appgeneratedkey
+        	sipApplicationSessionImpl = sipApplicationSessionsByAppGeneratedKey.putIfAbsent(appGeneratedKey, session);
+        	if (sipApplicationSessionImpl == null) {
+    			sipApplicationSessions.putIfAbsent(key, session);
+    			if(!recreate) {
+    				scheduleExpirationTimer(session);
+    			}
+    			// put succeeded, use new value
+    			if(logger.isDebugEnabled()) {
+    				logger.debug("Adding a sip application session with the key : " + key);
+    			}
+    			session.setNew(true);
+        		((ClusteredSipApplicationSession<OutgoingDistributableSessionData>)session).clearOutdated();
+                sipApplicationSessionImpl = session;                
             }
-    		session.setNew(true);
-    		((ClusteredSipApplicationSession<OutgoingDistributableSessionData>)session).clearOutdated();
-        }				
+        } else {        	
+    		sipApplicationSessionImpl = sipApplicationSessions.putIfAbsent(key, session);
+    		if (sipApplicationSessionImpl == null) {
+    			if(!recreate) {
+    				scheduleExpirationTimer(session);
+    			}
+    			// put succeeded, use new value
+    			if(logger.isDebugEnabled()) {
+    				logger.debug("Adding a sip application session with the key : " + key);
+    			}
+    			session.setNew(true);
+        		((ClusteredSipApplicationSession<OutgoingDistributableSessionData>)session).clearOutdated();
+                sipApplicationSessionImpl = session;
+                
+            }
+        }		
 		return sipApplicationSessionImpl;
 	}
 
