@@ -91,13 +91,12 @@ public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 	/**
 	 * Whether this timer is persistent.
 	 */
-	private boolean persistent = true;
+	private boolean persistent = false;
 
 	/**
 	 * Whether this timer has been successfully cancelled. Used for debugging.
 	 */
-	@SuppressWarnings("unused")
-	private Boolean isCanceled = null;
+	private boolean isCanceled = false;
 
 	/**
 	 * Timer unique id
@@ -184,11 +183,11 @@ public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 			if (future != null) {
 				// need to force cancel to get rid of
 				// the task which is currently scheduled
-				boolean res = future.cancel(mayInterruptIfRunning);
+				future.cancel(mayInterruptIfRunning);
+				isCanceled = true;
 				// used for debugging/optimizeIt purpose
 				// kan be kept in production code since object should
 				// be due for gc anyway....
-				isCanceled = Boolean.valueOf(res);
 				appSessionToCancelThisTimersFrom = getApplicationSession();
 				future = null;
 			}
@@ -363,6 +362,13 @@ public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 		synchronized (TIMER_LOCK) {
 			return scheduledExecutionTime - System.currentTimeMillis();
 		}
+	}
+
+	/**
+	 * @return the isCanceled
+	 */
+	public boolean isCanceled() {
+		return isCanceled;
 	}
 
 }

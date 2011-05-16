@@ -34,5 +34,6 @@ import org.mobicents.servlet.sip.core.timers.SipServletTimerService;
 public interface ClusteredSipServletTimerService extends SipServletTimerService {
 
 	ServletTimer rescheduleTimerLocally(MobicentsSipApplicationSession sipApplicationSession, String timerId);
+	void cancel(String id);
 
 }

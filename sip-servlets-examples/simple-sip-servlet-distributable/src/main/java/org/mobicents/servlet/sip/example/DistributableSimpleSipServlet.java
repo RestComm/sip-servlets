@@ -59,14 +59,16 @@ public class DistributableSimpleSipServlet
 	
 	private static final String CALLEE_SEND_BYE = "yousendbye";	
 	private static final String SAS_TIMER_SEND_BYE = "sastimersendbye";
+	private static final String CANCEL_SERVLET_TIMER = "cancelservlettimer";
 	
 	private static final String NO_ATTRIBUTES = "NoAttributes";
 	private static final String REMOVE_ATTRIBUTES = "RemoveAttributes";
 	
 	//60 sec
 	private static final int DEFAULT_BYE_DELAY = 60000;
-	
 	private int byeDelay = DEFAULT_BYE_DELAY;
+	
+	ServletTimer servletTimer = null;
 	
 	/** Creates a new instance of SimpleProxyServlet */
 	public DistributableSimpleSipServlet() {
@@ -132,6 +134,9 @@ public class DistributableSimpleSipServlet
 			timer.createTimer(request.getApplicationSession(), byeDelay, false, request.getSession().getId());
 		} else if ((((SipURI)request.getTo().getURI()).getUser()).contains(SAS_TIMER_SEND_BYE)) {
 			request.getSession().getApplicationSession().setExpires(1);
+		} else if ((((SipURI)request.getTo().getURI()).getUser()).contains(CANCEL_SERVLET_TIMER)) {
+			TimerService timer = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);			
+			servletTimer = timer.createTimer(request.getApplicationSession(), byeDelay, false, request.getSession().getId());
 		}
 	}
 
@@ -191,6 +196,14 @@ public class DistributableSimpleSipServlet
 			sipServletResponse.send();
 		}
 	}
+	
+	@Override
+	protected void doAck(SipServletRequest req) throws ServletException,
+			IOException {
+		if ((((SipURI)req.getTo().getURI()).getUser()).contains(CANCEL_SERVLET_TIMER)) {						
+			servletTimer.cancel();
+		}
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -199,7 +212,7 @@ public class DistributableSimpleSipServlet
 			throws ServletException, IOException {
 		if(logger.isInfoEnabled()) {
 			logger.info("Distributable Simple Servlet: Got response:\n" + response);
-		}
+		}		
 		if(SipServletResponse.SC_OK == response.getStatus() && "BYE".equalsIgnoreCase(response.getMethod())) {
 			SipApplicationSession sipApplicationSession = response.getApplicationSession(false);
 			if(sipApplicationSession != null && sipApplicationSession.isValid()) {

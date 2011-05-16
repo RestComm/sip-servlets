@@ -29,9 +29,11 @@ import javax.servlet.sip.SipApplicationSession;
 
 import org.apache.log4j.Logger;
 import org.jboss.web.tomcat.service.session.ClusteredSipManager;
+import org.jboss.web.tomcat.service.session.ClusteredSipServletTimerService;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SipManager;
+import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.timers.TimerTask;
 
 /**
@@ -60,6 +62,9 @@ public class TimerServiceTask extends TimerTask implements MobicentsServletTimer
 					logger.debug("sip application session for key " + data.getKey() + " was found");
 				} 			
 				this.servletTimer = new ServletTimerImpl(data.getData(), data.getDelay(), sipApplicationSession.getSipContext().getListeners().getTimerListener(), sipApplicationSession);
+				if(logger.isDebugEnabled()) {				
+					logger.debug("ServletTimer recreated for TimerServiceTask " + data.getTaskID() + " with ServletTimerId " + servletTimer.getId());
+				} 	
 			} else {
 				if(logger.isDebugEnabled()) {
 					logger.debug("sip application session for key " + data.getKey() + " was not found neither locally or in the cache, sip servlet timer recreation will be problematic");
@@ -85,7 +90,13 @@ public class TimerServiceTask extends TimerTask implements MobicentsServletTimer
 	}
 
 	public void cancel() {
-		servletTimer.cancel();
+		if(servletTimer != null && !servletTimer.isCanceled()) {
+			if(logger.isDebugEnabled()) {				
+				logger.debug("Cancelling TimerServiceTask " + data.getTaskID() + " for servletTimerId " + servletTimer.getId());
+			} 	
+			((ClusteredSipServletTimerService)((SipContext)sipManager.getContainer()).getTimerService()).cancel(servletTimer.getId());
+			servletTimer.cancel();
+		} 
 	}
 	
 	public void cancel(boolean mayInterruptIfRunning, boolean updateAppSessionReadyToInvalidateState) {

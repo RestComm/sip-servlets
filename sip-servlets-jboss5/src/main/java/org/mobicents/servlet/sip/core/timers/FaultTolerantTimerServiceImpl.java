@@ -79,7 +79,7 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 		if (!sipApplicationSessionImpl.hasTimerListener()) {
 			throw new IllegalStateException("No Timer listeners have been configured for this application ");
 		}
-		ServletTimerImpl servletTimer = createTimerLocaly(delay, isPersistent, info, sipApplicationSessionImpl);				
+		TimerServiceTask servletTimer = createTimerLocaly(delay, isPersistent, info, sipApplicationSessionImpl);				
 		
 		return servletTimer;
 	}
@@ -104,7 +104,7 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 		if (!sipApplicationSessionImpl.hasTimerListener()) {
 			throw new IllegalStateException("No Timer listeners have been configured for this application ");
 		}		
-		ServletTimerImpl servletTimer = createTimerLocaly(delay, period, fixedDelay,isPersistent, info,sipApplicationSessionImpl);			
+		TimerServiceTask servletTimer = createTimerLocaly(delay, period, fixedDelay,isPersistent, info,sipApplicationSessionImpl);			
 		
 		return servletTimer;
 	}
@@ -118,7 +118,7 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 	 * @param sipApplicationSession
 	 * @return
 	 */
-	private ServletTimerImpl createTimerLocaly(long delay,
+	private TimerServiceTask createTimerLocaly(long delay,
 			boolean isPersistent, Serializable info, MobicentsSipApplicationSession sipApplicationSession) {
 		
 		final TimerListener listener = sipApplicationSession.getSipContext().getListeners().getTimerListener();
@@ -131,7 +131,7 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 		if (isPersistent) {
 			persist(servletTimer);
 		} 
-		return servletTimer;
+		return timerServiceTask;
 	}
 	/**
 	 * 
@@ -144,7 +144,7 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 	 * @param sipApplicationSession
 	 * @return
 	 */
-	private ServletTimerImpl createTimerLocaly(long delay, 
+	private TimerServiceTask createTimerLocaly(long delay, 
 			long period, boolean fixedDelay, boolean isPersistent,
 			Serializable info, MobicentsSipApplicationSession sipApplicationSession) {
 		final TimerListener listener = sipApplicationSession.getSipContext().getListeners().getTimerListener();
@@ -162,7 +162,7 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 		if (isPersistent) {			
 			persist(servletTimer);
 		} 
-		return servletTimer;
+		return timerServiceTask;
 	}
 
 	/**
@@ -211,6 +211,13 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 		return started.get();
 	}
 
+	public void cancel(String timerId) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("Cancelling ServletTimer " + timerId);
+		}
+		getScheduler().cancel(timerId);
+	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see org.jboss.web.tomcat.service.session.ClusteredSipServletTimerService#rescheduleTimerLocally(org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession, java.lang.String)
@@ -224,8 +231,8 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 				if(logger.isDebugEnabled()) {
 					logger.debug("Task " + timerId + " is not present locally, but on another node, cancelling the remote one and rescheduling it locally.");
 				}
-				// we cancel it, this will cause the remote owner node to remove it and cancel its local task 
-				getScheduler().cancel(timerId);
+				// we cancel it, this will cause the remote owner node to remove it and cancel its local task
+				cancel(timerId);
 				// we recreate the task locally 
 				ServletTimerImpl servletTimerImpl = new ServletTimerImpl(timerTaskData.getData(), timerTaskData.getDelay(), sipApplicationSession.getSipContext().getListeners().getTimerListener(), sipApplicationSession);
 				TimerServiceTask timerServiceTask = new TimerServiceTask(sipManager, servletTimerImpl, timerTaskData);
