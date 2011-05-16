@@ -795,16 +795,27 @@ public class TestSipListener implements SipListener {
 //			}
 //			
 //			this.dialogs.add(dialog);
-			logger.info("Dialog State = " + dialog.getState());
+			if(dialog != null) {
+				logger.info("Dialog State = " + dialog.getState());
+			}
 			
 			Response response = protocolObjects.messageFactory.createResponse(200, notify);
 			// SHOULD add a Contact
-			ContactHeader contact = (ContactHeader) contactHeader.clone();
-			((SipURI)contact.getAddress().getURI()).setParameter( "id", "sub" );
+			ContactHeader contact = null;
+			if(contactHeader != null) {
+				contact = (ContactHeader) contactHeader.clone();
+			} else {
+				SipURI contactURI = protocolObjects.addressFactory.createSipURI(null, "127.0.0.1");
+				contactURI.setPort(listeningPoint.getPort());
+				Address contactAddress = protocolObjects.addressFactory.createAddress(contactURI);
+				contact = protocolObjects.headerFactory.createContactHeader(contactAddress);
+			}
 			response.addHeader( contact );
 			logger.info("Transaction State = " + serverTransactionId.getState());
 			serverTransactionId.sendResponse(response);
-			logger.info("Dialog State = " + dialog.getState());
+			if(dialog != null) {
+				logger.info("Dialog State = " + dialog.getState());
+			}
 			SubscriptionStateHeader subscriptionState = (SubscriptionStateHeader) notify
 					.getHeader(SubscriptionStateHeader.NAME);
 

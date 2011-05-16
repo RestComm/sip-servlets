@@ -27,13 +27,17 @@ import java.io.IOException;
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
+import javax.servlet.sip.SipServletContextEvent;
+import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 
@@ -42,7 +46,7 @@ import org.apache.log4j.Logger;
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
-public class NotifierSipServlet extends SipServlet implements SipSessionListener {
+public class NotifierSipServlet extends SipServlet implements SipSessionListener, SipServletListener {
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(NotifierSipServlet.class);
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
@@ -163,6 +167,30 @@ public class NotifierSipServlet extends SipServlet implements SipSessionListener
 			} catch (IOException e) {
 				logger.error("Exception occured while sending the request",e);			
 			}
+		}
+	}
+
+	public void servletInitialized(SipServletContextEvent ce) {
+		if(ce.getServletContext().getInitParameter("sendUnsollictedNotify") != null) {
+			SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);
+			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
+			
+			URI fromURI = sipFactory.createSipURI("UnsollictedNotify", "here.com");
+			URI toURI =  sipFactory.createSipURI("LittleGuy", "there.com");
+			SipServletRequest sipServletRequest = 
+				sipFactory.createRequest(sipApplicationSession, "NOTIFY", fromURI, toURI);
+			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
+			sipServletRequest.addHeader("Event", "aastra-xml");
+			sipServletRequest.addHeader("Subscription-State", "pending");
+			try {	
+				sipServletRequest.setContent("<AastraIPPhoneExecute><ExecuteItem URI=\"http://192.168.10.1/XMLTests/SampleTextScreen.xml\"/></AastraIPPhoneExecute>", "application/xml");
+				sipServletRequest.setRequestURI(requestURI);
+				sipServletRequest.getSession().setAttribute("sendUnsollictedNotify", Boolean.TRUE);
+				logger.info("session id " + sipServletRequest.getSession().getId());				
+				sipServletRequest.send();
+			} catch (IOException e) {
+				logger.error("Unexpected exception while sending the request " + sipServletRequest, e);
+			}					
 		}
 	}
 }

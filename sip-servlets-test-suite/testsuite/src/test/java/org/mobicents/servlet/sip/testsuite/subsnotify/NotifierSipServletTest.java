@@ -24,16 +24,19 @@ package org.mobicents.servlet.sip.testsuite.subsnotify;
 
 import gov.nist.javax.sip.header.SubscriptionState;
 
-import java.text.ParseException;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.sip.InvalidArgumentException;
-import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.message.Request;
 
+import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.startup.SipContextConfig;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -59,6 +62,7 @@ public class NotifierSipServletTest extends SipServletTestCase {
 	
 	public NotifierSipServletTest(String name) {
 		super(name);
+		autoDeployOnStartup = false;
 	}
 
 	@Override
@@ -66,6 +70,21 @@ public class NotifierSipServletTest extends SipServletTestCase {
 		assertTrue(tomcat.deployContext(
 				projectHome + "/sip-servlets-test-suite/applications/notifier-servlet/src/main/sipapp",
 				"sip-test-context", "sip-test"));
+	}
+	
+	public SipStandardContext deployApplication(String name, String value) {
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/notifier-servlet/src/main/sipapp");
+		context.setName("sip-test-context");
+		context.setPath("sip-test");
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		ApplicationParameter applicationParameter = new ApplicationParameter();
+		applicationParameter.setName(name);
+		applicationParameter.setValue(value);
+		context.addApplicationParameter(applicationParameter);
+		assertTrue(tomcat.deployContext(context));
+		return context;
 	}
 
 	@Override
@@ -75,23 +94,8 @@ public class NotifierSipServletTest extends SipServletTestCase {
 	}
 	
 	@Override
-	protected void setUp() {
-		try {
-			super.setUp();						
-			
-			senderProtocolObjects =new ProtocolObjects(
-					"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
-						
-			sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
-			SipProvider senderProvider = sender.createProvider();			
-			
-			senderProvider.addSipListener(sender);
-			
-			senderProtocolObjects.start();			
-		} catch (Exception ex) {
-			ex.printStackTrace();
-			fail("unexpected exception ");
-		}
+	protected void setUp() throws Exception {
+		super.setUp();							
 	}
 	
 	/*
@@ -99,7 +103,18 @@ public class NotifierSipServletTest extends SipServletTestCase {
 	 * Check that everything works correctly included the Sip Session Termination upon sending a NOTIFY
 	 * containing Subscription State of Terminated.
 	 */
-	public void testNotify() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+	public void testNotify() throws Exception {
+		senderProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		SipProvider senderProvider = sender.createProvider();			
+		
+		senderProvider.addSipListener(sender);
+		
+		senderProtocolObjects.start();
+		
+		deployApplication();
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -119,6 +134,27 @@ public class NotifierSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getAllMessagesContent().size() >= 1);
 		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));		
+	}
+	
+	/*
+	 * Test the fact that a sip servlet send an unsollicited NOTIFY 
+	 */
+	public void testSendUnsollicitedNotify() throws Exception {
+		Map<String, String> properties = new HashMap<String, String>();
+		properties.put("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
+		senderProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null, properties);
+					
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();			
+		
+		senderProvider.addSipListener(sender);
+		
+		senderProtocolObjects.start();
+		
+		deployApplication("sendUnsollictedNotify", "true");
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.allRequests.size() >= 1);			
 	}
 
 	@Override

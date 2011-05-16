@@ -49,7 +49,7 @@ public class SameContainerRoutingServletTest extends SipServletTestCase {
 	
 	private static transient Logger logger = Logger.getLogger(SameContainerRoutingServletTest.class);
 	
-	private static final int TIMEOUT = 30000;
+	private static final int TIMEOUT = 40000;
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
 	
