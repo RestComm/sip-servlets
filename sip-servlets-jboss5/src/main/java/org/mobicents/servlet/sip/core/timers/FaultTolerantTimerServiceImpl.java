@@ -219,28 +219,31 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 		TimerTask timerTask = getScheduler().getLocalRunningTask(timerId);
 		if(timerTask == null) {
 			TimerServiceTaskData timerTaskData = (TimerServiceTaskData) getScheduler().getTimerTaskData(timerId);
-			// we recreate the task locally 
-			ServletTimerImpl servletTimerImpl = new ServletTimerImpl(timerTaskData.getData(), timerTaskData.getDelay(), sipApplicationSession.getSipContext().getListeners().getTimerListener(), sipApplicationSession);
-			TimerServiceTask timerServiceTask = new TimerServiceTask(sipManager, servletTimerImpl, timerTaskData);
 			
 			if(timerTaskData != null) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Task " + timerId + " is not present locally, but on another node, cancelling the remote one and rescheduling it locally.");
 				}
 				// we cancel it, this will cause the remote owner node to remove it and cancel its local task 
-				getScheduler().cancel(timerId);				
+				getScheduler().cancel(timerId);
+				// we recreate the task locally 
+				ServletTimerImpl servletTimerImpl = new ServletTimerImpl(timerTaskData.getData(), timerTaskData.getDelay(), sipApplicationSession.getSipContext().getListeners().getTimerListener(), sipApplicationSession);
+				TimerServiceTask timerServiceTask = new TimerServiceTask(sipManager, servletTimerImpl, timerTaskData);
+				
 				// and reset its start time to the correct one
 				timerServiceTask.beforeRecover();				
 				// and reschedule it locally
 				getScheduler().schedule(timerServiceTask);
+				return timerServiceTask;
 			} else {
-				if(logger.isDebugEnabled()) {
-					logger.debug("Task " + timerId + " is not present locally, nor on another node, rescheduling it.");
-				}
+//				if(logger.isWarningEnabled()) {
+					logger.warn("Task " + timerId + " is not present locally, nor on another node, not possible to reschedule it.");
+//				}
+				return null;
 				// and reschedule it locally
-				getScheduler().schedule(timerServiceTask);
+//				getScheduler().schedule(timerServiceTask);
 			}
-			return timerServiceTask;
+//			return timerServiceTask;
 		} else {
 			if(logger.isInfoEnabled()) {
 				logger.info("Task " + timerId + " is already present locally no need to reschedule it.");
