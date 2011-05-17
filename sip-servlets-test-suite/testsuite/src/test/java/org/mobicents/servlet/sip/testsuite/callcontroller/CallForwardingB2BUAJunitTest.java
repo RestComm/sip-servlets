@@ -132,6 +132,45 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		assertTrue(sender.getAllMessagesContent().contains("sipApplicationSessionReadyToBeInvalidated"));
 	}
 	
+	public void testCallForwardingToItself() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-myself";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+				
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+		sender.setTimeToWaitBeforeBye(TIMEOUT*2);
+		Thread.sleep(TIMEOUT*2);
+		assertTrue(receiver.isAckReceived());
+		Thread.sleep(TIMEOUT*4);
+		assertTrue(sender.getOkToByeReceived());
+		assertTrue(receiver.getByeReceived());		
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		assertEquals(2, sender.getAllMessagesContent().size());
+		assertTrue(sender.getAllMessagesContent().contains("sipApplicationSessionReadyToBeInvalidated"));
+	}
+	
 	/*
 	 * non regression test for Issue 2419 
 	 */
