@@ -51,5 +51,5 @@ public @interface SipApplication {
 	
 	int proxyTimeout() default 180;
 	
-	int sessionTimeout() default 180;
+	int sessionTimeout() default 3;
 }
