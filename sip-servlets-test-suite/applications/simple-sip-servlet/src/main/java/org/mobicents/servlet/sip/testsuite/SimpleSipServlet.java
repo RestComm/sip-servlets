@@ -69,9 +69,11 @@ public class SimpleSipServlet
 		extends SipServlet 
 		implements SipErrorListener, TimerListener, SipConnectorListener, SipSessionListener, SipApplicationSessionListener, SipServletListener {
 	
+	private static transient Logger logger = Logger.getLogger(SimpleSipServlet.class);
+	
 	private static final String TEST_EXCEPTION_ON_EXPIRE = "exceptionOnExpire";
 	private static final String TEST_BYE_ON_EXPIRE = "byeOnExpire";
-	private static transient Logger logger = Logger.getLogger(SimpleSipServlet.class);
+	private static final String CLONE_URI = "cloneURI";	
 	private static final long serialVersionUID = 1L;
 	private static final String TEST_PRACK = "prack";
 	private static final String TEST_ERROR_RESPONSE = "testErrorResponse";
@@ -150,6 +152,42 @@ public class SimpleSipServlet
 		logger.info("from : " + fromString);
 		logger.info("Got request: "
 				+ request.getMethod());	
+		
+		if(fromString.contains(TEST_SYSTEM_HEADER_MODIFICATION)) {
+			SipServletResponse res = request.createResponse(SipServletResponse.SC_OK);
+			Address contact = res.getAddressHeader("Contact");
+			SipURI uri = (SipURI)contact.getURI();
+			// Illegal Operation 1
+			try {
+				uri.setHost("foo.com");
+				logger.error("can modify host of the Contact URI, this shouldn't be allowed");
+				request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR).send();
+				return;
+			} catch (IllegalArgumentException e) {
+				// good 
+			}
+			
+			// IllegalOperation 2
+			try {
+				SipURI from = (SipURI)res.getAddressHeader("From").getURI();
+				from.setHost("bar.com");
+				logger.error("can modify host of the From URI, this shouldn't be allowed");
+				request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR).send();
+				return;
+			} catch (IllegalArgumentException e) {
+				// good 
+			}			
+			res.send();
+			return;
+		}
+		
+		if(fromString.contains(CLONE_URI)) {			
+			URI from = request.getFrom().getURI();
+			SipURI clonedFrom = (SipURI)from.clone();
+			
+			for (final Iterator<String> parameterNames = from.getParameterNames(); parameterNames.hasNext();)
+	            clonedFrom.removeParameter(parameterNames.next());
+		}
 		
 		if(fromString.contains(TEST_SYSTEM_HEADER_MODIFICATION)) {
 			SipServletResponse res = request.createResponse(SipServletResponse.SC_OK);

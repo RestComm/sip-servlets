@@ -141,12 +141,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);
-				
-//		String toUser = "receiver";
-//		String toSipAddress = "sip-servlets.com";
-//		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
-//				toUser, toSipAddress);
-		
+						
 		URI toAddress = senderProtocolObjects.addressFactory.createURI("urn:service:sos");
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);
@@ -157,6 +152,27 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		// test non regression for Issue 1687 : Contact Header is present in SIP Message where it shouldn't
 		Response response = sender.getFinalResponse();
 		assertNull(response.getHeader(ContactHeader.NAME));
+	}
+	/*
+	 * Non regression test for Issue 2522 http://code.google.com/p/mobicents/issues/detail?id=2522
+	 * Cloned URI is not modifiable
+	 */
+	public void testShootmeCloneURI() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "cloneURI";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+						
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+		Thread.sleep(TIMEOUT);
+		assertEquals(200, sender.getFinalResponseStatus());
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());	
 	}
 	
 	public void testShootmeSendByeOnExpire() throws InterruptedException, SipException, ParseException, InvalidArgumentException {

@@ -383,7 +383,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 */
 	@Override
 	public SipURI clone() {
-		return new SipURIImpl((javax.sip.address.SipURI) this.getSipURI().clone(), isModifiable);
+		return new SipURIImpl((javax.sip.address.SipURI) this.getSipURI().clone(), ModifiableRule.Modifiable);
 	}
 
 	/*
