@@ -185,6 +185,8 @@ public class ProxyUtils {
 							&& proxyBranchRequest.getTransaction().getState() != TransactionState.TERMINATED) {
 						branchId = proxyBranchRequest.getTransaction().getBranchId();
 						logger.debug("reusing original branch id " + branchId);
+					} else {
+						branchId = JainSipUtils.createBranch(sipAppKey.getId(),  appName);
 					}
 					// Issue 					
 					viaHeader = JainSipUtils.createViaHeader(
@@ -199,6 +201,8 @@ public class ProxyUtils {
 							&& proxyBranchRequest.getTransaction().getState() != TransactionState.TERMINATED) {
 						branchId = proxyBranchRequest.getTransaction().getBranchId();
 						logger.debug("reusing original branch id " + branchId);
+					} else {
+						branchId = JainSipUtils.createBranch(sipAppKey.getId(),  appName);
 					}
 
 					viaHeader = SipFactories.headerFactory.createViaHeader(
