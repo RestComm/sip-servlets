@@ -333,7 +333,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					// if a dialog has already been created
 					// reuse local tag
 					final Dialog dialog = transaction.getDialog();
-					if(dialog != null && dialog.getLocalTag() != null && dialog.getLocalTag().length() > 0) {
+					if(dialog != null && dialog.getLocalTag() != null && dialog.getLocalTag().length() > 0
+							&& session.getKey().getToTag() != null && session.getKey().getToTag().length() >0) {
 						if((session != null && !dialog.getLocalTag().equals(session.getKey().getToTag()))) {
 							// Issue 2354 : if the dialog to tag is different than the  session to tag use the session to tag
 							// so that we send the forked response out with the correct to tag
@@ -436,7 +437,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 			return newSipServletResponse;
 		} catch (ParseException ex) {
-			throw new IllegalArgumentException("Bad status code" + statusCode,
+			throw new IllegalArgumentException("Bad status code " + statusCode,
 					ex);
 		}		
 	}

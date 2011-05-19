@@ -23,6 +23,7 @@
 package org.mobicents.servlet.sip.testsuite.simple;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -775,6 +776,37 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
 		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));
 	}
+	
+	// Test for SS spec 11.1.6 transaction timeout notification
+	// Test Issue 2580 http://code.google.com/p/mobicents/issues/detail?id=2580
+	public void testTransactionTimeoutResponse() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setDropRequest(true);
+		List<Integer> provisionalResponsesToSend = receiver.getProvisionalResponsesToSend();
+		provisionalResponsesToSend.clear();
+		
+		SipProvider receiverProvider = receiver.createProvider();			
+		receiverProvider.addSipListener(receiver);
+		receiverProtocolObjects.start();
+		
+		tomcat.startTomcat();
+		deployApplication();
+		
+		Thread.sleep(DIALOG_TIMEOUT);
+		
+		Iterator<String> allMessagesIterator = receiver.getAllMessagesContent().iterator();		
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+			
+		}
+		assertTrue(receiver.txTimeoutReceived);
+	}	
+
+	
 
 	@Override
 	protected void tearDown() throws Exception {					
