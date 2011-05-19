@@ -415,6 +415,8 @@ public final class JainSipUtils {
 		// those headers are singleton headers not list headers
 		SINGLETON_HEADER_NAMES.add(ProxyAuthenticateHeader.NAME);		
 		SINGLETON_HEADER_NAMES.add(ProxyAuthorizationHeader.NAME);
+		// Same thing for Issue 2578 
+		SINGLETON_HEADER_NAMES.add(AuthenticationInfoHeader.NAME);
 	}	
 	
 	// we don't have any other choice as to maintain a static list of multi value headers
@@ -427,8 +429,7 @@ public final class JainSipUtils {
 		LIST_HEADER_NAMES.add(AcceptHeader.NAME);
 		LIST_HEADER_NAMES.add(AlertInfoHeader.NAME);
 		LIST_HEADER_NAMES.add(AllowEventsHeader.NAME);
-		LIST_HEADER_NAMES.add(AllowHeader.NAME);
-		LIST_HEADER_NAMES.add(AuthenticationInfoHeader.NAME);
+		LIST_HEADER_NAMES.add(AllowHeader.NAME);		
 		LIST_HEADER_NAMES.add(AuthorizationHeader.NAME);
 		LIST_HEADER_NAMES.add(CallInfoHeader.NAME);
 		LIST_HEADER_NAMES.add(ContactHeader.NAME);

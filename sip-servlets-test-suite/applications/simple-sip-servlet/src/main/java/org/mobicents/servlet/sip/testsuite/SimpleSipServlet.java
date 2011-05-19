@@ -59,6 +59,7 @@ import javax.servlet.sip.TimerService;
 import javax.servlet.sip.URI;
 import javax.servlet.sip.SipSession.State;
 import javax.sip.ListeningPoint;
+import javax.sip.header.AuthenticationInfoHeader;
 
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.SipSessionExt;
@@ -685,6 +686,11 @@ public class SimpleSipServlet
 			response = SipServletResponse.SC_SERVER_INTERNAL_ERROR;
 		}
 		SipServletResponse resp = req.createResponse(response);
+		if(req.getFrom().toString().contains("authenticationInfoHeader")) {
+			resp = req.createResponse(SipServletResponse.SC_UNAUTHORIZED);
+			resp.addHeader(AuthenticationInfoHeader.NAME,
+					 "NTLM rspauth=\"01000000000000005CD422F0C750C7C6\";srand=\"0B9D33A2\";snum=\"1\";opaque=\"BCDC0C9D\";qop=\"auth\";targetname=\"server.contoso.com\";realm=\"SIP Communications Service\"");
+		}
 		resp.send();
 		
 	}

@@ -37,6 +37,7 @@ import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.address.URI;
 import javax.sip.header.AllowHeader;
+import javax.sip.header.AuthenticationInfoHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.ServerHeader;
 import javax.sip.message.Request;
@@ -597,6 +598,27 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertEquals(200, sender.getFinalResponseStatus());
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());
+	}
+
+	// test for http://code.google.com/p/mobicents/issues/detail?id=2578
+	public void testShootmeAuthenticationInfoHeader() throws Exception {
+		String fromName = "authenticationInfoHeader";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setHandleAuthorization(false);
+		sender.sendSipRequest("REGISTER", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertEquals(401, sender.getFinalResponseStatus());
+		AuthenticationInfoHeader authenticationInfoHeader = (AuthenticationInfoHeader) sender.getFinalResponse().getHeader(AuthenticationInfoHeader.NAME);
+		assertEquals("Authentication-Info: NTLM rspauth=\"01000000000000005CD422F0C750C7C6\";srand=\"0B9D33A2\";snum=\"1\";opaque=\"BCDC0C9D\";qop=\"auth\";targetname=\"server.contoso.com\";realm=\"SIP Communications Service\"",
+				authenticationInfoHeader.toString().trim());
 	}
 
 	public void testShootmeServerHeader() throws Exception {
