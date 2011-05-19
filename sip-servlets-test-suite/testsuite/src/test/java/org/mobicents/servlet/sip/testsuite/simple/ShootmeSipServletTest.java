@@ -617,7 +617,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertEquals(401, sender.getFinalResponseStatus());
 		AuthenticationInfoHeader authenticationInfoHeader = (AuthenticationInfoHeader) sender.getFinalResponse().getHeader(AuthenticationInfoHeader.NAME);
-		assertEquals("Authentication-Info: NTLM rspauth=\"01000000000000005CD422F0C750C7C6\";srand=\"0B9D33A2\";snum=\"1\";opaque=\"BCDC0C9D\";qop=\"auth\";targetname=\"server.contoso.com\";realm=\"SIP Communications Service\"",
+		assertEquals("Authentication-Info: NTLM rspauth=\"01000000000000005CD422F0C750C7C6\",srand=\"0B9D33A2\",snum=\"1\",opaque=\"BCDC0C9D\",qop=\"auth\",targetname=\"server.contoso.com\",realm=\"SIP Communications Service\"",
 				authenticationInfoHeader.toString().trim());
 	}
 
