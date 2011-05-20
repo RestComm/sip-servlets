@@ -22,6 +22,8 @@
 
 package org.mobicents.servlet.sip.testsuite.proxy;
 
+import gov.nist.javax.sip.message.MessageExt;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,7 +74,7 @@ public class ProxyRecordRouteUpdateTest extends SipServletTestCase {
 		List<Integer> provisionalResponsesToSend = new ArrayList<Integer>();
 		provisionalResponsesToSend.add(Response.RINGING);
 		receiver.setProvisionalResponsesToSend(provisionalResponsesToSend);
-		receiver.setWaitBeforeFinalResponse(15000);
+		receiver.setWaitBeforeFinalResponse(10000);
 		
 		sender.setSendUpdateOn180(true);
 		receiver.setSendUpdateAfterUpdate(true);
@@ -88,6 +90,45 @@ public class ProxyRecordRouteUpdateTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());
 		assertTrue(receiver.isAckReceived());
+		sender.sendBye();
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());
+		assertTrue(sender.getOkToByeReceived());
+	}
+	
+	// Check branchId of the ACK in case the INVITE has an UPDATE in between to make sure that
+	// the ACK to 200 OK INVITE is different than the UPDATE branchId
+	public void testProxySendUpdateBeforeFinalResponseCheckACKBranchId() throws Exception {
+		setupPhones(ListeningPoint.UDP);
+		String fromName = "unique-location-update";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "proxy-receiver-update";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		List<Integer> provisionalResponsesToSend = new ArrayList<Integer>();
+		provisionalResponsesToSend.add(Response.RINGING);
+		receiver.setProvisionalResponsesToSend(provisionalResponsesToSend);
+		receiver.setWaitBeforeFinalResponse(2000);
+		
+		sender.setSendUpdateOn180(true);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+		Thread.sleep(TIMEOUT*2);		
+		assertTrue(sender.isSendUpdate());
+		assertTrue(receiver.isUpdateReceived());
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(receiver.isAckReceived());
+		String inviteBranch = ((MessageExt)receiver.getInviteRequest()).getTopmostViaHeader().getBranch();
+		String updateBranch = ((MessageExt)receiver.getUpdateRequest()).getTopmostViaHeader().getBranch();
+		String ackBranch = ((MessageExt)receiver.getAckRequest()).getTopmostViaHeader().getBranch();
+		assertFalse(inviteBranch.equals(ackBranch));
+		assertFalse(updateBranch.equals(ackBranch));
 		sender.sendBye();
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());

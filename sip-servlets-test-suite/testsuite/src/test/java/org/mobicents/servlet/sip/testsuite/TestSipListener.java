@@ -329,6 +329,12 @@ public class TestSipListener implements SipListener {
 	private boolean sendUpdateAfterProvisionalResponses;
 
 	private Request ackRequest;
+
+	private boolean handleAuthorization = true;
+
+	private Request updateRequest;
+	
+	private Request infoRequest;
 	
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -426,6 +432,10 @@ public class TestSipListener implements SipListener {
 		
 		if (request.getMethod().equals(Request.UPDATE)) {
 			processUpdate(request, serverTransactionId);
+		}
+		
+		if (request.getMethod().equals(Request.INFO)) {
+			processInfo(request, serverTransactionId);
 		}
 		
 		if (request.getMethod().equals(Request.PUBLISH)) {
@@ -612,7 +622,6 @@ public class TestSipListener implements SipListener {
 			ServerTransaction serverTransactionId) {
 		try {
 			logger.info("shootist:  got a update. ServerTxId = " + serverTransactionId);
-			this.byeReceived  = true;
 			if (serverTransactionId == null) {
 				logger.info("shootist:  null TID.");
 				return;
@@ -627,6 +636,7 @@ public class TestSipListener implements SipListener {
 			logger.info("shootist:  Sending OK.");
 			logger.info("Dialog State = " + dialog.getState());
 			updateReceived = true;
+			updateRequest = request;
 			if (sendUpdateAfterUpdate) {
 				Request updateRequest = dialog.createRequest(Request.UPDATE);
 
@@ -648,6 +658,29 @@ public class TestSipListener implements SipListener {
 					sendUpdateAfterUpdate = false;
 				}
 			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public void processInfo(Request request,
+			ServerTransaction serverTransactionId) {
+		try {
+			logger.info("shootist:  got a info. ServerTxId = " + serverTransactionId);
+			if (serverTransactionId == null) {
+				logger.info("shootist:  null TID.");
+				return;
+			}
+			
+			Dialog dialog = serverTransactionId.getDialog();			
+			logger.info("Dialog State = " + dialog.getState());
+			Response response = protocolObjects.messageFactory.createResponse(
+					200, request);
+			serverTransactionId.sendResponse(response);
+			this.transactionCount++;
+			logger.info("shootist:  Sending OK.");
+			logger.info("Dialog State = " + dialog.getState());
+			infoRequest = request;		
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -1735,8 +1768,8 @@ public class TestSipListener implements SipListener {
 				dialog.sendRequest(ct);
 				sendUpdate = true;
 
-			} else if (response.getStatusCode() == Response.PROXY_AUTHENTICATION_REQUIRED
-					|| response.getStatusCode() == Response.UNAUTHORIZED) {
+			} else if ((response.getStatusCode() == Response.PROXY_AUTHENTICATION_REQUIRED
+					|| response.getStatusCode() == Response.UNAUTHORIZED) && handleAuthorization ) {
 				URI uriReq = tid.getRequest().getRequestURI();
 				Request authrequest = this.processResponseAuthorization(
 						response, uriReq);
@@ -3144,5 +3177,29 @@ public class TestSipListener implements SipListener {
 	 */
 	public Request getAckRequest() {
 		return ackRequest;
+	}
+
+	public void setHandleAuthorization(boolean handleAuthorization) {
+		this.handleAuthorization = handleAuthorization;
+	}
+
+	public boolean isHandleAuthorization() {
+		return handleAuthorization;
+	}
+
+	public void setUpdateRequest(Request updateRequest) {
+		this.updateRequest = updateRequest;
+	}
+
+	public Request getUpdateRequest() {
+		return updateRequest;
+	}
+
+	public void setInfoRequest(Request infoRequest) {
+		this.infoRequest = infoRequest;
+	}
+
+	public Request getInfoRequest() {
+		return infoRequest;
 	}
 }

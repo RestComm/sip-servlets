@@ -473,6 +473,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				    								if(logger.isDebugEnabled()) {
 				    									logger.debug("not calling the servlet since this is an ACK for a final error response");
 				    								}
+				    								break;
 											    }
 											    // Issue 1494 : http://code.google.com/p/mobicents/issues/detail?id=1494
 				                                // Only the first ACK makes it up to the application, in case the sip stack 
@@ -482,7 +483,8 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				                                    if(logger.isDebugEnabled()) {
 				                                        logger.debug("not calling the servlet since this is an ACK for a null last final response, which means the ACK was for a sip stack generated error response");
 				                                    }
-				                                    callServlet = false;				                                    
+				                                    callServlet = false;	
+				                                    break;
 											    }							 
 											}										
 										}

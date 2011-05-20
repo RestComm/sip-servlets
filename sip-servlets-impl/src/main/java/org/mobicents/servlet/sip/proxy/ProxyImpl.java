@@ -72,6 +72,7 @@ import org.mobicents.servlet.sip.core.timers.ProxyTimerService;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
+import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl.TransactionRequest;
 
 /**
@@ -101,7 +102,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 	private transient SipFactoryImpl sipFactoryImpl;
 	private boolean isNoCancel;
 	
-	transient HashMap<String, Object> transactionMap = new HashMap<String, Object>();
+	transient HashMap<String, TransactionApplicationData> transactionMap = new HashMap<String, TransactionApplicationData>();
 	
 	private transient Map<URI, ProxyBranchImpl> proxyBranches;
 	private boolean started; 
@@ -939,7 +940,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		this.callerFromHeader = initiatorFromHeader;
 	}
 
-	public HashMap<String, Object> getTransactionMap() {
+	public HashMap<String, TransactionApplicationData> getTransactionMap() {
 		return transactionMap;
 	}
 

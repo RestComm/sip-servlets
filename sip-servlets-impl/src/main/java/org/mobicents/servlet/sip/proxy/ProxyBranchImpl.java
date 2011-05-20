@@ -35,6 +35,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -60,8 +61,8 @@ import org.mobicents.javax.servlet.sip.ProxyBranchListener;
 import org.mobicents.javax.servlet.sip.ResponseType;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
-import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
+import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
@@ -69,6 +70,7 @@ import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
@@ -85,6 +87,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	private transient ProxyImpl proxy;
 	private transient SipServletRequestImpl originalRequest;
 	private transient SipServletRequestImpl prackOriginalRequest;
+	// From javadoc : object representing the request that is or to be proxied.
 	private transient SipServletRequestImpl outgoingRequest;
 	private transient SipServletResponseImpl lastResponse;
 	private URI targetURI;
@@ -271,6 +274,38 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 		recursedBranches.add(branch);
 	}
 
+	/**
+	 * from the given request in param, find the current corresponding matching forwarded orginal request
+	 * For a given ACK by example, there might be an UPDATE in between which make the outgoing requet not the INVITE one and can mess up
+	 * the branch id generation for the ACK (200 OK would have had the same branch id as UPDATE) 
+	 */
+	public SipServletRequestImpl getMatchingRequest(
+			SipServletRequestImpl request) {
+		if(request.getMethod().equals(Request.ACK)) {
+			Iterator<TransactionApplicationData> ongoingTransactions = proxy.getTransactionMap().values().iterator();
+			// Issue 1837 http://code.google.com/p/mobicents/issues/detail?id=1837
+			// ACK was received by JAIN-SIP but was not routed to application
+			// we need to go through the set of all ongoing tx since and INFO request can be received before a reINVITE tx has been completed
+			if(ongoingTransactions != null) {
+				if(logger.isDebugEnabled()) {
+                    logger.debug("going through all tx to check if we have the matching request to the ACK for branchId");
+                }
+				while (ongoingTransactions.hasNext()) {
+					TransactionApplicationData transactionApplicationData = ongoingTransactions.next();					
+					final SipServletMessageImpl sipServletMessage = transactionApplicationData.getSipServletMessage();
+					if(sipServletMessage != null && sipServletMessage instanceof SipServletRequestImpl && 
+							((MessageExt)request.getMessage()).getCSeqHeader().getSeqNumber() == ((MessageExt)sipServletMessage.getMessage()).getCSeqHeader().getSeqNumber() && 
+							((MessageExt)request.getMessage()).getCallIdHeader().getCallId().equals(((MessageExt)sipServletMessage.getMessage()).getCallIdHeader().getCallId())) {
+						return (SipServletRequestImpl)sipServletMessage;
+					}
+				}
+			}
+			return outgoingRequest;
+		} else {
+			return outgoingRequest;
+		}		
+	}
+	
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.ProxyBranch#getRequest()
 	 */
@@ -758,6 +793,17 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 			appData.setProxyBranch(this);
 			ctx.setApplicationData(appData);
 			
+			final SipServletRequestImpl clonedSipServletRequest = new SipServletRequestImpl(
+					clonedRequest,
+					proxy.getSipFactoryImpl(),
+					sipSession,
+					ctx, null, false);
+					 			
+			clonedSipServletRequest.setRoutingState(RoutingState.SUBSEQUENT);
+			// make sure to store the outgoing request to make sure the branchid for a ACK to a future reINVITE if this one is INFO
+			// by example will have the correct branchid and not the one from the INFO
+			this.outgoingRequest = clonedSipServletRequest;
+			
 			ctx.sendRequest();
 		} catch (Exception e) {
 			logger.error("A problem occured while proxying a request " + request + " in a dialog-stateless transaction", e);
@@ -1069,13 +1115,6 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	}
 
 	/**
-	 * @return the outgoingRequest
-	 */
-	public SipServletRequestImpl getOutgoingRequest() {
-		return outgoingRequest;
-	}
-
-	/**
 	 * @param originalRequest the originalRequest to set
 	 */
 	public void setOriginalRequest(SipServletRequestImpl originalRequest) {
@@ -1102,5 +1141,5 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	public URI getTargetURI() {
 		return targetURI;
 	}
-	
+
 }

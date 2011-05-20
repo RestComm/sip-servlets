@@ -190,6 +190,50 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 		
 		assertTrue(receiver.getInviteRequest().getRequestURI().toString().contains("extra-route"));
 	}
+	
+	// Check branchId of the ACK in case the reINVITE has an INFO in between to make sure that
+	// the ACK to 200 OK reINVITE is different than the INFO branchId
+	public void testProxyReinviteINFOCheckACKBranchId() throws Exception {
+		setupPhones(ListeningPoint.UDP);
+		String fromName = "unique-location";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "proxy-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		// part of non regression test for Issue http://code.google.com/p/mobicents/issues/detail?id=2359
+		// allow to check if ACK retrans keep the same different branch id		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(receiver.isAckReceived()); 
+		receiver.setAckReceived(false);
+		sender.setAckSent(false);
+		sender.sendInDialogSipRequest("INFO", null, null, null, null, null);		
+		Thread.sleep(500);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(receiver.isAckReceived());
+		receiver.setAckReceived(false);
+		receiver.setAckSent(false);
+		sender.setAckSent(false);
+		sender.setAckReceived(false);
+		//non regression test for Issue http://code.google.com/p/mobicents/issues/detail?id=2359	
+		String inviteBranch = ((MessageExt)receiver.getInviteRequest()).getTopmostViaHeader().getBranch();
+		String infoBranch = ((MessageExt)receiver.getInfoRequest()).getTopmostViaHeader().getBranch();
+		String ackBranch = ((MessageExt)receiver.getAckRequest()).getTopmostViaHeader().getBranch();
+		assertFalse(inviteBranch.equals(ackBranch));
+		assertFalse(infoBranch.equals(ackBranch));
+		sender.sendBye();
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());
+		assertTrue(sender.getOkToByeReceived());		
+	}
 
 	public void setupPhones(String transport) throws Exception {
 		senderProtocolObjects = new ProtocolObjects("proxy-sender",
