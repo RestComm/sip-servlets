@@ -21,20 +21,26 @@ if [ $# -eq 4 ]; then
 	    		rm ./proxy/*.log
 	    		echo "Distributed example used is proxy";
 	    		echo""| ./sipp $MSS_IP:5080 -sf proxy/location-service-receiver.xml -i $SIPP_IP -p 5090 -nd >sipp-uas-log-$1.txt 2&>1 &
-	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
+	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT
 	            ;;
 	    proxy-early)
 	    		rm ./proxy/*.log
 	    		echo "Distributed example used is proxy early dialog failover";
 	    		echo""| ./sipp $MSS_IP:5080 -sf proxy/location-service-receiver-early.xml -i $SIPP_IP -p 5090 -nd >sipp-uas-log-$1.txt 2&>1 &
-	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-sender-early.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
+	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-sender-early.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT
 	            ;;
 	    proxy-remote-send-bye)
 	    		rm ./proxy/*.log
 	    		echo "Distributed example used is proxy remote send bye";
 	    		echo""| ./sipp $MSS_IP:5080 -sf proxy/location-service-receiver-sends-bye.xml -i $SIPP_IP -p 5090 -nd >sipp-uas-log-$1.txt 2&>1 &
-	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-sender-receives-bye.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT -timeout_error
+	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-sender-receives-bye.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT
 	            ;;    
+	    proxy-indialog-info)
+	    		rm ./proxy/*.log
+	    		echo "Distributed example used is proxy indialog info bye";
+	    		echo""| ./sipp $MSS_IP:5080 -sf proxy/location-service-indialog-info-receiver.xml -i $SIPP_IP -p 5090 -nd >sipp-uas-log-$1.txt 2&>1 &
+	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-indialog-info-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT
+	    		;;
 	    custom-b2bua)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is custom b2bua";

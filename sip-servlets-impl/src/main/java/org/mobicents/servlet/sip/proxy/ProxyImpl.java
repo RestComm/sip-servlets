@@ -59,6 +59,8 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.ha.javax.sip.ClusteredSipStack;
+import org.mobicents.ha.javax.sip.ReplicationStrategy;
 import org.mobicents.javax.servlet.sip.ProxyExt;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.SipURIImpl;
@@ -74,6 +76,7 @@ import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl.TransactionRequest;
+import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
  * @author root
@@ -946,7 +949,13 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
-		originalRequest = (SipServletRequestImpl) in.readObject();
+		if(StaticServiceHolder.sipStandardService.getSipStack() instanceof ClusteredSipStack && 
+				((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
+			// Issue 2587 : read only if not null.
+			if(in.readBoolean()) {
+				originalRequest = (SipServletRequestImpl) in.readObject();
+			}
+		}
 		recurse = in.readBoolean();
 		proxyTimeout = in.readInt();
 		seqSearchTimeout = in.readInt();
@@ -968,7 +977,16 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 	}
 
 	public void writeExternal(ObjectOutput out) throws IOException {
-		out.writeObject(originalRequest);
+		if(StaticServiceHolder.sipStandardService.getSipStack() instanceof ClusteredSipStack && 
+				((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
+			// Issue 2587 : replicating original request is only useful for early dialog failover
+			if(originalRequest != null && originalRequest.getMethod().equalsIgnoreCase(Request.INVITE)) {
+				out.writeBoolean(true);
+				out.writeObject(originalRequest);
+			} else {
+				out.writeBoolean(false);
+			}
+		}
 		out.writeBoolean(recurse);
 		out.writeInt(proxyTimeout);
 		out.writeInt(seqSearchTimeout);
