@@ -1549,7 +1549,10 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			if(sipConnector != null && // Initial requests already use local address in RouteHeader.
 					sipConnector.isUseStaticAddress()) {
 				JainSipUtils.optimizeRouteHeaderAddressForInternalRoutingrequest(sipConnector, request, session, sipFactoryImpl, transport);
-			}			
+			}
+			//Issue 2588 : updating the last accessed times for ACK as well 
+			session.access();
+			sipApplicationSession.access();
 			if(logger.isDebugEnabled()) {
 				logger.debug("Sending the ACK request " + request);
 			}

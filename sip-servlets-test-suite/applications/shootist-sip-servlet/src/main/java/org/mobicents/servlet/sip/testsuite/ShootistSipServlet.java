@@ -138,6 +138,10 @@ public class ShootistSipServlet
 			if (status == SipServletResponse.SC_OK && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
 				SipServletRequest ackRequest = sipServletResponse.createAck();
 				ackRequest.send();
+				if(System.currentTimeMillis() - sipServletResponse.getSession().getLastAccessedTime() > 500) {
+					logger.error("lastAccessedTime was not updated => lastAccessedTime " + sipServletResponse.getSession().getLastAccessedTime() + " current Time  " + System.currentTimeMillis());
+					return;
+				}
 				
 				if(sipServletResponse.getRequest().isInitial() && !(sipServletResponse.getFrom().getURI() instanceof TelURL) && !(sipServletResponse.getTo().getURI() instanceof TelURL) &&
 						(((SipURI)sipServletResponse.getFrom().getURI()).getUser().equals("reinvite") || ((SipURI)sipServletResponse.getTo().getURI()).getUser().equals("reinvite"))) {
