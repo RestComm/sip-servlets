@@ -174,6 +174,11 @@
 			<param name="mss.home" value="${mss.home}"/>
 			<param name="node" value="${jboss.config}"/>
 		</antcall>
+		
+		<antcall target="build-mobicents-snmp">
+			<param name="mss.home" value="${mss.home}"/>
+			<param name="node" value="${jboss.config}"/>
+		</antcall>
 				
 		<antcall target="deploy-mgmnt" >
 			<param name="management.deploy.folder" value="${mss.home}/server/${jboss.config}/deploy" />
@@ -292,6 +297,16 @@
 		    </fileset>
 		  </copy>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/sglc">
+			<arg line="clean install -P set-svn-revision -Dmaven.test.skip=true -Djboss.home=${mss.home} -Dnode=${node}" />
+		</exec>			
+	</target>
+	
+	<target name="build-mobicents-snmp" depends="get-deps">
+		<echo>Building Mobicents SNMP Adaptor</echo>
+		<echo message="jboss.home= ${mss.home}"/>
+		<echo message="node= ${node}"/>	
+		<delete verbose="true" dir="${mss.home}/server/${node}/deploy/snmp-adaptor.sar"/>
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/snmp-adaptor">
 			<arg line="clean install -P set-svn-revision -Dmaven.test.skip=true -Djboss.home=${mss.home} -Dnode=${node}" />
 		</exec>			
 	</target>
