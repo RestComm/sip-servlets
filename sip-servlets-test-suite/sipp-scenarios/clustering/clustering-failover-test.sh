@@ -37,9 +37,15 @@ if [ $# -eq 4 ]; then
 	            ;;    
 	    proxy-indialog-info)
 	    		rm ./proxy/*.log
-	    		echo "Distributed example used is proxy indialog info bye";
+	    		echo "Distributed example used is proxy indialog info";
 	    		echo""| ./sipp $MSS_IP:5080 -sf proxy/location-service-indialog-info-receiver.xml -i $SIPP_IP -p 5090 -nd >sipp-uas-log-$1.txt 2&>1 &
 	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-indialog-info-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT
+	    		;;
+	    proxy-termination)
+	    		rm ./proxy/*.log
+	    		echo "Distributed example used is proxy termination";
+	    		echo""| ./sipp $MSS_IP:5080 -sf proxy/location-service-termination-receiver.xml -i $SIPP_IP -p 5090 -nd >sipp-uas-log-$1.txt 2&>1 &
+	    		./sipp $MSS_IP:5080 -s receiver-failover -sf proxy/location-service-termination-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -nd -timeout $ACTIVE_TIMEOUT
 	    		;;
 	    custom-b2bua)
 	    		rm ./b2bua/*.log

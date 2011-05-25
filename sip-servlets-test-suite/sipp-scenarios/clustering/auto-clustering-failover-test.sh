@@ -148,6 +148,13 @@ sleep $HALFSTARTSLEEP
 ./auto-run-test.sh proxy-indialog-info result.txt
 
 #The test killed server 1, so we start it again
+./auto-start-jboss-server.sh $config1 config1.pid 0 proxy-termination
+
+sleep $HALFSTARTSLEEP
+
+./auto-run-test.sh proxy-termination result.txt
+
+#The test killed server 1, so we start it again
 ./auto-start-jboss-server.sh $config1 config1.pid 0 proxy-remote-send-bye
 
 sleep $HALFSTARTSLEEP

@@ -24,24 +24,32 @@ package org.mobicents.servlet.sip.example;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Proxy;
+import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSessionEvent;
 import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipURI;
+import javax.servlet.sip.TimerListener;
+import javax.servlet.sip.TimerService;
+import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.ProxyExt;
 
 /**
  * This example shows Proxying on 2 different location.
@@ -50,12 +58,14 @@ import org.apache.log4j.Logger;
  * @author Jean Deruelle
  *
  */
-public class DistributableLocationServiceSipServlet extends SipServlet implements SipApplicationSessionListener{
+public class DistributableLocationServiceSipServlet extends SipServlet implements SipApplicationSessionListener, TimerListener {
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(DistributableLocationServiceSipServlet.class);
+	private static String TEST_TERMINATION = "test_termination";
 	private static final String CONTACT_HEADER = "Contact";
 	private static final String RECEIVED = "Received";
 	Map<String, List<URI>> registeredUsers = null;
+	ServletTimer timer = null;
 	
 	/** Creates a new instance of SpeedDialSipServlet */
 	public DistributableLocationServiceSipServlet() {}
@@ -95,6 +105,11 @@ public class DistributableLocationServiceSipServlet extends SipServlet implement
 				proxy.setRecordRoute(true);
 				proxy.setParallel(true);
 				proxy.setSupervised(true);
+				SipURI fromURI = ((SipURI)request.getFrom().getURI());	
+				if(fromURI.getUser().contains(TEST_TERMINATION)) {		
+					((ProxyExt)proxy).storeTerminationInformation(true);
+					logger.info("testing termination");
+				}
 				proxy.proxyTo(contactAddresses);		
 			} else {
 				if(logger.isInfoEnabled()) {
@@ -159,6 +174,15 @@ public class DistributableLocationServiceSipServlet extends SipServlet implement
 		}
 	}
 	
+	@Override
+	protected void doAck(SipServletRequest request) throws ServletException,
+			IOException {
+		String from = request.getFrom().getURI().toString();
+		if(from.contains(TEST_TERMINATION) && timer == null) {
+			timer = ((TimerService)getServletContext().getAttribute(TIMER_SERVICE)).createTimer(request.getApplicationSession(), 10000, false, (Serializable) request);
+		}
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -210,4 +234,19 @@ public class DistributableLocationServiceSipServlet extends SipServlet implement
 		}
 	}
 	
+	public void timeout(ServletTimer timer) {
+		SipServletRequest request = (SipServletRequest)timer.getInfo();
+		try {
+			((ProxyExt)request.getProxy()).terminateSession(request.getSession(), 500, "Testing termination", 500, "Testing Termination");
+		} catch (IllegalStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TooManyHopsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
