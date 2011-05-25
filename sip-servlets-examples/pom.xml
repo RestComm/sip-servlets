@@ -85,6 +85,12 @@
 			<version>1.6.0-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>		
+		<dependency>
+			<groupId>org.mobicents.servlet.sip</groupId>
+			<artifactId>sip-servlets-client</artifactId>
+			<version>1.6.0-SNAPSHOT</version>
+			<scope>provided</scope>
+		</dependency>	
 	</dependencies>	
 
 	<!-- repositories -->
