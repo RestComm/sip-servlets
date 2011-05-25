@@ -23,6 +23,7 @@
 package org.mobicents.servlet.sip.proxy;
 
 import gov.nist.javax.sip.header.Via;
+import gov.nist.javax.sip.message.MessageExt;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -43,6 +44,7 @@ import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.sip.SipException;
@@ -63,9 +65,9 @@ import org.mobicents.ha.javax.sip.ClusteredSipStack;
 import org.mobicents.ha.javax.sip.ReplicationStrategy;
 import org.mobicents.javax.servlet.sip.ProxyExt;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
-import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -124,6 +126,12 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 	// Issue 1791 : using a timer service created outside the application loader to avoid leaks on startup/shutdown
 	private transient ProxyTimerService proxyTimerService;
 
+	// Information required to implement 3GPP TS 24.229 section 5.2.8.1.2. ie Termination of Session originating from the proxy.
+	private long callerCSeq; 	 // Last CSeq seen from caller
+	private long calleeCSeq = 0; // Last CSeq seen from callee (We may never see one if the callee never sends a request)
+	private boolean storeTerminationInfo = false; // Enables storage of termination information.
+	private ProxyTerminationInfo terminationInfo; // Object to store termination information
+
 	// empty constructor used only for Externalizable interface
 	public ProxyImpl() {}
 	
@@ -145,6 +153,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		}
 		this.callerFromHeader = request.getFrom().toString();
 		this.previousNode = extractPreviousNodeFromRequest(request);
+		this.callerCSeq = ((MessageExt)request.getMessage()).getCSeqHeader().getSeqNumber();
 		String txid = ((ViaHeader) request.getMessage().getHeader(ViaHeader.NAME)).getBranch();
 		if(originalRequest.getTransactionApplicationData() != null) {
 			this.transactionMap.put(txid, originalRequest.getTransactionApplicationData());
@@ -780,14 +789,19 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 					&& !transaction.getState().equals(TransactionState.TERMINATED)) {	
 				// non retransmission case
 				try {
-					
-					proxiedResponse.send();
 					if(logger.isDebugEnabled())
-						logger.debug("Sending out proxied final response with existing transaction");
+						logger.debug("Sending out proxied final response with existing transaction " + proxiedResponse);
+					proxiedResponse.send();					
 					proxyBranches.clear();
 					originalRequest = null;
 					bestBranch = null;
 					bestResponse = null;
+					if (storeTerminationInfo && proxiedResponse.getRequest().isInitial() && getRecordRouteURI() != null) {
+						if(logger.isDebugEnabled()) {
+							logger.debug("storing termination Info for request " + proxiedResponse.getRequest());
+						}
+						terminationInfo = new ProxyTerminationInfo(proxiedResponse, getRecordRouteURI(), this);
+					}
 				} catch (Exception e) {
 					logger.error("A problem occured while proxying the final response", e);
 				}
@@ -820,6 +834,14 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 	}
 	
 	public void setOriginalRequest(SipServletRequestImpl originalRequest) {
+		// Determine the direction of the request. Either it's from the dialog initiator (the caller)
+		// or from the callee
+		if(originalRequest.getFrom().toString().equals(callerFromHeader)) {
+			callerCSeq = (((MessageExt)originalRequest.getMessage()).getCSeqHeader().getSeqNumber());
+		} else {
+			// If it's from the callee we should send it in the other direction
+		    calleeCSeq = (((MessageExt)originalRequest.getMessage()).getCSeqHeader().getSeqNumber());
+		}
 		this.originalRequest = originalRequest;
 	}
 
@@ -973,6 +995,13 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		}
 		previousNode = (SipURI) in.readObject();
 		callerFromHeader = in.readUTF();
+		calleeCSeq = in.readLong();
+		callerCSeq = in.readLong();
+		storeTerminationInfo = in.readBoolean();
+		if (storeTerminationInfo) {
+			terminationInfo = (ProxyTerminationInfo) in.readObject();
+			terminationInfo.setProxy(this);
+		}
 		this.proxyBranches = new LinkedHashMap<URI, ProxyBranchImpl> ();
 	}
 
@@ -1001,6 +1030,12 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		out.writeObject(finalBranchForSubsequentRequests);
 		out.writeObject(previousNode);
 		out.writeUTF(callerFromHeader);
+		out.writeLong(calleeCSeq);
+		out.writeLong(callerCSeq);
+		out.writeBoolean(storeTerminationInfo);
+		if (storeTerminationInfo) {
+			out.writeObject(terminationInfo);
+		}
 	}
 	/*
 	 * (non-Javadoc)
@@ -1031,7 +1066,37 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		}
 		this.proxyBranches.put(proxyBranchImpl.getTargetURI(), proxyBranchImpl);
 	}
-
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.javax.servlet.sip.ProxyExt#storeTerminationInformation(boolean)
+	 */
+	public void storeTerminationInformation(final boolean store) throws IllegalStateException {
+		if(null != finalBranchForSubsequentRequests) 
+			throw new IllegalStateException("Proxy has been established.");
+		storeTerminationInfo = store;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.javax.servlet.sip.ProxyExt#terminateSession(javax.servlet.sip.SipSession, int, java.lang.String, int, java.lang.String)
+	 */
+    public void terminateSession(final SipSession session,
+    							 final int calleeResponseCode, final String calleeResponseText,
+    							 final int callerResponseCode, final String callerResponseText)
+    							 throws IllegalStateException, IOException {
+    	if(null == finalBranchForSubsequentRequests) {
+			throw new IllegalStateException("Proxy has not yet been established. Before final response use cancel.");
+    	}
+    	if (!storeTerminationInfo || terminationInfo == null) {
+    		logger.error("storeTerminationInfo = " + storeTerminationInfo);
+    		if (terminationInfo == null) {
+    			logger.error("terminationInfo = null");
+    		}
+    		throw new IllegalStateException("No termination information stored.Call storeTerminationInformation before final response arrives.");
+    	}
+    	terminationInfo.terminate(session, callerCSeq, calleeCSeq, calleeResponseCode, calleeResponseText, callerResponseCode, callerResponseText);
+    }
+
 
 }

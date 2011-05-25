@@ -23,17 +23,20 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.ServletParseException;
+import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSessionEvent;
 import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipErrorEvent;
@@ -45,6 +48,9 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.TimerListener;
+import javax.servlet.sip.TimerService;
+import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
@@ -52,7 +58,7 @@ import org.mobicents.javax.servlet.sip.ProxyBranchListener;
 import org.mobicents.javax.servlet.sip.ProxyExt;
 import org.mobicents.javax.servlet.sip.ResponseType;
 
-public class ProxySipServlet extends SipServlet implements SipErrorListener, ProxyBranchListener, SipSessionListener, SipApplicationSessionListener {
+public class ProxySipServlet extends SipServlet implements SipErrorListener, ProxyBranchListener, SipSessionListener, SipApplicationSessionListener, TimerListener {
 	private static final String ERROR = "ERROR";
 	private static final String SIP_APPLICATION_SESSION_TIMEOUT = "sipApplicationSessionTimeout";
 	private static final long serialVersionUID = 1L;
@@ -65,8 +71,10 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 	private static String NON_RECORD_ROUTING = "nonRecordRouting";
 	private static String RECORD_ROUTING = "recordRouting";
 	private static String TEST_CREATE_SUBSEQUENT_REQUEST = "test_create_subsequent_request";
-	
+	private static String TEST_TERMINATION = "test_termination";
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
+
+	@Resource TimerService timerService;
 	
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
@@ -223,6 +231,10 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 				recordRoute = false;
 				logger.info("not record routing");
 			}
+			if(fromURI.getUser().contains(TEST_TERMINATION)) {		
+				((ProxyExt)proxy).storeTerminationInformation(true);
+				logger.info("testing termination");
+			}
 			//proxy.setOutboundInterface((SipURI)sipFactory.createAddress("sip:proxy@127.0.0.1:5070").getURI());
 			proxy.setRecordRoute(recordRoute);
 			proxy.setSupervised(true);
@@ -266,6 +278,9 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();
 			request.pushRoute((SipURI)uri1);			
+		}
+		if(from.contains(TEST_TERMINATION)) {
+			timerService.createTimer(request.getApplicationSession(), 1000, false, (Serializable) request);
 		}
 	}
 	
@@ -483,5 +498,22 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 	@Override
 	protected void doUpdate(SipServletRequest req) throws ServletException, IOException {
 		logger.info("Got request:\n "+req);
+	}
+
+	@Override
+	public void timeout(ServletTimer timer) {
+		SipServletRequest request = (SipServletRequest)timer.getInfo();
+		try {
+			((ProxyExt)request.getProxy()).terminateSession(request.getSession(), 500, "Testing termination", 500, "Testing Termination");
+		} catch (IllegalStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (TooManyHopsException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

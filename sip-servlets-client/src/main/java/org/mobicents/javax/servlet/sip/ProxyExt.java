@@ -22,6 +22,9 @@
 
 package org.mobicents.javax.servlet.sip;
 
+import java.io.IOException;
+
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 
 /**
@@ -34,6 +37,10 @@ import javax.servlet.sip.SipURI;
  * 		</li>
  * 		<li>
  * 			Allows for applications to set the outbound interface based on SipURI, to allow routing based on transport protocol as well.
+ * 		</li>
+ * 		<li>
+ * 			Allows for applications to terminate an established session by sending BYE requests in both directions as specified in 3GPP TS 24.229 section 5.2.8.1.2.
+ * 			It is not RFC3261 complient behaviour as SIP proxies SHOULD NOT originate SIP requests, and should therefore be used with caution.
  * 		</li>
  * </ul>
  * 
@@ -134,4 +141,34 @@ public interface ProxyExt {
 	 * @since 1.4
 	 */
 	void setOutboundInterface(SipURI outboundInterface);
+	/**
+	 * Enable (or disable) the storing of routing information required to terminate a proxy using terminateSession.
+	 * This must be called before a success final response has arrived.
+	 * @param store true to store information for termination, false to return to default behaviour
+	 * @throws IllegalStateException if the proxy session has been established
+	 * @since 1.6
+	 * @author Andrew Miller (Crocodile RCS)
+	 */
+	void storeTerminationInformation(final boolean store) throws IllegalStateException;
+    
+    /**
+     * Terminates an established session by sending BYE requests in both directions.
+     * This is required to implement 3GPP TS 24.229 section 5.2.8.1.2.
+     * It is not RFC3261 complient behaviour as SIP proxies SHOULD NOT originate SIP requests, and should therefore be used with caution.
+     * To enable this behaviour storeTerminationInformation(true) must be called before a success final response is received.
+     * 
+     * @param session The SipSession to terminate
+     * @param calleeResponseCode SIP response code to include in a Reason header in BYE sent to original call recipient. Must be in the range 300-699.
+     * @param calleeResponseText SIP response text to include in BYE sent to original call recipient. If null, no reason header will be used.
+     * @param callerResponseCode SIP response code to include in a Reason header in BYE sent to original caller. Must be in the range 300-699.
+     * @param callerResponseText SIP response text to include in BYE sent to original caller. If null, no reason header will be used.
+     * @throws IllegalStateException if the proxy session is not yet established or storeTerminationInformation not called before session was established.
+     * @throws IOException  if a transport error occurs when trying to send this request 
+     * @since 1.6
+     * @author Andrew Miller (Crocodile RCS)
+     */     
+    void terminateSession(final SipSession session,
+    					  final int calleeResponseCode, final String calleeResponseText,
+			 			  final int callerResponseCode, final String callerResponseText)
+    					  throws IllegalStateException, IOException;
 }

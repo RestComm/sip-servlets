@@ -964,7 +964,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 			sessionCreatingTransactionRequest.cleanUp();
 			sessionCreatingTransactionRequest = null;
 		}
-		if(proxy != null) {
+		if(proxy != null && !proxy.getAckReceived()) {
 			try {
 				proxy.cancel();
 			} catch (Exception e) {
