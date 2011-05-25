@@ -3950,8 +3950,10 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		this.outdatedSessionChecker = initOutdatedSessionChecker();
 		this.outdatedSipSessionChecker = initOutdatedSipSessionChecker();
 		this.outdatedSipApplicationSessionChecker = initOutdatedSipApplicationSessionChecker();
-		mobicentsCache = new MobicentsCache(getDistributedCacheConvergedSipManager().getJBossCache(), null);
+		mobicentsCache = new MobicentsCache(getDistributedCacheConvergedSipManager().getJBossCache());
+		mobicentsCache.startCache();
 		mobicentsCluster = new DefaultMobicentsCluster(mobicentsCache, getDistributedCacheConvergedSipManager().getJBossCache().getConfiguration().getRuntimeConfig().getTransactionManager(), new DefaultClusterElector());
+		mobicentsCluster.startCluster();
 		if(logger.isDebugEnabled()) {
 			logger.debug("Mobicents Sip Servlets Default Mobicents Cluster " + mobicentsCluster + " created");
 		}
@@ -3977,6 +3979,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		
 		mobicentsCache.stopCache();
 		mobicentsCache = null;
+		mobicentsCluster.stopCluster();
 		mobicentsCluster = null;
 		removeAllSessions();
 		

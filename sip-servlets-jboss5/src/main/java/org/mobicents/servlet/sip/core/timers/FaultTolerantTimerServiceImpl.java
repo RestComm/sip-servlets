@@ -120,11 +120,16 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 	 */
 	private TimerServiceTask createTimerLocaly(long delay,
 			boolean isPersistent, Serializable info, MobicentsSipApplicationSession sipApplicationSession) {
+				
 		
 		final TimerListener listener = sipApplicationSession.getSipContext().getListeners().getTimerListener();
 		final ServletTimerImpl servletTimer = new ServletTimerImpl(info, delay, listener, sipApplicationSession);
 		final TimerServiceTaskData timerTaskData = new TimerServiceTaskData(servletTimer.getId(), System.currentTimeMillis() + delay, -1, null);		
 		final TimerServiceTask timerServiceTask = new TimerServiceTask(sipManager, servletTimer, timerTaskData);
+		
+		if(logger.isDebugEnabled()) {
+			logger.debug("Scheduling Timer "+ servletTimer.getId() +" to expire in " + delay + " ms");
+		}
 		
 		getScheduler().schedule(timerServiceTask);				
 		sipApplicationSession.addServletTimer(timerServiceTask);
@@ -152,7 +157,14 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 				info, delay, fixedDelay, period, listener, sipApplicationSession);
 		PeriodicScheduleStrategy periodicScheduleStrategy = PeriodicScheduleStrategy.withFixedDelay;
 		if(!fixedDelay) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Scheduling Timer "+ servletTimer.getId() +" to expire in " + delay + " ms" + " at fixed rate of " + period);
+			}
 			periodicScheduleStrategy = PeriodicScheduleStrategy.atFixedRate;
+		} else {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Scheduling Timer "+ servletTimer.getId() +" to expire in " + delay + " ms" + " with fixed delay of " + period);
+			}
 		}
 		final TimerServiceTaskData timerTaskData = new TimerServiceTaskData(servletTimer.getId(), System.currentTimeMillis() + delay, period, periodicScheduleStrategy);		
 		final TimerServiceTask timerServiceTask = new TimerServiceTask(sipManager, servletTimer, timerTaskData);
@@ -240,7 +252,7 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 				// and reset its start time to the correct one
 				timerServiceTask.beforeRecover();				
 				// and reschedule it locally
-				getScheduler().schedule(timerServiceTask);
+				getScheduler().schedule(timerServiceTask, false);
 				return timerServiceTask;
 			} else {
 //				if(logger.isWarningEnabled()) {

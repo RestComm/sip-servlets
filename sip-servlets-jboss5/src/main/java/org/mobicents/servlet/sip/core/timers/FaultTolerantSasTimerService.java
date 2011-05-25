@@ -189,7 +189,7 @@ public class FaultTolerantSasTimerService implements ClusteredSipApplicationSess
 				// and reset its start time to the correct one
 				faultTolerantSasTimerTask.beforeRecover();				
 				// and reschedule it locally
-				getScheduler().schedule(faultTolerantSasTimerTask);
+				getScheduler().schedule(faultTolerantSasTimerTask, false);
 			} else {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Task for sip application session " + taskId + " is not present locally, nor on another node, nothing can be done.");
