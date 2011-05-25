@@ -3975,7 +3975,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	protected void stopExtensions() {
 		super.stopExtensions();
 		
-		mobicentsCache.stop();
+		mobicentsCache.stopCache();
 		mobicentsCache = null;
 		mobicentsCluster = null;
 		removeAllSessions();
