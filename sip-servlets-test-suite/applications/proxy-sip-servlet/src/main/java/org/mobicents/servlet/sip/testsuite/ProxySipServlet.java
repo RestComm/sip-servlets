@@ -280,7 +280,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			request.pushRoute((SipURI)uri1);			
 		}
 		if(from.contains(TEST_TERMINATION)) {
-			timerService.createTimer(request.getApplicationSession(), 1000, false, (Serializable) request);
+			timerService.createTimer(request.getApplicationSession(), 10000, false, (Serializable) request);
 		}
 	}
 	

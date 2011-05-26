@@ -1096,7 +1096,17 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
     		throw new IllegalStateException("No termination information stored.Call storeTerminationInformation before final response arrives.");
     	}
     	terminationInfo.terminate(session, callerCSeq, calleeCSeq, calleeResponseCode, calleeResponseText, callerResponseCode, callerResponseText);
-    }
+    }	
+
+	/**
+	 * @return the terminationInfo
+	 */
+	public boolean isTerminationSent() {
+		if(terminationInfo == null) {
+			return false;
+		}
+		return terminationInfo.isTerminationSent();
+	}
 
 
 }

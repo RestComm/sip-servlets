@@ -54,6 +54,7 @@ public class ProxyTerminationInfo implements Externalizable {
 	private From fromHeader;       // From: header in the direction caller->callee
 	private static final Logger logger = Logger.getLogger(ProxyTerminationInfo.class);
 	private String callId;
+	private boolean terminationSent; 
 	
 	private ProxyImpl proxyImpl;
 	
@@ -228,7 +229,18 @@ public class ProxyTerminationInfo implements Externalizable {
 	public void terminate(final SipSession session, long callerCSeq, long calleeCSeq,
 						  final int calleeResponseCode, final String calleeResponseText,
 						  final int callerResponseCode, final String callerResponseText) throws IOException {
+		if(terminationSent) {
+			throw new IllegalStateException("Proxy Termination Already Sent !");
+		}
 		sendBye (session, calleeContact, toHeader, fromHeader, callerCSeq + 1, calleeRouteSet, calleeResponseCode, calleeResponseText);
     	sendBye (session, callerContact, new To(fromHeader), new From(toHeader), calleeCSeq + 1, callerRouteSet, callerResponseCode, callerResponseText);
+    	terminationSent = true;
+	}
+
+	/**
+	 * @return the terminationSent
+	 */
+	public boolean isTerminationSent() {
+		return terminationSent;
 	}
 }

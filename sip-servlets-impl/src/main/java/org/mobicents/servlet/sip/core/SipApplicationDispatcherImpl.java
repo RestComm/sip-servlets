@@ -928,9 +928,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 															
 					if(sipSessionImpl != null) {
 						final ProxyImpl proxy = sipSessionImpl.getProxy();
-						if(!invalidateProxySession && (proxy == null || (proxy != null && proxy.getFinalBranchForSubsequentRequests() != null && !proxy.getFinalBranchForSubsequentRequests().getRecordRoute()))) {
+						if(!invalidateProxySession && 
+								(proxy == null || (proxy != null && 
+										((proxy.getFinalBranchForSubsequentRequests() != null && !proxy.getFinalBranchForSubsequentRequests().getRecordRoute()) ||
+										proxy.isTerminationSent()))))  {
 							if(logger.isDebugEnabled()) {
-								logger.debug("try to Invalidate Proxy session if it is non record routing " + sipSessionKey);
+								logger.debug("try to Invalidate Proxy session if it is non record routing or termination has been sent " + sipSessionKey);
 							}
 							invalidateProxySession = true;
 						}

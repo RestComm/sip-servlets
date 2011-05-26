@@ -48,7 +48,7 @@ public class ProxyTerminationTest extends SipServletTestCase {
 	ProtocolObjects	receiverProtocolObjects;
 
 
-	private static final int TIMEOUT = 20000;
+	private static final int TIMEOUT = 30000;
 
 	public ProxyTerminationTest(String name) {
 		super(name);
