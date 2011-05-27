@@ -1125,6 +1125,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
 						snapshotSipManager.snapshot(clusteredSipApplicationSession);
 					}
 				} 
+			} catch (Throwable e) {
+				logger.error("A problem occured while replicating", e);
+				// no need to rethrow an exception here as this is not recoverable and this could mess up the concurrency release of the semaphore on the session
 			} finally {
 				endBatchTransaction(batchStarted);
 				if(logger.isDebugEnabled()) {
@@ -1169,8 +1172,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				tm.endBatch();
 			}
 		} catch (Exception e) {
-			throw new IllegalStateException(
-					"Failed to stop batch replication transaction", e);
+			logger.error("Failed to stop batch replication transaction", e);
+			// no need to rethrow an exception here as this is not recoverable and this could mess up the concurrency release of the semaphore on the session
 		}
 	}
 	
