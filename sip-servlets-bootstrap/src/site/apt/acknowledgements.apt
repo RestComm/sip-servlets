@@ -96,6 +96,8 @@ Mobicents Sip Servlets' Hall Of Fame
 		
 		* Contributed {{{http://code.google.com/p/mobicents/issues/detail?id=2439}Issue 2439}} Termination of Session from Proxy as specified in 3GPP TS24.229 V10.2.0 Section 5.2.8.1.2.
 		
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2598}Issue 2598}} and contributed a fix for it
+		
 	* {{{http://blog.devrealm.org/}Georges Vagenas}} who has contributed MSS 2.0.0.ALPHA2
 	
 	* Ivan Dubrov (individual contributor) :

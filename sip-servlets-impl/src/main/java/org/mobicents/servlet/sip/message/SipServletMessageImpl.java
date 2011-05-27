@@ -1831,10 +1831,12 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 			ClassNotFoundException {		
 		sipFactoryImpl = (SipFactoryImpl) in.readObject();
 		String sessionKeyString = in.readUTF();
-		try {
-			sessionKey = SessionManagerUtil.parseSipSessionKey(sessionKeyString);
-		} catch (ParseException e) {
-			throw new IllegalArgumentException("SIP Sesion Key " + sessionKeyString + " previously serialized could not be reparsed", e);
+		if (sessionKeyString.length() > 0) {
+			try {
+				sessionKey = SessionManagerUtil.parseSipSessionKey(sessionKeyString);
+			} catch (ParseException e) {
+				throw new IllegalArgumentException("SIP Sesion Key " + sessionKeyString + " previously serialized could not be reparsed", e);
+			}
 		}
 		int attributesSize = in.readInt();
 		if(attributesSize > 0) {
@@ -1846,7 +1848,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 				attributes.put(key, value);
 			}
 		}
-		transactionApplicationData = (TransactionApplicationData) in.readObject();
+		if(in.readBoolean()) {
+			transactionApplicationData = (TransactionApplicationData) in.readObject();
+		}
 		headerForm = HeaderForm.valueOf(in.readUTF());
 		currentApplicationName = in.readUTF();
 		if(currentApplicationName.equals("")) {
@@ -1875,7 +1879,11 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		if(sessionKey != null) {
 			out.writeUTF(sessionKey.toString());
 		} else {
-			out.writeUTF(sipSession.getId());
+			if (null == sipSession) {
+				out.writeUTF("");
+			} else {
+				out.writeUTF(sipSession.getId());
+			}
 		}
 		if(attributes != null && attributes.size() > 0) {
 			out.writeInt(attributes.size());
@@ -1890,7 +1898,12 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		} else {
 			out.writeInt(0);
 		}
-		out.writeObject(transactionApplicationData);
+		if(transactionApplicationData != null) {
+			out.writeBoolean(true);
+			out.writeObject(transactionApplicationData);
+		} else {
+			out.writeBoolean(false);
+		}
 		out.writeUTF(headerForm.toString());
 		if(currentApplicationName != null) {
 			out.writeUTF(currentApplicationName);
@@ -1907,7 +1920,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 				out.writeBoolean(transaction instanceof ServerTransaction);
 			}
 		}
-		out.writeUTF(message.toString());		
+		out.writeUTF(message.toString());
 	}
 
 //	public void cleanUp() {
