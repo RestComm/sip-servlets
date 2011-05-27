@@ -12,6 +12,16 @@
 	<version>1.6.0-SNAPSHOT</version>
 	<name>Location Service Distributable Sip Servlet Example</name>
 	<url>http://www.mobicents.org/location_service.html</url>	
+	
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>annotations-api</artifactId>
+			<version>${tomcat.version}</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+	
 	<build>
 		<plugins>
 			<plugin>
