@@ -2,11 +2,11 @@ Quality Assurance
 
 * Continuous Integration TCK Tests for Jboss
 
-	The {{{http://hudson.jboss.org/hudson/job/MobicentsSipServletsReleaseTest/}Continuous Integration TCK tests for JBoss container}} displays the results of the latest run of the lastest hudson job running the TCK tests against the latest snapshot of the JBoss version of the Mobicents Sip servlets 
+	The {{{http://hudson.jboss.org/jenkins/job/MobicentsSipServletsReleaseTest/}Continuous Integration TCK tests for JBoss container}} displays the results of the latest run of the lastest hudson job running the TCK tests against the latest snapshot of the JBoss version of the Mobicents Sip servlets 
 	
 * Continuous Integration TCK Tests for Tomcat
 
-	The {{{http://hudson.jboss.org/hudson/job/MobicentsSipServletsReleaseTomcatTest/}Continuous Integration TCK tests for Tomcat container}} displays the results of the latest run of the lastest hudson job running the TCK tests against the latest snapshot of the Tomcat version of the Mobicents Sip servlets
+	The {{{http://hudson.jboss.org/jenkins/job/MobicentsSipServletsReleaseTomcatTest/}Continuous Integration TCK tests for Tomcat container}} displays the results of the latest run of the lastest hudson job running the TCK tests against the latest snapshot of the Tomcat version of the Mobicents Sip servlets
 * Continuous Integration TestSuite
 
 	The {{{https://hudson.jboss.org/hudson/job/MobicentsSipServlets}Continuous Integration TestSuite}} displays the results of the latest run of the lastest hudson job running the Mobicents Sip servlets testsuite
@@ -22,7 +22,7 @@ Quality Assurance
 
 	Mobicents Sip Servlets version 0.6 can handle load peaks of more than 400 cps. See {{{http://groups.google.com/group/mobicents-public/browse_thread/thread/13ab783b1acd8294}Report of a Mobicents Sip Servlets Performance Test}}		  
 
-	The {{{http://hudson.jboss.org/hudson/job/MobicentsSipServletsSimpleCallSetupPerformanceTest}Soak tests displays}} the results of the latest run of Mobicents Sip servlets load tests. 
+	The {{{http://hudson.jboss.org/jenkins/job/MobicentsSipServletsSimpleCallSetupPerformanceTest}Soak tests displays}} the results of the latest run of Mobicents Sip servlets load tests. 
 	
 	The Load Test is using a simple call flow : 
 	
