@@ -14,9 +14,9 @@
 			<item name="QA" href="qa.html" />
 		</menu>
 		<menu name="Documentation">
-			<item name="Community User Guide" href="http://hudson.jboss.org/jenkins/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets/index.html"/>
-			<item name="SIP Servlets 1.1 Javadoc" href="http://hudson.jboss.org/jenkins/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/api-docs/jsr289/javadocs/index.html"/>
-			<item name="Mobicents SIP Servlets Extensions Javadoc" href="http://hudson.jboss.org/jenkins/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/api-docs/jsr289/extensions/index.html"/>
+			<item name="Community User Guide" href="http://ci.jboss.org/jenkins/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets/index.html"/>
+			<item name="SIP Servlets 1.1 Javadoc" href="http://ci.jboss.org/jenkins/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/api-docs/jsr289/javadocs/index.html"/>
+			<item name="Mobicents SIP Servlets Extensions Javadoc" href="http://ci.jboss.org/jenkins/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/api-docs/jsr289/extensions/index.html"/>
 		</menu>
 		<menu name="Frameworks">			
 			<item name="CDI Telco Framework" href="./mss/ctf/mss-ctf.html"/>
