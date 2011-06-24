@@ -25,10 +25,12 @@ package org.mobicents.servlet.sip.message;
 import gov.nist.javax.sip.header.SIPHeader;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
+import java.io.ByteArrayOutputStream;
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.security.Principal;
@@ -42,14 +44,15 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 import java.util.Vector;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.MessagingException;
+import javax.mail.Multipart;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
@@ -89,8 +92,8 @@ import org.mobicents.ha.javax.sip.ReplicationStrategy;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
-import org.mobicents.servlet.sip.address.ParameterableHeaderImpl;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
+import org.mobicents.servlet.sip.address.ParameterableHeaderImpl;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -1259,20 +1262,27 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		
 		if(contentType != null && contentType.length() > 0) {
 			this.addHeader(ContentTypeHeader.NAME, contentType);
+			ContentTypeHeader contentTypeHeader = (ContentTypeHeader)this.message.getHeader(ContentTypeHeader.NAME);			
 			String charset = this.getCharacterEncoding();
 			try {		
-				Object tmpContent = content;
-				if(tmpContent instanceof String  && charset != null) {
-					//test for unsupportedencoding exception
-					new String("testEncoding".getBytes(charset));
-					
-					tmpContent = new String(((String)tmpContent).getBytes());
-				}
-				ContentTypeHeader contentTypeHeader = (ContentTypeHeader)this.message.getHeader(ContentTypeHeader.NAME);
-				this.message.setContent(content, contentTypeHeader);
-			} catch (ParseException e) {
-				throw new IllegalArgumentException("Parse error reading content type", e);
-			}
+				if(contentType.contains(CONTENT_TYPE_MULTIPART)) {
+					// Fix for Issue 2667 : Correct Handling of MimeMultipart
+					Multipart multipart = (Multipart) content;
+					OutputStream os = new ByteArrayOutputStream();
+					multipart.writeTo(os);
+					this.message.setContent(os.toString(), contentTypeHeader);
+				} else {
+					Object tmpContent = content;
+					if(tmpContent instanceof String  && charset != null) {
+						//test for unsupportedencoding exception
+						new String("testEncoding".getBytes(charset));
+						tmpContent = new String(((String)tmpContent).getBytes());
+					}
+					this.message.setContent(content, contentTypeHeader);
+				}				
+			} catch (Exception e) {
+				throw new IllegalArgumentException("Parse error reading content " + content + " with content type " + contentType, e);				
+			} 
 		}
 	}
 	

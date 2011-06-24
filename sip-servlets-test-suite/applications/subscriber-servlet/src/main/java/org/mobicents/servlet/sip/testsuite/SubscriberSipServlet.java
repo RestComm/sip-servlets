@@ -209,7 +209,7 @@ public class SubscriberSipServlet
 				sipServletResponse.send();
 				return;
 			}						
-		}
+		}		
 		if(getServletContext().getInitParameter("testMimeMultipartWhitespaces") != null) {
 			MimeMultipart multipart = (MimeMultipart) request.getContent();
 			try {
@@ -237,7 +237,34 @@ public class SubscriberSipServlet
 		} else {
 			logger.info("not sending 200 to Initial Notify as specified by the test configuration");			
 		}
-		
+		if(getServletContext().getInitParameter("testSendMultipart") != null ) {
+			Multipart multipart = (Multipart) request.getContent();
+			if(multipart != null) {
+				try {
+					int count = multipart.getCount();
+					logger.info("mulitpart count " + count);	
+					sendMessage(request.getSession(), "" + count);
+					BodyPart bodyPart = multipart.getBodyPart(0);					
+					logger.info("body part 0 's content type " + bodyPart.getContentType());
+					logger.info("body part 0 's content " + bodyPart.getContent());
+					Enumeration headers = bodyPart.getAllHeaders();
+					while (headers.hasMoreElements()) {
+						Header header = (Header) headers.nextElement();
+						logger.info("body part 0 's headers: name = " + header.getName() + ", value = " + header.getValue());
+					}
+				} catch (MessagingException e) {
+					logger.error("couldn't get count ", e);
+					SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+					sipServletResponse.send();
+					return;
+				}	
+			}
+			SipServletRequest infoRequest = request.getSession().createRequest("INFO");
+			infoRequest.setContentLength(request.getContentLength());
+			infoRequest.setContent(multipart, multipart.getContentType());
+			infoRequest.setRequestURI(request.getAddressHeader("Contact").getURI());
+			infoRequest.send();
+		}
 	}
 	
 	// SipServletListener methods
