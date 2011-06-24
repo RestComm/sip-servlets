@@ -83,7 +83,7 @@
 	
 	<properties>
 		<mobicents.tools.mavenplugin.eclipse.version>1.0.0.FINAL</mobicents.tools.mavenplugin.eclipse.version>
-		<mobicents.cluster.version>1.10-SNAPSHOT</mobicents.cluster.version>
+		<mobicents.cluster.version>1.11-SNAPSHOT</mobicents.cluster.version>
 		<mobicents.balancer.version>1.3-SNAPSHOT</mobicents.balancer.version>
 		<mobicents.jain.sip.ha.version>1.2.0-SNAPSHOT</mobicents.jain.sip.ha.version>
 		<mobicents.jain.sip.ext.version>1.0-SNAPSHOT</mobicents.jain.sip.ext.version>
