@@ -108,7 +108,7 @@
                                 <configuration>
                                     <checkoutDirectory>${checkout.basedir}/snmp-adaptor</checkoutDirectory>
                                     <skipCheckoutIfExists>true</skipCheckoutIfExists>
-                                    <connectionUrl>${sglc.connectionURL}</connectionUrl>
+                                    <connectionUrl>${snmp.connectionURL}</connectionUrl>
                                     <username>${checkout.username}</username>
                                     <password>${checkout.password}</password>
                                 </configuration>
@@ -212,7 +212,7 @@
                                     <basedir>${checkout.basedir}/snmp-adaptor</basedir>
                                     <scmVersion>HEAD</scmVersion>
                                     <scmVersionType>revision</scmVersionType>
-                                    <connectionUrl>${sglc.connectionURL}</connectionUrl>
+                                    <connectionUrl>${snmp.connectionURL}</connectionUrl>
                                     <username>${checkout.username}</username>
                                     <password>${checkout.password}</password>
                                 </configuration>
