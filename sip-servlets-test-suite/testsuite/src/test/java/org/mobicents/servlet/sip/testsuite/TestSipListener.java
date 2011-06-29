@@ -832,7 +832,7 @@ public class TestSipListener implements SipListener {
 				logger.info("Dialog State = " + dialog.getState());
 			}
 			
-			Response response = protocolObjects.messageFactory.createResponse(200, notify);
+			Response response = protocolObjects.messageFactory.createResponse(finalResponseToSend, notify);
 			// SHOULD add a Contact
 			ContactHeader contact = null;
 			if(contactHeader != null) {
