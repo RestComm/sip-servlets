@@ -33,6 +33,7 @@ import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
@@ -233,8 +234,9 @@ public class SipFactoryFacade implements SipFactory, Serializable {
 			sipApplicationSessionImpl = convergedSession.getApplicationSession(false);
 		}
 		if(sipApplicationSessionImpl == null) {
-			sipApplicationSessionImpl = (MobicentsSipApplicationSession)
-				sipFactoryImpl.createApplicationSessionByKey(sipApplicationKey);
+//			sipApplicationSessionImpl = (MobicentsSipApplicationSession)
+//				sipFactoryImpl.createApplicationSessionByKey(sipApplicationKey);
+			sipApplicationSessionImpl = (MobicentsSipApplicationSession) sipContext.getSipSessionsUtil().getApplicationSessionByKey(sipApplicationKey, true);
 			associateHttpSession(sipApplicationSessionImpl);
 		}
 		return sipApplicationSessionImpl;

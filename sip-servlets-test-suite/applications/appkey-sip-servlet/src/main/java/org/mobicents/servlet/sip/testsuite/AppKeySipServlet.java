@@ -112,7 +112,13 @@ public class AppKeySipServlet
 	 * @see javax.servlet.sip.SipServletListener#servletInitialized(javax.servlet.sip.SipServletContextEvent)
 	 */
 	public void servletInitialized(SipServletContextEvent ce) {
-		SipApplicationSession sipApplicationSession = sipSessionsUtil.getApplicationSessionByKey("appkeytest", true);
+		String appKeyName = "appkeytest";
+		SipApplicationSession sipApplicationSession = null;
+		if(ce.getServletContext().getInitParameter("createApplicationSessionByKey") != null) {
+			sipApplicationSession = sipFactory.createApplicationSessionByKey(appKeyName);
+		} else {
+			sipApplicationSession = sipSessionsUtil.getApplicationSessionByKey(appKeyName, true);
+		}
 		
 		URI fromURI = sipFactory.createSipURI("BigGuy", "here.com");
 		URI toURI = sipFactory.createSipURI("BigGuy", "there.com");
