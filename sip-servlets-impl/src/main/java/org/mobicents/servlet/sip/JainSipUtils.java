@@ -605,6 +605,10 @@ public final class JainSipUtils {
 	 */
 	public static javax.sip.address.SipURI createRecordRouteURI(SipNetworkInterfaceManager sipNetworkInterfaceManager, Message message) {
 		String transport = findTransport(message);		
+		return createRecordRouteURI(sipNetworkInterfaceManager, message, transport);
+	}
+	
+	public static javax.sip.address.SipURI createRecordRouteURI(SipNetworkInterfaceManager sipNetworkInterfaceManager, Message message, String transport) {	
 		ExtendedListeningPoint listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
 		boolean usePublicAddress = findUsePublicAddress(
 				sipNetworkInterfaceManager, message, listeningPoint);

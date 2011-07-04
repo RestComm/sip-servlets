@@ -82,6 +82,7 @@ import javax.sip.header.Parameters;
 import javax.sip.header.RequireHeader;
 import javax.sip.header.SupportedHeader;
 import javax.sip.header.ToHeader;
+import javax.sip.header.ViaHeader;
 import javax.sip.message.Message;
 import javax.sip.message.Request;
 
@@ -956,13 +957,15 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	 */
 	public String getRemoteAddr() {
 		if(getTransaction() != null) {
-			if(((SIPTransaction)getTransaction()).getPeerPacketSourceAddress() != null) {
+			if(((SIPTransaction)getTransaction()).getPeerPacketSourceAddress() != null &&
+					((SIPTransaction)getTransaction()).getPeerPacketSourceAddress().getHostAddress() != null) {
 				return ((SIPTransaction)getTransaction()).getPeerPacketSourceAddress().getHostAddress();
 			} else {
 				return ((SIPTransaction)getTransaction()).getPeerAddress();
 			}
 		} else {
-			return null;
+			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
+			return via.getHost();
 		}
 	}
 
@@ -971,14 +974,25 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	 * @see javax.servlet.sip.SipServletMessage#getRemotePort()
 	 */
 	public int getRemotePort() {
+		int port = -1;
+
 		if(getTransaction() != null) {
 			if(((SIPTransaction)getTransaction()).getPeerPacketSourceAddress() != null) {
-				return ((SIPTransaction)getTransaction()).getPeerPacketSourcePort();
+				port = ((SIPTransaction)getTransaction()).getPeerPacketSourcePort();
 			} else {
-				return ((SIPTransaction)getTransaction()).getPeerPort();
+				port = ((SIPTransaction)getTransaction()).getPeerPort();
 			}
 		} else {
-			return -1;
+			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
+			if(via != null) {
+				port = via.getPort();
+			}
+		}
+		if(port<=0) {
+			return 5060;
+		}
+		else {
+			return port;
 		}
 	}
 	

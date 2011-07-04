@@ -634,9 +634,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	public void proxySubsequentRequest(SipServletRequestImpl request) {		
 		if(!request.getMethod().equalsIgnoreCase("ACK") && !request.getMethod().equalsIgnoreCase("PRACK")) {
 			String branch = ((Via)request.getMessage().getHeader(Via.NAME)).getBranch();
-			synchronized (this.ongoingTransactions) {
-				this.ongoingTransactions.add(new TransactionRequest(branch, request));
-			}
+			this.ongoingTransactions.add(new TransactionRequest(branch, request));
 		}
 		// A re-INVITE needs special handling without goind through the dialog-stateful methods
 		if(request.getMethod().equalsIgnoreCase("INVITE")) {
@@ -798,6 +796,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 					proxy.getSipFactoryImpl(),
 					sipSession,
 					ctx, null, false);
+			appData.setSipServletMessage(clonedSipServletRequest);
 					 			
 			clonedSipServletRequest.setRoutingState(RoutingState.SUBSEQUENT);
 			// make sure to store the outgoing request to make sure the branchid for a ACK to a future reINVITE if this one is INFO

@@ -197,6 +197,11 @@ public class TransactionApplicationData implements Serializable {
 	public boolean isNoAppReturned() {
 		return noAppReturned;
 	}
+	
+	public void setSipServletMessage(SipServletMessageImpl message) {
+		this.sipServletMessage = message;
+	}
+
 
 	/**
 	 * @param modifier the modifier to set
