@@ -22,6 +22,7 @@
 
 package org.mobicents.servlet.sip.message;
 
+import gov.nist.javax.sip.header.HeaderExt;
 import gov.nist.javax.sip.header.SIPHeader;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
@@ -757,16 +758,16 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	public String getContentType() {
 		ContentTypeHeader cth = (ContentTypeHeader) this.message
 				.getHeader(getCorrectHeaderName(ContentTypeHeader.NAME));
-		if (cth != null)
-		{
-			String contentType = cth.getContentType();
-			String contentSubType = cth.getContentSubType();
-			if(contentSubType != null) 
-				return contentType + "/" + contentSubType;
-			return contentType;
-		}
-		else
-			return null;
+		if (cth != null) {
+			// Fix For Issue http://code.google.com/p/mobicents/issues/detail?id=2659
+			// getContentType doesn't return the full header value
+//			String contentType = cth.getContentType();
+//			String contentSubType = cth.getContentSubType();
+//			if(contentSubType != null) 
+//				return contentType + "/" + contentSubType;
+			return ((HeaderExt)cth).getValue();
+		} 
+		return null;
 	}
 
 	/*

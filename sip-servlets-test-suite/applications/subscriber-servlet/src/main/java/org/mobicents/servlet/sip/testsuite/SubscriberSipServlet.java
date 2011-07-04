@@ -190,6 +190,19 @@ public class SubscriberSipServlet
 			}
 		}
 		if(getServletContext().getInitParameter("testMultipart") != null ) {
+			String contentType = request.getContentType();
+			String contentTypeFromHeader = request.getHeader("Content-Type");
+			logger.info("contentType " + contentType);
+			logger.info("contentTypeFromHeader " + contentTypeFromHeader);
+			
+			if(!contentType.trim().equals("multipart/related;type=\"application/rlmi+xml\";start=\"<nXYxAE@pres.vancouver.example.com>\";boundary=\"50UBfW7LSCVLtggUPe5z\"") || 
+					!contentType.trim().equals(contentTypeFromHeader.trim())) {
+				logger.error("ContentType is incorrect " + contentType + " contentTypeFromHeader " + contentTypeFromHeader);
+				SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
+				sipServletResponse.send();
+				return;
+			}
+			
 			Multipart multipart = (Multipart) request.getContent();
 			try {
 				int count = multipart.getCount();
