@@ -90,6 +90,29 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			IOException {
 
 		logger.info("Got request:\n" + request.getMethod());
+		if(request.getFrom().toString().contains("proxy-tcp")) {
+			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
+			request.getProxy().setRecordRoute(true);
+			request.getProxy().proxyTo(sipFactory.createURI("sip:a@127.0.0.1:5090;transport=tcp"));
+			return;
+		}
+		
+		if(request.getFrom().toString().contains("proxy-udp")) {
+			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
+			request.getProxy().setRecordRoute(true);
+			request.getProxy().proxyTo(sipFactory.createURI("sip:a@127.0.0.1:5090;transport=udp"));
+			return;
+		}
+				
+		if(request.getFrom().toString().contains("proxy-tls")) {
+			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
+			request.getProxy().setRecordRoute(true);
+			request.getProxy().proxyTo(sipFactory.createURI("sips:a@127.0.0.1:5090;transport=tls"));
+			return;
+		}
 		String error = (String) request.getApplicationSession().getAttribute(ERROR);
 		if(error != null) {
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, error);
