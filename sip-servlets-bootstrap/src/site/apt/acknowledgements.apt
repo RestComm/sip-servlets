@@ -2,7 +2,9 @@ Mobicents Sip Servlets' Hall Of Fame
 
 	Bug Reports, enhancements or features for Mobicents Sip Servlets were contributed by the following people/companies:
 	
-	* Filip Olsson from {{{http://www.telavox.se}Telavox}} : reported {{{http://code.google.com/p/mobicents/issues/detail?id=112}Issue 112}} and contributed fix + test case for it 
+	* Filip Olsson from {{{http://www.telavox.se}Telavox}} : 
+	
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=112}Move adding of Via header to send() instead of B2buaHelper.createRequest}} and contributed fix + test case for it 
 	
 	* Thomas Leseney from {{{http://www.nexcom.fr/}Nexcom systems}} : 
 		
@@ -16,101 +18,109 @@ Mobicents Sip Servlets' Hall Of Fame
 		
 		* IPBX : {{{http://code.google.com/p/mobicents/issues/detail?id=122}issue 122}}
 		
-	* Eelco Cramer from {{{http://www.tno.nl}TNO ICT}} : reported {{{http://code.google.com/p/mobicents/issues/detail?id=280}Issue 280}} and contributed fix for it
+	* Eelco Cramer from {{{http://www.tno.nl}TNO ICT}} : 
+	
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=280}Routing to external application server incorrectly adds 'route' header}} and contributed fix for it
 	
 	* {{{mailto:haukex@zero-g.net}Hauke D\xE4mpfling}} : 
 	
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=410}Issue 410}} and contributed a fix for it.
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=410}SipURIImpl.getUser() throws NullPointerException instead of returning null}} and contributed a fix for it.
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=411}Issue 411}} and contributed a fix for it.
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=411}SipFactoryImpl.createSipServletRequest(...) uses App. Session key as Call-ID instead of random, unique ID}} and contributed a fix for it.
 	
-	* Joel Soderstrom from {{{http://www.telmi.se/}Telmi Communication}} : reported {{{http://code.google.com/p/mobicents/issues/detail?id=481}Issue 481}} and contributed a fix for it.
+	* Joel Soderstrom from {{{http://www.telmi.se/}Telmi Communication}} : 
+	
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=481}SipServletMessageImpl.getAddressHeader(..) throws exception instead of returning null}} and contributed a fix for it.
 	
 	* Alexandre Sova from {{{http://www.codeminders.com}Codeminders}}; commissioned by {{{http://www.avistar.com/}Avistar Communications Corp}} : 
 	
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=568}Issue 568}} and contributed a fix for it.
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=568}Second SIP request in SIP session cannot be "proxied"}} and contributed a fix for it.
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=585}Issue 585}} and contributed a fix for it.
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=585}Request's content not copied with B2buaHelper.createRequest(session, origRequest, ...)}} and contributed a fix for it.
 
 	* Alexander Kozlov from {{{http://www.codeminders.com}Codeminders}}; commissioned by {{{http://www.avistar.com/}Avistar Communications Corp}} : 
 	
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1015}Issue 1015}} and contributed a fix for it.		
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1015}Exception on addition a custom header to request}} and contributed a fix for it.		
 		
-		* contributed a fix for {{{http://code.google.com/p/mobicents/issues/detail?id=1010}Issue 1010}}.
+		* contributed a fix for {{{http://code.google.com/p/mobicents/issues/detail?id=1010}Unable to set flag parameter to parameterable header}}.
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1503}Issue 1503}} and contributed a fix for it.
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1503}Exception in thread "Timer-0" java.lang.IllegalArgumentException: Negative delay}} and contributed a fix for it.
 	
 	* Eric Cheung and Tom Smith from AT&T ECharts team for making sure E4SS is working continuously on Mobicents Sip Servlets and for their excellent bug reports.
 	
 	* Nick Semergey from {{{http://www.codeminders.com}Codeminders}}; commissioned by {{{http://www.avistar.com/}Avistar Communications Corp}} : 
 	
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1521}Issue 1521}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1521}Memory leak upon setting large RECEIVE_UDP_BUFFER_SIZE and SEND_UDP_BUFFER_SIZE}} and contributed a fix for it
 	
 	* Miha Polak and Jernej Krmelj both from {{{http://www.iskratel.com}Iskratel Slovenia}} : 
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1493}Issue 1493}} and help tremendously with heavy profiling, testing, insights and applying changes back and forth to help nailing it down
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1493}MSS Memory Leaks during some call flows errors}} and help tremendously with heavy profiling, testing, insights and applying changes back and forth to help nailing it down
 		
 	* Naoki Nishihara from {{{http://www.oki.com}OKI}} : 
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1612}Issue 1612}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1612}Mobicents Cluster does not remove non recurring tasks when they fired}} and contributed a fix for it
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1618}Issue 1618}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1618}on Timeout don't do the 408 processing for Server Transactions}} and contributed a fix for it
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1619}Issue 1619}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1619}removeAttribute is never called in cluster, when invalidating}} and contributed a fix for it
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1620}Issue 1620}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1620}Invalid synchronization in IntervalConvergedSnapshotManager}} and contributed a fix for it
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1621}Issue 1621}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1621}Missing null check in SipManagerDelegate}} and contributed a fix for it
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1627}Issue 1627}} and contributed a fix for it				
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1627}SASListener.sessionReadyToInvalidate() called multiple times}} and contributed a fix for it				
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1806}Issue 1806}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1806}SIP LB can not forward when node is listening on 0.0.0.0}} and contributed a fix for it
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1818}Issue 1818}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1818}Manage session-timeout configuration from sip.xml and web.xml separately}} and contributed a fix for it
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1853}Issue 1853}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1853}SipApplicationSession.getExpirationTime() returns 0 in converged app}} and contributed a fix for it
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1856}Issue 1856}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1856}Cannot create a parameterable header for Session-Expires}} and contributed a fix for it
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1869}Issue 1869}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1869}Messages on session that already have been invalidated or timed out should send 481}} and contributed a fix for it
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2216}Issue 2216}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2216}SIPDIalog will retransmit 200/INVITE only}} and contributed a fix for it
 		
 	* Yukinobu Imai from {{{http://www.oki.com}OKI}} : 
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1805}Issue 1805}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1805}SIPNode.equals method is implemented incorrectly}} and contributed a fix for it
 		
 	* Horaci Macias from {{{http://www.avaya.com/}Avaya}} :
 	
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1847}Issue 1847}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1847}Proxied reINVITE replaces request URI with Route address}} and contributed a fix for it
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2115}Issue 2115}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2115}Unable to handle GenericURI URIs}} and contributed a fix for it
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2461}Issue 2461}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2461}Cancelling a sequentially proxied INVITE reports exceptions}} and contributed a fix for it
 		
 	* Andrew Miller from {{{http://www.telsis.com/}Telsis}} :
 	
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1547}Issue 1547}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=1547}Can't add a Proxy-Authorization using SipServletMessage.addHeader}} and contributed a fix for it
 	
 	* Andrew Miller from {{{http://www.crocodile-rcs.com/}Crocodile RCS}} :
 		
-		* Contributed {{{http://code.google.com/p/mobicents/issues/detail?id=2439}Issue 2439}} Termination of Session from Proxy as specified in 3GPP TS24.229 V10.2.0 Section 5.2.8.1.2.
+		* Contributed {{{http://code.google.com/p/mobicents/issues/detail?id=2439}Termination of Session from Proxy as specified in 3GPP TS24.229 V10.2.0 Section 5.2.8.1.2.}}
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2598}Issue 2598}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2598}NPE seen when replicating in Proxy case}} and contributed a fix for it
 		
 	* {{{http://blog.devrealm.org/}Georges Vagenas}} who has contributed MSS 2.0.0.ALPHA2
 	
 	* Ivan Dubrov (individual contributor) :
 	 
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2321}Issue 2321}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2321}java.text.ParseException: Unexpected Token : Call-ID}} and contributed a fix for it
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2359}Issue 2359}} and contributed a fix for it 
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2359}Mobicents proxy sends ACK for 2xx response with wrong branch id}} and contributed a fix for it 
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2420}Issue 2420}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2420}SIP Balancer fails on urn:service:sos URIs}} and contributed a fix for it
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2427}Issue 2427}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2427}Serialize/Deserialize SipServletResponse in NO cluster environment exception}} and contributed a fix for it
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2429}Issue 2429}} and contributed a fix for it				
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2429}JAIN HA Heartbeat thinks balancer on 127.0.0.1 is unreachable on Windows}} and contributed a fix for it				
 		
-		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2441}Issue 2441}} and contributed a fix for it
+		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2441}When NOTIFY is received before Ok, remote tag is incorrectly set}} and contributed a fix for it
 	
+	* Subramanian Thamaraisamy from {{{http://www.cisco.com/}Cisco}} :
+		
+		* Reported and Contributed {{{http://code.google.com/p/mobicents/issues/detail?id=2669}DoS attacks against Mobicents}} 				
+		
