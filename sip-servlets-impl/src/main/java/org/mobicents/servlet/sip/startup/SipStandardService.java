@@ -240,9 +240,11 @@ public class SipStandardService extends StandardService implements SipService {
 			logger.info("Sip Stack path name : " + sipPathName);
 		}
 		SipFactories.initialize(sipPathName, usePrettyEncoding);
+		
+		String catalinaBase = getCatalinaBase();
 		if(darConfigurationFileLocation != null) {
 			if(!darConfigurationFileLocation.startsWith("file:///")) {
-				darConfigurationFileLocation = "file:///" + System.getProperty("catalina.home").replace(File.separatorChar, '/') + "/" + darConfigurationFileLocation;
+				darConfigurationFileLocation = "file:///" + catalinaBase.replace(File.separatorChar, '/') + "/" + darConfigurationFileLocation;
 			}
 			System.setProperty("javax.servlet.sip.dar", darConfigurationFileLocation);
  		}		
@@ -345,15 +347,9 @@ public class SipStandardService extends StandardService implements SipService {
 			// This simply puts HTTP and SSL port numbers in JVM properties menat to be read by jsip ha when sending heart beats with Node description.
 			StaticServiceHolder.sipStandardService.initializeSystemPortProperties();
 			
-			String catalinaHome = System.getProperty("catalina.home");
-	        if (catalinaHome == null) {
-	        	catalinaHome = System.getProperty("catalina.base");
-	        }
-	        if(catalinaHome == null) {
-	        	catalinaHome = ".";
-	        }
+			String catalinaBase = getCatalinaBase();
 	        if(sipStackPropertiesFileLocation != null && !sipStackPropertiesFileLocation.startsWith("file:///")) {
-				sipStackPropertiesFileLocation = "file:///" + catalinaHome.replace(File.separatorChar, '/') + "/" + sipStackPropertiesFileLocation;
+				sipStackPropertiesFileLocation = "file:///" + catalinaBase.replace(File.separatorChar, '/') + "/" + sipStackPropertiesFileLocation;
 	 		}
 	        boolean isPropsLoaded = false;
 	        if(sipStackProperties == null) {
@@ -401,12 +397,12 @@ public class SipStandardService extends StandardService implements SipService {
 				String debugLog = sipStackProperties.getProperty(DEBUG_LOG_STACK_PROP);
 				if(debugLog != null && debugLog.length() > 0 && !debugLog.startsWith("file:///")) {				
 					sipStackProperties.setProperty(DEBUG_LOG_STACK_PROP,
-						catalinaHome + "/" + debugLog);
+						catalinaBase + "/" + debugLog);
 				}
 				String serverLog = sipStackProperties.getProperty(SERVER_LOG_STACK_PROP);
 				if(serverLog != null && serverLog.length() > 0 && !serverLog.startsWith("file:///")) {
 					sipStackProperties.setProperty(SERVER_LOG_STACK_PROP,
-						catalinaHome + "/" + serverLog);
+						catalinaBase + "/" + serverLog);
 				}
 				// The whole MSS is built upon those assumptions, so those properties are not overrideable
 				sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");
@@ -424,9 +420,9 @@ public class SipStandardService extends StandardService implements SipService {
 				sipStackProperties.setProperty("gov.nist.javax.sip.TRACE_LEVEL",
 						"32");
 				sipStackProperties.setProperty(DEBUG_LOG_STACK_PROP,
-						catalinaHome + "/" + "mss-jsip-" + getName() +"-debug.txt");
+						catalinaBase + "/" + "mss-jsip-" + getName() +"-debug.txt");
 				sipStackProperties.setProperty(SERVER_LOG_STACK_PROP,
-						catalinaHome + "/" + "mss-jsip-" + getName() +"-messages.xml");
+						catalinaBase + "/" + "mss-jsip-" + getName() +"-messages.xml");
 				sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-" + getName());
 				sipStackProperties.setProperty(AUTOMATIC_DIALOG_SUPPORT_STACK_PROP, "off");		
 				sipStackProperties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
@@ -1172,5 +1168,20 @@ public class SipStandardService extends StandardService implements SipService {
 	 */
 	public String getDnsServerLocatorClass() {
 		return dnsServerLocatorClass;
+	}
+	
+	/**
+	 * Returns first the catalina.base if it is defined then the catalina.home if it is defined
+	 * then the current dir if none is specified
+	 */
+	protected String getCatalinaBase() {
+		String catalinaBase = System.getProperty("catalina.base");
+        if (catalinaBase == null) {
+        	catalinaBase = System.getProperty("catalina.home");
+        }
+        if(catalinaBase == null) {
+        	catalinaBase = ".";
+        }
+		return catalinaBase;
 	}
 }
