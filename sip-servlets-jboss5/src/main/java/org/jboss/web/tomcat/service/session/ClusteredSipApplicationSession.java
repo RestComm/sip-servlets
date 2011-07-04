@@ -739,7 +739,8 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		// From Sip Application Session
 		Boolean valid = (Boolean) md.getMetaData().get(IS_VALID);
 		if(valid != null) {
-			setValid(valid);
+			// call to super very important to avoid setting the session dirty on reload and rewrite to the cache
+			super.setValid(valid);
 		} 
 		sipSessions.clear();
 		SipSessionKey[] sipSessionKeys = (SipSessionKey[])md.getMetaData().get(SIP_SESSIONS);
@@ -813,6 +814,9 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 
 		// We are no longer outdated vis a vis distributed cache
 		clearOutdated();
+		// make sure we don't write back to the cache on a remote session refresh
+		sessionAttributesDirty = false;
+		sessionMetadataDirty = false;
 	}
 
 	// ------------------------------------------------------------------ Public

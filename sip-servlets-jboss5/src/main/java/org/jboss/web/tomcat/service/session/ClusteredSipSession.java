@@ -841,6 +841,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		isNew = false;
 		// We are no longer outdated vis a vis distributed cache
 		clearOutdated();
+		// make sure we don't write back to the cache on a remote session refresh
+		sessionAttributesDirty = false;
+		sessionMetadataDirty = false;
 	}
 
 	protected void updateSipSession(DistributableSipSessionMetadata md) {
@@ -849,7 +852,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		handlerServlet = (String) metaData.get(HANDLER);		
 		Boolean valid = (Boolean)metaData.get(IS_VALID);
 		if(valid != null) {
-			setValid(valid);
+			// call to super very important to avoid setting the session dirty on reload and rewrite to the cache
+			super.setValid(valid);
 		} 
 		state = (State)metaData.get(STATE);
 		Long cSeq = (Long) metaData.get(CSEQ);
