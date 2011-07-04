@@ -124,7 +124,13 @@ public class DefaultSasTimerTask implements SipApplicationSessionTimerTask {
 	}				
 	
 	public long getDelay() {
-		return sipApplicationSession.getExpirationTimeInternal() - System.currentTimeMillis();
+		if(sipApplicationSession != null) {
+			return sipApplicationSession.getExpirationTimeInternal() - System.currentTimeMillis();
+		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("sipapplicationsession has been nullified, return -1");
+		}
+		return -1;
 	}
 
 	/**
