@@ -1294,7 +1294,9 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 						tmpContent = new String(((String)tmpContent).getBytes());
 					}
 					this.message.setContent(content, contentTypeHeader);
-				}				
+				}
+			} catch (UnsupportedEncodingException uee) {
+				throw uee;
 			} catch (Exception e) {
 				throw new IllegalArgumentException("Parse error reading content " + content + " with content type " + contentType, e);				
 			} 
