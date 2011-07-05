@@ -115,7 +115,7 @@ ipAddress="127.0.0.1"
       </varlistentry>
     </variablelist>
     <note>
-      <para>A comprehensive list of implementing classes for the SIP Stack is available from the <ulink url="http://hudson.jboss.org/hudson/job/jain-sip/lastSuccessfulBuild/artifact/javadoc/javax/sip/SipStack.html">Class SipStackImpl page on nist.gov</ulink>.</para>
+      <para>A comprehensive list of implementing classes for the SIP Stack is available from the <ulink url="http://ci.jboss.org/jenkins/job/jain-sip/lastSuccessfulBuild/artifact/javadoc/javax/sip/SipStack.html">Class SipStackImpl page on nist.gov</ulink>.</para>
     </note>
   </section>
   <section id="bsssc-binary-SIP_Servlets_Server-Configuring_Application_Routing">
