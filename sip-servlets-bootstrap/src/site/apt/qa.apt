@@ -9,7 +9,7 @@ Quality Assurance
 	The {{{http://ci.jboss.org/jenkins/job/MobicentsSipServletsReleaseTomcatTest/}Continuous Integration TCK tests for Tomcat container}} displays the results of the latest run of the lastest hudson job running the TCK tests against the latest snapshot of the Tomcat version of the Mobicents Sip servlets
 * Continuous Integration TestSuite
 
-	The {{{https://hudson.jboss.org/hudson/job/MobicentsSipServlets}Continuous Integration TestSuite}} displays the results of the latest run of the lastest hudson job running the Mobicents Sip servlets testsuite
+	The {{{https://ci.jboss.org/jenkins/job/MobicentsSipServlets}Continuous Integration TestSuite}} displays the results of the latest run of the lastest hudson job running the Mobicents Sip servlets testsuite
 	against the latest piece of committed code
 	
 * Mobicents Sip Servlets Load and Performance Tests

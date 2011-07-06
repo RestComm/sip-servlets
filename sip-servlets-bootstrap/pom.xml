@@ -14,7 +14,7 @@
 	<url>http://www.mobicents.org-a.googlepages.com/products_sip_servlets.html</url>
 	<ciManagement>
 		<system>Hudson</system>
-		<url>https://hudson.jboss.org/hudson/job/MobicentsSipServlets/</url>
+		<url>https://ci.jboss.org/jenkins/job/MobicentsSipServlets/</url>
 	</ciManagement>
 	<developers>
 		<developer>
