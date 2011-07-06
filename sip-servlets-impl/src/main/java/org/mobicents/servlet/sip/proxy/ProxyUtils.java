@@ -73,20 +73,22 @@ public class ProxyUtils {
 			final SipFactoryImpl sipFactoryImpl = proxy.getSipFactoryImpl();
 			((MessageExt)clonedRequest).setApplicationData(null);
 
-			
+
 			String outboundTransport = null;
-			
+
 			RouteHeader rHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
 			if(rHeader != null) {
 				String nextApp = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME);
-				final SipApplicationSessionKey sipAppKey = originalRequest.getSipSession().getSipApplicationSession().getKey();
-				final String thisApp = sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());
-				outboundTransport = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getTransportParam();
-				if(outboundTransport == null) {
-					outboundTransport = ListeningPoint.UDP;
-				}
-				if(nextApp.equals(thisApp)) {
-					clonedRequest.removeHeader(RouteHeader.NAME);
+				if(nextApp != null) {
+					final SipApplicationSessionKey sipAppKey = originalRequest.getSipSession().getSipApplicationSession().getKey();
+					final String thisApp = sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());
+					outboundTransport = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getTransportParam();
+					if(outboundTransport == null) {
+						outboundTransport = ListeningPoint.UDP;
+					}
+					if(nextApp.equals(thisApp)) {
+						clonedRequest.removeHeader(RouteHeader.NAME);
+					}
 				}
 			}
 			
