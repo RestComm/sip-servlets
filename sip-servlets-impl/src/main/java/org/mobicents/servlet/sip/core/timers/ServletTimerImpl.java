@@ -190,6 +190,8 @@ public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 				// be due for gc anyway....
 				appSessionToCancelThisTimersFrom = getApplicationSession();
 				future = null;
+				// Issue 2367 removing the reference to the Serializable info so that it doesn't linger into memory
+				info = null;
 			}
 		}
 		if (appSessionToCancelThisTimersFrom != null && updateAppSessionReadyToInvalidateState) {
