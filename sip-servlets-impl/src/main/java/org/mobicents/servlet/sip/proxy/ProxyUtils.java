@@ -95,7 +95,8 @@ public class ProxyUtils {
 			String inboundTransport = ((ViaHeader)clonedRequest.getHeader(Via.NAME)).getTransport();
 			if(inboundTransport == null) inboundTransport = ListeningPoint.UDP;
 
-			
+			/*
+			 * The outbound transport has nothing to do with outbound interface
 			if(proxy.getOutboundInterface() != null) {
 				outboundTransport = proxy.getOutboundInterface().getTransportParam();
 				if(outboundTransport == null) {
@@ -105,7 +106,7 @@ public class ProxyUtils {
 						outboundTransport =  ListeningPoint.UDP;
 					}
 				}
-			}
+			}*/
 			
 			// The target is null when proxying subsequent requests (the Route header is already there)
 			if(destination != null)
@@ -194,11 +195,12 @@ public class ProxyUtils {
 			final String appName = sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());
 			final SipServletRequestImpl proxyBranchMatchingRequest = (SipServletRequestImpl) proxyBranch.getMatchingRequest(originalRequest);
 			//Add via header
+			if(outboundTransport == null && destination != null) {
+				outboundTransport = destination.getParameter("transport");
+			}
 			if(proxy.getOutboundInterface() == null) {
 				String branchId = null;
-				if(outboundTransport == null && destination != null) {
-					outboundTransport = destination.getParameter("transport");
-				}
+				
 				// http://code.google.com/p/mobicents/issues/detail?id=2359
 				// ivan dubrov : TERMINATED state checking to avoid reusing the branchid for ACK to 200 
 				if(Request.ACK.equals(method) && proxyBranchMatchingRequest != null && proxyBranchMatchingRequest.getTransaction() != null
@@ -293,6 +295,7 @@ public class ProxyUtils {
 					rrURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest, outboundTransport);
 				} else {
 					rrURI = ((SipURIImpl) proxy.getOutboundInterface()).getSipURI();
+					rrURI.setTransportParam(outboundTransport);
 				}
 				
 				final Iterator<String> paramNames = routeRecord.getParameterNames();

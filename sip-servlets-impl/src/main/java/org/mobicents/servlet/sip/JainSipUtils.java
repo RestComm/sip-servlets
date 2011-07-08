@@ -756,13 +756,17 @@ public final class JainSipUtils {
 	
 	public static void optimizeRouteHeaderAddressForInternalRoutingrequest(SipConnector sipConnector, Request request, MobicentsSipSession session,  SipFactoryImpl sipFactoryImpl, String transport) {
 		RouteHeader rh = (RouteHeader) request.getHeader(RouteHeader.NAME);
+		javax.sip.address.URI uri = null;
 		if(rh != null) {
-			javax.sip.address.URI uri = rh.getAddress().getURI();
-			if(uri.isSipURI()) {
-				javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
-				optimizeUriForInternalRoutingRequest(sipConnector, sipUri, session, sipFactoryImpl, transport);
-			}
+			uri = rh.getAddress().getURI();
+		} else {
+			uri = request.getRequestURI();
 		}
+		if(uri.isSipURI()) {
+			javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
+			optimizeUriForInternalRoutingRequest(sipConnector, sipUri, session, sipFactoryImpl, transport);
+		}
+
 	}
 
 	public static void optimizeUriForInternalRoutingRequest(SipConnector sipConnector, javax.sip.address.SipURI sipUri, MobicentsSipSession session,  SipFactoryImpl sipFactoryImpl, String transport) {
