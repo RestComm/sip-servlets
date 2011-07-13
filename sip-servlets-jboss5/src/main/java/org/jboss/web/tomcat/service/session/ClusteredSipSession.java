@@ -105,6 +105,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	protected static final String B2B_SESSION_SIZE = "b2bss";
 	protected static final String B2B_LINKED_REQUESTS_MAP = "b2blrm";
 	protected static final String B2B_LINKED_REQUESTS_SIZE = "b2blrs";
+	protected static final String TO_TAG = "tt";
 	protected static final String TXS_SIZE = "txm";
 	protected static final String TXS_IDS= "txid";
 	protected static final String TXS_TYPE= "txt";
@@ -947,6 +948,16 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 					}					
 				}				
 			}
+			String toTag = (String) metaData.get(TO_TAG);
+			if(logger.isDebugEnabled()) {
+				logger.debug("sessionkey replicated totag to " + toTag);
+			}
+			if(key.getToTag() == null && toTag != null && toTag.trim().length() > 0) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("setting sessionkey totag to " + toTag);
+				}
+				key.setToTag(toTag, false);
+			}
 			// Fix for Issue 2739 : Null returned for B2BUAHelperImpl.getLinkedSipServletRequest() in Early Dailog Failover
 			size = (Integer) metaData.get(B2B_LINKED_REQUESTS_SIZE);
 			SipServletRequestImpl[][] linkedRequests = (SipServletRequestImpl[][])metaData.get(B2B_LINKED_REQUESTS_MAP);
@@ -1052,6 +1063,11 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 					logger.debug("storing transaction type array " + txTypeArray);
 				}
 				metaData.put(TXS_TYPE, txTypeArray);
+				String toTag = key.getToTag();
+				if(toTag == null) {
+					toTag = "";
+				}
+				metaData.put(TO_TAG, toTag);
 				if(b2buaHelper != null) {
 					// Fix for Issue 2739 : Null returned for B2BUAHelperImpl.getLinkedSipServletRequest() in Early Dailog Failover
 					final Map<SipServletRequestImpl, SipServletRequestImpl> linkedRequestsMap = b2buaHelper.getOriginalRequestMap();

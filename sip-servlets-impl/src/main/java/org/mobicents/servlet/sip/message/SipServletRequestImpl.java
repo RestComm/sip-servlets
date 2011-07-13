@@ -360,9 +360,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						    }
 							if(toTag == null) {
 								toTag = ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(),sipSessionKey.getApplicationName(), sipAppSessionKey.getId());
-								// Fix for Issue 2739 : Null returned for B2BUAHelperImpl.getLinkedSipServletRequest() in Early Dailog Failover
-								// recomputing set to true so that for early dialogs the sip session is stored with the to tag correctly
-								session.getKey().setToTag(toTag, true);
+								//need to stay false for TCK Test com.bea.sipservlet.tck.agents.api.javax_servlet_sip.SipSessionListenerTest.testSessionDestroyed001
+								session.getKey().setToTag(toTag, false);
 							}
 							if(logger.isDebugEnabled()) {
 						    	logger.debug("setting ToTag: " + toTag);
