@@ -78,6 +78,13 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 				new String[]{"sip:forward-receiver-fwd-ack@sip-servlets.com", "sip:forward-receiver-fwd-ack@127.0.0.1:5090"});
 		forwardingUris.put("sip:receiver-fwd-ack@127.0.0.1:5080", 
 				new String[]{"sip:forward-receiver-fwd-ack@sip-servlets.com", "sip:forward-receiver-fwd-ack@127.0.0.1:5090"});
+		
+		forwardingUris.put("sip:receiver-linked@sip-servlets.com", 
+				new String[]{"sip:forward-receiver-linked@sip-servlets.com", "sip:forward-receiver-linked@127.0.0.1:5090"});
+		forwardingUris.put("sip:receiver-linked@127.0.0.1", 
+				new String[]{"sip:forward-receiver-linked@sip-servlets.com", "sip:forward-receiver-linked@127.0.0.1:5090"});
+		forwardingUris.put("sip:receiver-linked@127.0.0.1:5080", 
+				new String[]{"sip:forward-receiver-linked@sip-servlets.com", "sip:forward-receiver-linked@127.0.0.1:5090"});
 	}
 	
 	@Override
@@ -228,11 +235,21 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 				}
 				ackRequest.send();
 			}
-			//create and sends OK for the first call leg							
-			SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
-			SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
-			if(logger.isInfoEnabled()) {
-				logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);
+			SipServletResponse responseToOriginalRequest = null;
+			//create and sends OK for the first call leg	
+			if(sipServletResponse.getTo().getURI().toString().contains("linked")) {
+				B2buaHelper b2buaHelper = sipServletResponse.getRequest().getB2buaHelper();
+				SipServletRequest originalRequest = b2buaHelper.getLinkedSipServletRequest(sipServletResponse.getRequest());			
+				responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
+				if(logger.isInfoEnabled()) {
+					logger.info("Sending OK on the 1st call leg with linked " + responseToOriginalRequest.toString());
+				}				
+			} else {
+				SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
+				responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
+				if(logger.isInfoEnabled()) {
+					logger.info("Sending OK on 1st call leg" +  responseToOriginalRequest);
+				}
 			}
 			responseToOriginalRequest.setContentLength(sipServletResponse.getContentLength());
 			if(sipServletResponse.getContent() != null && sipServletResponse.getContentType() != null)
@@ -267,10 +284,21 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 	@Override
 	protected void doProvisionalResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
-		SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
-		SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
-		if(logger.isInfoEnabled()) {
-			logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
+		SipServletResponse responseToOriginalRequest = null;
+		if(sipServletResponse.getTo().getURI().toString().contains("linked")) {
+			B2buaHelper b2buaHelper = sipServletResponse.getRequest().getB2buaHelper();
+			SipServletRequest originalRequest = b2buaHelper.getLinkedSipServletRequest(sipServletResponse.getRequest());			
+			responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
+			if(logger.isInfoEnabled()) {
+				logger.info("Sending on the first call leg with linked " + responseToOriginalRequest.toString());
+			}
+			
+		} else {
+			SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
+			responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
+			if(logger.isInfoEnabled()) {
+				logger.info("Sending on the first call leg " + responseToOriginalRequest.toString());
+			}
 		}
 		responseToOriginalRequest.send();
 	}

@@ -945,27 +945,27 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 							}
 						}
 					}					
-				}	
-				// Fix for Issue 2739 : Null returned for B2BUAHelperImpl.getLinkedSipServletRequest() in Early Dailog Failover
-				size = (Integer) metaData.get(B2B_LINKED_REQUESTS_SIZE);
-				SipServletRequestImpl[][] linkedRequests = (SipServletRequestImpl[][])metaData.get(B2B_LINKED_REQUESTS_MAP);
-				if(logger.isDebugEnabled()) {
-					logger.debug("b2bua linked requests array size = " + size + ", value = " + linkedRequests);
+				}				
+			}
+			// Fix for Issue 2739 : Null returned for B2BUAHelperImpl.getLinkedSipServletRequest() in Early Dailog Failover
+			size = (Integer) metaData.get(B2B_LINKED_REQUESTS_SIZE);
+			SipServletRequestImpl[][] linkedRequests = (SipServletRequestImpl[][])metaData.get(B2B_LINKED_REQUESTS_MAP);
+			if(logger.isDebugEnabled()) {
+				logger.debug("b2bua linked requests array size = " + size + ", value = " + linkedRequests);
+			}
+			if(size != null && linkedRequests != null) {
+				Map<SipServletRequestImpl, SipServletRequestImpl> linkedRequestsMap = new ConcurrentHashMap<SipServletRequestImpl, SipServletRequestImpl>();
+				for (int i = 0; i < size; i++) {
+					SipServletRequestImpl key = linkedRequests[0][i];
+					SipServletRequestImpl value = linkedRequests[1][i];
+					linkedRequestsMap.put(key, value);						
 				}
-				if(size != null && linkedRequests != null) {
-					Map<SipServletRequestImpl, SipServletRequestImpl> linkedRequestsMap = new ConcurrentHashMap<SipServletRequestImpl, SipServletRequestImpl>();
-					for (int i = 0; i < size; i++) {
-						SipServletRequestImpl key = linkedRequests[0][i];
-						SipServletRequestImpl value = linkedRequests[1][i];
-						linkedRequestsMap.put(key, value);						
-					}
-					if(b2buaHelper == null) {
-						b2buaHelper = new B2buaHelperImpl();
-						b2buaHelper.setSipFactoryImpl(getManager().getSipFactoryImpl());
-						b2buaHelper.setSipManager(getManager());
-					}
-					b2buaHelper.setOriginalRequestMap(linkedRequestsMap);
+				if(b2buaHelper == null) {
+					b2buaHelper = new B2buaHelperImpl();
+					b2buaHelper.setSipFactoryImpl(getManager().getSipFactoryImpl());
+					b2buaHelper.setSipManager(getManager());
 				}
+				b2buaHelper.setOriginalRequestMap(linkedRequestsMap);
 			}
 		}
 		if(logger.isDebugEnabled()) {
