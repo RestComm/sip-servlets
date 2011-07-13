@@ -355,10 +355,18 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 						// make sure not to generate a new tag
 						synchronized (this) {
 							String toTag = sipSessionKey.getToTag();
+							if(logger.isDebugEnabled()) {
+						    	logger.debug("sipSessionKey ToTag : " + toTag);
+						    }
 							if(toTag == null) {
 								toTag = ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(),sipSessionKey.getApplicationName(), sipAppSessionKey.getId());
-								session.getKey().setToTag(toTag, false);
-							}											
+								// Fix for Issue 2739 : Null returned for B2BUAHelperImpl.getLinkedSipServletRequest() in Early Dailog Failover
+								// recomputing set to true so that for early dialogs the sip session is stored with the to tag correctly
+								session.getKey().setToTag(toTag, true);
+							}
+							if(logger.isDebugEnabled()) {
+						    	logger.debug("setting ToTag: " + toTag);
+						    }
 							toHeader.setTag(toTag);	
 						}						
 					} else {							

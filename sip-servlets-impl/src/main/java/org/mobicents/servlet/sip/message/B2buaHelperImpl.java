@@ -938,4 +938,11 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	public Map<SipServletRequestImpl, SipServletRequestImpl> getOriginalRequestMap() {
 		return originalRequestMap;
 	}
+	
+	/**
+	 * @param originalRequestsMap the originalRequests to set
+	 */
+	public void setOriginalRequestMap(Map<SipServletRequestImpl, SipServletRequestImpl> originalRequestsMap) {
+		this.originalRequestMap =  originalRequestsMap;
+	}
 }

@@ -103,6 +103,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 
 	protected static final String B2B_SESSION_MAP = "b2bsm";
 	protected static final String B2B_SESSION_SIZE = "b2bss";
+	protected static final String B2B_LINKED_REQUESTS_MAP = "b2blrm";
+	protected static final String B2B_LINKED_REQUESTS_SIZE = "b2blrs";
 	protected static final String TXS_SIZE = "txm";
 	protected static final String TXS_IDS= "txid";
 	protected static final String TXS_TYPE= "txt";
@@ -942,8 +944,28 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 								}
 							}
 						}
+					}					
+				}	
+				// Fix for Issue 2739 : Null returned for B2BUAHelperImpl.getLinkedSipServletRequest() in Early Dailog Failover
+				size = (Integer) metaData.get(B2B_LINKED_REQUESTS_SIZE);
+				SipServletRequestImpl[][] linkedRequests = (SipServletRequestImpl[][])metaData.get(B2B_LINKED_REQUESTS_MAP);
+				if(logger.isDebugEnabled()) {
+					logger.debug("b2bua linked requests array size = " + size + ", value = " + linkedRequests);
+				}
+				if(size != null && linkedRequests != null) {
+					Map<SipServletRequestImpl, SipServletRequestImpl> linkedRequestsMap = new ConcurrentHashMap<SipServletRequestImpl, SipServletRequestImpl>();
+					for (int i = 0; i < size; i++) {
+						SipServletRequestImpl key = linkedRequests[0][i];
+						SipServletRequestImpl value = linkedRequests[1][i];
+						linkedRequestsMap.put(key, value);						
 					}
-				}				
+					if(b2buaHelper == null) {
+						b2buaHelper = new B2buaHelperImpl();
+						b2buaHelper.setSipFactoryImpl(getManager().getSipFactoryImpl());
+						b2buaHelper.setSipManager(getManager());
+					}
+					b2buaHelper.setOriginalRequestMap(linkedRequestsMap);
+				}
 			}
 		}
 		if(logger.isDebugEnabled()) {
@@ -1030,6 +1052,23 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 					logger.debug("storing transaction type array " + txTypeArray);
 				}
 				metaData.put(TXS_TYPE, txTypeArray);
+				if(b2buaHelper != null) {
+					// Fix for Issue 2739 : Null returned for B2BUAHelperImpl.getLinkedSipServletRequest() in Early Dailog Failover
+					final Map<SipServletRequestImpl, SipServletRequestImpl> linkedRequestsMap = b2buaHelper.getOriginalRequestMap();
+					final int linkedRequestsMapSize = linkedRequestsMap.size();
+					final SipServletRequestImpl[][] linkedRequestsArray = new SipServletRequestImpl[2][linkedRequestsMapSize];
+					int j = 0;
+					for (Entry<SipServletRequestImpl, SipServletRequestImpl> entry : linkedRequestsMap.entrySet()) {
+						linkedRequestsArray [0][j] = entry.getKey(); 
+						linkedRequestsArray [1][j] = entry.getValue();
+						j++;
+					}
+					metaData.put(B2B_LINKED_REQUESTS_SIZE, linkedRequestsMapSize);
+					if(logger.isDebugEnabled()) {
+						logger.debug("storing b2bua linked requests array " + linkedRequestsArray);
+					}
+					metaData.put(B2B_LINKED_REQUESTS_MAP, linkedRequestsArray);
+				}	
 			}
 		}
 		distributedCacheManager.storeSipSessionData(outgoingData);

@@ -414,6 +414,32 @@ sleep $HALFSTARTSLEEP
 sleep 10
 
 ##################################
+# Test b2bua Linked Requests Early Dialog Failover
+##################################
+echo "Test b2bua early linked requests dialog failover"
+echo "================================"
+./auto-prepare-example.sh b2bua-early $config1
+./auto-prepare-example.sh b2bua-early $config2
+
+./auto-start-jboss-server.sh $config2 config2.pid 1 b2bua-early-linked
+
+#Wait to boot
+sleep $HALFSTARTSLEEP
+
+./auto-start-jboss-server.sh $config1 config1.pid 0 b2bua-early-linked
+
+#Wait to boot
+sleep $HALFSTARTSLEEP
+
+./auto-run-test.sh b2bua-early-linked result.txt
+
+#Kill the app servers
+./auto-kill-process-tree.sh `cat config1.pid` $config1
+./auto-kill-process-tree.sh `cat config2.pid` $config2
+
+sleep 10
+
+##################################
 # Test b2bua Forward Ack Early Dialog Failover
 ##################################
 echo "Test b2bua early dialog failover Forward Ack"
