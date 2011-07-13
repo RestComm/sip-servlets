@@ -498,7 +498,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		if(this.ackReceived) 
 			throw new IllegalStateException("Can't start. ACK has been received.");
 		if(!this.originalRequest.isInitial())
-			throw new IllegalStateException("Applications should not attepmt to " +
+			throw new IllegalStateException("Applications should not attempt to " +
 					"proxy subsequent requests. Proxying the initial request is " +
 					"sufficient to carry all subsequent requests through the same" +
 					" path.");
