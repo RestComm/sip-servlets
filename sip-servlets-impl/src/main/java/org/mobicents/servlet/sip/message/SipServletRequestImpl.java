@@ -98,7 +98,6 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
-import org.mobicents.ext.javax.sip.dns.DNSAwareRouter;
 import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.javax.servlet.sip.SipServletRequestExt;
 import org.mobicents.servlet.sip.JainSipUtils;
@@ -1097,12 +1096,21 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 								"since no more apps are interested.");
 					}
 					//Adding Route Header for LB if we are in a HA configuration
-					if(sipFactoryImpl.isUseLoadBalancer() && isInitial) {
-						sipFactoryImpl.addLoadBalancerRouteHeader(request);
-						addDNSRoute = false;
-						if(logger.isDebugEnabled()) {
-							logger.debug("adding route to Load Balancer since we are in a HA configuration " +
-									" and no more apps are interested.");
+					if(isInitial) {
+						if(sipFactoryImpl.isUseLoadBalancer()) {
+							sipFactoryImpl.addLoadBalancerRouteHeader(request);
+							addDNSRoute = false;
+							if(logger.isDebugEnabled()) {
+								logger.debug("adding route to Load Balancer since we are in a HA configuration " +
+								" and no more apps are interested.");
+							}
+						} else if(StaticServiceHolder.sipStandardService.getOutboundProxy() != null) {
+							sipFactoryImpl.addLoadBalancerRouteHeader(request);
+							addDNSRoute = false;
+							if(logger.isDebugEnabled()) {
+								logger.debug("adding route to outbound proxy (no load balancer set) since we have outboundProxy configured " +
+								" and no more apps are interested.");
+							}
 						}
 					}
 				}
@@ -1307,7 +1315,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				nextHopUri.setTransportParam(hop.getTransport());
 			}
 			// Deal with http://code.google.com/p/mobicents/issues/detail?id=2346
-			nextHopUri.setParameter(DNSAwareRouter.DNS_ROUTE, Boolean.TRUE.toString());
+			//nextHopUri.setParameter(DNSAwareRouter.DNS_ROUTE, Boolean.TRUE.toString());
 			final javax.sip.address.Address nextHopRouteAddress = 
 				SipFactories.addressFactory.createAddress(nextHopUri);
 			final RouteHeader nextHopRouteHeader = 
