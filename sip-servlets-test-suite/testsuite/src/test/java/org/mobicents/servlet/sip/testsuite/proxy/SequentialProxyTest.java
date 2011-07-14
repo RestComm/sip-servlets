@@ -23,6 +23,7 @@
 package org.mobicents.servlet.sip.testsuite.proxy;
 
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.startup.SipStandardService;
 
 public class SequentialProxyTest extends SipServletTestCase {
 
@@ -157,6 +158,32 @@ public class SequentialProxyTest extends SipServletTestCase {
 			fail("This party must not ever be contacted");
 	}
 	
+	// Test for http://code.google.com/p/mobicents/issues/detail?id=2740
+	public void testOutboundProxySetting() {
+
+		sipService.setOutboundProxy("127.0.0.1:5057");
+		this.shootme.init("stackName", null);
+		this.cutme.init(null);
+		this.shootist.init("sequential-reverse", false, null);
+		for (int q = 0; q < 10; q++) {
+			if (shootist.ended == false || cutme.canceled == false) {
+				try {
+					Thread.sleep(TIMEOUT);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} else {
+				break;
+			}
+		}
+		if (shootist.ended == false)
+			fail("Conversation not complete!");
+		if (cutme.canceled == true)
+			fail("This party must not ever be contacted");
+
+	}
+
 	public void testOKRetransmissionsReachApplication() {
 		shootme.retrans = 0;
 		this.shootme.init("stackName", null);
@@ -225,8 +252,10 @@ public class SequentialProxyTest extends SipServletTestCase {
 		super.tearDown();
 	}
 
+	SipStandardService sipService;
 	@Override
 	public void deployApplication() {
+		sipService = tomcat.getSipService();
 		assertTrue(tomcat
 				.deployContext(
 						projectHome
