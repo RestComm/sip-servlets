@@ -165,7 +165,7 @@ public class SubscriberSipServlet
 						
 		if("Active".equalsIgnoreCase(state)) {
 			SipServletRequest subscriberRequest = request.getSession().createRequest("SUBSCRIBE");
-			SipURI requestURI = ((SipFactory)getServletContext().getAttribute(SIP_FACTORY)).createSipURI("LittleGuy", "127.0.0.1:5080");
+			SipURI requestURI = ((SipFactory)getServletContext().getAttribute(SIP_FACTORY)).createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 			subscriberRequest.setRequestURI(requestURI);
 			subscriberRequest.setHeader("Expires", "0");
 			subscriberRequest.setHeader("Event", request.getHeader("Event"));
@@ -180,7 +180,7 @@ public class SubscriberSipServlet
 				request.getSession().createRequest("BYE").send();
 				SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 				SipURI fromURI = sipFactory.createSipURI("receiver", "sip-servlets.com");
-				SipURI requestURI = sipFactory.createSipURI("receiver", "127.0.0.1:5080");
+				SipURI requestURI = sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 				SipServletRequest sipServletRequest = sipFactory.createRequest(sipApplicationSession, "MESSAGE", fromURI, request.getFrom().getURI());
 				String messageContent = "dialogCompleted";
 				sipServletRequest.setContentLength(messageContent.length());
@@ -324,7 +324,7 @@ public class SubscriberSipServlet
 		SipURI toURI = sipFactory.createSipURI("LittleGuy", "there.com");
 		SipServletRequest sipServletRequest = 
 			sipFactory.createRequest(sipApplicationSession, "SUBSCRIBE", fromURI, toURI);
-		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");		
+		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");		
 		sipServletRequest.setRequestURI(requestURI);
 		sipServletRequest.setHeader("Expires", "200");
 		sipServletRequest.setHeader("Event", "reg; id=2");
@@ -372,7 +372,7 @@ public class SubscriberSipServlet
 					"MESSAGE", 
 					sipSession.getLocalParty(), 
 					sipSession.getRemoteParty());
-			SipURI sipUri=sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
+			SipURI sipUri=sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(body.length());
 			sipServletRequest.setContent(body, CONTENT_TYPE);

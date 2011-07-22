@@ -114,7 +114,7 @@ public class AnnotatedServlet extends SipServlet implements SipServletListener {
 			SipApplicationSession appSession = 
         	sipFactory.createApplicationSession(); // Injected factory
         	SipServletRequest req = sipFactory.createRequest(appSession,
-        		"INVITE", "sip:from@127.0.0.1:5070", "sip:to@127.0.0.1:5058");
+        		"INVITE", "sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", "sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5058");
         	req.send();
         } catch (Exception e) {
         	e.printStackTrace();
@@ -146,7 +146,7 @@ public class AnnotatedServlet extends SipServlet implements SipServletListener {
 			SipApplicationSession appSession = 
         	sipFactory.createApplicationSession();
         	SipServletRequest req = sipFactory.createRequest(appSession,
-        		"INVITE", "sip:from@127.0.0.1:5070", "sip:to@127.0.0.1:5070");
+        		"INVITE", "sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", "sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070");
         	req.send();
         } catch (Exception e) {
         	e.printStackTrace();

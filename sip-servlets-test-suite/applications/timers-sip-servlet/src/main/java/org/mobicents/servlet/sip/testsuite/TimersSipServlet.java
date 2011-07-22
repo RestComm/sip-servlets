@@ -184,7 +184,7 @@ public class TimersSipServlet
 						"MESSAGE", 
 						"sip:sender@sip-servlets.com", 
 						"sip:receiver@sip-servlets.com");
-				SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+				SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 				sipServletRequest.setRequestURI(sipUri);
 				sipServletRequest.setContentLength(SIP_APP_SESSION_EXPIRED.length());
 				sipServletRequest.setContent(SIP_APP_SESSION_EXPIRED, CONTENT_TYPE);
@@ -256,7 +256,7 @@ public class TimersSipServlet
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+			SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(content.length());
 			sipServletRequest.setContent(content, CONTENT_TYPE);
@@ -285,7 +285,7 @@ public class TimersSipServlet
 						"MESSAGE", 
 						"sip:sender@sip-servlets.com", 
 						"sip:receiver@sip-servlets.com");
-				SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+				SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 				sipServletRequest.setRequestURI(sipUri);
 				sipServletRequest.setContentLength(SIP_APP_SESSION_READY_TO_BE_INVALIDATED.length());
 				sipServletRequest.setContent(SIP_APP_SESSION_READY_TO_BE_INVALIDATED, CONTENT_TYPE);

@@ -82,7 +82,7 @@ public class AppKeySipServlet
 			URI toURI = sipFactory.createSipURI("LittleGuy", "there.com");
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipServletResponse.getApplicationSession(), "INVITE", fromURI, toURI);
-			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
+			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 			sipServletRequest.setRequestURI(requestURI);
 			String inviteCallId = sipServletRequest.getHeader("Call-ID");
 			String registerCallId = (String) sipServletResponse.getApplicationSession().getAttribute("CallId");
@@ -124,7 +124,7 @@ public class AppKeySipServlet
 		URI toURI = sipFactory.createSipURI("BigGuy", "there.com");
 		SipServletRequest sipServletRequest = 
 			sipFactory.createRequest(sipApplicationSession, "REGISTER", fromURI, toURI);
-		SipURI requestURI = sipFactory.createSipURI("BigGuy", "127.0.0.1:5080");
+		SipURI requestURI = sipFactory.createSipURI("BigGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 		sipServletRequest.setRequestURI(requestURI);
 		//Storing the Call id for future comparison
 		sipApplicationSession.setAttribute("CallId", sipServletRequest.getHeader("Call-ID"));

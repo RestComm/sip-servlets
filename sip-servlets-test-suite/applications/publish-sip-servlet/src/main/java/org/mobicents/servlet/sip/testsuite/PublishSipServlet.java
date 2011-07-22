@@ -79,7 +79,7 @@ public class PublishSipServlet extends SipServlet implements SipServletListener,
 			SipURI toURI = sipFactory.createSipURI("presentity", "example.com");
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipApplicationSession, "PUBLISH", fromURI, toURI);
-			SipURI requestURI = sipFactory.createSipURI("presentity", "127.0.0.1:5080");
+			SipURI requestURI = sipFactory.createSipURI("presentity", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 			sipServletRequest.setRequestURI(requestURI);
 			sipServletRequest.setExpires(3600);
 			sipServletRequest.setHeader("Event", "presence");
@@ -189,7 +189,7 @@ public class PublishSipServlet extends SipServlet implements SipServletListener,
 		SipURI toURI = sipFactory.createSipURI("presentity", "example.com");
 		SipServletRequest sipServletRequest = 
 			sipFactory.createRequest(timer.getApplicationSession(), "PUBLISH", fromURI, toURI);
-		SipURI requestURI = sipFactory.createSipURI("presentity", "127.0.0.1:5080");
+		SipURI requestURI = sipFactory.createSipURI("presentity", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 		sipServletRequest.setRequestURI(requestURI);
 		sipServletRequest.setExpires(3600);
 		sipServletRequest.setHeader("Event", "presence");

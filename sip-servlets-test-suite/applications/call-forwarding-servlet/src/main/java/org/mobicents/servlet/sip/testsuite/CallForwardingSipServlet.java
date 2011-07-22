@@ -69,7 +69,7 @@ public class CallForwardingSipServlet extends SipServlet implements SipErrorList
 		if(request.getFrom().getURI().toString().indexOf("sip:forward-sender@sip-servlets.com") != -1) {
 			SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_MOVED_TEMPORARILY);
-			SipURI sipUri= sipFactory.createSipURI("forward-receiver", "127.0.0.1:5090");		
+			SipURI sipUri= sipFactory.createSipURI("forward-receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090");		
 			sipServletResponse.addHeader("Contact", sipUri.toString());		
 			sipServletResponse.send();
 		}

@@ -78,49 +78,49 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	static {
 		forwardingUris = new HashMap<String, String[]>();
 		forwardingUris.put("sip:forward-sender@sip-servlets.com", 
-				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
-		forwardingUris.put("sip:forward-sender@127.0.0.1:5070", 
-				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
+		forwardingUris.put("sip:forward-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
 		forwardingUris.put("sip:forward-sender-forking-pending@sip-servlets.com", 
-				new String[]{"sip:forward-receiver-forking-pending@sip-servlets.com", "sip:forward-receiver-forking-pending@127.0.0.1:5070"});
+				new String[]{"sip:forward-receiver-forking-pending@sip-servlets.com", "sip:forward-receiver-forking-pending@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070"});
 		forwardingUris.put("sip:forward-sender-factory-same-callID@sip-servlets.com", 
-				new String[]{"sip:forward-receiver-factory-same-callID@sip-servlets.com", "sip:forward-receiver-factory-same-callID@127.0.0.1:5090"});
+				new String[]{"sip:forward-receiver-factory-same-callID@sip-servlets.com", "sip:forward-receiver-factory-same-callID@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
 		forwardingUris.put("sip:forward-sender-408@sip-servlets.com", 
-				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
 		forwardingUris.put("sip:forward-sender-408-new-thread@sip-servlets.com", 
-				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
 		forwardingUris.put("sip:factory-sender@sip-servlets.com", 
-				new String[]{"sip:factory-receiver@sip-servlets.com", "sip:factory-receiver@127.0.0.1:5090"});
+				new String[]{"sip:factory-receiver@sip-servlets.com", "sip:factory-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
 		forwardingUris.put("sip:forward-pending-sender@sip-servlets.com", 
-				new String[]{"sip:forward-pending-receiver@sip-servlets.com", "sip:forward-pending-receiver@127.0.0.1:5090"});
+				new String[]{"sip:forward-pending-receiver@sip-servlets.com", "sip:forward-pending-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
 		forwardingUris.put("sip:blocked-sender@sip-servlets.com", 
-				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
-		forwardingUris.put("sip:forward-sender@127.0.0.1", 
-				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
-		forwardingUris.put("sip:blocked-sender@127.0.0.1", 
-				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090"});
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
+		forwardingUris.put("sip:forward-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
+		forwardingUris.put("sip:blocked-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
 		forwardingUris.put("sip:forward-tcp-sender@sip-servlets.com", 
-			new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5090;transport=tcp"});
+			new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090;transport=tcp"});
 		forwardingUris.put("sip:forward-udp-sender@sip-servlets.com", 
-				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5080"});
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080"});
 		forwardingUris.put("sip:forward-udp-sender-tcp-sender@sip-servlets.com", 
-				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@127.0.0.1:5080"});
-		forwardingUris.put("sip:forward-sender@127.0.0.1:5090", 
-				new String[]{"sip:forward-receiver@127.0.0.1:5090", "sip:forward-receiver@127.0.0.1:5090"});
-		forwardingUris.put("sip:composition@127.0.0.1:5090", 
-				new String[]{"sip:forward-composition@127.0.0.1:5070", "sip:forward-composition@127.0.0.1:5070"});
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080"});
+		forwardingUris.put("sip:forward-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", 
+				new String[]{"sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
+		forwardingUris.put("sip:composition@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", 
+				new String[]{"sip:forward-composition@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", "sip:forward-composition@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070"});
 		forwardingUris.put("sip:composition@sip-servlets.com", 
-				new String[]{"sip:forward-composition@127.0.0.1:5070", "sip:forward-composition@127.0.0.1:5070"});
+				new String[]{"sip:forward-composition@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", "sip:forward-composition@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070"});
 		forwardingUris.put("sip:sender@sip-servlets.com", 
-				new String[]{"sip:fromB2BUA@sip-servlets.com", "sip:fromB2BUA@127.0.0.1:5090"});
+				new String[]{"sip:fromB2BUA@sip-servlets.com", "sip:fromB2BUA@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
 		forwardingUris.put("sip:samesipsession@sip-servlets.com", 
-				new String[]{"sip:forward-samesipsession@127.0.0.1:5070", "sip:forward-samesipsession@127.0.0.1:5070"});
+				new String[]{"sip:forward-samesipsession@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", "sip:forward-samesipsession@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070"});
 		forwardingUris.put("sip:cancel-samesipsession@sip-servlets.com", 
-				new String[]{"sip:cancel-forward-samesipsession@127.0.0.1:5070", "sip:cancel-forward-samesipsession@127.0.0.1:5070"});
+				new String[]{"sip:cancel-forward-samesipsession@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", "sip:cancel-forward-samesipsession@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070"});
 		forwardingUris.put("sip:error-samesipsession@sip-servlets.com", 
-				new String[]{"sip:error-forward-samesipsession@127.0.0.1:5070", "sip:error-forward-samesipsession@127.0.0.1:5070"});
+				new String[]{"sip:error-forward-samesipsession@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", "sip:error-forward-samesipsession@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070"});
 		forwardingUris.put("sip:forward-myself@sip-servlets.com", 
-				new String[]{"sip:forward-sender@127.0.0.1:5070", "sip:forward-sender@127.0.0.1:5070"});
+				new String[]{"sip:forward-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", "sip:forward-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070"});
 	}
 
 	SipSession incomingSession;
@@ -213,7 +213,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				logger.info("checkcontact param value " + paramValue);
 				// http://code.google.com/p/mobicents/issues/detail?id=1477
 				// Address parameters become un-quoted
-				if(!contactAddress.toString().equals("<sip:127.0.0.1:5056>;+sip.instance=\"<urn:uuid:some-xxxx>\"")) {
+				if(!contactAddress.toString().equals("<sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5056>;+sip.instance=\"<urn:uuid:some-xxxx>\"")) {
 					request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "bad contact address").send();
 					return;
 				}
@@ -258,9 +258,9 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			Map<String, List<String>> headers=new HashMap<String, List<String>>();
 			List<String> contactHeaderList = new ArrayList<String>();
 			if(request.getHeader(ContactHeader.NAME).contains("transport=tcp")) {
-				contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@127.0.0.1:5070;q=0.1;lr;transport=tcp;test>;test");
+				contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070;q=0.1;lr;transport=tcp;test>;test");
 			} else {
-				contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@127.0.0.1:5070;q=0.1;lr;transport=udp;test>;test");
+				contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070;q=0.1;lr;transport=udp;test>;test");
 			}
 			headers.put("Contact", contactHeaderList);
 			SipServletRequest forkedRequest = b2buaHelper.createRequest(origSession, request, headers);
@@ -295,11 +295,11 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		if(((SipURI)request.getFrom().getURI()).getUser().contains("tcp-sender")) {
 			if(request.getHeader(ContactHeader.NAME).contains("transport=tcp")) {
 				List<String> contactHeaderList = new ArrayList<String>();
-				contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@127.0.0.1:5070;q=0.1;lr;transport=udp;test>;test");
+				contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070;q=0.1;lr;transport=udp;test>;test");
 				headers.put("Contact", contactHeaderList);
 			} else {
 				List<String> contactHeaderList = new ArrayList<String>();
-				contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@127.0.0.1:5070;q=0.1;lr;transport=tcp;test>;test");
+				contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070;q=0.1;lr;transport=tcp;test>;test");
 				headers.put("Contact", contactHeaderList);
 			}
 		}
@@ -389,7 +389,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			headers.put("User-Agent", userAgentHeaderList);
 			
 			List<String> contactHeaderList = new ArrayList<String>();
-			contactHeaderList.add("\"callforwardingB2BUA\" <sip:127.0.0.1:5070;transport=tcp>");
+			contactHeaderList.add("\"callforwardingB2BUA\" <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070;transport=tcp>");
 			headers.put("Contact", contactHeaderList);
 			
 			List<String> extensionsHeaderList = new ArrayList<String>();
@@ -741,7 +741,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=sipFactory.createSipURI("receiver", "127.0.0.1:5080");
+			SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(content.length());
 			sipServletRequest.setContent(content, CONTENT_TYPE);

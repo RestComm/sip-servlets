@@ -49,15 +49,15 @@ public class LocationServiceSipServlet extends SipServlet {
 	
 	private static final String LOCAL_TRANSPORT = "udp";
 	private static final int LOCAL_PORT = 5070;
-	private static final String LOCAL_LOCALHOST_ADDR = "127.0.0.1";
+	private static final String LOCAL_LOCALHOST_ADDR = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 	
 	private static final String REMOTE_TRANSPORT = "udp";
 	private static final int REMOTE_PORT = 5090;
-	private static final String REMOTE_LOCALHOST_ADDR = "127.0.0.1";
+	private static final String REMOTE_LOCALHOST_ADDR = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 	
 	private static final String INITIAL_REMOTE_TRANSPORT = "udp";
 	private static final int INITIAL_REMOTE_PORT = 5070;
-	private static final String INITIAL_REMOTE_LOCALHOST_ADDR = "127.0.0.1";
+	private static final String INITIAL_REMOTE_LOCALHOST_ADDR = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 	
 	private static final String TEST_USER_REMOTE = "remote";
 	
@@ -73,16 +73,16 @@ public class LocationServiceSipServlet extends SipServlet {
 		SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
 		registeredUsers = new HashMap<String, List<URI>>();
 		List<URI> uriList  = new ArrayList<URI>();
-		uriList.add(sipFactory.createURI("sip:receiver@127.0.0.1:5090"));
-		uriList.add(sipFactory.createURI("sip:receiver@127.0.0.1:6090"));
+		uriList.add(sipFactory.createURI("sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
+		uriList.add(sipFactory.createURI("sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":6090"));
 		registeredUsers.put("sip:receiver@sip-servlets.com", uriList);
 		uriList  = new ArrayList<URI>();
-		uriList.add(sipFactory.createURI("sip:receiver-failover@127.0.0.1:5090"));
+		uriList.add(sipFactory.createURI("sip:receiver-failover@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
 		registeredUsers.put("sip:receiver-failover@sip-servlets.com", uriList);
-		registeredUsers.put("sip:receiver-failover@127.0.0.1:5090", uriList);
+		registeredUsers.put("sip:receiver-failover@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", uriList);
 		uriList  = new ArrayList<URI>();
-		uriList.add(sipFactory.createURI("sip:receiver@127.0.0.1:5070"));
-		registeredUsers.put("sip:proxy-b2bua@127.0.0.1:5070", uriList);
+		uriList.add(sipFactory.createURI("sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070"));
+		registeredUsers.put("sip:proxy-b2bua@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", uriList);
 		
 	}
 

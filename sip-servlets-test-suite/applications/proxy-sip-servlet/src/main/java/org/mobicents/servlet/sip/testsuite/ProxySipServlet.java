@@ -63,7 +63,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 	private static final String SIP_APPLICATION_SESSION_TIMEOUT = "sipApplicationSessionTimeout";
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(ProxySipServlet.class);
-	String host = "127.0.0.1";
+	String host = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 	private static String USE_HOSTNAME = "useHostName";	
 	private static String CHECK_URI = "check_uri";
 	private static String TEST_2_TRYING = "test_2_trying";
@@ -94,7 +94,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
 			request.getProxy().setRecordRoute(true);
-			request.getProxy().proxyTo(sipFactory.createURI("sip:a@127.0.0.1:5090;transport=tcp"));
+			request.getProxy().proxyTo(sipFactory.createURI("sip:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090;transport=tcp"));
 			return;
 		}
 		
@@ -102,7 +102,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
 			request.getProxy().setRecordRoute(true);
-			request.getProxy().proxyTo(sipFactory.createURI("sip:a@127.0.0.1:5090;transport=udp"));
+			request.getProxy().proxyTo(sipFactory.createURI("sip:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090;transport=udp"));
 			return;
 		}
 				
@@ -110,7 +110,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
 			request.getProxy().setRecordRoute(true);
-			request.getProxy().proxyTo(sipFactory.createURI("sips:a@127.0.0.1:5090;transport=tls"));
+			request.getProxy().proxyTo(sipFactory.createURI("sips:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090;transport=tls"));
 			return;
 		}
 		String error = (String) request.getApplicationSession().getAttribute(ERROR);
@@ -146,7 +146,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			
 		if(fromURI.getUser().contains(USE_HOSTNAME)) {		
-			host = "localhost";
+			host = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 			logger.info("using Host Name for proxy test");
 		}
 
@@ -239,11 +239,17 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 
 			for(SipURI uri:outboundInterfaces) {
 				logger.info("Outbound interface : " + uri);
-				if(uri.toString().indexOf("127.0.0.1")>0 && uri.getTransportParam().equalsIgnoreCase(transport)) {
+				if(uri.toString().indexOf("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "")>0 && uri.getTransportParam().equalsIgnoreCase(transport)) {
+						
 					// pick the lo interface, since its universal on all machines
 					proxy.setOutboundInterface(new InetSocketAddress(InetAddress.getByName(uri.getHost()),uri.getPort()));
 					obi = uri;
 					break;
+				}
+				if(System.getProperty("org.mobicents.testsuite.testhostaddr").contains("::1")) {
+					if(uri.toString().contains(":1")) {
+						obi = uri;break;
+					}
 				}
 			}
 
@@ -258,7 +264,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 				((ProxyExt)proxy).storeTerminationInformation(true);
 				logger.info("testing termination");
 			}
-			//proxy.setOutboundInterface((SipURI)sipFactory.createAddress("sip:proxy@127.0.0.1:5070").getURI());
+			//proxy.setOutboundInterface((SipURI)sipFactory.createAddress("sip:proxy@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070").getURI());
 			proxy.setRecordRoute(recordRoute);
 			proxy.setSupervised(true);
 			if(recordRoute) {
@@ -266,7 +272,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			}		
 			proxy.setParallel(true);
 			if(CHECK_URI.equals(fromURI.getUser())) {
-				Address routeAddress = sipFactory.createAddress("sip:127.0.0.1:5057");
+				Address routeAddress = sipFactory.createAddress("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057");
 				request.pushRoute(routeAddress);
 				Address ra = request.getAddressHeader("Route");
 				logger.info("doInvite: ra = " + ra);
@@ -452,7 +458,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri = sipFactory.createSipURI("receiver", "127.0.0.1:"+ port);
+			SipURI sipUri = sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":"+ port);
 			sipUri.setTransportParam(transport);
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(content.length());
@@ -523,7 +529,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		logger.info("Got request:\n "+req);
 	}
 
-	@Override
+	//@Override
 	public void timeout(ServletTimer timer) {
 		SipServletRequest request = (SipServletRequest)timer.getInfo();
 		try {

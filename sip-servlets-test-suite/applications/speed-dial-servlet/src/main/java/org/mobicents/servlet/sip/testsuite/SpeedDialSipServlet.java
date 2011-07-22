@@ -57,15 +57,15 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";	
 	private static final String REMOTE_TRANSPORT = "udp";
 	private static final int REMOTE_PORT = 5080;
-	private static final String REMOTE_LOCALHOST_ADDR = "127.0.0.1";
+	private static final String REMOTE_LOCALHOST_ADDR = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 	
 	private static final String INITIAL_REMOTE_TRANSPORT = "udp";
 	private static final int INITIAL_REMOTE_PORT = 5090;
-	private static final String INITIAL_REMOTE_LOCALHOST_ADDR = "127.0.0.1";
+	private static final String INITIAL_REMOTE_LOCALHOST_ADDR = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 	
 	private static final String LOCAL_TRANSPORT = "udp";
 	private static final int LOCAL_PORT = 5070;
-	private static final String LOCAL_LOCALHOST_ADDR = "127.0.0.1";
+	private static final String LOCAL_LOCALHOST_ADDR = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 	
 	private static final String TEST_USER_REMOTE = "remote";
 	
@@ -91,10 +91,10 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 		dialNumberToSipUriMapping.put("5", "sip:jeand@sip-servlets.com");
 		dialNumberToSipUriMapping.put("6", "sip:receiver-failover@sip-servlets.com");
 		dialNumberToSipUriMapping.put("b2bua", "sip:fromProxy@sip-servlets.com");
-		dialNumberToSipUriMapping.put("9", "sip:receiver@127.0.0.1:5090");
-		dialNumberToSipUriMapping.put("test-callResponseBacks", "sip:receiver@127.0.0.1:5090,sip:receiver@127.0.0.1:5091");
-		dialNumberToSipUriMapping.put("forward-pending-sender", "sip:forward-pending-sender@127.0.0.1:5080");
-		dialNumberToSipUriMapping.put("factory-sender", "sip:factory-sender@127.0.0.1:5080");		
+		dialNumberToSipUriMapping.put("9", "sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090");
+		dialNumberToSipUriMapping.put("test-callResponseBacks", "sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090,sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5091");
+		dialNumberToSipUriMapping.put("forward-pending-sender", "sip:forward-pending-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+		dialNumberToSipUriMapping.put("factory-sender", "sip:factory-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");		
 		String initParam = servletConfig.getServletContext().getInitParameter("record_route");
 		if(initParam != null && initParam.equals("false")) {
 			isRecordRoute = false;
@@ -334,10 +334,10 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
 			sipServletRequest.addHeader("Ext", "Test 1, 2 ,3");
-			SipURI sipUri = storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 			if(transport != null) {
 				if(transport.equalsIgnoreCase(ListeningPoint.TCP)) {
-					sipUri = storedFactory.createSipURI("receiver", "127.0.0.1:5081");
+					sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5081");
 				}
 				sipUri.setTransportParam(transport);
 			}

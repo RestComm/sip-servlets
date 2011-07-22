@@ -104,7 +104,7 @@ public class ServletMappingSipServlet extends SipServlet implements SipServletLi
 		SipApplicationSession appSession = factory.createApplicationSession();
 		SipServletRequest request =
 		    factory.createRequest(appSession, "MESSAGE",
-		                          "sip:from@127.0.0.1:5070", "sip:to@127.0.0.1:5080");
+		                          "sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", "sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 		request.setContentLength(2);
 		request.setContent(body, "text/plain;charset=UTF-8");
 		request.send();

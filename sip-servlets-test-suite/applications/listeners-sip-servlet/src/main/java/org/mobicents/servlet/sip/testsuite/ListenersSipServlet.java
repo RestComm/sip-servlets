@@ -369,7 +369,7 @@ public class ListenersSipServlet
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=sipFactory.createSipURI("receiver", "127.0.0.1:5080");
+			SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(SIP_SESSION_DESTROYED.length());
 			sipServletRequest.setContent(SIP_SESSION_DESTROYED, CONTENT_TYPE);
@@ -537,7 +537,7 @@ public class ListenersSipServlet
 						"MESSAGE", 
 						"sip:sender@sip-servlets.com", 
 						"sip:receiver@sip-servlets.com");
-				SipURI sipUri=sipFactory.createSipURI("receiver", "127.0.0.1:5080");
+				SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 				sipServletRequest.setRequestURI(sipUri);
 				sipServletRequest.setContentLength(SIP_APP_SESSION_DESTROYED.length());
 				sipServletRequest.setContent(SIP_APP_SESSION_DESTROYED, CONTENT_TYPE);

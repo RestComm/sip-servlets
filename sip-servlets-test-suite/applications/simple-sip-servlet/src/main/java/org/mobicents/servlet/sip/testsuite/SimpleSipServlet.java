@@ -138,6 +138,7 @@ public class SimpleSipServlet
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
 		
+		String vvv = request.getHeaders("Via").toString();
 		// From horacimacias : Non regression test for Issue 2115 MSS unable to handle GenericURI URIs
 		URI requestURI = request.getRequestURI();
 		logger.info("request URI : " + requestURI);
@@ -458,7 +459,7 @@ public class SimpleSipServlet
 			sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 			if(fromString.contains(TEST_FLAG_PARAM)) {
 				try {
-					sipServletResponse.setHeader("Contact", "sip:127.0.0.1:5070");
+					sipServletResponse.setHeader("Contact", "sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070");
 					logger.error("an IllegalArgumentException should be thrown when trying to set the Contact Header on a 2xx response");
 					sipServletResponse = request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR);
 					sipServletResponse.send();
@@ -485,7 +486,7 @@ public class SimpleSipServlet
 					sipServletResponse.send();
 					return;
 				}
-				contact = sipFactory.createParameterable("sip:user@127.0.0.1:5080;flagparam");
+				contact = sipFactory.createParameterable("sip:user@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;flagparam");
 				contactStringified = contact.toString().trim();
 				logger.info("Contact Header with flag param " + contactStringified);
 				if(contactStringified.endsWith("flagparam=")) {
@@ -663,7 +664,7 @@ public class SimpleSipServlet
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=sipFactory.createSipURI("receiver", "127.0.0.1:5080");
+			SipURI sipUri=sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(CANCEL_RECEIVED.length());
 			sipServletRequest.setContent(CANCEL_RECEIVED, CONTENT_TYPE);
@@ -682,7 +683,7 @@ public class SimpleSipServlet
 		contact.setExpires(3600);
 		logger.info("REGISTER Contact Address.toString = " + contact.toString());
 		int response = SipServletResponse.SC_OK;
-		if(!"<sip:sender@127.0.0.1:5080;transport=udp;lr>;expires=3600".equals(contact.toString())) {
+		if(!"<sip:sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;transport=udp;lr>;expires=3600".equals(contact.toString())) {
 			response = SipServletResponse.SC_SERVER_INTERNAL_ERROR;
 		}
 		SipServletResponse resp = req.createResponse(response);
@@ -790,8 +791,8 @@ public class SimpleSipServlet
 			register = registerSipSession.createRequest("REGISTER");			
 		} else {
 			SipApplicationSession app = sipFactory.createApplicationSession();
-			register = sipFactory.createRequest(app, "REGISTER", "sip:testRegisterSavedSession@simple-servlet.com", "sip:you@localhost:5058");
-			Parameterable contact = sipFactory.createParameterable("sip:john@127.0.0.1:6090;expires=900");
+			register = sipFactory.createRequest(app, "REGISTER", "sip:testRegisterSavedSession@simple-servlet.com", "sip:you@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5058");
+			Parameterable contact = sipFactory.createParameterable("sip:john@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":6090;expires=900");
 			register.addParameterableHeader("Contact", contact, true);
 			registerSipSession = register.getSession();
 			logger.info("saved session instance : " + registerSipSession);
@@ -808,8 +809,8 @@ public class SimpleSipServlet
 			register = sipSession.createRequest("REGISTER");
 		} else {
 			SipApplicationSession app = sipFactory.createApplicationSession();
-			register = sipFactory.createRequest(app, "REGISTER", "sip:testRegisterCSeq@simple-servlet.com", "sip:you@localhost:5058");
-			Parameterable contact = sipFactory.createParameterable("sip:john@127.0.0.1:6090;expires=900");
+			register = sipFactory.createRequest(app, "REGISTER", "sip:testRegisterCSeq@simple-servlet.com", "sip:you@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5058");
+			Parameterable contact = sipFactory.createParameterable("sip:john@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":6090;expires=900");
 			register.addParameterableHeader("Contact", contact, true);			
 		}
 		register.setHeader("Expires", "3600");
@@ -849,10 +850,10 @@ public class SimpleSipServlet
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
 			sipServletRequest.addHeader("Ext", "Test 1, 2 ,3");
-			SipURI sipUri = storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 			if(transport != null) {
 				if(transport.equalsIgnoreCase(ListeningPoint.TCP)) {
-					sipUri = storedFactory.createSipURI("receiver", "127.0.0.1:5081");
+					sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5081");
 				}
 				sipUri.setTransportParam(transport);
 			}

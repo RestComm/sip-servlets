@@ -232,7 +232,7 @@ public class Shootist implements SipListener {
 		Properties properties = new Properties();
 		// If you want to try TCP transport change the following to
 		String transport = "udp";
-		String peerHostPort = "127.0.0.1:5070";
+		String peerHostPort = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070";
 		properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort + "/"
 				+ transport);
 		// If you want to use UDP then uncomment this.
@@ -273,7 +273,7 @@ public class Shootist implements SipListener {
 			headerFactory = sipFactory.createHeaderFactory();
 			addressFactory = sipFactory.createAddressFactory();
 			messageFactory = sipFactory.createMessageFactory();
-			udpListeningPoint = sipStack.createListeningPoint("127.0.0.1", 5080, "udp");
+			udpListeningPoint = sipStack.createListeningPoint("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", 5080, "udp");
 			sipProvider = sipStack.createSipProvider(udpListeningPoint);
 			Shootist listener = this;
 			sipProvider.addSipListener(listener);
@@ -338,7 +338,7 @@ public class Shootist implements SipListener {
 					Request.INVITE, callIdHeader, cSeqHeader, fromHeader,
 					toHeader, viaHeaders, maxForwards);
 			// Create contact headers
-			String host = "127.0.0.1";
+			String host = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 
 			SipURI contactUrl = addressFactory.createSipURI(fromName, host);
 			contactUrl.setPort(udpListeningPoint.getPort());

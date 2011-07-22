@@ -84,7 +84,7 @@ public class JoinReceiverSipServlet extends SipServlet {
 			
 			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 			SipURI fromURI = sipFactory.createSipURI("receiver", "sip-servlets.com");
-			SipURI requestURI = sipFactory.createSipURI("receiver", "127.0.0.1:5090");
+			SipURI requestURI = sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090");
 			SipServletRequest sipServletRequest = sipFactory.createRequest(sipApplicationSession, "MESSAGE", fromURI, request.getFrom().getURI());
 			sipServletRequest.setContentLength(messageContent.length());
 			sipServletRequest.setContent(messageContent, CONTENT_TYPE);

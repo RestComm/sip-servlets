@@ -52,7 +52,7 @@ public class CallBlockingSipServlet extends SipServlet implements SipErrorListen
 		super.init(servletConfig);
 		blockedUris = new ArrayList<String>();
 		blockedUris.add("sip:blocked-sender@sip-servlets.com");
-		blockedUris.add("sip:blocked-sender@127.0.0.1");
+		blockedUris.add("sip:blocked-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 	}
 	
 	public boolean isUriBlocked(String uri) {

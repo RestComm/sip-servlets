@@ -193,7 +193,7 @@ public class ShootistSipServletAuth
 		SipServletRequest sipServletRequest = 
 			sipFactory.createRequest(sipApplicationSession, method, fromURI, toURI);
 		sipApplicationSession.setAttribute("nbSubsequentReq", numberOfSubsequentRequests);
-		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
+		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 		sipServletRequest.setRequestURI(requestURI);
 		try {			
 			sipServletRequest.send();
@@ -230,10 +230,10 @@ public class ShootistSipServletAuth
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
 			sipServletRequest.addHeader("Ext", "Test 1, 2 ,3");
-			SipURI sipUri = storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 			if(transport != null) {
 				if(transport.equalsIgnoreCase(ListeningPoint.TCP)) {
-					sipUri = storedFactory.createSipURI("receiver", "127.0.0.1:5081");
+					sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5081");
 				}
 				sipUri.setTransportParam(transport);
 			}

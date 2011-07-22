@@ -124,14 +124,14 @@ public class SessionStateUACSipServlet
 	public void servletInitialized(SipServletContextEvent ce) {
 		SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);
 		if(getServletContext().getInitParameter("testTimeout") != null) {
-			sendMessage(sipFactory, "This request must timeout", "sip:timeout@127.0.0.1:4794");
+			sendMessage(sipFactory, "This request must timeout", "sip:timeout@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":4794");
 		}else {
 			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 			SipURI fromURI = sipFactory.createSipURI("BigGuy", "here.com");			
 			SipURI toURI = sipFactory.createSipURI("LittleGuy", "there.com");
 			SipServletRequest sipServletRequest = 
 				sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);
-			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
+			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 			sipServletRequest.setRequestURI(requestURI);
 			sipServletRequest.setContentLength(SEND_1XX_4XX.length());
 			try {
@@ -156,7 +156,7 @@ public class SessionStateUACSipServlet
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri = sipFactory.createSipURI("receiver", "127.0.0.1:5080");
+			SipURI sipUri = sipFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 			sipServletRequest.setRequestURI(sipUri);
 			sipServletRequest.setContentLength(messageContent.length());
 			sipServletRequest.setContent(messageContent, CONTENT_TYPE);

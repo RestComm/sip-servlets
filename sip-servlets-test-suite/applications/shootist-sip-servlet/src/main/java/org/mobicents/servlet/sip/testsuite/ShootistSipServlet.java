@@ -98,7 +98,7 @@ public class ShootistSipServlet
 			if(resp.getHeader("require") != null) {
 				SipServletRequest prack = resp.createPrack();
 				SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
-				SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5080");
+				SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 				prack.setRequestURI(requestURI);
 				prack.send();
 			}
@@ -398,7 +398,7 @@ public class ShootistSipServlet
 			}
 			String dontSetRURI = ce.getServletContext().getInitParameter("dontSetRURI");
 			if(dontSetRURI == null) {
-				String host = "127.0.0.1:5080";
+				String host = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080";
 				if(ce.getServletContext().getInitParameter("testIOException") != null) {
 					host = ce.getServletContext().getInitParameter("testIOException");
 				}
@@ -414,7 +414,7 @@ public class ShootistSipServlet
 				if(ce.getServletContext().getInitParameter("transportRURI") != null) {
 					requestURI.setTransportParam(ce.getServletContext().getInitParameter("transportRURI"));
 					if(method.equalsIgnoreCase("REGISTER")) {
-						sipServletRequest.addHeader("Contact", "sips:LittleGuy@127.0.0.1:5080");
+						sipServletRequest.addHeader("Contact", "sips:LittleGuy@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 					}
 				}			
 				sipServletRequest.setRequestURI(requestURI);
@@ -435,7 +435,7 @@ public class ShootistSipServlet
 			} catch (IOException e) {
 				if(ce.getServletContext().getInitParameter("testIOException") != null) {
 					logger.info("expected exception thrown" + e);
-					((SipURI)sipServletRequest.getRequestURI()).setHost("127.0.0.1");
+					((SipURI)sipServletRequest.getRequestURI()).setHost("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 					((SipURI)sipServletRequest.getRequestURI()).setPort(5080);
 					((SipURI)sipServletRequest.getRequestURI()).setTransportParam("udp");
 					try {
@@ -521,7 +521,7 @@ public class ShootistSipServlet
 					"MESSAGE", 
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
-			SipURI sipUri=storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+			SipURI sipUri=storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 			sipServletRequest.setRequestURI(sipUri);
 			if(content != null) {
 				sipServletRequest.setContentLength(content.length());
@@ -587,10 +587,10 @@ public class ShootistSipServlet
 					"sip:sender@sip-servlets.com", 
 					"sip:receiver@sip-servlets.com");
 			sipServletRequest.addHeader("Ext", "Test 1, 2 ,3");
-			SipURI sipUri = storedFactory.createSipURI("receiver", "127.0.0.1:5080");
+			SipURI sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 			if(transport != null) {
 				if(transport.equalsIgnoreCase(ListeningPoint.TCP)) {
-					sipUri = storedFactory.createSipURI("receiver", "127.0.0.1:5081");
+					sipUri = storedFactory.createSipURI("receiver", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5081");
 				}
 				sipUri.setTransportParam(transport);
 			}

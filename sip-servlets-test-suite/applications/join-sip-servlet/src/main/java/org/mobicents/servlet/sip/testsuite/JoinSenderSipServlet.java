@@ -62,9 +62,9 @@ public class JoinSenderSipServlet extends SipServlet {
 		SipFactory sipFactory = (SipFactory)getServletContext().getAttribute(SIP_FACTORY);
 		registeredUsers = new HashMap<String, List<URI>>();
 		List<URI> uriList  = new ArrayList<URI>();		
-		uriList.add(sipFactory.createURI("sip:join@127.0.0.1:5090"));
+		uriList.add(sipFactory.createURI("sip:join@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
 		registeredUsers.put("sip:join@sip-servlets.com", uriList);
-		registeredUsers.put("sip:join@127.0.0.1:5070;transport=udp", uriList);
+		registeredUsers.put("sip:join@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070;transport=udp", uriList);
 	}
 
 	/**
@@ -79,7 +79,7 @@ public class JoinSenderSipServlet extends SipServlet {
 		
 		SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
 		SipURI fromURI = sipFactory.createSipURI("joiner", "sip-servlets.com");
-		SipURI requestURI = sipFactory.createSipURI("joiner", "127.0.0.1:5090");
+		SipURI requestURI = sipFactory.createSipURI("joiner", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090");
 		SipServletRequest sipServletRequest = sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, request.getFrom().getURI());
 		sipServletRequest.addHeader("Join", ((String)request.getContent()).substring("Join : ".length()));
 		sipServletRequest.setRequestURI(requestURI);
