@@ -40,7 +40,7 @@ import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class LocationServiceB2BUAStaticServerAddressTest extends SipServletTestCase {
 	
-	private static final String HOST = "127.0.0.1";
+	private static final String HOST = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 
 	private static final int MSS_PORT = 5070;
 

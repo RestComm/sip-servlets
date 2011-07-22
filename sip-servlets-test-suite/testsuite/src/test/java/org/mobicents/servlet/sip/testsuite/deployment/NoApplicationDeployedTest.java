@@ -96,7 +96,7 @@ public class NoApplicationDeployedTest extends SipServletTestCase {
 				fromName, fromHost);
 				
 		String toUser = "container";
-		String toHost = "127.0.0.1";
+		String toHost = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toHost);
 				

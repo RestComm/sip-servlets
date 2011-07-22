@@ -137,7 +137,7 @@ public class ProxySipServletDownstreamProxyForkingTest extends SipServletTestCas
         sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5060, listeningPointTransport);
 		tomcat.startTomcat();
 		Map<String, String> params= new HashMap<String, String>();
-		params.put("route", "sip:127.0.0.1:5070");
+		params.put("route", "sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070");
 		params.put("timeToWaitForBye", "20000");
 		params.put("dontSetRURI", "true");
 		SipStandardContext sipContext = deployApplication(params);

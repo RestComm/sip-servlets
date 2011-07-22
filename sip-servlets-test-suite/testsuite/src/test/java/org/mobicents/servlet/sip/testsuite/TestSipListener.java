@@ -465,7 +465,7 @@ public class TestSipListener implements SipListener {
 			Response response = protocolObjects.messageFactory.createResponse(
 					200, request);
 			Address address = protocolObjects.addressFactory
-			.createAddress("Shootme <sip:127.0.0.1:" + myPort
+			.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + myPort
 					+";transport="+protocolObjects.transport
 					+ ">");
 			contactHeader = protocolObjects.headerFactory.createContactHeader(address);
@@ -485,7 +485,7 @@ public class TestSipListener implements SipListener {
 				response.addHeader(rseqHeader);
 				((MessageExt)response).getToHeader().setTag(((MessageExt) request).getToHeader().getTag());
 				address = protocolObjects.addressFactory
-				.createAddress("Shootme <sip:127.0.0.1:" + myPort
+				.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + myPort
 						+";transport="+protocolObjects.transport
 						+ ">");
 				contactHeader = protocolObjects.headerFactory.createContactHeader(address);
@@ -730,7 +730,7 @@ public class TestSipListener implements SipListener {
 			}
 
 			// Both 2xx response to SUBSCRIBE and NOTIFY need a Contact
-			Address address = protocolObjects.addressFactory.createAddress("Notifier <sip:127.0.0.1>");
+			Address address = protocolObjects.addressFactory.createAddress("Notifier <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ">");
 			((SipURI)address.getURI()).setPort( sipProvider.getListeningPoint(ListeningPoint.UDP).getPort() );				
 			ContactHeader contactHeader = protocolObjects.headerFactory.createContactHeader(address);			
 			response.addHeader(contactHeader);
@@ -838,7 +838,7 @@ public class TestSipListener implements SipListener {
 			if(contactHeader != null) {
 				contact = (ContactHeader) contactHeader.clone();
 			} else {
-				SipURI contactURI = protocolObjects.addressFactory.createSipURI(null, "127.0.0.1");
+				SipURI contactURI = protocolObjects.addressFactory.createSipURI(null, "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 				contactURI.setPort(listeningPoint.getPort());
 				Address contactAddress = protocolObjects.addressFactory.createAddress(contactURI);
 				contact = protocolObjects.headerFactory.createContactHeader(contactAddress);
@@ -1251,7 +1251,7 @@ public class TestSipListener implements SipListener {
 						Header rseqHeader = protocolObjects.headerFactory.createRSeqHeader(rseqNumber.getAndIncrement());
 						response.addHeader(rseqHeader);
 						Address address = protocolObjects.addressFactory
-						.createAddress("Shootme <sip:127.0.0.1:" + myPort
+						.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + myPort
 								+";transport="+protocolObjects.transport
 								+ ">");
 						contactHeader = protocolObjects.headerFactory.createContactHeader(address);
@@ -1264,7 +1264,7 @@ public class TestSipListener implements SipListener {
 							provisionalResponseIt = provisionalResponsesToSend.iterator();
 						}
 						Address address = protocolObjects.addressFactory
-						.createAddress("Shootme <sip:127.0.0.1:" + myPort
+						.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + myPort
 								+";transport="+protocolObjects.transport
 								+ ">");
 						contactHeader = protocolObjects.headerFactory.createContactHeader(address);
@@ -1313,7 +1313,7 @@ public class TestSipListener implements SipListener {
 			
 			if(!waitForCancel) {
 				Address address = protocolObjects.addressFactory
-				.createAddress("Shootme <sip:127.0.0.1:" + myPort
+				.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + myPort
 						+";transport="+protocolObjects.transport
 						+ ">");
 				contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
@@ -1657,7 +1657,7 @@ public class TestSipListener implements SipListener {
 					}
 				} else if(cseq.getMethod().equals(Request.UPDATE) && sendUpdateAfterUpdate && prackReceived) {
 					Address address = protocolObjects.addressFactory
-					.createAddress("Shootme <sip:127.0.0.1:" + myPort
+					.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + myPort
 							+";transport="+protocolObjects.transport
 							+ ">");
 					contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
@@ -1695,7 +1695,7 @@ public class TestSipListener implements SipListener {
 					// Create ViaHeaders (either use tcp or udp)
 					ArrayList viaHeaders = new ArrayList();
 					ViaHeader viaHeader = protocolObjects.headerFactory
-							.createViaHeader("127.0.0.1", sipProvider
+							.createViaHeader("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", sipProvider
 									.getListeningPoint(protocolObjects.transport).getPort(), 
 									protocolObjects.transport,
 									null);
@@ -1825,7 +1825,7 @@ public class TestSipListener implements SipListener {
 			requestauth.removeHeader(ViaHeader.NAME);
 			// Create ViaHeaders
 			ViaHeader viaHeader = protocolObjects.headerFactory
-					.createViaHeader("127.0.0.1", sipProvider
+					.createViaHeader("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", sipProvider
 							.getListeningPoint(protocolObjects.transport).getPort(), protocolObjects.transport,
 							null);
 			// add via headers
@@ -1902,7 +1902,7 @@ public class TestSipListener implements SipListener {
 		
 		// Create ViaHeaders
 		ArrayList<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
-		ViaHeader viaHeader = protocolObjects.headerFactory.createViaHeader("127.0.0.1",
+		ViaHeader viaHeader = protocolObjects.headerFactory.createViaHeader("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
 				listeningPoint.getPort(), listeningPoint.getTransport(),
 				null);
 		// add via headers
@@ -1931,7 +1931,7 @@ public class TestSipListener implements SipListener {
 				Request.INVITE, callIdHeader, cSeqHeader, fromHeader, toHeader,
 				viaHeaders, maxForwards);
 		// Create contact headers
-		String host = "127.0.0.1";
+		String host = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 		
 		SipURI contactUrl = protocolObjects.addressFactory.createSipURI(fromName, host);
 		contactUrl.setPort(listeningPoint.getPort());
@@ -2025,7 +2025,7 @@ public class TestSipListener implements SipListener {
 	public SipProvider createProvider() throws Exception {
 		logger.info("Shootist: createProvider()");
 		listeningPoint = protocolObjects.sipStack.createListeningPoint(
-				"127.0.0.1", myPort, protocolObjects.transport);
+				"" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", myPort, protocolObjects.transport);
 		this.sipProvider = protocolObjects.sipStack
 				.createSipProvider(listeningPoint);
 		return sipProvider;
@@ -2035,7 +2035,7 @@ public class TestSipListener implements SipListener {
 	public void addListeningPoint(String ipAddress, int port, String transport) throws Exception {
 		logger.info("Shootist: addListeningPoint()");
 		ListeningPoint listeningPoint = protocolObjects.sipStack.createListeningPoint(
-				"127.0.0.1", port, transport);
+				"" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", port, transport);
 		sipProvider.addListeningPoint(listeningPoint);
 	}
 
@@ -2075,7 +2075,7 @@ public class TestSipListener implements SipListener {
 
 		List<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
 		ViaHeader viaHeader = protocolObjects.headerFactory
-				.createViaHeader("127.0.0.1", sipProvider
+				.createViaHeader("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", sipProvider
 						.getListeningPoint(protocolObjects.transport).getPort(), listeningPoint.getTransport(),
 						null);
 
@@ -2102,7 +2102,7 @@ public class TestSipListener implements SipListener {
 				requestURI, method, callIdHeader, cSeqHeader,
 				fromHeader, toHeader, viaHeaders, maxForwards);
 		// Create contact headers
-		String host = "127.0.0.1";
+		String host = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 		request.setHeader(protocolObjects.headerFactory.createHeader("REM", "RRRREM"));
 		URI contactUrl = null;
 		if(fromURI instanceof SipURI) {
@@ -2131,7 +2131,7 @@ public class TestSipListener implements SipListener {
 				.createContactHeader(contactAddress);
 		request.addHeader(contactHeader);
 		
-		SipURI uri = protocolObjects.addressFactory.createSipURI(null, "127.0.0.1");
+		SipURI uri = protocolObjects.addressFactory.createSipURI(null, "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		
 		uri.setLrParam();
 		uri.setTransportParam(protocolObjects.transport);
@@ -2207,7 +2207,7 @@ public class TestSipListener implements SipListener {
 
 		List<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
 		ViaHeader viaHeader = protocolObjects.headerFactory
-				.createViaHeader("127.0.0.1", sipProvider
+				.createViaHeader("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", sipProvider
 						.getListeningPoint(protocolObjects.transport).getPort(), listeningPoint.getTransport(),
 						null);
 
@@ -2234,7 +2234,7 @@ public class TestSipListener implements SipListener {
 				requestURI, method, callIdHeader, cSeqHeader,
 				fromHeader, toHeader, viaHeaders, maxForwards);
 		// Create contact headers
-		String host = "127.0.0.1";
+		String host = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 
 		URI contactUrl = null;
 		if(fromURI instanceof SipURI) {
@@ -2261,7 +2261,7 @@ public class TestSipListener implements SipListener {
 				.createContactHeader(contactAddress);
 		request.addHeader(contactHeader);
 		
-		SipURI uri = protocolObjects.addressFactory.createSipURI(null, "127.0.0.1");
+		SipURI uri = protocolObjects.addressFactory.createSipURI(null, "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		
 		uri.setLrParam();
 		uri.setTransportParam(protocolObjects.transport);
@@ -2344,7 +2344,7 @@ public class TestSipListener implements SipListener {
 		this.myPort = myPort;
 		if(peerPort > 0) {
 			this.peerPort = peerPort;
-			this.peerHostPort = "127.0.0.1:"+ peerPort;
+			this.peerHostPort = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":"+ peerPort;
 		}
 		this.sendBye = callerSendBye;
 		allMessagesContent = new ArrayList<String>();

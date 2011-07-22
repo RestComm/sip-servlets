@@ -192,7 +192,7 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 		
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("host", host);
-		params.put("route", "sip:127.0.0.1:5080;lr");
+		params.put("route", "sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;lr");
 		deployApplication(params);
 		
 		Thread.sleep(TIMEOUT/4);
@@ -200,7 +200,7 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 		assertNotNull(routeHeaders);
 		RouteHeader routeHeader = routeHeaders.next();
 		assertFalse(routeHeaders.hasNext());
-		assertEquals("sip:127.0.0.1:5080;lr", routeHeader.getAddress().getURI().toString());
+		assertEquals("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;lr", routeHeader.getAddress().getURI().toString());
 		assertTrue(receiver.getByeReceived());
 	}
 

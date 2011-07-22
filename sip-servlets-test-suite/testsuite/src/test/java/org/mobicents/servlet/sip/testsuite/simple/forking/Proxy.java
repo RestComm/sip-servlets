@@ -67,7 +67,7 @@ public class Proxy implements SipListener {
 
     private Hashtable clientTxTable = new Hashtable();
 
-    private static String host = "127.0.0.1";
+    private static String host = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 
     private int port = 5070;
 
@@ -93,7 +93,7 @@ public class Proxy implements SipListener {
     private void sendTo(ServerTransaction st, Request request, int targetPort) throws Exception {
         Request newRequest = (Request) request.clone();
         
-        SipURI sipUri = addressFactory.createSipURI("UA1", "127.0.0.1");
+        SipURI sipUri = addressFactory.createSipURI("UA1", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
         sipUri.setPort(targetPort);
         sipUri.setLrParam();
         Address address = addressFactory.createAddress("client1", sipUri);
@@ -103,7 +103,7 @@ public class Proxy implements SipListener {
         ViaHeader viaHeader = headerFactory.createViaHeader(host, this.port, transport, null);
         newRequest.addFirst(viaHeader);
         ClientTransaction ct1 = sipProvider.getNewClientTransaction(newRequest);
-        sipUri = addressFactory.createSipURI("proxy", "127.0.0.1");
+        sipUri = addressFactory.createSipURI("proxy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
         address = addressFactory.createAddress("proxy", sipUri);
         sipUri.setPort(5070);
         sipUri.setLrParam();

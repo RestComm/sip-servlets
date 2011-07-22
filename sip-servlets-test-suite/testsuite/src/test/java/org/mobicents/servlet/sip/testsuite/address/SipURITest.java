@@ -108,10 +108,10 @@ public class SipURITest extends junit.framework.TestCase {
 	}
 	
 	public void testParams() throws Exception {
-		URI uri = sipFactory.createURI("sip:127.0.0.1:5080");
+		URI uri = sipFactory.createURI("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 		uri.setParameter("Key", "val");
 		String s = uri.toString();
-		assertEquals("sip:127.0.0.1:5080;Key=val", s);
+		assertEquals("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;Key=val", s);
 	}
 	
 	public void testBrackets() throws Exception {

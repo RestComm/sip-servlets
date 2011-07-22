@@ -433,7 +433,7 @@ public class Shootist implements SipListener {
 		sipFactory = SipFactory.getInstance();
 		sipFactory.setPathName("gov.nist");
 		Properties properties = new Properties();		
-		String peerHostPort = "127.0.0.1:" + remotePort;
+		String peerHostPort = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + remotePort;
 		if(outboundProxy) {
 			properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort + "/"
 				+ transport);
@@ -479,7 +479,7 @@ public class Shootist implements SipListener {
 			headerFactory = sipFactory.createHeaderFactory();
 			addressFactory = sipFactory.createAddressFactory();
 			messageFactory = sipFactory.createMessageFactory();
-			listeningPoint = sipStack.createListeningPoint("127.0.0.1", 5058, transport);
+			listeningPoint = sipStack.createListeningPoint("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", 5058, transport);
 			sipProvider = sipStack.createSipProvider(listeningPoint);
 			Shootist listener = this;
 			sipProvider.addSipListener(listener);
@@ -558,7 +558,7 @@ public class Shootist implements SipListener {
 				
 			}
 			// Create contact headers
-			String host = "127.0.0.1";
+			String host = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 
 			SipURI contactUrl = addressFactory.createSipURI(fromName, host);
 			contactUrl.setPort(listeningPoint.getPort());

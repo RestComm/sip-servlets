@@ -138,7 +138,7 @@ public class ShootistSipServletENUMTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertFalse(badReceiver.getByeReceived());
 		assertTrue(receiver.getByeReceived());
-		assertEquals("sip:jean@localhost:5080", receiver.getInviteRequest().getRequestURI().toString());
+		assertEquals("sip:jean@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080", receiver.getInviteRequest().getRequestURI().toString());
 	}
 
 	private void mockDNSLookup(String host) throws TextParseException {
@@ -150,11 +150,11 @@ public class ShootistSipServletENUMTest extends SipServletTestCase {
 		supportedTransports.add(TRANSPORT);
 		
 		List<NAPTRRecord> mockedNAPTRRecords = new LinkedList<NAPTRRecord>();
-		// mocking the name because localhost is not absolute and localhost. cannot be resolved 
+		// mocking the name because " + System.getProperty("org.mobicents.testsuite.testhostaddr") + " is not absolute and " + System.getProperty("org.mobicents.testsuite.testhostaddr") + ". cannot be resolved 
 		Name name = mock(Name.class);
 		when(name.isAbsolute()).thenReturn(true);
-		when(name.toString()).thenReturn("!^.*$!sip:jean@localhost!.");
-		mockedNAPTRRecords.add(new NAPTRRecord(new Name("7.6.5.4.3.2.1.5.5.5.8.5.3.e164.arpa" + "."), DClass.IN, 1000, 0, 0, "s", "E2U+sip", "!^.*$!sip:jean@localhost:5080!.", name));		
+		when(name.toString()).thenReturn("!^.*$!sip:jean@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "!.");
+		mockedNAPTRRecords.add(new NAPTRRecord(new Name("7.6.5.4.3.2.1.5.5.5.8.5.3.e164.arpa" + "."), DClass.IN, 1000, 0, 0, "s", "E2U+sip", "!^.*$!sip:jean@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080!.", name));		
 		when(dnsLookupPerformer.performNAPTRLookup("7.6.5.4.3.2.1.5.5.5.8.5.3.e164.arpa", false, supportedTransports)).thenReturn(mockedNAPTRRecords);
 	}
 

@@ -37,7 +37,7 @@ public class B2BUACompositionJunitTest extends SipServletTestCase {
 	private static final String FROM_NAME = "composition";
 	
 	private static final String FROM_DOMAIN = "sip-servlets.com";
-	private static final String TO_DOMAIN = "127.0.0.1:5090";	
+	private static final String TO_DOMAIN = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090";	
 
 	private static transient Logger logger = Logger.getLogger(B2BUACompositionJunitTest.class);
 

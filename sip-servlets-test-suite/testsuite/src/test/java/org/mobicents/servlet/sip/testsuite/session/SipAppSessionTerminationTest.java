@@ -35,8 +35,8 @@ import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class SipAppSessionTerminationTest extends SipServletTestCase {
 
-	private static final String CLICK2DIAL_URL = "http://127.0.0.1:8080/click2call/call";
-	private static final String CLICK2DIAL_PARAMS = "?from=sip:sipAppTest@127.0.0.1:5056&to=sip:to@127.0.0.1:5057";
+	private static final String CLICK2DIAL_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":8080/click2call/call";
+	private static final String CLICK2DIAL_PARAMS = "?from=sip:sipAppTest@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5056&to=sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057";
 	private static transient Logger logger = Logger.getLogger(SipAppSessionTerminationTest.class);
 
 	TestSipListener receiver;

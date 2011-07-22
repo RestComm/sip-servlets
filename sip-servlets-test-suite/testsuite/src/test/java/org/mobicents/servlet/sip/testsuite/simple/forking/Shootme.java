@@ -69,7 +69,7 @@ public class Shootme   implements SipListener {
 
 
 
-    private static final String myAddress = "127.0.0.1";
+    private static final String myAddress = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 
     private Hashtable serverTxTable = new Hashtable();
 

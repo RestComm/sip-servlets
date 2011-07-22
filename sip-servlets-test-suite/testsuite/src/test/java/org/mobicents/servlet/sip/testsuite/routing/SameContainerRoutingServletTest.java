@@ -93,7 +93,7 @@ public class SameContainerRoutingServletTest extends SipServletTestCase {
 	protected void setUp() throws Exception {
 		super.setUp();						
 		senderProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5070", null, null);
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", null, null);
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();			
 		senderProvider.addSipListener(sender);
@@ -104,7 +104,7 @@ public class SameContainerRoutingServletTest extends SipServletTestCase {
 		List<ApplicationParameter> appParamList = new ArrayList<ApplicationParameter>();
 		ApplicationParameter applicationParameter = new ApplicationParameter();
 		applicationParameter.setName("requestURI");
-		applicationParameter.setValue("127.0.0.1:5070");
+		applicationParameter.setValue("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070");
 		appParamList.add(applicationParameter);
 		deployShootistApplication(appParamList);
 		Thread.sleep(TIMEOUT);
@@ -122,7 +122,7 @@ public class SameContainerRoutingServletTest extends SipServletTestCase {
 		List<ApplicationParameter> appParamList = new ArrayList<ApplicationParameter>();
 		ApplicationParameter applicationParameter = new ApplicationParameter();
 		applicationParameter.setName("requestURI");
-		applicationParameter.setValue("127.0.0.1:5070");
+		applicationParameter.setValue("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070");
 		ApplicationParameter applicationParameter2 = new ApplicationParameter();
 		applicationParameter2.setName("no200OKToNotify");
 		applicationParameter2.setValue("true");

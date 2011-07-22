@@ -42,7 +42,7 @@ public class DigestServerAuthenticationMethod implements AuthenticationMethod {
 
 	public static final String DEFAULT_SCHEME = "Digest";
 
-	public static final String DEFAULT_DOMAIN = "127.0.0.1";
+	public static final String DEFAULT_DOMAIN = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 
 	public static final String DEFAULT_ALGORITHM = "MD5";
 

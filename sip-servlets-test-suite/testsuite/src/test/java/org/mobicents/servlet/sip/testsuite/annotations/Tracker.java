@@ -199,7 +199,7 @@ public class Tracker implements SipListener {
 //			headerFactory = sipFactory.createHeaderFactory();
 //			addressFactory = sipFactory.createAddressFactory();
 			messageFactory = sipFactory.createMessageFactory();
-			ListeningPoint lp = sipStack.createListeningPoint("127.0.0.1",
+			ListeningPoint lp = sipStack.createListeningPoint("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
 					myPort, "udp");
 
 			Tracker listener = this;

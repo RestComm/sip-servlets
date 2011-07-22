@@ -76,7 +76,7 @@ public class UpdateSipServletTest extends SipServletTestCase {
 			super.setUp();						
 			
 			senderProtocolObjects =new ProtocolObjects(
-					"sender", "gov.nist", TRANSPORT, AUTODIALOG, "127.0.0.1:5070", null, null);
+					"sender", "gov.nist", TRANSPORT, AUTODIALOG, "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", null, null);
 						
 			sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 			SipProvider senderProvider = sender.createProvider();			

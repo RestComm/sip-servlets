@@ -145,7 +145,7 @@ public class UACReInviteSipServletTest extends SipServletTestCase {
 		assertTrue(receiver.isAckReceived());
 		
 		List<Header> headers = new ArrayList<Header>();
-		headers.add(receiverProtocolObjects.headerFactory.createHeader(RecordRouteHeader.NAME, "sip:127.0.0.1:5080"));
+		headers.add(receiverProtocolObjects.headerFactory.createHeader(RecordRouteHeader.NAME, "sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080"));
 		receiver.sendInDialogSipRequest("INVITE", null, null, null, headers, null);
 		Thread.sleep(TIMEOUT);
 		
@@ -182,7 +182,7 @@ public class UACReInviteSipServletTest extends SipServletTestCase {
 		assertTrue(receiver.isAckReceived());
 		
 		List<Header> headers = new ArrayList<Header>();
-		headers.add(receiverProtocolObjects.headerFactory.createHeader(RecordRouteHeader.NAME, "sip:127.0.0.1:5080"));
+		headers.add(receiverProtocolObjects.headerFactory.createHeader(RecordRouteHeader.NAME, "sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080"));
 		receiver.sendInDialogSipRequest("INVITE", null, null, null, headers, null);
 		Thread.sleep(TIMEOUT);
 		

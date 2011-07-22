@@ -107,7 +107,7 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 				.getProtocolHandler();
 		try {
 			udpProtocolHandler.setPort(5070);
-			udpProtocolHandler.setIpAddress("127.0.0.1");
+			udpProtocolHandler.setIpAddress("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 
 			udpProtocolHandler.setSignalingTransport("udp");
 		} catch (Exception e) {
@@ -116,7 +116,7 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 		}
 		tomcat.getSipService().setSipStackProperties(null);
 		udpProtocolHandler.setUseStaticAddress(true);
-		udpProtocolHandler.setStaticServerAddress("127.0.0.1");
+		udpProtocolHandler.setStaticServerAddress("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		udpProtocolHandler.setStaticServerPort(IPLB_ADDRESS);
 		tomcat.getSipService().addConnector(udpSipConnector);
 		try {
@@ -135,7 +135,7 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 	}
 	
 	private void startLoadBalancer() {	
-		ipBalancer = new UDPPacketForwarder(IPLB_ADDRESS, 5070, "127.0.0.1");
+		ipBalancer = new UDPPacketForwarder(IPLB_ADDRESS, 5070, "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		ipBalancer.start();
 	}
 	

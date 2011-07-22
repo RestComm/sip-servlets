@@ -112,7 +112,7 @@ public class ExternalApplicationRoutingTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		String r = "requestUri";
-		String ra = "127.0.0.1:5058";
+		String ra = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5058";
 		SipURI requestUri = senderProtocolObjects.addressFactory.createSipURI(
 				r, ra);
 		
@@ -138,7 +138,7 @@ public class ExternalApplicationRoutingTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		String r = "requestUri";
-		String ra = "127.0.0.1:5058";
+		String ra = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5058";
 		SipURI requestUri = senderProtocolObjects.addressFactory.createSipURI(
 				r, ra);
 		
@@ -164,7 +164,7 @@ public class ExternalApplicationRoutingTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		String r = "requestUri";
-		String ra = "127.0.0.1:5058";
+		String ra = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5058";
 		SipURI requestUri = senderProtocolObjects.addressFactory.createSipURI(
 				r, ra);
 		
@@ -191,7 +191,7 @@ public class ExternalApplicationRoutingTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		String r = "requestUri";
-		String ra = "127.0.0.1:5058";
+		String ra = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5058";
 		SipURI requestUri = senderProtocolObjects.addressFactory.createSipURI(
 				r, ra);
 		

@@ -98,12 +98,12 @@ public class ProxyBranchTimeoutTest extends SipServletTestCase {
 
 	public SipStack makeStack(String transport, int port) throws Exception {
 		Properties properties = new Properties();
-		String peerHostPort1 = "127.0.0.1:5070";
+		String peerHostPort1 = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070";
 		properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort1 + "/"
 				+ "udp");
 		properties.setProperty("javax.sip.STACK_NAME", "UAC_" + transport + "_"
 				+ port);
-		properties.setProperty("sipunit.BINDADDR", "127.0.0.1");
+		properties.setProperty("sipunit.BINDADDR", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
 				"logs/simplesipservlettest_debug_port" + port + ".txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
@@ -121,14 +121,14 @@ public class ProxyBranchTimeoutTest extends SipServletTestCase {
 //		ListeningPoint lp = sipStackSender.getSipProvider()
 //				.getListeningPoint("udp");
 //		String stackIPAddress = lp.getIPAddress();
-		sipPhoneSender = sipStackSender.createSipPhone("localhost",
+		sipPhoneSender = sipStackSender.createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
 				SipStack.PROTOCOL_UDP, 5070, "sip:sender@nist.gov");
 
 		for (int q = 0; q < receiversCount; q++) {
 			int port = 5058 - 1 - q;
 			sipStackReceivers[q] = makeStack(SipStack.PROTOCOL_UDP, port);
 			sipPhoneReceivers[q] = sipStackReceivers[q].createSipPhone(
-					"localhost", SipStack.PROTOCOL_UDP, 5070,
+					"" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", SipStack.PROTOCOL_UDP, 5070,
 					"sip:receiver@nist.gov");
 		}		
 	}

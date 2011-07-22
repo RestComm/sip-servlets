@@ -669,7 +669,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		logger.info("Test completed");
 		super.tearDown();
 		Thread.sleep(4000);
-//		FullThreadDump fullThreadDump = new FullThreadDump("127.0.0.1", 1090);
+//		FullThreadDump fullThreadDump = new FullThreadDump("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", 1090);
 //        fullThreadDump.dump();
 	}
 

@@ -181,7 +181,7 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
-		Header rh = senderProtocolObjects.headerFactory.createHeader("Route", "sip:extra-route@127.0.0.1:5057;lr");
+		Header rh = senderProtocolObjects.headerFactory.createHeader("Route", "sip:extra-route@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057;lr");
 		LinkedList<Header> hh = new LinkedList<Header>();
 		hh.add(rh);
 		Thread.sleep(TIMEOUT/4);

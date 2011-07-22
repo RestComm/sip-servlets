@@ -138,7 +138,7 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		while (contactHeaderIt.hasNext()) {
 			ContactHeader contactHeader = (ContactHeader) contactHeaderIt
 					.next();			
-			assertTrue(contactHeader.toString().trim().startsWith("Contact: \"callforwardingB2BUA\" <sip:test@127.0.0.1:5070;q=0.1;transport=tcp;test>;test"));
+			assertTrue(contactHeader.toString().trim().startsWith("Contact: \"callforwardingB2BUA\" <sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070;q=0.1;transport=tcp;test>;test"));
 			i++;
 		}
 		assertEquals(1, i);

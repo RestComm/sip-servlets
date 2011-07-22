@@ -144,14 +144,14 @@ public class SipConnectorTestManagement extends SipServletTestCase {
         receiver.getAllMessagesContent().clear();
         
         SipConnector sipConnector = new SipConnector();
-        sipConnector.setIpAddress("127.0.0.1");
+        sipConnector.setIpAddress("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
         sipConnector.setPort(5071);
         sipConnector.setTransport(ListeningPoint.UDP);
         assertTrue((Boolean)mbsc.invoke(objectName, "addSipConnector",new Object[] {sipConnector}, new String[]{SipConnector.class.getCanonicalName()}));
         sipConnectors = (SipConnector[]) mbsc.invoke(objectName, "findSipConnectors", null, null);
         assertEquals(2, sipConnectors.length);
         
-        assertTrue((Boolean)mbsc.invoke(objectName, "removeSipConnector",new Object[] {"127.0.0.1", 5071, ListeningPoint.UDP}, new String[]{String.class.getCanonicalName(), int.class.getCanonicalName(), String.class.getCanonicalName()}));
+        assertTrue((Boolean)mbsc.invoke(objectName, "removeSipConnector",new Object[] {"" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", 5071, ListeningPoint.UDP}, new String[]{String.class.getCanonicalName(), int.class.getCanonicalName(), String.class.getCanonicalName()}));
         sipConnectors = (SipConnector[]) mbsc.invoke(objectName, "findSipConnectors", null, null);
         assertEquals(1, sipConnectors.length);     
         
@@ -206,7 +206,7 @@ public class SipConnectorTestManagement extends SipServletTestCase {
 			logger.info(sipConnectors[i]);
 		}
         
-        assertTrue((Boolean)mbsc.invoke(objectName, "removeSipConnector",new Object[] {"127.0.0.1", 5070, ListeningPoint.UDP}, new String[]{String.class.getCanonicalName(), int.class.getCanonicalName(), String.class.getCanonicalName()}));
+        assertTrue((Boolean)mbsc.invoke(objectName, "removeSipConnector",new Object[] {"" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", 5070, ListeningPoint.UDP}, new String[]{String.class.getCanonicalName(), int.class.getCanonicalName(), String.class.getCanonicalName()}));
         sipConnectors = (SipConnector[]) mbsc.invoke(objectName, "findSipConnectors", null, null);
         assertEquals(0, sipConnectors.length);     
         
@@ -217,13 +217,13 @@ public class SipConnectorTestManagement extends SipServletTestCase {
         
         // adding udp connector
         SipConnector udpSipConnector = new SipConnector();
-        udpSipConnector.setIpAddress("127.0.0.1");
+        udpSipConnector.setIpAddress("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
         udpSipConnector.setPort(5072);
         udpSipConnector.setTransport(ListeningPoint.UDP);
         assertTrue((Boolean)mbsc.invoke(objectName, "addSipConnector",new Object[] {udpSipConnector}, new String[]{SipConnector.class.getCanonicalName()}));
         // adding tcp connector
         SipConnector tcpSipConnector = new SipConnector();
-        tcpSipConnector.setIpAddress("127.0.0.1");
+        tcpSipConnector.setIpAddress("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
         tcpSipConnector.setPort(5072);
         tcpSipConnector.setTransport(ListeningPoint.TCP);
         assertTrue((Boolean)mbsc.invoke(objectName, "addSipConnector",new Object[] {tcpSipConnector}, new String[]{SipConnector.class.getCanonicalName()}));
@@ -294,14 +294,14 @@ public class SipConnectorTestManagement extends SipServletTestCase {
         
         // trying to add a connector already present should return false and no messages should have been received
         SipConnector udpSipConnector = new SipConnector();
-        udpSipConnector.setIpAddress("127.0.0.1");
+        udpSipConnector.setIpAddress("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
         udpSipConnector.setPort(5070);
         udpSipConnector.setTransport(ListeningPoint.UDP);
         logger.info("Trying to add a sip connector already present");
         assertFalse((Boolean)mbsc.invoke(objectName, "addSipConnector",new Object[] {udpSipConnector}, new String[]{SipConnector.class.getCanonicalName()}));
         // trying to remove a connector not present should return false and no messages should have been received
         logger.info("Trying to remove a sip connector not present");
-        assertFalse((Boolean)mbsc.invoke(objectName, "removeSipConnector",new Object[] {"127.0.0.1", 5071, ListeningPoint.UDP}, new String[]{String.class.getCanonicalName(), int.class.getCanonicalName(), String.class.getCanonicalName()}));
+        assertFalse((Boolean)mbsc.invoke(objectName, "removeSipConnector",new Object[] {"" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", 5071, ListeningPoint.UDP}, new String[]{String.class.getCanonicalName(), int.class.getCanonicalName(), String.class.getCanonicalName()}));
         sipConnectors = (SipConnector[]) mbsc.invoke(objectName, "findSipConnectors", null, null);
         
         assertEquals(1, sipConnectors.length);                     
@@ -354,7 +354,7 @@ public class SipConnectorTestManagement extends SipServletTestCase {
         
         // trying to add a connector that is already bound to an external application
         SipConnector udpSipConnector = new SipConnector();
-        udpSipConnector.setIpAddress("127.0.0.1");
+        udpSipConnector.setIpAddress("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
         udpSipConnector.setPort(5080);
         udpSipConnector.setTransport(ListeningPoint.UDP);
         logger.info("Trying to add a sip connector already bound to an external applicaiton");
@@ -365,7 +365,7 @@ public class SipConnectorTestManagement extends SipServletTestCase {
 		}
         // trying to remove a connector not present should return false and no messages should have been received
         logger.info("Trying to remove a sip connector that was badly added");
-        assertFalse((Boolean)mbsc.invoke(objectName, "removeSipConnector",new Object[] {"127.0.0.1", 5080, ListeningPoint.UDP}, new String[]{String.class.getCanonicalName(), int.class.getCanonicalName(), String.class.getCanonicalName()}));
+        assertFalse((Boolean)mbsc.invoke(objectName, "removeSipConnector",new Object[] {"" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", 5080, ListeningPoint.UDP}, new String[]{String.class.getCanonicalName(), int.class.getCanonicalName(), String.class.getCanonicalName()}));
         sipConnectors = (SipConnector[]) mbsc.invoke(objectName, "findSipConnectors", null, null);
         assertEquals(1, sipConnectors.length);
         for (int i = 0; i < sipConnectors.length; i++) {

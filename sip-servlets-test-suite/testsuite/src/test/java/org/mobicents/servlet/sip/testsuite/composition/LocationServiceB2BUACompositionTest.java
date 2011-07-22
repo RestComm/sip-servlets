@@ -107,7 +107,7 @@ public class LocationServiceB2BUACompositionTest extends SipServletTestCase {
 				fromName, fromHost);
 				
 		String toUser = "proxy-b2bua";
-		String toHost = "127.0.0.1:5070";
+		String toHost = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070";
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toHost);
 		

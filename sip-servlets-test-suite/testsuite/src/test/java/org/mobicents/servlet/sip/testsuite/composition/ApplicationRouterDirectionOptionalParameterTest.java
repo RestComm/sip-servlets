@@ -36,8 +36,8 @@ import org.mobicents.servlet.sip.SipServletTestCase;
 
 public class ApplicationRouterDirectionOptionalParameterTest extends SipServletTestCase {
 
-	private static final String CLICK2DIAL_URL = "http://127.0.0.1:8080/click2call/call";
-	private static final String CLICK2DIAL_PARAMS = "?from=sip:from@127.0.0.1:5056&to=sip:to@127.0.0.1:5057";
+	private static final String CLICK2DIAL_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":8080/click2call/call";
+	private static final String CLICK2DIAL_PARAMS = "?from=sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5056&to=sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057";
 	private static transient Logger logger = Logger.getLogger(ApplicationRouterDirectionOptionalParameterTest.class);
 
 	private SipStack[] sipStackReceivers;
@@ -101,12 +101,12 @@ public class ApplicationRouterDirectionOptionalParameterTest extends SipServletT
 
 	public SipStack makeStack(String transport, int port) throws Exception {
 		Properties properties = new Properties();
-		String peerHostPort1 = "127.0.0.1:5070";
+		String peerHostPort1 = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070";
 		properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort1 + "/"
 				+ "udp");
 		properties.setProperty("javax.sip.STACK_NAME", "UAC_" + transport + "_"
 				+ port);
-		properties.setProperty("sipunit.BINDADDR", "127.0.0.1");
+		properties.setProperty("sipunit.BINDADDR", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
 				"logs/simplesipservlettest_debug_port" + port + ".txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
@@ -121,12 +121,12 @@ public class ApplicationRouterDirectionOptionalParameterTest extends SipServletT
 		sipPhoneReceivers = new SipPhone[receiversCount];
 
 		sipStackReceivers[0] = makeStack(SipStack.PROTOCOL_UDP, 5057);
-		sipPhoneReceivers[0] = sipStackReceivers[0].createSipPhone("127.0.0.1",
-				SipStack.PROTOCOL_UDP, 5070, "sip:to@127.0.0.1");
+		sipPhoneReceivers[0] = sipStackReceivers[0].createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
+				SipStack.PROTOCOL_UDP, 5070, "sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 
 		sipStackReceivers[1] = makeStack(SipStack.PROTOCOL_UDP, 5056);
-		sipPhoneReceivers[1] = sipStackReceivers[1].createSipPhone("127.0.0.1",
-				SipStack.PROTOCOL_UDP, 5070, "sip:from@127.0.0.1");
+		sipPhoneReceivers[1] = sipStackReceivers[1].createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
+				SipStack.PROTOCOL_UDP, 5070, "sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 	}
 
 	public void init() throws Exception {

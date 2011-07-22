@@ -72,13 +72,13 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 	
 	public void setupPhones(String a, String b) throws Exception {
 		Properties properties1 = new Properties();
-		//properties1.setProperty("javax.sip.IP_ADDRESS", "127.0.0.1");
+		//properties1.setProperty("javax.sip.IP_ADDRESS", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		String transport = "udp";
-		String peerHostPort1 = "127.0.0.1:5070";
+		String peerHostPort1 = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070";
 		properties1.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort1 + "/"
 				+ transport);
 		properties1.setProperty("javax.sip.STACK_NAME", "sender");
-		properties1.setProperty("sipunit.BINDADDR", "127.0.0.1");
+		properties1.setProperty("sipunit.BINDADDR", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		properties1.setProperty("gov.nist.javax.sip.DEBUG_LOG",
 			"logs/b2buadebug1.txt");
 		properties1.setProperty("gov.nist.javax.sip.SERVER_LOG",
@@ -87,12 +87,12 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 			"32");
 
 		Properties properties2 = new Properties();
-		// properties2.setProperty("javax.sip.IP_ADDRESS", "127.0.0.1");
-		String peerHostPort2 = "127.0.0.1:5070";
+		// properties2.setProperty("javax.sip.IP_ADDRESS", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
+		String peerHostPort2 = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070";
 		properties2.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort2 + "/"
 				+ transport);
 		properties2.setProperty("javax.sip.STACK_NAME", "receiver");
-		properties2.setProperty("sipunit.BINDADDR", "127.0.0.1");
+		properties2.setProperty("sipunit.BINDADDR", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		properties2.setProperty("gov.nist.javax.sip.DEBUG_LOG",
 			"logs/b2buadebug2.txt");
 		properties2.setProperty("gov.nist.javax.sip.SERVER_LOG",
@@ -101,10 +101,10 @@ public class B2BUASipUnitTest extends SipServletTestCase {
 			"32");
 
 		sipStackA = new SipStack(SipStack.PROTOCOL_UDP , 5058, properties1);					
-		sipPhoneA = sipStackA.createSipPhone("localhost", SipStack.PROTOCOL_UDP, 5070, a);
+		sipPhoneA = sipStackA.createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", SipStack.PROTOCOL_UDP, 5070, a);
 
 		sipStackB = new SipStack(SipStack.PROTOCOL_UDP , 5059, properties2);
-		sipPhoneB = sipStackB.createSipPhone("localhost", SipStack.PROTOCOL_UDP, 5070, b);
+		sipPhoneB = sipStackB.createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", SipStack.PROTOCOL_UDP, 5070, b);
 	}			
 
 	public void testB2BUASipUnit() throws Exception {

@@ -367,13 +367,13 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		receiverProtocolObjects.start();
 		tomcat.startTomcat();
 		Map<String, String> params = new HashMap<String, String>();
-		String userName = "sip:+34666666666@127.0.0.1:5080;pres-list=mylist";
+		String userName = "sip:+34666666666@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;pres-list=mylist";
 		params.put("username", userName);
 		params.put("useStringFactory", "true");
 		deployApplication(params);
 		Thread.sleep(TIMEOUT);
 		ToHeader toHeader = (ToHeader) receiver.getInviteRequest().getHeader(ToHeader.NAME);
-		assertEquals("To: <sip:+34666666666@127.0.0.1:5080;pres-list=mylist>", toHeader.toString().trim());
+		assertEquals("To: <sip:+34666666666@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;pres-list=mylist>", toHeader.toString().trim());
 		assertTrue(receiver.getByeReceived());		
 	}
 	
@@ -694,7 +694,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		tomcat.startTomcat();
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("transportRURI", "tcp");
-		params.put("testIOException", "localhost");
+		params.put("testIOException", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		deployApplication(params);
 		Thread.sleep(TIMEOUT);		
 		List<String> allMessagesContent = receiver.getAllMessagesContent();

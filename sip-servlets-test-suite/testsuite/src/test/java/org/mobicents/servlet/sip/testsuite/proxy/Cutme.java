@@ -293,7 +293,7 @@ public class Cutme implements SipListener {
 
 		try {
 			messageFactory = sipFactory.createMessageFactory();
-			ListeningPoint lp = sipStack.createListeningPoint("127.0.0.1",
+			ListeningPoint lp = sipStack.createListeningPoint("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
 					myPort, transport);
 
 			Cutme listener = this;

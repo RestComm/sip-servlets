@@ -71,7 +71,7 @@ public class Shootme implements SipListener {
 
 	private SipStack sipStack;
 
-	private static final String myAddress = "127.0.0.1";
+	private static final String myAddress = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 
 	private int myPort = 5057;
 	private String toTag;
@@ -416,7 +416,7 @@ public class Shootme implements SipListener {
 			headerFactory = sipFactory.createHeaderFactory();
 			addressFactory = sipFactory.createAddressFactory();
 			messageFactory = sipFactory.createMessageFactory();
-			ListeningPoint lp = sipStack.createListeningPoint("127.0.0.1",
+			ListeningPoint lp = sipStack.createListeningPoint("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
 					myPort, transport);
 
 			Shootme listener = this;

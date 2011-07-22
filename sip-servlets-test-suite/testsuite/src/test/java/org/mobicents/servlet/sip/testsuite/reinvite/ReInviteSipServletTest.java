@@ -178,7 +178,7 @@ public class ReInviteSipServletTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.addListeningPoint("127.0.0.1", 5081, ListeningPoint.TCP);
+		sender.addListeningPoint("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", 5081, ListeningPoint.TCP);
 		senderProtocolObjects.start();
 		
 		sender.setSendBye(false);

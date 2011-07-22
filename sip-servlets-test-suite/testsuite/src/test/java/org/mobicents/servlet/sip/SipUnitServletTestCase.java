@@ -47,7 +47,7 @@ public abstract class SipUnitServletTestCase extends SipTestCase {
 	protected String projectHome;
 	protected SipEmbedded tomcat;
 	protected String serviceFullClassName = "org.mobicents.servlet.sip.startup.SipStandardService";
-	protected String sipIpAddress = "127.0.0.1";
+	protected String sipIpAddress = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 	protected String serverName = "SIP-Servlet-Tomcat-Server";
 	protected String listeningPointTransport = ListeningPoint.UDP;
 	protected boolean createTomcatOnStartup = true;

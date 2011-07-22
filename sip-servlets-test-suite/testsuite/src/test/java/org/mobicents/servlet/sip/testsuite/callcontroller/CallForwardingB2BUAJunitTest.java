@@ -308,7 +308,7 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		sender.setTimeToWaitBeforeBye(TIMEOUT*2);
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Contact"}, new String[] {"<sip:127.0.0.1:5056>;+sip.instance=\"<urn:uuid:some-xxxx>\""}, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Contact"}, new String[] {"<sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5056>;+sip.instance=\"<urn:uuid:some-xxxx>\""}, true);		
 		Thread.sleep(TIMEOUT*3);
 		assertEquals(200, sender.getFinalResponseStatus());		
 	}

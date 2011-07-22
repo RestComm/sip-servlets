@@ -161,7 +161,7 @@ public class SequentialProxyTest extends SipServletTestCase {
 	// Test for http://code.google.com/p/mobicents/issues/detail?id=2740
 	public void testOutboundProxySetting() {
 
-		sipService.setOutboundProxy("127.0.0.1:5057");
+		sipService.setOutboundProxy("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057");
 		this.shootme.init("stackName", null);
 		this.cutme.init(null);
 		this.shootist.init("sequential-reverse", false, null);

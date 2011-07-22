@@ -102,7 +102,7 @@ public class CallForwardingB2BUAAuthTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 				
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Remote-Party-ID"}, new String[] {"<sip:test@127.0.0.1:5080>;screen=yes;privacy=off;party=calling;-call-initiator=5016;-call-initiator-location=int;-redirected-by;-int-ext=5016;-ent-name=Acro;-direction=ext;-call-id=55665"}, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Remote-Party-ID"}, new String[] {"<sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080>;screen=yes;privacy=off;party=calling;-call-initiator=5016;-call-initiator-location=int;-redirected-by;-int-ext=5016;-ent-name=Acro;-direction=ext;-call-id=55665"}, true);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
@@ -147,7 +147,7 @@ public class CallForwardingB2BUAAuthTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 				
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Remote-Party-ID"}, new String[] {"<sip:test@127.0.0.1:5080>;screen=yes;privacy=off;party=calling;-call-initiator=5016;-call-initiator-location=int;-redirected-by;-int-ext=5016;-ent-name=Acro;-direction=ext;-call-id=55665"}, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Remote-Party-ID"}, new String[] {"<sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080>;screen=yes;privacy=off;party=calling;-call-initiator=5016;-call-initiator-location=int;-redirected-by;-int-ext=5016;-ent-name=Acro;-direction=ext;-call-id=55665"}, true);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isCancelOkReceived());
 		assertTrue(sender.isRequestTerminatedReceived());

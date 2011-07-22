@@ -97,12 +97,12 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 
 	public SipStack makeStack(String transport, int port) throws Exception {
 		Properties properties = new Properties();
-		String peerHostPort1 = "127.0.0.1:5070";
+		String peerHostPort1 = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070";
 		properties.setProperty("javax.sip.OUTBOUND_PROXY", peerHostPort1 + "/"
 				+ "udp");
 		properties.setProperty("javax.sip.STACK_NAME", "UAC_" + transport + "_"
 				+ port);
-		properties.setProperty("sipunit.BINDADDR", "127.0.0.1");
+		properties.setProperty("sipunit.BINDADDR", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
 				"logs/callforwarding_debug_" + port + ".txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
@@ -114,10 +114,10 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 
 	public void setupPhone(String fromAddress, String toAddress) throws Exception {			
 			sipStackSender = makeStack(SipStack.PROTOCOL_UDP, 5080);			
-			sipPhoneSender = sipStackSender.createSipPhone("localhost",
+			sipPhoneSender = sipStackSender.createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
 					SipStack.PROTOCOL_UDP, 5070, fromAddress);		
 			sipStackReceiver = makeStack(SipStack.PROTOCOL_UDP, 5090);			
-			sipPhoneReceiver = sipStackReceiver.createSipPhone("localhost",
+			sipPhoneReceiver = sipStackReceiver.createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
 					SipStack.PROTOCOL_UDP, 5070, toAddress);
 	}
 

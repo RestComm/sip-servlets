@@ -67,7 +67,7 @@ public class SipSessionKeyParsingTest extends TestCase {
 
 	
 	public void testSipSessionKeyAndParsing() throws ParseException {
-		SipSessionKey sipSessionKey = new SipSessionKey("" + new Random().nextInt(10000000), null,  Utils.getInstance().generateCallIdentifier("127.0.0.1"), "" + UUID.randomUUID(), "ApplicationNameTest");
+		SipSessionKey sipSessionKey = new SipSessionKey("" + new Random().nextInt(10000000), null,  Utils.getInstance().generateCallIdentifier("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ""), "" + UUID.randomUUID(), "ApplicationNameTest");
 		String sipSessionKeyStringified = sipSessionKey.toString();
 		
 		SipSessionKey sipSessionKeyParsed =
@@ -79,9 +79,9 @@ public class SipSessionKeyParsingTest extends TestCase {
 	}
 	
 	public void testSipSessionKeyToTagSet() throws ParseException {
-		SipSessionKey sipSessionKeyNoToTag = new SipSessionKey("" + new Random().nextInt(10000000), null,  Utils.getInstance().generateCallIdentifier("127.0.0.1"), "" + UUID.randomUUID(), "ApplicationNameTest");
+		SipSessionKey sipSessionKeyNoToTag = new SipSessionKey("" + new Random().nextInt(10000000), null,  Utils.getInstance().generateCallIdentifier("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ""), "" + UUID.randomUUID(), "ApplicationNameTest");
 		
-		SipSessionKey sipSessionKeyDifferentFromTagAndToTag = new SipSessionKey("" + new Random().nextInt(10000000), "" + new Random().nextInt(10000000),  Utils.getInstance().generateCallIdentifier("127.0.0.1"), "" + UUID.randomUUID(), "ApplicationNameTest");
+		SipSessionKey sipSessionKeyDifferentFromTagAndToTag = new SipSessionKey("" + new Random().nextInt(10000000), "" + new Random().nextInt(10000000),  Utils.getInstance().generateCallIdentifier("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ""), "" + UUID.randomUUID(), "ApplicationNameTest");
 		
 		SipSessionKey sipSessionKeySameFromTagAndDifferentToTag = new SipSessionKey(sipSessionKeyNoToTag.getFromTag(), "" + new Random().nextInt(10000000),  sipSessionKeyNoToTag.getCallId(), sipSessionKeyNoToTag.getApplicationSessionId(), "ApplicationNameTest");
 		

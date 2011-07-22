@@ -44,7 +44,7 @@ import org.mobicents.servlet.sip.testsuite.TestSipListener;
 public class ConcurrentyControlAsyncWorkSessionIsolationTest extends SipServletTestCase {
 	
 	private static transient Logger logger = Logger.getLogger(ConcurrentyControlAsyncWorkSessionIsolationTest.class);
-	private static final String CLICK2DIAL_URL = "http://127.0.0.1:8080/click2call/call";
+	private static final String CLICK2DIAL_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":8080/click2call/call";
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
 //	private static final int TIMEOUT = 5000;	

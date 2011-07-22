@@ -103,7 +103,7 @@ public class LocationServiceReInviteSipServletTest extends SipServletTestCase {
 				fromName, fromSipAddress);
 				
 		String toUser = "receiver-failover";
-		String toSipAddress = "127.0.0.1:5090";
+		String toSipAddress = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090";
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
@@ -124,7 +124,7 @@ public class LocationServiceReInviteSipServletTest extends SipServletTestCase {
 				fromName, fromSipAddress);
 				
 		String toUser = "receiver-failover";
-		String toSipAddress = "127.0.0.1:5090";
+		String toSipAddress = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090";
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		

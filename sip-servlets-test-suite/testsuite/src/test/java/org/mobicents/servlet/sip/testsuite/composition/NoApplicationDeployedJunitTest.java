@@ -109,7 +109,7 @@ public class NoApplicationDeployedJunitTest extends SipServletTestCase {
 				toUser, toHost);
 		
 		SipURI routeAddress = senderProtocolObjects.addressFactory.createSipURI(
-				null, "127.0.0.1");
+				null, "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		routeAddress.setPort(5070);
 		routeAddress.setLrParam();
 		routeAddress.setTransportParam(senderProtocolObjects.transport);
@@ -152,7 +152,7 @@ public class NoApplicationDeployedJunitTest extends SipServletTestCase {
 				toUser, toHost);
 		
 		SipURI routeAddress = senderProtocolObjects.addressFactory.createSipURI(
-				null, "127.0.0.1");
+				null, "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		routeAddress.setPort(5070);
 		routeAddress.setLrParam();
 		routeAddress.setTransportParam(senderProtocolObjects.transport);
