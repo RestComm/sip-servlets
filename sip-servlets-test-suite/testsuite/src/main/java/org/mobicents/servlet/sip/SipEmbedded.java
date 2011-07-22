@@ -122,6 +122,9 @@ public class SipEmbedded {
 	 * @throws Exception
 	 */
 	public void initTomcat(String tomcatBasePath, Properties sipStackProperties) throws Exception {
+		if(System.getProperty("org.mobicents.testsuite.testhostaddr") == null) {
+			System.setProperty("org.mobicents.testsuite.testhostaddr", "127.0.0.1");// [::1] for IPv6
+		}
 		setPath(tomcatBasePath);
 		// Set the home directory
 //		System.setProperty("CATALINA_HOME", getPath());
@@ -171,7 +174,7 @@ public class SipEmbedded {
 		sipService.setUsePrettyEncoding(true);
 		if(isHA) {
 			sipService.setSipPathName("org.mobicents.ha");
-			sipService.setBalancers("127.0.0.1");
+			sipService.setBalancers("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		}
 //		sipService.setBypassRequestExecutor(true);
 //		sipService.setBypassResponseExecutor(true);
