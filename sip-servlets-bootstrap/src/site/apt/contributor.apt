@@ -30,7 +30,7 @@ Opening an Issue
 Becoming a Developer
 	
 	In order to become a contributor with write access to the code, you will need to have demonstrated an understanding of the codebase and testsuite by participating in the design discussions and submitting patches for bugs/enchancements before we will grant developer access.\
-	Developer role requires you to accept via email the following contributor agreement: {{{http://www.jboss.org/community/agreements/corporate.html}Mobicents Individual Contributor Agreement}}.\
+	Developer role requires you to accept via email the following contributor agreement: {{{https://cla.jboss.org/}Mobicents Individual Contributor Agreement}}.\
 	Before requesting developer access, send the full text of the agreement with an indication of acceptance to the email address specified at the end of the agreement document.\
 	Next, apply for Developer role in mailing one of the project owners with your google account email address. 
 	One of the project owners must use the project administration page to add your Google account email address to the {{{http://code.google.com/p/mobicents/}Mobicents Project}}. 
