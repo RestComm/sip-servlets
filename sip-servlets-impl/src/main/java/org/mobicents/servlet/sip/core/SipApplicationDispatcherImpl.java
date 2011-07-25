@@ -28,6 +28,7 @@ import gov.nist.javax.sip.ResponseEventExt;
 import gov.nist.javax.sip.SipStackImpl;
 import gov.nist.javax.sip.TransactionExt;
 import gov.nist.javax.sip.DialogTimeoutEvent.Reason;
+import gov.nist.javax.sip.message.MessageExt;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -626,6 +627,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 		ServerTransaction requestTransaction =  requestEvent.getServerTransaction();
 		final Dialog dialog = requestEvent.getDialog();
 		final Request request = requestEvent.getRequest();
+		// self routing makes the application data cloned, so we make sure to nullify it
+		((MessageExt)request).setApplicationData(null);
 		final String requestMethod = request.getMethod();
 		try {
 			if(logger.isDebugEnabled()) {
@@ -807,7 +810,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, M
 			}
 			return;
 		}
-
+		// self routing makes the application data cloned, so we make sure to nullify it
+		((MessageExt)response).setApplicationData(null);
+		
 		updateResponseStatistics(response);
 		ClientTransaction clientTransaction = responseEventExt.getClientTransaction();		
 		final Dialog dialog = responseEventExt.getDialog();
