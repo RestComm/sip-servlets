@@ -6,6 +6,8 @@ Mobicents Sip Servlets' Hall Of Fame
 		
 		* Reported and Contributed {{{http://code.google.com/p/mobicents/issues/detail?id=2669}DoS attacks against Mobicents}}
 		
+	* Thibault Leruitte (individual contributor) has greatly contributed to boostrap our Mobicents in the cloud initiative by porting {{{http://www.mobicents.org/incubator/cloud/intro.html}Mobicents Sip Servlets in the cloud}} 	
+		
 	* Ivan Dubrov (individual contributor) :
 	 
 		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=2321}java.text.ParseException: Unexpected Token : Call-ID}} and contributed a fix for it
