@@ -127,6 +127,8 @@ import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
+import org.mobicents.ext.javax.sip.dns.DNSAwareRouter;
+
 public class SipServletRequestImpl extends SipServletMessageImpl implements
 		SipServletRequestExt {
 
@@ -1315,7 +1317,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				nextHopUri.setTransportParam(hop.getTransport());
 			}
 			// Deal with http://code.google.com/p/mobicents/issues/detail?id=2346
-			//nextHopUri.setParameter(DNSAwareRouter.DNS_ROUTE, Boolean.TRUE.toString());
+			nextHopUri.setParameter(DNSAwareRouter.DNS_ROUTE, Boolean.TRUE.toString());
 			final javax.sip.address.Address nextHopRouteAddress = 
 				SipFactories.addressFactory.createAddress(nextHopUri);
 			final RouteHeader nextHopRouteHeader = 
