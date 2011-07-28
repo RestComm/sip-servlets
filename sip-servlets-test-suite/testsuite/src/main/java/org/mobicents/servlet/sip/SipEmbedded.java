@@ -121,10 +121,7 @@ public class SipEmbedded {
 	 * @param sipStackProperties 
 	 * @throws Exception
 	 */
-	public void initTomcat(String tomcatBasePath, Properties sipStackProperties) throws Exception {
-		if(System.getProperty("org.mobicents.testsuite.testhostaddr") == null) {
-			System.setProperty("org.mobicents.testsuite.testhostaddr", "127.0.0.1");// [::1] for IPv6
-		}
+	public void initTomcat(String tomcatBasePath, Properties sipStackProperties) throws Exception {		
 		setPath(tomcatBasePath);
 		// Set the home directory
 //		System.setProperty("CATALINA_HOME", getPath());

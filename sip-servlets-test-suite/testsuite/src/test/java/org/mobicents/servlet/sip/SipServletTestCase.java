@@ -44,7 +44,7 @@ public abstract class SipServletTestCase extends TestCase {
 	protected String tomcatBasePath;
 	protected String projectHome;
 	protected SipEmbedded tomcat;
-	protected String sipIpAddress = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
+	protected String sipIpAddress;
 	protected String serviceFullClassName = "org.mobicents.servlet.sip.startup.SipStandardService";
 	protected String serverName = "SIP-Servlet-Tomcat-Server";
 	protected String listeningPointTransport = ListeningPoint.UDP;
@@ -62,6 +62,10 @@ public abstract class SipServletTestCase extends TestCase {
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();		
+		if(System.getProperty("org.mobicents.testsuite.testhostaddr") == null) {
+			System.setProperty("org.mobicents.testsuite.testhostaddr", "127.0.0.1");// [::1] for IPv6			
+		}
+		sipIpAddress = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 		//Reading properties
 		Properties properties = new Properties();
 		InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(
