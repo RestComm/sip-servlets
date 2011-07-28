@@ -683,7 +683,7 @@ public class SimpleSipServlet
 		contact.setExpires(3600);
 		logger.info("REGISTER Contact Address.toString = " + contact.toString());
 		int response = SipServletResponse.SC_OK;
-		if(!"<sip:sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;transport=udp;lr>;expires=3600".equals(contact.toString())) {
+		if(!("<sip:sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;transport=udp;lr>;expires=3600").equals(contact.toString())) {
 			response = SipServletResponse.SC_SERVER_INTERNAL_ERROR;
 		}
 		SipServletResponse resp = req.createResponse(response);
