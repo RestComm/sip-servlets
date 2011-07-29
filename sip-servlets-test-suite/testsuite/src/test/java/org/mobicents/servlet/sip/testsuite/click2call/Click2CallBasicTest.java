@@ -39,10 +39,10 @@ import org.mobicents.servlet.sip.startup.SipStandardContext;
 
 public class Click2CallBasicTest extends SipServletTestCase {
 
-	private static final String CLICK2DIAL_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":8080/click2call/call";
-	private static final String RESOURCE_LEAK_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":8080/click2call/index.html";
-	private static final String EXPIRATION_TIME_PARAMS = "?expirationTime";
-	private static final String CLICK2DIAL_PARAMS = "?from=sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5056&to=sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057";
+	private String CLICK2DIAL_URL;
+	private String RESOURCE_LEAK_URL;
+	private String EXPIRATION_TIME_PARAMS;
+	private String CLICK2DIAL_PARAMS;
 	private static transient Logger logger = Logger.getLogger(Click2CallBasicTest.class);
 
 	private SipStack[] sipStackReceivers;
@@ -66,7 +66,11 @@ public class Click2CallBasicTest extends SipServletTestCase {
 	@Override
 	public void setUp() throws Exception {
 		if (firstTime) {
-			super.setUp();			
+			super.setUp();
+			CLICK2DIAL_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":8080/click2call/call";
+			RESOURCE_LEAK_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":8080/click2call/index.html";
+			EXPIRATION_TIME_PARAMS = "?expirationTime";
+			CLICK2DIAL_PARAMS = "?from=sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5056&to=sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057";
 		}
 		firstTime = true;
 	}

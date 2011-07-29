@@ -37,7 +37,7 @@ public class B2BUACompositionJunitTest extends SipServletTestCase {
 	private static final String FROM_NAME = "composition";
 	
 	private static final String FROM_DOMAIN = "sip-servlets.com";
-	private static final String TO_DOMAIN = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090";	
+	private String TO_DOMAIN;	
 
 	private static transient Logger logger = Logger.getLogger(B2BUACompositionJunitTest.class);
 
@@ -89,6 +89,7 @@ public class B2BUACompositionJunitTest extends SipServletTestCase {
 	protected void setUp() throws Exception {		
 		super.setUp();
 
+		TO_DOMAIN = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090";
 		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
 		tomcat.startTomcat();		
 		

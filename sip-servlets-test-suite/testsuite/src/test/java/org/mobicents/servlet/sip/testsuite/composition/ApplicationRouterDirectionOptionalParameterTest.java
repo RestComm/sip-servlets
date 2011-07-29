@@ -36,8 +36,8 @@ import org.mobicents.servlet.sip.SipServletTestCase;
 
 public class ApplicationRouterDirectionOptionalParameterTest extends SipServletTestCase {
 
-	private static final String CLICK2DIAL_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":8080/click2call/call";
-	private static final String CLICK2DIAL_PARAMS = "?from=sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5056&to=sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057";
+	private String CLICK2DIAL_URL;
+	private String CLICK2DIAL_PARAMS;
 	private static transient Logger logger = Logger.getLogger(ApplicationRouterDirectionOptionalParameterTest.class);
 
 	private SipStack[] sipStackReceivers;
@@ -59,6 +59,8 @@ public class ApplicationRouterDirectionOptionalParameterTest extends SipServletT
 	public void setUp() throws Exception {
 		if (firstTime) {
 			super.setUp();			
+			CLICK2DIAL_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":8080/click2call/call";
+			CLICK2DIAL_PARAMS = "?from=sip:from@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5056&to=sip:to@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5057";
 		}
 		firstTime = true;
 	}

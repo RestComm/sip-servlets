@@ -43,7 +43,7 @@ public class SameSipSessionB2BUACompositionJunitTest extends SipServletTestCase 
 	private static final String ERROR_FROM_NAME = "error-samesipsession";
 	
 	private static final String FROM_DOMAIN = "sip-servlets.com";
-	private static final String TO_DOMAIN = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070";	
+	private String TO_DOMAIN;	
 
 	private static transient Logger logger = Logger.getLogger(SameSipSessionB2BUACompositionJunitTest.class);
 
@@ -83,7 +83,8 @@ public class SameSipSessionB2BUACompositionJunitTest extends SipServletTestCase 
 	protected void setUp() throws Exception {
 		autoDeployOnStartup = false;
 		super.setUp();
-
+		TO_DOMAIN = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070";
+		
 		senderProtocolObjects = new ProtocolObjects(FROM_NAME,
 				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 	}

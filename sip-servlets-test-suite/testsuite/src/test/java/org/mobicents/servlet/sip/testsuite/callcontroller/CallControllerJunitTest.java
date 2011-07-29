@@ -36,7 +36,7 @@ public class CallControllerJunitTest extends SipServletTestCase {
 	private static final String FROM_NAME = "forward-sender";
 	
 	private static final String FROM_DOMAIN = "sip-servlets.com";
-	private static final String TO_DOMAIN = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090";	
+	private String toDomain;	
 
 	private static transient Logger logger = Logger.getLogger(CallControllerJunitTest.class);
 
@@ -86,7 +86,7 @@ public class CallControllerJunitTest extends SipServletTestCase {
 	protected void setUp() throws Exception {
 		autoDeployOnStartup = false;
 		super.setUp();
-
+		toDomain = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090";
 		senderProtocolObjects = new ProtocolObjects(FROM_NAME,
 				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		receiverProtocolObjects = new ProtocolObjects(TO_NAME,
@@ -116,7 +116,7 @@ public class CallControllerJunitTest extends SipServletTestCase {
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);
 		
-		String toSipAddress = TO_DOMAIN;
+		String toSipAddress = toDomain;
 		String toUser = TO_NAME;
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
@@ -147,7 +147,7 @@ public class CallControllerJunitTest extends SipServletTestCase {
 		receiverProtocolObjects.start();
 
 		String fromName = FROM_NAME;
-		String fromSipAddress = TO_DOMAIN;
+		String fromSipAddress = toDomain;
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);
 		
@@ -184,7 +184,7 @@ public class CallControllerJunitTest extends SipServletTestCase {
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);
 		
-		String toSipAddress = TO_DOMAIN;
+		String toSipAddress = toDomain;
 		String toUser = TO_NAME;
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);

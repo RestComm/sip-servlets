@@ -24,11 +24,8 @@ package org.mobicents.servlet.sip.testsuite.concurrency;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.Iterator;
 
-import javax.sip.InvalidArgumentException;
-import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
@@ -44,7 +41,7 @@ import org.mobicents.servlet.sip.testsuite.TestSipListener;
 public class ConcurrentyControlAsyncWorkSessionIsolationTest extends SipServletTestCase {
 	
 	private static transient Logger logger = Logger.getLogger(ConcurrentyControlAsyncWorkSessionIsolationTest.class);
-	private static final String CLICK2DIAL_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":8080/click2call/call";
+	private String CLICK2DIAL_URL;
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
 //	private static final int TIMEOUT = 5000;	
@@ -85,6 +82,7 @@ public class ConcurrentyControlAsyncWorkSessionIsolationTest extends SipServletT
 	@Override
 	protected void setUp() throws Exception {
 		super.setUp();						
+		CLICK2DIAL_URL = "http://" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":8080/click2call/call";
 		
 		senderProtocolObjects =new ProtocolObjects(
 				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
