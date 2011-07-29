@@ -101,6 +101,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 	private boolean recordRoutingEnabled;
 	private boolean parallel = true;
 	private boolean addToPath;
+	private int bestResponseSent = -1;
 	protected transient SipURI pathURI;
 	protected transient SipURI recordRouteURI;
 	private transient SipURI outboundInterface;
@@ -720,6 +721,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 					throw new DispatcherException("Unexpected exception while processing response : " + response, e);
 				}
 				timeoutResponse.send();
+				bestResponseSent = Response.REQUEST_TIMEOUT;
 				return;
 			} catch (IOException e) {
 				throw new IllegalStateException("Failed to send a timeout response", e);
@@ -791,11 +793,14 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 				try {
 					if(logger.isDebugEnabled())
 						logger.debug("Sending out proxied final response with existing transaction " + proxiedResponse);
-					proxiedResponse.send();					
+					
+					proxiedResponse.send();	
+					bestResponseSent = proxiedResponse.getStatus();
 					proxyBranches.clear();
 					originalRequest = null;
-					bestBranch = null;
-					bestResponse = null;
+					// not needed cleanup in the finally clause will do it
+//					bestBranch = null;
+//					bestResponse = null;
 					if (storeTerminationInfo && proxiedResponse.getRequest().isInitial() && getRecordRouteURI() != null) {
 						if(logger.isDebugEnabled()) {
 							logger.debug("storing termination Info for request " + proxiedResponse.getRequest());
@@ -1106,6 +1111,13 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 			return false;
 		}
 		return terminationInfo.isTerminationSent();
+	}
+
+	/**
+	 * @return the bestResponseSent
+	 */
+	public int getBestResponseSent() {
+		return bestResponseSent;
 	}
 
 

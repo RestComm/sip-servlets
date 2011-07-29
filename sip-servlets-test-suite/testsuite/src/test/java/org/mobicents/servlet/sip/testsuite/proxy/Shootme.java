@@ -395,7 +395,7 @@ public class Shootme implements SipListener {
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
 				"logs/debug"+stackName+".txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"logs/" + stackName + ".txt");
+				"logs/" + stackName + ".xml");
 
 		try {
 			// Create SipStack object

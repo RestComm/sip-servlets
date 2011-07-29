@@ -28,6 +28,8 @@ import org.mobicents.servlet.sip.SipServletTestCase;
 
 public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 
+	private static final String STACK_NAME = "shootme";
+
 	protected Shootist shootist;
 
 	protected Shootme shootme;
@@ -58,7 +60,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 	}
 	
 	public void testProxyCalleeSendsBye() {
-		this.shootme.init("stackName", null);
+		this.shootme.init(STACK_NAME, null);
 		this.shootme.callerSendsBye = false;
 		try {
 		this.cutme.init(null);
@@ -85,7 +87,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 	
 
 	public void testProxy() {
-		this.shootme.init("stackName", null);
+		this.shootme.init(STACK_NAME, null);
 		this.cutme.init(null);
 		this.shootist.init("useHostName",false, null);
 		for (int q = 0; q < 20; q++) {
@@ -97,14 +99,16 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 					e.printStackTrace();
 				}
 		}
-		if (shootist.ended == false)
+		if (shootist.isRequestTerminatedReceived())
+			fail("487 received from other end!");
+		if (!shootist.ended)
 			fail("Conversation not complete!");
-		if (cutme.canceled == false)
+		if (!cutme.canceled)
 			fail("The party that was supposed to be cancelled didn't cancel.");
 	}
 	
 	public void testProxyReadyToInvalidate() {
-		this.shootme.init("stackName", null);
+		this.shootme.init(STACK_NAME, null);
 		this.cutme.init(null);
 		this.shootist.init("check_rti",false, null);
 		for (int q = 0; q < 20; q++) {
@@ -125,7 +129,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 	}
 	
 	public void testProxyReadyToInvalidateTCP() {
-		this.shootme.init("stackName", "tcp");
+		this.shootme.init(STACK_NAME, "tcp");
 		this.cutme.init("tcp");
 		this.shootist.init("check_rti",false, "tcp");
 		for (int q = 0; q < 20; q++) {
@@ -150,7 +154,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 	 * http://code.google.com/p/mobicents/issues/detail?id=747
 	 */
 	public void testProxyNonRecordRouting() {
-		this.shootme.init("stackName", null);
+		this.shootme.init(STACK_NAME, null);
 		this.cutme.init(null);
 		this.shootist.init("nonRecordRouting",false, null);
 		for (int q = 0; q < 20; q++) {
@@ -173,7 +177,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 	 * http://code.google.com/p/mobicents/issues/detail?id=851
 	 */
 	public void testProxyURIParams() {
-		this.shootme.init("stackName", null);
+		this.shootme.init(STACK_NAME, null);
 		this.cutme.init(null);
 		this.shootist.init("check_uri",false, null);
 		for (int q = 0; q < 20; q++) {
@@ -194,7 +198,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 	 * http://code.google.com/p/mobicents/issues/detail?id=2417
 	 */
 	public void testProxy2Trying() {
-		this.shootme.init("stackName", null);
+		this.shootme.init(STACK_NAME, null);
 		this.cutme.init(null);
 		this.shootist.init("test_2_trying",false, null);
 		for (int q = 0; q < 20; q++) {
@@ -221,7 +225,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 	 * http://code.google.com/p/mobicents/issues/detail?id=2440
 	 */
 	public void testProxyCreateSubsequent() {
-		this.shootme.init("stackName", null);
+		this.shootme.init(STACK_NAME, null);
 		this.cutme.init(null);
 		this.shootist.init("test_create_subsequent_request",false, null);
 		for (int q = 0; q < 20; q++) {

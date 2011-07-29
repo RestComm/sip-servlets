@@ -274,7 +274,7 @@ public class Cutme implements SipListener {
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
 				"logs/cutmedebug.txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"logs/cutmelog.txt");
+				"logs/cutmelog.xml");
 
 		try {
 			// Create SipStack object

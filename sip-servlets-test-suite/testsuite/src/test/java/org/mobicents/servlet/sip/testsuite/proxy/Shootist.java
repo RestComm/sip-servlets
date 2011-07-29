@@ -141,6 +141,8 @@ public class Shootist implements SipListener {
 
 	private boolean forkedResponseReceived;
 
+	private boolean isRequestTerminatedReceived;
+
 
 	class ByeTask  extends TimerTask {
 		Dialog dialog;
@@ -293,6 +295,10 @@ public class Shootist implements SipListener {
 		if(response.getStatusCode() == 100) {
 			numberOfTryingReceived++;
 		}
+		if (response.getStatusCode() == Response.REQUEST_TERMINATED) {
+			isRequestTerminatedReceived = true;
+			return;
+		}
 		
 		SipURI fromUri = (SipURI)((FromHeader)response.getHeader(FromHeader.NAME)).getAddress().getURI();
 		RecordRouteHeader recordRouteHeader = (RecordRouteHeader)response.getHeader(RecordRouteHeader.NAME);
@@ -326,7 +332,7 @@ public class Shootist implements SipListener {
 		//System.out.println("Dialog = " + tid.getDialog());
 		//System.out.println("Dialog State is " + tid.getDialog().getState());
 
-		try {
+		try {			
 			if (response.getStatusCode() == Response.OK) {
 				if (cseq.getMethod().equals(Request.INVITE)) {
 					okToInviteRecevied = true;
@@ -453,7 +459,7 @@ public class Shootist implements SipListener {
 		properties.setProperty("gov.nist.javax.sip.DEBUG_LOG",
 				"logs/shootistdebug.txt");
 		properties.setProperty("gov.nist.javax.sip.SERVER_LOG",
-				"logs/shootistlog.txt");
+				"logs/shootistlog.xml");
 
 		// Drop the client connection after we are done with the transaction.
 		//properties.setProperty("gov.nist.javax.sip.CACHE_CLIENT_CONNECTIONS",
@@ -776,6 +782,14 @@ public class Shootist implements SipListener {
 	 */
 	public boolean isForkedResponseReceived() {
 		return forkedResponseReceived;
+	}
+
+
+	/**
+	 * @return the isRequestTerminatedReceived
+	 */
+	public boolean isRequestTerminatedReceived() {
+		return isRequestTerminatedReceived;
 	}
 
 }
