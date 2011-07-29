@@ -40,7 +40,7 @@ import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 public class LocationServiceB2BUAStaticServerAddressTest extends SipServletTestCase {
 	
-	private static final String HOST = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
+	private String HOST;
 
 	private static final int MSS_PORT = 5070;
 
@@ -97,7 +97,9 @@ public class LocationServiceB2BUAStaticServerAddressTest extends SipServletTestC
 	@Override
 	protected void setUp() throws Exception {		
 		super.setUp();
-
+		
+		HOST = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
+		
 		Connector udpSipConnector = null;
 		try {
 			udpSipConnector = new Connector(
