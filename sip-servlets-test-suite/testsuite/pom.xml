@@ -236,6 +236,7 @@
 					<excludes>
 						<exclude>**/TestSipListener.java</exclude>
 					</excludes>
+					<argLine>-Dorg.mobicents.testsuite.testhostaddr=${org.mobicents.testsuite.testhostaddr}</argLine>       				          				
 				</configuration>
 			</plugin>
 		</plugins>
