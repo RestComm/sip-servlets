@@ -460,7 +460,12 @@ public class ApplicationServerComponent
 
         return emsConnection;
     }
-
+   
+    private boolean runningEmbedded() {
+        Configuration pluginConfiguration = this.resourceContext.getPluginConfiguration();
+        String namingUrl = pluginConfiguration.getSimpleValue(ApplicationServerPluginConfigurationProperties.NAMING_URL, null);
+        return namingUrl == null;
+    }
     
     /**
      * This is the preferred way to use a connection from within this class; methods should not access the connection
@@ -493,7 +498,13 @@ public class ApplicationServerComponent
                     .getStringValue();
                 connectionSettings.initializeConnectionType((ConnectionTypeDescriptor) Class.forName(
                     connectionTypeDescriptorClass).newInstance());
-                connectionSettings.setServerUrl(pluginConfig.getSimpleValue(NAMING_URL_CONFIG_PROP, null));
+                boolean runningEmbedded = runningEmbedded();
+               	if (runningEmbedded) {
+               		connectionSettings.setServerUrl(System.getProperty("jboss.bind.address", "127.0.0.1"));
+            	} else {
+            		connectionSettings.setServerUrl(pluginConfig.getSimpleValue(NAMING_URL_CONFIG_PROP, null));
+            	}                                
+                
                 connectionSettings.setPrincipal(pluginConfig.getSimpleValue(PRINCIPAL_CONFIG_PROP, null));
                 connectionSettings.setCredentials(pluginConfig.getSimpleValue(CREDENTIALS_CONFIG_PROP, null));
                 connectionSettings.setLibraryURI(jbossHomeDir);

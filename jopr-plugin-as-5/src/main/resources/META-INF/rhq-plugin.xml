@@ -650,7 +650,7 @@
             <c:group name="connection" displayName="Connection Info">
 	            <c:simple-property name="namingURL" displayName="Naming Provider URL"
 	                               description="The JNP URL with which to connect to the JBoss Application Server instance (e.g. jnp://127.0.0.1:1099)."
-	                               default="jnp://127.0.0.1:1099"/>
+	                               />
 	            <c:simple-property name="principal" required="false" description="The name of the principal (i.e. user) to authenticate."/>
 	            <c:simple-property name="credentials" type="password" required="false"
 	                               description="The credentials (i.e. password) that should be used to authenticate the principal."/>
