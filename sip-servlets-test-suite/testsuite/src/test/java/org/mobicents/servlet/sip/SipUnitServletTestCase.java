@@ -67,6 +67,7 @@ public abstract class SipUnitServletTestCase extends SipTestCase {
 			System.setProperty("org.mobicents.testsuite.testhostaddr", "127.0.0.1");// [::1] for IPv6			
 		}
 		sipIpAddress = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
+		logger.info("sip ip address is " + sipIpAddress);
 		//Reading properties
 		Properties properties = new Properties();
 		InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(
