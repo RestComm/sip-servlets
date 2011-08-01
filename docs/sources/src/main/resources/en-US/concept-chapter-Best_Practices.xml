@@ -10,7 +10,8 @@
   <section id="bp-Best_Practices_Perf_Tips">
     <title>&PLATFORM_NAME; SIP Servlets Performance Tips</title>
     <para>Because the default profile of &PLATFORM_NAME; SIP Servlets is targeted at a
-    development environment, some tuning is required to make the server performance suitable for a  production environment.</para>
+    development environment, some tuning is required to make the server performance suitable for a production environment.</para>
+    <para>A useful presentation from OKI Japan </para>
     <section>
       <title>Tuning JBoss</title>
       <para>To ensure the server is finely tuned for a production envirionment, certain configuration must be changed. Visit the <ulink url="http://wiki.jboss.org/wiki/Wiki.jsp?page=JBossASTuningSliming">JBoss Application Server Tuning</ulink> wiki page to learn about optimization techniques.
@@ -78,9 +79,9 @@
           <para>Those properties control the size of the UDP buffer used for SIP messages. Under load, if the buffer capacity is overflown the messages are dropped causing retransmissions, further increasing the load and causing even more retransmissions.</para>
         </listitem>
         <listitem>
-          <para><emphasis>gov.nist.javax.sip.MAX_MESSAGE_SIZE=65536</emphasis>
+          <para><emphasis>gov.nist.javax.sip.MAX_MESSAGE_SIZE=10000</emphasis>
           </para>
-          <para><emphasis>Default value: 65536</emphasis>. </para>
+          <para><emphasis>Default value: 10000</emphasis>. </para>
           <para>This property controls the maximum size of content that can be read for a SIP Message on UDP.  The default is 65536. The average UDP message size is quite lower than this so reducing this property will benefit memory usage since a byte buffer of this size is created for every message received.</para> 
           <para>It also defines the maximum size of content that a TCP connection can read. Must be at least 4K. Default is "infinity" -- ie. no limit. This is to prevent DOS attacks launched by writing to a TCP connection until the server chokes.</para>
         </listitem>
@@ -104,7 +105,8 @@
       <para>The following tuning information applies to Sun JDK 1.6, however the information should also apply
       to Sun JDK 1.5.</para>
       <note>
-        <para>For more information on performance, refer to the <ulink url="http://java.sun.com/performance/reference/whitepapers/6_performance.html">Performance White Paper</ulink>.</para>
+      	<para>For more information on tuning &PLATFORM_NAME; SIP Servlets performance, refer to the <ulink url="http://www.slideshare.net/jean.deruelle/tuning-and-development-with-sip-servlets-on-mobicents">OKI Japan Presentation</ulink>.</para>
+        <para>For more information on performance, refer to the <ulink url="http://java.sun.com/performance/reference/whitepapers/6_performance.html">Performance White Paper</ulink>.</para>        
       </note>
       <para>To pass arguments to the JVM, change
       <filename>$JBOSS_HOME/bin/run.conf</filename> (Linux) or <filename>$JBOSS_HOME/bin/run.bat</filename> (Windows).</para>

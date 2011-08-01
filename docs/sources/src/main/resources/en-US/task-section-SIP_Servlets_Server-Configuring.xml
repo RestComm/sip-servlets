@@ -281,9 +281,16 @@ ipAddress="127.0.0.1"
         </listitem>
       </varlistentry>
       <varlistentry>
+        <term>dnsServerLocatorClass</term>
+        <listitem>
+          <para>Specifies the <classname>org.mobicents.ext.javax.sip.dns.DNSServerLocator</classname> implementation class that will be used by the container to perform DNS lookups compliant with RFC 3263 : Locating SIP Servers and E.164 NUmber Mapping. The default class used by the container is <classname>org.mobicents.ext.javax.sip.dns.DefaultDNSServerLocator</classname>, but any class implementing the <classname>org.mobicents.ext.javax.sip.dns.DNSServerLocator</classname> interface. To disable DNS lookups, this attribute should be left empty.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
         <term>addressResolverClass</term>
         <listitem>
           <para>Specifies the <classname>gov.nist.core.net.AddressResolver</classname> implementation class that will be used by the container to perform DNS lookups. The default class used by the container is <classname>org.mobicents.servlet.sip.core.DNSAddressResolver</classname>, but any class implementing the <classname>gov.nist.core.net.AddressResolver</classname> NIST SIP Stack interface and having a constructor with a <classname>org.mobicents.servlet.sip.core.SipApplicationDispatcher</classname> parameter can be used. To disable DNS lookups, this attribute should be left empty.</para>
+          <para>This attribute has been deprecated in favor of <literal>dnsServerLocatorClass</literal> attribute which provides better compliance with RFC 3263 : Location SIP Servers and ENUM support</para>
         </listitem>
       </varlistentry>      
     </variablelist>

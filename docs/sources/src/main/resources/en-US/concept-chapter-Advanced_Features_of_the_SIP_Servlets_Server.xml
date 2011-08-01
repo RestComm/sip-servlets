@@ -11,7 +11,8 @@ Congestion Control, load balancing with the &PLATFORM_NAME; Load Balancer, and, 
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_Concurrency_and_Congestion_Control.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_SIP_Servlet_Security.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_STUN_Support.xml"/>
-  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_Seam_Telco_Framework.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_JSR289_Extensions.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_CDI_Telco_Framework.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_Diameter_Support.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_SIP_Extensions.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_JRuby_Teclo_Integration.xml"/>
