@@ -1067,6 +1067,9 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 				if(toTag == null) {
 					toTag = "";
 				}
+				if(logger.isDebugEnabled()) {
+					logger.debug("storing session key toTag " + toTag);
+				}
 				metaData.put(TO_TAG, toTag);
 				if(b2buaHelper != null) {
 					// Fix for Issue 2739 : Null returned for B2BUAHelperImpl.getLinkedSipServletRequest() in Early Dailog Failover
