@@ -25,6 +25,9 @@
           <entry>DNS</entry><entry><ulink url="http://www.ietf.org/rfc/rfc3263.txt">RFC 3263</ulink></entry><entry>SIP: Locating SIP Servers</entry>
         </row>
         <row>
+          <entry>ENUM</entry><entry><ulink url="http://www.ietf.org/rfc/rfc2916.txt">RFC 2916</ulink></entry><entry>E.164 number and DNS</entry>
+        </row>
+        <row>
          <entry>INFO</entry><entry><ulink url="http://www.ietf.org/rfc/rfc2976.txt">RFC 2976</ulink></entry><entry>The SIP INFO Method</entry>
         </row>
         <row>
