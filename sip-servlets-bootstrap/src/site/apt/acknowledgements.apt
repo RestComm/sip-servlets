@@ -2,6 +2,10 @@ Mobicents Sip Servlets' Hall Of Fame
 
 	Bug Reports, enhancements or features for Mobicents Sip Servlets were contributed by the following people/companies:
 	
+	* {{{https://profiles.google.com/109129746241769739592}Oifa Yulian}} from Web Ukraine :
+		
+		* Reported and Contributed {{{http://code.google.com/p/mobicents/issues/detail?id=2774}Support for DNS ENUM regex}}
+		
 	* Subramanian Thamaraisamy from {{{http://www.cisco.com/}Cisco}} :
 		
 		* Reported and Contributed {{{http://code.google.com/p/mobicents/issues/detail?id=2669}DoS attacks against Mobicents}}
