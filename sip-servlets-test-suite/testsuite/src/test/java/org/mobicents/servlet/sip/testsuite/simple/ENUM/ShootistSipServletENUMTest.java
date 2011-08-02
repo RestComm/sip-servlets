@@ -153,8 +153,8 @@ public class ShootistSipServletENUMTest extends SipServletTestCase {
 		// mocking the name because " + System.getProperty("org.mobicents.testsuite.testhostaddr") + " is not absolute and " + System.getProperty("org.mobicents.testsuite.testhostaddr") + ". cannot be resolved 
 		Name name = mock(Name.class);
 		when(name.isAbsolute()).thenReturn(true);
-		when(name.toString()).thenReturn("!^.*$!sip:jean@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "!.");
-		mockedNAPTRRecords.add(new NAPTRRecord(new Name("7.6.5.4.3.2.1.5.5.5.8.5.3.e164.arpa" + "."), DClass.IN, 1000, 0, 0, "s", "E2U+sip", "!^.*$!sip:jean@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080!.", name));		
+		when(name.toString()).thenReturn("!^.*$!sip:jean@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080!");
+		mockedNAPTRRecords.add(new NAPTRRecord(new Name("7.6.5.4.3.2.1.5.5.5.8.5.3.e164.arpa" + "."), DClass.IN, 1000, 0, 0, "s", "E2U+sip", "!^.*$!sip:jean@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080!", name));		
 		when(dnsLookupPerformer.performNAPTRLookup("7.6.5.4.3.2.1.5.5.5.8.5.3.e164.arpa", false, supportedTransports)).thenReturn(mockedNAPTRRecords);
 	}
 
