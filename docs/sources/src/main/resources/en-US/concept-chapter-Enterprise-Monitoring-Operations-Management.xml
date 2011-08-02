@@ -5,17 +5,29 @@
 ]>
 <chapter id="emom-Enterprise-Monitoring-Operations-Management">
   <title>Enterprise Monitoring and Management</title>
-  <para>Jopr is an enterprise management solution for JBoss middleware
-  projects and other application technologies. This pluggable project provides
-  administration, monitoring, alerting, operational control and configuration
-  in an enterprise setting with fine-grained security and an advanced
-  extension model.</para>
-  <para>It provides support for monitoring base operating system information
-  on six operating systems as well as management of Apache, JBoss Application
-  Server (JBoss AS) and other related projects. See the <ulink url="http://www.jboss.org/jopr">Jopr website</ulink> or
-  the <ulink url="http://www.jboss.org/embjopr">Jopr embedded website</ulink> for more information.</para>
+  <para>There is two ways of monitoring Mobicents Sip Servlets :
+  <itemizedlist>
+  		  <listitem> <para>Through the industry standard Simple Network Management Protocol - SNMP</para></listitem>
+		  <listitem> <para>Through Jopr is an enterprise management solution for JBoss middleware
+		  projects and other application technologies. This pluggable project provides
+		  administration, monitoring, alerting, operational control and configuration
+		  in an enterprise setting with fine-grained security and an advanced
+		  extension model.</para>
+		  <para>It provides support for monitoring base operating system information
+		  on six operating systems as well as management of Apache, JBoss Application
+		  Server (JBoss AS) and other related projects. See the <ulink url="http://www.jboss.org/jopr">Jopr website</ulink> or
+		  the <ulink url="http://www.jboss.org/embjopr">Jopr embedded website</ulink> for more information.</para>
+		  </listitem>
+  </itemizedlist>
+  </para>
   <section>
-    <title>&PLATFORM_NAME; SIP Servlets Monitoring and Management</title>
+  		<title>&PLATFORM_NAME; SIP Servlets SNMP Monitoring and Management</title>
+  		<para>This chapter provides information on how to enable the management of
+	    &PLATFORM_NAME; SIP Servlets Servers through SNMP. It also allows applications to expose their metrics and management through SNMP</para>
+	    <para>See <ulink url="https://docs.jboss.org/author/display/MOBICENTS/SNMP+Adaptor">the full guide presents SNMP Monitoring for JBoss Application Server</ulink></para>
+  </section>
+  <section>
+    <title>&PLATFORM_NAME; SIP Servlets Jopr Monitoring and Management</title>
     <para>This chapter provides information on how to enable the management of
     &PLATFORM_NAME; SIP Servlets Servers through Jopr with our custom Jopr plug in.
     Two versions of Jopr are available: an embedded version, which is 
@@ -291,7 +303,7 @@
     </section>
   </section>
   <section>
-    <title>SIP Load Balancer Monitoring and Management</title>
+    <title>SIP Load Balancer Jopr Monitoring and Management</title>
     <para>This documentation provides information on how to enable the
     management of &PLATFORM_NAME; SIP Load Balancer through Jopr with our custom SIP
     Load Balancer Jopr plug in.</para>
