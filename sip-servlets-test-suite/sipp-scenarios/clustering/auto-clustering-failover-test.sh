@@ -116,6 +116,13 @@ sleep $HALFSTARTSLEEP
 
 ./auto-run-test.sh b2bua-remote-send-bye-no-ring result.txt
 
+#The test killed server 1, so we start it again
+./auto-start-jboss-server.sh $config1 config1.pid 0 b2bua-info
+
+sleep $HALFSTARTSLEEP
+
+./auto-run-test.sh b2bua-info result.txt
+
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat config1.pid` $config1
 ./auto-kill-process-tree.sh `cat config2.pid` $config2

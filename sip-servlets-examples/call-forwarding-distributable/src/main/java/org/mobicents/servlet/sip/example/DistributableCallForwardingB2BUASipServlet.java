@@ -203,12 +203,24 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
     protected void doUpdate(SipServletRequest request) throws ServletException,
             IOException {
 		if(logger.isInfoEnabled()) {
-			logger.info("Got UPDATE: " + request.toString());
+			logger.info("Got : " + request.toString());
 		}
         B2buaHelper helper = request.getB2buaHelper();
         SipSession peerSession = helper.getLinkedSession(request.getSession());
         SipServletRequest update = helper.createRequest(peerSession, request, null);
         update.send();
+    }
+	
+	@Override
+    protected void doInfo(SipServletRequest request) throws ServletException,
+            IOException {
+		if(logger.isInfoEnabled()) {
+			logger.info("Got : " + request.toString());
+		}
+        B2buaHelper helper = request.getB2buaHelper();
+        SipSession peerSession = helper.getLinkedSession(request.getSession());
+        SipServletRequest info = helper.createRequest(peerSession, request, null);
+        info.send();
     }
     
 	@Override
@@ -256,7 +268,7 @@ public class DistributableCallForwardingB2BUASipServlet extends SipServlet {
 				responseToOriginalRequest.setContent(sipServletResponse.getContent(), sipServletResponse.getContentType());
 			responseToOriginalRequest.send();
 		} 
-		if(sipServletResponse.getMethod().indexOf("UPDATE") != -1) {
+		if(sipServletResponse.getMethod().indexOf("UPDATE") != -1 || sipServletResponse.getMethod().indexOf("INFO") != -1) {
 			B2buaHelper helper = sipServletResponse.getRequest().getB2buaHelper();
 			SipServletRequest orgReq = helper.getLinkedSipServletRequest(sipServletResponse.getRequest());
 			SipServletResponse res2 = orgReq.createResponse(sipServletResponse.getStatus());
