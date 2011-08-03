@@ -1,6 +1,8 @@
-Mobicents Sip Servlets' Hall Of Fame
+Mobicents' Hall Of Fame
 
-	Bug Reports, enhancements or features for Mobicents Sip Servlets were contributed by the following people/companies:
+* Mobicents Sip Servlets
+
+	Bug Reports, enhancements or features for {{{http://www.mobicents.org/products_sip_servlets.html}Mobicents Sip Servlets}} were contributed by the following people/companies:
 	
 	* {{{https://profiles.google.com/109129746241769739592}Oifa Yulian}} from Web Ukraine :
 		
@@ -10,7 +12,7 @@ Mobicents Sip Servlets' Hall Of Fame
 		
 		* Reported and Contributed {{{http://code.google.com/p/mobicents/issues/detail?id=2669}DoS attacks against Mobicents}}
 		
-	* Thibault Leruitte (individual contributor) has greatly contributed to boostrap our Mobicents in the cloud initiative by porting {{{http://www.mobicents.org/incubator/cloud/intro.html}Mobicents Sip Servlets in the cloud}} 	
+	* {{{http://instagr.am/p/HCbhO/}Thibault Leruitte}} (individual contributor) has greatly contributed to boostrap our Mobicents in the cloud initiative by porting {{{http://www.mobicents.org/incubator/cloud/intro.html}Mobicents Sip Servlets in the cloud}} 	
 		
 	* Ivan Dubrov (individual contributor) :
 	 
@@ -129,3 +131,35 @@ Mobicents Sip Servlets' Hall Of Fame
 	* Filip Olsson from {{{http://www.telavox.se}Telavox}} : 
 	
 		* reported {{{http://code.google.com/p/mobicents/issues/detail?id=112}Move adding of Via header to send() instead of B2buaHelper.createRequest}} and contributed fix + test case for it
+		
+		
+* Mobicents JAIN-SLEE
+
+	Bug Reports, enhancements or features for {{{http://www.mobicents.org/slee/intro.html}Mobicents JAIN-SLEE}} were contributed by the following people/companies:
+	
+
+* Mobicents Diameter
+
+	Bug Reports, enhancements or features for {{{http://www.mobicents.org/diameter/index.html}Mobicents Diameter}} were contributed by the following people/companies:
+	
+
+* Mobicents Media Server
+
+	Bug Reports, enhancements or features for {{{http://www.mobicents.org/mms/mms-main.html}Mobicents Media Server}} were contributed by the following people/companies:
+
+
+* Mobicents SIP Presence Service
+
+	Bug Reports, enhancements or features for {{{http://www.mobicents.org/sip-presence/intro.html}Mobicents SIP Presence Service}} were contributed by the following people/companies:
+	
+	
+* Mobicents SS7 
+
+	Bug Reports, enhancements or features for the various projects located in our {{{http://www.mobicents.org/ss7/intro.html}Mobicents SS7}} were contributed by the following people/companies:
+	
+	
+* Mobicents Incubator 
+
+	Bug Reports, enhancements or features for the various projects located in our {{{http://www.mobicents.org/incubator.html}Mobicents Incubator}} were contributed by the following people/companies:
+	
+	
