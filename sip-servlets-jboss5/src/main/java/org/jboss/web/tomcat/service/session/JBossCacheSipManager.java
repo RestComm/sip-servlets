@@ -97,6 +97,7 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManagerDelegate;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.notification.SessionActivationNotificationCause;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.SipService;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
@@ -2184,10 +2185,11 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 						logger.debug("replicating following sip session " + session.getId());
 					}					
 
-					// Notify all session attributes that they get serialized
-					// (SRV 7.7.2)
+					// JSR 289 Section 6.4.3
+					// Containers MUST notify any session attributes implementing the SipSessionActivationListener and SipApplicationSessionActivationListener 
+					// during migration of a session. They MUST notify listeners of passivation prior to serialization of a session when such a migration takes place.
 					long begin = System.currentTimeMillis();
-					session.notifyWillPassivate(ClusteredSessionNotificationCause.REPLICATION);
+					session.notifyWillPassivate(SessionActivationNotificationCause.REPLICATION);
 					long elapsed = System.currentTimeMillis() - begin;
 					stats_.updatePassivationStats(realId, elapsed);
 
@@ -2222,10 +2224,11 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 						logger.debug("replicating following sip application session " + session.getId());
 					}
 
-					// Notify all session attributes that they get serialized
-					// (SRV 7.7.2)
+					// JSR 289 Section 6.4.3
+					// Containers MUST notify any session attributes implementing the SipSessionActivationListener and SipApplicationSessionActivationListener 
+					// during migration of a session. They MUST notify listeners of passivation prior to serialization of a session when such a migration takes place.
 					long begin = System.currentTimeMillis();
-					session.notifyWillPassivate(ClusteredSessionNotificationCause.REPLICATION);
+					session.notifyWillPassivate(SessionActivationNotificationCause.REPLICATION);
 					long elapsed = System.currentTimeMillis() - begin;
 					stats_.updatePassivationStats(realId, elapsed);
 
@@ -2520,9 +2523,19 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 						session.update(data);
 						if (mustAdd && initialLoad) {
 	        	        	if(logger.isDebugEnabled()) {
-	    	        			logger.debug("notifying listeners for activation of sip session " + key + " found in the distributed cache");
+	    	        			logger.debug("notifying listeners for activation of sip session " + key);
 	    	        		}
-	        	        	session.tellActivation(!passivated ? ClusteredSessionNotificationCause.FAILOVER : ClusteredSessionNotificationCause.ACTIVATION);
+	        	        	session.tellActivation(!passivated ? SessionActivationNotificationCause.FAILOVER : SessionActivationNotificationCause.ACTIVATION);
+						} else {							
+							// JSR 289 Section 6.4.3
+							// Containers MUST notify any session attributes implementing the SipSessionActivationListener and SipApplicationSessionActivationListener 
+							// during migration of a session. They MUST notify listeners of activation after deserialization of a session when such a migration takes place.
+							if (session.getNeedsPostReplicateActivation()) {
+								if(logger.isDebugEnabled()) {
+		    	        			logger.debug("notifying listeners for replication unserialization of sip session " + key);
+		    	        		}
+								session.notifyDidActivate(SessionActivationNotificationCause.REPLICATION);
+						    }
 						}
 	            	}
 	            } else if(logger.isDebugEnabled()) {
@@ -2531,19 +2544,6 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			} finally {
 				Thread.currentThread().setContextClassLoader(prevTCL);
 			}
-//            else if(mustAdd)
-//            {
-//               // Clunky; we set the session variable to null to indicate
-//               // no data so move on
-//               session = null;
-//            }
-//            
-//            if (session != null)
-//            {
-//               ClusteredSessionNotificationCause cause = passivated ? ClusteredSessionNotificationCause.ACTIVATION 
-//                                                                    : ClusteredSessionNotificationCause.FAILOVER;
-//               session.notifyDidActivate(cause);
-//            }
 		} catch (Exception ex) {
 			try {
 				// if(doTx)
@@ -2670,7 +2670,17 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 							if(logger.isDebugEnabled()) {
 	    	        			logger.debug("notifying listeners for activation of sip application session " + key + " found in the distributed cache");
 	    	        		}							
-							session.tellActivation(!passivated ? ClusteredSessionNotificationCause.FAILOVER : ClusteredSessionNotificationCause.ACTIVATION);
+							session.tellActivation(!passivated ? SessionActivationNotificationCause.FAILOVER : SessionActivationNotificationCause.ACTIVATION);
+						} else {
+							// JSR 289 Section 6.4.3
+							// Containers MUST notify any session attributes implementing the SipSessionActivationListener and SipApplicationSessionActivationListener 
+							// during migration of a session. They MUST notify listeners of activation after deserialization of a session when such a migration takes place.
+							if (session.getNeedsPostReplicateActivation()) {
+								if(logger.isDebugEnabled()) {
+		    	        			logger.debug("notifying listeners for replication unserialization of sip application session " + key);
+		    	        		}
+								session.notifyDidActivate(SessionActivationNotificationCause.REPLICATION);
+						    }
 						}
 					}
 					if(mustAdd && ((SipContext)getContainer()).getConcurrencyControlMode() == ConcurrencyControlMode.SipApplicationSession) {
@@ -2686,17 +2696,6 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			} finally {
 				Thread.currentThread().setContextClassLoader(prevTCL);
 			}
-//			else if (mustAdd) {
-//				// Clunky; we set the session variable to null to indicate
-//				// no data so move on
-//				session = null;
-//			}
-//
-//			if (session != null) {
-//				ClusteredSessionNotificationCause cause = passivated ? ClusteredSessionNotificationCause.ACTIVATION
-//						: ClusteredSessionNotificationCause.FAILOVER;
-//				session.notifyDidActivate(cause);
-//			}
 		} catch (Exception ex) {
 			try {
 				// if(doTx)
@@ -3385,10 +3384,10 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 					getSnapshotSipManager());
 			// If we previously called passivate() on the session due to
 	         // replication, we need to make an offsetting activate() call
-	         if (session.getNeedsPostReplicateActivation())
-	         {
-	            session.notifyDidActivate(ClusteredSessionNotificationCause.REPLICATION);
-	         }
+//	         if (session.getNeedsPostReplicateActivation())
+//	         {
+//	            session.notifyDidActivate(ClusteredSessionNotificationCause.REPLICATION);
+//	         }
 		}
 
 		return session;
@@ -3477,10 +3476,10 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			
 			// If we previously called passivate() on the session due to
 	         // replication, we need to make an offsetting activate() call
-	         if (session.getNeedsPostReplicateActivation())
-	         {
-	            session.notifyDidActivate(ClusteredSessionNotificationCause.REPLICATION);
-	         }
+//	         if (session.getNeedsPostReplicateActivation())
+//	         {
+//	            session.notifyDidActivate(ClusteredSessionNotificationCause.REPLICATION);
+//	         }
 		}
 
 		return session;

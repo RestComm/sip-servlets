@@ -28,6 +28,8 @@ import javax.servlet.sip.SipSessionActivationListener;
 import javax.servlet.sip.SipSessionEvent;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.notification.SessionActivationNotificationCause;
+import org.mobicents.servlet.sip.notification.SipSessionActivationEvent;
 
 /**
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
@@ -43,15 +45,17 @@ public class SipSessionActivationListenerAttribute implements Serializable,
 	 * @see javax.servlet.sip.SipSessionActivationListener#sessionDidActivate(javax.servlet.sip.SipSessionEvent)
 	 */
 	public void sessionDidActivate(SipSessionEvent event) {
-		logger.info("Following sip session just activated " + event.getSession().getId());
-		event.getSession().setAttribute(SIP_SESSION_ACTIVATED, "true" );
+		logger.info("Following sip session just activated " + event.getSession().getId() + " cause " + ((SipSessionActivationEvent)event).getCause());
+		if(((SipSessionActivationEvent)event).getCause() == SessionActivationNotificationCause.FAILOVER) {
+			event.getSession().setAttribute(SIP_SESSION_ACTIVATED, "true" );
+		}
 	}
 
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.SipSessionActivationListener#sessionWillPassivate(javax.servlet.sip.SipSessionEvent)
 	 */
 	public void sessionWillPassivate(SipSessionEvent event) {
-		logger.info("Following sip session just passivated " + event.getSession().getId());
+		logger.info("Following sip session just passivated " + event.getSession().getId() + " cause " + ((SipSessionActivationEvent)event).getCause());
 	}
 
 }

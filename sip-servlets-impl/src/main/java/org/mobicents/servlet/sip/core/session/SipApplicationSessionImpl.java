@@ -60,6 +60,8 @@ import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.timers.MobicentsServletTimer;
 import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
 import org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade;
+import org.mobicents.servlet.sip.notification.SessionActivationNotificationCause;
+import org.mobicents.servlet.sip.notification.SipApplicationSessionActivationEvent;
 import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.utils.JvmRouteUtil;
 
@@ -975,7 +977,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	        	Object attribute = getAttributeMap().get(key);
 	            if (attribute instanceof SipApplicationSessionActivationListener) {
 	                if (event == null)
-	                    event = new SipApplicationSessionEvent(this);
+	                	event = new SipApplicationSessionActivationEvent(this, SessionActivationNotificationCause.PASSIVATION);
 	                try {
 	                    ((SipApplicationSessionActivationListener)attribute)
 	                        .sessionWillPassivate(event);
@@ -1000,7 +1002,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	        	Object attribute = sipApplicationSessionAttributeMap.get(key);
 	            if (attribute instanceof SipApplicationSessionActivationListener) {
 	                if (event == null)
-	                    event = new SipApplicationSessionEvent(this);
+	                	event = new SipApplicationSessionActivationEvent(this, SessionActivationNotificationCause.ACTIVATION);
 	                try {
 	                    ((SipApplicationSessionActivationListener)attribute)
 	                        .sessionDidActivate(event);

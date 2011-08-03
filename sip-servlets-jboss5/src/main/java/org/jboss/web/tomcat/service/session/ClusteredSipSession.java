@@ -84,6 +84,9 @@ import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
+import org.mobicents.servlet.sip.notification.SessionActivationNotificationCause;
+import org.mobicents.servlet.sip.notification.SipApplicationSessionActivationEvent;
+import org.mobicents.servlet.sip.notification.SipSessionActivationEvent;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipService;
@@ -1190,16 +1193,19 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	}
 
 	/** Inform any SipApplicationSessionActivationListener of the activation of this session */
-	public void tellActivation(ClusteredSessionNotificationCause cause) {		
+	public void tellActivation(SessionActivationNotificationCause cause) {		
 		if(attributes != null) {
 			for(Entry<String, Object> attribute : attributes.entrySet()) {
-				SipSessionEvent sipSessionEvent = new SipSessionEvent(this);
-				ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
-				java.lang.Thread.currentThread().setContextClassLoader(getSipApplicationSession().getSipContext().getLoader().getClassLoader());
+				SipSessionActivationEvent sipSessionEvent = new SipSessionActivationEvent(this, cause);				
 				
 				if(attribute.getValue() instanceof SipSessionActivationListener) {
+					
 					if (notificationPolicy.isSipSessionActivationListenerInvocationAllowed(
-							this.clusterStatus, cause, attribute.getKey())) {					
+							this.clusterStatus, cause, attribute.getKey())) {
+						
+						ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
+						java.lang.Thread.currentThread().setContextClassLoader(getSipApplicationSession().getSipContext().getLoader().getClassLoader());
+						
 						try {
 							if(logger.isDebugEnabled()) {
 								logger.debug("notifying sip session activation listener " + attribute.getValue() + " of sip session activation " + 
@@ -1209,10 +1215,10 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 						} catch (Throwable t) {
 							logger.error("SipSessionActivationListener " + attribute.getValue() + " threw exception", t);
 						}
+						
+						java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
 					}
-				}
-				
-				java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
+				}								
 			}		
 		}
 	}	
@@ -1230,7 +1236,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	 *            {@link ClusteredSessionNotificationCause#REPLICATION} or
 	 *            {@link ClusteredSessionNotificationCause#PASSIVATION}
 	 */
-	public void notifyWillPassivate(ClusteredSessionNotificationCause cause) {
+	public void notifyWillPassivate(SessionActivationNotificationCause cause) {
 		// Notify interested session event listeners
 //		fireSessionEvent(Session.SESSION_PASSIVATED_EVENT, null);
 
@@ -1250,8 +1256,11 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 							.isSipSessionActivationListenerInvocationAllowed(
 									this.clusterStatus, cause, keys[i])) {
 						if (event == null)
-							event = new SipSessionEvent(this);
+							event = new SipSessionActivationEvent(this, cause);						
 
+						ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
+						java.lang.Thread.currentThread().setContextClassLoader(getSipApplicationSession().getSipContext().getLoader().getClassLoader());
+						
 						try {
 							((SipSessionActivationListener) attribute)
 									.sessionWillPassivate(event);
@@ -1264,6 +1273,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 													.getString("clusteredSession.attributeEvent"),
 											t);
 						}
+						
+						java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
 					}
 				}
 			}
@@ -1271,7 +1282,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			hasActivationListener = hasListener ? Boolean.TRUE : Boolean.FALSE;
 		}
 
-		if (cause != ClusteredSessionNotificationCause.PASSIVATION) {
+		if (cause != SessionActivationNotificationCause.PASSIVATION) {
 			this.needsPostReplicateActivation = true;
 		}
 	}
@@ -1285,8 +1296,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	 *            {@link ClusteredSessionNotificationCause#REPLICATION} or
 	 *            {@link ClusteredSessionNotificationCause#PASSIVATION}
 	 */
-	public void notifyDidActivate(ClusteredSessionNotificationCause cause) {
-		if (cause == ClusteredSessionNotificationCause.ACTIVATION) {
+	public void notifyDidActivate(SessionActivationNotificationCause cause) {
+		if (cause == SessionActivationNotificationCause.ACTIVATION) {
 			this.needsPostReplicateActivation = true;
 		}
 
@@ -1310,7 +1321,12 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 							.isSipSessionActivationListenerInvocationAllowed(
 									this.clusterStatus, cause, keys[i])) {
 						if (event == null)
-							event = new SipSessionEvent(this);
+							event = new SipSessionActivationEvent(this, cause);
+						
+						ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
+						java.lang.Thread.currentThread().setContextClassLoader(getSipApplicationSession().getSipContext().getLoader().getClassLoader());
+						
+						
 						try {
 							((SipSessionActivationListener) attribute)
 									.sessionDidActivate(event);
@@ -1323,6 +1339,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 													.getString("clusteredSession.attributeEvent"),
 											t);
 						}
+						
+						java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
 					}
 				}
 			}
@@ -1330,7 +1348,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			hasActivationListener = hasListener ? Boolean.TRUE : Boolean.FALSE;
 		}
 
-		if (cause != ClusteredSessionNotificationCause.ACTIVATION) {
+		if (cause != SessionActivationNotificationCause.ACTIVATION) {
 			this.needsPostReplicateActivation = false;
 		}
 	}
@@ -1741,7 +1759,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	
 	@Override
 	public void passivate() {
-		notifyWillPassivate(ClusteredSessionNotificationCause.PASSIVATION);
+		notifyWillPassivate(SessionActivationNotificationCause.PASSIVATION);
 		processDialogPassivation();
 		sipApplicationSession = null;
 	}

@@ -22,6 +22,8 @@
 
 package org.jboss.web.tomcat.service.session.notification;
 
+import org.mobicents.servlet.sip.notification.SessionActivationNotificationCause;
+
 /**
  * @author jean.deruelle@gmail.com
  *
@@ -111,7 +113,7 @@ public interface ClusteredSipApplicationSessionNotificationPolicy {
 	 */
 	boolean isSipApplicationSessionActivationListenerInvocationAllowed(
 			ClusteredSessionManagementStatus status,
-			ClusteredSessionNotificationCause cause, String attributeName);
+			SessionActivationNotificationCause cause, String attributeName);
 
 	/**
 	 * Provides the policy information about the container's capabilities with

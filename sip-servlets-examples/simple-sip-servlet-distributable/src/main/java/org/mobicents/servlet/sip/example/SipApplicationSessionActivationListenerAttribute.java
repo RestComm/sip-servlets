@@ -28,6 +28,8 @@ import javax.servlet.sip.SipApplicationSessionActivationListener;
 import javax.servlet.sip.SipApplicationSessionEvent;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.notification.SessionActivationNotificationCause;
+import org.mobicents.servlet.sip.notification.SipApplicationSessionActivationEvent;
 
 /**
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
@@ -43,8 +45,10 @@ public class SipApplicationSessionActivationListenerAttribute implements
 	 * @see javax.servlet.sip.SipApplicationSessionActivationListener#sessionDidActivate(javax.servlet.sip.SipApplicationSessionEvent)
 	 */
 	public void sessionDidActivate(SipApplicationSessionEvent event) {
-		logger.info("Following sip application session just activated " + event.getApplicationSession().getId());
-		event.getApplicationSession().setAttribute(SIP_APPLICATION_SESSION_ACTIVATED, "true" );
+		logger.info("Following sip application session just activated " + event.getApplicationSession().getId() + " cause " + ((SipApplicationSessionActivationEvent)event).getCause());
+		if(((SipApplicationSessionActivationEvent)event).getCause() == SessionActivationNotificationCause.FAILOVER) {
+			event.getApplicationSession().setAttribute(SIP_APPLICATION_SESSION_ACTIVATED, "true" );
+		}
 
 	}
 
@@ -52,7 +56,7 @@ public class SipApplicationSessionActivationListenerAttribute implements
 	 * @see javax.servlet.sip.SipApplicationSessionActivationListener#sessionWillPassivate(javax.servlet.sip.SipApplicationSessionEvent)
 	 */
 	public void sessionWillPassivate(SipApplicationSessionEvent event) {
-		logger.info("Following sip application session just passivated " + event.getApplicationSession().getId());
+		logger.info("Following sip application session just passivated " + event.getApplicationSession().getId() + " cause " + ((SipApplicationSessionActivationEvent)event).getCause());
 
 	}
 

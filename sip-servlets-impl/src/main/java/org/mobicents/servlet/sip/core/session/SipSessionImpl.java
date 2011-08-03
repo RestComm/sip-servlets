@@ -114,6 +114,8 @@ import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
+import org.mobicents.servlet.sip.notification.SessionActivationNotificationCause;
+import org.mobicents.servlet.sip.notification.SipSessionActivationEvent;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.startup.SipContext;
 
@@ -1698,7 +1700,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	        	Object attribute = getAttributeMap().get(key);
 	            if (attribute instanceof SipSessionActivationListener) {
 	                if (event == null)
-	                    event = new SipSessionEvent(this);
+	                	event = new SipSessionActivationEvent(this, SessionActivationNotificationCause.PASSIVATION);
 	                try {
 	                    ((SipSessionActivationListener)attribute)
 	                        .sessionWillPassivate(event);
@@ -1723,7 +1725,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	        	Object attribute = getAttributeMap().get(key);
 	            if (attribute instanceof SipSessionActivationListener) {
 	                if (event == null)
-	                    event = new SipSessionEvent(this);
+	                	event = new SipSessionActivationEvent(this, SessionActivationNotificationCause.ACTIVATION);
 	                try {
 	                    ((SipSessionActivationListener)attribute)
 	                        .sessionDidActivate(event);

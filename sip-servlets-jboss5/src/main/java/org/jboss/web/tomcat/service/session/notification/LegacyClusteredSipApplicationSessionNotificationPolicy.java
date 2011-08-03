@@ -22,6 +22,8 @@
 
 package org.jboss.web.tomcat.service.session.notification;
 
+import org.mobicents.servlet.sip.notification.SessionActivationNotificationCause;
+
 /**
  * @author jean.deruelle@gmail.com
  *
@@ -32,7 +34,7 @@ public class LegacyClusteredSipApplicationSessionNotificationPolicy
 
 	public boolean isSipApplicationSessionActivationListenerInvocationAllowed(
 			ClusteredSessionManagementStatus status,
-			ClusteredSessionNotificationCause cause, String attributeName) {
+			SessionActivationNotificationCause cause, String attributeName) {
 		return status.isLocallyUsed();
 	}
 
