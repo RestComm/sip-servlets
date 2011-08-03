@@ -36,6 +36,7 @@ import org.apache.log4j.Logger;
 public class SipApplicationSessionActivationListenerAttribute implements
 		Serializable, SipApplicationSessionActivationListener {
 
+	public static final String SIP_APPLICATION_SESSION_ACTIVATED = "sipApplicationSessionActivated";
 	private static Logger logger = Logger.getLogger(SipApplicationSessionActivationListenerAttribute.class);
 	
 	/* (non-Javadoc)
@@ -43,6 +44,7 @@ public class SipApplicationSessionActivationListenerAttribute implements
 	 */
 	public void sessionDidActivate(SipApplicationSessionEvent event) {
 		logger.info("Following sip application session just activated " + event.getApplicationSession().getId());
+		event.getApplicationSession().setAttribute(SIP_APPLICATION_SESSION_ACTIVATED, "true" );
 
 	}
 

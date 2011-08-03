@@ -52,6 +52,8 @@ import org.apache.log4j.Logger;
 public class DistributableSimpleSipServlet 
 		extends SipServlet 
 		implements TimerListener, SipApplicationSessionListener {
+	private static final String SIP_APP_SESSION_ACTIVATION_LISTENER = "sipAppSessionActivationListener";
+	private static final String SIP_SESSION_ACTIVATION_LISTENER = "sipSessionActivationListener";
 	private static final long serialVersionUID = 1L;
 	private static final String RECEIVED = "Received";
 
@@ -104,9 +106,9 @@ public class DistributableSimpleSipServlet
 		if(!(((SipURI)request.getFrom().getURI()).getUser()).contains(NO_ATTRIBUTES)) {
 			if(request.isInitial()) { 
 				request.getSession().setAttribute("INVITE", RECEIVED);
-				request.getSession().setAttribute("sipSessionActivationListener", new SipSessionActivationListenerAttribute());
+				request.getSession().setAttribute(SIP_SESSION_ACTIVATION_LISTENER, new SipSessionActivationListenerAttribute());
 				request.getApplicationSession().setAttribute("INVITE", RECEIVED);
-				request.getApplicationSession().setAttribute("sipAppSessionActivationListener", new SipApplicationSessionActivationListenerAttribute());
+				request.getApplicationSession().setAttribute(SIP_APP_SESSION_ACTIVATION_LISTENER, new SipApplicationSessionActivationListenerAttribute());
 				if(((SipURI)request.getTo().getURI()).getUser().contains("reinvite")) {
 					if(logger.isInfoEnabled()) {			
 						logger.info("Distributable Simple Servlet: setting isReINVITE");
@@ -152,11 +154,19 @@ public class DistributableSimpleSipServlet
 		String sipApplicationSessionInviteAttribute  = (String) request.getApplicationSession().getAttribute("INVITE");
 		String sipSessionReInviteAttribute  = (String) request.getSession().getAttribute("REINVITE");
 		String sipApplicationSessionReInviteAttribute  = (String) request.getApplicationSession().getAttribute("REINVITE");
+		Object sipSessionActivationListener = request.getSession().getAttribute(SIP_SESSION_ACTIVATION_LISTENER);
+		Object sipApplicationSessionActivationListener = request.getApplicationSession().getAttribute(SIP_APP_SESSION_ACTIVATION_LISTENER);
+		Object sipSessionActivated = request.getSession().getAttribute(SipSessionActivationListenerAttribute.SIP_SESSION_ACTIVATED);
+		Object sipApplicationSessionActivated = request.getApplicationSession().getAttribute(SipApplicationSessionActivationListenerAttribute.SIP_APPLICATION_SESSION_ACTIVATED);
 		if(logger.isInfoEnabled()) {			
 			logger.info("Distributable Simple Servlet: attributes previously set in sip session INVITE : "+ sipSessionInviteAttribute);
 			logger.info("Distributable Simple Servlet: attributes previously set in sip application session INVITE : "+ sipApplicationSessionInviteAttribute);
 			logger.info("Distributable Simple Servlet: attributes previously set in sip session REINVITE : "+ sipSessionReInviteAttribute);
 			logger.info("Distributable Simple Servlet: attributes previously set in sip application session REINVITE : "+ sipApplicationSessionReInviteAttribute);
+			logger.info("Distributable Simple Servlet: attributes previously set in sip session sipSessionActivationListener : "+ sipSessionActivationListener);
+			logger.info("Distributable Simple Servlet: attributes previously set in sip application session sipApplciationSessionActivationListener : "+ sipApplicationSessionActivationListener);
+			logger.info("Distributable Simple Servlet: attributes previously set in sip session sipSessionActivated : "+ sipSessionActivated);
+			logger.info("Distributable Simple Servlet: attributes previously set in sip application session sipApplicationSessionActivated : "+ sipApplicationSessionActivated);
 		}
 		if(!(((SipURI)request.getFrom().getURI()).getUser()).contains(NO_ATTRIBUTES)) {
 			if(sipSessionInviteAttribute != null  && sipApplicationSessionInviteAttribute != null 				
@@ -173,7 +183,16 @@ public class DistributableSimpleSipServlet
 						return;
 					}
 				}
-				
+				if(sipApplicationSessionActivationListener != null && sipApplicationSessionActivated == null) {
+					SipServletResponse sipServletResponse = request.createResponse(500, "sipApplicationSessionActivationListener not called");
+					sipServletResponse.send();
+					return;
+				}
+				if(sipSessionActivationListener != null && sipSessionActivated == null) {
+					SipServletResponse sipServletResponse = request.createResponse(500, "sipSessionActivationListener not called");
+					sipServletResponse.send();
+					return;
+				}				
 				if(request.getSession().getAttribute("ISREINVITE") !=null && sipSessionReInviteAttribute != null  && sipApplicationSessionReInviteAttribute != null 				
 						&& RECEIVED.equalsIgnoreCase(sipSessionReInviteAttribute) 
 						&& RECEIVED.equalsIgnoreCase(sipApplicationSessionReInviteAttribute)) {

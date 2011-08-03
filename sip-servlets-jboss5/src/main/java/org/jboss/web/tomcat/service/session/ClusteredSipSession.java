@@ -36,8 +36,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -49,7 +49,6 @@ import javax.servlet.sip.SipSessionAttributeListener;
 import javax.servlet.sip.SipSessionBindingEvent;
 import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionEvent;
-import javax.servlet.sip.SipSessionListener;
 import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
 import javax.sip.SipStack;
@@ -1190,45 +1189,34 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		return sessionAttributesDirty || sessionMetadataDirty;
 	}
 
-	/** Inform any SipSessionListener of the creation of this session */
-	public void tellNew(ClusteredSessionNotificationCause cause) {
-		// Notify interested session event listeners
-//		fireSessionEvent(Session.SESSION_CREATED_EVENT, null);
-
-		// Notify interested application event listeners
-		if (notificationPolicy.isSipSessionListenerInvocationAllowed(
-				this.clusterStatus, cause, true)) {
-			Context context = (Context) manager.getContainer();
-			Object lifecycleListeners[] = context
-					.getApplicationLifecycleListeners();
-			if (lifecycleListeners != null) {
-				SipSessionEvent event = new SipSessionEvent(this);
-				for (int i = 0; i < lifecycleListeners.length; i++) {
-					if (!(lifecycleListeners[i] instanceof SipSessionListener))
-						continue;
-					SipSessionListener listener = (SipSessionListener) lifecycleListeners[i];
-					try {
-						fireContainerEvent(context, "beforeSessionCreated",
-								listener);
-						listener.sessionCreated(event);
-						fireContainerEvent(context, "afterSessionCreated",
-								listener);
-					} catch (Throwable t) {
+	/** Inform any SipApplicationSessionActivationListener of the activation of this session */
+	public void tellActivation(ClusteredSessionNotificationCause cause) {		
+		if(attributes != null) {
+			for(Entry<String, Object> attribute : attributes.entrySet()) {
+				SipSessionEvent sipSessionEvent = new SipSessionEvent(this);
+				ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
+				java.lang.Thread.currentThread().setContextClassLoader(getSipApplicationSession().getSipContext().getLoader().getClassLoader());
+				
+				if(attribute.getValue() instanceof SipSessionActivationListener) {
+					if (notificationPolicy.isSipSessionActivationListenerInvocationAllowed(
+							this.clusterStatus, cause, attribute.getKey())) {					
 						try {
-							fireContainerEvent(context, "afterSessionCreated",
-									listener);
-						} catch (Exception e) {
-							;
+							if(logger.isDebugEnabled()) {
+								logger.debug("notifying sip session activation listener " + attribute.getValue() + " of sip session activation " + 
+										key);
+							}
+							((SipSessionActivationListener)attribute.getValue()).sessionDidActivate(sipSessionEvent);
+						} catch (Throwable t) {
+							logger.error("SipSessionActivationListener " + attribute.getValue() + " threw exception", t);
 						}
-						manager.getContainer().getLogger().error(
-								sm.getString("clusteredSession.sessionEvent"),
-								t);
 					}
 				}
-			}
+				
+				java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
+			}		
 		}
 	}	
-
+	
 	private String[] keys() {
 		Set<String> keySet = getAttributesInternal().keySet();
 		return ((String[]) keySet.toArray(new String[keySet.size()]));

@@ -2509,7 +2509,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		        			session = (ClusteredSipSession<? extends OutgoingDistributableSessionData>) 
 		        					((ClusteredSipManagerDelegate)sipManagerDelegate).getNewMobicentsSipSession(key, sipFactory, sipApplicationSessionImpl, true);
 		        			OwnedSessionUpdate osu = unloadedSipSessions_.get(key);
-		        	        passivated = (osu != null && osu.passivated);
+		        	        passivated = (osu != null && osu.passivated);		        	        
 	            		} else {
 	            			if(logger.isDebugEnabled()) {
 	    	        			logger.debug("beware null parent sip application for session " + key);
@@ -2517,7 +2517,13 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	            		}
 	            	} 
 	            	if(session!= null) {
-						session.update(data);						
+						session.update(data);
+						if (mustAdd && initialLoad) {
+	        	        	if(logger.isDebugEnabled()) {
+	    	        			logger.debug("notifying listeners for activation of sip session " + key + " found in the distributed cache");
+	    	        		}
+	        	        	session.tellActivation(!passivated ? ClusteredSessionNotificationCause.FAILOVER : ClusteredSessionNotificationCause.ACTIVATION);
+						}
 	            	}
 	            } else if(logger.isDebugEnabled()) {
 	        		logger.debug("no data for sip session " + key + " in the distributed cache");
@@ -2561,22 +2567,19 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		}
 		if (session != null) {
 			if (mustAdd) {
-				unloadedSipSessions_.remove(key);				
-				if (!passivated) {
-					session.tellNew(ClusteredSessionNotificationCause.FAILOVER);
-				}
+				unloadedSipSessions_.remove(key);								
 			}
 			long elapsed = System.currentTimeMillis() - begin;
 			stats_.updateLoadStats(key.toString(), elapsed);
 
 			if (log_.isDebugEnabled()) {
 				log_
-						.debug("loadSession(): id= " + key + ", session="
+						.debug("loadSipSession(): id= " + key + ", session="
 								+ session);
 			}
 			return session;
 		} else if (log_.isDebugEnabled()) {
-			log_.debug("loadSession(): session " + key
+			log_.debug("loadSipSession(): session " + key
 					+ " not found in distributed cache");
 		}
 		if(session != null) {
@@ -2609,6 +2612,10 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			return null;
 		}
 
+		if(logger.isDebugEnabled()) {
+			logger.debug("load sip application session " + key + ", create = " + create);
+		}
+		
 		long begin = System.currentTimeMillis();
 		boolean mustAdd = false;
 		boolean passivated = false;
@@ -2655,10 +2662,16 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 						session = (ClusteredSipApplicationSession) 
 							((ClusteredSipManagerDelegate)sipManagerDelegate).getNewMobicentsSipApplicationSession(key, ((SipContext)getContainer()), true);
 						OwnedSessionUpdate osu = unloadedSipApplicationSessions_.get(key);
-						passivated = (osu != null && osu.passivated);
+						passivated = (osu != null && osu.passivated);						
 					}
 					if(session != null) {					
-						session.update(data);					
+						session.update(data);
+						if (mustAdd && initialLoad) {
+							if(logger.isDebugEnabled()) {
+	    	        			logger.debug("notifying listeners for activation of sip application session " + key + " found in the distributed cache");
+	    	        		}							
+							session.tellActivation(!passivated ? ClusteredSessionNotificationCause.FAILOVER : ClusteredSessionNotificationCause.ACTIVATION);
+						}
 					}
 					if(mustAdd && ((SipContext)getContainer()).getConcurrencyControlMode() == ConcurrencyControlMode.SipApplicationSession) {
 						if(logger.isInfoEnabled()) {
@@ -2705,21 +2718,18 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		}
 		if (session != null) {
 			if (mustAdd) {
-				unloadedSipApplicationSessions_.remove(key);	
-				if (!passivated) {
-					session.tellNew(ClusteredSessionNotificationCause.FAILOVER);
-				}
+				unloadedSipApplicationSessions_.remove(key);					
 			}
 			long elapsed = System.currentTimeMillis() - begin;
 			stats_.updateLoadStats(key.toString(), elapsed);
 
 			if (log_.isDebugEnabled()) {
-				log_.debug("loadSession(): id= " + key.toString()
+				log_.debug("loadSipApplicationSession(): id= " + key.toString()
 						+ ", session=" + session);
 			}
 			return session;
 		} else if (log_.isDebugEnabled()) {
-			log_.debug("loadSession(): session " + key.toString()
+			log_.debug("loadSipApplicationSession(): session " + key.toString()
 					+ " not found in distributed cache");
 		}
 		if(session != null) {

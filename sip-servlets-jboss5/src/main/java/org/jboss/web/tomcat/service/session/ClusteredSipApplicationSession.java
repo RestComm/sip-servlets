@@ -34,6 +34,7 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -936,42 +937,31 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		return sessionAttributesDirty || sessionMetadataDirty;
 	}
 
-	/** Inform any SipApplicationSessionListener of the creation of this session */
-	public void tellNew(ClusteredSessionNotificationCause cause) {
-		// Notify interested session event listeners
-//		fireSessionEvent(Session.SESSION_CREATED_EVENT, null);
-
-		// Notify interested application event listeners
-		if (notificationPolicy.isSipApplicationSessionListenerInvocationAllowed(
-				this.clusterStatus, cause, true)) {
-			Context context = (Context) manager.getContainer();
-			Object lifecycleListeners[] = context
-					.getApplicationLifecycleListeners();
-			if (lifecycleListeners != null) {
-				SipApplicationSessionEvent event = new SipApplicationSessionEvent(this);
-				for (int i = 0; i < lifecycleListeners.length; i++) {
-					if (!(lifecycleListeners[i] instanceof SipApplicationSessionListener))
-						continue;
-					SipApplicationSessionListener listener = (SipApplicationSessionListener) lifecycleListeners[i];
-					try {
-						fireContainerEvent(context, "beforeSessionCreated",
-								listener);
-						listener.sessionCreated(event);
-						fireContainerEvent(context, "afterSessionCreated",
-								listener);
-					} catch (Throwable t) {
+	/** Inform any SipApplicationSessionActivationListener of the activation of this session */
+	public void tellActivation(ClusteredSessionNotificationCause cause) {		
+		if(attributes != null) {
+			for(Entry<String, Object> attribute : attributes.entrySet()) {
+				SipApplicationSessionEvent sipApplicationSessionEvent = new SipApplicationSessionEvent(this);
+				ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
+				java.lang.Thread.currentThread().setContextClassLoader(sipContext.getLoader().getClassLoader());
+				
+				if(attribute.getValue() instanceof SipApplicationSessionActivationListener) {
+					if (notificationPolicy.isSipApplicationSessionActivationListenerInvocationAllowed(
+							this.clusterStatus, cause, attribute.getKey())) {					
 						try {
-							fireContainerEvent(context, "afterSessionCreated",
-									listener);
-						} catch (Exception e) {
-							;
+							if(logger.isDebugEnabled()) {
+								logger.debug("notifying sip application session activation listener " + attribute.getValue() + " of sip application session activation " + 
+										key);
+							}
+							((SipApplicationSessionActivationListener)attribute.getValue()).sessionDidActivate(sipApplicationSessionEvent);
+						} catch (Throwable t) {
+							logger.error("SipApplicationSessionActivationListener " + attribute.getValue() + " threw exception", t);
 						}
-						manager.getContainer().getLogger().error(
-								sm.getString("clusteredSession.sessionEvent"),
-								t);
 					}
 				}
-			}
+				
+				java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
+			}		
 		}
 	}	
 
