@@ -19,12 +19,14 @@ export EXIT_CODE=0;
 rm -rf result.txt
 
 # Start SIP LB
+sed 's/load-balancer-TEMPLATE/load-balancer-1/g' ./lb-logging.properties >lb-logging.properties.tmp
 echo "#!/bin/sh" > auto-startlb.sh
-echo "java -Djava.util.logging.config.file=lb-logging.properties -server -Xms1536m -Xmx1536m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -jar $JBOSS_HOME/sip-balancer/sip-balancer-jar-with-dependencies.jar -mobicents-balancer-config=$JBOSS_HOME/sip-balancer/lb-configuration.properties" >> auto-startlb.sh
+echo "java -Djava.util.logging.config.file=lb-logging.properties.tmp -server -Xms1536m -Xmx1536m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -jar $JBOSS_HOME/sip-balancer/sip-balancer-jar-with-dependencies.jar -mobicents-balancer-config=$JBOSS_HOME/sip-balancer/lb-configuration.properties" >> auto-startlb.sh
 chmod +x auto-startlb.sh
 
+sed 's/load-balancer-TEMPLATE/load-balancer-2/g' ./lb-logging.properties >lb-logging.properties.tmp
 echo "#!/bin/sh" > auto-startlb-worst.sh
-echo "java -Djava.util.logging.config.file=lb-logging.properties -server -Xms1536m -Xmx1536m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -jar $JBOSS_HOME/sip-balancer/sip-balancer-jar-with-dependencies.jar -mobicents-balancer-config=ar/worstcase-affinity-lb-configuration.properties" >> auto-startlb-worst.sh
+echo "java -Djava.util.logging.config.file=lb-logging.properties.tmp -server -Xms1536m -Xmx1536m -XX:PermSize=128M -XX:MaxPermSize=256M -XX:+UseConcMarkSweepGC -XX:+CMSIncrementalMode -jar $JBOSS_HOME/sip-balancer/sip-balancer-jar-with-dependencies.jar -mobicents-balancer-config=ar/worstcase-affinity-lb-configuration.properties" >> auto-startlb-worst.sh
 chmod +x auto-startlb-worst.sh
 
 # Uncomment this if you want to keep the original affinity testing.
