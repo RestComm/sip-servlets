@@ -5,6 +5,7 @@ export config2="port-1"
 export KILL_PARAMS="-9"
 export FULLSTARTSLEEP=82
 export HALFSTARTSLEEP=80
+export CALLS=5
 
 if [ "x$1" != "x" ]; then
     export FULLSTARTSLEEP=$1
@@ -58,7 +59,7 @@ sleep $HALFSTARTSLEEP
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh custom-b2bua result.txt
+./auto-run-test.sh custom-b2bua result.txt $CALLS
 
 
 #The test killed server 1, so we start it again
@@ -66,7 +67,7 @@ sleep $HALFSTARTSLEEP
 
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh custom-b2bua-udp-tcp result.txt
+./auto-run-test.sh custom-b2bua-udp-tcp result.txt $CALLS
 
 
 #The test killed server 1, so we start it again
@@ -74,7 +75,7 @@ sleep $HALFSTARTSLEEP
 
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh custom-b2bua-tcp-tcp result.txt
+./auto-run-test.sh custom-b2bua-tcp-tcp result.txt $CALLS
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat config1.pid` $config1
@@ -100,28 +101,28 @@ sleep $HALFSTARTSLEEP
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh b2bua result.txt
+./auto-run-test.sh b2bua result.txt $CALLS
 
 #The test killed server 1, so we start it again
 ./auto-start-jboss-server.sh $config1 config1.pid 0 b2bua-remote-send-bye
 
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh b2bua-remote-send-bye result.txt
+./auto-run-test.sh b2bua-remote-send-bye result.txt $CALLS
 
 #The test killed server 1, so we start it again
 ./auto-start-jboss-server.sh $config1 config1.pid 0 b2bua-remote-send-bye-no-ring
 
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh b2bua-remote-send-bye-no-ring result.txt
+./auto-run-test.sh b2bua-remote-send-bye-no-ring result.txt $CALLS
 
 #The test killed server 1, so we start it again
 ./auto-start-jboss-server.sh $config1 config1.pid 0 b2bua-info
 
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh b2bua-info result.txt
+./auto-run-test.sh b2bua-info result.txt $CALLS
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat config1.pid` $config1
@@ -147,28 +148,28 @@ sleep $HALFSTARTSLEEP
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh proxy result.txt
+./auto-run-test.sh proxy result.txt $CALLS
 
 #The test killed server 1, so we start it again
 ./auto-start-jboss-server.sh $config1 config1.pid 0 proxy-indialog-info
 
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh proxy-indialog-info result.txt
+./auto-run-test.sh proxy-indialog-info result.txt $CALLS
 
 #The test killed server 1, so we start it again
 ./auto-start-jboss-server.sh $config1 config1.pid 0 proxy-termination
 
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh proxy-termination result.txt
+./auto-run-test.sh proxy-termination result.txt $CALLS
 
 #The test killed server 1, so we start it again
 ./auto-start-jboss-server.sh $config1 config1.pid 0 proxy-remote-send-bye
 
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh proxy-remote-send-bye result.txt
+./auto-run-test.sh proxy-remote-send-bye result.txt $CALLS
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat config1.pid` $config1
@@ -194,28 +195,36 @@ sleep $HALFSTARTSLEEP
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh uas result.txt
+./auto-run-test.sh uas result.txt $CALLS
+
+#The test killed server 1, so we start it again
+./auto-start-jboss-server.sh $config1 config1.pid 0 uas-activation
+
+sleep $HALFSTARTSLEEP
+
+# we purposely have only 1 calls to test the failover activation notification here
+./auto-run-test.sh uas-activation result.txt 1
 
 #The test killed server 1, so we start it again
 ./auto-start-jboss-server.sh $config1 config1.pid 0 uas-remove-attributes
 
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh uas-remove-attributes result.txt
+./auto-run-test.sh uas-remove-attributes result.txt $CALLS
 
 #The test killed server 1, so we start it again
 ./auto-start-jboss-server.sh $config1 config1.pid 0 uas-no-attributes
 
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh uas-no-attributes result.txt
+./auto-run-test.sh uas-no-attributes result.txt $CALLS
 
 #The test killed server 1, so we start it again
 ./auto-start-jboss-server.sh $config1 config1.pid 0 uas-reinvite
 
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh uas-reinvite result.txt
+./auto-run-test.sh uas-reinvite result.txt $CALLS
 
 #if [ "x$3" == "xjboss-5" ]; then
 
@@ -224,14 +233,14 @@ sleep $HALFSTARTSLEEP
 
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh uas-timer result.txt
+./auto-run-test.sh uas-timer result.txt $CALLS
 
 #The test killed server 1, so we start it again
 ./auto-start-jboss-server.sh $config1 config1.pid 0 uas-sas-timer
 
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh uas-sas-timer result.txt
+./auto-run-test.sh uas-sas-timer result.txt $CALLS
 
 #End JBoss5-specific
 #fi
@@ -258,7 +267,7 @@ sleep $HALFSTARTSLEEP
 #takes a bit more time to boot on 0.0.0.0
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh uas-0.0.0.0 result.txt
+./auto-run-test.sh uas-0.0.0.0 result.txt $CALLS
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat config1.pid` $config1
@@ -284,7 +293,7 @@ sleep $HALFSTARTSLEEP
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh uas-reinvite-passivation result.txt
+./auto-run-test.sh uas-reinvite-passivation result.txt $CALLS
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat config1.pid` $config1
@@ -310,7 +319,7 @@ sleep $HALFSTARTSLEEP
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh uas-sas-timer-passivation result.txt
+./auto-run-test.sh uas-sas-timer-passivation result.txt $CALLS
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat config1.pid` $config1
@@ -336,7 +345,7 @@ sleep $HALFSTARTSLEEP
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh uas-timer-passivation result.txt
+./auto-run-test.sh uas-timer-passivation result.txt $CALLS
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat config1.pid` $config1
@@ -362,7 +371,7 @@ sleep $HALFSTARTSLEEP
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh proxy-early result.txt
+./auto-run-test.sh proxy-early result.txt $CALLS
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat config1.pid` $config1
@@ -388,7 +397,7 @@ sleep $HALFSTARTSLEEP
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh custom-b2bua-early result.txt
+./auto-run-test.sh custom-b2bua-early result.txt $CALLS
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat config1.pid` $config1
@@ -414,7 +423,7 @@ sleep $HALFSTARTSLEEP
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh b2bua-early result.txt
+./auto-run-test.sh b2bua-early result.txt $CALLS
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat config1.pid` $config1
@@ -440,7 +449,7 @@ sleep $HALFSTARTSLEEP
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh b2bua-early-linked result.txt
+./auto-run-test.sh b2bua-early-linked result.txt $CALLS
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat config1.pid` $config1
@@ -464,7 +473,7 @@ sleep $HALFSTARTSLEEP
 #Wait to boot
 sleep $HALFSTARTSLEEP
 
-./auto-run-test.sh b2bua-early-fwd-ack result.txt
+./auto-run-test.sh b2bua-early-fwd-ack result.txt $CALLS
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat config1.pid` $config1
@@ -500,7 +509,7 @@ sleep $HALFSTARTSLEEP
 rm -rf *.flag
 
 sleep $HALFSTARTSLEEP
-./auto-run-test.sh proxy-b2bua-ar result.txt
+./auto-run-test.sh proxy-b2bua-ar result.txt $CALLS
 
 sleep 20
 if [ -f lssdestryed.flag -a -f cb2buadestryed.flag ]; then
@@ -540,7 +549,7 @@ sleep $HALFSTARTSLEEP
 # SIPp should be running by the time JBoss finishes the startup, hence we use half start time here.
 
 sleep 50
-./auto-run-test.sh uac result.txt
+./auto-run-test.sh uac result.txt $CALLS
 
 #Kill the app servers
 ./auto-kill-process-tree.sh `cat config1.pid` $config1

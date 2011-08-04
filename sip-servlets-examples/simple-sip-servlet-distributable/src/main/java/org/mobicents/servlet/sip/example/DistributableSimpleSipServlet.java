@@ -183,16 +183,18 @@ public class DistributableSimpleSipServlet
 						return;
 					}
 				}
-				if(sipApplicationSessionActivationListener != null && sipApplicationSessionActivated == null) {
-					SipServletResponse sipServletResponse = request.createResponse(500, "sipApplicationSessionActivationListener not called");
-					sipServletResponse.send();
-					return;
+				if((((SipURI)request.getFrom().getURI()).getUser()).contains("test-activation")) {
+					if(sipApplicationSessionActivationListener != null && sipApplicationSessionActivated == null) {
+						SipServletResponse sipServletResponse = request.createResponse(500, "sipApplicationSessionActivationListener not called");
+						sipServletResponse.send();
+						return;
+					}
+					if(sipSessionActivationListener != null && sipSessionActivated == null) {
+						SipServletResponse sipServletResponse = request.createResponse(500, "sipSessionActivationListener not called");
+						sipServletResponse.send();
+						return;
+					}				
 				}
-				if(sipSessionActivationListener != null && sipSessionActivated == null) {
-					SipServletResponse sipServletResponse = request.createResponse(500, "sipSessionActivationListener not called");
-					sipServletResponse.send();
-					return;
-				}				
 				if(request.getSession().getAttribute("ISREINVITE") !=null && sipSessionReInviteAttribute != null  && sipApplicationSessionReInviteAttribute != null 				
 						&& RECEIVED.equalsIgnoreCase(sipSessionReInviteAttribute) 
 						&& RECEIVED.equalsIgnoreCase(sipApplicationSessionReInviteAttribute)) {
