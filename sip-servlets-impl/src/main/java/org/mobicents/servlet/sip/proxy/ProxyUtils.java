@@ -91,8 +91,17 @@ public class ProxyUtils {
 					}
 				}
 			} else {
+				// Fix for Issue 2783 : Proxying to non-UDP transport is broken
 				if(clonedRequest.getRequestURI().isSipURI()) {
 					outboundTransport = ((javax.sip.address.SipURI)clonedRequest.getRequestURI()).getTransportParam();
+					if(destination != null && destination.isSipURI()) {
+						String destinationTransport = ((SipURI)destination).getTransportParam();
+						if(outboundTransport == null) {
+							outboundTransport = destinationTransport;
+						} else if(!outboundTransport.equalsIgnoreCase(destinationTransport)) {
+							outboundTransport = destinationTransport;
+						}
+					}
 				}
 			}
 			
