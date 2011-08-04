@@ -53,6 +53,7 @@ import javax.sip.header.CSeqHeader;
 import javax.sip.header.Header;
 import javax.sip.header.Parameters;
 import javax.sip.header.RouteHeader;
+import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -431,8 +432,9 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		// the tx serialization is preserved		
 		sipContext.enterSipApp(sipApplicationSession, sipSessionImpl, false);
 		
-		// We are using only one priover per LP and per transport so this is safe
-		sipSessionImpl.setTransport(sipProvider.getListeningPoints()[0].getTransport());
+		// The fastest way to figure out the transport is the mandatory Via transport header 
+		ViaHeader via = (ViaHeader) request.getHeader(ViaHeader.NAME);
+		sipSessionImpl.setTransport(via.getTransport());
 		
 		// if the flag is set we bypass the executor. This flag should be made deprecated 
 		if(sipApplicationDispatcher.isBypassRequestExecutor() || ConcurrencyControlMode.Transaction.equals((sipContext.getConcurrencyControlMode()))) {

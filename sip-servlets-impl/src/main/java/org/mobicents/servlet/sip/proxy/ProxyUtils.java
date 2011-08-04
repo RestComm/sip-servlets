@@ -90,6 +90,10 @@ public class ProxyUtils {
 						clonedRequest.removeHeader(RouteHeader.NAME);
 					}
 				}
+			} else {
+				if(clonedRequest.getRequestURI().isSipURI()) {
+					outboundTransport = ((javax.sip.address.SipURI)clonedRequest.getRequestURI()).getTransportParam();
+				}
 			}
 			
 			String inboundTransport = ((ViaHeader)clonedRequest.getHeader(Via.NAME)).getTransport();
