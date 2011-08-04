@@ -23,7 +23,7 @@
     ]]>
   </send>
 
-  <pause milliseconds="300"/>
+ <pause milliseconds="300"/>
 
   <send retrans="500">
     <![CDATA[
@@ -50,10 +50,11 @@
     ]]>
   </send>
 
-  <recv request="ACK" >
+  <recv request="ACK">
 <action><exec command="./killserver.sh config1.pid 2 &"/>
 </action></recv>
 
+  <pause milliseconds="28000"/>
 
   <recv request="BYE" timeout="30000" />
 

@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
@@ -64,8 +63,7 @@ public class DistributableLocationServiceSipServlet extends SipServlet implement
 	private static String TEST_TERMINATION = "test_termination";
 	private static final String CONTACT_HEADER = "Contact";
 	private static final String RECEIVED = "Received";
-	Map<String, List<URI>> registeredUsers = null;
-	ServletTimer timer = null;
+	Map<String, List<URI>> registeredUsers = null;	
 	
 	/** Creates a new instance of SpeedDialSipServlet */
 	public DistributableLocationServiceSipServlet() {}
@@ -178,8 +176,14 @@ public class DistributableLocationServiceSipServlet extends SipServlet implement
 	protected void doAck(SipServletRequest request) throws ServletException,
 			IOException {
 		String from = request.getFrom().getURI().toString();
-		if(from.contains(TEST_TERMINATION) && timer == null) {
-			timer = ((TimerService)getServletContext().getAttribute(TIMER_SERVICE)).createTimer(request.getApplicationSession(), 10000, false, (Serializable) request);
+		Object timerSet = request.getSession().getAttribute("timerSet");
+		if(from.contains(TEST_TERMINATION) && timerSet == null) {
+			long duration = 30000;
+			if(logger.isInfoEnabled()) {			
+				logger.info("Starting timer for termination in " + duration + " ms ");
+			}
+			((TimerService)getServletContext().getAttribute(TIMER_SERVICE)).createTimer(request.getApplicationSession(), duration, false, (Serializable) request);
+			request.getSession().setAttribute("timerSet", "true");
 		}
 	}
 	
