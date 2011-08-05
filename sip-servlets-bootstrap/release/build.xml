@@ -289,7 +289,7 @@
 	
 	<target name="build-mobicents-sglc" depends="get-deps">
 		<echo>Building Mobicents Simple Global Logging Configuration</echo>
-		<echo message="JBOSS_HOME= ${mss.home}"/>
+		<echo message="jboss.home= ${mss.home}"/>
 		<echo message="node= ${node}"/>
 		<copy overwrite="true" verbose="true" todir="${base.path}/target/dependencies/sglc/sar/target/mobicents-sglc/log4j-templates">
 		    <fileset dir="${base.path}/sglc-templates">
@@ -297,24 +297,24 @@
 		    </fileset>
 		  </copy>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/sglc">
-			<arg line="clean install -P set-svn-revision -Dmaven.test.skip=true -DJBOSS_HOME=${mss.home} -Dnode=${node}" />
+			<arg line="clean install -P set-svn-revision -Dmaven.test.skip=true -Djboss.home=${mss.home} -Dnode=${node}" />
 		</exec>			
 	</target>
 	
 	<target name="build-mobicents-snmp" depends="get-deps">
 		<echo>Building Mobicents SNMP Adaptor</echo>
-		<echo message="JBOSS_HOME= ${mss.home}"/>
+		<echo message="jboss.home= ${mss.home}"/>
 		<echo message="node= ${node}"/>	
 		<delete verbose="true" dir="${mss.home}/server/${node}/deploy/snmp-adaptor.sar"/>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/snmp-adaptor/plugin">
 			<arg line="clean install -P set-svn-revision" />
 		</exec>	
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/snmp-adaptor">
-			<arg line="clean install -P set-svn-revision -Dmaven.test.skip=true -DJBOSS_HOME=${mss.home} -Dnode=${node}" />
+			<arg line="clean install -P set-svn-revision -Dmaven.test.skip=true -Djboss.home=${mss.home} -Dnode=${node}" />
 		</exec>			
 		<echo>Building Mobicents SNMP Deployer</echo>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/snmp-adaptor/deployer">
-			<arg line="clean install -P set-svn-revision -Dmaven.test.skip=true -DJBOSS_HOME=${mss.home} -Dnode=${node}" />
+			<arg line="clean install -P set-svn-revision,jboss-distro -Dmaven.test.skip=true -DJBOSS_HOME=${mss.home} -Dnode=${node}" />
 		</exec>	
 	</target>
 	
