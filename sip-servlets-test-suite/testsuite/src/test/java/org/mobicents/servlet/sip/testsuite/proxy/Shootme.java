@@ -95,6 +95,8 @@ public class Shootme implements SipListener {
 	public int inviteResponseCode = 0;
 	
 	public static boolean callerSendsBye = true;
+	
+	private long timeToWaitBeforeAnswer = -1;
 
 	class MyTimerTask extends TimerTask {
 		Shootme shootme;
@@ -266,6 +268,10 @@ public class Shootme implements SipListener {
 		
 			dialog = serverTransaction.getDialog();
 
+			if(timeToWaitBeforeAnswer > 0) {
+				Thread.sleep(timeToWaitBeforeAnswer);
+			}
+			
 			if(!usePrack)
 				serverTransaction.sendResponse(response);
 			else
@@ -517,5 +523,13 @@ public class Shootme implements SipListener {
 
 		}
 
+	}
+
+	public void setTimeToWaitBeforeAnswer(long timeToWaitBeforeAnswer) {
+		this.timeToWaitBeforeAnswer = timeToWaitBeforeAnswer;
+	}
+
+	public long getTimeToWaitBeforeAnswer() {
+		return timeToWaitBeforeAnswer;
 	}
 }

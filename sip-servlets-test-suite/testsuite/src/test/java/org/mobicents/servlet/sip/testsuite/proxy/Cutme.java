@@ -71,6 +71,8 @@ public class Cutme implements SipListener {
 	public static final boolean callerSendsBye = true;
 	
 	public boolean canceled = false;
+	
+	private long timeToWaitBeforeAnswer = -1;
 
 	class MyTimerTask extends TimerTask {
 		Cutme shootme;
@@ -176,6 +178,10 @@ public class Cutme implements SipListener {
 			inviteRequest = request;
 			dialog = st.getDialog();
 //			inviteRequest = request;
+			if(timeToWaitBeforeAnswer > 0) {
+				Thread.sleep(timeToWaitBeforeAnswer);
+			}
+			
 			st.sendResponse(response);
 			// If we dont send final response this will receive cancel.
 		} catch (Exception ex) {
@@ -359,5 +365,19 @@ public class Cutme implements SipListener {
 		}
 
 		sipStack.stop();
+	}
+
+	/**
+	 * @param timeToWaitBeforeAnswer the timeToWaitBeforeAnswer to set
+	 */
+	public void setTimeToWaitBeforeAnswer(long timeToWaitBeforeAnswer) {
+		this.timeToWaitBeforeAnswer = timeToWaitBeforeAnswer;
+	}
+
+	/**
+	 * @return the timeToWaitBeforeAnswer
+	 */
+	public long getTimeToWaitBeforeAnswer() {
+		return timeToWaitBeforeAnswer;
 	}
 }

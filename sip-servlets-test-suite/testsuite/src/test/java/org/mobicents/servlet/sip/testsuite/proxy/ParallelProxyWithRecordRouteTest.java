@@ -60,10 +60,12 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 	}
 	
 	public void testProxyCalleeSendsBye() {
-		this.shootme.init(STACK_NAME, null);
+		this.shootme.init(STACK_NAME, null);		
 		this.shootme.callerSendsBye = false;
+		this.shootme.setTimeToWaitBeforeAnswer(300);
 		try {
 		this.cutme.init(null);
+		this.cutme.setTimeToWaitBeforeAnswer(300);
 		this.shootist.init("useHostName",false, null);
 		for (int q = 0; q < 20; q++) {
 			if (shootist.ended == false && cutme.canceled == false)
