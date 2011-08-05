@@ -309,6 +309,11 @@
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/snmp-adaptor/plugin">
 			<arg line="clean install -P set-svn-revision" />
 		</exec>	
+		<copy overwrite="true" verbose="true" todir="${mss.home}/client">
+		    <fileset dir="${base.path}/target/dependencies/snmp-adaptor/plugin/target">
+		      <include name="**/mibgen*.jar"/>
+		    </fileset>
+		</copy>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/snmp-adaptor">
 			<arg line="clean install -P set-svn-revision -Dmaven.test.skip=true -Djboss.home=${mss.home} -Dnode=${node}" />
 		</exec>			
