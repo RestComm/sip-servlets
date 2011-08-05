@@ -241,7 +241,7 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 			
 			if(timerTaskData != null) {
 				if(logger.isDebugEnabled()) {
-					logger.debug("Task " + timerId + " is not present locally, but on another node, cancelling the remote one and rescheduling it locally.");
+					logger.debug("Timer Task " + timerId + " is not present locally, but on another node, cancelling the remote one and rescheduling it locally.");
 				}
 				// we cancel it, this will cause the remote owner node to remove it and cancel its local task
 				cancel(timerId);
@@ -256,7 +256,7 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 				return timerServiceTask;
 			} else {
 //				if(logger.isWarningEnabled()) {
-					logger.warn("Task " + timerId + " is not present locally, nor on another node, not possible to reschedule it.");
+					logger.warn("Timer Task " + timerId + " is not present locally, nor on another node, not possible to reschedule it.");
 //				}
 				return null;
 				// and reschedule it locally
@@ -265,7 +265,7 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 //			return timerServiceTask;
 		} else {
 			if(logger.isInfoEnabled()) {
-				logger.info("Task " + timerId + " is already present locally no need to reschedule it.");
+				logger.info("Timer Task " + timerId + " is already present locally no need to reschedule it.");
 			}
 			return null;
 		}
