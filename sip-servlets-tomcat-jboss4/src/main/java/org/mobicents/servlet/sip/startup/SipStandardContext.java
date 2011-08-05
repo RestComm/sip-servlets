@@ -66,6 +66,7 @@ import org.jboss.web.tomcat.service.session.SnapshotSipManager;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.annotations.SipAnnotationProcessor;
+import org.mobicents.servlet.sip.annotations.SipAnnotationProcessorImpl;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipContextEvent;
 import org.mobicents.servlet.sip.core.SipContextEventType;
@@ -324,7 +325,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			// normal lookup method - in the default naming context.
 			//tomcat naming 
 			this.setAnnotationProcessor(
-					new SipAnnotationProcessor(
+					new SipAnnotationProcessorImpl(
 							getNamingContextListener().getEnvContext(),
 							this));
         } else {
@@ -333,7 +334,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				InitialContext iniCtx = new InitialContext();
 				Context envCtx = (Context) iniCtx.lookup("java:comp/env");					
 				this.setAnnotationProcessor(
-						new SipAnnotationProcessor(
+						new SipAnnotationProcessorImpl(
 								envCtx,
 								this));
 			} catch (NamingException e) {
@@ -355,7 +356,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				if(isUseNaming()) {
 					//tomcat naming 
 					this.setAnnotationProcessor(
-							new SipAnnotationProcessor(
+							new SipAnnotationProcessorImpl(
 									getNamingContextListener().getEnvContext(),
 									this));
 				} else {
@@ -364,7 +365,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 						InitialContext iniCtx = new InitialContext();
 						Context envCtx = (Context) iniCtx.lookup("java:comp/env");					
 						this.setAnnotationProcessor(
-								new SipAnnotationProcessor(
+								new SipAnnotationProcessorImpl(
 										envCtx,
 										this));
 					} catch (NamingException e) {
