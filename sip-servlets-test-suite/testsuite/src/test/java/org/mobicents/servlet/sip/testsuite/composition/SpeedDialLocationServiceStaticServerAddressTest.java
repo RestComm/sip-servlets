@@ -121,7 +121,7 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 		udpProtocolHandler.setStaticServerAddress("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
 		udpProtocolHandler.setStaticServerPort(IPLB_ADDRESS_EXTERNAL);
 		tomcat.getSipService().addConnector(udpSipConnector);
-		//tomcat.getSipService().setOutboundProxy(System.getProperty("org.mobicents.testsuite.testhostaddr")+":"+IPLB_ADDRESS_INTERNAL);
+		tomcat.getSipService().setOutboundProxy(System.getProperty("org.mobicents.testsuite.testhostaddr")+":"+IPLB_ADDRESS_INTERNAL);
 		//tomcat.getSipService().setOutboundProxy(outboundProxy)
 		try {
 			tomcat.startTomcat();
@@ -146,11 +146,11 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 	}
 	
 	public void testSpeedDialLocationServiceCallerSendBye() throws Exception {		
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		sender = new TestSipListener(5080, 5005, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		receiver = new TestSipListener(5090, 5005, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 
@@ -180,11 +180,11 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 	}
 	
 	public void testSpeedDialLocationServiceErrorResponse() throws Exception {		
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		sender = new TestSipListener(5080, 5005, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		receiver = new TestSipListener(5090, 5005, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 		
@@ -277,13 +277,13 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 	}
 
 	public void testCancelSpeedDialLocationService() throws Exception {
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		sender = new TestSipListener(5080, 5005, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 		
 		startLoadBalancer();
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
+		receiver = new TestSipListener(5090, 5005, receiverProtocolObjects, true);
 		receiver.setRecordRoutingProxyTesting(true);
 		receiver.setWaitForCancel(true);
 		SipProvider receiverProvider = receiver.createProvider();
@@ -317,13 +317,13 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 
 	public void testRemoteAddrPortAndTransport() throws Exception {		
 		startLoadBalancer();
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		sender = new TestSipListener(5080, 5005, senderProtocolObjects, true);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
 		
 		
 
-		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		receiver = new TestSipListener(5090, 5005, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
 		SipProvider receiverProvider = receiver.createProvider();
 
