@@ -20,7 +20,7 @@
     
     <context-param>
       <param-name>xdms.xcap.root</param-name>
-      <param-value>/mobicents</param-value>
+      <param-value>/mobicents/</param-value>
     </context-param>
     
     <context-param>
