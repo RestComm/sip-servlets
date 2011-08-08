@@ -56,9 +56,11 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 	private ObjectName getSglcMBean() {
 		try {
 			ObjectName dispatcherQuery = new ObjectName("*:service=SimpleGlobalLoggingConfiguration");
-			ObjectInstance sglcInstance = (ObjectInstance) 
-			mserver.queryMBeans(dispatcherQuery, null).iterator().next();
-			ObjectName sglcName = sglcInstance.getObjectName();
+			Iterator<ObjectInstance> objectInstances = mserver.queryMBeans(dispatcherQuery, null).iterator();
+			ObjectName sglcName = null;
+			if(objectInstances.hasNext()) {
+				sglcName = objectInstances.next().getObjectName();
+			}
 			return sglcName;
 		} catch (Throwable t) {
 			throw new RuntimeException(t);
@@ -81,7 +83,9 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 	public String getLoggingMode() {
 		try {
 			ObjectName sglcName = getSglcMBean();
-			
+			if(sglcName == null) 
+				return null;
+				
 			String mode = 
 				(String) mserver.invoke(sglcName, "getCurrentProfile", new Object[]{}, new String[]{});
 			return mode.toString();
@@ -167,6 +171,9 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 	public void setLoggingMode(String mode) {
 		try {
 			ObjectName sglcName = getSglcMBean();
+			if(sglcName == null) 
+				return;
+			
 			mserver.invoke(sglcName, "switchLoggingConfiguration", new Object[]{mode}, new String[]{"java.lang.String"});
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
@@ -176,6 +183,9 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 	public String[] listLoggingProfiles() {
 		try {
 			ObjectName sglcName = getSglcMBean();
+			if(sglcName == null) 
+				return null;
+			
 			Set<String> profiles = (Set<String>) mserver.invoke(sglcName, "listProfiles", new Object[]{}, new String[]{});
 			String[] sglcModes = new String[0];
 			if(profiles != null) {

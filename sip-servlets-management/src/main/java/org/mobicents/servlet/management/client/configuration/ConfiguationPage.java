@@ -458,7 +458,8 @@ public class ConfiguationPage extends Panel {
 								}
 	
 								public void onSuccess(String result) {
-									sglc.setValue(result.toString());
+									if(result != null)
+										sglc.setValue(result.toString());
 								}
 								
 							});
