@@ -17,7 +17,7 @@
 		<dependency>
 			<groupId>org.mobicents</groupId>
 			<artifactId>xcap-client-api</artifactId>
-			<version>2.2.1.FINAL</version>				
+			<version>2.4.1.FINAL</version>				
 		</dependency>		   	
        
 		<dependency>

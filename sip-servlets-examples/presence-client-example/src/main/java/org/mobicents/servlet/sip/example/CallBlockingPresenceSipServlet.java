@@ -148,7 +148,7 @@ public class CallBlockingPresenceSipServlet extends SipServlet implements SipSer
         try {
 	        InitialContext ctx = new InitialContext(env);
 	        RMIAdaptor rmiAdaptor = (RMIAdaptor) ctx.lookup("jmx/rmi/RMIAdaptor");
-	        ObjectName userProfileMBeanObjectName = new ObjectName("org.mobicents.slee:userprofile=UserProfileControl");
+	        ObjectName userProfileMBeanObjectName = new ObjectName("org.mobicents.sippresence:name=UserProfileControl");
 	        
 	        String users = (String) rmiAdaptor.invoke(userProfileMBeanObjectName, "listUsersAsString", new String[]{}, new String[]{});
 	        if(!users.contains(username)) {
