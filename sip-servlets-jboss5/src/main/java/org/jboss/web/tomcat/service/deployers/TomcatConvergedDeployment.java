@@ -28,6 +28,8 @@ import java.net.URL;
 import java.security.CodeSource;
 import java.security.cert.Certificate;
 import java.util.Iterator;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.zip.ZipFile;
 
 import javax.management.Attribute;
@@ -103,7 +105,7 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 	protected void performDeployInternal(
 			WebApplication webApp, String hostName, String warUrlStr) throws Exception {
 
-		JBossWebMetaData metaData = webApp.getMetaData();
+		final JBossWebMetaData metaData = webApp.getMetaData();
 		String ctxPath = metaData.getContextRoot();
 		if (ctxPath.equals("/") || ctxPath.equals("/ROOT")
 				|| ctxPath.equals("")) {
@@ -119,7 +121,7 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		metaData.setContextLoader(loader);
 
-		StandardContext context = (StandardContext) Class.forName(
+		final StandardContext context = (StandardContext) Class.forName(
 				config.getContextClassName()).newInstance();
 
 		DeploymentUnit depUnit = webApp.getDeploymentUnit();
@@ -273,7 +275,34 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 			// Start it	
 			context.init();
 			// Build the ENC
-			injectSipUtilitiesIntoEJBs(context, metaData);
+			try {
+				injectSipUtilitiesIntoEJBs(context, metaData);
+			} catch (Exception e) {
+				log.warn("Attempt to inject SIP utilities into EJB failed. Possible cause is that you have an EJB waiting on dependencies http://code.google.com/p/mobicents/issues/detail?id=2772");
+				final ClassLoader cl = Thread.currentThread().getContextClassLoader();
+				new Timer().scheduleAtFixedRate(new TimerTask() {
+					int retries = 100;
+					public void run() {
+						Thread.currentThread().setContextClassLoader(cl);
+						if(retries-->0) {
+							log.debug("Trying to inject utilities for converged app into EJB - attempts left: " + retries);
+							try {
+								injectSipUtilitiesIntoEJBs(context, metaData);
+								log.info("Attempt to inject SIP utilitiess into EJB succeeded at " + retries + " attempts left.");
+								cancel();
+							} catch (Exception e) {
+								if(retries%10 == 0) {
+									log.warn("Attempt to inject SIP utilities into EJB failed " + context + " " + metaData + " retries left = " + retries);
+								}
+							}
+						} else {
+							cancel();
+							log.error("Attempt to inject SIP utilities into EJB failed after 100 attempts, the EJB didnt come up. We are giving up.");
+						}
+
+					}
+				}, 1, 1000);
+			}
 			context.start();						
 		} catch (Exception e) {
 			context.destroy();
