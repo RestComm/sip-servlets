@@ -326,7 +326,8 @@
 	<!-- Download dependencies from SourceForge -->
 	
 	<target name="build-mobicents-diameter-jboss-5" depends="get-mobicents-diameter-jboss-5">		
-		<unzip dest="${mss.home}/server/${jboss.config}/deploy/${diameter-jboss-5.name}" src="${diameter-jboss-5.distro.path}"/>			
+		<unzip dest="${mss.home}/server/${jboss.config}/deploy/${diameter-jboss-5.name}" src="${diameter-jboss-5.distro.path}"/>
+		<copy overwrite="true" file="${base.path}/jdiameter-config.xml" tofile="${mss.home}/server/${jboss.config}/deploy/${diameter-jboss-5.name}/config/jdiameter-config.xml" />
 	</target>
 	
 	<available file="${diameter-jboss-5.distro.path}" property="got.mobicents-diameter-jboss-5" />
