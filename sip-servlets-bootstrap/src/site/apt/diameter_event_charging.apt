@@ -50,7 +50,7 @@ Diameter Event Charging Service
 
   This example must be run under JBoss.
   
-  You will also need {{{http://www.ericsson.com/mobilityworld/developerszonedown/downloads/tools/charging_solutions/ChargingSDK-1_0_D31E.zip}Ericsson SDK Charging Emulator v1.0}}.
+  You will also need {{{http://mobicents.googlecode.com/files/ChargingSDK-1_0_D31E.zip}Ericsson SDK Charging Emulator v1.0}}.
   
   Run the Charging Emulator (PPSDiamEmul.jar) and configure it like this:\
     Peer Id: aaa://127.0.0.1:21812\
