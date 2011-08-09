@@ -306,7 +306,7 @@
 		<echo message="jboss.home= ${mss.home}"/>
 		<echo message="node= ${node}"/>	
 		<delete verbose="true" dir="${mss.home}/server/${node}/deploy/snmp-adaptor.sar"/>
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/snmp-adaptor/plugin">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/snmp-adaptor/mibgen">
 			<arg line="clean install -P set-svn-revision" />
 		</exec>	
 		<copy overwrite="true" verbose="true" todir="${mss.home}/client">
