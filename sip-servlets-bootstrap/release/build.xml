@@ -310,7 +310,7 @@
 			<arg line="clean install -P set-svn-revision" />
 		</exec>	
 		<copy overwrite="true" verbose="true" todir="${mss.home}/client">
-		    <fileset dir="${base.path}/target/dependencies/snmp-adaptor/plugin/target">
+		    <fileset dir="${base.path}/target/dependencies/snmp-adaptor/mibgen/plugin/target">
 		      <include name="**/mibgen*.jar"/>
 		    </fileset>
 		</copy>
