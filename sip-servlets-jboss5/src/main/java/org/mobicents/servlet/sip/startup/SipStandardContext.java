@@ -319,11 +319,22 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		//This will make start the sip context config, which will in turn parse the sip descriptor deployment
 		//and call load on startup which is equivalent to
 		//JSR 289 Section 2.1.1 Step 2.Invoke servlet.init(), the initialization method on the Servlet. Invoke the init() on all the load-on-startup Servlets in the applicatio
+        if(manager instanceof DistributableSipManager) {
+        	// due to refactoring on http://code.google.com/p/mobicents/issues/detail?id=2794
+        	// we set the container on the manager right before the start and after the context have been init-ed
+			hasDistributableManager = true;				
+			if(logger.isInfoEnabled()) {
+				logger.info("this context contains a manager that allows applications to work in a distributed environment");
+			}			
+			((SipManager)getManager()).setSipFactoryImpl(
+					((SipFactoryImpl)sipApplicationDispatcher.getSipFactory()));
+			((SipManager)manager).setContainer(this);			
+		}
 		super.start();	
 								
 		if(getAvailable()) {			
 			//set the session manager on the specific sipstandardmanager to handle converged http sessions
-			if(getManager() instanceof SipManager) {
+			if(!(getManager() instanceof DistributableSipManager) && getManager() instanceof SipManager) {
 				((SipManager)getManager()).setSipFactoryImpl(
 						((SipFactoryImpl)sipApplicationDispatcher.getSipFactory()));
 				((SipManager)manager).setContainer(this);
@@ -339,10 +350,14 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			//called implicitly within sipApplicationDispatcher.addSipApplication
 			sipApplicationDispatcher.addSipApplication(applicationName, this);
 			if(manager instanceof DistributableSipManager) {
+				// only call the setContainer on the manager when it has been fully initialized
 				hasDistributableManager = true;				
 				if(logger.isInfoEnabled()) {
 					logger.info("this context contains a manager that allows applications to work in a distributed environment");
 				}
+				((SipManager)getManager()).setSipFactoryImpl(
+						((SipFactoryImpl)sipApplicationDispatcher.getSipFactory()));
+				((SipManager)manager).setContainer(this);
 			}
 			if(logger.isInfoEnabled()) {
 				logger.info("sip application session timeout for this context is " + sipApplicationSessionTimeout + " minutes");
@@ -836,28 +851,28 @@ public class SipStandardContext extends StandardContext implements SipContext {
     
     @Override
     public synchronized void setManager(Manager manager) {
+    	if(getManager() != null && !manager.equals(getManager())) {
+    		// http://code.google.com/p/mobicents/issues/detail?id=2794 : TimerService object from JDNI lookup or injection is never HATimerService. This means that timers scheduled using that object will not survive across cluster changes.
+			// Avoid the DistributableSipManager set by TomcatConvergedDeployment to be overriden by JBossContextConfig.processContextConfig that reset the distributable manager.      		
+    		if(logger.isInfoEnabled()) {
+				logger.info("this context already contains a manager " + getManager() + " not setting new manager " + manager);
+			}	
+    		return;
+    	}
     	if(manager instanceof SipManager && sipApplicationDispatcher != null) {
 			((SipManager)manager).setSipFactoryImpl(
 					((SipFactoryImpl)sipApplicationDispatcher.getSipFactory())); 
 			((SipManager)manager).setContainer(this);
-		}
+		}    	
+    	super.setManager(manager);
     	if(manager instanceof DistributableSipManager) {
 			hasDistributableManager = true;
+			// if the logic comes unitl here, distributable is true, we set it to be able to start the FT timer services correctly on init
+			setDistributable(true);
 			if(logger.isInfoEnabled()) {
 				logger.info("this context contains a manager that allows applications to work in a distributed environment");
 			}			
-			if(logger.isInfoEnabled()) {
-				logger.info("Using the Fault Tolerant Timer Service to schedule fault tolerant timers in a distributed environment");
-			}			
-			sasTimerService.stop();
-			sasTimerService = null;
-			sasTimerService = new FaultTolerantSasTimerService((DistributableSipManager)manager, 4);
-			timerService = null;
-			timerService = new FaultTolerantTimerServiceImpl((DistributableSipManager)manager);										
-			this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
-					timerService);
 		} 
-    	super.setManager(manager);
     }
     
     @Override

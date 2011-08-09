@@ -3148,6 +3148,12 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	 */
 	@Override
 	public void setContainer(Container container) {
+		if(container != null && container instanceof SipContext && ((SipContext)container).getSipFactoryFacade() == null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("context " + container.getName() + " not yet init-ed so returning");
+			}
+			return;
+		}
 		super.setContainer(container);		
 		sipManagerDelegate.setContainer(container);
 		DistributedCacheConvergedSipManager<? extends OutgoingDistributableSessionData> distributedCacheConvergedSipManager = getDistributedCacheConvergedSipManager();
@@ -3158,8 +3164,10 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			if(logger.isDebugEnabled()) {
 				logger.debug("Setting Application Name " + applicationName + " for Manager " + this + " for context " + container.getName());
 			}
-			distributedCacheConvergedSipManager.setApplicationName(applicationName);
-			distributedCacheConvergedSipManager.setApplicationNameHashed(((SipContext)getContainer()).getApplicationNameHashed());
+			if(((SipContext)getContainer()).getApplicationName() != null && ((SipContext)getContainer()).getApplicationNameHashed() != null) {
+				distributedCacheConvergedSipManager.setApplicationName(applicationName);
+				distributedCacheConvergedSipManager.setApplicationNameHashed(((SipContext)getContainer()).getApplicationNameHashed());
+			}
 		}
 	}
 
@@ -4074,29 +4082,33 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		// with the way the overall context is created in TomcatDeployer.
 		// We can't do this in unembedded mode because we are called
 		// before our Context is registered with the MBean server
-		if (embedded_) {
-			ObjectName name = this.getObjectName(this.container_);
-
-			if (name != null) {
-				try {
-					MBeanServer server = this.getMBeanServer();
-
-					server.invoke(name, "addValve", new Object[] { valve },
-							new String[] { Valve.class.getName() });
-
-					installed = true;
-				} catch (Exception e) {
-					// JBAS-2422. If the context is restarted via JMX, the above
-					// JMX call will fail as the context will not be registered
-					// when it's made. So we catch the exception and fall back
-					// to adding the valve directly.
-					// TODO consider skipping adding via JMX and just do it
-					// directly
-					log_.debug("Caught exception installing valve to Context",
-							e);
-				}
-			}
-		}
+		
+		// Even on startup due to refactoring from http://code.google.com/p/mobicents/issues/detail?id=2794
+		// the below JMX call will fail as
+		// the context will not be registered when it's made so installing it directly
+//		if (embedded_) {
+//			ObjectName name = this.getObjectName(this.container_);
+//
+//			if (name != null) {
+//				try {
+//					MBeanServer server = this.getMBeanServer();
+//
+//					server.invoke(name, "addValve", new Object[] { valve },
+//							new String[] { Valve.class.getName() });
+//
+//					installed = true;
+//				} catch (Exception e) {
+//					// JBAS-2422. If the context is restarted via JMX, the above
+//					// JMX call will fail as the context will not be registered
+//					// when it's made. So we catch the exception and fall back
+//					// to adding the valve directly.
+//					// TODO consider skipping adding via JMX and just do it
+//					// directly
+//					log_.debug("Caught exception installing valve to Context",
+//							e);
+//				}
+//			}
+//		}
 
 		if (!installed) {
 			// If possible install via the ContainerBase.addValve() API.

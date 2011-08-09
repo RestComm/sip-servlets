@@ -272,6 +272,56 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 		SipJBossContextConfig.kernelLocal.set(kernel);
 		SipJBossContextConfig.deploymentUnitLocal.set(unit);
 		try {
+			// Clustering : 
+			AbstractJBossManager manager = null;
+			if (metaData.getDistributable() != null) {
+				// Need to be set very early (before context init) to avoid 
+				// http://code.google.com/p/mobicents/issues/detail?id=2794 : TimerService object from JDNI lookup or injection is never HATimerService. This means that timers scheduled using that object will not survive across cluster changes.				
+				// MSS : we set the classloader because Clustering class are mixed up with deployers class
+				// causing CL problems : need to separate them in different jars
+//				ClassLoader previousClassLoader = Thread.currentThread().getContextClassLoader();
+//				Thread.currentThread().setContextClassLoader(ClusteredSession.class.getClassLoader());
+				// Try to initate clustering, fallback to standard if no clustering
+				// is available				
+					String managerClassName = config.getManagerClass();								
+					Class managerClass = Thread.currentThread()
+							.getContextClassLoader().loadClass(managerClassName);
+					manager = (AbstractJBossManager) managerClass.newInstance();
+					// MSS : we set the classloader because Clustering class are mixed up with deployers class
+					// causing CL problems : need to separate them in different jars
+//					ClassLoader previousClassLoader = Thread.currentThread().getContextClassLoader();
+//					Thread.currentThread().setContextClassLoader(ClusteredSession.class.getClassLoader());
+					// Try to initate clustering, fallback to standard if no clustering
+					// is available
+					try {				
+						String name = "//"
+								+ ((hostName == null) ? "localhost" : hostName)
+								+ ctxPath;
+						manager.init(name, metaData);
+
+						server.setAttribute(objectName, new Attribute("manager",
+								manager));
+
+						log.debug("Enabled clustering support for ctxPath=" + ctxPath);
+					} catch (ClusteringNotSupportedException e) {
+						// JBAS-3513 Just log a WARN, not an ERROR
+						log
+								.warn("Failed to setup clustering, clustering disabled. ClusteringNotSupportedException: "
+										+ e.getMessage());
+					} catch (NoClassDefFoundError ncdf) {
+						// JBAS-3513 Just log a WARN, not an ERROR
+						log.warn("Failed to setup clustering, clustering disabled. NoClassDefFoundError: "
+								+ ncdf.getMessage());
+						log.debug("Classes needed for clustered webapp unavailable",
+								ncdf);				
+					} catch (Throwable t) {
+						// TODO consider letting this through and fail the deployment
+						log
+								.error(
+										"Failed to setup clustering, clustering disabled. Exception: ",
+										t);
+					}
+			}
 			// Start it	
 			context.init();
 			// Build the ENC
@@ -322,53 +372,6 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 			throw new DeploymentException("URL " + warUrlStr
 					+ " deployment failed");
 		}
-
-		// Clustering
-		if (metaData.getDistributable() != null) {
-			// MSS : we set the classloader because Clustering class are mixed up with deployers class
-			// causing CL problems : need to separate them in different jars
-//			ClassLoader previousClassLoader = Thread.currentThread().getContextClassLoader();
-//			Thread.currentThread().setContextClassLoader(ClusteredSession.class.getClassLoader());
-			// Try to initate clustering, fallback to standard if no clustering
-			// is available
-			try {
-				AbstractJBossManager manager = null;
-				String managerClassName = config.getManagerClass();								
-				Class managerClass = Thread.currentThread()
-						.getContextClassLoader().loadClass(managerClassName);
-				manager = (AbstractJBossManager) managerClass.newInstance();
-				String name = "//"
-						+ ((hostName == null) ? "localhost" : hostName)
-						+ ctxPath;
-				manager.init(name, metaData);
-
-				server.setAttribute(objectName, new Attribute("manager",
-						manager));
-
-				log.debug("Enabled clustering support for ctxPath=" + ctxPath);
-			} catch (ClusteringNotSupportedException e) {
-				// JBAS-3513 Just log a WARN, not an ERROR
-				log
-						.warn("Failed to setup clustering, clustering disabled. ClusteringNotSupportedException: "
-								+ e.getMessage());
-			} catch (NoClassDefFoundError ncdf) {
-				// JBAS-3513 Just log a WARN, not an ERROR
-				log.warn("Failed to setup clustering, clustering disabled. NoClassDefFoundError: "
-						+ ncdf.getMessage());
-				log.debug("Classes needed for clustered webapp unavailable",
-						ncdf);				
-			} catch (Throwable t) {
-				// TODO consider letting this through and fail the deployment
-				log
-						.error(
-								"Failed to setup clustering, clustering disabled. Exception: ",
-								t);
-			}
-//			Thread.currentThread().setContextClassLoader(previousClassLoader);
-		}
-
-		// Build the ENC
-//		injectSipUtilitiesIntoEJBs(context, metaData);
 		
 		/*
 		 * Add security association valve after the authorization valves so that
