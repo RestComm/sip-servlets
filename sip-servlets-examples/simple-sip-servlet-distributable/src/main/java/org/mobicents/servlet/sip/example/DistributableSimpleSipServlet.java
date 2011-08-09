@@ -25,6 +25,7 @@ package org.mobicents.servlet.sip.example;
 import java.io.IOException;
 import java.util.Iterator;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ServletTimer;
@@ -35,10 +36,10 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipSession.State;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
-import javax.servlet.sip.SipSession.State;
 
 import org.apache.log4j.Logger;
 
@@ -62,6 +63,7 @@ public class DistributableSimpleSipServlet
 	private static final String CALLEE_SEND_BYE = "yousendbye";	
 	private static final String SAS_TIMER_SEND_BYE = "sastimersendbye";
 	private static final String CANCEL_SERVLET_TIMER = "cancelservlettimer";
+	private static final String INJECTED_TIMER = "injectedtimer";
 	
 	private static final String NO_ATTRIBUTES = "NoAttributes";
 	private static final String REMOVE_ATTRIBUTES = "RemoveAttributes";
@@ -71,6 +73,7 @@ public class DistributableSimpleSipServlet
 	private int byeDelay = DEFAULT_BYE_DELAY;
 	
 	ServletTimer servletTimer = null;
+	@Resource TimerService injectedTimerService;
 	
 	/** Creates a new instance of SimpleProxyServlet */
 	public DistributableSimpleSipServlet() {
@@ -132,12 +135,34 @@ public class DistributableSimpleSipServlet
 		sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
 		sipServletResponse.send();
 		if((((SipURI)request.getTo().getURI()).getUser()).contains(CALLEE_SEND_BYE)) {
-			TimerService timer = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);			
+			TimerService timer = null;
+			if(!(((SipURI)request.getFrom().getURI()).getUser()).contains(INJECTED_TIMER)) {
+				if(logger.isInfoEnabled()) {			
+					logger.info("Distributable Simple Servlet: using injected timer");
+				}
+				timer = injectedTimerService;
+			} else {
+				if(logger.isInfoEnabled()) {			
+					logger.info("Distributable Simple Servlet: using servlet context timer");
+				}
+				timer = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);
+			}
 			timer.createTimer(request.getApplicationSession(), byeDelay, false, request.getSession().getId());
 		} else if ((((SipURI)request.getTo().getURI()).getUser()).contains(SAS_TIMER_SEND_BYE)) {
 			request.getSession().getApplicationSession().setExpires(1);
 		} else if ((((SipURI)request.getTo().getURI()).getUser()).contains(CANCEL_SERVLET_TIMER)) {
-			TimerService timer = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);			
+			TimerService timer = null;
+			if(!(((SipURI)request.getFrom().getURI()).getUser()).contains(INJECTED_TIMER)) {
+				if(logger.isInfoEnabled()) {			
+					logger.info("Distributable Simple Servlet: using injected timer");
+				}
+				timer = injectedTimerService;
+			} else {
+				if(logger.isInfoEnabled()) {			
+					logger.info("Distributable Simple Servlet: using servlet context timer");
+				}
+				timer = (TimerService) getServletContext().getAttribute(TIMER_SERVICE);
+			}			
 			servletTimer = timer.createTimer(request.getApplicationSession(), byeDelay, false, request.getSession().getId());
 		}
 	}
