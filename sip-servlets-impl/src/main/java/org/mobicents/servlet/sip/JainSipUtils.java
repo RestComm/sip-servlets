@@ -415,6 +415,9 @@ public final class JainSipUtils {
 		// those headers are singleton headers not list headers
 		SINGLETON_HEADER_NAMES.add(ProxyAuthenticateHeader.NAME);		
 		SINGLETON_HEADER_NAMES.add(ProxyAuthorizationHeader.NAME);
+		// Issue 2798 : Can't add a Authorization using SipServletMessage.addHeader
+		// those headers are singleton headers not list headers
+		SINGLETON_HEADER_NAMES.add(AuthorizationHeader.NAME);
 		// Same thing for Issue 2578 
 		SINGLETON_HEADER_NAMES.add(AuthenticationInfoHeader.NAME);
 	}	
@@ -429,8 +432,7 @@ public final class JainSipUtils {
 		LIST_HEADER_NAMES.add(AcceptHeader.NAME);
 		LIST_HEADER_NAMES.add(AlertInfoHeader.NAME);
 		LIST_HEADER_NAMES.add(AllowEventsHeader.NAME);
-		LIST_HEADER_NAMES.add(AllowHeader.NAME);		
-		LIST_HEADER_NAMES.add(AuthorizationHeader.NAME);
+		LIST_HEADER_NAMES.add(AllowHeader.NAME);				
 		LIST_HEADER_NAMES.add(CallInfoHeader.NAME);
 		LIST_HEADER_NAMES.add(ContactHeader.NAME);
 		LIST_HEADER_NAMES.add(ContentEncodingHeader.NAME);

@@ -347,8 +347,11 @@ public class ShootistSipServlet
 			if(authHeader != null) {
 				// test Issue 1547 : can't add a Proxy-Authorization using SipServletMessage.addHeader
 				// please note that addAuthHeader is not used here
-				sipServletRequest.addHeader("Proxy-Authorization", authHeader);
-				sipServletRequest.addHeader("Proxy-Authenticate", authHeader);
+				String headerToAdd = ce.getServletContext().getInitParameter("headerToAdd");				
+				sipServletRequest.addHeader(headerToAdd, authHeader);
+				if(headerToAdd.equals("Proxy-Authorization")) {
+					sipServletRequest.addHeader("Proxy-Authenticate", authHeader);
+				}
 			}
 			
 			String routeHeader = ce.getServletContext().getInitParameter("route");
