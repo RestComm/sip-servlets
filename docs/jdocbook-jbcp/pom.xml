@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip</groupId>
 		<artifactId>sip-servlets-docs</artifactId>
-		<version>1.6.0.FINAL</version>
+		<version>1.7.0-SNAPSHOT</version>
 	</parent>
 	
 	<artifactId>sip-servlets-docs-jdocbook-jbcp</artifactId>

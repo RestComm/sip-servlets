@@ -3,10 +3,10 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip</groupId>
 		<artifactId>sip-servlets-test-suite-parent</artifactId>
-		<version>1.6.0.FINAL</version>
+		<version>1.7.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>sip-servlets-test-suite</artifactId>
-  <version>1.6.0.FINAL</version>
+  <version>1.7.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Mobicents Sip Servlets Test Suite</name>
 	<dependencies>
@@ -27,22 +27,22 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-spec</artifactId>
-			<version>1.6.0.FINAL</version>
+			<version>1.7.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-impl</artifactId>
-			<version>1.6.0.FINAL</version>
+			<version>1.7.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-application-router</artifactId>
-			<version>1.6.0.FINAL</version>
+			<version>1.7.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-tomcat-jboss4</artifactId>
-			<version>1.6.0.FINAL</version>
+			<version>1.7.0-SNAPSHOT</version>
 		</dependency>
 		
 		<!-- j2ee dependencies -->

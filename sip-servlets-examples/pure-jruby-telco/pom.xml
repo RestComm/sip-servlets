@@ -5,14 +5,14 @@
 		</groupId>
 		<artifactId>sip-servlets-examples-parent
 		</artifactId>
-		<version>1.6.0.FINAL</version>
+		<version>1.7.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<groupId>org.mobicents.servlet.sip.example
 	</groupId>
 	<artifactId>pure-jruby-telco</artifactId>
 	<packaging>jar</packaging>
-	<version>1.6.0.FINAL</version>
+	<version>1.7.0-SNAPSHOT</version>
 	<name>JRuby Sip Servlet Demo Application</name>
 	<url>http://www.mobicents.org/mss-pure-jruby-telco.html
 	</url>
@@ -36,7 +36,7 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-spec</artifactId>
-			<version>1.6.0.FINAL</version>
+			<version>1.7.0-SNAPSHOT</version>
 		</dependency>	
 	</dependencies>
 
