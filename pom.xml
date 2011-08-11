@@ -3,11 +3,11 @@
 	<parent>
         	<artifactId>mobicents</artifactId>
         	<groupId>org.mobicents</groupId>
-        	<version>1.26-SNAPSHOT</version>
+        	<version>1.26</version>
     	</parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-bootstrap</artifactId>
-	<version>1.6.0-SNAPSHOT</version>
+	<version>1.6.0.FINAL</version>
 	<packaging>pom</packaging>	
 	<name>Mobicents Sip Servlets</name>
 	<url>http://www.mobicents.org/products_sip_servlets.html</url>
@@ -67,9 +67,9 @@
 		</license>
 	</licenses>
 	<scm>
-		<connection>scm:svn:https://mobicents.googlecode.com/svn/trunk/servers/sip-servlets</connection>
-		<developerConnection>scm:svn:https://mobicents.googlecode.com/svn/trunk/servers/sip-servlets</developerConnection>
-		<url>http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets</url>
+		<connection>scm:svn:https://mobicents.googlecode.com/svn/tags/servers/sip-servlets/release-1.6.0.FINAL</connection>
+		<developerConnection>scm:svn:https://mobicents.googlecode.com/svn/tags/servers/sip-servlets/release-1.6.0.FINAL</developerConnection>
+		<url>http://code.google.com/p/mobicents/source/browse/tags/servers/sip-servlets/release-1.6.0.FINAL</url>
 	</scm>
 	<modules>
 		<module>sip-servlets-bootstrap</module>
@@ -83,10 +83,10 @@
 	
 	<properties>
 		<mobicents.tools.mavenplugin.eclipse.version>1.0.0.FINAL</mobicents.tools.mavenplugin.eclipse.version>
-		<mobicents.cluster.version>1.11-SNAPSHOT</mobicents.cluster.version>
-		<mobicents.balancer.version>1.3-SNAPSHOT</mobicents.balancer.version>
-		<mobicents.jain.sip.ha.version>1.2.0-SNAPSHOT</mobicents.jain.sip.ha.version>
-		<mobicents.jain.sip.ext.version>1.0-SNAPSHOT</mobicents.jain.sip.ext.version>
+		<mobicents.cluster.version>1.11</mobicents.cluster.version>
+		<mobicents.balancer.version>1.4</mobicents.balancer.version>
+		<mobicents.jain.sip.ha.version>1.3.0</mobicents.jain.sip.ha.version>
+		<mobicents.jain.sip.ext.version>1.0</mobicents.jain.sip.ext.version>
 		<tomcat.version>6.0.32</tomcat.version>	
 	</properties>
 	

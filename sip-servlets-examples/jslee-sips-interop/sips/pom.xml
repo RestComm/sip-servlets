@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.example</groupId>
 		<artifactId>jslee-sips-interop-demo-parent</artifactId>
-		<version>1.6.0-SNAPSHOT</version>
+		<version>1.6.0.FINAL</version>
 	</parent>
 	<artifactId>jslee-sips-interop-demo-sips-parent</artifactId>
 	<packaging>pom</packaging>
