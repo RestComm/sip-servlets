@@ -31,7 +31,7 @@ Chat Server
  	
  	* Mobicents Sip Servlets 2.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/chatroom-servlet/2.0.0.ALPHA2/chatroom-servlet-2.0.0.ALPHA2.war}here}}.
 	
-	* Mobicents Sip Servlets 1.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/chatroom-servlet/1.5.0.FINAL/chatroom-servlet-1.5.0.FINAL.war}here}}.
+	* Mobicents Sip Servlets 1.X : {{{https://repository.jboss.org/nexus/content/groups/public/org/mobicents/servlet/sip/example/chatroom-servlet/1.6.0.FINAL/chatroom-servlet-1.6.0.FINAL.war}here}}.
 		
  	Drop the downloaded war file into your <<<tomcat_home/webapps>>> directory or <<<jboss_home/server/default/deploy>>> directory  
  	

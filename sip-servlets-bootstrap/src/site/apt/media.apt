@@ -1,11 +1,11 @@
 Media Support
 
-<This page is obsolete : More detailed and better looking installation instructions are available from the {{{http://ci.jboss.org/jenkins/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/sip-servlets/index.html#mipbx-Media_Support}Mobicents Sip Servlets User Guide}}>
+<This page is obsolete : More detailed and better looking installation instructions are available from the {{{http://ci.jboss.org/jenkins/view/Mobicents/job/Mobicents-Books/lastSuccessfulBuild/artifact/sip-servlets/index.html#mipbx-Media_Support}Mobicents Sip Servlets User Guide}}>
 
 * Description
 
 	Mobicents Sip Servlets is providing support for applications to setup media session 
-	through the {{{http://hudson.qa.jboss.com/hudson/job/MobicentsBooks/lastSuccessfulBuild/artifact/media/index.html}Mobicents Media Server}}.
+	through the {{{http://hudson.qa.jboss.com/hudson/job/Mobicents-Books/lastSuccessfulBuild/artifact/media/index.html}Mobicents Media Server}}.
 	
 	The Mobicents Media Server is an implementation of the 
 	{{{http://jcp.org/en/jsr/detail?id=309}JSR 309 specification}} 
