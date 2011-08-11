@@ -314,7 +314,7 @@
 		      <include name="**/mibgen*.jar"/>
 		    </fileset>
 		</copy>
-		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/snmp-adaptor">
+		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/snmp-adaptor/adaptor">
 			<arg line="clean install -P set-svn-revision -Dmaven.test.skip=true -Djboss.home=${mss.home} -Dnode=${node}" />
 		</exec>			
 		<echo>Building Mobicents SNMP Deployer</echo>
