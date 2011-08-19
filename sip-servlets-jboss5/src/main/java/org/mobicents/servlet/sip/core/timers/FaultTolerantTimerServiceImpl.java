@@ -240,13 +240,23 @@ public class FaultTolerantTimerServiceImpl implements ClusteredSipServletTimerSe
 			TimerServiceTaskData timerTaskData = (TimerServiceTaskData) getScheduler().getTimerTaskData(timerId);
 			
 			if(timerTaskData != null) {
+				// we recreate the task locally
+				PeriodicScheduleStrategy periodicScheduleStrategy = timerTaskData.getPeriodicScheduleStrategy();
 				if(logger.isDebugEnabled()) {
-					logger.debug("Timer Task " + timerId + " is not present locally, but on another node, cancelling the remote one and rescheduling it locally.");
+					logger.debug("Timer Task " + timerId + " is not present locally, but on another node, cancelling the remote one and rescheduling it locally with strategy " + periodicScheduleStrategy + ", delay " + timerTaskData.getDelay() + ", period " + timerTaskData.getPeriod());
 				}
 				// we cancel it, this will cause the remote owner node to remove it and cancel its local task
-				cancel(timerId);
-				// we recreate the task locally 
-				ServletTimerImpl servletTimerImpl = new ServletTimerImpl(timerTaskData.getData(), timerTaskData.getDelay(), sipApplicationSession.getSipContext().getListeners().getTimerListener(), sipApplicationSession);
+				cancel(timerId);				
+				boolean fixedDelay = false;
+				ServletTimerImpl servletTimerImpl = null;
+				if(periodicScheduleStrategy != null) {
+					if(periodicScheduleStrategy == PeriodicScheduleStrategy.withFixedDelay) {
+						fixedDelay = true;
+					}
+					servletTimerImpl = new ServletTimerImpl(timerTaskData.getData(), timerTaskData.getDelay(), fixedDelay, timerTaskData.getPeriod(), sipApplicationSession.getSipContext().getListeners().getTimerListener(), sipApplicationSession);
+				} else {
+					servletTimerImpl = new ServletTimerImpl(timerTaskData.getData(), timerTaskData.getDelay(), sipApplicationSession.getSipContext().getListeners().getTimerListener(), sipApplicationSession);
+				}
 				TimerServiceTask timerServiceTask = new TimerServiceTask(sipManager, servletTimerImpl, timerTaskData);
 				
 				// and reset its start time to the correct one

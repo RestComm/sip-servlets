@@ -118,6 +118,11 @@ if [ $# -eq 4 ]; then
 	            echo "Distributed example used is uac";
 	            ./sipp $MSS_IP:5080 -sf uac/receiver.xml -i $SIPP_IP -p 5090 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
+	    uac-register)
+				rm ./uac/*.log
+	            echo "Distributed example used is uac register";
+	            ./sipp $MSS_IP:5080 -sf uac/register-receiver.xml -i $SIPP_IP -p 5090 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
+	            ;;
 		c2c)
 				rm ./converged-click2call/*.log
 	            echo "Distributed example used is 3pcc";

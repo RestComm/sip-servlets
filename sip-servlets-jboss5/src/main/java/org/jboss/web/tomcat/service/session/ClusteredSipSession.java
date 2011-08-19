@@ -49,10 +49,12 @@ import javax.servlet.sip.SipSessionAttributeListener;
 import javax.servlet.sip.SipSessionBindingEvent;
 import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionEvent;
+import javax.servlet.sip.SipSession.State;
 import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
 import javax.sip.SipStack;
 import javax.sip.Transaction;
+import javax.sip.message.Request;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -103,6 +105,8 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 
 	private static final Logger logger = Logger.getLogger(ClusteredSipSession.class);
 
+	protected static final String SESSION_TX_REQUEST = "str";
+	protected static final String IS_SESSION_TX_REQUEST_SERVER = "istrs";
 	protected static final String B2B_SESSION_MAP = "b2bsm";
 	protected static final String B2B_SESSION_SIZE = "b2bss";
 	protected static final String B2B_LINKED_REQUESTS_MAP = "b2blrm";
@@ -906,6 +910,20 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			}
 			b2buaHelper.setSessionMap(sessionMap);
 		}
+		SipServletRequestImpl sessionRequest = (SipServletRequestImpl) metaData.get(SESSION_TX_REQUEST);
+		if(logger.isDebugEnabled()) {
+			logger.debug("session transaction creation request = " + sessionRequest);
+		}
+		if(sessionRequest != null) {
+			sessionCreatingTransactionRequest = sessionRequest;
+		}
+		Boolean isSessionStx = (Boolean) metaData.get(IS_SESSION_TX_REQUEST_SERVER);
+		if(logger.isDebugEnabled()) {
+			logger.debug("is session transaction creation server = " + isSessionStx);
+		}
+		if(isSessionStx != null) {
+			isSessionCreatingTransactionServer = isSessionCreatingTransactionServer;
+		}
 		if(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
 			Integer txsSize = (Integer) metaData.get(TXS_SIZE);
 			String[] txIds = (String[])metaData.get(TXS_IDS);
@@ -1044,7 +1062,12 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 					logger.debug("storing b2bua session array " + sessionArray);
 				}
 				metaData.put(B2B_SESSION_MAP, sessionArray);
-			}	
+			}
+			// http://code.google.com/p/mobicents/issues/detail?id=2799 since REGISTER always stays in INITIAL state there is a dedicated check
+			if(State.INITIAL.equals(state) && sessionCreatingDialog == null && sessionCreatingTransactionRequest != null && sessionCreatingTransactionRequest.getMethod().equalsIgnoreCase(Request.REGISTER)) {
+				metaData.put(SESSION_TX_REQUEST, sessionCreatingTransactionRequest);
+				metaData.put(IS_SESSION_TX_REQUEST_SERVER, isSessionCreatingTransactionServer);
+			}
 			if(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
 				final Set<Transaction> ongoingTransactions = getOngoingTransactions();
 				final int size = ongoingTransactions.size();

@@ -10,6 +10,11 @@
     	<param-name>send-on-init</param-name>
         <param-value>${send.on.init}</param-value>
   	</context-param>
+  	
+  	<context-param>
+    	<param-name>method</param-name>
+        <param-value>${sip.method}</param-value>
+  	</context-param>
 
 	<servlet>
 		<servlet-name>DistributableShootistSipServlet</servlet-name>

@@ -34,6 +34,7 @@ import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistrib
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.timers.PeriodicScheduleStrategy;
 import org.mobicents.timers.TimerTask;
 
 /**
@@ -60,7 +61,17 @@ public class TimerServiceTask extends TimerTask implements MobicentsServletTimer
 			if(sipApplicationSession != null) {
 				if(logger.isDebugEnabled()) {				
 					logger.debug("sip application session for key " + data.getKey() + " was found");
-				} 			
+				} 
+				PeriodicScheduleStrategy periodicScheduleStrategy = data.getPeriodicScheduleStrategy();
+				boolean fixedDelay = false;				
+				if(periodicScheduleStrategy != null) {
+					if(periodicScheduleStrategy == PeriodicScheduleStrategy.withFixedDelay) {
+						fixedDelay = true;
+					}
+					servletTimerImpl = new ServletTimerImpl(data.getData(), data.getDelay(), fixedDelay, data.getPeriod(), sipApplicationSession.getSipContext().getListeners().getTimerListener(), sipApplicationSession);
+				} else {
+					servletTimerImpl = new ServletTimerImpl(data.getData(), data.getDelay(), sipApplicationSession.getSipContext().getListeners().getTimerListener(), sipApplicationSession);
+				}
 				this.servletTimer = new ServletTimerImpl(data.getData(), data.getDelay(), sipApplicationSession.getSipContext().getListeners().getTimerListener(), sipApplicationSession);
 				if(logger.isDebugEnabled()) {				
 					logger.debug("ServletTimer recreated for TimerServiceTask " + data.getTaskID() + " with ServletTimerId " + servletTimer.getId());
@@ -87,6 +98,9 @@ public class TimerServiceTask extends TimerTask implements MobicentsServletTimer
 			servletTimer.setApplicationSession(sipManager.getSipApplicationSession(data.getKey(), false));
 		}
 		servletTimer.run();
+		if(servletTimer.getPeriod() > 0) {
+			data.setDelay(getTimeRemaining());
+		}
 	}
 
 	public void cancel() {

@@ -24,8 +24,10 @@ package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
@@ -33,18 +35,22 @@ import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
+import javax.servlet.sip.TimerListener;
+import javax.servlet.sip.TimerService;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 
 public class DistributableShootistSipServlet 
 		extends SipServlet 
-		implements SipServletListener {
+		implements SipServletListener, TimerListener {
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(DistributableShootistSipServlet.class);
 		
 	private static final String SENT = "Sent";
+	@Resource TimerService timerService;
 	
 	/** Creates a new instance of ShootistSipServlet */
 	public DistributableShootistSipServlet() {
@@ -92,26 +98,55 @@ public class DistributableShootistSipServlet
 	 */
 	public void servletInitialized(SipServletContextEvent ce) {
 		String sendOnInit = ce.getServletContext().getInitParameter("send-on-init");
+		String method = ce.getServletContext().getInitParameter("method");
 		logger.info("Send on Init : "+ sendOnInit);
 		if(sendOnInit == null || "true".equals(sendOnInit)) {
-			SipFactory sipFactory = (SipFactory)ce.getServletContext().getAttribute(SIP_FACTORY);
+			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			SipApplicationSession sipApplicationSession = sipFactory.createApplicationSession();
-			
-			URI fromURI = sipFactory.createSipURI("BigGuy", "here.com");
-			URI toURI = sipFactory.createSipURI("LittleGuy", "there.com");
-			SipServletRequest sipServletRequest = 
-				sipFactory.createRequest(sipApplicationSession, "INVITE", fromURI, toURI);
-			SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5090");
-			sipServletRequest.setRequestURI(requestURI);
-			
-			sipServletRequest.getSession().setAttribute("INVITE", SENT);
-			sipServletRequest.getApplicationSession().setAttribute("INVITE", SENT);
-			
-			try {			
-				sipServletRequest.send();
-			} catch (IOException e) {
-				logger.error(e);
-			}	
+			if(method.equalsIgnoreCase("INVITE")) {								
+				sendMessage(sipFactory.createApplicationSession(), method);				
+			} else {
+				timerService.createTimer(sipApplicationSession, 10000, 20000, true, true, method);
+			}
 		}
 	}
+
+	public void timeout(ServletTimer servletTimer) {
+		String method = (String) servletTimer.getInfo();
+		if(servletTimer.getApplicationSession().getAttribute(method) == null) {
+			sendMessage(servletTimer.getApplicationSession(), method);
+		} else {
+			if(servletTimer.getApplicationSession().getSessions().hasNext()) {
+				SipSession sipSession =(SipSession) servletTimer.getApplicationSession().getSessions().next();
+				try {
+					sipSession.createRequest(method).send();
+				} catch (IOException e) {
+					logger.error(e);
+				}
+			} else {
+				logger.error("Coldn't create a " + method + " request. No sip session available in sip application session " + servletTimer.getApplicationSession().getId());
+			}
+		}
+	}
+
+	private void sendMessage(SipApplicationSession sipApplicationSession, String method) {
+		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+		URI fromURI = sipFactory.createSipURI("BigGuy", "here.com");
+		URI toURI = sipFactory.createSipURI("LittleGuy", "there.com");
+		SipServletRequest sipServletRequest = 
+			sipFactory.createRequest(sipApplicationSession, method, fromURI, toURI);
+		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "127.0.0.1:5090");
+		sipServletRequest.setRequestURI(requestURI);
+		
+		sipServletRequest.getSession().setAttribute(method, SENT);
+		sipServletRequest.getApplicationSession().setAttribute(method, SENT);
+		
+		try {			
+			sipServletRequest.send();
+		} catch (IOException e) {
+			logger.error(e);
+		}	
+	}
+	
+	
 }

@@ -564,6 +564,32 @@ sleep 50
 
 sleep 10
 
+##################################
+# Test UAC REGISTER (should always be the last test or it may messed up the other tests) 
+##################################
+echo "Test UAC REGISTER"
+echo "================================"
+./auto-prepare-example.sh uac-register $config1 -Dsend.on.init=true
+./auto-prepare-example.sh uac-register $config2 -Dsend.on.init=false
+
+./auto-start-jboss-server.sh $config2 config2.pid 1 uac-register
+
+#Wait to boot
+sleep $HALFSTARTSLEEP
+
+./auto-start-jboss-server.sh $config1 config1.pid 0 uac-register
+
+# SIPp should be running by the time JBoss finishes the startup, hence we use half start time here.
+
+sleep 50
+./auto-run-test.sh uac-register result.txt $CALLS
+
+#Kill the app servers
+./auto-kill-process-tree.sh `cat config1.pid` $config1
+./auto-kill-process-tree.sh `cat config2.pid` $config2
+
+sleep 10
+
 
 
 ##################################

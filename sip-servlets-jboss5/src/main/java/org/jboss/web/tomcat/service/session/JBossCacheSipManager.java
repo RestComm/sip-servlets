@@ -49,6 +49,7 @@ import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSession.State;
 import javax.sip.SipStack;
+import javax.sip.message.Request;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -2177,9 +2178,11 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 				}
 
 				if (session.isValidInternal()
-						&& (session.isSessionDirty() || session.getMustReplicateTimestamp()) && 
+						&& (session.isSessionDirty() || session.getMustReplicateTimestamp()) &&
+								// http://code.google.com/p/mobicents/issues/detail?id=2799 since REGISTER always stays in INITIAL state there is a dedicated check
+								((State.INITIAL.equals(session.getState()) && session.getSessionCreatingDialog() == null && session.getSessionCreatingTransactionRequest() != null && session.getSessionCreatingTransactionRequest().getMethod().equalsIgnoreCase(Request.REGISTER)) ||
 								(State.CONFIRMED.equals(session.getState()) ||
-										(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy().equals(ReplicationStrategy.EarlyDialog) && State.EARLY.equals(session.getState())))) {
+										(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy().equals(ReplicationStrategy.EarlyDialog) && State.EARLY.equals(session.getState()))))) {
 					final String realId = session.getId();
 					if(logger.isDebugEnabled()) {
 						logger.debug("replicating following sip session " + session.getId());
