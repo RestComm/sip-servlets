@@ -57,6 +57,9 @@ import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.ProxyBranchListener;
 import org.mobicents.javax.servlet.sip.ProxyExt;
 import org.mobicents.javax.servlet.sip.ResponseType;
+import org.mobicents.javax.servlet.sip.SipFactoryExt;
+import org.mobicents.javax.servlet.sip.SipServletRequestExt;
+import org.mobicents.javax.servlet.sip.SipServletResponseExt;
 
 public class ProxySipServlet extends SipServlet implements SipErrorListener, ProxyBranchListener, SipSessionListener, SipApplicationSessionListener, TimerListener {
 	private static final String ERROR = "ERROR";
@@ -90,6 +93,17 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			IOException {
 
 		logger.info("Got request:\n" + request.getMethod());
+		SipServletRequestExt req = (SipServletRequestExt)request;
+		if(req.isOrphan()) return;
+		if(request.getFrom().toString().contains("proxy-orphan")) {
+			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+			SipFactoryExt sipFactoryExt = (SipFactoryExt) sipFactory;
+			sipFactoryExt.setRouteOrphanRequests(true);
+			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
+			request.getProxy().setRecordRoute(true);
+			request.getProxy().proxyTo(sipFactory.createURI("sip:a@127.0.0.1:5090;transport=udp"));
+			return;
+		}
 		if(request.getFrom().toString().contains("proxy-tcp")) {
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
@@ -303,6 +317,11 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			IOException {
 		SipURI fromURI = ((SipURI)request.getFrom().getURI());
 		String from = fromURI.toString();
+		if(request.getFrom().toString().contains("proxy-orphan")) {
+			request.getSession().invalidate();
+			request.getApplicationSession().invalidate();
+			return;
+		}
 		if(from.contains("unique-location-urn-route")) {
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();
@@ -322,6 +341,8 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		logger.info("Got BYE request:\n" + request);
 		SipURI fromURI = ((SipURI)request.getFrom().getURI());
 		String from = fromURI.toString();
+		SipServletRequestExt sipServletRequestExt = (SipServletRequestExt) request;
+		if(sipServletRequestExt.isOrphan()) return;
 		if(from.contains("unique-location-urn-route")) {
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();
@@ -361,6 +382,10 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 
 		logger.info("Got response: " + response);
 		logger.info("Sip Session is :" + response.getSession(false));
+		
+		SipServletResponseExt sipServletResponseExt = (SipServletResponseExt) response;
+		if(sipServletResponseExt.isOrphan()) return;
+		
 		if(!"PRACK".equals(response.getMethod()) && response.getProxy() != null && response.getProxy().getOriginalRequest() != null) {
 			logger.info("Original Sip Session is :" + response.getProxy().getOriginalRequest().getSession(false));
 		}

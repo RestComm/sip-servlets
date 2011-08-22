@@ -169,6 +169,47 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 		assertEquals(receiverCallIdHeader.getCallId(),senderCallIdHeader.getCallId());
 	}
 	
+	public void testCallForwardingCallerSendByeOrphan() throws Exception {
+		
+		senderProtocolObjects = new ProtocolObjects("forward-udp-sender",
+				"gov.nist", TRANSPORT_UDP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
+		receiverProtocolObjects = new ProtocolObjects("forward-udp-receiver",
+				"gov.nist", TRANSPORT_UDP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		sender.setRecordRoutingProxyTesting(true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "proxy-orphan";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "forward-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {UserAgentHeader.NAME, "extension-header"}, new String[] {"TestSipListener UA", "extension-sip-listener"}, addSipConnectorOnStartup);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getOkToByeReceived());
+		assertTrue(receiver.getByeReceived());
+		CallIdHeader receiverCallIdHeader = (CallIdHeader)receiver.getInviteRequest().getHeader(CallIdHeader.NAME);
+		CallIdHeader senderCallIdHeader = (CallIdHeader)sender.getInviteRequest().getHeader(CallIdHeader.NAME);
+		
+
+		assertEquals(receiverCallIdHeader.getCallId(),senderCallIdHeader.getCallId());
+
+	}
+	
 	public void testTCPCallForwardingCalleeSendByeTCPSender() throws Exception {
 		
 		senderProtocolObjects = new ProtocolObjects("forward-udp-sender",
