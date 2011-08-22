@@ -2176,13 +2176,15 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 							" getMustReplicateTimestamp " + session.getMustReplicateTimestamp() + 
 							" session state " + session.getState());
 				}
-
+				boolean isRegister = session.isValidInternal() && session.getSessionCreatingTransactionRequest().getMethod().equalsIgnoreCase(Request.REGISTER);
 				if (session.isValidInternal()
-						&& (session.isSessionDirty() || session.getMustReplicateTimestamp()) &&
+						&& (session.isSessionDirty() || session.getMustReplicateTimestamp() || isRegister) && // Again for REGISTER we ignore the session.isDirty for the second part of http://code.google.com/p/mobicents/issues/detail?id=2799
 								// http://code.google.com/p/mobicents/issues/detail?id=2799 since REGISTER always stays in INITIAL state there is a dedicated check
-								((State.INITIAL.equals(session.getState()) && session.getSessionCreatingDialog() == null && session.getSessionCreatingTransactionRequest() != null && session.getSessionCreatingTransactionRequest().getMethod().equalsIgnoreCase(Request.REGISTER)) ||
+								((State.INITIAL.equals(session.getState()) && session.getSessionCreatingDialog() == null
+										&& session.getSessionCreatingTransactionRequest() != null && isRegister) ||
 								(State.CONFIRMED.equals(session.getState()) ||
-										(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy().equals(ReplicationStrategy.EarlyDialog) && State.EARLY.equals(session.getState()))))) {
+										(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy().equals(ReplicationStrategy.EarlyDialog) 
+												&& State.EARLY.equals(session.getState()))))) {
 					final String realId = session.getId();
 					if(logger.isDebugEnabled()) {
 						logger.debug("replicating following sip session " + session.getId());

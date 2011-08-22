@@ -1295,7 +1295,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 			// we update the parent session for the REGISTER so that the CSeq is correctly increased
 			// if the session is stored
 			if(parentSession != null && Request.REGISTER.equals(originalMethod)) {
-				parentSession.setSessionCreatingTransactionRequest(message);
+				if(!parentSession.equals(this)) {
+					parentSession.setSessionCreatingTransactionRequest(message);
+				}
 			}
 		}
 	}
