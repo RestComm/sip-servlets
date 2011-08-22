@@ -29,6 +29,7 @@ import java.util.concurrent.ExecutorService;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
+import javax.servlet.sip.SipServletResponse;
 import javax.sip.ObjectInUseException;
 import javax.sip.ServerTransaction;
 import javax.sip.SipProvider;
@@ -50,6 +51,7 @@ import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.security.SipSecurityUtils;
 import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
 
 /**
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
@@ -212,6 +214,108 @@ public abstract class MessageDispatcher {
 				null);
 		sipApplicationSessionKey.setAppGeneratedKey(appGeneratedKey);
 		return sipApplicationSessionKey;
+	}
+	
+	public static void callServletForOrphanRequest(SipContext sipContext, SipServletRequestImpl request) throws DispatcherException, ServletException, IOException {
+		String servletHandler = sipContext.getServletHandler();		
+		//Fix for Issue 1200 : if we are not in a main-servlet servlet selection type, the mapping discovery should always be performed 
+		String mainServlet = servletHandler;
+		if(sipContext.isMainServlet() && mainServlet != null && mainServlet.length() > 0) {
+			servletHandler = mainServlet;				
+		} else {
+			SipServletMapping sipServletMapping = sipContext.findSipServletMappings(request);
+			if(sipServletMapping == null && sipContext.getSipRubyController() == null) {
+				logger.error("Sending 404 because no matching servlet found for this request ");
+				throw new DispatcherException(Response.NOT_FOUND);
+			} else if(sipServletMapping != null) {							
+				servletHandler = sipServletMapping.getServletName();
+				if(logger.isDebugEnabled()) {
+					logger.debug("servlet mapping Handler Name= " + servletHandler);
+				}
+			}
+		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("current request Handler " + servletHandler + " for orphan Request = " + request);
+		}
+		final Wrapper sipServletImpl = (Wrapper) sipContext.findChildrenByName(servletHandler);
+		if(sipServletImpl != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Dispatching orphan request " + request.toString() + 
+					" to servlet " + servletHandler);
+			}
+			final Servlet servlet = sipServletImpl.allocate();
+			// JBoss-specific CL issue:
+			// This is needed because usually the classloader here is some UnifiedClassLoader3,
+			// which has no idea where the servlet ENC is. We will use the classloader of the
+			// servlet class, which is the WebAppClassLoader, and has ENC fully loaded with
+			// with java:comp/env/security (manager, context etc)
+			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+			
+			try {
+				final ClassLoader cl = sipContext.getLoader().getClassLoader();
+				Thread.currentThread().setContextClassLoader(cl);
+				try {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Invoking instance " + servlet);
+					}
+					servlet.service(request, null);
+				} finally {								
+					sipServletImpl.deallocate(servlet);					
+				}
+			} finally {
+				Thread.currentThread().setContextClassLoader(oldClassLoader);
+			}
+		}
+	}
+	
+	public static void callServletForOrphanResponse(SipContext sipContext, SipServletResponse response) throws DispatcherException, ServletException, IOException {
+		String servletHandler = sipContext.getServletHandler();		
+		//Fix for Issue 1200 : if we are not in a main-servlet servlet selection type, the mapping discovery should always be performed 
+		String mainServlet = servletHandler;
+		
+		SipServletResponseImpl responseExt = (SipServletResponseImpl) response;
+		responseExt.setOrphan(true);
+		responseExt.setCurrentApplicationName(sipContext.getApplicationName());
+		if(sipContext.isMainServlet() && mainServlet != null && mainServlet.length() > 0) {
+			servletHandler = mainServlet;				
+		} else {
+			if(logger.isDebugEnabled()) {
+				logger.debug("servlet mapping Handler Name= " + servletHandler);
+			}
+
+		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("current request Handler " + servletHandler + " for orphan Request = " + response);
+		}
+		final Wrapper sipServletImpl = (Wrapper) sipContext.findChildrenByName(servletHandler);
+		if(sipServletImpl != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Dispatching orphan request " + response.toString() + 
+					" to servlet " + servletHandler);
+			}
+			final Servlet servlet = sipServletImpl.allocate();
+			// JBoss-specific CL issue:
+			// This is needed because usually the classloader here is some UnifiedClassLoader3,
+			// which has no idea where the servlet ENC is. We will use the classloader of the
+			// servlet class, which is the WebAppClassLoader, and has ENC fully loaded with
+			// with java:comp/env/security (manager, context etc)
+			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+			
+			try {
+				final ClassLoader cl = sipContext.getLoader().getClassLoader();
+				Thread.currentThread().setContextClassLoader(cl);
+				try {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Invoking instance " + servlet);
+					}
+					servlet.service(null, response);
+				} finally {								
+					sipServletImpl.deallocate(servlet);					
+				}
+			} finally {
+				Thread.currentThread().setContextClassLoader(oldClassLoader);
+			}
+		}
 	}
 	
 	public static void callServlet(SipServletRequestImpl request) throws ServletException, IOException {

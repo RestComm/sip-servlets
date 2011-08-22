@@ -101,6 +101,7 @@ public class SipFactoryImpl implements Externalizable {
 	private static final String LR_PARAM = "lr";
 
 	private boolean useLoadBalancer = false;
+	private boolean routeOrphanRequests = false;
 	private SipLoadBalancer loadBalancerToUse = null;
 	
 	public static class NamesComparator implements Comparator<String>, Serializable {		
@@ -877,5 +878,13 @@ public class SipFactoryImpl implements Externalizable {
 		if(useLoadBalancer) {
 			out.writeObject(loadBalancerToUse);
 		}
+	}
+	
+	public boolean isRouteOrphanRequests() {		
+		return routeOrphanRequests;
+	}
+	
+	public void setRouteOrphanRequests(boolean routeOrphanRequets) {
+		this.routeOrphanRequests = routeOrphanRequets;
 	}
 }
