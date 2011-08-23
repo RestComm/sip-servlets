@@ -67,7 +67,7 @@ public interface SipServletRequestExt extends SipServletRequest {
 	/**
 	 * This flag indicates that the sessions for this request has been lost. getSession and getApplicationSession() will return null 
 	 * and these request will just be proxied outside the container. This feature can only work for proxy applications with main-servlet
-	 * declarations.
+	 * declarations. This feature is enabled by the setRouteOrphanRequests method in SipFactoryExt.
 	 * 
 	 * @return
 	 */
@@ -76,7 +76,7 @@ public interface SipServletRequestExt extends SipServletRequest {
 	/**
 	 * This flag indicates that the sessions for this request has been lost. getSession and getApplicationSession() will return null 
 	 * and these request will just be proxied outside the container. This feature can only work for proxy applications with main-servlet
-	 * declarations.
+	 * declarations. This feature is enabled by the setRouteOrphanRequests method in SipFactoryExt.
 	 * 
 	 * @return
 	 */

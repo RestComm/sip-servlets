@@ -26,7 +26,7 @@ import javax.servlet.sip.SipServletResponse;
 
 
 /**
- * Interface Extension that adds extra features to the JSR 289 SipServetRequest interface.</br>
+ * Interface Extension that adds extra features to the JSR 289 SipServetResponse interface.</br>
  * It adds the following capabilities : 
  * 
  * <ul> 		
@@ -43,7 +43,7 @@ public interface SipServletResponseExt extends SipServletResponse {
 	/**
 	 * This flag indicates that the sessions for this request has been lost. getSession and getApplicationSession() will return null 
 	 * and these request will just be proxied outside the container. This feature can only work for proxy applications with main-servlet
-	 * declarations.
+	 * declarations. This feature is enabled by the setRouteOrphanRequests method in SipFactoryExt.
 	 * 
 	 * @return
 	 */
@@ -52,7 +52,7 @@ public interface SipServletResponseExt extends SipServletResponse {
 	/**
 	 * This flag indicates that the sessions for this request has been lost. getSession and getApplicationSession() will return null 
 	 * and these request will just be proxied outside the container. This feature can only work for proxy applications with main-servlet
-	 * declarations.
+	 * declarations. This feature is enabled by the setRouteOrphanRequests method in SipFactoryExt.
 	 * 
 	 * @return
 	 */

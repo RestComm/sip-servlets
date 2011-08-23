@@ -24,16 +24,33 @@ package org.mobicents.javax.servlet.sip;
 import javax.servlet.sip.SipFactory;
 
 /**
- * Interface Extension that adds extra features to the JSR 289 SipServetRequest interface.</br>
+ * Interface Extension that adds extra features to the JSR 289 SipFactory interface to allow proxying of orphaned requests.</br>
  * It adds the following capabilities : 
  * 
  * <ul> 		
- * 		<li>
- * 			
- * 		</li> 		
+ * 		<li>Requests and responses that do NOT have associated SipSession or SipApplicationSession will still be delivered to the main servlet of the application this factory belongs to. Such requests and responses are called "orphaned".</li> 	
+ *      <li>The requests and responses will be proxied outside the container to their regular destination after being delivered to the application</li>
+ *      <li>When orphaned requests or responses are delivered to the application you can check this with SipServletRequest.isOrhpan() and SipServletResponse.isOrphan()</li>	
+ * 		<li>The sessions for these requests are lost and getSession() methods may return null except for reINVITE requests when brand new sessions will be created</li>
+ * </ul>
+ * 
+ * You can turn on and off this feature on demand from your application at any time.
+ * 
+ * This feature is useful for stateless applications that don't want the memory overhead of
+ * sessions and dialogs. Inherently when there are no sessions there is no need for session
+ * replication in clusters. You can start a session in the first stage of the call (INVITE-OK-ACK)
+ * then invalidate the session and the subsequent requests will still be proxied to the correct
+ * destination while you application is still on the path and notified of the messages.
+ * 
+ * Good use cases for this feature are:
+ * <ul>
+ * <li>Long calls proxied through the server that are being accounted in a remote database instead of sessions</li>
+ * <li>Proxy applications that must scale linearly in a cluster of Sip Servlets Application Servers</li>
  * </ul>
  * 
  * @author jean.deruelle@gmail.com
+ * @author vladimir.ralev@gmail.com
+ * 
  * @since 1.6
  */
 public interface SipFactoryExt extends SipFactory {
