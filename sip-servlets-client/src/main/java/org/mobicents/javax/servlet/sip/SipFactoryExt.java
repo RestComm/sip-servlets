@@ -48,6 +48,7 @@ import javax.servlet.sip.SipFactory;
  * <li>Proxy applications that must scale linearly in a cluster of Sip Servlets Application Servers</li>
  * </ul>
  * 
+ * 
  * @author jean.deruelle@gmail.com
  * @author vladimir.ralev@gmail.com
  * 
@@ -56,12 +57,14 @@ import javax.servlet.sip.SipFactory;
 public interface SipFactoryExt extends SipFactory {
 	/**
 	 * This flag specifies if the current application can receive subsequent requests after their session has been lost or invalidated.
+	 * This feature can't be used with chained applications. Only single application can be on the path of the requests.
 	 * @return
 	 */
 	boolean isRouteOrphanRequests();
 	
 	/**
 	 * This flag specifies if the current application can receive subsequent requests after their session has been lost or invalidated.
+	 * This feature can't be used with chained applications. Only single application can be on the path of the requests.
 	 * @return
 	 */
 	void setRouteOrphanRequests(boolean routeOrphanRequets);
