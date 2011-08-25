@@ -238,9 +238,12 @@ public class ResponseDispatcher extends MessageDispatcher {
 				if(sipFactoryImpl.isRouteOrphanRequests()) {
 					try {
 						response.removeFirst(ViaHeader.NAME);
-						callServletForOrphanResponse(sipContext, new SipServletResponseImpl(response, sipFactoryImpl, null, null, dialog, true, false));
-						//sipProvider.sendResponse(response);
 						SIPServerTransaction stx = (SIPServerTransaction) ((SIPTransactionStack)sipProvider.getSipStack()).findTransaction((SIPMessage) response, true);
+
+						SipServletRequestImpl request = new SipServletRequestImpl(stx.getRequest(), sipFactoryImpl, null, null, null, false);
+						SipServletResponseImpl orphanResponse = new SipServletResponseImpl(response, sipFactoryImpl, null, null, dialog, true, false);
+						orphanResponse.setOriginalRequest(request);
+						callServletForOrphanResponse(sipContext, orphanResponse);
 						stx.sendMessage((SIPMessage) response);
 					} catch (Exception e) {
 						logger.error("Problem routing orphaned response", e);

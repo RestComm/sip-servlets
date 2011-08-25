@@ -557,7 +557,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		if(sessionKey != null) {
 			applicationName = sessionKey.getApplicationName();
 		}
-		if(applicationName != null) {
+		if(applicationName != null && sessionKey != null) {
 			final SipContext sipContext = sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(applicationName);
 			//call id not needed anymore since the sipappsessionkey is not a callid anymore but a random uuid
 			final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
