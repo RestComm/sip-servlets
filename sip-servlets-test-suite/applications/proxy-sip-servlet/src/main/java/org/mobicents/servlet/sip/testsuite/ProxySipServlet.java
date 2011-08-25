@@ -337,7 +337,10 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 	 */
 	protected void doBye(SipServletRequest request) throws ServletException,
 			IOException {
-
+		if(fail) {
+			request.createResponse(500).send();
+			throw new ServletException("Failed because of double response");
+		}
 		logger.info("Got BYE request:\n" + request);
 		SipURI fromURI = ((SipURI)request.getFrom().getURI());
 		String from = fromURI.toString();
@@ -373,12 +376,28 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			request.getApplicationSession().setExpires(1);
 		}
 	}
+	
+	long lastOKstamp=0;
+	SipServletResponse oldResp;
+	boolean fail;
 
 	/**
 	 * {@inheritDoc}
 	 */
 	protected void doResponse(SipServletResponse response)
 			throws ServletException, IOException {
+		long delta = Math.abs(System.currentTimeMillis() - lastOKstamp);
+		if(response.getStatus() == 200) {
+			new Exception().printStackTrace();
+			if(delta<20) {
+				fail = true;
+				throw new ServletException("Problem with double response delta=" + delta + "\n1:" + oldResp + "\n2:"
+						+ response);
+				// This means we receive two responses within 20ms which can't be a retransmission but an indication of a bug delivering responses twice http://code.google.com/p/mobicents/issues/detail?id=2821
+			}
+			lastOKstamp = System.currentTimeMillis();
+			oldResp = response;
+		}
 
 		logger.info("Got response: " + response);
 		logger.info("Sip Session is :" + response.getSession(false));
