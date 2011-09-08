@@ -163,11 +163,11 @@ public class SipSecurityUtils {
 						// If yes, see if the current user is in a role compatible with the
 						// required roles for the resource.
 						if(authenticate(request, sipConstraint)) {
-							GenericPrincipal principal = (GenericPrincipal) request.getUserPrincipal();
+							CatalinaSipPrincipal principal = (CatalinaSipPrincipal) request.getUserPrincipal();
 							if(principal == null) return false;
 							
 							for(String assignedRole:constraint.findAuthRoles()) {
-								if(principal.hasRole(assignedRole)) {
+								if(principal.isUserInRole(assignedRole)) {
 									constraintSatisfied = true;
 									break;
 								}

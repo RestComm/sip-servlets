@@ -36,6 +36,7 @@ import org.apache.tomcat.util.digester.RuleSetBase;
 import org.mobicents.servlet.sip.catalina.rules.MatchingRuleParser;
 import org.mobicents.servlet.sip.core.descriptor.MatchingRule;
 import org.mobicents.servlet.sip.core.descriptor.MobicentsSipServletMapping;
+import org.mobicents.servlet.sip.core.security.MobicentsSipLoginConfig;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -262,14 +263,14 @@ public class SipRuleSet extends RuleSetBase {
                                "setScope", 0);        
         //Handles Security Constraint
         digester.addObjectCreate(prefix + "sip-app/security-constraint",
-                                 "org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint");
+                                 SipSecurityConstraint.class.getName());
         digester.addSetNext(prefix + "sip-app/security-constraint",
                             "addConstraint");
 //                            "org.apache.catalina.deploy.SecurityConstraint");
         digester.addCallMethod(prefix + "sip-app/security-constraint/display-name",
                 "setDisplayName", 0);
         digester.addObjectCreate(prefix + "sip-app/security-constraint/resource-collection",
-        		"org.mobicents.servlet.sip.startup.loading.SipSecurityCollection");
+        		SipSecurityCollection.class.getName());
 		digester.addSetNext(prefix + "sip-app/security-constraint/resource-collection",
 				"addCollection");
 //		   		"org.apache.catalina.deploy.SecurityCollection");
@@ -299,10 +300,9 @@ public class SipRuleSet extends RuleSetBase {
         digester.addRule(prefix + "sip-app/login-config",
                          loginConfig);
         digester.addObjectCreate(prefix + "sip-app/login-config",
-                                 "org.mobicents.servlet.sip.startup.loading.SipLoginConfig");
+        		SipLoginConfig.class.getName());
         digester.addSetNext(prefix + "sip-app/login-config",
-                            "setSipLoginConfig");
-//                            "org.apache.catalina.deploy.LoginConfig");
+                            "setSipLoginConfig", MobicentsSipLoginConfig.class.getName());
         digester.addCallMethod(prefix + "sip-app/login-config/auth-method",
                                "setAuthMethod", 0);
         digester.addCallMethod(prefix + "sip-app/login-config/realm-name",
