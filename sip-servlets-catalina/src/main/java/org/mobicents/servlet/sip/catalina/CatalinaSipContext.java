@@ -23,7 +23,6 @@
 package org.mobicents.servlet.sip.catalina;
 
 import org.apache.AnnotationProcessor;
-import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.mobicents.servlet.sip.core.SipContext;
 

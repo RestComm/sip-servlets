@@ -11,7 +11,7 @@
 	<name>Mobicents Sip Servlets Catalina Abstract Layer</name>
 	<url>http://www.mobicents.org/products_sip_servlets.html</url>
 	<dependencies>
-		<!-- sip servlet spec dependency -->
+		<!-- sip servlets dependency -->
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-spec</artifactId>
@@ -19,8 +19,26 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
+			<artifactId>sip-servlets-impl</artifactId>
+			<version>1.7.0-SNAPSHOT</version>			
+		</dependency>
+		<dependency>
+			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-core-api</artifactId>
 			<version>1.7.0-SNAPSHOT</version>			
+		</dependency>
+		<dependency>
+			<groupId>javax.sip</groupId>
+			<artifactId>jain-sip-api</artifactId>
+			<version>${jain-sip-api.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.sip</groupId>
+			<artifactId>jain-sip-ri</artifactId>
+			<version>${jain-sip-ri.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<!-- logging dependency -->
 		<dependency>
@@ -42,6 +60,26 @@
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>coyote</artifactId>
 			<version>${tomcat.version}</version>
+			<scope>provided</scope>
+		</dependency>	
+<!-- mobicents sip stack extensions deps -->
+		<dependency>			
+			<groupId>org.mobicents.ha.javax.sip</groupId>
+			<artifactId>mobicents-jain-sip-ha-core</artifactId>
+			<version>${mobicents.jain.sip.ha.version}</version>	
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>			
+			<groupId>org.mobicents.javax.sip</groupId>
+			<artifactId>mobicents-jain-sip-ext</artifactId>
+			<version>${mobicents.jain.sip.ext.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>net.java.stun4j</groupId>
+			<artifactId>stun4j</artifactId>
+			<version>1.0.MOBICENTS</version>
 			<scope>provided</scope>
 		</dependency>	
 	</dependencies>
