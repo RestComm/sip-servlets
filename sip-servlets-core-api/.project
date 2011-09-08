@@ -1,0 +1,16 @@
+<projectDescription>
+  <name>sip-servlets-core-api</name>
+  <comment>Mobicents :: Parent pom for 1.x releases. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
+  <projects>
+    <project>sip-servlets-client</project>
+    <project>sip-servlets-spec</project>
+  </projects>
+  <buildSpec>
+    <buildCommand>
+      <name>org.eclipse.jdt.core.javabuilder</name>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+  </natures>
+</projectDescription>
