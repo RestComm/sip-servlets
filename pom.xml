@@ -76,6 +76,7 @@
 		<module>sip-servlets-spec</module>
 		<module>sip-servlets-client</module>		
 		<module>sip-servlets-jruby</module>
+		<module>sip-servlets-core-api</module>
 		<module>sip-servlets-impl</module>
 		<module>sip-servlets-application-router</module>
 		<module>sip-servlets-annotations</module>		
@@ -190,6 +191,7 @@
 		<profile>			
 			<id>release</id>
 			<modules>
+				<module>sip-servlets-catalina</module>				
 				<module>sip-servlets-tomcat-jboss4</module>
 				<module>sip-servlets-jboss5-metadata</module>
 				<module>sip-servlets-jruby</module>
@@ -210,19 +212,22 @@
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>			
-			<modules>				
+			<modules>		
+				<module>sip-servlets-catalina</module>						
 				<module>sip-servlets-tomcat-jboss4</module>				
 			</modules>			
 		</profile>
 		<profile>			
 			<id>jboss</id>
 			<modules>				
+				<module>sip-servlets-catalina</module>				
 				<module>sip-servlets-tomcat-jboss4</module>				
 			</modules>			
 		</profile>
 		<profile>			
 			<id>jboss-5</id>			
 			<modules>		
+				<module>sip-servlets-catalina</module>				
 				<module>sip-servlets-jboss5-metadata</module>	
 				<module>sip-servlets-jboss5-deployer</module>					
 				<module>sip-servlets-jboss5-ha-server-cache</module>
@@ -232,18 +237,21 @@
 		<profile>			
 			<id>tomcat-distro</id>			
 			<modules>				
+				<module>sip-servlets-catalina</module>				
 				<module>sip-servlets-tomcat-jboss4</module>				
 			</modules>			
 		</profile>
 		<profile>			
 			<id>jboss-distro</id>
-			<modules>				
+			<modules>		
+				<module>sip-servlets-catalina</module>						
 				<module>sip-servlets-tomcat-jboss4</module>				
 			</modules>			
 		</profile>
 		<profile>			
 			<id>jboss-5-distro</id>			
 			<modules>
+				<module>sip-servlets-catalina</module>				
 				<module>sip-servlets-jboss5-metadata</module>	
 				<module>sip-servlets-jboss5-deployer</module>					
 				<module>sip-servlets-jboss5-ha-server-cache</module>
@@ -272,39 +280,6 @@
 		    <enabled>true</enabled>
 		    <updatePolicy>never</updatePolicy>
 		  </snapshots>
-		</repository>
-		<repository>			
-			<id>JbossRepository</id>
-			<name>Jboss Repository</name>
-			<url>http://repository.jboss.org/maven2</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository>
-		<repository>
-            <id>backup.repository.jboss.org</id>
-            <name>JBoss Repository Backup</name>
-            <url>http://anonsvn.jboss.org/repos/repository.jboss.org/maven2/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-        </repository>
-		<repository>
-			<id>jboss-snapshots</id>
-			<name>JBoss Snapshot Repository</name>
-			<url>http://snapshots.jboss.org/maven2</url>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
+		</repository>		
 	</repositories>
 </project>
