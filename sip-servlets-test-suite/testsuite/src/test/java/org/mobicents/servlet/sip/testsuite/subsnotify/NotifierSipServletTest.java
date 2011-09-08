@@ -34,7 +34,7 @@ import javax.sip.message.Request;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
-import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.catalina.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
@@ -110,6 +110,44 @@ public class NotifierSipServletTest extends SipServletTestCase {
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();			
 		
+		senderProvider.addSipListener(sender);
+		
+		senderProtocolObjects.start();
+		
+		deployApplication();
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest(Request.SUBSCRIBE, fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertEquals(3, sender.getAllSubscriptionState().size());
+		for (String subscriptionState : SUBSCRIPTION_STATES) {
+			assertTrue(subscriptionState + " not present",sender.getAllSubscriptionState().contains(subscriptionState));	
+		}				
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getAllMessagesContent().size() >= 1);
+		assertTrue("session not invalidated after receiving Terminated Subscription State", sender.getAllMessagesContent().contains(SESSION_INVALIDATED));		
+	}
+	
+	/*
+	 * Test the fact that a sip servlet receive SUBSCRIBEs and sends NOTIFYs in response. 
+	 * Check that everything works correctly included the Sip Session Termination upon sending a NOTIFY
+	 * containing Subscription State of Terminated.
+	 */
+	public void testNotify408() throws Exception {
+		senderProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		SipProvider senderProvider = sender.createProvider();			
+		sender.setFinalResponseToSend(408);
 		senderProvider.addSipListener(sender);
 		
 		senderProtocolObjects.start();

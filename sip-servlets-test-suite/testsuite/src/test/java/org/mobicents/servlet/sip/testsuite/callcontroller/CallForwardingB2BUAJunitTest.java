@@ -34,10 +34,10 @@ import javax.sip.message.Request;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
-import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.catalina.SipStandardManager;
+import org.mobicents.servlet.sip.catalina.SipStandardService;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
-import org.mobicents.servlet.sip.startup.SipStandardService;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 

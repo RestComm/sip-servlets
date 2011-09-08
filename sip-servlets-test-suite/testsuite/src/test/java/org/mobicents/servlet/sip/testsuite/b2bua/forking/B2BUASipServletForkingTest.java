@@ -31,10 +31,10 @@ import javax.sip.SipProvider;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
-import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.catalina.SipStandardManager;
+import org.mobicents.servlet.sip.catalina.SipStandardService;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
-import org.mobicents.servlet.sip.startup.SipStandardService;
 import org.mobicents.servlet.sip.testsuite.proxy.Shootist;
 import org.mobicents.servlet.sip.testsuite.simple.forking.Proxy;
 import org.mobicents.servlet.sip.testsuite.simple.forking.Shootme;
@@ -147,7 +147,7 @@ public class B2BUASipServletForkingTest extends SipServletTestCase {
 		assertTrue(shootme1.checkBye());
 		assertTrue(shootme2.isAckSeen());
 		assertTrue(shootme2.checkBye());	
-		assertEquals(0, sipContext.getSipManager().getActiveSessions());
+		assertEquals(0, sipContext.getSipManager().getActiveSipSessions());
 		assertEquals(0, sipContext.getSipManager().getActiveSipApplicationSessions());
 		
 	}

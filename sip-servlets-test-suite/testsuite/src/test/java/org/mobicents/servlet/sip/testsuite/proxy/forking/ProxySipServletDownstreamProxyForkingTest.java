@@ -31,10 +31,10 @@ import javax.sip.SipProvider;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
-import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.catalina.SipStandardManager;
+import org.mobicents.servlet.sip.catalina.SipStandardService;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
-import org.mobicents.servlet.sip.startup.SipStandardService;
 import org.mobicents.servlet.sip.testsuite.proxy.Shootist;
 import org.mobicents.servlet.sip.testsuite.simple.forking.Proxy;
 import org.mobicents.servlet.sip.testsuite.simple.forking.Shootme;
@@ -121,7 +121,7 @@ public class ProxySipServletDownstreamProxyForkingTest extends SipServletTestCas
 	// non regression test for Issue 2390 http://code.google.com/p/mobicents/issues/detail?id=2390
 	// Proxy implementation not forwarding additional 2xx responses from downstream fork
 	public void testDownstreamProxyForking() throws Exception {		
-        Shootme shootme1 = new Shootme(5080, true, 1500);
+        Shootme shootme1 = new Shootme(5080, true, 1000);
         SipProvider shootmeProvider = shootme1.createProvider();
         shootmeProvider.addSipListener(shootme1);
         Shootme shootme2 = new Shootme(5081, true, 2500);
@@ -166,7 +166,7 @@ public class ProxySipServletDownstreamProxyForkingTest extends SipServletTestCas
 		sipStackProperties.setProperty("gov.nist.javax.sip.DELIVER_UNSOLICITED_NOTIFY", "true");
 		sipStackProperties.setProperty("gov.nist.javax.sip.THREAD_POOL_SIZE", "64");
 		sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER", "true");
-		sipStackProperties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "5");
+		sipStackProperties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "10");
 		sipStackProperties.setProperty(SipStandardService.LOOSE_DIALOG_VALIDATION, "true");
 		sipStackProperties.setProperty(SipStandardService.PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");
 		return sipStackProperties;

@@ -23,7 +23,7 @@
 package org.mobicents.servlet.sip.testsuite.proxy;
 
 import org.mobicents.servlet.sip.SipServletTestCase;
-import org.mobicents.servlet.sip.startup.SipStandardService;
+import org.mobicents.servlet.sip.catalina.SipStandardService;
 
 public class SequentialProxyTest extends SipServletTestCase {
 

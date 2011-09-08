@@ -48,14 +48,14 @@ import org.apache.coyote.http11.Http11Protocol;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.apache.tomcat.util.IntrospectionUtils;
+import org.mobicents.servlet.sip.catalina.SipHostConfig;
+import org.mobicents.servlet.sip.catalina.SipProtocolHandler;
+import org.mobicents.servlet.sip.catalina.SipStandardEngine;
+import org.mobicents.servlet.sip.catalina.SipStandardManager;
+import org.mobicents.servlet.sip.catalina.SipStandardService;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
-import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
-import org.mobicents.servlet.sip.startup.SipHostConfig;
-import org.mobicents.servlet.sip.startup.SipProtocolHandler;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
-import org.mobicents.servlet.sip.startup.SipStandardEngine;
-import org.mobicents.servlet.sip.startup.SipStandardService;
 
 /**
  * This class is emulating an embedded tomcat configured with sip servlets extension

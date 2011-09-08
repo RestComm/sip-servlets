@@ -33,7 +33,7 @@ import org.cafesip.sipunit.SipCall;
 import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
 import org.mobicents.servlet.sip.SipServletTestCase;
-import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.catalina.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
 

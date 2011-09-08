@@ -89,7 +89,6 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
 
 /**
  * This class is a UAC template. Shootist is the guy that shoots and shootme is
@@ -335,6 +334,8 @@ public class TestSipListener implements SipListener {
 	private Request updateRequest;
 	
 	private Request infoRequest;
+	
+	private boolean addRecordRouteForResponses;
 	
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -1256,6 +1257,12 @@ public class TestSipListener implements SipListener {
 								+ ">");
 						contactHeader = protocolObjects.headerFactory.createContactHeader(address);
 						response.addHeader(contactHeader);
+						if(isAddRecordRouteForResponses()) {
+							address = protocolObjects.addressFactory
+							.createAddress("sip:127.0.0.1:" + myPort +";transport="+protocolObjects.transport);
+							RecordRouteHeader recordRouteHeader = protocolObjects.headerFactory.createRecordRouteHeader(address);
+							response.addHeader(recordRouteHeader);
+						}
 						dialog.sendReliableProvisionalResponse(response);							
 						break;
 					}  else {
@@ -1267,8 +1274,15 @@ public class TestSipListener implements SipListener {
 						.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + myPort
 								+";transport="+protocolObjects.transport
 								+ ">");
-						contactHeader = protocolObjects.headerFactory.createContactHeader(address);
+						contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
 						response.addHeader(contactHeader);
+						if(isAddRecordRouteForResponses()) {
+							address = protocolObjects.addressFactory
+							.createAddress("sip:127.0.0.1:" + myPort +";transport="+protocolObjects.transport);
+							RecordRouteHeader recordRouteHeader = protocolObjects.headerFactory.createRecordRouteHeader(address);
+							response.addHeader(recordRouteHeader);
+						}
+						
 						st.sendResponse(response);
 					}					
 				}
@@ -1336,6 +1350,12 @@ public class TestSipListener implements SipListener {
 					toHeader.setTag(TO_TAG); // Application is supposed to set.
 				}
 				getFinalResponse().addHeader(contactHeader);
+				if(isAddRecordRouteForResponses()) {
+					address = protocolObjects.addressFactory
+					.createAddress("sip:127.0.0.1:" + myPort +";transport="+protocolObjects.transport);
+					RecordRouteHeader recordRouteHeader = protocolObjects.headerFactory.createRecordRouteHeader(address);
+					response.addHeader(recordRouteHeader);
+				}
 				if(!sendReliably) {					
 					Thread.sleep(waitBeforeFinalResponse);
 					logger.debug("sending back response " + response);
@@ -1845,7 +1865,7 @@ public class TestSipListener implements SipListener {
 				logger.error("Cannot get a new transaction for the request " + requestauth,e);
 				throw new IllegalArgumentException("Cannot get a new transaction for the request " + requestauth,e);
 			}
-			AuthorizationHeader authorization = DigestAuthenticator.getAuthorizationHeader(
+			AuthorizationHeader authorization = new org.mobicents.servlet.sip.catalina.security.authentication.DigestAuthenticator(protocolObjects.headerFactory).getAuthorizationHeader(
 					((CSeqHeader) response
 							.getHeader(CSeqHeader.NAME)).getMethod(),
 							uriReq.toString(),
@@ -3201,5 +3221,19 @@ public class TestSipListener implements SipListener {
 
 	public Request getInfoRequest() {
 		return infoRequest;
+	}
+
+	/**
+	 * @param addRecordRouteForResponses the addRecordRouteForResponses to set
+	 */
+	public void setAddRecordRouteForResponses(boolean addRecordRouteForResponses) {
+		this.addRecordRouteForResponses = addRecordRouteForResponses;
+	}
+
+	/**
+	 * @return the addRecordRouteForResponses
+	 */
+	public boolean isAddRecordRouteForResponses() {
+		return addRecordRouteForResponses;
 	}
 }

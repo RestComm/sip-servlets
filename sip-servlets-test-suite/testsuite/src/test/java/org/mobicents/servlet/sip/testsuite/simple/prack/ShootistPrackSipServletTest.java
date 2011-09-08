@@ -29,7 +29,7 @@ import javax.sip.SipProvider;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
-import org.mobicents.servlet.sip.core.session.SipStandardManager;
+import org.mobicents.servlet.sip.catalina.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
@@ -108,6 +108,25 @@ public class ShootistPrackSipServletTest extends SipServletTestCase {
 		applicationParameter = new ApplicationParameter();
 		applicationParameter.setName("cancel");
 		applicationParameter.setValue("true");
+		context.addApplicationParameter(applicationParameter);
+		assertTrue(tomcat.deployContext(context));
+		return context;
+	}
+	
+	public SipStandardContext deployApplicationPrackRoute() {
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp");
+		context.setName("sip-test-context");
+		context.setPath("sip-test");
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		ApplicationParameter applicationParameter = new ApplicationParameter();
+		applicationParameter.setName("prack");
+		applicationParameter.setValue("true");
+		context.addApplicationParameter(applicationParameter);
+		applicationParameter = new ApplicationParameter();
+		applicationParameter.setName("route");
+		applicationParameter.setValue("sip:127.0.0.1:5080");
 		context.addApplicationParameter(applicationParameter);
 		assertTrue(tomcat.deployContext(context));
 		return context;
@@ -221,12 +240,27 @@ public class ShootistPrackSipServletTest extends SipServletTestCase {
 					
 		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, true);
 		SipProvider senderProvider = receiver.createProvider();			
-		
 		senderProvider.addSipListener(receiver);
-		
 		receiverProtocolObjects.start();
 		tomcat.startTomcat();
 		deployApplicationPrack();
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getOkToByeReceived());		
+	}
+	
+	public void testShootistPrackCallerTestRoute() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, true);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		receiver.setAddRecordRouteForResponses(true);
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		deployApplicationPrackRoute();
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getOkToByeReceived());		
 	}

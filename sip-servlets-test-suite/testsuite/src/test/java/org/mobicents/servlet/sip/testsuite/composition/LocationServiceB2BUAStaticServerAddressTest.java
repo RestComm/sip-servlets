@@ -22,10 +22,10 @@
 
 package org.mobicents.servlet.sip.testsuite.composition;
 
-import java.io.File;
-
 import gov.nist.javax.sip.header.Contact;
 import gov.nist.javax.sip.header.Via;
+
+import java.io.File;
 
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
@@ -34,7 +34,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.UDPPacketForwarder;
-import org.mobicents.servlet.sip.startup.SipProtocolHandler;
+import org.mobicents.servlet.sip.catalina.SipProtocolHandler;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 

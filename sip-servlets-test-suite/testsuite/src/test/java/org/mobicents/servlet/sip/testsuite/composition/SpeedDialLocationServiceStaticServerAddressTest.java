@@ -33,7 +33,7 @@ import org.apache.catalina.connector.Connector;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.UDPPacketForwarder;
-import org.mobicents.servlet.sip.startup.SipProtocolHandler;
+import org.mobicents.servlet.sip.catalina.SipProtocolHandler;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
