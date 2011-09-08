@@ -109,7 +109,7 @@ import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
-import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
+import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
@@ -507,7 +507,7 @@ public final class JainSipUtils {
 	 */
 	public static ViaHeader createViaHeader(
 			SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String branch, String outboundInterface) {		
-		ExtendedListeningPoint listeningPoint = null;
+		MobicentsExtendedListeningPoint listeningPoint = null;
 		if(outboundInterface == null) {
 			String transport = findTransport(request);
 			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
@@ -547,7 +547,7 @@ public final class JainSipUtils {
 	 * @return
 	 */
 	public static ContactHeader createContactHeader(SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String displayName, String userName, String outboundInterface) {		
-		ExtendedListeningPoint listeningPoint = null;
+		MobicentsExtendedListeningPoint listeningPoint = null;
 		if(outboundInterface == null) {
 			String transport = findTransport(request);
 			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
@@ -615,7 +615,7 @@ public final class JainSipUtils {
 	}
 	
 	public static javax.sip.address.SipURI createRecordRouteURI(SipNetworkInterfaceManager sipNetworkInterfaceManager, Message message, String transport) {	
-		ExtendedListeningPoint listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
+		MobicentsExtendedListeningPoint listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
 		boolean usePublicAddress = findUsePublicAddress(
 				sipNetworkInterfaceManager, message, listeningPoint);
 		return listeningPoint.createRecordRouteURI(usePublicAddress);
@@ -630,7 +630,7 @@ public final class JainSipUtils {
 	 */
 	public static boolean findUsePublicAddress(
 			SipNetworkInterfaceManager sipNetworkInterfaceManager,
-			Message message, ExtendedListeningPoint listeningPoint) {
+			Message message, MobicentsExtendedListeningPoint listeningPoint) {
 		boolean usePublicAddress = false;
 		if(listeningPoint.isUseStaticAddress()) {
 			usePublicAddress = true;
@@ -784,7 +784,7 @@ public final class JainSipUtils {
 				if(logger.isDebugEnabled()) {
 					logger.debug("The request is going internally due to sipUri = " + sipUri);
 				}
-				ExtendedListeningPoint lp = null;
+				MobicentsExtendedListeningPoint lp = null;
 				if(session.getOutboundInterface() != null) {
 					javax.sip.address.SipURI outboundInterfaceURI = (javax.sip.address.SipURI) SipFactories.addressFactory.createURI(session.getOutboundInterface());
 					lp = sipNetworkInterfaceManager.findMatchingListeningPoint(outboundInterfaceURI, false);

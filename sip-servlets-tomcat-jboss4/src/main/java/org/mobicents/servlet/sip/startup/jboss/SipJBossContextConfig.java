@@ -45,13 +45,14 @@ import org.apache.tomcat.util.digester.Digester;
 import org.jboss.web.tomcat.security.config.JBossContextConfig;
 import org.mobicents.servlet.sip.annotations.AnnotationVerificationException;
 import org.mobicents.servlet.sip.annotations.ClassFileScanner;
-import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.catalina.CatalinaSipContext;
+import org.mobicents.servlet.sip.catalina.SipDeploymentException;
+import org.mobicents.servlet.sip.catalina.SipEntityResolver;
+import org.mobicents.servlet.sip.catalina.SipRuleSet;
+import org.mobicents.servlet.sip.catalina.SipServletImpl;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
-import org.mobicents.servlet.sip.startup.SipDeploymentException;
-import org.mobicents.servlet.sip.startup.SipEntityResolver;
-import org.mobicents.servlet.sip.startup.SipRuleSet;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
-import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 import org.xml.sax.EntityResolver;
 
 /**
@@ -87,7 +88,7 @@ public class SipJBossContextConfig extends JBossContextConfig
 			context.setWrapperClass(SipServletImpl.class.getName());
 			
 			//annotations scanning
-			ClassFileScanner scanner = new ClassFileScanner(((SipStandardContext)context).getJbossBasePath(), (SipContext)context);
+			ClassFileScanner scanner = new ClassFileScanner(((SipStandardContext)context).getJbossBasePath(), (CatalinaSipContext)context);
 			try {
 				scanner.scan();
 			} catch (AnnotationVerificationException ave) {
@@ -196,7 +197,7 @@ public class SipJBossContextConfig extends JBossContextConfig
 			servletSelectionSet = true;
 		}				
 		
-		if(((SipContext) context).getChildrenMap().keySet().size() > 1 && !servletSelectionSet) {
+		if(((CatalinaSipContext) context).getChildrenMap().keySet().size() > 1 && !servletSelectionSet) {
 			ok = false;
 			context.setConfigured(false);
 			throw new SipDeploymentException("the main servlet is not set and there is more than one servlet defined in the sip.xml or as annotations !");
@@ -298,7 +299,7 @@ public class SipJBossContextConfig extends JBossContextConfig
 					if (context instanceof SipContext) {
 						FileDirContext fileDirContext =new FileDirContext();
 						fileDirContext.setDocBase(docBase);
-		                ((SipContext) context).setResources(fileDirContext );
+		                ((CatalinaSipContext) context).setResources(fileDirContext );
 	                }
 				}
 			}

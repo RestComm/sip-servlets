@@ -35,8 +35,8 @@ import javax.servlet.http.HttpSessionActivationListener;
 import org.apache.log4j.Logger;
 import org.jboss.aspects.patterns.observable.Observer;
 import org.jboss.aspects.patterns.observable.Subject;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * 

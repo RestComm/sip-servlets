@@ -30,6 +30,7 @@ import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistrib
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipApplicationSessionNotificationPolicy;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipSessionNotificationPolicy;
 import org.mobicents.cluster.MobicentsCluster;
+import org.mobicents.servlet.sip.catalina.CatalinaSipManager;
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
@@ -38,7 +39,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
  * @author jean.deruelle@gmail.com
  *
  */
-public interface ClusteredSipManager<O extends OutgoingDistributableSessionData> extends ClusteredManager, DistributableSipManager {
+public interface ClusteredSipManager<O extends OutgoingDistributableSessionData> extends ClusteredManager, DistributableSipManager, CatalinaSipManager {
 	/**
 	 * Gets the policy for determining whether the servlet spec notifications
 	 * related to sip session events are allowed to be emitted on the local cluster

@@ -28,8 +28,8 @@ import javax.servlet.ServletContext;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ApplicationContext;
 import org.apache.catalina.core.StandardContext;
+import org.mobicents.servlet.sip.catalina.SipServletImpl;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
-import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 /**
  * A converged application context to be able to dispatch web or sip requests.

@@ -61,7 +61,6 @@ import javax.servlet.sip.Address;
 import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
-import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipSession;
 import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
@@ -87,7 +86,6 @@ import javax.sip.header.ViaHeader;
 import javax.sip.message.Message;
 import javax.sip.message.Request;
 
-import org.apache.catalina.realm.GenericPrincipal;
 import org.apache.log4j.Logger;
 import org.mobicents.ha.javax.sip.ClusteredSipStack;
 import org.mobicents.ha.javax.sip.ReplicationStrategy;
@@ -96,14 +94,15 @@ import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.address.ParameterableHeaderImpl;
-import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
+import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletMessage;
+import org.mobicents.servlet.sip.core.security.SipPrincipal;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipManager;
-import org.mobicents.servlet.sip.core.session.SipSessionKey;
-import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
@@ -112,7 +111,7 @@ import org.mobicents.servlet.sip.startup.StaticServiceHolder;
  * @author mranga
  * 
  */
-public abstract class SipServletMessageImpl implements SipServletMessage, Externalizable {
+public abstract class SipServletMessageImpl implements MobicentsSipServletMessage, Externalizable {
 
 	
 	private static final long serialVersionUID = 1L;
@@ -130,7 +129,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	
 	protected Message message;
 	protected SipFactoryImpl sipFactoryImpl;
-	protected SipSessionKey sessionKey;
+	protected MobicentsSipSessionKey sessionKey;
 	//lazy loaded and not serialized to avoid unecessary replication
 	protected transient MobicentsSipSession sipSession;
 
@@ -161,7 +160,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 
 	protected String currentApplicationName = null;
 	
-	protected transient Principal userPrincipal;
+	protected transient SipPrincipal userPrincipal;
 	
 	protected boolean isMessageSent;
 	// Made it transient for Issue 1523 : http://code.google.com/p/mobicents/issues/detail?id=1523
@@ -1038,14 +1037,14 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		MobicentsSipSession session = getSipSession();
 		if (session == null && create) {
 			MobicentsSipApplicationSession sipApplicationSessionImpl = (MobicentsSipApplicationSession)getApplicationSession(create);
-			SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(sipApplicationSessionImpl.getKey().getId(), currentApplicationName, message, false);
-			session = ((SipManager)sipApplicationSessionImpl.getSipContext().getManager()).getSipSession(sessionKey, create,
+			MobicentsSipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(sipApplicationSessionImpl.getKey().getId(), currentApplicationName, message, false);
+			session = sipApplicationSessionImpl.getSipContext().getSipManager().getSipSession(sessionKey, create,
 					sipFactoryImpl, sipApplicationSessionImpl);
 			session.setSessionCreatingTransactionRequest(this);
 			sessionKey = session.getKey();
 		} 
 		if(session != null) {
-			return session.getSession();
+			return session.getFacade();
 		}
 		return null;
 	}
@@ -1083,7 +1082,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	/**
 	 * @param session the session to set
 	 */
-	public SipSessionKey getSipSessionKey() {
+	public MobicentsSipSessionKey getSipSessionKey() {
 		return this.sessionKey;
 	}
 
@@ -1102,7 +1101,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	 * (non-Javadoc)
 	 * @see javax.servlet.sip.SipServletMessage#getUserPrincipal()
 	 */
-	public Principal getUserPrincipal() {
+	public SipPrincipal getUserPrincipal() {
 		if(this.userPrincipal == null) {
 			if(this.getSipSession() != null) {
 				this.userPrincipal = this.getSipSession().getUserPrincipal();
@@ -1111,7 +1110,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 		return this.userPrincipal;
 	}
 	
-	public void setUserPrincipal(Principal principal) {
+	public void setUserPrincipal(SipPrincipal principal) {
 		this.userPrincipal = principal;
 	}
 
@@ -1129,7 +1128,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 	 */
 	public boolean isUserInRole(String role) {
 		if(this.userPrincipal != null) {
-			return ((GenericPrincipal)this.userPrincipal).hasRole(role);
+			return this.userPrincipal.isUserInRole(role);
 		}
 		return false;
 	}
@@ -1794,7 +1793,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 			return sipTransaction.getHostPort().getHost().getIpAddress();
 		} else {
 			final String transport = JainSipUtils.findTransport(message);
-			final ExtendedListeningPoint listeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);		
+			final MobicentsExtendedListeningPoint listeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);		
 			return listeningPoint.getHost(true);
 		}		
 	}
@@ -1809,7 +1808,7 @@ public abstract class SipServletMessageImpl implements SipServletMessage, Extern
 			return sipTransaction.getPort();
 		} else {
 			final String transport = JainSipUtils.findTransport(message);
-			final ExtendedListeningPoint listeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);		
+			final MobicentsExtendedListeningPoint listeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);		
 			return listeningPoint.getPort();
 		}
 	}

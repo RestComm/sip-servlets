@@ -38,7 +38,7 @@ import java.io.Serializable;
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  *
  */
-public final class SipSessionKey implements Serializable {
+public final class SipSessionKey implements MobicentsSipSessionKey, Serializable {
 	private static final long serialVersionUID = 1L;
 	private final String fromTag;
 	private String toTag;

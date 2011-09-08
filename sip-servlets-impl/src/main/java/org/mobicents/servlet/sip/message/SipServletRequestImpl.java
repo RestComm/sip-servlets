@@ -28,8 +28,8 @@ import gov.nist.javax.sip.TransactionExt;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.MessageExt;
 import gov.nist.javax.sip.stack.IllegalTransactionStateException;
-import gov.nist.javax.sip.stack.SIPTransaction;
 import gov.nist.javax.sip.stack.IllegalTransactionStateException.Reason;
+import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -60,10 +60,10 @@ import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.Proxy;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSession.State;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.URI;
-import javax.servlet.sip.SipSession.State;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
@@ -80,6 +80,7 @@ import javax.sip.TransactionState;
 import javax.sip.address.Hop;
 import javax.sip.address.TelURL;
 import javax.sip.header.AuthorizationHeader;
+import javax.sip.header.CSeqHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
@@ -92,45 +93,45 @@ import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.header.WWWAuthenticateHeader;
-import javax.sip.header.CSeqHeader;
 import javax.sip.message.Message;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.ext.javax.sip.dns.DNSAwareRouter;
 import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
-import org.mobicents.javax.servlet.sip.SipServletRequestExt;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.address.GenericURIImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
-import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
-import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
+import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
+import org.mobicents.servlet.sip.core.MobicentsSipServlet;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
+import org.mobicents.servlet.sip.core.b2bua.MobicentsB2BUAHelper;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletRequest;
+import org.mobicents.servlet.sip.core.proxy.MobicentsProxy;
+import org.mobicents.servlet.sip.core.security.MobicentsAuthInfoEntry;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
-import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.security.AuthInfoEntry;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
-import org.mobicents.servlet.sip.security.authentication.DigestAuthenticator;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
-import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
-
-import org.mobicents.ext.javax.sip.dns.DNSAwareRouter;
 
 public class SipServletRequestImpl extends SipServletMessageImpl implements
-		SipServletRequestExt {
+		MobicentsSipServletRequest {
 
 	public static final String STALE = "stale";
 
@@ -352,8 +353,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 							toHeader.setTag(dialog.getLocalTag());
 						}
 					} else if(session != null && session.getSipApplicationSession() != null) {						
-						final SipApplicationSessionKey sipAppSessionKey = session.getSipApplicationSession().getKey();
-						final SipSessionKey sipSessionKey = session.getKey();
+						final MobicentsSipApplicationSessionKey sipAppSessionKey = session.getSipApplicationSession().getKey();
+						final MobicentsSipSessionKey sipSessionKey = session.getKey();
 						// Fix for Issue 1044 : javax.sip.SipException: Tag mismatch dialogTag during process B2B response
 						// make sure not to generate a new tag
 						synchronized (this) {
@@ -457,7 +458,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		final MobicentsSipSession session = getSipSession();
 		if (session.getProxy() != null)
 			throw new IllegalStateException("Proxy already present");
-		B2buaHelperImpl b2buaHelper = session.getB2buaHelper();
+		MobicentsB2BUAHelper b2buaHelper = session.getB2buaHelper();
 		if (b2buaHelper != null)
 			return b2buaHelper;
 		b2buaHelper = new B2buaHelperImpl();
@@ -541,7 +542,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		// if this request is initial. TODO: Consider deleting the session contents too? JSR 289 says
 		// the session is keyed against the headers, not against initial/non-initial...
 		if (create) { 
-			ProxyImpl proxy = session.getProxy();
+			MobicentsProxy proxy = session.getProxy();
 			boolean createNewProxy = false;
 			if(isInitial() && proxy != null && proxy.getOriginalRequest() == null)  {
 				createNewProxy = true;
@@ -933,8 +934,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * {@inheritDoc}
 	 */
 	public RequestDispatcher getRequestDispatcher(String handler) {
-		SipServletImpl sipServletImpl = (SipServletImpl) 
-			getSipSession().getSipApplicationSession().getSipContext().findChildrenByName(handler);
+		MobicentsSipServlet sipServletImpl = (MobicentsSipServlet) 
+			getSipSession().getSipApplicationSession().getSipContext().findSipServletByName(handler);
 		if(sipServletImpl == null) {
 			throw new IllegalArgumentException(handler + " is not a valid servlet name");
 		}
@@ -1064,7 +1065,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			}
 
 			SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);	
-			ExtendedListeningPoint matchingListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(
+			MobicentsExtendedListeningPoint matchingListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(
 					transport, false);
 			final SipProvider sipProvider = matchingListeningPoint.getSipProvider();
 
@@ -1161,7 +1162,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 										
 										javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
 										String nextApp = sipUri.getParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME);
-										final SipApplicationSessionKey sipAppKey = getSipSession().getSipApplicationSession().getKey();
+										final MobicentsSipApplicationSessionKey sipAppKey = getSipSession().getSipApplicationSession().getKey();
 										final String thisApp = sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());
 										if(thisApp.equals(nextApp)) {
 											if(sipConnector != null && sipConnector.isUseStaticAddress()) {
@@ -1340,7 +1341,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		final Request request = (Request) super.message;
 		final MobicentsSipSession session = getSipSession();
 		final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();
-		final ProxyImpl proxy = session.getProxy();
+		final MobicentsProxy proxy = session.getProxy();
 		ViaHeader viaHeader = (ViaHeader) request.getHeader(ViaHeader.NAME);
 		
 		if(!request.getMethod().equals(Request.CANCEL) && viaHeader == null) {
@@ -1464,14 +1465,14 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @throws ParseException
 	 */
 	private void setSystemContactHeader(final SipConnector sipConnector,
-			final ExtendedListeningPoint matchingListeningPoint, String transportForRequest)
+			final MobicentsExtendedListeningPoint matchingListeningPoint, String transportForRequest)
 			throws ParseException {
 		
 		final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();
 		final Request request = (Request) super.message;
 		final String requestMethod = getMethod();
 		final MobicentsSipSession session = getSipSession();
-		final ProxyImpl proxy = session.getProxy();
+		final MobicentsProxy proxy = session.getProxy();
 		
 		ContactHeader contactHeader = (ContactHeader)request.getHeader(ContactHeader.NAME);
 		if(contactHeader == null && !Request.REGISTER.equalsIgnoreCase(requestMethod) && JainSipUtils.CONTACT_HEADER_METHODS.contains(requestMethod) && proxy == null) {
@@ -1574,7 +1575,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	 * @throws SipException
 	 */
 	private void sendAck(final String transport, final SipConnector sipConnector,			
-			final ExtendedListeningPoint matchingListeningPoint)
+			final MobicentsExtendedListeningPoint matchingListeningPoint)
 			throws ParseException, SipException {
 		
 		final Request request = (Request) super.message;			
@@ -1603,7 +1604,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			// transaction can be null in case of forking
 			if(transaction != null) {
 				final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
-				final B2buaHelperImpl b2buaHelperImpl = sipSession.getB2buaHelper();
+				final MobicentsB2BUAHelper b2buaHelperImpl = sipSession.getB2buaHelper();
 				if(b2buaHelperImpl != null && tad != null) {
 					// we unlink the originalRequest early to avoid keeping the messages in mem for too long
 					b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
@@ -1890,7 +1891,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		
 		int nc = generateNcFromMessage(message);
 
-		AuthorizationHeader authorization = DigestAuthenticator.getAuthorizationHeader(
+		AuthorizationHeader authorization = getSipSession().getSipApplicationSession().getSipContext().getDigestAuthenticator().getAuthorizationHeader(
 				getMethod(),
 				uri,
 				"", // TODO: What is this entity-body?
@@ -2320,7 +2321,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		while(authHeaderIterator.hasNext()) {
 			AuthorizationHeader wwwAuthHeader = 
 				(AuthorizationHeader) authHeaderIterator.next();
-			AuthInfoEntry authInfoEntry = getSipSession().getSipSessionSecurity().getCachedAuthInfos().get(wwwAuthHeader.getRealm());
+			MobicentsAuthInfoEntry authInfoEntry = getSipSession().getSipSessionSecurity().getCachedAuthInfos().get(wwwAuthHeader.getRealm());
 			
 			if(authInfoEntry != null) {
 				
@@ -2334,7 +2335,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 					nextNonce = wwwAuthHeader.getNonce();
 				}
 				
-				AuthorizationHeader authorization = DigestAuthenticator.getAuthorizationHeader(
+				AuthorizationHeader authorization = getSipSession().getSipApplicationSession().getSipContext().getDigestAuthenticator().getAuthorizationHeader(
 						getMethod(),
 						this.getRequestURI().toString(),
 						"", // TODO: What is this entity-body?
@@ -2357,7 +2358,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			ProxyAuthorizationHeader proxyAuthHeader = 
 				(ProxyAuthorizationHeader) authHeaderIterator.next();
 //			String uri = wwwAuthHeader.getParameter("uri");
-			AuthInfoEntry authInfoEntry = getSipSession().getSipSessionSecurity().getCachedAuthInfos().get(proxyAuthHeader.getRealm());
+			MobicentsAuthInfoEntry authInfoEntry = getSipSession().getSipSessionSecurity().getCachedAuthInfos().get(proxyAuthHeader.getRealm());
 			
 			if(authInfoEntry != null) { 
 				
@@ -2370,7 +2371,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				} else {
 					nextNonce = proxyAuthHeader.getNonce();
 				}
-				AuthorizationHeader authorization = DigestAuthenticator.getAuthorizationHeader(
+				AuthorizationHeader authorization = getSipSession().getSipApplicationSession().getSipContext().getDigestAuthenticator().getAuthorizationHeader(
 						getMethod(),
 						this.getRequestURI().toString(),
 						"", // TODO: What is this entity-body?

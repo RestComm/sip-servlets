@@ -21,12 +21,15 @@
  */
 
 package org.mobicents.servlet.sip.security;
+
+import org.mobicents.servlet.sip.core.security.MobicentsAuthInfoEntry;
+
 /**
  * This class is just a data structure to contain auth info.
  * @author root
  *
  */
-public class AuthInfoEntry {
+public class AuthInfoEntry implements MobicentsAuthInfoEntry {
 	public String userName;
 	public String password;
 	public int statusCode;

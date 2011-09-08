@@ -66,24 +66,24 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
-import org.mobicents.javax.servlet.sip.SipServletResponseExt;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletResponse;
+import org.mobicents.servlet.sip.core.proxy.MobicentsProxy;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
-import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 /**
  * Implementation of the sip servlet response interface
  *
  */
 public class SipServletResponseImpl extends SipServletMessageImpl implements
-		SipServletResponseExt {
+		MobicentsSipServletResponse {
 	
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(SipServletResponseImpl.class);
@@ -472,8 +472,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 			final int statusCode = response.getStatusCode();
 			final MobicentsSipSession session = getSipSession();
 			final MobicentsSipApplicationSession sipApplicationSession = session.getSipApplicationSession();
-			final SipApplicationSessionKey sipAppSessionKey = sipApplicationSession.getKey();
-			final ProxyImpl proxy = session.getProxy();
+			final MobicentsSipApplicationSessionKey sipAppSessionKey = sipApplicationSession.getKey();
+			final MobicentsProxy proxy = session.getProxy();
 			// if this is a proxy response and the branch is record routing http://code.google.com/p/mobicents/issues/detail?id=747
 			// we add a record route
 			if(proxy != null && proxy.getFinalBranchForSubsequentRequests() == null &&

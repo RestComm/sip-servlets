@@ -29,15 +29,15 @@ import java.util.concurrent.ScheduledFuture;
 import javax.servlet.sip.TimerListener;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipManager;
-import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSessionKey;
 
 public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 	private static final Logger logger = Logger.getLogger(ServletTimerImpl.class);
 	
-	private SipApplicationSessionKey appSessionKey;
+	private MobicentsSipApplicationSessionKey appSessionKey;
 	private SipManager sipManager;
 	/**
 	 * Logger for this class
@@ -294,7 +294,7 @@ public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 		boolean batchStarted = false;
 		ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 		try {
-			ClassLoader cl = sipContext.getLoader().getClassLoader();
+			ClassLoader cl = sipContext.getSipContextClassLoader();
 			Thread.currentThread().setContextClassLoader(cl);
 			sipContext.enterSipApp(sipApplicationSession, null, false);
 			batchStarted = sipContext.enterSipAppHa(true);

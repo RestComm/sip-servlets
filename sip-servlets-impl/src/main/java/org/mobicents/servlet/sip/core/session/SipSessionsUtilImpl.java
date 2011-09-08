@@ -32,33 +32,32 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipSession;
-import javax.servlet.sip.SipSessionsUtil;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.core.SipContext;
 
 /**
  * @author Jean Deruelle
  *
  */
-public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
+public class SipSessionsUtilImpl implements MobicentsSipSessionsUtil, Serializable {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(SipSessionsUtilImpl.class);
 	
 	private transient SipContext sipContext;
 	
-	private transient ConcurrentHashMap<SipSessionKey, MobicentsSipSession> joinSession;
-	private transient ConcurrentHashMap<SipSessionKey, MobicentsSipSession> replacesSession;
+	private transient ConcurrentHashMap<MobicentsSipSessionKey, MobicentsSipSession> joinSession;
+	private transient ConcurrentHashMap<MobicentsSipSessionKey, MobicentsSipSession> replacesSession;
 	
-	private ConcurrentHashMap<SipApplicationSessionKey, SipApplicationSessionKey> joinApplicationSession;
-	private ConcurrentHashMap<SipApplicationSessionKey, SipApplicationSessionKey> replacesApplicationSession;
+	private ConcurrentHashMap<MobicentsSipApplicationSessionKey, MobicentsSipApplicationSessionKey> joinApplicationSession;
+	private ConcurrentHashMap<MobicentsSipApplicationSessionKey, MobicentsSipApplicationSessionKey> replacesApplicationSession;
 
 	public SipSessionsUtilImpl(SipContext sipContext) {
 		this.sipContext = sipContext;
-		joinSession = new ConcurrentHashMap<SipSessionKey, MobicentsSipSession>();
-		replacesSession = new ConcurrentHashMap<SipSessionKey, MobicentsSipSession>();
-		joinApplicationSession = new ConcurrentHashMap<SipApplicationSessionKey, SipApplicationSessionKey>();
-		replacesApplicationSession = new ConcurrentHashMap<SipApplicationSessionKey, SipApplicationSessionKey>();
+		joinSession = new ConcurrentHashMap<MobicentsSipSessionKey, MobicentsSipSession>();
+		replacesSession = new ConcurrentHashMap<MobicentsSipSessionKey, MobicentsSipSession>();
+		joinApplicationSession = new ConcurrentHashMap<MobicentsSipApplicationSessionKey, MobicentsSipApplicationSessionKey>();
+		replacesApplicationSession = new ConcurrentHashMap<MobicentsSipApplicationSessionKey, MobicentsSipApplicationSessionKey>();
 	}
 	
 	/**
@@ -77,14 +76,14 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 			return null;
 		}
 		if(applicationSessionKey.getApplicationName().equals(sipContext.getApplicationName())) {
-			MobicentsSipApplicationSession sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(applicationSessionKey, false);
+			MobicentsSipApplicationSession sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(applicationSessionKey, false);
 			if(sipApplicationSession == null) {
 				return null;
 			} else {
 				// make sure to acquire this app session and add it to the set of app sessions we monitor in the context of the application
 				// to release them all when we exit application code
 				sipContext.enterSipApp(sipApplicationSession, null, true);
-				return sipApplicationSession.getSession();
+				return sipApplicationSession.getFacade();
 			}
 		} else {
 			logger.warn("the given application session id : " + applicationSessionId + 
@@ -104,14 +103,14 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(null, sipContext.getApplicationName());
 		sipApplicationSessionKey.setAppGeneratedKey(applicationSessionKey);
 		
-		MobicentsSipApplicationSession sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(sipApplicationSessionKey, create);
+		MobicentsSipApplicationSession sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, create);
 		if(sipApplicationSession == null) {
 			return null;
 		} else {
 			// make sure to acquire this app session and add it to the set of app sessions we monitor in the context of the application
 			// to release them all when we exit application code
 			sipContext.enterSipApp(sipApplicationSession, null, true);
-			return sipApplicationSession.getSession();
+			return sipApplicationSession.getFacade();
 		}
 	}
 
@@ -151,7 +150,7 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 	 * @param correspondingSipSession the corresponding sip session to add
 	 * @param headerName the header name
 	 */
-	public void removeCorrespondingSipSession(SipSessionKey sipSession) {
+	public void removeCorrespondingSipSession(MobicentsSipSessionKey sipSession) {
 		joinSession.remove(sipSession);
 		replacesSession.remove(sipSession);
 	}
@@ -159,8 +158,8 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 	/**
 	 * {@inheritDoc}
 	 */
-	public SipApplicationSessionKey getCorrespondingSipApplicationSession(SipApplicationSessionKey sipApplicationSessionKey, String headerName) {
-		SipApplicationSessionKey correspondingSipApplicationSession = null;
+	public MobicentsSipApplicationSessionKey getCorrespondingSipApplicationSession(MobicentsSipApplicationSessionKey sipApplicationSessionKey, String headerName) {
+		MobicentsSipApplicationSessionKey correspondingSipApplicationSession = null;
 		if(headerName.equalsIgnoreCase(JoinHeader.NAME)) {
 			correspondingSipApplicationSession = joinApplicationSession.get(sipApplicationSessionKey);
 		} else if (headerName.equalsIgnoreCase(ReplacesHeader.NAME)) {
@@ -177,7 +176,7 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 	 * @param correspondingSipSession the corresponding sip session to add
 	 * @param headerName the header name
 	 */
-	public void addCorrespondingSipApplicationSession(SipApplicationSessionKey newApplicationSession, SipApplicationSessionKey correspondingSipApplicationSession, String headerName) {
+	public void addCorrespondingSipApplicationSession(MobicentsSipApplicationSessionKey newApplicationSession, MobicentsSipApplicationSessionKey correspondingSipApplicationSession, String headerName) {
 		if(headerName.equalsIgnoreCase(JoinHeader.NAME)) {
 			joinApplicationSession.putIfAbsent(newApplicationSession, correspondingSipApplicationSession);
 		} else if (headerName.equalsIgnoreCase(ReplacesHeader.NAME)) {
@@ -192,14 +191,13 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 	 * @param correspondingSipSession the corresponding sip session to add
 	 * @param headerName the header name
 	 */
-	public void removeCorrespondingSipApplicationSession(SipApplicationSessionKey sipApplicationSession) {
+	public void removeCorrespondingSipApplicationSession(MobicentsSipApplicationSessionKey sipApplicationSession) {
 		joinApplicationSession.remove(sipApplicationSession);
 		replacesApplicationSession.remove(sipApplicationSession);
-		Iterator<SipApplicationSessionKey> it = joinApplicationSession.values().iterator();
+		Iterator<MobicentsSipApplicationSessionKey> it = joinApplicationSession.values().iterator();
 		boolean found = false;
 		while (it.hasNext() && !found) {
-			SipApplicationSessionKey sipApplicationSessionKey = (SipApplicationSessionKey) it
-					.next();
+			MobicentsSipApplicationSessionKey sipApplicationSessionKey = it.next();
 			if(sipApplicationSessionKey.equals(sipApplicationSession)) {
 				joinApplicationSession.remove(sipApplicationSessionKey);
 				found = true;
@@ -208,8 +206,7 @@ public class SipSessionsUtilImpl implements SipSessionsUtil, Serializable {
 		it = replacesApplicationSession.values().iterator();
 		found = false;
 		while (it.hasNext() && !found) {
-			SipApplicationSessionKey sipApplicationSessionKey = (SipApplicationSessionKey) it
-					.next();
+			MobicentsSipApplicationSessionKey sipApplicationSessionKey = it.next();
 			if(sipApplicationSessionKey.equals(sipApplicationSession)) {
 				replacesApplicationSession.remove(sipApplicationSessionKey);
 				found = true;

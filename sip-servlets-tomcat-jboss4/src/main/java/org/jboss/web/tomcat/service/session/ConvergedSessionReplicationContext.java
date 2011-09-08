@@ -24,18 +24,12 @@ package org.jboss.web.tomcat.service.session;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
-
-import javax.servlet.sip.SipApplicationSession;
-import javax.servlet.sip.SipSession;
-import javax.servlet.sip.SipApplicationSession.Protocol;
 
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 

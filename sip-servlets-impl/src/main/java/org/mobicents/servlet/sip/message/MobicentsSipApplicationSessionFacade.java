@@ -39,14 +39,15 @@ import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.SipApplicationSessionAsynchronousWork;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionEventType;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
-import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
@@ -102,7 +103,7 @@ public class MobicentsSipApplicationSessionFacade implements
 		return this.sipApplicationSession.getCurrentRequestHandler();
 	}
 
-	public SipApplicationSessionKey getKey() {
+	public MobicentsSipApplicationSessionKey getKey() {
 		return this.sipApplicationSession.getKey();
 	}
 
@@ -243,8 +244,8 @@ public class MobicentsSipApplicationSessionFacade implements
 		this.sipApplicationSession.setInvalidateWhenReady(invalidateWhenReady);
 	}
 
-	public MobicentsSipApplicationSessionFacade getSession() {
-		return sipApplicationSession.getSession();
+	public MobicentsSipApplicationSession getFacade() {
+		return sipApplicationSession.getFacade();
 	}
 
 	public void readExternal(ObjectInput arg0) throws IOException,
@@ -260,7 +261,7 @@ public class MobicentsSipApplicationSessionFacade implements
 		SipContext sipContext = StaticServiceHolder.sipStandardService
 				.getSipApplicationDispatcher().findSipApplication(key.getApplicationName());
 		
-		this.sipApplicationSession = ((SipManager) sipContext.getManager()).getSipApplicationSession(
+		this.sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(
 				key, false);
 	}
 

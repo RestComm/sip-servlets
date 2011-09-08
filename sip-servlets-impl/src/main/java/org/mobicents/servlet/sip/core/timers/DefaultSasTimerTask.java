@@ -26,9 +26,9 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionEventType;
-import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * Timer task that will notify the listeners that the sip application session has expired 

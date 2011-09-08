@@ -30,8 +30,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * Implementation of a clustered sip application session for the JBossCacheManager.

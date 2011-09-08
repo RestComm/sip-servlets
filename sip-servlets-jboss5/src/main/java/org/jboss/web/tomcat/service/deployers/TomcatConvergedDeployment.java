@@ -62,8 +62,8 @@ import org.jboss.web.tomcat.service.TomcatConvergedSipInjectionContainer;
 import org.jboss.web.tomcat.service.TomcatInjectionContainer;
 import org.jboss.web.tomcat.service.session.AbstractJBossManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.ClusteringNotSupportedException;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
-import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig;
 
 /**

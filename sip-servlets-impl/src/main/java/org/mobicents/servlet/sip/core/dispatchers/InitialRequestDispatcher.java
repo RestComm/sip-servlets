@@ -66,20 +66,22 @@ import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.core.DispatcherException;
+import org.mobicents.servlet.sip.core.MobicentsSipFactory;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.SipSessionRoutingType;
+import org.mobicents.servlet.sip.core.descriptor.MobicentsSipServletMapping;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
-import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
-import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
-import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
 
 /**
  * This class is responsible for implementing the logic for routing an initial request
@@ -102,7 +104,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	 */
 	public void dispatchMessage(SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {
 		final SipApplicationRouter sipApplicationRouter = sipApplicationDispatcher.getSipApplicationRouter();
-		final SipFactoryImpl sipFactoryImpl = sipApplicationDispatcher.getSipFactory();
+		final MobicentsSipFactory sipFactoryImpl = sipApplicationDispatcher.getSipFactory();
 		final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
 		if(logger.isDebugEnabled()) {
 			logger.debug("Routing of Initial Request " + sipServletRequest);
@@ -314,7 +316,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	 * @param joinReplacesSipSession the potential corresponding Join/Replaces SipSession previously found, can be null
 	 * @throws DispatcherException a problem occured while dispatching the request
 	 */
-	private void dispatchInsideContainer(final SipProvider sipProvider, final SipApplicationRouterInfo applicationRouterInfo, final SipServletRequestImpl sipServletRequest, final SipFactoryImpl sipFactoryImpl, MobicentsSipSession joinReplacesSipSession, MobicentsSipApplicationSession encodeURISipApplicationSession) throws DispatcherException {
+	private void dispatchInsideContainer(final SipProvider sipProvider, final SipApplicationRouterInfo applicationRouterInfo, final SipServletRequestImpl sipServletRequest, final MobicentsSipFactory sipFactoryImpl, MobicentsSipSession joinReplacesSipSession, MobicentsSipApplicationSession encodeURISipApplicationSession) throws DispatcherException {
 		final String nextApplicationName = applicationRouterInfo.getNextApplicationName();
 		if(logger.isDebugEnabled()) {
 			logger.debug("Dispatching the request event to " + nextApplicationName);
@@ -331,7 +333,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			// and stops processing.
 			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "No matching deployed application has been found !");
 		}			
-		final SipManager sipManager = (SipManager)sipContext.getManager();
+		final SipManager sipManager = sipContext.getSipManager();
 		
 		// subscriber URI should be set before calling makeAppSessionKey method, see Issue 750
 		// http://code.google.com/p/mobicents/issues/detail?id=750
@@ -632,7 +634,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			}
 			SipContext sipContext = sipApplicationDispatcher.findSipApplication(targetedApplicationSessionKey.getApplicationName());
 			if(sipContext != null) {
-				return ((SipManager)sipContext.getManager()).getSipApplicationSession(targetedApplicationSessionKey, false);
+				return sipContext.getSipManager().getSipApplicationSession(targetedApplicationSessionKey, false);
 			}						
 		}
 		return null;
@@ -655,7 +657,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				while (sipSessionsIt.hasNext()) {
 					MobicentsSipSession mobicentsSipSession = (MobicentsSipSession) sipSessionsIt
 							.next();
-					SipSessionKey sessionKey = mobicentsSipSession.getKey();				
+					MobicentsSipSessionKey sessionKey = mobicentsSipSession.getKey();				
 					if(sessionKey.getCallId().trim().equals(dialog.getCallId().getCallId())) {
 						if(logger.isDebugEnabled()) {
 							logger.debug("found session with the same Call Id " + sessionKey + ", to Tag " + sessionKey.getToTag());
@@ -709,7 +711,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 					if(sipContext.isMainServlet() && mainServlet != null && mainServlet.length() > 0) {
 						sipSessionHandlerName = mainServlet;				
 					} else {
-						SipServletMapping sipServletMapping = sipContext.findSipServletMappings(sipServletRequest);
+						MobicentsSipServletMapping sipServletMapping = sipContext.findSipServletMappings(sipServletRequest);
 						if(sipServletMapping == null && sipContext.getSipRubyController() == null) {
 							logger.error("Sending 404 because no matching servlet found for this request ");
 							sendErrorResponse(Response.NOT_FOUND, sipServletRequest, sipProvider);

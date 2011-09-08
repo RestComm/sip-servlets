@@ -51,7 +51,6 @@ import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
-import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.utils.Inet6Util;
 
 /**
@@ -65,8 +64,8 @@ import org.mobicents.servlet.sip.utils.Inet6Util;
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  *
  */
-public class SipNetworkInterfaceManager {
-	private static final Logger logger = Logger.getLogger(SipNetworkInterfaceManager.class);
+public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManager {
+	private static final Logger logger = Logger.getLogger(SipNetworkInterfaceManagerImpl.class);
 	
 	/**
      * The maximum int value that could correspond to a port nubmer.
@@ -79,7 +78,7 @@ public class SipNetworkInterfaceManager {
      */
     public static final int MIN_PORT_NUMBER = 1024;    
     
-	Set<ExtendedListeningPoint> extendedListeningPointList = null;
+	Set<MobicentsExtendedListeningPoint> extendedListeningPointList = null;
 	List<SipURI> outboundInterfaces = null;
 	//related to google code issue 563, will be used to check if a request is aimed at a local network or outside
 	Set<String> outboundInterfacesIpAddresses = null;
@@ -88,28 +87,28 @@ public class SipNetworkInterfaceManager {
 	
 	//those maps are present to improve the performance of finding a listening point either from a transport
 	// or from a triplet ipaddress, port and transport
-	Map<String, Set<ExtendedListeningPoint>> transportMappingCacheMap = null;	
-	Map<String, ExtendedListeningPoint> extendedListeningPointsCacheMap = null;
+	Map<String, Set<MobicentsExtendedListeningPoint>> transportMappingCacheMap = null;	
+	Map<String, MobicentsExtendedListeningPoint> extendedListeningPointsCacheMap = null;
 	
 	Lock lock = null;
 	
 	/**
 	 * Default Constructor
 	 */
-	public SipNetworkInterfaceManager(SipApplicationDispatcher sipApplicationDispatcher) {
+	public SipNetworkInterfaceManagerImpl(SipApplicationDispatcher sipApplicationDispatcher) {
 		this.sipApplicationDispatcher = sipApplicationDispatcher;
-		extendedListeningPointList = new CopyOnWriteArraySet<ExtendedListeningPoint>();
+		extendedListeningPointList = new CopyOnWriteArraySet<MobicentsExtendedListeningPoint>();
 		outboundInterfaces = new CopyOnWriteArrayList<SipURI>();
 		outboundInterfacesIpAddresses = new CopyOnWriteArraySet<String>();
 		
 		// creating and populating the transport cache map with transports
-		transportMappingCacheMap = new HashMap<String, Set<ExtendedListeningPoint>>();
-		transportMappingCacheMap.put(ListeningPoint.TCP.toLowerCase(), new CopyOnWriteArraySet<ExtendedListeningPoint>());
-		transportMappingCacheMap.put(ListeningPoint.UDP.toLowerCase(), new CopyOnWriteArraySet<ExtendedListeningPoint>());
-		transportMappingCacheMap.put(ListeningPoint.SCTP.toLowerCase(), new CopyOnWriteArraySet<ExtendedListeningPoint>());
-		transportMappingCacheMap.put(ListeningPoint.TLS.toLowerCase(), new CopyOnWriteArraySet<ExtendedListeningPoint>());
+		transportMappingCacheMap = new HashMap<String, Set<MobicentsExtendedListeningPoint>>();
+		transportMappingCacheMap.put(ListeningPoint.TCP.toLowerCase(), new CopyOnWriteArraySet<MobicentsExtendedListeningPoint>());
+		transportMappingCacheMap.put(ListeningPoint.UDP.toLowerCase(), new CopyOnWriteArraySet<MobicentsExtendedListeningPoint>());
+		transportMappingCacheMap.put(ListeningPoint.SCTP.toLowerCase(), new CopyOnWriteArraySet<MobicentsExtendedListeningPoint>());
+		transportMappingCacheMap.put(ListeningPoint.TLS.toLowerCase(), new CopyOnWriteArraySet<MobicentsExtendedListeningPoint>());
 		// creating the ipaddress/port/transport cache map
-		extendedListeningPointsCacheMap = new ConcurrentHashMap<String, ExtendedListeningPoint>();
+		extendedListeningPointsCacheMap = new ConcurrentHashMap<String, MobicentsExtendedListeningPoint>();
 		lock = new ReentrantLock();
 	}
 	
@@ -117,7 +116,7 @@ public class SipNetworkInterfaceManager {
 	 * Retrieve the listening points for this manager
 	 * @return the listening points for this manager
 	 */
-	public Iterator<ExtendedListeningPoint> getExtendedListeningPoints() {
+	public Iterator<MobicentsExtendedListeningPoint> getExtendedListeningPoints() {
 		return extendedListeningPointList.iterator();
 	}
 	
@@ -125,11 +124,11 @@ public class SipNetworkInterfaceManager {
 	 * 
 	 * @param extendedListeningPoint
 	 */
-	public void addExtendedListeningPoint(ExtendedListeningPoint extendedListeningPoint) {
+	public void addExtendedListeningPoint(MobicentsExtendedListeningPoint extendedListeningPoint) {
 		extendedListeningPointList.add(extendedListeningPoint);
 		computeOutboundInterfaces();
 		// Adding to the transport cache map
-		Set<ExtendedListeningPoint> extendedListeningPoints = 
+		Set<MobicentsExtendedListeningPoint> extendedListeningPoints = 
 			transportMappingCacheMap.get(extendedListeningPoint.getTransport().toLowerCase());
 	    boolean added = extendedListeningPoints.add(extendedListeningPoint);
 	    if(added) {
@@ -149,7 +148,7 @@ public class SipNetworkInterfaceManager {
 		    Iterator<SipContext> sipContextIterator = sipApplicationDispatcher.findSipApplications();
 		    while (sipContextIterator.hasNext()) {
 				SipContext sipContext = (SipContext) sipContextIterator.next();
-				sipContext.notifySipContextListeners(new SipContextEvent(SipContextEventType.SIP_CONNECTOR_ADDED, extendedListeningPoint.getSipConnector()));
+				sipContext.notifySipContextListeners(new SipContextEventImpl(SipContextEventType.SIP_CONNECTOR_ADDED, extendedListeningPoint.getSipConnector()));
 			}
 	    }
 	}
@@ -158,18 +157,18 @@ public class SipNetworkInterfaceManager {
 	 * 
 	 * @param extendedListeningPoint
 	 */
-	public void removeExtendedListeningPoint(ExtendedListeningPoint extendedListeningPoint) {
+	public void removeExtendedListeningPoint(MobicentsExtendedListeningPoint extendedListeningPoint) {
 		// notifying the applications before removing the listening point so that apps can still try to send a message on it
 		if(extendedListeningPointList.contains(extendedListeningPoint)) {
 			Iterator<SipContext> sipContextIterator = sipApplicationDispatcher.findSipApplications();
 		    while (sipContextIterator.hasNext()) {
 				SipContext sipContext = (SipContext) sipContextIterator.next();
-				sipContext.notifySipContextListeners(new SipContextEvent(SipContextEventType.SIP_CONNECTOR_REMOVED, extendedListeningPoint.getSipConnector()));
+				sipContext.notifySipContextListeners(new SipContextEventImpl(SipContextEventType.SIP_CONNECTOR_REMOVED, extendedListeningPoint.getSipConnector()));
 			}
 			extendedListeningPointList.remove(extendedListeningPoint);
 			computeOutboundInterfaces();
 			// removing from the transport cache map
-			Set<ExtendedListeningPoint> extendedListeningPoints = 
+			Set<MobicentsExtendedListeningPoint> extendedListeningPoints = 
 				transportMappingCacheMap.get(extendedListeningPoint.getTransport().toLowerCase());
 		    extendedListeningPoints.remove(extendedListeningPoint);
 		    if(sipApplicationDispatcher.getDNSServerLocator() != null) {
@@ -196,12 +195,12 @@ public class SipNetworkInterfaceManager {
 	 * If none has been found, null is returned if strict is true.
 	 * If none has been found, an exception is thrown is strict is false and no listening point could be found.
 	 */
-	public ExtendedListeningPoint findMatchingListeningPoint(String transport, final boolean strict) {
+	public MobicentsExtendedListeningPoint findMatchingListeningPoint(String transport, final boolean strict) {
 		String tmpTransport = transport;
 		if(tmpTransport == null) {
 			tmpTransport = ListeningPoint.UDP;
 		}
-		Set<ExtendedListeningPoint> extendedListeningPoints = transportMappingCacheMap.get(tmpTransport.toLowerCase());
+		Set<MobicentsExtendedListeningPoint> extendedListeningPoints = transportMappingCacheMap.get(tmpTransport.toLowerCase());
 		if(extendedListeningPoints.size() > 0) {
 			return extendedListeningPoints.iterator().next();
 		}		
@@ -216,7 +215,7 @@ public class SipNetworkInterfaceManager {
 		}
 	}
 	
-	public ExtendedListeningPoint findMatchingListeningPoint(
+	public MobicentsExtendedListeningPoint findMatchingListeningPoint(
 			javax.sip.address.SipURI outboundInterface, boolean strict) {		
 		String tmpTransport = outboundInterface.getTransportParam();
 		if(tmpTransport == null) {
@@ -226,11 +225,11 @@ public class SipNetworkInterfaceManager {
 				tmpTransport =  ListeningPoint.UDP;
 			}
 		}
-		Set<ExtendedListeningPoint> extendedListeningPoints = transportMappingCacheMap.get(tmpTransport.toLowerCase());
+		Set<MobicentsExtendedListeningPoint> extendedListeningPoints = transportMappingCacheMap.get(tmpTransport.toLowerCase());
 		if(extendedListeningPoints.size() > 0) {
-			Iterator<ExtendedListeningPoint> extentdedLPiterator = extendedListeningPoints.iterator();
+			Iterator<MobicentsExtendedListeningPoint> extentdedLPiterator = extendedListeningPoints.iterator();
 			while (extentdedLPiterator.hasNext()) {
-				ExtendedListeningPoint extendedListeningPoint = extentdedLPiterator.next();
+				MobicentsExtendedListeningPoint extendedListeningPoint = extentdedLPiterator.next();
 				if(extendedListeningPoint.getIpAddresses().contains(outboundInterface.getHost())) {
 					return extendedListeningPoint;
 				}
@@ -240,9 +239,9 @@ public class SipNetworkInterfaceManager {
 			return null;
 		} else {
 			if(extendedListeningPointList.size() > 0) {
-				Iterator<ExtendedListeningPoint> extentdedLPiterator = extendedListeningPoints.iterator();
+				Iterator<MobicentsExtendedListeningPoint> extentdedLPiterator = extendedListeningPoints.iterator();
 				while (extentdedLPiterator.hasNext()) {
-					ExtendedListeningPoint extendedListeningPoint = extentdedLPiterator.next();
+					MobicentsExtendedListeningPoint extendedListeningPoint = extentdedLPiterator.next();
 					if(extendedListeningPoint.getIpAddresses().contains(outboundInterface.getHost())) {
 						return extendedListeningPoint;
 					}
@@ -264,14 +263,14 @@ public class SipNetworkInterfaceManager {
 	 * @return Retrieve the first matching listening point corresponding to the ipAddress port and transport.
 	 * If none has been found, null is returned.
 	 */
-	public ExtendedListeningPoint findMatchingListeningPoint(final String ipAddress, int port, String transport) {
+	public MobicentsExtendedListeningPoint findMatchingListeningPoint(final String ipAddress, int port, String transport) {
 		String tmpTransport = transport;
 		int portChecked = checkPortRange(port, tmpTransport);
 		if(tmpTransport == null) {
 			tmpTransport = ListeningPoint.UDP;
 		}	
 		// we check first if a listening point can be found (we only do the host resolving if not found to have better perf )
-		ExtendedListeningPoint listeningPoint = extendedListeningPointsCacheMap.get(ipAddress + "/" + portChecked + ":" + tmpTransport.toLowerCase());
+		MobicentsExtendedListeningPoint listeningPoint = extendedListeningPointsCacheMap.get(ipAddress + "/" + portChecked + ":" + tmpTransport.toLowerCase());
 		if(listeningPoint == null && !Inet6Util.isValidIP6Address(ipAddress) 
 					&& !Inet6Util.isValidIPV4Address(ipAddress)) {
 			// if no listening point has been found and the ipaddress is not a valid IP6 address nor a valid IPV4 address 
@@ -330,9 +329,9 @@ public class SipNetworkInterfaceManager {
 		}
 		List<SipURI> newlyComputedOutboundInterfaces = new CopyOnWriteArrayList<SipURI>();
 		Set<String> newlyComputedOutboundInterfacesIpAddresses = new CopyOnWriteArraySet<String>();
-		Iterator<ExtendedListeningPoint> it = getExtendedListeningPoints();
+		Iterator<MobicentsExtendedListeningPoint> it = getExtendedListeningPoints();
 		while (it.hasNext()) {
-			ExtendedListeningPoint extendedListeningPoint = it
+			MobicentsExtendedListeningPoint extendedListeningPoint = it
 					.next();
 									
 			for(String ipAddress : extendedListeningPoint.getIpAddresses()) {
@@ -365,7 +364,7 @@ public class SipNetworkInterfaceManager {
 		
 	}
 	
-	public static boolean findUsePublicAddress(Message message) {
+	public boolean findUsePublicAddress(Message message) {
 		// TODO add a caching mechanism to increase perf
 		boolean usePublicAddress = true;
 		String host = null;		

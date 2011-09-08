@@ -59,22 +59,23 @@ import org.jboss.metadata.sip.spec.SubdomainOfMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.TransportGuaranteeType;
 import org.jboss.web.tomcat.service.deployers.JBossContextConfig;
-import org.mobicents.servlet.sip.startup.SipContext;
-import org.mobicents.servlet.sip.startup.SipDeploymentException;
+import org.mobicents.servlet.sip.catalina.CatalinaSipContext;
+import org.mobicents.servlet.sip.catalina.SipDeploymentException;
+import org.mobicents.servlet.sip.catalina.SipLoginConfig;
+import org.mobicents.servlet.sip.catalina.SipSecurityCollection;
+import org.mobicents.servlet.sip.catalina.SipSecurityConstraint;
+import org.mobicents.servlet.sip.catalina.SipServletImpl;
+import org.mobicents.servlet.sip.catalina.rules.AndRule;
+import org.mobicents.servlet.sip.catalina.rules.ContainsRule;
+import org.mobicents.servlet.sip.catalina.rules.EqualsRule;
+import org.mobicents.servlet.sip.catalina.rules.ExistsRule;
+import org.mobicents.servlet.sip.catalina.rules.NotRule;
+import org.mobicents.servlet.sip.catalina.rules.OrRule;
+import org.mobicents.servlet.sip.catalina.rules.SubdomainRule;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.descriptor.MatchingRule;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
-import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
-import org.mobicents.servlet.sip.startup.loading.SipSecurityCollection;
-import org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint;
-import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
-import org.mobicents.servlet.sip.startup.loading.rules.AndRule;
-import org.mobicents.servlet.sip.startup.loading.rules.ContainsRule;
-import org.mobicents.servlet.sip.startup.loading.rules.EqualsRule;
-import org.mobicents.servlet.sip.startup.loading.rules.ExistsRule;
-import org.mobicents.servlet.sip.startup.loading.rules.MatchingRule;
-import org.mobicents.servlet.sip.startup.loading.rules.NotRule;
-import org.mobicents.servlet.sip.startup.loading.rules.OrRule;
-import org.mobicents.servlet.sip.startup.loading.rules.SubdomainRule;
 
 /**
  * Startup event listener for a the <b>SipStandardContext</b> that configures
@@ -129,7 +130,7 @@ public class SipJBossContextConfig extends JBossContextConfig {
 	 * @param convergedMetaData
 	 */
 	protected void processSipMetaData(JBossConvergedSipMetaData convergedMetaData) {
-		SipContext convergedContext = (SipContext) context;
+		CatalinaSipContext convergedContext = (CatalinaSipContext) context;
 		convergedContext.setWrapperClass(SipServletImpl.class.getName());
 		/* 
 		 * sip sepcific treatment 

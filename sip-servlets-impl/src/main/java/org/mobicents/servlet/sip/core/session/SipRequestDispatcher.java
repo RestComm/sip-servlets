@@ -32,7 +32,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 
-import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
+import org.mobicents.servlet.sip.core.MobicentsSipServlet;
 
 /**
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
@@ -40,9 +40,9 @@ import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
  */
 public class SipRequestDispatcher implements RequestDispatcher {
 
-	private SipServletImpl handler;
+	private MobicentsSipServlet handler;
 
-	public SipRequestDispatcher(SipServletImpl sipServletImpl) {
+	public SipRequestDispatcher(MobicentsSipServlet sipServletImpl) {
 		this.handler = sipServletImpl;
 	}
 	

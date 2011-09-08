@@ -31,18 +31,16 @@ import javax.servlet.sip.AuthInfo;
 import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipApplicationSession;
-import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.SipFactoryExt;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.session.ConvergedSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
-import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * Facade object which masks the internal <code>SipFactoryImpl</code>

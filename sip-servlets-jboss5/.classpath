@@ -167,5 +167,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/ha/javax/sip/mobicents-jain-sip-ha-core/1.2.0-SNAPSHOT/mobicents-jain-sip-ha-core-1.2.0-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/ha/javax/sip/mobicents-jain-sip-jboss5/1.2.0-SNAPSHOT/mobicents-jain-sip-jboss5-1.2.0-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/javax/sip/mobicents-jain-sip-ext/1.0-SNAPSHOT/mobicents-jain-sip-ext-1.0-SNAPSHOT.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-core-api"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-catalina"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

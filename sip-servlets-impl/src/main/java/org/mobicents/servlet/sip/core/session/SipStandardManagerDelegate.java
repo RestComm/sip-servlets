@@ -23,8 +23,8 @@
 package org.mobicents.servlet.sip.core.session;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
-import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 

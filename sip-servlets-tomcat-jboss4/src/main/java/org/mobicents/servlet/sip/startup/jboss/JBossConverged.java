@@ -25,7 +25,7 @@ package org.mobicents.servlet.sip.startup.jboss;
 import org.jboss.deployment.DeploymentInfo;
 import org.jboss.web.AbstractWebDeployer;
 import org.jboss.web.tomcat.service.JBossWeb;
-import org.mobicents.servlet.sip.startup.SipHostConfig;
+import org.mobicents.servlet.sip.catalina.SipHostConfig;
 
 /**
  * Extending the JBossWeb implementation of AbstractWebContainer to be able to deploy

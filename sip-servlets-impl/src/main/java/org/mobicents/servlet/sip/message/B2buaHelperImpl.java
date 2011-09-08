@@ -34,19 +34,18 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletException;
-import javax.servlet.sip.B2buaHelper;
 import javax.servlet.sip.SipServletMessage;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipSession.State;
 import javax.servlet.sip.TooManyHopsException;
 import javax.servlet.sip.UAMode;
-import javax.servlet.sip.SipSession.State;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
 import javax.sip.ClientTransaction;
 import javax.sip.InvalidArgumentException;
@@ -74,12 +73,17 @@ import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
-import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
+import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
+import org.mobicents.servlet.sip.core.MobicentsSipFactory;
 import org.mobicents.servlet.sip.core.RoutingState;
+import org.mobicents.servlet.sip.core.SipManager;
+import org.mobicents.servlet.sip.core.b2bua.MobicentsB2BUAHelper;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletMessage;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletRequest;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
-import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 
 /**
@@ -90,7 +94,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
  * @author Jean Deruelle
  */
 
-public class B2buaHelperImpl implements B2buaHelper, Serializable {
+public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = Logger.getLogger(B2buaHelperImpl.class);
@@ -115,7 +119,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	}
 	
 	//Map to handle linked sessions
-	private Map<SipSessionKey, SipSessionKey> sessionMap = null;	
+	private Map<MobicentsSipSessionKey, MobicentsSipSessionKey> sessionMap = null;	
 	//Map to handle linked derived sessions
 	private Map<String, String> derivedSessionMap = null;
 
@@ -130,7 +134,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	private transient SipManager sipManager;
 
 	public B2buaHelperImpl() {
-		sessionMap = new ConcurrentHashMap<SipSessionKey, SipSessionKey>();
+		sessionMap = new ConcurrentHashMap<MobicentsSipSessionKey, MobicentsSipSessionKey>();
 		derivedSessionMap = new ConcurrentHashMap<String, String>();
 		originalRequestMap = new ConcurrentHashMap<SipServletRequestImpl, SipServletRequestImpl>();
 	}
@@ -178,11 +182,11 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			}
 			
 			//Creating new call id
-			final Iterator<ExtendedListeningPoint> listeningPointsIterator = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints();				
+			final Iterator<MobicentsExtendedListeningPoint> listeningPointsIterator = sipFactoryImpl.getSipNetworkInterfaceManager().getExtendedListeningPoints();				
 			if(!listeningPointsIterator.hasNext()) {				
 				throw new IllegalStateException("There is no SIP connectors available to create the request");
 			}
-			final ExtendedListeningPoint extendedListeningPoint = listeningPointsIterator.next();
+			final MobicentsExtendedListeningPoint extendedListeningPoint = listeningPointsIterator.next();
 			final CallIdHeader callIdHeader = SipFactories.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
 			newRequest.setHeader(callIdHeader);
 			
@@ -199,7 +203,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			
 			newFromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(sipFactoryImpl.getSipApplicationDispatcher(), originalSession.getKey().getApplicationName(), appSession.getKey().getId()));
 			
-			final SipSessionKey key = SessionManagerUtil.getSipSessionKey(appSession.getKey().getId(), originalSession.getKey().getApplicationName(), newRequest, false);
+			final MobicentsSipSessionKey key = SessionManagerUtil.getSipSessionKey(appSession.getKey().getId(), originalSession.getKey().getApplicationName(), newRequest, false);
 			final MobicentsSipSession session = appSession.getSipContext().getSipManager().getSipSession(key, true, sipFactoryImpl, appSession);			
 			session.setHandler(originalSession.getHandler());
 		
@@ -528,7 +532,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		if(!sipSession.isValidInternal()) {
 			throw new IllegalArgumentException("sip session " + sipSession.getId() + " is invalid !");
 		}
-		final SipServletMessageImpl sipServletMessageImpl = sipSession.getSessionCreatingTransactionRequest();
+		final MobicentsSipServletMessage sipServletMessageImpl = sipSession.getSessionCreatingTransactionRequest();
 		if(!(sipServletMessageImpl instanceof SipServletRequestImpl)) {
 			throw new IllegalStateException("session creating transaction message is not a request !");
 		}
@@ -555,7 +559,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		if(!mobicentsSipSession.isValidInternal()) {
 			throw new IllegalArgumentException("the session " + mobicentsSipSession + " is invalid");
 		}		
-		SipSessionKey sipSessionKey = this.sessionMap.get(mobicentsSipSession.getKey());
+		MobicentsSipSessionKey sipSessionKey = this.sessionMap.get(mobicentsSipSession.getKey());
 		if(sipSessionKey == null) {
 			dumpLinkedSessions();
 			if(logger.isDebugEnabled()) {
@@ -615,7 +619,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 		}
 		
 		if(linkedSession != null) {
-			return linkedSession.getSession();
+			return linkedSession.getFacade();
 		} else {
 			return null;
 		}		
@@ -743,7 +747,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 			throw new NullPointerException("the argument is null");
 		}
 		final MobicentsSipSession key = (MobicentsSipSession) session;
-		final SipSessionKey sipSessionKey = key.getKey();
+		final MobicentsSipSessionKey sipSessionKey = key.getKey();
 		if(checkSession) {
 			if(!((MobicentsSipSession)session).isValidInternal() || 
 					State.TERMINATED.equals(key.getState()) ||
@@ -751,7 +755,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 				throw new IllegalArgumentException("the session is not currently linked to another session or it has been terminated");
 			}		
 		}
-		final SipSessionKey value  = this.sessionMap.remove(sipSessionKey);
+		final MobicentsSipSessionKey value  = this.sessionMap.remove(sipSessionKey);
 		if (value != null) {
 			this.sessionMap.remove(value);
 			if(logger.isDebugEnabled()) {
@@ -778,13 +782,13 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	 * @param session
 	 * @param checkSession
 	 */
-	public void unlinkOriginalRequestInternal(SipSessionKey sipSessionKey, boolean force) {
+	public void unlinkOriginalRequestInternal(MobicentsSipSessionKey sipSessionKey, boolean force) {
 		for (Entry<SipServletRequestImpl, SipServletRequestImpl> linkedRequests : originalRequestMap.entrySet()) {
 			SipServletRequestImpl request1 = linkedRequests.getKey();
 			SipServletRequestImpl request2 = linkedRequests.getValue();
 			if(request1 != null && request2 != null) {
-				SipSessionKey key1 = request1.getSipSessionKey();
-				SipSessionKey key2 = request2.getSipSessionKey();
+				MobicentsSipSessionKey key1 = request1.getSipSessionKey();
+				MobicentsSipSessionKey key2 = request2.getSipSessionKey();
 				if((key1!=null&&key1.equals(sipSessionKey)) || (key2!=null&&key2.equals(sipSessionKey))) {
 					unlinkOriginalRequestInternal(linkedRequests.getKey(), force);
 					unlinkOriginalRequestInternal(linkedRequests.getValue(), force);
@@ -798,7 +802,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	 * @param session
 	 * @param checkSession
 	 */
-	public void unlinkOriginalRequestInternal(SipServletRequestImpl sipServletRequestImpl, boolean force) {
+	public void unlinkOriginalRequestInternal(MobicentsSipServletRequest sipServletRequestImpl, boolean force) {
 		if(sipServletRequestImpl != null) {
 			SipServletRequestImpl linkedRequest = this.originalRequestMap.get(sipServletRequestImpl);			
 			if(sipServletRequestImpl != null) {
@@ -889,8 +893,8 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	/**
 	 * @param sipFactoryImpl the sipFactoryImpl to set
 	 */
-	public void setSipFactoryImpl(SipFactoryImpl sipFactoryImpl) {
-		this.sipFactoryImpl = sipFactoryImpl;
+	public void setSipFactoryImpl(MobicentsSipFactory sipFactoryImpl) {
+		this.sipFactoryImpl = (SipFactoryImpl) sipFactoryImpl;
 	}
 
 	/**
@@ -909,7 +913,7 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	
 	private void dumpLinkedSessions() {
 		if(logger.isDebugEnabled()) {
-			for (SipSessionKey key : sessionMap.keySet()) {
+			for (MobicentsSipSessionKey key : sessionMap.keySet()) {
 				logger.debug(key + " tied to session " + sessionMap.get(key));
 			}
 			for (String key : derivedSessionMap.keySet()) {
@@ -921,14 +925,14 @@ public class B2buaHelperImpl implements B2buaHelper, Serializable {
 	/**
 	 * @param sessionMap the sessionMap to set
 	 */
-	public void setSessionMap(Map<SipSessionKey, SipSessionKey> sessionMap) {
+	public void setSessionMap(Map<MobicentsSipSessionKey, MobicentsSipSessionKey> sessionMap) {
 		this.sessionMap = sessionMap;
 	}
 
 	/**
 	 * @return the sessionMap
 	 */
-	public Map<SipSessionKey, SipSessionKey> getSessionMap() {
+	public Map<MobicentsSipSessionKey, MobicentsSipSessionKey> getSessionMap() {
 		return sessionMap;
 	}
 

@@ -25,7 +25,8 @@ package org.mobicents.servlet.sip.core.session;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.security.AuthInfoEntry;
+import org.mobicents.servlet.sip.core.security.MobicentsAuthInfoEntry;
+import org.mobicents.servlet.sip.core.security.MobicentsSipSessionSecurity;
 
 /**
  * Added to cache the credentials and store the nextnonce for Issue 2173 http://code.google.com/p/mobicents/issues/detail?id=2173
@@ -33,10 +34,10 @@ import org.mobicents.servlet.sip.security.AuthInfoEntry;
  * @author jean.deruelle@gmail.com
  *
  */
-public class SipSessionSecurity {
+public class SipSessionSecurity implements MobicentsSipSessionSecurity {
 	private static final Logger logger = Logger.getLogger(SipSessionSecurity.class);
 	
-	private ConcurrentHashMap<String, AuthInfoEntry> cachedAuthInfos = new ConcurrentHashMap<String, AuthInfoEntry>(2);
+	private ConcurrentHashMap<String, MobicentsAuthInfoEntry> cachedAuthInfos = new ConcurrentHashMap<String, MobicentsAuthInfoEntry>(2);
 	private String nextNonce;
 	
 	public void removeCachedAuthInfo(String realm) {
@@ -46,7 +47,7 @@ public class SipSessionSecurity {
 		getCachedAuthInfos().remove(realm);
 	}
 	
-	public void addCachedAuthInfo(String realm, AuthInfoEntry authInfoEntry) {
+	public void addCachedAuthInfo(String realm, MobicentsAuthInfoEntry authInfoEntry) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Caching authInfo " + authInfoEntry + " for realm " + realm);
 		}
@@ -56,7 +57,7 @@ public class SipSessionSecurity {
 	/**
 	 * @return the cachedAuthInfos
 	 */
-	public ConcurrentHashMap<String, AuthInfoEntry> getCachedAuthInfos() {		
+	public ConcurrentHashMap<String, MobicentsAuthInfoEntry> getCachedAuthInfos() {		
 		return cachedAuthInfos;
 	}
 

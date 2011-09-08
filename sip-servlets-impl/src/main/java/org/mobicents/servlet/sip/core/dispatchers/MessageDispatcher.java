@@ -37,10 +37,15 @@ import javax.sip.Transaction;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.apache.catalina.Wrapper;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.core.DispatcherException;
+import org.mobicents.servlet.sip.core.MobicentsSipServlet;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.descriptor.MobicentsSipServletMapping;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletRequest;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletResponse;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -49,9 +54,6 @@ import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
-import org.mobicents.servlet.sip.security.SipSecurityUtils;
-import org.mobicents.servlet.sip.startup.SipContext;
-import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
 
 /**
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
@@ -153,10 +155,10 @@ public abstract class MessageDispatcher {
 			Servlet servlet = null;
 			// Set the Class Loader to the same that loaded the servlet class to avoid http://code.google.com/p/mobicents/issues/detail?id=700
 			ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
-			java.lang.Thread.currentThread().setContextClassLoader(sipContext.getLoader().getClassLoader());		
+			java.lang.Thread.currentThread().setContextClassLoader(sipContext.getSipContextClassLoader());		
 			
 			Class methodDeclaringClass = appKeyMethod.getDeclaringClass();
-			Wrapper sipServletImpl = (Wrapper) sipContext.findChildrenByClassName(methodDeclaringClass.getCanonicalName());			
+			MobicentsSipServlet sipServletImpl = sipContext.findSipServletByClassName(methodDeclaringClass.getCanonicalName());			
 			if(sipServletImpl != null) {				
 				try {
 					servlet = sipServletImpl.allocate();
@@ -223,7 +225,7 @@ public abstract class MessageDispatcher {
 		if(sipContext.isMainServlet() && mainServlet != null && mainServlet.length() > 0) {
 			servletHandler = mainServlet;				
 		} else {
-			SipServletMapping sipServletMapping = sipContext.findSipServletMappings(request);
+			MobicentsSipServletMapping sipServletMapping = sipContext.findSipServletMappings(request);
 			if(sipServletMapping == null && sipContext.getSipRubyController() == null) {
 				logger.error("Sending 404 because no matching servlet found for this request ");
 				throw new DispatcherException(Response.NOT_FOUND);
@@ -237,7 +239,7 @@ public abstract class MessageDispatcher {
 		if(logger.isDebugEnabled()) {
 			logger.debug("current request Handler " + servletHandler + " for orphan Request = " + request);
 		}
-		final Wrapper sipServletImpl = (Wrapper) sipContext.findChildrenByName(servletHandler);
+		final MobicentsSipServlet sipServletImpl = sipContext.findSipServletByName(servletHandler);
 		if(sipServletImpl != null) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Dispatching orphan request " + request.toString() + 
@@ -252,7 +254,7 @@ public abstract class MessageDispatcher {
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 			
 			try {
-				final ClassLoader cl = sipContext.getLoader().getClassLoader();
+				final ClassLoader cl = sipContext.getSipContextClassLoader();
 				Thread.currentThread().setContextClassLoader(cl);
 				try {
 					if(logger.isDebugEnabled()) {
@@ -287,7 +289,7 @@ public abstract class MessageDispatcher {
 		if(logger.isDebugEnabled()) {
 			logger.debug("current request Handler " + servletHandler + " for orphan Request = " + response);
 		}
-		final Wrapper sipServletImpl = (Wrapper) sipContext.findChildrenByName(servletHandler);
+		final MobicentsSipServlet sipServletImpl = sipContext.findSipServletByName(servletHandler);
 		if(sipServletImpl != null) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Dispatching orphan request " + response.toString() + 
@@ -302,7 +304,7 @@ public abstract class MessageDispatcher {
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 			
 			try {
-				final ClassLoader cl = sipContext.getLoader().getClassLoader();
+				final ClassLoader cl = sipContext.getSipContextClassLoader();
 				Thread.currentThread().setContextClassLoader(cl);
 				try {
 					if(logger.isDebugEnabled()) {
@@ -318,12 +320,12 @@ public abstract class MessageDispatcher {
 		}
 	}
 	
-	public static void callServlet(SipServletRequestImpl request) throws ServletException, IOException {
+	public static void callServlet(MobicentsSipServletRequest request) throws ServletException, IOException {
 		final MobicentsSipSession session = request.getSipSession();		
 		final String sessionHandler = session.getHandler();
 		final MobicentsSipApplicationSession sipApplicationSessionImpl = session.getSipApplicationSession();
 		final SipContext sipContext = sipApplicationSessionImpl.getSipContext();
-		final Wrapper sipServletImpl = (Wrapper) sipContext.findChildrenByName(sessionHandler);
+		final MobicentsSipServlet sipServletImpl = sipContext.findSipServletByName(sessionHandler);
 		if(sipServletImpl != null) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Dispatching request " + request.toString() + 
@@ -339,7 +341,7 @@ public abstract class MessageDispatcher {
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 			
 			try {
-				final ClassLoader cl = sipContext.getLoader().getClassLoader();
+				final ClassLoader cl = sipContext.getSipContextClassLoader();
 				Thread.currentThread().setContextClassLoader(cl);
 			
 				if(!securityCheck(request)) return;
@@ -366,7 +368,7 @@ public abstract class MessageDispatcher {
 			
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 			try {
-				final ClassLoader cl = sipContext.getLoader().getClassLoader();
+				final ClassLoader cl = sipContext.getSipContextClassLoader();
 				Thread.currentThread().setContextClassLoader(cl);
 			
 				sipContext.getSipRubyController().routeSipMessageToRubyApp(sipContext.getServletContext(), request);
@@ -398,13 +400,13 @@ public abstract class MessageDispatcher {
 		}
 	}
 	
-	public static void callServlet(SipServletResponseImpl response) throws ServletException, IOException {		
+	public static void callServlet(MobicentsSipServletResponse response) throws ServletException, IOException {		
 		final MobicentsSipSession session = response.getSipSession();
 		
 		final String sessionHandler = session.getHandler();
 		final MobicentsSipApplicationSession sipApplicationSessionImpl = session.getSipApplicationSession();
 		final SipContext sipContext = sipApplicationSessionImpl.getSipContext();
-		final Wrapper sipServletImpl = (Wrapper) sipContext.findChildrenByName(sessionHandler);
+		final MobicentsSipServlet sipServletImpl = (MobicentsSipServlet) sipContext.findSipServletByName(sessionHandler);
 		
 		if(sipServletImpl == null || sipServletImpl.isUnavailable()) {
 			if(sipContext.getSipRubyController() != null) {
@@ -417,7 +419,7 @@ public abstract class MessageDispatcher {
 				final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 			
 				try {
-					final ClassLoader cl = sipContext.getLoader().getClassLoader();
+					final ClassLoader cl = sipContext.getSipContextClassLoader();
 					Thread.currentThread().setContextClassLoader(cl);
 				
 					sipContext.getSipRubyController().routeSipMessageToRubyApp(sipContext.getServletContext(), response);
@@ -436,7 +438,7 @@ public abstract class MessageDispatcher {
 			}
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 			try {
-				final ClassLoader cl = sipContext.getLoader().getClassLoader();
+				final ClassLoader cl = sipContext.getSipContextClassLoader();
 				Thread.currentThread().setContextClassLoader(cl);
 			
 				try {				
@@ -451,11 +453,11 @@ public abstract class MessageDispatcher {
 				
 	}
 	
-	public static boolean securityCheck(SipServletRequestImpl request)
+	public static boolean securityCheck(MobicentsSipServletRequest request)
 	{
 		MobicentsSipApplicationSession appSession = (MobicentsSipApplicationSession) request.getApplicationSession();
 		SipContext sipStandardContext = appSession.getSipContext();
-		boolean authorized = SipSecurityUtils.authorize(sipStandardContext, request);
+		boolean authorized = sipStandardContext.authorize(request);
 		
 		// This will propagate the identity for the thread and all called components
 		// TODO: FIXME: This would introduce a dependency on JBoss

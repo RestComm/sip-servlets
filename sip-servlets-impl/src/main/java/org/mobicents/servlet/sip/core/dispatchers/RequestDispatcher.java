@@ -45,7 +45,7 @@ import javax.sip.message.Response;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
-import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
+import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.SipSessionRoutingType;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -133,7 +133,7 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 			}
 			clonedRequest.addHeader(viaHeader);	 			
 		}
-		ExtendedListeningPoint extendedListeningPoint = 
+		MobicentsExtendedListeningPoint extendedListeningPoint = 
 			sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
 		if(logger.isDebugEnabled()) {
 			logger.debug("Matching listening point found " 

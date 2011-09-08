@@ -56,9 +56,9 @@ import org.jboss.web.tomcat.security.HttpServletRequestPolicyContextHandler;
 import org.jboss.web.tomcat.service.DeployerConfig;
 import org.jboss.web.tomcat.service.JBossWebMBean;
 import org.jboss.web.tomcat.service.session.SessionIDGenerator;
-import org.mobicents.servlet.sip.annotations.SipApplicationAnnotationUtils;
-import org.mobicents.servlet.sip.startup.SipContext;
-import org.mobicents.servlet.sip.startup.SipHostConfig;
+import org.mobicents.servlet.sip.catalina.SipHostConfig;
+import org.mobicents.servlet.sip.catalina.annotations.SipApplicationAnnotationUtils;
+import org.mobicents.servlet.sip.core.SipContext;
 
 
 /**

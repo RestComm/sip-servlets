@@ -32,11 +32,10 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipSession.State;
 
-import org.apache.catalina.Container;
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
-import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * This class handles the management of sip sessions and sip application sessions for a given container (context)
@@ -63,7 +62,7 @@ public abstract class SipManagerDelegate {
 
 	protected SipFactoryImpl sipFactoryImpl;
 	
-	protected Container container;
+	protected SipContext container;
 
 	/**
      * The maximum number of active Sip Sessions allowed, or -1 for no limit.
@@ -89,36 +88,36 @@ public abstract class SipManagerDelegate {
     /**
      * The longest time (in seconds) that an expired sip session had been alive.
      */
-    protected int sipSessionMaxAliveTime;
+    private int sipSessionMaxAliveTime;
 
 
     /**
      * Average time (in seconds) that expired sip sessions had been alive.
      */
-    protected int sipSessionAverageAliveTime;
+    private int sipSessionAverageAliveTime;
 
 
     /**
      * Number of sip sessions that have expired.
      */
-    protected int expiredSipSessions = 0;
+    private int expiredSipSessions = 0;
     
     /**
      * The longest time (in seconds) that an expired Sip Application session had been alive.
      */
-    protected int sipApplicationSessionMaxAliveTime;
+    private int sipApplicationSessionMaxAliveTime;
 
 
     /**
      * Average time (in seconds) that expired Sip Application Sessions had been alive.
      */
-    protected int sipApplicationSessionAverageAliveTime;
+    private int sipApplicationSessionAverageAliveTime;
 
 
     /**
      * Number of sip application sessions that have expired.
      */
-    protected int expiredSipApplicationSessions = 0;
+    private int expiredSipApplicationSessions = 0;
     
     // Number of sip sessions created by this manager
     protected int sipSessionCounter=0;
@@ -126,13 +125,13 @@ public abstract class SipManagerDelegate {
     // Number of sip Application sessions created by this manager
     protected int sipApplicationSessionCounter=0;
     
-    protected int lastUpdatedSasCreationCounter = 0;
-    protected long lastSipApplicationSessionUpdatedTime = 0;
-    double lastAverageSasCreationPerSecond = 0.0;
+    private int lastUpdatedSasCreationCounter = 0;
+    private long lastSipApplicationSessionUpdatedTime = 0;
+    private double lastAverageSasCreationPerSecond = 0.0;
     
-    protected int lastUpdatedSsCreationCounter = 0;
-    protected long lastSipSessionUpdatedTime = 0;
-    double lastAverageSsCreationPerSecond = 0.0;
+    private int lastUpdatedSsCreationCounter = 0;
+    private long lastSipSessionUpdatedTime = 0;
+    private double lastAverageSsCreationPerSecond = 0.0;
 	/**
 	 * @return the SipFactoryImpl
 	 */
@@ -150,14 +149,14 @@ public abstract class SipManagerDelegate {
 	/**
 	 * @return the container
 	 */
-	public Container getContainer() {
+	public SipContext getContainer() {
 		return container;
 	}
 
 	/**
 	 * @param container the container to set
 	 */
-	public void setContainer(Container container) {
+	public void setContainer(SipContext container) {
 		this.container = container;
 	}
 	
@@ -166,7 +165,7 @@ public abstract class SipManagerDelegate {
 	 * @param key the identifier for this session
 	 * @return the sip session that had just been removed, null otherwise
 	 */
-	public MobicentsSipSession removeSipSession(final SipSessionKey key) {
+	public MobicentsSipSession removeSipSession(final MobicentsSipSessionKey key) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Removing a sip session with the key : " + key);
 		}
@@ -178,7 +177,7 @@ public abstract class SipManagerDelegate {
 	 * @param key the identifier for this session
 	 * @return the sip application session that had just been removed, null otherwise
 	 */
-	public MobicentsSipApplicationSession removeSipApplicationSession(final SipApplicationSessionKey key) {
+	public MobicentsSipApplicationSession removeSipApplicationSession(final MobicentsSipApplicationSessionKey key) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Removing a sip application session with the key : " + key);
 		}
@@ -322,7 +321,7 @@ public abstract class SipManagerDelegate {
 	
 	protected MobicentsSipSession setToTag(final SipSessionKey key, final MobicentsSipSession sipSession) {
 		final String currentKeyToTag = key.getToTag();
-		final SipSessionKey existingKey = sipSession.getKey();
+		final MobicentsSipSessionKey existingKey = sipSession.getKey();
 		final String toTag = existingKey.getToTag();
 		if(toTag == null && currentKeyToTag != null) {
 			existingKey.setToTag(currentKeyToTag, false);
@@ -745,7 +744,7 @@ public abstract class SipManagerDelegate {
 
 	public void updateStats() {
 		if(logger.isTraceEnabled()) {
-			logger.trace("updating sip manager " + container.getName() + " statistics");
+			logger.trace("updating sip manager " + container.getApplicationName() + " statistics");
 		}
 		long now = System.currentTimeMillis();
 		// Updating the number of Sip Application Session Creation Per Seconds

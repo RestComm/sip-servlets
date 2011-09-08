@@ -54,7 +54,7 @@ import org.jboss.invocation.MarshalledValueInputStream;
 import org.jboss.invocation.MarshalledValueOutputStream;
 import org.jboss.logging.Logger;
 import org.jboss.mx.util.MBeanProxyExt;
-import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.core.SipContext;
 
 /**
  * Implementation of a converged wrapper jboss cache service.

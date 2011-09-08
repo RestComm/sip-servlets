@@ -26,12 +26,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
@@ -149,11 +149,11 @@ public class AttributeBasedClusteredSipSession extends JBossCacheClusteredSipSes
 			}
 			
 			if(b2buaHelper != null) {
-				final Map<SipSessionKey, SipSessionKey> sessionMap = b2buaHelper.getSessionMap();
+				final Map<MobicentsSipSessionKey, MobicentsSipSessionKey> sessionMap = b2buaHelper.getSessionMap();
 				final int size = sessionMap.size();
 				final String[][] sessionArray = new String[2][size];
 				int i = 0;
-				for (Entry<SipSessionKey, SipSessionKey> entry : sessionMap.entrySet()) {
+				for (Entry<MobicentsSipSessionKey, MobicentsSipSessionKey> entry : sessionMap.entrySet()) {
 					sessionArray [0][i] = entry.getKey().toString(); 
 					sessionArray [1][i] = entry.getValue().toString();
 					i++;

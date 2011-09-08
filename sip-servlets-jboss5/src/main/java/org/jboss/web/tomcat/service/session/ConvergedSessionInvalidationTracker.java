@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.apache.catalina.Manager;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 
@@ -35,8 +37,8 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
  */
 public class ConvergedSessionInvalidationTracker {
 	private static final ThreadLocal<Map<Manager, String>> invalidatedSessions = new ThreadLocal<Map<Manager, String>>();
-	private static final ThreadLocal<Map<Manager, SipSessionKey>> invalidatedSipSessions = new ThreadLocal<Map<Manager, SipSessionKey>>();
-	private static final ThreadLocal<Map<Manager, SipApplicationSessionKey>> invalidatedSipApplicationSessions = new ThreadLocal<Map<Manager, SipApplicationSessionKey>>();
+	private static final ThreadLocal<Map<Manager, MobicentsSipSessionKey>> invalidatedSipSessions = new ThreadLocal<Map<Manager, MobicentsSipSessionKey>>();
+	private static final ThreadLocal<Map<Manager, MobicentsSipApplicationSessionKey>> invalidatedSipApplicationSessions = new ThreadLocal<Map<Manager, MobicentsSipApplicationSessionKey>>();
 	private static final ThreadLocal<Boolean> suspended = new ThreadLocal<Boolean>();
 
 	public static void suspend() {
@@ -58,22 +60,22 @@ public class ConvergedSessionInvalidationTracker {
 		}
 	}
 	
-	public static void sipSessionInvalidated(SipSessionKey key, Manager manager) {
+	public static void sipSessionInvalidated(MobicentsSipSessionKey key, Manager manager) {
 		if (Boolean.TRUE != suspended.get()) {
-			Map<Manager, SipSessionKey> map = invalidatedSipSessions.get();
+			Map<Manager, MobicentsSipSessionKey> map = invalidatedSipSessions.get();
 			if (map == null) {
-				map = new WeakHashMap<Manager, SipSessionKey>(2);
+				map = new WeakHashMap<Manager, MobicentsSipSessionKey>(2);
 				invalidatedSipSessions.set(map);
 			}
 			map.put(manager, key);
 		}
 	}
 	
-	public static void sipApplicationSessionInvalidated(SipApplicationSessionKey key, Manager manager) {
+	public static void sipApplicationSessionInvalidated(MobicentsSipApplicationSessionKey key, Manager manager) {
 		if (Boolean.TRUE != suspended.get()) {
-			Map<Manager, SipApplicationSessionKey> map = invalidatedSipApplicationSessions.get();
+			Map<Manager, MobicentsSipApplicationSessionKey> map = invalidatedSipApplicationSessions.get();
 			if (map == null) {
-				map = new WeakHashMap<Manager, SipApplicationSessionKey>(2);
+				map = new WeakHashMap<Manager, MobicentsSipApplicationSessionKey>(2);
 				invalidatedSipApplicationSessions.set(map);
 			}
 			map.put(manager, key);
@@ -96,18 +98,18 @@ public class ConvergedSessionInvalidationTracker {
 		return result;
 	}
 	
-	public static boolean isSipSessionInvalidated(SipSessionKey key, Manager manager) {
+	public static boolean isSipSessionInvalidated(MobicentsSipSessionKey key, Manager manager) {
 		boolean result = false;
-		Map<Manager, SipSessionKey> map = invalidatedSipSessions.get();
+		Map<Manager, MobicentsSipSessionKey> map = invalidatedSipSessions.get();
 		if (map != null) {
 			result = key.equals(map.get(manager));
 		}
 		return result;
 	}
 	
-	public static boolean isSipApplicationSessionInvalidated(SipApplicationSessionKey key, Manager manager) {
+	public static boolean isSipApplicationSessionInvalidated(MobicentsSipApplicationSessionKey key, Manager manager) {
 		boolean result = false;
-		Map<Manager, SipApplicationSessionKey> map = invalidatedSipApplicationSessions.get();
+		Map<Manager, MobicentsSipApplicationSessionKey> map = invalidatedSipApplicationSessions.get();
 		if (map != null) {
 			result = key.equals(map.get(manager));
 		}

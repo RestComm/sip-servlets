@@ -31,15 +31,13 @@ import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipSessionsUtil;
 import javax.servlet.sip.TimerService;
 
-import org.jboss.deployment.DeploymentInfo;
-import org.jboss.metadata.WebMetaData;
 import org.jboss.util.naming.NonSerializableFactory;
 import org.jboss.util.naming.Util;
 import org.jboss.web.AbstractWebContainer;
 import org.jboss.web.WebApplication;
 import org.jboss.web.tomcat.service.DeployerConfig;
 import org.jboss.web.tomcat.service.TomcatDeployer;
-import org.mobicents.servlet.sip.startup.SipHostConfig;
+import org.mobicents.servlet.sip.catalina.SipHostConfig;
 import org.mobicents.servlet.sip.startup.SipNamingContextListener;
 
 /**

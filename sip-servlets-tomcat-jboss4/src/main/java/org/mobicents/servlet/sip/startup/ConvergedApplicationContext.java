@@ -28,8 +28,9 @@ import javax.servlet.ServletContext;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.ApplicationContext;
 import org.apache.catalina.core.StandardContext;
+import org.mobicents.servlet.sip.catalina.SipServletImpl;
+import org.mobicents.servlet.sip.core.MobicentsSipServlet;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
-import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 /**
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
@@ -65,7 +66,7 @@ public class ConvergedApplicationContext extends ApplicationContext {
             return (null);
         
         if(wrapper instanceof SipServletImpl) {
-        	return new SipRequestDispatcher((SipServletImpl) wrapper);
+        	return new SipRequestDispatcher((MobicentsSipServlet) wrapper);
         } else {
         	return super.getNamedDispatcher(name);
         }

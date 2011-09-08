@@ -43,11 +43,11 @@ import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.jboss.servlet.http.HttpEvent;
+import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.session.ConvergedSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipManager;
 
 
 /**

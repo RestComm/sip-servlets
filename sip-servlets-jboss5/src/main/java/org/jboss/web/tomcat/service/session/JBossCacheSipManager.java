@@ -91,16 +91,19 @@ import org.mobicents.cluster.election.DefaultClusterElector;
 import org.mobicents.ha.javax.sip.ClusteredSipStack;
 import org.mobicents.ha.javax.sip.ReplicationStrategy;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.core.MobicentsSipFactory;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.SipService;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManagerDelegate;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.notification.SessionActivationNotificationCause;
-import org.mobicents.servlet.sip.startup.SipContext;
-import org.mobicents.servlet.sip.startup.SipService;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
@@ -2457,7 +2460,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		if (key == null) {
 			return null;
 		}
-		SipApplicationSessionKey applicationSessionKey = null;
+		MobicentsSipApplicationSessionKey applicationSessionKey = null;
 		if(sipApplicationSessionImpl != null) {
 			applicationSessionKey = sipApplicationSessionImpl.getKey();
 		} else {
@@ -2468,7 +2471,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 		}
 		SipFactoryImpl sipFactory = sipFactoryImpl;
 		if(sipFactory == null) {
-			sipFactory = this.getSipFactoryImpl();
+			sipFactory = (SipFactoryImpl) this.getMobicentsSipFactory();
 		}
 		long begin = System.currentTimeMillis();
 		boolean mustAdd = false;
@@ -3128,7 +3131,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	/**
 	 * @return the SipFactoryImpl
 	 */
-	public SipFactoryImpl getSipFactoryImpl() {
+	public MobicentsSipFactory getMobicentsSipFactory() {
 		return sipManagerDelegate.getSipFactoryImpl();
 	}
 
@@ -3136,15 +3139,15 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	 * @param sipFactoryImpl
 	 *            the SipFactoryImpl to set
 	 */
-	public void setSipFactoryImpl(SipFactoryImpl sipFactoryImpl) {
-		sipManagerDelegate.setSipFactoryImpl(sipFactoryImpl);
+	public void setMobicentsSipFactory(MobicentsSipFactory sipFactoryImpl) {
+		sipManagerDelegate.setSipFactoryImpl((SipFactoryImpl)sipFactoryImpl);
 	}
 
 	/**
 	 * @return the container
 	 */
 	public Container getContainer() {
-		return sipManagerDelegate.getContainer();
+		return (Container) sipManagerDelegate.getContainer();
 	}
 
 	/**
@@ -3160,7 +3163,9 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 			return;
 		}
 		super.setContainer(container);		
-		sipManagerDelegate.setContainer(container);
+		if(container instanceof SipContext) {	
+			sipManagerDelegate.setContainer((SipContext)container);
+		}
 		DistributedCacheConvergedSipManager<? extends OutgoingDistributableSessionData> distributedCacheConvergedSipManager = getDistributedCacheConvergedSipManager();
 		// Issue 1514: http://code.google.com/p/mobicents/issues/detail?id=1514	
 		// only set this up if the application is a SIP or converged application	
@@ -3179,7 +3184,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	/**
 	 * {@inheritDoc}
 	 */
-	public MobicentsSipSession removeSipSession(final SipSessionKey key) {
+	public MobicentsSipSession removeSipSession(final MobicentsSipSessionKey key) {
 		ClusteredSipSession<? extends OutgoingDistributableSessionData> clusterSess = (ClusteredSipSession<? extends OutgoingDistributableSessionData>) sipManagerDelegate.removeSipSession(key);
 		if(clusterSess == null) {
 			return null;
@@ -3253,7 +3258,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	 * {@inheritDoc}
 	 */
 	public MobicentsSipApplicationSession removeSipApplicationSession(
-			final SipApplicationSessionKey key) {
+			final MobicentsSipApplicationSessionKey key) {
 		ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> clusterSess = (ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData>) sipManagerDelegate.removeSipApplicationSession(key);
 		if(clusterSess == null) {
 			return null;
@@ -3329,7 +3334,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	 * @see org.mobicents.servlet.sip.core.session.SipManager#getSipApplicationSession(org.mobicents.servlet.sip.core.session.SipApplicationSessionKey, boolean)
 	 */
 	public MobicentsSipApplicationSession getSipApplicationSession(
-			final SipApplicationSessionKey key, final boolean create) {
+			final MobicentsSipApplicationSessionKey key, final boolean create) {
 		return getSipApplicationSession(key, create, false);		
 	}
 
@@ -3338,7 +3343,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	 * @see org.mobicents.servlet.sip.core.session.DistributableSipManager#getSipApplicationSession(org.mobicents.servlet.sip.core.session.SipApplicationSessionKey, boolean, boolean)
 	 */
 	public MobicentsSipApplicationSession getSipApplicationSession(
-			final SipApplicationSessionKey key, final boolean create, final boolean localOnly) {
+			final MobicentsSipApplicationSessionKey sipAppSessionKey, final boolean create, final boolean localOnly) {
+		SipApplicationSessionKey key = (SipApplicationSessionKey) sipAppSessionKey;
 		// Find it from the local store first
 		ClusteredSipApplicationSession<? extends OutgoingDistributableSessionData> session = findLocalSipApplicationSession(key, false);
 
@@ -3410,8 +3416,8 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	 * (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.session.SipManager#getSipSession(org.mobicents.servlet.sip.core.session.SipSessionKey, boolean, org.mobicents.servlet.sip.message.SipFactoryImpl, org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession)
 	 */
-	public MobicentsSipSession getSipSession(final SipSessionKey key,
-			final boolean create, final SipFactoryImpl sipFactoryImpl,
+	public MobicentsSipSession getSipSession(final MobicentsSipSessionKey key,
+			final boolean create, final MobicentsSipFactory sipFactoryImpl,
 			final MobicentsSipApplicationSession sipApplicationSessionImpl) {
 		return getSipSession(key, create, sipFactoryImpl, sipApplicationSessionImpl, false);
 	}
@@ -3420,10 +3426,12 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	 * (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.session.DistributableSipManager#getSipSession(org.mobicents.servlet.sip.core.session.SipSessionKey, boolean, org.mobicents.servlet.sip.message.SipFactoryImpl, org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession, boolean)
 	 */
-	public MobicentsSipSession getSipSession(final SipSessionKey key,
-			final boolean create, final SipFactoryImpl sipFactoryImpl,
+	public MobicentsSipSession getSipSession(final MobicentsSipSessionKey sipSessionKey,
+			final boolean create, final MobicentsSipFactory mobicentsSipFactory,
 			final MobicentsSipApplicationSession sipApplicationSessionImpl, final boolean localOnly) {
 		
+		SipSessionKey key = (SipSessionKey) sipSessionKey;
+		SipFactoryImpl sipFactoryImpl= (SipFactoryImpl) mobicentsSipFactory;
 		// Find it from the local store first
 		ClusteredSipSession<? extends OutgoingDistributableSessionData> session = findLocalSipSession(key, false, sipApplicationSessionImpl);
 		if(session == null) {
@@ -4506,7 +4514,7 @@ public class JBossCacheSipManager<O extends OutgoingDistributableSessionData> ex
 	      {
 	         assert session != null : "session is null";
 	         
-	         this.key = new ClusteredSipSessionKey(session.getKey(), session.getSipApplicationSession().getKey());
+	         this.key = new ClusteredSipSessionKey(session.getKey(), (SipApplicationSessionKey)session.getSipApplicationSession().getKey());
 	         this.session = session;
 	         this.osu = null;
 	      }

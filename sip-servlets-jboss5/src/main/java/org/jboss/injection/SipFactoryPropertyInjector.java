@@ -25,7 +25,7 @@ package org.jboss.injection;
 import org.jboss.ejb3.BeanContext;
 import org.jboss.injection.lang.reflect.BeanProperty;
 import org.jboss.web.tomcat.service.TomcatConvergedSipInjectionContainer;
-import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.core.SipContext;
 
 /**
  * Injects a SipFactory into a bean property.

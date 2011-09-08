@@ -23,10 +23,10 @@
 package org.mobicents.servlet.sip.core.timers;
 
 import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.proxy.ProxyBranchTimerTask;
 
 /**
  * @author jean.deruelle@gmail.com
@@ -41,7 +41,7 @@ public class ProxyTimerServiceImpl extends Timer implements ProxyTimerService {
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.timers.ProxyTimerService#cancel(org.mobicents.servlet.sip.proxy.ProxyBranchTimerTask)
 	 */
-	public void cancel(ProxyBranchTimerTask task) {
+	public void cancel(TimerTask task) {
 		task.cancel();
 	}
 
@@ -55,7 +55,7 @@ public class ProxyTimerServiceImpl extends Timer implements ProxyTimerService {
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.timers.ProxyTimerService#schedule(org.mobicents.servlet.sip.proxy.ProxyBranchTimerTask, long)
 	 */
-	public void schedule(ProxyBranchTimerTask task, long delay) {
+	public void schedule(TimerTask task, long delay) {
 		super.schedule(task, delay);
 	}
 

@@ -25,7 +25,7 @@ package org.mobicents.servlet.sip.annotations;
 import javax.naming.Context;
 
 import org.apache.AnnotationProcessor;
-import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.core.SipContext;
 
 /**
  * Interface for the Sip specific AnnotationProcessor extending the regular catalina AnnotationProcessor

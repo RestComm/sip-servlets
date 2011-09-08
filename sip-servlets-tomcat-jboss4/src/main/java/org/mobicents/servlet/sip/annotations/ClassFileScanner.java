@@ -27,8 +27,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Enumeration;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -41,8 +39,9 @@ import javax.servlet.sip.annotation.SipServlet;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControl;
-import org.mobicents.servlet.sip.startup.SipContext;
-import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
+import org.mobicents.servlet.sip.catalina.CatalinaSipContext;
+import org.mobicents.servlet.sip.catalina.SipServletImpl;
+import org.mobicents.servlet.sip.core.SipContext;
 
 /**
  * This class implement the logic to enumerate all class files in
@@ -62,7 +61,7 @@ public class ClassFileScanner {
 			
 	private String docbase;
 	
-	private SipContext sipContext;
+	private CatalinaSipContext sipContext;
 	
 	private String parsedAnnotatedPackage = null;
 	
@@ -72,7 +71,7 @@ public class ClassFileScanner {
 	
 	private AnnotationsClassLoader classLoader;
 	
-	public ClassFileScanner(String docbase, SipContext ctx) {
+	public ClassFileScanner(String docbase, CatalinaSipContext ctx) {
 		this.docbase = docbase;
 		this.sipContext = ctx;
 	}
@@ -91,7 +90,7 @@ public class ClassFileScanner {
 		ClassLoader cl = this.sipContext.getClass().getClassLoader();
 		this.classLoader = new AnnotationsClassLoader(
 				cl);
-		this.classLoader.setResources(this.sipContext.getResources());
+		this.classLoader.setResources(((CatalinaSipContext)this.sipContext).getResources());
 		this.classLoader.setAntiJARLocking(true);
 		
 		if(logger.isDebugEnabled()) {

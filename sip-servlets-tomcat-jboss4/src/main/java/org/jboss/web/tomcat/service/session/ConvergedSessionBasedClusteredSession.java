@@ -29,9 +29,9 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.sip.SipApplicationSession;
 
 import org.apache.catalina.security.SecurityUtil;
+import org.mobicents.servlet.sip.catalina.session.ConvergedSessionDelegate;
+import org.mobicents.servlet.sip.catalina.session.ConvergedSessionFacade;
 import org.mobicents.servlet.sip.core.session.ConvergedSession;
-import org.mobicents.servlet.sip.core.session.ConvergedSessionDelegate;
-import org.mobicents.servlet.sip.core.session.ConvergedSessionFacade;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 
 /**

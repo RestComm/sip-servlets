@@ -51,23 +51,26 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.SipFactoryExt;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
+import org.mobicents.servlet.sip.core.DispatcherException;
+import org.mobicents.servlet.sip.core.MobicentsSipFactory;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.SipManager;
+import org.mobicents.servlet.sip.core.proxy.MobicentsProxy;
+import org.mobicents.servlet.sip.core.proxy.MobicentsProxyBranch;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
-import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
-import org.mobicents.servlet.sip.proxy.ProxyImpl;
-import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
@@ -96,7 +99,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchMessage(final SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {
-		final SipFactoryImpl sipFactoryImpl = sipApplicationDispatcher.getSipFactory();
+		final MobicentsSipFactory sipFactoryImpl = sipApplicationDispatcher.getSipFactory();
 		final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipServletMessage;
 		if(logger.isDebugEnabled()) {
 			logger.debug("Routing of Subsequent Request " + sipServletRequest);
@@ -201,8 +204,8 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request);
 			}
 		}
-		final SipManager sipManager = (SipManager)sipContext.getManager();		
-		final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
+		final SipManager sipManager = sipContext.getSipManager();		
+		final MobicentsSipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				applicationName, 
 				applicationId);
 	
@@ -213,15 +216,15 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				sipManager.dumpSipApplicationSessions();
 			}
 			//trying the join or replaces matching sip app sessions
-			final SipApplicationSessionKey joinSipApplicationSessionKey = sipContext.getSipSessionsUtil().getCorrespondingSipApplicationSession(sipApplicationSessionKey, JoinHeader.NAME);
-			final SipApplicationSessionKey replacesSipApplicationSessionKey = sipContext.getSipSessionsUtil().getCorrespondingSipApplicationSession(sipApplicationSessionKey, ReplacesHeader.NAME);
+			final MobicentsSipApplicationSessionKey joinSipApplicationSessionKey = sipContext.getSipSessionsUtil().getCorrespondingSipApplicationSession(sipApplicationSessionKey, JoinHeader.NAME);
+			final MobicentsSipApplicationSessionKey replacesSipApplicationSessionKey = sipContext.getSipSessionsUtil().getCorrespondingSipApplicationSession(sipApplicationSessionKey, ReplacesHeader.NAME);
 			if(joinSipApplicationSessionKey != null) {
 				sipApplicationSession = sipManager.getSipApplicationSession(joinSipApplicationSessionKey, false);
 			} else if(replacesSipApplicationSessionKey != null) {
 				sipApplicationSession = sipManager.getSipApplicationSession(replacesSipApplicationSessionKey, false);
 			}
 			if(sipApplicationSession == null) {
-				boolean routeOrphanRequests = sipContext.getSipFactoryFacade().isRouteOrphanRequests();
+				boolean routeOrphanRequests = ((SipFactoryExt)sipContext.getSipFactoryFacade()).isRouteOrphanRequests();
 				if(logger.isDebugEnabled()) {
 					logger.debug("routeOrphanRequests = " + routeOrphanRequests + " for context " + sipContext.getApplicationName());
 				}
@@ -396,9 +399,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					}						
 							
 					// See if the subsequent request should go directly to the proxy
-					final ProxyImpl proxy = sipSession.getProxy();
+					final MobicentsProxy proxy = sipSession.getProxy();
 					if(proxy != null) {
-						ProxyBranchImpl finalBranch = proxy.getFinalBranchForSubsequentRequests();
+						MobicentsProxyBranch finalBranch = proxy.getFinalBranchForSubsequentRequests();
 						
 						boolean isPrack = requestMethod.equalsIgnoreCase(Request.PRACK);
 						boolean isUpdate = requestMethod.equalsIgnoreCase(Request.UPDATE);

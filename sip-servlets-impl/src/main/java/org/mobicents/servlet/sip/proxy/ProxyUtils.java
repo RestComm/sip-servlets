@@ -51,7 +51,9 @@ import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletResponse;
+import org.mobicents.servlet.sip.core.proxy.MobicentsProxyBranch;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -80,7 +82,7 @@ public class ProxyUtils {
 			if(rHeader != null) {
 				String nextApp = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME);
 				if(nextApp != null) {
-					final SipApplicationSessionKey sipAppKey = originalRequest.getSipSession().getSipApplicationSession().getKey();
+					final MobicentsSipApplicationSessionKey sipAppKey = originalRequest.getSipSession().getSipApplicationSession().getKey();
 					final String thisApp = sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());
 					outboundTransport = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getTransportParam();
 					if(outboundTransport == null) {
@@ -204,7 +206,7 @@ public class ProxyUtils {
 				// Cancel is hop by hop so remove all other via headers.
 				clonedRequest.removeHeader(ViaHeader.NAME);				
 			} 
-			final SipApplicationSessionKey sipAppKey = originalRequest.getSipSession().getSipApplicationSession().getKey();
+			final MobicentsSipApplicationSessionKey sipAppKey = originalRequest.getSipSession().getSipApplicationSession().getKey();
 			final String appName = sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());
 			final SipServletRequestImpl proxyBranchMatchingRequest = (SipServletRequestImpl) proxyBranch.getMatchingRequest(originalRequest);
 			//Add via header
@@ -366,7 +368,7 @@ public class ProxyUtils {
 		}
 	}
 	
-	public static SipServletResponseImpl createProxiedResponse(SipServletResponseImpl sipServetResponse, ProxyBranchImpl proxyBranch)
+	public static SipServletResponseImpl createProxiedResponse(MobicentsSipServletResponse sipServetResponse, MobicentsProxyBranch proxyBranch)
 	{
 		final Response response = (Response)sipServetResponse.getMessage();
 		final Response clonedResponse = (Response)  response.clone();

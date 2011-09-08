@@ -35,6 +35,8 @@ import org.apache.catalina.core.NamingContextListener;
 import org.apache.log4j.Logger;
 import org.apache.naming.ContextAccessController;
 import org.mobicents.servlet.sip.annotations.SipAnnotationProcessor;
+import org.mobicents.servlet.sip.catalina.CatalinaSipContext;
+import org.mobicents.servlet.sip.core.SipContext;
 
 /**
  * Helper class used to initialize and populate the JNDI context associated
@@ -66,7 +68,7 @@ public class SipNamingContextListener extends NamingContextListener {
 		super.lifecycleEvent(event);
 		if (event.getType().equalsIgnoreCase(Lifecycle.START_EVENT)) {
 			if (container instanceof SipContext) {
-				((SipAnnotationProcessor)((SipContext)container).getAnnotationProcessor()).setContext(envCtx);
+				((SipAnnotationProcessor)((CatalinaSipContext)container).getAnnotationProcessor()).setContext(envCtx);
 			}
 		}
 	}

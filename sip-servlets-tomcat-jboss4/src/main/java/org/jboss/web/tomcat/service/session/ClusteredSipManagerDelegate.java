@@ -23,14 +23,13 @@
 package org.jboss.web.tomcat.service.session;
 
 import org.jboss.metadata.WebMetaData;
-import org.mobicents.servlet.sip.core.session.DistributableSipManager;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipManagerDelegate;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
-import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
@@ -86,15 +85,15 @@ public class ClusteredSipManagerDelegate extends SipManagerDelegate {
 		MobicentsSipSession session = null;
 		switch (replicationGranularity) {
 		case (WebMetaData.REPLICATION_GRANULARITY_ATTRIBUTE): {
-				session = new AttributeBasedClusteredSipSession(key, sipFactoryImpl, mobicentsSipApplicationSession, (JBossCacheManager)container.getManager());
+				session = new AttributeBasedClusteredSipSession(key, sipFactoryImpl, mobicentsSipApplicationSession, (JBossCacheManager)container.getSipManager());
 			break;
 		}
 		case (WebMetaData.REPLICATION_GRANULARITY_FIELD): {
-				session = new FieldBasedClusteredSipSession(key, sipFactoryImpl, mobicentsSipApplicationSession, (JBossCacheManager)container.getManager());
+				session = new FieldBasedClusteredSipSession(key, sipFactoryImpl, mobicentsSipApplicationSession, (JBossCacheManager)container.getSipManager());
 			break;
 		}
 		default:
-				session = new SessionBasedClusteredSipSession(key, sipFactoryImpl, mobicentsSipApplicationSession, (JBossCacheManager)container.getManager());
+				session = new SessionBasedClusteredSipSession(key, sipFactoryImpl, mobicentsSipApplicationSession, (JBossCacheManager)container.getSipManager());
 			break;
 		}
 		return session;

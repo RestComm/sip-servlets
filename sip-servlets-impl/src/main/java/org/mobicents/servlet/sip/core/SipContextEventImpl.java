@@ -20,43 +20,52 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.mobicents.servlet.sip.startup;
+package org.mobicents.servlet.sip.core;
 
 /**
- * Exception occuring when something goes wrong with the deployment of the sip application
- * 
- * @author jean.deruelle@gmail.com
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
-public class SipDeploymentException extends RuntimeException {
-
+public class SipContextEventImpl implements SipContextEvent {
+	
+	SipContextEventType eventType;
+	Object eventObject;
+	
 	/**
-	 * 
+	 * @param eventType
+	 * @param eventObject
 	 */
-	public SipDeploymentException() {
+	public SipContextEventImpl(SipContextEventType eventType, Object eventObject) {
 		super();
+		this.eventType = eventType;
+		this.eventObject = eventObject;
 	}
 
 	/**
-	 * @param message
+	 * @return the eventType
 	 */
-	public SipDeploymentException(String message) {
-		super(message);
+	public SipContextEventType getEventType() {
+		return eventType;
 	}
 
 	/**
-	 * @param cause
+	 * @param eventType the eventType to set
 	 */
-	public SipDeploymentException(Throwable cause) {
-		super(cause);
+	public void setEventType(SipContextEventType eventType) {
+		this.eventType = eventType;
 	}
 
 	/**
-	 * @param message
-	 * @param cause
+	 * @return the eventObject
 	 */
-	public SipDeploymentException(String message, Throwable cause) {
-		super(message, cause);
+	public Object getEventObject() {
+		return eventObject;
 	}
 
+	/**
+	 * @param eventObject the eventObject to set
+	 */
+	public void setEventObject(Object eventObject) {
+		this.eventObject = eventObject;
+	}	
 }

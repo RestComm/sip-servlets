@@ -34,7 +34,7 @@ import java.util.UUID;
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  *
  */
-public final class SipApplicationSessionKey implements Serializable {
+public final class SipApplicationSessionKey implements Serializable, MobicentsSipApplicationSessionKey {
 
 	private static final long serialVersionUID = 1L;
 	private final String uuid;

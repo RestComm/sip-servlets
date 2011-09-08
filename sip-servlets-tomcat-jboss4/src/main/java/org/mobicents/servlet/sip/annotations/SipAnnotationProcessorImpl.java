@@ -34,7 +34,7 @@ import javax.persistence.PersistenceUnit;
 import javax.xml.ws.WebServiceRef;
 
 import org.apache.catalina.util.DefaultAnnotationProcessor;
-import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.core.SipContext;
 /**
  * An annotation processor which tries to inject resources found in the servlet context
  * instead of the naming context of the servlet.

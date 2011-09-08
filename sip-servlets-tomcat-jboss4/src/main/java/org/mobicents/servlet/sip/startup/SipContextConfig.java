@@ -44,7 +44,12 @@ import org.apache.naming.resources.FileDirContext;
 import org.apache.tomcat.util.digester.Digester;
 import org.mobicents.servlet.sip.annotations.AnnotationVerificationException;
 import org.mobicents.servlet.sip.annotations.ClassFileScanner;
-import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
+import org.mobicents.servlet.sip.catalina.CatalinaSipContext;
+import org.mobicents.servlet.sip.catalina.SipDeploymentException;
+import org.mobicents.servlet.sip.catalina.SipEntityResolver;
+import org.mobicents.servlet.sip.catalina.SipRuleSet;
+import org.mobicents.servlet.sip.catalina.SipServletImpl;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.xml.sax.EntityResolver;
 
 /**
@@ -93,7 +98,7 @@ public class SipContextConfig extends ContextConfig {
 			context.setWrapperClass(SipServletImpl.class.getName());
 			
 			//annotations scanning
-			ClassFileScanner scanner = new ClassFileScanner(((SipContext)context).getBasePath(), (SipContext)context);
+			ClassFileScanner scanner = new ClassFileScanner(((CatalinaSipContext)context).getBasePath(), (CatalinaSipContext)context);
 			try {
 				scanner.scan();
 			} catch (AnnotationVerificationException ave) {
@@ -177,7 +182,7 @@ public class SipContextConfig extends ContextConfig {
 			servletSelectionSet = true;
 		}
 		
-		if(((SipContext) context).getChildrenMap().keySet().size() > 1 && !servletSelectionSet) {
+		if(((CatalinaSipContext) context).getChildrenMap().keySet().size() > 1 && !servletSelectionSet) {
 			ok = false;
 			context.setConfigured(false);
 			throw new SipDeploymentException("the main servlet is not set and there is more than one servlet defined in the sip.xml or as annotations !");
@@ -259,7 +264,7 @@ public class SipContextConfig extends ContextConfig {
 				if (context instanceof SipContext) {
 					FileDirContext fileDirContext =new FileDirContext();
 					fileDirContext.setDocBase(docBase);
-	                ((SipContext) context).setResources(fileDirContext );
+	                ((CatalinaSipContext) context).setResources(fileDirContext );
 	            }
 			} else {
 				File docDir = new File(docBase);
@@ -285,7 +290,7 @@ public class SipContextConfig extends ContextConfig {
 					if (context instanceof SipContext) {
 						FileDirContext fileDirContext =new FileDirContext();
 						fileDirContext.setDocBase(docBase);
-		                ((SipContext) context).setResources(fileDirContext );
+		                ((CatalinaSipContext) context).setResources(fileDirContext );
 	                }
 				}
 			}

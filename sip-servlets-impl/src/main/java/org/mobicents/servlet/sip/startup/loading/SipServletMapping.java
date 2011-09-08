@@ -22,13 +22,15 @@
 
 package org.mobicents.servlet.sip.startup.loading;
 
-import org.mobicents.servlet.sip.startup.loading.rules.MatchingRule;
+import org.mobicents.servlet.sip.core.descriptor.MatchingRule;
+import org.mobicents.servlet.sip.core.descriptor.MobicentsSipServletMapping;
+
 
 /**
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
-public class SipServletMapping {
+public class SipServletMapping implements MobicentsSipServletMapping {
 	private String servletName;
 	private MatchingRule matchingRule;
 	/**

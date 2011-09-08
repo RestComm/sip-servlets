@@ -24,8 +24,9 @@ package org.mobicents.servlet.sip.core.session;
 
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.SipApplicationSessionAsynchronousWork;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
-import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * Wrapper around the SipApplicationSessionAsynchronousWork to make sure the work is done in a thread safe manner
@@ -60,7 +61,7 @@ public class SipApplicationSessionAsyncTask implements Runnable {
 				ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 				boolean batchStarted = false;
 				try {
-					ClassLoader cl = sipContext.getLoader().getClassLoader();
+					ClassLoader cl = sipContext.getSipContextClassLoader();
 					Thread.currentThread().setContextClassLoader(cl);
 					sipContext.enterSipApp(sipApplicationSession, null, false);
 					batchStarted = sipContext.enterSipAppHa(true);

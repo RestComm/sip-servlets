@@ -44,7 +44,6 @@ import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipServletRequest;
-import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
@@ -56,17 +55,19 @@ import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
-import org.mobicents.javax.servlet.sip.ProxyBranchExt;
 import org.mobicents.javax.servlet.sip.ProxyBranchListener;
 import org.mobicents.javax.servlet.sip.ResponseType;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.address.SipURIImpl;
+import org.mobicents.servlet.sip.core.DispatcherException;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
-import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletRequest;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletResponse;
+import org.mobicents.servlet.sip.core.proxy.MobicentsProxyBranch;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -80,7 +81,7 @@ import org.mobicents.servlet.sip.startup.StaticServiceHolder;
  * @author root
  *
  */
-public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externalizable {
+public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(ProxyBranchImpl.class);
@@ -316,12 +317,12 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	/* (non-Javadoc)
 	 * @see javax.servlet.sip.ProxyBranch#getResponse()
 	 */
-	public SipServletResponse getResponse() {
+	public MobicentsSipServletResponse getResponse() {
 		return lastResponse;
 	}
 	
-	public void setResponse(SipServletResponseImpl response) {
-		lastResponse = response;
+	public void setResponse(MobicentsSipServletResponse response) {
+		lastResponse = (SipServletResponseImpl) response;
 	}
 
 	/* (non-Javadoc)
@@ -473,7 +474,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	 * @param response
 	 * @throws DispatcherException 
 	 */
-	public void onResponse(final SipServletResponseImpl response, final int status) throws DispatcherException
+	public void onResponse(final MobicentsSipServletResponse response, final int status) throws DispatcherException
 	{
 		// If we are canceled but still receiving provisional responses try to cancel them
 		if(canceled && status < 200) {
@@ -631,7 +632,8 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	 * 
 	 * @param request
 	 */
-	public void proxySubsequentRequest(SipServletRequestImpl request) {		
+	public void proxySubsequentRequest(MobicentsSipServletRequest sipServletRequest) {
+		SipServletRequestImpl request = (SipServletRequestImpl) sipServletRequest;
 		if(!request.getMethod().equalsIgnoreCase("ACK") && !request.getMethod().equalsIgnoreCase("PRACK")) {
 			String branch = ((Via)request.getMessage().getHeader(Via.NAME)).getBranch();
 			this.ongoingTransactions.add(new TransactionRequest(branch, request));
@@ -843,7 +845,7 @@ public class ProxyBranchImpl implements ProxyBranch, ProxyBranchExt, Externaliza
 	 * party is still online.
 	 *
 	 */
-	void updateTimer(boolean cancel1xxTimer) {
+	public void updateTimer(boolean cancel1xxTimer) {
 		if(cancel1xxTimer) {
 			cancel1xxTimer();
 		}

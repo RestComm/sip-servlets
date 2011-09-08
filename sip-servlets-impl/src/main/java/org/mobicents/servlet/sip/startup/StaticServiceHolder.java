@@ -27,6 +27,7 @@ import gov.nist.javax.sip.stack.SIPTransaction;
 import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.SipService;
 
 /**
  * There can be only one tomcat service per SAR classloader, so it can be a static safely.
@@ -38,7 +39,7 @@ import org.apache.log4j.Logger;
  *
  */
 public class StaticServiceHolder {
-	public static SipStandardService sipStandardService;
+	public static SipService sipStandardService;
 	public static Method disableRetransmissionTimer; 
 	private static final Logger logger = Logger.getLogger(StaticServiceHolder.class);
 	static {

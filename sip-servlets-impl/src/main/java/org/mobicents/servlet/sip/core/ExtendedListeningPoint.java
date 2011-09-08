@@ -48,7 +48,7 @@ import org.mobicents.servlet.sip.SipFactories;
 e@gmail.com">Jean Deruelle</A>
  *
  */
-public class ExtendedListeningPoint {
+public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 	private static final Logger logger = Logger.getLogger(ExtendedListeningPoint.class);		
 	
 	// the listening point this class is extending

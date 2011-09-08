@@ -41,16 +41,16 @@ import javax.servlet.sip.SipSessionAttributeListener;
 import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.TimerListener;
-import javax.servlet.sip.annotation.SipServlet;
 
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.ProxyBranchListener;
+import org.mobicents.servlet.sip.core.MobicentsSipServlet;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.SipListeners;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
-import org.mobicents.servlet.sip.startup.SipContext;
-import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
 
 
-public class SipListenersHolder {
+public abstract class SipListenersHolder implements SipListeners {
 	private static final Logger logger = Logger.getLogger(SipListenersHolder.class);
 	
 	private List<SipApplicationSessionAttributeListener> sipApplicationSessionAttributeListeners;
@@ -66,11 +66,11 @@ public class SipListenersHolder {
 	private List<SipConnectorListener> sipConnectorListeners;
 	private List<ProxyBranchListener> proxyBranchListeners;
 	private List<ServletContextListener> servletContextListeners;
-	private Map<EventListener, SipServletImpl> listenerServlets;
+	protected Map<EventListener, MobicentsSipServlet> listenerServlets;
 	// There may be at most one TimerListener defined.
 	private TimerListener timerListener;
 	//the sip context the holder is attached to
-	private SipContext sipContext;	
+	protected SipContext sipContext;	
 
 	/**
 	 * Default Constructor
@@ -90,7 +90,7 @@ public class SipListenersHolder {
 		this.servletContextListeners = new ArrayList<ServletContextListener>();		
 		this.sipConnectorListeners = new ArrayList<SipConnectorListener>();
 		this.proxyBranchListeners = new ArrayList<ProxyBranchListener>();
-		listenerServlets = new HashMap<EventListener, SipServletImpl>();
+		listenerServlets = new HashMap<EventListener, MobicentsSipServlet>();
 	}
 	
 	/**
@@ -99,39 +99,39 @@ public class SipListenersHolder {
 	 * @param classLoader the classloader to load the listeners with
 	 * @return true if all the listeners have been successfully loaded, false otherwise
 	 */
-	public boolean loadListeners(String[] listeners,
-			ClassLoader classLoader) {				
-		// Instantiate all the listeners
-		for (String className : listeners) {			
-			try {
-				Class listenerClass = Class.forName(className, false, classLoader);
-				EventListener listener = (EventListener) listenerClass.newInstance();
-				((SipContext)sipContext).getAnnotationProcessor().processAnnotations(listener);
-				SipServletImpl sipServletImpl = (SipServletImpl)sipContext.findChildrenByClassName(className);
-				if(sipServletImpl != null) {
-					listener = (EventListener) sipServletImpl.allocate();
-					listenerServlets.put(listener, sipServletImpl);
-				} else {
-					SipServlet servlet = (SipServlet) listenerClass.getAnnotation(SipServlet.class);
-					if (servlet != null) {						
-						sipServletImpl = (SipServletImpl)sipContext.findChildrenByName(servlet.name());
-						if(sipServletImpl != null) {
-							listener = (EventListener) sipServletImpl.allocate();
-							listenerServlets.put(listener, sipServletImpl);
-						}
-					}					
-				}				             
-				addListenerToBunch(listener);				
-			} catch (Exception e) {
-				logger.fatal("Cannot instantiate listener class " + className,
-						e);
-				return false;
-			}
-		}
-		return true;
-	}
+	public abstract boolean loadListeners(String[] listeners, ClassLoader classLoader);
+//	{				
+//		// Instantiate all the listeners
+//		for (String className : listeners) {			
+//			try {
+//				Class listenerClass = Class.forName(className, false, classLoader);
+//				EventListener listener = (EventListener) listenerClass.newInstance();
+//				((SipContext)sipContext).getAnnotationProcessor().processAnnotations(listener);
+//				MobicentsSipServlet sipServletImpl = (MobicentsSipServlet)sipContext.findSipServletByClassName(className);
+//				if(sipServletImpl != null) {
+//					listener = (EventListener) sipServletImpl.allocate();
+//					listenerServlets.put(listener, sipServletImpl);
+//				} else {
+//					SipServlet servlet = (SipServlet) listenerClass.getAnnotation(SipServlet.class);
+//					if (servlet != null) {						
+//						sipServletImpl = (MobicentsSipServlet)sipContext.findSipServletByName(servlet.name());
+//						if(sipServletImpl != null) {
+//							listener = (EventListener) sipServletImpl.allocate();
+//							listenerServlets.put(listener, sipServletImpl);
+//						}
+//					}					
+//				}				             
+//				addListenerToBunch(listener);				
+//			} catch (Exception e) {
+//				logger.fatal("Cannot instantiate listener class " + className,
+//						e);
+//				return false;
+//			}
+//		}
+//		return true;
+//	}
 
-	private void addListenerToBunch(EventListener listener) {
+	protected void addListenerToBunch(EventListener listener) {
 		boolean added = false;
 		if (listener instanceof SipApplicationSessionAttributeListener) {
 			this.addListener((SipApplicationSessionAttributeListener) listener);
@@ -409,7 +409,7 @@ public class SipListenersHolder {
 			EventListener eventListener) {
 		if(eventListener instanceof javax.servlet.sip.SipServlet) {
 			try {
-				SipServletImpl wrapper = listenerServlets.get(eventListener);
+				MobicentsSipServlet wrapper = listenerServlets.get(eventListener);
 				if(wrapper != null) {
 					wrapper.deallocate((javax.servlet.sip.SipServlet)eventListener);
 				}

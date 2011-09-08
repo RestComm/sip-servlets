@@ -27,8 +27,8 @@ import java.util.Map;
 
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipApplicationSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingSessionGranularitySessionData;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * Implementation of a clustered sip application session for the JBossCacheManager.

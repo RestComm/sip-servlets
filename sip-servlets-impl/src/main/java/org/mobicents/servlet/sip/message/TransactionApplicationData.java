@@ -33,6 +33,7 @@ import javax.sip.Transaction;
 import javax.sip.address.Hop;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.message.MobicentsTransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 
 /**
@@ -40,7 +41,7 @@ import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
  * 
  *@author mranga
  */
-public class TransactionApplicationData implements Serializable {		
+public class TransactionApplicationData implements Serializable, MobicentsTransactionApplicationData {		
 
 	private static final long serialVersionUID = 9170581635026591070L;
 	private static final Logger logger = Logger.getLogger(TransactionApplicationData.class);

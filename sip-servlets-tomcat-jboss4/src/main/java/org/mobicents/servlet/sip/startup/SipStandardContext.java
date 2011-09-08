@@ -58,6 +58,7 @@ import org.apache.catalina.Wrapper;
 import org.apache.catalina.core.NamingContextListener;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.deploy.LoginConfig;
+import org.apache.catalina.security.SecurityUtil;
 import org.apache.log4j.Logger;
 import org.jboss.web.tomcat.service.session.ClusteredSipApplicationSession;
 import org.jboss.web.tomcat.service.session.ClusteredSipSession;
@@ -67,17 +68,34 @@ import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.annotations.SipAnnotationProcessor;
 import org.mobicents.servlet.sip.annotations.SipAnnotationProcessorImpl;
+import org.mobicents.servlet.sip.catalina.CatalinaSipContext;
+import org.mobicents.servlet.sip.catalina.CatalinaSipListenersHolder;
+import org.mobicents.servlet.sip.catalina.CatalinaSipManager;
+import org.mobicents.servlet.sip.catalina.SARDirContext;
+import org.mobicents.servlet.sip.catalina.SipDeploymentException;
+import org.mobicents.servlet.sip.catalina.SipLoginConfig;
+import org.mobicents.servlet.sip.catalina.SipSecurityConstraint;
+import org.mobicents.servlet.sip.catalina.SipServletImpl;
+import org.mobicents.servlet.sip.catalina.SipStandardManager;
+import org.mobicents.servlet.sip.catalina.security.SipSecurityUtils;
+import org.mobicents.servlet.sip.catalina.security.authentication.DigestAuthenticator;
+import org.mobicents.servlet.sip.core.MobicentsSipServlet;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipContextEvent;
 import org.mobicents.servlet.sip.core.SipContextEventType;
+import org.mobicents.servlet.sip.core.SipListeners;
+import org.mobicents.servlet.sip.core.SipManager;
+import org.mobicents.servlet.sip.core.SipService;
+import org.mobicents.servlet.sip.core.descriptor.MobicentsSipServletMapping;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletRequest;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletResponse;
+import org.mobicents.servlet.sip.core.security.MobicentsSipLoginConfig;
+import org.mobicents.servlet.sip.core.security.SipDigestAuthenticator;
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionCreationThreadLocal;
-import org.mobicents.servlet.sip.core.session.SipListenersHolder;
-import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
-import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.core.timers.ProxyTimerService;
 import org.mobicents.servlet.sip.core.timers.ProxyTimerServiceImpl;
 import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerService;
@@ -88,13 +106,7 @@ import org.mobicents.servlet.sip.dns.MobicentsDNSResolver;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
-import org.mobicents.servlet.sip.message.SipServletRequestImpl;
-import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.ruby.SipRubyController;
-import org.mobicents.servlet.sip.startup.loading.SipLoginConfig;
-import org.mobicents.servlet.sip.startup.loading.SipSecurityConstraint;
-import org.mobicents.servlet.sip.startup.loading.SipServletImpl;
-import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
 
 /**
  * Sip implementation of the <b>Context</b> interface extending the standard
@@ -104,7 +116,7 @@ import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
  * @author Jean Deruelle
  * 
  */
-public class SipStandardContext extends StandardContext implements SipContext {
+public class SipStandardContext extends StandardContext implements CatalinaSipContext {
 
 	private static final long serialVersionUID = 1L;
 	//	 the logger
@@ -126,10 +138,12 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	protected String description;
 	protected int proxyTimeout;
 	protected int sipApplicationSessionTimeout;
-	protected transient SipListenersHolder sipListeners;	
+	protected transient CatalinaSipListenersHolder sipListeners;	
 	protected transient SipFactoryFacade sipFactoryFacade;	
 	protected transient SipSessionsUtilImpl sipSessionsUtil;
 	protected transient SipLoginConfig sipLoginConfig;
+	protected transient SipSecurityUtils sipSecurityUtils;
+	protected transient SipDigestAuthenticator sipDigestAuthenticator;
 	
 	protected boolean hasDistributableManager;
 	
@@ -152,11 +166,11 @@ public class SipStandardContext extends StandardContext implements SipContext {
      * The set of sip servlet mapping configured for this
      * application.
      */
-    protected transient List<SipServletMapping> sipServletMappings = new ArrayList<SipServletMapping>();
+    protected transient List<MobicentsSipServletMapping> sipServletMappings = new ArrayList<MobicentsSipServletMapping>();
     
     protected transient SipApplicationDispatcher sipApplicationDispatcher = null;
     
-    protected transient Map<String, Container> childrenMap;
+    protected transient Map<String, MobicentsSipServlet> childrenMap;
     protected transient Map<String, Container> childrenMapByClassName;
 
 	protected boolean sipJNDIContextLoaded = false;
@@ -179,8 +193,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		super();
 		sipApplicationSessionTimeout = DEFAULT_LIFETIME;
 		pipeline.setBasic(new SipStandardContextValve());
-		sipListeners = new SipListenersHolder(this);
-		childrenMap = new HashMap<String, Container>();
+		sipListeners = new CatalinaSipListenersHolder(this);
+		childrenMap = new HashMap<String, MobicentsSipServlet>();
 		childrenMapByClassName = new HashMap<String, Container>();
 		int idleTime = getSipApplicationSessionTimeout();
 		if(idleTime <= 0) {
@@ -374,10 +388,10 @@ public class SipStandardContext extends StandardContext implements SipContext {
 				}
 			}			
 			//set the session manager on the specific sipstandardmanager to handle converged http sessions
-			if(getManager() instanceof SipManager) {
-				((SipManager)getManager()).setSipFactoryImpl(
-						((SipFactoryImpl)sipApplicationDispatcher.getSipFactory()));
-				((SipManager)manager).setContainer(this);
+			if(getManager() instanceof CatalinaSipManager) {
+				((CatalinaSipManager)getManager()).setMobicentsSipFactory(
+						sipApplicationDispatcher.getSipFactory());
+				((CatalinaSipManager)manager).setContainer(this);
 			}
 			// JSR 289 16.2 Servlet Selection
 			// When using this mechanism (the main-servlet) for servlet selection, 
@@ -386,6 +400,8 @@ public class SipStandardContext extends StandardContext implements SipContext {
 			if((mainServlet == null || mainServlet.length() < 1) && childrenMap.size() == 1) {
 				setMainServlet(childrenMap.keySet().iterator().next());
 			}
+			sipSecurityUtils = new SipSecurityUtils(this);
+			sipDigestAuthenticator = new DigestAuthenticator(sipApplicationDispatcher.getSipFactories().getHeaderFactory());
 			//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
 			//called implicitly within sipApplicationDispatcher.addSipApplication
 			sipApplicationDispatcher.addSipApplication(applicationName, this);
@@ -699,26 +715,28 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	/**
 	 * {@inheritDoc}
 	 */
-	public Map<String, Container> getChildrenMap() {		
-		return childrenMap;
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
-	public Container findChildrenByName(String name) {
-		if (name == null)
-            return (null);
-		return childrenMap.get(name);
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 */
 	public Container findChildrenByClassName(String className) {
 		if (className == null)
             return (null);
 		return childrenMapByClassName.get(className);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public MobicentsSipServlet findSipServletByName(String name) {
+		if (name == null)
+            return (null);
+		return (MobicentsSipServlet) childrenMap.get(name);
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 */
+	public MobicentsSipServlet findSipServletByClassName(String className) {
+		if (className == null)
+            return (null);
+		return (MobicentsSipServlet) childrenMapByClassName.get(className);
 	}
 
 	/* (non-Javadoc)
@@ -766,14 +784,14 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.SipContext#getListeners()
 	 */
-	public SipListenersHolder getListeners() {
+	public SipListeners getListeners() {
 		return sipListeners;
 	}
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.SipContext#setListeners(org.mobicents.servlet.sip.core.session.SipListenersHolder)
 	 */
-	public void setListeners(SipListenersHolder listeners) {
-		this.sipListeners = listeners;
+	public void setListeners(SipListeners listeners) {
+		this.sipListeners = (CatalinaSipListenersHolder) listeners;
 	}
 	/*
 	 * (non-Javadoc)
@@ -843,11 +861,11 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		return super.getLoginConfig();
 	}
 	
-	public void setSipLoginConfig(SipLoginConfig config) {
-		this.sipLoginConfig = config;
+	public void setSipLoginConfig(MobicentsSipLoginConfig config) {
+		this.sipLoginConfig = (SipLoginConfig) config;
 	}
 	
-	public SipLoginConfig getSipLoginConfig() {
+	public MobicentsSipLoginConfig getSipLoginConfig() {
 		return this.sipLoginConfig;
 	}
 	/**
@@ -953,9 +971,9 @@ public class SipStandardContext extends StandardContext implements SipContext {
     @Override
     public synchronized void setManager(Manager manager) {
     	if(manager instanceof SipManager && sipApplicationDispatcher != null) {
-			((SipManager)manager).setSipFactoryImpl(
+			((SipManager)manager).setMobicentsSipFactory(
 					((SipFactoryImpl)sipApplicationDispatcher.getSipFactory())); 
-			((SipManager)manager).setContainer(this);
+			((CatalinaSipManager)manager).setContainer(this);
 		}
     	if(manager instanceof DistributableSipManager) {
 			hasDistributableManager = true;
@@ -1000,7 +1018,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void addSipServletMapping(SipServletMapping sipServletMapping) {
+	public void addSipServletMapping(MobicentsSipServletMapping sipServletMapping) {
 		sipServletMappings.add(sipServletMapping);
 		isMainServlet = false;
 		if(servletHandler == null) {
@@ -1010,18 +1028,18 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	/**
 	 * {@inheritDoc}
 	 */
-	public List<SipServletMapping> findSipServletMappings() {
+	public List<MobicentsSipServletMapping> findSipServletMappings() {
 		return sipServletMappings;
 	}
 	
 	/**
 	 * {@inheritDoc}
 	 */
-	public SipServletMapping findSipServletMappings(SipServletRequest sipServletRequest) {
+	public MobicentsSipServletMapping findSipServletMappings(SipServletRequest sipServletRequest) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Checking sip Servlet Mapping for following request : " + sipServletRequest);
 		}
-		for (SipServletMapping sipServletMapping : sipServletMappings) {
+		for (MobicentsSipServletMapping sipServletMapping : sipServletMappings) {
 			if(sipServletMapping.getMatchingRule().matches(sipServletRequest)) {
 				return sipServletMapping;
 			} else {
@@ -1036,7 +1054,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	/**
 	 * {@inheritDoc}
 	 */
-	public void removeSipServletMapping(SipServletMapping sipServletMapping) {
+	public void removeSipServletMapping(MobicentsSipServletMapping sipServletMapping) {
 		sipServletMappings.remove(sipServletMapping);
 	}
 
@@ -1077,7 +1095,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 		enterSipApp(null, null, false);
 		boolean batchStarted = enterSipAppHa(true);
 		try {
-			for (Container container : childrenMap.values()) {
+			for (MobicentsSipServlet container : childrenMap.values()) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("container " + container.getName() + ", class : " + container.getClass().getName());
 				}
@@ -1297,7 +1315,7 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 * (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.SipContext#exitSipAppHa(org.mobicents.servlet.sip.message.SipServletRequestImpl, org.mobicents.servlet.sip.message.SipServletResponseImpl, boolean)
 	 */
-	public void exitSipAppHa(SipServletRequestImpl request, SipServletResponseImpl response, boolean batchStarted) {			
+	public void exitSipAppHa(MobicentsSipServletRequest request, MobicentsSipServletResponse response, boolean batchStarted) {			
 		if (getDistributable() && hasDistributableManager) {
 			if(logger.isDebugEnabled()) {
 				if(request != null) {
@@ -1382,5 +1400,25 @@ public class SipStandardContext extends StandardContext implements SipContext {
 	 */
 	public void setServletHandler(String servletHandler) {
 		this.servletHandler = servletHandler;
+	}
+	
+	public ClassLoader getSipContextClassLoader() {
+		return getLoader().getClassLoader();
+	}
+
+	public Map<String, MobicentsSipServlet> getChildrenMap() {
+		return childrenMap;
+	}
+
+	public boolean isPackageProtectionEnabled() {		
+		return SecurityUtil.isPackageProtectionEnabled();
+	}
+	
+	public boolean authorize(MobicentsSipServletRequest request) {
+		return sipSecurityUtils.authorize(request);
+	}
+
+	public SipDigestAuthenticator getDigestAuthenticator() {
+		return sipDigestAuthenticator;
 	}
 }

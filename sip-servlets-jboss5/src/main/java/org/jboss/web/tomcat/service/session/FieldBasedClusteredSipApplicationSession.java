@@ -27,13 +27,12 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jboss.aop.Advised;
-import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributableSipApplicationSessionMetadata;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.DistributedCacheConvergedSipManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSipApplicationSessionData;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * 

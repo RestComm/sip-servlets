@@ -49,7 +49,6 @@ import javax.servlet.sip.SipSessionAttributeListener;
 import javax.servlet.sip.SipSessionBindingEvent;
 import javax.servlet.sip.SipSessionBindingListener;
 import javax.servlet.sip.SipSessionEvent;
-import javax.servlet.sip.SipSession.State;
 import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
 import javax.sip.SipStack;
@@ -76,10 +75,13 @@ import org.jboss.web.tomcat.service.session.notification.ClusteredSipSessionNoti
 import org.mobicents.ha.javax.sip.ClusteredSipStack;
 import org.mobicents.ha.javax.sip.HASipDialog;
 import org.mobicents.ha.javax.sip.ReplicationStrategy;
+import org.mobicents.servlet.sip.catalina.CatalinaSipManager;
+import org.mobicents.servlet.sip.core.SipManager;
+import org.mobicents.servlet.sip.core.SipService;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
@@ -87,11 +89,9 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.notification.SessionActivationNotificationCause;
-import org.mobicents.servlet.sip.notification.SipApplicationSessionActivationEvent;
 import org.mobicents.servlet.sip.notification.SipSessionActivationEvent;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
-import org.mobicents.servlet.sip.startup.SipService;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
@@ -383,7 +383,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		support.firePropertyChange("authType", oldAuthType, this.authType);
 	}					
 
-	public SipManager getManager() {
+	public CatalinaSipManager getManager() {
 		return (this.manager);
 	}
 
@@ -880,7 +880,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		sessionCreatingDialogId = (String) metaData.get(DIALOG_ID);
 		proxy = (ProxyImpl) metaData.get(PROXY);
 		if(proxy != null) {
-			proxy.setSipFactoryImpl(getManager().getSipFactoryImpl());
+			proxy.setMobicentsSipFactory(getManager().getMobicentsSipFactory());
 		}
 		
 		transport = (String) metaData.get(TRANSPORT);
@@ -891,7 +891,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			logger.debug("b2bua session array size = " + size + ", value = " + sessionArray);
 		}
 		if(size != null && sessionArray != null) {
-			Map<SipSessionKey, SipSessionKey> sessionMap = new ConcurrentHashMap<SipSessionKey, SipSessionKey>();
+			Map<MobicentsSipSessionKey, MobicentsSipSessionKey> sessionMap = new ConcurrentHashMap<MobicentsSipSessionKey, MobicentsSipSessionKey>();
 			for (int i = 0; i < size; i++) {
 				String key = sessionArray[0][i];
 				String value = sessionArray[1][i];
@@ -905,7 +905,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			}
 			if(b2buaHelper == null) {
 				b2buaHelper = new B2buaHelperImpl();
-				b2buaHelper.setSipFactoryImpl(getManager().getSipFactoryImpl());
+				b2buaHelper.setSipFactoryImpl(getManager().getMobicentsSipFactory());
 				b2buaHelper.setSipManager(getManager());
 			}
 			b2buaHelper.setSessionMap(sessionMap);
@@ -993,7 +993,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 				}
 				if(b2buaHelper == null) {
 					b2buaHelper = new B2buaHelperImpl();
-					b2buaHelper.setSipFactoryImpl(getManager().getSipFactoryImpl());
+					b2buaHelper.setSipFactoryImpl(getManager().getMobicentsSipFactory());
 					b2buaHelper.setSipManager(getManager());
 				}
 				b2buaHelper.setOriginalRequestMap(linkedRequestsMap);
@@ -1048,11 +1048,11 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			}
 			
 			if(b2buaHelper != null) {
-				final Map<SipSessionKey, SipSessionKey> sessionMap = b2buaHelper.getSessionMap();
+				final Map<MobicentsSipSessionKey, MobicentsSipSessionKey> sessionMap = b2buaHelper.getSessionMap();
 				final int size = sessionMap.size();
 				final String[][] sessionArray = new String[2][size];
 				int i = 0;
-				for (Entry<SipSessionKey, SipSessionKey> entry : sessionMap.entrySet()) {
+				for (Entry<MobicentsSipSessionKey, MobicentsSipSessionKey> entry : sessionMap.entrySet()) {
 					sessionArray [0][i] = entry.getKey().toString(); 
 					sessionArray [1][i] = entry.getValue().toString();
 					i++;
@@ -1227,7 +1227,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 							this.clusterStatus, cause, attribute.getKey())) {
 						
 						ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
-						java.lang.Thread.currentThread().setContextClassLoader(getSipApplicationSession().getSipContext().getLoader().getClassLoader());
+						java.lang.Thread.currentThread().setContextClassLoader(getSipApplicationSession().getSipContext().getSipContextClassLoader());
 						
 						try {
 							if(logger.isDebugEnabled()) {
@@ -1282,7 +1282,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 							event = new SipSessionActivationEvent(this, cause);						
 
 						ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
-						java.lang.Thread.currentThread().setContextClassLoader(getSipApplicationSession().getSipContext().getLoader().getClassLoader());
+						java.lang.Thread.currentThread().setContextClassLoader(getSipApplicationSession().getSipContext().getSipContextClassLoader());
 						
 						try {
 							((SipSessionActivationListener) attribute)
@@ -1347,7 +1347,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 							event = new SipSessionActivationEvent(this, cause);
 						
 						ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
-						java.lang.Thread.currentThread().setContextClassLoader(getSipApplicationSession().getSipContext().getLoader().getClassLoader());
+						java.lang.Thread.currentThread().setContextClassLoader(getSipApplicationSession().getSipContext().getSipContextClassLoader());
 						
 						
 						try {

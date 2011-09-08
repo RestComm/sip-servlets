@@ -51,6 +51,8 @@ import org.apache.catalina.util.Enumerator;
 import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
 import org.jboss.metadata.WebMetaData;
+import org.mobicents.servlet.sip.catalina.CatalinaSipManager;
+import org.mobicents.servlet.sip.core.security.SipPrincipal;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipSessionImpl;
@@ -542,7 +544,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 		if (!isValid())
 			throw new IllegalStateException(sm
 					.getString("clusteredSession.setAttribute.ise"));
-		if ((getSipApplicationSession().getSipContext().getSipManager() != null) && getSipApplicationSession().getSipContext().getSipManager().getDistributable()
+		if ((getSipApplicationSession().getSipContext().getSipManager() != null) && ((CatalinaSipManager)getSipApplicationSession().getSipContext().getSipManager()).getDistributable()
 				&& !(canAttributeBeReplicated(value)))
 			throw new IllegalArgumentException(sm
 					.getString("clusteredSession.setAttribute.iae"));
@@ -791,7 +793,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 //						} catch (Exception e) {
 //							;
 //						}
-						getSipApplicationSession().getSipContext().getLogger()
+						logger
 								.error(sm.getString("standardSession.sessionEvent"),t);
 					}
 				}
@@ -861,9 +863,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 						((SipSessionActivationListener) attribute)
 								.sessionWillPassivate(event);
 					} catch (Throwable t) {
-						getSipApplicationSession().getSipContext().getSipManager()
-								.getContainer()
-								.getLogger()
+						logger
 								.error(
 										sm
 												.getString("clusteredSession.attributeEvent"),
@@ -898,9 +898,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 						((SipSessionActivationListener) attribute)
 								.sessionDidActivate(event);
 					} catch (Throwable t) {
-						getSipApplicationSession().getSipContext().getSipManager()
-								.getContainer()
-								.getLogger()
+						logger
 								.error(
 										sm
 												.getString("clusteredSession.attributeEvent"),
@@ -1010,7 +1008,7 @@ public abstract class ClusteredSipSession extends SipSessionImpl
 	 * @param principal
 	 *            The new Principal, or <code>null</code> if none
 	 */
-	public void setPrincipal(Principal principal) {
+	public void setPrincipal(SipPrincipal principal) {
 
 		Principal oldPrincipal = this.userPrincipal;
 		this.userPrincipal = principal;

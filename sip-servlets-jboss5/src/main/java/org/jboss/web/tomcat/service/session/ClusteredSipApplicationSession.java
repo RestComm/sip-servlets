@@ -49,7 +49,6 @@ import javax.servlet.sip.SipApplicationSessionAttributeListener;
 import javax.servlet.sip.SipApplicationSessionBindingEvent;
 import javax.servlet.sip.SipApplicationSessionBindingListener;
 import javax.servlet.sip.SipApplicationSessionEvent;
-import javax.servlet.sip.SipApplicationSessionListener;
 
 import org.apache.catalina.Context;
 import org.apache.catalina.Globals;
@@ -65,18 +64,18 @@ import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistrib
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionManagementStatus;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionNotificationCause;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipApplicationSessionNotificationPolicy;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.SipListeners;
+import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipListenersHolder;
-import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.core.timers.ClusteredSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.FaultTolerantSasTimerTask;
 import org.mobicents.servlet.sip.core.timers.TimerServiceTask;
 import org.mobicents.servlet.sip.notification.SessionActivationNotificationCause;
 import org.mobicents.servlet.sip.notification.SipApplicationSessionActivationEvent;
-import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * Abstract base class for sip session clustering based on SipApplicationSessionImpl. Different session
@@ -557,7 +556,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 								true)) {
 			try {
 				((SipApplicationSessionBindingListener) unbound)
-						.valueUnbound(new SipApplicationSessionBindingEvent(getSession(),
+						.valueUnbound(new SipApplicationSessionBindingEvent(getFacade(),
 								name));
 			} catch (Throwable t) {
 				manager.getContainer().getLogger().error(
@@ -569,11 +568,11 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		if (notificationPolicy.isSipApplicationSessionAttributeListenerInvocationAllowed(
 				this.clusterStatus, ClusteredSessionNotificationCause.MODIFY,
 				name, true)) {			
-			SipListenersHolder listeners = sipContext.getListeners();
+			SipListeners listeners = sipContext.getListeners();
 			List<SipApplicationSessionAttributeListener> listenersList = listeners.getSipApplicationSessionAttributeListeners();
 			if(listenersList.size() > 0) {
 				if(event == null) {
-					event = new SipApplicationSessionBindingEvent(getSession(), name);
+					event = new SipApplicationSessionBindingEvent(getFacade(), name);
 				}
 				if (unbound == null) {				
 					for (SipApplicationSessionAttributeListener listener : listenersList) {
@@ -950,7 +949,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 							this.clusterStatus, cause, attribute.getKey())) {		
 						
 						ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
-						java.lang.Thread.currentThread().setContextClassLoader(sipContext.getLoader().getClassLoader());
+						java.lang.Thread.currentThread().setContextClassLoader(sipContext.getSipContextClassLoader());
 						
 						try {
 							if(logger.isDebugEnabled()) {
@@ -1019,7 +1018,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 							event = new SipApplicationSessionActivationEvent(this, cause);
 						
 						ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
-						java.lang.Thread.currentThread().setContextClassLoader(sipContext.getLoader().getClassLoader());
+						java.lang.Thread.currentThread().setContextClassLoader(sipContext.getSipContextClassLoader());
 						
 						try {
 							((SipApplicationSessionActivationListener) attribute)
@@ -1084,7 +1083,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 							event = new SipApplicationSessionActivationEvent(this, cause);
 						
 						ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
-						java.lang.Thread.currentThread().setContextClassLoader(sipContext.getLoader().getClassLoader());
+						java.lang.Thread.currentThread().setContextClassLoader(sipContext.getSipContextClassLoader());
 						
 						try {
 							((SipApplicationSessionActivationListener) attribute)
@@ -1349,7 +1348,7 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 //					} catch (Exception e) {
 //						;
 //					}
-					sipContext.getLogger().error(
+					logger.error(
 							sm.getString("standardSession.attributeEvent"), t);
 				}
 			}

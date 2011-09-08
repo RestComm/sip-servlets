@@ -20,21 +20,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.mobicents.servlet.sip.core.session;
+package org.mobicents.servlet.sip.core;
 
-import javax.servlet.sip.ConvergedHttpSession;
+
+
 
 /**
- * Interface allowing us to check if a converged session is still valid
- * 
- * @author Jean Deruelle
+ * <p>A <strong>ModelMBean</strong> implementation for the
+ * <code>org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl</code> component.</p>
  *
+ * @author Jean Deruelle
  */
-public interface ConvergedSession 
-		extends ConvergedHttpSession {
-	
-	public MobicentsSipApplicationSession getApplicationSession(boolean create);
-	
-	// cannot reuse the isvalidInternal because it is protected in jboss 4
-	boolean isValidIntern();
+
+public interface SipApplicationDispatcherImplMBean extends SipApplicationDispatcher {
+
 }

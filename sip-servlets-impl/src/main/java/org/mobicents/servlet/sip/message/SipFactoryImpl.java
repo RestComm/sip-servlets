@@ -68,27 +68,28 @@ import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.address.GenericURIImpl;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
-import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
-import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
+import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
+import org.mobicents.servlet.sip.core.MobicentsSipFactory;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipManager;
-import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
-import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
-public class SipFactoryImpl implements Externalizable {	
+public class SipFactoryImpl implements MobicentsSipFactory, Externalizable {	
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(SipFactoryImpl.class
@@ -214,7 +215,7 @@ public class SipFactoryImpl implements Externalizable {
 		SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				sipContext.getApplicationName(), 
 				null);		
-		MobicentsSipApplicationSession sipApplicationSession = ((SipManager)sipContext.getManager()).getSipApplicationSession(
+		MobicentsSipApplicationSession sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(
 				sipApplicationSessionKey, true);
 		
 		if(StaticServiceHolder.sipStandardService.isHttpFollowsSip()) {
@@ -224,7 +225,7 @@ public class SipFactoryImpl implements Externalizable {
 			}
 		}
 			
-		return sipApplicationSession.getSession();
+		return sipApplicationSession.getFacade();
 	}
 
 	/*
@@ -361,11 +362,11 @@ public class SipFactoryImpl implements Externalizable {
 		try {
 			if(!sameCallId) {
 				//Creating new call id
-				final Iterator<ExtendedListeningPoint> listeningPointsIterator = getSipNetworkInterfaceManager().getExtendedListeningPoints();				
+				final Iterator<MobicentsExtendedListeningPoint> listeningPointsIterator = getSipNetworkInterfaceManager().getExtendedListeningPoints();				
 				if(!listeningPointsIterator.hasNext()) {				
 					throw new IllegalStateException("There is no SIP connectors available to create the request");
 				}
-				final ExtendedListeningPoint extendedListeningPoint = listeningPointsIterator.next();
+				final MobicentsExtendedListeningPoint extendedListeningPoint = listeningPointsIterator.next();
 				final CallIdHeader callIdHeader = SipFactories.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
 				newRequest.setHeader(callIdHeader);
 				if(logger.isDebugEnabled()) {
@@ -379,8 +380,8 @@ public class SipFactoryImpl implements Externalizable {
 									
 			newFromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(getSipApplicationDispatcher(), originalSession.getKey().getApplicationName(), originalAppSession.getKey().getId()));
 			
-			final SipSessionKey key = SessionManagerUtil.getSipSessionKey(originalAppSession.getKey().getId(), originalSession.getKey().getApplicationName(), newRequest, false);
-			final MobicentsSipSession session = ((SipManager)originalAppSession.getSipContext().getManager()).getSipSession(key, true, this, originalAppSession);			
+			final MobicentsSipSessionKey key = SessionManagerUtil.getSipSessionKey(originalAppSession.getKey().getId(), originalSession.getKey().getApplicationName(), newRequest, false);
+			final MobicentsSipSession session = originalAppSession.getSipContext().getSipManager().getSipSession(key, true, this, originalAppSession);			
 			session.setHandler(originalSession.getHandler());
 			
 			final SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
@@ -554,12 +555,12 @@ public class SipFactoryImpl implements Externalizable {
 		try {
 			cseqHeader = SipFactories.headerFactory.createCSeqHeader(1L, method);
 			// Fix provided by Hauke D. Issue 411
-			SipApplicationSessionKey sipApplicationSessionKey = mobicentsSipApplicationSession.getKey();
+			MobicentsSipApplicationSessionKey sipApplicationSessionKey = mobicentsSipApplicationSession.getKey();
 //			if(sipApplicationSessionKey.isAppGeneratedKey()) {
 			if(originalCallId == null) {
-				final Iterator<ExtendedListeningPoint> listeningPointsIterator = getSipNetworkInterfaceManager().getExtendedListeningPoints();				
+				final Iterator<MobicentsExtendedListeningPoint> listeningPointsIterator = getSipNetworkInterfaceManager().getExtendedListeningPoints();				
 				if(listeningPointsIterator.hasNext()) {
-					callIdHeader = SipFactories.headerFactory.createCallIdHeader(
+					callIdHeader = sipApplicationDispatcher.getSipFactories().getHeaderFactory().createCallIdHeader(
 							listeningPointsIterator.next().getSipProvider().getNewCallId().getCallId());
 				} else {
 					throw new IllegalStateException("There is no SIP connectors available to create the request");
@@ -639,9 +640,9 @@ public class SipFactoryImpl implements Externalizable {
 				fromHeader.setTag(fromTagToUse);
 			}
 			
-			SipSessionKey key = SessionManagerUtil.getSipSessionKey(
+			MobicentsSipSessionKey key = SessionManagerUtil.getSipSessionKey(
 					mobicentsSipApplicationSession.getKey().getId(), mobicentsSipApplicationSession.getKey().getApplicationName(), requestToWrap, false);
-			MobicentsSipSession session = ((SipManager)mobicentsSipApplicationSession.getSipContext().getManager()).
+			MobicentsSipSession session = mobicentsSipApplicationSession.getSipContext().getSipManager().
 				getSipSession(key, true, this, mobicentsSipApplicationSession);
 			session.setHandler(handler);
 			session.setLocalParty(new AddressImpl(fromAddress, null, ModifiableRule.NotModifiable));
@@ -804,7 +805,7 @@ public class SipFactoryImpl implements Externalizable {
 			sipUri.setLrParam();
 			String transport = JainSipUtils.findTransport(request);
 			sipUri.setTransportParam(transport);
-			ExtendedListeningPoint listeningPoint = 
+			MobicentsExtendedListeningPoint listeningPoint = 
 				getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);
 			sipUri.setParameter(MessageDispatcher.ROUTE_PARAM_NODE_HOST, 
 					listeningPoint.getHost(JainSipUtils.findUsePublicAddress(getSipNetworkInterfaceManager(), request, listeningPoint)));
@@ -844,7 +845,7 @@ public class SipFactoryImpl implements Externalizable {
 			sipUri.setLrParam();
 			String transport = JainSipUtils.findTransport(request);
 			sipUri.setTransportParam(transport);
-			ExtendedListeningPoint listeningPoint = 
+			MobicentsExtendedListeningPoint listeningPoint = 
 				getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);
 			sipUri.setParameter(MessageDispatcher.ROUTE_PARAM_NODE_HOST, 
 					listeningPoint.getHost(JainSipUtils.findUsePublicAddress(getSipNetworkInterfaceManager(), request, listeningPoint)));

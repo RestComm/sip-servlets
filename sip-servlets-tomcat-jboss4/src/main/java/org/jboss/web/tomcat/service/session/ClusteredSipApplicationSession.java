@@ -48,11 +48,12 @@ import org.apache.catalina.Globals;
 import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
 import org.jboss.metadata.WebMetaData;
+import org.mobicents.servlet.sip.catalina.CatalinaSipManager;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionImpl;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
-import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * Abstract base class for sip session clustering based on SipApplicationSessionImpl. Different session
@@ -467,7 +468,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 
 	public void access() {
 		super.access();
-		ConvergedSessionReplicationContext.bindSipApplicationSession(this, ((JBossCacheSipManager)sipContext.getManager()).getSnapshotManager());
+		ConvergedSessionReplicationContext.bindSipApplicationSession(this, ((JBossCacheSipManager)sipContext.getSipManager()).getSnapshotManager());
 		// JBAS-3528. If it's not the first access, make sure
 		// the 'new' flag is correct
 		//SipSession doesn't have the isNew flag
@@ -525,7 +526,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 		if (!isValid())
 			throw new IllegalStateException(sm
 					.getString("clusteredSession.setAttribute.ise"));
-		if ((sipContext.getSipManager() != null) && sipContext.getSipManager().getDistributable()
+		if ((sipContext.getSipManager() != null) && ((CatalinaSipManager)sipContext.getSipManager()).getDistributable()
 				&& !(canAttributeBeReplicated(value)))
 			throw new IllegalArgumentException(sm
 					.getString("clusteredSession.setAttribute.iae"));
@@ -539,7 +540,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 			try {
 				((SipApplicationSessionBindingListener) value).valueBound(event);
 			} catch (Throwable t) {
-				sipContext.getLogger().error(
+				logger.error(
 						sm.getString("standardSession.bindingEvent"), t);
 			}
 		}
@@ -555,7 +556,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 						.valueUnbound(new SipApplicationSessionBindingEvent(this,
 								name));
 			} catch (Throwable t) {
-				sipContext.getLogger().error(
+				logger.error(
 						sm.getString("standardSession.bindingEvent"), t);
 			}
 		}
@@ -597,7 +598,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 				} catch (Exception e) {
 					;
 				}
-				sipContext.getLogger().error(
+				logger.error(
 						sm.getString("standardSession.attributeEvent"), t);
 			}
 		}
@@ -769,7 +770,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 //						} catch (Exception e) {
 //							;
 //						}
-						sipContext.getLogger().error(
+						logger.error(
 								sm.getString("standardSession.sessionEvent"),t);
 					}
 				}
@@ -839,7 +840,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 						((SipApplicationSessionActivationListener) attribute)
 								.sessionWillPassivate(event);
 					} catch (Throwable t) {
-						sipContext.getLogger().error(sm.getString("clusteredSession.attributeEvent"),t);
+						logger.error(sm.getString("clusteredSession.attributeEvent"),t);
 					}
 				}
 			}
@@ -870,7 +871,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 						((SipApplicationSessionActivationListener) attribute)
 								.sessionDidActivate(event);
 					} catch (Throwable t) {
-						sipContext.getLogger().error(sm.getString("clusteredSession.attributeEvent"),t);
+						logger.error(sm.getString("clusteredSession.attributeEvent"),t);
 					}
 				}
 			}
@@ -1249,7 +1250,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 //				} catch (Exception e) {
 //					;
 //				}
-				sipContext.getLogger().error(
+				logger.error(
 						sm.getString("standardSession.attributeEvent"), t);
 			}
 		}
@@ -1286,7 +1287,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 
 	protected void sessionAttributesDirty() {
 		sessionAttributesDirty = true;
-		ConvergedSessionReplicationContext.bindSipApplicationSession(this, ((JBossCacheSipManager)sipContext.getManager()).getSnapshotManager());
+		ConvergedSessionReplicationContext.bindSipApplicationSession(this, ((JBossCacheSipManager)sipContext.getSipManager()).getSnapshotManager());
 	}
 
 	protected boolean getSessionAttributesDirty() {
@@ -1295,7 +1296,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 
 	protected void sessionMetadataDirty() {
 		sessionMetadataDirty = true;
-		ConvergedSessionReplicationContext.bindSipApplicationSession(this, ((JBossCacheSipManager)sipContext.getManager()).getSnapshotManager());
+		ConvergedSessionReplicationContext.bindSipApplicationSession(this, ((JBossCacheSipManager)sipContext.getSipManager()).getSnapshotManager());
 	}
 
 	protected boolean getSessionMetadataDirty() {
@@ -1304,7 +1305,7 @@ public abstract class ClusteredSipApplicationSession extends SipApplicationSessi
 	
 	protected void sessionLastAccessTimeDirty() {
 		sessionLastAccessTimeDirty = true;
-		ConvergedSessionReplicationContext.bindSipApplicationSession(this, ((JBossCacheSipManager)sipContext.getManager()).getSnapshotManager());
+		ConvergedSessionReplicationContext.bindSipApplicationSession(this, ((JBossCacheSipManager)sipContext.getSipManager()).getSnapshotManager());
 	}
 	
 	protected boolean getSessionLastAccessTimeDirty() {

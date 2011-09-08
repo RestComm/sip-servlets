@@ -39,7 +39,6 @@ import java.util.ListIterator;
 import java.util.Map;
 
 import javax.servlet.ServletException;
-import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipServletRequest;
@@ -63,13 +62,17 @@ import javax.sip.message.Response;
 import org.apache.log4j.Logger;
 import org.mobicents.ha.javax.sip.ClusteredSipStack;
 import org.mobicents.ha.javax.sip.ReplicationStrategy;
-import org.mobicents.javax.servlet.sip.ProxyExt;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.TelURLImpl;
-import org.mobicents.servlet.sip.core.dispatchers.DispatcherException;
+import org.mobicents.servlet.sip.core.DispatcherException;
+import org.mobicents.servlet.sip.core.MobicentsSipFactory;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletRequest;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletResponse;
+import org.mobicents.servlet.sip.core.proxy.MobicentsProxy;
+import org.mobicents.servlet.sip.core.proxy.MobicentsProxyBranch;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.timers.ProxyTimerService;
@@ -84,7 +87,7 @@ import org.mobicents.servlet.sip.startup.StaticServiceHolder;
  * @author root
  *
  */
-public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
+public class ProxyImpl implements MobicentsProxy, Externalizable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -304,7 +307,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 	/**
 	 * @return the finalBranchForSubsequentRequest
 	 */
-	public ProxyBranchImpl getFinalBranchForSubsequentRequests() {
+	public MobicentsProxyBranch getFinalBranchForSubsequentRequests() {
 		return finalBranchForSubsequentRequests;
 	}
 
@@ -532,7 +535,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		
 		started = true;
 		if(this.parallel) {
-			for (final ProxyBranchImpl pb : this.proxyBranches.values()) {
+			for (final MobicentsProxyBranch pb : this.proxyBranches.values()) {
 				if(!pb.isStarted()) {
 					pb.start();
 				}
@@ -664,7 +667,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		if(this.parallel) 
 			throw new IllegalStateException("This method is only for sequantial proxying");
 		
-		for(final ProxyBranchImpl pbi: this.proxyBranches.values())
+		for(final MobicentsProxyBranch pbi: this.proxyBranches.values())
 		{			
 			// Issue http://code.google.com/p/mobicents/issues/detail?id=2461
 			// don't start the branch is it has been cancelled already
@@ -678,7 +681,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 	
 	public boolean allResponsesHaveArrived()
 	{
-		for(final ProxyBranchImpl pbi: this.proxyBranches.values())
+		for(final MobicentsProxyBranch pbi: this.proxyBranches.values())
 		{
 			final SipServletResponse response = pbi.getResponse();
 			
@@ -699,13 +702,13 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		return true;
 	}
 	
-	public void sendFinalResponse(SipServletResponseImpl response,
+	public void sendFinalResponse(MobicentsSipServletResponse response,
 			ProxyBranchImpl proxyBranch) throws DispatcherException {		
 		
 		// If we didn't get any response and only a timeout just return a timeout
 		if(proxyBranch.isTimedOut()) {
 			try {
-				SipServletResponseImpl timeoutResponse = (SipServletResponseImpl) originalRequest.createResponse(Response.REQUEST_TIMEOUT);
+				MobicentsSipServletResponse timeoutResponse = (MobicentsSipServletResponse) originalRequest.createResponse(Response.REQUEST_TIMEOUT);
 				if(logger.isDebugEnabled())
 					logger.debug("Proxy branch has timed out");
 				// Issue 2474 & 2475
@@ -838,7 +841,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		return bestResponse;
 	}
 	
-	public void setOriginalRequest(SipServletRequestImpl originalRequest) {
+	public void setOriginalRequest(MobicentsSipServletRequest originalRequest) {
 		// Determine the direction of the request. Either it's from the dialog initiator (the caller)
 		// or from the callee
 		if(originalRequest.getFrom().toString().equals(callerFromHeader)) {
@@ -847,7 +850,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 			// If it's from the callee we should send it in the other direction
 		    calleeCSeq = (((MessageExt)originalRequest.getMessage()).getCSeqHeader().getSeqNumber());
 		}
-		this.originalRequest = originalRequest;
+		this.originalRequest = (SipServletRequestImpl) originalRequest;
 	}
 
 	/**
@@ -874,8 +877,8 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 	/**
 	 * @param sipFactoryImpl the sipFactoryImpl to set
 	 */
-	public void setSipFactoryImpl(SipFactoryImpl sipFactoryImpl) {
-		this.sipFactoryImpl = sipFactoryImpl;
+	public void setMobicentsSipFactory(MobicentsSipFactory sipFactoryImpl) {
+		this.sipFactoryImpl = (SipFactoryImpl) sipFactoryImpl;
 	}
 
 	/*
@@ -970,7 +973,7 @@ public class ProxyImpl implements Proxy, ProxyExt, Externalizable {
 		this.callerFromHeader = initiatorFromHeader;
 	}
 
-	public HashMap<String, TransactionApplicationData> getTransactionMap() {
+	public Map<String, TransactionApplicationData> getTransactionMap() {
 		return transactionMap;
 	}
 

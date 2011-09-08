@@ -25,6 +25,7 @@ package org.mobicents.servlet.sip.core.timers;
 import java.io.Serializable;
 
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.timers.TimerTaskData;
 
@@ -40,7 +41,7 @@ import org.mobicents.timers.TimerTaskData;
  */
 public class SipApplicationSessionTaskData extends TimerTaskData implements Serializable {
 	
-	private SipApplicationSessionKey key;
+	private MobicentsSipApplicationSessionKey key;
 	
 	public SipApplicationSessionTaskData(MobicentsSipApplicationSession sipApplicationSession) {
 		super(sipApplicationSession.getId(), -1, -1, null);
@@ -49,7 +50,7 @@ public class SipApplicationSessionTaskData extends TimerTaskData implements Seri
 	/**
 	 * @return the data
 	 */
-	public SipApplicationSessionKey getKey() {
+	public MobicentsSipApplicationSessionKey getKey() {
 		return key;
 	}
 }

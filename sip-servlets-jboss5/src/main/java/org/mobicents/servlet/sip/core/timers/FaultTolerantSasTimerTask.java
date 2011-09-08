@@ -22,9 +22,9 @@
 
 package org.mobicents.servlet.sip.core.timers;
 
+import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
-import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipManager;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSessionKey;
 import org.mobicents.timers.TimerTask;
 import org.mobicents.timers.TimerTaskData;
 
@@ -41,7 +41,7 @@ import org.mobicents.timers.TimerTaskData;
  */
 public class FaultTolerantSasTimerTask extends TimerTask implements SipApplicationSessionTimerTask {
 	protected SipApplicationSessionTimerTask sipApplicationSessionTimerTask;
-	private SipApplicationSessionKey sipApplicationSessionKey;
+	private MobicentsSipApplicationSessionKey sipApplicationSessionKey;
 	private SipManager manager;
 	
 	public FaultTolerantSasTimerTask(SipManager sipManager,

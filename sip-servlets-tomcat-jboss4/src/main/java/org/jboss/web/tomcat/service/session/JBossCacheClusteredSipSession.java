@@ -35,13 +35,14 @@ import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Service;
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.SipService;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
-import org.mobicents.servlet.sip.startup.SipService;
 
 
 /**
@@ -77,12 +78,12 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 	 *            the manager for this session
 	 */
 	public void initAfterLoad(JBossCacheSipManager manager) {
-		sipFactory = manager.getSipFactoryImpl();
+		sipFactory = (SipFactoryImpl) manager.getMobicentsSipFactory();
 		// Since attribute map may be transient, we may need to populate it
 		// from the underlying store.
 		populateMetaData();
 		if(proxy != null) {
-			proxy.setSipFactoryImpl(sipFactory);
+			proxy.setMobicentsSipFactory(sipFactory);
 		}
 		if(b2buaHelper != null) {
 			b2buaHelper.setSipFactoryImpl(sipFactory);
@@ -194,7 +195,7 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 			logger.debug("b2bua session array size = " + size + ", value = " + sessionArray);
 		}
 		if(size != null && sessionArray != null) {
-			Map<SipSessionKey, SipSessionKey> sessionMap = new ConcurrentHashMap<SipSessionKey, SipSessionKey>();
+			Map<MobicentsSipSessionKey, MobicentsSipSessionKey> sessionMap = new ConcurrentHashMap<MobicentsSipSessionKey, MobicentsSipSessionKey>();
 			for (int i = 0; i < size; i++) {
 				String key = sessionArray[0][i];
 				String value = sessionArray[1][i];
@@ -244,11 +245,11 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 			}
 			
 			if(b2buaHelper != null) {
-				final Map<SipSessionKey, SipSessionKey> sessionMap = b2buaHelper.getSessionMap();
+				final Map<MobicentsSipSessionKey, MobicentsSipSessionKey> sessionMap = b2buaHelper.getSessionMap();
 				final int size = sessionMap.size();
 				final String[][] sessionArray = new String[2][size];
 				int i = 0;
-				for (Entry<SipSessionKey, SipSessionKey> entry : sessionMap.entrySet()) {
+				for (Entry<MobicentsSipSessionKey, MobicentsSipSessionKey> entry : sessionMap.entrySet()) {
 					sessionArray [0][i] = entry.getKey().toString(); 
 					sessionArray [1][i] = entry.getValue().toString();
 					i++;

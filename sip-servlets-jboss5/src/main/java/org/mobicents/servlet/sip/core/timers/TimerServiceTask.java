@@ -31,9 +31,10 @@ import org.apache.log4j.Logger;
 import org.jboss.web.tomcat.service.session.ClusteredSipManager;
 import org.jboss.web.tomcat.service.session.ClusteredSipServletTimerService;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistributableSessionData;
+import org.mobicents.servlet.sip.catalina.CatalinaSipManager;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
-import org.mobicents.servlet.sip.core.session.SipManager;
-import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.timers.PeriodicScheduleStrategy;
 import org.mobicents.timers.TimerTask;
 
@@ -47,7 +48,7 @@ public class TimerServiceTask extends TimerTask implements MobicentsServletTimer
 	private static Logger logger = Logger.getLogger(TimerServiceTask.class);
 	ServletTimerImpl servletTimer;	
 	TimerServiceTaskData data;
-	SipManager sipManager;
+	CatalinaSipManager sipManager;
 	
 	/**
 	 * @param data

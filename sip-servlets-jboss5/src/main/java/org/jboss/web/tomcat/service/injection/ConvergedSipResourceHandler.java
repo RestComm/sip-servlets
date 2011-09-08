@@ -50,7 +50,6 @@ import org.jboss.injection.SipFactoryPropertyInjector;
 import org.jboss.injection.SipSessionsUtilPropertyInjector;
 import org.jboss.injection.SipTimerServicePropertyInjector;
 import org.jboss.injection.TimerServicePropertyInjector;
-import org.jboss.injection.UserTransactionPropertyInjector;
 import org.jboss.injection.ValueEncInjector;
 import org.jboss.injection.lang.reflect.BeanProperty;
 import org.jboss.injection.lang.reflect.FieldBeanProperty;
@@ -62,7 +61,7 @@ import org.jboss.metadata.javaee.spec.ResourceEnvironmentReferenceMetaData;
 import org.jboss.metadata.javaee.spec.ResourceReferenceMetaData;
 import org.jboss.reflect.plugins.ValueConvertor;
 import org.jboss.web.tomcat.service.TomcatConvergedSipInjectionContainer;
-import org.mobicents.servlet.sip.startup.SipContext;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.omg.CORBA.ORB;
 
 /**

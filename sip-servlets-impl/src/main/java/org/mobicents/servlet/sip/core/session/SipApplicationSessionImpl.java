@@ -53,16 +53,18 @@ import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.URI;
 
-import org.apache.catalina.security.SecurityUtil;
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.SipApplicationSessionAsynchronousWork;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.SipListeners;
+import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.timers.MobicentsServletTimer;
 import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
 import org.mobicents.servlet.sip.message.MobicentsSipApplicationSessionFacade;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.notification.SessionActivationNotificationCause;
 import org.mobicents.servlet.sip.notification.SipApplicationSessionActivationEvent;
-import org.mobicents.servlet.sip.startup.SipContext;
 import org.mobicents.servlet.sip.utils.JvmRouteUtil;
 
 /**
@@ -179,8 +181,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			sipContext.getListeners().getSipApplicationSessionListeners();
 		if(listeners.size() > 0) {
 			ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
-			java.lang.Thread.currentThread().setContextClassLoader(sipContext.getLoader().getClassLoader());
-			SipApplicationSessionEvent event = new SipApplicationSessionEvent(this.getSession());
+			java.lang.Thread.currentThread().setContextClassLoader(sipContext.getSipContextClassLoader());
+			SipApplicationSessionEvent event = new SipApplicationSessionEvent(this.getFacade());
 			if(logger.isDebugEnabled()) {
 				logger.debug("notifying sip application session listeners of context " + 
 						key.getApplicationName() + " of following event " + sipApplicationSessionEventType);
@@ -210,7 +212,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	public boolean addSipSession(MobicentsSipSession mobicentsSipSession) {
-		boolean wasNotPresent = this.sipSessions.add(mobicentsSipSession.getKey());
+		boolean wasNotPresent = this.sipSessions.add((SipSessionKey)mobicentsSipSession.getKey());
 		if(wasNotPresent) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("Added sip session " + mobicentsSipSession.getKey() + " to sip app session " + getKey());
@@ -225,7 +227,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		if(logger.isDebugEnabled()) {
 			logger.debug("Trying to remove sip session " + mobicentsSipSession);
 		}
-		final SipSessionKey key = mobicentsSipSession.getKey();
+		final SipSessionKey key = (SipSessionKey) mobicentsSipSession.getKey();
 		if(sipSessions != null) {			
 			boolean wasPresent = this.sipSessions.remove(key);
 			if(wasPresent) {
@@ -760,7 +762,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
             ((SipApplicationSessionBindingListener) value).valueUnbound(event);
         }
         
-		SipListenersHolder listeners = sipContext.getListeners();
+		SipListeners listeners = sipContext.getListeners();
 		List<SipApplicationSessionAttributeListener> listenersList = listeners.getSipApplicationSessionAttributeListeners();
 		if(listenersList.size() > 0) {		
 			if(event == null) {
@@ -826,7 +828,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
             }
         }
 
-		SipListenersHolder listeners = sipContext.getListeners();
+		SipListeners listeners = sipContext.getListeners();
 		List<SipApplicationSessionAttributeListener> listenersList = listeners.getSipApplicationSessionAttributeListeners();
 		if(listenersList.size() > 0) {
 			if(event == null) {
@@ -1189,10 +1191,10 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 	
 	@SuppressWarnings(value="unchecked")
-	public MobicentsSipApplicationSessionFacade getSession() {		
+	public MobicentsSipApplicationSession getFacade() {		
 
         if (facade == null){
-            if (SecurityUtil.isPackageProtectionEnabled()){
+            if (sipContext.isPackageProtectionEnabled()){
                 final MobicentsSipApplicationSession fsession = this;
                 facade = (MobicentsSipApplicationSessionFacade)AccessController.doPrivileged(new PrivilegedAction(){
                     public Object run(){
@@ -1270,7 +1272,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	 */
 	public void scheduleAsynchronousWork(
 			SipApplicationSessionAsynchronousWork work) {
-		sipContext.getSipApplicationDispatcher().getAsynchronousExecutor().execute(new SipApplicationSessionAsyncTask(key, work, sipContext.getSipApplicationDispatcher().getSipFactory()));
+		sipContext.getSipApplicationDispatcher().getAsynchronousExecutor().execute(new SipApplicationSessionAsyncTask(key, work, (SipFactoryImpl)sipContext.getSipApplicationDispatcher().getSipFactory()));
 	}	
 	
 	public void acquire() {

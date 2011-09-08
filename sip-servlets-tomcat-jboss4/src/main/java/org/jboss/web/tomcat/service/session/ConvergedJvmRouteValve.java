@@ -58,8 +58,7 @@ import org.apache.catalina.connector.Response;
 import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.valves.ValveBase;
 import org.jboss.logging.Logger;
-import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
-import org.mobicents.servlet.sip.core.session.ConvergedSessionFacade;
+import org.mobicents.servlet.sip.catalina.session.ConvergedSessionFacade;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**

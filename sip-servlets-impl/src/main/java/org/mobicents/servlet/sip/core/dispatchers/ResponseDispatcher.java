@@ -44,23 +44,25 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.SipFactoryExt;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.core.DispatcherException;
+import org.mobicents.servlet.sip.core.SipContext;
+import org.mobicents.servlet.sip.core.SipManager;
+import org.mobicents.servlet.sip.core.proxy.MobicentsProxyBranch;
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipManager;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
-import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
-import org.mobicents.servlet.sip.startup.SipContext;
 
 /**
  * This class is responsible for routing and dispatching responses to applications according to JSR 289 Section 
@@ -84,7 +86,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 	 * {@inheritDoc}
 	 */
 	public void dispatchMessage(final SipProvider sipProvider, SipServletMessageImpl sipServletMessage) throws DispatcherException {		
-		final SipFactoryImpl sipFactoryImpl = sipApplicationDispatcher.getSipFactory();
+		final SipFactoryImpl sipFactoryImpl = (SipFactoryImpl) sipApplicationDispatcher.getSipFactory();
 		final SipServletResponseImpl sipServletResponse = (SipServletResponseImpl) sipServletMessage;
 		final Response response = sipServletResponse.getResponse();
 		final ListIterator<ViaHeader> viaHeaders = response.getHeaders(ViaHeader.NAME);				
@@ -202,7 +204,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 				forwardResponseStatefully(sipServletResponse);
 				return ;
 			}
-			final SipManager sipManager = (SipManager)sipContext.getManager();
+			final SipManager sipManager = sipContext.getSipManager();
 			SipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(appId, appName, response, inverted);
 			if(logger.isDebugEnabled()) {
 				logger.debug("Trying to find session with following session key " + sessionKey);
@@ -235,7 +237,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 			}	
 			
 			if(tmpSession == null) {
-				if(sipFactoryImpl.isRouteOrphanRequests()) {
+				if(((SipFactoryExt)sipFactoryImpl).isRouteOrphanRequests()) {
 					try {
 						response.removeFirst(ViaHeader.NAME);
 						SIPServerTransaction stx = (SIPServerTransaction) ((SIPTransactionStack)sipProvider.getSipStack()).findTransaction((SIPMessage) response, true);
@@ -302,7 +304,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 							// See if this is a response to a proxied request
 							// We can not use session.getProxyBranch() because all branches belong to the same session
 							// and the session.proxyBranch is overwritten each time there is activity on the branch.
-							ProxyBranchImpl proxyBranch = null;
+							MobicentsProxyBranch proxyBranch = null;
 							if(finalApplicationData != null) {
 								proxyBranch = finalApplicationData.getProxyBranch();
 							}
