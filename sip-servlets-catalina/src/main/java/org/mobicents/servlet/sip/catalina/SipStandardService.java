@@ -67,6 +67,7 @@ import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.CongestionControlPolicy;
+import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
@@ -305,7 +306,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 				} 
 				//Tomcat specific loading case
 				MobicentsExtendedListeningPoint extendedListeningPoint = (MobicentsExtendedListeningPoint)
-					protocolHandler.getAttribute(MobicentsExtendedListeningPoint.class.getSimpleName());				
+					protocolHandler.getAttribute(ExtendedListeningPoint.class.getSimpleName());				
 				if(extendedListeningPoint != null && sipStack != null) {					
 					try {
 						extendedListeningPoint.getSipProvider().addSipListener(sipApplicationDispatcher);
