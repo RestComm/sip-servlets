@@ -23,6 +23,8 @@
 package org.mobicents.servlet.sip.core;
 
 /**
+ * Enumeration of the type of events that can be used to notify an application {@link SipContext}
+ * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */

@@ -28,6 +28,8 @@ import javax.sip.message.Message;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 
 /**
+ * Extension to the Sip Servlet Message interface from JSR 289
+ * 
  * @author jean.deruelle@gmail.com
  *
  */

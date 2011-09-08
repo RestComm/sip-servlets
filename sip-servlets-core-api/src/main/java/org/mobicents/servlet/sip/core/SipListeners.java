@@ -33,6 +33,8 @@ import javax.servlet.sip.TimerListener;
 import org.mobicents.javax.servlet.sip.ProxyBranchListener;
 
 /**
+ * Holds the listeners for a given {@link SipContext}
+ * 
  * @author jean.deruelle@gmail.com
  *
  */

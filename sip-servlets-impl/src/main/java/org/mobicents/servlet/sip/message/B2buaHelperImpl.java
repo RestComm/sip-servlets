@@ -893,7 +893,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	/**
 	 * @param sipFactoryImpl the sipFactoryImpl to set
 	 */
-	public void setSipFactoryImpl(MobicentsSipFactory sipFactoryImpl) {
+	public void setMobicentsSipFactory(MobicentsSipFactory sipFactoryImpl) {
 		this.sipFactoryImpl = (SipFactoryImpl) sipFactoryImpl;
 	}
 

@@ -29,6 +29,8 @@ import org.mobicents.javax.servlet.sip.ProxyExt;
 import org.mobicents.servlet.sip.core.message.MobicentsSipServletRequest;
 
 /**
+ * Extension to the Proxy interface from JSR 289
+ * 
  * @author jean.deruelle@gmail.com
  *
  */

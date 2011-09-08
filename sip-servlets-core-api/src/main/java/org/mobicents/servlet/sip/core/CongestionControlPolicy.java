@@ -23,7 +23,14 @@
 package org.mobicents.servlet.sip.core;
 
 /**
+ * Congestion Control Policy for the Mobicents Sip Servlets Server. <br/>
  * 
+ * The congestion control policy defines how an incoming message is handled when the server is overloaded. The following parameters are configurable :
+ * 
+ * <ul>
+ * <li>DropMessage - drop any incoming message</li>
+ * <li>ErrorResponse - send a 503 - Service Unavailable response to any incoming request (Default).</li>
+ * </ul>
  * @author jean.deruelle@gmail.com
  *
  */

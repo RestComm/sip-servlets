@@ -905,7 +905,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			}
 			if(b2buaHelper == null) {
 				b2buaHelper = new B2buaHelperImpl();
-				b2buaHelper.setSipFactoryImpl(getManager().getMobicentsSipFactory());
+				b2buaHelper.setMobicentsSipFactory(getManager().getMobicentsSipFactory());
 				b2buaHelper.setSipManager(getManager());
 			}
 			b2buaHelper.setSessionMap(sessionMap);
@@ -993,7 +993,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 				}
 				if(b2buaHelper == null) {
 					b2buaHelper = new B2buaHelperImpl();
-					b2buaHelper.setSipFactoryImpl(getManager().getMobicentsSipFactory());
+					b2buaHelper.setMobicentsSipFactory(getManager().getMobicentsSipFactory());
 					b2buaHelper.setSipManager(getManager());
 				}
 				b2buaHelper.setOriginalRequestMap(linkedRequestsMap);

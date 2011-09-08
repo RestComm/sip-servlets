@@ -23,15 +23,31 @@
 package org.mobicents.servlet.sip.core;
 
 /**
+ * Notify a {@link SipContext} that an event has occured in which it might be interesting in
+ * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *
  */
 public interface SipContextEvent {
 	
-	
+	/**
+	 * Retrieves the type of event
+	 * @return the type of event
+	 */
 	SipContextEventType getEventType();
+	/**
+	 * Set the type of event
+	 * @param eventType type of event to set
+	 */
 	void setEventType(SipContextEventType eventType);
-
+	/**
+	 * Retrieves the event objet itself
+	 * @return the event objet itself
+	 */
 	Object getEventObject();
+	/**
+	 * Set the event objet itself
+	 * @param eventObject the event objet itself
+	 */
 	void setEventObject(Object eventObject);
 }

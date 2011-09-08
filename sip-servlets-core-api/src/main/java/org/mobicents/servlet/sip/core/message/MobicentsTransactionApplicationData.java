@@ -23,6 +23,8 @@ package org.mobicents.servlet.sip.core.message;
 
 
 /**
+ * Give access to the Sip Servlet Message initating a transaction 
+ * 
  * @author jean.deruelle@gmail.com
  *
  */

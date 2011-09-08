@@ -30,6 +30,8 @@ import org.mobicents.servlet.sip.core.message.MobicentsSipServletRequest;
 import org.mobicents.servlet.sip.core.message.MobicentsSipServletResponse;
 
 /**
+ * Extension to the ProxyBranch interface from JSR 289
+ * 
  * @author jean.deruelle@gmail.com
  *
  */

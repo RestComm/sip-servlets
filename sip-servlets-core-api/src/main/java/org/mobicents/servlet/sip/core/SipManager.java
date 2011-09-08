@@ -35,7 +35,7 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 
 /**
  * A <b>SipManager</b> manages the Sip Sessions that are associated with a
- * particular Container.  Different Manager implementations may support
+ * particular {@link SipContext}.  Different Manager implementations may support
  * value-added features such as the persistent storage of sip session data,
  * as well as migrating sip sessions for distributable sip applications.
  * <p>
@@ -43,10 +43,8 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
  * with a <code>SipContext</code> implementation that implements reloading, it
  * must obey the following constraints:
  * <ul>
- * <li>Must implement <code>Lifecycle</code> so that the Context can indicate
- *     that a restart is required.
  * <li>Must allow a call to <code>stop()</code> to be followed by a call to
- *     <code>start()</code> on the same <code>SipManager</code> instance.
+ *     <code>start()</code> on the same <code>SipManager</code> instance.</li>
  * </ul>
  * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 

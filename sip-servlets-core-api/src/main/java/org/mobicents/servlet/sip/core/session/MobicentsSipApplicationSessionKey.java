@@ -23,6 +23,11 @@
 package org.mobicents.servlet.sip.core.session;
 
 /**
+ * <p>
+ * Class representing the key (which will also be its id) for a sip application session.<br/>
+ * It is composed of a random UUID and the application Name.
+ * </p>
+ * 
  * @author jean.deruelle@gmail.com
  *
  */

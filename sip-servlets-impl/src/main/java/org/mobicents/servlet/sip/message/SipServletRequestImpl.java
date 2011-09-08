@@ -462,7 +462,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		if (b2buaHelper != null)
 			return b2buaHelper;
 		b2buaHelper = new B2buaHelperImpl();
-		b2buaHelper.setSipFactoryImpl(sipFactoryImpl);
+		b2buaHelper.setMobicentsSipFactory(sipFactoryImpl);
 		b2buaHelper.setSipManager(session.getSipApplicationSession().getSipContext().getSipManager());
 		if(JainSipUtils.DIALOG_CREATING_METHODS.contains(getMethod())) {
 			this.createDialog = true; // flag that we want to create a dialog for outgoing request.

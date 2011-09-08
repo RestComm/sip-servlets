@@ -23,6 +23,16 @@
 package org.mobicents.servlet.sip.core.session;
 
 /**
+ * <p>
+ * Class representing the key (which will also be its id) for a sip session.<br/>
+ * It is composed of the From Header parameter Tag, the To Header parameter tag, the Call-Id, the app session id and the application Name.
+ * </p>
+ * IT is maaped to the SIP Dialog from RFC3261 (from tag, to tag + call-ID)
+ * <p>
+ * It is to be noted that the To Header parameter Tag will not be used in SipSessionKey comparison (equals() and hashcode() methods).<br/>
+ * It will only be used to check if a new derived sip session needs to be created.
+ * </p>
+ * 
  * @author jean.deruelle@gmail.com
  *
  */

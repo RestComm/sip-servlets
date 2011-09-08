@@ -33,6 +33,7 @@ import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask;
 
 /**
+ * Extension to the SipApplicationSession interface from JSR 289
  * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *

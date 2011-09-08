@@ -23,6 +23,8 @@ package org.mobicents.servlet.sip.core.descriptor;
 
 
 /**
+ * Represents a Sip Servlet Mapping as defined in sip.xml
+ * 
  * @author jean.deruelle@gmail.com
  *
  */

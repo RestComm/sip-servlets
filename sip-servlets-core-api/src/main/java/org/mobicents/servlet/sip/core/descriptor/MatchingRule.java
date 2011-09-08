@@ -25,9 +25,16 @@ package org.mobicents.servlet.sip.core.descriptor;
 import javax.servlet.sip.SipServletRequest;
 
 /**
+ * Corresponds to a  sip servlet-mapping rule defining in sip.xml under servlet-selection tag 
+ * 
  * @author Thomas Leseney
  */
 public interface MatchingRule {
+	/**
+	 * Check if the given request matches the given rule
+	 * @param request the request to check
+	 * @return true if the given request matches the given rule
+	 */
     boolean matches(SipServletRequest request);
     String getExpression();
 }

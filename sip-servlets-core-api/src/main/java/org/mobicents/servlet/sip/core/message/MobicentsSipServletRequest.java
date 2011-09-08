@@ -25,6 +25,9 @@ import org.mobicents.javax.servlet.sip.SipServletRequestExt;
 import org.mobicents.servlet.sip.core.security.SipPrincipal;
 
 /**
+ * 
+ * Extension to the Sip Servlet Request interface from JSR 289
+ * 
  * @author jean.deruelle@gmail.com
  *
  */

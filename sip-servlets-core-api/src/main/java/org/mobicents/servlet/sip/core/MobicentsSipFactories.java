@@ -27,16 +27,37 @@ import javax.sip.header.HeaderFactory;
 import javax.sip.message.MessageFactory;
 
 /**
+ * Give access to the factories of the underlying JAIN SIP Stack
+ * 
  * @author jean.deruelle@gmail.com
  *
  */
 public interface MobicentsSipFactories {
-
+	/**
+	 * Retrieves the JAIN SIP Address Factory
+	 * @return the JAIN SIP Address Factory
+	 */
 	AddressFactory getAddressFactory();
+	/**
+	 * Retrieves the JAIN SIP Header Factory
+	 * @return the JAIN SIP  Header Factory
+	 */
 	HeaderFactory getHeaderFactory();
+	/**
+	 * Retrieves the JAIN SIP Message Factory
+	 * @return the JAIN SIP Message Factory
+	 */
 	MessageFactory getMessageFactory();
+	/**
+	 * Retrieves the JAIN SIP Factory
+	 * @return the JAIN SIP Factory
+	 */
 	SipFactory getSipFactory();
-	
+	/**
+	 * Initializes the JAIN SIP SipFactory with the given path name
+	 * @param sipPathName path name to use to initialize the JAIN SIP Stack
+	 * @param usePrettyEncoding allow to display the headers on multiple lines or not
+	 */
 	void initialize(String sipPathName, boolean usePrettyEncoding);
 	
 

@@ -23,11 +23,16 @@ package org.mobicents.servlet.sip.core;
 
 
 /**
+ * Extension of the SipFactory interface from Sip Servlets Spec giving access to the sip application dispatcher 
+ * 
  * @author jean.deruelle@gmail.com
  *
  */
 public interface MobicentsSipFactory {
-
-	Object getSipApplicationDispatcher();
+	/**
+	 * Retrieves the Sip Application Dispatcher
+	 * @return the Sip Application Dispatcher
+	 */
+	SipApplicationDispatcher getSipApplicationDispatcher();
 
 }

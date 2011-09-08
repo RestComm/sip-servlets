@@ -45,6 +45,7 @@ import org.mobicents.servlet.sip.core.security.MobicentsSipSessionSecurity;
 import org.mobicents.servlet.sip.core.security.SipPrincipal;
 
 /**
+ * Extension to the SipSession interface from JSR 289
  * 
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
  *

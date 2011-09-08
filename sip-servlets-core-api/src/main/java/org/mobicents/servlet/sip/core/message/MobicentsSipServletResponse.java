@@ -26,6 +26,9 @@ import javax.sip.Dialog;
 import org.mobicents.javax.servlet.sip.SipServletResponseExt;
 
 /**
+ * 
+ * Extension to the Sip Servlet Response interface from JSR 289
+ * 
  * @author jean.deruelle@gmail.com
  *
  */

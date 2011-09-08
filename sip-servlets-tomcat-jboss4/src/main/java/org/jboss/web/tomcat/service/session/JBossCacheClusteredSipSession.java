@@ -86,7 +86,7 @@ public abstract class JBossCacheClusteredSipSession extends ClusteredSipSession 
 			proxy.setMobicentsSipFactory(sipFactory);
 		}
 		if(b2buaHelper != null) {
-			b2buaHelper.setSipFactoryImpl(sipFactory);
+			b2buaHelper.setMobicentsSipFactory(sipFactory);
 			b2buaHelper.setSipManager(manager);
 		}
 		//inject the dialog into the available sip stacks

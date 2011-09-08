@@ -49,7 +49,7 @@ import org.mobicents.servlet.sip.ruby.SipRubyController;
  * therefore an individual sip/converged application, in the Catalina servlet engine.
  *
  * <p>
- * This extends Tomcat Context interface to allow sip capabilities to be used on Tomcat deployed applictions.
+ * This is used to by example extends Tomcat Context interface to allow sip capabilities to be used on Tomcat deployed applications.
  * <p>
  *
  * @author Jean Deruelle
