@@ -37,6 +37,7 @@ import org.mobicents.servlet.sip.catalina.rules.MatchingRuleParser;
 import org.mobicents.servlet.sip.core.descriptor.MatchingRule;
 import org.mobicents.servlet.sip.core.descriptor.MobicentsSipServletMapping;
 import org.mobicents.servlet.sip.core.security.MobicentsSipLoginConfig;
+import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -203,9 +204,9 @@ public class SipRuleSet extends RuleSetBase {
         digester.addRule(prefix + "sip-app/servlet-selection/servlet-mapping",
                 servletSelection);
         digester.addObjectCreate(prefix + "sip-app/servlet-selection/servlet-mapping",        		
-        	"org.mobicents.servlet.sip.startup.loading.SipServletMapping");
+        	SipServletMapping.class.getName());
         digester.addSetNext(prefix + "sip-app/servlet-selection/servlet-mapping",        		
-        	"addSipServletMapping");
+        	"addSipServletMapping", MobicentsSipServletMapping.class.getName());
         digester.addCallMethod(prefix + "sip-app/servlet-selection/servlet-mapping/servlet-name",
         		"setServletName", 0);
         try {
