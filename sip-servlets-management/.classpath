@@ -3,13 +3,14 @@
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/catalina/6.0.32/catalina-6.0.32.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.6.0-SNAPSHOT/sip-servlets-spec-1.6.0-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-impl/1.6.0-SNAPSHOT/sip-servlets-impl-1.6.0-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-application-router/1.6.0-SNAPSHOT/sip-servlets-application-router-1.6.0-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-servlet/1.5.3/gwt-servlet-1.5.3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/com/gwtext/gwtext/2.0.5/gwtext-2.0.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/gwt-dnd/gwt-dnd/2.0.7/gwt-dnd-2.0.7.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-spec"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-core-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-annotations"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-impl"/>	
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-application-router"/>
 	<classpathentry kind="output" path="src/main/webapp/WEB-INF/classes"/>
 </classpath>

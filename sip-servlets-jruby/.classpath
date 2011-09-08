@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-annotations/1.6.0-SNAPSHOT/sip-servlets-annotations-1.6.0-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-impl/1.6.0-SNAPSHOT/sip-servlets-impl-1.6.0-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.6.0-SNAPSHOT/sip-servlets-spec-1.6.0-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-spec"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-annotations"/>	
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

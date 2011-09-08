@@ -51,7 +51,6 @@ import org.apache.tomcat.util.modeler.Registry;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
-import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 
 /**

@@ -36,8 +36,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/jboss/logging/jboss-logging-spi/2.0.5.GA/jboss-logging-spi-2.0.5.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/test/jboss-test/1.1.0.GA/jboss-test-1.1.0.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-api/1.2/jain-sip-api-1.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.X-SNAPSHOT/jain-sip-ri-1.2.X-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/javax/sip/mobicents-jain-sip-ext/1.0-SNAPSHOT/mobicents-jain-sip-ext-1.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.X-SNAPSHOT/jain-sip-ri-1.2.X-SNAPSHOT.jar"/>	
 	<classpathentry kind="var" path="M2_REPO/qdox/qdox/1.6/qdox-1.6.jar"/>
 	<classpathentry kind="var" path="M2_REPO/trove/trove/2.1.1/trove-2.1.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
@@ -48,5 +47,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-jruby"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-catalina"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-core-api"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jain-sip-ext"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

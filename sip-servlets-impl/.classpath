@@ -8,8 +8,7 @@
 	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
-	<classpathentry kind="var" path="M2_REPO/dnsjava/dnsjava/2.1.0/dnsjava-2.1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/ha/javax/sip/mobicents-jain-sip-ha-core/1.2.0-SNAPSHOT/mobicents-jain-sip-ha-core-1.2.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/dnsjava/dnsjava/2.1.0/dnsjava-2.1.0.jar"/>	
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/> 
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-annotations"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-spec"/>
@@ -20,5 +19,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/jain-sip"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jain-sip-ext"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-core-api"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/mobicents-jain-sip-ha-core"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
