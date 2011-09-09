@@ -213,6 +213,7 @@ public class ProxyUtils {
 			if(outboundTransport == null && destination != null) {
 				outboundTransport = destination.getParameter("transport");
 			}
+			
 			if(proxy.getOutboundInterface() == null) {
 				String branchId = null;
 				
@@ -263,6 +264,8 @@ public class ProxyUtils {
 			clonedRequest.addHeader(proxyBranch.viaHeader);		
 			
 			if(outboundTransport == null) outboundTransport = ListeningPoint.UDP;
+			
+			((MessageExt)clonedRequest).setApplicationData(outboundTransport);
 			
 			// Correction for misbehaving clients and unit testing
 			if(clonedRequest.getHeader(RouteHeader.NAME) == null) {
