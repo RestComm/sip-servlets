@@ -3,7 +3,7 @@
  configClass="org.mobicents.servlet.sip.startup.SipContextConfig"
  >
 
- <Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>
+ <Manager className="org.mobicents.servlet.sip.catalina.SipStandardManager"/>
 
  <Parameter name="foo" value="bar" />
 </Context>

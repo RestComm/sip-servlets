@@ -99,7 +99,7 @@
 
 
            <!--Context name="click2-call-context" path="/click2call" docBase="click-to-call" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig">
-			       <Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						
+			       <Manager className="org.mobicents.servlet.sip.catalina.SipStandardManager"/>						
 		   </Context-->
 
             <!-- Uncomment to enable request dumper. This Valve "logs interesting 

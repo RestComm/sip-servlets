@@ -13,7 +13,7 @@
    WEB-INF/context.xml 
    
 -->
-<Manager pathname="" className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>
+<Manager pathname="" className="org.mobicents.servlet.sip.catalina.SipStandardManager"/>
 
 <!--
  Install an InstanceListener to handle the establishment of the run-as

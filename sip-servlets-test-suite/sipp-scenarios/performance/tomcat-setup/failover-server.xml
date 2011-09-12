@@ -216,27 +216,27 @@
       <Host appBase="webapps" autoDeploy="true" name="localhost" unpackWARs="true" xmlNamespaceAware="false" xmlValidation="false" hostConfigClass="org.mobicents.servlet.sip.startup.SipHostConfig" configClass="org.mobicents.servlet.sip.startup.SipContextConfig">
 
 		<!--Context name="sip-test-context" path="/simple-sip-servlet" docBase="/home/deruelle/workspaces/mobicents-sip-servlets/sip-servlets-examples/simple-sip-servlet/src/main/sipapp" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.SipContextConfig">
-			<Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						
+			<Manager className="org.mobicents.servlet.sip.catalina.SipStandardManager"/>						
 		</Context>
 
 		<Context name="click2-call-context" path="/click2call" docBase="click-to-call" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.SipContextConfig">
-			<Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						
+			<Manager className="org.mobicents.servlet.sip.catalina.SipStandardManager"/>						
 		</Context>
 
 		<Context name="callforwarding" path="/callforwarding" docBase="call-forwarding" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.SipContextConfig">
-			<Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						
+			<Manager className="org.mobicents.servlet.sip.catalina.SipStandardManager"/>						
 		</Context>
 		
 		<Context name="callblocking" path="/callblocking" docBase="call-blocking" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.SipContextConfig">
-			<Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						
+			<Manager className="org.mobicents.servlet.sip.catalina.SipStandardManager"/>						
 		</Context>
 		
 		<Context name="speeddial" path="/speeddial" docBase="speed-dial" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.SipContextConfig">
-			<Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						
+			<Manager className="org.mobicents.servlet.sip.catalina.SipStandardManager"/>						
 		</Context>
 		
 		<Context name="locationservice" path="/locationservice" docBase="location-service" className="org.mobicents.servlet.sip.startup.SipStandardContext" configClass="org.mobicents.servlet.sip.startup.SipContextConfig">
-			<Manager className="org.mobicents.servlet.sip.core.session.SipStandardManager"/>						
+			<Manager className="org.mobicents.servlet.sip.catalina.SipStandardManager"/>						
 		</Context-->			 
 			
         <!-- Defines a cluster for this node,

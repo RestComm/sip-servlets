@@ -5,7 +5,7 @@
           description="Standard implementation of the SipManager interface"
                domain="Catalina"
                 group="SipManager"
-                 type="org.mobicents.servlet.sip.core.session.SipStandardManager">
+                 type="org.mobicents.servlet.sip.catalina.SipStandardManager">
 
     <attribute   name="algorithm"
           description="The message digest algorithm to be used when generating
