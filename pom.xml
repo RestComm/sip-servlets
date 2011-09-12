@@ -84,7 +84,7 @@
 	
 	<properties>
 		<mobicents.tools.mavenplugin.eclipse.version>1.0.0.FINAL</mobicents.tools.mavenplugin.eclipse.version>
-		<mobicents.cluster.version>1.12-SNAPSHOT</mobicents.cluster.version>
+		<mobicents.cluster.version>1.12</mobicents.cluster.version>
 		<mobicents.balancer.version>1.5-SNAPSHOT</mobicents.balancer.version>
 		<mobicents.jain.sip.ha.version>1.4.0-SNAPSHOT</mobicents.jain.sip.ha.version>
 		<mobicents.jain.sip.ext.version>1.1-SNAPSHOT</mobicents.jain.sip.ext.version>
@@ -129,8 +129,8 @@
 					<compilerArguments>
 						<g />
 					</compilerArguments>
-					<source>1.5</source>
-					<target>1.5</target>
+					<source>1.6</source>
+					<target>1.6</target>
 				</configuration>
 			</plugin>			
 			<plugin>
@@ -268,18 +268,51 @@
 	<!-- repositories -->
 	<repositories>
 		<repository>
-		  <id>jboss-public-repository-group</id>
-		  <name>JBoss Public Maven Repository Group</name>
-		  <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-		  <layout>default</layout>
-		  <releases>
-		    <enabled>true</enabled>
-		    <updatePolicy>never</updatePolicy>
-		  </releases>
-		  <snapshots>
-		    <enabled>true</enabled>
-		    <updatePolicy>never</updatePolicy>
-		  </snapshots>
-		</repository>		
+			<id>jboss-public-repository-group</id>
+			<name>JBoss Public Maven Repository Group</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
+			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>JbossRepository</id>
+			<name>Jboss Repository</name>
+			<url>http://repository.jboss.org/maven2</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>backup.repository.jboss.org</id>
+			<name>JBoss Repository Backup</name>
+			<url>http://anonsvn.jboss.org/repos/repository.jboss.org/maven2/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+		<repository>
+			<id>jboss-snapshots</id>
+			<name>JBoss Snapshot Repository</name>
+			<url>http://snapshots.jboss.org/maven2</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
 </project>
