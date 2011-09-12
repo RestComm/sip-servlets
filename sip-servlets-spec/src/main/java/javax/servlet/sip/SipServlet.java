@@ -269,18 +269,14 @@ public abstract class SipServlet extends javax.servlet.GenericServlet{
     	int status = resp.getStatus();
 		if (status < 200) {
 			doProvisionalResponse(resp);
-		} else {
-			if(resp.isBranchResponse()) {
-				doBranchResponse(resp);
-			} else {
-				if (status < 300) {
-					doSuccessResponse(resp);
-				} else if (status < 400) {
-					doRedirectResponse(resp);
-				} else {	
-					doErrorResponse(resp);
-				}
-			}		
+		} else {			
+			if (status < 300) {
+				doSuccessResponse(resp);
+			} else if (status < 400) {
+				doRedirectResponse(resp);
+			} else {	
+				doErrorResponse(resp);
+			}				
 		}
     }
 
@@ -331,7 +327,12 @@ public abstract class SipServlet extends javax.servlet.GenericServlet{
     	if (req != null) {
 			doRequest((SipServletRequest) req);
 		} else {
-			doResponse((SipServletResponse) resp);
+			SipServletResponse response = (SipServletResponse)resp;
+			if(response.isBranchResponse()) {
+				doBranchResponse(response);
+			} else {
+				doResponse(response);
+			}
 		}
     }
 

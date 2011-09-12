@@ -400,10 +400,10 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 		SipFactoryExt ext = (SipFactoryExt)sipFactory;
 		if(!ext.isRouteOrphanRequests()) { // not to break the orphan test
-			long delta = Math.abs(System.currentTimeMillis() - lastOKstamp);
-			if(response.getStatus() == 200) {
-				new Exception().printStackTrace();
+			long delta = Math.abs(System.currentTimeMillis() - lastOKstamp);			
+			if(response.getStatus() == 200) {								
 				if(delta<20) {
+					new Exception().printStackTrace();
 					fail = true;
 					throw new ServletException("Problem with double response delta=" + delta + "\n1:" + oldResp + "\n2:"
 							+ response);

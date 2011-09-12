@@ -65,6 +65,7 @@ import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
 import org.mobicents.ha.javax.sip.SipLoadBalancer;
+import org.mobicents.javax.servlet.sip.SipFactoryExt;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
@@ -89,7 +90,7 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
-public class SipFactoryImpl implements MobicentsSipFactory, Externalizable {	
+public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {	
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(SipFactoryImpl.class
@@ -887,5 +888,20 @@ public class SipFactoryImpl implements MobicentsSipFactory, Externalizable {
 	
 	public void setRouteOrphanRequests(boolean routeOrphanRequets) {
 		this.routeOrphanRequests = routeOrphanRequets;
+	}
+	@Override
+	public SipServletRequest createRequest(SipApplicationSession appSession,
+			String method, Address from, Address to) {
+		throw new UnsupportedOperationException("Use the one createRequest(SipApplicationSession appSession, String method, Address from, Address to, String handler) method instead");
+	}
+	@Override
+	public SipServletRequest createRequest(SipApplicationSession appSession,
+			String method, String from, String to) throws ServletParseException {
+		throw new UnsupportedOperationException("Use the one createRequest(SipApplicationSession appSession, String method, String from, String to, String handler) method instead");
+	}
+	@Override
+	public SipServletRequest createRequest(SipApplicationSession appSession,
+			String method, URI from, URI to) {
+		throw new UnsupportedOperationException("Use the one createRequest(SipApplicationSession appSession, String method, URI from, URI to, String handler) method instead");
 	}
 }
