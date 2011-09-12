@@ -138,7 +138,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	protected String description;
 	protected int proxyTimeout;
 	protected int sipApplicationSessionTimeout;
-	protected transient CatalinaSipListenersHolder sipListeners;	
+	protected transient SipListeners sipListeners;	
 	protected transient SipFactoryFacade sipFactoryFacade;	
 	protected transient SipSessionsUtilImpl sipSessionsUtil;
 	protected transient SipLoginConfig sipLoginConfig;

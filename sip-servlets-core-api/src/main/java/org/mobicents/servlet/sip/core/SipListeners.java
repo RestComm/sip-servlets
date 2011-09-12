@@ -23,14 +23,17 @@ package org.mobicents.servlet.sip.core;
 
 import java.util.List;
 
+import javax.servlet.ServletContextListener;
 import javax.servlet.sip.SipApplicationSessionAttributeListener;
 import javax.servlet.sip.SipApplicationSessionListener;
 import javax.servlet.sip.SipErrorListener;
+import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipSessionAttributeListener;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.TimerListener;
 
 import org.mobicents.javax.servlet.sip.ProxyBranchListener;
+import org.mobicents.servlet.sip.listener.SipConnectorListener;
 
 /**
  * Holds the listeners for a given {@link SipContext}
@@ -47,5 +50,12 @@ public interface SipListeners {
 	List<SipErrorListener> getSipErrorListeners();
 	List<ProxyBranchListener> getProxyBranchListeners();
 	TimerListener getTimerListener();
+	List<ServletContextListener> getServletContextListeners();
+	boolean loadListeners(String[] findSipApplicationListeners,
+			ClassLoader loader);
+	void clean();
+	void deallocateServletsActingAsListeners();
+	List<SipServletListener> getSipServletsListeners();
+	List<SipConnectorListener> getSipConnectorListeners();
 
 }
