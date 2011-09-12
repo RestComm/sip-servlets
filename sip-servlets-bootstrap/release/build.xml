@@ -424,7 +424,7 @@
 	
 	<target name="make-final-zip-jboss-5-jdk6" depends="set-time-stamp">
 		<fixcrlf srcdir="${jboss-5-jdk6.home}/bin" includes="*.sh" eol="lf" eof="remove" />
-		<fixcrlf srcdir="${jboss-5-jdk6.home}/mobicents-media-server/bin" includes="*.sh" eol="lf" eof="remove" />
+		<fixcrlf srcdir="${jboss-5-jdk6.home}/mobicents-media-server/mms-server/bin" includes="*.sh" eol="lf" eof="remove" />
 		<zip destfile="${base.path}/mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}-${time.stamp}-full.zip" filesonly="false">
 			<zipfileset dir="${jboss-5-jdk6.home}/bin" filemode="755" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}/bin">
 				<include name="*.sh" />
@@ -432,10 +432,10 @@
 			<zipfileset dir="${jboss-5-jdk6.home}/bin" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}/bin">
 				<exclude name="*.sh" />
 			</zipfileset>
-			<zipfileset dir="${jboss-5-jdk6.home}/mobicents-media-server/bin" filemode="755" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}/mobicents-media-server/bin">
+			<zipfileset dir="${jboss-5-jdk6.home}/mobicents-media-server/mms-server/bin" filemode="755" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}/mobicents-media-server/mms-server/bin">
 				<include name="*.sh" />
 			</zipfileset>
-			<zipfileset dir="${jboss-5-jdk6.home}/mobicents-media-server/bin" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}/mobicents-media-server/bin">
+			<zipfileset dir="${jboss-5-jdk6.home}/mobicents-media-server/mms-server/bin" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}/mobicents-media-server/mms-server/bin">
 				<exclude name="*.sh" />
 			</zipfileset>
 			<zipfileset dir="${jboss-5-jdk6.home}" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}" excludes="**/bin/** **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**"/>

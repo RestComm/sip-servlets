@@ -4,7 +4,10 @@ Release JSIP first
 Release Mobicents Parent 1 and 2 with the new JSIP
 Release Sip Balancer
 Release Mobicents Cluster
+Release Mobicents JAIN SIP Ext
 Release Mobicents JAIN SIP HA
+Release Mobicents SGLC
+Release Mobicents SNMP
 
 Important note : make sure to do a clean checkout of those projects to make the release to avoid messing up the SVN (happened to me on 1.1 release)
 
