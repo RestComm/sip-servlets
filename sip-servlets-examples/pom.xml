@@ -20,6 +20,7 @@
 		<module>chatserver</module>
 		<module>click2call-distributable</module>
 		<module>click-to-call</module>
+		<module>click-to-call-servlet3</module>
 		<module>conference-demo-jsr309</module>
 		<module>custom-call-forwarding-distributable</module>
 		<module>diameter-event-charging</module>
@@ -46,7 +47,7 @@
 		<mms.version>1.0.3.GA</mms.version>
 		<jsr309.version>2.0.0.BETA3</jsr309.version>
 		<jsr309.mscontrol.version>0.3</jsr309.mscontrol.version>
-        <war.plugin.version>2.1-beta-1</war.plugin.version>
+        	<war.plugin.version>2.1-beta-1</war.plugin.version>
 	</properties>
 
 	<dependencies>
