@@ -1,0 +1,100 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Click2Call Async</title>
+<script type="text/javascript" src="js/jquery.js"></script>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#msg").ajaxError(function(event, request, settings){
+		   $(this).append("<li>Error requesting page " + settings.url + "</li>");
+		 });
+	});
+
+	//First time issue a AJAX GET request to the --status-- servlet 
+	function update() {
+		//Make the AJAX call with jQuery to avoid compatibility issues with browsers
+		var xhr = $.ajax({url: '/Click2CallAsync/status',
+			async: true, 
+			success: function(data){
+			$("#text").html(data);
+		}});
+		
+		//Check the state of the XmlHttpRequest object. Since the PrintWriter just flushes and doesn't close
+		//the stream, the XmlHttpRequest readyState = 3. 
+		xhr.onreadystatechange = function() {
+		  if (xhr.readyState == 3 && xhr.status == 200) {
+			  $("#text").html(xhr.responseText);
+		  }
+		};
+	};
+		
+	$(document).ready(function() {
+		update();
+	});
+
+//Parse the JSONP response from the --status-- servlet
+function parseJsonp(resp){
+	$("#text").html(resp.msg);
+};
+//Use the functions below to issue AJAX GET requests for a new call or a bye requests to the --call-- servlet (ignore the response though)
+function call(firstToCall, secondToCall){
+	$.get("/Click2CallAsync/call", { to: firstToCall, from: secondToCall });
+};
+function bye(firstToBye, secondToBye){
+	$.get("/Click2CallAsync/call", {to: firstToBye, bye: "true", from: secondToBye});
+};
+function byeAll(){
+	$.get("/Click2CallAsync/call", {bye: "all"});
+};
+</script>
+
+<style>
+body {
+	font-family: Tahoma, Geneva, 'Trebuchet MS', Arial, Helvetica,
+		sans-serif;
+}
+
+.calltable,a {
+	border: 1px solid #D4E0EE;
+	border-collapse: collapse;
+	font-family: "Trebuchet MS", Arial, sans-serif;
+	color: #555;
+}
+
+.headtable {
+	border: none;
+	width: 100%;
+}
+
+td.calltable,tr {
+	padding: 4px;
+	border: 1px dotted black;
+}
+</style>
+
+</head>
+<body>
+
+<table class="headtable">
+	<tr>
+		<td style="vertical-align: middle"><img alt="Mobicents"
+			src="images/mobicents.logo.jpeg" /> <a
+			style="font-size: 30px; margin-left: 100px"><b>Click-to-Call Application using Servlet 3.0 Server Push </b></a></td>
+	</tr>
+</table>
+<hr />
+
+<div id="text">
+<br/>
+<a>No registered users. Please register at least two SIP User Agents.</a>
+<br/>
+</div>
+
+<hr />
+
+<div class="log" id="msg"></div>
+
+</body>
+</html>
