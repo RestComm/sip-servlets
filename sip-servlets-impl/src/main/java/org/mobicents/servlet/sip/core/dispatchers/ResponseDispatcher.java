@@ -152,7 +152,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 					tx = (SIPTransaction) ((SIPTransactionStack)sipProvider.getSipStack()).findTransaction((SIPMessage) response, true);
 				}
 				if(tx != null) {
-					tmpOriginalRequest = new SipServletRequestImpl(tx.getRequest(), sipFactoryImpl, null, null, null, false);
+					tmpOriginalRequest = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(tx.getRequest(), null, null, null, false);
 				}
 				
 			}
@@ -255,8 +255,9 @@ public class ResponseDispatcher extends MessageDispatcher {
 						response.removeFirst(ViaHeader.NAME);
 						SIPTransaction stx = (SIPTransaction) ((SIPTransactionStack)sipProvider.getSipStack()).findTransaction((SIPMessage) response, true);
 
-						SipServletRequestImpl request = new SipServletRequestImpl(stx.getRequest(), sipFactoryImpl, null, null, null, false);
-						SipServletResponseImpl orphanResponse = new SipServletResponseImpl(response, sipFactoryImpl, null, null, dialog, true, false);
+						SipServletRequestImpl request = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(stx.getRequest(), null, null, null, false);
+						SipServletResponseImpl orphanResponse = (SipServletResponseImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletResponse(
+								response, null, null, dialog, true, false);
 						orphanResponse.setOriginalRequest(request);
 						callServletForOrphanResponse(sipContext, orphanResponse);
 						stx.sendMessage((SIPMessage) response);

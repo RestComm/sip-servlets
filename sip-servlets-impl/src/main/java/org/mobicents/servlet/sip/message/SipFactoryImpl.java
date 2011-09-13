@@ -22,6 +22,7 @@
 
 package org.mobicents.servlet.sip.message;
 
+import gov.nist.javax.sip.header.HeaderFactoryImpl;
 import gov.nist.javax.sip.message.MessageExt;
 
 import java.io.Externalizable;
@@ -47,8 +48,12 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
+import javax.servlet.sip.ar.spi.SipApplicationRouterProvider;
 import javax.sip.ListeningPoint;
+import javax.sip.PeerUnavailableException;
 import javax.sip.SipException;
+import javax.sip.SipFactory;
+import javax.sip.address.AddressFactory;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
@@ -56,18 +61,18 @@ import javax.sip.header.ContentDispositionHeader;
 import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
+import javax.sip.header.HeaderFactory;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
+import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
 import org.mobicents.ha.javax.sip.SipLoadBalancer;
-import org.mobicents.javax.servlet.sip.SipFactoryExt;
 import org.mobicents.servlet.sip.JainSipUtils;
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.address.GenericURIImpl;
@@ -77,6 +82,7 @@ import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.MobicentsSipFactory;
+import org.mobicents.servlet.sip.core.MobicentsSipServletMessageFactory;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
@@ -106,6 +112,34 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 	private boolean routeOrphanRequests = false;
 	private SipLoadBalancer loadBalancerToUse = null;
 	
+	private static boolean initialized;
+	public static AddressFactory addressFactory;
+	public static HeaderFactory headerFactory;
+	public static SipFactory sipFactory;
+	public static MessageFactory messageFactory;
+	
+	private MobicentsSipServletMessageFactory mobicentsSipServletMessageFactory;
+
+	public void initialize(String pathName, boolean prettyEncoding) {
+		if (!initialized) {
+			try {
+				System.setProperty("gov.nist.core.STRIP_ADDR_SCOPES", "true");
+				sipFactory = SipFactory.getInstance();
+				sipFactory.setPathName(pathName);
+				addressFactory = sipFactory.createAddressFactory();				
+				headerFactory = sipFactory.createHeaderFactory();
+				if(prettyEncoding) {
+					((HeaderFactoryImpl)headerFactory).setPrettyEncoding(prettyEncoding);
+				}
+				messageFactory = sipFactory.createMessageFactory();
+				initialized = true;
+			} catch (PeerUnavailableException ex) {
+				logger.error("Could not instantiate factories -- exitting", ex);
+				throw new IllegalArgumentException("Cannot instantiate factories ", ex);
+			}
+		}
+	}
+	
 	public static class NamesComparator implements Comparator<String>, Serializable {		
 		private static final long serialVersionUID = 1L;
 
@@ -134,6 +168,17 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 	 */
 	public SipFactoryImpl(SipApplicationDispatcher sipApplicationDispatcher) {		
 		this.sipApplicationDispatcher = sipApplicationDispatcher;
+		try {
+			mobicentsSipServletMessageFactory = (MobicentsSipServletMessageFactory)
+				Class.forName(StaticServiceHolder.sipStandardService.getMobicentsSipServletMessageFactoryClassName()).newInstance();
+			mobicentsSipServletMessageFactory.setMobicentsSipFactory(this);
+		} catch (InstantiationException e) {
+			throw new IllegalArgumentException("Impossible to load the MobicentsSipServletMessageFactory ",e);
+		} catch (IllegalAccessException e) {
+			throw new IllegalArgumentException("Impossible to load the MobicentsSipServletMessageFactory ",e);
+		} catch (ClassNotFoundException e) {
+			throw new IllegalArgumentException("Impossible to load the MobicentsSipServletMessageFactory ",e);
+		}		
 	}
 
 	/*
@@ -167,7 +212,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 					+ "]");
 		}
 		URIImpl uriImpl = (URIImpl) uri;
-		return new AddressImpl(SipFactories.addressFactory
+		return new AddressImpl(SipFactoryImpl.addressFactory
 				.createAddress(uriImpl.getURI()), null, ModifiableRule.Modifiable);
 	}
 
@@ -184,7 +229,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 						+ "] with display name[" + displayName + "]");
 			}
 
-			javax.sip.address.Address address = SipFactories.addressFactory
+			javax.sip.address.Address address = SipFactoryImpl.addressFactory
 					.createAddress(((URIImpl) uri).getURI());
 			address.setDisplayName(displayName);
 			return new AddressImpl(address, null, ModifiableRule.Modifiable);
@@ -368,7 +413,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 					throw new IllegalStateException("There is no SIP connectors available to create the request");
 				}
 				final MobicentsExtendedListeningPoint extendedListeningPoint = listeningPointsIterator.next();
-				final CallIdHeader callIdHeader = SipFactories.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
+				final CallIdHeader callIdHeader = SipFactoryImpl.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
 				newRequest.setHeader(callIdHeader);
 				if(logger.isDebugEnabled()) {
 					logger.debug("not reusing same call id, new call id is " + callIdHeader);
@@ -385,9 +430,8 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			final MobicentsSipSession session = originalAppSession.getSipContext().getSipManager().getSipSession(key, true, this, originalAppSession);			
 			session.setHandler(originalSession.getHandler());
 			
-			final SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
+			final SipServletRequestImpl newSipServletRequest = (SipServletRequestImpl) mobicentsSipServletMessageFactory.createSipServletRequest(
 					newRequest,
-					this,					
 					session, 
 					null, 
 					null, 
@@ -419,7 +463,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 					+ "]");
 		}
 		try {
-			return new SipURIImpl(SipFactories.addressFactory.createSipURI(
+			return new SipURIImpl(SipFactoryImpl.addressFactory.createSipURI(
 					user, host), ModifiableRule.Modifiable);
 		} catch (ParseException e) {
 			logger.error("couldn't parse the SipURI from USER[" + user
@@ -434,7 +478,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 //			throw new ServletParseException("The uri " + uri + " is not valid");
 //		}
 		try {
-			javax.sip.address.URI jainUri = SipFactories.addressFactory
+			javax.sip.address.URI jainUri = SipFactoryImpl.addressFactory
 					.createURI(uri);
 			if (jainUri instanceof javax.sip.address.SipURI) {
 				return new SipURIImpl(
@@ -525,11 +569,11 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			// Issue 676 : from tags not removed so removing the tag
 			from.removeParameter(TAG_PARAM);
 			
-			fromAddress = SipFactories.addressFactory
+			fromAddress = SipFactoryImpl.addressFactory
 					.createAddress(((URIImpl)from.getURI()).getURI());
 			fromAddress.setDisplayName(from.getDisplayName());		
 			
-			fromHeader = SipFactories.headerFactory.createFromHeader(fromAddress, null);			
+			fromHeader = SipFactoryImpl.headerFactory.createFromHeader(fromAddress, null);			
 		} catch (Exception pe) {
 			throw new ServletParseException("Impossoible to parse the given From " + from.toString(), pe);
 		}
@@ -544,36 +588,36 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			// Issue 676 : to tags not removed so removing the tag
 			to.removeParameter(TAG_PARAM);
 			
-			toAddress = SipFactories.addressFactory
+			toAddress = SipFactoryImpl.addressFactory
 				.createAddress(((URIImpl)to.getURI()).getURI());
 			
 			toAddress.setDisplayName(to.getDisplayName());
 
-			toHeader = SipFactories.headerFactory.createToHeader(toAddress, null);										
+			toHeader = SipFactoryImpl.headerFactory.createToHeader(toAddress, null);										
 		} catch (Exception pe) {
 			throw new ServletParseException("Impossoible to parse the given To " + to.toString(), pe);
 		}
 		try {
-			cseqHeader = SipFactories.headerFactory.createCSeqHeader(1L, method);
+			cseqHeader = SipFactoryImpl.headerFactory.createCSeqHeader(1L, method);
 			// Fix provided by Hauke D. Issue 411
 			MobicentsSipApplicationSessionKey sipApplicationSessionKey = mobicentsSipApplicationSession.getKey();
 //			if(sipApplicationSessionKey.isAppGeneratedKey()) {
 			if(originalCallId == null) {
 				final Iterator<MobicentsExtendedListeningPoint> listeningPointsIterator = getSipNetworkInterfaceManager().getExtendedListeningPoints();				
 				if(listeningPointsIterator.hasNext()) {
-					callIdHeader = sipApplicationDispatcher.getSipFactories().getHeaderFactory().createCallIdHeader(
+					callIdHeader = sipApplicationDispatcher.getSipFactory().getHeaderFactory().createCallIdHeader(
 							listeningPointsIterator.next().getSipProvider().getNewCallId().getCallId());
 				} else {
 					throw new IllegalStateException("There is no SIP connectors available to create the request");
 				}
 			} else {
-				callIdHeader = SipFactories.headerFactory.createCallIdHeader(originalCallId);
+				callIdHeader = SipFactoryImpl.headerFactory.createCallIdHeader(originalCallId);
 			}
 //			} else {
-//				callIdHeader = SipFactories.headerFactory.createCallIdHeader(
+//				callIdHeader = SipFactoryImpl.headerFactory.createCallIdHeader(
 //						sipApplicationSessionKey.getId());
 //			}
-			maxForwardsHeader = SipFactories.headerFactory
+			maxForwardsHeader = SipFactoryImpl.headerFactory
 					.createMaxForwardsHeader(JainSipUtils.MAX_FORWARD_HEADER_VALUE);
 			URIImpl requestURI = (URIImpl)to.getURI().clone();
 
@@ -595,7 +639,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			//Issue 112 by folsson : no via header to add will be added when the request will be sent out
 			List<Header> viaHeaders = new ArrayList<Header>();
 						 			
-			requestToWrap = SipFactories.messageFactory.createRequest(
+			requestToWrap = SipFactoryImpl.messageFactory.createRequest(
 					requestURI.getURI(), 
 					method, 
 					callIdHeader, 
@@ -617,15 +661,15 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 				// if a sip load balancer is present in front of the server, the contact header is the one from the sip lb
 				// so that the subsequent requests can be failed over
 				if(useLoadBalancer) {
-					javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(fromName, loadBalancerToUse.getAddress().getHostAddress());
+					javax.sip.address.SipURI sipURI = SipFactoryImpl.addressFactory.createSipURI(fromName, loadBalancerToUse.getAddress().getHostAddress());
 					sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
 					sipURI.setPort(loadBalancerToUse.getSipPort());			
 					sipURI.setTransportParam(transport);
-					javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);
+					javax.sip.address.Address contactAddress = SipFactoryImpl.addressFactory.createAddress(sipURI);
 					if(displayName != null && displayName.length() > 0) {
 						contactAddress.setDisplayName(displayName);
 					}
-					contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);													
+					contactHeader = SipFactoryImpl.headerFactory.createContactHeader(contactAddress);													
 				} else {
 					contactHeader = JainSipUtils.createContactHeader(getSipNetworkInterfaceManager(), requestToWrap, displayName, fromName, null);
 				}
@@ -649,8 +693,8 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			session.setLocalParty(new AddressImpl(fromAddress, null, ModifiableRule.NotModifiable));
 			session.setRemoteParty(new AddressImpl(toAddress, null, ModifiableRule.NotModifiable));
 			
-			SipServletRequest retVal = new SipServletRequestImpl(
-					requestToWrap, this, session, null, null,
+			SipServletRequest retVal = (SipServletRequestImpl) mobicentsSipServletMessageFactory.createSipServletRequest(
+					requestToWrap, session, null, null,
 					JainSipUtils.DIALOG_CREATING_METHODS.contains(method));						
 			
 			return retVal;
@@ -664,17 +708,17 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 	 */
 	public Parameterable createParameterable(String value) throws ServletParseException {
 		try {			 
-			Header header = SipFactories.headerFactory.createHeader(ContactHeader.NAME, value);
+			Header header = SipFactoryImpl.headerFactory.createHeader(ContactHeader.NAME, value);
 			return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true);
 		} catch (ParseException e) {
 			try {
-				Header header = SipFactories.headerFactory.createHeader(ContentTypeHeader.NAME, value);
+				Header header = SipFactoryImpl.headerFactory.createHeader(ContentTypeHeader.NAME, value);
 				return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true);
 			} catch (ParseException pe) {
 				// Contribution from Nishihara, Naoki from Japan for Issue http://code.google.com/p/mobicents/issues/detail?id=1856
 				// Cannot create a parameterable header for Session-Expires
 				try {
-					Header header = SipFactories.headerFactory.createHeader(ContentDispositionHeader.NAME, value);
+					Header header = SipFactoryImpl.headerFactory.createHeader(ContentDispositionHeader.NAME, value);
 					return SipServletMessageImpl.createParameterable(header, SipServletMessageImpl.getFullHeaderName(header.getName()), true);
 				} catch (ParseException pe2) {
 					throw new ServletParseException("Impossible to parse the following parameterable "+ value , pe2);
@@ -804,7 +848,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 					port = Integer.parseInt(proxy.substring(separatorIndex + 1));
 				}
 			}
-			javax.sip.address.SipURI sipUri = SipFactories.addressFactory.createSipURI(null, host);
+			javax.sip.address.SipURI sipUri = SipFactoryImpl.addressFactory.createSipURI(null, host);
 			sipUri.setPort(port);
 			sipUri.setLrParam();
 			String transport = JainSipUtils.findTransport(request);
@@ -816,9 +860,9 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			sipUri.setParameter(MessageDispatcher.ROUTE_PARAM_NODE_PORT, 
 					"" + listeningPoint.getPort());
 			javax.sip.address.Address routeAddress = 
-				SipFactories.addressFactory.createAddress(sipUri);
+				SipFactoryImpl.addressFactory.createAddress(sipUri);
 			RouteHeader routeHeader = 
-				SipFactories.headerFactory.createRouteHeader(routeAddress);
+				SipFactoryImpl.headerFactory.createRouteHeader(routeAddress);
 			request.addFirst(routeHeader);			
 		} catch (ParseException e) {
 			//this should never happen
@@ -844,7 +888,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 					port = Integer.parseInt(proxy.substring(separatorIndex + 1));
 				}
 			}
-			javax.sip.address.SipURI sipUri = SipFactories.addressFactory.createSipURI(null, host);
+			javax.sip.address.SipURI sipUri = SipFactoryImpl.addressFactory.createSipURI(null, host);
 			sipUri.setPort(port);
 			sipUri.setLrParam();
 			String transport = JainSipUtils.findTransport(request);
@@ -856,9 +900,9 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			sipUri.setParameter(MessageDispatcher.ROUTE_PARAM_NODE_PORT, 
 					"" + listeningPoint.getPort());
 			javax.sip.address.Address routeAddress = 
-				SipFactories.addressFactory.createAddress(sipUri);
+				SipFactoryImpl.addressFactory.createAddress(sipUri);
 			RouteHeader routeHeader = 
-				SipFactories.headerFactory.createRouteHeader(routeAddress);
+				SipFactoryImpl.headerFactory.createRouteHeader(routeAddress);
 			request.addFirst(routeHeader);			
 		} catch (ParseException e) {
 			//this should never happen
@@ -905,5 +949,38 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 	public SipServletRequest createRequest(SipApplicationSession appSession,
 			String method, URI from, URI to) {
 		throw new UnsupportedOperationException("Use the one createRequest(SipApplicationSession appSession, String method, URI from, URI to, String handler) method instead");
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.MobicentsSipFactoryImpl#getAddressFactory()
+	 */
+	public AddressFactory getAddressFactory() {		
+		return addressFactory;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.MobicentsSipFactoryImpl#getHeaderFactory()
+	 */
+	public HeaderFactory getHeaderFactory() {
+		return headerFactory;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.MobicentsSipFactoryImpl#getMessageFactory()
+	 */
+	public MessageFactory getMessageFactory() {
+		return messageFactory;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.MobicentsSipFactoryImpl#getSipFactory()
+	 */
+	public SipFactory getJainSipFactory() {
+		return sipFactory;
+	}
+
+	@Override
+	public MobicentsSipServletMessageFactory getMobicentsSipServletMessageFactory() {
+		return mobicentsSipServletMessageFactory;
 	}
 }

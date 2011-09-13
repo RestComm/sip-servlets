@@ -44,11 +44,11 @@ import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.SipSessionRoutingType;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
 
@@ -148,7 +148,7 @@ public abstract class RequestDispatcher extends MessageDispatcher {
 		MaxForwardsHeader maxForwardsHeader = (MaxForwardsHeader) clonedRequest
 			.getHeader(MaxForwardsHeader.NAME);
 		if (maxForwardsHeader == null) {
-			maxForwardsHeader = SipFactories.headerFactory.createMaxForwardsHeader(JainSipUtils.MAX_FORWARD_HEADER_VALUE);
+			maxForwardsHeader = SipFactoryImpl.headerFactory.createMaxForwardsHeader(JainSipUtils.MAX_FORWARD_HEADER_VALUE);
 			clonedRequest.addHeader(maxForwardsHeader);
 		} else {
 			if(maxForwardsHeader.getMaxForwards() - 1 > 0) {

@@ -99,7 +99,6 @@ import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingListener;
 import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
@@ -173,8 +172,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	//the logger
 	private static final Logger logger = Logger.getLogger(SipApplicationDispatcherImpl.class);
 		
-	//the sip factory implementation, it is not clear if the sip factory should be the same instance
-	//for all applications
+	//the sip factory implementation
 	private SipFactoryImpl sipFactoryImpl = null;
 	//the sip application router responsible for the routing logic of sip messages to
 	//sip servlet applications
@@ -247,8 +245,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
     //the balancers names to send heartbeat to and our health info
 	private Set<SipLoadBalancer> sipLoadBalancers = new CopyOnWriteArraySet<SipLoadBalancer>();
 	
-	private MobicentsSipFactories sipFactories ;
-	
 	/**
 	 * 
 	 */
@@ -261,7 +257,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		sipNetworkInterfaceManager = new SipNetworkInterfaceManagerImpl(this);
 		maxMemory = Runtime.getRuntime().maxMemory() / (double) 1024;
 		congestionControlPolicy = CongestionControlPolicy.ErrorResponse;
-		sipFactories = new MobicentsSipFactoriesImpl();
 	}
 	
 	/**
@@ -643,7 +638,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				try {
 					//folsson fix : Workaround broken Cisco 7940/7912
 				    if(request.getHeader(MaxForwardsHeader.NAME) == null){
-					    request.setHeader(SipFactories.headerFactory.createMaxForwardsHeader(70));
+					    request.setHeader(SipFactoryImpl.headerFactory.createMaxForwardsHeader(70));
 					}
 				    requestTransaction = sipProvider.getNewServerTransaction(request);
 				    JainSipUtils.setTransactionTimers(((TransactionExt)requestTransaction), this);				    
@@ -664,9 +659,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				logger.debug("Dialog ref "  + dialog);				
 			}
 			
-			final SipServletRequestImpl sipServletRequest = new SipServletRequestImpl(
+			final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(
 						request,
-						sipFactoryImpl,
 						null,
 						transaction,
 						dialog,
@@ -843,9 +837,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 		
 		// Transate the response to SipServletResponse
-		final SipServletResponseImpl sipServletResponse = new SipServletResponseImpl(
+		final SipServletResponseImpl sipServletResponse = (SipServletResponseImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletResponse(				
 				response, 
-				sipFactoryImpl,
 				clientTransaction, 
 				null, 
 				dialog,
@@ -1535,13 +1528,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			// ROUTE modifier indicates that SipApplicationRouterInfo.getRoute() returns a valid route,
 			// it is up to container to decide whether it is external or internal.
 			if(SipRouteModifier.ROUTE.equals(sipRouteModifier)) {						
-				final Address routeAddress = SipFactories.addressFactory.createAddress(routes[0]);
-				final RouteHeader applicationRouterInfoRouteHeader = SipFactories.headerFactory.createRouteHeader(routeAddress);									
+				final Address routeAddress = SipFactoryImpl.addressFactory.createAddress(routes[0]);
+				final RouteHeader applicationRouterInfoRouteHeader = SipFactoryImpl.headerFactory.createRouteHeader(routeAddress);									
 				if(isRouteExternal(applicationRouterInfoRouteHeader)) {				
 					// push all of the routes on the Route header stack of the request and 
 					// send the request externally
 					for (int i = routes.length-1 ; i >= 0; i--) {
-						RouteHeader routeHeader = (RouteHeader) SipFactories.headerFactory.createHeader(RouteHeader.NAME, routes[i]);
+						RouteHeader routeHeader = (RouteHeader) SipFactoryImpl.headerFactory.createHeader(RouteHeader.NAME, routes[i]);
 						URI routeURI = routeHeader.getAddress().getURI();
 						if(routeURI.isSipURI()) {
 							((javax.sip.address.SipURI)routeURI).setLrParam();
@@ -1553,12 +1546,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				// Push container Route, pick up the first outbound interface
 				final SipURI sipURI = getOutboundInterfaces().get(0);
 				sipURI.setParameter("modifier", "route_back");
-				Header routeHeader = SipFactories.headerFactory.createHeader(RouteHeader.NAME, sipURI.toString());
+				Header routeHeader = SipFactoryImpl.headerFactory.createHeader(RouteHeader.NAME, sipURI.toString());
 				request.addHeader(routeHeader);
 				// push all of the routes on the Route header stack of the request and 
 				// send the request externally
 				for (int i = routes.length-1 ; i >= 0; i--) {
-					routeHeader = SipFactories.headerFactory.createHeader(RouteHeader.NAME, routes[i]);
+					routeHeader = SipFactoryImpl.headerFactory.createHeader(RouteHeader.NAME, routes[i]);
 					request.addHeader(routeHeader);
 				}
 			}
@@ -2165,9 +2158,5 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 
 	public String getVersion() {
 		return Version.getVersion();
-	}
-
-	public MobicentsSipFactories getSipFactories() {		
-		return sipFactories;
 	}
 }

@@ -34,7 +34,6 @@ import java.io.ObjectOutput;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
-import java.security.Principal;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -90,7 +89,6 @@ import org.apache.log4j.Logger;
 import org.mobicents.ha.javax.sip.ClusteredSipStack;
 import org.mobicents.ha.javax.sip.ReplicationStrategy;
 import org.mobicents.servlet.sip.JainSipUtils;
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.address.ParameterableHeaderImpl;
@@ -234,7 +232,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 */
 	public void addAcceptLanguage(Locale locale) {
 		checkCommitted();
-		AcceptLanguageHeader ach = SipFactories.headerFactory
+		AcceptLanguageHeader ach = SipFactoryImpl.headerFactory
 				.createAcceptLanguageHeader(locale);
 		message.addHeader(ach);
 
@@ -272,7 +270,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 
 		try {
 			String nameToAdd = getCorrectHeaderName(hName);
-			Header h = SipFactories.headerFactory.createHeader(nameToAdd, addr.toString());
+			Header h = SipFactoryImpl.headerFactory.createHeader(nameToAdd, addr.toString());
 
 			if (first) {
 				this.message.addFirst(h);
@@ -380,7 +378,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 
 			String nameToAdd = getCorrectHeaderName(hName);
 
-			Header header = SipFactories.headerFactory.createHeader(nameToAdd,
+			Header header = SipFactoryImpl.headerFactory.createHeader(nameToAdd,
 					body);
 			if (first)
 				this.message.addFirst(header);
@@ -474,9 +472,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 				try {
 					logger.debug("parametrable Value " + parametrable.getValue());					
 					if(this.isCommitted()) {
-						return new AddressImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), ModifiableRule.NotModifiable);
+						return new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), ModifiableRule.NotModifiable);
 					} else {
-						return new AddressImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), getModifiableRule(hName));
+						return new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), getModifiableRule(hName));
 					}
 				} catch (ParseException e) {
 					throw new ServletParseException("Impossible to parse the following header " + name + " as an address.", e);
@@ -520,7 +518,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			}  else {
 				Parameterable parametrable = createParameterable(header, header.getName(), message instanceof Request);
 				try {
-					AddressImpl addressImpl = new AddressImpl(SipFactories.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), getModifiableRule(hName));
+					AddressImpl addressImpl = new AddressImpl(SipFactoryImpl.addressFactory.createAddress(parametrable.getValue()), ((ParameterableHeaderImpl)parametrable).getInternalParameters(), getModifiableRule(hName));
 					retval.add(addressImpl);
 				} catch (ParseException e) {
 					throw new ServletParseException("Impossible to parse the following header " + name + " as an address.", e);
@@ -1196,7 +1194,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 */
 	public void setAcceptLanguage(Locale locale) {
 		checkCommitted();
-		AcceptLanguageHeader alh = SipFactories.headerFactory
+		AcceptLanguageHeader alh = SipFactoryImpl.headerFactory
 				.createAcceptLanguageHeader(locale);
 
 		this.message.setHeader(alh);
@@ -1229,7 +1227,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		Header h;
 		String headerNameToAdd = getCorrectHeaderName(hName);
 		try {
-			h = SipFactories.headerFactory.createHeader(headerNameToAdd, addr
+			h = SipFactoryImpl.headerFactory.createHeader(headerNameToAdd, addr
 					.toString());
 			this.message.setHeader(h);
 		} catch (ParseException e) {
@@ -1256,7 +1254,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		new String("testEncoding".getBytes(),enc);
 		checkCommitted();
 		try {			
-			this.message.setContentEncoding(SipFactories.headerFactory
+			this.message.setContentEncoding(SipFactoryImpl.headerFactory
 					.createContentEncodingHeader(enc));
 		} catch (Exception ex) {
 			throw new UnsupportedEncodingException(enc);
@@ -1330,7 +1328,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	public void setContentLanguage(Locale locale) {
 		checkCommitted();
 		ContentLanguageHeader contentLanguageHeader = 
-			SipFactories.headerFactory.createContentLanguageHeader(locale);
+			SipFactoryImpl.headerFactory.createContentLanguageHeader(locale);
 		this.message.setContentLanguage(contentLanguageHeader);
 	}
 	
@@ -1342,7 +1340,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		checkMessageState();
 		checkCommitted();
 		try {
-			ContentLengthHeader h = SipFactories.headerFactory.createContentLengthHeader(len);
+			ContentLengthHeader h = SipFactoryImpl.headerFactory.createContentLengthHeader(len);
 			this.message.setHeader(h);
 		} catch (InvalidArgumentException e) {
 			throw new IllegalStateException("Impossible to set a content length lower than 0", e);
@@ -1358,7 +1356,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		checkCommitted();
 		String name = getCorrectHeaderName(ContentTypeHeader.NAME);
 		try {
-			Header h = SipFactories.headerFactory.createHeader(name, type);
+			Header h = SipFactoryImpl.headerFactory.createHeader(name, type);
 			this.message
 					.removeHeader(getCorrectHeaderName(ContentTypeHeader.NAME));
 			this.message.addHeader(h);
@@ -1375,7 +1373,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	public void setExpires(int seconds) {
 		try {
 			ExpiresHeader expiresHeader = 
-				SipFactories.headerFactory.createExpiresHeader(seconds);			
+				SipFactoryImpl.headerFactory.createExpiresHeader(seconds);			
 			expiresHeader.setExpires(seconds);
 			this.message.setExpires(expiresHeader);
 		} catch (Exception e) {
@@ -1437,7 +1435,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 //				if(message.getHeader(fullName) != null) {
 //					try {
 						//Handle the case where mutliple headers for the same header name
-//						Header header = SipFactories.headerFactory.createHeader(headerCompact2FullNamesMappings.get(fullName), ((SIPHeader)message.getHeader(fullName)).getHeaderValue());
+//						Header header = SipFactoryImpl.headerFactory.createHeader(headerCompact2FullNamesMappings.get(fullName), ((SIPHeader)message.getHeader(fullName)).getHeaderValue());
 //						message.removeHeader(fullName);
 //						message.addHeader(header);
 //					} catch (ParseException e) {
@@ -1458,7 +1456,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			throw new IllegalArgumentException(name + " is a system header !");
 		}
 		try {
-			this.message.setHeader(SipFactories.headerFactory.createHeader(name, param.toString()));
+			this.message.setHeader(SipFactoryImpl.headerFactory.createHeader(name, param.toString()));
 		} catch (ParseException e) {
 			throw new IllegalArgumentException("Impossible to set this parameterable header", e);
 		}

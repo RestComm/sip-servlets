@@ -45,8 +45,6 @@ import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipURI;
 import javax.sip.InvalidArgumentException;
-import javax.sip.PeerUnavailableException;
-import javax.sip.SipFactory;
 import javax.sip.address.URI;
 import javax.sip.header.ReasonHeader;
 import javax.sip.header.RecordRouteHeader;
@@ -54,9 +52,9 @@ import javax.sip.header.RouteHeader;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 
@@ -142,26 +140,26 @@ public class ProxyTerminationInfo implements Externalizable {
 			ClassNotFoundException {
 
 		try {
-			calleeContact = SipFactories.addressFactory.createURI(in.readUTF());
-			callerContact = SipFactories.addressFactory.createURI(in.readUTF());
+			calleeContact = SipFactoryImpl.addressFactory.createURI(in.readUTF());
+			callerContact = SipFactoryImpl.addressFactory.createURI(in.readUTF());
 
 			int routeSetSize = in.readInt();
 			for (int i = 0; i < routeSetSize; i++) {
-				javax.sip.address.Address route = SipFactories.addressFactory.createAddress(in.readUTF());
+				javax.sip.address.Address route = SipFactoryImpl.addressFactory.createAddress(in.readUTF());
 				callerRouteSet.add(route);
 			} 
 
 			routeSetSize = in.readInt();
 			for (int i = 0; i < routeSetSize; i++) {
-				javax.sip.address.Address route = SipFactories.addressFactory.createAddress(in.readUTF());
+				javax.sip.address.Address route = SipFactoryImpl.addressFactory.createAddress(in.readUTF());
 				calleeRouteSet.add(route);
 			} 
 
-			javax.sip.address.Address toAddress = SipFactories.addressFactory.createAddress(in.readUTF());
-			toHeader = (To) SipFactories.headerFactory.createToHeader(toAddress, in.readUTF());
+			javax.sip.address.Address toAddress = SipFactoryImpl.addressFactory.createAddress(in.readUTF());
+			toHeader = (To) SipFactoryImpl.headerFactory.createToHeader(toAddress, in.readUTF());
 
-			javax.sip.address.Address fromAddress = SipFactories.addressFactory.createAddress(in.readUTF());
-			fromHeader = (From) SipFactories.headerFactory.createFromHeader(fromAddress, in.readUTF());
+			javax.sip.address.Address fromAddress = SipFactoryImpl.addressFactory.createAddress(in.readUTF());
+			fromHeader = (From) SipFactoryImpl.headerFactory.createFromHeader(fromAddress, in.readUTF());
 			callId = in.readUTF();
 		} catch (ParseException e) {
 			throw new IllegalArgumentException("Problem occurred while unserializing ProxyTerminationInfo", e);
@@ -208,11 +206,11 @@ public class ProxyTerminationInfo implements Externalizable {
 		Request request;
 
 		try {
-			request = SipFactories.messageFactory.createRequest(requestUri, Request.BYE,
-															 	SipFactories.headerFactory.createCallIdHeader(callId),
-																SipFactories.headerFactory.createCSeqHeader(cSeq, Request.BYE),
+			request = SipFactoryImpl.messageFactory.createRequest(requestUri, Request.BYE,
+															 	SipFactoryImpl.headerFactory.createCallIdHeader(callId),
+																SipFactoryImpl.headerFactory.createCSeqHeader(cSeq, Request.BYE),
 																from, to, new ArrayList(), 
-																SipFactories.headerFactory.createMaxForwardsHeader(70));
+																SipFactoryImpl.headerFactory.createMaxForwardsHeader(70));
 		} catch (ParseException e1) {
 			throw new IllegalArgumentException("Problem occurred while creating the Proxy BYE on session " + session + 
 					" requestURI = " + requestUri + " From = " + from + " To = " + to + " cSeq " + cSeq + 
@@ -226,7 +224,7 @@ public class ProxyTerminationInfo implements Externalizable {
 		if ((responseText != null) && (responseCode > 299) && (responseCode < 700)) {
 			ReasonHeader reason;
 			try {
-				reason = SipFactories.headerFactory.createReasonHeader("sip", responseCode, responseText);
+				reason = SipFactoryImpl.headerFactory.createReasonHeader("sip", responseCode, responseText);
 				((SIPMessage)request).addHeader(reason);
 			} catch (InvalidArgumentException e) {
 				throw new IllegalArgumentException("Failed to build reason header " + responseCode + ":" + responseText);				
@@ -243,7 +241,7 @@ public class ProxyTerminationInfo implements Externalizable {
 			request.addHeader(routeHeader);
 		}
 
-		SipServletRequestImpl sipServletRequest = new SipServletRequestImpl(request, proxyImpl.getSipFactoryImpl(),
+		SipServletRequestImpl sipServletRequest = (SipServletRequestImpl) proxyImpl.getSipFactoryImpl().getMobicentsSipServletMessageFactory().createSipServletRequest(request,
 													(MobicentsSipSession) session, null, null, false);
 		sipServletRequest.send();		
 	}

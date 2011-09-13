@@ -70,6 +70,7 @@ import org.mobicents.servlet.sip.core.CongestionControlPolicy;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
+import org.mobicents.servlet.sip.message.DefaultSipServletMessageFactory;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
@@ -152,9 +153,11 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	private String addressResolverClass = null;
 	private String dnsServerLocatorClass = DefaultDNSServerLocator.class.getName();
 	
+	private String mobicentsSipServletMessageFactoryClassName = DefaultSipServletMessageFactory.class.getName();
+	
 	//the balancers to send heartbeat to and our health info
 	@Deprecated
-	private String balancers;
+	private String balancers;	
 	
 	@Override
     public String getInfo() {
@@ -240,7 +243,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 		if(logger.isInfoEnabled()) {
 			logger.info("Sip Stack path name : " + sipPathName);
 		}
-		sipApplicationDispatcher.getSipFactories().initialize(sipPathName, usePrettyEncoding);
+		sipApplicationDispatcher.getSipFactory().initialize(sipPathName, usePrettyEncoding);
 		
 		String catalinaBase = getCatalinaBase();
 		if(darConfigurationFileLocation != null) {
@@ -475,8 +478,8 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 				while(stringTokenizer.hasMoreTokens()) {
 					serverHeaderList.add(stringTokenizer.nextToken());
 				}
-				ServerHeader serverHeader = sipApplicationDispatcher.getSipFactories().getHeaderFactory().createServerHeader(serverHeaderList);
-				((MessageFactoryExt)sipApplicationDispatcher.getSipFactories().getMessageFactory()).setDefaultServerHeader(serverHeader);
+				ServerHeader serverHeader = sipApplicationDispatcher.getSipFactory().getHeaderFactory().createServerHeader(serverHeaderList);
+				((MessageFactoryExt)sipApplicationDispatcher.getSipFactory().getMessageFactory()).setDefaultServerHeader(serverHeader);
 			}
 			String userAgent = sipStackProperties.getProperty(USER_AGENT_HEADER);
 			if(userAgent != null) {
@@ -485,8 +488,8 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 				while(stringTokenizer.hasMoreTokens()) {
 					userAgentList.add(stringTokenizer.nextToken());
 				}
-				UserAgentHeader userAgentHeader = sipApplicationDispatcher.getSipFactories().getHeaderFactory().createUserAgentHeader(userAgentList);
-				((MessageFactoryExt)sipApplicationDispatcher.getSipFactories().getMessageFactory()).setDefaultUserAgentHeader(userAgentHeader);
+				UserAgentHeader userAgentHeader = sipApplicationDispatcher.getSipFactory().getHeaderFactory().createUserAgentHeader(userAgentList);
+				((MessageFactoryExt)sipApplicationDispatcher.getSipFactory().getMessageFactory()).setDefaultUserAgentHeader(userAgentHeader);
 			}			
 			if(balancers != null) {
 				if(sipStackProperties.get(LoadBalancerHeartBeatingService.LB_HB_SERVICE_CLASS_NAME) == null) {
@@ -507,13 +510,13 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 			if(replicationStrategy != null) {
 				replicationStrategy = ReplicationStrategy.valueOf(replicationStrategyString);
 			}
-			sipStackProperties.put(ClusteredSipStack.REPLICATION_STRATEGY_PROPERTY, replicationStrategy);
+			sipStackProperties.put(ClusteredSipStack.REPLICATION_STRATEGY_PROPERTY, replicationStrategyString);
 			sipStackProperties.put(ClusteredSipStack.REPLICATE_APPLICATION_DATA, Boolean.valueOf(replicateApplicationData).toString());
 			if(logger.isInfoEnabled()) {
 				logger.info("Mobicents Sip Servlets sip stack properties : " + sipStackProperties);
 			}
 			// Create SipStack object
-			sipStack = sipApplicationDispatcher.getSipFactories().getSipFactory().createSipStack(sipStackProperties);		
+			sipStack = sipApplicationDispatcher.getSipFactory().getJainSipFactory().createSipStack(sipStackProperties);		
 			LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = null;
 			if(sipStack instanceof ClusteredSipStack) {
 				loadBalancerHeartBeatingService = ((ClusteredSipStack) sipStack).getLoadBalancerHeartBeatingService();
@@ -558,7 +561,8 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 			if(logger.isInfoEnabled()) {
 				logger.info("SIP stack initialized");
 			}
-		} catch (Exception ex) {			
+		} catch (Exception ex) {		
+			logger.error("A problem occured while initializing the SIP Stack", ex);
 			throw new LifecycleException("A problem occured while initializing the SIP Stack", ex);
 		}
 	}	
@@ -1192,5 +1196,16 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 
 	public ReplicationStrategy getReplicationStrategy() {
 		return replicationStrategy;
+	}
+
+	@Override
+	public String getMobicentsSipServletMessageFactoryClassName() {
+		return mobicentsSipServletMessageFactoryClassName;
+	}
+
+	@Override
+	public void setMobicentsSipServletMessageFactoryClassName(
+			String mobicentsSipServletMessageFactoryClassName) {
+		this.mobicentsSipServletMessageFactoryClassName = mobicentsSipServletMessageFactoryClassName;
 	}
 }

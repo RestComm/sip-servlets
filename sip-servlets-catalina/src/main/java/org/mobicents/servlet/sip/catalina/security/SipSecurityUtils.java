@@ -79,7 +79,7 @@ public class SipSecurityUtils {
 								return false;
 							}
 							javax.sip.address.Address address = 
-								sipStandardContext.getSipApplicationDispatcher().getSipFactories().getAddressFactory().createAddress(pAssertedHeaderValue);
+								sipStandardContext.getSipApplicationDispatcher().getSipFactory().getAddressFactory().createAddress(pAssertedHeaderValue);
 							String username = null;
 							if(address.getURI().isSipURI()) {
 								SipURI sipUri = (SipURI)address.getURI();
@@ -101,7 +101,7 @@ public class SipSecurityUtils {
 					}
 					// (2) Then if P-Identity has failed and is not required attempt DIGEST auth
 					if(!authenticated && authMethod.equalsIgnoreCase("DIGEST")) {
-						DigestAuthenticator digestAuthenticator = new DigestAuthenticator(sipStandardContext.getSipApplicationDispatcher().getSipFactories().getHeaderFactory());
+						DigestAuthenticator digestAuthenticator = new DigestAuthenticator(sipStandardContext.getSipApplicationDispatcher().getSipFactory().getHeaderFactory());
 						digestAuthenticator.setContext((CatalinaSipContext)sipStandardContext);
 						MobicentsSipServletResponse response = createErrorResponse(request, sipConstraint);
 						authenticated = digestAuthenticator.authenticate(request, response, loginConfig);		

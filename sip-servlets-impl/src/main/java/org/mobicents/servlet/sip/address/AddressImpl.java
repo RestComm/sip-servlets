@@ -38,7 +38,7 @@ import javax.sip.header.ContactHeader;
 import javax.sip.header.HeaderAddress;
 import javax.sip.header.Parameters;
 
-import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 
 /**
@@ -304,9 +304,9 @@ public class AddressImpl extends ParameterableImpl implements Address {
 	 */
 	public void setValue(String value) {
 		try {			
-			ContactHeader contactHeader = (ContactHeader) SipFactories.headerFactory.createHeader(
+			ContactHeader contactHeader = (ContactHeader) SipFactoryImpl.headerFactory.createHeader(
 					ContactHeader.NAME, value);
-			this.address = SipFactories.addressFactory.createAddress(value);
+			this.address = SipFactoryImpl.addressFactory.createAddress(value);
 			this.parameters = getParameters(((Parameters) contactHeader));
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Illegal argument", ex);

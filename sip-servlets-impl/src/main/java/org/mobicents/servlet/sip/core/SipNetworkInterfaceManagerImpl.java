@@ -48,9 +48,9 @@ import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
-import org.mobicents.servlet.sip.SipFactories;
-import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
+import org.mobicents.servlet.sip.address.SipURIImpl;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.utils.Inet6Util;
 
 /**
@@ -337,7 +337,7 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 			for(String ipAddress : extendedListeningPoint.getIpAddresses()) {
 				try {
 					newlyComputedOutboundInterfacesIpAddresses.add(ipAddress);
-					javax.sip.address.SipURI jainSipURI = SipFactories.addressFactory.createSipURI(
+					javax.sip.address.SipURI jainSipURI = SipFactoryImpl.addressFactory.createSipURI(
 							null, ipAddress);
 					jainSipURI.setPort(extendedListeningPoint.getPort());
 					jainSipURI.setTransportParam(extendedListeningPoint.getTransport());

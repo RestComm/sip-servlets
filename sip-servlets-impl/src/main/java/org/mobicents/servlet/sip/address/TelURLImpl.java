@@ -30,7 +30,7 @@ import java.util.Iterator;
 import javax.servlet.sip.TelURL;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
 /**
  * Wrapper class for servlet TelURL. Would be nice if the javax.sip and servlet
@@ -171,7 +171,7 @@ public class TelURLImpl extends URIImpl implements TelURL {
 	 */
 	public void setValue(String value) {
 		try {
-			this.telUrl = SipFactories.addressFactory.createTelURL(value);
+			this.telUrl = SipFactoryImpl.addressFactory.createTelURL(value);
 		} catch (ParseException ex) {
 			throw new IllegalArgumentException("Bad url string " + value);
 		}

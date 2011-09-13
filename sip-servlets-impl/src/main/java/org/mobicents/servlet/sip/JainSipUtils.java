@@ -108,7 +108,6 @@ import javax.sip.message.Message;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
@@ -514,7 +513,7 @@ public final class JainSipUtils {
 		} else {
 			javax.sip.address.SipURI outboundInterfaceURI = null;			
 			try {
-				outboundInterfaceURI = (javax.sip.address.SipURI) SipFactories.addressFactory.createURI(outboundInterface);
+				outboundInterfaceURI = (javax.sip.address.SipURI) SipFactoryImpl.addressFactory.createURI(outboundInterface);
 			} catch (ParseException e) {
 				throw new IllegalArgumentException("couldn't parse the outbound interface " + outboundInterface, e);
 			}
@@ -554,7 +553,7 @@ public final class JainSipUtils {
 		} else {
 			javax.sip.address.SipURI outboundInterfaceURI = null;			
 			try {
-				outboundInterfaceURI = (javax.sip.address.SipURI) SipFactories.addressFactory.createURI(outboundInterface);
+				outboundInterfaceURI = (javax.sip.address.SipURI) SipFactoryImpl.addressFactory.createURI(outboundInterface);
 			} catch (ParseException e) {
 				throw new IllegalArgumentException("couldn't parse the outbound interface " + outboundInterface, e);
 			}			
@@ -786,7 +785,7 @@ public final class JainSipUtils {
 				}
 				MobicentsExtendedListeningPoint lp = null;
 				if(session.getOutboundInterface() != null) {
-					javax.sip.address.SipURI outboundInterfaceURI = (javax.sip.address.SipURI) SipFactories.addressFactory.createURI(session.getOutboundInterface());
+					javax.sip.address.SipURI outboundInterfaceURI = (javax.sip.address.SipURI) SipFactoryImpl.addressFactory.createURI(session.getOutboundInterface());
 					lp = sipNetworkInterfaceManager.findMatchingListeningPoint(outboundInterfaceURI, false);
 				} else {
 					lp = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);

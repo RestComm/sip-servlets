@@ -31,7 +31,6 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.security.AccessController;
-import java.security.Principal;
 import java.security.PrivilegedAction;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -96,7 +95,6 @@ import org.apache.log4j.Priority;
 import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.javax.servlet.sip.SipSessionAsynchronousWork;
 import org.mobicents.servlet.sip.JainSipUtils;
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.address.SipURIImpl;
@@ -406,7 +404,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 						}
 						if(sipFactory.isUseLoadBalancer()) {
 							SipLoadBalancer loadBalancerToUse = sipFactory.getLoadBalancerToUse();
-							javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(userName, loadBalancerToUse.getAddress().getHostAddress());
+							javax.sip.address.SipURI sipURI = SipFactoryImpl.addressFactory.createSipURI(userName, loadBalancerToUse.getAddress().getHostAddress());
 							sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
 							sipURI.setPort(loadBalancerToUse.getSipPort());
 
@@ -414,8 +412,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 							// We can leave it like this. It will be updated if needed in the send() method
 							sipURI.setTransportParam(ListeningPoint.UDP);
 							
-							javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);
-							contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);													
+							javax.sip.address.Address contactAddress = SipFactoryImpl.addressFactory.createAddress(sipURI);
+							contactHeader = SipFactoryImpl.headerFactory.createContactHeader(contactAddress);													
 						} else {											
 
 							contactHeader = JainSipUtils.createContactHeader(sipFactory.getSipNetworkInterfaceManager(), methodRequest, displayName, userName, outboundInterface);
@@ -437,8 +435,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 				methodRequest.removeHeader(ViaHeader.NAME);
 				
 				//if a SUBSCRIBE or BYE is sent for exemple, it will reuse the prexisiting dialog
-				sipServletRequest = new SipServletRequestImpl(
-						methodRequest, this.sipFactory, this, null, sessionCreatingDialog,
+				sipServletRequest = (SipServletRequestImpl) sipFactory.getMobicentsSipServletMessageFactory().createSipServletRequest(
+						methodRequest, this, null, sessionCreatingDialog,
 						false);
 			} catch (SipException e) {
 				logger.error("Cannot create the " + method + " request from the dialog " + sessionCreatingDialog,e);
@@ -492,8 +490,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		    				sipNetworkInterfaceManager, request, branch, outboundInterface);
 		    		request.addHeader(viaHeader);
 					
-					sipServletRequest = new SipServletRequestImpl(
-							request, this.sipFactory, this, null, sessionCreatingDialog,
+					sipServletRequest = (SipServletRequestImpl) sipFactory.getMobicentsSipServletMessageFactory().createSipServletRequest(
+							request, this, null, sessionCreatingDialog,
 							true);
 					
 					// Fix for Issue http://code.google.com/p/mobicents/issues/detail?id=2230 BYE is routed to unexpected IP
@@ -1814,7 +1812,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
 				address + " not found");		
 		try {
-			outboundInterface = new SipURIImpl(SipFactories.addressFactory.createSipURI(null, address), ModifiableRule.NotModifiable).toString();
+			outboundInterface = new SipURIImpl(SipFactoryImpl.addressFactory.createSipURI(null, address), ModifiableRule.NotModifiable).toString();
 		} catch (ParseException e) {
 			logger.error("couldn't parse the SipURI from USER[" + null
 					+ "] HOST[" + address + "]", e);
@@ -1846,7 +1844,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(networkInterface == null) throw new IllegalArgumentException("Network interface for " +
 				address + " not found");
 		try {
-			outboundInterface = new SipURIImpl(SipFactories.addressFactory.createSipURI(null, address), ModifiableRule.NotModifiable).toString();
+			outboundInterface = new SipURIImpl(SipFactoryImpl.addressFactory.createSipURI(null, address), ModifiableRule.NotModifiable).toString();
 		} catch (ParseException e) {
 			logger.error("couldn't parse the SipURI from USER[" + null
 					+ "] HOST[" + address + "]", e);

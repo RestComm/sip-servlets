@@ -158,9 +158,8 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		// the modified RR and Path parameters (as defined in the spec).
 		Request cloned = (Request)originalRequest.getMessage().clone();
 		((MessageExt)cloned).setApplicationData(null);
-		this.outgoingRequest = new SipServletRequestImpl(
+		this.outgoingRequest = (SipServletRequestImpl) proxy.getSipFactoryImpl().getMobicentsSipServletMessageFactory().createSipServletRequest(
 				cloned,
-				proxy.getSipFactoryImpl(),
 				this.originalRequest.getSipSession(),
 				null, null, false);
 	}
@@ -418,9 +417,8 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		if(logger.isDebugEnabled()) {
 			logger.debug("creating cloned Request for proxybranch " + request);
 		}
-		final SipServletRequestImpl clonedRequest = new SipServletRequestImpl(
+		final SipServletRequestImpl clonedRequest = (SipServletRequestImpl) proxy.getSipFactoryImpl().getMobicentsSipServletMessageFactory().createSipServletRequest(
 				request,
-				proxy.getSipFactoryImpl(),
 				null,
 				null, null, false);
 		
@@ -559,7 +557,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		if(status >= 300 && status < 400 && recurse) {
 			String contact = response.getHeader("Contact");
 			if(contact != null) {
-				//javax.sip.address.SipURI uri = SipFactories.addressFactory.createAddress(contact);
+				//javax.sip.address.SipURI uri = SipFactoryImpl.addressFactory.createAddress(contact);
 				try {
 					if(logger.isDebugEnabled())
 						logger.debug("Processing recursed response");
@@ -793,9 +791,8 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 			appData.setProxyBranch(this);
 			ctx.setApplicationData(appData);
 			
-			final SipServletRequestImpl clonedSipServletRequest = new SipServletRequestImpl(
+			final SipServletRequestImpl clonedSipServletRequest = (SipServletRequestImpl) proxy.getSipFactoryImpl().getMobicentsSipServletMessageFactory().createSipServletRequest(
 					clonedRequest,
-					proxy.getSipFactoryImpl(),
 					sipSession,
 					ctx, null, false);
 			appData.setSipServletMessage(clonedSipServletRequest);

@@ -27,7 +27,7 @@ import java.text.ParseException;
 import javax.servlet.sip.URI;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
 /**
  * URI wrapper for any scheme URI implementation
@@ -54,7 +54,7 @@ public class GenericURIImpl extends URIImpl {
 	 */
 	public void setValue(String value) {
 		try {
-			this.uri = SipFactories.addressFactory.createURI(value);
+			this.uri = SipFactoryImpl.addressFactory.createURI(value);
 		} catch (ParseException ex) {
 			logger.error("Bad input arg", ex);
 			throw new IllegalArgumentException("Bad input arg", ex);

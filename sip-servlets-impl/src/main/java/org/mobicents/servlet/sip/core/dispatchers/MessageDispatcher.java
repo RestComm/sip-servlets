@@ -38,7 +38,6 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.DispatcherException;
 import org.mobicents.servlet.sip.core.MobicentsSipServlet;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
@@ -50,6 +49,7 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
@@ -124,7 +124,7 @@ public abstract class MessageDispatcher {
 			ServerTransaction transaction, Request request,
 			SipProvider sipProvider) {
 		try{
-			Response response=SipFactories.messageFactory.createResponse
+			Response response=SipFactoryImpl.messageFactory.createResponse
 	        	(errorCode,request);			
 	        if (transaction!=null) {
 	        	transaction.sendResponse(response);

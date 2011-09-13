@@ -401,7 +401,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				setMainServlet(childrenMap.keySet().iterator().next());
 			}
 			sipSecurityUtils = new SipSecurityUtils(this);
-			sipDigestAuthenticator = new DigestAuthenticator(sipApplicationDispatcher.getSipFactories().getHeaderFactory());
+			sipDigestAuthenticator = new DigestAuthenticator(sipApplicationDispatcher.getSipFactory().getHeaderFactory());
 			//JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
 			//called implicitly within sipApplicationDispatcher.addSipApplication
 			sipApplicationDispatcher.addSipApplication(applicationName, this);

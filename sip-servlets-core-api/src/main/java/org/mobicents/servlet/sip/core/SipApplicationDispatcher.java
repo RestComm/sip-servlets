@@ -214,6 +214,4 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 	DNSServerLocator getDNSServerLocator();
 	
 	String getVersion();
-
-	MobicentsSipFactories getSipFactories();
 }

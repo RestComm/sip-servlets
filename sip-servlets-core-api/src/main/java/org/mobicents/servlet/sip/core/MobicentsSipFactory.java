@@ -21,6 +21,11 @@
  */
 package org.mobicents.servlet.sip.core;
 
+import javax.sip.SipFactory;
+import javax.sip.address.AddressFactory;
+import javax.sip.header.HeaderFactory;
+import javax.sip.message.MessageFactory;
+
 import org.mobicents.javax.servlet.sip.SipFactoryExt;
 
 
@@ -37,4 +42,32 @@ public interface MobicentsSipFactory extends SipFactoryExt {
 	 */
 	SipApplicationDispatcher getSipApplicationDispatcher();
 
+	MobicentsSipServletMessageFactory getMobicentsSipServletMessageFactory();
+	
+	/**
+	 * Retrieves the JAIN SIP Address Factory
+	 * @return the JAIN SIP Address Factory
+	 */
+	AddressFactory getAddressFactory();
+	/**
+	 * Retrieves the JAIN SIP Header Factory
+	 * @return the JAIN SIP  Header Factory
+	 */
+	HeaderFactory getHeaderFactory();
+	/**
+	 * Retrieves the JAIN SIP Message Factory
+	 * @return the JAIN SIP Message Factory
+	 */
+	MessageFactory getMessageFactory();
+	/**
+	 * Retrieves the JAIN SIP Factory
+	 * @return the JAIN SIP Factory
+	 */
+	SipFactory getJainSipFactory();
+	/**
+	 * Initializes the JAIN SIP SipFactory with the given path name
+	 * @param sipPathName path name to use to initialize the JAIN SIP Stack
+	 * @param usePrettyEncoding allow to display the headers on multiple lines or not
+	 */
+	void initialize(String sipPathName, boolean usePrettyEncoding);
 }

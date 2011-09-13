@@ -67,7 +67,6 @@ import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
@@ -82,7 +81,7 @@ import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
  * Implementation of the sip servlet response interface
  *
  */
-public class SipServletResponseImpl extends SipServletMessageImpl implements
+public abstract class SipServletResponseImpl extends SipServletMessageImpl implements
 		MobicentsSipServletResponse {
 	
 	private static final long serialVersionUID = 1L;
@@ -114,7 +113,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 * @param dialog
 	 * @param originalRequest
 	 */
-	public SipServletResponseImpl (
+	protected SipServletResponseImpl (
 			Response response, 
 			SipFactoryImpl sipFactoryImpl, 
 			Transaction transaction, 
@@ -233,9 +232,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					ackRequest.addHeader(routeHeader);
 				}
 			}
-			sipServletAckRequest = new SipServletRequestImpl(
+			sipServletAckRequest = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(
 					ackRequest,
-					this.sipFactoryImpl, 
 					this.getSipSession(), 
 					this.getTransaction(), 
 					dialog, 
@@ -286,9 +284,8 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 					prackRequest.addHeader(routeHeader);
 				}
 			}
-			sipServletPrackRequest = new SipServletRequestImpl(
+			sipServletPrackRequest = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(
 					prackRequest,
-					this.sipFactoryImpl, 
 					this.getSipSession(), 
 					this.getTransaction(), 
 					dialog, 
@@ -488,9 +485,9 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				sipURI.setParameter(MessageDispatcher.APP_ID, sipAppSessionKey.getId());
 				sipURI.setLrParam();				
 				final javax.sip.address.Address recordRouteAddress = 
-					SipFactories.addressFactory.createAddress(sipURI);
+					SipFactoryImpl.addressFactory.createAddress(sipURI);
 				final RecordRouteHeader recordRouteHeader = 
-					SipFactories.headerFactory.createRecordRouteHeader(recordRouteAddress);
+					SipFactoryImpl.headerFactory.createRecordRouteHeader(recordRouteAddress);
 				response.addFirst(recordRouteHeader);
 				if(logger.isDebugEnabled()) {
 					logger.debug("Record Route added to the response "+ recordRouteHeader);
@@ -513,10 +510,10 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 				// Send reliably can add a duplicate 100rel to the requires line
 				// don't add it if it is already present (the app can add it)
 				if(!containsRel100(response)) {
-					final Header requireHeader = SipFactories.headerFactory.createRequireHeader(REL100_OPTION_TAG);
+					final Header requireHeader = SipFactoryImpl.headerFactory.createRequireHeader(REL100_OPTION_TAG);
 					response.addHeader(requireHeader);
 				}
-				final Header rseqHeader = SipFactories.headerFactory.createRSeqHeader(getTransactionApplicationData().getRseqNumber().getAndIncrement());
+				final Header rseqHeader = SipFactoryImpl.headerFactory.createRSeqHeader(getTransactionApplicationData().getRseqNumber().getAndIncrement());
 				response.addHeader(rseqHeader);
 			}
 			if(logger.isDebugEnabled()) {
@@ -781,7 +778,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 	 */
 	public void setCharacterEncoding(String enc) {		
 		try {			
-			this.message.setContentEncoding(SipFactories.headerFactory
+			this.message.setContentEncoding(SipFactoryImpl.headerFactory
 					.createContentEncodingHeader(enc));
 		} catch (Exception ex) {
 			throw new IllegalArgumentException("Encoding " + enc + " not valid", ex);
@@ -805,7 +802,7 @@ public class SipServletResponseImpl extends SipServletMessageImpl implements
 		super.readExternal(in);
 		String messageString = in.readUTF();
 		try {
-			message = SipFactories.messageFactory.createResponse(messageString);
+			message = SipFactoryImpl.messageFactory.createResponse(messageString);
 		} catch (ParseException e) {
 			throw new IllegalArgumentException("Message " + messageString + " previously serialized could not be reparsed", e);
 		}

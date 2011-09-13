@@ -47,7 +47,6 @@ import javax.sip.message.Response;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
@@ -153,13 +152,13 @@ public class ProxyUtils {
 				}
 				
 //				// Add route header
-//				javax.sip.address.SipURI routeUri = SipFactories.addressFactory.createSipURI(
+//				javax.sip.address.SipURI routeUri = SipFactoryImpl.addressFactory.createSipURI(
 //						params.destination.getUser(), params.destination.getHost());
 //				routeUri.setPort(params.destination.getPort());
 //				routeUri.setLrParam();
-//				javax.sip.address.Address address = SipFactories.addressFactory.createAddress(params.destination.getUser(),
+//				javax.sip.address.Address address = SipFactoryImpl.addressFactory.createAddress(params.destination.getUser(),
 //						routeUri);
-//				RouteHeader rheader = SipFactories.headerFactory.createRouteHeader(address);
+//				RouteHeader rheader = SipFactoryImpl.headerFactory.createRouteHeader(address);
 //				
 //				clonedRequest.setHeader(rheader);
 			}
@@ -196,7 +195,7 @@ public class ProxyUtils {
 			MaxForwardsHeader mf = (MaxForwardsHeader) clonedRequest
 				.getHeader(MaxForwardsHeader.NAME);
 			if (mf == null) {
-				mf = SipFactories.headerFactory.createMaxForwardsHeader(70);
+				mf = SipFactoryImpl.headerFactory.createMaxForwardsHeader(70);
 				clonedRequest.addHeader(mf);
 			} else {
 				mf.setMaxForwards(mf.getMaxForwards() - 1);
@@ -254,7 +253,7 @@ public class ProxyUtils {
 					branchId = JainSipUtils.createBranch(sipAppKey.getId(),  appName);
 				}
 
-				proxyBranch.viaHeader = SipFactories.headerFactory.createViaHeader(
+				proxyBranch.viaHeader = SipFactoryImpl.headerFactory.createViaHeader(
 						proxy.getOutboundInterface().getHost(),
 						proxy.getOutboundInterface().getPort(),
 						outboundTransport,
@@ -301,9 +300,9 @@ public class ProxyUtils {
 					inboundRURI.setParameter(MessageDispatcher.APP_ID, sipAppKey.getId());
 					inboundRURI.setLrParam();
 
-					final Address rraddress = SipFactories.addressFactory
+					final Address rraddress = SipFactoryImpl.addressFactory
 					.createAddress(null, inboundRURI);
-					final RecordRouteHeader recordRouteHeader = SipFactories.headerFactory
+					final RecordRouteHeader recordRouteHeader = SipFactoryImpl.headerFactory
 					.createRecordRouteHeader(rraddress);
 
 					clonedRequest.addFirst(recordRouteHeader);
@@ -334,9 +333,9 @@ public class ProxyUtils {
 				rrURI.setParameter(MessageDispatcher.APP_ID, sipAppKey.getId());
 				rrURI.setLrParam();
 				
-				final Address rraddress = SipFactories.addressFactory
+				final Address rraddress = SipFactoryImpl.addressFactory
 					.createAddress(null, rrURI);
-				final RecordRouteHeader recordRouteHeader = SipFactories.headerFactory
+				final RecordRouteHeader recordRouteHeader = SipFactoryImpl.headerFactory
 					.createRecordRouteHeader(rraddress);
 				
 				clonedRequest.addFirst(recordRouteHeader);
@@ -355,11 +354,11 @@ public class ProxyUtils {
 							path.getParameter(paramName));
 				}
 				
-				final Address pathAddress = SipFactories.addressFactory
+				final Address pathAddress = SipFactoryImpl.addressFactory
 					.createAddress(null, pathURI);
 				
 				// Here I need to reference the header factory impl class because can't create path header otherwise
-				final PathHeader pathHeader = ((HeaderFactoryExt)SipFactories.headerFactory)
+				final PathHeader pathHeader = ((HeaderFactoryExt)SipFactoryImpl.headerFactory)
 					.createPathHeader(pathAddress);
 				
 				clonedRequest.addFirst(pathHeader);
@@ -414,8 +413,8 @@ public class ProxyUtils {
 		
 		if(transaction != null && originalRequest != null) {
 			// non retransmission case
-			newServletResponseImpl = new SipServletResponseImpl(clonedResponse,		
-					sipFactoryImpl,
+			newServletResponseImpl = (SipServletResponseImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletResponse(
+					clonedResponse,		
 					originalRequest.getTransaction(),
 					originalRequest.getSipSession(),
 					sipServetResponse.getDialog(),
@@ -423,8 +422,8 @@ public class ProxyUtils {
 					sipServetResponse.isRetransmission());
 		} else {
 			// retransmission case
-			newServletResponseImpl = new SipServletResponseImpl(clonedResponse,		
-					sipFactoryImpl,
+			newServletResponseImpl = (SipServletResponseImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletResponse(
+					clonedResponse,		
 					null,
 					sipServetResponse.getSipSession(),
 					sipServetResponse.getDialog(),

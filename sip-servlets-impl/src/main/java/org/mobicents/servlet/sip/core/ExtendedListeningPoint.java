@@ -41,7 +41,7 @@ import javax.sip.header.ViaHeader;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
-import org.mobicents.servlet.sip.SipFactories;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
 /**
  * @author <A HREF="mailto:jean.deruellimport javax.sip.SipProvider;
@@ -131,7 +131,7 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 		try {
 			// FIXME : the SIP URI can be cached to improve performance 
 			String host = getIpAddress(usePublicAddress);
-			javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(userName, host);
+			javax.sip.address.SipURI sipURI = SipFactoryImpl.addressFactory.createSipURI(userName, host);
 			sipURI.setHost(host);
 			sipURI.setPort(port);		
 			// Issue 1150 : we assume that if the transport match the default protocol of the transport protocol used it is not added
@@ -140,8 +140,8 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 			if((!sipURI.isSecure() && !ListeningPoint.UDP.equalsIgnoreCase(transport)) || (sipURI.isSecure() && !ListeningPoint.TCP.equalsIgnoreCase(transport))) { 
 				sipURI.setTransportParam(transport);
 			}
-			javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);			
-			ContactHeader contact = SipFactories.headerFactory.createContactHeader(contactAddress);
+			javax.sip.address.Address contactAddress = SipFactoryImpl.addressFactory.createAddress(sipURI);			
+			ContactHeader contact = SipFactoryImpl.headerFactory.createContactHeader(contactAddress);
 		
 			if(displayName != null && displayName.length() > 0) {
 				contactAddress.setDisplayName(displayName);
@@ -164,7 +164,7 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 	public ViaHeader createViaHeader(String branch, boolean usePublicAddress) {
         try {
         	String host = getIpAddress(usePublicAddress);
-            ViaHeader via = SipFactories.headerFactory.createViaHeader(host, port, transport, branch);
+            ViaHeader via = SipFactoryImpl.headerFactory.createViaHeader(host, port, transport, branch);
             return via;
         } catch (ParseException ex) {
         	logger.error ("Unexpected error while creating a via header",ex);
@@ -184,7 +184,7 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 	public javax.sip.address.SipURI createRecordRouteURI(boolean usePublicAddress) {		
 		try {			
 			String host = getIpAddress(usePublicAddress);
-			SipURI sipUri = SipFactories.addressFactory.createSipURI(null, host);
+			SipURI sipUri = SipFactoryImpl.addressFactory.createSipURI(null, host);
 			sipUri.setPort(port);
 			sipUri.setTransportParam(transport);
 			// Do we want to add an ID here?

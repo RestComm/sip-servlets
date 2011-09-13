@@ -71,7 +71,6 @@ import javax.sip.message.Request;
 import org.apache.log4j.Logger;
 import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.servlet.sip.JainSipUtils;
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.MobicentsSipFactory;
@@ -187,7 +186,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 				throw new IllegalStateException("There is no SIP connectors available to create the request");
 			}
 			final MobicentsExtendedListeningPoint extendedListeningPoint = listeningPointsIterator.next();
-			final CallIdHeader callIdHeader = SipFactories.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
+			final CallIdHeader callIdHeader = sipFactoryImpl.getHeaderFactory().createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
 			newRequest.setHeader(callIdHeader);
 			
 			final List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
@@ -208,9 +207,8 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			session.setHandler(originalSession.getHandler());
 		
 			
-			final SipServletRequestImpl newSipServletRequest = new SipServletRequestImpl(
+			final SipServletRequestImpl newSipServletRequest = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(
 					newRequest,
-					sipFactoryImpl,					
 					session, 
 					null, 
 					null, 
@@ -237,15 +235,15 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 				// so that the subsequent requests can be failed over
 				if(sipFactoryImpl.isUseLoadBalancer()) {
 					final SipLoadBalancer loadBalancerToUse = sipFactoryImpl.getLoadBalancerToUse();
-					javax.sip.address.SipURI sipURI = SipFactories.addressFactory.createSipURI(fromName, loadBalancerToUse.getAddress().getHostAddress());
+					javax.sip.address.SipURI sipURI = sipFactoryImpl.getAddressFactory().createSipURI(fromName, loadBalancerToUse.getAddress().getHostAddress());
 					sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
 					sipURI.setPort(loadBalancerToUse.getSipPort());			
 					sipURI.setTransportParam(ListeningPoint.UDP);
-					javax.sip.address.Address contactAddress = SipFactories.addressFactory.createAddress(sipURI);
+					javax.sip.address.Address contactAddress = sipFactoryImpl.getAddressFactory().createAddress(sipURI);
 					if(diaplayName != null && diaplayName.length() > 0) {
 						contactAddress.setDisplayName(diaplayName);
 					}
-					contactHeader = SipFactories.headerFactory.createContactHeader(contactAddress);													
+					contactHeader = sipFactoryImpl.getHeaderFactory().createContactHeader(contactAddress);													
 				} else {					
 					contactHeader = JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, diaplayName, fromName, session.getOutboundInterface());
 				}	
@@ -406,7 +404,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 							logger.debug("trying to copy original header name " + headerName + " into the new subsequent request with an empty value");
 						}
 						try {
-							subsequentMessage.addHeader(SipFactories.headerFactory.createHeader(headerName, ""));
+							subsequentMessage.addHeader(sipFactoryImpl.getHeaderFactory().createHeader(headerName, ""));
 						} catch (ParseException e) {
 							if(logger.isDebugEnabled()) {
 								logger.debug("couldn't copy original header name " + headerName + " into the new subsequent request with an empty value");
@@ -485,7 +483,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	 * @return
 	 * @throws ParseException
 	 */
-	private final static List<String> retrieveContactHeaders(
+	private final List<String> retrieveContactHeaders(
 			Map<String, List<String>> headerMap, Request newRequest)
 			throws ParseException {
 		List<String> contactHeaderList = new ArrayList<String>();
@@ -502,7 +500,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 						newRequest.removeHeader(headerName);
 					}
 					for (String value : entry.getValue()) {							
-						final Header header = SipFactories.headerFactory.createHeader(
+						final Header header = sipFactoryImpl.getHeaderFactory().createHeader(
 								headerName, value);					
 						if(! JainSipUtils.SINGLETON_HEADER_NAMES.contains(header.getName())) {
 							newRequest.addHeader(header);

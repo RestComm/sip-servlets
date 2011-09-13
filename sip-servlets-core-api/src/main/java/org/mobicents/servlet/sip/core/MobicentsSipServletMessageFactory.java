@@ -21,44 +21,30 @@
  */
 package org.mobicents.servlet.sip.core;
 
-import javax.sip.SipFactory;
-import javax.sip.address.AddressFactory;
-import javax.sip.header.HeaderFactory;
-import javax.sip.message.MessageFactory;
+import javax.sip.Dialog;
+import javax.sip.Transaction;
+import javax.sip.message.Request;
+import javax.sip.message.Response;
+
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletRequest;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletResponse;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 
 /**
- * Give access to the factories of the underlying JAIN SIP Stack
- * 
  * @author jean.deruelle@gmail.com
- *
+ * 
  */
-public interface MobicentsSipFactories {
-	/**
-	 * Retrieves the JAIN SIP Address Factory
-	 * @return the JAIN SIP Address Factory
-	 */
-	AddressFactory getAddressFactory();
-	/**
-	 * Retrieves the JAIN SIP Header Factory
-	 * @return the JAIN SIP  Header Factory
-	 */
-	HeaderFactory getHeaderFactory();
-	/**
-	 * Retrieves the JAIN SIP Message Factory
-	 * @return the JAIN SIP Message Factory
-	 */
-	MessageFactory getMessageFactory();
-	/**
-	 * Retrieves the JAIN SIP Factory
-	 * @return the JAIN SIP Factory
-	 */
-	SipFactory getSipFactory();
-	/**
-	 * Initializes the JAIN SIP SipFactory with the given path name
-	 * @param sipPathName path name to use to initialize the JAIN SIP Stack
-	 * @param usePrettyEncoding allow to display the headers on multiple lines or not
-	 */
-	void initialize(String sipPathName, boolean usePrettyEncoding);
-	
+public interface MobicentsSipServletMessageFactory {
 
+	MobicentsSipServletRequest createSipServletRequest(Request request,
+			MobicentsSipSession sipSession,
+			Transaction transaction, Dialog dialog, boolean createDialog);
+
+	MobicentsSipServletResponse createSipServletResponse(Response response,
+			Transaction transaction,
+			MobicentsSipSession session, Dialog dialog,
+			boolean hasBeenReceived, boolean isRetransmission);
+	
+	MobicentsSipFactory getMobicentsSipFactory();
+	void setMobicentsSipFactory(MobicentsSipFactory sipFactory);
 }

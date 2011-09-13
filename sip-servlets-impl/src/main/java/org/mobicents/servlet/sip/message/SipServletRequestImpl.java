@@ -102,7 +102,6 @@ import org.mobicents.ext.javax.sip.dns.DNSAwareRouter;
 import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.address.GenericURIImpl;
@@ -130,7 +129,7 @@ import org.mobicents.servlet.sip.security.AuthInfoEntry;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
-public class SipServletRequestImpl extends SipServletMessageImpl implements
+public abstract class SipServletRequestImpl extends SipServletMessageImpl implements
 		MobicentsSipServletRequest {
 
 	public static final String STALE = "stale";
@@ -195,7 +194,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	// needed for externalizable
 	public SipServletRequestImpl () {}
 	
-	public SipServletRequestImpl(Request request, SipFactoryImpl sipFactoryImpl,
+	protected SipServletRequestImpl(Request request, SipFactoryImpl sipFactoryImpl,
 			MobicentsSipSession sipSession, Transaction transaction, Dialog dialog,
 			boolean createDialog) {
 		super(request, sipFactoryImpl, transaction, sipSession, dialog);
@@ -275,8 +274,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		try {			
 			Request cancelRequest = ((ClientTransaction) getTransaction())
 					.createCancel();
-			SipServletRequestImpl newRequest = new SipServletRequestImpl(
-					cancelRequest, sipFactoryImpl, getSipSession(),
+			SipServletRequestImpl newRequest = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(
+					cancelRequest, getSipSession(),
 					null, getTransaction().getDialog(), false);
 			newRequest.inviteTransactionToCancel = super.getTransaction();
 			return newRequest;
@@ -321,7 +320,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		}
 		try {
 			final Request request = (Request) this.getMessage();
-			final Response response = SipFactories.messageFactory.createResponse(
+			final Response response = SipFactoryImpl.messageFactory.createResponse(
 					statusCode, request);			
 			if(reasonPhrase!=null) {
 				response.setReasonPhrase(reasonPhrase);
@@ -421,7 +420,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 //			while (recordRouteHeaders.hasNext()) {
 //				RecordRouteHeader recordRouteHeader = (RecordRouteHeader) recordRouteHeaders
 //						.next();
-//				RouteHeader routeHeader = SipFactories.headerFactory.createRouteHeader(recordRouteHeader.getAddress());
+//				RouteHeader routeHeader = SipFactoryImpl.headerFactory.createRouteHeader(recordRouteHeader.getAddress());
 //				response.addHeader(routeHeader);
 //			}
 			
@@ -435,7 +434,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 				}
 			}
 			
-			final SipServletResponseImpl newSipServletResponse = new SipServletResponseImpl(response, super.sipFactoryImpl,
+			final SipServletResponseImpl newSipServletResponse = (SipServletResponseImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletResponse(
+					response, 
 					validate ? (ServerTransaction) transaction : transaction, session, getDialog(), false, false);
 			newSipServletResponse.setOriginalRequest(this);
 			if(!Request.PRACK.equals(requestMethod) && statusCode >= Response.OK && 
@@ -627,7 +627,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			logger.debug("Pushing path into message of value [" + uri + "]");
 
 		try {
-			javax.sip.header.Header p = SipFactories.headerFactory
+			javax.sip.header.Header p = SipFactoryImpl.headerFactory
 					.createHeader(PathHeader.NAME, uri.toString());
 			this.message.addFirst(p);
 		} catch (Exception e) {
@@ -680,8 +680,8 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			
 			sipUri.setLrParam();
 			try {
-				javax.sip.header.Header p = SipFactories.headerFactory
-						.createRouteHeader(SipFactories.addressFactory
+				javax.sip.header.Header p = SipFactoryImpl.headerFactory
+						.createRouteHeader(SipFactoryImpl.addressFactory
 								.createAddress(sipUri));
 				this.message.addFirst(p);
 			} catch (SipException e) {
@@ -808,7 +808,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		return null;
 	}
 
-	public Enumeration getLocales() {
+	public Enumeration<Locale> getLocales() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -835,37 +835,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see javax.servlet.ServletRequest#getParameterMap()
-	 */
-	public Map<String, String> getParameterMap() {
-		// JSR 289 Section 5.6.1 Parameters :
-		// For initial requests where a preloaded Route header specified the application to be invoked, the parameters are those of the SIP or SIPS URI in that Route header.
-		// For initial requests where the application is invoked the parameters are those present on the request URI, 
-		// if this is a SIP or a SIPS URI. For other URI schemes, the parameter set is undefined.
-		// For subsequent requests in a dialog, the parameters presented to the application  are those that the application itself 
-		// set on the Record-Route header for the initial request or response (see 10.4 Record-Route Parameters). 
-		// These will typically be the URI parameters of the top Route header field but if the upstream SIP element is a 
-		// "strict router" they may be returned in the request URI (see RFC 3261). 
-		// It is the containers responsibility to recognize whether the upstream element is a strict router and determine the right parameter set accordingly.
-		HashMap<String, String> retval = new HashMap<String, String>();
-		if(this.getPoppedRoute() != null) {
-			Iterator<String> parameterNamesIt =  this.getPoppedRoute().getURI().getParameterNames();
-			while (parameterNamesIt.hasNext()) {
-				String parameterName = parameterNamesIt.next();
-				retval.put(parameterName, this.getPoppedRoute().getURI().getParameter(parameterName));			
-			}
-		} else {
-			Iterator<String> parameterNamesIt =  this.getRequestURI().getParameterNames();
-			while (parameterNamesIt.hasNext()) {
-				String parameterName = parameterNamesIt.next();
-				retval.put(parameterName, this.getRequestURI().getParameter(parameterName));			
-			}
-		}		
-		
-		return retval;
-	}
+	
 	/*
 	 * (non-Javadoc)
 	 * @see javax.servlet.ServletRequest#getParameterNames()
@@ -1313,7 +1283,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 	private void addDnsRoute(Hop hop, final Request request)
 			throws ParseException, SipException {
 		if(hop != null && sipFactoryImpl.getSipApplicationDispatcher().isExternal(hop.getHost(), hop.getPort(), hop.getTransport())) {	
-			javax.sip.address.SipURI nextHopUri = SipFactories.addressFactory.createSipURI(null, hop.getHost());
+			javax.sip.address.SipURI nextHopUri = SipFactoryImpl.addressFactory.createSipURI(null, hop.getHost());
 			nextHopUri.setLrParam();
 			nextHopUri.setPort(hop.getPort());
 			if(hop.getTransport() != null) {
@@ -1322,9 +1292,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 			// Deal with http://code.google.com/p/mobicents/issues/detail?id=2346
 			nextHopUri.setParameter(DNSAwareRouter.DNS_ROUTE, Boolean.TRUE.toString());
 			final javax.sip.address.Address nextHopRouteAddress = 
-				SipFactories.addressFactory.createAddress(nextHopUri);
+				SipFactoryImpl.addressFactory.createAddress(nextHopUri);
 			final RouteHeader nextHopRouteHeader = 
-				SipFactories.headerFactory.createRouteHeader(nextHopRouteAddress);
+				SipFactoryImpl.headerFactory.createRouteHeader(nextHopRouteAddress);
 			if(logger.isDebugEnabled()) {
 				logger.debug("Adding next hop found by RFC 3263 lookups as route header" + nextHopRouteHeader);			    	
 			}
@@ -1651,9 +1621,9 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		sipURI.setParameter(MessageDispatcher.ROUTE_PARAM_PREV_APP_ID, 
 				applicationSessionId);
 		final javax.sip.address.Address routeAddress = 
-			SipFactories.addressFactory.createAddress(sipURI);
+			SipFactoryImpl.addressFactory.createAddress(sipURI);
 		final RouteHeader routeHeader = 
-			SipFactories.headerFactory.createRouteHeader(routeAddress);
+			SipFactoryImpl.headerFactory.createRouteHeader(routeAddress);
 		request.addFirst(routeHeader);		
 		// adding the application router info to avoid calling the AppRouter twice
 		// See Issue 791 : http://code.google.com/p/mobicents/issues/detail?id=791
@@ -2234,7 +2204,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 		super.readExternal(in);
 		String messageString = in.readUTF();
 		try {
-			message = SipFactories.messageFactory.createRequest(messageString);
+			message = SipFactoryImpl.messageFactory.createRequest(messageString);
 		} catch (ParseException e) {
 			throw new IllegalArgumentException("Message " + messageString + " previously serialized could not be reparsed", e);
 		}
@@ -2397,7 +2367,7 @@ public class SipServletRequestImpl extends SipServletMessageImpl implements
 
 	// Issue 2354 : need to clone the original request to create the forked response
 	public Object clone() {
-		SipServletRequestImpl sipServletRequestImpl = new SipServletRequestImpl((Request)message, sipFactoryImpl, sipSession, getTransaction(), null, createDialog);
+		SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest((Request)message, sipSession, getTransaction(), null, createDialog);
 		sipServletRequestImpl.setLinkedRequest(linkedRequest);
 		sipServletRequestImpl.setPoppedRoute(poppedRouteHeader);
 		sipServletRequestImpl.setSubscriberURI(subscriberURI);

@@ -33,8 +33,8 @@ import javax.sip.InvalidArgumentException;
 import javax.sip.header.Parameters;
 
 import org.apache.log4j.Logger;
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
 /**
  * Implementation of the SipURI interface. This is just a thin wrapper on the
@@ -357,7 +357,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	 */
 	public void setValue(String value) {
 		try {
-			this.uri = SipFactories.addressFactory.createURI(value);
+			this.uri = SipFactoryImpl.addressFactory.createURI(value);
 			if(this.uri instanceof Parameters) {
 				super.setParameters(AddressImpl.getParameters((Parameters)uri));
 			} else {

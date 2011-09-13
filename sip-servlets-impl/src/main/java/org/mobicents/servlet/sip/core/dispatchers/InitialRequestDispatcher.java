@@ -59,7 +59,6 @@ import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.address.GenericURIImpl;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
@@ -78,6 +77,7 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
+import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
@@ -338,7 +338,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		// subscriber URI should be set before calling makeAppSessionKey method, see Issue 750
 		// http://code.google.com/p/mobicents/issues/detail?id=750
 		try {
-			URI subscriberUri = SipFactories.addressFactory.createAddress(applicationRouterInfo.getSubscriberURI()).getURI();
+			URI subscriberUri = SipFactoryImpl.addressFactory.createAddress(applicationRouterInfo.getSubscriberURI()).getURI();
 			javax.servlet.sip.URI jainSipSubscriberUri = null; 
 			if(subscriberUri instanceof javax.sip.address.SipURI) {
 				jainSipSubscriberUri= new SipURIImpl((javax.sip.address.SipURI)subscriberUri, ModifiableRule.NotModifiable);
@@ -522,18 +522,18 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 					Address routeAddress = null; 
 					RouteHeader applicationRouterInfoRouteHeader = null;
 					try {
-						routeAddress = SipFactories.addressFactory.createAddress(routes[0]);
-						applicationRouterInfoRouteHeader = SipFactories.headerFactory.createRouteHeader(routeAddress);										
+						routeAddress = SipFactoryImpl.addressFactory.createAddress(routes[0]);
+						applicationRouterInfoRouteHeader = SipFactoryImpl.headerFactory.createRouteHeader(routeAddress);										
 						if(sipApplicationDispatcher.isRouteExternal(applicationRouterInfoRouteHeader)) {						
 							// push all of the routes on the Route header stack of the request and 
 							// send the request externally
 							for (int i = routes.length-1 ; i >= 0; i--) {
-								routeAddress = SipFactories.addressFactory.createAddress(routes[i]);
+								routeAddress = SipFactoryImpl.addressFactory.createAddress(routes[i]);
 								URI routeURI = routeAddress.getURI();
 								if(routeURI.isSipURI()) {
 									((javax.sip.address.SipURI)routeURI).setLrParam();
 								}
-								Header routeHeader = SipFactories.headerFactory.createRouteHeader(routeAddress);
+								Header routeHeader = SipFactoryImpl.headerFactory.createRouteHeader(routeAddress);
 								// Fix for Issue 280 provided by eelcoc
 								try {
 									request.addFirst(routeHeader);
@@ -544,7 +544,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 							if(logger.isDebugEnabled()) {
 								logger.debug("Routing the request externally " + sipServletRequest );
 							}
-							request.setRequestURI(SipFactories.addressFactory.createURI(routes[0]));
+							request.setRequestURI(SipFactoryImpl.addressFactory.createURI(routes[0]));
 							try {
 								forwardRequestStatefully(sipServletRequest, null, sipRouteModifier);
 								return true;
@@ -577,14 +577,14 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 						// Push container Route, pick up the first outbound interface
 						SipURI sipURI = sipApplicationDispatcher.getOutboundInterfaces().get(0);
 						sipURI.setParameter("modifier", "route_back");						
-						Header routeHeader = SipFactories.headerFactory.createHeader(RouteHeader.NAME, sipURI.toString());
+						Header routeHeader = SipFactoryImpl.headerFactory.createHeader(RouteHeader.NAME, sipURI.toString());
 						// Fix for Issue 280 provided by eelcoc
 						try {
 							request.addFirst(routeHeader);
 							// push all of the routes on the Route header stack of the request and 
 							// send the request externally
 							for (int i = routes.length-1 ; i >= 0; i--) {
-								routeHeader = SipFactories.headerFactory.createHeader(RouteHeader.NAME, routes[i]);
+								routeHeader = SipFactoryImpl.headerFactory.createHeader(RouteHeader.NAME, routes[i]);
 								request.addFirst(routeHeader);
 							}
 						} catch (SipException e) {
