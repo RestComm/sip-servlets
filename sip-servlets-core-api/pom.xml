@@ -60,6 +60,13 @@
 			<version>${mobicents.jain.sip.ext.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>			
+			<groupId>org.mobicents.ha.javax.sip</groupId>
+			<artifactId>mobicents-jain-sip-ha-core</artifactId>
+			<version>${mobicents.jain.sip.ha.version}</version>	
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	<build>
 		<plugins>		

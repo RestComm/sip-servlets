@@ -1883,8 +1883,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			currentApplicationName = null;
 		}
 		isMessageSent = in.readBoolean();
-		if(StaticServiceHolder.sipStandardService.getSipStack() instanceof ClusteredSipStack && 
-				((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {		
+		if(ReplicationStrategy.EarlyDialog == StaticServiceHolder.sipStandardService.getReplicationStrategy()) {
 			transactionId = in.readUTF();
 			if(transactionId != null) {
 				if(transactionId.equals("")) {
@@ -1937,8 +1936,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			out.writeUTF("");
 		}
 		out.writeBoolean(isMessageSent);
-		if(StaticServiceHolder.sipStandardService.getSipStack() instanceof ClusteredSipStack && 
-				((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
+		if(ReplicationStrategy.EarlyDialog == StaticServiceHolder.sipStandardService.getReplicationStrategy()) {
 			if(transaction == null) {
 				out.writeUTF("");
 			} else {

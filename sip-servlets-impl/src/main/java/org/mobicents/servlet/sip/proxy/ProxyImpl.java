@@ -979,8 +979,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {
-		if(StaticServiceHolder.sipStandardService.getSipStack() instanceof ClusteredSipStack && 
-				((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
+		if(ReplicationStrategy.EarlyDialog == StaticServiceHolder.sipStandardService.getReplicationStrategy()) {
 			// Issue 2587 : read only if not null.
 			if(in.readBoolean()) {
 				originalRequest = (SipServletRequestImpl) in.readObject();
@@ -1014,8 +1013,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	}
 
 	public void writeExternal(ObjectOutput out) throws IOException {
-		if(StaticServiceHolder.sipStandardService.getSipStack() instanceof ClusteredSipStack && 
-				((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).getReplicationStrategy() == ReplicationStrategy.EarlyDialog) {
+		if(ReplicationStrategy.EarlyDialog == StaticServiceHolder.sipStandardService.getReplicationStrategy()) {
 			// Issue 2587 : replicating original request is only useful for early dialog failover
 			if(originalRequest != null && originalRequest.getMethod().equalsIgnoreCase(Request.INVITE)) {
 				out.writeBoolean(true);

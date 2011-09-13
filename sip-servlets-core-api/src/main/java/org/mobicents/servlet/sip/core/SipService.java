@@ -24,6 +24,7 @@ package org.mobicents.servlet.sip.core;
 
 import javax.sip.SipStack;
 
+import org.mobicents.ha.javax.sip.ReplicationStrategy;
 import org.mobicents.servlet.sip.SipConnector;
 
 /**
@@ -64,4 +65,5 @@ public interface SipService {
 	public SipConnector[] findSipConnectors();
 	public boolean isDialogPendingRequestChecking();
 	public boolean isMd5ContactUserPart();
+	public ReplicationStrategy getReplicationStrategy();
 }
