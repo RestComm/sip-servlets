@@ -114,7 +114,7 @@
 			
 			<copy file="${base.path}/server-tomcat-7.xml" tofile="${tomcat7.home}/conf/server.xml" overwrite="yes"/>
 			<copy file="${base.path}/mss-sip-stack.properties" tofile="${tomcat7.home}/conf/mss-sip-stack.properties" />
-			<copy file="${base.path}/tomcat7-context-namespaceaware.xml.bak" tofile="${tomcat7.home}/conf/context-namespaceaware.xml.bak"/>		
+			<copy file="${base.path}/tomcat7-context-namespaceaware.xml" tofile="${tomcat7.home}/conf/context-namespaceaware.xml.bak"/>		
 			
 			<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
 				<!--<arg line="clean buildnumber:create install -U -P set-svn-revision -DCATALINA_HOME=${tomcat.home} -P tomcat-distro,docs" />-->
