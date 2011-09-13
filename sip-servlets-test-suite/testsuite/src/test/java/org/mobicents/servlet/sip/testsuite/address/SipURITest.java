@@ -22,12 +22,10 @@
 
 package org.mobicents.servlet.sip.testsuite.address;
 
-import javax.servlet.sip.Address;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
 /**
@@ -59,7 +57,7 @@ public class SipURITest extends junit.framework.TestCase {
 	private SipFactoryImpl sipFactory;
 	
 	public void setUp() {		
-		SipFactories.initialize("gov.nist", true);		
+		new SipFactoryImpl(null).initialize("gov.nist", true);		
 		sipFactory = new SipFactoryImpl(null);
 	}
 	

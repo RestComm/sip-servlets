@@ -25,7 +25,6 @@ package org.mobicents.servlet.sip.testsuite.address;
 import javax.sip.PeerUnavailableException;
 import javax.sip.SipFactory;
 
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
 public class UrnSchemeTest extends junit.framework.TestCase {
@@ -39,7 +38,7 @@ public class UrnSchemeTest extends junit.framework.TestCase {
 	private String scheme = "urn";
 	
 	public void setUp() {		
-		SipFactories.initialize("gov.nist", true);		
+		new SipFactoryImpl(null).initialize("gov.nist", true);		
 		sipFactory = new SipFactoryImpl(null);
 
 		try {

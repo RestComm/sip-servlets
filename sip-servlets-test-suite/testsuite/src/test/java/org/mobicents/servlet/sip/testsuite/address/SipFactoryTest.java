@@ -25,7 +25,6 @@ package org.mobicents.servlet.sip.testsuite.address;
 import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.ServletParseException;
 
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 
 /**
@@ -35,7 +34,7 @@ public class SipFactoryTest extends junit.framework.TestCase {
 	private SipFactoryImpl sipFactory;
 	
 	public void setUp() {
-		SipFactories.initialize("gov.nist", true);
+		new SipFactoryImpl(null).initialize("gov.nist", true);
 		sipFactory = new SipFactoryImpl(null);
 	}
 	
