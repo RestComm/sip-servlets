@@ -17,7 +17,9 @@
 	<property name="jboss-5-jdk6.download.url" value="http://downloads.sourceforge.net/project/jboss/JBoss/JBoss-${jboss-5.version}/jboss-${jboss-5.version}-jdk6.zip" />
 	
 	<property name="tomcat.version" value="6.0.33" />
+	<property name="tomcat7.version" value="7.0.14" />
 	<property name="tomcat.download.url" value="http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip" />
+	<property name="tomcat7.download.url" value="http://archive.apache.org/dist/tomcat/tomcat-7/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip" />
 	
 	<property name="mms.version" value="2.1.0.BETA3" />
 	<property name="mms.download.url" value="http://downloads.sourceforge.net/project/mobicents/Mobicents%20Media%20Server/${mms.version}/mms-server.zip" />
@@ -35,6 +37,7 @@
 	<property name="diameter-jboss-5.distro.path" value="${base.path}/mobicents-diameter-jboss-5-${diameter-jboss-5.version}.sar" />
 	
 	<property name="tomcat.distro.zip.path" value="${base.path}/apache-tomcat-${tomcat.version}.zip" />
+	<property name="tomcat7.distro.zip.path" value="${base.path}/apache-tomcat-${tomcat7.version}.zip" />
 	<property name="jboss.distro.zip.path" value="${base.path}/jboss-${jboss.version}.zip" />
 	<property name="jboss-5.distro.zip.path" value="${base.path}/jboss-${jboss-5.version}.zip" />
 	<property name="jboss-5-jdk6.distro.zip.path" value="${base.path}/jboss-${jboss-5.version}-jdk6.zip" />
@@ -47,6 +50,7 @@
 	<property name="jboss-5-jdk6.home" value="${release.path}/jboss-jdk6-${jboss-5.version}" />
 	<property name="jboss-5-jdk6.home.temp" value="${release.path}/temp" />
 	<property name="tomcat.home" value="${release.path}/apache-tomcat-${tomcat.version}" />
+	<property name="tomcat7.home" value="${release.path}/apache-tomcat-${tomcat7.version}" />
 	<property name="embjopr.war" value="admin-console.war" />
 	<property name="embjopr.home" value="${release.path}/${embjopr.war}" />
 	<property name="embjopr.home.contents" value="${release.path}/embedded-jopr.war-contents" />
@@ -66,7 +70,7 @@
 	
 	<!-- Release target -->
 	
-	<target name="release" depends="clean,release-jboss-5-jdk6,release-tomcat,make-src-zip" />
+	<target name="release" depends="clean,release-jboss-5-jdk6,release-tomcat,release-tomcat7,make-src-zip" />
 	
 	<!-- Tomcat version -->
 	
@@ -101,6 +105,40 @@
 		</antcall>
 		<antcall target="make-final-zip-tomcat" />
 	</target>
+	
+	<target name="release-tomcat7" depends="extract-tomcat7">
+			<copy file="TOMCAT-SIP-SERVLETS-README.txt" todir="${tomcat7.home}" />
+			
+			<mkdir dir="${tomcat7.home}/conf/dars"/>
+			<copy file="${base.path}/../src/site/resources/click2call-async-dar.properties" tofile="${tomcat7.home}/conf/dars/mobicents-dar.properties" />
+			
+			<copy file="${base.path}/server-tomcat-7.xml" tofile="${tomcat7.home}/conf/server.xml" overwrite="yes"/>
+			<copy file="${base.path}/mss-sip-stack.properties" tofile="${tomcat7.home}/conf/mss-sip-stack.properties" />
+			<copy file="${base.path}/tomcat7-context-namespaceaware.xml.bak" tofile="${tomcat7.home}/conf/context-namespaceaware.xml.bak"/>		
+			
+			<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
+				<!--<arg line="clean buildnumber:create install -U -P set-svn-revision -DCATALINA_HOME=${tomcat.home} -P tomcat-distro,docs" />-->
+				<arg line="clean buildnumber:create install -U -P set-svn-revision -DCATALINA_HOME=${tomcat7.home} -P tomcat-7-distro" />
+			</exec>
+			
+			<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call-servlet3">
+				<arg line="clean install -U -P set-svn-revision" />
+			</exec>
+			
+			<copy tofile="${tomcat7.home}/webapps/Click2CallAsync.war">
+				<fileset dir="${base.path}/../../sip-servlets-examples/click-to-call-servlet3/target/" includes="Click2CallAsync.war" />
+			</copy>
+			
+			<antcall target="deploy-mgmnt">
+				<param name="management.deploy.folder" value="${tomcat7.home}/webapps" />
+			</antcall>
+			
+			<mkdir dir="${tomcat7.home}/docs" />
+			<antcall target="build-documentation">
+				<param name="mss.home" value="${tomcat7.home}"/>
+			</antcall>
+			<antcall target="make-final-zip-tomcat7" />
+		</target>
 	
 	<!-- JBoss 5 jdk6 version -->
 	<target name="release-jboss-5-jdk6" depends="extract-jboss-5-jdk6">
@@ -473,6 +511,19 @@
 		</zip>
 	</target>
 	
+	<target name="make-final-zip-tomcat7" depends="set-time-stamp">
+		<fixcrlf srcdir="${tomcat7.home}/bin" includes="*.sh" eol="lf" eof="remove" />
+		<zip destfile="${base.path}/mss-${mss.release.version}-apache-tomcat-${tomcat7.version}-${time.stamp}.zip" filesonly="false">
+			<zipfileset dir="${tomcat7.home}/bin" filemode="755" prefix="mss-${mss.release.version}-apache-tomcat-${tomcat7.version}/bin">
+				<include name="*.sh" />
+			</zipfileset>
+			<zipfileset dir="${tomcat7.home}/bin" prefix="mss-${mss.release.version}-apache-tomcat-${tomcat7.version}/bin">
+				<exclude name="*.sh" />
+			</zipfileset>
+			<zipfileset dir="${tomcat7.home}" prefix="mss-${mss.release.version}-apache-tomcat-${tomcat7.version}" excludes="**/bin/**"/>
+		</zip>
+	</target>
+	
 	<target name="set-time-stamp" unless="skip.timestamp">
 		<tstamp>
 			<format property="time.stamp" pattern="yyMMddHHmm" />
@@ -484,6 +535,7 @@
 	<target name="clean">
 		<delete dir="${jboss.home}" />
 		<delete dir="${tomcat.home}" />
+		<delete dir="${tomcat7.home}" />
 		<delete dir="${release.path}"/>
 		<delete>
 		    <fileset dir="${base.path}" includes="mss-${mss.release.version}*.zip"/>
@@ -543,9 +595,20 @@
 		<get dest="${tomcat.distro.zip.path}" src="${tomcat.download.url}"/>
 	</target>
 	
+	<available file="${tomcat7.distro.zip.path}" property="got.tomcat7" />
+	<target name="get-tomcat7" unless="got.tomcat7">
+		<echo>Downloading Apache Tomcat</echo>
+		<get dest="${tomcat7.distro.zip.path}" src="${tomcat7.download.url}"/>
+	</target>
+	
 	<target name="extract-tomcat" depends="get-tomcat">
 		<delete dir="${tomcat.home}" failonerror="true" />
 		<unzip src="${tomcat.distro.zip.path}" dest="${tomcat.home}/.." />
+	</target>
+	
+	<target name="extract-tomcat7" depends="get-tomcat7">
+		<delete dir="${tomcat7.home}" failonerror="true" />
+		<unzip src="${tomcat7.distro.zip.path}" dest="${tomcat7.home}/.." />
 	</target>
 	
 	<available file="${embjopr.distro.zip.path}" property="got.jopr" />

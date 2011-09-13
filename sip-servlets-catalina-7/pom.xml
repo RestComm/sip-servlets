@@ -96,7 +96,7 @@
 					</classpathExcludes-->
 					<generateProjectsForModules>true</generateProjectsForModules>	
 					<resolveTransitiveDependencies>true</resolveTransitiveDependencies>
-					<eclipseProjectName>sip-servlets-catalina</eclipseProjectName>
+					<eclipseProjectName>sip-servlets-catalina-7</eclipseProjectName>
 				</configuration>
 			</plugin>
 			<plugin>
