@@ -4,13 +4,13 @@
 	<classpathentry kind="var" path="M2_REPO/net/java/stun4j/stun4j/1.0.MOBICENTS/stun4j-1.0.MOBICENTS.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.32/annotations-api-6.0.32.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/catalina/6.0.32/catalina-6.0.32.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/coyote/6.0.32/coyote-6.0.32.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/juli/6.0.32/juli-6.0.32.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.33/annotations-api-6.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/catalina/6.0.33/catalina-6.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/coyote/6.0.33/coyote-6.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/juli/6.0.33/juli-6.0.33.jar"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar" sourcepath="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14-sources.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/servlet-api/6.0.32/servlet-api-6.0.32.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/servlet-api/6.0.33/servlet-api-6.0.33.jar"/>
 	<classpathentry kind="src" path="/sip-servlets-spec"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-core-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jain-sip"/>

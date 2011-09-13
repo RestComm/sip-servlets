@@ -45,13 +45,13 @@
 	<classpathentry kind="var" path="M2_REPO/org/mockito/mockito-all/1.8.5/mockito-all-1.8.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="lib" path="testsuite/lib/sipunit.jar" sourcepath="/sipunit/src"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/catalina/6.0.32/catalina-6.0.32.jar" sourcepath="/TOMCAT_HOME/java"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/coyote/6.0.32/coyote-6.0.32.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/servlet-api/6.0.32/servlet-api-6.0.32.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/jsp-api/6.0.32/jsp-api-6.0.32.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/el-api/6.0.32/el-api-6.0.32.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/jasper/6.0.32/jasper-6.0.32.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.32/annotations-api-6.0.32.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/catalina/6.0.33/catalina-6.0.33.jar" sourcepath="/TOMCAT_HOME/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/coyote/6.0.33/coyote-6.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/servlet-api/6.0.33/servlet-api-6.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/jsp-api/6.0.33/jsp-api-6.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/el-api/6.0.33/el-api-6.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/jasper/6.0.33/jasper-6.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.33/annotations-api-6.0.33.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-application-router"/>
 	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-tomcat-jboss4"/>

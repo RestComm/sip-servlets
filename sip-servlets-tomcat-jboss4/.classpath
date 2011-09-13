@@ -21,11 +21,11 @@
 	<classpathentry kind="var" path="M2_REPO/org/apache/ant/ant-junit/1.7.0/ant-junit-1.7.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/ant/ant-launcher/1.7.0/ant-launcher-1.7.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/ant/ant/1.7.0/ant-1.7.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.32/annotations-api-6.0.32.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/catalina/6.0.32/catalina-6.0.32.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/coyote/6.0.32/coyote-6.0.32.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/juli/6.0.32/juli-6.0.32.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/servlet-api/6.0.32/servlet-api-6.0.32.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.33/annotations-api-6.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/catalina/6.0.33/catalina-6.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/coyote/6.0.33/coyote-6.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/juli/6.0.33/juli-6.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/servlet-api/6.0.33/servlet-api-6.0.33.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/aop/jboss-aop-aspects/2.0.0.CR14/jboss-aop-aspects-2.0.0.CR14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/aop/jboss-aop/2.0.0.CR14/jboss-aop-2.0.0.CR14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/jboss-common-core/2.2.7.GA/jboss-common-core-2.2.7.GA.jar"/>
