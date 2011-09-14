@@ -1479,6 +1479,13 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 					if(!ListeningPoint.UDP.equalsIgnoreCase(transportForRequest)) {
 						contactSipUri.setTransportParam(transportForRequest);
 					}						
+					
+					// If the transport for the request was changed in the last moment we need to update the header
+					String transportParam = contactSipUri.getTransportParam();
+					if(transportParam != null && !transportParam.equalsIgnoreCase(transportForRequest)) {
+						contactSipUri.setTransportParam(transportForRequest);
+					}
+
 					if(ListeningPoint.TLS.equalsIgnoreCase(transportForRequest)) {
 						final javax.sip.address.URI requestURI = request.getRequestURI();
 						// make the contact uri secure only if the request uri is secure to cope with issue http://code.google.com/p/mobicents/issues/detail?id=2269
