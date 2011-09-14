@@ -340,7 +340,7 @@ public interface SipServletResponse extends javax.servlet.sip.SipServletMessage,
      * This status is also returned by a redirect server that recognizes the user identified by the Request-URI, but does not currently have a valide forwarding location for that user.
      * See Also:Constant Field Values
      */
-    static final int SC_TEMPORARLY_UNAVAILABLE=480;
+    static final int SC_TEMPORARILY_UNAVAILABLE=480;
 
     /**
      * Status code (483) indicating that the server received a request that contains more Via entries (hops) (Section 6.40) than allowed by the Max-Forwards (Section 6.23) header field.
