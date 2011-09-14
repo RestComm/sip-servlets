@@ -38,8 +38,8 @@ public class UrnSchemeTest extends junit.framework.TestCase {
 	private String scheme = "urn";
 	
 	public void setUp() {		
-		new SipFactoryImpl(null).initialize("gov.nist", true);		
-		sipFactory = new SipFactoryImpl(null);
+		sipFactory = new SipFactoryImpl();
+		sipFactory.initialize("gov.nist", true);
 
 		try {
 			jainAddressFactory = SipFactory.getInstance().createAddressFactory();

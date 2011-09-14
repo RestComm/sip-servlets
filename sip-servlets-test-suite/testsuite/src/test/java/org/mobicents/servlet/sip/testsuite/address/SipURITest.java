@@ -27,6 +27,7 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
  * Tests from RFC3261 §19.1.4 URI Comparison
@@ -57,8 +58,8 @@ public class SipURITest extends junit.framework.TestCase {
 	private SipFactoryImpl sipFactory;
 	
 	public void setUp() {		
-		new SipFactoryImpl(null).initialize("gov.nist", true);		
-		sipFactory = new SipFactoryImpl(null);
+		sipFactory = new SipFactoryImpl();
+		sipFactory.initialize("gov.nist", true);
 	}
 	
 	private SipURI sipUri(String uri) throws Exception {
