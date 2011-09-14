@@ -19,7 +19,7 @@
 	<property name="tomcat.version" value="6.0.33" />
 	<property name="tomcat7.version" value="7.0.14" />
 	<property name="tomcat.download.url" value="http://archive.apache.org/dist/tomcat/tomcat-6/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip" />
-	<property name="tomcat7.download.url" value="http://archive.apache.org/dist/tomcat/tomcat-7/v${tomcat.version}/bin/apache-tomcat-${tomcat.version}.zip" />
+	<property name="tomcat7.download.url" value="http://archive.apache.org/dist/tomcat/tomcat-7/v${tomcat7.version}/bin/apache-tomcat-${tomcat7.version}.zip" />
 	
 	<property name="mms.version" value="2.1.0.BETA3" />
 	<property name="mms.download.url" value="http://downloads.sourceforge.net/project/mobicents/Mobicents%20Media%20Server/${mms.version}/mms-server.zip" />
