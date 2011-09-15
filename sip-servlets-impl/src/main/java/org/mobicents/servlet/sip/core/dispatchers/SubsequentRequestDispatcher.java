@@ -42,6 +42,7 @@ import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
 import javax.sip.address.SipURI;
+import javax.sip.address.URI;
 import javax.sip.header.Parameters;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.SubscriptionStateHeader;
@@ -53,6 +54,7 @@ import javax.sip.message.Response;
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.SipFactoryExt;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.DispatcherException;
@@ -134,56 +136,65 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			if(applicationId == null && applicationName == null) {
 				//gvag Issue 2337 & 2327
 				javax.sip.address.URI requestURI = request.getRequestURI();
-				
-				boolean isAnotherDomain = false;
-				
-				if(requestURI.isSipURI()){
-					final String host = ((SipURI) requestURI).getHost();
-					final int port = ((SipURI) requestURI).getPort();
-					final String transport = JainSipUtils.findTransport(request);
-					isAnotherDomain = sipApplicationDispatcher.isExternal(host, port, transport);
-				} else {
-					if(logger.isDebugEnabled()) {
-						logger.debug("The Request URI " + requestURI + " is not a SIP URI and the Route Header was null or didn't contain information about an application to call (which would be incorrect) so we assume the request is an ACK for a container generated error response or misrouted");
-					}	
+				// Issue 2850 :	Use Request-URI custom Mobicents parameters to route request for misbehaving agents, workaround for Cisco-SIPGateway/IOS-12.x user agent
+				if(request.getRequestURI() instanceof javax.sip.address.SipURI) {
+					final String applicationNameHashed = ((Parameters)requestURI).getParameter(RR_PARAM_APPLICATION_NAME);
+					if(applicationNameHashed != null && applicationNameHashed.length() > 0) {				
+						applicationName = sipApplicationDispatcher.getApplicationNameFromHash(applicationNameHashed);
+						applicationId = ((Parameters)requestURI).getParameter(APP_ID);
+					}
 				}
-				
-				// Issue 823 (http://code.google.com/p/mobicents/issues/detail?id=823) : 
-				// Container should proxy statelessly subsequent requests not targeted at itself
-				if(isAnotherDomain) {	
-					if(Request.ACK.equals(method) && sipServletRequest.getTransaction() != null && ((SIPServerTransaction)sipServletRequest.getTransaction()).getLastResponseStatusCode() >= 300) {
-						// Issue 2213 (http://code.google.com/p/mobicents/issues/detail?id=2213) :
-						// ACK for final error response are proxied statelessly for proxy applications
-						//Means that this is an ACK to a container generated error response, so we can drop it
-						if(logger.isDebugEnabled()) {
-							logger.debug("The popped Route, application Id and name are null for an ACK, and this is an ACK for an error response, so it is dropped");
-						}				
-						return ;
-					} 
-					// Some UA are misbehaving and don't follow the non record proxy so they sent subsequent requests to the container (due to oubound proxy set probably) instead of directly to the UA
-					// so we proxy statelessly those requests
-					if(logger.isDebugEnabled()) {
-						logger.debug("No application found to handle this request " + request + " with the following popped route header " + poppedRouteHeader + " so forwarding statelessly to the outside since it is not targeted at the container");
-					}
-					try {
-						sipProvider.sendRequest(request);
-					} catch (SipException e) {
-						throw new DispatcherException("cannot proxy statelessly outside of the container the following request " + request, e);
-					}
-					return;
-				} else {
-					if(Request.ACK.equals(method)) {
-						//Means that this is an ACK to a container generated error response, so we can drop it
-						if(logger.isDebugEnabled()) {
-							logger.debug("The popped Route, application Id and name are null for an ACK, so this is an ACK to a container generated error response, so it is dropped");
-						}				
-						return ;
+				if(applicationId == null && applicationName == null) {
+					boolean isAnotherDomain = false;
+					
+					if(requestURI.isSipURI()){
+						final String host = ((SipURI) requestURI).getHost();
+						final int port = ((SipURI) requestURI).getPort();
+						final String transport = JainSipUtils.findTransport(request);
+						isAnotherDomain = sipApplicationDispatcher.isExternal(host, port, transport);
 					} else {
-						if(poppedRouteHeader != null) {
-							throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request +
-								"in this popped routed header " + poppedRouteHeader);
+						if(logger.isDebugEnabled()) {
+							logger.debug("The Request URI " + requestURI + " is not a SIP URI and the Route Header was null or didn't contain information about an application to call (which would be incorrect) so we assume the request is an ACK for a container generated error response or misrouted");
+						}	
+					}
+					
+					// Issue 823 (http://code.google.com/p/mobicents/issues/detail?id=823) : 
+					// Container should proxy statelessly subsequent requests not targeted at itself
+					if(isAnotherDomain) {	
+						if(Request.ACK.equals(method) && sipServletRequest.getTransaction() != null && ((SIPServerTransaction)sipServletRequest.getTransaction()).getLastResponseStatusCode() >= 300) {
+							// Issue 2213 (http://code.google.com/p/mobicents/issues/detail?id=2213) :
+							// ACK for final error response are proxied statelessly for proxy applications
+							//Means that this is an ACK to a container generated error response, so we can drop it
+							if(logger.isDebugEnabled()) {
+								logger.debug("The popped Route, application Id and name are null for an ACK, and this is an ACK for an error response, so it is dropped");
+							}				
+							return ;
+						} 
+						// Some UA are misbehaving and don't follow the non record proxy so they sent subsequent requests to the container (due to oubound proxy set probably) instead of directly to the UA
+						// so we proxy statelessly those requests
+						if(logger.isDebugEnabled()) {
+							logger.debug("No application found to handle this request " + request + " with the following popped route header " + poppedRouteHeader + " so forwarding statelessly to the outside since it is not targeted at the container");
+						}
+						try {
+							sipProvider.sendRequest(request);
+						} catch (SipException e) {
+							throw new DispatcherException("cannot proxy statelessly outside of the container the following request " + request, e);
+						}
+						return;
+					} else {
+						if(Request.ACK.equals(method)) {
+							//Means that this is an ACK to a container generated error response, so we can drop it
+							if(logger.isDebugEnabled()) {
+								logger.debug("The popped Route, application Id and name are null for an ACK, so this is an ACK to a container generated error response, so it is dropped");
+							}				
+							return ;
 						} else {
-							throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request);
+							if(poppedRouteHeader != null) {
+								throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request +
+									"in this popped routed header " + poppedRouteHeader);
+							} else {
+								throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot find the application to handle this subsequent request " + request);
+							}
 						}
 					}
 				}
@@ -412,6 +423,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						sipSession.updateStateOnSubsequentRequest(sipServletRequest, true);
 						if(finalBranch != null) {								
 							proxy.setAckReceived(requestMethod.equalsIgnoreCase(Request.ACK));
+							checkRequestURIForNonCompliantAgents(finalBranch, request);							
 							proxy.setOriginalRequest(sipServletRequest);
 							// if(!isAckRetranmission) { // We should pass the ack retrans (implied by 10.2.4.1 Handling 2xx Responses to INVITE)
 								callServlet(sipServletRequest);
@@ -439,6 +451,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 
 									if (proxyToTag.equals(requestToTag) || proxyFromTag.equals(requestToTag) ) { 
 										finalBranch = proxyBranch;
+										checkRequestURIForNonCompliantAgents(finalBranch, request);
 										finalBranch.proxySubsequentRequest(sipServletRequest);
 									} 
 								}
@@ -564,6 +577,23 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				sipContext.exitSipApp(sipSession.getSipApplicationSession(), sipSession);				
 			}
 			//nothing more needs to be done, either the app acted as UA, PROXY or B2BUA. in any case we stop routing	
+		}
+		
+		// Issue 2850 :	Use Request-URI custom Mobicents parameters to route request for misbehaving agents, workaround for Cisco-SIPGateway/IOS-12.x user agent
+		private void checkRequestURIForNonCompliantAgents(MobicentsProxyBranch finalBranch, Request request) {
+			URI requestURI = request.getRequestURI();
+			if(request.getRequestURI() instanceof javax.sip.address.SipURI && ((Parameters)requestURI).getParameter(MessageDispatcher.RR_PARAM_PROXY_APP) != null && requestURI instanceof SipURI) {								
+				final String host = ((SipURI) requestURI).getHost();
+				final int port = ((SipURI) requestURI).getPort();
+				final String transport = JainSipUtils.findTransport(request);
+				boolean isAnotherDomain = StaticServiceHolder.sipStandardService.getSipApplicationDispatcher().isExternal(host, port, transport);
+				if(!isAnotherDomain) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Non Compliant Agent targeting Mobicents directly, Changing the request URI from " + requestURI + " to " + finalBranch.getTargetURI() + " to avoid going in a loop");
+					}
+					request.setRequestURI(((URIImpl)finalBranch.getTargetURI()).getURI());
+				}								
+			}
 		}
 	}
 	

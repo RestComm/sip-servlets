@@ -369,7 +369,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		// not delivering OK to BYE
 		String doBranchRespValue = (String) request.getApplicationSession().getAttribute("branchResponseReceived");
 		if("true".equals(doBranchRespValue))
-			sipServletResponse.send();
+//			sipServletResponse.send();
 		
 
 		logger.info("invalidate when ready "
@@ -402,8 +402,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		if(!ext.isRouteOrphanRequests()) { // not to break the orphan test
 			long delta = Math.abs(System.currentTimeMillis() - lastOKstamp);			
 			if(response.getStatus() == 200) {								
-				if(delta<20) {
-					new Exception().printStackTrace();
+				if(delta < 20) {					
 					fail = true;
 					throw new ServletException("Problem with double response delta=" + delta + "\n1:" + oldResp + "\n2:"
 							+ response);
@@ -441,8 +440,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 	protected void doBranchResponse(SipServletResponse resp)
 			throws ServletException, IOException {
 		logger.info("doBranchResponse callback was called.");		
-		resp.getApplicationSession().setAttribute("branchResponseReceived", "true");
-		super.doBranchResponse(resp);
+		resp.getApplicationSession().setAttribute("branchResponseReceived", "true");		
 	}	
 	
 	// SipErrorListener methods

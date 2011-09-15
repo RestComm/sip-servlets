@@ -72,7 +72,6 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 				try {
 					Thread.sleep(TIMEOUT);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		}
@@ -97,7 +96,6 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 				try {
 					Thread.sleep(TIMEOUT);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		}
@@ -118,7 +116,6 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 				try {
 					Thread.sleep(TIMEOUT_READY_TO_INVALIDTE);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		}
@@ -139,7 +136,6 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 				try {
 					Thread.sleep(TIMEOUT_READY_TO_INVALIDTE);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		}
@@ -164,7 +160,6 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 				try {
 					Thread.sleep(TIMEOUT);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		}
@@ -187,7 +182,6 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 				try {
 					Thread.sleep(TIMEOUT);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		}
@@ -208,7 +202,6 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 				try {
 					Thread.sleep(TIMEOUT);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		}
@@ -227,7 +220,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 	 * http://code.google.com/p/mobicents/issues/detail?id=2440
 	 */
 	public void testProxyCreateSubsequent() {
-		this.shootme.init(STACK_NAME, null);
+		this.shootme.init(STACK_NAME, null);		
 		this.cutme.init(null);
 		this.shootist.init("test_create_subsequent_request",false, null);
 		for (int q = 0; q < 20; q++) {
@@ -235,19 +228,40 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 				try {
 					Thread.sleep(TIMEOUT);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 		}
 		if (shootist.ended == true)
 			fail("Conversation complete where it shouldn't be since the createSubsequentRequest should have thrown an IllegalStateException!");				
 	}
+	
+	/**
+	 * Non regression test for Issue 2850 : Use Request-URI custom Mobicents parameters to route request for misbehaving agents
+	 * http://code.google.com/p/mobicents/issues/detail?id=2850
+	 */
+	public void testProxyRequestURIMobicentsParam() {
+		this.shootme.init(STACK_NAME, null);	
+		this.shootist.init("unique-location",false, null);
+		this.shootist.moveRouteParamsToRequestURI = true;
+		this.cutme.init(null);
+		for (int q = 0; q < 20; q++) {
+			if (!shootist.ended && !cutme.canceled)
+				try {
+					Thread.sleep(TIMEOUT);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+		}
+		if (!shootist.ended)
+			fail("Conversation not complete");				
+	}
 
 	@Override
 	public void tearDown() throws Exception {
 		shootist.destroy();
 		shootme.destroy();
-		cutme.destroy();
+		if(cutme != null)
+			cutme.destroy();
 		super.tearDown();
 	}
 

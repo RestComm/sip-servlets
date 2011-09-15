@@ -677,7 +677,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				request.removeFirst(RouteHeader.NAME);
 				sipServletRequest.setPoppedRoute(routeHeader);
 				final Parameters poppedAddress = (Parameters)routeHeader.getAddress().getURI();
-				if(poppedAddress.getParameter(MessageDispatcher.RR_PARAM_PROXY_APP) != null) {
+				if(poppedAddress.getParameter(MessageDispatcher.RR_PARAM_PROXY_APP) != null || 
+						// Issue 2850 :	Use Request-URI custom Mobicents parameters to route request for misbehaving agents, workaround for Cisco-SIPGateway/IOS-12.x user agent 
+						(request.getRequestURI() instanceof javax.sip.address.SipURI && ((Parameters)request.getRequestURI()).getParameter(MessageDispatcher.RR_PARAM_PROXY_APP) != null)) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("the request is for a proxy application, thus it is a subsequent request ");
 					}

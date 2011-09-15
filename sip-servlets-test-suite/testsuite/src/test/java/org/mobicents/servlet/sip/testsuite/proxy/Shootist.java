@@ -28,6 +28,7 @@ import gov.nist.javax.sip.SipStackImpl;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
@@ -143,6 +144,8 @@ public class Shootist implements SipListener {
 
 	private boolean isRequestTerminatedReceived;
 
+	public boolean moveRouteParamsToRequestURI;
+	
 
 	class ByeTask  extends TimerTask {
 		Dialog dialog;
@@ -152,7 +155,22 @@ public class Shootist implements SipListener {
 		public void run () {
 			try {
 			   Request byeRequest = this.dialog.createRequest(Request.BYE);
-			   ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
+			   if(moveRouteParamsToRequestURI) {
+				   RouteHeader routeHeader = (RouteHeader) byeRequest.getHeader(RouteHeader.NAME);
+				   SipURI sipURI = (SipURI) routeHeader.getAddress().getURI();
+				   Iterator<String> parameterNames = sipURI.getParameterNames();
+				   while (parameterNames.hasNext()) {
+					   String parameterName = parameterNames.next();					
+					   if(!parameterName.equals("transport") && !parameterName.equals("lr")) {
+						   ((SipURI)byeRequest.getRequestURI()).setParameter(parameterName, sipURI.getParameter(parameterName));
+						   sipURI.removeParameter(parameterName);
+						   parameterNames = sipURI.getParameterNames();
+					   }
+				   }
+				   ((SipURI)byeRequest.getRequestURI()).setPort(Integer.parseInt(remotePort));
+			   }			  
+			   System.out.println("Sending BYE " + byeRequest);
+			   ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);			   
 			   dialog.sendRequest(ct);
 			} catch (Exception ex) {
 				ex.printStackTrace();				
@@ -322,9 +340,9 @@ public class Shootist implements SipListener {
 		}
 		
 		// If the caller is supposed to send the bye
-		if ( !byeTaskRunning && dialog != null) {
-			byeTaskRunning = true;
+		if ( !byeTaskRunning && dialog != null) {			
 			if(!response.getHeader("From").toString().contains("sequential")) {
+				byeTaskRunning = true;
 				new Timer().schedule(new ByeTask(dialog), 4000) ;
 			}
 		}
@@ -365,14 +383,16 @@ public class Shootist implements SipListener {
 						System.out.println("Sending ACK");
 						dialog.sendAck(ackRequest);
 						
-						try {
-							 Thread.sleep(pauseBeforeBye);
-							   Request byeRequest = dialog.createRequest(Request.BYE);
-							   ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
-							   dialog.sendRequest(ct);
+						if(!byeTaskRunning) {
+							try {							
+								Thread.sleep(pauseBeforeBye);
+								Request byeRequest = dialog.createRequest(Request.BYE);
+								ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
+								dialog.sendRequest(ct);
 							} catch (Exception ex) {
 								ex.printStackTrace();
 							}
+						}
 					}
 					
 				} else if (cseq.getMethod().equals(Request.CANCEL)) {
