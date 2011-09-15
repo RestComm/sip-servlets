@@ -29,23 +29,27 @@ import gov.nist.javax.sip.stack.SIPTransaction;
 import gov.nist.javax.sip.stack.SIPTransactionStack;
 
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.ListIterator;
 
 import javax.servlet.ServletException;
+import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.SipSession.State;
+import javax.servlet.sip.URI;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
-import javax.sip.header.ViaHeader;
+import javax.sip.header.*;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.SipFactoryExt;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.DispatcherException;
 import org.mobicents.servlet.sip.core.SipContext;
@@ -62,6 +66,7 @@ import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
+import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 /**
@@ -255,12 +260,36 @@ public class ResponseDispatcher extends MessageDispatcher {
 						response.removeFirst(ViaHeader.NAME);
 						SIPTransaction stx = (SIPTransaction) ((SIPTransactionStack)sipProvider.getSipStack()).findTransaction((SIPMessage) response, true);
 
-						SipServletRequestImpl request = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(stx.getRequest(), null, null, null, false);
-						SipServletResponseImpl orphanResponse = (SipServletResponseImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletResponse(
-								response, null, null, dialog, true, false);
-						orphanResponse.setOriginalRequest(request);
-						callServletForOrphanResponse(sipContext, orphanResponse);
-						stx.sendMessage((SIPMessage) response);
+						if(stx != null) {
+							SipServletRequestImpl request = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(stx.getRequest(), sipFactoryImpl, null, null, null, false);
+							SipServletResponseImpl orphanResponse = (SipServletResponseImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletResponse(response, sipFactoryImpl, null, null, dialog, true, false);
+							orphanResponse.setOriginalRequest(request);
+							callServletForOrphanResponse(sipContext, orphanResponse);
+							stx.sendMessage((SIPMessage) response);
+						} else {
+							if(sipServletResponse.getRequest() == null) {
+								ToHeader toHeader = ((ToHeader)response.getHeader(ToHeader.NAME));
+								FromHeader fromHeader = ((FromHeader)response.getHeader(FromHeader.NAME));
+								javax.sip.address.URI uri = ((ToHeader)response.getHeader(ToHeader.NAME)).getAddress().getURI();
+								CSeqHeader cseq = (CSeqHeader) response.getHeader(CSeqHeader.NAME);
+								CallIdHeader callid = (CallIdHeader) response.getHeader(CallIdHeader.NAME);
+								ViaHeader via = (ViaHeader) response.getHeader(ViaHeader.NAME);
+								LinkedList<ViaHeader> vialist = new LinkedList<ViaHeader>();
+								vialist.add(via);
+								MaxForwardsHeader mf = SipFactories.headerFactory.createMaxForwardsHeader(80);
+								ContentTypeHeader cth = SipFactories.headerFactory.createContentTypeHeader("orphan", "orphan");
+								try {
+									Request r = SipFactories.messageFactory.createRequest(uri, cseq.getMethod(), callid, cseq, fromHeader, toHeader, vialist, mf, cth, new byte[]{});
+									sipServletResponse.setOriginalRequest((SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(r, sipFactoryImpl, null, null, dialog, false));
+									callServletForOrphanResponse(sipContext, sipServletResponse);
+									sipProvider.sendResponse(response);
+								} catch (Exception e) {
+									if(logger.isDebugEnabled()) {
+										logger.debug("failed sending artificial request for response ");
+									}
+								}
+							}
+						}
 					} catch (Exception e) {
 						logger.error("Problem routing orphaned response", e);
 					}
@@ -280,6 +309,19 @@ public class ResponseDispatcher extends MessageDispatcher {
 				}
 				sipServletResponse.setSipSession(tmpSession);					
 			}			
+			
+			if(sipServletResponse.getRequest() == null && tmpSession.getProxy() != null) {
+				for(ProxyBranch pbi:tmpSession.getProxy().getProxyBranches()) {
+					ProxyBranchImpl pb = (ProxyBranchImpl) pbi;
+					Request r = (Request) ((SipServletRequestImpl)pb.getRequest()).getMessage();
+					ViaHeader via1 = (ViaHeader) r.getHeader(ViaHeader.NAME);
+					ViaHeader via2 = (ViaHeader) response.getHeader(ViaHeader.NAME);
+					if(via1.getBranch().equals(via2.getBranch())) {
+						sipServletResponse.setOriginalRequest(((SipServletRequestImpl)pb.getRequest()));
+						break;
+					}
+				}
+			}
 			
 			if(logger.isDebugEnabled()) {
 				logger.debug("route response on following session " + tmpSession.getId());
