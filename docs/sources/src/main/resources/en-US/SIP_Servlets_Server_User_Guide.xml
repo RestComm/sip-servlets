@@ -19,5 +19,6 @@
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-Enterprise-Monitoring-Operations-Management.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-Advanced_Features_of_the_SIP_Servlets_Server.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-Best_Practices.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-JSR289-Errata.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="Revision_History.xml"/>
 <!--<index />--></book>

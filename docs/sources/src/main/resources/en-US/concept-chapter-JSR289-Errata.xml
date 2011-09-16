@@ -1,0 +1,27 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<!-- This document was created with Syntext Serna Free. --><!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "SIP_Servlets_Server_User_Guide.ent">
+%BOOK_ENTITIES;
+]>
+<chapter id="bp-Best_Practices">
+  <title>JSR 289 Errata</title>
+  <para>This chapter discusses deviations from the JSR 289 specification by &PLATFORM_NAME;
+  SIP Servlets after feedback on usage in real world deployments and from the community.</para>
+  <section id="bp-Deviations">
+    <title>&PLATFORM_NAME; SIP Servlets Deviations from JSR 289</title>
+    <itemizedlist>
+        <listitem>
+          <para><emphasis>Correlation of Responses to Proxy Branches </emphasis>: It seems the javadoc for <ulink url="http://ci.jboss.org/jenkins/view/Mobicents/job/Mobicents-Books/lastSuccessfulBuild/artifact/api-docs/jsr289/javadocs/javax/servlet/sip/SipServlet.html#doResponse(javax.servlet.sip.SipServletResponse)">Speed Dial</ulink> contains an error, SipServlet.doBranchResponse() shouldn't be included as it contradicts the last sentence from the spec 10.2.4.2 Correlating responses to proxy branches :
+			"Note that if the doBranchResponse() is not overridden then doResponse() method will be invoked only for the best final response as before", 
+			If SipServlet.doBranchResponse() handling is done in SipServlet.doResponse() and the servlet overrides SipServlet.doResponse() then it will receive intermediate final responses 
+			as well as the best final response which is not the desired behavior, so the doBranchResponse() handling is done in SipServlet.doService() method allowing applications 
+			not overriding doResponse or doService to receive both intermediate final responses  on the doBranchResponse as well as the best final response on doResponse but this fixes the issue of intermediate final responses being delivered to doResponse in case the servlet overrides it.
+		</para>
+        </listitem>
+        <listitem>
+          <para><emphasis>SipServletResponse typo</emphasis> :
+          <emphasis> SipServletResponse.SC_TEMPORARLY_UNAVAILABLE</emphasis>  should be replaced by SC_TEMPORARILY_UNAVAILABLE.</para>
+        </listitem>
+      </itemizedlist>
+    </section>    
+</chapter>
