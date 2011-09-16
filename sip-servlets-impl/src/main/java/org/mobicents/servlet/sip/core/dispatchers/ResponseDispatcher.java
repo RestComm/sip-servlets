@@ -24,7 +24,6 @@ package org.mobicents.servlet.sip.core.dispatchers;
 
 import gov.nist.javax.sip.message.MessageExt;
 import gov.nist.javax.sip.message.SIPMessage;
-import gov.nist.javax.sip.stack.SIPServerTransaction;
 import gov.nist.javax.sip.stack.SIPTransaction;
 import gov.nist.javax.sip.stack.SIPTransactionStack;
 
@@ -35,21 +34,25 @@ import java.util.ListIterator;
 import javax.servlet.ServletException;
 import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.SipSession.State;
-import javax.servlet.sip.URI;
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
-import javax.sip.header.*;
+import javax.sip.header.CSeqHeader;
+import javax.sip.header.CallIdHeader;
+import javax.sip.header.ContentTypeHeader;
+import javax.sip.header.FromHeader;
+import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.ToHeader;
+import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.SipFactoryExt;
 import org.mobicents.servlet.sip.JainSipUtils;
-import org.mobicents.servlet.sip.SipFactories;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.DispatcherException;
 import org.mobicents.servlet.sip.core.SipContext;
@@ -261,8 +264,8 @@ public class ResponseDispatcher extends MessageDispatcher {
 						SIPTransaction stx = (SIPTransaction) ((SIPTransactionStack)sipProvider.getSipStack()).findTransaction((SIPMessage) response, true);
 
 						if(stx != null) {
-							SipServletRequestImpl request = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(stx.getRequest(), sipFactoryImpl, null, null, null, false);
-							SipServletResponseImpl orphanResponse = (SipServletResponseImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletResponse(response, sipFactoryImpl, null, null, dialog, true, false);
+							SipServletRequestImpl request = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(stx.getRequest(), null, null, null, false);
+							SipServletResponseImpl orphanResponse = (SipServletResponseImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletResponse(response, null, null, dialog, true, false);
 							orphanResponse.setOriginalRequest(request);
 							callServletForOrphanResponse(sipContext, orphanResponse);
 							stx.sendMessage((SIPMessage) response);
@@ -276,11 +279,11 @@ public class ResponseDispatcher extends MessageDispatcher {
 								ViaHeader via = (ViaHeader) response.getHeader(ViaHeader.NAME);
 								LinkedList<ViaHeader> vialist = new LinkedList<ViaHeader>();
 								vialist.add(via);
-								MaxForwardsHeader mf = SipFactories.headerFactory.createMaxForwardsHeader(80);
-								ContentTypeHeader cth = SipFactories.headerFactory.createContentTypeHeader("orphan", "orphan");
+								MaxForwardsHeader mf = sipFactoryImpl.getHeaderFactory().createMaxForwardsHeader(80);
+								ContentTypeHeader cth = sipFactoryImpl.getHeaderFactory().createContentTypeHeader("orphan", "orphan");
 								try {
-									Request r = SipFactories.messageFactory.createRequest(uri, cseq.getMethod(), callid, cseq, fromHeader, toHeader, vialist, mf, cth, new byte[]{});
-									sipServletResponse.setOriginalRequest((SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(r, sipFactoryImpl, null, null, dialog, false));
+									Request r = sipFactoryImpl.getMessageFactory().createRequest(uri, cseq.getMethod(), callid, cseq, fromHeader, toHeader, vialist, mf, cth, new byte[]{});
+									sipServletResponse.setOriginalRequest((SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(r, null, null, dialog, false));
 									callServletForOrphanResponse(sipContext, sipServletResponse);
 									sipProvider.sendResponse(response);
 								} catch (Exception e) {
