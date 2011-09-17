@@ -3,11 +3,11 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "SIP_Servlets_Server_User_Guide.ent">
 %BOOK_ENTITIES;
 ]>
-<chapter id="bp-Best_Practices">
+<chapter id="bp-jsr289-errata">
   <title>JSR 289 Errata</title>
   <para>This chapter discusses deviations from the JSR 289 specification by &PLATFORM_NAME;
   SIP Servlets after feedback on usage in real world deployments and from the community.</para>
-  <section id="bp-Deviations">
+  <section id="errata-Deviations">
     <title>&PLATFORM_NAME; SIP Servlets Deviations from JSR 289</title>
     <itemizedlist>
         <listitem>
