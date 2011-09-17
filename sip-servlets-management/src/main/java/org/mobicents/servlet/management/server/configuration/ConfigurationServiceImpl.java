@@ -73,7 +73,7 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 			
 			ConcurrencyControlMode mode = 
 				(ConcurrencyControlMode) mserver.getAttribute(
-						dispatcherName, "concurrencyControlMode");
+						dispatcherName, "ConcurrencyControlMode");
 			return mode.toString();
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
@@ -100,7 +100,7 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 			
 			String size = 
 				mserver.getAttribute(
-						dispatcherName, "queueSize").toString();
+						dispatcherName, "QueueSize").toString();
 			return Integer.parseInt(size);
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
@@ -113,7 +113,7 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 			
 			String size = 
 				mserver.getAttribute(
-						dispatcherName, "baseTimerInterval").toString();
+						dispatcherName, "BaseTimerInterval").toString();
 			return Integer.parseInt(size);
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
@@ -126,7 +126,7 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 			
 			String size = 
 				mserver.getAttribute(
-						dispatcherName, "t2Interval").toString();
+						dispatcherName, "T2Interval").toString();
 			return Integer.parseInt(size);
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
@@ -139,7 +139,7 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 			
 			String size = 
 				mserver.getAttribute(
-						dispatcherName, "t4Interval").toString();
+						dispatcherName, "T4Interval").toString();
 			return Integer.parseInt(size);
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
@@ -152,7 +152,7 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 			
 			String size = 
 				mserver.getAttribute(
-						dispatcherName, "timerDInterval").toString();
+						dispatcherName, "TimerDInterval").toString();
 			return Integer.parseInt(size);
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
@@ -162,7 +162,9 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 	public void setConcurrencyControlMode(String mode) {
 		try {
 			ObjectName dispatcherName = getApplicationDispatcher();
-			mserver.invoke(dispatcherName, "setConcurrencyControlModeByName", new Object[]{mode}, new String[]{"java.lang.String"});
+			
+			Attribute att = new Attribute("ConcurrencyControlModeByName", mode);
+			mserver.setAttribute(dispatcherName, att);			
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
 		}
@@ -207,7 +209,7 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 	public void setQueueSize(int queueSize) {
 		try {
 			ObjectName dispatcherName = getApplicationDispatcher();
-			Attribute att = new Attribute("queueSize", new Integer(queueSize));
+			Attribute att = new Attribute("QueueSize", new Integer(queueSize));
 			mserver.setAttribute(dispatcherName, att);
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
@@ -218,7 +220,7 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 	public void setBaseTimerInterval(int baseTimerInterval) {
 		try {
 			ObjectName dispatcherName = getApplicationDispatcher();
-			Attribute att = new Attribute("baseTimerInterval", new Integer(baseTimerInterval));
+			Attribute att = new Attribute("BaseTimerInterval", new Integer(baseTimerInterval));
 			mserver.setAttribute(dispatcherName, att);
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
@@ -229,7 +231,7 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 	public void setT2Interval(int t2Interval) {
 		try {
 			ObjectName dispatcherName = getApplicationDispatcher();
-			Attribute att = new Attribute("t2Interval", new Integer(t2Interval));
+			Attribute att = new Attribute("T2Interval", new Integer(t2Interval));
 			mserver.setAttribute(dispatcherName, att);
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
@@ -240,7 +242,7 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 	public void setT4Interval(int t4Interval) {
 		try {
 			ObjectName dispatcherName = getApplicationDispatcher();
-			Attribute att = new Attribute("t4Interval", new Integer(t4Interval));
+			Attribute att = new Attribute("T4Interval", new Integer(t4Interval));
 			mserver.setAttribute(dispatcherName, att);
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
@@ -252,7 +254,7 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 	public void setTimerDInterval(int timerDInterval) {
 		try {
 			ObjectName dispatcherName = getApplicationDispatcher();
-			Attribute att = new Attribute("timerDInterval", new Integer(timerDInterval));
+			Attribute att = new Attribute("TimerDInterval", new Integer(timerDInterval));
 			mserver.setAttribute(dispatcherName, att);
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
@@ -266,7 +268,7 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 			
 			CongestionControlPolicy policy = 
 				(CongestionControlPolicy) mserver.getAttribute(
-						dispatcherName, "congestionControlPolicy");
+						dispatcherName, "CongestionControlPolicy");
 			return policy.toString();
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
@@ -279,7 +281,7 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 			
 			String memoryThreshold = 
 				mserver.getAttribute(
-						dispatcherName, "memoryThreshold").toString();
+						dispatcherName, "MemoryThreshold").toString();
 			return Integer.parseInt(memoryThreshold);
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
@@ -288,8 +290,10 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 
 	public void setCongestionControlPolicy(String policy) {
 		try {
-			ObjectName dispatcherName = getApplicationDispatcher();			
-			mserver.invoke(dispatcherName, "setCongestionControlPolicyByName", new Object[]{policy}, new String[]{"java.lang.String"});
+			ObjectName dispatcherName = getApplicationDispatcher();	
+			
+			Attribute att = new Attribute("CongestionControlPolicyByName", policy);
+			mserver.setAttribute(dispatcherName, att);			
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
 		}
@@ -298,7 +302,7 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 	public void setMemoryThreshold(int memoryThreshold) {
 		try {
 			ObjectName dispatcherName = getApplicationDispatcher();
-			Attribute att = new Attribute("memoryThreshold", new Integer(memoryThreshold));
+			Attribute att = new Attribute("MemoryThreshold", new Integer(memoryThreshold));
 			mserver.setAttribute(dispatcherName, att);
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
@@ -312,7 +316,7 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 			
 			String checkingInterval = 
 				mserver.getAttribute(
-						dispatcherName, "congestionControlCheckingInterval").toString();
+						dispatcherName, "CongestionControlCheckingInterval").toString();
 			return Long.parseLong(checkingInterval);
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);
@@ -322,7 +326,7 @@ public class ConfigurationServiceImpl  extends RemoteServiceServlet implements C
 	public void setCongestionControlCheckingInterval(long interval) {
 		try {
 			ObjectName dispatcherName = getApplicationDispatcher();
-			Attribute att = new Attribute("congestionControlCheckingInterval", new Long(interval));
+			Attribute att = new Attribute("CongestionControlCheckingInterval", new Long(interval));
 			mserver.setAttribute(dispatcherName, att);
 		} catch (Throwable t) {
 			throw new RuntimeException("Error", t);

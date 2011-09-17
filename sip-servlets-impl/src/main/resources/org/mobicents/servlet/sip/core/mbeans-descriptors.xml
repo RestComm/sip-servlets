@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <mbeans-descriptors>
 
-	<mbean name="SipApplicationDispatcher"
+	<!--mbean name="SipApplicationDispatcher"
 		description="Sip Application Dispatcher Component" domain="Catalina"
 		group="SipApplicationDispatcher"
 		type="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl">
@@ -173,6 +173,6 @@
 				description="the SIP method to query for getting the corresponding number of requests processed"
 				type="java.lang.String" />
 		</operation>
-	</mbean>
+	</mbean-->
 
 </mbeans-descriptors>

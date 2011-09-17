@@ -24,6 +24,7 @@ package org.mobicents.servlet.sip.core;
 
 import gov.nist.javax.sip.SipListenerExt;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -214,4 +215,11 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 	DNSServerLocator getDNSServerLocator();
 	
 	String getVersion();
+	
+	public Object retrieveApplicationRouterConfiguration();
+	public void updateApplicationRouterConfiguration(Object configuration);
+	public Serializable retrieveApplicationRouterConfigurationString();
+	public void updateApplicationRouterConfiguration(Serializable configuration);
+	
+	public String[] findInstalledSipApplications();
 }
