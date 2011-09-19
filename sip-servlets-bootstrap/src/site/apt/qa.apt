@@ -22,7 +22,7 @@ Quality Assurance
 
 	Mobicents Sip Servlets version 0.6 can handle load peaks of more than 400 cps. See {{{http://groups.google.com/group/mobicents-public/browse_thread/thread/13ab783b1acd8294}Report of a Mobicents Sip Servlets Performance Test}}		  
 
-	The {{{http://ci.jboss.org/jenkins/job/MobicentsSipServletsSimpleCallSetupPerformanceTest}Soak tests displays}} the results of the latest run of Mobicents Sip servlets load tests. 
+	The {{{http://ci.jboss.org/jenkins/job/MobicentsSipServletsPerformance-UAS/}Soak tests displays}} the results of the latest run of Mobicents Sip servlets load tests. 
 	
 	The Load Test is using a simple call flow : 
 	
