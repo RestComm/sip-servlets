@@ -48,7 +48,6 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
-import javax.servlet.sip.ar.spi.SipApplicationRouterProvider;
 import javax.sip.ListeningPoint;
 import javax.sip.PeerUnavailableException;
 import javax.sip.SipException;
@@ -168,17 +167,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 	 */
 	public SipFactoryImpl(SipApplicationDispatcher sipApplicationDispatcher) {		
 		this.sipApplicationDispatcher = sipApplicationDispatcher;
-		try {
-			mobicentsSipServletMessageFactory = (MobicentsSipServletMessageFactory)
-				Class.forName(StaticServiceHolder.sipStandardService.getMobicentsSipServletMessageFactoryClassName()).newInstance();
-			mobicentsSipServletMessageFactory.setMobicentsSipFactory(this);
-		} catch (InstantiationException e) {
-			throw new IllegalArgumentException("Impossible to load the MobicentsSipServletMessageFactory ",e);
-		} catch (IllegalAccessException e) {
-			throw new IllegalArgumentException("Impossible to load the MobicentsSipServletMessageFactory ",e);
-		} catch (ClassNotFoundException e) {
-			throw new IllegalArgumentException("Impossible to load the MobicentsSipServletMessageFactory ",e);
-		}		
+		mobicentsSipServletMessageFactory = initMobicentsSipServletMessageFactory();
 	}
 
 	/*
@@ -918,7 +907,10 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 		useLoadBalancer = in.readBoolean();
 		if(useLoadBalancer) {
 			loadBalancerToUse = (SipLoadBalancer) in.readObject();
-		}		
+		}
+		if(mobicentsSipServletMessageFactory == null) {
+			mobicentsSipServletMessageFactory = initMobicentsSipServletMessageFactory();
+		}
 	}
 
 	public void writeExternal(ObjectOutput out) throws IOException {
@@ -982,5 +974,21 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 	@Override
 	public MobicentsSipServletMessageFactory getMobicentsSipServletMessageFactory() {
 		return mobicentsSipServletMessageFactory;
+	}
+	
+	protected MobicentsSipServletMessageFactory initMobicentsSipServletMessageFactory() {
+		MobicentsSipServletMessageFactory factory = null;
+		try {
+			factory = (MobicentsSipServletMessageFactory)
+				Class.forName(StaticServiceHolder.sipStandardService.getMobicentsSipServletMessageFactoryClassName()).newInstance();
+			factory.setMobicentsSipFactory(this);
+		} catch (InstantiationException e) {
+			throw new IllegalArgumentException("Impossible to load the MobicentsSipServletMessageFactory ",e);
+		} catch (IllegalAccessException e) {
+			throw new IllegalArgumentException("Impossible to load the MobicentsSipServletMessageFactory ",e);
+		} catch (ClassNotFoundException e) {
+			throw new IllegalArgumentException("Impossible to load the MobicentsSipServletMessageFactory ",e);
+		}	
+		return factory;
 	}
 }
