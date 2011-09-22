@@ -1597,6 +1597,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	}
 
 	public Transaction getTransaction() {
+		if (logger.isDebugEnabled()) {
+			logger.debug("transaction " + transaction + " transactionId = " + transactionId + " transactionType " + transactionType);
+		}
 		if(transaction == null && transactionId != null) {            
 			// used for early dialog failover purposes, lazily load the transaction
             setTransaction(((ClusteredSipStack)StaticServiceHolder.sipStandardService.getSipStack()).findTransaction(transactionId, transactionType));
@@ -1883,11 +1886,17 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		isMessageSent = in.readBoolean();
 		if(ReplicationStrategy.EarlyDialog == StaticServiceHolder.sipStandardService.getReplicationStrategy()) {
 			transactionId = in.readUTF();
+			if (logger.isDebugEnabled()) {
+				logger.debug("readExternal transactionId = " + transactionId);
+			}
 			if(transactionId != null) {
 				if(transactionId.equals("")) {
 					transactionId = null;
 				} else { 
 					transactionType = in.readBoolean();
+					if (logger.isDebugEnabled()) {
+						logger.debug("readExternal transactionType = " + transactionType);
+					}
 				}
 			}
 		}
@@ -1933,11 +1942,17 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		} else {
 			out.writeUTF("");
 		}
-		out.writeBoolean(isMessageSent);
+		out.writeBoolean(isMessageSent);		
 		if(ReplicationStrategy.EarlyDialog == StaticServiceHolder.sipStandardService.getReplicationStrategy()) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("writeExternal transaction = " + transaction);
+			}
 			if(transaction == null) {
 				out.writeUTF("");
 			} else {
+				if (logger.isDebugEnabled()) {
+					logger.debug("writeExternal transactionId = " + transaction.getBranchId() + " transactionType " + (transaction instanceof ServerTransaction));
+				}
 				out.writeUTF(transaction.getBranchId());
 				out.writeBoolean(transaction instanceof ServerTransaction);
 			}
