@@ -507,7 +507,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 			if(replicationStrategyString.equals(ReplicationStrategy.EarlyDialog.toString())) {
 				replicateApplicationData = true;
 			}			
-			if(replicationStrategy != null) {
+			if(replicationStrategyString != null) {
 				replicationStrategy = ReplicationStrategy.valueOf(replicationStrategyString);
 			}
 			sipStackProperties.put(ClusteredSipStack.REPLICATION_STRATEGY_PROPERTY, replicationStrategyString);
