@@ -618,9 +618,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				removeAttribute(key, true);
 			}
 		}
-		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);
+		// http://code.google.com/p/mobicents/issues/detail?id=2885
+        // FQN Memory Leak in HA mode with PESSIMISTIC locking
+        // remove it before the DELETION notification to avoid the sip application session to be destroyed before 
+        // and leaking in the JBoss Cache
 		
-		isValid = false;
 		//cancelling the timers
 		if(servletTimers != null) {
 			for (Map.Entry<String, ServletTimer> servletTimerEntry : servletTimers.entrySet()) {
@@ -633,14 +635,16 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		if(!expired && expirationTimerTask != null) {
 			cancelExpirationTimer();
 		}
-		
+		SipManager manager = sipContext.getSipManager();
+		manager.removeSipApplicationSession(key);
+		sipContext.getSipSessionsUtil().removeCorrespondingSipApplicationSession(key);
 		/*
          * Compute how long this session has been alive, and update
          * session manager's related properties accordingly
          */
         long timeNow = System.currentTimeMillis();
         int timeAlive = (int) ((timeNow - creationTime)/1000);
-        SipManager manager = sipContext.getSipManager();
+                
         synchronized (manager) {
             if (timeAlive > manager.getSipApplicationSessionMaxAliveTime()) {
                 manager.setSipApplicationSessionMaxAliveTime(timeAlive);
@@ -652,9 +656,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
             average = ((average * (numExpired-1)) + timeAlive)/numExpired;
             manager.setSipApplicationSessionAverageAliveTime(average);
         }
+        
+		notifySipApplicationSessionListeners(SipApplicationSessionEventType.DELETION);				
 		
-		sipContext.getSipManager().removeSipApplicationSession(key);
-		sipContext.getSipSessionsUtil().removeCorrespondingSipApplicationSession(key);
+		isValid = false;
+				
 		expirationTimerTask = null;
 //		expirationTimerFuture = null;
 		if(httpSessions != null) {

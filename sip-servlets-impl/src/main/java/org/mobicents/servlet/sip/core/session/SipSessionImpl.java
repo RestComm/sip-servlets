@@ -865,17 +865,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 				removeAttribute(key, true);
 			}
 		}
-		notifySipSessionListeners(SipSessionEventType.DELETION);			
 		
-		isValid = false;
-		
-		if(derivedSipSessions != null) {
-			for (MobicentsSipSession derivedMobicentsSipSession : derivedSipSessions.values()) {
-				derivedMobicentsSipSession.invalidate();
-			}		
-			derivedSipSessions.clear();
-		}	
-		
+		// http://code.google.com/p/mobicents/issues/detail?id=2885
+        // FQN Memory Leak in HA mode with PESSIMISTIC locking
+        // remove it before the DELETION notification to avoid the sip application session to be destroyed before 
+        // and leaking in the JBoss Cache
 		/*
          * Compute how long this session has been alive, and update
          * session manager's related properties accordingly
@@ -898,6 +892,18 @@ public class SipSessionImpl implements MobicentsSipSession {
 		
 		manager.removeSipSession(key);		
 		sipApplicationSession.getSipContext().getSipSessionsUtil().removeCorrespondingSipSession(key);
+		
+		notifySipSessionListeners(SipSessionEventType.DELETION);			
+		
+		isValid = false;
+		
+		if(derivedSipSessions != null) {
+			for (MobicentsSipSession derivedMobicentsSipSession : derivedSipSessions.values()) {
+				derivedMobicentsSipSession.invalidate();
+			}		
+			derivedSipSessions.clear();
+		}	
+		
 		sipApplicationSession.onSipSessionReadyToInvalidate(this);
 		if(ongoingTransactions != null) {
 			if(logger.isDebugEnabled()) {
