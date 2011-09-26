@@ -866,18 +866,21 @@ public class SipSessionImpl implements MobicentsSipSession {
 			}
 		}
 		
-		// http://code.google.com/p/mobicents/issues/detail?id=2885
+		final MobicentsSipApplicationSession sipApplicationSession = getSipApplicationSession();
+        SipManager manager = sipApplicationSession.getSipContext().getSipManager();
+        // http://code.google.com/p/mobicents/issues/detail?id=2885
         // FQN Memory Leak in HA mode with PESSIMISTIC locking
         // remove it before the DELETION notification to avoid the sip application session to be destroyed before 
-        // and leaking in the JBoss Cache
+        // and leaking in the JBoss Cache		
+		manager.removeSipSession(key);		
+		sipApplicationSession.getSipContext().getSipSessionsUtil().removeCorrespondingSipSession(key);
+		
 		/*
          * Compute how long this session has been alive, and update
          * session manager's related properties accordingly
          */
         long timeNow = System.currentTimeMillis();
-        int timeAlive = (int) ((timeNow - creationTime)/1000);
-        final MobicentsSipApplicationSession sipApplicationSession = getSipApplicationSession();
-        SipManager manager = sipApplicationSession.getSipContext().getSipManager();
+        int timeAlive = (int) ((timeNow - creationTime)/1000);        
         synchronized (manager) {
             if (timeAlive > manager.getSipSessionMaxAliveTime()) {
                 manager.setSipSessionMaxAliveTime(timeAlive);
@@ -889,10 +892,7 @@ public class SipSessionImpl implements MobicentsSipSession {
             average = ((average * (numExpired-1)) + timeAlive)/numExpired;
             manager.setSipSessionAverageAliveTime(average);
         }
-		
-		manager.removeSipSession(key);		
-		sipApplicationSession.getSipContext().getSipSessionsUtil().removeCorrespondingSipSession(key);
-		
+        
 		notifySipSessionListeners(SipSessionEventType.DELETION);			
 		
 		isValid = false;
