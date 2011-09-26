@@ -397,6 +397,20 @@
 			</snapshots>
 		</repository>
 		<repository>
+			<id>jboss-3rd-party-upload-repository-group</id>
+			<name>JBoss ThirdParty Upload Repository Group</name>
+			<url>https://repository.jboss.org/nexus/content/repositories/thirdparty-upload</url>
+			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
 			<id>JbossRepository</id>
 			<name>Jboss Repository</name>
 			<url>http://repository.jboss.org/maven2</url>
