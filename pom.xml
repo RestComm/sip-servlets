@@ -383,7 +383,7 @@
 			</snapshots>
 		</repository>
 		<repository>
-			<id>jboss-public-repository-group</id>
+			<id>jboss-3rd-party-repository-group</id>
 			<name>JBoss ThirdParty Releases Repository Group</name>
 			<url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases</url>
 			<layout>default</layout>
