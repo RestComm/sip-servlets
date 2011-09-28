@@ -337,6 +337,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that
 		// the tx serialization is preserved		
 		sipContext.enterSipApp(sipApplicationSession, sipSession, false);
+		// Issue 2886 : http://code.google.com/p/mobicents/issues/detail?id=2886 ACK is bound out of replication context
+		// we need to enter the serialization here because validateCSeq below can set the CSeq so we need to replicate it
+		final boolean batchStarted = sipContext.enterSipAppHa(true);
 		
 		// Issue 1714 : do the validation after lock acquisition to avoid conccurency on CSeq validation 
 		// if a concurrency control mode is used
@@ -347,6 +350,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			if(!isValid) {
 				// Issue 1714 release the lock if we don't call the app
 				sipContext.exitSipApp(sipApplicationSession, sipSession);
+				// Issue 2886 : http://code.google.com/p/mobicents/issues/detail?id=2886 ACK is bound out of replication context
+				// we need to exit the serialization here because validateCSeq above can set the CSeq so we need to replicate it
+				sipContext.exitSipAppHa(sipServletRequest, null, batchStarted);
 				return;
 			}
 		}
@@ -354,8 +360,12 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		
 		// if the flag is set we bypass the executor. This flag should be made deprecated 
 		if(sipApplicationDispatcher.isBypassRequestExecutor() || ConcurrencyControlMode.Transaction.equals((sipContext.getConcurrencyControlMode()))) {
+			dispatchTask.setBatchStarted(batchStarted);
 			dispatchTask.dispatchAndHandleExceptions();
 		} else {
+			// Issue 2886 : http://code.google.com/p/mobicents/issues/detail?id=2886 ACK is bound out of replication context
+			// we need to exitSipAppHa because a new thread will be started here 
+			sipContext.exitSipAppHa(sipServletRequest, null, batchStarted);
 			if(logger.isDebugEnabled()) {
 				logger.debug("We are just before executor with sipAppSession=" + sipApplicationSession + " and sipSession=" + sipSession + " for " + sipServletMessage);
 			}
@@ -367,10 +377,16 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 	}	
 
 	public static class SubsequentDispatchTask extends DispatchTask {
+		boolean batchStarted = false;
+		
 		SubsequentDispatchTask(SipServletRequestImpl sipServletRequest, SipProvider sipProvider) {
 			super(sipServletRequest, sipProvider);
 		}
 		
+		public void setBatchStarted(boolean batchStarted) {
+			this.batchStarted = batchStarted;
+		}
+
 		public void dispatch() throws DispatcherException {
 			final SipServletRequestImpl sipServletRequest = (SipServletRequestImpl)sipServletMessage;
 			final MobicentsSipSession sipSession = sipServletRequest.getSipSession();
@@ -378,7 +394,11 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			final SipContext sipContext = appSession.getSipContext();
 			final Request request = (Request) sipServletRequest.getMessage();
 			
-			boolean batchStarted = sipContext.enterSipAppHa(true);
+			if(!sipContext.getSipApplicationDispatcher().isBypassRequestExecutor()) {
+				// Issue 2886 : http://code.google.com/p/mobicents/issues/detail?id=2886 ACK is bound out of replication context
+				// we need to enterSipAppHa because was started in another thread so we need to bind to this thread
+				batchStarted = sipContext.enterSipAppHa(true);
+			}			
 			
 			final String requestMethod = sipServletRequest.getMethod();
 			try {
