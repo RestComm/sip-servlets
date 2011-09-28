@@ -314,7 +314,17 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}			
 		
 		final MobicentsSipSession sipSession = tmpSipSession;
-		sipServletRequest.setSipSession(sipSession);
+		sipServletRequest.setSipSession(sipSession);		
+		
+		final SubsequentDispatchTask dispatchTask = new SubsequentDispatchTask(sipServletRequest, sipProvider);
+		// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that
+		// the tx serialization is preserved		
+		sipContext.enterSipApp(sipApplicationSession, sipSession, false);
+		// Issue 2886 : http://code.google.com/p/mobicents/issues/detail?id=2886 ACK is bound out of replication context
+		// we need to enter the serialization here because validateCSeq below can set the CSeq so we need to replicate it
+		final boolean batchStarted = sipContext.enterSipAppHa(true);
+		
+		// Issue 1714 && Issue 2886 : moving the requests pending within the serialization block 
 		if(request.getMethod().equals(Request.ACK)) {
 			sipSession.setRequestsPending(sipSession.getRequestsPending() - 1);
 		} else if(request.getMethod().equals(Request.INVITE)){
@@ -332,15 +342,6 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			}
 			sipSession.setRequestsPending(sipSession.getRequestsPending() + 1);
 		}
-		
-		final SubsequentDispatchTask dispatchTask = new SubsequentDispatchTask(sipServletRequest, sipProvider);
-		// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that
-		// the tx serialization is preserved		
-		sipContext.enterSipApp(sipApplicationSession, sipSession, false);
-		// Issue 2886 : http://code.google.com/p/mobicents/issues/detail?id=2886 ACK is bound out of replication context
-		// we need to enter the serialization here because validateCSeq below can set the CSeq so we need to replicate it
-		final boolean batchStarted = sipContext.enterSipAppHa(true);
-		
 		// Issue 1714 : do the validation after lock acquisition to avoid conccurency on CSeq validation 
 		// if a concurrency control mode is used
 		
