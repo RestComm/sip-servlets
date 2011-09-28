@@ -68,7 +68,7 @@
 		<repository>
 			<id>nuxeo-repository</id>
 			<name>Nuxeo Repository</name>
-			<url>https://maven.nuxeo.org/nexus/content/groups/public</url>
+			<url>http://maven.nuxeo.org/nexus/content/groups/public</url>
 			<releases>
 				<enabled>true</enabled>
 			</releases>
