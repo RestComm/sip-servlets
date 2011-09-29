@@ -121,6 +121,14 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			request.getProxy().proxyTo(sipFactory.createURI("sip:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090;transport=udp"));
 			return;
 		}
+		
+		if(request.getFrom().toString().contains("proxy-unspecified")) {
+			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
+			request.getProxy().setRecordRoute(true);
+			request.getProxy().proxyTo(sipFactory.createURI("sip:a@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
+			return;
+		}
 				
 		if(request.getFrom().toString().contains("proxy-tls")) {
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
