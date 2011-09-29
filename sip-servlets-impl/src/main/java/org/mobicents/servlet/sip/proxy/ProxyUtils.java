@@ -26,6 +26,7 @@ import gov.nist.javax.sip.header.HeaderFactoryExt;
 import gov.nist.javax.sip.header.Via;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.MessageExt;
+import gov.nist.javax.sip.message.SIPMessage;
 import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.util.Iterator;
@@ -105,6 +106,8 @@ public class ProxyUtils {
 					}
 				}
 			}
+			
+			if(outboundTransport == null) outboundTransport = ListeningPoint.UDP;
 			
 			String inboundTransport = ((ViaHeader)clonedRequest.getHeader(Via.NAME)).getTransport();
 			if(inboundTransport == null) inboundTransport = ListeningPoint.UDP;
@@ -231,16 +234,10 @@ public class ProxyUtils {
 			} else { 
 				//If outbound interface is specified use it
 				String branchId = null;
-				
-				if(outboundTransport == null) {
-					outboundTransport = proxy.getOutboundInterface().getTransportParam();
-					if(outboundTransport == null) {
-						if(proxy.getOutboundInterface().isSecure()) {
-							outboundTransport =  ListeningPoint.TLS;
-						} else {
-							outboundTransport =  ListeningPoint.UDP;
-						}
-					}
+
+				// make sure to adjust for TLS
+				if(proxy.getOutboundInterface().isSecure()) {
+					outboundTransport =  ListeningPoint.TLS;
 				}
 
 				// http://code.google.com/p/mobicents/issues/detail?id=2359
@@ -363,6 +360,8 @@ public class ProxyUtils {
 				
 				clonedRequest.addFirst(pathHeader);
 			}
+			
+			((SIPMessage)clonedRequest).setApplicationData(outboundTransport);
 			
 			return clonedRequest;
 		} catch (Exception e) {
