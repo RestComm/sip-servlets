@@ -49,6 +49,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
 import javax.sip.ObjectInUseException;
 import javax.sip.Transaction;
@@ -796,6 +797,26 @@ public final class JainSipUtils {
 			}
 		} catch (ParseException e) {
 			logger.error("AR optimization error", e);
+		}
+	}
+
+	public static void optimizeViaHeaderAddressForStaticAddress(SipConnector sipConnector, Request request, SipFactoryImpl sipFactoryImpl, String transport) throws ParseException, InvalidArgumentException {
+		javax.sip.address.URI uri = request.getRequestURI();
+
+		ViaHeader viaHeader = (ViaHeader) request.getHeader(ViaHeader.NAME);
+
+		RouteHeader route = (RouteHeader) request.getHeader(RouteHeader.NAME);
+		if(route != null) {
+			uri = route.getAddress().getURI();
+		}
+		if(uri.isSipURI()) {
+			javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
+			String host = sipUri.getHost();
+			int port = sipUri.getPort();
+			if(sipFactoryImpl.getSipApplicationDispatcher().isExternal(host, port, transport)) {
+				viaHeader.setHost(sipConnector.getStaticServerAddress());
+				viaHeader.setPort(sipConnector.getStaticServerPort());
+			}
 		}
 	}
 }

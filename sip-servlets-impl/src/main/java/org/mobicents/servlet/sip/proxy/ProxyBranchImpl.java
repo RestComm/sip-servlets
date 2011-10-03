@@ -689,6 +689,11 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 				if(sipConnector.isUseStaticAddress()) {
 					JainSipUtils.optimizeRouteHeaderAddressForInternalRoutingrequest(
 							sipConnector, clonedRequest, sipSession, sipFactoryImpl, transport);
+					try {
+						JainSipUtils.optimizeViaHeaderAddressForStaticAddress(sipConnector, clonedRequest, sipFactoryImpl, transport);
+					} catch (Exception e) {
+						throw new RuntimeException(e);
+					}
 				}
 				sipProvider.sendRequest(clonedRequest);
 			}

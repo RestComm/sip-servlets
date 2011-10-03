@@ -27,6 +27,7 @@ import java.util.ListIterator;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.ViaHeader;
+import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.catalina.connector.Connector;
@@ -263,7 +264,16 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 		assertTrue(ipBalancerInternal.sipMessageWithoutRetrans.size()>0);
 		assertTrue(receiver.getOkToByeReceived());
 		assertTrue(sender.getByeReceived());	
-		
+
+		for(Request r : receiver.allRequests) {
+			ViaHeader via = (ViaHeader) r.getHeader(ViaHeader.NAME);
+			assertEquals(IPLB_ADDRESS_EXTERNAL, via.getPort());
+		}
+		for(Request r : sender.allRequests) {
+			ViaHeader via = (ViaHeader) r.getHeader(ViaHeader.NAME);
+			assertEquals(IPLB_ADDRESS_EXTERNAL, via.getPort());
+		}
+
 		for(Response message : sender.allResponses) {
 			if(message.getStatusCode()>200) {
 				fail("We don't expect errors. This is error: " + message);
