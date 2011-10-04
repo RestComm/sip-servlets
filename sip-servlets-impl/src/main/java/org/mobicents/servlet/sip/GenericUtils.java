@@ -22,8 +22,13 @@
 
 package org.mobicents.servlet.sip;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.Priority;
 
 /**
  * Generic utils not related to SIP.
@@ -81,5 +86,20 @@ public class GenericUtils {
 		String hashed =  convertToHex(md.digest());
 		hashed = reduceHash(hashed, 8);
 		return hashed;
+	}
+	
+	public static String makeStackTrace() {
+		StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        StackTraceElement[] ste = new Exception().getStackTrace();
+        // Skip the log writer frame and log all the other stack frames.
+        for (int i = 1; i < ste.length; i++) {
+            String callFrame = "[" + ste[i].getFileName() + ":"
+                    + ste[i].getLineNumber() + "]";
+            pw.print(callFrame);
+        }
+        pw.close();
+        String stackTrace = sw.getBuffer().toString();
+        return stackTrace;
 	}
 }
