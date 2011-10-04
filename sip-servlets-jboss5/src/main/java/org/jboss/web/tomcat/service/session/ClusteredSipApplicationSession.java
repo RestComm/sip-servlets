@@ -64,6 +64,7 @@ import org.jboss.web.tomcat.service.session.distributedcache.spi.OutgoingDistrib
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionManagementStatus;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSessionNotificationCause;
 import org.jboss.web.tomcat.service.session.notification.ClusteredSipApplicationSessionNotificationPolicy;
+import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.SipListeners;
 import org.mobicents.servlet.sip.core.SipManager;
@@ -1267,8 +1268,10 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 	}
 
 	protected final void sessionAttributesDirty() {
-		if (!sessionAttributesDirty && log.isTraceEnabled())
-			log.trace("Marking session attributes dirty " + key);
+		if (!sessionAttributesDirty && log.isDebugEnabled()) {
+			log.debug("Marking session attributes dirty " + key);
+			log.debug(GenericUtils.makeStackTrace());
+		}
 
 		sessionAttributesDirty = true;
 		ConvergedSessionReplicationContext.bindSipApplicationSession(this, manager.getSnapshotSipManager());

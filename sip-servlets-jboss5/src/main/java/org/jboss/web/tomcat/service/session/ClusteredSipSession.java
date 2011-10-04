@@ -75,6 +75,7 @@ import org.jboss.web.tomcat.service.session.notification.ClusteredSipSessionNoti
 import org.mobicents.ha.javax.sip.ClusteredSipStack;
 import org.mobicents.ha.javax.sip.HASipDialog;
 import org.mobicents.ha.javax.sip.ReplicationStrategy;
+import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.catalina.CatalinaSipManager;
 import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.SipService;
@@ -1532,8 +1533,10 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	}
 
 	protected final void sessionAttributesDirty() {
-		if (!sessionAttributesDirty && log.isTraceEnabled())
-			log.trace("Marking session attributes dirty " + haId);
+		if (!sessionAttributesDirty && log.isDebugEnabled()) {
+			log.debug("Marking session attributes dirty " + haId);
+			log.debug(GenericUtils.makeStackTrace());
+		}
 
 		sessionAttributesDirty = true;
 		ConvergedSessionReplicationContext.bindSipSession(this, manager.getSnapshotSipManager());
