@@ -96,7 +96,10 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		SipApplicationSession sas = request.getApplicationSession();
 		logger.info("Got request:\n" + request.getMethod());
 		SipServletRequestExt req = (SipServletRequestExt)request;
-		if(req.isOrphan()) return;
+		if(req.isOrphan() && !req.isInitial()) {
+			req.getSession().setAttribute("h", "hhh");
+			return;
+		}
 		if(request.getFrom().toString().contains("proxy-orphan")) {
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			SipFactoryExt sipFactoryExt = (SipFactoryExt) sipFactory;

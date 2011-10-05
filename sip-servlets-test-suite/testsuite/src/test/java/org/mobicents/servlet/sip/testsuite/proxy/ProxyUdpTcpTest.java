@@ -250,6 +250,61 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 
 	}
 	
+	public void testCallForwardingCallerSendByeOrphan2() throws Exception {
+		
+		senderProtocolObjects = new ProtocolObjects("forward-udp-sender",
+				"gov.nist", TRANSPORT_UDP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
+		receiverProtocolObjects = new ProtocolObjects("forward-udp-receiver",
+				"gov.nist", TRANSPORT_UDP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		sender.setRecordRoutingProxyTesting(true);
+		SipProvider senderProvider = sender.createProvider();
+		sender.setSendBye(false);
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "proxy-orphan";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "forward-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {UserAgentHeader.NAME, "extension-header"}, new String[] {"TestSipListener UA", "extension-sip-listener"}, addSipConnectorOnStartup);	
+		
+		Thread.sleep(TIMEOUT);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(receiver.isAckReceived());
+		receiver.setAckReceived(false);
+		sender.setAckSent(false);		
+		receiver.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isAckSent());
+		assertTrue(sender.isAckReceived());
+		receiver.sendBye();
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getOkToByeReceived());
+		assertTrue(sender.getByeReceived());
+		CallIdHeader receiverCallIdHeader = (CallIdHeader)receiver.getInviteRequest().getHeader(CallIdHeader.NAME);
+		CallIdHeader senderCallIdHeader = (CallIdHeader)sender.getInviteRequest().getHeader(CallIdHeader.NAME);
+		
+
+		assertEquals(receiverCallIdHeader.getCallId(),senderCallIdHeader.getCallId());
+
+	}
+
+	
 	public void testTCPCallForwardingCalleeSendByeTCPSender() throws Exception {
 		
 		senderProtocolObjects = new ProtocolObjects("forward-udp-sender",
