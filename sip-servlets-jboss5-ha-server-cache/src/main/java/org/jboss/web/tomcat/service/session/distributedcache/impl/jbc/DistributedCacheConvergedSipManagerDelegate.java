@@ -26,9 +26,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.Set;
 
 import org.jboss.cache.Fqn;
 import org.jboss.cache.Node;
