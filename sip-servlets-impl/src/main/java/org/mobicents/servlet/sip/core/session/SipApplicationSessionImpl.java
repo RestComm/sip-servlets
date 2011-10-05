@@ -1338,4 +1338,14 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			}
 		}
 	}
+	
+	protected boolean orphan = false;
+
+	public boolean isOrphan() {
+		return orphan;
+	}
+
+	public void setOrphan(boolean orphan) {
+		this.orphan = orphan;
+	}
 }

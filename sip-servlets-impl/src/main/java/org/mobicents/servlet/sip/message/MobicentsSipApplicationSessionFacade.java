@@ -338,5 +338,13 @@ public class MobicentsSipApplicationSessionFacade implements
 	public void release() {
 		sipApplicationSession.release();
 	}
+	
+	public boolean isOrphan() {
+		return sipApplicationSession.isOrphan();
+	}
+
+	public void setOrphan(boolean orphan) {
+		sipApplicationSession.setOrphan(orphan);
+	}
 
 }

@@ -32,10 +32,10 @@ import javax.servlet.sip.SipFactory;
  * 		<li>Requests and responses that do NOT have associated SipSession or SipApplicationSession will still be delivered to the main servlet of the application this factory belongs to. Such requests and responses are called "orphaned".</li> 	
  *      <li>The requests and responses will be proxied outside the container to their regular destination after being delivered to the application</li>
  *      <li>When orphaned requests or responses are delivered to the application you can check this with SipServletRequest.isOrhpan() and SipServletResponse.isOrphan()</li>	
- * 		<li>The sessions for these requests are lost and getSession() methods may return null except for reINVITE requests when brand new sessions will be created</li>
+ * 		<li>The sessions for these requests are lost and getSession() methods will cause brand new sessions to be created. These new sessions are unrelated to the lost sessions.</li>
  * </ul>
  * 
- * You can turn on and off this feature on demand from your application at any time.
+ * You can turn on and off this feature on demand from your application at any time. By default it is off.
  * 
  * This feature is useful for stateless applications that don't want the memory overhead of
  * sessions and dialogs. Inherently when there are no sessions there is no need for session

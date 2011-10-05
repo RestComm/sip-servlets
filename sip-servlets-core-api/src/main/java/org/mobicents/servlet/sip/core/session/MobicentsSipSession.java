@@ -174,4 +174,7 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	
 	void setSipSessionSecurity(MobicentsSipSessionSecurity sipSessionSecurity);
 	MobicentsSipSessionSecurity getSipSessionSecurity();
+	public void setOrphan(boolean orphan);
+
+	public boolean isOrphan();
 }

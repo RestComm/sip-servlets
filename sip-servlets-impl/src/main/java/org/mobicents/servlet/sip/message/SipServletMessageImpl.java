@@ -550,9 +550,20 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 				return sipApplicationSession;
 			}
 		}
+		
 		String applicationName = getCurrentApplicationName();
 		if(sessionKey != null) {
 			applicationName = sessionKey.getApplicationName();
+		} else {
+			if(this instanceof SipServletRequestImpl && isOrphan()) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Orphans session " + applicationName + " " + sessionKey);
+				}
+				orphan = true;
+				sessionKey = SessionManagerUtil.getSipSessionKey(
+						SessionManagerUtil.getSipApplicationSessionKey(applicationName, ((SipServletRequestImpl)this).getAppSessionId()).getId(),
+						applicationName, message, false);
+			}
 		}
 		if(applicationName != null && sessionKey != null) {
 			final SipContext sipContext = sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(applicationName);
@@ -561,6 +572,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 					applicationName, 
 					sessionKey.getApplicationSessionId());
 			MobicentsSipApplicationSession applicationSession =  sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, create);
+			applicationSession.setOrphan(isOrphan());
 			return applicationSession;
 		}
 		return null;
@@ -1032,6 +1044,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 * @see javax.servlet.sip.SipServletMessage#getSession(boolean)
 	 */
 	public SipSession getSession(boolean create) {
+		
 		MobicentsSipSession session = getSipSession();
 		if (session == null && create) {
 			MobicentsSipApplicationSession sipApplicationSessionImpl = (MobicentsSipApplicationSession)getApplicationSession(create);
@@ -1039,8 +1052,10 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			session = sipApplicationSessionImpl.getSipContext().getSipManager().getSipSession(sessionKey, create,
 					sipFactoryImpl, sipApplicationSessionImpl);
 			session.setSessionCreatingTransactionRequest(this);
+			session.setOrphan(isOrphan());
 			sessionKey = session.getKey();
-		} 
+		}
+		
 		if(session != null) {
 			return session.getFacade();
 		}
@@ -2020,4 +2035,12 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 //		transport= null;
 //		userPrincipal= null;
 //	}
+	public void setOrphan(boolean orphan) {
+		this.orphan = orphan;
+	}
+
+	public boolean isOrphan() {
+		return orphan;
+	}	
+	boolean orphan;
 }

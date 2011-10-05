@@ -2328,4 +2328,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 			}
 		}
 	}
+	
+	protected boolean orphan = false;
+
+	public boolean isOrphan() {
+		return orphan;
+	}
+
+	public void setOrphan(boolean orphan) {
+		this.orphan = orphan;
+	}
 }

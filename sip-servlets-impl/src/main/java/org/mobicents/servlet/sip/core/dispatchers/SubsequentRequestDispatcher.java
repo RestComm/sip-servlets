@@ -54,6 +54,7 @@ import javax.sip.message.Response;
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.SipFactoryExt;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.address.URIImpl;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
@@ -121,6 +122,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			if(applicationNameHashed != null && applicationNameHashed.length() > 0) {				
 				applicationName = sipApplicationDispatcher.getApplicationNameFromHash(applicationNameHashed);
 				applicationId = poppedAddress.getParameter(APP_ID);
+				sipServletRequest.setAppSessionId(applicationId);
 			}
 		} 
 		if(applicationId == null) {
@@ -234,46 +236,60 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			} else if(replacesSipApplicationSessionKey != null) {
 				sipApplicationSession = sipManager.getSipApplicationSession(replacesSipApplicationSessionKey, false);
 			}
-			if(sipApplicationSession == null) {
-				boolean routeOrphanRequests = ((SipFactoryExt)sipContext.getSipFactoryFacade()).isRouteOrphanRequests();
-				if(logger.isDebugEnabled()) {
-					logger.debug("routeOrphanRequests = " + routeOrphanRequests + " for context " + sipContext.getApplicationName());
-				}
-				if(!routeOrphanRequests) {
-					if(poppedRouteHeader != null) {
-						throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "Cannot find the corresponding sip application session to this subsequent request " + request +
-								" with the following popped route header " + sipServletRequest.getPoppedRoute() + ", it may already have been invalidated or timed out");
-					} else {
-						throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "Cannot find the corresponding sip application session to this subsequent request " + request +
-								", it may already have been invalidated or timed out");					
-					}
+		}
+		// Orphaned requests are routed from here
+		if(sipApplicationSession == null || sipApplicationSession.isOrphan()) {
+			boolean routeOrphanRequests = ((SipFactoryExt)sipContext.getSipFactoryFacade()).isRouteOrphanRequests();
+			if(logger.isDebugEnabled()) {
+				logger.debug("routeOrphanRequests = " + routeOrphanRequests + " for context " + sipContext.getApplicationName() + " appSession=" + sipApplicationSession);
+			}
+			if(!routeOrphanRequests) {
+				if(poppedRouteHeader != null) {
+					throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "Cannot find the corresponding sip application session to this subsequent request " + request +
+							" with the following popped route header " + sipServletRequest.getPoppedRoute() + ", it may already have been invalidated or timed out");
 				} else {
-					sipServletRequest.setOrphan(true);
-					sipServletRequest.setCurrentApplicationName(sipContext.getApplicationName());
-					try {
-						MessageDispatcher.callServletForOrphanRequest(sipContext, sipServletRequest);
-						try {
-							String branch = ((ViaHeader)sipServletRequest.getMessage().getHeader(ViaHeader.NAME)).getBranch();
-							sipServletRequest.getMessage().addHeader(JainSipUtils.createViaHeader(sipApplicationDispatcher.getSipNetworkInterfaceManager(), request, 
-									JainSipUtils.createBranch("orphan", 
-											sipApplicationDispatcher.getHashFromApplicationName(applicationName),
-											Integer.toString(branch.hashCode()) + branch.substring(branch.length()/2)), 
-											null) 
-									);
-							sipProvider.sendRequest((Request) sipServletRequest.getMessage());
-						} catch (SipException e) {
-							logger.error("Error routing orphaned request" ,e);
-						}
-						return;
-					} catch (ServletException e) {
-						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
-					} catch (IOException e) {				
-						throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
-					} 						
+					throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "Cannot find the corresponding sip application session to this subsequent request " + request +
+							", it may already have been invalidated or timed out");					
 				}
+			} else {
+				sipServletRequest.setOrphan(true);
+				sipServletRequest.setCurrentApplicationName(sipContext.getApplicationName());
+				try {
+					MessageDispatcher.callServletForOrphanRequest(sipContext, sipServletRequest);
+					try {
+						String transport = JainSipUtils.findTransport(request);
+						SipConnector connector = StaticServiceHolder.sipStandardService.findSipConnector(transport);
+
+						String branch = ((ViaHeader)sipServletRequest.getMessage().getHeader(ViaHeader.NAME)).getBranch();
+						ViaHeader via = JainSipUtils.createViaHeader(sipApplicationDispatcher.getSipNetworkInterfaceManager(), request, 
+								JainSipUtils.createBranch("orphan", 
+										sipApplicationDispatcher.getHashFromApplicationName(applicationName),
+										Integer.toString(branch.hashCode()) + branch.substring(branch.length()/2)), 
+										null) ;
+						if(connector.isUseStaticAddress()) {
+							try {
+								via.setHost(connector.getStaticServerAddress());
+								via.setPort(connector.getStaticServerPort());
+							} catch (Exception e) {
+								throw new RuntimeException(e);
+							}
+
+						}
+						sipServletRequest.getMessage().addHeader(via);
+
+						sipProvider.sendRequest((Request) sipServletRequest.getMessage());
+					} catch (SipException e) {
+						logger.error("Error routing orphaned request" ,e);
+					}
+					return;
+				} catch (ServletException e) {
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
+				} catch (IOException e) {				
+					throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "An unexpected servlet exception occured while processing the following subsequent request " + request, e);
+				} 						
 			}
 		}
-		
+
 		if(StaticServiceHolder.sipStandardService.isHttpFollowsSip()) {
 			String jvmRoute = StaticServiceHolder.sipStandardService.getJvmRoute();
 			if(jvmRoute == null) {
@@ -346,7 +362,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		// if a concurrency control mode is used
 		
 		// BEGIN validation delegated to the applicationas per JSIP patch for http://code.google.com/p/mobicents/issues/detail?id=766
-		if(sipSession.getProxy() == null) {
+		boolean orphan = sipSession.isOrphan() || sipApplicationSession.isOrphan();
+		sipServletRequest.setOrphan(orphan);
+		if(sipSession.getProxy() == null && !orphan) {
 			boolean isValid = sipSession.validateCSeq(sipServletRequest);
 			if(!isValid) {
 				// Issue 1714 release the lock if we don't call the app

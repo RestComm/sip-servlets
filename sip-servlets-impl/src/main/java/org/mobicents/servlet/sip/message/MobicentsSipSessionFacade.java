@@ -510,6 +510,14 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public void release() {
 		sipSession.release();
 	}
+	protected boolean orphan = false;
 
+	public boolean isOrphan() {
+		return sipSession.isOrphan();
+	}
+
+	public void setOrphan(boolean orphan) {
+		sipSession.setOrphan(orphan);
+	}
 
 }

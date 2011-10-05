@@ -849,13 +849,4 @@ public abstract class SipServletResponseImpl extends SipServletMessageImpl imple
 	public boolean isRetransmission() {		
 		return isRetransmission;
 	}
-
-	public boolean isOrphan() {
-		return this.orphanRequest;
-	}
-
-	public void setOrphan(boolean orphan) {
-		this.orphanRequest = orphan;
-		
-	}
 }

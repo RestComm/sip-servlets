@@ -196,6 +196,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 			String strippedBranchId = branch.substring(BRANCH_MAGIC_COOKIE.length());
 			int indexOfUnderscore = strippedBranchId.indexOf("_");
 			if(indexOfUnderscore == -1) {
+				if(sipServletResponse.getStatus() == Response.TRYING) return;
 				throw new DispatcherException("the via header branch " + branch + " for the response is wrong the response does not reuse the one from the original request");
 			}
 			final String appId = strippedBranchId.substring(0, indexOfUnderscore);
@@ -266,6 +267,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 						if(stx != null) {
 							SipServletRequestImpl request = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(stx.getRequest(), null, null, null, false);
 							SipServletResponseImpl orphanResponse = (SipServletResponseImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletResponse(response, null, null, dialog, true, false);
+							request.setOrphan(true);
 							orphanResponse.setOriginalRequest(request);
 							callServletForOrphanResponse(sipContext, orphanResponse);
 							stx.sendMessage((SIPMessage) response);
@@ -283,7 +285,9 @@ public class ResponseDispatcher extends MessageDispatcher {
 								ContentTypeHeader cth = sipFactoryImpl.getHeaderFactory().createContentTypeHeader("orphan", "orphan");
 								try {
 									Request r = sipFactoryImpl.getMessageFactory().createRequest(uri, cseq.getMethod(), callid, cseq, fromHeader, toHeader, vialist, mf, cth, new byte[]{});
-									sipServletResponse.setOriginalRequest((SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(r, null, null, dialog, false));
+									SipServletRequestImpl req = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(r, null, null, dialog, false);
+									req.setOrphan(true);
+									sipServletResponse.setOriginalRequest(req);
 									callServletForOrphanResponse(sipContext, sipServletResponse);
 									sipProvider.sendResponse(response);
 								} catch (Exception e) {

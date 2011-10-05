@@ -581,7 +581,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	 * {@inheritDoc}
 	 */
 	public boolean isInitial() {
-		return isInitial; 
+		return isInitial && !isOrphan(); 
 	}
 	
 	/*
@@ -2382,19 +2382,14 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		return sipServletRequestImpl;
 	}
 	
-		/**
-	 * @param orphanRequest the orphanRequest to set
-	 */
-	public void setOrphan(boolean orphanRequest) {
-		this.orphanRequest = orphanRequest;
+	private String appSid;
+
+	public String getAppSessionId() {
+		return appSid;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.mobicents.javax.servlet.sip.SipServletRequestExt#isOrphan()
-	 */
-	public boolean isOrphan() {
-		return orphanRequest;
-	}		
+	public void setAppSessionId(String appSid) {
+		this.appSid = appSid;
+	}
 
 }
