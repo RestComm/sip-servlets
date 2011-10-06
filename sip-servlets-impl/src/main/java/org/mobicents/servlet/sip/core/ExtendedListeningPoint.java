@@ -22,6 +22,8 @@
 
 package org.mobicents.servlet.sip.core;
 
+import gov.nist.javax.sip.ListeningPointExt;
+
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -52,7 +54,7 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 	private static final Logger logger = Logger.getLogger(ExtendedListeningPoint.class);		
 	
 	// the listening point this class is extending
-	private ListeningPoint listeningPoint;
+	private ListeningPointExt listeningPoint;
 	// the sip provider attached to 
 	private SipProvider sipProvider;
 	private SipConnector sipConnector;
@@ -70,7 +72,7 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 	/**
 	 * 
 	 */
-	public ExtendedListeningPoint(SipProvider sipProvider, ListeningPoint listeningPoint, SipConnector sipConnector) {
+	public ExtendedListeningPoint(SipProvider sipProvider, ListeningPointExt listeningPoint, SipConnector sipConnector) {
 		this.sipProvider = sipProvider;		
 		this.listeningPoint = listeningPoint;
 		this.sipConnector = sipConnector;
@@ -199,7 +201,7 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 	 * Retrieve the jain sip listening point being extended by this class
 	 * @return the jain sip listening point being extended by this class
 	 */
-	public ListeningPoint getListeningPoint() {
+	public ListeningPointExt getListeningPoint() {
 		return listeningPoint;
 	}
 	

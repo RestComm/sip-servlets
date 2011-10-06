@@ -25,6 +25,7 @@ package org.mobicents.servlet.sip.core;
 import gov.nist.javax.sip.ClientTransactionExt;
 import gov.nist.javax.sip.DialogTimeoutEvent;
 import gov.nist.javax.sip.DialogTimeoutEvent.Reason;
+import gov.nist.javax.sip.IOExceptionEventExt;
 import gov.nist.javax.sip.ResponseEventExt;
 import gov.nist.javax.sip.SipStackImpl;
 import gov.nist.javax.sip.TransactionExt;
@@ -99,6 +100,7 @@ import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingListener;
 import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
+import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
@@ -113,6 +115,7 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
@@ -121,7 +124,6 @@ import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.router.ManageableApplicationRouter;
-import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
  * Implementation of the SipApplicationDispatcher interface.
@@ -171,7 +173,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	
 	//the logger
 	private static final Logger logger = Logger.getLogger(SipApplicationDispatcherImpl.class);
-		
+	
+	// ref back to the sip service
+	private SipService sipService = null;
 	//the sip factory implementation
 	private SipFactoryImpl sipFactoryImpl = null;
 	//the sip application router responsible for the routing logic of sip messages to
@@ -190,7 +194,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	private Lock statusLock = new ReentrantLock();
 
 	protected SipStack sipStack;
-	private SipNetworkInterfaceManagerImpl sipNetworkInterfaceManager;
+	private SipNetworkInterfaceManager sipNetworkInterfaceManager;
 	private DNSServerLocator dnsServerLocator;
 	
 	// stats
@@ -323,8 +327,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		congestionControlThreadPool = new ScheduledThreadPoolExecutor(2,
 				new ThreadPoolExecutor.CallerRunsPolicy());
 		congestionControlThreadPool.prestartAllCoreThreads();	
-		logger.info("AsynchronousThreadPoolExecutor size is " + StaticServiceHolder.sipStandardService.getDispatcherThreadPoolSize());		
-		asynchronousExecutor = new ThreadPoolExecutor(StaticServiceHolder.sipStandardService.getDispatcherThreadPoolSize(), 64, 90, TimeUnit.SECONDS,
+		logger.info("AsynchronousThreadPoolExecutor size is " + sipService.getDispatcherThreadPoolSize());		
+		asynchronousExecutor = new ThreadPoolExecutor(sipService.getDispatcherThreadPoolSize(), 64, 90, TimeUnit.SECONDS,
 				new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
 		            private int threadCount = 0;
 		
@@ -516,7 +520,36 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	 * @see javax.sip.SipListener#processIOException(javax.sip.IOExceptionEvent)
 	 */
 	public void processIOException(IOExceptionEvent event) {
-		
+		if(event instanceof IOExceptionEventExt  && ((IOExceptionEventExt)event).getReason() == gov.nist.javax.sip.IOExceptionEventExt.Reason.KeepAliveTimeout) {
+			IOExceptionEventExt keepAliveTimeout = ((IOExceptionEventExt)event);
+			
+			SipConnector connector = findSipConnector(
+	                keepAliveTimeout.getLocalHost(),
+	                keepAliveTimeout.getLocalPort(),
+	                keepAliveTimeout.getTransport());								
+			
+			if(connector != null) {
+		        for (SipContext sipContext : applicationDeployed.values()) {
+		        	final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();	
+		        	final ClassLoader cl = sipContext.getSipContextClassLoader();
+					Thread.currentThread().setContextClassLoader(cl);
+					try {	
+			            for (SipConnectorListener connectorListener : sipContext.getListeners().getSipConnectorListeners()) {
+			            	try {	
+				                connectorListener.onKeepAliveTimeout(connector,
+				                        keepAliveTimeout.getPeerHost(),
+				                        keepAliveTimeout.getPeerPort());
+			            	} catch (Throwable t) {
+								logger.error("SipErrorListener threw exception", t);
+							}
+			            }
+					} finally {				
+						Thread.currentThread().setContextClassLoader(oldClassLoader);
+					}
+		        }
+//		        return;
+			}
+		}
 		if(dnsServerLocator != null && event.getSource() instanceof ClientTransaction) {			
 			ClientTransaction ioExceptionTx = (ClientTransaction) event.getSource();
 			if(ioExceptionTx.getApplicationData() != null) {
@@ -1048,6 +1081,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			dialog.setApplicationData(null);
 		}
 	}
+	public SipConnector findSipConnector(String ipAddress, int port, String transport){
+        MobicentsExtendedListeningPoint extendedListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(ipAddress, port, transport);
+        if(extendedListeningPoint != null) {
+        	return extendedListeningPoint.getSipConnector();
+        }
+        return null;
+    }
 	
 	/*
 	 * (non-Javadoc)
@@ -1060,7 +1100,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		} else {
 			eventTransaction = timeoutEvent.getClientTransaction();
 		}
-		final Transaction transaction = eventTransaction;		
+		final Transaction transaction = eventTransaction;
 		if(logger.isDebugEnabled()) {
 			logger.debug("transaction " + transaction + " timed out => " + transaction.getRequest().toString());
 		}
@@ -2160,5 +2200,15 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 
 	public String getVersion() {
 		return Version.getVersion();
+	}
+
+	@Override
+	public SipService getSipService() {
+		return sipService;
+	}
+
+	@Override
+	public void setSipService(SipService sipService) {
+		this.sipService = sipService;
 	}
 }

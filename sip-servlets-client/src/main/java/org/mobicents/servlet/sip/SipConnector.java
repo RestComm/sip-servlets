@@ -186,8 +186,8 @@ public class SipConnector implements Serializable {
 		this.useStaticAddress = useStaticAddress;
 	}
 	
-	/*
-	 * Cleans up all cached TCP sockets in case they are stalled. You should not call this method on
+	/**
+	 * Cleans up all cached TCP/TLS/SCTP sockets in case they are stalled. You should not call this method on
 	 * UDP connector, it has no effect.
 	 * 
 	 * After closing the sockets when needed new sockets will be created for the same dialog or
@@ -198,12 +198,12 @@ public class SipConnector implements Serializable {
 			logger.warn("Cannot close TCP sockets on UDP connector");
 			return;
 		}
-		MBeanServer mbeanServer = (MBeanServer) MBeanServerFactory.findMBeanServer(null).iterator().next();
+		MBeanServer mbeanServer = getMBeanServer();
 		try {
 			if(logger.isDebugEnabled()) {
 				logger.debug("MBean Server = " + mbeanServer);
 			}
-			Set<ObjectName> queryNames = mbeanServer.queryNames(new ObjectName("jboss.web:type=GlobalRequestProcessor,*"), null);
+			Set<ObjectName> queryNames = mbeanServer.queryNames(new ObjectName("*:type=GlobalRequestProcessor,*"), null);
 			for(ObjectName objectName : queryNames) {
 				if(objectName.getCanonicalName().toLowerCase().contains("sip-tcp") ||
 						objectName.getCanonicalName().toLowerCase().contains("sip-tls")) {
@@ -218,6 +218,78 @@ public class SipConnector implements Serializable {
 			logger.error("Error closing the TCP sockets", e);
 		}
 	}
+
+	private MBeanServer getMBeanServer() {
+		return (MBeanServer) MBeanServerFactory.findMBeanServer(null).iterator().next();
+	}
+	
+	/**
+     * Send a heartbeat to the specified Ip address and port
+     * via this listening point. This method can be used to send out a period
+     * Double CR-LF for NAT keepalive as defined in RFC5626
+     *
+     * @since 1.7
+     * 
+     * @param ipAddress
+     * @param port
+     */
+    public void sendHeartBeat(String ipAddress, int port) throws Exception {
+    	MBeanServer mbeanServer = getMBeanServer();
+			
+		Set<ObjectName> queryNames = mbeanServer.queryNames(new ObjectName("*:type=Service,*"), null);
+		for(ObjectName objectName : queryNames) {								
+			mbeanServer.invoke(objectName, "sendHeartBeat", new Object[]{this.ipAddress, this.port, this.transport, ipAddress, port}, new String[] {String.class.getName() , "int", String.class.getName(), String.class.getName() , "int"});
+		} 
+			   
+    }
+    
+    /**
+     * Allow to reset the RFC5626 Section 4.4.1 keeplive on  a given TCP/TLS/SCTP connection
+     * @since 1.7
+     * 
+     * @param ipAddress
+     * @param port
+     * @param timeout
+     * @return
+     * @throws Exception
+     */
+    public boolean setKeepAliveTimeout(String ipAddress, int port, long timeout) throws Exception {
+    	MBeanServer mbeanServer = getMBeanServer();
+		
+		Set<ObjectName> queryNames = mbeanServer.queryNames(new ObjectName("*:type=Service,*"), null);
+		boolean changed = false; 
+		for(ObjectName objectName : queryNames) {								
+			changed = (Boolean) mbeanServer.invoke(objectName, "setKeepAliveTimeout", new Object[]{this, ipAddress, port, timeout}, new String[] {SipConnector.class.getName() , String.class.getName(), "int" , "long"});
+			if(changed) {
+				return changed;
+			}
+		}		
+		return false;
+    }
+
+    /**
+     * Allow to close a given TCP/TLS/SCTP connection
+     * @since 1.7
+     * 
+     * @param ipAddress
+     * @param port
+     * @return
+     * @throws Exception
+     */
+    public boolean closeReliableConnection(String ipAddress, int port) throws Exception {
+    	MBeanServer mbeanServer = getMBeanServer();
+		
+		Set<ObjectName> queryNames = mbeanServer.queryNames(new ObjectName("*:type=Service,*"), null);
+		boolean changed = false; 
+		for(ObjectName objectName : queryNames) {								
+			changed = (Boolean) mbeanServer.invoke(objectName, "closeReliableConnection", new Object[]{this, ipAddress, port}, new String[] {SipConnector.class.getName() , String.class.getName(), "int"});
+			if(changed) {
+				return changed;
+			}
+		}
+		return false;
+    }
+
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()

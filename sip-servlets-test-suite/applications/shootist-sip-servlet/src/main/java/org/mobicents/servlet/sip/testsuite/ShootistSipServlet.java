@@ -54,14 +54,17 @@ import javax.sip.ListeningPoint;
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.SipSessionExt;
 import org.mobicents.javax.servlet.sip.dns.DNSResolver;
+import org.mobicents.servlet.sip.SipConnector;
+import org.mobicents.servlet.sip.listener.SipConnectorListener;
 
 public class ShootistSipServlet 
 		extends SipServlet 
-		implements SipServletListener,TimerListener, SipSessionListener, SipApplicationSessionListener {
+		implements SipServletListener,TimerListener, SipSessionListener, SipApplicationSessionListener, SipConnectorListener {
 	private static final long serialVersionUID = 1L;
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 	private static final String ENCODE_URI = "encodedURI";
 	private static final String TEST_ERROR_RESPONSE = "testErrorResponse";
+	private static final String NO_BYE = "noBye";
 	private static transient Logger logger = Logger.getLogger(ShootistSipServlet.class);
 	
 	public static AtomicBoolean isAlreadyAccessed = new AtomicBoolean(false);
@@ -73,6 +76,8 @@ public class ShootistSipServlet
 	TimerService timerService;
 	@Resource
 	SipFactory sipFactory;
+	
+	ServletTimer keepAlivetimer;
 	
 	/** Creates a new instance of ShootistSipServlet */
 	public ShootistSipServlet() {
@@ -144,7 +149,7 @@ public class ShootistSipServlet
 					SipServletRequest request=sipServletResponse.getSession().createRequest("INVITE");				
 					request.send();
 				}  else {
-					if(sipServletResponse.getApplicationSession().getAttribute(ENCODE_URI) == null) {
+					if(sipServletResponse.getApplicationSession().getAttribute(ENCODE_URI) == null && getServletContext().getInitParameter(NO_BYE) == null) {
 						String timeToWaitForBye = getServletContext().getInitParameter("timeToWaitForBye");
 						int delay = 2000;
 						if(timeToWaitForBye != null) {
@@ -153,6 +158,21 @@ public class ShootistSipServlet
 						SipServletRequest sipServletRequest = sipServletResponse.getSession().createRequest("BYE");
 						ServletTimer timer = timerService.createTimer(sipServletResponse.getApplicationSession(), delay, false, (Serializable)sipServletRequest);
 						sipServletResponse.getApplicationSession().setAttribute("timer", timer);
+					}
+				}
+			}
+			if(getServletContext().getInitParameter("closeReliableChannel")!= null) {
+				timerService.createTimer(sipFactory.createApplicationSession(), Long.valueOf(getServletContext().getInitParameter("timeout")), false, "" + sipServletResponse.getInitialRemotePort());
+			}
+			if(getServletContext().getInitParameter("testKeepAlive") != null) {
+				SipConnector[] sipConnectors = (SipConnector[]) getServletContext().getAttribute("org.mobicents.servlet.sip.SIP_CONNECTORS");
+				for (SipConnector sipConnector : sipConnectors) {
+					if(sipConnector.getIpAddress().equals(sipServletResponse.getLocalAddr()) && sipConnector.getPort() == sipServletResponse.getLocalPort() && sipConnector.getTransport().equals(sipServletResponse.getTransport())) {
+						sipServletResponse.getApplicationSession().setAttribute("keepAliveAddress", sipServletResponse.getInitialRemoteAddr());
+						sipServletResponse.getApplicationSession().setAttribute("keepAlivePort", sipServletResponse.getInitialRemotePort());
+						sipServletResponse.getApplicationSession().setAttribute("keepAlivetoSend", Integer.valueOf(getServletContext().getInitParameter("testKeepAlive")));
+						keepAlivetimer = timerService.createTimer(sipServletResponse.getApplicationSession(), 0, 2000, false, false, sipConnector);
+						return;
 					}
 				}
 			}
@@ -479,20 +499,59 @@ public class ShootistSipServlet
 
 	public void timeout(ServletTimer timer) {
 		try {
+			Serializable info = timer.getInfo();
+			if (info instanceof String) {
+				String port = (String)info;
+				SipConnector[] sipConnectors = (SipConnector[]) getServletContext().getAttribute("org.mobicents.servlet.sip.SIP_CONNECTORS");
+				for (SipConnector sipConnector : sipConnectors) {
+					if(sipConnector.getIpAddress().equals(System.getProperty("org.mobicents.testsuite.testhostaddr")) && sipConnector.getTransport().equalsIgnoreCase("TCP")) {
+						try {							
+							boolean changed = sipConnector.closeReliableConnection(System.getProperty("org.mobicents.testsuite.testhostaddr"), Integer.valueOf(port));							
+							logger.info("SipConnector reliable connection killed changed " + System.getProperty("org.mobicents.testsuite.testhostaddr") +":"+ Integer.valueOf(port)+ " changed " + changed);
+							if(changed) {
+								keepAlivetimer.cancel();
+							}							
+						} catch (Exception e) {
+							e.printStackTrace();
+						}					
+					}
+				}
+				return;
+			}
 			access();
 			ClassLoader cl = Thread.currentThread().getContextClassLoader();
 			if(!cl.getClass().getSimpleName().equals("WebappClassLoader")) {
 				logger.error("ClassLoader " + cl);
 				throw new IllegalArgumentException("Bad Context Classloader : " + cl);
-			}
-			SipServletRequest sipServletRequest = (SipServletRequest) timer.getInfo();
-			sipServletRequest.getApplicationSession().setAttribute("timeSent", Long.valueOf(System.currentTimeMillis()));
-			try {
-				sipServletRequest.send();
-			} catch (IOException e) {
-				logger.error("Unexpected exception while sending the BYE request",e);
-			}
-			timer.cancel();
+			}			
+			if(info instanceof SipConnector) {
+				String remoteAddress = (String) timer.getApplicationSession().getAttribute("keepAliveAddress");
+				int remotePort = (Integer) timer.getApplicationSession().getAttribute("keepAlivePort");
+				int keepAlivetoSend = (Integer) timer.getApplicationSession().getAttribute("keepAlivetoSend");
+				Integer keepAliveSent = (Integer) timer.getApplicationSession().getAttribute("keepAliveSent");
+				if(keepAliveSent == null) {
+					keepAliveSent = 0;
+				}
+				logger.info("keepalive sent " + keepAliveSent + " ,keepAliveToSend " + keepAlivetoSend);
+				if(keepAliveSent < keepAlivetoSend) {
+					try {
+						((SipConnector)info).sendHeartBeat(remoteAddress, remotePort);
+					} catch (Exception e) {
+						logger.error("problem sending heartbeat to " + remoteAddress+":"+ remotePort);
+						timer.cancel();
+					}
+					timer.getApplicationSession().setAttribute("keepAliveSent", new Integer(keepAliveSent.intValue() +1));
+				}
+			} else {
+				SipServletRequest sipServletRequest = (SipServletRequest) timer.getInfo();
+				sipServletRequest.getApplicationSession().setAttribute("timeSent", Long.valueOf(System.currentTimeMillis()));
+				try {
+					sipServletRequest.send();
+				} catch (IOException e) {
+					logger.error("Unexpected exception while sending the BYE request",e);
+				}
+				timer.cancel();
+			}			
 		} finally {
 			release();
 		}
@@ -605,5 +664,24 @@ public class ShootistSipServlet
 		} catch (IOException e) {
 			logger.error("Exception occured while sending the request",e);			
 		}
+	}
+	
+
+	@Override
+	public void sipConnectorAdded(SipConnector connector) {
+		
+	}
+
+	@Override
+	public void sipConnectorRemoved(SipConnector connector) {
+		
+	}
+
+	@Override
+	public void onKeepAliveTimeout(SipConnector connector, String peerAddress,
+			int peerPort) {
+		logger.error("SipConnector " + connector + " remotePeer " + peerAddress +":"+ peerPort);
+		keepAlivetimer.cancel();
+		sendMessage(sipFactory.createApplicationSession(), sipFactory, "shootist onKeepAliveTimeout", "tcp");		
 	}
 }

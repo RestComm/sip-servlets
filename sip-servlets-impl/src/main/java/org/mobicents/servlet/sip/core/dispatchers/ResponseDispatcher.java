@@ -626,19 +626,27 @@ public class ResponseDispatcher extends MessageDispatcher {
 			}
 		} else {
 			// if the message comes from an internal source we add the initial remote info from the previously added headers
-			transactionApplicationData.setInitialRemoteHostAddress(sipServletMessage.getHeader(JainSipUtils.INITIAL_REMOTE_ADDR_HEADER_NAME));
+			String remoteAddressHeader = sipServletMessage.getHeader(JainSipUtils.INITIAL_REMOTE_ADDR_HEADER_NAME);
 			String remotePortHeader = sipServletMessage.getHeader(JainSipUtils.INITIAL_REMOTE_PORT_HEADER_NAME);
+			String remoteTransportHeader = sipServletMessage.getHeader(JainSipUtils.INITIAL_REMOTE_TRANSPORT_HEADER_NAME);					
 			int intRemotePort = -1;
 			if(remotePortHeader != null) {
 				intRemotePort = Integer.parseInt(remotePortHeader);
 			}
-			transactionApplicationData.setInitialRemotePort(intRemotePort);
-			transactionApplicationData.setInitialRemoteTransport(sipServletMessage.getHeader(JainSipUtils.INITIAL_REMOTE_TRANSPORT_HEADER_NAME));
-			if(nextViaHeader == null || sipApplicationDispatcher.isViaHeaderExternal(nextViaHeader)) {
-				sipServletMessage.removeHeaderInternal(JainSipUtils.INITIAL_REMOTE_ADDR_HEADER_NAME, true); 
-				sipServletMessage.removeHeaderInternal(JainSipUtils.INITIAL_REMOTE_PORT_HEADER_NAME, true);
-				sipServletMessage.removeHeaderInternal(JainSipUtils.INITIAL_REMOTE_TRANSPORT_HEADER_NAME, true);
-			}			
-		}
+			if(remoteAddressHeader == null && remoteTransportHeader == null && remotePortHeader == null) {
+				transactionApplicationData.setInitialRemoteHostAddress(initialRemoteAddr);
+				transactionApplicationData.setInitialRemotePort(initialRemotePort);
+				transactionApplicationData.setInitialRemoteTransport(initialRemoteTransport);
+			} else {
+				transactionApplicationData.setInitialRemoteHostAddress(remoteAddressHeader);
+				transactionApplicationData.setInitialRemotePort(intRemotePort);
+				transactionApplicationData.setInitialRemoteTransport(remoteTransportHeader);
+				if(nextViaHeader == null || sipApplicationDispatcher.isViaHeaderExternal(nextViaHeader)) {
+					sipServletMessage.removeHeaderInternal(JainSipUtils.INITIAL_REMOTE_ADDR_HEADER_NAME, true); 
+					sipServletMessage.removeHeaderInternal(JainSipUtils.INITIAL_REMOTE_PORT_HEADER_NAME, true);
+					sipServletMessage.removeHeaderInternal(JainSipUtils.INITIAL_REMOTE_TRANSPORT_HEADER_NAME, true);
+				}			
+			}
+		}	
 	}
 }

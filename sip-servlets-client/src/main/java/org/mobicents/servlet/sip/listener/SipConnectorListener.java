@@ -44,4 +44,12 @@ public interface SipConnectorListener extends EventListener {
 	 * @param connector the connector that has just been removed
 	 */
 	void sipConnectorRemoved(SipConnector connector);
+	/**
+	 * if a RFC 5626 KeepAlive timeout has fired which gives the connector on which it happened
+	 * and the peer information involved.
+	 * @param connector the connector on which the timeout happened
+	 * @param peerAddress the peer address which didn't send the needed RFC5626 keepalive
+	 * @param peerPort the peer port which didn't send the needed RFC5626 keepalive
+	 */
+    void onKeepAliveTimeout(SipConnector connector, String peerAddress, int peerPort);
 }

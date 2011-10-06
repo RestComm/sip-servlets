@@ -22,9 +22,10 @@
 
 package org.mobicents.servlet.sip.core;
 
+import gov.nist.javax.sip.ListeningPointExt;
+
 import java.util.List;
 
-import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.ContactHeader;
@@ -49,7 +50,7 @@ public interface MobicentsExtendedListeningPoint {
 	 * Get the JAIN SIP listening point associated with this listening point
 	 * @return the JAIN SIP listening point associated with this listening point
 	 */
-	ListeningPoint getListeningPoint();
+	ListeningPointExt getListeningPoint();
 	/**
 	 * true if a static address should be used
 	 * @return

@@ -22,6 +22,8 @@
 
 package org.mobicents.servlet.sip.catalina;
 
+import gov.nist.javax.sip.ListeningPointExt;
+
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
@@ -261,7 +263,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 				//TODO add it as a listener for global ip address changes if STUN rediscover a new addess at some point
 			}
 			
-			ListeningPoint listeningPoint = sipStack.createListeningPoint(ipAddress,
+			ListeningPointExt listeningPoint = (ListeningPointExt) sipStack.createListeningPoint(ipAddress,
 					port, signalingTransport);
 			if(useStun) {
 				// TODO: (ISSUE-CONFUSION) Check what is the confusion here, why not use the globalport. It ends up putting the local port everywhere

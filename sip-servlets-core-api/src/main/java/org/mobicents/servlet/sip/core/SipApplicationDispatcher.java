@@ -222,4 +222,7 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 	public void updateApplicationRouterConfiguration(Serializable configuration);
 	
 	public String[] findInstalledSipApplications();
+	
+	public SipService getSipService();
+	public void setSipService(SipService sipService);
 }

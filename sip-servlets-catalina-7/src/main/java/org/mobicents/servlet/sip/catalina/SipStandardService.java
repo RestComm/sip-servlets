@@ -26,6 +26,7 @@ package org.mobicents.servlet.sip.catalina;
 import gov.nist.core.net.AddressResolver;
 import gov.nist.javax.sip.SipStackExt;
 import gov.nist.javax.sip.message.MessageFactoryExt;
+import gov.nist.javax.sip.stack.SIPTransactionStack;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -245,6 +246,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 		if(logger.isInfoEnabled()) {
 			logger.info("Sip Stack path name : " + sipPathName);
 		}
+		sipApplicationDispatcher.setSipService(this);
 		sipApplicationDispatcher.getSipFactory().initialize(sipPathName, usePrettyEncoding);
 		
 		String catalinaBase = getCatalinaBase();
@@ -1216,4 +1218,25 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 			String mobicentsSipServletMessageFactoryClassName) {
 		this.mobicentsSipServletMessageFactoryClassName = mobicentsSipServletMessageFactoryClassName;
 	}
+	
+	public void sendHeartBeat(String localAddress, int localPort, String transport, String remoteIpAddress, int remotePort) throws IOException {
+		MobicentsExtendedListeningPoint extendedListeningPoint = sipApplicationDispatcher.getSipNetworkInterfaceManager().findMatchingListeningPoint(localAddress, localPort, transport);
+		if(extendedListeningPoint != null) {
+			extendedListeningPoint.getListeningPoint().sendHeartbeat(remoteIpAddress, remotePort);
+		}		
+	}
+	
+    public boolean setKeepAliveTimeout(SipConnector sipConnector, String clientAddress, int clientPort, long timeout) {
+        SIPTransactionStack sipStack = ((SIPTransactionStack) sipApplicationDispatcher.getSipStack());
+
+        return sipStack.setKeepAliveTimeout(sipConnector.getIpAddress(), sipConnector.getPort(), sipConnector.getTransport(),
+                clientAddress, clientPort, timeout);
+    }
+
+    public void closeReliableConnection(SipConnector sipConnector, String clientAddress, int clientPort) {
+        SIPTransactionStack sipStack = ((SIPTransactionStack) sipApplicationDispatcher.getSipStack());
+
+        sipStack.closeReliableConnection(sipConnector.getIpAddress(),sipConnector.getPort(), sipConnector.getTransport(),
+                clientAddress, clientPort);
+    }
 }

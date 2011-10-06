@@ -51,13 +51,13 @@ import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipSession.State;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 import javax.servlet.sip.URI;
-import javax.servlet.sip.SipSession.State;
 import javax.sip.ListeningPoint;
 import javax.sip.header.AuthenticationInfoHeader;
 
@@ -572,6 +572,9 @@ public class SimpleSipServlet
 			sendMessage(req.getApplicationSession(), sipFactory, "ackReceived", null);
 			return;
 		}
+		if(getServletContext().getInitParameter("changeKeepAliveTimeout")!= null) {
+			timerService.createTimer(sipFactory.createApplicationSession(), Long.valueOf(getServletContext().getInitParameter("timeout")), false, "" + req.getInitialRemotePort());
+		}
 	}
 	
 	@Override
@@ -774,11 +777,25 @@ public class SimpleSipServlet
 					logger.error("Unexpected exception while sending the OK", e);
 				}
 			}
-		} else {
+		} else if(info instanceof SipSession){
 			try {
 				((SipSession)info).createRequest("BYE").send();
 			} catch (IOException e) {
 				e.printStackTrace();
+			}
+		} else if (info instanceof String) {
+			String port = (String)info;
+			SipConnector[] sipConnectors = (SipConnector[]) getServletContext().getAttribute("org.mobicents.servlet.sip.SIP_CONNECTORS");
+			for (SipConnector sipConnector : sipConnectors) {
+				if(sipConnector.getIpAddress().equals(System.getProperty("org.mobicents.testsuite.testhostaddr")) && sipConnector.getPort() == 5070 && sipConnector.getTransport().equalsIgnoreCase("TCP")) {
+					try {
+						boolean changed = sipConnector.setKeepAliveTimeout(System.getProperty("org.mobicents.testsuite.testhostaddr"), Integer.valueOf(port), Long.valueOf(getServletContext().getInitParameter("changeKeepAliveTimeout")));
+						logger.info("SipConnector timeoutvalue changed " + getServletContext().getInitParameter("changeKeepAliveTimeout") + " changed " + changed + "for " + System.getProperty("org.mobicents.testsuite.testhostaddr") +":"+ Integer.valueOf(port));
+						break;
+					} catch (Exception e) {
+						e.printStackTrace();
+					}					
+				}
 			}
 		}
 	}
@@ -965,5 +982,12 @@ public class SimpleSipServlet
 		if(byeDelayString != null) {
 			timeout= Integer.parseInt(byeDelayString);
 		}
+	}
+
+	@Override
+	public void onKeepAliveTimeout(SipConnector connector, String peerAddress,
+			int peerPort) {
+		logger.error("SipConnector " + connector + " remotePeer " + peerAddress +":"+ peerPort);
+		sendMessage(sipFactory.createApplicationSession(), sipFactory, "shootme onKeepAliveTimeout", "tcp");
 	}
 }

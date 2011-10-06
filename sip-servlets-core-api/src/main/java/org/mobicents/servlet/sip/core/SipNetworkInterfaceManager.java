@@ -85,6 +85,18 @@ public interface SipNetworkInterfaceManager {
 	 * @return true if the public ip address found by STUN Discovery for this message should be used
 	 */
 	boolean findUsePublicAddress(Message message);
+	/**
+	 * Retrieve the first matching listening Point corresponding to the 
+	 * ipAddress port and transport given in parameter.
+	 *
+	 * @param ipAddress the ip address
+	 * @param port the port
+	 * @param transport the transport
+	 * @return Retrieve the first matching listening point corresponding to the ipAddress port and transport.
+	 * If none has been found, null is returned.
+	 */
+	MobicentsExtendedListeningPoint findMatchingListeningPoint(String host,
+			int port, String transport);
 		
 
 }
