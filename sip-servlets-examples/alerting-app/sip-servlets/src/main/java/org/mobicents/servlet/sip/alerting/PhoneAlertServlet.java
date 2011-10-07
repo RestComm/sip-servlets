@@ -76,7 +76,10 @@ public class PhoneAlertServlet extends HttpServlet
 	        // Get the content of the request as the text to parse
 	        byte[] content = new byte[request.getContentLength()];
 	        request.getInputStream().read(content,0, request.getContentLength());        
-	        alertText = new String(content); 
+	        alertText = new String(content);
+	        // Fix from Rafael Soares http://groups.google.com/group/mobicents-public/browse_thread/thread/16015a2e2c034806
+	        // remove '\n' and ',' chars to avoid problems with TTS
+	        alertText = alertText.replace('\n', ' ').replace(',', ' ');
 	        if(logger.isInfoEnabled()) {
 	        	logger.info("Got an alert : \n alertID : " + alertId + " \n tel : " + tel + " \n text : " +alertText);
 	        }
