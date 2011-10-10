@@ -98,6 +98,8 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
     /** FQN of the SecurityContext Class */
     private String securityContextClassName;
     private String policyRegistrationName;
+    /** Added for  2908:	In HA mode distributable Web Apps set as Sip Apps */
+    private String sipManagerClass;
     	
 	/**
     * Unmarshall factory used for parsing shared web.xml.
@@ -181,7 +183,7 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 				.setServiceClassLoader((getServiceClassLoader() == null) ? getClass()
 						.getClassLoader()
 						: getServiceClassLoader());
-		config.setManagerClass(this.managerClass);
+//		config.setManagerClass(this.managerClass);
 		config.setJava2ClassLoadingCompliance(this.java2ClassLoadingCompliance);
 		config.setUnpackWars(this.unpackWars);
 		config.setLenientEjbLink(this.lenientEjbLink);
@@ -193,9 +195,11 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 		if(isSipServletApplication(unit, metaData)) { 
 			className = (getDeploymentClass() == null) ? "org.jboss.web.tomcat.service.deployers.TomcatConvergedDeployment"
 					: getDeploymentClass();
-			config.setContextClassName(SIP_CONTEXT_CLASS);					
+			config.setContextClassName(SIP_CONTEXT_CLASS);	
+			config.setManagerClass(this.sipManagerClass);
 		}else {			
 			config.setContextClassName(contextClassName);
+			config.setManagerClass(this.managerClass);
 		}
 		AbstractWarDeployment convergedDeployment = (AbstractWarDeployment) (getClass()
 				.getClassLoader().loadClass(className)).newInstance();
@@ -433,5 +437,19 @@ public class TomcatConvergedDeployer extends org.jboss.web.tomcat.service.deploy
 					SimpleValueSupport.wrap(convergedMeta.getApplicationName()));
 			managedObjects.put("SipApplicationNameMO", sipAppNameMo);
 		}
+	}
+
+	/**
+	 * @param sipManagerClass the sipManagerClass to set
+	 */
+	public void setSipManagerClass(String sipManagerClass) {
+		this.sipManagerClass = sipManagerClass;
+	}
+
+	/**
+	 * @return the sipManagerClass
+	 */
+	public String getSipManagerClass() {
+		return sipManagerClass;
 	}
 }

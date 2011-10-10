@@ -224,7 +224,12 @@ $Id: war-deployers-jboss-beans.xml 85945 2009-03-16 19:45:12Z dimitris@jboss.org
           Class of the session manager (used if context is marked as 'distributable'. Currently allowed values:
           - org.jboss.web.tomcat.service.session.JBossCacheManager
       -->
-      <property name="managerClass">org.jboss.web.tomcat.service.session.JBossCacheSipManager</property>
+      <property name="managerClass">org.jboss.web.tomcat.service.session.JBossCacheManager</property>
+      <!--
+          Class of the session manager (used if context is marked as 'distributable' and being a sip application. Currently allowed values:
+          - org.jboss.web.tomcat.service.session.JBossCacheSipManager
+      -->
+      <property name="sipManagerClass">org.jboss.web.tomcat.service.session.JBossCacheSipManager</property>
 
       <!-- The name of the request property under with the authenticated JAAS
       Subject is stored on successful authentication. If null or empty then
