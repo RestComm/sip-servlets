@@ -243,13 +243,14 @@
     </section>
     <section>
       <title>Other Approaches</title>
-<!--Issue #838 Editor comment - After reading this section, I got the impression that STUN, TURN, and ICE are not recommended solutions.  
-
-So if these are not the right methods, what should a user be configuring?  
-
-Can you link to other sections in the guide that can show the reader what they should be considering?-->      <para>Other approaches include using proxy and media that can act as
+	<para>While the above is a good solution to circumvent NAT issues. There might be cases where it is not possible to use those solutions at all.</para>
+	<para>Other approaches include using proxy and media that can act as
       gateways, Session Border Controllers, enhanced Firewall with Application
-      Layer Gateway (ALG) and Tunnelling.<!--Issue #838 Editor Comment - is there more information available on some websites that the reader can refer to?--></para>
+      Layer Gateway (ALG) and Tunnelling.</para>
+    <para>
+    	Here is more information on <ulink url="http://groups.google.com/group/mobicents-public/browse_thread/thread/5f1d6cbda9e8c302">Session Border Controllers</ulink> and how they can resolve NAT issues when above solutions 
+    	are not possible
+    </para>
     </section>
   </section>
 </chapter>
