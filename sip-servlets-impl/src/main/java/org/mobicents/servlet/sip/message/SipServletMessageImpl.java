@@ -572,7 +572,10 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 					applicationName, 
 					sessionKey.getApplicationSessionId());
 			MobicentsSipApplicationSession applicationSession =  sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, create);
-			applicationSession.setOrphan(isOrphan());
+			if(applicationSession != null) {
+				// application session can be null if create is false and it is an orphan request
+				applicationSession.setOrphan(isOrphan());
+			}			
 			return applicationSession;
 		}
 		return null;
