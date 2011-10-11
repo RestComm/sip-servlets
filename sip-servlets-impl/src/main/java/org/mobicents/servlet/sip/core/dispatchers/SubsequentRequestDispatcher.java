@@ -121,8 +121,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			final String applicationNameHashed = poppedAddress.getParameter(RR_PARAM_APPLICATION_NAME);
 			if(applicationNameHashed != null && applicationNameHashed.length() > 0) {				
 				applicationName = sipApplicationDispatcher.getApplicationNameFromHash(applicationNameHashed);
-				applicationId = poppedAddress.getParameter(APP_ID);
-				sipServletRequest.setAppSessionId(applicationId);
+				applicationId = poppedAddress.getParameter(APP_ID);				
 			}
 		} 
 		if(applicationId == null) {
@@ -253,6 +252,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				}
 			} else {
 				sipServletRequest.setOrphan(true);
+				sipServletRequest.setAppSessionId(applicationId);
 				sipServletRequest.setCurrentApplicationName(sipContext.getApplicationName());
 				try {
 					MessageDispatcher.callServletForOrphanRequest(sipContext, sipServletRequest);

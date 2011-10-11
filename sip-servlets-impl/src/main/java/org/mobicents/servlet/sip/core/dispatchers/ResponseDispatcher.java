@@ -268,6 +268,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 							SipServletRequestImpl request = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(stx.getRequest(), null, null, null, false);
 							SipServletResponseImpl orphanResponse = (SipServletResponseImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletResponse(response, null, null, dialog, true, false);
 							request.setOrphan(true);
+							orphanResponse.setAppSessionId(appId);
 							orphanResponse.setOriginalRequest(request);
 							callServletForOrphanResponse(sipContext, orphanResponse);
 							stx.sendMessage((SIPMessage) response);
@@ -288,6 +289,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 									SipServletRequestImpl req = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(r, null, null, dialog, false);
 									req.setOrphan(true);
 									sipServletResponse.setOriginalRequest(req);
+									sipServletResponse.setAppSessionId(appId);
 									callServletForOrphanResponse(sipContext, sipServletResponse);
 									sipProvider.sendResponse(response);
 								} catch (Exception e) {

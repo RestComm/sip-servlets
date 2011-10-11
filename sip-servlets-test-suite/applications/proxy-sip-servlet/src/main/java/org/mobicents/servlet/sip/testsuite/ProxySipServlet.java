@@ -103,6 +103,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		if(request.getFrom().toString().contains("proxy-orphan")) {
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			SipFactoryExt sipFactoryExt = (SipFactoryExt) sipFactory;
+			request.getApplicationSession(false);
 			sipFactoryExt.setRouteOrphanRequests(true);
 			Object o = getServletContext().getAttribute(javax.servlet.sip.SipServlet. OUTBOUND_INTERFACES);
 			request.getProxy().setRecordRoute(true);
@@ -407,7 +408,10 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		SipApplicationSession sas = response.getApplicationSession();
 		SipServletRequest re = response.getRequest();
 		re.getCallId();
-		if(sipServletResponseExt.isOrphan()) return;
+		if(sipServletResponseExt.isOrphan()) {
+			sipServletResponseExt.getApplicationSession(false);
+			return;
+		}
 		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 		SipFactoryExt ext = (SipFactoryExt)sipFactory;
 		if(!ext.isRouteOrphanRequests()) { // not to break the orphan test

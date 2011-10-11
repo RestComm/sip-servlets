@@ -167,6 +167,10 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	
 	protected transient String method;
 	
+	// needed for orphan routing
+	boolean orphan;
+	private String appSessionId;
+	
 	// needed for externalizable
 	public SipServletMessageImpl () {}
 	
@@ -561,7 +565,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 				}
 				orphan = true;
 				sessionKey = SessionManagerUtil.getSipSessionKey(
-						SessionManagerUtil.getSipApplicationSessionKey(applicationName, ((SipServletRequestImpl)this).getAppSessionId()).getId(),
+						SessionManagerUtil.getSipApplicationSessionKey(applicationName, getAppSessionId()).getId(),
 						applicationName, message, false);
 			}
 		}
@@ -2045,5 +2049,12 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	public boolean isOrphan() {
 		return orphan;
 	}	
-	boolean orphan;
+
+	public String getAppSessionId() {
+		return appSessionId;
+	}
+	
+	public void setAppSessionId(String appSessionId) {
+		this.appSessionId = appSessionId;
+	}
 }

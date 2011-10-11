@@ -39,13 +39,11 @@ import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
@@ -2380,16 +2378,5 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		sipServletRequestImpl.setSubscriberURI(subscriberURI);
 		sipServletRequestImpl.setAttributeMap(getAttributeMap());
 		return sipServletRequestImpl;
-	}
-	
-	private String appSid;
-
-	public String getAppSessionId() {
-		return appSid;
-	}
-
-	public void setAppSessionId(String appSid) {
-		this.appSid = appSid;
-	}
-
+	}	
 }
