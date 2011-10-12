@@ -893,7 +893,11 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			}
 		} else {
 			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
-			return via.getHost();
+			if(via == null) {
+				return null;
+			} else {
+				return via.getHost();
+			}
 		}
 	}
 
@@ -2182,7 +2186,11 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			}
 		} else {
 			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
-			return via.getHost();
+			if(via == null) {
+				return null;
+			} else {
+				return via.getHost();
+			}
 		}
 	}
 
@@ -2198,7 +2206,11 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			}
 		}else {
 			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
-			return via.getPort()<=0 ? 5060 : via.getPort();
+			if(via == null) {
+				return -1;
+			} else {
+				return via.getPort()<=0 ? 5060 : via.getPort();
+			}
 		}
 		
 	}
@@ -2211,7 +2223,11 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			return ((SIPTransaction)getTransaction()).getTransport();
 		} else {
 			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
-			return via.getTransport();
+			if(via == null) {
+				return null;
+			} else {
+				return via.getTransport();
+			}
 		}
 	}
 	

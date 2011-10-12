@@ -834,7 +834,23 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		assertTrue(receiver.txTimeoutReceived);
 	}	
 
-	
+	/*
+	 * http://code.google.com/p/mobicents/issues/detail?id=2902
+	 */
+	public void testShootistRemoteAddrAndPort() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();			
+		receiverProvider.addSipListener(receiver);
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		deployApplication("testRemoteAddrAndPort", "true");
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());		
+	}	
 
 	@Override
 	protected void tearDown() throws Exception {					

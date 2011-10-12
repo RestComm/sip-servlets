@@ -449,6 +449,18 @@ public class ShootistSipServlet
 				logger.error("the ToTag should be empty, not sending the request");
 				return;
 			}
+			
+			String testRemoteAddrAndPort = ce.getServletContext().getInitParameter("testRemoteAddrAndPort");
+			if(testRemoteAddrAndPort != null) {
+				sipServletRequest.getRemoteAddr();
+				sipServletRequest.getRemotePort();
+				sipServletRequest.getRemoteHost();
+				sipServletRequest.getRemoteUser();
+				sipServletRequest.getInitialRemoteAddr();
+				sipServletRequest.getInitialPoppedRoute();
+				sipServletRequest.getInitialRemotePort();
+				sipServletRequest.getInitialTransport();
+			}
 			try {			
 				sipServletRequest.send();
 			} catch (IOException e) {

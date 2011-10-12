@@ -982,7 +982,11 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			}
 		} else {
 			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
-			return via.getHost();
+			if(via == null) {
+				return null;
+			} else {
+				return via.getHost();
+			}
 		}
 	}
 
