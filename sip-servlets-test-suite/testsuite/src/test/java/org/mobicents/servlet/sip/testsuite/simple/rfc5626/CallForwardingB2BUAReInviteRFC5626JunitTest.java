@@ -22,15 +22,9 @@
 
 package org.mobicents.servlet.sip.testsuite.simple.rfc5626;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
-import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
-import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -39,7 +33,8 @@ import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 /*
  * 
- * Added for Issue 1409 http://code.google.com/p/mobicents/issues/detail?id=1409
+ * Added for Issue 2254 http://code.google.com/p/mobicents/issues/detail?id=2254
+ * Testing B2BUA Use case not covered by the spec where the UA connects directly to a B2BUA instead of edge proxy 
  */
 public class CallForwardingB2BUAReInviteRFC5626JunitTest extends SipServletTestCase {
 	
@@ -86,6 +81,11 @@ public class CallForwardingB2BUAReInviteRFC5626JunitTest extends SipServletTestC
 				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);					
 	}
 	
+	/**
+	 * UAC sends INVITE with wrong Via and Contact IP address to make sure that when the subsequent request from the other end is received back
+	 * it can be routed back to UAC on the correct IP through the ob parameter support
+	 * @throws Exception
+	 */
 	public void testCallForwardingCallerSendBye() throws Exception {
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		SipProvider senderProvider = sender.createProvider();

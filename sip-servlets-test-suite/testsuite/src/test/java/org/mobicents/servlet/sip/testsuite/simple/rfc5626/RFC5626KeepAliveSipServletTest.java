@@ -49,6 +49,13 @@ import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
+/**
+ * Added for Issue 2254 http://code.google.com/p/mobicents/issues/detail?id=2254
+ * Testing keepalive section 4.4.1
+ * 
+ * @author jean.deruelle@gmail.com
+ *
+ */
 public class RFC5626KeepAliveSipServletTest extends SipServletTestCase {
 	
 	private static transient Logger logger = Logger.getLogger(RFC5626KeepAliveSipServletTest.class);
