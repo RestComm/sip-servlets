@@ -336,6 +336,8 @@ public class TestSipListener implements SipListener {
 	private Request infoRequest;
 	
 	private boolean addRecordRouteForResponses;
+
+	private boolean isRFC5626Support;
 	
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -1527,7 +1529,11 @@ public class TestSipListener implements SipListener {
 				List<Header> headers = new ArrayList<Header>();
 				Header reinviteHeader = protocolObjects.headerFactory.createHeader("ReInvite", "true");
 				headers.add(reinviteHeader);
-				sendInDialogSipRequest("INVITE", null, null, null, headers, null);
+				String transport = null;
+				if(ackRequest.getRequestURI() instanceof SipURI) {
+					transport = ((SipURI)ackRequest.getRequestURI()).getTransportParam();
+				}
+				sendInDialogSipRequest("INVITE", null, null, null, headers, transport);
 				reinviteSent = true;
 				return;
 			}
@@ -2098,7 +2104,13 @@ public class TestSipListener implements SipListener {
 				.createViaHeader("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", sipProvider
 						.getListeningPoint(protocolObjects.transport).getPort(), listeningPoint.getTransport(),
 						null);
-
+		if(isRFC5626Support) {
+			//try to bind to non existing IP
+			 viaHeader = protocolObjects.headerFactory
+				.createViaHeader("192.192.192.192", sipProvider
+						.getListeningPoint(protocolObjects.transport).getPort(), listeningPoint.getTransport(),
+						null);
+		}
 		// add via headers
 		viaHeaders.add(viaHeader);
 
@@ -2123,6 +2135,10 @@ public class TestSipListener implements SipListener {
 				fromHeader, toHeader, viaHeaders, maxForwards);
 		// Create contact headers
 		String host = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
+		if(isRFC5626Support) {
+			//try to bind to non existing IP
+			 host = "192.192.192.192";
+		}
 		request.setHeader(protocolObjects.headerFactory.createHeader("REM", "RRRREM"));
 		URI contactUrl = null;
 		if(fromURI instanceof SipURI) {
@@ -2135,6 +2151,9 @@ public class TestSipListener implements SipListener {
 			if(setTransport) {
 				((SipURI)contactUrl).setTransportParam(listeningPoint.getTransport());		
 				((SipURI)contactUrl).setLrParam();
+			}
+			if(isRFC5626Support) {
+				((SipURI)contactUrl).setParameter("ob", null);
 			}
 		} else {
 			contactUrl = fromURI;
@@ -2529,6 +2548,8 @@ public class TestSipListener implements SipListener {
 		
 		addSpecificHeaders(method, message);
 		message.removeHeader(ViaHeader.NAME);
+		logger.info("in dialog message = " + message);
+		
 		ClientTransaction clientTransaction = sipProvider.getNewClientTransaction(message);
 		if(method.equals("INVITE")) {
 			inviteClientTid = clientTransaction;
@@ -3235,5 +3256,9 @@ public class TestSipListener implements SipListener {
 	 */
 	public boolean isAddRecordRouteForResponses() {
 		return addRecordRouteForResponses;
+	}
+
+	public void setRFC5626Support(boolean isRFC5626Support) {
+		this.isRFC5626Support = isRFC5626Support;
 	}
 }

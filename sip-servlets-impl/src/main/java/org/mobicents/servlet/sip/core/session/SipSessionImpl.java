@@ -284,6 +284,23 @@ public class SipSessionImpl implements MobicentsSipSession {
     // Handle Header [Authentication-Info: nextnonce="xyz"] in sip authorization responses
 	protected transient MobicentsSipSessionSecurity sipSessionSecurity;
 	
+	/**
+	 * This is the flow for this session, i.e., this uri represents the 
+	 * remote destination from where the request actually was received on.
+	 * We will use this this "flow" whenever we send out a subsequent
+	 * request to this destination. See RFC5626 for details.
+	 * 
+	 * TODO: in a fail-over scenario, should we keep this uri? If e.g. this
+	 * flow is a TCP connection, that connection will of course not be
+	 * failed over to the other server, which then would cause us to not (depending
+	 * on the NAT) be able to connect to the remote client anyway. On the other hand
+	 * if this is a nice NAT we will be able to get through so at least we have
+	 * a chance of reconnecting as opposed to having the complete wrong address.
+	 * So for now, I'll keep the flow around.
+	 */
+	private javax.sip.address.SipURI flow;
+
+	
 	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession) {
 		this.key = key;
 		setSipApplicationSession(mobicentsSipApplicationSession);
@@ -2329,6 +2346,22 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 	}
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.MobicentsSipSession#setFlow(javax.sip.address.SipURI)
+	 */
+	public void setFlow(final javax.sip.address.SipURI flow) {
+		this.flow = flow;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.session.MobicentsSipSession#getFlow()
+	 */
+	public javax.sip.address.SipURI getFlow() {
+		return flow;
+	}
+
 	protected boolean orphan = false;
 
 	public boolean isOrphan() {

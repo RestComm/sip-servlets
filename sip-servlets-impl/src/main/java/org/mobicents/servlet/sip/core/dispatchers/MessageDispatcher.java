@@ -99,6 +99,18 @@ public abstract class MessageDispatcher {
 	
 	
 	protected SipApplicationDispatcher sipApplicationDispatcher = null;
+	
+	/**
+	 * From RFC 5626:
+	 * 
+	 * "The "ob" parameter is a SIP URI parameter that has a different meaning
+	 * depending on context. In a Path header field value, it is used by the
+	 * first edge proxy to indicate that a flow token was added to the URI. In a
+	 * Contact or Route header field value, it indicates that the UA would like
+	 * other requests in the same dialog to be routed over the same flow."
+	 * 
+	 */
+	public static final String SIP_OUTBOUND_PARAM_OB = "ob";
 		
 	public MessageDispatcher() {}
 	

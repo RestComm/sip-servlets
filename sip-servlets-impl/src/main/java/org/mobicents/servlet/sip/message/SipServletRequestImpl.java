@@ -49,7 +49,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Vector;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletInputStream;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.AuthInfo;
@@ -901,8 +900,8 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	/**
 	 * {@inheritDoc}
 	 */
-	public RequestDispatcher getRequestDispatcher(String handler) {
-		MobicentsSipServlet sipServletImpl = (MobicentsSipServlet) 
+	public javax.servlet.RequestDispatcher getRequestDispatcher(String handler) {
+		MobicentsSipServlet sipServletImpl = (MobicentsSipServlet)
 			getSipSession().getSipApplicationSession().getSipContext().findSipServletByName(handler);
 		if(sipServletImpl == null) {
 			throw new IllegalArgumentException(handler + " is not a valid servlet name");
@@ -961,7 +960,16 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				RouteHeader routeHeader = (RouteHeader) request.getHeader(RouteHeader.NAME);
 				if(routeHeader != null) {
 					uriToResolve = routeHeader.getAddress().getURI();
+				} else {
+					// RFC5626 - see if we are to find a flow for this request.
+					// Note: we should do this even if the "uriToResolve" is coming
+					// from a route header but since we currently have not implemented
+					// the correct things for a proxy scenario, only do it for UAS
+					// scenarios. At least this will minimize the potential for messing
+					// up right now...
+					uriToResolve = resolveSipOutbound(uriToResolve);
 				}
+
 				if(session.getTransport() != null && uriToResolve.isSipURI() && ((javax.sip.address.SipURI)uriToResolve).getTransportParam() == null &&
 						// no need to modify the Request URI for UDP which is the default transport
 						!session.getTransport().equalsIgnoreCase(ListeningPoint.UDP)) {					
@@ -980,6 +988,39 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			}
 		}
 		send(hop);
+	}
+	
+	
+	/**
+	 * Check to see if the uri to resolve contains a "ob" parameter and if so, try
+	 * and locate a "flow" for this uri.
+	 * 
+	 * This is part of the RFC5626 implementation
+	 * 
+	 * @param uriToResolve
+	 * @return the flow uri or if no flow was found, the same uri 
+	 * that was passed into the method
+	 */
+	private javax.sip.address.URI resolveSipOutbound(final javax.sip.address.URI uriToResolve) {
+		if (!uriToResolve.isSipURI()) {
+			return uriToResolve;
+		}
+
+		final javax.sip.address.SipURI sipURI = (javax.sip.address.SipURI) uriToResolve;
+		if (sipURI.getParameter(MessageDispatcher.SIP_OUTBOUND_PARAM_OB) == null) {
+			// no ob parameter, return
+			return uriToResolve;
+		}
+		final MobicentsSipSession session = getSipSession();
+		final javax.sip.address.SipURI flow = session.getFlow();
+		if (flow != null) {
+			if (logger.isDebugEnabled()) {
+				logger.debug("Found a flow \"" + flow + "\" for the original uri \"" + uriToResolve + "\"");
+			}
+			return flow;
+		}
+
+		return uriToResolve;
 	}
 	
 	public void send(Hop hop) throws IOException {
@@ -1032,7 +1073,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				logger.debug("The found transport for sending request is '" + transport + "'");
 			}
 
-			SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);	
+			SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);
 			MobicentsExtendedListeningPoint matchingListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(
 					transport, false);
 			final SipProvider sipProvider = matchingListeningPoint.getSipProvider();

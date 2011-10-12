@@ -510,6 +510,15 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public void release() {
 		sipSession.release();
 	}
+	
+	public void setFlow(final javax.sip.address.SipURI flow) {
+		this.sipSession.setFlow(flow);
+	}
+
+	public javax.sip.address.SipURI getFlow() {
+		return this.sipSession.getFlow();
+	}
+
 	protected boolean orphan = false;
 
 	public boolean isOrphan() {
@@ -519,5 +528,4 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public void setOrphan(boolean orphan) {
 		sipSession.setOrphan(orphan);
 	}
-
 }

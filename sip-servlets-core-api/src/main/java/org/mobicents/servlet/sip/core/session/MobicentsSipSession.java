@@ -174,6 +174,17 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	
 	void setSipSessionSecurity(MobicentsSipSessionSecurity sipSessionSecurity);
 	MobicentsSipSessionSecurity getSipSessionSecurity();
+	
+	/**
+	 * Associate a particular flow (see RFC5626) with this
+	 * session.
+	 * 
+	 * @param flow
+	 */
+	public void setFlow(final javax.sip.address.SipURI flow);
+
+	public javax.sip.address.SipURI getFlow();
+
 	public void setOrphan(boolean orphan);
 
 	public boolean isOrphan();
