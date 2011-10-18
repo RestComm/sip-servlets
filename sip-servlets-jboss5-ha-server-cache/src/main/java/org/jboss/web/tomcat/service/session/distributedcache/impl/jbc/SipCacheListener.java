@@ -24,6 +24,7 @@ package org.jboss.web.tomcat.service.session.distributedcache.impl.jbc;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.jboss.cache.Fqn;
 import org.jboss.cache.buddyreplication.BuddyManager;
 import org.jboss.cache.notifications.annotation.NodeCreated;
@@ -32,7 +33,6 @@ import org.jboss.cache.notifications.annotation.NodeRemoved;
 import org.jboss.cache.notifications.event.NodeCreatedEvent;
 import org.jboss.cache.notifications.event.NodeModifiedEvent;
 import org.jboss.cache.notifications.event.NodeRemovedEvent;
-import org.jboss.logging.Logger;
 import org.jboss.metadata.web.jboss.ReplicationGranularity;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.LocalDistributableConvergedSessionManager;
 import org.jboss.web.tomcat.service.session.distributedcache.spi.LocalDistributableSessionManager;
