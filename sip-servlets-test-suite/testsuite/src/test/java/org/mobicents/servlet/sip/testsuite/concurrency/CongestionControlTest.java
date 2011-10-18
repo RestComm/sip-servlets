@@ -29,6 +29,7 @@ import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 
+import org.apache.catalina.LifecycleException;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
@@ -92,11 +93,11 @@ public class CongestionControlTest extends SipServletTestCase {
 
 	}
 	
-	public void testCongestedQueueErrorResponse() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+	public void testCongestedQueueErrorResponse() throws InterruptedException, SipException, ParseException, InvalidArgumentException, LifecycleException {
 		tomcat.getSipService().getSipApplicationDispatcher().setBypassRequestExecutor(false);
 		tomcat.getSipService().getSipApplicationDispatcher().setBypassResponseExecutor(false);
 		tomcat.getSipService().getSipApplicationDispatcher().setCongestionControlCheckingInterval(2000);
-		tomcat.getSipService().getSipApplicationDispatcher().setQueueSize(1);
+		tomcat.getSipService().getSipApplicationDispatcher().setQueueSize(1000);
 		tomcat.getSipService().getSipApplicationDispatcher().setCongestionControlPolicy(CongestionControlPolicy.ErrorResponse);
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
@@ -112,10 +113,13 @@ public class CongestionControlTest extends SipServletTestCase {
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
 		Thread.sleep(TIMEOUT_ACK);
 		assertTrue(sender.isAckSent());
+		tomcat.getSipService().getSipApplicationDispatcher().setQueueSize(-1);
+		tomcat.getSipService().getSipApplicationDispatcher().setBackToNormalQueueSize(0);
+		Thread.sleep(TIMEOUT_ACK);
 		// For this test the queue size is 3, so we feed 40 messages asap and watch for error response.
 		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
-		for(int q=0; q<40; q++) {
-			sender.sendInDialogSipRequest("INFO", Integer.valueOf(q).toString(), "text", "plain", null, null);
+		for(int q=0; q < 40; q++) {
+			sender.sendSipRequest("INVITE", fromAddress, toAddress, Integer.valueOf(q).toString(), null, false);
 			Thread.sleep(100);
 		}
 		Thread.sleep(TIMEOUT);	
@@ -145,7 +149,7 @@ public class CongestionControlTest extends SipServletTestCase {
 		// For this test the queue size is 3, so we feed 40 messages asap and watch for error response.
 		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
 		for(int q=0; q<40; q++) {
-			sender.sendInDialogSipRequest("INFO", Integer.valueOf(q).toString(), "text", "plain", null, null);
+			sender.sendSipRequest("INVITE", fromAddress, toAddress, Integer.valueOf(q).toString(), null, false);
 			Thread.sleep(100);
 		}
 		Thread.sleep(TIMEOUT);	
@@ -154,7 +158,7 @@ public class CongestionControlTest extends SipServletTestCase {
 	
 	public void testMemoryCongestedErrorResponse() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		tomcat.getSipService().getSipApplicationDispatcher().setCongestionControlCheckingInterval(2000);
-		tomcat.getSipService().getSipApplicationDispatcher().setMemoryThreshold(0);
+		tomcat.getSipService().getSipApplicationDispatcher().setMemoryThreshold(95);
 		tomcat.getSipService().getSipApplicationDispatcher().setCongestionControlPolicy(CongestionControlPolicy.ErrorResponse);
 		String fromName = "sender";
 		String fromSipAddress = "sip-servlets.com";
@@ -170,10 +174,12 @@ public class CongestionControlTest extends SipServletTestCase {
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
 		Thread.sleep(TIMEOUT_ACK);
 		assertTrue(sender.isAckSent());
+		tomcat.getSipService().getSipApplicationDispatcher().setMemoryThreshold(0);
+		Thread.sleep(TIMEOUT_ACK);
 		// For this test the queue size is 3, so we feed 40 messages asap and watch for error response.
 		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
 		for(int q=0; q<40; q++) {
-			sender.sendInDialogSipRequest("INFO", Integer.valueOf(q).toString(), "text", "plain", null, null);
+			sender.sendSipRequest("INVITE", fromAddress, toAddress, Integer.valueOf(q).toString(), null, false);
 			Thread.sleep(100);
 		}
 		Thread.sleep(TIMEOUT);	
@@ -201,9 +207,35 @@ public class CongestionControlTest extends SipServletTestCase {
 		// For this test the queue size is 3, so we feed 40 messages asap and watch for error response.
 		// Since we dont want to wait 40*5 secs, we kill everything with no clean up, that's fine for this test.
 		for(int q=0; q<40; q++) {			
-			sender.sendInDialogSipRequest("INFO", Integer.valueOf(q).toString(), "text", "plain", null, null);
+			sender.sendSipRequest("INVITE", fromAddress, toAddress, Integer.valueOf(q).toString(), null, false);
 			Thread.sleep(100);
 		}
+		Thread.sleep(TIMEOUT);	
+		assertFalse(sender.isServiceUnavailableReceived());
+	}
+
+	public void testMemoryCongestedErrorResponseReInvite() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		tomcat.getSipService().getSipApplicationDispatcher().setCongestionControlCheckingInterval(2000);
+		tomcat.getSipService().getSipApplicationDispatcher().setMemoryThreshold(95);
+		tomcat.getSipService().getSipApplicationDispatcher().setCongestionControlPolicy(CongestionControlPolicy.ErrorResponse);
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setSendBye(false);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+		Thread.sleep(TIMEOUT_ACK);
+		assertTrue(sender.isAckSent());
+		tomcat.getSipService().getSipApplicationDispatcher().setMemoryThreshold(0);
+		Thread.sleep(TIMEOUT_ACK*2);
+		sender.sendInDialogSipRequest("INVITE", Integer.valueOf(1).toString(), "text", "plain", null, null);
+		Thread.sleep(100);
 		Thread.sleep(TIMEOUT);	
 		assertFalse(sender.isServiceUnavailableReceived());
 	}

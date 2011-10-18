@@ -647,15 +647,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	 * (non-Javadoc)
 	 * @see javax.sip.SipListener#processRequest(javax.sip.RequestEvent)
 	 */
-	public void processRequest(RequestEvent requestEvent) {
-		if((rejectSipMessages || memoryToHigh) && CongestionControlPolicy.DropMessage.equals(congestionControlPolicy)) {
-			String method = requestEvent.getRequest().getMethod();
-			boolean goodMethod = method.equals(Request.ACK) || method.equals(Request.PRACK) || method.equals(Request.BYE) || method.equals(Request.CANCEL);
-			if(!goodMethod) {
-				logger.error("dropping request, memory is too high or too many messages present in queues");
-				return;
-			}
-		}	
+	public void processRequest(RequestEvent requestEvent) {			
 		final SipProvider sipProvider = (SipProvider)requestEvent.getSource();
 		ServerTransaction requestTransaction =  requestEvent.getServerTransaction();
 		final Dialog dialog = requestEvent.getDialog();
@@ -663,6 +655,24 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		// self routing makes the application data cloned, so we make sure to nullify it
 		((MessageExt)request).setApplicationData(null);
 		final String requestMethod = request.getMethod();
+		
+		final RouteHeader routeHeader = (RouteHeader) request
+				.getHeader(RouteHeader.NAME);
+		
+		if((rejectSipMessages || memoryToHigh) && CongestionControlPolicy.DropMessage.equals(congestionControlPolicy)) {
+			String method = requestEvent.getRequest().getMethod();
+			boolean goodMethod = method.equals(Request.ACK) || method.equals(Request.PRACK) || method.equals(Request.BYE) || method.equals(Request.CANCEL) || method.equals(Request.UPDATE) || method.equals(Request.INFO);
+			if(logger.isDebugEnabled()) {
+				logger.debug("congestion control good method " + goodMethod + ", dialog "  + dialog + " routeHeader " + routeHeader);
+			}
+			if(!goodMethod) {
+				if(dialog == null && (routeHeader == null || ((Parameters)routeHeader.getAddress().getURI()).getParameter(MessageDispatcher.RR_PARAM_PROXY_APP) == null)) { 
+					logger.error("dropping request, memory is too high or too many messages present in queues");
+					return;
+				}
+			}
+		}	
+		
 		try {
 			if(logger.isDebugEnabled()) {
 				logger.debug("sipApplicationDispatcher " + this + ", Got a request event "  + request.toString());
@@ -701,8 +711,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			updateRequestStatistics(request);
 			// Check if the request is meant for me. If so, strip the topmost
 			// Route header.
-			final RouteHeader routeHeader = (RouteHeader) request
-					.getHeader(RouteHeader.NAME);
 			
 			//Popping the router header if it's for the container as
 			//specified in JSR 289 - Section 15.8
@@ -731,11 +739,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			
 			try {
 				if(rejectSipMessages || memoryToHigh) {
-					if(!Request.ACK.equals(requestMethod) && !Request.PRACK.equals(requestMethod)) {
-						String method = requestEvent.getRequest().getMethod();
-						boolean goodMethod = method.equals(Request.BYE) || method.equals(Request.CANCEL);
-						if(!goodMethod) {
-							MessageDispatcher.sendErrorResponse(Response.SERVICE_UNAVAILABLE, sipServletRequest, sipProvider);
+					String method = requestEvent.getRequest().getMethod();
+					boolean goodMethod = method.equals(Request.ACK) || method.equals(Request.PRACK) || method.equals(Request.BYE) || method.equals(Request.CANCEL) || method.equals(Request.UPDATE) || method.equals(Request.INFO);
+					if(logger.isDebugEnabled()) {
+						logger.debug("congestion control good method " + goodMethod + ", dialog "  + dialog + " routeHeader " + routeHeader);
+					}
+					if(!goodMethod) {
+						if(dialog == null && (routeHeader == null || ((Parameters)routeHeader.getAddress().getURI()).getParameter(MessageDispatcher.RR_PARAM_PROXY_APP) == null)) {
+							MessageDispatcher.sendErrorResponse(Response.SERVICE_UNAVAILABLE, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
 							return;
 						}
 					}
