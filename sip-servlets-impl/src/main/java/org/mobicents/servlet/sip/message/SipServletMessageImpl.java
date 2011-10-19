@@ -1110,6 +1110,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		return this.sessionKey;
 	}
 
+	public void setSipSessionKey(MobicentsSipSessionKey sessionKey) {
+		this.sessionKey = sessionKey;
+	}
 	
 	/*
 	 * (non-Javadoc)
