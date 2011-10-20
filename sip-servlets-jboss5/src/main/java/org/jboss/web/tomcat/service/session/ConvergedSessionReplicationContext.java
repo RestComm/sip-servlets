@@ -301,7 +301,7 @@ public final class ConvergedSessionReplicationContext
 	   
       ConvergedSessionReplicationContext ctx = getCurrentSipContext(); 
       if(logger.isDebugEnabled()) {
-			logger.debug("binding app session= " + session + " in mgr " + manager + " ctx = " + ctx);
+			logger.debug("binding app session= " + session + " at version " + session.getVersion() + " in mgr " + manager + " ctx = " + ctx);
 	  }
       if (ctx != null && ctx.sipappCount > 0)
       {
@@ -317,7 +317,7 @@ public final class ConvergedSessionReplicationContext
    {
       ConvergedSessionReplicationContext ctx = getCurrentContext();
       if(logger.isDebugEnabled()) {
-			logger.debug("session expired session= " + session + " in mgr " + manager + " ctx = " + ctx);
+			logger.debug("session expired session= " + session + " at version " + session.getVersion() + " in mgr " + manager + " ctx = " + ctx);
 	  }
       if (ctx != null && ctx.webappCount > 0)
       {

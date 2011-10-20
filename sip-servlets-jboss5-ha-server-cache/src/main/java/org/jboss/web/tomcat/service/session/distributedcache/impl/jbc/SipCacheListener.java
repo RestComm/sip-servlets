@@ -92,7 +92,6 @@ public class SipCacheListener extends CacheListenerBase
 //   private static final String TREE_CACHE_CLASS = "org.jboss.cache.TreeCache";
 //   private static final String DATA_GRAVITATION_CLEANUP = "_dataGravitationCleanup";
    
-   private static Logger log_ = Logger.getLogger(SipCacheListener.class);
    private String sipApplicationNameHashed;
    private String sipApplicationName;
    private boolean fieldBased_;
