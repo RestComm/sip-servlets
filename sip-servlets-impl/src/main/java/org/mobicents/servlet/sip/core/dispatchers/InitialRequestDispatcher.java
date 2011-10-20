@@ -389,7 +389,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 
 			if(StaticServiceHolder.sipStandardService.isHttpFollowsSip()) {
 				String jvmRoute = StaticServiceHolder.sipStandardService.getJvmRoute();
-				if(jvmRoute == null) {
+				if(jvmRoute != null) {
 					sipApplicationSession.setJvmRoute(jvmRoute);
 				}
 			}

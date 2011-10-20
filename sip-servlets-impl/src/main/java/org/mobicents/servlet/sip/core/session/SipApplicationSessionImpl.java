@@ -213,10 +213,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	public boolean addSipSession(MobicentsSipSession mobicentsSipSession) {
 		boolean wasNotPresent = this.sipSessions.add((SipSessionKey)mobicentsSipSession.getKey());
-		if(wasNotPresent) {
-			if(logger.isDebugEnabled()) {
-				logger.debug("Added sip session " + mobicentsSipSession.getKey() + " to sip app session " + getKey());
-			}
+		if(logger.isDebugEnabled() && wasNotPresent) {
+			logger.debug("Added sip session " + mobicentsSipSession.getKey() + " to sip app session " + getKey());
 		}
 		readyToInvalidate = false;
 		return wasNotPresent;
@@ -230,10 +228,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		final SipSessionKey key = (SipSessionKey) mobicentsSipSession.getKey();
 		if(sipSessions != null) {			
 			boolean wasPresent = this.sipSessions.remove(key);
-			if(wasPresent) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("Removed sip session " + key + " from sip app session " + getKey());
-				}
+			if(logger.isDebugEnabled() && wasPresent) {
+				logger.debug("Removed sip session " + key + " from sip app session " + getKey());
 			}
 			return key;
 		} 
@@ -245,17 +241,33 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			httpSessions = new CopyOnWriteArraySet<String>();
 		}
 		boolean wasNotPresent = this.httpSessions.add(JvmRouteUtil.removeJvmRoute(httpSession.getId()));
+		if(logger.isDebugEnabled() && wasNotPresent) {
+			logger.debug("Added http session " + JvmRouteUtil.removeJvmRoute(httpSession.getId()) + " to sip app session " + getKey());
+		}
 		readyToInvalidate = false;
 		// TODO: We assume that there is only one HTTP session in the app session. In this case
 		// we are safe to only assign jvmRoute once here. When we support multiple http sessions
 		// we will need something more sophisticated.
-		setJvmRoute(JvmRouteUtil.extractJvmRoute(httpSession.getId()));
+		String jvmRoute = JvmRouteUtil.extractJvmRoute(httpSession.getId());	
+		if(jvmRoute != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("JVM Route " + jvmRoute + " for just added http session " + JvmRouteUtil.removeJvmRoute(httpSession.getId()));
+			}
+			setJvmRoute(jvmRoute);
+		}
 		return wasNotPresent;
 	}
 	
 	public boolean removeHttpSession(HttpSession httpSession) {
 		if(httpSessions != null) {
-			return this.httpSessions.remove(JvmRouteUtil.removeJvmRoute(httpSession.getId()));
+			if(logger.isDebugEnabled()) {
+				logger.debug("Trying to remove http session " + JvmRouteUtil.removeJvmRoute(httpSession.getId()));
+			}
+			boolean wasPresent = this.httpSessions.remove(JvmRouteUtil.removeJvmRoute(httpSession.getId()));
+			if(logger.isDebugEnabled() && wasPresent) {
+				logger.debug("Removed http session " + JvmRouteUtil.removeJvmRoute(httpSession.getId()) + " from sip app session " + getKey());
+			}
+			return wasPresent;
 		}
 		return false;
 	}
@@ -1221,6 +1233,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	}
 
 	public void setJvmRoute(String jvmRoute) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("Setting JVM route to " + jvmRoute);
+		}
 		// Assign the new jvmRoute
 		this.jvmRoute = jvmRoute;
 	}

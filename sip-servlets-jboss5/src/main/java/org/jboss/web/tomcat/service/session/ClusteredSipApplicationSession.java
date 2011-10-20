@@ -736,7 +736,8 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 		this.metadata = md;
 		
 		String jvmRoute = (String) md.getMetaData().get(JVM_ROUTE);
-		setJvmRoute(jvmRoute);
+		// call the parent method to not make the session dirty on update
+		super.setJvmRoute(jvmRoute);
 		
 		
 		// From Sip Application Session
