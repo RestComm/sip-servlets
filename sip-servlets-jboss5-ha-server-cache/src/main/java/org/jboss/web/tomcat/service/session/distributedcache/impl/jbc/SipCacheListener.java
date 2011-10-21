@@ -108,6 +108,10 @@ public class SipCacheListener extends CacheListenerBase
 			attributeBased_ = true;
 		this.sipApplicationName = sipApplicationName;
 		this.sipApplicationNameHashed = sipApplicationNameHashed;
+		if(logger.isDebugEnabled()) {
+			   logger.debug("SipCacheListener sipApplicationName : " + sipApplicationName + ", sipApplicationNameHashed " + sipApplicationNameHashed + 
+					   ", granularity " + granularity + ", contextHostPath " + contextHostPath);
+		}
 	}
 
    protected boolean isFqnForOurSipapp(Fqn<String> fqn, boolean isBuddy)
