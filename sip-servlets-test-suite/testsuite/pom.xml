@@ -246,7 +246,7 @@
 					<excludes>
 						<exclude>**/TestSipListener.java</exclude>
 					</excludes>
-					<argLine>-Dorg.mobicents.testsuite.testhostaddr=${org.mobicents.testsuite.testhostaddr}</argLine>       				          				
+					<argLine>-Dorg.mobicents.testsuite.testhostaddr=${org.mobicents.testsuite.testhostaddr} -XX:MaxPermSize=256m -Xms1024m -Xmx1024m</argLine>       				          				
 				</configuration>
 			</plugin>
 		</plugins>
