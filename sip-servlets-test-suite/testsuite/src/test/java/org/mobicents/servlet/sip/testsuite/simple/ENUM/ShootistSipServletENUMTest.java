@@ -145,7 +145,7 @@ public class ShootistSipServletENUMTest extends SipServletTestCase {
 		tomcat.getSipService().getSipApplicationDispatcher().getDNSServerLocator().setDnsLookupPerformer(dnsLookupPerformer);
 		
 		Set<String> supportedTransports = new HashSet<String>();
-		supportedTransports.add(TRANSPORT);
+		supportedTransports.add(TRANSPORT.toUpperCase());
 		
 		List<NAPTRRecord> mockedNAPTRRecords = new LinkedList<NAPTRRecord>();
 		// mocking the name because " + System.getProperty("org.mobicents.testsuite.testhostaddr") + " is not absolute and " + System.getProperty("org.mobicents.testsuite.testhostaddr") + ". cannot be resolved 

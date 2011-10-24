@@ -210,7 +210,7 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 		tomcat.getSipService().getSipApplicationDispatcher().getDNSServerLocator().setDnsLookupPerformer(dnsLookupPerformer);
 		
 		Set<String> supportedTransports = new HashSet<String>();
-		supportedTransports.add(TRANSPORT);
+		supportedTransports.add(TRANSPORT.toUpperCase());
 		
 		List<NAPTRRecord> mockedNAPTRRecords = new LinkedList<NAPTRRecord>();
 		// mocking the name because localhost is not absolute and localhost. cannot be resolved 
