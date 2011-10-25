@@ -24,6 +24,7 @@ package org.mobicents.servlet.sip.testsuite;
 
 import gov.nist.javax.sip.DialogExt;
 import gov.nist.javax.sip.address.SipUri;
+import gov.nist.javax.sip.header.HeaderExt;
 import gov.nist.javax.sip.header.HeaderFactoryExt;
 import gov.nist.javax.sip.header.ParameterNames;
 import gov.nist.javax.sip.header.SIPETag;
@@ -31,6 +32,7 @@ import gov.nist.javax.sip.header.SIPHeaderNames;
 import gov.nist.javax.sip.header.WWWAuthenticate;
 import gov.nist.javax.sip.header.extensions.JoinHeader;
 import gov.nist.javax.sip.header.extensions.ReplacesHeader;
+import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.MessageExt;
 
 import java.text.ParseException;
@@ -83,6 +85,7 @@ import javax.sip.header.RouteHeader;
 import javax.sip.header.SIPETagHeader;
 import javax.sip.header.SIPIfMatchHeader;
 import javax.sip.header.SubscriptionStateHeader;
+import javax.sip.header.SupportedHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Request;
@@ -287,7 +290,7 @@ public class TestSipListener implements SipListener {
 
 	private boolean setTransport=true;
 
-	private boolean serviceUnavailableReceived = false;
+	private Response serviceUnavailableResponse = null;
 
 	private int referResponseToSend = 202;
 
@@ -337,7 +340,7 @@ public class TestSipListener implements SipListener {
 	
 	private boolean addRecordRouteForResponses;
 
-	private boolean isRFC5626Support;
+	private RFC5626UseCase rfc5626UseCase;
 	
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -1102,6 +1105,20 @@ public class TestSipListener implements SipListener {
 				toHeader.setTag(Integer.toString(new Random().nextInt(10000000)));
 			}
 //			okResponse.addHeader(contactHeader);
+			SupportedHeader supportedHeader = (SupportedHeader) request.getHeader(SupportedHeader.NAME);
+			PathHeader pathHeader = (PathHeader) request.getHeader(PathHeader.NAME);
+			contactHeader = (ContactHeader) request.getHeader(ContactHeader.NAME);
+			if(supportedHeader != null) {
+				okResponse.addHeader(supportedHeader);
+				if(((HeaderExt)supportedHeader).getValue().contains("outbound")) {					
+					okResponse.addHeader(protocolObjects.headerFactory.createRequireHeader("outbound"));
+					contactHeader.setExpires(3600);
+					okResponse.addHeader(contactHeader);
+					if(pathHeader != null) {
+						okResponse.addHeader(pathHeader);
+					}
+				}
+			}
 			serverTransaction.sendResponse(okResponse);
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -1564,7 +1581,7 @@ public class TestSipListener implements SipListener {
 			this.serverErrorReceived = true;
 		}		
 		if(response.getStatusCode() == 503) {
-			this.serviceUnavailableReceived  = true;
+			this.serviceUnavailableResponse = response;
 		}
 		if(response.toString().toLowerCase().contains("info")) {
 			lastInfoResponseTime = System.currentTimeMillis();
@@ -2104,7 +2121,7 @@ public class TestSipListener implements SipListener {
 				.createViaHeader("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", sipProvider
 						.getListeningPoint(protocolObjects.transport).getPort(), listeningPoint.getTransport(),
 						null);
-		if(isRFC5626Support) {
+		if(rfc5626UseCase != null && rfc5626UseCase == RFC5626UseCase.B2BUA) {
 			//try to bind to non existing IP
 			 viaHeader = protocolObjects.headerFactory
 				.createViaHeader("192.192.192.192", sipProvider
@@ -2135,7 +2152,7 @@ public class TestSipListener implements SipListener {
 				fromHeader, toHeader, viaHeaders, maxForwards);
 		// Create contact headers
 		String host = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
-		if(isRFC5626Support) {
+		if(rfc5626UseCase != null && rfc5626UseCase == RFC5626UseCase.B2BUA) {
 			//try to bind to non existing IP
 			 host = "192.192.192.192";
 		}
@@ -2150,9 +2167,11 @@ public class TestSipListener implements SipListener {
 			((SipURI)contactUrl).setPort(listeningPoint.getPort());
 			if(setTransport) {
 				((SipURI)contactUrl).setTransportParam(listeningPoint.getTransport());		
-				((SipURI)contactUrl).setLrParam();
+				if(rfc5626UseCase == null) {
+					((SipURI)contactUrl).setLrParam();
+				}
 			}
-			if(isRFC5626Support) {
+			if(rfc5626UseCase != null && rfc5626UseCase == RFC5626UseCase.B2BUA) {
 				((SipURI)contactUrl).setParameter("ob", null);
 			}
 		} else {
@@ -2168,6 +2187,10 @@ public class TestSipListener implements SipListener {
 
 		contactHeader = protocolObjects.headerFactory
 				.createContactHeader(contactAddress);
+		if (rfc5626UseCase != null && rfc5626UseCase == RFC5626UseCase.Proxy) {
+			contactHeader.setParameter("reg-id", "1");
+			contactHeader.setParameter("+sip.instance", "\"<urn:uuid:00000000-0000-1000-8000-AABBCCDDEEFF>\"");
+		}
 		request.addHeader(contactHeader);
 		
 		SipURI uri = protocolObjects.addressFactory.createSipURI(null, "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
@@ -3024,8 +3047,8 @@ public class TestSipListener implements SipListener {
 	/**
 	 * @return the serviceUnavailableReceived
 	 */
-	public boolean isServiceUnavailableReceived() {
-		return serviceUnavailableReceived;
+	public Response getServiceUnavailableResponse() {
+		return serviceUnavailableResponse;
 	}
 
 	public void setReferResponseToSend(int referResponseToSend) {
@@ -3258,7 +3281,7 @@ public class TestSipListener implements SipListener {
 		return addRecordRouteForResponses;
 	}
 
-	public void setRFC5626Support(boolean isRFC5626Support) {
-		this.isRFC5626Support = isRFC5626Support;
+	public void setRFC5626UseCase(RFC5626UseCase rfc5626UseCase) {
+		this.rfc5626UseCase = rfc5626UseCase;
 	}
 }

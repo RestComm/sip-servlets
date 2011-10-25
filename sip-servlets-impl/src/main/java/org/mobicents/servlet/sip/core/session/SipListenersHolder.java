@@ -43,6 +43,7 @@ import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.TimerListener;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.ContainerListener;
 import org.mobicents.javax.servlet.sip.ProxyBranchListener;
 import org.mobicents.servlet.sip.core.MobicentsSipServlet;
 import org.mobicents.servlet.sip.core.SipContext;
@@ -69,6 +70,7 @@ public abstract class SipListenersHolder implements SipListeners {
 	protected Map<EventListener, MobicentsSipServlet> listenerServlets;
 	// There may be at most one TimerListener defined.
 	private TimerListener timerListener;
+	private ContainerListener containerListener;
 	//the sip context the holder is attached to
 	protected SipContext sipContext;	
 
@@ -200,6 +202,11 @@ public abstract class SipListenersHolder implements SipListeners {
 		
 		if (listener instanceof ProxyBranchListener) {
 			this.addListener((ProxyBranchListener) listener);
+			added = true;
+		}
+		
+		if (listener instanceof ContainerListener) {
+			this.setContainerListener((ContainerListener) listener);
 			added = true;
 		}
 
@@ -378,6 +385,7 @@ public abstract class SipListenersHolder implements SipListeners {
 			checkDeallocateServlet(proxyListener);
 		}
 		checkDeallocateServlet(timerListener);
+		checkDeallocateServlet(containerListener);
 	}
 	
 	/**
@@ -400,6 +408,7 @@ public abstract class SipListenersHolder implements SipListeners {
 		this.proxyBranchListeners.clear();
 		this.listenerServlets.clear();
 		this.timerListener = null;
+		this.containerListener = null;
 	}
 
 	/**
@@ -419,4 +428,22 @@ public abstract class SipListenersHolder implements SipListeners {
 		}
 	}
 
+	/**
+	 * @return the containerListener
+	 */
+	public ContainerListener getContainerListener() {
+		return containerListener;
+	}
+
+	/**
+	 * @param containerListener the containerListener to set
+	 */
+	public void setContainerListener(ContainerListener containerListener) {
+		if(this.containerListener != null) {
+			throw new IllegalArgumentException(
+					"the Container listener has already been set ("+ this.containerListener.getClass().getName() +
+					"), There may be at most one ContainerListener defined !");
+		}			 
+		this.containerListener = containerListener;
+	}
 }

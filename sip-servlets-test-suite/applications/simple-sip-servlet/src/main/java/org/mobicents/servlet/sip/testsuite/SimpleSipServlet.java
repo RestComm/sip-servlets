@@ -858,7 +858,7 @@ public class SimpleSipServlet
 	 * @param sipApplicationSession
 	 * @param storedFactory
 	 */
-	private void sendMessage(SipApplicationSession sipApplicationSession,
+	public static void sendMessage(SipApplicationSession sipApplicationSession,
 			SipFactory storedFactory, String content, String transport) {
 		try {
 			SipServletRequest sipServletRequest = storedFactory.createRequest(

@@ -60,6 +60,7 @@ import javax.management.ObjectName;
 import javax.servlet.sip.SipErrorEvent;
 import javax.servlet.sip.SipErrorListener;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.ar.SipApplicationRouter;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
@@ -98,6 +99,8 @@ import org.apache.log4j.Logger;
 import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingListener;
 import org.mobicents.ha.javax.sip.SipLoadBalancer;
+import org.mobicents.javax.servlet.CongestionControlEvent;
+import org.mobicents.javax.servlet.ContainerListener;
 import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
@@ -610,13 +613,21 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		this.numberOfMessagesInQueue = getNumberOfPendingMessages();
 		if(rejectSipMessages) {
 			if(numberOfMessagesInQueue  < backToNormalQueueSize) {
-				logger.warn("number of pending messages in the queues : " + numberOfMessagesInQueue + " < to the back to normal queue Size : " + backToNormalQueueSize + " => stopping to reject requests");
+				String message = "Number of pending messages in the queues : " + numberOfMessagesInQueue + " < to the back to normal queue Size : " + backToNormalQueueSize;
+				logger.warn(message + " => stopping to reject requests");
 				rejectSipMessages = false;
+				final CongestionControlEvent congestionControlEvent = new CongestionControlEvent(
+						org.mobicents.javax.servlet.CongestionControlEvent.Reason.Queue, message);		
+				callbackCongestionControlListener(rejectSipMessages, congestionControlEvent);
 			}
 		} else {
 			if(numberOfMessagesInQueue > queueSize) {
-				logger.warn("number of pending messages in the queues : " + numberOfMessagesInQueue + " > to the queue Size : " + queueSize + " => starting to reject requests");
+				String message = "Number of pending messages in the queues : " + numberOfMessagesInQueue + " > to the queue Size : " + queueSize;
+				logger.warn(message + " => starting to reject requests");
 				rejectSipMessages = true;
+				final CongestionControlEvent congestionControlEvent = new CongestionControlEvent(
+						org.mobicents.javax.servlet.CongestionControlEvent.Reason.Queue, message);		
+				callbackCongestionControlListener(rejectSipMessages, congestionControlEvent);
 			}
 		}
 	}
@@ -632,13 +643,21 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 
 		if(memoryToHigh) {
 			if(percentageOfMemoryUsed < backToNormalMemoryThreshold) {
-				logger.warn("Memory used: " + percentageOfMemoryUsed + "% < to the back to normal memory threshold : " + backToNormalMemoryThreshold + " => stopping to reject requests");
-				memoryToHigh = false;				
+				String message = "Memory used: " + percentageOfMemoryUsed + "% < to the back to normal memory threshold : " + backToNormalMemoryThreshold+ "%";
+				logger.warn(message + " => stopping to reject requests");
+				memoryToHigh = false;		
+				final CongestionControlEvent congestionControlEvent = new CongestionControlEvent(
+						org.mobicents.javax.servlet.CongestionControlEvent.Reason.Memory, message);		
+				callbackCongestionControlListener(memoryToHigh, congestionControlEvent);			
 			}
 		} else {
 			if(percentageOfMemoryUsed > memoryThreshold) {
-				logger.warn("Memory used: " + percentageOfMemoryUsed + "% > to the memory threshold : " + memoryThreshold + " => starting to reject requests");
+				String message = "Memory used: " + percentageOfMemoryUsed + "% > to the memory threshold : " + memoryThreshold+ "%";
+				logger.warn(message + " => starting to reject requests");
 				memoryToHigh = true;
+				final CongestionControlEvent congestionControlEvent = new CongestionControlEvent(
+						org.mobicents.javax.servlet.CongestionControlEvent.Reason.Memory, message);		
+				callbackCongestionControlListener(memoryToHigh, congestionControlEvent);
 			}
 		}
 	}
@@ -658,6 +677,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		
 		final RouteHeader routeHeader = (RouteHeader) request
 				.getHeader(RouteHeader.NAME);
+		
+		// congestion control is done here only if we drop messages to avoid generating STX 
+		if(CongestionControlPolicy.DropMessage.equals(congestionControlPolicy) && controlCongestion(request, null, dialog, routeHeader, sipProvider)) {
+			return;
+		}
 		
 		if((rejectSipMessages || memoryToHigh) && CongestionControlPolicy.DropMessage.equals(congestionControlPolicy)) {
 			String method = requestEvent.getRequest().getMethod();
@@ -738,18 +762,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			}
 			
 			try {
-				if(rejectSipMessages || memoryToHigh) {
-					String method = requestEvent.getRequest().getMethod();
-					boolean goodMethod = method.equals(Request.ACK) || method.equals(Request.PRACK) || method.equals(Request.BYE) || method.equals(Request.CANCEL) || method.equals(Request.UPDATE) || method.equals(Request.INFO);
-					if(logger.isDebugEnabled()) {
-						logger.debug("congestion control good method " + goodMethod + ", dialog "  + dialog + " routeHeader " + routeHeader);
-					}
-					if(!goodMethod) {
-						if(dialog == null && (routeHeader == null || ((Parameters)routeHeader.getAddress().getURI()).getParameter(MessageDispatcher.RR_PARAM_PROXY_APP) == null)) {
-							MessageDispatcher.sendErrorResponse(Response.SERVICE_UNAVAILABLE, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
-							return;
-						}
-					}
+				// congestion control is done here so that the STX is created and a response can be generated back
+				// and that 
+				if(controlCongestion(request, sipServletRequest, dialog, routeHeader, sipProvider)) {
+					return;
 				}
 				messageDispatcherFactory.getRequestDispatcher(sipServletRequest, this).
 					dispatchMessage(sipProvider, sipServletRequest);
@@ -777,7 +793,100 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			return;
 		}
 	}
+	
+	private void callbackCongestionControlListener(boolean triggered, CongestionControlEvent congestionControlEvent) {
+		for (SipContext sipContext : applicationDeployed.values()) {
+			final ContainerListener containerListener = 
+				sipContext.getListeners().getContainerListener();
+								
+			if(containerListener != null) {
+				final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();						
+				try {				
+					final ClassLoader cl = sipContext.getSipContextClassLoader();
+					Thread.currentThread().setContextClassLoader(cl);
+											
+					try {				
+						if(triggered) {
+							containerListener.onCongestionControlStarted(congestionControlEvent);
+						} else {
+							containerListener.onCongestionControlStopped(congestionControlEvent);
+						}
+					} catch (Throwable t) {
+						logger.error("ContainerListener threw exception", t);
+					}
+				} finally {				
+					Thread.currentThread().setContextClassLoader(oldClassLoader);
+				}
+			}
+		}
+	}
 
+	private boolean controlCongestion(Request request, SipServletRequestImpl sipServletRequest, Dialog dialog, RouteHeader routeHeader, SipProvider sipProvider) {
+		if(rejectSipMessages || memoryToHigh) {
+			String method = request.getMethod();
+			boolean goodMethod = method.equals(Request.ACK) || method.equals(Request.PRACK) || method.equals(Request.BYE) || method.equals(Request.CANCEL) || method.equals(Request.UPDATE) || method.equals(Request.INFO);
+			if(logger.isDebugEnabled()) {
+				logger.debug("congestion control good method " + goodMethod + ", dialog "  + dialog + " routeHeader " + routeHeader);
+			}
+			if(!goodMethod) {
+				if(dialog == null && (routeHeader == null || ((Parameters)routeHeader.getAddress().getURI()).getParameter(MessageDispatcher.RR_PARAM_PROXY_APP) == null)) {
+					if(CongestionControlPolicy.DropMessage.equals(congestionControlPolicy)) {
+						logger.error("dropping request, memory is too high or too many messages present in queues");
+						return true;
+					}
+					SipServletResponse sipServletResponse = null;
+					String message = null;
+					if(rejectSipMessages) {
+						message = "Number of pending messages in the queues : " + numberOfMessagesInQueue + " > to the queue Size : " + queueSize;
+					} else if (memoryToHigh) {
+						message = "Memory used: " + percentageOfMemoryUsed + "% > to the memory threshold : " + memoryThreshold + "%";
+					}
+					final CongestionControlEvent congestionControlEvent = new CongestionControlEvent(
+							org.mobicents.javax.servlet.CongestionControlEvent.Reason.Memory, message);
+					
+					for (SipContext sipContext : applicationDeployed.values()) {
+						final ContainerListener containerListener = 
+							sipContext.getListeners().getContainerListener();
+						
+						if(containerListener != null) {
+							final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();						
+							try {				
+								final ClassLoader cl = sipContext.getSipContextClassLoader();
+								Thread.currentThread().setContextClassLoader(cl);
+															
+								try {				
+									sipServletResponse = containerListener.onRequestThrottled(sipServletRequest, congestionControlEvent);
+								} catch (Throwable t) {
+									logger.error("ContainerListener threw exception", t);
+								}
+							} finally {				
+								Thread.currentThread().setContextClassLoader(oldClassLoader);
+							}
+							
+							if(sipServletResponse != null) {
+								// container listener generated a response, we send it
+								try{
+									((ServerTransaction)sipServletRequest.getTransaction()).sendResponse(((SipServletResponseImpl)sipServletResponse).getResponse());
+//									sipServletResponse.send();
+								} catch (Exception e) {
+									logger.error("Problem while sending the error response " + sipServletResponse + " to the following request "
+											+ request.toString(), e);
+								}
+								return true;
+							}
+						}
+					}
+					// no application implements the container listener or the container listener didn't generate any responses so we send back a generic one.
+					if(sipServletResponse == null) {
+						MessageDispatcher.sendErrorResponse(Response.SERVICE_UNAVAILABLE, (ServerTransaction) sipServletRequest.getTransaction(), request, sipProvider);
+						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * @param requestMethod
 	 */

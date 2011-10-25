@@ -20,9 +20,26 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+/*
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.mobicents.servlet.sip.testsuite.concurrency;
 
 import java.text.ParseException;
+import java.util.List;
 
 import javax.sip.InvalidArgumentException;
 import javax.sip.SipException;
@@ -33,8 +50,8 @@ import org.apache.catalina.LifecycleException;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
-import org.mobicents.servlet.sip.catalina.SipStandardManager;
 import org.mobicents.servlet.sip.core.CongestionControlPolicy;
+import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
@@ -123,7 +140,12 @@ public class CongestionControlTest extends SipServletTestCase {
 			Thread.sleep(100);
 		}
 		Thread.sleep(TIMEOUT);	
-		assertTrue(sender.isServiceUnavailableReceived());		
+		assertNotNull(sender.getServiceUnavailableResponse());
+		assertNotNull(sender.getServiceUnavailableResponse().getHeader("Reason"));
+		assertNotNull(sender.getServiceUnavailableResponse().getHeader("ReasonMessage"));
+		List<String> allMessagesContent = sender.getAllMessagesContent();
+		assertTrue(allMessagesContent.size() > 0);
+		assertTrue("congestionControlStarted", allMessagesContent.contains("congestionControlStarted"));
 	}
 	
 	public void testCongestedQueueDropMessage() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
@@ -153,7 +175,7 @@ public class CongestionControlTest extends SipServletTestCase {
 			Thread.sleep(100);
 		}
 		Thread.sleep(TIMEOUT);	
-		assertFalse(sender.isServiceUnavailableReceived());
+		assertNull(sender.getServiceUnavailableResponse());
 	}
 	
 	public void testMemoryCongestedErrorResponse() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
@@ -183,7 +205,12 @@ public class CongestionControlTest extends SipServletTestCase {
 			Thread.sleep(100);
 		}
 		Thread.sleep(TIMEOUT);	
-		assertTrue(sender.isServiceUnavailableReceived());
+		assertNotNull(sender.getServiceUnavailableResponse());
+		assertNotNull(sender.getServiceUnavailableResponse().getHeader("Reason"));
+		assertNotNull(sender.getServiceUnavailableResponse().getHeader("ReasonMessage"));
+		List<String> allMessagesContent = sender.getAllMessagesContent();
+		assertTrue(allMessagesContent.size() > 0);
+		assertTrue("congestionControlStarted", allMessagesContent.contains("congestionControlStarted"));
 	}
 	
 	public void testMemoryCongestedDropMessage() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
@@ -211,7 +238,7 @@ public class CongestionControlTest extends SipServletTestCase {
 			Thread.sleep(100);
 		}
 		Thread.sleep(TIMEOUT);	
-		assertFalse(sender.isServiceUnavailableReceived());
+		assertNull(sender.getServiceUnavailableResponse());
 	}
 
 	public void testMemoryCongestedErrorResponseReInvite() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
@@ -236,8 +263,24 @@ public class CongestionControlTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT_ACK*2);
 		sender.sendInDialogSipRequest("INVITE", Integer.valueOf(1).toString(), "text", "plain", null, null);
 		Thread.sleep(100);
+		Thread.sleep(TIMEOUT);
+		assertNull(sender.getServiceUnavailableResponse());
+		for(int q=0; q<40; q++) {			
+			sender.sendSipRequest("INVITE", fromAddress, toAddress, Integer.valueOf(q).toString(), null, false);
+			Thread.sleep(100);
+		}
 		Thread.sleep(TIMEOUT);	
-		assertFalse(sender.isServiceUnavailableReceived());
+		assertNotNull(sender.getServiceUnavailableResponse());
+		assertNotNull(sender.getServiceUnavailableResponse().getHeader("Reason"));
+		assertNotNull(sender.getServiceUnavailableResponse().getHeader("ReasonMessage"));
+		List<String> allMessagesContent = sender.getAllMessagesContent();
+		assertTrue(allMessagesContent.size() > 0);
+		assertTrue("congestionControlStarted", allMessagesContent.contains("congestionControlStarted"));
+		tomcat.getSipService().getSipApplicationDispatcher().setMemoryThreshold(100);
+		Thread.sleep(TIMEOUT);	
+		allMessagesContent = sender.getAllMessagesContent();
+		assertTrue(allMessagesContent.size() > 0);
+		assertTrue("congestionControlStopped", allMessagesContent.contains("congestionControlStopped"));
 	}
 	
 	@Override
