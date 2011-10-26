@@ -33,6 +33,7 @@ import javax.servlet.sip.SipSessionAttributeListener;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.TimerListener;
 
+import org.mobicents.javax.servlet.ContainerListener;
 import org.mobicents.javax.servlet.sip.ProxyBranchListener;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
 
@@ -58,5 +59,6 @@ public interface SipListeners {
 	void deallocateServletsActingAsListeners();
 	List<SipServletListener> getSipServletsListeners();
 	List<SipConnectorListener> getSipConnectorListeners();
+	ContainerListener getContainerListener();
 
 }
