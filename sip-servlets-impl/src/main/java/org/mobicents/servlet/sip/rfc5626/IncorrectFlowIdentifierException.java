@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * Copyright 2008, Red Hat Middleware LLC, and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -19,57 +19,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
-package org.mobicents.servlet.sip.core;
-
-import javax.sip.address.Hop;
+package org.mobicents.servlet.sip.rfc5626;
 
 /**
- * Hop implementation
- * 
- * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
+ * @author jean.deruelle@gmail.com
  *
  */
-public class HopImpl implements Hop {
-	private String host;
-	private int port;
-	private String transport;
-	
-	/**
-	 * @param host
-	 * @param port
-	 * @param transport
-	 */
-	public HopImpl(String host, int port, String transport) {
-		this.host = host;
-		this.port = port;
-		this.transport = transport;
+public class IncorrectFlowIdentifierException extends Exception {
+
+	public IncorrectFlowIdentifierException(String message) {
+		super(message);
 	}
-	/**
-	 * @return the host
-	 */
-	public String getHost() {
-		return host;
-	}
-	
-	/**
-	 * @return the port
-	 */
-	public int getPort() {
-		return port;
-	}
-	
-	/**
-	 * @return the transport
-	 */
-	public String getTransport() {
-		return transport;
-	}	
-	
-	/**
-     * Debugging println.
-     */
-    public String toString() {
-        return host + ":" + port + "/" + transport;
-    }
+
 }

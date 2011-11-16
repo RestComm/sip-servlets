@@ -42,6 +42,9 @@ import javax.servlet.sip.SipURI;
  * 			Allows for applications to terminate an established session by sending BYE requests in both directions as specified in 3GPP TS 24.229 section 5.2.8.1.2.
  * 			It is not RFC3261 complient behaviour as SIP proxies SHOULD NOT originate SIP requests, and should therefore be used with caution.
  * 		</li>
+ * 		<li>
+ * 			Allows for applications to support the RFC 5626 SIP Outbound. As support for this RFC introduces more check on the headers there can be a little performance overheader which is why it is conditionned under a flag 
+ * 		</li>
  * </ul>
  * 
  * Here is some sample code to show how it can be used :
@@ -151,6 +154,18 @@ public interface ProxyExt {
 	 */
 	void storeTerminationInformation(final boolean store) throws IllegalStateException;
     
+	/**
+	 * Specifies whether this proxy object is set to support the RFC 5626 Sip Outbound or not.
+	 * @param sipOutboundSupport whether this proxy object is set to support the RFC 5626 Sip Outbound or not
+	 */
+	void setSipOutboundSupport(boolean sipOutboundSupport);
+	/**
+	 *
+     * Returns true if this proxy object is set to support the RFC 5626 Sip Outbound or false otherwise.
+	 * @return true if this proxy object is set to support the RFC 5626 Sip Outbound or false otherwise
+	 */
+	boolean getSipOutboundSupport();
+	
     /**
      * Terminates an established session by sending BYE requests in both directions.
      * This is required to implement 3GPP TS 24.229 section 5.2.8.1.2.

@@ -298,9 +298,9 @@ public class ProxyUtils {
 					inboundRURI.setLrParam();
 
 					final Address rraddress = SipFactoryImpl.addressFactory
-					.createAddress(null, inboundRURI);
+						.createAddress(null, inboundRURI);
 					final RecordRouteHeader recordRouteHeader = SipFactoryImpl.headerFactory
-					.createRecordRouteHeader(rraddress);
+						.createRecordRouteHeader(rraddress);
 
 					clonedRequest.addFirst(recordRouteHeader);
 				}
@@ -347,8 +347,12 @@ public class ProxyUtils {
 				// Copy the parameters set by the user
 				while(paramNames.hasNext()) {
 					String paramName = paramNames.next();
-					pathURI.setParameter(paramName,
-							path.getParameter(paramName));
+					if(paramName.equals("lr")) {
+						pathURI.setParameter(paramName, null);
+					} else {
+						pathURI.setParameter(paramName,
+								path.getParameter(paramName));
+					}
 				}
 				
 				final Address pathAddress = SipFactoryImpl.addressFactory

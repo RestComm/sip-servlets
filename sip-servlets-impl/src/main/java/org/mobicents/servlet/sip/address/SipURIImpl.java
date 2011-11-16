@@ -52,7 +52,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 	protected static final String USER = "user";
 	protected static final String TRANSPORT = "transport";
 	private final static Logger logger = Logger.getLogger(SipURIImpl.class.getCanonicalName()); 
-	protected ModifiableRule isModifiable = ModifiableRule.Modifiable;
+	private ModifiableRule isModifiable = ModifiableRule.Modifiable;
 	
 	public SipURIImpl(javax.sip.address.SipURI sipUri, ModifiableRule isModifiable) {		
 		super(sipUri);
@@ -200,7 +200,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 		}
 		if (flag) {
 			getSipURI().setLrParam();
-			super.parameters.put(LR_PARAM, "");
+			super.parameters.put(LR_PARAM, null);
 		} else {
 			getSipURI().removeParameter(LR_PARAM);
 			super.parameters.remove(LR_PARAM);
@@ -423,5 +423,19 @@ public class SipURIImpl extends URIImpl implements SipURI {
 		}
 		super.removeParameter(name);
 		((Parameters)getSipURI()).removeParameter(name);
+	}
+
+	/**
+	 * @param isModifiable the isModifiable to set
+	 */
+	public void setIsModifiable(ModifiableRule isModifiable) {
+		this.isModifiable = isModifiable;
+	}
+
+	/**
+	 * @return the isModifiable
+	 */
+	public ModifiableRule getIsModifiable() {
+		return isModifiable;
 	}
 }

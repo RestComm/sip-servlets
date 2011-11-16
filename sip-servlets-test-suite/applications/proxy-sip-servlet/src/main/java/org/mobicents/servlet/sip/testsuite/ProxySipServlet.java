@@ -76,6 +76,9 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 	private static String RECORD_ROUTING = "recordRouting";
 	private static String TEST_CREATE_SUBSEQUENT_REQUEST = "test_create_subsequent_request";
 	private static String TEST_TERMINATION = "test_termination";
+	private static String REGISTER_OUTBOUND = "register-outbound";
+	private static String INVITE_INBOUND = "invite-inbound";
+	
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 
 	@Resource TimerService timerService;
@@ -86,6 +89,16 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		super.init(servletConfig);
 	}
 
+	@Override
+	protected void doRegister(SipServletRequest req) throws ServletException,
+			IOException {
+		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
+		req.getProxy().setAddToPath(true);
+		URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();
+		((ProxyExt)req.getProxy()).setSipOutboundSupport(true);
+		req.getProxy().proxyTo(uri1);
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -253,12 +266,27 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 
 			proxy.proxyTo(uris);
 		} else {
+			Proxy proxy = request.getProxy();
 			ArrayList<URI> uris = new ArrayList<URI>();
 			uris.add(uri1);
-			if(!fromURI.getUser().contains("unique-location") && !fromURI.getUser().contains("prack")) {
+			if(!fromURI.getUser().contains("unique-location") && !fromURI.getUser().contains("prack") && !fromURI.getUser().contains(REGISTER_OUTBOUND)) {
 				uris.add(uri2);
 			}
-			Proxy proxy = request.getProxy();
+			if(fromURI.getUser().contains(REGISTER_OUTBOUND)) {
+				((ProxyExt)proxy).setSipOutboundSupport(true);
+			}
+			if(fromURI.getUser().contains(INVITE_INBOUND)) {
+				((ProxyExt)proxy).setSipOutboundSupport(true);
+				uris.clear();
+				SipURI sipURI = sipFactory.createSipURI("receiver", host );
+				sipURI.setPort(5080);
+				if(via.contains("TCP") || via.contains("tcp")) {					
+					sipURI.setTransportParam("tcp");
+					uris.add(sipURI);
+				} else {
+					uris.add(sipURI);
+				}
+			}			
 			List<SipURI> outboundInterfaces = (List<SipURI>)getServletContext().getAttribute(OUTBOUND_INTERFACES);
 
 			if(outboundInterfaces == null) throw new NullPointerException("Outbound interfaces should not be null");
@@ -407,7 +435,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		SipServletResponseExt sipServletResponseExt = (SipServletResponseExt) response;
 		SipApplicationSession sas = response.getApplicationSession();
 		SipServletRequest re = response.getRequest();
-		re.getCallId();
+//		re.getCallId();
 		if(sipServletResponseExt.isOrphan()) {
 			sipServletResponseExt.getApplicationSession(false);
 			return;

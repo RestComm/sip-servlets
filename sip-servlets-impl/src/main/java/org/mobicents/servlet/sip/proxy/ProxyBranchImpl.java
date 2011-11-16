@@ -75,6 +75,8 @@ import org.mobicents.servlet.sip.message.SipServletMessageImpl;
 import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.message.TransactionApplicationData;
+import org.mobicents.servlet.sip.rfc5626.IncorrectFlowIdentifierException;
+import org.mobicents.servlet.sip.rfc5626.RFC5626Helper;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
@@ -444,11 +446,23 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		}
 		
 		// Use the original dialog in the new session
-		newSession.setSessionCreatingDialog(originalSipSession.getSessionCreatingDialog());
+		// commented out proxy applications shouldn't use any dialogs !!!
+//		newSession.setSessionCreatingDialog(originalSipSession.getSessionCreatingDialog());
 		
 		// And set a reference to the proxy		
 		newSession.setProxy(proxy);		
 				
+		try {
+			RFC5626Helper.checkRequest(this, request, originalRequest);
+		} catch (IncorrectFlowIdentifierException e1) {
+			logger.error(e1.getMessage(), e1);
+			try {
+				originalRequest.createResponse(403).send();
+			} catch (IOException e) {
+				logger.error("couldn't send 403 response", e1);
+			}
+			return;
+		}
 		//JSR 289 Section 15.1.6
 		if(!subsequent) {
 			// Subsequent requests can't have a routing directive?
@@ -464,8 +478,8 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		if(clonedRequest.getTransactionApplicationData() != null) {
 			proxy.transactionMap.put(txid, clonedRequest.getTransactionApplicationData());
 		}
-	}
-	
+	}	
+
 	/**
 	 * A callback. Here we receive all responses from the proxied requests we have sent.
 	 * 
@@ -695,6 +709,12 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 						throw new RuntimeException(e);
 					}
 				}
+				try {
+					RFC5626Helper.checkRequest(this, clonedRequest, originalRequest);
+				} catch (IncorrectFlowIdentifierException e1) {
+					logger.error(e1.getMessage(), e1);					
+					return;
+				}
 				sipProvider.sendRequest(clonedRequest);
 			}
 			else {				
@@ -757,6 +777,18 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		String transport = JainSipUtils.findTransport(clonedRequest);
 		SipProvider sipProvider =sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(
 				transport, false).getSipProvider();
+		
+		try {
+			RFC5626Helper.checkRequest(this, clonedRequest, request);
+		} catch (IncorrectFlowIdentifierException e1) {
+			logger.error(e1.getMessage(), e1);
+			try {
+				originalRequest.createResponse(403).send();
+			} catch (IOException e) {
+				logger.error("couldn't send 403 response", e1);
+			}
+			return;
+		}
 		
 		if(logger.isDebugEnabled()) {
 			logger.debug("Getting new Client Tx for request " + clonedRequest);
@@ -941,6 +973,10 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 			this.pathURI = new SipURIImpl (JainSipUtils.createRecordRouteURI( proxy.getSipFactoryImpl().getSipNetworkInterfaceManager(), null), ModifiableRule.NotModifiable);
 		}		
 		this.isAddToPath = isAddToPath;
+	}
+	
+	public boolean isAddToPath() {
+		return this.isAddToPath;
 	}
 
 	/**

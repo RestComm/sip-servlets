@@ -27,6 +27,7 @@ import gov.nist.javax.sip.SipStackImpl;
 import gov.nist.javax.sip.TransactionExt;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.MessageExt;
+import gov.nist.javax.sip.message.SIPRequest;
 import gov.nist.javax.sip.stack.IllegalTransactionStateException;
 import gov.nist.javax.sip.stack.IllegalTransactionStateException.Reason;
 import gov.nist.javax.sip.stack.SIPTransaction;
@@ -2177,41 +2178,45 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	/**
 	 * {@inheritDoc}
 	 */
-	public String getInitialRemoteAddr() {	
-		if(getTransaction() != null) {
-			if(((SIPTransaction)getTransaction()).getPeerPacketSourceAddress() != null) {
-				return ((SIPTransaction)getTransaction()).getPeerPacketSourceAddress().getHostAddress();
-			} else {
-				return ((SIPTransaction)getTransaction()).getPeerAddress();
-			}
-		} else {
-			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
-			if(via == null) {
-				return null;
-			} else {
-				return via.getHost();
-			}
-		}
+	public String getInitialRemoteAddr() {
+		return ((SIPRequest)message).getRemoteAddress().getHostAddress();
+		// replaced because wasn't giving correct info for ACK
+//		if(getTransaction() != null) {
+//			if(((SIPTransaction)getTransaction()).getPeerPacketSourceAddress() != null) {
+//				return ((SIPTransaction)getTransaction()).getPeerPacketSourceAddress().getHostAddress();
+//			} else {
+//				return ((SIPTransaction)getTransaction()).getPeerAddress();
+//			}
+//		} else {
+//			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
+//			if(via == null) {
+//				return null;
+//			} else {
+//				return via.getHost();
+//			}
+//		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
-	public int getInitialRemotePort() {		
-		if(getTransaction() != null) {
-			if(((SIPTransaction)getTransaction()).getPeerPacketSourceAddress() != null) {
-				return ((SIPTransaction)getTransaction()).getPeerPacketSourcePort();
-			} else {
-				return ((SIPTransaction)getTransaction()).getPeerPort();
-			}
-		}else {
-			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
-			if(via == null) {
-				return -1;
-			} else {
-				return via.getPort()<=0 ? 5060 : via.getPort();
-			}
-		}
+	public int getInitialRemotePort() {
+		return ((SIPRequest)message).getRemotePort();
+		// replaced because wasn't giving correct info for ACK
+//		if(getTransaction() != null) {
+//			if(((SIPTransaction)getTransaction()).getPeerPacketSourceAddress() != null) {
+//				return ((SIPTransaction)getTransaction()).getPeerPacketSourcePort();
+//			} else {
+//				return ((SIPTransaction)getTransaction()).getPeerPort();
+//			}
+//		}else {
+//			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
+//			if(via == null) {
+//				return -1;
+//			} else {
+//				return via.getPort()<=0 ? 5060 : via.getPort();
+//			}
+//		}
 		
 	}
 

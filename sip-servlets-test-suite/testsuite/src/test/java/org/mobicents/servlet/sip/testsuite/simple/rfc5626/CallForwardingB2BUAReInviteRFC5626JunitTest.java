@@ -29,6 +29,7 @@ import javax.sip.header.MaxForwardsHeader;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
+import org.mobicents.servlet.sip.testsuite.RFC5626UseCase;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
 /*
@@ -110,7 +111,7 @@ public class CallForwardingB2BUAReInviteRFC5626JunitTest extends SipServletTestC
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.setRFC5626Support(true);		
+		sender.setRFC5626UseCase(RFC5626UseCase.B2BUA);		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isInviteReceived());

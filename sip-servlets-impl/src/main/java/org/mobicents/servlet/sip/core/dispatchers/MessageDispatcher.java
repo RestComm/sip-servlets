@@ -111,6 +111,7 @@ public abstract class MessageDispatcher {
 	 * 
 	 */
 	public static final String SIP_OUTBOUND_PARAM_OB = "ob";
+	public static final String SIP_OUTBOUND_PARAM_REG_ID = "reg-id";	
 		
 	public MessageDispatcher() {}
 	

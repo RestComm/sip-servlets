@@ -2121,7 +2121,7 @@ public class TestSipListener implements SipListener {
 				.createViaHeader("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "", sipProvider
 						.getListeningPoint(protocolObjects.transport).getPort(), listeningPoint.getTransport(),
 						null);
-		if(rfc5626UseCase != null && rfc5626UseCase == RFC5626UseCase.B2BUA) {
+		if(rfc5626UseCase != null && (rfc5626UseCase == RFC5626UseCase.B2BUA || rfc5626UseCase == RFC5626UseCase.Proxy)) {
 			//try to bind to non existing IP
 			 viaHeader = protocolObjects.headerFactory
 				.createViaHeader("192.192.192.192", sipProvider
@@ -2152,7 +2152,7 @@ public class TestSipListener implements SipListener {
 				fromHeader, toHeader, viaHeaders, maxForwards);
 		// Create contact headers
 		String host = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
-		if(rfc5626UseCase != null && rfc5626UseCase == RFC5626UseCase.B2BUA) {
+		if(rfc5626UseCase != null && (rfc5626UseCase == RFC5626UseCase.B2BUA || rfc5626UseCase == RFC5626UseCase.Proxy)) {
 			//try to bind to non existing IP
 			 host = "192.192.192.192";
 		}
@@ -2171,7 +2171,7 @@ public class TestSipListener implements SipListener {
 					((SipURI)contactUrl).setLrParam();
 				}
 			}
-			if(rfc5626UseCase != null && rfc5626UseCase == RFC5626UseCase.B2BUA) {
+			if(rfc5626UseCase != null && (rfc5626UseCase == RFC5626UseCase.B2BUA || rfc5626UseCase == RFC5626UseCase.Proxy)) {
 				((SipURI)contactUrl).setParameter("ob", null);
 			}
 		} else {

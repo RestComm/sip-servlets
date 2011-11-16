@@ -60,7 +60,6 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
-import org.mobicents.ha.javax.sip.ClusteredSipStack;
 import org.mobicents.ha.javax.sip.ReplicationStrategy;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
@@ -104,8 +103,9 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	private boolean recordRoutingEnabled;
 	private boolean parallel = true;
 	private boolean addToPath;
+	private boolean sipOutboundSupport;
 	private int bestResponseSent = -1;
-	protected transient SipURI pathURI;
+	protected transient SipURIImpl pathURI;
 	protected transient SipURI recordRouteURI;
 	private transient SipURI outboundInterface;
 	private transient SipFactoryImpl sipFactoryImpl;
@@ -134,7 +134,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	private long callerCSeq; 	 // Last CSeq seen from caller
 	private long calleeCSeq = 0; // Last CSeq seen from callee (We may never see one if the callee never sends a request)
 	private boolean storeTerminationInfo = false; // Enables storage of termination information.
-	private ProxyTerminationInfo terminationInfo; // Object to store termination information
+	private ProxyTerminationInfo terminationInfo; // Object to store termination information	
 
 	// empty constructor used only for Externalizable interface
 	public ProxyImpl() {}
@@ -411,7 +411,9 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 			throw new IllegalStateException("Cannot set a record route on an already started proxy");
 		}
 		if(this.pathURI == null) {
-			this.pathURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipNetworkInterfaceManager(), null), ModifiableRule.NotModifiable);
+			this.pathURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipNetworkInterfaceManager(), null), ModifiableRule.Modifiable);			
+			pathURI.setLrParam(true);
+			pathURI.setIsModifiable(ModifiableRule.NotModifiable);
 		}		
 		addToPath = p;
 
@@ -455,7 +457,14 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 				message = originalRequest.getMessage();
 			}
 			// record route should be based on the original received message
-			this.recordRouteURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipNetworkInterfaceManager(), message), ModifiableRule.ProxyRecordRouteNotModifiable);
+			javax.sip.address.SipURI flowUri= originalRequest.getSipSession().getFlow();
+			if(flowUri != null) {				
+				this.recordRouteURI = new SipURIImpl (flowUri, ModifiableRule.ProxyRecordRouteNotModifiable);
+				if(logger.isDebugEnabled())
+					logger.debug("Using Session Flow URI as record route URI " + recordRouteURI);
+			} else {
+				this.recordRouteURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipNetworkInterfaceManager(), message), ModifiableRule.ProxyRecordRouteNotModifiable);
+			}
 			if(logger.isDebugEnabled()) {
 				logger.debug("Record routing enabled for proxy, Record Route used will be : " + recordRouteURI.toString());
 			}
@@ -1119,6 +1128,16 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	 */
 	public int getBestResponseSent() {
 		return bestResponseSent;
+	}
+
+	@Override
+	public boolean getSipOutboundSupport() {		
+		return sipOutboundSupport;
+	}
+
+	@Override
+	public void setSipOutboundSupport(boolean sipOutboundSupport) {
+		this.sipOutboundSupport = sipOutboundSupport;
 	}
 
 
