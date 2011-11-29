@@ -2179,6 +2179,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	 * {@inheritDoc}
 	 */
 	public String getInitialRemoteAddr() {
+		if(message == null || ((SIPRequest)message).getRemoteAddress() == null) {
+			return null;
+		}
 		return ((SIPRequest)message).getRemoteAddress().getHostAddress();
 		// replaced because wasn't giving correct info for ACK
 //		if(getTransaction() != null) {
@@ -2201,6 +2204,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	 * {@inheritDoc}
 	 */
 	public int getInitialRemotePort() {
+		if(message == null ) {
+			return -1;
+		}
 		return ((SIPRequest)message).getRemotePort();
 		// replaced because wasn't giving correct info for ACK
 //		if(getTransaction() != null) {
