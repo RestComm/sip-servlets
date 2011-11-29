@@ -110,6 +110,32 @@ public class ProxyEdgeRecordRouteTest extends SipServletTestCase {
 		assertTrue(sender.getOkToByeReceived());		
 	}
 	
+	public void testProxyProcessOutgoingInitialRequests403() throws Exception {
+		String fromName = "register-outbound";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "proxy-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setRFC5626UseCase(RFC5626UseCase.Proxy);
+		sender.sendSipRequest("REGISTER", fromAddress, toAddress, null, null, false, new String[]{"Supported"}, new String[]{"outbound"}, true);		
+		Thread.sleep(TIMEOUT);
+		assertEquals(200, sender.getFinalResponseStatus());
+		PathHeader pathHeader = (PathHeader) sender.getFinalResponse().getHeader(PathHeader.NAME);
+		assertNotNull(pathHeader);
+		String flow = ((SipURI)pathHeader.getAddress().getURI()).getUser();
+		assertNotNull(flow);
+		assertNotNull(((SipURI)pathHeader.getAddress().getURI()).getParameter("ob"));
+		((SipURI)pathHeader.getAddress().getURI()).setUser("77+977+977+977+9AXvvv71C77+9Qu+/vTlt3ITvv70677+977+9Zi9UQ1BfMTI3LjAuMC4xXzUwNzBfMTI3LjAuMC4xXzQ2MTYy");
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null,(SipURI) pathHeader.getAddress().getURI(), false, null, null, true);
+		Thread.sleep(TIMEOUT);		
+		assertEquals(403,sender.getFinalResponseStatus());					
+	}
+	
 	public void testProxyProcessIncomingInitialRequests() throws Exception {
 		String fromName = "invite-inbound";
 		String fromSipAddress = "sip-servlets.com";

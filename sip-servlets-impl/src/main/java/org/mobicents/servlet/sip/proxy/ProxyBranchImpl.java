@@ -455,7 +455,8 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		try {
 			RFC5626Helper.checkRequest(this, request, originalRequest);
 		} catch (IncorrectFlowIdentifierException e1) {
-			logger.error(e1.getMessage(), e1);
+			logger.warn(e1.getMessage());
+			this.cancel();
 			try {
 				originalRequest.createResponse(403).send();
 			} catch (IOException e) {
@@ -712,7 +713,8 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 				try {
 					RFC5626Helper.checkRequest(this, clonedRequest, originalRequest);
 				} catch (IncorrectFlowIdentifierException e1) {
-					logger.error(e1.getMessage(), e1);					
+					logger.warn(e1.getMessage());		
+					this.cancel();
 					return;
 				}
 				sipProvider.sendRequest(clonedRequest);
@@ -781,7 +783,8 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		try {
 			RFC5626Helper.checkRequest(this, clonedRequest, request);
 		} catch (IncorrectFlowIdentifierException e1) {
-			logger.error(e1.getMessage(), e1);
+			logger.warn(e1.getMessage());
+			this.cancel();
 			try {
 				originalRequest.createResponse(403).send();
 			} catch (IOException e) {

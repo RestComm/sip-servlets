@@ -218,17 +218,26 @@ public class RFC5626Helper {
 	private static HopImpl decodeFlowToken(String user) throws IncorrectFlowIdentifierException {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Decoding RFC 5626 Flow token " + user);
+		}		
+		byte[] byteConcat = Base64.decodeBase64(user.getBytes());
+		if(logger.isDebugEnabled()) {
+			logger.debug("Decoding RFC 5626 Flow token byteContact after base64 decoding is " + new String(byteConcat).trim());
 		}
-		byte[] byteConcat = Base64.decodeBase64(user);
 		String concatenation = new String(byteConcat);
 		int indexOfSlash = concatenation.indexOf("/");
 		String hmac = concatenation.substring(0, indexOfSlash);
 		String arrayS = concatenation.substring(indexOfSlash + 1, concatenation.length());
-		byte[] recomputedHmac = mac.doFinal(arrayS.getBytes());
-		// FIXME for some reason the hmac is not recomputed to the same value
-//		if(!Arrays.equals(hmac.trim().getBytes(),recomputedHmac)) {
-//			throw new IncorrectFlowIdentifierException("hmac " + hmac.getBytes() + " is different from the recomputed hmac " + recomputedHmac);
-//		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("Decoding RFC 5626 Flow token recomputing hmac of array S " + arrayS);
+		}
+		byte[] recomputedHmac = mac.doFinal(arrayS.trim().getBytes());
+		if(logger.isDebugEnabled()) {
+			logger.debug("Decoding RFC 5626 Flow token recomputed Hmac" + recomputedHmac);
+		}
+		recomputedHmac = new String(recomputedHmac).trim().getBytes();
+		if(!Arrays.equals(hmac.trim().getBytes(),recomputedHmac)) {
+			throw new IncorrectFlowIdentifierException("hmac " + hmac + " is different from the recomputed hmac " + new String(recomputedHmac).trim());
+		}
 		StringTokenizer stringTokenizer = new StringTokenizer(arrayS, "_");
 		String transport = stringTokenizer.nextToken();
 		stringTokenizer.nextToken();
@@ -264,14 +273,25 @@ public class RFC5626Helper {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Generating RFC 5626 Flow token from " + arrayS);
 		}
-		byte[] byteArrayS = arrayS.toString().getBytes();
+		byte[] byteArrayS = arrayS.toString().trim().getBytes();
 		byte[] hmac = mac.doFinal(byteArrayS);
-		byte[] byteConcat = new byte[hmac.length + byteArrayS.length + 1];
-		System.arraycopy(hmac, 0, byteConcat, 0, hmac.length);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Generating RFC 5626 Flow token hmac is " + new String(hmac).trim());
+		}
+		hmac = new String(hmac).trim().getBytes();
 		byte[] concatDelimiter = "/".getBytes();
+		byte[] byteConcat = new byte[hmac.length + concatDelimiter.length + byteArrayS.length];
+		System.arraycopy(hmac, 0, byteConcat, 0, hmac.length);		
 		System.arraycopy(concatDelimiter, 0, byteConcat, hmac.length, concatDelimiter.length);
-		System.arraycopy(byteArrayS, 0, byteConcat, hmac.length +1, byteArrayS.length);
+		System.arraycopy(byteArrayS, 0, byteConcat, hmac.length + concatDelimiter.length, byteArrayS.length);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Generating RFC 5626 Flow token byteContact before base64 encoding is " + new String(byteConcat).trim());
+		}
 		// does not result in a 32 octet id though...
-		return Base64.encodeBase64String(byteConcat).trim();
+		byte[] base64Encoded = Base64.encodeBase64(byteConcat);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Generating RFC 5626 Flow token byteContact after base64 encoding is " + new String(base64Encoded).trim());
+		}
+		return new String(base64Encoded).trim();
 	}
 }
