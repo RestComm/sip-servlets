@@ -448,7 +448,7 @@
 		
 		<copy todir="${release.path}/src/mobicents/servers/sip-servlets" includeEmptyDirs="false">
 			<fileset dir="${base.path}/../.."
-				includes="**/pom.xml **/sip-servlets-application-router/** **/sip-servlets-bootstrap/** **/sip-servlets-examples/** **/sip-servlets-impl/** **/sip-servlets-management/** **/sip-servlets-spec/**"
+				includes="**/pom.xml **/sip-servlets-annotations/** **/sip-servlets-application-router/** **/sip-servlets-bootstrap/** **/sip-servlets-catalina/** **/sip-servlets-catalina-7/** **/sip-servlets-client/** **/sip-servlets-core-api/** **/sip-servlets-examples/** **/sip-servlets-impl/** **/sip-servlets-jboss5/** **/sip-servlets-jboss5-deployer/** **/sip-servlets-jboss5-ha-server-cache/** **/sip-servlets-jboss5-metadata/** **/sip-servlets-jruby/** **/sip-servlets-management/** **/sip-servlets-spec/** **/sip-servlets-tomcat-jboss4/** **/tomcat7/**"
 				excludes="**/mobicents-skin/** **/sip-servlets-bootstrap/src/site/** **/sip-servlets-impl/null/** **/www/**" />
 		</copy>
 		
