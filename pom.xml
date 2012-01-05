@@ -204,7 +204,7 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<properties>
-				<tomcat.version>6.0.33</tomcat.version>	
+				<tomcat.version>6.0.35</tomcat.version>	
 			</properties>			
 			<modules>		
 				<module>sip-servlets-catalina</module>						
@@ -227,7 +227,7 @@
 				<module>sip-servlets-tomcat-jboss4</module>				
 			</modules>
 			<properties>
-				<tomcat.version>6.0.33</tomcat.version>	
+				<tomcat.version>6.0.35</tomcat.version>	
 			</properties>	
 			<dependencies>
 				<!-- j2ee dependencies -->
@@ -249,7 +249,7 @@
 				<module>sip-servlets-jboss5</module>				
 			</modules>
 			<properties>
-				<tomcat.version>6.0.33</tomcat.version>	
+				<tomcat.version>6.0.35</tomcat.version>	
 			</properties>	
 			<dependencies>
 				<!-- j2ee dependencies -->
@@ -268,7 +268,7 @@
 				<module>sip-servlets-tomcat-jboss4</module>				
 			</modules>
 			<properties>
-				<tomcat.version>6.0.33</tomcat.version>	
+				<tomcat.version>6.0.35</tomcat.version>	
 			</properties>	
 			<dependencies>
 				<!-- j2ee dependencies -->
@@ -287,7 +287,7 @@
 				<module>sip-servlets-tomcat-jboss4</module>				
 			</modules>
 			<properties>
-				<tomcat.version>6.0.33</tomcat.version>	
+				<tomcat.version>6.0.35</tomcat.version>	
 			</properties>	
 			<dependencies>
 				<!-- j2ee dependencies -->
@@ -309,7 +309,7 @@
 				<module>sip-servlets-jboss5</module>				
 			</modules>
 			<properties>
-				<tomcat.version>6.0.33</tomcat.version>	
+				<tomcat.version>6.0.35</tomcat.version>	
 			</properties>	
 			<dependencies>
 				<!-- j2ee dependencies -->
