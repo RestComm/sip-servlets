@@ -70,7 +70,7 @@
 	
 	<!-- Release target -->
 	
-	<target name="release" depends="clean,release-tomcat7,release-tomcat,release-jboss-5-jdk6,make-src-zip" />
+	<target name="release" depends="clean,build-documentation,release-tomcat7,release-tomcat,release-jboss-5-jdk6,make-src-zip" />
 	
 	<!-- Tomcat version -->
 	
@@ -100,7 +100,7 @@
 		</antcall>
 		
 		<mkdir dir="${tomcat.home}/docs" />
-		<antcall target="build-documentation">
+		<antcall target="copy-documentation">
 			<param name="mss.home" value="${tomcat.home}"/>
 		</antcall>
 		<antcall target="make-final-zip-tomcat" />
@@ -134,7 +134,7 @@
 			</antcall>
 			
 			<mkdir dir="${tomcat7.home}/docs" />
-			<antcall target="build-documentation">
+			<antcall target="copy-documentation">
 				<param name="mss.home" value="${tomcat7.home}"/>
 			</antcall>
 			<antcall target="make-final-zip-tomcat7" />
@@ -175,7 +175,7 @@
 		<antcall target="build-mobicents-sip-load-balancer">
 			<param name="mss.home" value="${jboss-5-jdk6.home}"/>
 		</antcall>
-		<antcall target="build-documentation">
+		<antcall target="copy-documentation">
 			<param name="mss.home" value="${jboss-5-jdk6.home}"/>
 		</antcall>
 		<!-- include Click to Call example -->
@@ -408,7 +408,9 @@
 		<exec executable="${mvn.executable}" dir="${docs.stage.dir}/sip-servlets/">
 			<arg line="clean install -P mobicents" />
 		</exec>
-		
+	</target>
+	
+	<target name="copy-documentation">
 		<!--copy overwrite="true" todir="${jboss.home}/docs/mobicents-media-server">
 			<fileset dir="${docs.stage.dir}/media/target/docbook/publish/en-US/" />
 		</copy-->
