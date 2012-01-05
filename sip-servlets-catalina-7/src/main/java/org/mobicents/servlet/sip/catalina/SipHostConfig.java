@@ -78,35 +78,41 @@ public class SipHostConfig extends HostConfig {
 
         //        String baseName = getBaseName(name);
         
-        ContextName cn = new ContextName(name, null);
+        ContextName cn = new ContextName(name);
         String baseName = cn.getBaseName();
         
         //No need for docBase, replace by baseName
         //String docBase = getBaseName(name);
+        if (deploymentExists(baseName)) {
+            return;
+        }
         
         // Deploy XML descriptors from configBase
         File xml = new File(configBase, baseName + ".xml");
-        if (xml.exists())
-            deployDescriptor(cn, xml, baseName + ".xml");
+        if (xml.exists()) {
+            deployDescriptor(cn, xml);
+            return;
+        }
         // Deploy WARs, and loop if additional descriptors are found
         File war = new File(appBase, baseName + ".war");
         if (war.exists()) {
         	boolean isSipServletApplication = isSipServletArchive(war);
             if(isSipServletApplication) {  
-            	deploySAR(cn, war, baseName + ".war");
+            	deploySAR(cn, war);
             } else {
-            	deployWAR(cn, war, baseName + ".war");
+            	deployWAR(cn, war);
             }
+            return;
         }
         // Deploy expanded folders
         File dir = new File(appBase, baseName);
         if (dir.exists()) {
-            deployDirectory(cn, dir, baseName);
+            deployDirectory(cn, dir);
         }
 		// Deploy SARs, and loop if additional descriptors are found
         File sar = new File(appBase, baseName + SAR_EXTENSION);
         if (sar.exists()) {
-            deploySAR(cn, sar, baseName + SAR_EXTENSION);
+            deploySAR(cn, sar);
         }
 	}
 	
@@ -116,7 +122,7 @@ public class SipHostConfig extends HostConfig {
 	 * @param sar
 	 * @param string
 	 */
-	private void deploySAR(ContextName cn, File sar, String file) {
+	private void deploySAR(ContextName cn, File sar) {
 		if (deploymentExists(cn.getName()))
             return;
 		if(logger.isDebugEnabled()) {
@@ -128,23 +134,23 @@ public class SipHostConfig extends HostConfig {
 		host.setConfigClass(SIP_CONTEXT_CONFIG_CLASS);
 		setConfigClass(SIP_CONTEXT_CONFIG_CLASS);
 		setContextClass(SIP_CONTEXT_CLASS);
-		deployWAR(cn, sar, file);
+		deployWAR(cn, sar);
 		host.setConfigClass(initialConfigClass);
 		configClass = initialConfigClass;
         contextClass = initialContextClass;
 	}
 	
 	@Override
-	protected void deployWAR(ContextName cn, File dir, String file) {
+	protected void deployWAR(ContextName cn, File dir) {
 		if(logger.isTraceEnabled()) {
     		logger.trace("Context class used to deploy the WAR : " + contextClass);
     		logger.trace("Context config class used to deploy the WAR : " + configClass);
     	}
-		super.deployWAR(cn, dir, file);
+		super.deployWAR(cn, dir);
 	}
 
 	@Override
-	protected void deployDirectory(ContextName cn, File dir, String file) {
+	protected void deployDirectory(ContextName cn, File dir) {
 		if (deploymentExists(cn.getName()))
             return;
 		
@@ -159,18 +165,18 @@ public class SipHostConfig extends HostConfig {
 			host.setConfigClass(SIP_CONTEXT_CONFIG_CLASS);
 			setConfigClass(SIP_CONTEXT_CONFIG_CLASS);
 			setContextClass(SIP_CONTEXT_CLASS);
-			super.deployDirectory(cn, dir, file);
+			super.deployDirectory(cn, dir);
 			host.setConfigClass(initialConfigClass);
 			configClass = initialConfigClass;
 	        contextClass = initialContextClass;
 		} else {
-			super.deployDirectory(cn, dir, file);
+			super.deployDirectory(cn, dir);
 		}
 	}
 	
 	@Override
-	protected void deployDescriptor(ContextName cn, File contextXml, String file) {
-		super.deployDescriptor(cn, contextXml, file);
+	protected void deployDescriptor(ContextName cn, File contextXml) {
+		super.deployDescriptor(cn, contextXml);
 	}
 	
 	@Override
@@ -197,16 +203,14 @@ public class SipHostConfig extends HostConfig {
 //                    contextPath = "";
                 
                 if (isServiced(cn.getName()))
-                    continue;
-                
-                String file = files[i];
+                    continue;                               
                                 
                 String initialConfigClass = configClass;
         		String initialContextClass = contextClass;
         		host.setConfigClass(SIP_CONTEXT_CONFIG_CLASS);
         		setConfigClass(SIP_CONTEXT_CONFIG_CLASS);
         		setContextClass(SIP_CONTEXT_CLASS);
-                deploySAR(cn, dir, file);
+                deploySAR(cn, dir);
                 host.setConfigClass(initialConfigClass);
                 configClass = initialConfigClass;
                 contextClass = initialContextClass;        		

@@ -3,11 +3,11 @@
 	<classpathentry including="**/*.java" kind="src" path="src/main/java"/>
 	<classpathentry kind="var" path="M2_REPO/net/java/stun4j/stun4j/1.0.MOBICENTS/stun4j-1.0.MOBICENTS.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.14/tomcat-catalina-7.0.14.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.14/tomcat-coyote-7.0.14.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.14/tomcat-juli-7.0.14.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.14/tomcat-api-7.0.14.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.14/tomcat-servlet-api-7.0.14.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.23/tomcat-catalina-7.0.23.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.23/tomcat-coyote-7.0.23.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.23/tomcat-juli-7.0.23.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.23/tomcat-api-7.0.23.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.23/tomcat-servlet-api-7.0.23.jar"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar" sourcepath="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-api/1.2/jain-sip-api-1.2.jar" sourcepath="/M2_REPO/javax/sip/jain-sip-ri/1.2.X-SNAPSHOT/jain-sip-ri-1.2.X-SNAPSHOT-sources.jar"/>

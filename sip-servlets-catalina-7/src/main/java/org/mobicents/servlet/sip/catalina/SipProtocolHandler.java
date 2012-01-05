@@ -517,7 +517,11 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 		sipConnector.setUseStaticAddress(useStaticAddress);
 	}
 	
-	public InetAddress getAddress() {
+	public String getAddress() {
+		return getName();
+	}
+	
+	public InetAddress getInetIpAddress() {
 		try {
 			return InetAddress.getByName(sipConnector.getIpAddress());
 		} catch (UnknownHostException e) {
@@ -525,7 +529,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			return null;
 		}
 	}
-    public void setAddress(InetAddress ia) { 
+    public void setInetIpAddress(InetAddress ia) { 
     	sipConnector.setIpAddress(ia.getHostAddress());
     }
     
@@ -563,8 +567,8 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 
 	public String getName() {
         String encodedAddr = "";
-        if (getAddress() != null) {
-            encodedAddr = "" + getAddress();
+        if (getInetIpAddress() != null) {
+            encodedAddr = "" + getInetIpAddress();
             if (encodedAddr.startsWith("/"))
                 encodedAddr = encodedAddr.substring(1);
             encodedAddr = URLEncoder.encode(encodedAddr) + "-";

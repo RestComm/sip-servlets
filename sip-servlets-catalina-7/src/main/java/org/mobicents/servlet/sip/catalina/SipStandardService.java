@@ -51,7 +51,6 @@ import javax.sip.header.UserAgentHeader;
 
 import org.apache.catalina.Engine;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.LifecycleState;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardService;
 import org.apache.coyote.ProtocolHandler;
@@ -595,11 +594,12 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 		}	
 		if(!connectorsStartedExternally) {
 			sipApplicationDispatcher.stop();
-		}	
+		}
+		super.stopInternal();
 		if(logger.isInfoEnabled()) {
 			logger.info("SIP Standard Service Stopped.");
 		}
-		setState(LifecycleState.STOPPING);
+//		setState(LifecycleState.STOPPING);		
 	}
 	
 	/**
