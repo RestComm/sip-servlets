@@ -463,7 +463,7 @@ public class ApplicationServerComponent
    
     private boolean runningEmbedded() {
         Configuration pluginConfiguration = this.resourceContext.getPluginConfiguration();
-        String namingUrl = pluginConfiguration.getSimpleValue(ApplicationServerPluginConfigurationProperties.NAMING_URL, null);
+        String namingUrl = pluginConfiguration.getSimpleValue(NAMING_URL_CONFIG_PROP, null);
         return namingUrl == null;
     }
     
