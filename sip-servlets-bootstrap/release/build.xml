@@ -416,7 +416,7 @@
 			<fileset dir="${docs.stage.dir}/sip-servlets/target/docbook/publish/en-US/" />
 		</copy--> 
 		<copy overwrite="true" todir="${mss.home}/docs/mobicents-sip-servlets">
-			<fileset dir="${base.path}/../../docs/jdocbook-mobicents/target/docbook/publish/en-US/" />
+			<fileset dir="${docs.stage.dir}/sip-servlets/jdocbook-mobicents/target/docbook/publish/en-US/" />
 		</copy>
 		
 		<!--delete dir="${docs.stage.dir}" /-->
