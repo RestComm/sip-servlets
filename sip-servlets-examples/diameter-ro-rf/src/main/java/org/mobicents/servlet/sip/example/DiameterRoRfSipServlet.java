@@ -106,7 +106,7 @@ public class DiameterRoRfSipServlet extends SipServlet implements
 			logger.error("Failed to start charging process. Aborting call.", e);
 			request
 					.createResponse(
-							SipServletResponse.SC_TEMPORARLY_UNAVAILABLE)
+							SipServletResponse.SC_TEMPORARILY_UNAVAILABLE)
 					.send();
 		}
 	}
