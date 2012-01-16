@@ -413,7 +413,8 @@
 	    <repository>
 		<id>java.net-Public</id>
 		<name>Maven Java Net Snapshots and Releases</name>
-		<url>https://maven.java.net/content/groups/public/</url>
+		<!--url>https://maven.java.net/content/groups/public/</url-->
+		<url>http://download.java.net/maven/2/</url>
 		<releases>
 				<enabled>true</enabled>
 				<updatePolicy>never</updatePolicy>
