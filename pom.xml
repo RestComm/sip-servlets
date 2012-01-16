@@ -435,7 +435,7 @@
 				<enabled>true</enabled>
 			</releases>
 		</repository>
-		<!--repository>
+		<repository>
 			<id>backup.repository.jboss.org</id>
 			<name>JBoss Repository Backup</name>
 			<url>http://anonsvn.jboss.org/repos/repository.jboss.org/maven2/</url>
@@ -446,7 +446,7 @@
 				<enabled>true</enabled>
 			</releases>
 		</repository>
-		<repository>
+		<!--repository>
 			<id>jboss-snapshots</id>
 			<name>JBoss Snapshot Repository</name>
 			<url>http://snapshots.jboss.org/maven2</url>
