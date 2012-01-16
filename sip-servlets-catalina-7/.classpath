@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry including="**/*.java" kind="src" path="src/main/java"/>
 	<classpathentry kind="var" path="M2_REPO/net/java/stun4j/stun4j/1.0.MOBICENTS/stun4j-1.0.MOBICENTS.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.23/tomcat-catalina-7.0.23.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.23/tomcat-coyote-7.0.23.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.23/tomcat-juli-7.0.23.jar"/>
