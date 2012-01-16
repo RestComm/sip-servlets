@@ -410,14 +410,12 @@
 				<updatePolicy>never</updatePolicy>
 			</snapshots>
 		</repository>
-		<repositories>
-		    <repository>
-			<id>java.net-Public</id>
-			<name>Maven Java Net Snapshots and Releases</name>
-			<url>https://maven.java.net/content/groups/public/</url>
-			<updatePolicy>never</updatePolicy>
-		    </repository>
-		</repositories>
+	    <repository>
+		<id>java.net-Public</id>
+		<name>Maven Java Net Snapshots and Releases</name>
+		<url>https://maven.java.net/content/groups/public/</url>
+		<updatePolicy>never</updatePolicy>
+	    </repository>
 		<!--repository>
 			<id>JbossRepository</id>
 			<name>Jboss Repository</name>
