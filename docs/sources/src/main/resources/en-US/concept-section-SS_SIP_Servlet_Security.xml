@@ -58,7 +58,7 @@
         </listitem>
         <listitem>
           <para>To create &lt;A1_cryptographic_string&gt;, execute the following command in a terminal:</para>
-          <programlisting>home]$ java -cp ../server/default/lib/jbosssx.jar org.jboss.security.auth.spi.RFC2617Digest admin sip-servlets-realm &lt;password&gt;</programlisting>
+          <programlisting>home]$ java -cp ../../common/lib/jbosssx-server.jar org.jboss.security.auth.spi.RFC2617Digest admin sip-servlets-realm &lt;password&gt;</programlisting>
         </listitem>
         <listitem>
           <para>Copy the A1 hash, and paste it into the admin parameter in the previous step.</para>
