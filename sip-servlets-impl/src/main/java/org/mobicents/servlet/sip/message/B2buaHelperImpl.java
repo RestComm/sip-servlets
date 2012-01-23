@@ -62,7 +62,6 @@ import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.RecordRouteHeader;
-import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
 import javax.sip.message.Message;
@@ -103,7 +102,9 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 		B2BUA_SYSTEM_HEADERS.add(CallIdHeader.NAME);
 		B2BUA_SYSTEM_HEADERS.add(CSeqHeader.NAME);
 		B2BUA_SYSTEM_HEADERS.add(ViaHeader.NAME);
-		B2BUA_SYSTEM_HEADERS.add(RouteHeader.NAME);
+		// Fix http://code.google.com/p/mobicents/issues/detail?id=3060
+		// B2buaHelper.createRequest method throws IllegalArgumentException when "Route" header is included in "headerMap"
+//		B2BUA_SYSTEM_HEADERS.add(RouteHeader.NAME);
 		B2BUA_SYSTEM_HEADERS.add(RecordRouteHeader.NAME);
 		B2BUA_SYSTEM_HEADERS.add(PathHeader.NAME);
 	}
