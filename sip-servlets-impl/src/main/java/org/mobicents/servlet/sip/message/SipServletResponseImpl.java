@@ -594,7 +594,9 @@ public abstract class SipServletResponseImpl extends SipServletMessageImpl imple
 			}
 			if(originalRequest != null) {				
 				originalRequest.setResponse(this);
-				if(originalRequest.getTransaction() !=  null && originalRequest.getTransaction().getApplicationData() != null && ((TransactionApplicationData)originalRequest.getTransaction().getApplicationData()).getSipServletMessage() != null) {
+				if(originalRequest.getTransaction() !=  null && originalRequest.getTransaction().getApplicationData() != null && 
+						((TransactionApplicationData)originalRequest.getTransaction().getApplicationData()).getSipServletMessage() != null &&
+						((TransactionApplicationData)originalRequest.getTransaction().getApplicationData()).getSipServletMessage() instanceof SipServletRequestImpl) {
 					// used for early dialog failover purposes
 					((SipServletRequestImpl)((TransactionApplicationData)originalRequest.getTransaction().getApplicationData()).getSipServletMessage()).setResponse(this);
 				}				
