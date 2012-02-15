@@ -758,7 +758,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		
 		// Determine the direction of the request. Either it's from the dialog initiator (the caller)
 		// or from the callee
-		if(!request.getFrom().toString().equals(proxy.getCallerFromHeader())) {
+		if(!((MessageExt)request.getMessage()).getFromHeader().getTag().toString().equals(proxy.getCallerFromTag())) {
 			// If it's from the callee we should send it in the other direction
 			targetURI = proxy.getPreviousNode();
 		}

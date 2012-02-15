@@ -126,7 +126,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	
 	// The From-header of the initiator of the request. Used to determine the direction of the request.
 	// Caller -> Callee or Caller <- Callee
-	private String callerFromHeader;
+	private String callerFromTag;
 	// Issue 1791 : using a timer service created outside the application loader to avoid leaks on startup/shutdown
 	private transient ProxyTimerService proxyTimerService;
 
@@ -155,7 +155,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 				throw new IllegalArgumentException("couldn't parse the outbound interface " + outboundInterface, e);
 			}
 		}
-		this.callerFromHeader = request.getFrom().toString();
+		this.callerFromTag = ((MessageExt)request.getMessage()).getFromHeader().getTag();
 		this.previousNode = extractPreviousNodeFromRequest(request);
 		this.callerCSeq = ((MessageExt)request.getMessage()).getCSeqHeader().getSeqNumber();
 		String txid = ((ViaHeader) request.getMessage().getHeader(ViaHeader.NAME)).getBranch();
@@ -853,7 +853,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	public void setOriginalRequest(MobicentsSipServletRequest originalRequest) {
 		// Determine the direction of the request. Either it's from the dialog initiator (the caller)
 		// or from the callee
-		if(originalRequest.getFrom().toString().equals(callerFromHeader)) {
+		if(((MessageExt)originalRequest.getMessage()).getFromHeader().getTag().equals(callerFromTag)) {
 			callerCSeq = (((MessageExt)originalRequest.getMessage()).getCSeqHeader().getSeqNumber());
 		} else {
 			// If it's from the callee we should send it in the other direction
@@ -974,12 +974,12 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 		return previousNode;
 	}
 
-	public String getCallerFromHeader() {
-		return callerFromHeader;
+	public String getCallerFromTag() {
+		return callerFromTag ;
 	}
 
-	public void setCallerFromHeader(String initiatorFromHeader) {
-		this.callerFromHeader = initiatorFromHeader;
+	public void setCallerFromTag(String initiatorFromTag) {
+		this.callerFromTag = initiatorFromTag;
 	}
 
 	public Map<String, TransactionApplicationData> getTransactionMap() {
@@ -1010,7 +1010,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 			finalBranchForSubsequentRequests.setProxy(this);
 		}
 		previousNode = (SipURI) in.readObject();
-		callerFromHeader = in.readUTF();
+		callerFromTag = in.readUTF();
 		calleeCSeq = in.readLong();
 		callerCSeq = in.readLong();
 		storeTerminationInfo = in.readBoolean();
@@ -1044,7 +1044,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 		out.writeBoolean(tryingSent);
 		out.writeObject(finalBranchForSubsequentRequests);
 		out.writeObject(previousNode);
-		out.writeUTF(callerFromHeader);
+		out.writeUTF(callerFromTag);
 		out.writeLong(calleeCSeq);
 		out.writeLong(callerCSeq);
 		out.writeBoolean(storeTerminationInfo);
