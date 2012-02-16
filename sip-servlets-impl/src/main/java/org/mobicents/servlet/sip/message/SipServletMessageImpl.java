@@ -272,6 +272,12 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 					+ "] is system header, cant add, modify it!!!");
 		}
 
+		if (hName.equalsIgnoreCase("From") || hName.equalsIgnoreCase("To")) {
+			logger.error("Error, can't add From or To header [" + hName + "]");
+			throw new IllegalArgumentException(
+					"Can't add From or To header, see JSR 289 Section 4.1.2");
+		}
+
 		try {
 			String nameToAdd = getCorrectHeaderName(hName);
 			Header h = SipFactoryImpl.headerFactory.createHeader(nameToAdd, addr.toString());
@@ -802,10 +808,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 * @see javax.servlet.sip.SipServletMessage#getFrom()
 	 */
 	public Address getFrom() {
-		// AddressImpl enforces immutability!!
 		FromHeader from = (FromHeader) this.message
 				.getHeader(getCorrectHeaderName(FromHeader.NAME));
-		AddressImpl address = new AddressImpl(from.getAddress(), AddressImpl.getParameters((Parameters)from), getTransaction() == null ? ModifiableRule.Modifiable : ModifiableRule.NotModifiable);
+		AddressImpl address = new AddressImpl(from.getAddress(), AddressImpl.getParameters((Parameters)from), ModifiableRule.From);
 		return address;
 	}
 	
@@ -1121,7 +1126,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	public Address getTo() {
 		ToHeader to = (ToHeader) this.message
 			.getHeader(getCorrectHeaderName(ToHeader.NAME));
-		return new AddressImpl(to.getAddress(), AddressImpl.getParameters((Parameters)to), getTransaction() == null ? ModifiableRule.Modifiable : ModifiableRule.NotModifiable);
+		return new AddressImpl(to.getAddress(), AddressImpl.getParameters((Parameters)to), ModifiableRule.To);
 	}
 	
 	/*
@@ -1181,6 +1186,12 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		if (isSystemHeader(getModifiableRule(hName))) {
 			throw new IllegalArgumentException("Cant remove system header["
 					+ hName + "]");
+		}
+		
+		if (hName.equalsIgnoreCase("From") || hName.equalsIgnoreCase("To")) {
+			logger.error("Error, can't remove From or To header [" + hName + "]");
+			throw new IllegalArgumentException(
+					"Cant remove From or To header, see JSR 289 Section 4.1.2");
 		}
 
 		String nameToSearch = getCorrectHeaderName(hName);
@@ -1242,9 +1253,15 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 					+ addr + "]");
 
 		if (isSystemHeader(getModifiableRule(hName))) {
-			logger.error("Error, cant remove system header [" + hName + "]");
+			logger.error("Error, can't set system header [" + hName + "]");
 			throw new IllegalArgumentException(
 					"Cant set system header, it is maintained by container!!");
+		}
+
+		if (hName.equalsIgnoreCase("From") || hName.equalsIgnoreCase("To")) {
+			logger.error("Error, can't set From or To header [" + hName + "]");
+			throw new IllegalArgumentException(
+					"Cant set From or To header, see JSR 289 Section 4.1.2");
 		}
 
 //		if (!isAddressTypeHeader(hName)) {

@@ -599,6 +599,25 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());
 	}
+	
+	// test for http://code.google.com/p/mobicents/issues/detail?id=2563
+	public void testShootmeFromToHeadersModification() throws Exception {
+		String fromName = "fromToHeaderModification";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertEquals(200, sender.getFinalResponseStatus());
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());
+	}
 
 	// test for http://code.google.com/p/mobicents/issues/detail?id=2578
 	public void testShootmeAuthenticationInfoHeader() throws Exception {

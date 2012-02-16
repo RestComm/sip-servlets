@@ -102,6 +102,7 @@ public class SimpleSipServlet
 	private static final String TEST_NO_ACK_RECEIVED = "noAckReceived";
 	private static final String TEST_SYSTEM_HEADER_MODIFICATION = "systemHeaderModification";
 	private static final String TEST_SERIALIZATION = "serialization";
+	private static final String TEST_FROM_TO_HEADER_MODIFICATION = "fromToHeaderModification";
 	
 	@Resource
 	SipFactory sipFactory;
@@ -181,6 +182,51 @@ public class SimpleSipServlet
 			}			
 			res.send();
 			return;
+		}
+		
+		// 4.1.2 The From and To Header Fields
+		if(fromString.contains(TEST_FROM_TO_HEADER_MODIFICATION)) {
+			((SipURI)request.getFrom().getURI()).setUser("modifiedFrom");
+			((SipURI)request.getTo().getURI()).setUser("modifiedTo");
+			((SipURI)request.getAddressHeader("From").getURI()).setUser("modifiedFrom");
+			((SipURI)request.getAddressHeader("To").getURI()).setUser("modifiedTo");
+			request.getFrom().setURI(request.getFrom().getURI());
+			request.getTo().setURI(request.getTo().getURI());
+			try {
+				request.setAddressHeader("From", request.getFrom());
+				request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR).send();
+				return;
+			} catch (IllegalArgumentException e) {
+				logger.info("expected exception thrown on setting from header");
+			}
+			try {
+				request.addAddressHeader("To", request.getTo(), true);
+				request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR).send();
+				return;
+			} catch (IllegalArgumentException e) {
+				logger.info("expected exception thrown on adding to header");
+			}
+			try {
+				request.removeHeader("To");
+				request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR).send();
+				return;
+			} catch (IllegalArgumentException e) {
+				logger.info("expected exception thrown on removing to header");
+			}
+			try {
+				request.getFrom().setParameter("tag", "newtag");
+				request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR).send();
+				return;
+			} catch (IllegalStateException e) {
+				logger.info("expected exception thrown on setting from tag");
+			}
+			try {
+				request.getTo().setParameter("tag", "newtag");
+				request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR).send();
+				return;
+			} catch (IllegalStateException e) {
+				logger.info("expected exception thrown on setting to tag");
+			}
 		}
 		
 		if(fromString.contains(CLONE_URI)) {			
