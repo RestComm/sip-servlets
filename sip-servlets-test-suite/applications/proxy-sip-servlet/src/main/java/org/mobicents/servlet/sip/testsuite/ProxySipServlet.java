@@ -78,7 +78,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 	private static String TEST_TERMINATION = "test_termination";
 	private static String REGISTER_OUTBOUND = "register-outbound";
 	private static String INVITE_INBOUND = "invite-inbound";
-	
+	private static final String BRANCHES = "branches";
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
 
 	@Resource TimerService timerService;
@@ -350,7 +350,15 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 				}
 			}
 			
-			proxy.proxyTo(uris);
+			if(fromURI.getUser().contains(BRANCHES)) {		
+				List<ProxyBranch> proxyBranches = proxy.createProxyBranches(uris);
+				for(ProxyBranch proxyBranch : proxyBranches) {
+					proxyBranch.getRequest().setContent("test", CONTENT_TYPE);
+				}
+				proxy.startProxy();
+			} else {
+				proxy.proxyTo(uris);
+			}
 		}
 	}
 

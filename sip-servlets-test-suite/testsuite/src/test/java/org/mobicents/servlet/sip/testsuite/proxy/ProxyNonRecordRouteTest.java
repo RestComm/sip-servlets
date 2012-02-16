@@ -96,6 +96,36 @@ public class ProxyNonRecordRouteTest extends SipServletTestCase {
 		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
 		assertTrue("sessionReadyToInvalidate", allMessagesContent.contains("sessionReadyToInvalidate"));
 	}
+	
+	/*
+	 * Testing setting the SDP Content on Proxy Branches
+	 */
+	public void testProxySetSDPContentOnBranches() throws Exception {
+		String fromName = "unique-location-nonRecordRouting-branches";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "proxy-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(receiver.isAckReceived());
+		receiver.setAckReceived(false);
+		sender.setAckSent(false);
+		sender.sendBye();
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());
+		assertTrue(sender.getOkToByeReceived());
+		List<String> allMessagesContent = sender.getAllMessagesContent();
+		assertEquals(2,allMessagesContent.size());
+		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
+		assertTrue("sessionReadyToInvalidate", allMessagesContent.contains("sessionReadyToInvalidate"));
+	}
 
 	@Override
 	public void tearDown() throws Exception {
