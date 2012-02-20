@@ -176,6 +176,55 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		assertEquals(2, i);
 	}
 
+	public void testCallForwardingREGISTERCheckContact() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-tcp-sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "forward-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("REGISTER", fromAddress, toAddress, null, null, false, new String[] {UserAgentHeader.NAME, "extension-header"}, new String[] {"TestSipListener UA", "extension-sip-listener"}, true);		
+		Thread.sleep(TIMEOUT);
+		ListIterator<UserAgentHeader> userAgentHeaderIt = receiver.getRegisterReceived().getHeaders(UserAgentHeader.NAME);
+		int i = 0; 
+		while (userAgentHeaderIt.hasNext()) {
+			UserAgentHeader userAgentHeader = (UserAgentHeader) userAgentHeaderIt
+					.next();
+			assertTrue(userAgentHeader.toString().trim().endsWith("CallForwardingB2BUASipServlet"));
+			i++;
+		}
+		assertEquals(1, i);
+		ListIterator<ContactHeader> contactHeaderIt = receiver.getRegisterReceived().getHeaders(ContactHeader.NAME);
+		assertTrue(contactHeaderIt.hasNext());
+		assertTrue(contactHeaderIt.next().toString().trim().startsWith("Contact: <sip:forward-tcp-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070;transport=tcp>"));
+		assertTrue(contactHeaderIt.hasNext());
+		assertTrue(contactHeaderIt.next().toString().trim().startsWith("Contact: \"callforwardingB2BUA\" <sip:test@192.168.15.15:5055;q=0.1;transport=tcp;test>;test"));
+		ListIterator<Header> extensionHeaderIt = receiver.getRegisterReceived().getHeaders("extension-header");
+		i = 0; 
+		while (extensionHeaderIt.hasNext()) {	
+			extensionHeaderIt.next();
+			i++;
+		}
+		assertEquals(2, i);		
+	}
+
+	
 	public void testCallForwardingCalleeSendByeTCPSender() throws Exception {
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);		
 		SipProvider senderProvider = sender.createProvider();

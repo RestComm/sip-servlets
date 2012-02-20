@@ -245,7 +245,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				if(((SipURI)request.getFrom().getURI()).getUser().contains("factory")) {
 					forwardInviteUsingSipFactory(request, forwardingUri);
 				} else {
-					forwardInviteUsingB2BUAHelper(request, forwardingUri);
+					forwardRequestUsingB2BUAHelper(request, forwardingUri);
 				}
 			} else {
 				logger.info("INVITE has not been forwarded.");
@@ -273,7 +273,19 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		}
 	}	
 	
-	private void forwardInviteUsingB2BUAHelper(SipServletRequest request,
+	@Override
+	protected void doRegister(SipServletRequest request) throws ServletException,
+			IOException {
+		String[] forwardingUri = forwardingUris.get(request.getFrom().getURI().toString());
+		
+		if(forwardingUri != null && forwardingUri.length > 0) {
+			forwardRequestUsingB2BUAHelper(request, forwardingUri);
+		} else {
+			logger.info("REGISTER has not been forwarded.");
+		}
+	}
+	
+	private void forwardRequestUsingB2BUAHelper(SipServletRequest request,
 			String[] forwardingUri) throws IOException, IllegalArgumentException, TooManyHopsException, ServletParseException {
 		B2buaHelper helper = request.getB2buaHelper();						
 		
@@ -295,11 +307,11 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		if(((SipURI)request.getFrom().getURI()).getUser().contains("tcp-sender")) {
 			if(request.getHeader(ContactHeader.NAME).contains("transport=tcp")) {
 				List<String> contactHeaderList = new ArrayList<String>();
-				contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070;q=0.1;lr;transport=udp;test>;test");
+				contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@192.168.15.15:5055;q=0.1;lr;transport=udp;test;method=INVITE;>;test");
 				headers.put("Contact", contactHeaderList);
 			} else {
 				List<String> contactHeaderList = new ArrayList<String>();
-				contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070;q=0.1;lr;transport=tcp;test>;test");
+				contactHeaderList.add("\"callforwardingB2BUA\" <sip:test@192.168.15.15:5055;q=0.1;lr;transport=tcp;test;method=INVITE;>;test");
 				headers.put("Contact", contactHeaderList);
 			}
 		}
@@ -519,6 +531,19 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	            prackPendingMessage.createResponse(sipServletResponse.getStatus()).send();
 	            return;
 	        } 
+			if(originalSession!= null && cSeqValue.indexOf("REGISTER") != -1) {			
+				SipSession peerSession = sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
+			    try {				    	
+			    	SipServletResponse responseToOriginalRequest = sipServletResponse.getRequest().getB2buaHelper().createResponseToOriginalRequest(peerSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
+			    	logger.info("Created response " + responseToOriginalRequest + " to original request " +  sipServletResponse.getRequest());
+			    	responseToOriginalRequest.send();
+			    	return;
+			    }catch (Exception e) {
+			    	logger.error("exception happened while trying to forward the response to the other side", e);
+			    	peerSession.createRequest("BYE").send();
+			    	sipServletResponse.getSession().createRequest("BYE").send();
+				}
+			}
 			//if this is a response to an INVITE we ack it and forward the OK 
 			if(originalSession!= null && cSeqValue.indexOf("INVITE") != -1) {			
 				//create and sends OK for the first call leg							

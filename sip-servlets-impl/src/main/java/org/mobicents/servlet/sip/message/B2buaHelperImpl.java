@@ -218,13 +218,27 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			newSipServletRequest.setRoutingDirective(SipApplicationRoutingDirective.CONTINUE, origRequest);			
 			
 			final String method = origRequest.getMethod();
-			newRequest.removeHeader(ContactHeader.NAME);	
-			// Following JSR 289 section 4.1.3, for REGISTER requests
-			if(Request.REGISTER.equalsIgnoreCase(method) && contactHeaderSet.size() > 0) {
-				for (String contactHeaderValue : contactHeaderSet) {
-					newSipServletRequest.addHeaderInternal(ContactHeader.NAME, contactHeaderValue, true);
+			// For non-REGISTER requests, the Contact header field is not copied but is populated by the container as usual but if Contact header is present in the headerMap 
+			// then relevant portions of Contact header is to be used in the request created, in accordance with section 4.1.3 of the specification.
+			if(Request.REGISTER.equalsIgnoreCase(method)) {
+				// Issue 2565 http://code.google.com/p/mobicents/issues/detail?id=2565
+				// So if the request is REGISTER the Contact Header field is copied and is used 
+				if(contactHeaderSet.size() > 0) {
+					// And additional contact from the map are added + stripping the forbidden params
+					for (String contactHeaderValue : contactHeaderSet) {
+						newSipServletRequest.addHeaderInternal(ContactHeader.NAME, contactHeaderValue, true);						
+					}
+					ListIterator<ContactHeader> contactHeaders = newSipServletRequest.getMessage().getHeaders(ContactHeader.NAME);
+					while (contactHeaders.hasNext()) {
+						final URI contactURI = contactHeaders.next().getAddress().getURI();
+						// and reset its user part and params accoridng to 4.1.3 The Contact Header Field
+						if(contactURI instanceof SipURI) {
+							stripForbiddenContactURIParams((SipURI)contactURI);
+						}
+					}
 				}
 			} else {
+				newRequest.removeHeader(ContactHeader.NAME);	
 				//Creating container contact header
 				ContactHeader contactHeader = null;
 				String fromName = null;
@@ -475,6 +489,17 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 		// and set the new correct ones
 		for (ContactHeader newContactHeader : newContactHeaders) {
 			newRequest.addHeader(newContactHeader);
+		}
+	}
+	
+	private void stripForbiddenContactURIParams(SipURI contactURI) {
+		Iterator<String> uriParameters = contactURI.getParameterNames();
+		while (uriParameters.hasNext()) {
+			String parameter = uriParameters.next();
+			if(CONTACT_FORBIDDEN_PARAMETER.contains(parameter)) {
+				contactURI.removeParameter(parameter);
+				uriParameters = contactURI.getParameterNames();
+			}
 		}
 	}
 	
