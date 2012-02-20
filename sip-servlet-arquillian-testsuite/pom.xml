@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<!-- <parent> <groupId>org.mobicents.servlet.sip</groupId> <artifactId>sip-servlets-bootstrap</artifactId> 
+		<version>1.7.0-SNAPSHOT</version> <relativePath>../sip-servlets-bootstrap/pom.xml</relativePath> 
+		</parent> -->
+
+	<!-- JBoss Parent -->
+	<parent>
+		<groupId>org.jboss</groupId>
+		<artifactId>jboss-parent</artifactId>
+		<version>6-beta-2</version>
+		<relativePath />
+	</parent>
+
+	<groupId>org.mobicents.servlet.sip</groupId>
+	<artifactId>sip-servlets-arquillian-testsuite</artifactId>
+	<version>1.7.0-SNAPSHOT</version>
+	<name>sip-servlets-arquillian-testsuite</name>
+
+	<packaging>pom</packaging>
+
+	<developers>
+		<developer>
+			<name>George Vagenas</name>
+			<email>gvagenas@gmail.com</email>
+		</developer>
+	</developers>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- Versioning -->
+		<!-- <version.arquillian_core>1.0.0.CR7</version.arquillian_core> -->
+		<version.arquillian_core>1.0.0.Final-SNAPSHOT</version.arquillian_core>
+		<version.shrinkwrap_tomcat>1.0.0-beta-12</version.shrinkwrap_tomcat>
+
+		<version.jboss_spec>1.0.0.Final</version.jboss_spec>
+		<version.weld_servlet>1.1.2.Final</version.weld_servlet>
+		<version.ctf.core>1.0.0-SNAPSHOT</version.ctf.core>
+		<version.org.apache.tomcat>6.0.33</version.org.apache.tomcat>
+
+		<!-- override from parent -->
+		<version.release.plugin>2.1</version.release.plugin>
+		<maven.compiler.target>1.5</maven.compiler.target>
+		<maven.compiler.source>1.5</maven.compiler.source>
+
+		<!-- Mobicents -->
+		<version.org.mobicents.servlet.sip>1.7.0-SNAPSHOT</version.org.mobicents.servlet.sip>
+		<version.mobicents.jain.sip.ext>1.0</version.mobicents.jain.sip.ext>
+		<version.mobicents.jain.sip.jboss4>1.2.0.FINAL</version.mobicents.jain.sip.jboss4>
+
+		<!-- Jain SIP -->
+		<jain-sip-api.version>1.2</jain-sip-api.version>
+		<jain-sip-ri.version>1.2.X-SNAPSHOT</jain-sip-ri.version>
+	</properties>
+
+	<modules>
+		<module>simple</module>
+		<module>click2call</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+
+			<dependency>
+				<groupId>javax.servlet</groupId>
+				<artifactId>servlet-api</artifactId>
+				<version>2.5</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- Arquiilian dependencies -->
+			<dependency>
+				<groupId>org.jboss.arquillian</groupId>
+				<artifactId>arquillian-bom</artifactId>
+				<version>${version.arquillian_core}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.arquillian</groupId>
+				<artifactId>arquillian-build</artifactId>
+				<version>${version.arquillian_core}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+
+			<!-- <dependency> <groupId>org.jboss.arquillian.container</groupId> <artifactId>arquillian-container-spi</artifactId> 
+				<version>1.0.0.CR5</version> </dependency> <dependency> <groupId>org.jboss.arquillian.container</groupId> 
+				<artifactId>arquillian-container-test-spi</artifactId> <version>1.0.0.CR5</version> 
+				</dependency> -->
+			<!-- <dependency> <groupId>org.jboss.shrinkwrap.container</groupId> <artifactId>shrinkwrap-container-tomcat-60</artifactId> 
+				<version>${version.shrinkwrap_tomcat}</version> </dependency> -->
+			<dependency>
+				<groupId>org.jboss.weld.servlet</groupId>
+				<artifactId>weld-servlet</artifactId>
+				<version>${version.weld_servlet}</version>
+				<scope>test</scope>
+			</dependency>
+			<!-- <dependency> <groupId>org.jboss.arquillian.protocol</groupId> <artifactId>arquillian-protocol-servlet</artifactId> 
+				<version>1.0.0.CR5</version> </dependency> <dependency> <groupId>org.jboss.arquillian.testenricher</groupId> 
+				<artifactId>arquillian-testenricher-cdi</artifactId> <version>1.0.0.CR5</version> 
+				</dependency> <dependency> <groupId>org.jboss.arquillian.testenricher</groupId> 
+				<artifactId>arquillian-testenricher-resource</artifactId> <version>1.0.0.CR5</version> 
+				</dependency> <dependency> <groupId>org.jboss.arquillian.testenricher</groupId> 
+				<artifactId>arquillian-testenricher-initialcontext</artifactId> <version>1.0.0.CR5</version> 
+				</dependency> <dependency> <groupId>org.jboss.arquillian.junit</groupId> 
+				<artifactId>arquillian-junit-container</artifactId> <version>1.0.0.CR5</version> 
+				<scope>test</scope> </dependency> <dependency> <groupId>junit</groupId> <artifactId>junit</artifactId> 
+				<version>4.8.1</version> <scope>test</scope> </dependency> <dependency> <groupId>org.jboss.shrinkwrap.resolver</groupId> 
+				<artifactId>shrinkwrap-resolver-impl-maven</artifactId> <version>1.0.0-beta-5</version> 
+				<scope>test</scope> </dependency> -->
+			<dependency>
+				<groupId>org.mobicents.servlet.sip.ctf.core</groupId>
+				<artifactId>ctf-core</artifactId>
+				<scope>test</scope>
+				<version>${version.ctf.core}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mobicents.servlet.sip.ctf.core</groupId>
+				<artifactId>ctf-core-extension</artifactId>
+				<scope>test</scope>
+				<version>${version.ctf.core}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.jboss.spec.javax.servlet</groupId>
+				<artifactId>jboss-servlet-api_3.0_spec</artifactId>
+				<version>${version.jboss_spec}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- Mobicents -->
+			<dependency>
+				<groupId>org.mobicents.servlet.sip</groupId>
+				<artifactId>sip-servlets-impl</artifactId>
+				<version>${version.org.mobicents.servlet.sip}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mobicents.servlet.sip</groupId>
+				<artifactId>sip-servlets-client</artifactId>
+				<version>${version.org.mobicents.servlet.sip}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mobicents.servlet.sip</groupId>
+				<artifactId>sip-servlets-application-router</artifactId>
+				<version>${version.org.mobicents.servlet.sip}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mobicents.servlet.sip</groupId>
+				<artifactId>sip-servlets-core-api</artifactId>
+				<version>${version.org.mobicents.servlet.sip}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mobicents.servlet.sip</groupId>
+				<artifactId>sip-servlets-catalina</artifactId>
+				<version>${version.org.mobicents.servlet.sip}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mobicents.servlet.sip</groupId>
+				<artifactId>sip-servlets-tomcat-jboss4</artifactId>
+				<version>${version.org.mobicents.servlet.sip}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mobicents.ha.javax.sip</groupId>
+				<artifactId>mobicents-jain-sip-jboss4</artifactId>
+				<version>${version.mobicents.jain.sip.jboss4}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mobicents.javax.sip</groupId>
+				<artifactId>mobicents-jain-sip-ext</artifactId>
+				<version>${version.mobicents.jain.sip.ext}</version>
+			</dependency>
+
+
+		</dependencies>
+	</dependencyManagement>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<pushChanges>false</pushChanges>
+					<localCheckout>true</localCheckout>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.12</version>
+				<configuration>
+					<testFailureIgnore>true</testFailureIgnore>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<repositories>
+		<repository>
+			<id>jboss-public-repository</id>
+			<name>JBoss Public Repository</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+		</repository>
+
+		<repository>
+			<id>jboss-snapshots-repository</id>
+			<name>JBoss Snapshots repository</name>
+			<url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
+		</repository>
+	</repositories>
+
+</project>
