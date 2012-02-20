@@ -207,7 +207,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.12</version>
 				<configuration>
-					<testFailureIgnore>true</testFailureIgnore>
+				<!--	<testFailureIgnore>true</testFailureIgnore>-->
 				</configuration>
 			</plugin>
 		</plugins>
