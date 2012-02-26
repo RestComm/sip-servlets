@@ -359,6 +359,26 @@
 				</dependency>
 			</dependencies>	
 		</profile>
+		<profile>
+			<id>as7</id>
+			<modules>
+				<module>sip-servlets-as7</module>
+			</modules>
+			<properties>
+				<!-- keep in sync with jboss-as/pom.xml -->
+				<!-- <version.org.jboss.web>7.0.10.Final</version.org.jboss.web> -->
+				<version.org.jboss.spec.javax.servlet.jboss-servlet-api_3.0_spec>1.0.0.Final</version.org.jboss.spec.javax.servlet.jboss-servlet-api_3.0_spec>
+			</properties>
+			<dependencies>
+				<!-- j2ee dependencies -->
+				<dependency>
+					<groupId>org.jboss.spec.javax.servlet</groupId>
+					<artifactId>jboss-servlet-api_3.0_spec</artifactId>
+					<version>${version.org.jboss.spec.javax.servlet.jboss-servlet-api_3.0_spec}</version>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>	
+		</profile>
 		<profile>			
 			<id>docs</id>
 			<modules>
