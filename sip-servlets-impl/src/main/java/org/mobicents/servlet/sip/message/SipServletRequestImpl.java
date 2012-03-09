@@ -1067,6 +1067,10 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
     			}
 	    	} 						
 			
+			//Issue http://code.google.com/p/mobicents/issues/detail?id=3144
+			//Store the transport of the resolved hop to be used later
+			((MessageExt)message).setApplicationData(hop.getTransport());
+			
 			// adding via header and update via branch if null
 			checkViaHeaderAddition();
 						
