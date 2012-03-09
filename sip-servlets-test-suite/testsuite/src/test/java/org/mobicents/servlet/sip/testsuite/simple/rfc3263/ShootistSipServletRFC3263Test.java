@@ -34,7 +34,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
+import javax.sip.header.ContactHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.message.Response;
 
@@ -49,6 +51,7 @@ import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
+import org.mobicents.servlet.sip.testsuite.simple.ShootistSipServletTest;
 import org.xbill.DNS.DClass;
 import org.xbill.DNS.NAPTRRecord;
 import org.xbill.DNS.Name;
@@ -138,6 +141,10 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 	
 	@Override
 	protected void setUp() throws Exception {
+		 System.setProperty( "javax.net.ssl.keyStore",  ShootistSipServletTest.class.getResource("testkeys").getPath() );
+	        System.setProperty( "javax.net.ssl.trustStore", ShootistSipServletTest.class.getResource("testkeys").getPath() );
+	        System.setProperty( "javax.net.ssl.keyStorePassword", "passphrase" );
+	        System.setProperty( "javax.net.ssl.keyStoreType", "jks" );
         super.setUp();		
 	}
 	
@@ -172,6 +179,84 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 		assertNull(routeHeader);
 		assertFalse(badReceiver.getByeReceived());
 		assertTrue(receiver.getByeReceived());
+	}
+	
+	/*
+	 * Non Regression test for Issue http://code.google.com/p/mobicents/issues/detail?id=3140
+	 */
+	public void testShootistTLSwithTLSConnector() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"receiver", "gov.nist", ListeningPoint.TLS, AUTODIALOG, null, null, null);
+		receiver = new TestSipListener(5081, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();			
+		receiverProvider.addSipListener(receiver);
+		receiverProtocolObjects.start();
+		
+		badReceiverProtocolObjects =new ProtocolObjects(
+				"bad-receiver", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+		badReceiver = new TestSipListener(5081, 5070, badReceiverProtocolObjects, false);
+		SipProvider badReceiverProvider = badReceiver.createProvider();			
+		badReceiverProvider.addSipListener(badReceiver);
+		badReceiverProtocolObjects.start();
+		badReceiver.setDropRequest(true);
+		String host = "mobicents.org";
+		
+		tomcat.startTomcat();
+		tomcat.removeConnector(sipConnector);
+		tomcat.addSipConnector(serverName, sipIpAddress, 5071, ListeningPoint.TLS);
+		
+		mockDNSLookup(host);		
+		
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("host", host);
+		params.put("method", "REGISTER");
+		params.put("secureRURI", "true");
+		deployApplication(params);
+		
+		Thread.sleep(TIMEOUT);
+		RouteHeader routeHeader = (RouteHeader) receiver.getRegisterReceived().getHeader(RouteHeader.NAME);
+		assertNull(routeHeader);
+		assertNull(receiver.getRegisterReceived().getHeader(ContactHeader.NAME));		
+	}
+	
+	/*
+	 * Non Regression test for Issue http://code.google.com/p/mobicents/issues/detail?id=3140
+	 */
+	public void testShootistTLSwithTCPConnector() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"receiver", "gov.nist", ListeningPoint.TCP, AUTODIALOG, null, null, null);
+		receiver = new TestSipListener(5081, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();			
+		receiverProvider.addSipListener(receiver);
+		receiverProtocolObjects.start();
+		
+		badReceiverProtocolObjects =new ProtocolObjects(
+				"bad-receiver", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+		badReceiver = new TestSipListener(5081, 5070, badReceiverProtocolObjects, false);
+		SipProvider badReceiverProvider = badReceiver.createProvider();			
+		badReceiverProvider.addSipListener(badReceiver);
+		badReceiverProtocolObjects.start();
+		badReceiver.setDropRequest(true);
+		String host = "mobicents.org";
+		
+		tomcat.startTomcat();
+		tomcat.removeConnector(sipConnector);
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
+		
+		mockDNSLookup(host);		
+		
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("host", host);
+		params.put("method", "REGISTER");
+		params.put("secureRURI", "true");
+		deployApplication(params);
+		
+		Thread.sleep(TIMEOUT);
+		RouteHeader routeHeader = (RouteHeader) receiver.getRegisterReceived().getHeader(RouteHeader.NAME);
+		assertNull(routeHeader);
+		assertNull(receiver.getRegisterReceived().getHeader(ContactHeader.NAME));		
 	}
 	
 	/*
@@ -211,6 +296,8 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 		
 		Set<String> supportedTransports = new HashSet<String>();
 		supportedTransports.add(TRANSPORT.toUpperCase());
+		supportedTransports.add(ListeningPoint.TCP.toUpperCase());
+		supportedTransports.add(ListeningPoint.TLS.toUpperCase());
 		
 		List<NAPTRRecord> mockedNAPTRRecords = new LinkedList<NAPTRRecord>();
 		// mocking the name because localhost is not absolute and localhost. cannot be resolved 
@@ -222,7 +309,16 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 		List<Record> mockedSRVRecords = new LinkedList<Record>();
 		mockedSRVRecords.add(new SRVRecord(new Name("_sip._" + TRANSPORT.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 1, 0, 5080, name));
 		mockedSRVRecords.add(new SRVRecord(new Name("_sip._" + TRANSPORT.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 0, 0, 5081, name));
-		when(dnsLookupPerformer.performSRVLookup("_sip._" + TRANSPORT.toLowerCase() + "." + host + ".")).thenReturn(mockedSRVRecords);
+		when(dnsLookupPerformer.performSRVLookup("_sip._" + TRANSPORT.toLowerCase() + "." + host)).thenReturn(mockedSRVRecords);
+		List<Record> mockedSRVTCPRecords = new LinkedList<Record>();
+		mockedSRVTCPRecords.add(new SRVRecord(new Name("_sips._" + ListeningPoint.TCP.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 1, 0, 5081, name));
+//		mockedSRVTLSRecords.add(new SRVRecord(new Name("_sips._" + ListeningPoint.TLS.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 1, 0, 5081, name));
+		when(dnsLookupPerformer.performSRVLookup("_sips._" + ListeningPoint.TCP.toLowerCase() + "." + host)).thenReturn(mockedSRVTCPRecords);
+		
+		List<Record> mockedSRVTLSRecords = new LinkedList<Record>();
+		mockedSRVTLSRecords.add(new SRVRecord(new Name("_sips._" + ListeningPoint.TCP.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 1, 0, 5081, name));
+//		mockedSRVTLSRecords.add(new SRVRecord(new Name("_sips._" + ListeningPoint.TLS.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 1, 0, 5081, name));
+		when(dnsLookupPerformer.performSRVLookup("_sips._" + ListeningPoint.TLS.toLowerCase() + "." + host)).thenReturn(mockedSRVTLSRecords);
 	}
 	/*
 	 * Making sure the procedures of retrying the next hop of RFC 3263 are working
