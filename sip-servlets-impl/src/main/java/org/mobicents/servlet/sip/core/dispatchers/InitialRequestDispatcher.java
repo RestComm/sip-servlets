@@ -221,6 +221,9 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			if(replacesHeader != null) {
 				joinReplacesDialog = ((SipStackExt)sipProvider.getSipStack()).getReplacesDialog(replacesHeader);
 			}
+			if(logger.isDebugEnabled()) {
+				logger.debug("joinReplacesDialog = " + joinReplacesDialog + ", targetedRequestInfo = " + targetedRequestInfo);
+			}
 			if(targetedRequestInfo != null) {
 				// If no match is found, but the Request-URI in the INVITE corresponds to a conference URI, the UAS MUST ignore the Join header and continue
 				// processing the INVITE as if the Join header did not exist
@@ -231,10 +234,10 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				
 				//Otherwise if no match is found, the UAS rejects the INVITE and returns a 481 Call/Transaction Does Not Exist response.
 //				throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "Join/Replaces Header : no match is found as per RFC 3911, Section 4 or RFC 3891, Section 3 in the request " + request);
-			} else if(((TransactionApplicationData)joinReplacesDialog.getApplicationData()) != null && !Request.INVITE.equals(((TransactionApplicationData)joinReplacesDialog.getApplicationData()).getSipServletMessage().getMethod())) {
+			} else if(joinReplacesDialog != null && ((TransactionApplicationData)joinReplacesDialog.getApplicationData()) != null && !Request.INVITE.equals(((TransactionApplicationData)joinReplacesDialog.getApplicationData()).getSipServletMessage().getMethod())) {
 				//Likewise, if the Join/Replaces header field matches a dialog which was not created with an INVITE, the UAS MUST reject the request with a 481 response.
 				throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "Join/Replaces header field matches a dialog which was not created with an INVITE as per RFC 3911, Section 4 or RFC 3891, Section 3 in the request " + request);
-			} else if(DialogState.TERMINATED.equals(joinReplacesDialog.getState())) {
+			} else if(joinReplacesDialog != null && DialogState.TERMINATED.equals(joinReplacesDialog.getState())) {
 				// If the Join/Replaces header field matches a dialog which has already terminated, the UA SHOULD decline the request with a 603 Declined response.
 				throw new DispatcherException(Response.DECLINE, "Join/Replaces header field matches a dialog which has already terminated as per RFC 3911, Section 4 or RFC 3891, Section 3 in the request " + request);
 			}
