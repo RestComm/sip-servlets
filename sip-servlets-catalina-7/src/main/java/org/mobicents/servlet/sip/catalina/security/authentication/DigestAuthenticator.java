@@ -571,6 +571,12 @@ public class DigestAuthenticator
 		// TODO Auto-generated method stub
 		return false;
 	}
+	
+	@Override
+	public boolean authenticate(Request arg0, HttpServletResponse arg1) throws IOException {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 	@Override
 	public void login(String arg0, String arg1, Request arg2)

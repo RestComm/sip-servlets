@@ -7,13 +7,13 @@
 	<classpathentry kind="var" path="M2_REPO/org/apache/ant/ant-junit/1.7.0/ant-junit-1.7.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/ant/ant-launcher/1.7.0/ant-launcher-1.7.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/ant/ant/1.7.0/ant-1.7.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.23/tomcat-annotations-api-7.0.23.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.23/tomcat-catalina-7.0.23.jar" sourcepath="/M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.23/tomcat-catalina-7.0.23-sources.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.23/tomcat-coyote-7.0.23.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.23/tomcat-juli-7.0.23.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.23/tomcat-servlet-api-7.0.23.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.23/tomcat-api-7.0.23.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.23/tomcat-util-7.0.23.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.26/tomcat-annotations-api-7.0.26.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.26/tomcat-catalina-7.0.26.jar" sourcepath="/M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.26/tomcat-catalina-7.0.26-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.26/tomcat-coyote-7.0.26.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.26/tomcat-juli-7.0.26.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.26/tomcat-servlet-api-7.0.26.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.26/tomcat-api-7.0.26.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.26/tomcat-util-7.0.26.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-api/1.2/jain-sip-api-1.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.X-SNAPSHOT/jain-sip-ri-1.2.X-SNAPSHOT.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-impl"/>
