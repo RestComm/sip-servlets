@@ -62,7 +62,7 @@ public class RFC5626KeepAliveSipServletTest extends SipServletTestCase {
 
 	private static final String TRANSPORT = "tcp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 20000;
+	private static final int TIMEOUT = 30000;
 //	private static final int TIMEOUT = 100000000;
 	
 	SipEmbedded tomcatShootist;

@@ -49,7 +49,7 @@ public class SameSipSessionB2BUACompositionJunitTest extends SipServletTestCase 
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 5000;	
+	private static final int TIMEOUT = 10000;	
 //	private static final int TIMEOUT = 100000000;
 	
 	TestSipListener sender;

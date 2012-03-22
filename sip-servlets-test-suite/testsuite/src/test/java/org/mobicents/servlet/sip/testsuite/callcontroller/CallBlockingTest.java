@@ -39,7 +39,7 @@ public class CallBlockingTest extends SipUnitServletTestCase {
 	private SipStack sipStackSender;
 	private SipPhone sipPhoneSender;	
 
-	private static final int timeout = 10000;	
+	private static final int TIMEOUT = 20000;	
 
 	public CallBlockingTest(String name) {
 		super(name);
@@ -104,7 +104,7 @@ public class CallBlockingTest extends SipUnitServletTestCase {
 		init();
 		SipCall sender = sipPhoneSender.createSipCall();
 		assertTrue(sender.initiateOutgoingCall("sip:receiver@sip-servlets.com", null));
-		assertTrue(sender.waitOutgoingCallResponse(timeout));	
+		assertTrue(sender.waitOutgoingCallResponse(TIMEOUT));	
 		assertResponseReceived(Response.FORBIDDEN, sender);
 	}
 }

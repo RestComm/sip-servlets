@@ -36,7 +36,7 @@ public class ShootistTelURLSipServletTest extends SipServletTestCase {
 	private static transient Logger logger = Logger.getLogger(ShootistTelURLSipServletTest.class);		
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 5000;	
+	private static final int TIMEOUT = 10000;	
 //	private static final int TIMEOUT = 100000000;
 	
 	TestSipListener receiver;

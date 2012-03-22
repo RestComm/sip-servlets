@@ -42,8 +42,8 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 	private SipStack sipStackReceiver;
 	private SipPhone sipPhoneReceiver;
 
-	private static final int TIMEOUT = 20000;
-	private static final int TIMEOUT_FORBIDDEN = 30000;	
+	private static final int TIMEOUT = 30000;
+	private static final int TIMEOUT_FORBIDDEN = 40000;	
 //	private static final int TIMEOUT = 1000000;
 
 	public CallControllerSipUnitTest(String name) {

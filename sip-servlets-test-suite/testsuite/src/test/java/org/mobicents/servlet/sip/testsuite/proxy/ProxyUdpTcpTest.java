@@ -48,7 +48,7 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 	private static final String TRANSPORT_UDP = "udp";
 	private static final String TRANSPORT_TCP = "tcp";
 	private static final boolean AUTODIALOG = true;
-	private static final int TIMEOUT = 10000;	
+	private static final int TIMEOUT = 20000;	
 //	private static final int TIMEOUT = 100000000;
 	
 	TestSipListener sender;
