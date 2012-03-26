@@ -1,0 +1,11 @@
+--- modules/org/jboss/as/web/main/module.xml.original	2012-03-03 23:25:22.662844116 +0100
++++ modules/org/jboss/as/web/main/module.xml	2012-03-03 23:25:38.690642620 +0100
+@@ -65,5 +65,8 @@
+         <module name="org.jboss.common-core"/>
+         <module name="org.picketbox"/>
+         <module name="javax.security.jacc.api"/>
++        <!-- MSS -->
++        <module name="org.mobicents.javax.servlet.sip" export="true"/>
++        <module name="org.mobicents.libs"/>
+     </dependencies>
+ </module>

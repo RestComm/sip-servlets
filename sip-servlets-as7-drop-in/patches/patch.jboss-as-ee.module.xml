@@ -1,0 +1,12 @@
+--- modules/org/jboss/as/ee/main/module.xml.original	2012-03-04 13:38:25.270750472 +0100
++++ modules/org/jboss/as/ee/main/module.xml	2012-03-04 17:54:24.129663467 +0100
+@@ -50,6 +50,9 @@
+         <module name="org.jboss.logging"/>
+         <module name="org.jboss.metadata"/>
+         <module name="org.jboss.vfs"/>
++        <!-- MSS -->
++        <module name="org.mobicents.javax.servlet.sip" export="true"/>
++        <module name="org.mobicents.libs"/>
+ 
+     </dependencies>
+ </module>
