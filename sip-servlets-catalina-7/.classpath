@@ -17,6 +17,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-client"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-impl"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jain-sip"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jain-sip-ext"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/mobicents-jain-sip-ext"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

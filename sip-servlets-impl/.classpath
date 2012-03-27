@@ -17,7 +17,7 @@
 	<classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-jruby"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jain-sip"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jain-sip-ext"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/mobicents-jain-sip-ext"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-core-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/mobicents-jain-sip-ha-core"/>
 	<classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.5/commons-codec-1.5.jar"/>

@@ -161,7 +161,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-client"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/mobicents-jain-sip-ha-core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/mobicents-jain-sip-jboss5"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jain-sip-ext"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/mobicents-jain-sip-ext"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/cache"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/timers"/>

@@ -1,0 +1,24 @@
+<projectDescription>
+  <name>jboss-as-mobicents</name>
+  <comment>JBoss Application Server: Parent Aggregator. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
+  <projects>
+    <project>mobicents-jain-sip-ext</project>
+    <project>mobicents-jain-sip-ha-core</project>
+    <project>sip-servlets-annotations</project>
+    <project>sip-servlets-application-router</project>
+    <project>sip-servlets-as7</project>
+    <project>sip-servlets-client</project>
+    <project>sip-servlets-core-api</project>
+    <project>sip-servlets-impl</project>
+    <project>sip-servlets-jruby</project>
+    <project>sip-servlets-spec</project>
+  </projects>
+  <buildSpec>
+    <buildCommand>
+      <name>org.eclipse.jdt.core.javabuilder</name>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+  </natures>
+</projectDescription>

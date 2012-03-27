@@ -31,8 +31,10 @@ import static org.jboss.as.controller.parsing.ParseUtils.requireNoNamespaceAttri
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedAttribute;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedElement;
 import static org.mobicents.as7.Constants.CONNECTOR;
+import static org.mobicents.as7.Constants.APPLICATION_ROUTER;
 import static org.mobicents.as7.Constants.ENABLED;
 import static org.mobicents.as7.Constants.NAME;
+import static org.mobicents.as7.Constants.VALUE;
 import static org.mobicents.as7.Constants.PROTOCOL;
 import static org.mobicents.as7.Constants.SCHEME;
 import static org.mobicents.as7.Constants.SOCKET_BINDING;
@@ -87,6 +89,16 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
                 writer.writeEndElement();
             }
         }
+        if(node.hasDefined(APPLICATION_ROUTER)) {
+            for(final Property applicationRouter : node.get(APPLICATION_ROUTER).asPropertyList()) {
+                final ModelNode config = applicationRouter.getValue();
+                writer.writeStartElement(Element.APPLICATION_ROUTER.getLocalName());
+                writer.writeAttribute(NAME, applicationRouter.getName());
+                writeAttribute(writer, Attribute.VALUE.getLocalName(), config);
+
+                writer.writeEndElement();
+            }
+        }
         writer.writeEndElement();
     }
 
@@ -123,6 +135,10 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
                     switch (element) {
                         case CONNECTOR: {
                             parseConnector(reader,address, list);
+                            break;
+                        }
+                        case APPLICATION_ROUTER: {
+                            parseApplicationRouter(reader,address, list);
                             break;
                         } default: {
                             throw unexpectedElement(reader);
@@ -195,6 +211,49 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         if(scheme != null) connector.get(SCHEME).set(scheme);
         if(enabled != null) connector.get(ENABLED).set(enabled);
         list.add(connector);
+    }
+
+    static void parseApplicationRouter(XMLExtendedStreamReader reader, ModelNode address, List<ModelNode> list) throws XMLStreamException {
+        String name = null;
+        String value = null;
+        final int count = reader.getAttributeCount();
+        for (int i = 0; i < count; i++) {
+            requireNoNamespaceAttribute(reader, i);
+            final String attrValue = reader.getAttributeValue(i);
+            final Attribute attribute = Attribute.forName(reader.getAttributeLocalName(i));
+            switch (attribute) {
+            case NAME:
+                name = attrValue;
+                break;
+            case VALUE:
+                value = attrValue;
+                break;
+            default:
+                throw unexpectedAttribute(reader, i);
+            }
+        }
+        if (name == null) {
+            throw missingRequired(reader, Collections.singleton(Attribute.NAME));
+        }
+        final ModelNode applicationRouter = new ModelNode();
+        applicationRouter.get(OP).set(ADD);
+        applicationRouter.get(OP_ADDR).set(address).add(APPLICATION_ROUTER, name);
+        while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
+            switch (Namespace.forUri(reader.getNamespaceURI())) {
+            case SIP_1_0: {
+                final Element element = Element.forName(reader.getLocalName());
+                switch (element) {
+                default:
+                    throw unexpectedElement(reader);
+                }
+                //break;
+            }
+            default:
+                throw unexpectedElement(reader);
+            }
+        }
+        if(value != null) applicationRouter.get(VALUE).set(value);
+        list.add(applicationRouter);
     }
 
     static void writeAttribute(final XMLExtendedStreamWriter writer, final String name, ModelNode node) throws XMLStreamException {

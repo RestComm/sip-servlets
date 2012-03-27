@@ -103,6 +103,20 @@
         </plugins>
     </build>
 
+<pluginRepositories>
+<pluginRepository>
+         <id>zanata-releases</id>
+         <name>zanata-releases</name>
+         <url>https://repository.jboss.org/nexus/content/repositories/flies-releases</url>
+         <releases>
+            <enabled>true</enabled>
+         </releases>
+         <snapshots>
+            <enabled>false</enabled>
+         </snapshots>
+      </pluginRepository>
+</pluginRepositories>
+
     <dependencies>
 
     </dependencies>

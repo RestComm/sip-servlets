@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry including="**/*.java" kind="src" path="src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-api/1.2/jain-sip-api-1.2.jar" sourcepath="M2_REPO/javax/sip/jain-sip-api/1.2/jain-sip-api-1.2-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.X-SNAPSHOT/jain-sip-ri-1.2.X-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/javaee-web-api/6.0/javaee-web-api-6.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/logging/jboss-logging/3.1.0.GA/jboss-logging-3.1.0.GA.jar" sourcepath="M2_REPO/org/jboss/logging/jboss-logging/3.1.0.GA/jboss-logging-3.1.0.GA-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/web/jbossweb/7.0.10.Final/jbossweb-7.0.10.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
+	<classpathentry kind="src" path="/mobicents-jain-sip-ext"/>
+	<classpathentry kind="src" path="/mobicents-jain-sip-ha-core"/>
+	<classpathentry kind="src" path="/sip-servlets-annotations"/>
+	<classpathentry kind="src" path="/sip-servlets-client"/>
+	<classpathentry kind="src" path="/sip-servlets-core-api"/>
+	<classpathentry kind="src" path="/sip-servlets-impl"/>
+	<classpathentry kind="src" path="/sip-servlets-jruby"/>
+	<classpathentry kind="src" path="/sip-servlets-spec"/>
+	<classpathentry kind="var" path="M2_REPO/net/java/stun4j/stun4j/1.0.MOBICENTS/stun4j-1.0.MOBICENTS.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>

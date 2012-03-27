@@ -47,6 +47,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-jruby"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-catalina"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-core-api"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jain-sip-ext"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/mobicents-jain-sip-ext"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

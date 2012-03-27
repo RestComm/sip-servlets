@@ -8,18 +8,19 @@
      </extensions>
  
      <management>
-@@ -266,6 +267,10 @@
+@@ -266,6 +268,11 @@
                  <alias name="example.com"/>
              </virtual-server>
          </subsystem>
 +        <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0">
 +            <connector name="sip-udp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-udp"/>
 +            <connector name="sip-tcp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tcp"/>
++            <!--application-router name="darFile" value="${jboss.server.config.dir}/dars/mobicents-dar.properties"/-->
 +        </subsystem>
          <subsystem xmlns="urn:jboss:domain:webservices:1.1">
              <modify-wsdl-address>true</modify-wsdl-address>
              <wsdl-host>${jboss.bind.address:127.0.0.1}</wsdl-host>
-@@ -291,6 +296,8 @@
+@@ -291,6 +297,8 @@
      <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
          <socket-binding name="http" port="8080"/>
          <socket-binding name="https" port="8443"/>

@@ -11,6 +11,12 @@
 	<name>Mobicents Sip Servlets AS7 Abstract Layer</name>
 	<url>http://www.mobicents.org/products_sip_servlets.html</url>
 	<dependencies>
+<dependency>
+    <groupId>javax</groupId>
+    <artifactId>javaee-web-api</artifactId>
+    <version>6.0</version>
+    <scope>provided</scope>
+  </dependency>
 		<dependency>
 			<groupId>org.jboss.web</groupId>
 			<artifactId>jbossweb</artifactId>
