@@ -3,7 +3,7 @@
 	<parent>
         	<artifactId>mobicents</artifactId>
         	<groupId>org.mobicents</groupId>
-        	<version>1.28</version>
+        	<version>1.27-SNAPSHOT</version>
     	</parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-bootstrap</artifactId>
@@ -182,14 +182,17 @@
 		<profile>			
 			<id>release</id>
 			<modules>
-				<module>sip-servlets-catalina</module>				
-				<module>sip-servlets-tomcat-jboss4</module>
-				<module>sip-servlets-jboss5-metadata</module>
 				<module>sip-servlets-jruby</module>
-				<module>sip-servlets-jboss5-deployer</module>
-				<module>sip-servlets-jboss5-ha-server-cache</module>
-				<module>sip-servlets-jboss5</module>			
-				<module>sip-servlets-management</module>
+				<module>containers/sip-servlets-catalina</module>				
+				<module>containers/sip-servlets-tomcat-jboss4</module>
+				<module>containers/sip-servlets-jboss5-metadata</module>
+				<module>containers/sip-servlets-jboss5-deployer</module>
+				<module>containers/sip-servlets-jboss5-ha-server-cache</module>
+				<module>containers/sip-servlets-jboss5</module>
+				<module>containers/sip-servlets-as7</module>
+				<module>containers/sip-servlets-as7-drop-in/jboss-as-mobicents</module>
+				<module>containers/sip-servlets-as7-drop-in/build-mobicents-modules</module>												
+				<module>management/sip-servlets-management</module>
 				<module>sip-servlets-examples</module>
 				<module>sip-servlets-test-suite</module>
 				<module>docs</module>				
@@ -207,8 +210,8 @@
 				<tomcat.version>6.0.35</tomcat.version>	
 			</properties>			
 			<modules>		
-				<module>sip-servlets-catalina</module>						
-				<module>sip-servlets-tomcat-jboss4</module>				
+				<module>containers/sip-servlets-catalina</module>						
+				<module>containers/sip-servlets-tomcat-jboss4</module>				
 			</modules>	
 			<dependencies>
 				<!-- j2ee dependencies -->
@@ -219,34 +222,15 @@
 					<scope>provided</scope>
 				</dependency>
 			</dependencies>		
-		</profile>
-		<profile>			
-			<id>jboss</id>
-			<modules>				
-				<module>sip-servlets-catalina</module>				
-				<module>sip-servlets-tomcat-jboss4</module>				
-			</modules>
-			<properties>
-				<tomcat.version>6.0.35</tomcat.version>	
-			</properties>	
-			<dependencies>
-				<!-- j2ee dependencies -->
-				<dependency>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-					<version>2.5</version>
-					<scope>provided</scope>
-				</dependency>
-			</dependencies>			
-		</profile>
+		</profile>		
 		<profile>			
 			<id>jboss-5</id>			
 			<modules>		
-				<module>sip-servlets-catalina</module>				
-				<module>sip-servlets-jboss5-metadata</module>	
-				<module>sip-servlets-jboss5-deployer</module>					
-				<module>sip-servlets-jboss5-ha-server-cache</module>
-				<module>sip-servlets-jboss5</module>				
+				<module>containers/sip-servlets-catalina</module>				
+				<module>containers/sip-servlets-jboss5-metadata</module>	
+				<module>containers/sip-servlets-jboss5-deployer</module>					
+				<module>containers/sip-servlets-jboss5-ha-server-cache</module>
+				<module>containers/sip-servlets-jboss5</module>				
 			</modules>
 			<properties>
 				<tomcat.version>6.0.35</tomcat.version>	
@@ -264,27 +248,8 @@
 		<profile>			
 			<id>tomcat-distro</id>			
 			<modules>				
-				<module>sip-servlets-catalina</module>				
-				<module>sip-servlets-tomcat-jboss4</module>				
-			</modules>
-			<properties>
-				<tomcat.version>6.0.35</tomcat.version>	
-			</properties>	
-			<dependencies>
-				<!-- j2ee dependencies -->
-				<dependency>
-					<groupId>javax.servlet</groupId>
-					<artifactId>servlet-api</artifactId>
-					<version>2.5</version>
-					<scope>provided</scope>
-				</dependency>
-			</dependencies>			
-		</profile>
-		<profile>			
-			<id>jboss-distro</id>
-			<modules>		
-				<module>sip-servlets-catalina</module>						
-				<module>sip-servlets-tomcat-jboss4</module>				
+				<module>containers/sip-servlets-catalina</module>				
+				<module>containers/sip-servlets-tomcat-jboss4</module>				
 			</modules>
 			<properties>
 				<tomcat.version>6.0.35</tomcat.version>	
@@ -302,11 +267,11 @@
 		<profile>			
 			<id>jboss-5-distro</id>			
 			<modules>
-				<module>sip-servlets-catalina</module>				
-				<module>sip-servlets-jboss5-metadata</module>	
-				<module>sip-servlets-jboss5-deployer</module>					
-				<module>sip-servlets-jboss5-ha-server-cache</module>
-				<module>sip-servlets-jboss5</module>				
+				<module>containers/sip-servlets-catalina</module>				
+				<module>containers/sip-servlets-jboss5-metadata</module>	
+				<module>containers/sip-servlets-jboss5-deployer</module>					
+				<module>containers/sip-servlets-jboss5-ha-server-cache</module>
+				<module>containers/sip-servlets-jboss5</module>				
 			</modules>
 			<properties>
 				<tomcat.version>6.0.35</tomcat.version>	
@@ -324,8 +289,8 @@
 		<profile>			
 			<id>tomcat-7</id>			
 			<modules>
-				<module>sip-servlets-catalina-7</module>			
-				<module>tomcat-7</module>
+				<module>containers/sip-servlets-catalina-7</module>			
+				<module>containers/tomcat-7</module>
 			</modules>
 			<properties>
 				<tomcat.version>7.0.26</tomcat.version>
@@ -343,8 +308,8 @@
 		<profile>
 			<id>tomcat-7-distro</id>
 			<modules>
-				<module>sip-servlets-catalina-7</module>			
-				<module>tomcat-7</module>
+				<module>containers/sip-servlets-catalina-7</module>			
+				<module>containers/tomcat-7</module>
 			</modules>
 			<properties>
 				<tomcat.version>7.0.26</tomcat.version>
@@ -362,7 +327,9 @@
 		<profile>
 			<id>as7</id>
 			<modules>
-				<module>sip-servlets-as7</module>
+				<module>containers/sip-servlets-as7</module>
+				<module>containers/sip-servlets-as7-drop-in/jboss-as-mobicents</module>
+				<module>containers/sip-servlets-as7-drop-in/build-mobicents-modules</module>												
 			</modules>
 			<properties>
 				<!-- keep in sync with jboss-as/pom.xml -->

@@ -1,15 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.mobicents.servlet.sip.example</groupId>
+		<groupId>org.mobicents.servlet.sip.examples</groupId>
 		<artifactId>alerting-app-parent</artifactId>
 		<version>1.7.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<groupId>org.mobicents.servlet.sip.example</groupId>
 	<artifactId>alerting-app</artifactId>
 	<packaging>war</packaging>
-	<version>1.7.0-SNAPSHOT</version>
 	<name>Alerting Application</name>
 	<dependencies>	
 		<!-- media dependencies -->
@@ -26,7 +24,7 @@
 		</dependency>
 		<!-- jslee deps : Commented out since the prefferred way is through SMS Servlets -->
 		<!--dependency>		
-			<groupId>org.mobicents.servlet.sip.example</groupId>
+			<groupId>org.mobicents.servlet.sip.examples</groupId>
 			<artifactId>alerting-app-jslee-custom-events</artifactId>
 			<version>1.5-SNAPSHOT</version>
 			<scope>provided</scope>

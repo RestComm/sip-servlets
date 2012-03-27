@@ -2,15 +2,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<parent>
-		<groupId>org.mobicents.servlet.sip.example</groupId>
+		<groupId>org.mobicents.servlet.sip.examples</groupId>
 		<artifactId>sip-servlets-examples-parent</artifactId>
 		<version>1.7.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<groupId>org.mobicents.servlet.sip.example</groupId>
 	<artifactId>alerting-app-parent</artifactId>
 	<packaging>pom</packaging>
-	<version>1.7.0-SNAPSHOT</version>
 	<name>JSLEE - SIP Servlets Alerting Application Parent</name>
 	<url>http://www.mobicents.org/mss-alerting-application.html</url>
 	<modules>				

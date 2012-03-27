@@ -1,0 +1,187 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>mobicents</artifactId>
+        <groupId>org.mobicents</groupId>
+        <version>1.19</version>
+    </parent>
+    <groupId>org.mobicents.servlet.sip.management</groupId>
+    <artifactId>jopr-mobicents-sip-servlets-plugin</artifactId>
+    <version>1.4-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>Jopr Mobicents Sip Servlets Plugin</name>
+    <description>A plugin for managing Mobicents Sip Servlets servers</description>
+    <repositories>
+              <repository>
+                      <id>jboss-public-repository-group</id>
+                      <name>JBoss Public Maven Repository Group</name>
+                      <url>https://repository.jboss.org/nexus/content/groups/public</url>
+                      <layout>default</layout>
+                      <releases>
+                              <enabled>true</enabled>
+                              <updatePolicy>never</updatePolicy>
+                      </releases>
+                      <snapshots>
+                              <enabled>true</enabled>
+                              <updatePolicy>never</updatePolicy>
+                      </snapshots>
+              </repository>
+      </repositories>
+	
+
+<scm>
+		<connection>scm:svn:http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets</connection>
+		<developerConnection>scm:svn:https://mobicents.googlecode.com/svn/trunk/servers/sip-servlets</developerConnection>
+		<url>http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets</url>
+	</scm>
+<distributionManagement>
+    <repository>
+      <id>jboss-releases-repository</id>
+      <name>JBoss Releases Repository</name>
+      <url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</url>
+    </repository>
+    <snapshotRepository>
+      <id>jboss-snapshots-repository</id>
+      <name>JBoss Snapshots Repository</name>
+      <url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
+    </snapshotRepository>
+  </distributionManagement>
+    <properties>
+        <jopr-version>2.2.0.GA</jopr-version>
+        <rhq.version>1.2.0.GA</rhq.version>
+    </properties>
+	
+    <dependencies>
+
+		<dependency>
+            <groupId>org.rhq</groupId>
+            <artifactId>rhq-core-parent</artifactId>
+            <version>${rhq.version}</version>
+	    	<type>pom</type>
+        </dependency>   
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.14</version>
+            <scope>provided</scope>
+        </dependency>
+
+		<!-- logging dependency -->
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.0.4</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>mc4j</groupId>
+            <artifactId>org-mc4j-ems</artifactId>
+            <version>1.2.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.on</groupId>
+            <artifactId>jopr-jboss-as-plugin</artifactId>
+            <version>${jopr-version}</version>
+        </dependency>
+		
+        <dependency>
+            <groupId>org.jboss.on</groupId>
+            <artifactId>jopr-tomcat-plugin</artifactId>
+            <version>${jopr-version}</version>
+        </dependency>
+		
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>7.0.2</version>
+        </dependency>                     
+
+        <dependency>
+            <groupId>org.rhq</groupId>
+            <artifactId>rhq-core-native-system</artifactId>
+            <version>${rhq.version}</version>
+            <scope>provided</scope> <!-- provided by the agent/plugin-container -->
+        </dependency>
+
+	<dependency>
+            <groupId>org.rhq</groupId>
+            <artifactId>rhq-core-util</artifactId>
+            <version>${rhq.version}</version>
+            <scope>provided</scope> <!-- provided by the agent/plugin-container -->
+        </dependency>
+
+	<dependency>
+            <groupId>org.rhq</groupId>
+            <artifactId>rhq-plugins-parent</artifactId>
+            <version>${rhq.version}</version>
+	    <type>pom</type>
+            <scope>provided</scope> <!-- provided by the agent/plugin-container -->
+        </dependency>
+
+        <dependency>
+            <groupId>org.rhq</groupId>
+            <artifactId>rhq-jmx-plugin</artifactId>
+            <version>${rhq.version}</version>
+            <scope>provided</scope> <!-- provided by the agent/plugin-container -->
+        </dependency>
+
+		<dependency>
+            <groupId>org.rhq</groupId>
+            <artifactId>rhq-core-domain</artifactId>
+            <version>${rhq.version}</version>
+            <scope>provided</scope> <!-- provided by the agent/plugin-container -->
+        </dependency>
+
+		<dependency>
+            <groupId>org.rhq</groupId>
+            <artifactId>rhq-core-plugin-api</artifactId>
+            <version>${rhq.version}</version>
+            <scope>provided</scope> <!-- provided by the agent/plugin-container -->
+        </dependency>
+
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.persistence</groupId>
+            <artifactId>persistence-api</artifactId>
+            <version>1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-annotations</artifactId>
+            <version>3.3.0.ga</version>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-commons-annotations</artifactId>
+            <version>3.3.0.ga</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <compilerArguments>
+                        <g />
+                    </compilerArguments>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                </configuration>
+            </plugin>            
+        </plugins>
+    </build>
+</project>

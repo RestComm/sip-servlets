@@ -4,7 +4,7 @@
 	<packaging>pom</packaging>
 	
 	<parent>
-		<groupId>org.mobicents.servlet.sip.example</groupId>
+		<groupId>org.mobicents.servlet.sip.examples</groupId>
 		<artifactId>jslee-sips-interop-demo-jslee-services-parent</artifactId>
 		<version>1.7.0-SNAPSHOT</version>
 	</parent>
@@ -13,7 +13,7 @@
 	
 	<dependencies>
 		<dependency>
-			<groupId>org.mobicents.servlet.sip.example</groupId>
+			<groupId>org.mobicents.servlet.sip.examples</groupId>
 			<artifactId>jslee-sips-interop-demo-jslee-interop-sbb</artifactId>
 			<version>1.7.0-SNAPSHOT</version>
 		</dependency>

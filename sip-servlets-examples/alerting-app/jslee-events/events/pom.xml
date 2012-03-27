@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	
 	<parent>
-		<groupId>org.mobicents.servlet.sip.example</groupId>
+		<groupId>org.mobicents.servlet.sip.examples</groupId>
 		<artifactId>alerting-app-jslee-events-parent</artifactId>
 		<version>1.5-SNAPSHOT</version>
 	</parent>

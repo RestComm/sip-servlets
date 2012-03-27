@@ -6,7 +6,7 @@
 		<version>1.7.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
-	<groupId>org.mobicents.servlet.sip.example</groupId>
+	<groupId>org.mobicents.servlet.sip.examples</groupId>
 	<artifactId>sip-servlets-examples-parent</artifactId>
 	<version>1.7.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
