@@ -3,7 +3,7 @@
 	<parent>
         	<artifactId>mobicents</artifactId>
         	<groupId>org.mobicents</groupId>
-        	<version>1.27-SNAPSHOT</version>
+        	<version>1.29-SNAPSHOT</version>
     	</parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-bootstrap</artifactId>
@@ -356,6 +356,20 @@
 	<!-- repositories -->
 	<repositories>
 		<repository>
+			  <id>mobicents-public-repository-group</id>
+			  <name>Mobicens Public Maven Repository Group</name>
+			  <url>https://oss.sonatype.org/content/groups/public</url>
+			  <layout>default</layout>
+			  <releases>
+			    <enabled>true</enabled>
+			    <updatePolicy>never</updatePolicy>
+			  </releases>
+			  <snapshots>
+			    <enabled>true</enabled>
+			    <updatePolicy>never</updatePolicy>
+			  </snapshots>
+		</repository>
+		<repository>
 			<id>jboss-public-repository-group</id>
 			<name>JBoss Public Maven Repository Group</name>
 			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
@@ -410,18 +424,7 @@
 				<enabled>true</enabled>
 				<updatePolicy>never</updatePolicy>
 			</snapshots>
-	    </repository>
-		<repository>
-			<id>JbossRepository</id>
-			<name>Jboss Repository</name>
-			<url>http://repository.jboss.org/maven2</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-		</repository>
+	    </repository>		
 		<repository>
 			<id>backup.repository.jboss.org</id>
 			<name>JBoss Repository Backup</name>
