@@ -31,12 +31,12 @@ unzip $BUILD_DIR/../../jboss-as-7.1.1.Final.zip -d $BUILD_DIR
 
 #
 # build sip-servlets-as7-drop-in modules and install in AS7
-mvn clean install -f ./sip-servlets-as7-drop-in/jboss-as-mobicents/pom.xml
+mvn clean install -f ./containers/sip-servlets-as7-drop-in/jboss-as-mobicents/pom.xml
 
-mvn clean package -f ./sip-servlets-as7-drop-in/build-mobicents-modules/pom.xml
+mvn clean package -f ./containers/sip-servlets-as7-drop-in/build-mobicents-modules/pom.xml
 #
 # modules installation
-cp -pr ./sip-servlets-as7-drop-in/build-mobicents-modules/target/$AS7_TAG/modules/org/mobicents/ $BUILD_DIR/$AS7_TAG/modules/org/
+cp -pr ./containers/sip-servlets-as7-drop-in/build-mobicents-modules/target/$AS7_TAG/modules/org/mobicents/ $BUILD_DIR/$AS7_TAG/modules/org/
 cp $BUILD_DIR/../../../src/site/resources/click2call-dar.properties $BUILD_DIR/$AS7_TAG/standalone/configuration/dars
 
 #
@@ -44,15 +44,15 @@ cp $BUILD_DIR/../../../src/site/resources/click2call-dar.properties $BUILD_DIR/$
 cp $BUILD_DIR/$AS7_TAG/standalone/configuration/standalone.xml $BUILD_DIR/$AS7_TAG/standalone/configuration/standalone-sip.xml
 
 cd $BUILD_DIR/$AS7_TAG
-patch -p0 --verbose < ../../../../../sip-servlets-as7-drop-in/patches/patch.standalone.sip.dropin.xml
+patch -p0 --verbose < ../../../../../containers/sip-servlets-as7-drop-in/patches/patch.standalone.sip.dropin.xml
 
 #
 # Configure jboss-as-web module
-patch -p0 --verbose < ../../../../../sip-servlets-as7-drop-in/patches/patch.jboss-as-web.module.xml
+patch -p0 --verbose < ../../../../../containers/sip-servlets-as7-drop-in/patches/patch.jboss-as-web.module.xml
 
 #
 # Configure jboss-as-ee module
-patch -p0 --verbose < ../../../../../sip-servlets-as7-drop-in/patches/patch.jboss-as-ee.module.xml
+patch -p0 --verbose < ../../../../../containers/sip-servlets-as7-drop-in/patches/patch.jboss-as-ee.module.xml
 
 cd ..
 zip -r ../../mss-1.7.0-SNAPSHOT-$AS7_TAG-$(date '+%s').zip $AS7_TAG
