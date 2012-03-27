@@ -54,6 +54,9 @@ patch -p0 --verbose < ../../../../../sip-servlets-as7-drop-in/patches/patch.jbos
 # Configure jboss-as-ee module
 patch -p0 --verbose < ../../../../../sip-servlets-as7-drop-in/patches/patch.jboss-as-ee.module.xml
 
+cd ..
+zip -r ../../mss-1.7.0-SNAPSHOT-$AS7_TAG.zip $AS7_TAG
+
 #
 # Run AS7
 #export JBOSS_HOME=$BUILD_DIR/$AS7_TAG
