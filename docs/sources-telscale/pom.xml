@@ -9,15 +9,15 @@
 		<version>1.7.0-SNAPSHOT</version>
 	</parent>
 	
-	<artifactId>sip-servlets-docs-sources-jbcp</artifactId>
+	<artifactId>sip-servlets-docs-sources-telscale</artifactId>
 			
 	<properties>
-		<platform.name>JBoss Communications</platform.name>
-		<short.platform.name>JBCP SIP Servlets</short.platform.name>
-		<cmd.platform.name>jbcp-ss</cmd.platform.name>		
-		<home.link>jbcp-1.2.1/jboss-eap-4.3/jboss-as/</home.link>
-		<mss4j.release.zip>jbcp-ss-1.0-jboss-4.2.3.GA-0904221307.zip</mss4j.release.zip>
-		<mss4t.release.zip>jbcp-ss-1.0.GA-apache-tomcat-6.0.14-0904221257.zip</mss4t.release.zip>	
+		<platform.name>TelScale</platform.name>
+		<short.platform.name>TelScale SIP Servlets</short.platform.name>
+		<cmd.platform.name>telscale-ss</cmd.platform.name>		
+		<home.link>telscale-6.1/jboss-eap-5.1/jboss-as/</home.link>
+		<mss4j.release.zip>telscale-ss-6.1-eap-5.1.GA.zip</mss4j.release.zip>
+		<mss4t.release.zip>telscale-ss-1.0.GA-apache-tomcat-6.0.35.zip</mss4t.release.zip>	
 		<author.email.ivelin>iivanov@redhat.com</author.email.ivelin>
 		<author.email.eduardo>emartins@redhat.com</author.email.eduardo>
 		<author.email.jean>jean.deruelle@redhat.com</author.email.jean>

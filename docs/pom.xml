@@ -25,9 +25,9 @@
 			</activation>
 			<modules>
 				<module>sources-mobicents</module>
-				<module>sources-jbcp</module>
+				<module>sources-telscale</module>
 				<module>jdocbook-mobicents</module>
-				<module>jdocbook-jbcp</module>
+				<module>jdocbook-telscale</module>
 			</modules>
 		</profile>
 		<profile>
@@ -38,10 +38,10 @@
 			</modules>
 		</profile>
 		<profile>
-			<id>jbcp</id>
+			<id>telscale</id>
 			<modules>
-				<module>sources-jbcp</module>
-				<module>jdocbook-jbcp</module>
+				<module>sources-telscale</module>
+				<module>jdocbook-telscale</module>
 			</modules>
 		</profile>
 	</profiles>
