@@ -44,3 +44,8 @@ hs_err_pid*.log
 PutObjectStoreDirHere
 # ignore mvn-rpmbuild repo
 /.m2
+
+#ignore autogenerate src doco folder
+docs/sources-mobicents/src/
+docs/sources-telscale/src/
+
