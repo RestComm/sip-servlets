@@ -84,11 +84,11 @@
 		<copy file="${base.path}/mss-sip-stack.properties" tofile="${tomcat.home}/conf/mss-sip-stack.properties" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean buildnumber:create install -U -P set-git-hash -DCATALINA_HOME=${tomcat.home} -P tomcat-distro,docs" />
+			<arg line="clean buildnumber:create install -P set-git-hash -DCATALINA_HOME=${tomcat.home} -P tomcat-distro,docs" />
 		</exec>
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
-			<arg line="clean install -U -P set-git-hash" />
+			<arg line="clean install -P set-git-hash" />
 		</exec>
 		
 		<copy tofile="${tomcat.home}/webapps/click2call.war">
@@ -117,12 +117,12 @@
 			<copy file="${base.path}/tomcat7-context-namespaceaware.xml" tofile="${tomcat7.home}/conf/context-namespaceaware.xml.bak"/>		
 			
 			<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-				<!--<arg line="clean buildnumber:create install -U -P set-git-hash -DCATALINA_HOME=${tomcat.home} -P tomcat-distro,docs" />-->
-				<arg line="clean buildnumber:create install -U -P set-git-hash -DCATALINA_HOME=${tomcat7.home} -P tomcat-7-distro" />
+				<!--<arg line="clean buildnumber:create install -P set-git-hash -DCATALINA_HOME=${tomcat.home} -P tomcat-distro,docs" />-->
+				<arg line="clean buildnumber:create install -P set-git-hash -DCATALINA_HOME=${tomcat7.home} -P tomcat-7-distro" />
 			</exec>
 			
 			<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call-servlet3">
-				<arg line="clean install -U -P set-git-hash" />
+				<arg line="clean install -P set-git-hash" />
 			</exec>
 			
 			<copy tofile="${tomcat7.home}/webapps/Click2CallAsync.war">
@@ -155,7 +155,7 @@
 			<property name="jboss.config" value="default"/>
 		</ant>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/diameter-event-charging">
-			<arg line="clean install -U -P set-git-hash" />
+			<arg line="clean install -P set-git-hash" />
 		</exec>		
 		<copy tofile="${jboss-5-jdk6.home}/server/default/deploy/diameter-event-charging.war">
 			<fileset dir="${base.path}/../../sip-servlets-examples/diameter-event-charging/target/" includes="diameter-event-charging-*.war" />
@@ -166,7 +166,7 @@
 		</antcall>
 		<!-- include JSR309 media example -->
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet">
-			<arg line="clean install -U -P set-git-hash" />
+			<arg line="clean install -P set-git-hash" />
 		</exec>
 		<copy tofile="${jboss-5-jdk6.home}/server/default/deploy/media-jsr309-servlet.war">
 			<fileset dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet/target/" includes="media-jsr309-servlet.war" />
@@ -180,7 +180,7 @@
 		</antcall>
 		<!-- include Click to Call example -->
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click-to-call">
-			<arg line="clean install -U -P set-git-hash" />
+			<arg line="clean install -P set-git-hash" />
 		</exec>
 				
 		<copy tofile="${jboss-5-jdk6.home}/server/default/deploy/click2call.war">
@@ -205,7 +205,7 @@
 		<copy file="${base.path}/jboss-5-log4j.xml" overwrite="true" tofile="${mss.home}/server/${jboss.config}/conf/jboss-log4j.xml" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../..">
-			<arg line="clean buildnumber:create install -U -P set-git-hash,jboss-5-distro,docs -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
+			<arg line="clean buildnumber:create install -P set-git-hash,jboss-5-distro,docs -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
 		</exec>		
 		
 		<antcall target="build-mobicents-sglc">
@@ -224,7 +224,7 @@
 		
 		<!-- commented out due to recurring wrong rhq files on hudson -->		
 		<!--exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../jopr-plugin-as-5">
-			<arg line="clean install -U -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
+			<arg line="clean install -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
 		</exec-->
 		<antcall target="deploy-mss-jopr-plugin-5"/>
 		
@@ -252,7 +252,7 @@
 		<copy overwrite="true" file="${base.path}/failover-war-deployers-jboss-beans.xml" tofile="${mss.home}/server/${jboss.config}/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml" />
 		
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/../../sip-servlets-examples/click2call-distributable">
-			<arg line="clean install -U -P set-git-hash" />
+			<arg line="clean install -P set-git-hash" />
 		</exec>
 									
 		<copy tofile="${mss.home}/server/all/deploy/click2call-distributable.war">
@@ -266,7 +266,7 @@
 	<target name="deploy-mgmnt">
 		<property name="management.home" location="${base.path}/../../management/sip-servlets-management/"/>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${management.home}">
-			<arg line="clean install -U -P set-git-hash" />
+			<arg line="clean install -P set-git-hash" />
 		</exec>
 		<copy file="${management.home}/target/sip-servlets-management-${mss.release.version}.war" tofile="${management.deploy.folder}/sip-servlets-management.war"/>
 	</target>
