@@ -9,11 +9,13 @@
 	<artifactId>sip-servlets-bootstrap</artifactId>
 	<version>1.7.0-SNAPSHOT</version>
 	<packaging>pom</packaging>	
+
 	<name>Mobicents Sip Servlets</name>
-	<url>http://www.mobicents.org/products_sip_servlets.html</url>
+	<description>Mobicents SIP Servlets</description>
+	<url>http://code.google.com/p/sipservlets/</url>
 	<ciManagement>
 		<system>Hudson</system>
-		<url>https://hudson.jboss.org/hudson/job/MobicentsSipServlets/</url>
+		<url>https://mobicents.ci.cloudbees.com/job/Mobicents-SipServlets-Testsuite/</url>
 	</ciManagement>
 	<developers>
 		<developer>
@@ -66,11 +68,13 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
+	
 	<scm>
-		<connection>scm:svn:https://mobicents.googlecode.com/svn/trunk/servers/sip-servlets</connection>
-		<developerConnection>scm:svn:https://mobicents.googlecode.com/svn/trunk/servers/sip-servlets</developerConnection>
-		<url>http://code.google.com/p/mobicents/source/browse/trunk/servers/sip-servlets</url>
+		<connection>scm:git:https://code.google.com/p/sipservlets/</connection>
+		<developerConnection>scm:git:https://code.google.com/p/sipservlets/</developerConnection>
+		<url>https://code.google.com/p/sipservlets/</url>
 	</scm>
+
 	<modules>
 		<module>sip-servlets-bootstrap</module>
 		<module>sip-servlets-spec</module>
@@ -84,9 +88,9 @@
 	
 	<properties>
 		<mobicents.tools.mavenplugin.eclipse.version>1.0.0.FINAL</mobicents.tools.mavenplugin.eclipse.version>
-		<mobicents.cluster.version>1.12</mobicents.cluster.version>
+		<mobicents.cluster.version>1.13.1.FINAL</mobicents.cluster.version>
 		<mobicents.balancer.version>1.5.0.FINAL</mobicents.balancer.version>
-		<mobicents.jain.sip.ha.version>1.4.0-SNAPSHOT</mobicents.jain.sip.ha.version>
+		<mobicents.jain.sip.ha.version>1.3.1.FINAL</mobicents.jain.sip.ha.version>
 		<mobicents.jain.sip.ext.version>1.1</mobicents.jain.sip.ext.version>		
 	</properties>
 	
@@ -107,9 +111,8 @@
 		<configuration>
 			<allowTimestampedSnapshots>true</allowTimestampedSnapshots>
 			<preparationGoals>clean install</preparationGoals>
-                       	<tagBase>
-                               	https://mobicents.googlecode.com/svn/tags/servers/sip-servlets/
-                       	</tagBase>
+			<autoVersionSubmodules>true</autoVersionSubmodules>							
+			<arguments>-Dmaven.test.skip</arguments>                       	
 		</configuration>
 	</plugin>
 
@@ -170,10 +173,10 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-release-plugin</artifactId>
 						<configuration>
-							<autoVersionSubmodules>true</autoVersionSubmodules>
-							<tagBase>https://mobicents.googlecode.com/svn/tags/servers/sip-servlets
-							</tagBase>
-							<arguments>-Dmaven.test.skip</arguments>
+							<allowTimestampedSnapshots>true</allowTimestampedSnapshots>
+							<preparationGoals>clean install</preparationGoals>
+							<autoVersionSubmodules>true</autoVersionSubmodules>							
+							<arguments>-Dmaven.test.skip</arguments>                       	
 						</configuration>
 					</plugin>
 				</plugins>
