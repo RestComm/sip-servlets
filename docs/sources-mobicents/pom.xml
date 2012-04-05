@@ -44,9 +44,9 @@
 						<configuration>
 							<artifactItems>
 								<artifactItem>
-									<groupId>${pom.groupId}</groupId>
+									<groupId>${project.groupId}</groupId>
 									<artifactId>sip-servlets-docs-sources</artifactId>
-									<version>${pom.version}</version>
+									<version>${project.version}</version>
 									<type>jar</type>
 									<overWrite>true</overWrite>
 									<outputDirectory>${basedir}/src/main/resources</outputDirectory>
