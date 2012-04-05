@@ -14,8 +14,6 @@
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.26/tomcat-servlet-api-7.0.26.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.26/tomcat-api-7.0.26.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.26/tomcat-util-7.0.26.jar"/>
-	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-api/1.2/jain-sip-api-1.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.X-SNAPSHOT/jain-sip-ri-1.2.X-SNAPSHOT.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-impl"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-spec"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-annotations"/>
@@ -25,5 +23,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-core-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-catalina-7"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/mobicents-jain-sip-ext"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jain-sip"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

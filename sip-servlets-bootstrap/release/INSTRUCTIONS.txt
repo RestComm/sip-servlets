@@ -1,6 +1,0 @@
-Download Tomcat 6.0.14 in this directory (release) in zip format
-Download Jboss 4.2.2.GA in this directory (release) in zip format
-Change the MAVEN_HOME to map your own in build.properties
-Set M2_HOME to the same folder.
-open a shell and do :
-ant
