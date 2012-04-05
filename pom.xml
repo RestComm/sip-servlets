@@ -77,8 +77,7 @@
 		<url>https://code.google.com/p/sipservlets/</url>
 	</scm>
 
-	<modules>
-		<module>sip-servlets-bootstrap</module>
+	<modules>		
 		<module>sip-servlets-spec</module>
 		<module>sip-servlets-client</module>		
 		<module>sip-servlets-jruby</module>
