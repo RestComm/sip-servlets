@@ -100,9 +100,8 @@
 					<eclipseProjectName>sip-servlets-catalina-7</eclipseProjectName>
 				</configuration>
 			</plugin>
-			<plugin>
+			<!--plugin>
         		<artifactId>maven-javadoc-plugin</artifactId>
-        		<!-- Note: Older versions will not work. -->
         		<version>2.6.1</version>        	
         			<configuration>
 					    <doclet>org.jboss.apiviz.APIviz</doclet>
@@ -127,7 +126,7 @@
           				 <docfilessubdirs>true</docfilessubdirs>
           				 <overview>${basedir}/src/javadoc/overview.html</overview>
 			        </configuration>
-      		</plugin>
+      		</plugin-->
 		</plugins>
 	</build>			
 	<profiles>
