@@ -115,7 +115,7 @@
 		<!-- release properties -->
 		<release.name.prefix>mobicents-all-</release.name.prefix> 
 		<release.name.suffix>-jboss-${jboss.version}</release.name.suffix> 		
-		<release.name>${release.name.prefix}${pom.version}${release.name.suffix}</release.name>
+		<release.name>${release.name.prefix}${project.version}${release.name.suffix}</release.name>
 	</properties>
 	<!-- repositories -->
 	<repositories>
