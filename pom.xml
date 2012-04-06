@@ -328,6 +328,7 @@
 			<properties>
 				<!-- keep in sync with jboss-as/pom.xml -->
 				<!-- <version.org.jboss.web>7.0.10.Final</version.org.jboss.web> -->
+				<jboss.version>7.1.1.Final</jboss.version>
 				<version.org.jboss.spec.javax.servlet.jboss-servlet-api_3.0_spec>1.0.0.Final</version.org.jboss.spec.javax.servlet.jboss-servlet-api_3.0_spec>
 			</properties>
 			<dependencies>

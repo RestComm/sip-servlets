@@ -28,9 +28,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.jboss.as</groupId>
-        <artifactId>jboss-as-parent</artifactId>
-        <version>7.1.1.Final</version>
+        <groupId>org.mobicents.servlet.sip</groupId>
+		<artifactId>sip-servlets-bootstrap</artifactId>
+		<version>1.7.0-SNAPSHOT</version>
+		<relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <groupId>org.mobicents.servlet.sip.containers</groupId>
@@ -38,7 +39,6 @@
 
     <name>JBoss Application Server: Build Mobicents Add-on Modules</name>
 	<description>>JBoss Application Server: Build Mobicents Add-on Modules</description>
-	<url>http://www.mobicents.org</url>    
 	<packaging>pom</packaging>
     
     <properties>
@@ -49,37 +49,11 @@
         <generated.configs.examples>${generated.configs}/docs/examples/configs</generated.configs.examples>
         <generated.configs.src.dir>${basedir}/src/main/resources</generated.configs.src.dir>
         <!-- MSS -->
-        <mobicents.sip-servlets.version>1.7.0-SNAPSHOT</mobicents.sip-servlets.version>
         <junit.version>4.1</junit.version>
-        <jain-sip-api.version>1.2</jain-sip-api.version>
-        <jain-sip-ri.version>1.2.X-SNAPSHOT</jain-sip-ri.version>
-        <mobicents.tools.mavenplugin.eclipse.version>1.0.0.FINAL</mobicents.tools.mavenplugin.eclipse.version>
-        <mobicents.cluster.version>1.12</mobicents.cluster.version>
-        <mobicents.balancer.version>1.5-SNAPSHOT</mobicents.balancer.version>
-        <mobicents.jain.sip.ha.version>1.4.0-SNAPSHOT</mobicents.jain.sip.ha.version>
-        <mobicents.jain.sip.ext.version>1.1-SNAPSHOT</mobicents.jain.sip.ext.version>
-        <dnsjava.version>2.1.0</dnsjava.version>
+	<version.org.jboss.jandex>1.0.3.Final</version.org.jboss.jandex>
+	<version.rhino.js>1.7R2</version.rhino.js>
+	<version.org.apache.ant>1.8.2</version.org.apache.ant>
     </properties>
-
-	<distributionManagement>
-	    <repository>
-	      <id>mobicents-releases-repository</id>
-	      <name>Mobicents Releases Repository</name>
-	      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-	    </repository>
-	    <snapshotRepository>
-	      <id>mobicents-snapshots-repository</id>
-	      <name>Mobicents Snapshots Repository</name>
-	      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-	    </snapshotRepository>
-	  </distributionManagement>
-
-
-	 <scm>
-                <connection>scm:git:https://code.google.com/p/sipservlets/</connection>
-                <developerConnection>scm:git:https://code.google.com/p/sipservlets/</developerConnection>
-                <url>https://code.google.com/p/sipservlets/</url>
-        </scm>
 
     <build>
         <plugins>
@@ -137,82 +111,8 @@
             <enabled>false</enabled>
          </snapshots>
       </pluginRepository>
-<pluginRepository>
-                          <id>mobicents-public-repository-group</id>
-                          <name>Mobicens Public Maven Repository Group</name>
-                          <url>https://oss.sonatype.org/content/groups/public</url>
-                          <layout>default</layout>
-                          <releases>
-                            <enabled>true</enabled>
-                            <updatePolicy>never</updatePolicy>
-                          </releases>
-                          <snapshots>
-                            <enabled>true</enabled>
-                            <updatePolicy>never</updatePolicy>
-                          </snapshots>
-                </pluginRepository>
-		<pluginRepository>
-			<id>jboss-public-repository-group</id>
-			<name>JBoss Public Maven Repository Group</name>
-			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
-			<layout>default</layout>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-			</snapshots>
-		</pluginRepository>
 </pluginRepositories>
 
-
-<repositories>
-		<repository>
-                          <id>mobicents-public-repository-group</id>
-                          <name>Mobicens Public Maven Repository Group</name>
-                          <url>https://oss.sonatype.org/content/groups/public</url>
-                          <layout>default</layout>
-                          <releases>
-                            <enabled>true</enabled>
-                            <updatePolicy>never</updatePolicy>
-                          </releases>
-                          <snapshots>
-                            <enabled>true</enabled>
-                            <updatePolicy>never</updatePolicy>
-                          </snapshots>
-                </repository>
-		<repository>
-			<id>jboss-public-repository-group</id>
-			<name>JBoss Public Maven Repository Group</name>
-			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
-			<layout>default</layout>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>jboss-deprecated-repository</id>
-			<name>JBoss Deprecated Maven Repository</name>
-			<url>https://repository.jboss.org/nexus/content/repositories/deprecated/ 
-	            </url>
-			<layout>default</layout>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-				<updatePolicy>never</updatePolicy>
-			</snapshots>
-		</repository>
-	</repositories>
 
     <dependencies>
 
@@ -220,32 +120,6 @@
 
     <profiles>
 	<profile>
-                      <id>release-sign-artifacts</id>
-                      <activation>
-                        <property>
-                          <name>performRelease</name>
-                          <value>true</value>
-                        </property>
-                      </activation>
-                      <build>
-                        <plugins>
-                          <plugin>
-                            <groupId>org.apache.maven.plugins</groupId>
-                            <artifactId>maven-gpg-plugin</artifactId>
-                            <executions>
-                              <execution>
-                                <id>sign-artifacts</id>
-                                <phase>install</phase>
-                                <goals>
-                                  <goal>sign</goal>
-                                </goals>
-                              </execution>
-                            </executions>
-                          </plugin>
-                        </plugins>
-                      </build>
-                    </profile>
-        <profile>
             <id>normal</id>
             <activation>
                 <property><name>!minimalistic</name></property>
@@ -277,48 +151,48 @@
                 <dependency>
                     <groupId>org.mobicents.servlet.sip</groupId>
                     <artifactId>sip-servlets-impl</artifactId>
-                    <version>${mobicents.sip-servlets.version}</version>
+                    <version>${project.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>org.mobicents.servlet.sip</groupId>
                     <artifactId>sip-servlets-spec</artifactId>
-                    <version>${mobicents.sip-servlets.version}</version>
+                    <version>${project.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>org.mobicents.servlet.sip</groupId>
                     <artifactId>sip-servlets-annotations</artifactId>
-                    <version>${mobicents.sip-servlets.version}</version>
+                    <version>${project.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>org.mobicents.servlet.sip</groupId>
                     <artifactId>sip-servlets-jruby</artifactId>
-                    <version>${mobicents.sip-servlets.version}</version>
+                    <version>${project.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>org.mobicents.servlet.sip</groupId>
                     <artifactId>sip-servlets-client</artifactId>
-                    <version>${mobicents.sip-servlets.version}</version>
+                    <version>${project.version}</version>
                 </dependency>
 
                 <dependency>
                     <groupId>org.mobicents.servlet.sip</groupId>
                     <artifactId>sip-servlets-core-api</artifactId>
-                    <version>${mobicents.sip-servlets.version}</version>
+                    <version>${project.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
                 <dependency>
                     <groupId>org.mobicents.servlet.sip.containers</groupId>
                     <artifactId>sip-servlets-as7</artifactId>
-                    <version>${mobicents.sip-servlets.version}</version>
+                    <version>${project.version}</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -332,7 +206,7 @@
                 <dependency>
                     <groupId>dnsjava</groupId>
                     <artifactId>dnsjava</artifactId>
-                    <version>${dnsjava.version}</version>
+                    <version>2.0.6</version>
                     <scope>provided</scope>
                 </dependency>
 
@@ -346,7 +220,7 @@
                 <dependency>
                     <groupId>org.mobicents.servlet.sip</groupId>
                     <artifactId>sip-servlets-application-router</artifactId>
-                    <version>${mobicents.sip-servlets.version}</version>
+                    <version>${project.version}</version>
                 </dependency>
 
             </dependencies>
