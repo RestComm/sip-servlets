@@ -37,7 +37,9 @@
     <artifactId>jboss-as7-mobicents-build</artifactId>
 
     <name>JBoss Application Server: Build Mobicents Add-on Modules</name>
-    <packaging>pom</packaging>
+	<description>>JBoss Application Server: Build Mobicents Add-on Modules</description>
+	<url>http://www.mobicents.org</url>    
+	<packaging>pom</packaging>
     
     <properties>
         <!-- generated configs root dirs -->
@@ -58,6 +60,26 @@
         <mobicents.jain.sip.ext.version>1.1-SNAPSHOT</mobicents.jain.sip.ext.version>
         <dnsjava.version>2.1.0</dnsjava.version>
     </properties>
+
+	<distributionManagement>
+	    <repository>
+	      <id>mobicents-releases-repository</id>
+	      <name>Mobicents Releases Repository</name>
+	      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+	    </repository>
+	    <snapshotRepository>
+	      <id>mobicents-snapshots-repository</id>
+	      <name>Mobicents Snapshots Repository</name>
+	      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+	    </snapshotRepository>
+	  </distributionManagement>
+
+
+	 <scm>
+                <connection>scm:git:https://code.google.com/p/sipservlets/</connection>
+                <developerConnection>scm:git:https://code.google.com/p/sipservlets/</developerConnection>
+                <url>https://code.google.com/p/sipservlets/</url>
+        </scm>
 
     <build>
         <plugins>
@@ -115,13 +137,114 @@
             <enabled>false</enabled>
          </snapshots>
       </pluginRepository>
+<pluginRepository>
+                          <id>mobicents-public-repository-group</id>
+                          <name>Mobicens Public Maven Repository Group</name>
+                          <url>https://oss.sonatype.org/content/groups/public</url>
+                          <layout>default</layout>
+                          <releases>
+                            <enabled>true</enabled>
+                            <updatePolicy>never</updatePolicy>
+                          </releases>
+                          <snapshots>
+                            <enabled>true</enabled>
+                            <updatePolicy>never</updatePolicy>
+                          </snapshots>
+                </pluginRepository>
+		<pluginRepository>
+			<id>jboss-public-repository-group</id>
+			<name>JBoss Public Maven Repository Group</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
+			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</pluginRepository>
 </pluginRepositories>
+
+
+<repositories>
+		<repository>
+                          <id>mobicents-public-repository-group</id>
+                          <name>Mobicens Public Maven Repository Group</name>
+                          <url>https://oss.sonatype.org/content/groups/public</url>
+                          <layout>default</layout>
+                          <releases>
+                            <enabled>true</enabled>
+                            <updatePolicy>never</updatePolicy>
+                          </releases>
+                          <snapshots>
+                            <enabled>true</enabled>
+                            <updatePolicy>never</updatePolicy>
+                          </snapshots>
+                </repository>
+		<repository>
+			<id>jboss-public-repository-group</id>
+			<name>JBoss Public Maven Repository Group</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
+			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>jboss-deprecated-repository</id>
+			<name>JBoss Deprecated Maven Repository</name>
+			<url>https://repository.jboss.org/nexus/content/repositories/deprecated/ 
+	            </url>
+			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</repository>
+	</repositories>
 
     <dependencies>
 
     </dependencies>
 
     <profiles>
+	<profile>
+                      <id>release-sign-artifacts</id>
+                      <activation>
+                        <property>
+                          <name>performRelease</name>
+                          <value>true</value>
+                        </property>
+                      </activation>
+                      <build>
+                        <plugins>
+                          <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-gpg-plugin</artifactId>
+                            <executions>
+                              <execution>
+                                <id>sign-artifacts</id>
+                                <phase>install</phase>
+                                <goals>
+                                  <goal>sign</goal>
+                                </goals>
+                              </execution>
+                            </executions>
+                          </plugin>
+                        </plugins>
+                      </build>
+                    </profile>
         <profile>
             <id>normal</id>
             <activation>
