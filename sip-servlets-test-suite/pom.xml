@@ -11,6 +11,9 @@
 	<packaging>pom</packaging>
 	<name>sip-servlets-test-suite-parent</name>
 	<url>http://www.mobicents.org/tests.html</url>
+	<properties>
+		<tomcat.version>6.0.35</tomcat.version>	
+	</properties>
 	<modules>
 		<module>applications</module>		
 		<module>testsuite</module>
