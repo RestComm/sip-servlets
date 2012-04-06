@@ -185,17 +185,7 @@
 		</profile>
 		<profile>			
 			<id>release</id>
-			<modules>
-				<module>sip-servlets-jruby</module>
-				<module>containers/sip-servlets-catalina</module>				
-				<module>containers/sip-servlets-tomcat-jboss4</module>
-				<module>containers/sip-servlets-jboss5-metadata</module>
-				<module>containers/sip-servlets-jboss5-deployer</module>
-				<module>containers/sip-servlets-jboss5-ha-server-cache</module>
-				<module>containers/sip-servlets-jboss5</module>
-				<module>containers/sip-servlets-as7</module>
-				<module>containers/sip-servlets-as7-drop-in/jboss-as-mobicents</module>
-				<module>containers/sip-servlets-as7-drop-in/build-mobicents-modules</module>												
+			<modules>								
 				<module>management/sip-servlets-management</module>
 				<module>sip-servlets-examples</module>
 				<module>sip-servlets-test-suite</module>
