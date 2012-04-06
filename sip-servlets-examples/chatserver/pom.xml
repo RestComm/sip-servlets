@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.examples</groupId>
 		<artifactId>sip-servlets-examples-parent</artifactId>
-		<version>1.7.0-SNAPSHOT</version>
+		<version>1.7.0.FINAL</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>chatroom-servlet</artifactId>

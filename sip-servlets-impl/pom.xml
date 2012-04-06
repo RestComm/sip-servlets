@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.mobicents.servlet.sip</groupId>
 		<artifactId>sip-servlets-bootstrap</artifactId>
-		<version>1.7.0-SNAPSHOT</version>
+		<version>1.7.0.FINAL</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	<artifactId>sip-servlets-impl</artifactId>
@@ -23,31 +22,31 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-spec</artifactId>
-			<version>1.7.0-SNAPSHOT</version>
+			<version>1.7.0.FINAL</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-core-api</artifactId>
-			<version>1.7.0-SNAPSHOT</version>
+			<version>1.7.0.FINAL</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-annotations</artifactId>
-			<version>1.7.0-SNAPSHOT</version>
+			<version>1.7.0.FINAL</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-client</artifactId>
-			<version>1.7.0-SNAPSHOT</version>
+			<version>1.7.0.FINAL</version>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-jruby</artifactId>
-			<version>1.7.0-SNAPSHOT</version>
+			<version>1.7.0.FINAL</version>
 		</dependency>
 
 		<!-- logging dependency -->
@@ -188,14 +187,10 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true"
-											file="${project.build.directory}/${project.build.finalName}.${project.packaging}"
-											todir="${CATALINA_HOME}/lib" />
-										<copy verbose="true" file="docs/logging.properties"
-											todir="${CATALINA_HOME}/conf" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${CATALINA_HOME}/lib" />
+										<copy verbose="true" file="docs/logging.properties" todir="${CATALINA_HOME}/conf" />
 										<copy verbose="true" file="docs/log4j.xml" todir="${CATALINA_HOME}/lib" />
-										<copy verbose="true" file="docs/mss-sip-stack.properties"
-											todir="${CATALINA_HOME}/conf" />
+										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${CATALINA_HOME}/conf" />
 										<copy todir="${CATALINA_HOME}">
 											<fileset dir="LICENSES" casesensitive="yes">
 												<include name="**/*" />
@@ -246,14 +241,10 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true"
-											file="${project.build.directory}/${project.build.finalName}.${project.packaging}"
-											todir="${env.CATALINA_HOME}/lib" />
-										<copy verbose="true" file="docs/logging.properties"
-											todir="${env.CATALINA_HOME}/conf" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.CATALINA_HOME}/lib" />
+										<copy verbose="true" file="docs/logging.properties" todir="${env.CATALINA_HOME}/conf" />
 										<copy verbose="true" file="docs/log4j.xml" todir="${env.CATALINA_HOME}/lib" />
-										<copy verbose="true" file="docs/mss-sip-stack.properties"
-											todir="${CATALINA_HOME}/conf" />
+										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${CATALINA_HOME}/conf" />
 										<copy todir="${env.CATALINA_HOME}">
 											<fileset dir="LICENSES" casesensitive="yes">
 												<include name="**/*" />
@@ -301,14 +292,10 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true"
-											file="${project.build.directory}/${project.build.finalName}.${project.packaging}"
-											todir="${CATALINA_HOME}/lib" />
-										<copy verbose="true" file="docs/logging.properties"
-											todir="${CATALINA_HOME}/conf" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${CATALINA_HOME}/lib" />
+										<copy verbose="true" file="docs/logging.properties" todir="${CATALINA_HOME}/conf" />
 										<copy verbose="true" file="docs/log4j.xml" todir="${CATALINA_HOME}/lib" />
-										<copy verbose="true" file="docs/mss-sip-stack.properties"
-											todir="${CATALINA_HOME}/conf" />
+										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${CATALINA_HOME}/conf" />
 										<copy todir="${CATALINA_HOME}">
 											<fileset dir="LICENSES" casesensitive="yes">
 												<include name="**/*" />
@@ -356,14 +343,10 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true"
-											file="${project.build.directory}/${project.build.finalName}.${project.packaging}"
-											todir="${env.CATALINA_HOME}/lib" />
-										<copy verbose="true" file="docs/logging.properties"
-											todir="${env.CATALINA_HOME}/conf" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.CATALINA_HOME}/lib" />
+										<copy verbose="true" file="docs/logging.properties" todir="${env.CATALINA_HOME}/conf" />
 										<copy verbose="true" file="docs/log4j.xml" todir="${env.CATALINA_HOME}/lib" />
-										<copy verbose="true" file="docs/mss-sip-stack.properties"
-											todir="${CATALINA_HOME}/conf" />
+										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${CATALINA_HOME}/conf" />
 										<copy todir="${env.CATALINA_HOME}">
 											<fileset dir="LICENSES" casesensitive="yes">
 												<include name="**/*" />
@@ -411,13 +394,9 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true"
-											file="${project.build.directory}/${project.build.finalName}.${project.packaging}"
-											todir="${env.JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer" />
-										<copy verbose="true" file="docs/jboss-log4j.xml"
-											todir="${env.JBOSS_HOME}/server/${node}/conf" />
-										<copy verbose="true" file="docs/mss-sip-stack.properties"
-											todir="${env.JBOSS_HOME}/server/${node}/conf" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer" />
+										<copy verbose="true" file="docs/jboss-log4j.xml" todir="${env.JBOSS_HOME}/server/${node}/conf" />
+										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${env.JBOSS_HOME}/server/${node}/conf" />
 										<copy todir="${env.JBOSS_HOME}/docs/licenses">
 											<fileset file="LICENSES/*" />
 										</copy>
@@ -462,11 +441,8 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true"
-											file="${project.build.directory}/${project.build.finalName}.${project.packaging}"
-											todir="${JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer" />
-										<copy verbose="true" file="docs/mss-sip-stack.properties"
-											todir="${env.JBOSS_HOME}/server/${node}/conf" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer" />
+										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${env.JBOSS_HOME}/server/${node}/conf" />
 										<copy todir="${JBOSS_HOME}/docs/licenses">
 											<fileset file="LICENSES/*" />
 										</copy>
@@ -511,13 +487,9 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true"
-											file="${project.build.directory}/${project.build.finalName}.${project.packaging}"
-											todir="${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar" />
-										<copy verbose="true" file="docs/jboss5/jboss-log4j.xml"
-											todir="${env.JBOSS_HOME}/server/${node}/conf" />
-										<copy verbose="true" file="docs/mss-sip-stack.properties"
-											todir="${env.JBOSS_HOME}/server/${node}/conf" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar" />
+										<copy verbose="true" file="docs/jboss5/jboss-log4j.xml" todir="${env.JBOSS_HOME}/server/${node}/conf" />
+										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${env.JBOSS_HOME}/server/${node}/conf" />
 										<copy todir="${env.JBOSS_HOME}/docs/licenses">
 											<fileset file="LICENSES/*" />
 										</copy>
@@ -562,11 +534,8 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true"
-											file="${project.build.directory}/${project.build.finalName}.${project.packaging}"
-											todir="${JBOSS_HOME}/server/${node}/deploy/jbossweb.sar" />
-										<copy verbose="true" file="docs/mss-sip-stack.properties"
-											todir="${JBOSS_HOME}/server/${node}/conf" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/${node}/deploy/jbossweb.sar" />
+										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${JBOSS_HOME}/server/${node}/conf" />
 										<copy todir="${JBOSS_HOME}/docs/licenses">
 											<fileset file="LICENSES/*" />
 										</copy>

@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.examples</groupId>
 		<artifactId>jslee-sips-interop-demo-jslee-services-parent</artifactId>
-		<version>1.7.0-SNAPSHOT</version>
+		<version>1.7.0.FINAL</version>
 	</parent>
 	
 	<artifactId>jslee-sips-interop-demo-jslee-interop-services-DU</artifactId>
@@ -15,7 +15,7 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip.examples</groupId>
 			<artifactId>jslee-sips-interop-demo-jslee-interop-sbb</artifactId>
-			<version>1.7.0-SNAPSHOT</version>
+			<version>1.7.0.FINAL</version>
 		</dependency>
 	</dependencies>
 	
