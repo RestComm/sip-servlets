@@ -12,13 +12,13 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip.examples</groupId>
 			<artifactId>jslee-sips-interop-commons</artifactId>
-			<version>1.7.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servlet.sip.examples</groupId>
 			<artifactId>jslee-sips-interop-demo-sips-business</artifactId>
-			<version>1.7.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -36,7 +36,7 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-spec</artifactId>
-			<version>1.7.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<!-- logging dependency -->

@@ -13,9 +13,9 @@
 	
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.tomcat</groupId>
-			<artifactId>annotations-api</artifactId>
-			<version>${tomcat.version}</version>
+			<groupId>javax.annotation</groupId>
+			<artifactId>jsr250-api</artifactId>
+			<version>1.0</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>

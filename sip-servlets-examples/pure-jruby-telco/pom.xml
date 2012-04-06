@@ -31,7 +31,7 @@
 		<dependency>
 			<groupId>org.mobicents.servlet.sip</groupId>
 			<artifactId>sip-servlets-spec</artifactId>
-			<version>1.7.0-SNAPSHOT</version>
+			<version>${project.version}</version>
 		</dependency>	
 	</dependencies>
 
