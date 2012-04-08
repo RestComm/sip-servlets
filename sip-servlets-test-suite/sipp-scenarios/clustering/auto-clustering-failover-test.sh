@@ -3,8 +3,8 @@ export EXAMPLES_HOME=../../../sip-servlets-examples
 export config1="all"
 export config2="port-1"
 export KILL_PARAMS="-9"
-export FULLSTARTSLEEP=82
-export HALFSTARTSLEEP=80
+export FULLSTARTSLEEP=182
+export HALFSTARTSLEEP=180
 export CALLS=5
 
 if [ "x$1" != "x" ]; then
