@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.testsuite.applications</groupId>
 		<artifactId>sip-servlets-test-suite-applications</artifactId>
-		<version>1.8.0-SNAPSHOT</version>
+		<version>6.1.0-TelScale-SNAPSHOT</version>
 	</parent>
 	<artifactId>proxy-sip-servlet</artifactId>
 	<packaging>war</packaging>
