@@ -15,6 +15,7 @@
 package org.mobicents.as7;
 
 import static org.jboss.as.web.WebMessages.MESSAGES;
+import static org.mobicents.as7.Constants.VALUE;
 
 import javax.management.MBeanServer;
 
@@ -44,11 +45,18 @@ class SipServerService implements SipServer, Service<SipServer> {
 
     // FIXME: josemrecio - settle on using the proper name
     private static final String JBOSS_SIP = "jboss.sip";
-    //private static final String JBOSS_WEB = "jboss.web";
-    private static final String JBOSS_WEB = "jboss.sip";
 
 //    private final String defaultHost;
 //    private final boolean useNative;
+	private static final String FILE_PREFIX_PATH = "file:///";
+    private String sipAppRouterFile;
+    private String sipStackPropertiesFile;
+    final String sipPathName;
+    final String sipAppDispatcherClass;
+    final int sipCongestionControlInterval;
+    final String sipConcurrencyControlMode;
+    final boolean usePrettyEncoding;
+
     private final String instanceId;
 
 //    private Engine engine;
@@ -61,10 +69,17 @@ class SipServerService implements SipServer, Service<SipServer> {
     private final InjectedValue<MBeanServer> mbeanServer = new InjectedValue<MBeanServer>();
     private final InjectedValue<String> pathInjector = new InjectedValue<String>();
 
-    public SipServerService(/*final String defaultHost, final boolean useNative, */final String instanceId) {
+    public SipServerService(final String sipAppRouterFile, final String sipStackPropertiesFile, final String sipPathName, String sipAppDispatcherClass, int sipCongestionControlInterval, String sipConcurrencyControlMode, boolean usePrettyEncoding, String instanceId) {
 //        this.defaultHost = defaultHost;
 //        this.useNative = useNative;
+    	this.sipAppRouterFile = sipAppRouterFile;
+    	this.sipStackPropertiesFile = sipStackPropertiesFile;
+    	this.sipPathName = sipPathName;
+    	this.sipAppDispatcherClass = sipAppDispatcherClass;
+    	this.sipCongestionControlInterval = sipCongestionControlInterval;
+    	this.sipConcurrencyControlMode = sipConcurrencyControlMode;
         this.instanceId = instanceId;
+        this.usePrettyEncoding = usePrettyEncoding;
     }
 
     /** {@inheritDoc} */
@@ -103,15 +118,47 @@ class SipServerService implements SipServer, Service<SipServer> {
 //        server.addLifecycleListener(new JasperListener());
 
         final SipStandardService sipService = new SipStandardService();
-        sipService.setSipApplicationDispatcherClassName(SipApplicationDispatcherImpl.class.getName());
-        sipService.setConcurrencyControlMode("None");
-        sipService.setCongestionControlCheckingInterval(-1);
-        sipService.setName(JBOSS_WEB);//sipService.setName(JBOSS_SIP);
+        if (sipAppDispatcherClass != null) {
+        	sipService.setSipApplicationDispatcherClassName(sipAppDispatcherClass);        	
+        }
+        else {
+        	sipService.setSipApplicationDispatcherClassName(SipApplicationDispatcherImpl.class.getName());
+        }
+        //
+		final String configDir = System.getProperty("jboss.server.config.dir");
+    	if(sipAppRouterFile != null) {
+    		if(!sipAppRouterFile.startsWith(FILE_PREFIX_PATH)) {
+    			sipAppRouterFile = FILE_PREFIX_PATH.concat(configDir).concat("/").concat(sipAppRouterFile);
+    		}
+    		System.setProperty("javax.servlet.sip.dar", sipAppRouterFile);
+    	}
+    	//
+    	sipService.setSipPathName(sipPathName);
+    	//
+    	if(sipStackPropertiesFile != null) {
+    		if(!sipStackPropertiesFile.startsWith(FILE_PREFIX_PATH)) {
+    			sipStackPropertiesFile = FILE_PREFIX_PATH.concat(configDir).concat("/").concat(sipStackPropertiesFile);
+    		}
+    	}
+        sipService.setSipStackPropertiesFile(sipStackPropertiesFile);
+        //
+        if (sipConcurrencyControlMode != null) {
+        	sipService.setConcurrencyControlMode(sipConcurrencyControlMode);
+        }
+        else {
+        	sipService.setConcurrencyControlMode("None");
+        }
+        //
+        sipService.setCongestionControlCheckingInterval(sipCongestionControlInterval);
+        //
+        sipService.setUsePrettyEncoding(usePrettyEncoding);
+        //
+        sipService.setName(JBOSS_SIP);
         sipService.setServer(server);
         server.addService(sipService);
 
         final SipStandardEngine sipEngine = new SipStandardEngine();
-        sipEngine.setName(JBOSS_WEB); //sipEngine.setName(JBOSS_SIP);
+        sipEngine.setName(JBOSS_SIP);
         sipEngine.setService(sipService);
 //        sipEngine.setDefaultHost(defaultHost);
         if (instanceId != null) {

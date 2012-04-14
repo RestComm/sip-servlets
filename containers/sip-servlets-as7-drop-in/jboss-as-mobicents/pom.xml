@@ -169,6 +169,13 @@
         </dependency>
 
         <dependency>
+                <groupId>net.java.stun4j</groupId>
+                <artifactId>stun4j</artifactId>
+                <version>1.0.MOBICENTS</version>
+                <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.mobicents.ha.javax.sip</groupId>
             <artifactId>mobicents-jain-sip-ha-core</artifactId>
             <version>${mobicents.jain.sip.ha.version}</version>
