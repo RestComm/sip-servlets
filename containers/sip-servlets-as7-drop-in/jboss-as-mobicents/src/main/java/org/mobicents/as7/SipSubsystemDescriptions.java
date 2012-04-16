@@ -48,10 +48,11 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 
 /**
- * The web subsystem description providers.
+ * The sip subsystem description providers.
  *
  * @author Emanuel Muckenhuber
  * @author Jean-Frederic Clere
+ * @author josemrecio@gmail.com
  */
 class SipSubsystemDescriptions {
 
@@ -71,6 +72,36 @@ class SipSubsystemDescriptions {
         node.get(ATTRIBUTES, Constants.INSTANCE_ID, DESCRIPTION).set(bundle.getString("sip.instance-id"));
         node.get(ATTRIBUTES, Constants.INSTANCE_ID, REQUIRED).set(false);
 
+        node.get(ATTRIBUTES, Constants.APPLICATION_ROUTER, TYPE).set(ModelType.STRING);
+        node.get(ATTRIBUTES, Constants.APPLICATION_ROUTER, DESCRIPTION).set(bundle.getString("sip.application-router"));
+        node.get(ATTRIBUTES, Constants.APPLICATION_ROUTER, REQUIRED).set(true);
+
+        node.get(ATTRIBUTES, Constants.SIP_STACK_PROPS, TYPE).set(ModelType.STRING);
+        node.get(ATTRIBUTES, Constants.SIP_STACK_PROPS, DESCRIPTION).set(bundle.getString("sip.stack-properties"));
+        node.get(ATTRIBUTES, Constants.SIP_STACK_PROPS, REQUIRED).set(true);
+
+        node.get(ATTRIBUTES, Constants.SIP_PATH_NAME, TYPE).set(ModelType.STRING);
+        node.get(ATTRIBUTES, Constants.SIP_PATH_NAME, DESCRIPTION).set(bundle.getString("sip.path-name"));
+        node.get(ATTRIBUTES, Constants.SIP_PATH_NAME, REQUIRED).set(false);
+
+        node.get(ATTRIBUTES, Constants.SIP_APP_DISPATCHER_CLASS, TYPE).set(ModelType.STRING);
+        node.get(ATTRIBUTES, Constants.SIP_APP_DISPATCHER_CLASS, DESCRIPTION).set(bundle.getString("sip.app-dispatcher-class"));
+        node.get(ATTRIBUTES, Constants.SIP_APP_DISPATCHER_CLASS, REQUIRED).set(true);
+
+        node.get(ATTRIBUTES, Constants.CONCURRENCY_CONTROL_MODE, TYPE).set(ModelType.STRING);
+        node.get(ATTRIBUTES, Constants.CONCURRENCY_CONTROL_MODE, DESCRIPTION).set(bundle.getString("sip.concurrency-control-mode"));
+        node.get(ATTRIBUTES, Constants.CONCURRENCY_CONTROL_MODE, REQUIRED).set(false);
+        //node.get(ATTRIBUTES, Constants.CONCURRENCY_CONTROL_MODE, DEFAULT).set("None");
+
+        node.get(ATTRIBUTES, Constants.CONGESTION_CONTROL_INTERVAL, TYPE).set(ModelType.INT);
+        node.get(ATTRIBUTES, Constants.CONGESTION_CONTROL_INTERVAL, DESCRIPTION).set(bundle.getString("sip.congestion-control-interval"));
+        node.get(ATTRIBUTES, Constants.CONGESTION_CONTROL_INTERVAL, REQUIRED).set(false);
+
+        node.get(ATTRIBUTES, Constants.USE_PRETTY_ENCODING, TYPE).set(ModelType.BOOLEAN);
+        node.get(ATTRIBUTES, Constants.USE_PRETTY_ENCODING, DESCRIPTION).set(bundle.getString("sip.use-pretty-encoding"));
+        node.get(ATTRIBUTES, Constants.USE_PRETTY_ENCODING, REQUIRED).set(false);
+        node.get(ATTRIBUTES, Constants.USE_PRETTY_ENCODING, DEFAULT).set(true);
+
         node.get(CHILDREN, Constants.CONNECTOR, DESCRIPTION).set(bundle.getString("sip.connector"));
         node.get(CHILDREN, Constants.CONNECTOR, MODEL_DESCRIPTION);
 
@@ -88,12 +119,36 @@ class SipSubsystemDescriptions {
         node.get(REQUEST_PROPERTIES, Constants.INSTANCE_ID, DESCRIPTION).set(bundle.getString("sip.instance-id"));
         node.get(REQUEST_PROPERTIES, Constants.INSTANCE_ID, REQUIRED).set(false);
 
-//        // Add configuration, connectors etc
-//        ModelNode configuration = node.get(REQUEST_PROPERTIES, Constants.CONTAINER_CONFIG);
-//        getConfigurationCommonDescription(configuration, "value-type", bundle);
-//        configuration.get(TYPE).set(ModelType.OBJECT);
-//        configuration.get(REQUIRED).set(false);
+        node.get(REQUEST_PROPERTIES, Constants.APPLICATION_ROUTER, TYPE).set(ModelType.STRING);
+        node.get(REQUEST_PROPERTIES, Constants.APPLICATION_ROUTER, DESCRIPTION).set(bundle.getString("sip.application-router"));
+        node.get(REQUEST_PROPERTIES, Constants.APPLICATION_ROUTER, REQUIRED).set(true);
 
+        node.get(REQUEST_PROPERTIES, Constants.SIP_STACK_PROPS, TYPE).set(ModelType.STRING);
+        node.get(REQUEST_PROPERTIES, Constants.SIP_STACK_PROPS, DESCRIPTION).set(bundle.getString("sip.stack-properties"));
+        node.get(REQUEST_PROPERTIES, Constants.SIP_STACK_PROPS, REQUIRED).set(true);
+
+        node.get(REQUEST_PROPERTIES, Constants.SIP_PATH_NAME, TYPE).set(ModelType.STRING);
+        node.get(REQUEST_PROPERTIES, Constants.SIP_PATH_NAME, DESCRIPTION).set(bundle.getString("sip.path-name"));
+        node.get(REQUEST_PROPERTIES, Constants.SIP_PATH_NAME, REQUIRED).set(false);
+
+        node.get(REQUEST_PROPERTIES, Constants.SIP_APP_DISPATCHER_CLASS, TYPE).set(ModelType.STRING);
+        node.get(REQUEST_PROPERTIES, Constants.SIP_APP_DISPATCHER_CLASS, DESCRIPTION).set(bundle.getString("sip.app-dispatcher-class"));
+        node.get(REQUEST_PROPERTIES, Constants.SIP_APP_DISPATCHER_CLASS, REQUIRED).set(true);
+
+        node.get(REQUEST_PROPERTIES, Constants.CONCURRENCY_CONTROL_MODE, TYPE).set(ModelType.STRING);
+        node.get(REQUEST_PROPERTIES, Constants.CONCURRENCY_CONTROL_MODE, DESCRIPTION).set(bundle.getString("sip.concurrency-control-mode"));
+        node.get(REQUEST_PROPERTIES, Constants.CONCURRENCY_CONTROL_MODE, REQUIRED).set(false);
+
+        node.get(REQUEST_PROPERTIES, Constants.CONGESTION_CONTROL_INTERVAL, TYPE).set(ModelType.INT);
+        node.get(REQUEST_PROPERTIES, Constants.CONGESTION_CONTROL_INTERVAL, DESCRIPTION).set(bundle.getString("sip.congestion-control-interval"));
+        node.get(REQUEST_PROPERTIES, Constants.CONGESTION_CONTROL_INTERVAL, REQUIRED).set(false);
+
+        node.get(REQUEST_PROPERTIES, Constants.USE_PRETTY_ENCODING, TYPE).set(ModelType.BOOLEAN);
+        node.get(REQUEST_PROPERTIES, Constants.USE_PRETTY_ENCODING, DESCRIPTION).set(bundle.getString("sip.use-pretty-encoding"));
+        node.get(REQUEST_PROPERTIES, Constants.USE_PRETTY_ENCODING, REQUIRED).set(false);
+        node.get(REQUEST_PROPERTIES, Constants.USE_PRETTY_ENCODING, DEFAULT).set(true);
+
+        // Add configuration, connectors etc
         ModelNode connector = node.get(REQUEST_PROPERTIES, Constants.CONNECTOR);
         getConnectorCommonDescription(connector, "value-type", bundle);
         connector.get(TYPE).set(ModelType.OBJECT);
@@ -128,7 +183,7 @@ class SipSubsystemDescriptions {
 
         node.get(type, Constants.NAME, TYPE).set(ModelType.STRING);
         node.get(type, Constants.NAME, DESCRIPTION).set(bundle.getString("sip.connector.name"));
-        node.get(type, Constants.NAME, REQUIRED).set(false); // TODO should be true.
+        node.get(type, Constants.NAME, REQUIRED).set(true);
         node.get(type, Constants.NAME, NILLABLE).set(false);
 
         node.get(type, Constants.PROTOCOL, TYPE).set(ModelType.STRING);
@@ -149,6 +204,32 @@ class SipSubsystemDescriptions {
         node.get(type, Constants.ENABLED, DESCRIPTION).set(bundle.getString("sip.connector.enabled"));
         node.get(type, Constants.ENABLED, REQUIRED).set(false);
         node.get(type, Constants.ENABLED, DEFAULT).set(true);
+
+        node.get(type, Constants.USE_STATIC_ADDRESS, TYPE).set(ModelType.BOOLEAN);
+        node.get(type, Constants.USE_STATIC_ADDRESS, DESCRIPTION).set(bundle.getString("sip.connector.use-static-address"));
+        node.get(type, Constants.USE_STATIC_ADDRESS, REQUIRED).set(false);
+        node.get(type, Constants.USE_STATIC_ADDRESS, DEFAULT).set(false);
+
+        node.get(type, Constants.STATIC_SERVER_ADDRESS, TYPE).set(ModelType.STRING);
+        node.get(type, Constants.STATIC_SERVER_ADDRESS, DESCRIPTION).set(bundle.getString("sip.connector.static-server-address"));
+        node.get(type, Constants.STATIC_SERVER_ADDRESS, REQUIRED).set(false);
+
+        node.get(type, Constants.STATIC_SERVER_PORT, TYPE).set(ModelType.INT);
+        node.get(type, Constants.STATIC_SERVER_PORT, DESCRIPTION).set(bundle.getString("sip.connector.static-server-port"));
+        node.get(type, Constants.STATIC_SERVER_PORT, REQUIRED).set(false);
+
+        node.get(type, Constants.USE_STUN, TYPE).set(ModelType.BOOLEAN);
+        node.get(type, Constants.USE_STUN, DESCRIPTION).set(bundle.getString("sip.connector.use-stun"));
+        node.get(type, Constants.USE_STUN, REQUIRED).set(false);
+        node.get(type, Constants.USE_STUN, DEFAULT).set(false);
+
+        node.get(type, Constants.STUN_SERVER_ADDRESS, TYPE).set(ModelType.STRING);
+        node.get(type, Constants.STUN_SERVER_ADDRESS, DESCRIPTION).set(bundle.getString("sip.connector.stun-server-address"));
+        node.get(type, Constants.STUN_SERVER_ADDRESS, REQUIRED).set(false);
+
+        node.get(type, Constants.STUN_SERVER_PORT, TYPE).set(ModelType.INT);
+        node.get(type, Constants.STUN_SERVER_PORT, DESCRIPTION).set(bundle.getString("sip.connector.stun-server-port"));
+        node.get(type, Constants.STUN_SERVER_PORT, REQUIRED).set(false);
 
         if (ATTRIBUTES.equals(type)) {
             /* add the stats descriptions */
@@ -237,14 +318,6 @@ class SipSubsystemDescriptions {
             locale = Locale.getDefault();
         }
         return ResourceBundle.getBundle(RESOURCE_NAME, locale);
-    }
-
-    public static ModelNode getConfigurationDescription(Locale locale) {
-        final ResourceBundle bundle = getResourceBundle(locale);
-        final ModelNode node = new ModelNode();
-        node.get(DESCRIPTION).set(bundle.getString("sip.configuration"));
-
-        return node;
     }
 
 }

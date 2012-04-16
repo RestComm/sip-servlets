@@ -36,6 +36,7 @@ import org.jboss.as.controller.parsing.ExtensionParsingContext;
 import org.jboss.as.controller.registry.AttributeAccess.Storage;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.as.controller.registry.OperationEntry;
+import org.jboss.as.web.WebContainerDefinition;
 import org.jboss.dmr.ModelType;
 import org.jboss.logging.Logger;
 import org.mobicents.as7.deployment.ServletDeploymentStats;
@@ -49,7 +50,6 @@ public class SipExtension implements Extension {
 
     private static final Logger log = Logger.getLogger("org.mobicents.as7");
 
-    public static final String NAMESPACE_FOR_TESTING = Namespace.CURRENT.getUriString();
     public static final String SUBSYSTEM_NAME = "sip";
     private static final PathElement connectorPath =  PathElement.pathElement(Constants.CONNECTOR);
 

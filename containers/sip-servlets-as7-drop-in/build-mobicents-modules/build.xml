@@ -61,6 +61,7 @@
             <maven-resource group="javax.sip" artifact="jain-sip-ri"/>
             <maven-resource group="org.mobicents.ha.javax.sip" artifact="mobicents-jain-sip-ha-core"/>
             <maven-resource group="dnsjava" artifact="dnsjava"/>
+            <maven-resource group="net.java.stun4j" artifact="stun4j"/>
         </module-def>
 
     </target>

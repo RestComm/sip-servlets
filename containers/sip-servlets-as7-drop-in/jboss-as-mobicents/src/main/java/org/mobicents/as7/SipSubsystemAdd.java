@@ -87,10 +87,24 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler implements Descript
 //                operation.get(Constants.DEFAULT_VIRTUAL_SERVER).asString() : DEFAULT_VIRTUAL_SERVER;
 //        final boolean useNative = operation.hasDefined(Constants.NATIVE) ?
 //                operation.get(Constants.NATIVE).asBoolean() : DEFAULT_NATIVE;
-        final String instanceId = operation.hasDefined(Constants.INSTANCE_ID) ? operation.get(
-                Constants.INSTANCE_ID).asString() : null;
+    	final String instanceId = operation.hasDefined(Constants.INSTANCE_ID) ? operation.get(
+    			Constants.INSTANCE_ID).asString() : null;
+    	final String sipAppRouterFile = operation.hasDefined(Constants.APPLICATION_ROUTER) ? operation.get(
+    	    	Constants.APPLICATION_ROUTER).asString() : null;
+    	final String sipStackPropertiesFile = operation.hasDefined(Constants.SIP_STACK_PROPS) ? operation.get(
+    	    	Constants.SIP_STACK_PROPS).asString() : null;
+    	final String sipPathName = operation.hasDefined(Constants.SIP_PATH_NAME) ? operation.get(
+    			Constants.SIP_PATH_NAME).asString() : null;
+    	final String sipAppDispatcherClass = operation.hasDefined(Constants.SIP_APP_DISPATCHER_CLASS) ? operation.get(
+    			Constants.SIP_APP_DISPATCHER_CLASS).asString() : null;
+    	final int sipCongestionControlInterval = operation.hasDefined(Constants.CONGESTION_CONTROL_INTERVAL) ? operation.get(
+    			Constants.CONGESTION_CONTROL_INTERVAL).asInt() : -1;
+    	final String sipConcurrencyControlMode = operation.hasDefined(Constants.CONCURRENCY_CONTROL_MODE) ? operation.get(
+    			Constants.CONCURRENCY_CONTROL_MODE).asString() : null;
+    	final boolean usePrettyEncoding = operation.hasDefined(Constants.USE_PRETTY_ENCODING) ? operation.get(
+    	    	Constants.USE_PRETTY_ENCODING).asBoolean() : true;
 
-        final SipServerService service = new SipServerService(/*defaultVirtualServer, useNative, */instanceId);
+        final SipServerService service = new SipServerService(sipAppRouterFile, sipStackPropertiesFile, sipPathName, sipAppDispatcherClass, sipCongestionControlInterval, sipConcurrencyControlMode, usePrettyEncoding, instanceId);
         newControllers.add(context.getServiceTarget().addService(SipSubsystemServices.JBOSS_SIP, service)
                 .addDependency(AbstractPathService.pathNameOf(TEMP_DIR), String.class, service.getPathInjector())
                 .addDependency(DependencyType.OPTIONAL, ServiceName.JBOSS.append("mbean", "server"), MBeanServer.class, service.getMbeanServer())

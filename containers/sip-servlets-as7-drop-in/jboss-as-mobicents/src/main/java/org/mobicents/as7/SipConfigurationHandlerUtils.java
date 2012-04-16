@@ -52,6 +52,27 @@ class SipConfigurationHandlerUtils {
         if (operation.hasDefined(Constants.INSTANCE_ID)) {
             rootModel.get(Constants.INSTANCE_ID).set(operation.get(Constants.INSTANCE_ID));
         }
+        if (operation.hasDefined(Constants.APPLICATION_ROUTER)) {
+            rootModel.get(Constants.APPLICATION_ROUTER).set(operation.get(Constants.APPLICATION_ROUTER));
+        }
+        if (operation.hasDefined(Constants.SIP_STACK_PROPS)) {
+            rootModel.get(Constants.SIP_STACK_PROPS).set(operation.get(Constants.SIP_STACK_PROPS));
+        }
+        if (operation.hasDefined(Constants.SIP_PATH_NAME)) {
+            rootModel.get(Constants.SIP_PATH_NAME).set(operation.get(Constants.SIP_PATH_NAME));
+        }
+        if (operation.hasDefined(Constants.SIP_APP_DISPATCHER_CLASS)) {
+            rootModel.get(Constants.SIP_APP_DISPATCHER_CLASS).set(operation.get(Constants.SIP_APP_DISPATCHER_CLASS));
+        }
+        if (operation.hasDefined(Constants.CONCURRENCY_CONTROL_MODE)) {
+            rootModel.get(Constants.CONCURRENCY_CONTROL_MODE).set(operation.get(Constants.CONCURRENCY_CONTROL_MODE));
+        }
+        if (operation.hasDefined(Constants.CONGESTION_CONTROL_INTERVAL)) {
+            rootModel.get(Constants.CONGESTION_CONTROL_INTERVAL).set(operation.get(Constants.CONGESTION_CONTROL_INTERVAL));
+        }
+        if (operation.hasDefined(Constants.USE_PRETTY_ENCODING)) {
+            rootModel.get(Constants.USE_PRETTY_ENCODING).set(operation.get(Constants.USE_PRETTY_ENCODING));
+        }
     }
 
     static void populateModel(final ModelNode subModel, final ModelNode operation) {

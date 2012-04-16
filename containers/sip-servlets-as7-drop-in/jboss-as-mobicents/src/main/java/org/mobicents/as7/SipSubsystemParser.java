@@ -31,13 +31,17 @@ import static org.jboss.as.controller.parsing.ParseUtils.requireNoNamespaceAttri
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedAttribute;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedElement;
 import static org.mobicents.as7.Constants.CONNECTOR;
-import static org.mobicents.as7.Constants.APPLICATION_ROUTER;
 import static org.mobicents.as7.Constants.ENABLED;
 import static org.mobicents.as7.Constants.NAME;
-import static org.mobicents.as7.Constants.VALUE;
 import static org.mobicents.as7.Constants.PROTOCOL;
 import static org.mobicents.as7.Constants.SCHEME;
 import static org.mobicents.as7.Constants.SOCKET_BINDING;
+import static org.mobicents.as7.Constants.USE_STATIC_ADDRESS;
+import static org.mobicents.as7.Constants.STATIC_SERVER_ADDRESS;
+import static org.mobicents.as7.Constants.STATIC_SERVER_PORT;
+import static org.mobicents.as7.Constants.USE_STUN;
+import static org.mobicents.as7.Constants.STUN_SERVER_ADDRESS;
+import static org.mobicents.as7.Constants.STUN_SERVER_PORT;
 
 import java.util.Collections;
 import java.util.List;
@@ -76,6 +80,13 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         ModelNode node = context.getModelNode();
 
         writeAttribute(writer, Attribute.INSTANCE_ID.getLocalName(), node);
+        writeAttribute(writer, Attribute.APPLICATION_ROUTER.getLocalName(), node);
+        writeAttribute(writer, Attribute.SIP_STACK_PROPS.getLocalName(), node);
+        writeAttribute(writer, Attribute.SIP_PATH_NAME.getLocalName(), node);
+        writeAttribute(writer, Attribute.SIP_APP_DISPATCHER_CLASS.getLocalName(), node);
+        writeAttribute(writer, Attribute.CONCURRENCY_CONTROL_MODE.getLocalName(), node);
+        writeAttribute(writer, Attribute.CONGESTION_CONTROL_INTERVAL.getLocalName(), node);
+        writeAttribute(writer, Attribute.USE_PRETTY_ENCODING.getLocalName(), node);
         if(node.hasDefined(CONNECTOR)) {
             for(final Property connector : node.get(CONNECTOR).asPropertyList()) {
                 final ModelNode config = connector.getValue();
@@ -85,16 +96,12 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
                 writeAttribute(writer, Attribute.SCHEME.getLocalName(), config);
                 writeAttribute(writer, Attribute.SOCKET_BINDING.getLocalName(), config);
                 writeAttribute(writer, Attribute.ENABLED.getLocalName(), config);
-
-                writer.writeEndElement();
-            }
-        }
-        if(node.hasDefined(APPLICATION_ROUTER)) {
-            for(final Property applicationRouter : node.get(APPLICATION_ROUTER).asPropertyList()) {
-                final ModelNode config = applicationRouter.getValue();
-                writer.writeStartElement(Element.APPLICATION_ROUTER.getLocalName());
-                writer.writeAttribute(NAME, applicationRouter.getName());
-                writeAttribute(writer, Attribute.VALUE.getLocalName(), config);
+                writeAttribute(writer, Attribute.USE_STATIC_ADDRESS.getLocalName(), config);
+                writeAttribute(writer, Attribute.STATIC_SERVER_ADDRESS.getLocalName(), config);
+                writeAttribute(writer, Attribute.STATIC_SERVER_PORT.getLocalName(), config);
+                writeAttribute(writer, Attribute.USE_STUN.getLocalName(), config);
+                writeAttribute(writer, Attribute.STUN_SERVER_ADDRESS.getLocalName(), config);
+                writeAttribute(writer, Attribute.STUN_SERVER_PORT.getLocalName(), config);
 
                 writer.writeEndElement();
             }
@@ -119,6 +126,13 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
             final Attribute attribute = Attribute.forName(reader.getAttributeLocalName(i));
             switch (attribute) {
             case INSTANCE_ID:
+            case APPLICATION_ROUTER:
+            case SIP_STACK_PROPS:
+            case SIP_APP_DISPATCHER_CLASS:
+            case SIP_PATH_NAME:
+            case CONGESTION_CONTROL_INTERVAL:
+            case CONCURRENCY_CONTROL_MODE:
+            case USE_PRETTY_ENCODING:
                 subsystem.get(attribute.getLocalName()).set(value);
                 break;
             default:
@@ -137,10 +151,7 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
                             parseConnector(reader,address, list);
                             break;
                         }
-                        case APPLICATION_ROUTER: {
-                            parseApplicationRouter(reader,address, list);
-                            break;
-                        } default: {
+                        default: {
                             throw unexpectedElement(reader);
                         }
                     }
@@ -158,6 +169,13 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         String bindingRef = null;
         String scheme = null;
         String enabled = null;
+        Boolean useStaticAddress = null;
+        String staticServerAddress = null;
+        int staticServerPort = -1;
+        Boolean useStun = null;
+        String stunServerAddress = null;
+        int stunServerPort = -1;
+
         final int count = reader.getAttributeCount();
         for (int i = 0; i < count; i++) {
             requireNoNamespaceAttribute(reader, i);
@@ -179,6 +197,24 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
             case ENABLED:
                 enabled = value;
                 break;
+            case USE_STATIC_ADDRESS:
+            	useStaticAddress = Boolean.valueOf(value);
+            	break;
+            case STATIC_SERVER_ADDRESS:
+            	staticServerAddress = value;
+            	break;
+            case STATIC_SERVER_PORT:
+            	staticServerPort = Integer.parseInt(value);
+            	break;
+            case USE_STUN:
+            	useStun = Boolean.valueOf(value);
+            	break;
+            case STUN_SERVER_ADDRESS:
+            	stunServerAddress = value;
+            	break;
+            case STUN_SERVER_PORT:
+            	stunServerPort = Integer.parseInt(value);
+            	break;
             default:
                 throw unexpectedAttribute(reader, i);
             }
@@ -210,50 +246,17 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         connector.get(SOCKET_BINDING).set(bindingRef);
         if(scheme != null) connector.get(SCHEME).set(scheme);
         if(enabled != null) connector.get(ENABLED).set(enabled);
+        if (useStaticAddress != null) {
+        	connector.get(USE_STATIC_ADDRESS).set(useStaticAddress);
+        	if (staticServerAddress != null) connector.get(STATIC_SERVER_ADDRESS).set(staticServerAddress);
+        	if (staticServerPort != -1) connector.get(STATIC_SERVER_PORT).set(staticServerPort);        	
+        }
+        if (useStun != null) {
+        	connector.get(USE_STUN).set(useStun);
+        	if (stunServerAddress != null) connector.get(STUN_SERVER_ADDRESS).set(stunServerAddress);
+        	if (stunServerPort != -1) connector.get(STUN_SERVER_PORT).set(stunServerPort);
+        }
         list.add(connector);
-    }
-
-    static void parseApplicationRouter(XMLExtendedStreamReader reader, ModelNode address, List<ModelNode> list) throws XMLStreamException {
-        String name = null;
-        String value = null;
-        final int count = reader.getAttributeCount();
-        for (int i = 0; i < count; i++) {
-            requireNoNamespaceAttribute(reader, i);
-            final String attrValue = reader.getAttributeValue(i);
-            final Attribute attribute = Attribute.forName(reader.getAttributeLocalName(i));
-            switch (attribute) {
-            case NAME:
-                name = attrValue;
-                break;
-            case VALUE:
-                value = attrValue;
-                break;
-            default:
-                throw unexpectedAttribute(reader, i);
-            }
-        }
-        if (name == null) {
-            throw missingRequired(reader, Collections.singleton(Attribute.NAME));
-        }
-        final ModelNode applicationRouter = new ModelNode();
-        applicationRouter.get(OP).set(ADD);
-        applicationRouter.get(OP_ADDR).set(address).add(APPLICATION_ROUTER, name);
-        while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
-            switch (Namespace.forUri(reader.getNamespaceURI())) {
-            case SIP_1_0: {
-                final Element element = Element.forName(reader.getLocalName());
-                switch (element) {
-                default:
-                    throw unexpectedElement(reader);
-                }
-                //break;
-            }
-            default:
-                throw unexpectedElement(reader);
-            }
-        }
-        if(value != null) applicationRouter.get(VALUE).set(value);
-        list.add(applicationRouter);
     }
 
     static void writeAttribute(final XMLExtendedStreamWriter writer, final String name, ModelNode node) throws XMLStreamException {

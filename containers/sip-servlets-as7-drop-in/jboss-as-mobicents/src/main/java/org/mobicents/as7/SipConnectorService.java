@@ -46,6 +46,12 @@ class SipConnectorService implements Service<Connector> {
 
     private String protocol = "SIP/2.0";
     private String scheme = "sip";
+    private Boolean useStaticAddress = false;
+    private String staticServerAddress = null;
+    private int staticServerPort = -1;
+    private Boolean useStun = false;
+    private String stunServerAddress = null;
+    private int stunServerPort = -1;
 
     private Boolean enableLookups = null;
     private String proxyName = null;
@@ -61,12 +67,20 @@ class SipConnectorService implements Service<Connector> {
     private final InjectedValue<SocketBinding> binding = new InjectedValue<SocketBinding>();
     private final InjectedValue<SipServer> server = new InjectedValue<SipServer>();
 
-    public SipConnectorService(String protocol, String scheme) {
+    public SipConnectorService(String protocol, String scheme, boolean useStaticAddress, String staticServerAddress, int staticServerPort, boolean useStun, String stunServerAddress, int stunServerPort) {
         Logger.getLogger("org.mobicents.as7").info("SipConnectorService(), protocol = " + protocol + " - scheme = " + scheme);
         if (protocol != null)
             this.protocol = protocol;
         if (scheme != null)
             this.scheme = scheme;
+        this.useStaticAddress = useStaticAddress;
+        if (staticServerAddress != null)
+            this.staticServerAddress = staticServerAddress;
+        this.staticServerPort = staticServerPort;
+        this.useStun = useStun;
+        if (stunServerAddress != null)
+            this.stunServerAddress = stunServerAddress;
+        this.stunServerPort = stunServerPort;
     }
 
     /**
@@ -89,6 +103,12 @@ class SipConnectorService implements Service<Connector> {
             sipConnector.setIpAddress(address.getHostName());
             sipConnector.setPort(address.getPort());
             sipConnector.setTransport(binding.getName().substring("sip-".length()));
+            sipConnector.setUseStaticAddress(useStaticAddress);
+            sipConnector.setStaticServerAddress(staticServerAddress);
+            sipConnector.setStaticServerPort(staticServerPort);
+            sipConnector.setUseStun(useStun);
+            sipConnector.setStunServerAddress(stunServerAddress);
+            sipConnector.setStunServerPort(stunServerPort);
             SipProtocolHandler sipProtocolHandler = (SipProtocolHandler) connector.getProtocolHandler();
             sipProtocolHandler.setSipConnector(sipConnector);
             if (enableLookups != null)
