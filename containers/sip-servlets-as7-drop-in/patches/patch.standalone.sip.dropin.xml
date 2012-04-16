@@ -8,27 +8,29 @@
      </extensions>
      <management>
          <security-realms>
-@@ -260,6 +261,10 @@
+@@ -260,6 +261,11 @@
                  <alias name="example.com"/>
              </virtual-server>
          </subsystem>
-+        <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" application-router="dars/mobicents-dar.properties" stack-properties="mss-sip-stack.properties" path-name="gov.nist" app-dispatcher-class="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" concurrency-control-mode="None" congestion-control-interval="-1">
++        <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" application-router="dars/mobicents-dar.properties" stack-properties="mss-sip-stack.properties" path-name="gov.nist" app-dispatcher-class="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" concurrency-control-mode="SipApplicationSession" congestion-control-interval="-1">
 +            <connector name="sip-udp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-udp"/>
 +            <connector name="sip-tcp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tcp"/>
++            <connector name="sip-tls" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tls"/>
 +        </subsystem>
          <subsystem xmlns="urn:jboss:domain:webservices:1.1">
              <modify-wsdl-address>true</modify-wsdl-address>
              <wsdl-host>${jboss.bind.address:127.0.0.1}</wsdl-host>
-@@ -295,6 +300,8 @@
+@@ -295,6 +301,9 @@
          <socket-binding name="ajp" port="8009"/>
          <socket-binding name="http" port="8080"/>
          <socket-binding name="https" port="8443"/>
 +        <socket-binding name="sip-udp" port="5080"/>
 +        <socket-binding name="sip-tcp" port="5080"/>
++        <socket-binding name="sip-tls" port="5081"/>
          <socket-binding name="osgi-http" interface="management" port="8090"/>
          <socket-binding name="remoting" port="4447"/>
          <socket-binding name="txn-recovery-environment" port="4712"/>
-@@ -303,4 +310,4 @@
+@@ -303,4 +312,4 @@
              <remote-destination host="localhost" port="25"/>
          </outbound-socket-binding>
      </socket-binding-group>
