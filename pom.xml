@@ -202,6 +202,7 @@
 			</activation>
 			<properties>
 				<tomcat.version>6.0.35</tomcat.version>	
+				<jboss4.version>4.2.3.GA</jboss4.version>
 			</properties>			
 			<modules>		
 				<module>containers/sip-servlets-catalina</module>						
@@ -247,6 +248,7 @@
 			</modules>
 			<properties>
 				<tomcat.version>6.0.35</tomcat.version>	
+				<jboss4.version>4.2.3.GA</jboss4.version>
 			</properties>	
 			<dependencies>
 				<!-- j2ee dependencies -->
