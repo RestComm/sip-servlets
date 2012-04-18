@@ -629,7 +629,10 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	
 	public Executor getExecutor() {
 		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException();
+//		throw new UnsupportedOperationException();
+		
+		//Issue 80: http://code.google.com/p/sipservlets/issues/detail?id=80
+		return null;
 	}
 
 	@Override
