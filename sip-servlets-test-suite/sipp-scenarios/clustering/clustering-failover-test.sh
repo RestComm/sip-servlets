@@ -50,7 +50,7 @@ if [ $# -eq 4 ]; then
 	    custom-b2bua)
 	    		rm ./b2bua/*.log
 	            echo "Distributed example used is custom b2bua";
-	            echo""| ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -i $SIPP_IP -p 5090 >sipp-uas-log-$1.txt 2&>1 &
+	            echo""| ./sipp $MSS_IP:5080 -sf b2bua/custom-call-forwarding-receiver.xml -trace_err -trace_msg -i $SIPP_IP -p 5090 >sipp-uas-log-$1.txt 2&>1 &
 	    		./sipp $MSS_IP:5080 -s receiver -sf b2bua/custom-call-forwarding-sender.xml -trace_err -i $SIPP_IP -p 5050 -r $RATE -m $CALLS -rsa $LB_IP:5060 -trace_msg -timeout $ACTIVE_TIMEOUT -timeout_error
 	            ;;
 	    custom-b2bua-early)
