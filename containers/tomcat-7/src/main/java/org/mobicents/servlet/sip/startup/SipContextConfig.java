@@ -73,7 +73,9 @@ import org.xml.sax.EntityResolver;
 public class SipContextConfig extends ContextConfig {	
 
 	private static transient final Logger logger = Logger.getLogger(SipContextConfig.class);
-	private static Boolean hasWebAnnotations = false;
+	//Issue 77: http://code.google.com/p/sipservlets/issues/detail?id=77
+	private Boolean hasWebAnnotations = false;
+
 
 	/**
 	 * {@inheritDoc}
