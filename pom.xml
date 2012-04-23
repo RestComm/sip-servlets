@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-        	<artifactId>mobicents</artifactId>
+        	<artifactId>mobicents-parent</artifactId>
         	<groupId>org.mobicents</groupId>
-        	<version>1.29</version>
+        	<version>2.23-SNAPSHOT</version>
     	</parent>
 	<groupId>org.mobicents.servlet.sip</groupId>
 	<artifactId>sip-servlets-bootstrap</artifactId>
@@ -202,6 +202,7 @@
 			</activation>
 			<properties>
 				<tomcat.version>6.0.35</tomcat.version>	
+				<jboss4.version>4.2.3.GA</jboss4.version>
 			</properties>			
 			<modules>		
 				<module>containers/sip-servlets-catalina</module>						
@@ -247,6 +248,7 @@
 			</modules>
 			<properties>
 				<tomcat.version>6.0.35</tomcat.version>	
+				<jboss4.version>4.2.3.GA</jboss4.version>
 			</properties>	
 			<dependencies>
 				<!-- j2ee dependencies -->

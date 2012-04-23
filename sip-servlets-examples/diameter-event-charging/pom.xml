@@ -22,18 +22,6 @@
       <version>1.3.3.FINAL</version>
       <scope>provided</scope>
     </dependency>    
-    <dependency>
-		  <groupId>jboss</groupId>
-		  <artifactId>jboss-system</artifactId>
-		  <version>${jboss.version}</version>
-		  <scope>provided</scope>
-    </dependency>    
-    <dependency>
-		  <groupId>jboss</groupId>
-		  <artifactId>jboss-jmx</artifactId>
-		  <version>${jboss.version}</version>
-		  <scope>provided</scope>
-    </dependency>    
 	</dependencies>
 	<url>http://www.mobicents.org/diameter_event_charging.html</url>
 	<build>
