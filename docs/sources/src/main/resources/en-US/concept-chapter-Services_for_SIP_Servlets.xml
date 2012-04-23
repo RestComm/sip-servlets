@@ -580,6 +580,8 @@ charging_sdk]$ jar -xvf ChargingSDK-1_0_D31E.zip</screen>
       </variablelist>
       <formalpara id="sfss-binary-Call-Blocking_Service-Downloading">
         <title>Downloading</title>
+
+		
         <para>The Call-Blocking Service is comprised of two archive files, a
         Web Archive (WAR) and a Default Application Router (DAR) configuration
         file, which you need to add to your installed SIP Servlets Server. For
