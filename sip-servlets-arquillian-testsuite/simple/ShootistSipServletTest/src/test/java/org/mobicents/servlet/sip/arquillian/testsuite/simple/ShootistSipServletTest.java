@@ -84,7 +84,7 @@ public class ShootistSipServletTest extends SipTestCase
 
 	@BeforeClass
 	public static void beforeClass(){
-		sipStackTool = new SipStackTool();
+		sipStackTool = new SipStackTool("ShootistSipServletTest");
 	}
 
 	@Before

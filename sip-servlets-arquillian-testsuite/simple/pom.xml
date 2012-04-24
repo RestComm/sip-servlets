@@ -6,13 +6,13 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.arquillian.testsuite</groupId>
 		<artifactId>sip-servlets-arquillian-testsuite</artifactId>
-		<version>1.7.0-SNAPSHOT</version>
+		<version>1.8.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<groupId>org.mobicents.servlet.sip.arquillian.testsuite</groupId>
 	<artifactId>simple</artifactId>
-	<version>1.7.0-SNAPSHOT</version>
+	<version>1.8.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>simple</name>
 

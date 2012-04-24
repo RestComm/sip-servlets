@@ -101,7 +101,7 @@ public class Click2CallBasicTest extends SipTestCase
 
 	@BeforeClass
 	public static void beforeClass(){
-		sipStackTool = new SipStackTool();
+		sipStackTool = new SipStackTool("Click2Call");
 	}
 
 
