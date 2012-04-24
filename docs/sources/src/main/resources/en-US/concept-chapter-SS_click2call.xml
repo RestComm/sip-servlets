@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "SIP_Servlets_Server_User_Guide.ent">
+%BOOK_ENTITIES;
+]>
+
+<chapter id="concept-chapter-SS_click2call">
+  <title>Tomcat Servlet Click2call Windows Setup</title>
+<para>
+Mobicents SIP Servlets Server can be run on a JBoss Application Server or on the Tomcat Servlet Container. Here is how
+to install and configure both JBoss a Microsoft Windows based system.
+</para>
+
+<para> 
+Tomcat Servlet running on Microsoft Windows
+The Mobicents Platform is based on Java, so you need to make sure you have both the Java Runtime Environment (JRE)
+and, or the Java Development Kit (JDK) installed on your Windows based system. </para>
+
+<para>
+You can download the <ulink url="http://www.java.com/en/">  Java Runtime Environment here </ulink>. 
+
+</para>
+
+<para>
+<step>
+Do to the following to open the cmd window
+<screen> menu > Start > Run > CMD</screen>
+
+
+In the black CMD window type 'java -version' You should see something similar to the screenshot below 
+
+
+
+          <figure>
+            <title>Testing if Java is installed and running</title>
+            <mediaobject id="windows_cmd_test_java_running">
+              <imageobject>
+                <imagedata  align="center" fileref="images/windows_cmd_test_java_running.png" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure>
+
+</step>
+</para>
+
+<para>
+If you are a developer, you can get the <ulink ref="http://www.oracle.com/technetwork/java/archive-139210.html"> Java Development Kit here </ulink>. 
+It is recommended that you install the latest version of JDK. You can opt for the JDK Java SE (Standard Edition) for test purposes. 
+Once you have downloaded JDK, you will see an executable like the one below in your download folder. 
+</para>
+
+<para>
+<step>
+Double-click the .exe file and follow the menu to complete your installation. <screen> Jdk-(version)-windows-i586.exe </screen>
+
+
+          <figure>
+            <title>JDK executable file</title>
+            <mediaobject id="jdk_download_executable">
+              <imageobject>
+                <imagedata  align="center" fileref="images/jdk_download_executable.jpg" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure>
+</step>
+</para>
+
+<para>
+JAVA_Home  enviroment variable. 
+In order for applications to interact with your Java installation, you need to specify the install location by setting the JAVA_HOME environment variable. 
+Start the 'cmd' without the quotes and press Enter
+<screen>
+Start > Run > cmd
+</screen>
+<para>
+In the CMD window, type </para>
+<screen>
+Set JAVA_HOME=C:\Java\jdk1.7.0_02
+</screen>
+</para>
+<para>
+          <figure>
+            <title>Set environment variable</title>
+            <mediaobject id="set_env_variable_windows">
+              <imageobject>
+                <imagedata  align="center" fileref="images/set_env_variable_windows.jpg" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure>
+</para>
+<para>
+This will set the environment variable for your session. The  <literal> C:\Java\jdk1.7.0_02 </literal> is the root folder where your JDK files are installed. You can go to <ulink url="http://support.microsoft.com/kb/931715"> this Microsoft page </ulink> to see how set your environment variable and make it permanent.
+If you want to make sure the JDK environment variable is set, type <screen> c:\> Set </screen>
+</para>
+ 
+ 
+<para>
+Installing Mobicents Tomcat on Windows It is recommended that you install the latest Mobicents Sip Servlets. 
+You can download the <ulink url="http://www.mobicents.org/mss-downloads.html"> MSS for Tomcat here </ulink>
+Make sure you download the latest Tomcat and not the JBoss. 
+
+          <figure>
+            <title>Download mobicents tomcat</title>
+            <mediaobject id="install_mobicents_tomcat_windows">
+              <imageobject>
+                <imagedata  align="center" fileref="images/install_mobicents_tomcat_windows.png" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure>
+
+The downloaded file will appear similar to this screenshot
+
+
+          <figure>
+            <title>Content of Tomcat Directory</title>
+            <mediaobject id="content_mss_tomcat_directory">
+              <imageobject>
+                <imagedata  align="center" fileref="images/content_mss_tomcat_directory.png" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure> 
+</para>
+
+<para>
+
+Once you have extracted the content of the MSS Tomcat server zip file, you need to set the CATALINA_HOME environment variable. Open the 'cmd' window 
+<screen> Start > run > cmd </screen>
+In this example, the environment variable is set as follows:
+<screen> set CATALINA_HOME=C:\tomcat\mss-1.6.0.FINAL-apache-tomcat-6.0.32 </screen>
+
+Start the MSS Tomcat Server
+
+The \bin directory in the root of your Tomcat folder holds the executables you need to work with the MSS server application. 
+To start the server, you need to execute the startup.bat file. First, start the cmd window as follows:
+<screen>
+Start > run > cmd 
+</screen>
+
+
+
+          <figure>
+            <title>Start Tomcat Server</title>
+            <mediaobject id="starting_tomcat_server">
+              <imageobject>
+                <imagedata  align="center" fileref="images/starting_tomcat_server.png" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure>
+
+
+This will open another cmd.exe window similar to the one below
+
+
+          <figure>
+            <title>Tomcat Server Started</title>
+            <mediaobject id="mss_tomcat_server_started">
+              <imageobject>
+                <imagedata  align="center" fileref="images/mss_tomcat_server_started.png" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure>
+		  
+	Note that the server is started and you can now begin to use the application.
+</para>
+
+
+<para>
+
+
+Once the MSS Tomcat server is up and running, you should be able to go to http://localhost:8080/ 
+and see the web server in action. If the page doesn’t open or you get an error message saying page 
+is not found, the 8080 port might be in use by another service. You will have to change the port 
+in the server.xml file located in the c:\TOMCAT_ROOT_FOLDER\conf\server.xml. You will need a text editor like Notepad++ to change the connector. 
+Here is a screenshot of the server.xml file with the default port 8080.
+
+
+          <figure>
+            <title>Tomcat Default Http Port</title>
+            <mediaobject id="changing_tomcat_http_default_port">
+              <imageobject>
+                <imagedata  align="center" fileref="images/changing_tomcat_http_default_port.png" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure>
+
+
+ The port number must be higher than 1024. In the example below, the port number for the connector has been change to 8040
+ 
+           <figure>
+            <title>Change Default Http Port to 8040</title>
+            <mediaobject id="updated_tomcat_http_port">
+              <imageobject>
+                <imagedata  align="center" fileref="images/updated_tomcat_http_port.png" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure>
+		  
+</para>
+
+
+<para>
+You can use your internet browser to see the result by going to <literal> http://localhost:8040 </literal>
+You will see a page similar to the screenshot below
+
+           <figure>
+            <title>Localhost Homepage</title>
+            <mediaobject id="localhost_http_homepage">
+              <imageobject>
+                <imagedata  align="center" fileref="images/localhost_http_homepage.png" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure>
+
+In order to manage the Click2call sip servlet clients, you need to navigate to the <literal> http://localhost:8040/click2call </literal>
+If you get an error message that says, page cannot be displayed, you need to make sure the
+ MSS Tomcat server is running by executing the startup.bat file in the <literal> MSS_Tomcat_root_folder\bin\startup.bat </literal>
+Here is a screenshot of what the Click2call applet will look like without any registered soft phone clients
+
+		  
+           <figure>
+            <title>Click2call Homepage</title>
+            <mediaobject id="click2call_sip_servlets_sample_application">
+              <imageobject>
+                <imagedata  align="center" fileref="images/click2call_sip_servlets_sample_application.png" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure>		  
+
+</para>
+
+<para>
+At the moment there are no registered users. That is because you need to get the softphone clients to register with the Tomcat server you started above.
+You need to install a minimum of two soft phones in order to be able to run the sip servlet Click2Call sample.
+In this example, we shall be using 2 soft phones clients, <emphasis> WengoPhone and 3CXPhone. </emphasis>
+Download the latest version of the soft phones, install and configure them like the screenshots below:
+
+           <figure>
+            <title>Wengo Softphone Configuration</title>
+            <mediaobject id="wengo_softphone_configuration">
+              <imageobject>
+                <imagedata  align="center" fileref="images/wengo_softphone_configuration.png" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure>		  
+
+</para>
+
+<para>
+You can use any username and password you desire. The MSS Tomcat server is listening for calls on the <emphasis> 127.0.0.1:5080 port </emphasis>
+</para>
+<para>
+<emphasis> Configuring the 3CXPhone </emphasis> 
+After the installation is complete, you can start up the 3CXPhone, you will see the screen below prompting you to create a profile. Click on the Create Profile Button.
+
+           <figure>
+            <title>3CXphone Profile</title>
+            <mediaobject id="3cxphone_softphone_profile">
+              <imageobject>
+                <imagedata  align="center" fileref="images/3cxphone_softphone_profile.png" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure>	
+		  
+In the Accounts window choose the <emphasis> 'New' </emphasis> button and configure as follows
+	
+           <figure>
+            <title>3CXphone Softphone Configuration</title>
+            <mediaobject id="3CXphone_softphone_configuration">
+              <imageobject>
+                <imagedata  align="center" fileref="images/3CXphone_softphone_configuration.jpg" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure>	
+</para>
+
+<para>
+
+
+Once the 2 soft phone clients are configured with the SIP details, 
+you can go back to the <literal> http://localhost:8040/click2call/index.jsp page and you will see the clients registered with the server. </literal>
+
+
+           <figure>
+            <title>Registered Sip Clients</title>
+            <mediaobject id="mobicents_sip_servlets_registered_clients">
+              <imageobject>
+                <imagedata  align="center" fileref="images/mobicents_sip_servlets_registered_clients.png" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure>	
+	
+	Before you can make calls, you will need to specify the contact details of the person you want to call. It is just like entering the phone number. 
+	Because this is a SIP based setting, you will need to enter the SIP address instead of the phone number.
+	
+	
+	
+</para>
+<para>
+<emphasis> Testing the Soft Phones on Click2Call</emphasis>
+In order to be able to make a call from one phone to the other, you need to create a contact user. 
+Because you will be using the SIP protocol, you will need to type the contact details with the testphone1 SIP pointing to the <screen> testphone2@127.0.0.1 </screen>
+
+           <figure>
+            <title>Wengo Phone Contact User Details</title>
+            <mediaobject id="wengo_softphone_user_contact">
+              <imageobject>
+                <imagedata  align="center" fileref="images/wengo_softphone_user_contact.jpg" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure>	
+</para>
+<para>
+You need to do the same on the 3CXPhone contact. The phone contact number will be <screen> sip:testphone1@127.0.0.1:5080 </screen>
+           <figure>
+            <title>3CXPhone Contact User Details</title>
+            <mediaobject id="3cxphone_contact_user_detail.png">
+              <imageobject>
+                <imagedata  align="center" fileref="images/3cxphone_contact_user_detail.png" format="PNG"/>
+              </imageobject>
+            </mediaobject>
+          </figure>	
+Once you have both contact sip details configured, you can start to make calls and fully use the Click2call application.
+
+</para> 
+
+</chapter> 
