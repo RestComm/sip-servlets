@@ -16,7 +16,7 @@
 
 	<groupId>org.mobicents.servlet.sip.arquillian.testsuite</groupId>
 	<artifactId>sip-servlets-arquillian-testsuite</artifactId>
-	<version>1.7.0-SNAPSHOT</version>
+	<version>1.8.0-SNAPSHOT</version>
 	<name>sip-servlets-arquillian-testsuite</name>
 
 	<packaging>pom</packaging>
@@ -31,9 +31,9 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-		<version.arquillian_core>1.0.0.CR7</version.arquillian_core>
+		<version.arquillian_core>1.0.0.Final</version.arquillian_core>
 		<!-- <version.arquillian_core>1.0.0.Final-SNAPSHOT</version.arquillian_core> -->
-		<version.shrinkwrap_tomcat>1.0.0-beta-12</version.shrinkwrap_tomcat>
+		<version.shrinkwrap_tomcat>1.0.0</version.shrinkwrap_tomcat>
 
 		<version.jboss_spec>1.0.0.Final</version.jboss_spec>
 		<version.weld_servlet>1.1.2.Final</version.weld_servlet>
@@ -46,7 +46,7 @@
 		<maven.compiler.source>1.5</maven.compiler.source>
 
 		<!-- Mobicents -->
-		<version.org.mobicents.servlet.sip>1.7.0-SNAPSHOT</version.org.mobicents.servlet.sip>
+		<version.org.mobicents.servlet.sip>1.8.0-SNAPSHOT</version.org.mobicents.servlet.sip>
 		<version.mobicents.jain.sip.ext>1.0</version.mobicents.jain.sip.ext>
 		<version.mobicents.jain.sip.jboss4>1.2.0.FINAL</version.mobicents.jain.sip.jboss4>
 
