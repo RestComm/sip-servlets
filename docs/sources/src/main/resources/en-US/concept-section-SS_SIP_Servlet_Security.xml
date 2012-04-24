@@ -4,6 +4,7 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "SIP_Servlets_Server_User_Guide.ent">
 %BOOK_ENTITIES;
 ]>
+
 <section id="sss-SIP_Servlet_Security">
   <title>SIP Servlets Application Security</title>
 
@@ -250,4 +251,4 @@ admin=caller,role1,role2,..
       </orderedlist>
     </step>
   </procedure>
-</section>
+</section> 

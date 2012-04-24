@@ -17,9 +17,11 @@
   the server, the communication between the server and other SIP entities and
   securing the application and its content.</para>
 
-  <xi:include href="concept-section-SS_SIP_Servlet_Security.xml"
-              xmlns:xi="http://www.w3.org/2001/XInclude"/>
+  
 
-  <xi:include href="concept-section-SS_TLS.xml"
-              xmlns:xi="http://www.w3.org/2001/XInclude"/>
-</chapter>
+	
+ <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" 
+			href="concept-section-SS_SIP_Servlet_Security.xml"/> 
+ <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" 
+				href="concept-section-SS_TLS.xml" /> 	
+ </chapter>

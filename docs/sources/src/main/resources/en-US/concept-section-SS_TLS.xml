@@ -4,6 +4,7 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "SIP_Servlets_Server_User_Guide.ent">
 %BOOK_ENTITIES;
 ]>
+
 <section id="sss-TLS">
   <title>TLS</title>
 
@@ -14,7 +15,8 @@
         quick start. However, for production environment you need to obtain an officially signed
         certificate from a known CA and that process is outlined in section <xref linkend="sss-TLS_production_setup">Production Setup</xref>.</para>
 
-  <section>
+
+  <section> 
     <title>Quick Start</title>
 
     <para>This section shows how to create a self signed certificate, how to
@@ -178,13 +180,13 @@
                         trusted keystore so we need to extract the certificate out of the client key
                         store. This can also be done using the Java keytool.
                         <programlisting>keytool -exportcert -alias myclient -file client.cert -keystore myclient.jks -storepass secret -rfc</programlisting>The
-                        certificate is saved in file “client.cert” and we will use this file in the next
+                        certificate is saved in file 'client.cert' and we will use this file in the next
                         step. </para>
     </step>
 
     <step>
         <title>Re-configure the server</title>
-        <para>Simply change the <literal>gov.nist.javax.sip.TLS_CLIENT_AUTH_TYPE</literal> from “Disabled” to “Enabled” and start the server again.</para>
+        <para>Simply change the <literal>gov.nist.javax.sip.TLS_CLIENT_AUTH_TYPE</literal> from 'Disabled' to 'Enabled' and start the server again.</para>
     </step>
 
     <step>
@@ -192,7 +194,7 @@
                     <para>We will once again use openssl to verify our setup but now that the client
                         will be forced to present a certificate as well, we do need the certificate's
                         private key as well. The private key is embedded into the keystore and was
-                        generated when we issued the “kenkeypair” keytool-command. Unfortunately, the
+                        generated when we issued the 'kenkeypair' keytool-command. Unfortunately, the
                         keytool does not have an option for exporting the private key so we will have to
                         write a small java program to extract it for us. Luckily, it is not a lot of
                         code:</para>
@@ -234,7 +236,7 @@
         }
         return keyPassword;
         }
-        }</programlisting>
+        }</programlisting> 
 
     <para>Copy and paste the above code into a file call DumpPrivateKey.java and then compile it: </para>
 
@@ -250,7 +252,7 @@
                     information about the certificate exchange. </para>
             </step>
   </procedure>
-  </section>
+   </section>
 
   <section id="sss-TLS_production_setup">
       <title>Production Setup</title>
@@ -268,7 +270,7 @@
             <para><programlisting>openssl pkcs12 -inkey myprivate.key -in mycertificate.pem -export -out mystorage.pkcs12 -passout mysecret</programlisting></para>
 
             <para>where myprivate.key is the private key, <classname>mycertificate.pem</classname> is the X.509
-                    certificate. The password for the storage is “mysecret” and the name of the
+                    certificate. The password for the storage is 'mysecret' and the name of the
                     storage file is <classname>mystorage.pkcs12</classname>. </para>
        </step>
 
@@ -301,7 +303,8 @@
        </step>
 
      </procedure>
-  </section>
+  </section> 
 
 
-</section>
+
+</section> 
