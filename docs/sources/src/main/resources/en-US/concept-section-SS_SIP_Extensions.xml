@@ -69,6 +69,11 @@
         <row>
           <entry>Multipart type</entry><entry><ulink url="http://www.ietf.org/rfc/rfc4662.txt">RFC 4662</ulink></entry><entry>A Session Initiation Protocol (SIP) Event Notification</entry>
         </row>
+        <row>
+          <entry>To/From Header Modification </entry><entry><ulink url="http://www.ietf.org/rfc/rfc4916.txt">RFC 4916</ulink></entry><entry>Connected Identity in the Session Initiation Protocol (SIP)
+</entry>
+        </row>		
+		
       </tbody>
     </tgroup>
     </table>
