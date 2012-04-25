@@ -1,0 +1,2 @@
+INVITE: ("org.mobicents.servlet.sip.example.CallForwardingB2BUAApplication", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0"), \
+("org.mobicents.servlet.sip.example.CallBlockingApplication", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "1")
