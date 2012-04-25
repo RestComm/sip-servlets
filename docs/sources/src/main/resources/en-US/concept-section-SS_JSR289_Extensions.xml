@@ -5,7 +5,7 @@
 ]>
 <!-- chapter id nickname: sscacc -->
 <section id="sscacc-MSS_JSR289_Extensions">
-  <title>Mobicents vendor-specific Extensions to JSR 289</title>
-  <para>Mobicents provide Extensions for applications or external systems to interact with the Mobicents SIP Servlets container as well as Extensions not defined in the specification in the JSR 289 specification that can prove useful and might be proposed for inclusion in a next release of the SIP Servlets specification </para>
-  <para><ulink url="http://ci.jboss.org/jenkins/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/api-docs/jsr289/extensions/index.html">Javadoc for Mobicents JSR 289 Extensions</ulink></para>
+  <title>&PLATFORM_NAME; vendor-specific Extensions to JSR 289</title>
+  <para>&PLATFORM_NAME; provide Extensions for applications or external systems to interact with the &PLATFORM_NAME; SIP Servlets container as well as Extensions not defined in the specification in the JSR 289 specification that can prove useful and might be proposed for inclusion in a next release of the SIP Servlets specification </para>
+  <para><ulink url="http://ci.jboss.org/jenkins/view/Mobicents/job/MobicentsBooks/lastSuccessfulBuild/artifact/api-docs/jsr289/extensions/index.html">Javadoc for &PLATFORM_NAME; JSR 289 Extensions</ulink></para>
 </section>
