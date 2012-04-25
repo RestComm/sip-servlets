@@ -5,7 +5,7 @@
 ]>
 <chapter id="emom-Enterprise-Monitoring-Operations-Management">
   <title>Enterprise Monitoring and Management</title>
-  <para>There is two ways of monitoring Mobicents Sip Servlets :
+  <para>There is two ways of monitoring &PLATFORM_NAME; Sip Servlets :
   <itemizedlist>
   		  <listitem> <para>Through the industry standard Simple Network Management Protocol - SNMP</para></listitem>
 		  <listitem> <para>Through Jopr is an enterprise management solution for JBoss middleware
@@ -89,7 +89,7 @@
             , click on the <guimenuitem>MobicentsSipServlets</guimenuitem> link, then click on the
             <guimenuitem>jboss.web:type=SipApplicationDispatcher</guimenuitem> link to view the incoming metrics.</para>
 <!--Issue #706 Editor note - I have converted  all screenshots from <mediaobjects> to <figures> for you :)  I've also set the width attribute to 700 (<imagedata width="700") (usually, the limit for good formatting in HTML is 450).  The images, due to their size, were scaling off the html page.  For massive screenshots like this, consider capturing only the section of the screen that you are discussing in each step.  It will mean the information in the screenshot is more useful to the reader.-->            <figure>
-              <title>Mobicents SIP Servlets Server Metrics</title>
+              <title>&PLATFORM_NAME; SIP Servlets Server Metrics</title>
               <mediaobject>
                 <imageobject>
                   <imagedata width="700" fileref="images/mss-embjopr-home.png"/>
@@ -205,7 +205,7 @@
           <listitem>
             <para>Click on the <guimenuitem>jboss.web:type=SipApplicationDispatcher</guimenuitem> link to view the incoming metrics.</para>
             <figure>
-              <title>Mobicents SIP Servlets Server Metrics</title>
+              <title>&PLATFORM_NAME; SIP Servlets Server Metrics</title>
               <mediaobject>
                 <imageobject>
                   <imagedata width="700" fileref="images/mss-jopr-jboss-web.png"/>
@@ -356,7 +356,7 @@
         </listitem>
         <listitem>
           <para>From the Dashboard, in the Recently Added Resources
-          portlet, click on the Mobicents SIP Load Balancer.</para>
+          portlet, click on the &PLATFORM_NAME; SIP Load Balancer.</para>
 <!--Issue #706 Editor Comment - because you have described the location of the item so well, you don't actually need the screenshot here.  Save maintenance and use this writing technique in as many procedures as you can.-->          <figure>
             <title/>
             <mediaobject>

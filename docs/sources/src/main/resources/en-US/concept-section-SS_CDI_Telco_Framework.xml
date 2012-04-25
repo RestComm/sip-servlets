@@ -6,7 +6,7 @@
 <section id="stf-CDI_Telco_Framework">
     <title>CDI Telco Framework</title>
       <para>CDI is the Java standard for dependency injection and contextual lifecycle management, led by Gavin King for Red Hat, Inc. and is a Java Community Process(JCP) specification that integrates cleanly with the Java EE platform. Any Java EE 6-compliant application server provides support for JSR-299 (even the web profile). It seemed a natural fit create a new framework based on CDI for the Telco world.</para>
-	  <para>CDI-Telco-Framework (CTF) from Mobicents brings the power and productivity benefits of CDI into the Mobicents Sip Servlets platform providing dependency injection and contextual lifecycle management for converged HTTP/SIP applications. This new framework is intended to become a replacement for our previous Seam Telco Framework.</para>
+	  <para>CDI-Telco-Framework (CTF) from &PLATFORM_NAME; brings the power and productivity benefits of CDI into the &PLATFORM_NAME; Sip Servlets platform providing dependency injection and contextual lifecycle management for converged HTTP/SIP applications. This new framework is intended to become a replacement for our previous Seam Telco Framework.</para>
 	  <para>CTF mission statement is to simplify SipServlets development by introducing a component based programming model, ease of development by making available SIP utilities out of the box, and finally providing dependency injection and contextual lifecycle management to the SipServlets.</para>
 	  <figure>
       <title>CDI Telco Framework Extension</title>

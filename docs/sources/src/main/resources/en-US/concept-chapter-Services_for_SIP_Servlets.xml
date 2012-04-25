@@ -99,7 +99,7 @@ more information about WAR files, refer to the <ulink url="http://www.jboss.org/
 more information about DAR files, refer to the <ulink url="http://jcp.org/en/jsr/detail?id=289">JSR 289 spec, Appendix C</ulink>.</para>
 </formalpara>
 <para>Download the Location Service&apos;s WAR file from here: <ulink url="https://oss.sonatype.org/content/groups/public/org/mobicents/servlet/sip/examples/location-service/&VERSION;/location-service-&VERSION;.war"/>.</para>
-<para>Download the Location Service&apos;s DAR file from here: <ulink url="http://www.mobicents.org/locationservice-dar.properties"/>.</para>
+<para>Download the Location Service&apos;s DAR file from here: <ulink url="https://sipservlets.googlecode.com/git/sip-servlets-examples/location-service/locationservice-dar.properties"/>.</para>
 <formalpara id="sfss-binary-Location_Service-Installing">
 <title>Installing</title>
 <para>Both the <filename>location-service-&VERSION;.war</filename> WAR file
@@ -337,7 +337,7 @@ current version of which is named
 <step>
 <para>Secondly, download the corresponding Disk Archive
 (<acronym>DAR</acronym>) configuration file here:
-<ulink url="http://www.mobicents.org/diametereventcharging-dar.properties"/>.</para>
+<ulink url="https://sipservlets.googlecode.com/git/sip-servlets-examples/diameter-event-charging/diametereventcharging-dar.properties"/>.</para>
 </step>
 <step>
 <para>Finally, you will need to download the Ericsson Charging
@@ -589,7 +589,7 @@ more information about WAR files, refer to the <ulink url="http://www.jboss.org/
 more information about DAR files, refer to the <ulink url="http://jcp.org/en/jsr/detail?id=289">JSR 289 spec, Appendix C</ulink>.</para>
 </formalpara>
 <para>Download the Call-Blocking Service&apos;s WAR file from here: <ulink url="https://oss.sonatype.org/content/groups/public/org/mobicents/servlet/sip/examples/call-blocking/&VERSION;/call-blocking-&VERSION;.war"/>.</para>
-<para>Download the Call-Blocking Service&apos;s DAR file from here: <ulink url="http://www.mobicents.org/call-blocking-servlet-dar.properties"/>.</para>
+<para>Download the Call-Blocking Service&apos;s DAR file from here: <ulink url="https://sipservlets.googlecode.com/git/sip-servlets-examples/call-blocking/call-blocking-servlet-dar.properties"/>.</para>
 <formalpara id="sfss-binary-Call-Blocking_Service-Installing">
 <title>Installing</title>
 <para>Both the <filename>call-blocking-&VERSION;.war</filename> WAR file and
@@ -801,7 +801,7 @@ your installed SIP Servlets Server. For more information about WAR and
 DAR files, refer to the <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Server_Configuration_Guide/beta422/html/index.html">JBoss Application Server Administration and Development Guide</ulink>.</para>
 </formalpara>
 <para>Download the Call-Forwarding Service&apos;s WAR file from here: <ulink url="https://oss.sonatype.org/content/groups/public/org/mobicents/servlet/sip/examples/call-forwarding/&VERSION;/call-forwarding-&VERSION;.war"/>.</para>
-<para>Download the Call-Forwarding Service&apos;s DAR file from here: <ulink url="http://www.mobicents.org/call-forwarding-servlet-dar.properties"/>.</para>
+<para>Download the Call-Forwarding Service&apos;s DAR file from here: <ulink url="https://sipservlets.googlecode.com/git/sip-servlets-examples/call-forwarding/call-forwarding-b2bua-servlet-dar.properties"/>.</para>
 <formalpara id="sfss-binary-Call-Forwarding_Service-Installing">
 <title>Installing</title>
 <para>Both the <filename>call-forwarding-&VERSION;.war</filename> WAR file
@@ -1029,7 +1029,7 @@ more information about DAR files, refer to the <ulink url="http://jcp.org/en/jsr
 </formalpara>
 <para>Download the Call-Blocking Service&apos;s WAR file from here: <ulink url="https://oss.sonatype.org/content/groups/public/org/mobicents/servlet/sip/examples/call-blocking/&VERSION;/call-blocking-&VERSION;.war"/>.</para>
 <para>Download the Call-Forwarding Service&apos;s WAR file from here: <ulink url="https://oss.sonatype.org/content/groups/public/org/mobicents/servlet/sip/examples/call-forwarding/&VERSION;/call-forwarding-&VERSION;.war"/>.</para>
-<para>Download the Call-Controller Service&apos;s DAR file from here: <ulink url="http://www.mobicents.org/call-controller-servlet-dar.properties"/>.</para>
+<para>Download the Call-Controller Service&apos;s DAR file from here: <ulink url="https://sipservlets.googlecode.com/git/sip-servlets-examples/call-blocking/call-controller-servlet-dar.properties"/>.</para>
 <formalpara id="sfss-binary-Call-Controller_Service-Installing">
 <title>Installing</title>
 <para>The <filename>call-blocking-&VERSION;.war</filename>,

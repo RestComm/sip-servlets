@@ -22,6 +22,7 @@
 		<author.email.eduardo>emartins@redhat.com</author.email.eduardo>
 		<author.email.jean>jean.deruelle@redhat.com</author.email.jean>
 		<author.email.vlad>vralev@redhat.com</author.email.vlad>
+		<download.link>http://support.telestax.com/</download.link>
 	</properties>
 	
 	<build>

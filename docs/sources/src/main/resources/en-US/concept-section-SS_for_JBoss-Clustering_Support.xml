@@ -117,7 +117,7 @@ outboundProxy=&quot;127.0.0.1:5500&quot;
     </section>
     <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Uninstalling">
       <title>Uninstalling</title>
-      <para>Uninstalling a SIP Servlets Cluster would entail deleting the Mobicents SIP Servlets Servers directories, the SIP Load Balancer directory, and possibly removing the unused <envar>JBOSS_HOME</envar> environment variable.</para>
+      <para>Uninstalling a SIP Servlets Cluster would entail deleting the &PLATFORM_NAME; SIP Servlets Servers directories, the SIP Load Balancer directory, and possibly removing the unused <envar>JBOSS_HOME</envar> environment variable.</para>
     </section>
   </section>
   <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-SIP-Passivation">
@@ -128,7 +128,7 @@ outboundProxy=&quot;127.0.0.1:5500&quot;
     <para>
     	Passivation is the process of controlling memory usage by removing relatively unused sessions from memory while storing them in persistent storage. 
     	If a passivated session is requested by a client, it can be "activated" back into memory and removed from the persistent store. 
-    	Mobicents Sip Servlets  supports passivation of SipSessions (and by extension SIP Dialogs) and SipApplicationSessions  sipapps whose sip.xml includes the <literal>distributable</literal> tag (i.e. clustered sipapps).
+    	&PLATFORM_NAME; Sip Servlets supports passivation of SipSessions (and by extension SIP Dialogs) and SipApplicationSessions  sipapps whose sip.xml includes the <literal>distributable</literal> tag (i.e. clustered sipapps).
  </para>
  <para>
 		Passivation occurs at 2 points during the lifecycle of a sip application:

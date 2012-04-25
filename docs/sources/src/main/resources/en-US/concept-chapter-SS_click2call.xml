@@ -8,13 +8,13 @@
 <section id="concept-chapter-SS_click2call">
 <title>Tomcat Servlet Click2call Windows Setup</title>
 <para>
-Mobicents SIP Servlets Server can be run on a JBoss Application Server or on the Tomcat Servlet Container. Here is how
+&PLATFORM_NAME; SIP Servlets Server can be run on a JBoss Application Server or on the Tomcat Servlet Container. Here is how
 to install and configure both JBoss a Microsoft Windows based system.
 </para>
 
 <para> 
 Tomcat Servlet running on Microsoft Windows
-The Mobicents Platform is based on Java, so you need to make sure you have both the Java Runtime Environment (JRE)
+The &PLATFORM_NAME; Platform is based on Java, so you need to make sure you have both the Java Runtime Environment (JRE)
 and, or the Java Development Kit (JDK) installed on your Windows based system. </para>
 
 <para>
@@ -96,12 +96,12 @@ If you want to make sure the JDK environment variable is set, type <screen> c:\>
 
 
 <para>
-Installing Mobicents Tomcat on Windows It is recommended that you install the latest Mobicents Sip Servlets. 
-You can download the <ulink url="http://www.mobicents.org/mss-downloads.html"> MSS for Tomcat here </ulink>
+Installing &PLATFORM_NAME; Tomcat on Windows. It is recommended that you install the latest &PLATFORM_NAME; Sip Servlets. 
+You can download the <ulink url="&DOWNLOAD_LINK;"> &PLATFORM_NAME; SIP Servlets for Tomcat here </ulink>
 Make sure you download the latest Tomcat and not the JBoss. 
 
 <figure>
-<title>Download mobicents tomcat</title>
+<title>Download &PLATFORM_NAME; SIP Servlets for Tomcat</title>
 <mediaobject id="install_mobicents_tomcat_windows">
 <imageobject>
 <imagedata align="center" fileref="images/click2call_install_mobicents_tomcat_windows.png" format="PNG"/>

@@ -54,7 +54,7 @@
   </section>
   <section id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Downloading">
     <title>Downloading</title>
-    <para>The latest version of &PLATFORM_NAME; SIP Servlets for JBoss is available from TeleStax support portal <ulink url="http://support.telestax.com/"/>.</para>
+    <para>The latest version of &PLATFORM_NAME; SIP Servlets for JBoss is available from <ulink url="&DOWNLOAD_LINK;"/>.</para>
     <para>Each version of the SIP Servlets Server is comprised of tree separate binary distribution files: one which is &SHORT_PLATFORM_NAME; for JBoss, one which is &SHORT_PLATFORM_NAME; for EAP and the other which is &SHORT_PLATFORM_NAME; for Tomcat.  Download SIP Servlets Server for Tomcat and continue with the following instructions.</para>
   </section>
   <section id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Installing">

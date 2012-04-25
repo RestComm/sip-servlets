@@ -45,7 +45,7 @@
    <important>
 			<title>Optimization Note</title>
 			<para>
-				 To maximize performance it is recommended to use a load balancer with SIP affinity enabled, so that all messages related to the same call go to the same node even though Mobicents Sip Servlets supports the case where SIP transactions for a given SIP Dialog go to different nodes.
+				 To maximize performance it is recommended to use a load balancer with SIP affinity enabled, so that all messages related to the same call go to the same node even though &PLATFORM_NAME; Sip Servlets supports the case where SIP transactions for a given SIP Dialog go to different nodes.
 			</para>
   </important>
    </listitem>
@@ -65,7 +65,7 @@
   <important>
 			<title>Optimization Note</title>
 			<para>
-				 To maximize performance it is recommended to use a Load Balancer with SIP affinity enabled so that all messages related to the same SIP transaction (and even SIP call) go to the same node even though Mobicents Sip Servlets supports the case where SIP transactions for a given SIP Dialog go to different nodes.
+				 To maximize performance it is recommended to use a Load Balancer with SIP affinity enabled so that all messages related to the same SIP transaction (and even SIP call) go to the same node even though &PLATFORM_NAME; Sip Servlets supports the case where SIP transactions for a given SIP Dialog go to different nodes.
 			</para>
   </important>
     </listitem>    

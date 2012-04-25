@@ -86,8 +86,9 @@ Or something similar to that.  Do you agree?-->        <varlistentry>
           <example id="sslb-Complete_Sample_lb.properties_File">
             <title>Complete Sample lb.properties File</title>
             <programlisting linenumbering="unnumbered"><![CDATA[
-# Mobicents Load Balancer Settings
-# For an overview of the Mobicents Load Balancer visit http://docs.google.com/present/view?id=dc5jp5vx_89cxdvtxcm
+#]]> &PLATFORM_NAME; <![CDATA[Load Balancer Settings
+# For an overview of the]]> &PLATFORM_NAME; <![CDATA[ Load Balancer visit 
+# http://docs.google.com/present/view?id=dc5jp5vx_89cxdvtxcm
 # The Load balancer will listen for both TCP and UDP connections
 
 
@@ -314,7 +315,7 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
               <para>The <literal>balancers</literal> attribute must contain a IP address (or list of addresses) of the SIP load balancer(s) to which heartbeat information will be sent.</para>
             </listitem>
             <listitem>
-              <para>The <literal>sipPathName</literal> attribute must contain the following value <literal>org.mobicents.ha</literal> to indicate that the server will be using the Mobicents JAIN SIP HA SIP Stack which is an extension of the JAIN SIP Stack offering transparent replication.</para>
+              <para>The <literal>sipPathName</literal> attribute must contain the following value <literal>org.mobicents.ha</literal> to indicate that the server will be using the &PLATFORM_NAME; JAIN SIP HA SIP Stack which is an extension of the JAIN SIP Stack offering transparent replication.</para>
             </listitem>
           </itemizedlist>
         </step>
@@ -350,7 +351,7 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
         <title>Easy Node Configuration with JMX</title>
         <para>Both SIP Servlet-enabled JBoss and Tomcat have <acronym>JMX</acronym> (Java Management Extensions) interfaces that allow for easy server configuration. The JMX Console is available once the server has been started by navigating to <ulink url="http://localhost:8080/jmx-console/"/>.  </para>
       </formalpara>
-      <para>Both the <literal>balancers</literal> and <literal>heartBeatInterval</literal> attribute values are available under <literal>name=Mobicents-SIP-Servlets,type=load-balancer-heartbeat-service</literal> in the JMX Console.
+      <para>Both the <literal>balancers</literal> and <literal>heartBeatInterval</literal> attribute values are available under <literal>name=&PLATFORM_NAME;-SIP-Servlets,type=load-balancer-heartbeat-service</literal> in the JMX Console.
       </para>
       <variablelist>
           <varlistentry>
