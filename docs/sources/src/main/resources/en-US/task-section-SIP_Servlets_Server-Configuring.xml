@@ -140,7 +140,7 @@ ipAddress="127.0.0.1"
  t4Interval="5000"
  timerDInterval="32000"
  dispatcherThreadPoolSize="4"
- darConfigurationFileLocation="file:///home/silas/workspaces/mobicents-sip-servlets/
+ darConfigurationFileLocation="file:///home/user/workspaces/sip-servlets/
  sip-servlets-examples/reinvite-demo/reinvite-dar.properties"
  sipStackPropertiesFile="conf/mss-sip-stack.properties"
  dialogPendingRequestChecking="false">]]>
@@ -184,7 +184,7 @@ ipAddress="127.0.0.1"
               <para>gov.nist.javax.sip.SERVER_LOG=logs/mss-jsip-messages.xml</para>
             </listitem>
             <listitem>
-              <para>javax.sip.STACK_NAME=Mobicents-SIP-Servlets</para>
+              <para>javax.sip.STACK_NAME=&PLATFORM_NAME;-SIP-Servlets</para>
             </listitem>
             <listitem>
               <para>javax.sip.AUTOMATIC_DIALOG_SUPPORT=off</para>
@@ -199,7 +199,7 @@ ipAddress="127.0.0.1"
               <para>gov.nist.javax.sip.REENTRANT_LISTENER=true</para>
             </listitem>
             <listitem>
-              <para>gov.nist.javax.sip.MAX_FORK_TIME_SECONDS=0. Dialog forking is not enabled by default as it has an impact on memory. If set to a value greater than 0, Dialog Forking will be enabled on Mobicents Sip Servlets.</para>
+              <para>gov.nist.javax.sip.MAX_FORK_TIME_SECONDS=0. Dialog forking is not enabled by default as it has an impact on memory. If set to a value greater than 0, Dialog Forking will be enabled on &PLATFORM_NAME; Sip Servlets.</para>
             </listitem>
             <listitem>
               <para>gov.nist.javax.sip.AUTOMATIC_DIALOG_ERROR_HANDLING=false. Merged requests Loop Detection is turned off by default</para>
@@ -233,7 +233,7 @@ ipAddress="127.0.0.1"
         <term>bypassRequestExecutor/bypassResponseExecutor</term>
         <listitem>
           <para>If set to false, the SIP Servlets server uses a ThreadPoolExecutor linked to a LinkedBlockingQueue to dispatch the request/response threads. The container can then handle two different responses (for example a 180 Ringing and a 200 OK) concurrently. However, a race condition can occur where the second response overtakes the first one (200 OK dispatched to the application before the 180 Ringing) on UDP.</para>
-          <para>These flags are set to true by defauilt, Jain sip serializing is used per transaction to ensure such race conditions don't occur in Mobicents Sip Servlets even though they can still happen on UDP at jain sip level.</para>
+          <para>These flags are set to true by defauilt, Jain sip serializing is used per transaction to ensure such race conditions don't occur in &PLATFORM_NAME; Sip Servlets even though they can still happen on UDP at jain sip level.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
