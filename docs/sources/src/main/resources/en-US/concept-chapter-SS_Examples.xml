@@ -38,7 +38,7 @@
 </row>
 <row>
 <entry>
-<ulink url="http://www.mobicents.org/speed_dial.html">Speed Dial</ulink>
+<ulink url="https://code.google.com/p/sipservlets/wiki/SpeedDial">Speed Dial</ulink>
 </entry>
 <entry>Demonstrates how to implement speed dialing for SIP addresses. The demonstration uses a static list of speed dial numbers. The numbers are translated into a complete address based on prior configuration. The SIP addresses are proxied without record-routing, or supervised mode.</entry>
 </row>
@@ -50,37 +50,37 @@
 </row>
 <row>
 <entry>
-<ulink url="http://www.mobicents.org/speeddial_locationservice.html">Composed Speed Dial and Location</ulink>
+<ulink url="https://code.google.com/p/sipservlets/wiki/SpeedDialLocationService">Composed Speed Dial and Location</ulink>
 </entry>
 <entry>Speed Dial and Location are merged to create a new service. Speed Dial proxies the speed dial number to a SIP address, then Location Service proxies the call to the actual location of the call recipient.</entry>
 </row>
 <row>
 <entry>
-<ulink url="http://www.mobicents.org/click2call.html">Click to Call</ulink>
+<ulink url="concept-chapter-SS_click2call">Click to Call</ulink>
 </entry>
 <entry>Demonstrates how SIP Servlets can be used along with HTTP servlets as a converged application to place calls from a web portal. The example is a modified version of the click to dial example from the Sailfin project, but has been reworked to comply with JSR 289.</entry>
 </row>
 <row>
 <entry>
-<ulink url="http://www.mobicents.org/chatserver.html">Chat Server</ulink>
+<ulink url="https://code.google.com/p/sipservlets/wiki/ChatServer">Chat Server</ulink>
 </entry>
 <entry>Demonstrates <literal>MESSAGE</literal> SIP Extension support. This example is based on the chatroom server demonstration from the BEA dev2dev project, and has been modified to meet JSR 289 requirements.</entry>
 </row>
 <row>
 <entry>
-<ulink url="http://www.mobicents.org/mss-jsr309-demo.html">Media JSR 309 Example</ulink>
+<ulink url="https://code.google.com/p/sipservlets/wiki/MediaDemo">Media JSR 309 Example</ulink>
 </entry>
 <entry>Demonstrates how the Sip Servlets Application Developers can leverage the JSR-309 API, which provides to application developers multimedia capabilities with a generic media server (MS) abstraction interface. This example is only compatible with JBoss AS5. The solution is know to work with Twinkle and linphone SIP soft-phones.</entry>
 </row>
 <row>
 <entry>
-<ulink url="http://www.mobicents.org/shopping-demo-jsr309.html">Shopping</ulink>
+<ulink url="https://code.google.com/p/sipservlets/wiki/ShoppingDemo">Shopping</ulink>
 </entry>
 <entry>Demonstrates integration with Seam and Java Enterprise Edition (JEE), and JSR 309 Media integration with text to speech (TTS) and dual-tone multi-frequency (DTMF) tones. The demonstration builds on the Converged Demo example, and adds support for the SIP Servlets v1.1 specification.</entry>
 </row>
-<row>
+<!--row>
 <entry>
-<ulink url="http://www.mobicents.org/jslee-sips-interop-demo.html">JSLEE/SIP Servlets Interoperability</ulink>
+<ulink url="">JSLEE/SIP Servlets Interoperability</ulink>
 </entry>
 <entry>Demonstrates how the &PLATFORM_NAME; platform components can work in concert with each other to provide a integrated solution. All major components of the platform are used in this example, which was created to demonstrate to JavaOne 2008 delegates a possible use case scenario for the platform.</entry>
 </row>
@@ -89,7 +89,7 @@
 <ulink url="http://www.mobicents.org/facebook-c2c.html">Facebook Click to Call</ulink>
 </entry>
 <entry>Demonstrates how SIP Servlets and HTTP Servlets can be used can be used to create a Facebook plug-in that allows user to call POTS phones through a SIP-PSTN gateway provider. This demonstration is only available from the source repository; no binary is available.</entry>
-</row>
+</row-->
 <row>
 <entry>
 <xref linkend="sfss-The_Diameter_Event-Changing_Service"/>
@@ -98,23 +98,23 @@
 </row>
 <row>
 <entry>
-<ulink url="http://www.mobicents.org/mss-diameter_sh.html">Diameter Sh OpenIMS Integration</ulink>
+<ulink url="https://code.google.com/p/sipservlets/wiki/DiameterSh">Diameter Sh OpenIMS Integration</ulink>
 </entry>
 <entry>Demonstrates the integration between &PLATFORM_NAME; and OpenIMS, using the Diameter Sh interface to receive profile updates and SIP.</entry>
 </row>
 <row>
 <entry>
-<ulink url="http://www.mobicents.org/mss-diameter_rorf.html">Diameter Ro/Rf IIntegration</ulink>
+<ulink url="https://code.google.com/p/sipservlets/wiki/DiameterRoRf">Diameter Ro/Rf IIntegration</ulink>
 </entry>
 <entry>A Diameter Ro/Rf service that performs online call charging.</entry>
 </row>
 <row>
 <entry>
-<ulink url="http://www.mobicents.org/conference-demo-jsr309.html">Conference</ulink>
+<ulink url="https://code.google.com/p/sipservlets/wiki/ConferenceDemo">Conference</ulink>
 </entry>
 <entry>Demonstrates the capabilities of the Media Server, such as endpoint composition and conferencing, as well as proving that SIP Servlets are capable of working seamlessly with any third-party web framework, without repackaging or modifying the deployment descriptors. The demonstration uses Google&apos;s GWT Ajax framework with server-push updates to provide a desktop-like user interface experience and JSR 309 for Media Control. </entry>
 </row>
-<row>
+<!--row>
 <entry>
 <ulink url="http://www.mobicents.org/mss-ipbx.html">Media IPBX</ulink>
 </entry>
@@ -131,18 +131,18 @@
 <ulink url="http://www.mobicents.org/mss-pure-jruby-telco.html">Pure JRuby on Rails Telco</ulink>
 </entry>
 <entry>Builds on the JRuby on Rails SIP Servlets demonstration, but adds the ability to call the application rather that initially interact through the web portal. The application has the ability to set up and tear down the call.</entry>
-</row>
+</row-->
 <row>
 <entry>
-<ulink url="http://www.mobicents.org/alerting-app.html">Alerting Application</ulink>
+<ulink url="https://code.google.com/p/sipservlets/wiki/AlertingApplication">Alerting Application</ulink>
 </entry>
 <entry>This application was developed so that the JBoss RHQ/Jopr Enterprise Management Solution would be able to notify system administrators when a monitoring alert is fired by Jopr/RHQ.</entry>
 </row>
 <row>
 <entry>
-<ulink url="http://www.mobicents.org/mss-presence-client-example.html">Alerting Application</ulink>
+<ulink url="https://code.google.com/p/sipservlets/wiki/PresenceClientExample">SIP Presence Client Application</ulink>
 </entry>
-<entry>A Call Blocking application interoperating with the Mobicents SIP Presence Service to fetch the blocked contacts through XCAP.</entry>
+<entry>A Call Blocking application interoperating with the PLATFORM_NAME; SIP Presence Service (Technology Preview) to fetch the blocked contacts through XCAP.</entry>
 </row>
 </tbody>
 </tgroup>
