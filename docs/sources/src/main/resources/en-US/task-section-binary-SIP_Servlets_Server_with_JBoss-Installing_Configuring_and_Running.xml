@@ -74,8 +74,8 @@
   </section>
   <section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Downloading">
     <title>Downloading</title>
-    <para>The latest version of &PLATFORM_NAME; SIP Servlets for JBoss is available from <ulink url="http://www.mobicents.org/mss-downloads.html"/>.  The top row of the table contains the latest version.</para>
-    <para>Each version of the SIP Servlets Server is comprised of two separate binary distribution files: one which is &SHORT_PLATFORM_NAME; for JBoss, and the other which is &SHORT_PLATFORM_NAME; for Tomcat.  Download SIP Servlets Server for JBoss and continue with the following instructions.</para>
+    <para>The latest version of &PLATFORM_NAME; SIP Servlets for JBoss is available from TeleStax support portal <ulink url="http://support.telestax.com/"/>.</para>
+    <para>Each version of the SIP Servlets Server is comprised of tree separate binary distribution files: one which is &SHORT_PLATFORM_NAME; for JBoss, one which is &SHORT_PLATFORM_NAME; for EAP and the other which is &SHORT_PLATFORM_NAME; for Tomcat.  Download SIP Servlets Server for JBoss and continue with the following instructions.</para>
   </section>
   <section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Installing">
     <title>Installing</title>
@@ -165,7 +165,7 @@
   <section id="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Running">
     <title>Running</title>
     <para>To start the server, execute one of the startup scripts in the <filename>bin</filename> directory (on Linux or Windows), or by double-clicking the <filename>run.bat</filename> executable batch file in that same directory (on Windows only).  It is recommended that the JBoss Application Server is started using the terminal or Command Prompt because the messages displayed during startup can be used to debug, and subsequently correct, any problems.  In the Linux terminal or Command Prompt, a successfully started server will return the following information :</para>
-    <programlisting><![CDATA[22:39:07,598 INFO  [SipApplicationDispatcherImpl] Mobicents Sip Servlets <version> - revision <rev number> started.]]></programlisting>
+    <programlisting><![CDATA[22:39:07,598 INFO  [SipApplicationDispatcherImpl]]]> &PLATFORM_NAME; <![CDATA[Sip Servlets <version> - revision <rev number> started.]]></programlisting>
     <para>Detailed instructions are given below, arranged by platform.</para>
     <procedure>
       <title>Running &SHORT_PLATFORM_NAME; for JBoss on Linux</title>

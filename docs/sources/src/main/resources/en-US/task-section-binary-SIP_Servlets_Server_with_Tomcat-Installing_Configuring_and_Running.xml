@@ -54,7 +54,8 @@
   </section>
   <section id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Downloading">
     <title>Downloading</title>
-    <para>You can download the latest version of &SHORT_PLATFORM_NAME; for Tomcat from <ulink url="http://www.mobicents.org/mss-downloads.html"/>. The top row of the table holds the latest version. Note that each release of the &PLATFORM_NAME; SIP Servlets Server is comprised of two separate binary distribution files: one which is &SHORT_PLATFORM_NAME; for JBoss, and the other which is &SHORT_PLATFORM_NAME; for Tomcat. Download &PLATFORM_NAME; SIP Servlets Server for Tomcat and continue with the following instructions.</para>
+    <para>The latest version of &PLATFORM_NAME; SIP Servlets for JBoss is available from TeleStax support portal <ulink url="http://support.telestax.com/"/>.</para>
+    <para>Each version of the SIP Servlets Server is comprised of tree separate binary distribution files: one which is &SHORT_PLATFORM_NAME; for JBoss, one which is &SHORT_PLATFORM_NAME; for EAP and the other which is &SHORT_PLATFORM_NAME; for Tomcat.  Download SIP Servlets Server for Tomcat and continue with the following instructions.</para>
   </section>
   <section id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Installing">
     <title>Installing</title>
@@ -154,8 +155,8 @@
       <title>Setting the <envar>CATALINA_HOME</envar> Environment Variable on Linux</title>
       <step>
         <para>The <envar>CATALINA_HOME</envar> environment variable must point to the location of your Tomcat installation. Any &PLATFORM_NAME; server which runs on top of the Tomcat servlet container has a topmost directory, i.e. the directory in which you unzipped the zip file to install the server, and underneath that directory, a <filename>bin</filename> directory. <envar>CATALINA_HOME</envar> must be set to the topmost directory of your &PLATFORM_NAME; server installation.</para>
-        <para>Setting this variable in your personal <filename>~/.bashrc</filename> file has the advantage that it will always be set (for you, as a user) each time you log in or reboot the system. To do so, open <filename>~/.bashrc</filename> in a text editor (or create the file if it doesn&apos;t already exist) and insert the following line anywhere in the file, taking care to substitute <filename>&lt;mobicents_server&gt;</filename> for the topmost directory of the &PLATFORM_NAME; server you installed:</para>
-        <screen>export CATALINA_HOME=&quot;/home/&lt;username&gt;/&lt;path&gt;/&lt;to&gt;/&lt;mobicents_server&gt;&quot;</screen>
+        <para>Setting this variable in your personal <filename>~/.bashrc</filename> file has the advantage that it will always be set (for you, as a user) each time you log in or reboot the system. To do so, open <filename>~/.bashrc</filename> in a text editor (or create the file if it doesn&apos;t already exist) and insert the following line anywhere in the file, taking care to substitute <filename>&lt;sip_server&gt;</filename> for the topmost directory of the &PLATFORM_NAME; server you installed:</para>
+        <screen>export CATALINA_HOME=&quot;/home/&lt;username&gt;/&lt;path&gt;/&lt;to&gt;/&lt;sip_server&gt;&quot;</screen>
         <para>Save and close <filename>.bashrc</filename>.</para>
       </step>
       <step>
@@ -187,9 +188,9 @@
   <section id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Running">
     <title>Running</title>
     <para>Once installed, you can run the Tomcat Servlet Container by executing the one of the startup scripts in the <filename>bin</filename> directory (on Linux or Windows), or by double-clicking the <filename>run.bat</filename> executable batch file in that same directory (on Windows only). However, we suggest always starting Tomcat using the terminal or Command Prompt because you are then able to read—and act upon—any startup messages, and possibly debug any problems that may arise. In the Linux terminal or Command Prompt, you will be able to tell that the container started successfully if the last line of output is similar to the following:</para>
-    <programlisting><![CDATA[Using CATALINA_BASE:   /home/silas/temp/apps/mobicents/sip_servlets_server/mss-tomcat-1.0
-Using CATALINA_HOME:   /home/silas/temp/apps/mobicents/sip_servlets_server/mss-tomcat-1.0
-Using CATALINA_TMPDIR: /home/silas/temp/apps/mobicents/sip_servlets_server/mss-tomcat-1.0/temp
+    <programlisting><![CDATA[Using CATALINA_BASE:   /home/user/temp/apps/sip_servlets_server/
+Using CATALINA_HOME:   /home/user/temp/apps/sip_servlets_server/
+Using CATALINA_TMPDIR: /home/user/temp/apps/sip_servlets_server/temp
 Using JRE_HOME:       /etc/java-config-2/current-system-vm]]></programlisting>
     <para>Detailed instructions are given below, arranged by platform.</para>
     <procedure>
@@ -232,9 +233,9 @@ Using JRE_HOME:       /etc/java-config-2/current-system-vm]]></programlisting>
   <section id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Stopping">
     <title>Stopping</title>
     <para>Detailed instructions for stopping the Tomcat Servlet Container are given below, arranged by platform. Note that if you properly stop the server, you will see the following three lines as the last output in the Linux terminal or Command Prompt (both running and stopping the Tomcat Servlet Container produces the same output):</para>
-    <screen><![CDATA[Using CATALINA_BASE:   /home/silas/temp/apps/mobicents/sip_servlets_server/mss-tomcat-1.0
-Using CATALINA_HOME:   /home/silas/temp/apps/mobicents/sip_servlets_server/mss-tomcat-1.0
-Using CATALINA_TMPDIR: /home/silas/temp/apps/mobicents/sip_servlets_server/mss-tomcat-1.0/temp
+    <screen><![CDATA[Using CATALINA_BASE:   /home/user/temp/apps/sip_servlets_server
+Using CATALINA_HOME:   /home/user/temp/apps/sip_servlets_server
+Using CATALINA_TMPDIR: /home/user/temp/apps/sip_servlets_server/temp
 Using JRE_HOME:       /etc/java-config-2/current-system-vm]]></screen>
     <procedure>
       <title>Stopping &SHORT_PLATFORM_NAME; for Tomcat on Linux by Executing <filename>shutdown.sh</filename></title>
