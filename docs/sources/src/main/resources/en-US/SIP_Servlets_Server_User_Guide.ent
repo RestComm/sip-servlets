@@ -1,6 +1,7 @@
 <!ENTITY AUTHOR_EMAIL_IVELIN "${author.email.ivelin}">
 <!ENTITY AUTHOR_EMAIL_JEAN "${author.email.jean}">
 <!ENTITY AUTHOR_EMAIL_VLAD "${author.email.vlad}">
+<!ENTITY AUTHOR_EMAIL_CHARLES "${author.email.charles}">
 <!ENTITY BOOKID "${bookid}">
 <!ENTITY CMD_PLATFORM_NAME "${cmd.platform.name}">
 <!ENTITY HOME_LIN "${home.link}">

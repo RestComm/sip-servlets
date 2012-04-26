@@ -50,6 +50,17 @@
 		<email>&AUTHOR_EMAIL_IVELIN;</email>
 	</author>
 	<author>
+		<firstname>Charles</firstname>
+		<surname>Roufay</surname>
+		<!-- 
+		<affiliation>
+			<orgname>Red Hat, Inc.</orgname>
+			<orgdiv>${platform.name} Lead</orgdiv>
+		</affiliation>
+		-->
+		<email>&AUTHOR_EMAIL_CHARLES;</email>
+	</author>
+	<author>
         <firstname>Jared</firstname>
         <surname>Morgan</surname>
         <!-- 
