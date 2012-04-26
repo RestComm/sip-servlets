@@ -18,10 +18,9 @@
 		<home.link>telscale-6.1/jboss-eap-5.1/jboss-as/</home.link>
 		<mss4j.release.zip>telscale-ss-6.1-eap-5.1.GA.zip</mss4j.release.zip>
 		<mss4t.release.zip>telscale-ss-1.0.GA-apache-tomcat-6.0.35.zip</mss4t.release.zip>	
-		<author.email.ivelin>iivanov@redhat.com</author.email.ivelin>
-		<author.email.eduardo>emartins@redhat.com</author.email.eduardo>
-		<author.email.jean>jean.deruelle@redhat.com</author.email.jean>
-		<author.email.vlad>vralev@redhat.com</author.email.vlad>
+		<author.email.ivelin>iivanov@telestax.com</author.email.ivelin>
+		<author.email.jean>jean.deruelle@telestax.com</author.email.jean>
+		<author.email.vlad>vralev@telestax.com</author.email.vlad>
 		<download.link>http://support.telestax.com/</download.link>
 	</properties>
 	

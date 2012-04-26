@@ -17,7 +17,7 @@
 		<bookid>SIP_Servlets_Server_User_Guide</bookid>
 		<mss4j.release.size>135MB</mss4j.release.size>
 		<mss4t.release.size>20MB</mss4t.release.size>					
-		<holder>Red Hat Inc</holder>
+		<holder>TeleStax, Inc.</holder>
 	</properties>	
 	
 	<build>
