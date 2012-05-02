@@ -91,6 +91,9 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 	}
 	
 	private void createCacheListeners() {
+		// do here the creation of the root node for holding sip session data, cause it may fail if concurrently created on demand (storing sessions) 
+		jBossCacheService.getCache().getRoot().addChild(getSipApplicationSessionParentFqn(jBossCacheService.combinedPath_));
+		
 		sipCacheListener_ = new SipCacheListener(
 				jBossCacheService.cacheWrapper_, manager, jBossCacheService.combinedPath_,
 				Util.getReplicationGranularity(manager), sipApplicationName, sipApplicationNameHashed);
@@ -498,11 +501,16 @@ public class DistributedCacheConvergedSipManagerDelegate<T extends OutgoingDistr
 		return Fqn.fromList(Arrays.asList(objs), true);
 	}
 	
+	public Fqn<String> getSipApplicationSessionParentFqn(String contextHostPath) {
+		// /SIPSESSION/contextHostPath/sipApplicationName
+		String[] objs = new String[] { SIPSESSION, contextHostPath, sipApplicationNameHashed };
+		return Fqn.fromList(Arrays.asList(objs), true);
+	}
+	
 	public Fqn<String> getSipApplicationSessionFqn(String contextHostPath,
 			String sessionId) {
 		// /SIPSESSION/contextHostPath/sipApplicationName/id
-		String[] objs = new String[] { SIPSESSION, contextHostPath, sipApplicationNameHashed, sessionId };
-		return Fqn.fromList(Arrays.asList(objs), true);
+		return Fqn.fromRelativeElements(getSipApplicationSessionParentFqn(contextHostPath), sessionId);
 	}	
 	
 	public Fqn<String> getBuddyBackupSipSessionFqn(String dataOwner,
