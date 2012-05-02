@@ -746,24 +746,32 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 			// call to super very important to avoid setting the session dirty on reload and rewrite to the cache
 			super.setValid(valid);
 		} 
-		sipSessions.clear();
-		SipSessionKey[] sipSessionKeys = (SipSessionKey[])md.getMetaData().get(SIP_SESSIONS);
-		if(sipSessionKeys != null && sipSessionKeys.length > 0) {
-			for (SipSessionKey sipSessionKey : sipSessionKeys) {			
-				sipSessions.add(sipSessionKey);							
-			}	
-		}
-		servletTimerIds = (String[])md.getMetaData().get(SERVLETS_TIMERS);
 		
-		String[] httpSessionIds = (String[])md.getMetaData().get(HTTP_SESSIONS);
-		if(httpSessionIds != null && httpSessionIds.length > 0) {
-			if(httpSessions == null) {
-				httpSessions = new CopyOnWriteArraySet<String>();
+		final SipSessionKey[] sipSessionKeys = (SipSessionKey[]) md
+				.getMetaData().get(SIP_SESSIONS);
+		if (sipSessionKeys != null) {
+			this.sipSessions.clear();
+			for (SipSessionKey sipSessionKey : sipSessionKeys) {
+				this.sipSessions.add(sipSessionKey);
+			}
+		}
+
+		final String[] updatedServletTimerIds = (String[]) md.getMetaData()
+				.get(SERVLETS_TIMERS);
+		if (updatedServletTimerIds != null) {
+			this.servletTimerIds = updatedServletTimerIds;
+		}
+
+		final String[] httpSessionIds = (String[]) md.getMetaData().get(
+				HTTP_SESSIONS);
+		if (httpSessionIds != null) {
+			if (this.httpSessions == null) {
+				this.httpSessions = new CopyOnWriteArraySet<String>();
 			} else {
-				httpSessions.clear();
+				this.httpSessions.clear();
 			}
 			for (String httpSessionId : httpSessionIds) {
-				httpSessions.add(httpSessionId);
+				this.httpSessions.add(httpSessionId);
 			}
 		}
 		
