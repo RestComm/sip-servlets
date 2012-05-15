@@ -283,21 +283,21 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 //				Thread.currentThread().setContextClassLoader(ClusteredSession.class.getClassLoader());
 				// Try to initate clustering, fallback to standard if no clustering
 				// is available				
-					String managerClassName = config.getManagerClass();								
-					Class managerClass = Thread.currentThread()
-							.getContextClassLoader().loadClass(managerClassName);
-					manager = (AbstractJBossManager) managerClass.newInstance();
-					// MSS : we set the classloader because Clustering class are mixed up with deployers class
-					// causing CL problems : need to separate them in different jars
-//					ClassLoader previousClassLoader = Thread.currentThread().getContextClassLoader();
-//					Thread.currentThread().setContextClassLoader(ClusteredSession.class.getClassLoader());
-					// Try to initate clustering, fallback to standard if no clustering
-					// is available
-					try {				
-						String name = "//"
-								+ ((hostName == null) ? "localhost" : hostName)
-								+ ctxPath;
-						manager.init(name, metaData);
+				String managerClassName = config.getManagerClass();								
+				Class managerClass = Thread.currentThread()
+						.getContextClassLoader().loadClass(managerClassName);
+				manager = (AbstractJBossManager) managerClass.newInstance();
+				// MSS : we set the classloader because Clustering class are mixed up with deployers class
+				// causing CL problems : need to separate them in different jars
+				//ClassLoader previousClassLoader = Thread.currentThread().getContextClassLoader();
+				//Thread.currentThread().setContextClassLoader(ClusteredSession.class.getClassLoader());
+				// Try to initate clustering, fallback to standard if no clustering
+				// is available
+				try {				
+					String name = "//"
+							+ ((hostName == null) ? "localhost" : hostName)
+							+ ctxPath;
+					manager.init(name, metaData);
 
 						server.setAttribute(objectName, new Attribute("manager",
 								manager));
