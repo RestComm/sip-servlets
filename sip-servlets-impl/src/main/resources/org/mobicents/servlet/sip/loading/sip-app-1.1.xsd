@@ -1,305 +1,120 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  The sip-app element is the root of the deployment descriptor for
-  a SIP servlet application
--->
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
-  <xs:element name="sip-app">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref="app-name"/>
-        <xs:element minOccurs="0" ref="icon"/>
-        <xs:element minOccurs="0" ref="display-name"/>
-        <xs:element minOccurs="0" ref="description"/>
-        <xs:element minOccurs="0" ref="distributable"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="context-param"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="listener"/>
-        <xs:element minOccurs="0" maxOccurs="1" ref="main-servlet"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="servlet"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="servlet-mapping"/>
-        <xs:element minOccurs="0" ref="proxy-config"/>
-        <xs:element minOccurs="0" ref="session-config"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="resource-env-ref"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="resource-ref"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="security-constraint"/>
-        <xs:element minOccurs="0" ref="login-config"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="security-role"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="env-entry"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ejb-ref"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="ejb-local-ref"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The application name specifies the unique name of the application within
-    the container. The names of Sip Servlet applications must be unique within
-    a container instance or across clustered containers under common
-    administrative control for application selection to function properly.
-    It is recommended that application developers follow the Java class naming
-    convention when naming applications, e.g. "org.sipservlet.app.voiceMail",
-    to avoid naming conflicts with other developers.
-  -->
-  <xs:element name="app-name">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-    <!--
-      The icon element contains small-icon and large-icon elements that
-      specify the file names for small and a large GIF or JPEG icon images
-      used to represent the parent element in a GUI tool.
-    -->
-  <xs:element name="icon">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="small-icon"/>
-        <xs:element minOccurs="0" ref="large-icon"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The small-icon element contains the name of a file
-    containing a small (16 x 16) icon image. The file
-    name is a path relative to the root of the SAR.
 
-    The image may be either in the JPEG or GIF format.
-    The icon can be used by tools.
+<xs:schema xmlns="http://www.jcp.org/xml/ns/sipservlet"
+           targetNamespace="http://www.jcp.org/xml/ns/sipservlet"
+           xmlns:javaee="http://java.sun.com/xml/ns/javaee"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           version="1.1">
 
-    Example:
+  <xs:import namespace="http://java.sun.com/xml/ns/javaee" schemaLocation="web-app_2_5.xsd"/>
 
-    <small-icon>/employee-service-icon16x16.jpg</small-icon>
-  -->
-  <xs:element name="small-icon">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The large-icon element contains the name of a file
-    containing a large (32 x 32) icon image. The file
-    name is a path relative to the root of the SAR.
+  <xs:element name="sip-app" type="sip-appType"/>
 
-    The image may be either in the JPEG or GIF format.
-    The icon can be used by tools.
+  <xs:complexType name="sip-appType">
+    <xs:annotation>
+      <xs:documentation>
+        The sip-app element is the root of the deployment descriptor for
+        a SIP servlet application. Note that the sub-elements of this element can be
+        in the arbitrary order. Because of that, the multiplicity of the elements of distributable,
+        session-config, proxy-config, and login-config was changed from "?" to "*" in this schema.
+        However, the deployment descriptor instance file must not contain multiple elements of distributable,
+        session-config, proxy-config, and login-config.
+      </xs:documentation>
+    </xs:annotation>
 
-    Example:
-
-    <large-icon>/employee-service-icon32x32.jpg</large-icon>
-  -->
-  <xs:element name="large-icon">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The display-name element contains a short name that is intended to be
-    displayed by tools.  The display name need not be unique.
-
-    Example:
-
-    <display-name>Employee Self Service</display-name>
-  -->
-  <xs:element name="display-name">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The description element is used to provide text describing the parent
-    element.  The description element should include any information that
-    SAR producer wants to provide to the consumer of
-    SAR (i.e., to the Deployer). Typically, the tools
-    used by SAR consumer will display the description
-    when processing the parent element that contains the description.
-  -->
-  <xs:element name="description">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The distributable element, by its presence in a servlet application
-    deployment descriptor, indicates that this servlet application is
-    programmed appropriately to be deployed into a distributed servlet
-    container
-  -->
-  <xs:element name="distributable">
-    <xs:complexType>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The context-param element contains the declaration of a servlet
-    application's servlet context initialization parameters.
-  -->
-  <xs:element name="context-param">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref="param-name"/>
-        <xs:element ref="param-value"/>
-        <xs:element minOccurs="0" ref="description"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The param-name element contains the name of a parameter. Each parameter
-    name must be unique in the servlet application.
-  -->
-  <xs:element name="param-name">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!-- The param-value element contains the value of a parameter. -->
-  <xs:element name="param-value">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!-- The listener element indicates the deployment properties for a servlet application listener bean. -->
-  <xs:element name="listener">
-    <xs:complexType>
-      <xs:complexContent>
-        <xs:extension base="listener-class">
-          <xs:attribute name="id" type="xs:ID"/>
-        </xs:extension>
-      </xs:complexContent>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The listener-class element declares a class in the application must be registered as
-    a servlet application listener bean. The value is the fully qualified classname
-    of the listener class.
-  -->
-  <xs:complexType name="listener-class">
-    <xs:sequence>
-      <xs:element ref="listener-class"/>
-    </xs:sequence>
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="app-name" minOccurs="1" type="javaee:nonEmptyStringType">
+        <xs:annotation>
+          <xs:documentation>
+            The application name specifies the unique name of the application within
+            the container. The names of Sip Servlet applications must be unique within
+            a container instance or across clustered containers under common
+            administrative control for application selection to function properly.
+            It is recommended that application developers follow the Java class naming
+            convention when naming applications, e.g. "org.sipservlet.app.voiceMail",
+            to avoid naming conflicts with other developers.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:group ref="javaee:descriptionGroup"/>
+      <xs:element name="distributable" type="javaee:emptyType"/>
+      <xs:element name="context-param" type="javaee:param-valueType"/>
+      <xs:element name="listener" type="javaee:listenerType"/>
+      <xs:element name="servlet-selection" type="servlet-selectionType"/>
+      <xs:element name="servlet" type="javaee:servletType"/>
+      <xs:element name="proxy-config" type="proxy-configType"/>
+      <xs:element name="session-config" type="javaee:session-configType"/>
+      <xs:element name="security-constraint" type="security-constraintType"/>
+      <xs:element name="login-config" type="login-configType"/>
+      <xs:element name="security-role" type="javaee:security-roleType"/>
+      <xs:group ref="javaee:jndiEnvironmentRefsGroup"/>
+      <xs:element name="message-destination" type="javaee:message-destinationType"/>
+      <xs:element name="locale-encoding-mapping-list" type="javaee:locale-encoding-mapping-listType"/>
+    </xs:choice>
+    <xs:attribute name="version" type="sip-app-versionType"/>
+    <xs:attribute name="id" type="xs:ID"/>
   </xs:complexType>
-  <xs:element name="listener-class">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
+
+  <xs:complexType name="servlet-selectionType">
+    <xs:choice>
+      <xs:element name="main-servlet" type="javaee:nonEmptyStringType">
+        <xs:annotation>
+          <xs:documentation>
+            The main servlet name element contains the canonical name of the main servlet.
+            Only one servlet is designated as main within the servlet application.
+            The name is the name of one of the servlets declared in the servlet-name element.
+            If servlet-mapping mechanism is not used and there is only one servlet in the application,
+            then this declaration is optional wherein the lone servlet becomes the main servlet.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element maxOccurs="unbounded" name="servlet-mapping" type="servlet-mappingType"/>
+    </xs:choice>
+  </xs:complexType>
+
+  <xs:complexType name="servlet-mappingType">
+    <xs:annotation>
+      <xs:documentation>
+        The servlet-mapping element defines a mapping between a servlet and a pattern
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:sequence>
+      <xs:element name="servlet-name" type="javaee:servlet-nameType"/>
+      <xs:element name="pattern" type="patternType"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:ID"/>
+  </xs:complexType>
+
+  <xs:element name="condition" abstract="true">
+    <xs:annotation>
+      <xs:documentation>
+        The different types of conditions supported.
+      </xs:documentation>
+    </xs:annotation>
   </xs:element>
-  
-  
-  
-  <!--
-    The main servlet name element contains the canonical name of the
-    main servlet. Only one servlet is designated as
-    main within the servlet application. The name is the name of one
-    of the servlets declared in the <servlet-name> element.
-    If there is only one servlet in the application then this declaration is 
-    optional wherein the lone servlet becomes main-servlet, 
-    otherwise this MUST be present. 
-  -->
-  <xs:element name="main-servlet">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  
-  
-  <!-- The servlet element contains the declarative data of a servlet. -->
-  <xs:element name="servlet">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="icon"/>
-        <xs:element ref="servlet-name"/>
-        <xs:element minOccurs="0" ref="display-name"/>
-        <xs:element minOccurs="0" ref="description"/>
-        <xs:element ref="servlet-class"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="init-param"/>
-        <xs:element minOccurs="0" ref="load-on-startup"/>
-        <xs:element minOccurs="0" ref="run-as"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="security-role-ref"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The servlet-name element contains the canonical name of the
-    servlet. Each servlet name is unique within the servlet application.
-  -->
-  <xs:element name="servlet-name">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The servlet-class element contains the fully qualified class name
-    of the servlet.
-  -->
-  <xs:element name="servlet-class">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The init-param element contains a name/value pair as an
-    initialization param of the servlet
-  -->
-  <xs:element name="init-param">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref="param-name"/>
-        <xs:element ref="param-value"/>
-        <xs:element minOccurs="0" ref="description"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The load-on-startup element indicates that this servlet should be
-    loaded (instantiated and have its init() called) on the startup
-    of the servlet application. The optional contents of
-    these element must be an integer indicating the order in which
-    the servlet should be loaded. If the value is a negative integer,
-    or the element is not present, the container is free to load the
-    servlet whenever it chooses. If the value is a positive integer
-    or 0, the container must load and initialize the servlet as the
-    application is deployed. The container must guarantee that
-    servlets marked with lower integers are loaded before servlets
-    marked with higher integers. The container may choose the order
-    of loading of servlets with the same load-on-start-up value.
-  -->
-  <xs:element name="load-on-startup">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The servlet-mapping element defines a mapping between a servlet
-    and a pattern
-  -->
-  <xs:element name="servlet-mapping">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref="servlet-name"/>
-        <xs:element ref="pattern"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!-- The different types of conditions supported. -->
-  <xs:element name="condition" abstract="true"/>
-  <!-- A pattern is a condition: a predicate over the set of SIP requests. -->
-  <xs:element name="pattern">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref="condition"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    An "and" condition is true if and only if all its constituent conditions
-    are true.
-  -->
+
+  <xs:complexType name="patternType">
+    <xs:annotation>
+      <xs:documentation>
+        A pattern is a condition: a predicate over the set of SIP requests.
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:sequence>
+      <xs:element ref="condition"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:ID"/>
+  </xs:complexType>
+
   <xs:element name="and" substitutionGroup="condition">
+    <xs:annotation>
+      <xs:documentation>
+        An "and" condition is true if and only if all its constituent conditions are true.
+      </xs:documentation>
+    </xs:annotation>
+
     <xs:complexType>
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="condition"/>
@@ -307,11 +122,14 @@
       <xs:attribute name="id" type="xs:ID"/>
     </xs:complexType>
   </xs:element>
-  <!--
-    An "or" condition is true if at least one of its constituent conditions
-    is true.
-  -->
+
   <xs:element name="or" substitutionGroup="condition">
+    <xs:annotation>
+      <xs:documentation>
+        An "or" condition is true if at least one of its constituent conditions is true.
+      </xs:documentation>
+    </xs:annotation>
+
     <xs:complexType>
       <xs:sequence>
         <xs:element maxOccurs="unbounded" ref="condition"/>
@@ -319,8 +137,14 @@
       <xs:attribute name="id" type="xs:ID"/>
     </xs:complexType>
   </xs:element>
-  <!-- Negates the value of the contained condition. -->
+
   <xs:element name="not" substitutionGroup="condition">
+    <xs:annotation>
+      <xs:documentation>
+        Negates the value of the contained condition.
+      </xs:documentation>
+    </xs:annotation>
+
     <xs:complexType>
       <xs:sequence>
         <xs:element ref="condition"/>
@@ -328,8 +152,14 @@
       <xs:attribute name="id" type="xs:ID"/>
     </xs:complexType>
   </xs:element>
-  <!-- True if the value of the variable equals the specified literal value. -->
+
   <xs:element name="equal" substitutionGroup="condition">
+    <xs:annotation>
+      <xs:documentation>
+        True if the value of the variable equals the specified literal value.
+      </xs:documentation>
+    </xs:annotation>
+
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="var">
@@ -349,8 +179,14 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <!-- True if the value of the variable contains the specified literal value. -->
+
   <xs:element name="contains" substitutionGroup="condition">
+    <xs:annotation>
+      <xs:documentation>
+        True if the value of the variable contains the specified literal value.
+      </xs:documentation>
+    </xs:annotation>
+
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="var">
@@ -370,8 +206,14 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <!-- True if the specified variable exists. -->
+
   <xs:element name="exists" substitutionGroup="condition">
+    <xs:annotation>
+      <xs:documentation>
+        True if the specified variable exists.
+      </xs:documentation>
+    </xs:annotation>
+
     <xs:complexType>
       <xs:complexContent>
         <xs:extension base="var">
@@ -380,7 +222,7 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <!---->
+
   <xs:element name="subdomain-of" substitutionGroup="condition">
     <xs:complexType>
       <xs:complexContent>
@@ -393,677 +235,204 @@
       </xs:complexContent>
     </xs:complexType>
   </xs:element>
-  <!--
-    Specifies a variable. Example:
-      <var>request.uri.user</var>
-  -->
+
   <xs:complexType name="var">
+    <xs:annotation>
+      <xs:documentation>
+        Specifies a variable. Example: <var>request.uri.user</var>
+      </xs:documentation>
+    </xs:annotation>
+
     <xs:sequence>
       <xs:element ref="var"/>
     </xs:sequence>
   </xs:complexType>
+
   <xs:element name="var">
     <xs:complexType mixed="true">
       <xs:attribute name="id" type="xs:ID"/>
     </xs:complexType>
   </xs:element>
-  <!-- Specifies a literal string value that is used to specify rules. -->
+
   <xs:element name="value">
+    <xs:annotation>
+      <xs:documentation>
+        Specifies a literal string value that is used to specify rules.
+      </xs:documentation>
+    </xs:annotation>
+
     <xs:complexType mixed="true">
       <xs:attribute name="id" type="xs:ID"/>
     </xs:complexType>
   </xs:element>
-  <!-- Specifies whether the "equal" test is case sensitive or not. -->
-  <!-- Specifies whether the "contains" test is case sensitive or not. -->
-  <!-- The proxy-config element configures proxy-related parameters. -->
-  <xs:element name="proxy-config">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="proxy-timeout"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The proxy-timeout element defines the default timeout
-    for sequential searches for all proxy operations performed by this
-    application if the proxy is sequential. If the proxy is parallel it 
-    is the overall timeout of the entire proxy application when a final 
-    response is not received on any of the branches.
-    The specified timeout must be expressed in a whole
-    number of seconds. The container may override this value as a result
-    of its own local policy.
-  -->
-  <xs:element name="proxy-timeout">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The session-config element defines the session parameters for
-    this servlet application.
-  -->
-  <xs:element name="session-config">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="session-timeout"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The session-timeout element defines the default session timeout
-    interval for all application sessions created in this servlet
-    application. SipSessions have no timeout independent of that of the
-    containing application session. The lifetime of a SipSession is tied
-    to that of the parent application session. The specified timeout must
-    be expressed in a whole number of minutes.  If the timeout is 0 or
-    less, the container ensures the default behavior of sessions is never
-    to time out.
-  -->
-  <xs:element name="session-timeout">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The resource-env-ref element contains a declaration of a servlet's
-    reference to an administered object associated with a resource
-    in servlet's environment.  It consists of an optional
-    description, the resource environment reference name, and an
-    indication of the resource environment reference type expected by
-    servlet code.
-    
-    Example:
-    
-    <resource-env-ref>
-        <resource-env-ref-name>jms/StockQueue</resource-env-ref-name>
-        <resource-env-ref-type>javax.jms.Queue</resource-env-ref-type>
-    </resource-env-ref>
-  -->
-  <xs:element name="resource-env-ref">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="description"/>
-        <xs:element ref="resource-env-ref-name"/>
-        <xs:element ref="resource-env-ref-type"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The resource-env-ref-name element specifies the name of a resource
-    environment reference; its value is the environment entry name used in
-    servlet code.  The name is a JNDI name relative to the
-    java:comp/env context and must be unique within a servlet application.
-  -->
-  <xs:element name="resource-env-ref-name">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The resource-env-ref-type element specifies the type of a resource
-    environment reference.  It is the fully qualified name of a Java
-    language class or interface.
-  -->
-  <xs:element name="resource-env-ref-type">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The resource-ref element contains a declaration of a servlet's
-    reference to an external resource. It consists of an optional
-    description, the resource manager connection factory reference name,
-    the indication of the resource manager connection factory type
-    expected by servlet code, the type of authentication
-    (Application or Container), and an optional specification of the
-    shareability of connections obtained from the resource (Shareable or
-    Unshareable).
-    
-    Example:
-    
-        <resource-ref>
-    	<res-ref-name>jdbc/EmployeeAppDB</res-ref-name>
-    	<res-type>javax.sql.DataSource</res-type>
-    	<res-auth>Container</res-auth>
-    	<res-sharing-scope>Shareable</res-sharing-scope>
-        </resource-ref>
-    
-  -->
-  <xs:element name="resource-ref">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="description"/>
-        <xs:element ref="res-ref-name"/>
-        <xs:element ref="res-type"/>
-        <xs:element ref="res-auth"/>
-        <xs:element minOccurs="0" ref="res-sharing-scope"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The res-ref-name element specifies the name of the resource
-    factory reference name.
-  -->
-  <xs:element name="res-ref-name">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The res-ref-name element specifies the name of a resource manager
-    connection factory reference.  The name is a JNDI name relative to the
-    java:comp/env context.  The name must be unique within servlet application.
-  -->
-  <xs:element name="res-type">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The res-auth element specifies whether the servlet code signs
-    on programmatically to the resource manager, or whether the Container
-    will sign on to the resource manager on behalf of the servlet. In the
-    latter case, the Container uses information that is supplied by the
-    Deployer.
-    
-    The value of this element must be one of the two following:
-    
-    	<res-auth>Application</res-auth>
-    	<res-auth>Container</res-auth>
-  -->
-  <xs:element name="res-auth">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The res-sharing-scope element specifies whether connections obtained
-    through the given resource manager connection factory reference can be
-    shared. The value of this element, if specified, must be one of the
-    two following:
-    
-    	<res-sharing-scope>Shareable</res-sharing-scope>
-    	<res-sharing-scope>Unshareable</res-sharing-scope>
-    
-    The default value is Shareable.
-  -->
-  <xs:element name="res-sharing-scope">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The security-constraint element is used to associate security
-    constraints with one or more servlet resource collections
-  -->
-  <xs:element name="security-constraint">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="display-name"/>
-        <xs:element maxOccurs="unbounded" ref="resource-collection"/>
-        <xs:element minOccurs="0" ref="proxy-authentication"/>
-        <xs:element minOccurs="0" ref="auth-constraint"/>
-        <xs:element minOccurs="0" ref="user-data-constraint"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The resource-collection element is used to identify a subset
-    of the resources and SIP methods on those resources within a servlet
-    application to which a security constraint applies. If no SIP methods
-    are specified, then the security constraint applies to all SIP
-    methods.
-  -->
-  <xs:element name="resource-collection">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element ref="resource-name"/>
-        <xs:element minOccurs="0" ref="description"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="servlet-name"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="sip-method"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!-- The resource-name contains the name of this resource collection -->
-  <xs:element name="resource-name">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!-- The sip-method contains an SIP method (INVITE | BYE |...) -->
-  <xs:element name="sip-method">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The presence of the proxy-authentication element indicates to the
-    container that it must challenge the user agent with a 407 (Proxy
-    Authentication Required) response status code when authenticating an
-    incoming request. If not present a 401 (Unauthorized) status code is
-    used.
-  -->
-  <xs:element name="proxy-authentication">
-    <xs:complexType>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The user-data-constraint element is used to indicate how data
-    communicated between the client and container should be protected
-  -->
-  <xs:element name="user-data-constraint">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="description"/>
-        <xs:element ref="transport-guarantee"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The transport-guarantee element specifies that the communication
-    between client and server should be NONE, INTEGRAL, or
-    CONFIDENTIAL. NONE means that the application does not require any
-    transport guarantees. A value of INTEGRAL means that the application
-    requires that the data sent between the client and server be sent in
-    such a way that it can't be changed in transit. CONFIDENTIAL means
-    that the application requires that the data be transmitted in a
-    fashion that prevents other entities from observing the contents of
-    the transmission. In most cases, the presence of the INTEGRAL or
-    CONFIDENTIAL flag will indicate that the use of SSL is required.
-  -->
-  <xs:element name="transport-guarantee">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The auth-constraint element indicates the user roles that should
-    be permitted access to this resource collection. The role-name 
-    used here must either correspond to the role-name of one of the 
-    security-role elements defined for this servlet application, or be 
-    the specially reserved role-name "*" that is a compact syntax for 
-    indicating all roles in the servlet application. If both "*" and 
-    rolenames appear, the container interprets this as all roles.
-    If no roles are defined, no user is allowed access to the portion of
-    the servlet application described by the containing security-constraint.
-    The container matches role names case sensitively when determining 
-    access.
-  -->
-  <xs:element name="auth-constraint">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="description"/>
-        <xs:element minOccurs="0" maxOccurs="unbounded" ref="role-name"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!-- The role-name element contains the name of a security role. -->
-  <xs:element name="role-name">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The login-config element is used to configure the authentication
-    method that should be used, the realm name that should be used for
-    this application, and the attributes that are needed by the form login
-    mechanism.
-  -->
-  <xs:element name="login-config">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="auth-method"/>
-        <xs:element minOccurs="0" ref="realm-name"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The realm name element specifies the realm name to use in HTTP
-    Basic authorization
-  -->
-  <xs:element name="realm-name">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The auth-method element is used to configure the authentication
-    mechanism for the SIP servlet application. As a prerequisite to gaining 
-    service from any SIP servlet which is protected by an authorization
-    constraint, a user must have authenticated using the configured
-    mechanism. Legal values for this element are "BASIC", "DIGEST",
-    or "CLIENT-CERT".
-  -->
-  <xs:element name="auth-method">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The security-role element contains the declaration of a security
-    role which is used in the security-constraints placed on the servlet
-    application.
-  -->
-  <xs:element name="security-role">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="description"/>
-        <xs:element ref="role-name"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The security-role-ref element defines a mapping between the name of 
-    role called from a Servlet using 
-    isUserInRole(String name) and the name of a security role defined 
-    for the servlet application. For example, 
-    to map the security role reference "FOO" to the security role 
-    with role-name "manager" the sytax would 
-    be:
-    
-    <security-role-ref>
-    
-    
-    
-    
-    <role-name>FOO</role-name>
-    
-    <role-link>manager</manager>
-    </security-role-ref>
-    
-    In this case if the servlet called by a user belonging to the "manager" 
-    security role made the API call 
-    isUserInRole("FOO") the result would be true.
-    Since the role-name "*" has a special meaning for authorization 
-    constraints, its value is not permitted here.
-  -->
-  <xs:element name="security-role-ref">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="description"/>
-        <xs:element ref="role-name"/>
-        <xs:element ref="role-link"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The role-link element is used to link a security role reference
-    to a defined security role. The role-link element must contain the
-    name of one of the security roles defined in the security-role
-    elements.
-  -->
-  <xs:element name="role-link">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The env-entry element contains the declaration of a servlet application's
-    environment entry. The declaration consists of an optional
-    description, the name of the environment entry, and an optional
-    value.  If a value is not specified, one must be supplied
-    during deployment.
-  -->
-  <xs:element name="env-entry">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="description"/>
-        <xs:element ref="env-entry-name"/>
-        <xs:element minOccurs="0" ref="env-entry-value"/>
-        <xs:element ref="env-entry-type"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The env-entry-name element contains the name of a servlet applications's
-    environment entry.  The name is a JNDI name relative to the
-    java:comp/env context.  The name must be unique within a servlet application.
-    
-    Example: 
-    
-    <env-entry-name>minAmount</env-entry-name>
-  -->
-  <xs:element name="env-entry-name">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The env-entry-value element contains the value of A_COMPONENT's
-    environment entry. The value must be a String that is valid for the
-    constructor of the specified type that takes a single String
-    parameter, or for java.lang.Character, a single character.
-    
-    Example: 
-    
-    <env-entry-value>100.00</env-entry-value>
-  -->
-  <xs:element name="env-entry-value">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The env-entry-type element contains the fully-qualified Java type of
-    the environment entry value that is expected by THE_COMPONENT's
-    code.
-    
-    The following are the legal values of env-entry-type:
-    
-    	java.lang.Boolean
-    	java.lang.Byte
-    	java.lang.Character
-    	java.lang.String
-    	java.lang.Short
-    	java.lang.Integer
-    	java.lang.Long
-    	java.lang.Float
-    	java.lang.Double
-  -->
-  <xs:element name="env-entry-type">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The ejb-ref element is used for the declaration of a reference to
-    an enterprise bean's home. The declaration consists of:
-    
-    	- an optional description
-    	- the EJB reference name used in the code of
-    	  the servlet that's referencing the enterprise bean
-    	- the expected type of the referenced enterprise bean
-    	- the expected home and remote interfaces of the referenced
-    	  enterprise bean
-    	- optional ejb-link information, used to specify the referenced
-    	  enterprise bean
-    
-  -->
-  <xs:element name="ejb-ref">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="description"/>
-        <xs:element ref="ejb-ref-name"/>
-        <xs:element ref="ejb-ref-type"/>
-        <xs:element ref="home"/>
-        <xs:element ref="remote"/>
-        <xs:element minOccurs="0" ref="ejb-link"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The ejb-ref-name element contains the name of an EJB reference. The
-    EJB reference is an entry in the servlet's environment and is
-    relative to the java:comp/env context.  The name must be unique
-    within the servlet application.
-    
-    It is recommended that name is prefixed with "ejb/".
-    
-    Example: 
-    
-    <ejb-ref-name>ejb/Payroll</ejb-ref-name>
-  -->
-  <xs:element name="ejb-ref-name">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The ejb-ref-type element contains the expected type of the 
-    referenced enterprise bean. The ejb-ref-type element must be one of the following:
-    
-       <ejb-ref-type>Entity</ejb-ref-type>
-       <ejb-ref-type>Session</ejb-ref-type>
-  -->
-  <xs:element name="ejb-ref-type">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The home element contains the fully-qualified name of the enterprise
-    bean's home interface.
-    
-    Example:
-    
-    <home>com.aardvark.payroll.PayrollHome</home>
-  -->
-  <xs:element name="home">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The remote element contains the fully-qualified name of the enterprise
-    bean's remote interface.
-    
-    Example: 
-    
-    <remote>com.wombat.empl.EmployeeService</remote>
-  -->
-  <xs:element name="remote">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The ejb-link element is used in the ejb-ref or ejb-local-ref
-    elements to specify that an EJB reference is linked to another
-    enterprise bean.
-    
-    The value of the ejb-link element must be the ejb-name of an
-    enterprise bean in the same J2EE application unit.
-    
-    The name in the ejb-link element may be composed of a
-    path name specifying the ejb-jar containing the referenced enterprise
-    bean with the ejb-name of the target bean appended and separated from
-    the path name by "#".  The path name is relative to the SAR
-    containing the servlet application that is referencing the enterprise bean.
-    This allows multiple enterprise beans with the same ejb-name to be
-    uniquely identified.
-    
-    Examples: 
-    
-    	<ejb-link>EmployeeRecord</ejb-link>
-    
-    	<ejb-link>../products/product.jar#ProductEJB</ejb-link>
-    
-  -->
-  <xs:element name="ejb-link">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The ejb-local-ref element is used for the declaration of a reference to
-    an enterprise bean's local home. The declaration consists of:
-    
-    	- an optional description
-    	- the EJB reference name used in the code of THE_COMPONENT
-    	  that's referencing the enterprise bean
-    	- the expected type of the referenced enterprise bean
-    	- the expected local home and local interfaces of the referenced
-    	  enterprise bean
-    	- optional ejb-link information, used to specify the referenced
-    	  enterprise bean
-  -->
-  <xs:element name="ejb-local-ref">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="description"/>
-        <xs:element ref="ejb-ref-name"/>
-        <xs:element ref="ejb-ref-type"/>
-        <xs:element ref="local-home"/>
-        <xs:element ref="local"/>
-        <xs:element minOccurs="0" ref="ejb-link"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    
-    The local element contains the fully-qualified name of the
-    enterprise bean's local interface. 
-    
-    Used by ejb-local-ref
-    
-  -->
-  <xs:element name="local">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    
-    The local-home element contains the fully-qualified name of the
-    enterprise bean's local home interface. 
-    
-    Used by ejb-local-ref
-  -->
-  <xs:element name="local-home">
-    <xs:complexType mixed="true">
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
-  <!--
-    The run-as element, if defined for a servlet, overrides the security 
-    identity used to call an EJB
-    by that servlet in this servlet application. The role-name is one of the 
-    security roles already
-    defined for this servlet application.
-    
-    Used by: <servlet>
-  -->
-  <xs:element name="run-as">
-    <xs:complexType>
-      <xs:sequence>
-        <xs:element minOccurs="0" ref="description"/>
-        <xs:element ref="role-name"/>
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:ID"/>
-    </xs:complexType>
-  </xs:element>
+
+  <xs:complexType name="proxy-configType">
+    <xs:annotation>
+      <xs:documentation>
+        The proxy-config element configures proxy-related parameters.
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:sequence>
+      <xs:element name="proxy-timeout" minOccurs="0" type="javaee:xsdIntegerType"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:ID"/>
+  </xs:complexType>
+
+  <xs:complexType name="security-constraintType">
+    <xs:annotation>
+      <xs:documentation>
+        The security-constraint element is used to associate security
+        constraints with one or more servlet resource collections
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:sequence>
+      <xs:element name="display-name" minOccurs="0" maxOccurs="unbounded" type="javaee:display-nameType"/>
+      <xs:element name="resource-collection" maxOccurs="unbounded" type="resource-collectionType"/>
+      <xs:element name="proxy-authentication" minOccurs="0" type="proxy-authenticationType"/>
+      <xs:element name="auth-constraint" minOccurs="0" type="javaee:auth-constraintType"/>
+      <xs:element name="user-data-constraint" minOccurs="0" type="javaee:user-data-constraintType"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:ID"/>
+  </xs:complexType>
+
+  <xs:complexType name="resource-collectionType">
+    <xs:annotation>
+      <xs:documentation>
+        The resource-collection element is used to identify a subset
+        of the resources and SIP methods on those resources within a servlet
+        application to which a security constraint applies. If no SIP methods
+        are specified, then the security constraint applies to all SIP methods.
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:sequence>
+      <xs:element name="resource-name" type="javaee:string"/>
+      <xs:element name="description" minOccurs="0" type="javaee:descriptionType"/>
+      <xs:element name="servlet-name" minOccurs="0" maxOccurs="unbounded" type="javaee:servlet-nameType"/>
+      <xs:element name="sip-method" minOccurs="0" maxOccurs="unbounded" type="javaee:nonEmptyStringType"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:ID"/>
+  </xs:complexType>
+
+  <xs:complexType name="proxy-authenticationType">
+    <xs:annotation>
+      <xs:documentation>
+        The presence of the proxy-authentication element indicates to the
+        container that it must challenge the user agent with a 407 (Proxy
+        Authentication Required) response status code when authenticating an
+        incoming request. If not present a 401 (Unauthorized) status code is used.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="id" type="xs:ID"/>
+  </xs:complexType>
+
+  <xs:complexType name="login-configType">
+    <xs:annotation>
+      <xs:documentation>
+        The login-configType is used to configure the authentication
+        method that should be used, the realm name that should be
+        used for this application and the identity assertion scheme to be used.
+
+        Used in: sip-app
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:sequence>
+      <xs:element name="auth-method"
+                  type="javaee:auth-methodType"
+                  minOccurs="0"/>
+      <xs:element name="realm-name"
+                  type="javaee:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+            The realm name element specifies the realm name to
+            use for authentication.
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+      <xs:element name="identity-assertion"
+                  type="identity-assertionType"
+                  minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:ID"/>
+  </xs:complexType>
+
+
+  <xs:complexType name="identity-assertionType">
+    <xs:annotation>
+      <xs:documentation>
+        The identity-assertionType is used to configure the identity-assertion
+        scheme that should be used and whether the scheme is required or
+        supported.
+
+        Used in: login-config
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:sequence>
+      <xs:element name="identity-assertion-scheme"
+                  type="identity-assertion-schemeType"
+                  minOccurs="1">
+      </xs:element>
+      <xs:element name="identity-assertion-support"
+                  type="identity-assertion-supportType"
+                  minOccurs="0">
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="identity-assertion-schemeType">
+    <xs:annotation>
+      <xs:documentation>
+        The identity-assertion-schemeType is used to specify the scheme to be
+        used for identity assertion. Legal values include Identity and
+        P-Asserted-Identity.
+
+        Used in: identity-assertionType
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:simpleContent>
+      <xs:restriction base="javaee:string">
+        <xs:enumeration value="P-Asserted-Identity"/>
+        <xs:enumeration value="Identity"/>
+      </xs:restriction>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="identity-assertion-supportType">
+    <xs:annotation>
+      <xs:documentation>
+        The identity-assertion-supportType element is used to specify if the
+        identity assertion scheme is REQUIRED or SUPPORTED by the application.
+        The default value of this element is SUPPORTED.
+
+        Used in: identity-assertionType
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:simpleContent>
+      <xs:restriction base="javaee:string">
+        <xs:enumeration value="REQUIRED"/>
+        <xs:enumeration value="SUPPORTED"/>
+      </xs:restriction>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:simpleType name="sip-app-versionType">
+    <xs:annotation>
+      <xs:documentation>
+        This type contains the recognized versions of sip application supported.
+        It is used to designate the version of the sip application.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="1.1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
 </xs:schema>
-<!--
-  The ID mechanism is to allow tools to easily make tool-specific
-  references to the elements of the deployment descriptor. This allows
-  tools that produce additional deployment information (i.e information
-  beyond the standard deployment descriptor information) to store the
-  non-standard information in a separate file, and easily refer from
-  these tools-specific files to the information in the standard sip-app
-  deployment descriptor.
--->
+
