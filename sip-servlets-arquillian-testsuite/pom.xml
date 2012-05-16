@@ -162,14 +162,14 @@
 			</dependency>
 
 			<dependency>
-				<groupId>org.mobicents.servlet.sip</groupId>
+				<groupId>org.mobicents.servlet.sip.containers</groupId>
 				<artifactId>sip-servlets-catalina</artifactId>
 				<version>${version.org.mobicents.servlet.sip}</version>
 				<scope>provided</scope>
 			</dependency>
 
 			<dependency>
-				<groupId>org.mobicents.servlet.sip</groupId>
+				<groupId>org.mobicents.servlet.sip.containers</groupId>
 				<artifactId>sip-servlets-tomcat-jboss4</artifactId>
 				<version>${version.org.mobicents.servlet.sip}</version>
 				<scope>provided</scope>
@@ -179,12 +179,14 @@
 				<groupId>org.mobicents.ha.javax.sip</groupId>
 				<artifactId>mobicents-jain-sip-jboss4</artifactId>
 				<version>${version.mobicents.jain.sip.jboss4}</version>
+				<scope>provided</scope>
 			</dependency>
 
 			<dependency>
 				<groupId>org.mobicents.javax.sip</groupId>
 				<artifactId>mobicents-jain-sip-ext</artifactId>
 				<version>${version.mobicents.jain.sip.ext}</version>
+				<scope>provided</scope>
 			</dependency>
 
 
@@ -207,7 +209,23 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.12</version>
 				<configuration>
-				<!--	<testFailureIgnore>true</testFailureIgnore>-->
+					<!-- <testFailureIgnore>true</testFailureIgnore> -->
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>${basedir}</directory>
+							<includes>
+								<include>logs/</include>
+							</includes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+					</filesets>
 				</configuration>
 			</plugin>
 		</plugins>

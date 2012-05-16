@@ -48,7 +48,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mobicents.servlet.sip.SipConnector;
@@ -90,10 +89,10 @@ public class ShootistSipServletTest extends SipTestCase
 	@Before
 	public void setUp() throws Exception
 	{
-		//        System.setProperty( "javax.net.ssl.keyStore",  ClassLoader.getSystemClassLoader().getResource("testkeys").getPath() );
-		//        System.setProperty( "javax.net.ssl.trustStore", ClassLoader.getSystemClassLoader().getResource("testkeys").getPath() );
-		//        System.setProperty( "javax.net.ssl.keyStorePassword", "passphrase" );
-		//        System.setProperty( "javax.net.ssl.keyStoreType", "jks" );
+		        System.setProperty( "javax.net.ssl.keyStore",  ClassLoader.getSystemClassLoader().getResource("testkeys").getPath() );
+		        System.setProperty( "javax.net.ssl.trustStore", ClassLoader.getSystemClassLoader().getResource("testkeys").getPath() );
+		        System.setProperty( "javax.net.ssl.keyStorePassword", "passphrase" );
+		        System.setProperty( "javax.net.ssl.keyStoreType", "jks" );
 		//	
 				//Create the sipCall and start listening for messages
 				receiver = sipStackTool.initializeSipStack(SipStack.PROTOCOL_UDP, "127.0.0.1", "5080", "127.0.0.1:5070");
@@ -161,10 +160,12 @@ public class ShootistSipServletTest extends SipTestCase
 		logger.info("About to deploy the application");
 		deployer.deploy(testArchive);
 
-		sipCall.waitForIncomingCall(60000);
-		sipCall.listenForCancel();
-
-		assertTrue(sipCall.sendIncomingCallResponse(Response.RINGING,"RINGING",TIMEOUT,null,replacedHeaders,null));
+		assertTrue(sipCall.waitForIncomingCall(TIMEOUT));
+		
+		assertTrue(sipCall.sendIncomingCallResponse(Response.TRYING,"TRYING",-1,null,null,null));
+		assertTrue(sipCall.sendIncomingCallResponse(Response.RINGING,"RINGING",-1,null,replacedHeaders,null));
+		
+//		sipCall.listenForCancel();
 
 		//	https://lists.cs.columbia.edu/pipermail/sip-implementors/2005-December/011525.html
 		//	An early dialog is only established by a 1xx response with a to-tag.
@@ -299,7 +300,7 @@ public class ShootistSipServletTest extends SipTestCase
 		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
 		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));
 	}
-	//
+	
 	@Test @ContextParam(name="cancel", value="true")
 	public void testShootistEarlyMediaChange() throws Exception 
 	{
@@ -340,7 +341,7 @@ public class ShootistSipServletTest extends SipTestCase
 		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
 		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));
 	}
-	//	
+		
 	@Test
 	public void testShootistSetContact() throws Exception 
 	{
@@ -669,18 +670,16 @@ public class ShootistSipServletTest extends SipTestCase
 		assertTrue(contact.contains("from display"));
 	}
 
-	//TODO: Implement TLS for SipUnit
-	@Ignore @Test @ContextParam(name="secureRURI", value="true")
+	@Test @ContextParam(name="secureRURI", value="true")
 	public void testShootistContactTlsTransport() throws Exception 
 	{
-		
-//		containerManager.restartContainer();
+		containerManager.restartContainer();
 
 		containerManager.addSipConnector("localhost", 5071, ListeningPoint.TCP);
 		containerManager.addSipConnector("localhost", 5072, ListeningPoint.TLS);
 
-		receiver = sipStackTool.initializeSipStack("tls", "localhost", "5080", "localhost:5070");
-		sipPhone = receiver.createSipPhone("localhost", "tls", 5070, "sip:LittleGuy@there.com");
+		receiver = sipStackTool.initializeSipStack("tls", "localhost", "5080", "localhost:5072");
+		sipPhone = receiver.createSipPhone("localhost", "tls", 5072, "sips:LittleGuy@there.com");
 		
 		sipCall = sipPhone.createSipCall();
 		sipCall.listenForIncomingCall();
@@ -708,41 +707,47 @@ public class ShootistSipServletTest extends SipTestCase
 		assertTrue(viaString.toLowerCase().contains("tls"));
 		assertTrue(viaString.toLowerCase().contains("5072"));
 	}
-
-	//TODO: Implement TLS for SipUnit 
+ 
 	/**
 	 * non regression test for Issue 2269 http://code.google.com/p/mobicents/issues/detail?id=2269
 	 * Wrong Contact header scheme URI in case TLS call with 'sip:' scheme
 	 */
-	@Ignore @Test @ContextParam(name="trasnportRURI", value="tls")
+	@Test @ContextParam(name="transportRURI", value="tls") //@Ignore 
 	public void testShootistContactNonSecureURITlsTransport() throws Exception {
 
+		containerManager.restartContainer();
+
+		containerManager.addSipConnector("localhost", 5071, ListeningPoint.TCP);
+		containerManager.addSipConnector("localhost", 5072, ListeningPoint.TLS);
+
+		receiver = sipStackTool.initializeSipStack("tls", "localhost", "5080", "localhost:5070");
+		sipPhone = receiver.createSipPhone("localhost", "tls", 5070, "sip:LittleGuy@there.com");
+		
+		sipCall = sipPhone.createSipCall();
+		sipCall.listenForIncomingCall();
+		
 		logger.info("About to deploy the application");
 		deployer.deploy(testArchive);
-		assertTrue(true);
-				
-//		receiverProtocolObjects =new ProtocolObjects(
-//				"tls_receiver", "gov.nist", "TLS", AUTODIALOG, null, null, null);				
-//		
-//		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
-//		SipProvider senderProvider = receiver.createProvider();			
-//		
-//		senderProvider.addSipListener(receiver);
-//		
-//		receiverProtocolObjects.start();
-//		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5071, ListeningPoint.TCP);
-//		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5072, ListeningPoint.TLS);
-//		tomcat.startTomcat();
-//		deployApplication("transportRURI", "tls");
-//		Thread.sleep(TIMEOUT);
-//		assertTrue(receiver.getByeReceived());
-//		ContactHeader contactHeader = (ContactHeader) receiver.getInviteRequest().getHeader(ContactHeader.NAME);	
-//		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().contains("sip:"));
-//		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().contains("5072"));
-//		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().toLowerCase().contains("transport=tls"));
-//		String viaString = receiver.getInviteRequest().getHeader(ViaHeader.NAME).toString();
-//		assertTrue(viaString.toLowerCase().contains("tls"));
-//		assertTrue(viaString.toLowerCase().contains("5072"));
+
+		assertTrue(sipCall.waitForIncomingCall(TIMEOUT));
+		SipRequest request = sipCall.getLastReceivedRequest();
+		assertTrue(request.isInvite());
+
+		assertTrue(sipCall.sendIncomingCallResponse(Response.TRYING,"Trying", TIMEOUT));
+		assertTrue(sipCall.sendIncomingCallResponse(Response.RINGING,"Ringing",TIMEOUT));
+		assertTrue(sipCall.sendIncomingCallResponse(Response.OK, "OK", TIMEOUT));
+
+		sipCall.listenForDisconnect();
+		assertTrue(sipCall.waitForDisconnect(TIMEOUT));
+		sipCall.respondToDisconnect();
+		
+		ContactHeader contactHeader = (ContactHeader) request.getMessage().getHeader(ContactHeader.NAME);	
+		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().contains("sip:"));
+		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().contains("5072"));
+		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().toLowerCase().contains("transport=tls"));
+		String viaString = request.getMessage().getHeader(ViaHeader.NAME).toString();
+		assertTrue(viaString.toLowerCase().contains("tls"));
+		assertTrue(viaString.toLowerCase().contains("5072"));
 	}
 	
 	/**
@@ -854,42 +859,38 @@ public class ShootistSipServletTest extends SipTestCase
 	.put("transportRURI", "tls")
 	.put("method", "REGISTER").getMap();
 	
-//	//TODO: Implement TLS for SipUnit
 	/**
 	 * non regression test for Issue 2269 http://code.google.com/p/mobicents/issues/detail?id=2269
 	 * Wrong Contact header scheme URI in case TLS call with request URI 'sip:' scheme and contact is uri is secure with "sips"
 	 */
-	@Ignore @Test @ContextParamMap(value="testShootistRegisterContactNonSecureURITlsTransport")
+	@Test @ContextParamMap(value="testShootistRegisterContactNonSecureURITlsTransport")
 	public void testShootistRegisterContactNonSecureURITlsTransport() throws Exception {
 
+		containerManager.restartContainer();
+
+		containerManager.addSipConnector("localhost", 5071, ListeningPoint.TCP);
+		containerManager.addSipConnector("localhost", 5072, ListeningPoint.TLS);
+		
+		receiver = sipStackTool.initializeSipStack("tls", "localhost", "5080", "localhost:5070");
+		sipPhone = receiver.createSipPhone("localhost", "tls", 5070, "sip:LittleGuy@there.com");
+		
+		sipCall = sipPhone.createSipCall();
+		sipCall.listenForIncomingCall();
+		
 		logger.info("About to deploy the application");
 		deployer.deploy(testArchive);
-		assertTrue(true);
+
+		RequestEvent reqEvent = sipPhone.waitRequest(TIMEOUT);
+		Request request = reqEvent.getRequest();
+		assertTrue(request.getMethod().equals(Request.REGISTER));
 		
-//		//		receiver.sendInvite();
-//		receiverProtocolObjects =new ProtocolObjects(
-//				"tls_receiver", "gov.nist", "TLS", AUTODIALOG, null, null, null);				
-//		
-//		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
-//		SipProvider senderProvider = receiver.createProvider();			
-//		
-//		senderProvider.addSipListener(receiver);
-//		
-//		receiverProtocolObjects.start();
-//		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5071, ListeningPoint.TCP);
-//		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5072, ListeningPoint.TLS);
-//		tomcat.startTomcat();
-//		Map<String, String> params = new HashMap<String, String>();
-//		params.put("transportRURI", "tls");
-//		params.put("method", "REGISTER");
-//		deployApplication(params);
-//		tomcat.startTomcat();
-//		Thread.sleep(TIMEOUT);
-//		ContactHeader contactHeader = (ContactHeader) receiver.getRegisterReceived().getHeader(ContactHeader.NAME);
-//		assertNotNull(contactHeader);	
-//		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().contains("sip:"));
-//		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().contains("5072"));
-//		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().toLowerCase().contains("transport=tls"));
+		sipPhone.sendReply(reqEvent, 200, "OK", null, null, -1);
+		
+		ContactHeader contactHeader = (ContactHeader) request.getHeader(ContactHeader.NAME);
+		assertNotNull(contactHeader);	
+		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().contains("sip:"));
+		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().contains("5072"));
+		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().toLowerCase().contains("transport=tls"));
 	}
 
 	@ContextParamMap("testShootistProxyAuthorization")

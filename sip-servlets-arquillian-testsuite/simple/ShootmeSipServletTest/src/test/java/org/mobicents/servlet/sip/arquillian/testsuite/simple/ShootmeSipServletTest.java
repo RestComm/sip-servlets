@@ -100,7 +100,8 @@ public class ShootmeSipServletTest extends SipTestCase
 
 	public final static String[] ALLOW_HEADERS = new String[] {"INVITE","ACK","CANCEL","OPTIONS","BYE","SUBSCRIBE","NOTIFY","REFER"};
 
-	private static SipStackTool sipStackTool;
+	private static SipStackTool receiverSipStackTool;
+	private static SipStackTool senderSipStackTool;
 	private String testArchive = "simple";
 	private Boolean isDeployed = false;
 
@@ -109,19 +110,20 @@ public class ShootmeSipServletTest extends SipTestCase
 
 	@BeforeClass
 	public static void beforeClass(){
-		sipStackTool = new SipStackTool("ShootmeSipServletTest");
+		receiverSipStackTool = new SipStackTool("ShootmeSipServletTest_receiver");
+		senderSipStackTool = new SipStackTool("ShootmeSipServletTest_sender");
 	}
 
 	@Before
 	public void setUp() throws Exception
 	{
 		//Create the sipCall and start listening for messages
-		receiver = sipStackTool.initializeSipStack(SipStack.PROTOCOL_UDP, "127.0.0.1", receiverPort, "127.0.0.1:5070");
+		receiver = receiverSipStackTool.initializeSipStack(SipStack.PROTOCOL_UDP, "127.0.0.1", receiverPort, "127.0.0.1:5070");
 		sipPhoneReceiver = receiver.createSipPhone("127.0.0.1", SipStack.PROTOCOL_UDP, proxyPort, receiverURI);
 		sipCallReceiver = sipPhoneReceiver.createSipCall();
 		sipCallReceiver.listenForIncomingCall();
 
-		sender = sipStackTool.initializeSipStack(SipStack.PROTOCOL_UDP, "127.0.0.1", senderPort, "127.0.0.1:5070");
+		sender = senderSipStackTool.initializeSipStack(SipStack.PROTOCOL_UDP, "127.0.0.1", senderPort, "127.0.0.1:5070");
 		sipPhoneSender = sender.createSipPhone("127.0.0.1", SipStack.PROTOCOL_UDP, proxyPort, senderURI);
 		sipCallSender = sipPhoneSender.createSipCall();
 		sipCallSender.listenForIncomingCall();
@@ -191,7 +193,7 @@ public class ShootmeSipServletTest extends SipTestCase
 	 * Non regression test for Issue 2115 http://code.google.com/p/mobicents/issues/detail?id=2115
 	 * MSS unable to handle GenericURI URIs
 	 */
-	@Test @Ignore //SipUnit doesn't support URN
+	@Test //@Ignore //SipUnit doesn't support URN
 	public void testShootmeGenericRURI() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 
 		logger.info("About to deploy the application");
