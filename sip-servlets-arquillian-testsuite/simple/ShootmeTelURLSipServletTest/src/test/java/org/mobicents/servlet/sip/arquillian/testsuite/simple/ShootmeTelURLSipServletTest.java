@@ -76,7 +76,7 @@ public class ShootmeTelURLSipServletTest
 
 	@BeforeClass
 	public static void beforeClass(){
-		sipStackTool = new SipStackTool();
+		sipStackTool = new SipStackTool("ShootmeTelURLSipServletTest");
 	}
 
 	@Before

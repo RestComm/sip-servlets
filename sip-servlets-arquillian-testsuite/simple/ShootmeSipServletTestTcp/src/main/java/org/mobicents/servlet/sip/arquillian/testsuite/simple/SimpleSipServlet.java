@@ -678,7 +678,7 @@ public class SimpleSipServlet
 			logger.error("Exception occured while parsing the addresses",e);
 		} catch (IOException e) {
 			logger.error("Exception occured while sending the request",e);			
-		}
+		} 
 	}
 	
 	@Override

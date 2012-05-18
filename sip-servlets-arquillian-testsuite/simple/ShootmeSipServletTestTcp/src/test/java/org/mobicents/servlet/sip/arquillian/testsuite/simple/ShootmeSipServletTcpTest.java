@@ -3,19 +3,26 @@
  */
 package org.mobicents.servlet.sip.arquillian.testsuite.simple;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.Semaphore;
 import java.util.logging.Logger;
 
 import javax.sip.InvalidArgumentException;
+import javax.sip.RequestEvent;
 import javax.sip.SipException;
 import javax.sip.address.SipURI;
+import javax.sip.header.CSeqHeader;
 import javax.sip.header.Header;
+import javax.sip.header.ProxyAuthenticateHeader;
+import javax.sip.header.ToHeader;
+import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.cafesip.sipunit.SipCall;
@@ -23,6 +30,7 @@ import org.cafesip.sipunit.SipPhone;
 import org.cafesip.sipunit.SipStack;
 import org.cafesip.sipunit.SipTransaction;
 import org.jboss.arquillian.container.mss.extension.SipStackTool;
+import org.jboss.arquillian.container.mss.extension.authentication.DigestServerAuthenticationMethod;
 import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -67,7 +75,8 @@ public class ShootmeSipServletTcpTest
 
 	public final static String[] ALLOW_HEADERS = new String[] {"INVITE","ACK","CANCEL","OPTIONS","BYE","SUBSCRIBE","NOTIFY","REFER"};
 
-	private static SipStackTool sipStackTool;
+	private static SipStackTool receiverSipStackTool;
+	private static SipStackTool senderSipStackTool;
 	private String testArchive = "simple";
 	private Boolean isDeployed = false;
 
@@ -76,19 +85,20 @@ public class ShootmeSipServletTcpTest
 
 	@BeforeClass
 	public static void beforeClass(){
-		sipStackTool = new SipStackTool();
+		receiverSipStackTool = new SipStackTool("ShootmeSipServletTcpTest_receiver");
+		senderSipStackTool = new SipStackTool("ShootmeSipServletTcpTest_sender");
 	}
 
 	@Before
 	public void setUp() throws Exception
 	{
 		//Create the sipCall and start listening for messages
-		receiver = sipStackTool.initializeSipStack(SipStack.PROTOCOL_TCP, "127.0.0.1", receiverPort, "127.0.0.1:5070");
+		receiver = receiverSipStackTool.initializeSipStack(SipStack.PROTOCOL_TCP, "127.0.0.1", receiverPort, "127.0.0.1:5070");
 		sipPhoneReceiver = receiver.createSipPhone("127.0.0.1", SipStack.PROTOCOL_TCP, proxyPort, receiverURI);
 		sipCallReceiver = sipPhoneReceiver.createSipCall();
 		sipCallReceiver.listenForIncomingCall();
 
-		sender = sipStackTool.initializeSipStack(SipStack.PROTOCOL_TCP, "127.0.0.1", senderPort, "127.0.0.1:5070");
+		sender = senderSipStackTool.initializeSipStack(SipStack.PROTOCOL_TCP, "127.0.0.1", senderPort, "127.0.0.1:5070");
 		sipPhoneSender = sender.createSipPhone("127.0.0.1", SipStack.PROTOCOL_TCP, proxyPort, senderURI);
 		sipCallSender = sipPhoneSender.createSipCall();
 		sipCallSender.listenForIncomingCall();
@@ -195,12 +205,14 @@ public class ShootmeSipServletTcpTest
 		assertEquals(Response.RINGING, sipCallSender.getLastReceivedResponse().getStatusCode());
 
 		SipTransaction sipTrans1 = sipCallSender.sendCancel();
+		assertNotNull(sipTrans1);
+		
 		assertTrue(sipCallSender.waitForCancelResponse(sipTrans1, TIMEOUT));
 		assertEquals(Response.OK, sipCallSender.getLastReceivedResponse().getStatusCode());
 
 		assertTrue(sipCallSender.waitOutgoingCallResponse());
 		assertEquals(Response.REQUEST_TERMINATED, sipCallSender.getLastReceivedResponse().getStatusCode());
-
+		
 		//Override default options for sender
 		senderURI = "sip:receiver@sip-servlets.com";
 		sipPhoneSender = sender.createSipPhone("127.0.0.1", SipStack.PROTOCOL_TCP, proxyPort, senderURI);
