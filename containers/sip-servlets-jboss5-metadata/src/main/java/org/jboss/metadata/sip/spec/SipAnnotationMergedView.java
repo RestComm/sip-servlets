@@ -156,61 +156,71 @@ public class SipAnnotationMergedView {
 	   {
 	      merged.merge(xml, annotation); 
 	   }
-	   
-	   private static void mergeIn(SipMetaData merged, SipMetaData xml)
+	   /**
+	    * This method mimics MetaData.merge(override, value) in two step way. It works like:<br>
+	    * merged.setX(override.getX), more or less, in distinction to original method of MetaData.
+	    * 
+	    * 
+	    * @param merged
+	    * @param override
+	    */
+	   private static void mergeIn(SipMetaData merged, SipMetaData override)
 	   {
-	      merged.setDTD("", xml.getDtdPublicId(), xml.getDtdSystemId());
+	      merged.setDTD("", override.getDtdPublicId(), override.getDtdSystemId());
 	      
+	      //FIXME: check if we can extend "merge" method to mvoe this code.
 	      //Sip Specifics
 	    
-	      if(xml.getApplicationName() != null)
-		         merged.setApplicationName(xml.getApplicationName());
+	      if(override.getApplicationName() != null)
+		         merged.setApplicationName(override.getApplicationName());
 	      
-	      if(xml.getServletSelection() != null)
-		         merged.setServletSelection(xml.getServletSelection());
+	      if(override.getServletSelection() != null)
+		         merged.setServletSelection(override.getServletSelection());
 	      
-	      if(xml.getSipApplicationKeyMethod() != null)
-		         merged.setSipApplicationKeyMethod(xml.getSipApplicationKeyMethod());
+	      if(override.getSipApplicationKeyMethod() != null)
+		         merged.setSipApplicationKeyMethod(override.getSipApplicationKeyMethod());
 	      
-	      if(xml.getConcurrencyControlMode() != null)
-		         merged.setConcurrencyControlMode(xml.getConcurrencyControlMode());
+	      if(override.getConcurrencyControlMode() != null)
+		         merged.setConcurrencyControlMode(override.getConcurrencyControlMode());
 	      
 	      //Web Specifics
 	      
 	      //Version
-	      if(xml.getVersion() != null)
-	         merged.setVersion(xml.getVersion());
+	      if(override.getVersion() != null)
+	         merged.setVersion(override.getVersion());
 	      
 	      //Description Group
-	      if(xml.getDescriptionGroup() != null)
-	         merged.setDescriptionGroup(xml.getDescriptionGroup());
-	      
+	      if(override.getDescriptionGroup() != null)
+	         merged.setDescriptionGroup(override.getDescriptionGroup());
+
 	      //Merge the Params
-	      if(xml.getContextParams() != null)
-	         merged.setContextParams(xml.getContextParams());
+	      if(override.getContextParams() != null)
+	         //merged.mergeContextParameters(override.getContextParams());
+	    	  merged.setContextParams(override.getContextParams());
 	      
 	      //Distributable
-	      if(xml.getDistributable() != null)
-	         merged.setDistributable(xml.getDistributable());
+	      if(override.getDistributable() != null)
+	         merged.setDistributable(override.getDistributable());
 	      
 	      //Session Config
-	      if(xml.getSipSessionConfig() != null)
-	         merged.setSipSessionConfig(xml.getSipSessionConfig());
+	      if(override.getSipSessionConfig() != null)
+	         merged.setSipSessionConfig(override.getSipSessionConfig());
 	      
 	      //Listener meta data
-	      if(xml.getListeners() != null)
-	         merged.setListeners(xml.getListeners());
+	      if(override.getListeners() != null)
+	         merged.mergeListeners(override.getListeners());
 	      
 	      //Login Config
-	      if(xml.getSipLoginConfig() != null)
-	         merged.setSipLoginConfig(xml.getSipLoginConfig());
+	      if(override.getSipLoginConfig() != null)
+	         merged.setSipLoginConfig(override.getSipLoginConfig());
 	      
 	      //Security Constraints
-	      if(xml.getSipSecurityContraints() != null)
-	         merged.setSipSecurityContraints(xml.getSipSecurityContraints());
+	      if(override.getSipSecurityContraints() != null)
+	         //merged.mergeSipSecurityContraints(override.getSipSecurityContraints());
+	    	  merged.setSipSecurityContraints(override.getSipSecurityContraints());
 	      
 	      //Local Encodings
-	      if(xml.getLocalEncodings() != null)
-	         merged.setLocalEncodings(xml.getLocalEncodings());
+	      if(override.getLocalEncodings() != null)
+	         merged.setLocalEncodings(override.getLocalEncodings());
 	   }
 }

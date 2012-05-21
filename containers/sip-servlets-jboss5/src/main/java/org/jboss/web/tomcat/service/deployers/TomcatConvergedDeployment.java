@@ -283,43 +283,48 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 //				Thread.currentThread().setContextClassLoader(ClusteredSession.class.getClassLoader());
 				// Try to initate clustering, fallback to standard if no clustering
 				// is available				
-				String managerClassName = config.getManagerClass();								
-				Class managerClass = Thread.currentThread()
-						.getContextClassLoader().loadClass(managerClassName);
-				manager = (AbstractJBossManager) managerClass.newInstance();
-				// MSS : we set the classloader because Clustering class are mixed up with deployers class
-				// causing CL problems : need to separate them in different jars
-				//ClassLoader previousClassLoader = Thread.currentThread().getContextClassLoader();
-				//Thread.currentThread().setContextClassLoader(ClusteredSession.class.getClassLoader());
-				// Try to initate clustering, fallback to standard if no clustering
-				// is available
-				try {				
-					String name = "//"
-							+ ((hostName == null) ? "localhost" : hostName)
-							+ ctxPath;
-					manager.init(name, metaData);
+					String managerClassName = config.getManagerClass();	
+					if (managerClassName != null) {
+						Class managerClass = Thread.currentThread()
+								.getContextClassLoader().loadClass(managerClassName);
+						manager = (AbstractJBossManager) managerClass.newInstance();
+						// MSS : we set the classloader because Clustering class are mixed up with deployers class
+						// causing CL problems : need to separate them in different jars
+						//					ClassLoader previousClassLoader = Thread.currentThread().getContextClassLoader();
+						//					Thread.currentThread().setContextClassLoader(ClusteredSession.class.getClassLoader());
+						// Try to initate clustering, fallback to standard if no clustering
+						// is available
+						try {				
+							String name = "//"
+									+ ((hostName == null) ? "localhost" : hostName)
+									+ ctxPath;
+							manager.init(name, metaData);
 
-						server.setAttribute(objectName, new Attribute("manager",
-								manager));
+							server.setAttribute(objectName, new Attribute("manager",
+									manager));
 
-						log.debug("Enabled clustering support for ctxPath=" + ctxPath);
-					} catch (ClusteringNotSupportedException e) {
-						// JBAS-3513 Just log a WARN, not an ERROR
-						log
-								.warn("Failed to setup clustering, clustering disabled. ClusteringNotSupportedException: "
-										+ e.getMessage());
-					} catch (NoClassDefFoundError ncdf) {
-						// JBAS-3513 Just log a WARN, not an ERROR
-						log.warn("Failed to setup clustering, clustering disabled. NoClassDefFoundError: "
-								+ ncdf.getMessage());
-						log.debug("Classes needed for clustered webapp unavailable",
-								ncdf);				
-					} catch (Throwable t) {
-						// TODO consider letting this through and fail the deployment
-						log
-								.error(
-										"Failed to setup clustering, clustering disabled. Exception: ",
-										t);
+							log.debug("Enabled clustering support for ctxPath=" + ctxPath);
+						} catch (ClusteringNotSupportedException e) {
+							// JBAS-3513 Just log a WARN, not an ERROR
+							log
+							.warn("Failed to setup clustering, clustering disabled. ClusteringNotSupportedException: "
+									+ e.getMessage());
+						} catch (NoClassDefFoundError ncdf) {
+							// JBAS-3513 Just log a WARN, not an ERROR
+							log.warn("Failed to setup clustering, clustering disabled. NoClassDefFoundError: "
+									+ ncdf.getMessage());
+							log.debug("Classes needed for clustered webapp unavailable",
+									ncdf);				
+						} catch (Throwable t) {
+							// TODO consider letting this through and fail the deployment
+							log
+							.error(
+									"Failed to setup clustering, clustering disabled. Exception: ",
+									t);
+						}
+					}
+					else {
+						log.debug("Sip app has distributable but manager class is not set, running in local mode?");
 					}
 			}
 			// Start it	
@@ -333,23 +338,28 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 				new Timer().scheduleAtFixedRate(new TimerTask() {
 					int retries = 100;
 					public void run() {
-						Thread.currentThread().setContextClassLoader(cl);
-						if(retries-->0) {
-							log.debug("Trying to inject utilities for converged app into EJB - attempts left: " + retries);
-							try {
-								injectSipUtilitiesIntoEJBs(context, metaData);
-								log.info("Attempt to inject SIP utilitiess into EJB succeeded at " + retries + " attempts left.");
-								cancel();
-							} catch (Exception e) {
-								if(retries%10 == 0) {
-									log.warn("Attempt to inject SIP utilities into EJB failed " + context + " " + metaData + " retries left = " + retries);
+						final ClassLoader oldCl = Thread.currentThread().getContextClassLoader();
+						try {
+							Thread.currentThread().setContextClassLoader(cl);
+							if(retries-->0) {
+								log.debug("Trying to inject utilities for converged app into EJB - attempts left: " + retries);
+								try {
+									injectSipUtilitiesIntoEJBs(context, metaData);
+									log.info("Attempt to inject SIP utilitiess into EJB succeeded at " + retries + " attempts left.");
+									cancel();
+								} catch (Exception e) {
+									if(retries%10 == 0) {
+										log.warn("Attempt to inject SIP utilities into EJB failed " + context + " " + metaData + " retries left = " + retries);
+									}
 								}
+							} else {
+								cancel();
+								log.error("Attempt to inject SIP utilities into EJB failed after 100 attempts, the EJB didnt come up. We are giving up.");
 							}
-						} else {
-							cancel();
-							log.error("Attempt to inject SIP utilities into EJB failed after 100 attempts, the EJB didnt come up. We are giving up.");
+						} finally {
+							Thread.currentThread().setContextClassLoader(oldCl);
 						}
-
+						
 					}
 				}, 1, 1000);
 			}
@@ -372,7 +382,7 @@ public class TomcatConvergedDeployment extends TomcatDeployment {
 			throw new DeploymentException("URL " + warUrlStr
 					+ " deployment failed");
 		}
-		
+
 		/*
 		 * Add security association valve after the authorization valves so that
 		 * the authenticated user may be associated with the request

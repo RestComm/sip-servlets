@@ -23,6 +23,7 @@
 package org.jboss.metadata.sip.spec;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -456,4 +457,57 @@ public ConcurrencyControlMode getConcurrencyControlMode() {
 public void setConcurrencyControlMode(ConcurrencyControlMode mode) {
 	this.concurrencyControlMode = mode;
 }
+
+//public void mergeContextParameters( List<ParamValueMetaData> lst){
+//	//precaution, silent return?
+//	if(lst == null)
+//	{
+//		return;
+//	}
+//	
+//	if(this.contextParams == null)
+//	{
+//		//NOTE: make separate copy ?
+//		this.contextParams = new ArrayList<ParamValueMetaData>(lst);
+//	}else
+//	{
+//		this.contextParams.addAll(lst);
+//	}
+//}
+
+public void mergeListeners(List<ListenerMetaData> lst) {
+	    //precaution, silent return?
+		if(lst == null)
+		{
+			return;
+		}
+		
+		if(this.listeners == null)
+		{
+			//NOTE: make separate copy ?
+			this.listeners = new ArrayList<ListenerMetaData>(lst);
+		}else
+		{
+			this.listeners.addAll(lst);
+		}
+}
+
+//public void mergeSipSecurityContraints(List<SipSecurityConstraintMetaData> lst) {
+//	        //precaution, silent return?
+//			if(lst == null)
+//			{
+//				return;
+//			}
+//			
+//			if(this.sipSecurityContraints == null)
+//			{
+//				//NOTE: make separate copy ?
+//				this.sipSecurityContraints = new ArrayList<SipSecurityConstraintMetaData>(lst);
+//			}else
+//			{
+//				this.sipSecurityContraints.addAll(lst);
+//			}
+//	
+//}
+
 }

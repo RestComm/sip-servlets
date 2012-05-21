@@ -22,6 +22,7 @@
 
 package org.mobicents.servlet.sip.startup.jboss;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -217,7 +218,7 @@ public class SipJBossContextConfig extends JBossContextConfig {
 			convergedContext.setSipLoginConfig(sipLoginConfig2);
 		}
 		//Sip Listeners
-		List<ListenerMetaData> sipListeners = convergedMetaData.getSipListeners();
+		Collection<ListenerMetaData> sipListeners = convergedMetaData.getSipListeners();
 		if (sipListeners != null) {
 			for (ListenerMetaData value : sipListeners) {
 				convergedContext.addSipApplicationListener(value.getListenerClass());
