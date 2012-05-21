@@ -52,7 +52,16 @@ public class TimerServiceTaskFactory implements TimerTaskFactory {
 		MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(((TimerServiceTaskData)data).getKey(), false);
 		if(sipApplicationSession.getTimer((String)data.getTaskID()) == null) {
 			if(((SipContext)sipManager.getContainer()).getConcurrencyControlMode() != ConcurrencyControlMode.SipApplicationSession) {
-				return new TimerServiceTask(sipManager, null, (TimerServiceTaskData)data);
+				// http://code.google.com/p/sipservlets/issues/detail?id=90
+				final Thread currentThread = Thread.currentThread();
+				final ClassLoader currentThreadClassLoader = currentThread.getContextClassLoader();				
+				try {
+					currentThread.setContextClassLoader(sipApplicationSession.getSipContext().getSipContextClassLoader());
+					return new TimerServiceTask(sipManager, null, (TimerServiceTaskData)data);
+				}
+				finally {
+					currentThread.setContextClassLoader(currentThreadClassLoader);
+				}
 			}
 		}
 		// returning null to avoid recovery since it was already recovered above

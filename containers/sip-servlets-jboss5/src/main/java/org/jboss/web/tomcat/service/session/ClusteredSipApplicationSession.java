@@ -689,15 +689,21 @@ public abstract class ClusteredSipApplicationSession<O extends OutgoingDistribut
 			this.metadata.getMetaData().put(HTTP_SESSIONS, httpSessions.toArray(new String[httpSessions.size()]));
 		}
 		if(metadata.isServletTimersMapModified()) {
-			if(logger.isDebugEnabled()) {
-				logger.debug("ServletTimers size " + servletTimers.size() + " to add for replication");
-				Iterator<String>  servletTimersIt = servletTimers.keySet().iterator();
-				while (servletTimersIt.hasNext()) {
-					String servletTimerId = servletTimersIt.next();
-					logger.debug("ServletTimer id " + servletTimerId + " added for replication");
+			if (servletTimers == null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Warning, metadata says timers were modified, but session's local timer set is null, inconsistent state!");
 				}
+			} else {
+				if(logger.isDebugEnabled()) {
+					logger.debug("ServletTimers size " + servletTimers.size() + " to add for replication");
+					Iterator<String>  servletTimersIt = servletTimers.keySet().iterator();
+					while (servletTimersIt.hasNext()) {
+						String servletTimerId = servletTimersIt.next();
+						logger.debug("ServletTimer id " + servletTimerId + " added for replication");
+					}
+				}
+				this.metadata.getMetaData().put(SERVLETS_TIMERS, servletTimers.keySet().toArray(new String[servletTimers.keySet().size()]));
 			}
-			this.metadata.getMetaData().put(SERVLETS_TIMERS, servletTimers.keySet().toArray(new String[servletTimers.keySet().size()]));
 		}
 	}
 
