@@ -22,9 +22,14 @@
 
 package org.mobicents.servlet.sip.testsuite.proxy;
 
+import java.util.HashMap;
+import java.util.HashSet;
+
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.header.ViaHeader;
+import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -77,6 +82,56 @@ public class ProxyOverlappingTransactionsTest extends SipServletTestCase {
 		assertTrue(sender.numberOf491s>0);
 		assertTrue(receiver.numberOf491s>0);
 		receiver.sendBye();
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getByeReceived());
+		assertTrue(receiver.getOkToByeReceived());		
+	}
+	
+	//http://code.google.com/p/sipservlets/issues/detail?id=99
+	public void testProxyOverlapReinviteInfo() throws Exception {
+		setupPhones(ListeningPoint.UDP);
+		String fromName = "unique-location";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "proxy-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);	
+		
+		Thread.sleep(TIMEOUT/2);
+		assertTrue(sender.isAckSent());
+		assertTrue(receiver.isAckReceived());
+		receiver.setAckReceived(false);
+		sender.setAckSent(false);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		Thread.sleep(1);
+		
+		sender.sendInDialogSipRequest("INFO", null, null, null, null, null);
+		
+		Thread.sleep(TIMEOUT);
+		//assertTrue(sender.numberOf491s>0);
+		//assertTrue(receiver.numberOf491s>0);
+		receiver.sendBye();
+		HashMap<String,Request> ackBranches = new HashMap<String,Request>();
+		for(Request request:receiver.allRequests) {
+			if(request.getMethod().equals("ACK")) {
+				ViaHeader via = (ViaHeader) request.getHeader("VIa");
+				String branch = via.getBranch();
+				ackBranches.put(branch, request);
+			}
+		}
+		for(Request request:receiver.allRequests) {
+			if(request.getMethod().equals("INFO")) {
+				ViaHeader via = (ViaHeader) request.getHeader("VIa");
+				String branch = via.getBranch();
+				if(ackBranches.containsKey(branch)) 
+					fail("INFO and ACK have the same branch id for " + request + " and " + ackBranches.get(branch));;
+			}
+		}
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getByeReceived());
 		assertTrue(receiver.getOkToByeReceived());		
