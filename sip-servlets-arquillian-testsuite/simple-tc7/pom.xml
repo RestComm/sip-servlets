@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.mobicents.servlet.sip.arquillian.testsuite</groupId>
+		<artifactId>sip-servlets-arquillian-testsuite</artifactId>
+		<version>1.8.0-SNAPSHOT</version>
+		<relativePath>../pom.xml</relativePath>
+	</parent>
+
+	<groupId>org.mobicents.servlet.sip.arquillian.testsuite</groupId>
+	<artifactId>simple-tc7</artifactId>
+	<version>1.8.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>simple-tc7</name>
+
+	<modules>
+		<module>MultiHomeUACTest-tc7</module>
+		<module>MultiHomeUASTest-tc7</module>
+		<module>ShootistTelURLSipServletTest-tc7</module>
+		<module>ShootmeSipServletTestTcp-tc7</module>
+		<module>ShootmeTelURLSipServletTest-tc7</module>
+		<module>ShootmeSipServletTest-tc7</module>
+		<module>ShootistSipServletTest-tc7</module>
+	</modules>
+
+</project>

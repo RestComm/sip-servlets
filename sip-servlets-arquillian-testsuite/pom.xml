@@ -23,8 +23,15 @@
 
 	<developers>
 		<developer>
+			<id>george.vagenas</id>
 			<name>George Vagenas</name>
-			<email>gvagenas@gmail.com</email>
+			<email>george.vagenas@telestax.com</email>
+			<organization>TeleStax, Inc</organization>
+			<organizationUrl>http://www.telestax.com/</organizationUrl>
+			<roles>
+				<role>SIP Testing Project Lead</role>
+			</roles>
+			<timezone>+1</timezone>
 		</developer>
 	</developers>
 
@@ -32,13 +39,13 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<version.arquillian_core>1.0.0.Final</version.arquillian_core>
-		<!-- <version.arquillian_core>1.0.0.Final-SNAPSHOT</version.arquillian_core> -->
 		<version.shrinkwrap_tomcat>1.0.0</version.shrinkwrap_tomcat>
 
 		<version.jboss_spec>1.0.0.Final</version.jboss_spec>
 		<version.weld_servlet>1.1.2.Final</version.weld_servlet>
 		<version.ctf.core>1.0.0-SNAPSHOT</version.ctf.core>
 		<version.org.apache.tomcat>6.0.33</version.org.apache.tomcat>
+		<version.org.apache.tomcat-7>7.0.27</version.org.apache.tomcat-7>
 
 		<!-- override from parent -->
 		<version.release.plugin>2.1</version.release.plugin>
@@ -47,6 +54,8 @@
 
 		<!-- Mobicents -->
 		<version.org.mobicents.servlet.sip>1.8.0-SNAPSHOT</version.org.mobicents.servlet.sip>
+		<version.mss.arquillian>1.0.0-SNAPSHOT</version.mss.arquillian>
+		<version.sipunit>1.0.0-SNAPSHOT</version.sipunit>
 		<version.mobicents.jain.sip.ext>1.0</version.mobicents.jain.sip.ext>
 		<version.mobicents.jain.sip.jboss4>1.2.0.FINAL</version.mobicents.jain.sip.jboss4>
 
@@ -57,6 +66,7 @@
 
 	<modules>
 		<module>simple</module>
+		<module>simple-tc7</module>
 		<module>click2call</module>
 	</modules>
 
@@ -78,6 +88,7 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
+			
 			<dependency>
 				<groupId>org.jboss.arquillian</groupId>
 				<artifactId>arquillian-build</artifactId>
@@ -85,32 +96,14 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-
-			<!-- <dependency> <groupId>org.jboss.arquillian.container</groupId> <artifactId>arquillian-container-spi</artifactId> 
-				<version>1.0.0.CR5</version> </dependency> <dependency> <groupId>org.jboss.arquillian.container</groupId> 
-				<artifactId>arquillian-container-test-spi</artifactId> <version>1.0.0.CR5</version> 
-				</dependency> -->
-			<!-- <dependency> <groupId>org.jboss.shrinkwrap.container</groupId> <artifactId>shrinkwrap-container-tomcat-60</artifactId> 
-				<version>${version.shrinkwrap_tomcat}</version> </dependency> -->
+			
 			<dependency>
 				<groupId>org.jboss.weld.servlet</groupId>
 				<artifactId>weld-servlet</artifactId>
 				<version>${version.weld_servlet}</version>
 				<scope>test</scope>
 			</dependency>
-			<!-- <dependency> <groupId>org.jboss.arquillian.protocol</groupId> <artifactId>arquillian-protocol-servlet</artifactId> 
-				<version>1.0.0.CR5</version> </dependency> <dependency> <groupId>org.jboss.arquillian.testenricher</groupId> 
-				<artifactId>arquillian-testenricher-cdi</artifactId> <version>1.0.0.CR5</version> 
-				</dependency> <dependency> <groupId>org.jboss.arquillian.testenricher</groupId> 
-				<artifactId>arquillian-testenricher-resource</artifactId> <version>1.0.0.CR5</version> 
-				</dependency> <dependency> <groupId>org.jboss.arquillian.testenricher</groupId> 
-				<artifactId>arquillian-testenricher-initialcontext</artifactId> <version>1.0.0.CR5</version> 
-				</dependency> <dependency> <groupId>org.jboss.arquillian.junit</groupId> 
-				<artifactId>arquillian-junit-container</artifactId> <version>1.0.0.CR5</version> 
-				<scope>test</scope> </dependency> <dependency> <groupId>junit</groupId> <artifactId>junit</artifactId> 
-				<version>4.8.1</version> <scope>test</scope> </dependency> <dependency> <groupId>org.jboss.shrinkwrap.resolver</groupId> 
-				<artifactId>shrinkwrap-resolver-impl-maven</artifactId> <version>1.0.0-beta-5</version> 
-				<scope>test</scope> </dependency> -->
+			
 			<dependency>
 				<groupId>org.mobicents.servlet.sip.ctf.core</groupId>
 				<artifactId>ctf-core</artifactId>
@@ -170,7 +163,21 @@
 
 			<dependency>
 				<groupId>org.mobicents.servlet.sip.containers</groupId>
+				<artifactId>sip-servlets-catalina-7</artifactId>
+				<version>${version.org.mobicents.servlet.sip}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mobicents.servlet.sip.containers</groupId>
 				<artifactId>sip-servlets-tomcat-jboss4</artifactId>
+				<version>${version.org.mobicents.servlet.sip}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mobicents.servlet.sip.containers</groupId>
+				<artifactId>sip-servlets-tomcat-7</artifactId>
 				<version>${version.org.mobicents.servlet.sip}</version>
 				<scope>provided</scope>
 			</dependency>
