@@ -96,12 +96,14 @@ public class Click2CallBasicTest extends SipTestCase
 	String EXPIRATION_TIME_PARAMS = "?expirationTime";
 	String CLICK2DIAL_PARAMS = "?from=sip:from@127.0.0.1:5056&to=sip:to@127.0.0.1:5057";
 	
-	private static SipStackTool sipStackTool;
+	private static SipStackTool sipStackToolA;
+	private static SipStackTool sipStackToolB;
 	private String testArchive = "simple";
 
 	@BeforeClass
 	public static void beforeClass(){
-		sipStackTool = new SipStackTool("Click2Call");
+		sipStackToolA = new SipStackTool("Click2CallA");
+		sipStackToolB = new SipStackTool("Click2CallB");
 	}
 
 
@@ -109,9 +111,9 @@ public class Click2CallBasicTest extends SipTestCase
 	public void setUp() throws Exception
 	{
 		log.info("Creating sipStackA");
-		sipStackA = sipStackTool.initializeSipStack(SipStack.PROTOCOL_UDP, "127.0.0.1", myPortA, "127.0.0.1:"+proxyPort);
+		sipStackA = sipStackToolA.initializeSipStack(SipStack.PROTOCOL_UDP, "127.0.0.1", myPortA, "127.0.0.1:"+proxyPort);
 		log.info("Creating sipStackB");
-		sipStackB = sipStackTool.initializeSipStack(SipStack.PROTOCOL_UDP, "127.0.0.1", myPortB, "127.0.0.1:"+proxyPort);
+		sipStackB = sipStackToolB.initializeSipStack(SipStack.PROTOCOL_UDP, "127.0.0.1", myPortB, "127.0.0.1:"+proxyPort);
 		
 		log.info("About to start creating sipPhones");
 		ua = sipStackA.createSipPhone("localhost",SipStack.PROTOCOL_UDP,Integer.valueOf(proxyPort), "sip:to@127.0.0.1");

@@ -1,0 +1,30 @@
+<sip-app xmlns="http://www.jcp.org/xml/ns/sipservlet" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.jcp.org/xml/ns/sipservlet http://www.jcp.org/xml/ns/sipservlet/sip-app_1_1.xsd"
+	xmlns:javaee="http://java.sun.com/xml/ns/javaee" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	version="1.1">
+
+	<app-name>org.mobicents.servlet.sip.testsuite.ShootistApplication
+	</app-name>
+	<display-name>Shootist Sip Servlet</display-name>
+	<description>Shootist Sip Servlet</description>
+
+<!--  
+	<listener>
+		<listener-class>org.mobicents.servlet.sip.ctf.core.environment.servlet.SipServletsListener</listener-class>
+	</listener>
+ -->
+ 	
+<!--  
+	<listener>
+		<listener-class>org.mobicents.servlet.sip.arq.testsuite.simple.ShootistSipServlet</listener-class>
+	</listener>
+ -->
+	<!-- <main-servlet> ShootistSipServlet </main-servlet> -->
+	
+
+	<!-- <servlet> <servlet-name>ShootistSipServlet</servlet-name> <display-name>ShootistSipServlet</display-name> 
+		<description>Shootist SIP servlet</description> <servlet-class> org.mobicents.servlet.sip.testsuite.ShootistSipServlet 
+		</servlet-class> <load-on-startup>1</load-on-startup> </servlet> <listener> 
+		<listener-class> org.mobicents.servlet.sip.testsuite.ShootistSipServlet </listener-class> 
+		</listener> -->
+</sip-app>
