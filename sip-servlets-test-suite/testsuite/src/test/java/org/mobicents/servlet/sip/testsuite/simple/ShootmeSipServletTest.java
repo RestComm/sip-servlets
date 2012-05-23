@@ -354,9 +354,9 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		Request request = sender.createSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Remote-Party-ID", "Remote-Party-ID2", "Remote-Party-ID3", "Remote-Party-ID4", "Remote-Party-ID5"}, new String[] {"\"KATE SMITH\"<sip:4162375543@47.135.223.88;user=phone>; party=calling; privacy=off; screen=yes", "sip:4162375543@47.135.223.88;user=phone; party=calling; privacy=off; screen=yes", "<sip:4162375543@47.135.223.88;user=phone>; party=calling; privacy=off; screen=yes", "\"KATE SMITH\"<sip:4162375543@47.135.223.88>; party=calling; privacy=off; screen=yes", "<sip:4162375543@47.135.223.88>; party=calling; privacy=off; screen=yes"}, toAddress);		
 		
-		//request.setHeader(sender.protocolObjects.headerFactory.createHeader("Contact", "<sip:1.2.3.4:5061>;expires=500;+sip.instance=\"<urn:uuid:00000000-0000-0000-0000-000000000000>\";gruu=\"sip:100@ocs14.com;opaque=user:epid:xxxxxxxxxxxxxxxxxxxxxxxx;gruu\""));
+		request.setHeader(sender.protocolObjects.headerFactory.createHeader("Contact", "<sip:1.2.3.4:5061>;expires=500;+sip.instance=\"<urn:uuid:00000000-0000-0000-0000-000000000000>\";gruu=\"sip:100@ocs14.com;opaque=user:epid:xxxxxxxxxxxxxxxxxxxxxxxx;gruu\""));
 		
-		request.setHeader(sender.protocolObjects.headerFactory.createHeader("Contact", "sip:4162375543@47.135.223.88"));
+		//request.setHeader(sender.protocolObjects.headerFactory.createHeader("Contact", "sip:4162375543@47.135.223.88"));
 		sender.sendRequet(request);
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());
