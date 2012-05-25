@@ -247,7 +247,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				}
 				timerService = new FaultTolerantTimerServiceImpl((DistributableSipManager)getSipManager());
 			} else {
-				timerService = new TimerServiceImpl();
+				timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService());
 			}
 		}
 		if(proxyTimerService == null) {

@@ -1,9 +1,4 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation; either version 2.1 of
@@ -19,7 +14,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.core.timers;
 
 import java.io.Serializable;
@@ -32,6 +26,7 @@ import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.TimerListener;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.core.SipService;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 
 public class TimerServiceImpl implements SipServletTimerService {
@@ -44,8 +39,28 @@ public class TimerServiceImpl implements SipServletTimerService {
 	
 	private transient ScheduledThreadPoolExecutor scheduledExecutor;
 	
-	public TimerServiceImpl() {		
-		scheduledExecutor = new ScheduledThreadPoolExecutor(SCHEDULER_THREAD_POOL_DEFAULT_SIZE);;
+	public TimerServiceImpl(SipService sipService) {		
+		scheduledExecutor = new ScheduledThreadPoolExecutor(SCHEDULER_THREAD_POOL_DEFAULT_SIZE);
+		int purgePeriod = sipService.getCanceledTimerTasksPurgePeriod();
+		if(purgePeriod > 0) {
+			Runnable r = new Runnable() {			
+				public void run() {
+					try {
+						if(logger.isDebugEnabled()) {
+							logger.debug("Purging canceled timer tasks...");
+						}
+						scheduledExecutor.purge();
+						if(logger.isDebugEnabled()) {
+							logger.debug("Purging canceled timer tasks completed.");
+						}						
+					}
+					catch (Exception e) {
+						logger.error("failed to execute purge",e);
+					}
+				}
+			};
+			scheduledExecutor.scheduleWithFixedDelay(r, purgePeriod, purgePeriod, TimeUnit.MINUTES);
+		}
 	}
 	
 	/*

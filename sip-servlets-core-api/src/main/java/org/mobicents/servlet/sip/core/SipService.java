@@ -62,6 +62,7 @@ public interface SipService {
 	public String getJvmRoute();
 	public String getOutboundProxy();
 	public int getDispatcherThreadPoolSize();
+	public int getCanceledTimerTasksPurgePeriod();
 	public SipConnector[] findSipConnectors();
 	public boolean isDialogPendingRequestChecking();
 	public boolean isMd5ContactUserPart();

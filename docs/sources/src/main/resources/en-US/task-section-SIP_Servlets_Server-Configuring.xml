@@ -143,7 +143,8 @@ ipAddress="127.0.0.1"
  darConfigurationFileLocation="file:///home/user/workspaces/sip-servlets/
  sip-servlets-examples/reinvite-demo/reinvite-dar.properties"
  sipStackPropertiesFile="conf/mss-sip-stack.properties"
- dialogPendingRequestChecking="false">]]>
+ dialogPendingRequestChecking="false"
+ canceledTimerTasksPurgePeriod="1">]]>
  </programlisting>
     </example>
     <variablelist>
@@ -292,7 +293,13 @@ ipAddress="127.0.0.1"
           <para>Specifies the <classname>gov.nist.core.net.AddressResolver</classname> implementation class that will be used by the container to perform DNS lookups. The default class used by the container is <classname>org.mobicents.servlet.sip.core.DNSAddressResolver</classname>, but any class implementing the <classname>gov.nist.core.net.AddressResolver</classname> NIST SIP Stack interface and having a constructor with a <classname>org.mobicents.servlet.sip.core.SipApplicationDispatcher</classname> parameter can be used. To disable DNS lookups, this attribute should be left empty.</para>
           <para>This attribute has been deprecated in favor of <literal>dnsServerLocatorClass</literal> attribute which provides better compliance with RFC 3263 : Location SIP Servers and ENUM support</para>
         </listitem>
-      </varlistentry>      
+      </varlistentry> 
+      <varlistentry>
+        <term>canceledTimerTasksPurgePeriod</term>
+        <listitem>
+          <para>Defines a period to due a purge in the container timer schedulers. The purge may prevent excessive memory usage for apps that cancel most of the timers it sets.</para>
+        </listitem>
+      </varlistentry>       
     </variablelist>
   </section>
   <section id="bsssc-binary-SIP_Servlets_Server-Configuring_Logging">
