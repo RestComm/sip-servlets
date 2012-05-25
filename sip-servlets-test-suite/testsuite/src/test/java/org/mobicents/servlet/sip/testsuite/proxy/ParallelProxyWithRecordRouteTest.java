@@ -22,7 +22,11 @@
 
 package org.mobicents.servlet.sip.testsuite.proxy;
 
+import java.util.ListIterator;
+
 import javax.sip.ListeningPoint;
+import javax.sip.header.RecordRouteHeader;
+import javax.sip.header.RouteHeader;
 
 import org.mobicents.servlet.sip.SipServletTestCase;
 
@@ -37,7 +41,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 	protected Cutme cutme;
 
 	private static final int TIMEOUT = 15000;
-	private static final int TIMEOUT_READY_TO_INVALIDTE = 70000;
+	private static final int TIMEOUT_READY_TO_INVALIDATE = 70000;
 
 	public ParallelProxyWithRecordRouteTest(String name) {
 		super(name);
@@ -114,7 +118,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 		for (int q = 0; q < 20; q++) {
 			if (shootist.ended == false && cutme.canceled == false)
 				try {
-					Thread.sleep(TIMEOUT_READY_TO_INVALIDTE);
+					Thread.sleep(TIMEOUT_READY_TO_INVALIDATE);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -134,7 +138,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 		for (int q = 0; q < 20; q++) {
 			if (shootist.ended == false && cutme.canceled == false)
 				try {
-					Thread.sleep(TIMEOUT_READY_TO_INVALIDTE);
+					Thread.sleep(TIMEOUT_READY_TO_INVALIDATE);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -144,6 +148,33 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 		if (cutme.canceled == false)
 			fail("The party that was supposed to be cancelled didn't cancel.");
 		assertNotNull(shootist.getLastMessageContent());	
+		assertEquals("sessionReadyToInvalidate", shootist.getLastMessageContent());
+	}
+	
+	// Non regression test for http://code.google.com/p/sipservlets/issues/detail?id=81
+	public void testProxyRecordRoutePushRouteTCP() {
+		this.shootme.init(STACK_NAME, "tcp");
+		this.cutme.init("tcp");
+		this.shootist.init("unique-location-urn-route-uri1",false, "tcp");
+		for (int q = 0; q < 20; q++) {
+			if (shootist.ended == false && cutme.canceled == false)
+				try {
+					Thread.sleep(TIMEOUT);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+		}
+		if (shootist.ended == false)
+			fail("Conversation not complete!");
+		//proxied to unique location so no cancel from cutme
+		if (cutme.canceled == true)
+			fail("The party that was supposed to be cancelled didn't cancel.");
+		assertNotNull(shootist.getLastMessageContent());
+		ListIterator<RecordRouteHeader> recordRouteHeaders = shootme.getInviteRequest().getHeaders(RecordRouteHeader.NAME);
+		assertTrue(recordRouteHeaders.hasNext());
+		recordRouteHeaders.next();
+		//make sure we only have 1 RR Header
+		assertFalse(recordRouteHeaders.hasNext());
 		assertEquals("sessionReadyToInvalidate", shootist.getLastMessageContent());
 	}
 	

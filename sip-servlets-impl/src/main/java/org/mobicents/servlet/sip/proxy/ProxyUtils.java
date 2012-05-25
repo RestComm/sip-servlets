@@ -80,11 +80,11 @@ public class ProxyUtils {
 
 			RouteHeader rHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
 			if(rHeader != null) {
+				outboundTransport = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getTransportParam();
 				String nextApp = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME);
 				if(nextApp != null) {
 					final MobicentsSipApplicationSessionKey sipAppKey = originalRequest.getSipSession().getSipApplicationSession().getKey();
-					final String thisApp = sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());
-					outboundTransport = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getTransportParam();
+					final String thisApp = sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());					
 					if(outboundTransport == null) {
 						outboundTransport = ListeningPoint.UDP;
 					}

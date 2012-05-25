@@ -229,7 +229,11 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			if(from.contains("route")) {
 				request.pushRoute((SipURI)uri1);
 			}
-			proxy.proxyTo(request.getRequestURI());
+			if(from.contains("uri1")) {
+				proxy.proxyTo(uri1);
+			} else {
+				proxy.proxyTo(request.getRequestURI());
+			}
 			return;
 		}
 		

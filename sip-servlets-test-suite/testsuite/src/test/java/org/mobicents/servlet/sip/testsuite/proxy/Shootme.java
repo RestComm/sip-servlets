@@ -532,4 +532,18 @@ public class Shootme implements SipListener {
 	public long getTimeToWaitBeforeAnswer() {
 		return timeToWaitBeforeAnswer;
 	}
+
+	/**
+	 * @return the inviteRequest
+	 */
+	public Request getInviteRequest() {
+		return inviteRequest;
+	}
+
+	/**
+	 * @param inviteRequest the inviteRequest to set
+	 */
+	public void setInviteRequest(Request inviteRequest) {
+		this.inviteRequest = inviteRequest;
+	}
 }
