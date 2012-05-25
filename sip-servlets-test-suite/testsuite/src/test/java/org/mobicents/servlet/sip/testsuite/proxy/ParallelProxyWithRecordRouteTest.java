@@ -26,7 +26,6 @@ import java.util.ListIterator;
 
 import javax.sip.ListeningPoint;
 import javax.sip.header.RecordRouteHeader;
-import javax.sip.header.RouteHeader;
 
 import org.mobicents.servlet.sip.SipServletTestCase;
 

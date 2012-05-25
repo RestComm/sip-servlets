@@ -25,6 +25,7 @@ package org.mobicents.servlet.sip.testsuite.proxy;
 import gov.nist.javax.sip.message.MessageExt;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -100,6 +101,45 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());
 		assertTrue(sender.getOkToByeReceived());		
+	}
+	
+	// Test for http://code.google.com/p/sipservlets/issues/detail?id=44
+	public void testProxyReinviteAckSeenByApp() throws Exception {
+		setupPhones(ListeningPoint.UDP);
+		String fromName = "unique-location-ack-seen-by-app";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "proxy-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(receiver.isAckReceived());
+		// non regression test for Issue http://code.google.com/p/mobicents/issues/detail?id=2359	
+		String inviteBranch = ((MessageExt)receiver.getInviteRequest()).getTopmostViaHeader().getBranch();
+		String ackBranch = ((MessageExt)receiver.getAckRequest()).getTopmostViaHeader().getBranch();
+		assertFalse(inviteBranch.equals(ackBranch));
+		receiver.setAckReceived(false);
+		sender.setAckSent(false);
+		receiver.setFinalResponseToSend(491);
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);		
+		Thread.sleep(TIMEOUT);			
+		sender.sendBye();
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());
+		assertTrue(sender.getOkToByeReceived());
+		
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		assertFalse(sender.getAllMessagesContent().contains("ack-seen-by-app"));
 	}
 	
 	public void testProxyCalleeSendBye() throws Exception {

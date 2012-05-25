@@ -369,6 +369,8 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 	@Override
 	protected void doAck(SipServletRequest request) throws ServletException,
 			IOException {
+		logger.info("Got request:\n" + request);
+		
 		SipURI fromURI = ((SipURI)request.getFrom().getURI());
 		String from = fromURI.toString();
 		if(request.getFrom().toString().contains("proxy-orphan")) {
@@ -381,6 +383,11 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			URI uri1 = sipFactory.createAddress("sip:receiver@" + host + ":5057").getURI();
 			request.pushRoute((SipURI)uri1);			
 		}
+		
+		if(from.contains("unique-location-ack-seen-by-app") && request.getHeader("CSeq").contains("2")) {
+			sendMessage("ack-seen-by-app", 5080, "udp");
+		}
+		
 		if(from.contains(TEST_TERMINATION)) {
 			timerService.createTimer(request.getApplicationSession(), 10000, false, (Serializable) request);
 		}
