@@ -44,6 +44,7 @@ import javax.servlet.sip.Proxy;
 import javax.servlet.sip.ProxyBranch;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipServletRequest;
+import javax.servlet.sip.SipSession.State;
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 import javax.servlet.sip.ar.SipApplicationRoutingDirective;
@@ -548,8 +549,13 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 			} catch (Exception e) {
 				logger.error("A problem occured while proxying a response", e);
 			}
+			if(logger.isDebugEnabled())
+				logger.debug("SipSession state " + response.getSipSession().getState());
 			if(status == 200 &&
-				(Request.PRACK.equals(response.getMethod()) || Request.UPDATE.equals(response.getMethod()))) {
+				(Request.PRACK.equals(response.getMethod()) || Request.UPDATE.equals(response.getMethod()))
+				// Added for http://code.google.com/p/sipservlets/issues/detail?id=41
+				&& State.EARLY.equals(response.getSipSession().getState())) {
+				
 				updateTimer(true);
 			}
 			

@@ -453,7 +453,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		if(!ext.isRouteOrphanRequests()) { // not to break the orphan test
 			long delta = Math.abs(System.currentTimeMillis() - lastOKstamp);			
 			if(response.getStatus() == 200) {								
-				if(delta < 20) {					
+				if(delta < 20 & oldResp != null && response != null && oldResp.getCallId().equals(response.getCallId())) {					
 					fail = true;
 					throw new ServletException("Problem with double response delta=" + delta + "\n1:" + oldResp + "\n2:"
 							+ response);
@@ -490,7 +490,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 	@Override
 	protected void doBranchResponse(SipServletResponse resp)
 			throws ServletException, IOException {
-		logger.info("doBranchResponse callback was called.");		
+		logger.info("doBranchResponse callback was called " + resp);		
 		resp.getApplicationSession().setAttribute("branchResponseReceived", "true");		
 	}	
 	
@@ -544,7 +544,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 	public void onProxyBranchResponseTimeout(ResponseType responseType,
 			ProxyBranch proxyBranch) {
 		logger.info("onProxyBranchResponseTimeout callback was called. responseType = " + responseType + " , branch = " + proxyBranch + ", request " + proxyBranch.getRequest() + ", response " + proxyBranch.getResponse());
-		if(proxyBranch.getRequest() != null && proxyBranch.getRequest().getFrom().getURI().toString().contains("ResponseTimeout")) {
+		if(proxyBranch.getRequest() != null && (proxyBranch.getRequest().getFrom().getURI().toString().contains("ResponseTimeout") || proxyBranch.getRequest().getFrom().getURI().toString().contains("unique-location"))) {
 			sendMessage(responseType.toString(), 5080, "udp");
 		}
 	}
