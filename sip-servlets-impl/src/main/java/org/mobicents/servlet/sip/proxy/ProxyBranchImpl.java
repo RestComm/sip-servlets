@@ -800,7 +800,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		}
 		
 		if(logger.isDebugEnabled()) {
-			logger.debug("Getting new Client Tx for request " + clonedRequest);
+			logger.debug("Getting new Client Tx for request " + clonedRequest + "\n transport = " + transport);
 		}
 		// we mark them as accessed so that HA replication can occur		
 		sipSession.access();

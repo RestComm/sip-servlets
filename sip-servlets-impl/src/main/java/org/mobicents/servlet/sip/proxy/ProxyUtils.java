@@ -80,19 +80,25 @@ public class ProxyUtils {
 
 			RouteHeader rHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
 			if(rHeader != null) {
-				outboundTransport = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getTransportParam();
 				String nextApp = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME);
 				if(nextApp != null) {
 					final MobicentsSipApplicationSessionKey sipAppKey = originalRequest.getSipSession().getSipApplicationSession().getKey();
-					final String thisApp = sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());					
-					if(outboundTransport == null) {
-						outboundTransport = ListeningPoint.UDP;
-					}
+					final String thisApp = sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());
+					
 					if(nextApp.equals(thisApp)) {
 						clonedRequest.removeHeader(RouteHeader.NAME);
 					}
+					rHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
 				}
-			} else {
+				if(rHeader != null) {
+					outboundTransport = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getTransportParam();
+					if(outboundTransport == null) {
+						outboundTransport = ListeningPoint.UDP;
+					}
+				}
+				
+			}
+			if(outboundTransport == null) {
 				// Fix for Issue 2783 : Proxying to non-UDP transport is broken
 				if(clonedRequest.getRequestURI().isSipURI()) {
 					outboundTransport = ((javax.sip.address.SipURI)clonedRequest.getRequestURI()).getTransportParam();
@@ -108,9 +114,16 @@ public class ProxyUtils {
 			}
 			
 			if(outboundTransport == null) outboundTransport = ListeningPoint.UDP;
+
+			((MessageExt)clonedRequest).setApplicationData(outboundTransport);
 			
-			String inboundTransport = ((ViaHeader)clonedRequest.getHeader(Via.NAME)).getTransport();
+			Via via = ((Via)clonedRequest.getHeader(Via.NAME));
+			String inboundTransport = via.getTransport();
 			if(inboundTransport == null) inboundTransport = ListeningPoint.UDP;
+			
+			if(logger.isDebugEnabled()) {
+				logger.debug("Outbound transport = " + outboundTransport + " inbountTransport = " + inboundTransport);
+			}
 
 			/*
 			 * The outbound transport has nothing to do with outbound interface
@@ -211,11 +224,8 @@ public class ProxyUtils {
 			final MobicentsSipApplicationSessionKey sipAppKey = originalRequest.getSipSession().getSipApplicationSession().getKey();
 			final String appName = sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());
 			final SipServletRequestImpl proxyBranchMatchingRequest = (SipServletRequestImpl) proxyBranch.getMatchingRequest(originalRequest);
-			//Add via header
-			if(outboundTransport == null && destination != null) {
-				outboundTransport = destination.getParameter("transport");
-			}
 			
+			//Add via header
 			if(proxy.getOutboundInterface() == null) {
 				String branchId = null;
 				
@@ -259,10 +269,6 @@ public class ProxyUtils {
 
 			clonedRequest.addHeader(proxyBranch.viaHeader);		
 			
-			if(outboundTransport == null) outboundTransport = ListeningPoint.UDP;
-			
-			((MessageExt)clonedRequest).setApplicationData(outboundTransport);
-			
 			// Correction for misbehaving clients and unit testing
 			if(clonedRequest.getHeader(RouteHeader.NAME) == null) {
 				if(clonedRequest.getRequestURI().isSipURI()) {
@@ -298,9 +304,9 @@ public class ProxyUtils {
 					inboundRURI.setLrParam();
 
 					final Address rraddress = SipFactoryImpl.addressFactory
-						.createAddress(null, inboundRURI);
+					.createAddress(null, inboundRURI);
 					final RecordRouteHeader recordRouteHeader = SipFactoryImpl.headerFactory
-						.createRecordRouteHeader(rraddress);
+					.createRecordRouteHeader(rraddress);
 
 					clonedRequest.addFirst(recordRouteHeader);
 				}
