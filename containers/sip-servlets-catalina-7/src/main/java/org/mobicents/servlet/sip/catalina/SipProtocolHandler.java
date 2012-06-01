@@ -551,6 +551,15 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 		this.sipStackProperties = sipStackProperties;
 	}
     
+	public boolean isReplaceStaticServerAddressForInternalRoutingRequest() {
+		return sipConnector.isReplaceStaticServerAddressForInternalRoutingRequest();
+	}
+	
+	public void setReplaceStaticServerAddressForInternalRoutingRequest(
+			boolean value) {
+		sipConnector.setReplaceStaticServerAddressForInternalRoutingRequest(value);
+	}
+	
     /**
 	 * @param sipConnector the sipConnector to set
 	 */

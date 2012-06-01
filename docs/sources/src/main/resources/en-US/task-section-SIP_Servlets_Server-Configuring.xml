@@ -38,7 +38,8 @@ ipAddress="127.0.0.1"
  staticServerAddress="122.122.122.122" 
  staticServerPort="44"
  useStaticAddress="true"
- httpFollowsSip="false"/>]]></programlisting>
+ httpFollowsSip="false"
+ replaceStaticServerAddressForInternalRoutingRequest="false"/>]]></programlisting>
     </example>
     <variablelist>
       <title>SIP &lt;connector&gt; Attributes</title>
@@ -111,6 +112,12 @@ ipAddress="127.0.0.1"
           <para>
           When the HTTP Load Balancer sends HTTP requests that are not associated with the application session, the application server will force the HTTP request to be repeated until it lands on the correct node.
           </para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+		<term>replaceStaticServerAddressForInternalRoutingRequest</term>
+        <listitem>
+          <para>Optional property that by default has true value. If value is false then the Sip Servlets container will not replace addresses in Route headers, or in the Request URI, that points to the static server addresss, before proxying requests.</para>
         </listitem>
       </varlistentry>
     </variablelist>
