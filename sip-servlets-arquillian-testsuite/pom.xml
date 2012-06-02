@@ -60,8 +60,8 @@
 		<version.mobicents.jain.sip.jboss4>1.2.0.FINAL</version.mobicents.jain.sip.jboss4>
 
 		<!-- Jain SIP -->
-		<jain-sip-api.version>1.2</jain-sip-api.version>
-		<jain-sip-ri.version>1.2.X-SNAPSHOT</jain-sip-ri.version>
+		<jain-sip-api.version>1.2.1</jain-sip-api.version>
+		<jain-sip-ri.version>1.2.169</jain-sip-ri.version>
 	</properties>
 
 	<modules>
