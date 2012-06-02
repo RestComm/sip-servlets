@@ -22,6 +22,9 @@
 
 package org.mobicents.servlet.sip.arquillian.testsuite.simple;
 
+import gov.nist.javax.sip.header.HeaderFactoryExt;
+import gov.nist.javax.sip.header.ims.PrivacyHeader;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
@@ -50,6 +53,7 @@ import javax.servlet.sip.TimerListener;
 import javax.servlet.sip.TimerService;
 import javax.servlet.sip.URI;
 import javax.sip.ListeningPoint;
+import javax.sip.header.AllowEventsHeader;
 
 import org.apache.log4j.Logger;
 import org.mobicents.javax.servlet.sip.SipSessionExt;
@@ -363,6 +367,19 @@ public class ShootistSipServlet
 				}
 			} else {
 				sipServletRequest =	sipFactory.createRequest(sipApplicationSession, method, sipFactory.createAddress(fromURI, "from display"), sipFactory.createAddress(toURI,"to display"));
+				
+				String testPrivacy = ce.getServletContext().getInitParameter("testPrivacy");
+				if(testPrivacy != null){
+					String privacyHeaderValue = "user;critical;id";
+					sipServletRequest.addHeader(PrivacyHeader.NAME, privacyHeaderValue);
+				}
+				
+				String testAllowEvents = ce.getServletContext().getInitParameter("testAllowEvents");
+				if(testAllowEvents != null){
+					String allowEventsHeaderValue = "refer,conference";
+					sipServletRequest.addHeader(AllowEventsHeader.NAME, allowEventsHeaderValue);
+				}
+				
 			}
 			
 			String authHeader = ce.getServletContext().getInitParameter("auth-header");
@@ -464,6 +481,7 @@ public class ShootistSipServlet
 				sipServletRequest.getInitialRemotePort();
 				sipServletRequest.getInitialTransport();
 			}
+			
 			try {
 				sipServletRequest.send();
 			} catch (IOException e) {

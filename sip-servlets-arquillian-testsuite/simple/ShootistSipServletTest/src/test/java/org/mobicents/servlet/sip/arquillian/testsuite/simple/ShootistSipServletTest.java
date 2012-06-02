@@ -3,17 +3,23 @@
  */
 package org.mobicents.servlet.sip.arquillian.testsuite.simple;
 
+import gov.nist.javax.sip.header.SIPHeader;
+import gov.nist.javax.sip.header.ims.PrivacyHeader;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Logger;
 
+import javax.servlet.sip.SipServletRequest;
 import javax.sip.ListeningPoint;
 import javax.sip.RequestEvent;
 import javax.sip.address.Address;
 import javax.sip.address.SipURI;
+import javax.sip.header.AllowEventsHeader;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.Header;
@@ -1027,4 +1033,64 @@ public class ShootistSipServletTest extends SipTestCase
 		assertTrue(sipCall.waitForDisconnect(TIMEOUT));
 		sipCall.respondToDisconnect();	
 	}
+	
+	//Forum: https://groups.google.com/forum/?fromgroups#!topic/mobicents-public/H0EOg2fRJLk
+	@Test @ContextParam(name="testPrivacy", value="true")
+	public void testPrivacyHeader() throws Exception {
+
+		logger.info("About to deploy the application");
+		deployer.deploy(testArchive);
+
+		assertTrue(sipCall.waitForIncomingCall(TIMEOUT));
+		SipRequest request = sipCall.getLastReceivedRequest();
+		assertTrue(request.isInvite());
+		
+		assertTrue(sipCall.sendIncomingCallResponse(Response.TRYING,"Trying", TIMEOUT));
+		assertTrue(sipCall.sendIncomingCallResponse(Response.RINGING,"RINGING",TIMEOUT));	
+		assertTrue(sipCall.sendIncomingCallResponse(Response.OK, "OK", TIMEOUT));
+		
+		ListIterator privacyHeaderList = request.getMessage().getHeaders(PrivacyHeader.NAME);
+		StringBuilder value = new StringBuilder();
+		while (privacyHeaderList.hasNext()){
+			value.append(((SIPHeader)privacyHeaderList.next()).getHeaderValue());
+			if (privacyHeaderList.hasNext())
+				value.append(';');
+		}
+		assertEquals("user;critical;id", value.toString());
+		
+		sipCall.listenForDisconnect();
+		assertTrue(sipCall.waitForDisconnect(TIMEOUT));
+		sipCall.respondToDisconnect();	
+	}
+	
+	//Issue: http://code.google.com/p/mobicents/issues/detail?id=3142
+	@Test @ContextParam(name="testAllowEvents", value="true")
+	public void testAllowEventsHeader() throws Exception {
+
+		logger.info("About to deploy the application");
+		deployer.deploy(testArchive);
+
+		assertTrue(sipCall.waitForIncomingCall(TIMEOUT));
+		SipRequest request = sipCall.getLastReceivedRequest();
+		assertTrue(request.isInvite());
+		
+		assertTrue(sipCall.sendIncomingCallResponse(Response.TRYING,"Trying", TIMEOUT));
+		assertTrue(sipCall.sendIncomingCallResponse(Response.RINGING,"RINGING",TIMEOUT));	
+		assertTrue(sipCall.sendIncomingCallResponse(Response.OK, "OK", TIMEOUT));
+		
+//		String allowEventsHeaderValues = (SipServletRequest) 
+		ListIterator allowEventsHeaderList = request.getMessage().getHeaders(AllowEventsHeader.NAME);
+		StringBuilder value = new StringBuilder();
+		while (allowEventsHeaderList.hasNext()){
+			value.append(((SIPHeader)allowEventsHeaderList.next()).getHeaderValue());
+			if (allowEventsHeaderList.hasNext())
+				value.append(',');
+		}
+		assertEquals("refer,conference", value.toString());
+		
+		sipCall.listenForDisconnect();
+		assertTrue(sipCall.waitForDisconnect(TIMEOUT));
+		sipCall.respondToDisconnect();	
+	}
+	
 }
