@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<arquillian xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns="http://jboss.org/schema/arquillian"
+	xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
+	
+       <container qualifier="mss-tomcat-embedded-7" default="true"> <!--  mode="manual"> -->
+           <configuration>
+               <property name="tomcatHome">target/mss-tomcat-embedded-7</property>
+               <property name="workDir">work</property>
+               <property name="bindHttpPort">8888</property>
+               <property name="unpackArchive">true</property>
+               <property name="sipConnectors">:5070</property>
+<!--                <property name="sipApplicationRouterProviderClassName">org.jboss.arquillian.container.mobicents.servlet.sip.embedded_1.ar.DummyRouterProvider</property> -->
+               <property name="sipApplicationRouterProviderClassName">org.mobicents.servlet.sip.router.DefaultApplicationRouterProvider</property>
+           </configuration>
+       </container>
+</arquillian>

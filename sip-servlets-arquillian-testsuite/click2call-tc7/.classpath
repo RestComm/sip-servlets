@@ -4,7 +4,7 @@
   <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
   <classpathentry kind="output" path="target/classes"/>
   <classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar" sourcepath="M2_REPO/javax/activation/activation/1.1/activation-1.1-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/javax/enterprise/cdi-api/1.0/cdi-api-1.0.jar" sourcepath="M2_REPO/javax/enterprise/cdi-api/1.0/cdi-api-1.0-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/enterprise/cdi-api/1.0-SP4/cdi-api-1.0-SP4.jar" sourcepath="M2_REPO/javax/enterprise/cdi-api/1.0-SP4/cdi-api-1.0-SP4-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-api/1.2.1/jain-sip-api-1.2.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.169/jain-sip-ri-1.2.169.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/inject/javax.inject/1/javax.inject-1.jar" sourcepath="M2_REPO/javax/inject/javax.inject/1/javax.inject-1-sources.jar"/>
@@ -15,7 +15,6 @@
   <classpathentry kind="var" path="M2_REPO/org/sonatype/aether/aether-impl/1.8/aether-impl-1.8.jar" sourcepath="M2_REPO/org/sonatype/aether/aether-impl/1.8/aether-impl-1.8-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/sonatype/aether/aether-spi/1.8/aether-spi-1.8.jar" sourcepath="M2_REPO/org/sonatype/aether/aether-spi/1.8/aether-spi-1.8-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/sonatype/aether/aether-util/1.8/aether-util-1.8.jar" sourcepath="M2_REPO/org/sonatype/aether/aether-util/1.8/aether-util-1.8-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.33/annotations-api-6.0.33.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/arquillian/config/arquillian-config-api/1.0.0.Final/arquillian-config-api-1.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/arquillian/config/arquillian-config-api/1.0.0.Final/arquillian-config-api-1.0.0.Final-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/arquillian/config/arquillian-config-impl-base/1.0.0.Final/arquillian-config-impl-base-1.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/arquillian/config/arquillian-config-impl-base/1.0.0.Final/arquillian-config-impl-base-1.0.0.Final-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/arquillian/container/arquillian-container-impl-base/1.0.0.Final/arquillian-container-impl-base-1.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/arquillian/container/arquillian-container-impl-base/1.0.0.Final/arquillian-container-impl-base-1.0.0.Final-sources.jar"/>
@@ -31,21 +30,14 @@
   <classpathentry kind="var" path="M2_REPO/org/jboss/arquillian/test/arquillian-test-api/1.0.0.Final/arquillian-test-api-1.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/arquillian/test/arquillian-test-api/1.0.0.Final/arquillian-test-api-1.0.0.Final-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/arquillian/test/arquillian-test-impl-base/1.0.0.Final/arquillian-test-impl-base-1.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/arquillian/test/arquillian-test-impl-base/1.0.0.Final/arquillian-test-impl-base-1.0.0.Final-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/arquillian/test/arquillian-test-spi/1.0.0.Final/arquillian-test-spi-1.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/arquillian/test/arquillian-test-spi/1.0.0.Final/arquillian-test-spi-1.0.0.Final-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/catalina/6.0.33/catalina-6.0.33.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar" sourcepath="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging-api/1.1/commons-logging-api-1.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/coyote/6.0.33/coyote-6.0.33.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/ctf/core/ctf-core/1.0.0-SNAPSHOT/ctf-core-1.0.0-SNAPSHOT.jar" sourcepath="M2_REPO/org/mobicents/servlet/sip/ctf/core/ctf-core/1.0.0-SNAPSHOT/ctf-core-1.0.0-SNAPSHOT-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/dnsjava/dnsjava/2.1.1/dnsjava-2.1.1.jar" sourcepath="M2_REPO/dnsjava/dnsjava/2.1.1/dnsjava-2.1.1-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/dnsjava/dnsjava/2.0.6/dnsjava-2.0.6.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/eclipse/jdt/core/compiler/ecj/3.3.1/ecj-3.3.1.jar" sourcepath="M2_REPO/org/eclipse/jdt/core/compiler/ecj/3.3.1/ecj-3.3.1-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/el-api/6.0.33/el-api-6.0.33.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/eclipse/jdt/core/compiler/ecj/3.7/ecj-3.7.jar" sourcepath="M2_REPO/org/eclipse/jdt/core/compiler/ecj/3.7/ecj-3.7-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/geronimo-spec/geronimo-spec-j2ee-jacc/1.0-rc4/geronimo-spec-j2ee-jacc-1.0-rc4.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/google/collections/google-collections/1.0/google-collections-1.0.jar" sourcepath="M2_REPO/com/google/collections/google-collections/1.0/google-collections-1.0-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/jasper/6.0.33/jasper-6.0.33.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/jasper-el/6.0.33/jasper-el-6.0.33.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/jboss/interceptor/jboss-interceptor-api/1.1/jboss-interceptor-api-1.1.jar" sourcepath="M2_REPO/org/jboss/interceptor/jboss-interceptor-api/1.1/jboss-interceptor-api-1.1-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/jsp-api/6.0.33/jsp-api-6.0.33.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/juli/6.0.33/juli-6.0.33.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/jboss/spec/javax/interceptor/jboss-interceptors-api_1.1_spec/1.0.0.Beta1/jboss-interceptors-api_1.1_spec-1.0.0.Beta1.jar" sourcepath="M2_REPO/org/jboss/spec/javax/interceptor/jboss-interceptors-api_1.1_spec/1.0.0.Beta1/jboss-interceptors-api_1.1_spec-1.0.0.Beta1-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/junit/junit/4.8.1/junit-4.8.1.jar" sourcepath="M2_REPO/junit/junit/4.8.1/junit-4.8.1-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar" sourcepath="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/maven/maven-aether-provider/3.0.1/maven-aether-provider-3.0.1.jar" sourcepath="M2_REPO/org/apache/maven/maven-aether-provider/3.0.1/maven-aether-provider-3.0.1-sources.jar"/>
@@ -61,7 +53,7 @@
   <classpathentry kind="var" path="M2_REPO/org/jboss/arquillian/container/mss-arquillian-container-extension/1.0.0-SNAPSHOT/mss-arquillian-container-extension-1.0.0-SNAPSHOT.jar" sourcepath="M2_REPO/org/jboss/arquillian/container/mss-arquillian-container-extension/1.0.0-SNAPSHOT/mss-arquillian-container-extension-1.0.0-SNAPSHOT-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/arquillian/container/mss-arquillian-lifecycle-extension/1.0.0-SNAPSHOT/mss-arquillian-lifecycle-extension-1.0.0-SNAPSHOT.jar" sourcepath="M2_REPO/org/jboss/arquillian/container/mss-arquillian-lifecycle-extension/1.0.0-SNAPSHOT/mss-arquillian-lifecycle-extension-1.0.0-SNAPSHOT-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/arquillian/container/mss-arquillian-utilities-extension/1.0.0-SNAPSHOT/mss-arquillian-utilities-extension-1.0.0-SNAPSHOT.jar" sourcepath="M2_REPO/org/jboss/arquillian/container/mss-arquillian-utilities-extension/1.0.0-SNAPSHOT/mss-arquillian-utilities-extension-1.0.0-SNAPSHOT-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/jboss/arquillian/container/mss-tomcat-embedded-6/1.0.0-SNAPSHOT/mss-tomcat-embedded-6-1.0.0-SNAPSHOT.jar" sourcepath="M2_REPO/org/jboss/arquillian/container/mss-tomcat-embedded-6/1.0.0-SNAPSHOT/mss-tomcat-embedded-6-1.0.0-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/jboss/arquillian/container/mss-tomcat-embedded-7/1.0.0-SNAPSHOT/mss-tomcat-embedded-7-1.0.0-SNAPSHOT.jar" sourcepath="M2_REPO/org/jboss/arquillian/container/mss-tomcat-embedded-7/1.0.0-SNAPSHOT/mss-tomcat-embedded-7-1.0.0-SNAPSHOT-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/sonatype/plexus/plexus-cipher/1.4/plexus-cipher-1.4.jar" sourcepath="M2_REPO/org/sonatype/plexus/plexus-cipher/1.4/plexus-cipher-1.4-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/codehaus/plexus/plexus-classworlds/2.2.2/plexus-classworlds-2.2.2.jar" sourcepath="M2_REPO/org/codehaus/plexus/plexus-classworlds/2.2.2/plexus-classworlds-2.2.2-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/codehaus/plexus/plexus-component-annotations/1.5.5/plexus-component-annotations-1.5.5.jar" sourcepath="M2_REPO/org/codehaus/plexus/plexus-component-annotations/1.5.5/plexus-component-annotations-1.5.5-sources.jar"/>
@@ -69,9 +61,8 @@
   <classpathentry kind="var" path="M2_REPO/org/codehaus/plexus/plexus-interpolation/1.14/plexus-interpolation-1.14.jar" sourcepath="M2_REPO/org/codehaus/plexus/plexus-interpolation/1.14/plexus-interpolation-1.14-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/sonatype/plexus/plexus-sec-dispatcher/1.3/plexus-sec-dispatcher-1.3.jar" sourcepath="M2_REPO/org/sonatype/plexus/plexus-sec-dispatcher/1.3/plexus-sec-dispatcher-1.3-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/codehaus/plexus/plexus-utils/2.0.4/plexus-utils-2.0.4.jar" sourcepath="M2_REPO/org/codehaus/plexus/plexus-utils/2.0.4/plexus-utils-2.0.4-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/servlet-api/6.0.33/servlet-api-6.0.33.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/shrinkwrap/shrinkwrap-api/1.0.0/shrinkwrap-api-1.0.0.jar" sourcepath="M2_REPO/org/jboss/shrinkwrap/shrinkwrap-api/1.0.0/shrinkwrap-api-1.0.0-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/jboss/shrinkwrap/container/shrinkwrap-container-mobicents/1.0.0-SNAPSHOT/shrinkwrap-container-mobicents-1.0.0-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/jboss/shrinkwrap/container/shrinkwrap-container-mobicents-tomcat-7/1.0.0-SNAPSHOT/shrinkwrap-container-mobicents-tomcat-7-1.0.0-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/shrinkwrap/descriptors/shrinkwrap-descriptors-api-base/2.0.0-alpha-2/shrinkwrap-descriptors-api-base-2.0.0-alpha-2.jar" sourcepath="M2_REPO/org/jboss/shrinkwrap/descriptors/shrinkwrap-descriptors-api-base/2.0.0-alpha-2/shrinkwrap-descriptors-api-base-2.0.0-alpha-2-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/shrinkwrap/descriptors/shrinkwrap-descriptors-spi/2.0.0-alpha-2/shrinkwrap-descriptors-spi-2.0.0-alpha-2.jar" sourcepath="M2_REPO/org/jboss/shrinkwrap/descriptors/shrinkwrap-descriptors-spi/2.0.0-alpha-2/shrinkwrap-descriptors-spi-2.0.0-alpha-2-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/shrinkwrap/shrinkwrap-impl-base/1.0.0/shrinkwrap-impl-base-1.0.0.jar" sourcepath="M2_REPO/org/jboss/shrinkwrap/shrinkwrap-impl-base/1.0.0/shrinkwrap-impl-base-1.0.0-sources.jar"/>
@@ -81,19 +72,30 @@
   <classpathentry kind="var" path="M2_REPO/org/jboss/shrinkwrap/shrinkwrap-spi/1.0.0/shrinkwrap-spi-1.0.0.jar" sourcepath="M2_REPO/org/jboss/shrinkwrap/shrinkwrap-spi/1.0.0/shrinkwrap-spi-1.0.0-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-annotations/1.8.0-SNAPSHOT/sip-servlets-annotations-1.8.0-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-application-router/1.8.0-SNAPSHOT/sip-servlets-application-router-1.8.0-SNAPSHOT.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/containers/sip-servlets-catalina/1.8.0-SNAPSHOT/sip-servlets-catalina-1.8.0-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/containers/sip-servlets-catalina-7/1.8.0-SNAPSHOT/sip-servlets-catalina-7-1.8.0-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-client/1.8.0-SNAPSHOT/sip-servlets-client-1.8.0-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-core-api/1.8.0-SNAPSHOT/sip-servlets-core-api-1.8.0-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-impl/1.8.0-SNAPSHOT/sip-servlets-impl-1.8.0-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-jruby/1.8.0-SNAPSHOT/sip-servlets-jruby-1.8.0-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.8.0-SNAPSHOT/sip-servlets-spec-1.8.0-SNAPSHOT.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/containers/sip-servlets-tomcat-jboss4/1.8.0-SNAPSHOT/sip-servlets-tomcat-jboss4-1.8.0-SNAPSHOT.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/containers/sip-servlets-tomcat-7/1.8.0-SNAPSHOT/sip-servlets-tomcat-7-1.8.0-SNAPSHOT.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/cafesip/sipunit/sipunit/1.0.0-SNAPSHOT/sipunit-1.0.0-SNAPSHOT.jar" sourcepath="M2_REPO/org/cafesip/sipunit/sipunit/1.0.0-SNAPSHOT/sipunit-1.0.0-SNAPSHOT-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.27/tomcat-annotations-api-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.27/tomcat-annotations-api-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.27/tomcat-api-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-api/7.0.27/tomcat-api-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.27/tomcat-catalina-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.27/tomcat-catalina-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.27/tomcat-coyote-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.27/tomcat-coyote-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-el-api/7.0.27/tomcat-el-api-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-el-api/7.0.27/tomcat-el-api-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-jasper/7.0.27/tomcat-jasper-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-jasper/7.0.27/tomcat-jasper-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-jasper-el/7.0.27/tomcat-jasper-el-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-jasper-el/7.0.27/tomcat-jasper-el-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-jsp-api/7.0.27/tomcat-jsp-api-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-jsp-api/7.0.27/tomcat-jsp-api-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.27/tomcat-juli-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.27/tomcat-juli-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.27/tomcat-servlet-api-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.27/tomcat-servlet-api-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-tribes/7.0.27/tomcat-tribes-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-tribes/7.0.27/tomcat-tribes-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.27/tomcat-util-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-util/7.0.27/tomcat-util-7.0.27-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/maven/wagon/wagon-file/1.0-beta-7/wagon-file-1.0-beta-7.jar" sourcepath="M2_REPO/org/apache/maven/wagon/wagon-file/1.0-beta-7/wagon-file-1.0-beta-7-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/maven/wagon/wagon-http-lightweight/1.0-beta-7/wagon-http-lightweight-1.0-beta-7.jar" sourcepath="M2_REPO/org/apache/maven/wagon/wagon-http-lightweight/1.0-beta-7/wagon-http-lightweight-1.0-beta-7-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/maven/wagon/wagon-http-shared/1.0-beta-7/wagon-http-shared-1.0-beta-7.jar" sourcepath="M2_REPO/org/apache/maven/wagon/wagon-http-shared/1.0-beta-7/wagon-http-shared-1.0-beta-7-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/maven/wagon/wagon-provider-api/1.0-beta-7/wagon-provider-api-1.0-beta-7.jar" sourcepath="M2_REPO/org/apache/maven/wagon/wagon-provider-api/1.0-beta-7/wagon-provider-api-1.0-beta-7-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/jboss/weld/servlet/weld-servlet/1.1.2.Final/weld-servlet-1.1.2.Final.jar" sourcepath="M2_REPO/org/jboss/weld/servlet/weld-servlet/1.1.2.Final/weld-servlet-1.1.2.Final-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/xbean/xbean-reflect/3.4/xbean-reflect-3.4.jar" sourcepath="M2_REPO/org/apache/xbean/xbean-reflect/3.4/xbean-reflect-3.4-sources.jar"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 </classpath>

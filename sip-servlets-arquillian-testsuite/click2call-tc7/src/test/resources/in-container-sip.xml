@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>ClickToCall</app-name>
+	<display-name>Click2Dial Sip Servlet</display-name>
+	<description>Click2Dial Sip Servlet</description>
+	
+	<servlet-selection>
+		<main-servlet>
+			Click2DialSipServlet
+		</main-servlet>
+	</servlet-selection>
+
+	<servlet>
+		<servlet-name>Click2DialSipServlet</servlet-name>
+		<display-name>Click2DialSipServlet</display-name>
+		<description>Click2Dial SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.arquillian.testsuite.click2call.Click2DialSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<listener>
+		<listener-class>
+			org.mobicents.servlet.sip.arquillian.testsuite.click2call.Click2DialSipServlet
+		</listener-class>
+	</listener>
+</sip-app>
