@@ -356,7 +356,11 @@ public class SimpleSipServlet
 				sipServletResponse.send();
 				return;
 			}
-		}				
+		}			
+		
+		if(fromString.contains("gruuContact")) {
+			request.getParameterableHeader("Contact").getParameter("f");
+		}
 		
 		if(fromString.contains("RemotePartyId")) {
 			Address remotePID = request.getAddressHeader("Remote-Party-ID");

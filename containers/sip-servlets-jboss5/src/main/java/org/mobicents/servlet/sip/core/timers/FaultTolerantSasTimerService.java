@@ -141,7 +141,7 @@ public class FaultTolerantSasTimerService implements ClusteredSipApplicationSess
 	private FaultTolerantScheduler getScheduler() {
 		if(scheduledExecutor == null) {
 			TimerTaskFactory timerTaskFactory = new SipApplicationSessionTaskFactory(this.sipManager);
-			scheduledExecutor = new FaultTolerantScheduler(NAME + ((SipContext)sipManager.getContainer()).getApplicationNameHashed(), corePoolSize, this.sipManager.getMobicentsCluster(), (byte) 0, this.sipManager.getMobicentsCluster().getMobicentsCache().getJBossCache().getConfiguration().getRuntimeConfig().getTransactionManager(), timerTaskFactory);
+			scheduledExecutor = new FaultTolerantScheduler(NAME + ((SipContext)sipManager.getContainer()).getApplicationNameHashed(), corePoolSize, this.sipManager.getMobicentsCluster(), (byte) 0, this.sipManager.getMobicentsCluster().getMobicentsCache().getJBossCache().getConfiguration().getRuntimeConfig().getTransactionManager(), timerTaskFactory, ((SipContext)sipManager.getContainer()).getSipApplicationDispatcher().getSipService().getCanceledTimerTasksPurgePeriod());
 		}
 		return scheduledExecutor;
 	}

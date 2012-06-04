@@ -975,7 +975,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 					uriToResolve = resolveSipOutbound(uriToResolve);
 				}
 
-				if(session.getTransport() != null && uriToResolve.isSipURI() && ((javax.sip.address.SipURI)uriToResolve).getTransportParam() == null &&
+				if(session.getProxy() == null && session.getTransport() != null && uriToResolve.isSipURI() && ((javax.sip.address.SipURI)uriToResolve).getTransportParam() == null &&
 						// no need to modify the Request URI for UDP which is the default transport
 						!session.getTransport().equalsIgnoreCase(ListeningPoint.UDP)) {					
 					try {

@@ -154,6 +154,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		Response response = sender.getFinalResponse();
 		assertNull(response.getHeader(ContactHeader.NAME));
 	}
+	
 	/*
 	 * Non regression test for Issue 2522 http://code.google.com/p/mobicents/issues/detail?id=2522
 	 * Cloned URI is not modifiable
@@ -336,6 +337,27 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Remote-Party-ID", "Remote-Party-ID2", "Remote-Party-ID3", "Remote-Party-ID4", "Remote-Party-ID5"}, new String[] {"\"KATE SMITH\"<sip:4162375543@47.135.223.88;user=phone>; party=calling; privacy=off; screen=yes", "sip:4162375543@47.135.223.88;user=phone; party=calling; privacy=off; screen=yes", "<sip:4162375543@47.135.223.88;user=phone>; party=calling; privacy=off; screen=yes", "\"KATE SMITH\"<sip:4162375543@47.135.223.88>; party=calling; privacy=off; screen=yes", "<sip:4162375543@47.135.223.88>; party=calling; privacy=off; screen=yes"}, true);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());		
+	}
+	
+	public void testGRUUContactHeader() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "gruuContact";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		Request request = sender.createSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Remote-Party-ID", "Remote-Party-ID2", "Remote-Party-ID3", "Remote-Party-ID4", "Remote-Party-ID5"}, new String[] {"\"KATE SMITH\"<sip:4162375543@47.135.223.88;user=phone>; party=calling; privacy=off; screen=yes", "sip:4162375543@47.135.223.88;user=phone; party=calling; privacy=off; screen=yes", "<sip:4162375543@47.135.223.88;user=phone>; party=calling; privacy=off; screen=yes", "\"KATE SMITH\"<sip:4162375543@47.135.223.88>; party=calling; privacy=off; screen=yes", "<sip:4162375543@47.135.223.88>; party=calling; privacy=off; screen=yes"}, toAddress);		
+		
+		request.setHeader(sender.protocolObjects.headerFactory.createHeader("Contact", "<sip:1.2.3.4:5061>;expires=500;+sip.instance=\"<urn:uuid:00000000-0000-0000-0000-000000000000>\";gruu=\"sip:100@ocs14.com;opaque=user:epid:xxxxxxxxxxxxxxxxxxxxxxxx;gruu\""));
+		
+		//request.setHeader(sender.protocolObjects.headerFactory.createHeader("Contact", "sip:4162375543@47.135.223.88"));
+		sender.sendRequet(request);
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());		

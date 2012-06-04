@@ -1696,6 +1696,16 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	public void setTransport(String transport) {
 		this.transport = transport;
 	}
+	
+	protected static int countChars(String string, char c) {
+		int count = 0;
+		for(int w=0; w<string.length(); w++) {
+			if(string.charAt(w) == c) {
+				count ++;
+			}
+		}
+		return count;
+	}
 
 	protected static Parameterable createParameterable(Header header, String hName, boolean isRequest)
 			throws ServletParseException {
@@ -1724,30 +1734,78 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		if(stringHeader.trim().indexOf("<") == 0) {
 			
 			stringHeader = stringHeader.substring(1);
-			if(stringHeader.indexOf(">") != -1) {
+			int indexOfBracket = stringHeader.indexOf(">");
+			if(indexOfBracket != -1) {
 				hasLaRaQuotes = true;
 			}
-			String[] split = stringHeader.split(">");
-			value = split[0];			
+			//String[] split = stringHeader.split(">");
 			
-			if (split.length > 1 && split[1].contains(";")) {
-				// repleace first ";" with ""
-				split[1] = split[1].replaceFirst(";", "");
-				split = split[1].split(";");
-	
-				for (String pair : split) {
-					String[] vals = pair.split("=");
-					if (vals.length > 2) {
-						logger
-								.error("Wrong parameter format, expected value and name, got ["
-										+ pair + "]");
-						throw new ServletParseException(
-								"Wrong parameter format, expected value or name["
-										+ pair + "]");
+			value = stringHeader.substring(0, indexOfBracket);//split[0];	
+			String restOfHeader = stringHeader.substring(indexOfBracket+1) ;
+			
+			if (restOfHeader.length() > 1 && restOfHeader.contains(";")) {
+				// repleace first ";" with "" because it separates us from the URI that we romved
+				restOfHeader = restOfHeader.replaceFirst(";", "");
+				String[] split = restOfHeader.split(";");
+				
+				// Now concatenate the items that have quotes that represent nested parameters http://code.google.com/p/sipservlets/issues/detail?id=105
+				// example <sip:1.2.3.4:5061>;expires=500;+sip.instance="<urn:uuid:00000000-0000-0000-0000-000000000000>";gruu="sip:100@ocs14.com;opaque=user:epid:xxxxxxxxxxxxxxxxxxxxxxxx;gruu" 
+				ArrayList<StringBuffer> resplitListWithQuotes = new ArrayList<StringBuffer>(); // here we collect the items and append related entries that are part of the same quotation zone
+				int resplitIndex = 0;
+				boolean addToPrevious = false;
+				for(int q=0; q<split.length; q++) {
+					int countQuotes = countChars(split[q], '\"'); // how many " signs are there
+					if(countQuotes%2!=0) { // if not mod 2 then there is unclosed quote in that item
+						if(addToPrevious) { // if we alreay have seen one it means this quote is closing quote
+							resplitListWithQuotes.get(resplitIndex-1).append(";" + split[q]); // must reappend the ";" symbol because we lost it in the split
+							addToPrevious = false;
+						} else { // otherwise it's an opening quote
+							resplitListWithQuotes.add(new StringBuffer(split[q]));
+							resplitIndex++;
+							addToPrevious = true;
+						}
+					} else { // if mod 2 then there are no unclosed quotes in that item
+						if(addToPrevious) { // we will add any data 
+							resplitListWithQuotes.get(resplitIndex-1).append(";" + split[q]); // must reappend the ";" symbol because we lost it in the split
+						} else {
+							resplitListWithQuotes.add(new StringBuffer(split[q])); // this is the normal case without quotes to take care of
+							resplitIndex++;
+						}
 					}
+				}
+				
+				if(addToPrevious) {
+					// Lets warn if something is really that wrong
+					throw new RuntimeException("Unclosed quote sign in this string " + whole);
+				}
+				
+				// Change the split array now with the adjusted array
+				String[] newSplit = new String[resplitListWithQuotes.size()];
+				for(int q=0; q<resplitListWithQuotes.size(); q++) {
+					newSplit[q] = resplitListWithQuotes.get(q).toString();
+				}
+				split = newSplit;
+				
+				// And process with the usual algorithm
+				for (String pair : split) {
+					int indexOfEq = pair.indexOf('=');
+					String key = null;
+					String val = null;
+					if(indexOfEq<0) {
+						key = pair;
+						val = "";
+					} else {
+						key = pair.substring(0, indexOfEq);
+						if(indexOfEq+1>pair.length()) {
+							val = "";
+						} else {
+							val = pair.substring(indexOfEq+1);
+						}
+					}
+					
 					// Fix to Issue 1010 (http://code.google.com/p/mobicents/issues/detail?id=1010) : Unable to set flag parameter to parameterable header
 					// from Alexander Kozlov from Codeminders
-					paramMap.put(vals[0], vals.length == 2 ? vals[1] : "");
+					paramMap.put(key, val);
 				}
 			}
 		} else {

@@ -115,6 +115,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	private int backToNormalMemoryThreshold = 90;
 	protected String outboundProxy;
 	protected long congestionControlCheckingInterval = 30000;
+	private int canceledTimerTasksPurgePeriod = 0;
 	// base timer interval for jain sip tx 
 	private int baseTimerInterval = 500;
 	private int t2Interval = 4000;
@@ -908,6 +909,14 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 
 	public void setDispatcherThreadPoolSize(int dispatcherThreadPoolSize) {
 		this.dispatcherThreadPoolSize = dispatcherThreadPoolSize;
+	}
+	
+	public int getCanceledTimerTasksPurgePeriod() {
+		return canceledTimerTasksPurgePeriod;
+	}
+	
+	public void setCanceledTimerTasksPurgePeriod(int purgePeriod) {
+		this.canceledTimerTasksPurgePeriod = purgePeriod;
 	}
 
 

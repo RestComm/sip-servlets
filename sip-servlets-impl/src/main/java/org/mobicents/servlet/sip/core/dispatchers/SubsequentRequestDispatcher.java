@@ -487,7 +487,64 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 							sipSession.addSubscription(sipServletRequest);
 						}
 					}						
-							
+					
+					// Issue 1401 http://code.google.com/p/mobicents/issues/detail?id=1401
+					// JSR 289 Section 11.2.2 Receiving ACK : 
+					// "Applications are not notified of incoming ACKs for non-2xx final responses to INVITE."
+					boolean callServlet = true;
+					if(Request.ACK.equalsIgnoreCase(requestMethod)) {
+						final Set<Transaction> ongoingTransactions = sipSession.getOngoingTransactions();
+						// Issue 1837 http://code.google.com/p/mobicents/issues/detail?id=1837
+						// ACK was received by JAIN-SIP but was not routed to application
+						// we need to go through the set of all ongoing tx since and INFO request can be received before a reINVITE tx has been completed
+						if(ongoingTransactions != null) {
+							if(logger.isDebugEnabled()) {
+                                logger.debug("going through all Stx to check if we need to pass the ACK up to the application");
+                            }
+							for (Transaction transaction: ongoingTransactions) {
+								if(logger.isDebugEnabled()) {
+                                    logger.debug(" tx to check "+ transaction);
+                                }
+								if (transaction instanceof ServerTransaction && ((SIPTransaction)transaction).getMethod().equals(Request.INVITE)) {
+									if(logger.isDebugEnabled()) {
+	                                    logger.debug("Stx found "+ transaction.getBranchId() +" to check if we need to pass the ACK up to the application");
+	                                }
+									final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
+									if(tad != null) {
+										final SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
+										if(sipServletMessage != null && sipServletMessage instanceof SipServletRequestImpl && 
+												((MessageExt)request).getCSeqHeader().getSeqNumber() == ((MessageExt)sipServletMessage.getMessage()).getCSeqHeader().getSeqNumber()) {
+											SipServletRequestImpl correspondingInviteRequest = (SipServletRequestImpl)sipServletMessage;
+											final SipServletResponse lastFinalResponse = correspondingInviteRequest.getLastFinalResponse();
+											if(logger.isDebugEnabled()) {
+				                                logger.debug("last final response " + lastFinalResponse + " for original request " + correspondingInviteRequest);
+				                            }
+											
+										    if(lastFinalResponse != null && lastFinalResponse.getStatus() >= 300) {
+										    	callServlet = false;
+			    								if(logger.isDebugEnabled()) {
+			    									logger.debug("not calling the servlet since this is an ACK for a final error response");
+			    								}
+			    								break;
+										    }
+										    // Issue 1494 : http://code.google.com/p/mobicents/issues/detail?id=1494
+			                                // Only the first ACK makes it up to the application, in case the sip stack 
+										    // generates an error response the last final response will be null
+			                                // for the corresponding ACK and it should not be passed to the app
+										    if(lastFinalResponse == null) {
+			                                    if(logger.isDebugEnabled()) {
+			                                        logger.debug("not calling the servlet since this is an ACK for a null last final response, which means the ACK was for a sip stack generated error response");
+			                                    }
+			                                    callServlet = false;	
+			                                    break;
+										    }							 
+										}										
+									}
+								}
+							}
+						}							
+					}
+					
 					// See if the subsequent request should go directly to the proxy
 					final MobicentsProxy proxy = sipSession.getProxy();
 					if(proxy != null) {
@@ -505,9 +562,11 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 							checkRequestURIForNonCompliantAgents(finalBranch, request);							
 							proxy.setOriginalRequest(sipServletRequest);
 							// if(!isAckRetranmission) { // We should pass the ack retrans (implied by 10.2.4.1 Handling 2xx Responses to INVITE)
+							// emmartins: JSR 289 10.2.8 - ACKs for non-2xx final responses are just dropped 
+							if(callServlet) {
 								callServlet(sipServletRequest);
-
-							finalBranch.proxySubsequentRequest(sipServletRequest);
+								finalBranch.proxySubsequentRequest(sipServletRequest);
+							}
 						} else if(isPrack || isUpdate) {
 							callServlet(sipServletRequest);
 							final List<ProxyBranch> branches = proxy.getProxyBranches();
@@ -561,62 +620,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					}
 					// If it's not for a proxy then it's just an AR, so go to the next application
 					else {	
-						// Issue 1401 http://code.google.com/p/mobicents/issues/detail?id=1401
-						// JSR 289 Section 11.2.2 Receiving ACK : 
-						// "Applications are not notified of incoming ACKs for non-2xx final responses to INVITE."
-						boolean callServlet = true;
-						if(Request.ACK.equalsIgnoreCase(requestMethod)) {
-							final Set<Transaction> ongoingTransactions = sipSession.getOngoingTransactions();
-							// Issue 1837 http://code.google.com/p/mobicents/issues/detail?id=1837
-							// ACK was received by JAIN-SIP but was not routed to application
-							// we need to go through the set of all ongoing tx since and INFO request can be received before a reINVITE tx has been completed
-							if(ongoingTransactions != null) {
-								if(logger.isDebugEnabled()) {
-                                    logger.debug("going through all Stx to check if we need to pass the ACK up to the application");
-                                }
-								for (Transaction transaction: ongoingTransactions) {
-									if(logger.isDebugEnabled()) {
-	                                    logger.debug(" tx to check "+ transaction);
-	                                }
-									if (transaction instanceof ServerTransaction && ((SIPTransaction)transaction).getMethod().equals(Request.INVITE)) {
-										if(logger.isDebugEnabled()) {
-		                                    logger.debug("Stx found "+ transaction.getBranchId() +" to check if we need to pass the ACK up to the application");
-		                                }
-										final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
-										if(tad != null) {
-											final SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
-											if(sipServletMessage != null && sipServletMessage instanceof SipServletRequestImpl && 
-													((MessageExt)request).getCSeqHeader().getSeqNumber() == ((MessageExt)sipServletMessage.getMessage()).getCSeqHeader().getSeqNumber()) {
-												SipServletRequestImpl correspondingInviteRequest = (SipServletRequestImpl)sipServletMessage;
-												final SipServletResponse lastFinalResponse = correspondingInviteRequest.getLastFinalResponse();
-												if(logger.isDebugEnabled()) {
-					                                logger.debug("last final response " + lastFinalResponse + " for original request " + correspondingInviteRequest);
-					                            }
-												
-											    if(lastFinalResponse != null && lastFinalResponse.getStatus() >= 300) {
-											    	callServlet = false;
-				    								if(logger.isDebugEnabled()) {
-				    									logger.debug("not calling the servlet since this is an ACK for a final error response");
-				    								}
-				    								break;
-											    }
-											    // Issue 1494 : http://code.google.com/p/mobicents/issues/detail?id=1494
-				                                // Only the first ACK makes it up to the application, in case the sip stack 
-											    // generates an error response the last final response will be null
-				                                // for the corresponding ACK and it should not be passed to the app
-											    if(lastFinalResponse == null) {
-				                                    if(logger.isDebugEnabled()) {
-				                                        logger.debug("not calling the servlet since this is an ACK for a null last final response, which means the ACK was for a sip stack generated error response");
-				                                    }
-				                                    callServlet = false;	
-				                                    break;
-											    }							 
-											}										
-										}
-									}
-								}
-							}							
-						}
+						
 						// JSR 289 Section 6.2.1 :
 						// any state transition caused by the reception of a SIP message, 
 						// the state change must be accomplished by the container before calling 
