@@ -338,7 +338,14 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
             webappLoader.start();
             // Report this property change to interested listeners
             support.firePropertyChange("loader", null, webappLoader);
-        }        
+        } else {
+        	WebappLoader loader = (WebappLoader) getLoader();
+        	loader.setDelegate(getDelegate());
+        	setLoader(loader);
+        	loader.start();
+        	// Report this property change to interested listeners
+            support.firePropertyChange("loader", null, loader);
+        }
         
         //activating our custom naming context to be able to set the sip factory in JNDI
         if (isUseNaming()) {    

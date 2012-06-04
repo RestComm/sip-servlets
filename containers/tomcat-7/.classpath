@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src/main/java"/>
-	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
-	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/ant/ant-junit/1.7.0/ant-junit-1.7.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/ant/ant-launcher/1.7.0/ant-launcher-1.7.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/ant/ant/1.7.0/ant-1.7.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.26/tomcat-annotations-api-7.0.26.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.26/tomcat-catalina-7.0.26.jar" sourcepath="/M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.26/tomcat-catalina-7.0.26-sources.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.26/tomcat-coyote-7.0.26.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.26/tomcat-juli-7.0.26.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.26/tomcat-servlet-api-7.0.26.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.26/tomcat-api-7.0.26.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.26/tomcat-util-7.0.26.jar"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-impl"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-spec"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-annotations"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-client"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-jruby"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-core-api"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-catalina-7"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/mobicents-jain-sip-ext"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/jain-sip"/>
-	<classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-api/1.2.0/jain-sip-api-1.2.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.169/jain-sip-ri-1.2.169.jar"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="src" path="/sip-servlets-impl"/>
+  <classpathentry kind="src" path="/sip-servlets-spec"/>
+  <classpathentry kind="src" path="/sip-servlets-core-api"/>
+  <classpathentry kind="src" path="/sip-servlets-jruby"/>
+  <classpathentry kind="src" path="/sip-servlets-client"/>
+  <classpathentry kind="src" path="/sip-servlets-annotations"/>
+  <classpathentry kind="src" path="/sip-servlets-catalina-7"/>
+  <classpathentry kind="var" path="M2_REPO/org/mobicents/javax/sip/mobicents-jain-sip-ext/1.1/mobicents-jain-sip-ext-1.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar" sourcepath="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.27/tomcat-catalina-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.27/tomcat-catalina-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.27/tomcat-servlet-api-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.27/tomcat-servlet-api-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.27/tomcat-juli-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.27/tomcat-juli-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.27/tomcat-annotations-api-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.27/tomcat-annotations-api-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.27/tomcat-api-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-api/7.0.27/tomcat-api-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.27/tomcat-util-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-util/7.0.27/tomcat-util-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.27/tomcat-coyote-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.27/tomcat-coyote-7.0.27-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/geronimo-spec/geronimo-spec-j2ee-jacc/1.0-rc4/geronimo-spec-j2ee-jacc-1.0-rc4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar" sourcepath="M2_REPO/junit/junit/3.8.1/junit-3.8.1-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/javaee-web-api/6.0/javaee-web-api-6.0.jar"/>
 </classpath>
