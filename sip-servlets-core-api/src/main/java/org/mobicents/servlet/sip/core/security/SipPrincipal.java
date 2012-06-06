@@ -31,5 +31,5 @@ import java.security.Principal;
 public interface SipPrincipal extends Principal {
 
 	boolean isUserInRole(String role);
-
+	Principal getPrincipal();
 }

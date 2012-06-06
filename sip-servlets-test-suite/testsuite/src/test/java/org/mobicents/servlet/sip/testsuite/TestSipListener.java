@@ -341,6 +341,8 @@ public class TestSipListener implements SipListener {
 	private boolean addRecordRouteForResponses;
 
 	private RFC5626UseCase rfc5626UseCase;
+
+	private String securityUser = "user";
 	
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -1816,7 +1818,12 @@ public class TestSipListener implements SipListener {
 				URI uriReq = tid.getRequest().getRequestURI();
 				Request authrequest = this.processResponseAuthorization(
 						response, uriReq);
-		
+				
+				if(authrequest == null) {
+					System.out
+						.println("INVITE AUTHORIZATION null, stopping there");
+					return;
+				}
 				inviteClientTid.sendRequest();
 				System.out
 						.println("INVITE AUTHORIZATION sent:\n" + authrequest);
@@ -1864,6 +1871,10 @@ public class TestSipListener implements SipListener {
 				logger.error("Cannot increment the Cseq header to the new INVITE request",e);
 				throw new IllegalArgumentException("Cannot create the INVITE request",e);				
 			}
+			// non regression test for http://code.google.com/p/sipservlets/issues/detail?id=88
+			if(securityUser.equalsIgnoreCase("badUser") && cSeq.getSeqNumber() > 2) {
+				return null;
+			}
 			requestauth.setHeader(cSeq);
 			requestauth.removeHeader(ViaHeader.NAME);
 			// Create ViaHeaders
@@ -1895,7 +1906,7 @@ public class TestSipListener implements SipListener {
 					"", // TODO: What is this entity-body?
 					((WWWAuthenticate) (response
 							.getHeader(SIPHeaderNames.WWW_AUTHENTICATE))),
-					"user",
+					securityUser,
 					"pass",
 					((WWWAuthenticate) (response
 							.getHeader(SIPHeaderNames.WWW_AUTHENTICATE))).getNonce(),
@@ -3411,5 +3422,9 @@ public class TestSipListener implements SipListener {
 
 	public void setRFC5626UseCase(RFC5626UseCase rfc5626UseCase) {
 		this.rfc5626UseCase = rfc5626UseCase;
+	}
+
+	public void setSecurityUser(String securityUser) {
+		this.securityUser  = securityUser;
 	}
 }

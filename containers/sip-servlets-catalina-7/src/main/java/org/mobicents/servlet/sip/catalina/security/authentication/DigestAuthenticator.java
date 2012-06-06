@@ -168,7 +168,9 @@ public class DigestAuthenticator
         String authorization = request.getHeader("authorization");
         if (authorization != null) {
             principal = findPrincipal(request, authorization, context.getRealm());
-            if (principal != null) {
+            if (principal != null &&
+            		// fix for http://code.google.com/p/sipservlets/issues/detail?id=88
+            		principal.getPrincipal() != null) {
                 String username = parseUsername(authorization);
                 register(request, response, principal,
                          Constants.DIGEST_METHOD,

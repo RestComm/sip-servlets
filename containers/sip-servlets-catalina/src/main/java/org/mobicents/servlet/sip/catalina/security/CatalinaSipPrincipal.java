@@ -53,4 +53,9 @@ public class CatalinaSipPrincipal implements SipPrincipal {
 		return ((GenericPrincipal)principal).hasRole(role);
 	}
 
+	@Override
+	public Principal getPrincipal() {
+		return principal;
+	}
+
 }
