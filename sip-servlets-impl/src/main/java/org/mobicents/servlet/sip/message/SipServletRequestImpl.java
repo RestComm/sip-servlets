@@ -1307,11 +1307,12 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			// The second condition for SipExcpetion is to cover com.bea.sipservlet.tck.agents.spec.ProxyBranchTest.testCreatingBranchParallel() where they send a request twice, the second
 			// time it does a "Request already sent" jsip exception but the tx is going on and must not be destryed
 			boolean skipTxTermination = false;
-			if((ex instanceof IllegalTransactionStateException && ((IllegalTransactionStateException)ex).getReason().equals(Reason.RequestAlreadySent)) || !(getTransaction() instanceof ClientTransaction)) {
+			Transaction tx = getTransaction();
+			if((ex instanceof IllegalTransactionStateException && ((IllegalTransactionStateException)ex).getReason().equals(Reason.RequestAlreadySent)) || (tx != null && !(tx instanceof ClientTransaction))) {
 				skipTxTermination = true;
 			}
 			if(!skipTxTermination) {				
-				JainSipUtils.terminateTransaction(getTransaction());
+				JainSipUtils.terminateTransaction(tx);
 				// cleaning up the request to make sure it can be resent with some modifications in case of exception
 				if(transactionApplicationData.getHops() != null && transactionApplicationData.getHops().size() > 0) {
 					request.removeFirst(RouteHeader.NAME);
