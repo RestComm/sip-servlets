@@ -237,7 +237,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 	}
 	
 	public void testShootme491withRetrans() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
-		String fromName = "exceptionOnExpire";
+		String fromName = "normal";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);
@@ -262,6 +262,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
 		Thread.sleep(6000);
 		int current = sender.numberOf491s;
+		System.out.println("number of 491 " + current);
 		assertTrue(sender.numberOf491s>2);
 		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
 		Thread.sleep(1000);

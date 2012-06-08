@@ -328,6 +328,8 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					return;
 				} catch (IOException e) {
 					logger.error("Problem sending 491 response to " + sipServletRequest, e);
+				} finally {
+					sipContext.exitSipApp(sipApplicationSession, sipSession);
 				}
 			}
 			sipSession.setRequestsPending(sipSession.getRequestsPending() + 1);
