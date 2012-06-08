@@ -537,7 +537,7 @@
 									<tasks>
 										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/${node}/deploy/jbossweb.sar" />
 										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${JBOSS_HOME}/server/${node}/conf" />
-										<copy verbose="true" file="src/main/resources/org/mobicents/servlet/sip/loading/sip-app-1.1.xsd" todir="${env.JBOSS_HOME}/docs/schema" />
+										<copy verbose="true" file="src/main/resources/org/mobicents/servlet/sip/loading/sip-app-1.1.xsd" todir="${JBOSS_HOME}/docs/schema" />
 										<copy todir="${JBOSS_HOME}/docs/licenses">
 											<fileset file="LICENSES/*" />
 										</copy>
