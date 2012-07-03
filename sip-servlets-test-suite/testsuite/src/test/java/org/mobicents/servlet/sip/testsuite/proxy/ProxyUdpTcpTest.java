@@ -27,6 +27,8 @@ import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.UserAgentHeader;
+import javax.sip.message.Request;
+import javax.sip.header.Header;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -167,6 +169,55 @@ public class ProxyUdpTcpTest extends SipServletTestCase {
 		CallIdHeader receiverCallIdHeader = (CallIdHeader)sender.getInviteRequest().getHeader(CallIdHeader.NAME);
 		CallIdHeader senderCallIdHeader = (CallIdHeader)receiver.getInviteRequest().getHeader(CallIdHeader.NAME);		
 		assertEquals(receiverCallIdHeader.getCallId(),senderCallIdHeader.getCallId());
+	}
+	
+	public void testCallForwardingCalleeSendByeTCPSenderExtraRoutes() throws Exception {
+		
+		senderProtocolObjects = new ProtocolObjects("forward-udp-sender",
+				"gov.nist", TRANSPORT_TCP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
+		receiverProtocolObjects = new ProtocolObjects("forward-tcp-receiver",
+				"gov.nist", TRANSPORT_UDP, AUTODIALOG, null, listeningPointTransport, listeningPointTransport);
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);		
+		sender.setRecordRoutingProxyTesting(true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+//		receiver.setTransport(false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "proxy-udp";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		SipURI route = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, "127.0.0.1:5070");
+		
+		sender.extraRoute = true;
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, route, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getOkToByeReceived());
+		assertTrue(receiver.getByeReceived());
+		CallIdHeader receiverCallIdHeader = (CallIdHeader)sender.getInviteRequest().getHeader(CallIdHeader.NAME);
+		CallIdHeader senderCallIdHeader = (CallIdHeader)receiver.getInviteRequest().getHeader(CallIdHeader.NAME);		
+		assertEquals(receiverCallIdHeader.getCallId(),senderCallIdHeader.getCallId());
+		for(Request r : receiver.allRequests) {
+			if(r.getMethod().equalsIgnoreCase("ACK")) {
+				Header h = r.getHeader("Route");
+				if(h == null) fail("We expected extra Route header.");
+			}
+		}
 	}
 	
 	public void testUnspecifiedCallForwardingCalleeSendByeTCPSender() throws Exception {

@@ -118,6 +118,8 @@ public class TestSipListener implements SipListener {
 	
 	public int bindings;
 	
+	public boolean extraRoute = false;
+	
 	private boolean sendJoinMessage;
 	
 	private boolean sendReplacesMessage;
@@ -1640,7 +1642,11 @@ public class TestSipListener implements SipListener {
 					if(timeToWaitBeforeAck > 0) {
 						Thread.sleep(timeToWaitBeforeAck);
 					}
-					logger.info("Sending ACK " + ackRequest);					
+					logger.info("Sending ACK " + ackRequest);	
+					if(extraRoute) {
+						Header h = protocolObjects.headerFactory.createHeader("Route", ackRequest.getRequestURI().toString());
+						ackRequest.addLast(h);
+					}
 					if(!sendSubsequentRequestsThroughSipProvider) {
 						responseDialog.sendAck(ackRequest);
 					} else {
