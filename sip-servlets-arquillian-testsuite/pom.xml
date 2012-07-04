@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.jboss</groupId>
 		<artifactId>jboss-parent</artifactId>
-		<version>6-beta-2</version>
+		<version>9</version>
 		<relativePath />
 	</parent>
 
@@ -54,8 +54,8 @@
 
 		<!-- Mobicents -->
 		<version.org.mobicents.servlet.sip>1.8.0-SNAPSHOT</version.org.mobicents.servlet.sip>
-		<version.mss.arquillian>1.0.0-SNAPSHOT</version.mss.arquillian>
-		<version.sipunit>1.0.0-SNAPSHOT</version.sipunit>
+		<version.mss.arquillian>1.0.0-ALPHA1</version.mss.arquillian>
+		<version.sipunit>2.0.0</version.sipunit>
 		<version.mobicents.jain.sip.ext>1.0</version.mobicents.jain.sip.ext>
 		<version.mobicents.jain.sip.jboss4>1.2.0.FINAL</version.mobicents.jain.sip.jboss4>
 
@@ -68,6 +68,7 @@
 		<module>simple</module>
 		<module>simple-tc7</module>
 		<module>click2call</module>
+		<module>click2call-tc7</module>
 	</modules>
 
 	<dependencyManagement>
@@ -80,7 +81,27 @@
 				<scope>test</scope>
 			</dependency>
 
-			<!-- Arquiilian dependencies -->
+			<!-- Testing dependencies -->
+
+			<dependency>
+				<groupId>org.cafesip.sipunit</groupId>
+				<artifactId>sipunit</artifactId>
+				<version>${version.sipunit}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mobicents.arquillian.container</groupId>
+				<artifactId>mss-tomcat-embedded-6</artifactId>
+				<version>${version.mss.arquillian}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mobicents.arquillian.container</groupId>
+				<artifactId>mss-tomcat-embedded-7</artifactId>
+				<version>${version.mss.arquillian}</version>
+			</dependency>
+
 			<dependency>
 				<groupId>org.jboss.arquillian</groupId>
 				<artifactId>arquillian-bom</artifactId>
@@ -88,7 +109,7 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.jboss.arquillian</groupId>
 				<artifactId>arquillian-build</artifactId>
@@ -96,14 +117,14 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.jboss.weld.servlet</groupId>
 				<artifactId>weld-servlet</artifactId>
 				<version>${version.weld_servlet}</version>
 				<scope>test</scope>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>org.mobicents.servlet.sip.ctf.core</groupId>
 				<artifactId>ctf-core</artifactId>
@@ -216,6 +237,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.12</version>
 				<configuration>
+<!-- 				<reportsDirectory>${basedir}/reports</reportsDirectory> -->
 					<!-- <testFailureIgnore>true</testFailureIgnore> -->
 				</configuration>
 			</plugin>
@@ -229,6 +251,8 @@
 							<directory>${basedir}</directory>
 							<includes>
 								<include>logs/</include>
+								<include>*reports/</include>
+								<include>surefire/</include>
 							</includes>
 							<followSymlinks>false</followSymlinks>
 						</fileset>
@@ -249,6 +273,12 @@
 			<id>jboss-snapshots-repository</id>
 			<name>JBoss Snapshots repository</name>
 			<url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
+		</repository>
+
+		<repository>
+			<id>mobicents-releases-repository</id>
+			<name>Mobicents Releases Repository</name>
+			<url>https://oss.sonatype.org/content/repositories/releases/</url>
 		</repository>
 	</repositories>
 
