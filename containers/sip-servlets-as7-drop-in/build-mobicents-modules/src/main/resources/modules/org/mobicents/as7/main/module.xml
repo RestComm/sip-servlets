@@ -52,5 +52,8 @@
         <module name="javax.annotation.api"/>
         <module name="org.jboss.modules"/>
         <module name="org.jboss.as.naming"/>
+        <!-- mock clustering -->
+        <module name="org.jboss.as.clustering.web.spi" optional="true"/>
+        <module name="org.jboss.as.clustering.registry" optional="true"/>
     </dependencies>
 </module>

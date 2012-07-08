@@ -259,7 +259,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 				darConfigurationFileLocation = "file:///" + catalinaBase.replace(File.separatorChar, '/') + "/" + darConfigurationFileLocation;
 			}
 			System.setProperty("javax.servlet.sip.dar", darConfigurationFileLocation);
- 		}		
+ 		}
 		super.initialize();
 		sipApplicationDispatcher.setDomain(this.getName());
 		if(baseTimerInterval < 1) {

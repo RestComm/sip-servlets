@@ -31,22 +31,7 @@ enum Element {
     // must be first
     UNKNOWN(null),
 
-    ACCESS_LOG(Constants.ACCESS_LOG),
-    ALIAS(Constants.ALIAS),
-    CONDITION(Constants.CONDITION),
     CONNECTOR(Constants.CONNECTOR),
-    APPLICATION_ROUTER(Constants.APPLICATION_ROUTER),
-    CONTAINER_CONFIG(Constants.CONTAINER_CONFIG),
-    DIRECTORY(Constants.DIRECTORY),
-    JSP_CONFIGURATION(Constants.JSP_CONFIGURATION),
-    MIME_MAPPING(Constants.MIME_MAPPING),
-    REWRITE(Constants.REWRITE),
-    SSL(Constants.SSL),
-    SSO(Constants.SSO),
-    STATIC_RESOURCES(Constants.STATIC_RESOURCES),
-    SUBSYSTEM(Constants.SUBSYSTEM),
-    VIRTUAL_SERVER(Constants.VIRTUAL_SERVER),
-    WELCOME_FILE(Constants.WELCOME_FILE),
     ;
 
     private final String name;
