@@ -83,7 +83,7 @@
         <dependency>
             <groupId>org.jboss.as</groupId>
             <artifactId>jboss-as-web</artifactId>
-	    <version>7.1.1.Final</version>
+	    <version>7.1.2.Final</version>
         </dependency>
 
 	<dependency>
@@ -95,7 +95,7 @@
         <dependency>
             <groupId>org.jboss.web</groupId>
             <artifactId>jbossweb</artifactId>
-	    <version>7.0.10.Final</version>
+	    <version>7.0.16.Final</version>
         </dependency>
 
         <dependency>
@@ -204,7 +204,7 @@
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
-			<version>1.4</version>
+			<version>1.4.4</version>
 			<scope>provided</scope>
 		</dependency>
 		

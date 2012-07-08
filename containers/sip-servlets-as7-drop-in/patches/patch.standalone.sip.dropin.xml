@@ -1,5 +1,5 @@
---- standalone/configuration/standalone-sip.xml	2012-03-10 00:14:06.000000000 +0100
-+++ standalone/configuration/standalone-sip.xml	2012-04-15 11:54:27.744442914 +0200
+--- standalone/configuration/standalone-sip.xml	2012-07-08 09:57:27.000000000 +0200
++++ standalone/configuration/standalone-sip.xml	2012-07-08 11:52:39.400097715 +0200
 @@ -25,6 +25,7 @@
          <extension module="org.jboss.as.web"/>
          <extension module="org.jboss.as.webservices"/>
@@ -8,7 +8,7 @@
      </extensions>
      <management>
          <security-realms>
-@@ -260,6 +261,11 @@
+@@ -267,6 +268,11 @@
                  <alias name="example.com"/>
              </virtual-server>
          </subsystem>
@@ -20,7 +20,7 @@
          <subsystem xmlns="urn:jboss:domain:webservices:1.1">
              <modify-wsdl-address>true</modify-wsdl-address>
              <wsdl-host>${jboss.bind.address:127.0.0.1}</wsdl-host>
-@@ -295,6 +301,9 @@
+@@ -302,6 +308,9 @@
          <socket-binding name="ajp" port="8009"/>
          <socket-binding name="http" port="8080"/>
          <socket-binding name="https" port="8443"/>
@@ -30,7 +30,7 @@
          <socket-binding name="osgi-http" interface="management" port="8090"/>
          <socket-binding name="remoting" port="4447"/>
          <socket-binding name="txn-recovery-environment" port="4712"/>
-@@ -303,4 +312,4 @@
+@@ -310,4 +319,4 @@
              <remote-destination host="localhost" port="25"/>
          </outbound-socket-binding>
      </socket-binding-group>
