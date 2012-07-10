@@ -99,14 +99,12 @@
 		<dependency>
 			<groupId>org.cafesip.sipunit</groupId>
 			<artifactId>sipunit</artifactId>
-			<version>${version.sipunit}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>org.jboss.arquillian.container</groupId>
+			<groupId>org.mobicents.arquillian.container</groupId>
 			<artifactId>mss-tomcat-embedded-6</artifactId>
-			<version>${version.mss.arquillian}</version>
 		</dependency>
 
 		<dependency>
