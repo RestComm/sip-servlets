@@ -22,12 +22,11 @@
 
 package org.mobicents.as7;
 
-import java.util.Locale;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
+
 import org.jboss.as.controller.AbstractRemoveStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.PathAddress;
-import org.jboss.as.controller.descriptions.DescriptionProvider;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 import org.jboss.dmr.ModelNode;
 
 /**
@@ -35,7 +34,7 @@ import org.jboss.dmr.ModelNode;
  *
  * @author Emanuel Muckenhuber
  */
-class SipConnectorRemove extends AbstractRemoveStepHandler implements DescriptionProvider {
+class SipConnectorRemove extends AbstractRemoveStepHandler {
 
     static final SipConnectorRemove INSTANCE = new SipConnectorRemove();
 
@@ -53,8 +52,4 @@ class SipConnectorRemove extends AbstractRemoveStepHandler implements Descriptio
         // TODO:  RE-ADD SERVICES
     }
 
-    @Override
-    public ModelNode getModelDescription(Locale locale) {
-        return SipSubsystemDescriptions.getConnectorRemove(locale);
-    }
 }

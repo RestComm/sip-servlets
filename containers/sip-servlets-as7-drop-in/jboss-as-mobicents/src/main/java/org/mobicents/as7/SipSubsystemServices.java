@@ -11,18 +11,6 @@ import org.jboss.msc.service.ServiceName;
  * @author Brian Stansberry (c) 2011 Red Hat Inc.
  * @author Emanuel Muckenhuber
  */
-
-/*
-
-TODO: complete support for configuration parameters:
-
-sipPathName="org.mobicents.ha"
-sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-congestionControlCheckingInterval="-1"
-darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
-sipStackPropertiesFile="conf/mss-sip-stack.properties">
-
- */
 public final class SipSubsystemServices {
 
     /** The base name for jboss.sip services. */

@@ -37,6 +37,8 @@ import org.jboss.msc.value.InjectedValue;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.startup.SipProtocolHandler;
 
+import static org.mobicents.as7.SipMessages.MESSAGES;
+
 /**
  * Service creating and starting a web connector.
  *
@@ -68,7 +70,6 @@ class SipConnectorService implements Service<Connector> {
     private final InjectedValue<SipServer> server = new InjectedValue<SipServer>();
 
     public SipConnectorService(String protocol, String scheme, boolean useStaticAddress, String staticServerAddress, int staticServerPort, boolean useStun, String stunServerAddress, int stunServerPort) {
-        Logger.getLogger("org.mobicents.as7").info("SipConnectorService(), protocol = " + protocol + " - scheme = " + scheme);
         if (protocol != null)
             this.protocol = protocol;
         if (scheme != null)
@@ -133,7 +134,7 @@ class SipConnectorService implements Service<Connector> {
             connector.start();
             this.connector = connector;
         } catch (Exception e) {
-            throw new StartException(e);
+            throw new StartException(MESSAGES.connectorStartError(), e);
         }
         // Register the binding after the connector is started
         binding.getSocketBindings().getNamedRegistry().registerBinding(new ConnectorBinding(binding));
@@ -160,7 +161,7 @@ class SipConnectorService implements Service<Connector> {
     public synchronized Connector getValue() throws IllegalStateException {
         final Connector connector = this.connector;
         if (connector == null) {
-            throw new IllegalStateException();
+            throw MESSAGES.nullValue();
         }
         return connector;
     }

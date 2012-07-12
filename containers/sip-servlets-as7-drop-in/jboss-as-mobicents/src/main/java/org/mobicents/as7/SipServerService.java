@@ -14,18 +14,16 @@
  */
 package org.mobicents.as7;
 
-import static org.jboss.as.web.WebMessages.MESSAGES;
-import static org.mobicents.as7.Constants.VALUE;
+import static org.mobicents.as7.SipMessages.MESSAGES;
 
 import javax.management.MBeanServer;
-
-//import javax.management.MBeanServer;
 
 import org.apache.catalina.Host;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.core.StandardService;
 import org.apache.tomcat.util.modeler.Registry;
+import org.jboss.as.controller.services.path.PathManager;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -45,6 +43,8 @@ class SipServerService implements SipServer, Service<SipServer> {
 
     // FIXME: josemrecio - settle on using the proper name
     private static final String JBOSS_SIP = "jboss.sip";
+
+    private static final String TEMP_DIR = "jboss.server.temp.dir";
 
 //    private final String defaultHost;
 //    private final boolean useNative;
@@ -67,7 +67,7 @@ class SipServerService implements SipServer, Service<SipServer> {
     private SipStandardService sipService;
 
     private final InjectedValue<MBeanServer> mbeanServer = new InjectedValue<MBeanServer>();
-    private final InjectedValue<String> pathInjector = new InjectedValue<String>();
+    private final InjectedValue<PathManager> pathManagerInjector = new InjectedValue<PathManager>();
 
     public SipServerService(final String sipAppRouterFile, final String sipStackPropertiesFile, final String sipPathName, String sipAppDispatcherClass, int sipCongestionControlInterval, String sipConcurrencyControlMode, boolean usePrettyEncoding, String instanceId) {
 //        this.defaultHost = defaultHost;
@@ -92,7 +92,7 @@ class SipServerService implements SipServer, Service<SipServer> {
             }
         }
 
-        System.setProperty("catalina.home", pathInjector.getValue());
+        System.setProperty("catalina.home", pathManagerInjector.getValue().getPathEntry(TEMP_DIR).resolvePath());
         final StandardServer server = new StandardServer();
 
 //        final StandardService service = new StandardService();
@@ -170,7 +170,7 @@ class SipServerService implements SipServer, Service<SipServer> {
             server.init();
             server.start();
         } catch (Exception e) {
-            throw new StartException(MESSAGES.errorStartingWeb(), e);
+            throw new StartException(MESSAGES.errorStartingSip(), e);
         }
         this.server = server;
 //        this.service = service;
@@ -234,8 +234,8 @@ class SipServerService implements SipServer, Service<SipServer> {
         return mbeanServer;
     }
 
-    InjectedValue<String> getPathInjector() {
-        return pathInjector;
+    InjectedValue<PathManager> getPathManagerInjector() {
+        return pathManagerInjector;
     }
 
     public StandardServer getServer() {

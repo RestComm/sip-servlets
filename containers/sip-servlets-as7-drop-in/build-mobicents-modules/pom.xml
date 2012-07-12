@@ -48,7 +48,7 @@
         <generated.configs.src.dir>${basedir}/src/main/resources</generated.configs.src.dir>
         <!-- MSS -->
 	<jboss.as.release.version>7.1.2.Final</jboss.as.release.version>
-        <junit.version>4.1</junit.version>
+        <junit.version>4.10</junit.version>
 	<version.org.jboss.jandex>1.0.3.Final</version.org.jboss.jandex>
 	<version.rhino.js>1.7R2</version.rhino.js>
 	<version.org.apache.ant>1.8.2</version.org.apache.ant>
