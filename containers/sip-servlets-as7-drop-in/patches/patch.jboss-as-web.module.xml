@@ -6,6 +6,6 @@
 +        <!-- MSS -->
 +        <module name="org.mobicents.javax.servlet.sip" export="true"/>
 +        <module name="org.mobicents.dar" export="true"/>
-+        <module name="org.mobicents.libs" export="true"/>
++        <module name="org.mobicents.libs"/>
      </dependencies>
  </module>
