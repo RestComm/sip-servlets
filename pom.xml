@@ -16,7 +16,7 @@
 	<url>http://code.google.com/p/sipservlets/</url>
 
 	<ciManagement>
-		<system>Hudson</system>
+		<system>Jenkins</system>
 		<url>https://mobicents.ci.cloudbees.com/job/Mobicents-SipServlets-Testsuite/</url>
 	</ciManagement>
 
