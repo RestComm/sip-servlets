@@ -48,9 +48,9 @@ import javax.sip.address.SipURI;
 
 import org.apache.catalina.LifecycleException;
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.CongestionControlPolicy;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
-import org.mobicents.servlet.sip.core.CongestionControlPolicy;
 import org.mobicents.servlet.sip.core.session.SipStandardManager;
 import org.mobicents.servlet.sip.startup.SipContextConfig;
 import org.mobicents.servlet.sip.startup.SipStandardContext;

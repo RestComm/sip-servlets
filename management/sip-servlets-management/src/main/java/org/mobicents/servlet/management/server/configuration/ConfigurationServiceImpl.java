@@ -32,9 +32,9 @@ import javax.management.MBeanServerFactory;
 import javax.management.ObjectInstance;
 import javax.management.ObjectName;
 
+import org.mobicents.javax.servlet.CongestionControlPolicy;
 import org.mobicents.servlet.management.client.configuration.ConfigurationService;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
-import org.mobicents.servlet.sip.core.CongestionControlPolicy;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 

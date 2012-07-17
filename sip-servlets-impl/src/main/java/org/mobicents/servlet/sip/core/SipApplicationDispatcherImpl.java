@@ -100,6 +100,7 @@ import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingListener;
 import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.javax.servlet.CongestionControlEvent;
+import org.mobicents.javax.servlet.CongestionControlPolicy;
 import org.mobicents.javax.servlet.ContainerListener;
 import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;

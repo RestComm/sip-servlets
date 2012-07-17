@@ -18,7 +18,7 @@
 			
 		<attribute name="congestionControlPolicy"
 			description="Congestion control policy specifies if what should be done on server congestion"
-			type="org.mobicents.servlet.sip.core.CongestionControlPolicy" 
+			type="org.mobicents.javax.servlet.CongestionControlPolicy" 
 			writeable="false"/>
 			
 		<attribute name="congestionControlCheckingInterval"

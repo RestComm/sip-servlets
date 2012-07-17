@@ -38,6 +38,7 @@ import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 
 import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
+import org.mobicents.javax.servlet.CongestionControlPolicy;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.message.MobicentsSipServletRequest;
 
