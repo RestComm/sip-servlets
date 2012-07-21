@@ -1520,4 +1520,14 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
         super.setInstanceManager(instanceManager);
     }
 
+	// http://code.google.com/p/sipservlets/issues/detail?id=135
+	@Override
+	public void bindThreadBindingListener() {
+		super.getThreadBindingListener().bind();
+	}
+	@Override
+	public void unbindThreadBindingListener() {
+		super.getThreadBindingListener().unbind();
+	}
+
 }

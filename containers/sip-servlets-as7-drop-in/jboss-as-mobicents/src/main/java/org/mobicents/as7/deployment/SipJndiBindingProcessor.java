@@ -26,8 +26,7 @@ import org.jboss.as.ee.component.Attachments;
 import org.jboss.as.ee.component.BindingConfiguration;
 import org.jboss.as.ee.component.EEModuleDescription;
 import org.jboss.as.ee.component.deployers.EEResourceReferenceProcessorRegistry;
-import org.jboss.as.ee.structure.DeploymentType;
-import org.jboss.as.ee.structure.DeploymentTypeMarker;
+import org.jboss.as.server.deployment.AttachmentList;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
@@ -46,51 +45,61 @@ public class SipJndiBindingProcessor implements DeploymentUnitProcessor {
     static final String SIP_SESSIONS_UTIL_JNDI = "SipSessionsUtil";
     static final String SIP_TIMER_SERVICE_JNDI = "TimerService";
 
-
     @Override
     public void deploy(final DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
 
         final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
-        if (!DeploymentTypeMarker.isType(DeploymentType.EAR, deploymentUnit)) {
-            return;
-        }
+        final DeploymentUnit parentDU = deploymentUnit.getParent();
+
         // look for the sip application name to properly build the jndi name
         String sipApplicationName = null;
-        for (final DeploymentUnit subDeployment : deploymentUnit.getAttachment(org.jboss.as.server.deployment.Attachments.SUB_DEPLOYMENTS)) {
-            SipMetaData sipMetaData = subDeployment.getAttachment(SipMetaData.ATTACHMENT_KEY);
-            if (sipMetaData != null) {
-                sipApplicationName = sipMetaData.getApplicationName();
-                break;
-            }
+        SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
+        if (sipMetaData != null) {
+        	sipApplicationName = sipMetaData.getApplicationName();
+        }        	
+        else if (parentDU != null){
+            AttachmentList<DeploymentUnit> subDeploymentList = parentDU.getAttachment(org.jboss.as.server.deployment.Attachments.SUB_DEPLOYMENTS);
+            for (final DeploymentUnit subDeployment : subDeploymentList) {
+            	sipMetaData = subDeployment.getAttachment(SipMetaData.ATTACHMENT_KEY);
+            	if (sipMetaData != null) {
+            		sipApplicationName = sipMetaData.getApplicationName();
+            		break;
+            	}
+            }        	
         }
         if (sipApplicationName == null) {
-            // not a sip deployment
-            return;
+        	// not a sip deployment
+        	return;
         }
-        for (final DeploymentUnit subDeployment : deploymentUnit.getAttachment(org.jboss.as.server.deployment.Attachments.SUB_DEPLOYMENTS)) {
-            final EEResourceReferenceProcessorRegistry registry = subDeployment.getAttachment(Attachments.RESOURCE_REFERENCE_PROCESSOR_REGISTRY);
-            // Add a EEResourceReferenceProcessor which handles @Resource references with no mappedName
-            registry.registerResourceReferenceProcessor(new SipFactoryResourceProcessor(deploymentUnit));
-            registry.registerResourceReferenceProcessor(new SipSessionsUtilResourceProcessor(deploymentUnit));
-            registry.registerResourceReferenceProcessor(new SipTimerServiceResourceProcessor(deploymentUnit));
-
-            // Create binding between jndi path and injection source
-            final EEModuleDescription description = subDeployment.getAttachment(Attachments.EE_MODULE_DESCRIPTION);
-            if (description == null) {
-                continue;
-            }
-            for (String jndiBaseSip: JNDI_BASE_FOR_SIP) {
-                final String jndiBaseMapped = jndiBaseSip + SIP_PREFIX_JNDI + sipApplicationName + "/";
-                description.getBindingConfigurations().add(new BindingConfiguration(jndiBaseMapped + SIP_FACTORY_JNDI, new SipFactoryInjectionSource(deploymentUnit)));
-                description.getBindingConfigurations().add(new BindingConfiguration(jndiBaseMapped + SIP_SESSIONS_UTIL_JNDI, new SipSessionsUtilInjectionSource(deploymentUnit)));
-                description.getBindingConfigurations().add(new BindingConfiguration(jndiBaseMapped + SIP_TIMER_SERVICE_JNDI, new SipTimerServiceInjectionSource(deploymentUnit)));
-            }
-        }
+        // anchorDU will have a SIPWebContext.ATTACHMENT so jndi lookups can be resolved to context resources
+        final DeploymentUnit anchorDU = (parentDU == null)? deploymentUnit : parentDU;
+        setupSipJndiBindingsPerDeploymentUnit(anchorDU, deploymentUnit, sipApplicationName);
     }
 
     @Override
     public void undeploy(final DeploymentUnit context) {
+    	// TODO: do we need to explictly remove jndi bindings?
 
     }
 
+    private static void setupSipJndiBindingsPerDeploymentUnit(final DeploymentUnit anchorDU, final DeploymentUnit subDU, final String sipApplicationName) {
+		final EEResourceReferenceProcessorRegistry registry = subDU.getAttachment(Attachments.RESOURCE_REFERENCE_PROCESSOR_REGISTRY);
+		// Add a EEResourceReferenceProcessor which handles @Resource references with no mappedName
+		registry.registerResourceReferenceProcessor(new SipFactoryResourceProcessor(anchorDU));
+		registry.registerResourceReferenceProcessor(new SipSessionsUtilResourceProcessor(anchorDU));
+		registry.registerResourceReferenceProcessor(new SipTimerServiceResourceProcessor(anchorDU));
+
+		// Create binding between jndi path and injection source
+		final EEModuleDescription description = subDU.getAttachment(Attachments.EE_MODULE_DESCRIPTION);
+		if (description == null) {
+			return;
+		}
+		// Add bindings proper
+		for (String jndiBaseSip: JNDI_BASE_FOR_SIP) {
+			final String jndiBaseMapped = jndiBaseSip + SIP_PREFIX_JNDI + sipApplicationName + "/";
+			description.getBindingConfigurations().add(new BindingConfiguration(jndiBaseMapped + SIP_FACTORY_JNDI, new SipFactoryInjectionSource(anchorDU)));
+			description.getBindingConfigurations().add(new BindingConfiguration(jndiBaseMapped + SIP_SESSIONS_UTIL_JNDI, new SipSessionsUtilInjectionSource(anchorDU)));
+			description.getBindingConfigurations().add(new BindingConfiguration(jndiBaseMapped + SIP_TIMER_SERVICE_JNDI, new SipTimerServiceInjectionSource(anchorDU)));
+		}
+	}
 }
