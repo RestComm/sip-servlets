@@ -537,6 +537,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		        	final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();	
 		        	final ClassLoader cl = sipContext.getSipContextClassLoader();
 					Thread.currentThread().setContextClassLoader(cl);
+					// http://code.google.com/p/sipservlets/issues/detail?id=135
+					sipContext.bindThreadBindingListener();
 					try {	
 			            for (SipConnectorListener connectorListener : sipContext.getListeners().getSipConnectorListeners()) {
 			            	try {	
@@ -548,6 +550,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 							}
 			            }
 					} finally {				
+						// http://code.google.com/p/sipservlets/issues/detail?id=135
+						sipContext.unbindThreadBindingListener();
 						Thread.currentThread().setContextClassLoader(oldClassLoader);
 					}
 		        }
@@ -805,6 +809,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				try {				
 					final ClassLoader cl = sipContext.getSipContextClassLoader();
 					Thread.currentThread().setContextClassLoader(cl);
+					// http://code.google.com/p/sipservlets/issues/detail?id=135
+					sipContext.bindThreadBindingListener();
 											
 					try {				
 						if(triggered) {
@@ -815,7 +821,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					} catch (Throwable t) {
 						logger.error("ContainerListener threw exception", t);
 					}
-				} finally {				
+				} finally {
+					// http://code.google.com/p/sipservlets/issues/detail?id=135
+					sipContext.unbindThreadBindingListener();
 					Thread.currentThread().setContextClassLoader(oldClassLoader);
 				}
 			}
@@ -854,13 +862,17 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 							try {				
 								final ClassLoader cl = sipContext.getSipContextClassLoader();
 								Thread.currentThread().setContextClassLoader(cl);
+								// http://code.google.com/p/sipservlets/issues/detail?id=135
+								sipContext.bindThreadBindingListener();
 															
 								try {				
 									sipServletResponse = containerListener.onRequestThrottled(sipServletRequest, congestionControlEvent);
 								} catch (Throwable t) {
 									logger.error("ContainerListener threw exception", t);
 								}
-							} finally {				
+							} finally {		
+								// http://code.google.com/p/sipservlets/issues/detail?id=135
+								sipContext.unbindThreadBindingListener();
 								Thread.currentThread().setContextClassLoader(oldClassLoader);
 							}
 							
@@ -1065,6 +1077,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				try {
 					final ClassLoader cl = sipContext.getSipContextClassLoader();
 					Thread.currentThread().setContextClassLoader(cl);
+					// http://code.google.com/p/sipservlets/issues/detail?id=135
+					sipContext.bindThreadBindingListener();
 					final SipManager sipManager = sipContext.getSipManager();					
 					final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 							sipSessionKey.getApplicationName(), 
@@ -1143,6 +1157,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					}
 
 				} finally {
+					// http://code.google.com/p/sipservlets/issues/detail?id=135
+					sipContext.unbindThreadBindingListener();
 					Thread.currentThread().setContextClassLoader(oldClassLoader);
 				}
 			}
@@ -1334,6 +1350,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			try {				
 				final ClassLoader cl = sipContext.getSipContextClassLoader();
 				Thread.currentThread().setContextClassLoader(cl);
+				// http://code.google.com/p/sipservlets/issues/detail?id=135
+				sipContext.bindThreadBindingListener();
 				
 				final SipErrorEvent sipErrorEvent = new SipErrorEvent(
 						(SipServletRequest)sipServletMessage, 
@@ -1348,6 +1366,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					}
 				}
 			} finally {				
+				// http://code.google.com/p/sipservlets/issues/detail?id=135
+				sipContext.unbindThreadBindingListener();
 				Thread.currentThread().setContextClassLoader(oldClassLoader);
 			}
 			final Dialog dialog = sipSession.getSessionCreatingDialog();
@@ -1394,7 +1414,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			try {				
 				final ClassLoader cl = sipContext.getSipContextClassLoader();
 				Thread.currentThread().setContextClassLoader(cl);
-				
+				// http://code.google.com/p/sipservlets/issues/detail?id=135
+				sipContext.bindThreadBindingListener();
+
 				final SipErrorEvent sipErrorEvent = new SipErrorEvent(
 						(SipServletRequest)sipServletMessage, 
 						lastInfoResponse);
@@ -1407,6 +1429,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					}
 				}
 			} finally {
+				// http://code.google.com/p/sipservlets/issues/detail?id=135
+				sipContext.unbindThreadBindingListener();
 				Thread.currentThread().setContextClassLoader(oldClassLoader);
 			}			
 		}
