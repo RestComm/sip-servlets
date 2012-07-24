@@ -39,7 +39,8 @@ import org.mobicents.metadata.sip.spec.SipMetaData;
  */
 public class SipJndiBindingProcessor implements DeploymentUnitProcessor {
 
-    static final String[] JNDI_BASE_FOR_SIP = {"java:", "java:app/", "java:comp/env/"};
+//    static final String[] JNDI_BASE_FOR_SIP = {"java:", "java:app/", "java:comp/env/"};
+    static final String[] JNDI_BASE_FOR_SIP = {"java:comp/env/"};
     static final String SIP_PREFIX_JNDI = "sip/";
     static final String SIP_FACTORY_JNDI = "SipFactory";
     static final String SIP_SESSIONS_UTIL_JNDI = "SipSessionsUtil";
