@@ -25,6 +25,7 @@ package org.mobicents.as7;
 import org.jboss.logging.Message;
 import org.jboss.logging.MessageBundle;
 import org.jboss.logging.Messages;
+import org.jboss.vfs.VirtualFile;
 
 /**
  * Date: 05.11.2011
@@ -53,6 +54,12 @@ public interface SipMessages {
 
     @Message(id = 18009, value = "Error starting sip container")
     String errorStartingSip();
+    
+    @Message(id = 18026, value = "Failed to resolve module for deployment %s")
+    String failedToResolveModule(VirtualFile deploymentRoot);
+
+    @Message(id = 18027, value = "Failed to add Mobicents SIP deployment service")
+    String failedToAddSipDeployment();
 
     /**
      * A message indicating the metric is unknown.

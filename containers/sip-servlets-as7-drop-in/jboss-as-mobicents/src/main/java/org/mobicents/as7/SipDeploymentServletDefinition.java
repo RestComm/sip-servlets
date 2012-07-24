@@ -13,7 +13,6 @@ import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
-import org.jboss.as.controller.registry.Resource;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.jboss.msc.service.ServiceController;
@@ -21,8 +20,8 @@ import org.jboss.msc.service.ServiceController;
 /**
  * @author Tomaz Cerar
  * @created 23.2.12 18:35
+ * @author josemrecio@gmail.com
  */
-// TODO: josemrecio - check if using virtual-host and context-root make sense
 public class SipDeploymentServletDefinition extends SimpleResourceDefinition {
     public static final SipDeploymentServletDefinition INSTANCE = new SipDeploymentServletDefinition();
 
@@ -80,16 +79,10 @@ public class SipDeploymentServletDefinition extends SimpleResourceDefinition {
         public void execute(final OperationContext context, final ModelNode operation) throws OperationFailedException {
             final PathAddress address = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.OP_ADDR));
 
-            final Resource web = context.readResourceFromRoot(address.subAddress(0, address.size() - 1), false);
-            final ModelNode subModel = web.getModel();
-
-            final String host = subModel.require("virtual-host").asString();
-            final String path = subModel.require("context-root").asString();
-
             context.addStep(new OperationStepHandler() {
                 @Override
                 public void execute(final OperationContext context, final ModelNode operation) throws OperationFailedException {
-                    final ServiceController<?> controller = context.getServiceRegistry(false).getService(SipSubsystemServices.deploymentServiceName(host, path));
+                  final ServiceController<?> controller = context.getServiceRegistry(false).getService(SipSubsystemServices.deploymentServiceName());
                     if (controller != null) {
                         final String name = address.getLastElement().getValue();
                         final Context webContext = Context.class.cast(controller.getValue());
