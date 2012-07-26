@@ -179,4 +179,8 @@ public interface SipContext {
 	
 	boolean authorize(MobicentsSipServletRequest request);
 	SipDigestAuthenticator getDigestAuthenticator();
+
+	// http://code.google.com/p/sipservlets/issues/detail?id=135
+	void bindThreadBindingListener();
+	void unbindThreadBindingListener();
 }

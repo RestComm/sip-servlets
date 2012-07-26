@@ -1372,6 +1372,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 							try {
 								final ClassLoader cl = getLoader().getClassLoader();
 								Thread.currentThread().setContextClassLoader(cl);
+								// http://code.google.com/p/sipservlets/issues/detail?id=135
+								bindThreadBindingListener();
 							
 								switch(event.getEventType()) {
 									case SERVLET_INITIALIZED : {
@@ -1419,6 +1421,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 									servletHandler = null;
 								}
 							} finally {
+								// http://code.google.com/p/sipservlets/issues/detail?id=135
+								unbindThreadBindingListener();
 								Thread.currentThread().setContextClassLoader(oldClassLoader);
 							}
 						}					
@@ -1519,5 +1523,15 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
     public void setInstanceManager(InstanceManager instanceManager) {
         super.setInstanceManager(instanceManager);
     }
+
+	// http://code.google.com/p/sipservlets/issues/detail?id=135
+	@Override
+	public void bindThreadBindingListener() {
+		super.getThreadBindingListener().bind();
+	}
+	@Override
+	public void unbindThreadBindingListener() {
+		super.getThreadBindingListener().unbind();
+	}
 
 }

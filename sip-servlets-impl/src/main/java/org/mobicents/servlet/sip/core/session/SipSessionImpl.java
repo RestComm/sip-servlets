@@ -330,7 +330,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 							sipSessionEventType);
 				}
 				ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
-				java.lang.Thread.currentThread().setContextClassLoader(sipContext.getSipContextClassLoader());	
+				java.lang.Thread.currentThread().setContextClassLoader(sipContext.getSipContextClassLoader());
+				// http://code.google.com/p/sipservlets/issues/detail?id=135
+				sipContext.bindThreadBindingListener();
 				SipSessionEvent sipSessionEvent = new SipSessionEvent(this.getFacade());
 				for (SipSessionListener sipSessionListener : sipSessionListeners) {
 					try {
@@ -349,6 +351,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 						logger.error("SipSessionListener threw exception", t);
 					}
 				}
+				// http://code.google.com/p/sipservlets/issues/detail?id=135
+				sipContext.unbindThreadBindingListener();
 				java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
 			}		
 		}
