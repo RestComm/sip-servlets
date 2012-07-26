@@ -10,7 +10,7 @@ if [ $# -ne 0 ]; then
 	    		rm ./proxy/*.log
 	    		echo "Distributed example used is proxy";
 	    		./sipp $TEST_IP:5055 -sf proxy-scenario/performance-proxy-uas.xml -trace_err -i $TEST_IP -p 5090 -bg -nd
-				./sipp $TEST_IP:5090 -sf proxy-scenario/performance-proxy-uac.xml -trace_err -i $TEST_IP -p 5055 -rsa $TEST_IP:5080 -r 100 -m 250000 -nd
+				./sipp $TEST_IP:5090 -sf proxy-scenario/performance-proxy-uac.xml -trace_err -i $TEST_IP -p 5055 -rsa $TEST_IP:5080 -r 50 -m 250000 -nd
 				sleep 10
 	            ;;
 	    b2bua)

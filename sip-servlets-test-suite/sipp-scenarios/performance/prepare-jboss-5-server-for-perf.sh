@@ -1,4 +1,4 @@
-mvn clean install -f ../../../pom.xml -P jboss-5 -U
+mvn clean install -f ../../../pom.xml -P jboss-5
 
 cp jboss-5-setup/mss-sip-stack-jboss.properties $JBOSS_HOME/server/default/conf/mss-sip-stack.properties
 cp jboss-5-setup/context-jboss-5.xml $JBOSS_HOME/server/default/deploy/jbossweb.sar/context.xml
