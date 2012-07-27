@@ -294,10 +294,7 @@ public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 		boolean batchStarted = false;
 		ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 		try {
-			ClassLoader cl = sipContext.getSipContextClassLoader();
-			Thread.currentThread().setContextClassLoader(cl);
-			// http://code.google.com/p/sipservlets/issues/detail?id=135
-			sipContext.bindThreadBindingListener();
+			sipContext.enterSipContext();	
 			sipContext.enterSipApp(sipApplicationSession, null, false);
 			batchStarted = sipContext.enterSipAppHa(true);
 			listener.timeout(this);
@@ -305,9 +302,7 @@ public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 			logger.error("An unexpected exception happened in the timer callback!",t);
 		} finally {		
 			try {
-				// http://code.google.com/p/sipservlets/issues/detail?id=135
-				sipContext.unbindThreadBindingListener();
-				Thread.currentThread().setContextClassLoader(oldClassLoader);
+				sipContext.exitSipContext(oldClassLoader);
 				if (isRepeatingTimer) {
 					estimateNextExecution();
 				} else {

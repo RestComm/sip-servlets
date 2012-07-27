@@ -64,10 +64,7 @@ public class SipSessionAsyncTask implements Runnable {
 				boolean batchStarted = false;
 				ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 				try {
-					ClassLoader cl = sipContext.getSipContextClassLoader();
-					Thread.currentThread().setContextClassLoader(cl);
-					// http://code.google.com/p/sipservlets/issues/detail?id=135
-					sipContext.bindThreadBindingListener();
+					sipContext.enterSipContext();	
 					sipContext.enterSipApp(sipApplicationSession, sipSession, false);
 					batchStarted = sipContext.enterSipAppHa(true);
 					
@@ -77,9 +74,7 @@ public class SipSessionAsyncTask implements Runnable {
 				} finally {
 					sipContext.exitSipAppHa(null, null, batchStarted);
 					sipContext.exitSipApp(sipApplicationSession, sipSession);
-					// http://code.google.com/p/sipservlets/issues/detail?id=135
-					sipContext.unbindThreadBindingListener();
-					Thread.currentThread().setContextClassLoader(oldClassLoader);					
+					sipContext.exitSipContext(oldClassLoader);				
 				}
 			} else {
 				if(logger.isDebugEnabled()) {

@@ -267,10 +267,7 @@ public abstract class MessageDispatcher {
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 			
 			try {
-				final ClassLoader cl = sipContext.getSipContextClassLoader();
-				Thread.currentThread().setContextClassLoader(cl);
-				// http://code.google.com/p/sipservlets/issues/detail?id=135
-				sipContext.bindThreadBindingListener();
+				sipContext.enterSipContext();				
 				try {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Invoking instance " + servlet);
@@ -279,10 +276,8 @@ public abstract class MessageDispatcher {
 				} finally {								
 					sipServletImpl.deallocate(servlet);					
 				}
-			} finally {
-				// http://code.google.com/p/sipservlets/issues/detail?id=135
-				sipContext.unbindThreadBindingListener();
-				Thread.currentThread().setContextClassLoader(oldClassLoader);
+			} finally {				
+				sipContext.exitSipContext(oldClassLoader);
 			}
 		}
 	}
@@ -321,10 +316,7 @@ public abstract class MessageDispatcher {
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 			
 			try {
-				final ClassLoader cl = sipContext.getSipContextClassLoader();
-				Thread.currentThread().setContextClassLoader(cl);
-				// http://code.google.com/p/sipservlets/issues/detail?id=135
-				sipContext.bindThreadBindingListener();
+				sipContext.enterSipContext();	
 				try {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Invoking instance " + servlet);
@@ -337,9 +329,7 @@ public abstract class MessageDispatcher {
 					sipServletImpl.deallocate(servlet);					
 				}
 			} finally {
-				// http://code.google.com/p/sipservlets/issues/detail?id=135
-				sipContext.unbindThreadBindingListener();
-				Thread.currentThread().setContextClassLoader(oldClassLoader);
+				sipContext.exitSipContext(oldClassLoader);
 			}
 		}
 	}
@@ -365,13 +355,9 @@ public abstract class MessageDispatcher {
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 			
 			try {
-				final ClassLoader cl = sipContext.getSipContextClassLoader();
-				Thread.currentThread().setContextClassLoader(cl);
+				sipContext.enterSipContext();	
 			
-				if(!securityCheck(request)) return;
-	
-				// http://code.google.com/p/sipservlets/issues/detail?id=135
-				sipContext.bindThreadBindingListener();
+				if(!securityCheck(request)) return;				
 
 				if(logger.isDebugEnabled()) {
 					logger.debug("Invoking instance " + servlet);
@@ -383,9 +369,7 @@ public abstract class MessageDispatcher {
 					sipServletImpl.deallocate(servlet);
 				}
 			} finally {
-				// http://code.google.com/p/sipservlets/issues/detail?id=135
-				sipContext.unbindThreadBindingListener();
-				Thread.currentThread().setContextClassLoader(oldClassLoader);
+				sipContext.exitSipContext(oldClassLoader);
 			}
 		} else if(sipContext.getSipRubyController() != null) {
 			//handling the ruby case
@@ -467,10 +451,7 @@ public abstract class MessageDispatcher {
 			}
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 			try {
-				final ClassLoader cl = sipContext.getSipContextClassLoader();
-				Thread.currentThread().setContextClassLoader(cl);
-				// http://code.google.com/p/sipservlets/issues/detail?id=135
-				sipContext.bindThreadBindingListener();
+				sipContext.enterSipContext();	
 			
 				try {				
 					servlet.service(null, response);
@@ -478,9 +459,7 @@ public abstract class MessageDispatcher {
 					sipServletImpl.deallocate(servlet);
 				}
 			} finally {
-				// http://code.google.com/p/sipservlets/issues/detail?id=135
-				sipContext.unbindThreadBindingListener();
-				Thread.currentThread().setContextClassLoader(oldClassLoader);
+				sipContext.exitSipContext(oldClassLoader);
 			}
 		}
 				

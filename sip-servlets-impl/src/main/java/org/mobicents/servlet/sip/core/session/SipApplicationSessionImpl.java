@@ -180,10 +180,8 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		List<SipApplicationSessionListener> listeners = 
 			sipContext.getListeners().getSipApplicationSessionListeners();
 		if(listeners.size() > 0) {
-			ClassLoader oldLoader = java.lang.Thread.currentThread().getContextClassLoader();
-			java.lang.Thread.currentThread().setContextClassLoader(sipContext.getSipContextClassLoader());
-			// http://code.google.com/p/sipservlets/issues/detail?id=135
-			sipContext.bindThreadBindingListener();
+			ClassLoader oldClassLoader = java.lang.Thread.currentThread().getContextClassLoader();
+			sipContext.enterSipContext();	
 			SipApplicationSessionEvent event = new SipApplicationSessionEvent(this.getFacade());
 			if(logger.isDebugEnabled()) {
 				logger.debug("notifying sip application session listeners of context " + 
@@ -209,9 +207,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 					logger.error("SipApplicationSessionListener threw exception", t);
 				}
 			}
-			// http://code.google.com/p/sipservlets/issues/detail?id=135
-			sipContext.unbindThreadBindingListener();
-			java.lang.Thread.currentThread().setContextClassLoader(oldLoader);
+			sipContext.exitSipContext(oldClassLoader);
 		}		
 	}
 	

@@ -181,6 +181,6 @@ public interface SipContext {
 	SipDigestAuthenticator getDigestAuthenticator();
 
 	// http://code.google.com/p/sipservlets/issues/detail?id=135
-	void bindThreadBindingListener();
-	void unbindThreadBindingListener();
+	void enterSipContext();
+	void exitSipContext(ClassLoader oldClassLoader);
 }

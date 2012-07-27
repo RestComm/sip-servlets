@@ -1525,13 +1525,25 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
     }
 
 	// http://code.google.com/p/sipservlets/issues/detail?id=135
-	@Override
 	public void bindThreadBindingListener() {
 		super.getThreadBindingListener().bind();
 	}
-	@Override
 	public void unbindThreadBindingListener() {
 		super.getThreadBindingListener().unbind();
 	}
 
+	@Override
+	public void enterSipContext() {
+		final ClassLoader cl = getSipContextClassLoader();
+		Thread.currentThread().setContextClassLoader(cl);
+		// http://code.google.com/p/sipservlets/issues/detail?id=135
+		bindThreadBindingListener();
+	}
+
+	@Override
+	public void exitSipContext(ClassLoader oldClassLoader) {
+		// http://code.google.com/p/sipservlets/issues/detail?id=135
+		unbindThreadBindingListener();
+		Thread.currentThread().setContextClassLoader(oldClassLoader);
+	}
 }
