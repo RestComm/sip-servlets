@@ -79,6 +79,7 @@ import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.catalina.CatalinaSipManager;
 import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.SipService;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletMessage;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -1661,7 +1662,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	private void sessionMetadataDirty() {
 //		if (!sessionMetadataDirty && !isNew && log.isTraceEnabled())
 		if(log.isDebugEnabled()) {
-			log.debug("Marking session metadata dirty " + key);
+			log.debug("Marking sip session metadata dirty " + key);
 		}
 		sessionMetadataDirty = true;
 		ConvergedSessionReplicationContext.bindSipSession(this, manager.getSnapshotSipManager());
@@ -1746,6 +1747,16 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		super.setValid(isValid);
 		sessionMetadataDirty();
 		metadata.getMetaData().put(IS_VALID, isValid);
+	}
+	
+	// http://code.google.com/p/sipservlets/issues/detail?id=42
+	@Override	
+	public void setSessionCreatingTransactionRequest(
+			MobicentsSipServletMessage message) {		
+		super.setSessionCreatingTransactionRequest(message);
+		if(State.INITIAL.equals(state) && sessionCreatingDialog == null && sessionCreatingTransactionRequest != null && sessionCreatingTransactionRequest.getMethod().equalsIgnoreCase(Request.REGISTER)) {
+			sessionMetadataDirty();
+		}
 	}
 	
 	@Override
