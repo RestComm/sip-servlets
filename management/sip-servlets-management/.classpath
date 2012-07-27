@@ -10,7 +10,8 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-spec"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-core-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-annotations"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-impl"/>	
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-impl"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-application-router"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-client"/>
 	<classpathentry kind="output" path="src/main/webapp/WEB-INF/classes"/>
 </classpath>
