@@ -22,7 +22,9 @@
 
 package org.mobicents.servlet.sip.message;
 
+import gov.nist.javax.sip.header.HeaderFactoryExt;
 import gov.nist.javax.sip.header.HeaderFactoryImpl;
+import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.MessageExt;
 
 import java.io.Externalizable;
@@ -889,8 +891,13 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			javax.sip.address.Address routeAddress = 
 				SipFactoryImpl.addressFactory.createAddress(sipUri);
 			RouteHeader routeHeader = 
-				SipFactoryImpl.headerFactory.createRouteHeader(routeAddress);
-			request.addFirst(routeHeader);			
+				SipFactoryImpl.headerFactory.createRouteHeader(routeAddress);			
+			request.addFirst(routeHeader);
+			if(Request.REGISTER.equalsIgnoreCase(request.getMethod())) {
+				PathHeader pathHeader = 
+						((HeaderFactoryExt)SipFactoryImpl.headerFactory).createPathHeader(routeAddress);
+				request.addFirst(pathHeader);
+			}
 		} catch (ParseException e) {
 			//this should never happen
 			throw new IllegalArgumentException("Impossible to set the Load Balancer Route Header !", e);

@@ -24,6 +24,7 @@ package org.mobicents.servlet.sip.core.session;
 
 import gov.nist.javax.sip.ServerTransactionExt;
 import gov.nist.javax.sip.address.SipUri;
+import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.MessageExt;
 
 import java.io.IOException;
@@ -520,6 +521,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 						}
 						request.setRequestURI(sipUri);
 					}
+					// http://code.google.com/p/sipservlets/issues/detail?id=130
+					// removes the Route and Path Headers added previously for requests that the container originated 
+					// when the Load Balancer is used to avoid adding them again with each request going out.
+					request.removeHeader(RouteHeader.NAME);
+					request.removeHeader(PathHeader.NAME);
 				} else {
 					if(logger.isDebugEnabled()) {
 						logger.debug("orignal tx for creating susbequent request " + method + " on session " + key +" was a Server Tx");
