@@ -867,6 +867,15 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			super.setValid(valid);
 		} 
 		state = (State)metaData.get(STATE);
+		if(logger.isDebugEnabled()) {
+			logger.debug("replicated sip session state = " + state);
+		}
+		// http://code.google.com/p/sipservlets/issues/detail?id=42
+		// in case of REGISTER (or out of dialog requests) , the state will have stayed INITIAL
+		// and as such not changed so not replicated, thus if state is null we default to INITIAL
+		if(state == null) {
+			state = State.INITIAL;
+		}
 		Long cSeq = (Long) metaData.get(CSEQ);
 		if(cSeq != null) {
 			cseq = cSeq;
