@@ -10,11 +10,14 @@ import org.jboss.as.controller.AbstractRuntimeOnlyHandler;
 import org.jboss.as.controller.AttributeDefinition;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
+import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.SimpleAttributeDefinition;
+import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
+import org.jboss.as.controller.registry.Resource;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.jboss.msc.service.ServiceController;
@@ -30,6 +33,8 @@ import org.mobicents.servlet.sip.core.SipManager;
 public class SipDeploymentDefinition extends SimpleResourceDefinition {
     public static final SipDeploymentDefinition INSTANCE = new SipDeploymentDefinition();
 
+    public static final AttributeDefinition APP_NAME = new SimpleAttributeDefinitionBuilder("app-name", ModelType.STRING).setStorageRuntime().build();
+
     private SipDeploymentDefinition() {
         super(PathElement.pathElement(SUBSYSTEM, SipExtension.SUBSYSTEM_NAME),
               SipExtension.getResourceDescriptionResolver("deployment"));
@@ -38,6 +43,7 @@ public class SipDeploymentDefinition extends SimpleResourceDefinition {
 
     @Override
     public void registerAttributes(ManagementResourceRegistration resourceRegistration) {
+        resourceRegistration.registerReadOnlyAttribute(APP_NAME, null);
         for (SessionStat stat : SessionStat.values()) {
             resourceRegistration.registerMetric(stat.definition, SessionManagerStatsHandler.getInstance());
         }
@@ -57,7 +63,14 @@ public class SipDeploymentDefinition extends SimpleResourceDefinition {
         @Override
         protected void executeRuntimeStep(OperationContext context, ModelNode operation) throws OperationFailedException {
 
-        	final ServiceController<?> controller = context.getServiceRegistry(false).getService(SipSubsystemServices.deploymentServiceName());
+        	final PathAddress address = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.OP_ADDR));
+
+            final Resource sip = context.readResourceFromRoot(address.subAddress(0, address.size()), false);
+            final ModelNode subModel = sip.getModel();
+
+            final String appName = APP_NAME.resolveModelAttribute(context, subModel).asString();
+
+        	final ServiceController<?> controller = context.getServiceRegistry(false).getService(SipSubsystemServices.deploymentServiceName(appName));
         	SessionStat stat = SessionStat.getStat(operation.require(ModelDescriptionConstants.NAME).asString());
 
         	if (stat == null) {

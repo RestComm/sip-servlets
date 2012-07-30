@@ -39,10 +39,10 @@ import org.jboss.msc.service.StopContext;
 class SipDeploymentService implements Service<Context> {
 
     private StandardContext sipContext;
-    private final DeploymentUnit du;
+    private final DeploymentUnit anchorDu;
 
     public SipDeploymentService(final DeploymentUnit du) {
-        this.du = du;
+    	this.anchorDu =SIPWebContext.getSipContextAnchorDu(du);
     }
 
     /**
@@ -50,7 +50,7 @@ class SipDeploymentService implements Service<Context> {
      */
     public synchronized void start(StartContext startContext) throws StartException {
         if (sipContext == null) {
-        	this.sipContext = du.getAttachment(SIPWebContext.ATTACHMENT);
+        	this.sipContext = anchorDu.getAttachment(SIPWebContext.ATTACHMENT);
         }
     }
 

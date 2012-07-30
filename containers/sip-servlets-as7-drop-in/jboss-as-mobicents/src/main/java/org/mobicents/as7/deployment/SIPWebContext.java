@@ -68,16 +68,28 @@ public class SIPWebContext extends SipStandardContext {
         super();
         deploymentUnit = du;
         sipJBossContextConfig = createContextConfig(this, deploymentUnit);
-        // if this an ear deployment, attach this to the parent deploymentUnit so it can be used to inject context resources (SipFactory, etc.)
-        DeploymentUnit parentDu = deploymentUnit.getParent();
-        if (parentDu == null) {
-            // this is a war only deployment
-            return;
+        // attach context to top-level deploymentUnit so it can be used to get context resources (SipFactory, etc.)
+        final DeploymentUnit anchorDu = getSipContextAnchorDu(du);
+        if (anchorDu != null) {
+        	if (logger.isDebugEnabled()) logger.debug("Attaching SIPWebContext " + this + " to " + anchorDu.getName());
+        	anchorDu.putAttachment(SIPWebContext.ATTACHMENT, this);
         }
-        if (DeploymentTypeMarker.isType(DeploymentType.EAR, parentDu)) {
-            if (logger.isDebugEnabled()) logger.debug("Attaching SIPWebContext " + this + " to " + parentDu.getName());
-            parentDu.putAttachment(SIPWebContext.ATTACHMENT, this);
+        else {
+        	logger.error("Can't attach SIPWebContext " + this + " to " + deploymentUnit.getName() + " - This is probably a bug");
         }
+//        DeploymentUnit parentDu = deploymentUnit.getParent();
+//        if (parentDu == null) {
+//        	// this is a war only deployment
+//        	if (logger.isDebugEnabled()) logger.debug("Attaching SIPWebContext " + this + " to " + deploymentUnit.getName());
+//        	deploymentUnit.putAttachment(SIPWebContext.ATTACHMENT, this);
+//        }
+//        else if (DeploymentTypeMarker.isType(DeploymentType.EAR, parentDu)) {
+//        	if (logger.isDebugEnabled()) logger.debug("Attaching SIPWebContext " + this + " to " + parentDu.getName());
+//        	parentDu.putAttachment(SIPWebContext.ATTACHMENT, this);
+//        }
+//        else {
+//        	logger.error("Cowardly refusing to attach SIPWebContext " + this + " to " + deploymentUnit.getName() + " - This is probably a bug");
+//        }
     }
 
     public void postProcessContext(DeploymentUnit deploymentUnit) {
@@ -265,6 +277,23 @@ public class SIPWebContext extends SipStandardContext {
         SipJBossContextConfig config = new SipJBossContextConfig(deploymentUnit);
         sipContext.addLifecycleListener(config);
         return config;
+    }
+    
+    // returns the anchor deployment unit that will have attached a SIPWebContext
+    public static DeploymentUnit getSipContextAnchorDu(final DeploymentUnit du) {
+        // attach context to top-level deploymentUnit so it can be used to get context resources (SipFactory, etc.)
+        DeploymentUnit parentDu = du.getParent();
+        if (parentDu == null) {
+        	// this is a war only deployment
+        	return du;
+        }
+        else if (DeploymentTypeMarker.isType(DeploymentType.EAR, parentDu)) {
+        	return parentDu;
+        }
+        else {
+        	logger.error("Can't find proper anchor deployment unit for " + du.getName() + " - This is probably a bug");
+        	return null;
+        }
     }
 
 }

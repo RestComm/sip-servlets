@@ -13,6 +13,7 @@ import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
 import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
+import org.jboss.as.controller.registry.Resource;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.jboss.msc.service.ServiceController;
@@ -79,10 +80,15 @@ public class SipDeploymentServletDefinition extends SimpleResourceDefinition {
         public void execute(final OperationContext context, final ModelNode operation) throws OperationFailedException {
             final PathAddress address = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.OP_ADDR));
 
+            final Resource sip = context.readResourceFromRoot(address.subAddress(0, address.size() - 1), false);
+            final ModelNode subModel = sip.getModel();
+
+            final String appName = subModel.require("app-name").asString();
+
             context.addStep(new OperationStepHandler() {
                 @Override
                 public void execute(final OperationContext context, final ModelNode operation) throws OperationFailedException {
-                  final ServiceController<?> controller = context.getServiceRegistry(false).getService(SipSubsystemServices.deploymentServiceName());
+                  final ServiceController<?> controller = context.getServiceRegistry(false).getService(SipSubsystemServices.deploymentServiceName(appName));
                     if (controller != null) {
                         final String name = address.getLastElement().getValue();
                         final Context webContext = Context.class.cast(controller.getValue());

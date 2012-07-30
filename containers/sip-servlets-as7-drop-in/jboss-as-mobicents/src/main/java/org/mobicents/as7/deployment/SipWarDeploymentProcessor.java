@@ -40,6 +40,7 @@ import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistryException;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.vfs.VirtualFile;
+import org.mobicents.as7.SipDeploymentDefinition;
 import org.mobicents.as7.SipSubsystemServices;
 import org.mobicents.metadata.sip.spec.SipMetaData;
 
@@ -83,7 +84,8 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
             throw new DeploymentUnitProcessingException(MESSAGES.failedToResolveModule(deploymentRoot));
         }
         final SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
-    	final ServiceName deploymentServiceName = SipSubsystemServices.deploymentServiceName();
+        final String appNameMgmt = sipMetaData.getApplicationName();
+    	final ServiceName deploymentServiceName = SipSubsystemServices.deploymentServiceName(appNameMgmt);
         try {
         	final SipDeploymentService sipDeploymentService = new SipDeploymentService(deploymentUnit);
         	ServiceBuilder<?> builder = serviceTarget
@@ -109,6 +111,9 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
         	throw new DeploymentUnitProcessingException(MESSAGES.failedToAddSipDeployment(), e);
         }
 
+        // Process sip related mgmt information
+        final ModelNode node = deploymentUnit.getDeploymentSubsystemModel("sip");
+        node.get(SipDeploymentDefinition.APP_NAME.getName()).set("".equals(appNameMgmt) ? "/" : appNameMgmt);
         processManagement(deploymentUnit, sipMetaData);
     }
 
