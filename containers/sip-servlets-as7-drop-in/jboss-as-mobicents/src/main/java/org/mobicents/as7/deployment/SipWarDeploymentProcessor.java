@@ -84,52 +84,57 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
             throw new DeploymentUnitProcessingException(MESSAGES.failedToResolveModule(deploymentRoot));
         }
         final SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
-        final String appNameMgmt = sipMetaData.getApplicationName();
-    	final ServiceName deploymentServiceName = SipSubsystemServices.deploymentServiceName(appNameMgmt);
-        try {
-        	final SipDeploymentService sipDeploymentService = new SipDeploymentService(deploymentUnit);
-        	ServiceBuilder<?> builder = serviceTarget
-        			.addService(deploymentServiceName, sipDeploymentService);
+        if(sipMetaData != null) {
+	        final String appNameMgmt = sipMetaData.getApplicationName();
+	    	final ServiceName deploymentServiceName = SipSubsystemServices.deploymentServiceName(appNameMgmt);
+	        try {
+	        	final SipDeploymentService sipDeploymentService = new SipDeploymentService(deploymentUnit);
+	        	ServiceBuilder<?> builder = serviceTarget
+	        			.addService(deploymentServiceName, sipDeploymentService);
+	
+	//        	TODO: when distributable is implemented
+	//        	if (sipMetaData.getDistributable() != null) {
+	//        		DistributedCacheManagerFactoryService factoryService = new DistributedCacheManagerFactoryService();
+	//        		DistributedCacheManagerFactory factory = factoryService.getValue();
+	//        		if (factory != null) {
+	//        			ServiceName factoryServiceName = deploymentServiceName.append("session");
+	//        			builder.addDependency(DependencyType.OPTIONAL, factoryServiceName, DistributedCacheManagerFactory.class, config.getDistributedCacheManagerFactoryInjector());
+	//
+	//        			ServiceBuilder<DistributedCacheManagerFactory> factoryBuilder = serviceTarget.addService(factoryServiceName, factoryService);
+	//        			boolean enabled = factory.addDeploymentDependencies(deploymentServiceName, deploymentUnit.getServiceRegistry(), serviceTarget, factoryBuilder, metaData);
+	//        			factoryBuilder.setInitialMode(enabled ? ServiceController.Mode.ON_DEMAND : ServiceController.Mode.NEVER).install();
+	//        		}
+	//        	}
+	            // add dependency to sip deployment service
+	            builder.addDependency(deploymentServiceName);
+	            builder.setInitialMode(Mode.ACTIVE).install();
+	        } catch (ServiceRegistryException e) {
+	        	throw new DeploymentUnitProcessingException(MESSAGES.failedToAddSipDeployment(), e);
+	        }        
 
-//        	TODO: when distributable is implemented
-//        	if (sipMetaData.getDistributable() != null) {
-//        		DistributedCacheManagerFactoryService factoryService = new DistributedCacheManagerFactoryService();
-//        		DistributedCacheManagerFactory factory = factoryService.getValue();
-//        		if (factory != null) {
-//        			ServiceName factoryServiceName = deploymentServiceName.append("session");
-//        			builder.addDependency(DependencyType.OPTIONAL, factoryServiceName, DistributedCacheManagerFactory.class, config.getDistributedCacheManagerFactoryInjector());
-//
-//        			ServiceBuilder<DistributedCacheManagerFactory> factoryBuilder = serviceTarget.addService(factoryServiceName, factoryService);
-//        			boolean enabled = factory.addDeploymentDependencies(deploymentServiceName, deploymentUnit.getServiceRegistry(), serviceTarget, factoryBuilder, metaData);
-//        			factoryBuilder.setInitialMode(enabled ? ServiceController.Mode.ON_DEMAND : ServiceController.Mode.NEVER).install();
-//        		}
-//        	}
-            // add dependency to sip deployment service
-            builder.addDependency(deploymentServiceName);
-            builder.setInitialMode(Mode.ACTIVE).install();
-        } catch (ServiceRegistryException e) {
-        	throw new DeploymentUnitProcessingException(MESSAGES.failedToAddSipDeployment(), e);
+	        // Process sip related mgmt information
+	        final ModelNode node = deploymentUnit.getDeploymentSubsystemModel("sip");
+	        node.get(SipDeploymentDefinition.APP_NAME.getName()).set("".equals(appNameMgmt) ? "/" : appNameMgmt);
+	        processManagement(deploymentUnit, sipMetaData);
+        } else {
+        	
         }
-
-        // Process sip related mgmt information
-        final ModelNode node = deploymentUnit.getDeploymentSubsystemModel("sip");
-        node.get(SipDeploymentDefinition.APP_NAME.getName()).set("".equals(appNameMgmt) ? "/" : appNameMgmt);
-        processManagement(deploymentUnit, sipMetaData);
     }
 
     void processManagement(final DeploymentUnit unit, final SipMetaData sipMetaData) {
-        for (final ServletMetaData servlet : sipMetaData.getSipServlets()) {
-            try {
-                final String name = servlet.getName().replace(' ', '_');
-                final ModelNode node = unit.createDeploymentSubModel("sip", PathElement.pathElement("servlet", name));
-                node.get("servlet-class").set(servlet.getServletClass());
-                node.get("servlet-name").set(servlet.getServletName());
-            } catch (Exception e) {
-                // Should a failure in creating the mgmt view also make to the deployment to fail?
-                continue;
-            }
-        }
-
+    	if(sipMetaData.getSipServlets() != null) {
+	        for (final ServletMetaData servlet : sipMetaData.getSipServlets()) {
+	            try {
+	                final String name = servlet.getName().replace(' ', '_');
+	                final ModelNode node = unit.createDeploymentSubModel("sip", PathElement.pathElement("servlet", name));
+	                node.get("servlet-class").set(servlet.getServletClass());
+	                node.get("servlet-name").set(servlet.getServletName());
+	            } catch (Exception e) {
+	                // Should a failure in creating the mgmt view also make to the deployment to fail?
+	                continue;
+	            }
+	        }
+    	}
     }
 }
 
