@@ -22,8 +22,8 @@ public final class SipSubsystemServices {
     /** The base name for jboss.sip deployments. */
     static final ServiceName JBOSS_SIP_DEPLOYMENT_BASE = JBOSS_SIP.append("deployment");
 
-    public static ServiceName deploymentServiceName(final String virtualHost, final String contextPath) {
-        return JBOSS_SIP_DEPLOYMENT_BASE.append(virtualHost).append("".equals(contextPath) ? "/" : contextPath);
+    public static ServiceName deploymentServiceName(final String appName) {
+        return JBOSS_SIP_DEPLOYMENT_BASE.append("".equals(appName) ? "/" : appName);
     }
 
     private SipSubsystemServices() {
