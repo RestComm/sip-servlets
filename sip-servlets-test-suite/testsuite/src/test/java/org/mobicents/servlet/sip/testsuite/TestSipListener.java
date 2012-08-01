@@ -345,6 +345,7 @@ public class TestSipListener implements SipListener {
 	private RFC5626UseCase rfc5626UseCase;
 
 	private String securityUser = "user";
+	private String securityPwd = "pass";
 	
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -1878,7 +1879,7 @@ public class TestSipListener implements SipListener {
 				throw new IllegalArgumentException("Cannot create the INVITE request",e);				
 			}
 			// non regression test for http://code.google.com/p/sipservlets/issues/detail?id=88
-			if(securityUser.equalsIgnoreCase("badUser") && cSeq.getSeqNumber() > 2) {
+			if((securityUser.equalsIgnoreCase("badUser") || securityPwd.equalsIgnoreCase("badpwd")) && cSeq.getSeqNumber() > 2) {
 				return null;
 			}
 			requestauth.setHeader(cSeq);
@@ -1913,7 +1914,7 @@ public class TestSipListener implements SipListener {
 					((WWWAuthenticate) (response
 							.getHeader(SIPHeaderNames.WWW_AUTHENTICATE))),
 					securityUser,
-					"pass",
+					securityPwd,
 					((WWWAuthenticate) (response
 							.getHeader(SIPHeaderNames.WWW_AUTHENTICATE))).getNonce(),
 					1);
@@ -3432,5 +3433,9 @@ public class TestSipListener implements SipListener {
 
 	public void setSecurityUser(String securityUser) {
 		this.securityUser  = securityUser;
+	}
+
+	public void setSecurityPwd(String securityPwd) {
+		this.securityPwd  = securityPwd;
 	}
 }
