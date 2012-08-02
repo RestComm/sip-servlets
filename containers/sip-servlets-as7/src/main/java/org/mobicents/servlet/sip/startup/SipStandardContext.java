@@ -230,7 +230,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,
 				sipFactoryFacade);
 		if(timerService == null) {
-// kk distributable			if(getDistributable() && hasDistributableManager) {
+// FIXME: distributable not supported
+//			if(getDistributable() && hasDistributableManager) {
 //				if(logger.isInfoEnabled()) {
 //					logger.info("Using the Fault Tolerant Timer Service to schedule fault tolerant timers in a distributed environment");
 //				}
@@ -244,7 +245,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			proxyTimerService = new ProxyTimerServiceImpl();
 		}
 		if(sasTimerService == null || !sasTimerService.isStarted()) {
-// kk distributable			if(getDistributable() && hasDistributableManager) {
+// FIXME: distributable not supported
+//distributable			if(getDistributable() && hasDistributableManager) {
 //				sasTimerService = new FaultTolerantSasTimerService((DistributableSipManager)getSipManager(), 4);
 //			} else {
 //				sasTimerService = new StandardSipApplicationSessionTimerService();
@@ -395,6 +397,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 
     }
 
+	// AS7 invokes this before listenerStart()
 	@Override
     public boolean contextListenerStart() {
 		boolean ok = super.contextListenerStart();
@@ -403,80 +406,40 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			return ok;
 		}
 
-        if (log.isDebugEnabled())
-            log.debug("Starting context event listeners");
+		if (logger.isDebugEnabled())
+            logger.debug("Configuring sip listeners");
 
         // Instantiate the required listeners
-        String listeners[] = findSipApplicationListeners();
-        EventListener listenerInstances[] = applicationListenerInstances;
-        EventListener results[] = new EventListener[listeners.length + listenerInstances.length];
-        for (int i = 0; i < listeners.length; i++) {
-            if (getLogger().isDebugEnabled())
-                getLogger().debug(" Configuring event listener class '" +
-                    listeners[i] + "'");
-            try {
-                results[i] = (EventListener) instanceManager.newInstance(listeners[i]);
-            } catch (Throwable t) {
-                getLogger().error
-                    (sm.getString("standardContext.applicationListener",
-                                  listeners[i]), t);
-                ok = false;
+        ClassLoader loader = getLoader().getClassLoader();
+        ok = sipListeners.loadListeners(findSipApplicationListeners(), loader);
+        if(!ok) {
+			return ok;
+		}
+
+        List<ServletContextListener> servletContextListeners = sipListeners.getServletContextListeners();
+        if (servletContextListeners != null) {
+            ServletContextEvent event =
+                new ServletContextEvent(getServletContext());
+            for (ServletContextListener servletContextListener : servletContextListeners) {						
+                if (servletContextListener == null)
+                    continue;
+                
+                try {
+                    fireContainerEvent("beforeContextInitialized", servletContextListener);
+                    servletContextListener.contextInitialized(event);
+                    fireContainerEvent("afterContextInitialized", servletContextListener);
+                } catch (Throwable t) {
+                    fireContainerEvent("afterContextInitialized", servletContextListener);
+                    getLogger().error
+                        (sm.getString("standardContext.listenerStart",
+                        		servletContextListener.getClass().getName()), t);
+                    ok = false;
+                }
+                
+                // TODO Annotation processing                 
             }
         }
-        for (int i = 0; i < listenerInstances.length; i++) {
-            results[i + listeners.length] = listenerInstances[i];
-        }
-        applicationListenerInstances = new EventListener[0];
-        if (!ok) {
-            getLogger().error(sm.getString("standardContext.applicationSkipped"));
-            return (false);
-        }
 
-        // Sort listeners in two arrays
-        ArrayList<EventListener> otherListeners = new ArrayList<EventListener>();
-        ArrayList<EventListener> contextLifecycleListeners = new ArrayList<EventListener>();
-        for (int i = 0; i < results.length; i++) {
-            if (results[i] instanceof ServletContextListener) {
-                contextLifecycleListeners.add(results[i]);
-            }
-            otherListeners.add(results[i]);
-        }
-
-        this.listenersInstances = otherListeners.toArray();
-        setApplicationLifecycleListeners(contextLifecycleListeners.toArray());
-
-        // Send application start events
-
-        if (getLogger().isDebugEnabled())
-            getLogger().debug("Sending application start events");
-
-        Object instances[] = getApplicationLifecycleListeners();
-        if (instances == null)
-            return (ok);
-        ServletContextEvent event =
-          new ServletContextEvent(getServletContext());
-        for (int i = 0; i < instances.length; i++) {
-            if (instances[i] == null)
-                continue;
-            if (!(instances[i] instanceof ServletContextListener))
-                continue;
-            ServletContextListener listener =
-                (ServletContextListener) instances[i];
-            try {
-                context.setRestricted(isRestricted(listener));
-                fireContainerEvent("beforeContextInitialized", listener);
-                listener.contextInitialized(event);
-                fireContainerEvent("afterContextInitialized", listener);
-            } catch (Throwable t) {
-                fireContainerEvent("afterContextInitialized", listener);
-                getLogger().error
-                    (sm.getString("standardContext.listenerStart",
-                                  instances[i].getClass().getName()), t);
-                ok = false;
-            } finally {
-                context.setRestricted(false);
-            }
-        }
         return (ok);
 
     }
@@ -491,86 +454,9 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		if (logger.isDebugEnabled())
             logger.debug("Configuring sip listeners");
 
-        // Instantiate the required listeners
-        ClassLoader loader = getLoader().getClassLoader();
-        ok = sipListeners.loadListeners(findSipApplicationListeners(), loader);
-        if(!ok) {
-			return ok;
-		}
-        
-        List<ServletContextListener> servletContextListeners = sipListeners.getServletContextListeners();
-        if (servletContextListeners != null) {
-            ServletContextEvent event =
-                new ServletContextEvent(getServletContext());
-            for (ServletContextListener servletContextListener : servletContextListeners) {						
-                if (servletContextListener == null)
-                    continue;
-                
-                try {
-                    fireContainerEvent("beforeContextInitialized", servletContextListener);
-                    servletContextListener.contextInitialized(event);
-                    fireContainerEvent("afterContextInitialized", servletContextListener);
-                } catch (Throwable t) {
-                    fireContainerEvent("afterContextInitialized", servletContextListener);
-                    getLogger().error
-                        (sm.getString("standardContext.listenerStart",
-                        		servletContextListener.getClass().getName()), t);
-                    ok = false;
-                }
-                
-                // TODO Annotation processing                 
-            }
-        }
         return ok;
 	}
 
-	
-	/*
-	@Override
-	public boolean listenerStart() {
-		boolean ok = super.listenerStart();
-		//the web listeners couldn't be started so we don't even try to load the sip ones
-		if(!ok) {
-			return ok;
-		}
-		if (logger.isDebugEnabled())
-            logger.debug("Configuring sip listeners");
-
-        // Instantiate the required listeners
-        ClassLoader loader = getLoader().getClassLoader();
-        ok = sipListeners.loadListeners(findSipApplicationListeners(), loader);
-        if(!ok) {
-			return ok;
-		}
-        
-        List<ServletContextListener> servletContextListeners = sipListeners.getServletContextListeners();
-        if (servletContextListeners != null) {
-            ServletContextEvent event =
-                new ServletContextEvent(getServletContext());
-            for (ServletContextListener servletContextListener : servletContextListeners) {						
-                if (servletContextListener == null)
-                    continue;
-                
-                try {
-                    fireContainerEvent("beforeContextInitialized", servletContextListener);
-                    servletContextListener.contextInitialized(event);
-                    fireContainerEvent("afterContextInitialized", servletContextListener);
-                } catch (Throwable t) {
-                    fireContainerEvent("afterContextInitialized", servletContextListener);
-                    getLogger().error
-                        (sm.getString("standardContext.listenerStart",
-                        		servletContextListener.getClass().getName()), t);
-                    ok = false;
-                }
-                
-                // TODO Annotation processing                 
-            }
-        }
-        return ok;
-	}
-	*/
-	
-	// FIXME: this should be changed (very much as listenerStart() above ...)
 	@Override
 	public boolean listenerStop() {
 		boolean ok = super.listenerStop();
@@ -1234,7 +1120,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	 */
     public boolean enterSipAppHa(boolean startCacheActivity) {
     	boolean batchStarted = false;
-// kk distributable		if(getDistributable() && hasDistributableManager) {
+// FIXME: distributable not supported
+//		if(getDistributable() && hasDistributableManager) {
 //			batchStarted = startBatchTransaction();
 ////			if(bindSessions) {
 ////				ConvergedSessionReplicationContext.enterSipappAndBindSessions(sipApplicationSession,
@@ -1251,7 +1138,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
      * @see org.mobicents.servlet.sip.startup.SipContext#exitSipAppHa(org.mobicents.servlet.sip.message.SipServletRequestImpl, org.mobicents.servlet.sip.message.SipServletResponseImpl, boolean)
      */
 	public void exitSipAppHa(MobicentsSipServletRequest request, MobicentsSipServletResponse response, boolean batchStarted) {	
-// kk distributable		if (getDistributable() && hasDistributableManager) {
+// FIXME: distributable not supported
+//		if (getDistributable() && hasDistributableManager) {
 //			if(logger.isInfoEnabled()) {
 //				if(request != null) {
 //					logger.info("We are now after the servlet invocation for request " + request + ", We replicate no matter what " );
@@ -1297,7 +1185,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 //		}
 	}
 	
-// kk distributable	private boolean startBatchTransaction() {
+// FIXME: distributable not supported
+//	private boolean startBatchTransaction() {
 //		DistributedCacheConvergedSipManager distributedConvergedManager = ((ClusteredSipManager) manager)
 //				.getDistributedCacheConvergedSipManager();
 //		BatchingManager tm = distributedConvergedManager.getBatchingManager();
@@ -1317,7 +1206,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 //		return started;
 //	}
 	
-// kk distributable	private void endBatchTransaction(boolean wasStarted) {
+// FIXME: distributable not supported
+//	private void endBatchTransaction(boolean wasStarted) {
 //		DistributedCacheConvergedSipManager<? extends OutgoingDistributableSessionData> distributedConvergedManager = ((ClusteredSipManager) manager)
 //				.getDistributedCacheConvergedSipManager();
 //		BatchingManager tm = distributedConvergedManager.getBatchingManager();
