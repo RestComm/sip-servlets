@@ -144,7 +144,8 @@ public class ShootistSipServlet
 					return;
 				}
 				
-				if(sipServletResponse.getRequest().isInitial() && !(sipServletResponse.getFrom().getURI() instanceof TelURL) && !(sipServletResponse.getTo().getURI() instanceof TelURL) &&
+				if(sipServletResponse.getRequest().isInitial() && !(sipServletResponse.getFrom().getURI() instanceof TelURL) && !(sipServletResponse.getTo().getURI() instanceof TelURL) && 
+						((SipURI)sipServletResponse.getFrom().getURI()).getUser() != null &&
 						(((SipURI)sipServletResponse.getFrom().getURI()).getUser().equals("reinvite") || ((SipURI)sipServletResponse.getTo().getURI()).getUser().equals("reinvite"))) {
 					SipServletRequest request=sipServletResponse.getSession().createRequest("INVITE");				
 					request.send();
@@ -304,6 +305,9 @@ public class ShootistSipServlet
 			String userName = ce.getServletContext().getInitParameter("username");
 			if(userName == null || userName.length() < 1) {
 				userName = "BigGuy";
+			}
+			if(userName.equalsIgnoreCase("nullTest")) {
+				userName = "";
 			}
 			URI fromURI = sipFactory.createSipURI(userName, "here.com");
 			URI toURI = null;

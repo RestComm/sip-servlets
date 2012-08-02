@@ -35,6 +35,7 @@ import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.FromHeader;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.ProxyAuthorizationHeader;
 import javax.sip.header.ToHeader;
@@ -375,6 +376,31 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		ToHeader toHeader = (ToHeader) receiver.getInviteRequest().getHeader(ToHeader.NAME);
 		assertEquals("To: <sip:+34666666666@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;pres-list=mylist>", toHeader.toString().trim());
+		assertTrue(receiver.getByeReceived());		
+	}
+	
+	/**
+	 * non regression test for Issue 145 http://code.google.com/p/sipservlets/issues/detail?id=145
+	 */
+	public void testShootistUserNameNull() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		Map<String, String> params = new HashMap<String, String>();
+		String userName = "nullTest";
+		params.put("username", userName);
+		deployApplication(params);
+		Thread.sleep(TIMEOUT);
+		FromHeader fromHeader = (FromHeader) receiver.getInviteRequest().getHeader(FromHeader.NAME);
+		assertEquals("sip:here.com", fromHeader.getAddress().getURI().toString().trim());
 		assertTrue(receiver.getByeReceived());		
 	}
 	

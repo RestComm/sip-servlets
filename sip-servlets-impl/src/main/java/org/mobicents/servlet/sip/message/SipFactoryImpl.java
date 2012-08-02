@@ -486,10 +486,14 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 	 * @see javax.servlet.sip.SipFactory#createSipURI(java.lang.String,
 	 *      java.lang.String)
 	 */
-	public SipURI createSipURI(String user, String host) {
+	public SipURI createSipURI(String user, String host) {		
 		if (logger.isDebugEnabled()) {
 			logger.debug("Creating SipURI from USER[" + user + "] HOST[" + host
 					+ "]");
+		}		
+		// Fix for http://code.google.com/p/sipservlets/issues/detail?id=145
+		if(user != null && user.trim().isEmpty()) {
+			user = null;
 		}
 		try {
 			return new SipURIImpl(SipFactoryImpl.addressFactory.createSipURI(
