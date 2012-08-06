@@ -23,6 +23,7 @@
 package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
@@ -202,5 +203,33 @@ public class DistributableClick2CallSipServlet
 	 */
 	public void noPrackReceived(SipErrorEvent ee) {
 		logger.info("Error: noPrackReceived.");
+	}
+	
+	protected void doRegister(SipServletRequest req) throws ServletException, IOException {
+		logger.info("Received register request: " + req.getTo());
+		int response = SipServletResponse.SC_OK;
+		SipServletResponse resp = req.createResponse(response);
+		HashMap<String, String> users = (HashMap<String, String>) getServletContext().getAttribute("registeredUsersMap");
+		if(users == null) users = new HashMap<String, String>();
+		getServletContext().setAttribute("registeredUsersMap", users);
+		
+		Address address = req.getAddressHeader(CONTACT_HEADER);
+		String fromURI = req.getFrom().getURI().toString();
+		
+		int expires = address.getExpires();
+		if(expires < 0) {
+			expires = req.getExpires();
+		}
+		if(expires == 0) {
+			users.remove(fromURI);
+			logger.info("User " + fromURI + " unregistered");
+		} else {
+			resp.setAddressHeader(CONTACT_HEADER, address);
+			users.put(fromURI, address.getURI().toString());
+			logger.info("User " + fromURI + 
+					" registered with an Expire time of " + expires);
+		}				
+						
+		resp.send();
 	}
 }
