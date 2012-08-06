@@ -35,6 +35,8 @@ import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
+import javax.servlet.sip.SipApplicationSession.Protocol;
+import javax.servlet.sip.annotation.SipApplicationKey;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -64,36 +66,13 @@ public class DistributableClick2CallSipServlet
 		super.init(servletConfig);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void doInvite(SipServletRequest req) throws ServletException,
-			IOException {
-		logger.info("Click2Dial don't handle INVITE. Here's the one we got :  " + req.toString());
-		SipSession linkedSession = (SipSession) req.getSession().getAttribute("LinkedSession");
-		SipServletRequest r = linkedSession.createRequest("INVITE");
-		Object content = req.getContent();
-		if(content != null) {
-			r.setContent(content, req.getContentType());
-		}
-		r.send();
-	}
-	
-	@Override
-	protected void doOptions(SipServletRequest req) throws ServletException,
-			IOException {
-		logger.info("Got :  " + req.toString());
-		req.createResponse(SipServletResponse.SC_OK).send();
-	}
-	
 	@Override
     protected void doSuccessResponse(SipServletResponse resp)
 			throws ServletException, IOException {
 		logger.info("Got OK");
 		SipSession session = resp.getSession();
 
-		if ("INVITE".equals(resp.getMethod()) && resp.getStatus() == SipServletResponse.SC_OK) {
+		if (resp.getStatus() == SipServletResponse.SC_OK) {
 
 			Boolean inviteSent = (Boolean) session.getAttribute("InviteSent");
 			if (inviteSent != null && inviteSent.booleanValue()) {
@@ -102,7 +81,6 @@ public class DistributableClick2CallSipServlet
 			Address secondPartyAddress = (Address) resp.getSession()
 					.getAttribute("SecondPartyAddress");
 			if (secondPartyAddress != null) {
-				resp.getApplicationSession().setAttribute("setFromSipServletUA1", resp.getApplicationSession().getId());
 
 				SipServletRequest invite = sipFactory.createRequest(resp
 						.getApplicationSession(), "INVITE", session
@@ -112,22 +90,27 @@ public class DistributableClick2CallSipServlet
 						+ secondPartyAddress);
 
 				String contentType = resp.getContentType();
-				if (contentType != null) {
-					invite.setContent(resp.getContent(), contentType);
+				if (contentType.trim().equals("application/sdp")) {
+					invite.setContent(resp.getContent(), "application/sdp");
 				}
 
-				session.setAttribute("LinkedSession", invite.getSession());
-				invite.getSession().setAttribute("LinkedSession", session);
+				session.setAttribute("LinkedSessionId", invite.getSession().getId());
+				invite.getSession().setAttribute("LinkedSessionId", session.getId());
 
 				SipServletRequest ack = resp.createAck();
 				invite.getSession().setAttribute("FirstPartyAck", ack);
 				invite.getSession().setAttribute("FirstPartyContent", resp.getContent());
 				
+				Call call = (Call) session.getAttribute("call");
+				
+				// The call links the two sessions, add the new session to the call
+				call.addSession(invite.getSession());
+				invite.getSession().setAttribute("call", call);
+				
 				invite.send();
 
 				session.setAttribute("InviteSent", Boolean.TRUE);
 			} else {
-				resp.getApplicationSession().setAttribute("setFromSipServletUA2", resp.getApplicationSession().getId());
 				String cSeqValue = resp.getHeader("CSeq");
 				if(cSeqValue.indexOf("INVITE") != -1) {				
 					logger.info("Got OK from second party -- sending ACK");
@@ -136,16 +119,13 @@ public class DistributableClick2CallSipServlet
 					SipServletRequest firstPartyAck = (SipServletRequest) resp
 							.getSession().getAttribute("FirstPartyAck");
 	
-					if (resp.getContentType() != null) {
+//					if (resp.getContentType() != null && resp.getContentType().equals("application/sdp")) {
 						firstPartyAck.setContent(resp.getContent(),
-								resp.getContentType());
+								"application/sdp");
 						secondPartyAck.setContent(resp.getSession().getAttribute("FirstPartyContent"),
-								resp.getContentType());
-					}
+								"application/sdp");
+//					}
 	
-					session.setAttribute("LinkedSession", firstPartyAck.getSession());
-					firstPartyAck.getSession().setAttribute("LinkedSession", session);
-					
 					firstPartyAck.send();
 					secondPartyAck.send();
 				}
@@ -157,6 +137,10 @@ public class DistributableClick2CallSipServlet
 	protected void doErrorResponse(SipServletResponse resp) throws ServletException,
 			IOException {
 		// If someone rejects it remove the call from the table
+		CallStatusContainer calls = (CallStatusContainer) resp.getApplicationSession().getAttribute("activeCalls");
+		calls.removeCall(resp.getFrom().getURI().toString(), resp.getTo().getURI().toString());
+		calls.removeCall(resp.getTo().getURI().toString(), resp.getFrom().getURI().toString());
+		resp.getApplicationSession().setAttribute("activeCalls", calls);
 
 	}
 
@@ -165,15 +149,20 @@ public class DistributableClick2CallSipServlet
 			IOException {
 		logger.info("Got bye");
 		SipSession session = request.getSession();
-		SipSession linkedSession = (SipSession) session
-				.getAttribute("LinkedSession");
-		if (linkedSession != null) {
-			SipServletRequest bye = linkedSession.createRequest("BYE");
-			logger.info("Sending bye to " + linkedSession.getRemoteParty());
-			bye.send();
-		} else {
-			throw new RuntimeException("linkedSession is not replicated correctly");
+		String linkedSessionId= (String) session.getAttribute("LinkedSessionId");
+		logger.info("linked session id = " + linkedSessionId);
+		if(linkedSessionId != null) {
+			SipSession linkedSession = (SipSession) request.getApplicationSession().getSession(linkedSessionId, Protocol.SIP);
+			if (linkedSession != null) {
+				SipServletRequest bye = linkedSession.createRequest("BYE");
+				logger.info("Sending bye to " + linkedSession.getRemoteParty());
+				bye.send();
+			}
 		}
+		CallStatusContainer calls = (CallStatusContainer) request.getApplicationSession().getAttribute("activeCalls");
+		calls.removeCall(request.getFrom().getURI().toString(), request.getTo().getURI().toString());
+		calls.removeCall(request.getTo().getURI().toString(), request.getFrom().getURI().toString());
+		request.getApplicationSession().getAttribute("activeCalls");
 		SipServletResponse ok = request
 				.createResponse(SipServletResponse.SC_OK);
 		ok.send();
@@ -209,9 +198,9 @@ public class DistributableClick2CallSipServlet
 		logger.info("Received register request: " + req.getTo());
 		int response = SipServletResponse.SC_OK;
 		SipServletResponse resp = req.createResponse(response);
-		HashMap<String, String> users = (HashMap<String, String>) getServletContext().getAttribute("registeredUsersMap");
+		HashMap<String, String> users = (HashMap<String, String>) req.getApplicationSession().getAttribute("registeredUsersMap");
 		if(users == null) users = new HashMap<String, String>();
-		getServletContext().setAttribute("registeredUsersMap", users);
+		req.getApplicationSession().setAttribute("registeredUsersMap", users);
 		
 		Address address = req.getAddressHeader(CONTACT_HEADER);
 		String fromURI = req.getFrom().getURI().toString();
@@ -231,5 +220,13 @@ public class DistributableClick2CallSipServlet
 		}				
 						
 		resp.send();
+	}
+	
+	@SipApplicationKey
+	public static String makeAppSessionKey(SipServletRequest sipServletRequest) {
+		if("REGISTER".equalsIgnoreCase(sipServletRequest.getMethod())) {
+			return "registeredUsersMapAppSession";
+		}
+		return null;
 	}
 }
