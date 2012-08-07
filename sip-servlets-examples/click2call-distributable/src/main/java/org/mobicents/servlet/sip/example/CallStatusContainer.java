@@ -26,8 +26,12 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class CallStatusContainer implements Serializable {
-	
+	private static Log logger = LogFactory.getLog(CallStatusContainer.class);
+
 	private HashSet<Call> activeCalls = new HashSet<Call> ();
 	
 	public Call addCall(String from, String to, String status) {

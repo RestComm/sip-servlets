@@ -108,8 +108,7 @@ public class SimpleWebServlet extends HttpServlet
         	}
         	
         	// Add the call in the active calls
-        	Call call = calls.addCall(fromAddr, toAddr, "FFFF00");
-        	appSession.setAttribute("activeCalls", calls);
+        	Call call = calls.addCall(fromAddr, toAddr, "FFFF00");        	
         	
         	SipServletRequest req = sipFactory.createRequest(appSession, "INVITE", from, to);
 
@@ -119,6 +118,7 @@ public class SimpleWebServlet extends HttpServlet
         	
         	// This session will be used to send BYE
         	call.addSession(req.getSession());
+        	appSession.setAttribute("activeCalls", calls);
         	
         	logger.info("Sending request" + req);
         	// Send the INVITE request            

@@ -102,10 +102,14 @@ public class DistributableClick2CallSipServlet
 				invite.getSession().setAttribute("FirstPartyContent", resp.getContent());
 				
 				Call call = (Call) session.getAttribute("call");
+				CallStatusContainer calls = (CallStatusContainer) resp.getApplicationSession().getAttribute("activeCalls");
 				
 				// The call links the two sessions, add the new session to the call
 				call.addSession(invite.getSession());
 				invite.getSession().setAttribute("call", call);
+				
+				// force the trigger of the application session attribute replication
+				resp.getApplicationSession().setAttribute("activeCalls", calls);
 				
 				invite.send();
 

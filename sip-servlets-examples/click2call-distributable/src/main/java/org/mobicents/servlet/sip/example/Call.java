@@ -30,9 +30,13 @@ import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipApplicationSession.Protocol;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-public class Call implements Serializable
-{
+
+public class Call implements Serializable {
+	
+	private static Log logger = LogFactory.getLog(Call.class);
 	private String from;
 	private String to;
 	private String status;
@@ -52,6 +56,7 @@ public class Call implements Serializable
 	}
 	
 	public void addSession(SipSession session) {
+		logger.info("adding session " + session.getId() + " to call from " + from + " to " + to);
 		this.sessions.add(session.getId());
 	}
 
@@ -59,6 +64,7 @@ public class Call implements Serializable
 		Iterator it = this.sessions.iterator();
 		while(it.hasNext()) {
 			String sessionId = (String) it.next();
+			logger.info("sending BYE on session " + sessionId + " of call from " + from + " to " + to);
 			SipSession session = (SipSession) sipApplicationSession.getSession(sessionId, Protocol.SIP);
 			try {
 				session.createRequest("BYE").send();
