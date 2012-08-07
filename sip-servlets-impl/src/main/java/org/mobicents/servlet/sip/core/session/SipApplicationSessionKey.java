@@ -25,6 +25,9 @@ package org.mobicents.servlet.sip.core.session;
 import java.io.Serializable;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.GenericUtils;
+
 /**
  * <p>
  * Class representing the key (which will also be its id) for a sip application session.<br/>
@@ -37,7 +40,9 @@ import java.util.UUID;
 public final class SipApplicationSessionKey implements Serializable, MobicentsSipApplicationSessionKey {
 
 	private static final long serialVersionUID = 1L;
-	private final String uuid;
+	private static final Logger logger = Logger.getLogger(SipApplicationSessionKey.class
+			.getCanonicalName());
+	private String uuid;
 	private String appGeneratedKey;
 	private final String applicationName;
 	private String toString;
@@ -82,6 +87,13 @@ public final class SipApplicationSessionKey implements Serializable, MobicentsSi
 		// If found, the container MUST call the method to get the key and generate an 
 		// application-session-id by appending some unique identifier
 		if(appGeneratedKey != null) {
+			// http://code.google.com/p/sipservlets/issues/detail?id=146 : @SipApplicationSessionKey usage can break replication
+			// Hash the appGeneratedKey to make sure it always resolve to the same uuid and reset the uuid with it.
+			// TODO Ideally this method should be removed and the logic included in the constructor
+			uuid = GenericUtils.hashString(appGeneratedKey);
+			if(logger.isDebugEnabled()) {
+				logger.debug("uuid for appGeneratedKey " + appGeneratedKey + " set to " + uuid);
+			}
 			toString = appGeneratedKey + SessionManagerUtil.SESSION_KEY_SEPARATOR + uuid + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName;
 		}
 	}
