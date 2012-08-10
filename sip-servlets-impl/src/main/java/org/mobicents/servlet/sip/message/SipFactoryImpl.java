@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -367,10 +367,10 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 		}
 	    
 		final SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
-		final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
-		final MobicentsSipApplicationSession originalAppSession = originalSession
-				.getSipApplicationSession();				
-		
+		final MobicentsSipApplicationSession originalAppSession = (MobicentsSipApplicationSession) origRequestImpl.getApplicationSession(false);		
+		if (originalAppSession == null) {
+			throw new IllegalStateException("original request's app session does not exists");
+		}			
 		
 		final Request newRequest = (Request) origRequestImpl.message.clone();
 		((MessageExt)newRequest).setApplicationData(null);
@@ -453,11 +453,16 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 				}
 			}
 									
-			newFromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(getSipApplicationDispatcher(), originalSession.getKey().getApplicationName(), originalAppSession.getKey().getId()));
+			newFromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(getSipApplicationDispatcher(), originalAppSession.getKey().getApplicationName(), originalAppSession.getKey().getId()));
 			
-			final MobicentsSipSessionKey key = SessionManagerUtil.getSipSessionKey(originalAppSession.getKey().getId(), originalSession.getKey().getApplicationName(), newRequest, false);
+			final MobicentsSipSessionKey key = SessionManagerUtil.getSipSessionKey(originalAppSession.getKey().getId(), originalAppSession.getKey().getApplicationName(), newRequest, false);
 			final MobicentsSipSession session = originalAppSession.getSipContext().getSipManager().getSipSession(key, true, this, originalAppSession);			
-			session.setHandler(originalSession.getHandler());
+			final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
+			if(originalSession != null) {
+				session.setHandler(originalSession.getHandler());
+			} else if(originalAppSession.getCurrentRequestHandler() != null) {
+				session.setHandler(originalAppSession.getCurrentRequestHandler());
+			}
 			
 			final SipServletRequestImpl newSipServletRequest = (SipServletRequestImpl) mobicentsSipServletMessageFactory.createSipServletRequest(
 					newRequest,
