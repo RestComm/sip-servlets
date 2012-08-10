@@ -85,6 +85,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         SipDefinition.SIP_PATH_NAME.validateAndSet(operation, model);
         SipDefinition.SIP_APP_DISPATCHER_CLASS.validateAndSet(operation, model);
         SipDefinition.CONGESTION_CONTROL_INTERVAL.validateAndSet(operation, model);
+        SipDefinition.CONGESTION_CONTROL_POLICY.validateAndSet(operation, model);
         SipDefinition.CONCURRENCY_CONTROL_MODE.validateAndSet(operation, model);
         SipDefinition.USE_PRETTY_ENCODING.validateAndSet(operation, model);
         SipDefinition.ADDITIONAL_PARAMETERABLE_HEADERS.validateAndSet(operation, model);
@@ -128,6 +129,9 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ModelNode sipCongestionControlIntervalModel = SipDefinition.CONGESTION_CONTROL_INTERVAL.resolveModelAttribute(context, fullModel);
         final int sipCongestionControlInterval = sipCongestionControlIntervalModel.isDefined() ? sipCongestionControlIntervalModel.asInt() : -1;
 
+        final ModelNode congestionControlPolicyModel = SipDefinition.CONGESTION_CONTROL_POLICY.resolveModelAttribute(context, fullModel);
+        final String congestionControlPolicy = congestionControlPolicyModel.isDefined() ? congestionControlPolicyModel.asString() : "ErrorResponse";
+        
         final ModelNode sipConcurrencyControlModeModel = SipDefinition.CONCURRENCY_CONTROL_MODE.resolveModelAttribute(context, fullModel);
         final String sipConcurrencyControlMode = sipConcurrencyControlModeModel.isDefined() ? sipConcurrencyControlModeModel.asString() : null;
 
@@ -170,7 +174,8 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         		sipPathName, 
         		sipAppDispatcherClass, 
         		additionalParameterableHeaders, 
-        		sipCongestionControlInterval, 
+        		sipCongestionControlInterval,
+        		congestionControlPolicy,
         		sipConcurrencyControlMode, 
         		usePrettyEncoding, 
         		baseTimerInterval, 

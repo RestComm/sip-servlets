@@ -47,6 +47,7 @@ interface Constants {
     String CANCELED_TIMER_TASKS_PURGE_PERIOD = "canceled-timer-tasks-purge-period";
     String CONCURRENCY_CONTROL_MODE = "concurrency-control-mode";
     String CONGESTION_CONTROL_INTERVAL = "congestion-control-interval";
+    String CONGESTION_CONTROL_POLICY = "congestion-control-policy";
     String CONTAINER = "container";
     String CONTAINER_CONFIG = CONFIGURATION;
     String DEFAULT_VIRTUAL_SERVER = "default-virtual-server";

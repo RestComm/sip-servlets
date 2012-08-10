@@ -62,6 +62,7 @@ class SipServerService implements SipServer, Service<SipServer> {
     final String sipAppDispatcherClass;
     final String additionalParameterableHeaders;
     final int sipCongestionControlInterval;
+    final String congestionControlPolicy;
     final String sipConcurrencyControlMode;
     final boolean usePrettyEncoding;
  	final int baseTimerInterval;
@@ -91,7 +92,8 @@ class SipServerService implements SipServer, Service<SipServer> {
     		final String sipPathName, 
     		String sipAppDispatcherClass, 
     		String additionalParameterableHeaders, 
-    		int sipCongestionControlInterval, 
+    		int sipCongestionControlInterval,
+    		String congestionControlPolicy,
     		String sipConcurrencyControlMode, 
     		boolean usePrettyEncoding, 
     		int baseTimerInterval, 
@@ -101,7 +103,7 @@ class SipServerService implements SipServer, Service<SipServer> {
     		boolean dialogPendingRequestChecking, 
     		int canceledTimerTasksPurgePeriod, 
     		int memoryThreshold,
-    	 	int backToNormalMemoryThreshold,
+    	 	int backToNormalMemoryThreshold,    	 
     		String instanceId) {
 //        this.defaultHost = defaultHost;
 //        this.useNative = useNative;
@@ -111,6 +113,7 @@ class SipServerService implements SipServer, Service<SipServer> {
     	this.sipAppDispatcherClass = sipAppDispatcherClass;
     	this.additionalParameterableHeaders = additionalParameterableHeaders;
     	this.sipCongestionControlInterval = sipCongestionControlInterval;
+    	this.congestionControlPolicy = congestionControlPolicy;
     	this.sipConcurrencyControlMode = sipConcurrencyControlMode;
         this.instanceId = instanceId;
         this.usePrettyEncoding = usePrettyEncoding;
@@ -206,6 +209,7 @@ class SipServerService implements SipServer, Service<SipServer> {
         sipService.setCanceledTimerTasksPurgePeriod(canceledTimerTasksPurgePeriod);
         sipService.setMemoryThreshold(memoryThreshold);
         sipService.setBackToNormalMemoryThreshold(backToNormalMemoryThreshold);
+        sipService.setCongestionControlPolicy(congestionControlPolicy);
         
         sipService.setName(JBOSS_SIP);
         sipService.setServer(server);

@@ -81,6 +81,7 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         SipDefinition.SIP_APP_DISPATCHER_CLASS.marshallAsAttribute(node, false, writer);
         SipDefinition.CONCURRENCY_CONTROL_MODE.marshallAsAttribute(node, false, writer);
         SipDefinition.CONGESTION_CONTROL_INTERVAL.marshallAsAttribute(node, false, writer);
+        SipDefinition.CONGESTION_CONTROL_POLICY.marshallAsAttribute(node, false, writer);
         SipDefinition.USE_PRETTY_ENCODING.marshallAsAttribute(node, false, writer);
         SipDefinition.ADDITIONAL_PARAMETERABLE_HEADERS.marshallAsAttribute(node, false, writer);
         SipDefinition.BASE_TIMER_INTERVAL.marshallAsAttribute(node, false, writer);
@@ -133,6 +134,7 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
 	            case DIALOG_PENDING_REQUEST_CHECKING:
 	            case CANCELED_TIMER_TASKS_PURGE_PERIOD:
 	            case CONGESTION_CONTROL_INTERVAL:
+	            case CONGESTION_CONTROL_POLICY:
 	            case MEMORY_THRESHOLD:
 	            case BACK_TO_NORMAL_MEMORY_THRESHOLD:
 	            case CONCURRENCY_CONTROL_MODE:

@@ -100,6 +100,14 @@ public class SipDefinition extends SimpleResourceDefinition {
                     //.setValidator(new IntRangeValidator(1, true))
                     .setDefaultValue(new ModelNode(-1))
                     .build();
+    protected static final SimpleAttributeDefinition CONGESTION_CONTROL_POLICY =
+            new SimpleAttributeDefinitionBuilder(Constants.CONGESTION_CONTROL_POLICY, ModelType.STRING, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.CONGESTION_CONTROL_POLICY)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    //.setValidator(new IntRangeValidator(1, true))
+                    .setDefaultValue(new ModelNode("ErrorResponse"))
+                    .build();
     protected static final SimpleAttributeDefinition USE_PRETTY_ENCODING =
             new SimpleAttributeDefinitionBuilder(Constants.USE_PRETTY_ENCODING, ModelType.BOOLEAN, true)
                     .setAllowExpression(true)
@@ -196,6 +204,7 @@ public class SipDefinition extends SimpleResourceDefinition {
         registration.registerReadWriteAttribute(SIP_PATH_NAME, null, new ReloadRequiredWriteAttributeHandler(SIP_PATH_NAME));
         registration.registerReadWriteAttribute(SIP_APP_DISPATCHER_CLASS, null, new ReloadRequiredWriteAttributeHandler(SIP_APP_DISPATCHER_CLASS));
         registration.registerReadWriteAttribute(CONGESTION_CONTROL_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(CONGESTION_CONTROL_INTERVAL));
+        registration.registerReadWriteAttribute(CONGESTION_CONTROL_POLICY, null, new ReloadRequiredWriteAttributeHandler(CONGESTION_CONTROL_POLICY));
         registration.registerReadWriteAttribute(CONCURRENCY_CONTROL_MODE, null, new ReloadRequiredWriteAttributeHandler(CONCURRENCY_CONTROL_MODE));
         registration.registerReadWriteAttribute(USE_PRETTY_ENCODING, null, new ReloadRequiredWriteAttributeHandler(USE_PRETTY_ENCODING));
         registration.registerReadWriteAttribute(ADDITIONAL_PARAMETERABLE_HEADERS, null, new ReloadRequiredWriteAttributeHandler(ADDITIONAL_PARAMETERABLE_HEADERS));
