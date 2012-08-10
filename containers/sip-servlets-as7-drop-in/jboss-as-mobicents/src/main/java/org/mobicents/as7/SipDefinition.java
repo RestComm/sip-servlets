@@ -156,6 +156,21 @@ public class SipDefinition extends SimpleResourceDefinition {
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .setDefaultValue(new ModelNode(-1))
                     .build();
+    protected static final SimpleAttributeDefinition MEMORY_THRESHOLD =
+            new SimpleAttributeDefinitionBuilder(Constants.MEMORY_THRESHOLD, ModelType.INT, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.MEMORY_THRESHOLD)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(85))
+                    .build();
+    protected static final SimpleAttributeDefinition BACK_TO_NORMAL_MEMORY_THRESHOLD =
+            new SimpleAttributeDefinitionBuilder(Constants.BACK_TO_NORMAL_MEMORY_THRESHOLD, ModelType.INT, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.BACK_TO_NORMAL_MEMORY_THRESHOLD)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(75))
+                    .build();
+   
     
     
     private SipDefinition() {
@@ -190,5 +205,7 @@ public class SipDefinition extends SimpleResourceDefinition {
         registration.registerReadWriteAttribute(TIMER_D_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(TIMER_D_INTERVAL));
         registration.registerReadWriteAttribute(DIALOG_PENDING_REQUEST_CHECKING, null, new ReloadRequiredWriteAttributeHandler(DIALOG_PENDING_REQUEST_CHECKING));
         registration.registerReadWriteAttribute(CANCELED_TIMER_TASKS_PURGE_PERIOD, null, new ReloadRequiredWriteAttributeHandler(CANCELED_TIMER_TASKS_PURGE_PERIOD));
+        registration.registerReadWriteAttribute(MEMORY_THRESHOLD, null, new ReloadRequiredWriteAttributeHandler(MEMORY_THRESHOLD));
+        registration.registerReadWriteAttribute(BACK_TO_NORMAL_MEMORY_THRESHOLD, null, new ReloadRequiredWriteAttributeHandler(BACK_TO_NORMAL_MEMORY_THRESHOLD));
     }
 }

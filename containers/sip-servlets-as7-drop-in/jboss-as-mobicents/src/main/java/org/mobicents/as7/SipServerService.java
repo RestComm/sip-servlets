@@ -70,6 +70,8 @@ class SipServerService implements SipServer, Service<SipServer> {
  	final int timerDInterval;
  	final boolean dialogPendingRequestChecking;
  	final int canceledTimerTasksPurgePeriod;
+ 	final int memoryThreshold;
+ 	final int backToNormalMemoryThreshold;
  	
     private final String instanceId;
 
@@ -98,6 +100,8 @@ class SipServerService implements SipServer, Service<SipServer> {
     		int timerDInterval, 
     		boolean dialogPendingRequestChecking, 
     		int canceledTimerTasksPurgePeriod, 
+    		int memoryThreshold,
+    	 	int backToNormalMemoryThreshold,
     		String instanceId) {
 //        this.defaultHost = defaultHost;
 //        this.useNative = useNative;
@@ -116,6 +120,8 @@ class SipServerService implements SipServer, Service<SipServer> {
         this.timerDInterval = timerDInterval;
         this.dialogPendingRequestChecking = dialogPendingRequestChecking;
         this.canceledTimerTasksPurgePeriod = canceledTimerTasksPurgePeriod;
+        this.memoryThreshold = memoryThreshold;
+        this.backToNormalMemoryThreshold = backToNormalMemoryThreshold;
     }
 
     /** {@inheritDoc} */
@@ -198,6 +204,8 @@ class SipServerService implements SipServer, Service<SipServer> {
         }
         sipService.setDialogPendingRequestChecking(dialogPendingRequestChecking);
         sipService.setCanceledTimerTasksPurgePeriod(canceledTimerTasksPurgePeriod);
+        sipService.setMemoryThreshold(memoryThreshold);
+        sipService.setBackToNormalMemoryThreshold(backToNormalMemoryThreshold);
         
         sipService.setName(JBOSS_SIP);
         sipService.setServer(server);

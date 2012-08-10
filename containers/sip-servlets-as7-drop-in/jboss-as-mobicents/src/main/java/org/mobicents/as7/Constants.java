@@ -29,6 +29,8 @@ interface Constants {
     String ACCESS_LOG = "access-log";
     String ADDITIONAL_PARAMETERABLE_HEADERS = "additional-parameterable-headers";
     String ALIAS = "alias";
+    String APPLICATION_ROUTER = "application-router";
+    String BACK_TO_NORMAL_MEMORY_THRESHOLD = "back-to-normal-memory-threshold";
     String BASE_TIMER_INTERVAL = "base-timer-interval";
     String CA_CERTIFICATE_FILE = "ca-certificate-file";
     String CA_CERTIFICATE_PASSWORD = "ca-certificate-password";
@@ -41,8 +43,7 @@ interface Constants {
     String CIPHER_SUITE = "cipher-suite";
     String CONDITION = "condition";
     String CONFIGURATION = "configuration";
-    String CONNECTOR = "connector";
-    String APPLICATION_ROUTER = "application-router";
+    String CONNECTOR = "connector";    
     String CANCELED_TIMER_TASKS_PURGE_PERIOD = "canceled-timer-tasks-purge-period";
     String CONCURRENCY_CONTROL_MODE = "concurrency-control-mode";
     String CONGESTION_CONTROL_INTERVAL = "congestion-control-interval";
@@ -78,6 +79,7 @@ interface Constants {
     String MAX_DEPTH = "max-depth";
     String MAX_POST_SIZE = "max-post-size";
     String MAX_SAVE_POST_SIZE = "max-save-post-size";
+    String MEMORY_THRESHOLD = "memory-threshold";
     String MIME_MAPPING = "mime-mapping";
     String MODIFICATION_TEST_INTERVAL = "modification-test-interval";
     String NAME = "name";
