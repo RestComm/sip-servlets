@@ -27,7 +27,7 @@ package org.mobicents.as7;
 interface Constants {
 
     String ACCESS_LOG = "access-log";
-    String ADDITIONAL_PARAMETERABLE_HEADERS = "additional-parameterable-heders";
+    String ADDITIONAL_PARAMETERABLE_HEADERS = "additional-parameterable-headers";
     String ALIAS = "alias";
     String BASE_TIMER_INTERVAL = "base-timer-interval";
     String CA_CERTIFICATE_FILE = "ca-certificate-file";

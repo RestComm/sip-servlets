@@ -189,6 +189,16 @@ class SipServerService implements SipServer, Service<SipServer> {
         //
         sipService.setUsePrettyEncoding(usePrettyEncoding);
         //
+        sipService.setBaseTimerInterval(baseTimerInterval);
+        sipService.setT2Interval(t2Interval);
+        sipService.setT4Interval(t4Interval);
+        sipService.setTimerDInterval(timerDInterval);
+        if(additionalParameterableHeaders != null) {
+        	sipService.setAdditionalParameterableHeaders(additionalParameterableHeaders);
+        }
+        sipService.setDialogPendingRequestChecking(dialogPendingRequestChecking);
+        sipService.setCanceledTimerTasksPurgePeriod(canceledTimerTasksPurgePeriod);
+        
         sipService.setName(JBOSS_SIP);
         sipService.setServer(server);
         server.addService(sipService);
