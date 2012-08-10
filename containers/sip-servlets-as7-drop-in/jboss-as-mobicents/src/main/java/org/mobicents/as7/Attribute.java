@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2010, Red Hat Inc., and individual contributors as indicated
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -32,6 +32,9 @@ enum Attribute {
     UNKNOWN(null),
 
     APPLICATION_ROUTER(Constants.APPLICATION_ROUTER),
+    ADDITIONAL_PARAMETERABLE_HEADERS(Constants.ADDITIONAL_PARAMETERABLE_HEADERS),
+    BASE_TIMER_INTERVAL(Constants.BASE_TIMER_INTERVAL),
+    CANCELED_TIMER_TASKS_PURGE_PERIOD(Constants.CANCELED_TIMER_TASKS_PURGE_PERIOD),
     CA_CERTIFICATE_FILE(Constants.CA_CERTIFICATE_FILE),
     CA_CERTIFICATE_PASSWORD(Constants.CA_CERTIFICATE_PASSWORD),
     CA_REVOCATION_URL(Constants.CA_REVOCATION_URL),
@@ -46,6 +49,7 @@ enum Attribute {
     DEFAULT_VIRTUAL_SERVER(Constants.DEFAULT_VIRTUAL_SERVER),
     DEFAULT_WEB_MODULE(Constants.DEFAULT_WEB_MODULE),
     DEVELOPMENT(Constants.DEVELOPMENT),
+    DIALOG_PENDING_REQUEST_CHECKING(Constants.DIALOG_PENDING_REQUEST_CHECKING),
     DIRECTORY(Constants.DIRECTORY),
     DISABLED(Constants.DISABLED),
     DISPLAY_SOURCE_FRAGMENT(Constants.DISPLAY_SOURCE_FRAGMENT),
@@ -105,7 +109,10 @@ enum Attribute {
     STUN_SERVER_ADDRESS(Constants.STUN_SERVER_ADDRESS),
     STUN_SERVER_PORT(Constants.STUN_SERVER_PORT),
     SUBSTITUTION(Constants.SUBSTITUTION),
+    T2_INTERVAL(Constants.T2_INTERVAL),
+    T4_INTERVAL(Constants.T4_INTERVAL),    
     TARGET_VM(Constants.TARGET_VM),
+    TIMER_D_INTERVAL(Constants.TIMER_D_INTERVAL),
     TRIM_SPACES(Constants.TRIM_SPACES),
     TRUSTSTORE_TYPE(Constants.TRUSTSTORE_TYPE),
     TAG_POOLING(Constants.TAG_POOLING),

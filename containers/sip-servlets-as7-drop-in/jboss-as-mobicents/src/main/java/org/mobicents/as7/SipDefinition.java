@@ -1,3 +1,24 @@
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package org.mobicents.as7;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
@@ -86,7 +107,57 @@ public class SipDefinition extends SimpleResourceDefinition {
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .setDefaultValue(new ModelNode(true))
                     .build();
-
+    protected static final SimpleAttributeDefinition ADDITIONAL_PARAMETERABLE_HEADERS =
+            new SimpleAttributeDefinitionBuilder(Constants.ADDITIONAL_PARAMETERABLE_HEADERS, ModelType.STRING, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.ADDITIONAL_PARAMETERABLE_HEADERS)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(null)
+                    .build();
+    protected static final SimpleAttributeDefinition BASE_TIMER_INTERVAL =
+            new SimpleAttributeDefinitionBuilder(Constants.BASE_TIMER_INTERVAL, ModelType.INT, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.BASE_TIMER_INTERVAL)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(500))
+                    .build();
+    protected static final SimpleAttributeDefinition T2_INTERVAL =
+            new SimpleAttributeDefinitionBuilder(Constants.T2_INTERVAL, ModelType.INT, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.T2_INTERVAL)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(4000))
+                    .build();
+    protected static final SimpleAttributeDefinition T4_INTERVAL =
+            new SimpleAttributeDefinitionBuilder(Constants.T4_INTERVAL, ModelType.INT, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.T4_INTERVAL)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(5000))
+                    .build();
+    protected static final SimpleAttributeDefinition TIMER_D_INTERVAL =
+            new SimpleAttributeDefinitionBuilder(Constants.TIMER_D_INTERVAL, ModelType.INT, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.TIMER_D_INTERVAL)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(32000))
+                    .build();
+    protected static final SimpleAttributeDefinition DIALOG_PENDING_REQUEST_CHECKING =
+            new SimpleAttributeDefinitionBuilder(Constants.DIALOG_PENDING_REQUEST_CHECKING, ModelType.BOOLEAN, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.DIALOG_PENDING_REQUEST_CHECKING)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(false))
+                    .build();
+    protected static final SimpleAttributeDefinition CANCELED_TIMER_TASKS_PURGE_PERIOD =
+            new SimpleAttributeDefinitionBuilder(Constants.CANCELED_TIMER_TASKS_PURGE_PERIOD, ModelType.INT, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.CANCELED_TIMER_TASKS_PURGE_PERIOD)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(-1))
+                    .build();
+    
+    
     private SipDefinition() {
         super(PathElement.pathElement(ModelDescriptionConstants.SUBSYSTEM, SipExtension.SUBSYSTEM_NAME),
                 SipExtension.getResourceDescriptionResolver(null));
@@ -112,5 +183,12 @@ public class SipDefinition extends SimpleResourceDefinition {
         registration.registerReadWriteAttribute(CONGESTION_CONTROL_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(CONGESTION_CONTROL_INTERVAL));
         registration.registerReadWriteAttribute(CONCURRENCY_CONTROL_MODE, null, new ReloadRequiredWriteAttributeHandler(CONCURRENCY_CONTROL_MODE));
         registration.registerReadWriteAttribute(USE_PRETTY_ENCODING, null, new ReloadRequiredWriteAttributeHandler(USE_PRETTY_ENCODING));
+        registration.registerReadWriteAttribute(ADDITIONAL_PARAMETERABLE_HEADERS, null, new ReloadRequiredWriteAttributeHandler(ADDITIONAL_PARAMETERABLE_HEADERS));
+        registration.registerReadWriteAttribute(BASE_TIMER_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(BASE_TIMER_INTERVAL));
+        registration.registerReadWriteAttribute(T2_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(T2_INTERVAL));
+        registration.registerReadWriteAttribute(T4_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(T4_INTERVAL));
+        registration.registerReadWriteAttribute(TIMER_D_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(TIMER_D_INTERVAL));
+        registration.registerReadWriteAttribute(DIALOG_PENDING_REQUEST_CHECKING, null, new ReloadRequiredWriteAttributeHandler(DIALOG_PENDING_REQUEST_CHECKING));
+        registration.registerReadWriteAttribute(CANCELED_TIMER_TASKS_PURGE_PERIOD, null, new ReloadRequiredWriteAttributeHandler(CANCELED_TIMER_TASKS_PURGE_PERIOD));
     }
 }

@@ -1,8 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2010, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -19,7 +19,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.as7;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
@@ -83,6 +82,13 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         SipDefinition.CONCURRENCY_CONTROL_MODE.marshallAsAttribute(node, false, writer);
         SipDefinition.CONGESTION_CONTROL_INTERVAL.marshallAsAttribute(node, false, writer);
         SipDefinition.USE_PRETTY_ENCODING.marshallAsAttribute(node, false, writer);
+        SipDefinition.ADDITIONAL_PARAMETERABLE_HEADERS.marshallAsAttribute(node, false, writer);
+        SipDefinition.BASE_TIMER_INTERVAL.marshallAsAttribute(node, false, writer);
+        SipDefinition.T2_INTERVAL.marshallAsAttribute(node, false, writer);
+        SipDefinition.T4_INTERVAL.marshallAsAttribute(node, false, writer);
+        SipDefinition.TIMER_D_INTERVAL.marshallAsAttribute(node, false, writer);
+        SipDefinition.DIALOG_PENDING_REQUEST_CHECKING.marshallAsAttribute(node, false, writer);
+        SipDefinition.CANCELED_TIMER_TASKS_PURGE_PERIOD.marshallAsAttribute(node, false, writer);
         if(node.hasDefined(CONNECTOR)) {
         	for(final Property connector : node.get(CONNECTOR).asPropertyList()) {
         		final ModelNode config = connector.getValue();
@@ -117,6 +123,13 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
 	            case SIP_STACK_PROPS:
 	            case SIP_APP_DISPATCHER_CLASS:
 	            case SIP_PATH_NAME:
+	            case ADDITIONAL_PARAMETERABLE_HEADERS:
+	            case BASE_TIMER_INTERVAL:
+	            case T2_INTERVAL:
+	            case T4_INTERVAL:
+	            case TIMER_D_INTERVAL:
+	            case DIALOG_PENDING_REQUEST_CHECKING:
+	            case CANCELED_TIMER_TASKS_PURGE_PERIOD:
 	            case CONGESTION_CONTROL_INTERVAL:
 	            case CONCURRENCY_CONTROL_MODE:
 	            case USE_PRETTY_ENCODING:

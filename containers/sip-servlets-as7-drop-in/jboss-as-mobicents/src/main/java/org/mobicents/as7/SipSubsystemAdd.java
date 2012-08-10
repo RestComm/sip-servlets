@@ -1,8 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2010, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -19,7 +19,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.as7;
 
 import java.util.List;
@@ -88,6 +87,13 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         SipDefinition.CONGESTION_CONTROL_INTERVAL.validateAndSet(operation, model);
         SipDefinition.CONCURRENCY_CONTROL_MODE.validateAndSet(operation, model);
         SipDefinition.USE_PRETTY_ENCODING.validateAndSet(operation, model);
+        SipDefinition.ADDITIONAL_PARAMETERABLE_HEADERS.validateAndSet(operation, model);
+        SipDefinition.BASE_TIMER_INTERVAL.validateAndSet(operation, model);
+        SipDefinition.T2_INTERVAL.validateAndSet(operation, model);
+        SipDefinition.T4_INTERVAL.validateAndSet(operation, model);
+        SipDefinition.TIMER_D_INTERVAL.validateAndSet(operation, model);
+        SipDefinition.DIALOG_PENDING_REQUEST_CHECKING.validateAndSet(operation, model);
+        SipDefinition.CANCELED_TIMER_TASKS_PURGE_PERIOD.validateAndSet(operation, model);
     }
 
     @Override
@@ -110,6 +116,12 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
         final ModelNode sipAppDispatcherClassModel = SipDefinition.SIP_APP_DISPATCHER_CLASS.resolveModelAttribute(context, fullModel);
         final String sipAppDispatcherClass = sipAppDispatcherClassModel.isDefined() ? sipAppDispatcherClassModel.asString() : null;
+        
+        final ModelNode usePrettyEncodingModel = SipDefinition.CANCELED_TIMER_TASKS_PURGE_PERIOD.resolveModelAttribute(context, fullModel);
+        final boolean usePrettyEncoding = usePrettyEncodingModel.isDefined() ? usePrettyEncodingModel.asBoolean() : true;
+        
+        final ModelNode additionalParameterableHeadersModel = SipDefinition.ADDITIONAL_PARAMETERABLE_HEADERS.resolveModelAttribute(context, fullModel);
+        final String additionalParameterableHeaders = additionalParameterableHeadersModel.isDefined() ? additionalParameterableHeadersModel.asString() : null;
 
         final ModelNode sipCongestionControlIntervalModel = SipDefinition.CONGESTION_CONTROL_INTERVAL.resolveModelAttribute(context, fullModel);
         final int sipCongestionControlInterval = sipCongestionControlIntervalModel.isDefined() ? sipCongestionControlIntervalModel.asInt() : -1;
@@ -117,8 +129,23 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ModelNode sipConcurrencyControlModeModel = SipDefinition.CONCURRENCY_CONTROL_MODE.resolveModelAttribute(context, fullModel);
         final String sipConcurrencyControlMode = sipConcurrencyControlModeModel.isDefined() ? sipConcurrencyControlModeModel.asString() : null;
 
-        final ModelNode usePrettyEncodingModel = SipDefinition.USE_PRETTY_ENCODING.resolveModelAttribute(context, fullModel);
-        final boolean usePrettyEncoding = usePrettyEncodingModel.isDefined() ? usePrettyEncodingModel.asBoolean() : true;
+        final ModelNode baseTimerIntervalModel = SipDefinition.BASE_TIMER_INTERVAL.resolveModelAttribute(context, fullModel);
+        final int baseTimerInterval = baseTimerIntervalModel.isDefined() ? baseTimerIntervalModel.asInt() : 500;
+        
+        final ModelNode t2IntervalModel = SipDefinition.T2_INTERVAL.resolveModelAttribute(context, fullModel);
+        final int t2Interval = t2IntervalModel.isDefined() ? t2IntervalModel.asInt() : 4000;
+        
+        final ModelNode t4IntervalModel = SipDefinition.T4_INTERVAL.resolveModelAttribute(context, fullModel);
+        final int t4Interval = t4IntervalModel.isDefined() ? t4IntervalModel.asInt() : 5000;
+        
+        final ModelNode timerDIntervalModel = SipDefinition.TIMER_D_INTERVAL.resolveModelAttribute(context, fullModel);
+        final int timerDInterval = timerDIntervalModel.isDefined() ? timerDIntervalModel.asInt() : 32000;
+        
+        final ModelNode dialogPendingRequestCheckingModel = SipDefinition.DIALOG_PENDING_REQUEST_CHECKING.resolveModelAttribute(context, fullModel);
+        final boolean dialogPendingRequestChecking = dialogPendingRequestCheckingModel.isDefined() ? dialogPendingRequestCheckingModel.asBoolean() : false;
+        
+        final ModelNode canceledTimerTasksPurgePeriodModel = SipDefinition.CANCELED_TIMER_TASKS_PURGE_PERIOD.resolveModelAttribute(context, fullModel);
+        final int canceledTimerTasksPurgePeriod = canceledTimerTasksPurgePeriodModel.isDefined() ? canceledTimerTasksPurgePeriodModel.asInt() : -1;
 
 //    	final String instanceId = operation.hasDefined(Constants.INSTANCE_ID) ? operation.get(Constants.INSTANCE_ID).asString() : null;
 //    	final String sipAppRouterFile = operation.hasDefined(Constants.APPLICATION_ROUTER) ? operation.get(Constants.APPLICATION_ROUTER).asString() : null;
@@ -129,7 +156,22 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
 //    	final String sipConcurrencyControlMode = operation.hasDefined(Constants.CONCURRENCY_CONTROL_MODE) ? operation.get(Constants.CONCURRENCY_CONTROL_MODE).asString() : null;
 //    	final boolean usePrettyEncoding = operation.hasDefined(Constants.USE_PRETTY_ENCODING) ? operation.get(Constants.USE_PRETTY_ENCODING).asBoolean() : true;
 
-        final SipServerService service = new SipServerService(sipAppRouterFile, sipStackPropertiesFile, sipPathName, sipAppDispatcherClass, sipCongestionControlInterval, sipConcurrencyControlMode, usePrettyEncoding, instanceId);
+        final SipServerService service = new SipServerService(
+        		sipAppRouterFile, 
+        		sipStackPropertiesFile, 
+        		sipPathName, 
+        		sipAppDispatcherClass, 
+        		additionalParameterableHeaders, 
+        		sipCongestionControlInterval, 
+        		sipConcurrencyControlMode, 
+        		usePrettyEncoding, 
+        		baseTimerInterval, 
+        		t2Interval, 
+        		t4Interval, 
+        		timerDInterval, 
+        		dialogPendingRequestChecking, 
+        		canceledTimerTasksPurgePeriod, 
+        		instanceId);
         newControllers.add(context.getServiceTarget().addService(SipSubsystemServices.JBOSS_SIP, service)
                 .addDependency(PathManagerService.SERVICE_NAME, PathManager.class, service.getPathManagerInjector())
                 .addDependency(DependencyType.OPTIONAL, ServiceName.JBOSS.append("mbean", "server"), MBeanServer.class, service.getMbeanServer())
