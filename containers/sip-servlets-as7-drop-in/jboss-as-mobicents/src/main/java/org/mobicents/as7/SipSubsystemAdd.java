@@ -47,19 +47,22 @@ import org.jboss.msc.value.InjectedValue;
 import org.mobicents.as7.clustering.sip.MockDistributedCacheManagerFactoryService;
 import org.mobicents.as7.deployment.AttachSipServerServiceProcessor;
 import org.mobicents.as7.deployment.SipAnnotationDeploymentProcessor;
+import org.mobicents.as7.deployment.SipComponentProcessor;
 import org.mobicents.as7.deployment.SipContextFactoryDeploymentProcessor;
 import org.mobicents.as7.deployment.SipJndiBindingProcessor;
 import org.mobicents.as7.deployment.SipParsingDeploymentProcessor;
 import org.mobicents.as7.deployment.SipWarDeploymentProcessor;
 
 /**
- * Adds the web subsystem.
+ * Adds the sip subsystem.
  *
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
  */
 class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
+	// FIXME: these priorities should be substituted by values from with org.jboss.as.server.deployment.Phase
+	//   aligned with those used by web subsystem
     static int PARSE_SIP_DEPLOYMENT_PRIORITY = 0x4000;
     static int SIP_ANNOTATION_DEPLOYMENT_PRIORITY = 0x5000;
     static int SIP_CONTEXT_FACTORY_DEPLOYMENT_PRIORITY = 0x6000;
@@ -200,6 +203,9 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(SipExtension.SUBSYSTEM_NAME, Phase.PARSE, PARSE_SIP_DEPLOYMENT_PRIORITY, new SipParsingDeploymentProcessor());
                 // handles annotations
                 processorTarget.addDeploymentProcessor(SipExtension.SUBSYSTEM_NAME, Phase.PARSE, SIP_ANNOTATION_DEPLOYMENT_PRIORITY, new SipAnnotationDeploymentProcessor());
+                // creates component's configurations (mainly for resolving reference annotations)
+                // FIXME: should this priority be Phase.PARSE_WEB_COMPONENTS + 1?
+                processorTarget.addDeploymentProcessor(SipExtension.SUBSYSTEM_NAME, Phase.PARSE, SIP_ANNOTATION_DEPLOYMENT_PRIORITY + 1, new SipComponentProcessor());
                 // attach SipServer to deployment unit (so we can recover it from the sip context)
                 processorTarget.addDeploymentProcessor(SipExtension.SUBSYSTEM_NAME, Phase.POST_MODULE, SIP_CONTEXT_FACTORY_DEPLOYMENT_PRIORITY -1 , new AttachSipServerServiceProcessor(service));
                 // plugs our context factory into web subsystem deployers
