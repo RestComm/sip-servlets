@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -19,8 +19,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.testsuite.simple;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -831,6 +831,28 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));
 	}
 	
+	// Tests Issue 143 http://code.google.com/p/mobicents/issues/detail?id=143
+	public void testShootist422Response() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setProvisionalResponsesToSend(new ArrayList<Integer>());
+		receiver.setFinalResponseToSend(422);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();		
+		deployApplication("testErrorResponse", "true");
+		Thread.sleep(TIMEOUT);				
+		receiver.setFinalResponseToSend(200);
+		Thread.sleep(TIMEOUT);				
+		assertTrue(receiver.isAckReceived());
+	}
+		
+		
 	// Test for SS spec 11.1.6 transaction timeout notification
 	// Test Issue 2580 http://code.google.com/p/mobicents/issues/detail?id=2580
 	public void testTransactionTimeoutResponse() throws Exception {

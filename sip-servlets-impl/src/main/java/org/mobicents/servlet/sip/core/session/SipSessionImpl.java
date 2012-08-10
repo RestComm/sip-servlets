@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -19,7 +19,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.core.session;
 
 import gov.nist.javax.sip.ServerTransactionExt;
@@ -393,7 +392,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 		if(sessionCreatingDialog != null && DialogState.TERMINATED.equals(sessionCreatingDialog.getState()) && !method.equalsIgnoreCase(Request.BYE)) {
 			// don't do it for authentication as the dialog will go back to TERMINATED state, so we should allow to create challenge requests
 			if(sessionCreatingTransactionRequest == null || sessionCreatingTransactionRequest.getLastFinalResponse() == null ||
-					(sessionCreatingTransactionRequest.getLastFinalResponse().getStatus() != 401 && sessionCreatingTransactionRequest.getLastFinalResponse().getStatus() != 407)) {				
+					(sessionCreatingTransactionRequest.getLastFinalResponse().getStatus() != 401 && sessionCreatingTransactionRequest.getLastFinalResponse().getStatus() != 407 &&
+						// http://code.google.com/p/sipservlets/issues/detail?id=143 RFC 4028 Session Timer : Allow sending retry INVITE after receiving 422 response
+						sessionCreatingTransactionRequest.getLastFinalResponse().getStatus() != SipServletResponse.SC_SESSION_INTERVAL_TOO_SMALL)) {				
 				throw new IllegalStateException("cannot create a subsequent request " + method + " because the dialog " + sessionCreatingDialog + " for session " + key + " is in TERMINATED state");
 			}
 		}
