@@ -1,8 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2011, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -22,8 +22,6 @@
 
 package org.mobicents.as7.deployment;
 
-import static org.mobicents.as7.SipMessages.MESSAGES;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -40,10 +38,8 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 import org.jboss.as.server.deployment.annotation.CompositeIndex;
-//import org.jboss.as.web.deployment.WebAttachments;
 import org.jboss.as.web.deployment.WebAttachments;
 import org.jboss.as.web.deployment.component.ComponentInstantiator;
-import org.jboss.as.web.deployment.component.ManagedBeanComponentInstantiator;
 import org.jboss.as.web.deployment.component.WebComponentDescription;
 import org.jboss.as.web.deployment.component.WebComponentInstantiator;
 import org.jboss.metadata.web.spec.ListenerMetaData;
