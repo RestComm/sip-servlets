@@ -60,6 +60,9 @@ public interface SipMessages {
     @Message(id = 18027, value = "Failed to add Mobicents SIP deployment service")
     String failedToAddSipDeployment();
 
+    @Message(id = 18043, value = "%s has the wrong component type, it cannot be used as a SIP component")
+    RuntimeException wrongComponentType(String clazz);
+
     /**
      * A message indicating the metric is unknown.
      *
