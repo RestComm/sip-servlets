@@ -570,7 +570,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 				}
 				orphan = true;
 				sessionKey = SessionManagerUtil.getSipSessionKey(
-						SessionManagerUtil.getSipApplicationSessionKey(applicationName, getAppSessionId()).getId(),
+						SessionManagerUtil.getSipApplicationSessionKey(applicationName, getAppSessionId(), null).getId(),
 						applicationName, message, false);
 			}
 		}
@@ -579,7 +579,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			//call id not needed anymore since the sipappsessionkey is not a callid anymore but a random uuid
 			final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 					applicationName, 
-					sessionKey.getApplicationSessionId());
+					sessionKey.getApplicationSessionId(), null);
 			MobicentsSipApplicationSession applicationSession =  sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, create);
 			if(applicationSession != null) {
 				// application session can be null if create is false and it is an orphan request
@@ -1085,7 +1085,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		if(sipSession == null && sessionKey != null) {
 			final String applicationName = sessionKey.getApplicationName(); 
 			final SipContext sipContext = sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(applicationName);
-			SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessionKey.getApplicationSessionId(), sessionKey.getApplicationName());
+			SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessionKey.getApplicationSessionId(), sessionKey.getApplicationName(), null);
 			MobicentsSipApplicationSession sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
 			sipSession = sipContext.getSipManager().getSipSession(sessionKey, false, sipFactoryImpl, sipApplicationSession);	
 		} 

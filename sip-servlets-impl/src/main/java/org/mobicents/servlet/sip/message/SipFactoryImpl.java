@@ -19,7 +19,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.header.HeaderFactoryExt;
@@ -251,6 +250,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 		//call id not needed anymore since the sipappsessionkey is not a callid anymore but a random uuid
 		SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				sipContext.getApplicationName(), 
+				null,
 				null);		
 		MobicentsSipApplicationSession sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(
 				sipApplicationSessionKey, true);

@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -110,13 +110,14 @@ public class SessionManagerUtil {
 	 * @return the computed key 
 	 * @throws NullPointerException if one of the two parameters is null
 	 */
-	public static SipApplicationSessionKey getSipApplicationSessionKey(final String applicationName, final String id) {
+	public static SipApplicationSessionKey getSipApplicationSessionKey(final String applicationName, final String id, final String appGeneratedKey) {
 		if(applicationName == null) {
 			throw new NullPointerException("the application name cannot be null for sip application session key creation");
 		}
 		return new SipApplicationSessionKey(
 				id,
-				applicationName);		
+				applicationName,
+				appGeneratedKey);		
 	}
 	
 	/**
@@ -143,11 +144,10 @@ public class SessionManagerUtil {
 			appGeneratedKey = uuid;
 			uuid = leftover.substring(0, indexOfComma);
 			String applicationName = leftover.substring(indexOfComma + 1, leftover.length());
-			sipApplicationSessionKey = getSipApplicationSessionKey(applicationName, uuid);
-			sipApplicationSessionKey.setAppGeneratedKey(appGeneratedKey);
+			sipApplicationSessionKey = getSipApplicationSessionKey(applicationName, uuid, appGeneratedKey);
 		} else {
 			String applicationName = leftover;
-			sipApplicationSessionKey = getSipApplicationSessionKey(applicationName, uuid);
+			sipApplicationSessionKey = getSipApplicationSessionKey(applicationName, uuid, null);
 		}	
 		return sipApplicationSessionKey;
 	}

@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -19,18 +19,15 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.testsuite.targeting;
 
 import java.text.ParseException;
 
+import junit.framework.TestCase;
 import nl.jqno.equalsverifier.EqualsVerifier;
 
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
-import org.mobicents.servlet.sip.core.session.SipSessionKey;
-
-import junit.framework.TestCase;
 
 /**
  * Non Regression Test for Issue 2423
@@ -63,7 +60,7 @@ public class SipApplicationSessionKeyParsingTest extends TestCase {
 
 	
 	public void testSipApplicationSessionKeyAndParsing() throws ParseException {
-		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(null, "ApplicationNameTest");
+		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(null, "ApplicationNameTest", null);
 		String sipApplicationSessionKeyStringified = sipApplicationSessionKey.toString();
 		
 		SipApplicationSessionKey sipApplicationSessionKeyParsed =
@@ -74,10 +71,9 @@ public class SipApplicationSessionKeyParsingTest extends TestCase {
 		assertEquals(sipApplicationSessionKey.toString(), sipApplicationSessionKeyParsed.toString());		
 	}
 	
-	public void testSipApplicationSessionKeyGeneratedAndParsing() throws ParseException {
-		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(null, "ApplicationNameTest");
+	public void testSipApplicationSessionKeyGeneratedAndParsing() throws ParseException {		
 		String appGeneratedKey = "myGeneratedKey";
-		sipApplicationSessionKey.setAppGeneratedKey(appGeneratedKey);
+		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(null, "ApplicationNameTest", appGeneratedKey);
 		String sipApplicationSessionKeyStringified = sipApplicationSessionKey.toString();
 		
 		SipApplicationSessionKey sipApplicationSessionKeyParsed =
@@ -88,8 +84,7 @@ public class SipApplicationSessionKeyParsingTest extends TestCase {
 		assertEquals(sipApplicationSessionKey.toString(), sipApplicationSessionKeyParsed.toString());		
 		assertTrue(sipApplicationSessionKey.toString().startsWith(appGeneratedKey));
 		
-		SipApplicationSessionKey sipApplicationSessionKeyDifferentAppGeneratedKey = new SipApplicationSessionKey(sipApplicationSessionKeyParsed.getId(), "ApplicationNameTest");
-		sipApplicationSessionKeyDifferentAppGeneratedKey.setAppGeneratedKey("myDifferentGeneratedKey");
+		SipApplicationSessionKey sipApplicationSessionKeyDifferentAppGeneratedKey = new SipApplicationSessionKey(sipApplicationSessionKeyParsed.getId(), "ApplicationNameTest", "myDifferentGeneratedKey");		
 		System.out.println(sipApplicationSessionKeyDifferentAppGeneratedKey);				
 		assertFalse(sipApplicationSessionKeyDifferentAppGeneratedKey.toString().equals(sipApplicationSessionKeyParsed.toString()));	
 	}
