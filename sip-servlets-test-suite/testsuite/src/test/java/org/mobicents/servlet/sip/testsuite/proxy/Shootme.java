@@ -97,6 +97,8 @@ public class Shootme implements SipListener {
 	public static boolean callerSendsBye = true;
 	
 	private long timeToWaitBeforeAnswer = -1;
+	
+	String transport = "UDP";
 
 	class MyTimerTask extends TimerTask {
 		Shootme shootme;
@@ -280,7 +282,7 @@ public class Shootme implements SipListener {
 			this.okResponse = messageFactory.createResponse(Response.OK,
 					request);
 			Address address = addressFactory.createAddress("Shootme <sip:"
-					+ myAddress + ":" + myPort + ">");
+					+ myAddress + ":" + myPort + ";transport=" + transport + ">");
 			ContactHeader contactHeader = headerFactory
 					.createContactHeader(address);
 			response.addHeader(contactHeader);
@@ -389,6 +391,7 @@ public class Shootme implements SipListener {
 		if(transport == null) {
 			transport = ListeningPoint.UDP;
 		}
+		this.transport = transport;
 		SipFactory sipFactory = null;
 		sipStack = null;
 		sipFactory = SipFactory.getInstance();
@@ -513,7 +516,7 @@ public class Shootme implements SipListener {
 			ToHeader to = (ToHeader) response.getHeader(ToHeader.NAME);
 			to.setTag(this.toTag);
 			Address address = addressFactory.createAddress("Shootme <sip:"
-					+ myAddress + ":" + myPort + ">");
+					+ myAddress + ":" + myPort + "transport=" + transport +">");
 			ContactHeader contactHeader = headerFactory
 					.createContactHeader(address);
 			response.addHeader(contactHeader);
