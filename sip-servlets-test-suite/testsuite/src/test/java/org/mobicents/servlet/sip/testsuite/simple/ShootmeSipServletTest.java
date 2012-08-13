@@ -359,7 +359,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		
 		//request.setHeader(sender.protocolObjects.headerFactory.createHeader("Contact", "sip:4162375543@47.135.223.88"));
 		sender.sendRequet(request);
-		Thread.sleep(TIMEOUT);
+		Thread.sleep(TIMEOUT*2);
 		assertTrue(sender.isAckSent());
 		assertTrue(sender.getOkToByeReceived());		
 	}

@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -1649,8 +1649,11 @@ public class TestSipListener implements SipListener {
 						ackRequest.addLast(h);
 					}
 					if(!sendSubsequentRequestsThroughSipProvider) {
+						logger.info("Sending ACK through dialog " + ackRequest);	
 						responseDialog.sendAck(ackRequest);
+						this.dialog = responseDialog;
 					} else {
+						logger.info("Sending ACK through provider " + ackRequest);	
 						sipProvider.sendRequest(ackRequest);
 					}
 					ackSent = true;					
