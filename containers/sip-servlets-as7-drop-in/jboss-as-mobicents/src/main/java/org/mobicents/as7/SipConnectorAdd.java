@@ -1,8 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2010, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -19,23 +19,16 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.as7;
 
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
-import static org.mobicents.as7.Constants.ENABLED;
-import static org.mobicents.as7.Constants.PROTOCOL;
-import static org.mobicents.as7.Constants.SCHEME;
-import static org.mobicents.as7.Constants.SOCKET_BINDING;
-import static org.mobicents.as7.Constants.USE_STATIC_ADDRESS;
 import static org.mobicents.as7.Constants.STATIC_SERVER_ADDRESS;
 import static org.mobicents.as7.Constants.STATIC_SERVER_PORT;
-import static org.mobicents.as7.Constants.USE_STUN;
 import static org.mobicents.as7.Constants.STUN_SERVER_ADDRESS;
 import static org.mobicents.as7.Constants.STUN_SERVER_PORT;
+import static org.mobicents.as7.SipConnectorDefinition.CONNECTOR_ATTRIBUTES;
+
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.catalina.connector.Connector;
 import org.jboss.as.controller.AbstractAddStepHandler;
@@ -43,41 +36,20 @@ import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.ServiceVerificationHandler;
-import org.jboss.as.controller.descriptions.DescriptionProvider;
-import org.jboss.as.controller.operations.common.Util;
+import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.registry.Resource;
 import org.jboss.as.network.SocketBinding;
 import org.jboss.dmr.ModelNode;
-import org.jboss.dmr.ModelType;
-import org.jboss.dmr.Property;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 
 /**
- * {@code OperationHandler} responsible for adding a web connector.
+ * {@code OperationHandler} responsible for adding a sip connector.
  *
  * @author Emanuel Muckenhuber
  */
-class SipConnectorAdd extends AbstractAddStepHandler implements DescriptionProvider {
-
-    static final String OPERATION_NAME = ADD;
-
-    static ModelNode getRecreateOperation(ModelNode address, ModelNode existing) {
-        ModelNode op = Util.getEmptyOperation(OPERATION_NAME, address);
-        op.get(PROTOCOL).set(existing.get(PROTOCOL));
-        op.get(SOCKET_BINDING).set(existing.get(SOCKET_BINDING));
-        if (existing.hasDefined(SCHEME)) op.get(SCHEME).set(existing.get(SCHEME).asString());
-        if (existing.hasDefined(ENABLED)) op.get(ENABLED).set(existing.get(ENABLED).asBoolean());
-        if (existing.hasDefined(USE_STATIC_ADDRESS)) op.get(USE_STATIC_ADDRESS).set(existing.get(USE_STATIC_ADDRESS).asBoolean());
-        if (existing.hasDefined(STATIC_SERVER_ADDRESS)) op.get(STATIC_SERVER_ADDRESS).set(existing.get(STATIC_SERVER_ADDRESS).asString());
-        if (existing.hasDefined(STATIC_SERVER_PORT)) op.get(STATIC_SERVER_PORT).set(existing.get(STATIC_SERVER_PORT).asInt());
-        if (existing.hasDefined(USE_STUN)) op.get(USE_STUN).set(existing.get(USE_STUN).asBoolean());
-        if (existing.hasDefined(STUN_SERVER_ADDRESS)) op.get(STUN_SERVER_ADDRESS).set(existing.get(STUN_SERVER_ADDRESS).asString());
-        if (existing.hasDefined(STUN_SERVER_PORT)) op.get(STUN_SERVER_PORT).set(existing.get(STUN_SERVER_PORT).asInt());
-
-        return op;
-    }
+class SipConnectorAdd extends AbstractAddStepHandler {
 
     static final SipConnectorAdd INSTANCE = new SipConnectorAdd();
 
@@ -86,44 +58,36 @@ class SipConnectorAdd extends AbstractAddStepHandler implements DescriptionProvi
     }
 
     @Override
-    protected void populateModel(final ModelNode operation, final Resource resource) {
-        final ModelNode model = resource.getModel();
+    protected void populateModel(final ModelNode operation, final ModelNode model) throws OperationFailedException {
+        PathAddress address = PathAddress.pathAddress(operation.require(OP_ADDR));
+        model.get(SipConnectorDefinition.NAME.getName()).set(address.getLastElement().getValue());
 
-        populateModel(operation, model);
-        SipConfigurationHandlerUtils.initializeConnector(resource, operation);
-    }
-
-    @Override
-    protected void populateModel(ModelNode operation, ModelNode subModel) {
-        subModel.get(PROTOCOL).set(operation.get(PROTOCOL));
-        subModel.get(SOCKET_BINDING).set(operation.get(SOCKET_BINDING));
-        if (operation.hasDefined(SCHEME)) subModel.get(SCHEME).set(operation.get(SCHEME));
-        if (operation.hasDefined(ENABLED)) subModel.get(ENABLED).set(operation.get(ENABLED).asBoolean());
-        if (operation.hasDefined(USE_STATIC_ADDRESS)) subModel.get(USE_STATIC_ADDRESS).set(operation.get(USE_STATIC_ADDRESS).asBoolean());
-        if (operation.hasDefined(STATIC_SERVER_ADDRESS)) subModel.get(STATIC_SERVER_ADDRESS).set(operation.get(STATIC_SERVER_ADDRESS));
-        if (operation.hasDefined(STATIC_SERVER_PORT)) subModel.get(STATIC_SERVER_PORT).set(operation.get(STATIC_SERVER_PORT));
-        if (operation.hasDefined(USE_STUN)) subModel.get(USE_STUN).set(operation.get(USE_STUN).asBoolean());
-        if (operation.hasDefined(STUN_SERVER_ADDRESS)) subModel.get(STUN_SERVER_ADDRESS).set(operation.get(STUN_SERVER_ADDRESS));
-        if (operation.hasDefined(STUN_SERVER_PORT)) subModel.get(STUN_SERVER_PORT).set(operation.get(STUN_SERVER_PORT));
+        for (SimpleAttributeDefinition def : CONNECTOR_ATTRIBUTES) {
+            def.validateAndSet(operation, model);
+        }
     }
 
     @Override
     protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model, ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers) throws OperationFailedException {
-        final PathAddress address = PathAddress.pathAddress(operation.get(OP_ADDR));
+    	final PathAddress address = PathAddress.pathAddress(operation.get(OP_ADDR));
         final String name = address.getLastElement().getValue();
-        final String bindingRef = operation.require(SOCKET_BINDING).asString();
 
-        final boolean enabled = operation.hasDefined(ENABLED) ? operation.get(ENABLED).asBoolean() : true;
+        ModelNode fullModel = Resource.Tools.readModel(context.readResource(PathAddress.EMPTY_ADDRESS));
+        final String bindingRef = SipConnectorDefinition.SOCKET_BINDING.resolveModelAttribute(context, fullModel).asString();
 
-        final boolean useStaticAddress = operation.hasDefined(USE_STATIC_ADDRESS) ? operation.get(USE_STATIC_ADDRESS).asBoolean() : false;
-        final String staticServerAddress = operation.hasDefined(STATIC_SERVER_ADDRESS) ? operation.get(STATIC_SERVER_ADDRESS).asString() : null;
-        final int staticServerPort = operation.hasDefined(STATIC_SERVER_PORT) ? operation.get(STATIC_SERVER_PORT).asInt() : -1;
+        final boolean enabled = SipConnectorDefinition.ENABLED.resolveModelAttribute(context, fullModel).asBoolean();
+        final String protocol = SipConnectorDefinition.PROTOCOL.resolveModelAttribute(context, fullModel).asString();
+        final String scheme = SipConnectorDefinition.SCHEME.resolveModelAttribute(context, fullModel).asString();
 
-        final boolean useStun = operation.hasDefined(USE_STUN) ? operation.get(USE_STUN).asBoolean() : false;
-        final String stunServerAddress = operation.hasDefined(STUN_SERVER_ADDRESS) ? operation.get(STUN_SERVER_ADDRESS).asString() : null;
-        final int stunServerPort = operation.hasDefined(STUN_SERVER_PORT) ? operation.get(STUN_SERVER_PORT).asInt() : -1;
+        final boolean useStaticAddress = SipConnectorDefinition.USE_STATIC_ADDRESS.resolveModelAttribute(context, fullModel).asBoolean();        
+        final String staticServerAddress = operation.hasDefined(STATIC_SERVER_ADDRESS) ? SipConnectorDefinition.STATIC_SERVER_ADDRESS.resolveModelAttribute(context, fullModel).asString() : null;
+        final int staticServerPort = operation.hasDefined(STATIC_SERVER_PORT) ? SipConnectorDefinition.STATIC_SERVER_PORT.resolveModelAttribute(context, fullModel).asInt() : -1;
 
-        final SipConnectorService service = new SipConnectorService(operation.require(PROTOCOL).asString(), operation.get(SCHEME).asString(), useStaticAddress, staticServerAddress, staticServerPort, useStun, stunServerAddress, stunServerPort);
+        final boolean useStun = SipConnectorDefinition.USE_STUN.resolveModelAttribute(context, fullModel).asBoolean();        
+        final String stunServerAddress = operation.hasDefined(STUN_SERVER_ADDRESS) ? SipConnectorDefinition.STUN_SERVER_ADDRESS.resolveModelAttribute(context, fullModel).asString() : null;
+        final int stunServerPort = operation.hasDefined(STUN_SERVER_PORT) ? SipConnectorDefinition.STUN_SERVER_PORT.resolveModelAttribute(context, fullModel).asInt() : -1;
+
+        final SipConnectorService service = new SipConnectorService(protocol, scheme, useStaticAddress, staticServerAddress, staticServerPort, useStun, stunServerAddress, stunServerPort);
         final ServiceBuilder<Connector> serviceBuilder = context.getServiceTarget().addService(SipSubsystemServices.JBOSS_SIP_CONNECTOR.append(name), service)
                 .addDependency(SipSubsystemServices.JBOSS_SIP, SipServer.class, service.getServer())
                 .addDependency(SocketBinding.JBOSS_BINDING_NAME.append(bindingRef), SocketBinding.class, service.getBinding());
@@ -132,25 +96,8 @@ class SipConnectorAdd extends AbstractAddStepHandler implements DescriptionProvi
             serviceBuilder.addListener(verificationHandler);
         }
         final ServiceController<Connector> serviceController = serviceBuilder.install();
-        if(newControllers != null) {
+        if (newControllers != null) {
             newControllers.add(serviceController);
         }
     }
-
-    @Override
-    public ModelNode getModelDescription(Locale locale) {
-        return SipSubsystemDescriptions.getConnectorAdd(locale);
-    }
-
-    private ModelNode resolveExpressions(OperationContext context, ModelNode connector) throws OperationFailedException {
-        ModelNode result = connector.clone();
-        for (Property p :connector.asPropertyList()){
-            ModelNode node = p.getValue();
-            if (node.getType() == ModelType.EXPRESSION){
-                result.get(p.getName()).set(context.resolveExpressions(node));
-            }
-        }
-        return result;
-    }
-
 }

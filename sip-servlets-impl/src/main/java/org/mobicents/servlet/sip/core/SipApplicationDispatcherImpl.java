@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -100,6 +100,7 @@ import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingListener;
 import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.javax.servlet.CongestionControlEvent;
+import org.mobicents.javax.servlet.CongestionControlPolicy;
 import org.mobicents.javax.servlet.ContainerListener;
 import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
@@ -534,8 +535,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			if(connector != null) {
 		        for (SipContext sipContext : applicationDeployed.values()) {
 		        	final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();	
-		        	final ClassLoader cl = sipContext.getSipContextClassLoader();
-					Thread.currentThread().setContextClassLoader(cl);
+		        	sipContext.enterSipContext();	
 					try {	
 			            for (SipConnectorListener connectorListener : sipContext.getListeners().getSipConnectorListeners()) {
 			            	try {	
@@ -547,7 +547,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 							}
 			            }
 					} finally {				
-						Thread.currentThread().setContextClassLoader(oldClassLoader);
+						sipContext.exitSipContext(oldClassLoader);
 					}
 		        }
 //		        return;
@@ -802,9 +802,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			if(containerListener != null) {
 				final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();						
 				try {				
-					final ClassLoader cl = sipContext.getSipContextClassLoader();
-					Thread.currentThread().setContextClassLoader(cl);
-											
+					sipContext.enterSipContext();	
 					try {				
 						if(triggered) {
 							containerListener.onCongestionControlStarted(congestionControlEvent);
@@ -814,8 +812,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					} catch (Throwable t) {
 						logger.error("ContainerListener threw exception", t);
 					}
-				} finally {				
-					Thread.currentThread().setContextClassLoader(oldClassLoader);
+				} finally {
+					sipContext.exitSipContext(oldClassLoader);
 				}
 			}
 		}
@@ -851,16 +849,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 						if(containerListener != null) {
 							final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();						
 							try {				
-								final ClassLoader cl = sipContext.getSipContextClassLoader();
-								Thread.currentThread().setContextClassLoader(cl);
-															
+								sipContext.enterSipContext();							
 								try {				
 									sipServletResponse = containerListener.onRequestThrottled(sipServletRequest, congestionControlEvent);
 								} catch (Throwable t) {
 									logger.error("ContainerListener threw exception", t);
 								}
-							} finally {				
-								Thread.currentThread().setContextClassLoader(oldClassLoader);
+							} finally {		
+								sipContext.exitSipContext(oldClassLoader);
 							}
 							
 							if(sipServletResponse != null) {
@@ -1062,12 +1058,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			if(sipContext != null) {
 				final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 				try {
-					final ClassLoader cl = sipContext.getSipContextClassLoader();
-					Thread.currentThread().setContextClassLoader(cl);
+					sipContext.enterSipContext();	
 					final SipManager sipManager = sipContext.getSipManager();					
 					final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 							sipSessionKey.getApplicationName(), 
-							sipSessionKey.getApplicationSessionId());
+							sipSessionKey.getApplicationSessionId(),
+							null);
 					
 					MobicentsSipSession sipSessionImpl = null;
 					MobicentsSipApplicationSession sipApplicationSession = null;
@@ -1142,7 +1138,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					}
 
 				} finally {
-					Thread.currentThread().setContextClassLoader(oldClassLoader);
+					sipContext.exitSipContext(oldClassLoader);
 				}
 			}
 		}
@@ -1331,8 +1327,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 									
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();						
 			try {				
-				final ClassLoader cl = sipContext.getSipContextClassLoader();
-				Thread.currentThread().setContextClassLoader(cl);
+				sipContext.enterSipContext();	
 				
 				final SipErrorEvent sipErrorEvent = new SipErrorEvent(
 						(SipServletRequest)sipServletMessage, 
@@ -1347,7 +1342,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					}
 				}
 			} finally {				
-				Thread.currentThread().setContextClassLoader(oldClassLoader);
+				sipContext.exitSipContext(oldClassLoader);
 			}
 			final Dialog dialog = sipSession.getSessionCreatingDialog();
 			if(!notifiedApplication && sipSession.getProxy() == null &&
@@ -1391,9 +1386,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 			try {				
-				final ClassLoader cl = sipContext.getSipContextClassLoader();
-				Thread.currentThread().setContextClassLoader(cl);
-				
+				sipContext.enterSipContext();	
+
 				final SipErrorEvent sipErrorEvent = new SipErrorEvent(
 						(SipServletRequest)sipServletMessage, 
 						lastInfoResponse);
@@ -1406,7 +1400,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					}
 				}
 			} finally {
-				Thread.currentThread().setContextClassLoader(oldClassLoader);
+				sipContext.exitSipContext(oldClassLoader);
 			}			
 		}
 		return notifiedApplication;

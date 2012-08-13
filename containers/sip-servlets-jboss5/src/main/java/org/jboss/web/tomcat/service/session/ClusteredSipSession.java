@@ -79,6 +79,7 @@ import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.catalina.CatalinaSipManager;
 import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.SipService;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletMessage;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
@@ -866,6 +867,15 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 			super.setValid(valid);
 		} 
 		state = (State)metaData.get(STATE);
+		if(logger.isDebugEnabled()) {
+			logger.debug("replicated sip session state = " + state);
+		}
+		// http://code.google.com/p/sipservlets/issues/detail?id=42
+		// in case of REGISTER (or out of dialog requests) , the state will have stayed INITIAL
+		// and as such not changed so not replicated, thus if state is null we default to INITIAL
+		if(state == null) {
+			state = State.INITIAL;
+		}
 		Long cSeq = (Long) metaData.get(CSEQ);
 		if(cSeq != null) {
 			cseq = cSeq;
@@ -1661,7 +1671,7 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 	private void sessionMetadataDirty() {
 //		if (!sessionMetadataDirty && !isNew && log.isTraceEnabled())
 		if(log.isDebugEnabled()) {
-			log.debug("Marking session metadata dirty " + key);
+			log.debug("Marking sip session metadata dirty " + key);
 		}
 		sessionMetadataDirty = true;
 		ConvergedSessionReplicationContext.bindSipSession(this, manager.getSnapshotSipManager());
@@ -1746,6 +1756,16 @@ public abstract class ClusteredSipSession<O extends OutgoingDistributableSession
 		super.setValid(isValid);
 		sessionMetadataDirty();
 		metadata.getMetaData().put(IS_VALID, isValid);
+	}
+	
+	// http://code.google.com/p/sipservlets/issues/detail?id=42
+	@Override	
+	public void setSessionCreatingTransactionRequest(
+			MobicentsSipServletMessage message) {		
+		super.setSessionCreatingTransactionRequest(message);
+		if(State.INITIAL.equals(state) && sessionCreatingDialog == null && sessionCreatingTransactionRequest != null && sessionCreatingTransactionRequest.getMethod().equalsIgnoreCase(Request.REGISTER)) {
+			sessionMetadataDirty();
+		}
 	}
 	
 	@Override

@@ -1,31 +1,36 @@
 /*
- * JBoss, Home of Professional Open Source Copyright 2010, Red Hat Inc., and individual contributors as indicated by the
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
- * @authors tag. See the copyright.txt in the distribution for a full listing of individual contributors.
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
  *
- * This is free software; you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of the License, or (at your option) any later version.
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
  *
- * This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package org.mobicents.as7;
 
-import static org.jboss.as.web.WebMessages.MESSAGES;
-import static org.mobicents.as7.Constants.VALUE;
+import static org.mobicents.as7.SipMessages.MESSAGES;
 
 import javax.management.MBeanServer;
-
-//import javax.management.MBeanServer;
 
 import org.apache.catalina.Host;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.core.StandardService;
 import org.apache.tomcat.util.modeler.Registry;
+import org.jboss.as.controller.services.path.PathManager;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -46,6 +51,8 @@ class SipServerService implements SipServer, Service<SipServer> {
     // FIXME: josemrecio - settle on using the proper name
     private static final String JBOSS_SIP = "jboss.sip";
 
+    private static final String TEMP_DIR = "jboss.server.temp.dir";
+
 //    private final String defaultHost;
 //    private final boolean useNative;
 	private static final String FILE_PREFIX_PATH = "file:///";
@@ -53,10 +60,20 @@ class SipServerService implements SipServer, Service<SipServer> {
     private String sipStackPropertiesFile;
     final String sipPathName;
     final String sipAppDispatcherClass;
+    final String additionalParameterableHeaders;
     final int sipCongestionControlInterval;
+    final String congestionControlPolicy;
     final String sipConcurrencyControlMode;
     final boolean usePrettyEncoding;
-
+ 	final int baseTimerInterval;
+ 	final int t2Interval;
+ 	final int t4Interval;
+ 	final int timerDInterval;
+ 	final boolean dialogPendingRequestChecking;
+ 	final int canceledTimerTasksPurgePeriod;
+ 	final int memoryThreshold;
+ 	final int backToNormalMemoryThreshold;
+ 	
     private final String instanceId;
 
 //    private Engine engine;
@@ -67,19 +84,47 @@ class SipServerService implements SipServer, Service<SipServer> {
     private SipStandardService sipService;
 
     private final InjectedValue<MBeanServer> mbeanServer = new InjectedValue<MBeanServer>();
-    private final InjectedValue<String> pathInjector = new InjectedValue<String>();
+    private final InjectedValue<PathManager> pathManagerInjector = new InjectedValue<PathManager>();
 
-    public SipServerService(final String sipAppRouterFile, final String sipStackPropertiesFile, final String sipPathName, String sipAppDispatcherClass, int sipCongestionControlInterval, String sipConcurrencyControlMode, boolean usePrettyEncoding, String instanceId) {
+    public SipServerService(
+    		final String sipAppRouterFile, 
+    		final String sipStackPropertiesFile, 
+    		final String sipPathName, 
+    		String sipAppDispatcherClass, 
+    		String additionalParameterableHeaders, 
+    		int sipCongestionControlInterval,
+    		String congestionControlPolicy,
+    		String sipConcurrencyControlMode, 
+    		boolean usePrettyEncoding, 
+    		int baseTimerInterval, 
+    		int t2Interval, 
+    		int t4Interval, 
+    		int timerDInterval, 
+    		boolean dialogPendingRequestChecking, 
+    		int canceledTimerTasksPurgePeriod, 
+    		int memoryThreshold,
+    	 	int backToNormalMemoryThreshold,    	 
+    		String instanceId) {
 //        this.defaultHost = defaultHost;
 //        this.useNative = useNative;
     	this.sipAppRouterFile = sipAppRouterFile;
     	this.sipStackPropertiesFile = sipStackPropertiesFile;
     	this.sipPathName = sipPathName;
     	this.sipAppDispatcherClass = sipAppDispatcherClass;
+    	this.additionalParameterableHeaders = additionalParameterableHeaders;
     	this.sipCongestionControlInterval = sipCongestionControlInterval;
+    	this.congestionControlPolicy = congestionControlPolicy;
     	this.sipConcurrencyControlMode = sipConcurrencyControlMode;
         this.instanceId = instanceId;
         this.usePrettyEncoding = usePrettyEncoding;
+        this.baseTimerInterval = baseTimerInterval;
+        this.t2Interval = t2Interval;
+        this.t4Interval = t4Interval;
+        this.timerDInterval = timerDInterval;
+        this.dialogPendingRequestChecking = dialogPendingRequestChecking;
+        this.canceledTimerTasksPurgePeriod = canceledTimerTasksPurgePeriod;
+        this.memoryThreshold = memoryThreshold;
+        this.backToNormalMemoryThreshold = backToNormalMemoryThreshold;
     }
 
     /** {@inheritDoc} */
@@ -92,7 +137,7 @@ class SipServerService implements SipServer, Service<SipServer> {
             }
         }
 
-        System.setProperty("catalina.home", pathInjector.getValue());
+        System.setProperty("catalina.home", pathManagerInjector.getValue().getPathEntry(TEMP_DIR).resolvePath());
         final StandardServer server = new StandardServer();
 
 //        final StandardService service = new StandardService();
@@ -153,6 +198,19 @@ class SipServerService implements SipServer, Service<SipServer> {
         //
         sipService.setUsePrettyEncoding(usePrettyEncoding);
         //
+        sipService.setBaseTimerInterval(baseTimerInterval);
+        sipService.setT2Interval(t2Interval);
+        sipService.setT4Interval(t4Interval);
+        sipService.setTimerDInterval(timerDInterval);
+        if(additionalParameterableHeaders != null) {
+        	sipService.setAdditionalParameterableHeaders(additionalParameterableHeaders);
+        }
+        sipService.setDialogPendingRequestChecking(dialogPendingRequestChecking);
+        sipService.setCanceledTimerTasksPurgePeriod(canceledTimerTasksPurgePeriod);
+        sipService.setMemoryThreshold(memoryThreshold);
+        sipService.setBackToNormalMemoryThreshold(backToNormalMemoryThreshold);
+        sipService.setCongestionControlPolicy(congestionControlPolicy);
+        
         sipService.setName(JBOSS_SIP);
         sipService.setServer(server);
         server.addService(sipService);
@@ -170,7 +228,7 @@ class SipServerService implements SipServer, Service<SipServer> {
             server.init();
             server.start();
         } catch (Exception e) {
-            throw new StartException(MESSAGES.errorStartingWeb(), e);
+            throw new StartException(MESSAGES.errorStartingSip(), e);
         }
         this.server = server;
 //        this.service = service;
@@ -234,8 +292,8 @@ class SipServerService implements SipServer, Service<SipServer> {
         return mbeanServer;
     }
 
-    InjectedValue<String> getPathInjector() {
-        return pathInjector;
+    InjectedValue<PathManager> getPathManagerInjector() {
+        return pathManagerInjector;
     }
 
     public StandardServer getServer() {

@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -25,6 +25,9 @@ package org.mobicents.servlet.sip.core.session;
 import java.io.Serializable;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.GenericUtils;
+
 /**
  * <p>
  * Class representing the key (which will also be its id) for a sip application session.<br/>
@@ -37,8 +40,10 @@ import java.util.UUID;
 public final class SipApplicationSessionKey implements Serializable, MobicentsSipApplicationSessionKey {
 
 	private static final long serialVersionUID = 1L;
+	private static final Logger logger = Logger.getLogger(SipApplicationSessionKey.class
+			.getCanonicalName());
 	private final String uuid;
-	private String appGeneratedKey;
+	private final String appGeneratedKey;
 	private final String applicationName;
 	private String toString;
 	
@@ -46,16 +51,31 @@ public final class SipApplicationSessionKey implements Serializable, MobicentsSi
 	 * @param id
 	 * @param applicationName
 	 */
-	public SipApplicationSessionKey(String id, String applicationName) {
+	public SipApplicationSessionKey(String id, String applicationName, String appGeneratedKey) {
 		super();
-		if(id == null) {
-			// Issue 1551 : SipApplicationSessionKey is not unique
-			this.uuid = "" + UUID.randomUUID();
-		} else {
-			this.uuid = id;
-		}		
+		this.appGeneratedKey = appGeneratedKey;
 		this.applicationName = applicationName;
-		toString = uuid + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName;
+		// "While processing the initial request after selecting the application, the 
+		// container MUST look for this annotated static method within the application. 
+		// If found, the container MUST call the method to get the key and generate an 
+		// application-session-id by appending some unique identifier
+		if(appGeneratedKey != null) {
+			// http://code.google.com/p/sipservlets/issues/detail?id=146 : @SipApplicationSessionKey usage can break replication
+			// Hash the appGeneratedKey to make sure it always resolve to the same uuid and reset the uuid with it.			
+			uuid = GenericUtils.hashString(appGeneratedKey);
+			if(logger.isDebugEnabled()) {
+				logger.debug("uuid for appGeneratedKey " + appGeneratedKey + " set to " + uuid);
+			}
+			toString = appGeneratedKey + SessionManagerUtil.SESSION_KEY_SEPARATOR + uuid + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName;
+		} else {
+			if(id == null) {
+				// Issue 1551 : SipApplicationSessionKey is not unique
+				this.uuid = "" + UUID.randomUUID();
+			} else {
+				this.uuid = id;
+			}					
+			toString = uuid + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName;
+		}
 	}
 	/**
 	 * @return the Id
@@ -75,16 +95,9 @@ public final class SipApplicationSessionKey implements Serializable, MobicentsSi
 	public String getAppGeneratedKey() {
 		return appGeneratedKey;
 	}
-	public void setAppGeneratedKey(String appGeneratedKey) {
-		this.appGeneratedKey = appGeneratedKey;
-		// "While processing the initial request after selecting the application, the 
-		// container MUST look for this annotated static method within the application. 
-		// If found, the container MUST call the method to get the key and generate an 
-		// application-session-id by appending some unique identifier
-		if(appGeneratedKey != null) {
-			toString = appGeneratedKey + SessionManagerUtil.SESSION_KEY_SEPARATOR + uuid + SessionManagerUtil.SESSION_KEY_SEPARATOR + applicationName;
-		}
-	}
+//	public void setAppGeneratedKey(String appGeneratedKey) {
+//		
+//	}
 	
 	/* (non-Javadoc)
 	 * @see java.lang.Object#hashCode()

@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -56,7 +56,8 @@ public class SipSessionAsyncTask implements Runnable {
 			SipManager sipManager = sipContext.getSipManager();
 			final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 					key.getApplicationName(), 
-					key.getApplicationSessionId());								
+					key.getApplicationSessionId(),
+					null);								
 			MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);
 			MobicentsSipSession sipSession = sipManager.getSipSession(key, false, sipFactoryImpl, sipApplicationSession);	
 					
@@ -64,8 +65,7 @@ public class SipSessionAsyncTask implements Runnable {
 				boolean batchStarted = false;
 				ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 				try {
-					ClassLoader cl = sipContext.getSipContextClassLoader();
-					Thread.currentThread().setContextClassLoader(cl);
+					sipContext.enterSipContext();	
 					sipContext.enterSipApp(sipApplicationSession, sipSession, false);
 					batchStarted = sipContext.enterSipAppHa(true);
 					
@@ -75,7 +75,7 @@ public class SipSessionAsyncTask implements Runnable {
 				} finally {
 					sipContext.exitSipAppHa(null, null, batchStarted);
 					sipContext.exitSipApp(sipApplicationSession, sipSession);
-					Thread.currentThread().setContextClassLoader(oldClassLoader);					
+					sipContext.exitSipContext(oldClassLoader);				
 				}
 			} else {
 				if(logger.isDebugEnabled()) {

@@ -6,7 +6,7 @@
 	<distributable/>
 	<servlet>
         <servlet-name>ClickToCall</servlet-name>
-        <servlet-class>org.mobicents.servlet.sip.example.DistributableClick2CallHttpServletServlet</servlet-class>
+        <servlet-class>org.mobicents.servlet.sip.example.SimpleWebServlet</servlet-class>
         <load-on-startup>1</load-on-startup>        
     </servlet>
     <servlet-mapping>

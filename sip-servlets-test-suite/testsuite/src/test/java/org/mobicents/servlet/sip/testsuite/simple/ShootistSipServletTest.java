@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -19,8 +19,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.testsuite.simple;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -35,6 +35,7 @@ import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.FromHeader;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.ProxyAuthorizationHeader;
 import javax.sip.header.ToHeader;
@@ -375,6 +376,31 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		ToHeader toHeader = (ToHeader) receiver.getInviteRequest().getHeader(ToHeader.NAME);
 		assertEquals("To: <sip:+34666666666@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;pres-list=mylist>", toHeader.toString().trim());
+		assertTrue(receiver.getByeReceived());		
+	}
+	
+	/**
+	 * non regression test for Issue 145 http://code.google.com/p/sipservlets/issues/detail?id=145
+	 */
+	public void testShootistUserNameNull() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		Map<String, String> params = new HashMap<String, String>();
+		String userName = "nullTest";
+		params.put("username", userName);
+		deployApplication(params);
+		Thread.sleep(TIMEOUT);
+		FromHeader fromHeader = (FromHeader) receiver.getInviteRequest().getHeader(FromHeader.NAME);
+		assertEquals("sip:here.com", fromHeader.getAddress().getURI().toString().trim());
 		assertTrue(receiver.getByeReceived());		
 	}
 	
@@ -805,6 +831,28 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));
 	}
 	
+	// Tests Issue 143 http://code.google.com/p/mobicents/issues/detail?id=143
+	public void testShootist422Response() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setProvisionalResponsesToSend(new ArrayList<Integer>());
+		receiver.setFinalResponseToSend(422);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();		
+		deployApplication("testErrorResponse", "true");
+		Thread.sleep(TIMEOUT);				
+		receiver.setFinalResponseToSend(200);
+		Thread.sleep(TIMEOUT);				
+		assertTrue(receiver.isAckReceived());
+	}
+		
+		
 	// Test for SS spec 11.1.6 transaction timeout notification
 	// Test Issue 2580 http://code.google.com/p/mobicents/issues/detail?id=2580
 	public void testTransactionTimeoutResponse() throws Exception {

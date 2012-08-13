@@ -1386,4 +1386,15 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	public SipDigestAuthenticator getDigestAuthenticator() {
 		return sipDigestAuthenticator;
 	}
+
+	@Override
+	public void enterSipContext() {
+		final ClassLoader cl = getSipContextClassLoader();
+		Thread.currentThread().setContextClassLoader(cl);
+	}
+
+	@Override
+	public void exitSipContext(ClassLoader oldClassLoader) {
+		Thread.currentThread().setContextClassLoader(oldClassLoader);
+	}
 }

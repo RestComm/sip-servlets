@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -19,10 +19,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.message;
 
+import gov.nist.javax.sip.header.HeaderFactoryExt;
 import gov.nist.javax.sip.header.HeaderFactoryImpl;
+import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.MessageExt;
 
 import java.io.Externalizable;
@@ -249,6 +250,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 		//call id not needed anymore since the sipappsessionkey is not a callid anymore but a random uuid
 		SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				sipContext.getApplicationName(), 
+				null,
 				null);		
 		MobicentsSipApplicationSession sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(
 				sipApplicationSessionKey, true);
@@ -365,10 +367,10 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 		}
 	    
 		final SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
-		final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
-		final MobicentsSipApplicationSession originalAppSession = originalSession
-				.getSipApplicationSession();				
-		
+		final MobicentsSipApplicationSession originalAppSession = (MobicentsSipApplicationSession) origRequestImpl.getApplicationSession(false);		
+		if (originalAppSession == null) {
+			throw new IllegalStateException("original request's app session does not exists");
+		}			
 		
 		final Request newRequest = (Request) origRequestImpl.message.clone();
 		((MessageExt)newRequest).setApplicationData(null);
@@ -451,11 +453,16 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 				}
 			}
 									
-			newFromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(getSipApplicationDispatcher(), originalSession.getKey().getApplicationName(), originalAppSession.getKey().getId()));
+			newFromHeader.setTag(ApplicationRoutingHeaderComposer.getHash(getSipApplicationDispatcher(), originalAppSession.getKey().getApplicationName(), originalAppSession.getKey().getId()));
 			
-			final MobicentsSipSessionKey key = SessionManagerUtil.getSipSessionKey(originalAppSession.getKey().getId(), originalSession.getKey().getApplicationName(), newRequest, false);
+			final MobicentsSipSessionKey key = SessionManagerUtil.getSipSessionKey(originalAppSession.getKey().getId(), originalAppSession.getKey().getApplicationName(), newRequest, false);
 			final MobicentsSipSession session = originalAppSession.getSipContext().getSipManager().getSipSession(key, true, this, originalAppSession);			
-			session.setHandler(originalSession.getHandler());
+			final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
+			if(originalSession != null) {
+				session.setHandler(originalSession.getHandler());
+			} else if(originalAppSession.getCurrentRequestHandler() != null) {
+				session.setHandler(originalAppSession.getCurrentRequestHandler());
+			}
 			
 			final SipServletRequestImpl newSipServletRequest = (SipServletRequestImpl) mobicentsSipServletMessageFactory.createSipServletRequest(
 					newRequest,
@@ -484,10 +491,14 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 	 * @see javax.servlet.sip.SipFactory#createSipURI(java.lang.String,
 	 *      java.lang.String)
 	 */
-	public SipURI createSipURI(String user, String host) {
+	public SipURI createSipURI(String user, String host) {		
 		if (logger.isDebugEnabled()) {
 			logger.debug("Creating SipURI from USER[" + user + "] HOST[" + host
 					+ "]");
+		}		
+		// Fix for http://code.google.com/p/sipservlets/issues/detail?id=145
+		if(user != null && user.trim().isEmpty()) {
+			user = null;
 		}
 		try {
 			return new SipURIImpl(SipFactoryImpl.addressFactory.createSipURI(
@@ -889,8 +900,13 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			javax.sip.address.Address routeAddress = 
 				SipFactoryImpl.addressFactory.createAddress(sipUri);
 			RouteHeader routeHeader = 
-				SipFactoryImpl.headerFactory.createRouteHeader(routeAddress);
-			request.addFirst(routeHeader);			
+				SipFactoryImpl.headerFactory.createRouteHeader(routeAddress);			
+			request.addFirst(routeHeader);
+			if(Request.REGISTER.equalsIgnoreCase(request.getMethod())) {
+				PathHeader pathHeader = 
+						((HeaderFactoryExt)SipFactoryImpl.headerFactory).createPathHeader(routeAddress);
+				request.addFirst(pathHeader);
+			}
 		} catch (ParseException e) {
 			//this should never happen
 			throw new IllegalArgumentException("Impossible to set the Load Balancer Route Header !", e);

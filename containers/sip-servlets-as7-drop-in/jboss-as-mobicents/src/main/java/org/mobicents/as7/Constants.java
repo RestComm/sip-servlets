@@ -1,8 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2010, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -19,7 +19,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.as7;
 
 /**
@@ -28,7 +27,11 @@ package org.mobicents.as7;
 interface Constants {
 
     String ACCESS_LOG = "access-log";
+    String ADDITIONAL_PARAMETERABLE_HEADERS = "additional-parameterable-headers";
     String ALIAS = "alias";
+    String APPLICATION_ROUTER = "application-router";
+    String BACK_TO_NORMAL_MEMORY_THRESHOLD = "back-to-normal-memory-threshold";
+    String BASE_TIMER_INTERVAL = "base-timer-interval";
     String CA_CERTIFICATE_FILE = "ca-certificate-file";
     String CA_CERTIFICATE_PASSWORD = "ca-certificate-password";
     String CA_REVOCATION_URL = "ca-revocation-url";
@@ -40,15 +43,17 @@ interface Constants {
     String CIPHER_SUITE = "cipher-suite";
     String CONDITION = "condition";
     String CONFIGURATION = "configuration";
-    String CONNECTOR = "connector";
-    String APPLICATION_ROUTER = "application-router";
+    String CONNECTOR = "connector";    
+    String CANCELED_TIMER_TASKS_PURGE_PERIOD = "canceled-timer-tasks-purge-period";
     String CONCURRENCY_CONTROL_MODE = "concurrency-control-mode";
     String CONGESTION_CONTROL_INTERVAL = "congestion-control-interval";
+    String CONGESTION_CONTROL_POLICY = "congestion-control-policy";
     String CONTAINER = "container";
     String CONTAINER_CONFIG = CONFIGURATION;
     String DEFAULT_VIRTUAL_SERVER = "default-virtual-server";
     String DEFAULT_WEB_MODULE = "default-web-module";
     String DEVELOPMENT = "development";
+    String DIALOG_PENDING_REQUEST_CHECKING = "dialog-pending-request-checking";
     String DIRECTORY = "directory";
     String DISABLED = "disabled";
     String DISPLAY_SOURCE_FRAGMENT = "display-source-fragment";
@@ -75,6 +80,7 @@ interface Constants {
     String MAX_DEPTH = "max-depth";
     String MAX_POST_SIZE = "max-post-size";
     String MAX_SAVE_POST_SIZE = "max-save-post-size";
+    String MEMORY_THRESHOLD = "memory-threshold";
     String MIME_MAPPING = "mime-mapping";
     String MODIFICATION_TEST_INTERVAL = "modification-test-interval";
     String NAME = "name";
@@ -116,9 +122,12 @@ interface Constants {
     String STUN_SERVER_PORT = "stun-server-port";
     String SUBSTITUTION = "substitution";
     String SUBSYSTEM = "subsystem";
+    String T2_INTERVAL = "t2-interval";
+    String T4_INTERVAL = "t4-interval";
     String TAG_POOLING = "tag-pooling";
     String TARGET_VM = "target-vm";
     String TEST = "test";
+    String TIMER_D_INTERVAL = "timer-d-interval";
     String TRIM_SPACES = "trim-spaces";
     String TRUSTSTORE_TYPE = "truststore-type";
     String USE_PRETTY_ENCODING = "use-pretty-encoding";
@@ -140,5 +149,7 @@ interface Constants {
     String MAX_TIME = "maxTime";
     String REQUEST_COUNT = "requestCount";
 
+    String LOAD_TIME ="load-time";
+    String MIN_TIME = "min-time";
 
 }

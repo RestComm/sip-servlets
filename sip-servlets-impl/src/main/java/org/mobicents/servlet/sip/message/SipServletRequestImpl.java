@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -19,7 +19,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.DialogExt;
@@ -1118,27 +1117,31 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 					//to check if there is any other apps interested in it
 					addInfoForRoutingBackToContainer(routerInfo, session.getSipApplicationSession().getKey().getId(), session.getKey().getApplicationName());
 					addDNSRoute = false;
-				} else {
-					if(logger.isDebugEnabled()) {
-						logger.debug("routing outside the container " +
-								"since no more apps are interested.");
-					}
-					//Adding Route Header for LB if we are in a HA configuration
-					if(isInitial) {
-						if(sipFactoryImpl.isUseLoadBalancer()) {
-							sipFactoryImpl.addLoadBalancerRouteHeader(request);
-							addDNSRoute = false;
-							if(logger.isDebugEnabled()) {
-								logger.debug("adding route to Load Balancer since we are in a HA configuration " +
-								" and no more apps are interested.");
-							}
-						} else if(StaticServiceHolder.sipStandardService.getOutboundProxy() != null) {
-							sipFactoryImpl.addLoadBalancerRouteHeader(request);
-							addDNSRoute = false;
-							if(logger.isDebugEnabled()) {
-								logger.debug("adding route to outbound proxy (no load balancer set) since we have outboundProxy configured " +
-								" and no more apps are interested.");
-							}
+				}
+			}
+			
+			if(addDNSRoute) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("routing outside the container " +
+							"since no more apps are interested.");
+				}
+				// Adding Route Header for LB if the request is initial or
+				// http://code.google.com/p/sipservlets/issues/detail?id=130
+				// if we are in a HA configuration and the request is an out of dialog request
+				if(isInitial() || dialog == null) {					
+					if(sipFactoryImpl.isUseLoadBalancer()) {
+						sipFactoryImpl.addLoadBalancerRouteHeader(request);
+						addDNSRoute = false;
+						if(logger.isDebugEnabled()) {
+							logger.debug("adding route to Load Balancer since we are in a HA configuration " +
+							" and no more apps are interested.");
+						}
+					} else if(StaticServiceHolder.sipStandardService.getOutboundProxy() != null) {
+						sipFactoryImpl.addLoadBalancerRouteHeader(request);
+						addDNSRoute = false;
+						if(logger.isDebugEnabled()) {
+							logger.debug("adding route to outbound proxy (no load balancer set) since we have outboundProxy configured " +
+							" and no more apps are interested.");
 						}
 					}
 				}

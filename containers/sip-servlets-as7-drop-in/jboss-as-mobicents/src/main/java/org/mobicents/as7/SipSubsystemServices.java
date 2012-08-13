@@ -1,5 +1,23 @@
-/**
+/*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 package org.mobicents.as7;
 
@@ -10,18 +28,6 @@ import org.jboss.msc.service.ServiceName;
  *
  * @author Brian Stansberry (c) 2011 Red Hat Inc.
  * @author Emanuel Muckenhuber
- */
-
-/*
-
-TODO: complete support for configuration parameters:
-
-sipPathName="org.mobicents.ha"
-sipApplicationDispatcherClassName="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl"
-congestionControlCheckingInterval="-1"
-darConfigurationFileLocation="conf/dars/mobicents-dar.properties"
-sipStackPropertiesFile="conf/mss-sip-stack.properties">
-
  */
 public final class SipSubsystemServices {
 
@@ -34,8 +40,8 @@ public final class SipSubsystemServices {
     /** The base name for jboss.sip deployments. */
     static final ServiceName JBOSS_SIP_DEPLOYMENT_BASE = JBOSS_SIP.append("deployment");
 
-    public static ServiceName deploymentServiceName(final String virtualHost, final String contextPath) {
-        return JBOSS_SIP_DEPLOYMENT_BASE.append(virtualHost).append("".equals(contextPath) ? "/" : contextPath);
+    public static ServiceName deploymentServiceName(final String appName) {
+        return JBOSS_SIP_DEPLOYMENT_BASE.append("".equals(appName) ? "/" : appName);
     }
 
     private SipSubsystemServices() {

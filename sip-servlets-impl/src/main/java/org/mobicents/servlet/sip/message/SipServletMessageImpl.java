@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -19,7 +19,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.header.HeaderExt;
@@ -571,7 +570,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 				}
 				orphan = true;
 				sessionKey = SessionManagerUtil.getSipSessionKey(
-						SessionManagerUtil.getSipApplicationSessionKey(applicationName, getAppSessionId()).getId(),
+						SessionManagerUtil.getSipApplicationSessionKey(applicationName, getAppSessionId(), null).getId(),
 						applicationName, message, false);
 			}
 		}
@@ -580,7 +579,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			//call id not needed anymore since the sipappsessionkey is not a callid anymore but a random uuid
 			final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 					applicationName, 
-					sessionKey.getApplicationSessionId());
+					sessionKey.getApplicationSessionId(), null);
 			MobicentsSipApplicationSession applicationSession =  sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, create);
 			if(applicationSession != null) {
 				// application session can be null if create is false and it is an orphan request
@@ -1086,7 +1085,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		if(sipSession == null && sessionKey != null) {
 			final String applicationName = sessionKey.getApplicationName(); 
 			final SipContext sipContext = sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(applicationName);
-			SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessionKey.getApplicationSessionId(), sessionKey.getApplicationName());
+			SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessionKey.getApplicationSessionId(), sessionKey.getApplicationName(), null);
 			MobicentsSipApplicationSession sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
 			sipSession = sipContext.getSipManager().getSipSession(sessionKey, false, sipFactoryImpl, sipApplicationSession);	
 		} 

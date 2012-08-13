@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -145,7 +145,7 @@ public class SipCacheListener extends AbstractCacheListener
         	
         	if(isFqnSipApplicationSessionRootSized(size, isBuddy)) {
         		String sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
-        		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessId, sipApplicationName);
+        		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessId, sipApplicationName, null);
         		manager_.processRemoteSipApplicationSessionInvalidation(sipApplicationSessionKey);
         	} else {
         		String sipAppSessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
@@ -170,7 +170,7 @@ public class SipCacheListener extends AbstractCacheListener
          	if(isFqnSipApplicationSessionRootSized(size, isBuddy)) {
          		sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
          		attrKey = getSipApplicationSessionIdPojoKeyFromFqn(fqn, isBuddy);
-         		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessId, sipApplicationName);
+         		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessId, sipApplicationName, null);
          		manager_.processRemoteSipApplicationSessionAttributeRemoval(sipApplicationSessionKey, attrKey);
          	} else {
          		String sipAppSessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
@@ -191,7 +191,7 @@ public class SipCacheListener extends AbstractCacheListener
         	 String sessId = null;
          	if(isFqnSipApplicationSessionRootSized(size, isBuddy)) {
          		sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
-         		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessId, sipApplicationName);
+         		SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessId, sipApplicationName, null);
          		manager_.processSipApplicationSessionLocalPojoModification(sipApplicationSessionKey);
          	} else {
          		String sipAppSessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
@@ -240,7 +240,7 @@ public class SipCacheListener extends AbstractCacheListener
     	 String sessId = null;
       	 if(isFqnSipApplicationSessionRootSized(size, isBuddy)) {
       		 sessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
-      		 SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessId, sipApplicationName);
+      		 SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessId, sipApplicationName, null);
       		 manager_.processSipApplicationSessionLocalPojoModification(sipApplicationSessionKey);
       	 } else {
       		 String sipAppSessId = getSipApplicationSessionIdFromFqn(fqn, isBuddy);
@@ -275,7 +275,7 @@ public class SipCacheListener extends AbstractCacheListener
        	 }
          
 		 
-		 SipApplicationSessionKey key = new SipApplicationSessionKey(sessId, sipApplicationName);
+		 SipApplicationSessionKey key = new SipApplicationSessionKey(sessId, sipApplicationName, null);
 		 ClusteredSipApplicationSession sipApplicationSession = manager_.findLocalSipApplicationSession(key, false);
          if (sipApplicationSession == null)
          {

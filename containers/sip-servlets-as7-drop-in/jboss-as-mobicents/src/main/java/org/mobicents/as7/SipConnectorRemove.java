@@ -1,8 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2010, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -19,15 +19,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.as7;
 
-import java.util.Locale;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
+
 import org.jboss.as.controller.AbstractRemoveStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.PathAddress;
-import org.jboss.as.controller.descriptions.DescriptionProvider;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 import org.jboss.dmr.ModelNode;
 
 /**
@@ -35,7 +33,7 @@ import org.jboss.dmr.ModelNode;
  *
  * @author Emanuel Muckenhuber
  */
-class SipConnectorRemove extends AbstractRemoveStepHandler implements DescriptionProvider {
+class SipConnectorRemove extends AbstractRemoveStepHandler {
 
     static final SipConnectorRemove INSTANCE = new SipConnectorRemove();
 
@@ -53,8 +51,4 @@ class SipConnectorRemove extends AbstractRemoveStepHandler implements Descriptio
         // TODO:  RE-ADD SERVICES
     }
 
-    @Override
-    public ModelNode getModelDescription(Locale locale) {
-        return SipSubsystemDescriptions.getConnectorRemove(locale);
-    }
 }

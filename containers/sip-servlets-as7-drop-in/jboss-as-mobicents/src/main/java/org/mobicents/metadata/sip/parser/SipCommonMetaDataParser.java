@@ -1,8 +1,8 @@
 /*
- * JBoss, Home of Professional Open Source.
- * Copyright 2010, Red Hat, Inc., and individual contributors
- * as indicated by the @author tags. See the copyright.txt file in the
- * distribution for a full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -19,7 +19,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.metadata.sip.parser;
 
 import java.util.ArrayList;
@@ -39,6 +38,7 @@ import org.jboss.metadata.parser.servlet.LocaleEncodingsMetaDataParser;
 import org.jboss.metadata.parser.servlet.ServletMetaDataParser;
 import org.jboss.metadata.parser.servlet.SessionConfigMetaDataParser;
 import org.jboss.metadata.parser.util.MetaDataElementParser;
+import org.jboss.metadata.property.PropertyReplacers;
 import org.jboss.metadata.web.spec.ListenerMetaData;
 import org.mobicents.metadata.sip.spec.Element;
 import org.mobicents.metadata.sip.spec.SipMetaData;
@@ -84,7 +84,8 @@ public class SipCommonMetaDataParser extends MetaDataElementParser {
                     listeners = new ArrayList<ListenerMetaData>();
                     smd.setListeners(listeners);
                 }
-                listeners.add(ListenerMetaDataParser.parse(reader));
+                // FIXME: 7.1.2.Final - setup proper ProperlyReplacer
+                listeners.add(ListenerMetaDataParser.parse(reader, PropertyReplacers.noop()));
                 break;
             case SERVLET_SELECTION:
                 smd.setServletSelection(SipServletSelectionMetaDataParser.parse(reader));
@@ -95,7 +96,8 @@ public class SipCommonMetaDataParser extends MetaDataElementParser {
                     servlets = new SipServletsMetaData();
                     smd.setSipServlets(servlets);
                 }
-                servlets.add(ServletMetaDataParser.parse(reader));
+                // FIXME: 7.1.2.Final - setup proper ProperlyReplacer
+                servlets.add(ServletMetaDataParser.parse(reader, PropertyReplacers.noop()));
                 break;
             case PROXY_CONFIG:
                 smd.setProxyConfig(ProxyConfigMetaDataParser.parse(reader));
@@ -103,7 +105,8 @@ public class SipCommonMetaDataParser extends MetaDataElementParser {
             case SESSION_CONFIG:
                  if (smd.getSessionConfig() != null)
                      throw new XMLStreamException("Multiple session-config elements detected", reader.getLocation());
-                 smd.setSessionConfig(SessionConfigMetaDataParser.parse(reader));
+                 // FIXME: 7.1.2.Final - setup proper ProperlyReplacer
+                 smd.setSessionConfig(SessionConfigMetaDataParser.parse(reader, PropertyReplacers.noop()));
                  break;
             case SECURITY_CONSTRAINT:
                 List<SipSecurityConstraintMetaData> sipSecurityConstraints = smd.getSipSecurityConstraints();
@@ -133,10 +136,12 @@ public class SipCommonMetaDataParser extends MetaDataElementParser {
                     messageDestinations = new MessageDestinationsMetaData();
                     smd.setMessageDestinations(messageDestinations);
                 }
-                messageDestinations.add(MessageDestinationMetaDataParser.parse(reader));
+                // FIXME: 7.1.2.Final - setup proper ProperlyReplacer
+                messageDestinations.add(MessageDestinationMetaDataParser.parse(reader, PropertyReplacers.noop()));
                 break;
             case LOCALE_ENCODING_MAPPING_LIST:
-                smd.setLocalEncodings(LocaleEncodingsMetaDataParser.parse(reader));
+                // FIXME: 7.1.2.Final - setup proper ProperlyReplacer
+                smd.setLocalEncodings(LocaleEncodingsMetaDataParser.parse(reader, PropertyReplacers.noop()));
                 break;
             default:
                 return false;

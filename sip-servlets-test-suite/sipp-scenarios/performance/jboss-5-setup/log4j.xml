@@ -161,15 +161,19 @@
 
    <!-- Limit the org.apache category to INFO as its DEBUG is verbose -->
    <category name="org.mobicents">
-      <priority value="ERROR"/>
+      <priority value="WARN"/>
    </category>
    
+   <category name="gov.nist">
+      <priority value="WARN"/>
+   </category>
+
    <category name="org.jboss.web.tomcat.service.session">
-      <priority value="ERROR"/>
+      <priority value="WARN"/>
    </category>
    
    <category name="org.jboss">
-      <priority value="ERROR"/>
+      <priority value="WARN"/>
    </category>
    
    <category name="javax.enterprise">
@@ -330,7 +334,7 @@
    <!-- ======================= -->
 
    <root>
-   	  <priority value ="ERROR" />  
+   	  <priority value ="WARN" />  
       <appender-ref ref="CONSOLE"/>
       <appender-ref ref="FILE"/>
    </root>

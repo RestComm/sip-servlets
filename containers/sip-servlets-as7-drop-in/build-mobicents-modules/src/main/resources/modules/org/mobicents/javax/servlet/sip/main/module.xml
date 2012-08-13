@@ -25,6 +25,7 @@
 <module xmlns="urn:jboss:module:1.1" name="org.mobicents.javax.servlet.sip">
     <dependencies>
         <module name="javax.servlet.api" export="true"/>
+        <module name="org.apache.log4j"/>
     </dependencies>
 
     <resources>

@@ -148,6 +148,28 @@ public class ShootmeSipServletAuthTest extends SipServletTestCase {
 		assertFalse(sender.getOkToByeReceived());
 		assertEquals(401, sender.getFinalResponseStatus());
 	}
+	
+	// Testing bad pwd making sure it returns 401
+	public void testShootmeBadPassword() throws InterruptedException, SipException,
+			ParseException, InvalidArgumentException {
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.setSecurityPwd("badpwd");
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null,
+				false);
+		Thread.sleep(TIMEOUT);
+		assertFalse(sender.isAckSent());
+		assertFalse(sender.getOkToByeReceived());
+		assertEquals(401, sender.getFinalResponseStatus());
+	}
 
 	@Override
 	protected void tearDown() throws Exception {

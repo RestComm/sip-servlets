@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -19,7 +19,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.testsuite.b2bua;
 
 import java.io.File;
@@ -85,6 +84,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				new String[]{"sip:forward-receiver-forking-pending@sip-servlets.com", "sip:forward-receiver-forking-pending@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070"});
 		forwardingUris.put("sip:forward-sender-factory-same-callID@sip-servlets.com", 
 				new String[]{"sip:forward-receiver-factory-same-callID@sip-servlets.com", "sip:forward-receiver-factory-same-callID@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
+		forwardingUris.put("sip:forward-sender-factory-same-callID-kill-original-session@sip-servlets.com", 
+				new String[]{"sip:forward-receiver-factory-same-callID-kill-original-session@sip-servlets.com", "sip:forward-receiver-factory-same-callI-kill-original-sessionD@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
 		forwardingUris.put("sip:forward-sender-408@sip-servlets.com", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
 		forwardingUris.put("sip:forward-sender-408-new-thread@sip-servlets.com", 
@@ -346,6 +347,10 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
         SipApplicationSession appSession = origReq.getApplicationSession();
         SipServletRequest newRequest = null;
         if(((SipURI)origReq.getFrom().getURI()).getUser().contains("same-callID")) {
+        	if(((SipURI)origReq.getFrom().getURI()).getUser().contains("kill-original-session")) {
+        		origReq.createResponse(SipServletResponse.SC_BUSY_HERE).send();
+        		origReq.getSession().invalidate();        		
+        	}
         	newRequest = sipFactory.createRequest(origReq, true);   
         	newRequest.setRequestURI(to);
         } else {
@@ -355,11 +360,15 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
         	newRequest.setContent(origReq.getContent(), origReq.getContentType());
         }
         newRequest.setHeader("Allow", "INVITE, ACK, CANCEL, BYE, REFER, UPDATE, INFO");
-        b2buaHelper.linkSipSessions(origReq.getSession(), newRequest.getSession()); //Linking sessions!
-        origReq.getSession().setAttribute("originalRequest", origReq);
-        logger.info("forkedRequest = " + newRequest);
-        newRequest.getSession().setAttribute("originalRequest", origReq);
-        newRequest.getB2buaHelper().linkSipSessions(origReq.getSession(), newRequest.getSession()); //Linking sessions!
+        if(!((SipURI)origReq.getFrom().getURI()).getUser().contains("kill-original-session")) {
+        	b2buaHelper.linkSipSessions(origReq.getSession(), newRequest.getSession()); //Linking sessions!        
+        	origReq.getSession().setAttribute("originalRequest", origReq);
+        }
+        logger.info("forkedRequest = " + newRequest);        
+        if(!((SipURI)origReq.getFrom().getURI()).getUser().contains("kill-original-session")) {
+        	newRequest.getSession().setAttribute("originalRequest", origReq);
+        	newRequest.getB2buaHelper().linkSipSessions(origReq.getSession(), newRequest.getSession()); //Linking sessions!
+        }
         outgoingSession = newRequest.getSession();
         
         if(origReq.getFrom().getURI().toString().contains("myself")) {
@@ -490,6 +499,13 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		
 		SipSession originalSession =   
 		    sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
+		
+		if(((SipURI)sipServletResponse.getFrom().getURI()).getUser().contains("same-callID-kill-original-session")) {
+			sipServletResponse.getSession().setAttribute(ACT_AS_UAS, true);
+			SipServletRequest ackRequest = sipServletResponse.createAck();
+			logger.info("Sending " +  ackRequest);
+			ackRequest.send();
+		}
 		
 		if(sipServletResponse.getApplicationSession().getAttribute(TEST_USE_LINKED_REQUEST) != null) {
 			if(getServletContext().getInitParameter("checkOriginalRequestMapSize") != null && ((B2buaHelperImpl)b2buaHelper).getOriginalRequestMap().size() != 2 && cSeqValue.indexOf("INVITE") != -1) {

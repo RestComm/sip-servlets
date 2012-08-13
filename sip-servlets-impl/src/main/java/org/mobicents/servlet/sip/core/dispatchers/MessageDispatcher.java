@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -226,8 +226,8 @@ public abstract class MessageDispatcher {
 		}
 		SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				applicationName, 
-				null);
-		sipApplicationSessionKey.setAppGeneratedKey(appGeneratedKey);
+				null,
+				appGeneratedKey);
 		return sipApplicationSessionKey;
 	}
 	
@@ -267,8 +267,7 @@ public abstract class MessageDispatcher {
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 			
 			try {
-				final ClassLoader cl = sipContext.getSipContextClassLoader();
-				Thread.currentThread().setContextClassLoader(cl);
+				sipContext.enterSipContext();				
 				try {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Invoking instance " + servlet);
@@ -277,8 +276,8 @@ public abstract class MessageDispatcher {
 				} finally {								
 					sipServletImpl.deallocate(servlet);					
 				}
-			} finally {
-				Thread.currentThread().setContextClassLoader(oldClassLoader);
+			} finally {				
+				sipContext.exitSipContext(oldClassLoader);
 			}
 		}
 	}
@@ -317,8 +316,7 @@ public abstract class MessageDispatcher {
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 			
 			try {
-				final ClassLoader cl = sipContext.getSipContextClassLoader();
-				Thread.currentThread().setContextClassLoader(cl);
+				sipContext.enterSipContext();	
 				try {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Invoking instance " + servlet);
@@ -331,7 +329,7 @@ public abstract class MessageDispatcher {
 					sipServletImpl.deallocate(servlet);					
 				}
 			} finally {
-				Thread.currentThread().setContextClassLoader(oldClassLoader);
+				sipContext.exitSipContext(oldClassLoader);
 			}
 		}
 	}
@@ -357,11 +355,10 @@ public abstract class MessageDispatcher {
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 			
 			try {
-				final ClassLoader cl = sipContext.getSipContextClassLoader();
-				Thread.currentThread().setContextClassLoader(cl);
+				sipContext.enterSipContext();	
 			
-				if(!securityCheck(request)) return;
-	
+				if(!securityCheck(request)) return;				
+
 				if(logger.isDebugEnabled()) {
 					logger.debug("Invoking instance " + servlet);
 				}
@@ -372,7 +369,7 @@ public abstract class MessageDispatcher {
 					sipServletImpl.deallocate(servlet);
 				}
 			} finally {
-				Thread.currentThread().setContextClassLoader(oldClassLoader);
+				sipContext.exitSipContext(oldClassLoader);
 			}
 		} else if(sipContext.getSipRubyController() != null) {
 			//handling the ruby case
@@ -454,8 +451,7 @@ public abstract class MessageDispatcher {
 			}
 			final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 			try {
-				final ClassLoader cl = sipContext.getSipContextClassLoader();
-				Thread.currentThread().setContextClassLoader(cl);
+				sipContext.enterSipContext();	
 			
 				try {				
 					servlet.service(null, response);
@@ -463,7 +459,7 @@ public abstract class MessageDispatcher {
 					sipServletImpl.deallocate(servlet);
 				}
 			} finally {
-				Thread.currentThread().setContextClassLoader(oldClassLoader);
+				sipContext.exitSipContext(oldClassLoader);
 			}
 		}
 				

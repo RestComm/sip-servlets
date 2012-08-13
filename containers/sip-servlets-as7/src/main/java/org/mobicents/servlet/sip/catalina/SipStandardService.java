@@ -64,10 +64,10 @@ import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingListener;
 import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingService;
 import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingServiceImpl;
 import org.mobicents.ha.javax.sip.ReplicationStrategy;
+import org.mobicents.javax.servlet.CongestionControlPolicy;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
-import org.mobicents.servlet.sip.core.CongestionControlPolicy;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
@@ -259,7 +259,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 				darConfigurationFileLocation = "file:///" + catalinaBase.replace(File.separatorChar, '/') + "/" + darConfigurationFileLocation;
 			}
 			System.setProperty("javax.servlet.sip.dar", darConfigurationFileLocation);
- 		}		
+ 		}
 		super.initialize();
 		sipApplicationDispatcher.setDomain(this.getName());
 		if(baseTimerInterval < 1) {

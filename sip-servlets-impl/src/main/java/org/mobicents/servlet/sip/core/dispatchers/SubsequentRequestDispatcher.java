@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -219,7 +219,8 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		final SipManager sipManager = sipContext.getSipManager();		
 		final MobicentsSipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 				applicationName, 
-				applicationId);
+				applicationId,
+				null);
 	
 		MobicentsSipSession tmpSipSession = null;
 		MobicentsSipApplicationSession sipApplicationSession = sipManager.getSipApplicationSession(sipApplicationSessionKey, false);

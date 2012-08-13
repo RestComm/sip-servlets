@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -19,7 +19,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.testsuite.callcontroller;
 
 import gov.nist.javax.sip.message.MessageExt;
@@ -243,6 +242,47 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT*3);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
+		
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		assertEquals(1, sender.getAllMessagesContent().size());
+		assertTrue(sender.getAllMessagesContent().contains("sipApplicationSessionReadyToBeInvalidated"));
+		assertEquals(((MessageExt)sender.getInviteRequest()).getCallIdHeader().getCallId(), ((MessageExt)receiver.getInviteRequest()).getCallIdHeader().getCallId());
+	}
+	
+	// Non regression test for http://code.google.com/p/sipservlets/issues/detail?id=126
+	public void testCallForwardingCallerSendByeUseSameCallIDOriginalSessionTerminated() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, true);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-sender-factory-same-callID-kill-original-session";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		//receiver.setTimeToWaitBeforeBye(TIMEOUT*2);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isAckReceived());
+		Thread.sleep(TIMEOUT*2);
+		assertTrue(receiver.getOkToByeReceived());
 		
 		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
 		while (allMessagesIterator.hasNext()) {
