@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -154,7 +154,7 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 	public void testProxyRecordRoutePushRouteTCP() {
 		this.shootme.init(STACK_NAME, "tcp");
 		this.cutme.init("tcp");
-		this.shootist.init("unique-location-urn-route-uri1",false, "tcp");
+		this.shootist.init("unique-location-urn-route-tcp-uri1",false, "tcp");
 		for (int q = 0; q < 20; q++) {
 			if (shootist.ended == false && cutme.canceled == false)
 				try {
