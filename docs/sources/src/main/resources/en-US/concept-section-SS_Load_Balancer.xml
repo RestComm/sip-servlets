@@ -305,7 +305,9 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
         </step>
         <step>
           <title>Configure logging</title>
-          <para>The SIP load balancer uses <ulink url="http://java.sun.com/j2se/1.4.2/docs/guide/util/logging/overview.html">Java Logging</ulink> as a logging mechanism. You can configure it through a property file and specify the property file to be used by using the following command <literal>-Djava.util.logging.config.file=./lb-logging.properties</literal>. Please refer to JDK logging for more informationon how to configure the Java logging.</para>
+         <para>The SIP load balancer uses <ulink url="http://logging.apache.org/log4j">Log4J</ulink> as a logging mechanism. You can configure it through the typical log4j xml configuration file and specify the path as follows <literal>-DlogConfigFile=./log4j.xml</literal>.
+		Please refer to Log4J documentation for more information on how to configure the logging. A shortcut exists if you want to switch between INFO/DEBUG/WARN logging levels. The JVM option
+		<literal>-DlogLevel=DEBUG</literal> will allow you to switch all loggig categories to the specified log level.</para>
         </step>
         <step>
           <title>Configure the <filename>server.xml</filename> configuration file</title>
