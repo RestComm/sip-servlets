@@ -31,6 +31,7 @@ import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.metadata.web.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.SessionConfigMetaData;
 import org.mobicents.metadata.sip.spec.ProxyConfigMetaData;
+import org.mobicents.metadata.sip.spec.SipApplicationKeyMethodInfo;
 import org.mobicents.metadata.sip.spec.SipLoginConfigMetaData;
 import org.mobicents.metadata.sip.spec.SipSecurityConstraintMetaData;
 import org.mobicents.metadata.sip.spec.SipServletSelectionMetaData;
@@ -56,7 +57,11 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
     private JBossSipServletsMetaData sipServlets;
     private MessageDestinationsMetaData messageDestinations;
     private SecurityRolesMetaData securityRoles;
-    private Method sipApplicationKeyMethod;
+    // AS7 isolated class loading does not allow to fetch Method
+    // so processors fill SipApplicationKeyMethodInfo and Method is fetched afterwards 
+    // private Method sipApplicationKeyMethod;
+    private SipApplicationKeyMethodInfo sipApplicationKeyMethodInfo;
+
     private ConcurrencyControlMode concurrencyControlMode;
 
     /**
@@ -185,18 +190,32 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
         return sipSessionConfig;
     }
 
+//    /**
+//     * @param sipApplicationKeyMethod the sipApplicationKeyMethod to set
+//     */
+//    public void setSipApplicationKeyMethod(Method sipApplicationKeyMethod) {
+//        this.sipApplicationKeyMethod = sipApplicationKeyMethod;
+//    }
+//
+//    /**
+//     * @return the sipApplicationKeyMethod
+//     */
+//    public Method getSipApplicationKeyMethod() {
+//        return sipApplicationKeyMethod;
+//    }
+
     /**
-     * @param sipApplicationKeyMethod the sipApplicationKeyMethod to set
+     * @param sipApplicationKeyMethodInfo the sipApplicationKeyMethodInfo to set
      */
-    public void setSipApplicationKeyMethod(Method sipApplicationKeyMethod) {
-        this.sipApplicationKeyMethod = sipApplicationKeyMethod;
+    public void setSipApplicationKeyMethodInfo(SipApplicationKeyMethodInfo sipApplicationKeyMethodInfo) {
+        this.sipApplicationKeyMethodInfo = sipApplicationKeyMethodInfo;
     }
 
     /**
-     * @return the sipApplicationKeyMethod
+     * @return the sipApplicationKeyMethodInfo
      */
-    public Method getSipApplicationKeyMethod() {
-        return sipApplicationKeyMethod;
+    public SipApplicationKeyMethodInfo getSipApplicationKeyMethodInfo() {
+        return this.sipApplicationKeyMethodInfo;
     }
 
     /**

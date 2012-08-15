@@ -21,9 +21,14 @@
  */
 package org.mobicents.servlet.sip.startup.jboss;
 
+import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.sip.SipServletRequest;
+
+import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Loader;
 import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.startup.ContextConfig;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -51,6 +56,7 @@ import org.mobicents.metadata.sip.spec.ExistsMetaData;
 import org.mobicents.metadata.sip.spec.NotMetaData;
 import org.mobicents.metadata.sip.spec.OrMetaData;
 import org.mobicents.metadata.sip.spec.PatternMetaData;
+import org.mobicents.metadata.sip.spec.SipApplicationKeyMethodInfo;
 import org.mobicents.metadata.sip.spec.SipLoginConfigMetaData;
 import org.mobicents.metadata.sip.spec.SipResourceCollectionMetaData;
 import org.mobicents.metadata.sip.spec.SipResourceCollectionsMetaData;
@@ -128,8 +134,9 @@ public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig 
 
     /**
      * @param convergedMetaData
+     * @throws Exception 
      */
-    public void processSipMetaData(JBossConvergedSipMetaData convergedMetaData) {
+    public void processSipMetaData(JBossConvergedSipMetaData convergedMetaData) throws Exception {
         CatalinaSipContext convergedContext = (CatalinaSipContext) context;
         convergedContext.setWrapperClass(SipServletImpl.class.getName());
         /*
@@ -321,7 +328,17 @@ public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig 
                 convergedContext.addChild((SipServletImpl) wrapper);
             }
         }
-        convergedContext.setSipApplicationKeyMethod(convergedMetaData.getSipApplicationKeyMethod());
+        final SipApplicationKeyMethodInfo sipApplicationKeyMethodInfo = convergedMetaData.getSipApplicationKeyMethodInfo();
+        final String sipApplicationKeyClassName = sipApplicationKeyMethodInfo.getClassName();
+        final String sipApplicationKeyMethodName = sipApplicationKeyMethodInfo.getMethodName();
+        ClassLoader contextCLoader = context.getLoader().getClassLoader();
+        Method sipApplicationKeyMethod = null;
+        try {
+        	sipApplicationKeyMethod = Class.forName(sipApplicationKeyClassName, true, contextCLoader).getMethod(sipApplicationKeyMethodName, SipServletRequest.class);
+        } catch (Exception e) {
+        	throw e;
+        }
+        convergedContext.setSipApplicationKeyMethod(sipApplicationKeyMethod);
         convergedContext.setConcurrencyControlMode(convergedMetaData.getConcurrencyControlMode());
         convergedContext.setWrapperClass(StandardWrapper.class.getName());
     }

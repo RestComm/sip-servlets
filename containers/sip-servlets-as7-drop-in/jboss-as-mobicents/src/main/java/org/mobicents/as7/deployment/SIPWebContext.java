@@ -116,7 +116,11 @@ public class SIPWebContext extends SipStandardContext {
         JBossWebMetaDataMerger.merge(mergedMetaData, override, original);
 
         augmentAnnotations(mergedMetaData, sipMetaData, sipAnnotationMetaData);
-        processMetaData(mergedMetaData, sipMetaData);
+        try {
+			processMetaData(mergedMetaData, sipMetaData);
+		} catch (Exception e) {
+			throw new LifecycleException(e);
+		}
 
         super.start();
     }
@@ -241,7 +245,14 @@ public class SIPWebContext extends SipStandardContext {
                             }
                         }
                     }
-
+                    if (annotatedMetaData.getSipApplicationKeyMethodInfo() != null) {
+                    	sipMetaData.setSipApplicationKeyMethodInfo(annotatedMetaData.getSipApplicationKeyMethodInfo());
+                    }
+                    if (annotatedMetaData.getConcurrencyControlMode() != null) {
+                    	if (sipMetaData.getConcurrencyControlMode() == null) {
+                    		sipMetaData.setConcurrencyControlMode(annotatedMetaData.getConcurrencyControlMode());
+                    	}
+                    }
                 }
             }
             if (logger.isDebugEnabled()) {
@@ -265,7 +276,7 @@ public class SIPWebContext extends SipStandardContext {
         }
     }
 
-    private void processMetaData(JBossWebMetaData mergedMetaData, SipMetaData sipMetaData) {
+    private void processMetaData(JBossWebMetaData mergedMetaData, SipMetaData sipMetaData) throws Exception {
         //processJBossWebMetaData(sharedJBossWebMetaData);
         //processWebMetaData(sharedJBossWebMetaData);
         JBossSipMetaDataMerger.merge((JBossConvergedSipMetaData)mergedMetaData, null, sipMetaData);

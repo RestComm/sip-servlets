@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 import org.jboss.as.server.deployment.AttachmentKey;
+import org.jboss.invocation.proxy.MethodIdentifier;
 import org.jboss.metadata.javaee.spec.Environment;
 import org.jboss.metadata.web.spec.WebMetaData;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
@@ -62,7 +63,10 @@ public abstract class SipMetaData extends WebMetaData implements Environment {
 //    /** The message destinations */
 //    private MessageDestinationsMetaData messageDestinations;
 
-    private Method sipApplicationKeyMethod;
+    // AS7 isolated class loading does not allow to fetch Method,
+    // so processors fill SipApplicationKeyMethodInfo and Method is fetched afterwards 
+    // private Method sipApplicationKeyMethod;
+    private SipApplicationKeyMethodInfo sipApplicationKeyMethodInfo;
     private ConcurrencyControlMode concurrencyControlMode;
 
     /**
@@ -374,18 +378,32 @@ public abstract class SipMetaData extends WebMetaData implements Environment {
         return applicationName;
     }
 
+//    /**
+//     * @param sipApplicationKeyMethod the sipApplicationKeyMethod to set
+//     */
+//    public void setSipApplicationKeyMethod(Method sipApplicationKeyMethod) {
+//        this.sipApplicationKeyMethod = sipApplicationKeyMethod;
+//    }
+//
+//    /**
+//     * @return the sipApplicationKeyMethod
+//     */
+//    public Method getSipApplicationKeyMethod() {
+//        return sipApplicationKeyMethod;
+//    }
+
     /**
-     * @param sipApplicationKeyMethod the sipApplicationKeyMethod to set
+     * @param sipApplicationKeyMethodInfo the sipApplicationKeyMethodInfo to set
      */
-    public void setSipApplicationKeyMethod(Method sipApplicationKeyMethod) {
-        this.sipApplicationKeyMethod = sipApplicationKeyMethod;
+    public void setSipApplicationKeyMethodInfo(SipApplicationKeyMethodInfo sipApplicationKeyMethodInfo) {
+        this.sipApplicationKeyMethodInfo = sipApplicationKeyMethodInfo;
     }
 
     /**
-     * @return the sipApplicationKeyMethod
+     * @return the sipApplicationKeyMethodInfo
      */
-    public Method getSipApplicationKeyMethod() {
-        return sipApplicationKeyMethod;
+    public SipApplicationKeyMethodInfo getSipApplicationKeyMethodInfo() {
+        return this.sipApplicationKeyMethodInfo;
     }
 
     public ConcurrencyControlMode getConcurrencyControlMode() {

@@ -21,14 +21,19 @@
  */
 package org.mobicents.as7.deployment;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.annotation.SipApplication;
+import javax.servlet.sip.annotation.SipApplicationKey;
 import javax.servlet.sip.annotation.SipListener;
 import javax.servlet.sip.annotation.SipServlet;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControl;
+import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 
 import org.jboss.annotation.javaee.Descriptions;
 import org.jboss.annotation.javaee.DisplayNames;
@@ -48,6 +53,8 @@ import org.jboss.jandex.AnnotationValue;
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.Index;
+import org.jboss.jandex.MethodInfo;
+import org.jboss.jandex.Type;
 import org.jboss.logging.Logger;
 import org.jboss.metadata.javaee.spec.DescriptionGroupMetaData;
 import org.jboss.metadata.javaee.spec.DescriptionImpl;
@@ -63,6 +70,7 @@ import org.jboss.vfs.VirtualFile;
 import org.mobicents.metadata.sip.spec.ProxyConfigMetaData;
 import org.mobicents.metadata.sip.spec.Sip11MetaData;
 import org.mobicents.metadata.sip.spec.SipAnnotationMetaData;
+import org.mobicents.metadata.sip.spec.SipApplicationKeyMethodInfo;
 import org.mobicents.metadata.sip.spec.SipMetaData;
 import org.mobicents.metadata.sip.spec.SipServletSelectionMetaData;
 import org.mobicents.metadata.sip.spec.SipServletsMetaData;
@@ -95,6 +103,8 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
     protected static final DotName sipListener = DotName.createSimple(SipListener.class.getName());
     protected static final DotName sipServlet = DotName.createSimple(SipServlet.class.getName());
     protected static final DotName sipApplication = DotName.createSimple(SipApplication.class.getName());
+    protected static final DotName sipApplicationKey = DotName.createSimple(SipApplicationKey.class.getName());
+    protected static final DotName concurrencyControl = DotName.createSimple(ConcurrencyControl.class.getName());
 //    protected static final DotName webServlet = DotName.createSimple(WebServlet.class.getName());
 //    protected static final DotName runAs = DotName.createSimple(RunAs.class.getName());
 //    protected static final DotName declareRoles = DotName.createSimple(DeclareRoles.class.getName());
@@ -246,6 +256,48 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
             sipAnnotationMetaData.setSipServlets(sipServlets);
         }
 
+        //@SipApplicationKey
+        final List<AnnotationInstance> sipApplicationKeyAnnotations = index.getAnnotations(sipApplicationKey);
+        if (sipApplicationKeyAnnotations != null && sipApplicationKeyAnnotations.size() > 0) {
+            for (final AnnotationInstance annotation : sipApplicationKeyAnnotations) {
+                if (logger.isDebugEnabled()) logger.debug("processAnnotations(): @SipApplicationKey: " + annotation);
+                final AnnotationTarget target = annotation.target();
+                if (!(target instanceof MethodInfo)) {
+                    throw new DeploymentUnitProcessingException("@SipApplicationKey is only allowed at method level " + target);
+                }
+                final MethodInfo methodInfo = MethodInfo.class.cast(target);
+                if(!Modifier.isStatic(methodInfo.flags()) || !Modifier.isPublic(methodInfo.flags())) {
+                	throw new DeploymentUnitProcessingException("A method annotated with the @SipApplicationKey annotation MUST be public and static");
+                }
+                if(!methodInfo.returnType().name().toString().equals(String.class.getName())) {
+                	throw new DeploymentUnitProcessingException("A method annotated with the @SipApplicationKey annotation MUST return a String");
+                }
+                final Type[] types = methodInfo.args();
+                if(types.length != 1 || !types[0].name().toString().equals(SipServletRequest.class.getName())) {
+                	throw new DeploymentUnitProcessingException("A method annotated with the @SipApplicationKey annotation MUST have a single argument of type SipServletRequest");
+                }
+                if(sipAnnotationMetaData.getSipApplicationKeyMethodInfo() != null) {
+                	throw new DeploymentUnitProcessingException("More than one SipApplicationKey annotated method is not allowed.");
+                }
+                final SipApplicationKeyMethodInfo sipApplicationKeyMethodInfo = new SipApplicationKeyMethodInfo(methodInfo.declaringClass().name().toString(), methodInfo.name());
+                sipAnnotationMetaData.setSipApplicationKeyMethodInfo(sipApplicationKeyMethodInfo);
+            	if (logger.isDebugEnabled()) logger.debug("processAnnotations(): added " + sipApplicationKeyMethodInfo + " as @SipApplicationKey method");
+            }
+        }
+        //@ConcurrencyControl
+        final List<AnnotationInstance> concurrencyControlAnnotations = index.getAnnotations(concurrencyControl);
+        if (concurrencyControlAnnotations != null && concurrencyControlAnnotations.size() > 0) {
+            for (final AnnotationInstance annotation : concurrencyControlAnnotations) {
+                if (logger.isDebugEnabled()) logger.debug("processAnnotations(): @ConcurrencyControl: " + annotation);
+                final AnnotationTarget target = annotation.target();
+                if (!(target instanceof ClassInfo)) {
+                    throw new DeploymentUnitProcessingException("@ConcurrencyControl is only allowed at package level " + target);
+                }
+                ConcurrencyControlMode mode = ConcurrencyControlMode.valueOf(annotation.value("mode").asString());
+                sipAnnotationMetaData.setConcurrencyControlMode(mode);
+            	if (logger.isDebugEnabled()) logger.debug("processAnnotations(): ConcurrencyControl set to " + mode);
+            }
+        }
         return sipAnnotationMetaData;
     }
 

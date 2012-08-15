@@ -38,7 +38,7 @@ import org.mobicents.metadata.sip.spec.SipServletsMetaData;
  * @author Scott.Stark@jboss.org
  * @version $Revision: 84989 $
  *
- * @author josemrecio
+ * @author josemrecio@gmail.com
  *
  */
 public class JBossSipMetaDataMerger extends NamedModuleImplMerger {
@@ -120,10 +120,10 @@ public class JBossSipMetaDataMerger extends NamedModuleImplMerger {
             originalRoles = original.getSecurityRoles();
         SecurityRolesMetaDataMerger.merge(dest.getSipSecurityRoles(), overrideRoles, originalRoles);
 
-        if (override != null && override.getSipApplicationKeyMethod() != null)
-            dest.setSipApplicationKeyMethod(override.getSipApplicationKeyMethod());
-        else if (original != null && original.getSipApplicationKeyMethod() != null)
-            dest.setSipApplicationKeyMethod(original.getSipApplicationKeyMethod());
+        if (override != null && override.getSipApplicationKeyMethodInfo() != null)
+            dest.setSipApplicationKeyMethodInfo(override.getSipApplicationKeyMethodInfo());
+        else if (original != null && original.getSipApplicationKeyMethodInfo() != null)
+            dest.setSipApplicationKeyMethodInfo(original.getSipApplicationKeyMethodInfo());
 
         if (override != null && override.getConcurrencyControlMode() != null)
             dest.setConcurrencyControlMode(override.getConcurrencyControlMode());
