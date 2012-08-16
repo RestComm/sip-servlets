@@ -105,7 +105,9 @@ public class SIPWebContext extends SipStandardContext {
 
     @Override
     public void start() throws LifecycleException {
-        log.infof("Starting sip web context for deployment %s", deploymentUnit.getName());
+    	if(log.isInfoEnabled()) {
+    		log.infof("Starting sip web context for deployment %s", deploymentUnit.getName());
+    	}
         SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
         SipAnnotationMetaData sipAnnotationMetaData = deploymentUnit.getAttachment(SipAnnotationMetaData.ATTACHMENT_KEY);
 
@@ -119,7 +121,7 @@ public class SIPWebContext extends SipStandardContext {
         try {
 			processMetaData(mergedMetaData, sipMetaData);
 		} catch (Exception e) {
-			throw new LifecycleException(e);
+			throw new LifecycleException("An unexpected exception happened while parsing sip meta data from " + deploymentUnit.getName(), e);
 		}
 
         super.start();

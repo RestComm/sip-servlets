@@ -329,16 +329,18 @@ public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig 
             }
         }
         final SipApplicationKeyMethodInfo sipApplicationKeyMethodInfo = convergedMetaData.getSipApplicationKeyMethodInfo();
-        final String sipApplicationKeyClassName = sipApplicationKeyMethodInfo.getClassName();
-        final String sipApplicationKeyMethodName = sipApplicationKeyMethodInfo.getMethodName();
-        ClassLoader contextCLoader = context.getLoader().getClassLoader();
-        Method sipApplicationKeyMethod = null;
-        try {
-        	sipApplicationKeyMethod = Class.forName(sipApplicationKeyClassName, true, contextCLoader).getMethod(sipApplicationKeyMethodName, SipServletRequest.class);
-        } catch (Exception e) {
-        	throw e;
+        if(sipApplicationKeyMethodInfo != null) {
+	        final String sipApplicationKeyClassName = sipApplicationKeyMethodInfo.getClassName();
+	        final String sipApplicationKeyMethodName = sipApplicationKeyMethodInfo.getMethodName();
+	        ClassLoader contextCLoader = context.getLoader().getClassLoader();
+	        Method sipApplicationKeyMethod = null;
+	        try {
+	        	sipApplicationKeyMethod = Class.forName(sipApplicationKeyClassName, true, contextCLoader).getMethod(sipApplicationKeyMethodName, SipServletRequest.class);
+	        } catch (Exception e) {
+	        	throw e;
+	        }
+	        convergedContext.setSipApplicationKeyMethod(sipApplicationKeyMethod);
         }
-        convergedContext.setSipApplicationKeyMethod(sipApplicationKeyMethod);
         convergedContext.setConcurrencyControlMode(convergedMetaData.getConcurrencyControlMode());
         convergedContext.setWrapperClass(StandardWrapper.class.getName());
     }
