@@ -116,7 +116,19 @@ public class ConvergedSessionDelegate {
 		Host host = (Host)context.getParent();
 		//Service
 		Service service = ((Engine)host.getParent()).getService();
-		String hostname = host.getName();
+		String[] aliases = host.findAliases();
+		String hostname = null;
+		
+		// Needed for http://code.google.com/p/sipservlets/issues/detail?id=150
+		// to pass TCK test com.bea.sipservlet.tck.agents.api.javax_servlet_sip.ConvergedHttpSessionTest.testEncodeURL002
+		if(aliases.length < 1) {
+			hostname = host.getName();
+		} else {
+			// FIXME would be better to try to match the alias by some path or IP but unaware if this is really needed at this point
+			// or how it can be effectively done
+			hostname = aliases[0];
+		}
+		
 		//retrieving the port corresponding to the specified scheme
 		//TODO ask EG what if the scheme is not supported on the server ?
 		int port = -1;		
