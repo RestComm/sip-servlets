@@ -2153,6 +2153,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @return
 	 */
 	protected boolean isAckReceived(long cSeq) {
+		if(acksReceived == null) {
+			// http://code.google.com/p/sipservlets/issues/detail?id=152 
+			// if there is no map, it means that the session was already destroyed and it is a retransmission 
+			return true;
+		}
 		Boolean ackReceived = acksReceived.get(cSeq);
 		if(logger.isDebugEnabled()) {
 			logger.debug("isAckReceived for CSeq " + cSeq +" : " + ackReceived);
