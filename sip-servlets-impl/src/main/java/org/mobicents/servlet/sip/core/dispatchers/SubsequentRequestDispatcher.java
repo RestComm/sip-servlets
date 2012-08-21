@@ -331,6 +331,12 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				}
 			}
 			sipSession.setRequestsPending(sipSession.getRequestsPending() + 1);
+
+            // The fastest way to figure out the transport is the mandatory Via transport header
+            final ViaHeader via = (ViaHeader) request.getHeader(ViaHeader.NAME);
+            sipSession.setTransport(via.getTransport());
+            
+            handleSipOutbound(sipServletRequest);
 		}
 		// Issue 1714 : do the validation after lock acquisition to avoid conccurency on CSeq validation 
 		// if a concurrency control mode is used

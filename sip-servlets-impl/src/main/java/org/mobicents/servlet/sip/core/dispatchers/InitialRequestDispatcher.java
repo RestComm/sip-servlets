@@ -48,7 +48,6 @@ import javax.sip.DialogState;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.Address;
-import javax.sip.header.ContactHeader;
 import javax.sip.address.URI;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.Header;
@@ -454,57 +453,6 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 	}
 	
 	
-	/**
-	 * NOTE! This is only a partial implementation and will only work
-	 * when we are acting as a UAS as per RFC 5626 Section 4.3. Sending Non-REGISTER Requests.
-	 * Need to add some more logic for proxy scenarios. See RFC 5626 for exact details.
-	 * 
-	 * The purpose of this method is to examine the request in an effort
-	 * to determine if the logic of RFC 5626 should be applied. I.e., should
-	 * we create and store a "flow" for this request so that subsequent requests
-	 * will use the same connection as they "arrived" on.
-	 * 
-	 * @param request
-	 */
-	private void handleSipOutbound(final SipServletRequestImpl sipServletRequest) {
-
-		// if this is not a dialog creating request, then bail out right away
-		if (!JainSipUtils.DIALOG_CREATING_METHODS.contains(sipServletRequest.getMethod())) {
-			return;
-		}		
-		
-		final Request request = (Request) sipServletRequest.getMessage();
-		final ContactHeader contact = (ContactHeader) request.getHeader(ContactHeader.NAME);				
-				
-		final URI requestUri = request.getRequestURI();
-		
-		//
-		if ((contact != null && contact.getAddress().getURI() instanceof Parameters && ((Parameters)contact.getAddress().getURI()).getParameter(SIP_OUTBOUND_PARAM_OB) != null)) {
-			final String remoteHost = sipServletRequest.getRemoteAddr();
-			final int remotePort = sipServletRequest.getRemotePort();
-			final String transport = sipServletRequest.getTransport();
-			final MobicentsSipSession sipSessionImpl = sipServletRequest.getSipSession();
-
-			try {							
-				final javax.sip.address.SipURI flowURI = SipFactoryImpl.addressFactory.createSipURI(null, remoteHost);
-				flowURI.setPort(remotePort);
-				flowURI.setTransportParam(transport);
-
-				sipSessionImpl.setFlow(flowURI);
-			} catch (final ParseException e) {
-				logger.warn("Unable to create new flow URI from " + remoteHost + ":" 
-						+ remotePort + ";transport=" + transport + " due to a parse exception");
-			} 
-		} else if(sipServletRequest.getPoppedRouteHeader() != null && (requestUri instanceof javax.sip.address.SipURI && ((javax.sip.address.SipURI)requestUri).getParameter(SIP_OUTBOUND_PARAM_OB) != null)) {
-			// If there is a route on the request, then we are acting as a proxy
-			final javax.sip.address.SipURI poppedURI = (javax.sip.address.SipURI) sipServletRequest.getPoppedRouteHeader().getAddress().getURI();
-			String flowToken = poppedURI.getUser();
-			//TODO validate flow token and information and check it against session flow token
-			// See Section 5.3
-			return;					
-		}	
-	}
-
 
 	/**
 	 * Dispatch a request outside the container
@@ -531,7 +479,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			try {
 				forwardRequestStatefully(sipServletRequest, SipSessionRoutingType.PREVIOUS_SESSION, SipRouteModifier.NO_ROUTE);
 			} catch (Exception e) {
-				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following subsequent request " + request, e);
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Unexpected Exception while trying to forward statefully the following initial request " + request, e);
 			}
 		} else {
 			// the Request-URI does not point to another domain, and there is no Route header, 
