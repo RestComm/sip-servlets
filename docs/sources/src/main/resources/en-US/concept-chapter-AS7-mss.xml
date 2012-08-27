@@ -1,0 +1,623 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
+<!ENTITY % BOOK_ENTITIES SYSTEM "SIP_Servlets_Server_User_Guide.ent">
+%BOOK_ENTITIES;
+]>
+
+<chapter>
+  <title>Getting Started with MSS for JBoss AS7 </title>
+
+
+
+<note>
+<title> Features not yet available on MSS for JBoss AS7 </title>
+<para> * Sip Clustering and Failover  </para>
+<para> * SNMP  </para>
+<para> * Jopr Monitoring  </para>
+<para> * SIP Security  </para>
+</note>
+
+<para>
+Some of the features mentioned above will likely be added in the future. As of the time of this writing, they are not available. Even though Jopr monitoring is not available, there is a Command Line Interface (CLI), which will be discussed further down. As the features become available, this guide will be updated to reflect the changes. 
+</para>
+
+
+<section>
+<title>
+Downloading and Starting MSS for JBoss AS7
+</title>
+<para>
+If you have been working with JBoss for some time, you will quickly notice that the JBoss AS7 iteration has gone through a lot of changes. This guide will help you understand how you can quickly get started with JBoss AS7 within the MSS framework.
+</para>
+
+<para>
+
+You can go to the link below to download the latest MSS for JBoss AS7: <ulink url=" http://sourceforge.net/projects/mobicents/files/Mobicents%20Sip%20Servlets/">Download Latest Version of MSS for JBoss AS7 </ulink>
+</para> 
+
+<para>
+You will need to extract the content of the file into a directory on your local system. The root directory of the MSS for JBoss AS7 that you downloaded will be referred to in this guide as $JBOSS_HOME.  
+</para>
+
+
+<para>
+If this is your first time working with MSS for JBoss, you will need to make sure you have Java Run Time or JDK installed on your computer. You will also need to have the environment variables set.  See the links below to  learn how to get JRE or JDK setup on your system. 
+</para>
+
+<para>
+Installing and Configuring JDK
+</para>
+<para> <xref linkend="install-configure-JDK"/></para>
+
+
+
+<para>
+Setting Environment Variables
+</para>
+
+<para> <xref linkend="setting-jboss-ENV-variable-windows-unix"/></para>
+
+
+<para>
+To start the server do the following:
+</para>
+<screen>
+$JBOSS_HOME/bin/standalone.sh
+</screen>
+
+<para>
+During the startup process, you will notice that the final part of the log output will be similar to the truncated output below. Notice that the Admin console interface can be accessed at http://172.0.0.1:9990. This will be explained later. 
+</para>
+<screen>
+14:28:43,972 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015951: Admin console listening on http://127.0.0.1:9990
+14:28:43,974 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015874: JBoss AS 7.1.2.Final "Steropes" 
+started in 22148ms - Started 222 of 306 services (83 services are passive or on-demand)
+
+</screen>
+<para>
+You will notice that the startup is very fast. The reason for this is that services like High Availability and SIP are no longer started by default. This provides better system resource management. With the simple startup above, you will be able to enter the default web interface of the application server by going to this url http://127.0.0.1:8080. The result will show a screenshot similar to the one below.
+</para>
+
+
+<para>
+            <figure>
+              <title>JBoss Application Server 7 Welcome Page</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata width="700" fileref="images/welcome-page-Mss-JBoss-AS7.png"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
+
+</para>
+
+<para>
+With the standard startup script, you will not have access to any SIP functionalities. This is because of the modular approach of JBoss AS7. There is a configuration file that needs to be used to activate additional functionalities like SIP and High Availability.
+</para>
+
+
+<para>
+In order to start the MSS for JBoss AS7 with SIP functionalities, you need to append the startup script with the SIP configuration file. The configuration files are located in the $JBOSS_HOME/standalone/configuration directory. You can see the content of the directory below
+</para>
+<screen>
+application-roles.properties  mgmt-users.properties     standalone-ha.xml
+application-users.properties  mss-sip-stack.properties  standalone-sip.xml
+dars                          standalone-full-ha.xml    standalone.xml
+logging.properties            standalone-full.xml       standalone_xml_history
+</screen>
+
+
+<para>
+If you want to start MSS with SIP services activated, you need to go to the $JBOSS_HOME/bin directory. Type the following command:
+</para>
+
+<screen>
+./standalone.sh -c standalone-sip.xml
+</screen>
+
+<para>
+The click2call SIP sample application bundled with MSS will become available at this url http://127.0.0.1:8080/click2call. You can configure multiple SIP softphones to use the sample application. See the section below for how to configure and test the SIP sample application.
+</para>
+
+<section>
+<title>Testing Click2Call with MSS for JBOSS AS7 </title>
+
+<para>
+Once the server is started as stated in the previous section, you can configure multiple instances of any SIP softphone you prefer. In this example, Linphone will be used.
+</para>
+
+<screen>
+(configuring two instances of Linphone)
+
+start Linphone 
+go to the Options menu
+
+On the Network Settings tab, 
+	SIP (UDP) port to 5061. (leave the rest as default)
+On the Manage SIP Accounts tab, 
+	click the add button
+	Your SIP identity: = sip:linphone@127.0.0.1:5080
+	SIP Proxy address: = sip 127.0.0.1:5080
+
+Leave the rest of the settings as default.
+	
+
+Configuring Linphone (on the second shell)
+
+go to the Options menu
+
+On the Network Settings tab, 
+	SIP (UDP) port to 5062. (leave the rest as default)
+On the Manage SIP Accounts tab, 
+	click the add button
+	Your SIP identity: = sip:linphone2@127.0.0.1:5080
+	SIP Proxy address: = sip 127.0.0.1:5080
+
+Leave the rest of the settings as default.
+</screen>
+
+<para>
+A correctly configured Linphone will look like the screenshot below.
+</para>
+
+<para>
+            <figure>
+              <title>Successfully Configured Linphone</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata width="700" fileref="images/linphone-registration-port-5080.png"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
+
+</para>
+
+
+
+<para>
+Once the phones are successfully registered with the MSS for JBoss AS7 server, you can check the result in the sample SIP application at this url, http://127.0.0.1:8080/click2call/
+</para>
+
+
+<para>
+            <figure>
+              <title>Click2call SIP Registered Softphones</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata width="700" fileref="images/click2call-JbossAS7-registered-clients.png"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
+
+</para>
+
+
+<para>
+You can make calls from the sample click2call application and see the logs in the shell terminal you used to start the MSS for JBoss AS7 server. 
+</para>
+
+
+</section>
+
+
+
+
+
+<section>
+
+<title> Command Line Interface for MSS JBoss AS7</title>
+
+
+<para>
+Part of the task of any administrator who has to manage a JBoss server will be to monitor services offered to clients. There is a command line interface bundled with JBoss AS7 which can be accessed by going to the $JBOSS_HOME/bin directory. 
+
+</para>
+
+<para> You need to make sure that the JBoss server is started running on your system and listening on port 9999 (in a different shell terminal). The section below will work you through steps to familiarize yourself with the CLI. 
+</para>
+
+<para>
+There are so many features available with the MSS for JBoss AS7 CLI. The example below will concentrate on getting data from a running SIP protocol. 
+</para>
+
+
+<para>
+In the $JBOSS_HOME/bin directory, type
+
+</para>
+<screen>
+./jboss-cli.sh 
+</screen>
+<para>
+(This will show the message below)
+</para>
+
+<screen>
+You are disconnected at the moment. 
+Type 'connect' to connect to the server or 
+'help' for the list of supported commands.
+</screen>
+<para>
+At the [disconnected /] command  prompt, type 
+</para>
+<screen>
+connect
+</screen>
+
+<para>
+When you see the [standalone@localhost:9999 /] at the prompt, you are successfully connected to the server.
+</para>
+
+<note>
+<title>Navigating the CLI </title>
+<para>Moving around the MSS for JBoss AS7 CLI is similar to normal file system with a few exceptions. You can use commands like, (ls, cd, cd..) to navigate around the CLI
+</para>
+
+</note>
+
+
+
+<para>
+Follow the steps below to access SIP information from the CLI
+</para>
+
+
+
+<screen>
+At the prompt type (ls)
+
+[standalone@localhost:9999 /] ls
+core-service                  deployment                    extension
+interface                     path                          socket-binding-group
+subsystem                     system-property               launch-type=STANDALONE
+management-major-version=1    management-minor-version=2    name=linux-fedora
+namespaces=[]                 process-type=Server           product-name=undefined
+product-version=undefined     profile-name=undefined        release-codename=Steropes
+release-version=7.1.2.Final   running-mode=NORMAL           schema-locations=[]
+server-state=running
+
+[standalone@localhost:9999 /] cd deployment
+
+[standalone@localhost:9999 deployment] ls
+click2call.war                sip-servlets-management.war
+
+[standalone@localhost:9999 deployment] cd click2call.war
+
+[standalone@localhost:9999 deployment=click2call.war] ls
+subdeployment
+subsystem
+content=[{"path" => "deployments/click2call.war","relative-to" => "jboss.server.base.dir","archive" => true}]
+enabled=true
+name=click2call.war
+persistent=false
+runtime-name=click2call.war
+status=OK
+
+[standalone@localhost:9999 deployment=click2call.war] cd subsystem 
+
+[standalone@localhost:9999 subsystem] ls
+sip   web
+
+[standalone@localhost:9999 subsystem] cd sip
+
+
+[standalone@localhost:9999 subsystem=sip] ls
+servlet
+active-sip-application-sessions=7
+active-sip-sessions=8
+app-name=org.mobicents.servlet.sip.example.SimpleApplication
+expired-sip-application-sessions=25
+expired-sip-sessions=26
+max-active-sip-sessions=-1
+rejected-sip-application-sessions=0
+rejected-sip-sessions=0
+sip-application-session-avg-alive-time=180
+sip-application-session-max-alive-time=230
+sip-application-sessions-created=32
+sip-application-sessions-per-sec=0.0
+sip-session-avg-alive-time=162
+sip-session-max-alive-time=180
+sip-sessions-created=34
+sip-sessions-per-sec=0.0
+
+
+</screen>
+
+<note>
+<title>No SIP data on the CLI </title>
+<para>
+The data from the SIP subsystem are only available if you have the click2call 
+sample application running and your softphones are connected to the server. 
+</para>
+</note>
+
+
+<para>
+There is also a SIP servlets management console that is available at this url http://127.0.0.1:8080/sip-servlets-management. The resulting page will be similar to the screenshot below.
+</para>
+
+<para>
+            <figure>
+              <title>JBoss Application Server 7 Welcome Page</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata width="700" fileref="images/sip-servlets-management-console-AS7.png"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
+
+</para>
+
+
+</section>
+
+
+
+<section>
+<title>Accessing Management Console </title>
+
+<para>
+MSS for JBoss AS7 provides a management console that can be useful for accessing vital information about your server. In the welcome page that appears when you access  http://127.0.0.1:8080, there is a link that points to  the Administration Console. 
+</para>
+
+<para>
+If you don't have a user account for the management console, you will see a screenshot like the one below. It contains instructions about how to create a user account.
+</para>
+
+
+
+
+<para>
+            <figure>
+              <title>Administration Console Error Page</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata width="700" fileref="images/admin-console-error-page.png"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
+
+</para>
+
+<para>
+Go to the $JBoss_HOME/bin directory and run the ./add-user.sh script. You can follow the interactive user mode to create an account for the Administration Console. 
+</para>
+
+<para>
+Once the user account has been created, you can access the Administration Console at this address http://127.0.0.1:9990/console/ 
+</para>
+
+<para>
+The screenshot below shows you what the Administration Console looks like.
+</para>
+
+
+<para>
+            <figure>
+              <title>Administration Console </title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata width="700" fileref="images/admin-console-AS7-homepage.png"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
+
+</para>
+
+
+
+
+
+<note>
+<title> Deleting Administration Console User Account</title>
+<para>
+Deleting the user account isn't very intuitive. In the event that you will need to remove an account and create another one, you can remove the account from the mgmt-users.properties file. It is located in the $MSS_JBoss_HOME/standalone/configuration directory. If you are running in the domain mode, you will need to check the corresponding configuration directory. 
+</para>
+</note>
+
+</section>
+
+
+
+
+</section>
+
+
+
+
+
+<section>
+<title>MSS for Tomcat AS7 - Downloading and Installing </title>
+
+<para>
+You can download the latest MSS for Tomcat AS7   <ulink url=" http://sourceforge.net/projects/mobicents/files/Mobicents%20Sip%20Servlets/">HERE</ulink>
+</para> 
+
+<para>
+The content of the downloaded file can be extracted to any location you prefer on your computer. The root directory to which the content of the download is extracted will be referred to as $TOMCAT_HOME. 
+</para>
+
+
+<para>
+The content of the $TOMCAT_HOME/bin is similar to the output below.
+</para>
+
+<screen>
+bootstrap.jar                 cpappend.bat      startup.bat
+catalina.bat                  daemon.sh         startup.sh
+catalina.sh                   digest.bat        tomcat-juli.jar
+catalina-tasks.xml            digest.sh         tomcat-native.tar.gz
+commons-daemon.jar            setclasspath.bat  tool-wrapper.bat
+commons-daemon-native.tar.gz  setclasspath.sh   tool-wrapper.sh
+configtest.bat                shutdown.bat      version.bat
+configtest.sh                 shutdown.sh       version.sh
+
+</screen>
+
+<para>
+
+You can start MSS for Tomcat AS7 by going to $TOMCAT_HOME/bin directory and typing the following: 
+</para>
+
+
+
+<screen>
+sudo ./catalina.sh run 
+</screen>
+
+<para>
+The startup process is slightly different from MSS for JBoss AS7. If you see an output like the one below, you know that Tomcat is correctly started. This is a truncated log from the startup process.
+</para>
+
+<screen>
+
+2012-08-21 22:23:41,025 INFO  [SipApplicationDispatcherImpl] (main) SipApplicationDispatcher Started
+2012-08-21 22:23:41,025 INFO  [SipStandardService] (main) SIP Standard Service Started.
+Aug 21, 2012 10:23:41 PM org.apache.catalina.startup.Catalina start
+INFO: Server startup in 3608 ms
+
+
+</screen>
+
+
+
+
+<para>
+If you get an error message about environment variables or Java, make sure you have the CATALINA environment variables set. 
+</para>
+
+<para>
+Setting Environment Variables - JAVA and CATALINA
+</para>
+
+<para> <xref linkend="setting-jboss-ENV-variable-windows-unix"/></para>
+
+<section>
+<title>Testing Click2CallAsync with MSS for Tomcat AS7 </title>
+
+<para>
+If MSS for Tomcat AS7 is started and running, you should be able to use your web browser to access the welcome page at this url http://127.0.0.1:8080/ This will show you a screenshot similar to the one below.
+</para>
+
+
+<para>
+            <figure>
+              <title>JBoss Application Server 7 Welcome Page</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata width="700" fileref="images/welcome-page-Mss-JBoss-AS7.png"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
+
+</para>
+
+<para>
+Deploying your application once the server is running is simple. You need to copy your .War files to the  $TOMCAT_HOME/webapps directory.
+</para>
+
+<para>
+ There is a pre-installed sample SIP application that you can use to test your MSS Tomcat AS7 configuration. The application is also located in the $TOMCAT_HOME/webapps directory
+</para>
+
+<para>
+Start your web browser and go to the link, http://127.0.0.1:8080/Click2CallAsync/
+</para>
+
+<para>
+Note that the application name is case-sensitive and will not work if you try to access it as http://127.0.0.1:8080/click2callasync/
+</para>
+
+<para>
+The sample sip application will show 
+</para>
+
+
+
+<para>
+            <figure>
+              <title>SIP Sample Click2CallAsync Application</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata width="700" fileref="images/click2call-tomcat-AS7-application.png"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
+
+</para>
+
+
+<para>
+
+In order to use the application, you can download a softphone and start multiple instances of the phone. In this guide, the softphone that will be used is Linphone. The configuration is as follows:
+</para>
+
+<note>
+<title> Multiple Instances of Linphone</title>
+<para>
+On some Linux systems, you might need to use a different user account in order to start a second instance of Linphone. Ex. sudo linphone
+</para>
+</note>
+
+<screen>
+(configuring two instances of Linphone)
+
+start Linphone 
+go to the Options menu
+
+On the Network Settings tab, 
+	SIP (UDP) port to 5061. (leave the rest as default)
+On the Manage SIP Accounts tab, 
+	click the add button
+	Your SIP identity: = sip:linphone@127.0.0.1:5080
+	SIP Proxy address: = sip 127.0.0.1:5080
+
+Leave the rest of the settings as default.
+	
+
+Configuring Linphone (on the second shell)
+
+go to the Options menu
+
+On the Network Settings tab, 
+	SIP (UDP) port to 5062. (leave the rest as default)
+On the Manage SIP Accounts tab, 
+	click the add button
+	Your SIP identity: = sip:linphone2@127.0.0.1:5080
+	SIP Proxy address: = sip 127.0.0.1:5080
+
+Leave the rest of the settings as default.
+</screen>
+
+<para>
+Once the softphones are configured and are successfully registered with with the MSS for Tomcat AS7 server, you will see a screenshot like the one below in the web browser at this url http://127.0.0.1:8080/Click2CallAsync/
+</para>
+
+<para>
+            <figure>
+              <title>SIP Click2CallAsync with Registers Clients</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata width="700" fileref="images/click2callasync-tomcat-registered-clients.png"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
+
+</para>
+
+<para>
+You can make calls using the application and the softphones you configured will ring. It is important to start MSS for Tomcat AS7 in a terminal using the (./catalina.sh run) script. It will help with troubleshooting SIP calls. The logs you see on the terminal will let you know when a softphone registers with the Tomcat server and you will also be able to see the status of call setup and shutdown.
+</para>
+
+<para>
+The best way to stop a server is using the CTRL-D on the terminal in which the server was started. If you started the MSS for Tomcat AS7 server using the $TOMCAT_HOME/bin/startup.sh, you can stop the server using $TOMCAT_HOME/bin/shutdown.sh
+</para>
+
+
+
+</section>
+
+</section>
+
+</chapter>
+

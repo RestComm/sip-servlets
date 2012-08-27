@@ -19,10 +19,7 @@
 
 	<profiles>
 		<profile>
-			<id>all</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
+			<id>all</id>			
 			<modules>
 				<module>sources-mobicents</module>
 				<module>sources-telscale</module>
@@ -31,7 +28,10 @@
 			</modules>
 		</profile>
 		<profile>
-			<id>mobicents</id>			
+			<id>mobicents</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>			
 			<modules>
 				<module>sources-mobicents</module>
 				<module>jdocbook-mobicents</module>				
