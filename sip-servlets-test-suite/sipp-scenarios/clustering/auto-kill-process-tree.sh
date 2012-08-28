@@ -1,7 +1,7 @@
 #!/bin/sh
 export pid=$1
 killed="no"
-for child in $(ps -o pid,ppid -ax | \
+for child in $(ps -o pid,ppid ax | \
    awk "{ if ( \$2 == $pid ) { print \$1 }}")
 do
   echo "Killing script $2 child process $child because parent pid = $pid"
