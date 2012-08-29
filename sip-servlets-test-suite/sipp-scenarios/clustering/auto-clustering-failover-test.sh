@@ -16,6 +16,14 @@ if [ "x$2" != "x" ]; then
     export HALFSTARTSLEEP=$2
 fi
 
+if [ "x$4" != "x" ]; then
+    export config1=$4
+fi
+
+if [ "x$5" != "x" ]; then
+    export config2=$5
+fi
+
 export EXIT_CODE=0;
 
 rm -rf result.txt
