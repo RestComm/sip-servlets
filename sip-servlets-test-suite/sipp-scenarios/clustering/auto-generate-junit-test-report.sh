@@ -1,3 +1,4 @@
+echo "generating tests reports"
 export numTests=`cat $1 | wc -l`
 export numPassed=`grep "0" $1 | wc -l`
 export reportfile=$2
