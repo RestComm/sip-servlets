@@ -556,7 +556,7 @@ sleep $HALFSTARTSLEEP
 
 # SIPp should be running by the time JBoss finishes the startup, hence we use half start time here.
 
-sleep 50
+sleep 5
 ./auto-run-test.sh uac result.txt $CALLS
 
 #Kill the app servers
