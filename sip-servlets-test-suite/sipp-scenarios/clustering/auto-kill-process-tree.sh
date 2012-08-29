@@ -14,7 +14,7 @@ do
   export killed="yes"
 done
 
-if [ "yes" = $killed ]; then
+if [ "no" = $killed ]; then
   echo "The app server is not dead? We will sleep. We must raise error here, because this server should have been dead."
   sleep 1
 fi
