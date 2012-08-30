@@ -1524,7 +1524,10 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 					contactSipUri.setHost(sipConnector.getStaticServerAddress());
 					contactSipUri.setPort(sipConnector.getStaticServerPort());
 					contactSipUri.setUser(null);
-				} else {
+				} 
+				// http://code.google.com/p/sipservlets/issues/detail?id=156 
+				// MSS overwrites host part of Contact Header in REGISTER requests
+				else if(JainSipUtils.CONTACT_HEADER_METHODS.contains(requestMethod)) {
 					boolean usePublicAddress = JainSipUtils.findUsePublicAddress(
 							sipNetworkInterfaceManager, request, matchingListeningPoint);
 					contactSipUri.setHost(matchingListeningPoint.getIpAddress(usePublicAddress));

@@ -761,6 +761,31 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	}
 	
 	/**
+	 * non regression test for Issue 156 http://code.google.com/p/sipservlets/issues/detail?id=156
+	 * Contact header in REGISTER overwritten by container
+	 */
+	public void testShootistRegisterSetContact() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("setRandomContact", "true");
+		params.put("method", "REGISTER");
+		deployApplication(params);
+		Thread.sleep(TIMEOUT);	
+		ContactHeader contactHeader = (ContactHeader) receiver.getRegisterReceived().getHeader(ContactHeader.NAME);
+		assertNotNull(contactHeader);	
+		assertEquals(((SipURI)contactHeader.getAddress().getURI()).toString(),"sip:random@172.172.172.172:3289");
+	}
+	
+	/**
 	 * non regression test for Issue 1547 http://code.google.com/p/mobicents/issues/detail?id=1547
 	 * Can't add a Proxy-Authorization using SipServletMessage.addHeader
 	 */

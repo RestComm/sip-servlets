@@ -446,7 +446,13 @@ public class ShootistSipServlet
 					if(method.equalsIgnoreCase("REGISTER")) {
 						sipServletRequest.addHeader("Contact", "sips:LittleGuy@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 					}
-				}			
+				}
+				// http://code.google.com/p/sipservlets/issues/detail?id=156
+				if(ce.getServletContext().getInitParameter("setRandomContact") != null) {
+					if(method.equalsIgnoreCase("REGISTER")) {
+						sipServletRequest.addHeader("Contact", "sip:random@172.172.172.172:3289");
+					}
+				}	
 				sipServletRequest.setRequestURI(requestURI);
 				if(ce.getServletContext().getInitParameter("enum") != null) {
 					sipServletRequest.setRequestURI(toURI);
