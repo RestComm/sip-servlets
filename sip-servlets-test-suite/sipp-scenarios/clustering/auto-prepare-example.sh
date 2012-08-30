@@ -73,7 +73,15 @@ if [ $# -ne 0 ]; then
 	            ;; 
 	    uac)
 	            echo "Distributed example used is uas"
-	    		mvn clean install $3 -f $EXAMPLES_HOME/shootist-sip-servlet-distributable/pom.xml
+	    		mvn clean install $3 -Dsip.method=INVITE -f $EXAMPLES_HOME/shootist-sip-servlet-distributable/pom.xml
+				rm -rf $JBOSS_HOME/server/$config/deploy/shootist-sip-servlet-distributable-*.war
+				cp $EXAMPLES_HOME/shootist-sip-servlet-distributable/target/shootist-sip-servlet-distributable-*.war $JBOSS_HOME/server/$config/deploy
+				cp $EXAMPLES_HOME/shootist-sip-servlet-distributable/distributable-shootist-dar.properties $JBOSS_HOME/server/$config/conf/dars/mobicents-dar.properties
+	            ;;
+	    uac-register)
+	            echo "Distributed example used is uac REGISTER"
+	    		mvn clean install $3 -Dsip.method=REGISTER -f $EXAMPLES_HOME/shootist-sip-servlet-distributable/pom.xml
+				mvn clean install $3 -f $EXAMPLES_HOME/shootist-sip-servlet-distributable/pom.xml
 				rm -rf $JBOSS_HOME/server/$config/deploy/shootist-sip-servlet-distributable-*.war
 				cp $EXAMPLES_HOME/shootist-sip-servlet-distributable/target/shootist-sip-servlet-distributable-*.war $JBOSS_HOME/server/$config/deploy
 				cp $EXAMPLES_HOME/shootist-sip-servlet-distributable/distributable-shootist-dar.properties $JBOSS_HOME/server/$config/conf/dars/mobicents-dar.properties
