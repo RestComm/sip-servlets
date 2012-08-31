@@ -118,6 +118,7 @@
         <screen>&CMD_PLATFORM_NAME;-jboss-&lt;version&gt;]$ rm &quot;&SSS_MSS4J_ZIP;&quot;</screen>
       </step>
     </procedure>
+
     <procedure>
       <title>Installing the &SHORT_PLATFORM_NAME; for JBoss Binary Distribution on <productname>Windows</productname></title>
       <para>For this procedure, it is assumed that the downloaded archive is saved in the <filename>My Downloads</filename> folder.</para>

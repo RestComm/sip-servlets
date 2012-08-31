@@ -20,12 +20,23 @@
 		  </listitem>
   </itemizedlist>
   </para>
-  <section>
-  		<title>&PLATFORM_NAME; SIP Servlets SNMP Monitoring and Management</title>
-  		<para>This chapter provides information on how to enable the management of
-	    &PLATFORM_NAME; SIP Servlets Servers through SNMP. It also allows applications to expose their metrics and management through SNMP</para>
-	    <para>See <ulink url="https://docs.jboss.org/author/display/MOBICENTS/SNMP+Adaptor">the full guide presents SNMP Monitoring for JBoss Application Server</ulink></para>
-  </section>
+
+<note>
+<title>SNMP and Monitoring for &SHORT_PLATFORM_NAME; for JBoss AS7 </title>
+<para>
+This feature is not yet implemented in &SHORT_PLATFORM_NAME; for JBoss AS7. This guide will be updated when SNMP and other monitoring features become available. In the meantime, see chapter below for information about the CLI.
+</para>
+
+<para>
+<xref linkend="getting-started-with-MSS-Tomcat-AS7"/>
+
+
+</para>
+</note>
+
+		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-Telscale-snmp-adaptor.xml"/>
+ 
+
   <section>
     <title>&PLATFORM_NAME; SIP Servlets Jopr Monitoring and Management</title>
     <para>This chapter provides information on how to enable the management of

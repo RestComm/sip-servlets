@@ -6,6 +6,25 @@
 <!-- chapter id nickname: sfss -->
 <section id="sfss-Services_for_SIP_Servlets">
 <title>Operating the Example Applications</title>
+
+<note>
+<title> Important Information  </title>
+<para>
+Before trying out the examples in this section, you must have installed, configured and have &SHORT_PLATFORM_NAME; for JBoss or &SHORT_PLATFORM_NAME; for Tomcat AS7 running on your system.
+</para>
+
+<para>
+See the chapters below for detailed instructions.
+</para>
+<para>
+ <xref linkend="getting-started-with-MSS-JBOSS-AS7"/> 
+</para>
+<para>
+<xref linkend="getting-started-with-MSS-Tomcat-AS7"/> 
+</para>
+</note>
+
+
 <section id="sfss-The_Location_Service">
 <title>The Location Service</title>
 <para>The &PLATFORM_NAME; Location Service contains a list of mappings of
@@ -61,13 +80,19 @@ URIs:</para>
 </listitem>
 </itemizedlist>
 <!-- The Location Service --> <section id="sfss-binary-Location_Service--Installing_Configuring_and_Running">
+
+
+<!--
 <title>The Location Service: Installing, Configuring and Running</title>
 <para>&#160;</para>
+
 <formalpara id="sfss-binary-Location_Service-Pre-Install_Requirements_and_Prerequisites">
 <title>Pre-Install Requirements and Prerequisites</title>
 <para>The following requirements must be met before installation can begin.</para>
 </formalpara>
-<!-- <variablelist
+-->
+<!-- 
+<variablelist
 id="sfss-binary-Location_Service-Hardware_Requirements">
 <title>Hardware Requirements</title>
 <varlistentry>
@@ -76,7 +101,10 @@ id="sfss-binary-Location_Service-Hardware_Requirements">
 <para>&nbsp;</para>
 </listitem>
 </varlistentry>
-</variablelist> --> <variablelist id="sfss-binary-Location_Service-Software_Prerequisites">
+</variablelist> 
+
+
+<variablelist id="sfss-binary-Location_Service-Software_Prerequisites">
 <title>Software Prerequisites</title>
 <varlistentry>
 <term>Either an &SHORT_PLATFORM_NAME; for JBoss or an &SHORT_PLATFORM_NAME; for Tomcat Installation</term>
@@ -90,6 +118,9 @@ Tomcat here: <xref linkend="bssswticar-SIP_Servlets_Server_with_Tomcat-Installin
 </listitem>
 </varlistentry>
 </variablelist>
+
+--> 
+
 <formalpara id="sfss-binary-Location_Service-Downloading">
 <title>Downloading</title>
 <para>The Location Service is comprised of two archive files, a Web
@@ -101,6 +132,8 @@ more information about DAR files, refer to the <ulink url="http://jcp.org/en/jsr
 <para>Download the Location Service&apos;s WAR file from here: <ulink url="https://oss.sonatype.org/content/groups/public/org/mobicents/servlet/sip/examples/location-service/&VERSION;/location-service-&VERSION;.war"/>.</para>
 <para>Download the Location Service&apos;s DAR file from here: <ulink url="https://sipservlets.googlecode.com/git/sip-servlets-examples/location-service/locationservice-dar.properties"/>.</para>
 <formalpara id="sfss-binary-Location_Service-Installing">
+
+
 <title>Installing</title>
 <para>Both the <filename>location-service-&VERSION;.war</filename> WAR file
 and the <filename>locationservice-dar.properties</filename> DAR file
@@ -111,18 +144,20 @@ JBoss or with &SHORT_PLATFORM_NAME; for Tomcat:</para>
 </formalpara>
 <variablelist>
 <varlistentry>
-<term>&SHORT_PLATFORM_NAME; for JBoss</term>
+
+<term>&SHORT_PLATFORM_NAME; for JBoss AS7</term>
 <listitem>
 <para>Place <filename>location-service-&VERSION;.war</filename> into the
-<filename><envar>JBOSS_HOME</envar>/server/default/deploy/</filename>
+<filename><envar>JBOSS_HOME</envar>/standalone/deployments/</filename>
 directory, and <filename>locationservice-dar.properties</filename>
 into the
-<filename><envar>JBOSS_HOME</envar>/server/default/conf/dars/</filename>
+<filename><envar>JBOSS_HOME</envar>/standalone/configuration/dars/
+</filename>
 directory.</para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>&SHORT_PLATFORM_NAME; for Tomcat</term>
+<term>&SHORT_PLATFORM_NAME; for Tomcat AS7</term>
 <listitem>
 <para>Place <filename>location-service-&VERSION;.war</filename> into the
 <filename><envar>CATALINA_HOME</envar>/webapps/</filename>
@@ -134,34 +169,64 @@ directory.</para>
 </varlistentry>
 </variablelist>
 <formalpara id="sfss-binary-Location_Service-Configuring">
-<title>Configuring</title>
+<title>Configuration</title>
+
+<!--
 <para>The <literal>darConfigurationFileLocation</literal> attribute of
 the <literal>Service</literal> element must be set to the value
 <userinput>conf/dars/locationservice-dar.properties</userinput>. The
 instructions are given below by SIP Servlets Server type:</para>
+-->
 </formalpara>
+
 <variablelist>
 <varlistentry>
+
 <term>&SHORT_PLATFORM_NAME; for JBoss</term>
 <listitem>
+
+<!--
 <para>Open the
-<filename><envar>JBOSS_HOME</envar>/server/default/deploy/jboss-web.deployer/server.xml</filename>
+<filename><envar>JBOSS_HOME</envar>/standalone/deployments/jboss-web.deployer/server.xml</filename>
 configuration file and find the <literal>Service</literal>
 element. Add an attribute to it called
 <userinput>darConfigurationFileLocation</userinput>, and set it to
 <replaceable>conf/dars/locationservice-dar.properties</replaceable>:</para>
+ 
+-->
 <example id="sfss-Editing_SS_for_JBoss_server.xml_for_the_Location_Service">
-<title>Editing &SHORT_PLATFORM_NAME; for JBoss&apos;s server.xml for the Location Service</title>
+<title>Editing &SHORT_PLATFORM_NAME; for JBoss&apos;s standalone-sip.xml for the Location Service</title>
+
+<!--
 <programlisting role="XML">&lt;Service
 name=&quot;jboss.web&quot;
 className=&quot;org.mobicents.servlet.sip.startup.SipStandardService&quot;
 sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
 darConfigurationFileLocation=&quot;conf/dars/locationservice-dar.properties&quot;
 sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;&gt;</programlisting>
+
+-->
+
 </example>
+
+<screen>
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml file search for the line 
+
+ &lt;subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
+application-router="dars/mobicents-dar.properties" 
+
+and replace it with the line below
+
+ &lt;subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0"
+ application-router="dars/locationservice-dar.properties" 
+</screen>
+<!--
 <para>Make sure that the configuration file only contains one
 <literal>darConfigurationFileLocation</literal> attribute: your
 new one.</para>
+
+-->
+
 </listitem>
 </varlistentry>
 <varlistentry>
@@ -192,14 +257,17 @@ new one.</para>
 <title>Running</title>
 <para>Once the WAR and DAR files have been placed in the right
 directories, and the JBoss Application Server or Tomcat Servlet
-Container knows where to find them (which you specified in a
+Container knows where to find them (which you specified in the <filename>standalone-sip.xml</filename> and
 <filename>server.xml</filename> file), then you should go ahead and
 run the SIP Servlets Server.</para>
 </formalpara>
+<!--
 <para>To learn how to run the SIP Servlets-enabled JBoss Application
 Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Running"/>.</para>
 <para>To learn how to run the SIP Servlets-enabled Tomcat Container,
 refer to <xref linkend="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Running"/>.</para>
+-->
+
 <formalpara id="sfss-binary-Location_Service-Testing">
 <title>Testing</title>
 <para>The following procedure shows how to test the Location
@@ -226,7 +294,9 @@ the receiver or callee—should now be ringing.</para>
 id="sfss-binary-Location_Service-Using">
 <title>Using</title>
 <para>&nbsp;</para>
-</formalpara>--> <formalpara id="sfss-binary-Location_Service-Stopping">
+</formalpara>
+
+ <formalpara id="sfss-binary-Location_Service-Stopping">
 <title>Stopping</title>
 <para>To learn how to stop the SIP Servlets-enabled JBoss Application
 Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.</para>
@@ -244,6 +314,8 @@ again, you may want to unset or reset the
 </formalpara>
 <para>You may also wish to delete the WAR and DAR files for the Location
 Service, which you installed in <xref linkend="sfss-binary-Location_Service-Installing"/>.</para>
+
+-->
 </section>
 </section>
 <section id="sfss-The_Diameter_Event-Changing_Service">
@@ -297,8 +369,8 @@ Charging Server in order to debit the already-credited €10.00</para>
 <para>Preparing your &SHORT_PLATFORM_NAME; for JBoss server to run the Diameter
 Event-Changing example requires downloading a WAR archive, a DAR
 archive, the Ericsson Charging Emulator, setting an attribute in JBoss&apos;s
-<filename>server.xml</filename> configuration file, and then running
-JBoss AS. Detailed instructions follow.</para>
+<filename>standalone-sip.xml</filename> configuration file, and then running
+JBoss AS. Detailed instructions in the section below.</para>
 <formalpara id="sfss-binary-Diameter_Event-Changing_Service-Pre-Install_Requirements_and_Prerequisites">
 <title>Pre-Install Requirements and Prerequisites</title>
 <para>The following requirements must be met before installation can begin.</para>
@@ -344,6 +416,8 @@ current version of which is named
 Emulator, version 1.0, from <ulink url="http://mobicents.googlecode.com/files/ChargingSDK-1_0_D31E.zip"/>.</para>
 </step>
 </procedure>
+
+
 <formalpara id="sfss-binary-Diameter_Event-Changing_Service-Installing">
 <title>Installing</title>
 <para>The following procedure describes how to install the downloaded files.</para>
@@ -352,14 +426,14 @@ Emulator, version 1.0, from <ulink url="http://mobicents.googlecode.com/files/Ch
 <step>
 <para>Place the <filename>diameter-event-charging-&VERSION;.war</filename>
 WAR archive into the
-<filename>$JBOSS_HOME/server/&lt;profile&gt;/deploy</filename>
+<filename>$JBOSS_HOME/standalone/deployments/</filename>
 directory.</para>
 </step>
 <step>
 <para>Place the
 <filename>diametereventcharging-dar.properties</filename> DAR file
 in your
-<filename><envar>$JBOSS_HOME</envar>/server/&lt;profile&gt;/conf/dars</filename>
+$JBOSS_HOME/standalone/configuration/dars/ 
 directory.</para>
 </step>
 <step>
@@ -376,7 +450,10 @@ command to do the dirty work:</para>
 </step>
 </procedure>
 <formalpara id="sfss-binary-Diameter_Event-Changing_Service-Configuring">
-<title>Configuring</title>
+<title>Configuration</title>
+
+
+<!--
 <para>To configure the server for the Event-Changing example, simply
 open the <filename>server.xml</filename> configuration file in your
 server&apos;s
@@ -385,11 +462,44 @@ directory, and edit the value of the
 <literal>darConfigurationFileLocation</literal> attribute of the
 <literal>Service</literal> element so that it is
 <literal>conf/dars/mobicents-dar.properties</literal>.</para>
+-->
 </formalpara>
-<example id="sfss-Editing_the_darConfigurationFileLocation_Attribute_of_the_Service_Tag">
-<title>Editing the darConfigurationFileLocation Attribute of the Service Tag</title>
-<programlisting linenumbering="unnumbered" role="XML">...
 
+
+<variablelist>
+<varlistentry>
+
+<term>&SHORT_PLATFORM_NAME; for JBoss</term>
+<listitem>
+
+
+<example id="sfss-Editing_the_darConfigurationFileLocation_Attribute_of_the_Service_Tag">
+<title>Editing the standalone-sip.xml for the Diameter Event-Changer Service</title>
+
+</example>
+
+<screen>
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml
+make sure the application router is pointing the mobicents-dar.properties file as follows. 
+
+ &lt;subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
+application-router="dars/mobicents-dar.properties" 
+
+ 
+</screen>
+
+
+</listitem>
+</varlistentry>
+</variablelist>
+
+
+
+
+
+
+
+<!--
 &lt;Service name=&quot;jboss.web&quot;
 className=&quot;org.mobicents.servlet.sip.startup.SipStandardService&quot;
 sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
@@ -398,18 +508,24 @@ darConfigurationFileLocation=&quot;conf/dars/mobicents-dar.properties&quot;
 sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;&gt;
 
 ...
-</programlisting>
-</example>
+-->
+
+
+
 <!--<para>Your server is now set up to run the Event-Changing example.</para>--> <formalpara id="sfss-binary-Diameter_Event-Changing_Service-Running">
 <title>Running</title>
 <para>The following procedure describes how to run the Diameter Event-Changing Service.</para>
 </formalpara>
 <procedure id="sfss-Diameter_Event-Changing_Service">
 <title>Diameter Event-Changing Service</title>
+<!--
 <step>
 <para>First, you should run your &SHORT_PLATFORM_NAME; for JBoss server. For
 instructions on doing so, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Running"/>.</para>
 </step>
+
+-->
+
 <step>
 <para>Then, run the Ericsson Charging Emulator. Open a terminal,
 change the working directory to the location of the unzipped
@@ -527,6 +643,8 @@ id="sfss-binary-Diameter_Event-Changing_Service-Uninstalling">
 <para>&nbsp;</para>
 </formalpara>--> </section>
 </section>
+
+
 <section id="sfss-The_Call-Blocking_Service">
 <title>The Call-Blocking Service</title>
 <para>The &PLATFORM_NAME; Call-Blocking Service, upon receiving an
@@ -551,11 +669,12 @@ evolving towards the eventual use of a database.</para>
 <!-- The Call-Blocking Service --> <section id="sfss-binary-Call-Blocking_Service--Installing_Configuring_and_Running">
 <title>The Call-Blocking Service: Installing, Configuring and Running</title>
 <para>&#160;</para>
+<!--
 <formalpara id="sfss-binary-Call-Blocking_Service-Pre-Install_Requirements_and_Prerequisites">
 <title>Pre-Install Requirements and Prerequisites</title>
 <para>The following requirements must be met before installation can begin.</para>
 </formalpara>
-<!-- <variablelist
+<variablelist
 id="sfss-binary-Call-Blocking_Service-Hardware_Requirements">
 <title>Hardware Requirements</title>
 <varlistentry>
@@ -578,6 +697,8 @@ Tomcat here: <xref linkend="bssswticar-SIP_Servlets_Server_with_Tomcat-Installin
 </listitem>
 </varlistentry>
 </variablelist>
+
+-->
 <formalpara id="sfss-binary-Call-Blocking_Service-Downloading">
 <title>Downloading</title>
 
@@ -588,8 +709,11 @@ file, which you need to add to your installed SIP Servlets Server. For
 more information about WAR files, refer to the <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Server_Configuration_Guide/beta422/html/index.html">JBoss Application Server Administration and Development Guide</ulink>. For
 more information about DAR files, refer to the <ulink url="http://jcp.org/en/jsr/detail?id=289">JSR 289 spec, Appendix C</ulink>.</para>
 </formalpara>
+
 <para>Download the Call-Blocking Service&apos;s WAR file from here: <ulink url="https://oss.sonatype.org/content/groups/public/org/mobicents/servlet/sip/examples/call-blocking/&VERSION;/call-blocking-&VERSION;.war"/>.</para>
 <para>Download the Call-Blocking Service&apos;s DAR file from here: <ulink url="https://sipservlets.googlecode.com/git/sip-servlets-examples/call-blocking/call-blocking-servlet-dar.properties"/>.</para>
+
+
 <formalpara id="sfss-binary-Call-Blocking_Service-Installing">
 <title>Installing</title>
 <para>Both the <filename>call-blocking-&VERSION;.war</filename> WAR file and
@@ -604,10 +728,10 @@ or with &SHORT_PLATFORM_NAME; for Tomcat:</para>
 <term>&SHORT_PLATFORM_NAME; for JBoss</term>
 <listitem>
 <para>Place <filename>call-blocking-&VERSION;.war</filename> into the
-<filename><envar>JBOSS_HOME</envar>/server/default/deploy/</filename>
+<filename><envar>JBOSS_HOME</envar>/standalone/deployments/</filename>
 directory, and
 <filename>call-blocking-servlet-dar.properties</filename> into the
-<filename><envar>JBOSS_HOME</envar>/server/default/conf/dars/</filename>
+<filename><envar>JBOSS_HOME</envar>/standalone/configuration/dars/</filename>
 directory.</para>
 </listitem>
 </varlistentry>
@@ -624,20 +748,57 @@ directory.</para>
 </listitem>
 </varlistentry>
 </variablelist>
+
+
 <formalpara id="sfss-binary-Call-Blocking_Service-Configuring">
 <title>Configuring</title>
+</formalpara>
+
+<variablelist>
+<varlistentry>
+<term>&SHORT_PLATFORM_NAME; for JBoss</term>
+<listitem>
+
+
+<example id="sfss-Editing_the_callBlockingService_Attribute_of_the_Service_Tag">
+<title>Editing the standalone-sip.xml file for Call Blocking</title>
+
+</example>
+
+<screen>
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml search for the line below
+ 
+ &lt;subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
+ application-router="dars/mobicents-dar.properties"  
+
+change it to the following
+
+ &lt;subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
+ application-router="dars/call-blocking-servlet-dar.properties" 
+
+ </screen>
+</listitem>
+</varlistentry>
+</variablelist>
+
+
+<!--
 <para>The <literal>darConfigurationFileLocation</literal> attribute of
 the <literal>Service</literal> element must be set to the value
 <userinput>conf/dars/call-blocking-servlet-dar.properties</userinput>.
 The instructions for doing so are given below by SIP Servlets Server
 type:</para>
-</formalpara>
+-->
+
+
+
 <variablelist>
+<!--
 <varlistentry>
 <term>&SHORT_PLATFORM_NAME; for JBoss</term>
 <listitem>
 <para>Open the
-<filename><envar>JBOSS_HOME</envar>/server/default/deploy/jboss-web.deployer/server.xml</filename>
+<filename><envar>JBOSS_HOME</envar>/standalone/deployments/jboss-web.deployer/server.xml</filename>
 configuration file and find the <literal>Service</literal>
 element. Add an attribute to it called
 <userinput>darConfigurationFileLocation</userinput>, and set it to
@@ -651,11 +812,16 @@ sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplic
 darConfigurationFileLocation=&quot;conf/dars/call-blocking-servlet-dar.properties&quot;
 sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;&gt;</programlisting>
 </example>
+
+
 <para>Make sure that the configuration file only contains one
 <literal>darConfigurationFileLocation</literal> attribute: your
 new one.</para>
 </listitem>
 </varlistentry>
+-->
+
+
 <varlistentry>
 <term>&SHORT_PLATFORM_NAME; for Tomcat</term>
 <listitem>
@@ -680,18 +846,24 @@ new one.</para>
 </listitem>
 </varlistentry>
 </variablelist>
+
+
+
 <formalpara id="sfss-binary-Call-Blocking_Service-Running">
 <title>Running</title>
 <para>Once the WAR and DAR files have been placed in the right
 directories, and the JBoss Application Server or Tomcat Servlet
 Container knows where to find them (which you specified in a
-<filename>server.xml</filename> file), then you should go ahead and
+<filename>server.xml</filename> and the <filename>standalone-sip.xml</filename>  files), then you should go ahead and
 run the SIP Servlets Server.</para>
 </formalpara>
+<!--
 <para>To learn how to run the SIP Servlets-enabled JBoss Application
 Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Running"/>.</para>
 <para>To learn how to run the SIP Servlets-enabled Tomcat Container,
 refer to <xref linkend="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Running"/>.</para>
+-->
+
 <formalpara id="sfss-binary-Call-Blocking_Service-Testing">
 <title>Testing</title>
 <para>The following procedure shows how to test the Call-Blocking
@@ -715,7 +887,9 @@ softphone does not need to be registered.</para>
 id="sfss-binary-Call-Blocking_Service-Using">
 <title>Using</title>
 <para>&nbsp;</para>
-</formalpara>--> <formalpara id="sfss-binary-Call-Blocking_Service-Stopping">
+</formalpara>
+
+<formalpara id="sfss-binary-Call-Blocking_Service-Stopping">
 <title>Stopping</title>
 <para>To learn how to stop the SIP Servlets-enabled JBoss Application
 Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.</para>
@@ -733,6 +907,9 @@ it again, you may want to unset or reset the
 </formalpara>
 <para>You may also wish to delete the WAR and DAR files for the
 Call-Blocking Service, which you installed in <xref linkend="sfss-binary-Call-Blocking_Service-Installing"/>.</para>
+
+-->
+
 </section>
 </section>
 <section id="sfss-The_Call-Forwarding_Service">
@@ -779,7 +956,9 @@ id="sfss-binary-Call-Forwarding_Service-Hardware_Requirements">
 <para>&nbsp;</para>
 </listitem>
 </varlistentry>
-</variablelist> --> <variablelist id="sfss-binary-Call-Forwarding_Service-Software_Prerequisites">
+</variablelist> 
+
+<variablelist id="sfss-binary-Call-Forwarding_Service-Software_Prerequisites">
 <title>Software Prerequisites</title>
 <varlistentry>
 <term>Either an &SHORT_PLATFORM_NAME; for JBoss or an &SHORT_PLATFORM_NAME; for Tomcat Installation</term>
@@ -793,6 +972,8 @@ Tomcat here: <xref linkend="bssswticar-SIP_Servlets_Server_with_Tomcat-Installin
 </listitem>
 </varlistentry>
 </variablelist>
+-->
+
 <formalpara id="sfss-binary-Call-Forwarding_Service-Downloading">
 <title>Downloading</title>
 <para>The Call-Forwarding Service is comprised of two archive files, a
@@ -816,11 +997,11 @@ with &SHORT_PLATFORM_NAME; for JBoss or with &SHORT_PLATFORM_NAME; for Tomcat:</
 <term>&SHORT_PLATFORM_NAME; for JBoss</term>
 <listitem>
 <para>Place <filename>call-forwarding-&VERSION;.war</filename> into the
-<filename><envar>JBOSS_HOME</envar>/server/default/deploy/</filename>
+<filename><envar>JBOSS_HOME</envar>/standalone/deployments/</filename>
 directory, and
 <filename>call-forwarding-servlet-dar.properties</filename> into
 the
-<filename><envar>JBOSS_HOME</envar>/server/default/conf/dars/</filename>
+<filename><envar>JBOSS_HOME</envar>/standalone/configuration/dars/</filename>
 directory.</para>
 </listitem>
 </varlistentry>
@@ -837,38 +1018,77 @@ directory.</para>
 </varlistentry>
 </variablelist>
 <formalpara id="sfss-binary-Call-Forwarding_Service-Configuring">
+
 <title>Configuring</title>
+<!--
 <para>The <literal>darConfigurationFileLocation</literal> attribute of
 the <literal>Service</literal> element must be set to the value
 <userinput>conf/dars/call-forwarding-b2bua-servlet-dar.properties</userinput>.
 The instructions for doing so are given below by SIP Servlets Server
 type:</para>
+-->
 </formalpara>
+
 <variablelist>
 <varlistentry>
+
 <term>&SHORT_PLATFORM_NAME; for JBoss</term>
 <listitem>
+
+
+<!--
 <para>Open the
-<filename><envar>JBOSS_HOME</envar>/server/default/deploy/jboss-web.deployer/server.xml</filename>
+<filename><envar>JBOSS_HOME</envar>/standalone/deployments/jboss-web.deployer/server.xml</filename>
 configuration file and find the <literal>Service</literal>
 element. Add an attribute to it called
 <userinput>darConfigurationFileLocation</userinput>, and set it to
 <replaceable>conf/dars/call-forwarding-b2bua-servlet-dar.properties</replaceable>:</para>
+
+-->
+
 <example id="sfss-Editing_SS_for_JBoss_server.xml_for_the_Call-Forwarding_Service">
-<title>Editing &SHORT_PLATFORM_NAME; for JBoss&apos;s server.xml for the Call-Forwarding Service</title>
+<title>Editing &SHORT_PLATFORM_NAME; for JBoss&apos;s standalone-sip.xml for the Call-Forwarding Service</title>
+</example>
+<screen>
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml search for the line below
+ 
+ &lt;subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
+ application-router="dars/mobicents-dar.properties"  
+
+change it to the following
+
+ &lt;subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
+ application-router="dars/call-forwarding-b2bua-servlet-dar.properties" 
+
+ 
+</screen>
+
+
+<!--
 <programlisting role="XML">&lt;Service
 name=&quot;jboss.web&quot;
 className=&quot;org.mobicents.servlet.sip.startup.SipStandardService&quot;
 sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
 darConfigurationFileLocation=&quot;conf/dars/call-forwarding-b2bua-servlet-dar.properties&quot;
 sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;&gt;</programlisting>
-</example>
+
+-->
+
+
+<!--
 <para>Make sure that the configuration file only contains one
 <literal>darConfigurationFileLocation</literal> attribute: your
 new one.</para>
+-->
 </listitem>
+
 </varlistentry>
+
+
+
+
 <varlistentry>
+
 <term>&SHORT_PLATFORM_NAME; for Tomcat</term>
 <listitem>
 <para>Open the
@@ -893,17 +1113,21 @@ new one.</para>
 </varlistentry>
 </variablelist>
 <formalpara id="sfss-binary-Call-Forwarding_Service-Running">
+
 <title>Running</title>
 <para>Once the WAR and DAR files have been placed in the right
 directories, and the JBoss Application Server or Tomcat Servlet
 Container knows where to find them (which you specified in a
-<filename>server.xml</filename> file), then you should go ahead and
+<filename>standalone-sip.xml</filename> and <filename>server.xml</filename>  files), then you should go ahead and
 run the SIP Servlets Server.</para>
 </formalpara>
+<!--
 <para>To learn how to run the SIP Servlets-enabled JBoss Application
 Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Running"/>.</para>
 <para>To learn how to run the SIP Servlets-enabled Tomcat Container,
 refer to <ulink url="bbssswticar-binary-SIP_Servlets_Server_with_Tomcat-Running"/>.</para>
+-->
+
 <formalpara id="sfss-binary-Call-Forwarding_Service-Testing">
 <title>Testing</title>
 <para>The following procedure shows how to test the Call-Forwarding
@@ -938,7 +1162,8 @@ settings of the first SIP softphone to:</para>
 id="sfss-binary-Call-Forwarding_Service-Using">
 <title>Using</title>
 <para>&nbsp;</para>
-</formalpara>--> <formalpara id="sfss-binary-Call-Forwarding_Service-Stopping">
+</formalpara>
+<formalpara id="sfss-binary-Call-Forwarding_Service-Stopping">
 <title>Stopping</title>
 <para>To learn how to stop the SIP Servlets-enabled JBoss Application
 Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.</para>
@@ -956,6 +1181,8 @@ using it again, you may want to unset or reset the
 </formalpara>
 <para>You may also wish to delete the WAR and DAR files for the
 Call-Forwarding Service, which you installed in <xref linkend="sfss-binary-Call-Forwarding_Service-Installing"/>.</para>
+-->
+
 </section>
 </section>
 <section id="sfss-The_Call-Controller_Service">
@@ -1004,7 +1231,9 @@ id="sfss-binary-Call-Controller_Service-Hardware_Requirements">
 <para>&nbsp;</para>
 </listitem>
 </varlistentry>
-</variablelist> --> <variablelist id="sfss-binary-Call-Controller_Service-Software_Prerequisites">
+</variablelist>  
+
+<variablelist id="sfss-binary-Call-Controller_Service-Software_Prerequisites">
 <title>Software Prerequisites</title>
 <varlistentry>
 <term>Either an &SHORT_PLATFORM_NAME; for JBoss or an &SHORT_PLATFORM_NAME; for Tomcat Installation</term>
@@ -1018,6 +1247,8 @@ Tomcat here: <xref linkend="bssswticar-SIP_Servlets_Server_with_Tomcat-Installin
 </listitem>
 </varlistentry>
 </variablelist>
+-->
+
 <formalpara id="sfss-binary-Call-Controller_Service-Downloading">
 <title>Downloading</title>
 <para>The Call-Controller Service is comprised of two WAR files, one
@@ -1046,11 +1277,11 @@ for JBoss or with &SHORT_PLATFORM_NAME; for Tomcat:</para>
 <listitem>
 <para>Place <filename>call-blocking-&VERSION;.war</filename> and
 <filename>call-forwarding-&VERSION;.war</filename> into the
-<filename><envar>JBOSS_HOME</envar>/server/default/deploy/</filename>
+<filename><envar>JBOSS_HOME</envar>/standalone/deployments/</filename>
 directory, and
 <filename>call-controller-servlet-dar.properties</filename> into
 the
-<filename><envar>JBOSS_HOME</envar>/server/default/conf/dars/</filename>
+<filename><envar>JBOSS_HOME</envar>/standalone/configuration/dars/</filename>
 directory.</para>
 </listitem>
 </varlistentry>
@@ -1068,32 +1299,63 @@ directory.</para>
 </varlistentry>
 </variablelist>
 <formalpara id="sfss-binary-Call-Controller_Service-Configuring">
+
 <title>Configuring</title>
+<!--
 <para>The <literal>darConfigurationFileLocation</literal> attribute of
 the <literal>Service</literal> element must be set to the value
 <userinput>conf/dars/call-controller-servlet-dar.properties</userinput>.
 Instructions for doing so are given below by SIP Servlets Server
 type:</para>
+-->
+
 </formalpara>
 <variablelist>
 <varlistentry>
+-->
 <term>&SHORT_PLATFORM_NAME; for JBoss</term>
 <listitem>
+<!--
 <para>Open the
-<filename><envar>JBOSS_HOME</envar>/server/default/deploy/jboss-web.deployer/server.xml</filename>
+<filename><envar>JBOSS_HOME</envar>/standalone/deployments/jboss-web.deployer/server.xml</filename>
 configuration file and find the <literal>Service</literal>
 element. Add an attribute to it called
 <userinput>darConfigurationFileLocation</userinput>, and set it to
 <replaceable>conf/dars/call-controller-servlet-dar.properties </replaceable>:</para>
+
+
 <example id="sfss-Editing_SS_for_JBoss_server.xml_for_the_Call-Controller_Service">
-<title>Editing &SHORT_PLATFORM_NAME; for JBoss&apos;s server.xml for the Call-Controller Service</title>
+-->
+
+<example>
+<title>Editing &SHORT_PLATFORM_NAME; for JBoss&apos;s standalone-sip.xml for the Call-Controller Service</title>
+
+<screen>
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml search for the line below
+ 
+ &lt;subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
+ application-router="dars/mobicents-dar.properties"  
+
+change it to the following
+
+ &lt;subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
+ application-router="dars/call-controller-servlet-dar.properties" 
+
+ 
+</screen>
+
+<!--
 <programlisting role="XML">&lt;Service
 name=&quot;jboss.web&quot;
 className=&quot;org.mobicents.servlet.sip.startup.SipStandardService&quot;
 sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
 darConfigurationFileLocation=&quot;conf/dars/call-controller-servlet-dar.properties &quot;
 sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;&gt;</programlisting>
+-->
+
 </example>
+
+
 <para>Make sure that the configuration file only contains one
 <literal>darConfigurationFileLocation</literal> attribute: your
 new one.</para>
@@ -1108,14 +1370,18 @@ configuration file and find the <literal>Service</literal>
 element. Add an attribute to it called
 <userinput>darConfigurationFileLocation</userinput>, and set it to
 <userinput>conf/dars/call-controller-servlet-dar.properties </userinput>:</para>
+
 <example id="sfss-Editing_MSS_for_Tomcats_server.xml_for_the_Call-Controller_Service">
 <title>Editing &SHORT_PLATFORM_NAME; for Tomcat&apos;s server.xml for the Call-Controller Service</title>
+
 <programlisting role="XML">&lt;Service
 name=&quot;Sip-Servlets&quot;
 className=&quot;org.mobicents.servlet.sip.startup.SipStandardService&quot;
 sipApplicationDispatcherClassName=&quot;org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl&quot;
 darConfigurationFileLocation=&quot;conf/dars/call-controller-servlet-dar.properties &quot;
 sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;&gt;</programlisting>
+
+
 </example>
 <para>Make sure that the configuration file only contains one
 <literal>darConfigurationFileLocation</literal> attribute: your
@@ -1131,10 +1397,12 @@ Container knows where to find them (which you specified in a
 <filename>server.xml</filename> file), then you should go ahead and
 run the SIP Servlets Server.</para>
 </formalpara>
+<!--
 <para>To learn how to run the SIP Servlets-enabled JBoss Application
 Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Running"/>.</para>
 <para>To learn how to run the SIP Servlets-enabled Tomcat Container,
 refer to <xref linkend="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Running"/>.</para>
+-->
 <formalpara id="sfss-binary-Call-Controller_Service-Testing">
 <title>Testing</title>
 <para>Two use-cases can be distinguished for the Call-Controller
@@ -1211,7 +1479,9 @@ ringing.</para>
 id="sfss-binary-Call-Controller_Service-Using">
 <title>Using</title>
 <para>&nbsp;</para>
-</formalpara>--> <formalpara id="sfss-binary-Call-Controller_Service-Stopping">
+</formalpara>
+
+ <formalpara id="sfss-binary-Call-Controller_Service-Stopping">
 <title>Stopping</title>
 <para>To learn how to stop the SIP Servlets-enabled JBoss Application
 Server, refer to <xref linkend="bssswjicar-binary-SIP_Servlets_Server_with_JBoss-Stopping"/>.</para>
@@ -1229,6 +1499,7 @@ using it again, you may want to unset or reset the
 </formalpara>
 <para>You may also wish to delete the WAR and DAR files for the
 Call-Controller Service, which you installed in <xref linkend="sfss-binary-Call-Controller_Service-Installing"/>.</para>
+-->
 <note>
 <para><xref linkend="ssea-SIP_Servlet_Example_Applications"/>
 provides more information about other service examples

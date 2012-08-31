@@ -7,8 +7,21 @@
   <title>Configuring</title>
   <para>&nbsp;</para>
   <section id="bsssc-binary-SIP_Servlets_Server-Adding_SIP_Connectors">
+<<<<<<< HEAD
     <title>Configuring SIP Connectors</title>
     <para>SIP Connectors are added by adding a <emphasis>&lt;Connector&gt;</emphasis> element under the <emphasis>&lt;Service&gt;</emphasis> element in the container's <filename>server.xml</filename> configuration file.</para>
+=======
+
+   <title>Configuring SIP Connectors and Bindings</title>
+
+<para>
+
+There are two important configuration files that you might need to modifying depending on your system needs. The standalone-sip.xml file for &SHORT_PLATFORM_NAME; for JBoss AS7 and the server.xml file for &SHORT_PLATFORM_NAME; for Tomcat. The extracts below will give you a snapshot of default configurations.
+</para>
+
+<!--
+    <para>SIP Connectors are added by adding a <emphasis>&lt;Connector&gt;</emphasis> element under the <emphasis>&lt;Service&gt;</emphasis> element in the container's <filename>standalone-sip.xml</filename> configuration file.</para>
+>>>>>>> a0a62a4... modified all chapters with MSS for AS7 update
     <para>Three SIP Connectors are configured for SIP Servlets:</para>
     <itemizedlist>
       <listitem>
@@ -22,11 +35,64 @@
         </para>
       </listitem>
     </itemizedlist>
+
+-->
+<formalpara>
+<title> For JBoss</title>
+</formalpara>
+
+<para>
+Changing the ports and other configuration for the SIP connector can be done in the standalone-sip.xml file. Below is an extract.
+</para>
+
     <example>
-      <title>Adding a SIP Connector to server.xml</title>
-      <para>
+      <title>Adding a SIP Connector to $JBOSS_HOME/standalone/configuration/standalone-sip.xml</title>
+
+<!-- 
+     <para>
       To add a SIP Connector on the IP address <literal>127.0.0.1</literal>, on port <literal>5080</literal>, using the UDP transport protocol, you should insert the following XML element:
       </para>
+-->
+
+
+
+      <programlisting linenumbering="unnumbered" role="XML"><![CDATA[
+
+ <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
+        <socket-binding name="management-native" interface="management" port="${jboss.management.native.port:9999}"/>
+        <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:9990}"/>
+        <socket-binding name="management-https" interface="management" port="${jboss.management.https.port:9443}"/>
+        <socket-binding name="ajp" port="8009"/>
+        <socket-binding name="http" port="8080"/>
+        <socket-binding name="https" port="8443"/>
+        <socket-binding name="sip-udp" port="5080"/>
+        <socket-binding name="sip-tcp" port="5080"/>
+        <socket-binding name="sip-tls" port="5081"/>
+        <socket-binding name="osgi-http" interface="management" port="8090"/>
+        <socket-binding name="remoting" port="4447"/>
+        <socket-binding name="txn-recovery-environment" port="4712"/>
+        <socket-binding name="txn-status-manager" port="4713"/>
+        <outbound-socket-binding name="mail-smtp">
+            <remote-destination host="localhost" port="25"/>
+        </outbound-socket-binding>
+    </socket-binding-group>
+
+]]></programlisting>
+    
+</example>
+
+
+<formalpara>
+<title> For Tomcat</title>
+</formalpara>
+
+<para>
+Changing the ports and other configuration for the SIP connector can be done in the server.xml file. Below is an extract.
+</para>
+
+    <example>
+      <title>Adding a SIP Connector to $CATALINA_HOME/conf/server.xml</title>
+
       <programlisting linenumbering="unnumbered" role="XML"><![CDATA[
   <Connector port="5080" 
 ipAddress="127.0.0.1"
@@ -38,9 +104,16 @@ ipAddress="127.0.0.1"
  staticServerAddress="122.122.122.122" 
  staticServerPort="44"
  useStaticAddress="true"
+<<<<<<< HEAD
  httpFollowsSip="false"
  replaceStaticServerAddressForInternalRoutingRequest="false"/>]]></programlisting>
+=======
+ httpFollowsSip="false"/>]]></programlisting>
+
+>>>>>>> a0a62a4... modified all chapters with MSS for AS7 update
     </example>
+
+
     <variablelist>
       <title>SIP &lt;connector&gt; Attributes</title>
       <varlistentry>
@@ -70,19 +143,19 @@ ipAddress="127.0.0.1"
       <varlistentry>
         <term>useStun</term>
         <listitem>
-          <para>Enables Session Traversal Utilities for NAT (STUN) support for this Connector. The attribute defaults to &quot;false&quot;. If set to &quot;true&quot;, ensure that the <literal>ipAddress</literal> attribute is <emphasis>not</emphasis> set to <literal>127.0.0.1</literal>. Refer to <xref linkend="mssstun-MSS_STUN"/> for more information about STUN.</para>
+          <para>Enables Session Traversal Utilities for NAT (STUN) support for this Connector. The attribute defaults to &quot;false&quot;. If set to &quot;true&quot;, ensure that the <literal>ipAddress</literal> attribute is <emphasis>not</emphasis> set to <literal>127.0.0.1</literal>. Refer to <xref linkend="mssstun-&SHORT_PLATFORM_NAME;_STUN"/> for more information about STUN.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
         <term>stunServerAddress</term>
         <listitem>
-          <para>Specifies the STUN server address used to discover the public IP address of the SIP Connector. This attribute is only required if the <literal>useStun</literal> attribute is set to &quot;true&quot;. Refer to <xref linkend="mssstun-MSS_STUN"/> for more information about STUN and public STUN servers.</para>
+          <para>Specifies the STUN server address used to discover the public IP address of the SIP Connector. This attribute is only required if the <literal>useStun</literal> attribute is set to &quot;true&quot;. Refer to <xref linkend="mssstun-&SHORT_PLATFORM_NAME;_STUN"/> for more information about STUN and public STUN servers.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
         <term>stunServerPort</term>
         <listitem>
-          <para>Specifies the STUN server port of the STUN server used in the <literal>stunServerAddress</literal> attribute. You should rarely need to change this attribute; also, it is only needed if the <literal>useStun</literal> attribute is set to &quot;true&quot;. Refer to <xref linkend="mssstun-MSS_STUN"/> for more information about STUN.</para>
+          <para>Specifies the STUN server port of the STUN server used in the <literal>stunServerAddress</literal> attribute. You should rarely need to change this attribute; also, it is only needed if the <literal>useStun</literal> attribute is set to &quot;true&quot;. Refer to <xref linkend="mssstun-&SHORT_PLATFORM_NAME;_STUN"/> for more information about STUN.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
@@ -131,7 +204,25 @@ ipAddress="127.0.0.1"
     <para>The application router is responsible for application selection and must not implement application logic. For example, the application router cannot modify a request or send a response.</para>
     <para>For more information about the application router, refer to the following sections of the <ulink url="http://jcp.org/en/jsr/detail?id=289">JSR 289 specification</ulink>: Application Router Packaging and Deployment, Application Selection Process, and Appendix C.
    </para>
-    <para>In order to configure the application router, you should edit the <literal>Service</literal> element in the container's <filename>server.xml</filename> configuration file:</para>
+
+<note>
+
+<title> </title>
+
+<para>
+See the example chapters for more information about the Application Router Configuration for SIP &SHORT_PLATFORM_NAME; for JBoss AS7
+</para>
+<para>
+ <xref linkend="sfss-Services_for_SIP_Servlets"/> 
+</para>
+
+</note>
+
+
+
+    <para>In order to configure the application router for Tomcat, you should edit the <literal>Service</literal> element in the container's <filename>server.xml</filename> configuration file:</para>
+
+
     <example id="bsssc-Configuring_the_Service_Element_in_the_Containers_server.xml">
       <title>Configuring the Service Element in the Container&apos;s server.xml</title>
       <programlisting linenumbering="unnumbered" role="XML"><![CDATA[
@@ -309,9 +400,133 @@ ipAddress="127.0.0.1"
       </varlistentry>       
     </variablelist>
   </section>
+
+
   <section id="bsssc-binary-SIP_Servlets_Server-Configuring_Logging">
     <title>SIP Servlets Server Logging</title>
-    <para>There are two separate levels of logging:</para>
+ 
+<para>
+Logging is an important part of working with &PLATFORM_NAME; for JBoss AS7. There are a few files that you need to be familiar with in order to successfully troubleshoot and adapt JBoss server monitoring and logging to your environment.
+</para>
+
+<para>
+$JBOSS/standalone/configuration/logging.properties
+</para>
+<para>
+$JBOSS/standalone/configuration/mss-sip-stack.properties
+</para>
+
+<para>
+$JBOSS/standalone/configuration/standalone-sip.xml
+</para>
+
+<example id="standalone-sip.xml-logging-configuration">
+<title>
+Setting the log file name in $JBOSS/standalone/configuration/standalone-sip.xml
+</title>
+
+<programlisting linenumbering="unnumbered" role="XML">
+<![CDATA[
+
+ </formatter>
+<file relative-to="jboss.server.log.dir" path="server.log"/>
+<suffix value=".yyyy-MM-dd"/>
+<append value="true"/>
+
+]]>
+</programlisting>
+
+</example>
+
+<para>
+
+The above produces the content of the $JBOSS_HOME/standalone/log directory which will look similar to the extract below
+
+</para>
+
+<screen>
+                       server.log.2012-08-14  server.log.2012-08-24
+server.log             server.log.2012-08-16  server.log.2012-08-25
+server.log.2012-08-07  server.log.2012-08-21  server.log.2012-08-26
+server.log.2012-08-13  server.log.2012-08-22
+</screen>
+
+
+<formalpara>
+<title>Logging Files for &SHORT_PLATFORM_NAME; for Tomcat </title>
+</formalpara>
+
+<para>
+If you are working with Tomcat, the log configuration files are located in the $CATALINA_HOME/conf/ directory. The log4j configuration file is located in $CATALINA_HOME/lib/ directory
+</para>
+
+
+<para>
+$CATALINA_HOME/conf/logging.properties
+</para>
+<para>
+$CATALINA_HOME/conf/mss-sip-stack.properties
+</para>
+
+<para>
+$CATALINA_HOME/conf/server.xml
+</para>
+
+<para>
+$CATALINA_HOME/lib/log4j.xml
+</para>
+
+<formalpara>
+<title>Truncated Sample Configuration from Server.xml  </title>
+</formalpara>
+
+<example id="server.xml-logging-configuration">
+<title>
+Setting the log file name $CATALINA_HOME/conf/server.xml
+</title>
+
+<programlisting linenumbering="unnumbered" role="XML">
+<![CDATA[
+
+
+<Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"  
+               prefix="localhost_access_log." suffix=".txt"
+               pattern="%h %l %u %t &quot;%r&quot; %s %b" resolveHosts="false"/>
+
+
+]]>
+</programlisting>
+
+</example>
+
+
+<formalpara>
+<title>Truncated Sample Configuration from log4j.xml  </title>
+</formalpara>
+
+<example id="log4j.xml-logging-configuration">
+<title>
+Configuring the log file name $CATALINA_HOME/lib/log4j.xml
+</title>
+
+<programlisting linenumbering="unnumbered" role="XML">
+<![CDATA[
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+  <appender name="rolling-file" class="org.apache.log4j.RollingFileAppender"> 
+    <param name="file" value="${catalina.home}/logs/sip-server.log"/>
+    <param name="MaxFileSize" value="1000KB"/>
+
+]]>
+</programlisting>
+
+</example>
+
+<para>
+The result of the extract configuration above that is taken from the log4j.xml file can be seen in the $CATALINA_HOME/logs directory. 
+</para>
+
+<!--
+   <para>There are two separate levels of logging:</para>
     <itemizedlist>
       <listitem>
         <para>Logging at the container level, which can be configured using the <filename>log4j.xml</filename> configuration file, usually located in the container&apos;s <filename>lib</filename> directory.</para>
@@ -330,6 +545,11 @@ ipAddress="127.0.0.1"
 			</category>]]>
 	 	</programlisting>
  	</example>
+<<<<<<< HEAD
 	<para>For this category to be used in MSS, you need to specify it in <filename>JBOSS_HOME/server/default/conf/mss-sip-stack.properties</filename>, add the <literal>gov.nist.javax.sip.LOG4J_LOGGER_NAME=gov.nist</literal> property, and set the <literal>gov.nist.javax.sip.TRACE_LEVEL=LOG4J</literal> property.</para>
+=======
+	<para>For this category to be used in &SHORT_PLATFORM_NAME;, you need to specify it in <filename>JBOSS_HOME/server/default/conf/mss-sip-stack.properties</filename>, add the <literal>gov.nist.javax.sip.LOG4J_LOGGER_NAME=gov.nist</literal> property, and set the <literal>gov.nist.javax.sip.TRACE_LEVEL=LOG4J</literal> property.</para>
+-->
+>>>>>>> a0a62a4... modified all chapters with MSS for AS7 update
   </section>
 </section>

@@ -17,7 +17,12 @@
   the server, the communication between the server and other SIP entities and
   securing the application and its content.</para>
 
-  
+  <note>
+<title> SIP Security &SHORT_PLATFORM_NAME; JBoss AS7 </title>
+<para>
+As of the time of writing this guide, the SIP security &SHORT_PLATFORM_NAME; JBoss AS7 is still being worked on and has not yet been implemented. This guide will be updated when the feature becomes available.
+</para>
+</note>
 
 	
  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" 

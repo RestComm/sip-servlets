@@ -3,8 +3,50 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "SIP_Servlets_Server_User_Guide.ent">
 %BOOK_ENTITIES;
 ]>
-<!-- chapter id nickname: ssfjcs --><section id="ssfjcs-SS_for_JBoss-Clustering_Support">
-  <title>&PLATFORM_NAME; SIP Servlets for JBoss: Clustering Support</title>
+<!-- chapter id nickname: ssfjcs -->
+<section id="ssfjcs-SS_for_JBoss-Clustering_Support">
+  <title> Understanding &PLATFORM_NAME; High Availabilty </title>
+
+<note>
+<title>High Availability in &SHORT_PLATFORM_NAME; for JBoss AS7 </title>
+<para>
+This feature is not yet implemented in &SHORT_PLATFORM_NAME; for JBoss AS7. This guide will be updated when the feature becomes available.
+</para>
+
+</note>
+
+
+
+<para> High Availability </para>
+
+<para>
+Is a term used to describe software and hardware based strategies that are implemented to ensure optimal performance and continuous system operation in case of failure. High availability encompasses, clustering, failover and load balancing
+</para>
+
+
+
+<para>  Clustering </para>  
+<para>
+Is a technique used to ensure continuous service availability by having two or more servers communicate with each other and share configuration and application data (replication) on  fixed, predetermined intervals. This produces two or more application servers with identical setup. There is often a primary server within a clustered cloud from which data is replicated to the secondary. The application servers within a clustered environment will use what is called a heartbeat to ensure that all servers within are alive and functioning. In the case of failure, another server (secondary) will take over the task of responding to client's requests without impacting user experience. In some clustered ecosystem, load balancing is used as explained below.
+
+</para>
+
+<para> Load Balancing</para> 
+<para>
+This is ultimately about performance. All request from clients  are evenly distributed by the (load balancer) to multiple application servers that are running similar configurations.This type of setup often includes fault tolerance or failover. When one of the nodes, application server instance is not available, all traffic will be directed to the remaining servers. This ensures continuity albeit performance can degrade. Load balancing allows a single point of entry for multiple clients.
+</para>
+
+
+<para> Failover </para>  
+
+<para>
+Failover is a way to provide continuous service to clients connecting to an application server in case of system, software or hardware failure. Connections to an unresponsive server is directed (failed over) to a backup server. This is often done within the scope of a clustered configuration aided by a load balancer.
+</para>
+
+<para>
+It is important to note that clustering is also a way to provide failover and enhance server performance. The same can be said of load balancing. The idea behind all the above mentioned techniques is to provide high availability to connecting clients connecting to applications running on &PLATFORM_NAME;. In a nutshell, high availability englobes all the above mentioned techniques.
+</para>
+
   <para>&PLATFORM_NAME; supports the clustering of SIP Servlets-enabled JBoss Application Servers for performance, reliability and failover purposes. Note that only &SHORT_PLATFORM_NAME; for JBoss Servers can be used as cluster nodes; &SHORT_PLATFORM_NAME; for Tomcat Containers are not supported.</para>
   <para>The SIP Servlets Server uses the  JBoss Application Server as its servlet container, and takes advantage of its capabilities, including clustering and failover.  For detailed background information about JBoss Application Server clustering refer to the <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Clustering_Guide/beta422/html/index.html">JBoss Application Server Clustering Guide</ulink>.</para>
 <!-- SIP Servlets Server Cluster -->  <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Installing_Configuring_and_Running">

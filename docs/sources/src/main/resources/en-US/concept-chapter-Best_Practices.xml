@@ -19,7 +19,18 @@
       <para>While it is preferable to have a fast Application Server, most of the information doesn&apos;t apply to &PLATFORM_NAME;. In summary, the most important optimization technique is to remove logs, leaving only what is required.</para>
       <para> Check the log configuration file in
       the following location and review the information.</para>
-      <para><filename>$JBOSS_HOME/server/default/conf/jboss-log4j.xml</filename></para>
+   
+
+
+<para>
+ <xref linkend="bsssc-binary-SIP_Servlets_Server-Configuring_Logging"/> 
+</para>
+
+
+<!--
+<filename>$JBOSS_HOME/server/default/conf/jboss-log4j.xml</filename></para>
+-->
+
     </section>
     <section>
       <title>Tuning &PLATFORM_NAME; SIP Servlets</title>
@@ -109,7 +120,7 @@
         <para>For more information on performance, refer to the <ulink url="http://java.sun.com/performance/reference/whitepapers/6_performance.html">Performance White Paper</ulink>.</para>        
       </note>
       <para>To pass arguments to the JVM, change
-      <filename>$JBOSS_HOME/bin/run.conf</filename> (Linux) or <filename>$JBOSS_HOME/bin/run.bat</filename> (Windows).</para>
+      <filename>$JBOSS_HOME/bin/standalone.conf</filename> (Linux) or <filename>$JBOSS_HOME/bin/standalone.bat</filename> (Windows).</para>
       <itemizedlist>
         <listitem>
           <para><emphasis role="bold">Garbage Collection</emphasis> </para>

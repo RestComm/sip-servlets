@@ -17,7 +17,7 @@
       </listitem>
       <listitem>
         <para>Editing
-  the server&apos;s <filename>server.xml</filename> configuration file.</para>
+  the server&apos;s <filename>server.xml</filename> or  <filename>standalone-sip.xml</filename> configuration file.</para>
       </listitem>
       <listitem>
         <para>From the
@@ -166,7 +166,7 @@
       </listitem>
       <listitem>
         <para>Editing
-  the server&apos;s <filename>server.xml</filename> configuration file.</para>
+  the server&apos;s <filename>server.xml</filename> or the <filename>standalone-sip.xml</filename> configuration file.</para>
       </listitem>
       <listitem>
         <para>From the
@@ -194,31 +194,60 @@
         </figure>
         <important>
           <title>Persistent Settings</title>
-          <para>Concurrency and congestion control settings altered through the SIP Servlets Management Console are not saved to the <filename>server.xml</filename> configuration file.  </para>
+          <para>Concurrency and congestion control settings altered through the SIP Servlets Management Console are not saved to the <filename>server.xml</filename>  or the <filename>standalone-sip.xml</filename>configuration file.  </para>
           <para>To make settings persistent, append the settings to  the <filename>server.xml</filename> file directly.  </para>
         </important>
       </listitem>
     </varlistentry>
     <varlistentry>
-      <term>Tuning Parameters Permanently by Editing <filename>server.xml</filename></term>
+      <term>Making your changes permanent in <filename>standalone-sip.xml</filename></term>
       <listitem>
         <para>Alternatively, you can edit your server&apos;s
-        <filename>server.xml</filename> configuration file, which has the
+        <filename>standalone-sip.xml</filename> configuration file, which has the
         benefit of making your chosen settings changes permanent. Instructions
         follow, grouped by the SIP Servlets Server you are running:</para>
         <procedure>
           <title>Tuning &PLATFORM_NAME; SIP Servlets for JBoss Server Settings for Concurrency and Congestion Control</title>
           <step>
-            <title>Open server.xml File</title>
+            <title>Open standalone-sip.xml File</title>
             <para>Open the
-            <filename><envar>$JBOSS_HOME</envar>/server/default/deploy/jboss-web.deployer/server.xml</filename>
+            <filename><envar>$JBOSS_HOME/standalone/configuration/standalone-sip.xml </envar></filename>
             configuration file in a text editor.</para>
           </step>
+
           <step>
+
+
+<example id="standalone-sip.xml-concurrency-editing">
+<title>
+Extract from stanalone-sip.xml file with conccurency configuration
+</title>
+
+<programlisting linenumbering="unnumbered" role="XML">
+<![CDATA[
+
+
+<subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" application-router="dars/mobicents-dar.properties" stack-properties="mss-sip-stack.properties" path-name="gov.nist" app-dispatcher-class="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" concurrency-control-mode="SipApplicationSession" congestion-control-interval="-1">
+            <connector name="sip-udp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-udp"/>
+            <connector name="sip-tcp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tcp"/>
+            <connector name="sip-tls" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tls"/>
+        </subsystem>
+
+
+
+]]>
+</programlisting>
+
+</example>
+
+
+<!--
+
             <title>Add Parameters to &lt;service&gt; Element</title>
             <para>Locate the <markup>&lt;service&gt;</markup> element, and add the
             <literal>concurrencyControlMode</literal> and/or 
             <literal>sipMessageQueueSize</literal> attributes.</para>
+
             <example id="sscacc-MSSJ-Permanently_Changing_Tunable_Parameters_by_Editing_server.xml">
               <title>server.xml Concurrency and Congestion Control Attributes</title>
               <programlisting role="XML">&lt;Service
@@ -244,7 +273,14 @@
             <replaceable>SipSession</replaceable> is the value of this
             attribute when it is not present—and overridden—in
             <filename>server.xml</filename>.</para>
+
+-->
+
+
           </step>
+
+<!--
+
           <step>
             <title>Define the Correct Attribute Values</title>
             <para>The following  default values for the concurrency and congestion control parameters are used regardless of whether the attributes are defined in the <filename>server.xml</filename> file:</para>
@@ -270,6 +306,8 @@
             </itemizedlist>
             <para>Experimentation is required for these tuning parameters depending on the operating system and server.</para>
           </step>
+
+-->
         </procedure>
         <procedure>
           <title>Tuning &PLATFORM_NAME; SIP Servlets for Tomcat Server Settings for Concurrency and Congestion Control</title>

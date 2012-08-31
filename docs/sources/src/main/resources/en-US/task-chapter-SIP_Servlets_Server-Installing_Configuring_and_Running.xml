@@ -4,13 +4,22 @@
 %BOOK_ENTITIES;
 ]><!-- chapter id nickname: sssicar -->
 <chapter id="sssicar-SIP_Servlets_Server-Installing_Configuring_and_Running">
-	<title>SIP Servlets Server-Installing, Configuring and Running</title>
+	
+<!--
+<title>SIP Servlets Server-Installing, Configuring and Running</title>
 	<para></para>
 	<xi:include href="task-section-binary-SIP_Servlets_Server_with_JBoss-Installing_Configuring_and_Running.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
+-->
+	<xi:include href="concept-chapter-AS7-mss.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
+
 	
 	<xi:include href="task-section-binary-SIP_Servlets_Server_with_Tomcat-Installing_Configuring_and_Running.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
 	
 	<xi:include href="task-section-SIP_Servlets_Server-Configuring.xml" xmlns:xi="http://www.w3.org/2001/XInclude"/>
-	
+
+<!--
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-Working_with_the_SIP_Servlets_Management_Console.xml"/>	
+-->
 </chapter>
 
