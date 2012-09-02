@@ -38,7 +38,7 @@ You can go to the link below to download the latest &SHORT_PLATFORM_NAME; for JB
 </para> 
 
 <para>
-You will need to extract the content of the file into a directory on your local system. The root directory of the &SHORT_PLATFORM_NAME; for JBoss AS7 that you downloaded will be referred to in this guide as $JBOSS_HOME.  
+You will need to extract the content of the file into a directory on your local system. The root directory of the &SHORT_PLATFORM_NAME; for JBoss AS7 that you downloaded will be referred to in this guide as $AS7_HOME.  
 </para>
 
 
@@ -60,15 +60,16 @@ Setting Environment Variables
 <para> <xref linkend="setting-jboss-ENV-variable-windows-unix"/></para>
 
 
-<para>
+<formalpara>
+<title> Starting &SHORT_PLATFORM_NAME; for JBoss AS7 </title>
 To start the server do the following:
-</para>
+</formalpara>
 <screen>
-$JBOSS_HOME/bin/standalone.sh
+$AS7_HOME/bin/standalone.sh
 </screen>
 
 <para>
-During the startup process, you will notice that the final part of the log output will be similar to the truncated output below. Notice that the Admin console interface can be accessed at http://172.0.0.1:9990. This will be explained later. 
+During the startup process, you will notice that the final part of the log output will be similar to the truncated output below. Notice that the Admin Console interface can be accessed at http://172.0.0.1:9990. This will be explained later. 
 </para>
 <screen>
 14:28:43,972 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015951: Admin console listening on http://127.0.0.1:9990
@@ -94,12 +95,12 @@ You will notice that the startup is very fast. The reason for this is that servi
 </para>
 
 <para>
-With the standard startup script, you will not have access to any SIP functionalities. This is because of the modular approach of JBoss AS7. There is a configuration file that needs to be used to activate additional functionalities like SIP and High Availability.
+With the standard startup script, you will not have access to any SIP functionalities. This is because of the modular approach implemented in JBoss AS7. There is a configuration file that needs to be used to activate additional functionalities like SIP and High Availability.
 </para>
 
 
 <para>
-In order to start the &SHORT_PLATFORM_NAME; for JBoss AS7 with SIP functionalities, you need to append the startup script with the SIP configuration file. The configuration files are located in the $JBOSS_HOME/standalone/configuration directory. You can see the content of the directory below
+In order to start the &SHORT_PLATFORM_NAME; for JBoss AS7 with SIP functionalities, you need to append the startup script with the SIP configuration file. The configuration files are located in the $AS7_HOME/standalone/configuration directory. You can see the content of the directory below
 </para>
 <screen>
 application-roles.properties  mgmt-users.properties     standalone-ha.xml
@@ -108,14 +109,31 @@ dars                          standalone-full-ha.xml    standalone.xml
 logging.properties            standalone-full.xml       standalone_xml_history
 </screen>
 
+<formalpara>
+<title>Starting &SHORT_PLATFORM_NAME; for JBoss AS7 with SIP</title>
+</formalpara>
 
 <para>
-If you want to start &SHORT_PLATFORM_NAME; with SIP services activated, you need to go to the $JBOSS_HOME/bin directory. Type the following command:
+If you want to start &SHORT_PLATFORM_NAME; with SIP services activated, you need to go to the $AS7_HOME/bin directory. Type the following command:
 </para>
 
 <screen>
 ./standalone.sh -c standalone-sip.xml
 </screen>
+
+
+<formalpara>
+<title> You will see a message similar to the one below once the server is successfully started</title>
+</formalpara>
+
+<screen>
+20:43:21,487 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 37) JBAS018559: Deployed "click2call.war"
+20:43:21,489 INFO  [org.jboss.as.server] (ServerService Thread Pool -- 37) JBAS018559: Deployed "sip-servlets-management.war"
+20:43:21,647 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015951: Admin console listening on http://127.0.0.1:9990
+20:43:21,648 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015874: JBoss AS 7.1.2.Final "Steropes" started in 26560ms - Started 232 of 321 services (88 services are passive or on-demand)
+</screen>
+
+
 
 <para>
 The click2call SIP sample application bundled with &SHORT_PLATFORM_NAME; will become available at this url http://127.0.0.1:8080/click2call. You can configure multiple SIP softphones to use the sample application. See the section below for how to configure and test the SIP sample application.
@@ -212,20 +230,20 @@ You can make calls from the sample click2call application and see the logs in th
 
 
 <para>
-Part of the task of any administrator who has to manage a JBoss server will be to monitor services offered to clients. There is a command line interface bundled with JBoss AS7 which can be accessed by going to the $JBOSS_HOME/bin directory. 
+Part of the task of any administrator who has to manage a JBoss server will be to monitor services offered to clients. There is a command line interface bundled with JBoss AS7 which can be accessed by going to the $AS7_HOME/bin directory. 
 
 </para>
 
-<para> You need to make sure that the JBoss server is started running on your system and listening on port 9999 (in a different shell terminal). The section below will work you through steps to familiarize yourself with the CLI. 
+<para> You need to make sure that the JBoss server is running on your system and listening on port 9999. The section below will work you through steps to familiarize yourself with the CLI. 
 </para>
 
 <para>
-There are so many features available with the &SHORT_PLATFORM_NAME; for JBoss AS7 CLI. The example below will concentrate on getting data from a running SIP protocol. 
+There are so many features available with the &SHORT_PLATFORM_NAME; for JBoss AS7 CLI. The example below will concentrate on getting data from the SIP you started using the <filename> ./standalone.sh -c standalone-sip.xml </filename> script. 
 </para>
 
 
 <para>
-In the $JBOSS_HOME/bin directory, type
+In the $AS7_HOME/bin directory, type
 
 </para>
 <screen>
@@ -335,8 +353,13 @@ sample application running and your softphones are connected to the server.
 </note>
 
 
+
+<formalpara>
+<title> SIP Servlets Management Console </title>
+</formalpara>
+
 <para>
-There is also a SIP servlets management console that is available at this url http://127.0.0.1:8080/sip-servlets-management. The resulting page will be similar to the screenshot below.
+There is also a SIP servlets management console that is available at this url http://127.0.0.1:8080/sip-servlets-management. The resulting page will be similar to the screenshot below. More information will be provided about the SIP servlets management console in later chapters of this guide. 
 </para>
 
 <para>
@@ -351,7 +374,6 @@ There is also a SIP servlets management console that is available at this url ht
 
 </para>
 
-	<para>For more information on concurrency and congestion control tuning, refer to <xref linkend="sscacc-Configuring_the_Concurrency_and_Congestion_Control_Settings"/>.</para>
 
 </section>
 
@@ -382,6 +404,11 @@ If you don't have a user account for the management console, you will see a scre
             </figure>
 
 </para>
+
+
+<formalpara>
+<title> Creating a User Account</title>
+</formalpara>
 
 <para>
 Go to the $JBoss_HOME/bin directory and run the ./add-user.sh script. You can follow the interactive user mode to create an account for the Administration Console. 
@@ -429,8 +456,9 @@ Deleting the user account isn't very intuitive. In the event that you will need 
         <para>Create a directory in <filename>My Downloads</filename> to extract the zip file&apos;s contents into.  For ease of identification, it is recommended that the version number of the binary is included in the folder name.  For example, <filename>&SHORT_PLATFORM_NAME;-jboss-&lt;version&gt;</filename>.</para>
       </step>
       <step>
-        <para>Extract the contents of the archive, specifying the destination folder as the one created in the previous step.</para>
+        <para>Extract the contents of the archive, specifying the destination folder as the one created in the previous step. You can either use Winzip or the opensource tool called 7-Zip to extract the content of the donwloaded &SHORT_PLATFORM_NAME; for JBoss AS7 file </para>
       </step>
+<!--
       <step>
         <para>Alternatively, execute the <command>jar -xvf</command> command to extract the binary distribution files from the zip archive.</para>
         <orderedlist>
@@ -440,21 +468,31 @@ Deleting the user account isn't very intuitive. In the event that you will need 
           <listitem>
             <para>Open the Windows Command Prompt and navigate to the folder that contains the archive using the <command>cd</command> command</para>
           </listitem>
+ 
           <listitem>
             <para>Execute the <command>jar -xvf</command> command to extract the archive contents into the current folder.</para>
             <screen>C:\Users\&lt;user&gt;\My Downloads\&CMD_PLATFORM_NAME;-jboss-&lt;version&gt;&gt;jar -xvf &quot;&SSS_MSS4J_ZIP;&quot;</screen>
           </listitem>
+
+
         </orderedlist>
+
       </step>
+
+-->
       <step>
         <para>It is recommended that the folder holding the &SHORT_PLATFORM_NAME; for JBoss files (in this example, the folder named <filename>&CMD_PLATFORM_NAME;-jboss-<replaceable>&lt;version&gt;</replaceable></filename>) is moved to a user-defined location for storing executable programs.  For example, the <filename>Program Files</filename> folder.</para>
       </step>
+
+-->
+
+<!--
       <step>
         <para>Consider deleting the archive, if free disk space is an issue.</para>
         <screen>C:\Users\&lt;user&gt;\My Downloads\&CMD_PLATFORM_NAME;-jboss-&lt;version&gt;&gt;delete &quot;&SSS_MSS4J_ZIP;&quot;</screen>
       </step>
+-->
     </procedure>
-
 
 
 <procedure>

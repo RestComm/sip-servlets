@@ -107,12 +107,14 @@ Deploying your application once the server is running is simple. You need to cop
 Start your web browser and go to the link, http://127.0.0.1:8080/Click2CallAsync/
 </para>
 
+<note>
+<title> Sample Application Name</title>
 <para>
 Note that the application name is case-sensitive and will not work if you try to access it as http://127.0.0.1:8080/click2callasync/
 </para>
-
+</note>
 <para>
-The sample sip application will show 
+The sample SIP application page will be similar to the screenshot below. 
 </para>
 
 
@@ -132,13 +134,13 @@ The sample sip application will show
 
 <para>
 
-In order to use the application, you can download a softphone and start multiple instances of the phone. In this guide, the softphone that will be used is Linphone. The configuration is as follows:
+In order to use the application, you can download a softphone and start multiple instances of the phone on a single server. In this guide, the softphone that will be used is Linphone. The configuration is as follows:
 </para>
 
 <note>
 <title> Multiple Instances of Linphone</title>
 <para>
-On some Linux systems, you might need to use a different user account in order to start a second instance of Linphone. Ex. sudo linphone
+On some Linux systems, you might need to use a different user profile in order to start a second instance of Linphone. Ex. sudo linphone
 </para>
 </note>
 
@@ -189,9 +191,13 @@ Once the softphones are configured and are successfully registered with with the
 </para>
 
 <para>
-You can make calls using the application and the softphones you configured will ring. It is important to start &SHORT_PLATFORM_NAME; for Tomcat AS7 in a terminal using the (./catalina.sh run) script. It will help with troubleshooting SIP calls. The logs you see on the terminal will let you know when a softphone registers with the Tomcat server and you will also be able to see the status of call setup and shutdown.
+You can make calls using the application and the softphones you configured will start ringing. It is important to start &SHORT_PLATFORM_NAME; for Tomcat AS7 in a terminal using the (./catalina.sh run) script. It will help with troubleshooting SIP calls. The logs you see on the terminal will let you know when a softphone registers with the Tomcat server and you will also be able to see the status of call setup and shutdown.
 </para>
 
+
+<formalpara>
+<title>Stopping &SHORT_PLATFORM_NAME; for Tomcat AS7 </title>
+</formalpara>
 <para>
 The best way to stop a server is using the CTRL-D on the terminal in which the server was started. If you started the &SHORT_PLATFORM_NAME; for Tomcat AS7 server using the $CATALINA_HOME/bin/startup.sh, you can stop the server using $CATALINA_HOME/bin/shutdown.sh
 </para>

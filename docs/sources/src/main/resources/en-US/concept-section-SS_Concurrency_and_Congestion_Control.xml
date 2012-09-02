@@ -211,7 +211,7 @@
           <step>
             <title>Open standalone-sip.xml File</title>
             <para>Open the
-            <filename><envar>$JBOSS_HOME/standalone/configuration/standalone-sip.xml </envar></filename>
+            <filename><envar>$AS7_HOME/standalone/configuration/standalone-sip.xml </envar></filename>
             configuration file in a text editor.</para>
           </step>
 

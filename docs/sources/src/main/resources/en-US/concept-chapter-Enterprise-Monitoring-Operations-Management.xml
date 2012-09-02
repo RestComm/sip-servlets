@@ -24,7 +24,7 @@
 <note>
 <title>SNMP and Monitoring for &SHORT_PLATFORM_NAME; for JBoss AS7 </title>
 <para>
-This feature is not yet implemented in &SHORT_PLATFORM_NAME; for JBoss AS7. This guide will be updated when SNMP and other monitoring features become available. In the meantime, see chapter below for information about the CLI.
+This feature is not yet implemented in &SHORT_PLATFORM_NAME; for JBoss AS7. This guide will be updated when SNMP and other monitoring features become available. In the meantime, see the chapter below for information about the CLI.
 </para>
 
 <para>

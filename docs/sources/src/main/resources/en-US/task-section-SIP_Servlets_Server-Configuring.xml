@@ -16,7 +16,7 @@
 
 <para>
 
-There are two important configuration files that you might need to modifying depending on your system needs. The standalone-sip.xml file for &SHORT_PLATFORM_NAME; for JBoss AS7 and the server.xml file for &SHORT_PLATFORM_NAME; for Tomcat. The extracts below will give you a snapshot of default configurations.
+There are two important configuration files that you might need to modifying depending on your system needs. The standalone-sip.xml file in &SHORT_PLATFORM_NAME; for JBoss AS7 and the server.xml file in &SHORT_PLATFORM_NAME; for Tomcat. The extracts below will give you a snapshot of default configurations.
 </para>
 
 <!--
@@ -440,7 +440,7 @@ Setting the log file name in $JBOSS/standalone/configuration/standalone-sip.xml
 
 <para>
 
-The above produces the content of the $JBOSS_HOME/standalone/log directory which will look similar to the extract below
+The configuration above produces SIP logs that can be found in the  $JBOSS_HOME/standalone/log directory. Below is an extract of the log files.
 
 </para>
 
@@ -522,7 +522,7 @@ Configuring the log file name $CATALINA_HOME/lib/log4j.xml
 </example>
 
 <para>
-The result of the extract configuration above that is taken from the log4j.xml file can be seen in the $CATALINA_HOME/logs directory. 
+The result of the extracted configuration above that is taken from the log4j.xml file  and can be found in the $CATALINA_HOME/logs directory. 
 </para>
 
 <!--
