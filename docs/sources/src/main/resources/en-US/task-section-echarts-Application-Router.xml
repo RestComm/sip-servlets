@@ -40,8 +40,8 @@ I've changed them for you so you can see how the nesting is better.
 Please see the following link to learn how to deploy jar files in &SHORT_PLATFORM_NAME; for JBoss AS7. 
 </para>
 
+
 <!--ulink url="https://docs.jboss.org/author/display/AS7/How+do+I+migrate+my+application+from+AS5+or+AS6+to+AS7"> Migrating from AS5, AS6 to AS7</ulink-->
-   
     <procedure>
       <title>Installing DFCAR on JBoss AS7</title>
 
@@ -76,7 +76,7 @@ Please see the following link to learn how to deploy jar files in &SHORT_PLATFOR
 	<para>
 	</para>
       </step>
-    </procedure>
 
+    </procedure>
   </section>
 </section>

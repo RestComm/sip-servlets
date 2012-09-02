@@ -1,4 +1,4 @@
-﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE section PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
 <!ENTITY % BOOK_ENTITIES SYSTEM "SIP_Servlets_Server_User_Guide.ent">
 %BOOK_ENTITIES;
@@ -109,7 +109,7 @@ Start your web browser and go to the link, <ulink url="http://127.0.0.1:8080/Cli
 <note>
 <title> Sample Application Name</title>
 <para>
-Note that the application name is case-sensitive and will not work if you try to access it as http://127.0.0.1:8080/click2callasync/
+Note that the application name is case-sensitive and will not work if you try to access it as <ulink url="http://127.0.0.1:8080/click2callasync/">http://127.0.0.1:8080/click2callasync/</ulink>
 </para>
 </note>
 <para>
@@ -550,4 +550,3 @@ Using JRE_HOME:       /etc/java-config-2/current-system-vm]]></screen>
 -->
 </section>
 </section>
-
