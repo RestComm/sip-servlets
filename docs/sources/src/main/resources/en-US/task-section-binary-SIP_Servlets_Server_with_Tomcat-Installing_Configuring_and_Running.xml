@@ -8,16 +8,15 @@
 
 
 <section id="getting-started-with-MSS-Tomcat-AS7">
-<title>Getting Started with &SHORT_PLATFORM_NAME; for Tomcat AS7  </title>
+<title>Getting Started with &SHORT_PLATFORM_NAME; for Tomcat 7  </title>
 
 <para>
-You can download the latest &SHORT_PLATFORM_NAME; for Tomcat AS7   <ulink url=" http://sourceforge.net/projects/mobicents/files/Mobicents%20Sip%20Servlets/">HERE</ulink>
+You can download the latest &SHORT_PLATFORM_NAME; for Tomcat 7  <ulink url=" https://code.google.com/p/sipservlets/wiki/Downloads?tm=2">Download Latest Version of &SHORT_PLATFORM_NAME; for Tomcat 7 </ulink>
 </para> 
 
 <para>
 The content of the downloaded file can be extracted to any location you prefer on your computer. The root directory to which the content of the download is extracted will be referred to as $CATALINA_HOME. 
 </para>
-
 
 <para>
 The content of the $CATALINA_HOME/bin is similar to the output below.
@@ -37,7 +36,7 @@ configtest.sh                 shutdown.sh       version.sh
 
 <para>
 
-You can start &SHORT_PLATFORM_NAME; for Tomcat AS7 by going to $CATALINA_HOME/bin directory and typing the following: 
+You can start &SHORT_PLATFORM_NAME; for Tomcat 7 by going to $CATALINA_HOME/bin directory and typing the following: 
 </para>
 
 
@@ -76,10 +75,10 @@ Setting Environment Variables - JAVA and CATALINA
 
 
 <section>
-<title>Testing Click2CallAsync with &SHORT_PLATFORM_NAME; for Tomcat AS7 </title>
+<title>Testing Click2CallAsync with &SHORT_PLATFORM_NAME; for Tomcat 7 </title>
 
 <para>
-If &SHORT_PLATFORM_NAME; for Tomcat AS7 is started and running, you should be able to use your web browser to access the welcome page at this url http://127.0.0.1:8080/ This will show you a screenshot similar to the one below.
+If &SHORT_PLATFORM_NAME; for Tomcat 7 is started and running, you should be able to use your web browser to access the welcome page at this url http://127.0.0.1:8080/ This will show you a screenshot similar to the one below.
 </para>
 
 
@@ -100,7 +99,7 @@ Deploying your application once the server is running is simple. You need to cop
 </para>
 
 <para>
- There is a pre-installed sample SIP application that you can use to test your &SHORT_PLATFORM_NAME; Tomcat AS7 configuration. The application is also located in the $CATALINA_HOME/webapps directory
+ There is a pre-installed sample SIP application that you can use to test your &SHORT_PLATFORM_NAME; Tomcat 7 configuration. The application is also located in the $CATALINA_HOME/webapps directory
 </para>
 
 <para>
@@ -151,31 +150,31 @@ start Linphone
 go to the Options menu
 
 On the Network Settings tab, 
-	SIP (UDP) port to 5061. (leave the rest as default)
+        SIP (UDP) port to 5061. (leave the rest as default)
 On the Manage SIP Accounts tab, 
-	click the add button
-	Your SIP identity: = sip:linphone@127.0.0.1:5080
-	SIP Proxy address: = sip 127.0.0.1:5080
+        click the add button
+        Your SIP identity: = sip:linphone@127.0.0.1:5080
+        SIP Proxy address: = sip 127.0.0.1:5080
 
 Leave the rest of the settings as default.
-	
+        
 
 Configuring Linphone (on the second shell)
 
 go to the Options menu
 
 On the Network Settings tab, 
-	SIP (UDP) port to 5062. (leave the rest as default)
+        SIP (UDP) port to 5062. (leave the rest as default)
 On the Manage SIP Accounts tab, 
-	click the add button
-	Your SIP identity: = sip:linphone2@127.0.0.1:5080
-	SIP Proxy address: = sip 127.0.0.1:5080
+        click the add button
+        Your SIP identity: = sip:linphone2@127.0.0.1:5080
+        SIP Proxy address: = sip 127.0.0.1:5080
 
 Leave the rest of the settings as default.
 </screen>
 
 <para>
-Once the softphones are configured and are successfully registered with with the &SHORT_PLATFORM_NAME; for Tomcat AS7 server, you will see a screenshot like the one below in the web browser at this url http://127.0.0.1:8080/Click2CallAsync/
+Once the softphones are configured and are successfully registered with with the &SHORT_PLATFORM_NAME; for Tomcat 7 server, you will see a screenshot like the one below in the web browser at this url http://127.0.0.1:8080/Click2CallAsync/
 </para>
 
 <para>
@@ -191,15 +190,15 @@ Once the softphones are configured and are successfully registered with with the
 </para>
 
 <para>
-You can make calls using the application and the softphones you configured will start ringing. It is important to start &SHORT_PLATFORM_NAME; for Tomcat AS7 in a terminal using the (./catalina.sh run) script. It will help with troubleshooting SIP calls. The logs you see on the terminal will let you know when a softphone registers with the Tomcat server and you will also be able to see the status of call setup and shutdown.
+You can make calls using the application and the softphones you configured will start ringing. It is important to start &SHORT_PLATFORM_NAME; for Tomcat 7 in a terminal using the (./catalina.sh run) script. It will help with troubleshooting SIP calls. The logs you see on the terminal will let you know when a softphone registers with the Tomcat server and you will also be able to see the status of call setup and shutdown.
 </para>
 
 
 <formalpara>
-<title>Stopping &SHORT_PLATFORM_NAME; for Tomcat AS7 </title>
+<title>Stopping &SHORT_PLATFORM_NAME; for Tomcat 7 </title>
 </formalpara>
 <para>
-The best way to stop a server is using the CTRL-D on the terminal in which the server was started. If you started the &SHORT_PLATFORM_NAME; for Tomcat AS7 server using the $CATALINA_HOME/bin/startup.sh, you can stop the server using $CATALINA_HOME/bin/shutdown.sh
+The best way to stop a server is using the CTRL-D on the terminal in which the server was started. If you started the &SHORT_PLATFORM_NAME; for Tomcat 7 server using the $CATALINA_HOME/bin/startup.sh, you can stop the server using $CATALINA_HOME/bin/shutdown.sh
 </para>
 
 </section>
@@ -231,9 +230,6 @@ The best way to stop a server is using the CTRL-D on the terminal in which the s
     </listitem>
   </itemizedlist>
   <bridgehead id="bssswticar-Installing_the_Java_Development_Kit">Installing the Java Development Kit</bridgehead>
-<<<<<<< HEAD
-  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="Common_Content/Java_Development_Kit-Installing_Configuring_and_Running.xml"/>
-=======
 
 
 
@@ -252,7 +248,6 @@ See the links below for detailed information about downloading,installing and co
 
 <!--
 
->>>>>>> a0a62a4... modified all chapters with MSS for AS7 update
   <section id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-PreInstall_Requirements_and_Prerequisites">
     <title>Pre-Install Requirements and Prerequisites</title>
     <variablelist id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Hardware_Requirements">
@@ -343,7 +338,7 @@ See the links below for detailed information about downloading,installing and co
 
 <section>
 
-      <title>Installing the &SHORT_PLATFORM_NAME; for Tomcat AS7 Binary Distribution on Windows</title>
+      <title>Installing the &SHORT_PLATFORM_NAME; for Tomcat 7 Binary Distribution on Windows</title>
     <procedure>
       <step>
         <para>For this example, we&apos;ll assume that you downloaded the binary distribution zip file to the <filename>My Downloads</filename> folder. First, using Windows Explorer, create a subdirectory in <filename>My Downloads</filename> to extract the zip file&apos;s contents into. When you name this folder, it is good practice to include the version number; if you do so, remember to correctly match it with the version of the &SHORT_PLATFORM_NAME; for Tomcat binary distribution you downloaded. In these instructions, we will refer to this folder as <filename>&CMD_PLATFORM_NAME;-tomcat-<replaceable>&lt;version&gt;</replaceable></filename>.</para>
@@ -392,9 +387,6 @@ See the links below for detailed information about downloading,installing and co
         <para>If you are installing a &PLATFORM_NAME; server from source which uses the Tomcat servlet container, then you <emphasis>must</emphasis> set <envar>CATALINA_HOME</envar>.</para>
       </listitem>
     </itemizedlist>
-<<<<<<< HEAD
-    <para>The following instructions detail how to set <envar>CATALINA_HOME</envar> on both Linux and Windows.</para>
-=======
     <para>See the link below for detailed instruction on how to set <envar>CATALINA_HOME</envar> on both Linux and Windows.</para>
 
 <para> <xref linkend="setting-CATALINA_HOME-ENV-linux-windows"/></para>
@@ -402,7 +394,6 @@ See the links below for detailed information about downloading,installing and co
 
 <!--
 
->>>>>>> a0a62a4... modified all chapters with MSS for AS7 update
     <procedure id="bssswticar-Setting_the_CATALINA_HOME_Environment_Variable_on_Linux">
       <title>Setting the <envar>CATALINA_HOME</envar> Environment Variable on Linux</title>
       <step>
@@ -431,9 +422,16 @@ See the links below for detailed information about downloading,installing and co
         <para>For information on how to set environment variables in Windows, refer to <ulink url="http://support.microsoft.com/kb/931715"/>.</para>
       </step>
     </procedure>
+
+
+
   </section>
 
 -->
+
+
+
+
   <section id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Configuring">
     <title>Configuring</title>
     <para>Configuring &SHORT_PLATFORM_NAME; for Tomcat consists in setting the <envar>CATALINA_HOME</envar> environment variable and then, optionally, customizing your &SHORT_PLATFORM_NAME; for Tomcat container by adding SIP Connectors, configuring the application router, and configuring logging. See <xref linkend="bsssc-binary-SIP_Servlets_Server-Configuring"/> to learn what and how to configure &SHORT_PLATFORM_NAME; for Tomcat.</para>
@@ -533,6 +531,8 @@ Using JRE_HOME:       /etc/java-config-2/current-system-vm]]></screen>
     <title>Using</title>
     <para>After starting the server successfully, you can access the default web applications included with &SHORT_PLATFORM_NAME; for Tomcat by opening the following URL in your browser: <ulink url="http://localhost:8080/"/>.</para>
     <para>You can also access the SIP Servlets Management Console by opening <ulink url="http://localhost:8080/sip-servlets-management/"/> in your browser.</para>
+    <para>To uninstall &SHORT_PLATFORM_NAME; for Tomcat, simply delete the directory you decompressed the binary distribution archive into.</para>
+
   </section>
 
 -->
@@ -541,10 +541,13 @@ Using JRE_HOME:       /etc/java-config-2/current-system-vm]]></screen>
     <title>Testing</title>
     <para>&nbsp;</para>
   </section>
-  <section id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Uninstalling">
+
+ <section id="bssswticar-binary-SIP_Servlets_Server_with_Tomcat-Uninstalling">
     <title>Uninstalling</title>
     <para>To uninstall &SHORT_PLATFORM_NAME; for Tomcat, simply delete the directory you decompressed the binary distribution archive into.</para>
   </section>
+
+-->
 </section>
 </section>
 

@@ -3,14 +3,18 @@
 <!ENTITY % BOOK_ENTITIES SYSTEM "SIP_Servlets_Server_User_Guide.ent">
 %BOOK_ENTITIES;
 ]>
-<!-- chapter id nickname: bsssc --><section id="bsssc-binary-SIP_Servlets_Server-Configuring">
-  <title>Configuring</title>
+<!-- chapter id nickname: bsssc -->
+
+<section id="bsssc-binary-SIP_Servlets_Server-Configuring">
+<title> Sip Connectors </title>
+ 
+<para>
+&PLATFORM_NAME; comes with default settings that are designed to get your system up and running without the need to know about all the detailed configurations. That said, there are situations in which you might like to fine-tune your setttings to adapt it to your needs. That is what the following section will help you achieve. You will get a better understand of SIP connectors and how to make them work for you.
+</para>
+
   <para>&nbsp;</para>
+
   <section id="bsssc-binary-SIP_Servlets_Server-Adding_SIP_Connectors">
-<<<<<<< HEAD
-    <title>Configuring SIP Connectors</title>
-    <para>SIP Connectors are added by adding a <emphasis>&lt;Connector&gt;</emphasis> element under the <emphasis>&lt;Service&gt;</emphasis> element in the container's <filename>server.xml</filename> configuration file.</para>
-=======
 
    <title>Configuring SIP Connectors and Bindings</title>
 
@@ -21,7 +25,6 @@ There are two important configuration files that you might need to modifying dep
 
 <!--
     <para>SIP Connectors are added by adding a <emphasis>&lt;Connector&gt;</emphasis> element under the <emphasis>&lt;Service&gt;</emphasis> element in the container's <filename>standalone-sip.xml</filename> configuration file.</para>
->>>>>>> a0a62a4... modified all chapters with MSS for AS7 update
     <para>Three SIP Connectors are configured for SIP Servlets:</para>
     <itemizedlist>
       <listitem>
@@ -104,13 +107,8 @@ ipAddress="127.0.0.1"
  staticServerAddress="122.122.122.122" 
  staticServerPort="44"
  useStaticAddress="true"
-<<<<<<< HEAD
- httpFollowsSip="false"
- replaceStaticServerAddressForInternalRoutingRequest="false"/>]]></programlisting>
-=======
  httpFollowsSip="false"/>]]></programlisting>
 
->>>>>>> a0a62a4... modified all chapters with MSS for AS7 update
     </example>
 
 
@@ -185,12 +183,6 @@ ipAddress="127.0.0.1"
           <para>
           When the HTTP Load Balancer sends HTTP requests that are not associated with the application session, the application server will force the HTTP request to be repeated until it lands on the correct node.
           </para>
-        </listitem>
-      </varlistentry>
-      <varlistentry>
-		<term>replaceStaticServerAddressForInternalRoutingRequest</term>
-        <listitem>
-          <para>Optional property that by default has true value. If value is false then the Sip Servlets container will not replace addresses in Route headers, or in the Request URI, that points to the static server addresss, before proxying requests.</para>
         </listitem>
       </varlistentry>
     </variablelist>
@@ -340,7 +332,7 @@ See the example chapters for more information about the Application Router Confi
         <listitem>
           <para>Specifies the <literal>T1</literal> Base Timer Interval, which allows the SIP Servlets container to adjust its timers depending on network conditions. The default interval is 500 (milliseconds).</para>
           <para>For more information about available timers, refer to the <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
-		  <para>All of the timers present in the tables depend on <literal>T1</literal>, <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal>.</para>
+                  <para>All of the timers present in the tables depend on <literal>T1</literal>, <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal>.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
@@ -536,20 +528,18 @@ The result of the extracted configuration above that is taken from the log4j.xml
       </listitem>
     </itemizedlist>
     <para>You can setup the logging so that the NIST SIP Stack will log into the container logs.</para>
-	<para>To use LOG4J in NIST SIP Stack, you need to define a category in <filename>JBOSS_HOME/server/default/conf/jboss-log4j.xml</filename> and set it to <literal>off</literal>.</para>
-	<example id="bsssc-Configuring_the_Stack_Logs_in_the_Container_log4j.xml">
-		<title>Configuring the NIST SIP Stack to log into the Container&apos;s logs</title>
-		<programlisting linenumbering="unnumbered" role="XML"><![CDATA[
-			<category name="gov.nist">
-			<priority value="OFF"/>
-			</category>]]>
-	 	</programlisting>
- 	</example>
-<<<<<<< HEAD
-	<para>For this category to be used in MSS, you need to specify it in <filename>JBOSS_HOME/server/default/conf/mss-sip-stack.properties</filename>, add the <literal>gov.nist.javax.sip.LOG4J_LOGGER_NAME=gov.nist</literal> property, and set the <literal>gov.nist.javax.sip.TRACE_LEVEL=LOG4J</literal> property.</para>
-=======
-	<para>For this category to be used in &SHORT_PLATFORM_NAME;, you need to specify it in <filename>JBOSS_HOME/server/default/conf/mss-sip-stack.properties</filename>, add the <literal>gov.nist.javax.sip.LOG4J_LOGGER_NAME=gov.nist</literal> property, and set the <literal>gov.nist.javax.sip.TRACE_LEVEL=LOG4J</literal> property.</para>
+        <para>To use LOG4J in NIST SIP Stack, you need to define a category in <filename>JBOSS_HOME/server/default/conf/jboss-log4j.xml</filename> and set it to <literal>off</literal>.</para>
+        <example id="bsssc-Configuring_the_Stack_Logs_in_the_Container_log4j.xml">
+                <title>Configuring the NIST SIP Stack to log into the Container&apos;s logs</title>
+                <programlisting linenumbering="unnumbered" role="XML"><![CDATA[
+                        <category name="gov.nist">
+                        <priority value="OFF"/>
+                        </category>]]>
+                </programlisting>
+        </example>
+        <para>For this category to be used in &SHORT_PLATFORM_NAME;, you need to specify it in <filename>JBOSS_HOME/server/default/conf/mss-sip-stack.properties</filename>, add the <literal>gov.nist.javax.sip.LOG4J_LOGGER_NAME=gov.nist</literal> property, and set the <literal>gov.nist.javax.sip.TRACE_LEVEL=LOG4J</literal> property.</para>
 -->
->>>>>>> a0a62a4... modified all chapters with MSS for AS7 update
   </section>
+
+
 </section>

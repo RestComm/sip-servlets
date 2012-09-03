@@ -34,10 +34,10 @@ This feature is not yet implemented in &SHORT_PLATFORM_NAME; for JBoss AS7. This
 </para>
 </note>
 
-		<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-Telscale-snmp-adaptor.xml"/>
+		<!--xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-Telscale-snmp-adaptor.xml"/-->
  
 
-  <section>
+  <!--section>
     <title>&PLATFORM_NAME; SIP Servlets Jopr Monitoring and Management</title>
     <para>This chapter provides information on how to enable the management of
     &PLATFORM_NAME; SIP Servlets Servers through Jopr with our custom Jopr plug in.
@@ -58,7 +58,7 @@ This feature is not yet implemented in &SHORT_PLATFORM_NAME; for JBoss AS7. This
       </section>
       <section>
         <title>Jopr for Production</title>
-<!--Ticket #709 - Editor Comment - this list should be a procedure, and expanded to explain the process a bit more thoroughly.-->        <itemizedlist>
+	 <itemizedlist>
           <listitem>
             <para>Follow the <ulink url="http://jboss.org/community/docs/DOC-12828">Jopr installation instructions</ulink> to install the latest version of Jopr.</para>
           </listitem>
@@ -88,7 +88,7 @@ This feature is not yet implemented in &SHORT_PLATFORM_NAME; for JBoss AS7. This
     </section>
     <section>
       <title>Usage Instructions</title>
-<!--Issue #706 Editor Note - if you made these <sections> into <procedures>, (for example "Using Jopr for Development" and "Using Jopr for Production") you would avoid some of the 5 level headings you have here.  Also consider the usage of images in this section.  Do they *really* enhance the user's understanding of the step?  Think about writing about the images and documenting the critical fields that the user must complete.-->      <section id="emom-Embedded-Jopr">
+<section id="emom-Embedded-Jopr">
         <title>Jopr for Development</title>
         <itemizedlist>
           <listitem>
@@ -99,7 +99,7 @@ This feature is not yet implemented in &SHORT_PLATFORM_NAME; for JBoss AS7. This
             <para>From the tree on the left side of the screen, under Services
             , click on the <guimenuitem>MobicentsSipServlets</guimenuitem> link, then click on the
             <guimenuitem>jboss.web:type=SipApplicationDispatcher</guimenuitem> link to view the incoming metrics.</para>
-<!--Issue #706 Editor note - I have converted  all screenshots from <mediaobjects> to <figures> for you :)  I've also set the width attribute to 700 (<imagedata width="700") (usually, the limit for good formatting in HTML is 450).  The images, due to their size, were scaling off the html page.  For massive screenshots like this, consider capturing only the section of the screen that you are discussing in each step.  It will mean the information in the screenshot is more useful to the reader.-->            <figure>
+<figure>
               <title>&PLATFORM_NAME; SIP Servlets Server Metrics</title>
               <mediaobject>
                 <imageobject>
@@ -174,7 +174,7 @@ This feature is not yet implemented in &SHORT_PLATFORM_NAME; for JBoss AS7. This
       </section>
       <section id="emom-Jopr4Production">
         <title>Jopr For Production</title>
-<!--Issue #706 Editor Comment - make the step wording the same as Jopr for Development (for consistency)-->        <itemizedlist>
+	<itemizedlist>
           <listitem>
             <para>Log in to the Jopr console on <ulink url="http://localhost:7080/" type="">http://localhost:7080</ulink>.</para>
             <para>From the <guilabel>Dashboard</guilabel> tab, in the Auto Discovery portlet, import your
@@ -320,9 +320,9 @@ This feature is not yet implemented in &SHORT_PLATFORM_NAME; for JBoss AS7. This
     Load Balancer Jopr plug in.</para>
     <para>With the &PLATFORM_NAME; SIP Load Balancer Jopr plug in, you can currently
     see metrics, configure and manage the &PLATFORM_NAME; SIP Load Balancer.</para>
-<!--Issue #706 Editor Comment - consider changing the sections to <procedures>.-->    <section>
+ <section>
       <title>Installation of the Enterprise Monitoring and Management Console</title>
-<!--Issue #706 Editor comment - Don't forget: Itemised list para items should be complete sentences, therefore they should be finished with a full stop.  Likewise, they should start with a capital letter :)-->      <itemizedlist>
+    <itemizedlist>
         <listitem>
           <para>Follow the <ulink url="http://jboss.org/community/docs/DOC-12828">Jopr installation instructions</ulink> to install the latest version of Jopr.</para>
         </listitem>
@@ -348,9 +348,9 @@ This feature is not yet implemented in &SHORT_PLATFORM_NAME; for JBoss AS7. This
         </listitem>
       </itemizedlist>
     </section>
-<!--Issue #706 Editor Comment - consider changing the sections to <procedures>.-->    <section>
+<section>
       <title>Usage Instructions</title>
-<!--Issue #706 Editor Comment - Remember, try to keep one succinct step per procedural step.  Too many substeps in a single step confuses the reader.  Also, usage instructions like this should be numbered (which would be automatic in a <procedure> to assist the reader. :)-->      <itemizedlist>
+	<itemizedlist>
         <listitem>
           <para>Log in to the Jopr console from the <guilabel>Dashboard</guilabel> tab, in
           the Auto Discovery portlet and import your &PLATFORM_NAME; SIP Load Balancer
@@ -368,7 +368,7 @@ This feature is not yet implemented in &SHORT_PLATFORM_NAME; for JBoss AS7. This
         <listitem>
           <para>From the Dashboard, in the Recently Added Resources
           portlet, click on the &PLATFORM_NAME; SIP Load Balancer.</para>
-<!--Issue #706 Editor Comment - because you have described the location of the item so well, you don't actually need the screenshot here.  Save maintenance and use this writing technique in as many procedures as you can.-->          <figure>
+	<figure>
             <title/>
             <mediaobject>
               <imageobject>
@@ -426,5 +426,5 @@ This feature is not yet implemented in &SHORT_PLATFORM_NAME; for JBoss AS7. This
         </listitem>
       </itemizedlist>
     </section>
-  </section>
+  </section-->
 </chapter>
