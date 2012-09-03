@@ -78,7 +78,7 @@ started in 22148ms - Started 222 of 306 services (83 services are passive or on-
 
 </screen>
 <para>
-You will notice that the startup is very fast. The reason for this is that services like High Availability and SIP are no longer started by default. This provides better system resource management. With the simple startup above, you will be able to enter the default web interface of the application server by going to this url http://127.0.0.1:8080. The result will show a screenshot similar to the one below.
+You will notice that the startup is very fast. The reason for this is that JBoss was rewritten from the ground up for speed with services being started concurrently and non critical services remain passive until first use. This provides better system resource management. With the simple startup above, you will be able to enter the default web interface of the application server by going to this url http://127.0.0.1:8080. The result will show a screenshot similar to the one below.
 </para>
 
 
