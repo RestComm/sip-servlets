@@ -310,18 +310,14 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
 		<literal>-DlogLevel=DEBUG</literal> will allow you to switch all loggig categories to the specified log level.</para>
         </step>
         <step>
-          <title>Configure the <filename>server.xml</filename> configuration file</title>
-          <para>Ensure the following attributes are configured for the <literal>&lt;service&gt;</literal> element in <filename>server.xml</filename>.</para>
-          <itemizedlist>            
-            <listitem>
-              <para>The <literal>balancers</literal> attribute must contain a IP address (or list of addresses) of the SIP load balancer(s) to which heartbeat information will be sent.</para>
-            </listitem>
+          <title>Configure the container configuration file</title>
+          <para>Ensure the following attributes are configured for the <literal>&lt;service&gt;</literal> element in <filename>server.xml</filename> for Tomcat or in the mobicents <literal>subsystem</literal> element for JBoss AS7.</para>
+          <itemizedlist>                        
             <listitem>
               <para>The <literal>sipPathName</literal> attribute must contain the following value <literal>org.mobicents.ha</literal> to indicate that the server will be using the &PLATFORM_NAME; JAIN SIP HA SIP Stack which is an extension of the JAIN SIP Stack offering transparent replication.</para>
             </listitem>
           </itemizedlist>
         </step>
-        <!-- Is needed on JB5 Version only -->
 		<step>
           <title>Configure the <filename>mss-sip-stack.properties</filename> configuration file</title>          
           <itemizedlist>
@@ -344,10 +340,10 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
       <note>
         <title>Configuration File Locations</title>
         <para>On &SHORT_PLATFORM_NAME; for Tomcat server installations, <filename>server.xml</filename> is located in <filename>&lt;install_directory&gt;/conf</filename>.</para>
-        <para>On &SHORT_PLATFORM_NAME; for JBoss server installations, the default <filename>server.xml</filename> configuration file is located
-         in <filename>server/default/deploy/jboss-web.sar</filename> (or <filename>server/default/deploy/jboss-web.deployer</filename> for JBoss Application Server 4.x and EAP 4.x).</para>
-        <para>On &SHORT_PLATFORM_NAME; for JBoss installations, with JBoss clustering support enabled, the &quot;all&quot; <filename>server.xml</filename> file must be configured.  It is located in <filename>server/all/deploy/jboss-web.deployer</filename>.</para>
-        <para>To determine what profile should be altered for each &SHORT_PLATFORM_NAME; for JBoss installation, refer to <xref linkend="ssfjcs-SS_for_JBoss-Clustering_Support"/>.</para>
+        <para>On &SHORT_PLATFORM_NAME; for JBoss server installations, the default <filename>standalone-sip.xml</filename> configuration file is located
+         in <filename>standalone/configuration</filename></para>
+        <!--para>On &SHORT_PLATFORM_NAME; for JBoss installations, with JBoss clustering support enabled, the &quot;all&quot; <filename>server.xml</filename> file must be configured.  It is located in <filename>server/all/deploy/jboss-web.deployer</filename>.</para>
+        <para>To determine what profile should be altered for each &SHORT_PLATFORM_NAME; for JBoss installation, refer to <xref linkend="ssfjcs-SS_for_JBoss-Clustering_Support"/>.</para-->
       </note>
       <formalpara>
         <title>Easy Node Configuration with JMX</title>
@@ -440,18 +436,18 @@ INFO: Node registry started</screen>
         <step>
           <title>Configure SIP Server Nodes</title>
           <para>SIP Servlets Server nodes can run on the JBoss Application Server, or the Tomcat Servlet Container.  The SIP Servlets Server binary distributions define the type of SIP Servlets Server nodes used, and should already be installed from <xref linkend="sslb-binary-SIP_Load_Balancer-Software_Prerequisites"/>.</para>
-          <para>The <filename>server.xml</filename> file specifies the nodes used.  Because there is more then one client node specified, unique listener ports must be specified for each node to monitor HTTP and/or SIP connections.  <xref linkend="sslb-Changing_the_SIP_Connector_Port_for_Servlet_Server_Nodes"/> describes the affected element in the <filename>server.xml</filename> file.</para>
-          <note>
+          <para>The Tomcat's <filename>server.xml</filename> or JBoss's <filename>standalone-sip.xml</filename> file specifies the nodes used.  Because there is more then one client node specified, unique listener ports must be specified for each node to monitor HTTP and/or SIP connections.  <xref linkend="bsssc-binary-SIP_Servlets_Server-Adding_SIP_Connectors"/> describes the affected element in the configuration file.</para>
+          <!--note>
             <title>Configuration File Location</title>
-            <para>For the JBoss SIP Servlets Server binary distribution, <filename>server.xml</filename> is located in the  <filename>&lt;install_directory&gt;/server/all/deploy/jboss-web.deployer/</filename> directory (for JBoss Application Server 4.x or EAP 4.x <filename>&lt;install_directory&gt;/server/all/deploy/jboss-web.deployer/</filename>).  For the Tomcat binary distribution, <filename>server.xml</filename> is located in the <filename>&lt;install_directory&gt;/conf/</filename> directory.</para>
+            <para>For the JBoss SIP Servlets Server binary distribution, the configuration file is located at <filename>&lt;install_directory&gt;/standalone/configuration/standalone-sip.xml</filename>.  For the Tomcat binary distribution, the configuration file is located at <filename>&lt;install_directory&gt;/conf/server.xml</filename>.</para>
           </note>
           <example id="sslb-Changing_the_SIP_Connector_Port_for_Servlet_Server_Nodes">
-            <title>Changing the SIP Connector Port for Servlet Server Nodes in server.xml</title>
+            <title>Changing the SIP Connector Port for Servlet Server Nodes in configuration file</title>
             <programlisting linenumbering="unnumbered" role="XML">
-<![CDATA[<!-- Define a SIP Connector -->
+<![CDATA[
 <Connector port="5080"]]>
             </programlisting>
-          </example>
+          </example-->
         </step>
         <step>
           <title>Start Load Balancer Client Nodes</title>
@@ -470,7 +466,7 @@ INFO: Node registry started</screen>
         <title>Testing Load Balancing</title>
         <step>
           <title>Deploy an Application</title>
-          <para>Ensure that for each node, the DAR file location is specified in the <filename>server.xml</filename> file.</para>
+          <para>Ensure that for each node, the DAR file is the same.</para>
           <para>Deploy the Location service manually on both nodes.</para>
         </step>
         <step>
@@ -524,18 +520,21 @@ INFO: Stopping the sip forwarder</screen>
 <!--Issue #822 Editor Comment - This paragraph block needs to be converted into a <procedure>.-->      <warning>
         <para>Pure IP load balancing is not a recommented option. It is advised to use a distributed load balancer instead. Proper operation with pure IP load balancing depends on the ability of the IP load balancer to establish request affinity based on IP addresses and ports.</para>
       </warning>
-    </section>
-    <section>
-      <title></title>
-      <para>First you need to remove the SIP load balancers from any configuration in &SHORT_PLATFORM_NAME;. In particular the <literal>balancers</literal> 
-      attribute in <filename>server.xml</filename>.   and edit the jboss.web  engine tag. You should remove the balancers attribute from the Service tag of 
+      <para>First you need to remove the SIP load balancers from any configuration in &SHORT_PLATFORM_NAME;. In particular the <literal>org.mobicents.ha.javax.sip.BALANCERS</literal> 
+      attribute in <filename>mss-sip-stack.properties</filename>. You should remove the balancers attribute from the Service tag of 
       jboss.web service. This simply removes the default load balancer from the system and the traffic bypasses the SIP load-balancer. Next you must configure
        &SHORT_PLATFORM_NAME; to put the IP load balancer IP address in the <literal>Via</literal>, <literal>Contact</literal> and other system headers where 
        the IP address of the server machine is required. This will ensure that any responses or subsequent SIP requests follow the same path, but always hit 
        the load balancer instead of particular cluster node that may fail.  To specify the IP load balancer address in &SHORT_PLATFORM_NAME; your should edit
-        this file <filename>JBOSS_HOME/server/all/deploy/jboss-web.deployer/server.xml</filename> and specify <literal>staticServerAddress</literal> such as: </para>
+        this file on Tomcat <filename>CATALINA_HOME/conf/server.xml</filename> and specify <literal>staticServerAddress</literal> such as: </para>
       <programlisting>&lt;Connector port=&quot;5080&quot; 
      ipAddress = &quot;${jboss.bind.address}&quot;
+     ...
+staticServerAddress=&quot;122.122.122.122&quot; staticServerPort=&quot;44&quot; 
+useStaticAddress=&quot;true&quot;/&gt;
+</programlisting>
+	<para> and edit this file on JBoss <filename>JBOSS_HOME/standalone/configuration/standalone-sip.xml</filename> and specify <literal>staticServerAddress</literal> such as: </para>
+      <programlisting>&lt;socket-binding name=&quot;sip-udp&quot; port=&quot;5080&quot;
      ...
 staticServerAddress=&quot;122.122.122.122&quot; staticServerPort=&quot;44&quot; 
 useStaticAddress=&quot;true&quot;/&gt;

@@ -40,24 +40,43 @@ I've changed them for you so you can see how the nesting is better.
 Please see the following link to learn how to deploy jar files in &SHORT_PLATFORM_NAME; for JBoss AS7. 
 </para>
 
-<ulink url="https://docs.jboss.org/author/display/AS7/How+do+I+migrate+my+application+from+AS5+or+AS6+to+AS7"> Migrating from AS5, AS6 to AS7</ulink>
-<!--   
+<!--ulink url="https://docs.jboss.org/author/display/AS7/How+do+I+migrate+my+application+from+AS5+or+AS6+to+AS7"> Migrating from AS5, AS6 to AS7</ulink-->
+   
     <procedure>
-      <title>Installing DFCAR on JBoss 5.1.x</title>
+      <title>Installing DFCAR on JBoss AS7</title>
 
       <step>
         <title>Deploy the DFCAR</title>
-        <para>Drop the <filename>dfcar.jar</filename> from the ECharts distribution package in the
-      <literal>JBOSS_HOME/server/default/deploy/jbossweb.sar/ </literal>directory.</para>
+        <para>Create a directory under <literal>JBOSS_HOME/modules/org/echarts/</literal></para>
+	<para>Drop the <filename>dfcar.jar</filename> from the ECharts distribution package in the
+      <literal>JBOSS_HOME/modules/org/echarts/ </literal>directory.</para>
+	<para>Create a <literal>module.xml</literal> file under the same directory with the following contents</para>
+	<programlisting><![CDATA[<module xmlns="urn:jboss:module:1.1" name="org.echarts">
+<resources>
+<resource-root path="dfcar.jar"/>
+</resources>
+<dependencies>
+<module name="org.apache.log4j"/>
+<module name="org.mobicents.javax.servlet.sip"/>
+</dependencies>
+</module>]]></programlisting>
       </step>
       <step>
         <title>Remove the DAR</title>
         <para>Remove the &PLATFORM_NAME; Default Application Router
       located in 
-      <literal>JBOSS_HOME/server/default/deploy/jbossweb.sar/sip-servlets-application-router-*.jar</literal>.</para>
+      <literal>JBOSS_HOME/modules/org/mobicents/dar</literal>.</para>
       </step>
-
+      <step>
+	<title>Use the DFC DAR</title>
+        <para>In <literal>JBOSS_HOME/modules/org/jboss/as/web/main/module.xml</literal>, replace the following line </para>
+	<programlisting><![CDATA[<module name="org.mobicents.dar" export="true"/>]]></programlisting>
+	<para>by this one</para>
+	<programlisting><![CDATA[<module name="org.echarts" export="true"/>]]></programlisting>	
+	<para>
+	</para>
+      </step>
     </procedure>
--->
+
   </section>
 </section>

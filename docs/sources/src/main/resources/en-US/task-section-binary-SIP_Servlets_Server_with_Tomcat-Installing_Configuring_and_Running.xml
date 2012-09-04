@@ -70,7 +70,7 @@ If you get an error message about environment variables or Java, make sure you h
 Setting Environment Variables - JAVA and CATALINA
 </para>
 
-<para> <xref linkend="setting-jboss-ENV-variable-windows-unix"/></para>
+<para> <xref linkend="setting-CATALINA_HOME-ENV-linux-windows"/></para>
 
 
 
@@ -78,7 +78,7 @@ Setting Environment Variables - JAVA and CATALINA
 <title>Testing Click2CallAsync with &SHORT_PLATFORM_NAME; for Tomcat 7 </title>
 
 <para>
-If &SHORT_PLATFORM_NAME; for Tomcat 7 is started and running, you should be able to use your web browser to access the welcome page at this url http://127.0.0.1:8080/ This will show you a screenshot similar to the one below.
+If &SHORT_PLATFORM_NAME; for Tomcat 7 is started and running, you should be able to use your web browser to access the welcome page at this url <ulink url="http://127.0.0.1:8080/">http://127.0.0.1:8080/</ulink> This will show you a screenshot similar to the one below.
 </para>
 
 
@@ -87,7 +87,7 @@ If &SHORT_PLATFORM_NAME; for Tomcat 7 is started and running, you should be able
               <title>JBoss Application Server 7 Welcome Page</title>
               <mediaobject>
                 <imageobject>
-                  <imagedata width="700" fileref="images/welcome-page-Mss-JBoss-AS7.png"/>
+                  <imagedata width="700" fileref="images/welcome-page-MSS-Tomcat-7.png"/>
                 </imageobject>
               </mediaobject>
             </figure>
@@ -103,7 +103,7 @@ Deploying your application once the server is running is simple. You need to cop
 </para>
 
 <para>
-Start your web browser and go to the link, http://127.0.0.1:8080/Click2CallAsync/
+Start your web browser and go to the link, <ulink url="http://127.0.0.1:8080/Click2CallAsync/">http://127.0.0.1:8080/Click2CallAsync/</ulink>
 </para>
 
 <note>
@@ -174,7 +174,7 @@ Leave the rest of the settings as default.
 </screen>
 
 <para>
-Once the softphones are configured and are successfully registered with with the &SHORT_PLATFORM_NAME; for Tomcat 7 server, you will see a screenshot like the one below in the web browser at this url http://127.0.0.1:8080/Click2CallAsync/
+Once the softphones are configured and are successfully registered with the &SHORT_PLATFORM_NAME; for Tomcat 7 server, you will see a screenshot like the one below in the web browser at this url <ulink url="http://127.0.0.1:8080/Click2CallAsync/">http://127.0.0.1:8080/Click2CallAsync/</ulink>
 </para>
 
 <para>

@@ -69,7 +69,7 @@ $AS7_HOME/bin/standalone.sh
 </screen>
 
 <para>
-During the startup process, you will notice that the final part of the log output will be similar to the truncated output below. Notice that the Admin Console interface can be accessed at http://172.0.0.1:9990. This will be explained later. 
+During the startup process, you will notice that the final part of the log output will be similar to the truncated output below. Notice that the Admin Console interface can be accessed at <ulink url="http://172.0.0.1:9990">http://172.0.0.1:9990</ulink>. This will be explained later. 
 </para>
 <screen>
 14:28:43,972 INFO  [org.jboss.as] (Controller Boot Thread) JBAS015951: Admin console listening on http://127.0.0.1:9990
@@ -136,7 +136,7 @@ If you want to start &SHORT_PLATFORM_NAME; with SIP services activated, you need
 
 
 <para>
-The click2call SIP sample application bundled with &SHORT_PLATFORM_NAME; will become available at this url http://127.0.0.1:8080/click2call. You can configure multiple SIP softphones to use the sample application. See the section below for how to configure and test the SIP sample application.
+The click2call SIP sample application bundled with &SHORT_PLATFORM_NAME; will become available at this url <ulink url="http://127.0.0.1:8080/click2call">http://127.0.0.1:8080/click2call</ulink>. You can configure multiple SIP softphones to use the sample application. See the section below for how to configure and test the SIP sample application.
 </para>
 </section>
 
@@ -196,7 +196,7 @@ A correctly configured Linphone will look like the screenshot below.
 
 
 <para>
-Once the phones are successfully registered with the &SHORT_PLATFORM_NAME; for JBoss AS7 server, you can check the result in the sample SIP application at this url, http://127.0.0.1:8080/click2call/
+Once the phones are successfully registered with the &SHORT_PLATFORM_NAME; for JBoss AS7 server, you can check the result in the sample SIP application at this url, <ulink url="http://127.0.0.1:8080/click2call">http://127.0.0.1:8080/click2call</ulink>
 </para>
 
 
@@ -359,7 +359,7 @@ sample application running and your softphones are connected to the server.
 </formalpara>
 
 <para>
-There is also a SIP servlets management console that is available at this url http://127.0.0.1:8080/sip-servlets-management. The resulting page will be similar to the screenshot below. More information will be provided about the SIP servlets management console in later chapters of this guide. 
+There is also a SIP servlets management console that is available at this url  <ulink url="http://127.0.0.1:8080/sip-servlets-management">http://127.0.0.1:8080/sip-servlets-management</ulink>. The resulting page will be similar to the screenshot below. More information will be provided about the SIP servlets management console in later chapters of this guide. 
 </para>
 
 <para>
@@ -383,7 +383,7 @@ There is also a SIP servlets management console that is available at this url ht
 <title>Accessing Management Console </title>
 
 <para>
-&SHORT_PLATFORM_NAME; for JBoss AS7 provides a management console that can be useful for accessing vital information about your server. In the welcome page that appears when you access  http://127.0.0.1:8080, there is a link that points to  the Administration Console. 
+&SHORT_PLATFORM_NAME; for JBoss AS7 provides a management console that can be useful for accessing vital information about your server. In the welcome page that appears when you access <ulink url="http://127.0.0.1:8080">http://127.0.0.1:8080</ulink>, there is a link that points to  the Administration Console. 
 </para>
 
 <para>
@@ -415,7 +415,7 @@ Go to the $JBoss_HOME/bin directory and run the ./add-user.sh script. You can fo
 </para>
 
 <para>
-Once the user account has been created, you can access the Administration Console at this address http://127.0.0.1:9990/console/ 
+Once the user account has been created, you can access the Administration Console at this address <ulink url="http://127.0.0.1:9990/console/">http://127.0.0.1:9990/console/</ulink>
 </para>
 
 <para>

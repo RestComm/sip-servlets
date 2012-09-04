@@ -15,7 +15,7 @@
 <chapter>
 <title>Clustering and High Availability</title>
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_for_JBoss-Clustering_Support.xml"/>
-<xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_for_JBoss-Failover_Support.xml"/>
+<!--xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_for_JBoss-Failover_Support.xml"/-->
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_Load_Balancer.xml"/>
 </chapter>
 <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-Enterprise-Monitoring-Operations-Management.xml"/>

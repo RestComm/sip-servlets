@@ -194,17 +194,17 @@
         </figure>
         <important>
           <title>Persistent Settings</title>
-          <para>Concurrency and congestion control settings altered through the SIP Servlets Management Console are not saved to the <filename>server.xml</filename>  or the <filename>standalone-sip.xml</filename>configuration file.  </para>
+          <para>Concurrency and congestion control settings altered through the SIP Servlets Management Console are not saved to the <filename>server.xml</filename> on Tomcat, only on JBoss AS7 through the <filename>standalone-sip.xml</filename>configuration file.  </para>
           <para>To make settings persistent, append the settings to  the <filename>server.xml</filename> file directly.  </para>
         </important>
       </listitem>
     </varlistentry>
     <varlistentry>
-      <term>Making your changes permanent in <filename>standalone-sip.xml</filename></term>
+      <term>Making your changes permanent in <filename>standalone-sip.xml</filename> or <filename>server.xml</filename> by manual editing</term>
       <listitem>
         <para>Alternatively, you can edit your server&apos;s
-        <filename>standalone-sip.xml</filename> configuration file, which has the
-        benefit of making your chosen settings changes permanent. Instructions
+        <filename>standalone-sip.xml</filename> or <filename>server.xml</filename> configuration file, which has the
+        benefit of making your chosen settings changes permanent for Tomcat. Instructions
         follow, grouped by the SIP Servlets Server you are running:</para>
         <procedure>
           <title>Tuning &PLATFORM_NAME; SIP Servlets for JBoss Server Settings for Concurrency and Congestion Control</title>
@@ -366,7 +366,7 @@ Extract from stanalone-sip.xml file with conccurency configuration
         &PLATFORM_NAME; SIP Servlets for JBoss&apos;s JMX console. </para>
         <para>All changes performed
         at run time are effective immediately, but do not persist across
-        reboots.  As with JBoss and Tomcat, the   <filename>server.xml</filename> must be appended with the settings in order to make the configuration persistent.</para>
+        reboots for Tomcat, only on JBoss AS7.  the <filename>server.xml</filename> must be appended with the settings in order to make the configuration persistent.</para>
         <para>When editing the <literal>dispatcher</literal> MBean from
         &PLATFORM_NAME; SIP Servlets for JBoss&apos;s JMX console, values allowed for the
         concurrency control mode are <userinput>None</userinput>,
@@ -374,11 +374,11 @@ Extract from stanalone-sip.xml file with conccurency configuration
         <userinput>SipApplicationSession</userinput>.</para>
       </listitem>
     </varlistentry>
-    <varlistentry>
+    <!--varlistentry>
       <term>Tuning Parameters from Enterprise Monitoring and Managent Console</term>
       <listitem>
         <para>If  the Enterprise Monitoring and Managenemt console is installed as described in <xref linkend="emom-Enterprise-Monitoring-Operations-Management"/>, the tunable parameters can be altered by  following the instructions  in <xref linkend="emom-Embedded-Jopr"/> or <xref linkend="emom-Jopr4Production"/></para>
       </listitem>
-    </varlistentry>
+    </varlistentry-->
   </variablelist>
 </section>

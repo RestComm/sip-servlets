@@ -212,7 +212,7 @@ See the example chapters for more information about the Application Router Confi
 
 
 
-    <para>In order to configure the application router for Tomcat, you should edit the <literal>Service</literal> element in the container's <filename>server.xml</filename> configuration file:</para>
+    <para>In order to configure the application router for Tomcat, you should edit the <literal>Service</literal> element in the container's <filename>server.xml</filename> configuration file</para>
 
 
     <example id="bsssc-Configuring_the_Service_Element_in_the_Containers_server.xml">
@@ -237,6 +237,20 @@ See the example chapters for more information about the Application Router Confi
  canceledTimerTasksPurgePeriod="1">]]>
  </programlisting>
     </example>
+
+<para>For &SHORT_PLATFORM_NAME; for JBoss AS7 this is located in standalone-sip.xml file :</para>
+
+<example id="bsssc-Configuring_the_mobicents_subsystem_in_the_Containers_standalone-sip.xml">
+      <title>Configuring the Mobicents SubSystem Element in the Container&apos;s standalone.xml</title>
+      <programlisting linenumbering="unnumbered" role="XML"><![CDATA[
+  <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" application-router="dars/mobicents-dar.properties" stack-properties="mss-sip-stack.properties" path-name="gov.nist" app-dispatcher-class="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" concurrency-control-mode="SipApplicationSession" congestion-control-interval="-1">
+            <connector name="sip-udp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-udp"/>
+            <connector name="sip-tcp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tcp"/>
+            <connector name="sip-tls" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tls"/>
+        </subsystem>]]>
+ </programlisting>
+    </example>
+
     <variablelist>
       <title>SIP Service element attributes</title>
       <varlistentry>
@@ -398,8 +412,12 @@ See the example chapters for more information about the Application Router Confi
     <title>SIP Servlets Server Logging</title>
  
 <para>
-Logging is an important part of working with &PLATFORM_NAME; for JBoss AS7. There are a few files that you need to be familiar with in order to successfully troubleshoot and adapt JBoss server monitoring and logging to your environment.
+Logging is an important part of working with &PLATFORM_NAME;. There are a few files that you need to be familiar with in order to successfully troubleshoot and adapt &SHORT_PLATFORM_NAME; server monitoring and logging to your environment.
 </para>
+
+<formalpara>
+<title>Logging Files for &SHORT_PLATFORM_NAME; for JBoss AS7</title>
+</formalpara>
 
 <para>
 $JBOSS/standalone/configuration/logging.properties
@@ -517,28 +535,36 @@ Configuring the log file name $CATALINA_HOME/lib/log4j.xml
 The result of the extracted configuration above that is taken from the log4j.xml file  and can be found in the $CATALINA_HOME/logs directory. 
 </para>
 
-<!--
+<formalpara>JAIN-SIP Stack Logging</formalpara>
    <para>There are two separate levels of logging:</para>
     <itemizedlist>
       <listitem>
-        <para>Logging at the container level, which can be configured using the <filename>log4j.xml</filename> configuration file, usually located in the container&apos;s <filename>lib</filename> directory.</para>
+        <para>Logging at the container level, which can be configured using the <filename>log4j.xml</filename> or <filename>standalone-sip.xml</filename> configuration file seen above</para>
       </listitem>
       <listitem>
-        <para>Logging of the NIST SIP stack, which is configured in the <literal>Connector</literal> element of the container&apos;s <filename>server.xml</filename> configuration file.</para>
+        <para>Logging of the JAIN SIP stack, which is configured through the container logging and the SIP stack properties themselves</para>
       </listitem>
     </itemizedlist>
-    <para>You can setup the logging so that the NIST SIP Stack will log into the container logs.</para>
-        <para>To use LOG4J in NIST SIP Stack, you need to define a category in <filename>JBOSS_HOME/server/default/conf/jboss-log4j.xml</filename> and set it to <literal>off</literal>.</para>
+    <para>You can setup the logging so that the JAIN SIP Stack will log into the container logs.</para>
+        <para>To use LOG4J in JAIN SIP Stack in Tomcat, you need to define a category in <filename>CATALINE_HOME/lib/jboss-log4j.xml</filename> and set it to <literal>DEBUG</literal>.</para>
         <example id="bsssc-Configuring_the_Stack_Logs_in_the_Container_log4j.xml">
-                <title>Configuring the NIST SIP Stack to log into the Container&apos;s logs</title>
+                <title>Configuring the JAIN SIP Stack to log into the Tomcat Container&apos;s logs</title>
                 <programlisting linenumbering="unnumbered" role="XML"><![CDATA[
                         <category name="gov.nist">
-                        <priority value="OFF"/>
+                        <priority value="DEBUG"/>
                         </category>]]>
                 </programlisting>
         </example>
-        <para>For this category to be used in &SHORT_PLATFORM_NAME;, you need to specify it in <filename>JBOSS_HOME/server/default/conf/mss-sip-stack.properties</filename>, add the <literal>gov.nist.javax.sip.LOG4J_LOGGER_NAME=gov.nist</literal> property, and set the <literal>gov.nist.javax.sip.TRACE_LEVEL=LOG4J</literal> property.</para>
--->
+        <para>To use LOG4J in JAIN SIP Stack in JBoss, you need to define a logger in <filename>JBOSS_HOME/standalone/configuration/standalone-sip.xml</filename> and set it to <literal>DEBUG</literal>.</para>
+	<example id="bsssc-Configuring_the_Stack_Logs_in_the_Container_standlaone-sip.xml">
+                <title>Configuring the JAIN SIP Stack to log into the JBoss Container&apos;s logs</title>
+                <programlisting linenumbering="unnumbered" role="XML"><![CDATA[
+                        <logger category="gov.nist">
+                		<level name="DEBUG"/>
+            		</logger>]]>
+                </programlisting>
+        </example>
+        <para>For this category to be used in &SHORT_PLATFORM_NAME;, you need to specify it in <filename>JBOSS_HOME/standalone/configuration/mss-sip-stack.properties</filename> or <filename>CATALINE_HOME/conf/mss-sip-stack.properties</filename>, add the <literal>gov.nist.javax.sip.LOG4J_LOGGER_NAME=gov.nist</literal> property, and set the <literal>gov.nist.javax.sip.TRACE_LEVEL=LOG4J</literal> property.</para>
   </section>
 
 

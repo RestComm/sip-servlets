@@ -14,7 +14,7 @@ Congestion Control, load balancing with the &PLATFORM_NAME; Load Balancer, and, 
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_CDI_Telco_Framework.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_Diameter_Support.xml"/>
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_SIP_Extensions.xml"/>
-  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_JRuby_Teclo_Integration.xml"/>
+  <!--xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_JRuby_Teclo_Integration.xml"/-->
   <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-SS_JSLEE_Interop.xml"/>
   <section>
     <title>Eclipse IDE Tools</title>

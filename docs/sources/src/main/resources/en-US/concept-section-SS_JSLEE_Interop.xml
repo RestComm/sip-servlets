@@ -135,5 +135,5 @@
   Servlets and JSLEE work together. <ulink url="http://mobicents.googlecode.com/files/deruelle-JSleeSipServletsInteroperability-final.pdf">Our &quot;JSLEE and SIP-Servlets Interoperability with Mobicents Communication Platform&quot; paper</ulink> describes our approach and the possible different
   approaches we have identified to achieve the goal of interoperability
   between SIP Servlets and JSLEE.</para>
-  <para>You can also use our <ulink url="http://www.mobicents.org/jslee-sips-interop-demo.html">JSLEE/SIP Servlets interoperability example</ulink>, showcasing our approach.</para>
+  <para>You can also use our <ulink url="https://code.google.com/p/sipservlets/source/browse/#git%2Fsip-servlets-examples%2Fjslee-sips-interop">JSLEE/SIP Servlets interoperability example</ulink>, showcasing our approach.</para>
 </section>

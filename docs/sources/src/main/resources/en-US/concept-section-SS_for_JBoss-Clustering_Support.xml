@@ -10,7 +10,7 @@
 <note>
 <title>High Availability in &SHORT_PLATFORM_NAME; for JBoss AS7 </title>
 <para>
-This feature is not yet implemented in &SHORT_PLATFORM_NAME; for JBoss AS7. This guide will be updated when the feature becomes available.
+Clustering and Failover features as described below are not yet implemented in &SHORT_PLATFORM_NAME; for JBoss AS7. This guide will be updated when the feature becomes available.
 </para>
 
 </note>
@@ -47,9 +47,9 @@ Failover is a way to provide continuous service to clients connecting to an appl
 It is important to note that clustering is also a way to provide failover and enhance server performance. The same can be said of load balancing. The idea behind all the above mentioned techniques is to provide high availability to connecting clients connecting to applications running on &PLATFORM_NAME;. In a nutshell, high availability englobes all the above mentioned techniques.
 </para>
 
-  <para>&PLATFORM_NAME; supports the clustering of SIP Servlets-enabled JBoss Application Servers for performance, reliability and failover purposes. Note that only &SHORT_PLATFORM_NAME; for JBoss Servers can be used as cluster nodes; &SHORT_PLATFORM_NAME; for Tomcat Containers are not supported.</para>
+  <!--para>&PLATFORM_NAME; supports the clustering of SIP Servlets-enabled JBoss Application Servers for performance, reliability and failover purposes. Note that only &SHORT_PLATFORM_NAME; for JBoss Servers can be used as cluster nodes; &SHORT_PLATFORM_NAME; for Tomcat Containers are not supported.</para>
   <para>The SIP Servlets Server uses the  JBoss Application Server as its servlet container, and takes advantage of its capabilities, including clustering and failover.  For detailed background information about JBoss Application Server clustering refer to the <ulink url="http://www.jboss.org/file-access/default/members/jbossas/freezone/docs/Clustering_Guide/beta422/html/index.html">JBoss Application Server Clustering Guide</ulink>.</para>
-<!-- SIP Servlets Server Cluster -->  <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Installing_Configuring_and_Running">
+	<section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-Installing_Configuring_and_Running">
     <title>SIP Servlets Server Cluster: Installing, Configuring and Running</title>
     <para>&nbsp;</para>
     <section id="ssfjcs-binary-SIP_Servlets_Server_Cluster-PreInstall_Requirements_and_Prerequisites">
@@ -252,16 +252,16 @@ In both cases, sessions are passivated on a Least Recently Used (LRU) basis.
 			    <programlisting role="XML">
 					   &lt;property name=&quot;cacheLoaderConfig&quot;&gt;
 			             &lt;bean class=&quot;org.jboss.cache.config.CacheLoaderConfig&quot;&gt;
-			                    &lt;!-- Do not change these --&gt;
+			                    &lt;!&ndash;&ndash; Do not change these &ndash;&ndash;&gt;
 			                    &lt;property name=&quot;passivation&quot;&gt;true &lt;/property&gt;			                   
 			                    &lt;property name=&quot;shared&quot;&gt;false &lt;/property&gt;
 			                   
 			                    &lt;property name=&quot;individualCacheLoaderConfigs&quot;&gt;
 			                      &lt;list&gt;
 			                         &lt;bean class=&quot;org.jboss.cache.loader.FileCacheLoaderConfig&quot;&gt;
-			                            &lt;!-- Where passivated sessions are stored --&gt;
+			                            &lt;!&ndash;&ndash; Where passivated sessions are stored &ndash;&ndash;&gt;
 			                            &lt;property name=&quot;location&quot;&gt;${jboss.server.data.dir}${/}session &lt;/property&gt;
-			                            &lt;!-- Do not change these --&gt;
+			                            &lt;!&ndash;&ndash; Do not change these &ndash;&ndash;&gt;
 			                            &lt;property name=&quot;async&quot;&gt;false &lt;/property&gt;
 			                            &lt;property name=&quot;fetchPersistentState&quot;&gt;true &lt;/property&gt;
 			                            &lt;property name=&quot;purgeOnStartup&quot;&gt;true &lt;/property&gt;
@@ -335,12 +335,12 @@ In both cases, sessions are passivated on a Least Recently Used (LRU) basis.
 		     If you are deploying several sipapps and each uses the same set of passivation configurations, you may wish to skip the jboss-web.xml configuration and just change the server-wide defaults.  This can be done by uncommenting the following section in the $JBOSS_HOME/server/xxx/deployers/jbossweb.deployer/META-INF/war-deployers-jboss-beans.xml file's WebAppClusteringDefaultsDeployer and setting the values you desire:
 		    </para>
 		     <programlisting role="XML">
-						  &lt;!--
+						  &lt;!&ndash;&ndash;
 					       &lt;property name=&quot;useSessionPassivation&quot;&gt;false &lt;/property&gt;
 					       &lt;property name=&quot;passivationMaxIdleTime&quot;&gt;-1 &lt;/property&gt;
 					       &lt;property name=&quot;passivationMinIdleTime&quot;&gt;-1 &lt;/property&gt;
-					      --&gt;
+					      &ndash;&ndash;&gt;
 				</programlisting>
 	</section>
-    </section>
+    </section-->
 </section>

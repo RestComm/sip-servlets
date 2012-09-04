@@ -17,7 +17,7 @@
   to discover a public IP address, and then use this address in the SIP messages
   sent through the connector.</para>
   <para>To make a SIP connector STUN-enabled, three attributes must be
-  appended to the <markup>&lt;connector&gt;</markup> child element in the <filename>server.xml</filename>
+  appended to the <markup>&lt;connector&gt;</markup> child element in the <filename>server.xml</filename> or <markup>&lt;socket-binding&gt;</markup> child element in <filename>standalone-sip.xml</filename>
   file. The properties are:<itemizedlist>
       <listitem>
         <para>useStun=&quot;true&quot;</para>
