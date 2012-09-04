@@ -32,10 +32,10 @@ import java.util.StringTokenizer;
 import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
+import javax.sip.SipFactory;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
-import org.apache.catalina.ServerFactory;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
@@ -206,7 +206,9 @@ public class SipEmbedded {
 				Http11Protocol.class.getName());
 		Http11Protocol httpProtocolHandler = (Http11Protocol) httpConnector
 				.getProtocolHandler();		
-		httpProtocolHandler.setPort(port);		
+		httpProtocolHandler.setPort(port);	
+		httpConnector.setPort(port);
+		httpProtocolHandler.setProperty("port", ""+port);
 		httpProtocolHandler.setDisableUploadTimeout(true);
 		httpProtocolHandler.setMaxHttpHeaderSize(8192);
 //		httpProtocolHandler.setMaxSpareThreads(75);
@@ -275,7 +277,7 @@ public class SipEmbedded {
 			} catch (LifecycleException e) {
 				log.error("SipService already stopped ", e);
 			}		
-			ServerFactory.getServer().removeService(sipService);
+			SipFactory.getInstance().resetFactory();
 		}
 	}
 

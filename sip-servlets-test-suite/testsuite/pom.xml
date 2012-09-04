@@ -35,7 +35,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servlet.sip.containers</groupId>
-			<artifactId>sip-servlets-catalina</artifactId>
+			<artifactId>sip-servlets-catalina-7</artifactId>
 			<version>1.8.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
@@ -50,22 +50,15 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mobicents.servlet.sip.containers</groupId>
-			<artifactId>sip-servlets-tomcat-jboss4</artifactId>
+			<artifactId>sip-servlets-tomcat-7</artifactId>
 			<version>1.8.0-SNAPSHOT</version>
 		</dependency>
 		
 		<!-- j2ee dependencies -->
 		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>2.5</version>			
-		</dependency>
-		
-		<!-- j2ee dependencies -->
-		<dependency>
-			<groupId>javax.servlet.jsp</groupId>
-			<artifactId>jsp-api</artifactId>
-			<version>2.1</version>			
+			<groupId>geronimo-spec</groupId>
+			<artifactId>geronimo-spec-j2ee-jacc</artifactId>
+			<version>1.0-rc4</version>
 		</dependency>
 		
 		<!-- logging dependency -->
@@ -134,32 +127,39 @@
 		<!-- Tomcat dependencies -->
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
-			<artifactId>catalina</artifactId>
-			<version>${tomcat.version}</version>
+			<artifactId>tomcat-catalina</artifactId>
+			<version>${tomcat-7.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
-			<artifactId>coyote</artifactId>
-			<version>${tomcat.version}</version>
+			<artifactId>tomcat-coyote</artifactId>
+			<version>${tomcat-7.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.tomcat</groupId>
-			<artifactId>jasper</artifactId>
-			<version>${tomcat.version}</version>
+			<artifactId>tomcat-jasper</artifactId>
+			<version>${tomcat-7.version}</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.tomcat</groupId>
+			<artifactId>tomcat-jsp-api</artifactId>
+			<version>${tomcat-7.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 	<!--  Introduced because of https://issues.apache.org/bugzilla/show_bug.cgi?id=50604, should be removed when we move away from Tomcat's version 6.0.32 -->
-		<dependency>
+		<!--dependency>
 			<groupId>org.eclipse.jdt.core.compiler</groupId>
 			<artifactId>ecj</artifactId>
 			<version>3.5.1</version>
 			<scope>provided</scope>
-		</dependency>
+		</dependency-->
 		
 		<dependency>
 			<groupId>commons-codec</groupId>

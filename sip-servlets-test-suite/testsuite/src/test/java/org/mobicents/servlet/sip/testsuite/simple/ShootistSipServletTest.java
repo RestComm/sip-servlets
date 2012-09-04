@@ -84,7 +84,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		SipStandardContext context = new SipStandardContext();
 		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp");
 		context.setName("sip-test-context");
-		context.setPath("sip-test");
+		context.setPath("/sip-test");
 		context.addLifecycleListener(new SipContextConfig());
 		context.setManager(new SipStandardManager());
 		context.setConcurrencyControlMode(ConcurrencyControlMode.SipApplicationSession);
@@ -100,7 +100,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		SipStandardContext context = new SipStandardContext();
 		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp");
 		context.setName("sip-test-context");
-		context.setPath("sip-test");
+		context.setPath("/sip-test");
 		context.addLifecycleListener(new SipContextConfig());
 		context.setConcurrencyControlMode(ConcurrencyControlMode.SipApplicationSession);
 		context.setManager(new SipStandardManager());
@@ -119,7 +119,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		SipStandardContext context = new SipStandardContext();
 		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp");
 		context.setName("sip-test-context");
-		context.setPath("sip-test");
+		context.setPath("/sip-test");
 		context.addLifecycleListener(new SipContextConfig());
 		context.setManager(new SipStandardManager());
 		if(concurrencyControlMode != null) {
@@ -139,7 +139,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		SipStandardContext context = new SipStandardContext();
 		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/shootist-sip-servlet/src/main/sipapp");
 		context.setName("sip-test-context");
-		context.setPath("sip-test");
+		context.setPath("/sip-test");
 		context.addLifecycleListener(new SipContextConfig());
 		context.setManager(new SipStandardManager());
 		ApplicationParameter applicationParameter = new ApplicationParameter();
