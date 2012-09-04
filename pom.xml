@@ -215,7 +215,7 @@
 				<maven.test.skip>true</maven.test.skip>
 			</properties>
 		</profile>
-		<profile>
+		<!--profile>
 			<id>tomcat</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
@@ -229,7 +229,6 @@
 				<module>containers/sip-servlets-tomcat-jboss4</module>
 			</modules>
 			<dependencies>
-				<!-- j2ee dependencies -->
 				<dependency>
 					<groupId>javax.servlet</groupId>
 					<artifactId>servlet-api</artifactId>
@@ -251,7 +250,6 @@
 				<tomcat.version>6.0.35</tomcat.version>
 			</properties>
 			<dependencies>
-				<!-- j2ee dependencies -->
 				<dependency>
 					<groupId>javax.servlet</groupId>
 					<artifactId>servlet-api</artifactId>
@@ -271,7 +269,6 @@
 				<jboss4.version>4.2.3.GA</jboss4.version>
 			</properties>
 			<dependencies>
-				<!-- j2ee dependencies -->
 				<dependency>
 					<groupId>javax.servlet</groupId>
 					<artifactId>servlet-api</artifactId>
@@ -293,7 +290,6 @@
 				<tomcat.version>6.0.35</tomcat.version>
 			</properties>
 			<dependencies>
-				<!-- j2ee dependencies -->
 				<dependency>
 					<groupId>javax.servlet</groupId>
 					<artifactId>servlet-api</artifactId>
@@ -301,9 +297,12 @@
 					<scope>provided</scope>
 				</dependency>
 			</dependencies>
-		</profile>
+		</profile-->
 		<profile>
 			<id>tomcat-7</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 			<modules>
 				<module>containers/sip-servlets-catalina-7</module>
 				<module>containers/tomcat-7</module>
