@@ -291,6 +291,7 @@ public class SipEmbedded {
 		context.setName(name);
 		context.setPath(path);
 		context.setParent(host);
+		context.setProcessTlds(false);
 		context.addLifecycleListener(new SipContextConfig());
 		context.setManager(new SipStandardManager());
 		host.addChild(context);
@@ -302,6 +303,7 @@ public class SipEmbedded {
 		context.setName(name);
 		context.setPath(path);
 		context.setParent(host);
+		context.setProcessTlds(false);
 		context.setSipApplicationSessionTimeout(appSessionTimeout);
 		context.addLifecycleListener(new SipContextConfig());
 		context.setManager(new SipStandardManager());
@@ -311,6 +313,7 @@ public class SipEmbedded {
 	
 	public boolean deployContext(SipStandardContext context) {
 		context.setParent(host);
+		context.setProcessTlds(false);
 		host.addChild(context);
 		return context.getAvailable();	
 	}

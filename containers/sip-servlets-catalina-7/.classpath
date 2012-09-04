@@ -6,7 +6,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/javax/sip/mobicents-jain-sip-ext/1.1-SNAPSHOT/mobicents-jain-sip-ext-1.1-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/ha/javax/sip/mobicents-jain-sip-ha-core/1.4.0-SNAPSHOT/mobicents-jain-sip-ha-core-1.4.0-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.27/tomcat-annotations-api-7.0.27.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.27/tomcat-catalina-7.0.27.jar" sourcepath="/M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.27/tomcat-catalina-7.0.27-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.27/tomcat-catalina-7.0.27.jar" sourcepath="/TOMCAT_HOME/java"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.27/tomcat-coyote-7.0.27.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.27/tomcat-juli-7.0.27.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.27/tomcat-servlet-api-7.0.27.jar"/>

@@ -573,7 +573,7 @@ public final class ConvergedApplicationContextFacade
         }
     }
 
-
+    @Override
     public boolean setInitParameter(String name, String value) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return ((Boolean) doPrivileged("setInitParameter",

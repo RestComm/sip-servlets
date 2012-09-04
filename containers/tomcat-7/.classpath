@@ -22,7 +22,5 @@
   <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.27/tomcat-api-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-api/7.0.27/tomcat-api-7.0.27-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.27/tomcat-util-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-util/7.0.27/tomcat-util-7.0.27-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.27/tomcat-coyote-7.0.27.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.27/tomcat-coyote-7.0.27-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/geronimo-spec/geronimo-spec-j2ee-jacc/1.0-rc4/geronimo-spec-j2ee-jacc-1.0-rc4.jar"/>
   <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar" sourcepath="M2_REPO/junit/junit/3.8.1/junit-3.8.1-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/javax/javaee-web-api/6.0/javaee-web-api-6.0.jar"/>
 </classpath>

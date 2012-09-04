@@ -15,7 +15,6 @@
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/javax/transaction/jta/1.1/jta-1.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4.4/mail-1.4.4.jar" sourcepath="M2_REPO/javax/mail/mail/1.4.4/mail-1.4.4-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/validation/validation-api/1.0.0.GA/validation-api-1.0.0.GA.jar" sourcepath="M2_REPO/javax/validation/validation-api/1.0.0.GA/validation-api-1.0.0.GA-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/antlr/antlr/2.7.6-brew/antlr-2.7.6-brew.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-collections/commons-collections/3.1/commons-collections-3.1.jar"/>
@@ -32,7 +31,7 @@
   <classpathentry kind="var" path="M2_REPO/org/jacorb/jacorb/2.3.2.jbossorg-0/jacorb-2.3.2.jbossorg-0.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/jandex/1.0.3.Final/jandex-1.0.3.Final.jar" sourcepath="M2_REPO/org/jboss/jandex/1.0.3.Final/jandex-1.0.3.Final-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/web/jasper-jdt/7.0.3.Final/jasper-jdt-7.0.3.Final.jar" sourcepath="M2_REPO/org/jboss/web/jasper-jdt/7.0.3.Final/jasper-jdt-7.0.3.Final-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/javax/javaee-web-api/6.0/javaee-web-api-6.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.27/tomcat-servlet-api-7.0.27.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/spec/javax/annotation/jboss-annotations-api_1.1_spec/1.0.1.Final/jboss-annotations-api_1.1_spec-1.0.1.Final.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/as/jboss-as-build-config/7.1.2.Final/jboss-as-build-config-7.1.2.Final.jar" sourcepath="M2_REPO/org/jboss/as/jboss-as-build-config/7.1.2.Final/jboss-as-build-config-7.1.2.Final-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/as/jboss-as-clustering-api/7.1.2.Final/jboss-as-clustering-api-7.1.2.Final.jar" sourcepath="M2_REPO/org/jboss/as/jboss-as-clustering-api/7.1.2.Final/jboss-as-clustering-api-7.1.2.Final-sources.jar"/>

@@ -70,7 +70,5 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-core-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-catalina-7"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/tomcat-7"/>
-	<classpathentry kind="var" path="M2_REPO/javax/javaee-web-api/6.0/javaee-web-api-6.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/geronimo-spec/geronimo-spec-j2ee-jacc/1.0-rc4/geronimo-spec-j2ee-jacc-1.0-rc4.jar"/>
 	<classpathentry kind="output" path="testsuite/target/test-classes"/>
 </classpath>
