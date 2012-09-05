@@ -148,10 +148,10 @@ JBoss or with &SHORT_PLATFORM_NAME; for Tomcat:</para>
 <term>&SHORT_PLATFORM_NAME; for JBoss AS7</term>
 <listitem>
 <para>Place <filename>location-service-&VERSION;.war</filename> into the
-<filename><envar>$AS7_HOME</envar>/standalone/deployments/</filename>
+<filename><envar>$JBOSS_HOME</envar>/standalone/deployments/</filename>
 directory, and <filename>locationservice-dar.properties</filename>
 into the
-<filename><envar>$AS7_HOME</envar>/standalone/configuration/dars/
+<filename><envar>$JBOSS_HOME</envar>/standalone/configuration/dars/
 </filename>
 directory.</para>
 </listitem>
@@ -210,7 +210,7 @@ sipStackPropertiesFile=&quot;conf/mss-sip-stack.properties&quot;&gt;</programlis
 </example>
 
 <screen>
-In the $AS7_HOME/standalone/configuration/standalone-sip.xml file search for the line 
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml file search for the line 
 
  &lt;subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
 application-router="dars/mobicents-dar.properties" 
@@ -426,14 +426,14 @@ Emulator, version 1.0, from <ulink url="http://mobicents.googlecode.com/files/Ch
 <step>
 <para>Place the <filename>diameter-event-charging-&VERSION;.war</filename>
 WAR archive into the
-<filename>$AS7_HOME/standalone/deployments/</filename>
+<filename>$JBOSS_HOME/standalone/deployments/</filename>
 directory.</para>
 </step>
 <step>
 <para>Place the
 <filename>diametereventcharging-dar.properties</filename> DAR file
 in your
-$AS7_HOME/standalone/configuration/dars/ 
+$JBOSS_HOME/standalone/configuration/dars/ 
 directory.</para>
 </step>
 <step>
@@ -479,7 +479,7 @@ directory, and edit the value of the
 </example>
 
 <screen>
-In the $AS7_HOME/standalone/configuration/standalone-sip.xml
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml
 make sure the application router is pointing the mobicents-dar.properties file as follows. 
 
  &lt;subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
@@ -730,10 +730,10 @@ or with &SHORT_PLATFORM_NAME; for Tomcat:</para>
 <term>&SHORT_PLATFORM_NAME; for JBoss</term>
 <listitem>
 <para>Place <filename>call-blocking-&VERSION;.war</filename> into the
-<filename><envar>$AS7_HOME</envar>/standalone/deployments/</filename>
+<filename><envar>$JBOSS_HOME</envar>/standalone/deployments/</filename>
 directory, and
 <filename>call-blocking-servlet-dar.properties</filename> into the
-<filename><envar>$AS7_HOME</envar>/standalone/configuration/dars/</filename>
+<filename><envar>$JBOSS_HOME</envar>/standalone/configuration/dars/</filename>
 directory.</para>
 </listitem>
 </varlistentry>
@@ -768,7 +768,7 @@ directory.</para>
 </example>
 
 <screen>
-In the $AS7_HOME/standalone/configuration/standalone-sip.xml search for the line below
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml search for the line below
  
  &lt;subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
  application-router="dars/mobicents-dar.properties"  
@@ -999,11 +999,11 @@ with &SHORT_PLATFORM_NAME; for JBoss or with &SHORT_PLATFORM_NAME; for Tomcat:</
 <term>&SHORT_PLATFORM_NAME; for JBoss</term>
 <listitem>
 <para>Place <filename>call-forwarding-&VERSION;.war</filename> into the
-<filename><envar>$AS7_HOME</envar>/standalone/deployments/</filename>
+<filename><envar>$JBOSS_HOME</envar>/standalone/deployments/</filename>
 directory, and
 <filename>call-forwarding-servlet-dar.properties</filename> into
 the
-<filename><envar>$AS7_HOME</envar>/standalone/configuration/dars/</filename>
+<filename><envar>$JBOSS_HOME</envar>/standalone/configuration/dars/</filename>
 directory.</para>
 </listitem>
 </varlistentry>
@@ -1052,7 +1052,7 @@ element. Add an attribute to it called
 <title>Editing &SHORT_PLATFORM_NAME; for JBoss&apos;s standalone-sip.xml for the Call-Forwarding Service</title>
 </example>
 <screen>
-In the $AS7_HOME/standalone/configuration/standalone-sip.xml search for the line below
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml search for the line below
  
  &lt;subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
  application-router="dars/mobicents-dar.properties"  
@@ -1279,11 +1279,11 @@ for JBoss or with &SHORT_PLATFORM_NAME; for Tomcat:</para>
 <listitem>
 <para>Place <filename>call-blocking-&VERSION;.war</filename> and
 <filename>call-forwarding-&VERSION;.war</filename> into the
-<filename><envar>$AS7_HOME</envar>/standalone/deployments/</filename>
+<filename><envar>$JBOSS_HOME</envar>/standalone/deployments/</filename>
 directory, and
 <filename>call-controller-servlet-dar.properties</filename> into
 the
-<filename><envar>$AS7_HOME</envar>/standalone/configuration/dars/</filename>
+<filename><envar>$JBOSS_HOME</envar>/standalone/configuration/dars/</filename>
 directory.</para>
 </listitem>
 </varlistentry>
@@ -1333,7 +1333,7 @@ element. Add an attribute to it called
 <title>Editing &SHORT_PLATFORM_NAME; for JBoss&apos;s standalone-sip.xml for the Call-Controller Service</title>
 
 <screen>
-In the $AS7_HOME/standalone/configuration/standalone-sip.xml search for the line below
+In the $JBOSS_HOME/standalone/configuration/standalone-sip.xml search for the line below
  
  &lt;subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" 
  application-router="dars/mobicents-dar.properties"  

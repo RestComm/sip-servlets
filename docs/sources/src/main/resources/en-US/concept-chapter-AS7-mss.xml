@@ -38,7 +38,7 @@ You can go to the link below to download the latest &SHORT_PLATFORM_NAME; for JB
 </para> 
 
 <para>
-You will need to extract the content of the file into a directory on your local system. The root directory of the &SHORT_PLATFORM_NAME; for JBoss AS7 that you downloaded will be referred to in this guide as $AS7_HOME.  
+You will need to extract the content of the file into a directory on your local system. The root directory of the &SHORT_PLATFORM_NAME; for JBoss AS7 that you downloaded will be referred to in this guide as $JBOSS_HOME.  
 </para>
 
 
@@ -65,7 +65,7 @@ Setting Environment Variables
 To start the server do the following:
 </formalpara>
 <screen>
-$AS7_HOME/bin/standalone.sh
+$JBOSS_HOME/bin/standalone.sh
 </screen>
 
 <para>
@@ -100,7 +100,7 @@ With the standard startup script, you will not have access to any SIP functional
 
 
 <para>
-In order to start the &SHORT_PLATFORM_NAME; for JBoss AS7 with SIP functionalities, you need to append the startup script with the SIP configuration file. The configuration files are located in the $AS7_HOME/standalone/configuration directory. You can see the content of the directory below
+In order to start the &SHORT_PLATFORM_NAME; for JBoss AS7 with SIP functionalities, you need to append the startup script with the SIP configuration file. The configuration files are located in the $JBOSS_HOME/standalone/configuration directory. You can see the content of the directory below
 </para>
 <screen>
 application-roles.properties  mgmt-users.properties     standalone-ha.xml
@@ -114,7 +114,7 @@ logging.properties            standalone-full.xml       standalone_xml_history
 </formalpara>
 
 <para>
-If you want to start &SHORT_PLATFORM_NAME; with SIP services activated, you need to go to the $AS7_HOME/bin directory. Type the following command:
+If you want to start &SHORT_PLATFORM_NAME; with SIP services activated, you need to go to the $JBOSS_HOME/bin directory. Type the following command:
 </para>
 
 <screen>
@@ -230,7 +230,7 @@ You can make calls from the sample click2call application and see the logs in th
 
 
 <para>
-Part of the task of any administrator who has to manage a JBoss server will be to monitor services offered to clients. There is a command line interface bundled with JBoss AS7 which can be accessed by going to the $AS7_HOME/bin directory. 
+Part of the task of any administrator who has to manage a JBoss server will be to monitor services offered to clients. There is a command line interface bundled with JBoss AS7 which can be accessed by going to the $JBOSS_HOME/bin directory. 
 
 </para>
 
@@ -243,7 +243,7 @@ There are so many features available with the &SHORT_PLATFORM_NAME; for JBoss AS
 
 
 <para>
-In the $AS7_HOME/bin directory, type
+In the $JBOSS_HOME/bin directory, type
 
 </para>
 <screen>

@@ -120,7 +120,7 @@
         <para>For more information on performance, refer to the <ulink url="http://java.sun.com/performance/reference/whitepapers/6_performance.html">Performance White Paper</ulink>.</para>        
       </note>
       <para>To pass arguments to the JVM, change
-      <filename>$AS7_HOME/bin/standalone.conf</filename> (Linux) or <filename>$AS7_HOME/bin/standalone.bat</filename> (Windows).</para>
+      <filename>$JBOSS_HOME/bin/standalone.conf</filename> (Linux) or <filename>$JBOSS_HOME/bin/standalone.bat</filename> (Windows).</para>
       <itemizedlist>
         <listitem>
           <para><emphasis role="bold">Garbage Collection</emphasis> </para>

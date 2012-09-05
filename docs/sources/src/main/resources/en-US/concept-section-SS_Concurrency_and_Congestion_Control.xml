@@ -85,11 +85,23 @@
       </listitem>
     </varlistentry>
   </variablelist>
+
+
+
   <formalpara>
     <title>Congestion Control</title>
     <para>&PLATFORM_NAME; Sip Servlets currently provides the following  congestion
     control mechanisms:</para>
   </formalpara>
+
+<note>
+
+<title>Changing Congestion Control Settings </title>
+<para>
+All the settings and congifurations starting with gov.nist.javax.sip are located in the $JBOSS-HOME/standalone/configuration/mss-sip-stack.properties file. The section below will provide further details.
+</para>
+</note>
+
   <itemizedlist>
     <listitem>
       <para>Congestion control is largely application-specific and it is implemented in a pipeline. 
@@ -211,7 +223,7 @@
           <step>
             <title>Open standalone-sip.xml File</title>
             <para>Open the
-            <filename><envar>$AS7_HOME/standalone/configuration/standalone-sip.xml </envar></filename>
+            <filename><envar>$JBOSS_HOME/standalone/configuration/standalone-sip.xml </envar></filename>
             configuration file in a text editor.</para>
           </step>
 
