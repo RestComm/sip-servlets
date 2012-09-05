@@ -45,6 +45,7 @@ public abstract class SipServletTestCase extends TestCase {
 	protected String projectHome;
 	protected SipEmbedded tomcat;
 	protected String sipIpAddress;
+	protected String httpIpAddress;
 	protected String serviceFullClassName = "org.mobicents.servlet.sip.catalina.SipStandardService";
 	protected String serverName = "SIP-Servlet-Tomcat-Server";
 	protected String listeningPointTransport = ListeningPoint.UDP;
@@ -66,7 +67,9 @@ public abstract class SipServletTestCase extends TestCase {
 			System.setProperty("org.mobicents.testsuite.testhostaddr", "127.0.0.1");// [::1] for IPv6			
 		}
 		sipIpAddress = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
+		httpIpAddress = "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "";
 		logger.info("sip ip address is " + sipIpAddress);
+		logger.info("http ip address is " + httpIpAddress);
 		//Reading properties
 		Properties properties = new Properties();
 		InputStream inputStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(
@@ -110,7 +113,7 @@ public abstract class SipServletTestCase extends TestCase {
 		if(initTomcatOnStartup) {
 			Properties sipStackProperties = getSipStackProperties(); 
 			tomcat.initTomcat(tomcatBasePath, sipStackProperties);
-			tomcat.addHttpConnector(8080);
+			tomcat.addHttpConnector(httpIpAddress, 8080);
 			/*
 			 * <Connector debugLog="../logs/debuglog.txt" ipAddress="0.0.0.0"
 			 * logLevel="DEBUG" port="5070"

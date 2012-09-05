@@ -23,6 +23,7 @@
 package org.mobicents.servlet.sip;
 import java.io.File;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -36,6 +37,7 @@ import javax.sip.SipFactory;
 
 import org.apache.catalina.Container;
 import org.apache.catalina.LifecycleException;
+import org.apache.catalina.Server;
 import org.apache.catalina.connector.Connector;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
@@ -201,11 +203,12 @@ public class SipEmbedded {
 	/**
 	 * @throws Exception
 	 */
-	public void addHttpConnector(int port) throws Exception {
+	public void addHttpConnector(String ipAddress, int port) throws Exception {
 		Connector httpConnector = new Connector(
 				Http11Protocol.class.getName());
 		Http11Protocol httpProtocolHandler = (Http11Protocol) httpConnector
 				.getProtocolHandler();		
+		httpProtocolHandler.setAddress(InetAddress.getByName(ipAddress));
 		httpProtocolHandler.setPort(port);	
 		httpConnector.setPort(port);
 		httpProtocolHandler.setProperty("port", ""+port);
@@ -271,12 +274,30 @@ public class SipEmbedded {
 	 */
 	public void stopTomcat() {
 		// Stop the embedded server
-		if(sipService != null) {			
+		Server server = null;
+		if(sipService != null) {
+			Connector[] connectors = sipService.findConnectors();
+			// Fix regression on the testsuite causing Tomcat not to remove properly the connectors
+			// and making the tests hang
+			for (Connector connector : connectors) {
+				try {
+					connector.stop();
+					connector.destroy();
+				} catch (LifecycleException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}				
+				sipService.removeConnector(connector);
+			}
 			try {
-				sipService.stop();
+				server = sipService.getServer();
+				sipService.stop();				
 			} catch (LifecycleException e) {
 				log.error("SipService already stopped ", e);
-			}		
+			}	
+			if(server != null) {
+				server.removeService(sipService);
+			}
 			SipFactory.getInstance().resetFactory();
 		}
 	}
