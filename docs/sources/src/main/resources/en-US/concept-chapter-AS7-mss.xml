@@ -360,6 +360,7 @@ sample application running and your softphones are connected to the server.
 
 <para>
 There is also a SIP servlets management console that is available at this url  <ulink url="http://127.0.0.1:8080/sip-servlets-management">http://127.0.0.1:8080/sip-servlets-management</ulink>. The resulting page will be similar to the screenshot below. More information will be provided about the SIP servlets management console in later chapters of this guide. 
+</para>
 <para>
             <figure>
               <title>JBoss Application Server 7 Management Console</title>
