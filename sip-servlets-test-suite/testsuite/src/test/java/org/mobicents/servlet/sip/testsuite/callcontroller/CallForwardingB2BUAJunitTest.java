@@ -26,6 +26,7 @@ import gov.nist.javax.sip.message.MessageExt;
 import java.util.Iterator;
 import java.util.Properties;
 
+import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.message.Request;
@@ -564,6 +565,54 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		assertTrue(receiver.isAckReceived());
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
+	}
+	
+	public void testCallForwardingCaller2ConnectorsPortIssue() throws Exception {
+		
+		senderProtocolObjects = new ProtocolObjects("forward-sender",
+				"gov.nist", ListeningPoint.TCP, AUTODIALOG, null, "32", "true");
+		receiverProtocolObjects = new ProtocolObjects("receiver",
+				"gov.nist", ListeningPoint.TCP, AUTODIALOG, null, null, null);
+		
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5071, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		tomcat.removeConnector(sipConnector);
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
+		tomcat.addSipConnector(serverName, sipIpAddress, 5071, ListeningPoint.TCP);
+		
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "2-connectors-port-issue-sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "2-connectors-port-issue-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+				
+		sender.sendSipRequest("REGISTER", fromAddress, fromAddress, null, null, false);
+		Thread.sleep(TIMEOUT);
+		assertEquals(200, sender.getFinalResponseStatus());
+		
+		receiver.sendSipRequest("REGISTER", toAddress, toAddress, null, null, false);
+		sender.setTimeToWaitBeforeBye(TIMEOUT*2);
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckReceived());
+		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
 	}
 	
 	@Override

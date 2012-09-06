@@ -127,11 +127,40 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	SipSession incomingSession;
 	SipSession outgoingSession;
 	int okReceived = 0;
+	SipURI aliceContact;
 	
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
 		logger.info("the call forwarding B2BUA sip servlet has been started");
 		super.init(servletConfig);		
+	}
+	
+	@Override
+	protected void doRequest(SipServletRequest request) throws ServletException,
+			IOException {
+		if (request.getFrom().getURI().toString().contains("2-connectors-port-issue-sender") || request.getFrom().getURI().toString().contains("2-connectors-port-issue-receiver")) {
+			try {
+	            if ("REGISTER".equals(request.getMethod())) {
+	                if (request.getFrom().getURI().toString().contains("2-connectors-port-issue-sender")) {
+	                    // when alice registers, let's keep her contact using remote port information
+	                    String contact = request.getHeader("Contact");
+	                    SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
+	            				SIP_FACTORY);
+	                    aliceContact = (SipURI) sipFactory.createURI(contact.substring(1, contact.length() - 1));
+	                    aliceContact.setPort(request.getRemotePort());
+	                } else {
+	                    // when any request from bob is received, let's try to send an INVITE to Alice
+	                    SipServletRequest out = request.getSession().createRequest("INVITE");
+	                    out.setRequestURI(aliceContact);
+	                    out.send();
+	                }
+	                request.createResponse(SipServletResponse.SC_OK).send();
+	            }
+	        } catch (Exception ex) {
+	            log("Error processing request", ex);
+	        }
+		}
+		super.doRequest(request);
 	}
 	
 	@Override
@@ -494,6 +523,13 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	protected void doSuccessResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.toString());
+		
+		if (sipServletResponse.getFrom().getURI().toString().contains("2-connectors-port-issue-sender") || sipServletResponse.getFrom().getURI().toString().contains("2-connectors-port-issue-receiver")) {
+			SipServletRequest ackRequest = sipServletResponse.createAck();
+			logger.info("Sending " +  ackRequest);
+			ackRequest.send();
+		}
+		
 		String cSeqValue = sipServletResponse.getHeader("CSeq");
 		B2buaHelper b2buaHelper = sipServletResponse.getRequest().getB2buaHelper();			
 		
