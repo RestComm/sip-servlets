@@ -26,7 +26,7 @@
   <classpathentry kind="var" path="M2_REPO/org/eclipse/jdt/core/compiler/ecj/3.7/ecj-3.7.jar"/>
   <classpathentry kind="var" path="M2_REPO/nl/jqno/equalsverifier/equalsverifier/1.0.1/equalsverifier-1.0.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/geronimo-spec/geronimo-spec-j2ee-jacc/1.0-rc4/geronimo-spec-j2ee-jacc-1.0-rc4.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.27/tomcat-servlet-api-7.0.27.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.29/tomcat-servlet-api-7.0.29.jar"/>
   <classpathentry kind="var" path="M2_REPO/jboss/jboss-cache/1.4.1.SP5/jboss-cache-1.4.1.SP5.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/jboss-common-core/2.2.14.GA/jboss-common-core-2.2.14.GA.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/logging/jboss-logging-spi/2.1.0.GA/jboss-logging-spi-2.1.0.GA.jar"/>
@@ -54,16 +54,16 @@
   <classpathentry kind="src" path="/sip-servlets-tomcat-7"/>
   <classpathentry kind="lib" path="lib/sipunit.jar"/>
   <classpathentry kind="var" path="M2_REPO/net/java/stun4j/stun4j/1.0.MOBICENTS/stun4j-1.0.MOBICENTS.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.27/tomcat-annotations-api-7.0.27.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.27/tomcat-api-7.0.27.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.27/tomcat-catalina-7.0.27.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.27/tomcat-coyote-7.0.27.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-el-api/7.0.27/tomcat-el-api-7.0.27.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-jasper/7.0.27/tomcat-jasper-7.0.27.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-jasper-el/7.0.27/tomcat-jasper-el-7.0.27.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-jsp-api/7.0.27/tomcat-jsp-api-7.0.27.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.27/tomcat-juli-7.0.27.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.27/tomcat-servlet-api-7.0.27.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.27/tomcat-util-7.0.27.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.29/tomcat-annotations-api-7.0.29.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.29/tomcat-api-7.0.29.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.29/tomcat-catalina-7.0.29.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.29/tomcat-coyote-7.0.29.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-el-api/7.0.29/tomcat-el-api-7.0.29.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-jasper/7.0.29/tomcat-jasper-7.0.29.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-jasper-el/7.0.29/tomcat-jasper-el-7.0.29.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-jsp-api/7.0.29/tomcat-jsp-api-7.0.29.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.29/tomcat-juli-7.0.29.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.29/tomcat-servlet-api-7.0.29.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.29/tomcat-util-7.0.29.jar"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 </classpath>

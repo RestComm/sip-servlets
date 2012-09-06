@@ -308,7 +308,7 @@
 				<module>containers/tomcat-7</module>
 			</modules>
 			<properties>
-				<tomcat-7.version>7.0.27</tomcat-7.version>
+				<tomcat-7.version>7.0.29</tomcat-7.version>
 			</properties>
 			<dependencies>
 				<!-- j2ee dependencies -->
@@ -327,7 +327,7 @@
 				<module>containers/tomcat-7</module>
 			</modules>
 			<properties>
-				<tomcat-7.version>7.0.27</tomcat-7.version>
+				<tomcat-7.version>7.0.29</tomcat-7.version>
 			</properties>
 			<dependencies>
 				<!-- j2ee dependencies -->

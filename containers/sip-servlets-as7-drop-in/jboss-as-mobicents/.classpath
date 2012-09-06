@@ -31,7 +31,7 @@
   <classpathentry kind="var" path="M2_REPO/org/jacorb/jacorb/2.3.2.jbossorg-0/jacorb-2.3.2.jbossorg-0.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/jandex/1.0.3.Final/jandex-1.0.3.Final.jar" sourcepath="M2_REPO/org/jboss/jandex/1.0.3.Final/jandex-1.0.3.Final-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/web/jasper-jdt/7.0.3.Final/jasper-jdt-7.0.3.Final.jar" sourcepath="M2_REPO/org/jboss/web/jasper-jdt/7.0.3.Final/jasper-jdt-7.0.3.Final-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.27/tomcat-servlet-api-7.0.27.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.29/tomcat-servlet-api-7.0.29.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/spec/javax/annotation/jboss-annotations-api_1.1_spec/1.0.1.Final/jboss-annotations-api_1.1_spec-1.0.1.Final.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/as/jboss-as-build-config/7.1.2.Final/jboss-as-build-config-7.1.2.Final.jar" sourcepath="M2_REPO/org/jboss/as/jboss-as-build-config/7.1.2.Final/jboss-as-build-config-7.1.2.Final-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/jboss/as/jboss-as-clustering-api/7.1.2.Final/jboss-as-clustering-api-7.1.2.Final.jar" sourcepath="M2_REPO/org/jboss/as/jboss-as-clustering-api/7.1.2.Final/jboss-as-clustering-api-7.1.2.Final-sources.jar"/>

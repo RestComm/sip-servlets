@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry including="**/*.java" kind="src" path="src/main/java"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.27/tomcat-servlet-api-7.0.27.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.29/tomcat-servlet-api-7.0.29.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/logging/jboss-logging/3.1.0.GA/jboss-logging-3.1.0.GA.jar" sourcepath="M2_REPO/org/jboss/logging/jboss-logging/3.1.0.GA/jboss-logging-3.1.0.GA-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/jboss/web/jbossweb/7.0.10.Final/jbossweb-7.0.10.Final.jar"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>

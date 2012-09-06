@@ -650,4 +650,10 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 //		throw new UnsupportedOperationException();
 		destroy();
 	}
+
+	@Override
+	public boolean isAprRequired() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 }
