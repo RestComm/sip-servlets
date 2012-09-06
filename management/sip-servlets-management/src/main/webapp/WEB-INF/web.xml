@@ -36,6 +36,58 @@
     <servlet-class>org.mobicents.servlet.management.server.deploy.DeploymentServiceImpl</servlet-class>
   </servlet>
   <!--inserted by gwt-maven-->
+  <!--inserted by gwt-maven-->
+  <servlet>
+    <servlet-name>org.mobicents.servlet.management.server.router.DARConfigurationServiceImpl/org.mobicents.servlet.management.SipServletsManagement/DARConfigurationService</servlet-name>
+    <servlet-class>org.mobicents.servlet.management.server.router.DARConfigurationServiceImpl</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>org.mobicents.servlet.management.server.configuration.ConfigurationServiceImpl/org.mobicents.servlet.management.SipServletsManagement/ConfigurationService</servlet-name>
+    <servlet-class>org.mobicents.servlet.management.server.configuration.ConfigurationServiceImpl</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>org.mobicents.servlet.management.server.deploy.DeploymentServiceImpl/org.mobicents.servlet.management.SipServletsManagement/DeploymentService</servlet-name>
+    <servlet-class>org.mobicents.servlet.management.server.deploy.DeploymentServiceImpl</servlet-class>
+  </servlet>
+  <!--inserted by gwt-maven-->
+  <servlet>
+    <servlet-name>org.mobicents.servlet.management.server.router.DARConfigurationServiceImpl/org.mobicents.servlet.management.SipServletsManagement/DARConfigurationService</servlet-name>
+    <servlet-class>org.mobicents.servlet.management.server.router.DARConfigurationServiceImpl</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>org.mobicents.servlet.management.server.configuration.ConfigurationServiceImpl/org.mobicents.servlet.management.SipServletsManagement/ConfigurationService</servlet-name>
+    <servlet-class>org.mobicents.servlet.management.server.configuration.ConfigurationServiceImpl</servlet-class>
+  </servlet>
+  <servlet>
+    <servlet-name>org.mobicents.servlet.management.server.deploy.DeploymentServiceImpl/org.mobicents.servlet.management.SipServletsManagement/DeploymentService</servlet-name>
+    <servlet-class>org.mobicents.servlet.management.server.deploy.DeploymentServiceImpl</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>org.mobicents.servlet.management.server.router.DARConfigurationServiceImpl/org.mobicents.servlet.management.SipServletsManagement/DARConfigurationService</servlet-name>
+    <url-pattern>/org.mobicents.servlet.management.SipServletsManagement/DARConfigurationService</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>org.mobicents.servlet.management.server.configuration.ConfigurationServiceImpl/org.mobicents.servlet.management.SipServletsManagement/ConfigurationService</servlet-name>
+    <url-pattern>/org.mobicents.servlet.management.SipServletsManagement/ConfigurationService</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>org.mobicents.servlet.management.server.deploy.DeploymentServiceImpl/org.mobicents.servlet.management.SipServletsManagement/DeploymentService</servlet-name>
+    <url-pattern>/org.mobicents.servlet.management.SipServletsManagement/DeploymentService</url-pattern>
+  </servlet-mapping>
+  <!--inserted by gwt-maven-->
+  <servlet-mapping>
+    <servlet-name>org.mobicents.servlet.management.server.router.DARConfigurationServiceImpl/org.mobicents.servlet.management.SipServletsManagement/DARConfigurationService</servlet-name>
+    <url-pattern>/org.mobicents.servlet.management.SipServletsManagement/DARConfigurationService</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>org.mobicents.servlet.management.server.configuration.ConfigurationServiceImpl/org.mobicents.servlet.management.SipServletsManagement/ConfigurationService</servlet-name>
+    <url-pattern>/org.mobicents.servlet.management.SipServletsManagement/ConfigurationService</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>org.mobicents.servlet.management.server.deploy.DeploymentServiceImpl/org.mobicents.servlet.management.SipServletsManagement/DeploymentService</servlet-name>
+    <url-pattern>/org.mobicents.servlet.management.SipServletsManagement/DeploymentService</url-pattern>
+  </servlet-mapping>
+  <!--inserted by gwt-maven-->
   <servlet-mapping>
     <servlet-name>org.mobicents.servlet.management.server.router.DARConfigurationServiceImpl/org.mobicents.servlet.management.SipServletsManagement/DARConfigurationService</servlet-name>
     <url-pattern>/org.mobicents.servlet.management.SipServletsManagement/DARConfigurationService</url-pattern>

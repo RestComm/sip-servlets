@@ -2,6 +2,6 @@
    <!-- Uncomment the security-domain to enable security. You will
       need to edit the htmladaptor login configuration to setup the
       login modules used to authentication users. -->
-      <security-domain>java:/jaas/monitoring-app</security-domain>
+      <security-domain>jboss-web-policy</security-domain>
 
 </jboss-web>
