@@ -17,5 +17,8 @@
 	<classpathentry kind="var" path="M2_REPO/net/java/stun4j/stun4j/1.0.MOBICENTS/stun4j-1.0.MOBICENTS.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jain-sip"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/security/jbosssx/2.0.5.Final/jbosssx-2.0.5.Final.jar" sourcepath="M2_REPO/org/jboss/as/jboss-as-security/7.1.2.Final/jboss-as-security-7.1.2.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/as/jboss-as-web/7.1.2.Final/jboss-as-web-7.1.2.Final.jar" sourcepath="M2_REPO/org/jboss/as/jboss-as-web/7.1.2.Final/jboss-as-web-7.1.2.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/security/jboss-security-spi/2.0.5.Final/jboss-security-spi-2.0.5.Final.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

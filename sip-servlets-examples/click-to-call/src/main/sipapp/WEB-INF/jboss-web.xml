@@ -1,0 +1,3 @@
+<jboss-web>
+      <security-domain>sip-servlets</security-domain>
+</jboss-web>

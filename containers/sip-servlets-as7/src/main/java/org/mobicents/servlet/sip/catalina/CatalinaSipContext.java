@@ -39,9 +39,11 @@ import org.mobicents.servlet.sip.core.SipContext;
 public interface CatalinaSipContext extends SipContext, Context {	
 
 	void addConstraint(org.apache.catalina.deploy.SecurityConstraint securityConstraint);
-	
 	void removeConstraint(org.apache.catalina.deploy.SecurityConstraint securityConstraint);					
 	
+	void setSecurityDomain(String securityDomain);
+	String getSecurityDomain();
+
 	void addChild(SipServletImpl child);
 	
 	void removeChild(SipServletImpl child);

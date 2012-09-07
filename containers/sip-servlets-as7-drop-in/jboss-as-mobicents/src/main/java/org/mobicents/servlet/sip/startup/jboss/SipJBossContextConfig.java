@@ -195,6 +195,10 @@ public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig 
             convergedContext.setSipApplicationSessionTimeout(convergedMetaData.getSessionConfig().getSessionTimeout());
         }
 
+        // http://code.google.com/p/sipservlets/issues/detail?id=158 : 	Implement Missing SIP Security in AS7
+        String securityDomain = convergedMetaData.getSecurityDomain();
+        convergedContext.setSecurityDomain(securityDomain);
+        
         // sip security contstraints
         List<SipSecurityConstraintMetaData> sipConstraintMetaDatas = convergedMetaData.getSipSecurityConstraints();
         if (sipConstraintMetaDatas != null) {

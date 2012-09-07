@@ -103,7 +103,7 @@ public class SipSecurityUtils {
 						DigestAuthenticator digestAuthenticator = new DigestAuthenticator(sipStandardContext.getSipApplicationDispatcher().getSipFactory().getHeaderFactory());
 						digestAuthenticator.setContext((CatalinaSipContext)sipStandardContext);
 						MobicentsSipServletResponse response = createErrorResponse(request, sipConstraint);
-						authenticated = digestAuthenticator.authenticate(request, response, loginConfig);		
+						authenticated = digestAuthenticator.authenticate(request, response, loginConfig, ((CatalinaSipContext)sipStandardContext).getSecurityDomain());		
 						request.setUserPrincipal(digestAuthenticator.getPrincipal());
 					} else if(authMethod.equalsIgnoreCase("BASIC")) {
 						throw new IllegalStateException("Basic authentication not supported in JSR 289");

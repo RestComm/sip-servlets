@@ -38,11 +38,12 @@ import javax.sip.header.ProxyAuthorizationHeader;
 import javax.sip.header.WWWAuthenticateHeader;
 
 import org.apache.catalina.Realm;
-import org.apache.catalina.authenticator.Constants;
 import org.apache.catalina.connector.Request;
-import org.apache.catalina.deploy.LoginConfig;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.log4j.Logger;
+import org.jboss.security.SecurityConstants;
+import org.jboss.security.SecurityContext;
+import org.jboss.security.SecurityRolesAssociation;
 import org.mobicents.servlet.sip.catalina.SipLoginConfig;
 import org.mobicents.servlet.sip.catalina.security.CatalinaSipPrincipal;
 import org.mobicents.servlet.sip.core.message.MobicentsSipServletRequest;
@@ -50,6 +51,8 @@ import org.mobicents.servlet.sip.core.message.MobicentsSipServletResponse;
 import org.mobicents.servlet.sip.core.security.MobicentsSipLoginConfig;
 import org.mobicents.servlet.sip.core.security.SipDigestAuthenticator;
 import org.mobicents.servlet.sip.core.security.SipPrincipal;
+import org.mobicents.servlet.sip.security.SIPSecurityConstants;
+import org.mobicents.servlet.sip.security.SecurityActions;
 
 /**
  * An <b>Authenticator</b> and <b>Valve</b> implementation of HTTP DIGEST
@@ -149,7 +152,8 @@ public class DigestAuthenticator
      */
     public boolean authenticate(MobicentsSipServletRequest request,
     							MobicentsSipServletResponse response,
-                                MobicentsSipLoginConfig config)
+                                MobicentsSipLoginConfig config,
+                                String securityDomain)
         throws IOException {
     	
     	principal = null;
@@ -167,7 +171,7 @@ public class DigestAuthenticator
         // Validate any credentials already included with this request
         String authorization = request.getHeader("authorization");
         if (authorization != null) {
-            principal = findPrincipal(request, authorization, context.getRealm());
+            principal = findPrincipal(request, authorization, context.getRealm(), securityDomain);
             if (principal != null &&
             		// fix for http://code.google.com/p/sipservlets/issues/detail?id=88
             		principal.getPrincipal() != null) {
@@ -208,7 +212,8 @@ public class DigestAuthenticator
      */
     protected static SipPrincipal findPrincipal(MobicentsSipServletRequest request,
                                              String authorization,
-                                             Realm realm) {
+                                             Realm realm,
+                                             String securityDomain) {
 
         //System.out.println("Authorization token : " + authorization);
         // Validate the authorization credentials format    	
@@ -278,8 +283,28 @@ public class DigestAuthenticator
         }
         String md5a2 = MD5_ECNODER.encode(buffer);
 
-        return (new CatalinaSipPrincipal(realm.authenticate(userName, response, nOnce, nc, cnonce, qop,
-                                   realmName, md5a2)));
+        //taken from https://github.com/jbossas/jboss-as/blob/7.1.2.Final/web/src/main/java/org/jboss/as/web/security/SecurityContextAssociationValve.java#L86
+        SecurityContext sc = SecurityActions.getSecurityContext();
+        if (sc == null) {
+        	if (log.isDebugEnabled()) {
+                log.debug("Security Domain " + securityDomain);
+        	}
+        	if (securityDomain == null) {
+        		if (log.isDebugEnabled()) {
+                    log.debug("Security Domain is null using default security domain " + SIPSecurityConstants.DEFAULT_SIP_APPLICATION_POLICY);
+            	}
+                securityDomain = SIPSecurityConstants.DEFAULT_SIP_APPLICATION_POLICY;
+        	}
+            sc = SecurityActions.createSecurityContext(securityDomain);
+            SecurityActions.setSecurityContextOnAssociation(sc);
+        }
+        
+        try {
+        	return (new CatalinaSipPrincipal(realm.authenticate(userName, response, nOnce, nc, cnonce, qop, realmName, md5a2)));
+        } finally {        
+            SecurityActions.clearSecurityContext();
+            SecurityRolesAssociation.setSecurityRoles(null);
+        }
 
     }
 

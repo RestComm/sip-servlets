@@ -72,6 +72,9 @@ public class JBossSipMetaDataMerger extends NamedModuleImplMerger {
         else if (original != null && original.getSipSecurityConstraints() != null)
             dest.setSipSecurityConstraints(original.getSipSecurityConstraints());
 
+        if (override != null && override.getSecurityDomain() != null)
+            dest.setSecurityDomain(override.getSecurityDomain());
+        
         if (override != null && override.getSipSessionConfig() != null)
             dest.setSipSessionConfig(override.getSipSessionConfig());
         else if (original != null && original.getSessionConfig() != null)

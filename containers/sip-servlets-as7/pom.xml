@@ -25,6 +25,22 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.jboss.as</groupId>
+			<artifactId>jboss-as-web</artifactId>
+			<version>7.1.2.Final</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+            <groupId>org.jboss.security</groupId>
+            <artifactId>jbosssx</artifactId>
+            <version>2.0.5.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.security</groupId>
+            <artifactId>jboss-security-spi</artifactId>
+            <version>2.0.5.Final</version>
+        </dependency>
+		<dependency>
 			<groupId>org.jboss.logging</groupId>
 			<artifactId>jboss-logging</artifactId>
 			<version>3.1.1.GA</version>

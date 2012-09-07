@@ -12,10 +12,9 @@
 
 <note>
 <title> Features not yet available on &SHORT_PLATFORM_NAME; for JBoss AS7 </title>
-<para> * Sip Clustering and Failover  </para>
+<para> * SIP Clustering and Failover  </para>
 <para> * SNMP  </para>
 <para> * Jopr Monitoring  </para>
-<para> * SIP Security  </para>
 </note>
 
 <para>

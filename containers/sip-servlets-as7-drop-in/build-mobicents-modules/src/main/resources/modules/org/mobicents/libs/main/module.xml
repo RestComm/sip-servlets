@@ -36,6 +36,11 @@
         <module name="javax.mail.api"/>
         <module name="javax.activation.api"/>
         <module name="org.jboss.as.web"/>
+        <!-- handling security -->
+        <module name="javax.security.auth.message.api"/>
+        <module name="org.jboss.as.security"/>
+        <module name="org.picketbox"/>
+        <module name="javax.security.jacc.api"/>
     </dependencies>
 
 </module>

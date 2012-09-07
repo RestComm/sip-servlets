@@ -117,6 +117,10 @@ public class SIPWebContext extends SipStandardContext {
         final WebMetaData original = null;
         JBossWebMetaDataMerger.merge(mergedMetaData, override, original);
 
+        if(log.isInfoEnabled()) {
+    		log.infof("security domain " + mergedMetaData.getSecurityDomain() + " for deployment %s", deploymentUnit.getName());
+    	}
+        
         augmentAnnotations(mergedMetaData, sipMetaData, sipAnnotationMetaData);
         try {
 			processMetaData(mergedMetaData, sipMetaData);

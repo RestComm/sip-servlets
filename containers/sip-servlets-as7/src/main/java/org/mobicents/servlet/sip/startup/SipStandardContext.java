@@ -136,6 +136,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	protected transient MobicentsSipLoginConfig sipLoginConfig;
 	protected transient SipSecurityUtils sipSecurityUtils;
 	protected transient SipDigestAuthenticator sipDigestAuthenticator;
+	protected transient String securityDomain;
 	
 	protected boolean hasDistributableManager;
 	
@@ -290,7 +291,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	@Override
 	public synchronized void start() throws LifecycleException {
 		if(logger.isInfoEnabled()) {
-			logger.info("Starting the sip context");
+			logger.info("Starting the sip context " + getName());
 		}
 		if( initialized ) { 
 			prepareServletContext();
@@ -375,11 +376,11 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				logger.info("http session timeout for this context is " + getSessionTimeout() + " minutes");
 			}
 			if(logger.isInfoEnabled()) {
-				logger.info("sip context started");
+				logger.info("sip context started " + getName());
 			}
 		} else {
 			if(logger.isInfoEnabled()) {
-				logger.info("sip context didn't started due to errors");
+				logger.info("sip context " + getName() + " didn't started due to errors");
 			}
 		}
 										
@@ -526,7 +527,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	@Override
 	public synchronized void stop() throws LifecycleException {
 		if(logger.isInfoEnabled()) {
-			logger.info("Stopping the sip context");
+			logger.info("Stopping the sip context " + getName());
 		}
 		if(manager instanceof SipManager) {
 			((SipManager)manager).dumpSipSessions();
@@ -565,7 +566,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		// Issue 1478 : nullify the ref to avoid reusing it
 		timerService = null;
 		getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE, null);
-		logger.info("sip context stopped");
+		logger.info("sip context stopped " + getName());
 	}
 
 	@Override
@@ -743,6 +744,16 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	public void removeConstraint(SipSecurityConstraint securityConstraint) {
 		super.removeConstraint(securityConstraint);
 	}
+	
+
+	public void setSecurityDomain(String securityDomain) {
+		this.securityDomain = securityDomain;
+	}
+	
+	public String getSecurityDomain() {
+		return securityDomain;
+	}
+
 	
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.startup.SipContext#getSmallIcon()
@@ -1237,110 +1248,112 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				sasTimerService.start();
 			}
 		}
-				
-		enterSipApp(null, null, false);
-		boolean batchStarted = enterSipAppHa(true);
-		try {
-			for (MobicentsSipServlet container : childrenMap.values()) {
-				if(logger.isDebugEnabled()) {
-					logger.debug("container " + container.getName() + ", class : " + container.getClass().getName());
-				}
-				if(container instanceof Wrapper) {			
-					Wrapper wrapper = (Wrapper) container;
-					Servlet sipServlet = null;
-					try {
-						sipServlet = wrapper.allocate();
-						if(sipServlet instanceof SipServlet) {
-							// Fix for issue 1086 (http://code.google.com/p/mobicents/issues/detail?id=1086) : 
-							// Cannot send a request in SipServletListener.initialize() for servlet-selection applications
-							boolean servletHandlerWasNull = false;
-							if(servletHandler == null) {
-								servletHandler = container.getName();
-								servletHandlerWasNull = true;
-							}
-							final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-							try {
-								final ClassLoader cl = getLoader().getClassLoader();
-								Thread.currentThread().setContextClassLoader(cl);
-								// http://code.google.com/p/sipservlets/issues/detail?id=135
-								bindThreadBindingListener();
-							
-								switch(event.getEventType()) {
-									case SERVLET_INITIALIZED : {
-										SipServletContextEvent sipServletContextEvent = 
-											new SipServletContextEvent(getServletContext(), (SipServlet)sipServlet);
-										List<SipServletListener> sipServletListeners = sipListeners.getSipServletsListeners();
-										if(logger.isDebugEnabled()) {
-											logger.debug(sipServletListeners.size() + " SipServletListener to notify of servlet initialization");
-										}
-										for (SipServletListener sipServletListener : sipServletListeners) {					
-											sipServletListener.servletInitialized(sipServletContextEvent);					
-										}
-										break;
-									}
-									case SIP_CONNECTOR_ADDED : {
-										// reload the outbound interfaces if they have changed
-										this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
-												sipApplicationDispatcher.getOutboundInterfaces());	
-										
-										List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
-										if(logger.isDebugEnabled()) {
-											logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector addition");
-										}
-										for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {					
-											sipConnectorListener.sipConnectorAdded((SipConnector)event.getEventObject());				
-										}
-										break;
-									}
-									case SIP_CONNECTOR_REMOVED : {
-										// reload the outbound interfaces if they have changed
-										this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
-												sipApplicationDispatcher.getOutboundInterfaces());
-										
-										List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
-										if(logger.isDebugEnabled()) {
-											logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector removal");
-										}
-										for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {					
-											sipConnectorListener.sipConnectorRemoved((SipConnector)event.getEventObject());				
-										}
-										break;
-									}								
+		
+		if(this.available) {
+			enterSipApp(null, null, false);
+			boolean batchStarted = enterSipAppHa(true);
+			try {
+				for (MobicentsSipServlet container : childrenMap.values()) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("container " + container.getName() + ", class : " + container.getClass().getName());
+					}
+					if(container instanceof Wrapper) {			
+						Wrapper wrapper = (Wrapper) container;
+						Servlet sipServlet = null;
+						try {
+							sipServlet = wrapper.allocate();
+							if(sipServlet instanceof SipServlet) {
+								// Fix for issue 1086 (http://code.google.com/p/mobicents/issues/detail?id=1086) : 
+								// Cannot send a request in SipServletListener.initialize() for servlet-selection applications
+								boolean servletHandlerWasNull = false;
+								if(servletHandler == null) {
+									servletHandler = container.getName();
+									servletHandlerWasNull = true;
 								}
-								if(servletHandlerWasNull) {
-									servletHandler = null;
+								final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
+								try {
+									final ClassLoader cl = getLoader().getClassLoader();
+									Thread.currentThread().setContextClassLoader(cl);
+									// http://code.google.com/p/sipservlets/issues/detail?id=135
+									bindThreadBindingListener();
+								
+									switch(event.getEventType()) {
+										case SERVLET_INITIALIZED : {
+											SipServletContextEvent sipServletContextEvent = 
+												new SipServletContextEvent(getServletContext(), (SipServlet)sipServlet);
+											List<SipServletListener> sipServletListeners = sipListeners.getSipServletsListeners();
+											if(logger.isDebugEnabled()) {
+												logger.debug(sipServletListeners.size() + " SipServletListener to notify of servlet initialization");
+											}
+											for (SipServletListener sipServletListener : sipServletListeners) {					
+												sipServletListener.servletInitialized(sipServletContextEvent);					
+											}
+											break;
+										}
+										case SIP_CONNECTOR_ADDED : {
+											// reload the outbound interfaces if they have changed
+											this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
+													sipApplicationDispatcher.getOutboundInterfaces());	
+											
+											List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
+											if(logger.isDebugEnabled()) {
+												logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector addition");
+											}
+											for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {					
+												sipConnectorListener.sipConnectorAdded((SipConnector)event.getEventObject());				
+											}
+											break;
+										}
+										case SIP_CONNECTOR_REMOVED : {
+											// reload the outbound interfaces if they have changed
+											this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
+													sipApplicationDispatcher.getOutboundInterfaces());
+											
+											List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
+											if(logger.isDebugEnabled()) {
+												logger.debug(sipConnectorListeners.size() + " SipConnectorListener to notify of sip connector removal");
+											}
+											for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {					
+												sipConnectorListener.sipConnectorRemoved((SipConnector)event.getEventObject());				
+											}
+											break;
+										}								
+									}
+									if(servletHandlerWasNull) {
+										servletHandler = null;
+									}
+								} finally {
+									// http://code.google.com/p/sipservlets/issues/detail?id=135
+									unbindThreadBindingListener();
+									Thread.currentThread().setContextClassLoader(oldClassLoader);
 								}
-							} finally {
-								// http://code.google.com/p/sipservlets/issues/detail?id=135
-								unbindThreadBindingListener();
-								Thread.currentThread().setContextClassLoader(oldClassLoader);
+							}					
+						} catch (ServletException e) {
+							logger.error("Cannot allocate the servlet "+ wrapper.getServletClass() +" for notifying the listener " +
+									" of the event " + event.getEventType(), e);
+							ok = false; 
+						} catch (Throwable e) {
+							logger.error("An error occured when notifying the servlet " + wrapper.getServletClass() +
+									" of the event " + event.getEventType(), e);
+							ok = false; 
+						} 
+						try {
+							if(sipServlet != null) {
+								wrapper.deallocate(sipServlet);
 							}
-						}					
-					} catch (ServletException e) {
-						logger.error("Cannot allocate the servlet "+ wrapper.getServletClass() +" for notifying the listener " +
-								" of the event " + event.getEventType(), e);
-						ok = false; 
-					} catch (Throwable e) {
-						logger.error("An error occured when notifying the servlet " + wrapper.getServletClass() +
-								" of the event " + event.getEventType(), e);
-						ok = false; 
-					} 
-					try {
-						if(sipServlet != null) {
-							wrapper.deallocate(sipServlet);
+						} catch (ServletException e) {
+				            logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
+				            ok = false;
+						} catch (Throwable e) {
+							logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
+				            ok = false;
 						}
-					} catch (ServletException e) {
-			            logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
-			            ok = false;
-					} catch (Throwable e) {
-						logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
-			            ok = false;
 					}
 				}
+			} finally {
+				exitSipAppHa(null, null, batchStarted);
+				exitSipApp(null, null);	
 			}
-		} finally {
-			exitSipAppHa(null, null, batchStarted);
-			exitSipApp(null, null);	
 		}
 		return ok;
 	}

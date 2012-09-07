@@ -242,12 +242,14 @@ public abstract class AuthenticatorBase
      * @param response Response we are creating
      * @param config    Login configuration describing how authentication
      *              should be performed
+     * @param securityDomain the securityDomain coming from jboss-web.xml
      *
      * @exception IOException if an input/output error occurs
      */
     protected abstract boolean authenticate(MobicentsSipServletRequest request,
                                             MobicentsSipServletResponse response,
-                                            MobicentsSipLoginConfig config)
+                                            MobicentsSipLoginConfig config,
+                                            String securityDomain)
         throws IOException;
 
 

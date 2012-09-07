@@ -21,7 +21,7 @@
 		</listener-class>
 	</listener>
 	
-	<!-- Uncomment to enable security
+	<!-- Uncomment to enable security -->
 	<security-constraint>
 	   <display-name>REGISTER Method Security Constraint</display-name>
 	      <resource-collection>
@@ -37,6 +37,6 @@
 	 
 	 <login-config> 
          	<auth-method>DIGEST</auth-method> 
-         	<realm-name>sip-servlets-realm</realm-name> 
-   	 </login-config> -->
+         	<realm-name>sip-servlets</realm-name> 
+   	 </login-config>
 </sip-app>
