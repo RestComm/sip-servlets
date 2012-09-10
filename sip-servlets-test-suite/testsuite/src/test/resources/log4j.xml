@@ -19,7 +19,12 @@
     </layout> 
   </appender> 
   <root> 
-    <priority value ="DEBUG" />     
+  
+  <category name="org.mobicents">
+      <priority value="TRACE"/>
+   </category>
+   
+    <priority value ="TRACE" />     
     <appender-ref ref="rolling-file" /> 
     <appender-ref ref="console" />
   </root>   

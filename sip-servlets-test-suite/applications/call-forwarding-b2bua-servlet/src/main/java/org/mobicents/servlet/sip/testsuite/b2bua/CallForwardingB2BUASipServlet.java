@@ -158,17 +158,18 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			            String transport = request.getTransport();
 			            List<SipURI> outboundInterfaces = (List<SipURI>) getServletContext().getAttribute(OUTBOUND_INTERFACES);
 			            for (SipURI uri : outboundInterfaces) {
-					if(uri.getHost().equalsIgnoreCase(ipAddress) && uri.getPort() == port && uri.getTransportParam().equalsIgnoreCase(transport)) {
-						incomingInterface = uri;
-					}
-				    }
+								if(uri.getHost().equalsIgnoreCase(ipAddress) && uri.getPort() == port && uri.getTransportParam().equalsIgnoreCase(transport)) {
+									incomingInterface = uri;
+								}
+							}
 			        } else {
-			            // when any request from bob is received, let's try to send an INVITE to Alice
-			            SipSession session = request.getSession();
-			            // setting the outbound interface to make sure the container pick the correct connector
-			       	    ((SipSessionExt)session).setOutboundInterface(incomingInterface);
-			            SipServletRequest out = session.createRequest("INVITE");
+			        	// when any request from bob is received, let's try to send an INVITE to Alice
+		    	            SipSession session = request.getSession();
+		    	            // setting the outbound interface to make sure the container pick the correct connector	            
+		    	            SipServletRequest out = session.createRequest("INVITE");
 			            out.setRequestURI(aliceContact);
+			            SipSession inviteSession = out.getSession();
+			            ((SipSessionExt)inviteSession).setOutboundInterface(incomingInterface);
 			            out.send();
 			        }
 			        request.createResponse(SipServletResponse.SC_OK).send();
@@ -723,6 +724,9 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	protected void doProvisionalResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.toString());
+		if (sipServletResponse.getFrom().getURI().toString().contains("2-connectors-port-issue-sender") || sipServletResponse.getFrom().getURI().toString().contains("2-connectors-port-issue-receiver")) {
+			return;
+		}
 		SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
 		String fromURI = sipServletResponse.getFrom().getURI().toString();
 		String toURI = sipServletResponse.getTo().getURI().toString();

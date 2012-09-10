@@ -575,10 +575,10 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		receiverProtocolObjects = new ProtocolObjects("receiver",
 				"gov.nist", ListeningPoint.TCP, AUTODIALOG, null, null, null);
 		
-		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		sender = new TestSipListener(5080, 5071, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();
 
-		receiver = new TestSipListener(5090, 5071, receiverProtocolObjects, false);
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);

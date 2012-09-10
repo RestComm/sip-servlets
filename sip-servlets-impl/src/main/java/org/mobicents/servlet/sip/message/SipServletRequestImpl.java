@@ -1086,15 +1086,14 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				logger.debug("The found transport for sending request is '" + transport + "'");
 			}
 
-			SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);
 			MobicentsExtendedListeningPoint matchingListeningPoint = null;
 			// Issue 159 : http://code.google.com/p/sipservlets/issues/detail?id=159 
 		    // Bad choice of connectors when multiple of the same transport are available			
 			String outboundInterface = session.getOutboundInterface();
-			if(outboundInterface == null) {
-				matchingListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(
-						transport, false);
-			} else {
+			if(outboundInterface != null) {
+				if(logger.isTraceEnabled()) {
+					logger.trace("Trying to find listening point with outbound interface " + outboundInterface);
+				}
 				javax.sip.address.SipURI outboundInterfaceURI = null;			
 				try {
 					outboundInterfaceURI = (javax.sip.address.SipURI) SipFactoryImpl.addressFactory.createURI(outboundInterface);
@@ -1103,9 +1102,16 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				}
 				matchingListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(outboundInterfaceURI, false);
 			}
+			if(matchingListeningPoint == null) {
+				if(logger.isTraceEnabled()) {
+					logger.trace("Trying to find listening point with transport " + transport);
+				}
+				matchingListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(
+						transport, false);
+			}
 			
 			final SipProvider sipProvider = matchingListeningPoint.getSipProvider();
-
+			SipConnector sipConnector = matchingListeningPoint.getSipConnector();
 
 			//we update the via header after the sip connector has been found for the correct transport
 			checkViaHeaderUpdateForStaticExternalAddressUsage(sipConnector);

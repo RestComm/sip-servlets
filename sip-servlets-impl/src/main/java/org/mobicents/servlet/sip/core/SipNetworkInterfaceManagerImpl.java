@@ -206,13 +206,21 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 		}
 		Set<MobicentsExtendedListeningPoint> extendedListeningPoints = transportMappingCacheMap.get(tmpTransport.toLowerCase());
 		if(extendedListeningPoints.size() > 0) {
-			return extendedListeningPoints.iterator().next();
+			MobicentsExtendedListeningPoint extendedListeningPoint = extendedListeningPoints.iterator().next();
+			if(logger.isTraceEnabled()) {
+				logger.trace("Found first listening point " + extendedListeningPoint + " with transport " + transport);
+			}
+			return extendedListeningPoint;
 		}		
 		if(strict) {
 			return null;
 		} else {
 			if(extendedListeningPointList.size() > 0) {
-				return extendedListeningPointList.iterator().next();
+				MobicentsExtendedListeningPoint extendedListeningPoint = extendedListeningPointList.iterator().next();
+				if(logger.isTraceEnabled()) {
+					logger.trace("Found first listening point " + extendedListeningPoint + " with transport " + transport);
+				}
+				return extendedListeningPoint;
 			} else {
 				throw new RuntimeException("no valid sip connectors could be found to create the sip application session !!!");
 			} 
@@ -220,8 +228,11 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 	}
 	
 	public MobicentsExtendedListeningPoint findMatchingListeningPoint(
-			javax.sip.address.SipURI outboundInterface, boolean strict) {		
-		String tmpTransport = outboundInterface.getTransportParam();
+			javax.sip.address.SipURI outboundInterface, boolean strict) {
+		if(logger.isTraceEnabled()) {
+			logger.trace("Trying to find listening point corresponding to outbound interface " + outboundInterface + " in strict manner " + strict);
+		}
+		String tmpTransport = outboundInterface.getTransportParam();		
 		if(tmpTransport == null) {
 			if(outboundInterface.isSecure()) {
 				tmpTransport =  ListeningPoint.TCP;
@@ -234,8 +245,14 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 			Iterator<MobicentsExtendedListeningPoint> extentdedLPiterator = extendedListeningPoints.iterator();
 			while (extentdedLPiterator.hasNext()) {
 				MobicentsExtendedListeningPoint extendedListeningPoint = extentdedLPiterator.next();
+				if(logger.isTraceEnabled()) {
+					logger.trace("Comparing listening point " + extendedListeningPoint + " with outbound ipaddress " + outboundInterface.getHost() + " and port " + outboundInterface.getPort());
+				}
 				// Fix for http://code.google.com/p/sipservlets/issues/detail?id=159 	Bad choice of connectors when multiple of the same transport are available
 				if(extendedListeningPoint.getIpAddresses().contains(outboundInterface.getHost()) && extendedListeningPoint.getPort() == outboundInterface.getPort()) {
+					if(logger.isTraceEnabled()) {
+						logger.trace("Found listening point " + extendedListeningPoint);
+					}
 					return extendedListeningPoint;
 				}
 			}
@@ -247,7 +264,14 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 				Iterator<MobicentsExtendedListeningPoint> extentdedLPiterator = extendedListeningPoints.iterator();
 				while (extentdedLPiterator.hasNext()) {
 					MobicentsExtendedListeningPoint extendedListeningPoint = extentdedLPiterator.next();
-					if(extendedListeningPoint.getIpAddresses().contains(outboundInterface.getHost())) {
+					if(logger.isTraceEnabled()) {
+						logger.trace("Comparing listening point " + extendedListeningPoint + " with outbound ipaddress " + outboundInterface.getHost() + " and port " + outboundInterface.getPort());
+					}
+					// Fix for http://code.google.com/p/sipservlets/issues/detail?id=159 	Bad choice of connectors when multiple of the same transport are available
+					if(extendedListeningPoint.getIpAddresses().contains(outboundInterface.getHost()) && extendedListeningPoint.getPort() == outboundInterface.getPort()) {
+						if(logger.isTraceEnabled()) {
+							logger.trace("Found listening point " + extendedListeningPoint);
+						}
 						return extendedListeningPoint;
 					}
 				}
@@ -290,6 +314,9 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 			for (InetAddress inetAddress : inetAddresses) {
 				listeningPoint = extendedListeningPointsCacheMap.get(inetAddress.getHostAddress() + "/" + portChecked + ":" + tmpTransport.toLowerCase());
 				if(listeningPoint != null) {
+					if(logger.isTraceEnabled()) {
+						logger.trace("Found listening point " + listeningPoint);
+					}
 					return listeningPoint;
 				}
 			}
