@@ -337,8 +337,8 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 		if(this.getSipMessageQueueSize() <= 0)
 			throw new LifecycleException("Message queue size can not be 0 or less");
 
-		if(logger.isInfoEnabled()) {
-			logger.info("SIP Standard Service Started.");
+		if(logger.isDebugEnabled()) {
+			logger.debug("SIP Standard Service Started.");
 		}
 	}
 	
@@ -597,8 +597,8 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 			sipApplicationDispatcher.stop();
 		}
 		super.stopInternal();
-		if(logger.isInfoEnabled()) {
-			logger.info("SIP Standard Service Stopped.");
+		if(logger.isDebugEnabled()) {
+			logger.debug("SIP Standard Service Stopped.");
 		}
 //		setState(LifecycleState.STOPPING);		
 	}

@@ -2295,8 +2295,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		// stopping the sip stack	
 		if(sipStack != null) {
 			sipStack.start();
-			if(logger.isInfoEnabled()) {
-				logger.info("SIP stack started");
+			if(logger.isDebugEnabled()) {
+				logger.debug("SIP stack started");
 			}
 		}
 	}
@@ -2306,8 +2306,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		if(sipStack != null) {
 			sipStack.stop();
 			sipStack = null;
-			if(logger.isInfoEnabled()) {
-				logger.info("SIP stack stopped");
+			if(logger.isDebugEnabled()) {
+				logger.debug("SIP stack stopped");
 			}
 		}
 	}
