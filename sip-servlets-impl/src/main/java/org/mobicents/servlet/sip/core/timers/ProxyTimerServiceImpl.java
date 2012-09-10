@@ -65,8 +65,8 @@ public class ProxyTimerServiceImpl extends Timer implements ProxyTimerService {
 	public void stop() {		
 		started.set(false);
 		super.cancel();
-		if(logger.isInfoEnabled()) {
-			logger.info("Stopped proxy timer service "+ this);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Stopped proxy timer service "+ this);
 		}
 	}
 	/* (non-Javadoc)
@@ -74,8 +74,8 @@ public class ProxyTimerServiceImpl extends Timer implements ProxyTimerService {
 	 */
 	public void start() {	
 		started.set(true);
-		if(logger.isInfoEnabled()) {
-			logger.info("Started proxy timer service "+ this);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Started proxy timer service "+ this);
 		}
 	}
 }

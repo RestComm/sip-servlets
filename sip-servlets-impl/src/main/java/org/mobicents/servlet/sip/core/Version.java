@@ -42,6 +42,7 @@ public class Version {
 					String releaseName = releaseProperties.getProperty("release.name");
 					String releaseDate = releaseProperties.getProperty("release.date");
 					String releaseRevision = releaseProperties.getProperty("release.revision");
+					String releaseDisclaimer = releaseProperties.getProperty("release.disclaimer");
 					if(releaseVersion != null) {
 						// Follow the EAP Convention 
 						// Release ID: JBoss [EAP] 5.0.1 (build: SVNTag=JBPAPP_5_0_1 date=201003301050)
@@ -49,6 +50,9 @@ public class Version {
 						logger.info(releaseName + " Sip Servlets " + releaseVersion + " (build: Git Hash=" + releaseRevision + " date=" + releaseDate + ") Started.");
 					} else {
 						logger.warn("Unable to extract the version of Mobicents Sip Servlets currently running");
+					}
+					if(releaseDisclaimer != null) {
+						logger.info(releaseDisclaimer);
 					}
 				} else {
 					logger.warn("Unable to extract the version of Mobicents Sip Servlets currently running");

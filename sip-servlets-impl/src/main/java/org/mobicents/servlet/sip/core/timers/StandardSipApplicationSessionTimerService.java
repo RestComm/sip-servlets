@@ -77,15 +77,15 @@ public class StandardSipApplicationSessionTimerService extends
 	public void stop() {		
 		started.set(false);
 		super.cancel();
-		if(logger.isInfoEnabled()) {
-			logger.info("Stopped timer service "+ this);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Stopped timer service "+ this);
 		}
 	}
 
 	public void start() {	
 		started.set(true);
-		if(logger.isInfoEnabled()) {
-			logger.info("Started timer service "+ this);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Started timer service "+ this);
 		}
 	}
 

@@ -15,6 +15,7 @@
 		<mobicents.name>Mobicents</mobicents.name>
 		<maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
 		<release.timestamp>${maven.build.timestamp}</release.timestamp>
+		<release.disclaimer>Thank you for running Telscale - Carrier Grade Communications Platform by the creators of Mobicents. Copyright 2012 Telestax, Inc.</release.disclaimer>
 	</properties>
 
 	<dependencies>
