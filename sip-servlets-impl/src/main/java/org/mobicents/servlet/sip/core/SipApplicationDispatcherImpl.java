@@ -397,8 +397,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			sipContext.notifySipContextListeners(new SipContextEventImpl(SipContextEventType.SERVLET_INITIALIZED, null));
 		}
 		
-		if(logger.isInfoEnabled()) {
-			logger.info("SipApplicationDispatcher Started");
+		if(logger.isDebugEnabled()) {
+			logger.debug("SipApplicationDispatcher Started");
 		}	
 	}	
 	
@@ -428,8 +428,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				logger.error("Impossible to register the Sip Application dispatcher in domain" + domain, e);
 			}
 		}		
-		if(logger.isInfoEnabled()) {
-			logger.info("SipApplicationDispatcher Stopped");
+		if(logger.isDebugEnabled()) {
+			logger.debug("SipApplicationDispatcher Stopped");
 		}
 	}
 	
