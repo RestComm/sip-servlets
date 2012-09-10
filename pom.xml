@@ -89,6 +89,7 @@
 	</modules>
 
 	<properties>
+		<jain-sip-ri.version>1.2.X-NIO-SNAPSHOT</jain-sip-ri.version>
 		<mobicents.tools.mavenplugin.eclipse.version>1.0.0.FINAL</mobicents.tools.mavenplugin.eclipse.version>
 		<mobicents.cluster.version>1.13.1.FINAL</mobicents.cluster.version>
 		<mobicents.balancer.version>1.6.0-SNAPSHOT</mobicents.balancer.version>
