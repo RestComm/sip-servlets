@@ -394,7 +394,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			    			super.sipFactoryImpl.getSipNetworkInterfaceManager(), request, null, null, outboundInterface);
 				    String transport = "udp";
 				    if(session != null && session.getTransport() != null) transport = session.getTransport();
-					SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);
+				    SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);
 					if(sipConnector != null && sipConnector.isUseStaticAddress()) {
 						if(session != null && session.getProxy() == null) {
 							boolean sipURI = contactHeader.getAddress().getURI().isSipURI();
@@ -1087,8 +1087,23 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			}
 
 			SipConnector sipConnector = StaticServiceHolder.sipStandardService.findSipConnector(transport);
-			MobicentsExtendedListeningPoint matchingListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(
-					transport, false);
+			MobicentsExtendedListeningPoint matchingListeningPoint = null;
+			// Issue 159 : http://code.google.com/p/sipservlets/issues/detail?id=159 
+		    // Bad choice of connectors when multiple of the same transport are available			
+			String outboundInterface = session.getOutboundInterface();
+			if(outboundInterface == null) {
+				matchingListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(
+						transport, false);
+			} else {
+				javax.sip.address.SipURI outboundInterfaceURI = null;			
+				try {
+					outboundInterfaceURI = (javax.sip.address.SipURI) SipFactoryImpl.addressFactory.createURI(outboundInterface);
+				} catch (ParseException e) {
+					throw new IllegalArgumentException("couldn't parse the outbound interface " + outboundInterface, e);
+				}
+				matchingListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(outboundInterfaceURI, false);
+			}
+			
 			final SipProvider sipProvider = matchingListeningPoint.getSipProvider();
 
 

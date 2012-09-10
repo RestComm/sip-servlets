@@ -61,6 +61,7 @@ import javax.sip.header.ContactHeader;
 import javax.sip.message.Request;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.SipSessionExt;
 import org.mobicents.servlet.sip.message.B2buaHelperImpl;
 
 
@@ -127,7 +128,9 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	SipSession incomingSession;
 	SipSession outgoingSession;
 	int okReceived = 0;
+
 	SipURI aliceContact;
+	SipURI incomingInterface;
 	
 	@Override
 	public void init(ServletConfig servletConfig) throws ServletException {
@@ -140,25 +143,39 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			IOException {
 		if (request.getFrom().getURI().toString().contains("2-connectors-port-issue-sender") || request.getFrom().getURI().toString().contains("2-connectors-port-issue-receiver")) {
 			try {
-	            if ("REGISTER".equals(request.getMethod())) {
-	                if (request.getFrom().getURI().toString().contains("2-connectors-port-issue-sender")) {
-	                    // when alice registers, let's keep her contact using remote port information
-	                    String contact = request.getHeader("Contact");
-	                    SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
-	            				SIP_FACTORY);
-	                    aliceContact = (SipURI) sipFactory.createURI(contact.substring(1, contact.length() - 1));
-	                    aliceContact.setPort(request.getRemotePort());
-	                } else {
-	                    // when any request from bob is received, let's try to send an INVITE to Alice
-	                    SipServletRequest out = request.getSession().createRequest("INVITE");
-	                    out.setRequestURI(aliceContact);
-	                    out.send();
-	                }
-	                request.createResponse(SipServletResponse.SC_OK).send();
-	            }
-	        } catch (Exception ex) {
-	            log("Error processing request", ex);
-	        }
+			    if ("REGISTER".equals(request.getMethod())) {
+			        if (request.getFrom().getURI().toString().contains("2-connectors-port-issue-sender")) {
+			            // when alice registers, let's keep her contact using remote port information
+			            String contact = request.getHeader("Contact");
+			            SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
+			    				SIP_FACTORY);
+			            aliceContact = (SipURI) sipFactory.createURI(contact.substring(1, contact.length() - 1));
+			            aliceContact.setPort(request.getRemotePort());
+			            // Storing the incoming interface on which we received the message to be able to pick the correct interface
+			            // When sending requests to this SIP UA.
+			            String ipAddress = request.getLocalAddr();
+			            int port = request.getLocalPort();
+			            String transport = request.getTransport();
+			            List<SipURI> outboundInterfaces = (List<SipURI>) getServletContext().getAttribute(OUTBOUND_INTERFACES);
+			            for (SipURI uri : outboundInterfaces) {
+					if(uri.getHost().equalsIgnoreCase(ipAddress) && uri.getPort() == port && uri.getTransportParam().equalsIgnoreCase(transport)) {
+						incomingInterface = uri;
+					}
+				    }
+			        } else {
+			            // when any request from bob is received, let's try to send an INVITE to Alice
+			            SipSession session = request.getSession();
+			            // setting the outbound interface to make sure the container pick the correct connector
+			       	    ((SipSessionExt)session).setOutboundInterface(incomingInterface);
+			            SipServletRequest out = session.createRequest("INVITE");
+			            out.setRequestURI(aliceContact);
+			            out.send();
+			        }
+			        request.createResponse(SipServletResponse.SC_OK).send();
+			    }
+			} catch (Exception ex) {
+			    log("Error processing request", ex);
+			}
 		}
 		super.doRequest(request);
 	}
@@ -523,13 +540,14 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 	protected void doSuccessResponse(SipServletResponse sipServletResponse)
 			throws ServletException, IOException {
 		logger.info("Got : " + sipServletResponse.toString());
-		
+
 		if (sipServletResponse.getFrom().getURI().toString().contains("2-connectors-port-issue-sender") || sipServletResponse.getFrom().getURI().toString().contains("2-connectors-port-issue-receiver")) {
+			// we send the ACK directly only in non PRACK scenario
 			SipServletRequest ackRequest = sipServletResponse.createAck();
 			logger.info("Sending " +  ackRequest);
 			ackRequest.send();
+			return;
 		}
-		
 		String cSeqValue = sipServletResponse.getHeader("CSeq");
 		B2buaHelper b2buaHelper = sipServletResponse.getRequest().getB2buaHelper();			
 		

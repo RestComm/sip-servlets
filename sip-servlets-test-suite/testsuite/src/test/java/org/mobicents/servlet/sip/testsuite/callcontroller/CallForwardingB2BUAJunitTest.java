@@ -567,6 +567,7 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		assertTrue(receiver.getByeReceived());
 	}
 	
+
 	public void testCallForwardingCaller2ConnectorsPortIssue() throws Exception {
 		
 		senderProtocolObjects = new ProtocolObjects("forward-sender",
@@ -584,8 +585,9 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		senderProvider.addSipListener(sender);
 
 		tomcat.removeConnector(sipConnector);
-		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
+
 		tomcat.addSipConnector(serverName, sipIpAddress, 5071, ListeningPoint.TCP);
+		tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
 		
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();

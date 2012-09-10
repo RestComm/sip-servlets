@@ -234,7 +234,8 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 			Iterator<MobicentsExtendedListeningPoint> extentdedLPiterator = extendedListeningPoints.iterator();
 			while (extentdedLPiterator.hasNext()) {
 				MobicentsExtendedListeningPoint extendedListeningPoint = extentdedLPiterator.next();
-				if(extendedListeningPoint.getIpAddresses().contains(outboundInterface.getHost())) {
+				// Fix for http://code.google.com/p/sipservlets/issues/detail?id=159 	Bad choice of connectors when multiple of the same transport are available
+				if(extendedListeningPoint.getIpAddresses().contains(outboundInterface.getHost()) && extendedListeningPoint.getPort() == outboundInterface.getPort()) {
 					return extendedListeningPoint;
 				}
 			}
