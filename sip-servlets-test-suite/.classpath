@@ -44,7 +44,7 @@
 	<classpathentry kind="var" path="M2_REPO/junit/junit/4.8.2/junit-4.8.2.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mockito/mockito-all/1.8.5/mockito-all-1.8.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.29/tomcat-catalina-7.0.29.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.29/tomcat-catalina-7.0.29-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.29/tomcat-catalina-7.0.29.jar" sourcepath="/TOMCAT_HOME/java"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.29/tomcat-servlet-api-7.0.29.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.29/tomcat-servlet-api-7.0.29-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.29/tomcat-juli-7.0.29.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.29/tomcat-juli-7.0.29-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.29/tomcat-annotations-api-7.0.29.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.29/tomcat-annotations-api-7.0.29-sources.jar"/>
