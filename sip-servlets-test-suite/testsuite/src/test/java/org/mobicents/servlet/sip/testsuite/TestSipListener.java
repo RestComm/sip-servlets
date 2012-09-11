@@ -23,6 +23,7 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import gov.nist.javax.sip.DialogExt;
+import gov.nist.javax.sip.SipStackImpl;
 import gov.nist.javax.sip.address.SipUri;
 import gov.nist.javax.sip.header.HeaderExt;
 import gov.nist.javax.sip.header.HeaderFactoryExt;
@@ -34,6 +35,8 @@ import gov.nist.javax.sip.header.extensions.JoinHeader;
 import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.MessageExt;
+import gov.nist.javax.sip.stack.SIPDialog;
+import gov.nist.javax.sip.stack.SIPTransactionStack;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -101,7 +104,7 @@ import org.apache.log4j.Logger;
  */
 
 public class TestSipListener implements SipListener {
-	private static final String TO_TAG = "5432";
+	private String toTag = Integer.toString(new Random().nextInt(10000000));
 	
 	public List<Request> allRequests = new LinkedList<Request>();
 	public List<Response> allResponses = new LinkedList<Response>();
@@ -346,6 +349,8 @@ public class TestSipListener implements SipListener {
 
 	private String securityUser = "user";
 	private String securityPwd = "pass";
+
+	private boolean sendProvisionalResponseBeforeChallenge = false;
 	
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -1172,19 +1177,56 @@ public class TestSipListener implements SipListener {
 			return;
 		}
 		try {
+			ServerTransaction st = requestEvent.getServerTransaction();			
+			if (st == null) {
+				st = sipProvider.getNewServerTransaction(request);
+			}
+			inviteServerTid = st;
+			Dialog dialog = st.getDialog();
+			if(request.getHeader(JoinHeader.NAME) != null) {
+				setJoinRequestReceived(true);
+				this.joinDialog = dialog;
+			} else if (request.getHeader(ReplacesHeader.NAME) != null) {
+				setReplacesRequestReceived(true);
+				this.replacesDialog = dialog;
+			} else {
+				this.dialogCount ++;
+				this.dialog = dialog;
+			}						
+			
+			logger.info("Shootme: dialog = " + dialog);
+			if(dialog != null) {
+				logger.info("Shootme: dialog state = " + dialog.getState());
+			}
+			if(dialog != null && disableSequenceNumberValidation) {
+				((DialogExt)dialog).disableSequenceNumberValidation();
+			}
+			this.inviteRequest = request;
+			
+			boolean sendReliably = false;
+			RequireHeader requireHeader = (RequireHeader) request.getHeader(RequireHeader.NAME);				
+			if(requireHeader != null && "100rel".equalsIgnoreCase(requireHeader.getOptionTag().trim())) {
+				sendReliably = true;
+			}
+			
+			if(sendProvisionalResponseBeforeChallenge) {
+				sendProvisionalResponses(request, st, dialog, sendReliably);				
+			}
 			if(challengeRequests) {
 				// Verify AUTHORIZATION !!!!!!!!!!!!!!!!
 		        dsam = new DigestServerAuthenticationMethod();
 		        dsam.initialize(); // it should read values from file, now all static
 		        if ( !checkProxyAuthorization(request) ) {
 		        	 Thread.sleep(600);
-		        	Response response180 = protocolObjects.messageFactory.createResponse(100,request);
-		        	 if (serverTransaction!=null)
-			                serverTransaction.sendResponse(response180);
-			            else 
-			                sipProvider.sendResponse(response180);
-		        	 
-		        	 Thread.sleep(600);
+		        	if(!sendProvisionalResponseBeforeChallenge) {
+			        	Response response100 = protocolObjects.messageFactory.createResponse(100,request);
+			        	if (st!=null)
+			        		st.sendResponse(response100);
+				        else 
+				        	sipProvider.sendResponse(response100);
+			        	 
+			        	Thread.sleep(600);
+		        	}
 		    		
 		            Response responseauth = protocolObjects.messageFactory.createResponse(Response.PROXY_AUTHENTICATION_REQUIRED,request);
 		
@@ -1211,105 +1253,31 @@ public class TestSipListener implements SipListener {
 		            }
 		
 		            ToHeader toHeader = (ToHeader) responseauth.getHeader(ToHeader.NAME);
-		            toHeader.setTag(TO_TAG + 10000); // Application is supposed to set.
+		            toHeader.setTag(toTag); // Application is supposed to set.
 		            
-		            if (serverTransaction!=null)
-		                serverTransaction.sendResponse(responseauth);
+		            if(sendProvisionalResponseBeforeChallenge) {
+						provisionalResponsesToSend.clear();
+						toTag = Integer.toString(new Random().nextInt(10000000));
+						System.out.println("Resetted toTag to "+toTag);
+						this.dialog.delete();
+						((SIPTransactionStack)this.protocolObjects.sipStack).removeDialog((SIPDialog)dialog);
+//						Thread.sleep(10000);
+						this.dialog = null;
+					}
+		            
+		            if (st!=null)
+		                st.sendResponse(responseauth);
 		            else 
 		                sipProvider.sendResponse(responseauth);
 		
+					
 		            System.out.println("RequestValidation: 407 PROXY_AUTHENTICATION_REQUIRED replied:\n"+responseauth.toString());
 		            return;
 		        }
 		        System.out.println("shootme: got an Invite with Authorization, sending Trying");
 			}
-		
-			ServerTransaction st = requestEvent.getServerTransaction();			
-			if (st == null) {
-				st = sipProvider.getNewServerTransaction(request);
-			}
-			inviteServerTid = st;
-			Dialog dialog = st.getDialog();
-			if(request.getHeader(JoinHeader.NAME) != null) {
-				setJoinRequestReceived(true);
-				this.joinDialog = dialog;
-			} else if (request.getHeader(ReplacesHeader.NAME) != null) {
-				setReplacesRequestReceived(true);
-				this.replacesDialog = dialog;
-			} else {
-				this.dialogCount ++;
-				this.dialog = dialog;
-			}						
-			
-			logger.info("Shootme: dialog = " + dialog);
-			if(dialog != null && disableSequenceNumberValidation) {
-				((DialogExt)dialog).disableSequenceNumberValidation();
-			}
-			this.inviteRequest = request;
-			
-			boolean sendReliably = false;
-			RequireHeader requireHeader = (RequireHeader) request.getHeader(RequireHeader.NAME);				
-			if(requireHeader != null && "100rel".equalsIgnoreCase(requireHeader.getOptionTag().trim())) {
-				sendReliably = true;
-			}
-				
-			Iterator<Integer> provisionalResponseIt = provisionalResponsesToSend.iterator();
-			while (provisionalResponseIt.hasNext()) {
-				int provisionalResponseToSend = provisionalResponseIt.next();
-				Thread.sleep(getTimeToWaitBetweenProvisionnalResponse());
-				logger.info("shootme: Creating provisional response with status code " + provisionalResponseToSend);
-				Response response = protocolObjects.messageFactory.createResponse(
-						provisionalResponseToSend, request);
-				if(response.getStatusCode() == 183) {
-					response.setReasonPhrase("different" + System.nanoTime());
-				}				
-				if(provisionalResponseToSend >= Response.TRYING && provisionalResponseToSend < Response.OK) {
-					ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
-					if(provisionalResponseToSend != Response.TRYING && toHeader.getTag() == null) {
-						toHeader.setTag(TO_TAG); // Application is supposed to set.
-					}
-					if(sendReliably && provisionalResponseToSend != Response.TRYING) {
-						provisionalResponsesToSend.remove(0);
-						provisionalResponseIt = provisionalResponsesToSend.iterator();
-						requireHeader = protocolObjects.headerFactory.createRequireHeader("100rel");
-						response.addHeader(requireHeader);
-						Header rseqHeader = protocolObjects.headerFactory.createRSeqHeader(rseqNumber.getAndIncrement());
-						response.addHeader(rseqHeader);
-						Address address = protocolObjects.addressFactory
-						.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + myPort
-								+";transport="+protocolObjects.transport
-								+ ">");
-						contactHeader = protocolObjects.headerFactory.createContactHeader(address);
-						response.addHeader(contactHeader);
-						if(isAddRecordRouteForResponses()) {
-							address = protocolObjects.addressFactory
-							.createAddress("sip:127.0.0.1:" + myPort +";transport="+protocolObjects.transport);
-							RecordRouteHeader recordRouteHeader = protocolObjects.headerFactory.createRecordRouteHeader(address);
-							response.addHeader(recordRouteHeader);
-						}
-						dialog.sendReliableProvisionalResponse(response);							
-						break;
-					}  else {
-						if(provisionalResponseToSend == Response.TRYING) {
-							provisionalResponsesToSend.remove(0);
-							provisionalResponseIt = provisionalResponsesToSend.iterator();
-						}
-						Address address = protocolObjects.addressFactory
-						.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + myPort
-								+";transport="+protocolObjects.transport
-								+ ">");
-						contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
-						response.addHeader(contactHeader);
-						if(isAddRecordRouteForResponses()) {
-							address = protocolObjects.addressFactory
-							.createAddress("sip:127.0.0.1:" + myPort +";transport="+protocolObjects.transport);
-							RecordRouteHeader recordRouteHeader = protocolObjects.headerFactory.createRecordRouteHeader(address);
-							response.addHeader(recordRouteHeader);
-						}
-						
-						st.sendResponse(response);
-					}					
-				}
+			if(!sendProvisionalResponseBeforeChallenge) {
+				sendProvisionalResponses(request, st, dialog, sendReliably);
 			}
 			
 			if (sendUpdateAfterProvisionalResponses) {
@@ -1351,13 +1319,14 @@ public class TestSipListener implements SipListener {
 			
 			if(!waitForCancel) {
 				Address address = protocolObjects.addressFactory
-				.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + myPort
+					.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + myPort
 						+";transport="+protocolObjects.transport
 						+ ">");
 				contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
 				setFinalResponse(protocolObjects.messageFactory
 						.createResponse(finalResponseToSend, request));
 				Response response = getFinalResponse();
+				logger.debug("created final response " + response);
 				if(testAckViaParam) {
 					ViaHeader viaHeader = (ViaHeader)response.getHeader(ViaHeader.NAME);
 					viaHeader.setParameter("testAckViaParam", "true");
@@ -1370,8 +1339,12 @@ public class TestSipListener implements SipListener {
 					response.addHeader(authenticationInfoHeader);
 				}
 				ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
+				if(sendProvisionalResponseBeforeChallenge) {
+					toHeader.removeParameter("tag");
+				}
 				if(toHeader.getTag() == null) {
-					toHeader.setTag(TO_TAG); // Application is supposed to set.
+					logger.debug("setting to Tag " + toTag);
+					toHeader.setTag(toTag); // Application is supposed to set.
 				}
 				getFinalResponse().addHeader(contactHeader);
 				if(isAddRecordRouteForResponses()) {
@@ -1403,6 +1376,71 @@ public class TestSipListener implements SipListener {
 			}
 		} catch (Exception ex) {
 			logger.error("unexpected exception", ex);
+		}
+	}
+
+	private void sendProvisionalResponses(Request request,
+			ServerTransaction st, Dialog dialog, boolean sendReliably)
+			throws InterruptedException, ParseException,
+			InvalidArgumentException, SipException {
+		RequireHeader requireHeader;
+		Iterator<Integer> provisionalResponseIt = provisionalResponsesToSend.iterator();
+		while (provisionalResponseIt.hasNext()) {
+			int provisionalResponseToSend = provisionalResponseIt.next();
+			Thread.sleep(getTimeToWaitBetweenProvisionnalResponse());
+			logger.info("shootme: Creating provisional response with status code " + provisionalResponseToSend);
+			Response response = protocolObjects.messageFactory.createResponse(
+					provisionalResponseToSend, request);
+			if(response.getStatusCode() == 183) {
+				response.setReasonPhrase("different" + System.nanoTime());
+			}				
+			if(provisionalResponseToSend >= Response.TRYING && provisionalResponseToSend < Response.OK) {
+				ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
+				if(provisionalResponseToSend != Response.TRYING && toHeader.getTag() == null) {
+					toHeader.setTag(toTag); // Application is supposed to set.
+				}
+				if(sendReliably && provisionalResponseToSend != Response.TRYING) {
+					provisionalResponsesToSend.remove(0);
+					provisionalResponseIt = provisionalResponsesToSend.iterator();
+					requireHeader = protocolObjects.headerFactory.createRequireHeader("100rel");
+					response.addHeader(requireHeader);
+					Header rseqHeader = protocolObjects.headerFactory.createRSeqHeader(rseqNumber.getAndIncrement());
+					response.addHeader(rseqHeader);
+					Address address = protocolObjects.addressFactory
+					.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + myPort
+							+";transport="+protocolObjects.transport
+							+ ">");
+					contactHeader = protocolObjects.headerFactory.createContactHeader(address);
+					response.addHeader(contactHeader);
+					if(isAddRecordRouteForResponses()) {
+						address = protocolObjects.addressFactory
+						.createAddress("sip:127.0.0.1:" + myPort +";transport="+protocolObjects.transport);
+						RecordRouteHeader recordRouteHeader = protocolObjects.headerFactory.createRecordRouteHeader(address);
+						response.addHeader(recordRouteHeader);
+					}
+					dialog.sendReliableProvisionalResponse(response);							
+					break;
+				}  else {
+					if(provisionalResponseToSend == Response.TRYING) {
+						provisionalResponsesToSend.remove(0);
+						provisionalResponseIt = provisionalResponsesToSend.iterator();
+					}
+					Address address = protocolObjects.addressFactory
+					.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + myPort
+							+";transport="+protocolObjects.transport
+							+ ">");
+					contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
+					response.addHeader(contactHeader);
+					if(isAddRecordRouteForResponses()) {
+						address = protocolObjects.addressFactory
+						.createAddress("sip:127.0.0.1:" + myPort +";transport="+protocolObjects.transport);
+						RecordRouteHeader recordRouteHeader = protocolObjects.headerFactory.createRecordRouteHeader(address);
+						response.addHeader(recordRouteHeader);
+					}
+					
+					st.sendResponse(response);
+				}					
+			}
 		}
 	}
 	
@@ -1720,7 +1758,7 @@ public class TestSipListener implements SipListener {
 							.createResponse(finalResponseToSend, inviteRequest));					
 					ToHeader toHeader = (ToHeader) getFinalResponse().getHeader(ToHeader.NAME);
 					if(toHeader.getTag() == null) {
-						toHeader.setTag(TO_TAG); // Application is supposed to set.
+						toHeader.setTag(toTag); // Application is supposed to set.
 					}
 					getFinalResponse().addHeader(contactHeader);
 					inviteServerTid.sendResponse(getFinalResponse());
@@ -3440,5 +3478,9 @@ public class TestSipListener implements SipListener {
 
 	public void setSecurityPwd(String securityPwd) {
 		this.securityPwd  = securityPwd;
+	}
+
+	public void sendProvisionalResponseBeforeChallenge(boolean b) {
+		sendProvisionalResponseBeforeChallenge  = b;
 	}
 }

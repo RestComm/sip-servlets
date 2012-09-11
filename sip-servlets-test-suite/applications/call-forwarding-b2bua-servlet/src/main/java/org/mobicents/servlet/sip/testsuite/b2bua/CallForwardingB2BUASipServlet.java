@@ -81,6 +81,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
 		forwardingUris.put("sip:forward-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", 
 				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
+		forwardingUris.put("sip:forward-sender-auth-early-dialog@sip-servlets.com", 
+				new String[]{"sip:forward-receiver-auth-early-dialog@sip-servlets.com", "sip:forward-receiver-auth-early-dialog@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
 		forwardingUris.put("sip:forward-sender-forking-pending@sip-servlets.com", 
 				new String[]{"sip:forward-receiver-forking-pending@sip-servlets.com", "sip:forward-receiver-forking-pending@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070"});
 		forwardingUris.put("sip:forward-sender-factory-same-callID@sip-servlets.com", 
@@ -549,8 +551,14 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			ackRequest.send();
 			return;
 		}
+		
 		String cSeqValue = sipServletResponse.getHeader("CSeq");
 		B2buaHelper b2buaHelper = sipServletResponse.getRequest().getB2buaHelper();			
+
+		if (cSeqValue.indexOf("INVITE") != -1 && (sipServletResponse.getFrom().getURI().toString().contains("auth-early-dialog") || sipServletResponse.getFrom().getURI().toString().contains("auth-early-dialog"))) {
+			SipServletRequest clientRequest = b2buaHelper.createRequest(sipServletResponse.getRequest(), 
+					true, null); 
+		}
 		
 		SipSession originalSession =   
 		    sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());

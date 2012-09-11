@@ -117,6 +117,47 @@ public class CallForwardingB2BUAAuthTest extends SipServletTestCase {
 		assertEquals(1, nbHeaders);
 	}
 	
+	// Non regression test for issues 19 http://code.google.com/p/sipservlets/issues/detail?id=19
+	public void testCallForwardingShootmeAuthEarlyDialog() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		receiver.sendProvisionalResponseBeforeChallenge(true);
+		receiver.setChallengeRequests(true);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-sender-auth-early-dialog";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "forward-receiver-auth-early-dialog";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+				
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Remote-Party-ID"}, new String[] {"<sip:test@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080>;screen=yes;privacy=off;party=calling;-call-initiator=5016;-call-initiator-location=int;-redirected-by;-int-ext=5016;-ent-name=Acro;-direction=ext;-call-id=55665"}, true);		
+		Thread.sleep(TIMEOUT*2);
+		assertTrue(sender.getOkToByeReceived());
+		assertTrue(receiver.getByeReceived());
+		// Non Regression test for http://code.google.com/p/mobicents/issues/detail?id=2094
+		// B2b re-invite for authentication will duplicate Remote-Party-ID header
+		ListIterator<Header> it = receiver.getInviteRequest().getHeaders("Remote-Party-ID");
+		int nbHeaders= 0;
+		while (it.hasNext()) {
+			Header header = it.next();
+			nbHeaders++;
+		}
+		assertEquals(1, nbHeaders);
+	}
+	
 	/*
 	 * Non regression test for Issue http://code.google.com/p/mobicents/issues/detail?id=2114
 	 * In B2b servlet, after re-INVITE, and try to create CANCEL will get "final response already sent!" exception.
