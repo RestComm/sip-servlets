@@ -604,6 +604,15 @@ public class SipSessionImpl implements MobicentsSipSession {
 				else if (sipSessionSecurity != null) {
 					sipServletRequest.updateAuthorizationHeaders(false);
 				}
+				// http://code.google.com/p/sipservlets/issues/detail?id=19 
+				// Retried Request are not considered as initial
+				if(sessionCreatingTransactionRequest != null && sessionCreatingTransactionRequest.getLastFinalResponse() != null && 
+						sessionCreatingTransactionRequest.getLastFinalResponse().getStatus() >= 400 && sessionCreatingTransactionRequest.getLastFinalResponse().getStatus() < 500) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Treating as Initial Request");
+					}
+					sipServletRequest.setRoutingState(RoutingState.INITIAL);
+				}
 				
 				return sipServletRequest;
 			} else {

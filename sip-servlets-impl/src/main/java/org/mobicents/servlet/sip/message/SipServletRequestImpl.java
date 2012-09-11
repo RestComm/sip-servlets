@@ -1752,6 +1752,11 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		if(routingState.equals(RoutingState.SUBSEQUENT)) {
 			isInitial = false;
 		}
+		// http://code.google.com/p/sipservlets/issues/detail?id=19 
+		// Retried Request are not considered as initial
+		if(routingState.equals(RoutingState.INITIAL)) {
+			isInitial = true;
+		}
 		if(logger.isDebugEnabled()) {
 			logger.debug("setting routing state to " + routingState);
 		}
