@@ -212,7 +212,7 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		assertEquals(1, i);
 		ListIterator<ContactHeader> contactHeaderIt = receiver.getRegisterReceived().getHeaders(ContactHeader.NAME);
 		assertTrue(contactHeaderIt.hasNext());
-		assertTrue(contactHeaderIt.next().toString().trim().startsWith("Contact: <sip:forward-tcp-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070;transport=tcp>"));
+		assertTrue(contactHeaderIt.next().toString().trim().startsWith("Contact: <sip:forward-tcp-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;transport=tcp>"));
 		assertTrue(contactHeaderIt.hasNext());
 		assertTrue(contactHeaderIt.next().toString().trim().startsWith("Contact: \"callforwardingB2BUA\" <sip:test@192.168.15.15:5055;q=0.1;transport=tcp;test>;test"));
 		ListIterator<Header> extensionHeaderIt = receiver.getRegisterReceived().getHeaders("extension-header");
