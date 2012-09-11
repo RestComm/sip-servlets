@@ -515,8 +515,8 @@ public class Shootme implements SipListener {
 					inviteRequest);
 			ToHeader to = (ToHeader) response.getHeader(ToHeader.NAME);
 			to.setTag(this.toTag);
-			Address address = addressFactory.createAddress("Shootme <sip:"
-					+ myAddress + ":" + myPort + "transport=" + transport +">");
+			Address address = addressFactory.createAddress("sip:"
+					+ myAddress + ":" + myPort + ";transport=" + transport);
 			ContactHeader contactHeader = headerFactory
 					.createContactHeader(address);
 			response.addHeader(contactHeader);

@@ -49,7 +49,7 @@ public class ProxyPrackTest extends SipServletTestCase implements SipListener {
 
 	protected Hashtable providerTable = new Hashtable();
 
-	private static final int TIMEOUT = 5000;
+	private static final int TIMEOUT = 20000;
 
 	private static final int receiversCount = 1;
 
@@ -70,7 +70,7 @@ public class ProxyPrackTest extends SipServletTestCase implements SipListener {
 
 	public void testPrackProxying() {
 		this.shootme.init("stackName", null);
-//		this.cutme.init(listeningPointTransport);
+//		this.cutme.init(null);
 		this.shootist.init("prack-useHostName",false, null);
 		for (int q = 0; q < 20; q++) {
 			if (shootist.ended == false && cutme.canceled == false)
