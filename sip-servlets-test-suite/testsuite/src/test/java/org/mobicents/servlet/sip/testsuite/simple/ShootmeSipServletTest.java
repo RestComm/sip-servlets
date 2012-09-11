@@ -44,6 +44,7 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.SipEmbedded;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
@@ -674,7 +675,9 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		tomcat.removeConnector(sipConnector);
-		tomcat.stopTomcat();		
+		tomcat.startTomcat();
+		tomcat.stopTomcat();
+		
 		Properties sipStackProperties = new Properties();
 		sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-"
 				+ sipIpAddress + "-" + 5070);
@@ -687,12 +690,25 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		sipStackProperties.setProperty("gov.nist.javax.sip.REENTRANT_LISTENER",
 				"true");
 		sipStackProperties.setProperty("org.mobicents.servlet.sip.SERVER_HEADER",
-			"MobicentsSipServletsServer");
-		tomcat.getSipService().setSipStackProperties(sipStackProperties);
-		tomcat.getSipService().init();
-		tomcat.restartTomcat();
+				"MobicentsSipServletsServer");
+		
+		tomcat = new SipEmbedded(serverName, serviceFullClassName);
+		tomcat.setLoggingFilePath(				
+				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
+				File.separatorChar + "testsuite" + 
+				File.separatorChar + "src" +
+				File.separatorChar + "test" + 
+				File.separatorChar + "resources" + File.separatorChar);
+		logger.info("Log4j path is : " + tomcat.getLoggingFilePath());
+		String darConfigurationFile = getDarConfigurationFile();
+		tomcat.setDarConfigurationFilePath(darConfigurationFile);
+		tomcat.initTomcat(tomcatBasePath, sipStackProperties);
+		tomcat.addHttpConnector(httpIpAddress, 8080);			
+		if(addSipConnectorOnStartup) {
+			sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
+		}
+		tomcat.startTomcat();	
 		deployApplication();
-		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isAckSent());
