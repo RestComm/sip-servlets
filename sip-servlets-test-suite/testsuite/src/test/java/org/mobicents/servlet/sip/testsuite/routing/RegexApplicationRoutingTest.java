@@ -150,6 +150,7 @@ public class RegexApplicationRoutingTest extends SipServletTestCase {
 	protected void tearDown() throws Exception {					
 		senderProtocolObjects.destroy();	
 		registerRecieverProtocolObjects.destroy();
+		tomcat.stopTomcat();
 		logger.info("Test completed");
 		super.tearDown();
 	}
