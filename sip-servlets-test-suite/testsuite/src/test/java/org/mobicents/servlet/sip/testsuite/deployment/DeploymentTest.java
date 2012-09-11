@@ -74,7 +74,7 @@ public class DeploymentTest extends SipServletTestCase {
 		}
 		assertTrue(tomcat.deployContext(
 			projectHome + "/sip-servlets-test-suite/applications/simple-sip-servlet/src/main/sipapp",
-			"sip-test-context", webContextName));
+			webContextName + "sip-test-context", webContextName));
 	}
 	
 	public void deployShootmeAuthApplication(String webContextName) {

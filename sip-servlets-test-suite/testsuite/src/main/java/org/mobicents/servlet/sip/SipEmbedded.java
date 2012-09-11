@@ -275,7 +275,13 @@ public class SipEmbedded {
 	public void stopTomcat() {
 		// Stop the embedded server
 		Server server = null;
-		if(sipService != null) {
+		if(sipService != null) {			
+			try {
+				server = sipService.getServer();
+				sipService.stop();				
+			} catch (LifecycleException e) {
+				log.error("SipService already stopped ", e);
+			}	
 			Connector[] connectors = sipService.findConnectors();
 			// Fix regression on the testsuite causing Tomcat not to remove properly the connectors
 			// and making the tests hang
@@ -289,12 +295,6 @@ public class SipEmbedded {
 				}				
 				sipService.removeConnector(connector);
 			}
-			try {
-				server = sipService.getServer();
-				sipService.stop();				
-			} catch (LifecycleException e) {
-				log.error("SipService already stopped ", e);
-			}	
 			if(server != null) {
 				server.removeService(sipService);
 			}

@@ -109,16 +109,20 @@ public class CallControllerSipUnitTest extends SipUnitServletTestCase {
 				"logs/callforwarding_server_" + port + ".xml");
 		properties.setProperty("gov.nist.javax.sip.TRACE_LEVEL", "32");
 		
-		return new SipStack(transport, port, properties);		
+		return new SipStack(transport, port, properties);
 	}
 
-	public void setupPhone(String fromAddress, String toAddress) throws Exception {			
+	public void setupPhone(String fromAddress, String toAddress) {
+		try {
 			sipStackSender = makeStack(SipStack.PROTOCOL_UDP, 5080);			
 			sipPhoneSender = sipStackSender.createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
 					SipStack.PROTOCOL_UDP, 5070, fromAddress);		
 			sipStackReceiver = makeStack(SipStack.PROTOCOL_UDP, 5090);			
 			sipPhoneReceiver = sipStackReceiver.createSipPhone("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "",
 					SipStack.PROTOCOL_UDP, 5070, toAddress);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 

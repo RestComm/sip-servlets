@@ -576,7 +576,8 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 
 	@Override
 	public void stopInternal() throws LifecycleException {
-
+		// on Tomcat 7 super.stop needs to be called before for Issue 1411 http://code.google.com/p/mobicents/issues/detail?id=1411
+		super.stopInternal();
 		// Tomcat specific unloading case
 		// Issue 1411 http://code.google.com/p/mobicents/issues/detail?id=1411
 		// Sip Connectors should be removed after removing all Sip Servlets to allow them to send BYE to terminate cleanly
@@ -595,8 +596,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 		}	
 		if(!connectorsStartedExternally) {
 			sipApplicationDispatcher.stop();
-		}
-		super.stopInternal();
+		}	
 		if(logger.isDebugEnabled()) {
 			logger.debug("SIP Standard Service Stopped.");
 		}
