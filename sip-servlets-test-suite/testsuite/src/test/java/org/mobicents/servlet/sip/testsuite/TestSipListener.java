@@ -1259,10 +1259,10 @@ public class TestSipListener implements SipListener {
 						provisionalResponsesToSend.clear();
 						toTag = Integer.toString(new Random().nextInt(10000000));
 						System.out.println("Resetted toTag to "+toTag);
-						this.dialog.delete();
-						((SIPTransactionStack)this.protocolObjects.sipStack).removeDialog((SIPDialog)dialog);
-//						Thread.sleep(10000);
-						this.dialog = null;
+//						this.dialog.delete();
+//						((SIPTransactionStack)this.protocolObjects.sipStack).removeDialog((SIPDialog)dialog);
+////						Thread.sleep(10000);
+//						this.dialog = null;
 					}
 		            
 		            if (st!=null)

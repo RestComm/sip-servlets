@@ -461,7 +461,17 @@ public class SipSessionImpl implements MobicentsSipSession {
 				logger.error("Cannot create the " + method + " request from the dialog " + sessionCreatingDialog,e);
 				throw new IllegalArgumentException("Cannot create the " + method + " request from the dialog " + sessionCreatingDialog + " for sip session " + key,e);
 			} 	
-		} else {			
+		} else {	
+			boolean treatAsInitialRequest = false;
+			// http://code.google.com/p/sipservlets/issues/detail?id=19 
+			// Retried Request are not considered as initial
+			if(sessionCreatingTransactionRequest != null && sessionCreatingTransactionRequest.getLastFinalResponse() != null && 
+					sessionCreatingTransactionRequest.getLastFinalResponse().getStatus() >= 400 && sessionCreatingTransactionRequest.getLastFinalResponse().getStatus() < 500) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Treating as Initial Request");
+				}
+				treatAsInitialRequest = true;
+			}
 			//case where other requests are sent with the same session like REGISTER or for challenge requests
 			if(sessionCreatingTransactionRequest != null) {
 				if(!isSessionCreatingTransactionServer) {
@@ -509,8 +519,16 @@ public class SipSessionImpl implements MobicentsSipSession {
 		    				sipNetworkInterfaceManager, request, branch, outboundInterface);
 		    		request.addHeader(viaHeader);
 					
+		    		// http://code.google.com/p/sipservlets/issues/detail?id=161
+		    		// Don't reuse the dialog for challenge requests as it can lead to the JAIN SIP Stack
+		    		// reusing the Terminated dialog and drop 200 OK
+		    		Dialog dialogToUse = sessionCreatingDialog;
+		    		if(treatAsInitialRequest) {
+		    			dialogToUse = null;
+		    		}
+		    		
 					sipServletRequest = (SipServletRequestImpl) sipFactory.getMobicentsSipServletMessageFactory().createSipServletRequest(
-							request, this, null, sessionCreatingDialog,
+							request, this, null, dialogToUse,
 							true);
 					
 					// Fix for Issue http://code.google.com/p/mobicents/issues/detail?id=2230 BYE is routed to unexpected IP
@@ -604,13 +622,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 				else if (sipSessionSecurity != null) {
 					sipServletRequest.updateAuthorizationHeaders(false);
 				}
-				// http://code.google.com/p/sipservlets/issues/detail?id=19 
-				// Retried Request are not considered as initial
-				if(sessionCreatingTransactionRequest != null && sessionCreatingTransactionRequest.getLastFinalResponse() != null && 
-						sessionCreatingTransactionRequest.getLastFinalResponse().getStatus() >= 400 && sessionCreatingTransactionRequest.getLastFinalResponse().getStatus() < 500) {
-					if(logger.isDebugEnabled()) {
-						logger.debug("Treating as Initial Request");
-					}
+				if(treatAsInitialRequest) {
 					sipServletRequest.setRoutingState(RoutingState.INITIAL);
 				}
 				

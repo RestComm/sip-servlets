@@ -118,6 +118,7 @@ public class CallForwardingB2BUAAuthTest extends SipServletTestCase {
 	}
 	
 	// Non regression test for issues 19 http://code.google.com/p/sipservlets/issues/detail?id=19
+	// and http://code.google.com/p/sipservlets/issues/detail?id=161
 	public void testCallForwardingShootmeAuthEarlyDialog() throws Exception {
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
 		SipProvider senderProvider = sender.createProvider();

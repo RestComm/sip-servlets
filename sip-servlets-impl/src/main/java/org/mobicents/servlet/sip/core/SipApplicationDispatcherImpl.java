@@ -975,6 +975,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			logger.debug("Client Transaction " + clientTransaction);
 			logger.debug("Original Transaction " + originalTransaction);
 			logger.debug("Dialog " + dialog);
+			if(dialog != null) {
+				logger.debug("Dialog State " + dialog.getState());
+			}
 		}
 		// Issue 1468 : Handling forking 
 		if(isForkedResponse && originalTransaction != null && !responseEventExt.isRetransmission()) {
