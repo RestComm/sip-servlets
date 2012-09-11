@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sip-app>
+	<app-name>WebsocketSample</app-name>
+	<display-name>WebsocketSample</display-name>
+	<description>WebsocketSample</description>
+	
+	<servlet-selection>
+		<main-servlet>
+			SimpleSipServlet
+		</main-servlet>
+	</servlet-selection>
+
+	<servlet>
+		<servlet-name>SimpleSipServlet</servlet-name>
+		<display-name>SimpleSipServlet</display-name>
+		<description>Simple SIP servlet</description>
+		<servlet-class>
+			org.mobicents.servlet.sip.example.SimpleSipServlet
+		</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+    
+    <listener>
+		<listener-class>
+			org.mobicents.servlet.sip.example.SimpleSipServlet
+		</listener-class>
+	</listener>
+</sip-app>
