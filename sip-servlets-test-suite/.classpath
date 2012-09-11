@@ -44,14 +44,13 @@
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mockito/mockito-all/1.8.5/mockito-all-1.8.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
-	<classpathentry kind="lib" path="testsuite/lib/sipunit.jar" sourcepath="/sipunit/src"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.29/tomcat-catalina-7.0.29.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.29/tomcat-catalina-7.0.29-sources.jar"/>
-  	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.29/tomcat-servlet-api-7.0.29.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.29/tomcat-servlet-api-7.0.29-sources.jar"/>
-  	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.29/tomcat-juli-7.0.29.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.29/tomcat-juli-7.0.29-sources.jar"/>
-  	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.29/tomcat-annotations-api-7.0.29.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.29/tomcat-annotations-api-7.0.29-sources.jar"/>
-  	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.29/tomcat-api-7.0.29.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-api/7.0.29/tomcat-api-7.0.29-sources.jar"/>
-  	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.29/tomcat-util-7.0.29.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-util/7.0.29/tomcat-util-7.0.29-sources.jar"/>
-  	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.29/tomcat-coyote-7.0.29.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.29/tomcat-coyote-7.0.29-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.29/tomcat-servlet-api-7.0.29.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.29/tomcat-servlet-api-7.0.29-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.29/tomcat-juli-7.0.29.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.29/tomcat-juli-7.0.29-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.29/tomcat-annotations-api-7.0.29.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.29/tomcat-annotations-api-7.0.29-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.29/tomcat-api-7.0.29.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-api/7.0.29/tomcat-api-7.0.29-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.29/tomcat-util-7.0.29.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-util/7.0.29/tomcat-util-7.0.29-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.29/tomcat-coyote-7.0.29.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.29/tomcat-coyote-7.0.29-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-jsp-api/7.0.29/tomcat-jsp-api-7.0.29.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-el-api/7.0.29/tomcat-el-api-7.0.29.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-jasper/7.0.29/tomcat-jasper-7.0.29.jar"/>
@@ -70,5 +69,10 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-core-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-catalina-7"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/tomcat-7"/>
+	<classpathentry kind="var" path="M2_REPO/org/cafesip/sipunit/sipunit/2.0.0/sipunit-2.0.0.jar" sourcepath="M2_REPO/org/cafesip/sipunit/sipunit/2.0.0/sipunit-2.0.0-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/home/jean/.m2/repository/org/cafesip/sipunit/sipunit/2.0.0/sipunit-2.0.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="testsuite/target/test-classes"/>
 </classpath>
