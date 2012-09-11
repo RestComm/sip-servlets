@@ -29,6 +29,7 @@ import org.apache.catalina.Context;
 import org.apache.catalina.Wrapper;
 import org.apache.catalina.deploy.SecurityConstraint;
 import org.apache.catalina.startup.SetNextNamingRule;
+import org.apache.log4j.Logger;
 import org.apache.tomcat.util.digester.Digester;
 import org.apache.tomcat.util.digester.NodeCreateRule;
 import org.apache.tomcat.util.digester.Rule;
@@ -51,7 +52,7 @@ import org.xml.sax.Attributes;
  */
 public class SipRuleSet extends RuleSetBase {
 
-
+	
     // ----------------------------------------------------- Instance Variables
 
 
@@ -590,19 +591,27 @@ final class WrapperCreateRule extends Rule {
 
 final class PatternRule extends NodeCreateRule {
 	
+	private static transient final Logger logger = Logger.getLogger(PatternRule.class);
 	
 	public PatternRule() throws Exception {
 		super();
 	}
 	
+	@Override
+	public void begin(String namespace, String name, Attributes attributes)
+			throws Exception {
+		super.begin(namespace, name, attributes);
+	}
 	
-	public void end() throws Exception {	    
+	@Override
+	public void end(String namespace, String name) throws Exception {	    
 	    Element e = (Element) super.digester.pop();
 		Node pattern = (Node) e;
-
 		NodeList list = pattern.getChildNodes();
-	   
 		MatchingRule rule = MatchingRuleParser.buildRule((Element) list.item(0));
+		if(logger.isTraceEnabled()) {
+			logger.trace("matching rule : " + rule);
+		}
 		MobicentsSipServletMapping sipServletMapping = (MobicentsSipServletMapping) digester.peek();
 	    sipServletMapping.setMatchingRule(rule);
 	//    if (digester.getLogger().isDebugEnabled())
