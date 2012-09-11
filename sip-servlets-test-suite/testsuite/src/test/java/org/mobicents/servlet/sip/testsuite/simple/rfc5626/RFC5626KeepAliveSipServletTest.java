@@ -22,6 +22,7 @@
 
 package org.mobicents.servlet.sip.testsuite.simple.rfc5626;
 
+import gov.nist.javax.sip.stack.OIOMessageProcessorFactory;
 import gov.nist.javax.sip.stack.SIPTransactionStack;
 
 import java.io.File;
@@ -291,6 +292,8 @@ public class RFC5626KeepAliveSipServletTest extends SipServletTestCase {
 		sipStackProperties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "1");
 		sipStackProperties.setProperty(SipStandardService.LOOSE_DIALOG_VALIDATION, "true");
 		sipStackProperties.setProperty(SipStandardService.PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");		
+		sipStackProperties.setProperty("gov.nist.javax.sip.MESSAGE_PROCESSOR_FACTORY", OIOMessageProcessorFactory.class.getName());
+		sipStackProperties.setProperty("gov.nist.javax.sip.USE_NIO", "false");
 		return sipStackProperties;
 	}
 

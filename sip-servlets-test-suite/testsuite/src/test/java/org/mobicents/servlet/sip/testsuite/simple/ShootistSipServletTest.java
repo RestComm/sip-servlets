@@ -21,6 +21,7 @@
  */
 package org.mobicents.servlet.sip.testsuite.simple;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -46,6 +47,7 @@ import javax.sip.message.Response;
 
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
+import org.mobicents.servlet.sip.SipEmbedded;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
@@ -527,7 +529,9 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		
 		receiverProtocolObjects.start();
 		tomcat.removeConnector(sipConnector);
+		tomcat.startTomcat();
 		tomcat.stopTomcat();
+		
 		Properties sipStackProperties = new Properties();
 		sipStackProperties.setProperty("javax.sip.STACK_NAME", "mss-"
 				+ sipIpAddress + "-" + 5070);
@@ -541,11 +545,26 @@ public class ShootistSipServletTest extends SipServletTestCase {
 				"true");
 		sipStackProperties.setProperty("org.mobicents.servlet.sip.USER_AGENT_HEADER",
 			"MobicentsSipServletsUserAgent");
-		tomcat.getSipService().setSipStackPropertiesFile(null);
-		tomcat.getSipService().setSipStackProperties(sipStackProperties);
-		tomcat.getSipService().init();
-		tomcat.restartTomcat();
-		sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
+		
+		tomcat = new SipEmbedded(serverName, serviceFullClassName);
+		tomcat.setLoggingFilePath(				
+				projectHome + File.separatorChar + "sip-servlets-test-suite" + 
+				File.separatorChar + "testsuite" + 
+				File.separatorChar + "src" +
+				File.separatorChar + "test" + 
+				File.separatorChar + "resources" + File.separatorChar);
+		logger.info("Log4j path is : " + tomcat.getLoggingFilePath());
+		String darConfigurationFile = getDarConfigurationFile();
+		tomcat.setDarConfigurationFilePath(darConfigurationFile);
+		if(initTomcatOnStartup) {			
+			tomcat.initTomcat(tomcatBasePath, sipStackProperties);
+			tomcat.addHttpConnector(httpIpAddress, 8080);			
+			if(addSipConnectorOnStartup) {
+				sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5070, listeningPointTransport);
+			}
+		}		
+	
+		tomcat.startTomcat();
 		deployApplication();
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());	
@@ -756,7 +775,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		ContactHeader contactHeader = (ContactHeader) receiver.getRegisterReceived().getHeader(ContactHeader.NAME);
 		assertNotNull(contactHeader);	
 		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().contains("sip:"));
-		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().contains("5072"));
+		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().contains("5080"));
 		assertTrue(((SipURI)contactHeader.getAddress().getURI()).toString().toLowerCase().contains("transport=tls"));
 	}
 	
