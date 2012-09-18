@@ -105,8 +105,8 @@ public class SIPWebContext extends SipStandardContext {
 
     @Override
     public void start() throws LifecycleException {
-    	if(log.isInfoEnabled()) {
-    		log.infof("Starting sip web context for deployment %s", deploymentUnit.getName());
+    	if(log.isDebugEnabled()) {
+    		log.debugf("Starting sip web context for deployment %s", deploymentUnit.getName());
     	}
         SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
         SipAnnotationMetaData sipAnnotationMetaData = deploymentUnit.getAttachment(SipAnnotationMetaData.ATTACHMENT_KEY);
@@ -117,8 +117,8 @@ public class SIPWebContext extends SipStandardContext {
         final WebMetaData original = null;
         JBossWebMetaDataMerger.merge(mergedMetaData, override, original);
 
-        if(log.isInfoEnabled()) {
-    		log.infof("security domain " + mergedMetaData.getSecurityDomain() + " for deployment %s", deploymentUnit.getName());
+        if(log.isDebugEnabled()) {
+    		log.debugf("security domain " + mergedMetaData.getSecurityDomain() + " for deployment %s", deploymentUnit.getName());
     	}
         
         augmentAnnotations(mergedMetaData, sipMetaData, sipAnnotationMetaData);

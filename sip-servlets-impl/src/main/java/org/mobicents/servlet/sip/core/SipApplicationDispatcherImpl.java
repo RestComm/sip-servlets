@@ -456,12 +456,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		//if the application has not set any concurrency control mode, we default to the container wide one
 		if(sipApplication.getConcurrencyControlMode() == null) {			
 			sipApplication.setConcurrencyControlMode(concurrencyControlMode);
-			if(logger.isInfoEnabled()) {
-				logger.info("No concurrency control mode for application " + sipApplicationName + " , defaulting to the container wide one : " + concurrencyControlMode);
+			if(logger.isDebugEnabled()) {
+				logger.debug("No concurrency control mode for application " + sipApplicationName + " , defaulting to the container wide one : " + concurrencyControlMode);
 			}
 		} else {
-			if(logger.isInfoEnabled()) {
-				logger.info("Concurrency control mode for application " + sipApplicationName + " is " + sipApplication.getConcurrencyControlMode());
+			if(logger.isDebugEnabled()) {
+				logger.debug("Concurrency control mode for application " + sipApplicationName + " is " + sipApplication.getConcurrencyControlMode());
 			}
 		}
 		sipApplication.getServletContext().setAttribute(ConcurrencyControlMode.class.getCanonicalName(), sipApplication.getConcurrencyControlMode());		
@@ -485,16 +485,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		} finally {
 			statusLock.unlock();
 		}
-		if(logger.isInfoEnabled()) {
-			logger.info("the following sip servlet application has been added : " + sipApplicationName);
+		if(logger.isDebugEnabled()) {
+			logger.debug("the following sip servlet application has been added : " + sipApplicationName);
 		}
-		if(logger.isInfoEnabled()) {
-			logger.info("It contains the following Sip Servlets : ");
+		if(logger.isDebugEnabled()) {
+			logger.debug("It contains the following Sip Servlets : ");
 			for(String servletName : sipApplication.getChildrenMap().keySet()) {
-				logger.info("SipApplicationName : " + sipApplicationName + "/ServletName : " + servletName);
+				logger.debug("SipApplicationName : " + sipApplicationName + "/ServletName : " + servletName);
 			}
 			if(sipApplication.getSipRubyController() != null) {
-				logger.info("It contains the following Sip Ruby Controller : " + sipApplication.getSipRubyController());
+				logger.debug("It contains the following Sip Ruby Controller : " + sipApplication.getSipRubyController());
 			}
 		}
 	}
@@ -512,8 +512,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		String hash = GenericUtils.hashString(sipApplicationName);
 		mdToApplicationName.remove(hash);
 		applicationNameToMd.remove(sipApplicationName);
-		if(logger.isInfoEnabled()) {
-			logger.info("the following sip servlet application has been removed : " + sipApplicationName);
+		if(logger.isDebugEnabled()) {
+			logger.debug("the following sip servlet application has been removed : " + sipApplicationName);
 		}
 		return sipContext;
 	}

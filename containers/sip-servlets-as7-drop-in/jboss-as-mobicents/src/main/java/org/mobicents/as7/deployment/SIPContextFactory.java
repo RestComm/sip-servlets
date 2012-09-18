@@ -39,14 +39,14 @@ class SIPContextFactory implements WebContextFactory {
 
     @Override
     public StandardContext createContext(final DeploymentUnit deploymentUnit) throws DeploymentUnitProcessingException {
-        logger.info("create context for " + deploymentUnit.getName());
+        logger.debug("create context for " + deploymentUnit.getName());
         // Create the SIP specific context
         return new SIPWebContext(deploymentUnit);
     }
 
     @Override
     public void postProcessContext(DeploymentUnit deploymentUnit, StandardContext webContext) {
-        logger.info("postProcessContext() for " + deploymentUnit.getName());
+        logger.debug("postProcessContext() for " + deploymentUnit.getName());
         if (webContext instanceof SIPWebContext) {
             ((SIPWebContext)webContext).postProcessContext(deploymentUnit);
         }

@@ -194,8 +194,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 
 	@Override
 	public void init() throws Exception {
-		if(logger.isInfoEnabled()) {
-			logger.info("Initializing the sip context");
+		if(logger.isDebugEnabled()) {
+			logger.debug("Initializing the sip context");
 		}
 //		if (this.getParent() != null) {
 //			// Add the main configuration listener for sip applications
@@ -212,8 +212,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		
 		prepareServletContext();
 		
-		if(logger.isInfoEnabled()) {
-			logger.info("sip context Initialized");
+		if(logger.isDebugEnabled()) {
+			logger.debug("sip context Initialized");
 		}	
 	}
 
@@ -290,8 +290,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 
 	@Override
 	public synchronized void start() throws LifecycleException {
-		if(logger.isInfoEnabled()) {
-			logger.info("Starting the sip context " + getName());
+		if(logger.isDebugEnabled()) {
+			logger.debug("Starting the sip context " + getName());
 		}
 		if( initialized ) { 
 			prepareServletContext();
@@ -330,8 +330,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
         	// due to refactoring on http://code.google.com/p/mobicents/issues/detail?id=2794
         	// we set the container on the manager right before the start and after the context have been init-ed
 			hasDistributableManager = true;				
-			if(logger.isInfoEnabled()) {
-				logger.info("this context contains a manager that allows applications to work in a distributed environment");
+			if(logger.isDebugEnabled()) {
+				logger.debug("this context contains a manager that allows applications to work in a distributed environment");
 			}			
 			((SipManager)getManager()).setMobicentsSipFactory(
 					(sipApplicationDispatcher.getSipFactory()));
@@ -361,22 +361,22 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			if(manager instanceof DistributableSipManager) {
 				// only call the setContainer on the manager when it has been fully initialized
 				hasDistributableManager = true;				
-				if(logger.isInfoEnabled()) {
-					logger.info("this context contains a manager that allows applications to work in a distributed environment");
+				if(logger.isDebugEnabled()) {
+					logger.debug("this context contains a manager that allows applications to work in a distributed environment");
 				}
 				((SipManager)getManager()).setMobicentsSipFactory(
 						(sipApplicationDispatcher.getSipFactory()));
 				((CatalinaSipManager)manager).setContainer(this);	
 			}
-			if(logger.isInfoEnabled()) {
-				logger.info("sip application session timeout for this context is " + sipApplicationSessionTimeout + " minutes");
+			if(logger.isDebugEnabled()) {
+				logger.debug("sip application session timeout for this context is " + sipApplicationSessionTimeout + " minutes");
 			}
 			
-			if(logger.isInfoEnabled()) {
-				logger.info("http session timeout for this context is " + getSessionTimeout() + " minutes");
+			if(logger.isDebugEnabled()) {
+				logger.debug("http session timeout for this context is " + getSessionTimeout() + " minutes");
 			}
-			if(logger.isInfoEnabled()) {
-				logger.info("sip context started " + getName());
+			if(logger.isDebugEnabled()) {
+				logger.debug("sip context started " + getName());
 			}
 		} else {
 			if(logger.isInfoEnabled()) {
@@ -526,8 +526,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	
 	@Override
 	public synchronized void stop() throws LifecycleException {
-		if(logger.isInfoEnabled()) {
-			logger.info("Stopping the sip context " + getName());
+		if(logger.isDebugEnabled()) {
+			logger.debug("Stopping the sip context " + getName());
 		}
 		if(manager instanceof SipManager) {
 			((SipManager)manager).dumpSipSessions();
@@ -566,7 +566,9 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		// Issue 1478 : nullify the ref to avoid reusing it
 		timerService = null;
 		getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE, null);
-		logger.info("sip context stopped " + getName());
+		if(logger.isDebugEnabled()) {
+			logger.debug("sip context stopped " + getName());
+		}
 	}
 
 	@Override
@@ -1364,8 +1366,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 
 	public void setConcurrencyControlMode(ConcurrencyControlMode mode) {
 		this.concurrencyControlMode = mode;
-		if(concurrencyControlMode != null && logger.isInfoEnabled()) {
-			logger.info("Concurrency Control set to " + concurrencyControlMode.toString() + " for application " + applicationName);
+		if(concurrencyControlMode != null && logger.isDebugEnabled()) {
+			logger.debug("Concurrency Control set to " + concurrencyControlMode.toString() + " for application " + applicationName);
 		}
 	}
 	

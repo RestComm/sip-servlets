@@ -91,7 +91,7 @@ class SipConnectorService implements Service<Connector> {
      * @throws StartException if the connector cannot be started
      */
     public synchronized void start(StartContext context) throws StartException {
-        Logger.getLogger("org.mobicents.as7").info("SipConnectorService.start(), protocol = " + protocol + " - scheme = " + scheme);
+        Logger.getLogger("org.mobicents.as7").debug("SipConnectorService.start(), protocol = " + protocol + " - scheme = " + scheme);
         final SocketBinding binding = this.binding.getValue();
         final InetSocketAddress address = binding.getSocketAddress();
         final Executor executor = this.executor.getOptionalValue();
