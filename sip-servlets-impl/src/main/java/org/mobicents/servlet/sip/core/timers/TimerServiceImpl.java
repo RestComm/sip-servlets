@@ -189,8 +189,8 @@ public class TimerServiceImpl implements SipServletTimerService {
 	
 	public void stop() {
 		scheduledExecutor.shutdownNow();
-		if(logger.isInfoEnabled()) {
-			logger.info("Stopped timer service "+ this);
+		if(logger.isDebugEnabled()) {
+			logger.debug("Stopped timer service "+ this);
 		}
 	}
 
