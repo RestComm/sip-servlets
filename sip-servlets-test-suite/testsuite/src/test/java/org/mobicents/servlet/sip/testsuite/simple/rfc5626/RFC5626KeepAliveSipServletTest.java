@@ -292,8 +292,7 @@ public class RFC5626KeepAliveSipServletTest extends SipServletTestCase {
 		sipStackProperties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "1");
 		sipStackProperties.setProperty(SipStandardService.LOOSE_DIALOG_VALIDATION, "true");
 		sipStackProperties.setProperty(SipStandardService.PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");		
-		sipStackProperties.setProperty("gov.nist.javax.sip.MESSAGE_PROCESSOR_FACTORY", OIOMessageProcessorFactory.class.getName());
-		sipStackProperties.setProperty("gov.nist.javax.sip.USE_NIO", "false");
+		sipStackProperties.setProperty("gov.nist.javax.sip.MESSAGE_PROCESSOR_FACTORY", OIOMessageProcessorFactory.class.getName());		
 		return sipStackProperties;
 	}
 
@@ -301,6 +300,7 @@ public class RFC5626KeepAliveSipServletTest extends SipServletTestCase {
 	protected void tearDown() throws Exception {					
 		receiverProtocolObjects.destroy();	
 //		registerRecieverProtocolObjects.destroy();
+		tomcatShootist.stopTomcat();
 		logger.info("Test completed");
 		super.tearDown();
 	}
