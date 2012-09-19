@@ -223,7 +223,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	public void cancelAllExcept(ProxyBranch except, String[] protocol, int[] reasonCode, String[] reasonText, boolean throwExceptionIfCannotCancel) {
 		if(logger.isDebugEnabled()) {
 			if(except == null) {
-				logger.debug("Cancelling all Branches except");
+				logger.debug("Cancelling all Branches");
 			} else {
 				logger.debug("Cancelling all Branches except " + except + " with outgoing resquest " + except.getRequest());
 			}
