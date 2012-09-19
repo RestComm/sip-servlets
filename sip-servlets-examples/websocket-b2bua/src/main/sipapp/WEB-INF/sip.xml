@@ -7,23 +7,23 @@
 	
 	<servlet-selection>
 		<main-servlet>
-			SimpleSipServlet
+			WebSocketB2BUASipServlet
 		</main-servlet>
 	</servlet-selection>
 
 	<servlet>
-		<servlet-name>SimpleSipServlet</servlet-name>
-		<display-name>SimpleSipServlet</display-name>
-		<description>Simple SIP servlet</description>
+		<servlet-name>WebSocketB2BUASipServlet</servlet-name>
+		<display-name>WebSocketB2BUASipServlet</display-name>
+		<description>WebSocket B2BUA SIP servlet</description>
 		<servlet-class>
-			org.mobicents.servlet.sip.example.SimpleSipServlet
+			org.mobicents.servlet.sip.example.WebSocketB2BUASipServlet
 		</servlet-class>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
     
     <listener>
 		<listener-class>
-			org.mobicents.servlet.sip.example.SimpleSipServlet
+			org.mobicents.servlet.sip.example.WebSocketB2BUASipServlet
 		</listener-class>
 	</listener>
 </sip-app>

@@ -1,5 +1,5 @@
 <projectDescription>
-  <name>simple-sip-servlet</name>
+  <name>websocket-b2bua</name>
   <comment>Mobicents SIP Servlets. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
   <projects/>
   <buildSpec>
