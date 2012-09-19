@@ -221,6 +221,9 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	}
 
 	public void cancelAllExcept(ProxyBranch except, String[] protocol, int[] reasonCode, String[] reasonText, boolean throwExceptionIfCannotCancel) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("Cancelling all Branches except " + except + " with outgoing resquest " + except.getRequest());
+		}
 		for(ProxyBranch proxyBranch : proxyBranches.values()) {		
 			if(!proxyBranch.equals(except)) {
 				// Do not make this check in the beginning of the method, because in case of reINVITE etc, we already have a single brnch nd this method
