@@ -108,6 +108,7 @@ public class LocationServiceReInviteSipServletTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		receiver.setSendReinvite(true);
+		receiver.setWaitBeforeFinalResponse(2000);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);			
 		assertTrue(sender.isInviteReceived());

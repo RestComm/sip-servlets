@@ -86,6 +86,7 @@ public class JoinSipServletTest extends SipServletTestCase {
 
 		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
+		receiver.setWaitBeforeFinalResponse(2000);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);

@@ -152,6 +152,7 @@ public class LocationServiceB2BUAStaticServerAddressTest extends SipServletTestC
 
 			receiver = new TestSipListener(5090, IP_LOAD_BALANCER_PORT, receiverProtocolObjects, false);
 			receiver.setRecordRoutingProxyTesting(true);
+			receiver.setWaitBeforeFinalResponse(2000);
 			SipProvider receiverProvider = receiver.createProvider();
 
 			ipBalancer = new UDPPacketForwarder(IP_LOAD_BALANCER_PORT, MSS_PORT, HOST);

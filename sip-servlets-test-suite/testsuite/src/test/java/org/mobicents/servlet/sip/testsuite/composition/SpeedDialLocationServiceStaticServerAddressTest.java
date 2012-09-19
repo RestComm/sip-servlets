@@ -219,6 +219,7 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 
 		receiver = new TestSipListener(5090, 5005, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
+		receiver.setWaitBeforeFinalResponse(2000);
 		SipProvider receiverProvider = receiver.createProvider();
 		
 		startLoadBalancer();
@@ -335,6 +336,7 @@ public class SpeedDialLocationServiceStaticServerAddressTest extends SipServletT
 
 		receiver = new TestSipListener(5090, 5005, receiverProtocolObjects, false);
 		receiver.setRecordRoutingProxyTesting(true);
+		receiver.setWaitBeforeFinalResponse(2000);
 		SipProvider receiverProvider = receiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
