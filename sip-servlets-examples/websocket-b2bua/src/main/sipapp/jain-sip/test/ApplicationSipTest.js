@@ -292,14 +292,13 @@ ApplicationSipTest.prototype.register =function(sipDomain, sipDisplayName, sipUs
             this.jainSipUserAgentHeader = this.headerFactory.createUserAgentHeader(this.listeningPoint.getUserAgent());
             
             // Send SIP REGISTER request
-            var fromSipUriString=this.sipUserName+"@"+this.sipDomain;
-            var contactUriString=this.sipUserName+"@"+this.localIpAddress;             
+            var fromSipUriString=this.sipUserName+"@"+this.sipDomain;            
             var jainSipCseqHeader=this.headerFactory.createCSeqHeader(1,"REGISTER");
             var jainSipCallIdHeader=this.headerFactory.createCallIdHeader();
             var jainSipExpiresHeader=this.headerFactory.createExpiresHeader(3600);
             var jainSipMaxForwardHeader=this.headerFactory.createMaxForwardsHeader(70);
             var jainSipRequestUri=this.addressFactory.createSipURI_user_host(null,this.sipDomain);
-            var jainSipAllowListHeader=this.headerFactory.createHeaders("Allow: INVITE,ACK,CANCEL,OPTION,BYE,REFER,NOTIFY,MESSAGE,SUBSCRIBE,INFO");
+            var jainSipAllowListHeader=this.headerFactory.createHeaders("Allow: INVITE,ACK,CANCEL,BYE");
             var jainSipFromUri=this.addressFactory.createSipURI_user_host(null,fromSipUriString);
             var jainSipFromAddress=this.addressFactory.createAddress_name_uri(null,jainSipFromUri);
             var random=new Date();
@@ -596,7 +595,7 @@ ApplicationSipTest.prototype.sendInviteSipRequest =function(sdpOffer){
         var jainSipCallIdHeader=this.headerFactory.createCallIdHeader();
         var jainSipMaxForwardHeader=this.headerFactory.createMaxForwardsHeader(70);
         var jainSipRequestUri=this.addressFactory.createSipURI_user_host(null,toSipUriString);
-        var jainSipAllowListHeader=this.headerFactory.createHeaders("Allow: INVITE,ACK,CANCEL,OPTION,BYE"+",REFER,NOTIFY,MESSAGE,SUBSCRIBE,INFO");         
+        var jainSipAllowListHeader=this.headerFactory.createHeaders("Allow: INVITE,ACK,CANCEL,BYE");         
         var jainSipFromUri=this.addressFactory.createSipURI_user_host(null,fromSipUriString);
         var jainSipFromAdress=this.addressFactory.createAddress_name_uri(null,jainSipFromUri);
         var tagfrom=random.getTime();
@@ -744,7 +743,7 @@ ApplicationSipTest.prototype.handleStateMachineInvitingResponseEvent =function(r
             this.jainSipInvitingDialog.sendAck(jainSipMessageACK);
             var sdpAnswerString = jainSipResponse.getContent();
             this.peerConnection.setRemoteDescription(this.peerConnection.SDP_ANSWER,new this.sessionDescriptionConstructor(sdpAnswerString));
-            console.log("ApplicationSipTest:peerConnectionOnStableState(): sdpAnswerString="+sdpAnswerString);
+            console.log("ApplicationSipTest:handleStateMachineInvitingResponseEvent(): sdpAnswerString="+sdpAnswerString);
             this.peerConnectionState = 'established';  
         }
         else
@@ -1146,12 +1145,14 @@ ApplicationSipTest.prototype.peerConnectionOnStableState =function(timeoutEvent)
                 this.peerConnection.setLocalDescription(this.peerConnection.SDP_OFFER,newOffer);
                 console.log("ApplicationSipTest:peerConnectionOnStableState(): newOffer="+newOffer);
                 this.peerConnection.startIce();
+                this.peerConnectionIceStarted = true;
                 this.peerConnectionState = 'preparing-offer';
                 this.peerConnectionMarkActionNeeded();
                 return;
             } 
             else
-                console.log("ApplicationSipTest:peerConnectionOnStableState(): Not sending a new offer");
+            {    console.log("ApplicationSipTest:peerConnectionOnStableState(): Not sending a new offer:");
+            }
         } 
         else if (this.peerConnectionState == 'preparing-offer') 
         {
@@ -1165,11 +1166,11 @@ ApplicationSipTest.prototype.peerConnectionOnStableState =function(timeoutEvent)
         } 
         else if (this.peerConnectionState == 'offer-received') 
         {
-            mySDP = this.peerConnection.createAnswer(this.lastReceivedSdpOfferString , {
+            var sdpAnswer = this.peerConnection.createAnswer(this.lastReceivedSdpOfferString , {
                 has_audio:true, 
                 has_video:true
             });
-            this.peerConnection.setLocalDescription(this.peerConnection.SDP_ANSWER,	mySDP);
+            this.peerConnection.setLocalDescription(this.peerConnection.SDP_ANSWER,sdpAnswer);
             this.peerConnectionState = 'offer-received-preparing-answer';
             if (!this.peerConnectionIceStarted) 
             {
@@ -1188,8 +1189,8 @@ ApplicationSipTest.prototype.peerConnectionOnStableState =function(timeoutEvent)
         {
             if (this.peerConnectionMoreIceComing) 
                 return;
-            mySDP = this.peerConnection.localDescription;
-            this.send200OKSipResponse(mySDP.toSdp())
+            var localSdp = this.peerConnection.localDescription;
+            this.send200OKSipResponse(localSdp.toSdp())
             this.peerConnectionState = 'established';
         } 
         else 
