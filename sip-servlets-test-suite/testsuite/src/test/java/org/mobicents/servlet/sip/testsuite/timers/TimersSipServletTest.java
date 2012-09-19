@@ -175,7 +175,7 @@ public class TimersSipServletTest extends SipServletTestCase {
 			String message = (String) allMessagesIterator.next();
 			logger.info(message);
 		}
-		assertTrue(sender.getAllMessagesContent().contains("sipAppSessionExpired"));	
+		assertTrue(sender.getAllMessagesContent().isEmpty());	
 	}
 	
 	// Issue 1478 : http://code.google.com/p/mobicents/issues/detail?id=1478

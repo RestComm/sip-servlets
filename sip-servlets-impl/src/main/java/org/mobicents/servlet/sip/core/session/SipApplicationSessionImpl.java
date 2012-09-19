@@ -405,7 +405,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				logger.debug("Re-Scheduling sip application session "+ key +" to expire in " + sipApplicationSessionTimeout / 60 / 1000L + " minutes");
 				Calendar calendar = Calendar.getInstance();
 				calendar.setTimeInMillis(expirationTime);
-				logger.debug("sip application session "+ key +" will expires at " + new SimpleDateFormat().format(calendar.getTime()));
+				logger.debug("sip application session "+ key +" will expires at " + new SimpleDateFormat("MM/yyyy/dd hh:mm:ss.SSS").format(calendar.getTime()));
 			}
 		}
 	}
