@@ -5,7 +5,12 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <script type='text/javascript'>   
             var logger =  undefined; //console;
-        </script>	 
+        </script>	
+	<link rel="icon" type="image/png" href="../main/bootstrap/img/telestax-favicon.png">
+	<link href="../main/bootstrap/css/bootstrap.min.css" rel="stylesheet"> 
+	<link href="../main/bootstrap/css/bootstrap-responsive.css" rel="stylesheet">
+	<link href="../main/bootstrap/css/docs.css" rel="stylesheet">
+	<script src="../main/bootstrap/js/bootstrap.min.js"></script>
         <script src="../main/javascript/gov/nist/core/GenericObject.js" type="text/javascript"></script>
         <script src="../main/javascript/gov/nist/core/GenericObjectList.js" type="text/javascript"></script>
         <script src="../main/javascript/gov/nist/core/NameValue.js" type="text/javascript"></script>
@@ -292,7 +297,7 @@
                 register.disabled=true;
             }
         </script>
-        <style type='text/css'>
+        <!--style type='text/css'>
             div {
                 border: 0px solid black;
             }
@@ -312,62 +317,88 @@
             span.alert {
                 font-style: italic;
             }
-        </style>
+        </style-->
     </head>
     <body onload="onLoad()" onbeforeunload="onBeforeUnload()">
-        <div id="sipAccountSettings" >
-            <div id='stunServerDiv'>
-                <label>STUN server:</label>
-                <input  id="stunServer"  type="text" size="40"> 
-            </div>
-            <div id='sipWsUrlDiv'>
-                <label>SIP outbound proxy WS URL:</label>
-                <input  id="sipWsUrl"  type="text" size="40"> 
-            </div>
-            <div id='sipDomainDiv'>
-                <label>SIP Domain:</label>
-                <input id="sipDomain"  type="text" size="30" value="sipasf.fr"> 
-            </div>           
-            <div id='sipDisplayNameDiv'>
-                <label>SIP Display Name:</label>
-                <input id="sipDisplayName"  type="text" size="30" value="laurent"> 
-            </div>
-            <div id='sipUserNameDiv'>
-                <label>SIP User Name:</label>
-                <input id="sipUserName"  type="text" size="30" value="9999"> 
-            </div>
-            <div id='sipLoginDiv'>
-                <label>SIP Login:</label>
-                <input id="sipLogin"   type="text" size="30" value="9999@sipasf.fr"> 
-            </div>
-            <div id='sipPasswordDiv'>
-                <label>SIP Password:</label>
-                <input id="sipPassword"   type="password" size="30" value="1234"> 
-            </div>
-            <div id='sipContactPhoneNumberDiv'>
-                <label>SIP Contact phone number:</label>
-                <input id="sipContactPhoneNumber"  type="text" size="30" value="7777"> 
-            </div>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">        
+	<div class="container">
+          <a class="brand" href="#">Mobicents, Connect the Cans, WebRTC Client,  By </a><a href="http://www.telestax.com"><img style="display: block;" alt="TeleStax" src="../main/bootstrap/img/TeleStax_logo_small.png" /></a>
         </div>
-        <div id='input'>
-            <div>
-                <input id='Register' class='button' type='submit' name='Register' disabled="disabled"
-                       value='Register' onclick = "register();"/>
-                <input id='UnRegister' class='button' type='submit' name='UnRegister'
-                       value='UnRegister' disabled="disabled" onclick = "unRegister();"/>
-                <input id='Call' class='button' type='submit' name='Call'
-                       value='Call' disabled="disabled" onclick = "call(document.getElementById('sipContactPhoneNumber').value);"/>
-                <input id='Bye' class='button' type='submit' name='Bye'
-                       value='Bye' disabled="disabled" onclick = "bye();"/>
-            </div>
-        </div>
-        <div id='media'>
-            <div>
-                <video id="localVideoPreview" autoplay="autoplay" style="height:100px; width:100px"></video>  
-            </div>
-             <div>
-                <video id="remoteVideo" autoplay="autoplay" style="height:100px; width:100px"></video>  
-            </div>
-        </div>
+	<!--div class="container">
+          <a class="brand" href="#">By</a>    
+	  <a href="http://www.telestax.com"><img style="display: block;" alt="TeleStax" src="../main/bootstrap/img/TeleStax_logo_small.png" /></a>
+        </div-->
+      </div>
+    </div>
+    <div class="container-fluid">
+      	<div class="row-fluid">
+        	<div class="span3">
+          		<div class="form-horizontal well">
+			   <div id="sipAccountSettings" >
+	    		   	<div class="nav-header">Registration</div>
+			        <div class="nav-header">&nbsp;</div>
+			        <div class="control-group" id='stunServerDiv'>
+			                <label class="control-label" for="stunServer">STUN server:</label>
+			                <input id="stunServer"  type="text" size="40"> 
+		                </div>
+            			<div class="control-group" id='sipWsUrlDiv'>
+			                <label class="control-label">SIP outbound Proxy :</label>
+			                <input  id="sipWsUrl"  type="text" size="40"> 
+		                </div>
+			        <div class="control-group"id='sipDomainDiv'>
+                			<label class="control-label">SIP Domain:</label>
+			                <input id="sipDomain"  type="text" size="30" value="sipasf.fr"> 
+		                </div>           
+		                <div class="control-group"id='sipDisplayNameDiv'>
+			                <label class="control-label">SIP Display Name:</label>
+			                <input id="sipDisplayName"  type="text" size="30" value="laurent"> 
+		                </div>
+		                <div class="control-group"id='sipUserNameDiv'>
+			                <label class="control-label">SIP User Name:</label>
+			                <input id="sipUserName"  type="text" size="30" value="9999"> 
+            			</div>
+		                <div class="control-group"id='sipLoginDiv'>
+			                <label class="control-label">SIP Login:</label>
+			                <input id="sipLogin"   type="text" size="30" value="9999@sipasf.fr"> 
+		                </div>
+		                <div class="control-group"id='sipPasswordDiv'>
+			                <label class="control-label">SIP Password:</label>
+			                <input id="sipPassword"   type="password" size="30" value="1234"> 
+		                </div>           
+			        <div class="control-group"id ='input'>
+			                <input id='Register' class="btn btn-primary" type='submit' name='Register' disabled="disabled" value='Register' onclick = "register();"/>
+					&nbsp;&nbsp;&nbsp;&nbsp;
+			                <input id='UnRegister' class="btn btn-primary" type='submit' name='UnRegister' value='UnRegister' disabled="disabled" onclick = "unRegister();"/>
+				</div>
+			</div>
+	          </div><!--/.well -->
+              </div><!--/span-->
+	      <div class="span9">
+			<div class="form-horizontal well">
+			   <div>
+				<div class="nav-header">Communicate</div>		    				      
+	      			<p class="lead"> 
+       				   <div id='sipContactPhoneNumberDiv'>
+					<div id='input'>
+			                	Contact To Call: <input id="sipContactPhoneNumber" type="text" class="input-xlarge focused" >					
+						&nbsp;<input id='Call' class="btn btn-primary" type='submit' name='Call' value='Call' disabled="disabled" onclick = "call(document.getElementById('sipContactPhoneNumber').value);"/>
+						&nbsp;<input id='Bye' class="btn btn-primary" type='submit' name='Bye' value='Bye' disabled="disabled" onclick = "bye();"/>
+						<div id='media'>						
+						    <div id='over'>
+							<video id="localVideoPreview" autoplay="autoplay" style="background-color: #000000; height:150px; width:150px; margin-right: 600px; -webkit-transition-property: opacity;-webkit-transition-duration: 2s;"></video>  
+						    </div>
+		   				    <div>
+							<video id="remoteVideo" width="640px" height="480px" autoplay="autoplay" style="background-color: #000000;margin-top: 10px;-webkit-transition-property: opacity; -webkit-transition-duration: 2s;"></video>  
+						    </div>
+						</div>											  
+ 			                 </div>						
+       		                   </div>
+	      			</p>      		        
+			   </div>
+		        </div>
+     	       </div>			
+	</div>
+    </div>
     </body>
 </html>
