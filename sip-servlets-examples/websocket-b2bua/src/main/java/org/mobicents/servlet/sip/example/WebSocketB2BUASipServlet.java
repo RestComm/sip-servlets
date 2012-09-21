@@ -30,6 +30,7 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
 import javax.servlet.sip.ServletTimer;
+import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
@@ -94,6 +95,9 @@ public class WebSocketB2BUASipServlet extends SipServlet implements TimerListene
 	IOException {
 		SipServletResponse response = (SipServletResponse) sessions.get(request.getSession()).getAttribute("lastResponse");
 		response.createAck().send();
+		SipApplicationSession sipApplicationSession = request.getApplicationSession();
+		// Defaulting the sip application session to 1h
+		sipApplicationSession.setExpires(60);
 	}
 
 	HashMap<String, Address> registeredUsersToIp = new HashMap<String, Address>();
