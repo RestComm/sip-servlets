@@ -28,6 +28,7 @@ import org.jboss.as.ee.structure.DeploymentType;
 import org.jboss.as.ee.structure.DeploymentTypeMarker;
 import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.DeploymentUnit;
+import org.jboss.as.web.deployment.WarMetaData;
 import org.jboss.logging.Logger;
 import org.jboss.metadata.merge.web.jboss.JBossWebMetaDataMerger;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
@@ -113,7 +114,8 @@ public class SIPWebContext extends SipStandardContext {
 
         JBossWebMetaData mergedMetaData = null;
         mergedMetaData = new JBossConvergedSipMetaData();
-        final JBossWebMetaData override = null;
+        final WarMetaData warMetaData = deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
+        final JBossWebMetaData override = warMetaData.getJbossWebMetaData();
         final WebMetaData original = null;
         JBossWebMetaDataMerger.merge(mergedMetaData, override, original);
 

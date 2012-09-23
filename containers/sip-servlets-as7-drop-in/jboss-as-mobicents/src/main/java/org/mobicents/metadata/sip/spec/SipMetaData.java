@@ -21,11 +21,9 @@
  */
 package org.mobicents.metadata.sip.spec;
 
-import java.lang.reflect.Method;
 import java.util.List;
 
 import org.jboss.as.server.deployment.AttachmentKey;
-import org.jboss.invocation.proxy.MethodIdentifier;
 import org.jboss.metadata.javaee.spec.Environment;
 import org.jboss.metadata.web.spec.WebMetaData;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
