@@ -338,9 +338,11 @@ body .one .bsa_it_p {
 	position: absolute;
 	left: 10px;	
 	top:10px;
-	background: rgba(22,33,66,0.8);
+	/*background: rgba(22,33,66,0.8);*/
 	width: 150px;
 	text-align: left;
 	margin: 0;
 	padding: 0;
 }
+
+#draggable { width: 150px; height: 150px; padding: 0.5em; }

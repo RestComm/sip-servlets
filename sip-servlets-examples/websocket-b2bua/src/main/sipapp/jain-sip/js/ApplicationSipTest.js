@@ -151,6 +151,7 @@ ApplicationSipTest.prototype.initPeerConnectionStateMachine=function(){
         console.debug ("ApplicationSipTest:initPeerConnectionStateMachine(): force peerConnection close");
         document.getElementById("remoteVideo").pause();
         document.getElementById("remoteVideo").src= null;
+	document.getElementById("remoteVideo").style.visibility = "hidden";
         this.peerConnection.close();
     }
     this.peerConnection = null;
@@ -187,7 +188,9 @@ ApplicationSipTest.prototype.processTransactionTerminated =function(transactionT
 //SIPListener interface implementation
 ApplicationSipTest.prototype.processDisconnected =function(){   
     console.error("ApplicationSipTest:processDisconnected()"); 
-    alert("disconnected with SIP server");
+    modal_alert("Disconnected with SIP server");
+
+    show_desktop_notification("Disconnected with SIP server");
     this.initGUI();
 }
 
@@ -230,6 +233,7 @@ ApplicationSipTest.prototype.processRequest =function(requestEvent){
     var jainSipRequestMethod=jainSipRequest.getMethod();   
     if((jainSipRequestMethod=="BYE")||(jainSipRequestMethod=="ACK")||(jainSipRequestMethod=="CANCEL"))
     {
+	stopRinging();
         // Subscequent request on ongoing dialog
         if(this.invitingState!=this.INVITING_INITIAL_STATE) this.handleStateMachineInvitingRequestEvent(requestEvent); 
         else if(this.invitedState!=this.INVITED_INITIAL_STATE)  this.handleStateMachineInvitedRequestEvent(requestEvent);
@@ -321,12 +325,12 @@ ApplicationSipTest.prototype.register =function(sipDomain, sipDisplayName, sipUs
             this.initGUI();
             this.initSipRegisterStateMachine();
             console.error("ApplicationSipTest:register(): catched exception:"+exception);
-            alert("ApplicationSipTest:register(): catched exception:"+exception);  
+            modal_alert("ApplicationSipTest:register(): catched exception:"+exception);  
         }
     }
     else
     {
-        alert("ApplicationSipTest:register(): bad state, action register unauthorized");      
+        modal_alert("ApplicationSipTest:register(): bad state, action register unauthorized");      
     }  
 }
 
@@ -415,7 +419,7 @@ ApplicationSipTest.prototype.handleStateMachineRegisterResponseEvent =function(r
                 showCallButton();
                 showUnRegisterButton();
                 hideRegisterButton();
-                hideByeButton();
+                hideByeButton();		
             }
             
             if(this.unregisterPendingFlag==true) {
@@ -431,7 +435,7 @@ ApplicationSipTest.prototype.handleStateMachineRegisterResponseEvent =function(r
         }
         else
         {
-            alert("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine())    
+            modal_alert("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine())    
         }
     }                     
     else if(this.registerState==this.REGISTERING_401_STATE)
@@ -466,7 +470,7 @@ ApplicationSipTest.prototype.handleStateMachineRegisterResponseEvent =function(r
         }
         else
         {
-            alert("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            modal_alert("SIP registration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
             this.init();
         } 
     }
@@ -507,7 +511,7 @@ ApplicationSipTest.prototype.handleStateMachineRegisterResponseEvent =function(r
         }
         else
         {
-            alert("SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());  
+            modal_alert("SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());  
             this.init();
         }
     }
@@ -532,7 +536,7 @@ ApplicationSipTest.prototype.handleStateMachineRegisterResponseEvent =function(r
         }
         else
         {
-            alert("SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            modal_alert("SIP unregistration failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
             this.init();
         }
     }
@@ -567,20 +571,21 @@ ApplicationSipTest.prototype.call =function(to){
             catch(exception)
             {
                 console.error("ApplicationSipTest:call(): catched exception:"+exception);
-                alert("ApplicationSipTest:call(): catched exception:"+exception);  
+                modal_alert("ApplicationSipTest:call(): catched exception:"+exception);  
                 this.initPeerConnectionStateMachine();
                 this.initSipInvitingStateMachine();
                 showCallButton(); 
+                stopRinging();
             }
         }
         else
         {
-            alert("ApplicationSipTest:call(): bad state, action call unauthorized");    
+            modal_alert("ApplicationSipTest:call(): bad state, action call unauthorized");    
         }
     }
     else
     {
-        alert("ApplicationSipTest:call(): unregistered, action call unauthorized");           
+        modal_alert("ApplicationSipTest:call(): unregistered, action call unauthorized");           
     }
 }
 
@@ -589,7 +594,7 @@ ApplicationSipTest.prototype.sendInviteSipRequest =function(sdpOffer){
     console.debug("ApplicationSipTest:sendInviteSipRequest()"); 
     try{
         var fromSipUriString=this.sipUserName+"@"+this.sipDomain;
-        var toSipUriString= this.callee+"@"+this.sipDomain;
+        var toSipUriString= this.callee;
         var random=new Date();       
         var jainSipCseqHeader=this.headerFactory.createCSeqHeader(1,"INVITE");
         var jainSipCallIdHeader=this.headerFactory.createCallIdHeader();
@@ -674,7 +679,7 @@ ApplicationSipTest.prototype.bye =function(){
         catch(exception)
         {
             console.error("ApplicationSipTest:bye(): catched exception:"+exception);
-            alert("ApplicationSipTest:bye(): catched exception:"+exception); 
+            modal_alert("ApplicationSipTest:bye(): catched exception:"+exception); 
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();
             hideByeButton();
@@ -695,7 +700,7 @@ ApplicationSipTest.prototype.bye =function(){
         catch(exception)
         {
             console.error("ApplicationSipTest:bye(): catched exception:"+exception);
-            alert("ApplicationSipTest:bye(): catched exception:"+exception); 
+            modal_alert("ApplicationSipTest:bye(): catched exception:"+exception); 
             this.initPeerConnectionStateMachine();
             this.initSipInvitedStateMachine();
             hideByeButton();
@@ -705,7 +710,7 @@ ApplicationSipTest.prototype.bye =function(){
     }
     else
     {
-        alert("ApplicationSipTest:bye(): bad state, action call unauthorized");     
+        modal_alert("ApplicationSipTest:bye(): bad state, action call unauthorized");     
     }
    
 }
@@ -718,6 +723,7 @@ ApplicationSipTest.prototype.handleStateMachineInvitingResponseEvent =function(r
     {
         if(statusCode< 200)
         {
+	    startRinging();
             console.debug("ApplicationSipTest:handleStateMachineInvitingResponseEvent(): 1XX response ignored"); 
         }
         else if(statusCode==407)
@@ -734,6 +740,7 @@ ApplicationSipTest.prototype.handleStateMachineInvitingResponseEvent =function(r
         }
         else if(statusCode==200)
         {
+	    stopRinging();
             this.jainSipInvitingDialog=responseEvent.getOriginalTransaction().getDialog();
             this.invitingState=this.INVITING_ACCEPTED_STATE;
             showByeButton();
@@ -748,13 +755,13 @@ ApplicationSipTest.prototype.handleStateMachineInvitingResponseEvent =function(r
         }
         else
         {
-            alert("SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine()) 
+            modal_alert("SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine()) 
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();
             showCallButton();
             hideByeButton();
             showUnRegisterButton();
-
+	    stopRinging();
         }     
     } 
     else if(this.invitingState==this.INVITING_407_STATE)
@@ -775,7 +782,7 @@ ApplicationSipTest.prototype.handleStateMachineInvitingResponseEvent =function(r
         }
         else
         {
-            alert("SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            modal_alert("SIP INVITE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
             hideByeButton();
             showCallButton();
             showUnRegisterButton();
@@ -809,17 +816,19 @@ ApplicationSipTest.prototype.handleStateMachineInvitingResponseEvent =function(r
             showCallButton();
             document.getElementById("remoteVideo").pause();
             document.getElementById("remoteVideo").src= null;
+            document.getElementById("remoteVideo").style.visibility = "hidden";
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();  
         }
         else
         {
-            alert("SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            modal_alert("SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
             hideByeButton();
             showUnRegisterButton();
             showCallButton();
             document.getElementById("remoteVideo").pause();
             document.getElementById("remoteVideo").src= null;
+            document.getElementById("remoteVideo").style.visibility = "hidden";
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();  
         }
@@ -834,17 +843,19 @@ ApplicationSipTest.prototype.handleStateMachineInvitingResponseEvent =function(r
             showCallButton();
             document.getElementById("remoteVideo").pause();
             document.getElementById("remoteVideo").src= null;
+            document.getElementById("remoteVideo").style.visibility = "hidden";
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();  
         }
         else
         {
-            alert("SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            modal_alert("SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
             hideByeButton();
             showUnRegisterButton();
             showCallButton();
             document.getElementById("remoteVideo").pause();
             document.getElementById("remoteVideo").src= null;
+            document.getElementById("remoteVideo").style.visibility = "hidden";
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();  
         }        
@@ -880,9 +891,10 @@ ApplicationSipTest.prototype.handleStateMachineInvitingRequestEvent =function(re
             showCallButton();
             document.getElementById("remoteVideo").pause();
             document.getElementById("remoteVideo").src= null;
+            document.getElementById("remoteVideo").style.visibility = "hidden";
             this.initPeerConnectionStateMachine();
             this.initSipInvitingStateMachine();  
-            alert("Contact has hangup"); 
+            modal_alert("Contact has hangup"); 
         }
         else
         {
@@ -932,7 +944,7 @@ ApplicationSipTest.prototype.handleStateMachineInvitedResponseEvent =function(re
         }
         else
         {
-            alert("SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            modal_alert("SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
             hideByeButton();
             showUnRegisterButton();
             showCallButton();
@@ -952,7 +964,7 @@ ApplicationSipTest.prototype.handleStateMachineInvitedResponseEvent =function(re
         }
         else
         {
-            alert("SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
+            modal_alert("SIP BYE failed:" + jainSipResponse.getStatusCode()+ "  "+ jainSipResponse.getStatusLine());
             hideByeButton();
             showUnRegisterButton();
             showCallButton();
@@ -969,63 +981,21 @@ ApplicationSipTest.prototype.handleStateMachineInvitedRequestEvent =function(req
     var headerFrom = jainSipRequest.getHeader("From");
     if(this.invitedState==this.INVITED_INITIAL_STATE)
     {
+	startRinging();
         var jainSip180ORingingResponse=jainSipRequest.createResponse(180, "Ringing");
         jainSip180ORingingResponse.addHeader(this.jainSipContactHeader);
         jainSip180ORingingResponse.addHeader(this.jainSipUserAgentHeader);
         requestEvent.getServerTransaction().sendResponse(jainSip180ORingingResponse);
+
+	applicationSip.jainSipInvitedReceivedRequest=jainSipRequest;
+	applicationSip.jainSipInvitedTransaction=requestEvent.getServerTransaction();
+        applicationSip.jainSipInvitedDialog=requestEvent.getServerTransaction().getDialog();
             
         var sipUri = headerFrom.getAddress().getURI();
         console.debug("ApplicationSipTest:handleStateMachineInvitedRequestEvent(): sipUri.getUser()="+sipUri.getUser());
-        var result = confirm("Call from "+sipUri.getUser()+ ": Accept or Reject");
-        if (result==true)
-        {
-            // Accepted 
-            try
-            {
-                this.jainSipInvitedReceivedRequest=jainSipRequest;
-                this.jainSipInvitedTransaction=requestEvent.getServerTransaction();
-                this.jainSipInvitedDialog=requestEvent.getServerTransaction().getDialog();
-                this.createPeerConnection();
-                this.peerConnection.addStream(this.localAudioVideoMediaStream, {
-                    has_audio: true, 
-                    has_video: true
-                });
-                this.lastReceivedSdpOfferString = jainSipRequest.getContent();
-                var sdpOffer = new this.sessionDescriptionConstructor(this.lastReceivedSdpOfferString);
-                this.peerConnection.setRemoteDescription(this.peerConnection.SDP_OFFER,	sdpOffer);
-                this.peerConnectionState = 'offer-received';
-                this.peerConnectionMarkActionNeeded();
-            }
-            catch(exception)
-            {
-                // Temporarily Unavailable
-                var jainSipResponse480=jainSipRequest.createResponse(480,"Temporarily Unavailable");
-                jainSipResponse480.addHeader(this.jainSipContactHeader);
-                jainSipResponse480.addHeader(this.jainSipUserAgentHeader);
-                requestEvent.getServerTransaction().sendResponse(jainSipResponse480);
-                hideByeButton();
-                showCallButton();
-                showUnRegisterButton(); 
-                this.initPeerConnectionStateMachine();
-                this.initSipInvitedStateMachine();
-                console.error("ApplicationSipTest:handleStateMachineInvitedRequestEvent(): catched exception:"+exception);
-                alert("ApplicationSipTest:handleStateMachineInvitedRequestEvent(): catched exception:"+exception);  
-            }
-        }
-        else
-        {
-            // Rejected 
-            // Temporarily Unavailable
-            var jainSipResponse480=jainSipRequest.createResponse(480,"Temporarily Unavailable");
-            jainSipResponse480.addHeader(this.jainSipContactHeader);
-            jainSipResponse480.addHeader(this.jainSipUserAgentHeader);
-            requestEvent.getServerTransaction().sendResponse(jainSipResponse480);
-            hideByeButton();
-            showCallButton();
-            showUnRegisterButton();
-            this.initPeerConnectionStateMachine();
-            this.initSipInvitedStateMachine();
-        }  
+	show_desktop_notification("Incoming Call from " + sipUri.getUser());
+	$("#call_message").html("<p>Incoming Call from " + sipUri.getUser() +"</p>");
+        $('#callModal').modal(); 
     } 
     else if(this.invitedState==this.INVITED_ACCEPTED_STATE)
     {
@@ -1043,9 +1013,10 @@ ApplicationSipTest.prototype.handleStateMachineInvitedRequestEvent =function(req
             this.jainSipInvitedDialog=null;
             document.getElementById("remoteVideo").pause();
             document.getElementById("remoteVideo").src= null;
+	    document.getElementById("remoteVideo").style.visibility = "hidden";
             this.peerConnection.close();
             this.peerConnection=null;
-            alert("Contact has hangup"); 
+            modal_alert("Contact has hangup"); 
         }
         else if(requestMethod=="ACK")  
         {         
@@ -1064,7 +1035,7 @@ ApplicationSipTest.prototype.handleStateMachineInvitedRequestEvent =function(req
         console.error("ApplicationSipTest:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored");        
     } 
 }
-    
+  
 ApplicationSipTest.prototype.createPeerConnection =function(){
     console.debug("ApplicationSipTest:createPeerConnection()");
     var that = this;
@@ -1091,6 +1062,7 @@ ApplicationSipTest.prototype.createPeerConnection =function(){
         var url = webkitURL.createObjectURL(that.remoteAudioVideoMediaStream);
         document.getElementById("remoteVideo").src= url;
         document.getElementById("remoteVideo").play();
+	document.getElementById("remoteVideo").style.visibility = "visible";
     }
 		
     this.peerConnection.onremovestream = function(event) 
@@ -1099,6 +1071,7 @@ ApplicationSipTest.prototype.createPeerConnection =function(){
         that.remoteAudioVideoMediaStream = null;
         document.getElementById("remoteVideo").pause();
         document.getElementById("remoteVideo").src= null;
+	document.getElementById("remoteVideo").style.visibility = "hidden";
 
     }
             
@@ -1198,4 +1171,70 @@ ApplicationSipTest.prototype.peerConnectionOnStableState =function(timeoutEvent)
             
         this.peerConnectionActionNeeded = false;
     }
+}
+
+// Accept modal 
+$('#callModal .accept-btn').click(function() {
+// Accepted 
+    try
+    {               
+        applicationSip.createPeerConnection();
+        applicationSip.peerConnection.addStream(applicationSip.localAudioVideoMediaStream, {
+            has_audio: true, 
+            has_video: true
+        });
+        applicationSip.lastReceivedSdpOfferString = applicationSip.jainSipInvitedReceivedRequest.getContent();
+        var sdpOffer = new applicationSip.sessionDescriptionConstructor(applicationSip.lastReceivedSdpOfferString);
+        applicationSip.peerConnection.setRemoteDescription(applicationSip.peerConnection.SDP_OFFER,sdpOffer);
+        applicationSip.peerConnectionState = 'offer-received';
+        applicationSip.peerConnectionMarkActionNeeded();
+    }
+    catch(exception)
+    {
+	alert("ApplicationSipTest:accept(): catched exception:"+exception);  
+        // Temporarily Unavailable
+        var jainSipResponse480=applicationSip.jainSipInvitedReceivedRequest.createResponse(480,"Temporarily Unavailable");
+        jainSipResponse480.addHeader(applicationSip.jainSipContactHeader);
+        jainSipResponse480.addHeader(applicationSip.jainSipUserAgentHeader);
+        applicationSip.jainSipInvitedTransaction.sendResponse(jainSipResponse480);
+        hideByeButton();
+        showCallButton();
+        showUnRegisterButton(); 
+        stopRinging();
+        applicationSip.initPeerConnectionStateMachine();
+        applicationSip.initSipInvitedStateMachine();
+        console.error("ApplicationSipTest:handleStateMachineInvitedRequestEvent(): catched exception:"+exception);
+        alert("ApplicationSipTest:handleStateMachineInvitedRequestEvent(): catched exception:"+exception);  
+    }
+});
+
+// Reject modal
+$('#callModal .reject-btn').click(function() {
+// Rejected 
+    // Temporarily Unavailable
+    var jainSipResponse480=applicationSip.jainSipInvitedReceivedRequest.createResponse(480,"Temporarily Unavailable");
+    jainSipResponse480.addHeader(applicationSip.jainSipContactHeader);
+    jainSipResponse480.addHeader(applicationSip.jainSipUserAgentHeader);
+    applicationSip.jainSipInvitedTransaction.sendResponse(jainSipResponse480);
+    hideByeButton();
+    showCallButton();
+    showUnRegisterButton();
+    stopRinging();
+    applicationSip.initPeerConnectionStateMachine();
+    applicationSip.initSipInvitedStateMachine();
+});
+
+function modal_alert(message) {
+	$("#modal_message").html(message);
+	$('#messageModal').modal(); 
+}
+
+function show_desktop_notification(message) {
+	if (window.webkitNotifications && window.webkitNotifications.checkPermission() == 0) {
+		var thumb = "img/TeleStax-logo-globe-only-transparent-bg.png";
+		var title = "Mobicents HTML5 WebRTC Client";
+		var popup = window.webkitNotifications.createNotification(thumb, title, message);
+		//Show the popup
+		popup.show();
+	}
 }
