@@ -287,11 +287,11 @@ public class DigestAuthenticator
         SecurityContext sc = SecurityActions.getSecurityContext();
         if (sc == null) {
         	if (log.isDebugEnabled()) {
-                log.debug("Security Domain " + securityDomain);
+                log.debug("Security Domain " + securityDomain + " for Realm " + realmName);
         	}
         	if (securityDomain == null) {
         		if (log.isDebugEnabled()) {
-                    log.debug("Security Domain is null using default security domain " + SIPSecurityConstants.DEFAULT_SIP_APPLICATION_POLICY);
+                    log.debug("Security Domain is null using default security domain " + SIPSecurityConstants.DEFAULT_SIP_APPLICATION_POLICY + " for Realm " + realmName);
             	}
                 securityDomain = SIPSecurityConstants.DEFAULT_SIP_APPLICATION_POLICY;
         	}
