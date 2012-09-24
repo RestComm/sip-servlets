@@ -1014,8 +1014,8 @@ ApplicationSipTest.prototype.handleStateMachineInvitedRequestEvent =function(req
             document.getElementById("remoteVideo").pause();
             document.getElementById("remoteVideo").src= null;
 	    document.getElementById("remoteVideo").style.visibility = "hidden";
-            this.peerConnection.close();
-            this.peerConnection=null;
+            this.initPeerConnectionStateMachine();
+            this.initSipInvitingStateMachine();  
             modal_alert("Contact has hangup"); 
         }
         else if(requestMethod=="ACK")  
