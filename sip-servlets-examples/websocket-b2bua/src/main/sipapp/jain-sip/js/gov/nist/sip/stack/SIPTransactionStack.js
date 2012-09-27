@@ -78,7 +78,8 @@ function SIPTransactionStack() {
     this.non2XXAckPassedToListener=null;
     this.maxMessageSize=null;
     this.addressResolver = new DefaultAddressResolver();
-    
+    this.stackAddress =null;
+	
     this.dialogCreatingMethods.push("REFER");
     this.dialogCreatingMethods.push("INVITE");
     this.dialogCreatingMethods.push("SUBSCRIBE");
@@ -1042,7 +1043,7 @@ SIPTransactionStack.prototype.setHostAddress =function(stackAddress){
 }
 
 SIPTransactionStack.prototype.getHostAddress =function(){
-    if(logger!=undefined) logger.debug("SIPTransactionStack:getHostAddress()"+stackAddress);
+    if(logger!=undefined) logger.debug("SIPTransactionStack:getHostAddress()");
     return this.stackAddress ;  
 }
 

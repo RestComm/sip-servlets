@@ -1015,7 +1015,7 @@ ApplicationSipTest.prototype.handleStateMachineInvitedRequestEvent =function(req
             document.getElementById("remoteVideo").src= null;
 	    document.getElementById("remoteVideo").style.visibility = "hidden";
             this.initPeerConnectionStateMachine();
-            this.initSipInvitingStateMachine();  
+            this.initSipInvitingStateMachine();
             modal_alert("Contact has hangup"); 
         }
         else if(requestMethod=="ACK")  
@@ -1035,14 +1035,14 @@ ApplicationSipTest.prototype.handleStateMachineInvitedRequestEvent =function(req
         console.error("ApplicationSipTest:handleStateMachineInvitedRequestEvent(): bad state, SIP request ignored");        
     } 
 }
-  
+    
 ApplicationSipTest.prototype.createPeerConnection =function(){
     console.debug("ApplicationSipTest:createPeerConnection()");
     var that = this;
     this.peerConnection = new this.jsepPeerConnectionConstructor(
         this.peerConnectionStunServer,
         function(candidate, more) 
-        {
+        {       
             console.debug("ApplicationSipTest:createPeerConnection():candidate="+candidate+" more="+more);
             if (more == false) 
             {
@@ -1051,13 +1051,17 @@ ApplicationSipTest.prototype.createPeerConnection =function(){
                 that.peerConnectionMoreIceComing = false;
                 that.peerConnectionMarkActionNeeded();
             }
+            else
+            {
+                console.debug("ApplicationSipTest:createPeerConnection():candidate.constructor.toString()="+candidate.constructor.toString());
+            }
             that.peerConnectionIceCandidateCount += 1;
         }
         );	
 		
     this.peerConnection.onaddstream = function(event) 
     {
-        console.debug("ApplicationSipTest:createPeerConnection():onaddstream()");
+        console.debug("ApplicationSipTest:PeerConnection():onaddstream()");
         that.remoteAudioVideoMediaStream = event.stream;
         var url = webkitURL.createObjectURL(that.remoteAudioVideoMediaStream);
         document.getElementById("remoteVideo").src= url;
@@ -1067,12 +1071,30 @@ ApplicationSipTest.prototype.createPeerConnection =function(){
 		
     this.peerConnection.onremovestream = function(event) 
     {
-        console.debug("ApplicationSipTest:createPeerConnection():onremovestream()");
+        console.debug("ApplicationSipTest:PeerConnection():onremovestream()");
         that.remoteAudioVideoMediaStream = null;
         document.getElementById("remoteVideo").pause();
         document.getElementById("remoteVideo").src= null;
 	document.getElementById("remoteVideo").style.visibility = "hidden";
 
+    }
+    
+    
+    this.peerConnection.onopen= function(event) 
+    {
+        console.debug("ApplicationSipTest:PeerConnection():onopen()");
+    }
+    
+    this.peerConnection.onstatechange= function(event) 
+    {
+        var peerConnection = event.target;
+        console.debug("ApplicationSipTest:PeerConnection():onstatechange():peerConnection.readyState="+peerConnection.readyState);
+    }
+   
+    
+    this.peerConnection.onconnecting= function(event) 
+    {
+        console.debug("ApplicationSipTest:PeerConnection():onconnecting()");
     }
             
     this.peerConnectionMarkActionNeeded();
@@ -1118,13 +1140,13 @@ ApplicationSipTest.prototype.peerConnectionOnStableState =function(timeoutEvent)
                 this.peerConnection.setLocalDescription(this.peerConnection.SDP_OFFER,newOffer);
                 console.log("ApplicationSipTest:peerConnectionOnStableState(): newOffer="+newOffer);
                 this.peerConnection.startIce();
-                this.peerConnectionIceStarted = true;
                 this.peerConnectionState = 'preparing-offer';
                 this.peerConnectionMarkActionNeeded();
                 return;
             } 
             else
-            {    console.log("ApplicationSipTest:peerConnectionOnStableState(): Not sending a new offer:");
+            {
+                console.log("ApplicationSipTest:peerConnectionOnStableState(): Not sending a new offer:");
             }
         } 
         else if (this.peerConnectionState == 'preparing-offer') 

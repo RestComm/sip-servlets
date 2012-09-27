@@ -15,7 +15,7 @@
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">        
 	<div class="container">
-          <a class="brand" href="#">Mobicents, Connect the Cans, WebRTC Client,  By </a><a href="http://www.telestax.com"><img style="display: block;" alt="TeleStax" src="img/TeleStax_logo_small.png" /></a>
+          <a class="brand" href="#">Mobicents HTML5 WebRTC Client, By </a><a href="http://www.telestax.com"><img style="display: block;" alt="TeleStax" src="img/TeleStax_logo_small.png" /></a>
         </div>
 	<!--div class="container">
           <a class="brand" href="#">By</a>    
