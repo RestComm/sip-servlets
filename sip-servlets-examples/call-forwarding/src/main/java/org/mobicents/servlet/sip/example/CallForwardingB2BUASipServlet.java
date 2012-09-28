@@ -214,8 +214,8 @@ public class CallForwardingB2BUASipServlet extends SipServlet {
 			logger.info("Got : " + sipServletResponse.getStatus() + " "
 				+ sipServletResponse.getReasonPhrase());
 		}
-		// we don't forward the timeout
-		if(sipServletResponse.getStatus() != 408) {
+		// we don't forward the timeout nor the Request Terminated due to CANCEL
+		if(sipServletResponse.getStatus() != 408 && sipServletResponse.getStatus() != 487) {
 			//create and sends the error response for the first call leg
 			SipServletRequest originalRequest = (SipServletRequest) sipServletResponse.getSession().getAttribute("originalRequest");
 			SipServletResponse responseToOriginalRequest = originalRequest.createResponse(sipServletResponse.getStatus());
