@@ -16,8 +16,13 @@
  */
 package org.mobicents.servlet.sip.example;
 
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 

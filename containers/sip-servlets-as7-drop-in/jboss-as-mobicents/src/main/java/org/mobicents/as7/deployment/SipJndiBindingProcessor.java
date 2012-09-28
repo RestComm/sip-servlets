@@ -30,6 +30,7 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
+import org.mobicents.metadata.sip.spec.SipAnnotationMetaData;
 import org.mobicents.metadata.sip.spec.SipMetaData;
 
 /**
@@ -53,17 +54,28 @@ public class SipJndiBindingProcessor implements DeploymentUnitProcessor {
         // look for the sip application name to properly build the jndi name
         String sipApplicationName = null;
         SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
+        SipAnnotationMetaData sipAnnotationMetaData = deploymentUnit.getAttachment(SipAnnotationMetaData.ATTACHMENT_KEY);
         if (sipMetaData != null) {
         	sipApplicationName = sipMetaData.getApplicationName();
-        }        	
+        }
+        else if (sipAnnotationMetaData != null && sipAnnotationMetaData.isSipApplicationAnnotationPresent()) {
+        	// FIXME: very dirty fix, this should be done in a separate function
+        	sipApplicationName = sipAnnotationMetaData.get("classes").getApplicationName();
+        }
         else if (parentDU != null){
             AttachmentList<DeploymentUnit> subDeploymentList = parentDU.getAttachment(org.jboss.as.server.deployment.Attachments.SUB_DEPLOYMENTS);
             for (final DeploymentUnit subDeployment : subDeploymentList) {
             	sipMetaData = subDeployment.getAttachment(SipMetaData.ATTACHMENT_KEY);
+                sipAnnotationMetaData = deploymentUnit.getAttachment(SipAnnotationMetaData.ATTACHMENT_KEY);
             	if (sipMetaData != null) {
             		sipApplicationName = sipMetaData.getApplicationName();
             		break;
             	}
+                else if (sipAnnotationMetaData != null && sipAnnotationMetaData.isSipApplicationAnnotationPresent()) {
+                	// FIXME: very dirty fix, this should be done in a separate function
+                	sipApplicationName = sipAnnotationMetaData.get("classes").getApplicationName();
+                	break;
+                }
             }        	
         }
         if (sipApplicationName == null) {
