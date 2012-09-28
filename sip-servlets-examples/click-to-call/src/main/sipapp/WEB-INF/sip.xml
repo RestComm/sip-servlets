@@ -22,7 +22,7 @@
 	</listener>
 	
 	<!-- Uncomment to enable security -->
-	<security-constraint>
+	<!--security-constraint>
 	   <display-name>REGISTER Method Security Constraint</display-name>
 	      <resource-collection>
 	          <resource-name>SimpleSipServlet</resource-name>
@@ -38,5 +38,5 @@
 	 <login-config> 
          	<auth-method>DIGEST</auth-method> 
          	<realm-name>sip-servlets</realm-name> 
-   	 </login-config>
+   	 </login-config-->
 </sip-app>
