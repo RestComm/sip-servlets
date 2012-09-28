@@ -27,6 +27,7 @@ import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 import org.jboss.as.web.ext.WebContextFactory;
 import org.jboss.logging.Logger;
+import org.mobicents.metadata.sip.spec.SipAnnotationMetaData;
 import org.mobicents.metadata.sip.spec.SipMetaData;
 
 /**
@@ -45,11 +46,18 @@ public class SipContextFactoryDeploymentProcessor implements DeploymentUnitProce
     public void deploy(final DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
         final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
         // Check if the deployment contains a sip metadata
-        final SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
+        SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
         if(sipMetaData == null) {
-            if (logger.isDebugEnabled()) logger.debug(deploymentUnit.getName() + " has null sipMetaData, no Sip context factory installed");
-            // In case there is no metadata attached, it means this is not a sip deployment, so we can safely ignore it!
-            return;
+            if (logger.isDebugEnabled()) logger.debug(deploymentUnit.getName() + " has null sipMetaData, checking annotations");
+            SipAnnotationMetaData sipAnnotationMetaData = deploymentUnit.getAttachment(SipAnnotationMetaData.ATTACHMENT_KEY);
+            if(sipAnnotationMetaData == null || !sipAnnotationMetaData.isSipApplicationAnnotationPresent()) {   
+            	// http://code.google.com/p/sipservlets/issues/detail?id=168
+            	// When no sip.xml but annotations only, Application is not recognized as SIP App by AS7
+            	
+	            // In case there is no metadata attached, it means this is not a sip deployment, so we can safely ignore it!
+            	if (logger.isDebugEnabled()) logger.debug(deploymentUnit.getName() + " has null sipMetaData and no SipApplication annotation, no Sip context factory installed");
+	            return;
+            }
         }
         if (logger.isDebugEnabled()) logger.debug(deploymentUnit.getName() + " sip context factory installed");
         // Just attach the context factory, the web subsystem will pick it up

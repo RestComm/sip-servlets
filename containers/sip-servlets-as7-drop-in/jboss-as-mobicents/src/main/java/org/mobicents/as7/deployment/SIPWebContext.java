@@ -40,6 +40,7 @@ import org.mobicents.as7.SipServer;
 import org.mobicents.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.mobicents.metadata.sip.merge.JBossSipMetaDataMerger;
 import org.mobicents.metadata.sip.spec.ProxyConfigMetaData;
+import org.mobicents.metadata.sip.spec.Sip11MetaData;
 import org.mobicents.metadata.sip.spec.SipAnnotationMetaData;
 import org.mobicents.metadata.sip.spec.SipMetaData;
 import org.mobicents.metadata.sip.spec.SipServletSelectionMetaData;
@@ -122,7 +123,12 @@ public class SIPWebContext extends SipStandardContext {
         if(log.isDebugEnabled()) {
     		log.debugf("security domain " + mergedMetaData.getSecurityDomain() + " for deployment %s", deploymentUnit.getName());
     	}
-        
+        if(sipMetaData == null && sipAnnotationMetaData != null && sipAnnotationMetaData.isSipApplicationAnnotationPresent()) {
+        	// http://code.google.com/p/sipservlets/issues/detail?id=168
+        	// When no sip.xml but annotations only, Application is not recognized as SIP App by AS7
+        	log.debugf("sip meta data is null, creating a new one");
+        	sipMetaData = new Sip11MetaData();
+        }
         augmentAnnotations(mergedMetaData, sipMetaData, sipAnnotationMetaData);
         try {
 			processMetaData(mergedMetaData, sipMetaData);
