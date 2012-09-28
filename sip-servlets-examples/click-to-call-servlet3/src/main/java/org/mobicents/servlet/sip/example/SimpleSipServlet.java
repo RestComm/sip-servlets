@@ -18,13 +18,10 @@ package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.annotation.Resource;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -38,7 +35,6 @@ import javax.servlet.sip.SipServletResponse;
 import javax.servlet.sip.SipSession;
 import javax.servlet.sip.annotation.SipListener;
 
-
 import org.apache.log4j.Logger;
 
 @javax.servlet.sip.annotation.SipServlet(loadOnStartup=1, applicationName="ClickToCallAsyncApplication")
@@ -48,6 +44,7 @@ public class SimpleSipServlet extends SipServlet implements SipErrorListener,
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(SimpleSipServlet.class);
 	private static final String CONTACT_HEADER = "Contact";
+//	@Resource
 	private SipFactory sipFactory;
 	
 	public SimpleSipServlet() {

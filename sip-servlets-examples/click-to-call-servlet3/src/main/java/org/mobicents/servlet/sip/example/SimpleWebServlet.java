@@ -23,6 +23,7 @@ import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import javax.annotation.Resource;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -46,6 +47,7 @@ public class SimpleWebServlet extends HttpServlet
 { 	
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger.getLogger(SimpleWebServlet.class);
+//	@Resource
 	private SipFactory sipFactory;	
 
 	@Override
