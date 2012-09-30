@@ -28,13 +28,13 @@ import java.net.URI;
 import javax.media.mscontrol.MediaEventListener;
 import javax.media.mscontrol.MediaSession;
 import javax.media.mscontrol.MsControlException;
+import javax.media.mscontrol.Parameters;
 import javax.media.mscontrol.join.JoinEvent;
 import javax.media.mscontrol.join.JoinEventListener;
 import javax.media.mscontrol.join.Joinable.Direction;
 import javax.media.mscontrol.mediagroup.MediaGroup;
-import javax.media.mscontrol.mediagroup.Player;
-import javax.media.mscontrol.mediagroup.PlayerEvent;
 import javax.media.mscontrol.mediagroup.Recorder;
+import javax.media.mscontrol.mediagroup.RecorderEvent;
 import javax.media.mscontrol.networkconnection.NetworkConnection;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -53,7 +53,7 @@ import org.apache.log4j.Logger;
  * 
  */
 public class PromptAndRecordServlet extends PlayerServlet implements
-		TimerListener {
+TimerListener {
 	private static final long serialVersionUID = 1L;
 	private static Logger logger = Logger
 			.getLogger(PromptAndRecordServlet.class);
@@ -64,7 +64,7 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 
 	private static final int RECORDING_DELAY = 30000;
 
-	private final static String RECORDER = "test.wav";
+	private final static String RECORDER = "file:///tmp/test.wav";
 
 	// private final String RECORDED_FILE = "file://" +
 	// System.getProperty("jboss.server.data.dir") + "/" + RECORDER;
@@ -76,7 +76,7 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 
 	@Override
 	protected void doAck(SipServletRequest req) throws ServletException,
-			IOException {
+	IOException {
 		SipSession sipSession = req.getSession();
 
 		MediaSession ms = (MediaSession) sipSession
@@ -99,7 +99,7 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 
 	@Override
 	protected void doBye(SipServletRequest request) throws ServletException,
-			IOException {
+	IOException {
 		MediaGroup mediaGroup = (MediaGroup) request.getSession().getAttribute(
 				"MEDIA_GROUP");
 		if (mediaGroup != null) {
@@ -133,7 +133,7 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 			}
 		} else {
 			logger
-					.info("the session has not been found, it may have been already invalidated");
+			.info("the session has not been found, it may have been already invalidated");
 		}
 	}
 
@@ -148,12 +148,28 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 					// NC Joined to MG
 
 					try {
-						Player player = mg.getPlayer();
-						player.addListener(new PlayerListener());
 
-						URI prompt = URI.create(WELCOME_MSG);
+						URI prompt = URI.create(WELCOME_MSG);						
+						Recorder recorder = mg.getRecorder();
+						Parameters options = mg.createParameters();
+						options.put(Recorder.PROMPT, prompt);
+						recorder.addListener(new RecorderListener());
 
-						player.play(prompt, null, null);
+						logger.info("recording the user at " + RECORDER);
+						URI recPrompt = URI.create(RECORDER);
+
+						recorder.record(recPrompt, null, options);
+
+						MediaSession mediaSession = mg.getMediaSession();
+						SipSession sipSession = (SipSession) mediaSession
+								.getAttribute("SIP_SESSION");
+						SipApplicationSession sipAppSession = sipSession
+								.getApplicationSession();
+
+						TimerService timer = (TimerService) getServletContext()
+								.getAttribute(TIMER_SERVICE);
+						timer.createTimer(sipAppSession, RECORDING_DELAY,
+								false, sipSession.getId());
 
 					} catch (MsControlException e) {
 						logger.error(e);
@@ -171,47 +187,11 @@ public class PromptAndRecordServlet extends PlayerServlet implements
 
 	}
 
-	private class PlayerListener implements MediaEventListener<PlayerEvent> {
+	private class RecorderListener implements MediaEventListener<RecorderEvent> {
 
-		public void onEvent(PlayerEvent event) {
-
-			Player player = event.getSource();
-			MediaGroup mg = player.getContainer();
-			if (!isBye) {
-				if (event.isSuccessful()
-						&& (PlayerEvent.PLAY_COMPLETED == event.getEventType())) {
-
-					MediaSession mediaSession = event.getSource()
-							.getMediaSession();
-
-					SipSession sipSession = (SipSession) mediaSession
-							.getAttribute("SIP_SESSION");
-
-					sipSession.setAttribute("MEDIA_GROUP", mg);
-
-					SipApplicationSession sipAppSession = sipSession
-							.getApplicationSession();
-
-					try {
-						Recorder recoredr = mg.getRecorder();
-						logger.info("recording the user at " + RECORDER);
-						URI prompt = URI.create(RECORDER);
-
-						recoredr.record(prompt, null, null);
-
-						TimerService timer = (TimerService) getServletContext()
-								.getAttribute(TIMER_SERVICE);
-						timer.createTimer(sipAppSession, RECORDING_DELAY,
-								false, sipSession.getId());
-
-					} catch (MsControlException e) {
-						logger.error("An unexpected error happened ", e);
-					}
-				} else {
-					logger.error("Player didn't complete successfully ");
-				}
-			}
-
+		public void onEvent(RecorderEvent event) {
+			logger.info("New RecorderEvent received: "+event.getEventType());
+			logger.info("Recording duration: "+event.getDuration());
 		}
 
 	}

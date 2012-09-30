@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.mobicents.servlet.sip.examples</groupId>
@@ -40,9 +41,27 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.mobicents.jsr309</groupId>
-			<artifactId>mobicents-jsr309-impl</artifactId>
-			<version>2.4.0.FINAL</version>
+			<groupId>org.mobicents.media.client</groupId>
+			<artifactId>jsr-309-driver</artifactId>
+			<version>3.0.0.CR1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.mobicents.media.client</groupId>
+			<artifactId>mgcp-driver</artifactId>
+			<version>3.0.0.CR1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>jain</groupId>
+			<artifactId>jain-mgcp-ri</artifactId>
+			<version>1.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.sdp</groupId>
+			<artifactId>nist-sdp</artifactId>
+			<version>1.0</version>
 		</dependency>
 
 		<!-- j2ee dependencies -->
@@ -62,7 +81,7 @@
 
 	</dependencies>
 	<build>
-		 <finalName>media-jsr309-servlet</finalName>
+		<finalName>media-jsr309-servlet</finalName>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -79,7 +98,7 @@
 						${basedir}/src/main/sipapp
 					</warSourceDirectory>
 				</configuration>
-			</plugin>			
+			</plugin>
 		</plugins>
 	</build>
 
@@ -92,18 +111,18 @@
 			<layout>default</layout>
 		</repository>
 		<repository>
-			  <id>mobicents-public-repository-group</id>
-			  <name>Mobicens Public Maven Repository Group</name>
-			  <url>https://oss.sonatype.org/content/groups/public</url>
-			  <layout>default</layout>
-			  <releases>
-			    <enabled>true</enabled>
-			    <updatePolicy>never</updatePolicy>
-			  </releases>
-			  <snapshots>
-			    <enabled>true</enabled>
-			    <updatePolicy>never</updatePolicy>
-			  </snapshots>
+			<id>mobicents-public-repository-group</id>
+			<name>Mobicens Public Maven Repository Group</name>
+			<url>https://oss.sonatype.org/content/groups/public</url>
+			<layout>default</layout>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
 		</repository>
 		<repository>
 			<id>jboss-public-repository-group</id>
@@ -119,5 +138,5 @@
 				<updatePolicy>never</updatePolicy>
 			</snapshots>
 		</repository>
-	</repositories>	
+	</repositories>
 </project>

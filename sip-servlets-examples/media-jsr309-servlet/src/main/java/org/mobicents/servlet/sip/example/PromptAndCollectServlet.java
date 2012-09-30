@@ -24,7 +24,6 @@ package org.mobicents.servlet.sip.example;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 
 import javax.media.mscontrol.MediaEventListener;
 import javax.media.mscontrol.MediaSession;
@@ -34,11 +33,10 @@ import javax.media.mscontrol.join.JoinEvent;
 import javax.media.mscontrol.join.JoinEventListener;
 import javax.media.mscontrol.join.Joinable.Direction;
 import javax.media.mscontrol.mediagroup.MediaGroup;
-import javax.media.mscontrol.mediagroup.Player;
-import javax.media.mscontrol.mediagroup.PlayerEvent;
 import javax.media.mscontrol.mediagroup.signals.SignalDetector;
 import javax.media.mscontrol.mediagroup.signals.SignalDetectorEvent;
 import javax.media.mscontrol.networkconnection.NetworkConnection;
+import javax.media.mscontrol.resource.RTC;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipServletRequest;
@@ -161,12 +159,14 @@ public class PromptAndCollectServlet extends PlayerServlet {
 			MediaGroup mediaGroup = (MediaGroup) request.getSession()
 					.getAttribute("MediaGroup");
 			try {
-				playDTMF(mediaGroup.getPlayer(), signal);
+				playDTMF(mediaGroup, signal);
 			} catch (MsControlException e) {
 				logger.error(
 						"Problem playing the stream corresponding to the following DTMF "
 								+ signal, e);
 				responseCode = SipServletResponse.SC_SERVER_INTERNAL_ERROR;
+			} catch (InterruptedException e) {
+				e.printStackTrace();
 			}
 		}
 		// sending response
@@ -178,8 +178,9 @@ public class PromptAndCollectServlet extends PlayerServlet {
 	 * @param mg
 	 * @param dtmf
 	 * @throws MsControlException
+	 * @throws InterruptedException 
 	 */
-	private void playDTMF(Player player, String dtmf) throws MsControlException {
+	private void playDTMF(MediaGroup mg, String dtmf) throws MsControlException, InterruptedException {
 		URI prompt = null;
 
 		if (dtmf.equals("0")) {
@@ -218,13 +219,17 @@ public class PromptAndCollectServlet extends PlayerServlet {
 			throw new MsControlException("This DigitMap is not recognized "
 					+ dtmf);
 		}
+		try{
+			
+			SignalDetector sg = mg.getSignalDetector();
+			 Parameters options = mg.createParameters();
+			 options.put(SignalDetector.PROMPT, prompt);
+			 sg.addListener(new SignalDetectorListener());
+			 sg.receiveSignals(1, null, new RTC[] {MediaGroup.SIGDET_STOPPLAY}, options);
+		} catch (Exception e){
+			logger.error(e);
+		}
 
-		Parameters p = player.getMediaSession().createParameters();
-		p.put(Player.BEHAVIOUR_IF_BUSY, Player.STOP_IF_BUSY);
-		player.play(prompt, null, p);
-		SignalDetector sg = player.getContainer().getSignalDetector();
-		sg.addListener(new SignalDetectorListener());
-		player.getContainer().getSignalDetector().receiveSignals(1, null, null, null);
 	}
 
 	private class MyJoinEventListener implements JoinEventListener {
@@ -240,17 +245,14 @@ public class PromptAndCollectServlet extends PlayerServlet {
 						logger.debug("NC joined to MG. Start Player");
 					}
 					try {
-						Player player = mg.getPlayer();
-						player.addListener(new PlayerListener());
 
-						URI prompt = getPrompt();
-						Parameters p = player.getMediaSession().createParameters();
-						p.put(Player.BEHAVIOUR_IF_BUSY, Player.STOP_IF_BUSY);
-						player.play(prompt, null, p);
-						SignalDetector sg = mg.getSignalDetector();
-						sg.addListener(new SignalDetectorListener());
-						mg.getSignalDetector().receiveSignals(1, null, null, null);
-
+						 URI prompt = getPrompt();
+						 Parameters options = mg.createParameters();
+						 options.put(SignalDetector.PROMPT, prompt);
+						 SignalDetector sg = mg.getSignalDetector();
+						 sg.addListener(new SignalDetectorListener());
+						 sg.receiveSignals(1, null, new RTC[] {MediaGroup.SIGDET_STOPPLAY}, options);
+					
 					} catch (Exception e) {
 						logger.error(e);
 					}
@@ -271,59 +273,31 @@ public class PromptAndCollectServlet extends PlayerServlet {
 		return URI.create(WELCOME_MSG);
 	}
 
-	private class PlayerListener implements MediaEventListener<PlayerEvent> {
-
-		public void onEvent(PlayerEvent event) {
-			try {
-				logger.info("PlayerListener Received event " + isBye + " " + event.getEventType() + "Event: "+ event);
-				Player player = event.getSource();
-				MediaGroup mg = player.getContainer();
-				if (!isBye) {
-					logger.info("Is not BYE " + event.isSuccessful() + " " + event.getEventType());
-					if (event.isSuccessful()
-							&& (PlayerEvent.PLAY_COMPLETED == event.getEventType())) {
-						logger.info("Received PlayComplete event");
-						try {
-							SignalDetector sg = mg.getSignalDetector();
-							sg.addListener(new SignalDetectorListener());
-							sg.receiveSignals(1, null, null, null);
-						} catch (MsControlException e) {
-							logger.error(e);
-						}
-					} else {
-						logger.error("Player didn't complete successfully ");
-					}
-				}
-
-			}
-			catch (Exception e) {
-				logger.error("Broken", e);
-			}
-		}
-
-	}
-
 	class SignalDetectorListener implements
 			MediaEventListener<SignalDetectorEvent> {
 
 		public void onEvent(SignalDetectorEvent event) {
 			try {
-				MediaGroup mg = (MediaGroup) event.getSource().getContainer();
-
-				SignalDetector sg = mg.getSignalDetector();
+	
+				SignalDetector sg = event.getSource();
+				MediaGroup mg = (MediaGroup) sg.getContainer();
+				
 				sg.removeListener(this);
 
 				if (event.isSuccessful()
 						&& (SignalDetectorEvent.RECEIVE_SIGNALS_COMPLETED == event
 								.getEventType())) {
 					String seq = event.getSignalString();
-
-					playDTMF(mg.getPlayer(), seq);
-
+					
+					playDTMF(mg, seq);
+					
 				} else {
 					logger.error("DTMF detection failed " + event.getSignalString());
 				}
+				
 			} catch (MsControlException e) {
+				e.printStackTrace();
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 

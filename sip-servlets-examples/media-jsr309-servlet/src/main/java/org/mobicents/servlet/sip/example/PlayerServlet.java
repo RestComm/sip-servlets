@@ -178,6 +178,7 @@ public class PlayerServlet extends SipServlet implements ServletContextListener 
 		MediaSession mediaSession = (MediaSession) request.getSession()
 				.getAttribute("MEDIA_SESSION");
 		mediaSession.release();
+		request.getSession().removeAttribute("MEDIA_SESSION");
 
 		SipServletResponse sipServletResponse = request.createResponse(200);
 		sipServletResponse.send();
