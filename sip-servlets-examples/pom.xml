@@ -40,6 +40,7 @@
 		<module>simple-sip-servlet-distributable</module>
 		<module>speed-dial</module>
 		<module>uac-register</module>
+		<module>websocket-b2bua</module>
 	</modules>
 
 	<properties>
