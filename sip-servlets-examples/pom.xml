@@ -26,8 +26,8 @@
 		<module>diameter-event-charging</module>
 		<module>diameter-openims</module>
 		<module>diameter-ro-rf</module>
-		<module>facebook-c2c</module>
-		<module>jslee-sips-interop</module>
+		<!--module>facebook-c2c</module>
+		<module>jslee-sips-interop</module-->
 		<module>location-service</module>
 		<module>location-service-distributable</module>
 		<module>media-jsr309-servlet</module>
@@ -35,7 +35,7 @@
 		<module>presence-client-example</module>
 		<module>shootist-sip-servlet</module>
 		<module>shootist-sip-servlet-distributable</module>
-		<module>shopping-demo-jsr309</module>
+		<!--module>shopping-demo-jsr309</module-->
 		<module>simple-sip-servlet</module>
 		<module>simple-sip-servlet-distributable</module>
 		<module>speed-dial</module>
