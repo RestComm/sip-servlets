@@ -411,7 +411,7 @@ public class ShootistSipServlet
 					}
 				}
 			}
-			if(!method.equalsIgnoreCase("REGISTER")) {
+			if(!method.equalsIgnoreCase("REGISTER") && !method.equalsIgnoreCase("OPTIONS")) {
 				Address addr = null;
 				try {
 					addr = sipServletRequest.getAddressHeader("Contact");
@@ -447,9 +447,9 @@ public class ShootistSipServlet
 						sipServletRequest.addHeader("Contact", "sips:LittleGuy@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 					}
 				}
-				// http://code.google.com/p/sipservlets/issues/detail?id=156
+				// http://code.google.com/p/sipservlets/issues/detail?id=156 and http://code.google.com/p/sipservlets/issues/detail?id=172 
 				if(ce.getServletContext().getInitParameter("setRandomContact") != null) {
-					if(method.equalsIgnoreCase("REGISTER")) {
+					if(method.equalsIgnoreCase("REGISTER") || method.equalsIgnoreCase("OPTIONS")) {
 						sipServletRequest.addHeader("Contact", "sip:random@172.172.172.172:3289");
 					}
 				}	

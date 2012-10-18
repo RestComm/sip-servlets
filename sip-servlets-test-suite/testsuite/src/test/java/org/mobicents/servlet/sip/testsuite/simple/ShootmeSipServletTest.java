@@ -44,6 +44,8 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.Before;
 import org.mobicents.servlet.sip.SipEmbedded;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.core.SipContext;
@@ -90,6 +92,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 	}
 	
 	@Override
+	@Before
 	protected void setUp() throws Exception {
 		super.setUp();						
 		
@@ -721,6 +724,7 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 	}
 	
 	@Override
+	@After
 	protected void tearDown() throws Exception {					
 		senderProtocolObjects.destroy();	
 		registerRecieverProtocolObjects.destroy();

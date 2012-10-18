@@ -343,6 +343,8 @@ public class TestSipListener implements SipListener {
 	
 	private Request infoRequest;
 	
+	private Request optionsRequest;
+	
 	private boolean addRecordRouteForResponses;
 
 	private RFC5626UseCase rfc5626UseCase;
@@ -448,6 +450,10 @@ public class TestSipListener implements SipListener {
 		
 		if (request.getMethod().equals(Request.UPDATE)) {
 			processUpdate(request, serverTransactionId);
+		}
+		
+		if (request.getMethod().equals(Request.OPTIONS)) {
+			processOptions(request, serverTransactionId);
 		}
 		
 		if (request.getMethod().equals(Request.INFO)) {
@@ -674,6 +680,37 @@ public class TestSipListener implements SipListener {
 					sendUpdateAfterUpdate = false;
 				}
 			}
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+	}
+	
+	public void processOptions(Request request,
+			ServerTransaction serverTransactionId) {
+		try {
+			logger.info("shootist:  got a OPTIONS. ServerTxId = " + serverTransactionId);
+						
+			if (serverTransactionId == null) {
+				serverTransactionId = sipProvider.getNewServerTransaction(request);
+			}
+			if (serverTransactionId == null) {
+				logger.info("shootist:  null TID.");
+				return;
+			}
+			
+			Dialog dialog = serverTransactionId.getDialog();
+			if(dialog != null) {
+				logger.info("Dialog State = " + dialog.getState());
+			}
+			Response response = protocolObjects.messageFactory.createResponse(
+					200, request);
+			serverTransactionId.sendResponse(response);
+			this.transactionCount++;
+			logger.info("shootist:  Sending OK.");
+			if(dialog != null) {
+				logger.info("Dialog State = " + dialog.getState());
+			}
+			this.optionsRequest = request;		
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
@@ -3452,6 +3489,14 @@ public class TestSipListener implements SipListener {
 
 	public Request getInfoRequest() {
 		return infoRequest;
+	}
+	
+	public void setOptionsRequest(Request optionsRequest) {
+		this.optionsRequest = optionsRequest;
+	}
+
+	public Request getOptionsRequest() {
+		return this.optionsRequest;
 	}
 
 	/**

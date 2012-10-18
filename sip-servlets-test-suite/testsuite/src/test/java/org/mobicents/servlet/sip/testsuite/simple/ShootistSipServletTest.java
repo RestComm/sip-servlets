@@ -47,6 +47,9 @@ import javax.sip.message.Response;
 
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 import org.mobicents.servlet.sip.SipEmbedded;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.address.RFC2396UrlDecoder;
@@ -159,6 +162,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	}
 	
 	@Override
+	@Before
 	protected void setUp() throws Exception {
 
         System.setProperty( "javax.net.ssl.keyStore",  ShootistSipServletTest.class.getResource("testkeys").getPath() );
@@ -803,6 +807,33 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		assertNotNull(contactHeader);	
 		assertEquals(((SipURI)contactHeader.getAddress().getURI()).toString(),"sip:random@172.172.172.172:3289");
 	}
+
+	/**
+	 * non regression test for Issue 172 http://code.google.com/p/sipservlets/issues/detail?id=172
+	 * Contact header in OPTIONS overwritten by container
+	 */
+	@Test
+	public void testShootistOptionsSetContact() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();			
+		
+		receiverProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("setRandomContact", "true");
+		params.put("method", "OPTIONS");
+		deployApplication(params);
+		Thread.sleep(TIMEOUT);	
+		ContactHeader contactHeader = (ContactHeader) receiver.getOptionsRequest().getHeader(ContactHeader.NAME);
+		assertNotNull(contactHeader);	
+		assertEquals(((SipURI)contactHeader.getAddress().getURI()).toString(),"sip:random@172.172.172.172:3289");
+	}
+	
 	
 	/**
 	 * non regression test for Issue 1547 http://code.google.com/p/mobicents/issues/detail?id=1547
@@ -945,6 +976,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	}	
 
 	@Override
+	@After
 	protected void tearDown() throws Exception {					
 		receiverProtocolObjects.destroy();			
 		logger.info("Test completed");

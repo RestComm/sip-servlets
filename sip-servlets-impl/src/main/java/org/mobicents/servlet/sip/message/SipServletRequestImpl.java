@@ -240,7 +240,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			Request request = (Request) this.message;
 	
 			String method = request.getMethod();
-			if (method.equals(Request.REGISTER)) {
+			if (method.equals(Request.REGISTER) || method.equals(Request.OPTIONS)) {
 				return ModifiableRule.ContactNotSystem;
 			} else {
 				return ModifiableRule.ContactSystem;
