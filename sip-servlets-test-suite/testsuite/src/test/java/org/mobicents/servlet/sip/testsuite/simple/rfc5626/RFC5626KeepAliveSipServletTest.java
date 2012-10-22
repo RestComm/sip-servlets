@@ -22,7 +22,8 @@
 
 package org.mobicents.servlet.sip.testsuite.simple.rfc5626;
 
-import gov.nist.javax.sip.stack.OIOMessageProcessorFactory;
+import gov.nist.javax.sip.SipStackImpl;
+import gov.nist.javax.sip.stack.NioMessageProcessorFactory;
 import gov.nist.javax.sip.stack.SIPTransactionStack;
 
 import java.io.File;
@@ -38,6 +39,7 @@ import javax.sip.ListeningPoint;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 
+import org.apache.catalina.connector.Connector;
 import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipEmbedded;
@@ -71,6 +73,8 @@ public class RFC5626KeepAliveSipServletTest extends SipServletTestCase {
 	TestSipListener receiver;
 	SipProvider receiverProvider = null;
 	ProtocolObjects receiverProtocolObjects;
+
+	private Connector shootistConnector;
 	
 //	TestSipListener registerReciever;	
 //	ProtocolObjects registerRecieverProtocolObjects;	
@@ -145,7 +149,7 @@ public class RFC5626KeepAliveSipServletTest extends SipServletTestCase {
 		tomcatShootist.setDarConfigurationFilePath(darConfigurationFile);
 		tomcatShootist.initTomcat(darConfigurationFile, getSipStackProperties("mss-Shootist"));
 		tomcatShootist.startTomcat();
-		tomcatShootist.addSipConnector("tomcatShootist", System.getProperty("org.mobicents.testsuite.testhostaddr"), 5090, listeningPointTransport);
+		shootistConnector = tomcatShootist.addSipConnector("tomcatShootist", System.getProperty("org.mobicents.testsuite.testhostaddr"), 5090, listeningPointTransport);
 		
 		receiverProtocolObjects =new ProtocolObjects(
 				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, "4", "true");
@@ -244,7 +248,7 @@ public class RFC5626KeepAliveSipServletTest extends SipServletTestCase {
 		assertEquals(1, receiver.getAllMessagesContent().size());
 	}
 	
-	public void testShootistCloseReliableChannel() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+	public void testShootistCloseReliableChannel() throws Exception {
 		((SIPTransactionStack)tomcat.getSipService().getSipStack()).setReliableConnectionKeepAliveTimeout(2200);
 		((SIPTransactionStack)tomcatShootist.getSipService().getSipStack()).setReliableConnectionKeepAliveTimeout(2200);
 		
@@ -254,10 +258,18 @@ public class RFC5626KeepAliveSipServletTest extends SipServletTestCase {
 		params.put("host",  "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + sipConnector.getPort()+";transport=tcp;");
 		params.put("noBye", "true");
 		params.put("testKeepAlive", "100");
-		params.put("closeReliableChannel", "true");
-		params.put("timeout", "" + TIMEOUT);
+		if(!((SipStackImpl)tomcatShootist.getSipService().getSipStack()).getMessageProcessorFactory().getClass().getName().equals(NioMessageProcessorFactory.class.getName())) {			
+			params.put("closeReliableChannel", "true");
+			params.put("timeout", "" + TIMEOUT);
+		} else {
+			logger.debug("Nio setup we will kill the connection through removal of connector to avoid the retry mechanism false positivie");
+		}
 		deployShootist(params);
 		Thread.sleep(TIMEOUT);
+		if(((SipStackImpl)tomcatShootist.getSipService().getSipStack()).getMessageProcessorFactory().getClass().getName().equals(NioMessageProcessorFactory.class.getName())) {
+			logger.debug("killing the connection through removal of connector to avoid the retry mechanism false positivie");
+			tomcatShootist.removeConnector(shootistConnector);
+		}
 		assertEquals(0, receiver.getAllMessagesContent().size());		
 		Thread.sleep(TIMEOUT);
 		Iterator<String> allMessagesIterator = receiver.getAllMessagesContent().iterator();		
@@ -292,7 +304,6 @@ public class RFC5626KeepAliveSipServletTest extends SipServletTestCase {
 		sipStackProperties.setProperty("gov.nist.javax.sip.MAX_FORK_TIME_SECONDS", "1");
 		sipStackProperties.setProperty(SipStandardService.LOOSE_DIALOG_VALIDATION, "true");
 		sipStackProperties.setProperty(SipStandardService.PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");		
-		sipStackProperties.setProperty("gov.nist.javax.sip.MESSAGE_PROCESSOR_FACTORY", OIOMessageProcessorFactory.class.getName());		
 		return sipStackProperties;
 	}
 

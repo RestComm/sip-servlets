@@ -1039,5 +1039,13 @@ public class SimpleSipServlet
 			int peerPort) {
 		logger.error("SipConnector " + connector + " remotePeer " + peerAddress +":"+ peerPort);
 		sendMessage(sipFactory.createApplicationSession(), sipFactory, "shootme onKeepAliveTimeout", "tcp");
+		if(getServletContext().getInitParameter("changeKeepAliveTimeout")!= null) {
+			try {
+				boolean changed = connector.setKeepAliveTimeout(System.getProperty("org.mobicents.testsuite.testhostaddr"), peerPort, 2200);
+				logger.info("SipConnector timeoutvalue changed " + getServletContext().getInitParameter("changeKeepAliveTimeout") + " changed " + changed + "for " + System.getProperty("org.mobicents.testsuite.testhostaddr") +":"+ peerPort);
+			} catch (Exception e) {
+				logger.error("couldn't change the timeout " + e);
+			}
+		}
 	}
 }
