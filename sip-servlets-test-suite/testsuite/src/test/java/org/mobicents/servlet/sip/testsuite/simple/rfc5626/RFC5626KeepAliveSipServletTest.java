@@ -223,6 +223,32 @@ public class RFC5626KeepAliveSipServletTest extends SipServletTestCase {
 		assertEquals(1, receiver.getAllMessagesContent().size());
 	}
 	
+	// making sure that we don't receive one timeout per Connection Based Transport Connector 
+	public void testShootistTimeoutMultipleListeningPoints() throws Exception {
+		((SIPTransactionStack)tomcat.getSipService().getSipStack()).setReliableConnectionKeepAliveTimeout(2200);
+		((SIPTransactionStack)tomcatShootist.getSipService().getSipStack()).setReliableConnectionKeepAliveTimeout(2200);
+		
+		tomcat.addSipConnector(serverName, "" + System.getProperty("org.mobicents.testsuite.testhostaddr"), 6090, ListeningPoint.TLS);
+		tomcatShootist.addSipConnector(serverName, "" + System.getProperty("org.mobicents.testsuite.testhostaddr"), 6091, ListeningPoint.TLS);
+		Map<String, String> params = new HashMap<String, String>();		
+		deployShootme(params);
+		params = new HashMap<String, String>();
+		params.put("host",  "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + sipConnector.getPort()+";transport=tcp;");
+		params.put("noBye", "true");
+		params.put("testKeepAlive", "100");
+		deployShootist(params);
+		Thread.sleep(TIMEOUT);
+		tomcat.stopTomcat();
+		Thread.sleep(TIMEOUT/2);
+		Iterator<String> allMessagesIterator = receiver.getAllMessagesContent().iterator();		
+		while (allMessagesIterator.hasNext()) {
+			String message = (String) allMessagesIterator.next();
+			logger.info(message);
+		}
+		assertTrue("shootist onKeepAliveTimeout", receiver.getAllMessagesContent().contains("shootist onKeepAliveTimeout"));
+		assertEquals(1, receiver.getAllMessagesContent().size());
+	}
+	
 	public void testShootistModifyKeepAliveTimeout() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
 		((SIPTransactionStack)tomcat.getSipService().getSipStack()).setReliableConnectionKeepAliveTimeout(2200);
 		((SIPTransactionStack)tomcatShootist.getSipService().getSipStack()).setReliableConnectionKeepAliveTimeout(2200);
