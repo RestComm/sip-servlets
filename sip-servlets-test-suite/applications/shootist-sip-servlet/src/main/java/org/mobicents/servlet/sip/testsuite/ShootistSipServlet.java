@@ -21,6 +21,8 @@
  */
 package org.mobicents.servlet.sip.testsuite;
 
+import gov.nist.javax.sip.stack.SIPTransactionStack;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
@@ -164,7 +166,7 @@ public class ShootistSipServlet
 			if(getServletContext().getInitParameter("closeReliableChannel")!= null) {
 				timerService.createTimer(sipFactory.createApplicationSession(), Long.valueOf(getServletContext().getInitParameter("timeout")), false, "" + sipServletResponse.getInitialRemotePort());
 			}
-			if(getServletContext().getInitParameter("testKeepAlive") != null) {
+			if(getServletContext().getInitParameter("testKeepAlive") != null && sipServletResponse.getInitialRemotePort() != 5081) {
 				SipConnector[] sipConnectors = (SipConnector[]) getServletContext().getAttribute("org.mobicents.servlet.sip.SIP_CONNECTORS");
 				for (SipConnector sipConnector : sipConnectors) {
 					if(sipConnector.getIpAddress().equals(sipServletResponse.getLocalAddr()) && sipConnector.getPort() == sipServletResponse.getLocalPort() && sipConnector.getTransport().equals(sipServletResponse.getTransport())) {
@@ -569,7 +571,16 @@ public class ShootistSipServlet
 						logger.error("problem sending heartbeat to " + remoteAddress+":"+ remotePort);
 						timer.cancel();
 					}
-					timer.getApplicationSession().setAttribute("keepAliveSent", new Integer(keepAliveSent.intValue() +1));
+					keepAliveSent = keepAliveSent.intValue() +1;
+					timer.getApplicationSession().setAttribute("keepAliveSent", new Integer(keepAliveSent));
+					if(keepAliveSent >= keepAlivetoSend) {
+						try {
+							((SipConnector)info).setKeepAliveTimeout(remoteAddress, remotePort, -1);
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}	
+	                }
 				}
 			} else {
 				SipServletRequest sipServletRequest = (SipServletRequest) timer.getInfo();
