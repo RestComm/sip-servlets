@@ -273,7 +273,10 @@ public class SipContextConfig extends ContextConfig {
 					.endsWith(".war"))
 					&& !file.isDirectory() && unpackWARs) {
 				URL war = new URL("jar:" + (new File(docBase)).toURI().toURL() + "!/");
-				String contextPath = context.getPath();
+		        //Issue:175: http://code.google.com/p/sipservlets/issues/detail?id=175
+				ContextName cn = new ContextName(context.getPath(),
+		                context.getWebappVersion());
+		        String contextPath = cn.getBaseName();
 
 				//				if (contextPath.equals("")) {
 				//					contextPath = "ROOT";
