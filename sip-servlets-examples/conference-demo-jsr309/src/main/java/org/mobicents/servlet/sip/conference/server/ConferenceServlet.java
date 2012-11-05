@@ -83,6 +83,8 @@ public class ConferenceServlet extends SipServlet implements SipServletListener 
 			"jboss.bind.address", "127.0.0.1");
 	protected static final String MGW_PORT = "2427";
 	
+	private static MediaSession mediaSession;
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -100,8 +102,8 @@ public class ConferenceServlet extends SipServlet implements SipServletListener 
 			
 			SipSession sipSession = request.getSession();
 			MsControlObjects.msControlFactory = (MsControlFactory) getServletContext().getAttribute(MS_CONTROL_FACTORY);
-			MediaSession mediaSession = (MediaSession) MsControlObjects.msControlFactory
-			.createMediaSession();
+//			MediaSession mediaSession = (MediaSession) MsControlObjects.msControlFactory
+//			.createMediaSession();
 
 			sipSession.setAttribute("MEDIA_SESSION", mediaSession);
 			mediaSession.setAttribute("SIP_SESSION", sipSession);
@@ -205,6 +207,7 @@ public class ConferenceServlet extends SipServlet implements SipServletListener 
 				final MsControlFactory msControlFactory = new DriverImpl().getFactory(properties); 
 				MsControlObjects.msControlFactory = msControlFactory;
 				event.getServletContext().setAttribute(MS_CONTROL_FACTORY, msControlFactory);
+				mediaSession = MsControlObjects.msControlFactory.createMediaSession();
 				logger.info("started MGCP Stack on " + LOCAL_ADDRESS + "and port " + CA_PORT + " obj: " + MsControlObjects.msControlFactory);
 			} catch (Exception e) {
 				logger.error("couldn't start the underlying MGCP Stack", e);

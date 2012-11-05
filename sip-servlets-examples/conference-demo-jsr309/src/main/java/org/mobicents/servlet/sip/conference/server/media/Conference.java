@@ -49,6 +49,7 @@ public class Conference {
 	private ConcurrentHashMap<String, ConferenceParticipant> participants = 
 		new ConcurrentHashMap<String, ConferenceParticipant>();
 	
+	private MediaSession mediaSession;
 	
 	private ExecutorService executor = Executors.newSingleThreadExecutor();
 	
@@ -63,7 +64,8 @@ public class Conference {
 	public synchronized void joinParticipant(final ConferenceParticipant participant) {
 		logger.info("Adding user " + participant.getName());
 		final Conference thisConference = this;
-		
+		if(mediaSession==null)
+			mediaSession=participant.getSession();
 		executor.execute(new Runnable() {
 
 			public void run() {
@@ -106,10 +108,10 @@ public class Conference {
 	public synchronized MediaMixer getMixer() {
 		if(mixer == null) {
 			try {
-				MediaSession createMediaSession = MsControlObjects.msControlFactory.createMediaSession();
-				Parameters createParameters = createMediaSession.createParameters();
+//				MediaSession createMediaSession = MsControlObjects.msControlFactory.createMediaSession();
+				Parameters createParameters = mediaSession.createParameters();
 				createParameters.put(ParameterEnum.MAX_PORTS, 100);
-				mixer = createMediaSession.createMediaMixer(MediaMixer.AUDIO, createParameters);
+				mixer = mediaSession.createMediaMixer(MediaMixer.AUDIO, createParameters);
 			} catch (MsControlException e) {
 				logger.error(e);
 			}
