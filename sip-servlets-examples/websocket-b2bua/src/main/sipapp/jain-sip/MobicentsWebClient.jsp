@@ -1,7 +1,7 @@
 <%@ page import="org.mobicents.servlet.sip.SipConnector" %>
 <html>
     <head>
-        <title>ApplicationSipTest</title>
+        <title>Mobicents HTML5 WebRTC Client</title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <script type='text/javascript'>   
             var logger =  undefined; //console;
@@ -146,10 +146,10 @@
 	<script src="js/jquery-ui-1.8.23.custom.min.js"></script>	
 	<script src="js/bootstrap.js"></script>
 	<script src="js/bootstrap.min.js"></script>
-        <script src="js/jain-sip-js.js" type="text/javascript"></script>
-        <script src="js/ApplicationSipTest.js" type="text/javascript" ></script>
+        <script src="js/jain-sip.js" type="text/javascript"></script>
+        <script src="js/MobicentsWebRTCPhone.js" type="text/javascript" ></script>
 	<script type='text/javascript'>	
-            var applicationSip=null;         
+            var mobicentsWebRTCPhone=null;         
 
                <%
                 SipConnector[] sipConnectors = (SipConnector[]) getServletContext().getAttribute(
@@ -213,27 +213,27 @@
 		    if (window.webkitNotifications) {
 			window.webkitNotifications.requestPermission();
 		    }
-                applicationSip=new ApplicationSipTest(document.getElementById("sipWsUrl").value);
-                applicationSip.localAudioVideoMediaStream=localAudioVideoMediaStream;
+                mobicentsWebRTCPhone=new MobicentsWebRTCPhone(document.getElementById("sipWsUrl").value);
+                mobicentsWebRTCPhone.localAudioVideoMediaStream=localAudioVideoMediaStream;
             }
 
             function unRegister()
             {
-                if(applicationSip!=null)
+                if(mobicentsWebRTCPhone!=null)
                 {
-                    applicationSip.unRegister();   
+                    mobicentsWebRTCPhone.unRegister();   
                 }
             }
 
             function call(from,to)
             {   
-                applicationSip.call(from,to);
+                mobicentsWebRTCPhone.call(from,to);
             }
 
 
             function bye()
             {
-                applicationSip.bye();
+                mobicentsWebRTCPhone.bye();
             }
                 
                 
