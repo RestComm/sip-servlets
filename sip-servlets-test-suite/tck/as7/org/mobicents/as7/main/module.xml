@@ -28,7 +28,7 @@
     </properties>
 
     <resources>
-        <resource-root path="jboss-as7-mobicents-1.8.0-SNAPSHOT.jar"/>
+        <resource-root path="jboss-as7-mobicents-2.1.0-SNAPSHOT.jar"/>
         <!-- Insert resources here -->
     </resources>
 
