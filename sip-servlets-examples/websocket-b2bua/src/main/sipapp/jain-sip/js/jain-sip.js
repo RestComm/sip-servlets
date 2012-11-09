@@ -7303,7 +7303,7 @@ function Via() {
     this.sentProtocol=new Protocol();
     this.sentBy=new HostPort();
     this.comment=null;
-    this.rPortFlag = false;
+    this.rPortFlag = true;
     this.headerName=this.NAME;
     this.parameters = new NameValueList();
     this.duplicates = new DuplicateNameValueList();
