@@ -120,6 +120,9 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		if(name.equalsIgnoreCase("tag") && (isModifiable == ModifiableRule.From || isModifiable == ModifiableRule.To)) {
 			throw new IllegalStateException("it is forbidden to remove the tag parameter on To or From Header");
 		}
+		if(name.equalsIgnoreCase("branch") && isModifiable == ModifiableRule.Via) {
+			throw new IllegalStateException("it is forbidden to set the branch parameter on the Via Header");
+		}
 		this.parameters.remove(name);
 		if(header != null) {
 			header.removeParameter(name);
@@ -144,6 +147,9 @@ public abstract class ParameterableImpl implements Parameterable ,Cloneable, Ser
 		}
 		if(name.equalsIgnoreCase("tag") && (isModifiable == ModifiableRule.From || isModifiable == ModifiableRule.To)) {
 			throw new IllegalStateException("it is forbidden to set the tag parameter on To or From Header");
+		}
+		if(name.equalsIgnoreCase("branch") && isModifiable == ModifiableRule.Via) {
+			throw new IllegalStateException("it is forbidden to set the branch parameter on the Via Header");
 		}
 		//Fix from abondar for Issue 494 and angelo.marletta for Issue 502      
 		this.parameters.put(name.toLowerCase(), value);

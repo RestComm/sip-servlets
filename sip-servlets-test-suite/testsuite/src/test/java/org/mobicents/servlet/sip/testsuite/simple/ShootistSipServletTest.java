@@ -184,7 +184,10 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		tomcat.startTomcat();
 		deployApplication();
 		Thread.sleep(TIMEOUT);
-		assertTrue(receiver.getByeReceived());		
+		assertTrue(receiver.getByeReceived());
+		// Non regression test for http://code.google.com/p/sipservlets/issues/detail?id=31
+		assertNotNull(((ViaHeader)receiver.getInviteRequest().getHeader(ViaHeader.NAME)).getParameter("rport"));
+		assertNotNull(((ViaHeader)receiver.getByeRequestReceived().getHeader(ViaHeader.NAME)).getParameter("rport"));
 	}
 	// Also Tests Issue 1693 http://code.google.com/p/mobicents/issues/detail?id=1693
 	public void testShootistCancel() throws Exception {

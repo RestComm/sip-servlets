@@ -450,8 +450,15 @@ public class SipSessionImpl implements MobicentsSipSession {
 					ViaHeader viaHeader = viaHeaders.next();
 					((MessageExt)methodRequest).setApplicationData(viaHeader.getTransport());
 				}
-				//Issue 112 fix by folsson
+				//Issue 112 fix by folsson 
 				methodRequest.removeHeader(ViaHeader.NAME);
+				
+				// cater to http://code.google.com/p/sipservlets/issues/detail?id=31 to be able to set the rport in applications
+				final SipApplicationDispatcher sipApplicationDispatcher = sipFactory.getSipApplicationDispatcher();
+				final String branch = JainSipUtils.createBranch(getSipApplicationSession().getKey().getId(),  sipApplicationDispatcher.getHashFromApplicationName(getKey().getApplicationName()));
+				ViaHeader viaHeader = JainSipUtils.createViaHeader(
+	    				sipFactory.getSipNetworkInterfaceManager(), methodRequest, branch, outboundInterface);
+				methodRequest.addHeader(viaHeader);
 				
 				//if a SUBSCRIBE or BYE is sent for exemple, it will reuse the prexisiting dialog
 				sipServletRequest = (SipServletRequestImpl) sipFactory.getMobicentsSipServletMessageFactory().createSipServletRequest(

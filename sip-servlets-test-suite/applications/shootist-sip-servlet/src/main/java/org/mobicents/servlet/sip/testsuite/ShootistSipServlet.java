@@ -32,6 +32,7 @@ import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.sip.Address;
+import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
@@ -480,6 +481,39 @@ public class ShootistSipServlet
 				sipServletRequest.getInitialRemotePort();
 				sipServletRequest.getInitialTransport();
 			}
+			// test for http://code.google.com/p/sipservlets/issues/detail?id=31
+			Parameterable paramVia = null;
+			try {
+				String via = sipServletRequest.getHeader("Via");
+				paramVia = sipServletRequest.getParameterableHeader("Via");
+				
+				logger.info("Via Header " + via);
+				logger.info("Param Via Header " + paramVia);								
+			} catch (ServletParseException e) {
+				logger.error("couln't parse the Via Header ", e);
+			}
+			paramVia.setParameter("rport", "");
+			boolean gotException = false;
+			try {
+				paramVia.setParameter("branch", "");
+			} catch (IllegalStateException e) {
+				gotException = true;
+			}
+			if(gotException) {
+				logger.info("got the expected exception on Via Header branch setting");
+			} else {
+				throw new IllegalStateException("didn't get the expected exception on branch modification of the Via Header"); 
+			}
+			if(testRemoteAddrAndPort != null) {
+				sipServletRequest.getRemoteAddr();
+				sipServletRequest.getRemotePort();
+				sipServletRequest.getRemoteHost();
+				sipServletRequest.getRemoteUser();
+				sipServletRequest.getInitialRemoteAddr();
+				sipServletRequest.getInitialPoppedRoute();
+				sipServletRequest.getInitialRemotePort();
+				sipServletRequest.getInitialTransport();
+			}
 			try {			
 				sipServletRequest.send();
 			} catch (IOException e) {
@@ -583,12 +617,16 @@ public class ShootistSipServlet
 	                }
 				}
 			} else {
-				SipServletRequest sipServletRequest = (SipServletRequest) timer.getInfo();
+				SipServletRequest sipServletRequest = (SipServletRequest) timer.getInfo();				
 				sipServletRequest.getApplicationSession().setAttribute("timeSent", Long.valueOf(System.currentTimeMillis()));
 				try {
+					// http://code.google.com/p/sipservlets/issues/detail?id=31
+					sipServletRequest.getParameterableHeader("Via").setParameter("rport", "");
 					sipServletRequest.send();
 				} catch (IOException e) {
 					logger.error("Unexpected exception while sending the BYE request",e);
+				} catch (ServletParseException e) {
+					logger.error("Couldn't parse via header for BYE request",e);
 				}
 				timer.cancel();
 			}			

@@ -377,6 +377,13 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 		//removing the via header from original request
 		newRequest.removeHeader(ViaHeader.NAME);	
 		
+		// cater to http://code.google.com/p/sipservlets/issues/detail?id=31 to be able to set the rport in applications
+		final SipApplicationDispatcher sipApplicationDispatcher = getSipApplicationDispatcher();
+		final String branch = JainSipUtils.createBranch(originalAppSession.getKey().getId(),  sipApplicationDispatcher.getHashFromApplicationName(originalAppSession.getKey().getApplicationName()));
+		ViaHeader viaHeader = JainSipUtils.createViaHeader(
+				getSipNetworkInterfaceManager(), newRequest, branch, null);
+		newRequest.addHeader(viaHeader);
+		
 		final FromHeader newFromHeader = (FromHeader) newRequest.getHeader(FromHeader.NAME); 
 		
 		//assign a new from tag
@@ -730,6 +737,13 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			session.setHandler(handler);
 			session.setLocalParty(new AddressImpl(fromAddress, null, ModifiableRule.NotModifiable));
 			session.setRemoteParty(new AddressImpl(toAddress, null, ModifiableRule.NotModifiable));
+			
+			// cater to http://code.google.com/p/sipservlets/issues/detail?id=31 to be able to set the rport in applications
+			final SipApplicationDispatcher sipApplicationDispatcher = getSipApplicationDispatcher();
+			final String branch = JainSipUtils.createBranch(sipApplicationSessionKey.getId(),  sipApplicationDispatcher.getHashFromApplicationName(sipApplicationSessionKey.getApplicationName()));
+			ViaHeader viaHeader = JainSipUtils.createViaHeader(
+    				getSipNetworkInterfaceManager(), requestToWrap, branch, session.getOutboundInterface());
+			requestToWrap.addHeader(viaHeader);
 			
 			SipServletRequest retVal = (SipServletRequestImpl) mobicentsSipServletMessageFactory.createSipServletRequest(
 					requestToWrap, session, null, null,

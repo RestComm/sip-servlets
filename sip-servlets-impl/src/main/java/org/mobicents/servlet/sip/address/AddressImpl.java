@@ -58,7 +58,7 @@ public class AddressImpl extends ParameterableImpl implements Address {
 	private javax.sip.address.Address address;
 	
 	public enum ModifiableRule {
-		NotModifiable, ProxyRecordRouteNotModifiable, ContactSystem, ContactNotSystem, Modifiable, From, To;
+		NotModifiable, ProxyRecordRouteNotModifiable, ContactSystem, ContactNotSystem, Modifiable, From, To, Via;
 	}
 		
 	public javax.sip.address.Address getAddress() {

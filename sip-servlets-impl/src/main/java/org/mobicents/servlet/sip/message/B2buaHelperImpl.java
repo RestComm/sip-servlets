@@ -74,6 +74,7 @@ import org.mobicents.servlet.sip.core.ApplicationRoutingHeaderComposer;
 import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.MobicentsSipFactory;
 import org.mobicents.servlet.sip.core.RoutingState;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipManager;
 import org.mobicents.servlet.sip.core.b2bua.MobicentsB2BUAHelper;
 import org.mobicents.servlet.sip.core.message.MobicentsSipServletMessage;
@@ -162,7 +163,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 //		 	newRequest.removeContent();				
 			//removing the via header from original request
 			newRequest.removeHeader(ViaHeader.NAME);	
-						
+					
 			// Remove the route header ( will point to us ).
 			// commented as per issue 649
 //			newRequest.removeHeader(RouteHeader.NAME);
@@ -207,6 +208,13 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			final MobicentsSipSession session = appSession.getSipContext().getSipManager().getSipSession(key, true, sipFactoryImpl, appSession);			
 			session.setHandler(originalSession.getHandler());
 		
+			
+			// cater to http://code.google.com/p/sipservlets/issues/detail?id=31 to be able to set the rport in applications
+			final SipApplicationDispatcher sipApplicationDispatcher = sipFactoryImpl.getSipApplicationDispatcher();
+			final String branch = JainSipUtils.createBranch(appSession.getKey().getId(),  sipApplicationDispatcher.getHashFromApplicationName(appSession.getKey().getApplicationName()));
+			ViaHeader viaHeader = JainSipUtils.createViaHeader(
+    				sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, branch, session.getOutboundInterface());
+			newRequest.addHeader(viaHeader);
 			
 			final SipServletRequestImpl newSipServletRequest = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(
 					newRequest,

@@ -1113,8 +1113,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			final SipProvider sipProvider = matchingListeningPoint.getSipProvider();
 			SipConnector sipConnector = matchingListeningPoint.getSipConnector();
 
+			
 			//we update the via header after the sip connector has been found for the correct transport
-			checkViaHeaderUpdateForStaticExternalAddressUsage(sipConnector);
+			checkViaHeaderUpdateOrForStaticExternalAddressUsage(matchingListeningPoint, hop);
 			
 			if(Request.ACK.equals(requestMethod)) {
 				// DNS Route need to be added for ACK
@@ -1426,28 +1427,62 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	 * @throws ParseException
 	 * @throws InvalidArgumentException
 	 */
-	private void checkViaHeaderUpdateForStaticExternalAddressUsage(final SipConnector sipConnector)
+	private void checkViaHeaderUpdateOrForStaticExternalAddressUsage(final MobicentsExtendedListeningPoint mobicentsExtendedListeningPoint, final Hop hop)
 			throws ParseException, InvalidArgumentException {
 		
+		final SipConnector sipConnector = mobicentsExtendedListeningPoint.getSipConnector();
 		final Request request = (Request) super.message;	
 		ViaHeader viaHeader = (ViaHeader) request.getHeader(ViaHeader.NAME);
 				
-		if(sipConnector != null && sipConnector.isUseStaticAddress()) {
-			javax.sip.address.URI uri = request.getRequestURI();
-			RouteHeader route = (RouteHeader) request.getHeader(RouteHeader.NAME);
-			if(route != null) {
-				uri = route.getAddress().getURI();
-			}
-			if(uri.isSipURI()) {
-				javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
-				String host = sipUri.getHost();
-				int port = sipUri.getPort();
-				if(sipFactoryImpl.getSipApplicationDispatcher().isExternal(host, port, transport)) {
-					viaHeader.setHost(sipConnector.getStaticServerAddress());
-					viaHeader.setPort(sipConnector.getStaticServerPort());
+		if(sipConnector != null) {
+			if(sipConnector.isUseStaticAddress()) {
+				javax.sip.address.URI uri = request.getRequestURI();
+				RouteHeader route = (RouteHeader) request.getHeader(RouteHeader.NAME);
+				if(route != null) {
+					uri = route.getAddress().getURI();
+				}
+				if(uri.isSipURI()) {
+					javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
+					String host = sipUri.getHost();
+					int port = sipUri.getPort();
+					if(sipFactoryImpl.getSipApplicationDispatcher().isExternal(host, port, transport)) {
+						viaHeader.setHost(sipConnector.getStaticServerAddress());
+						viaHeader.setPort(sipConnector.getStaticServerPort());
+					}
+				}
+			} else {
+				// Cope with http://code.google.com/p/sipservlets/issues/detail?id=31 set rport
+				// since we set the via header before request creation now, we make sure to update it based on the outbound destination before sending it out
+				String ipAddressToCheckAgainst = sipConnector.getIpAddress();
+				if(mobicentsExtendedListeningPoint.isAnyLocalAddress()) {
+					for(String lpIpAddress : mobicentsExtendedListeningPoint.getIpAddresses()) {
+						if(logger.isTraceEnabled()) {
+							logger.trace("AnyLocalAddress so checking the list of ip addresses " + lpIpAddress + " to see if one matches the destination hop" + hop.getHost());
+						}
+						if(lpIpAddress.equalsIgnoreCase(hop.getHost())) {
+							ipAddressToCheckAgainst = lpIpAddress;
+							if(logger.isTraceEnabled()) {
+								logger.trace("AnyLocalAddress using ip address " + lpIpAddress + " matching the destination hop" + hop.getHost());
+							}
+						}
+					}
+				}
+				if(!viaHeader.getHost().equalsIgnoreCase(ipAddressToCheckAgainst) || 
+						viaHeader.getTransport().equalsIgnoreCase(sipConnector.getTransport()) ||
+						viaHeader.getPort() != sipConnector.getPort()) {
+					if(logger.isTraceEnabled()) {
+						logger.trace("Via " + viaHeader + " different than outbound SIP Connector picked by the container " + sipConnector + " , updating it");
+					}
+					viaHeader.setHost(ipAddressToCheckAgainst);
+					viaHeader.setPort(sipConnector.getPort());
+					viaHeader.setTransport(sipConnector.getTransport());
+					if(logger.isTraceEnabled()) {
+						logger.trace("Via updated to outbound SIP Connector picked by the container " + viaHeader);
+					}
 				}
 			}
-		}		
+		}
+		
 	}
 	
 	/**

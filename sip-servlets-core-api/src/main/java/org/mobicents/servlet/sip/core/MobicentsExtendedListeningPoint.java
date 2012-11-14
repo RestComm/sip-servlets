@@ -120,5 +120,12 @@ public interface MobicentsExtendedListeningPoint {
 	 * @return a Record Route Header based on this SIP Listening Point
 	 */
 	SipURI createRecordRouteURI(boolean usePublicAddress);
+	
+	/**
+	 * return true if the ip address maps to 0.0.0.0.
+	 * If it's true call getIpAddresses ti get the real list of ip addresses it maps too
+	 * @return true if the ip adress is a any local address
+	 */
+	boolean isAnyLocalAddress();
 
 }

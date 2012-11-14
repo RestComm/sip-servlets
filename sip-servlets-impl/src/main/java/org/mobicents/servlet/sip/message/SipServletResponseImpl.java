@@ -70,6 +70,7 @@ import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.core.RoutingState;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.message.MobicentsSipServletResponse;
 import org.mobicents.servlet.sip.core.proxy.MobicentsProxy;
@@ -270,6 +271,13 @@ public abstract class SipServletResponseImpl extends SipServletMessageImpl imple
 			// Fix for Issue 1808 : The Via header of PRACK request that sent by Mobicents contains "0.0.0.0".
 			// we remove the via header that was given by the dialog and let MSS set it later on
 			prackRequest.removeHeader(ViaHeader.NAME);
+			// cater to http://code.google.com/p/sipservlets/issues/detail?id=31 to be able to set the rport in applications
+			final SipApplicationDispatcher sipApplicationDispatcher = sipFactoryImpl.getSipApplicationDispatcher();
+			final String branch = JainSipUtils.createBranch(session.getSipApplicationSession().getKey().getId(),  sipApplicationDispatcher.getHashFromApplicationName(session.getSipApplicationSession().getKey().getApplicationName()));
+			ViaHeader viaHeader = JainSipUtils.createViaHeader(
+    				sipFactoryImpl.getSipNetworkInterfaceManager(), prackRequest, branch, session.getOutboundInterface());
+			prackRequest.addHeader(viaHeader);
+			
 			//Application Routing to avoid going through the same app that created the ack
 			ListIterator<RouteHeader> routeHeaders = prackRequest.getHeaders(RouteHeader.NAME);
 			prackRequest.removeHeader(RouteHeader.NAME);

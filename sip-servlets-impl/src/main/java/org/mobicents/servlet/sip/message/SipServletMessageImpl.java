@@ -1857,6 +1857,13 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 				modifiableRule = ModifiableRule.NotModifiable;
 			}
 		}
+		if(headerName.equalsIgnoreCase(ViaHeader.NAME)) {
+			if(isRequest) {
+				modifiableRule = ModifiableRule.Via;
+			} else {
+				modifiableRule = ModifiableRule.NotModifiable;
+			}
+		}
 		if (logger.isDebugEnabled())
 			logger.debug("modifiableRule for [" + hName + "] from ["
 					+ whole + "] is " + modifiableRule);
