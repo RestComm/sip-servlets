@@ -944,6 +944,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	@Override
 	public void send() throws IOException {
 		checkReadOnly();
+		// Cope with com.bea.sipservlet.tck.agents.api.javax_servlet_sip.SipServletMessageTest.testSend101 
+		// make sure a message received cannot be sent out
+		checkMessageState();
 		final Request request = (Request) super.message;
 		final String requestMethod = getMethod();
 		final SipApplicationDispatcher sipApplicationDispatcher = sipFactoryImpl.getSipApplicationDispatcher();
