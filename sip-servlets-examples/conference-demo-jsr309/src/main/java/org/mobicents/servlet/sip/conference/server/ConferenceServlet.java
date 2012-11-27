@@ -159,7 +159,7 @@ public class ConferenceServlet extends SipServlet implements SipServletListener 
 				try {
 					ConferenceConnectionListener listener = 
 						new ConferenceConnectionListener(response);
-					MediaSession mediaSession = MsControlObjects.msControlFactory.createMediaSession();
+//					MediaSession mediaSession = MsControlObjects.msControlFactory.createMediaSession();
 					NetworkConnection conn = mediaSession
 					.createNetworkConnection(NetworkConnection.BASIC);
 
