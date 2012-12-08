@@ -24,6 +24,6 @@
   <classpathentry kind="src" path="/sip-servlets-impl"/>
   <classpathentry kind="src" path="/sip-servlets-jruby"/>
   <classpathentry kind="src" path="/sip-servlets-spec"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.29/tomcat-annotations-api-7.0.29.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.33/tomcat-annotations-api-7.0.33.jar"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 </classpath>

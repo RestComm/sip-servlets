@@ -4,13 +4,13 @@
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/ha/javax/sip/mobicents-jain-sip-ha-core/1.4.0-SNAPSHOT/mobicents-jain-sip-ha-core-1.4.0-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.29/tomcat-annotations-api-7.0.29.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.29/tomcat-catalina-7.0.29.jar" sourcepath="/TOMCAT_HOME/java"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.29/tomcat-coyote-7.0.29.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.29/tomcat-juli-7.0.29.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.29/tomcat-servlet-api-7.0.29.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.29/tomcat-api-7.0.29.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.29/tomcat-util-7.0.29.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.33/tomcat-annotations-api-7.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.33/tomcat-catalina-7.0.33.jar" sourcepath="/TOMCAT_HOME/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.33/tomcat-coyote-7.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.33/tomcat-juli-7.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.33/tomcat-servlet-api-7.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.33/tomcat-api-7.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.33/tomcat-util-7.0.33.jar"/>
 	<classpathentry kind="src" path="/sip-servlets-annotations"/>
 	<classpathentry kind="src" path="/sip-servlets-client"/>
 	<classpathentry kind="src" path="/sip-servlets-core-api"/>
