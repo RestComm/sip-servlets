@@ -14,8 +14,7 @@
 	<properties>
 		<mobicents.name>Mobicents</mobicents.name>
 		<maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
-		<release.timestamp>${maven.build.timestamp}</release.timestamp>
-		<release.disclaimer>Thank you for running Mobicents Community code. For Commercial Grade Support, please purchase a Telscale subscription from http://www.telestax.com</release.disclaimer>
+		<release.timestamp>${maven.build.timestamp}</release.timestamp>		
 	</properties>
 
 	<dependencies>
