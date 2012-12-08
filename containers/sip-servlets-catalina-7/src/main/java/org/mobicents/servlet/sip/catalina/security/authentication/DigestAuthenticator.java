@@ -68,12 +68,6 @@ public class DigestAuthenticator
     // -------------------------------------------------------------- Constants
 
     /**
-     * The MD5 helper object for this class.
-     */
-    static final MD5Encoder MD5_ECNODER = new MD5Encoder();
-
-
-    /**
      * Descriptive information about this implementation.
      */
     protected static final String INFO =
@@ -276,7 +270,7 @@ public class DigestAuthenticator
         synchronized (md5Helper) {
             buffer = md5Helper.digest(a2.getBytes());
         }
-        String md5a2 = MD5_ECNODER.encode(buffer);
+        String md5a2 = MD5Encoder.encode(buffer);
 
         return (new CatalinaSipPrincipal(realm.authenticate(userName, response, nOnce, nc, cnonce, qop,
                                    realmName, md5a2)));
@@ -363,7 +357,7 @@ public class DigestAuthenticator
         synchronized (md5Helper) {
             buffer = md5Helper.digest(nOnceValue.getBytes());
         }
-        nOnceValue = MD5_ECNODER.encode(buffer);
+        nOnceValue = MD5Encoder.encode(buffer);
 
         return nOnceValue;
     }
@@ -414,7 +408,7 @@ public class DigestAuthenticator
 
         String authenticateHeader = "Digest realm=\"" + realmName + "\", "
             +  "qop=\"auth\", nonce=\"" + nOnce + "\", " + "opaque=\""
-            + MD5_ECNODER.encode(buffer) + "\"";
+            + MD5Encoder.encode(buffer) + "\"";
         
         // There are different headers for different types of auth
         if(response.getStatus() == 
@@ -504,7 +498,7 @@ public class DigestAuthenticator
         synchronized (md5Helper) {
             buffer = md5Helper.digest(nOnceValue.getBytes());
         }
-        String cnonce = MD5_ECNODER.encode(buffer);
+        String cnonce = MD5Encoder.encode(buffer);
 
         try {
             response = MessageDigestResponseAlgorithm.calculateResponse(

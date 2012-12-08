@@ -41,7 +41,6 @@ import org.apache.catalina.Realm;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.util.MD5Encoder;
 import org.apache.log4j.Logger;
-import org.jboss.security.SecurityConstants;
 import org.jboss.security.SecurityContext;
 import org.jboss.security.SecurityRolesAssociation;
 import org.mobicents.servlet.sip.catalina.SipLoginConfig;
@@ -73,7 +72,7 @@ public class DigestAuthenticator
     /**
      * The MD5 helper object for this class.
      */
-    static final MD5Encoder MD5_ECNODER = new MD5Encoder();
+    static final MD5Encoder MD5_ENCODER = new MD5Encoder();
 
 
     /**
@@ -281,7 +280,7 @@ public class DigestAuthenticator
         synchronized (md5Helper) {
             buffer = md5Helper.digest(a2.getBytes());
         }
-        String md5a2 = MD5_ECNODER.encode(buffer);
+        String md5a2 = MD5_ENCODER.encode(buffer);
 
         //taken from https://github.com/jbossas/jboss-as/blob/7.1.2.Final/web/src/main/java/org/jboss/as/web/security/SecurityContextAssociationValve.java#L86
         SecurityContext sc = SecurityActions.getSecurityContext();
@@ -388,7 +387,7 @@ public class DigestAuthenticator
         synchronized (md5Helper) {
             buffer = md5Helper.digest(nOnceValue.getBytes());
         }
-        nOnceValue = MD5_ECNODER.encode(buffer);
+        nOnceValue = MD5_ENCODER.encode(buffer);
 
         return nOnceValue;
     }
@@ -439,7 +438,7 @@ public class DigestAuthenticator
 
         String authenticateHeader = "Digest realm=\"" + realmName + "\", "
             +  "qop=\"auth\", nonce=\"" + nOnce + "\", " + "opaque=\""
-            + MD5_ECNODER.encode(buffer) + "\"";
+            + MD5_ENCODER.encode(buffer) + "\"";
         
         // There are different headers for different types of auth
         if(response.getStatus() == 
@@ -529,7 +528,7 @@ public class DigestAuthenticator
         synchronized (md5Helper) {
             buffer = md5Helper.digest(nOnceValue.getBytes());
         }
-        String cnonce = MD5_ECNODER.encode(buffer);
+        String cnonce = MD5_ENCODER.encode(buffer);
 
         try {
             response = MessageDigestResponseAlgorithm.calculateResponse(
