@@ -26,6 +26,7 @@ import javax.sip.SipStack;
 
 import org.mobicents.ha.javax.sip.ReplicationStrategy;
 import org.mobicents.servlet.sip.SipConnector;
+import org.mobicents.servlet.sip.core.message.OutboundProxy;
 
 /**
  * This extends the definition of Service from tomcat interface to SIP.
@@ -60,7 +61,7 @@ public interface SipService {
 	
 	public boolean isHttpFollowsSip();
 	public String getJvmRoute();
-	public String getOutboundProxy();
+	public OutboundProxy getOutboundProxy();
 	public int getDispatcherThreadPoolSize();
 	public int getCanceledTimerTasksPurgePeriod();
 	public SipConnector[] findSipConnectors();

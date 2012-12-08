@@ -71,6 +71,7 @@ import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
+import org.mobicents.servlet.sip.core.message.OutboundProxy;
 import org.mobicents.servlet.sip.message.Servlet3SipServletMessageFactory;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
@@ -113,7 +114,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	private int backToNormalSipMessageQueueSize = 1300;
 	protected int memoryThreshold = 95;
 	private int backToNormalMemoryThreshold = 90;
-	protected String outboundProxy;
+	protected OutboundProxy outboundProxy;
 	protected long congestionControlCheckingInterval = 30000;
 	private int canceledTimerTasksPurgePeriod = 0;
 	// base timer interval for jain sip tx 
@@ -893,13 +894,15 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	}
 
 
-	public String getOutboundProxy() {
+	public OutboundProxy getOutboundProxy() {
 		return outboundProxy;
 	}
 
 
 	public void setOutboundProxy(String outboundProxy) {
-		this.outboundProxy = outboundProxy;
+		if(outboundProxy != null) {
+			this.outboundProxy =  new OutboundProxy(outboundProxy);
+		}
 	}
 	
 	public int getDispatcherThreadPoolSize() {

@@ -87,6 +87,7 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
+import org.mobicents.servlet.sip.core.message.OutboundProxy;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -889,16 +890,13 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 		try {
 			String host = null;
 			int port = -1; 
-			String proxy = StaticServiceHolder.sipStandardService.getOutboundProxy();
+			OutboundProxy proxy = StaticServiceHolder.sipStandardService.getOutboundProxy();
 			if(proxy == null) {
 				host = loadBalancerToUse.getAddress().getHostAddress();
 				port = loadBalancerToUse.getSipPort();
-			} else {
-				int separatorIndex = proxy.indexOf(":");
-				if(separatorIndex>0) {
-					host = proxy.substring(0, separatorIndex);
-					port = Integer.parseInt(proxy.substring(separatorIndex + 1));
-				}
+			} else {				
+				host = proxy.getHost();
+				port = proxy.getPort();				
 			}
 			javax.sip.address.SipURI sipUri = SipFactoryImpl.addressFactory.createSipURI(null, host);
 			sipUri.setPort(port);
@@ -934,16 +932,13 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 		try {
 			String host = null;
 			int port = -1; 
-			String proxy = StaticServiceHolder.sipStandardService.getOutboundProxy();
+			OutboundProxy proxy = StaticServiceHolder.sipStandardService.getOutboundProxy();
 			if(proxy == null) {
 				host = lbhost;
 				port = lbport;
 			} else {
-				int separatorIndex = proxy.indexOf(":");
-				if(separatorIndex>0) {
-					host = proxy.substring(0, separatorIndex);
-					port = Integer.parseInt(proxy.substring(separatorIndex + 1));
-				}
+				host = proxy.getHost();
+				port = proxy.getPort();	
 			}
 			javax.sip.address.SipURI sipUri = SipFactoryImpl.addressFactory.createSipURI(null, host);
 			sipUri.setPort(port);
