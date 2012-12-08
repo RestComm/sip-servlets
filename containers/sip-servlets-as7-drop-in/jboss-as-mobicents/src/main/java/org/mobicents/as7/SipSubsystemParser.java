@@ -92,6 +92,7 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         SipDefinition.CANCELED_TIMER_TASKS_PURGE_PERIOD.marshallAsAttribute(node, false, writer);
         SipDefinition.MEMORY_THRESHOLD.marshallAsAttribute(node, false, writer);
         SipDefinition.BACK_TO_NORMAL_MEMORY_THRESHOLD.marshallAsAttribute(node, false, writer);
+        SipDefinition.OUTBOUND_PROXY.marshallAsAttribute(node, false, writer);
         if(node.hasDefined(CONNECTOR)) {
         	for(final Property connector : node.get(CONNECTOR).asPropertyList()) {
         		final ModelNode config = connector.getValue();
@@ -137,6 +138,7 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
 	            case CONGESTION_CONTROL_POLICY:
 	            case MEMORY_THRESHOLD:
 	            case BACK_TO_NORMAL_MEMORY_THRESHOLD:
+	            case OUTBOUND_PROXY:
 	            case CONCURRENCY_CONTROL_MODE:
 	            case USE_PRETTY_ENCODING:
 	                subsystem.get(attribute.getLocalName()).set(value);

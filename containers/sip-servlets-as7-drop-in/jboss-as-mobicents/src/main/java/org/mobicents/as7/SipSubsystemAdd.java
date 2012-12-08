@@ -100,6 +100,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         SipDefinition.CANCELED_TIMER_TASKS_PURGE_PERIOD.validateAndSet(operation, model);
         SipDefinition.MEMORY_THRESHOLD.validateAndSet(operation, model);
         SipDefinition.BACK_TO_NORMAL_MEMORY_THRESHOLD.validateAndSet(operation, model);
+        SipDefinition.OUTBOUND_PROXY.validateAndSet(operation, model);
     }
 
     @Override
@@ -162,6 +163,9 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ModelNode backToNormalMemoryThresholdModel = SipDefinition.BACK_TO_NORMAL_MEMORY_THRESHOLD.resolveModelAttribute(context, fullModel);
         final int backToNormalMemoryThreshold = backToNormalMemoryThresholdModel.isDefined() ? backToNormalMemoryThresholdModel.asInt() : -1;
         
+        final ModelNode outboundProxyModel = SipDefinition.OUTBOUND_PROXY.resolveModelAttribute(context, fullModel);
+        final String outboundProxy = outboundProxyModel.isDefined() ? outboundProxyModel.asString() : null;
+        
 //    	final String instanceId = operation.hasDefined(Constants.INSTANCE_ID) ? operation.get(Constants.INSTANCE_ID).asString() : null;
 //    	final String sipAppRouterFile = operation.hasDefined(Constants.APPLICATION_ROUTER) ? operation.get(Constants.APPLICATION_ROUTER).asString() : null;
 //    	final String sipStackPropertiesFile = operation.hasDefined(Constants.SIP_STACK_PROPS) ? operation.get(Constants.SIP_STACK_PROPS).asString() : null;
@@ -189,6 +193,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         		canceledTimerTasksPurgePeriod, 
         		memoryThreshold,
         		backToNormalMemoryThreshold,
+        		outboundProxy,
         		instanceId);
         newControllers.add(context.getServiceTarget().addService(SipSubsystemServices.JBOSS_SIP, service)
                 .addDependency(PathManagerService.SERVICE_NAME, PathManager.class, service.getPathManagerInjector())

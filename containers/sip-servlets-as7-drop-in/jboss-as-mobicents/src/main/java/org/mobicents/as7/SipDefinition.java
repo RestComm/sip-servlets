@@ -178,7 +178,13 @@ public class SipDefinition extends SimpleResourceDefinition {
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .setDefaultValue(new ModelNode(75))
                     .build();
-   
+    protected static final SimpleAttributeDefinition OUTBOUND_PROXY =
+            new SimpleAttributeDefinitionBuilder(Constants.OUTBOUND_PROXY, ModelType.STRING, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.OUTBOUND_PROXY)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(null)
+                    .build();
     
     
     private SipDefinition() {
@@ -216,5 +222,6 @@ public class SipDefinition extends SimpleResourceDefinition {
         registration.registerReadWriteAttribute(CANCELED_TIMER_TASKS_PURGE_PERIOD, null, new ReloadRequiredWriteAttributeHandler(CANCELED_TIMER_TASKS_PURGE_PERIOD));
         registration.registerReadWriteAttribute(MEMORY_THRESHOLD, null, new ReloadRequiredWriteAttributeHandler(MEMORY_THRESHOLD));
         registration.registerReadWriteAttribute(BACK_TO_NORMAL_MEMORY_THRESHOLD, null, new ReloadRequiredWriteAttributeHandler(BACK_TO_NORMAL_MEMORY_THRESHOLD));
+        registration.registerReadWriteAttribute(OUTBOUND_PROXY, null, new ReloadRequiredWriteAttributeHandler(OUTBOUND_PROXY));
     }
 }

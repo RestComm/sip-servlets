@@ -80,6 +80,7 @@ enum Attribute {
     MAX_SAVE_POST_SIZE(Constants.MAX_SAVE_POST_SIZE),
     NAME(Constants.NAME),
     NATIVE(Constants.NATIVE),
+    OUTBOUND_PROXY(Constants.OUTBOUND_PROXY),
     PASSWORD(Constants.PASSWORD),
     PATH(Constants.PATH),
     PATTERN(Constants.PATTERN),

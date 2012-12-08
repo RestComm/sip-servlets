@@ -85,6 +85,7 @@ interface Constants {
     String MODIFICATION_TEST_INTERVAL = "modification-test-interval";
     String NAME = "name";
     String NATIVE = "native";
+    String OUTBOUND_PROXY = "outbound-proxy";
     String PASSWORD = "password";
     String PATH = "path";
     String PATTERN = "pattern";
