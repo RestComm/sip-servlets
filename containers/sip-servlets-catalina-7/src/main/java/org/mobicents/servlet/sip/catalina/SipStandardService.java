@@ -902,6 +902,11 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	public void setOutboundProxy(String outboundProxy) {
 		if(outboundProxy != null) {
 			this.outboundProxy =  new OutboundProxy(outboundProxy);
+		} else {
+			this.outboundProxy = null;
+		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("Outbound Proxy : " + outboundProxy);
 		}
 	}
 	
