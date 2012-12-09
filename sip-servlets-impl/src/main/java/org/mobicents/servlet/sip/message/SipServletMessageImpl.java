@@ -1901,7 +1901,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	public String getLocalAddr() {
 		final SIPTransaction sipTransaction = (SIPTransaction)getTransaction();
 		if(sipTransaction != null) {
-			return sipTransaction.getHostPort().getHost().getIpAddress();
+			return sipTransaction.getHost();
 		} else {
 			final String transport = JainSipUtils.findTransport(message);
 			final MobicentsExtendedListeningPoint listeningPoint = sipFactoryImpl.getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);		
