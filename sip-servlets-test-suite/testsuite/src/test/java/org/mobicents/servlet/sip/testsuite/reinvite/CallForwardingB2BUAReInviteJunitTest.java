@@ -25,11 +25,14 @@ package org.mobicents.servlet.sip.testsuite.reinvite;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.header.AllowHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.UserAgentHeader;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
@@ -157,7 +160,7 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {AllowHeader.NAME}, new String[] {"INVITE, CANCEL, BYE, ACK, OPTIONS"}, true);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.isInviteReceived());
 		assertTrue(receiver.isAckReceived());
@@ -166,10 +169,21 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		// Non Regression test for http://code.google.com/p/mobicents/issues/detail?id=1490
 		// B2buaHelper.createRequest does not decrement Max-forwards
 		assertEquals(69, maxForwardsHeader.getMaxForwards());
+		
+		ListIterator<AllowHeader> allowHeaderIt = receiver.getInviteRequest().getHeaders(AllowHeader.NAME);
+		int i = 0; 
+		while (allowHeaderIt.hasNext()) {	
+			allowHeaderIt.next();
+			i++;
+		}
+		assertEquals(5, i);
 
 		Header methodHeader = receiverProtocolObjects.headerFactory.createHeader("Supported", "");
+		// Non Regression for Issue 184 http://code.google.com/p/sipservlets/issues/detail?id=184
+		Header allowHeader = receiverProtocolObjects.headerFactory.createAllowHeader("INVITE, CANCEL, BYE, ACK, OPTIONS");
 		List<Header> headers = new ArrayList<Header>();
 		headers.add(methodHeader);
+		headers.add(allowHeader);
 		
 		sender.sendInDialogSipRequest("INVITE", null, null, null, headers, null);
 		receiver.setInviteReceived(false);
@@ -177,6 +191,13 @@ public class CallForwardingB2BUAReInviteJunitTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.isInviteReceived());
 		assertTrue(receiver.isAckReceived());
+		allowHeaderIt = receiver.getInviteRequest().getHeaders(AllowHeader.NAME);
+		i = 0; 
+		while (allowHeaderIt.hasNext()) {	
+			allowHeaderIt.next();
+			i++;
+		}
+		assertEquals(5, i);
 		sender.sendInDialogSipRequest("BYE", null, null, null, null, null);
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());

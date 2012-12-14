@@ -66,6 +66,7 @@ import javax.sip.address.Address;
 import javax.sip.address.SipURI;
 import javax.sip.address.TelURL;
 import javax.sip.address.URI;
+import javax.sip.header.AllowHeader;
 import javax.sip.header.AuthenticationInfoHeader;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.CSeqHeader;
@@ -2318,7 +2319,12 @@ public class TestSipListener implements SipListener {
 		
 		if(headerNames != null) {
 			for(int q=0; q<headerNames.length; q++) {
-				Header h = protocolObjects.headerFactory.createHeader(headerNames[q], headerContents[q]);
+				Header h = null;
+				if(headerNames[q].equalsIgnoreCase(AllowHeader.NAME)) {
+					h = protocolObjects.headerFactory.createAllowHeader(headerContents[q]);
+				} else {
+					h = protocolObjects.headerFactory.createHeader(headerNames[q], headerContents[q]);
+				}
 				if(setHeader) {
 					request.setHeader(h);
 				} else {

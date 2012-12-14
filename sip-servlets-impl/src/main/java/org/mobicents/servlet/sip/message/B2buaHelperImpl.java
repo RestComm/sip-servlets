@@ -401,40 +401,46 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 			String headerName = headerNames.next();
 			if(!JainSipUtils.SYSTEM_HEADERS.contains(headerName) && !headerName.equalsIgnoreCase(ContactHeader.NAME)
 					&& !headerName.equalsIgnoreCase(FromHeader.NAME) && !headerName.equalsIgnoreCase(ToHeader.NAME)) {
-				HeaderExt origHeader = (HeaderExt) origMessage.getHeader(headerName);
+				// Issue 184 : http://code.google.com/p/sipservlets/issues/detail?id=184
+				// Not all headers are copied for subsequent requests using B2buaHelper.createRequest(session, request, map)
+				// Fix by Alexander Saveliev, iterate through all headers and copy them
+                ListIterator<Header> origHeaderIt = origMessage.getHeaders(headerName);
 				ListIterator<Header> subsHeaderIt = subsequentMessage.getHeaders(headerName);
-				// Issue http://code.google.com/p/mobicents/issues/detail?id=2094
-				// B2b re-invite for authentication will duplicate Remote-Party-ID header
-				// checking if the subsequent request and original request share the same header name and value
-				// before copying to avoid duplicating the headers
-				boolean headerNameValueAlreadyPresent = false;
-				while (subsHeaderIt.hasNext() && !headerNameValueAlreadyPresent) {
-					HeaderExt subsHeader = (HeaderExt) subsHeaderIt.next();
-					if(origHeader.getValue().equals(subsHeader.getValue())) {
-						headerNameValueAlreadyPresent = true;
-					}
-				}
-				if(!headerNameValueAlreadyPresent) {
-					if(origHeader != null) {
-						subsequentMessage.addHeader(((Header)origHeader.clone()));
-						if(logger.isDebugEnabled()) {
-							logger.debug("original header " + origHeader + " copied in the new subsequent request");
-						}
-					} else {
-						// Issue 2500 http://code.google.com/p/mobicents/issues/detail?id=2500
-						// B2buaHelper.createRequest() throws a NullPointerException if the request contains an empty header
-						if(logger.isDebugEnabled()) {
-							logger.debug("trying to copy original header name " + headerName + " into the new subsequent request with an empty value");
-						}
-						try {
-							subsequentMessage.addHeader(sipFactoryImpl.getHeaderFactory().createHeader(headerName, ""));
-						} catch (ParseException e) {
-							if(logger.isDebugEnabled()) {
-								logger.debug("couldn't copy original header name " + headerName + " into the new subsequent request with an empty value");
-							}
-						}
-					}
-				}
+                while (origHeaderIt.hasNext()) {
+                    HeaderExt origHeader = (HeaderExt) origHeaderIt.next();
+                    // Issue http://code.google.com/p/mobicents/issues/detail?id=2094
+                    // B2b re-invite for authentication will duplicate Remote-Party-ID header
+                    // checking if the subsequent request and original request share the same header name and value
+                    // before copying to avoid duplicating the headers
+                    boolean headerNameValueAlreadyPresent = false;
+                    while (subsHeaderIt.hasNext() && !headerNameValueAlreadyPresent) {
+                        HeaderExt subsHeader = (HeaderExt) subsHeaderIt.next();
+                        if (origHeader.getValue().equals(subsHeader.getValue())) {
+                            headerNameValueAlreadyPresent = true;
+                        }
+                    }
+                    if (!headerNameValueAlreadyPresent) {
+                        if (origHeader != null) {
+                            subsequentMessage.addHeader(((Header) origHeader.clone()));
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("original header " + origHeader + " copied in the new subsequent request");
+                            }
+                        } else {
+                            // Issue 2500 http://code.google.com/p/mobicents/issues/detail?id=2500
+                            // B2buaHelper.createRequest() throws a NullPointerException if the request contains an empty header
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("trying to copy original header name " + headerName + " into the new subsequent request with an empty value");
+                            }
+                            try {
+                                subsequentMessage.addHeader(sipFactoryImpl.getHeaderFactory().createHeader(headerName, ""));
+                            } catch (ParseException e) {
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug("couldn't copy original header name " + headerName + " into the new subsequent request with an empty value");
+                                }
+                            }
+                        }
+                    }
+                }
 			}
 		}
 	}

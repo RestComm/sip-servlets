@@ -27,6 +27,7 @@ import java.util.ListIterator;
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.header.AllowHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.Header;
@@ -118,13 +119,14 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
-		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {UserAgentHeader.NAME, "extension-header"}, new String[] {"TestSipListener UA", "extension-sip-listener"}, true);		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {UserAgentHeader.NAME, "extension-header", AllowHeader.NAME}, new String[] {"TestSipListener UA", "extension-sip-listener", "INVITE, CANCEL, BYE, ACK, OPTIONS"}, true);		
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
 		CallIdHeader receiverCallIdHeader = (CallIdHeader)receiver.getInviteRequest().getHeader(CallIdHeader.NAME);
 		CallIdHeader senderCallIdHeader = (CallIdHeader)sender.getInviteRequest().getHeader(CallIdHeader.NAME);
 		ListIterator<UserAgentHeader> userAgentHeaderIt = receiver.getInviteRequest().getHeaders(UserAgentHeader.NAME);
+		ListIterator<AllowHeader> allowHeaderIt = receiver.getInviteRequest().getHeaders(AllowHeader.NAME);
 		int i = 0; 
 		while (userAgentHeaderIt.hasNext()) {
 			UserAgentHeader userAgentHeader = (UserAgentHeader) userAgentHeaderIt
@@ -157,7 +159,13 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 			assertTrue(userAgentHeader.toString().trim().endsWith("CallForwardingB2BUASipServlet"));
 			i++;
 		}
-		assertEquals(1, i);
+		assertEquals(1, i);		
+		i = 0; 
+		while (allowHeaderIt.hasNext()) {	
+			allowHeaderIt.next();
+			i++;
+		}
+		assertEquals(5, i);
 		contactHeaderIt = receiver.getByeRequestReceived().getHeaders(ContactHeader.NAME);
 		i = 0; 
 		while (contactHeaderIt.hasNext()) {
