@@ -173,10 +173,10 @@ class SipServerService implements SipServer, Service<SipServer> {
         	sipService.setSipApplicationDispatcherClassName(SipApplicationDispatcherImpl.class.getName());
         }
         //
-		final String configDir = System.getProperty("jboss.server.config.dir");
+		final String baseDir = System.getProperty("jboss.server.base.dir");
     	if(sipAppRouterFile != null) {
     		if(!sipAppRouterFile.startsWith(FILE_PREFIX_PATH)) {
-    			sipAppRouterFile = FILE_PREFIX_PATH.concat(configDir).concat("/").concat(sipAppRouterFile);
+    			sipAppRouterFile = FILE_PREFIX_PATH.concat(baseDir).concat("/").concat(sipAppRouterFile);
     		}
     		System.setProperty("javax.servlet.sip.dar", sipAppRouterFile);
     	}
@@ -185,7 +185,7 @@ class SipServerService implements SipServer, Service<SipServer> {
     	//
     	if(sipStackPropertiesFile != null) {
     		if(!sipStackPropertiesFile.startsWith(FILE_PREFIX_PATH)) {
-    			sipStackPropertiesFile = FILE_PREFIX_PATH.concat(configDir).concat("/").concat(sipStackPropertiesFile);
+    			sipStackPropertiesFile = FILE_PREFIX_PATH.concat(baseDir).concat("/").concat(sipStackPropertiesFile);
     		}
     	}
         sipService.setSipStackPropertiesFile(sipStackPropertiesFile);
