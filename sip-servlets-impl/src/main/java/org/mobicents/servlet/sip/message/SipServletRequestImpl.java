@@ -965,7 +965,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			} else {
 				javax.sip.address.URI uriToResolve =  request.getRequestURI();
 				RouteHeader routeHeader = (RouteHeader) request.getHeader(RouteHeader.NAME);
-				if(routeHeader != null) {
+				if(routeHeader != null) {					
 					uriToResolve = routeHeader.getAddress().getURI();
 				} else {
 					// RFC5626 - see if we are to find a flow for this request.
@@ -976,17 +976,32 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 					// up right now...
 					uriToResolve = resolveSipOutbound(uriToResolve);
 				}
-
-				if(session.getProxy() == null && session.getTransport() != null && uriToResolve.isSipURI() && ((javax.sip.address.SipURI)uriToResolve).getTransportParam() == null &&
+				String uriToResolveTransport = ((javax.sip.address.SipURI)uriToResolve).getTransportParam(); 
+				boolean transportParamModified = false;
+				if(session.getProxy() == null && session.getTransport() != null && uriToResolve.isSipURI() && uriToResolveTransport  == null &&
 						// no need to modify the Request URI for UDP which is the default transport
 						!session.getTransport().equalsIgnoreCase(ListeningPoint.UDP)) {					
 					try {
 						((javax.sip.address.SipURI)uriToResolve).setTransportParam(session.getTransport());
+						transportParamModified = true;
 					} catch (ParseException e) {
 						// nothing to do here, will never happen
 					}
 				}
 				Queue<Hop> hops = dnsServerLocator.locateHops(uriToResolve);
+				if(transportParamModified) {
+					// Issue http://code.google.com/p/sipservlets/issues/detail?id=186
+					// Resetting the transport to what is was before the modification to avoid modifying the route set
+					if(uriToResolveTransport == null) {
+						((javax.sip.address.SipURI)uriToResolve).removeParameter("transport");
+					} else {
+						try {
+							((javax.sip.address.SipURI)uriToResolve).setTransportParam(uriToResolveTransport);
+						} catch (ParseException e) {
+							// nothing to do here, will never happen
+						}
+					}
+				}
 				if(hops.size() > 0) {
 					// RFC 3263 support don't remove the current hop, it will be the one to reuse for CANCEL and ACK to non 2xx transactions
 					hop = hops.peek();
