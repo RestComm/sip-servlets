@@ -4,8 +4,85 @@
 %BOOK_ENTITIES;
 ]>
 <!-- chapter id nickname: ittsss --><chapter id="ittsss-Introduction_to_the_SIP_Servlets_Server">
-  <title>Introduction to the SIP Servlets Server</title>
-  <para>
+  
+<title>Introduction</title>
+
+<section>
+
+<title>Overview of &PLATFORM_NAME; SIP Servlets within the Telecommunications Industry</title>
+
+
+<para>
+
+The <ulink url="http://www.mobicents.org/"> Mobicents Communication Platform </ulink> is the best architecture to create, deploy and manage services and applications integrating voice, video and data across a range of IP and legacy communications networks. It drives convergence with the following key enablers:
+</para>
+
+<para>
+            <figure>
+              <title>Mobicents Architecture Overview</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata width="700" fileref="images/mobicents_intro_architecture.png"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
+
+</para>
+
+
+<!--
+<para>&PLATFORM_NAME; is the first and only open source <acronym>VoIP</acronym> platform certified for <acronym>JAIN SLEE</acronym> 1.0 and <acronym>SIP</acronym> Servlets 1.1 compliance.  &PLATFORM_NAME; serves as a high-performance core for Service Delivery Platforms (<acronym>SDP</acronym>s) and <acronym>IP</acronym> Multimedia Subsystems (<acronym>IMS</acronym>s) by leveraging <acronym>J2EE</acronym> to enable the convergence of data and video in Next-Generation Intelligent Network (<acronym>NGIN</acronym>) applications.</para>
+		<para>The &PLATFORM_NAME; enables the composition of predefined Service Building Blocks (<acronym>SBB</acronym>s) such as Call-Control, Billing, User-Provisioning, Administration and Presence-Sensing.  Out-of-the-box monitoring and management of &PLATFORM_NAME; components is achieved through <acronym>JMX</acronym> Consoles. <acronym>JSLEE</acronym> allows popular protocol stacks such as <acronym>SIP</acronym> to be plugged in as Resource Adapters (<acronym>RA</acronym>s), and Service Building Blocks—which share many similarities with <acronym>EJB</acronym>s—allow the easy accommodation and integration of enterprise applications with end points such as the Web, Customer Relationship Management (<acronym>CRM</acronym>) systems and Service-Oriented Architectures (<acronym>SOA</acronym>s). The &PLATFORM_NAME; is the natural choice for telecommunication Operations Support Systems (OSSs) and Network Management Systems (NMSs).</para>
+		<para>In addition to the telecommunication industry, the &PLATFORM_NAME; is suitable for a variety of problem domains demanding an Event-Driven Architecture (<acronym>EDA</acronym>) for high-volume, low-latency signaling, such as financial trading, online gaming, (<acronym>RFID</acronym>) sensor network integration, and distributed control.</para>
+
+
+
+-->
+
+
+</section>
+
+
+<section>
+
+<title>Overview of SIP Servlets Server</title>
+ 
+<para>
+
+Mobicents SIP Servlets is a modern communications middleware platform. Mobicents SIP Servlets facilitates the shift towards Cloud Communications by enabling deployment and autoscaling of real time SIP Servlets apps across all major IaaS (Infrastructure as a Service) providers and also brings realtime communications (voice and video) to your Browser using HTML5 <ulink url="http://www.webrtc.org/">WebRTC </ulink> and SIP Over WebSockets !
+
+</para>
+<para>
+The <ulink url=" http://code.google.com/p/sipservlets/wiki/HTML5WebRTCVideoApplication"> Mobicents HTML5 WebRTC Client </ulink>allows you to make video calls from and to any Web Browser supporting <ulink url="http://www.webrtc.org/">WebRTC </ulink> , (only Google Chrome supports it so far but all major browsers should support it in the next 6 months) as well as SIP Endpoints.
+</para>
+<para>
+Mobicents SIP Servlets enables turnkey SaaS offerings such as <ulink url="http://www.restcomm.org/"> RestComm </ulink>.
+</para>
+<para>
+Mobicents SIP Servlets implements the latest SIP Servlet v1.1 (JSR 289) standard. It can be plugged into any Application Server container (currently 7.X and JBoss 7.X) and also offers High Availability and Failover.
+</para>
+<para>
+Mobicents SIP Servlets is lead by <ulink url="http://www.telestax.com/">TeleStax, Inc </ulink>. and developed collaboratively by a community of individual and enterprise contributors. 
+
+</para>
+
+
+<para>
+            <figure>
+              <title>Mobicents WebRTC SIP Stack</title>
+              <mediaobject>
+                <imageobject>
+                  <imagedata width="700" fileref="images/mss_webrtc_stack.png"/>
+                </imageobject>
+              </mediaobject>
+            </figure>
+
+</para>
+</section>
+
+<!--
+
+ <para>
   &PLATFORM_NAME;
    SIP (Session Initiation Protocol) Servlets deliver a consistent, open platform on which to develop and deploy portable and distributed SIP and Java Enterprise Edition services. The &PLATFORM_NAME;
    SIP Servlets Server is a <emphasis>certified</emphasis> implementation of the SIP Servlet v1.1 (JSR 289) specification that can run on top of either the JBoss Application Server or the Tomcat Servlet Container.</para>
@@ -43,6 +120,9 @@
       <para>Extensions, including SUBSCRIBE/NOTIFY</para>
     </listitem>
   </itemizedlist>
+-->
+
+<!--
   <section id="ittsss-High-Availability-SIP_Servlets_Server_Load_Balancing_Clustering_and_Failover">
     <title>High-Availability: SIP Servlets Server Load Balancing, Clustering and Failover</title>
     <para>Telecommunications applications demand High-Availability (HA), fault tolerance, scalability and performance. Providing highly-available end-user applications that are tolerant of faults is commonly achieved through the use of clustering technologies.</para>
@@ -92,5 +172,5 @@
       </varlistentry>
     </variablelist>
   </section>
-  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-Working_with_the_SIP_Servlets_Management_Console.xml"/>
+  <xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-section-Working_with_the_SIP_Servlets_Management_Console.xml"/-->
 </chapter>

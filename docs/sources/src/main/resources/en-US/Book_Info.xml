@@ -11,41 +11,12 @@
 	<edition>2.0</edition>
 	<pubsnumber>1</pubsnumber>
 	<abstract>
-		<para>&PLATFORM_NAME; is the first and only open source <acronym>VoIP</acronym> platform certified for <acronym>JAIN SLEE</acronym> 1.0 and <acronym>SIP</acronym> Servlets 1.1 compliance.  &PLATFORM_NAME; serves as a high-performance core for Service Delivery Platforms (<acronym>SDP</acronym>s) and <acronym>IP</acronym> Multimedia Subsystems (<acronym>IMS</acronym>s) by leveraging <acronym>J2EE</acronym> to enable the convergence of data and video in Next-Generation Intelligent Network (<acronym>NGIN</acronym>) applications.</para>
-		<para>The &PLATFORM_NAME; enables the composition of predefined Service Building Blocks (<acronym>SBB</acronym>s) such as Call-Control, Billing, User-Provisioning, Administration and Presence-Sensing.  Out-of-the-box monitoring and management of &PLATFORM_NAME; components is achieved through <acronym>JMX</acronym> Consoles. <acronym>JSLEE</acronym> allows popular protocol stacks such as <acronym>SIP</acronym> to be plugged in as Resource Adapters (<acronym>RA</acronym>s), and Service Building Blocks—which share many similarities with <acronym>EJB</acronym>s—allow the easy accommodation and integration of enterprise applications with end points such as the Web, Customer Relationship Management (<acronym>CRM</acronym>) systems and Service-Oriented Architectures (<acronym>SOA</acronym>s). The &PLATFORM_NAME; is the natural choice for telecommunication Operations Support Systems (OSSs) and Network Management Systems (NMSs).</para>
-		<para>In addition to the telecommunication industry, the &PLATFORM_NAME; is suitable for a variety of problem domains demanding an Event-Driven Architecture (<acronym>EDA</acronym>) for high-volume, low-latency signaling, such as financial trading, online gaming, (<acronym>RFID</acronym>) sensor network integration, and distributed control.</para>
-	</abstract>
-	<corpauthor>
-		<inlinemediaobject>
-			<imageobject>
-				<imagedata
-					format="SVG"
-					fileref="Common_Content/images/title_logo.svg" />
-			</imageobject>
-			<textobject>
-				<phrase>Logo</phrase>
-			</textobject>
-		</inlinemediaobject>
-	</corpauthor>
-	<copyright>
-		<year>&YEAR;</year>
-		<holder>&HOLDER;</holder>
-	</copyright>
-	<!--ORIGINAL:
-	<xi:include
-		href="Common_Content/Legal_Notice.xml"
-		xmlns:xi="http://www.w3.org/2001/XInclude" />-->
-	<!--FOR JDOCBOOK:-->
-	<!--<xi:include
-		xmlns:xi="http://www.w3.org/2001/XInclude"
-		href="Common_Content/Legal_Notice.xml">
-		<xi:fallback
-			xmlns:xi="http://www.w3.org/2001/XInclude">
-			<xi:include
-				href="fallback_content/Legal_Notice.xml"
-				xmlns:xi="http://www.w3.org/2001/XInclude"></xi:include>
-		</xi:fallback>
-	</xi:include>-->
+
+
+<para>
+This user guide will help you get a better understanding of &PLATFORM_NAME; SIP servlets and how the container can be used in an enterprise context. The guide will cover how to  how to quickly get started with &PLATFORM_NAME; SIP servlets either on top of JBoss or Apache Tomcat containers. There are sample applications included for those who want to grasp how to build SIP applications. You will also learn how to use advanced features like High Availability through Clustering and Failover. Finally, monitoring and security will be explained.
+</para>
+</abstract>
 	<xi:include href="Author_Group.xml" xmlns:xi="http://www.w3.org/2001/XInclude" />
 </bookinfo>
 
