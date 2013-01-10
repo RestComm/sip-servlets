@@ -153,10 +153,12 @@
 
                <%
                 SipConnector[] sipConnectors = (SipConnector[]) getServletContext().getAttribute(
-                		"org.mobicents.servlet.sip.SIP_CONNECTORS");
+                		"org.mobicents.servlet.sip.SIP_CONNECTORS");               
             	for(int q=0; q<sipConnectors.length; q++) {
             		if(sipConnectors[q].getTransport().equalsIgnoreCase("WS")) {
             			out.println("var defaultSipWsUrl=\"ws://" + sipConnectors[q].getIpAddress() + ":" + sipConnectors[q].getPort() + "\";");
+            		} else if (sipConnectors[q].getTransport().equalsIgnoreCase("WSS")) {
+            			out.println("var defaultSipWsUrl=\"wss://" + sipConnectors[q].getIpAddress() + ":" + sipConnectors[q].getPort() + "\";");
             		}
             	}
             	%>
