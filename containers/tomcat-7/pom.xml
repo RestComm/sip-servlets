@@ -80,6 +80,13 @@
 			<version>${mobicents.jain.sip.ext.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.mobicents.tools</groupId>
+			<artifactId>sip-balancer-jar</artifactId>
+			<version>${mobicents.balancer.version}</version>
+			<scope>provided</scope>
+		</dependency>
 
 		<dependency>
 			<groupId>log4j</groupId>
@@ -159,6 +166,23 @@
 							</execution>
 						</executions>
 					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-to-tomcat-lib</id>
+								<phase>package</phase>
+								<goals>
+									<goal> copy-dependencies </goal>
+								</goals>
+								<configuration>
+									<includeArtifactIds>sip-balancer-jar</includeArtifactIds>
+									<outputDirectory>${CATALINA_HOME}/lib</outputDirectory>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
 				</plugins>
 			</build>
 		</profile>
@@ -181,6 +205,23 @@
 								<goals>
 									<goal>run</goal>
 								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>copy-to-tomcat-lib</id>
+								<phase>package</phase>
+								<goals>
+									<goal> copy-dependencies </goal>
+								</goals>
+								<configuration>
+									<includeArtifactIds>sip-balancer-jar</includeArtifactIds>
+									<outputDirectory>${CATALINA_HOME}/lib</outputDirectory>
+								</configuration>
 							</execution>
 						</executions>
 					</plugin>
