@@ -314,7 +314,7 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
           <para>Ensure the following attributes are configured for the <literal>&lt;service&gt;</literal> element in <filename>server.xml</filename> for Tomcat or in the mobicents <literal>subsystem</literal> element for JBoss AS7.</para>
           <itemizedlist>                        
             <listitem>
-              <para>The <literal>sipPathName</literal> attribute must contain the following value <literal>org.mobicents.ha</literal> to indicate that the server will be using the &PLATFORM_NAME; JAIN SIP HA SIP Stack which is an extension of the JAIN SIP Stack offering transparent replication.</para>
+              <para>The <literal>sipPathName</literal> attribute must contain the following value <literal>org.mobicents.ha.balancing.only</literal> to indicate that the server will be using the &PLATFORM_NAME; JAIN SIP HA SIP Stack which is an extension of the JAIN SIP Stack offering integration with the Mobicents Load Balancer and transparent replication.</para>
             </listitem>
           </itemizedlist>
         </step>
@@ -341,7 +341,8 @@ gov.nist.javax.sip.REENTRANT_LISTENER = true
         <title>Configuration File Locations</title>
         <para>On &SHORT_PLATFORM_NAME; for Tomcat server installations, <filename>server.xml</filename> is located in <filename>&lt;install_directory&gt;/conf</filename>.</para>
         <para>On &SHORT_PLATFORM_NAME; for JBoss server installations, the default <filename>standalone-sip.xml</filename> configuration file is located
-         in <filename>standalone/configuration</filename></para>
+         in <filename>standalone/configuration</filename> or the default <filename>domain-sip.xml</filename> configuration file located
+         in <filename>domain/configuration</filename> for cluster configurations</para>  
         <!--para>On &SHORT_PLATFORM_NAME; for JBoss installations, with JBoss clustering support enabled, the &quot;all&quot; <filename>server.xml</filename> file must be configured.  It is located in <filename>server/all/deploy/jboss-web.deployer</filename>.</para>
         <para>To determine what profile should be altered for each &SHORT_PLATFORM_NAME; for JBoss installation, refer to <xref linkend="ssfjcs-SS_for_JBoss-Clustering_Support"/>.</para-->
       </note>
