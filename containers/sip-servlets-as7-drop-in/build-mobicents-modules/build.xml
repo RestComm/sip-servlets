@@ -54,12 +54,13 @@
 
         <module-def name="org.mobicents.libs">
             <maven-resource group="org.mobicents.servlet.sip.containers" artifact="sip-servlets-as7"/>
-	     <maven-resource group="org.mobicents.servlet.sip" artifact="sip-servlets-core-api"/>
+	    <maven-resource group="org.mobicents.servlet.sip" artifact="sip-servlets-core-api"/>
             <maven-resource group="org.mobicents.servlet.sip" artifact="sip-servlets-impl"/>
             <maven-resource group="javax.sip" artifact="jain-sip-api"/>
             <maven-resource group="org.mobicents.javax.sip" artifact="mobicents-jain-sip-ext"/>
             <maven-resource group="javax.sip" artifact="jain-sip-ri"/>
             <maven-resource group="org.mobicents.ha.javax.sip" artifact="mobicents-jain-sip-ha-core"/>
+	    <maven-resource group="org.mobicents.tools" artifact="sip-balancer-jar"/>
             <maven-resource group="dnsjava" artifact="dnsjava"/>
             <maven-resource group="net.java.stun4j" artifact="stun4j"/>
         </module-def>

@@ -229,6 +229,13 @@
                     <artifactId>sip-servlets-application-router</artifactId>
                     <version>${project.version}</version>
                 </dependency>
+	
+		<dependency>
+			<groupId>org.mobicents.tools</groupId>
+			<artifactId>sip-balancer-jar</artifactId>
+			<version>${mobicents.balancer.version}</version>
+			<scope>provided</scope>
+		</dependency>
 
             </dependencies>
 
