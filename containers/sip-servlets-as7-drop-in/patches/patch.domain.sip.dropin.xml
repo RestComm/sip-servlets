@@ -1,7 +1,5 @@
-diff --git a/domain.xml b/domain-sip.xml
-index 172b505..b76aef2 100644
---- a/domain.xml
-+++ b/domain-sip.xml
+--- domain/configuration/domain-sip.xml
++++ domain/configuration/domain-sip.xml
 @@ -1,6 +1,7 @@
  <?xml version='1.0' encoding='UTF-8'?>
  
