@@ -61,7 +61,7 @@
                      <alias name="example.com"/>
                  </virtual-server>
              </subsystem>
-+            <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" application-router="../../configuration/dars/mobicents-dar.properties" stack-properties="../../configuration/mss-sip-stack.properties" path-name="org.mobicents.ha.balancing.only" app-dispatcher-class="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" concurrency-control-mode="SipApplicationSession" congestion-control-interval="-1">
++            <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" application-router="../../configuration/dars/mobicents-dar.properties" stack-properties="../../configuration/mss-sip-stack.properties" path-name="org.mobicents.ext" app-dispatcher-class="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" concurrency-control-mode="SipApplicationSession" congestion-control-interval="-1">
 +                <connector name="sip-udp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-udp"/>
 +                <connector name="sip-tcp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tcp"/>
 +                <connector name="sip-tls" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tls"/>
@@ -131,7 +131,7 @@
                      <alias name="example.com"/>
                  </virtual-server>
              </subsystem>
-+            <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" application-router="../../configuration/dars/mobicents-dar.properties" stack-properties="../../configuration/mss-sip-stack.properties" path-name="org.mobicents.ha.balancing.only" app-dispatcher-class="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" concurrency-control-mode="SipApplicationSession" congestion-control-interval="-1">
++            <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" application-router="../../configuration/dars/mobicents-dar.properties" stack-properties="../../configuration/mss-sip-stack.properties" path-name="org.mobicents.ext" app-dispatcher-class="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" concurrency-control-mode="SipApplicationSession" congestion-control-interval="-1">
 +                <connector name="sip-udp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-udp"/>
 +                <connector name="sip-tcp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tcp"/>
 +                <connector name="sip-tls" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tls"/>
@@ -242,7 +242,7 @@
                      <alias name="example.com"/>
                  </virtual-server>
              </subsystem>
-+            <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" application-router="../../configuration/dars/mobicents-dar.properties" stack-properties="../../configuration/mss-sip-stack.properties" path-name="org.mobicents.ha.balancing.only" app-dispatcher-class="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" concurrency-control-mode="SipApplicationSession" congestion-control-interval="-1">
++            <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" application-router="../../configuration/dars/mobicents-dar.properties" stack-properties="../../configuration/mss-sip-stack.properties" path-name="org.mobicents.ext" app-dispatcher-class="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" concurrency-control-mode="SipApplicationSession" congestion-control-interval="-1">
 +                <connector name="sip-udp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-udp"/>
 +                <connector name="sip-tcp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tcp"/>
 +                <connector name="sip-tls" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tls"/>
@@ -407,7 +407,7 @@
                      <alias name="example.com"/>
                  </virtual-server>
              </subsystem>
-+            <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" application-router="../../configuration/dars/mobicents-dar.properties" stack-properties="../../configuration/mss-sip-stack.properties" path-name="org.mobicents.ha.balancing.only" app-dispatcher-class="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" concurrency-control-mode="SipApplicationSession" congestion-control-interval="-1">
++            <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" application-router="../../configuration/dars/mobicents-dar.properties" stack-properties="../../configuration/mss-sip-stack.properties" path-name="org.mobicents.ext" app-dispatcher-class="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" concurrency-control-mode="SipApplicationSession" congestion-control-interval="-1">
 +                <connector name="sip-udp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-udp"/>
 +                <connector name="sip-tcp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tcp"/>
 +                <connector name="sip-tls" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tls"/>
