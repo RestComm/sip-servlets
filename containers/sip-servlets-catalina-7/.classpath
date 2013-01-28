@@ -3,7 +3,6 @@
 	<classpathentry including="**/*.java" kind="src" path="src/main/java"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/ha/javax/sip/mobicents-jain-sip-ha-core/1.4.0-SNAPSHOT/mobicents-jain-sip-ha-core-1.4.0-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.33/tomcat-annotations-api-7.0.33.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.33/tomcat-catalina-7.0.33.jar" sourcepath="/TOMCAT_HOME/java"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.33/tomcat-coyote-7.0.33.jar"/>
@@ -21,5 +20,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/jain-sip"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/mobicents-jain-sip-ext"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/mobicents-jain-sip-ha-core"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

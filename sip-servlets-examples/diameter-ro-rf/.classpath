@@ -14,7 +14,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/servers/diameter/mobicents-diameter-mux-jar/1.3.3.FINAL/mobicents-diameter-mux-jar-1.3.3.FINAL.jar"/>
 	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
 	<classpathentry kind="var" path="M2_REPO/picocontainer/picocontainer/1.2/picocontainer-1.2.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.7.0-SNAPSHOT/sip-servlets-spec-1.7.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/2.1.0-SNAPSHOT/sip-servlets-spec-2.1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.5.8/slf4j-api-1.5.8.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-log4j12/1.5.8/slf4j-log4j12-1.5.8.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>

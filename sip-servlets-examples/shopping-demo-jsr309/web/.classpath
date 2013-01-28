@@ -17,7 +17,7 @@
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/external/jsr309/mscontrol/1.0/mscontrol-1.0.jar"/>
 	<classpathentry kind="var" path="M2_REPO/jain/jain-mgcp-ri/1.0/jain-mgcp-ri-1.0.jar"/>
 	<classpathentry kind="src" path="/shopping-demo-business"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.7.0-SNAPSHOT/sip-servlets-spec-1.7.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/2.1.0-SNAPSHOT/sip-servlets-spec-2.1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

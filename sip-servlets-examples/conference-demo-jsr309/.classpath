@@ -1,20 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry including="**/*.java" kind="src" path="src/main/java"/>
-	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.X-SNAPSHOT/jain-sip-ri-1.2.X-SNAPSHOT.jar"/>
-	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.35/annotations-api-6.0.35.jar"/>
-	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging-api/1.0.4/commons-logging-api-1.0.4.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-dev/1.5.3/gwt-dev-1.5.3-linux.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-servlet/1.5.3/gwt-servlet-1.5.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-user/1.5.3/gwt-user-1.5.3.jar"/>
-	<classpathentry kind="var" path="M2_REPO/com/gwtext/gwtext/2.0.5/gwtext-2.0.5.jar"/>
-	<classpathentry kind="var" path="M2_REPO/junit/junit/4.1/junit-4.1.jar"/>
-	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/external/jsr309/mscontrol/1.0/mscontrol-1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/jain/jain-mgcp-ri/1.0/jain-mgcp-ri-1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/jsr309/mobicents-jsr309-impl/2.0.0.BETA5/mobicents-jsr309-impl-2.0.0.BETA5.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.7.0-SNAPSHOT/sip-servlets-spec-1.7.0-SNAPSHOT.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.X-SNAPSHOT/jain-sip-ri-1.2.X-SNAPSHOT.jar" sourcepath="M2_REPO/javax/sip/jain-sip-ri/1.2.X-SNAPSHOT/jain-sip-ri-1.2.X-SNAPSHOT-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/jean/.m2/repository/javax/sip/jain-sip-ri/1.2.X-SNAPSHOT/jain-sip-ri-1.2.X-SNAPSHOT-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/annotation/jsr250-api/1.0/jsr250-api-1.0.jar"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+  <classpathentry kind="var" path="M2_REPO/com/gwtext/gwtext/2.0.5/gwtext-2.0.5.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-servlet/1.5.3/gwt-servlet-1.5.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-user/1.5.3/gwt-user-1.5.3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/gwt/gwt-dev/1.5.3/gwt-dev-1.5.3-linux.jar"/>
+  <classpathentry kind="var" path="M2_REPO/junit/junit/4.1/junit-4.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/mobicents/external/jsr309/mscontrol/1.0/mscontrol-1.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/mobicents/media/client/jsr-309-driver/3.0.0.CR1/jsr-309-driver-3.0.0.CR1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/jain/jain-mgcp-ri/1.0/jain-mgcp-ri-1.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/mobicents/media/client/mgcp-driver/3.0.0.CR1/mgcp-driver-3.0.0.CR1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javolution/javolution/5.5.1/javolution-5.5.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/jboss/microcontainer/jboss-dependency/2.0.6.GA/jboss-dependency-2.0.6.GA.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/jboss/jbossxb/2.0.1.GA/jbossxb-2.0.1.GA.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/jboss/logging/jboss-logging-spi/2.1.0.GA/jboss-logging-spi-2.1.0.GA.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/jboss/jboss-common-core/2.2.14.GA/jboss-common-core-2.2.14.GA.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/jboss/jboss-reflect/2.0.2.GA/jboss-reflect-2.0.2.GA.jar"/>
+  <classpathentry kind="var" path="M2_REPO/apache-xerces/xml-apis/2.9.1/xml-apis-2.9.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/wutka-dtdparser/dtdparser121/1.2.1/dtdparser121-1.2.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/sun-jaxb/jaxb-api/2.1.9-brew/jaxb-api-2.1.9-brew.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/jboss/jboss-mdr/2.0.1.GA/jboss-mdr-2.0.1.GA.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging-api/1.0.4/commons-logging-api-1.0.4.jar"/>
+  <classpathentry kind="src" path="/sip-servlets-spec"/>
+  <classpathentry kind="src" path="/sip-servlets-client"/>
+  <classpathentry kind="var" path="M2_REPO/javax/javaee-web-api/6.0/javaee-web-api-6.0.jar"/>
 </classpath>

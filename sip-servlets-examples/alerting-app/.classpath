@@ -12,8 +12,8 @@
 	<classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/geronimo/specs/geronimo-ejb_3.0_spec/1.0/geronimo-ejb_3.0_spec-1.0.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/6.0.35/annotations-api-6.0.35.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/1.7.0-SNAPSHOT/sip-servlets-spec-1.7.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/annotations-api/7.0.33/annotations-api-7.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/2.1.0-SNAPSHOT/sip-servlets-spec-2.1.0-SNAPSHOT.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/apache/geronimo/specs/geronimo-j2ee_1.4_spec/1.1/geronimo-j2ee_1.4_spec-1.1.jar"/>
 	<!--classpathentry kind="var" path="M2_REPO/org/mobicents/resources/smpp-ratype/1.2.6.GA/smpp-ratype-1.2.6.GA.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mobicents/resources/smpp-events/1.2.6.GA/smpp-events-1.2.6.GA.jar"/>

@@ -55,7 +55,7 @@
 				      		<groupId>org.mobicents.jdocbook</groupId>
 				      		<artifactId>telestax-community-style</artifactId>
 				      		<type>jdocbook-style</type>
-				      		<version>1.2.0</version>
+				      		<version>1.3.0-SNAPSHOT</version>
 				    	</dependency>
 				</dependencies>
 				<configuration>					
