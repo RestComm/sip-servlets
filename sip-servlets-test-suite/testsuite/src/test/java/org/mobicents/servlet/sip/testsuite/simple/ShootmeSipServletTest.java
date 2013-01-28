@@ -381,6 +381,25 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 	}
 	
 	/**
+	 * non regression test for Issue 172 http://code.google.com/p/sipservlets/issues/detail?id=172
+	 * Possible to add contact Header to 200 OK to OPTIONS 
+	 */
+	public void testShootmeOptions() throws Exception {
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		sender.sendSipRequest("OPTIONS", fromAddress, fromAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isFinalResponseReceived());
+		assertEquals(200, sender.getFinalResponseStatus());
+		ContactHeader contactHeader = (ContactHeader) sender.getFinalResponse().getHeader(ContactHeader.NAME);
+		assertNotNull(contactHeader);	
+		assertEquals(((SipURI)contactHeader.getAddress().getURI()).toString(),"sip:random@172.172.172.172:3289");
+	}
+	
+	/**
 	 * non regression test for Issue 1104 http://code.google.com/p/mobicents/issues/detail?id=1104
 	 * Cannot find the corresponding sip session to this subsequent request
 	 * 

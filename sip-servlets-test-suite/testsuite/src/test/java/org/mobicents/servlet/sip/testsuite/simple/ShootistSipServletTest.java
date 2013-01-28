@@ -813,7 +813,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 
 	/**
 	 * non regression test for Issue 172 http://code.google.com/p/sipservlets/issues/detail?id=172
-	 * Contact header in OPTIONS overwritten by container
+	 * Possible to add params to Contact header 
 	 */
 	@Test
 	public void testShootistOptionsSetContact() throws Exception {
@@ -833,8 +833,10 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		deployApplication(params);
 		Thread.sleep(TIMEOUT);	
 		ContactHeader contactHeader = (ContactHeader) receiver.getOptionsRequest().getHeader(ContactHeader.NAME);
-		assertNotNull(contactHeader);	
-		assertEquals(((SipURI)contactHeader.getAddress().getURI()).toString(),"sip:random@172.172.172.172:3289");
+		assertNotNull(contactHeader);
+		assertNotNull(contactHeader.getParameter("optionParam"));
+		assertEquals(contactHeader.getParameter("optionParam"),"optionValue");
+		assertEquals(((SipURI)contactHeader.getAddress().getURI()).getUser(), "optionUser");
 	}
 	
 	

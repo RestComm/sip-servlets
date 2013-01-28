@@ -772,6 +772,20 @@ public class SimpleSipServlet
 		resp.send();
 	}
 	
+	@Override
+	protected void doOptions(SipServletRequest req) throws ServletException,
+			IOException {
+		int response = SipServletResponse.SC_OK;
+		SipServletResponse resp = req.createResponse(response);
+		/**
+		 * non regression test for Issue 172 http://code.google.com/p/sipservlets/issues/detail?id=172
+		 * Possible to add contact Header to 200 OK to OPTIONS 
+		 */
+		resp.addHeader("Contact", "sip:random@172.172.172.172:3289");
+		resp.send();
+	}
+	
+	
 	// SipErrorListener methods
 
 	/**

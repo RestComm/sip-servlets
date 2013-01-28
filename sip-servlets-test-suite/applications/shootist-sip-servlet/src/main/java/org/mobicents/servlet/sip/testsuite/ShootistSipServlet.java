@@ -21,8 +21,6 @@
  */
 package org.mobicents.servlet.sip.testsuite;
 
-import gov.nist.javax.sip.stack.SIPTransactionStack;
-
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
@@ -452,8 +450,31 @@ public class ShootistSipServlet
 				}
 				// http://code.google.com/p/sipservlets/issues/detail?id=156 and http://code.google.com/p/sipservlets/issues/detail?id=172 
 				if(ce.getServletContext().getInitParameter("setRandomContact") != null) {
-					if(method.equalsIgnoreCase("REGISTER") || method.equalsIgnoreCase("OPTIONS")) {
+					if(method.equalsIgnoreCase("REGISTER")) {
 						sipServletRequest.addHeader("Contact", "sip:random@172.172.172.172:3289");
+					}
+					if(method.equalsIgnoreCase("OPTIONS")) {
+						try {
+							sipServletRequest.addHeader("Contact", "sip:random@172.172.172.172:3289");
+							logger.error("JSR 289, Section 4.1.3 The Contact Header Field: Contact header is a system header  except for the following messages:  4. 200/OPTIONS responses. Container should have thrown an exception");
+							throw new IllegalStateException("JSR 289, Section 4.1.3 The Contact Header Field: Contact header is a system header  except for the following messages:  4. 200/OPTIONS responses. Container should have thrown an exception");							
+						} catch(Exception e) {							
+						}						
+						try {
+							Address contactAddress = sipServletRequest.getAddressHeader("Contact");
+							((SipURI)contactAddress.getURI()).setUser("optionUser");
+							((SipURI)contactAddress.getURI()).setHost("optionHost.com");
+							logger.error("JSR 289, Section 4.1.3 The Contact Header Field: Contact header is a system header  except for the following messages:  4. 200/OPTIONS responses. Container should have thrown an exception");
+							throw new IllegalStateException("JSR 289, Section 4.1.3 The Contact Header Field: Contact header is a system header  except for the following messages:  4. 200/OPTIONS responses. Container should have thrown an exception");							
+						} catch(Exception e) {							
+						}
+						try {
+							Parameterable contactHeader = sipServletRequest.getParameterableHeader("Contact");
+							contactHeader.setParameter("optionParam", "optionValue");
+						} catch (ServletParseException e) {
+							logger.error("an error occured while getting the contact Header", e);
+						}
+						
 					}
 				}	
 				sipServletRequest.setRequestURI(requestURI);

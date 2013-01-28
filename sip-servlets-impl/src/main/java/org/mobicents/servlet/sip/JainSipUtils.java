@@ -159,6 +159,8 @@ public final class JainSipUtils {
 		CONTACT_HEADER_METHODS.add(Request.NOTIFY);
 		CONTACT_HEADER_METHODS.add(Request.REFER);
 		CONTACT_HEADER_METHODS.add(Request.UPDATE);
+		// http://code.google.com/p/sipservlets/issues/detail?id=172 
+		CONTACT_HEADER_METHODS.add(Request.OPTIONS);
 	}
 	
 	public static final Set<String> DIALOG_CREATING_METHODS = new TreeSet<String>(
