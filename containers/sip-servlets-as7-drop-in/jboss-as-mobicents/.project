@@ -1,15 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
   <name>jboss-as7-mobicents</name>
   <comment>&gt;JBoss Application Server: Mobicents Sip Servlets Adaptation Layer. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
   <projects>
-    <project>sip-servlets-annotations</project>
-    <project>sip-servlets-application-router</project>
-    <project>sip-servlets-as7</project>
-    <project>sip-servlets-client</project>
-    <project>sip-servlets-core-api</project>
     <project>sip-servlets-impl</project>
-    <project>sip-servlets-jruby</project>
     <project>sip-servlets-spec</project>
+    <project>sip-servlets-core-api</project>
+    <project>sip-servlets-jruby</project>
+    <project>sip-servlets-client</project>
+    <project>sip-servlets-annotations</project>
+    <project>sip-servlets-as7</project>
+    <project>mobicents-jain-sip-ha-core</project>
+    <project>sip-servlets-application-router</project>
   </projects>
   <buildSpec>
     <buildCommand>
