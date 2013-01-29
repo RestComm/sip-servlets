@@ -24,18 +24,6 @@
       <version>1.3.3.FINAL</version>
       <scope>provided</scope>
     </dependency>  
-    <dependency>
-      <groupId>jboss</groupId>
-      <artifactId>jboss-system</artifactId>
-      <version>${jboss.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>jboss</groupId>
-      <artifactId>jboss-jmx</artifactId>
-      <version>${jboss.version}</version>
-      <scope>provided</scope>
-    </dependency>
   </dependencies>
 
 	<build>
