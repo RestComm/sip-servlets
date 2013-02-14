@@ -1,4 +1,9 @@
 /*
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
+ * by the @authors tag. See the copyright.txt in the distribution for a
+ * full listing of individual contributors.
+ *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
  * published by the Free Software Foundation; either version 2.1 of
@@ -14,6 +19,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 package org.mobicents.servlet.sip.startup;
 
 import java.io.File;
@@ -127,12 +133,23 @@ public class SipContextConfig extends ContextConfig {
 				ok = false;
 			}					
 
+			String applicationSipXmlPath = SipContext.APPLICATION_SIP_XML;
 			InputStream sipXmlInputStream = servletContext
-			.getResourceAsStream(SipContext.APPLICATION_SIP_XML);
+					.getResourceAsStream(applicationSipXmlPath);			
+			if(sipXmlInputStream == null) {
+				// http://code.google.com/p/sipservlets/issues/detail?id=167 Deal with strict compliance
+				if(logger.isInfoEnabled()) {
+					logger.info(applicationSipXmlPath + " has not been found, checking with a leading slash as servlet compliance might be enabled");
+				}
+				applicationSipXmlPath = "/" + SipContext.APPLICATION_SIP_XML;
+				sipXmlInputStream = servletContext
+						.getResourceAsStream(applicationSipXmlPath);
+				
+			}
 			// processing of the sip.xml file
 			if (sipXmlInputStream != null) {
 				if(logger.isDebugEnabled()) {
-					logger.debug(SipContext.APPLICATION_SIP_XML + " has been found !");
+					logger.debug(applicationSipXmlPath + " has been found !");
 				}								
 
 				Digester sipDigester =  DigesterFactory.newDigester(context.getXmlValidation(),
@@ -154,7 +171,7 @@ public class SipContextConfig extends ContextConfig {
 				}
 			} else {
 				if(logger.isInfoEnabled()) {
-					logger.info(SipContext.APPLICATION_SIP_XML + " has not been found !");
+					logger.info(applicationSipXmlPath + " has not been found !");
 				}
 				ok = false;
 			}	

@@ -24,6 +24,10 @@
       <priority value="TRACE"/>
    </category>
    
+   <category name="org.mobicents.tools.sip.balancer">
+      <priority value="INFO"/>
+   </category>
+   
     <priority value ="TRACE" />     
     <appender-ref ref="rolling-file" /> 
     <appender-ref ref="console" />
