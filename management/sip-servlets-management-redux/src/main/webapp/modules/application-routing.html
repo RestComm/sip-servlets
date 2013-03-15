@@ -1,0 +1,155 @@
+					<h3 style="margin: 0px;"><i class="icon-copy"></i> Application Routing</h3>
+					<hr style="margin: 10 0px;"/>
+				<button id="apply-server-settings" class="btn btn-small" onclick="saveDarConfiguration()"><i style="color: #000000;"></i> Apply Changes</button> 
+				<script type="text/javascript">
+					var applications;
+					
+					$(document).ready(function () {												
+						mbeanSearch="*:type=SipApplicationDispatcher";
+						var mbean;
+						$.ajax({
+							dataType: "json",
+							url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
+						})
+						.done(function(html) {
+							if (html.error) {
+								logToConsole("ERROR", html.error);
+							}
+							else {			
+								mbean = html.value[0];
+								var j4p = new Jolokia({url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
+								j4p.execute(mbean, "findInstalledSipApplications", {
+					                 success: function(value) {
+					                     applications=value;
+					                 }        
+					            });
+								
+							}
+						})
+						.fail(function() {
+							logToConsole("ERROR", "Failure trying to communicate with the SIP Servlets Server. Please try again later.");
+						})
+	    			});
+				</script>
+				<p>
+					<span id="mss-settings">
+					<ul class="nav nav-tabs" id="myTab">
+  						<li class="active"><a href="#application-all" data-toggle="tab">All</a></li>
+  						<li><a href="#application-register" data-toggle="tab">REGISTER</a></li>
+						<li><a href="#application-invite" data-toggle="tab">INVITE</a></li>
+						<li><a href="#application-options" data-toggle="tab">OPTIONS</a></li>
+						<li><a href="#application-message" data-toggle="tab">MESSAGE</a></li>
+						<li><a href="#application-subscribe" data-toggle="tab">SUBSCRIBE</a></li>
+						<li><a href="#application-notify" data-toggle="tab">NOTIFY</a></li>
+						<li><a href="#application-publish" data-toggle="tab">PUBLISH</a></li>
+						<li><a href="#application-refer" data-toggle="tab">REFER</a></li>					
+					</ul>	
+						
+  				 	<div class="tab-content">
+						<div class="tab-pane active" id="application-all">
+							<button class="btn btn-small" onclick="addApplication('all')"><a href="#" class="add-all" data-toggle="tab">Add Application</a></button>							
+					  	</div>
+					  	<div class="tab-pane" id="application-register">
+					  		<button class="btn btn-small" onclick="addApplication('register')"><a href="#" class="add-register" data-toggle="tab">Add Application</a></button>
+					  </div>
+					  <div class="tab-pane" id="application-invite">
+					  		<button class="btn btn-small" onclick="addApplication('invite')"><a href="#" class="add-invite" data-toggle="tab">Add Application</a></button>
+					  </div>
+					  <div class="tab-pane" id="application-options">
+							<button class="btn btn-small" onclick="addApplication('options')"><a href="#" class="add-options" data-toggle="tab">Add Application</a></button>
+					  </div>					  
+					  <div class="tab-pane" id="application-message">
+							<button class="btn btn-small" onclick="addApplication('message')"><a href="#" class="add-message" data-toggle="tab">Add Application</a></button>			  
+					  </div>
+					  <div class="tab-pane" id="application-subscribe">
+							<button class="btn btn-small" onclick="addApplication('subscribe')"><a href="#" class="add-subscribe" data-toggle="tab">Add Application</a></button>				  
+					  </div>
+					  <div class="tab-pane" id="application-notify">
+							<button class="btn btn-small" onclick="addApplication('notify')"><a href="#" class="add-notify" data-toggle="tab">Add Application</a></button>											  
+					  </div>
+					  <div class="tab-pane" id="application-publish">
+							<button class="btn btn-small" onclick="addApplication('publish')"><a href="#" class="add-publish" data-toggle="tab">Add Application</a></button>				  
+					  </div>
+					  <div class="tab-pane" id="application-refer">
+							<button class="btn btn-small" onclick="addApplication('refer')"><a href="#" class="add-refer" data-toggle="tab">Add Application</a></button>
+					  </div>
+					</div>	
+					</span>
+					
+				</p>	
+				<script type="text/javascript">										
+	    			function addApplication(type) {		    				
+						var id = $("#application-"+ type).children().length; //think about it ;
+				        var tabContent = '<div id="'+type+'-application-content-'+ id +'" class="span3">'
+		        		+ '<label>SIP Application Name : </label><select id="sipApplicationName" style="float: left; height: 28px;">';
+		        		for (var i = 0; i < applications.length; i++) {
+		        			tabContent = tabContent + '<option value="'+ applications[i] +'">'+ applications[i] +'</option>';
+	    				}
+	    				tabContent = tabContent + '</select> </br></br>'
+	    				+ '<label>Susbcriber Identity : </label><input id="subscriberIdentity" type="text" style="float: left; height: 28px;"class="input-large" placeholder="DAR: From"></input> </br></br>'
+						+ '<label>Routing Region : </label><select id="routingRegion" style="float: left; height: 28px;"class="input-large"><option value="ORIGINATING">Originating</option><option value="NEUTRAL">Neutral</option><option value="TERMINATING">Terminating</option> </select> </br></br>'
+						+ '<label>Route Modifiers : </label><select id="routeModifiers" style="float: left; height: 28px;"class="input-large"><option value="NO_ROUTE">No Route</option><option value="ROUTE">Route</option><option value="CLEAR_ROUTE">Clear Route</option> </select> </br></br>'
+						+ '<label>Route : </label><input id="route" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Route"></input> </br></br>'
+						+ '<label>Order : </label><input id="order" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Order"></input> </br></br>'
+						+ '<button id="remove-application-'+ id +'" class="btn btn-small" onclick="removeApplication(\''+type+'\', ' + id + ')">Remove Application</button> </br></br></div>';				        
+						$(".add-"+ type).closest('button').after(tabContent); 
+				    }
+					
+				    function removeApplication(type, id) {			
+				    	var application = "#" + type + "-application-content-"+ id;
+				    	logToConsole("INFO", application);
+						$(application).remove();
+						//reindex the applications 
+				    }
+				    
+	    			
+					function applyServerSettings() {
+						mbeanSearch="*:type=SipApplicationDispatcher";
+						var mbean;
+						$.ajax({
+							dataType: "json",
+							url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
+						})
+						.done(function(html) {
+							if (html.error) {
+								logToConsole("ERROR", html.error);
+							}
+							else {			
+								mbean = html.value[0];
+								var j4p = new Jolokia({url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
+															
+							}
+						})
+						.fail(function() {
+							logToConsole("ERROR", "Failure trying to communicate with the SIP Servlets Server. Please try again later.");
+						})						
+					}
+					
+					$(document).ready(function () {												
+						mbeanSearch="*:type=SipApplicationDispatcher";
+						var mbean;
+						$.ajax({
+							dataType: "json",
+							url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
+						})
+						.done(function(html) {
+							if (html.error) {
+								logToConsole("ERROR", html.error);
+							}
+							else {			
+								mbean = html.value[0];
+								var j4p = new Jolokia({url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
+								j4p.execute(mbean, "retrieveApplicationRouterConfiguration", {
+					                 success: function(value) {
+					                     console.log(value);
+					                 }        
+					            });
+								
+							}
+						})
+						.fail(function() {
+							logToConsole("ERROR", "Failure trying to communicate with the SIP Servlets Server. Please try again later.");
+						})
+	    			});
+					</script>
+					

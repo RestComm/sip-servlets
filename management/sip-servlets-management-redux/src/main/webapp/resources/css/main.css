@@ -1,0 +1,93 @@
+body {
+	background-color: white;
+	color: black;
+	font-family: arial, verdana, sans, helvetica, sans-serif;
+	font-size: 12px;
+	margin: 0px;
+	padding: 0px;
+}
+.header {
+	background: url('../images/top-background.png');
+	width: 960px;
+}
+.left-menu {
+	width: 160px;
+	float: left;
+}
+.content {
+	width: 800px;
+	float: left;
+}
+.console {
+	background-color: #FAFAFA;
+	border: 2px solid #DFDFDF;
+	padding: 2px;
+	width: 99%;
+	font-family: monospace;
+	color: black;
+	height: 160px;
+	overflow: auto; position: relative;
+}
+
+.console-wrapper {
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	margin-left: -18px;
+}
+
+
+.attachment {
+    border: 1px solid #ccc;
+    background-color: #eee;
+    padding: 3px 10px;
+    display: inline-block;
+    border-radius: 3px;
+    float: right;
+}
+
+.attachment span {
+	font-weight: bold;
+}
+
+.attachment button {
+    margin: 0px;
+    margin-left: 15px;
+    opacity: .3;
+    border: 0px;
+    background: none;
+    padding: 0px;
+}
+
+.attachment button:hover {opacity: 1;}
+
+.du-row {
+	display: none;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+.component-row {
+	cursor: pointer;
+}
+
+.component-row-details {
+	display: none;
+}
+
+tbody tr:hover td.component-row-details-cell {
+	background-color: transparent;
+}
+
+/* From GWT */
+.panel-title { /* was .common-SmartTabPanel-Title */
+	background-color: #FFFFFF;
+	font-weight: bold;
+	color: #2b4a6d;
+	padding-top: 5px;
+	padding-left: 12px;
+	font-size: 18px;
+}
+

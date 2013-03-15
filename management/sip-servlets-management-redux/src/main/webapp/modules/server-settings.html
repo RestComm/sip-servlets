@@ -1,0 +1,115 @@
+					<h3 style="margin: 0px;"><i class="icon-copy"></i> SIP Servlets Server Settings</h3>
+					<hr style="margin: 10 0px;"/>
+
+ 					<p>
+					<span id="mss-settings">
+					<ul class="nav nav-tabs" id="myTab">
+  						<li class="active"><a href="#congestion" data-toggle="tab">Congestion Control</a></li>
+  						<li><a href="#timers" data-toggle="tab">SIP Timers</a></li>
+						<li><a href="#various" data-toggle="tab">Various</a></li>
+					</ul>	
+						
+  				 	<div class="tab-content">
+						<div class="tab-pane active" id="congestion">
+							<label>>Congestion Control Checking Interval : </label><input id="congestionControlCheckingInterval" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Congestion Control Checking Interval"></input></br></br>
+							<label>>Memory Threshold : </label><input id="memoryThreshold" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Memory Threshold"></input> </br></br>
+							<label>>Back To Normal Memory Threshold : </label><input id="backToNormalMemoryThreshold" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Back To Normal Memory Threshold"></input></br></br>
+							<label>>Congestion Control Policy : </label><select id="congestionControlPolicy" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Congestion Control Policy">
+								<option value="DropMessage">DropMessage</option>
+		  						<option value="ErrorResponse">ErrorResponse</option>  					
+							</select> </br></br>
+					  	</div>
+					  <div class="tab-pane" id="timers">
+					  		<label>>SIP Base Timer Interval : </label><input id="sipBaseTimer" type="text" style="float: left; height: 28px;"class="input-large" placeholder="SIP Base Timer Interval"></input> </br></br>
+							<label>>SIP Timer T2 : </label><input id="sipTimerT2" type="text" style="float: left; height: 28px;"class="input-large" placeholder="SIP Timer T2"></input> </br></br>
+							<label>>SIP Timer T4 : </label><input id="sipTimerT4" type="text" style="float: left; height: 28px;"class="input-large" placeholder="SIP Timer T4"></input> </br></br>
+							<label>>SIP Timer Timer D : </label><input id="sipTimerD" type="text" style="float: left; height: 28px;"class="input-large" placeholder="SIP Timer D"></input> </br></br>
+					  </div>
+					  <div class="tab-pane" id="various">
+							<label>>Concurrency Control Mode : </label><select id="concurrencyControlMode" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Concurrency Control">
+								<option value="None">None</option>
+								<option value="SipSession">SipSession</option>
+								<option value="SipApplicationSession">SipApplicationSession</option>  						  						  					
+							</select> </br></br>
+							<!--label>>Logging Mode : </label><select id="loggingMode" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Logging Mode">
+								<option value="trace">trace</option>
+		  						<option value="debug">debug</option>
+		  						<option value="default">default</option>
+		  						<option value="production">production</option>
+							</select>		</br></br>-->												  
+					  </div>					  
+					</div>	
+					</span>
+					<button id="apply-server-settings" class="btn btn-small" onclick="applyServerSettings()"><i style="color: #000000;"></i> Apply Changes</button> 
+				</p>	
+				<script type="text/javascript">
+					$(document).ready(function () {												
+						mbeanSearch="*:type=SipApplicationDispatcher";
+						var mbean;
+						$.ajax({
+							dataType: "json",
+							url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
+						})
+						.done(function(html) {
+							if (html.error) {
+								logToConsole("ERROR", html.error);
+							}
+							else {			
+								mbean = html.value[0];
+								var j4p = new Jolokia({url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
+								var baseTimerInterval = j4p.getAttribute(mbean, "BaseTimerInterval",{method: "post"});
+								var t2Interval = j4p.getAttribute(mbean, "T2Interval",{method: "post"});
+								var t4Interval = j4p.getAttribute(mbean, "T4Interval",{method: "post"});
+								var timerDInterval = j4p.getAttribute(mbean, "TimerDInterval",{method: "post"});								
+								var concurrencyControlMode = j4p.getAttribute(mbean, "ConcurrencyControlMode",{method: "post"});
+								var congestionControlPolicyByName = j4p.getAttribute(mbean, "CongestionControlPolicyByName",{method: "post"});
+								var congestionControlCheckingInterval = j4p.getAttribute(mbean, "CongestionControlCheckingInterval",{method: "post"});
+								var memoryThreshold = j4p.getAttribute(mbean, "MemoryThreshold",{method: "post"});
+								var backToNormalMemoryThreshold = j4p.getAttribute(mbean, "BackToNormalMemoryThreshold",{method: "post"});
+								$("#memoryThreshold").val(memoryThreshold);
+								$("#backToNormalMemoryThreshold").val(backToNormalMemoryThreshold);
+								$("#sipBaseTimer").val(baseTimerInterval);
+								$("#sipTimerT2").val(t2Interval);
+								$("#sipTimerT4").val(t4Interval);
+								$("#sipTimerD").val(timerDInterval);
+								$("#concurrencyControlMode").val(concurrencyControlMode);
+								$("#congestionControlCheckingInterval").val(congestionControlCheckingInterval);
+								$("#congestionControlPolicy").val(congestionControlPolicyByName);
+								
+							}
+						})
+						.fail(function() {
+							logToConsole("ERROR", "Failure trying to communicate with the SIP Servlets Server. Please try again later.");
+						})
+	    			});
+					
+					function applyServerSettings() {
+						mbeanSearch="*:type=SipApplicationDispatcher";
+						var mbean;
+						$.ajax({
+							dataType: "json",
+							url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
+						})
+						.done(function(html) {
+							if (html.error) {
+								logToConsole("ERROR", html.error);
+							}
+							else {			
+								mbean = html.value[0];
+								var j4p = new Jolokia({url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
+								j4p.setAttribute(mbean, "BaseTimerInterval",$("#sipBaseTimer").val(),{method: "post"});
+								j4p.setAttribute(mbean, "T2Interval",$("#sipTimerT2").val(),{method: "post"});
+								j4p.setAttribute(mbean, "T4Interval",$("#sipTimerT4").val(),{method: "post"});
+								j4p.setAttribute(mbean, "TimerDInterval",$("#sipTimerD").val(),{method: "post"});								
+								j4p.setAttribute(mbean, "ConcurrencyControlMode",$("#concurrencyControlMode").val(),{method: "post"});
+								j4p.setAttribute(mbean, "CongestionControlPolicyByName",$("#congestionControlPolicy").val(),{method: "post"});
+								j4p.setAttribute(mbean, "CongestionControlCheckingInterval",$("#congestionControlCheckingInterval").val(),{method: "post"});
+								j4p.setAttribute(mbean, "MemoryThreshold",$("#memoryThreshold").val(),{method: "post"});
+								j4p.setAttribute(mbean, "BackToNormalMemoryThreshold",$("#backToNormalMemoryThreshold").val(),{method: "post"});								
+							}
+						})
+						.fail(function() {
+							logToConsole("ERROR", "Failure trying to communicate with the SIP Servlets Server. Please try again later.");
+						})						
+					}
+					</script>
