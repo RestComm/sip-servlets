@@ -184,7 +184,7 @@
 							else {			
 								mbean = html.value[0];
 								var j4p = new Jolokia({url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
-								j4p.execute(mbean, "updateApplicationRouterConfiguration(java.lang.String)", getDarConfiguration(), {
+								j4p.execute(mbean, "updateApplicationRouterConfiguration(java.lang.Object)", getDarConfiguration(), {
 									success: function(value) {					                	 					                	
 										logToConsole("INFO", "DAR Information successfully updated");
 						            }, 
