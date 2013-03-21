@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
+import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.servlet.sip.ar.SipApplicationRoutingRegionType;
 import javax.servlet.sip.ar.SipRouteModifier;
@@ -116,9 +117,9 @@ public class DefaultApplicationRouterParser {
 	 * @return a Map of key as sip method and value as a list of SipApplicationRouterInfo
 	 * @throws ParseException if anything goes wrong during the parsing
 	 */
-	public Map<String, List<DefaultSipApplicationRouterInfo>> parse() throws ParseException {
-		Map<String, List<DefaultSipApplicationRouterInfo>> sipApplicationRoutingInfo = 
-			new HashMap<String, List<DefaultSipApplicationRouterInfo>>();
+	public Map<String, List<? extends SipApplicationRouterInfo>> parse() throws ParseException {
+		Map<String, List<? extends SipApplicationRouterInfo>> sipApplicationRoutingInfo = 
+			new HashMap<String, List<? extends SipApplicationRouterInfo>>();
 		
 		Iterator darEntriesIterator = properties.entrySet().iterator();
 		while(darEntriesIterator.hasNext()) {
@@ -127,7 +128,7 @@ public class DefaultApplicationRouterParser {
 			String sipMethod = darEntry.getKey();
 			String sipApplicationRouterInfosStringified = darEntry.getValue();
 			//parse the corresponding value  
-			List<DefaultSipApplicationRouterInfo> sipApplicationRouterInfoList = 
+			List<? extends SipApplicationRouterInfo> sipApplicationRouterInfoList = 
 				parseSipApplicationRouterInfos(sipApplicationRouterInfosStringified);
 			sipApplicationRoutingInfo.put(sipMethod, sipApplicationRouterInfoList);
 		}
@@ -140,7 +141,7 @@ public class DefaultApplicationRouterParser {
 	 * @return
 	 * @throws ParseException
 	 */
-	public Map<String, List<DefaultSipApplicationRouterInfo>> parse(String configuration) throws ParseException {
+	public Map<String, List<? extends SipApplicationRouterInfo>> parse(String configuration) throws ParseException {
 		Properties tempProperties = new Properties();
 		// tempProperties.load(new StringReader(configuration)); // This needs Java 1.6
 		ByteArrayInputStream stringStream = new ByteArrayInputStream(configuration.getBytes());
@@ -160,7 +161,7 @@ public class DefaultApplicationRouterParser {
 	 * @return
 	 * @throws ParseException
 	 */
-	public Map<String, List<DefaultSipApplicationRouterInfo>> parse(Properties properties) throws ParseException {
+	public Map<String, List<? extends SipApplicationRouterInfo>> parse(Properties properties) throws ParseException {
 		this.properties = properties;
 		return parse();
 	}
@@ -173,7 +174,7 @@ public class DefaultApplicationRouterParser {
 	 * @return a list of SipApplicationRouterInfo
 	 * @throws ParseException if anything goes wrong during the parsing
 	 */
-	private List<DefaultSipApplicationRouterInfo> parseSipApplicationRouterInfos(String sipApplicationRouterInfosStringified) throws ParseException {
+	private List<? extends SipApplicationRouterInfo> parseSipApplicationRouterInfos(String sipApplicationRouterInfosStringified) throws ParseException {
 		List<DefaultSipApplicationRouterInfo> sipApplicationRouterInfos = new ArrayList<DefaultSipApplicationRouterInfo>();
 		while(sipApplicationRouterInfosStringified.indexOf("(") != -1) {
 			int indexOfLeftParenthesis = sipApplicationRouterInfosStringified.indexOf("(");

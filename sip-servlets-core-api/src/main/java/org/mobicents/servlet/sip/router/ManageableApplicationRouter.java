@@ -22,6 +22,11 @@
 
 package org.mobicents.servlet.sip.router;
 
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.sip.ar.SipApplicationRouterInfo;
+
 
 /**
  * This interface simply exposes methods to reconfigure an Application Router
@@ -47,4 +52,12 @@ public interface ManageableApplicationRouter {
 	 * @return the current configuration (possibly a string)
 	 */
 	Object getCurrentConfiguration();
+	
+	/**
+	 * This method will provide the configuration that is currently active
+	 * in the AR. It can be parsed and visualized by the management application.
+	 * 
+	 * @return the current configuration (possibly a string)
+	 */
+	Map<String, List<? extends SipApplicationRouterInfo>> getConfiguration();
 }

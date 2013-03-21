@@ -26,6 +26,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringReader;
 import java.text.ParseException;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -191,7 +192,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	//Applications deployed within the container
 	Set<String> containerDeployedApplicationNames = null;
 	//List of applications defined in the defautl application router properties file
-	Map<String, List<DefaultSipApplicationRouterInfo>> defaultSipApplicationRouterInfos;
+	Map<String, List<? extends SipApplicationRouterInfo>> defaultSipApplicationRouterInfos;
 	
 	/**
 	 * Default Constructor
@@ -199,7 +200,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	public DefaultApplicationRouter() {
 		containerDeployedApplicationNames = new HashSet<String>();
 		defaultApplicationRouterParser = new DefaultApplicationRouterParser();
-		defaultSipApplicationRouterInfos = new ConcurrentHashMap<String, List<DefaultSipApplicationRouterInfo>>();
+		defaultSipApplicationRouterInfos = new ConcurrentHashMap<String, List<? extends SipApplicationRouterInfo>>();
 	}
 	
 	/**
@@ -249,7 +250,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 						+ " , region=" + region + " , directive=" + directive + 
 						", targetedRequestInfo="+ targetedRequestInfo + ", stateinfo=" + stateInfo + " with following dar " + defaultApplicationRouterParser.getProperties());
 			}
-			List<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoList = 
+			List<? extends SipApplicationRouterInfo> defaultSipApplicationRouterInfoList = 
 				defaultSipApplicationRouterInfos.get(initialRequest.getMethod());		
 			sipApplicationRouterInfo = getNextApplication(initialRequest, stateInfo,
 						defaultSipApplicationRouterInfoList);			
@@ -270,13 +271,13 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	 * This method is checking if the application that initiated the request is currently configured to be called for this method.
 	 * Apps that initiate request may not be in the list.
 	 */
-	private DefaultSipApplicationRouterInfo getFirstRequestApplicationEntry(List<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoList, SipServletRequest initialRequest) {
+	private DefaultSipApplicationRouterInfo getFirstRequestApplicationEntry(List<? extends SipApplicationRouterInfo> defaultSipApplicationRouterInfoList, SipServletRequest initialRequest) {
 		SipSession sipSession = initialRequest.getSession(false);
 		if(sipSession != null) {
 			String appName = sipSession.getApplicationSession().getApplicationName();
-			Iterator<DefaultSipApplicationRouterInfo> iterator = defaultSipApplicationRouterInfoList.iterator();
+			Iterator<? extends SipApplicationRouterInfo> iterator = defaultSipApplicationRouterInfoList.iterator();
 			while(iterator.hasNext()) {
-				DefaultSipApplicationRouterInfo next = iterator.next();
+				DefaultSipApplicationRouterInfo next = (DefaultSipApplicationRouterInfo)iterator.next();
 				if(next.getApplicationName().equals(appName)) return next;
 			}
 		}
@@ -286,7 +287,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	private SipApplicationRouterInfo getNextApplication(
 			SipServletRequest initialRequest,
 			Serializable stateInfo,
-			List<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoList) {
+			List<? extends SipApplicationRouterInfo> defaultSipApplicationRouterInfoList) {
 		
 		if(defaultSipApplicationRouterInfoList != null && defaultSipApplicationRouterInfoList.size() > 0) {
 			int previousAppOrder = 0; 
@@ -296,7 +297,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 					log.debug("The previous app order was : " + previousAppOrder);
 				}
 			}
-			ListIterator<DefaultSipApplicationRouterInfo> defaultSipApplicationRouterInfoIt = defaultSipApplicationRouterInfoList.listIterator(previousAppOrder++);
+			ListIterator<? extends SipApplicationRouterInfo> defaultSipApplicationRouterInfoIt = defaultSipApplicationRouterInfoList.listIterator(previousAppOrder++);
 			while (defaultSipApplicationRouterInfoIt.hasNext() ) {
 				
 				/*
@@ -307,13 +308,13 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 				 *  or by looking at the DIRECTION hint in the optional parameters. If the request was initiated by the app then we will
 				 *  call only applications without INBOUND direction. All applications without hint will be called to keep backward compatibility.
 				 */
-				DefaultSipApplicationRouterInfo defaultSipApplicationRouterInfo = defaultSipApplicationRouterInfoIt.next();
+				DefaultSipApplicationRouterInfo defaultSipApplicationRouterInfo = (DefaultSipApplicationRouterInfo) defaultSipApplicationRouterInfoIt.next();
 				
 				/*
 				 * This method is checking if the application that initiated the request is currently configured to be called for this method.
 				 * Apps that initiate request may not be in the list thus params must be assumed for them.
 				 */
-				DefaultSipApplicationRouterInfo requestSipApplicationRouterInfo = getFirstRequestApplicationEntry(defaultSipApplicationRouterInfoList, initialRequest);
+				DefaultSipApplicationRouterInfo requestSipApplicationRouterInfo = (DefaultSipApplicationRouterInfo) getFirstRequestApplicationEntry(defaultSipApplicationRouterInfoList, initialRequest);
 				
 				String currentDirection = defaultSipApplicationRouterInfo.getOptionalParameters().get(DIRECTION_PARAMETER);
 				String requestDirection = null;
@@ -425,10 +426,19 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	 */
 	public synchronized void configure(Object configuration) {
 		
-		if(!(configuration instanceof Properties)) 
-			throw new IllegalArgumentException("Configuration for DAR must be of type Properties.");
+		if(!(configuration instanceof Properties) && !(configuration.toString() instanceof String)) 
+			throw new IllegalArgumentException("Configuration for DAR must be of type Properties or String; " + configuration.getClass().getName() + " was received");
 		
-		Properties properties = (Properties) configuration;
+		Properties properties = new Properties();
+		if(configuration instanceof String) {
+			try {
+				properties.load(new StringReader((String)configuration));
+			} catch (IOException e) {
+				throw new IllegalArgumentException(e);
+			}
+		} else if(configuration instanceof Properties) {
+			properties = (Properties) configuration;
+		}
 		try {
 			defaultSipApplicationRouterInfos = 
 				this.defaultApplicationRouterParser.parse(properties);
@@ -475,6 +485,13 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	 */
 	public synchronized Object getCurrentConfiguration() {
 		return defaultApplicationRouterParser.getProperties();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.router.ManageableApplicationRouter#getCurrentConfiguration()
+	 */
+	public synchronized Map<String, List<? extends SipApplicationRouterInfo>> getConfiguration() {
+		return defaultSipApplicationRouterInfos;
 	}
 
 }

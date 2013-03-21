@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.servlet.sip.ar.SipRouteModifier;
 
@@ -37,21 +38,16 @@ import javax.servlet.sip.ar.SipRouteModifier;
  * @author Jean Deruelle
  *
  */
-public class DefaultSipApplicationRouterInfo {
-	private String applicationName;
-	private String subscriberIdentity;
-	private SipApplicationRoutingRegion routingRegion;
-	private String[] routes;
-	private SipRouteModifier routeModifier;
+public class DefaultSipApplicationRouterInfo extends SipApplicationRouterInfo {
+//	private String applicationName;
+//	private SipApplicationRoutingRegion routingRegion;
+//	private String subscriberIdentity;	
+//	private String[] routes;
+//	private SipRouteModifier routeModifier;
 	private int order;
 	private Map<String, String> optionalParameters;
 			
-	/**
-	 * 
-	 */
-	public DefaultSipApplicationRouterInfo() {
-		super();
-	}
+	
 	/**
 	 * @param applicationName
 	 * @param subscriberIdentity
@@ -64,12 +60,12 @@ public class DefaultSipApplicationRouterInfo {
 			String subscriberIdentity,
 			SipApplicationRoutingRegion routingRegion, String[] routes,
 			SipRouteModifier routeModifier, int order, String optionalParameters) {
-		super();
-		this.applicationName = applicationName;
-		this.subscriberIdentity = subscriberIdentity;
-		this.routingRegion = routingRegion;
-		this.routes = routes;
-		this.routeModifier = routeModifier;
+		super(applicationName, routingRegion, subscriberIdentity, routes, routeModifier, null);
+//		this.applicationName = applicationName;
+//		this.subscriberIdentity = subscriberIdentity;
+//		this.routingRegion = routingRegion;
+//		this.routes = routes;
+//		this.routeModifier = routeModifier;
 		this.order = order;
 		try {
 			this.optionalParameters = stringToMap(optionalParameters);
@@ -112,62 +108,17 @@ public class DefaultSipApplicationRouterInfo {
 	 * @return the applicationName
 	 */
 	public String getApplicationName() {
-		return applicationName;
+		return getNextApplicationName();
 	}
-	/**
-	 * @param applicationName the applicationName to set
-	 */
-	public void setApplicationName(String applicationName) {
-		this.applicationName = applicationName;
-	}
+	
 	/**
 	 * @return the subscriberIdentity
 	 */
 	public String getSubscriberIdentity() {
-		return subscriberIdentity;
+		return getSubscriberURI();
 	}
-	/**
-	 * @param subscriberIdentity the subscriberIdentity to set
-	 */
-	public void setSubscriberIdentity(String subscriberIdentity) {
-		this.subscriberIdentity = subscriberIdentity;
-	}
-	/**
-	 * @return the routingRegionType
-	 */
-	public SipApplicationRoutingRegion getRoutingRegion() {
-		return routingRegion;
-	}
-	/**
-	 * @param routingRegionType the routingRegionType to set
-	 */
-	public void setRoutingRegionType(SipApplicationRoutingRegion routingRegion) {
-		this.routingRegion = routingRegion;
-	}
-	/**
-	 * @return the route
-	 */
-	public String[] getRoutes() {
-		return routes;
-	}
-	/**
-	 * @param route the route to set
-	 */
-	public void setRoutes(String[] routes) {
-		this.routes = routes;
-	}
-	/**
-	 * @return the routeModifier
-	 */
-	public SipRouteModifier getRouteModifier() {
-		return routeModifier;
-	}
-	/**
-	 * @param routeModifier the routeModifier to set
-	 */
-	public void setRouteModifier(SipRouteModifier routeModifier) {
-		this.routeModifier = routeModifier;
-	}
+	
+	
 	/**
 	 * @return the order
 	 */
