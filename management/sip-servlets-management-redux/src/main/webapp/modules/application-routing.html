@@ -1,40 +1,10 @@
 					<h3 style="margin: 0px;"><i class="icon-copy"></i> Application Routing</h3>
 					<hr style="margin: 10 0px;"/>
 				<button id="apply-server-settings" class="btn btn-small" onclick="saveDarConfiguration()"><i style="color: #000000;"></i> Apply Changes</button> 
-				<script type="text/javascript">
-					var applications;
-					
-					$(document).ready(function () {												
-						mbeanSearch="*:type=SipApplicationDispatcher";
-						var mbean;
-						$.ajax({
-							dataType: "json",
-							url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
-						})
-						.done(function(html) {
-							if (html.error) {
-								logToConsole("ERROR", html.error);
-							}
-							else {			
-								mbean = html.value[0];
-								var j4p = new Jolokia({url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
-								j4p.execute(mbean, "findInstalledSipApplications", {
-					                 success: function(value) {
-					                     applications=value;
-					                 }        
-					            });
-								
-							}
-						})
-						.fail(function() {
-							logToConsole("ERROR", "Failure trying to communicate with the SIP Servlets Server. Please try again later.");
-						})
-	    			});
-				</script>
 				<p>
 					<span id="mss-settings">
 					<ul class="nav nav-tabs" id="myTab">
-  						<li class="active"><a href="#application-all" data-toggle="tab">All</a></li>
+  						<li class="active"><a href="#application-all" data-toggle="tab">ALL</a></li>
   						<li><a href="#application-register" data-toggle="tab">REGISTER</a></li>
 						<li><a href="#application-invite" data-toggle="tab">INVITE</a></li>
 						<li><a href="#application-options" data-toggle="tab">OPTIONS</a></li>
@@ -77,33 +47,130 @@
 					</span>
 					
 				</p>	
-				<script type="text/javascript">										
-	    			function addApplication(type) {		    				
+				<script type="text/javascript">		
+					var applications;
+				
+					function addApplication(type) {
+						addApplication(type, null, null, null, null, null, null);
+					}
+					
+	    			function addApplication(type, applicationName, subscriberIdentity, routingRegion, routeModifier, routes, order) {		    				
 						var id = $("#application-"+ type).children().length; //think about it ;
 				        var tabContent = '<div id="'+type+'-application-content-'+ id +'" class="span3">'
-		        		+ '<label>SIP Application Name : </label><select id="sipApplicationName" style="float: left; height: 28px;">';
+		        		+ '<label>SIP Application Name : </label><select id="'+type+'-application-content-'+ id +'-sipApplicationName" style="float: left; height: 28px;">';
+		        		var subscriberURI = "";
+		        		if(subscriberIdentity != null) {
+		        			subscriberURI = subscriberIdentity; 
+		        		}
+		        		var route = "";
+		        		if(routes != null) {
+		        			route = routes; 
+		        		}
+		        		var appOrder = "";
+		        		if(order != null) {
+		        			appOrder = order; 
+		        		}
 		        		for (var i = 0; i < applications.length; i++) {
-		        			tabContent = tabContent + '<option value="'+ applications[i] +'">'+ applications[i] +'</option>';
+		        			if(applicationName != null && applications[i] == applicationName) {
+		        				tabContent = tabContent + '<option value="'+ applications[i] +'" selected>'+ applications[i] +'</option>';
+		        			} else {
+		        				tabContent = tabContent + '<option value="'+ applications[i] +'">'+ applications[i] +'</option>';
+		        			}
 	    				}
 	    				tabContent = tabContent + '</select> </br></br>'
-	    				+ '<label>Susbcriber Identity : </label><input id="subscriberIdentity" type="text" style="float: left; height: 28px;"class="input-large" placeholder="DAR: From"></input> </br></br>'
-						+ '<label>Routing Region : </label><select id="routingRegion" style="float: left; height: 28px;"class="input-large"><option value="ORIGINATING">Originating</option><option value="NEUTRAL">Neutral</option><option value="TERMINATING">Terminating</option> </select> </br></br>'
-						+ '<label>Route Modifiers : </label><select id="routeModifiers" style="float: left; height: 28px;"class="input-large"><option value="NO_ROUTE">No Route</option><option value="ROUTE">Route</option><option value="CLEAR_ROUTE">Clear Route</option> </select> </br></br>'
-						+ '<label>Route : </label><input id="route" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Route"></input> </br></br>'
-						+ '<label>Order : </label><input id="order" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Order"></input> </br></br>'
-						+ '<button id="remove-application-'+ id +'" class="btn btn-small" onclick="removeApplication(\''+type+'\', ' + id + ')">Remove Application</button> </br></br></div>';				        
+	    				+ '<label>Susbcriber Identity : </label><input id="'+type+'-application-content-'+ id +'-subscriberIdentity" type="text" style="float: left; height: 28px;"class="input-large" placeholder="DAR: From" value="' + subscriberURI + '"></input> </br></br>'
+						+ '<label>Routing Region : </label><select id="'+type+'-application-content-'+ id +'-routingRegion" style="float: left; height: 28px;"class="input-large">';	
+						if(routingRegion != null && routingRegion == "ORIGINATING") {
+							tabContent = tabContent + '<option value="ORIGINATING" selected>Originating</option>';
+						} else {
+							tabContent = tabContent + '<option value="ORIGINATING">Originating</option>';
+						}
+						if(routingRegion != null && routingRegion == "NEUTRAL") {
+							tabContent = tabContent + '<option value="NEUTRAL" selected>Neutral</option>';
+						} else {
+							tabContent = tabContent + '<option value="NEUTRAL">Neutral</option>';
+						}
+						if(routingRegion != null && routingRegion == "TERMINATING") {
+							tabContent = tabContent + '<option value="TERMINATING" selected>Terminating</option>';
+						} else {
+							tabContent = tabContent + '<option value="TERMINATING">Terminating</option>';
+						}
+						tabContent = tabContent + '</select> </br></br>'
+						+ '<label>Route Modifiers : </label><select id="'+type+'-application-content-'+ id +'-routeModifiers" style="float: left; height: 28px;"class="input-large">';
+						if(routeModifier != null && routeModifier == "NO_ROUTE") {
+							tabContent = tabContent + '<option value="NO_ROUTE">No Route</option>';
+						} else {
+							tabContent = tabContent + '<option value="NO_ROUTE">No Route</option>';
+						}
+						if(routeModifier != null && routeModifier == "ROUTE") {
+							tabContent = tabContent + '<option value="ROUTE">Route</option>';
+						} else {
+							tabContent = tabContent + '<option value="ROUTE">Route</option>';
+						}
+						if(routeModifier != null && routeModifier == "CLEAR_ROUTE") {
+							tabContent = tabContent + '<option value="CLEAR_ROUTE">Clear Route</option>';
+						} else {
+							tabContent = tabContent + '<option value="CLEAR_ROUTE">Clear Route</option>';
+						}						
+						tabContent = tabContent + '</select> </br></br>'
+						+ '<label>Route : </label><input id="'+type+'-application-content-'+ id +'-route" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Route" value="' + route + '"></input> </br></br>'
+						+ '<label>Order : </label><input id="'+type+'-application-content-'+ id +'-order" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Order" value="' + appOrder + '"></input> </br></br>'
+						+ '<button id="'+type+'-application-content-'+ id +'-remove-application-'+ id +'" class="btn btn-small" onclick="removeApplication(\''+type+'\', ' + id + ')">Remove Application</button> </br></br></div>';				        
 						$(".add-"+ type).closest('button').after(tabContent); 
 				    }
 					
 				    function removeApplication(type, id) {			
 				    	var application = "#" + type + "-application-content-"+ id;
-				    	logToConsole("INFO", application);
+				    	//logToConsole("INFO", application);
 						$(application).remove();
 						//reindex the applications 
 				    }
 				    
+				    function getDarMethodInformation(tabMethod, methodLowserCase, method) {
+				    	var darMethodConfiguration = "";				    	
+				    	if(tabMethod.length > 1) {
+				    		darMethodConfiguration = method + "=";
+					    	for (var i = 1; i < tabMethod.length; i++) {
+					    		sipApplicationName = $("#" + methodLowserCase + "-application-content-"+ i +"-sipApplicationName").val();
+					    		subscriberIdentity = $("#" + methodLowserCase + "-application-content-"+ i +"-subscriberIdentity").val();
+					    		routingRegion = $("#" + methodLowserCase + "-application-content-"+ i +"-routingRegion").val();
+					    		routeModifiers = $("#" + methodLowserCase + "-application-content-"+ i +"-routeModifiers").val();
+					    		route = $("#" + methodLowserCase + "-application-content-"+ i +"-route").val();
+					    		order = $("#" + methodLowserCase + "-application-content-"+ i +"-order").val();
+					    		var darApplication = "(";
+					    		darApplication = darApplication + "\"" + sipApplicationName + "\",";	
+					    		darApplication = darApplication + "\"" + subscriberIdentity + "\",";
+					    		darApplication = darApplication + "\"" + routingRegion + "\",";
+					    		darApplication = darApplication + "\"" + route + "\",";
+					    		darApplication = darApplication + "\"" + routeModifiers + "\",";					    		
+					    		darApplication = darApplication + "\"" + order + "\"";
+					    		darApplication = darApplication + ")"
+					    		darMethodConfiguration = darMethodConfiguration + darApplication;
+					    		if(i+1 < tabMethod.length) {
+					    			darMethodConfiguration = darMethodConfiguration + ",";
+					    		}
+					    	}
+					    	darMethodConfiguration = darMethodConfiguration + "\n";
+				    	}
+				    	return darMethodConfiguration;
+				    }
+				    
+				    function getDarConfiguration() {
+				    	var darConfiguration = "";
+				    	darConfiguration = darConfiguration + getDarMethodInformation($("#application-all").children(), "all", "ALL");
+				    	darConfiguration = darConfiguration + getDarMethodInformation($("#application-register").children(), "register", "REGISTER");
+				    	darConfiguration = darConfiguration + getDarMethodInformation($("#application-invite").children(), "invite", "INVITE");
+				    	darConfiguration = darConfiguration + getDarMethodInformation($("#application-options").children(), "options", "OPTIONS");
+				    	darConfiguration = darConfiguration + getDarMethodInformation($("#application-message").children(), "message", "MESSAGE");
+				    	darConfiguration = darConfiguration + getDarMethodInformation($("#application-subscribe").children(), "subscribe", "SUBSCRIBE");
+				    	darConfiguration = darConfiguration + getDarMethodInformation($("#application-notify").children(), "notify", "NOTIFY");
+				    	darConfiguration = darConfiguration + getDarMethodInformation($("#application-publish").children(), "publish", "PUBLISH");
+				    	darConfiguration = darConfiguration + getDarMethodInformation($("#application-refer").children(), "refer", "REFER");
+				    	//console.log(darConfiguration);
+				    	return darConfiguration;
+				    }
 	    			
-					function applyServerSettings() {
+					function saveDarConfiguration() {
 						mbeanSearch="*:type=SipApplicationDispatcher";
 						var mbean;
 						$.ajax({
@@ -117,12 +184,34 @@
 							else {			
 								mbean = html.value[0];
 								var j4p = new Jolokia({url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
-															
+								j4p.execute(mbean, "updateApplicationRouterConfiguration(java.lang.String)", getDarConfiguration(), {
+									success: function(value) {					                	 					                	
+										logToConsole("INFO", "DAR Information successfully updated");
+						            }, 
+									error: function(value) {					                	 					                	
+										logToConsole("ERROR", "Problem updating the DAR Information:" + JSON.stringify(value)); 
+						            } 
+								});								
 							}
 						})
 						.fail(function() {
 							logToConsole("ERROR", "Failure trying to communicate with the SIP Servlets Server. Please try again later.");
 						})						
+					}
+					
+					function addMethodApplicationFromDar(method, methodString) {
+						for (var i = 0; i < method.length; i++) {
+	                    	 methodDARInformation = method[i];
+	                    	 //console.log(methodDARInformation);
+	                    	 addApplication(
+	                    			 methodString, 
+	                    			 methodDARInformation.applicationName, 
+	                    			 methodDARInformation.subscriberIdentity, 
+	                    			 methodDARInformation.routingRegion.type, 
+	                    			 methodDARInformation.routeModifier, 
+	                    			 methodDARInformation.routes, 
+	                    			 methodDARInformation.order);
+	                     }
 					}
 					
 					$(document).ready(function () {												
@@ -139,9 +228,50 @@
 							else {			
 								mbean = html.value[0];
 								var j4p = new Jolokia({url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
-								j4p.execute(mbean, "retrieveApplicationRouterConfiguration", {
+								j4p.execute(mbean, "findInstalledSipApplications", {
 					                 success: function(value) {
-					                     console.log(value);
+					                     applications=value;					                     
+					                 }        
+					            });
+								j4p.getAttribute(mbean, "ApplicationRouterConfiguration", {
+					                 success: function(value) {					                	 					                	
+					                     darInformation = value;
+					                     if(darInformation.ALL != null) {
+						                     method = darInformation.ALL;					                     
+						                     addMethodApplicationFromDar(method, "all");
+					                     }
+					                     if(darInformation.REGISTER != null) {
+						                     method = darInformation.REGISTER;					                     
+						                     addMethodApplicationFromDar(method, "register");
+					                     }
+					                     if(darInformation.INVITE != null) {
+						                     method = darInformation.INVITE;					                     
+						                     addMethodApplicationFromDar(method, "invite");
+					                     }
+					                     if(darInformation.OPTIONS != null) {
+						                     method = darInformation.OPTIONS;					                     
+						                     addMethodApplicationFromDar(method, "options");
+					                     }
+					                     if(darInformation.MESSAGE != null) {
+						                     method = darInformation.MESSAGE;					                     
+						                     addMethodApplicationFromDar(method, "message");
+					                     }
+					                     if(darInformation.SUBSCRIBE != null) {
+						                     method = darInformation.SUBSCRIBE;					                     
+						                     addMethodApplicationFromDar(method, "subscribe");
+					                     }
+					                     if(darInformation.NOTIFY != null) {
+						                     method = darInformation.NOTIFY;					                     
+						                     addMethodApplicationFromDar(method, "notify");
+					                     }
+					                     if(darInformation.PUBLISH != null) {
+						                     method = darInformation.PUBLISH;					                     
+						                     addMethodApplicationFromDar(method, "publish");
+					                     }
+					                     if(darInformation.REFER != null) {
+						                     method = darInformation.REFER;					                     
+						                     addMethodApplicationFromDar(method, "refer");
+					                     }
 					                 }        
 					            });
 								
