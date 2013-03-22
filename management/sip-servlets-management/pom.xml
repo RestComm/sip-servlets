@@ -16,7 +16,7 @@
 	<name>sip-servlets-management</name>
 
 	<build>
-		<finalName>sip-servlets-management-redux</finalName>
+		<finalName>sip-servlets-management</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
