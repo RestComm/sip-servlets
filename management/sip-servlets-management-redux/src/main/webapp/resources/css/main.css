@@ -6,8 +6,7 @@ body {
 	margin: 0px;
 	padding: 0px;
 }
-.header {
-	background: url('../images/top-background.png');
+.header {	
 	width: 960px;
 }
 .left-menu {

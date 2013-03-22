@@ -106,6 +106,7 @@
 								j4p.setAttribute(mbean, "CongestionControlCheckingInterval",$("#congestionControlCheckingInterval").val(),{method: "post"});
 								j4p.setAttribute(mbean, "MemoryThreshold",$("#memoryThreshold").val(),{method: "post"});
 								j4p.setAttribute(mbean, "BackToNormalMemoryThreshold",$("#backToNormalMemoryThreshold").val(),{method: "post"});								
+								logToConsole("INFO", "SIP Servlets Settings successfully updated.");
 							}
 						})
 						.fail(function() {

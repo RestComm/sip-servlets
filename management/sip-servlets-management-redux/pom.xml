@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.mobicents</groupId>
-	<artifactId>slee-management</artifactId>
+	<artifactId>sip-servlets-management-redux</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 
 	<packaging>war</packaging>

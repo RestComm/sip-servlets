@@ -115,15 +115,41 @@
 						tabContent = tabContent + '</select> </br></br>'
 						+ '<label>Route : </label><input id="'+type+'-application-content-'+ id +'-route" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Route" value="' + route + '"></input> </br></br>'
 						+ '<label>Order : </label><input id="'+type+'-application-content-'+ id +'-order" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Order" value="' + appOrder + '"></input> </br></br>'
-						+ '<button id="'+type+'-application-content-'+ id +'-remove-application-'+ id +'" class="btn btn-small" onclick="removeApplication(\''+type+'\', ' + id + ')">Remove Application</button> </br></br></div>';				        
+						+ '<button id="'+type+'-application-content-remove-application-'+ id +'" class="btn btn-small">Remove Application</button> </br></br></div>';				        
 						$(".add-"+ type).closest('button').after(tabContent); 
+						//console.log("adding removeApplication("+type+", "+ id+")");
+						$("#" + type + "-application-content-remove-application-" + id).attr("onclick","removeApplication(\'"+type+"\',"+ id+")");
 				    }
 					
-				    function removeApplication(type, id) {			
-				    	var application = "#" + type + "-application-content-"+ id;
+				    function removeApplication(method, id) {			
+				    	var application = "#" + method + "-application-content-"+ id;
+				    	originalNumberOfApplications = $("#application-" + method).children().length;
+				    	//console.log(id);
 				    	//logToConsole("INFO", application);
 						$(application).remove();
-						//reindex the applications 
+						//reindex the applications						
+				    	if(originalNumberOfApplications > 2) {				
+				    		var newIndex = 0;
+					    	for (var i = 1; i < originalNumberOfApplications; i++) {					    		
+					    		if(i != id) {
+					    			newIndex++;
+					    			console.log("reindexing " + i + " with " + newIndex);					    			
+					    			$("#" + method + "-application-content-"+ i).attr('id', method + "-application-content-"+ newIndex);
+						    		$("#" + method + "-application-content-"+ i +"-sipApplicationName").attr('id',method + "-application-content-"+ newIndex +"-sipApplicationName");
+						    		$("#" + method + "-application-content-"+ i +"-subscriberIdentity").attr('id',method + "-application-content-"+ newIndex +"-subscriberIdentity");
+						    		$("#" + method + "-application-content-"+ i +"-routingRegion").attr('id',method + "-application-content-"+ newIndex +"-routingRegion");
+						    		$("#" + method + "-application-content-"+ i +"-routeModifiers").attr('id',method + "-application-content-"+ newIndex +"-routeModifiers");
+						    		$("#" + method + "-application-content-"+ i +"-route").attr('id',method + "-application-content-"+ newIndex +"-route");
+						    		$("#" + method + "-application-content-"+ i +"-order").attr('id',method + "-application-content-"+ newIndex +"-order");
+						    		//console.log("removing removeApplication("+method+", "+ i+")");
+						    		$("#" + method + "-application-content-remove-application-" + i).removeAttr("onclick");						    								    	
+						    		$("#" + method + "-application-content-remove-application-" + i).attr('id', method + "-application-content-remove-application-" + newIndex);
+						    		$("#" + method + "-application-content-remove-application-" + newIndex).removeAttr("click");						    	
+						    		$("#" + method + "-application-content-remove-application-" + newIndex).attr("onclick","removeApplication(\'"+method+"\',"+ newIndex+")");
+						    		//console.log("adding removeApplication("+method+", "+ newIndex+")");
+					    		}
+					    	}
+				    	}
 				    }
 				    
 				    function getDarMethodInformation(tabMethod, methodLowserCase, method) {

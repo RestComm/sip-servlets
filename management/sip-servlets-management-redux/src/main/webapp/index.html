@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.no-icons.min.css" rel="stylesheet">
+		<link href="resources/css/bootstrap-combined.no-icons.min-2.3.1.css" rel="stylesheet">
 		<style type="text/css">
 		body {
 			padding-top: 60px;
@@ -19,20 +19,23 @@
 			}
 		}
 		</style>
-		<link href="http://netdna.bootstrapcdn.com/font-awesome/3.0.2/css/font-awesome.css" rel="stylesheet">
+		<link href="resources/css/font-awesome-3.0.2.min.css" rel="stylesheet">
 		<link href="resources/css/main.css" rel="stylesheet" />
-		<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.1/jquery-ui.min.js"></script>
-		<script src="http://code.highcharts.com/highcharts.js"></script>
-		<script src="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/js/bootstrap.min.js"></script>
-		<script src="http://www.jolokia.org/dist/1.1.0/js/jolokia.js"></script>
-		<script src="http://www.jolokia.org/dist/1.1.0/js/jolokia-simple.js"></script>
+		<script src="resources/js/jquery-1.9.1.min.js"></script>
+		<script src="resources/js/jquery-ui-1.10.1.min.js"></script>
+		<script src="resources/js/highcharts-3.0.0.js"></script>
+		<script src="resources/js/bootstrap-2.3.1.min.js"></script>
+		<script src="resources/js/jolokia-min.js"></script>
+		<script src="resources/js/jolokia-simple-min.js"></script>
 		<script src="resources/js/servercontrol.js"></script>
 		<title>Mobicents Management Console</title>
 	</head>
 	<body>
 		<div class="header">
-			<img src="resources/images/header.png" />
+			<div class="container">
+				<img src="resources/images/logo.png" />				
+				<img src="resources/images/header.png" />
+			</div>
 		</div>
 		<div class="container-fluid">
 			<div class="row-fluid">
@@ -43,8 +46,8 @@
 							<li class="active"><a href="#" onclick="setMenu(this, 'server-control')"><i class="icon-hdd" style="font-size: 1.2em;"></i> Server Control</a></li>
 							<li><a href="#" onclick="setMenu(this, 'application-routing')"><i class="icon-copy" style="font-size: 1.2em;"></i> Application Routing</a></li>
 							<li><a href="#" onclick="setMenu(this, 'server-settings')"><i class="icon-th-large" style="font-size: 1.2em;"></i> Server Settings</a></li>
-							<li class="nav-header">Monitoring</li>
-							<li><a href="#" onclick="setMenu(this, 'metrics')"><i class="icon-dashboard" style="font-size: 1.2em;"></i> Metrics</a></li>
+							<!--li class="nav-header">Monitoring</li>
+							<li><a href="#" onclick="setMenu(this, 'metrics')"><i class="icon-dashboard" style="font-size: 1.2em;"></i> Metrics</a></li-->
 						</ul>
 					</div><!--/.well -->
 				</div><!--/span-->
