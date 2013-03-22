@@ -2032,6 +2032,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			logger.info("Congestion Control policy set to " + this.congestionControlPolicy.toString());
 		}
 	}	
+	
+	/**
+	 * @return the congestionControlPolicy
+	 */
+	public String getCongestionControlPolicyByName() {
+		return congestionControlPolicy.toString();
+	}
 
 	/**
 	 * @return the congestionControlPolicy

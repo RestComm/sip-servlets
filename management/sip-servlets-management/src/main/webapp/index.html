@@ -72,7 +72,7 @@
 							$("[data-toggle='tooltip']").tooltip();
 						});
 						window.jolokiaAddress = '127.0.0.1';
-						window.jolokiaPort = '8180';
+						window.jolokiaPort = '8080';
 						jolokia = new Jolokia({url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia"});
 						if(!window.jolokiaAddress || ! window.jolokiaPort) {
 							// ask for it...

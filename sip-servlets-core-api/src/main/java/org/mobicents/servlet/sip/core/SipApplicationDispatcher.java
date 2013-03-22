@@ -27,6 +27,7 @@ import gov.nist.javax.sip.SipListenerExt;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
@@ -174,6 +175,7 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 		
 	CongestionControlPolicy getCongestionControlPolicy();
 	void setCongestionControlPolicy(CongestionControlPolicy congestionControlPolicy);
+	String getCongestionControlPolicyByName();
 	void setCongestionControlPolicyByName(String congestionControlPolicy);
 	
 	int getNumberOfMessagesInQueue();
