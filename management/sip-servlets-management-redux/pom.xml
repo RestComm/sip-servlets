@@ -1,13 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
+	<parent>
+		<groupId>org.mobicents.servlet.sip</groupId>
+		<artifactId>sip-servlets-bootstrap</artifactId>
+		<version>6.1.3-TelScale-SNAPSHOT</version>
+		<relativePath>../../pom.xml</relativePath>
+	</parent>
+
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.mobicents</groupId>
-	<artifactId>sip-servlets-management-redux</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
-
+	<groupId>org.mobicents.servlet.sip.management</groupId>
+	<artifactId>sip-servlets-management</artifactId>	
 	<packaging>war</packaging>
+	<name>sip-servlets-management</name>
 
 	<build>
 		<finalName>sip-servlets-management-redux</finalName>
