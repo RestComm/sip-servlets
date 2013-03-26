@@ -35,7 +35,11 @@ import org.mobicents.metadata.sip.spec.IdentityAssertionMetaData;
 public class IdentityAssertionParser extends MetaDataElementParser {
 
     public static IdentityAssertionMetaData parse(XMLStreamReader reader) throws XMLStreamException {
+<<<<<<< HEAD
         IdentityAssertionMetaData idAssertionConfig = new IdentityAssertionMetaData();
+=======
+    	IdentityAssertionMetaData idAssertionConfig = new IdentityAssertionMetaData();
+>>>>>>> 567e843... Initial commit for Issue 203: 	Upgrade to jboss-as-7.2.0.Final
 
         // Handle attributes
         final int count = reader.getAttributeCount();
@@ -47,7 +51,11 @@ public class IdentityAssertionParser extends MetaDataElementParser {
             final Attribute attribute = Attribute.forName(reader.getAttributeLocalName(i));
             switch (attribute) {
                 case ID: {
+<<<<<<< HEAD
                     idAssertionConfig.setId(value);
+=======
+                	idAssertionConfig.setId(value);
+>>>>>>> 567e843... Initial commit for Issue 203: 	Upgrade to jboss-as-7.2.0.Final
                     break;
                 }
                 default:
@@ -60,11 +68,19 @@ public class IdentityAssertionParser extends MetaDataElementParser {
             final Element element = Element.forName(reader.getLocalName());
             switch (element) {
                 case IDENTITY_ASSERTION_SCHEME:
+<<<<<<< HEAD
                     idAssertionConfig.setIdentityAssertionScheme(getElementText(reader));
                     break;
                 case IDENTITY_ASSERTION_SUPPORT:
                     idAssertionConfig.setIdentityAssertionSupport(getElementText(reader));
                     break;
+=======
+                	idAssertionConfig.setIdentityAssertionScheme(getElementText(reader));
+                    break;
+                case IDENTITY_ASSERTION_SUPPORT:
+                	idAssertionConfig.setIdentityAssertionSupport(getElementText(reader));
+                	break;
+>>>>>>> 567e843... Initial commit for Issue 203: 	Upgrade to jboss-as-7.2.0.Final
                 default:
                     throw unexpectedElement(reader);
             }

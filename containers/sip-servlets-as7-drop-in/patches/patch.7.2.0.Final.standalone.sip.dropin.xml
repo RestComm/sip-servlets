@@ -1,0 +1,55 @@
+--- standalone/configuration/standalone-sip.xml	2013-03-14 11:56:48.000000000 +0100
++++ standalone/configuration/standalone-sip.xml	2013-03-14 13:10:14.017295558 +0100
+@@ -24,6 +24,7 @@
+         <extension module="org.jboss.as.web"/>
+         <extension module="org.jboss.as.webservices"/>
+         <extension module="org.jboss.as.weld"/>
++        <extension module="org.mobicents.as7"/>
+     </extensions>
+     <management>
+         <security-realms>
+@@ -242,6 +243,20 @@
+                         <policy-module code="Delegating" flag="required"/>
+                     </authorization>
+                 </security-domain>
++		<security-domain name="sip-servlets">
++			<authentication> 
++				<login-module code="UsersRoles" flag="required"> 
++				    <module-option name="usersProperties" value="${jboss.server.config.dir}/sip-servlets-users.properties"/> 
++				    <module-option name="rolesProperties" value="${jboss.server.config.dir}/sip-servlets-roles.properties"/> 
++				    <module-option name="hashAlgorithm" value="MD5"/>
++				<module-option name="hashEncoding" value="RFC2617"/>
++				<module-option name="hashUserPassword" value="false"/>
++			   	<module-option name="hashStorePassword" value="true"/>
++				<module-option name="passwordIsA1Hash" value="true"/>
++				<module-option name="storeDigestCallback" value="org.jboss.security.auth.callback.RFC2617Digest"/>
++				</login-module> 
++			</authentication> 
++		</security-domain>
+             </security-domains>
+         </subsystem>
+         <subsystem xmlns="urn:jboss:domain:threads:1.1"/>
+@@ -273,6 +288,12 @@
+             <client-config name="Standard-Client-Config"/>
+         </subsystem>
+         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
++        <subsystem xmlns="urn:org.mobicents:sip-servlets-as7:1.0" application-router="configuration/dars/mobicents-dar.properties" stack-properties="configuration/mss-sip-stack.properties" path-name="org.mobicents.ext" app-dispatcher-class="org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl" concurrency-control-mode="SipApplicationSession" congestion-control-interval="-1">
++            <connector name="sip-udp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-udp"/>
++            <connector name="sip-tcp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tcp"/>
++            <connector name="sip-tls" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tls"/>
++            <connector name="sip-ws" protocol="SIP/2.0" scheme="sip" socket-binding="sip-ws"/>
++        </subsystem>
+     </profile>
+     <interfaces>
+         <interface name="management">
+@@ -297,6 +318,10 @@
+         <socket-binding name="ajp" port="8009"/>
+         <socket-binding name="http" port="8080"/>
+         <socket-binding name="https" port="8443"/>
++        <socket-binding name="sip-udp" port="5080"/>
++        <socket-binding name="sip-tcp" port="5080"/>
++        <socket-binding name="sip-tls" port="5081"/>
++        <socket-binding name="sip-ws" port="5082"/>
+         <socket-binding name="remoting" port="4447"/>
+         <socket-binding name="txn-recovery-environment" port="4712"/>
+         <socket-binding name="txn-status-manager" port="4713"/>
