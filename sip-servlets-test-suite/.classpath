@@ -68,11 +68,11 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/mobicents-jain-sip-ext"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-core-api"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-catalina-7"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/tomcat-7"/>
 	<classpathentry kind="var" path="M2_REPO/org/cafesip/sipunit/sipunit/2.0.0/sipunit-2.0.0.jar" sourcepath="M2_REPO/org/cafesip/sipunit/sipunit/2.0.0/sipunit-2.0.0-sources.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/home/jean/.m2/repository/org/cafesip/sipunit/sipunit/2.0.0/sipunit-2.0.0-javadoc.jar!/"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-tomcat-7"/>
 	<classpathentry kind="output" path="testsuite/target/test-classes"/>
 </classpath>
