@@ -48,7 +48,7 @@
 						var mbean;
 						$.ajax({
 							dataType: "json",
-							url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
+							url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
 						})
 						.done(function(html) {
 							if (html.error) {
@@ -56,7 +56,7 @@
 							}
 							else {			
 								mbean = html.value[0];
-								var j4p = new Jolokia({url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
+								var j4p = new Jolokia({url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
 								var baseTimerInterval = j4p.getAttribute(mbean, "BaseTimerInterval",{method: "post"});
 								var t2Interval = j4p.getAttribute(mbean, "T2Interval",{method: "post"});
 								var t4Interval = j4p.getAttribute(mbean, "T4Interval",{method: "post"});
@@ -88,7 +88,7 @@
 						var mbean;
 						$.ajax({
 							dataType: "json",
-							url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
+							url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
 						})
 						.done(function(html) {
 							if (html.error) {
@@ -96,7 +96,7 @@
 							}
 							else {			
 								mbean = html.value[0];
-								var j4p = new Jolokia({url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
+								var j4p = new Jolokia({url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
 								j4p.setAttribute(mbean, "BaseTimerInterval",$("#sipBaseTimer").val(),{method: "post"});
 								j4p.setAttribute(mbean, "T2Interval",$("#sipTimerT2").val(),{method: "post"});
 								j4p.setAttribute(mbean, "T4Interval",$("#sipTimerT4").val(),{method: "post"});

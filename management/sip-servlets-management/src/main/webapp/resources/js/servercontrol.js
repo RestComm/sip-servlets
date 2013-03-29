@@ -27,12 +27,16 @@ function setMenu(element, module) {
 	});
 }
 
+function showConnectionOptions() {
+	$("#connection-options").toggle();
+}
+
 function changeServerState(method) {
 	mbeanSearch="*:type=SipApplicationDispatcher";
 	var mbean;
 	$.ajax({
 		dataType: "json",
-		url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
+		url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
 	})
 	.done(function(html) {
 		if (html.error) {
@@ -43,7 +47,7 @@ function changeServerState(method) {
 			timeToWait = $("#time-to-wait").val();
 			$.ajax({
 				dataType: "json",
-				url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/exec/" + jolokia.escape(mbean) + "/"  + method + "/" + timeToWait
+				url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/exec/" + jolokia.escape(mbean) + "/"  + method + "/" + timeToWait
 			})
 			.done(function(html) {
 				if (html.error) {
@@ -254,7 +258,7 @@ function cancelDeployableUnitInstall() {
 //	}
 //	$.ajax({
 //		dataType: "json",
-//		url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/exec/" + jolokia.escape(mbean) + "/"  + method + "/" +  $("#du-filename-path").val().replace(/\//g,'!/')
+//		url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/exec/" + jolokia.escape(mbean) + "/"  + method + "/" +  $("#du-filename-path").val().replace(/\//g,'!/')
 //	})
 //	.done(function(html) {
 //		if (html.error) {
@@ -291,7 +295,7 @@ function cancelDeployableUnitInstall() {
 //	// });
 //	$.ajax({
 //		dataType: "json",
-//		url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/exec/" + jolokia.escape(mbean) + "/"  + method + "/" +  url.replace(/\//g,'!/')
+//		url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/exec/" + jolokia.escape(mbean) + "/"  + method + "/" +  url.replace(/\//g,'!/')
 //	})
 //	.done(function(html) {
 //		if (html.error) {

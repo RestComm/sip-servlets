@@ -18,12 +18,17 @@
 				padding-right: 5px;
 			}
 		}
+		
+		.required{
+		    border:1px solid rgba(196, 39, 39, 0.3) !important;
+		    -webkit-box-shadow: 0px 0px 5px 2px rgba(196, 39, 39, 0.3) !important;
+		    box-shadow: 0px 0px 5px 2px rgba(196, 39, 39, 0.3) !important;
+		}
 		</style>
 		<link href="resources/css/font-awesome-3.0.2.min.css" rel="stylesheet">
 		<link href="resources/css/main.css" rel="stylesheet" />
 		<script src="resources/js/jquery-1.9.1.min.js"></script>
-		<script src="resources/js/jquery-ui-1.10.1.min.js"></script>
-		<script src="resources/js/highcharts-3.0.0.js"></script>
+		<script src="resources/js/jquery-ui-1.10.1.min.js"></script>		
 		<script src="resources/js/bootstrap-2.3.1.min.js"></script>
 		<script src="resources/js/jolokia-min.js"></script>
 		<script src="resources/js/jolokia-simple-min.js"></script>
@@ -31,15 +36,53 @@
 		<title>Mobicents Management Console</title>
 	</head>
 	<body>
-		<div class="header">
-			<div class="container">
-				<img src="resources/images/logo.png" />				
-				<img src="resources/images/header.png" />
+		<div class="navbar navbar-inverse navbar-fixed-top">
+			<div class="navbar-inner">
+				<div class="container-fluid">
+					<button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+					<span class="brand" style="vertical-align: bottom;"><img src="resources/images/telestax_logo_dark1.png" /> SIP SERVLETS MANAGEMENT CONSOLE</span>
+					<!--div class="nav-collapse collapse">
+						<p class="navbar-text pull-right" style="font-size: 1.3em;">
+							<span style="margin-top: 15px; vertical-align: sub;">
+								<i class="icon-user"></i> &nbsp; <a href="#" class="navbar-link">Administrator</a>
+							</span>
+							 &nbsp; <a href="#" class="btn btn-danger btn-small"><i class="icon-off"></i> Sign Out</a>
+						</p>
+					</div--><!--/.nav-collapse -->
+				</div>
 			</div>
 		</div>
-		<div class="container-fluid">
+		<div class="container-fluid" style="padding-top: 60px;">
 			<div class="row-fluid">
 				<div class="span3">
+					<div class="well sidebar-nav">
+						<ul class="nav nav-list">
+							<li class="nav-header"><i class="icon-desktop"></i> Connected to: <span id="connected-to" style="color: #777777; font-size: 12px;"></span> &nbsp; <span><button class="btn btn-small" style="width: 26px;"  onclick="showConnectionOptions();"><i id="conn-options-icon"class="icon-caret-down" style="margin-left: -5px;" data-toggle="tooltip" data-placement="right" title="Show Connection Options"></i></button></span></li>
+							<span id="connection-options" style="display: none;">
+								<hr style="margin: 10px 0;"/>
+								<li class="nav-header"><i class="icon-plus-sign"></i>New Connection</li>
+								<li>
+									<input class="span7" id="host" type="text" placeholder="IP Address">
+									<input class="span3" id="port" type="text" placeholder="Port">
+									<button id="protocol" type="button" onclick="changeProtocol()" style="vertical-align: baseline; height: 28px;" class="btn btn-small btn-danger" data-toggle="button" ><i id="protocolIcon" class="icon-unlock" style="font-size: 22px; width: 12px;" data-toggle="tooltip" data-placement="right" title="Secure Connection (HTTPS)"></i></button>
+									<!--input class="span6" id="user" type="text" placeholder="Username" />
+									<input class="span6	" id="pass" type="password" placeholder="Password" /-->
+									<button class="btn btn-primary" type="button" onclick="connect()">Connect</button>
+								</li>
+								<!--hr style="margin: 20px 0 10px 0;"/>
+								<li class="nav-header"><i class="icon-time"></i>Recent Connections</li>
+								<li><a href="#"><span style="padding-left: 20px;">192.168.1.123:8080</span></a></li>
+								<li><a href="#"><span style="padding-left: 20px;">127.0.0.2:8080</span></a></li>
+								<li><a href="#"><span style="padding-left: 20px;">84.143.32.234:8080</span></a></li>
+								<li><a href="#"><span style="padding-left: 20px;">101.102.103.104:80</span></a></li>
+								<li><a href="#"><span style="padding-left: 20px;">1.2.3.4:8080</span></a></li-->
+							</span>
+						</ul>
+					</div>
 					<div class="well sidebar-nav">
 						<ul class="nav nav-list">
 							<li class="nav-header">Management</li>
@@ -71,18 +114,35 @@
 						$(function () {
 							$("[data-toggle='tooltip']").tooltip();
 						});
-						window.jolokiaAddress = '127.0.0.1';
-						window.jolokiaPort = '8080';
-						jolokia = new Jolokia({url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia"});
-						if(!window.jolokiaAddress || ! window.jolokiaPort) {
-							// ask for it...
-						}
-						else {
-							$('#content').load('modules/application-routing.html');
-						}
+						$("#host").val(window.location.hostname);
+						$("#port").val(window.location.port);
+						window.jolokiaProtocol = "http://";
+						if(window.location.protocol == "https:") {
+							changeProtocol();
+						}						
+						window.jolokiaAddress = window.location.hostname;
+						window.jolokiaPort = window.location.port;
+						jolokia = new Jolokia({url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia"});						
+						$('#content').load('modules/application-routing.html');						
 						$("#btn-min-console").click();
-						logToConsole('INFO', 'Mobicents SIP Servlets Management Console ready!');
+						logToConsole('INFO', 'Mobicents SIP Servlets Management Console ready ! Connected to : ' +  window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort);					
 	    			});
+					
+					function changeProtocol() {
+						if($('#protocolIcon').hasClass('icon-unlock')) {
+							window.jolokiaProtocol = "https://";
+							$('#protocol').removeClass();$('#protocol').addClass('btn btn-small btn-success');
+							$('#protocolIcon').removeClass();$('#protocolIcon').addClass('icon-lock');													
+						} else {
+							window.jolokiaProtocol = "http://";
+							$('#protocol').removeClass();$('#protocol').addClass('btn btn-small btn-danger');
+							$('#protocolIcon').removeClass();$('#protocolIcon').addClass('icon-unlock');							
+						}						
+					}
+					
+					function connect() {												
+						logToConsole('INFO', 'Connected to : ' +  window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort);
+					}
 					</script>
 				</div>
 			</div>

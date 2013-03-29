@@ -13,6 +13,11 @@
 				  <i class="icon-info-sign" style="color: #000000;"></i> Click on Each Tab to individually configure the applications to be called for each SIP Message received by the container
 				</div>
 				
+				<div class="alert alert-error" id="login-error" style="display:none;">
+				  <button type="button" class="close">&times;</button>
+				  Please verify that "Subscriber Identity" and "Order" fields are correctly filled out or each application !
+				</div>
+				
 				<p>
 					<span id="mss-settings">
 					<ul class="nav nav-tabs" id="myTab">
@@ -190,13 +195,18 @@
 				    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>				    
 				  </div>
 				</div>  	
-				<script type="text/javascript">		
+				<script type="text/javascript">	
+					$('#login-error .close').on("click", function(e) {
+					    $(this).parent().hide();
+					});
+				
 					$('#sourceModal').on('show', function () {
 					  content = "<pre>" + getDarConfiguration() + "</pre>";
 					  $("#sourceModalBody").html(content);
 					})
 					
 					var applications;
+					var formInvalid;
 				
 					function addApplication(type) {
 						addApplication(type, null, null, null, null, null, null);
@@ -315,6 +325,18 @@
 					    		routeModifiers = $("#" + methodLowserCase + "-application-content-"+ i +"-routeModifiers").val();
 					    		route = $("#" + methodLowserCase + "-application-content-"+ i +"-route").val();
 					    		order = $("#" + methodLowserCase + "-application-content-"+ i +"-order").val();
+					    		if(subscriberIdentity.trim() == "") {
+					    			$("#" + methodLowserCase + "-application-content-"+ i +"-subscriberIdentity").addClass("required");					    			
+					    			formInvalid = true;
+					    		} else if($("#" + methodLowserCase + "-application-content-"+ i +"-subscriberIdentity").hasClass("required")) {
+					    			$("#" + methodLowserCase + "-application-content-"+ i +"-subscriberIdentity").removeClass("required");		
+					    		}
+								if(order.trim() == "") {
+									$("#" + methodLowserCase + "-application-content-"+ i +"-order").addClass("required");									
+									formInvalid = true;
+					    		} else if($("#" + methodLowserCase + "-application-content-"+ i +"-order").hasClass("required")) {
+					    			$("#" + methodLowserCase + "-application-content-"+ i +"-order").removeClass("required");		
+					    		}
 					    		var darApplication = "(";
 					    		darApplication = darApplication + "\"" + sipApplicationName + "\",";	
 					    		darApplication = darApplication + "\"" + subscriberIdentity + "\",";
@@ -349,11 +371,18 @@
 				    }
 	    			
 					function saveDarConfiguration() {
+						formInvalid = false;
+						darConfiguration = getDarConfiguration();
+						if(formInvalid) {
+							$("#login-error").show();
+							logToConsole("ERROR", "Please verify that \"Subscriber Identity\" and \"Order\" fields are correctly filled out or each application !");
+							return false;
+						}
 						mbeanSearch="*:type=SipApplicationDispatcher";
 						var mbean;
 						$.ajax({
 							dataType: "json",
-							url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
+							url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
 						})
 						.done(function(html) {
 							if (html.error) {
@@ -361,8 +390,8 @@
 							}
 							else {			
 								mbean = html.value[0];
-								var j4p = new Jolokia({url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
-								j4p.execute(mbean, "updateApplicationRouterConfiguration(java.lang.Object)", getDarConfiguration(), {
+								var j4p = new Jolokia({url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
+								j4p.execute(mbean, "updateApplicationRouterConfiguration(java.lang.Object)", darConfiguration, {
 									success: function(value) {					                	 					                	
 										logToConsole("INFO", "DAR Information successfully updated");
 						            }, 
@@ -397,7 +426,7 @@
 						var mbean;
 						$.ajax({
 							dataType: "json",
-							url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
+							url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/search/" + mbeanSearch
 						})
 						.done(function(html) {
 							if (html.error) {
@@ -405,7 +434,7 @@
 							}
 							else {			
 								mbean = html.value[0];
-								var j4p = new Jolokia({url: "http://" + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
+								var j4p = new Jolokia({url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
 								j4p.execute(mbean, "findInstalledSipApplications", {
 					                 success: function(value) {
 					                     applications=value;					                     
