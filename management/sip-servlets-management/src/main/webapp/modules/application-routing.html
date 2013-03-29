@@ -1,6 +1,18 @@
 					<h3 style="margin: 0px;"><i class="icon-copy"></i> Application Routing</h3>
 					<hr style="margin: 10 0px;"/>
-				<button id="apply-server-settings" class="btn btn-small" onclick="saveDarConfiguration()"><i style="color: #000000;"></i> Apply Changes</button> 
+				<a href="#helpModal" role="button" class="btn btn-small" data-toggle="modal"><i class="icon-question-sign" style="color: #000000;"></i> Help</a> &nbsp;
+				<a href="#sourceModal" role="button" class="btn btn-small" data-toggle="modal"><i class="icon-edit" style="color: #000000;"></i> Application Routing Source</a> &nbsp;
+				<button id="apply-server-settings" class="btn btn-small" onclick="saveDarConfiguration()"><i class="icon-save" style="color: #000000;"></i>  Apply Changes</button>
+				
+				<p>
+					<br/>
+				</p> 
+				
+				<div class="alert alert-info">
+				  <button type="button" class="close" data-dismiss="alert">&times;</button>
+				  <i class="icon-info-sign" style="color: #000000;"></i> Click on Each Tab to individually configure the applications to be called for each SIP Message received by the container
+				</div>
+				
 				<p>
 					<span id="mss-settings">
 					<ul class="nav nav-tabs" id="myTab">
@@ -17,37 +29,173 @@
 						
   				 	<div class="tab-content">
 						<div class="tab-pane active" id="application-all">
-							<button class="btn btn-small" onclick="addApplication('all')"><a href="#" class="add-all" data-toggle="tab">Add Application</a></button>							
+							<button class="btn btn-small" onclick="addApplication('all')"><a href="#" class="add-all" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>							
 					  	</div>
 					  	<div class="tab-pane" id="application-register">
-					  		<button class="btn btn-small" onclick="addApplication('register')"><a href="#" class="add-register" data-toggle="tab">Add Application</a></button>
+					  		<button class="btn btn-small" onclick="addApplication('register')"><a href="#" class="add-register" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>
 					  </div>
 					  <div class="tab-pane" id="application-invite">
-					  		<button class="btn btn-small" onclick="addApplication('invite')"><a href="#" class="add-invite" data-toggle="tab">Add Application</a></button>
+					  		<button class="btn btn-small" onclick="addApplication('invite')"><a href="#" class="add-invite" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>
 					  </div>
 					  <div class="tab-pane" id="application-options">
-							<button class="btn btn-small" onclick="addApplication('options')"><a href="#" class="add-options" data-toggle="tab">Add Application</a></button>
+							<button class="btn btn-small" onclick="addApplication('options')"><a href="#" class="add-options" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>
 					  </div>					  
 					  <div class="tab-pane" id="application-message">
-							<button class="btn btn-small" onclick="addApplication('message')"><a href="#" class="add-message" data-toggle="tab">Add Application</a></button>			  
+							<button class="btn btn-small" onclick="addApplication('message')"><a href="#" class="add-message" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>			  
 					  </div>
 					  <div class="tab-pane" id="application-subscribe">
-							<button class="btn btn-small" onclick="addApplication('subscribe')"><a href="#" class="add-subscribe" data-toggle="tab">Add Application</a></button>				  
+							<button class="btn btn-small" onclick="addApplication('subscribe')"><a href="#" class="add-subscribe" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>				  
 					  </div>
 					  <div class="tab-pane" id="application-notify">
-							<button class="btn btn-small" onclick="addApplication('notify')"><a href="#" class="add-notify" data-toggle="tab">Add Application</a></button>											  
+							<button class="btn btn-small" onclick="addApplication('notify')"><a href="#" class="add-notify" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>											  
 					  </div>
 					  <div class="tab-pane" id="application-publish">
-							<button class="btn btn-small" onclick="addApplication('publish')"><a href="#" class="add-publish" data-toggle="tab">Add Application</a></button>				  
+							<button class="btn btn-small" onclick="addApplication('publish')"><a href="#" class="add-publish" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>				  
 					  </div>
 					  <div class="tab-pane" id="application-refer">
-							<button class="btn btn-small" onclick="addApplication('refer')"><a href="#" class="add-refer" data-toggle="tab">Add Application</a></button>
+							<button class="btn btn-small" onclick="addApplication('refer')"><a href="#" class="add-refer" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>
 					  </div>
 					</div>	
 					</span>
 					
-				</p>	
+				</p>
+				<!-- Help Modal -->
+				<div id="helpModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="helpModalLabel" aria-hidden="true">
+				  <div class="modal-header">
+				    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+				    <h3 id="helpModalLabel">Application Routing Editor Help</h3>
+				  </div>
+				  <div class="modal-body">
+				    <span style="font-family:helvetica,ariel,sans-serif;">
+						<h1>The User Interface</h1>
+						<p>
+						Under each SIP Method Tab you can add the applications in a chain to be called when a particular message for this method is received. 
+						The applications will be called in the order you specify through the <b>Order</b> value.</p>						
+						<br><hr>
+						<h1>Default Application Router</h1>						
+						
+						<p>As an application router component is essential for the functioning of
+						the container the following application router logic SHOULD be available
+						with every container compliant with this specification. The container
+						implementations MAY chose to provide a much richer application router
+						component. For the purpose of this discussion the application router
+						defined in this appendix is termed as Default Application Router (DAR).
+						</p>
+						
+						<p>The Application Router and the Container have a simple contract defined
+						by the <code>SipApplicationRouter</code> interface. <br>
+						
+						The DAR MUST implement all the methods of that interface as described in
+						this document.
+						
+						
+						
+						</p><p><b>The DAR Configuration File</b><br>
+						The DAR works off a simple configuration text file which is modeled as a
+						Java properties file:
+						
+						</p><ul>
+						<li>The properties file MUST be made available to the DAR and the
+						location/content of this file MUST be accessible from a hierarchical URI
+						which itself is to be supplied as a system property "javax.servlet.sip.dar.configuration"
+						 </li>
+						<li>The propeties file has a simple format in which the name of the
+						property is the SIP method and the value is a simple comma separated
+						stringified value for the SipRouterInfo object.
+						<pre style="white-space: pre-wrap">INVITE: (sip-router-info-1), (sip-router-info-2)..        REGISTER:  (sip-router-info-3), (sip-router-info-4)..</pre>
+						</li>
+						<li> The properties file is first read by the DAR when the
+						<code>init()</code> is first called on the DAR. The arguments passed in the
+						
+						<code>init()</code> are ignored. </li>
+						<li> The properties file is refreshed each time
+						<code>applicationDeployed()</code> or <code>applicationUndeployed()</code>
+						is called. Similar to <code>init()</code>, the argument of these two invocations are ignored, these callbacks act just as a trigger to read the file afresh.
+						</li>
+						</ul>
+						<p></p>
+						
+						<p> The sip-router-info data that goes in the properties file is a
+						stringified version of the SipRouterInfo object. It consists of the
+						following information :
+						</p><ul>
+						<li>The name of the application as known to the container</li>
+						<li>The identity of the subscriber that the DAR returns. It can return any
+						header in the SIP request using the DAR directive DAR:<i>SIP_HEADER</i> e.g
+						"DAR:From" would return the sip uri in From header. Or alternatively it can
+						return any string.</li>
+						<li>The routing region, one of the strings "ORIGINATING", "TERMINATING" or
+						"NEUTRAL"</li>
+						<li>A SIP URI indicating the route as returned by the application route, it
+						can be an empty string. </li>
+						<li>A route modifier which can be any one of the strings "ROUTE",
+						"NO_ROUTE", or "CLEAR_ROUTE" </li>
+						<li>A string representing stateInfo. As stateInfo is for application
+						router's internal use only, what goes in this is up to the individual DAR
+						implementations. As a hint the stateInfo could contain the index into the
+						list of sip-router-info that was returned last. </li>
+						
+						</ul>
+						
+						<p></p>
+						<p> Following is an example of the DAR configuration file:
+						</p>
+						<pre>INVITE: ("OriginatingCallWaiting", "DAR:From", "ORIGINATING", "","NO_ROUTE", "0"), ("CallForwarding", "DAR:To", "TERMINATING", "","NO_ROUTE", "1")</pre>
+						In this example, the DAR is setup to invoke two applications on INVITE
+						request, one each in the originating and the terminating half. The
+						applications are identified by their names as defined in the application
+						deployment descriptors and used here. The subscriber identity returned in
+						this case is the URI from the From and To header respectively for the two
+						applications. The DAR does not return any route to the container and
+						maintains the invocation state in the stateInfo as the index of the last
+						application in the list. 
+						
+						<p><b>The DAR Operation</b><br>
+						
+						
+						The key interaction point between the Container and the Application Router
+						is the method
+						</p><pre>SipApplicationRouterInfo getNextApplication(SipServletRequest initialRequest, SipApplicationRoutingRegion region, SipApplicationRoutingDirective directive, java.lang.String stateInfo);</pre>
+						
+						This method is invoked when an initial request is received by the
+						container. When this method is invoked on DAR it will make use of the
+						stateInfo and the initialRequest parameters and find out what SIP method is
+						in the request. Next it will create the object <code>
+						
+						SipApplicationRouterInfo</code> from the sip-router-info information in the
+						properties file, starting from the first in the list. The stateInfo could
+						contain the index of the last sip-router-info returned so on next
+						invocation of getNextApplication the DAR proceeds to the next sip-router-
+						info in the list. The order of declaration of sip-router-info becomes
+						the priority order of invocation.
+						
+						<p> As you would notice, this is a minimalist application router with no processing logic besides the declaration of the application order. It is expected that in real world deployments, the application router shall play an extremely important role in application orchestration and composition. It is likely to make use of complex rules and diverse data repositories. The DAR is intended to be a very simple implementation that is available as part of the reference implementation, and could be used instead of a real world application router.
+						</p>
+						</span>
+				  </div>
+				  <div class="modal-footer">
+				    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>				    
+				  </div>
+				</div>
+				
+				<!-- Source Modal -->
+				<div id="sourceModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="sourceModalLabel" aria-hidden="true">
+				  <div class="modal-header">
+				    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+				    <h3 id="sourceModalLabel">Default Application Router Source</h3>
+				  </div>
+				  <div id="sourceModalBody" class="modal-body">						
+				  </div>
+				  <div class="modal-footer">
+				    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>				    
+				  </div>
+				</div>  	
 				<script type="text/javascript">		
+					$('#sourceModal').on('show', function () {
+					  content = "<pre>" + getDarConfiguration() + "</pre>";
+					  $("#sourceModalBody").html(content);
+					})
+					
 					var applications;
 				
 					function addApplication(type) {
@@ -66,7 +214,7 @@
 		        		if(routes != null) {
 		        			route = routes; 
 		        		}
-		        		var appOrder = "";
+		        		var appOrder = id-1;
 		        		if(order != null) {
 		        			appOrder = order; 
 		        		}
@@ -77,9 +225,13 @@
 		        				tabContent = tabContent + '<option value="'+ applications[i] +'">'+ applications[i] +'</option>';
 		        			}
 	    				}
-	    				tabContent = tabContent + '</select> </br></br>'
-	    				+ '<label>Susbcriber Identity : </label><input id="'+type+'-application-content-'+ id +'-subscriberIdentity" type="text" style="float: left; height: 28px;"class="input-large" placeholder="DAR: From" value="' + subscriberURI + '"></input> </br></br>'
-						+ '<label>Routing Region : </label><select id="'+type+'-application-content-'+ id +'-routingRegion" style="float: left; height: 28px;"class="input-large">';	
+	    				tabContent = tabContent + '</select> </br></br>';
+	    				if(subscriberIdentity != null) {
+	    					tabContent = tabContent + '<label>Susbcriber Identity : </label><input id="'+type+'-application-content-'+ id +'-subscriberIdentity" type="text" style="float: left; height: 28px;"class="input-large" placeholder="DAR:From" value="' + subscriberURI + '"></input> </br></br>';
+	    				} else {
+	    					tabContent = tabContent + '<label>Susbcriber Identity : </label><input id="'+type+'-application-content-'+ id +'-subscriberIdentity" type="text" style="float: left; height: 28px;"class="input-large" placeholder="DAR:From" value="DAR:From"></input> </br></br>'
+	    				}
+	    				tabContent = tabContent + '<label>Routing Region : </label><select id="'+type+'-application-content-'+ id +'-routingRegion" style="float: left; height: 28px;"class="input-large">';	
 						if(routingRegion != null && routingRegion == "ORIGINATING") {
 							tabContent = tabContent + '<option value="ORIGINATING" selected>Originating</option>';
 						} else {
@@ -113,9 +265,9 @@
 							tabContent = tabContent + '<option value="CLEAR_ROUTE">Clear Route</option>';
 						}						
 						tabContent = tabContent + '</select> </br></br>'
-						+ '<label>Route : </label><input id="'+type+'-application-content-'+ id +'-route" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Route" value="' + route + '"></input> </br></br>'
-						+ '<label>Order : </label><input id="'+type+'-application-content-'+ id +'-order" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Order" value="' + appOrder + '"></input> </br></br>'
-						+ '<button id="'+type+'-application-content-remove-application-'+ id +'" class="btn btn-small">Remove Application</button> </br></br></div>';				        
+						+ '<label>Route : </label><input id="'+type+'-application-content-'+ id +'-route" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Route" value="' + route + '"></input> </br></br>';
+						tabContent = tabContent + '<label>Order : </label><input id="'+type+'-application-content-'+ id +'-order" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Order" value="' + appOrder + '"></input> </br></br>';						
+						tabContent = tabContent + '<button id="'+type+'-application-content-remove-application-'+ id +'" class="btn btn-small"><i class="icon-remove" style="color: #000000;"></i> Remove Application</button> </br></br></div>';				        
 						$(".add-"+ type).closest('button').after(tabContent); 
 						//console.log("adding removeApplication("+type+", "+ id+")");
 						$("#" + type + "-application-content-remove-application-" + id).attr("onclick","removeApplication(\'"+type+"\',"+ id+")");
@@ -262,41 +414,78 @@
 								j4p.getAttribute(mbean, "ApplicationRouterConfiguration", {
 					                 success: function(value) {					                	 					                	
 					                     darInformation = value;
+					                     active = true;
 					                     if(darInformation.ALL != null) {
 						                     method = darInformation.ALL;					                     
 						                     addMethodApplicationFromDar(method, "all");
+						                     if(active) {
+						                    	 $('#myTab a[href="#application-all"]').tab('show');
+						                    	 active = false;
+						                     }
 					                     }
 					                     if(darInformation.REGISTER != null) {
 						                     method = darInformation.REGISTER;					                     
 						                     addMethodApplicationFromDar(method, "register");
+						                     if(active) {
+						                    	 $('#myTab a[href="#application-register"]').tab('show');
+						                    	 active = false;
+						                     }
 					                     }
 					                     if(darInformation.INVITE != null) {
 						                     method = darInformation.INVITE;					                     
 						                     addMethodApplicationFromDar(method, "invite");
+						                     if(active) {
+						                    	 $('#myTab a[href="#application-invite"]').tab('show');
+						                    	 active = false;
+						                     }
 					                     }
 					                     if(darInformation.OPTIONS != null) {
 						                     method = darInformation.OPTIONS;					                     
 						                     addMethodApplicationFromDar(method, "options");
+						                     if(active) {
+						                    	 $('#myTab a[href="#application-options"]').tab('show');
+						                    	 active = false;
+						                     }
 					                     }
 					                     if(darInformation.MESSAGE != null) {
 						                     method = darInformation.MESSAGE;					                     
 						                     addMethodApplicationFromDar(method, "message");
+						                     if(active) {
+						                    	 $('#myTab a[href="#application-message"]').tab('show');
+						                    	 active = false;
+						                     }
 					                     }
 					                     if(darInformation.SUBSCRIBE != null) {
 						                     method = darInformation.SUBSCRIBE;					                     
 						                     addMethodApplicationFromDar(method, "subscribe");
+						                     if(active) {
+						                    	 $('#myTab a[href="#application-subscribe"]').tab('show');
+						                    	 active = false;
+						                     }
 					                     }
 					                     if(darInformation.NOTIFY != null) {
 						                     method = darInformation.NOTIFY;					                     
 						                     addMethodApplicationFromDar(method, "notify");
+						                     if(active) {
+						                    	 $('#myTab a[href="#application-notify"]').tab('show');
+						                    	 active = false;
+						                     }
 					                     }
 					                     if(darInformation.PUBLISH != null) {
 						                     method = darInformation.PUBLISH;					                     
 						                     addMethodApplicationFromDar(method, "publish");
+						                     if(active) {
+						                    	 $('#myTab a[href="#application-publish"]').tab('show');
+						                    	 active = false;
+						                     }
 					                     }
 					                     if(darInformation.REFER != null) {
 						                     method = darInformation.REFER;					                     
 						                     addMethodApplicationFromDar(method, "refer");
+						                     if(active) {
+						                    	 $('#myTab a[href="#application-refer"]').tab('show');
+						                    	 active = false;
+						                     }
 					                     }
 					                 }        
 					            });
