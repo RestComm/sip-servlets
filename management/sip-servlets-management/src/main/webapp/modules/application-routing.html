@@ -13,9 +13,9 @@
 				  <i class="icon-info-sign" style="color: #000000;"></i> Click on Each Tab to individually configure the applications to be called for each SIP Message received by the container
 				</div>
 				
-				<div class="alert alert-error" id="login-error" style="display:none;">
+				<div class="alert alert-error" id="login-ar-error" style="display:none;">
 				  <button type="button" class="close">&times;</button>
-				  Please verify that "Subscriber Identity" and "Order" fields are correctly filled out or each application !
+				  Please verify that "Subscriber Identity" and "Order" fields are correctly filled out for each application !
 				</div>
 				
 				<p>
@@ -196,7 +196,7 @@
 				  </div>
 				</div>  	
 				<script type="text/javascript">	
-					$('#login-error .close').on("click", function(e) {
+					$('#login-ar-error .close').on("click", function(e) {
 					    $(this).parent().hide();
 					});
 				
@@ -374,8 +374,8 @@
 						formInvalid = false;
 						darConfiguration = getDarConfiguration();
 						if(formInvalid) {
-							$("#login-error").show();
-							logToConsole("ERROR", "Please verify that \"Subscriber Identity\" and \"Order\" fields are correctly filled out or each application !");
+							$("#login-ar-error").show();
+							logToConsole("ERROR", "Please verify that \"Subscriber Identity\" and \"Order\" fields are correctly filled out for each application !");
 							return false;
 						}
 						mbeanSearch="*:type=SipApplicationDispatcher";

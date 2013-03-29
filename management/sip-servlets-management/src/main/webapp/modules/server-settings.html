@@ -1,6 +1,17 @@
 					<h3 style="margin: 0px;"><i class="icon-dashboard"></i> SIP Servlets Server Settings</h3>
 					<hr style="margin: 10 0px;"/>
 
+					<button id="apply-server-settings" class="btn btn-small" onclick="applyServerSettings()"><i class="icon-save" style="color: #000000;"></i>  Apply Changes</button>
+					
+					<p>
+						<br/>
+					</p> 
+					
+					<div class="alert alert-error" id="login-settings-error" style="display:none;">
+					  <button type="button" class="close">&times;</button>
+					  Some Fields are not correctly filled out, please double check the settings below !
+					</div>
+					
  					<p>
 					<span id="mss-settings">
 					<ul class="nav nav-tabs" id="myTab">
@@ -39,10 +50,13 @@
 							</select>		</br></br>-->												  
 					  </div>					  
 					</div>	
-					</span>
-					<button id="apply-server-settings" class="btn btn-small" onclick="applyServerSettings()"><i class="icon-save" style="color: #000000;"></i>  Apply Changes</button> 
+					</span>					 
 				</p>	
 				<script type="text/javascript">
+					$('#login-settings-error .close').on("click", function(e) {
+					    $(this).parent().hide();
+					});
+				
 					$(document).ready(function () {												
 						mbeanSearch="*:type=SipApplicationDispatcher";
 						var mbean;
@@ -84,6 +98,63 @@
 	    			});
 					
 					function applyServerSettings() {
+						var formInvalid = false;
+						var baseTimerInterval = $("#sipBaseTimer").val();
+						if(baseTimerInterval.trim() == "") {
+			    			$("#sipBaseTimer").addClass("required");					    			
+			    			formInvalid = true;
+			    		} else if($("#sipBaseTimer").hasClass("required")) {
+			    			$("#sipBaseTimer").removeClass("required");		
+			    		}
+						var t2Interval = $("#sipTimerT2").val();
+						if(t2Interval.trim() == "") {
+			    			$("#sipTimerT2").addClass("required");					    			
+			    			formInvalid = true;
+			    		} else if($("#sipTimerT2").hasClass("required")) {
+			    			$("#sipTimerT2").removeClass("required");		
+			    		}
+						var t4Interval = $("#sipTimerT4").val();
+						if(t4Interval.trim() == "") {
+			    			$("#sipTimerT4").addClass("required");					    			
+			    			formInvalid = true;
+			    		} else if($("#sipTimerT4").hasClass("required")) {
+			    			$("#sipTimerT4").removeClass("required");		
+			    		}
+						var timerDInterval = $("#sipTimerD").val();
+						if(timerDInterval.trim() == "") {
+			    			$("#sipTimerD").addClass("required");					    			
+			    			formInvalid = true;
+			    		} else if($("#sipTimerD").hasClass("required")) {
+			    			$("#sipTimerD").removeClass("required");		
+			    		}										
+						var congestionControlCheckingInterval = $("#congestionControlCheckingInterval").val();
+						if(congestionControlCheckingInterval.trim() == "") {
+			    			$("#congestionControlCheckingInterval").addClass("required");					    			
+			    			formInvalid = true;
+			    		} else if($("#congestionControlCheckingInterval").hasClass("required")) {
+			    			$("#congestionControlCheckingInterval").removeClass("required");		
+			    		}
+						var memoryThreshold = $("#memoryThreshold").val();
+						if(memoryThreshold.trim() == "") {
+			    			$("#memoryThreshold").addClass("required");					    			
+			    			formInvalid = true;
+			    		} else if($("#memoryThreshold").hasClass("required")) {
+			    			$("#memoryThreshold").removeClass("required");		
+			    		}
+						var backToNormalMemoryThreshold = $("#backToNormalMemoryThreshold").val();
+						if(backToNormalMemoryThreshold.trim() == "") {
+			    			$("#backToNormalMemoryThreshold").addClass("required");					    			
+			    			formInvalid = true;
+			    		} else if($("#backToNormalMemoryThreshold").hasClass("required")) {
+			    			$("#backToNormalMemoryThreshold").removeClass("required");		
+			    		}
+						
+						if(formInvalid) {
+							$("#login-settings-error").show();
+							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
+							return false;
+						}
+						
 						mbeanSearch="*:type=SipApplicationDispatcher";
 						var mbean;
 						$.ajax({
@@ -97,15 +168,15 @@
 							else {			
 								mbean = html.value[0];
 								var j4p = new Jolokia({url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
-								j4p.setAttribute(mbean, "BaseTimerInterval",$("#sipBaseTimer").val(),{method: "post"});
-								j4p.setAttribute(mbean, "T2Interval",$("#sipTimerT2").val(),{method: "post"});
-								j4p.setAttribute(mbean, "T4Interval",$("#sipTimerT4").val(),{method: "post"});
-								j4p.setAttribute(mbean, "TimerDInterval",$("#sipTimerD").val(),{method: "post"});								
-								j4p.setAttribute(mbean, "ConcurrencyControlMode",$("#concurrencyControlMode").val(),{method: "post"});
-								j4p.setAttribute(mbean, "CongestionControlPolicyByName",$("#congestionControlPolicy").val(),{method: "post"});
-								j4p.setAttribute(mbean, "CongestionControlCheckingInterval",$("#congestionControlCheckingInterval").val(),{method: "post"});
-								j4p.setAttribute(mbean, "MemoryThreshold",$("#memoryThreshold").val(),{method: "post"});
-								j4p.setAttribute(mbean, "BackToNormalMemoryThreshold",$("#backToNormalMemoryThreshold").val(),{method: "post"});								
+								j4p.setAttribute(mbean, "BaseTimerInterval",baseTimerInterval,{method: "post"});
+								j4p.setAttribute(mbean, "T2Interval",t2Interval,{method: "post"});
+								j4p.setAttribute(mbean, "T4Interval",t4Interval,{method: "post"});
+								j4p.setAttribute(mbean, "TimerDInterval",timerDInterval,{method: "post"});								
+								j4p.setAttribute(mbean, "ConcurrencyControlMode",concurrencyControlMode,{method: "post"});
+								j4p.setAttribute(mbean, "CongestionControlPolicyByName",congestionControlPolicyByName,{method: "post"});
+								j4p.setAttribute(mbean, "CongestionControlCheckingInterval",congestionControlCheckingInterval,{method: "post"});
+								j4p.setAttribute(mbean, "MemoryThreshold",memoryThreshold,{method: "post"});
+								j4p.setAttribute(mbean, "BackToNormalMemoryThreshold",backToNormalMemoryThreshold,{method: "post"});								
 								logToConsole("INFO", "SIP Servlets Settings successfully updated.");
 							}
 						})
