@@ -172,8 +172,8 @@
 								j4p.setAttribute(mbean, "T2Interval",t2Interval,{method: "post"});
 								j4p.setAttribute(mbean, "T4Interval",t4Interval,{method: "post"});
 								j4p.setAttribute(mbean, "TimerDInterval",timerDInterval,{method: "post"});								
-								j4p.setAttribute(mbean, "ConcurrencyControlMode",concurrencyControlMode,{method: "post"});
-								j4p.setAttribute(mbean, "CongestionControlPolicyByName",congestionControlPolicyByName,{method: "post"});
+								j4p.setAttribute(mbean, "ConcurrencyControlMode",$("#concurrencyControlMode").val(),{method: "post"});
+								j4p.setAttribute(mbean, "CongestionControlPolicyByName",$("#congestionControlPolicy").val(),{method: "post"});
 								j4p.setAttribute(mbean, "CongestionControlCheckingInterval",congestionControlCheckingInterval,{method: "post"});
 								j4p.setAttribute(mbean, "MemoryThreshold",memoryThreshold,{method: "post"});
 								j4p.setAttribute(mbean, "BackToNormalMemoryThreshold",backToNormalMemoryThreshold,{method: "post"});								
