@@ -377,6 +377,8 @@
 							$("#login-ar-error").show();
 							logToConsole("ERROR", "Please verify that \"Subscriber Identity\" and \"Order\" fields are correctly filled out for each application !");
 							return false;
+						} else {
+							$("#login-ar-error").hide();
 						}
 						mbeanSearch="*:type=SipApplicationDispatcher";
 						var mbean;

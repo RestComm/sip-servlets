@@ -153,6 +153,8 @@
 							$("#login-settings-error").show();
 							logToConsole("ERROR", "Some Fields are not correctly filled out, please double check the settings !");
 							return false;
+						} else {
+							$("#login-settings-error").hide();
 						}
 						
 						mbeanSearch="*:type=SipApplicationDispatcher";
