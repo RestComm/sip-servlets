@@ -33,32 +33,32 @@
 					</ul>	
 						
   				 	<div class="tab-content">
-						<div class="tab-pane active" id="application-all">
-							<button class="btn btn-small" onclick="addApplication('all')"><a href="#" class="add-all" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>							
+						<div class="tab-pane active" id="application-all">		 													
+							<button id="application-all-add-button" class="btn btn-small" onclick="addApplication('all')"><a href="#" class="add-all" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>							
 					  	</div>
 					  	<div class="tab-pane" id="application-register">
-					  		<button class="btn btn-small" onclick="addApplication('register')"><a href="#" class="add-register" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>
+					  		<button id="application-register-add-button" class="btn btn-small" onclick="addApplication('register')"><a href="#" class="add-register" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>
 					  </div>
 					  <div class="tab-pane" id="application-invite">
-					  		<button class="btn btn-small" onclick="addApplication('invite')"><a href="#" class="add-invite" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>
+					  		<button id="application-invite-add-button" class="btn btn-small" onclick="addApplication('invite')"><a href="#" class="add-invite" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>
 					  </div>
 					  <div class="tab-pane" id="application-options">
-							<button class="btn btn-small" onclick="addApplication('options')"><a href="#" class="add-options" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>
+							<button id="application-options-add-button" class="btn btn-small" onclick="addApplication('options')"><a href="#" class="add-options" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>
 					  </div>					  
 					  <div class="tab-pane" id="application-message">
-							<button class="btn btn-small" onclick="addApplication('message')"><a href="#" class="add-message" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>			  
+							<button id="application-message-add-button" class="btn btn-small" onclick="addApplication('message')"><a href="#" class="add-message" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>			  
 					  </div>
 					  <div class="tab-pane" id="application-subscribe">
-							<button class="btn btn-small" onclick="addApplication('subscribe')"><a href="#" class="add-subscribe" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>				  
+							<button id="application-subscribe-add-button" class="btn btn-small" onclick="addApplication('subscribe')"><a href="#" class="add-subscribe" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>				  
 					  </div>
 					  <div class="tab-pane" id="application-notify">
-							<button class="btn btn-small" onclick="addApplication('notify')"><a href="#" class="add-notify" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>											  
+							<button id="application-notify-add-button" class="btn btn-small" onclick="addApplication('notify')"><a href="#" class="add-notify" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>											  
 					  </div>
 					  <div class="tab-pane" id="application-publish">
-							<button class="btn btn-small" onclick="addApplication('publish')"><a href="#" class="add-publish" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>				  
+							<button id="application-publish-add-button" class="btn btn-small" onclick="addApplication('publish')"><a href="#" class="add-publish" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>				  
 					  </div>
 					  <div class="tab-pane" id="application-refer">
-							<button class="btn btn-small" onclick="addApplication('refer')"><a href="#" class="add-refer" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>
+							<button id="application-refer-add-button" class="btn btn-small" onclick="addApplication('refer')"><a href="#" class="add-refer" data-toggle="tab"><i class="icon-plus" style="color: #000000;"></i> Add Application</a></button>
 					  </div>
 					</div>	
 					</span>
@@ -215,7 +215,7 @@
 	    			function addApplication(type, applicationName, subscriberIdentity, routingRegion, routeModifier, routes, order) {		    				
 						var id = $("#application-"+ type).children().length; //think about it ;
 				        var tabContent = '<div id="'+type+'-application-content-'+ id +'" class="span3">'
-		        		+ '<label>SIP Application Name : </label><select id="'+type+'-application-content-'+ id +'-sipApplicationName" style="float: left; height: 28px;">';
+		        		+ '<div class="control-group">	<label class="control-label">SIP Application Name : </label><div class="controls"><select id="'+type+'-application-content-'+ id +'-sipApplicationName" >';		        		
 		        		var subscriberURI = "";
 		        		if(subscriberIdentity != null) {
 		        			subscriberURI = subscriberIdentity; 
@@ -235,13 +235,13 @@
 		        				tabContent = tabContent + '<option value="'+ applications[i] +'">'+ applications[i] +'</option>';
 		        			}
 	    				}
-	    				tabContent = tabContent + '</select> </br></br>';
+	    				tabContent = tabContent + '</select> </div>';	    				
 	    				if(subscriberIdentity != null) {
-	    					tabContent = tabContent + '<label>Susbcriber Identity : </label><input id="'+type+'-application-content-'+ id +'-subscriberIdentity" type="text" style="float: left; height: 28px;"class="input-large" placeholder="DAR:From" value="' + subscriberURI + '"></input> </br></br>';
+	    					tabContent = tabContent + '</div><div class="control-group">	<label class="control-label">Susbcriber Identity : </label><div class="controls"><input id="'+type+'-application-content-'+ id +'-subscriberIdentity" type="text" class="input-large" placeholder="DAR:From" value="' + subscriberURI + '"></input> </div>';
 	    				} else {
-	    					tabContent = tabContent + '<label>Susbcriber Identity : </label><input id="'+type+'-application-content-'+ id +'-subscriberIdentity" type="text" style="float: left; height: 28px;"class="input-large" placeholder="DAR:From" value="DAR:From"></input> </br></br>'
+	    					tabContent = tabContent + '</div><div class="control-group">	<label class="control-label">Susbcriber Identity : </label><div class="controls"><input id="'+type+'-application-content-'+ id +'-subscriberIdentity" type="text" class="input-large" placeholder="DAR:From" value="DAR:From"></input> </div>'
 	    				}
-	    				tabContent = tabContent + '<label>Routing Region : </label><select id="'+type+'-application-content-'+ id +'-routingRegion" style="float: left; height: 28px;"class="input-large">';	
+	    				tabContent = tabContent + '</div><div class="control-group">	<label class="control-label">Routing Region : </label><div class="controls"><select id="'+type+'-application-content-'+ id +'-routingRegion" class="input-large">';	
 						if(routingRegion != null && routingRegion == "ORIGINATING") {
 							tabContent = tabContent + '<option value="ORIGINATING" selected>Originating</option>';
 						} else {
@@ -257,8 +257,8 @@
 						} else {
 							tabContent = tabContent + '<option value="TERMINATING">Terminating</option>';
 						}
-						tabContent = tabContent + '</select> </br></br>'
-						+ '<label>Route Modifiers : </label><select id="'+type+'-application-content-'+ id +'-routeModifiers" style="float: left; height: 28px;"class="input-large">';
+						tabContent = tabContent + '</select> </div>'
+						+ '</div><div class="control-group">	<label class="control-label">Route Modifiers : </label><div class="controls"><select id="'+type+'-application-content-'+ id +'-routeModifiers" class="input-large">';
 						if(routeModifier != null && routeModifier == "NO_ROUTE") {
 							tabContent = tabContent + '<option value="NO_ROUTE">No Route</option>';
 						} else {
@@ -274,11 +274,13 @@
 						} else {
 							tabContent = tabContent + '<option value="CLEAR_ROUTE">Clear Route</option>';
 						}						
-						tabContent = tabContent + '</select> </br></br>'
-						+ '<label>Route : </label><input id="'+type+'-application-content-'+ id +'-route" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Route" value="' + route + '"></input> </br></br>';
-						tabContent = tabContent + '<label>Order : </label><input id="'+type+'-application-content-'+ id +'-order" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Order" value="' + appOrder + '"></input> </br></br>';						
-						tabContent = tabContent + '<button id="'+type+'-application-content-remove-application-'+ id +'" class="btn btn-small"><i class="icon-remove" style="color: #000000;"></i> Remove Application</button> </br></br></div>';				        
-						$(".add-"+ type).closest('button').after(tabContent); 
+						tabContent = tabContent + '</select> </div>'
+						+ '</div><div class="control-group">	<label class="control-label">Route : </label><div class="controls"><input id="'+type+'-application-content-'+ id +'-route" type="text" class="input-large" placeholder="Route" value="' + route + '"></input> </div>';
+						tabContent = tabContent + '</div><div class="control-group">	<label class="control-label">Order : </label><div class="controls"><input id="'+type+'-application-content-'+ id +'-order" type="text" class="input-large" placeholder="Order" value="' + appOrder + '"></input> </div></div>';						
+						tabContent = tabContent + '<button id="'+type+'-application-content-remove-application-'+ id +'" class="btn btn-small"><i class="icon-remove"></i> Remove Application</button> <br/><br/></div>';					
+						//console.log("tabContent "+ tabContent);
+						//console.log("tabContent "+ $("#application-" + type + "-add-button"));														
+						$("#application-" + type + "-add-button").after(tabContent); 
 						//console.log("adding removeApplication("+type+", "+ id+")");
 						$("#" + type + "-application-content-remove-application-" + id).attr("onclick","removeApplication(\'"+type+"\',"+ id+")");
 				    }

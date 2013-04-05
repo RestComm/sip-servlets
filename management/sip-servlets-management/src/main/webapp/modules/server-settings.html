@@ -12,8 +12,8 @@
 					  Some Fields are not correctly filled out, please double check the settings below !
 					</div>
 					
- 					<p>
-					<span id="mss-settings">
+ 				
+					
 					<ul class="nav nav-tabs" id="myTab">
   						<li class="active"><a href="#congestion" data-toggle="tab">Congestion Control</a></li>
   						<li><a href="#timers" data-toggle="tab">SIP Timers</a></li>
@@ -22,36 +22,53 @@
 						
   				 	<div class="tab-content">
 						<div class="tab-pane active" id="congestion">
-							<label>>Congestion Control Checking Interval : </label><input id="congestionControlCheckingInterval" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Congestion Control Checking Interval"></input></br></br>
-							<label>>Memory Threshold : </label><input id="memoryThreshold" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Memory Threshold"></input> </br></br>
-							<label>>Back To Normal Memory Threshold : </label><input id="backToNormalMemoryThreshold" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Back To Normal Memory Threshold"></input></br></br>
-							<label>>Congestion Control Policy : </label><select id="congestionControlPolicy" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Congestion Control Policy">
-								<option value="DropMessage">DropMessage</option>
-		  						<option value="ErrorResponse">ErrorResponse</option>  					
-							</select> </br></br>
+							<div class="control-group">								
+								<label class="control-label">Congestion Control Checking Interval : </label><div class="controls"><input id="congestionControlCheckingInterval" type="text" class="input-large" placeholder="Congestion Control Checking Interval"></input></div>
+							</div>
+							<div class="control-group">
+								<label class="control-label">Memory Threshold : </label><div class="controls"><input id="memoryThreshold" type="text" class="input-large" placeholder="Memory Threshold"></input></div>
+							</div>
+							<div class="control-group">
+								<label class="control-label">Back To Normal Memory Threshold : </label><div class="controls"><input id="backToNormalMemoryThreshold" type="text" class="input-large" placeholder="Back To Normal Memory Threshold"></input></div>
+							</div>
+							<div class="control-group">
+								<label class="control-label">Congestion Control Policy : </label><div class="controls"><select id="congestionControlPolicy" class="input-large">
+									<option value="DropMessage">DropMessage</option>
+			  						<option value="ErrorResponse">ErrorResponse</option>  					
+								</select></div>
+							</div>
 					  	</div>
-					  <div class="tab-pane" id="timers">
-					  		<label>>SIP Base Timer Interval : </label><input id="sipBaseTimer" type="text" style="float: left; height: 28px;"class="input-large" placeholder="SIP Base Timer Interval"></input> </br></br>
-							<label>>SIP Timer T2 : </label><input id="sipTimerT2" type="text" style="float: left; height: 28px;"class="input-large" placeholder="SIP Timer T2"></input> </br></br>
-							<label>>SIP Timer T4 : </label><input id="sipTimerT4" type="text" style="float: left; height: 28px;"class="input-large" placeholder="SIP Timer T4"></input> </br></br>
-							<label>>SIP Timer Timer D : </label><input id="sipTimerD" type="text" style="float: left; height: 28px;"class="input-large" placeholder="SIP Timer D"></input> </br></br>
-					  </div>
-					  <div class="tab-pane" id="various">
-							<label>>Concurrency Control Mode : </label><select id="concurrencyControlMode" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Concurrency Control">
-								<option value="None">None</option>
-								<option value="SipSession">SipSession</option>
-								<option value="SipApplicationSession">SipApplicationSession</option>  						  						  					
-							</select> </br></br>
-							<!--label>>Logging Mode : </label><select id="loggingMode" type="text" style="float: left; height: 28px;"class="input-large" placeholder="Logging Mode">
+					  	<div class="tab-pane" id="timers">
+					  		<div class="control-group">	
+					  			<label class="control-label">SIP Base Timer Interval : </label><div class="controls"><input id="sipBaseTimer" type="text" class="input-large" placeholder="SIP Base Timer Interval"></input></div>
+					  		</div>
+					  		<div class="control-group">	
+								<label class="control-label">SIP Timer T2 : </label><div class="controls"><input id="sipTimerT2" type="text" class="input-large" placeholder="SIP Timer T2"></input></div>
+							</div>
+							<div class="control-group">	
+								<label class="control-label">SIP Timer T4 : </label><div class="controls"><input id="sipTimerT4" type="text" class="input-large" placeholder="SIP Timer T4"></input></div>
+							</div>
+							<div class="control-group">	
+								<label class="control-label">SIP Timer Timer D : </label><div class="controls"><input id="sipTimerD" type="text" class="input-large" placeholder="SIP Timer D"></input></div>
+							</div>
+					 	</div>
+					  	<div class="tab-pane" id="various">
+					  		<div class="control-group">	
+								<label class="control-label">Concurrency Control Mode : </label><div class="controls"><select id="concurrencyControlMode" class="input-large">
+									<option value="None">None</option>
+									<option value="SipSession">SipSession</option>
+									<option value="SipApplicationSession">SipApplicationSession</option>  						  						  					
+								</select></div>
+							</div>
+							<!--label>Logging Mode : </label><select id="loggingMode" type="text" class="input-large" placeholder="Logging Mode">
 								<option value="trace">trace</option>
 		  						<option value="debug">debug</option>
 		  						<option value="default">default</option>
 		  						<option value="production">production</option>
-							</select>		</br></br>-->												  
-					  </div>					  
-					</div>	
-					</span>					 
-				</p>	
+							</select>		<br/><br/>-->												  
+					  	</div>					  
+					</div>					
+				 
 				<script type="text/javascript">
 					$('#login-settings-error .close').on("click", function(e) {
 					    $(this).parent().hide();
