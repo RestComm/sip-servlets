@@ -1,0 +1,429 @@
+<html>
+    <head>
+        <title>MobicentsWebRTCPhone</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">	
+        <link rel="icon" type="image/png" href="img/telestax-favicon.png">
+        <link href="./css/bootstrap.min.css" rel="stylesheet"> 
+        <link href="./css/bootstrap-responsive.css" rel="stylesheet">
+        <link href="./css/docs.css" rel="stylesheet">
+
+        <script src="./js/jquery-1.7.2.min.js"></script>
+        <script src="./js/jquery-ui-1.8.23.custom.min.js"></script>	
+        <script src="./js/bootstrap.js"></script>
+        <script src="./js/bootstrap.min.js"></script>
+        <script src="./js/jain-sip.js" type="text/javascript"></script> 
+        <script src="./js/WebRtcComm.js" type="text/javascript"></script>  
+        <script src="./js/MobicentsWebRTCPhoneController.js" type="text/javascript" ></script>
+        <script type='text/javascript'>	 
+            mobicentsWebRTCPhoneController=new MobicentsWebRTCPhoneController(this);
+
+            function modal_alert(message) {
+                $("#modal_message").html(message);
+                $('#messageModal').modal(); 
+            }
+
+            function show_desktop_notification(message) {
+                if (window.webkitNotifications && window.webkitNotifications.checkPermission() == 0) {
+                    var thumb = "img/telestax-logo-2012-web-square.png";
+                    var title = "Mobicents HTML5 WebRTC Client";
+                    var popup = window.webkitNotifications.createNotification(thumb, title, message);
+                    //Show the popup
+                    popup.show();
+                    setTimeout(function(){
+            	        popup.cancel();
+                    }, '10000');                
+                }
+            }
+            function enableConnectButton() 
+            {
+                document.getElementById("Register").disabled=false;
+            }
+    
+            function disableConnectButton() 
+            {
+                document.getElementById("Register").disabled=true;
+            }
+
+            function enableDisconnectButton() 
+            {
+                document.getElementById("UnRegister").disabled=false;
+            }
+    
+            function disableDisconnectButton() 
+            {
+                document.getElementById("UnRegister").disabled=true;
+            }
+ 
+            function  enableCallButton() 
+            {
+                document.getElementById("Call").disabled=false;
+            }
+    
+            function disableCallButton() 
+            {
+                document.getElementById("Call").disabled=true;
+            }
+
+            function enableEndCallButton() 
+            {
+                document.getElementById("Bye").disabled=false;
+            }
+    
+            function disableEndCallButton() 
+            {
+                document.getElementById("Bye").disabled=true;
+            }
+
+            function showLocalVideo() 
+            {
+                document.getElementById("localVideoPreview").disabled=true;
+            }
+
+            function hideLocalVideo() 
+            {
+                document.getElementById("localVideoPreview").disabled=true;
+            }
+
+            function showRemoteVideo() 
+            {
+                document.getElementById("remoteVideo").style.visibility = "visible";
+            }
+
+            function hideRemoteVideo()
+            {
+                document.getElementById("remoteVideo").style.visibility = "hidden";
+            }
+
+            function playLocalVideo(localMediaStream) 
+            {
+                if(typeof navigator.webkitGetUserMedia != undefined)
+                {     
+                    document.getElementById("localVideoPreview").src=webkitURL.createObjectURL(localMediaStream);
+                }
+                else if(typeof navigator.mozGetUserMedia != undefined)
+                {
+                    document.getElementById("localVideoPreview").mozSrcObject=localMediaStream;
+                }
+                document.getElementById("localVideoPreview").play();
+            }
+
+
+            function stopLocalVideo() 
+            {
+                document.getElementById("localVideoPreview").pause();
+                if(typeof navigator.webkitGetUserMedia != undefined)
+                {     
+                    document.getElementById("localVideoPreview").src=null;
+                }
+                else if(typeof navigator.mozGetUserMedia != undefined)
+                {
+                    document.getElementById("localVideoPreview").mozSrcObject=null;
+                }
+            }
+
+            function playRemoteVideo(remoteMediaStream) 
+            {
+                if(typeof navigator.webkitGetUserMedia != undefined)
+                {     
+                    document.getElementById("remoteVideo").src=webkitURL.createObjectURL(remoteMediaStream);
+                }
+                else if(typeof navigator.mozGetUserMedia != undefined)
+                {
+                    document.getElementById("remoteVideo").mozSrcObject=remoteMediaStream;
+                }
+                document.getElementById("remoteVideo").play();
+            }
+
+
+            function stopRemoteVideo() 
+            {
+                document.getElementById("remoteVideo").pause();
+                if(typeof navigator.webkitGetUserMedia != undefined)
+                {     
+                    document.getElementById("remoteVideo").src=undefined;
+                }
+                else if(typeof navigator.mozGetUserMedia != undefined)
+                {
+                    document.getElementById("remoteVideo").mozSrcObject=undefined;
+                }
+            }
+
+            function playRinging(remoteMediaStream) 
+            {
+                document.getElementById("ringing").play();
+            }
+
+
+            function stopRinging() 
+            {
+                document.getElementById("ringing").pause();
+            }
+           
+           
+            function setStunServerTextInputValue(value) 
+            {
+                document.getElementById("stunServer").value=value;
+            }
+
+            function setSipOutboundProxyTextInputValue(value) 
+            {
+                document.getElementById("sipOutboundProxy").value=value;
+            }
+
+            function setSipDomainTextInputValue(value) 
+            {
+                document.getElementById("sipDomain").value=value;
+            }
+
+            function setSipDisplayNameTextInputValue(value) 
+            {
+                document.getElementById("sipDisplayName").value=value;
+            }
+
+            function setSipUserNameTextInputValue(value) 
+            {
+                document.getElementById("sipUserName").value=value;
+            }
+
+            function setSipLoginTextInputValue(value) 
+            {
+                document.getElementById("sipLogin").value=value;
+            }
+
+            function setSipPasswordTextInputValue(value) 
+            {
+                document.getElementById("sipPassword").value=value;
+            }
+
+            function setSipContactUriTextInputValue(value) 
+            {
+                document.getElementById("sipContactUri").value=value;
+            }
+           
+
+            function getTextInputValue(elementId) 
+            {
+                var value = document.getElementById(elementId).value;
+                if(value=="undefined") return undefined;
+                else if(value=="") return undefined;
+                else return value
+            }
+            
+            function getStunServerTextInputValue() 
+            {
+                return getTextInputValue("stunServer")
+            }
+
+            function getSipOutboundProxyTextInputValue() 
+            {
+                return getTextInputValue("sipOutboundProxy");
+            }
+            
+            function getSipDomainTextInputValue() 
+            {
+                return getTextInputValue("sipDomain");
+            }
+
+            function getSipDisplayNameTextInputValue() 
+            {
+                return getTextInputValue("sipDisplayName");
+            }
+
+            function getSipUserNameTextInputValue() 
+            {
+                return getTextInputValue("sipUserName"); 
+            }
+
+            function getSipLoginTextInputValue() 
+            {
+                return getTextInputValue("sipLogin");
+            }
+
+            function getSipPasswordTextInputValue() 
+            {
+                return getTextInputValue("sipPassword"); 
+            }
+
+            function getSipContactUriTextInputValue() 
+            {
+                return getTextInputValue("sipContactUri");
+            }  
+            
+            $(function() {
+                $( "#resizable" ).resizable({
+                    maxHeight: 640,
+                    maxWidth: 480,
+                    minHeight: 220,
+                    minWidth: 160
+                });
+            });
+            
+            $(function() {
+                $( "#localVideoPreview" ).draggable({ containment: "#media", scroll: false });
+            });            
+    
+            function toggleFullScreen() {
+            	var videoElement = document.getElementById("remoteVideo");
+                if (!document.mozFullScreen && !videoElement.webkitDisplayingFullscreen) {
+                    /* if (videoElement.mozRequestFullScreen) {
+                        videoElement.mozRequestFullScreen();
+                    } else { */
+                        videoElement.webkitEnterFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+                    /* } */
+                } else {
+                    /* if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else { */
+                    	videoElement.webkitExitFullscreen();
+                    /* } */
+                }
+            }
+        </script>
+    </head>
+    <body onload='mobicentsWebRTCPhoneController.onLoadViewEventHandler();' onunload='mobicentsWebRTCPhoneController.onUnloadViewEventHandler();'>
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-inner">        
+                <div class="container">
+                    <a class="brand" href="#">Mobicents HTML5 WebRTC Client, By </a>
+                    <div class="container">
+                        <img  width="50"  height="50" alt="Orange" src="img/logo-orange.jpg" />
+                        <img alt="TeleStax" src="img/Telestax-logo-print-150dpi.png" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="container-fluid">
+            <div class="row-fluid">
+                <div class="span5">
+                    <div class="form-horizontal well">
+                        <div id="sipAccountSettings" >
+                            <div class="nav-header">Registration</div>
+                            <div class="nav-header">&nbsp;</div>			        
+                            <div class="control-group" id='sipDisplayNameDiv'>
+                                <label class="control-label">
+                                    <a style="color:#555555" href="#" rel="tooltip" title="Name that will be displayed when you contact others" data-placement="top" data-delay: { show: 10, hide: 100 }>Display Name</a>:</label>
+                                <input id="sipDisplayName"  type="text" size="30"> 
+                            </div>
+                            <div class="control-group" id='sipDomainDiv'>
+                                <label class="control-label">
+                                    <a style="color:#555555" href="#" rel="tooltip" title="Domain to be registered under" data-placement="top" data-delay: { show: 10, hide: 100 }>Domain</a>:</label>
+                                <input id="sipDomain"  type="text" size="30"> 
+                            </div>           
+                            <div class="control-group" id='sipUserNameDiv'>
+                                <label class="control-label">
+                                    <a style="color:#555555" href="#" rel="tooltip" title="User Name to be registered under" data-placement="top" data-delay: { show: 10, hide: 100 }>User Name</a>:</label>
+                                <input id="sipUserName"  type="text" size="30"> 
+                            </div>
+                            <div class="accordion" id="accordion1">
+                                <div class="accordion-group">
+                                    <div class="accordion-heading">           
+                                        <a class="accordion-toggle nav-header" data-toggle="collapse" data-parent="#accordion1" href="#security">
+                                            Security
+                                        </a>						 
+                                    </div>
+                                    <div id="security" class="accordion-body collapse">
+                                        <div class="accordion-inner">
+                                            <div class="control-group" id='sipLoginDiv'>
+                                                <label class="control-label">
+                                                    <a style="color:#555555" href="#" rel="tooltip" title="Login to authenticate" data-placement="top" data-delay: { show: 10, hide: 100 }>SIP Login</a>:</label>
+                                                <input id="sipLogin"   type="text" size="30"> 
+                                            </div>
+                                            <div class="control-group" id='sipPasswordDiv'>
+                                                <label class="control-label">
+                                                    <a style="color:#555555" href="#" rel="tooltip" title="Password to authenticate" data-placement="top" data-delay: { show: 10, hide: 100 }>SIP Password</a>:</label>
+                                                <input id="sipPassword"   type="text" size="30"> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-group">
+                                    <div class="accordion-heading">           
+                                        <a class="accordion-toggle nav-header" data-toggle="collapse" data-parent="#accordion1" href="#advancedSettings">
+                                            Advanced Settings
+                                        </a>						 
+                                    </div>
+                                    <div id="advancedSettings" class="accordion-body collapse">
+                                        <div class="accordion-inner">
+                                            <div class="control-group" id='stunServerDiv'>
+                                                <label class="control-label" for="stunServer"><a style="color:#555555" href="#" rel="tooltip" title="Specify the IP Address and Port of a Stun Server" data-placement="top" data-delay: { show: 10, hide: 100 }>STUN server</a>:</label>
+                                                <input id="stunServer"  type="text" size="30"> 
+                                            </div>
+                                            <div class="control-group" id='sipOutboundProxyDiv'>
+                                                <label class="control-label"><a style="color:#555555" href="#" rel="tooltip" title="Specify the IP Address and Port of a WebSocket Server" data-placement="top" data-delay: { show: 10, hide: 100 }>Outbound Proxy</a> :</label>
+                                                <input  id="sipOutboundProxy"  type="text" size="30"> 
+                                            </div>							
+                                        </div>
+                                    </div>					    
+                                </div>
+                            </div>				
+                            <div class="control-group" id ='input'>
+                                <input id='Register' class="btn btn-primary" type='submit' name='Register' disabled="disabled" value='Register'  onclick = "mobicentsWebRTCPhoneController.onClickConnectButtonViewEventHandler();"/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <input id='UnRegister' class="btn btn-primary" type='submit' name='UnRegister' value='UnRegister' disabled="disabled"  onclick = "mobicentsWebRTCPhoneController.onClickDisconnectButtonViewEventHandler();"/>
+                            </div>
+                        </div>
+                    </div><!--/.well -->
+                </div><!--/span-->
+                <div class="span7">
+                    <div class="form-horizontal well">
+                        <div>
+                            <div class="nav-header">Communicate</div>		    				      
+                            <p class="lead"> 
+                            <div id='sipContactUriDiv'>
+                                <div id='input'>
+                                    Contact To Call: <input id="sipContactUri" type="text" size="60" class="input-xlarge focused" >					
+                                    &nbsp;<input id='Call' class="btn btn-primary" type='submit' name='Call' value='Call' disabled="disabled" onclick = "mobicentsWebRTCPhoneController.onClickCallButtonViewEventHandler(getSipContactUriTextInputValue());"/>
+                                    &nbsp;<input id='Bye' class="btn btn-primary" type='submit' name='Bye' value='Bye' disabled="disabled" onclick = "mobicentsWebRTCPhoneController.onClickEndCallButtonViewEventHandler();"/>
+                                    <div id='media'>
+                                        <div id='over'>
+                                            <video id="localVideoPreview" autoplay="autoplay" class="ui-widget-content" style="height:120px; width:160px; margin-top: 10px; margin-right: 600px; -webkit-transition-property: opacity;-webkit-transition-duration: 2s;"></video>  
+                                        </div>
+                                        <div id='resizable'>
+                                            <video id="remoteVideo" onDblClick="toggleFullScreen();" width="640" height="480" autoplay="autoplay" style="margin-top: 10px;-webkit-transition-property: opacity; -webkit-transition-duration: 2s;"></video>  
+                                        </div>						    
+                                    </div>	
+                                    <p><i>Double-Click the video to enter Full Screen mode </i></p>										  
+                                </div>						
+                            </div>    		        
+                        </div>
+                    </div>
+                </div>			
+            </div>
+
+
+            <div class="modal hide fade" id="callModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-header">
+                    <!--button type="button" class="close" data-dismiss="modal" aria-hidden="true">Ã</button-->
+                    <h3 id="call_message">Incoming Call</h3>
+                </div>	  
+                <div class="modal-footer">
+                    <button class="btn reject-btn" data-dismiss="modal" aria-hidden="true">Reject</button>
+                    <button class="btn btn-primary accept-btn" data-dismiss="modal">Accept</button>
+                </div>
+            </div>
+
+            <div class="modal hide fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                <div class="modal-header">
+                    <!--button type="button" class="close" data-dismiss="modal" aria-hidden="true">Ã</button-->
+                    <h3 id="modal_message">Incoming Call</h3>
+                </div>	  
+                <div class="modal-footer">
+                    <button class="btn btn-primary" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+        <audio id="ringing" loop src="audio/ringing.wav" ></audio>
+        <script type='text/javascript'>	           
+            // Accept modal 
+            $('#callModal .accept-btn').click(function() {
+                mobicentsWebRTCPhoneController.onClickAcceptCallButtonViewEventHandler();
+ 
+            });
+
+            // Reject modal
+            $('#callModal .reject-btn').click(function() { 
+                mobicentsWebRTCPhoneController.onClickRejectCallButtonViewEventHandler();
+            });
+</script>
+    </body>
+</html>
