@@ -38,7 +38,6 @@
     <name>JBoss Application Server: Build Mobicents Add-on Modules</name>
 	<description>&gt;JBoss Application Server: Build Mobicents Add-on Modules</description>
 	<packaging>pom</packaging>
-   
 	<properties>
 		<!-- generated configs root dirs -->
 		<generated.configs>${basedir}/target/generated-configs</generated.configs>
@@ -47,7 +46,7 @@
 		<generated.configs.examples>${generated.configs}/docs/examples/configs</generated.configs.examples>
 		<generated.configs.src.dir>${basedir}/src/main/resources</generated.configs.src.dir>
 		<!-- MSS -->
-		<jboss.as.release.version>7.1.3.Final</jboss.as.release.version>
+		<jboss.as.release.version>7.2.0.Final</jboss.as.release.version>
 		<junit.version>4.10</junit.version>
 		<version.org.jboss.jandex>1.0.3.Final</version.org.jboss.jandex>
 		<version.rhino.js>1.7R2</version.rhino.js>

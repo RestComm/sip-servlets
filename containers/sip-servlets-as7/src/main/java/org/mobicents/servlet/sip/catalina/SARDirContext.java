@@ -22,6 +22,8 @@
 
 package org.mobicents.servlet.sip.catalina;
 
+import static org.jboss.web.NamingMessages.MESSAGES;
+
 import java.io.File;
 import java.util.Hashtable;
 import java.util.zip.ZipFile;
@@ -31,6 +33,7 @@ import org.apache.naming.resources.WARDirContext;
  * SAR Directory Context implementation. 
  * It extends the Tomcat WARDirContext since it can contains converged apps 
  * @author Jean Deruelle
+ * @author josemrecio@gmail.com
  */
 public class SARDirContext extends WARDirContext {
 
@@ -60,23 +63,20 @@ public class SARDirContext extends WARDirContext {
 	public void setDocBase(String docBase) {		
 		// Validate the format of the proposed document root
 		if (docBase == null)
-			throw new IllegalArgumentException(sm.getString("resources.null"));
+            throw MESSAGES.invalidNullDocumentBase();
 		if (!(docBase.endsWith(".sar")))
-			throw new IllegalArgumentException(sm
-					.getString("warResources.notWar"));
+            throw MESSAGES.docBaseNotWar(docBase);
 
 		// Calculate a File object referencing this document base directory
 		File base = new File(docBase);
 
 		// Validate that the document base is an existing directory
 		if (!base.exists() || !base.canRead() || base.isDirectory())
-			throw new IllegalArgumentException(sm.getString(
-					"warResources.invalidWar", docBase));
+            throw MESSAGES.docBaseNotWar(docBase);
 		try {
 			this.base = new ZipFile(base);
 		} catch (Exception e) {
-			throw new IllegalArgumentException(sm.getString(
-					"warResources.invalidWar", e.getMessage()));
+            throw MESSAGES.failedOpeningWar(e.getMessage());
 		}
 		// Change the document root property
         this.docBase = docBase;

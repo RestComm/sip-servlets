@@ -341,6 +341,7 @@
 			</modules>
 			<properties>				
 				<version.org.jboss.spec.javax.servlet.jboss-servlet-api_3.0_spec>1.0.0.Final</version.org.jboss.spec.javax.servlet.jboss-servlet-api_3.0_spec>
+				<log4j.version>1.2.16</log4j.version>
 			</properties>
 			<dependencies>
 				<!-- j2ee dependencies -->

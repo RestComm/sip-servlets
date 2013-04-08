@@ -29,9 +29,7 @@ import java.util.Random;
 
 import org.apache.catalina.Authenticator;
 import org.apache.catalina.Context;
-import org.apache.catalina.authenticator.Constants;
 import org.apache.log4j.Logger;
-import org.apache.naming.StringManager;
 import org.mobicents.servlet.sip.core.message.MobicentsSipServletRequest;
 import org.mobicents.servlet.sip.core.message.MobicentsSipServletResponse;
 import org.mobicents.servlet.sip.core.security.MobicentsSipLoginConfig;
@@ -117,10 +115,10 @@ public abstract class AuthenticatorBase
 
 
     /**
-     * The string manager for this package.
+     * The string manager for this package (not supported in AS-7.2.0)
      */
-    protected static final StringManager STRING_MANAGER =
-        StringManager.getManager(Constants.Package);
+//    protected static final StringManager STRING_MANAGER =
+//        StringManager.getManager(Constants.Package);
 
 
 

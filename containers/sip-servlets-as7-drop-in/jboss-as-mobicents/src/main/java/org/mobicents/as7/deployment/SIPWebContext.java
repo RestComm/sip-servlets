@@ -107,8 +107,8 @@ public class SIPWebContext extends SipStandardContext {
 
     @Override
     public void start() throws LifecycleException {
-    	if(log.isDebugEnabled()) {
-    		log.debugf("Starting sip web context for deployment %s", deploymentUnit.getName());
+    	if(logger.isDebugEnabled()) {
+    		logger.debugf("Starting sip web context for deployment %s", deploymentUnit.getName());
     	}
         SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
         SipAnnotationMetaData sipAnnotationMetaData = deploymentUnit.getAttachment(SipAnnotationMetaData.ATTACHMENT_KEY);
@@ -116,17 +116,17 @@ public class SIPWebContext extends SipStandardContext {
         JBossWebMetaData mergedMetaData = null;
         mergedMetaData = new JBossConvergedSipMetaData();
         final WarMetaData warMetaData = deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
-        final JBossWebMetaData override = warMetaData.getJbossWebMetaData();
+        final JBossWebMetaData override = warMetaData.getJBossWebMetaData();
         final WebMetaData original = null;
         JBossWebMetaDataMerger.merge(mergedMetaData, override, original);
 
-        if(log.isDebugEnabled()) {
-    		log.debugf("security domain " + mergedMetaData.getSecurityDomain() + " for deployment %s", deploymentUnit.getName());
+        if(logger.isDebugEnabled()) {
+    		logger.debugf("security domain " + mergedMetaData.getSecurityDomain() + " for deployment %s", deploymentUnit.getName());
     	}
         if(sipMetaData == null && sipAnnotationMetaData != null && sipAnnotationMetaData.isSipApplicationAnnotationPresent()) {
         	// http://code.google.com/p/sipservlets/issues/detail?id=168
         	// When no sip.xml but annotations only, Application is not recognized as SIP App by AS7
-        	log.debugf("sip meta data is null, creating a new one");
+        	logger.debugf("sip meta data is null, creating a new one");
         	sipMetaData = new Sip11MetaData();
         }
         augmentAnnotations(mergedMetaData, sipMetaData, sipAnnotationMetaData);

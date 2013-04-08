@@ -22,6 +22,8 @@
 
 package org.mobicents.servlet.sip.startup;
 
+import static org.jboss.web.CatalinaMessages.MESSAGES;
+
 import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -431,9 +433,11 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
                     fireContainerEvent("afterContextInitialized", servletContextListener);
                 } catch (Throwable t) {
                     fireContainerEvent("afterContextInitialized", servletContextListener);
+//                    getLogger().error
+//                        (sm.getString("standardContext.listenerStart",
+//                        		servletContextListener.getClass().getName()), t);
                     getLogger().error
-                        (sm.getString("standardContext.listenerStart",
-                        		servletContextListener.getClass().getName()), t);
+                    	(MESSAGES.errorSendingContextInitializedEvent(servletContextListener.getClass().getName()), t);
                     ok = false;
                 }
                 
@@ -478,9 +482,11 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
                     fireContainerEvent("afterContextDestroyed", servletContextListener);
                 } catch (Throwable t) {
                     fireContainerEvent("afterContextDestroyed", servletContextListener);
+//                    getLogger().error
+//                        (sm.getString("standardContext.listenerStop",
+//                        		servletContextListener.getClass().getName()), t);
                     getLogger().error
-                        (sm.getString("standardContext.listenerStop",
-                        		servletContextListener.getClass().getName()), t);
+                    	(MESSAGES.errorSendingContextDestroyedEvent(servletContextListener.getClass().getName()), t);                    
                     ok = false;
                 }
                 

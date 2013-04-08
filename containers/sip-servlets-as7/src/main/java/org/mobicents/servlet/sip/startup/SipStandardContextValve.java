@@ -22,6 +22,8 @@
 
 package org.mobicents.servlet.sip.startup;
 
+import static org.jboss.web.CatalinaMessages.MESSAGES;
+
 import java.io.IOException;
 import java.text.ParseException;
 
@@ -40,7 +42,7 @@ import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.core.Constants;
 import org.apache.catalina.core.StandardContext;
-import org.apache.catalina.util.StringManager;
+//import org.apache.catalina.util.StringManager;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.buf.MessageBytes;
 import org.jboss.servlet.http.HttpEvent;
@@ -78,10 +80,10 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
 
 
     /**
-     * The string manager for this package.
+     * The string manager for this package (not supported in AS-7.2.0)
      */
-    private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+//    private static final StringManager sm =
+//        StringManager.getManager(Constants.Package);
 
 
     private static transient final Logger logger = Logger.getLogger(SipStandardContextValve.class);
@@ -197,8 +199,7 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
                 try {
                     listener.requestInitialized(event);
                 } catch (Throwable t) {
-                    container.getLogger().error(sm.getString("standardContext.requestListener.requestInit",
-                                     instances[i].getClass().getName()), t);
+                    container.getLogger().error(MESSAGES.requestListenerInitException(instances[i].getClass().getName()), t);
                     ServletRequest sreq = request.getRequest();
                     sreq.setAttribute(RequestDispatcher.ERROR_EXCEPTION,t);
                     return;
@@ -273,8 +274,7 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
                 try {
                     listener.requestDestroyed(event);
                 } catch (Throwable t) {
-                    container.getLogger().error(sm.getString("standardContext.requestListener.requestDestroy",
-                                     instances[i].getClass().getName()), t);
+                    container.getLogger().error(MESSAGES.requestListenerDestroyException(instances[i].getClass().getName()), t);
                     ServletRequest sreq = request.getRequest();
                     sreq.setAttribute(RequestDispatcher.ERROR_EXCEPTION,t);
                 }

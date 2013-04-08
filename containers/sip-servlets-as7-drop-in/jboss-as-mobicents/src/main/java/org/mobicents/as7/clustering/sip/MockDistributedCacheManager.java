@@ -181,4 +181,10 @@ public class MockDistributedCacheManager implements DistributedCacheManager<Outg
 
     }
 
+	@Override
+	public boolean isPersistenceEnabled() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }
