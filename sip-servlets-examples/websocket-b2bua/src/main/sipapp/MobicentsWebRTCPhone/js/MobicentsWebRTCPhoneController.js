@@ -23,14 +23,14 @@ MobicentsWebRTCPhoneController.prototype.constructor=MobicentsWebRTCPhoneControl
 MobicentsWebRTCPhoneController.prototype.DEFAULT_SIP_OUTBOUND_PROXY="ws://" + window.location.hostname + ":5082";
 MobicentsWebRTCPhoneController.prototype.DEFAULT_SIP_USER_AGENT="MobicentsWebRTCPhone/0.0.1" 
 MobicentsWebRTCPhoneController.prototype.DEFAULT_SIP_USER_AGENT_CAPABILITIES=undefined 
-MobicentsWebRTCPhoneController.prototype.DEFAULT_SIP_DOMAIN="sip.test.com";
+MobicentsWebRTCPhoneController.prototype.DEFAULT_SIP_DOMAIN="webrtc.mobicents.org";
 MobicentsWebRTCPhoneController.prototype.DEFAULT_SIP_DISPLAY_NAME="alice";
 MobicentsWebRTCPhoneController.prototype.DEFAULT_SIP_USER_NAME="alice";
 MobicentsWebRTCPhoneController.prototype.DEFAULT_SIP_LOGIN=undefined;
 MobicentsWebRTCPhoneController.prototype.DEFAULT_SIP_PASSWORD=undefined;
 MobicentsWebRTCPhoneController.prototype.DEFAULT_SIP_CONTACT="bob";
 MobicentsWebRTCPhoneController.prototype.DEFAULT_SIP_REGISTER_MODE=true;
-MobicentsWebRTCPhoneController.prototype.DEFAULT_STUN_SERVER=undefined; // stun.l.google.com:19302
+MobicentsWebRTCPhoneController.prototype.DEFAULT_STUN_SERVER="undefined"; // stun.l.google.com:19302
 
 /**
  * on load event handler
@@ -279,7 +279,7 @@ MobicentsWebRTCPhoneController.prototype.onClickCallButtonViewEventHandler=funct
                 localMediaStream: this.localAudioVideoMediaStream,
                 audioMediaFlag:true,
                 videoMediaFlag:true,
-                dataMediaFlag:false
+                messageMediaFlag:false
             }
             this.webRtcCommCall = this.webRtcCommClient.call(calleePhoneNumber, callConfiguration);
             this.view.disableCallButton();
@@ -335,7 +335,7 @@ MobicentsWebRTCPhoneController.prototype.onClickAcceptCallButtonViewEventHandler
                 localMediaStream: this.localAudioVideoMediaStream,
                 audioMediaFlag:true,
                 videoMediaFlag:true,
-                dataMediaFlag:false
+                messageMediaFlag:false
             }
             this.webRtcCommCall.accept(callConfiguration);
             this.view.enableEndCallButton();
@@ -501,8 +501,8 @@ MobicentsWebRTCPhoneController.prototype.onWebRtcCommCallRingingEvent=function(w
     this.view.disableDisconnectButton();
     this.view.disableEndCallButton();
     this.view.disableConnectButton();
-    show_desktop_notification("Incoming Call from " + this.webRtcCommCall.callerPhoneNumber);
-    $("#call_message").html("<p>Incoming Call from " + this.webRtcCommCall.callerPhoneNumber +"</p>");
+    show_desktop_notification("Incoming Call from " + webRtcCommCall.getCallerPhoneNumber());
+    $("#call_message").html("<p>Incoming Call from " + webRtcCommCall.getCallerPhoneNumber() +"</p>");
      $('#callModal').modal(); 
 }
 
