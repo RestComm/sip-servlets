@@ -31,6 +31,7 @@ import org.mobicents.metadata.sip.spec.SipLoginConfigMetaData;
 
 /**
  * @author Remy Maucherat
+ * @author josemrecio@gmail.com
  */
 public class SipLoginConfigMetaDataParser extends MetaDataElementParser {
 
@@ -66,10 +67,8 @@ public class SipLoginConfigMetaDataParser extends MetaDataElementParser {
                     loginConfig.setRealmName(getElementText(reader));
                     break;
                 case IDENTITY_ASSERTION:
-                    // TODO: add identity_assertion parser
-                    // loginConfig.setIdentityAssertion(IdentityAssertionParser.parse(reader))
-                    // break;
-                    throw unexpectedElement(reader);
+                    loginConfig.setIdentityAssertion(IdentityAssertionParser.parse(reader));
+                    break;
                 default:
                     throw unexpectedElement(reader);
             }

@@ -43,6 +43,8 @@ public enum Element {
     EQUAL("equal"),
     EXISTS("exists"),
     IDENTITY_ASSERTION("identity-assertion"),
+    IDENTITY_ASSERTION_SCHEME("identity-assertion-scheme"),
+    IDENTITY_ASSERTION_SUPPORT("identity-assertion-support"),
     LISTENER("listener"),
     LOCALE_ENCODING_MAPPING_LIST("locale-encoding-mapping-list"),
     LOGIN_CONFIG("login-config"),
