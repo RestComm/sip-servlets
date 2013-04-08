@@ -3,28 +3,70 @@
 	<head>
 		<link href="resources/css/bootstrap-combined.no-icons.min-2.3.1.css" rel="stylesheet">
 		<style type="text/css">
-		body {
-			padding-top: 60px;
-			padding-bottom: 40px;
-		}
-		.sidebar-nav {
-			padding: 9px 0;
-		}
+			/* Sticky footer styles
+			-------------------------------------------------- */
 
-		@media (max-width: 980px) {
-			/* Enable use of floated navbar text */
-			.navbar-text.pull-right {
-				float: none;
-				padding-left: 5px;
-				padding-right: 5px;
+			html,
+			body {
+				height: 100%;
+				/* The html and body elements cannot have any padding or margin. */
 			}
-		}
+
+			/* Wrapper for page content to push down footer */
+			#wrap {
+				min-height: 100%;
+				height: auto !important;
+				height: 100%;
+				/* Negative indent footer by it's height */
+				margin: 0 auto -40px;
+			}
+
+			/* Set the fixed height of the footer here */
+			#push,
+			#footer {
+				height: 90px;
+			}
+			#footer {
+			}
+
+			/* Lastly, apply responsive CSS fixes as necessary */
+			@media (max-width: 767px) {
+				#footer {
+					margin-left: -20px;
+					margin-right: -20px;
+					padding-left: 20px;
+					padding-right: 20px;
+				}
+			}
+
+			@media (max-width: 980px) {
+				/* Enable use of floated navbar text */
+				.navbar-text.pull-right {
+					float: none;
+					padding-left: 5px;
+					padding-right: 5px;
+				}
+			}
+
+
+			/* Custom page CSS
+			-------------------------------------------------- */
+			/* Not required for template or sticky footer method. */
+
+			.container {
+				width: auto;
+				max-width: 680px;
+			}
+
+			.container .credit {
+				margin: 20px 0;
+			}
 		
-		.required{
-		    border:1px solid rgba(196, 39, 39, 0.3) !important;
-		    -webkit-box-shadow: 0px 0px 5px 2px rgba(196, 39, 39, 0.3) !important;
-		    box-shadow: 0px 0px 5px 2px rgba(196, 39, 39, 0.3) !important;
-		}
+			.required{
+			    border:1px solid rgba(196, 39, 39, 0.3) !important;
+			    -webkit-box-shadow: 0px 0px 5px 2px rgba(196, 39, 39, 0.3) !important;
+			    box-shadow: 0px 0px 5px 2px rgba(196, 39, 39, 0.3) !important;
+			}
 		</style>
 		<link href="resources/css/font-awesome-3.0.2.min.css" rel="stylesheet">
 		<link href="resources/css/main.css" rel="stylesheet" />
@@ -37,80 +79,86 @@
 		<title>Mobicents Management Console</title>
 	</head>
 	<body>
-		<div class="navbar navbar-inverse navbar-fixed-top">
-			<div class="navbar-inner">
-				<div class="container-fluid">
-					<button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-					</button>
-					<span class="brand" style="vertical-align: bottom;"><img src="resources/images/telestax_logo_dark1.png" /> SIP SERVLETS MANAGEMENT CONSOLE</span>
-					<!--div class="nav-collapse collapse">
-						<p class="navbar-text pull-right" style="font-size: 1.3em;">
-							<span style="margin-top: 15px; vertical-align: sub;">
-								<i class="icon-user"></i> &nbsp; <a href="#" class="navbar-link">Administrator</a>
-							</span>
-							 &nbsp; <a href="#" class="btn btn-danger btn-small"><i class="icon-off"></i> Sign Out</a>
-						</p>
-					</div--><!--/.nav-collapse -->
+		<div id="wrap">
+			<div class="navbar navbar-inverse navbar-fixed-top">
+				<div class="navbar-inner">
+					<div class="container-fluid">
+						<button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</button>
+						<span class="brand" style="vertical-align: bottom;"><img src="resources/images/telestax_logo_dark1.png" /> SIP SERVLETS MANAGEMENT CONSOLE</span>
+						<!--div class="nav-collapse collapse">
+							<p class="navbar-text pull-right" style="font-size: 1.3em;">
+								<span style="margin-top: 15px; vertical-align: sub;">
+									<i class="icon-user"></i> &nbsp; <a href="#" class="navbar-link">Administrator</a>
+								</span>
+								 &nbsp; <a href="#" class="btn btn-danger btn-small"><i class="icon-off"></i> Sign Out</a>
+							</p>
+						</div--><!--/.nav-collapse -->
+					</div>
 				</div>
 			</div>
-		</div>
-		<div class="container-fluid" style="padding-top: 60px;">
-			<div class="row-fluid">
-				<div class="span3">
-					<div class="well sidebar-nav">
-						<ul class="nav nav-list">
-							<li class="nav-header"><i class="icon-desktop"></i> Connected to: <span id="connected-to" style="color: #777777; font-size: 12px;"></span> &nbsp; <span><button class="btn btn-small" style="width: 26px;"  onclick="showConnectionOptions();"><i id="conn-options-icon"class="icon-caret-down" style="margin-left: -5px;" data-toggle="tooltip" data-placement="right" title="Show Connection Options"></i></button></span></li>
-							<span id="connection-options" style="display: none;">
-								<hr style="margin: 10px 0;"/>
-								<li class="nav-header"><i class="icon-plus-sign"></i>New Connection</li>
-								<li>
-									<input class="span7" id="host" type="text" placeholder="IP Address">
-									<input class="span3" id="port" type="text" placeholder="Port">
-									<button id="protocol" type="button" onclick="changeProtocol()" style="vertical-align: baseline; height: 28px;" class="btn btn-small btn-danger" data-toggle="button" ><i id="protocolIcon" class="icon-unlock" style="font-size: 22px; width: 12px;" data-toggle="tooltip" data-placement="right" title="Secure Connection (HTTPS)"></i></button>
-									<!--input class="span6" id="user" type="text" placeholder="Username" />
-									<input class="span6	" id="pass" type="password" placeholder="Password" /-->
-									<button class="btn btn-primary" type="button" onclick="connect()">Connect</button>
-								</li>
-								<!--hr style="margin: 20px 0 10px 0;"/>
-								<li class="nav-header"><i class="icon-time"></i>Recent Connections</li>
-								<li><a href="#"><span style="padding-left: 20px;">192.168.1.123:8080</span></a></li>
-								<li><a href="#"><span style="padding-left: 20px;">127.0.0.2:8080</span></a></li>
-								<li><a href="#"><span style="padding-left: 20px;">84.143.32.234:8080</span></a></li>
-								<li><a href="#"><span style="padding-left: 20px;">101.102.103.104:80</span></a></li>
-								<li><a href="#"><span style="padding-left: 20px;">1.2.3.4:8080</span></a></li-->
-							</span>
-						</ul>
-					</div>
-					<div class="well sidebar-nav">
-						<ul class="nav nav-list">
-							<li class="nav-header">Management</li>
-							<!--li class="active"><a href="#" onclick="setMenu(this, 'server-control')"><i class="icon-cogs" style="font-size: 1.2em;"></i> Server Control</a></li-->
-							<li><a href="#" onclick="setMenu(this, 'application-routing')"><i class="icon-copy" style="font-size: 1.2em;"></i> Application Routing</a></li>
-							<li><a href="#" onclick="setMenu(this, 'server-settings')"><i class="icon-dashboard" style="font-size: 1.2em;"></i> Server Settings</a></li>
-							<!--li class="nav-header">Monitoring</li>
-							<li><a href="#" onclick="setMenu(this, 'metrics')"><i class="icon-dashboard" style="font-size: 1.2em;"></i> Metrics</a></li-->
-						</ul>
-					</div><!--/.well -->
-				</div><!--/span-->
-				<div id="content" class="span9">
-				</div> 
-				<div class="console-wrapper">
-					<h5 style="margin: 0px;">
-						<i class="icon-file-alt"></i> Mobicents Management Console Log
-						<span style="float: right; margin-right:10px;">
-							<button id="btn-clear-console" class="btn btn-inverse" data-toggle="tooltip" title="Clear Console" data-placement="left" onclick="$(this).tooltip('hide'); clearConsole();"><i class="icon-trash"></i></button>&nbsp;
-							<button id="btn-min-console" class="btn btn-inverse" data-toggle="tooltip" title="Minimize Console" data-placement="left" onclick="$(this).tooltip('hide'); minimizeConsole();"><i class="icon-double-angle-down"></i></button>
-							<button id="btn-restore-console" class="btn btn-inverse" data-toggle="tooltip" title="Restore Console" data-placement="left" onclick="$(this).tooltip('hide'); restoreConsole();" style="display: none;"><i class="icon-double-angle-up"></i></button>
+			<div class="container-fluid" style="padding-top: 60px;">
+				<div class="row-fluid">
+					<div class="span3">
+						<div class="well sidebar-nav">
+							<ul class="nav nav-list">
+								<li class="nav-header"><i class="icon-desktop"></i> Connected to: <span id="connected-to" style="color: #777777; font-size: 12px;"></span> &nbsp; <span><button class="btn btn-small" style="width: 26px;"  onclick="showConnectionOptions();"><i id="conn-options-icon"class="icon-caret-down" style="margin-left: -5px;" data-toggle="tooltip" data-placement="right" title="Show Connection Options"></i></button></span></li>
+								<span id="connection-options" style="display: none;">
+									<hr style="margin: 10px 0;"/>
+									<li class="nav-header"><i class="icon-plus-sign"></i>New Connection</li>
+									<li>
+										<input class="span7" id="host" type="text" placeholder="IP Address">
+										<input class="span3" id="port" type="text" placeholder="Port">
+										<button id="protocol" type="button" onclick="changeProtocol()" style="vertical-align: baseline; height: 28px;" class="btn btn-small btn-danger" data-toggle="button" ><i id="protocolIcon" class="icon-unlock" style="font-size: 22px; width: 12px;" data-toggle="tooltip" data-placement="right" title="Secure Connection (HTTPS)"></i></button>
+										<!--input class="span6" id="user" type="text" placeholder="Username" />
+										<input class="span6	" id="pass" type="password" placeholder="Password" /-->
+										<button class="btn btn-primary" type="button" onclick="connect()">Connect</button>
+									</li>
+									<!--hr style="margin: 20px 0 10px 0;"/>
+									<li class="nav-header"><i class="icon-time"></i>Recent Connections</li>
+									<li><a href="#"><span style="padding-left: 20px;">192.168.1.123:8080</span></a></li>
+									<li><a href="#"><span style="padding-left: 20px;">127.0.0.2:8080</span></a></li>
+									<li><a href="#"><span style="padding-left: 20px;">84.143.32.234:8080</span></a></li>
+									<li><a href="#"><span style="padding-left: 20px;">101.102.103.104:80</span></a></li>
+									<li><a href="#"><span style="padding-left: 20px;">1.2.3.4:8080</span></a></li-->
+								</span>
+							</ul>
+						</div>
+						<div class="well sidebar-nav">
+							<ul class="nav nav-list">
+								<li class="nav-header">Management</li>
+								<!--li class="active"><a href="#" onclick="setMenu(this, 'server-control')"><i class="icon-cogs" style="font-size: 1.2em;"></i> Server Control</a></li-->
+								<li><a href="#" onclick="setMenu(this, 'application-routing')"><i class="icon-copy" style="font-size: 1.2em;"></i> Application Routing</a></li>
+								<li><a href="#" onclick="setMenu(this, 'server-settings')"><i class="icon-dashboard" style="font-size: 1.2em;"></i> Server Settings</a></li>
+								<!--li class="nav-header">Monitoring</li>
+								<li><a href="#" onclick="setMenu(this, 'metrics')"><i class="icon-dashboard" style="font-size: 1.2em;"></i> Metrics</a></li-->
+							</ul>
+						</div><!--/.well -->
+					</div><!--/span-->
+					<div id="content" class="span9">
+					</div> 					
+				</div>
+			</div>
+		</div>	
+		<div id="footer">
+				<div class="container" style="max-width: none;">
+					<p class="muted credit">
+						<span style="float: right; margin-right:20px;">
+							<button id="btn-clear-console" class="btn btn-link" data-toggle="tooltip" title="Clear Console" data-placement="left" onclick="$(this).tooltip('hide'); clearConsole();"><i class="icon-trash"></i></button>&nbsp;
+							<button id="btn-min-console" class="btn btn-link" data-toggle="tooltip" title="Minimize Console" data-placement="left" onclick="$(this).tooltip('hide'); minimizeConsole();"><i class="icon-double-angle-down"></i></button>
+							<button id="btn-max-console" class="btn btn-link" data-toggle="tooltip" title="Maximize Console" data-placement="left" onclick="$(this).tooltip('hide'); maximizeConsole();" style="display: none;"><i class="icon-double-angle-up"></i></button>
 						</span>
-					</h5>
-					<div class="console">
-						<div id="console-log-text"></div>
-					</div>
-					<p class="muted credit"><h5 style="text-align: center;"><small>(c) 2013 TeleStax Inc.</small></h5></p>
-					<script type="text/javascript">
+						<h5 style="margin: 0 0 0 20px;"><i class="icon-file-alt"></i> Mobicents Management Console Log</h5>
+						<div style="margin-left: 20px;">
+							<div id="console-log-text" class="console"></div>
+						</div>
+					</p>
+				</div>
+			</div>		
+			<script type="text/javascript">
 					$(document).ready(function () {
 						$(function () {
 							$("[data-toggle='tooltip']").tooltip();
@@ -123,7 +171,8 @@
 						}						
 						window.jolokiaAddress = window.location.hostname;
 						window.jolokiaPort = window.location.port;
-						jolokia = new Jolokia({url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia"});						
+						jolokia = new Jolokia({url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia"});
+						$('#connected-to').text(window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort);
 						$('#content').load('modules/application-routing.html');						
 						$("#btn-min-console").click();
 						logToConsole('INFO', 'Mobicents SIP Servlets Management Console ready ! Connected to : ' +  window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort);					
@@ -144,9 +193,6 @@
 					function connect() {												
 						logToConsole('INFO', 'Connected to : ' +  window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort);
 					}
-					</script>
-				</div>
-			</div>
-		</div>
+					</script>	
 	</body>
 </html>

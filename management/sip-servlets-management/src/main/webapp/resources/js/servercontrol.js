@@ -91,13 +91,13 @@ function clearConsole() {
 function minimizeConsole() {
 	$('.console').animate({height: '20px'});
 	$('#btn-min-console').hide();
-	$('#btn-restore-console').show();
+	$('#btn-max-console').show();
 }
 
-function restoreConsole() {
+function maximizeConsole() {
 	$('.console').animate({height: '160px'});
 	$('#btn-min-console').show();
-	$('#btn-restore-console').hide();
+	$('#btn-max-console').hide();
 }
 
 function filterDeployableUnitsList() {
