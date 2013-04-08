@@ -5,7 +5,4 @@
             30
         </session-timeout>
     </session-config>
-     <welcome-file-list>
-        <welcome-file>MobicentsWebRTCPhone/MobicentsWebRTCPhoneView.html</welcome-file>
-    </welcome-file-list>
 </web-app>
