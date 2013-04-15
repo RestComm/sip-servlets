@@ -26,6 +26,7 @@
     <dependencies>
         <module name="javax.servlet.api" export="true"/>
         <module name="org.apache.log4j"/>
+        <module name="javax.api"/>
     </dependencies>
 
     <resources>
