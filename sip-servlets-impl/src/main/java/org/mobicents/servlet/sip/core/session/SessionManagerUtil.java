@@ -163,7 +163,9 @@ public class SessionManagerUtil {
 			String sipSessionKey) throws ParseException {
 		
 		int indexOfLeftParenthesis = sipSessionKey.indexOf("(");
-		int indexOfRightParenthesis = sipSessionKey.indexOf(")");
+		// see http://code.google.com/p/sipservlets/issues/detail?id=207
+		// support for Call-ID with ')' character
+		int indexOfRightParenthesis = sipSessionKey.lastIndexOf(")");
 		if(indexOfLeftParenthesis == -1) {
 			throw new ParseException("The left parenthesis could not be found in the following key " + sipSessionKey, 0);
 		}
