@@ -191,7 +191,7 @@ MobicentsWebRTCPhoneController.prototype.onGetUserMediaSuccessEventHandler=funct
 {
     try
     {
-        console.debug("MobicentsWebRTCPhoneController:onWebkitGetUserMediaSuccessEventHandler(): localAudioVideoMediaStream.id="+localAudioVideoMediaStream.id);
+        console.debug("MobicentsWebRTCPhoneController:onGetUserMediaSuccessEventHandler(): localAudioVideoMediaStream.id="+localAudioVideoMediaStream.id);
         this.localAudioVideoMediaStream=localAudioVideoMediaStream;
         this.view.playLocalVideo(this.localAudioVideoMediaStream);
         this.view.showLocalVideo();
@@ -199,7 +199,7 @@ MobicentsWebRTCPhoneController.prototype.onGetUserMediaSuccessEventHandler=funct
     }
     catch(exception)
     {
-        console.debug("MobicentsWebRTCPhoneController:onWebkitGetUserMediaSuccessEventHandler(): catched exception: "+exception);
+        console.debug("MobicentsWebRTCPhoneController:onGetUserMediaSuccessEventHandler(): catched exception: "+exception);
     }
 }           
  

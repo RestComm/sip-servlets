@@ -105,10 +105,9 @@ public class WebSocketB2BUASipServlet extends SipServlet implements TimerListene
 	protected void doRegister(SipServletRequest request) throws ServletException,
 	IOException {
 
-		
-		Address addr = request.getAddressHeader("Contact");
-		SipURI sipUri = (SipURI) addr.getURI();
-		registeredUsersToIp.put(sipUri.getUser(), addr);
+		Address addr = request.getAddressHeader("Contact");		
+		String user = ((SipURI) request.getFrom().getURI()).getUser();
+		registeredUsersToIp.put(user, addr);
 		if(logger.isInfoEnabled()) {
 			logger.info("Address registered " + addr);
 		}
