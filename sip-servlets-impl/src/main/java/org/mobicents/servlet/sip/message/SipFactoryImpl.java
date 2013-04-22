@@ -888,12 +888,18 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 	 */
 	public void addLoadBalancerRouteHeader(Request request) {
 		try {
+			String transport = JainSipUtils.findTransport(request);
 			String host = null;
 			int port = -1; 
 			OutboundProxy proxy = StaticServiceHolder.sipStandardService.getOutboundProxy();
 			if(proxy == null) {
-				host = loadBalancerToUse.getAddress().getHostAddress();
-				port = loadBalancerToUse.getSipPort();
+				if(transport.equalsIgnoreCase("ws")){
+					//This is a WebSocket request through LB, no need to add Route header.
+					return;
+				} else {
+					host = loadBalancerToUse.getAddress().getHostAddress();
+					port = loadBalancerToUse.getSipPort();
+				}
 			} else {				
 				host = proxy.getHost();
 				port = proxy.getPort();				
@@ -901,7 +907,6 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			javax.sip.address.SipURI sipUri = SipFactoryImpl.addressFactory.createSipURI(null, host);
 			sipUri.setPort(port);
 			sipUri.setLrParam();
-			String transport = JainSipUtils.findTransport(request);
 			sipUri.setTransportParam(transport);
 			MobicentsExtendedListeningPoint listeningPoint = 
 				getSipNetworkInterfaceManager().findMatchingListeningPoint(transport, false);
