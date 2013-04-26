@@ -191,8 +191,9 @@ public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig 
             convergedContext.setProxyTimeout(convergedMetaData.getProxyConfig().getProxyTimeout());
         }
         // sip session config
-        if (convergedMetaData.getSessionConfig() != null) {
-            convergedContext.setSipApplicationSessionTimeout(convergedMetaData.getSessionConfig().getSessionTimeout());
+        // http://code.google.com/p/sipservlets/issues/detail?id=209 : Incorrect merging for session-timeout in sip.xml
+        if (convergedMetaData.getSipSessionConfig() != null) {
+            convergedContext.setSipApplicationSessionTimeout(convergedMetaData.getSipSessionConfig().getSessionTimeout());
         }
 
         // http://code.google.com/p/sipservlets/issues/detail?id=158 : 	Implement Missing SIP Security in AS7
