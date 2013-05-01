@@ -388,7 +388,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 					String outboundInterface = null;
 					if(session != null) {
 						outboundInterface = session.getOutboundInterface();
-					}		
+					}
 				    // Add the contact header for the dialog.				    
 				    ContactHeader contactHeader = JainSipUtils.createContactHeader(
 			    			super.sipFactoryImpl.getSipNetworkInterfaceManager(), request, null, null, outboundInterface);
@@ -1485,6 +1485,14 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 						}
 					}
 				}
+				//Issue: https://code.google.com/p/sipservlets/issues/detail?id=210
+				String outboundInterface = this.getSipSession().getOutboundInterface();
+				if(outboundInterface != null){
+					javax.sip.address.SipURI outboundInterfaceURI = (javax.sip.address.SipURI) SipFactoryImpl.addressFactory.createURI(outboundInterface);
+					ipAddressToCheckAgainst = ((gov.nist.javax.sip.address.SipUri)outboundInterfaceURI).getHost();
+				}
+				
+				
 				if(!viaHeader.getHost().equalsIgnoreCase(ipAddressToCheckAgainst) || 
 						viaHeader.getTransport().equalsIgnoreCase(sipConnector.getTransport()) ||
 						viaHeader.getPort() != sipConnector.getPort()) {
@@ -1602,11 +1610,18 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				// http://code.google.com/p/sipservlets/issues/detail?id=156 
 				// MSS overwrites host part of Contact Header in REGISTER requests
 				else if(JainSipUtils.CONTACT_HEADER_METHODS.contains(requestMethod)) {
+					//Issue: https://code.google.com/p/sipservlets/issues/detail?id=210
+					String outboundInterface = this.getSipSession().getOutboundInterface();
+					if(outboundInterface != null){
+						javax.sip.address.SipURI outboundInterfaceURI = (javax.sip.address.SipURI) SipFactoryImpl.addressFactory.createURI(outboundInterface);
+						String outboundHost = ((gov.nist.javax.sip.address.SipUri)outboundInterfaceURI).getHost();
+						contactSipUri.setHost(outboundHost);
+					} else {	
 					boolean usePublicAddress = JainSipUtils.findUsePublicAddress(
 							sipNetworkInterfaceManager, request, matchingListeningPoint);
-					contactSipUri.setHost(matchingListeningPoint.getIpAddress(usePublicAddress));
+					contactSipUri.setHost(matchingListeningPoint.getIpAddress(usePublicAddress));	
+					}
 					contactSipUri.setPort(matchingListeningPoint.getPort());
-					
 				}
 				// http://code.google.com/p/mobicents/issues/detail?id=1150 only set transport if not udp
 				if(transportForRequest != null) {

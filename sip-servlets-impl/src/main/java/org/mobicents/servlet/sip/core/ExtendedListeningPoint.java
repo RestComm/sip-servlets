@@ -60,6 +60,7 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 	private SipConnector sipConnector;
 	private String globalIpAddress;
 	String mostOutboundAddress = null;
+	String appOutboundAddress = null;
 	private int globalPort;
 	private List<String> ipAddresses;
 	private boolean isAnyLocalAddress;
@@ -116,9 +117,13 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 		// Making use of the global ip address discovered by STUN if it is present		
 		if(usePublicAddress && globalIpAddress != null) {
 			return globalIpAddress;
-		} else {
-			return mostOutboundAddress;
-		}
+		} 
+		//Issue: https://code.google.com/p/sipservlets/issues/detail?id=210
+		if(appOutboundAddress != null) {
+			return appOutboundAddress;
+ 		} else {
+ 			return mostOutboundAddress;
+ 		}
 		
 	}
 
@@ -352,5 +357,13 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 	 */
 	public SipConnector getSipConnector() {
 		return sipConnector;
+	}
+	
+	public String getAppOutboundAddress(){
+		return appOutboundAddress;
+	}
+	
+	public void setAppOutboundAddress(String appOutboundAddress){
+		this.appOutboundAddress = appOutboundAddress;
 	}
 }

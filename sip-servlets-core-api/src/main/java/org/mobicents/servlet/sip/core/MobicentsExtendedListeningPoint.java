@@ -127,5 +127,19 @@ public interface MobicentsExtendedListeningPoint {
 	 * @return true if the ip adress is a any local address
 	 */
 	boolean isAnyLocalAddress();
+	
+	/**
+	 * https://code.google.com/p/sipservlets/issues/detail?id=210
+	 * Set the desired outbound interface
+	 * @param appOutboundAddress
+	 */
+	void setAppOutboundAddress(String appOutboundAddress);
+	
+	/**
+	 * https://code.google.com/p/sipservlets/issues/detail?id=210
+	 * Get the outbound interface
+	 * @return
+	 */
+	String getAppOutboundAddress();
 
 }
