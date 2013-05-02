@@ -564,7 +564,12 @@ public final class JainSipUtils {
 		}
 		boolean usePublicAddress = findUsePublicAddress(
 				sipNetworkInterfaceManager, request, listeningPoint);
-		ContactHeader ch = listeningPoint.createContactHeader(displayName, userName, usePublicAddress);
+		ContactHeader ch = null;
+		if(outboundInterface!=null){
+			ch = listeningPoint.createContactHeader(displayName, userName, usePublicAddress, outboundInterface);
+		} else {
+			ch = listeningPoint.createContactHeader(displayName, userName, usePublicAddress);
+		}
 		if(StaticServiceHolder.sipStandardService.isMd5ContactUserPart()) {
 			CallIdHeader callId = (CallIdHeader)request.getHeader(CallIdHeader.NAME);
 			String username = getHash(callId.getCallId().getBytes());

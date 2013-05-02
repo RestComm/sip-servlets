@@ -60,7 +60,6 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 	private SipConnector sipConnector;
 	private String globalIpAddress;
 	String mostOutboundAddress = null;
-	String appOutboundAddress = null;
 	private int globalPort;
 	private List<String> ipAddresses;
 	private boolean isAnyLocalAddress;
@@ -117,16 +116,11 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 		// Making use of the global ip address discovered by STUN if it is present		
 		if(usePublicAddress && globalIpAddress != null) {
 			return globalIpAddress;
-		} 
-		//Issue: https://code.google.com/p/sipservlets/issues/detail?id=210
-		if(appOutboundAddress != null) {
-			return appOutboundAddress;
- 		} else {
- 			return mostOutboundAddress;
- 		}
+		} else {
+			return mostOutboundAddress;
+		}
 		
 	}
-
 	/**
 	 * Create a Contact Header based on the host, port and transport of this listening point 
 	 * @param usePublicAddress if true, the host will be the global ip address found by STUN otherwise
@@ -135,9 +129,27 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 	 * @return the Contact header 
 	 */
 	public ContactHeader createContactHeader(String displayName, String userName, boolean usePublicAddress) {
+		return createContactHeader(displayName, userName, usePublicAddress, null);
+	}
+	
+	/**
+	 * Create a Contact Header based on the host, port and transport of this listening point 
+	 * @param usePublicAddress if true, the host will be the global ip address found by STUN otherwise
+	 *  it will be the local network interface ipaddress
+	 * @param displayName the display name to use
+	 * @param outboundInterface the outbound interface ip address to be used for the host part of the Contact header
+	 * @return the Contact header 
+	 */
+	public ContactHeader createContactHeader(String displayName, String userName, boolean usePublicAddress, String outboundInterface) {
 		try {
 			// FIXME : the SIP URI can be cached to improve performance 
-			String host = getIpAddress(usePublicAddress);
+			String host = null;
+			if(outboundInterface!=null){
+				javax.sip.address.SipURI outboundInterfaceURI = (javax.sip.address.SipURI) SipFactoryImpl.addressFactory.createURI(outboundInterface);
+				host = outboundInterfaceURI.getHost();
+			} else {
+				host = getIpAddress(usePublicAddress);
+			}
 			javax.sip.address.SipURI sipURI = SipFactoryImpl.addressFactory.createSipURI(userName, host);
 			sipURI.setHost(host);
 			sipURI.setPort(port);		
@@ -357,13 +369,5 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 	 */
 	public SipConnector getSipConnector() {
 		return sipConnector;
-	}
-	
-	public String getAppOutboundAddress(){
-		return appOutboundAddress;
-	}
-	
-	public void setAppOutboundAddress(String appOutboundAddress){
-		this.appOutboundAddress = appOutboundAddress;
 	}
 }

@@ -253,8 +253,6 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 					if(logger.isTraceEnabled()) {
 						logger.trace("Found listening point " + extendedListeningPoint);
 					}
-					//Issue: https://code.google.com/p/sipservlets/issues/detail?id=210
-					extendedListeningPoint.setAppOutboundAddress(outboundInterface.getHost());
 					return extendedListeningPoint;
 				}
 			}
@@ -274,8 +272,6 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 						if(logger.isTraceEnabled()) {
 							logger.trace("Found listening point " + extendedListeningPoint);
 						}
-						//Issue: https://code.google.com/p/sipservlets/issues/detail?id=210
-						extendedListeningPoint.setAppOutboundAddress(outboundInterface.getHost());
 						return extendedListeningPoint;
 					}
 				}
