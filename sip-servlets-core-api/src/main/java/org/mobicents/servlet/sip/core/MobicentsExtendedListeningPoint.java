@@ -119,7 +119,7 @@ public interface MobicentsExtendedListeningPoint {
 	 * @param displayName the display name to use for the contact header to create
 	 * @param userName the user name to use for the contact header to create
 	 * @param usePublicAddress wether or not to use the ip address found by STUN discovery
-	 * @param outboundInterface the outbound interface ip address to be used
+	 * @param outboundInterface the outbound interface ip address to be used for the host part of the Contact header
 	 * @return a Contact Header based on this SIP Listening Point
 	 */
 	ContactHeader createContactHeader(String displayName, String userName,
