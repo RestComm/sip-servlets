@@ -133,7 +133,7 @@ public interface SipServletResponse extends javax.servlet.sip.SipServletMessage,
      * Status code (604) indicating that the server has authoritative information that the user indicated in the To request field does not exist anywhere. Searching for the user elsewhere will not yield an results.
      * See Also:Constant Field Values
      */
-    static final int SC_DOES_NOT_EXIT_ANYWHERE=604;
+    static final int SC_DOES_NOT_EXIST_ANYWHERE=604;
 
     /**
      * Status code (421) indicating that the UAS needs a particular extension to process the request, but this extension is not listed in a Supported header field in the request.
