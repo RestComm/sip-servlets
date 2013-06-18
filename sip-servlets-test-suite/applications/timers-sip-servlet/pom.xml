@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.testsuite.applications</groupId>
 		<artifactId>sip-servlets-test-suite-applications</artifactId>
-		<version>2.1.0-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 	<artifactId>timers-sip-servlet</artifactId>
 	<packaging>war</packaging>
