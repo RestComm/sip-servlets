@@ -93,6 +93,7 @@
 		<mobicents.balancer.version>1.7.0-SNAPSHOT</mobicents.balancer.version>
 		<mobicents.jain.sip.ha.version>1.5.0-SNAPSHOT</mobicents.jain.sip.ha.version>
 		<mobicents.jain.sip.ext.version>1.2.0.FINAL</mobicents.jain.sip.ext.version>
+		<tomcat-7.version>7.0.42</tomcat-7.version>
 	</properties>
 
 	<dependencies>
@@ -304,9 +305,6 @@
 				<module>containers/sip-servlets-catalina-7</module>
 				<module>containers/tomcat-7</module>
 			</modules>
-			<properties>
-				<tomcat-7.version>7.0.33</tomcat-7.version>
-			</properties>
 			<dependencies>
 				<!-- j2ee dependencies -->
 				<dependency>
@@ -323,9 +321,6 @@
 				<module>containers/sip-servlets-catalina-7</module>
 				<module>containers/tomcat-7</module>
 			</modules>
-			<properties>
-				<tomcat-7.version>7.0.33</tomcat-7.version>
-			</properties>
 			<dependencies>
 				<!-- j2ee dependencies -->
 				<dependency>
