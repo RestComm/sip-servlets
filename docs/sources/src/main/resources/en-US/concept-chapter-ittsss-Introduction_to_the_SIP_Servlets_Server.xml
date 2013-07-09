@@ -49,20 +49,20 @@ The <ulink url="http://www.mobicents.org/"> Mobicents Communication Platform </u
  
 <para>
 
-Mobicents SIP Servlets is a modern communications middleware platform. Mobicents SIP Servlets facilitates the shift towards Cloud Communications by enabling deployment and autoscaling of real time SIP Servlets apps across all major IaaS (Infrastructure as a Service) providers and also brings realtime communications (voice and video) to your Browser using HTML5 <ulink url="http://www.webrtc.org/">WebRTC </ulink> and SIP Over WebSockets !
+&PLATFORM_NAME; SIP Servlets is a modern communications middleware platform. &PLATFORM_NAME; SIP Servlets facilitates the shift towards Cloud Communications by enabling deployment and autoscaling of real time SIP Servlets apps across all major IaaS (Infrastructure as a Service) providers and also brings realtime communications (voice and video) to your Browser using HTML5 <ulink url="http://www.webrtc.org/">WebRTC </ulink> and SIP Over WebSockets !
 
 </para>
 <para>
-The <ulink url=" http://code.google.com/p/sipservlets/wiki/HTML5WebRTCVideoApplication"> Mobicents HTML5 WebRTC Client </ulink>allows you to make video calls from and to any Web Browser supporting <ulink url="http://www.webrtc.org/">WebRTC </ulink> , (only Google Chrome supports it so far but all major browsers should support it in the next 6 months) as well as SIP Endpoints.
+The <ulink url=" http://code.google.com/p/sipservlets/wiki/HTML5WebRTCVideoApplication"> &PLATFORM_NAME; HTML5 WebRTC Client </ulink>allows you to make video calls from and to any Web Browser supporting <ulink url="http://www.webrtc.org/">WebRTC </ulink> , (only Google Chrome supports it so far but all major browsers should support it in the next 6 months) as well as SIP Endpoints.
 </para>
 <para>
-Mobicents SIP Servlets enables turnkey SaaS offerings such as <ulink url="http://www.restcomm.org/"> RestComm </ulink>.
+&PLATFORM_NAME; SIP Servlets enables turnkey SaaS offerings such as <ulink url="http://www.restcomm.org/"> RestComm </ulink>.
 </para>
 <para>
-Mobicents SIP Servlets implements the latest SIP Servlet v1.1 (JSR 289) standard. It can be plugged into any Application Server container (currently 7.X and JBoss 7.X) and also offers High Availability and Failover.
+&PLATFORM_NAME; SIP Servlets implements the latest SIP Servlet v1.1 (JSR 289) standard. It can be plugged into any Application Server container (currently 7.X and JBoss 7.X) and also offers High Availability and Failover.
 </para>
 <para>
-Mobicents SIP Servlets is lead by <ulink url="http://www.telestax.com/">TeleStax, Inc </ulink>. and developed collaboratively by a community of individual and enterprise contributors. 
+&PLATFORM_NAME; SIP Servlets is lead by <ulink url="http://www.telestax.com/">TeleStax, Inc </ulink>. and developed collaboratively by a community of individual and enterprise contributors. 
 
 </para>
 
