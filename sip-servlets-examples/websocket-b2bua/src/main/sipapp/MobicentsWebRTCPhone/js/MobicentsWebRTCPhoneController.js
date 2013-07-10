@@ -751,11 +751,11 @@ MobicentsWebRTCPhoneController.prototype.onWebRTCommClientClosedEvent=function()
 }
     
 /**
- * Implementation of the WebRtcCommCall listener interface
+ * Implementation of the webRTCommCall listener interface
  */
-MobicentsWebRTCPhoneController.prototype.onWebRTCommCallClosedEvent=function(webRtcCommCall)
+MobicentsWebRTCPhoneController.prototype.onWebRTCommCallClosedEvent=function(webRTCommCall)
 {
-    console.debug ("MobicentsWebRTCPhoneController:onWebRTCommCallClosedEvent(): webRtcCommCall.getId()="+webRtcCommCall.getId()); 
+    console.debug ("MobicentsWebRTCPhoneController:onWebRTCommCallClosedEvent(): webRTCommCall.getId()="+webRTCommCall.getId()); 
 
     //Enabled button DISCONECT, CALL
     this.view.enableCallButton();
@@ -773,11 +773,11 @@ MobicentsWebRTCPhoneController.prototype.onWebRTCommCallClosedEvent=function(web
    
    
 /**
- * Implementation of the WebRtcCommCall listener interface
+ * Implementation of the webRTCommCall listener interface
  */
-MobicentsWebRTCPhoneController.prototype.onWebRTCommCallOpenedEvent=function(webRtcCommCall)
+MobicentsWebRTCPhoneController.prototype.onWebRTCommCallOpenedEvent=function(webRTCommCall)
 {
-    console.debug ("MobicentsWebRTCPhoneController:onWebRTCommCallOpenedEvent(): webRtcCommCall.getId()="+webRtcCommCall.getId()); 
+    console.debug ("MobicentsWebRTCPhoneController:onWebRTCommCallOpenedEvent(): webRTCommCall.getId()="+webRTCommCall.getId()); 
    
     this.view.stopRinging();
     this.view.disableCallButton();
@@ -809,22 +809,22 @@ MobicentsWebRTCPhoneController.prototype.onWebRTCommCallOpenedEvent=function(web
 }
 
 /**
- * Implementation of the WebRtcCommCall listener interface
+ * Implementation of the webRTCommCall listener interface
  */
-MobicentsWebRTCPhoneController.prototype.onWebRTCommCallInProgressEvent=function(webRtcCommCall)
+MobicentsWebRTCPhoneController.prototype.onWebRTCommCallInProgressEvent=function(webRTCommCall)
 {
-    console.debug ("MobicentsWebRTCPhoneController:onWebRTCommCallInProgressEvent(): webRtcCommCall.getId()="+webRtcCommCall.getId()); 
+    console.debug ("MobicentsWebRTCPhoneController:onWebRTCommCallInProgressEvent(): webRTCommCall.getId()="+webRTCommCall.getId()); 
 
     modal_alert("Communication in progress"); 
 }
 
 
 /**
- * Implementation of the WebRtcCommCall listener interface
+ * Implementation of the webRTCommCall listener interface
  */
-MobicentsWebRTCPhoneController.prototype.onWebRTCommCallOpenErrorEvent=function(webRtcCommCall, error)
+MobicentsWebRTCPhoneController.prototype.onWebRTCommCallOpenErrorEvent=function(webRTCommCall, error)
 {
-    console.debug ("MobicentsWebRTCPhoneController:onWebRTCommCallOpenErrorEvent(): webRtcCommCall.getId()="+webRtcCommCall.getId()); 
+    console.debug ("MobicentsWebRTCPhoneController:onWebRTCommCallOpenErrorEvent(): webRTCommCall.getId()="+webRTCommCall.getId()); 
 
     //Enabled button DISCONECT, CALL
     this.view.enableCallButton();
@@ -841,11 +841,11 @@ MobicentsWebRTCPhoneController.prototype.onWebRTCommCallOpenErrorEvent=function(
 }
 
 /**
- * Implementation of the WebRtcCommCall listener interface
+ * Implementation of the webRTCommCall listener interface
  */
-MobicentsWebRTCPhoneController.prototype.onWebRTCommCallRingingEvent=function(webRtcCommCall)
+MobicentsWebRTCPhoneController.prototype.onWebRTCommCallRingingEvent=function(webRTCommCall)
 {
-    console.debug ("MobicentsWebRTCPhoneController:onWebRTCommCallRingingEvent(): webRtcCommCall.getId()="+webRtcCommCall.getId()); 
+    console.debug ("MobicentsWebRTCPhoneController:onWebRTCommCallRingingEvent(): webRTCommCall.getId()="+webRTCommCall.getId()); 
     this.webRTCommCall=webRTCommCall;
     this.view.playRinging();
     this.view.disableCallButton();
@@ -854,17 +854,17 @@ MobicentsWebRTCPhoneController.prototype.onWebRTCommCallRingingEvent=function(we
     this.view.disableConnectButton();
     //this.view.disableSendMessageButton();
     //this.view.disableCancelCallButton();
-    show_desktop_notification("Incoming Call from " + webRtcCommCall.getCallerPhoneNumber());
-    $("#call_message").html("<p>Incoming Call from " + webRtcCommCall.getCallerPhoneNumber() +"</p>");
+    show_desktop_notification("Incoming Call from " + webRTCommCall.getCallerPhoneNumber());
+    $("#call_message").html("<p>Incoming Call from " + webRTCommCall.getCallerPhoneNumber() +"</p>");
      $('#callModal').modal(); 
 }
 
 /**
- * Implementation of the WebRtcCommCall listener interface
+ * Implementation of the webRTCommCall listener interface
  */
-MobicentsWebRTCPhoneController.prototype.onWebRTCommCallRingingBackEvent=function(webRtcCommCall)
+MobicentsWebRTCPhoneController.prototype.onWebRTCommCallRingingBackEvent=function(webRTCommCall)
 {
-    console.debug ("MobicentsWebRTCPhoneController:onWebRTCommCallRingingBackEvent(): webRtcCommCall.getId()="+webRtcCommCall.getId()); 
+    console.debug ("MobicentsWebRTCPhoneController:onWebRTCommCallRingingBackEvent(): webRTCommCall.getId()="+webRTCommCall.getId()); 
     this.view.playRinging();
     this.view.disableCallButton();
     this.view.disableDisconnectButton();
@@ -877,9 +877,9 @@ MobicentsWebRTCPhoneController.prototype.onWebRTCommCallRingingBackEvent=functio
 /**
  * Implementation of the WebRTCommCall listener interface
  */
-WebRTCommTestWebAppController.prototype.onWebRTCommCallHangupEvent=function(webRTCommCall)
+MobicentsWebRTCPhoneController.prototype.onWebRTCommCallHangupEvent=function(webRTCommCall)
 {
-    console.debug ("WebRTCommTestWebAppController:onWebRTCommCallHangupEvent(): webRTCommCall.getId()="+webRTCommCall.getId()); 
+    console.debug ("MobicentsWebRTCPhoneController:onWebRTCommCallHangupEvent(): webRTCommCall.getId()="+webRTCommCall.getId()); 
     //Enabled button DISCONECT, CALL
     this.view.enableCallButton();
     this.view.enableDisconnectButton();
@@ -904,9 +904,9 @@ WebRTCommTestWebAppController.prototype.onWebRTCommCallHangupEvent=function(webR
 /**
  * Implementation of the WebRTCommCall listener interface
  */
-WebRTCommTestWebAppController.prototype.onWebRTCommCallMessageEvent=function(webRTCommCall, message)
+MobicentsWebRTCPhoneController.prototype.onWebRTCommCallMessageEvent=function(webRTCommCall, message)
 {
-    console.debug ("WebRTCommTestWebAppController:onWebRTCommCallMessageEvent(): webRTCommCall.getId()="+webRTCommCall.getId()); 
+    console.debug ("MobicentsWebRTCPhoneController:onWebRTCommCallMessageEvent(): webRTCommCall.getId()="+webRTCommCall.getId()); 
     if(webRTCommCall.isIncoming()) alert("Message from "+webRTCommCall.getCallerPhoneNumber()+":"+message);
     else alert("Message from "+webRTCommCall.getCalleePhoneNumber()+":"+message);
 }
