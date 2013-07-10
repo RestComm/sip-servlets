@@ -794,10 +794,10 @@ MobicentsWebRTCPhoneController.prototype.onWebRTCommCallOpenedEvent=function(web
     }
     else
     {
-        if(webRTCommCall.getRemoteAudioMediaStream())
+        /*if(webRTCommCall.getRemoteAudioMediaStream())
         {
             this.view.playRemoteAudio(webRTCommCall.getRemoteAudioMediaStream());
-        } 
+        } */
         if(webRTCommCall.getRemoteVideoMediaStream())
         {
             this.view.showRemoteVideo();
@@ -888,11 +888,11 @@ MobicentsWebRTCPhoneController.prototype.onWebRTCommCallHangupEvent=function(web
     this.view.disableEndCallButton();
     //this.view.disableCancelCallButton();
     this.view.disableConnectButton();
-    //this.view.disableSendMessageButton();
-    this.view.hideRemoteVideo();
+    //this.view.disableSendMessageButton();    
     this.view.stopRemoteVideo();
-    this.view.stopRemoteAudio();
+    //this.view.stopRemoteAudio();
     this.view.stopRinging();
+    this.view.hideRemoteVideo();
     this.webRTCommCall=undefined;
     
     if(webRTCommCall.getCallerPhoneNumber())
