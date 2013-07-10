@@ -12,7 +12,7 @@
         <script src="./js/bootstrap.js"></script>
         <script src="./js/bootstrap.min.js"></script>
         <script src="./js/jain-sip.js" type="text/javascript"></script> 
-        <script src="./js/WebRtcComm.js" type="text/javascript"></script>  
+        <script src="./js/WebRTComm.js" type="text/javascript"></script>  
         <script src="./js/MobicentsWebRTCPhoneController.js" type="text/javascript" ></script>
         <script type='text/javascript'>	 
             mobicentsWebRTCPhoneController=new MobicentsWebRTCPhoneController(this);
@@ -76,12 +76,12 @@
 
             function showLocalVideo() 
             {
-                document.getElementById("localVideoPreview").disabled=true;
+                document.getElementById("localVideo").disabled=true;
             }
 
             function hideLocalVideo() 
             {
-                document.getElementById("localVideoPreview").disabled=true;
+                document.getElementById("localVideo").disabled=true;
             }
 
             function showRemoteVideo() 
@@ -94,7 +94,88 @@
                 document.getElementById("remoteVideo").style.visibility = "hidden";
             }
 
-            function playLocalVideo(localMediaStream) 
+	    function playLocalVideo(localMediaStream) 
+            {
+                if(typeof navigator.webkitGetUserMedia != 'undefined')
+                {     
+                    document.getElementById("localVideo").src=webkitURL.createObjectURL(localMediaStream);
+                }
+                else if(typeof navigator.mozGetUserMedia != 'undefined')
+                {
+                    document.getElementById("localVideo").mozSrcObject=localMediaStream;
+                }
+                document.getElementById("localVideo").muted=true;
+                document.getElementById("localVideo").play();
+            }
+
+
+            function stopLocalVideo() 
+            {
+                document.getElementById("localVideo").pause();
+                if(typeof navigator.webkitGetUserMedia != 'undefined')
+                {     
+                    document.getElementById("localVideo").src=null;
+                }
+                else if(typeof navigator.mozGetUserMedia != 'undefined')
+                {
+                    document.getElementById("localVideo").mozSrcObject=null;
+                }
+            }
+
+            function playRemoteVideo(remoteMediaStream) 
+            {
+                if(typeof navigator.webkitGetUserMedia != 'undefined')
+                {     
+                    document.getElementById("remoteVideo").src=webkitURL.createObjectURL(remoteMediaStream);
+                }
+                else if(typeof navigator.mozGetUserMedia != 'undefined')
+                {
+                    document.getElementById("remoteVideo").mozSrcObject=remoteMediaStream;
+                }
+                document.getElementById("remoteVideo").play();
+            }
+
+
+            function stopRemoteVideo() 
+            {
+                document.getElementById("remoteVideo").pause();
+                if(typeof navigator.webkitGetUserMedia != 'undefined')
+                {     
+                    document.getElementById("remoteVideo").src=undefined;
+                }
+                else if(typeof navigator.mozGetUserMedia != 'undefined')
+                {
+                    document.getElementById("remoteVideo").mozSrcObject=undefined;
+                }
+            }
+
+            function playRemoteAudio(remoteMediaStream) 
+            {
+                if(typeof navigator.webkitGetUserMedia != 'undefined')
+                {     
+                    document.getElementById("remoteAudio").src=webkitURL.createObjectURL(remoteMediaStream);
+                }
+                else if(typeof navigator.mozGetUserMedia != 'undefined')
+                {
+                    document.getElementById("remoteAudio").mozSrcObject=remoteMediaStream;
+                }
+                document.getElementById("remoteAudio").play();         
+            }
+            
+            function stopRemoteAudio() 
+            {
+                document.getElementById("remoteAudio").pause();
+                if(typeof navigator.webkitGetUserMedia != 'undefined')
+                {     
+                    document.getElementById("remoteAudio").src=undefined;
+                }
+                else if(typeof navigator.mozGetUserMedia != 'undefined')
+                {
+                    document.getElementById("remoteAudio").mozSrcObject=undefined;
+                }
+            }
+
+            /*function playLocalVideo(localMediaStream) 
             {
                 if(typeof navigator.webkitGetUserMedia != undefined)
                 {     
@@ -146,7 +227,7 @@
                 {
                     document.getElementById("remoteVideo").mozSrcObject=undefined;
                 }
-            }
+            }*/
 
             function playRinging(remoteMediaStream) 
             {
@@ -195,9 +276,9 @@
                 document.getElementById("sipPassword").value=value;
             }
 
-            function setSipContactUriTextInputValue(value) 
+            function setSipContactTextInputValue(value) 
             {
-                document.getElementById("sipContactUri").value=value;
+                document.getElementById("sipContact").value=value;
             }
            
 
@@ -244,10 +325,40 @@
                 return getTextInputValue("sipPassword"); 
             }
 
-            function getSipContactUriTextInputValue() 
+            function getSipContactTextInputValue() 
             {
-                return getTextInputValue("sipContactUri");
+                return getTextInputValue("sipContact");
             }  
+
+	    function getAudioCodecsFilterTextInputValue() 
+            {
+                return getTextInputValue("audioCodecsFilter")
+            }
+            
+            function getVideoCodecsFilterTextInputValue() 
+            {
+                return getTextInputValue("videoCodecsFilter")
+            }
+            
+            function getLocalVideoFormatTextInputValue() 
+            {
+                return getTextInputValue("localVideoFormat")
+            }
+
+	    function setAudioCodecsFilterTextInputValue(value) 
+            {
+                document.getElementById("audioCodecsFilter").value=value;
+            }
+            
+            function setVideoCodecsFilterTextInputValue(value) 
+            {
+                document.getElementById("videoCodecsFilter").value=value;
+            }
+            
+            function setLocalVideoFormatTextInputValue(value) 
+            {
+                document.getElementById("localVideoFormat").value=value;
+            }
             
             $(function() {
                 $( "#resizable" ).resizable({
@@ -259,7 +370,7 @@
             });
             
             $(function() {
-                $( "#localVideoPreview" ).draggable({ containment: "#media", scroll: false });
+                $( "#localVideo" ).draggable({ containment: "#media", scroll: false });
             });            
     
             function toggleFullScreen() {
@@ -355,6 +466,67 @@
                                         </div>
                                     </div>					    
                                 </div>
+				<div class="accordion-group">
+                                    <div class="accordion-heading">           
+                                        <a class="accordion-toggle nav-header" data-toggle="collapse" data-parent="#accordion1" href="#communicationSettings">
+                                            Communication Settings
+                                        </a>						 
+                                    </div>
+                                    <div id="communicationSettings" class="accordion-body collapse">
+					<div id='audioCodecsFilterDiv'>
+					    <label>Audio codecs filter (ordered by priority e.g. PCMU,PCMA,OPUS):</label>
+					    <input id='audioCodecsFilter' type="text" size="30" >
+					</div>
+					<div id='videoCodecsFilterDiv'>
+					    <label>Video codecs filter (ordered by priority e.g. VP8, H264):</label>
+					    <input id='videoCodecsFilter' type="text" size="30" >
+					</div>
+					<div id='localVideoFormatDiv'>
+					    <label>Local video format:</label>
+					    <input id='localVideoFormat' type="text" size="100" onchange = "webRTCommTestWebAppController.onChangeLocalVideoFormatViewEventHandler();">
+					</div>
+				    </div>	
+				</div>
+				<!--label style="color:black; font-weight:bold; ">Communication settings</label>
+				    <div style="border:black solid thin; width:1000px" id="webRTCommClientSipCallConfigurationDiv" title="Call settings"  >
+					<div id='sipContactPhoneNumberDiv'>
+					    <label>SIP Contact phone number:</label>
+					    <input id="sipContact"  type="text" size="30" > 
+					</div>
+					<div id='sipRegisterModeDiv'>
+					    <label>SIP REGISTER required:</label>
+					    <input  id='sipRegistrationCkeckBox' type="checkbox" checked name="sipRegistrationCkeckBox">
+					</div>
+					<div id='audioMediaDiv'>
+					    <label>Audio media:</label>
+					    <input  id='audioMediaCkeckBox' type="checkbox" checked>
+					</div>
+					<div id='videoMediaDiv'>
+					    <label>Video media:</label>
+					    <input  id='videoMediaCkeckBox' type="checkbox" checked >
+					</div>
+					<div id='messageMediaDiv'>
+					    <label>Message media:</label>
+					    <input  id='messageMediaCkeckBox' type="checkbox" checked>
+					</div>
+					<div id='audioCodecsFilterDiv'>
+					    <label>Audio codecs filter (ordered by priority e.g. PCMU,PCMA,OPUS):</label>
+					    <input id='audioCodecsFilter' type="text" size="30" >
+					</div>
+					<div id='videoCodecsFilterDiv'>
+					    <label>Video codecs filter (ordered by priority e.g. VP8, H264):</label>
+					    <input id='videoCodecsFilter' type="text" size="30" >
+					</div>
+					<div id='localVideoFormatDiv'>
+					    <label>Local video format:</label>
+					    <input id='localVideoFormat' type="text" size="100" onchange = "webRTCommTestWebAppController.onChangeLocalVideoFormatViewEventHandler();">
+					</div>
+					 <div id='messageMediaDiv'>
+					    <label>DTLS SRTP mode:</label>
+					    <input  id='dtlsSrtpKeyAgreementCkeckBox' type="checkbox" checked>
+					    <label style="color:red">(ckecked: DTLS, unchecked:SDES)</label>
+					</div>
+				    </div--> 
                             </div>				
                             <div class="control-group" id ='input'>
                                 <input id='Register' class="btn btn-primary" type='submit' name='Register' disabled="disabled" value='Register'  onclick = "mobicentsWebRTCPhoneController.onClickConnectButtonViewEventHandler();"/>
@@ -369,14 +541,14 @@
                         <div>
                             <div class="nav-header">Communicate</div>		    				      
                             <p class="lead"> 
-                            <div id='sipContactUriDiv'>
+                            <div id='sipContactDiv'>
                                 <div id='input'>
-                                    Contact To Call: <input id="sipContactUri" type="text" size="60" class="input-xlarge focused" >					
-                                    &nbsp;<input id='Call' class="btn btn-primary" type='submit' name='Call' value='Call' disabled="disabled" onclick = "mobicentsWebRTCPhoneController.onClickCallButtonViewEventHandler(getSipContactUriTextInputValue());"/>
+                                    Contact To Call: <input id="sipContact" type="text" size="60" class="input-xlarge focused" >					
+                                    &nbsp;<input id='Call' class="btn btn-primary" type='submit' name='Call' value='Call' disabled="disabled" onclick = "mobicentsWebRTCPhoneController.onClickCallButtonViewEventHandler(getSipContactTextInputValue());"/>
                                     &nbsp;<input id='Bye' class="btn btn-primary" type='submit' name='Bye' value='Bye' disabled="disabled" onclick = "mobicentsWebRTCPhoneController.onClickEndCallButtonViewEventHandler();"/>
                                     <div id='media'>
                                         <div id='over'>
-                                            <video id="localVideoPreview" autoplay="autoplay" class="ui-widget-content" style="height:120px; width:160px; margin-top: 10px; margin-right: 600px; -webkit-transition-property: opacity;-webkit-transition-duration: 2s;"></video>  
+                                            <video id="localVideo" autoplay="autoplay" class="ui-widget-content" style="height:120px; width:160px; margin-top: 10px; margin-right: 600px; -webkit-transition-property: opacity;-webkit-transition-duration: 2s;"></video>  
                                         </div>
                                         <div id='resizable'>
                                             <video id="remoteVideo" onDblClick="toggleFullScreen();" width="640" height="480" autoplay="autoplay" style="margin-top: 10px;-webkit-transition-property: opacity; -webkit-transition-duration: 2s;"></video>  

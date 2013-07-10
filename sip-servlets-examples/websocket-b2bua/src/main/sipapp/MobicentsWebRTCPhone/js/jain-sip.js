@@ -4638,145 +4638,6 @@ ConnectionField.prototype.clone =function() {
  */
 
 /*
- *  Implementation of the JAIN-SIP ConnectionField .
- *  @see  gov/nist/javax/sdp/fields/ConnectionField.java 
- *  @author Laurent STRULLU (laurent.strullu@orange.com)
- *  @version 1.0 
- */
-
-/**
- * constructor
- */
-function ConnectionField() {
-    this.classname="ConnectionField";
-    this.fieldName=this.CONNECTION_FIELD;
-    this.networkType=SDPField.prototype.IN;
-    this.addressType=SDPField.prototype.IPV4;
-    this.address=null;
-}
- 
-ConnectionField.prototype = new SDPField();
-ConnectionField.prototype.constructor=ConnectionField; 
-
-
-ConnectionField.prototype.getNetworkType =function() {
-    return this.networkType;
-}
-
-ConnectionField.prototype.getAddressType =function() {
-    return this.addressType;
-}
-
-ConnectionField.prototype.getAddress =function() {
-    if (this.address == null)
-        return null;
-    else {
-        var host = this.address.getAddress();
-        if (host == null)
-            return null;
-        else
-            return host.getAddress();
-    }
-} 
-
-/**
- * Set the nettype member
- */
-ConnectionField.prototype.setNetworkType =function(networkType) {
-    if(typeof networkType ==  'string')
-    {
-        this.networkType = networkType;
-    }
-    else throw new SdpException("ConnectionField.setNetworkType() requires string type argument");  
-}
-
-/**
- * Set the addrtype member
- */
-ConnectionField.prototype.setAddressType =function(addressType) {
-    if(typeof addressType ==  'string')
-    {
-        this.addressType = addressType;
-    }
-    else throw new SdpException("ConnectionField.setAddressType() requires string type argument");  
-}
-
-
-/**
- * Set the address member
- */
-ConnectionField.prototype.setAddress =function(address) {
-    if(address instanceof ConnectionAddress)
-    {
-        this.address = address;
-    }
-    else if(typeof address == 'string')
-    {
-        if (this.address == null) {
-            this.address = new ConnectionAddress();
-            var host = new Host(address);
-            this.address.setHost(host);
-        } else {
-            var host = this.address.getHost();
-            if (host == null) {
-                host = new Host(address);
-                this.address.setAddress(host);
-            } else
-                host.setAddress(address);
-        }
-    }
-    else throw new SdpException("ConnectionField.setAddress() requires ConnectionAddress object or string argument");  
-}
-
-
-/**
- * Get the string encoded version of this object
- * @since v1.0
- */
-ConnectionField.prototype.encode =function() {
-    if(this.address == null) throw  new SdpException("ConnectionField.encode() requires address"); 
-    var encoded_string = this.CONNECTION_FIELD;
-    encoded_string += this.networkType;
-    encoded_string += Separators.prototype.SP;
-    encoded_string += this.addressType;
-    encoded_string += Separators.prototype.SP;
-    encoded_string += this.address.encode();
-    encoded_string += Separators.prototype.NEWLINE;
-    return encoded_string; 
-}
-
-
-ConnectionField.prototype.clone =function() {
-    var retval = new ConnectionField();
-    if (this.address != null)
-        retval.address = this.address.clone();
-    retval.networkType=this.networkType;
-    retval.addressType=this.addressType;
-    return retval;
-}
-/*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
- * and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-
-/*
  *  Implementation of the JAIN-SIP KeyField .
  *  @see  gov/nist/javax/sdp/fields/KeyField.java 
  *  @author Laurent STRULLU (laurent.strullu@orange.com)
@@ -5038,92 +4899,6 @@ MediaField.prototype.clone =function() {
     }
     return retval;
 }
-
-/*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
- * and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-
-/*
- *  Implementation of the JAIN-SIP KeyField .
- *  @see  gov/nist/javax/sdp/fields/KeyField.java 
- *  @author Laurent STRULLU (laurent.strullu@orange.com)
- *  @version 1.0 
- */
-
-function KeyField() {
-    this.classname="KeyField";
-    this.fieldName=this.KEY_FIELD;
-    this.method=null;
-    this.key=null;
-    
-}
- 
-KeyField.prototype = new SDPField();
-KeyField.prototype.constructor=KeyField; 
-
-KeyField.prototype.getMethod =function() {
-    return this.method;
-}
-
-KeyField.prototype.getKey =function() {
-    return this.key;
-}
-
-/**
- * Set the type member
- */
-KeyField.prototype.setMethod =function(method) {
-    if(typeof method == "string")
-    {
-        this.method = method;
-    } 
-    else throw new SdpException("KeyField.setMethod() requires string object argument");
-}
-   
-/**
- * Set the keyData member
- */
-KeyField.prototype.setKey =function(key) {
-     if(typeof key == "string")
-    {
-        this.key = key;
-    } 
-    else throw new SdpException("KeyField.setKey() requires string object argument");
-}
-
-/**
- *  Get the string encoded version of this object
- * @since v1.0
- */
-KeyField.prototype.encode =function() {
-    if(this.method==null) throw  new SdpException("KeyField.encode() requires method");
-    if(this.key==null) throw  new SdpException("KeyField.encode() requires key");
-    var encodedString=this.KEY_FIELD;
-    encodedString += this.method;
-    encodedString += Separators.prototype.COLON;
-    encodedString += this.key;
-    encodedString += Separators.prototype.NEWLINE;
-    return encodedString;
-}
-
 
 /*
  * TeleStax, Open Source Cloud Communications  Copyright 2012. 
@@ -14589,93 +14364,6 @@ TimeStamp.prototype.setTimeDelay =function(delay){
  */
 
 /*
- *  Implementation of the JAIN-SIP ContentLength .
- *  @see  gov/nist/javax/sip/header/ContentLength.java 
- *  @author Yuemin Qin (yuemin.qin@orange.com)
- *  @author Laurent STRULLU (laurent.strullu@orange.com)
- *  @version 1.0 
- */
-function ContentLength(length) {
-    this.classname="ContentLength";
-    this.headerName=this.NAME;
-    this.contentLength=null;
-    if(length==null)
-    {
-        this.headerName=this.NAME;
-    }
-    else
-    {
-        this.headerName=this.NAME;
-        this.contentLength=length;
-    }
-}
-
-ContentLength.prototype = new SIPHeader();
-ContentLength.prototype.constructor=ContentLength;
-ContentLength.prototype.NAME="Content-Length";
-
-ContentLength.prototype.getContentLength =function(){
-    var x=this.contentLength-0;
-    return x;
-}
-
-ContentLength.prototype.setContentLength =function(contentLength){
-    if (contentLength < 0)
-    {
-        console.error("ContentLength:setContentLength(): the contentLength parameter is < 0");
-        throw "ContentLength:setContentLength(): the contentLength parameter is < 0";
-}
-    this.contentLength = contentLength;
-}
-
-ContentLength.prototype.encodeBody =function(){
-    return this.encodeBodyBuffer("").toString();
-}
-
-ContentLength.prototype.encodeBodyBuffer =function(buffer){
-    if (this.contentLength == null)
-    {
-        buffer=buffer+"0";
-    }
-    else
-    {
-        buffer=buffer+this.contentLength.toString();
-    }
-    return buffer;
-}
-
-ContentLength.prototype.match =function(other){
-    if (other instanceof ContentLength)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}/*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
- * and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
-
-/*
  *  Implementation of the JAIN-SIP ContentDisposition .
  *  @see  gov/nist/javax/sip/header/ContentDisposition.java 
  *  @author Yuemin Qin (yuemin.qin@orange.com)
@@ -23010,14 +22698,16 @@ SIPRequest.prototype.checkHeaders =function(){
         /*if (getHeader(SubscriptionStateHeader.NAME) == null){
             console.error(prefix + SubscriptionStateHeader.NAME, 0);
         }*/
-        if (getHeader(this.EventHeader) == null){
+        if (this.getHeader(this.EventHeader) == null){
             console.error("SIPRequest:checkHeaders(): "+prefix + this.EventHeader);
             throw "SIPRequest:checkHeaders(): "+prefix + this.EventHeader;
         }
     } else if (this.getMethod()==this.PUBLISH) {
         if (this.getHeader(this.EventHeader) == null)
+                {
             console.error("SIPRequest:checkHeaders(): "+prefix + this.EventHeader);
             throw "SIPRequest:checkHeaders(): "+prefix + this.EventHeader;
+                }
     }
     if (this.requestLine.getMethod()==this.INVITE
         || this.requestLine.getMethod()==this.SUBSCRIBE
