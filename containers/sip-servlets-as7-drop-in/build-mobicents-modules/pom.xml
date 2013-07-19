@@ -38,212 +38,215 @@
     <name>JBoss Application Server: Build Mobicents Add-on Modules</name>
 	<description>&gt;JBoss Application Server: Build Mobicents Add-on Modules</description>
 	<packaging>pom</packaging>
-    
-    <properties>
-        <!-- generated configs root dirs -->
-        <generated.configs>${basedir}/target/generated-configs</generated.configs>
-        <generated.configs.standalone>${generated.configs}/standalone/configuration</generated.configs.standalone>
-        <generated.configs.domain>${generated.configs}/domain/configuration</generated.configs.domain>
-        <generated.configs.examples>${generated.configs}/docs/examples/configs</generated.configs.examples>
-        <generated.configs.src.dir>${basedir}/src/main/resources</generated.configs.src.dir>
-        <!-- MSS -->
-	<jboss.as.release.version>7.1.2.Final</jboss.as.release.version>
-        <junit.version>4.10</junit.version>
-	<version.org.jboss.jandex>1.0.3.Final</version.org.jboss.jandex>
-	<version.rhino.js>1.7R2</version.rhino.js>
-	<version.org.apache.ant>1.8.2</version.org.apache.ant>
-    </properties>
+   
+	<properties>
+		<!-- generated configs root dirs -->
+		<generated.configs>${basedir}/target/generated-configs</generated.configs>
+		<generated.configs.standalone>${generated.configs}/standalone/configuration</generated.configs.standalone>
+		<generated.configs.domain>${generated.configs}/domain/configuration</generated.configs.domain>
+		<generated.configs.examples>${generated.configs}/docs/examples/configs</generated.configs.examples>
+		<generated.configs.src.dir>${basedir}/src/main/resources</generated.configs.src.dir>
+		<!-- MSS -->
+		<jboss.as.release.version>7.1.3.Final</jboss.as.release.version>
+		<junit.version>4.10</junit.version>
+		<version.org.jboss.jandex>1.0.3.Final</version.org.jboss.jandex>
+		<version.rhino.js>1.7R2</version.rhino.js>
+		<version.org.apache.ant>1.8.2</version.org.apache.ant>
+	</properties>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-		<version>1.6</version>
-                <inherited>false</inherited>
-                <executions>
-                    <!--  See src/resources/configuration/ReadMe.txt for how the configuration assembly works -->
-                    <execution>
-                        <id>build-dist</id>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                        <phase>package</phase>
-                        <configuration>
-                            <target>
-                                <ant antfile="build.xml" inheritRefs="true">
-                                    <target name="${ant.target}" />
-                                </ant>
-                            </target>
-                        </configuration>
-                    </execution>
-                </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.jboss</groupId>
-                        <artifactId>jandex</artifactId>
-                        <version>${version.org.jboss.jandex}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.apache.ant</groupId>
-                        <artifactId>ant-apache-bsf</artifactId>
-                        <version>${version.org.apache.ant}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>rhino</groupId>
-                        <artifactId>js</artifactId>
-                        <version>${version.rhino.js}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>    
-        </plugins>
-    </build>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.6</version>
+				<inherited>false</inherited>
+				<executions>
+					<!-- See src/resources/configuration/ReadMe.txt for how the configuration 
+						assembly works -->
+					<execution>
+						<id>build-dist</id>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<target>
+								<ant antfile="build.xml" inheritRefs="true">
+									<target name="${ant.target}" />
+								</ant>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>org.jboss</groupId>
+						<artifactId>jandex</artifactId>
+						<version>${version.org.jboss.jandex}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.apache.ant</groupId>
+						<artifactId>ant-apache-bsf</artifactId>
+						<version>${version.org.apache.ant}</version>
+					</dependency>
+					<dependency>
+						<groupId>rhino</groupId>
+						<artifactId>js</artifactId>
+						<version>${version.rhino.js}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
+		</plugins>
+	</build>
 
-<pluginRepositories>
-<pluginRepository>
-         <id>zanata-releases</id>
-         <name>zanata-releases</name>
-         <url>https://repository.jboss.org/nexus/content/repositories/flies-releases</url>
-         <releases>
-            <enabled>true</enabled>
-         </releases>
-         <snapshots>
-            <enabled>false</enabled>
-         </snapshots>
-      </pluginRepository>
-</pluginRepositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>zanata-releases</id>
+			<name>zanata-releases</name>
+			<url>https://repository.jboss.org/nexus/content/repositories/flies-releases</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 
 
-    <dependencies>
+	<dependencies>
 
-    </dependencies>
+	</dependencies>
 
-    <profiles>
-	<profile>
-            <id>normal</id>
-            <activation>
-                <property><name>!minimalistic</name></property>
-            </activation>
+	<profiles>
+		<profile>
+			<id>normal</id>
+			<activation>
+				<property>
+					<name>!minimalistic</name>
+				</property>
+			</activation>
 
-            <dependencies>
+			<dependencies>
 
-                <dependency>
-                    <groupId>javax.sip</groupId>
-                    <artifactId>jain-sip-api</artifactId>
-                    <version>${jain-sip-api.version}</version>
-                    <scope>provided</scope>
-                </dependency>
+				<dependency>
+					<groupId>javax.sip</groupId>
+					<artifactId>jain-sip-api</artifactId>
+					<version>${jain-sip-api.version}</version>
+					<scope>provided</scope>
+				</dependency>
 
-                <dependency>
-                    <groupId>javax.sip</groupId>
-                    <artifactId>jain-sip-ri</artifactId>
-                    <version>${jain-sip-ri.version}</version>
-                    <scope>provided</scope>
-                </dependency>
+				<dependency>
+					<groupId>javax.sip</groupId>
+					<artifactId>jain-sip-ri</artifactId>
+					<version>${jain-sip-ri.version}</version>
+					<scope>provided</scope>
+				</dependency>
 
-                <dependency>
-                    <groupId>org.mobicents.servlet.sip.containers</groupId>
-                    <artifactId>jboss-as7-mobicents</artifactId>
-                    <version>${project.version}</version>
-                    <scope>provided</scope>
-                </dependency>
+				<dependency>
+					<groupId>org.mobicents.servlet.sip.containers</groupId>
+					<artifactId>jboss-as7-mobicents</artifactId>
+					<version>${project.version}</version>
+					<scope>provided</scope>
+				</dependency>
 
-                <dependency>
-                    <groupId>org.mobicents.servlet.sip</groupId>
-                    <artifactId>sip-servlets-impl</artifactId>
-                    <version>${project.version}</version>
-                    <scope>provided</scope>
-                </dependency>
+				<dependency>
+					<groupId>org.mobicents.servlet.sip</groupId>
+					<artifactId>sip-servlets-impl</artifactId>
+					<version>${project.version}</version>
+					<scope>provided</scope>
+				</dependency>
 
-                <dependency>
-                    <groupId>org.mobicents.servlet.sip</groupId>
-                    <artifactId>sip-servlets-spec</artifactId>
-                    <version>${project.version}</version>
-                    <scope>provided</scope>
-                </dependency>
+				<dependency>
+					<groupId>org.mobicents.servlet.sip</groupId>
+					<artifactId>sip-servlets-spec</artifactId>
+					<version>${project.version}</version>
+					<scope>provided</scope>
+				</dependency>
 
-                <dependency>
-                    <groupId>org.mobicents.servlet.sip</groupId>
-                    <artifactId>sip-servlets-annotations</artifactId>
-                    <version>${project.version}</version>
-                    <scope>provided</scope>
-                </dependency>
+				<dependency>
+					<groupId>org.mobicents.servlet.sip</groupId>
+					<artifactId>sip-servlets-annotations</artifactId>
+					<version>${project.version}</version>
+					<scope>provided</scope>
+				</dependency>
 
-                <dependency>
-                    <groupId>org.mobicents.servlet.sip</groupId>
-                    <artifactId>sip-servlets-jruby</artifactId>
-                    <version>${project.version}</version>
-                    <scope>provided</scope>
-                </dependency>
+				<dependency>
+					<groupId>org.mobicents.servlet.sip</groupId>
+					<artifactId>sip-servlets-jruby</artifactId>
+					<version>${project.version}</version>
+					<scope>provided</scope>
+				</dependency>
 
-                <dependency>
-                    <groupId>org.mobicents.servlet.sip</groupId>
-                    <artifactId>sip-servlets-client</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
+				<dependency>
+					<groupId>org.mobicents.servlet.sip</groupId>
+					<artifactId>sip-servlets-client</artifactId>
+					<version>${project.version}</version>
+				</dependency>
 
-                <dependency>
-                    <groupId>org.mobicents.servlet.sip</groupId>
-                    <artifactId>sip-servlets-core-api</artifactId>
-                    <version>${project.version}</version>
-                    <scope>provided</scope>
-                </dependency>
+				<dependency>
+					<groupId>org.mobicents.servlet.sip</groupId>
+					<artifactId>sip-servlets-core-api</artifactId>
+					<version>${project.version}</version>
+					<scope>provided</scope>
+				</dependency>
 
-                <dependency>
-                    <groupId>org.mobicents.servlet.sip.containers</groupId>
-                    <artifactId>sip-servlets-as7</artifactId>
-                    <version>${project.version}</version>
-                    <scope>provided</scope>
-                </dependency>
+				<dependency>
+					<groupId>org.mobicents.servlet.sip.containers</groupId>
+					<artifactId>sip-servlets-as7</artifactId>
+					<version>${project.version}</version>
+					<scope>provided</scope>
+				</dependency>
 
-                <dependency>            
-                    <groupId>org.mobicents.javax.sip</groupId>
-                    <artifactId>mobicents-jain-sip-ext</artifactId>
-                    <version>${mobicents.jain.sip.ext.version}</version>
-                    <scope>provided</scope>
-                </dependency>
+				<dependency>
+					<groupId>org.mobicents.javax.sip</groupId>
+					<artifactId>mobicents-jain-sip-ext</artifactId>
+					<version>${mobicents.jain.sip.ext.version}</version>
+					<scope>provided</scope>
+				</dependency>
 
-                <dependency>
-                    <groupId>dnsjava</groupId>
-                    <artifactId>dnsjava</artifactId>
-                    <version>2.0.6</version>
-                    <scope>provided</scope>
-                </dependency>
+				<dependency>
+					<groupId>dnsjava</groupId>
+					<artifactId>dnsjava</artifactId>
+					<version>2.0.6</version>
+					<scope>provided</scope>
+				</dependency>
 
-                <dependency>
-                        <groupId>net.java.stun4j</groupId>
-                        <artifactId>stun4j</artifactId>
-                        <version>1.0.MOBICENTS</version>
-                        <scope>provided</scope>
-                </dependency>
+				<dependency>
+					<groupId>net.java.stun4j</groupId>
+					<artifactId>stun4j</artifactId>
+					<version>1.0.MOBICENTS</version>
+					<scope>provided</scope>
+				</dependency>
 
-                <dependency>
-                    <groupId>org.mobicents.ha.javax.sip</groupId>
-                    <artifactId>mobicents-jain-sip-ha-core</artifactId>
-                    <version>${mobicents.jain.sip.ha.version}</version>
-                    <scope>provided</scope>
-                </dependency>
+				<dependency>
+					<groupId>org.mobicents.ha.javax.sip</groupId>
+					<artifactId>mobicents-jain-sip-ha-core</artifactId>
+					<version>${mobicents.jain.sip.ha.version}</version>
+					<scope>provided</scope>
+				</dependency>
 
-                <dependency>
-                    <groupId>org.mobicents.servlet.sip</groupId>
-                    <artifactId>sip-servlets-application-router</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-	
-		<dependency>
-			<groupId>org.mobicents.tools</groupId>
-			<artifactId>sip-balancer-jar</artifactId>
-			<version>${mobicents.balancer.version}</version>
-			<scope>provided</scope>
-		</dependency>
+				<dependency>
+					<groupId>org.mobicents.servlet.sip</groupId>
+					<artifactId>sip-servlets-application-router</artifactId>
+					<version>${project.version}</version>
+				</dependency>
 
-            </dependencies>
+				<dependency>
+					<groupId>org.mobicents.tools</groupId>
+					<artifactId>sip-balancer-jar</artifactId>
+					<version>${mobicents.balancer.version}</version>
+					<scope>provided</scope>
+				</dependency>				
 
-            <properties>
-                <ant.target>all</ant.target>
-            </properties>
-        </profile>
+			</dependencies>
 
-    </profiles>
+			<properties>
+				<ant.target>all</ant.target>
+			</properties>
+		</profile>
+
+	</profiles>
 </project>
 
