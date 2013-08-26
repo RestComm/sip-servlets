@@ -246,6 +246,21 @@
                 document.getElementById("stunServer").value=value;
             }
 
+	    function setTurnServerTextInputValue(value) 
+            {
+                document.getElementById("turnServer").value=value;
+            }
+
+	    function setTurnLoginTextInputValue(value) 
+            {
+                document.getElementById("turnLogin").value=value;
+            }
+		
+	    function setTurnPasswordTextInputValue(value) 
+            {
+                document.getElementById("turnPassword").value=value;
+            }
+
             function setSipOutboundProxyTextInputValue(value) 
             {
                 document.getElementById("sipOutboundProxy").value=value;
@@ -293,6 +308,21 @@
             function getStunServerTextInputValue() 
             {
                 return getTextInputValue("stunServer")
+            }
+	
+	    function getTurnServerTextInputValue() 
+            {
+                return getTextInputValue("turnServer")
+            }
+
+   	    function getTurnLoginTextInputValue() 
+            {
+                return getTextInputValue("turnLogin")
+            }
+
+	    function getTurnPasswordTextInputValue() 
+            {
+                return getTextInputValue("turnPassword")
             }
 
             function getSipOutboundProxyTextInputValue() 
@@ -458,6 +488,18 @@
                                             <div class="control-group" id='stunServerDiv'>
                                                 <label class="control-label" for="stunServer"><a style="color:#555555" href="#" rel="tooltip" title="Specify the IP Address and Port of a Stun Server" data-placement="top" data-delay: { show: 10, hide: 100 }>STUN server</a>:</label>
                                                 <input id="stunServer"  type="text" size="30"> 
+                                            </div>
+					    <div class="control-group" id='turnServerDiv'>
+                                                <label class="control-label" for="turnServer"><a style="color:#555555" href="#" rel="tooltip" title="Specify the IP Address and Port of a Turn Server" data-placement="top" data-delay: { show: 10, hide: 100 }>TURN server</a>:</label>
+                                                <input id="turnServer"  type="text" size="30"> 
+                                            </div>
+					    <div class="control-group" id='turnLoginDiv'>
+                                                <label class="control-label" for="turnLogin"><a style="color:#555555" href="#" rel="tooltip" title="Turn Server Login" data-placement="top" data-delay: { show: 10, hide: 100 }>TURN server Login</a>:</label>
+                                                <input id="turnLogin"  type="text" size="30"> 
+                                            </div>
+					    <div class="control-group" id='turnPasswordDiv'>
+                                                <label class="control-label" for="turnPassword"><a style="color:#555555" href="#" rel="tooltip" title="Turn Server Password" data-placement="top" data-delay: { show: 10, hide: 100 }>TURN server Password</a>:</label>
+                                                <input id="turnPassword"  type="text" size="30"> 
                                             </div>
                                             <div class="control-group" id='sipOutboundProxyDiv'>
                                                 <label class="control-label"><a style="color:#555555" href="#" rel="tooltip" title="Specify the IP Address and Port of a WebSocket Server" data-placement="top" data-delay: { show: 10, hide: 100 }>Outbound Proxy</a> :</label>

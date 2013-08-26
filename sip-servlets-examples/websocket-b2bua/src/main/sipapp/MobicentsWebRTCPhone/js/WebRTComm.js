@@ -2585,6 +2585,7 @@ WebRTCommCall.prototype.createRTCPeerConnection =function(){
     var that = this;
     if(this.webRTCommClient.configuration.RTCPeerConnection.stunServer)
     {
+	console.debug("Using Following stun server : " + this.webRTCommClient.configuration.RTCPeerConnection.stunServer);
         rtcPeerConnectionConfiguration.iceServers.push({
             url:"stun:"+this.webRTCommClient.configuration.RTCPeerConnection.stunServer
         });
@@ -2593,12 +2594,21 @@ WebRTCommCall.prototype.createRTCPeerConnection =function(){
         && this.webRTCommClient.configuration.RTCPeerConnection.turnLogin 
         && this.webRTCommClient.configuration.RTCPeerConnection.turnPassword)
         {
+	console.debug("Using Following turn server : " + this.webRTCommClient.configuration.RTCPeerConnection.turnServer + " with username " + this.webRTCommClient.configuration.RTCPeerConnection.turnLogin);
         rtcPeerConnectionConfiguration.iceServers.push({
             url:"turn:"+this.webRTCommClient.configuration.RTCPeerConnection.turnLogin+"@"+this.webRTCommClient.configuration.RTCPeerConnection.turnServer, 
             credential:this.webRTCommClient.configuration.RTCPeerConnection.turnPassword
         });
     }     
-    
+
+    if(this.webRTCommClient.configuration.RTCPeerConnection.turnServer
+        && this.webRTCommClient.configuration.RTCPeerConnection.turnLogin == null)
+        {
+	console.debug("Using Following turn server : " + this.webRTCommClient.configuration.RTCPeerConnection.turnServer);
+        rtcPeerConnectionConfiguration.iceServers.push({
+            url:"turn:"+this.webRTCommClient.configuration.RTCPeerConnection.turnServer
+        });
+    }     
     
     console.debug("WebRTCommCall:createPeerConnection():rtcPeerConnectionConfiguration="+JSON.stringify(rtcPeerConnectionConfiguration));
     console.debug("WebRTCommCall:createPeerConnection():peerConnectionContraints="+JSON.stringify(peerConnectionContraints));

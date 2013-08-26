@@ -32,11 +32,11 @@ MobicentsWebRTCPhoneController.prototype.DEFAULT_SIP_LOGIN=undefined;
 MobicentsWebRTCPhoneController.prototype.DEFAULT_SIP_PASSWORD=undefined;
 MobicentsWebRTCPhoneController.prototype.DEFAULT_SIP_CONTACT="bob";
 MobicentsWebRTCPhoneController.prototype.DEFAULT_SIP_REGISTER_MODE=true;
-MobicentsWebRTCPhoneController.prototype.DEFAULT_STUN_SERVER="undefined"; // stun.l.google.com:19302
-//MobicentsWebRTCPhoneController.prototype.DEFAULT_STUN_SERVER="webrtcstunserver:3478"; 
-//MobicentsWebRTCPhoneController.prototype.DEFAULT_TURN_SERVER="webrtcturnserver:5000";  
-MobicentsWebRTCPhoneController.prototype.DEFAULT_TURN_LOGIN="test"; 
-MobicentsWebRTCPhoneController.prototype.DEFAULT_TURN_PASSWORD="1234"; 
+//MobicentsWebRTCPhoneController.prototype.DEFAULT_STUN_SERVER="undefined"; // stun.l.google.com:19302
+MobicentsWebRTCPhoneController.prototype.DEFAULT_STUN_SERVER=undefined; 
+MobicentsWebRTCPhoneController.prototype.DEFAULT_TURN_SERVER=undefined;
+MobicentsWebRTCPhoneController.prototype.DEFAULT_TURN_LOGIN=undefined; 
+MobicentsWebRTCPhoneController.prototype.DEFAULT_TURN_PASSWORD=undefined; 
 MobicentsWebRTCPhoneController.prototype.DEFAULT_AUDIO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
 MobicentsWebRTCPhoneController.prototype.DEFAULT_VIDEO_CODECS_FILTER=undefined; // RTCPeerConnection default codec filter
 MobicentsWebRTCPhoneController.prototype.DEFAULT_LOCAL_VIDEO_FORMAT="{\"mandatory\": {\"maxWidth\": 500}}"
@@ -154,9 +154,9 @@ MobicentsWebRTCPhoneController.prototype.initView=function(){
     this.view.stopRemoteVideo();
     this.view.hideRemoteVideo();
     this.view.setStunServerTextInputValue(this.webRTCommClientConfiguration.RTCPeerConnection.stunServer);
-//    this.view.setTurnServerTextInputValue(this.webRTCommClientConfiguration.RTCPeerConnection.turnServer);
-//    this.view.setTurnLoginTextInputValue(this.webRTCommClientConfiguration.RTCPeerConnection.turnLogin);
-//    this.view.setTurnPasswordTextInputValue(this.webRTCommClientConfiguration.RTCPeerConnection.turnPassword);
+    this.view.setTurnServerTextInputValue(this.webRTCommClientConfiguration.RTCPeerConnection.turnServer);
+    this.view.setTurnLoginTextInputValue(this.webRTCommClientConfiguration.RTCPeerConnection.turnLogin);
+    this.view.setTurnPasswordTextInputValue(this.webRTCommClientConfiguration.RTCPeerConnection.turnPassword);
     this.view.setSipOutboundProxyTextInputValue(this.webRTCommClientConfiguration.sip.sipOutboundProxy);
 //    this.view.setSipUserAgentTextInputValue(this.webRTCommClientConfiguration.sip.sipUserAgent);
 //    this.view.setSipUriContactParametersTextInputValue(this.webRTCommClientConfiguration.sip.sipUriContactParameters);
@@ -325,7 +325,7 @@ MobicentsWebRTCPhoneController.prototype.onClickConnectButtonViewEventHandler=fu
     {
         try
         {
-			/*if(this.view.getUseStunServerValue())
+	    if(this.view.getStunServerTextInputValue() != null)
             {
                 this.webRTCommClientConfiguration.RTCPeerConnection.stunServer= this.view.getStunServerTextInputValue();
             }
@@ -333,7 +333,7 @@ MobicentsWebRTCPhoneController.prototype.onClickConnectButtonViewEventHandler=fu
             {
                 this.webRTCommClientConfiguration.RTCPeerConnection.stunServer=undefined;
             }
-            if(this.view.getUseTurnServerValue())
+            if(this.view.getTurnServerTextInputValue() != null)
             {
                 this.webRTCommClientConfiguration.RTCPeerConnection.turnServer= this.view.getTurnServerTextInputValue();
                 this.webRTCommClientConfiguration.RTCPeerConnection.turnLogin= this.view.getTurnLoginTextInputValue();
@@ -344,7 +344,7 @@ MobicentsWebRTCPhoneController.prototype.onClickConnectButtonViewEventHandler=fu
                 this.webRTCommClientConfiguration.RTCPeerConnection.turnServer= undefined;
                 this.webRTCommClientConfiguration.RTCPeerConnection.turnLogin= undefined;
                 this.webRTCommClientConfiguration.RTCPeerConnection.turnPassword= undefined;
-            }*/
+            }
 
            //this.webRTCommClientConfiguration.RTCPeerConnection.forceTurnMediaRelay=this.view.getForceTurnMediaRelayValue();
             //this.webRTCommClientConfiguration.RTCPeerConnection.dtlsSrtpKeyAgreement=this.view.getDtlsSrtpKeyAgreementValue();
