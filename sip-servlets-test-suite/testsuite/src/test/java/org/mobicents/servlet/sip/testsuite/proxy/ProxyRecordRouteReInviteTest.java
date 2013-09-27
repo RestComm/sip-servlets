@@ -22,6 +22,7 @@
 
 package org.mobicents.servlet.sip.testsuite.proxy;
 
+import gov.nist.javax.sip.header.HeaderExt;
 import gov.nist.javax.sip.message.MessageExt;
 
 import java.util.ArrayList;
@@ -274,6 +275,45 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 		assertTrue(receiver.getByeReceived());
 		assertTrue(sender.getOkToByeReceived());		
 	}
+	
+	// https://code.google.com/p/sipservlets/issues/detail?id=238
+    public void testProxyINFOLeak() throws Exception {
+        setupPhones(ListeningPoint.UDP);
+        String fromName = "unique-location";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);      
+        
+        String toSipAddress = "sip-servlets.com";
+        String toUser = "proxy-receiver";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+        
+        // part of non regression test for Issue http://code.google.com/p/mobicents/issues/detail?id=2359
+        // allow to check if ACK retrans keep the same different branch id      
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);     
+        Thread.sleep(TIMEOUT);
+        assertTrue(sender.isAckSent());
+        assertTrue(receiver.isAckReceived()); 
+        receiver.setAckReceived(false);
+        sender.setAckSent(false);
+        sender.sendInDialogSipRequest("INFO", null, null, null, null, null);        
+        Thread.sleep(500);
+        sender.sendInDialogSipRequest("INFO", null, null, null, null, null);      
+        Thread.sleep(500);
+        sender.sendInDialogSipRequest("INFO", null, null, null, null, null);
+        Thread.sleep(500);
+        sender.sendInDialogSipRequest("INFO", null, null, null, null, null);
+        Thread.sleep(500);
+        sender.sendInDialogSipRequest("INFO", null, null, null, null, null);
+        Thread.sleep(TIMEOUT*2);        
+        sender.sendBye();
+        Thread.sleep(TIMEOUT);
+        assertTrue(receiver.getByeReceived());        
+        assertTrue(sender.getOkToByeReceived());
+        assertNotNull(sender.getFinalResponse().getHeader("X-Proxy-Transactions"));
+        assertEquals("1",((HeaderExt)sender.getFinalResponse().getHeader("X-Proxy-Transactions")).getValue());
+    }
 
 	public void setupPhones(String transport) throws Exception {
 		senderProtocolObjects = new ProtocolObjects("proxy-sender",

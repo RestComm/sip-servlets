@@ -1453,10 +1453,13 @@ public class SipSessionImpl implements MobicentsSipSession {
 //			sessionCreatingTransactionRequest = null;
 //		}
 				
-		if(sessionCreatingTransactionRequest != null && 
-				sessionCreatingTransactionRequest.getTransaction()!= null && 
-				sessionCreatingTransactionRequest.getTransaction().equals(transaction)) {
+		if(sessionCreatingTransactionRequest != null && 				
+				transaction.equals(sessionCreatingTransactionRequest.getTransaction())) {
 			sessionCreatingTransactionRequest.cleanUp();
+		}
+		
+		if (proxy != null) {
+		    proxy.removeTransaction(transaction.getBranchId());
 		}
 			
 		if(logger.isDebugEnabled()) {

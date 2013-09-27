@@ -32,11 +32,11 @@ import java.io.ObjectOutput;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.ProxyBranch;
@@ -111,7 +111,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	private transient SipFactoryImpl sipFactoryImpl;
 	private boolean isNoCancel;
 	
-	transient HashMap<String, TransactionApplicationData> transactionMap = new HashMap<String, TransactionApplicationData>();
+	private final transient Map<String, TransactionApplicationData> transactionMap = new ConcurrentHashMap<String, TransactionApplicationData>();
 	
 	private transient Map<URI, ProxyBranchImpl> proxyBranches;
 	private boolean started; 
@@ -158,11 +158,26 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 		this.callerFromTag = ((MessageExt)request.getMessage()).getFromHeader().getTag();
 		this.previousNode = extractPreviousNodeFromRequest(request);
 		this.callerCSeq = ((MessageExt)request.getMessage()).getCSeqHeader().getSeqNumber();
-		String txid = ((ViaHeader) request.getMessage().getHeader(ViaHeader.NAME)).getBranch();
-		if(originalRequest.getTransactionApplicationData() != null) {
-			this.transactionMap.put(txid, originalRequest.getTransactionApplicationData());
-		}
-	}
+		putTransaction(originalRequest);
+    }
+    // https://code.google.com/p/sipservlets/issues/detail?id=238
+    public void putTransaction(SipServletRequestImpl request) {
+            final String txId = ((ViaHeader) request.getMessage().getHeader(ViaHeader.NAME)).getBranch();
+            final TransactionApplicationData txData = request.getTransactionApplicationData();
+            if(txData != null && this.transactionMap.put(txId, txData) == null) {
+                    if(logger.isDebugEnabled()) {
+                            logger.debug("Transaction "+txId+" added to proxy.");
+                    }
+            }                               
+    }
+    // https://code.google.com/p/sipservlets/issues/detail?id=238
+    public void removeTransaction(String txId) {
+            if(this.transactionMap.remove(txId) != null) {
+                    if(logger.isDebugEnabled()) {
+                            logger.debug("Transaction "+txId+" removed from proxy.");
+                    }
+            }                                       
+    }
 	
 	/*
 	 * This method will find the address of the machine that is the previous dialog path node.

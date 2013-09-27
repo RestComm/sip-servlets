@@ -61,6 +61,7 @@ import org.mobicents.javax.servlet.sip.ResponseType;
 import org.mobicents.javax.servlet.sip.SipFactoryExt;
 import org.mobicents.javax.servlet.sip.SipServletRequestExt;
 import org.mobicents.javax.servlet.sip.SipServletResponseExt;
+import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 public class ProxySipServlet extends SipServlet implements SipErrorListener, ProxyBranchListener, SipSessionListener, SipApplicationSessionListener, TimerListener {
 	private static final String ERROR = "ERROR";
@@ -501,6 +502,9 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			}
 		}
 		response.toString();
+		if(response.getMethod().equalsIgnoreCase("BYE")) {
+		    response.addHeader("X-Proxy-Transactions", "" + ((ProxyImpl)response.getProxy()).getTransactionMap().size());
+		}
 		super.doResponse(response);
 	}
 	

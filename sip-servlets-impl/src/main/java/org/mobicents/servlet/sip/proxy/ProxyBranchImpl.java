@@ -122,7 +122,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	 * in both directions in proxy. http://code.google.com/p/mobicents/issues/detail?id=1852
 	 * 
 	 */
-	public transient LinkedList<TransactionRequest> ongoingTransactions = new LinkedList<TransactionRequest>();
+	public transient List<TransactionRequest> ongoingTransactions = new LinkedList<TransactionRequest>();
 	
 	public static class TransactionRequest {
 		public TransactionRequest(String branch, SipServletRequestImpl request) {
@@ -238,7 +238,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	public void onBranchTerminated() {
 		if(outgoingRequest != null) {
 			String txid = ((ViaHeader) outgoingRequest.getMessage().getHeader(ViaHeader.NAME)).getBranch();
-			proxy.getTransactionMap().remove(txid);
+			proxy.removeTransaction(txid);
 		}
 	}
 	
@@ -384,10 +384,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 			}
 			recordRoute = recordRouteURI;
 		}
-		if(!originalRequest.getMethod().equalsIgnoreCase("ACK") && !originalRequest.getMethod().equalsIgnoreCase("PRACK")) {
-			String branch = ((Via)originalRequest.getMessage().getHeader(Via.NAME)).getBranch();
-			this.ongoingTransactions.add(new TransactionRequest(branch, originalRequest));
-		}
+		addTransaction(originalRequest);
 						
 		Request cloned = ProxyUtils.createProxiedRequest(
 				outgoingRequest,
@@ -412,8 +409,8 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		started = true;
 		forwardRequest(cloned, false);		
 	}
-	
-	/**
+
+    /**
 	 * Forward the request to the specified destination. The method is used internally.
 	 * @param request
 	 * @param subsequent Set to false if the the method is initial
@@ -479,10 +476,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
-		String txid = ((ViaHeader) clonedRequest.getMessage().getHeader(ViaHeader.NAME)).getBranch();
-		if(clonedRequest.getTransactionApplicationData() != null) {
-			proxy.transactionMap.put(txid, clonedRequest.getTransactionApplicationData());
-		}
+		proxy.putTransaction(clonedRequest);
 	}	
 
 	/**
@@ -630,6 +624,20 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		return timedOut;
 	}
 	
+	// https://code.google.com/p/sipservlets/issues/detail?id=238
+	public void addTransaction(SipServletRequestImpl request) {
+        if(!request.getMethod().equalsIgnoreCase("ACK") && !request.getMethod().equalsIgnoreCase("PRACK")) {
+                String branch = ((Via)request.getMessage().getHeader(Via.NAME)).getBranch();
+                if(this.ongoingTransactions.add(new TransactionRequest(branch, request))) {
+                        request.getTransactionApplicationData().setProxyBranch(this);
+                        if(logger.isDebugEnabled()) {
+                                logger.debug("Added transaction "+branch+" to proxy branch.");
+                        }
+                }                                               
+        }                               
+    }
+	
+	// https://code.google.com/p/sipservlets/issues/detail?id=238
 	public void removeTransaction(String branch) {
 		synchronized(this.ongoingTransactions) {
 			TransactionRequest remove = null;
@@ -642,11 +650,11 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 			if(remove != null) {
 				boolean removed = this.ongoingTransactions.remove(remove);
 				if(logger.isDebugEnabled()) {
-					logger.debug("Removed transaction from proxy " + branch + " success: " + removed);
+					logger.debug("Removed transaction " + branch + " from proxy branch ? " + removed);
 				}
 			} else {
 				if(logger.isDebugEnabled()) {
-					logger.debug("Removing transaction from proxy " + branch + " FAILED. It was null");
+					logger.debug("Removing transaction " + branch + " from proxy branch FAILED. Not found.");
 				}
 			}
 		}
@@ -659,10 +667,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	 */
 	public void proxySubsequentRequest(MobicentsSipServletRequest sipServletRequest) {
 		SipServletRequestImpl request = (SipServletRequestImpl) sipServletRequest;
-		if(!request.getMethod().equalsIgnoreCase("ACK") && !request.getMethod().equalsIgnoreCase("PRACK")) {
-			String branch = ((Via)request.getMessage().getHeader(Via.NAME)).getBranch();
-			this.ongoingTransactions.add(new TransactionRequest(branch, request));
-		}
+		addTransaction(request);
 		// A re-INVITE needs special handling without goind through the dialog-stateful methods
 		if(request.getMethod().equalsIgnoreCase("INVITE")) {
 			if(logger.isDebugEnabled()) {
