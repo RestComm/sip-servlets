@@ -17,8 +17,7 @@
     <layout class="org.apache.log4j.PatternLayout"> 
       <param name="ConversionPattern" value="%d %p %t %l - %m%n"/> 
     </layout> 
-  </appender> 
-  <root> 
+  </appender>    
   
   <category name="org.mobicents">
       <priority value="TRACE"/>
@@ -27,7 +26,7 @@
    <category name="org.mobicents.tools.sip.balancer">
       <priority value="INFO"/>
    </category>
-   
+  <root> 
     <priority value ="TRACE" />     
     <appender-ref ref="rolling-file" /> 
     <appender-ref ref="console" />
