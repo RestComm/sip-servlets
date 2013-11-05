@@ -1,24 +1,22 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
- * and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications
+ * Copyright 2011-2013, Telestax Inc and individual contributors
+ * by the @authors tag.
  *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
+ * This program is free software: you can redistribute it and/or modify
+ * under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
  *
- * This software is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
+
 package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.header.HeaderExt;
@@ -106,6 +104,7 @@ import org.mobicents.servlet.sip.startup.StaticServiceHolder;
  * Implementation of SipServletMessage
  * 
  * @author mranga
+ * @author jean.deruelle@telestax.com
  * 
  */
 public abstract class SipServletMessageImpl implements MobicentsSipServletMessage, Externalizable {
@@ -1828,7 +1827,32 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 					// from Alexander Kozlov from Codeminders
 					paramMap.put(vals[0], vals.length == 2 ? vals[1] : "");
 				}
-			}
+			} else if (value.length() > 1 && value.contains(",")) {
+			    // Deals with https://code.google.com/p/sipservlets/issues/detail?id=239
+                // repleace first ";" with ""
+//                String parameters = value.substring(value.indexOf(",") + 1);
+//                value = value.substring(0, value.indexOf(","));             
+                String[] split = value.split(",");
+    
+                for (String pair : split) {
+                    String[] vals = pair.split("=");
+                    if (vals.length > 2) {
+                        logger
+                                .error("Wrong parameter format, expected value and name, got ["
+                                        + pair + "]");
+                        throw new ServletParseException(
+                                "Wrong parameter format, expected value or name["
+                                        + pair + "]");
+                    }
+                    String paramValue = vals[1];
+                    if(vals.length < 2) {
+                        paramValue ="";
+                    } else if(vals.length == 2 && vals[1].indexOf('\"') == 0 && vals[1].lastIndexOf('\"') == vals[1].length()-1) {
+                        paramValue  = vals[1].substring(1, vals[1].length()-1);
+                    }
+                    paramMap.put(vals[0], paramValue);
+                }
+            }
 		}		
 		
 		// quotes are parts of the value as well as the display Name
