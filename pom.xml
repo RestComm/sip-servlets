@@ -94,6 +94,7 @@
 		<mobicents.jain.sip.ha.version>1.5.0-SNAPSHOT</mobicents.jain.sip.ha.version>
 		<mobicents.jain.sip.ext.version>1.3.0-SNAPSHOT</mobicents.jain.sip.ext.version>
 		<tomcat-7.version>7.0.42</tomcat-7.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<dependencies>
