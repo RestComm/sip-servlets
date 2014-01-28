@@ -21,7 +21,7 @@
 		<dependency>
 			<groupId>org.jboss.web</groupId>
 			<artifactId>jbossweb</artifactId>
-			<version>7.2.0.Final</version>
+			<version>7.3.0.Final</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
