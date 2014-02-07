@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.mobicents.servlet.sip.examples</groupId>
 		<artifactId>sip-servlets-examples-parent</artifactId>
-		<version>2.1.0-SNAPSHOT</version>
+		<version>3.0.0-SNAPSHOT</version>
 		<relativePath>../pom.xml</relativePath>
 	</parent>
 	
@@ -26,14 +26,14 @@
       <scope>provided</scope>
     </dependency>    
     <dependency>
-		  <groupId>jboss</groupId>
-		  <artifactId>jboss-system</artifactId>
+		  <groupId>org.jboss.jbossas</groupId>
+		  <artifactId>jboss-as-system</artifactId>
 		  <version>${jboss.version}</version>
 		  <scope>provided</scope>
     </dependency>    
     <dependency>
-		  <groupId>jboss</groupId>
-		  <artifactId>jboss-jmx</artifactId>
+		  <groupId>org.jboss.jbossas</groupId>
+		  <artifactId>jboss-as-system-jmx</artifactId>
 		  <version>${jboss.version}</version>
 		  <scope>provided</scope>
     </dependency>    
