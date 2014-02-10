@@ -1,23 +1,20 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
- * and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications
+ * Copyright 2011-2014, Telestax Inc and individual contributors
+ * by the @authors tag.
  *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
+ * This program is free software: you can redistribute it and/or modify
+ * under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
  *
- * This software is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 package org.mobicents.servlet.sip.message;
 
@@ -1441,7 +1438,8 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 
 	/**
 	 * 
-	 * @param sipConnector
+	 * @param mobicentsExtendedListeningPoint
+     * @param hop
 	 * @throws ParseException
 	 * @throws InvalidArgumentException
 	 */
@@ -1563,12 +1561,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	}
 
 	/**
-	 * @param request
-	 * @param requestMethod
-	 * @param session
-	 * @param proxy
-	 * @param sipNetworkInterfaceManager
-	 * @param transport
+	 * @param sipConnector
+	 * @param matchingListeningPoint
+	 * @param transportForRequest
 	 * @param sipConnector
 	 * @param matchingListeningPoint
 	 * @throws ParseException
@@ -1690,12 +1685,8 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	}
 
 	/**
-	 * @param request
-	 * @param session
-	 * @param viaHeader
 	 * @param transport
 	 * @param sipConnector
-	 * @param sipApplicationSession
 	 * @param matchingListeningPoint
 	 * @throws ParseException
 	 * @throws SipException
@@ -2043,7 +2034,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	}
 
 	/**
-	 * @param finalResponse the finalResponse to set
+	 * @param response the finalResponse to set
 	 */
 	public void setResponse(SipServletResponseImpl response) {		
 		if(response.getStatus() >= 200 && 
@@ -2289,51 +2280,75 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	 * {@inheritDoc}
 	 */
 	public String getInitialRemoteAddr() {
-		if(message == null || ((SIPRequest)message).getRemoteAddress() == null) {
-			return null;
+        // https://code.google.com/p/sipservlets/issues/detail?id=255 includes both ACK Support without tx and packet
+        // source ip address
+        if(getMethod().equalsIgnoreCase(Request.ACK)) {
+            if(logger.isTraceEnabled()) {
+                logger.trace("ACK request trying to return the Via address as we don't have a transaction");
+            }
+            // replaced because wasn't giving correct info for ACK
+            if(message == null || ((SIPRequest)message).getRemoteAddress() == null) {
+                return null;
+            }
+            return ((SIPRequest)message).getRemoteAddress().getHostAddress();
+        } else if(getTransaction() != null) {
+            if(logger.isTraceEnabled()) {
+                logger.trace("transaction not null, returning packet source ip address");
+            }
+			if(((SIPTransaction)getTransaction()).getPeerPacketSourceAddress() != null) {
+				return ((SIPTransaction)getTransaction()).getPeerPacketSourceAddress().getHostAddress();
+			} else {
+				return ((SIPTransaction)getTransaction()).getPeerAddress();
+			}
+		} else {
+            if(logger.isTraceEnabled()) {
+                logger.trace("transaction null, returning top via ip address");
+            }
+			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
+			if(via == null) {
+				return null;
+			} else {
+				return via.getHost();
+			}
 		}
-		return ((SIPRequest)message).getRemoteAddress().getHostAddress();
-		// replaced because wasn't giving correct info for ACK
-//		if(getTransaction() != null) {
-//			if(((SIPTransaction)getTransaction()).getPeerPacketSourceAddress() != null) {
-//				return ((SIPTransaction)getTransaction()).getPeerPacketSourceAddress().getHostAddress();
-//			} else {
-//				return ((SIPTransaction)getTransaction()).getPeerAddress();
-//			}
-//		} else {
-//			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
-//			if(via == null) {
-//				return null;
-//			} else {
-//				return via.getHost();
-//			}
-//		}
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public int getInitialRemotePort() {
-		if(message == null ) {
-			return -1;
+        // https://code.google.com/p/sipservlets/issues/detail?id=255 includes both ACK Support without tx and packet
+        // source port
+        if(getMethod().equalsIgnoreCase(Request.ACK)) {
+            if(logger.isTraceEnabled()) {
+                logger.trace("ACK request trying to return the Via port as we don't have a transaction");
+            }
+            // replaced because wasn't giving correct info for ACK
+            if(message == null ) {
+                return -1;
+            }
+            return ((SIPRequest)message).getRemotePort();
+        } else if(getTransaction() != null) {
+            if(logger.isTraceEnabled()) {
+                logger.trace("transaction not null, returning packet source port");
+            }
+			if(((SIPTransaction)getTransaction()).getPeerPacketSourceAddress() != null) {
+				return ((SIPTransaction)getTransaction()).getPeerPacketSourcePort();
+			} else {
+				return ((SIPTransaction)getTransaction()).getPeerPort();
+			}
+		}else {
+            if(logger.isTraceEnabled()) {
+                logger.trace("transaction null, returning top via port");
+            }
+			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
+			if(via == null) {
+				return -1;
+			} else {
+				return via.getPort()<=0 ? 5060 : via.getPort();
+			}
 		}
-		return ((SIPRequest)message).getRemotePort();
-		// replaced because wasn't giving correct info for ACK
-//		if(getTransaction() != null) {
-//			if(((SIPTransaction)getTransaction()).getPeerPacketSourceAddress() != null) {
-//				return ((SIPTransaction)getTransaction()).getPeerPacketSourcePort();
-//			} else {
-//				return ((SIPTransaction)getTransaction()).getPeerPort();
-//			}
-//		}else {
-//			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
-//			if(via == null) {
-//				return -1;
-//			} else {
-//				return via.getPort()<=0 ? 5060 : via.getPort();
-//			}
-//		}
-		
+
 	}
 
 	/**
