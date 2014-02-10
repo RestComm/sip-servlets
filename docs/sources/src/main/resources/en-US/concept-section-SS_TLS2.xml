@@ -184,8 +184,8 @@
           <title>Re-configure and Test</title>
           <para>Now that we have a java keystore the server configuration is exactly the same as
                     described in the quick start, i.e., simply set the java properties
-                    <literal>javax.net.ssl.keyStore</literal> to point to this key keystore file and then set the
-                            password through the property <literal>javax.net.ssl.keyStorePassword</literal>. Once the server
+                    <literal>javax.net.ssl.keyStore</literal> and <literal>javax.net.ssl.trustStore</literal> to point to this key keystore file and then set the
+                            password through the property <literal>javax.net.ssl.keyStorePassword</literal> and <literal>javax.net.ssl.trustStorePassword</literal>. Once the server
                     has been re-started you can use openssl to verify the setup. </para>
        </step>
 

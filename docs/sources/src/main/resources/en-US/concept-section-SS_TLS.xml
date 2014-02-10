@@ -86,6 +86,8 @@
             <itemizedlist>
                 <listitem><para><literal>javax.net.ssl.keyStore</literal> – the filename and location of the keystore to use.</para></listitem>
                 <listitem><para><literal>javax.net.ssl.keyStorePassword</literal> – the password to the keystore.</para></listitem>
+		<listitem><para><literal>javax.net.ssl.trustStore</literal> – the filename and location of the truststore to use.</para></listitem>
+                <listitem><para><literal>javax.net.ssl.trustStorePassword</literal> – the password to the truststore.</para></listitem>
                 <listitem><para><literal>gov.nist.javax.sip.TLS_CLIENT_AUTH_TYPE</literal> – which type of authentication we will require of the
                     client (for now, the client authentication type will be set to Disabled).</para></listitem>
             </itemizedlist>
@@ -93,7 +95,7 @@
 
         <para>The configuration options are JVM parameters and you will have to add these to the
                         command line when you start the server:
-                        <programlisting>./bin/run.sh -Djavax.net.ssl.keyStorePassword=mysecret -Dgov.nist.javax.sip.TLS_CLIENT_AUTH_TYPE=Disabled -Djavax.net.ssl.keyStore=/path/to/your/keystore/myserver.jks</programlisting></para>
+                        <programlisting>./bin/run.sh -Djavax.net.ssl.keyStorePassword=mysecret -Dgov.nist.javax.sip.TLS_CLIENT_AUTH_TYPE=Disabled -Djavax.net.ssl.keyStore=/path/to/your/keystore/myserver.jks -Djavax.net.ssl.trustStorePassword=mysecret -Djavax.net.ssl.trustStore=/path/to/your/keystore/myserver.jks</programlisting></para>
 
 
         <para>Once the server is up, we are ready to verify that we can get a TLS connection using the
@@ -297,8 +299,8 @@
           <title>Re-configure and Test</title>
           <para>Now that we have a java keystore the server configuration is exactly the same as
                     described in the quick start, i.e., simply set the java properties
-                    <literal>javax.net.ssl.keyStore</literal> to point to this key keystore file and then set the
-                            password through the property <literal>javax.net.ssl.keyStorePassword</literal>. Once the server
+                    <literal>javax.net.ssl.keyStore</literal> and <literal>javax.net.ssl.trustStore</literal> to point to this key keystore file and then set the
+                            password through the property <literal>javax.net.ssl.keyStorePassword</literal> and <literal>javax.net.ssl.trustStorePassword</literal>. Once the server
                     has been re-started you can use openssl to verify the setup. </para>
        </step>
 
