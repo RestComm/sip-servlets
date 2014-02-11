@@ -47,9 +47,9 @@ Please see the following link to learn how to deploy jar files in &SHORT_PLATFOR
 
       <step>
         <title>Deploy the DFCAR</title>
-        <para>Create a directory under <literal>JBOSS_HOME/modules/org/echarts/</literal></para>
+        <para>Create a directory under <literal>JBOSS_HOME/modules/system/layers/base/org/echarts/</literal></para>
 	<para>Drop the <filename>dfcar.jar</filename> from the ECharts distribution package in the
-      <literal>JBOSS_HOME/modules/org/echarts/ </literal>directory.</para>
+      <literal>JBOSS_HOME/modules/system/layers/base/org/echarts/ </literal>directory.</para>
 	<para>Create a <literal>module.xml</literal> file under the same directory with the following contents</para>
 	<programlisting><![CDATA[<module xmlns="urn:jboss:module:1.1" name="org.echarts">
 <resources>
@@ -65,11 +65,11 @@ Please see the following link to learn how to deploy jar files in &SHORT_PLATFOR
         <title>Remove the DAR</title>
         <para>Remove the &PLATFORM_NAME; Default Application Router
       located in 
-      <literal>JBOSS_HOME/modules/org/mobicents/dar</literal>.</para>
+      <literal>JBOSS_HOME/modules/system/layers/base/org/mobicents/dar</literal>.</para>
       </step>
       <step>
 	<title>Use the DFC DAR</title>
-        <para>In <literal>JBOSS_HOME/modules/org/jboss/as/web/main/module.xml</literal>, replace the following line </para>
+        <para>In <literal>JBOSS_HOME/modules/system/layers/base/org/jboss/as/web/main/module.xml</literal>, replace the following line </para>
 	<programlisting><![CDATA[<module name="org.mobicents.dar" export="true"/>]]></programlisting>
 	<para>by this one</para>
 	<programlisting><![CDATA[<module name="org.echarts" export="true"/>]]></programlisting>	

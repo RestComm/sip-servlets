@@ -73,7 +73,7 @@
           <para>To create &lt;A1_cryptographic_string&gt;, execute the
           following command in a terminal:</para>
 
-          <programlisting>home]$ java -cp ../../modules/org/picketbox/main/picketbox-4.0.9.Final.jar org.jboss.security.auth.callback.RFC2617Digest admin sip-servlets &lt;password&gt;</programlisting>
+          <programlisting>home]$ java -cp ../../modules/system/layers/base/org/picketbox/main/picketbox-4.0.15.Final.jar org.jboss.security.auth.callback.RFC2617Digest admin sip-servlets &lt;password&gt;</programlisting>
         </listitem>
 
         <listitem>
