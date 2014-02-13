@@ -90,14 +90,28 @@ public class SipNamingContextListener extends NamingContextListener {
             	logger.debug("Sip Subcontext removed from the JNDI context for container " + event.getContainer());
             }
         } if (type.equals(NAMING_CONTEXT_APPNAME_SUBCONTEXT_ADDED_EVENT)) {
-            addAppNameSubContext(envCtx, appName);
-            if(logger.isDebugEnabled()) {
-            	logger.debug(appName + " Subcontext added to the JNDI context for container " + event.getContainer());
+            if(appName != null) {
+                // https://code.google.com/p/sipservlets/issues/detail?id=257
+                addAppNameSubContext(envCtx, appName);
+                if(logger.isDebugEnabled()) {
+                    logger.debug(appName + " Subcontext added to the JNDI context for container " + event.getContainer());
+                }
+            } else {
+                if(logger.isDebugEnabled()) {
+                    logger.debug(appName + " is null so subcontext not added to JNDI context for container " + event.getContainer());
+                }
             }
         } else if (type.equals(NAMING_CONTEXT_APPNAME_SUBCONTEXT_REMOVED_EVENT)) {
-            removeAppNameSubContext(envCtx, appName);
-            if(logger.isDebugEnabled()) {
-            	logger.debug(appName + " Subcontext removed from the JNDI context for container " + event.getContainer());
+            if(appName != null) {
+                // https://code.google.com/p/sipservlets/issues/detail?id=257
+                removeAppNameSubContext(envCtx, appName);
+                if(logger.isDebugEnabled()) {
+                    logger.debug(appName + " Subcontext removed from the JNDI context for container " + event.getContainer());
+                }
+            } else {
+                if(logger.isDebugEnabled()) {
+                    logger.debug(appName + " is null so subcontext not removed to JNDI context for container " + event.getContainer());
+                }
             }
         } else if (type.equals(NAMING_CONTEXT_SIP_FACTORY_ADDED_EVENT)) {
 			SipFactory sipFactory = (SipFactory) event.getData();
