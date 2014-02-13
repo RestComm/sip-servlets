@@ -45,7 +45,7 @@
 		<version.weld_servlet>1.1.2.Final</version.weld_servlet>
 		<version.ctf.core>1.0.0-SNAPSHOT</version.ctf.core>
 		<version.org.apache.tomcat>6.0.33</version.org.apache.tomcat>
-		<version.org.apache.tomcat-7>7.0.33</version.org.apache.tomcat-7>
+		<version.org.apache.tomcat-7>7.0.50</version.org.apache.tomcat-7>
 
 		<!-- override from parent -->
 		<version.release.plugin>2.1</version.release.plugin>
