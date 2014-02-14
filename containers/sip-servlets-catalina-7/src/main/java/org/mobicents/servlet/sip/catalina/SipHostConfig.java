@@ -28,6 +28,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
 import org.apache.catalina.Context;
+import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.HostConfig;
 import org.apache.catalina.util.ContextName;
 import org.apache.log4j.Logger;
@@ -97,9 +98,17 @@ public class SipHostConfig extends HostConfig {
         File war = new File(appBase, baseName + ".war");
         if (war.exists()) {
         	boolean isSipServletApplication = isSipServletArchive(war);
-            if(isSipServletApplication) {  
+            if(isSipServletApplication) {
+                if(logger.isDebugEnabled()) {
+                    logger.debug(SipContext.APPLICATION_SIP_XML + " found in "
+                            + baseName + ". Enabling sip servlet archive deployment");
+                }
             	deploySAR(cn, war);
             } else {
+                if(logger.isDebugEnabled()) {
+                    logger.debug(SipContext.APPLICATION_SIP_XML + " not found in "
+                            + baseName + ". Not Enabling sip servlet archive deployment");
+                }
             	deployWAR(cn, war);
             }
             return;
@@ -117,7 +126,7 @@ public class SipHostConfig extends HostConfig {
 	}
 	
 	/**
-	 * 
+	 *
 	 * @param NAME
 	 * @param sar
 	 * @param string
@@ -126,7 +135,7 @@ public class SipHostConfig extends HostConfig {
 		if (deploymentExists(cn.getName()))
             return;
 		if(logger.isDebugEnabled()) {
-    		logger.debug(SipContext.APPLICATION_SIP_XML + " found in " 
+    		logger.debug(SipContext.APPLICATION_SIP_XML + " found in "
     				+ sar + ". Enabling sip servlet archive deployment");
     	}
 		String initialConfigClass = configClass;
@@ -142,9 +151,9 @@ public class SipHostConfig extends HostConfig {
 	
 	@Override
 	protected void deployWAR(ContextName cn, File dir) {
-		if(logger.isTraceEnabled()) {
-    		logger.trace("Context class used to deploy the WAR : " + contextClass);
-    		logger.trace("Context config class used to deploy the WAR : " + configClass);
+		if(logger.isDebugEnabled()) {
+    		logger.debug("Context class used to deploy the WAR : " + contextClass);
+    		logger.debug("Context config class used to deploy the WAR : " + configClass);
     	}
 		super.deployWAR(cn, dir);
 	}
@@ -170,6 +179,17 @@ public class SipHostConfig extends HostConfig {
 			configClass = initialConfigClass;
 	        contextClass = initialContextClass;
 		} else {
+            if(logger.isDebugEnabled()) {
+                logger.debug(SipContext.APPLICATION_SIP_XML + " not found in "
+                        + dir + ". Not Enabling sip servlet archive deployment");
+            }
+            // https://code.google.com/p/sipservlets/issues/detail?id=257 make sure the digester to parse directories
+            // containing META-INF/context.xml is the correct one
+            digester = createDigester(StandardContext.class.getName());
+            if(logger.isDebugEnabled()) {
+                logger.debug("Context class used to deploy the directory : " + contextClass);
+                logger.debug("Context config class used to deploy the directory : " + configClass);
+            }
 			super.deployDirectory(cn, dir);
 		}
 	}
@@ -193,6 +213,10 @@ public class SipHostConfig extends HostConfig {
             File dir = new File(appBase, files[i]);
             boolean isSipServletApplication = isSipServletArchive(dir);
             if(isSipServletApplication) {
+                if(logger.isDebugEnabled()) {
+                    logger.debug(SipContext.APPLICATION_SIP_XML + " found in "
+                            + files[i] + ". Enabling sip servlet archive deployment");
+                }
             	ContextName cn = new ContextName(files[i]);
                 // Calculate the context path and make sure it is unique
 //                String contextPath = "/" + files[i];
@@ -214,7 +238,13 @@ public class SipHostConfig extends HostConfig {
                 host.setConfigClass(initialConfigClass);
                 configClass = initialConfigClass;
                 contextClass = initialContextClass;        		
-            }                        
+            } else {
+                if(logger.isDebugEnabled()) {
+                    logger.debug(SipContext.APPLICATION_SIP_XML + " not found in "
+                            + files[i] + ". Not Enabling sip servlet archive deployment");
+                }
+                setContextClass(StandardContext.class.getName());
+            }
         }
         super.deployWARs(appBase, files);
 	}

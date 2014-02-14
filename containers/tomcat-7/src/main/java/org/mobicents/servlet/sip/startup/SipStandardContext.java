@@ -200,8 +200,9 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	@Override
 	public void initInternal() throws LifecycleException {
 		if(logger.isInfoEnabled()) {
-			logger.info("Initializing the sip context");
+			logger.info("Initializing the sip context " + getName());
 		}
+
 //		if (this.getParent() != null) {
 //			// Add the main configuration listener for sip applications
 //			LifecycleListener sipConfigurationListener = new SipContextConfig();
@@ -218,7 +219,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		prepareServletContext();
 		
 		if(logger.isInfoEnabled()) {
-			logger.info("sip context Initialized");
+			logger.info("sip context Initialized " + getName());
 		}	
 	}
 
@@ -282,7 +283,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	@Override
 	public synchronized void startInternal() throws LifecycleException {
 		if(logger.isInfoEnabled()) {
-			logger.info("Starting the sip context");
+			logger.info("Starting the sip context " + getName());
 		}
 //		if( this.getState().equals(LifecycleState.INITIALIZED)) { 
 			prepareServletContext();
@@ -448,11 +449,11 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				logger.info("sip application session timeout for this context is " + sipApplicationSessionTimeout + " minutes");
 			}
 			if(logger.isInfoEnabled()) {
-				logger.info("sip context started");
+				logger.info("sip context started " + getName());
 			}			
 		} else {
 			if(logger.isInfoEnabled()) {
-				logger.info("sip context didn't started due to errors");
+				logger.info("sip context didn't started due to errors " + getName());
 			}
 		}							
 	}
