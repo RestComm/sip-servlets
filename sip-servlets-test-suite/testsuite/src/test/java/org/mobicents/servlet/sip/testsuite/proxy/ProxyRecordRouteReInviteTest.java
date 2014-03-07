@@ -1,23 +1,20 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications
+ * Copyright 2011-2013, Telestax Inc and individual contributors
+ * by the @authors tag.
  *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
+ * This program is free software: you can redistribute it and/or modify
+ * under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
  *
- * This software is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 package org.mobicents.servlet.sip.testsuite.proxy;
@@ -315,6 +312,55 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
         assertEquals("1",((HeaderExt)sender.getFinalResponse().getHeader("X-Proxy-Transactions")).getValue());
     }
 
+    /*
+     * Non regression test for https://code.google.com/p/sipservlets/issues/detail?id=202
+     */
+    public void testProxyModifySDP() throws Exception {
+		setupPhones(ListeningPoint.UDP);
+		String fromName = "modify-SDP";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "proxy-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		// part of non regression test for Issue http://code.google.com/p/mobicents/issues/detail?id=2359
+		// allow to check if ACK retrans keep the same different branch id
+		sender.setTimeToWaitBeforeAck(2000);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(receiver.isAckReceived());		
+        assertEquals("SDP modified successfully", new String(sender.getFinalResponse().getRawContent(), "UTF-8"));
+		// non regression test for Issue http://code.google.com/p/mobicents/issues/detail?id=2359	
+		String inviteBranch = ((MessageExt)receiver.getInviteRequest()).getTopmostViaHeader().getBranch();
+		String ackBranch = ((MessageExt)receiver.getAckRequest()).getTopmostViaHeader().getBranch();
+		assertFalse(inviteBranch.equals(ackBranch));
+		receiver.setAckReceived(false);
+		sender.setAckSent(false);	
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(receiver.isAckReceived());
+		receiver.setAckReceived(false);
+		receiver.setAckSent(false);
+		sender.setAckSent(false);
+		sender.setAckReceived(false);
+		assertEquals("SDP modified successfully", new String(sender.getFinalResponse().getRawContent(), "UTF-8"));
+		receiver.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isAckSent());
+		assertTrue(sender.isAckReceived());
+		assertEquals("SDP modified successfully", new String(receiver.getFinalResponse().getRawContent(), "UTF-8"));
+		sender.sendBye();
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());
+		assertTrue(sender.getOkToByeReceived());		
+	}
+    
 	public void setupPhones(String transport) throws Exception {
 		senderProtocolObjects = new ProtocolObjects("proxy-sender",
 				"gov.nist", transport, AUTODIALOG, null, null, null);

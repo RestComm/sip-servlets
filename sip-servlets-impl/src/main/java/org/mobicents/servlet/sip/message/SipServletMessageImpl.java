@@ -1311,8 +1311,11 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 * @see javax.servlet.sip.SipServletMessage#setContent(java.lang.Object, java.lang.String)
 	 */
 	public void setContent(Object content, String contentType)
-			throws UnsupportedEncodingException {		
-		checkMessageState();
+			throws UnsupportedEncodingException {
+		// https://code.google.com/p/sipservlets/issues/detail?id=202
+		if(getSipSession().getProxy() == null) {			
+			checkMessageState();
+		}
 		checkContentType(contentType);
 		checkCommitted();
 		
