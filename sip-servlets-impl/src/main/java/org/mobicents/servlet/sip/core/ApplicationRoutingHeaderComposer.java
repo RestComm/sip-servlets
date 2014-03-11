@@ -1,23 +1,20 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications
+ * Copyright 2011-2014, Telestax Inc and individual contributors
+ * by the @authors tag.
  *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
+ * This program is free software: you can redistribute it and/or modify
+ * under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
  *
- * This software is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 package org.mobicents.servlet.sip.core;
@@ -31,7 +28,7 @@ import org.apache.log4j.Logger;
  * behaves as UAC. When the container acts as UAC the AR must be stored in the from-tag
  * of the outgoing request.When the container acts as UAS/B2BUA the AR must be stored in the to-tag
  * of the outgoing request. The string looks like this:
- * uniqueValue_appname1_appGeneratedApplicationSessionId
+ * uniqueValue_serverId_appname1_appGeneratedApplicationSessionId
  * 
  * @author vralev
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
@@ -59,7 +56,7 @@ public class ApplicationRoutingHeaderComposer {
 
 	
 	public final static String[] getAppNameAndSessionId(SipApplicationDispatcher sipApplicationDispatcher, String text) {
-		String[] tuple = new String[2];
+		String[] tuple = new String[3];
 		if(text != null) {					
 			final String[] tokens = text.split(TOKEN_SEPARATOR);
 		
@@ -67,12 +64,19 @@ public class ApplicationRoutingHeaderComposer {
 			// and it will be stored for later.
 			if(tokens.length > 1) {				
 				// Otherwise extract the uniqueValue from the tag string, it's the first token.
-				final String hashedAppName = tokens[1];
-				String appName = sipApplicationDispatcher.getApplicationNameFromHash(hashedAppName);
-				if(appName == null) 
-					throw new IllegalArgumentException("The hash doesn't correspond to any app name: " + hashedAppName);
-				tuple[0] = appName;				
-				tuple[1] = tokens[2];
+				final String hashedAppName = tokens[2];
+				if(sipApplicationDispatcher.getApplicationServerIdHash().equalsIgnoreCase(tokens[1])) {
+					String appName = sipApplicationDispatcher.getApplicationNameFromHash(hashedAppName);
+					if(appName == null) 
+						throw new IllegalArgumentException("The hash doesn't correspond to any app name: " + hashedAppName);
+					tuple[0] = tokens[1];
+					tuple[1] = appName;				
+					tuple[2] = tokens[3];
+				} else {
+					tuple[0] = tokens[1];
+					tuple[1] = null;				
+					tuple[2] = null;
+				}
 			}
 		}		
 		return tuple;
@@ -80,6 +84,8 @@ public class ApplicationRoutingHeaderComposer {
 	
 	public final static String getHash(SipApplicationDispatcher sipApplicationDispatcher, String  applicationName,  String applicationId) {
 		String text = randomString() + TOKEN_SEPARATOR;
+		// https://code.google.com/p/sipservlets/issues/detail?id=237
+		text += sipApplicationDispatcher.getApplicationServerIdHash() + TOKEN_SEPARATOR;
 		text += sipApplicationDispatcher.getHashFromApplicationName(applicationName);
 		if(applicationId != null && applicationId.length() > 0) {
 			text = text + TOKEN_SEPARATOR + applicationId; 

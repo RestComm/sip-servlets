@@ -21,7 +21,11 @@
   <classpathentry kind="src" path="/sip-servlets-jruby"/>
   <classpathentry kind="src" path="/sip-servlets-client"/>
   <classpathentry kind="src" path="/sip-servlets-annotations"/>
-  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.17/log4j-1.2.17.jar"/>
+  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16.jar" sourcepath="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/home/jean/.m2/repository/log4j/log4j/1.2.16/log4j-1.2.16-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
   <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-codec/commons-codec/1.5/commons-codec-1.5.jar"/>
   <classpathentry kind="var" path="M2_REPO/dnsjava/dnsjava/2.1.0/dnsjava-2.1.0.jar"/>

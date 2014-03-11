@@ -178,6 +178,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	
 	// app server id
 	private String applicationServerId;
+	private String applicationServerIdHash;
 	// ref back to the sip service
 	private SipService sipService = null;
 	//the sip factory implementation
@@ -267,6 +268,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		maxMemory = Runtime.getRuntime().maxMemory() / (double) 1024;
 		congestionControlPolicy = CongestionControlPolicy.ErrorResponse;
 		applicationServerId = "" + UUID.randomUUID();
+		applicationServerIdHash = GenericUtils.hashString(applicationServerId);
 	}
 	
 	/**
@@ -1520,6 +1522,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	public String getApplicationServerId() {		
 		return applicationServerId;
 	}
+	@Override
+	public String getApplicationServerIdHash() {		
+		return applicationServerIdHash;
+	}
+	
 	
 	/**
 	 * Check if the route is external

@@ -306,7 +306,7 @@ public class SimpleSipServlet
 			inviteSipSession = request.getSession();
 			inviteSipSession.setAttribute(TEST_EXCEPTION_ON_EXPIRE, true);
 		}
-		if(fromString.contains(TEST_ERROR_RESPONSE)) {	
+		if(fromString.contains(TEST_ERROR_RESPONSE) || fromString.contains("error-response")) {	
 			request.getApplicationSession().setAttribute(TEST_ERROR_RESPONSE, "true");
 			SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_BUSY_HERE);
 			sipServletResponse.send();

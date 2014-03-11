@@ -125,9 +125,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 			final ToHeader toHeader = (ToHeader) request.getHeader(ToHeader.NAME);
 			final String arText = toHeader.getTag();
 			try {
-				final String[] tuple = ApplicationRoutingHeaderComposer.getAppNameAndSessionId(sipApplicationDispatcher, arText);
-				applicationName = tuple[0];
-				applicationId = tuple[1];
+				final String[] tuple = ApplicationRoutingHeaderComposer.getAppNameAndSessionId(sipApplicationDispatcher, arText);				
+				applicationName = tuple[1];
+				applicationId = tuple[2];
 			} catch(IllegalArgumentException e) {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, e);
 			}
@@ -164,7 +164,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 							// ACK for final error response are proxied statelessly for proxy applications
 							//Means that this is an ACK to a container generated error response, so we can drop it
 							if(logger.isDebugEnabled()) {
-								logger.debug("The popped Route, application Id and name are null for an ACK, and this is an ACK for an error response, so it is dropped");
+								logger.debug("The popped Route, application Id and name are null for an ACK or belonging to a different SIP application server, this is an ACK for an error response, so it is dropped");
 							}				
 							return ;
 						} 

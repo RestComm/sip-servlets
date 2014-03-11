@@ -228,4 +228,5 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 	public void setSipService(SipService sipService);
 
 	String getApplicationServerId();
+	String getApplicationServerIdHash();
 }
