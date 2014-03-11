@@ -252,8 +252,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	private MessageDispatcherFactory messageDispatcherFactory;
 	
     //the balancers names to send heartbeat to and our health info
-	private Set<SipLoadBalancer> sipLoadBalancers = new CopyOnWriteArraySet<SipLoadBalancer>();
-	private LicenseEnforcer enforcer;	
+	private Set<SipLoadBalancer> sipLoadBalancers = new CopyOnWriteArraySet<SipLoadBalancer>();	
 	
 	/**
 	 * 
