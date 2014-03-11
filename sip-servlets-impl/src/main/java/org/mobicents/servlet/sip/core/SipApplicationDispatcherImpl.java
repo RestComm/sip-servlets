@@ -1,23 +1,20 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
- * and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications
+ * Copyright 2011-2014, Telestax Inc and individual contributors
+ * by the @authors tag.
  *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
+ * This program is free software: you can redistribute it and/or modify
+ * under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
  *
- * This software is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 package org.mobicents.servlet.sip.core;
@@ -39,6 +36,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -178,6 +176,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	//the logger
 	private static final Logger logger = Logger.getLogger(SipApplicationDispatcherImpl.class);
 	
+	// app server id
+	private String applicationServerId;
 	// ref back to the sip service
 	private SipService sipService = null;
 	//the sip factory implementation
@@ -252,6 +252,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	
     //the balancers names to send heartbeat to and our health info
 	private Set<SipLoadBalancer> sipLoadBalancers = new CopyOnWriteArraySet<SipLoadBalancer>();
+	private LicenseEnforcer enforcer;	
 	
 	/**
 	 * 
@@ -265,6 +266,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		sipNetworkInterfaceManager = new SipNetworkInterfaceManagerImpl(this);
 		maxMemory = Runtime.getRuntime().maxMemory() / (double) 1024;
 		congestionControlPolicy = CongestionControlPolicy.ErrorResponse;
+		applicationServerId = "" + UUID.randomUUID();
 	}
 	
 	/**
@@ -1512,6 +1514,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	
 	public String getHashFromApplicationName(String appName) {
 		return applicationNameToMd.get(appName);
+	}
+	
+	@Override
+	public String getApplicationServerId() {		
+		return applicationServerId;
 	}
 	
 	/**

@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
   <name>sip-servlets-impl</name>
-  <comment/>
-  <projects/>
+  <comment>Mobicents SIP Servlets. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
+  <projects>
+    <project>sip-servlets-spec</project>
+    <project>sip-servlets-core-api</project>
+    <project>sip-servlets-jruby</project>
+    <project>sip-servlets-client</project>
+    <project>sip-servlets-annotations</project>
+  </projects>
   <buildSpec>
     <buildCommand>
       <name>org.eclipse.jdt.core.javabuilder</name>
-      <arguments/>
     </buildCommand>
   </buildSpec>
   <natures>

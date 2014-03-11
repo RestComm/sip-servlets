@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
+
 package org.mobicents.servlet.sip.message;
 
 import gov.nist.javax.sip.DialogExt;
@@ -1224,10 +1225,11 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 									if(uri.isSipURI()) {
 										
 										javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
+										String serverId = sipUri.getParameter(MessageDispatcher.RR_PARAM_SERVER_NAME);
 										String nextApp = sipUri.getParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME);
 										final MobicentsSipApplicationSessionKey sipAppKey = getSipSession().getSipApplicationSession().getKey();
 										final String thisApp = sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());
-										if(thisApp.equals(nextApp)) {
+										if(sipFactoryImpl.getSipApplicationDispatcher().getApplicationServerId().equalsIgnoreCase(serverId) && thisApp.equals(nextApp)) {
 											if(sipConnector != null && sipConnector.isUseStaticAddress()) {
 												sipUri.setHost(sipConnector.getStaticServerAddress());
 												sipUri.setPort(sipConnector.getStaticServerPort());

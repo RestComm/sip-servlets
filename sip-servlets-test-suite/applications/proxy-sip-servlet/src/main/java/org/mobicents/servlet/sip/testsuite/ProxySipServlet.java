@@ -1,6 +1,6 @@
 /*
  * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2013, Telestax Inc and individual contributors
+ * Copyright 2011-2014, Telestax Inc and individual contributors
  * by the @authors tag.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -224,7 +224,17 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			proxy.setRecordRoute(true);
 			proxy.setProxyTimeout(5);
 			logger.info("proxying to downstream proxy" + request.getRequestURI());
-			if(from.contains("route")) {
+			if(from.contains("push-route-app-server")) {
+				logger.info("Max Forwards " + request.getHeader("Max-Forwards"));
+				if(request.getHeader("Max-Forwards").equalsIgnoreCase("70")) {
+					logger.info("proxying to downstream app server on port 5069");
+					// only the first hop proxy to the second server or the second server will endlessly route to itself
+					URI uriAppServer = sipFactory.createAddress("sip:receiver@" + host + ":5069").getURI();	
+					request.pushRoute((SipURI)uriAppServer);
+					proxy.proxyTo(request.getRequestURI());
+					return;
+				}
+			} else if(from.contains("route")) {
 				request.pushRoute((SipURI)uri1);
 			}
 			if(from.contains("uri1")) {
