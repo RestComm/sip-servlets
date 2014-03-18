@@ -581,6 +581,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 				} catch (SipException e) {
 					logger.error("cannot forward the response statelessly" , e);
 				} 
+				sipApplicationDispatcher.updateResponseStatistics(newResponse, false);
 			}
 		} else {
 			//B2BUA case we don't have to do anything here

@@ -138,6 +138,7 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 					sipServletRequest.createResponse(200, "Canceling");
 				Response cancelJsipResponse = (Response) cancelResponse.getMessage();
 				cancelTransaction.sendResponse(cancelJsipResponse);
+				sipApplicationDispatcher.updateResponseStatistics(cancelJsipResponse, false);
 			} catch (SipException e) {
 				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Impossible to send the ok to the CANCEL", e);
 			} catch (InvalidArgumentException e) {
@@ -179,7 +180,8 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 		}
 		try {
 			Response requestTerminatedResponse = (Response) inviteResponse.getMessage();
-			((ServerTransaction)inviteTransaction).sendResponse(requestTerminatedResponse);				
+			((ServerTransaction)inviteTransaction).sendResponse(requestTerminatedResponse);	
+			inviteRequest.getSipSession().getSipApplicationSession().getSipContext().getSipApplicationDispatcher().updateResponseStatistics(requestTerminatedResponse, false);
 		} catch (SipException e) {
 			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Impossible to send the 487 to the INVITE transaction corresponding to CANCEL", e);
 		} catch (InvalidArgumentException e) {

@@ -1,4 +1,4 @@
-﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN" "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
 <!ENTITY % BOOK_ENTITIES SYSTEM "SIP_Servlets_Server_User_Guide.ent">
 %BOOK_ENTITIES;
@@ -7,32 +7,138 @@
   <title>Enterprise Monitoring and Management</title>
   <para>There is two ways of monitoring &PLATFORM_NAME; Sip Servlets :
   <itemizedlist>
+		  <listitem> <para>Through JMX</para></listitem>
   		  <listitem> <para>Through the industry standard Simple Network Management Protocol - SNMP</para></listitem>
-		  <listitem> <para>Through Jopr is an enterprise management solution for JBoss middleware
-		  projects and other application technologies. This pluggable project provides
-		  administration, monitoring, alerting, operational control and configuration
-		  in an enterprise setting with fine-grained security and an advanced
-		  extension model.</para>
-		  <para>It provides support for monitoring base operating system information
-		  on six operating systems as well as management of Apache, JBoss Application
-		  Server (JBoss AS) and other related projects. See the <ulink url="http://www.jboss.org/jopr">Jopr website</ulink> or
-		  the <ulink url="http://www.jboss.org/embjopr">Jopr embedded website</ulink> for more information.</para>
+		  <listitem> <para>Through the &PLATFORM_NAME; Sip Servlets Management Console.</para>
 		  </listitem>
   </itemizedlist>
   </para>
 
-<note>
-<title>SNMP and Monitoring for &SHORT_PLATFORM_NAME; for JBoss AS7 </title>
-<para>
-This feature is not yet implemented in &SHORT_PLATFORM_NAME; for JBoss AS7. This guide will be updated when SNMP and other monitoring features become available. In the meantime, see the chapter below for information about the CLI.
-</para>
+<section>
+        <title>JMX Monitoring</title>
+        <para>
+	        The default mechanism for monitoring &PLATFORM_NAME; Sip Servlets is using the Java Management Extensions (JMX) technology.
+	        The Oracle website includes the list of options and how to configure JMX Remote on Java 7 
+	        <ulink url="http://docs.oracle.com/javase/7/docs/technotes/guides/management/agent.html">http://docs.oracle.com/javase/7/docs/technotes/guides/management/agent.html</ulink>
+        </para>
+        <para>
+        	Please find below, the list of SIP Specific metrics that can be monitored through JMX 
+        </para>
+        <section>
+	        <title>SIP Stack Monitoring Metrics</title>
+	        <para>JMX Name <literal>Domain=org.mobicents.jain.sip,name=Mobicents-SIP-Servlets,type=sip-stack</literal> provides the following metrics : </para>
+	        <itemizedlist>
+	          <listitem>
+	            <para><literal>NumberOfClientTransactions</literal> : Active number of SIP Client Transactions.</para>
+	          </listitem>
+	          <listitem>
+	            <para><literal>NumberOfServerTransactions</literal> : Active number of SIP Server Transactions.</para>
+	          </listitem>
+	          <listitem>
+	            <para><literal>NumberOfDialogTransactions</literal> : Active number of SIP Dialogs.</para>
+	          </listitem>          
+	          <listitem>
+	            <para><literal>LocalMode</literal> : whether the stack is using replication or not.</para>
+	          </listitem>
+	        </itemizedlist>
+        </section>
+        <section>
+	        <title>Container SIP Core Router (SipApplicationDispatcher) Monitoring Metrics</title>
+	        <para>JMX Name <literal>Domain=&lt;server_name&gt;,type=SipApplicationDispatcher</literal> provides the following metrics : </para>
+	        <itemizedlist>
+	          <listitem>
+	            <para><literal>RequestsProcessedByMethod</literal> : Number of incoming SIP requests that have been processed by SIP Method name (INVITE, BYE, INFO, ...).</para>
+	          </listitem>
+	          <listitem>
+	            <para><literal>ResponsesProcessedByStatusCode</literal> : Number of incoming SIP responses that have been processed by status code (1xx, 2xx, 3xx, ...).</para>
+	          </listitem>	         
+	        </itemizedlist>
+	        <itemizedlist>
+	          <listitem>
+	            <para><literal>RequestsSentByMethod</literal> : Number of outgoing SIP requests that have been sent by SIP Method name (INVITE, BYE, INFO, ...).</para>
+	          </listitem>
+	          <listitem>
+	            <para><literal>ResponsesSentByStatusCode</literal> : Number of outgoing SIP responses that have been sent by status code (1xx, 2xx, 3xx, ...).</para>
+	          </listitem>	         
+	        </itemizedlist>
+        </section>
+        <section>
+	        <title>Application Level Monitoring Metrics</title>
+	        <para>JMX Name <literal>Domain=&lt;server_name&gt;,path=&lt;application_context_name&gt;,type=SipManager,host=&lt;host_name&gt;</literal> provides the following metrics : </para>
+	        <itemizedlist>
+	          <listitem>
+	            <para><literal>expiredSipSessions</literal> : Number of SIP sessions that have expired</para>
+	          </listitem>
+	          <listitem>
+	            <para><literal>expiredSipApplicationSessions</literal> : Number of SIP Application sessions that have expired</para>
+	          </listitem>
+	          <listitem>
+	            <para><literal>sipSessionAverageAliveTime</literal> : the average time (in seconds) that expired SIP sessions had been alive.</para>
+	          </listitem>	         	         
+	          <listitem>
+	            <para><literal>sipApplicationSessionAverageAliveTime</literal> : the average time (in seconds) that expired SIP Application sessions had been alive.</para>
+	          </listitem>
+	          <listitem>
+	            <para><literal>sipSessionCounter</literal> : Number of SIP Sessions created.</para>
+	          </listitem>
+	          <listitem>
+	            <para><literal>sipApplicationSessionCounter</literal> : Number of SIP Application Sessions created.</para>
+	          </listitem>
+	          <listitem>
+	            <para><literal>activeSipSessions</literal> : Number of currently active SIP Sessions.</para>
+	          </listitem>
+	          <listitem>
+	            <para><literal>activeSipApplicationSessions</literal> : Number of currently active SIP Application Sessions.</para>
+	          </listitem>
+	          <listitem>
+	            <para><literal>rejectedSipSessions</literal> : Number of SIP session creations that failed due to maxActiveSipSessions.</para>
+	          </listitem>
+	          <listitem>
+	            <para><literal>rejectedSipApplicationSessions</literal> : Number of SIP Application session creations that failed due to maxActiveSipApplicationSessions.</para>
+	          </listitem>
+	          <listitem>
+	            <para><literal>numberOfSipSessionCreationPerSecond</literal> : Number of SIP sessions per second that have been created.</para>
+	          </listitem>
+	          <listitem>
+	            <para><literal>numberOfSipApplicationSessionCreationPerSecond</literal> : Number of SIP Application sessions per second that have been created.</para>
+	          </listitem>
+	        </itemizedlist>
+        </section>
+        <section>
+	        <title>JMX Monitoring for &SHORT_PLATFORM_NAME; for JBoss AS7/EAP6</title>
+	        <para>
+		        Follow the link <ulink url="https://community.jboss.org/wiki/UsingJconsoleToConnectToJMXOnAS7">To Connect JConsole to JMX on AS7/EAP6</ulink>.
+	        </para>
+	        
+			<note>
+				<title>SNMP Monitoring for &SHORT_PLATFORM_NAME; for JBoss AS7 </title>
+				<para>
+				The SNMP feature is not yet implemented in &SHORT_PLATFORM_NAME; for JBoss AS7. This guide will be updated when SNMP monitoring feature become available. 
+				In the meantime, see the chapter below for information about the CLI.
+				</para>
+				
+				<para>
+				<xref linkend="getting-started-with-MSS-JBOSS-AS7-CLI"/>
+				
+				
+				</para>
+			</note>
+        </section>
+        <section>
+	        <title>JMX Monitoring for &SHORT_PLATFORM_NAME; for Tomcat 7</title>
+	        <para>
+		        Follow the link <ulink url="http://tomcat.apache.org/tomcat-7.0-doc/monitoring.html">To Connect JConsole to JMX on Tomcat 7</ulink>.
+	        </para>
+	        <note>
+				<title>SNMP Monitoring for &SHORT_PLATFORM_NAME; for Tomcat 7 </title>
+				<para>
+				The SNMP feature is not yet implemented in &SHORT_PLATFORM_NAME; for Tomcat 7. This guide will be updated when SNMP monitoring feature become available. 
+				</para>
+			</note>
+        </section>
+</section>
+      
 
-<para>
-<xref linkend="getting-started-with-MSS-Tomcat-AS7"/>
-
-
-</para>
-</note>
 
 		<!--xi:include xmlns:xi="http://www.w3.org/2001/XInclude" href="concept-chapter-Telscale-snmp-adaptor.xml"/-->
  

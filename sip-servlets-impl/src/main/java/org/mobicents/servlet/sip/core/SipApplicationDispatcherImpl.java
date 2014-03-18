@@ -224,6 +224,21 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			responsesProcessedByStatusCode.put(classOfSc, new AtomicLong(0));
 		}
 	}
+	// https://telestax.atlassian.net/browse/MSS-74
+	private static AtomicLong requestsSent = new AtomicLong(0);
+	private static AtomicLong responsesSent= new AtomicLong(0);
+	static final Map<String, AtomicLong> requestsSentByMethod = new ConcurrentHashMap<String, AtomicLong>();
+	static {
+		for (String method : METHODS_SUPPORTED) {
+			requestsSentByMethod.put(method, new AtomicLong(0));
+		}
+	}
+	static final Map<String, AtomicLong> responsesSentByStatusCode = new ConcurrentHashMap<String, AtomicLong>();
+	static {
+		for (String classOfSc : RESPONSES_PER_CLASS_OF_SC) {
+			responsesSentByStatusCode.put(classOfSc, new AtomicLong(0));
+		}
+	}
 	// congestion control
 	private boolean memoryToHigh = false;	
 	private double maxMemory;
@@ -767,7 +782,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				} catch ( TransactionUnavailableException tae) {
 					logger.error("cannot get a new Server transaction for this request " + request, tae);
 					// Sends a 500 Internal server error and stops processing.				
-					MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, requestTransaction, request, sipProvider);				
+					MessageDispatcher.sendErrorResponse(this, Response.SERVER_INTERNAL_ERROR, requestTransaction, request, sipProvider);				
 	                return;
 				} catch ( TransactionAlreadyExistsException taex ) {
 					// This is a retransmission so just return.
@@ -787,7 +802,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 						transaction,
 						dialog,
 						JainSipUtils.DIALOG_CREATING_METHODS.contains(requestMethod));			
-			updateRequestStatistics(request);
+			updateRequestsStatistics(request, true);
 			// Check if the request is meant for me. If so, strip the topmost
 			// Route header.
 			
@@ -828,14 +843,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 				logger.error("Unexpected exception while processing request " + request,e);
 				// Sends an error response if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
 				if(!Request.ACK.equalsIgnoreCase(requestMethod)) {
-					MessageDispatcher.sendErrorResponse(e.getErrorCode(), sipServletRequest, sipProvider);
+					MessageDispatcher.sendErrorResponse(this, e.getErrorCode(), sipServletRequest, sipProvider);
 				}
 				return;
 			} catch (Throwable e) {
 				logger.error("Unexpected exception while processing request " + request,e);
 				// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
 				if(!Request.ACK.equalsIgnoreCase(requestMethod)) {
-					MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, sipServletRequest, sipProvider);
+					MessageDispatcher.sendErrorResponse(this, Response.SERVER_INTERNAL_ERROR, sipServletRequest, sipProvider);
 				}
 				return;
 			}
@@ -843,7 +858,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			logger.error("Unexpected exception while processing request " + request,e);
 			// Sends a 500 Internal server error if the subsequent request is not an ACK (otherwise it violates RF3261) and stops processing.				
 			if(!Request.ACK.equalsIgnoreCase(request.getMethod())) {
-				MessageDispatcher.sendErrorResponse(Response.SERVER_INTERNAL_ERROR, requestTransaction, request, sipProvider);
+				MessageDispatcher.sendErrorResponse(this, Response.SERVER_INTERNAL_ERROR, requestTransaction, request, sipProvider);
 			}
 			return;
 		}
@@ -918,6 +933,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 								// container listener generated a response, we send it
 								try{
 									((ServerTransaction)sipServletRequest.getTransaction()).sendResponse(((SipServletResponseImpl)sipServletResponse).getResponse());
+									sipFactoryImpl.getSipApplicationDispatcher().updateResponseStatistics(((SipServletResponseImpl)sipServletResponse).getResponse(), false);
 //									sipServletResponse.send();
 								} catch (Exception e) {
 									logger.error("Problem while sending the error response " + sipServletResponse + " to the following request "
@@ -929,7 +945,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					}
 					// no application implements the container listener or the container listener didn't generate any responses so we send back a generic one.
 					if(sipServletResponse == null) {
-						MessageDispatcher.sendErrorResponse(Response.SERVICE_UNAVAILABLE, (ServerTransaction) sipServletRequest.getTransaction(), request, sipProvider);
+						MessageDispatcher.sendErrorResponse(this, Response.SERVICE_UNAVAILABLE, (ServerTransaction) sipServletRequest.getTransaction(), request, sipProvider);						
 						return true;
 					}
 				}
@@ -941,15 +957,30 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	/**
 	 * @param requestMethod
 	 */
-	private void updateRequestStatistics(final Request request) {
+	public void updateRequestsStatistics(final Request request, final boolean processed) {
 		if(gatherStatistics) {
-			requestsProcessed.incrementAndGet();
-			final String method = request.getMethod();
-			final AtomicLong requestsProcessed = requestsProcessedByMethod.get(method);
-			if(requestsProcessed == null) {
-				requestsProcessedByMethod.put(method, new AtomicLong());
+			AtomicLong requestsStats = null;			
+			if(processed) {
+				requestsStats = requestsProcessed;
 			} else {
-				requestsProcessed.incrementAndGet();
+				requestsStats = requestsSent;
+			}
+			requestsStats.incrementAndGet();
+			final String method = request.getMethod();
+			AtomicLong requestsStatsMethod = null;
+			if(processed) {
+				requestsStatsMethod = requestsProcessedByMethod.get(method);
+			} else {
+				requestsStatsMethod = requestsSentByMethod.get(method);
+			}
+			if(requestsStatsMethod == null) {
+				if(processed) {
+					requestsProcessedByMethod.put(method, new AtomicLong());
+				} else {
+					requestsSentByMethod.put(method, new AtomicLong());
+				}
+			} else {
+				requestsStatsMethod.incrementAndGet();
 			}
 		}
 	}
@@ -957,38 +988,47 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	/**
 	 * @param requestMethod
 	 */
-	private void updateResponseStatistics(final Response response) {
+	public void updateResponseStatistics(final Response response, final boolean processed) {
 		if(gatherStatistics) {
-			responsesProcessed.incrementAndGet();	
+			AtomicLong responsesStats = null;			
+			Map<String, AtomicLong> responsesStatsStatusCode = null;
+			if(processed) {
+				responsesStats = responsesProcessed;
+				responsesStatsStatusCode = responsesProcessedByStatusCode;
+			} else {
+				responsesStats = responsesSent;
+				responsesStatsStatusCode = responsesSentByStatusCode;
+			}
+			responsesStats.incrementAndGet();	
 			final int statusCode = response.getStatusCode();
 			int statusCodeDiv = statusCode / 100;
 			switch (statusCodeDiv) {
 				case 1:
-					responsesProcessedByStatusCode.get("1XX").incrementAndGet();
+					responsesStatsStatusCode.get("1XX").incrementAndGet();
 					break;
 				case 2:
-					responsesProcessedByStatusCode.get("2XX").incrementAndGet();
+					responsesStatsStatusCode.get("2XX").incrementAndGet();
 					break;
 				case 3:
-					responsesProcessedByStatusCode.get("3XX").incrementAndGet();
+					responsesStatsStatusCode.get("3XX").incrementAndGet();
 					break;
 				case 4:
-					responsesProcessedByStatusCode.get("4XX").incrementAndGet();
+					responsesStatsStatusCode.get("4XX").incrementAndGet();
 					break;
 				case 5:
-					responsesProcessedByStatusCode.get("5XX").incrementAndGet();
+					responsesStatsStatusCode.get("5XX").incrementAndGet();
 					break;
 				case 6:
-					responsesProcessedByStatusCode.get("6XX").incrementAndGet();
+					responsesStatsStatusCode.get("6XX").incrementAndGet();
 					break;
 				case 7:
-					responsesProcessedByStatusCode.get("7XX").incrementAndGet();
+					responsesStatsStatusCode.get("7XX").incrementAndGet();
 					break;
 				case 8:
-					responsesProcessedByStatusCode.get("8XX").incrementAndGet();
+					responsesStatsStatusCode.get("8XX").incrementAndGet();
 					break;
 				case 9:
-					responsesProcessedByStatusCode.get("9XX").incrementAndGet();
+					responsesStatsStatusCode.get("9XX").incrementAndGet();
 					break;
 			}			
 		}
@@ -1018,7 +1058,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		// self routing makes the application data cloned, so we make sure to nullify it
 		((MessageExt)response).setApplicationData(null);
 		
-		updateResponseStatistics(response);
+		updateResponseStatistics(response, true);
 		ClientTransaction clientTransaction = responseEventExt.getClientTransaction();		
 		final Dialog dialog = responseEventExt.getDialog();
 		final boolean isForkedResponse = responseEventExt.isForkedResponse();
@@ -2086,6 +2126,53 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	 */
 	public long getResponsesProcessed() {
 		return responsesProcessed.get();
+	}
+	
+	/**
+	 * @return the requestsProcessed
+	 */
+	public long getRequestsSent() {
+		return requestsSent.get();
+	}
+	
+	/**
+	 * @return the requestsProcessedByMethod
+	 */
+	public Map<String, AtomicLong> getRequestsSentByMethod() {		
+		return requestsSentByMethod;
+	}
+
+	/**
+	 * @return the responsesProcessedByStatusCode
+	 */
+	public Map<String, AtomicLong> getResponsesSentByStatusCode() {		
+		return responsesSentByStatusCode;
+	}
+	
+	/**
+	 * @return the requestsProcessed
+	 */
+	public long getRequestsSentByMethod(String method) {
+		AtomicLong requestsSent = requestsSentByMethod.get(method);
+		if(requestsSent != null) {
+			return requestsSent.get();
+		}
+		return 0;
+	}
+	
+	public long getResponsesSentByStatusCode(String statusCode) {
+		AtomicLong responsesSent = responsesSentByStatusCode.get(statusCode);
+		if(responsesSent != null) {
+			return responsesSent.get();
+		}
+		return 0;
+	}
+	
+	/**
+	 * @return the requestsProcessed
+	 */
+	public long getResponsesSent() {
+		return responsesSent.get();
 	}
 
 	/**

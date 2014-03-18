@@ -175,6 +175,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						}
 						try {
 							sipProvider.sendRequest(request);
+							sipFactoryImpl.getSipApplicationDispatcher().updateRequestsStatistics(request, false);
 						} catch (SipException e) {
 							throw new DispatcherException("cannot proxy statelessly outside of the container the following request " + request, e);
 						}
@@ -419,6 +420,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 				sipServletRequest.getMessage().addHeader(via);
 
 				sipProvider.sendRequest((Request) sipServletRequest.getMessage());
+				sipContext.getSipApplicationDispatcher().updateRequestsStatistics(request, false);
 			} catch (SipException e) {
 				logger.error("Error routing orphaned request" ,e);
 			}

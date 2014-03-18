@@ -31,6 +31,7 @@ import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.Header;
+import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
@@ -98,7 +99,19 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 		sender.sendBye();
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());
-		assertTrue(sender.getOkToByeReceived());		
+		assertTrue(sender.getOkToByeReceived());
+		logger.info("RequestsProcessedByMethod " + tomcat.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod());
+		logger.info("RequestsSentByMethod " + tomcat.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod());
+		logger.info("ResponsesProcessedByStatusCode " + tomcat.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode());
+		logger.info("ResponsesSentByStatusCode " + tomcat.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode());
+		assertTrue(tomcat.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod(Request.INVITE)>1);
+		assertTrue(tomcat.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod(Request.ACK)>1);
+		assertTrue(tomcat.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod(Request.BYE)>0);
+		assertTrue(tomcat.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode("2XX")>1);
+		assertTrue(tomcat.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod(Request.INVITE)>1);
+		assertTrue(tomcat.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod(Request.ACK)>1);
+		assertTrue(tomcat.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod(Request.BYE)>0);
+		assertTrue(tomcat.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode("2XX")>1);
 	}
 	
 	/*

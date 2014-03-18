@@ -498,7 +498,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		}
 		clonedRequest.getTransactionApplicationData().setProxyBranch(this);			
 		try {
-			clonedRequest.send();
+			clonedRequest.send();			
 		} catch (IOException e) {
 			throw new IllegalStateException(e);
 		}
@@ -772,6 +772,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 					return;
 				}
 				sipProvider.sendRequest(clonedRequest);
+				sipFactoryImpl.getSipApplicationDispatcher().updateRequestsStatistics(clonedRequest, false);
 			}
 			else {				
 				forwardRequest(clonedRequest, true);
@@ -899,6 +900,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 			this.outgoingRequest = clonedSipServletRequest;
 			
 			ctx.sendRequest();
+			sipFactoryImpl.getSipApplicationDispatcher().updateRequestsStatistics(clonedRequest, false);
 		} catch (Exception e) {
 			logger.error("A problem occured while proxying a request " + request + " in a dialog-stateless transaction", e);
 			JainSipUtils.terminateTransaction(ctx);
