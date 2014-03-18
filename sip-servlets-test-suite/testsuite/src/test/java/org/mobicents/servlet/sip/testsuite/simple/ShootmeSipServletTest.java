@@ -134,6 +134,10 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		// test non regression for Issue 1687 : Contact Header is present in SIP Message where it shouldn't
 		Response response = sender.getFinalResponse();
 		assertNull(response.getHeader(ContactHeader.NAME));
+		assertEquals(1,tomcat.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod(Request.INVITE));
+		assertEquals(1,tomcat.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod(Request.ACK));
+		assertEquals(1,tomcat.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod(Request.BYE));
+		assertEquals(2,tomcat.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode("2XX"));
 	}
 	
 	/*
@@ -260,6 +264,8 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
 		Thread.sleep(12000);
 		assertTrue(sender.numberOf491s>0);
+		assertTrue(tomcat.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod(Request.INVITE)>1);
+		assertTrue(tomcat.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode("4XX")>0);
 	}
 	
 	public void testShootme491withRetrans() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
@@ -419,6 +425,8 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isFinalResponseReceived());
 		assertEquals(200, sender.getFinalResponseStatus());
+		assertEquals(1,tomcat.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod(Request.REGISTER));
+		assertEquals(1,tomcat.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode("2XX"));
 	}
 	
 	/**
@@ -546,6 +554,12 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 			logger.info(message);
 		}
 		assertTrue(sender.getAllMessagesContent().contains("cancelReceived"));
+		assertEquals(1,tomcat.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod(Request.INVITE));
+		assertEquals(1,tomcat.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod(Request.CANCEL));
+		assertEquals(1,tomcat.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod(Request.ACK));
+		assertTrue(tomcat.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode("1XX")>0);
+		assertTrue(tomcat.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode("2XX")>0);
+		assertTrue(tomcat.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode("4XX")>0);
 	}
 	
 	public void testShootmeMultipleValueHeaders() throws Exception {

@@ -120,8 +120,8 @@ public abstract class MessageDispatcher {
 //		this.sipApplicationDispatcher = sipApplicationDispatcher;
 //	}
 	
-	public static void sendErrorResponse(int errorCode, SipServletRequestImpl sipServletRequest, SipProvider sipProvider) {
-		MessageDispatcher.sendErrorResponse(errorCode, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
+	public static void sendErrorResponse(SipApplicationDispatcher sipApplicationDispatcher, int errorCode, SipServletRequestImpl sipServletRequest, SipProvider sipProvider) {
+		MessageDispatcher.sendErrorResponse(sipApplicationDispatcher, errorCode, (ServerTransaction) sipServletRequest.getTransaction(), (Request) sipServletRequest.getMessage(), sipProvider);
 		if(sipServletRequest.getSipSession() != null) {
 			sipServletRequest.getSipSession().updateStateOnResponse((SipServletResponseImpl)sipServletRequest.createResponse(SipServletResponseImpl.SC_SERVER_INTERNAL_ERROR), false);
 		}
@@ -134,7 +134,7 @@ public abstract class MessageDispatcher {
 	 * @param request
 	 * @param sipProvider
 	 */
-	public static void sendErrorResponse(int errorCode,
+	public static void sendErrorResponse(SipApplicationDispatcher sipApplicationDispatcher, int errorCode,
 			ServerTransaction transaction, Request request,
 			SipProvider sipProvider) {
 		try{
@@ -144,7 +144,8 @@ public abstract class MessageDispatcher {
 	        	transaction.sendResponse(response);
 	        } else { 
 	        	sipProvider.sendResponse(response);
-	        }
+	        }	        
+	        sipApplicationDispatcher.updateResponseStatistics(response, false);
 		} catch (Exception e) {
 			logger.error("Problem while sending the error response to the following request "
 					+ request.toString(), e);

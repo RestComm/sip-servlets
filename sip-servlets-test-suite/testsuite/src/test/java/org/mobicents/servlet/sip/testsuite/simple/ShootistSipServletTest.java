@@ -192,6 +192,10 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		// Non regression test for http://code.google.com/p/sipservlets/issues/detail?id=31
 		assertNotNull(((ViaHeader)receiver.getInviteRequest().getHeader(ViaHeader.NAME)).getParameter("rport"));
 		assertNotNull(((ViaHeader)receiver.getByeRequestReceived().getHeader(ViaHeader.NAME)).getParameter("rport"));
+		assertEquals(1,tomcat.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod(Request.INVITE));
+		assertEquals(1,tomcat.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod(Request.ACK));
+		assertEquals(1,tomcat.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod(Request.BYE));
+		assertEquals(2,tomcat.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode("2XX"));
 	}
 	// Also Tests Issue 1693 http://code.google.com/p/mobicents/issues/detail?id=1693
 	public void testShootistCancel() throws Exception {
@@ -214,6 +218,11 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		assertTrue(allMessagesContent.size() >= 2);
 		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
 		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));
+		assertEquals(1,tomcat.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod(Request.INVITE));
+		assertEquals(1,tomcat.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod(Request.CANCEL));
+		assertTrue(tomcat.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode("1XX")>0);
+		assertTrue(tomcat.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode("2XX")>0);
+		assertTrue(tomcat.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode("4XX")>0);
 	}
 	
 	public void testShootistCancelServletTimerCancelConcurrency() throws Exception {

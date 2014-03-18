@@ -36,6 +36,8 @@ import javax.sip.SipStack;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
+import javax.sip.message.Request;
+import javax.sip.message.Response;
 
 import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.javax.servlet.CongestionControlPolicy;
@@ -198,9 +200,22 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 	
 	String[] getExtensionsSupported();
 	String[] getRfcSupported();
-		
+	
+	public Map<String, AtomicLong> getRequestsProcessedByMethod();
+	public Map<String, AtomicLong> getResponsesProcessedByStatusCode();	
+	long getRequestsProcessedByMethod(String method);
+	long getResponsesProcessedByStatusCode(String statusCode);
+	// https://github.com/Mobicents/sip-servlets/issues/65
+	public Map<String, AtomicLong> getRequestsSentByMethod();
+	public Map<String, AtomicLong> getResponsesSentByStatusCode();	
+	long getRequestsSentByMethod(String method);
+	long getResponsesSentByStatusCode(String statusCode);
+	
 	void setGatherStatistics(boolean gatherStatistics);	
 	boolean isGatherStatistics();
+	
+	void updateResponseStatistics(final Response response, final boolean processed);
+	void updateRequestsStatistics(final Request request, final boolean processed);
 	
 	void setBackToNormalMemoryThreshold(
 			int backToNormalMemoryThreshold);

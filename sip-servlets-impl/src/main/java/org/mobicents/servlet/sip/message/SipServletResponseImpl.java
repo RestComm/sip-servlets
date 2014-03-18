@@ -646,6 +646,7 @@ public abstract class SipServletResponseImpl extends SipServletMessageImpl imple
 						((SIPServerTransaction) transaction).setDialog(null, null);
 					}
 					transaction.sendResponse( (Response)this.message );
+					sipFactoryImpl.getSipApplicationDispatcher().updateResponseStatistics((Response)this.message, false);
 					if(dialog != null) {
 						// we need to set the dialog again because it's possible that when the dialog
 						// was created it was in null state thus no dialog id so we need to reset it to trigger
