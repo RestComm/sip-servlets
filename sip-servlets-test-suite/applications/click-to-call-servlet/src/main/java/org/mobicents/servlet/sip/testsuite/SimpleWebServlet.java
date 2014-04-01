@@ -59,6 +59,7 @@ import org.mobicents.javax.servlet.sip.SipApplicationSessionAsynchronousWork;
 import org.mobicents.javax.servlet.sip.SipApplicationSessionExt;
 import org.mobicents.javax.servlet.sip.SipSessionAsynchronousWork;
 import org.mobicents.javax.servlet.sip.SipSessionExt;
+import org.mobicents.javax.servlet.sip.SipSessionsUtilExt;
 
 public class SimpleWebServlet extends HttpServlet { 	
 	private static final long serialVersionUID = 1L;
@@ -179,7 +180,7 @@ public class SimpleWebServlet extends HttpServlet {
 			final SipApplicationSession sipApplicationSession = sipSessionsUtil.getApplicationSessionById(asyncWorkSasId);
 			Iterator<SipSession> sipSessionIterator = (Iterator<SipSession>) sipApplicationSession.getSessions(Protocol.SIP.toString());
 			SipSession sipSession = sipSessionIterator.next();
-			((SipSessionExt)sipSession).scheduleAsynchronousWork(new SipSessionAsynchronousWork() {
+			((SipSessionsUtilExt)sipSessionsUtil).scheduleAsynchronousWork(sipSession.getId(), new SipSessionAsynchronousWork() {
 				private static final long serialVersionUID = 1L;
 	
 				public void doAsynchronousWork(SipSession sipSession) {				
@@ -202,9 +203,8 @@ public class SimpleWebServlet extends HttpServlet {
 				}
 			});
 			
-		} else {
-			final SipApplicationSession sipApplicationSession = sipSessionsUtil.getApplicationSessionById(asyncWorkSasId);
-			((SipApplicationSessionExt)sipApplicationSession).scheduleAsynchronousWork(new SipApplicationSessionAsynchronousWork() {
+		} else {			
+			((SipSessionsUtilExt)sipSessionsUtil).scheduleAsynchronousWork(asyncWorkSasId, new SipApplicationSessionAsynchronousWork() {
 				private static final long serialVersionUID = 1L;
 	
 				public void doAsynchronousWork(SipApplicationSession sipApplicationSession) {				
