@@ -78,6 +78,7 @@ public interface SipApplicationSessionExt {
      * It has to be noted that the work may never execute if the session gets invalidated in the meantime
      * and the work will be executed locally on the node on a cluster. 
      * 
+     * @deprecated in favor of SipSessionsUtilExt.scheduleAsynchronousWork(String sipApplicationSessionId, SipApplicationSessionAsynchronousWork work);
 	 * @param work the work to be performed on this SipApplicationSession. 
 	 */
     void scheduleAsynchronousWork(SipApplicationSessionAsynchronousWork work);

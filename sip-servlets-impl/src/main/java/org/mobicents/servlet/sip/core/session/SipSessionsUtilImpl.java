@@ -1,23 +1,20 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
- * and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications
+ * Copyright 2011-2014, Telestax Inc and individual contributors
+ * by the @authors tag.
  *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
+ * This program is free software: you can redistribute it and/or modify
+ * under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
  *
- * This software is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 package org.mobicents.servlet.sip.core.session;
@@ -34,6 +31,8 @@ import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipSession;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.SipApplicationSessionAsynchronousWork;
+import org.mobicents.javax.servlet.sip.SipSessionAsynchronousWork;
 import org.mobicents.servlet.sip.core.SipContext;
 
 /**
@@ -64,6 +63,14 @@ public class SipSessionsUtilImpl implements MobicentsSipSessionsUtil, Serializab
 	 * {@inheritDoc}
 	 */
 	public SipApplicationSession getApplicationSessionById(String applicationSessionId) {
+		return getApplicationSessionById(applicationSessionId, true);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.javax.servlet.sip.SipSessionsUtilExt#getApplicationSessionById(java.lang.String, boolean)
+	 */
+	public SipApplicationSession getApplicationSessionById(String applicationSessionId, boolean isContainerManaged) {
 		if(applicationSessionId == null) {
 			throw new NullPointerException("the given id is null !");
 		}
@@ -82,7 +89,7 @@ public class SipSessionsUtilImpl implements MobicentsSipSessionsUtil, Serializab
 			} else {
 				// make sure to acquire this app session and add it to the set of app sessions we monitor in the context of the application
 				// to release them all when we exit application code
-				sipContext.enterSipApp(sipApplicationSession, null, true);
+				sipContext.enterSipApp(sipApplicationSession, null, true, isContainerManaged);
 				return sipApplicationSession.getFacade();
 			}
 		} else {
@@ -97,6 +104,15 @@ public class SipSessionsUtilImpl implements MobicentsSipSessionsUtil, Serializab
 	 */
 	public SipApplicationSession getApplicationSessionByKey(String applicationSessionKey,
 			boolean create) {
+		return getApplicationSessionByKey(applicationSessionKey, create, true);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.javax.servlet.sip.SipSessionsUtilExt#getApplicationSessionByKey(java.lang.String, boolean, boolean)
+	 */
+	public SipApplicationSession getApplicationSessionByKey(String applicationSessionKey,
+			boolean create, boolean isContainerManaged) {
 		if(applicationSessionKey == null) {
 			throw new NullPointerException("the given key is null !");
 		}
@@ -108,7 +124,7 @@ public class SipSessionsUtilImpl implements MobicentsSipSessionsUtil, Serializab
 		} else {
 			// make sure to acquire this app session and add it to the set of app sessions we monitor in the context of the application
 			// to release them all when we exit application code
-			sipContext.enterSipApp(sipApplicationSession, null, true);
+			sipContext.enterSipApp(sipApplicationSession, null, true, isContainerManaged);
 			return sipApplicationSession.getFacade();
 		}
 	}
@@ -211,5 +227,31 @@ public class SipSessionsUtilImpl implements MobicentsSipSessionsUtil, Serializab
 				found = true;
 			}
 		}
+	}
+
+	@Override
+	public void scheduleAsynchronousWork(String sipSessionId,
+			SipSessionAsynchronousWork work) {
+		SipSessionKey sipSessionKey;
+		try {
+			sipSessionKey = SessionManagerUtil.parseSipSessionKey(sipSessionId);
+		} catch (ParseException e) {
+			throw new IllegalArgumentException("the given application session id : " + sipSessionId + 
+					" couldn't be parsed correctly ",e);
+		}
+		sipContext.getSipApplicationDispatcher().getAsynchronousExecutor().execute(new SipSessionAsyncTask(sipSessionKey, work, sipContext.getSipApplicationDispatcher().getSipFactory()));
+	}
+
+	@Override
+	public void scheduleAsynchronousWork(String sipApplicationSessionId,
+			SipApplicationSessionAsynchronousWork work) {
+		SipApplicationSessionKey applicationSessionKey;
+		try {
+			applicationSessionKey = SessionManagerUtil.parseSipApplicationSessionKey(sipApplicationSessionId );
+		} catch (ParseException e) {
+			throw new IllegalArgumentException("the given application session id : " + sipApplicationSessionId + 
+					" couldn't be parsed correctly ",e);
+		}
+		sipContext.getSipApplicationDispatcher().getAsynchronousExecutor().execute(new SipApplicationSessionAsyncTask(applicationSessionKey, work, sipContext.getSipApplicationDispatcher().getSipFactory()));
 	}
 }

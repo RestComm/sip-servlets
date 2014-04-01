@@ -1106,7 +1106,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 						} 
 						boolean batchStarted = false;
 						try {
-							sipContext.enterSipApp(sipApplicationSession, sipSessionImpl, false);
+							sipContext.enterSipApp(sipApplicationSession, sipSessionImpl, false, true);
 							batchStarted = sipContext.enterSipAppHa(true);
 							if(logger.isDebugEnabled()) {
 								logger.debug("sip session " + sipSessionKey + " is valid ? :" + sipSessionImpl.isValidInternal());
@@ -1128,7 +1128,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 					}															
 					if(sipApplicationSession != null) {												
 						try {
-							sipContext.enterSipApp(sipApplicationSession, null, false);
+							sipContext.enterSipApp(sipApplicationSession, null, false, true);
 							if(logger.isDebugEnabled()) {
 								logger.debug("sip app session " + sipApplicationSession.getKey() + " is valid ? :" + sipApplicationSession.isValidInternal());
 								if(sipApplicationSession.isValidInternal()) {
@@ -1177,7 +1177,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 								if(sipContext != null) {
 									MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
 									try {
-										sipContext.enterSipApp(sipApplicationSession, sipSession, false);
+										sipContext.enterSipApp(sipApplicationSession, sipSession, false, true);
 										checkForAckNotReceived(sipServletMessage);
 										checkForPrackNotReceived(sipServletMessage);
 									} finally {
@@ -1248,7 +1248,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 							if(sipContext != null) {
 								MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
 								try {
-									sipContext.enterSipApp(sipApplicationSession, sipSession, false);
+									sipContext.enterSipApp(sipApplicationSession, sipSession, false, true);
 									MobicentsB2BUAHelper b2buaHelperImpl = sipSession.getB2buaHelper();
 
 									if(b2buaHelperImpl != null && tad.getSipServletMessage() instanceof SipServletRequestImpl) {
@@ -1463,7 +1463,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 							if(sipContext != null) {
 								MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
 								try {
-									sipContext.enterSipApp(sipApplicationSession, sipSession, false);
+									sipContext.enterSipApp(sipApplicationSession, sipSession, false, true);
 									if(b2buaHelperImpl != null && tad.getSipServletMessage() instanceof SipServletRequestImpl) {
 										b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
 									}

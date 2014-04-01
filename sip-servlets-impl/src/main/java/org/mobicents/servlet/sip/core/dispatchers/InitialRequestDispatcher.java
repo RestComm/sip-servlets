@@ -436,7 +436,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		final InitialDispatchTask dispatchTask = new InitialDispatchTask(sipServletRequest, sipProvider);
 		// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that
 		// the tx serialization is preserved		
-		sipContext.enterSipApp(sipApplicationSession, sipSessionImpl, false);
+		sipContext.enterSipApp(sipApplicationSession, sipSessionImpl, false, true);
 		
 		// The fastest way to figure out the transport is the mandatory Via transport header 
 		ViaHeader via = (ViaHeader) request.getHeader(ViaHeader.NAME);

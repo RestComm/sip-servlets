@@ -307,7 +307,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		final SubsequentDispatchTask dispatchTask = new SubsequentDispatchTask(sipServletRequest, sipProvider);
 		// we enter the sip app here, thus acuiring the semaphore on the session (if concurrency control is set) before the jain sip tx semaphore is released and ensuring that
 		// the tx serialization is preserved		
-		sipContext.enterSipApp(sipApplicationSession, sipSession, false);
+		sipContext.enterSipApp(sipApplicationSession, sipSession, false, true);
 		// Issue 2886 : http://code.google.com/p/mobicents/issues/detail?id=2886 ACK is bound out of replication context
 		// we need to enter the serialization here because validateCSeq below can set the CSeq so we need to replicate it
 		final boolean batchStarted = sipContext.enterSipAppHa(true);

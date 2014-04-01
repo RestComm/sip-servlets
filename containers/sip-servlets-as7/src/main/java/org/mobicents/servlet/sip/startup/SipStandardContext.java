@@ -1,23 +1,20 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications
+ * Copyright 2011-2014, Telestax Inc and individual contributors
+ * by the @authors tag.
  *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
+ * This program is free software: you can redistribute it and/or modify
+ * under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
  *
- * This software is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 package org.mobicents.servlet.sip.startup;
@@ -1035,9 +1032,9 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 
     /*
      * (non-Javadoc)
-     * @see org.mobicents.servlet.sip.startup.SipContext#enterSipApp(org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession, org.mobicents.servlet.sip.core.session.MobicentsSipSession, boolean)
+     * @see org.mobicents.servlet.sip.core.SipContext#enterSipApp(org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession, org.mobicents.servlet.sip.core.session.MobicentsSipSession, boolean, boolean)
      */
-    public void enterSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession, boolean checkIsManagedThread) {		
+    public void enterSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession, boolean checkIsManagedThread, boolean isContainerManaged) {		
 		switch (concurrencyControlMode) {
 			case SipSession:				
 				if(sipSession != null) {
@@ -1060,14 +1057,17 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 							sipApplicationSessionsAccessedThreadLocal.set(sipApplicationSessionCreationThreadLocal);
 						}
 						boolean notPresent = sipApplicationSessionCreationThreadLocal.getSipApplicationSessions().add(sipApplicationSession);
-						if(notPresent) {
+						if(notPresent && isContainerManaged) {
 							if(logger.isDebugEnabled()) {
 								logger.debug("acquiring sipApplicationSession=" + sipApplicationSession +
 										" since it is not present in our local thread of accessed sip application sessions " );
 							}
 							sipApplicationSession.acquire();
-						} else {
-							if(logger.isDebugEnabled()) {
+						} else if(logger.isDebugEnabled()) {
+							if(!isContainerManaged) {
+								logger.debug("not acquiring sipApplicationSession=" + sipApplicationSession +
+										" since application specified the container shouldn't managed it ");
+							} else {
 								logger.debug("not acquiring sipApplicationSession=" + sipApplicationSession +
 										" since it is present in our local thread of accessed sip application sessions ");
 							}
@@ -1258,7 +1258,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		}
 		
 		if(this.available) {
-			enterSipApp(null, null, false);
+			enterSipApp(null, null, false, true);
 			boolean batchStarted = enterSipAppHa(true);
 			try {
 				for (MobicentsSipServlet container : childrenMap.values()) {
