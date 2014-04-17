@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath> 
+	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar"/>
+	<classpathentry kind="var" path="M2_REPO/dnsjava/dnsjava/2.1.0/dnsjava-2.1.0.jar"/>
+	<classpathentry kind="var" path="M2_REPO/nl/jqno/equalsverifier/equalsverifier/1.0.1/equalsverifier-1.0.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/objenesis/objenesis/1.2/objenesis-1.2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/cglib/cglib-nodep/2.2/cglib-nodep-2.2.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/cafesip/sipunit/sipunit/2.0.0/sipunit-2.0.0.jar" sourcepath="M2_REPO/org/cafesip/sipunit/sipunit/2.0.0/sipunit-2.0.0-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/home/jean/.m2/repository/org/cafesip/sipunit/sipunit/2.0.0/sipunit-2.0.0-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="var" path="M2_REPO/concurrent/concurrent/1.3.4/concurrent-1.3.4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mockito/mockito-all/1.8.5/mockito-all-1.8.5.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.33/tomcat-catalina-7.0.33.jar" sourcepath="/TOMCAT_HOME/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.33/tomcat-juli-7.0.33.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.33/tomcat-juli-7.0.33-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.33/tomcat-annotations-api-7.0.33.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.33/tomcat-annotations-api-7.0.33-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.33/tomcat-api-7.0.33.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-api/7.0.33/tomcat-api-7.0.33-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.33/tomcat-util-7.0.33.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-util/7.0.33/tomcat-util-7.0.33-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.33/tomcat-coyote-7.0.33.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.33/tomcat-coyote-7.0.33-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-jsp-api/7.0.33/tomcat-jsp-api-7.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-el-api/7.0.33/tomcat-el-api-7.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-jasper/7.0.33/tomcat-jasper-7.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1.1/activation-1.1.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.33/tomcat-servlet-api-7.0.33.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.33/tomcat-servlet-api-7.0.33-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/junit/junit/4.8.2/junit-4.8.2.jar"/>
+	<classpathentry kind="src" output="applications/simple-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/simple-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/distributable-servlet/src/main/sipapp/WEB-INF/classes" path="applications/distributable-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/same-instance-servlet/src/main/sipapp/WEB-INF/classes" path="applications/same-instance-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/no-main-servlet-app/src/main/sipapp/WEB-INF/classes" path="applications/no-main-servlet-app/src/main/java"/>
+	<classpathentry kind="src" output="applications/no-app-name-servlet/src/main/sipapp/WEB-INF/classes" path="applications/no-app-name-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/replaces-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/replaces-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/join-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/join-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/deploy-test-app/src/main/sipapp/WEB-INF/classes" path="applications/deploy-test-app/src/main/java"/>
+	<classpathentry kind="src" output="applications/appkey-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/appkey-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/shootme-sip-servlet-auth/src/main/sipapp/WEB-INF/classes" path="applications/shootme-sip-servlet-auth/src/main/java"/>
+	<classpathentry kind="src" output="applications/shootist-sip-servlet-auth/src/main/sipapp/WEB-INF/classes" path="applications/shootist-sip-servlet-auth/src/main/java"/>
+	<classpathentry kind="src" output="applications/refer-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/refer-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/publish-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/publish-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/update-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/update-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/dispatcher-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/dispatcher-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/handler-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/handler-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/chatroom-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/chatroom-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/notifier-servlet/src/main/sipapp/WEB-INF/classes" path="applications/notifier-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/subscriber-servlet/src/main/sipapp/WEB-INF/classes" path="applications/subscriber-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/servlet-mapping-servlet/src/main/sipapp/WEB-INF/classes" path="applications/servlet-mapping-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/proxy-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/proxy-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/click-to-call-servlet/src/main/sipapp/WEB-INF/classes" path="applications/click-to-call-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/shootist-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/shootist-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/b2bua-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/b2bua-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/call-forwarding-servlet/src/main/sipapp/WEB-INF/classes" path="applications/call-forwarding-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/call-forwarding-b2bua-servlet/src/main/sipapp/WEB-INF/classes" path="applications/call-forwarding-b2bua-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/call-blocking-servlet/src/main/sipapp/WEB-INF/classes" path="applications/call-blocking-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/location-service-servlet/src/main/sipapp/WEB-INF/classes" path="applications/location-service-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/speed-dial-servlet/src/main/sipapp/WEB-INF/classes" path="applications/speed-dial-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/listeners-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/listeners-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/timers-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/timers-sip-servlet/src/main/java"/>
+	<classpathentry kind="src" output="applications/session-state-uas/src/main/sipapp/WEB-INF/classes" path="applications/session-state-uas/src/main/java"/>
+	<classpathentry kind="src" output="applications/session-state-uac/src/main/sipapp/WEB-INF/classes" path="applications/session-state-uac/src/main/java"/>
+	<classpathentry kind="src" output="applications/annotated-servlet/src/main/sipapp/WEB-INF/classes" path="applications/annotated-servlet/src/main/java"/>
+	<classpathentry kind="src" output="testsuite/target/classes" path="testsuite/src/main/java"/>
+	<classpathentry kind="src" path="testsuite/src/test/resources"/>
+	<classpathentry kind="src" path="testsuite/src/test/java"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-spec"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-impl"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-application-router"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-annotations"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-client"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jain-sip"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/mobicents-jain-sip-ext"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-core-api"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-catalina-7"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-servlets-tomcat-7"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/sip-balancer-jar"/>
+	<classpathentry kind="output" path="testsuite/target/test-classes"/>
+</classpath>
