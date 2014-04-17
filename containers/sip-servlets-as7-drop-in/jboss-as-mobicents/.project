@@ -10,7 +10,6 @@
     <project>sip-servlets-client</project>
     <project>sip-servlets-annotations</project>
     <project>sip-servlets-as7</project>
-    <project>mobicents-jain-sip-ha-core</project>
     <project>sip-servlets-application-router</project>
   </projects>
   <buildSpec>

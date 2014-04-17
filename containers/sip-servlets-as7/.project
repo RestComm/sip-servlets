@@ -9,7 +9,6 @@
     <project>sip-servlets-jruby</project>
     <project>sip-servlets-client</project>
     <project>sip-servlets-annotations</project>
-    <project>mobicents-jain-sip-ha-core</project>
   </projects>
   <buildSpec>
     <buildCommand>
