@@ -1,30 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <classpath>
   <classpathentry kind="src" path="src/test/java" output="target/test-classes" including="**/*.java"/>
   <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
   <classpathentry kind="output" path="target/classes"/>
-  <classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1.1/activation-1.1.1.jar" sourcepath="M2_REPO/javax/activation/activation/1.1.1/activation-1.1.1-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-api/1.2.0/jain-sip-api-1.2.0.jar" sourcepath="M2_REPO/javax/sip/jain-sip-api/1.2.0/jain-sip-api-1.2.0-sources.jar">
     <attributes>
       <attribute value="jar:file:/home/jean/.m2/repository/javax/sip/jain-sip-api/1.2.0/jain-sip-api-1.2.0-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.169/jain-sip-ri-1.2.169.jar" sourcepath="M2_REPO/javax/sip/jain-sip-ri/1.2.169/jain-sip-ri-1.2.169-sources.jar">
+  <classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.X-SNAPSHOT/jain-sip-ri-1.2.X-SNAPSHOT.jar" sourcepath="M2_REPO/javax/sip/jain-sip-ri/1.2.X-SNAPSHOT/jain-sip-ri-1.2.X-SNAPSHOT-sources.jar">
     <attributes>
-      <attribute value="jar:file:/home/jean/.m2/repository/javax/sip/jain-sip-ri/1.2.169/jain-sip-ri-1.2.169-javadoc.jar!/" name="javadoc_location"/>
+      <attribute value="jar:file:/home/jean/.m2/repository/javax/sip/jain-sip-ri/1.2.X-SNAPSHOT/jain-sip-ri-1.2.X-SNAPSHOT-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar" sourcepath="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1.1/activation-1.1.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar" sourcepath="M2_REPO/javax/mail/mail/1.4/mail-1.4-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
-  <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging-api/1.0.4/commons-logging-api-1.0.4.jar"/>
-  <classpathentry kind="var" path="M2_REPO/javax/javaee-web-api/6.0/javaee-web-api-6.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14.jar" sourcepath="M2_REPO/log4j/log4j/1.2.14/log4j-1.2.14-sources.jar"/>
-  <classpathentry kind="src" path="/sip-servlets-annotations"/>
-  <classpathentry kind="src" path="/sip-servlets-client"/>
-  <classpathentry kind="src" path="/sip-servlets-core-api"/>
-  <classpathentry kind="src" path="/sip-servlets-impl"/>
-  <classpathentry kind="src" path="/sip-servlets-jruby"/>
-  <classpathentry kind="src" path="/sip-servlets-spec"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.33/tomcat-annotations-api-7.0.33.jar"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+  <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.17/log4j-1.2.17.jar"/>
+  <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging-api/1.0.4/commons-logging-api-1.0.4.jar"/>
+  <classpathentry kind="src" path="/sip-servlets-spec"/>
+  <classpathentry kind="src" path="/sip-servlets-impl"/>
+  <classpathentry kind="src" path="/sip-servlets-core-api"/>
+  <classpathentry kind="src" path="/sip-servlets-jruby"/>
+  <classpathentry kind="src" path="/sip-servlets-client"/>
+  <classpathentry kind="src" path="/sip-servlets-annotations"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.50/tomcat-annotations-api-7.0.50.jar"/>
+  <classpathentry kind="var" path="M2_REPO/javax/javaee-web-api/6.0/javaee-web-api-6.0.jar"/>
 </classpath>

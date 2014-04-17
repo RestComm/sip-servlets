@@ -1,6 +1,6 @@
 /*
  * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2013, Telestax Inc and individual contributors
+ * Copyright 2011-2014, Telestax Inc and individual contributors
  * by the @authors tag.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -260,6 +260,8 @@ public final class JainSipUtils {
 		PARAMETERABLE_HEADER_NAMES.add(ProxyAuthenticateHeader.NAME);
 		PARAMETERABLE_HEADER_NAMES.add(AuthorizationHeader.NAME);
         PARAMETERABLE_HEADER_NAMES.add(ProxyAuthorizationHeader.NAME);
+        // https://code.google.com/p/sipservlets/issues/detail?id=260
+        PARAMETERABLE_HEADER_NAMES.add(EventHeader.NAME);
 	}
 
 	
