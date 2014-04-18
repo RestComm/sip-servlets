@@ -186,14 +186,17 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 			if(this.isStarted() && !canceled && !timedOut &&
 					(outgoingRequest.getMethod().equalsIgnoreCase(Request.INVITE) ||
 							// https://code.google.com/p/sipservlets/issues/detail?id=253
-							outgoingRequest.getMethod().equalsIgnoreCase(Request.PRACK))) {
+							outgoingRequest.getMethod().equalsIgnoreCase(Request.PRACK) ||
+							// https://code.google.com/p/sipservlets/issues/detail?id=33
+							outgoingRequest.getMethod().equalsIgnoreCase(Request.UPDATE))) {
 				if(lastResponse != null) { /* According to SIP RFC we should send cancel only if we receive any response first*/
 					if(logger.isDebugEnabled()) {
 						logger.debug("Trying to cancel PorxyBranch for outgoing request " + outgoingRequest);
 					}
 					SipServletRequest cancelRequest = null;
-					if(outgoingRequest.getMethod().equalsIgnoreCase(Request.PRACK)) {
-						// https://code.google.com/p/sipservlets/issues/detail?id=253 in case of PRACK we need to take the original INVITE
+					if(outgoingRequest.getMethod().equalsIgnoreCase(Request.PRACK) || outgoingRequest.getMethod().equalsIgnoreCase(Request.UPDATE)) {
+						// https://code.google.com/p/sipservlets/issues/detail?id=253 and https://code.google.com/p/sipservlets/issues/detail?id=33
+						// in case of PRACK or UPDATE we need to take the original INVITE
 						cancelRequest = originalRequest.getLinkedRequest().createCancel();
 					} else {
 						cancelRequest = outgoingRequest.createCancel();
