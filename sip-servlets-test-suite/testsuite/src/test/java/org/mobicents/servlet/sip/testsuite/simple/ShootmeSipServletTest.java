@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.sip.InvalidArgumentException;
 import javax.sip.SipException;
@@ -134,6 +135,30 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		Response response = sender.getFinalResponse();
 		assertNull(response.getHeader(ContactHeader.NAME));
 	}
+	
+	/*
+	 * https://code.google.com/p/sipservlets/issues/detail?id=264
+	 */
+	public void testShootmeColumnInCallIdHeader() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+		String fromName = "sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+				
+		String toUser = "receiver";
+		String toSipAddress = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[] {"Call-ID"}, new String[] {"jean:telestax:random:" + UUID.randomUUID() + "@localhost"}, true);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.isAckSent());
+		assertTrue(sender.getOkToByeReceived());	
+		// test non regression for Issue 1687 : Contact Header is present in SIP Message where it shouldn't
+		Response response = sender.getFinalResponse();
+		assertNull(response.getHeader(ContactHeader.NAME));
+	}
+	
 	/*
 	 * Non regression test for Issue 2115 http://code.google.com/p/mobicents/issues/detail?id=2115
 	 * MSS unable to handle GenericURI URIs

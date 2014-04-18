@@ -148,7 +148,12 @@ public class SimpleSipServlet
 			request.createResponse(SipServletResponse.SC_OK).send();
 			return;
 		}				
-			
+		String sipSessionId = request.getSession().getId();
+		SipSession sipSession = request.getApplicationSession().getSipSession(sipSessionId);
+		if(sipSession == null || !sipSession.equals(request.getSession())) {
+			throw new RuntimeException("original sip session is " + request.getSession() + " and retrieved sip session is " + sipSession);
+		}
+		
 		logger.info("from : " + fromString);
 		logger.info("Got request: "
 				+ request.getMethod());	
