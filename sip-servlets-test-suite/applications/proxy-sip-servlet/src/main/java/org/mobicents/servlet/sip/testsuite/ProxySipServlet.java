@@ -272,6 +272,10 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 				uris.add(uri1);
 			} else if(from.contains("sequential-cut")) {
 				uris.add(uri2);
+			} else if(from.contains("nonexist-1xx")) {
+				uris.add(uri3);
+				proxy.setProxyTimeout(40);
+				((ProxyExt)proxy).setProxy1xxTimeout(1);
 			} else if(from.contains("nonexist")) {
 				uris.add(uri3);
 				proxy.setProxyTimeout(40);
@@ -557,11 +561,11 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			for (ProxyBranch proxyBranch : branches) {
 			    if(response.getFrom().getURI().toString().contains("change-to-user")) {
 			        // https://code.google.com/p/sipservlets/issues/detail?id=154
-	                Address toHeader = proxyBranch.getRequest().getAddressHeader("To");
-	                SipURI toSipURI = (SipURI) toHeader.getURI();
-	                toSipURI.setUser("newuser");
-	            }
-            }			
+	                	Address toHeader = proxyBranch.getRequest().getAddressHeader("To");
+	                	SipURI toSipURI = (SipURI) toHeader.getURI();
+	                	toSipURI.setUser("newuser");
+	            	    }	
+            		}			
 			response.getProxy().startProxy();
 		}
 	}	
@@ -612,7 +616,10 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
     		IOException {
     	logger.error("CANCEL seen at proxy " + req);
     }
-
+    /*
+     * (non-Javadoc)
+     * @see org.mobicents.javax.servlet.sip.ProxyBranchListener#onProxyBranchResponseTimeout(org.mobicents.javax.servlet.sip.ResponseType, javax.servlet.sip.ProxyBranch)
+     */
 	public void onProxyBranchResponseTimeout(ResponseType responseType,
 			ProxyBranch proxyBranch) {
 		logger.info("onProxyBranchResponseTimeout callback was called. responseType = " + responseType + " , branch = " + proxyBranch + ", request " + proxyBranch.getRequest() + ", response " + proxyBranch.getResponse());

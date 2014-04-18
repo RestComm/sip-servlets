@@ -71,6 +71,7 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.message.MobicentsSipServletResponse;
 import org.mobicents.servlet.sip.core.proxy.MobicentsProxy;
+import org.mobicents.servlet.sip.core.proxy.MobicentsProxyBranch;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
@@ -695,9 +696,9 @@ public abstract class SipServletResponseImpl extends SipServletMessageImpl imple
 
 
 	/**
-	 * @param proxyBranch the proxyBranch to set
+	 * {@inheritDoc}
 	 */
-	public void setProxyBranch(ProxyBranch proxyBranch) {
+	public void setProxyBranch(MobicentsProxyBranch proxyBranch) {
 		this.proxyBranch = proxyBranch;
 		// doBranchResponse is only called for intermediate branch final responses
 		if(proxyBranch != null && getStatus() >= 200) {
