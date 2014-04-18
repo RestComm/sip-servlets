@@ -1359,10 +1359,14 @@ public class TestSipListener implements SipListener {
 			}
 			
 			if(!waitForCancel) {
-				Address address = protocolObjects.addressFactory
-					.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + myPort
-						+";transport="+protocolObjects.transport
-						+ ">");
+				Address address = protocolObjects.addressFactory.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":" + myPort
+							+";transport="+protocolObjects.transport
+							+ ">");
+				if(finalResponseToSend == Response.MOVED_TEMPORARILY) {
+					address = protocolObjects.addressFactory.createAddress("Shootme <sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5058"
+							+";transport="+protocolObjects.transport
+							+ ">");
+				}
 				contactHeader = protocolObjects.headerFactory.createContactHeader(address);						
 				setFinalResponse(protocolObjects.messageFactory
 						.createResponse(finalResponseToSend, request));
