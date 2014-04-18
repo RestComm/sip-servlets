@@ -348,7 +348,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 				logger.info("doInvite: uri = " + uri);
 				proxy.setParallel(false);
 			}
-			if (from.contains("update")){
+			if (from.contains("update") || from.contains("prack")){
 				proxy.setProxyTimeout(40);
 			} else {
 				proxy.setProxyTimeout(4);

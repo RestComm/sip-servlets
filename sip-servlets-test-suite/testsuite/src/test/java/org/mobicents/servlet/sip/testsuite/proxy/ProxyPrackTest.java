@@ -1,99 +1,143 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications
+ * Copyright 2011-2014, Telestax Inc and individual contributors
+ * by the @authors tag.
  *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
+ * This program is free software: you can redistribute it and/or modify
+ * under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
  *
- * This software is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 package org.mobicents.servlet.sip.testsuite.proxy;
 
-import java.util.EventObject;
-import java.util.Hashtable;
-
-import javax.sip.DialogTerminatedEvent;
-import javax.sip.IOExceptionEvent;
-import javax.sip.RequestEvent;
-import javax.sip.ResponseEvent;
-import javax.sip.SipListener;
+import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
-import javax.sip.TimeoutEvent;
-import javax.sip.TransactionTerminatedEvent;
+import javax.sip.address.SipURI;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
+import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
-public class ProxyPrackTest extends SipServletTestCase implements SipListener {
+public class ProxyPrackTest extends SipServletTestCase {
 
 	private static transient Logger logger = Logger.getLogger(ProxyPrackTest.class);
 
-	protected Shootist shootist;
+	private static final String SESSION_EXPIRED = "sessionExpired";
+	private static final String SESSION_READY_TO_INVALIDATE = "sessionReadyToInvalidate";
+	private static final String SIP_SESSION_READY_TO_INVALIDATE = "sipSessionReadyToInvalidate";
+	private static final boolean AUTODIALOG = true;
+	TestSipListener sender;
+	TestSipListener neutral;
+	TestSipListener receiver;
+	ProtocolObjects senderProtocolObjects;
+	ProtocolObjects	receiverProtocolObjects;
+	ProtocolObjects neutralProto;
 
-	protected Shootme shootme;
-	
-	protected Cutme cutme;
-
-	protected Hashtable providerTable = new Hashtable();
 
 	private static final int TIMEOUT = 20000;
 
-	private static final int receiversCount = 1;
-
 	public ProxyPrackTest(String name) {
 		super(name);
-		this.sipIpAddress = "0.0.0.0";
+		autoDeployOnStartup = false;
 	}
 
 	@Override
 	public void setUp() throws Exception {
 		super.setUp();
-		this.shootist = new Shootist(false, null);
-		this.shootist.usePrack = true;
-		this.shootme = new Shootme(5057);
-		this.shootme.usePrack = true;
-		this.cutme = new Cutme();
+		senderProtocolObjects = new ProtocolObjects("proxy-sender",
+				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
+		receiverProtocolObjects = new ProtocolObjects("proxy-receiver",
+				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
+		neutralProto = new ProtocolObjects("neutral",
+				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		sender.setRecordRoutingProxyTesting(true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5057, 5070, receiverProtocolObjects, false);
+		receiver.setRecordRoutingProxyTesting(true);
+		SipProvider receiverProvider = receiver.createProvider();
+		
+		neutral = new TestSipListener(5058, 5070, neutralProto, false);
+		neutral.setRecordRoutingProxyTesting(true);
+		SipProvider neutralProvider = neutral.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+		neutralProvider.addSipListener(neutral);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+		neutralProto.start();
 	}
 
-	public void testPrackProxying() {
-		this.shootme.init("stackName", null);
-//		this.cutme.init(null);
-		this.shootist.init("prack-useHostName",false, null);
-		for (int q = 0; q < 20; q++) {
-			if (shootist.ended == false && cutme.canceled == false)
-				try {
-					Thread.sleep(TIMEOUT);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		}
-		if (!shootist.ended)
-			fail("Conversation not complete!");
-		if (!shootist.prackOkReceived)
-			fail("No OK to PRACK received");
-		if (!shootist.okToInviteRecevied)
-			fail("No OK to INVITE received");
+	public void testPrackProxying() throws Exception {
+		deployApplication();
+		String fromName = "prack-useHostName";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "proxy-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+						
+		String[] headerNames = new String[]{"require"};
+		String[] headerValues = new String[]{"100rel"};
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);		
+		Thread.sleep(TIMEOUT);
+		assertEquals(200,sender.getFinalResponseStatus());
+		assertTrue(sender.isOkToPrackReceived());
+		assertTrue(sender.isAckSent());
+		sender.sendBye();
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());
+		assertTrue(sender.getOkToByeReceived());		
+	}
+	
+	/*
+	 * Non Regression test for https://code.google.com/p/sipservlets/issues/detail?id=253
+	 */
+	public void testCancelPrackProxying() throws Exception {
+		deployApplication();
+		String fromName = "prack-useHostName";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "proxy-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		receiver.setWaitForCancel(true);
+		String[] headerNames = new String[]{"require"};
+		String[] headerValues = new String[]{"100rel"};
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);		
+		Thread.sleep(TIMEOUT);
+		sender.sendCancel();
+		Thread.sleep(TIMEOUT);
+		assertEquals(487,sender.getFinalResponseStatus());
+		
 	}
 
 	@Override
 	public void tearDown() throws Exception {
-		shootist.destroy();
-		shootme.destroy();
-		//cutme.destroy();
+		senderProtocolObjects.destroy();
+		receiverProtocolObjects.destroy();		
+		neutralProto.destroy();
+		logger.info("Test completed");
 		super.tearDown();
 	}
 
@@ -112,50 +156,5 @@ public class ProxyPrackTest extends SipServletTestCase implements SipListener {
 				+ projectHome
 				+ "/sip-servlets-test-suite/testsuite/src/test/resources/"
 				+ "org/mobicents/servlet/sip/testsuite/proxy/simple-sip-servlet-dar.properties";
-	}
-
-	public void init() {
-		// setupPhones();
-	}
-
-	private SipListener getSipListener(EventObject sipEvent) {
-		SipProvider source = (SipProvider) sipEvent.getSource();
-		SipListener listener = (SipListener) providerTable.get(source);
-		if (listener == null)
-			throw new RuntimeException("Unexpected null listener");
-		return listener;
-	}
-
-	public void processRequest(RequestEvent requestEvent) {
-		getSipListener(requestEvent).processRequest(requestEvent);
-
-	}
-
-	public void processResponse(ResponseEvent responseEvent) {
-		getSipListener(responseEvent).processResponse(responseEvent);
-
-	}
-
-	public void processTimeout(TimeoutEvent timeoutEvent) {
-		getSipListener(timeoutEvent).processTimeout(timeoutEvent);
-	}
-
-	public void processIOException(IOExceptionEvent exceptionEvent) {
-		fail("unexpected exception");
-
-	}
-
-	public void processTransactionTerminated(
-			TransactionTerminatedEvent transactionTerminatedEvent) {
-		getSipListener(transactionTerminatedEvent)
-				.processTransactionTerminated(transactionTerminatedEvent);
-
-	}
-
-	public void processDialogTerminated(
-			DialogTerminatedEvent dialogTerminatedEvent) {
-		getSipListener(dialogTerminatedEvent).processDialogTerminated(
-				dialogTerminatedEvent);
-
 	}
 }

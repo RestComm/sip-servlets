@@ -184,12 +184,21 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		try {			
 			cancelTimer();
 			if(this.isStarted() && !canceled && !timedOut &&
-					outgoingRequest.getMethod().equalsIgnoreCase(Request.INVITE)) {
+					(outgoingRequest.getMethod().equalsIgnoreCase(Request.INVITE) ||
+							// https://code.google.com/p/sipservlets/issues/detail?id=253
+							outgoingRequest.getMethod().equalsIgnoreCase(Request.PRACK))) {
 				if(lastResponse != null) { /* According to SIP RFC we should send cancel only if we receive any response first*/
 					if(logger.isDebugEnabled()) {
 						logger.debug("Trying to cancel PorxyBranch for outgoing request " + outgoingRequest);
 					}
-					SipServletRequest cancelRequest = outgoingRequest.createCancel();
+					SipServletRequest cancelRequest = null;
+					if(outgoingRequest.getMethod().equalsIgnoreCase(Request.PRACK)) {
+						// https://code.google.com/p/sipservlets/issues/detail?id=253 in case of PRACK we need to take the original INVITE
+						cancelRequest = originalRequest.getLinkedRequest().createCancel();
+					} else {
+						cancelRequest = outgoingRequest.createCancel();
+					}
+					
 					//Adding reason headers if needed
 					if(protocol != null && reasonCode != null && reasonText != null
 							&& protocol.length == reasonCode.length && reasonCode.length == reasonText.length) {
@@ -222,7 +231,9 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 				canceled = true;
 			}
 			if(!this.isStarted() &&
-					outgoingRequest.getMethod().equalsIgnoreCase(Request.INVITE)) {
+					(outgoingRequest.getMethod().equalsIgnoreCase(Request.INVITE) ||
+							// https://code.google.com/p/sipservlets/issues/detail?id=253
+							outgoingRequest.getMethod().equalsIgnoreCase(Request.PRACK))) {
 				canceled = true;	
 			}
 		}
@@ -758,7 +769,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	 */
 	public void proxyDialogStateless(SipServletRequestImpl request) {
 		if(logger.isDebugEnabled()) {
-			logger.debug("Proxying request dialog-statelessly" + request);
+			logger.debug("Proxying request dialog-statelessly " + request);
 		}
 		final SipFactoryImpl sipFactoryImpl = proxy.getSipFactoryImpl();
 		final SipApplicationDispatcher sipApplicationDispatcher = sipFactoryImpl.getSipApplicationDispatcher();

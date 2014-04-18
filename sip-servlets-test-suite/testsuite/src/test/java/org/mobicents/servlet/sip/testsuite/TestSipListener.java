@@ -518,8 +518,11 @@ public class TestSipListener implements SipListener {
 				return;
 			} 
 			
-			if(!sendUpdateAfterUpdate)
+			if(!sendUpdateAfterUpdate && !waitForCancel)
 				inviteServerTid.sendResponse(getFinalResponse());
+			else {
+				logger.info("sendUpdateAfterUpdate or Waiting for CANCEL, stopping the PRACK processing and not sending 200 OK to INVITE");
+			}
 		} catch(Exception e) {
 			logger.error("Unexpected exception while trying to send the 200 to PRACK " + request, e);
 		}
