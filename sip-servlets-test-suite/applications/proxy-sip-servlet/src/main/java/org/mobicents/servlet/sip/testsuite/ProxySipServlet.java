@@ -546,6 +546,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 	@Override
 	protected void doBranchResponse(SipServletResponse response)
 			throws ServletException, IOException {
+
 		logger.info("doBranchResponse callback was called " + response);		
 		response.getApplicationSession().setAttribute("branchResponseReceived", "true");	
 		if(response.getStatus() == 408) {
