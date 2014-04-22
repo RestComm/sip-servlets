@@ -243,15 +243,22 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 				logger.debug("Cancelling all Branches except " + except + " with outgoing resquest " + except.getRequest());
 			}
 		}
-		for(ProxyBranch proxyBranch : proxyBranches.values()) {		
+		for(MobicentsProxyBranch proxyBranch : proxyBranches.values()) {		
 			if(!proxyBranch.equals(except)) {
 				// Do not make this check in the beginning of the method, because in case of reINVITE etc, we already have a single brnch nd this method
 				// would have no actual effect, no need to fail it just because we've already seen ACK. Only throw exception if there are other branches.
 				try {
 					proxyBranch.cancel(protocol, reasonCode, reasonText);
-				} catch (IllegalStateException e) {
-					// TODO: Instead of catching excpetions here just determine if the branch is cancellable
-					if(throwExceptionIfCannotCancel) throw e;
+				} catch (IllegalStateException e) {				
+					if(throwExceptionIfCannotCancel) {
+						throw e;
+					} else {
+						// https://code.google.com/p/sipservlets/issues/detail?id=266
+						if(logger.isDebugEnabled()) {
+							logger.debug("Problem cancelling proxy branch " + proxyBranch.getTargetURI() + " lastResponse "+ proxyBranch.getResponse() + 
+								" isCancelled " + proxyBranch.isCanceled() + " isStarted " + proxyBranch.isStarted() + " isTimedOut " + proxyBranch.isTimedOut());
+						}
+					}
 				}
 			}
 		}

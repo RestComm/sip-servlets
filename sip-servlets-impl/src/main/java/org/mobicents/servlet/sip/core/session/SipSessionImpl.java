@@ -1033,7 +1033,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}
 		if(proxy != null && !proxy.getAckReceived()) {
 			try {
-				proxy.cancel();
+				proxy.cancelAllExcept(null, null, null, null, false);
 			} catch (Exception e) {
 				logger.debug("Problem cancelling proxy. We just try our best. This is not a critical error.", e);
 			}
