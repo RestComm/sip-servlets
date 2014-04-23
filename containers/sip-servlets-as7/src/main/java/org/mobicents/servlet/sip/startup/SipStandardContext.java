@@ -1066,7 +1066,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 						} else if(logger.isDebugEnabled()) {
 							if(!isContainerManaged) {
 								logger.debug("not acquiring sipApplicationSession=" + sipApplicationSession +
-										" since application specified the container shouldn't managed it ");
+										" since application specified the container shouldn't manage it ");
 							} else {
 								logger.debug("not acquiring sipApplicationSession=" + sipApplicationSession +
 										" since it is present in our local thread of accessed sip application sessions ");
