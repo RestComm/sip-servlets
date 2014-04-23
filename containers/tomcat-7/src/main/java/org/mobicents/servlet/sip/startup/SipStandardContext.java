@@ -1233,7 +1233,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 				break;
 			case SipApplicationSession:
 				if(logger.isDebugEnabled()) {
-					logger.debug("checkIsManagedThread " + checkIsManagedThread + " , isManagedThread " + isManagedThread.get());
+					logger.debug("checkIsManagedThread " + checkIsManagedThread + " , isManagedThread " + isManagedThread.get() + ", isContainerManaged " + isContainerManaged);
 				}
 				// http://code.google.com/p/mobicents/issues/detail?id=2534 && http://code.google.com/p/mobicents/issues/detail?id=2526
 				if(!checkIsManagedThread || (checkIsManagedThread && Boolean.TRUE.equals(isManagedThread.get()))) {
