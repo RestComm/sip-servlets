@@ -174,7 +174,7 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 		// Issue 1484 : http://code.google.com/p/mobicents/issues/detail?id=1484
 		// we terminate the session only for initial requests
 		if(inviteRequest.isInitial()) {
-			inviteRequest.getSipSession().setState(State.TERMINATED);
+			inviteRequest.getSipSession().setState(State.TERMINATED);			
 		}
 		try {
 			Response requestTerminatedResponse = (Response) inviteResponse.getMessage();

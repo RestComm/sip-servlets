@@ -1405,6 +1405,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 
 	public void setState(State state) {
 		this.state = state;
+		if(state == State.TERMINATED) {
+		    setReadyToInvalidate(true);
+		}
 	}
 	
 	public void onTerminatedState() {
@@ -1582,7 +1585,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 			// the state of the SipSession object becomes TERMINATED.
 			else {
 				setState(State.TERMINATED);
-				setReadyToInvalidate(true);
 				if(logger.isDebugEnabled()) {
 					logger.debug("the following sip session " + getKey() + " has its state updated to " + state);
 				}
@@ -1609,7 +1611,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 			if(!hasOngoingSubscriptions) {
 				if(getProxy() == null || response.getStatus() != 487) {
 					setState(State.TERMINATED);
-					setReadyToInvalidate(true);
 					if(logger.isDebugEnabled()) {
 						logger.debug("the following sip session " + getKey() + " has its state updated to " + state);
 						logger.debug("the following sip session " + getKey() + " is ready to be invalidated ");
@@ -2087,7 +2088,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 			if(!hasOngoingSubscriptions) {		
 				if(subscriptions.size() < 1) {
 					if((originalMethod != null && okToByeSentOrReceived) || !Request.INVITE.equals(originalMethod) ) {
-						setReadyToInvalidate(true);
 						setState(State.TERMINATED);
 					}
 				}			

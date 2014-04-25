@@ -35,6 +35,9 @@ import javax.sip.header.UserAgentHeader;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.catalina.SipStandardManager;
+import org.mobicents.servlet.sip.startup.SipContextConfig;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -58,6 +61,7 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 	TestSipListener receiver;
 	ProtocolObjects senderProtocolObjects;
 	ProtocolObjects	receiverProtocolObjects;
+	SipStandardManager sipStandardManager = null;
 
 	public B2BUATcpUdpTest(String name) {
 		super(name);
@@ -67,10 +71,16 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 
 	@Override
 	public void deployApplication() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp",
-				"sip-test-context", 
-				"sip-test"));
+	    sipStandardManager = new SipStandardManager();
+	    SipStandardContext context = new SipStandardContext();
+        context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/call-forwarding-b2bua-servlet/src/main/sipapp");
+        context.setName("sip-test-context");
+        context.setPath("/sip-test");       
+        context.addLifecycleListener(new SipContextConfig());
+        context.setManager(sipStandardManager);
+        boolean success = tomcat.deployContext(
+                context);
+		assertTrue(success);
 	}
 
 	@Override
@@ -263,7 +273,7 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		assertTrue(receiver.getByeReceived());
 		CallIdHeader receiverCallIdHeader = (CallIdHeader)sender.getInviteRequest().getHeader(CallIdHeader.NAME);
 		CallIdHeader senderCallIdHeader = (CallIdHeader)receiver.getInviteRequest().getHeader(CallIdHeader.NAME);		
-		assertFalse(receiverCallIdHeader.getCallId().equals(senderCallIdHeader.getCallId()));
+		assertFalse(receiverCallIdHeader.getCallId().equals(senderCallIdHeader.getCallId()));		
 	}
 	
 	public void testCallForwardingCalleeSendBye() throws Exception {
@@ -321,6 +331,7 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
 				toUser, toSipAddress);
 		
+		receiver.setWaitForCancel(true);
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
 		Thread.sleep(500);
 		sender.sendCancel();
@@ -331,6 +342,9 @@ public class B2BUATcpUdpTest extends SipServletTestCase {
 		CallIdHeader receiverCallIdHeader = (CallIdHeader)receiver.getInviteRequest().getHeader(CallIdHeader.NAME);
 		CallIdHeader senderCallIdHeader = (CallIdHeader)sender.getInviteRequest().getHeader(CallIdHeader.NAME);		
 		assertFalse(receiverCallIdHeader.getCallId().equals(senderCallIdHeader.getCallId()));
+		Thread.sleep(TIMEOUT*2);
+		assertEquals(0, sipStandardManager.getActiveSipApplicationSessions());
+		assertEquals(0, sipStandardManager.getActiveSipSessions());
 	}
 	
 	@Override

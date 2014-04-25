@@ -421,8 +421,7 @@ public class ResponseDispatcher extends MessageDispatcher {
 									callServlet(sipServletResponse);
 								}
 								if(status == 487 && proxy.allResponsesHaveArrived()) {
-									session.setState(State.TERMINATED);
-									session.setInvalidateWhenReady(true);
+									session.setState(State.TERMINATED);									
 									if(logger.isDebugEnabled()) {
 										logger.debug("Received 487 on a proxy branch and we are not waiting on other branches. Setting state to TERMINATED for session " + session);										
 									}																		
