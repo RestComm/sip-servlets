@@ -783,6 +783,27 @@ public class ShootmeSipServletTest extends SipServletTestCase {
 		assertTrue(serverHeader.toString().contains("MobicentsSipServletsServer"));
 	}
 	
+	/*
+	 * https://code.google.com/p/sipservlets/issues/detail?id=137
+	 */
+	public void testShootmeResponseGetRemoteAddress() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+        String fromName = "locallyGeneratedRemoteAddress";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);
+                
+        String toUser = "receiver";
+        String toSipAddress = "sip-servlets.com";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+        
+        sender.setSendBye(false);
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);     
+        Thread.sleep(TIMEOUT*2);
+        assertTrue(sender.isAckSent());
+        assertTrue(sender.getByeReceived());    
+    }
+	
 	@Override
 	@After
 	protected void tearDown() throws Exception {					

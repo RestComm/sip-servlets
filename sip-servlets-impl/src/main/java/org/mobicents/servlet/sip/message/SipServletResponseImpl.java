@@ -869,4 +869,21 @@ public abstract class SipServletResponseImpl extends SipServletMessageImpl imple
 	public boolean isRetransmission() {		
 		return isRetransmission;
 	}
+	
+	// https://code.google.com/p/sipservlets/issues/detail?id=137
+	@Override
+	public String getRemoteAddr() {
+	    if(!hasBeenReceived) {
+	        return null;
+	    }
+	    return super.getRemoteAddr();
+	}
+	
+	@Override
+	public int getRemotePort() {
+	    if(!hasBeenReceived) {
+            return -1;
+        }
+	    return super.getRemotePort();
+	}
 }

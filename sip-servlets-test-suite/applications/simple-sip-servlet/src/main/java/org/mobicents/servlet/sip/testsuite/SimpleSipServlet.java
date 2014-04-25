@@ -100,6 +100,7 @@ public class SimpleSipServlet
 	private static final String TEST_SYSTEM_HEADER_MODIFICATION = "systemHeaderModification";
 	private static final String TEST_SERIALIZATION = "serialization";
 	private static final String TEST_FROM_TO_HEADER_MODIFICATION = "fromToHeaderModification";
+	private static final String TEST_LOCALLY_GENERATED_REMOTE_ADDRESS = "locallyGeneratedRemoteAddress";
 	
 	@Resource
 	SipFactory sipFactory;
@@ -148,6 +149,16 @@ public class SimpleSipServlet
 			request.createResponse(SipServletResponse.SC_OK).send();
 			return;
 		}				
+		if(fromString.contains(TEST_LOCALLY_GENERATED_REMOTE_ADDRESS)) {
+		    // https://code.google.com/p/sipservlets/issues/detail?id=137
+		    SipServletResponse sipServletResponse = request.createResponse(SipServletResponse.SC_OK);
+		    if(sipServletResponse.getRemoteAddr() != null) {
+		        request.createResponse(SipServletResponse.SC_SERVER_INTERNAL_ERROR, "getRemoteAddr not null as it should be since response is locally generated").send();
+		        return;
+		    }
+		    sipServletResponse.send();		    
+		    return;
+		}
 		String sipSessionId = request.getSession().getId();
 		SipSession sipSession = request.getApplicationSession().getSipSession(sipSessionId);
 		if(sipSession == null || !sipSession.equals(request.getSession())) {
@@ -606,7 +617,7 @@ public class SimpleSipServlet
 					nbOfAcks = Integer.valueOf(nbOfAcks.intValue() + 1);
 				}
 				req.getSession().setAttribute("nbAcks", nbOfAcks);
-			} else if(TEST_IS_SIP_SERVLET_SEND_BYE.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {				
+			} else if(TEST_IS_SIP_SERVLET_SEND_BYE.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser()) || TEST_LOCALLY_GENERATED_REMOTE_ADDRESS.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {				
 				timerService.createTimer(req.getApplicationSession(), timeout, false, (Serializable)req.getSession());
 			} else if(TEST_EXCEPTION_ON_EXPIRE.equalsIgnoreCase(((SipURI)req.getFrom().getURI()).getUser())) {
 				try {
@@ -846,7 +857,12 @@ public class SimpleSipServlet
 			}
 		} else if(info instanceof SipSession){
 			try {
-				((SipSession)info).createRequest("BYE").send();
+				SipServletRequest bye = ((SipSession)info).createRequest("BYE");
+				if(bye.getTo().getURI().toString().contains(TEST_LOCALLY_GENERATED_REMOTE_ADDRESS) && bye.getRemoteAddr() != null) {
+				    throw new IllegalStateException("remoteport should be null");
+				} else {
+				    bye.send();
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

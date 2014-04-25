@@ -148,9 +148,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	// was received. Applications can determine the actual IP address of the UA
 	// that originated the message from the message Via header fields.
 	// But for upstream - thats a proxy stuff, fun with ReqURI, RouteHeader
-	protected transient InetAddress remoteAddr = null;
+	//protected transient InetAddress remoteAddr = null;
 
-	protected transient int remotePort = -1;
+	//protected transient int remotePort = -1;
 
 	protected transient String transport = null;
 
@@ -986,6 +986,12 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			}
 		} else {
 			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
+			// https://code.google.com/p/sipservlets/issues/detail?id=137
+			boolean isExternal = sipFactoryImpl.getSipApplicationDispatcher().isViaHeaderExternal(via);
+			if(message instanceof Request && !isExternal) {
+			    // locally generated messages should return null as per Javadoc
+			    return null;
+			}
 			if(via == null) {
 				return null;
 			} else {
@@ -1009,6 +1015,12 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			}
 		} else {
 			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
+			// https://code.google.com/p/sipservlets/issues/detail?id=137
+            boolean isExternal = sipFactoryImpl.getSipApplicationDispatcher().isViaHeaderExternal(via);
+            if(message instanceof Request && !isExternal) {
+                // locally generated messages should return -1 as per Javadoc
+                return -1;
+            }
 			if(via != null) {
 				port = via.getPort();
 			}
