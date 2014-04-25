@@ -554,6 +554,14 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			// This URi completes and need to be canceled before answering
 			uris.add(sipFactory.createAddress("sip:neutral@" + host + ":5058").getURI());
 			List<ProxyBranch> branches = response.getProxy().createProxyBranches(uris);
+			for (ProxyBranch proxyBranch : branches) {
+			    if(response.getFrom().getURI().toString().contains("change-to-user")) {
+			        // https://code.google.com/p/sipservlets/issues/detail?id=154
+	                Address toHeader = proxyBranch.getRequest().getAddressHeader("To");
+	                SipURI toSipURI = (SipURI) toHeader.getURI();
+	                toSipURI.setUser("newuser");
+	            }
+            }			
 			response.getProxy().startProxy();
 		}
 	}	

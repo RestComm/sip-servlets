@@ -29,6 +29,7 @@ import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.Header;
 import javax.sip.header.RecordRouteHeader;
+import javax.sip.header.ToHeader;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -218,6 +219,36 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 		assertEquals(480,sender.getFinalResponseStatus());
 		assertTrue(neutral.isCancelReceived());
 	}
+	
+	/*
+     * Non Regression test for https://code.google.com/p/sipservlets/issues/detail?id=154
+     */
+    public void testCancel480ChangeToUserProxying() throws Exception {
+        deployApplication();
+        String fromName = "cancel-480-sequential-2-locations-change-to-user";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);      
+        
+        String toSipAddress = "sip-servlets.com";
+        String toUser = "proxy-receiver";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+                        
+        receiver.setFinalResponseToSend(480);
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);     
+        Thread.sleep(TIMEOUT);
+        assertEquals("newuser", ((SipURI)((ToHeader)neutral.getInviteRequest().getHeader(ToHeader.NAME)).getAddress().getURI()).getUser());
+        sender.sendBye();
+        Thread.sleep(TIMEOUT);
+        // We receive 480 and not 487 because of JSR 289 Section 10.2.6 
+        // When receiving a CANCEL for a transaction for which a Proxy object exists the server responds
+        // to the CANCEL with a 200 and if the original request has not been proxied yet the container responds to it with a 487 final
+        // response. otherwise, all branches are cancelled, and response processing continues as usual
+        assertEquals(200,sender.getFinalResponseStatus());
+        assertTrue(neutral.getByeReceived());
+        assertTrue(sender.getOkToByeReceived());
+    }
 	
 	/*
      * https://code.google.com/p/sipservlets/issues/detail?id=22
