@@ -19,13 +19,9 @@
 
 package org.mobicents.servlet.sip.testsuite.proxy;
 
-import java.util.ListIterator;
-
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
-import javax.sip.header.Header;
-import javax.sip.header.RecordRouteHeader;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -86,6 +82,30 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 	}
 
 	/*
+     * Non Regression test for https://code.google.com/p/sipservlets/issues/detail?id=164
+     */
+    public void testCancelProxying() throws Exception {
+        deployApplication();
+        String fromName = "cancel-unique-location";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);      
+        
+        String toSipAddress = "sip-servlets.com";
+        String toUser = "proxy-receiver";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+                                
+        receiver.setWaitForCancel(true);
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);     
+        Thread.sleep(TIMEOUT);
+        sender.sendCancel();
+        Thread.sleep(TIMEOUT);
+        assertTrue(receiver.isCancelReceived());
+        assertEquals(487,sender.getFinalResponseStatus());        
+    }
+	
+	/*
 	 * https://code.google.com/p/sipservlets/issues/detail?id=2
 	 */
 	public void testRedirectProxying() throws Exception {
@@ -117,7 +137,7 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 	 */
 	public void testCancelRedirectProxying() throws Exception {
 		deployApplication();
-		String fromName = "redirect-unique-location";
+		String fromName = "cancel-unique-location";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);		
