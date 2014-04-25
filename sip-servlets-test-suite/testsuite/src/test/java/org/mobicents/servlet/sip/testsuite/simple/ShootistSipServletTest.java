@@ -978,7 +978,25 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		deployApplication("testRemoteAddrAndPort", "true");
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());		
-	}	
+	}
+	
+	// https://code.google.com/p/sipservlets/issues/detail?id=169
+    public void testShootistMultipartBytes() throws Exception {
+        receiverProtocolObjects =new ProtocolObjects(
+                "sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+                    
+        receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+        receiver.setProvisionalResponsesToSend(new ArrayList<Integer>());        
+        SipProvider senderProvider = receiver.createProvider();         
+        
+        senderProvider.addSipListener(receiver);
+        
+        receiverProtocolObjects.start();
+        tomcat.startTomcat();       
+        deployApplication("testMultipartBytes", "true");
+        Thread.sleep(TIMEOUT);
+        assertTrue(receiver.getByeReceived());
+    }
 
 	@Override
 	@After

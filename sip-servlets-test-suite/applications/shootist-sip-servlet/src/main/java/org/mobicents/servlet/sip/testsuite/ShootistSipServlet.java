@@ -23,6 +23,7 @@ package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -534,6 +535,14 @@ public class ShootistSipServlet
 				sipServletRequest.getInitialPoppedRoute();
 				sipServletRequest.getInitialRemotePort();
 				sipServletRequest.getInitialTransport();
+			}
+			if(ce.getServletContext().getInitParameter("testMultipartBytes") != null) {
+			    // https://code.google.com/p/sipservlets/issues/detail?id=169
+			    try {
+                    sipServletRequest.setContent(new String("test Multipart"), "multipart/unknown");
+                } catch (UnsupportedEncodingException e) {
+                    throw new IllegalStateException("couldn't set the content", e);
+                }
 			}
 			try {			
 				sipServletRequest.send();

@@ -1337,7 +1337,8 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			ContentTypeHeader contentTypeHeader = (ContentTypeHeader)this.message.getHeader(ContentTypeHeader.NAME);			
 			String charset = this.getCharacterEncoding();
 			try {		
-				if(contentType.contains(CONTENT_TYPE_MULTIPART)) {
+			    // https://code.google.com/p/sipservlets/issues/detail?id=169
+				if(contentType.contains(CONTENT_TYPE_MULTIPART) && content instanceof Multipart) {
 					// Fix for Issue 2667 : Correct Handling of MimeMultipart
 					Multipart multipart = (Multipart) content;
 					OutputStream os = new ByteArrayOutputStream();
