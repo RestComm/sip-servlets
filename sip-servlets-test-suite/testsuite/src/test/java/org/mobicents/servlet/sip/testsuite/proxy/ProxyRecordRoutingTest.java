@@ -19,6 +19,9 @@
 
 package org.mobicents.servlet.sip.testsuite.proxy;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
@@ -96,6 +99,32 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
         SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
                 toUser, toSipAddress);
                                 
+        receiver.setWaitForCancel(true);
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);     
+        Thread.sleep(TIMEOUT);
+        sender.sendCancel();
+        Thread.sleep(TIMEOUT);
+        assertTrue(receiver.isCancelReceived());
+        assertEquals(487,sender.getFinalResponseStatus());        
+    }
+    
+    /*
+     * Non Regression test for https://code.google.com/p/sipservlets/issues/detail?id=164
+     */
+    public void testCancelProxyingNon1XX() throws Exception {
+        deployApplication();
+        String fromName = "cancel-unique-location";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);      
+        
+        String toSipAddress = "sip-servlets.com";
+        String toUser = "proxy-receiver";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+        List<Integer> provResponses = new ArrayList<Integer>();
+        provResponses.add(100);
+        receiver.setProvisionalResponsesToSend(provResponses);            
         receiver.setWaitForCancel(true);
         sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);     
         Thread.sleep(TIMEOUT);
