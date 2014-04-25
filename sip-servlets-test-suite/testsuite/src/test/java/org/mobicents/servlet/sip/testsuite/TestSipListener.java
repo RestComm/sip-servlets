@@ -3451,4 +3451,12 @@ public class TestSipListener implements SipListener {
 	public void sendProvisionalResponseBeforeChallenge(boolean b) {
 		sendProvisionalResponseBeforeChallenge  = b;
 	}
+
+    public String getToTag() {
+        return toTag;
+    }
+
+    public void setToTag(String toTag) {
+        this.toTag = toTag;
+    }
 }

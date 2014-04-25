@@ -21,10 +21,14 @@ package org.mobicents.servlet.sip.testsuite.proxy;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Random;
 
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.header.Header;
+import javax.sip.header.RecordRouteHeader;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -214,6 +218,28 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 		assertEquals(480,sender.getFinalResponseStatus());
 		assertTrue(neutral.isCancelReceived());
 	}
+	
+	/*
+     * https://code.google.com/p/sipservlets/issues/detail?id=22
+     */
+    public void testUnderscoreToTagFinalResponseProxying() throws Exception {
+        deployApplication();
+        String fromName = "underscore-to-tag-unique-location";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);      
+        
+        String toSipAddress = "sip-servlets.com";
+        String toUser = "proxy-receiver";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+
+        receiver.setFinalResponseToSend(404);
+        receiver.setToTag(Integer.toString(new Random().nextInt(10000000)) + "_Random_Random");                                
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+        Thread.sleep(TIMEOUT);
+        assertEquals(404,sender.getFinalResponseStatus());                     
+    }
 	
 	@Override
 	public void tearDown() throws Exception {

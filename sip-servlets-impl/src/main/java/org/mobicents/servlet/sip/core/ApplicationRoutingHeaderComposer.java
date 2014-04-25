@@ -62,7 +62,7 @@ public class ApplicationRoutingHeaderComposer {
 		
 			// If there is no AR in the string, generate a uniqueValue for the tag
 			// and it will be stored for later.
-			if(tokens.length > 1) {				
+			if(tokens.length > 2) {				
 				// Otherwise extract the uniqueValue from the tag string, it's the first token.
 				final String hashedAppName = tokens[2];
 				if(sipApplicationDispatcher.getApplicationServerIdHash().equalsIgnoreCase(tokens[1])) {
