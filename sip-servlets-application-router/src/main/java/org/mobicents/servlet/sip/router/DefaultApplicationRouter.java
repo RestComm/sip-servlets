@@ -176,6 +176,7 @@ import org.apache.log4j.Logger;
 public class DefaultApplicationRouter implements SipApplicationRouter, ManageableApplicationRouter{	
 	private static final String DIRECTION_PARAMETER = "DIRECTION";
 	private static final String REGEX_PARAMETER = "REGEX";
+	private static final String REGEX_POPPED_ROUTE_PARAMETER = "REGEX_POPPED_ROUTE";
 	private static final String DIRECTION_OUTBOUND = "OUTBOUND";
 	private static final String DIRECTION_INBOUND = "INBOUND";
 	//	the logger
@@ -355,6 +356,24 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 						continue; // pattern not matching, just don't call the application
 					}
 				}
+				// https://code.google.com/p/sipservlets/issues/detail?id=43
+				String regExPoppedRoute = defaultSipApplicationRouterInfo.getOptionalParameters().get(REGEX_POPPED_ROUTE_PARAMETER);
+                if(regExPoppedRoute != null) {
+                    Pattern pattern = Pattern.compile(regExPoppedRoute);
+                    Matcher matcher = pattern.matcher(initialRequest.getPoppedRoute().toString());
+                    if(matcher.find()) {
+                        if(log.isDebugEnabled()) {
+                            log.debug("initialRequest Popped Route" + initialRequest.getPoppedRoute() + " matching regex pattern " + regExPoppedRoute +
+                               "begin index " + matcher.start() + " and ending at index " + matcher.end() + " for application " + defaultSipApplicationRouterInfo.getApplicationName());
+                        }                       
+                    } else {
+                        if(log.isDebugEnabled()) {
+                            log.debug("initialRequest Popped Route" + initialRequest.getPoppedRoute() + " matching regex pattern " + regExPoppedRoute +
+                               " skipping application " + defaultSipApplicationRouterInfo.getApplicationName());
+                        }
+                        continue; // pattern not matching, just don't call the application
+                    }
+                }
 				
 				boolean isApplicationPresentInContainer = false;
 				synchronized (containerDeployedApplicationNames) {
