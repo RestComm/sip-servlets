@@ -56,9 +56,8 @@ import org.mobicents.servlet.sip.message.SipServletRequestImpl;
 import org.mobicents.servlet.sip.message.SipServletResponseImpl;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 /**
- * TODO: Use outbound interface from ProxyParams.outboundInterface when adding local
- * listening point addresses.
- *
+ * @author jean.deruelle@telestax.com
+ * @author vralev@gmail.com
  */
 public class ProxyUtils {
 	private static final Logger logger = Logger.getLogger(ProxyUtils.class);
@@ -111,7 +110,19 @@ public class ProxyUtils {
 				}
 			}
 			
-			if(outboundTransport == null) outboundTransport = ListeningPoint.UDP;
+			if(outboundTransport == null) {
+			    // https://code.google.com/p/sipservlets/issues/detail?id=20 in case the Request URI doesn't contain the transport
+			    // check the RecordRoute to see if it's set there to a different value			    
+			    String rrHeaderTransport = null;
+			    if(routeRecord != null) {
+			        rrHeaderTransport = routeRecord.getTransportParam();
+			    }
+			    if(rrHeaderTransport == null) {
+			        outboundTransport = ListeningPoint.UDP;
+			    } else {
+			        outboundTransport = rrHeaderTransport;
+			    }
+			}
 
 			((MessageExt)clonedRequest).setApplicationData(outboundTransport);
 			

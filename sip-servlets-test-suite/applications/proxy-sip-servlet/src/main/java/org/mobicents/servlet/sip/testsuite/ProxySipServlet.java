@@ -340,6 +340,10 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			proxy.setSupervised(true);
 			if(recordRoute) {
 				proxy.getRecordRouteURI().setParameter("testparamname", "TESTVALUE");
+				if((via.contains("TCP") || via.contains("tcp")) && fromURI.getUser().contains("tcp-record-route-tcp")) {
+					proxy.getRecordRouteURI().setTransportParam("TCP");
+					uri1.removeParameter("transport");
+				}
 			}		
 			proxy.setParallel(true);
 			if(CHECK_URI.equals(fromURI.getUser())) {
