@@ -19,9 +19,13 @@
 
 package org.mobicents.servlet.sip.testsuite.proxy;
 
+import java.util.ListIterator;
+
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.header.Header;
+import javax.sip.header.RecordRouteHeader;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -161,7 +165,7 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 		assertEquals(480,sender.getFinalResponseStatus());
 		assertTrue(neutral.isCancelReceived());
 	}
-
+	
 	@Override
 	public void tearDown() throws Exception {
 		senderProtocolObjects.destroy();

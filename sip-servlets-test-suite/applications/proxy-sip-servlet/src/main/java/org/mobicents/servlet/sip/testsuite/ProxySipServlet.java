@@ -108,7 +108,7 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		logger.info("Got request:\n" + request.getMethod());
 		SipServletRequestExt req = (SipServletRequestExt)request;
 		if(req.isOrphan() && !req.isInitial()) {
-			req.getSession().setAttribute("h", "hhh");
+			req.getSession().setAttribute("h", "hhh");			
 			return;
 		}
 		if(request.getFrom().toString().contains("proxy-orphan")) {
@@ -178,6 +178,10 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			request.getApplicationSession().setAttribute(SIP_APPLICATION_SESSION_TIMEOUT, "true");			
 		}
 		if(!request.isInitial()){
+		    if(request.getFrom().toString().contains("final-response-subsequent")) {
+                // https://code.google.com/p/sipservlets/issues/detail?id=21
+                request.createResponse(491).send();
+            }
 			return;
 		}
 						

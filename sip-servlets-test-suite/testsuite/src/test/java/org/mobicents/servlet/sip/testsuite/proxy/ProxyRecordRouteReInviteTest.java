@@ -101,6 +101,45 @@ public class ProxyRecordRouteReInviteTest extends SipServletTestCase {
 		assertTrue(sender.getOkToByeReceived());		
 	}
 	
+	/*
+	 * https://code.google.com/p/sipservlets/issues/detail?id=21
+	 */
+	public void testProxyCallerFinalResponseOnSubsequentRequest() throws Exception {
+        setupPhones(ListeningPoint.UDP);
+        String fromName = "unique-location-final-response-subsequent";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);      
+        
+        String toSipAddress = "sip-servlets.com";
+        String toUser = "proxy-receiver";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+        
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);     
+        Thread.sleep(TIMEOUT);
+        assertTrue(sender.isAckSent());
+        assertTrue(receiver.isAckReceived());
+        // non regression test for Issue http://code.google.com/p/mobicents/issues/detail?id=2359   
+        String inviteBranch = ((MessageExt)receiver.getInviteRequest()).getTopmostViaHeader().getBranch();
+        String ackBranch = ((MessageExt)receiver.getAckRequest()).getTopmostViaHeader().getBranch();
+        assertFalse(inviteBranch.equals(ackBranch));
+        receiver.setAckReceived(false);
+        sender.setAckSent(false);
+        sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);      
+        Thread.sleep(TIMEOUT);
+        assertEquals(491, sender.getFinalResponseStatus());
+        assertFalse(receiver.isAckReceived());
+        receiver.setAckReceived(false);
+        receiver.setAckSent(false);
+        sender.setAckSent(false);
+        sender.setAckReceived(false);
+        sender.sendBye();
+        Thread.sleep(TIMEOUT);
+        assertTrue(receiver.getByeReceived());
+        assertTrue(sender.getOkToByeReceived());        
+    }
+	
 	// Test for http://code.google.com/p/sipservlets/issues/detail?id=44
 	public void testProxyReinviteAckSeenByApp() throws Exception {
 		setupPhones(ListeningPoint.UDP);

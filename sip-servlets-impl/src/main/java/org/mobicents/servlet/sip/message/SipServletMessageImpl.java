@@ -159,7 +159,8 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	protected transient SipPrincipal userPrincipal;
 	
 	protected boolean isMessageSent;
-	// Made it transient for Issue 1523 : http://code.google.com/p/mobicents/issues/detail?id=1523
+
+    // Made it transient for Issue 1523 : http://code.google.com/p/mobicents/issues/detail?id=1523
 	// NotSerializableException happens if a message is stored in the sip session during HA
 	protected transient Dialog dialog;
 	
@@ -2172,4 +2173,8 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	public void setAppSessionId(String appSessionId) {
 		this.appSessionId = appSessionId;
 	}
+	
+	public boolean isMessageSent() {
+        return isMessageSent;
+    }
 }
