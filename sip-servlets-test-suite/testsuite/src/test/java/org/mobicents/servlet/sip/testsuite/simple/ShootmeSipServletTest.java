@@ -804,6 +804,32 @@ public class ShootmeSipServletTest extends SipServletTestCase {
         assertTrue(sender.getByeReceived());    
     }
 	
+	/*
+	 * https://code.google.com/p/sipservlets/issues/detail?id=194
+	 */
+	public void testShootmeSendBye407Terminated() throws InterruptedException, SipException, ParseException, InvalidArgumentException {
+        String fromName = "SSsendBye";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);
+                
+        String toUser = "receiver";
+        String toSipAddress = "sip-servlets.com";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+        
+        sender.setByeResponse(407);
+        sender.setSendBye(false);
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);     
+        Thread.sleep(TIMEOUT * 2);
+        assertTrue(sender.isAckSent());
+        assertTrue(sender.getByeReceived());
+        Thread.sleep(TIMEOUT);        
+        List<String> allMessagesContent = sender.getAllMessagesContent();
+        assertEquals(1,allMessagesContent.size());
+        assertEquals("CONFIRMED", allMessagesContent.get(0));        
+    }
+	
 	@Override
 	@After
 	protected void tearDown() throws Exception {					

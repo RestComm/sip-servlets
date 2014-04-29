@@ -669,6 +669,11 @@ public class SimpleSipServlet
 		if(response.getStatus() == SipServletResponse.SC_UNAUTHORIZED || 
 				response.getStatus() == SipServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED) {
 		
+		    if(response.getMethod().equalsIgnoreCase("BYE")) {
+		        // https://code.google.com/p/sipservlets/issues/detail?id=194
+		        sendMessage(sipFactory.createApplicationSession(), sipFactory, response.getSession().getState().toString(), null);
+		        return;		        
+		    }
 			// Avoid re-sending if the auth repeatedly fails.
 			if(!"true".equals(getServletContext().getAttribute("FirstResponseRecieved")))
 			{				
