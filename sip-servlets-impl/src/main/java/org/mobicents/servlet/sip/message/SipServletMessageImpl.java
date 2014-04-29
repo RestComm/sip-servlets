@@ -30,7 +30,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.InetAddress;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Enumeration;

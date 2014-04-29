@@ -325,6 +325,9 @@ public class ShootistSipServlet
 					} catch (ServletParseException e) {
 						logger.error("Impossible to create the tel URL", e);
 					}
+					if(ce.getServletContext().getInitParameter("flag") != null) {
+					    toURI.setParameter(ce.getServletContext().getInitParameter("flag"), "");
+					}
 					if(ce.getServletContext().getInitParameter("enum") != null) {
 						DNSResolver dnsResolver = (DNSResolver) getServletContext().getAttribute("org.mobicents.servlet.sip.DNS_RESOLVER");
 						toURI = dnsResolver.getSipURI(toURI);
