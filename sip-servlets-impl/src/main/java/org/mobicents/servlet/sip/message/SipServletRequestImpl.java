@@ -1653,11 +1653,23 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	 * @return
 	 */
 	public boolean visitNextHop() {
+	    if(logger.isDebugEnabled()) {
+            logger.debug("visitNextHop txAppData " + transactionApplicationData);
+        }
 		if(transactionApplicationData != null) {
 			Queue<Hop> nextHops = transactionApplicationData.getHops();
+			if(logger.isDebugEnabled()) {
+	            logger.debug("visitNextHop nextHops " + nextHops);
+	            if(nextHops != null) {
+	                logger.debug("visitNextHop nextHops size " + nextHops.size());
+	            }
+	        }
 			if(sipFactoryImpl.getSipApplicationDispatcher().getDNSServerLocator() != null && nextHops != null && nextHops.size() > 1) {
 				nextHops.remove();
 				Hop nextHop = nextHops.peek();
+				if(logger.isDebugEnabled()) {
+		            logger.debug("visitNextHop nextHop " + nextHop);
+		        }
 				if(nextHop != null) {
 					// If a failure occurs, the client SHOULD create a new request, 
 					// which is identical to the previous, but

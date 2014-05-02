@@ -1,23 +1,20 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications
+ * Copyright 2011-2014, Telestax Inc and individual contributors
+ * by the @authors tag.
  *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
+ * This program is free software: you can redistribute it and/or modify
+ * under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
  *
- * This software is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 package org.mobicents.servlet.sip.testsuite.simple.rfc3263;
@@ -72,6 +69,12 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 	
 	TestSipListener badReceiver;
 	ProtocolObjects badReceiverProtocolObjects;
+	
+	TestSipListener badReceiver2;
+    ProtocolObjects badReceiver2ProtocolObjects;
+    
+    TestSipListener badReceiver3;
+    ProtocolObjects badReceiver3ProtocolObjects;
 	
 	public ShootistSipServletRFC3263Test(String name) {
 		super(name);
@@ -320,6 +323,40 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 //		mockedSRVTLSRecords.add(new SRVRecord(new Name("_sips._" + ListeningPoint.TLS.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 1, 0, 5081, name));
 		when(dnsLookupPerformer.performSRVLookup("_sips._" + ListeningPoint.TLS.toLowerCase() + "." + host)).thenReturn(mockedSRVTLSRecords);
 	}
+	
+	private void mockDNSLookup4Records(String host) throws TextParseException {
+        DNSLookupPerformer dnsLookupPerformer = mock(DefaultDNSLookupPerformer.class);
+        //mocking the DNS Lookups to match our test cases
+        tomcat.getSipService().getSipApplicationDispatcher().getDNSServerLocator().setDnsLookupPerformer(dnsLookupPerformer);
+        
+        Set<String> supportedTransports = new HashSet<String>();
+        supportedTransports.add(TRANSPORT.toUpperCase());
+        supportedTransports.add(ListeningPoint.TCP.toUpperCase());
+        supportedTransports.add(ListeningPoint.TLS.toUpperCase());
+        
+        List<NAPTRRecord> mockedNAPTRRecords = new LinkedList<NAPTRRecord>();
+        // mocking the name because localhost is not absolute and localhost. cannot be resolved 
+        Name name = mock(Name.class);
+        when(name.isAbsolute()).thenReturn(true);
+        when(name.toString()).thenReturn("localhost");
+        mockedNAPTRRecords.add(new NAPTRRecord(new Name(host + "."), DClass.IN, 1000, 0, 0, "s", "SIP+D2U", "", new Name("_sip._" + TRANSPORT.toLowerCase() + "." + host + ".")));      
+        when(dnsLookupPerformer.performNAPTRLookup(host, false, supportedTransports)).thenReturn(mockedNAPTRRecords);
+        List<Record> mockedSRVRecords = new LinkedList<Record>();
+        mockedSRVRecords.add(new SRVRecord(new Name("_sip._" + TRANSPORT.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 1, 0, 5080, name));
+        mockedSRVRecords.add(new SRVRecord(new Name("_sip._" + TRANSPORT.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 0, 0, 5081, name));
+        mockedSRVRecords.add(new SRVRecord(new Name("_sip._" + TRANSPORT.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 0, 0, 5082, name));
+        mockedSRVRecords.add(new SRVRecord(new Name("_sip._" + TRANSPORT.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 0, 0, 5083, name));
+        when(dnsLookupPerformer.performSRVLookup("_sip._" + TRANSPORT.toLowerCase() + "." + host)).thenReturn(mockedSRVRecords);
+        List<Record> mockedSRVTCPRecords = new LinkedList<Record>();
+        mockedSRVTCPRecords.add(new SRVRecord(new Name("_sips._" + ListeningPoint.TCP.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 1, 0, 5081, name));
+//      mockedSRVTLSRecords.add(new SRVRecord(new Name("_sips._" + ListeningPoint.TLS.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 1, 0, 5081, name));
+        when(dnsLookupPerformer.performSRVLookup("_sips._" + ListeningPoint.TCP.toLowerCase() + "." + host)).thenReturn(mockedSRVTCPRecords);
+        
+        List<Record> mockedSRVTLSRecords = new LinkedList<Record>();
+        mockedSRVTLSRecords.add(new SRVRecord(new Name("_sips._" + ListeningPoint.TCP.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 1, 0, 5081, name));
+//      mockedSRVTLSRecords.add(new SRVRecord(new Name("_sips._" + ListeningPoint.TLS.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 1, 0, 5081, name));
+        when(dnsLookupPerformer.performSRVLookup("_sips._" + ListeningPoint.TLS.toLowerCase() + "." + host)).thenReturn(mockedSRVTLSRecords);
+    }
 	/*
 	 * Making sure the procedures of retrying the next hop of RFC 3263 are working
 	 * and that the same hop is used for CANCEL
@@ -367,6 +404,8 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 	/*
 	 * Making sure the procedures of retrying the next hop of RFC 3263 are working
 	 * and that the ACK to an error response uses the same hop
+	 * 
+	 * Updated for https://code.google.com/p/sipservlets/issues/detail?id=249
 	 */
 	public void testShootistErrorResponse() throws Exception {
 		Map<String, String> additionalProps = new HashMap<String, String>();
@@ -388,19 +427,38 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 		badReceiverProvider.addSipListener(badReceiver);
 		badReceiverProtocolObjects.start();
 		badReceiver.setDropRequest(true);
+		
+		badReceiver2ProtocolObjects =new ProtocolObjects(
+                "bad-receiver2", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+        badReceiver2 = new TestSipListener(5082, 5070, badReceiver2ProtocolObjects, false);
+        SipProvider badReceiver2Provider = badReceiver2.createProvider();         
+        badReceiver2Provider.addSipListener(badReceiver2);
+        badReceiver2ProtocolObjects.start();
+        badReceiver2.setDropRequest(true);
+        
+        badReceiver3ProtocolObjects =new ProtocolObjects(
+                "bad-receiver3", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+        badReceiver3 = new TestSipListener(5083, 5070, badReceiver3ProtocolObjects, false);
+        SipProvider badReceiver3Provider = badReceiver3.createProvider();         
+        badReceiver3Provider.addSipListener(badReceiver3);
+        badReceiver3ProtocolObjects.start();
+        badReceiver3.setDropRequest(true);
+        
 		String host = "mobicents.org";
 		
 		tomcat.startTomcat();
 		
-		mockDNSLookup(host);		
+		mockDNSLookup4Records(host);		
 		
 		Map<String, String> params = new HashMap<String, String>();
 		params.put("host", host);
 		params.put("testErrorResponse", "true");
 		deployApplication(params);
 		
-		Thread.sleep(DIALOG_TIMEOUT + TIMEOUT);
+		Thread.sleep(DIALOG_TIMEOUT * 3 + TIMEOUT);
 		assertFalse(badReceiver.isAckReceived());
+		assertFalse(badReceiver2.isAckReceived());
+		assertFalse(badReceiver3.isAckReceived());
 		assertTrue(receiver.isAckReceived());	
 		RouteHeader routeHeader = (RouteHeader) receiver.getInviteRequest().getHeader(RouteHeader.NAME);
 		assertNull(routeHeader);
@@ -416,6 +474,12 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 		if(badReceiverProtocolObjects != null) {
 			badReceiverProtocolObjects.destroy();
 		}
+		if(badReceiver2ProtocolObjects != null) {
+            badReceiver2ProtocolObjects.destroy();
+        }
+		if(badReceiver3ProtocolObjects != null) {
+            badReceiver3ProtocolObjects.destroy();
+        }
 		logger.info("Test completed");
 		super.tearDown();
 	}

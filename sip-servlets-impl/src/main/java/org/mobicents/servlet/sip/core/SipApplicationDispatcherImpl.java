@@ -1241,7 +1241,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 						MobicentsSipSession sipSession = sipServletMessage.getSipSession();					
 						boolean appNotifiedOfPrackNotReceived = false;
 						// session can be null if a message was sent outside of the container by the container itself during Initial request dispatching
-						// but the external host doesn't send any response so we call out to the application only if the session is not null					
+						// but the external host doesn't send any response so we call out to the application only if the session is not null
+						if(logger.isDebugEnabled()) {
+                            logger.debug("time out happened on sipSession " + sipSession);
+                        }
 						if(sipSession != null) {
 							SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());					
 							//the context can be null if the server is being shutdown
@@ -1255,6 +1258,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 										b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
 									}
 									// naoki : Fix for Issue 1618 http://code.google.com/p/mobicents/issues/detail?id=1618 on Timeout don't do the 408 processing for Server Transactions
+									if(logger.isDebugEnabled()) {
+			                            logger.debug("time out happened on server tx ? " + timeoutEvent.isServerTransaction() + " and message " + sipServletMessage);
+			                        }
 									if(sipServletMessage instanceof SipServletRequestImpl && !timeoutEvent.isServerTransaction()) {
 										try {
 											ProxyBranchImpl proxyBranchImpl = tad.getProxyBranch();
