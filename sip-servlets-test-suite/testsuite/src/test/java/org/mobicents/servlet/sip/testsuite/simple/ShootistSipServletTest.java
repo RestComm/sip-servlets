@@ -19,6 +19,8 @@
 
 package org.mobicents.servlet.sip.testsuite.simple;
 
+import gov.nist.javax.sip.message.MessageExt;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -1022,6 +1024,26 @@ public class ShootistSipServletTest extends SipServletTestCase {
             i++;
         }
         assertEquals(2, i);
+    }
+    
+    /*
+     * https://code.google.com/p/sipservlets/issues/detail?id=245
+     */
+    public void testShootistAddressParam() throws Exception {
+//      receiver.sendInvite();
+        receiverProtocolObjects =new ProtocolObjects(
+                "sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+                    
+        receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+        SipProvider receiverProvider = receiver.createProvider();           
+        receiverProvider.addSipListener(receiver);
+        receiverProtocolObjects.start();
+        tomcat.startTomcat();
+        deployApplication("testAddressParam", "true");
+        Thread.sleep(TIMEOUT);
+        assertTrue(receiver.getByeReceived());
+        assertEquals("00112233", ((MessageExt)receiver.getInviteRequest()).getFromHeader().getParameter("epid"));
+        assertEquals("33221100", ((MessageExt)receiver.getInviteRequest()).getToHeader().getParameter("epid"));
     }
 
 	@Override

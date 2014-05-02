@@ -808,8 +808,13 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	public Address getFrom() {
 		FromHeader from = (FromHeader) this.message
 				.getHeader(getCorrectHeaderName(FromHeader.NAME));
-		AddressImpl address = new AddressImpl(from.getAddress(), AddressImpl.getParameters((Parameters)from), ModifiableRule.From);
-		return address;
+//		AddressImpl address = new AddressImpl(from.getAddress(), AddressImpl.getParameters((Parameters)from), ModifiableRule.From);
+		// https://code.google.com/p/sipservlets/issues/detail?id=245
+        try {
+            return new AddressImpl(from, ModifiableRule.From);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Couldn't parse From Header " + from, e);
+        }
 	}
 	
 	/*
@@ -1136,7 +1141,13 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	public Address getTo() {
 		ToHeader to = (ToHeader) this.message
 			.getHeader(getCorrectHeaderName(ToHeader.NAME));
-		return new AddressImpl(to.getAddress(), AddressImpl.getParameters((Parameters)to), ModifiableRule.To);
+		// return new AddressImpl(to.getAddress(), AddressImpl.getParameters((Parameters)to), ModifiableRule.To);
+		// https://code.google.com/p/sipservlets/issues/detail?id=245
+		try {
+            return new AddressImpl(to, ModifiableRule.From);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Couldn't parse From Header " + to, e);
+        }
 	}
 	
 	/*

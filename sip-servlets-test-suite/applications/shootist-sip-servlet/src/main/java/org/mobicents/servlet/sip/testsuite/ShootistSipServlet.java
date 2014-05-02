@@ -550,6 +550,24 @@ public class ShootistSipServlet
                     throw new IllegalStateException("couldn't set the content", e);
                 }
 			}
+			if(ce.getServletContext().getInitParameter("testAddressParam") != null) {
+			    // https://code.google.com/p/sipservlets/issues/detail?id=245
+                try {
+                    sipServletRequest.getFrom().setDisplayName("Test name");
+                    sipServletRequest.getFrom().setParameter("epid", "00112233");
+                    sipServletRequest.getTo().setParameter("epid", "33221100");
+                    
+                    Address address = sipFactory.createAddress(sipFactory.createURI("sip:test@address.example.com"));                
+    			    address.setParameter("epid", "bzz");
+    			    sipServletRequest.addAddressHeader("TestAddress", address, true);
+    
+    			    logger.info("testAddressParam Test Address" + address);
+    			    logger.info("request " + sipServletRequest);
+                } catch (ServletParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+			}
 			try {			
 				sipServletRequest.send();
 			} catch (IOException e) {
