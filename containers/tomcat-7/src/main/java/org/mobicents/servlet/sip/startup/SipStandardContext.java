@@ -1158,7 +1158,10 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 									case SIP_CONNECTOR_ADDED : {
 										// reload the outbound interfaces if they have changed
 										this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
-												sipApplicationDispatcher.getOutboundInterfaces());	
+												sipApplicationDispatcher.getOutboundInterfaces());
+										// https://code.google.com/p/sipservlets/issues/detail?id=246
+										this.getServletContext().setAttribute("org.mobicents.servlet.sip.SIP_CONNECTORS",
+								                sipApplicationDispatcher.getSipService().findSipConnectors());
 										
 										List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
 										if(logger.isDebugEnabled()) {
@@ -1172,7 +1175,10 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 									case SIP_CONNECTOR_REMOVED : {
 										// reload the outbound interfaces if they have changed
 										this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
-												sipApplicationDispatcher.getOutboundInterfaces());	
+												sipApplicationDispatcher.getOutboundInterfaces());
+										// https://code.google.com/p/sipservlets/issues/detail?id=246
+										this.getServletContext().setAttribute("org.mobicents.servlet.sip.SIP_CONNECTORS",
+								                sipApplicationDispatcher.getSipService().findSipConnectors());
 										
 										List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
 										if(logger.isDebugEnabled()) {
