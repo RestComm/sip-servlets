@@ -504,6 +504,11 @@ public class ShootistSipServlet
 				sipServletRequest.getInitialRemotePort();
 				sipServletRequest.getInitialTransport();
 			}
+			String testMultipleReasonHeaders = ce.getServletContext().getInitParameter("testMultipleReasonHeaders");
+            if(testMultipleReasonHeaders != null) {
+                sipServletRequest.addHeader("Reason", "SIP ;cause=200 ;text=\"Call completed elsewhere\"");               
+                sipServletRequest.addHeader("Reason", "Q.850 ;cause=16 ;text=\"Terminated\"");
+            }
 			// test for http://code.google.com/p/sipservlets/issues/detail?id=31
 			Parameterable paramVia = null;
 			try {

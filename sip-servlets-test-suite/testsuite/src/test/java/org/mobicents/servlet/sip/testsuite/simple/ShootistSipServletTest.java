@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -35,8 +36,10 @@ import javax.sip.address.SipURI;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.FromHeader;
+import javax.sip.header.Header;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.ProxyAuthorizationHeader;
+import javax.sip.header.ReasonHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.UserAgentHeader;
 import javax.sip.header.ViaHeader;
@@ -994,6 +997,31 @@ public class ShootistSipServletTest extends SipServletTestCase {
         deployApplication("testMultipartBytes", "true");
         Thread.sleep(TIMEOUT);
         assertTrue(receiver.getByeReceived());
+    }
+    
+    // https://code.google.com/p/sipservlets/issues/detail?id=216
+    public void testShootistMutlipleReasonHeaders() throws Exception {
+        receiverProtocolObjects =new ProtocolObjects(
+                "sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+                    
+        receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+        receiver.setProvisionalResponsesToSend(new ArrayList<Integer>());        
+        SipProvider senderProvider = receiver.createProvider();         
+        
+        senderProvider.addSipListener(receiver);
+        
+        receiverProtocolObjects.start();
+        tomcat.startTomcat();       
+        deployApplication("testMultipleReasonHeaders", "true");
+        Thread.sleep(TIMEOUT);
+        assertTrue(receiver.getByeReceived());
+        ListIterator<Header> listIt = receiver.getInviteRequest().getHeaders(ReasonHeader.NAME);
+        int i = 0;
+        while (listIt.hasNext()) {
+            listIt.next();
+            i++;
+        }
+        assertEquals(2, i);
     }
 
 	@Override
