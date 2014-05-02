@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
@@ -538,7 +539,8 @@ public final class JainSipUtils {
 	 * @return
 	 */
 	public static String createBranch(String appSessionId, String appname) {
-		return createBranch(appSessionId, appname, Long.toString(System.nanoTime()));
+	    // https://code.google.com/p/sipservlets/issues/detail?id=269
+		return createBranch(appSessionId, appname, UUID.randomUUID().toString());
     }
 	
 	public static String createBranch(String appSessionId, String appname, String random) {
