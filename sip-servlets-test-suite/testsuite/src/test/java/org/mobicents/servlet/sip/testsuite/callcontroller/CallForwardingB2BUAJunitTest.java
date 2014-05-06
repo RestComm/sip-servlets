@@ -367,6 +367,7 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
 
+		receiver.setWaitForCancel(true);
 		String fromName = "forward-sender";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
@@ -378,7 +379,7 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 				toUser, toSipAddress);
 		
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
-		Thread.sleep(500);
+		Thread.sleep(1500);
 		sender.sendCancel();
 		Thread.sleep(TIMEOUT);
 		assertTrue(sender.isCancelOkReceived());

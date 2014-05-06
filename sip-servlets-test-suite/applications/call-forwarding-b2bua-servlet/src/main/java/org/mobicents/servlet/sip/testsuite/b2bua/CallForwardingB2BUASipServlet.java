@@ -756,7 +756,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			} else {
 				responseToOriginalRequest.send();
 			}
-		} else {
+		} else if(!originalRequest.isCommitted()) {
 			SipSession originalSession =   
 			    sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
 			checkForkedSession(originalSession, sipServletResponse);
