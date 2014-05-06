@@ -1000,7 +1000,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 						}
 					}
 				}
-				if(hops.size() > 0) {
+				if(hops != null && hops.size() > 0) {
 					// RFC 3263 support don't remove the current hop, it will be the one to reuse for CANCEL and ACK to non 2xx transactions
 					hop = hops.peek();
 					transactionApplicationData.setHops(hops);				
@@ -1353,11 +1353,14 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			if((ex instanceof IllegalTransactionStateException && ((IllegalTransactionStateException)ex).getReason().equals(Reason.RequestAlreadySent)) || (tx != null && !(tx instanceof ClientTransaction))) {
 				skipTxTermination = true;
 			}
-			if(!skipTxTermination) {				
+			if(!skipTxTermination) {
 				JainSipUtils.terminateTransaction(tx);
 				// cleaning up the request to make sure it can be resent with some modifications in case of exception
 				if(transactionApplicationData.getHops() != null && transactionApplicationData.getHops().size() > 0) {
 					request.removeFirst(RouteHeader.NAME);
+					// https://code.google.com/p/sipservlets/issues/detail?id=250 retry directly on TCP
+                    visitNextHop();
+                    return;
 				}
 				request.removeFirst(ViaHeader.NAME);
 				request.removeFirst(ContactHeader.NAME);

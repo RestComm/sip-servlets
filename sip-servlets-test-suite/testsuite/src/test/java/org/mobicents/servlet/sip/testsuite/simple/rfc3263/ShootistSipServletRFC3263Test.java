@@ -230,7 +230,7 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 //		receiver.sendInvite();
 		receiverProtocolObjects =new ProtocolObjects(
 				"receiver", "gov.nist", ListeningPoint.TCP, AUTODIALOG, null, null, null);
-		receiver = new TestSipListener(5081, 5070, receiverProtocolObjects, false);
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
 		SipProvider receiverProvider = receiver.createProvider();			
 		receiverProvider.addSipListener(receiver);
 		receiverProtocolObjects.start();
@@ -263,6 +263,45 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 	}
 	
 	/*
+     * Non Regression test for Issue https://code.google.com/p/sipservlets/issues/detail?id=250
+     */
+    public void testShootistTCP() throws Exception {
+//      receiver.sendInvite();
+        receiverProtocolObjects =new ProtocolObjects(
+                "receiver", "gov.nist", ListeningPoint.TCP, AUTODIALOG, null, null, null);
+        receiver = new TestSipListener(5081, 5070, receiverProtocolObjects, false);
+        SipProvider receiverProvider = receiver.createProvider();           
+        receiverProvider.addSipListener(receiver);
+        receiverProtocolObjects.start();
+        
+        badReceiverProtocolObjects =new ProtocolObjects(
+                "bad-receiver", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+        badReceiver = new TestSipListener(5080, 5070, badReceiverProtocolObjects, false);
+        SipProvider badReceiverProvider = badReceiver.createProvider();         
+        badReceiverProvider.addSipListener(badReceiver);
+        badReceiverProtocolObjects.start();
+        badReceiver.setDropRequest(true);
+        String host = "mobicents.org";
+        
+        tomcat.startTomcat();
+        tomcat.removeConnector(sipConnector);
+        tomcat.addSipConnector(serverName, sipIpAddress, 5070, ListeningPoint.TCP);
+        
+        mockDNSLookupTCP(host);        
+        
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("host", host);
+        params.put("method", "REGISTER");
+        params.put("route", "sip:mobicents.org;transport=tcp");
+        deployApplication(params);
+        
+        Thread.sleep(TIMEOUT);
+        RouteHeader routeHeader = (RouteHeader) receiver.getRegisterReceived().getHeader(RouteHeader.NAME);
+        assertNull(routeHeader);
+        assertNull(receiver.getRegisterReceived().getHeader(ContactHeader.NAME));       
+    }
+	
+	/*
 	 * Non Regression test for Issue http://code.google.com/p/mobicents/issues/detail?id=2346
 	 */
 	public void testShootistRouteCheck() throws Exception {
@@ -291,7 +330,8 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 		assertEquals("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;lr", routeHeader.getAddress().getURI().toString());
 		assertTrue(receiver.getByeReceived());
 	}
-
+	
+	
 	private void mockDNSLookup(String host) throws TextParseException {
 		DNSLookupPerformer dnsLookupPerformer = mock(DefaultDNSLookupPerformer.class);
 		//mocking the DNS Lookups to match our test cases
@@ -324,6 +364,29 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 		when(dnsLookupPerformer.performSRVLookup("_sips._" + ListeningPoint.TLS.toLowerCase() + "." + host)).thenReturn(mockedSRVTLSRecords);
 	}
 	
+	private void mockDNSLookupTCP(String host) throws TextParseException {
+        DNSLookupPerformer dnsLookupPerformer = mock(DefaultDNSLookupPerformer.class);
+        //mocking the DNS Lookups to match our test cases
+        tomcat.getSipService().getSipApplicationDispatcher().getDNSServerLocator().setDnsLookupPerformer(dnsLookupPerformer);
+        
+        Set<String> supportedTransports = new HashSet<String>();
+        supportedTransports.add(TRANSPORT.toUpperCase());
+        supportedTransports.add(ListeningPoint.TCP.toUpperCase());        
+        
+        List<NAPTRRecord> mockedNAPTRRecords = new LinkedList<NAPTRRecord>();
+        // mocking the name because localhost is not absolute and localhost. cannot be resolved 
+        Name name = mock(Name.class);
+        when(name.isAbsolute()).thenReturn(true);
+        when(name.toString()).thenReturn("localhost");
+        mockedNAPTRRecords.add(new NAPTRRecord(new Name(host + "."), DClass.IN, 1000, 0, 0, "s", "SIP+D2T", "", new Name("_sip._" + ListeningPoint.TCP.toLowerCase() + "." + host + ".")));      
+        when(dnsLookupPerformer.performNAPTRLookup(host, false, supportedTransports)).thenReturn(mockedNAPTRRecords);      
+        List<Record> mockedSRVTCPRecords = new LinkedList<Record>();
+        mockedSRVTCPRecords.add(new SRVRecord(new Name("_sip._" + ListeningPoint.TCP.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 0, 0, 5080, name));
+        mockedSRVTCPRecords.add(new SRVRecord(new Name("_sip._" + ListeningPoint.TCP.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 2, 0, 5081, name));
+        mockedSRVTCPRecords.add(new SRVRecord(new Name("_sip._" + ListeningPoint.TCP.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 1, 0, 5082, name));
+        when(dnsLookupPerformer.performSRVLookup("_sip._" + ListeningPoint.TCP.toLowerCase() + "." + host)).thenReturn(mockedSRVTCPRecords);           
+    }
+	
 	private void mockDNSLookup4Records(String host) throws TextParseException {
         DNSLookupPerformer dnsLookupPerformer = mock(DefaultDNSLookupPerformer.class);
         //mocking the DNS Lookups to match our test cases
@@ -342,10 +405,10 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
         mockedNAPTRRecords.add(new NAPTRRecord(new Name(host + "."), DClass.IN, 1000, 0, 0, "s", "SIP+D2U", "", new Name("_sip._" + TRANSPORT.toLowerCase() + "." + host + ".")));      
         when(dnsLookupPerformer.performNAPTRLookup(host, false, supportedTransports)).thenReturn(mockedNAPTRRecords);
         List<Record> mockedSRVRecords = new LinkedList<Record>();
-        mockedSRVRecords.add(new SRVRecord(new Name("_sip._" + TRANSPORT.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 1, 0, 5080, name));
+        mockedSRVRecords.add(new SRVRecord(new Name("_sip._" + TRANSPORT.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 3, 0, 5080, name));
         mockedSRVRecords.add(new SRVRecord(new Name("_sip._" + TRANSPORT.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 0, 0, 5081, name));
-        mockedSRVRecords.add(new SRVRecord(new Name("_sip._" + TRANSPORT.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 0, 0, 5082, name));
-        mockedSRVRecords.add(new SRVRecord(new Name("_sip._" + TRANSPORT.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 0, 0, 5083, name));
+        mockedSRVRecords.add(new SRVRecord(new Name("_sip._" + TRANSPORT.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 1, 0, 5082, name));
+        mockedSRVRecords.add(new SRVRecord(new Name("_sip._" + TRANSPORT.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 2, 0, 5083, name));
         when(dnsLookupPerformer.performSRVLookup("_sip._" + TRANSPORT.toLowerCase() + "." + host)).thenReturn(mockedSRVRecords);
         List<Record> mockedSRVTCPRecords = new LinkedList<Record>();
         mockedSRVTCPRecords.add(new SRVRecord(new Name("_sips._" + ListeningPoint.TCP.toLowerCase() + "." + host + "."), DClass.IN, 1000L, 1, 0, 5081, name));
@@ -456,6 +519,9 @@ public class ShootistSipServletRFC3263Test extends SipServletTestCase {
 		deployApplication(params);
 		
 		Thread.sleep(DIALOG_TIMEOUT * 3 + TIMEOUT);
+		assertTrue(badReceiver.isInviteReceived());
+        assertTrue(badReceiver2.isInviteReceived());
+        assertTrue(badReceiver3.isInviteReceived());
 		assertFalse(badReceiver.isAckReceived());
 		assertFalse(badReceiver2.isAckReceived());
 		assertFalse(badReceiver3.isAckReceived());
