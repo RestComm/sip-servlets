@@ -1605,7 +1605,8 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				if(sipConnector != null && sipConnector.isUseStaticAddress()) {
 					contactSipUri.setHost(sipConnector.getStaticServerAddress());
 					contactSipUri.setPort(sipConnector.getStaticServerPort());
-					contactSipUri.setUser(null);
+					//https://telestax.atlassian.net/browse/MSS-103
+					//contactSipUri.setUser(null);
 				} 
 				// http://code.google.com/p/sipservlets/issues/detail?id=156 
 				// MSS overwrites host part of Contact Header in REGISTER requests
