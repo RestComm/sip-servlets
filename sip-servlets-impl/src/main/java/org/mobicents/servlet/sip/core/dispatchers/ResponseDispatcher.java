@@ -113,7 +113,9 @@ public class ResponseDispatcher extends MessageDispatcher {
 				if(applicationData.getSipServletMessage() instanceof SipServletRequestImpl) {
 					tmpOriginalRequest = (SipServletRequestImpl)applicationData.getSipServletMessage();
 					// clearing the hops found by RFC 3263
-					if(applicationData.getHops() != null) {
+					if(applicationData.getHops() != null 
+							// https://code.google.com/p/sipservlets/issues/detail?id=267 clearing the hops only on final response so it can be reused for CANCEL requests
+							&& response.getStatusCode() >= 200) {
 						applicationData.getHops().clear();
 					}
 				}

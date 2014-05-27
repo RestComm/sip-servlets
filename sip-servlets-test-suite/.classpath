@@ -13,18 +13,18 @@
 	<classpathentry kind="var" path="M2_REPO/concurrent/concurrent/1.3.4/concurrent-1.3.4.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/mockito/mockito-all/1.8.5/mockito-all-1.8.5.jar"/>
 	<classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.0.4/commons-logging-1.0.4.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.33/tomcat-catalina-7.0.33.jar" sourcepath="/TOMCAT_HOME/java"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.33/tomcat-juli-7.0.33.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.33/tomcat-juli-7.0.33-sources.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.33/tomcat-annotations-api-7.0.33.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.33/tomcat-annotations-api-7.0.33-sources.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.33/tomcat-api-7.0.33.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-api/7.0.33/tomcat-api-7.0.33-sources.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.33/tomcat-util-7.0.33.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-util/7.0.33/tomcat-util-7.0.33-sources.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.33/tomcat-coyote-7.0.33.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.33/tomcat-coyote-7.0.33-sources.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-jsp-api/7.0.33/tomcat-jsp-api-7.0.33.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-el-api/7.0.33/tomcat-el-api-7.0.33.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-jasper/7.0.33/tomcat-jasper-7.0.33.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.50/tomcat-catalina-7.0.50.jar" sourcepath="/TOMCAT_HOME/java"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.50/tomcat-juli-7.0.50.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.50/tomcat-juli-7.0.50-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.50/tomcat-annotations-api-7.0.50.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.50/tomcat-annotations-api-7.0.50-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.50/tomcat-api-7.0.50.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-api/7.0.50/tomcat-api-7.0.50-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.50/tomcat-util-7.0.50.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-util/7.0.50/tomcat-util-7.0.50-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.50/tomcat-coyote-7.0.50.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.50/tomcat-coyote-7.0.50-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-jsp-api/7.0.50/tomcat-jsp-api-7.0.50.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-el-api/7.0.50/tomcat-el-api-7.0.50.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-jasper/7.0.50/tomcat-jasper-7.0.50.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1.1/activation-1.1.1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar"/>
-	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.33/tomcat-servlet-api-7.0.33.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.33/tomcat-servlet-api-7.0.33-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.50/tomcat-servlet-api-7.0.50.jar" sourcepath="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.50/tomcat-servlet-api-7.0.50-sources.jar"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/4.8.2/junit-4.8.2.jar"/>
 	<classpathentry kind="src" output="applications/simple-sip-servlet/src/main/sipapp/WEB-INF/classes" path="applications/simple-sip-servlet/src/main/java"/>
 	<classpathentry kind="src" output="applications/distributable-servlet/src/main/sipapp/WEB-INF/classes" path="applications/distributable-servlet/src/main/java"/>
