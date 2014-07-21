@@ -558,6 +558,8 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 						
 						boolean isPrack = requestMethod.equalsIgnoreCase(Request.PRACK);
 						boolean isUpdate = requestMethod.equalsIgnoreCase(Request.UPDATE);
+						// https://code.google.com/p/sipservlets/issues/detail?id=275
+						boolean isNotify = requestMethod.equalsIgnoreCase(Request.NOTIFY);
 						// JSR 289 Section 6.2.1 :
 						// any state transition caused by the reception of a SIP message, 
 						// the state change must be accomplished by the container before calling 
@@ -573,7 +575,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 								callServlet(sipServletRequest);
 								finalBranch.proxySubsequentRequest(sipServletRequest);
 							}
-						} else if(isPrack || isUpdate) {
+						} else if(isPrack || isUpdate
+								// https://code.google.com/p/sipservlets/issues/detail?id=275
+								|| isNotify) {
 							callServlet(sipServletRequest);
 							final List<ProxyBranch> branches = proxy.getProxyBranches();
 							for(ProxyBranch pb : branches) {
@@ -583,21 +587,38 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 									proxyBranch.setWaitingForPrack(false);
 								} else {
 									//Issue: https://code.google.com/p/mobicents/issues/detail?id=2264
-									if(logger.isDebugEnabled()){
-										logger.debug("Checking request's To header tag against proxyBranch's From tag and To tag" +
-												"in order to identify the proxyBranch for this request ");
-									}
 									String requestToTag = ((RequestExt)request).getToHeader().getTag();
 
-									SipServletResponseImpl proxyResponse = (SipServletResponseImpl)(proxyBranch.getResponse());									
-									String proxyToTag = ((MessageExt)proxyResponse.getMessage()).getToHeader().getTag();
-									String proxyFromTag = ((MessageExt)proxyResponse.getMessage()).getFromHeader().getTag();
-
-									if (proxyToTag.equals(requestToTag) || proxyFromTag.equals(requestToTag) ) { 
-										finalBranch = proxyBranch;
-										checkRequestURIForNonCompliantAgents(finalBranch, request);
-										finalBranch.proxySubsequentRequest(sipServletRequest);
-									} 
+									SipServletResponseImpl proxyResponse = (SipServletResponseImpl)(proxyBranch.getResponse());
+									if (isNotify && proxyResponse == null) {
+										// https://code.google.com/p/sipservlets/issues/detail?id=275
+										if(logger.isDebugEnabled()){
+											logger.debug("NOTIFY Request and response not yet received at proxy, checking request's To header tag against proxyBranch's request From tag " +
+													"in order to identify the proxyBranch for this request ");
+										}
+								        // No Response from SUBSCRIBE before receiving NOTIFY
+								        SipServletRequestImpl subscribeRequest = (SipServletRequestImpl)(proxyBranch.getRequest());
+								        String subscribeFromTag = ((MessageExt)subscribeRequest.getMessage()).getFromHeader().getTag();
+								        
+								        if (subscribeFromTag.equals(requestToTag) ) { 
+								          finalBranch = proxyBranch;
+								          checkRequestURIForNonCompliantAgents(finalBranch, request);
+								          finalBranch.proxySubsequentRequest(sipServletRequest);
+								        } 
+								    } else {
+								    	if(logger.isDebugEnabled()){
+											logger.debug("Checking request's To header tag against proxyBranch's From tag and To tag" +
+													"in order to identify the proxyBranch for this request ");
+										}
+										String proxyToTag = ((MessageExt)proxyResponse.getMessage()).getToHeader().getTag();
+										String proxyFromTag = ((MessageExt)proxyResponse.getMessage()).getFromHeader().getTag();
+	
+										if (proxyToTag.equals(requestToTag) || proxyFromTag.equals(requestToTag) ) { 
+											finalBranch = proxyBranch;
+											checkRequestURIForNonCompliantAgents(finalBranch, request);
+											finalBranch.proxySubsequentRequest(sipServletRequest);
+										} 
+								    }
 								}
 							}
 							if (finalBranch == null && isUpdate){

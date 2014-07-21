@@ -15,6 +15,8 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ *
+ * This file incorporates work covered by the following copyright contributed under the GNU LGPL : Copyright 2007-2011 Red Hat.
  */
 
 package org.mobicents.servlet.sip.testsuite;
@@ -32,8 +34,10 @@ import gov.nist.javax.sip.header.extensions.JoinHeader;
 import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 import gov.nist.javax.sip.header.ims.PathHeader;
 import gov.nist.javax.sip.message.MessageExt;
-import gov.nist.javax.sip.stack.SIPDialog;
 import gov.nist.javax.sip.stack.SIPTransactionStack;
+import gov.nist.javax.sip.message.SIPResponse;
+import gov.nist.javax.sip.stack.SIPDialog;
+import gov.nist.javax.sip.stack.SIPTransaction;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -306,6 +310,7 @@ public class TestSipListener implements SipListener {
 	private Response inviteOkResponse;
 
 	private boolean sendNotify = true;
+	private boolean sendNotifyBeforeResponseToSubscribe = false;
 	
 	private boolean countRetrans = false;	
 	private int nbRetrans = 0;	
@@ -807,7 +812,13 @@ public class TestSipListener implements SipListener {
 			 * 
 			 *  Do this before creating the NOTIFY request below
 			 */
-			st.sendResponse(response);
+			if(!sendNotifyBeforeResponseToSubscribe) {
+				logger.info("Sending Response to Subscribe");
+				Thread.sleep(waitBeforeFinalResponse);
+				st.sendResponse(response);
+			} else {
+				((SIPDialog)dialog).setLastResponse((SIPTransaction)st, (SIPResponse)response); 
+			}
 			//Thread.sleep(1000); // Be kind to implementations
 						
 			/*
@@ -821,7 +832,7 @@ public class TestSipListener implements SipListener {
 			 * the subscription is not active.
 			 */
 			if(sendNotify ) {
-				Request notifyRequest = dialog.createRequest( "NOTIFY" );
+				Request notifyRequest = dialog.createRequest("NOTIFY");
 				
 				
 				// Mark the contact header, to check that the remote contact is updated
@@ -858,6 +869,11 @@ public class TestSipListener implements SipListener {
 				if (expires.getExpires() != 0) {
 					Thread myEventSource = new Thread(new MyEventSource(this,eventHeader));
 					myEventSource.start();
+				}
+				if(sendNotifyBeforeResponseToSubscribe) {
+					logger.info("Sending Response to Subscribe");
+					Thread.sleep(waitBeforeFinalResponse);
+					st.sendResponse(response);
 				}
 			}
 		} catch (Throwable ex) {
@@ -3484,5 +3500,20 @@ public class TestSipListener implements SipListener {
 	 */
 	public void setCancelRequest(Request cancelRequest) {
 		this.cancelRequest = cancelRequest;
+	}
+
+	/**
+	 * @return the sendNotifyBeforeResponseToSubscribe
+	 */
+	public boolean isSendNotifyBeforeResponseToSubscribe() {
+		return sendNotifyBeforeResponseToSubscribe;
+	}
+
+	/**
+	 * @param sendNotifyBeforeResponseToSubscribe the sendNotifyBeforeResponseToSubscribe to set
+	 */
+	public void setSendNotifyBeforeResponseToSubscribe(
+			boolean sendNotifyBeforeResponseToSubscribe) {
+		this.sendNotifyBeforeResponseToSubscribe = sendNotifyBeforeResponseToSubscribe;
 	}
 }
