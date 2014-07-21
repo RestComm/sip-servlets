@@ -31,6 +31,7 @@ import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.Transaction;
 import javax.sip.TransactionState;
+import javax.sip.header.ReasonHeader;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
@@ -251,8 +252,10 @@ public class CancelRequestDispatcher extends RequestDispatcher {
 							return;
 						}
 					} else {
+						// Forward Reason Header https://code.google.com/p/sipservlets/issues/detail?id=272
+						ReasonHeader reasonHeader = (ReasonHeader) sipServletRequest.getMessage().getHeader(ReasonHeader.NAME);
 						// otherwise, all branches are cancelled, and response processing continues as usual
-						proxy.cancelAllExcept(null, null, null, null, false);
+						proxy.cancelAllExcept(null, new String[] {reasonHeader.getProtocol()}, new int[] {reasonHeader.getCause()}, new String[] {reasonHeader.getText()}, false);
 					}
 					// Fix for Issue 796 : SIP servlet (simple proxy) does not receive "Cancel" requests. (http://code.google.com/p/mobicents/issues/detail?id=796)
 					// JSR 289 Section 10.2.6 Receiving CANCEL : In either case, the application is subsequently invoked with the CANCEL request

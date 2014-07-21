@@ -79,6 +79,7 @@ import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.ProxyAuthorizationHeader;
+import javax.sip.header.ReasonHeader;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.ReferToHeader;
 import javax.sip.header.RequireHeader;
@@ -162,6 +163,8 @@ public class TestSipListener implements SipListener {
 
 	private int dialogCount;
 
+	private Request cancelRequest;
+	
 	private boolean cancelReceived;
 	
 	private boolean cancelOkReceived;
@@ -1181,6 +1184,7 @@ public class TestSipListener implements SipListener {
 			cancelReceived = true;
 			SipProvider sipProvider = (SipProvider) requestEvent.getSource();
 			Request request = requestEvent.getRequest();
+			setCancelRequest(request);
 			Response response = protocolObjects.messageFactory.createResponse(
 					Response.OK, request);
 			ServerTransaction st = requestEvent.getServerTransaction();
@@ -2595,6 +2599,8 @@ public class TestSipListener implements SipListener {
 			logger.info("Sending cancel");
 			
 			Request cancelRequest = inviteClientTid.createCancel();
+			ReasonHeader reasonHeader = (ReasonHeader) this.protocolObjects.headerFactory.createReasonHeader("SIP", 200, "testing text");
+			cancelRequest.addHeader(reasonHeader);
 			ClientTransaction cancelTid = sipProvider
 					.getNewClientTransaction(cancelRequest);
 			cancelTid.sendRequest();
@@ -3465,4 +3471,18 @@ public class TestSipListener implements SipListener {
     public void setByeResponse(int byeResponse) {
         this.byeResponse = byeResponse;
     }
+
+	/**
+	 * @return the cancelRequest
+	 */
+	public Request getCancelRequest() {
+		return cancelRequest;
+	}
+
+	/**
+	 * @param cancelRequest the cancelRequest to set
+	 */
+	public void setCancelRequest(Request cancelRequest) {
+		this.cancelRequest = cancelRequest;
+	}
 }

@@ -77,8 +77,6 @@ import org.mobicents.servlet.sip.rfc5626.IncorrectFlowIdentifierException;
 import org.mobicents.servlet.sip.rfc5626.RFC5626Helper;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
-import com.sun.mail.iap.Response;
-
 /**
  * @author jean.deruelle@telestax.com
  * @author vralev@gmail.com
