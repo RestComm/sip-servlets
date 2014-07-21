@@ -15,6 +15,8 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ *
+ * This file incorporates work covered by the following copyright contributed under the GNU LGPL : Copyright 2007-2011 Red Hat.
  */
 
 package org.mobicents.servlet.sip.proxy;
@@ -79,10 +81,15 @@ public class ProxyUtils {
 				String nextApp = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME);
 				String serverName = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getParameter(MessageDispatcher.RR_PARAM_SERVER_NAME);
 				if(sipFactoryImpl.getSipApplicationDispatcher().getApplicationServerId().equals(serverName) && nextApp != null) {
+				// https://code.google.com/p/sipservlets/issues/detail?id=273
+				String nextSipAppId = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getParameter(MessageDispatcher.APP_ID);
+				if(nextApp != null) {
 					final MobicentsSipApplicationSessionKey sipAppKey = originalRequest.getSipSession().getSipApplicationSession().getKey();
 					final String thisApp = sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());
 					
-					if(nextApp.equals(thisApp)) {
+					if(nextApp.equals(thisApp) && 
+							// https://code.google.com/p/sipservlets/issues/detail?id=273
+							nextSipAppId.equals(sipAppKey.getId())) {
 						clonedRequest.removeFirst(RouteHeader.NAME);
 					}
 					rHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);

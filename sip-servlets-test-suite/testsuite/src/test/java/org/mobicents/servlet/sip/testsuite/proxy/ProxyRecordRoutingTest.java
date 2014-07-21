@@ -15,6 +15,8 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ *
+ * This file incorporates work covered by the following copyright contributed under the GNU LGPL : Copyright 2007-2011 Red Hat.
  */
 
 package org.mobicents.servlet.sip.testsuite.proxy;
@@ -30,6 +32,7 @@ import javax.sip.address.SipURI;
 import javax.sip.header.Header;
 import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.ToHeader;
+import javax.sip.header.ReasonHeader;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -110,7 +113,15 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
         sender.sendCancel();
         Thread.sleep(TIMEOUT);
         assertTrue(receiver.isCancelReceived());
-        assertEquals(487,sender.getFinalResponseStatus());        
+        assertNotNull(receiver.getCancelRequest());
+        // https://code.google.com/p/sipservlets/issues/detail?id=272
+        ReasonHeader reasonHeader = (ReasonHeader) receiver.getCancelRequest().getHeader(ReasonHeader.NAME);
+        assertNotNull(reasonHeader);
+        assertEquals("SIP", reasonHeader.getProtocol());
+        assertEquals(200, reasonHeader.getCause());
+        assertEquals("testing text", reasonHeader.getText());
+        assertTrue(receiver.isCancelReceived());
+        assertEquals(487,sender.getFinalResponseStatus());  
     }
     
     /*
@@ -220,7 +231,7 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 		assertTrue(neutral.isCancelReceived());
 	}
 	
-	/*
+    /*
      * Non Regression test for https://code.google.com/p/sipservlets/issues/detail?id=154
      */
     public void testCancel480ChangeToUserProxying() throws Exception {
@@ -250,7 +261,7 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
         assertTrue(sender.getOkToByeReceived());
     }
 	
-	/*
+    /*
      * https://code.google.com/p/sipservlets/issues/detail?id=22
      */
     public void testUnderscoreToTagFinalResponseProxying() throws Exception {
