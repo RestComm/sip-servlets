@@ -807,9 +807,11 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 			// If it's from the callee we should send it in the other direction
 			targetURI = proxy.getPreviousNode();
 		}
-		
+		// https://code.google.com/p/sipservlets/issues/detail?id=274
+		// as described in https://lists.cs.columbia.edu/pipermail/sip-implementors/2003-June/004986.html
+		// we should record route on reINVITE as well for robustness in case of UA crash, so adding recordRouteURI in the call to this method
 		Request clonedRequest = 
-			ProxyUtils.createProxiedRequest(request, this, targetURI, null, null, null);
+			ProxyUtils.createProxiedRequest(request, this, targetURI, null, recordRouteURI, null);
 
 		ViaHeader viaHeader = (ViaHeader) clonedRequest.getHeader(ViaHeader.NAME);
 		try {

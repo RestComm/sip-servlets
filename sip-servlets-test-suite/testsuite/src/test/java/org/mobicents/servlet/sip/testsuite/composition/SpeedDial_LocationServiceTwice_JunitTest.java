@@ -26,15 +26,16 @@ import java.util.ListIterator;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.Header;
+import javax.sip.header.RecordRouteHeader;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
-public class SpeedDial_LocationServiceTwice_PrackJunitTest extends SipServletTestCase {
+public class SpeedDial_LocationServiceTwice_JunitTest extends SipServletTestCase {
 	
-	private static transient Logger logger = Logger.getLogger(SpeedDial_LocationServiceTwice_PrackJunitTest.class);
+	private static transient Logger logger = Logger.getLogger(SpeedDial_LocationServiceTwice_JunitTest.class);
 
 	private static final String TRANSPORT = "udp";
 	private static final boolean AUTODIALOG = true;
@@ -46,7 +47,7 @@ public class SpeedDial_LocationServiceTwice_PrackJunitTest extends SipServletTes
 	ProtocolObjects senderProtocolObjects;
 	ProtocolObjects	receiverProtocolObjects;
 
-	public SpeedDial_LocationServiceTwice_PrackJunitTest(String name) {
+	public SpeedDial_LocationServiceTwice_JunitTest(String name) {
 		super(name);
 	}
 
@@ -130,6 +131,51 @@ public class SpeedDial_LocationServiceTwice_PrackJunitTest extends SipServletTes
 			numberOfPrack++;
 		}
 		assertEquals(2,numberOfPrack);
+	}
+	
+	/*
+	 * Non regression test for https://code.google.com/p/sipservlets/issues/detail?id=274
+	 */
+	public void testSpeedDialLocationServiceRecordRouteReInviteCallerSendBye() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		sender.setRecordRoutingProxyTesting(true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		receiver.setRecordRoutingProxyTesting(true);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "sender";
+		String fromHost = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromHost);
+				
+		String toUser = "7";
+		String toHost = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toHost);
+		
+		sender.setSendReinvite(true);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);			
+		assertTrue(receiver.isInviteReceived());
+		sender.sendInDialogSipRequest("BYE", null, null, null, null, null);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());
+		assertTrue(sender.getOkToByeReceived());
+		int numberOfRRouteHeaders = 0;
+		ListIterator<Header> listHeaderIt =  receiver.getInviteRequest().getHeaders(RecordRouteHeader.NAME);
+		while (listHeaderIt.hasNext()) {
+			listHeaderIt.next();
+			numberOfRRouteHeaders++;
+		}
+		assertEquals(3,numberOfRRouteHeaders);
 	}
 	
 	@Override
