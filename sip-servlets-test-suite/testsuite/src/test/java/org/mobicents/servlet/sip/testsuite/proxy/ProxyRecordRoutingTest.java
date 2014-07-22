@@ -110,7 +110,7 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
         receiver.setWaitForCancel(true);
         sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);     
         Thread.sleep(TIMEOUT);
-        sender.sendCancel();
+        sender.sendCancel(true);
         Thread.sleep(TIMEOUT);
         assertTrue(receiver.isCancelReceived());
         assertNotNull(receiver.getCancelRequest());
