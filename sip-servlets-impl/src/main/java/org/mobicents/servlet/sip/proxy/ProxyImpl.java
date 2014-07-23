@@ -15,6 +15,8 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ *
+ * This file incorporates work covered by the following copyright contributed under the GNU LGPL : Copyright 2007-2011 Red Hat.
  */
 
 
@@ -186,15 +188,19 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	 */
 	private SipURI extractPreviousNodeFromRequest(SipServletRequestImpl request) {
 		SipURI uri = null;
-		try {
+//		try {
 			// First check for record route
-			RecordRouteHeader rrh = (RecordRouteHeader) request.getMessage().getHeader(RecordRouteHeader.NAME);
-			if(rrh != null) {
-				javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) rrh.getAddress().getURI();
-				uri = new SipURIImpl(sipUri, ModifiableRule.NotModifiable);
-			} else { 
-				// If no record route is found then use the last via (the originating endpoint)
-				ListIterator<ViaHeader> viaHeaders = request.getMessage().getHeaders(ViaHeader.NAME);
+//			RecordRouteHeader rrh = (RecordRouteHeader) request.getMessage().getHeader(RecordRouteHeader.NAME);
+//			if(rrh != null) {
+//				javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) rrh.getAddress().getURI();
+//				uri = new SipURIImpl(sipUri, ModifiableRule.NotModifiable);
+//			} else { 
+				// https://code.google.com/p/sipservlets/issues/detail?id=275
+				// we should use the contact header from the originating endpoint
+				ContactHeader contact = (ContactHeader) request.getMessage().getHeader(ContactHeader.NAME);
+				javax.sip.address.SipURI contactUri = ((javax.sip.address.SipURI)contact.getAddress().getURI());
+				uri = new SipURIImpl(contactUri, ModifiableRule.NotModifiable);
+				/*ListIterator<ViaHeader> viaHeaders = request.getMessage().getHeaders(ViaHeader.NAME);
 				ViaHeader lastVia = null;
 				while(viaHeaders.hasNext()) {
 					lastVia = viaHeaders.next();
@@ -205,12 +211,12 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 					uri.setTransportParam(lastVia.getTransport());
 				} else {
 					uri.setTransportParam("udp");
-				}
-			}
-		} catch (Exception e) {
-			// We shouldn't completely fail in this case because it is rare to visit this code
-			logger.error("Failed parsing previous address ", e);
-		}
+				}*/
+//			}
+//		} catch (Exception e) {
+//			// We shouldn't completely fail in this case because it is rare to visit this code
+//			logger.error("Failed parsing previous address ", e);
+//		}
 		return uri;
 
 	}

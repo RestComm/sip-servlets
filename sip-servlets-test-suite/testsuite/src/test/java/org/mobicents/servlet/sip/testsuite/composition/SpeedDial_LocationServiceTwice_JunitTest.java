@@ -25,6 +25,7 @@ import java.util.ListIterator;
 
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.address.URI;
 import javax.sip.header.Header;
 import javax.sip.header.RecordRouteHeader;
 
@@ -165,6 +166,53 @@ public class SpeedDial_LocationServiceTwice_JunitTest extends SipServletTestCase
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
 		Thread.sleep(TIMEOUT);			
 		assertTrue(receiver.isInviteReceived());
+		sender.sendInDialogSipRequest("BYE", null, null, null, null, null);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.getByeReceived());
+		assertTrue(sender.getOkToByeReceived());
+		int numberOfRRouteHeaders = 0;
+		ListIterator<Header> listHeaderIt =  receiver.getInviteRequest().getHeaders(RecordRouteHeader.NAME);
+		while (listHeaderIt.hasNext()) {
+			listHeaderIt.next();
+			numberOfRRouteHeaders++;
+		}
+		assertEquals(3,numberOfRRouteHeaders);
+	}
+	
+	/*
+	 * Non regression test for https://code.google.com/p/sipservlets/issues/detail?id=275
+	 */
+	public void testSpeedDialLocationServiceRecordRouteReInviteCalleeSendReInvite() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		sender.setRecordRoutingProxyTesting(true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		receiver.setRecordRoutingProxyTesting(true);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "sender";
+		String fromHost = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromHost);
+				
+		String toUser = "7";
+		String toHost = "sip-servlets.com";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toHost);
+		
+		receiver.setSendReinvite(true);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);			
+		assertTrue(sender.isInviteReceived());
+		URI requestUri = sender.getInviteRequest().getRequestURI();
+		assertEquals("sip:sender@127.0.0.1:5080;transport=udp;lr", requestUri.toString().trim());
 		sender.sendInDialogSipRequest("BYE", null, null, null, null, null);
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());

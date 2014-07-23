@@ -28,6 +28,8 @@ import javax.sip.InvalidArgumentException;
 import javax.sip.SipException;
 import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
+import javax.sip.address.URI;
+import javax.sip.header.ContactHeader;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
@@ -112,6 +114,9 @@ public class LocationServiceReInviteSipServletTest extends SipServletTestCase {
 		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, true);		
 		Thread.sleep(TIMEOUT);			
 		assertTrue(sender.isInviteReceived());
+		URI requestUri = sender.getInviteRequest().getRequestURI();
+		// https://code.google.com/p/sipservlets/issues/detail?id=275
+		assertEquals("sip:reinvite@127.0.0.1:5080;transport=udp;lr", requestUri.toString().trim());
 		sender.sendInDialogSipRequest("BYE", null, null, null, null, null);
 		Thread.sleep(TIMEOUT);
 		assertTrue(receiver.getByeReceived());
