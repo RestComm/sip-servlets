@@ -188,35 +188,38 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	 */
 	private SipURI extractPreviousNodeFromRequest(SipServletRequestImpl request) {
 		SipURI uri = null;
-//		try {
-			// First check for record route
-//			RecordRouteHeader rrh = (RecordRouteHeader) request.getMessage().getHeader(RecordRouteHeader.NAME);
-//			if(rrh != null) {
-//				javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) rrh.getAddress().getURI();
-//				uri = new SipURIImpl(sipUri, ModifiableRule.NotModifiable);
-//			} else { 
-				// https://code.google.com/p/sipservlets/issues/detail?id=275
-				// we should use the contact header from the originating endpoint
-				ContactHeader contact = (ContactHeader) request.getMessage().getHeader(ContactHeader.NAME);
-				javax.sip.address.SipURI contactUri = ((javax.sip.address.SipURI)contact.getAddress().getURI());
-				uri = new SipURIImpl(contactUri, ModifiableRule.NotModifiable);
-				/*ListIterator<ViaHeader> viaHeaders = request.getMessage().getHeaders(ViaHeader.NAME);
-				ViaHeader lastVia = null;
-				while(viaHeaders.hasNext()) {
-					lastVia = viaHeaders.next();
-				} 
-				String uriString = ((Via)lastVia).getSentBy().toString();
-				uri = sipFactoryImpl.createSipURI(null, uriString);
-				if(lastVia.getTransport() != null) {
-					uri.setTransportParam(lastVia.getTransport());
-				} else {
-					uri.setTransportParam("udp");
-				}*/
-//			}
-//		} catch (Exception e) {
-//			// We shouldn't completely fail in this case because it is rare to visit this code
-//			logger.error("Failed parsing previous address ", e);
-//		}
+		// https://code.google.com/p/sipservlets/issues/detail?id=275
+		// we should use the contact header from the originating endpoint
+		ContactHeader contact = (ContactHeader) request.getMessage().getHeader(ContactHeader.NAME);
+		if(contact != null) { 
+			javax.sip.address.SipURI contactUri = ((javax.sip.address.SipURI)contact.getAddress().getURI());
+			uri = new SipURIImpl(contactUri, ModifiableRule.NotModifiable);
+		} else {
+			try {
+				// First check for record route
+				RecordRouteHeader rrh = (RecordRouteHeader) request.getMessage().getHeader(RecordRouteHeader.NAME);
+				if(rrh != null) {
+					javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) rrh.getAddress().getURI();
+					uri = new SipURIImpl(sipUri, ModifiableRule.NotModifiable);
+				} else { 
+					ListIterator<ViaHeader> viaHeaders = request.getMessage().getHeaders(ViaHeader.NAME);
+					ViaHeader lastVia = null;
+					while(viaHeaders.hasNext()) {
+						lastVia = viaHeaders.next();
+					} 
+					String uriString = ((Via)lastVia).getSentBy().toString();
+					uri = sipFactoryImpl.createSipURI(null, uriString);
+					if(lastVia.getTransport() != null) {
+						uri.setTransportParam(lastVia.getTransport());
+					} else {
+						uri.setTransportParam("udp");
+					}
+				}
+			} catch (Exception e) {
+				// We shouldn't completely fail in this case because it is rare to visit this code
+				logger.error("Failed parsing previous address ", e);
+			}
+		}
 		return uri;
 
 	}
