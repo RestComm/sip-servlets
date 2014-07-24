@@ -81,18 +81,19 @@ public class ProxyUtils {
 				String nextApp = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getParameter(MessageDispatcher.RR_PARAM_APPLICATION_NAME);
 				String serverName = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getParameter(MessageDispatcher.RR_PARAM_SERVER_NAME);
 				if(sipFactoryImpl.getSipApplicationDispatcher().getApplicationServerId().equals(serverName) && nextApp != null) {
-				// https://code.google.com/p/sipservlets/issues/detail?id=273
-				String nextSipAppId = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getParameter(MessageDispatcher.APP_ID);
-				if(nextApp != null) {
-					final MobicentsSipApplicationSessionKey sipAppKey = originalRequest.getSipSession().getSipApplicationSession().getKey();
-					final String thisApp = sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());
+					// https://code.google.com/p/sipservlets/issues/detail?id=273
+					String nextSipAppId = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getParameter(MessageDispatcher.APP_ID);
+					if(nextApp != null) {
+						final MobicentsSipApplicationSessionKey sipAppKey = originalRequest.getSipSession().getSipApplicationSession().getKey();
+						final String thisApp = sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipAppKey.getApplicationName());
 					
-					if(nextApp.equals(thisApp) && 
-							// https://code.google.com/p/sipservlets/issues/detail?id=273
-							nextSipAppId.equals(sipAppKey.getId())) {
-						clonedRequest.removeFirst(RouteHeader.NAME);
+						if(nextApp.equals(thisApp) && 
+								// https://code.google.com/p/sipservlets/issues/detail?id=273
+								nextSipAppId.equals(sipAppKey.getId())) {
+							clonedRequest.removeFirst(RouteHeader.NAME);
+						}
+						rHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
 					}
-					rHeader = (RouteHeader) clonedRequest.getHeader(RouteHeader.NAME);
 				}
 				if(rHeader != null) {
 					outboundTransport = ((javax.sip.address.SipURI)rHeader.getAddress().getURI()).getTransportParam();
