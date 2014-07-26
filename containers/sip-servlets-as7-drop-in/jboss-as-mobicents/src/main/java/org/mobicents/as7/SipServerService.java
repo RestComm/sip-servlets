@@ -31,11 +31,13 @@ import org.apache.catalina.core.StandardServer;
 import org.apache.catalina.core.StandardService;
 import org.apache.tomcat.util.modeler.Registry;
 import org.jboss.as.controller.services.path.PathManager;
+import org.jboss.logging.Logger;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
+import org.mobicents.as7.deployment.SIPWebContext;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.startup.SipProtocolHandler;
 import org.mobicents.servlet.sip.startup.SipStandardEngine;
@@ -47,7 +49,7 @@ import org.mobicents.servlet.sip.startup.SipStandardService;
  * @author Emanuel Muckenhuber
  */
 class SipServerService implements SipServer, Service<SipServer> {
-
+	private static final Logger logger = Logger.getLogger(SipServerService.class);
     // FIXME: josemrecio - settle on using the proper name
     private static final String JBOSS_SIP = "jboss.sip";
 
@@ -141,8 +143,8 @@ class SipServerService implements SipServer, Service<SipServer> {
         }
 
         System.setProperty("catalina.home", pathManagerInjector.getValue().getPathEntry(TEMP_DIR).resolvePath());
-        final StandardServer server = new StandardServer();
-
+        server = new StandardServer();
+        
 //        final StandardService service = new StandardService();
 //        service.setName(JBOSS_SIP);
 //        service.setServer(server);
@@ -165,7 +167,12 @@ class SipServerService implements SipServer, Service<SipServer> {
 //        }
 //        server.addLifecycleListener(new JasperListener());
 
-        final SipStandardService sipService = new SipStandardService();
+        sipService = new SipStandardService();
+        // https://code.google.com/p/sipservlets/issues/detail?id=277
+        // Add the Service and sip app dispatched right away so apps can get the needed objects
+        // when they deploy fast
+        server.addService(sipService);
+        
         if (sipAppDispatcherClass != null) {
         	sipService.setSipApplicationDispatcherClassName(sipAppDispatcherClass);        	
         }
@@ -216,9 +223,8 @@ class SipServerService implements SipServer, Service<SipServer> {
         sipService.setOutboundProxy(outboundProxy);
         sipService.setName(JBOSS_SIP);
         sipService.setServer(server);
-        server.addService(sipService);
 
-        final SipStandardEngine sipEngine = new SipStandardEngine();
+        sipEngine = new SipStandardEngine();
         sipEngine.setName(JBOSS_SIP);
         sipEngine.setService(sipService);
 //        sipEngine.setDefaultHost(defaultHost);
@@ -233,11 +239,6 @@ class SipServerService implements SipServer, Service<SipServer> {
         } catch (Exception e) {
             throw new StartException(MESSAGES.errorStartingSip(), e);
         }
-        this.server = server;
-//        this.service = service;
-//        this.engine = engine;
-        this.sipService = sipService;
-        this.sipEngine = sipEngine;
     }
 
     /** {@inheritDoc} */

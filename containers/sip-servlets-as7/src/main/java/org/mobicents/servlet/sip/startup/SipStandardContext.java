@@ -279,7 +279,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			Service service = ((Engine)container).getService();
 			if(service instanceof SipService) {
 				sipApplicationDispatcher = 
-					((SipService)service).getSipApplicationDispatcher();								
+					((SipService)service).getSipApplicationDispatcher();
 			}
 		}
 		if(sipApplicationDispatcher == null) {

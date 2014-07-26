@@ -395,6 +395,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			throw new IllegalStateException("The SIP Stack couldn't be started " , e);
 		}
 		
+		checkLicense();
+		
 		//JSR 289 Section 2.1.1 Step 4.If present invoke SipServletListener.servletInitialized() on each of initialized Servlet's listeners.
 		for (SipContext sipContext : applicationDeployed.values()) {
 			sipContext.notifySipContextListeners(new SipContextEventImpl(SipContextEventType.SERVLET_INITIALIZED, null));
