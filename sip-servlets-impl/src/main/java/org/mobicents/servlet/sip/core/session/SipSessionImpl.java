@@ -524,6 +524,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		    				sipNetworkInterfaceManager, request, branch, outboundInterface);
 		    		request.addHeader(viaHeader);
 					
+		    		// https://code.google.com/p/sipservlets/issues/detail?id=278
+		    		request.removeContent();
 		    		// http://code.google.com/p/sipservlets/issues/detail?id=161
 		    		// Don't reuse the dialog for challenge requests as it can lead to the JAIN SIP Stack
 		    		// reusing the Terminated dialog and drop 200 OK

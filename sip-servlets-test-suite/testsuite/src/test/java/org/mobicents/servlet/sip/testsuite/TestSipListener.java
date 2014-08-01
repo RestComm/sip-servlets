@@ -360,6 +360,8 @@ public class TestSipListener implements SipListener {
 	private String securityPwd = "pass";
 
 	private boolean sendProvisionalResponseBeforeChallenge = false;
+
+	private boolean checkSDPNullOnChallengeRequests;
 	
 	class MyEventSource implements Runnable {
 		private TestSipListener notifier;
@@ -1332,6 +1334,12 @@ public class TestSipListener implements SipListener {
 					
 		            System.out.println("RequestValidation: 407 PROXY_AUTHENTICATION_REQUIRED replied:\n"+responseauth.toString());
 		            return;
+		        }
+		        if(checkSDPNullOnChallengeRequests) {
+		        	//https://code.google.com/p/sipservlets/issues/detail?id=278
+		        	if(request.getContentLength().getContentLength() > 0) {
+		        		throw new Exception("SDP should be empty");
+		        	}
 		        }
 		        System.out.println("shootme: got an Invite with Authorization, sending Trying");
 			}
@@ -3521,5 +3529,9 @@ public class TestSipListener implements SipListener {
 	public void setSendNotifyBeforeResponseToSubscribe(
 			boolean sendNotifyBeforeResponseToSubscribe) {
 		this.sendNotifyBeforeResponseToSubscribe = sendNotifyBeforeResponseToSubscribe;
+	}
+
+	public void setCheckSDPNullOnChallengeRequests(boolean checkSDPNullOnChallengeRequests) {
+		this.checkSDPNullOnChallengeRequests = checkSDPNullOnChallengeRequests;
 	}
 }

@@ -20,6 +20,7 @@
 package org.mobicents.servlet.sip.testsuite;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -49,6 +50,28 @@ public class ShootistSipServletAuth
 	private static final long serialVersionUID = 1L;
 	private static transient Logger logger = Logger.getLogger(ShootistSipServletAuth.class);
 	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
+	
+	private String sampleSDP = "v=0" +
+      "o=alice 2890844526 2890844526 IN IP4 host.atlanta.example.com" +
+      "s=" +
+      "c=IN IP4 host.atlanta.example.com" +
+      "t=0 0" +
+      "m=audio 49170 RTP/AVP 0" +
+      "a=rtpmap:0 PCMU/8000" +
+      "m=audio 51372 RTP/AVP 97 101" +
+      "a=rtpmap:97 iLBC/8000" +
+      "a=rtpmap:101 telephone-event/8000";
+	
+	private String sampleSDP2 = "v=1" +
+		      "o=alice 2890844526 2890844526 IN IP4 host.atlanta.example.com" +
+		      "s=" +
+		      "c=IN IP4 host.atlanta.example.com" +
+		      "t=0 0" +
+		      "m=audio 49170 RTP/AVP 0" +
+		      "a=rtpmap:0 PCMU/8000" +
+		      "m=audio 51372 RTP/AVP 97 101" +
+		      "a=rtpmap:97 iLBC/8000" +
+		      "a=rtpmap:101 telephone-event/8000";
 	
 	/** Creates a new instance of ShootistSipServletAuth */
 	public ShootistSipServletAuth() {
@@ -135,6 +158,16 @@ public class ShootistSipServletAuth
 			if(!fromString.contains("reinvite")) {
 				SipServletRequest sipServletRequest = sipServletResponse.getSession().createRequest("BYE");
 				sipServletRequest.send();
+			} else if(!sipServletResponse.getHeader("CSeq").contains((String)sipServletResponse.getApplicationSession().getAttribute("nbSubsequentReq"))) {
+				getServletContext().setAttribute("FirstResponseRecieved", "false");
+				SipServletRequest invite = sipServletResponse.getSession().createRequest(sipServletResponse.getMethod());
+				try {
+					invite.setContent(sampleSDP2, "application/sdp");
+				} catch (UnsupportedEncodingException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				invite.send();
 			}
 		}
 		if("REGISTER".equalsIgnoreCase(sipServletResponse.getMethod())) {
@@ -197,6 +230,14 @@ public class ShootistSipServletAuth
 		sipApplicationSession.setAttribute("nbSubsequentReq", numberOfSubsequentRequests);
 		SipURI requestURI = sipFactory.createSipURI("LittleGuy", "" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
 		sipServletRequest.setRequestURI(requestURI);
+		if(method.equalsIgnoreCase("INVITE")) {
+			try {
+				sipServletRequest.setContent(sampleSDP, "application/sdp");
+			} catch (UnsupportedEncodingException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		try {			
 			sipServletRequest.send();
 		} catch (IOException e) {

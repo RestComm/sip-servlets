@@ -21,6 +21,8 @@
  */
 
 package org.mobicents.servlet.sip.testsuite.security;
+import gov.nist.javax.sip.message.MessageExt;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -179,6 +181,34 @@ public class ShootistSipServletAuthTest extends SipServletTestCase {
 		deployApplication(params);
 		Thread.sleep(TIMEOUT);	
 		assertEquals(4, receiver.getLastRegisterCSeqNumber());
+	}
+	
+	/*
+	 * Non regression test for https://code.google.com/p/sipservlets/issues/detail?id=278
+	 */
+	public void testShootistReinviteCheckSDP() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender-app-send-reinvite-cache-credentials", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setChallengeRequests(true);
+		receiver.setCheckSDPNullOnChallengeRequests(true);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();		
+		
+		tomcat.startTomcat();
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("from", "sender-app-send-reinvite-cache-credentials");
+		params.put("nbSubsequentReq","4");
+		params.put("METHOD", "INVITE");
+		deployApplication(params);
+		Thread.sleep(TIMEOUT);	
+		assertEquals(4, ((MessageExt)receiver.getFinalResponse()).getCSeqHeader().getSeqNumber());
+		assertNull(receiver.getInviteRequest().getContent());
 	}
 
 	/*
