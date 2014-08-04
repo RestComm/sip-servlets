@@ -150,11 +150,21 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public void invalidate() {
 		getSipSession().invalidate();
 	}
+	
+	@Override
+	public void invalidate(boolean bypassCheck) {
+		getSipSession().invalidate(bypassCheck);		
+	}
 
 	public boolean isReadyToInvalidate() {
 		return getSipSession().isReadyToInvalidate();
 	}
 
+	@Override
+	public boolean isReadyToInvalidateInternal() {
+		return getSipSession().isReadyToInvalidateInternal();
+	}
+	
 	public boolean isValid() {
 		return getSipSession().isValid();
 	}

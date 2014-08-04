@@ -156,6 +156,8 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	SipApplicationRouterInfo getNextSipApplicationRouterInfo();	
 
 	public boolean isValidInternal();
+	// https://code.google.com/p/sipservlets/issues/detail?id=279
+	public boolean isReadyToInvalidateInternal();
  
 	public long getCseq();
 	public void setCseq(long cseq);
@@ -187,4 +189,11 @@ public interface MobicentsSipSession extends SipSession, SipSessionExt {
 	public void setOrphan(boolean orphan);
 
 	public boolean isOrphan();
+	
+	// https://code.google.com/p/sipservlets/issues/detail?id=279
+	/**
+	 * Invalidate with an option to bypass the check if the session was already invalidated
+	 * @param bypassCheck whether or not to by pass the checks to throw Exception if the session was already invalidated or is in the process of it
+	 */
+	public void invalidate(boolean bypassCheck);
 }

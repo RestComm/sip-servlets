@@ -27,10 +27,15 @@ import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.address.URI;
 import javax.sip.header.Header;
+import javax.sip.header.ReasonHeader;
 import javax.sip.header.RecordRouteHeader;
 
+import org.apache.catalina.deploy.ApplicationParameter;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.catalina.SipStandardManager;
+import org.mobicents.servlet.sip.startup.SipContextConfig;
+import org.mobicents.servlet.sip.startup.SipStandardContext;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -45,25 +50,38 @@ public class SpeedDial_LocationServiceTwice_JunitTest extends SipServletTestCase
 	 
 	TestSipListener sender;
 	TestSipListener receiver;
+	TestSipListener receiver2;
 	ProtocolObjects senderProtocolObjects;
 	ProtocolObjects	receiverProtocolObjects;
+	ProtocolObjects	receiver2ProtocolObjects;
 
 	public SpeedDial_LocationServiceTwice_JunitTest(String name) {
 		super(name);
 	}
 
 	@Override
-	public void deployApplication() {
-		deploySpeedDial();
+	protected void deployApplication() {
+		
+	}
+	
+	public void deployBothApplication(boolean isSpeedDialRecordRoute) {
+		deploySpeedDial("record_route", "" + isSpeedDialRecordRoute);
 		deployLocationService();
 	}
 
-	private void deploySpeedDial() {
-		assertTrue(tomcat.deployContext(
-				projectHome + "/sip-servlets-test-suite/applications/speed-dial-servlet/src/main/sipapp",
-				"speed-dial-context", 
-				"speed-dial"));
-	}
+	public void deploySpeedDial(String name, String value) {
+		SipStandardContext context = new SipStandardContext();
+		context.setDocBase(projectHome + "/sip-servlets-test-suite/applications/speed-dial-servlet/src/main/sipapp");
+		context.setName("speed-dial-context");
+		context.setPath("speed-dial");
+		context.addLifecycleListener(new SipContextConfig());
+		context.setManager(new SipStandardManager());
+		ApplicationParameter applicationParameter = new ApplicationParameter();
+		applicationParameter.setName(name);
+		applicationParameter.setValue(value);
+		context.addApplicationParameter(applicationParameter);
+		assertTrue(tomcat.deployContext(context));
+	}		
 	
 	private void deployLocationService() {
 		assertTrue(tomcat.deployContext(
@@ -88,12 +106,15 @@ public class SpeedDial_LocationServiceTwice_JunitTest extends SipServletTestCase
 				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 		receiverProtocolObjects = new ProtocolObjects("receiver",
 				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);			
+		receiver2ProtocolObjects = new ProtocolObjects("receiver2",
+				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);			
 	}
 	
 	/*
 	 * Non regression test for https://code.google.com/p/sipservlets/issues/detail?id=273
 	 */
 	public void testSpeedDialLocationServicePRACKCalleeSendBye() throws Exception {
+		deployBothApplication(true);
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
@@ -138,6 +159,7 @@ public class SpeedDial_LocationServiceTwice_JunitTest extends SipServletTestCase
 	 * Non regression test for https://code.google.com/p/sipservlets/issues/detail?id=274
 	 */
 	public void testSpeedDialLocationServiceRecordRouteReInviteCallerSendBye() throws Exception {
+		deployBothApplication(true);
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
@@ -183,6 +205,7 @@ public class SpeedDial_LocationServiceTwice_JunitTest extends SipServletTestCase
 	 * Non regression test for https://code.google.com/p/sipservlets/issues/detail?id=275
 	 */
 	public void testSpeedDialLocationServiceRecordRouteReInviteCalleeSendReInvite() throws Exception {
+		deployBothApplication(true);
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
@@ -225,6 +248,49 @@ public class SpeedDial_LocationServiceTwice_JunitTest extends SipServletTestCase
 		}
 		assertEquals(3,numberOfRRouteHeaders);
 	}
+	
+	/*
+     * Non Regression test for https://code.google.com/p/sipservlets/issues/detail?id=164
+     */
+    public void testCancelProxying() throws Exception {
+    	deployBothApplication(false);
+    	sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
+		sender.setRecordRoutingProxyTesting(true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		receiver.setRecordRoutingProxyTesting(true);
+		SipProvider receiverProvider = receiver.createProvider();
+		
+		receiver2 = new TestSipListener(5091, 5070, receiver2ProtocolObjects, false);
+		receiver2.setRecordRoutingProxyTesting(true);
+		SipProvider receiver2Provider = receiver2.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		receiver2Provider.addSipListener(receiver2);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+		receiver2ProtocolObjects.start();
+    	
+        String fromName = "sender";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);      
+        
+        String toSipAddress = "sip-servlets.com";
+        String toUser = "8";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+                                
+        receiver2.setWaitForCancel(true);
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);     
+        Thread.sleep(TIMEOUT);
+        assertTrue(receiver2.isCancelReceived());
+        assertTrue(sender.isFinalResponseReceived());
+        // https://code.google.com/p/sipservlets/issues/detail?id=272
+    }
 	
 	@Override
 	protected void tearDown() throws Exception {	

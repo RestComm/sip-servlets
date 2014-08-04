@@ -91,6 +91,7 @@ public class SpeedDialSipServlet extends SipServlet implements SipErrorListener,
 		dialNumberToSipUriMapping.put("6", "sip:receiver-failover@sip-servlets.com");
 		// https://code.google.com/p/sipservlets/issues/detail?id=273
 		dialNumberToSipUriMapping.put("7", "sip:receiver-prack@sip-servlets.com");
+		dialNumberToSipUriMapping.put("8", "sip:cancel-receiver@sip-servlets.com");
 		dialNumberToSipUriMapping.put("b2bua", "sip:fromProxy@sip-servlets.com");
 		dialNumberToSipUriMapping.put("9", "sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090");
 		dialNumberToSipUriMapping.put("test-callResponseBacks", "sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090,sip:receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5091");

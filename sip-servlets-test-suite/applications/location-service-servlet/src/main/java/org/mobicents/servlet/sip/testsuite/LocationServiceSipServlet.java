@@ -85,6 +85,15 @@ public class LocationServiceSipServlet extends SipServlet {
 		registeredUsers.put("sip:receiver-prack@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", uriList);
 		
 		uriList  = new ArrayList<URI>();
+		uriList.add(sipFactory.createURI("sip:cancel-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
+		registeredUsers.put("sip:cancel-receiver@sip-servlets.com", uriList);
+		uriList  = new ArrayList<URI>();
+		uriList.add(sipFactory.createURI("sip:cancel-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
+		uriList.add(sipFactory.createURI("sip:cancel-receiver2@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5091"));		
+		registeredUsers.put("sip:cancel-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", uriList);
+		
+		
+		uriList  = new ArrayList<URI>();
 		uriList.add(sipFactory.createURI("sip:receiver-failover@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"));
 		registeredUsers.put("sip:receiver-failover@sip-servlets.com", uriList);
 		registeredUsers.put("sip:receiver-failover@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090", uriList);

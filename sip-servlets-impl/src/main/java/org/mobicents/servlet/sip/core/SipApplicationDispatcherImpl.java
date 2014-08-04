@@ -1090,10 +1090,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 						final MobicentsProxy proxy = sipSessionImpl.getProxy();
 						if(!invalidateProxySession && 
 								(proxy == null || (proxy != null && 
-										((proxy.getFinalBranchForSubsequentRequests() != null && !proxy.getFinalBranchForSubsequentRequests().getRecordRoute()) ||
-										proxy.isTerminationSent()))))  {
+										((proxy.getFinalBranchForSubsequentRequests() != null && (!proxy.getFinalBranchForSubsequentRequests().getRecordRoute()) ||
+										proxy.isTerminationSent())))))  {
 							if(logger.isDebugEnabled()) {
-								logger.debug("try to Invalidate Proxy session if it is non record routing or termination has been sent " + sipSessionKey);
+								if(proxy != null) {
+									logger.debug("try to Invalidate Proxy session if it is non record routing " + proxy.getFinalBranchForSubsequentRequests().getRecordRoute() + " or termination " + proxy.isTerminationSent() + " has been sent " + sipSessionKey);
+								} else {
+									logger.debug("Non Proxy session : invalidating");
+								}
 							}
 							invalidateProxySession = true;
 						}
@@ -1111,10 +1115,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 							if(logger.isDebugEnabled()) {
 								logger.debug("sip session " + sipSessionKey + " is valid ? :" + sipSessionImpl.isValidInternal());
 								if(sipSessionImpl.isValidInternal()) {
-									logger.debug("Sip session " + sipSessionKey + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidate());
+									// https://code.google.com/p/sipservlets/issues/detail?id=279
+									logger.debug("Sip session " + sipSessionKey + " is ready to be invalidated ? :" + sipSessionImpl.isReadyToInvalidateInternal());
 								}
 							}
-							if(sipSessionImpl.isValidInternal() && sipSessionImpl.isReadyToInvalidate()) {														
+							if(sipSessionImpl.isValidInternal() &&
+									// https://code.google.com/p/sipservlets/issues/detail?id=279
+									sipSessionImpl.isReadyToInvalidateInternal()) {														
 								sipSessionImpl.onTerminatedState();							
 							}
 						} finally {

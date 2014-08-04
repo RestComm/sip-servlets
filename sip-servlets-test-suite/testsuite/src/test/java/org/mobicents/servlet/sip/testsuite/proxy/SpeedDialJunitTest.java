@@ -311,6 +311,7 @@ public class SpeedDialJunitTest extends SipServletTestCase {
 		assertTrue(sender.isCancelOkReceived());
 		assertTrue(sender.isRequestTerminatedReceived());
 		assertTrue(receiver.isCancelReceived());
+		Thread.sleep(TIMEOUT);
 	}
 	
 	@Override

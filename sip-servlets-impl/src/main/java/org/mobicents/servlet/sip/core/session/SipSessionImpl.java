@@ -954,7 +954,8 @@ public class SipSessionImpl implements MobicentsSipSession {
 		
 		if(derivedSipSessions != null) {
 			for (MobicentsSipSession derivedMobicentsSipSession : derivedSipSessions.values()) {
-				derivedMobicentsSipSession.invalidate();
+				// https://code.google.com/p/sipservlets/issues/detail?id=279
+				derivedMobicentsSipSession.invalidate(bypassCheck);
 			}		
 			derivedSipSessions.clear();
 		}	
