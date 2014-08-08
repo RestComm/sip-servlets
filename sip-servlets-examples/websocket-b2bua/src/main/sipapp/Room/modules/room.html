@@ -1,0 +1,216 @@
+			  <!--div id="swipe-container">
+			      <ul id="pages">				
+				<li class="page">
+				   <div class="page-content"-->
+					<div id="left-sidebar" class="span2 fill">
+						<div id="my-rooms" class="well sidebar-nav fill">		
+							<!--p>Rooms :</p-->
+							<table id="contact_search_add" class="table" >							  
+								<tbody>							  
+									<tr>
+								      		<td style="border-top:0px;overflow:hidden;">
+									  		<input id="sipContact" type="text" placeholder="Search or Add Room" style="width:auto;max-width:80%"/>
+									  		<a id="addNewContact" href="#" onclick="$('#contact_search_list').hide();$('#contact_list').show();addContact(getSipContactTextInputValue())"><i class="icon-plus" style="font-size: 1.2em;"/></a>
+									  	</td>									
+								    	</tr>			
+								</tbody>
+							</table>
+							<table id="contact_search_list">							  
+								<tbody>							  					    
+								</tbody>
+							</table>												
+							<table id="contact_list" style="table-display:fixed; overflow:hidden">							  
+								<tbody>							  					    
+								</tbody>
+							</table>					
+						</div><!--/.well -->
+						&nbsp;<br/>
+						&nbsp;<br/>
+						&nbsp;<br/>
+						&nbsp;<br/>
+					</div><!--/span-->
+					<div id="content" class="span8 fill"> <!-- BEGIN OF MAIN CONTENT -->
+					    <div id="chat" class="well sidebar-nav fill">							
+					    </div>
+					</div> <!-- END OF MAIN CONTENT -->
+					<div id="right-sidebar" class="span2 fill">
+    					    <div id="participants" class="well sidebar-nav fill">
+						    <!--span class="input-group-btn"-->
+							<p>Participants :  <a id="addNewParticipant" href="#" onclick="addParticipant()"><i class="icon-plus" style="font-size: 1.2em;"/></a></p>							    							
+						    <!--/span-->
+						    <div id='media'>
+						        <div id='over'>
+							    <table id="participant_list" style="table-display:fixed; overflow:hidden">							  
+								<tbody>	
+									<tr><td>
+										<div class="participant">	
+											<video id="localVideo" autoplay="autoplay" style="height:140px; width:140px;"></video>							
+										</div>
+				  					</td></tr>
+								</tbody>
+							    </table>						            
+						        </div>				                					    
+						    </div>
+					    </div>
+					</div><!--/span-->				    
+				   <!--/div>
+				</li>
+				<li class="page">				  
+				</li>
+			      </ul>
+			    </div-->                            
+			
+			<!-- modal -->
+			<div class="modal hide fade" id="fileShareModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	                <div class="modal-header">
+	                    <!--button type="button" class="close" data-dismiss="modal" aria-hidden="true">Ã</button-->
+	                    <h3 id="call_message">Share File</h3>
+	                </div>	 
+	                <div class="modal-body">
+					    <p>Choose file to share : </p>
+					    <input type="file" id="fileToShare" name="files[]" multiple/> 
+					     <!-- The global progress bar -->
+					    <div id="progress" class="progress">
+					        <div class="progress-bar progress-bar-success"></div>
+					    </div>
+					    <!-- The container for the uploaded files -->
+					    <div id="files" class="files"></div>
+					    <br>
+					</div> 
+	                <div class="modal-footer">
+	                    <button class="btn reject-btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+	                    <button class="btn btn-primary accept-btn" data-dismiss="modal">Share</button>
+	                </div>
+            	</div>
+        <audio id="ringing" loop src="resources/audio/ringing.wav" ></audio>
+	<audio id="chat_notification" src="resources/audio/chat_notification.wav" ></audio>
+	<script type='text/javascript'>	 
+		$('#contact_search_list').hide();
+		$('#addNewContact').hide();		
+	        $('#sipContact').keyup(function() {
+ 	        	if($(this).val() != '') {
+	           		$('#addNewContact').show();
+	           		$('#contact_search_list').show();
+				$('#contact_list').hide();
+	        	} else {
+	        		$('#addNewContact').hide();
+		        	$('#contact_search_list').hide();
+		        	$('#contact_list').show();
+	        	}
+	     	});
+					     
+		var self = this;
+		$("#sipContact").autocomplete({
+		      	delay: 500,    
+		      	source: contactList,
+			select: function (event, ui) {					        	
+			    chat(ui.item.label);
+			    event.preventDefault();
+			    $('#sipContact').val('');
+			},
+			    search: function (event, ui) {
+			    	this.source = self.contactList;						    	
+			},
+			response: function (event, ui) {
+				$('#contact_search_list > tbody:last').empty();
+			    	for(var i = 0; i < ui.content.length; i ++) {						    		
+			    		$('#contact_search_list > tbody:last').append('<tr onclick="chat(\'' + ui.content[i].label + '\');$(\'#sipContact\').val(\'\');$(\'#sipContact\').keyup()" id="contact-' + ui.content[i].label + '" style="cursor: pointer;"><td style="border-top:0px;overflow:hidden;">' + ui.content[i].label + '</td></tr>');						        	
+				}							    													    	
+			    	event.preventDefault();
+			}
+		}).data("ui-autocomplete")._renderItemData = function( ul, item) {return ;};
+					     					     
+	          
+            	// Accept modal 
+            	$('#fileShareModal .accept-btn').click(function() {
+            		var file = document.getElementById('fileToShare').files[0];
+            		var reader = new FileReader();
+	            	reader.readAsDataURL(file);
+        	    	reader.onload = onReadAsDataURL;
+            	            	                        	
+        	        $('#fileShareModal').modal('hide')
+        	});
+
+		function onReadAsDataURL(event, text) {
+	                var data = {}; // data object to transmit over data channel
+	                var chunkLength = 1000;
+                
+	                if (event) {
+	                	text = event.target.result; // on first invocation                 
+	                }
+
+	                if (text.length > chunkLength) {
+	                    data.message = text.slice(0, chunkLength); // getting chunk using predefined chunk length
+	                } else {
+	                    data.message = text;
+	                    data.last = true;
+	                }
+	                
+	                mobicentsWebRTCPhoneController.webRTCommCall.shareFileChunk(data);                
+	
+	                var remainingDataURL = text.slice(data.message.length);
+	                if (remainingDataURL.length) setTimeout(function () {
+	                    onReadAsDataURL(null, remainingDataURL); // continue transmitting
+	                }, 500)
+		}
+            
+		// Reject modal
+            	$('#fileShareModal .reject-btn').click(function() { 
+            		$('#fileShareModal').modal('hide')
+            	});
+            
+            	/*$(function() {
+            		$("#remoteVideo").resizable({
+		    		maxHeight : 640,
+		    		maxWidth : 480,
+		    		minHeight : 220,
+		    		minWidth : 160
+            		});
+            	});*/
+
+            	/*$(function() {
+            		$("#localVideo").draggable({
+            			containment : "#media",
+            			scroll : false
+            		});
+            	});*/
+
+
+	    /*$(function() {
+	      var container = $("#swipe-container");
+
+	      container.dragend({
+		minTouchDistance  : "60",
+		keyboardNavigation: true,
+		pageClass         : "page"
+	      });
+
+	      $("#demo").dragend({
+		direction: "vertical",
+		scribe: "40px"
+	      });
+
+	      $("a.next").on("click", function() {
+		container.dragend("left");
+	      });
+
+	      $("a.previous").on("click", function() {
+		container.dragend("right");
+	      });
+
+	      $("h1.logo, a.reset").on("click", function() {
+		container.dragend("reset");
+	      });
+
+	      $("body").on("resize", function(event) {
+		event.preventDefault();
+	      }).on("touchmove", function(event){
+		event.preventDefault();
+	      });
+
+	      $(window).on("load", function() {
+		container.css("opacity", 1)
+	      })
+
+	    });  */           
+	</script>

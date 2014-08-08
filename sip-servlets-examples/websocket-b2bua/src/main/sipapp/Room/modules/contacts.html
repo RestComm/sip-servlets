@@ -1,0 +1,63 @@
+						<div id="left-sidebar" class="well sidebar-nav">
+							<table id="contact_search_add" class="table" >							  
+							  <tbody>							  
+							  	<tr>
+							      <td style="border-top:0px;overflow:hidden;">
+								  		<input id="sipContact" type="text" placeholder="Search or Add Contact" style="width:auto;max-width:80%"/>
+								  		<a id="addNewContact" href="#" onclick="$('#contact_search_list').hide();$('#contact_list').show();addContact(getSipContactTextInputValue())"><i class="icon-plus" style="font-size: 1.2em;"/></a>
+								  </td>									
+							    </tr>			
+							  </tbody>
+							</table>
+							<table id="contact_search_list" class="table">							  
+							  <tbody>							  					    
+							  </tbody>
+							</table>												
+							<table id="contact_list" class="table">							  
+							  <tbody>							  					    
+							  </tbody>
+							</table>					
+						</div><!--/.well -->
+						&nbsp;<br/>
+						&nbsp;<br/>
+						&nbsp;<br/>
+						&nbsp;<br/>
+						
+						<script type='text/javascript'>	 
+						$('#contact_search_list').hide();
+						$('#addNewContact').hide();
+					     $('#sipContact').keyup(function() {
+					        if($(this).val() != '') {
+					           $('#addNewContact').show();
+					           $('#contact_search_list').show();
+					           $('#contact_list').hide();
+					        }
+					        else {
+					        	$('#addNewContact').hide();
+					        	$('#contact_search_list').hide();
+					        	$('#contact_list').show();
+					        }
+					     });
+					     
+					     var self = this;
+					     $("#sipContact").autocomplete({
+					      	delay: 500,    
+					      	source: contactList,
+					        select: function (event, ui) {					        	
+					            chat(ui.item.label);
+					            event.preventDefault();
+					            $('#sipContact').val('');
+					        },
+						    search: function (event, ui) {
+						    	this.source = self.contactList;						    	
+					        },
+					        response: function (event, ui) {
+					        	$('#contact_search_list > tbody:last').empty();
+						    	for(var i = 0; i < ui.content.length; i ++) {						    		
+						    		$('#contact_search_list > tbody:last').append('<tr onclick="chat(\'' + ui.content[i].label + '\');$(\'#sipContact\').val(\'\');$(\'#sipContact\').keyup()" id="contact-' + ui.content[i].label + '" style="cursor: pointer;"><td style="border-top:0px;overflow:hidden;">' + ui.content[i].label + '</td></tr>');						        	
+						        }							    													    	
+						    	event.preventDefault();
+					        }
+					      }).data("ui-autocomplete")._renderItemData = function( ul, item) {return ;};
+					     					     
+						</script>

@@ -1,0 +1,151 @@
+/* style sheets */
+.ui-chatbox {
+    /*position: fixed;
+    bottom:0;
+    padding: 2px;*/
+    min-height: 100%;
+    height: 100%;
+    background:  #f5f5f5;
+}
+
+.ui-chatbox-titlebar {
+    padding: 3px;
+    height: 3%;
+    cursor: pointer;
+}
+
+.ui-chatbox-incoming-call {
+    padding: 3px;
+    min-height: 5%;
+    height: 5%;
+    cursor: pointer;
+}
+
+.ui-chatbox-content {
+    padding: 0px;
+    margin: 0px;
+    border: 0px;
+    background:  #f5f5f5;
+}
+
+.ui-chatbox-log {
+    padding: 3px;
+    min-height: 95%;
+    height: 95%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #f5f5f5;
+}
+
+.ui-chatbox-input {
+    padding: 3px;
+    border-top: 1px solid #f5f5f5;
+    overflow: hidden;
+    min-height: 30px;
+    height: 30px;
+    margin-bottom: 10px;
+}
+
+.ui-chatbox-input-box {
+    margin: 0px;
+    border: 0px;
+    padding: 0px;
+    min-height: 100%;
+    height: 100% !important;
+    width:100%;
+    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
+    resize: none; 
+}
+
+.ui-chatbox-icon {
+    float: right;
+}
+
+.ui-chatbox-input-focus {
+    border-color: #f5f5f5;
+}
+
+.ui-chatbox-discussion-peer {
+  width: 50%;
+  max-width:50%;
+  clear: both;
+  float: left;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+
+.ui-chatbox-discussion {
+  width: 50%;
+  max-width:50%;
+  float: right;
+  clear: both;
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+
+.ui-chatbox-avatar {
+    height: 40px; 
+    width: 40px;
+    float: right;
+    margin-top: 10px;
+    clear: both;
+}
+
+.ui-chatbox-avatar-peer {
+    height: 40px; 
+    width: 40px;
+    clear: both;
+    float: left;
+}
+
+.ui-chatbox-date {
+    justify-content: flex-end;
+    margin-top: 10px;
+    clear: both;
+    font-size:  90%;
+    font-style: italic;
+    background:  white;
+    /* Source: http://snipplr.com/view/10979/css-cross-browser-word-wrap */
+    white-space: pre-wrap;      /* CSS3 */
+    white-space: -moz-pre-wrap; /* Firefox */
+    white-space: -pre-wrap;     /* Opera <7 */
+    white-space: -o-pre-wrap;   /* Opera 7 */
+    word-wrap: break-word;      /* IE */
+}
+
+.ui-chatbox-msg {
+    text-align: right;
+    overflow:hidden;
+    margin-right: 10px;
+    float: right;
+    background:  white;
+    width: 85%;
+    max-width:85%;
+    /* Source: http://snipplr.com/view/10979/css-cross-browser-word-wrap */
+    white-space: pre-wrap;      /* CSS3 */
+    white-space: -moz-pre-wrap; /* Firefox */
+    white-space: -pre-wrap;     /* Opera <7 */
+    white-space: -o-pre-wrap;   /* Opera 7 */
+    word-wrap: break-word;      /* IE */
+}
+
+.ui-chatbox-msg-peer {    
+    overflow:hidden;
+    margin-left: 10px;
+    float: left;
+    background:  white;    
+    width: 85%;
+    max-width:85%;
+    /* Source: http://snipplr.com/view/10979/css-cross-browser-word-wrap */
+    white-space: pre-wrap;      /* CSS3 */
+    white-space: -moz-pre-wrap; /* Firefox */
+    white-space: -pre-wrap;     /* Opera <7 */
+    white-space: -o-pre-wrap;   /* Opera 7 */
+    word-wrap: break-word;      /* IE */
+}
+

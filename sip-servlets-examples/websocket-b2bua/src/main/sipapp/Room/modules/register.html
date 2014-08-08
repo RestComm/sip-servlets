@@ -1,0 +1,143 @@
+<div class="span12">
+                    <div class="form-horizontal well">
+                        <div id="sipAccountSettings" >
+                            <div class="nav-header">Registration</div>
+                            <div class="nav-header">&nbsp;</div>			        
+                            <div class="control-group" id='sipDisplayNameDiv'>
+                                <label class="control-label">
+                                    <a style="color:#555555" href="#" rel="tooltip" title="Name that will be displayed when you contact others" data-placement="top" data-delay: { show: 10, hide: 100 }>Display Name</a>:</label>
+                                <input id="sipDisplayName"  type="text" size="30"> 
+                            </div>
+                            <div class="control-group" id='sipDomainDiv'>
+                                <label class="control-label">
+                                    <a style="color:#555555" href="#" rel="tooltip" title="Domain to be registered under" data-placement="top" data-delay: { show: 10, hide: 100 }>Domain</a>:</label>
+                                <input id="sipDomain"  type="text" size="30"> 
+                            </div>           
+                            <div class="control-group" id='sipUserNameDiv'>
+                                <label class="control-label">
+                                    <a style="color:#555555" href="#" rel="tooltip" title="User Name to be registered under" data-placement="top" data-delay: { show: 10, hide: 100 }>User Name</a>:</label>
+                                <input id="sipUserName"  type="text" size="30"> 
+                            </div>
+                            <div class="accordion" id="accordion1">
+                                <div class="accordion-group">
+                                    <div class="accordion-heading">           
+                                        <a class="accordion-toggle nav-header" data-toggle="collapse" data-parent="#accordion1" href="#security">
+                                            Security
+                                        </a>						 
+                                    </div>
+                                    <div id="security" class="accordion-body collapse">
+                                        <div class="accordion-inner">
+                                            <div class="control-group" id='sipLoginDiv'>
+                                                <label class="control-label">
+                                                    <a style="color:#555555" href="#" rel="tooltip" title="Login to authenticate" data-placement="top" data-delay: { show: 10, hide: 100 }>SIP Login</a>:</label>
+                                                <input id="sipLogin"   type="text" size="30"> 
+                                            </div>
+                                            <div class="control-group" id='sipPasswordDiv'>
+                                                <label class="control-label">
+                                                    <a style="color:#555555" href="#" rel="tooltip" title="Password to authenticate" data-placement="top" data-delay: { show: 10, hide: 100 }>SIP Password</a>:</label>
+                                                <input id="sipPassword"   type="text" size="30"> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-group">
+                                    <div class="accordion-heading">           
+                                        <a class="accordion-toggle nav-header" data-toggle="collapse" data-parent="#accordion1" href="#advancedSettings">
+                                            Advanced Settings
+                                        </a>						 
+                                    </div>
+                                    <div id="advancedSettings" class="accordion-body collapse">
+                                        <div class="accordion-inner">
+                                            <div class="control-group" id='stunServerDiv'>
+                                                <label class="control-label" for="stunServer"><a style="color:#555555" href="#" rel="tooltip" title="Specify the IP Address and Port of a Stun Server" data-placement="top" data-delay: { show: 10, hide: 100 }>STUN server</a>:</label>
+                                                <input id="stunServer"  type="text" size="30"> 
+                                            </div>
+					    <div class="control-group" id='turnServerDiv'>
+                                                <label class="control-label" for="turnServer"><a style="color:#555555" href="#" rel="tooltip" title="Specify the IP Address and Port of a Turn Server" data-placement="top" data-delay: { show: 10, hide: 100 }>TURN server</a>:</label>
+                                                <input id="turnServer"  type="text" size="30"> 
+                                            </div>
+					    <div class="control-group" id='turnLoginDiv'>
+                                                <label class="control-label" for="turnLogin"><a style="color:#555555" href="#" rel="tooltip" title="Turn Server Login" data-placement="top" data-delay: { show: 10, hide: 100 }>TURN server Login</a>:</label>
+                                                <input id="turnLogin"  type="text" size="30"> 
+                                            </div>
+					    <div class="control-group" id='turnPasswordDiv'>
+                                                <label class="control-label" for="turnPassword"><a style="color:#555555" href="#" rel="tooltip" title="Turn Server Password" data-placement="top" data-delay: { show: 10, hide: 100 }>TURN server Password</a>:</label>
+                                                <input id="turnPassword"  type="text" size="30"> 
+                                            </div>
+                                            <div class="control-group" id='sipOutboundProxyDiv'>
+                                                <label class="control-label"><a style="color:#555555" href="#" rel="tooltip" title="Specify the IP Address and Port of a WebSocket Server" data-placement="top" data-delay: { show: 10, hide: 100 }>Outbound Proxy</a> :</label>
+                                                <input  id="sipOutboundProxy"  type="text" size="30"> 
+                                            </div>							
+                                        </div>
+                                    </div>					    
+                                </div>
+				<div class="accordion-group">
+                                    <div class="accordion-heading">           
+                                        <a class="accordion-toggle nav-header" data-toggle="collapse" data-parent="#accordion1" href="#communicationSettings">
+                                            Communication Settings
+                                        </a>						 
+                                    </div>
+                                    <div id="communicationSettings" class="accordion-body collapse">
+					<div id='audioCodecsFilterDiv'>
+					    <label>Audio codecs filter (ordered by priority e.g. PCMU,PCMA,OPUS):</label>
+					    <input id='audioCodecsFilter' type="text" size="30" >
+					</div>
+					<div id='videoCodecsFilterDiv'>
+					    <label>Video codecs filter (ordered by priority e.g. VP8, H264):</label>
+					    <input id='videoCodecsFilter' type="text" size="30" >
+					</div>
+					<div id='localVideoFormatDiv'>
+					    <label>Local video format:</label>
+					    <input id='localVideoFormat' type="text" size="100" onchange = "webRTCommTestWebAppController.onChangeLocalVideoFormatViewEventHandler();">
+					</div>
+				    </div>	
+				</div>
+				<!--label style="color:black; font-weight:bold; ">Communication settings</label>
+				    <div style="border:black solid thin; width:1000px" id="webRTCommClientSipCallConfigurationDiv" title="Call settings"  >
+					<div id='sipContactPhoneNumberDiv'>
+					    <label>SIP Contact phone number:</label>
+					    <input id="sipContact"  type="text" size="30" > 
+					</div>
+					<div id='sipRegisterModeDiv'>
+					    <label>SIP REGISTER required:</label>
+					    <input  id='sipRegistrationCkeckBox' type="checkbox" checked name="sipRegistrationCkeckBox">
+					</div>
+					<div id='audioMediaDiv'>
+					    <label>Audio media:</label>
+					    <input  id='audioMediaCkeckBox' type="checkbox" checked>
+					</div>
+					<div id='videoMediaDiv'>
+					    <label>Video media:</label>
+					    <input  id='videoMediaCkeckBox' type="checkbox" checked >
+					</div>
+					<div id='messageMediaDiv'>
+					    <label>Message media:</label>
+					    <input  id='messageMediaCkeckBox' type="checkbox" checked>
+					</div>
+					<div id='audioCodecsFilterDiv'>
+					    <label>Audio codecs filter (ordered by priority e.g. PCMU,PCMA,OPUS):</label>
+					    <input id='audioCodecsFilter' type="text" size="30" >
+					</div>
+					<div id='videoCodecsFilterDiv'>
+					    <label>Video codecs filter (ordered by priority e.g. VP8, H264):</label>
+					    <input id='videoCodecsFilter' type="text" size="30" >
+					</div>
+					<div id='localVideoFormatDiv'>
+					    <label>Local video format:</label>
+					    <input id='localVideoFormat' type="text" size="100" onchange = "webRTCommTestWebAppController.onChangeLocalVideoFormatViewEventHandler();">
+					</div>
+					 <div id='messageMediaDiv'>
+					    <label>DTLS SRTP mode:</label>
+					    <input  id='dtlsSrtpKeyAgreementCkeckBox' type="checkbox" checked>
+					    <label style="color:red">(ckecked: DTLS, unchecked:SDES)</label>
+					</div>
+				    </div--> 
+                            </div>				
+                            <div class="control-group" id ='input'>
+                                <input id='Register' class="btn btn-primary" type='submit' name='Register' disabled="disabled" value='Register'  onclick = "mobicentsWebRTCPhoneController.onClickConnectButtonViewEventHandler();"/>
+                                &nbsp;&nbsp;&nbsp;&nbsp;
+                                <!--input id='UnRegister' class="btn btn-primary" type='submit' name='UnRegister' value='UnRegister' disabled="disabled"  onclick = "mobicentsWebRTCPhoneController.onClickDisconnectButtonViewEventHandler();"/-->
+                            </div>
+                        </div>
+                    </div><!--/.well -->
+                </div><!--/span-->

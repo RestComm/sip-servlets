@@ -1,23 +1,20 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications
+ * Copyright 2011-2014, Telestax Inc and individual contributors
+ * by the @authors tag.
  *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
+ * This program is free software: you can redistribute it and/or modify
+ * under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
  *
- * This software is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 package org.mobicents.servlet.sip.example;
@@ -45,13 +42,15 @@ import org.apache.log4j.Logger;
 /**
  * This example shows a simple websocket app
  * 
+ * @author jean.deruelle@telestax.com
  * @author Vladimir Ralev
  *
  */
 public class WebSocketB2BUASipServlet extends SipServlet implements TimerListener {
 	private static Logger logger = Logger.getLogger(WebSocketB2BUASipServlet.class);
 	private static final long serialVersionUID = 1L;
-
+	private static final String CONTENT_TYPE = "text/plain;charset=UTF-8";
+	
 	@Resource
 	SipFactory sipFactory;
 	
@@ -90,7 +89,7 @@ public class WebSocketB2BUASipServlet extends SipServlet implements TimerListene
 		sessions.put(request.getSession(), outRequest.getSession());
 		sessions.put(outRequest.getSession(), request.getSession());
 	}
-
+	
 	protected void doAck(SipServletRequest request) throws ServletException,
 	IOException {
 		SipServletResponse response = (SipServletResponse) sessions.get(request.getSession()).getAttribute("lastResponse");
@@ -122,9 +121,47 @@ public class WebSocketB2BUASipServlet extends SipServlet implements TimerListene
 			IOException {
 		request.getSession().setAttribute("lastRequest", request);
 		if(logger.isInfoEnabled()) {
-			logger.info("SimpleProxyServlet: Got BYE request:\n" + request);
+			logger.info("Got BYE request:\n" + request);
 		}
 		sessions.get(request.getSession()).createRequest("BYE").send();
+	}
+	
+	@Override
+	protected void doMessage(SipServletRequest request) throws ServletException,
+			IOException {
+		request.getSession().setAttribute("lastRequest", request);
+		if(logger.isInfoEnabled()) {
+			logger.info("Got MESSAGE request:\n" + request);
+		}
+		SipSession sipSession = sessions.get(request.getSession());
+		SipServletRequest message = null;
+		if(sipSession == null) {
+			SipServletRequest outRequest = sipFactory.createRequest(request.getApplicationSession(),
+					"MESSAGE", request.getFrom().getURI(), request.getTo().getURI());
+			String user = ((SipURI) request.getTo().getURI()).getUser();
+			Address calleeAddress = registeredUsersToIp.get(user);
+			if(calleeAddress == null) {
+				request.createResponse(SipServletResponse.SC_NOT_FOUND).send();
+				return;
+			}
+			outRequest.setRequestURI(calleeAddress.getURI());
+			message = outRequest;
+			sessions.put(request.getSession(), outRequest.getSession());
+			sessions.put(outRequest.getSession(), request.getSession());
+		} else {
+			 message = sipSession.createRequest("MESSAGE");
+		}
+		if(request.getContent() != null) {
+			String contentType = request.getContentType();
+			if(contentType == null || contentType.isEmpty()) {
+				contentType = CONTENT_TYPE;
+			}
+			message.setContent(request.getContent(), contentType);
+		}
+		if(logger.isInfoEnabled()) {
+			logger.info("Seding MESSAGE request:\n" + message);
+		}
+		message.send();
 	}
 
 	/**

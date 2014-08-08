@@ -1,0 +1,14 @@
+			<div class="container" style="max-width: none;">
+				<p class="">
+					<h5 style="margin: 0 0 0 14px;"><i class="icon-file-alt"></i> Management Console Log 
+					<span style="float: right; margin-right: 10px;">
+						<button id="btn-clear-console" class="btn btn-link" style="padding: 0 5px 0 5px;" data-toggle="tooltip" title="Clear Console" data-placement="left" onclick="$(this).tooltip('hide'); clearConsole();"><i class="icon-trash"></i></button>&nbsp;
+						<button id="btn-min-console" class="btn btn-link" style="padding: 0 10px 0 10px;" data-toggle="tooltip" title="Minimize Console" data-placement="left" onclick="$(this).tooltip('hide'); minimizeConsole();"><i class="icon-double-angle-down"></i></button>
+						<button id="btn-max-console" class="btn btn-link" style="padding: 0 5px 0 5px;" data-toggle="tooltip" title="Maximize Console" data-placement="left" onclick="$(this).tooltip('hide'); maximizeConsole();" style="display: none;"><i class="icon-double-angle-up"></i></button>
+					</span>
+					</h5>
+					<div style="margin-left: 3px;">
+						<div id="console-log-text" class="console"></div>
+					</div>
+				</p>
+			</div>
