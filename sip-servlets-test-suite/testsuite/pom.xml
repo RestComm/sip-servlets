@@ -199,11 +199,11 @@
 			<version>2.1.0</version>
 		</dependency>
 		
-		<dependency>			
+		<!--dependency>			
 			<groupId>org.mobicents.ha.javax.sip</groupId>
 			<artifactId>mobicents-jain-sip-jboss4</artifactId>
 			<version>${mobicents.jain.sip.ha.version}</version>				
-		</dependency>
+		</dependency-->
 		
 		<!-- clustering deps -->
 		<dependency>
