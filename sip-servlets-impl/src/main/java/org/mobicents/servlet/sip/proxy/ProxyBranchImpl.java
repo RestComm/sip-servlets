@@ -726,8 +726,10 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 //			if(!((SipApplicationDispatcherImpl)proxy.getSipFactoryImpl().getSipApplicationDispatcher()).isRouteExternal(routeHeader)) {
 //				clonedRequest.removeFirst(RouteHeader.NAME);	
 //			}
-//		}					
-		
+//		}
+
+		updateTimer(false); 
+
 		try {
 			// Reset the proxy supervised state to default Chapter 6.2.1 - page down list bullet number 6
 			proxy.setSupervised(true);
