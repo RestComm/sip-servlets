@@ -1,0 +1,9 @@
+<sip-app xmlns="http://www.jcp.org/xml/ns/sipservlet" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.jcp.org/xml/ns/sipservlet http://www.jcp.org/xml/ns/sipservlet/sip-app_1_1.xsd"
+	xmlns:javaee="http://java.sun.com/xml/ns/javaee" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+	version="1.1">
+
+	<app-name>SimpleSipServletApplication</app-name>
+	<display-name>Simple Sip Servlet</display-name>
+	<description>Simple Sip Servlet</description>
+</sip-app>
