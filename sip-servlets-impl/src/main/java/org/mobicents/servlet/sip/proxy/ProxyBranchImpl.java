@@ -208,12 +208,16 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 						cancelRequest = outgoingRequest.createCancel();
 					}
 					
-					//Adding reason headers if needed
+					//https://code.google.com/p/sipservlets/issues/detail?id=272 Adding reason headers if needed
 					if(protocol != null && reasonCode != null && reasonText != null
 							&& protocol.length == reasonCode.length && reasonCode.length == reasonText.length) {
 						for (int i = 0; i < protocol.length; i++) {
-							((SipServletRequestImpl)cancelRequest).setHeaderInternal("Reason", 
-									protocol[i] + ";cause=" + reasonCode[i] + ";text=\"" + reasonText[i] + "\"", false);
+							String reasonHeaderValue = protocol[i] + ";cause=" + reasonCode[i];
+							if(reasonText[i] != null && reasonText[i].trim().length() > 0) {
+								reasonHeaderValue = reasonHeaderValue.concat(";text=\"" + reasonText[i] + "\"");
+							}
+							((SipServletRequestImpl)cancelRequest).setHeaderInternal("Reason", reasonHeaderValue, false);
+							
 						}
 					}
 					cancelRequest.send();

@@ -2619,16 +2619,16 @@ public class TestSipListener implements SipListener {
 	}
 
 	public void sendCancel() {
-		sendCancel(false);
+		sendCancel(false, null);
 	}
 	
-	public void sendCancel(boolean addReason) {
+	public void sendCancel(boolean addReason, String reasonText) {
 		try {
 			logger.info("Sending cancel");
 			
 			Request cancelRequest = inviteClientTid.createCancel();
 			if(addReason) {
-				ReasonHeader reasonHeader = (ReasonHeader) this.protocolObjects.headerFactory.createReasonHeader("SIP", 200, "testing text");
+				ReasonHeader reasonHeader = (ReasonHeader) this.protocolObjects.headerFactory.createReasonHeader("SIP", 200, reasonText);
 				cancelRequest.addHeader(reasonHeader);
 			}
 			ClientTransaction cancelTid = sipProvider
