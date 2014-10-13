@@ -202,6 +202,7 @@ public class Shootme implements SipListener {
 	
 	public int retrans = -1;
 	public boolean scrambleResponses = false;
+	public int waitFinalResponse =1000;
 	/**
 	 * Process the ACK request. Send the bye and complete the call flow.
 	 */
@@ -296,7 +297,7 @@ public class Shootme implements SipListener {
 	
 			if(!usePrack) {
 				if(inviteResponseCode == 0) {
-					new Timer().schedule(new MyTimerTask(this), 1000);
+					new Timer().schedule(new MyTimerTask(this), waitFinalResponse);
 				} else {
 					Response customResp = messageFactory.createResponse(inviteResponseCode,
 							request);

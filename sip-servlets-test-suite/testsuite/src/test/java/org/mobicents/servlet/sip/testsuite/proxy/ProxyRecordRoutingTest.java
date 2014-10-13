@@ -50,9 +50,11 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 	TestSipListener sender;
 	TestSipListener neutral;
 	TestSipListener receiver;
+	TestSipListener secondReceiver;
 	ProtocolObjects senderProtocolObjects;
 	ProtocolObjects	receiverProtocolObjects;
 	ProtocolObjects neutralProto;
+	ProtocolObjects secondProto;
 
 
 	private static final int TIMEOUT = 20000;
@@ -71,6 +73,8 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
 		neutralProto = new ProtocolObjects("neutral",
 				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
+		secondProto = new ProtocolObjects("proxy-second-receiver",
+				"gov.nist", ListeningPoint.UDP, AUTODIALOG, null, null, null);
 		sender = new TestSipListener(5080, 5070, senderProtocolObjects, false);
 		sender.setRecordRoutingProxyTesting(true);
 		SipProvider senderProvider = sender.createProvider();
@@ -82,14 +86,20 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 		neutral = new TestSipListener(5058, 5070, neutralProto, false);
 		neutral.setRecordRoutingProxyTesting(true);
 		SipProvider neutralProvider = neutral.createProvider();
+		
+		secondReceiver = new TestSipListener(5056, 5070, secondProto, false);
+		secondReceiver.setRecordRoutingProxyTesting(true);
+		SipProvider secondProvider = secondReceiver.createProvider();
 
 		receiverProvider.addSipListener(receiver);
 		senderProvider.addSipListener(sender);
 		neutralProvider.addSipListener(neutral);
+		secondProvider.addSipListener(secondReceiver);
 
 		senderProtocolObjects.start();
 		receiverProtocolObjects.start();
 		neutralProto.start();
+		secondProto.start();
 	}
 
 	/*
@@ -138,6 +148,61 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
         System.out.println("reasonHeader Text " + reasonHeader.getText());
         assertNull(reasonHeader.getText());
         assertTrue(receiver.isCancelReceived());
+        assertEquals(487,sender.getFinalResponseStatus());  
+    }
+    
+    /*
+     * Non Regression test for https://code.google.com/p/sipservlets/issues/detail?id=283
+     */
+    public void testCancelProxying2Locations() throws Exception {
+        deployApplication();
+        String fromName = "cancel-both-location";
+        String fromSipAddress = "sip-servlets.com";
+        SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+                fromName, fromSipAddress);      
+        
+        String toSipAddress = "sip-servlets.com";
+        String toUser = "proxy-receiver";
+        SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+                toUser, toSipAddress);
+                                
+        receiver.setWaitForCancel(true);
+        secondReceiver.setWaitForCancel(true);
+        secondReceiver.setWaitBeforeFinalResponse(2000);
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);     
+        Thread.sleep(TIMEOUT);
+        sender.sendCancel(true, "testing text");
+        Thread.sleep(TIMEOUT);
+        assertTrue(receiver.isCancelReceived());
+        assertNotNull(receiver.getCancelRequest());
+        assertTrue(secondReceiver.isCancelReceived());
+        assertNotNull(secondReceiver.getCancelRequest());
+        // https://code.google.com/p/sipservlets/issues/detail?id=272
+        ReasonHeader reasonHeader = (ReasonHeader) receiver.getCancelRequest().getHeader(ReasonHeader.NAME);
+        assertNotNull(reasonHeader);
+        assertEquals("SIP", reasonHeader.getProtocol());
+        assertEquals(200, reasonHeader.getCause());
+        System.out.println("reasonHeader Text " + reasonHeader.getText());
+        assertEquals("testing text", reasonHeader.getText());
+        assertTrue(receiver.isCancelReceived());
+        assertTrue(secondReceiver.isCancelReceived());
+        assertEquals(487,sender.getFinalResponseStatus());  
+        
+        sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);     
+        Thread.sleep(TIMEOUT);
+        sender.sendCancel(true, null);
+        Thread.sleep(TIMEOUT);
+        assertTrue(receiver.isCancelReceived());
+        assertNotNull(receiver.getCancelRequest());
+        // https://code.google.com/p/sipservlets/issues/detail?id=272
+        reasonHeader = (ReasonHeader) receiver.getCancelRequest().getHeader(ReasonHeader.NAME);
+        assertNotNull(reasonHeader);
+        assertEquals("SIP", reasonHeader.getProtocol());
+        assertEquals(200, reasonHeader.getCause());
+        System.out.println("reasonHeader Text " + reasonHeader.getText());
+        assertNull(reasonHeader.getText());
+        assertTrue(receiver.isCancelReceived());
+        assertTrue(secondReceiver.isCancelReceived());
         assertEquals(487,sender.getFinalResponseStatus());  
     }
     
@@ -303,6 +368,7 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 	@Override
 	public void tearDown() throws Exception {
 		senderProtocolObjects.destroy();
+		secondProto.destroy();
 		receiverProtocolObjects.destroy();		
 		neutralProto.destroy();
 		logger.info("Test completed");

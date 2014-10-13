@@ -1200,6 +1200,7 @@ public class TestSipListener implements SipListener {
 			ServerTransaction serverTransactionId) {
 		try {
 			cancelReceived = true;
+			Thread.sleep(waitBeforeFinalResponse);
 			SipProvider sipProvider = (SipProvider) requestEvent.getSource();
 			Request request = requestEvent.getRequest();
 			setCancelRequest(request);

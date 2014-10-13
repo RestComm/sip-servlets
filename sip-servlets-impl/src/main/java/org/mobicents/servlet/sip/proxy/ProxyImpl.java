@@ -666,6 +666,12 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 			if(logger.isDebugEnabled())
 				logger.debug("All responses have arrived, sending final response for parallel proxy" );
 			sendFinalResponse(bestResponse, bestBranch);
+		} else if(parallel && originalRequest != null && originalRequest.getMethod().equalsIgnoreCase(Request.INVITE) && status >= 200 && status < 300) {
+			// https://code.google.com/p/sipservlets/issues/detail?id=283 make sure we automatically forward all 2xx responses for INVITE
+			finalBranchForSubsequentRequests = bestBranch;			
+			if(logger.isDebugEnabled())
+				logger.debug("not all responses have arrived, but sending 2xx final response for parallel proxy" );
+			sendFinalResponse(bestResponse, bestBranch);
 		} else if (!parallel) {
 			final int bestResponseStatus = bestResponse.getStatus();
 			if(bestResponseStatus >= 200 && bestResponseStatus < 300) {
@@ -737,7 +743,11 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 				return false;
 			}
 			
-			if(pbi.isStarted() && !pbi.isTimedOut() && !pbi.isCanceled())
+			if(pbi.isStarted() && !pbi.isTimedOut()
+					// Issue http://code.google.com/p/mobicents/issues/detail?id=2461 adding !isCancelled
+					// Issue https://code.google.com/p/sipservlets/issues/detail?id=283 fixing !isCancelled for parallel branches, 
+					// we should wait for best reponse from all branches
+					&& (!parallel && !pbi.isCanceled() || (parallel && pbi.isCanceled())) )
 			{
 				if(response == null || 						// if there is no response yet
 					response.getStatus() < Response.OK) {	// or if the response if not final
@@ -796,14 +806,20 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 			}
 		}
 		
+		final int bestResponseStatus = response.getStatus();
 		if(parallel) {
 			if(!allResponsesHaveArrived()) {
-				if(logger.isDebugEnabled())
-					logger.debug("The application has started new branches so we are waiting for responses on those" );
-				return;
+					// https://code.google.com/p/sipservlets/issues/detail?id=283 make sure we automatically forward all 2xx responses for INVITE
+					if(originalRequest != null && originalRequest.getMethod().equalsIgnoreCase(Request.INVITE) && bestResponseStatus >= 200 && bestResponseStatus < 300) {
+						if(logger.isDebugEnabled())
+							logger.debug("This is a 2XX to an INVITE, it has to be forwarded upstream" );
+					} else {
+						if(logger.isDebugEnabled())
+							logger.debug("The application has started new branches so we are waiting for responses on those" );
+						return;
+					}
 			}
 		} else {
-			final int bestResponseStatus = response.getStatus();
 			if((bestResponseStatus < 200 || bestResponseStatus >= 300) && !allResponsesHaveArrived()) {
 				if(logger.isDebugEnabled())
 					logger.debug("The application has started new branches so we are waiting for responses on those" );

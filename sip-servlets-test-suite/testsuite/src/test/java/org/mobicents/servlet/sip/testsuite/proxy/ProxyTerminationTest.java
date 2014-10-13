@@ -55,7 +55,7 @@ public class ProxyTerminationTest extends SipServletTestCase {
 
 	public void testProxyTermination() throws Exception {
 		setupPhones(ListeningPoint.UDP);
-		String fromName = "test_termination";
+		String fromName = "test_termination_unique_location";
 		String fromSipAddress = "sip-servlets.com";
 		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
 				fromName, fromSipAddress);		
