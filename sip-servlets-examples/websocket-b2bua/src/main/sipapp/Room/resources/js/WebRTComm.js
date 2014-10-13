@@ -1,22 +1,3 @@
-/*
- * TeleStax, Open Source Cloud Communications
- * Copyright 2011-2014, Telestax Inc and individual contributors
- * by the @authors tag.
- *
- * This program is free software: you can redistribute it and/or modify
- * under the terms of the GNU Affero General Public License as
- * published by the Free Software Foundation; either version 3 of
- * the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
- *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
- */
-
 /**
  * @class PrivateJainSipMessageConnector
  * @private
@@ -1013,16 +994,6 @@ PrivateJainSipCallConnector.prototype.processInvitingSipResponseEvent = function
     {
         if (statusCode < 200)
         {
-	    if (statusCode === 180)
-            {
-                // Notify the ringing back event
-                this.webRTCommCall.onPrivateCallConnectorCallRingingBackEvent();
-            }
-            else if (statusCode === 183)
-            {
-                // Notify asynchronously the in progress event
-                this.webRTCommCall.onPrivateCallConnectorCallInProgressEvent();
-            }
             console.debug("PrivateJainSipCallConnector:processInvitingSipResponseEvent(): 1XX response ignored");
         }
         else if (statusCode === 200)
@@ -3492,6 +3463,21 @@ WebRTCommCall.prototype.onRtcPeerConnectionOnAddStreamEvent = function(event) {
             console.debug("WebRTCommCall:onRtcPeerConnectionOnAddStreamEvent(): this.peerConnection.iceConnectionState=" + this.peerConnection.iceConnectionState);
             console.debug("WebRTCommCall:onRtcPeerConnectionOnAddStreamEvent(): this.peerConnectionState=" + this.peerConnectionState);
 	    this.remoteBundledAudioVideoMediaStream = event.stream;
+	    // https://code.google.com/p/webrtcomm/issues/detail?id=22 Make sure to call WebRTCommCall on add stream event
+            if (this.eventListener.onWebRTCommCallOpenedEvent)
+            {
+                var that = this;
+                setTimeout(function() {
+                    try {
+		        console.debug("WebRTCommCall:calling onWebRTCommCallOpenedEvent(): event=" + event);
+                        that.eventListener.onWebRTCommCallOpenedEvent(that);
+                    }
+                    catch (exception)
+                    {
+                        console.error("WebRTCommCall:onRtcPeerConnectionOnAddStreamEvent(): catched exception in listener:" + exception);
+                    }
+                }, 1);
+            }
         }
         else
         {
@@ -3682,7 +3668,8 @@ WebRTCommCall.prototype.onRtcPeerConnectionCreateOfferSuccessEvent = function(sd
                 {
                     this.forceTurnMediaRelay(parsedSdpOffer);
                 }
-				// this.patchChromeIce(parsedSdpOffer, "ice-options");
+		// Allow patching of chrome ice-options for interconnect with Mobicents Media Server, commented for now but to be made configurable
+		// this.patchChromeIce(parsedSdpOffer, "ice-options");
                 console.debug("WebRTCommCall:onRtcPeerConnectionCreateOfferSuccessEvent(): parsedSdpOffer=" + parsedSdpOffer);
 
                 // Apply modified SDP Offer
@@ -3776,7 +3763,8 @@ WebRTCommCall.prototype.onRtcPeerConnectionSetLocalDescriptionSuccessEvent = fun
 
                     // Apply modified SDP Offer
                     this.connector.invite(parsedSdpOffer);
-                    //this.connector.invite(this.peerConnectionLocalDescription.sdp);
+                    // results in second invite being sent when testing chrome and ff, so commented out
+		    // this.connector.invite(this.peerConnectionLocalDescription.sdp);
                     this.peerConnectionState = 'offer-sent';
                 }
                 else if (this.peerConnectionState === 'preparing-answer')
@@ -3899,7 +3887,8 @@ WebRTCommCall.prototype.onRtcPeerConnectionCreateAnswerSuccessEvent = function(s
                         console.error("WebRTCommCall:onRtcPeerConnectionCreateAnswerSuccessEvent(): configured codec filtering has failded, use inital RTCPeerConnection SDP offer");
                     }
                 }
-                // this.patchChromeIce(parsedSdpAnswer, "ice-options");
+            	// Allow patching of chrome ice-options for interconnect with Mobicents Media Server, commented for now but to be made configurable
+		// this.patchChromeIce(parsedSdpOffer, "ice-options");
 
                 sdpAnswser.sdp = parsedSdpAnswer;
                 this.peerConnectionLocalDescription = parsedSdpAnswer;
@@ -3972,6 +3961,7 @@ WebRTCommCall.prototype.onRtcPeerConnectionSetRemoteDescriptionSuccessEvent = fu
             if (this.peerConnectionState === 'answer-received')
             {
                 this.peerConnectionState = 'established';
+		console.debug("WebRTCommCall:onRtcPeerConnectionSetRemoteDescriptionSuccessEvent(): this.peerConnectionState=" + this.peerConnectionState);
                 // Notify closed event to listener
                 if (this.eventListener.onWebRTCommCallOpenedEvent)
                 {
