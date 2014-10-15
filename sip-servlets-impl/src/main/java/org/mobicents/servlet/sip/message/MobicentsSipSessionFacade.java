@@ -69,6 +69,7 @@ import org.mobicents.servlet.sip.startup.StaticServiceHolder;
  * 
  * @author vralev
  * @author jean.deruelle@gmail.com
+ * @author <A HREF="mailto:gvagenas@gmail.com">George Vagenas</A>
  *
  */
 public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializable {
@@ -538,4 +539,36 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
 	public void setOrphan(boolean orphan) {
 		sipSession.setOrphan(orphan);
 	}
+
+    /* (non-Javadoc)
+     * @see org.mobicents.javax.servlet.sip.SipSessionExt#setBypassLoadBalancer(boolean)
+     */
+    @Override
+    public void setBypassLoadBalancer(boolean bypassLoadBalancer) {
+        this.sipSession.setBypassLoadBalancer(bypassLoadBalancer);
+    }
+
+    /* (non-Javadoc)
+     * @see org.mobicents.javax.servlet.sip.SipSessionExt#getBypassLoadBalancer()
+     */
+    @Override
+    public boolean getBypassLoadBalancer() {
+        return this.sipSession.getBypassLoadBalancer();
+    }
+
+    /* (non-Javadoc)
+     * @see org.mobicents.javax.servlet.sip.SipSessionExt#setBypassProxy(boolean)
+     */
+    @Override
+    public void setBypassProxy(boolean bypassProxy) {
+        this.sipSession.setBypassProxy(bypassProxy);
+    }
+
+    /* (non-Javadoc)
+     * @see org.mobicents.javax.servlet.sip.SipSessionExt#getBypassProxy()
+     */
+    @Override
+    public boolean getBypassProxy() {
+        return this.sipSession.getBypassProxy();
+    }
 }

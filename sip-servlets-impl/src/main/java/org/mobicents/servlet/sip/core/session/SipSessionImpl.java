@@ -140,6 +140,7 @@ import org.mobicents.servlet.sip.proxy.ProxyImpl;
  * @author vralev
  * @author mranga
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
+ * @author <A HREF="mailto:gvagenas@gmail.com">George Vagenas</A>
  */
 public class SipSessionImpl implements MobicentsSipSession {
 		
@@ -297,6 +298,9 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * So for now, I'll keep the flow around.
 	 */
 	private javax.sip.address.SipURI flow;
+	
+    private boolean bypassLoadBalancer = false;
+    private boolean bypassProxy = false;
 
 	
 	protected SipSessionImpl (SipSessionKey key, SipFactoryImpl sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession) {
@@ -2429,4 +2433,32 @@ public class SipSessionImpl implements MobicentsSipSession {
 	public void setOrphan(boolean orphan) {
 		this.orphan = orphan;
 	}
+    /* (non-Javadoc)
+     * @see org.mobicents.javax.servlet.sip.SipSessionExt#setBypassLoadBalancer(boolean)
+     */
+    @Override
+    public void setBypassLoadBalancer(boolean bypassLoadBalancer) {
+        this.bypassLoadBalancer = bypassLoadBalancer;
+    }
+    /* (non-Javadoc)
+     * @see org.mobicents.javax.servlet.sip.SipSessionExt#getBypassLoadBalancer()
+     */
+    @Override
+    public boolean getBypassLoadBalancer() {
+        return this.bypassLoadBalancer;
+    }
+    /* (non-Javadoc)
+     * @see org.mobicents.javax.servlet.sip.SipSessionExt#setBypassProxy(boolean)
+     */
+    @Override
+    public void setBypassProxy(boolean bypassProxy) {
+        this.bypassProxy = bypassProxy;
+    }
+    /* (non-Javadoc)
+     * @see org.mobicents.javax.servlet.sip.SipSessionExt#getBypassProxy()
+     */
+    @Override
+    public boolean getBypassProxy() {
+        return this.bypassProxy;
+    }
 }

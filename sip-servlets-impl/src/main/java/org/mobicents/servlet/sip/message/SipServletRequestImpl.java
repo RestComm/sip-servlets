@@ -1166,15 +1166,18 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				// Adding Route Header for LB if the request is initial or
 				// http://code.google.com/p/sipservlets/issues/detail?id=130
 				// if we are in a HA configuration and the request is an out of dialog request
-				if(isInitial() || dialog == null) {					
-					if(sipFactoryImpl.isUseLoadBalancer()) {
+				if(isInitial() || dialog == null) {		
+				    //Issue: https://code.google.com/p/sipservlets/issues/detail?id=284
+					if(!session.getBypassLoadBalancer() && sipFactoryImpl.isUseLoadBalancer()) {
 						sipFactoryImpl.addLoadBalancerRouteHeader(request);
 						addDNSRoute = false;
 						if(logger.isDebugEnabled()) {
 							logger.debug("adding route to Load Balancer since we are in a HA configuration " +
 							" and no more apps are interested.");
 						}
-					} else if(StaticServiceHolder.sipStandardService.getOutboundProxy() != null) {
+					}
+					//Issue: https://code.google.com/p/sipservlets/issues/detail?id=284
+					else if(!session.getBypassProxy() && StaticServiceHolder.sipStandardService.getOutboundProxy() != null) {
 						sipFactoryImpl.addLoadBalancerRouteHeader(request);
 						addDNSRoute = false;
 						if(logger.isDebugEnabled()) {
@@ -1336,7 +1339,8 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 						logger.debug("Sending the in dialog request " + request);
 					}
 					dialog.sendRequest((ClientTransaction) getTransaction());
-				}			
+				}	
+				sipFactoryImpl.getSipApplicationDispatcher().updateRequestsStatistics(request, false);
 				isMessageSent = true;
 				
 				if(method.equals(Request.INVITE)) {
@@ -1347,7 +1351,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			}
 		} catch (Exception ex) {			
 			// The second condition for SipExcpetion is to cover com.bea.sipservlet.tck.agents.spec.ProxyBranchTest.testCreatingBranchParallel() where they send a request twice, the second
-			// time it does a "Request already sent" jsip exception but the tx is going on and must not be destryed
+			// time it does a "Request already sent" jsip exception but the tx is going on and must not be destroyed
 			boolean skipTxTermination = false;
 			Transaction tx = getTransaction();
 			if((ex instanceof IllegalTransactionStateException && ((IllegalTransactionStateException)ex).getReason().equals(Reason.RequestAlreadySent)) || (tx != null && !(tx instanceof ClientTransaction))) {
@@ -1456,7 +1460,8 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		ViaHeader viaHeader = (ViaHeader) request.getHeader(ViaHeader.NAME);
 				
 		if(sipConnector != null) {
-			if(sipConnector.isUseStaticAddress()) {
+		    //Issue: https://code.google.com/p/sipservlets/issues/detail?id=284
+			if(sipConnector.isUseStaticAddress() && !((MobicentsSipSession)getSession()).getBypassLoadBalancer() ) {
 				javax.sip.address.URI uri = request.getRequestURI();
 				RouteHeader route = (RouteHeader) request.getHeader(RouteHeader.NAME);
 				if(route != null) {
@@ -1602,7 +1607,8 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			boolean sipURI = contactHeader.getAddress().getURI().isSipURI();
 			if(sipURI) {
 				javax.sip.address.SipURI contactSipUri = (javax.sip.address.SipURI) contactHeader.getAddress().getURI();
-				if(sipConnector != null && sipConnector.isUseStaticAddress()) {
+				//Issue: https://code.google.com/p/sipservlets/issues/detail?id=284
+				if(sipConnector != null && sipConnector.isUseStaticAddress() && !session.getBypassLoadBalancer()) {
 					contactSipUri.setHost(sipConnector.getStaticServerAddress());
 					contactSipUri.setPort(sipConnector.getStaticServerPort());
 					//https://telestax.atlassian.net/browse/MSS-103
@@ -1735,6 +1741,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			}
 			session.getSessionCreatingDialog().sendAck(request);
 			session.setRequestsPending(session.getRequestsPending()-1);
+			sipFactoryImpl.getSipApplicationDispatcher().updateRequestsStatistics(request, false);
 			final Transaction transaction = getTransaction();
 			// transaction can be null in case of forking
 			if(transaction != null) {

@@ -115,4 +115,29 @@ public interface SipSessionExt {
      * @param copyRecordRouteHeadersOnSubsequentResponses true if the session currently exhibit the behavior described above 
      */
     boolean getCopyRecordRouteHeadersOnSubsequentResponses();
+    //Issue:https://telestax.atlassian.net/browse/MSS-121
+    /**
+     * Allows for application to bypass routing to LoadBalancer for a request (if LoadBalancer is in use)
+     * This is useful to cope with NAT issues, where sip client has open NAT port to container but not to LoadBalancer
+     * @param bypassLoadBalancer
+     */
+    void setBypassLoadBalancer(boolean bypassLoadBalancer);
+    /**
+     * Allows for application to bypass routing to LoadBalancer for a request (if LoadBalancer is in use)
+     * This is useful to cope with NAT issues, where sip client has open NAT port to container but not to LoadBalancer
+     * @return bypassLoadBalancer
+     */
+    boolean getBypassLoadBalancer();
+    /**
+     * Allows for application to bypass routing to Proxy for a request (if Proxy is in use)
+     * This is useful to cope with NAT issues, where sip client has open NAT port to container but not to Proxy
+     * @param bypassProxy
+     */
+    void setBypassProxy(boolean bypassProxy);
+    /**
+     * Allows for application to bypass routing to Proxy for a request (if Proxy is in use)
+     * This is useful to cope with NAT issues, where sip client has open NAT port to container but not to Proxy
+     * @param bypassProxy
+     */
+    boolean getBypassProxy();
 }
