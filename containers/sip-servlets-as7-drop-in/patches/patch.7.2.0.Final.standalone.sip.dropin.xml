@@ -1,5 +1,5 @@
---- standalone.xml	2014-10-16 12:15:25.117776599 +0200
-+++ standalone-sip.xml	2014-10-16 13:38:34.689661426 +0200
+--- standalone/configuration/standalone-sip.xml	2014-10-16 12:15:25.117776599 +0200
++++ standalone/configuration/standalone-sip.xml	2014-10-16 13:38:34.689661426 +0200
 @@ -24,6 +24,7 @@
          <extension module="org.jboss.as.web"/>
          <extension module="org.jboss.as.webservices"/>
