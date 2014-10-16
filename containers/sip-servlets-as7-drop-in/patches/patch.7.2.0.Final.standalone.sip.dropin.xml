@@ -44,21 +44,17 @@
              </security-domains>
          </subsystem>
          <subsystem xmlns="urn:jboss:domain:threads:1.1"/>
-@@ -256,10 +277,9 @@
+@@ -256,6 +277,9 @@
          </subsystem>
          <subsystem xmlns="urn:jboss:domain:web:1.4" default-virtual-server="default-host" native="false">
              <connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http"/>
--             <virtual-server name="default-host" enable-welcome-root="true">
--                 <alias name="localhost"/>
--                 <alias name="example.com"/>
--
-+	    <!--connector name="https" protocol="HTTP/1.1" scheme="https" socket-binding="https" enable-lookups="false" secure="true">
++            <!--connector name="https" protocol="HTTP/1.1" scheme="https" socket-binding="https" enable-lookups="false" secure="true">
 +                <ssl name="https" key-alias="KEY_ALIAS" password="SECRET" certificate-key-file="${jboss.server.config.dir}/keystore.jks" protocol="TLSv1,TLSv1.1,TLSv1.2"/>
 +            </connector-->
              <virtual-server name="default-host" enable-welcome-root="true">
                  <alias name="localhost"/>
                  <alias name="example.com"/>
-@@ -277,6 +297,12 @@
+@@ -273,6 +297,12 @@
              <client-config name="Standard-Client-Config"/>
          </subsystem>
          <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
@@ -71,7 +67,7 @@
      </profile>
      <interfaces>
          <interface name="management">
-@@ -301,6 +327,10 @@
+@@ -297,6 +327,10 @@
          <socket-binding name="ajp" port="8009"/>
          <socket-binding name="http" port="8080"/>
          <socket-binding name="https" port="8443"/>
