@@ -1339,8 +1339,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 						logger.debug("Sending the in dialog request " + request);
 					}
 					dialog.sendRequest((ClientTransaction) getTransaction());
-				}	
-				sipFactoryImpl.getSipApplicationDispatcher().updateRequestsStatistics(request, false);
+				}
 				isMessageSent = true;
 				
 				if(method.equals(Request.INVITE)) {
@@ -1741,7 +1740,6 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			}
 			session.getSessionCreatingDialog().sendAck(request);
 			session.setRequestsPending(session.getRequestsPending()-1);
-			sipFactoryImpl.getSipApplicationDispatcher().updateRequestsStatistics(request, false);
 			final Transaction transaction = getTransaction();
 			// transaction can be null in case of forking
 			if(transaction != null) {
