@@ -31,7 +31,7 @@ Read the [Online SIP Servlets Documentation](http://docs.telestax.com/sip-servle
 
 Want to Contribute ? 
 ========
-[See our Contributors Guide](https://github.com/Mobicents/sip-servlets/wiki/Contribute-to-Mobicents)
+[See our Contributors Guide](https://github.com/Mobicents/sip-servlets/wiki/Contribute-to-Mobicents-SIP-Servlets)
 
 Issue Tracking and Roadmap
 ========
