@@ -23,10 +23,10 @@
 		<module>click-to-call-servlet3</module>
 		<module>conference-demo-jsr309</module>
 		<module>custom-call-forwarding-distributable</module>
-		<!--module>diameter-event-charging</module>
+		<module>diameter-event-charging</module>
 		<module>diameter-openims</module>
 		<module>diameter-ro-rf</module>
-		<module>facebook-c2c</module>
+		<!--module>facebook-c2c</module>
 		<module>jslee-sips-interop</module-->
 		<module>location-service</module>
 		<module>location-service-distributable</module>
