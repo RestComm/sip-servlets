@@ -1,23 +1,20 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications
+ * Copyright 2011-2014, Telestax Inc and individual contributors
+ * by the @authors tag.
  *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
+ * This program is free software: you can redistribute it and/or modify
+ * under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
  *
- * This software is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
 package org.mobicents.servlet.sip.example.diameter.rorf;
@@ -39,6 +36,8 @@ import org.jdiameter.api.cca.ServerCCASession;
 import org.jdiameter.api.cca.ServerCCASessionListener;
 import org.jdiameter.api.cca.events.JCreditControlAnswer;
 import org.jdiameter.api.cca.events.JCreditControlRequest;
+import org.jdiameter.client.api.ISessionFactory;
+import org.jdiameter.client.impl.app.cca.ClientCCASessionDataLocalImpl;
 import org.jdiameter.client.impl.app.cca.ClientCCASessionImpl;
 import org.jdiameter.common.api.app.IAppSessionFactory;
 import org.jdiameter.common.api.app.cca.ICCAMessageFactory;
@@ -48,6 +47,7 @@ import org.jdiameter.common.impl.app.auth.ReAuthAnswerImpl;
 import org.jdiameter.common.impl.app.auth.ReAuthRequestImpl;
 import org.jdiameter.common.impl.app.cca.JCreditControlAnswerImpl;
 import org.jdiameter.common.impl.app.cca.JCreditControlRequestImpl;
+import org.jdiameter.server.impl.app.cca.ServerCCASessionDataLocalImpl;
 import org.jdiameter.server.impl.app.cca.ServerCCASessionImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,18 +86,26 @@ public abstract class CreditControlSessionFactory implements IAppSessionFactory,
     this.defaultTxTimerValue = defaultTxTimerValue;
   }
 
+  public AppSession getSession(String sessionId, Class<? extends AppSession> aClass) {
+	  return getNewSession(sessionId, aClass, null, null);
+  }
+  
   public AppSession getNewSession(String sessionId, Class<? extends AppSession> aClass, ApplicationId applicationId, Object[] args) {
     AppSession value = null;
     try {
       if (aClass ==  ClientCCASession.class) {
 
         ClientCCASessionImpl clientSession = null;
+        ClientCCASessionDataLocalImpl data = new ClientCCASessionDataLocalImpl();
+        data.setApplicationId(applicationId);
         if(args != null && args.length>1 && args[0] instanceof Request) {
-          Request request = (Request) args[0];
-          clientSession = new ClientCCASessionImpl(request.getSessionId(), this, sessionFactory, this, this, this);
+        	Request request = (Request) args[0];
+        	data.setSessionId(request.getSessionId());
+        	clientSession = new ClientCCASessionImpl(data, this, (ISessionFactory) sessionFactory, this, this, this);
         }
         else {
-          clientSession = new ClientCCASessionImpl(sessionId, this, sessionFactory, this, this, this);
+        	data.setSessionId(sessionId);
+        	clientSession = new ClientCCASessionImpl(data, this, (ISessionFactory) sessionFactory, this, this, this);
         }
         clientSession.addStateChangeNotification(this);
         
@@ -105,13 +113,17 @@ public abstract class CreditControlSessionFactory implements IAppSessionFactory,
       }
       else if (aClass ==  ServerCCASession.class) {
         ServerCCASessionImpl serverSession = null;
+        ServerCCASessionDataLocalImpl data = new ServerCCASessionDataLocalImpl();
+        data.setApplicationId(applicationId);
         if (args !=  null && args.length > 1 && args[0] instanceof Request) {
-          // This shouldn't happen but just in case
-          Request request = (Request) args[0];
-          serverSession = new ServerCCASessionImpl(request.getSessionId(), this, sessionFactory, this, this, this);
+        	// This shouldn't happen but just in case
+        	Request request = (Request) args[0];
+        	data.setSessionId(request.getSessionId());
+        	serverSession = new ServerCCASessionImpl(data, this, (ISessionFactory) sessionFactory, this, this, this);
         }
         else {
-          serverSession = new ServerCCASessionImpl(sessionId, this, sessionFactory, this, this, this);
+        	data.setSessionId(sessionId);
+        	serverSession = new ServerCCASessionImpl(data, this, (ISessionFactory) sessionFactory, this, this, this);
         }
         serverSession.addStateChangeNotification(this);
 
