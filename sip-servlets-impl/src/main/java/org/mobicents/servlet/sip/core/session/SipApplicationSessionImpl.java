@@ -223,6 +223,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			logger.debug("Trying to remove sip session " + mobicentsSipSession);
 		}
 		final SipSessionKey key = (SipSessionKey) mobicentsSipSession.getKey();
+		// https://github.com/Mobicents/sip-servlets/issues/41
 		// Handle forking case to remove the session only if the parent session is not valid anymore otherwise remove only from the list of derived sessions
 		MobicentsSipSession parentSession = mobicentsSipSession.getParentSession();
 		if(parentSession != null) {
@@ -501,6 +502,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 					if(sipSession.isValidInternal()) {
 						retSipSessions.add(sipSession);
 					}
+					// https://github.com/Mobicents/sip-servlets/issues/41 
 					// Adding derived Sessions to the list of returned sip sessions
 					Iterator<MobicentsSipSession> derivedSessionsIterator = sipSession.getDerivedSipSessions();
 					while (derivedSessionsIterator.hasNext()) {

@@ -941,6 +941,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 			manager.removeSipSession(key);		
 			sipApplicationSession.getSipContext().getSipSessionsUtil().removeCorrespondingSipSession(key);
         } else {
+        	// https://github.com/Mobicents/sip-servlets/issues/41
         	if(logger.isDebugEnabled()) {
         		logger.debug("sip session " + key + " is a derived session, so not removing it from the manager, only from the parent session " + parentSipSession.getKey());
         	}
@@ -973,7 +974,10 @@ public class SipSessionImpl implements MobicentsSipSession {
 		
 		isValid = false;
 		
-		if(derivedSipSessions != null && !bypassCheck) {
+		if(derivedSipSessions != null
+				// https://github.com/Mobicents/sip-servlets/issues/41 
+				// Invalidate derived session only if forcefully asked by the application 
+				&& !bypassCheck) {
 			for (MobicentsSipSession derivedMobicentsSipSession : derivedSipSessions.values()) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Invalidating Derived Sip Session " + derivedMobicentsSipSession.getKey());
