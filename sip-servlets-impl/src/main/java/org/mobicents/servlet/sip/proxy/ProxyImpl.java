@@ -606,7 +606,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 				if( (status >= 200 && status < 300) 
 					|| (status >= 600 && status < 700) ) { 
 					if(logger.isDebugEnabled())
-						logger.debug("Cancelling all other broanches in this proxy");
+						logger.debug("Cancelling all other branches in this proxy");
 					cancelAllExcept(branch, null, null, null, false);
 				}
 			}
@@ -747,7 +747,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 					// Issue http://code.google.com/p/mobicents/issues/detail?id=2461 adding !isCancelled
 					// Issue https://code.google.com/p/sipservlets/issues/detail?id=283 fixing !isCancelled for parallel branches, 
 					// we should wait for best reponse from all branches
-					&& (!parallel && !pbi.isCanceled() || (parallel && pbi.isCanceled())) )
+					&& (!parallel && !pbi.isCanceled() || parallel) )
 			{
 				if(response == null || 						// if there is no response yet
 					response.getStatus() < Response.OK) {	// or if the response if not final
