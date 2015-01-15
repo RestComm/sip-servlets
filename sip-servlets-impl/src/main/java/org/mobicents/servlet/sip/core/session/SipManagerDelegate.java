@@ -369,6 +369,10 @@ public abstract class SipManagerDelegate {
 	protected MobicentsSipSession createDerivedSipSession(MobicentsSipSession parentSipSession, SipSessionKey sessionKey) {
 		// clone the session and add it to the map of derived sessions
 		MobicentsSipSession sipSessionImpl = getNewMobicentsSipSession(sessionKey, sipFactoryImpl, parentSipSession.getSipApplicationSession());
+		if(logger.isDebugEnabled()) {
+			logger.debug("Created derived session " + sipSessionImpl + " with sessionKey " + sessionKey + " for parent session " + 
+					 parentSipSession + " with parent session key " + parentSipSession.getKey());
+		}
 		sipSessionImpl.setSipSessionAttributeMap(parentSipSession.getSipSessionAttributeMap());
 		try {
 			sipSessionImpl.setHandler(parentSipSession.getHandler());

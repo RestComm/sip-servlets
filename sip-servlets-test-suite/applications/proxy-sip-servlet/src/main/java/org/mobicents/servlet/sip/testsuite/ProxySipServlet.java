@@ -26,6 +26,7 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Resource;
@@ -45,6 +46,7 @@ import javax.servlet.sip.SipFactory;
 import javax.servlet.sip.SipServlet;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
@@ -481,6 +483,15 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		
 		logger.info("Got response: " + response);
 		logger.info("Sip Session is :" + response.getSession(false));
+		Iterator<SipSession> it = (Iterator<SipSession>) response.getApplicationSession(false).getSessions("SIP");
+		logger.debug("dumping sip session list");
+		int i = 0;
+		while (it.hasNext()) {
+			SipSession sipSession = it.next();
+			logger.debug("sip session " + sipSession.getId());
+			i++;
+		}
+		logger.debug("Number of SIP Sessions is :" + i);
 		
 		SipServletResponseExt sipServletResponseExt = (SipServletResponseExt) response;
 		SipApplicationSession sas = response.getApplicationSession();

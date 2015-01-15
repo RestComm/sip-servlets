@@ -127,6 +127,7 @@ public class ProxySipServletDownstreamProxyForkingTest extends SipServletTestCas
         Shootme shootme2 = new Shootme(5081, true, 2500);
         SipProvider shootme2Provider = shootme2.createProvider();
         shootme2Provider.addSipListener(shootme2);
+        shootme2.setWaitBeforeFinalResponse(9000);
 		Proxy proxy = new Proxy(5070,2);
 		SipProvider provider = proxy.createSipProvider();
         provider.addSipListener(proxy);

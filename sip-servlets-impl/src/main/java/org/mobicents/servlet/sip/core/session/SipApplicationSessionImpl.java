@@ -218,13 +218,48 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 //		sipSessionImpl.setSipApplicationSession(this);
 	}
 	
-	public SipSessionKey removeSipSession (MobicentsSipSession mobicentsSipSession) {
+	public SipSessionKey removeSipSession(MobicentsSipSession mobicentsSipSession) {
 		if(logger.isDebugEnabled()) {
 			logger.debug("Trying to remove sip session " + mobicentsSipSession);
 		}
 		final SipSessionKey key = (SipSessionKey) mobicentsSipSession.getKey();
-		if(sipSessions != null) {			
+		// Handle forking case to remove the session only if the parent session is not valid anymore otherwise remove only from the list of derived sessions
+		MobicentsSipSession parentSession = mobicentsSipSession.getParentSession();
+		if(parentSession != null) {
+			Iterator<MobicentsSipSession> itDerivedSessions = parentSession.getDerivedSipSessions();
+			if(itDerivedSessions.hasNext()) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("parent session " + parentSession.getKey() + " still contains derived sip sessions so not removing");
+					logger.debug("Derived sip sessions left are : ");
+					while (itDerivedSessions.hasNext()) {
+						MobicentsSipSession derivedSipSession = itDerivedSessions.next();
+						logger.debug("Derived sip session : " + derivedSipSession.getKey());
+					}
+				} 
+				return null;
+			}
+			if(parentSession.isValidInternal()) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("not removing parent sip session " + parentSession.getKey() + " without derived sessions since it's still valid");
+				}
+				return null;
+			}
+		}
+		Iterator<MobicentsSipSession> itDerivedSessions = mobicentsSipSession.getDerivedSipSessions();
+		if(itDerivedSessions.hasNext()) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Sip Session " + mobicentsSipSession.getKey() + " still contains derived sip sessions so not removing");
+				logger.debug("Derived sip sessions left are : ");
+				while (itDerivedSessions.hasNext()) {
+					MobicentsSipSession derivedSipSession = itDerivedSessions.next();
+					logger.debug("Derived sip session : " + derivedSipSession.getKey());
+				}
+			}
+			return null;
+		}
+		if(sipSessions != null) {
 			boolean wasPresent = this.sipSessions.remove(key);
+			
 			if(logger.isDebugEnabled() && wasPresent) {
 				logger.debug("Removed sip session " + key + " from sip app session " + getKey());
 			}
@@ -463,7 +498,16 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			for(SipSessionKey sipSessionKey : sipSessions) {
 				MobicentsSipSession sipSession = sipContext.getSipManager().getSipSession(sipSessionKey, false, null, this);
 				if(sipSession != null) {
-					retSipSessions.add(sipSession);
+					if(sipSession.isValidInternal()) {
+						retSipSessions.add(sipSession);
+					}
+					// Adding derived Sessions to the list of returned sip sessions
+					Iterator<MobicentsSipSession> derivedSessionsIterator = sipSession.getDerivedSipSessions();
+					while (derivedSessionsIterator.hasNext()) {
+						MobicentsSipSession derivedSipSession = derivedSessionsIterator
+								.next();
+						retSipSessions.add(derivedSipSession);
+					}
 				}
 			}
 		}

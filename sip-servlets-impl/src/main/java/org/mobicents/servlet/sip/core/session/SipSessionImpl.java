@@ -871,6 +871,11 @@ public class SipSessionImpl implements MobicentsSipSession {
 		return this.state;
 	}
 
+	public State getStateInternal() {
+		return this.state;
+	}
+
+	
 //	public ThreadPoolExecutor getExecutorService() {
 //		return executorService;
 //	}
@@ -930,9 +935,21 @@ public class SipSessionImpl implements MobicentsSipSession {
         // http://code.google.com/p/mobicents/issues/detail?id=2885
         // FQN Memory Leak in HA mode with PESSIMISTIC locking
         // remove it before the DELETION notification to avoid the sip application session to be destroyed before 
-        // and leaking in the JBoss Cache		
-		manager.removeSipSession(key);		
-		sipApplicationSession.getSipContext().getSipSessionsUtil().removeCorrespondingSipSession(key);
+        // and leaking in the JBoss Cache
+        MobicentsSipSession parentSipSession = getParentSession();
+        if(parentSipSession == null) {
+			manager.removeSipSession(key);		
+			sipApplicationSession.getSipContext().getSipSessionsUtil().removeCorrespondingSipSession(key);
+        } else {
+        	if(logger.isDebugEnabled()) {
+        		logger.debug("sip session " + key + " is a derived session, so not removing it from the manager, only from the parent session " + parentSipSession.getKey());
+        	}
+    		// Handle forking case to remove the session only if the parent session is not valid anymore otherwise remove only from the list of derived sessions
+    		MobicentsSipSession removedSession = parentSipSession.removeDerivedSipSession(key.getToTag());
+			if(logger.isDebugEnabled() && removedSession != null) {
+				logger.debug("removed derived sip session " + key + " from the list of derived sessions from the parent session " + parentSipSession.getKey());
+			}
+        }
 		
 		/*
          * Compute how long this session has been alive, and update
@@ -956,11 +973,14 @@ public class SipSessionImpl implements MobicentsSipSession {
 		
 		isValid = false;
 		
-		if(derivedSipSessions != null) {
+		if(derivedSipSessions != null && !bypassCheck) {
 			for (MobicentsSipSession derivedMobicentsSipSession : derivedSipSessions.values()) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Invalidating Derived Sip Session " + derivedMobicentsSipSession.getKey());
+				}
 				// https://code.google.com/p/sipservlets/issues/detail?id=279
 				derivedMobicentsSipSession.invalidate(bypassCheck);
-			}		
+			}	
 			derivedSipSessions.clear();
 		}	
 		

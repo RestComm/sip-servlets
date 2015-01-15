@@ -340,12 +340,12 @@ public class Shootist implements SipListener {
 		}
 		
 		// If the caller is supposed to send the bye
-		if ( !byeTaskRunning && dialog != null) {			
-			if(!response.getHeader("From").toString().contains("sequential")) {
-				byeTaskRunning = true;
-				new Timer().schedule(new ByeTask(dialog), 4000) ;
-			}
-		}
+//		if ( !byeTaskRunning && dialog != null) {			
+//			if(!response.getHeader("From").toString().contains("sequential")) {
+//				byeTaskRunning = true;
+//				new Timer().schedule(new ByeTask(dialog), 4000) ;
+//			}
+//		}
 		System.out.println("transaction state is " + tid.getState());
 		//System.out.println("Dialog = " + tid.getDialog());
 		//System.out.println("Dialog State is " + tid.getDialog().getState());
@@ -384,7 +384,8 @@ public class Shootist implements SipListener {
 						dialog.sendAck(ackRequest);
 						
 						if(!byeTaskRunning) {
-							try {							
+							try {					
+								System.out.println("Waiting for " + pauseBeforeBye + " before sending BYE");
 								Thread.sleep(pauseBeforeBye);
 								Request byeRequest = dialog.createRequest(Request.BYE);
 								ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);

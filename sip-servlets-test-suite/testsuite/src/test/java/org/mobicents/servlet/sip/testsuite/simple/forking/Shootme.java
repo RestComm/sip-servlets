@@ -107,6 +107,7 @@ public class Shootme   implements SipListener {
 
     private static Timer timer = new Timer();
 
+    private long waitBeforeFinalResponse = 0;
 
     class MyTimerTask extends TimerTask {
         RequestEvent  requestEvent;
@@ -253,6 +254,8 @@ public class Shootme   implements SipListener {
                 ContactHeader contactHeader = headerFactory
                         .createContactHeader(address);
                 okResponse.addHeader(contactHeader);
+                Thread.sleep(waitBeforeFinalResponse);
+				logger.debug("sending back response " + okResponse);
                 inviteTid.sendResponse(okResponse);
                 logger.info("shootme: Dialog state after OK: "
                         + inviteTid.getDialog().getState());
@@ -409,6 +412,8 @@ public class Shootme   implements SipListener {
         return ackSeen;
     }
 
-
+    public void setWaitBeforeFinalResponse(long waitBeforeFinalResponse) {
+		this.waitBeforeFinalResponse = waitBeforeFinalResponse;
+	}
 
 }
