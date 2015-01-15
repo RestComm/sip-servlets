@@ -1143,8 +1143,10 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				return;
 			}						
 			boolean addDNSRoute = true;
-			//Added for initial requests only (that are not REGISTER) not for subsequent requests 
-			if(isInitial() && !Request.REGISTER.equalsIgnoreCase(requestMethod)) {
+			//Added for initial requests only not for subsequent requests 
+			if(isInitial()) {  
+				// https://telestax.atlassian.net/browse/MSS-124 commented as this breaks AR for REGISTER 
+				// && !Request.REGISTER.equalsIgnoreCase(requestMethod)) {
 				final SipApplicationRouterInfo routerInfo = sipFactoryImpl.getNextInterestedApplication(this);
 				if(routerInfo.getNextApplicationName() != null) {
 					if(logger.isDebugEnabled()) {

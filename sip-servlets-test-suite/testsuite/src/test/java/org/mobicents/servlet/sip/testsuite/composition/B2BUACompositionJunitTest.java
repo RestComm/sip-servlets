@@ -198,6 +198,36 @@ public class B2BUACompositionJunitTest extends SipServletTestCase {
 		assertTrue(receiver.isCancelReceived());
 	}
 	
+	public void testRegisterComposition() throws Exception {
+		deployB2BUA();
+		deployCallForwarding();
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);		
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5059, 5070, receiverProtocolObjects, false);	
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = FROM_NAME;
+		String fromSipAddress = FROM_DOMAIN;
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = TO_DOMAIN;
+		String toUser = TO_NAME;
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		sender.sendSipRequest("REGISTER", fromAddress, fromAddress, null, null, true);		
+		Thread.sleep(TIMEOUT);
+		assertNotNull(receiver.getRegisterReceived());
+	}
+	
 	@Override
 	protected void tearDown() throws Exception {	
 		senderProtocolObjects.destroy();

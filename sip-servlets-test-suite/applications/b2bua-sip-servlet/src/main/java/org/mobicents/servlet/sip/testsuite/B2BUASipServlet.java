@@ -45,6 +45,30 @@ public class B2BUASipServlet extends SipServlet {
 	private static transient Logger logger = Logger.getLogger(B2BUASipServlet.class);
 
 	@Override
+	protected void doRegister(SipServletRequest request) throws ServletException,
+			IOException {
+		Map<String, List<String>> headers=new HashMap<String, List<String>>();
+		List<String> toHeaderList = new ArrayList<String>();
+		toHeaderList.add("sip:aa@sip-servlets.com");
+		headers.put("To", toHeaderList);
+		
+		B2buaHelper helper = request.getB2buaHelper();
+		SipServletRequest forkedRequest = helper.createRequest(request, true,
+				headers);				
+		
+		SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
+				SIP_FACTORY);				
+		SipURI sipUri = (SipURI) sipFactory.createURI("sip:aa@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5059");	
+		forkedRequest.setRequestURI(sipUri);
+		
+		if (logger.isDebugEnabled()) {
+			logger.debug("forkedRequest = " + forkedRequest);
+		}
+		forkedRequest.getSession().setAttribute("originalRequest", request);
+		forkedRequest.send();
+	}
+	
+	@Override
 	protected void doInvite(SipServletRequest request) throws ServletException,
 			IOException {
 		logger.info("Got request:\n" + request);
@@ -116,6 +140,14 @@ public class B2BUASipServlet extends SipServlet {
 						helper.createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), "OK");
 					responseToOriginalRequest.send();
 				}
+			} else if (sipServletResponse.getMethod().equalsIgnoreCase("REGISTER")) {
+				B2buaHelper helper = sipServletResponse.getRequest().getB2buaHelper();
+				//create and sends OK for the first call leg
+				SipSession originalSession =   
+				    helper.getLinkedSession(sipServletResponse.getSession());					
+				SipServletResponse responseToOriginalRequest = 
+					helper.createResponseToOriginalRequest(originalSession, sipServletResponse.getStatus(), "OK");
+				responseToOriginalRequest.send();
 			}
 		} else {
 			super.doResponse(sipServletResponse);
