@@ -1132,7 +1132,15 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	
 	private void updateReadyToInvalidateState() {
 		if(isValidInternal() && !readyToInvalidate) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("underlying sip sessions " + getSipSessions().size());
+			}
 			for(MobicentsSipSession sipSession : getSipSessions()) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Is Sip Session Key " + sipSession.getKey() + " ready to be invalidated, "
+							+ "isvalidInternal " + sipSession.isValidInternal() + 
+							", isReadyToInvalidate " + sipSession.isReadyToInvalidateInternal());
+				}
 				if(sipSession.isValidInternal() && !sipSession.isReadyToInvalidate()) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Sip Session not ready to be invalidated : " + sipSession.getKey());

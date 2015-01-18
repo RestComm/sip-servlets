@@ -127,7 +127,9 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 		if (cutme.canceled == false)
 			fail("The party that was supposed to be cancelled didn't cancel.");
 		assertNotNull(shootist.getLastMessageContent());	
-		assertEquals("sessionReadyToInvalidate", shootist.getLastMessageContent());
+		if(!shootist.getLastMessageContent().equals("sipSessionReadyToInvalidate") && !shootist.getLastMessageContent().equals("sessionReadyToInvalidate")) {
+			fail();
+		}
 	}
 	
 	public void testProxyReadyToInvalidateTCP() {
@@ -146,8 +148,10 @@ public class ParallelProxyWithRecordRouteTest extends SipServletTestCase {
 			fail("Conversation not complete!");
 		if (cutme.canceled == false)
 			fail("The party that was supposed to be cancelled didn't cancel.");
-		assertNotNull(shootist.getLastMessageContent());	
-		assertEquals("sessionReadyToInvalidate", shootist.getLastMessageContent());
+		assertNotNull(shootist.getLastMessageContent());
+		if(!shootist.getLastMessageContent().equals("sipSessionReadyToInvalidate") && !shootist.getLastMessageContent().equals("sessionReadyToInvalidate")) {
+			fail();
+		}
 	}
 	
 	// Non regression test for http://code.google.com/p/sipservlets/issues/detail?id=81

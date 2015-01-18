@@ -323,6 +323,10 @@ public abstract class SipManagerDelegate {
 		final String currentKeyToTag = key.getToTag();
 		final MobicentsSipSessionKey existingKey = sipSession.getKey();
 		final String toTag = existingKey.getToTag();
+		if(logger.isDebugEnabled()) {
+			logger.debug("Totag " + toTag + 
+					" currentKeyToTag " + currentKeyToTag);
+		}
 		if(toTag == null && currentKeyToTag != null) {
 			existingKey.setToTag(currentKeyToTag, false);
 			if(logger.isDebugEnabled()) {

@@ -483,16 +483,17 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 		
 		logger.info("Got response: " + response);
 		logger.info("Sip Session is :" + response.getSession(false));
-		Iterator<SipSession> it = (Iterator<SipSession>) response.getApplicationSession(false).getSessions("SIP");
-		logger.debug("dumping sip session list");
-		int i = 0;
-		while (it.hasNext()) {
-			SipSession sipSession = it.next();
-			logger.debug("sip session " + sipSession.getId());
-			i++;
+		if(response.getApplicationSession(false) != null) {
+			Iterator<SipSession> it = (Iterator<SipSession>) response.getApplicationSession(false).getSessions("SIP");
+			logger.debug("dumping sip session list");
+			int i = 0;
+			while (it.hasNext()) {
+				SipSession sipSession = it.next();
+				logger.debug("sip session " + sipSession.getId());
+				i++;
+			}
+			logger.debug("Number of SIP Sessions is :" + i);
 		}
-		logger.debug("Number of SIP Sessions is :" + i);
-		
 		SipServletResponseExt sipServletResponseExt = (SipServletResponseExt) response;
 		SipApplicationSession sas = response.getApplicationSession();
 		SipServletRequest re = response.getRequest();

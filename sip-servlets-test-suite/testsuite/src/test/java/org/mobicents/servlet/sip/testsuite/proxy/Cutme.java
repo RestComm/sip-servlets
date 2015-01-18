@@ -65,6 +65,8 @@ public class Cutme implements SipListener {
 	protected Request inviteRequest;
 
 	private Response okResponse;
+	
+	private String toTag = null;
 
 	private Dialog dialog;
 
@@ -165,7 +167,7 @@ public class Cutme implements SipListener {
 			// System.out.println("cutme: " + request);
 			Response response = messageFactory.createResponse(Response.RINGING,
 					request);
-			String toTag = Integer.toString((int) (Math.random()*10000000));
+			toTag = Integer.toString((int) (Math.random()*10000000));
 			ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
 			toHeader.setTag(toTag); // Application is supposed to set.
 			
@@ -240,6 +242,8 @@ public class Cutme implements SipListener {
 			Response responseOK = messageFactory.createResponse(200, request);
 			serverTransactionId.sendResponse(responseOK);
 			Response response = messageFactory.createResponse(487, inviteRequest);
+			ToHeader toHeader = (ToHeader) response.getHeader(ToHeader.NAME);
+			toHeader.setTag(toTag); // Application is supposed to set.
 			inviteTid.sendResponse(response);
 
 			this.canceled = true;

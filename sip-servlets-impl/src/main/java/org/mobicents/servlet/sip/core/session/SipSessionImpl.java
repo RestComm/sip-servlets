@@ -938,8 +938,18 @@ public class SipSessionImpl implements MobicentsSipSession {
         // and leaking in the JBoss Cache
         MobicentsSipSession parentSipSession = getParentSession();
         if(parentSipSession == null) {
-			manager.removeSipSession(key);		
-			sipApplicationSession.getSipContext().getSipSessionsUtil().removeCorrespondingSipSession(key);
+        	if(derivedSipSessions == null || derivedSipSessions.isEmpty()) {
+        		// https://github.com/Mobicents/sip-servlets/issues/41
+        		if(logger.isDebugEnabled()) {
+            		logger.debug("sip session " + key + " has no derived sessions removing it from the manager");
+            	}
+				manager.removeSipSession(key);		
+				sipApplicationSession.getSipContext().getSipSessionsUtil().removeCorrespondingSipSession(key);
+        	} else {
+        		if(logger.isDebugEnabled()) {
+            		logger.debug("sip session " + key + " is the parent session, not removing it from the manager yet as there is still derived sessions");
+            	}
+        	}
         } else {
         	// https://github.com/Mobicents/sip-servlets/issues/41
         	if(logger.isDebugEnabled()) {
