@@ -468,7 +468,7 @@ public abstract class MessageDispatcher {
 	
 	public static boolean securityCheck(MobicentsSipServletRequest request)
 	{
-		MobicentsSipApplicationSession appSession = (MobicentsSipApplicationSession) request.getApplicationSession();
+		MobicentsSipApplicationSession appSession = (MobicentsSipApplicationSession) request.getSipApplicationSession(true);
 		SipContext sipStandardContext = appSession.getSipContext();
 		boolean authorized = sipStandardContext.authorize(request);
 		

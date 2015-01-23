@@ -542,7 +542,12 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 * @see javax.servlet.sip.SipServletMessage#getApplicationSession()
 	 */
 	public SipApplicationSession getApplicationSession() {
-		return getApplicationSession(true);
+		MobicentsSipApplicationSession sipApplicationSession = getSipApplicationSession(true);
+		if(sipApplicationSession == null) {
+			return null;
+		} else {
+			return sipApplicationSession.getFacade();
+		}
 	}
 
 	/*
@@ -551,6 +556,15 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 * @see javax.servlet.sip.SipServletMessage#getApplicationSession(boolean)
 	 */
 	public SipApplicationSession getApplicationSession(boolean create) {
+		MobicentsSipApplicationSession sipApplicationSession = getSipApplicationSession(create);
+		if(sipApplicationSession == null) {
+			return null;
+		} else {
+			return sipApplicationSession.getFacade();
+		}
+	}
+	
+	public MobicentsSipApplicationSession getSipApplicationSession(boolean create) {
 		MobicentsSipSession sipSession = getSipSession();
 		if(sipSession != null) {
 			MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
@@ -1078,7 +1092,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		
 		MobicentsSipSession session = getSipSession();
 		if (session == null && create) {
-			MobicentsSipApplicationSession sipApplicationSessionImpl = (MobicentsSipApplicationSession)getApplicationSession(create);
+			MobicentsSipApplicationSession sipApplicationSessionImpl = (MobicentsSipApplicationSession)getSipApplicationSession(create);
 			MobicentsSipSessionKey sessionKey = SessionManagerUtil.getSipSessionKey(sipApplicationSessionImpl.getKey().getId(), currentApplicationName, message, false);
 			session = sipApplicationSessionImpl.getSipContext().getSipManager().getSipSession(sessionKey, create,
 					sipFactoryImpl, sipApplicationSessionImpl);

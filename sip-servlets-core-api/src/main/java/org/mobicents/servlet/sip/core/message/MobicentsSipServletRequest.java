@@ -24,6 +24,7 @@ package org.mobicents.servlet.sip.core.message;
 
 import org.mobicents.javax.servlet.sip.SipServletRequestExt;
 import org.mobicents.servlet.sip.core.security.SipPrincipal;
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 
 /**
  * 

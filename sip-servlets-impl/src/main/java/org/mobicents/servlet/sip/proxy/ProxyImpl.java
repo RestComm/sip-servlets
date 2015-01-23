@@ -142,7 +142,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	
 	public ProxyImpl(SipServletRequestImpl request, SipFactoryImpl sipFactoryImpl)
 	{
-		this.proxyTimerService = ((MobicentsSipApplicationSession)request.getApplicationSession(false)).getSipContext().getProxyTimerService();
+		this.proxyTimerService = ((MobicentsSipApplicationSession)request.getSipApplicationSession(false)).getSipContext().getProxyTimerService();
 		this.originalRequest = request;
 		this.sipFactoryImpl = sipFactoryImpl;
 		this.proxyBranches = new LinkedHashMap<URI, ProxyBranchImpl> ();		

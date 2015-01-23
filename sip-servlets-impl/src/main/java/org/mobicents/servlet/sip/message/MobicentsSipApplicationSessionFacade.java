@@ -309,8 +309,8 @@ public class MobicentsSipApplicationSessionFacade implements
 		return sipApplicationSession.getExpirationTimeInternal();
 	}
 
-	public Set<MobicentsSipSession> getSipSessions() {
-		return sipApplicationSession.getSipSessions();
+	public Set<MobicentsSipSession> getSipSessions(boolean internal) {
+		return sipApplicationSession.getSipSessions(internal);
 	}
 
 	public SipApplicationSessionTimerTask getExpirationTimerTask() {

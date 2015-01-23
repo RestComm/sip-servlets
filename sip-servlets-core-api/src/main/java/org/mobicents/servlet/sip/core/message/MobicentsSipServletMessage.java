@@ -23,6 +23,7 @@ import javax.servlet.sip.SipServletMessage;
 import javax.sip.Transaction;
 import javax.sip.message.Message;
 
+import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 
 /**
@@ -41,6 +42,9 @@ public interface MobicentsSipServletMessage extends SipServletMessage {
 	MobicentsTransactionApplicationData getTransactionApplicationData();
 	
 	Message getMessage();
+
 	// https://code.google.com/p/sipservlets/issues/detail?id=21
 	boolean isMessageSent();
+	
+	MobicentsSipApplicationSession getSipApplicationSession(boolean create);
 }

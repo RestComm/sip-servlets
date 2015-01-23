@@ -366,7 +366,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 		}
 	    
 		final SipServletRequestImpl origRequestImpl = (SipServletRequestImpl) origRequest;
-		final MobicentsSipApplicationSession originalAppSession = (MobicentsSipApplicationSession) origRequestImpl.getApplicationSession(false);		
+		final MobicentsSipApplicationSession originalAppSession = (MobicentsSipApplicationSession) origRequestImpl.getSipApplicationSession(false);		
 		if (originalAppSession == null) {
 			throw new IllegalStateException("original request's app session does not exists");
 		}			

@@ -90,7 +90,7 @@ public interface MobicentsSipApplicationSession extends SipApplicationSession, S
 
 	long getSipApplicationSessionTimeout();
 	
-	Set<MobicentsSipSession> getSipSessions();
+	Set<MobicentsSipSession> getSipSessions(boolean internal);
 
 	void invalidate(boolean bypassCheck);
 	public void setOrphan(boolean orphan);

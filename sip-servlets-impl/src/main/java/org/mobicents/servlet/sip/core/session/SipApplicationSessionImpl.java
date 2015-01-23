@@ -465,7 +465,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		if(!isValid()) {
 			throw new IllegalStateException("SipApplicationSession already invalidated !");
 		}
-		Set<MobicentsSipSession> sipSessions = getSipSessions();
+		Set<MobicentsSipSession> sipSessions = getSipSessions(false);
 		Set<HttpSession> httpSessions = getHttpSessions();
 		Set protocolSessions = new HashSet();
 		protocolSessions.addAll(httpSessions);
@@ -485,22 +485,27 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			throw new NullPointerException("protocol given in argument is null");
 		}
 		if("SIP".equalsIgnoreCase(protocol)) {
-			return getSipSessions().iterator();
+			return getSipSessions(false).iterator();
 		} else if("HTTP".equalsIgnoreCase(protocol)) {			
 			return getHttpSessions().iterator();
 		} else {
 			throw new IllegalArgumentException(protocol + " sessions are not handled by this container");
 		}
 	}
-	
-	public Set<MobicentsSipSession> getSipSessions() {
+	// internal flag in parameter added for https://github.com/Mobicents/sip-servlets/issues/43 so that we return the facade object
+	// to avoid serialization issues
+	public Set<MobicentsSipSession> getSipSessions(boolean internal) {
 		Set<MobicentsSipSession> retSipSessions = new HashSet<MobicentsSipSession>();
 		if(sipSessions != null) {
 			for(SipSessionKey sipSessionKey : sipSessions) {
 				MobicentsSipSession sipSession = sipContext.getSipManager().getSipSession(sipSessionKey, false, null, this);
 				if(sipSession != null) {
 					if(sipSession.isValidInternal()) {
-						retSipSessions.add(sipSession);
+						if(internal) {
+							retSipSessions.add(sipSession);
+						} else {
+							retSipSessions.add(sipSession.getFacade());
+						}
 					}
 					// https://github.com/Mobicents/sip-servlets/issues/41 
 					// Adding derived Sessions to the list of returned sip sessions
@@ -508,7 +513,11 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 					while (derivedSessionsIterator.hasNext()) {
 						MobicentsSipSession derivedSipSession = derivedSessionsIterator
 								.next();
-						retSipSessions.add(derivedSipSession);
+						if(internal) {
+							retSipSessions.add(derivedSipSession);
+						} else {
+							retSipSessions.add(derivedSipSession.getFacade());
+						}
 					}
 				}
 			}
@@ -554,7 +563,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 			//can happen if the id passed is invalid
 		}		 
 		if(isPresent) {
-			return sipContext.getSipManager().getSipSession(sipSessionKey, false, null, this);
+			return sipContext.getSipManager().getSipSession(sipSessionKey, false, null, this).getFacade();
 		} else {
 			return null;
 		}
@@ -635,7 +644,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		}
 		
 		//doing the invalidation
-		for(MobicentsSipSession session: getSipSessions()) {
+		for(MobicentsSipSession session: getSipSessions(true)) {
 			if(session.isValidInternal()) {
 				boolean lockSession = false;
 				if(bypassCheck && sipContext.getConcurrencyControlMode() == ConcurrencyControlMode.SipSession) {
@@ -1133,9 +1142,9 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 	private void updateReadyToInvalidateState() {
 		if(isValidInternal() && !readyToInvalidate) {
 			if(logger.isDebugEnabled()) {
-				logger.debug("underlying sip sessions " + getSipSessions().size());
+				logger.debug("underlying sip sessions " + getSipSessions(true).size());
 			}
-			for(MobicentsSipSession sipSession : getSipSessions()) {
+			for(MobicentsSipSession sipSession : getSipSessions(true)) {
 				if(logger.isDebugEnabled()) {
 					logger.debug("Is Sip Session Key " + sipSession.getKey() + " ready to be invalidated, "
 							+ "isvalidInternal " + sipSession.isValidInternal() + 
@@ -1190,7 +1199,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 		// and if the invalidateWhenReady flag is true
 		if(isValidInternal() && readyToInvalidate && invalidateWhenReady) {						
 			boolean allSipSessionsInvalidated = true;
-			for(MobicentsSipSession sipSession : getSipSessions()) {
+			for(MobicentsSipSession sipSession : getSipSessions(true)) {
 				if(sipSession.isValidInternal()) {
 					allSipSessionsInvalidated = false;
 					break;
