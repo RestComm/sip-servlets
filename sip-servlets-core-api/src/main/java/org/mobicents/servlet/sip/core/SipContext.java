@@ -125,8 +125,6 @@ public interface SipContext {
 
 	String getEngineName();
 
-	String getBasePath();
-	
 	boolean notifySipContextListeners(SipContextEvent event);
 	
 	/**

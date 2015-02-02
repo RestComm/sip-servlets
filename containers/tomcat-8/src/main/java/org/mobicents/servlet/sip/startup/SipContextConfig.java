@@ -32,6 +32,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Enumeration;
+import java.util.Locale;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -45,18 +46,15 @@ import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardWrapper;
 import org.apache.catalina.startup.Constants;
 import org.apache.catalina.startup.ContextConfig;
-import org.apache.catalina.startup.DigesterFactory;
 import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.util.ContextName;
 import org.apache.log4j.Logger;
-import org.apache.naming.resources.DirContextURLConnection;
-import org.apache.naming.resources.FileDirContext;
-import org.apache.naming.resources.ResourceAttributes;
 import org.apache.tomcat.util.ExceptionUtils;
 import org.apache.tomcat.util.bcel.classfile.AnnotationEntry;
 import org.apache.tomcat.util.bcel.classfile.ClassFormatException;
 import org.apache.tomcat.util.bcel.classfile.ClassParser;
 import org.apache.tomcat.util.bcel.classfile.JavaClass;
+import org.apache.tomcat.util.descriptor.DigesterFactory;
 import org.apache.tomcat.util.digester.Digester;
 import org.mobicents.servlet.sip.annotations.AnnotationVerificationException;
 import org.mobicents.servlet.sip.annotations.ClassFileScanner;
@@ -124,7 +122,7 @@ public class SipContextConfig extends ContextConfig {
 			context.setWrapperClass(org.mobicents.servlet.sip.catalina.SipServletImpl.class.getName());
 
 			//annotations scanning
-			ClassFileScanner scanner = new ClassFileScanner(((CatalinaSipContext)context).getBasePath(), (CatalinaSipContext)context);
+			ClassFileScanner scanner = new ClassFileScanner(context.getDocBase(), (CatalinaSipContext)context);
 			try {
 				scanner.scan();
 			} catch (AnnotationVerificationException ave) {
@@ -133,19 +131,20 @@ public class SipContextConfig extends ContextConfig {
 				ok = false;
 			}					
 
-			String applicationSipXmlPath = SipContext.APPLICATION_SIP_XML;
+			String applicationSipXmlPath =  "/" + SipContext.APPLICATION_SIP_XML;
 			InputStream sipXmlInputStream = servletContext
-					.getResourceAsStream(applicationSipXmlPath);			
-			if(sipXmlInputStream == null) {
-				// http://code.google.com/p/sipservlets/issues/detail?id=167 Deal with strict compliance
-				if(logger.isInfoEnabled()) {
-					logger.info(applicationSipXmlPath + " has not been found, checking with a leading slash as servlet compliance might be enabled");
-				}
-				applicationSipXmlPath = "/" + SipContext.APPLICATION_SIP_XML;
-				sipXmlInputStream = servletContext
-						.getResourceAsStream(applicationSipXmlPath);
-				
-			}
+					.getResourceAsStream(applicationSipXmlPath);
+			// compliance is now enforced in Tomcat 8
+//			if(sipXmlInputStream == null) {
+//				// http://code.google.com/p/sipservlets/issues/detail?id=167 Deal with strict compliance
+//				if(logger.isInfoEnabled()) {
+//					logger.info(applicationSipXmlPath + " has not been found, checking with a leading slash as servlet compliance might be enabled");
+//				}
+//				applicationSipXmlPath = "/" + SipContext.APPLICATION_SIP_XML;
+//				sipXmlInputStream = servletContext
+//						.getResourceAsStream(applicationSipXmlPath);
+//				
+//			}
 			// processing of the sip.xml file
 			if (sipXmlInputStream != null) {
 				if(logger.isDebugEnabled()) {
@@ -154,7 +153,8 @@ public class SipContextConfig extends ContextConfig {
 
 				Digester sipDigester =  DigesterFactory.newDigester(context.getXmlValidation(),
 						context.getXmlNamespaceAware(),
-						new SipRuleSet());
+						new SipRuleSet(),
+						false);
 				EntityResolver entityResolver = new SipEntityResolver();
 				sipDigester.setValidating(false);		
 				sipDigester.setEntityResolver(entityResolver);				
@@ -239,120 +239,217 @@ public class SipContextConfig extends ContextConfig {
 	}
 
 	/**
-	 * Adjust docBase.
-	 */
-	protected void fixDocBase() throws IOException {
-		if(context instanceof SipContext) {
-			Host host = (Host) context.getParent();
-			String appBase = host.getAppBase();
-			boolean unpackWARs = true;
-			if (host instanceof StandardHost) {
-				unpackWARs = ((StandardHost) host).isUnpackWARs()
-				&& ((StandardContext) context).getUnpackWAR();
-			}
-			File canonicalAppBase = new File(appBase);
-			if (canonicalAppBase.isAbsolute()) {
-				canonicalAppBase = canonicalAppBase.getCanonicalFile();
-			} else {
-				canonicalAppBase = new File(System.getProperty("catalina.base"),
-						appBase).getCanonicalFile();
-			}
-			String docBase = context.getDocBase();
-			if (docBase == null) {
-				// Trying to guess the docBase according to the path
-				String path = context.getPath();
-				if (path == null) {
-					return;
-				}
+     * Adjust docBase.
+     */
+    protected void fixDocBase()
+        throws IOException {
 
-				ContextName cn = new ContextName(path, context.getWebappVersion());
-				docBase = cn.getBaseName();
+        Host host = (Host) context.getParent();
+        File appBase = host.getAppBaseFile();
 
-				//				if (path.equals("")) {
-				//					docBase = "ROOT";
-				//				} else {
-				//					if (path.startsWith("/")) {
-				//	                    docBase = path.substring(1).replace('/', '#');
-				//	                } else {
-				//	                    docBase = path.replace('/', '#');
-				//	                }
-				//				}
-			}
-			File file = new File(docBase);
-			if (!file.isAbsolute()) {
-				docBase = (new File(canonicalAppBase, docBase)).getPath();
-			} else {
-				docBase = file.getCanonicalPath();
-			}
-			file = new File(docBase);
-			//			String origDocBase = docBase;
-			if ((docBase.toLowerCase().endsWith(".sar") || docBase.toLowerCase()
-					.endsWith(".war"))
-					&& !file.isDirectory() && unpackWARs) {
-				URL war = new URL("jar:" + (new File(docBase)).toURI().toURL() + "!/");
-		        //Issue:175: http://code.google.com/p/sipservlets/issues/detail?id=175
-				ContextName cn = new ContextName(context.getPath(),
-		                context.getWebappVersion());
-		        String contextPath = cn.getBaseName();
+        String docBase = context.getDocBase();
+        if (docBase == null) {
+            // Trying to guess the docBase according to the path
+            String path = context.getPath();
+            if (path == null) {
+                return;
+            }
+            ContextName cn = new ContextName(path, context.getWebappVersion());
+            docBase = cn.getBaseName();
+        }
 
-				//				if (contextPath.equals("")) {
-				//					contextPath = "ROOT";
-				//				} else {
-				//		            if (contextPath.lastIndexOf('/') > 0) {
-				//		                contextPath = "/" + contextPath.substring(1).replace('/','#');
-				//		            }
-				//		        }
+        File file = new File(docBase);
+        if (!file.isAbsolute()) {
+            docBase = (new File(appBase, docBase)).getPath();
+        } else {
+            docBase = file.getCanonicalPath();
+        }
+        file = new File(docBase);
+        String origDocBase = docBase;
 
-				docBase = ExpandWar.expand(host, war, contextPath);
-				file = new File(docBase);
-				docBase = file.getCanonicalPath();
-				if (context instanceof CatalinaSipContext) {
-					FileDirContext fileDirContext =new FileDirContext();
-					fileDirContext.setDocBase(docBase);
-					((CatalinaSipContext) context).setResources(fileDirContext );
-				}
-			} else {
-				File docDir = new File(docBase);
-				if (!docDir.exists()) {
-					String[] extensions = new String[] { ".sar", ".war" };
-					for (String extension : extensions) {
-						File archiveFile = new File(docBase + extension);
-						if (archiveFile.exists()) {
-							if (unpackWARs) {
-								URL war = new URL("jar:" + archiveFile.toURI().toURL()
-										+ "!/");
-								docBase = ExpandWar.expand(host, war, context
-										.getPath());
-								file = new File(docBase);
-								docBase = file.getCanonicalPath();
-							} else {
-								docBase = archiveFile.getCanonicalPath();
-							}
+        ContextName cn = new ContextName(context.getPath(),
+                context.getWebappVersion());
+        String pathName = cn.getBaseName();
 
-							break;
+        boolean unpackWARs = true;
+        if (host instanceof StandardHost) {
+            unpackWARs = ((StandardHost) host).isUnpackWARs();
+            if (unpackWARs && context instanceof StandardContext) {
+                unpackWARs =  ((StandardContext) context).getUnpackWAR();
+            }
+        }
+
+        if ((docBase.toLowerCase(Locale.ENGLISH).endsWith(".sar") || docBase.toLowerCase(Locale.ENGLISH).endsWith(".war")) && !file.isDirectory()) {
+            if (unpackWARs) {
+                URL war = new URL("jar:" + (new File(docBase)).toURI().toURL() + "!/");
+                docBase = ExpandWar.expand(host, war, pathName);
+                file = new File(docBase);
+                docBase = file.getCanonicalPath();
+                if (context instanceof StandardContext) {
+                    ((StandardContext) context).setOriginalDocBase(origDocBase);
+                }
+            } else {
+                URL war =
+                        new URL("jar:" + (new File (docBase)).toURI().toURL() + "!/");
+                ExpandWar.validate(host, war, pathName);
+            }
+        } else {
+            File docDir = new File(docBase);
+            if (!docDir.exists()) {
+            	String[] extensions = new String[] { ".sar", ".war" };
+				for (String extension : extensions) {
+					File archiveFile = new File(docBase + extension);
+					if (archiveFile.exists()) {
+						URL war =
+		                        new URL("jar:" + archiveFile.toURI().toURL() + "!/");
+						if (unpackWARs) {
+							docBase = ExpandWar.expand(host, war, context
+									.getPath());
+							file = new File(docBase);
+							docBase = file.getCanonicalPath();
+						} else {
+							docBase = archiveFile.getCanonicalPath();
+							ExpandWar.validate(host, war, pathName);
 						}
-					}
-					if (context instanceof CatalinaSipContext) {
-						FileDirContext fileDirContext =new FileDirContext();
-						fileDirContext.setDocBase(docBase);
-						((CatalinaSipContext) context).setResources(fileDirContext );
+
+						break;
 					}
 				}
-			}
-			if (docBase.startsWith(canonicalAppBase.getPath() + File.separatorChar)) {
-				docBase = docBase.substring(canonicalAppBase.getPath().length());
-				docBase = docBase.replace(File.separatorChar, '/');
-				if (docBase.startsWith("/")) {
-					docBase = docBase.substring(1);
-				}
-			} else {
-				docBase = docBase.replace(File.separatorChar, '/');
-			}
-			context.setDocBase(docBase);
-		} else {
-			super.fixDocBase();
-		}
-	}
+                if (context instanceof StandardContext) {
+                    ((StandardContext) context).setOriginalDocBase(origDocBase);
+                }
+            }
+        }
+
+        if (docBase.startsWith(appBase.getPath() + File.separatorChar)) {
+            docBase = docBase.substring(appBase.getPath().length());
+            docBase = docBase.replace(File.separatorChar, '/');
+            if (docBase.startsWith("/")) {
+                docBase = docBase.substring(1);
+            }
+        } else {
+            docBase = docBase.replace(File.separatorChar, '/');
+        }
+
+        context.setDocBase(docBase);
+
+    }
+//	
+//	/**
+//	 * Adjust docBase.
+//	 */
+//	protected void fixDocBase() throws IOException {
+//		if(context instanceof SipContext) {
+//			Host host = (Host) context.getParent();
+//			String appBase = host.getAppBase();
+//			boolean unpackWARs = true;
+//			if (host instanceof StandardHost) {
+//				unpackWARs = ((StandardHost) host).isUnpackWARs()
+//				&& ((StandardContext) context).getUnpackWAR();
+//			}
+//			File canonicalAppBase = new File(appBase);
+//			if (canonicalAppBase.isAbsolute()) {
+//				canonicalAppBase = canonicalAppBase.getCanonicalFile();
+//			} else {
+//				canonicalAppBase = new File(System.getProperty("catalina.base"),
+//						appBase).getCanonicalFile();
+//			}
+//			String docBase = context.getDocBase();
+//			if (docBase == null) {
+//				// Trying to guess the docBase according to the path
+//				String path = context.getPath();
+//				if (path == null) {
+//					return;
+//				}
+//
+//				ContextName cn = new ContextName(path, context.getWebappVersion());
+//				docBase = cn.getBaseName();
+//
+//				//				if (path.equals("")) {
+//				//					docBase = "ROOT";
+//				//				} else {
+//				//					if (path.startsWith("/")) {
+//				//	                    docBase = path.substring(1).replace('/', '#');
+//				//	                } else {
+//				//	                    docBase = path.replace('/', '#');
+//				//	                }
+//				//				}
+//			}
+//			File file = new File(docBase);
+//			if (!file.isAbsolute()) {
+//				docBase = (new File(canonicalAppBase, docBase)).getPath();
+//			} else {
+//				docBase = file.getCanonicalPath();
+//			}
+//			file = new File(docBase);
+//			//			String origDocBase = docBase;
+//			if ((docBase.toLowerCase().endsWith(".sar") || docBase.toLowerCase()
+//					.endsWith(".war"))
+//					&& !file.isDirectory() && unpackWARs) {
+//				URL war = new URL("jar:" + (new File(docBase)).toURI().toURL() + "!/");
+//		        //Issue:175: http://code.google.com/p/sipservlets/issues/detail?id=175
+//				ContextName cn = new ContextName(context.getPath(),
+//		                context.getWebappVersion());
+//		        String contextPath = cn.getBaseName();
+//
+//				//				if (contextPath.equals("")) {
+//				//					contextPath = "ROOT";
+//				//				} else {
+//				//		            if (contextPath.lastIndexOf('/') > 0) {
+//				//		                contextPath = "/" + contextPath.substring(1).replace('/','#');
+//				//		            }
+//				//		        }
+//
+//				docBase = ExpandWar.expand(host, war, contextPath);
+//				file = new File(docBase);
+//				docBase = file.getCanonicalPath();
+//				if (context instanceof CatalinaSipContext) {
+//					FileDirContext fileDirContext =new FileDirContext();
+//					fileDirContext.setDocBase(docBase);
+//					((CatalinaSipContext) context).setResources(fileDirContext );
+//				}
+//			} else {
+//				File docDir = new File(docBase);
+//				if (!docDir.exists()) {
+//					String[] extensions = new String[] { ".sar", ".war" };
+//					for (String extension : extensions) {
+//						File archiveFile = new File(docBase + extension);
+//						if (archiveFile.exists()) {
+//							if (unpackWARs) {
+//								URL war = new URL("jar:" + archiveFile.toURI().toURL()
+//										+ "!/");
+//								docBase = ExpandWar.expand(host, war, context
+//										.getPath());
+//								file = new File(docBase);
+//								docBase = file.getCanonicalPath();
+//							} else {
+//								docBase = archiveFile.getCanonicalPath();
+//							}
+//
+//							break;
+//						}
+//					}
+//					if (context instanceof CatalinaSipContext) {
+//						FileDirContext fileDirContext =new FileDirContext();
+//						fileDirContext.setDocBase(docBase);
+//						((CatalinaSipContext) context).setResources(fileDirContext );
+//					}
+//				}
+//			}
+//			if (docBase.startsWith(canonicalAppBase.getPath() + File.separatorChar)) {
+//				docBase = docBase.substring(canonicalAppBase.getPath().length());
+//				docBase = docBase.replace(File.separatorChar, '/');
+//				if (docBase.startsWith("/")) {
+//					docBase = docBase.substring(1);
+//				}
+//			} else {
+//				docBase = docBase.replace(File.separatorChar, '/');
+//			}
+//			context.setDocBase(docBase);
+//		} else {
+//			super.fixDocBase();
+//		}
+//	}
 
 	
 	
@@ -370,8 +467,9 @@ public class SipContextConfig extends ContextConfig {
 			return;
 		} else if ("jar".equals(webinfClasses.getProtocol())) {
 			processAnnotationsJar(webinfClasses);
-		} else if ("jndi".equals(webinfClasses.getProtocol())) {
-			processAnnotationsJndi(webinfClasses);
+		// Removed from Tomcat 8	
+//		} else if ("jndi".equals(webinfClasses.getProtocol())) {
+//			processAnnotationsJndi(webinfClasses);
 		} else if ("file".equals(webinfClasses.getProtocol())) {
 			try {
 				processAnnotationsFile(new File(webinfClasses.toURI()));
@@ -464,77 +562,80 @@ public class SipContextConfig extends ContextConfig {
 		}
 	}
 
-	protected void processAnnotationsJndi(URL url) {
-		try {
-			URLConnection urlConn = url.openConnection();
-			DirContextURLConnection dcUrlConn;
-			if (!(urlConn instanceof DirContextURLConnection)) {
-				// This should never happen
-				sm.getString("contextConfig.jndiUrlNotDirContextConn", url);
-				return;
-			}
-
-			dcUrlConn = (DirContextURLConnection) urlConn;
-			dcUrlConn.setUseCaches(false);
-
-			String type = dcUrlConn.getHeaderField(ResourceAttributes.TYPE);
-			if (ResourceAttributes.COLLECTION_TYPE.equals(type)) {
-				// Collection
-				Enumeration<String> dirs = dcUrlConn.list();
-				while (dirs.hasMoreElements()) {
-					String dir = dirs.nextElement();
-					URL dirUrl = new URL(url.toString() + '/' + dir);
-					processAnnotationsJndi(dirUrl);
-				}
-
-			} else {
-				// Single file
-				if (url.getPath().endsWith(".class")) {
-					InputStream is = null;
-					try {
-						is = dcUrlConn.getInputStream();
-						processAnnotationsStream(is);
-					} catch (IOException e) {
-						logger.error(sm.getString("contextConfig.inputStreamJndi",
-								url),e);
-					} finally {
-						if (is != null) {
-							try {
-								is.close();
-							} catch (Throwable t) {
-								ExceptionUtils.handleThrowable(t);
-							}
-						}
-					}
-				}
-			}
-		} catch (IOException e) {
-			logger.error(sm.getString("contextConfig.jndiUrl", url), e);
-		} 
-	}
+	// removed from Tomcat 8
+//	protected void processAnnotationsJndi(URL url) {
+//		try {
+//			URLConnection urlConn = url.openConnection();
+//			DirContextURLConnection dcUrlConn;
+//			if (!(urlConn instanceof DirContextURLConnection)) {
+//				// This should never happen
+//				sm.getString("contextConfig.jndiUrlNotDirContextConn", url);
+//				return;
+//			}
+//
+//			dcUrlConn = (DirContextURLConnection) urlConn;
+//			dcUrlConn.setUseCaches(false);
+//
+//			String type = dcUrlConn.getHeaderField(ResourceAttributes.TYPE);
+//			if (ResourceAttributes.COLLECTION_TYPE.equals(type)) {
+//				// Collection
+//				Enumeration<String> dirs = dcUrlConn.list();
+//				while (dirs.hasMoreElements()) {
+//					String dir = dirs.nextElement();
+//					URL dirUrl = new URL(url.toString() + '/' + dir);
+//					processAnnotationsJndi(dirUrl);
+//				}
+//
+//			} else {
+//				// Single file
+//				if (url.getPath().endsWith(".class")) {
+//					InputStream is = null;
+//					try {
+//						is = dcUrlConn.getInputStream();
+//						processAnnotationsStream(is);
+//					} catch (IOException e) {
+//						logger.error(sm.getString("contextConfig.inputStreamJndi",
+//								url),e);
+//					} finally {
+//						if (is != null) {
+//							try {
+//								is.close();
+//							} catch (Throwable t) {
+//								ExceptionUtils.handleThrowable(t);
+//							}
+//						}
+//					}
+//				}
+//			}
+//		} catch (IOException e) {
+//			logger.error(sm.getString("contextConfig.jndiUrl", url), e);
+//		} 
+//	}
 
 	protected void processAnnotationsStream(InputStream is)
 	throws ClassFormatException, IOException {
 
-		ClassParser parser = new ClassParser(is, null);
+		ClassParser parser = new ClassParser(is);
 		JavaClass clazz = parser.parse();
 
 		AnnotationEntry[] annotationsEntries = clazz.getAnnotationEntries();
-
-		for (AnnotationEntry ae : annotationsEntries) {
-			String type = ae.getAnnotationType();
-			if ("Ljavax/servlet/annotation/WebServlet;".equals(type)) {
-				hasWebAnnotations=true;
-			}else if ("Ljavax/servlet/annotation/WebFilter;".equals(type)) {
-				hasWebAnnotations=true;
-			}else if ("Ljavax/servlet/annotation/WebListener;".equals(type)) {
-				hasWebAnnotations=true;
-			}else if ("Ljavax/servlet/annotation/WebInitParam;".equals(type)) {
-				hasWebAnnotations=true;
-			}else if ("Ljavax/servlet/annotation/MultipartConfig;".equals(type)) {
-				hasWebAnnotations=true;
-			} else {
-				// Unknown annotation - ignore
+		if (annotationsEntries != null) {
+            String className = clazz.getClassName();
+			for (AnnotationEntry ae : annotationsEntries) {
+				String type = ae.getAnnotationType();
+				if ("Ljavax/servlet/annotation/WebServlet;".equals(type)) {
+					hasWebAnnotations=true;
+				}else if ("Ljavax/servlet/annotation/WebFilter;".equals(type)) {
+					hasWebAnnotations=true;
+				}else if ("Ljavax/servlet/annotation/WebListener;".equals(type)) {
+					hasWebAnnotations=true;
+				}else if ("Ljavax/servlet/annotation/WebInitParam;".equals(type)) {
+					hasWebAnnotations=true;
+				}else if ("Ljavax/servlet/annotation/MultipartConfig;".equals(type)) {
+					hasWebAnnotations=true;
+				} else {
+					// Unknown annotation - ignore
+				}
 			}
 		}
 	}
