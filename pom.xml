@@ -333,6 +333,75 @@
 			</dependencies>
 		</profile>
 		<profile>
+			<id>tomcat-8</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<modules>
+				<module>containers/sip-servlets-catalina-8</module>
+				<module>containers/tomcat-8</module>
+			</modules>
+			<properties>
+				<tomcat-8.version>8.0.18</tomcat-8.version>
+			</properties>
+			<dependencies>
+				<!-- j2ee dependencies -->
+				<dependency>
+					<groupId>javax</groupId>
+					<artifactId>javaee-web-api</artifactId>
+					<version>6.0</version>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<compilerArguments>
+								<g />
+							</compilerArguments>
+							<source>1.7</source>
+							<target>1.7</target>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>tomcat-8-distro</id>
+			<modules>
+				<module>containers/sip-servlets-catalina-8</module>
+				<module>containers/tomcat-8</module>
+			</modules>
+			<properties>
+				<tomcat-8.version>8.0.18</tomcat-8.version>
+			</properties>
+			<dependencies>
+				<!-- j2ee dependencies -->
+				<dependency>
+					<groupId>javax</groupId>
+					<artifactId>javaee-web-api</artifactId>
+					<version>6.0</version>
+					<scope>provided</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<configuration>
+							<compilerArguments>
+								<g />
+							</compilerArguments>
+							<source>1.7</source>
+							<target>1.7</target>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
 			<id>as7</id>
 			<modules>
 				<module>containers/sip-servlets-as7</module>
