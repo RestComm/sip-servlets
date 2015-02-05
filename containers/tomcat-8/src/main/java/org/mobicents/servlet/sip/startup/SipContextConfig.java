@@ -122,7 +122,10 @@ public class SipContextConfig extends ContextConfig {
 			context.setWrapperClass(org.mobicents.servlet.sip.catalina.SipServletImpl.class.getName());
 
 			//annotations scanning
-			ClassFileScanner scanner = new ClassFileScanner(context.getDocBase(), (CatalinaSipContext)context);
+			Host host = (Host) context.getParent();
+	        File appBase = host.getAppBaseFile();
+	        
+			ClassFileScanner scanner = new ClassFileScanner(appBase.getPath() +  File.separatorChar + ((CatalinaSipContext)context).getDocBase(), (CatalinaSipContext)context);
 			try {
 				scanner.scan();
 			} catch (AnnotationVerificationException ave) {

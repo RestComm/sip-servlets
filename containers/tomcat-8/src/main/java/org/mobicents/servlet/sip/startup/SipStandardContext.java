@@ -358,13 +358,24 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			setUseNaming(false);
 		}
 
+		// Standard container startup
+        if (logger.isDebugEnabled())
+            logger.debug("Processing standard container startup");
+
+        Loader loader = getLoader();
+        if ((loader != null) && (loader instanceof Lifecycle)) {
+        	// we start the loader before we create the sip instance manager otherwise the classloader is null 
+            ((Lifecycle) loader).start();
+        }
+        
 		if (ok && isUseNaming()) {
             if (getNamingContextListener() == null) {
-                NamingContextListener ncl = new SipNamingContextListener();
-                ncl.setName(getNamingContextName());
-                ncl.setExceptionOnFailedWrite(getJndiExceptionOnFailedWrite());
-                addLifecycleListener(ncl);
-                setNamingContextListener(ncl);
+                NamingContextListener namingContextListener = new SipNamingContextListener();
+                namingContextListener.setName(getNamingContextName());
+                namingContextListener.setExceptionOnFailedWrite(getJndiExceptionOnFailedWrite());
+                setNamingContextListener(namingContextListener);
+                addLifecycleListener(namingContextListener);
+                addContainerListener(namingContextListener);  
             }
             // Replace the default annotation processor. This is needed to handle resource injection
 			// for SipFactory, Session utils and other objects residing in the servlet context space.
@@ -376,17 +387,9 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 			this.setInstanceManager(
 					new DefaultSipInstanceManager(
 							getNamingContextListener().getEnvContext(),
-							injectionMap, this, this.getClass().getClassLoader()));
+							injectionMap, this, this.getLoader().getClassLoader()));
         }
 		
-        // Standard container startup
-        if (logger.isDebugEnabled())
-            logger.debug("Processing standard container startup");
-
-        Loader loader = getLoader();
-        if ((loader != null) && (loader instanceof Lifecycle))
-            ((Lifecycle) loader).start();
-
         // Acquire clustered manager
         Manager contextManager = null;
         Manager manager = getManager();
@@ -444,7 +447,7 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 					this.setInstanceManager(
 							new DefaultSipInstanceManager(
 									getNamingContextListener().getEnvContext(),
-									injectionMap, this, this.getClass().getClassLoader()));
+									injectionMap, this, this.getLoader().getClassLoader()));
 				} 
 			}		
 			getServletContext().setAttribute(InstanceManager.class.getName(), getInstanceManager());

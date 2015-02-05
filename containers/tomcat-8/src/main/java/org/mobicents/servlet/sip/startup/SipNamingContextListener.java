@@ -57,11 +57,26 @@ public class SipNamingContextListener extends NamingContextListener {
 	public static final String SIP_FACTORY_JNDI_NAME = "SipFactory";
 	public static final String SIP_SESSIONS_UTIL_JNDI_NAME = "SipSessionsUtil";
 	public static final String TIMER_SERVICE_JNDI_NAME = "TimerService";	
+
+	/**
+     * Token for configuring associated JNDI context.
+     */
+    private Object token = null;
 	
 	@Override
 	public void lifecycleEvent(LifecycleEvent event) {
+		container = event.getLifecycle();
+
+        if (container instanceof org.apache.catalina.Context) {
+            token = ((org.apache.catalina.Context) container).getNamingToken();
+        } else if (container instanceof org.apache.catalina.Server) {
+            token = ((org.apache.catalina.Server) container).getNamingToken();
+        } else {
+            return;
+        }
+
 		super.lifecycleEvent(event);
-		if (event.getType().equalsIgnoreCase(Lifecycle.START_EVENT)) {
+		if (event.getType().equalsIgnoreCase(Lifecycle.CONFIGURE_START_EVENT)) {
 			if (container instanceof CatalinaSipContext) {
 				((CatalinaSipContext)container).getSipInstanceManager().setContext(envCtx);
 			}
@@ -73,7 +88,7 @@ public class SipNamingContextListener extends NamingContextListener {
 		super.containerEvent(event);
 		
 		// Setting the context in read/write mode
-        ContextAccessController.setWritable(getName(), container);        
+        ContextAccessController.setWritable(getName(), token);        
         String type = event.getType();
         SipContext sipContext = null;
         String appName = null;

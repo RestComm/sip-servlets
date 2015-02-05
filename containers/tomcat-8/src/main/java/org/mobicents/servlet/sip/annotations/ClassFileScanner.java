@@ -34,6 +34,7 @@ import javax.servlet.sip.annotation.SipApplicationKey;
 import javax.servlet.sip.annotation.SipListener;
 import javax.servlet.sip.annotation.SipServlet;
 
+import org.apache.catalina.loader.WebappClassLoader;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControl;
 import org.mobicents.servlet.sip.catalina.CatalinaSipContext;
@@ -65,7 +66,7 @@ public class ClassFileScanner {
 	
 	private Method sipAppKey = null;
 	
-	private AnnotationsClassLoader classLoader;
+	private ClassLoader classLoader;
 	
 	public ClassFileScanner(String docbase, CatalinaSipContext ctx) {
 		this.docbase = docbase;
@@ -84,34 +85,33 @@ public class ClassFileScanner {
 	 */
 	public void scan() throws AnnotationVerificationException {
 		ClassLoader cl = this.sipContext.getClass().getClassLoader();
-		this.classLoader = new AnnotationsClassLoader(
-				cl);
-		this.classLoader.setResources(this.sipContext.getResources());
-		this.classLoader.setAntiJARLocking(true);
+		this.classLoader = sipContext.getLoader().getClassLoader();
+//		this.classLoader.setResources(this.sipContext.getResources());
+//		this.classLoader.setAntiJARLocking(true);
 		
 		if(logger.isInfoEnabled()) {
 			logger.info("Annotations docBase : " + this.docbase);
 		}
 		
-		this.classLoader.setWorkDir(new File(this.docbase + "/tmp"));
+//		this.classLoader.setWorkDir(new File(this.docbase + "/tmp"));
 		
 		// Add this SAR/WAR's binary file from WEB-INF/classes and WEB-INF/lib		
-		this.classLoader.addRepository("/WEB-INF/classes/", new File(this.docbase + "/WEB-INF/classes/"));
-		this.classLoader.addJarDir(this.docbase + "/WEB-INF/lib/");
+//		this.classLoader.addRepository("/WEB-INF/classes/", new File(this.docbase + "/WEB-INF/classes/"));
+//		this.classLoader.addJarDir(this.docbase + "/WEB-INF/lib/");
 		//Add those only for EAR files
-		if(docbase.indexOf(".ear")!=-1) {
-			//Adding root dir to include jars located here like ejb modules and so on...
-			//Ideally we may want to parse the application.xml and get the jars that are defined in it...?
-			this.classLoader.addJarDir(this.docbase + "/../");
-			
-			// Try to add the EAR binaries as repositories
-			File earJarDir = new File(this.docbase + "/../APP-INF/lib");
-			File earClassesDir = new File(this.docbase + "/../APP-INF/classes");
-			if(earJarDir.exists())
-				this.classLoader.addJarDir(this.docbase + "/../APP-INF/lib");
-			if(earClassesDir.exists())
-				this.classLoader.addRepository(this.docbase + "/../APP-INF/classes");
-		}
+//		if(docbase.indexOf(".ear")!=-1) {
+//			//Adding root dir to include jars located here like ejb modules and so on...
+//			//Ideally we may want to parse the application.xml and get the jars that are defined in it...?
+//			this.classLoader.addJarDir(this.docbase + "/../");
+//			
+//			// Try to add the EAR binaries as repositories
+//			File earJarDir = new File(this.docbase + "/../APP-INF/lib");
+//			File earClassesDir = new File(this.docbase + "/../APP-INF/classes");
+//			if(earJarDir.exists())
+//				this.classLoader.addJarDir(this.docbase + "/../APP-INF/lib");
+//			if(earClassesDir.exists())
+//				this.classLoader.addRepository(this.docbase + "/../APP-INF/classes");
+//		}
 		// TODO: Add META-INF classpath
 			
 		_scan(new File(this.docbase));
