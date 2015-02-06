@@ -172,114 +172,6 @@
 	</build>
 	<profiles>
 		<profile>
-			<id>tomcat-distro</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.1</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<configuration>
-									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${CATALINA_HOME}/lib" />
-										<copy verbose="true" file="docs/logging.properties" todir="${CATALINA_HOME}/conf" />
-										<copy verbose="true" file="docs/log4j.xml" todir="${CATALINA_HOME}/lib" />
-										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${CATALINA_HOME}/conf" />
-										<copy todir="${CATALINA_HOME}">
-											<fileset dir="LICENSES" casesensitive="yes">
-												<include name="**/*" />
-												<exclude name="GPL-LICENSE.TXT" />
-											</fileset>
-										</copy>
-									</tasks>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>copy-to-tomcat-lib</id>
-								<phase>package</phase>
-								<goals>
-									<goal> copy-dependencies </goal>
-								</goals>
-								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,activation,mail,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext,commons-codec</includeArtifactIds>
-									<outputDirectory>${CATALINA_HOME}/lib</outputDirectory>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>tomcat</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.1</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<configuration>
-									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.CATALINA_HOME}/lib" />
-										<copy verbose="true" file="docs/logging.properties" todir="${env.CATALINA_HOME}/conf" />
-										<copy verbose="true" file="docs/log4j.xml" todir="${env.CATALINA_HOME}/lib" />
-										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${CATALINA_HOME}/conf" />
-										<copy todir="${env.CATALINA_HOME}">
-											<fileset dir="LICENSES" casesensitive="yes">
-												<include name="**/*" />
-												<exclude name="GPL-LICENSE.TXT" />
-											</fileset>
-										</copy>
-									</tasks>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>copy-to-tomcat-lib</id>
-								<phase>package</phase>
-								<goals>
-									<goal> copy-dependencies </goal>
-								</goals>
-								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext,commons-codec</includeArtifactIds>
-									<outputDirectory>${env.CATALINA_HOME}/lib</outputDirectory>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
 			<id>tomcat-7-distro</id>
 			<build>
 				<plugins>
@@ -382,7 +274,7 @@
 			</build>
 		</profile>
 		<profile>
-			<id>jboss</id>
+			<id>tomcat-8-distro</id>
 			<build>
 				<plugins>
 					<plugin>
@@ -394,11 +286,15 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer" />
-										<copy verbose="true" file="docs/jboss-log4j.xml" todir="${env.JBOSS_HOME}/server/${node}/conf" />
-										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${env.JBOSS_HOME}/server/${node}/conf" />										
-										<copy todir="${env.JBOSS_HOME}/docs/licenses">
-											<fileset file="LICENSES/*" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${CATALINA_HOME}/lib" />
+										<copy verbose="true" file="docs/logging.properties" todir="${CATALINA_HOME}/conf" />
+										<copy verbose="true" file="docs/log4j.xml" todir="${CATALINA_HOME}/lib" />
+										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${CATALINA_HOME}/conf" />
+										<copy todir="${CATALINA_HOME}">
+											<fileset dir="LICENSES" casesensitive="yes">
+												<include name="**/*" />
+												<exclude name="GPL-LICENSE.TXT" />
+											</fileset>
 										</copy>
 									</tasks>
 								</configuration>
@@ -413,60 +309,14 @@
 						<artifactId>maven-dependency-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>copy-to-jboss-lib</id>
-								<phase>package</phase>
-								<goals>
-									<goal>copy-dependencies</goal>
-								</goals>
-								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext,commons-codec</includeArtifactIds>
-									<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer</outputDirectory>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>jboss-distro</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.1</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<configuration>
-									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer" />
-										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${env.JBOSS_HOME}/server/${node}/conf" />
-										<copy todir="${JBOSS_HOME}/docs/licenses">
-											<fileset file="LICENSES/*" />
-										</copy>
-									</tasks>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>copy-to-jboss-lib</id>
+								<id>copy-to-tomcat-lib</id>
 								<phase>package</phase>
 								<goals>
 									<goal> copy-dependencies </goal>
 								</goals>
 								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext,commons-codec</includeArtifactIds>
-									<outputDirectory>${JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer/</outputDirectory>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,activation,mail,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext,commons-codec</includeArtifactIds>
+									<outputDirectory>${CATALINA_HOME}/lib</outputDirectory>
 								</configuration>
 							</execution>
 						</executions>
@@ -475,7 +325,7 @@
 			</build>
 		</profile>
 		<profile>
-			<id>jboss-5</id>
+			<id>tomcat-8</id>
 			<build>
 				<plugins>
 					<plugin>
@@ -487,12 +337,15 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar" />
-										<copy verbose="true" file="docs/jboss5/jboss-log4j.xml" todir="${env.JBOSS_HOME}/server/${node}/conf" />
-										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${env.JBOSS_HOME}/server/${node}/conf" />
-										<copy verbose="true" file="src/main/resources/org/mobicents/servlet/sip/loading/sip-app-1.1.xsd" todir="${env.JBOSS_HOME}/docs/schema" />
-										<copy todir="${env.JBOSS_HOME}/docs/licenses">
-											<fileset file="LICENSES/*" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.CATALINA_HOME}/lib" />
+										<copy verbose="true" file="docs/logging.properties" todir="${env.CATALINA_HOME}/conf" />
+										<copy verbose="true" file="docs/log4j.xml" todir="${env.CATALINA_HOME}/lib" />
+										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${CATALINA_HOME}/conf" />
+										<copy todir="${env.CATALINA_HOME}">
+											<fileset dir="LICENSES" casesensitive="yes">
+												<include name="**/*" />
+												<exclude name="GPL-LICENSE.TXT" />
+											</fileset>
 										</copy>
 									</tasks>
 								</configuration>
@@ -507,61 +360,14 @@
 						<artifactId>maven-dependency-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>copy-to-jboss-lib</id>
+								<id>copy-to-tomcat-lib</id>
 								<phase>package</phase>
 								<goals>
-									<goal>copy-dependencies</goal>
+									<goal> copy-dependencies </goal>
 								</goals>
 								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext,commons-codec</includeArtifactIds>
-									<outputDirectory>${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>jboss-5-distro</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.1</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<configuration>
-									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/${node}/deploy/jbossweb.sar" />
-										<copy verbose="true" file="docs/mss-sip-stack.properties" todir="${JBOSS_HOME}/server/${node}/conf" />
-										<copy verbose="true" file="src/main/resources/org/mobicents/servlet/sip/loading/sip-app-1.1.xsd" todir="${JBOSS_HOME}/docs/schema" />
-										<copy todir="${JBOSS_HOME}/docs/licenses">
-											<fileset file="LICENSES/*" />
-										</copy>
-									</tasks>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-dependency-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>copy-to-jboss-lib</id>
-								<phase>package</phase>
-								<goals>
-									<goal>copy-dependencies</goal>
-								</goals>
-								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,dnsjava,stun4j,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext,commons-codec</includeArtifactIds>
-									<outputDirectory>${JBOSS_HOME}/server/${node}/deploy/jbossweb.sar</outputDirectory>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext,commons-codec</includeArtifactIds>
+									<outputDirectory>${env.CATALINA_HOME}/lib</outputDirectory>
 								</configuration>
 							</execution>
 						</executions>
