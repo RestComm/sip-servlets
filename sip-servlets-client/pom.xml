@@ -100,56 +100,6 @@
 				</plugins>
 			</build>
 		</profile>		
-		<profile>		
-			<id>jboss</id>			
-			<build>			
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.1</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<configuration>
-									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer/" />
-									</tasks>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>		
-			<id>jboss-5</id>			
-			<build>			
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.1</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<configuration>
-									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar/" />
-									</tasks>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
 		<profile>			
 			<id>tomcat-distro</id>
 			<activation>
@@ -178,8 +128,11 @@
 				</plugins>
 			</build>
 		</profile>		
-		<profile>		
-			<id>jboss-distro</id>			
+		<profile>			
+			<id>tomcat-8</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>			
 			<build>			
 				<plugins>
 					<plugin>
@@ -191,7 +144,8 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer/" />
+										<echo message="${env.CATALINA_HOME}" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.CATALINA_HOME}/lib" />
 									</tasks>
 								</configuration>
 								<goals>
@@ -202,9 +156,12 @@
 					</plugin>
 				</plugins>
 			</build>
-		</profile>
-		<profile>		
-			<id>jboss-5-distro</id>			
+		</profile>		
+		<profile>			
+			<id>tomcat-8-distro</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>			
 			<build>			
 				<plugins>
 					<plugin>
@@ -216,7 +173,7 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/${node}/deploy/jbossweb.sar/" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${CATALINA_HOME}/lib" />
 									</tasks>
 								</configuration>
 								<goals>
@@ -227,6 +184,6 @@
 					</plugin>
 				</plugins>
 			</build>
-		</profile>
+		</profile>	
 	</profiles>
 </project>

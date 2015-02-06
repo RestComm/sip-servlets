@@ -43,65 +43,7 @@
 	</build>
 	<profiles>
 		<profile>
-			<id>tomcat-distro</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.1</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<configuration>
-									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${CATALINA_HOME}/lib" />
-									</tasks>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>tomcat</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.1</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<configuration>
-									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.CATALINA_HOME}/lib" />
-									</tasks>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-
-		<profile>
 			<id>tomcat-7-distro</id>
-
 			<build>
 				<plugins>
 					<plugin>
@@ -150,9 +92,8 @@
 				</plugins>
 			</build>
 		</profile>
-
 		<profile>
-			<id>jboss</id>
+			<id>tomcat-8-distro</id>
 			<build>
 				<plugins>
 					<plugin>
@@ -164,7 +105,7 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${CATALINA_HOME}/lib" />
 									</tasks>
 								</configuration>
 								<goals>
@@ -177,7 +118,7 @@
 			</build>
 		</profile>
 		<profile>
-			<id>jboss-distro</id>
+			<id>tomcat-8</id>
 			<build>
 				<plugins>
 					<plugin>
@@ -189,60 +130,7 @@
 								<phase>package</phase>
 								<configuration>
 									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/${node}/deploy/jboss-web.deployer" />
-									</tasks>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>jboss-5</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.1</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<configuration>
-									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deployers/jbossweb.deployer/" />
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.JBOSS_HOME}/server/${node}/deploy/jbossweb.sar" />
-
-									</tasks>
-								</configuration>
-								<goals>
-									<goal>run</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>jboss-5-distro</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-antrun-plugin</artifactId>
-						<version>1.1</version>
-						<executions>
-							<execution>
-								<phase>package</phase>
-								<configuration>
-									<tasks>
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/${node}/deployers/jbossweb.deployer/" />
-										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${JBOSS_HOME}/server/${node}/deploy/jbossweb.sar" />
+										<copy verbose="true" file="${project.build.directory}/${project.build.finalName}.${project.packaging}" todir="${env.CATALINA_HOME}/lib" />
 									</tasks>
 								</configuration>
 								<goals>
