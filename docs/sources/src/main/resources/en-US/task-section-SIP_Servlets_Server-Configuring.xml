@@ -45,7 +45,8 @@ There are two important configuration files that you might need to modifying dep
 </formalpara>
 
 <para>
-Changing the ports and other configuration for the SIP connector can be done in the standalone-sip.xml file. Below is an extract.
+Changing the ports and other configuration for the SIP connector can be done in the standalone-sip.xml file. 
+Below is an extract :
 </para>
 
     <example>
@@ -71,6 +72,7 @@ Changing the ports and other configuration for the SIP connector can be done in 
         <socket-binding name="sip-udp" port="5080"/>
         <socket-binding name="sip-tcp" port="5080"/>
         <socket-binding name="sip-tls" port="5081"/>
+	<socket-binding name="sip-ws" port="5082"/>
         <socket-binding name="osgi-http" interface="management" port="8090"/>
         <socket-binding name="remoting" port="4447"/>
         <socket-binding name="txn-recovery-environment" port="4712"/>
@@ -84,6 +86,82 @@ Changing the ports and other configuration for the SIP connector can be done in 
     
 </example>
 
+<para>
+If you need to add a connector for the same protocol, a new socket-binding should be created. A naming convention should be followed for the name attribute of the new socket-binding.
+The convention is &lt;name&gt;-sip-&lt;protocol&gt;. By example, 
+<programlisting linenumbering="unnumbered" role="XML"><![CDATA[
+	<socket-binding name="second-sip-udp" port="5080"/>
+]]></programlisting>
+</para>
+
+<variablelist>
+      <title>SIP &lt;connector&gt; Attributes</title>
+      <varlistentry>
+        <term>port (defined at the socket-binding element)</term>
+        <listitem>
+          <para>The port number on which the container will be able to receive SIP messages.</para>
+        </listitem>
+      </varlistentry>      
+      <varlistentry>
+        <term>protocol</term>
+        <listitem>
+          <para>Specifies the connector is a SIP Connector and not an HTTP Connector. There is no need to change this property.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>signalingTransport (use socket-binding element)</term>
+        <listitem>
+          <para>Specifies the transport on which the container will be able to receive SIP messages. Supported Values are &quot;udp&quot;, &quot;tcp&quot;, &quot;tls&quot; and &quot;ws&quot;.</para>
+        </listitem>
+      </varlistentry>      
+      <varlistentry>
+        <term>use-stun</term>
+        <listitem>
+          <para>Enables Session Traversal Utilities for NAT (STUN) support for this Connector. The attribute defaults to &quot;false&quot;. If set to &quot;true&quot;, ensure that the <literal>ipAddress</literal> attribute is <emphasis>not</emphasis> set to <literal>127.0.0.1</literal>. Refer to <xref linkend="mssstun-&SHORT_PLATFORM_NAME;_STUN"/> for more information about STUN.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>stun-server-address </term>
+        <listitem>
+          <para>Specifies the STUN server address used to discover the public IP address of the SIP Connector. This attribute is only required if the <literal>useStun</literal> attribute is set to &quot;true&quot;. Refer to <xref linkend="mssstun-&SHORT_PLATFORM_NAME;_STUN"/> for more information about STUN and public STUN servers.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>stun-server-port</term>
+        <listitem>
+          <para>Specifies the STUN server port of the STUN server used in the <literal>stunServerAddress</literal> attribute. You should rarely need to change this attribute; also, it is only needed if the <literal>useStun</literal> attribute is set to &quot;true&quot;. Refer to <xref linkend="mssstun-&SHORT_PLATFORM_NAME;_STUN"/> for more information about STUN.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>use-static-address</term>
+        <listitem>
+          <para>Specifies whether the settings in staticServerAddress and staticServerPort are activated. The default value is &quot;false&quot; (deactivated).</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>static-server-address</term>
+        <listitem>
+          <para>Specifies what load-balancer server address is inserted in Contact/Via headers for server-created requests. This parameter  is useful for  cluster configurations where  requests should  be bound to a load-balancer address, rather than  a specific node address.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>static-server-port</term>
+        <listitem>
+          <para>Specifies the port of the load-balancer specified in staticServerAddress. This parameter is useful in cluster configurations where requests should be bound to a load-balancer address rather than a specific node address.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>http-follow-sip</term>
+        <listitem>
+          <para>
+          Makes the application server aware of how the SIP Load Balancers assign request affinity, and stores this information in the application session.
+          </para>
+          <para>
+          When the HTTP Load Balancer sends HTTP requests that are not associated with the application session, the application server will force the HTTP request to be repeated until it lands on the correct node.
+          </para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
 
 <formalpara>
 <title> For Tomcat</title>

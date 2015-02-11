@@ -277,7 +277,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 
 			boolean createSipProvider = false;
 			SipProvider sipProvider = null;
-			if(sipStack.getSipProviders().hasNext()) {
+			if(sipStack.getSipProviders() != null && sipStack.getSipProviders().hasNext()) {
 				sipProvider = (SipProvider) sipStack.getSipProviders().next();				
 				for (ListeningPoint listeningPointTemp : sipProvider.getListeningPoints()) {
 					if(!(listeningPointTemp.getIPAddress().equalsIgnoreCase(listeningPoint.getIPAddress()) && listeningPointTemp.getPort() == listeningPoint.getPort())) {

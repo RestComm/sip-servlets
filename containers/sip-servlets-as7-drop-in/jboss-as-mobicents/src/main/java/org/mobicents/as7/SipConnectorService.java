@@ -101,15 +101,17 @@ class SipConnectorService implements Service<Connector> {
             connector.setPort(address.getPort());
             connector.setScheme(scheme);
             SipConnector sipConnector = new SipConnector();
-            sipConnector.setIpAddress(address.getHostName());
+            sipConnector.setIpAddress(address.getAddress().getHostAddress());
             sipConnector.setPort(address.getPort());
-            sipConnector.setTransport(binding.getName().substring("sip-".length()));
+            // https://github.com/Mobicents/sip-servlets/issues/44 support multiple connectors
+            sipConnector.setTransport(binding.getName().substring(binding.getName().lastIndexOf("sip-")+("sip-".length())));
             sipConnector.setUseStaticAddress(useStaticAddress);
             sipConnector.setStaticServerAddress(staticServerAddress);
             sipConnector.setStaticServerPort(staticServerPort);
             sipConnector.setUseStun(useStun);
             sipConnector.setStunServerAddress(stunServerAddress);
             sipConnector.setStunServerPort(stunServerPort);
+            Logger.getLogger("org.mobicents.as7").debug("SipConnectorService.start(), address = " + address.getAddress().getHostAddress() + " - port = " + address.getPort());
             SipProtocolHandler sipProtocolHandler = (SipProtocolHandler) connector.getProtocolHandler();
             sipProtocolHandler.setSipConnector(sipConnector);
             if (enableLookups != null)
