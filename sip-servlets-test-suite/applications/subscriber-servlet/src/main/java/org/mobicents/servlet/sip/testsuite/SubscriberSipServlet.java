@@ -33,6 +33,7 @@ import javax.mail.Multipart;
 import javax.mail.internet.MimeMultipart;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.sip.Parameterable;
 import javax.servlet.sip.ServletTimer;
 import javax.servlet.sip.SipApplicationSession;
 import javax.servlet.sip.SipFactory;
@@ -158,6 +159,7 @@ public class SubscriberSipServlet
 				+ request.getMethod());			
 		request.getApplicationSession().setAttribute("sendMessage", "true");
 		String state = request.getHeader("Subscription-State");
+		Parameterable parameterable = request.getParameterableHeader("Subscription-State");
 		logger.info("state " + state);
 		logger.info("session id " + request.getSession().getId());
 		logger.info("sameContainerUserName attribute in session " + request.getSession().getAttribute(TEST_SAME_CONTAINER_USER_NAME));

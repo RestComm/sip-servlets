@@ -95,6 +95,7 @@ import javax.sip.header.RetryAfterHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ServerHeader;
 import javax.sip.header.SubjectHeader;
+import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.SupportedHeader;
 import javax.sip.header.TimeStampHeader;
 import javax.sip.header.ToHeader;
@@ -263,6 +264,8 @@ public final class JainSipUtils {
         PARAMETERABLE_HEADER_NAMES.add(ProxyAuthorizationHeader.NAME);
         // https://code.google.com/p/sipservlets/issues/detail?id=260
         PARAMETERABLE_HEADER_NAMES.add(EventHeader.NAME);
+        // https://github.com/Mobicents/sip-servlets/issues/45
+        PARAMETERABLE_HEADER_NAMES.add(SubscriptionStateHeader.NAME);
 	}
 
 	
