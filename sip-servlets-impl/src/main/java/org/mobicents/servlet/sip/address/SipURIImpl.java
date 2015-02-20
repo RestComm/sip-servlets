@@ -409,7 +409,11 @@ public class SipURIImpl extends URIImpl implements SipURI {
 		}
 		String escapedValue = null;
 		// https://github.com/Mobicents/sip-servlets/issues/46 
-		// Protecting against null and empty value to avoid NPE 
+		// Protecting against null and empty value to avoid NPE
+		if(value == null) {
+			// Done to pass UriServlet.testSetParameter101 TCK test waiting for an NPE
+			throw new NullPointerException("Value is not allowed to be NULL as per method contract");
+		}
 		if(value != null && value.trim().length() > 1) {
 			escapedValue = RFC2396UrlDecoder.encode(value);
 		}
