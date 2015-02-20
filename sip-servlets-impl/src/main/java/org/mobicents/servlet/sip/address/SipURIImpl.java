@@ -407,7 +407,12 @@ public class SipURIImpl extends URIImpl implements SipURI {
 				return;
 			}
 		}
-		String escapedValue = RFC2396UrlDecoder.encode(value);
+		String escapedValue = null;
+		// https://github.com/Mobicents/sip-servlets/issues/46 
+		// Protecting against null and empty value to avoid NPE 
+		if(value != null && value.trim().length() > 1) {
+			escapedValue = RFC2396UrlDecoder.encode(value);
+		}
 		super.setParameter(name, value);
 		try {
 			((Parameters)getSipURI()).setParameter(name, escapedValue);
