@@ -108,9 +108,16 @@ public class SipURITest extends junit.framework.TestCase {
 	
 	public void testParams() throws Exception {
 		URI uri = sipFactory.createURI("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080");
+		System.out.println(uri);
 		uri.setParameter("Key", "val");
+		System.out.println(uri);
 		String s = uri.toString();
 		assertEquals("sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5080;Key=val", s);
+		// Non regression for https://github.com/Mobicents/sip-servlets/issues/46
+		uri.setParameter("orig", null);
+		System.out.println(uri);
+		uri.setParameter("orig2", "");
+		System.out.println(uri);
 	}
 	
 	public void testBrackets() throws Exception {
