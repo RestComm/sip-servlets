@@ -160,6 +160,8 @@ public final class JainSipUtils {
 		CONTACT_HEADER_METHODS.add(Request.UPDATE);
 		// http://code.google.com/p/sipservlets/issues/detail?id=172 
 		CONTACT_HEADER_METHODS.add(Request.OPTIONS);
+		// https://github.com/Mobicents/sip-servlets/issues/48 Added to support RCS
+		CONTACT_HEADER_METHODS.add(Request.MESSAGE);
 	}
 	
 	public static final Set<String> DIALOG_CREATING_METHODS = new TreeSet<String>(

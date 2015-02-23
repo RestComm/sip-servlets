@@ -842,6 +842,34 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		assertEquals(((SipURI)contactHeader.getAddress().getURI()).getUser(), "optionUser");
 	}
 	
+	/**
+	 * non regression test for Github Issue 48 https://github.com/Mobicents/sip-servlets/issues/48
+	 * Possible to add params to Contact header for Message 
+	 */
+	@Test
+	public void testShootistMessageSetContact() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();			
+		
+		receiverProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("setRandomContact", "true");
+		params.put("method", "MESSAGE");
+		deployApplication(params);
+		Thread.sleep(TIMEOUT);	
+		ContactHeader contactHeader = (ContactHeader) receiver.getMessageRequest().getHeader(ContactHeader.NAME);
+		assertNotNull(contactHeader);
+		assertNotNull(contactHeader.getParameter("optionParam"));
+		assertEquals(contactHeader.getParameter("optionParam"),"optionValue");
+		assertEquals(((SipURI)contactHeader.getAddress().getURI()).getUser(), "optionUser");
+	}
+	
 	
 	/**
 	 * non regression test for Issue 1547 http://code.google.com/p/mobicents/issues/detail?id=1547
