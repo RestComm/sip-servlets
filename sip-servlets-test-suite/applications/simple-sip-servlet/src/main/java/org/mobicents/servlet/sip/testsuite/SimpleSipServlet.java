@@ -920,6 +920,11 @@ public class SimpleSipServlet
 		}
 		register.setHeader("Expires", "3600");
 		register.setHeader("test", "test");
+		String initialRemoteAddr = register.getInitialRemoteAddr();
+		logger.info("initialRemoteAddr : " + initialRemoteAddr);
+		if(initialRemoteAddr != null) {
+			throw new IllegalArgumentException("the initial remote address should be null");
+		}
 		if(removeContact) {
 			register.removeHeader("Contact");
 		}

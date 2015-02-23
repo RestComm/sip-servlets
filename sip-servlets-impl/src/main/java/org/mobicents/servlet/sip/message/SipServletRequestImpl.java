@@ -2330,7 +2330,11 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
                 logger.trace("transaction null, returning top via ip address");
             }
 			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
-			if(via == null) {
+			if(via == null ||
+					// https://github.com/Mobicents/sip-servlets/issues/47
+					// check if the via is container generated, if it is then it means 
+					// this is an outgoing request or response and thus should return null
+					!sipFactoryImpl.getSipApplicationDispatcher().isViaHeaderExternal(via) ) {
 				return null;
 			} else {
 				return via.getHost();
@@ -2367,7 +2371,11 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
                 logger.trace("transaction null, returning top via port");
             }
 			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
-			if(via == null) {
+			if(via == null ||
+					// https://github.com/Mobicents/sip-servlets/issues/47
+					// check if the via is container generated, if it is then it means 
+					// this is an outgoing request or response and thus should return null
+					!sipFactoryImpl.getSipApplicationDispatcher().isViaHeaderExternal(via) ) {
 				return -1;
 			} else {
 				return via.getPort()<=0 ? 5060 : via.getPort();
@@ -2384,7 +2392,11 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			return ((SIPTransaction)getTransaction()).getTransport();
 		} else {
 			ViaHeader via = (ViaHeader) message.getHeader(ViaHeader.NAME);
-			if(via == null) {
+			if(via == null ||
+					// https://github.com/Mobicents/sip-servlets/issues/47
+					// check if the via is container generated, if it is then it means 
+					// this is an outgoing request or response and thus should return null
+					!sipFactoryImpl.getSipApplicationDispatcher().isViaHeaderExternal(via) ) {
 				return null;
 			} else {
 				return via.getTransport();
