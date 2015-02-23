@@ -414,7 +414,7 @@ public class ShootistSipServlet
 					}
 				}
 			}
-			if(!method.equalsIgnoreCase("REGISTER") && !method.equalsIgnoreCase("OPTIONS")) {
+			if(!method.equalsIgnoreCase("REGISTER") && !method.equalsIgnoreCase("OPTIONS") && !method.equalsIgnoreCase("MESSAGE")) {
 				Address addr = null;
 				try {
 					addr = sipServletRequest.getAddressHeader("Contact");
@@ -455,7 +455,7 @@ public class ShootistSipServlet
 					if(method.equalsIgnoreCase("REGISTER")) {
 						sipServletRequest.addHeader("Contact", "sip:random@172.172.172.172:3289");
 					}
-					if(method.equalsIgnoreCase("OPTIONS")) {
+					if(method.equalsIgnoreCase("OPTIONS") || method.equalsIgnoreCase("MESSAGE")) {
 						try {
 							sipServletRequest.addHeader("Contact", "sip:random@172.172.172.172:3289");
 							logger.error("JSR 289, Section 4.1.3 The Contact Header Field: Contact header is a system header  except for the following messages:  4. 200/OPTIONS responses. Container should have thrown an exception");
