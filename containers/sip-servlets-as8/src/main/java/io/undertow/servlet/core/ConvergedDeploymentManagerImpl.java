@@ -1,20 +1,13 @@
 package io.undertow.servlet.core;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.annotation.Resource;
-import javax.servlet.Servlet;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletException;
-import javax.servlet.sip.SipFactory;
-
-import org.mobicents.servlet.sip.core.MobicentsSipServlet;
 import org.mobicents.servlet.sip.undertow.SipServletImpl;
 import org.mobicents.servlet.sip.undertow.UndertowSipContextDeployment;
 
@@ -35,7 +28,7 @@ import io.undertow.servlet.api.ServletInfo;
 import io.undertow.servlet.api.ServletStackTraces;
 import io.undertow.servlet.api.ThreadSetupAction;
 import io.undertow.servlet.api.DeploymentManager.State;
-import io.undertow.servlet.handlers.ConvergedApplicationHandler;
+import io.undertow.servlet.handlers.ConvergedApplicationInitHandler;
 import io.undertow.servlet.handlers.ServletDispatchingHandler;
 import io.undertow.servlet.handlers.ServletHandler;
 import io.undertow.servlet.handlers.ServletInitialHandler;
@@ -98,7 +91,7 @@ public class ConvergedDeploymentManagerImpl extends DeploymentManagerImpl implem
 
                 ((UndertowSipContextDeployment) deployment).contextListenerStart();
 
-                ConvergedApplicationHandler handler = new ConvergedApplicationHandler();
+                ConvergedApplicationInitHandler handler = new ConvergedApplicationInitHandler();
                 handler.setHttpHandler(root);
                 handler.setDeployment((UndertowSipContextDeployment) deployment);
 

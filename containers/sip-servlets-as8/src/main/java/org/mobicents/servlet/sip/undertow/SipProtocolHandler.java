@@ -184,6 +184,53 @@ public class SipProtocolHandler implements MBeanRegistration {
         return result;
     }
 
+    public void destroy() throws Exception {
+        if(logger.isDebugEnabled()) {
+            logger.debug("Stopping a sip protocol handler");
+        }
+        //Jboss specific unloading case
+        SipApplicationDispatcher sipApplicationDispatcher = (SipApplicationDispatcher)
+            getAttribute(SipApplicationDispatcher.class.getSimpleName());
+        if(sipApplicationDispatcher != null && extendedListeningPoint != null) {
+            if(logger.isDebugEnabled()) {
+                logger.debug("Removing the Sip Application Dispatcher as a sip listener for listening point " + extendedListeningPoint);
+            }
+            extendedListeningPoint.getSipProvider().removeSipListener(sipApplicationDispatcher);
+            sipApplicationDispatcher.getSipNetworkInterfaceManager().removeExtendedListeningPoint(extendedListeningPoint);
+        }
+        // removing listening point and sip provider
+        if(sipStack != null) {
+            if(extendedListeningPoint != null) {
+                if(extendedListeningPoint.getSipProvider().getListeningPoints().length == 1) {
+                    sipStack.deleteSipProvider(extendedListeningPoint.getSipProvider());
+                    if(logger.isDebugEnabled()) {
+                        logger.debug("Removing the sip provider");
+                    }
+                } else {
+                    if(logger.isDebugEnabled()) {
+                        logger.debug("Removing the following Listening Point " + extendedListeningPoint + " from the sip provider");
+                    }
+                    extendedListeningPoint.getSipProvider().removeListeningPoint(extendedListeningPoint.getListeningPoint());
+                }
+                if(logger.isDebugEnabled()) {
+                    logger.debug("Removing the following Listening Point " + extendedListeningPoint);
+                }               
+                sipStack.deleteListeningPoint(extendedListeningPoint.getListeningPoint());
+                extendedListeningPoint = null;
+            }               
+        }
+        if (tpOname != null)
+            //TODO:Registry.getRegistry(null, null).unregisterComponent(tpOname);
+        if (rgOname != null)
+            //TODO:Registry.getRegistry(null, null).unregisterComponent(rgOname);
+        //TODO:setStarted(false);
+        sipStack = null;
+    }
+
+    public void resume(){
+        
+    }
+    
     /**
      * @param sipConnector the sipConnector to set
      */

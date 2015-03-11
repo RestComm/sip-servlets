@@ -90,6 +90,8 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
     // TODO:protected transient SipSecurityUtils sipSecurityUtils;
     // TODO:protected transient SipDigestAuthenticator sipDigestAuthenticator;
     protected transient String securityDomain;
+    
+    protected String displayName;
 
     private transient ThreadLocal<SipApplicationSessionCreationThreadLocal> sipApplicationSessionsAccessedThreadLocal = new ThreadLocal<SipApplicationSessionCreationThreadLocal>();
     // http://code.google.com/p/mobicents/issues/detail?id=2534 &&
@@ -123,6 +125,30 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
 
     }
 
+    public void init() throws Exception {
+        if(logger.isDebugEnabled()) {
+            logger.debug("Initializing the sip context");
+        }
+//      if (this.getParent() != null) {
+//          // Add the main configuration listener for sip applications
+//          LifecycleListener sipConfigurationListener = new SipContextConfig();
+//          this.addLifecycleListener(sipConfigurationListener);            
+//          setDelegate(true);
+//      }               
+        // call the super method to correctly initialize the context and fire
+        // up the
+        // init event on the new registered SipContextConfig, so that the
+        // standardcontextconfig
+        // is correctly initialized too
+        
+        prepareServletContext();
+        
+        if(logger.isDebugEnabled()) {
+            logger.debug("sip context Initialized");
+        }   
+    }
+    
+    
     public synchronized void start() throws ServletException {
         if (logger.isDebugEnabled()) {
             logger.debug("Starting the sip context " + this.getApplicationName());
@@ -888,6 +914,14 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
         // TODO:unbindThreadBindingListener();
         Thread.currentThread().setContextClassLoader(oldClassLoader);
 
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
 }

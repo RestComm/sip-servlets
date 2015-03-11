@@ -9,11 +9,11 @@ import javax.servlet.ServletException;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.handlers.PathHandler;
-import io.undertow.server.handlers.udp.UdpHandler;
+import io.undertow.server.handlers.udp.RootUdpHandler;
 import io.undertow.servlet.api.ConvergedDeploymentInfo;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
-import io.undertow.servlet.handlers.ConvergedApplicationHandler;
+import io.undertow.servlet.handlers.ConvergedApplicationInitHandler;
 
 public class SipServletServerExampleASC {
     public static final String MYAPP = "/my-sipapp-asc";
@@ -39,13 +39,14 @@ public class SipServletServerExampleASC {
 
             manager.deploy();
 
-            ConvergedApplicationHandler servletHandler = (ConvergedApplicationHandler) manager.start();
-
+            ConvergedApplicationInitHandler servletHandler = (ConvergedApplicationInitHandler) manager.start();
+            RootUdpHandler rootHandler = new RootUdpHandler();
+            rootHandler.wrapNextHandler(servletHandler);
             PathHandler path = Handlers.path(Handlers.redirect(MYAPP)).addPrefixPath(MYAPP,
                     servletHandler.getHttpHandler());
 
             Undertow server = Undertow.builder().addHttpListener(18080, "localhost").addUdpListener(15080, "localhost")
-                    .setHandler((UdpHandler) servletHandler).setHandler(path).build();
+                    .setHandler(rootHandler).setHandler(path).build();
             server.start();
 
         } catch (ServletException e) {
