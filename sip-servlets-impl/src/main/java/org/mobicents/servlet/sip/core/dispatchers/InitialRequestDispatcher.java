@@ -340,22 +340,25 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		
 		// subscriber URI should be set before calling makeAppSessionKey method, see Issue 750
 		// http://code.google.com/p/mobicents/issues/detail?id=750
-		try {
-			URI subscriberUri = SipFactoryImpl.addressFactory.createAddress(applicationRouterInfo.getSubscriberURI()).getURI();
-			javax.servlet.sip.URI jainSipSubscriberUri = null; 
-			if(subscriberUri instanceof javax.sip.address.SipURI) {
-				jainSipSubscriberUri= new SipURIImpl((javax.sip.address.SipURI)subscriberUri, ModifiableRule.NotModifiable);
-			} else if (subscriberUri instanceof javax.sip.address.TelURL) {
-				jainSipSubscriberUri = new TelURLImpl((javax.sip.address.TelURL)subscriberUri);
-			} else {
-				jainSipSubscriberUri = new GenericURIImpl(subscriberUri);
+		if(applicationRouterInfo.getSubscriberURI() != null) {
+			// https://github.com/Mobicents/sip-servlets/issues/49 NullPointerException if the approuter returns a subscriberUri is null
+			try {
+				URI subscriberUri = SipFactoryImpl.addressFactory.createAddress(applicationRouterInfo.getSubscriberURI()).getURI();
+				javax.servlet.sip.URI jainSipSubscriberUri = null; 
+				if(subscriberUri instanceof javax.sip.address.SipURI) {
+					jainSipSubscriberUri= new SipURIImpl((javax.sip.address.SipURI)subscriberUri, ModifiableRule.NotModifiable);
+				} else if (subscriberUri instanceof javax.sip.address.TelURL) {
+					jainSipSubscriberUri = new TelURLImpl((javax.sip.address.TelURL)subscriberUri);
+				} else {
+					jainSipSubscriberUri = new GenericURIImpl(subscriberUri);
+				}
+				sipServletRequest.setSubscriberURI(jainSipSubscriberUri);
+			} catch (ParseException pe) {
+				throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Impossible to parse the subscriber URI returned by the Application Router " 
+						+ applicationRouterInfo.getSubscriberURI() +
+						", please put one of DAR:<HeaderName> with Header containing a valid URI or an exlicit valid URI ", pe);
 			}
-			sipServletRequest.setSubscriberURI(jainSipSubscriberUri);
-		} catch (ParseException pe) {
-			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "Impossible to parse the subscriber URI returned by the Application Router " 
-					+ applicationRouterInfo.getSubscriberURI() +
-					", please put one of DAR:<HeaderName> with Header containing a valid URI or an exlicit valid URI ", pe);
-		} 		
+		}
 		
 		MobicentsSipApplicationSession sipApplicationSession = encodeURISipApplicationSession;
 		if(logger.isDebugEnabled())  {
@@ -423,8 +426,11 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		// set the request's stateInfo to result.getStateInfo(), region to result.getRegion(), and URI to result.getSubscriberURI().			
 		sipSessionImpl.setStateInfo(applicationRouterInfo.getStateInfo());
 		sipSessionImpl.setRoutingRegion(applicationRouterInfo.getRoutingRegion());
-		sipServletRequest.setRoutingRegion(applicationRouterInfo.getRoutingRegion());		
-		sipSessionImpl.setSipSubscriberURI(sipServletRequest.getSubscriberURI().toString());
+		sipServletRequest.setRoutingRegion(applicationRouterInfo.getRoutingRegion());	
+		if (sipServletRequest.getSubscriberURI() != null) {
+			// https://github.com/Mobicents/sip-servlets/issues/49 NullPointerException if the approuter returns a subscriberUri is null
+			sipSessionImpl.setSipSubscriberURI(sipServletRequest.getSubscriberURI().toString());
+		}
 		final long cSeq = ((CSeqHeader)request.getHeader(CSeqHeader.NAME)).getSeqNumber();
 		sipSessionImpl.setCseq(cSeq);
 		
