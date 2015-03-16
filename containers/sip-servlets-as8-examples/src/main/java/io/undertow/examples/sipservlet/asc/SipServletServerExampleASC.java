@@ -1,7 +1,7 @@
 package io.undertow.examples.sipservlet.asc;
 
-import static io.undertow.servlet.ConvergedServlets.defaultContainer;
-import static io.undertow.servlet.ConvergedServlets.deployment;
+import static io.undertow.servlet.UndertowConvergedServlets.defaultContainer;
+import static io.undertow.servlet.UndertowConvergedServlets.deployment;
 import static io.undertow.servlet.ConvergedServlets.servlet;
 
 import javax.servlet.ServletException;

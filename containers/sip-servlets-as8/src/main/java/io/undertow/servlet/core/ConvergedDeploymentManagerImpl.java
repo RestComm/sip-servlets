@@ -4,10 +4,10 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletException;
+
 import org.mobicents.servlet.sip.undertow.SipServletImpl;
 import org.mobicents.servlet.sip.undertow.UndertowSipContextDeployment;
 
@@ -18,6 +18,7 @@ import io.undertow.server.handlers.PredicateHandler;
 import io.undertow.server.session.SessionListener;
 import io.undertow.servlet.UndertowServletLogger;
 import io.undertow.servlet.api.ConvergedDeploymentInfo;
+import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.InstanceHandle;
@@ -27,10 +28,12 @@ import io.undertow.servlet.api.ServletContainerInitializerInfo;
 import io.undertow.servlet.api.ServletInfo;
 import io.undertow.servlet.api.ServletStackTraces;
 import io.undertow.servlet.api.ThreadSetupAction;
-import io.undertow.servlet.api.DeploymentManager.State;
-import io.undertow.servlet.handlers.ConvergedApplicationInitHandler;
+import io.undertow.servlet.core.ApplicationListeners;
+import io.undertow.servlet.core.CompositeThreadSetupAction;
+import io.undertow.servlet.core.ContextClassLoaderSetupAction;
+import io.undertow.servlet.core.DeploymentManagerImpl;
+import io.undertow.servlet.core.SessionListenerBridge;
 import io.undertow.servlet.handlers.ServletDispatchingHandler;
-import io.undertow.servlet.handlers.ServletHandler;
 import io.undertow.servlet.handlers.ServletInitialHandler;
 import io.undertow.servlet.predicate.DispatcherTypePredicate;
 import io.undertow.servlet.spec.ServletContextImpl;
@@ -47,94 +50,48 @@ public class ConvergedDeploymentManagerImpl extends DeploymentManagerImpl implem
         this.servletContainer = servletContainer;
     }
 
+    protected Deployment createDeployment(DeploymentManager manager, DeploymentInfo deploymentInfo,
+            ServletContainer servletContainer) {
+        return new UndertowSipContextDeployment(manager, deploymentInfo, servletContainer);
+    }
+
+    @Override 
+    public HttpHandler start() throws ServletException{
+        HttpHandler handler = super.start();
+        this.state = super.getState();
+        return handler;
+    }
+
     @Override
-    public HttpHandler start() throws ServletException {
-        if (originalDeployment instanceof ConvergedDeploymentInfo) {
+    public void stop() throws ServletException {
+        super.stop();
+        state = super.getState();
+    }
 
-            ThreadSetupAction.Handle handle = deployment.getThreadSetupAction().setup(null);
-            try {
-                deployment.getSessionManager().start();
-
-                // we need to copy before iterating
-                // because listeners can add other listeners
-                ArrayList<Lifecycle> lifecycles = new ArrayList<>(deployment.getLifecycleObjects());
-                for (Lifecycle object : lifecycles) {
-                    object.start();
-                }
-                HttpHandler root = deployment.getHandler();
-                final TreeMap<Integer, List<ManagedServlet>> loadOnStartup = new TreeMap<>();
-                for (Map.Entry<String, ServletHandler> entry : deployment.getServlets().getServletHandlers().entrySet()) {
-                    ManagedServlet servlet = entry.getValue().getManagedServlet();
-                    Integer loadOnStartupNumber = servlet.getServletInfo().getLoadOnStartup();
-                    if (loadOnStartupNumber != null) {
-                        if (loadOnStartupNumber < 0) {
-                            continue;
-                        }
-                        List<ManagedServlet> list = loadOnStartup.get(loadOnStartupNumber);
-                        if (list == null) {
-                            loadOnStartup.put(loadOnStartupNumber, list = new ArrayList<>());
-                        }
-                        list.add(servlet);
-                    }
-                }
-                for (Map.Entry<Integer, List<ManagedServlet>> load : loadOnStartup.entrySet()) {
-                    for (ManagedServlet servlet : load.getValue()) {
-                        servlet.createServlet();
-                    }
-                }
-
-                if (deployment.getDeploymentInfo().isEagerFilterInit()) {
-                    for (ManagedFilter filter : deployment.getFilters().getFilters().values()) {
-                        filter.createFilter();
-                    }
-                }
-
-                ((UndertowSipContextDeployment) deployment).contextListenerStart();
-
-                ConvergedApplicationInitHandler handler = new ConvergedApplicationInitHandler();
-                handler.setHttpHandler(root);
-                handler.setDeployment((UndertowSipContextDeployment) deployment);
-
-                state = State.STARTED;
-
-                return handler;
-            } finally {
-                handle.tearDown();
-            }
-
-        } else {
-            return super.start();
-        }
+    @Override
+    public void undeploy() {
+        super.undeploy();
+        state = super.getState();
     }
 
     @Override
     public void deploy() {
         if (originalDeployment instanceof ConvergedDeploymentInfo) {
             ConvergedDeploymentInfo deploymentInfo = (ConvergedDeploymentInfo) originalDeployment;
-            Map<String, ServletInfo> sipServlets = deploymentInfo.getSipServlets();
 
             if (deploymentInfo.getServletStackTraces() == ServletStackTraces.ALL) {
                 UndertowServletLogger.REQUEST_LOGGER.servletStackTracesAll(deploymentInfo.getDeploymentName());
             }
 
             deploymentInfo.validate();
-            final UndertowSipContextDeployment deployment = new UndertowSipContextDeployment(this, deploymentInfo,
-                    servletContainer);
+            final UndertowSipContextDeployment deployment = (UndertowSipContextDeployment) this
+                    .createDeployment(this, deploymentInfo, servletContainer);
             this.deployment = deployment;
 
             final ServletContextImpl servletContext = deployment.getServletContext();// new
                                                                                      // ServletContextImpl(servletContainer,
                                                                                      // deployment);
-
-            for (ServletInfo info : sipServlets.values()) {
-                SipServletImpl servlet = new SipServletImpl(info, servletContext);
-                servlet.setDescription(info.getName());
-                servlet.setDisplayName(info.getName());
-                servlet.setServletName(info.getName());
-                servlet.setupMultipart(servletContext);
-
-                deployment.addChild(servlet);
-            }
+            createSipServlets(deployment, deploymentInfo, servletContext);
 
             // deployment.setServletContext(servletContext);
 
@@ -201,9 +158,10 @@ public class ConvergedDeploymentManagerImpl extends DeploymentManagerImpl implem
 
                 MetricsCollector metrics = deploymentInfo.getMetricsCollector();
                 if (metrics != null) {
+                    //FIXME public MetricsChainHandler
                     wrappedHandlers = new MetricsChainHandler(wrappedHandlers, metrics, deployment);
                 }
-
+                //FIXME public SecurityActions and createServletInitialHandler method
                 final ServletInitialHandler servletInitialHandler = SecurityActions.createServletInitialHandler(
                         deployment.getServletPaths(), wrappedHandlers, deployment.getThreadSetupAction(),
                         servletContext);
@@ -226,13 +184,29 @@ public class ConvergedDeploymentManagerImpl extends DeploymentManagerImpl implem
             state = State.DEPLOYED;
 
         } else {
-
             super.deploy();
+            state = super.getState();
         }
     }
 
+    protected void createSipServlets(final UndertowSipContextDeployment deployment,
+            final ConvergedDeploymentInfo deploymentInfo, ServletContextImpl servletContext) {
+        for (Map.Entry<String, ServletInfo> servlet : deploymentInfo.getSipServlets().entrySet()) {
+            deployment.getSipServlets().addServlet(servlet.getValue());
+
+            SipServletImpl sipServlet = new SipServletImpl(servlet.getValue(), servletContext);
+            sipServlet.setDescription(servlet.getValue().getName());
+            sipServlet.setDisplayName(servlet.getValue().getName());
+            sipServlet.setServletName(servlet.getValue().getName());
+            sipServlet.setupMultipart(servletContext);
+
+            deployment.addChild(sipServlet);
+        }
+
+    }
+
+    @Override
     public State getState() {
         return state;
     }
-
 }

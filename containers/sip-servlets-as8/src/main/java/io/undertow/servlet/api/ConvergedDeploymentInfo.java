@@ -2,6 +2,7 @@ package io.undertow.servlet.api;
 
 import io.undertow.servlet.core.ConvergedSessionManagerFactory;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,45 +20,70 @@ import org.mobicents.servlet.sip.core.descriptor.MobicentsSipServletMapping;
 import org.mobicents.servlet.sip.core.security.MobicentsSipLoginConfig;
 import org.mobicents.servlet.sip.ruby.SipRubyController;
 
-public class ConvergedDeploymentInfo extends DeploymentInfo implements Cloneable{
+public class ConvergedDeploymentInfo extends DeploymentInfo implements Cloneable {
     private static final Logger logger = Logger.getLogger(ConvergedDeploymentInfo.class);
 
-    
     private final Map<String, ServletInfo> sipServlets = new HashMap<>();
     private SessionManagerFactory sessionManagerFactory = new ConvergedSessionManagerFactory();
-    
-    //sip-xml meta:
+
+    // sip-xml meta:
     protected String applicationName;
     protected String description;
     protected String smallIcon;
     protected String largeIcon;
     protected int proxyTimeout;
-    protected int sipApplicationSessionTimeout;    
-    // Issue 1200 this is needed to be able to give a default servlet handler if we are not in main-servlet servlet selection case
+    protected int sipApplicationSessionTimeout;
+    // Issue 1200 this is needed to be able to give a default servlet handler if we are not in main-servlet servlet
+    // selection case
     // by example when creating a new sip application session from a factory from an http servlet
     private String servletHandler;
     protected boolean isMainServlet;
     private String mainServlet;
     protected transient MobicentsSipLoginConfig sipLoginConfig;
     protected transient Method sipApplicationKeyMethod;
-    protected ConcurrencyControlMode concurrencyControlMode;    
+    protected ConcurrencyControlMode concurrencyControlMode;
     protected transient List<String> sipApplicationListeners = new CopyOnWriteArrayList<String>();
     protected transient List<MobicentsSipServletMapping> sipServletMappings = new ArrayList<MobicentsSipServletMapping>();
     private transient SipRubyController rubyController;
-    //TODO feltölteni:
     protected transient Map<String, MobicentsSipServlet> childrenMap;
     protected transient Map<String, MobicentsSipServlet> childrenMapByClassName;
+
+    public ConvergedDeploymentInfo(){
+        //default constructor
+    }
     
-    
+    //using reflection to copy fields fast:
+    public ConvergedDeploymentInfo(DeploymentInfo info) {
+        Class fromClass = info.getClass();
+        Class toClass = super.getClass().getSuperclass();
+        for(Field fromField : fromClass.getDeclaredFields()){
+            for(Field toField : toClass.getDeclaredFields()){
+                if(toField.getType() == fromField.getType() &&
+                        toField.getName().equals(fromField.getName()))
+                {
+                    toField.setAccessible(true);
+                    fromField.setAccessible(true);
+                    try {
+                        toField.set(this, fromField.get(info));
+                    } catch (IllegalArgumentException | IllegalAccessException e1) {
+                        e1.printStackTrace();
+                    }
+                    fromField.setAccessible(false);
+                    toField.setAccessible(false);
+                }
+            }
+        }
+    }
+
     public ConvergedDeploymentInfo addSipServlets(final ServletInfo... servlets) {
         for (final ServletInfo servlet : servlets) {
             sipServlets.put(servlet.getName(), servlet);
             return this;
-     
+
         }
         return this;
     }
-    
+
     public Map<String, ServletInfo> getSipServlets() {
         return Collections.unmodifiableMap(sipServlets);
     }
@@ -136,43 +162,44 @@ public class ConvergedDeploymentInfo extends DeploymentInfo implements Cloneable
 
     public void addSipApplicationListener(String listener) {
         sipApplicationListeners.add(listener);
-        //TODO:fireContainerEvent("addSipApplicationListener", listener);
+        // TODO:fireContainerEvent("addSipApplicationListener", listener);
     }
 
     public void removeSipApplicationListener(String listener) {
         sipApplicationListeners.remove(listener);
 
         // Inform interested listeners
-        //TODO:fireContainerEvent("removeSipApplicationListener", listener);
+        // TODO:fireContainerEvent("removeSipApplicationListener", listener);
     }
 
     public void addSipServletMapping(MobicentsSipServletMapping sipServletMapping) {
         sipServletMappings.add(sipServletMapping);
         isMainServlet = false;
-        if(servletHandler == null) {
+        if (servletHandler == null) {
             servletHandler = sipServletMapping.getServletName();
         }
     }
+
     public List<MobicentsSipServletMapping> findSipServletMappings() {
         return sipServletMappings;
     }
-    
+
     public MobicentsSipServletMapping findSipServletMappings(SipServletRequest sipServletRequest) {
-        if(logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             logger.debug("Checking sip Servlet Mapping for following request : " + sipServletRequest);
         }
         for (MobicentsSipServletMapping sipServletMapping : sipServletMappings) {
-            if(sipServletMapping.getMatchingRule().matches(sipServletRequest)) {
+            if (sipServletMapping.getMatchingRule().matches(sipServletRequest)) {
                 return sipServletMapping;
             } else {
-                logger.debug("Following mapping rule didn't match : servletName => " + 
-                        sipServletMapping.getServletName() + " | expression = "+ 
-                        sipServletMapping.getMatchingRule().getExpression());
+                logger.debug("Following mapping rule didn't match : servletName => "
+                        + sipServletMapping.getServletName() + " | expression = "
+                        + sipServletMapping.getMatchingRule().getExpression());
             }
         }
         return null;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -180,9 +207,6 @@ public class ConvergedDeploymentInfo extends DeploymentInfo implements Cloneable
         sipServletMappings.remove(sipServletMapping);
     }
 
-    
-    
-    
     public String[] findSipApplicationListeners() {
         return sipApplicationListeners.toArray(new String[sipApplicationListeners.size()]);
     }
@@ -234,14 +258,13 @@ public class ConvergedDeploymentInfo extends DeploymentInfo implements Cloneable
     public void setChildrenMapByClassName(Map<String, MobicentsSipServlet> childrenMapByClassName) {
         this.childrenMapByClassName = childrenMapByClassName;
     }
-    
-    
+
     @Override
-    public ConvergedDeploymentInfo clone(){
-        Object parent=null;
+    public ConvergedDeploymentInfo clone() {
+        Object parent = null;
         try {
             parent = super.clone("");
-            ConvergedDeploymentInfo info = (ConvergedDeploymentInfo)parent;
+            ConvergedDeploymentInfo info = (ConvergedDeploymentInfo) parent;
             return info;
         } catch (CloneNotSupportedException e) {
             // TODO Auto-generated catch block
@@ -249,7 +272,7 @@ public class ConvergedDeploymentInfo extends DeploymentInfo implements Cloneable
         }
         return null;
     }
-    
+
     public SessionManagerFactory getSessionManagerFactory() {
         return sessionManagerFactory;
     }
@@ -257,6 +280,14 @@ public class ConvergedDeploymentInfo extends DeploymentInfo implements Cloneable
     public DeploymentInfo setSessionManagerFactory(final SessionManagerFactory sessionManagerFactory) {
         this.sessionManagerFactory = sessionManagerFactory;
         return this;
+    }
+
+    public List<String> getSipApplicationListeners() {
+        return sipApplicationListeners;
+    }
+
+    public List<MobicentsSipServletMapping> getSipServletMappings() {
+        return sipServletMappings;
     }
 
 }

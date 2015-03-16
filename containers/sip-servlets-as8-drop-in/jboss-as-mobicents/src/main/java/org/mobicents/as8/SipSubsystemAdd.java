@@ -21,9 +21,17 @@
  */
 package org.mobicents.as8;
 
+import io.undertow.servlet.api.JBossConvergedServletContainer;
+
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 import javax.management.MBeanServer;
+
+
+
+
 
 //import org.jboss.as.clustering.web.DistributedCacheManagerFactory;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
@@ -41,8 +49,9 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceBuilder.DependencyType;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
+import org.jboss.msc.service.AbstractServiceListener;
+import org.jboss.msc.service.ServiceListener;
 import org.jboss.msc.service.ServiceName;
-
 //import org.mobicents.as7.clustering.sip.MockDistributedCacheManagerFactoryService;
 import org.mobicents.as8.deployment.AttachSipServerServiceProcessor;
 import org.mobicents.as8.deployment.SipAnnotationDeploymentProcessor;
@@ -51,6 +60,9 @@ import org.mobicents.as8.deployment.SipContextFactoryDeploymentProcessor;
 import org.mobicents.as8.deployment.SipJndiBindingProcessor;
 import org.mobicents.as8.deployment.SipParsingDeploymentProcessor;
 import org.mobicents.as8.deployment.SipWarDeploymentProcessor;
+import org.mobicents.as8.deployment.UndertowDeploymentServiceListenerProcessor;
+import org.wildfly.extension.undertow.ServletContainerService;
+import org.wildfly.extension.undertow.UndertowService;
 
 /**
  * Adds the sip subsystem.
@@ -58,6 +70,7 @@ import org.mobicents.as8.deployment.SipWarDeploymentProcessor;
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
  */
+@SuppressWarnings("deprecation")
 class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     // FIXME: these priorities should be substituted by values from with org.jboss.as.server.deployment.Phase
@@ -244,6 +257,9 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 processorTarget.addDeploymentProcessor(SipExtension.SUBSYSTEM_NAME, Phase.INSTALL,
                         Phase.INSTALL_WAR_DEPLOYMENT, new SipWarDeploymentProcessor());
 
+                processorTarget.addDeploymentProcessor(SipExtension.SUBSYSTEM_NAME, Phase.INSTALL,
+                        Phase.INSTALL_WAR_DEPLOYMENT+1, new UndertowDeploymentServiceListenerProcessor());
+                
                 // // Add the SIP specific deployment processor
                 // processorTarget.addDeploymentProcessor(Phase.PARSE, DEPLOYMENT_PROCESS_PRIORITY,
                 // SipMetaDataDeploymentProcessor.INSTANCE);
@@ -305,12 +321,40 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
          * .addDependency(SipSubsystemServices.JBOSS_SIP, SipServer.class, server) .setInitialMode(Mode.ON_DEMAND)
          * .install()); newControllers.addAll(factory.installServices(target)); }
          */
-
+        //TODO:
+        String name="default";
+        this.addListenerToSerletContainerService(context, name, model);
     }
 
+    
+    public void addListenerToSerletContainerService(OperationContext context, String name, ModelNode model) throws OperationFailedException {
+        ServiceName serviceName = UndertowService.SERVLET_CONTAINER.append(name);
+        
+        
+        ServiceController<?> servletContainerServiceController = null;
+        ServletContainerService servletContainerService = null;
+        while(servletContainerServiceController == null || servletContainerService==null)
+        {
+            if(servletContainerServiceController==null){
+                servletContainerServiceController=context.getServiceRegistry(false).getService(serviceName);
+            }
+            if(servletContainerServiceController!=null){
+                servletContainerService = (ServletContainerService)servletContainerServiceController.getValue();
+            }
+        }
+
+        //TODO timeout error:
+        /*if(servletContainerService == null){
+            throw new OperationFailedException(model);
+        }*/
+        ServletContainerServiceListener listener = ServletContainerServiceListener.newInstance();
+        
+        listener.setService(servletContainerService);
+        servletContainerServiceController.addListener(listener);
+    }
+    
     @Override
     protected boolean requiresRuntimeVerification() {
         return false;
     }
-
 }

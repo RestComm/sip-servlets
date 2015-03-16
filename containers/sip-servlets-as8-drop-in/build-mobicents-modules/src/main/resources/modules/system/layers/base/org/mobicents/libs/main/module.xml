@@ -39,11 +39,12 @@
         <!-- new entries starts-->
         <module name="org.jboss.as.web-common"/>
         <module name="io.undertow.core"/>
-	<module name="io.undertow.servlet"/>
-	<module name="org.wildfly.extension.undertow"/>
-	<module name="org.wildfly.extension.io"/>
-	<module name="org.jboss.xnio"/>
+      	<module name="io.undertow.servlet"/>
+	      <module name="org.wildfly.extension.undertow"/>
+	      <module name="org.wildfly.extension.io"/>
+	      <module name="org.jboss.xnio"/>
         <module name="org.jboss.xnio.nio"/>
+	      <module name="io.undertow.jsp"/>
         <!-- new entries ends-->
         <!-- handling security -->
         <module name="javax.security.auth.message.api"/>

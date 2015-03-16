@@ -8,10 +8,11 @@ import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ServletContainer;
 import io.undertow.servlet.core.DeploymentImpl;
 import io.undertow.servlet.core.ManagedServlet;
+import io.undertow.servlet.core.ManagedServlets;
+import io.undertow.servlet.handlers.ServletPathMatches;
 import io.undertow.servlet.spec.ServletContextImpl;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -71,8 +72,8 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
 
     private final ConvergedDeploymentInfo deploymentInfo;
     private final UndertowSipManager sessionManager;
-    // TODO tölteni!!
-    private final List<SipServletImpl> sipServlets;
+
+    private final ManagedServlets sipServlets;
 
     // TODO setter
     protected transient SipApplicationDispatcher sipApplicationDispatcher = null;
@@ -109,8 +110,7 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
         this.sessionManager = (UndertowSipManager) this.deploymentInfo.getSessionManagerFactory().createSessionManager(
                 this);
 
-        // TODO jó-e az arrayList??
-        this.sipServlets = new ArrayList<SipServletImpl>();
+        this.sipServlets = new ManagedServlets(this, new ServletPathMatches(this));
 
         this.setSipApplicationSessionTimeout(DEFAULT_LIFETIME);
         // pipeline.setBasic(new SipStandardContextValve());
@@ -125,7 +125,7 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
 
     }
 
-    public void init() throws Exception {
+    public void init() throws ServletException {
         if(logger.isDebugEnabled()) {
             logger.debug("Initializing the sip context");
         }
@@ -191,9 +191,97 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
         if (logger.isDebugEnabled()) {
             logger.debug("sip context started " + this.getApplicationName());
         }
-
     }
 
+    public synchronized void stop() throws ServletException {
+        String name = this.getApplicationName();
+        if(logger.isDebugEnabled()) {
+            logger.debug("Stopping the sip context " + name);
+        }
+
+        this.sessionManager.dumpSipSessions();
+        this.sessionManager.dumpSipApplicationSessions();
+        logger.warn("number of active sip sessions : " + this.sessionManager.getActiveSipSessions()); 
+        logger.warn("number of active sip application sessions : " + this.sessionManager.getActiveSipApplicationSessions());
+
+        // this should happen after so that applications can still do some processing
+        // in destroy methods to notify that context is getting destroyed and app removed
+        sipListeners.deallocateServletsActingAsListeners();
+        this.deploymentInfo.getSipApplicationListeners().clear();
+        this.deploymentInfo.getSipServletMappings().clear();
+        
+        this.getChildrenMap().clear();
+        this.deploymentInfo.getChildrenMapByClassName().clear();
+        if(sipApplicationDispatcher != null) {
+            if(this.getApplicationName() != null) {
+                sipApplicationDispatcher.removeSipApplication(this.getApplicationName());
+            } else {
+                logger.error("the application name is null for the following context : " + name);
+            }
+        }   
+        if(sasTimerService != null && sasTimerService.isStarted()) {
+            sasTimerService.stop();         
+        }
+        // Issue 1478 : nullify the ref to avoid reusing it
+        sasTimerService = null;
+        // Issue 1791 : don't check is the service is started it makes the stop
+        // of tomcat hang
+        if(timerService != null) {
+            timerService.stop();
+        }   
+        if(proxyTimerService != null) {
+            proxyTimerService.stop();
+        }
+        // Issue 1478 : nullify the ref to avoid reusing it
+        timerService = null;
+        getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE, null);
+        if(logger.isDebugEnabled()) {
+            logger.debug("sip context stopped " + name);
+        }
+    }
+
+    public boolean listenerStop() {
+        boolean ok = true;
+        if (logger.isDebugEnabled())
+            logger.debug("Sending application stop events");
+        
+        List<ServletContextListener> servletContextListeners = sipListeners.getServletContextListeners();
+        if (servletContextListeners != null) {
+            ServletContextEvent event =
+                new ServletContextEvent(getServletContext());
+            for (ServletContextListener servletContextListener : servletContextListeners) {                     
+                if (servletContextListener == null)
+                    continue;
+                
+                try {
+                    //TODO:fireContainerEvent("beforeContextDestroyed", servletContextListener);
+                    servletContextListener.contextDestroyed(event);
+                  //TODO:fireContainerEvent("afterContextDestroyed", servletContextListener);
+                } catch (Throwable t) {
+                  //TODO:fireContainerEvent("afterContextDestroyed", servletContextListener);
+//                    getLogger().error
+//                        (sm.getString("standardContext.listenerStop",
+//                              servletContextListener.getClass().getName()), t);
+                    //getLogger().error
+                    //    (MESSAGES.errorSendingContextDestroyedEvent(servletContextListener.getClass().getName()), t);                    
+                    //TODO:
+                    t.printStackTrace();
+                    ok = false;
+                }
+                
+                // TODO Annotation processing                 
+            }
+        }
+
+        // TODO Annotation processing check super class on tomcat 6
+        
+        sipListeners.clean();
+
+        return ok;
+    }
+
+    
+    
     protected void prepareServletContext() throws ServletException {
         /*
          * if(sipApplicationDispatcher == null) { setApplicationDispatcher(); }
@@ -548,6 +636,7 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
         return null;
     }
 
+    //callers: SipApplicationDispatcher.addSipApplications
     @Override
     public boolean notifySipContextListeners(SipContextEvent event) {
         boolean ok = true;
@@ -571,7 +660,9 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
         enterSipApp(null, null, false, true);
         boolean batchStarted = enterSipAppHa(true);
         try {
-            for (ManagedServlet managedServlet : this.sipServlets) {
+            
+            for (String servletName : this.deploymentInfo.getSipServlets().keySet()) {
+                ManagedServlet managedServlet = this.sipServlets.getManagedServlet(servletName);
                 if (logger.isDebugEnabled()) {
                     logger.debug("managedServlet " + managedServlet.getServletInfo().getName() + ", class : "
                             + managedServlet.getClass().getName());
@@ -922,6 +1013,10 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public ManagedServlets getSipServlets() {
+        return sipServlets;
     }
 
 }

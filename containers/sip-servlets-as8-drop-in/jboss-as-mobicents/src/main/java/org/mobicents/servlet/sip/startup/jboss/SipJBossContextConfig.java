@@ -21,14 +21,17 @@
  */
 package org.mobicents.servlet.sip.startup.jboss;
 
+import io.undertow.servlet.api.ConvergedDeploymentInfo;
 import io.undertow.servlet.api.ServletInfo;
 
 import java.lang.reflect.Method;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.servlet.Servlet;
 import javax.servlet.sip.SipServletRequest;
 
+import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.web.common.ServletContextAttribute;
 import org.jboss.logging.Logger;
@@ -44,6 +47,7 @@ import org.jboss.metadata.javaee.spec.SecurityRoleRefMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRoleRefsMetaData;
 import org.jboss.metadata.web.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.ServletMetaData;
+import org.jboss.modules.Module;
 import org.mobicents.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.mobicents.metadata.sip.jboss.JBossSipServletsMetaData;
 import org.mobicents.metadata.sip.spec.AndMetaData;
@@ -129,8 +133,8 @@ public class SipJBossContextConfig{
      * @param convergedMetaData
      * @throws Exception 
      */
-    public void processSipMetaData(JBossConvergedSipMetaData convergedMetaData) throws Exception {
-        UndertowSipContextDeployment convergedContext = deploymentUnit.getAttachment(null);//TODO(CatalinaSipContext) context;
+    public void processSipMetaData(JBossConvergedSipMetaData convergedMetaData, UndertowSipContextDeployment convergedContext) throws Exception {
+        //UndertowSipContextDeployment convergedContext = (CatalinaSipContext) context;
         //convergedContext.setWrapperClass(SipServletImpl.class.getName());
         /*
          * sip specific treatment
@@ -166,10 +170,12 @@ public class SipJBossContextConfig{
         }
 
         // sip context params
+        this.processSipContextParameters(convergedMetaData);
+        //TODO which one is correct?
         List<? extends ParamValueMetaData> sipContextParams = convergedMetaData.getSipContextParams();
         if (sipContextParams != null) {
             for (ParamValueMetaData param : sipContextParams) {
-                //TODO:convergedContext.addParameter(param.getParamName(), param.getParamValue());
+                convergedContext.getDeploymentInfo().addServletContextAttribute(param.getParamName(), param.getParamValue());
             }
         }
 
@@ -296,7 +302,8 @@ public class SipJBossContextConfig{
                         "the main servlet is not set and there is more than one servlet defined in the sip.xml or as annotations !");
             }
             for (ServletMetaData value : sipServlets) {
-                Class servletClass = Class.forName(value.getServletClass(),true,null);  
+                final Module module = deploymentUnit.getAttachment(Attachments.MODULE);
+                Class<? extends Servlet> servletClass = (Class<? extends Servlet>) module.getClassLoader().loadClass(value.getServletClass());
                 ServletInfo servletInfo = new ServletInfo(value.getName(), servletClass);
                 
                 SipServletImpl wrapper = new SipServletImpl(servletInfo, convergedContext.getServletContext());//TODO:listeners, etc (SipServletImpl) convergedContext.createWrapper();
@@ -324,7 +331,9 @@ public class SipJBossContextConfig{
                         servletInfo.addSecurityRoleRef(ref.getRoleName(), ref.getRoleLink());
                     }
                 }
+                ((ConvergedDeploymentInfo)convergedContext.getDeploymentInfo()).addSipServlets(servletInfo);
                 convergedContext.addChild((SipServletImpl) wrapper);
+                convergedContext.getSipServlets().addServlet(servletInfo);
             }
         }
         final SipApplicationKeyMethodInfo sipApplicationKeyMethodInfo = convergedMetaData.getSipApplicationKeyMethodInfo();

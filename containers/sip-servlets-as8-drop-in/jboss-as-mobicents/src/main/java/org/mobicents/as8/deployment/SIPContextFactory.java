@@ -21,15 +21,9 @@
  */
 package org.mobicents.as8.deployment;
 
-import io.undertow.servlet.api.DeploymentInfo;
-import io.undertow.servlet.api.DeploymentManager;
-import io.undertow.servlet.api.ServletContainer;
-
-import org.jboss.as.naming.deployment.Attachments;
 import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.DeploymentUnit;
-import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
-import org.jboss.as.server.deployment.SimpleAttachable;
+//import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.logging.Logger;
 
 /**
@@ -39,14 +33,14 @@ import org.jboss.logging.Logger;
  * @author josemrecio@gmail.com
  */
 class SIPContextFactory{
-    
+    static AttachmentKey<SIPContextFactory> ATTACHMENT = AttachmentKey.create(SIPContextFactory.class);
     Logger logger = Logger.getLogger(SIPContextFactory.class);
 
-    //TODO hoe to call this?
-    public SIPWebContext createContext(final DeploymentUnit deploymentUnit,DeploymentManager deploymentManager, DeploymentInfo deploymentInfo, ServletContainer servletContainer) throws DeploymentUnitProcessingException {
+    //TODO how to call this?
+    public SIPWebContext addDeplyomentUnitToContext(final DeploymentUnit deploymentUnit, SIPWebContext context) /*TODO:throws DeploymentUnitProcessingException */{
         logger.debug("create context for " + deploymentUnit.getName());
         // Create the SIP specific context
-        return new SIPWebContext(deploymentUnit, deploymentManager, deploymentInfo, servletContainer);
+        return context.addDeploymentUnit(deploymentUnit);
     }
 
     public void postProcessContext(DeploymentUnit deploymentUnit, SIPWebContext webContext) {

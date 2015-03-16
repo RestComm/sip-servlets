@@ -25,7 +25,6 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
-
 import org.jboss.logging.Logger;
 import org.mobicents.metadata.sip.spec.SipAnnotationMetaData;
 import org.mobicents.metadata.sip.spec.SipMetaData;
@@ -44,6 +43,7 @@ public class SipContextFactoryDeploymentProcessor implements DeploymentUnitProce
 
     @Override
     public void deploy(final DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
+
         final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
         // Check if the deployment contains a sip metadata
         SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
@@ -59,10 +59,11 @@ public class SipContextFactoryDeploymentProcessor implements DeploymentUnitProce
 	            return;
             }
         }
+        
         if (logger.isDebugEnabled()) logger.debug(deploymentUnit.getName() + " sip context factory installed");
         // Just attach the context factory, the web subsystem will pick it up
         final SIPContextFactory contextFactory = new SIPContextFactory();
-        deploymentUnit.putAttachment(/*TODO*/null, contextFactory);
+        deploymentUnit.putAttachment(SIPContextFactory.ATTACHMENT, contextFactory);
     }
 
     @Override

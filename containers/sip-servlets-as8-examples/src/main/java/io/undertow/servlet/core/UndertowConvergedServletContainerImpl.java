@@ -1,17 +1,16 @@
 package io.undertow.servlet.core;
 
-import io.undertow.servlet.api.ConvergedServletContainer;
+import io.undertow.servlet.api.UndertowConvergedServletContainer;
 import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
-import io.undertow.servlet.core.ServletContainerImpl;
 
-public class ConvergedServletContainerImpl extends ServletContainerImpl implements ConvergedServletContainer{
+public class UndertowConvergedServletContainerImpl extends ConvergedServletContainerImpl implements UndertowConvergedServletContainer{
 
     @Override
     public DeploymentManager addDeployment(final DeploymentInfo deployment) {
         DeploymentInfo dep = deployment.clone();
         
-        DeploymentManager deploymentManager = new ConvergedDeploymentManagerImpl(dep, this);
+        DeploymentManager deploymentManager = new UndertowConvergedDeploymentManagerImpl(dep, this);
         deployments.put(dep.getDeploymentName(), deploymentManager);
         deploymentsByPath.put(dep.getContextPath(), deploymentManager);
         return deploymentManager;
