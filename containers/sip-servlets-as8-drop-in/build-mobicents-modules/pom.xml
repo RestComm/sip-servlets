@@ -128,7 +128,6 @@
 			</activation>
 
 			<dependencies>
-
 				<dependency>
 					<groupId>javax.sip</groupId>
 					<artifactId>jain-sip-api</artifactId>
@@ -245,7 +244,6 @@
 					<version>${mobicents.balancer.version}</version>
 					<scope>provided</scope>
 				</dependency>				
-
 			</dependencies>
 
 			<properties>

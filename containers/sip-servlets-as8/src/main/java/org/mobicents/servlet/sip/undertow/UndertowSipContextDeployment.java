@@ -7,9 +7,6 @@ import io.undertow.servlet.api.DeploymentInfo;
 import io.undertow.servlet.api.DeploymentManager;
 import io.undertow.servlet.api.ServletContainer;
 import io.undertow.servlet.core.DeploymentImpl;
-import io.undertow.servlet.core.ManagedServlet;
-import io.undertow.servlet.core.ManagedServlets;
-import io.undertow.servlet.handlers.ServletPathMatches;
 import io.undertow.servlet.spec.ServletContextImpl;
 
 import java.lang.reflect.Method;
@@ -73,8 +70,6 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
     private final ConvergedDeploymentInfo deploymentInfo;
     private final UndertowSipManager sessionManager;
 
-    private final ManagedServlets sipServlets;
-
     // TODO setter
     protected transient SipApplicationDispatcher sipApplicationDispatcher = null;
     // TODO setter
@@ -101,6 +96,8 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
 
     ConvergedApplicationContext context;
 
+    private ClassLoader sipContextClassLoader;
+    
     public UndertowSipContextDeployment(DeploymentManager deploymentManager, DeploymentInfo deploymentInfo,
             ServletContainer servletContainer) {
         super(deploymentManager, deploymentInfo, servletContainer);
@@ -109,8 +106,6 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
         // TODO:
         this.sessionManager = (UndertowSipManager) this.deploymentInfo.getSessionManagerFactory().createSessionManager(
                 this);
-
-        this.sipServlets = new ManagedServlets(this, new ServletPathMatches(this));
 
         this.setSipApplicationSessionTimeout(DEFAULT_LIFETIME);
         // pipeline.setBasic(new SipStandardContextValve());
@@ -400,7 +395,7 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
 
         // Instantiate the required listeners
         // TODO jó-e:
-        ClassLoader loader = this.getClass().getClassLoader();
+        ClassLoader loader = this.getSipContextClassLoader();
         boolean ok = sipListeners.loadListeners(findSipApplicationListeners(), loader);
         if (!ok) {
             return ok;
@@ -532,7 +527,7 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
 
     @Override
     public int getSipApplicationSessionTimeout() {
-        return this.deploymentInfo.getProxyTimeout();
+        return this.deploymentInfo.getSipApplicationSessionTimeout();
     }
 
     @Override
@@ -662,7 +657,7 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
         try {
             
             for (String servletName : this.deploymentInfo.getSipServlets().keySet()) {
-                ManagedServlet managedServlet = this.sipServlets.getManagedServlet(servletName);
+                SipServletImpl managedServlet = (SipServletImpl) this.getChildrenMap().get(servletName);
                 if (logger.isDebugEnabled()) {
                     logger.debug("managedServlet " + managedServlet.getServletInfo().getName() + ", class : "
                             + managedServlet.getClass().getName());
@@ -680,7 +675,7 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
                         }
                         final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
                         try {
-                            final ClassLoader cl = this.getClass().getClassLoader();
+                            final ClassLoader cl = this.getSipContextClassLoader();
                             Thread.currentThread().setContextClassLoader(cl);
                             // http://code.google.com/p/sipservlets/issues/detail?id=135
                             // TODO:bindThreadBindingListener();
@@ -964,10 +959,15 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
 
     @Override
     public ClassLoader getSipContextClassLoader() {
-        // TODO jó-e:
-        return this.getClass().getClassLoader();
+        return sipContextClassLoader;
     }
 
+    public void addSipContextClassLoader(ClassLoader sipContextClassLoader) {
+        if(this.sipContextClassLoader==null){
+            this.sipContextClassLoader = sipContextClassLoader;
+        }
+    }
+    
     @Override
     public Map<String, MobicentsSipServlet> getChildrenMap() {
         return this.deploymentInfo.getChildrenMap();
@@ -1014,9 +1014,4 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
     }
-
-    public ManagedServlets getSipServlets() {
-        return sipServlets;
-    }
-
 }

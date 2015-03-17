@@ -20,12 +20,15 @@ import io.undertow.servlet.core.ManagedServlets;
 import io.undertow.servlet.handlers.ServletHandler;
 
 import org.jboss.as.ee.component.EEModuleDescription;
+import org.jboss.as.server.deployment.AttachmentKey;
+import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 import org.jboss.as.web.common.WarMetaData;
 import org.jboss.metadata.web.jboss.JBossWebMetaData;
+import org.jboss.modules.Module;
 import org.jboss.msc.service.AbstractServiceListener;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceListener;
@@ -34,6 +37,7 @@ import org.jboss.msc.value.ImmediateValue;
 import org.mobicents.as8.ServletContainerServiceListener;
 import org.mobicents.metadata.sip.spec.SipAnnotationMetaData;
 import org.mobicents.metadata.sip.spec.SipMetaData;
+import org.mobicents.servlet.sip.undertow.SipServletImpl;
 import org.wildfly.extension.undertow.UndertowService;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentService;
@@ -121,9 +125,6 @@ public class UndertowDeploymentServiceListenerProcessor implements DeploymentUni
                 deploymentServiceName);
         UndertowDeploymentService deploymentService = (UndertowDeploymentService) deploymentServiceController
                 .getValue();
-        UndertowDeploymentServiceListener deploymentListener = new UndertowDeploymentServiceListener(deploymentService,
-                deploymentUnit);
-        deploymentServiceController.addListener(deploymentListener);
 
         final ServiceName deploymentInfoServiceName = deploymentServiceName
                 .append(UndertowDeploymentInfoService.SERVICE_NAME);
@@ -131,6 +132,11 @@ public class UndertowDeploymentServiceListenerProcessor implements DeploymentUni
                 deploymentInfoServiceName);
         UndertowDeploymentInfoService deplyomentInfoService = (UndertowDeploymentInfoService) deploymentInfoServiceController
                 .getService();
+
+        UndertowDeploymentServiceListener deploymentListener = new UndertowDeploymentServiceListener(deploymentService, deplyomentInfoService,
+                deploymentUnit);
+        deploymentServiceController.addListener(deploymentListener);
+        
         UndertowDeploymentInfoServiceListener deploymentInfoListener = new UndertowDeploymentInfoServiceListener(
                 deplyomentInfoService, deploymentServiceController, deploymentUnit);
         deploymentInfoServiceController.addListener(deploymentInfoListener);
@@ -146,7 +152,7 @@ public class UndertowDeploymentServiceListenerProcessor implements DeploymentUni
 
         private UndertowDeploymentInfoService deploymentInfoservice = null;
         private UndertowDeploymentService deploymentService = null;
-        private ServiceController<?> deploymentServiceController = null;
+        //private ServiceController<?> deploymentServiceController = null;
 
         private DeploymentUnit deploymentUnit = null;
 
@@ -154,15 +160,14 @@ public class UndertowDeploymentServiceListenerProcessor implements DeploymentUni
                 ServiceController<?> deploymentServiceController, DeploymentUnit deploymentUnit) {
             this.deploymentInfoservice = deploymentInfoService;
             this.deploymentUnit = deploymentUnit;
-            this.deploymentServiceController = deploymentServiceController;
+            //this.deploymentServiceController = deploymentServiceController;
             this.deploymentService = (UndertowDeploymentService) deploymentServiceController.getValue();
 
         }
 
         @Override
         public void transition(final ServiceController controller, final ServiceController.Transition transition) {
-            System.out.println("UndertowDeploymentInfoServiceListener.transition:" + transition
-                    + ", deploymentInfoservice:" + deploymentInfoservice + ", deploymentService:" + deploymentService);
+            //System.out.println("UndertowDeploymentInfoServiceListener.transition():" + transition);
             if (transition == ServiceController.Transition.STARTING_to_UP) {
 
                 while (deploymentInfoservice.getValue() == null) {
@@ -180,9 +185,7 @@ public class UndertowDeploymentServiceListenerProcessor implements DeploymentUni
                             field.set(deploymentInfoservice, convergedInfo);
                             this.deploymentService.getDeploymentInfoInjectedValue().setValue(
                                     new ImmediateValue<DeploymentInfo>(convergedInfo));
-                            System.out.println("UndertowDeploymentInfoServiceListener.transition modified:"
-                                    + transition + ", deploymentInfoservice:" + deploymentInfoservice
-                                    + ", deploymentService:" + deploymentService);
+                            //System.out.println("UndertowDeploymentInfoServiceListener.transition() deploymentInfo injected!");
                         } catch (IllegalArgumentException e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
@@ -199,16 +202,18 @@ public class UndertowDeploymentServiceListenerProcessor implements DeploymentUni
 
     @SuppressWarnings({ "rawtypes" })
     class UndertowDeploymentServiceListener extends AbstractServiceListener implements ServiceListener {
-        private UndertowDeploymentService service = null;
+        private UndertowDeploymentService deploymentService = null;
+        private UndertowDeploymentInfoService deploymentInfoservice = null;
         private DeploymentUnit deploymentUnit = null;
 
-        public UndertowDeploymentServiceListener(UndertowDeploymentService service, DeploymentUnit deploymentUnit) {
-            this.service = service;
+        public UndertowDeploymentServiceListener(UndertowDeploymentService deploymentService, UndertowDeploymentInfoService deploymentInfoservice, DeploymentUnit deploymentUnit) {
+            this.deploymentService = deploymentService;
             this.deploymentUnit = deploymentUnit;
+            this.deploymentInfoservice = deploymentInfoservice;
 
         }
 
-        private void createServlets(ManagedServlets servlets, SIPWebContext context) throws ServletException{
+        private void createServlets(ManagedServlets servlets, List<SipServletImpl> sipServlets, SIPWebContext context) throws ServletException{
             final TreeMap<Integer, List<ManagedServlet>> loadOnStartup = new TreeMap<>();
             for(Map.Entry<String, ServletHandler> entry: servlets.getServletHandlers().entrySet()) {
                 ManagedServlet servlet = entry.getValue().getManagedServlet();
@@ -224,6 +229,21 @@ public class UndertowDeploymentServiceListenerProcessor implements DeploymentUni
                     list.add(servlet);
                 }
             }
+
+            for(SipServletImpl servlet: sipServlets) {
+                Integer loadOnStartupNumber = servlet.getServletInfo().getLoadOnStartup();
+                if(loadOnStartupNumber != null) {
+                    if(loadOnStartupNumber < 0) {
+                        continue;
+                    }
+                    List<ManagedServlet> list = loadOnStartup.get(loadOnStartupNumber);
+                    if(list == null) {
+                        loadOnStartup.put(loadOnStartupNumber, list = new ArrayList<>());
+                    }
+                    list.add(servlet);
+                }
+            }
+            
             for(Map.Entry<Integer, List<ManagedServlet>> load : loadOnStartup.entrySet()) {
                 for(ManagedServlet servlet : load.getValue()) {
                     servlet.createServlet();
@@ -239,29 +259,35 @@ public class UndertowDeploymentServiceListenerProcessor implements DeploymentUni
         @Override
         public void transition(final ServiceController controller, final ServiceController.Transition transition) {
             if (transition == ServiceController.Transition.STARTING_to_UP) {
-                SIPWebContext context = (SIPWebContext) this.service.getDeployment();
+                SIPWebContext context = (SIPWebContext) this.deploymentService.getDeployment();
 
                 SIPContextFactory factory = this.deploymentUnit.getAttachment(SIPContextFactory.ATTACHMENT);
-                factory.addDeplyomentUnitToContext(deploymentUnit, context);
+                factory.addDeplyomentUnitToContext(deploymentUnit, deploymentInfoservice, context);
 
                 try {
+                    Module module = deploymentUnit.getAttachment(Attachments.MODULE);
+                    context.addSipContextClassLoader(module.getClassLoader());
                     context.init();
                     context.start();
                     context.contextListenerStart();
                     
-                    //lets init servlets here to be able to do injections provided by the SIPWebContext
-                    this.createServlets(context.getServlets(),context);
-                    
-                    //lets do this for sipServlets also:
-                    this.createServlets(context.getSipServlets(), context);
-                    
+                    //lets init servlets only here to be able to do injections provided by the SIPWebContext
+                    //sipSErvlets initialized earlier in context.start() to be able to notify its contextlisteners
+                    List<SipServletImpl> sipServlets= new ArrayList<SipServletImpl>();
+                    /*for (String servletName :((ConvergedDeploymentInfo)context.getDeploymentInfo()).getSipServlets().keySet()) 
+                    {
+                        SipServletImpl managedServlet = (SipServletImpl) context.getChildrenMap().get(servletName);
+                        sipServlets.add(managedServlet);
+                    }*/
 
+                    this.createServlets(context.getServlets(),sipServlets, context);
+                    
                 } catch (ServletException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             } else if (transition == ServiceController.Transition.STOPPING_to_DOWN) {
-                SIPWebContext context = (SIPWebContext) this.service.getDeployment();
+                SIPWebContext context = (SIPWebContext) this.deploymentService.getDeployment();
                 try {
                     if(context!=null){
                         context.stop();

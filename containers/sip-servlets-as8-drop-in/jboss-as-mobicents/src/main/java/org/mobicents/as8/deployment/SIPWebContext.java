@@ -53,6 +53,7 @@ import org.mobicents.metadata.sip.spec.SipServletsMetaData;
 import org.mobicents.servlet.sip.core.SipService;
 import org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig;
 import org.mobicents.servlet.sip.undertow.UndertowSipContextDeployment;
+import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
 
 /**
  * The SIP specific implementation of the jboss-web {@code StandardContext}.
@@ -75,9 +76,9 @@ public class SIPWebContext extends UndertowSipContextDeployment {
         super(deploymentManager, deploymentInfo, servletContainer);
     }
 
-    public SIPWebContext addDeploymentUnit(DeploymentUnit du) {
+    public SIPWebContext addDeploymentUnit(DeploymentUnit du,UndertowDeploymentInfoService deploymentInfoservice) {
         deploymentUnit = du;
-        sipJBossContextConfig = createContextConfig(/* this, */deploymentUnit);
+        sipJBossContextConfig = createContextConfig(/* this, */deploymentUnit,deploymentInfoservice);
         // attach context to top-level deploymentUnit so it can be used to get context resources (SipFactory, etc.)
         final DeploymentUnit anchorDu = getSipContextAnchorDu(du);
         if (anchorDu != null) {
@@ -333,8 +334,8 @@ public class SIPWebContext extends UndertowSipContextDeployment {
         sipJBossContextConfig.processSipMetaData((JBossConvergedSipMetaData) mergedMetaData, this);
     }
 
-    private SipJBossContextConfig createContextConfig(/* SipStandardContext sipContext, */DeploymentUnit deploymentUnit) {
-        SipJBossContextConfig config = new SipJBossContextConfig(deploymentUnit);
+    private SipJBossContextConfig createContextConfig(/* SipStandardContext sipContext, */DeploymentUnit deploymentUnit,UndertowDeploymentInfoService deploymentInfoservice) {
+        SipJBossContextConfig config = new SipJBossContextConfig(deploymentUnit,deploymentInfoservice);
         // TODO:sipContext.addLifecycleListener(config);
         return config;
     }

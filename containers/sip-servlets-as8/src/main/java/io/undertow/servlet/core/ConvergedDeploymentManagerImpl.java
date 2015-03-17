@@ -192,7 +192,6 @@ public class ConvergedDeploymentManagerImpl extends DeploymentManagerImpl implem
     protected void createSipServlets(final UndertowSipContextDeployment deployment,
             final ConvergedDeploymentInfo deploymentInfo, ServletContextImpl servletContext) {
         for (Map.Entry<String, ServletInfo> servlet : deploymentInfo.getSipServlets().entrySet()) {
-            deployment.getSipServlets().addServlet(servlet.getValue());
 
             SipServletImpl sipServlet = new SipServletImpl(servlet.getValue(), servletContext);
             sipServlet.setDescription(servlet.getValue().getName());

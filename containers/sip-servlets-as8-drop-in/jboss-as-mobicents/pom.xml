@@ -105,6 +105,12 @@
 		</exclusions>			
 	</dependency>
 	<dependency>
+	        <groupId>org.wildfly</groupId>
+    		<artifactId>wildfly-naming</artifactId>
+    		<version>8.2.0.Final</version>
+ 		<scope>provided</scope>
+	</dependency>				
+	<dependency>
 		<groupId>org.wildfly</groupId>
 		<artifactId>wildfly-web</artifactId>
 		<version>8.2.0.Final</version>

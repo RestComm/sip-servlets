@@ -25,6 +25,7 @@ import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.DeploymentUnit;
 //import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.logging.Logger;
+import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
 
 /**
  * The Sip context factory.
@@ -37,10 +38,10 @@ class SIPContextFactory{
     Logger logger = Logger.getLogger(SIPContextFactory.class);
 
     //TODO how to call this?
-    public SIPWebContext addDeplyomentUnitToContext(final DeploymentUnit deploymentUnit, SIPWebContext context) /*TODO:throws DeploymentUnitProcessingException */{
+    public SIPWebContext addDeplyomentUnitToContext(final DeploymentUnit deploymentUnit, UndertowDeploymentInfoService deploymentInfoservice, SIPWebContext context) /*TODO:throws DeploymentUnitProcessingException */{
         logger.debug("create context for " + deploymentUnit.getName());
         // Create the SIP specific context
-        return context.addDeploymentUnit(deploymentUnit);
+        return context.addDeploymentUnit(deploymentUnit,deploymentInfoservice);
     }
 
     public void postProcessContext(DeploymentUnit deploymentUnit, SIPWebContext webContext) {

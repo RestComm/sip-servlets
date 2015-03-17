@@ -22,6 +22,8 @@
 package org.mobicents.servlet.sip.startup.jboss;
 
 import io.undertow.servlet.api.ConvergedDeploymentInfo;
+import io.undertow.servlet.api.InstanceFactory;
+import io.undertow.servlet.api.InstanceHandle;
 import io.undertow.servlet.api.ServletInfo;
 
 import java.lang.reflect.Method;
@@ -31,7 +33,8 @@ import java.util.List;
 import javax.servlet.Servlet;
 import javax.servlet.sip.SipServletRequest;
 
-import org.jboss.as.server.deployment.Attachments;
+import org.jboss.as.naming.ManagedReference;
+import org.jboss.as.naming.ManagedReferenceFactory;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.web.common.ServletContextAttribute;
 import org.jboss.logging.Logger;
@@ -47,7 +50,6 @@ import org.jboss.metadata.javaee.spec.SecurityRoleRefMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRoleRefsMetaData;
 import org.jboss.metadata.web.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.ServletMetaData;
-import org.jboss.modules.Module;
 import org.mobicents.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.mobicents.metadata.sip.jboss.JBossSipServletsMetaData;
 import org.mobicents.metadata.sip.spec.AndMetaData;
@@ -74,6 +76,8 @@ import org.mobicents.servlet.sip.undertow.rules.OrRule;
 import org.mobicents.servlet.sip.undertow.rules.SubdomainRule;
 import org.mobicents.servlet.sip.core.descriptor.MatchingRule;
 import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
+import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
+
 
 /**
  * Startup event listener for a the <b>SipStandardContext</b> that configures the properties of that Context, and the associated
@@ -84,10 +88,11 @@ import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
  */
 public class SipJBossContextConfig{
     DeploymentUnit deploymentUnit;
+    UndertowDeploymentInfoService deploymentInfoservice;
     
-    
-    public SipJBossContextConfig(DeploymentUnit deploymentUnitContext) {
-        deploymentUnit = deploymentUnitContext;
+    public SipJBossContextConfig(DeploymentUnit deploymentUnitContext, UndertowDeploymentInfoService deploymentInfoservice) {
+        this.deploymentUnit = deploymentUnitContext;
+        this.deploymentInfoservice = deploymentInfoservice;
     }
 
     private static transient Logger logger = Logger.getLogger(SipJBossContextConfig.class);
@@ -296,22 +301,29 @@ public class SipJBossContextConfig{
         }
         // Sip Servlet
         JBossSipServletsMetaData sipServlets = convergedMetaData.getSipServlets();
+
         if (sipServlets != null) {
             if (sipServlets.size() > 1 && !servletSelectionSet) {
                 throw new SipDeploymentException(
                         "the main servlet is not set and there is more than one servlet defined in the sip.xml or as annotations !");
             }
             for (ServletMetaData value : sipServlets) {
-                final Module module = deploymentUnit.getAttachment(Attachments.MODULE);
-                Class<? extends Servlet> servletClass = (Class<? extends Servlet>) module.getClassLoader().loadClass(value.getServletClass());
-                ServletInfo servletInfo = new ServletInfo(value.getName(), servletClass);
+
+                Class<? extends Servlet> servletClass = (Class<? extends Servlet>) convergedContext.getSipContextClassLoader().loadClass(value.getServletClass());
+                ManagedReferenceFactory creator = deploymentInfoservice.getComponentRegistryInjectedValue().getValue().createInstanceFactory(servletClass);
                 
-                SipServletImpl wrapper = new SipServletImpl(servletInfo, convergedContext.getServletContext());//TODO:listeners, etc (SipServletImpl) convergedContext.createWrapper();
+                ServletInfo servletInfo = null;
+                if (creator != null) {
+                    InstanceFactory<Servlet> factory = createInstanceFactory(creator);
+                    servletInfo = new ServletInfo(value.getName(), servletClass,factory);
+                }else{
+                    servletInfo = new ServletInfo(value.getName(), servletClass);
+                }
+                
                 // no main servlet defined in the sip.xml we take the name of the only sip servlet present
                 if (!servletSelectionSet) {
                     convergedContext.setMainServlet(value.getName());
                 }
-                wrapper.setServletName(value.getServletName());
                 if (value.getJspFile() != null) {
                     servletInfo.setJspFile(value.getJspFile());
                 }
@@ -331,16 +343,20 @@ public class SipJBossContextConfig{
                         servletInfo.addSecurityRoleRef(ref.getRoleName(), ref.getRoleLink());
                     }
                 }
+                SipServletImpl wrapper = new SipServletImpl(servletInfo, convergedContext.getServletContext());//TODO:listeners, etc (SipServletImpl) convergedContext.createWrapper();
+                wrapper.setupMultipart(convergedContext.getServletContext());
+                wrapper.setServletName(value.getServletName());
+
                 ((ConvergedDeploymentInfo)convergedContext.getDeploymentInfo()).addSipServlets(servletInfo);
-                convergedContext.addChild((SipServletImpl) wrapper);
-                convergedContext.getSipServlets().addServlet(servletInfo);
+                convergedContext.addChild(wrapper);
+                convergedContext.addLifecycleObjects(wrapper);
             }
         }
         final SipApplicationKeyMethodInfo sipApplicationKeyMethodInfo = convergedMetaData.getSipApplicationKeyMethodInfo();
         if(sipApplicationKeyMethodInfo != null) {
 	        final String sipApplicationKeyClassName = sipApplicationKeyMethodInfo.getClassName();
 	        final String sipApplicationKeyMethodName = sipApplicationKeyMethodInfo.getMethodName();
-	        //TODO:
+
 	        ClassLoader contextCLoader = convergedContext.getSipContextClassLoader();
 	        Method sipApplicationKeyMethod = null;
 	        try {
@@ -354,6 +370,27 @@ public class SipJBossContextConfig{
         //TODO:convergedContext.setWrapperClass(StandardWrapper.class.getName());
     }
 
+    //copied from UndertowDeploymentInfoService
+    private static <T> InstanceFactory<T> createInstanceFactory(final ManagedReferenceFactory creator) {
+        return new InstanceFactory<T>() {
+            @Override
+            public InstanceHandle<T> createInstance() throws InstantiationException {
+                final ManagedReference instance = creator.getReference();
+                return new InstanceHandle<T>() {
+                    @Override
+                    public T getInstance() {
+                        return (T) instance.getInstance();
+                    }
+
+                    @Override
+                    public void release() {
+                        instance.release();
+                    }
+                };
+            }
+        };
+    }
+    
     public static MatchingRule buildRule(ConditionMetaData condition) {
 
         if (condition instanceof AndMetaData) {
