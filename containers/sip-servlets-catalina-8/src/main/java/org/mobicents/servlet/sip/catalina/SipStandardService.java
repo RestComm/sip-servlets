@@ -1257,46 +1257,4 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
         sipStack.closeReliableConnection(sipConnector.getIpAddress(),sipConnector.getPort(), sipConnector.getTransport(),
                 clientAddress, clientPort);
     }
-
-    /*
-	 * (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.core.SipService#stopGracefully(long)
-	 */
-	public void stopGracefully(long timeToWait) {
-		if(logger.isInfoEnabled()) {
-			logger.info("Stopping the Server Gracefully in " + timeToWait + " ms");
-		}
-		if(timeToWait == 0) {
-			if(gracefulStopFuture != null) {
-				gracefulStopFuture.cancel(false);
-			}
-			try {
-				getServer().stop();
-			} catch (LifecycleException e) {
-				logger.error("The server couldn't be stopped", e);
-			}
-		} else {
-			sipApplicationDispatcher.setGracefulShutdown(true);
-			Iterator<SipContext> sipContexts = sipApplicationDispatcher.findSipApplications();
-			while (sipContexts.hasNext()) {
-				SipContext sipContext = sipContexts.next();
-				sipContext.stopGracefully(timeToWait);
-			}
-			gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ServiceGracefulStopTask(this), 30000, 30000, TimeUnit.MILLISECONDS);
-			if(timeToWait > 0) {
-				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().schedule(
-						new Runnable() {
-							public void run() { 
-								gracefulStopFuture.cancel(false);
-								try {
-									getServer().stop();
-								} catch (LifecycleException e) {
-									logger.error("The server couldn't be stopped", e);
-								}
-							}
-						}
-	                , timeToWait, TimeUnit.MILLISECONDS);
-			}
-		}
-	}
 }

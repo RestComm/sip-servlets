@@ -1581,48 +1581,4 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	public void exitSipContext(ClassLoader oldClassLoader) {
 		Thread.currentThread().setContextClassLoader(oldClassLoader);
 	}
-
-	@Override
-	/*
-	 * (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.core.SipContext#stopGracefully(long)
-	 */
-	public void stopGracefully(long timeToWait) {
-		// http://code.google.com/p/sipservlets/issues/detail?id=195 
-		// Support for Graceful Shutdown of SIP Applications and Overall Server
-		if(logger.isInfoEnabled()) {
-			logger.info("Stopping the Context " + getName() + " Gracefully in " + timeToWait + " ms");
-		}
-		// Guarantees that the application won't be routed any initial requests anymore but will still handle subsequent requests
-		List<String> applicationsUndeployed = new ArrayList<String>();
-		applicationsUndeployed.add(applicationName);
-		sipApplicationDispatcher.getSipApplicationRouter().applicationUndeployed(applicationsUndeployed);
-		if(timeToWait == 0) {
-			// equivalent to forceful stop
-			if(gracefulStopFuture != null) {
-				gracefulStopFuture.cancel(false);
-			}
-			try {
-				stop();
-			} catch (LifecycleException e) {
-				logger.error("The server couldn't be stopped", e);
-			}
-		} else {		
-			long gracefulStopTaskInterval = 30000;
-			if(timeToWait > 0 && timeToWait < gracefulStopTaskInterval) {
-				// if the time to Wait is < to the gracefulStopTaskInterval then we schedule the task directly once to the time to wait
-				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().schedule(new ContextGracefulStopTask(this, timeToWait), timeToWait, TimeUnit.MILLISECONDS);         
-			} else {
-				// if the time to Wait is > to the gracefulStopTaskInterval or infinite (negative value) then we schedule the task to run every gracefulStopTaskInterval, not needed to be exactly precise on the timeToWait in this case
-				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ContextGracefulStopTask(this, timeToWait), gracefulStopTaskInterval, gracefulStopTaskInterval, TimeUnit.MILLISECONDS);                      
-			}
-		}
-	}
-
-	@Override
-	public boolean isStoppingGracefully() {
-		if(gracefulStopFuture != null)
-			return true;
-		return false;
-	}
 }
