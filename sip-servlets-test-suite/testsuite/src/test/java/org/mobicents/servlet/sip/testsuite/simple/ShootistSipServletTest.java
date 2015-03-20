@@ -709,7 +709,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	}
 	
 	/**
-	 * non regression test
+	 * non regression test for https://github.com/Mobicents/sip-servlets/issues/36
 	 * REGISTER CSeq Increase for UAC use cases using session.createRequest("REGISTER")
 	 */
 	public void testShootistRegisterCSeqIncrease() throws Exception {

@@ -1556,6 +1556,19 @@ public class SipSessionImpl implements MobicentsSipSession {
 					logger.debug("resetting the to tag since a response to a non dialog creating and terminating method has been received for non proxy session with no dialog in state " + state);
 				}
 				key.setToTag(null, false);
+				
+				// https://github.com/Mobicents/sip-servlets/issues/36
+				// Memory leak: SipAppSession and contained SipSessions are not cleaned-up  
+				// for non dialog creating requests after a 2xx response is received.
+				// This code sets these SipSessions to ReadyToInvalidate. 
+				// Applications that want to create susbequent requests (re REGISTER) should call sipSession.setInvalidateWhenReady(false);
+				if ( state != null && State.INITIAL.equals(state) &&
+						response.getStatus() >= 200  && response.getStatus() != 407 && response.getStatus() != 401) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Setting SipSession " + getKey() + " for response " + response.getStatus() + " to a non dialog creating or terminating request " + method + " in state " + state + " to ReadyToInvalidate=true");
+					}
+					setReadyToInvalidate(true);
+				}
 			}
 			return;
 		}

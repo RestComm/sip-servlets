@@ -647,6 +647,7 @@ public class SimpleSipServlet
 		// This is for the REGISTER CSeq test
 		final String fromString = resp.getFrom().toString();
 		if(resp.getMethod().equalsIgnoreCase("REGISTER") && !fromString.contains(TEST_REGISTER_NO_CONTACT)) {
+			resp.getSession().setInvalidateWhenReady(false);
 			int cseq = Integer.parseInt(resp.getRequest().getHeader("CSeq").substring(0,1));
 			if(cseq < 4) {
 				SipApplicationSession appSession = sipFactory.createApplicationSession();
@@ -764,6 +765,7 @@ public class SimpleSipServlet
 			resp.addHeader(AuthenticationInfoHeader.NAME,
 					 "NTLM rspauth=\"01000000000000005CD422F0C750C7C6\",srand=\"0B9D33A2\",snum=\"1\",opaque=\"BCDC0C9D\",qop=\"auth\",targetname=\"server.contoso.com\",realm=\"SIP Communications Service\"");
 		}
+		resp.getSession().setInvalidateWhenReady(false);
 		resp.send();
 		
 	}
@@ -903,6 +905,7 @@ public class SimpleSipServlet
 			logger.info("saved session instance : " + registerSipSession);
 			registerSipSession.setAttribute("attribute", "value");
 		}
+		registerSipSession.setInvalidateWhenReady(false);
 		register.setHeader("Expires", "3600");
 		register.setHeader("test", "test");
 		register.send();

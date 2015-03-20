@@ -137,6 +137,7 @@ public class ShootistSipServlet
 					+ sipServletResponse.getMethod());
 			int status = sipServletResponse.getStatus();
 			if (status == SipServletResponse.SC_OK && "REGISTER".equalsIgnoreCase(sipServletResponse.getMethod())) {
+				sipServletResponse.getSession().setInvalidateWhenReady(false);
 				timerService.createTimer(sipServletResponse.getApplicationSession(), 20000L, false, (Serializable)sipServletResponse.getSession());
 			}
 			if (status == SipServletResponse.SC_OK && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
