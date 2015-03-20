@@ -41,6 +41,7 @@ import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.SipServletResponse;
+import javax.servlet.sip.SipSession;
 import javax.servlet.sip.SipSessionEvent;
 import javax.servlet.sip.SipSessionListener;
 import javax.servlet.sip.SipURI;
@@ -135,6 +136,9 @@ public class ShootistSipServlet
 			logger.info("Got : " + sipServletResponse.getStatus() + " "
 					+ sipServletResponse.getMethod());
 			int status = sipServletResponse.getStatus();
+			if (status == SipServletResponse.SC_OK && "REGISTER".equalsIgnoreCase(sipServletResponse.getMethod())) {
+				timerService.createTimer(sipServletResponse.getApplicationSession(), 20000L, false, (Serializable)sipServletResponse.getSession());
+			}
 			if (status == SipServletResponse.SC_OK && "INVITE".equalsIgnoreCase(sipServletResponse.getMethod())) {
 				SipServletRequest ackRequest = sipServletResponse.createAck();
 				ackRequest.send();
@@ -670,6 +674,13 @@ public class ShootistSipServlet
 						}	
 	                }
 				}
+			} else if(info instanceof SipSession){
+				SipSession sipSession = (SipSession) info;
+				try {
+					sipSession.createRequest("REGISTER").send();
+				} catch (IOException e) {
+					logger.error("Unexpected exception while sending the REGISTER request",e);
+				} 
 			} else {
 				SipServletRequest sipServletRequest = (SipServletRequest) timer.getInfo();				
 				sipServletRequest.getApplicationSession().setAttribute("timeSent", Long.valueOf(System.currentTimeMillis()));
