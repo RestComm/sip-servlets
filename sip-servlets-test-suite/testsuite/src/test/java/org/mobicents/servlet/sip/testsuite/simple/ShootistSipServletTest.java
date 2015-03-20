@@ -709,6 +709,28 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	}
 	
 	/**
+	 * non regression test
+	 * REGISTER CSeq Increase for UAC use cases using session.createRequest("REGISTER")
+	 */
+	public void testShootistRegisterCSeqIncrease() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		deployApplication("method", "REGISTER");
+		Thread.sleep(DIALOG_TIMEOUT);		
+		assertNull(receiver.getRegisterReceived().getHeader(ContactHeader.NAME));	
+		assertTrue(receiver.getLastRegisterCSeqNumber() >= 2);
+	}
+	
+	/**
 	 * non regression test for http://code.google.com/p/mobicents/issues/detail?id=2288
 	 * SipServletRequest.send() throws IllegalStateException instead of IOException
 	 */
