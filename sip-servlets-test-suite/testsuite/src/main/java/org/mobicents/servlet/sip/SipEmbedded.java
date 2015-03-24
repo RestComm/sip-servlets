@@ -171,6 +171,8 @@ public class SipEmbedded {
 		sipService.setCongestionControlCheckingInterval(-1);
 		sipService.setAdditionalParameterableHeaders("additionalParameterableHeader");
 		sipService.setUsePrettyEncoding(true);
+//		sipService.setCallIdMaxLength(32);
+//		sipService.setTagHashMaxLength(10);
 		if(isHA) {
 			sipService.setSipPathName("org.mobicents.ha");
 			sipService.setBalancers("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");

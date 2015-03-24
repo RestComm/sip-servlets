@@ -74,7 +74,7 @@ public class GenericUtils {
 	 * @param input
 	 * @return
 	 */
-	public static String hashString(String input) {
+	public static String hashString(String input, int length) {
 		MessageDigest md;
 		try {
 			md = MessageDigest.getInstance("SHA");
@@ -84,7 +84,7 @@ public class GenericUtils {
 		byte[] bytes = input.getBytes();
 		md.update(bytes);
 		String hashed =  convertToHex(md.digest());
-		hashed = reduceHash(hashed, 8);
+		hashed = reduceHash(hashed, length);
 		return hashed;
 	}
 	

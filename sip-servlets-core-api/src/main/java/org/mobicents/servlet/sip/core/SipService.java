@@ -68,6 +68,8 @@ public interface SipService {
 	public boolean isDialogPendingRequestChecking();
 	public boolean isMd5ContactUserPart();
 	public ReplicationStrategy getReplicationStrategy();
+	public int getTagHashMaxLength();
+	public int getCallIdMaxLength();
 	
 	public String getMobicentsSipServletMessageFactoryClassName();
 	public void setMobicentsSipServletMessageFactoryClassName(String mobicentsSipServletMessageFactoryClassName);

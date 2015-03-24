@@ -312,6 +312,8 @@ See the example chapters for more information about the Application Router Confi
  sip-servlets-examples/reinvite-demo/reinvite-dar.properties"
  sipStackPropertiesFile="conf/mss-sip-stack.properties"
  dialogPendingRequestChecking="false"
+ callIdMaxLength="32"
+ tagHashMaxLength="10"
  canceledTimerTasksPurgePeriod="1">]]>
  </programlisting>
     </example>
@@ -338,19 +340,19 @@ See the example chapters for more information about the Application Router Confi
         </listitem>
       </varlistentry>
       <varlistentry>
-        <term>sipApplicationDispatcherClassName</term>
+        <term>sipApplicationDispatcherClassName (Tomcat) - app-dispatcher-class (JBoss/EAP)</term>
         <listitem>
           <para>This attribute specifies the class name of the <literal>org.mobicents.servlet.sip.core.SipApplicationDispatcher</literal> implementation to use. The routing algorithm and application selection process is performed in that class.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
-        <term>darConfigurationFileLocation</term>
+        <term>darConfigurationFileLocation (Tomcat) - application-router (JBoss/EAP)</term>
         <listitem>
           <para>The default application router file location. This is used by the default application router to determine the application selection logic. Refer to Appendix C of the JSR 289 specification for more details.</para>
         </listitem>
       </varlistentry>
        <varlistentry>
-        <term>sipStackPropertiesFile</term>
+        <term>sipStackPropertiesFile (Tomcat) - stack-properties (JBoss/EAP)</term>
         <listitem>
           <para>Specifies the location of the file containing key value pairs corresponding to the SIP Stack configuration properties. This attribute is used to further tune the JAIN SIP Stack. If this property is omitted, the following default values are assumed:</para>
           <itemizedlist>
@@ -400,27 +402,27 @@ See the example chapters for more information about the Application Router Confi
         </listitem>
       </varlistentry>
       <varlistentry>
-        <term>usePrettyEncoding</term>
+        <term>usePrettyEncoding (Tomcat) - use-pretty-encoding (JBoss/EAP)</term>
         <listitem>
           <para>Allows Via, Route, and RecordRoute header field information to be split into multiple lines, rather than each header field being separating with a comma. The attribute defaults to &quot;true&quot;. Leaving this attribute at the default setting may assist in debugging non-RFC3261 compliant SIP servers.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
-        <term>additionalParameterableHeaders</term>
+        <term>additionalParameterableHeaders (Tomcat) - additional-parameterable-headers (JBoss/EAP)</term>
         <listitem>
           <para>Comma separated list of header names that are treated as parameterable by the container. The specified headers are classed as valid, in addition to the standard parameterable headers defined in the Sip Servlets 1.1 Specification.</para>
           <para>Setting and getting parameters is allowed for both the standard and the additional parameters. Parameters that are not specified in <literal>additionalParameterableHeaders</literal> will result in a ServletParseException error.</para>
         </listitem>
       </varlistentry>
-      <varlistentry>
+      <!--varlistentry>
         <term>bypassRequestExecutor/bypassResponseExecutor</term>
         <listitem>
           <para>If set to false, the SIP Servlets server uses a ThreadPoolExecutor linked to a LinkedBlockingQueue to dispatch the request/response threads. The container can then handle two different responses (for example a 180 Ringing and a 200 OK) concurrently. However, a race condition can occur where the second response overtakes the first one (200 OK dispatched to the application before the 180 Ringing) on UDP.</para>
           <para>These flags are set to true by defauilt, Jain sip serializing is used per transaction to ensure such race conditions don't occur in &PLATFORM_NAME; Sip Servlets even though they can still happen on UDP at jain sip level.</para>
         </listitem>
-      </varlistentry>
+      </varlistentry-->
       <varlistentry>
-        <term>baseTimerInterval</term>
+        <term>baseTimerInterval (Tomcat) - base-timer-interval (JBoss/EAP)</term>
         <listitem>
           <para>Specifies the <literal>T1</literal> Base Timer Interval, which allows the SIP Servlets container to adjust its timers depending on network conditions. The default interval is 500 (milliseconds).</para>
           <para>For more information about available timers, refer to the <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
@@ -428,7 +430,7 @@ See the example chapters for more information about the Application Router Confi
         </listitem>
       </varlistentry>
       <varlistentry>
-        <term>t2Interval</term>
+        <term>t2Interval (Tomcat) - t2-interval (JBoss/EAP)</term>
         <listitem>
           <para>Specifies the <literal>T2</literal> Interval, which allows the SIP Servlets container to adjust its timers depending on network conditions. The default interval is 4000 (milliseconds).</para>
           <para>For more information about available timers, refer to the <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
@@ -436,7 +438,7 @@ See the example chapters for more information about the Application Router Confi
         </listitem>
       </varlistentry>
       <varlistentry>
-        <term>t4Interval</term>
+        <term>t4Interval (Tomcat) - t4-interval (JBoss/EAP)</term>
         <listitem>
           <para>Specifies the <literal>T4</literal> Interval, which allows the SIP Servlets container to adjust its timers depending on network conditions. The default interval is 5000 (milliseconds).</para>
           <para>For more information about available timers, refer to the <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
@@ -444,40 +446,52 @@ See the example chapters for more information about the Application Router Confi
         </listitem>
       </varlistentry>
       <varlistentry>
-        <term>timerDInterval</term>
+        <term>timerDInterval (Tomcat) - timerD-interval (JBoss/EAP)</term>
         <listitem>
           <para>Specifies the <literal>Timer D</literal> Interval, which allows the SIP Servlets container to adjust its timers depending on network conditions. The default interval is 32000 (milliseconds).</para>
           <para>For more information about available timers, refer to the <ulink url="http://tools.ietf.org/html/rfc3261#appendix-A">RFC326 &quot;Table of Timer Values&quot;1</ulink>, and the document contained in the <ulink url="http://www.3gpp.org/ftp/Specs/html-info/24229.htm">3GPP-IMS TS 24.229 v9.1.0 specification ZIP archive</ulink>.</para>
           <para>All of the timers present in the tables depend on <literal>T1</literal>, <literal>T2</literal>, <literal>T4</literal>, and <literal>Timer D</literal>.</para>
         </listitem>
       </varlistentry>
-      <varlistentry>
+      <!--varlistentry>
         <term>dispatcherThreadPoolSize</term>
         <listitem>
           <para>The number of threads used for processing SIP messages inside the Sip Servlets container by the dispatcher. The default value is 4.</para>
         </listitem>
-      </varlistentry>
+      </varlistentry-->
       <varlistentry>
-        <term>dialogPendingRequestChecking</term>
+        <term>dialogPendingRequestChecking (Tomcat) - dialog-pending-request-checking (JBoss/EAP)</term>
         <listitem>
           <para>This property enables and disables error checking when SIP transactions overlap. If within a single dialog an INVITE request arrives while there is antoher transaction proceeding, the container will send a 491 error response. The default value is false.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
-        <term>dnsServerLocatorClass</term>
+        <term>callIdMaxLength (Tomcat) - call-id-max-length (JBoss/EAP)</term>
+        <listitem>
+          <para>This property allows to shorten the size of Call-ID Header. This is useful when integrating with Lync (which has a limit of 32 in size) or older SIP Servers</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>tagHashMaxLength (Tomcat) - tag-hash-max-length (JBoss/EAP)</term>
+        <listitem>
+          <para>This property allows to shorten the size of tags in From and To Header. This is useful when integrating with Lync (which has a limit of 10 in size) or older SIP Servers</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>dnsServerLocatorClass (Tomcat) - dns-server-locator-class (JBoss/EAP)</term>
         <listitem>
           <para>Specifies the <classname>org.mobicents.ext.javax.sip.dns.DNSServerLocator</classname> implementation class that will be used by the container to perform DNS lookups compliant with RFC 3263 : Locating SIP Servers and E.164 NUmber Mapping. The default class used by the container is <classname>org.mobicents.ext.javax.sip.dns.DefaultDNSServerLocator</classname>, but any class implementing the <classname>org.mobicents.ext.javax.sip.dns.DNSServerLocator</classname> interface. To disable DNS lookups, this attribute should be left empty.</para>
         </listitem>
       </varlistentry>
       <varlistentry>
-        <term>addressResolverClass</term>
+        <term>addressResolverClass (Tomcat) - address-resolver-class (JBoss/EAP)</term>
         <listitem>
           <para>Specifies the <classname>gov.nist.core.net.AddressResolver</classname> implementation class that will be used by the container to perform DNS lookups. The default class used by the container is <classname>org.mobicents.servlet.sip.core.DNSAddressResolver</classname>, but any class implementing the <classname>gov.nist.core.net.AddressResolver</classname> NIST SIP Stack interface and having a constructor with a <classname>org.mobicents.servlet.sip.core.SipApplicationDispatcher</classname> parameter can be used. To disable DNS lookups, this attribute should be left empty.</para>
           <para>This attribute has been deprecated in favor of <literal>dnsServerLocatorClass</literal> attribute which provides better compliance with RFC 3263 : Location SIP Servers and ENUM support</para>
         </listitem>
       </varlistentry> 
       <varlistentry>
-        <term>canceledTimerTasksPurgePeriod</term>
+        <term>canceledTimerTasksPurgePeriod (Tomcat) - canceled-timer-tasks-purge-period (JBoss/EAP)</term>
         <listitem>
           <para>Defines a period to due a purge in the container timer schedulers. The purge may prevent excessive memory usage for apps that cancel most of the timers it sets.</para>
         </listitem>

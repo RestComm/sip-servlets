@@ -157,6 +157,20 @@ public class SipDefinition extends SimpleResourceDefinition {
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .setDefaultValue(new ModelNode(false))
                     .build();
+    protected static final SimpleAttributeDefinition CALL_ID_MAX_LENGTH =
+            new SimpleAttributeDefinitionBuilder(Constants.CALL_ID_MAX_LENGTH, ModelType.INT, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.CALL_ID_MAX_LENGTH)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(-1))
+                    .build();
+    protected static final SimpleAttributeDefinition TAG_HASH_MAX_LENGTH =
+            new SimpleAttributeDefinitionBuilder(Constants.TAG_HASH_MAX_LENGTH, ModelType.INT, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.TAG_HASH_MAX_LENGTH)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(-1))
+                    .build();
     protected static final SimpleAttributeDefinition CANCELED_TIMER_TASKS_PURGE_PERIOD =
             new SimpleAttributeDefinitionBuilder(Constants.CANCELED_TIMER_TASKS_PURGE_PERIOD, ModelType.INT, true)
                     .setAllowExpression(true)

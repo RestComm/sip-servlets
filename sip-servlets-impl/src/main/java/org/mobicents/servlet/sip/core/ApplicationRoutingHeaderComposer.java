@@ -49,9 +49,9 @@ public class ApplicationRoutingHeaderComposer {
 			return str;
 		}
 	}
-	public final static String randomString() {
+	public final static String randomString(int length) {
 		long randValue = Math.abs(RANDOM.nextInt(1211111) ^ System.nanoTime());
-		return reduceRandomValue(String.valueOf(randValue), 8);
+		return reduceRandomValue(String.valueOf(randValue), length);
 	}
 
 	
@@ -83,7 +83,7 @@ public class ApplicationRoutingHeaderComposer {
 	}		
 	
 	public final static String getHash(SipApplicationDispatcher sipApplicationDispatcher, String  applicationName,  String applicationId) {
-		String text = randomString() + TOKEN_SEPARATOR;
+		String text = randomString(sipApplicationDispatcher.getTagHashMaxLength()) + TOKEN_SEPARATOR;
 		// https://code.google.com/p/sipservlets/issues/detail?id=237
 		text += sipApplicationDispatcher.getApplicationServerIdHash() + TOKEN_SEPARATOR;
 		text += sipApplicationDispatcher.getHashFromApplicationName(applicationName);

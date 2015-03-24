@@ -27,6 +27,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.GenericUtils;
+import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 
 /**
  * <p>
@@ -62,7 +63,7 @@ public final class SipApplicationSessionKey implements Serializable, MobicentsSi
 		if(appGeneratedKey != null) {
 			// http://code.google.com/p/sipservlets/issues/detail?id=146 : @SipApplicationSessionKey usage can break replication
 			// Hash the appGeneratedKey to make sure it always resolve to the same uuid and reset the uuid with it.			
-			uuid = GenericUtils.hashString(appGeneratedKey);
+			uuid = GenericUtils.hashString(appGeneratedKey, SipApplicationDispatcherImpl.APP_ID_HASHING_MAX_LENGTH);
 			if(logger.isDebugEnabled()) {
 				logger.debug("uuid for appGeneratedKey " + appGeneratedKey + " set to " + uuid);
 			}
@@ -70,7 +71,12 @@ public final class SipApplicationSessionKey implements Serializable, MobicentsSi
 		} else {
 			if(id == null) {
 				// Issue 1551 : SipApplicationSessionKey is not unique
-				this.uuid = "" + UUID.randomUUID();
+				String tempUuid = "" + UUID.randomUUID();
+				if(SipApplicationDispatcherImpl.APP_ID_HASHING_MAX_LENGTH > 0) {
+					this.uuid = tempUuid.substring(0, SipApplicationDispatcherImpl.APP_ID_HASHING_MAX_LENGTH);
+				} else {
+					this.uuid = tempUuid;
+				}
 			} else {
 				this.uuid = id;
 			}					
