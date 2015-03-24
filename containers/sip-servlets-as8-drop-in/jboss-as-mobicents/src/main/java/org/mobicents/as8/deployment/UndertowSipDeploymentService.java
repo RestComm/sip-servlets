@@ -12,6 +12,7 @@ import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 
+import org.jboss.as.server.ServerLogger;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.modules.Module;
@@ -45,7 +46,7 @@ public class UndertowSipDeploymentService implements Service<UndertowSipDeployme
 
     @Override
     public void start(StartContext context) throws StartException {
-        System.out.println("UndertowSipDeploymentService.start()");
+        ServerLogger.DEPLOYMENT_LOGGER.debug("UndertowSipDeploymentService.start()");
         SIPWebContext sipWebContext = (SIPWebContext) this.deploymentService.getDeployment();
 
         SIPContextFactory factory = this.deploymentUnit.getAttachment(SIPContextFactory.ATTACHMENT);
@@ -71,10 +72,9 @@ public class UndertowSipDeploymentService implements Service<UndertowSipDeployme
             this.createServlets(sipWebContext.getServlets(), sipServlets, sipWebContext);
 
         } catch (ServletException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            ServerLogger.DEPLOYMENT_LOGGER.error(e.getMessage(),e);
         }
-        System.out.println("UndertowSipDeploymentService.start() finished");
+        ServerLogger.DEPLOYMENT_LOGGER.debug("UndertowSipDeploymentService.start() finished");
     }
 
     @Override

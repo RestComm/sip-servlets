@@ -5,6 +5,7 @@ import io.undertow.servlet.api.DeploymentInfo;
 
 import java.lang.reflect.Field;
 
+import org.jboss.as.server.ServerLogger;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.StartContext;
@@ -27,7 +28,7 @@ public class UndertowDeploymentInfoReflectionService implements Service<Undertow
 
     @Override
     public void start(StartContext context) throws StartException {
-        System.out.println("UndertowDeploymentInfoReflectionService.start()");
+        ServerLogger.DEPLOYMENT_LOGGER.debug("UndertowDeploymentInfoReflectionService.start()");
         DeploymentInfo info = this.deploymentInfoService.getValue().getValue();
         ConvergedDeploymentInfo convergedInfo = new ConvergedDeploymentInfo(info);
 
@@ -41,19 +42,18 @@ public class UndertowDeploymentInfoReflectionService implements Service<Undertow
                      * this.deploymentService.getValue().getDeploymentInfoInjectedValue().setValue( new
                      * ImmediateValue<DeploymentInfo>(convergedInfo));
                      */
-                    System.out.println("UndertowDeploymentInfoReflectionService.start() deploymentInfo injected:"
+                    ServerLogger.DEPLOYMENT_LOGGER.debug("UndertowDeploymentInfoReflectionService.start() deploymentInfo injected:"
                             + convergedInfo);
                 } catch (IllegalArgumentException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    ServerLogger.DEPLOYMENT_LOGGER.error(e.getMessage(),e);
                 } catch (IllegalAccessException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    ServerLogger.DEPLOYMENT_LOGGER.error(e.getMessage(),e);
                 }
                 field.setAccessible(false);
+                break;
             }
         }
-        System.out.println("UndertowDeploymentInfoReflectionService.start() finished");
+        ServerLogger.DEPLOYMENT_LOGGER.debug("UndertowDeploymentInfoReflectionService.start() finished");
     }
 
     public InjectedValue<UndertowDeploymentInfoService> getDeploymentInfoServiceInjectedValue() {

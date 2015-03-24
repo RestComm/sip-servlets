@@ -1,5 +1,6 @@
 package org.mobicents.as8.deployment;
 
+import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
@@ -18,6 +19,13 @@ public class UndertowDeploymentInfoServiceReflectionProcessor implements Deploym
 
     @Override
     public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
+
+        // TODO:
+        final String name="default";
+        final ServiceName servletContainerReflectionServiceName = ServletContainerReflectionService.SERVICE_NAME.append(name);
+        //lets earn that deploymentService and deploymentInfoService will depend on the servletContainerReflectionService: 
+        phaseContext.getDeploymentUnit().getAttachment(Attachments.WEB_DEPENDENCIES).add(servletContainerReflectionServiceName);
+
         final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
         SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
         if (sipMetaData == null) {
@@ -40,19 +48,20 @@ public class UndertowDeploymentInfoServiceReflectionProcessor implements Deploym
         // TODO:
         final String defaultHost = "default-host";
         final String defaultServer = "default-server";
-
+        
         String hostName = /* TODO:UndertowDeploymentProcessor. */UndertowSipDeploymentProcessor.hostNameOfDeployment(warMetaData, defaultHost);
         final String pathName = /* TODO:UndertowDeploymentProcessor. */UndertowSipDeploymentProcessor.pathNameOfDeployment(deploymentUnit, metaData);
 
         String serverInstanceName = metaData.getServerInstanceName() == null ? defaultServer : metaData
                 .getServerInstanceName();
 
+        
         final ServiceName deploymentServiceName = UndertowService.deploymentServiceName(serverInstanceName, hostName,
                 pathName);
 
         final ServiceName deploymentInfoServiceName = deploymentServiceName
                 .append(UndertowDeploymentInfoService.SERVICE_NAME);
-
+        
     
         //instantiate injector service
         UndertowDeploymentInfoReflectionService deploymentInfoReflectionService = new UndertowDeploymentInfoReflectionService();

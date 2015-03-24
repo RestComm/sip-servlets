@@ -16,7 +16,6 @@ import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.value.ImmediateValue;
-import org.mobicents.as8.ServletContainerServiceListener;
 import org.mobicents.metadata.sip.spec.SipAnnotationMetaData;
 import org.mobicents.metadata.sip.spec.SipMetaData;
 import org.wildfly.extension.undertow.UndertowService;
@@ -63,12 +62,6 @@ public class UndertowSipDeploymentProcessor implements DeploymentUnitProcessor {
 
     @Override
     public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-
-        ServletContainerServiceListener servletContainerServiceListener = ServletContainerServiceListener.newInstance();
-        // lets wait till ServletContainerServiceListener change the container for us:
-        servletContainerServiceListener.acquireSemaphore();
-        // after the change we should release the semaphore:
-        servletContainerServiceListener.releaseSemaphore();
 
         final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
         SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
