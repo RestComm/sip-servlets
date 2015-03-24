@@ -448,7 +448,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 					throw new IllegalStateException("There is no SIP connectors available to create the request");
 				}
 				final MobicentsExtendedListeningPoint extendedListeningPoint = listeningPointsIterator.next();
-				final CallIdHeader callIdHeader = SipFactoryImpl.headerFactory.createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
+				final CallIdHeader callIdHeader = sipApplicationDispatcher.getCallId(extendedListeningPoint, null);
 				newRequest.setHeader(callIdHeader);
 				if(logger.isDebugEnabled()) {
 					logger.debug("not reusing same call id, new call id is " + callIdHeader);
@@ -649,13 +649,12 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 			if(originalCallId == null) {
 				final Iterator<MobicentsExtendedListeningPoint> listeningPointsIterator = getSipNetworkInterfaceManager().getExtendedListeningPoints();				
 				if(listeningPointsIterator.hasNext()) {
-					callIdHeader = sipApplicationDispatcher.getSipFactory().getHeaderFactory().createCallIdHeader(
-							listeningPointsIterator.next().getSipProvider().getNewCallId().getCallId());
+					callIdHeader = getSipApplicationDispatcher().getCallId(listeningPointsIterator.next(), null);
 				} else {
 					throw new IllegalStateException("There is no SIP connectors available to create the request");
 				}
 			} else {
-				callIdHeader = SipFactoryImpl.headerFactory.createCallIdHeader(originalCallId);
+				callIdHeader = getSipApplicationDispatcher().getCallId(null, originalCallId);
 			}
 //			} else {
 //				callIdHeader = SipFactoryImpl.headerFactory.createCallIdHeader(

@@ -72,6 +72,9 @@ class SipServerService implements SipServer, Service<SipServer> {
  	final int t4Interval;
  	final int timerDInterval;
  	final boolean dialogPendingRequestChecking;
+ 	final int callIdMaxLength;
+	final int tagHashMaxLength;
+	
  	final int canceledTimerTasksPurgePeriod;
  	final int memoryThreshold;
  	final int backToNormalMemoryThreshold;
@@ -103,7 +106,9 @@ class SipServerService implements SipServer, Service<SipServer> {
     		int t2Interval, 
     		int t4Interval, 
     		int timerDInterval, 
-    		boolean dialogPendingRequestChecking, 
+    		boolean dialogPendingRequestChecking,
+    		int callIdMaxLength,
+    		int tagHashMaxLength,
     		int canceledTimerTasksPurgePeriod, 
     		int memoryThreshold,
     	 	int backToNormalMemoryThreshold,
@@ -126,6 +131,8 @@ class SipServerService implements SipServer, Service<SipServer> {
         this.t4Interval = t4Interval;
         this.timerDInterval = timerDInterval;
         this.dialogPendingRequestChecking = dialogPendingRequestChecking;
+        this.callIdMaxLength = callIdMaxLength;
+        this.tagHashMaxLength = tagHashMaxLength;
         this.canceledTimerTasksPurgePeriod = canceledTimerTasksPurgePeriod;
         this.memoryThreshold = memoryThreshold;
         this.backToNormalMemoryThreshold = backToNormalMemoryThreshold;

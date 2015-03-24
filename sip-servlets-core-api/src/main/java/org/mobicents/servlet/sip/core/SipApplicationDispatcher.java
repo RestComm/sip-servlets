@@ -22,6 +22,7 @@ package org.mobicents.servlet.sip.core;
 import gov.nist.javax.sip.SipListenerExt;
 
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.ar.SipApplicationRouter;
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.sip.SipStack;
+import javax.sip.header.CallIdHeader;
 import javax.sip.header.RouteHeader;
 import javax.sip.header.ViaHeader;
 
@@ -229,4 +231,7 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 
 	String getApplicationServerId();
 	String getApplicationServerIdHash();
+
+	int getTagHashMaxLength();
+	CallIdHeader getCallId(MobicentsExtendedListeningPoint extendedListeningPoint, String callId) throws ParseException;
 }

@@ -134,6 +134,8 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	protected String darConfigurationFileLocation;
 	protected boolean connectorsStartedExternally = false;
 	protected boolean dialogPendingRequestChecking = false;
+	protected int callIdMaxLength;
+	protected int tagHashMaxLength;
 	
 	protected boolean httpFollowsSip = false;
 	protected String jvmRoute;
@@ -1187,6 +1189,34 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	public void setHttpFollowsSip(boolean httpFollowsSip) {
 		this.httpFollowsSip = httpFollowsSip;
 	}	
+
+	/**
+	 * @return the tagHashMaxLength
+	 */
+	public int getTagHashMaxLength() {
+		return tagHashMaxLength;
+	}
+
+	/**
+	 * @param tagHashMaxLength the tagHashMaxLength to set
+	 */
+	public void setTagHashMaxLength(int tagHashMaxLength) {
+		this.tagHashMaxLength = tagHashMaxLength;
+	}
+
+	/**
+	 * @return the callIdMaxLength
+	 */
+	public int getCallIdMaxLength() {
+		return callIdMaxLength;
+	}
+
+	/**
+	 * @param callIdMaxLength the callIdMaxLength to set
+	 */
+	public void setCallIdMaxLength(int callIdMaxLength) {
+		this.callIdMaxLength = callIdMaxLength;
+	}
 
 	/**
 	 * @return the sipStack

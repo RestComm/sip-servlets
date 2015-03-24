@@ -85,6 +85,7 @@ import javax.sip.TransactionUnavailableException;
 import javax.sip.address.Address;
 import javax.sip.address.URI;
 import javax.sip.header.CSeqHeader;
+import javax.sip.header.CallIdHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.Parameters;
@@ -243,6 +244,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	private int t4Interval = 5000; // t4 timer interval for jain sip tx
 	private int timerDInterval = 32000; // timer D interval for jain sip tx
 	private ConcurrencyControlMode concurrencyControlMode;
+	public static int APP_ID_HASHING_MAX_LENGTH = -1;
+	private static final int NUMBER_OF_TAG_SEPARATORS = 3;
+	private int tagHashMaxLength = 8;
+	private int callIdMaxLength = -1;
 	
 	// This executor is used for async things that don't need to wait on session executors, like CANCEL requests
 	// or when the container is configured to execute every request ASAP without waiting on locks (no concurrency control)
@@ -266,8 +271,6 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		sipNetworkInterfaceManager = new SipNetworkInterfaceManagerImpl(this);
 		maxMemory = Runtime.getRuntime().maxMemory() / (double) 1024;
 		congestionControlPolicy = CongestionControlPolicy.ErrorResponse;
-		applicationServerId = "" + UUID.randomUUID();
-		applicationServerIdHash = GenericUtils.hashString(applicationServerId);
 	}
 	
 	/**
@@ -330,6 +333,24 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			logger.info("bypassRequestExecutor ? " + bypassRequestExecutor);
 			logger.info("bypassResponseExecutor ? " + bypassResponseExecutor);
 		}
+		if(sipService.getCallIdMaxLength() > 0) {
+			callIdMaxLength = sipService.getCallIdMaxLength();
+			if(logger.isInfoEnabled()) {
+				logger.info("callIdMaxLength ? " + callIdMaxLength);
+			}
+		}
+		int tagHashMaxTotalLength = sipService.getTagHashMaxLength();
+		if(tagHashMaxTotalLength > 0) {
+			this.tagHashMaxLength = (tagHashMaxTotalLength - NUMBER_OF_TAG_SEPARATORS) / 4;
+			APP_ID_HASHING_MAX_LENGTH = tagHashMaxTotalLength - NUMBER_OF_TAG_SEPARATORS - (this.tagHashMaxLength * NUMBER_OF_TAG_SEPARATORS);
+			if(logger.isInfoEnabled()) {
+				logger.info("tagHashMaxLength ? " + tagHashMaxLength);
+				logger.info("DEFAULT_TAG_HASHING_MAX_LENGTH ? " + APP_ID_HASHING_MAX_LENGTH);
+			}
+		}
+		applicationServerId = "" + UUID.randomUUID();
+		applicationServerIdHash = GenericUtils.hashString(applicationServerId, tagHashMaxLength);
+		
 		messageDispatcherFactory = new MessageDispatcherFactory(this);
 		congestionControlThreadPool = new ScheduledThreadPoolExecutor(2,
 				new ThreadPoolExecutor.CallerRunsPolicy());
@@ -471,7 +492,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		
 		applicationDeployed.put(sipApplicationName, sipApplication);
 
-		String hash = GenericUtils.hashString(sipApplicationName);
+		String hash = GenericUtils.hashString(sipApplicationName, tagHashMaxLength);
 		mdToApplicationName.put(hash, sipApplicationName);
 		applicationNameToMd.put(sipApplicationName, hash);
 		
@@ -512,7 +533,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		if(sipContext != null) {
 			sipContext.getSipManager().removeAllSessions();
 		}
-		String hash = GenericUtils.hashString(sipApplicationName);
+		String hash = GenericUtils.hashString(sipApplicationName, tagHashMaxLength);
 		mdToApplicationName.remove(hash);
 		applicationNameToMd.remove(sipApplicationName);
 		if(logger.isDebugEnabled()) {
@@ -1539,6 +1560,23 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		return applicationServerIdHash;
 	}
 	
+	@Override
+	public int getTagHashMaxLength() {
+		return tagHashMaxLength;
+	}
+	
+	@Override
+	public CallIdHeader getCallId(
+			MobicentsExtendedListeningPoint extendedListeningPoint, String callId) throws ParseException {
+		String callIdString = callId;
+		if(callIdString == null) {
+			callIdString = extendedListeningPoint.getSipProvider().getNewCallId().getCallId();
+		}
+		if(callIdMaxLength > 0 && callIdString.length() > callIdMaxLength) {
+			callIdString = callIdString.substring(0, callIdMaxLength);
+		}
+		return SipFactoryImpl.headerFactory.createCallIdHeader(callIdString);
+	}
 	
 	/**
 	 * Check if the route is external

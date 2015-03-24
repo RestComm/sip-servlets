@@ -207,7 +207,7 @@ public class ProxyTerminationInfo implements Externalizable {
 
 		try {
 			request = SipFactoryImpl.messageFactory.createRequest(requestUri, Request.BYE,
-															 	SipFactoryImpl.headerFactory.createCallIdHeader(callId),
+																proxyImpl.getSipFactoryImpl().getSipApplicationDispatcher().getCallId(null, callId),
 																SipFactoryImpl.headerFactory.createCSeqHeader(cSeq, Request.BYE),
 																from, to, new ArrayList(), 
 																SipFactoryImpl.headerFactory.createMaxForwardsHeader(70));

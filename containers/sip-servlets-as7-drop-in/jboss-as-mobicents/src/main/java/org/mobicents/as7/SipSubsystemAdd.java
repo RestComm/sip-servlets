@@ -154,6 +154,12 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ModelNode dialogPendingRequestCheckingModel = SipDefinition.DIALOG_PENDING_REQUEST_CHECKING.resolveModelAttribute(context, fullModel);
         final boolean dialogPendingRequestChecking = dialogPendingRequestCheckingModel.isDefined() ? dialogPendingRequestCheckingModel.asBoolean() : false;
         
+        final ModelNode callIdMaxLengthModel = SipDefinition.CALL_ID_MAX_LENGTH.resolveModelAttribute(context, fullModel);
+        final int callIdMaxLength = callIdMaxLengthModel.isDefined() ? callIdMaxLengthModel.asInt() : -1;
+        
+        final ModelNode tagHashMaxLengthModel = SipDefinition.TAG_HASH_MAX_LENGTH.resolveModelAttribute(context, fullModel);
+        final int tagHashMaxLength = callIdMaxLengthModel.isDefined() ? tagHashMaxLengthModel.asInt() : -1;
+        
         final ModelNode canceledTimerTasksPurgePeriodModel = SipDefinition.CANCELED_TIMER_TASKS_PURGE_PERIOD.resolveModelAttribute(context, fullModel);
         final int canceledTimerTasksPurgePeriod = canceledTimerTasksPurgePeriodModel.isDefined() ? canceledTimerTasksPurgePeriodModel.asInt() : -1;
         
@@ -189,7 +195,9 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         		t2Interval, 
         		t4Interval, 
         		timerDInterval, 
-        		dialogPendingRequestChecking, 
+        		dialogPendingRequestChecking,
+        		callIdMaxLength,
+        		tagHashMaxLength,
         		canceledTimerTasksPurgePeriod, 
         		memoryThreshold,
         		backToNormalMemoryThreshold,

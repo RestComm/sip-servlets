@@ -188,7 +188,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 				throw new IllegalStateException("There is no SIP connectors available to create the request");
 			}
 			final MobicentsExtendedListeningPoint extendedListeningPoint = listeningPointsIterator.next();
-			final CallIdHeader callIdHeader = sipFactoryImpl.getHeaderFactory().createCallIdHeader(extendedListeningPoint.getSipProvider().getNewCallId().getCallId());
+			final CallIdHeader callIdHeader = sipFactoryImpl.getSipApplicationDispatcher().getCallId(extendedListeningPoint, null);
 			newRequest.setHeader(callIdHeader);
 			
 			final List<String> contactHeaderSet = retrieveContactHeaders(headerMap,
