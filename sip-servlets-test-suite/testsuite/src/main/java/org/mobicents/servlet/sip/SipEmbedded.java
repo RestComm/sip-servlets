@@ -86,6 +86,10 @@ public class SipEmbedded {
 	MBeanServer mBeanServer = null;
 	
 	private boolean isHA = false;
+	
+	private int callIdSize = -1;
+	
+	private int tagSize = -1;
 
 	/**
 	 * Default Constructor
@@ -94,6 +98,17 @@ public class SipEmbedded {
 	public SipEmbedded(String serverName, String serviceFullClassName) {
 		this.serviceFullClassName = serviceFullClassName;
 		this.serverName = serverName;
+	}
+	
+	/**
+	 * Default Constructor
+	 * 
+	 */
+	public SipEmbedded(String serverName, String serviceFullClassName, int callIdSize, int tagSize) {
+		this.serviceFullClassName = serviceFullClassName;
+		this.serverName = serverName;
+		this.callIdSize = callIdSize;
+		this.tagSize = tagSize;
 	}
 
 	/**
@@ -171,8 +186,12 @@ public class SipEmbedded {
 		sipService.setCongestionControlCheckingInterval(-1);
 		sipService.setAdditionalParameterableHeaders("additionalParameterableHeader");
 		sipService.setUsePrettyEncoding(true);
-//		sipService.setCallIdMaxLength(32);
-//		sipService.setTagHashMaxLength(10);
+		if(callIdSize > 0) {
+			sipService.setCallIdMaxLength(callIdSize);
+		}
+		if(tagSize > 0) {
+			sipService.setTagHashMaxLength(tagSize);
+		}
 		if(isHA) {
 			sipService.setSipPathName("org.mobicents.ha");
 			sipService.setBalancers("" + System.getProperty("org.mobicents.testsuite.testhostaddr") + "");
