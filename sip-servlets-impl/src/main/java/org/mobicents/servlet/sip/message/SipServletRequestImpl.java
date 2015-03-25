@@ -80,6 +80,7 @@ import javax.sip.header.ContactHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.Parameters;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.ProxyAuthorizationHeader;
 import javax.sip.header.RecordRouteHeader;
@@ -1590,6 +1591,13 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		final MobicentsProxy proxy = session.getProxy();
 		
 		ContactHeader contactHeader = (ContactHeader)request.getHeader(ContactHeader.NAME);
+		if(contactHeader != null && (((Parameters)contactHeader.getAddress().getURI()).getParameter("gruu") != null || 
+				((Parameters)contactHeader.getAddress().getURI()).getParameter("gr") != null)) {
+			 if(logger.isDebugEnabled()) {
+				 logger.debug("not changing existing contact header " + contactHeader + " as it contains gruu");
+			 }
+			 return;
+		}
 		if(contactHeader == null && !Request.REGISTER.equalsIgnoreCase(requestMethod) && JainSipUtils.CONTACT_HEADER_METHODS.contains(requestMethod) && proxy == null) {
 			final FromHeader fromHeader = (FromHeader) request.getHeader(FromHeader.NAME);
 			final javax.sip.address.URI fromUri = fromHeader.getAddress().getURI();

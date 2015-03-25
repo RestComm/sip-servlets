@@ -753,7 +753,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		ContactHeader contactHeader = (ContactHeader) receiver.getRegisterReceived().getHeader(ContactHeader.NAME);
 		assertNotNull(contactHeader);
-		assertEquals("Contact: <sip:caller@127.0.0.1:5070;gruu;opaque=hdg7777ad7aflzig8sf7>",
+		assertEquals("Contact: <sip:caller@example.com;gruu;opaque=hdg7777ad7aflzig8sf7>",
 				contactHeader.toString().trim());
 	}
 	
@@ -780,7 +780,7 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		Thread.sleep(TIMEOUT);
 		ContactHeader contactHeader = (ContactHeader) receiver.getInviteRequest().getHeader(ContactHeader.NAME);
 		assertNotNull(contactHeader);
-		assertEquals("Contact: <sip:caller@127.0.0.1:5070;gruu;opaque=hdg7777ad7aflzig8sf7>",
+		assertEquals("Contact: <sip:caller@example.com;gruu;opaque=hdg7777ad7aflzig8sf7>",
 				contactHeader.toString().trim());	
 	}
 	
