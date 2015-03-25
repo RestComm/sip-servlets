@@ -1621,7 +1621,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	public static boolean isSystemHeaderAndNotGruu(ModifiableRule modifiableRule, String value) {
 		boolean isSettingGruu = false;
 		if(modifiableRule == ModifiableRule.ContactSystem && 
-				(value.indexOf("gruu;") != -1 ||
+				(value.indexOf("gruu") != -1 ||
 					value.indexOf("gr=") != -1)) {
 			isSettingGruu = true;
 			if (logger.isDebugEnabled())
