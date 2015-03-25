@@ -573,6 +573,26 @@ public class ShootistSipServlet
                     e.printStackTrace();
                 }
 			}
+			if(ce.getServletContext().getInitParameter("testGruu") != null) {
+			    logger.info("testGruu Test Address");
+			    // https://github.com/Mobicents/sip-servlets/issues/51
+                try {
+                	// Support for https://tools.ietf.org/html/rfc5627
+                	Address address = sipFactory.createAddress("<sip:callee@example.com;gr=urn:uuid:f81d4fae-7dec-11d0-a765-00a0c91e6bf6>");
+                	sipServletRequest.addAddressHeader("Contact", address, true);
+                	logger.info("request " + sipServletRequest);
+                	sipServletRequest.removeHeader("Contact");
+                	
+                	// Support for https://tools.ietf.org/html/draft-ietf-sip-gruu-10#section-14.1 for Lync interop
+                	address = sipFactory.createAddress("<sip:caller@example.com;gruu;opaque=hdg7777ad7aflzig8sf7>");
+                	sipServletRequest.addAddressHeader("Contact", address, true);
+                	logger.info("request " + sipServletRequest);
+    
+                } catch (ServletParseException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+			}
 			try {			
 				sipServletRequest.send();
 			} catch (IOException e) {
