@@ -144,10 +144,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	
 	// List of sip extensions supported by the container	
 	private static final String[] EXTENSIONS_SUPPORTED = 
-		{"MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE", "PUBLISH", "REFER", "PRACK", "100rel", "STUN", "path", "join", "outbound", "from-change"};
+		{"MESSAGE", "INFO", "SUBSCRIBE", "NOTIFY", "UPDATE", "PUBLISH", "REFER", "PRACK", "100rel", "STUN", "path", "join", "outbound", "from-change", "gruu"};
 	// List of sip rfcs supported by the container
 	private static final String[] RFC_SUPPORTED = 
-		{"3261", "3428", "2976", "3265", "3311", "3903", "3515", "3262", "3489", "3327", "3911", "5626", "4916"};
+		{"3261", "3428", "2976", "3265", "3311", "3903", "3515", "3262", "3489", "3327", "3911", "5626", "4916", "5627"};
 
 	private static final String[] RESPONSES_PER_CLASS_OF_SC = 
 		{"1XX", "2XX", "3XX", "4XX", "5XX", "6XX", "7XX", "8XX", "9XX"};

@@ -731,6 +731,60 @@ public class ShootistSipServletTest extends SipServletTestCase {
 	}
 	
 	/**
+	 * non regression test for https://github.com/Mobicents/sip-servlets/issues/51
+	 * Contact header with gruu is added to REGISTER request
+	 */
+	public void testShootistRegisterGruu() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("method", "REGISTER");
+		params.put("testGruu", "true");
+		deployApplication(params);
+		Thread.sleep(TIMEOUT);
+		ContactHeader contactHeader = (ContactHeader) receiver.getRegisterReceived().getHeader(ContactHeader.NAME);
+		assertNotNull(contactHeader);
+		assertEquals("Contact: <sip:caller@127.0.0.1:5070;gruu;opaque=hdg7777ad7aflzig8sf7>",
+				contactHeader.toString().trim());
+	}
+	
+	/**
+	 * non regression test for https://github.com/Mobicents/sip-servlets/issues/51
+	 * Contact header with gruu is added to INVITE request
+	 */
+	public void testShootistInviteGruu() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("method", "INVITE");
+		params.put("testGruu", "true");
+		deployApplication(params);
+		Thread.sleep(TIMEOUT);
+		ContactHeader contactHeader = (ContactHeader) receiver.getInviteRequest().getHeader(ContactHeader.NAME);
+		assertNotNull(contactHeader);
+		assertEquals("Contact: <sip:caller@127.0.0.1:5070;gruu;opaque=hdg7777ad7aflzig8sf7>",
+				contactHeader.toString().trim());	
+	}
+	
+	/**
 	 * non regression test for http://code.google.com/p/mobicents/issues/detail?id=2288
 	 * SipServletRequest.send() throws IllegalStateException instead of IOException
 	 */

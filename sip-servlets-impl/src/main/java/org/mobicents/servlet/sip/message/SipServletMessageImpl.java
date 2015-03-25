@@ -66,6 +66,7 @@ import javax.sip.Transaction;
 import javax.sip.header.AcceptLanguageHeader;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
+import javax.sip.header.ContactHeader;
 import javax.sip.header.ContentLanguageHeader;
 import javax.sip.header.ContentLengthHeader;
 import javax.sip.header.ContentTypeHeader;
@@ -73,7 +74,6 @@ import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.Header;
 import javax.sip.header.HeaderAddress;
-import javax.sip.header.Parameters;
 import javax.sip.header.RequireHeader;
 import javax.sip.header.SupportedHeader;
 import javax.sip.header.ToHeader;
@@ -264,7 +264,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 //					+ "] is not of an address type");
 //		}
 		
-		if (isSystemHeader(getModifiableRule(hName))) {
+		if (isSystemHeaderAndNotGruu(getModifiableRule(hName), (Parameterable)addr.getURI())) {
 			logger.error("Error, can't add system header [" + hName + "]");
 			throw new IllegalArgumentException("Header[" + hName
 					+ "] is system header, cant add, modify it!!!");
@@ -1218,9 +1218,17 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		checkCommitted();
 		String hName = getFullHeaderName(name);
 
-		if (isSystemHeader(getModifiableRule(hName))) {
-			throw new IllegalArgumentException("Cant remove system header["
-					+ hName + "]");
+		if(hName.trim().equalsIgnoreCase(ContactHeader.NAME)) {
+			String header = getHeader(hName);
+			if (isSystemHeaderAndNotGruu(getModifiableRule(hName), header)) {
+				throw new IllegalArgumentException("Cant remove system header["
+						+ hName + "]");
+			}
+		} else {
+			if (isSystemHeader(getModifiableRule(hName))) {
+				throw new IllegalArgumentException("Cant remove system header["
+						+ hName + "]");
+			}
 		}
 		
 		if (hName.equalsIgnoreCase("From") || hName.equalsIgnoreCase("To")) {
@@ -1287,7 +1295,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			logger.debug("Setting address header [" + name + "] to value ["
 					+ addr + "]");
 
-		if (isSystemHeader(getModifiableRule(hName))) {
+		if (isSystemHeaderAndNotGruu(getModifiableRule(hName), (Parameterable)addr.getURI())) {
 			logger.error("Error, can't set system header [" + hName + "]");
 			throw new IllegalArgumentException(
 					"Cant set system header, it is maintained by container!!");
@@ -1477,7 +1485,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		if(value == null) {
 			throw new NullPointerException ("value parameter is null");
 		}
-		if(isSystemHeader(getModifiableRule(name))) {
+		if (isSystemHeader(getModifiableRule(name))) {
 			throw new IllegalArgumentException(name + " is a system header !");
 		}
 		checkCommitted();
@@ -1591,6 +1599,35 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		} else {
 			return false;
 		}
+	}
+	
+	/**
+	 * Support for GRUU https://github.com/Mobicents/sip-servlets/issues/51
+	 * if the header contains one of the gruu, gr, temp-gruu or pub-gruu, it is allowed to set the Contact Header
+	 * as per RFC 5627
+	 */
+	public static boolean isSystemHeaderAndNotGruu(ModifiableRule modifiableRule, Parameterable parameterable) {
+		boolean isSettingGruu = false;
+		if(modifiableRule == ModifiableRule.ContactSystem && 
+				(parameterable.getParameter("gruu") != null || 
+					parameterable.getParameter("gr") != null)) {
+			isSettingGruu = true;
+			if (logger.isDebugEnabled())
+				logger.debug("Setting gruu so modifying contact header address is allowed");
+		}
+		return !isSettingGruu && isSystemHeader(modifiableRule);
+	}
+	
+	public static boolean isSystemHeaderAndNotGruu(ModifiableRule modifiableRule, String value) {
+		boolean isSettingGruu = false;
+		if(modifiableRule == ModifiableRule.ContactSystem && 
+				(value.indexOf("gruu;") != -1 ||
+					value.indexOf("gr=") != -1)) {
+			isSettingGruu = true;
+			if (logger.isDebugEnabled())
+				logger.debug("Setting gruu so modifying contact header address is allowed");
+		}
+		return !isSettingGruu && isSystemHeader(modifiableRule);
 	}
 	
 	/**
