@@ -244,7 +244,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	private int t4Interval = 5000; // t4 timer interval for jain sip tx
 	private int timerDInterval = 32000; // timer D interval for jain sip tx
 	private ConcurrencyControlMode concurrencyControlMode;
-	public static int APP_ID_HASHING_MAX_LENGTH = -1;
+	public static int APP_ID_HASHING_MAX_LENGTH = 8;
 	private static final int NUMBER_OF_TAG_SEPARATORS = 3;
 	private int tagHashMaxLength = 8;
 	private int callIdMaxLength = -1;
