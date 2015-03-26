@@ -215,14 +215,6 @@ public class LyncInteropShootistSipServletTest extends SipServletTestCase {
 		assertTrue(receiver.getByeReceived());
 		assertEquals(32,((RequestExt)receiver.getInviteRequest()).getCallIdHeader().getCallId().trim().length());
 		assertEquals(10,((RequestExt)receiver.getInviteRequest()).getFromHeader().getTag().trim().length());
-		// Non regression test for http://code.google.com/p/sipservlets/issues/detail?id=31
-		assertNotNull(((ViaHeader)receiver.getInviteRequest().getHeader(ViaHeader.NAME)).getParameter("rport"));
-		assertNotNull(((ViaHeader)receiver.getByeRequestReceived().getHeader(ViaHeader.NAME)).getParameter("rport"));
-		assertEquals(1,tomcat.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod(Request.INVITE));
-		assertEquals(1,tomcat.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod(Request.ACK));
-		assertEquals(1,tomcat.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod(Request.BYE));
-		assertEquals(2,tomcat.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode("2XX"));
-		
 	}
 	
 	@Override
