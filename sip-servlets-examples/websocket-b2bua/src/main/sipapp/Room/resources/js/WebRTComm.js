@@ -3147,7 +3147,8 @@ WebRTCommCall.prototype.createRTCPeerConnection = function() {
 		    && this.webRTCommClient.configuration.RTCPeerConnection.turnPassword)
 	    {
 		rtcPeerConnectionConfiguration.iceServers.push({
-		    url: "turn:" + this.webRTCommClient.configuration.RTCPeerConnection.turnLogin + "@" + this.webRTCommClient.configuration.RTCPeerConnection.turnServer,
+		    url: "turn:" + this.webRTCommClient.configuration.RTCPeerConnection.turnServer,
+		    username: this.webRTCommClient.configuration.RTCPeerConnection.turnLogin,
 		    credential: this.webRTCommClient.configuration.RTCPeerConnection.turnPassword
 		});
 	    }
