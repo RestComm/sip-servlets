@@ -2437,13 +2437,9 @@ WebRTCommCall.prototype.open = function(calleePhoneNumber, configuration) {
                         else if (window.mozRTCPeerConnection)
                         {
                             var sdpConstraints = {
-                                mandatory:
-                                        {
-                                            offerToReceiveAudio: this.configuration.audioMediaFlag,
-                                            offerToReceiveVideo: this.configuration.videoMediaFlag,
-                                            mozDontOfferDataChannel: !this.configuration.messageMediaFlag
-                                        },
-                                optional: []
+                                    offerToReceiveAudio: this.configuration.audioMediaFlag,
+                                    offerToReceiveVideo: this.configuration.videoMediaFlag,
+                                    mozDontOfferDataChannel: !this.configuration.messageMediaFlag
                             };
 
                             console.debug("WebRTCommCall:open():sdpConstraints=" + JSON.stringify(sdpConstraints));
@@ -3997,13 +3993,9 @@ WebRTCommCall.prototype.onRtcPeerConnectionSetRemoteDescriptionSuccessEvent = fu
                 else if (window.mozRTCPeerConnection)
                 {
                     var sdpConstraints = {
-                        mandatory:
-                                {
-                                    offerToReceiveAudio: this.configuration.audioMediaFlag,
-                                    offerToReceiveVideo: this.configuration.videoMediaFlag,
-                                    mozDontOfferDataChannel: !this.configuration.messageMediaFlag
-                                },
-                        optional: []
+                            offerToReceiveAudio: this.configuration.audioMediaFlag,
+                            offerToReceiveVideo: this.configuration.videoMediaFlag,
+                            mozDontOfferDataChannel: !this.configuration.messageMediaFlag
                     };
 		    console.debug("WebRTCommCall:onRtcPeerConnectionSetRemoteDescriptionSuccessEvent():sdpConstraints=" + JSON.stringify(sdpConstraints));
                     this.peerConnection.createAnswer(function(answer) {
