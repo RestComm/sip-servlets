@@ -52,8 +52,10 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 	
 	TestSipListener sender;
 	TestSipListener receiver;
+	TestSipListener receiver2;
 	ProtocolObjects senderProtocolObjects;
 	ProtocolObjects	receiverProtocolObjects;
+	ProtocolObjects	receiver2ProtocolObjects;
 
 	public CallForwardingB2BUAJunitTest(String name) {
 		super(name);
@@ -89,6 +91,8 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		senderProtocolObjects = new ProtocolObjects("forward-sender",
 				"gov.nist", TRANSPORT, AUTODIALOG, null, "32", "true");
 		receiverProtocolObjects = new ProtocolObjects("receiver",
+				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+		receiver2ProtocolObjects = new ProtocolObjects("receiver2",
 				"gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
 			
 	}
@@ -618,6 +622,56 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 		}
 	}
 	
+	/*
+	 * Non regression test for https://github.com/Mobicents/sip-servlets/issues/56
+	 */
+	public void testCallForwardingCallerReInvite3rdLeg() throws Exception {
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+		
+		receiver2 = new TestSipListener(5091, 5070, receiver2ProtocolObjects, false);
+		SipProvider receiver2Provider = receiver2.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		receiver2Provider.addSipListener(receiver2);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+		receiver2ProtocolObjects.start();
+
+		String fromName = "forward-sender-3rd-leg-factory";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+				
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);
+		sender.setTimeToWaitBeforeBye(TIMEOUT*2);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver.isAckReceived());
+		sender.sendInDialogSipRequest("INVITE", null, null, null, null, null);
+		Thread.sleep(TIMEOUT);
+		assertTrue(receiver2.isAckReceived());
+		Thread.sleep(TIMEOUT*3);
+		assertTrue(sender.getOkToByeReceived());
+		assertTrue(receiver2.getByeReceived());		
+//		Iterator<String> allMessagesIterator = sender.getAllMessagesContent().iterator();
+//		while (allMessagesIterator.hasNext()) {
+//			String message = (String) allMessagesIterator.next();
+//			logger.info(message);
+//		}
+//		assertEquals(1, sender.getAllMessagesContent().size());
+//		assertTrue(sender.getAllMessagesContent().contains("sipApplicationSessionReadyToBeInvalidated"));
+	}
+	
 	@Override
 	protected Properties getSipStackProperties() {
 		Properties sipStackProperties = new Properties();
@@ -643,7 +697,8 @@ public class CallForwardingB2BUAJunitTest extends SipServletTestCase {
 	@Override
 	protected void tearDown() throws Exception {	
 		senderProtocolObjects.destroy();
-		receiverProtocolObjects.destroy();			
+		receiverProtocolObjects.destroy();
+		receiver2ProtocolObjects.destroy();
 		logger.info("Test completed");
 		super.tearDown();
 	}

@@ -590,11 +590,15 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 	 * @see javax.servlet.sip.B2buaHelper#getLinkedSession(javax.servlet.sip.SipSession)
 	 */
 	public SipSession getLinkedSession(final SipSession session) {
+		return getLinkedSession(session, true);
+	}
+	
+	public SipSession getLinkedSession(final SipSession session, boolean checkSession) {
 		if ( session == null) { 
 			throw new NullPointerException("the argument is null");
 		}
 		final MobicentsSipSession mobicentsSipSession = (MobicentsSipSession)session;
-		if(!mobicentsSipSession.isValidInternal()) {
+		if(checkSession && !mobicentsSipSession.isValidInternal()) {
 			throw new IllegalArgumentException("the session " + mobicentsSipSession + " is invalid");
 		}		
 		MobicentsSipSessionKey sipSessionKey = this.sessionMap.get(mobicentsSipSession.getKey());
@@ -753,14 +757,34 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 				State.TERMINATED.equals(((MobicentsSipSession)session1).getState()) ||
 				State.TERMINATED.equals(((MobicentsSipSession)session2).getState()) ||
 				!session1.getApplicationSession().equals(session2.getApplicationSession()) ||
-				sessionMap.get(((MobicentsSipSession)session1).getKey()) != null ||
-				sessionMap.get(((MobicentsSipSession)session2).getKey()) != null) {
+				(sessionMap.get(((MobicentsSipSession)session1).getKey()) != null && sessionMap.get(((MobicentsSipSession)session1).getKey()) != ((MobicentsSipSession)session2).getKey())  ||
+				(sessionMap.get(((MobicentsSipSession)session2).getKey()) != null && sessionMap.get(((MobicentsSipSession)session2).getKey()) != ((MobicentsSipSession)session1).getKey())) {
 			throw new IllegalArgumentException("either of the specified sessions has been terminated " +
 					"or the sessions do not belong to the same application session or " +
 					"one or both the sessions are already linked with some other session(s)");
 		}
 		this.sessionMap.put(((MobicentsSipSession)session1).getKey(), ((MobicentsSipSession)session2).getKey());
 		this.sessionMap.put(((MobicentsSipSession)session2).getKey(), ((MobicentsSipSession) session1).getKey());
+		// https://github.com/Mobicents/sip-servlets/issues/56
+		if(!this.equals(((MobicentsSipSession)session1).getB2buaHelper())) {
+			if(((MobicentsSipSession)session1).getB2buaHelper() == null) {
+				((MobicentsSipSession)session1).setB2buaHelper(this);
+			} else {
+				Map<MobicentsSipSessionKey, MobicentsSipSessionKey> forkedSessionMap = ((MobicentsSipSession)session1).getB2buaHelper().getSessionMap();
+				forkedSessionMap.put(((MobicentsSipSession)session1).getKey(), ((MobicentsSipSession)session2).getKey());
+				forkedSessionMap.put(((MobicentsSipSession)session2).getKey(), ((MobicentsSipSession) session1).getKey());
+			}
+		}
+		// https://github.com/Mobicents/sip-servlets/issues/56
+		if(!this.equals(((MobicentsSipSession)session2).getB2buaHelper())) {
+			if(((MobicentsSipSession)session2).getB2buaHelper() == null) {
+				((MobicentsSipSession)session2).setB2buaHelper(this);
+			} else {
+				Map<MobicentsSipSessionKey, MobicentsSipSessionKey> forkedSessionMap = ((MobicentsSipSession)session2).getB2buaHelper().getSessionMap();
+				forkedSessionMap.put(((MobicentsSipSession)session1).getKey(), ((MobicentsSipSession)session2).getKey());
+				forkedSessionMap.put(((MobicentsSipSession)session2).getKey(), ((MobicentsSipSession) session1).getKey());
+			}
+		}
 		if(logger.isDebugEnabled()) {
 			logger.debug("sipsession " + ((MobicentsSipSession)session1).getKey() + " linked to sip session " + ((MobicentsSipSession)session2).getKey());
 		}
@@ -793,20 +817,44 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 				throw new IllegalArgumentException("the session is not currently linked to another session or it has been terminated");
 			}		
 		}
-		final MobicentsSipSessionKey value  = this.sessionMap.remove(sipSessionKey);
+		final MobicentsSipSessionKey value  = this.sessionMap.get(sipSessionKey);
 		if (value != null) {
+			SipSession linkedSipSession = getLinkedSession(session, checkSession);
+			this.sessionMap.remove(sipSessionKey);
 			this.sessionMap.remove(value);
 			if(logger.isDebugEnabled()) {
 				logger.debug("sipsession " + sipSessionKey + " unlinked from sip session " + value);
 			}
+			if(linkedSipSession != null) {
+				// https://github.com/Mobicents/sip-servlets/issues/56
+				MobicentsB2BUAHelper linkedB2buaHelper = ((MobicentsSipSession)linkedSipSession).getB2buaHelper();
+				if(!linkedB2buaHelper.equals(this)) {
+					linkedB2buaHelper.unlinkSipSessionsInternal(linkedSipSession, false);
+				} else {
+					linkedB2buaHelper = ((MobicentsSipSession)session).getB2buaHelper();
+					linkedB2buaHelper.unlinkSipSessionsInternal(linkedSipSession, false);
+				}
+			}
 		} else if(logger.isDebugEnabled()) {
 			logger.debug("no sipsession for " + sipSessionKey + " to unlink");			
 		}
-		final String linkedDerivedSessionId = this.derivedSessionMap.remove(sipSessionKey.toString());
+		final String linkedDerivedSessionId = this.derivedSessionMap.get(sipSessionKey.toString());
 		if (linkedDerivedSessionId != null) {
+			SipSession linkedSipSession = getLinkedSession(session, checkSession);
+			this.derivedSessionMap.remove(sipSessionKey.toString());
 			this.derivedSessionMap.remove(linkedDerivedSessionId);
 			if(logger.isDebugEnabled()) {
 				logger.debug("derived sipsession " + sipSessionKey.toString() + " unlinked from derived sip session " + linkedDerivedSessionId);
+			}
+			if(linkedSipSession != null) {
+				// https://github.com/Mobicents/sip-servlets/issues/56
+				MobicentsB2BUAHelper linkedB2buaHelper = ((MobicentsSipSession)linkedSipSession).getB2buaHelper();
+				if(!linkedB2buaHelper.equals(this)) {
+					linkedB2buaHelper.unlinkSipSessions(linkedSipSession);
+				} else {
+					linkedB2buaHelper = ((MobicentsSipSession)session).getB2buaHelper();
+					linkedB2buaHelper.unlinkSipSessions(linkedSipSession);
+				}
 			}
 		} else if(logger.isDebugEnabled()) {
 			logger.debug("no derived sipsession for " + sipSessionKey.toString() + " to unlink");			
