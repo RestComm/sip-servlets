@@ -125,6 +125,14 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				new String[]{"sip:error-forward-samesipsession@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", "sip:error-forward-samesipsession@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070"});
 		forwardingUris.put("sip:forward-myself@sip-servlets.com", 
 				new String[]{"sip:forward-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", "sip:forward-sender@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070"});
+		forwardingUris.put("sip:forward-sender-3rd-leg@sip-servlets.com", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
+		forwardingUris.put("sip:forward-sender-3rd-leg@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
+		forwardingUris.put("sip:forward-sender-3rd-leg-factory@sip-servlets.com", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
+		forwardingUris.put("sip:forward-sender-3rd-leg-factory@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070", 
+				new String[]{"sip:forward-receiver@sip-servlets.com", "sip:forward-receiver@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5090"});
 	}
 
 	SipSession incomingSession;
@@ -304,6 +312,28 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 			// deals with reinvite requests
 			B2buaHelper b2buaHelper = request.getB2buaHelper();
 			SipSession origSession = b2buaHelper.getLinkedSession(request.getSession());
+			if(request.getFrom().getURI().toString().contains("3rd-leg") || request.getTo().getURI().toString().contains("3rd-leg")) {
+				// https://github.com/Mobicents/sip-servlets/issues/56
+				b2buaHelper.unlinkSipSessions(request.getSession());
+				B2buaHelper origB2buaHelper = (B2buaHelper) origSession.getAttribute("b2buaHelper");
+				SipSession forkedSession = origB2buaHelper.getLinkedSession(origSession);
+				if(forkedSession != null) {
+					throw new IllegalArgumentException("Session retrieved should be null as it has just been unlinked from the other side");
+				}
+				SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(
+						SIP_FACTORY);
+				URI from = request.getTo().getURI();
+		        URI to= sipFactory.createURI("sip:receiver2@" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5091");
+				SipServletRequest newRequest = sipFactory.createRequest(request.getApplicationSession(), "INVITE", from, to);
+		        if(request.getContent() != null) {
+		        	newRequest.setContent(request.getContent(), request.getContentType());
+		        }
+		        newRequest.setHeader("Allow", "INVITE, ACK, CANCEL, BYE, REFER, UPDATE, INFO");
+		        request.getB2buaHelper().linkSipSessions(request.getSession(), newRequest.getSession());
+		        newRequest.getSession().setAttribute("originalRequest", request);
+		        newRequest.send();
+		        return;
+			}
 			origSession.setAttribute("originalRequest", request);
 			Map<String, List<String>> headers=new HashMap<String, List<String>>();
 			List<String> contactHeaderList = new ArrayList<String>();
@@ -380,6 +410,10 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 		logger.info("forkedRequest = " + forkedRequest);
 		outgoingSession = forkedRequest.getSession();
 		forkedRequest.getSession().setAttribute("originalRequest", request);
+		if(forkedRequest.getSession().isValid())
+			forkedRequest.getSession().setAttribute("b2buaHelper", forkedRequest.getB2buaHelper());
+		if(request.getSession().isValid())
+			request.getSession().setAttribute("b2buaHelper", request.getB2buaHelper());
 		if(request.getFrom().getURI().toString().contains("myself")) {
 			((SipURI)forkedRequest.getAddressHeader("From").getURI()).setUser("forward-sender");
 		}
@@ -419,6 +453,12 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
         	newRequest.getB2buaHelper().linkSipSessions(origReq.getSession(), newRequest.getSession()); //Linking sessions!
         }
         outgoingSession = newRequest.getSession();
+        
+        // https://github.com/Mobicents/sip-servlets/issues/56
+        if(newRequest.getSession().isValid())
+        	newRequest.getSession().setAttribute("b2buaHelper", newRequest.getB2buaHelper());
+        if(origReq.getSession().isValid())
+        	origReq.getSession().setAttribute("b2buaHelper", origReq.getB2buaHelper());
         
         if(origReq.getFrom().getURI().toString().contains("myself")) {
 			((SipURI)newRequest.getAddressHeader("From").getURI()).setUser("forward-sender");
