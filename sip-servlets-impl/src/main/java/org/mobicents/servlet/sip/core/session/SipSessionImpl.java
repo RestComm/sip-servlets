@@ -732,8 +732,12 @@ public class SipSessionImpl implements MobicentsSipSession {
 	public String getCallId() {
 		if(this.sessionCreatingDialog != null)
 			return this.sessionCreatingDialog.getCallId().getCallId();
-		else
+		else if(sessionCreatingTransactionRequest != null)
 			return ((CallIdHeader)this.sessionCreatingTransactionRequest.getMessage().getHeader(CallIdHeader.NAME)).getCallId();
+		else if(key != null) 
+			return key.getCallId();
+		else
+			return null;
 	}
 
 	/*
