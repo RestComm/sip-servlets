@@ -996,8 +996,10 @@ public class SimpleSipServlet
 
 
 	public void sessionCreated(SipSessionEvent se) {
-		// TODO Auto-generated method stub
-		
+		logger.info(se.getSession().getCallId());
+		logger.info(se.getSession().getLocalParty());
+		logger.info(se.getSession().getRemoteParty());
+		logger.info(se.getSession().getState());
 	}
 
 
