@@ -410,25 +410,32 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 					if(JainSipUtils.CONTACT_HEADER_METHODS.contains(newRequest.getMethod())) {
 						String fromName = null;
 						String displayName = origRequest.getFrom().getDisplayName();
-						if(origRequest.getAddressHeader(ContactHeader.NAME).getURI() instanceof SipURI) {
+						if(origRequest != null && origRequest.getAddressHeader(ContactHeader.NAME) != null && 
+								origRequest.getAddressHeader(ContactHeader.NAME).getURI() instanceof SipURI) {
 							fromName = ((SipURI)origRequest.getFrom().getURI()).getUser();
 						}
 						// Create the contact name address.
 						ContactHeader contactHeader = null;
 						// if a sip load balancer is present in front of the server, the contact header is the one from the sip lb
 						// so that the subsequent requests can be failed over
-						if(useLoadBalancer) {
-							javax.sip.address.SipURI sipURI = addressFactory.createSipURI(fromName, loadBalancerToUse.getAddress().getHostAddress());
-							sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
-							sipURI.setPort(loadBalancerToUse.getSipPort());
-							sipURI.setTransportParam(JainSipUtils.findTransport(newRequest));
-							javax.sip.address.Address contactAddress = addressFactory.createAddress(sipURI);
-							if(displayName != null && displayName.length() > 0) {
-								contactAddress.setDisplayName(displayName);
+						if(fromName != null) {
+							if(useLoadBalancer) {
+								javax.sip.address.SipURI sipURI = addressFactory.createSipURI(fromName, loadBalancerToUse.getAddress().getHostAddress());
+								sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
+								sipURI.setPort(loadBalancerToUse.getSipPort());
+								sipURI.setTransportParam(JainSipUtils.findTransport(newRequest));
+								javax.sip.address.Address contactAddress = addressFactory.createAddress(sipURI);
+								if(displayName != null && displayName.length() > 0) {
+									contactAddress.setDisplayName(displayName);
+								}
+								contactHeader = headerFactory.createContactHeader(contactAddress);
+							} else {
+								contactHeader = JainSipUtils.createContactHeader(getSipNetworkInterfaceManager(), newRequest, displayName, fromName, null);
 							}
-							contactHeader = headerFactory.createContactHeader(contactAddress);
 						} else {
-							contactHeader = JainSipUtils.createContactHeader(getSipNetworkInterfaceManager(), newRequest, displayName, fromName, null);
+							if(logger.isDebugEnabled()) {
+								logger.debug("Unable to create Contact Header. It will be added later on send.");
+							}
 						}
 			
 						if(contactHeader != null) {

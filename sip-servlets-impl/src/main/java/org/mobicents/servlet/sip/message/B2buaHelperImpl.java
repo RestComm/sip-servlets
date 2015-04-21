@@ -935,13 +935,13 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 		
 		final MobicentsSipSession originalSession = origRequestImpl.getSipSession();
 		final MobicentsSipSession session = newSipServletRequest.getSipSession();
-			
-		sessionMap.put(originalSession.getKey(), session.getKey());
-		sessionMap.put(session.getKey(), originalSession.getKey());	
-		dumpLinkedSessions();
+		// B2buaHelperTest.testLinkSipSessions101 assumes the sessions shouldn't be linked together	
+//		sessionMap.put(originalSession.getKey(), session.getKey());
+//		sessionMap.put(session.getKey(), originalSession.getKey());	
+//		dumpLinkedSessions();
 
-		originalRequestMap.put(newSipServletRequest, origRequestImpl);
-		originalRequestMap.put(origRequestImpl, newSipServletRequest);
+//		originalRequestMap.put(newSipServletRequest, origRequestImpl);
+//		originalRequestMap.put(origRequestImpl, newSipServletRequest);
 		
 		session.setB2buaHelper(this);
 		originalSession.setB2buaHelper(this);
