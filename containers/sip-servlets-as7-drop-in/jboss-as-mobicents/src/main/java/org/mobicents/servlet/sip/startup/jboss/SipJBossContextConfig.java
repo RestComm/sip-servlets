@@ -315,6 +315,7 @@ public class SipJBossContextConfig extends /*JBossContextConfig*/ ContextConfig 
                     wrapper.setJspFile(value.getJspFile());
                 }
                 wrapper.setLoadOnStartupString(value.getLoadOnStartup());
+                wrapper.setLoadOnStartup(value.getLoadOnStartupInt());
                 if (value.getRunAs() != null) {
                     wrapper.setRunAs(value.getRunAs().getRoleName());
                 }

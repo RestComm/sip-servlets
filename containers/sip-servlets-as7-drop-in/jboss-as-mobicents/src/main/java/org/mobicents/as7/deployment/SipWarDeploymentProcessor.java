@@ -128,6 +128,7 @@ public class SipWarDeploymentProcessor implements DeploymentUnitProcessor {
 	                final ModelNode node = unit.createDeploymentSubModel("sip", PathElement.pathElement("servlet", name));
 	                node.get("servlet-class").set(servlet.getServletClass());
 	                node.get("servlet-name").set(servlet.getServletName());
+	                node.get("load-on-startup").set(servlet.getLoadOnStartup());
 	            } catch (Exception e) {
 	                // Should a failure in creating the mgmt view also make to the deployment to fail?
 	                continue;
