@@ -25,6 +25,9 @@ import java.io.File;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
@@ -1260,10 +1263,14 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		if(this.available) {
 			enterSipApp(null, null, false, true);
 			boolean batchStarted = enterSipAppHa(true);
+			// https://github.com/Mobicents/sip-servlets/issues/52
+			List<MobicentsSipServlet> sipServlets = new ArrayList<MobicentsSipServlet>(childrenMap.values());
+			Collections.sort(sipServlets, new SipServletLoadOnStartupComparator());
+			
 			try {
-				for (MobicentsSipServlet container : childrenMap.values()) {
+				for (MobicentsSipServlet container : sipServlets) {
 					if(logger.isDebugEnabled()) {
-						logger.debug("container " + container.getName() + ", class : " + container.getClass().getName());
+						logger.debug("container " + container.getName() + ", class : " + container.getClass().getName() + ", load-on-startup : " + container.getLoadOnStartup());
 					}
 					if(container instanceof Wrapper) {			
 						Wrapper wrapper = (Wrapper) container;
@@ -1462,5 +1469,23 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		// http://code.google.com/p/sipservlets/issues/detail?id=135
 		unbindThreadBindingListener();
 		Thread.currentThread().setContextClassLoader(oldClassLoader);
+	}
+	
+	// https://github.com/Mobicents/sip-servlets/issues/52
+	protected class SipServletLoadOnStartupComparator implements Comparator<MobicentsSipServlet> {
+
+		@Override
+		public int compare(MobicentsSipServlet o1, MobicentsSipServlet o2) {
+			if(o1 != null && o2 != null) {
+				if(o1.getLoadOnStartup() > o2.getLoadOnStartup()) {
+					return 1;
+				} else if(o1.getLoadOnStartup() == o2.getLoadOnStartup()) {
+					return 0;
+				} else {
+					return -1;
+				}
+			}
+			return 0;
+		}
 	}
 }
