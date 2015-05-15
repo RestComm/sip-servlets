@@ -31,6 +31,7 @@ import org.mobicents.metadata.sip.spec.PatternMetaData;
 
 /**
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  *
  */
 public class SipServletMappingPatternMetaDataParser extends MetaDataElementParser {

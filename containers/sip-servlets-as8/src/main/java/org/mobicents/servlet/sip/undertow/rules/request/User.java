@@ -26,7 +26,8 @@ import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
 
 /**
- * @author Thomas Leseney 
+ * @author Thomas Leseney
+ * @author alerant.appngin@gmail.com
  */
 public class User implements Extractor {
 	

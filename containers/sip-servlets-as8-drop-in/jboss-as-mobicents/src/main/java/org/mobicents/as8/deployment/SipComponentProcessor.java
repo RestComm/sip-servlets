@@ -58,6 +58,8 @@ import org.mobicents.metadata.sip.spec.SipMetaData;
  * For CDI and EE components a component definition is added to the deployment.
  * <p/>
  * For now we are just using managed bean components as servlets. We may need a custom component type in future.
+ * 
+ * @author alerant.appngin@gmail.com
  */
 public class SipComponentProcessor implements DeploymentUnitProcessor {
 

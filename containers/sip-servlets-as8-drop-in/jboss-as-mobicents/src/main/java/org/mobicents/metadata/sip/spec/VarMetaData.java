@@ -23,6 +23,7 @@ package org.mobicents.metadata.sip.spec;
 
 /**
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  *
  */
 public class VarMetaData extends ConditionMetaData {

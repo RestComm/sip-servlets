@@ -36,6 +36,7 @@ import org.wildfly.extension.undertow.Constants;
  * @author Tomaz Cerar
  * @created 22.2.12 15:03
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  */
 public class SipConnectorDefinition extends SimpleResourceDefinition {
     public static final SipConnectorDefinition INSTANCE = new SipConnectorDefinition();

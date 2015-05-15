@@ -26,6 +26,7 @@ package org.mobicents.metadata.sip.spec;
  * No need to store the args and return type, they are always the same (String, SipServletRequest)
  *
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  */
 public class SipApplicationKeyMethodInfo {
 	

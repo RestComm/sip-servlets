@@ -28,6 +28,8 @@ import java.util.ArrayList;
  *
  * @author jean.deruelle@gmail.com
  * @version $Revision$
+ * 
+ * @author alerant.appngin@gmail.com
  */
 public class SipResourceCollectionsMetaData extends ArrayList<SipResourceCollectionMetaData> {
     private static final long serialVersionUID = 1;

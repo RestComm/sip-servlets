@@ -40,6 +40,7 @@ import org.mobicents.servlet.sip.undertow.SipStandardService;
  * Service configuring and starting the web container.
  *
  * @author Emanuel Muckenhuber
+ * @author alerant.appngin@gmail.com
  */
 class SipServerService implements SipServer, Service<SipServer> {
 	private static final Logger logger = Logger.getLogger(SipServerService.class);

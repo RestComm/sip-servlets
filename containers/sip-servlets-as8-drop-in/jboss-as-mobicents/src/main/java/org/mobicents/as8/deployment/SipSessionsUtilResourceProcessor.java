@@ -35,6 +35,7 @@ import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
  *
  * @author Jaikiran Pai
  * @author josemrecio
+ * @author alerant.appngin@gmail.com
  *
  */
 public final class SipSessionsUtilResourceProcessor implements EEResourceReferenceProcessor {

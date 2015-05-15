@@ -24,6 +24,7 @@ package org.mobicents.metadata.sip.spec;
 
 /**
  * @author jean.deruelle@gmail.com
+ * @author alerant.appngin@gmail.com
  *
  */
 public class EqualMetaData extends ConditionMetaData {

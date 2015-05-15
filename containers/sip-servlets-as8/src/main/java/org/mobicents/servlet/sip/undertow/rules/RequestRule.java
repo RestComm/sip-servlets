@@ -44,6 +44,7 @@ import org.mobicents.servlet.sip.core.descriptor.MatchingRule;
 
 /**
  * @author Thomas Leseney
+ * @author alerant.appngin@gmail.com
  */
 public abstract class RequestRule implements MatchingRule {
     

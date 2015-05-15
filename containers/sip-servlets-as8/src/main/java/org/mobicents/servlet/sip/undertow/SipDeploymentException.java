@@ -26,6 +26,7 @@ package org.mobicents.servlet.sip.undertow;
  * Exception occuring when something goes wrong with the deployment of the sip application
  * 
  * @author jean.deruelle@gmail.com
+ * @author alerant.appngin@gmail.com
  *
  */
 public class SipDeploymentException extends RuntimeException {

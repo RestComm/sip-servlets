@@ -84,6 +84,7 @@ import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
  * defined servlets. It extends the JbossContextConfig to be able to load sip servlet applications.
  *
  * @author Jean Deruelle
+ * @author alerant.appngin@gmail.com
  *
  */
 public class SipJBossContextConfig{

@@ -27,6 +27,7 @@ import org.mobicents.metadata.sip.spec.SipMetaData;
  * Sip application spec metadata if no xsd is defined in the sip.xml.
  *
  * @author jean.deruelle@gmail.com
+ * @author alerant.appngin@gmail.com
  */
 public class JBossSip11MetaData extends SipMetaData {
     private static final long serialVersionUID = 1;

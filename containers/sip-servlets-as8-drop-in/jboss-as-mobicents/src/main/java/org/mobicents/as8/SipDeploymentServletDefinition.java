@@ -47,6 +47,7 @@ import org.wildfly.extension.undertow.deployment.UndertowMetricsCollector;
  * @author Tomaz Cerar
  * @created 23.2.12 18:35
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  */
 public class SipDeploymentServletDefinition extends SimpleResourceDefinition {
     public static final SipDeploymentServletDefinition INSTANCE = new SipDeploymentServletDefinition();

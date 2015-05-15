@@ -30,7 +30,10 @@ import javax.sip.header.HeaderFactory;
 import javax.sip.message.MessageFactory;
 
 import org.apache.log4j.Logger;
-
+/**
+ * @author alerant.appngin@gmail.com
+ *
+ */
 public class SipFactories {
     private final static Logger logger = Logger.getLogger(SipFactories.class.getCanonicalName());
 

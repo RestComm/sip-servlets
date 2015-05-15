@@ -35,6 +35,7 @@ import org.jboss.msc.service.ServiceBuilder;
  *
  * User: Jaikiran Pai
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  *
  */
 public class SipTimerServiceInjectionSource extends InjectionSource {

@@ -30,7 +30,10 @@ import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.MobicentsSipServlet;
 import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
-
+/**
+ * @author alerant.appngin@gmail.com
+ *
+ */
 public class UndertowSipListenersHolder extends SipListenersHolder {
 
     private static final Logger logger = Logger.getLogger(UndertowSipListenersHolder.class);

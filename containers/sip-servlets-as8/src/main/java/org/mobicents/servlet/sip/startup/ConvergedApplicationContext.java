@@ -29,7 +29,8 @@ import org.mobicents.servlet.sip.undertow.SipServletImpl;
 import org.mobicents.servlet.sip.undertow.UndertowSipContextDeployment;
 
 /**
- * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A> 
+ * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
+ * @author alerant.appngin@gmail.com 
  *
  */
 public class ConvergedApplicationContext extends ServletContextImpl {

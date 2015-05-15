@@ -30,6 +30,7 @@ import org.mobicents.metadata.sip.spec.ProxyConfigMetaData;
 
 /**
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  *
  */
 public class ProxyConfigMetaDataParser extends MetaDataElementParser {

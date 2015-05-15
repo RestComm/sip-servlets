@@ -29,6 +29,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * @author Thomas Leseney
+ * @author alerant.appngin@gmail.com
  */
 public class MatchingRuleParser {
 	

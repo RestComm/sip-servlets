@@ -26,6 +26,7 @@ import java.util.Map;
 
 /**
  * @author Jean Deruelle
+ * @author alerant.appngin@gmail.com
  */
 public enum Element {
     // must be first

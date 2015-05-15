@@ -39,6 +39,7 @@ import org.mobicents.metadata.sip.spec.SipServletsMetaData;
  * @version $Revision: 84989 $
  *
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  *
  */
 public class JBossSipMetaDataMerger extends NamedModuleImplMerger {

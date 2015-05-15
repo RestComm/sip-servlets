@@ -36,6 +36,7 @@ import org.jboss.metadata.javaee.support.NamedMetaDataWithDescriptions;
 /**
  * @author jean.deruelle@gmail.com
  * @version $Revision$
+ * @author alerant.appngin@gmail.com
  */
 public class SipResourceCollectionMetaData extends NamedMetaDataWithDescriptions {
     private static final long serialVersionUID = 1;

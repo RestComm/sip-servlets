@@ -35,6 +35,8 @@ import org.jboss.metadata.web.spec.UserDataConstraintMetaData;
  *
  * @author jean.deruelle@gmail.com
  * @version $Revision$
+ * 
+ * @author alerant.appngin@gmail.com
  */
 public class SipSecurityConstraintMetaData extends IdMetaDataImpl {
     private static final long serialVersionUID = 1;

@@ -35,6 +35,7 @@ import org.mobicents.metadata.sip.spec.SipMetaData;
  *
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  */
 public class SipContextFactoryDeploymentProcessor implements DeploymentUnitProcessor {
 

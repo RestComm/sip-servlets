@@ -28,6 +28,7 @@ import org.jboss.msc.service.ServiceName;
  *
  * @author Brian Stansberry (c) 2011 Red Hat Inc.
  * @author Emanuel Muckenhuber
+ * @author alerant.appngin@gmail.com
  */
 public final class SipSubsystemServices {
 

@@ -25,6 +25,7 @@ import org.jboss.metadata.javaee.support.IdMetaDataImplWithOverride;
 
 /**
  * @author deruelle
+ * @author alerant.appngin@gmail.com
  *
  */
 public abstract class ConditionMetaData extends IdMetaDataImplWithOverride<ConditionMetaData> {

@@ -26,6 +26,8 @@ import org.jboss.metadata.javaee.support.IdMetaDataImpl;
 /**
  * @author jean.deruelle@gmail.com
  * @version $Revision$
+ * 
+ * @author alerant.appngin@gmail.com
  */
 public class SipLoginConfigMetaData extends IdMetaDataImpl {
     private static final long serialVersionUID = 1;

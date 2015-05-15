@@ -28,6 +28,7 @@ import java.util.Map;
  * An enumeration of all the possible XML attributes in the web-app 3.0 schema, by name.
  *
  * @author Remy Maucherat
+ * @author alerant.appngin@gmail.com
  */
 public enum Attribute {
     // always first

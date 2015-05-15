@@ -48,6 +48,7 @@ import org.mobicents.metadata.sip.spec.SipServletsMetaData;
 /**
  * @author Remy Maucherat
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  *
  */
 public class SipCommonMetaDataParser extends MetaDataElementParser {

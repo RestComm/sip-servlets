@@ -29,6 +29,8 @@ import org.jboss.metadata.web.jboss.JBossServletMetaData;
  *
  * @author Scott.Stark@jboss.org
  * @version $Revision: 66673 $
+ * 
+ * @author alerant.appngin@gmail.com
  */
 public class JBossSipServletsMetaData extends AbstractMappedMetaData<JBossServletMetaData> {
     private static final long serialVersionUID = 1;

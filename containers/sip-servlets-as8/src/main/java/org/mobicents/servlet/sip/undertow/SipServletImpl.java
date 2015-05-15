@@ -19,7 +19,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package org.mobicents.servlet.sip.undertow;
 
 import io.undertow.servlet.api.ServletInfo;
@@ -30,7 +29,10 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 
 import org.mobicents.servlet.sip.core.MobicentsSipServlet;
-
+/**
+ * @author alerant.appngin@gmail.com
+ *
+ */
 public class SipServletImpl extends ManagedServlet implements MobicentsSipServlet {
 
     private static final long serialVersionUID = 1L;

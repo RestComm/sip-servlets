@@ -32,6 +32,7 @@ import org.jboss.dmr.ModelNode;
  * Update removing a web connector
  *
  * @author Emanuel Muckenhuber
+ * @author alerant.appngin@gmail.com
  */
 class SipConnectorRemove extends AbstractRemoveStepHandler {
 

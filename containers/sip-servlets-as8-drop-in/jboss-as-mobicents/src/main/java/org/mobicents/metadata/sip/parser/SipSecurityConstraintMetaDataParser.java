@@ -35,6 +35,7 @@ import org.mobicents.metadata.sip.spec.SipSecurityConstraintMetaData;
 
 /**
  * @author Remy Maucherat
+ * @author alerant.appngin@gmail.com
  */
 public class SipSecurityConstraintMetaDataParser extends MetaDataElementParser {
 

@@ -31,6 +31,7 @@ import org.mobicents.metadata.sip.spec.VarMetaData;
 
 /**
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  *
  */
 public class EqualMetaDataParser extends MetaDataElementParser {

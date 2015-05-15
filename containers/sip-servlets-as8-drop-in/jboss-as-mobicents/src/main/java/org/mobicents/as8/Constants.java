@@ -23,6 +23,7 @@ package org.mobicents.as8;
 
 /**
  * @author Emanuel Muckenhuber
+ * @author alerant.appngin@gmail.com
  */
 public interface Constants {
 

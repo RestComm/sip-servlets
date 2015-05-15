@@ -29,6 +29,7 @@ import org.mobicents.servlet.sip.undertow.SipStandardService;
  *
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  */
 public interface SipServer {
 

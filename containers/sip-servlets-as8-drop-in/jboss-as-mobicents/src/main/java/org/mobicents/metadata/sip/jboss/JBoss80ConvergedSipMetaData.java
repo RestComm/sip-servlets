@@ -26,6 +26,7 @@ package org.mobicents.metadata.sip.jboss;
  * parsing
  *
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  */
 public class JBoss80ConvergedSipMetaData extends JBossConvergedSipMetaData {
     private static final long serialVersionUID = 1;

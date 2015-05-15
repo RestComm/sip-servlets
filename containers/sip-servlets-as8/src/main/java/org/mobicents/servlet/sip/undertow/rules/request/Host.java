@@ -27,6 +27,7 @@ import javax.servlet.sip.URI;
 
 /**
  * @author Thomas Leseney
+ * @author alerant.appngin@gmail.com
  */
 public class Host implements Extractor {
 	public Host(String token) {

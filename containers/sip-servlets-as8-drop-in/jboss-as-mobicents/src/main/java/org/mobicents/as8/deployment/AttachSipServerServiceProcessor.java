@@ -31,6 +31,7 @@ import org.mobicents.as8.SipServer;
  * Attaches SipServer to the deploymentUnit so can be recovered afterwards
  *
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  */
 public class AttachSipServerServiceProcessor implements DeploymentUnitProcessor {
 

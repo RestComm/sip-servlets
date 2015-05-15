@@ -40,6 +40,7 @@ import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
  * Extend the JBossWebMetaData from JBoss 5 to provide support for converged sip/http applications
  *
  * @author jean.deruelle@gmail.com
+ * @author alerant.appngin@gmail.com
  *
  */
 public class JBossConvergedSipMetaData extends JBossWebMetaData {

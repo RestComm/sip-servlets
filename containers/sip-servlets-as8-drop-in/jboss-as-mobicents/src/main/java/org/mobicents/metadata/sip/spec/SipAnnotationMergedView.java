@@ -36,6 +36,8 @@ import org.jboss.metadata.web.spec.ServletMetaData;
  *
  * @author jean.deruelle@gmail.com
  * FIXME: josemrecio - update using org.jboss.metadata.merge.web.spec.AnnotationMergedViewMerger as template
+ * 
+ * @author alerant.appngin@gmail.com
  */
 public class SipAnnotationMergedView {
 

@@ -28,6 +28,7 @@ import org.mobicents.metadata.sip.spec.IdentityAssertionMetaData;
 
 /**
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  */
 public class IdentityAssertionParser extends MetaDataElementParser {
 

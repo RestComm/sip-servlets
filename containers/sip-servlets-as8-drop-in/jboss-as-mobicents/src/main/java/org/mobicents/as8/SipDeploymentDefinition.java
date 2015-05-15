@@ -51,6 +51,7 @@ import org.mobicents.servlet.sip.core.SipManager;
  * @author <a href="mailto:torben@jit-central.com">Torben Jaeger</a>
  * @created 23.2.12 18:32
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  */
 public class SipDeploymentDefinition extends SimpleResourceDefinition {
     public static final SipDeploymentDefinition INSTANCE = new SipDeploymentDefinition();

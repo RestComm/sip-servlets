@@ -39,6 +39,7 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 
 /**
  * @author jean.deruelle@gmail.com
+ * @author alerant.appngin@gmail.com
  *
  */
 public class Servlet3SipServletRequestImpl extends SipServletRequestImpl implements MobicentsSipServletRequest {

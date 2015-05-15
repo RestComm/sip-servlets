@@ -27,6 +27,7 @@ import java.util.Map;
 /**
  * @author Emanuel Muckenhuber
  * @author Jean-Frederic Clere
+ * @author alerant.appngin@gmail.com
  */
 enum Attribute {
     UNKNOWN(null),

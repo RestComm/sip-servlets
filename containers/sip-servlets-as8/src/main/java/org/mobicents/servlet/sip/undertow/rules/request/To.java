@@ -26,6 +26,7 @@ import javax.servlet.sip.SipServletRequest;
 
 /**
  * @author Thomas Leseney
+ * @author alerant.appngin@gmail.com
  */
 public class To implements Extractor {
 	public To(String token) {

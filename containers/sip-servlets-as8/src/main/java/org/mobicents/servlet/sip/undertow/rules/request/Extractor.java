@@ -24,6 +24,7 @@ package org.mobicents.servlet.sip.undertow.rules.request;
 
 /**
  * @author Thomas Leseney
+ * @author alerant.appngin@gmail.com
  */
 public interface Extractor {
 	Object extract(Object input);

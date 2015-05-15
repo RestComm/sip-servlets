@@ -24,6 +24,7 @@ package org.mobicents.metadata.sip.spec;
 /**
  * @author Scott.Stark@jboss.org
  * @version $Revision: 65943 $
+ * @author alerant.appngin@gmail.com
  */
 //public class SipServletsMetaData extends AbstractMappedMetaData<ServletMetaData> {
 public class SipServletsMetaData extends ServletsMetaData {

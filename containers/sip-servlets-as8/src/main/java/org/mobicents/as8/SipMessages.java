@@ -30,6 +30,7 @@ import org.jboss.virtual.VirtualFile;
  * Date: 05.11.2011
  *
  * @author <a href="mailto:jperkins@redhat.com">James R. Perkins</a>
+ * @author alerant.appngin@gmail.com
  */
 @MessageBundle(projectCode = "MSS")
 public interface SipMessages {

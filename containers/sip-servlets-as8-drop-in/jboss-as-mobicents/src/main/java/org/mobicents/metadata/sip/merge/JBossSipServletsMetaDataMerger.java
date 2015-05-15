@@ -32,6 +32,8 @@ import org.mobicents.metadata.sip.spec.SipServletsMetaData;
  *
  * @author Scott.Stark@jboss.org
  * @version $Revision: 66673 $
+ * 
+ * @author alerant.appngin@gmail.com
  */
 public class JBossSipServletsMetaDataMerger {
     public static JBossSipServletsMetaData merge(JBossSipServletsMetaData override, SipServletsMetaData original) {

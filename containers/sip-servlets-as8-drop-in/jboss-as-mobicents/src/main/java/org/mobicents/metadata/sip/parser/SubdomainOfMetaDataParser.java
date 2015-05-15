@@ -30,6 +30,7 @@ import org.mobicents.metadata.sip.spec.SubdomainOfMetaData;
 
 /**
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  *
  */
 public class SubdomainOfMetaDataParser extends MetaDataElementParser {

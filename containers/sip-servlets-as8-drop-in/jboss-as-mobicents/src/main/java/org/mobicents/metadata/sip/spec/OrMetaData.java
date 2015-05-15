@@ -25,6 +25,7 @@ import java.util.List;
 
 /**
  * @author jean.deruelle@gmail.com
+ * @author alerant.appngin@gmail.com
  *
  */
 public class OrMetaData extends ConditionMetaData {

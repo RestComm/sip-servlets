@@ -32,6 +32,7 @@ import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
  *
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  */
 class SIPContextFactory{
     static AttachmentKey<SIPContextFactory> ATTACHMENT = AttachmentKey.create(SIPContextFactory.class);

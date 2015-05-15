@@ -79,6 +79,7 @@ import org.mobicents.metadata.sip.spec.SipServletsMetaData;
  * @author Emanuel Muckenhuber
  * @author Remy Maucherat
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  */
 public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor {
 

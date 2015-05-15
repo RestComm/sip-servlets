@@ -37,6 +37,7 @@ import static org.mobicents.as8.SipMessages.MESSAGES;
 
 /**
  * @author Emanuel Muckenhuber
+ * @author alerant.appngin@gmail.com
  */
 class SipConnectorMetrics implements OperationStepHandler {
 

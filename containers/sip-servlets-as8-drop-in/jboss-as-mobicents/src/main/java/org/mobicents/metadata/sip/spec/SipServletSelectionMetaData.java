@@ -30,6 +30,7 @@ import org.mobicents.servlet.sip.ruby.SipRubyController;
 /**
  * @author jean.deruelle@gmail.com
  * @version $Revision$
+ * @author alerant.appngin@gmail.com
  */
 public class SipServletSelectionMetaData extends IdMetaDataImpl {
     private static final long serialVersionUID = 1;

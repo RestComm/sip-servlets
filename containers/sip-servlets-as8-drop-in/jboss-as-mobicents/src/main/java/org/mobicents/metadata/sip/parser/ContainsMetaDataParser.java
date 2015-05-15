@@ -30,6 +30,7 @@ import org.mobicents.metadata.sip.spec.Element;
 
 /**
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  *
  */
 public class ContainsMetaDataParser extends MetaDataElementParser {

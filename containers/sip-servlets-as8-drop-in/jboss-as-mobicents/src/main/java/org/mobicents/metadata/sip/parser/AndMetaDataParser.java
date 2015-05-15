@@ -30,7 +30,7 @@ import org.mobicents.metadata.sip.spec.Attribute;
 
 /**
  * @author josemrecio@gmail.com
- *
+ * @author alerant.appngin@gmail.com
  */
 public class AndMetaDataParser extends MetaDataElementParser {
 

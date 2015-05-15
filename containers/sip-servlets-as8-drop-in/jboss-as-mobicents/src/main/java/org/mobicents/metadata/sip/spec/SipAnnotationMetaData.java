@@ -28,6 +28,7 @@ import org.jboss.as.server.deployment.AttachmentKey;
 /**
  *
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  *
  */
 public class SipAnnotationMetaData extends HashMap<String, SipMetaData> {

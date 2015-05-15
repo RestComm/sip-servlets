@@ -26,6 +26,7 @@ import javax.servlet.sip.Address;
 
 /**
  * @author Thomas Leseney
+ * @author alerant.appngin@gmail.com
  */
 public class DisplayName implements Extractor  {
 	public DisplayName(String token) {

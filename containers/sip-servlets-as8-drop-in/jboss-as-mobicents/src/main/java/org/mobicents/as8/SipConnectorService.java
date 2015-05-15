@@ -43,6 +43,7 @@ import static org.mobicents.as8.SipMessages.MESSAGES;
  * Service creating and starting a web connector.
  *
  * @author Emanuel Muckenhuber
+ * @author alerant.appngin@gmail.com
  */
 class SipConnectorService implements Service<SipUdpListener> {
 

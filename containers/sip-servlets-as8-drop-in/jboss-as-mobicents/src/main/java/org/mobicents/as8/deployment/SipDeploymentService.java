@@ -33,6 +33,7 @@ import org.jboss.msc.service.StopContext;
  *
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  */
 class SipDeploymentService implements Service<SIPWebContext> {
 

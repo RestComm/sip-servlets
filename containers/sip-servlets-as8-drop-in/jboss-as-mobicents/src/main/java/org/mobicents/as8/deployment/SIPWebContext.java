@@ -61,6 +61,7 @@ import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
  *
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  */
 public class SIPWebContext extends UndertowSipContextDeployment {
 

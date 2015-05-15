@@ -25,7 +25,7 @@ import org.jboss.metadata.javaee.support.IdMetaDataImpl;
 
 /**
  * @author jean.deruelle@gmail.com
- *
+ * @author alerant.appngin@gmail.com
  */
 public class ProxyAuthenticationMetaData extends IdMetaDataImpl {
 

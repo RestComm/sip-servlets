@@ -36,6 +36,7 @@ import org.mobicents.metadata.sip.spec.SipResourceCollectionMetaData;
 
 /**
  * @author Remy Maucherat
+ * @author alerant.appngin@gmail.com
  */
 public class SipResourceCollectionsMetaDataParser extends MetaDataElementParser {
 

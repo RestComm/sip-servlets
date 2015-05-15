@@ -38,6 +38,7 @@ import org.jboss.as.controller.registry.OperationEntry;
  *
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
+ * @author alerant.appngin@gmail.com
  */
 public class SipExtension implements Extension {
     public static final String SUBSYSTEM_NAME = "sip";

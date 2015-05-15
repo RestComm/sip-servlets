@@ -45,6 +45,7 @@ import org.jboss.dmr.ModelType;
 
 /**
  * @author Tomaz Cerar
+ * @author alerant.appngin@gmail.com
  * @created 22.2.12 14:29
  */
 public class SipDefinition extends SimpleResourceDefinition {

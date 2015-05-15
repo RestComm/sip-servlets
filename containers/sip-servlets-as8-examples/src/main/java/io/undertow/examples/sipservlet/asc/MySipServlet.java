@@ -62,7 +62,7 @@ public class MySipServlet extends SipServlet {
 	    
 	    
 	}
-	
+
 	@Override
 	protected void doNotify(SipServletRequest req) throws ServletException,IOException {
 	    System.out.println("MySipServlet NOTIFY: Got request:\n" + req.getMethod());
