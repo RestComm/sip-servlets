@@ -89,6 +89,8 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         SipDefinition.T4_INTERVAL.marshallAsAttribute(node, false, writer);
         SipDefinition.TIMER_D_INTERVAL.marshallAsAttribute(node, false, writer);
         SipDefinition.DIALOG_PENDING_REQUEST_CHECKING.marshallAsAttribute(node, false, writer);
+        SipDefinition.DNS_SERVER_LOCATOR_CLASS.marshallAsAttribute(node, false, writer);
+        SipDefinition.DNS_RESOLVER_CLASS.marshallAsAttribute(node, false, writer);
         SipDefinition.CANCELED_TIMER_TASKS_PURGE_PERIOD.marshallAsAttribute(node, false, writer);
         SipDefinition.MEMORY_THRESHOLD.marshallAsAttribute(node, false, writer);
         SipDefinition.BACK_TO_NORMAL_MEMORY_THRESHOLD.marshallAsAttribute(node, false, writer);
@@ -133,6 +135,8 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
 	            case T4_INTERVAL:
 	            case TIMER_D_INTERVAL:
 	            case DIALOG_PENDING_REQUEST_CHECKING:
+	            case DNS_SERVER_LOCATOR_CLASS:
+	            case DNS_RESOLVER_CLASS:
 	            case CANCELED_TIMER_TASKS_PURGE_PERIOD:
 	            case CONGESTION_CONTROL_INTERVAL:
 	            case CONGESTION_CONTROL_POLICY:

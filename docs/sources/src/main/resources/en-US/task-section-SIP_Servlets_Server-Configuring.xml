@@ -483,6 +483,12 @@ See the example chapters for more information about the Application Router Confi
           <para>Specifies the <classname>org.mobicents.ext.javax.sip.dns.DNSServerLocator</classname> implementation class that will be used by the container to perform DNS lookups compliant with RFC 3263 : Locating SIP Servers and E.164 NUmber Mapping. The default class used by the container is <classname>org.mobicents.ext.javax.sip.dns.DefaultDNSServerLocator</classname>, but any class implementing the <classname>org.mobicents.ext.javax.sip.dns.DNSServerLocator</classname> interface. To disable DNS lookups, this attribute should be left empty.</para>
         </listitem>
       </varlistentry>
+	  <varlistentry>
+        <term>dnsResolverClass (Tomcat) - dns-resolver-class (JBoss/EAP)</term>
+        <listitem>
+          <para>Specifies the <classname>org.mobicents.javax.servlet.sip.dns.DNSResolver</classname> implementation class that will be used by the container to perform DNS lookups compliant with RFC 3263 : Locating SIP Servers and E.164 NUmber Mapping. The default class used by the container is <classname>org.mobicents.servlet.sip.dns.MobicentsDNSResolver</classname>, but any class implementing the <classname>org.mobicents.servlet.sip.dns.DNSResolver</classname> interface. To disable DNS lookups, this attribute should be left empty.</para>
+        </listitem>
+      </varlistentry>      
       <varlistentry>
         <term>addressResolverClass (Tomcat) - address-resolver-class (JBoss/EAP)</term>
         <listitem>

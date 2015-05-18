@@ -70,6 +70,7 @@ public interface SipService {
 	public ReplicationStrategy getReplicationStrategy();
 	public int getTagHashMaxLength();
 	public int getCallIdMaxLength();
+	public String getDnsResolverClass();
 	
 	public String getMobicentsSipServletMessageFactoryClassName();
 	public void setMobicentsSipServletMessageFactoryClassName(String mobicentsSipServletMessageFactoryClassName);

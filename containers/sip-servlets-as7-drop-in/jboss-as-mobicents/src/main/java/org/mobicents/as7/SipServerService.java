@@ -72,6 +72,8 @@ class SipServerService implements SipServer, Service<SipServer> {
  	final int t4Interval;
  	final int timerDInterval;
  	final boolean dialogPendingRequestChecking;
+ 	final String dnsServerLocatorClass;
+ 	final String dnsResolverClass;
  	final int callIdMaxLength;
 	final int tagHashMaxLength;
 	
@@ -107,6 +109,8 @@ class SipServerService implements SipServer, Service<SipServer> {
     		int t4Interval, 
     		int timerDInterval, 
     		boolean dialogPendingRequestChecking,
+    		String dnsServerLocatorClass,
+    		String dnsResolverClass,
     		int callIdMaxLength,
     		int tagHashMaxLength,
     		int canceledTimerTasksPurgePeriod, 
@@ -131,6 +135,8 @@ class SipServerService implements SipServer, Service<SipServer> {
         this.t4Interval = t4Interval;
         this.timerDInterval = timerDInterval;
         this.dialogPendingRequestChecking = dialogPendingRequestChecking;
+        this.dnsServerLocatorClass = dnsServerLocatorClass;
+        this.dnsResolverClass = dnsResolverClass;
         this.callIdMaxLength = callIdMaxLength;
         this.tagHashMaxLength = tagHashMaxLength;
         this.canceledTimerTasksPurgePeriod = canceledTimerTasksPurgePeriod;
@@ -223,6 +229,8 @@ class SipServerService implements SipServer, Service<SipServer> {
         	sipService.setAdditionalParameterableHeaders(additionalParameterableHeaders);
         }
         sipService.setDialogPendingRequestChecking(dialogPendingRequestChecking);
+        sipService.setDnsServerLocatorClass(dnsServerLocatorClass);
+        sipService.setDnsResolverClass(dnsResolverClass);
         sipService.setCanceledTimerTasksPurgePeriod(canceledTimerTasksPurgePeriod);
         sipService.setMemoryThreshold(memoryThreshold);
         sipService.setBackToNormalMemoryThreshold(backToNormalMemoryThreshold);

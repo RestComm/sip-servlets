@@ -30,6 +30,7 @@ import gov.nist.javax.sip.message.MessageExt;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -95,12 +96,14 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
+import org.mobicents.ext.javax.sip.dns.DNSAwareRouter;
 import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingListener;
 import org.mobicents.ha.javax.sip.SipLoadBalancer;
 import org.mobicents.javax.servlet.CongestionControlEvent;
 import org.mobicents.javax.servlet.CongestionControlPolicy;
 import org.mobicents.javax.servlet.ContainerListener;
+import org.mobicents.javax.servlet.sip.dns.DNSResolver;
 import org.mobicents.servlet.sip.GenericUtils;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
@@ -118,6 +121,7 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.dns.MobicentsDNSResolver;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.message.SipServletMessageImpl;
@@ -202,6 +206,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	protected SipStack sipStack;
 	private SipNetworkInterfaceManager sipNetworkInterfaceManager;
 	private DNSServerLocator dnsServerLocator;
+	private DNSResolver dnsResolver;
 	
 	// stats
 	private boolean gatherStatistics = true;
@@ -317,6 +322,32 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 		sipApplicationRouter.init();
 		sipApplicationRouter.applicationDeployed(new ArrayList<String>(applicationDeployed.keySet()));
+		
+		// set the DNSServerLocator allowing to support RFC 3263 and do DNS lookups to resolve uris
+		if(sipService.getDnsResolverClass() != null && sipService.getDnsResolverClass().trim().length() > 0) {
+			if(logger.isInfoEnabled()) {
+				logger.info("SipApplicationDispatcher will be using " + sipService.getDnsResolverClass() + " as DNSResolver");
+			}
+			try {
+	            // create parameters argument to identify constructor
+	            Class[] paramTypes = new Class[] {DNSServerLocator.class};
+	            // get constructor of AddressResolver in order to instantiate
+	            Constructor dnsResolverConstructor = Class.forName(sipService.getDnsResolverClass()).getConstructor(
+	                    paramTypes);
+	            // Wrap properties object in order to pass to constructor of AddressResolver
+	            Object[] conArgs = new Object[] {dnsServerLocator};
+	            // Creates a new instance of AddressResolver Class with the supplied sipApplicationDispatcher.
+	            dnsResolver = (DNSResolver) dnsResolverConstructor.newInstance(conArgs);
+	        } catch (Exception e) {
+	            logger.error("Couldn't set the DNSResolver " + sipService.getDnsResolverClass(), e);
+	            throw new IllegalArgumentException(e);
+	        }
+		} else {
+			if(logger.isInfoEnabled()) {
+				logger.info("Using default MobicentsDNSResolver since none has been specified.");
+			}
+			dnsResolver = new MobicentsDNSResolver(dnsServerLocator);
+		}	
 		
 		if( oname == null ) {
 			try {				
@@ -1848,6 +1879,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	 */
 	public SipContext findSipApplication(String applicationName) {
 		return applicationDeployed.get(applicationName);
+	}
+	
+	public DNSResolver getDNSResolver() {		
+		return dnsResolver;
 	}
 	
 	public DNSServerLocator getDNSServerLocator() {		

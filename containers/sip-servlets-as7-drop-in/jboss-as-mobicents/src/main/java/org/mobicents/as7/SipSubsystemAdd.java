@@ -97,6 +97,8 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         SipDefinition.T4_INTERVAL.validateAndSet(operation, model);
         SipDefinition.TIMER_D_INTERVAL.validateAndSet(operation, model);
         SipDefinition.DIALOG_PENDING_REQUEST_CHECKING.validateAndSet(operation, model);
+        SipDefinition.DNS_SERVER_LOCATOR_CLASS.validateAndSet(operation, model);
+        SipDefinition.DNS_RESOLVER_CLASS.validateAndSet(operation, model);
         SipDefinition.CANCELED_TIMER_TASKS_PURGE_PERIOD.validateAndSet(operation, model);
         SipDefinition.MEMORY_THRESHOLD.validateAndSet(operation, model);
         SipDefinition.BACK_TO_NORMAL_MEMORY_THRESHOLD.validateAndSet(operation, model);
@@ -154,6 +156,12 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ModelNode dialogPendingRequestCheckingModel = SipDefinition.DIALOG_PENDING_REQUEST_CHECKING.resolveModelAttribute(context, fullModel);
         final boolean dialogPendingRequestChecking = dialogPendingRequestCheckingModel.isDefined() ? dialogPendingRequestCheckingModel.asBoolean() : false;
         
+        final ModelNode dnsServerLocatorClassModel = SipDefinition.DNS_SERVER_LOCATOR_CLASS.resolveModelAttribute(context, fullModel);
+        final String dnsServerLocatorClass = dnsServerLocatorClassModel.isDefined() ? dnsServerLocatorClassModel.asString() : null;
+        
+        final ModelNode dnsResolverClassModel = SipDefinition.DNS_SERVER_LOCATOR_CLASS.resolveModelAttribute(context, fullModel);
+        final String dnsResolverClass = dnsResolverClassModel.isDefined() ? dnsResolverClassModel.asString() : null;
+        
         final ModelNode callIdMaxLengthModel = SipDefinition.CALL_ID_MAX_LENGTH.resolveModelAttribute(context, fullModel);
         final int callIdMaxLength = callIdMaxLengthModel.isDefined() ? callIdMaxLengthModel.asInt() : -1;
         
@@ -196,6 +204,8 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         		t4Interval, 
         		timerDInterval, 
         		dialogPendingRequestChecking,
+        		dnsServerLocatorClass,
+        		dnsResolverClass,
         		callIdMaxLength,
         		tagHashMaxLength,
         		canceledTimerTasksPurgePeriod, 
