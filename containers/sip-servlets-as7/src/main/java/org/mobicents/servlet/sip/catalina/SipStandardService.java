@@ -72,6 +72,7 @@ import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.message.OutboundProxy;
+import org.mobicents.servlet.sip.dns.MobicentsDNSResolver;
 import org.mobicents.servlet.sip.message.Servlet3SipServletMessageFactory;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
@@ -157,6 +158,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	@Deprecated
 	private String addressResolverClass = null;
 	private String dnsServerLocatorClass = DefaultDNSServerLocator.class.getName();
+	private String dnsResolverClass = MobicentsDNSResolver.class.getName();
 	private String mobicentsSipServletMessageFactoryClassName = Servlet3SipServletMessageFactory.class.getName();
 	
 	//the balancers to send heartbeat to and our health info
@@ -282,7 +284,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 		sipApplicationDispatcher.setGatherStatistics(gatherStatistics);
 		sipApplicationDispatcher.setConcurrencyControlMode(ConcurrencyControlMode.valueOf(getConcurrencyControlMode()));		
 		sipApplicationDispatcher.setBypassRequestExecutor(bypassRequestExecutor);
-		sipApplicationDispatcher.setBypassResponseExecutor(bypassResponseExecutor);		
+		sipApplicationDispatcher.setBypassResponseExecutor(bypassResponseExecutor);
 		sipApplicationDispatcher.setSipStack(sipStack);
 		sipApplicationDispatcher.init();
 		// Tomcat specific loading case where the connectors are added even before the service is initialized
@@ -1237,6 +1239,20 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	 */
 	public String getDnsServerLocatorClass() {
 		return dnsServerLocatorClass;
+	}
+	
+	/**
+	 * @param dnsResolverClass the dnsResolverClass to set
+	 */
+	public void setDnsResolverClass(String dnsResolverClass) {
+		this.dnsResolverClass = dnsResolverClass;
+	}
+
+	/**
+	 * @return the dnsResolverClass
+	 */
+	public String getDnsResolverClass() {
+		return dnsResolverClass;
 	}
 	
 	/**
