@@ -287,7 +287,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	 * @see javax.servlet.sip.SipServletRequest#createResponse(int)
 	 */
 	public SipServletResponse createResponse(int statusCode) {
-		return createResponse(statusCode, null, true);
+		return createResponse(statusCode, null, true, false);
 	}
 	
 	/*
@@ -295,10 +295,10 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	 * @see javax.servlet.sip.SipServletRequest#createResponse(int, java.lang.String)
 	 */
 	public SipServletResponse createResponse(final int statusCode, final String reasonPhrase) {
-		return createResponse(statusCode, reasonPhrase, true);
+		return createResponse(statusCode, reasonPhrase, true, false);
 	}		
 	
-	public SipServletResponse createResponse(final int statusCode, final String reasonPhrase, boolean validate) {
+	public SipServletResponse createResponse(final int statusCode, final String reasonPhrase, boolean validate, boolean hasBeenReceived) {
 		checkReadOnly();
 		final Transaction transaction = getTransaction();
 		if(RoutingState.CANCELLED.equals(routingState)) {
@@ -432,7 +432,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			
 			final SipServletResponseImpl newSipServletResponse = (SipServletResponseImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletResponse(
 					response, 
-					validate ? (ServerTransaction) transaction : transaction, session, getDialog(), false, false);
+					validate ? (ServerTransaction) transaction : transaction, session, getDialog(), hasBeenReceived, false);
 			newSipServletResponse.setOriginalRequest(this);
 			if(!Request.PRACK.equals(requestMethod) && statusCode >= Response.OK && 
 					statusCode <= Response.SESSION_NOT_ACCEPTABLE) {	
