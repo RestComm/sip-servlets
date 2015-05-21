@@ -1336,10 +1336,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 												return;
 											}
 											sipServletMessage.setTransaction(transaction);
-											SipServletResponseImpl response = (SipServletResponseImpl) sipServletRequestImpl.createResponse(408, null, false);
+											SipServletResponseImpl response = (SipServletResponseImpl) sipServletRequestImpl.createResponse(408, null, false, true);
 											// Fix for Issue 1734
 											sipServletRequestImpl.setResponse(response);
-
 											MessageDispatcher.callServlet(response);
 											if(tad.getProxyBranch() != null) {
 												tad.getProxyBranch().setResponse(response);
