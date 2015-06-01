@@ -649,11 +649,11 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
         return null;
     }
 
-    @Override
-    public String getBasePath() {
+//    @Override
+//    public String getBasePath() {
         // TODO???
-        return null;
-    }
+//        return null;
+//    }
 
     //callers: SipApplicationDispatcher.addSipApplications
     @Override

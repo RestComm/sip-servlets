@@ -175,4 +175,10 @@ public class SipServletImpl extends ManagedServlet implements MobicentsSipServle
         return super.isPermanentlyUnavailable();
     }
 
+	@Override
+	public int getLoadOnStartup() {
+		//TODO
+		return 0;
+	}
+
 }

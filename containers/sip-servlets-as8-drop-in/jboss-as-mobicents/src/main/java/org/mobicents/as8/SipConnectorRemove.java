@@ -46,8 +46,6 @@ class SipConnectorRemove extends AbstractRemoveStepHandler {
         final PathAddress address = PathAddress.pathAddress(operation.require(OP_ADDR));
         final String name = address.getLastElement().getValue();
         context.removeService(SipSubsystemServices.JBOSS_SIP_CONNECTOR.append(name));
-        
-        //TODO remove updListener also??? 
     }
 
     protected void recoverServices(OperationContext context, ModelNode operation, ModelNode model) {

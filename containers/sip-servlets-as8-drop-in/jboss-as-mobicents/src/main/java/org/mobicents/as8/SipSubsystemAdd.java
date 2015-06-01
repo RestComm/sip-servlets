@@ -35,6 +35,8 @@ import javax.management.MBeanServer;
 
 
 
+
+
 //import org.jboss.as.clustering.web.DistributedCacheManagerFactory;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
@@ -114,6 +116,8 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         SipDefinition.T4_INTERVAL.validateAndSet(operation, model);
         SipDefinition.TIMER_D_INTERVAL.validateAndSet(operation, model);
         SipDefinition.DIALOG_PENDING_REQUEST_CHECKING.validateAndSet(operation, model);
+        SipDefinition.DNS_SERVER_LOCATOR_CLASS.validateAndSet(operation, model);
+        SipDefinition.DNS_RESOLVER_CLASS.validateAndSet(operation, model);
         SipDefinition.CANCELED_TIMER_TASKS_PURGE_PERIOD.validateAndSet(operation, model);
         SipDefinition.MEMORY_THRESHOLD.validateAndSet(operation, model);
         SipDefinition.BACK_TO_NORMAL_MEMORY_THRESHOLD.validateAndSet(operation, model);
@@ -190,6 +194,18 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final boolean dialogPendingRequestChecking = dialogPendingRequestCheckingModel.isDefined() ? dialogPendingRequestCheckingModel
                 .asBoolean() : false;
 
+        final ModelNode dnsServerLocatorClassModel = SipDefinition.DNS_SERVER_LOCATOR_CLASS.resolveModelAttribute(context, fullModel);
+        final String dnsServerLocatorClass = dnsServerLocatorClassModel.isDefined() ? dnsServerLocatorClassModel.asString() : null;
+        
+        final ModelNode dnsResolverClassModel = SipDefinition.DNS_SERVER_LOCATOR_CLASS.resolveModelAttribute(context, fullModel);
+        final String dnsResolverClass = dnsResolverClassModel.isDefined() ? dnsResolverClassModel.asString() : null;
+        
+        final ModelNode callIdMaxLengthModel = SipDefinition.CALL_ID_MAX_LENGTH.resolveModelAttribute(context, fullModel);
+        final int callIdMaxLength = callIdMaxLengthModel.isDefined() ? callIdMaxLengthModel.asInt() : -1;
+        
+        final ModelNode tagHashMaxLengthModel = SipDefinition.TAG_HASH_MAX_LENGTH.resolveModelAttribute(context, fullModel);
+        final int tagHashMaxLength = callIdMaxLengthModel.isDefined() ? tagHashMaxLengthModel.asInt() : -1;
+                
         final ModelNode canceledTimerTasksPurgePeriodModel = SipDefinition.CANCELED_TIMER_TASKS_PURGE_PERIOD
                 .resolveModelAttribute(context, fullModel);
         final int canceledTimerTasksPurgePeriod = canceledTimerTasksPurgePeriodModel.isDefined() ? canceledTimerTasksPurgePeriodModel
@@ -226,8 +242,9 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final SipServerService service = new SipServerService(sipAppRouterFile, sipStackPropertiesFile, sipPathName,
                 sipAppDispatcherClass, additionalParameterableHeaders, sipCongestionControlInterval,
                 congestionControlPolicy, sipConcurrencyControlMode, usePrettyEncoding, baseTimerInterval, t2Interval,
-                t4Interval, timerDInterval, dialogPendingRequestChecking, canceledTimerTasksPurgePeriod,
-                memoryThreshold, backToNormalMemoryThreshold, outboundProxy, instanceId);
+                t4Interval, timerDInterval, dialogPendingRequestChecking, dnsServerLocatorClass, dnsResolverClass,
+        		callIdMaxLength, tagHashMaxLength, canceledTimerTasksPurgePeriod, memoryThreshold, 
+        		backToNormalMemoryThreshold, outboundProxy, instanceId);
         newControllers.add(context
                 .getServiceTarget()
                 .addService(SipSubsystemServices.JBOSS_SIP, service)
@@ -354,7 +371,9 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         try {
             servletContainerServiceController.awaitValue();
             servletContainerService=(ServletContainerService)servletContainerServiceController.getValue();
-        } catch (IllegalStateException | InterruptedException e) {
+        }catch (IllegalStateException s){
+        	throw new OperationFailedException("ServletContainer service failed to start!!!", operation);
+    	}catch(InterruptedException e) {
             throw new OperationFailedException("ServletContainer service failed to start!!!", operation);
         }
         

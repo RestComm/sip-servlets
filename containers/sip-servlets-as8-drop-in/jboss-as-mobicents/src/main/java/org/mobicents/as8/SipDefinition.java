@@ -42,6 +42,7 @@ import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.as.controller.registry.OperationEntry;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
+import org.mobicents.as8.Constants;
 
 /**
  * @author Tomaz Cerar
@@ -158,6 +159,34 @@ public class SipDefinition extends SimpleResourceDefinition {
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .setDefaultValue(new ModelNode(false))
                     .build();
+    protected static final SimpleAttributeDefinition DNS_SERVER_LOCATOR_CLASS =
+            new SimpleAttributeDefinitionBuilder(Constants.DNS_SERVER_LOCATOR_CLASS, ModelType.STRING, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.DNS_SERVER_LOCATOR_CLASS)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(null)
+                    .build();
+    protected static final SimpleAttributeDefinition DNS_RESOLVER_CLASS =
+            new SimpleAttributeDefinitionBuilder(Constants.DNS_RESOLVER_CLASS, ModelType.STRING, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.DNS_RESOLVER_CLASS)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(null)
+                    .build();
+    protected static final SimpleAttributeDefinition CALL_ID_MAX_LENGTH =
+            new SimpleAttributeDefinitionBuilder(Constants.CALL_ID_MAX_LENGTH, ModelType.INT, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.CALL_ID_MAX_LENGTH)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(-1))
+                    .build();
+    protected static final SimpleAttributeDefinition TAG_HASH_MAX_LENGTH =
+            new SimpleAttributeDefinitionBuilder(Constants.TAG_HASH_MAX_LENGTH, ModelType.INT, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.TAG_HASH_MAX_LENGTH)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(-1))
+                    .build();    
     protected static final SimpleAttributeDefinition CANCELED_TIMER_TASKS_PURGE_PERIOD =
             new SimpleAttributeDefinitionBuilder(Constants.CANCELED_TIMER_TASKS_PURGE_PERIOD, ModelType.INT, true)
                     .setAllowExpression(true)

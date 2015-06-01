@@ -24,6 +24,8 @@ package io.undertow.servlet;
 import io.undertow.servlet.api.ConvergedDeploymentInfo;
 import io.undertow.servlet.api.ConvergedServletContainer;
 import io.undertow.servlet.api.ServletContainer;
+import io.undertow.servlet.core.ConvergedServletContainerImpl;
+import io.undertow.servlet.core.ServletContainerImpl;
 
 /**
  * @author alerant.appngin@gmail.com
@@ -35,6 +37,7 @@ public class ConvergedServlets extends Servlets {
 
     protected ConvergedServlets() {
         super();
+
     }
 
     public static ConvergedDeploymentInfo deployment() {
@@ -52,5 +55,10 @@ public class ConvergedServlets extends Servlets {
             return container = ConvergedServletContainer.Factory.newInstance();
         }
     }
+    
+    public static ServletContainer newContainer() {
+        return new ConvergedServletContainerImpl();
+    }
+
 
 }

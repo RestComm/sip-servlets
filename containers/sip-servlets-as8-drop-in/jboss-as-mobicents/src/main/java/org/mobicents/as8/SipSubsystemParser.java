@@ -48,6 +48,7 @@ import org.jboss.staxmapper.XMLElementReader;
 import org.jboss.staxmapper.XMLElementWriter;
 import org.jboss.staxmapper.XMLExtendedStreamReader;
 import org.jboss.staxmapper.XMLExtendedStreamWriter;
+import org.mobicents.as8.SipConnectorDefinition;
 
 /**
  * The web subsystem parser.
@@ -199,6 +200,24 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
             case ENABLED:
             	SipConnectorDefinition.ENABLED.parseAndSetParameter(value, connector, reader);
                 break;
+            case USE_STATIC_ADDRESS:
+            	SipConnectorDefinition.USE_STATIC_ADDRESS.parseAndSetParameter(value, connector, reader);
+            	break;
+            case STATIC_SERVER_ADDRESS:
+            	SipConnectorDefinition.STATIC_SERVER_ADDRESS.parseAndSetParameter(value, connector, reader);
+            	break;
+            case STATIC_SERVER_PORT:
+            	SipConnectorDefinition.STATIC_SERVER_PORT.parseAndSetParameter(value, connector, reader);
+            	break;
+            case USE_STUN:
+            	SipConnectorDefinition.USE_STUN.parseAndSetParameter(value, connector, reader);
+            	break;
+            case STUN_SERVER_ADDRESS:
+            	SipConnectorDefinition.STUN_SERVER_ADDRESS.parseAndSetParameter(value, connector, reader);
+            	break;
+            case STUN_SERVER_PORT:
+            	SipConnectorDefinition.STUN_SERVER_PORT.parseAndSetParameter(value, connector, reader);
+            	break;                
             default:
                 throw unexpectedAttribute(reader, i);
             }

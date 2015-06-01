@@ -63,7 +63,6 @@
 	    <maven-resource group="org.mobicents.tools" artifact="sip-balancer-jar"/>
             <maven-resource group="dnsjava" artifact="dnsjava"/>
             <maven-resource group="net.java.stun4j" artifact="stun4j"/>
-            <maven-resource group="jain-sip" artifact="jain-sip-undertow-ext"/>
         </module-def>
     </target>
 

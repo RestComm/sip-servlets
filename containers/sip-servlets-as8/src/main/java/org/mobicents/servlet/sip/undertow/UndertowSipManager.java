@@ -41,7 +41,6 @@ import org.mobicents.servlet.sip.core.session.SipManagerDelegate;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.core.session.SipStandardManagerDelegate;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
-import org.mobicents.servlet.sip.message.UndertowSipFactoryImpl;
 /**
  * @author alerant.appngin@gmail.com
  *

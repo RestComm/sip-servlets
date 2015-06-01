@@ -52,6 +52,9 @@
                         -AgeneratedTranslationFilesPath=${project.build.directory}/generated-translation-files
                     </compilerArgument>
                 </configuration>
+		<dependencies>
+
+		</dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -82,12 +85,24 @@
     </pluginRepositories>
 
     <dependencies>
-	<!-- dependency>
+       <!-- dependency>
+	    <groupId>org.jboss.as</groupId>
+	    <artifactId>jboss-as-web</artifactId>
+	    <version>7.2.0.Final</version>
+	    <scope>compile</scope>
+	</dependency>
+	<dependency>
+	    <groupId>org.jboss.web</groupId>
+	    <artifactId>jbossweb</artifactId>
+	    <version>7.2.0.Final</version>
+	    <scope>compile</scope>
+	</dependency -->
+	<dependency>
 	    <groupId>javax</groupId>
 	    <artifactId>javaee-web-api</artifactId>
 	    <version>6.0</version>
 	    <scope>provided</scope>
-	</dependency -->
+	</dependency>
 	<dependency>
 		<groupId>org.wildfly</groupId>
 		<artifactId>wildfly-undertow</artifactId>
@@ -102,7 +117,7 @@
 			<groupId>io.undertow</groupId>
 			<artifactId>undertow-servlet</artifactId>
 		    </exclusion>
-		</exclusions>			
+		</exclusions>	
 	</dependency>
 	<dependency>
 	        <groupId>org.wildfly</groupId>
@@ -247,24 +262,24 @@
             <scope>provided</scope>
         </dependency>
 
-	<!-- jain-sip-ext dependency -->
-	<dependency>
-		<groupId>jain-sip</groupId>
-		<artifactId>jain-sip-undertow-ext</artifactId>
-		<version>1.0-SNAPSHOT</version>
+	<!-- -->        
+        <dependency>
+            <groupId>org.jboss.solder</groupId>
+            <artifactId>solder-tooling</artifactId>
+            <scope>provided</scope>
+            <optional>true</optional>
+            <version>3.2.1.Final</version>
 	</dependency>
 
-	<!-- xnio dependency -->
-	<dependency>
-		<groupId>org.jboss.xnio</groupId>
-		<artifactId>xnio-api</artifactId>
-		<version>3.3.0.Final</version>
-	</dependency>
-	<dependency>
-		<groupId>org.jboss.xnio</groupId>
-		<artifactId>xnio-nio</artifactId>
-		<version>3.3.0.Final</version>
-	</dependency>
+	<!-- jboss message bundle annotiations -->
+	<dependency>  
+            <groupId>org.jboss.logging</groupId>  
+            <artifactId>jboss-logging-annotations</artifactId>  
+            <version>1.2.0.Final</version>  
+            <!-- Only required during compile of the current module -->  
+            <scope>provided</scope>  
+            <optional>true</optional>  
+        </dependency>
     </dependencies>
 
     <profiles>

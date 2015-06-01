@@ -60,6 +60,7 @@ import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 import org.mobicents.servlet.sip.core.SipService;
 import org.mobicents.servlet.sip.core.message.OutboundProxy;
+import org.mobicents.servlet.sip.dns.MobicentsDNSResolver;
 import org.mobicents.servlet.sip.message.Servlet3SipServletMessageFactory;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 /**
@@ -85,7 +86,7 @@ public class SipStandardService implements SipService {
      */
     private static final String INFO = "org.mobicents.servlet.sip.startup.SipStandardService/1.0";
     // the sip application dispatcher class name defined in the server.xml
-    protected String sipApplicationDispatcherClassName = "org.mobicents.servlet.sip.core.UndertowSipApplicationDispatcherImpl";
+    protected String sipApplicationDispatcherClassName = "org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl";
     // instatiated class from the sipApplicationDispatcherClassName of the sip application dispatcher
     protected SipApplicationDispatcher sipApplicationDispatcher;
     private boolean gatherStatistics = true;
@@ -113,6 +114,8 @@ public class SipStandardService implements SipService {
     protected String darConfigurationFileLocation;
     protected boolean connectorsStartedExternally = false;
     protected boolean dialogPendingRequestChecking = false;
+	protected int callIdMaxLength;
+	protected int tagHashMaxLength;
 
     protected boolean httpFollowsSip = false;
     protected String jvmRoute;
@@ -134,6 +137,7 @@ public class SipStandardService implements SipService {
     @Deprecated
     private String addressResolverClass = null;
     private String dnsServerLocatorClass = DefaultDNSServerLocator.class.getName();
+	private String dnsResolverClass = MobicentsDNSResolver.class.getName();
     private String mobicentsSipServletMessageFactoryClassName = Servlet3SipServletMessageFactory.class.getName();
 
     // the balancers to send heartbeat to and our health info
@@ -836,4 +840,48 @@ public class SipStandardService implements SipService {
             logger.debug("Outbound Proxy : " + outboundProxy);
         }
     }
+
+	public String getDnsServerLocatorClass() {
+		return dnsServerLocatorClass;
+	}
+
+	public void setDnsServerLocatorClass(String dnsServerLocatorClass) {
+		this.dnsServerLocatorClass = dnsServerLocatorClass;
+	}
+
+	public String getDnsResolverClass() {
+		return dnsResolverClass;
+	}
+
+	public void setDnsResolverClass(String dnsResolverClass) {
+		this.dnsResolverClass = dnsResolverClass;
+	}
+	
+	/**
+	 * @return the callIdMaxLength
+	 */
+	public int getCallIdMaxLength() {
+		return callIdMaxLength;
+	}
+
+	/**
+	 * @param callIdMaxLength the callIdMaxLength to set
+	 */
+	public void setCallIdMaxLength(int callIdMaxLength) {
+		this.callIdMaxLength = callIdMaxLength;
+	}
+	
+	/**
+	 * @return the tagHashMaxLength
+	 */
+	public int getTagHashMaxLength() {
+		return tagHashMaxLength;
+	}
+
+	/**
+	 * @param tagHashMaxLength the tagHashMaxLength to set
+	 */
+	public void setTagHashMaxLength(int tagHashMaxLength) {
+		this.tagHashMaxLength = tagHashMaxLength;
+	}
 }

@@ -66,6 +66,10 @@ class SipServerService implements SipServer, Service<SipServer> {
  	final int t4Interval;
  	final int timerDInterval;
  	final boolean dialogPendingRequestChecking;
+ 	final String dnsServerLocatorClass;
+ 	final String dnsResolverClass;
+ 	final int callIdMaxLength;
+	final int tagHashMaxLength;
  	final int canceledTimerTasksPurgePeriod;
  	final int memoryThreshold;
  	final int backToNormalMemoryThreshold;
@@ -98,6 +102,10 @@ class SipServerService implements SipServer, Service<SipServer> {
     		int t4Interval, 
     		int timerDInterval, 
     		boolean dialogPendingRequestChecking, 
+    		String dnsServerLocatorClass,
+    		String dnsResolverClass,
+    		int callIdMaxLength,
+    		int tagHashMaxLength,
     		int canceledTimerTasksPurgePeriod, 
     		int memoryThreshold,
     	 	int backToNormalMemoryThreshold,
@@ -120,6 +128,10 @@ class SipServerService implements SipServer, Service<SipServer> {
         this.t4Interval = t4Interval;
         this.timerDInterval = timerDInterval;
         this.dialogPendingRequestChecking = dialogPendingRequestChecking;
+        this.dnsServerLocatorClass = dnsServerLocatorClass;
+        this.dnsResolverClass = dnsResolverClass;
+        this.callIdMaxLength = callIdMaxLength;
+        this.tagHashMaxLength = tagHashMaxLength;
         this.canceledTimerTasksPurgePeriod = canceledTimerTasksPurgePeriod;
         this.memoryThreshold = memoryThreshold;
         this.backToNormalMemoryThreshold = backToNormalMemoryThreshold;
@@ -132,7 +144,7 @@ class SipServerService implements SipServer, Service<SipServer> {
             // Set the MBeanServer
             final MBeanServer mbeanServer = this.mbeanServer.getOptionalValue();
             if(mbeanServer != null) {
-                //Registry.getRegistry(null, null).setMBeanServer(mbeanServer);
+            	//Registry.getRegistry(null, null).setMBeanServer(mbeanServer);
             }
         //}
 
@@ -210,6 +222,9 @@ class SipServerService implements SipServer, Service<SipServer> {
         	sipService.setAdditionalParameterableHeaders(additionalParameterableHeaders);
         }
         sipService.setDialogPendingRequestChecking(dialogPendingRequestChecking);
+        sipService.setCanceledTimerTasksPurgePeriod(canceledTimerTasksPurgePeriod);
+        sipService.setDnsServerLocatorClass(dnsServerLocatorClass);
+        sipService.setDnsResolverClass(dnsResolverClass);
         sipService.setCanceledTimerTasksPurgePeriod(canceledTimerTasksPurgePeriod);
         sipService.setMemoryThreshold(memoryThreshold);
         sipService.setBackToNormalMemoryThreshold(backToNormalMemoryThreshold);

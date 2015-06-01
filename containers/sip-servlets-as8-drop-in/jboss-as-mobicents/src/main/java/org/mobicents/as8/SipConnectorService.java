@@ -35,7 +35,6 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.undertow.SipProtocolHandler;
-import org.wildfly.extension.undertow.UdpListenerService;
 
 import static org.mobicents.as8.SipMessages.MESSAGES;
 
@@ -49,21 +48,32 @@ class SipConnectorService implements Service<SipUdpListener> {
 
     private String protocol = "SIP/2.0";
     private String scheme = "sip";
+    private Boolean useStaticAddress = false;
+    private String staticServerAddress = null;
+    private int staticServerPort = -1;
+    private Boolean useStun = false;
+    private String stunServerAddress = null;
+    private int stunServerPort = -1;
 
     private SipUdpListener connector;
-    private UdpListenerService listenerService;
     
     private final InjectedValue<Executor> executor = new InjectedValue<Executor>();
     private final InjectedValue<SocketBinding> binding = new InjectedValue<SocketBinding>();
     private final InjectedValue<SipServer> server = new InjectedValue<SipServer>();
 
-    public SipConnectorService(String protocol, String scheme, UdpListenerService listenerService) {
+    public SipConnectorService(String protocol, String scheme, boolean useStaticAddress, String staticServerAddress, int staticServerPort, boolean useStun, String stunServerAddress, int stunServerPort) {
         if (protocol != null)
             this.protocol = protocol;
         if (scheme != null)
             this.scheme = scheme;
-        if (listenerService!=null)
-               this.listenerService = listenerService;
+        this.useStaticAddress = useStaticAddress;
+        if (staticServerAddress != null)
+            this.staticServerAddress = staticServerAddress;
+        this.staticServerPort = staticServerPort;
+        this.useStun = useStun;
+        if (stunServerAddress != null)
+            this.stunServerAddress = stunServerAddress;
+        this.stunServerPort = stunServerPort;        
     }
 
     /**
@@ -83,14 +93,32 @@ class SipConnectorService implements Service<SipUdpListener> {
             SipConnector sipConnector = new SipConnector();
             sipConnector.setIpAddress(address.getHostName());
             sipConnector.setPort(address.getPort());
-            sipConnector.setTransport(binding.getName().substring("sip-".length()));
+            // https://github.com/Mobicents/sip-servlets/issues/44 support multiple connectors
+            sipConnector.setTransport(binding.getName().substring(binding.getName().lastIndexOf("sip-")+("sip-".length())));
+            sipConnector.setUseStaticAddress(useStaticAddress);
+            sipConnector.setStaticServerAddress(staticServerAddress);
+            sipConnector.setStaticServerPort(staticServerPort);
+            sipConnector.setUseStun(useStun);
+            sipConnector.setStunServerAddress(stunServerAddress);
+            sipConnector.setStunServerPort(stunServerPort);
+            
+            /*TODO: 
+             * enableLookups
+             * proxyName
+             * proxyPort
+             * redirectPort
+             * secure
+             * maxPostSize
+             * maxSavePostSize
+             * */ 
 
+            
             SipProtocolHandler sipProtocolHandler = new SipProtocolHandler(sipConnector);
 
             // TODO set Executor on ProtocolHandler
             // TODO use server socket factory - or integrate with {@code ManagedBinding}
 
-            final SipUdpListener connector = new SipUdpListener(sipProtocolHandler, listenerService);
+            final SipUdpListener connector = new SipUdpListener(sipProtocolHandler);
 
             connector.init();
             getSipServer().addConnector(connector);

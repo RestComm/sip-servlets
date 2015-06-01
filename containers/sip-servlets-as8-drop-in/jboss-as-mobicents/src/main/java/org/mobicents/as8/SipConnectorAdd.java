@@ -22,9 +22,12 @@
 package org.mobicents.as8;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
+import static org.mobicents.as8.Constants.STATIC_SERVER_ADDRESS;
+import static org.mobicents.as8.Constants.STATIC_SERVER_PORT;
+import static org.mobicents.as8.Constants.STUN_SERVER_ADDRESS;
+import static org.mobicents.as8.Constants.STUN_SERVER_PORT;
 import static org.mobicents.as8.SipConnectorDefinition.CONNECTOR_ATTRIBUTES;
 
-import java.util.Date;
 import java.util.List;
 
 import org.jboss.as.controller.AbstractAddStepHandler;
@@ -39,8 +42,6 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
-import org.jboss.msc.service.ServiceName;
-import org.wildfly.extension.undertow.UdpListenerService;
 
 /**
  * {@code OperationHandler} responsible for adding a sip connector.
@@ -81,48 +82,15 @@ class SipConnectorAdd extends AbstractAddStepHandler {
         final String protocol = SipConnectorDefinition.PROTOCOL.resolveModelAttribute(context, fullModel).asString();
         final String scheme = SipConnectorDefinition.SCHEME.resolveModelAttribute(context, fullModel).asString();
 
-        UdpListenerService udpListenerService = null;
-        boolean gotInjectedValues = false;
-        boolean timeout = false;
-        Date start = new Date();
-        // FIXME:needs a better solution here:
-        while ((udpListenerService == null || gotInjectedValues == false) && timeout == false) {
-            Date current = new Date();
-            if (current.getTime() - start.getTime() > 10000) {
-                timeout = true;
-                break;
-            }
-            List<ServiceName> serviceNames = context.getServiceRegistry(false).getServiceNames();
+        final boolean useStaticAddress = SipConnectorDefinition.USE_STATIC_ADDRESS.resolveModelAttribute(context, fullModel).asBoolean();        
+        final String staticServerAddress = operation.hasDefined(STATIC_SERVER_ADDRESS) ? SipConnectorDefinition.STATIC_SERVER_ADDRESS.resolveModelAttribute(context, fullModel).asString() : null;
+        final int staticServerPort = operation.hasDefined(STATIC_SERVER_PORT) ? SipConnectorDefinition.STATIC_SERVER_PORT.resolveModelAttribute(context, fullModel).asInt() : -1;
 
-            for (ServiceName serviceName : serviceNames) {
-                ServiceController<?> controller = context.getServiceRegistry(false).getService(serviceName);
-                if (controller.getService() instanceof UdpListenerService
-                        && name.equalsIgnoreCase(((UdpListenerService) controller.getService()).getName())) {
-                    udpListenerService = (UdpListenerService) controller.getService();
-
-                    // check whether values have been already injected by the container:
-                    try {
-                        if (udpListenerService.getServerService() != null
-                                && udpListenerService.getServerService().getValue() != null
-                                && udpListenerService.getServerService().getValue().getRootUdpHandler() != null
-                                && udpListenerService.getServerService().getValue().getRootUdpHandler().getChannel() != null) {
-                            gotInjectedValues = true;
-                        }
-                    } catch (Exception e) {
-                        gotInjectedValues = false;
-                    }
-
-                    break;
-                }
-            }
-
-        }
-
-        if (udpListenerService == null) {
-            throw new OperationFailedException("Please add an udp-listener to webserver definition!", operation);
-        }
-
-        final SipConnectorService service = new SipConnectorService(protocol, scheme, udpListenerService);
+        final boolean useStun = SipConnectorDefinition.USE_STUN.resolveModelAttribute(context, fullModel).asBoolean();        
+        final String stunServerAddress = operation.hasDefined(STUN_SERVER_ADDRESS) ? SipConnectorDefinition.STUN_SERVER_ADDRESS.resolveModelAttribute(context, fullModel).asString() : null;
+        final int stunServerPort = operation.hasDefined(STUN_SERVER_PORT) ? SipConnectorDefinition.STUN_SERVER_PORT.resolveModelAttribute(context, fullModel).asInt() : -1;
+        
+        final SipConnectorService service = new SipConnectorService(protocol, scheme, useStaticAddress, staticServerAddress, staticServerPort, useStun, stunServerAddress, stunServerPort);
 
         final ServiceBuilder<SipUdpListener> serviceBuilder = context
                 .getServiceTarget()

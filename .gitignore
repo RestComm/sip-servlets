@@ -60,3 +60,4 @@ sip-servlets-test-suite/applications/timers-sip-servlet/.project
 containers/sip-servlets-as8/pom másolata.xml
 containers/sip-servlets-as8-drop-in/build-mobicents-modules/pom másolata.xml
 containers/sip-servlets-as8-drop-in/jboss-as-mobicents/pom másolata.xml
+containers/sip-servlets-as8-drop-in/jboss-as-mobicents/pom.xml.bak
