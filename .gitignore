@@ -61,3 +61,23 @@ containers/sip-servlets-as8/pom másolata.xml
 containers/sip-servlets-as8-drop-in/build-mobicents-modules/pom másolata.xml
 containers/sip-servlets-as8-drop-in/jboss-as-mobicents/pom másolata.xml
 containers/sip-servlets-as8-drop-in/jboss-as-mobicents/pom.xml.bak
+containers/sip-servlets-as8-drop-in/jboss-as-mobicents/src/main/java/org/mobicents/as8/SipMessages_$bundle.java
+containers/sip-servlets-catalina-7/.classpath
+containers/sip-servlets-catalina-7/.classpath
+containers/sip-servlets-catalina-7/.project
+containers/sip-servlets-catalina-8/${CATALINA_HOME}/lib/sip-servlets-catalina-8-3.0.0-SNAPSHOT.jar
+containers/tomcat-7/${CATALINA_HOME}/lib/sip-balancer-jar-1.7.6.jar
+containers/tomcat-7/${CATALINA_HOME}/lib/sip-servlets-tomcat-7-3.0.0-SNAPSHOT.jar
+containers/tomcat-7/.classpath
+containers/tomcat-7/.classpath
+containers/tomcat-7/.project
+containers/tomcat-8/${CATALINA_HOME}/lib/sip-balancer-jar-1.7.6.jar
+containers/tomcat-8/${CATALINA_HOME}/lib/sip-servlets-tomcat-8-3.0.0-SNAPSHOT.jar
+sip-servlets-annotations/${CATALINA_HOME}/lib/sip-servlets-annotations-3.0.0-SNAPSHOT.jar
+sip-servlets-application-router/${CATALINA_HOME}/lib/sip-servlets-application-router-3.0.0-SNAPSHOT.jar
+sip-servlets-client/${CATALINA_HOME}/lib/sip-servlets-client-3.0.0-SNAPSHOT.jar
+sip-servlets-core-api/${CATALINA_HOME}/lib/sip-servlets-core-api-3.0.0-SNAPSHOT.jar
+sip-servlets-spec/${CATALINA_HOME}/lib/sip-servlets-spec-3.0.0-SNAPSHOT.jar
+containers/sip-servlets-catalina-7/.classpath
+containers/sip-servlets-as7/${CATALINA_HOME}/lib/sip-servlets-as7-3.0.0-SNAPSHOT.jar
+containers/sip-servlets-catalina-7/${CATALINA_HOME}/lib/sip-servlets-catalina-7-3.0.0-SNAPSHOT.jar
