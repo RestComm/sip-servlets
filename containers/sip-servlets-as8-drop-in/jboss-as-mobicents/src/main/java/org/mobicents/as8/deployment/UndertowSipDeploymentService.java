@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -21,6 +21,7 @@
  */
 package org.mobicents.as8.deployment;
 
+import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.core.ManagedFilter;
 import io.undertow.servlet.core.ManagedServlet;
 import io.undertow.servlet.core.ManagedServlets;
@@ -43,7 +44,6 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.mobicents.servlet.sip.undertow.SipServletImpl;
-import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentService;
 
 /**
@@ -53,12 +53,9 @@ public class UndertowSipDeploymentService implements Service<UndertowSipDeployme
     public static final ServiceName SERVICE_NAME = ServiceName.of("UndertowSipDeploymentService");
 
     private UndertowDeploymentService deploymentService = null;
-    private UndertowDeploymentInfoService deploymentInfoService = null;
     private DeploymentUnit deploymentUnit = null;
 
-    public UndertowSipDeploymentService(UndertowDeploymentService deploymentService,
-            UndertowDeploymentInfoService deploymentInfoService, DeploymentUnit deploymentUnit) {
-        this.deploymentInfoService = deploymentInfoService;
+    public UndertowSipDeploymentService(UndertowDeploymentService deploymentService, DeploymentUnit deploymentUnit) {
         this.deploymentService = deploymentService;
         this.deploymentUnit = deploymentUnit;
     }
@@ -71,15 +68,13 @@ public class UndertowSipDeploymentService implements Service<UndertowSipDeployme
     @Override
     public void start(StartContext context) throws StartException {
         ServerLogger.DEPLOYMENT_LOGGER.debug("UndertowSipDeploymentService.start()");
-        SIPWebContext sipWebContext = (SIPWebContext) this.deploymentService.getDeployment();
 
-        SIPContextFactory factory = this.deploymentUnit.getAttachment(SIPContextFactory.ATTACHMENT);
-        factory.addDeplyomentUnitToContext(this.deploymentUnit, this.deploymentInfoService, sipWebContext);
+        Deployment deployment = this.deploymentService.getDeployment();
+        SIPWebContext sipWebContext = this.deploymentUnit.getAttachment(SIPWebContext.ATTACHMENT_KEY);
 
         try {
             Module module = this.deploymentUnit.getAttachment(Attachments.MODULE);
-            sipWebContext.addSipContextClassLoader(module.getClassLoader());
-            sipWebContext.init();
+            sipWebContext.init(deployment, module.getClassLoader());
             sipWebContext.start();
             sipWebContext.contextListenerStart();
 
@@ -93,17 +88,17 @@ public class UndertowSipDeploymentService implements Service<UndertowSipDeployme
              * sipServlets.add(managedServlet); }
              */
 
-            this.createServlets(sipWebContext.getServlets(), sipServlets, sipWebContext);
+            this.createServlets(sipWebContext.getDeployment().getServlets(), sipServlets, sipWebContext);
 
         } catch (ServletException e) {
-            ServerLogger.DEPLOYMENT_LOGGER.error(e.getMessage(),e);
+            ServerLogger.DEPLOYMENT_LOGGER.error(e.getMessage(), e);
         }
         ServerLogger.DEPLOYMENT_LOGGER.debug("UndertowSipDeploymentService.start() finished");
     }
 
     @Override
     public void stop(StopContext context) {
-        SIPWebContext sipWebContext = (SIPWebContext) this.deploymentService.getDeployment();
+        SIPWebContext sipWebContext = this.deploymentUnit.getAttachment(SIPWebContext.ATTACHMENT_KEY);
         try {
             if (sipWebContext != null) {
                 sipWebContext.stop();
@@ -153,8 +148,8 @@ public class UndertowSipDeploymentService implements Service<UndertowSipDeployme
                 servlet.createServlet();
             }
         }
-        if (context.getDeploymentInfo().isEagerFilterInit()) {
-            for (ManagedFilter filter : context.getFilters().getFilters().values()) {
+        if (context.getDeploymentInfoFacade().getDeploymentInfo().isEagerFilterInit()) {
+            for (ManagedFilter filter : context.getDeployment().getFilters().getFilters().values()) {
                 filter.createFilter();
             }
         }

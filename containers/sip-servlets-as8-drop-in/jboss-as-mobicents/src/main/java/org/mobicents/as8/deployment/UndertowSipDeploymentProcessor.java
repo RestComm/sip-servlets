@@ -145,7 +145,7 @@ public class UndertowSipDeploymentProcessor implements DeploymentUnitProcessor {
         final ServiceName sipDeploymentServiceName = deploymentServiceName
                 .append(UndertowSipDeploymentService.SERVICE_NAME);
         UndertowSipDeploymentService sipDeploymentService = new UndertowSipDeploymentService(deploymentService,
-                deploymentInfoService, deploymentUnit);
+                deploymentUnit);
         ServiceBuilder<UndertowSipDeploymentService> sipDeploymentServiceBuilder = phaseContext.getServiceTarget()
                 .addService(sipDeploymentServiceName, sipDeploymentService);
         // this service depends on the base undertowdeployment service:

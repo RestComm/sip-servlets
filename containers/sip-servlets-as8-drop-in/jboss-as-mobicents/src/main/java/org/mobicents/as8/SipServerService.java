@@ -273,7 +273,7 @@ class SipServerService implements SipServer, Service<SipServer> {
     }
 
     /** {@inheritDoc} */
-    public synchronized void addConnector(SipUdpListener connector) {
+    public synchronized void addConnector(SipConnectorListener connector) {
         if (connector.getProtocolHandler() instanceof SipProtocolHandler) {
             final SipStandardService sipService = this.sipService;
             sipService.addConnector(connector.getProtocolHandler());
@@ -281,7 +281,7 @@ class SipServerService implements SipServer, Service<SipServer> {
     }
 
     /** {@inheritDoc} */
-    public synchronized void removeConnector(SipUdpListener connector) {
+    public synchronized void removeConnector(SipConnectorListener connector) {
         if (connector.getProtocolHandler() instanceof SipProtocolHandler) {
             final SipStandardService service = this.sipService;
             service.removeConnector(connector.getProtocolHandler());

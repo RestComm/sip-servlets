@@ -45,7 +45,7 @@ public class SipTimerServiceInjectionSource extends InjectionSource {
 
     SipTimerServiceInjectionSource(DeploymentUnit du) {
         sipDeploymentUnit = du;
-        sipContext = du.getAttachment(SIPWebContext.ATTACHMENT);
+        sipContext = du.getAttachment(SIPWebContext.ATTACHMENT_KEY);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class SipTimerServiceInjectionSource extends InjectionSource {
         public Object getInstance() {
             // return the TimerService
             if (sipContext == null) {
-                sipContext = sipDeploymentUnit.getAttachment(SIPWebContext.ATTACHMENT);
+                sipContext = sipDeploymentUnit.getAttachment(SIPWebContext.ATTACHMENT_KEY);
             }
             return sipContext.getTimerService();
         }

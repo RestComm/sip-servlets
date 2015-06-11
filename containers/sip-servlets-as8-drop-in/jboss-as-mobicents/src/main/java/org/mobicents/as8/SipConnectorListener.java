@@ -27,11 +27,11 @@ import org.mobicents.servlet.sip.undertow.SipProtocolHandler;
 /**
  * @author alerant.appngin@gmail.com
  */
-public class SipUdpListener {
+public class SipConnectorListener {
     
     private SipProtocolHandler protocolHandler;
 
-    public SipUdpListener(SipProtocolHandler protocolHandler) {
+    public SipConnectorListener(SipProtocolHandler protocolHandler) {
         
         this.protocolHandler = protocolHandler;
         

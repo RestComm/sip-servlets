@@ -96,7 +96,7 @@ class SipConnectorMetrics implements OperationStepHandler {
                             .getService(SipSubsystemServices.JBOSS_SIP_CONNECTOR.append(name));
                     if (controller != null) {
                         try {
-                            final SipUdpListener connector = (SipUdpListener) controller.getValue();
+                            final SipConnectorListener connector = (SipConnectorListener) controller.getValue();
                             final ModelNode result = context.getResult();
                             if (connector.getProtocolHandler() != null /*FIXME:&& connector.getProtocolHandler().getRequestGroupInfo() != null*/) {
                                 /*FIXME:RequestGroupInfo info = connector.getProtocolHandler().getRequestGroupInfo();

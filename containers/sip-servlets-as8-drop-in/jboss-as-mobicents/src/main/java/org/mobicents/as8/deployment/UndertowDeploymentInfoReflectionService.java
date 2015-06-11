@@ -21,12 +21,15 @@
  */
 package org.mobicents.as8.deployment;
 
-import io.undertow.servlet.api.ConvergedDeploymentInfo;
 import io.undertow.servlet.api.DeploymentInfo;
+import io.undertow.servlet.api.DeploymentInfoFacade;
+import io.undertow.servlet.core.ConvergedSessionManagerFactory;
 
-import java.lang.reflect.Field;
+import javax.servlet.ServletException;
 
 import org.jboss.as.server.ServerLogger;
+import org.jboss.as.server.deployment.DeploymentUnit;
+import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.StartContext;
@@ -40,9 +43,26 @@ import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
 public class UndertowDeploymentInfoReflectionService implements Service<UndertowDeploymentInfoReflectionService> {
     public static final ServiceName SERVICE_NAME = ServiceName.of("UndertowDeploymentInfoReflectionService");
 
-    private static final String DEPLOYMENTINFOFIELDNAME = "deploymentInfo";
-
     private InjectedValue<UndertowDeploymentInfoService> deploymentInfoService = new InjectedValue<UndertowDeploymentInfoService>();
+
+    private DeploymentUnit deploymentUnit = null;
+    private SIPWebContext webContext = null;
+    
+    public UndertowDeploymentInfoReflectionService(DeploymentUnit deploymentUnit) throws DeploymentUnitProcessingException{
+    	this.deploymentUnit = deploymentUnit;
+
+        //lets init sipWebContext:
+    	this.webContext = new SIPWebContext();
+        try {
+        	this.webContext.addDeploymentUnit(this.deploymentUnit);
+
+        	this.webContext.initDispatcher();
+            this.webContext.prepareServletContextServices();
+            this.webContext.attachContext();
+        } catch (ServletException e) {
+			throw new DeploymentUnitProcessingException(e);
+		}
+    }
 
     @Override
     public UndertowDeploymentInfoReflectionService getValue() throws IllegalStateException, IllegalArgumentException {
@@ -52,30 +72,30 @@ public class UndertowDeploymentInfoReflectionService implements Service<Undertow
     @Override
     public void start(StartContext context) throws StartException {
         ServerLogger.DEPLOYMENT_LOGGER.debug("UndertowDeploymentInfoReflectionService.start()");
-        DeploymentInfo info = this.deploymentInfoService.getValue().getValue();
-        ConvergedDeploymentInfo convergedInfo = new ConvergedDeploymentInfo(info);
+        SIPContextFactory factory = this.deploymentUnit.getAttachment(SIPContextFactory.ATTACHMENT);
 
-        Class<? extends UndertowDeploymentInfoService> serviceClass = deploymentInfoService.getValue().getClass();
-        for (Field field : serviceClass.getDeclaredFields()) {
-            if (UndertowDeploymentInfoReflectionService.DEPLOYMENTINFOFIELDNAME.equals(field.getName())) {
-                field.setAccessible(true);
-                try {
-                    field.set(deploymentInfoService.getValue(), convergedInfo);
-                    /*
-                     * this.deploymentService.getValue().getDeploymentInfoInjectedValue().setValue( new
-                     * ImmediateValue<DeploymentInfo>(convergedInfo));
-                     */
-                    ServerLogger.DEPLOYMENT_LOGGER.debug("UndertowDeploymentInfoReflectionService.start() deploymentInfo injected:"
-                            + convergedInfo);
-                } catch (IllegalArgumentException e) {
-                    ServerLogger.DEPLOYMENT_LOGGER.error(e.getMessage(),e);
-                } catch (IllegalAccessException e) {
-                    ServerLogger.DEPLOYMENT_LOGGER.error(e.getMessage(),e);
-                }
-                field.setAccessible(false);
-                break;
+        //lets add our custom sip session manager factory:
+        if(this.deploymentInfoService!=null && this.deploymentInfoService.getValue()!=null && this.deploymentInfoService.getValue().getValue()!=null){
+            DeploymentInfo info =  this.deploymentInfoService.getValue().getValue();
+            
+            DeploymentInfoFacade facade = new DeploymentInfoFacade();
+            try {
+                facade.addDeploymentInfo(info);
+                facade.setSessionManagerFactory(new ConvergedSessionManagerFactory());
+                this.deploymentUnit.putAttachment(DeploymentInfoFacade.ATTACHMENT_KEY, facade);
+            } catch (ServletException e) {
+                throw new StartException(e);  
             }
+        }else{
+            throw new StartException("DeploymentInfoService not properly initialized!");  
         }
+        
+        try {
+			this.webContext = factory.addDeplyomentUnitToContext(this.deploymentUnit, this.deploymentInfoService.getValue(), webContext);
+		} catch (ServletException e) {
+			throw new StartException(e);  
+		}
+
         ServerLogger.DEPLOYMENT_LOGGER.debug("UndertowDeploymentInfoReflectionService.start() finished");
     }
 

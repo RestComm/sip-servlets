@@ -1,29 +1,5 @@
-/*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
- * and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
 package io.undertow.servlet.api;
 
-import io.undertow.servlet.core.ConvergedSessionManagerFactory;
-
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,24 +8,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.servlet.ServletException;
 import javax.servlet.sip.SipServletRequest;
 
 import org.apache.log4j.Logger;
+import org.jboss.as.server.deployment.AttachmentKey;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.MobicentsSipServlet;
 import org.mobicents.servlet.sip.core.descriptor.MobicentsSipServletMapping;
 import org.mobicents.servlet.sip.core.security.MobicentsSipLoginConfig;
 import org.mobicents.servlet.sip.ruby.SipRubyController;
 
-/**
- * @author alerant.appngin@gmail.com
- *
- */
-public class ConvergedDeploymentInfo extends DeploymentInfo implements Cloneable {
-    private static final Logger logger = Logger.getLogger(ConvergedDeploymentInfo.class);
+public class DeploymentInfoFacade implements Cloneable{
+    public static AttachmentKey<DeploymentInfoFacade> ATTACHMENT_KEY = AttachmentKey.create(DeploymentInfoFacade.class);
+    
+    private DeploymentInfo deploymentInfo;
+	
+	private static final Logger logger = Logger.getLogger(DeploymentInfoFacade.class);
 
     private final Map<String, ServletInfo> sipServlets = new HashMap<>();
-    private SessionManagerFactory sessionManagerFactory = new ConvergedSessionManagerFactory();
 
     // sip-xml meta:
     protected String applicationName;
@@ -73,38 +50,25 @@ public class ConvergedDeploymentInfo extends DeploymentInfo implements Cloneable
     protected transient Map<String, MobicentsSipServlet> childrenMap;
     protected transient Map<String, MobicentsSipServlet> childrenMapByClassName;
 
-    public ConvergedDeploymentInfo(){
-        //default constructor
-    }
-    
-    //using reflection to copy fields fast:
-    public ConvergedDeploymentInfo(DeploymentInfo info) {
-        Class fromClass = info.getClass();
-        Class toClass = super.getClass().getSuperclass();
-        for(Field fromField : fromClass.getDeclaredFields()){
-            for(Field toField : toClass.getDeclaredFields()){
-                if(toField.getType() == fromField.getType() &&
-                        toField.getName().equals(fromField.getName()))
-                {
-                    toField.setAccessible(true);
-                    fromField.setAccessible(true);
-                    try {
-                        toField.set(this, fromField.get(info));
-                    } catch (IllegalArgumentException | IllegalAccessException e1) {
-                        e1.printStackTrace();
-                    }
-                    fromField.setAccessible(false);
-                    toField.setAccessible(false);
-                }
-            }
-        }
+    //default constructor:
+    public DeploymentInfoFacade(){}
+
+    public void addDeploymentInfo(DeploymentInfo info) throws ServletException{
+   		if(this.deploymentInfo==null){
+   			if(info!=null){
+   				this.deploymentInfo=info;
+   			}else{
+   				throw new ServletException("Cannot set deploymentInfo to null!"); 
+   			}
+   		}else{
+   			throw new ServletException("DeploymentInfo already set!"); 
+   		}
     }
 
-    public ConvergedDeploymentInfo addSipServlets(final ServletInfo... servlets) {
+    public DeploymentInfoFacade addSipServlets(final ServletInfo... servlets) {
         for (final ServletInfo servlet : servlets) {
             sipServlets.put(servlet.getName(), servlet);
             return this;
-
         }
         return this;
     }
@@ -284,26 +248,12 @@ public class ConvergedDeploymentInfo extends DeploymentInfo implements Cloneable
         this.childrenMapByClassName = childrenMapByClassName;
     }
 
-    @Override
-    public ConvergedDeploymentInfo clone() {
-        Object parent = null;
-        try {
-            parent = super.clone("");
-            ConvergedDeploymentInfo info = (ConvergedDeploymentInfo) parent;
-            return info;
-        } catch (CloneNotSupportedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     public SessionManagerFactory getSessionManagerFactory() {
-        return sessionManagerFactory;
+        return this.deploymentInfo.getSessionManagerFactory();
     }
 
-    public DeploymentInfo setSessionManagerFactory(final SessionManagerFactory sessionManagerFactory) {
-        this.sessionManagerFactory = sessionManagerFactory;
+    public DeploymentInfoFacade setSessionManagerFactory(final SessionManagerFactory sessionManagerFactory) {
+        this.deploymentInfo.setSessionManagerFactory(sessionManagerFactory);
         return this;
     }
 
@@ -315,4 +265,7 @@ public class ConvergedDeploymentInfo extends DeploymentInfo implements Cloneable
         return sipServletMappings;
     }
 
+	public DeploymentInfo getDeploymentInfo() {
+		return deploymentInfo;
+	}
 }

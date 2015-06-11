@@ -21,10 +21,10 @@
  */
 package org.mobicents.servlet.sip.startup.jboss;
 
-import io.undertow.servlet.api.ConvergedDeploymentInfo;
 import io.undertow.servlet.api.InstanceFactory;
 import io.undertow.servlet.api.InstanceHandle;
 import io.undertow.servlet.api.ServletInfo;
+import io.undertow.servlet.core.DeploymentImpl;
 
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -64,8 +64,8 @@ import org.mobicents.metadata.sip.spec.SipApplicationKeyMethodInfo;
 import org.mobicents.metadata.sip.spec.SipServletMappingMetaData;
 import org.mobicents.metadata.sip.spec.SipServletSelectionMetaData;
 import org.mobicents.metadata.sip.spec.SubdomainOfMetaData;
+import org.mobicents.servlet.sip.undertow.SipContextImpl;
 import org.mobicents.servlet.sip.undertow.SipDeploymentException;
-import org.mobicents.servlet.sip.undertow.UndertowSipContextDeployment;
 import org.mobicents.servlet.sip.undertow.SipServletImpl;
 import org.mobicents.servlet.sip.undertow.rules.AndRule;
 import org.mobicents.servlet.sip.undertow.rules.ContainsRule;
@@ -139,7 +139,7 @@ public class SipJBossContextConfig{
      * @param convergedMetaData
      * @throws Exception 
      */
-    public void processSipMetaData(JBossConvergedSipMetaData convergedMetaData, UndertowSipContextDeployment convergedContext) throws Exception {
+    public void processSipMetaData(JBossConvergedSipMetaData convergedMetaData, SipContextImpl convergedContext) throws Exception {
         //UndertowSipContextDeployment convergedContext = (CatalinaSipContext) context;
         //convergedContext.setWrapperClass(SipServletImpl.class.getName());
         /*
@@ -181,7 +181,7 @@ public class SipJBossContextConfig{
         List<? extends ParamValueMetaData> sipContextParams = convergedMetaData.getSipContextParams();
         if (sipContextParams != null) {
             for (ParamValueMetaData param : sipContextParams) {
-                convergedContext.getDeploymentInfo().addServletContextAttribute(param.getParamName(), param.getParamValue());
+                convergedContext.getDeploymentInfoFacade().getDeploymentInfo().addServletContextAttribute(param.getParamName(), param.getParamValue());
             }
         }
 
@@ -348,9 +348,9 @@ public class SipJBossContextConfig{
                 wrapper.setupMultipart(convergedContext.getServletContext());
                 wrapper.setServletName(value.getServletName());
 
-                ((ConvergedDeploymentInfo)convergedContext.getDeploymentInfo()).addSipServlets(servletInfo);
+                convergedContext.getDeploymentInfoFacade().addSipServlets(servletInfo);
                 convergedContext.addChild(wrapper);
-                convergedContext.addLifecycleObjects(wrapper);
+                ((DeploymentImpl)convergedContext.getDeployment()).addLifecycleObjects(wrapper);
             }
         }
         final SipApplicationKeyMethodInfo sipApplicationKeyMethodInfo = convergedMetaData.getSipApplicationKeyMethodInfo();

@@ -1,34 +1,4 @@
-/*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
- *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
- * the License, or (at your option) any later version.
- *
- * This software is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- */
 package org.mobicents.servlet.sip.undertow;
-
-import io.undertow.server.session.SessionManager;
-import io.undertow.servlet.api.ConvergedDeploymentInfo;
-import io.undertow.servlet.api.Deployment;
-import io.undertow.servlet.api.DeploymentInfo;
-import io.undertow.servlet.api.DeploymentManager;
-import io.undertow.servlet.api.ServletContainer;
-import io.undertow.servlet.core.DeploymentImpl;
-import io.undertow.servlet.spec.ServletContextImpl;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -46,6 +16,11 @@ import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.TimerService;
+
+import io.undertow.server.session.SessionManager;
+import io.undertow.servlet.api.Deployment;
+import io.undertow.servlet.api.DeploymentInfoFacade;
+import io.undertow.servlet.spec.ServletContextImpl;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipConnector;
@@ -78,22 +53,19 @@ import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.ruby.SipRubyController;
-import org.mobicents.servlet.sip.startup.ConvergedApplicationContext;
-/**
- * @author alerant.appngin@gmail.com
- *
- */
-public class UndertowSipContextDeployment extends DeploymentImpl implements SipContext, Deployment {
+import org.mobicents.servlet.sip.startup.ConvergedApplicationContextFacade;
 
-    private static final Logger logger = Logger.getLogger(UndertowSipContextDeployment.class);
+public class SipContextImpl implements SipContext {
+
+    private static final Logger logger = Logger.getLogger(SipContextImpl.class);
 
     // as mentionned per JSR 289 Section 6.1.2.1 default lifetime for an
     // application session is 3 minutes
     private static int DEFAULT_LIFETIME = 3;
 
-    private final ConvergedDeploymentInfo deploymentInfo;
-    private final UndertowSipManager sessionManager;
+    private Deployment deployment;
 
+    protected DeploymentInfoFacade deploymentInfoFacade;
     // TODO setter
     protected transient SipApplicationDispatcher sipApplicationDispatcher = null;
     // TODO setter
@@ -110,7 +82,7 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
     // TODO:protected transient SipSecurityUtils sipSecurityUtils;
     // TODO:protected transient SipDigestAuthenticator sipDigestAuthenticator;
     protected transient String securityDomain;
-    
+
     protected String displayName;
 
     private transient ThreadLocal<SipApplicationSessionCreationThreadLocal> sipApplicationSessionsAccessedThreadLocal = new ThreadLocal<SipApplicationSessionCreationThreadLocal>();
@@ -118,56 +90,58 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
     // http://code.google.com/p/mobicents/issues/detail?id=2526
     private transient ThreadLocal<Boolean> isManagedThread = new ThreadLocal<Boolean>();
 
-    ConvergedApplicationContext context;
+    ConvergedApplicationContextFacade context;
 
     private ClassLoader sipContextClassLoader;
-    
-    public UndertowSipContextDeployment(DeploymentManager deploymentManager, DeploymentInfo deploymentInfo,
-            ServletContainer servletContainer) {
-        super(deploymentManager, deploymentInfo, servletContainer);
-        this.deploymentInfo = (ConvergedDeploymentInfo) deploymentInfo;
 
-        // TODO:
-        this.sessionManager = (UndertowSipManager) this.deploymentInfo.getSessionManagerFactory().createSessionManager(
-                this);
+    // default constructor:
+    public SipContextImpl() {
+    }
+
+    public void init(Deployment deployment, ClassLoader sipContextClassLoader) throws ServletException {
+        if (logger.isDebugEnabled()) {
+            logger.debug("Initializing the sip context");
+        }
 
         this.setSipApplicationSessionTimeout(DEFAULT_LIFETIME);
         // pipeline.setBasic(new SipStandardContextValve());
-        sipListeners = new UndertowSipListenersHolder(this);
-        this.deploymentInfo.setChildrenMap(new HashMap<String, MobicentsSipServlet>());
-        this.deploymentInfo.setChildrenMapByClassName(new HashMap<String, MobicentsSipServlet>());
+        this.sipListeners = new UndertowSipListenersHolder(this);
+        this.deploymentInfoFacade.setChildrenMap(new HashMap<String, MobicentsSipServlet>());
+        this.deploymentInfoFacade.setChildrenMapByClassName(new HashMap<String, MobicentsSipServlet>());
         int idleTime = this.getSipApplicationSessionTimeout();
         if (idleTime <= 0) {
             idleTime = 1;
         }
-        this.deploymentInfo.setMainServlet(false);
+        this.deploymentInfoFacade.setMainServlet(false);
 
-    }
-
-    public void init() throws ServletException {
-        if(logger.isDebugEnabled()) {
-            logger.debug("Initializing the sip context");
+        if (this.sipContextClassLoader == null) {
+            this.sipContextClassLoader = sipContextClassLoader;
         }
-//      if (this.getParent() != null) {
-//          // Add the main configuration listener for sip applications
-//          LifecycleListener sipConfigurationListener = new SipContextConfig();
-//          this.addLifecycleListener(sipConfigurationListener);            
-//          setDelegate(true);
-//      }               
+
+        addDeploymentToContext(deployment);
+        // if (this.getParent() != null) {
+        // // Add the main configuration listener for sip applications
+        // LifecycleListener sipConfigurationListener = new ();
+        // this.addLifecycleListener(sipConfigurationListener);
+        // setDelegate(true);
+        // }
         // call the super method to correctly initialize the context and fire
         // up the
         // init event on the new registered SipContextConfig, so that the
         // standardcontextconfig
         // is correctly initialized too
-        
+
         prepareServletContext();
-        
-        if(logger.isDebugEnabled()) {
+
+        if (logger.isDebugEnabled()) {
             logger.debug("sip context Initialized");
-        }   
+        }
     }
-    
-    
+
+    private void addDeploymentToContext(Deployment deployment) throws ServletException {
+        this.deployment = deployment;
+    }
+
     public synchronized void start() throws ServletException {
         if (logger.isDebugEnabled()) {
             logger.debug("Starting the sip context " + this.getApplicationName());
@@ -177,8 +151,9 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
 
         // TODO:
         hasDistributableManager = false;
-        sessionManager.setMobicentsSipFactory(sipApplicationDispatcher.getSipFactory());
-        sessionManager.setContainer(this);
+        ((UndertowSipManager) this.getSessionManager())
+                .setMobicentsSipFactory(sipApplicationDispatcher.getSipFactory());
+        ((UndertowSipManager) this.getSessionManager()).setContainer(this);
 
         // JSR 289 16.2 Servlet Selection
         // When using this mechanism (the main-servlet) for servlet selection,
@@ -204,8 +179,8 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
 
         if (logger.isDebugEnabled()) {
             // TODO:
-            logger.debug("http session timeout for this context is " + this.deploymentInfo.getDefaultSessionTimeout()
-                    + " minutes");
+            logger.debug("http session timeout for this context is "
+                    + this.deploymentInfoFacade.getDeploymentInfo().getDefaultSessionTimeout() + " minutes");
         }
         if (logger.isDebugEnabled()) {
             logger.debug("sip context started " + this.getApplicationName());
@@ -214,47 +189,49 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
 
     public synchronized void stop() throws ServletException {
         String name = this.getApplicationName();
-        if(logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             logger.debug("Stopping the sip context " + name);
         }
 
-        this.sessionManager.dumpSipSessions();
-        this.sessionManager.dumpSipApplicationSessions();
-        logger.warn("number of active sip sessions : " + this.sessionManager.getActiveSipSessions()); 
-        logger.warn("number of active sip application sessions : " + this.sessionManager.getActiveSipApplicationSessions());
+        ((UndertowSipManager) this.getSessionManager()).dumpSipSessions();
+        ((UndertowSipManager) this.getSessionManager()).dumpSipApplicationSessions();
+        logger.warn("number of active sip sessions : "
+                + ((UndertowSipManager) this.getSessionManager()).getActiveSipSessions());
+        logger.warn("number of active sip application sessions : "
+                + ((UndertowSipManager) this.getSessionManager()).getActiveSipApplicationSessions());
 
         // this should happen after so that applications can still do some processing
         // in destroy methods to notify that context is getting destroyed and app removed
         sipListeners.deallocateServletsActingAsListeners();
-        this.deploymentInfo.getSipApplicationListeners().clear();
-        this.deploymentInfo.getSipServletMappings().clear();
-        
+        this.deploymentInfoFacade.getSipApplicationListeners().clear();
+        this.deploymentInfoFacade.getSipServletMappings().clear();
+
         this.getChildrenMap().clear();
-        this.deploymentInfo.getChildrenMapByClassName().clear();
-        if(sipApplicationDispatcher != null) {
-            if(this.getApplicationName() != null) {
+        this.deploymentInfoFacade.getChildrenMapByClassName().clear();
+        if (sipApplicationDispatcher != null) {
+            if (this.getApplicationName() != null) {
                 sipApplicationDispatcher.removeSipApplication(this.getApplicationName());
             } else {
                 logger.error("the application name is null for the following context : " + name);
             }
-        }   
-        if(sasTimerService != null && sasTimerService.isStarted()) {
-            sasTimerService.stop();         
+        }
+        if (sasTimerService != null && sasTimerService.isStarted()) {
+            sasTimerService.stop();
         }
         // Issue 1478 : nullify the ref to avoid reusing it
         sasTimerService = null;
         // Issue 1791 : don't check is the service is started it makes the stop
         // of tomcat hang
-        if(timerService != null) {
+        if (timerService != null) {
             timerService.stop();
-        }   
-        if(proxyTimerService != null) {
+        }
+        if (proxyTimerService != null) {
             proxyTimerService.stop();
         }
         // Issue 1478 : nullify the ref to avoid reusing it
         timerService = null;
         getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE, null);
-        if(logger.isDebugEnabled()) {
+        if (logger.isDebugEnabled()) {
             logger.debug("sip context stopped " + name);
         }
     }
@@ -263,56 +240,48 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
         boolean ok = true;
         if (logger.isDebugEnabled())
             logger.debug("Sending application stop events");
-        
+
         List<ServletContextListener> servletContextListeners = sipListeners.getServletContextListeners();
         if (servletContextListeners != null) {
-            ServletContextEvent event =
-                new ServletContextEvent(getServletContext());
-            for (ServletContextListener servletContextListener : servletContextListeners) {                     
+            ServletContextEvent event = new ServletContextEvent(getServletContext());
+            for (ServletContextListener servletContextListener : servletContextListeners) {
                 if (servletContextListener == null)
                     continue;
-                
+
                 try {
-                    //TODO:fireContainerEvent("beforeContextDestroyed", servletContextListener);
+                    // TODO:fireContainerEvent("beforeContextDestroyed", servletContextListener);
                     servletContextListener.contextDestroyed(event);
-                  //TODO:fireContainerEvent("afterContextDestroyed", servletContextListener);
+                    // TODO:fireContainerEvent("afterContextDestroyed", servletContextListener);
                 } catch (Throwable t) {
-                  //TODO:fireContainerEvent("afterContextDestroyed", servletContextListener);
-//                    getLogger().error
-//                        (sm.getString("standardContext.listenerStop",
-//                              servletContextListener.getClass().getName()), t);
-                    //getLogger().error
-                    //    (MESSAGES.errorSendingContextDestroyedEvent(servletContextListener.getClass().getName()), t);                    
-                    //TODO:
+                    // TODO:fireContainerEvent("afterContextDestroyed", servletContextListener);
+                    // getLogger().error
+                    // (sm.getString("standardContext.listenerStop",
+                    // servletContextListener.getClass().getName()), t);
+                    // getLogger().error
+                    // (MESSAGES.errorSendingContextDestroyedEvent(servletContextListener.getClass().getName()), t);
+                    // TODO:
                     t.printStackTrace();
                     ok = false;
                 }
-                
-                // TODO Annotation processing                 
+
+                // TODO Annotation processing
             }
         }
 
         // TODO Annotation processing check super class on tomcat 6
-        
+
         sipListeners.clean();
 
         return ok;
     }
 
-    
-    
-    protected void prepareServletContext() throws ServletException {
-        /*
-         * if(sipApplicationDispatcher == null) { setApplicationDispatcher(); }
-         */
+    public void prepareServletContextServices() {
         if (sipFactoryFacade == null) {
             sipFactoryFacade = new SipFactoryFacade((SipFactoryImpl) sipApplicationDispatcher.getSipFactory(), this);
         }
         if (sipSessionsUtil == null) {
             sipSessionsUtil = new SipSessionsUtilImpl(this);
         }
-        // needed when restarting applications through the tomcat manager
-        this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY, sipFactoryFacade);
         if (timerService == null) {
             // FIXME: distributable not supported
             // if(getDistributable() && hasDistributableManager) {
@@ -337,6 +306,13 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
             // }
             sasTimerService = new StandardSipApplicationSessionTimerService();
         }
+    }
+
+    protected void prepareServletContext() throws ServletException {
+        this.prepareServletContextServices();
+
+        // needed when restarting applications through the tomcat manager
+        this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY, sipFactoryFacade);
         this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE, timerService);
         this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SUPPORTED,
                 Arrays.asList(sipApplicationDispatcher.getExtensionsSupported()));
@@ -353,8 +329,8 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
     }
 
     public void addChild(SipServletImpl sipServletImpl) {
-        Map<String, MobicentsSipServlet> childrenMap = this.deploymentInfo.getChildrenMap();
-        Map<String, MobicentsSipServlet> childrenMapByClassName = this.deploymentInfo.getChildrenMapByClassName();
+        Map<String, MobicentsSipServlet> childrenMap = this.deploymentInfoFacade.getChildrenMap();
+        Map<String, MobicentsSipServlet> childrenMapByClassName = this.deploymentInfoFacade.getChildrenMapByClassName();
         SipServletImpl existingServlet = (SipServletImpl) childrenMap.get(sipServletImpl.getName());
         if (existingServlet != null) {
             logger.warn(sipServletImpl.getName() + " servlet already present, removing the previous one. "
@@ -374,8 +350,8 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
 
     public void removeChild(SipServletImpl sipServletImpl) {
         // super.removeChild(sipServletImpl);
-        Map<String, MobicentsSipServlet> childrenMap = this.deploymentInfo.getChildrenMap();
-        Map<String, MobicentsSipServlet> childrenMapByClassName = this.deploymentInfo.getChildrenMapByClassName();
+        Map<String, MobicentsSipServlet> childrenMap = this.deploymentInfoFacade.getChildrenMap();
+        Map<String, MobicentsSipServlet> childrenMapByClassName = this.deploymentInfoFacade.getChildrenMapByClassName();
 
         childrenMap.remove(sipServletImpl.getName());
         childrenMapByClassName.remove(sipServletImpl.getServletInfo().getName());
@@ -387,23 +363,6 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
             throw new ServletException("cannot find any application dispatcher for this context "
                     + this.getApplicationName());
         }
-    }
-
-    @Override
-    public SessionManager getSessionManager() {
-        return this.sessionManager;
-    }
-
-    @Override
-    public ServletContextImpl getServletContext() {
-        if (context == null) {
-            context = new ConvergedApplicationContext(super.getServletContainer(), this);
-            // TODO if (getAltDDName() != null)
-            // context.setAttribute(Globals.ALT_DD_ATTR,getAltDDName());
-        }
-
-        return (ServletContextImpl) (context.getFacade());
-
     }
 
     // ConvergedDeploymentManager should call this after web listeners starts
@@ -451,12 +410,24 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
         }
 
         return (ok);
+    }
 
+    public SessionManager getSessionManager() {
+        return this.deployment.getSessionManager();
+    }
+
+    public ServletContextImpl getServletContext() {
+        if (context == null) {
+            context = new ConvergedApplicationContextFacade(deployment.getServletContext(), this);
+            // TODO if (getAltDDName() != null)
+            // context.setAttribute(Globals.ALT_DD_ATTR,getAltDDName());
+        }
+        return context.getContext();
     }
 
     @Override
     public String getApplicationName() {
-        return this.deploymentInfo.getApplicationName();
+        return this.deploymentInfoFacade.getApplicationName();
     }
 
     @Override
@@ -472,30 +443,30 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
     @Override
     public void setApplicationName(String applicationName) {
         // TODO hívni deploy során, sip-xml parse-olásakor
-        deploymentInfo.setApplicationName(applicationName);
+        deploymentInfoFacade.setApplicationName(applicationName);
     }
 
     @Override
     public String getDescription() {
-        return this.deploymentInfo.getDescription();
+        return this.deploymentInfoFacade.getDescription();
     }
 
     @Override
     public void setDescription(String description) {
         // TODO hívni deploy során, sip-xml parse-olásakor
-        deploymentInfo.setDescription(description);
+        deploymentInfoFacade.setDescription(description);
 
     }
 
     @Override
     public String getLargeIcon() {
-        return this.deploymentInfo.getLargeIcon();
+        return this.deploymentInfoFacade.getLargeIcon();
     }
 
     @Override
     public void setLargeIcon(String largeIcon) {
         // TODO hívni deploy során, sip-xml parse-olásakor
-        this.deploymentInfo.setLargeIcon(largeIcon);
+        this.deploymentInfoFacade.setLargeIcon(largeIcon);
 
     }
 
@@ -512,130 +483,130 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
 
     @Override
     public boolean isMainServlet() {
-        return deploymentInfo.isMainServlet();
+        return deploymentInfoFacade.isMainServlet();
     }
 
     @Override
     public String getMainServlet() {
-        return deploymentInfo.getMainServlet();
+        return deploymentInfoFacade.getMainServlet();
     }
 
     @Override
     public void setMainServlet(String mainServlet) {
-        this.deploymentInfo.setMainServlet(mainServlet);
-        this.deploymentInfo.setServletHandler(mainServlet);
-        this.deploymentInfo.setMainServlet(true);
+        this.deploymentInfoFacade.setMainServlet(mainServlet);
+        this.deploymentInfoFacade.setServletHandler(mainServlet);
+        this.deploymentInfoFacade.setMainServlet(true);
     }
 
     @Override
     public void setServletHandler(String servletHandler) {
-        this.deploymentInfo.setServletHandler(servletHandler);
+        this.deploymentInfoFacade.setServletHandler(servletHandler);
 
     }
 
     @Override
     public String getServletHandler() {
-        return this.deploymentInfo.getServletHandler();
+        return this.deploymentInfoFacade.getServletHandler();
     }
 
     @Override
     public int getProxyTimeout() {
-        return this.deploymentInfo.getProxyTimeout();
+        return this.deploymentInfoFacade.getProxyTimeout();
     }
 
     @Override
     public void setProxyTimeout(int proxyTimeout) {
-        this.deploymentInfo.setProxyTimeout(proxyTimeout);
+        this.deploymentInfoFacade.setProxyTimeout(proxyTimeout);
 
     }
 
     @Override
     public int getSipApplicationSessionTimeout() {
-        return this.deploymentInfo.getSipApplicationSessionTimeout();
+        return this.deploymentInfoFacade.getSipApplicationSessionTimeout();
     }
 
     @Override
     public void setSipApplicationSessionTimeout(int proxyTimeout) {
-        this.deploymentInfo.setSipApplicationSessionTimeout(proxyTimeout);
+        this.deploymentInfoFacade.setSipApplicationSessionTimeout(proxyTimeout);
 
     }
 
     @Override
     public String getSmallIcon() {
-        return this.deploymentInfo.getSmallIcon();
+        return this.deploymentInfoFacade.getSmallIcon();
     }
 
     @Override
     public void setSmallIcon(String smallIcon) {
-        this.deploymentInfo.setSmallIcon(smallIcon);
+        this.deploymentInfoFacade.setSmallIcon(smallIcon);
 
     }
 
     @Override
     public void addSipApplicationListener(String listener) {
-        this.deploymentInfo.addSipApplicationListener(listener);
+        this.deploymentInfoFacade.addSipApplicationListener(listener);
         // TODO:fireContainerEvent("addSipApplicationListener", listener);
 
     }
 
     @Override
     public void removeSipApplicationListener(String listener) {
-        this.deploymentInfo.removeSipApplicationListener(listener);
+        this.deploymentInfoFacade.removeSipApplicationListener(listener);
         // TODO:fireContainerEvent("removeSipApplicationListener", listener);
     }
 
     @Override
     public String[] findSipApplicationListeners() {
-        return this.deploymentInfo.findSipApplicationListeners();
+        return this.deploymentInfoFacade.findSipApplicationListeners();
     }
 
     @Override
     public Method getSipApplicationKeyMethod() {
-        return this.deploymentInfo.getSipApplicationKeyMethod();
+        return this.deploymentInfoFacade.getSipApplicationKeyMethod();
     }
 
     @Override
     public void setSipApplicationKeyMethod(Method sipApplicationKeyMethod) {
-        this.deploymentInfo.setSipApplicationKeyMethod(sipApplicationKeyMethod);
+        this.deploymentInfoFacade.setSipApplicationKeyMethod(sipApplicationKeyMethod);
 
     }
 
     @Override
     public void setSipLoginConfig(MobicentsSipLoginConfig config) {
-        this.deploymentInfo.setSipLoginConfig(config);
+        this.deploymentInfoFacade.setSipLoginConfig(config);
 
     }
 
     @Override
     public MobicentsSipLoginConfig getSipLoginConfig() {
-        return this.deploymentInfo.getSipLoginConfig();
+        return this.deploymentInfoFacade.getSipLoginConfig();
     }
 
     @Override
     public void addSipServletMapping(MobicentsSipServletMapping sipServletMapping) {
-        this.deploymentInfo.addSipServletMapping(sipServletMapping);
+        this.deploymentInfoFacade.addSipServletMapping(sipServletMapping);
 
     }
 
     @Override
     public void removeSipServletMapping(MobicentsSipServletMapping sipServletMapping) {
-        this.deploymentInfo.removeSipServletMapping(sipServletMapping);
+        this.deploymentInfoFacade.removeSipServletMapping(sipServletMapping);
 
     }
 
     @Override
     public List<MobicentsSipServletMapping> findSipServletMappings() {
-        return this.deploymentInfo.findSipServletMappings();
+        return this.deploymentInfoFacade.findSipServletMappings();
     }
 
     @Override
     public MobicentsSipServletMapping findSipServletMappings(SipServletRequest sipServletRequest) {
-        return this.deploymentInfo.findSipServletMappings(sipServletRequest);
+        return this.deploymentInfoFacade.findSipServletMappings(sipServletRequest);
     }
 
     @Override
     public SipManager getSipManager() {
-        return this.sessionManager;
+        return (SipManager) this.deployment.getSessionManager();
     }
 
     @Override
@@ -649,18 +620,18 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
         return null;
     }
 
-//    @Override
-//    public String getBasePath() {
-        // TODO???
-//        return null;
-//    }
+    // @Override
+    // public String getBasePath() {
+    // TODO???
+    // return null;
+    // }
 
-    //callers: SipApplicationDispatcher.addSipApplications
+    // callers: SipApplicationDispatcher.addSipApplications
     @Override
     public boolean notifySipContextListeners(SipContextEvent event) {
         boolean ok = true;
         if (logger.isDebugEnabled()) {
-            logger.debug(this.deploymentInfo.getSipServlets().size() + " container to notify of "
+            logger.debug(this.deploymentInfoFacade.getSipServlets().size() + " container to notify of "
                     + event.getEventType());
         }
         if (event.getEventType() == SipContextEventType.SERVLET_INITIALIZED) {
@@ -679,8 +650,8 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
         enterSipApp(null, null, false, true);
         boolean batchStarted = enterSipAppHa(true);
         try {
-            
-            for (String servletName : this.deploymentInfo.getSipServlets().keySet()) {
+
+            for (String servletName : this.deploymentInfoFacade.getSipServlets().keySet()) {
                 SipServletImpl managedServlet = (SipServletImpl) this.getChildrenMap().get(servletName);
                 if (logger.isDebugEnabled()) {
                     logger.debug("managedServlet " + managedServlet.getServletInfo().getName() + ", class : "
@@ -938,47 +909,48 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
 
     @Override
     public void setConcurrencyControlMode(ConcurrencyControlMode mode) {
-        this.deploymentInfo.setConcurrencyControlMode(mode);
-        if (this.deploymentInfo.getConcurrencyControlMode() != null && logger.isDebugEnabled()) {
-            logger.debug("Concurrency Control set to " + this.deploymentInfo.getConcurrencyControlMode().toString()
-                    + " for application " + this.deploymentInfo.getApplicationName());
+        this.deploymentInfoFacade.setConcurrencyControlMode(mode);
+        if (this.deploymentInfoFacade.getConcurrencyControlMode() != null && logger.isDebugEnabled()) {
+            logger.debug("Concurrency Control set to "
+                    + this.deploymentInfoFacade.getConcurrencyControlMode().toString() + " for application "
+                    + this.deploymentInfoFacade.getApplicationName());
         }
     }
 
     @Override
     public ConcurrencyControlMode getConcurrencyControlMode() {
-        return this.deploymentInfo.getConcurrencyControlMode();
+        return this.deploymentInfoFacade.getConcurrencyControlMode();
     }
 
     @Override
     public void setSipRubyController(SipRubyController rubyController) {
-        this.deploymentInfo.setRubyController(rubyController);
+        this.deploymentInfoFacade.setRubyController(rubyController);
 
     }
 
     @Override
     public SipRubyController getSipRubyController() {
-        return this.deploymentInfo.getRubyController();
+        return this.deploymentInfoFacade.getRubyController();
     }
 
     @Override
     public String getPath() {
         // TODO:
-        return this.deploymentInfo.getDeploymentName();
+        return this.deploymentInfoFacade.getDeploymentInfo().getDeploymentName();
     }
 
     @Override
     public MobicentsSipServlet findSipServletByClassName(String canonicalName) {
         if (canonicalName == null)
             return (null);
-        return this.deploymentInfo.getChildrenMapByClassName().get(canonicalName);
+        return this.deploymentInfoFacade.getChildrenMapByClassName().get(canonicalName);
     }
 
     @Override
     public MobicentsSipServlet findSipServletByName(String name) {
         if (name == null)
             return (null);
-        return this.deploymentInfo.getChildrenMap().get(name);
+        return this.deploymentInfoFacade.getChildrenMap().get(name);
     }
 
     @Override
@@ -986,15 +958,9 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
         return sipContextClassLoader;
     }
 
-    public void addSipContextClassLoader(ClassLoader sipContextClassLoader) {
-        if(this.sipContextClassLoader==null){
-            this.sipContextClassLoader = sipContextClassLoader;
-        }
-    }
-    
     @Override
     public Map<String, MobicentsSipServlet> getChildrenMap() {
-        return this.deploymentInfo.getChildrenMap();
+        return this.deploymentInfoFacade.getChildrenMap();
     }
 
     @Override
@@ -1020,7 +986,6 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
         Thread.currentThread().setContextClassLoader(cl);
         // http://code.google.com/p/sipservlets/issues/detail?id=135
         // TODO:bindThreadBindingListener();
-
     }
 
     @Override
@@ -1028,7 +993,6 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
         // http://code.google.com/p/sipservlets/issues/detail?id=135
         // TODO:unbindThreadBindingListener();
         Thread.currentThread().setContextClassLoader(oldClassLoader);
-
     }
 
     public String getDisplayName() {
@@ -1037,5 +1001,13 @@ public class UndertowSipContextDeployment extends DeploymentImpl implements SipC
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public DeploymentInfoFacade getDeploymentInfoFacade() {
+        return deploymentInfoFacade;
+    }
+
+    public Deployment getDeployment() {
+        return deployment;
     }
 }

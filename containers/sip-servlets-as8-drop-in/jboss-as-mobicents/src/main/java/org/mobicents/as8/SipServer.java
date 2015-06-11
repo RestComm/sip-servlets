@@ -39,14 +39,14 @@ public interface SipServer {
      *
      * @param connector the connector
      */
-    void addConnector(SipUdpListener connector);
+    void addConnector(SipConnectorListener connector);
 
     /**
      * Remove connector.
      *
      * @param connector the connector
      */
-    void removeConnector(SipUdpListener connector);
+    void removeConnector(SipConnectorListener connector);
 
     /**
      * Add a virtual host.

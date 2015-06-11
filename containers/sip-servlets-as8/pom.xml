@@ -23,7 +23,7 @@
   			<artifactId>wildfly-undertow</artifactId>
   			<version>8.2.0.Final</version>
 			<scope>provided</scope>
-			<exclusions>
+			<!-- exclusions>
 		            <exclusion>
 		                <groupId>io.undertow</groupId>
 		                <artifactId>undertow-core</artifactId>
@@ -32,7 +32,7 @@
 				<groupId>io.undertow</groupId>
 				<artifactId>undertow-servlet</artifactId>
 		            </exclusion>
-		        </exclusions>	
+		        </exclusions -->
 		</dependency>
 		<dependency>
 			<groupId>org.wildfly</groupId>
@@ -46,7 +46,7 @@
   			<version>8.2.0.Final</version>
 			<scope>provided</scope>
 		</dependency>		
-		<dependency>
+		<!-- dependency>
     			<groupId>io.undertow</groupId>
     			<artifactId>undertow-core</artifactId>
   		        <version>1.2.0.Beta9-SNAPSHOT</version>
@@ -55,7 +55,7 @@
 			<groupId>io.undertow</groupId>
 			<artifactId>undertow-servlet</artifactId>
 			<version>1.2.0.Beta9-SNAPSHOT</version>
- 		</dependency>
+ 		</dependency -->
 		<!--dependency>
             		<groupId>org.jboss.security</groupId>
             		<artifactId>jbosssx</artifactId>

@@ -44,7 +44,7 @@ import static org.mobicents.as8.SipMessages.MESSAGES;
  * @author Emanuel Muckenhuber
  * @author alerant.appngin@gmail.com
  */
-class SipConnectorService implements Service<SipUdpListener> {
+class SipConnectorService implements Service<SipConnectorListener> {
 
     private String protocol = "SIP/2.0";
     private String scheme = "sip";
@@ -55,7 +55,7 @@ class SipConnectorService implements Service<SipUdpListener> {
     private String stunServerAddress = null;
     private int stunServerPort = -1;
 
-    private SipUdpListener connector;
+    private SipConnectorListener connector;
     
     private final InjectedValue<Executor> executor = new InjectedValue<Executor>();
     private final InjectedValue<SocketBinding> binding = new InjectedValue<SocketBinding>();
@@ -118,7 +118,7 @@ class SipConnectorService implements Service<SipUdpListener> {
             // TODO set Executor on ProtocolHandler
             // TODO use server socket factory - or integrate with {@code ManagedBinding}
 
-            final SipUdpListener connector = new SipUdpListener(sipProtocolHandler);
+            final SipConnectorListener connector = new SipConnectorListener(sipProtocolHandler);
 
             connector.init();
             getSipServer().addConnector(connector);
@@ -137,7 +137,7 @@ class SipConnectorService implements Service<SipUdpListener> {
     public synchronized void stop(StopContext context) {
         final SocketBinding binding = this.binding.getValue();
         binding.getSocketBindings().getNamedRegistry().unregisterBinding(binding.getName());
-        final SipUdpListener connector = this.connector;
+        final SipConnectorListener connector = this.connector;
         try {
             connector.pause();
         } catch (Exception e) {
@@ -151,8 +151,8 @@ class SipConnectorService implements Service<SipUdpListener> {
     }
 
     /** {@inheritDoc} */
-    public synchronized SipUdpListener getValue() throws IllegalStateException {
-        final SipUdpListener connector = this.connector;
+    public synchronized SipConnectorListener getValue() throws IllegalStateException {
+        final SipConnectorListener connector = this.connector;
         if (connector == null) {
             throw MESSAGES.nullValue();
         }

@@ -37,12 +37,13 @@
         <module name="javax.activation.api"/>
         <module name="org.jboss.as.web"/>
         <!-- new entries starts-->
+        <module name="org.jboss.as.server"/>
         <module name="org.jboss.as.web-common"/>
         <module name="io.undertow.core"/>
       	<module name="io.undertow.servlet"/>
-	      <module name="org.wildfly.extension.undertow"/>
-	      <module name="org.wildfly.extension.io"/>
-	      <module name="org.jboss.xnio"/>
+	<module name="org.wildfly.extension.undertow"/>
+	<module name="org.wildfly.extension.io"/>
+	<module name="org.jboss.xnio"/>
         <module name="org.jboss.xnio.nio"/>
         <module name="io.undertow.jsp"/>
         <!-- new entries ends-->

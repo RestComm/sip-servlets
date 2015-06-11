@@ -49,7 +49,7 @@ class SipDeploymentService implements Service<SIPWebContext> {
      */
     public synchronized void start(StartContext startContext) throws StartException {
         if (sipContext == null) {
-        	this.sipContext = anchorDu.getAttachment(SIPWebContext.ATTACHMENT);
+        	this.sipContext = anchorDu.getAttachment(SIPWebContext.ATTACHMENT_KEY);
         }
     }
 

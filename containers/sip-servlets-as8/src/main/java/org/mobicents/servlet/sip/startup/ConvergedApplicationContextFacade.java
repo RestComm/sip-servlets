@@ -17,8 +17,6 @@
 
 package org.mobicents.servlet.sip.startup;
 
-import io.undertow.servlet.api.Deployment;
-import io.undertow.servlet.api.ServletContainer;
 import io.undertow.servlet.spec.ServletContextImpl;
 import io.undertow.servlet.spec.SessionCookieConfigImpl;
 
@@ -44,13 +42,18 @@ import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
-import javax.servlet.SessionCookieConfig;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
+
+
+
 
 //TODO JASPER security???
 import org.apache.jasper.Constants;
 import org.apache.jasper.security.SecurityUtil;
+import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
+import org.mobicents.servlet.sip.undertow.SipContextImpl;
+import org.mobicents.servlet.sip.undertow.SipServletImpl;
 
 /**
  * Facade object which masks the internal <code>ApplicationContext</code>
@@ -63,7 +66,7 @@ import org.apache.jasper.security.SecurityUtil;
  * @author alerant.appngin@gmail.com
  */
 
-public final class ConvergedApplicationContextFacade extends ServletContextImpl implements ServletContext {
+public final class ConvergedApplicationContextFacade implements ServletContext {
 
     // ---------------------------------------------------------- Attributes
     /**
@@ -84,13 +87,11 @@ public final class ConvergedApplicationContextFacade extends ServletContextImpl 
      *
      * @param context The associated Context instance
      */
-    public ConvergedApplicationContextFacade(ConvergedApplicationContext context, ServletContainer servletContainer,
-            Deployment deployment) {
-        super(servletContainer, deployment);
+    public ConvergedApplicationContextFacade(ServletContextImpl context, SipContextImpl sipContext) {
         this.context = context;
-
-        classCache = new HashMap<String, Class<?>[]>();
-        objectCache = new HashMap<String, Method>();
+        this.sipContext = sipContext;
+        this.classCache = new HashMap<String, Class<?>[]>();
+        this.objectCache = new HashMap<String, Method>();
         initClassCache();
     }
 
@@ -127,10 +128,12 @@ public final class ConvergedApplicationContextFacade extends ServletContextImpl 
     /**
      * Wrapped application context.
      */
-    private ConvergedApplicationContext context = null;
+    private ServletContextImpl context = null;
+    private SipContextImpl sipContext = null;
 
     // ------------------------------------------------- ServletContext Methods
 
+    @Override
     public ServletContext getContext(String uripath) {
         ServletContext theContext = null;
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -138,10 +141,10 @@ public final class ConvergedApplicationContextFacade extends ServletContextImpl 
         } else {
             theContext = context.getContext(uripath);
         }
-        if ((theContext != null) && (theContext instanceof ConvergedApplicationContext)) {
-            theContext = ((ConvergedApplicationContext) theContext).getFacade();
+        if ((theContext != null) && (theContext instanceof ServletContextImpl)) {
+            theContext = this.context;
         }
-        return (theContext);
+        return theContext;
     }
 
     public int getMajorVersion() {
@@ -202,8 +205,19 @@ public final class ConvergedApplicationContextFacade extends ServletContextImpl 
     }
 
     public RequestDispatcher getNamedDispatcher(String name) {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (RequestDispatcher) doPrivileged("getNamedDispatcher", new Object[] { name });
+        // Validate the name argument
+        if (name == null)
+            return (null);
+
+        // Create and return a corresponding request dispatcher
+        Servlet servlet = (Servlet) sipContext.findSipServletByName(name);
+
+        if (servlet == null)
+            return context.getNamedDispatcher(name);
+        // return (null);
+
+        if (servlet instanceof SipServletImpl) {
+            return new SipRequestDispatcher((SipServletImpl) servlet);
         } else {
             return context.getNamedDispatcher(name);
         }
@@ -653,7 +667,7 @@ public final class ConvergedApplicationContextFacade extends ServletContextImpl 
      * @param methodName The method to call.
      * @param params The arguments passed to the called method.
      */
-    private Object invokeMethod(ConvergedApplicationContext appContext, final String methodName, Object[] params)
+    private Object invokeMethod(ServletContextImpl appContext, final String methodName, Object[] params)
             throws Throwable {
 
         try {
@@ -704,7 +718,7 @@ public final class ConvergedApplicationContextFacade extends ServletContextImpl 
      *                   will be invoked
      * @param params The arguments passed to the called method.
      */
-    private Object executeMethod(final Method method, final ConvergedApplicationContext context, final Object[] params)
+    private Object executeMethod(final Method method, final ServletContextImpl context, final Object[] params)
             throws PrivilegedActionException, IllegalAccessException, InvocationTargetException {
 
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -749,6 +763,10 @@ public final class ConvergedApplicationContextFacade extends ServletContextImpl 
             throw (VirtualMachineError) t;
         }
         // All other instances of Throwable will be silently swallowed
+    }
+
+    public ServletContextImpl getContext() {
+        return context;
     }
 
 }

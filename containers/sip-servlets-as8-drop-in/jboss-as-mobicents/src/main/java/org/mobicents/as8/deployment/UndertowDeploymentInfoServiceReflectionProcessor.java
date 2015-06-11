@@ -21,7 +21,6 @@
  */
 package org.mobicents.as8.deployment;
 
-import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
@@ -42,12 +41,6 @@ public class UndertowDeploymentInfoServiceReflectionProcessor implements Deploym
 
     @Override
     public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-
-        // TODO:
-        final String name="default";
-        final ServiceName servletContainerReflectionServiceName = ServletContainerReflectionService.SERVICE_NAME.append(name);
-        //lets earn that deploymentService and deploymentInfoService will depend on the servletContainerReflectionService: 
-        phaseContext.getDeploymentUnit().getAttachment(Attachments.WEB_DEPENDENCIES).add(servletContainerReflectionServiceName);
 
         final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
         SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
@@ -85,9 +78,9 @@ public class UndertowDeploymentInfoServiceReflectionProcessor implements Deploym
         final ServiceName deploymentInfoServiceName = deploymentServiceName
                 .append(UndertowDeploymentInfoService.SERVICE_NAME);
         
-    
+
         //instantiate injector service
-        UndertowDeploymentInfoReflectionService deploymentInfoReflectionService = new UndertowDeploymentInfoReflectionService();
+        UndertowDeploymentInfoReflectionService deploymentInfoReflectionService = new UndertowDeploymentInfoReflectionService(deploymentUnit);
         final ServiceName deploymentInfoReflectionServiceName = deploymentServiceName.append(UndertowDeploymentInfoReflectionService.SERVICE_NAME);
         //lets earn that deploymentService will depend on this service:
         phaseContext.getDeploymentUnit().getAttachment(WebComponentDescription.WEB_COMPONENTS).add(deploymentInfoReflectionServiceName);
@@ -95,8 +88,6 @@ public class UndertowDeploymentInfoServiceReflectionProcessor implements Deploym
         ServiceBuilder<UndertowDeploymentInfoReflectionService> infoInjectorBuilder = phaseContext.getServiceTarget().addService(deploymentInfoReflectionServiceName, deploymentInfoReflectionService);
         infoInjectorBuilder.addDependency(deploymentInfoServiceName);
         infoInjectorBuilder.install();
-
-    
     }
 
     @Override

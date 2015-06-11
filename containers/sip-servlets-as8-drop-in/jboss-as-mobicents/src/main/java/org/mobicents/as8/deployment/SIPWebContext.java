@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -21,9 +21,8 @@
  */
 package org.mobicents.as8.deployment;
 
-import io.undertow.servlet.api.DeploymentInfo;
-import io.undertow.servlet.api.DeploymentManager;
-import io.undertow.servlet.api.ServletContainer;
+import io.undertow.servlet.api.Deployment;
+import io.undertow.servlet.api.DeploymentInfoFacade;
 
 import java.util.ArrayList;
 
@@ -52,7 +51,7 @@ import org.mobicents.metadata.sip.spec.SipServletSelectionMetaData;
 import org.mobicents.metadata.sip.spec.SipServletsMetaData;
 import org.mobicents.servlet.sip.core.SipService;
 import org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig;
-import org.mobicents.servlet.sip.undertow.UndertowSipContextDeployment;
+import org.mobicents.servlet.sip.undertow.SipContextImpl;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
 
 /**
@@ -61,63 +60,77 @@ import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
  *
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
-public class SIPWebContext extends UndertowSipContextDeployment {
+public class SIPWebContext extends SipContextImpl {
 
-    static AttachmentKey<SIPWebContext> ATTACHMENT = AttachmentKey.create(SIPWebContext.class);
+    static AttachmentKey<SIPWebContext> ATTACHMENT_KEY = AttachmentKey.create(SIPWebContext.class);
 
     private static final Logger logger = Logger.getLogger(SIPWebContext.class);
 
     private DeploymentUnit deploymentUnit;
     private SipJBossContextConfig sipJBossContextConfig;
 
-    public SIPWebContext(DeploymentManager deploymentManager, DeploymentInfo deploymentInfo,
-            ServletContainer servletContainer) {
-        super(deploymentManager, deploymentInfo, servletContainer);
+    // default constructor:
+    public SIPWebContext() {
     }
 
-    public SIPWebContext addDeploymentUnit(DeploymentUnit du,UndertowDeploymentInfoService deploymentInfoservice) {
-        deploymentUnit = du;
-        sipJBossContextConfig = createContextConfig(/* this, */deploymentUnit,deploymentInfoservice);
+    public SIPWebContext addDeploymentUnit(DeploymentUnit du) throws ServletException {
+        if (this.deploymentUnit == null) {
+            if (du != null) {
+                this.deploymentUnit = du;
+            } else {
+                throw new ServletException("Cannot set deploymentUnit to null!");
+            }
+        }
+        return this;
+    }
+
+    public SIPWebContext createContextConfig(UndertowDeploymentInfoService deploymentInfoservice)
+            throws ServletException {
+        if (this.deploymentUnit == null) {
+            throw new ServletException("deploymentUnit not set, call SIPWebContext.addDeploymentUnit() first");
+        }
+        if (this.sipJBossContextConfig == null) {
+            this.sipJBossContextConfig = createContextConfig(this.deploymentUnit, deploymentInfoservice);
+        }
+        return this;
+    }
+
+    public SIPWebContext attachContext() throws ServletException {
+        if (this.deploymentUnit == null) {
+            throw new ServletException("deploymentUnit not set, call SIPWebContext.addDeploymentUnit() first");
+        }
+
         // attach context to top-level deploymentUnit so it can be used to get context resources (SipFactory, etc.)
-        final DeploymentUnit anchorDu = getSipContextAnchorDu(du);
+        final DeploymentUnit anchorDu = getSipContextAnchorDu(this.deploymentUnit);
         if (anchorDu != null) {
             if (logger.isDebugEnabled())
                 logger.debug("Attaching SIPWebContext " + this + " to " + anchorDu.getName());
-            anchorDu.putAttachment(SIPWebContext.ATTACHMENT, this);
+            anchorDu.putAttachment(SIPWebContext.ATTACHMENT_KEY, this);
         } else {
-            logger.error("Can't attach SIPWebContext " + this + " to " + deploymentUnit.getName()
+            logger.error("Can't attach SIPWebContext " + this + " to " + this.deploymentUnit.getName()
                     + " - This is probably a bug");
         }
-        // DeploymentUnit parentDu = deploymentUnit.getParent();
-        // if (parentDu == null) {
-        // // this is a war only deployment
-        // if (logger.isDebugEnabled()) logger.debug("Attaching SIPWebContext " + this + " to " +
-        // deploymentUnit.getName());
-        // deploymentUnit.putAttachment(SIPWebContext.ATTACHMENT, this);
-        // }
-        // else if (DeploymentTypeMarker.isType(DeploymentType.EAR, parentDu)) {
-        // if (logger.isDebugEnabled()) logger.debug("Attaching SIPWebContext " + this + " to " + parentDu.getName());
-        // parentDu.putAttachment(SIPWebContext.ATTACHMENT, this);
-        // }
-        // else {
-        // logger.error("Cowardly refusing to attach SIPWebContext " + this + " to " + deploymentUnit.getName() +
-        // " - This is probably a bug");
-        // }
+
         return this;
     }
 
     public void postProcessContext(DeploymentUnit deploymentUnit) {
     }
 
-    @Override
-    public void init() throws ServletException {
+    public void initDispatcher() {
         SipServer sipServer = deploymentUnit.getAttachment(SipServer.ATTACHMENT_KEY);
         if (sipServer.getService() instanceof SipService) {
             super.sipApplicationDispatcher = ((SipService) sipServer.getService()).getSipApplicationDispatcher();
         }
-        super.init();
+    }
+
+    @Override
+    public void init(Deployment deployment, ClassLoader sipContextClassLoader) throws ServletException {
+        super.deploymentInfoFacade = deploymentUnit.getAttachment(DeploymentInfoFacade.ATTACHMENT_KEY);
+        
+        super.init(deployment, sipContextClassLoader);
     }
 
     @Override
@@ -335,8 +348,10 @@ public class SIPWebContext extends UndertowSipContextDeployment {
         sipJBossContextConfig.processSipMetaData((JBossConvergedSipMetaData) mergedMetaData, this);
     }
 
-    private SipJBossContextConfig createContextConfig(/* SipStandardContext sipContext, */DeploymentUnit deploymentUnit,UndertowDeploymentInfoService deploymentInfoservice) {
-        SipJBossContextConfig config = new SipJBossContextConfig(deploymentUnit,deploymentInfoservice);
+    private SipJBossContextConfig createContextConfig(
+    /* SipStandardContext sipContext, */DeploymentUnit deploymentUnit,
+            UndertowDeploymentInfoService deploymentInfoservice) {
+        SipJBossContextConfig config = new SipJBossContextConfig(deploymentUnit, deploymentInfoservice);
         // TODO:sipContext.addLifecycleListener(config);
         return config;
     }

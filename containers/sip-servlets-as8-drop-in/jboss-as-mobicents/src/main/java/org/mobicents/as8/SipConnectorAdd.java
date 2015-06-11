@@ -92,7 +92,7 @@ class SipConnectorAdd extends AbstractAddStepHandler {
         
         final SipConnectorService service = new SipConnectorService(protocol, scheme, useStaticAddress, staticServerAddress, staticServerPort, useStun, stunServerAddress, stunServerPort);
 
-        final ServiceBuilder<SipUdpListener> serviceBuilder = context
+        final ServiceBuilder<SipConnectorListener> serviceBuilder = context
                 .getServiceTarget()
                 .addService(SipSubsystemServices.JBOSS_SIP_CONNECTOR.append(name), service)
                 .addDependency(SipSubsystemServices.JBOSS_SIP, SipServer.class, service.getServer())
@@ -102,7 +102,7 @@ class SipConnectorAdd extends AbstractAddStepHandler {
         if (enabled) {
             serviceBuilder.addListener(verificationHandler);
         }
-        final ServiceController<SipUdpListener> serviceController = serviceBuilder.install();
+        final ServiceController<SipConnectorListener> serviceController = serviceBuilder.install();
         if (newControllers != null) {
             newControllers.add(serviceController);
         }

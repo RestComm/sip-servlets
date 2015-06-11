@@ -57,7 +57,6 @@ import org.jboss.msc.service.ServiceListener;
 import org.jboss.msc.service.ServiceName;
 //import org.mobicents.as7.clustering.sip.MockDistributedCacheManagerFactoryService;
 import org.mobicents.as8.deployment.AttachSipServerServiceProcessor;
-import org.mobicents.as8.deployment.ServletContainerReflectionService;
 import org.mobicents.as8.deployment.SipAnnotationDeploymentProcessor;
 import org.mobicents.as8.deployment.SipComponentProcessor;
 import org.mobicents.as8.deployment.SipContextFactoryDeploymentProcessor;
@@ -345,48 +344,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
          * .addDependency(SipSubsystemServices.JBOSS_SIP, SipServer.class, server) .setInitialMode(Mode.ON_DEMAND)
          * .install()); newControllers.addAll(factory.installServices(target)); }
          */
-        //TODO:
-        String name="default";
         //get servletContainerService:
-        ServiceName servletContainerServiceName = UndertowService.SERVLET_CONTAINER.append(name);
-        ServiceController<?> servletContainerServiceController = null;
-        boolean timeout=false;
-        Date start = new Date();
-        // FIXME:needs a better solution here:
-        while(servletContainerServiceController == null && timeout == false){
-            Date current = new Date();
-            if (current.getTime() - start.getTime() > 10000) {
-                timeout = true;
-                break;
-            }
-
-            servletContainerServiceController = context.getServiceRegistry(false).getService(servletContainerServiceName);
-        }
-
-        if(servletContainerServiceController == null){
-            throw new OperationFailedException("ServletContainer service failed to start!!!", operation);
-        }
-        
-        ServletContainerService servletContainerService = null;
-        try {
-            servletContainerServiceController.awaitValue();
-            servletContainerService=(ServletContainerService)servletContainerServiceController.getValue();
-        }catch (IllegalStateException s){
-        	throw new OperationFailedException("ServletContainer service failed to start!!!", operation);
-    	}catch(InterruptedException e) {
-            throw new OperationFailedException("ServletContainer service failed to start!!!", operation);
-        }
-        
-        if(servletContainerService != null){
-            //instantiate new reflection service:
-            ServiceName reflectionServiceName = ServletContainerReflectionService.SERVICE_NAME.append(name);
-            ServletContainerReflectionService reflectionService = new ServletContainerReflectionService(servletContainerService);
-            newControllers.add(
-                    context.getServiceTarget()
-                    .addService(reflectionServiceName, reflectionService)
-                    .addDependency(servletContainerServiceName)
-                    .install());
-        }
     }
 
     

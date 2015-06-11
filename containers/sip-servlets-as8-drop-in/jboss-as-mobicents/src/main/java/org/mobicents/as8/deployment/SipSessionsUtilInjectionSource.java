@@ -45,7 +45,7 @@ public class SipSessionsUtilInjectionSource extends InjectionSource {
 
     SipSessionsUtilInjectionSource(DeploymentUnit du) {
         sipDeploymentUnit = du;
-        sipContext = du.getAttachment(SIPWebContext.ATTACHMENT);
+        sipContext = du.getAttachment(SIPWebContext.ATTACHMENT_KEY);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class SipSessionsUtilInjectionSource extends InjectionSource {
         public Object getInstance() {
             // return the SipSessionsUtil
             if (sipContext == null) {
-                sipContext = sipDeploymentUnit.getAttachment(SIPWebContext.ATTACHMENT);
+                sipContext = sipDeploymentUnit.getAttachment(SIPWebContext.ATTACHMENT_KEY);
             }
             return sipContext.getSipSessionsUtil();
         }
