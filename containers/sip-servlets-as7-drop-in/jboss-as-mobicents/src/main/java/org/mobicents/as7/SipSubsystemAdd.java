@@ -98,6 +98,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         SipDefinition.TIMER_D_INTERVAL.validateAndSet(operation, model);
         SipDefinition.DIALOG_PENDING_REQUEST_CHECKING.validateAndSet(operation, model);
         SipDefinition.DNS_SERVER_LOCATOR_CLASS.validateAndSet(operation, model);
+        SipDefinition.DNS_TIMEOUT.validateAndSet(operation, model);
         SipDefinition.DNS_RESOLVER_CLASS.validateAndSet(operation, model);
         SipDefinition.CANCELED_TIMER_TASKS_PURGE_PERIOD.validateAndSet(operation, model);
         SipDefinition.MEMORY_THRESHOLD.validateAndSet(operation, model);
@@ -159,6 +160,9 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ModelNode dnsServerLocatorClassModel = SipDefinition.DNS_SERVER_LOCATOR_CLASS.resolveModelAttribute(context, fullModel);
         final String dnsServerLocatorClass = dnsServerLocatorClassModel.isDefined() ? dnsServerLocatorClassModel.asString() : null;
         
+        final ModelNode dnsTimeoutModel = SipDefinition.DNS_TIMEOUT.resolveModelAttribute(context, fullModel);
+        final int dnsTimeout = dnsTimeoutModel.isDefined() ? dnsTimeoutModel.asInt() : null;
+        
         final ModelNode dnsResolverClassModel = SipDefinition.DNS_SERVER_LOCATOR_CLASS.resolveModelAttribute(context, fullModel);
         final String dnsResolverClass = dnsResolverClassModel.isDefined() ? dnsResolverClassModel.asString() : null;
         
@@ -205,6 +209,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         		timerDInterval, 
         		dialogPendingRequestChecking,
         		dnsServerLocatorClass,
+        		dnsTimeout,
         		dnsResolverClass,
         		callIdMaxLength,
         		tagHashMaxLength,

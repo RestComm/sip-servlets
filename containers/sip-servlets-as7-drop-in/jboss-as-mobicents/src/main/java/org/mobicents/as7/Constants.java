@@ -55,6 +55,7 @@ interface Constants {
     String DEVELOPMENT = "development";
     String DIALOG_PENDING_REQUEST_CHECKING = "dialog-pending-request-checking";
     String DNS_SERVER_LOCATOR_CLASS = "dns-server-locator-class";
+    String DNS_TIMEOUT = "dns-timeout";
     String DNS_RESOLVER_CLASS = "dns-resolver-class";
     String CALL_ID_MAX_LENGTH = "call-id-max-length";
     String TAG_HASH_MAX_LENGTH = "tag-hash-max-length";

@@ -24,14 +24,13 @@ package org.mobicents.servlet.sip.core;
 
 import gov.nist.javax.sip.ListeningPointExt;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -304,20 +303,22 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 					&& !Inet6Util.isValidIPV4Address(ipAddress)) {
 			// if no listening point has been found and the ipaddress is not a valid IP6 address nor a valid IPV4 address 
 			// then we try to resolve it as a hostname
-			InetAddress[] inetAddresses = new InetAddress[0];
+			Queue<Hop> hops = null;
 			try {
-				inetAddresses = InetAddress.getAllByName(ipAddress);
-			} catch (UnknownHostException e) {
+				hops = sipApplicationDispatcher.getDNSServerLocator().getDnsLookupPerformer().locateHopsForNonNumericAddressWithPort(ipAddress, port, transport);
+			} catch (Exception e) {
 				// not important it can mean that the ipAddress provided is not a hostname
 				// but an ip address not found in the searched listening points above				
 			}
-			for (InetAddress inetAddress : inetAddresses) {
-				listeningPoint = extendedListeningPointsCacheMap.get(inetAddress.getHostAddress() + "/" + portChecked + ":" + tmpTransport.toLowerCase());
-				if(listeningPoint != null) {
-					if(logger.isTraceEnabled()) {
-						logger.trace("Found listening point " + listeningPoint);
+			if(hops != null) {
+				for (Hop hop : hops) {
+					listeningPoint = extendedListeningPointsCacheMap.get(hop.getHost() + "/" + portChecked + ":" + tmpTransport.toLowerCase());
+					if(listeningPoint != null) {
+						if(logger.isTraceEnabled()) {
+							logger.trace("Found listening point " + listeningPoint);
+						}
+						return listeningPoint;
 					}
-					return listeningPoint;
 				}
 			}
 		}
@@ -399,7 +400,8 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 	public boolean findUsePublicAddress(Message message) {
 		// TODO add a caching mechanism to increase perf
 		boolean usePublicAddress = true;
-		String host = null;		
+		String host = null;
+		int port = -1;
 		String transport = JainSipUtils.findTransport(message);
 		if(message instanceof Request) {
 			// Get the first route header (it will be used before the request uri for request routing as per RFC3261)
@@ -415,12 +417,14 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 			if(uri instanceof javax.sip.address.SipURI) {
 				javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) uri;
 				host = sipUri.getHost();
+				port = sipUri.getPort();
 			}			
 		} else {		
 			// Get the first via header (it will be used for response routing as per RFC3261)
 			ViaHeader topmostViaHeader = (ViaHeader) message.getHeader(ViaHeader.NAME);
 			if(topmostViaHeader != null) {
 				host = topmostViaHeader.getHost();
+				port = topmostViaHeader.getPort();
 			}
 		}
 		// check if it the host is part of a private network as defined per RFC 1918 (see http://en.wikipedia.org/wiki/Private_network)
@@ -439,12 +443,21 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 				usePublicAddress = !isIPAddressPartOfPrivateNetwork(host);
 			} else {
 				logger.debug("host " + host + " is a hostname, " +
-					"doing DNS SRV lookup");
+					"doing DNS A + AAAA lookup");
 				//hostname  : DNS lookup to do
-				Hop hop = new HopImpl(host, -1, transport);
-				Hop lookedupHop = DNSAddressResolver.resolveHostByDnsSrvLookup(hop);
-				if(!hop.equals(lookedupHop)) {
-					usePublicAddress = !isIPAddressPartOfPrivateNetwork(lookedupHop.getHost());
+				Hop hop = new HopImpl(host, port, transport);
+				Queue<Hop> hops = null;
+				try {
+					hops = sipApplicationDispatcher.getDNSServerLocator().getDnsLookupPerformer().locateHopsForNonNumericAddressWithPort(host, port, transport);
+				} catch (Exception e) {
+					// not important it can mean that the ipAddress provided is not a hostname
+					// but an ip address not found in the searched listening points above				
+				}
+				if(hops != null && hops.size() > 0) {
+					Hop lookedupHop = hops.peek();
+					if(!hop.equals(lookedupHop)) {
+						usePublicAddress = !isIPAddressPartOfPrivateNetwork(lookedupHop.getHost());
+					}
 				}
 			}
 		}

@@ -96,7 +96,6 @@ import javax.sip.message.Request;
 import javax.sip.message.Response;
 
 import org.apache.log4j.Logger;
-import org.mobicents.ext.javax.sip.dns.DNSAwareRouter;
 import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingListener;
 import org.mobicents.ha.javax.sip.SipLoadBalancer;
@@ -206,6 +205,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	protected SipStack sipStack;
 	private SipNetworkInterfaceManager sipNetworkInterfaceManager;
 	private DNSServerLocator dnsServerLocator;
+	private int dnsTimeout;
 	private DNSResolver dnsResolver;
 	
 	// stats
@@ -1890,6 +1890,18 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 
 	public void setDNSServerLocator(DNSServerLocator dnsServerLocator) {
 		this.dnsServerLocator = dnsServerLocator;
+	}
+	
+	public int getDNSTimeout() {		
+		return dnsTimeout;
+	}
+
+	public void setDNSTimeout(int dnsTimeout) {
+		this.dnsTimeout = dnsTimeout;
+		if(logger.isInfoEnabled()) {
+			logger.info("DNSServerLocator will be using timeout of " + dnsTimeout + " seconds ");
+		}
+		dnsServerLocator.getDnsLookupPerformer().setDNSTimeout(dnsTimeout);
 	}
 
 	
