@@ -216,6 +216,8 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 
 	void setDNSServerLocator(DNSServerLocator dnsServerLocator);
 	DNSServerLocator getDNSServerLocator();
+	void setDNSTimeout(int dnsTiemout);
+	int getDNSTimeout();
 	
 	DNSResolver getDNSResolver();
 	

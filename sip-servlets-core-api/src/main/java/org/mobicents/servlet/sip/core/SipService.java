@@ -71,6 +71,7 @@ public interface SipService {
 	public int getTagHashMaxLength();
 	public int getCallIdMaxLength();
 	public String getDnsResolverClass();
+	public int getDnsTimeout();
 	
 	public String getMobicentsSipServletMessageFactoryClassName();
 	public void setMobicentsSipServletMessageFactoryClassName(String mobicentsSipServletMessageFactoryClassName);

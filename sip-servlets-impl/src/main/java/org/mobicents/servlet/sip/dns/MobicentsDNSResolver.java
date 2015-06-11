@@ -52,4 +52,14 @@ public class MobicentsDNSResolver implements DNSResolver {
 		return sipURI;
 	}
 
+	@Override
+	public void setDnsTimeout(int timeout) {
+		dnsServerLocator.getDnsLookupPerformer().setDNSTimeout(timeout);
+	}
+
+	@Override
+	public int getDnsTimeout() {
+		return dnsServerLocator.getDnsLookupPerformer().getDNSTimeout();
+	}
+
 }

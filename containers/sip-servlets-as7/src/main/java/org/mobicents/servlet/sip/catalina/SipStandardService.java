@@ -158,6 +158,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	@Deprecated
 	private String addressResolverClass = null;
 	private String dnsServerLocatorClass = DefaultDNSServerLocator.class.getName();
+	private int dnsTimeout = 1;
 	private String dnsResolverClass = MobicentsDNSResolver.class.getName();
 	private String mobicentsSipServletMessageFactoryClassName = Servlet3SipServletMessageFactory.class.getName();
 	
@@ -475,6 +476,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 		            // Creates a new instance of AddressResolver Class with the supplied sipApplicationDispatcher.
 		            DNSServerLocator dnsServerLocator = (DNSServerLocator) dnsServerLocatorConstructor.newInstance(conArgs);
 		            sipApplicationDispatcher.setDNSServerLocator(dnsServerLocator);
+		            sipApplicationDispatcher.setDNSTimeout(dnsTimeout);
 		            if(sipStackProperties.getProperty("javax.sip.ROUTER_PATH") == null) {
 		            	sipStackProperties.setProperty("javax.sip.ROUTER_PATH", DNSAwareRouter.class.getCanonicalName());
 		            }
@@ -1305,4 +1307,18 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
         sipStack.closeReliableConnection(sipConnector.getIpAddress(),sipConnector.getPort(), sipConnector.getTransport(),
                 clientAddress, clientPort);
     }
+
+	/**
+	 * @return the dnsTimeout
+	 */
+	public int getDnsTimeout() {
+		return dnsTimeout;
+	}
+
+	/**
+	 * @param dnsTimeout the dnsTimeout to set
+	 */
+	public void setDnsTimeout(int dnsTimeout) {
+		this.dnsTimeout = dnsTimeout;
+	}
 }

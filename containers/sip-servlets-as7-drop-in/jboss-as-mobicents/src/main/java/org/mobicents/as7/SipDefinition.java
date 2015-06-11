@@ -164,6 +164,13 @@ public class SipDefinition extends SimpleResourceDefinition {
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .setDefaultValue(null)
                     .build();
+    protected static final SimpleAttributeDefinition DNS_TIMEOUT =
+            new SimpleAttributeDefinitionBuilder(Constants.DNS_TIMEOUT, ModelType.INT, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.DNS_TIMEOUT)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(1))
+                    .build();
     protected static final SimpleAttributeDefinition DNS_RESOLVER_CLASS =
             new SimpleAttributeDefinitionBuilder(Constants.DNS_RESOLVER_CLASS, ModelType.STRING, true)
                     .setAllowExpression(true)
@@ -248,6 +255,7 @@ public class SipDefinition extends SimpleResourceDefinition {
         registration.registerReadWriteAttribute(TIMER_D_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(TIMER_D_INTERVAL));
         registration.registerReadWriteAttribute(DIALOG_PENDING_REQUEST_CHECKING, null, new ReloadRequiredWriteAttributeHandler(DIALOG_PENDING_REQUEST_CHECKING));
         registration.registerReadWriteAttribute(DNS_SERVER_LOCATOR_CLASS, null, new ReloadRequiredWriteAttributeHandler(DNS_SERVER_LOCATOR_CLASS));
+        registration.registerReadWriteAttribute(DNS_TIMEOUT, null, new ReloadRequiredWriteAttributeHandler(DNS_TIMEOUT));
         registration.registerReadWriteAttribute(DNS_RESOLVER_CLASS, null, new ReloadRequiredWriteAttributeHandler(DNS_RESOLVER_CLASS));
         registration.registerReadWriteAttribute(CANCELED_TIMER_TASKS_PURGE_PERIOD, null, new ReloadRequiredWriteAttributeHandler(CANCELED_TIMER_TASKS_PURGE_PERIOD));
         registration.registerReadWriteAttribute(MEMORY_THRESHOLD, null, new ReloadRequiredWriteAttributeHandler(MEMORY_THRESHOLD));

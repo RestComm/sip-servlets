@@ -37,7 +37,6 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
-import org.mobicents.as7.deployment.SIPWebContext;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl;
 import org.mobicents.servlet.sip.startup.SipProtocolHandler;
 import org.mobicents.servlet.sip.startup.SipStandardEngine;
@@ -73,6 +72,7 @@ class SipServerService implements SipServer, Service<SipServer> {
  	final int timerDInterval;
  	final boolean dialogPendingRequestChecking;
  	final String dnsServerLocatorClass;
+ 	final int dnsTimeout;
  	final String dnsResolverClass;
  	final int callIdMaxLength;
 	final int tagHashMaxLength;
@@ -110,6 +110,7 @@ class SipServerService implements SipServer, Service<SipServer> {
     		int timerDInterval, 
     		boolean dialogPendingRequestChecking,
     		String dnsServerLocatorClass,
+    		int dnsTimeout,
     		String dnsResolverClass,
     		int callIdMaxLength,
     		int tagHashMaxLength,
@@ -136,6 +137,7 @@ class SipServerService implements SipServer, Service<SipServer> {
         this.timerDInterval = timerDInterval;
         this.dialogPendingRequestChecking = dialogPendingRequestChecking;
         this.dnsServerLocatorClass = dnsServerLocatorClass;
+        this.dnsTimeout = dnsTimeout;
         this.dnsResolverClass = dnsResolverClass;
         this.callIdMaxLength = callIdMaxLength;
         this.tagHashMaxLength = tagHashMaxLength;
@@ -230,6 +232,7 @@ class SipServerService implements SipServer, Service<SipServer> {
         }
         sipService.setDialogPendingRequestChecking(dialogPendingRequestChecking);
         sipService.setDnsServerLocatorClass(dnsServerLocatorClass);
+        sipService.setDnsTimeout(dnsTimeout);
         sipService.setDnsResolverClass(dnsResolverClass);
         sipService.setCanceledTimerTasksPurgePeriod(canceledTimerTasksPurgePeriod);
         sipService.setMemoryThreshold(memoryThreshold);

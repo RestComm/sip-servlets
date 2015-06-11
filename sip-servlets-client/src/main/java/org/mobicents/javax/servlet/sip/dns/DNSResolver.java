@@ -58,4 +58,7 @@ public interface DNSResolver {
 	 * @return the SipURI found through ENUM methods or the uri itself if the uri is already a SipURI without a user=phone param
 	 */
 	SipURI getSipURI(URI uri);
+	
+	void setDnsTimeout(int timeout);
+	int getDnsTimeout();
 }
