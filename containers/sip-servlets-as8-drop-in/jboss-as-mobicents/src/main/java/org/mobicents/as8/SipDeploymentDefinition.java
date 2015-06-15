@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -51,7 +51,7 @@ import org.mobicents.servlet.sip.core.SipManager;
  * @author <a href="mailto:torben@jit-central.com">Torben Jaeger</a>
  * @created 23.2.12 18:32
  * @author josemrecio@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class SipDeploymentDefinition extends SimpleResourceDefinition {
     public static final SipDeploymentDefinition INSTANCE = new SipDeploymentDefinition();
@@ -86,36 +86,36 @@ public class SipDeploymentDefinition extends SimpleResourceDefinition {
         @Override
         protected void executeRuntimeStep(OperationContext context, ModelNode operation) throws OperationFailedException {
 
-        	final PathAddress address = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.OP_ADDR));
+            final PathAddress address = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.OP_ADDR));
 
             final Resource sip = context.readResourceFromRoot(address.subAddress(0, address.size()), false);
             final ModelNode subModel = sip.getModel();
 
             final String appName = APP_NAME.resolveModelAttribute(context, subModel).asString();
 
-        	final ServiceController<?> controller = context.getServiceRegistry(false).getService(SipSubsystemServices.deploymentServiceName(appName));
-        	SessionStat stat = SessionStat.getStat(operation.require(ModelDescriptionConstants.NAME).asString());
+            final ServiceController<?> controller = context.getServiceRegistry(false).getService(SipSubsystemServices.deploymentServiceName(appName));
+            SessionStat stat = SessionStat.getStat(operation.require(ModelDescriptionConstants.NAME).asString());
 
-        	if (stat == null) {
-        		context.getFailureDescription().set(SipMessages.MESSAGES.unknownMetric(operation.require(ModelDescriptionConstants.NAME).asString()));
+            if (stat == null) {
+                context.getFailureDescription().set(SipMessages.MESSAGES.unknownMetric(operation.require(ModelDescriptionConstants.NAME).asString()));
             } else {
                 final SIPWebContext sipContext = SIPWebContext.class.cast(controller.getValue());
                 SipManager sm = (SipManager) sipContext.getSessionManager();
                 ModelNode result = new ModelNode();
                 switch (stat) {
                     case ACTIVE_SIP_SESSIONS:
-//                    	// TODO: what about other manager implementations?
-//                    	if (sm.getDistributable() && (sm instanceof DistributableSessionManager)) {
-//                    		result.set(((DistributableSessionManager)sm).getActiveSessionCount());
-//                    	}
-                    	result.set(sm.getActiveSipSessions());
+//                      // TODO: what about other manager implementations?
+//                      if (sm.getDistributable() && (sm instanceof DistributableSessionManager)) {
+//                          result.set(((DistributableSessionManager)sm).getActiveSessionCount());
+//                      }
+                        result.set(sm.getActiveSipSessions());
                         break;
                     case ACTIVE_SIP_APP_SESSIONS:
-//                    	// TODO: what about other manager implementations?
-//                    	if (sm.getDistributable() && (sm instanceof DistributableSessionManager)) {
-//                    		result.set(((DistributableSessionManager)sm).getActiveSessionCount());
-//                    	}
-                    	result.set(sm.getActiveSipApplicationSessions());
+//                      // TODO: what about other manager implementations?
+//                      if (sm.getDistributable() && (sm instanceof DistributableSessionManager)) {
+//                          result.set(((DistributableSessionManager)sm).getActiveSessionCount());
+//                      }
+                        result.set(sm.getActiveSipApplicationSessions());
                         break;
                     case EXPIRED_SIP_SESSIONS:
                         result.set(sm.getExpiredSipSessions());

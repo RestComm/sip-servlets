@@ -28,26 +28,26 @@ import javax.servlet.sip.URI;
 
 /**
  * @author Thomas Leseney
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class Param implements Extractor {
-	
-	private String param;
-	
-	public Param(String token, String param) {
-		if (!token.equals("uri")) {
-			throw new IllegalArgumentException("Invalid expression: param after " + token);
-		}
-		this.param = param;
-	}
-	
-	public Object extract(Object input) {
-		URI uri = (URI) input;
-		if (uri.isSipURI()) {
-			return ((SipURI) uri).getParameter(param);
-		} else if ("tel".equals(uri.getScheme())) {
-			return ((TelURL) uri).getParameter(param);
-		}
-		return null;
-	}
+
+    private String param;
+
+    public Param(String token, String param) {
+        if (!token.equals("uri")) {
+            throw new IllegalArgumentException("Invalid expression: param after " + token);
+        }
+        this.param = param;
+    }
+
+    public Object extract(Object input) {
+        URI uri = (URI) input;
+        if (uri.isSipURI()) {
+            return ((SipURI) uri).getParameter(param);
+        } else if ("tel".equals(uri.getScheme())) {
+            return ((TelURL) uri).getParameter(param);
+        }
+        return null;
+    }
 }

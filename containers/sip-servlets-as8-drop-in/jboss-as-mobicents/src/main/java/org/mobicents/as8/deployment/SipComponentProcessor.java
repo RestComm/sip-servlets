@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -58,8 +58,8 @@ import org.mobicents.metadata.sip.spec.SipMetaData;
  * For CDI and EE components a component definition is added to the deployment.
  * <p/>
  * For now we are just using managed bean components as servlets. We may need a custom component type in future.
- * 
- * @author alerant.appngin@gmail.com
+ *
+ * @author kakonyi.istvan@alerant.hu
  */
 public class SipComponentProcessor implements DeploymentUnitProcessor {
 
@@ -95,8 +95,8 @@ public class SipComponentProcessor implements DeploymentUnitProcessor {
         final SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
         final SipAnnotationMetaData sipAnnotationMetaData = deploymentUnit.getAttachment(SipAnnotationMetaData.ATTACHMENT_KEY);
         if (sipMetaData == null && sipAnnotationMetaData == null) {
-        	// not a sip deployment
-        	return;
+            // not a sip deployment
+            return;
         }
         final Set<String> classes = getAllComponentClasses(deploymentUnit, compositeIndex, sipMetaData, sipAnnotationMetaData);
         for (String clazz : classes) {
@@ -150,7 +150,7 @@ public class SipComponentProcessor implements DeploymentUnitProcessor {
 //                getAllComponentClasses(webMetaData.getValue(), classes);
 //            }
         if (sipMetaData != null) {
-          getAllComponentClasses(sipMetaData, classes);        	
+            getAllComponentClasses(sipMetaData, classes);
         }
 //        if (metaData.getWebMetaData() != null)
 //            getAllComponentClasses(metaData.getWebMetaData(), classes);

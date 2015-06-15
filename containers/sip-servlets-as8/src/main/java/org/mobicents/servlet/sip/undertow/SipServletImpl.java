@@ -30,7 +30,7 @@ import javax.servlet.ServletException;
 
 import org.mobicents.servlet.sip.core.MobicentsSipServlet;
 /**
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  *
  */
 public class SipServletImpl extends ManagedServlet implements MobicentsSipServlet {
@@ -113,18 +113,18 @@ public class SipServletImpl extends ManagedServlet implements MobicentsSipServle
     // copied over from super class changing the JMX name being registered j2eeType is now SipServlet instead of Servlet
     /*
      * TODO: protected void registerJMX(StandardContext ctx) { ObjectName oname;
-     * 
+     *
      * String parentName = ctx.getName(); parentName = ("".equals(parentName)) ? "/" : parentName;
-     * 
+     *
      * String hostName = ctx.getParent().getName(); hostName = (hostName==null) ? "DEFAULT" : hostName;
-     * 
+     *
      * String domain = ctx.getDomain();
-     * 
+     *
      * String webMod= "//" + hostName + parentName; String onameStr = domain + ":j2eeType=SipServlet,name=" + getName()
      * + ",WebModule=" + webMod + ",J2EEApplication=" + ctx.getJ2EEApplication() + ",J2EEServer=" + ctx.getJ2EEServer();
      * try { oname=new ObjectName(onameStr); // controller=oname; // GVAG: no more controller in the
      * org.apache.catalina.core.ContainerBase Registry.getRegistry(null, null) .registerComponent(this, oname, null );
-     * 
+     *
      * // Send j2ee.object.created notification if (this.getObjectName() != null) { Notification notification = new
      * Notification( "j2ee.object.created", this.getObjectName(), sequenceNumber++);
      * broadcaster.sendNotification(notification); } } catch( Exception ex ) {
@@ -175,10 +175,10 @@ public class SipServletImpl extends ManagedServlet implements MobicentsSipServle
         return super.isPermanentlyUnavailable();
     }
 
-	@Override
-	public int getLoadOnStartup() {
-		//TODO
-		return 0;
-	}
+    @Override
+    public int getLoadOnStartup() {
+        //TODO
+        return 0;
+    }
 
 }

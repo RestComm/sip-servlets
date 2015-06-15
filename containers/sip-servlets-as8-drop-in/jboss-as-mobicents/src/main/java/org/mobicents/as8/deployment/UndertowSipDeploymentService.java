@@ -47,7 +47,7 @@ import org.mobicents.servlet.sip.undertow.SipServletImpl;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentService;
 
 /**
- *@author alerant.appngin@gmail.com
+ *@author kakonyi.istvan@alerant.hu
  */
 public class UndertowSipDeploymentService implements Service<UndertowSipDeploymentService> {
     public static final ServiceName SERVICE_NAME = ServiceName.of("UndertowSipDeploymentService");

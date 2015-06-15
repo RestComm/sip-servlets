@@ -30,21 +30,21 @@ import org.mobicents.servlet.sip.core.descriptor.MatchingRule;
 
 /**
  * @author Thomas Leseney
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class OrRule implements MatchingRule {
-	
+
     private ArrayList<MatchingRule> criteria = new ArrayList<MatchingRule>();
-    
+
     public OrRule() { }
-    
+
     public void addCriterion(MatchingRule c) {
-       criteria.add(c); 
+        criteria.add(c);
     }
-    
+
     public boolean matches(SipServletRequest request) {
         for (MatchingRule rule : criteria) {
-            if (rule.matches(request)) { 
+            if (rule.matches(request)) {
                 return true;
             }
         }
@@ -54,11 +54,11 @@ public class OrRule implements MatchingRule {
     public String getExpression() {
         StringBuffer sb = new StringBuffer("(");
         boolean first = true;
-         
+
         for (MatchingRule rule : criteria) {
             if (first) {
                 first = false;
-            } else { 
+            } else {
                 sb.append(" or ");
             }
             sb.append(rule.getExpression());

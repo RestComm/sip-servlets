@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -42,11 +42,11 @@ import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.as.controller.registry.OperationEntry;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
-import org.mobicents.as8.Constants;
+
 
 /**
  * @author Tomaz Cerar
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  * @created 22.2.12 14:29
  */
 public class SipDefinition extends SimpleResourceDefinition {
@@ -58,7 +58,7 @@ public class SipDefinition extends SimpleResourceDefinition {
                     .setXmlName(Constants.INSTANCE_ID)
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .setDefaultValue(null)
-                    .build();   
+                    .build();
     protected static final SimpleAttributeDefinition APPLICATION_ROUTER =
             new SimpleAttributeDefinitionBuilder(Constants.APPLICATION_ROUTER, ModelType.STRING, true)
                     .setAllowExpression(true)
@@ -186,7 +186,7 @@ public class SipDefinition extends SimpleResourceDefinition {
                     .setXmlName(Constants.TAG_HASH_MAX_LENGTH)
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .setDefaultValue(new ModelNode(-1))
-                    .build();    
+                    .build();
     protected static final SimpleAttributeDefinition CANCELED_TIMER_TASKS_PURGE_PERIOD =
             new SimpleAttributeDefinitionBuilder(Constants.CANCELED_TIMER_TASKS_PURGE_PERIOD, ModelType.INT, true)
                     .setAllowExpression(true)
@@ -215,8 +215,7 @@ public class SipDefinition extends SimpleResourceDefinition {
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .setDefaultValue(null)
                     .build();
-    
-    
+
     private SipDefinition() {
         super(PathElement.pathElement(ModelDescriptionConstants.SUBSYSTEM, SipExtension.SUBSYSTEM_NAME),
                 SipExtension.getResourceDescriptionResolver(null));

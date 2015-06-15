@@ -27,21 +27,21 @@ import javax.servlet.sip.URI;
 
 /**
  * @author Thomas Leseney
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class Host implements Extractor {
-	public Host(String token) {
-		if (!token.equals("uri")) {
-			throw new IllegalArgumentException("Invalid expression: host after " + token);
-		}
-	}
-	
-	public Object extract(Object input) {
-		URI uri = (URI) input;
-		if (uri.isSipURI()) {
+    public Host(String token) {
+        if (!token.equals("uri")) {
+            throw new IllegalArgumentException("Invalid expression: host after " + token);
+        }
+    }
+
+    public Object extract(Object input) {
+        URI uri = (URI) input;
+        if (uri.isSipURI()) {
             return ((SipURI)uri).getHost();
-		} else { 
+        } else {
             return null;
-		}
-	}
+        }
+    }
 }

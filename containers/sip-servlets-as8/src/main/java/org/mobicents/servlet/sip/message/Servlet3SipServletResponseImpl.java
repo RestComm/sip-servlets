@@ -30,13 +30,13 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 
 /**
  * @author jean.deruelle@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  *
  */
 public class Servlet3SipServletResponseImpl extends SipServletResponseImpl implements MobicentsSipServletResponse {
 
     /**
-     * 
+     *
      */
     public Servlet3SipServletResponseImpl() {
         // TODO Auto-generated constructor stub

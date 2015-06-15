@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -28,7 +28,7 @@ import org.jboss.as.server.deployment.AttachmentKey;
 /**
  *
  * @author josemrecio@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  *
  */
 public class SipAnnotationMetaData extends HashMap<String, SipMetaData> {
@@ -37,23 +37,21 @@ public class SipAnnotationMetaData extends HashMap<String, SipMetaData> {
     public static final AttachmentKey<SipAnnotationMetaData> ATTACHMENT_KEY = AttachmentKey.create(SipAnnotationMetaData.class);
 
     // http://code.google.com/p/sipservlets/issues/detail?id=168
-	// When no sip.xml but annotations only, Application is not recognized as SIP App by AS7
+    // When no sip.xml but annotations only, Application is not recognized as SIP App by AS7
     private boolean sipApplicationAnnotationPresent = false;
 
-	/**
-	 * @return the sipApplicationAnnotationPresent
-	 */
-	public boolean isSipApplicationAnnotationPresent() {
-		return sipApplicationAnnotationPresent;
-	}
+    /**
+     * @return the sipApplicationAnnotationPresent
+     */
+    public boolean isSipApplicationAnnotationPresent() {
+        return sipApplicationAnnotationPresent;
+    }
 
-	/**
-	 * @param sipApplicationAnnotationPresent the sipApplicationAnnotationPresent to set
-	 */
-	public void setSipApplicationAnnotationPresent(
-			boolean sipApplicationAnnotationPresent) {
-		this.sipApplicationAnnotationPresent = sipApplicationAnnotationPresent;
-	}
-    
-    
+    /**
+     * @param sipApplicationAnnotationPresent the sipApplicationAnnotationPresent to set
+     */
+    public void setSipApplicationAnnotationPresent(
+            boolean sipApplicationAnnotationPresent) {
+        this.sipApplicationAnnotationPresent = sipApplicationAnnotationPresent;
+    }
 }

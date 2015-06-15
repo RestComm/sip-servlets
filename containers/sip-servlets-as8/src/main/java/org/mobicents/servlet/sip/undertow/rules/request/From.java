@@ -26,16 +26,16 @@ import javax.servlet.sip.SipServletRequest;
 
 /**
  * @author Thomas Leseney
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class From implements Extractor {
-	public From(String token) {
-		if (!token.equals("request")) {
-			throw new IllegalArgumentException("Invalid expression: from after " + token);
-		}
-	}
-	
-	public Object extract(Object input) {
-		return ((SipServletRequest) input).getFrom();
-	}
+    public From(String token) {
+        if (!token.equals("request")) {
+            throw new IllegalArgumentException("Invalid expression: from after " + token);
+        }
+    }
+
+    public Object extract(Object input) {
+        return ((SipServletRequest) input).getFrom();
+    }
 }

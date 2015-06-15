@@ -26,17 +26,17 @@ import javax.servlet.sip.URI;
 
 /**
  * @author Thomas Leseney
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class Scheme implements Extractor {
-	
-	public Scheme(String token) {
-		if (!token.equals("uri")) {
-			throw new IllegalArgumentException("Invalid expression: scheme after " + token);
-		}
-	}
-	
-	public Object extract(Object input) {
-		return ((URI) input).getScheme();
-	}
+
+    public Scheme(String token) {
+        if (!token.equals("uri")) {
+            throw new IllegalArgumentException("Invalid expression: scheme after " + token);
+        }
+    }
+
+    public Object extract(Object input) {
+        return ((URI) input).getScheme();
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -26,8 +26,8 @@ import org.jboss.metadata.javaee.support.IdMetaDataImpl;
 /**
  * @author jean.deruelle@gmail.com
  * @version $Revision$
- * 
- * @author alerant.appngin@gmail.com
+ *
+ * @author kakonyi.istvan@alerant.hu
  */
 public class SipLoginConfigMetaData extends IdMetaDataImpl {
     private static final long serialVersionUID = 1;

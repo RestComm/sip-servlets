@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -25,16 +25,16 @@ package org.mobicents.as8;
 import org.mobicents.servlet.sip.undertow.SipProtocolHandler;
 
 /**
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class SipConnectorListener {
-    
+
     private SipProtocolHandler protocolHandler;
 
     public SipConnectorListener(SipProtocolHandler protocolHandler) {
-        
+
         this.protocolHandler = protocolHandler;
-        
+
     }
 
     public SipProtocolHandler getProtocolHandler() {
@@ -48,10 +48,10 @@ public class SipConnectorListener {
             e.printStackTrace();
         }
     }
-    
+
     public void start(){
         try {
-            this.protocolHandler.start();            
+            this.protocolHandler.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -59,7 +59,6 @@ public class SipConnectorListener {
 
     public void pause(){
         this.protocolHandler.resume();
-        
     }
 
     public void stop(){

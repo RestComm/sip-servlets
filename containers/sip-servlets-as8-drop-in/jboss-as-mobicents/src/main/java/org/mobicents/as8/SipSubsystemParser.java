@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -48,7 +48,6 @@ import org.jboss.staxmapper.XMLElementReader;
 import org.jboss.staxmapper.XMLElementWriter;
 import org.jboss.staxmapper.XMLExtendedStreamReader;
 import org.jboss.staxmapper.XMLExtendedStreamWriter;
-import org.mobicents.as8.SipConnectorDefinition;
 
 /**
  * The web subsystem parser.
@@ -57,7 +56,7 @@ import org.mobicents.as8.SipConnectorDefinition;
  * @author Brian Stansberry
  * @author Tomaz Cerar
  * @author josemrecio@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<ModelNode>>, XMLElementWriter<SubsystemMarshallingContext> {
 
@@ -96,15 +95,15 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         SipDefinition.BACK_TO_NORMAL_MEMORY_THRESHOLD.marshallAsAttribute(node, false, writer);
         SipDefinition.OUTBOUND_PROXY.marshallAsAttribute(node, false, writer);
         if(node.hasDefined(CONNECTOR)) {
-        	for(final Property connector : node.get(CONNECTOR).asPropertyList()) {
-        		final ModelNode config = connector.getValue();
-        		writer.writeStartElement(Element.CONNECTOR.getLocalName());
-        		writer.writeAttribute(NAME, connector.getName());
-        		for (SimpleAttributeDefinition attr : SipConnectorDefinition.CONNECTOR_ATTRIBUTES) {
-        			attr.marshallAsAttribute(config, false, writer);
-        		}
-        		writer.writeEndElement();
-        	}
+            for(final Property connector : node.get(CONNECTOR).asPropertyList()) {
+                final ModelNode config = connector.getValue();
+                writer.writeStartElement(Element.CONNECTOR.getLocalName());
+                writer.writeAttribute(NAME, connector.getName());
+                for (SimpleAttributeDefinition attr : SipConnectorDefinition.CONNECTOR_ATTRIBUTES) {
+                    attr.marshallAsAttribute(config, false, writer);
+                }
+                writer.writeEndElement();
+            }
         }
         writer.writeEndElement();
     }
@@ -124,29 +123,29 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
             final String value = reader.getAttributeValue(i);
             final Attribute attribute = Attribute.forName(reader.getAttributeLocalName(i));
             switch (attribute) {
-	            case INSTANCE_ID:
-	            case APPLICATION_ROUTER:
-	            case SIP_STACK_PROPS:
-	            case SIP_APP_DISPATCHER_CLASS:
-	            case SIP_PATH_NAME:
-	            case ADDITIONAL_PARAMETERABLE_HEADERS:
-	            case BASE_TIMER_INTERVAL:
-	            case T2_INTERVAL:
-	            case T4_INTERVAL:
-	            case TIMER_D_INTERVAL:
-	            case DIALOG_PENDING_REQUEST_CHECKING:
-	            case CANCELED_TIMER_TASKS_PURGE_PERIOD:
-	            case CONGESTION_CONTROL_INTERVAL:
-	            case CONGESTION_CONTROL_POLICY:
-	            case MEMORY_THRESHOLD:
-	            case BACK_TO_NORMAL_MEMORY_THRESHOLD:
-	            case OUTBOUND_PROXY:
-	            case CONCURRENCY_CONTROL_MODE:
-	            case USE_PRETTY_ENCODING:
-	                subsystem.get(attribute.getLocalName()).set(value);
-	                break;
-	            default:
-	                throw unexpectedAttribute(reader, i);
+                case INSTANCE_ID:
+                case APPLICATION_ROUTER:
+                case SIP_STACK_PROPS:
+                case SIP_APP_DISPATCHER_CLASS:
+                case SIP_PATH_NAME:
+                case ADDITIONAL_PARAMETERABLE_HEADERS:
+                case BASE_TIMER_INTERVAL:
+                case T2_INTERVAL:
+                case T4_INTERVAL:
+                case TIMER_D_INTERVAL:
+                case DIALOG_PENDING_REQUEST_CHECKING:
+                case CANCELED_TIMER_TASKS_PURGE_PERIOD:
+                case CONGESTION_CONTROL_INTERVAL:
+                case CONGESTION_CONTROL_POLICY:
+                case MEMORY_THRESHOLD:
+                case BACK_TO_NORMAL_MEMORY_THRESHOLD:
+                case OUTBOUND_PROXY:
+                case CONCURRENCY_CONTROL_MODE:
+                case USE_PRETTY_ENCODING:
+                    subsystem.get(attribute.getLocalName()).set(value);
+                    break;
+                default:
+                    throw unexpectedAttribute(reader, i);
             }
         }
         list.add(subsystem);
@@ -188,36 +187,36 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
                 name = value;
                 break;
             case SOCKET_BINDING:
-            	bindingRef = value;
-            	SipConnectorDefinition.SOCKET_BINDING.parseAndSetParameter(value, connector, reader);
+                bindingRef = value;
+                SipConnectorDefinition.SOCKET_BINDING.parseAndSetParameter(value, connector, reader);
                 break;
             case SCHEME:
-            	SipConnectorDefinition.SCHEME.parseAndSetParameter(value, connector, reader);
+                SipConnectorDefinition.SCHEME.parseAndSetParameter(value, connector, reader);
                 break;
             case PROTOCOL:
-            	SipConnectorDefinition.PROTOCOL.parseAndSetParameter(value, connector, reader);
+                SipConnectorDefinition.PROTOCOL.parseAndSetParameter(value, connector, reader);
                 break;
             case ENABLED:
-            	SipConnectorDefinition.ENABLED.parseAndSetParameter(value, connector, reader);
+                SipConnectorDefinition.ENABLED.parseAndSetParameter(value, connector, reader);
                 break;
             case USE_STATIC_ADDRESS:
-            	SipConnectorDefinition.USE_STATIC_ADDRESS.parseAndSetParameter(value, connector, reader);
-            	break;
+                SipConnectorDefinition.USE_STATIC_ADDRESS.parseAndSetParameter(value, connector, reader);
+                break;
             case STATIC_SERVER_ADDRESS:
-            	SipConnectorDefinition.STATIC_SERVER_ADDRESS.parseAndSetParameter(value, connector, reader);
-            	break;
+                SipConnectorDefinition.STATIC_SERVER_ADDRESS.parseAndSetParameter(value, connector, reader);
+                break;
             case STATIC_SERVER_PORT:
-            	SipConnectorDefinition.STATIC_SERVER_PORT.parseAndSetParameter(value, connector, reader);
-            	break;
+                SipConnectorDefinition.STATIC_SERVER_PORT.parseAndSetParameter(value, connector, reader);
+                break;
             case USE_STUN:
-            	SipConnectorDefinition.USE_STUN.parseAndSetParameter(value, connector, reader);
-            	break;
+                SipConnectorDefinition.USE_STUN.parseAndSetParameter(value, connector, reader);
+                break;
             case STUN_SERVER_ADDRESS:
-            	SipConnectorDefinition.STUN_SERVER_ADDRESS.parseAndSetParameter(value, connector, reader);
-            	break;
+                SipConnectorDefinition.STUN_SERVER_ADDRESS.parseAndSetParameter(value, connector, reader);
+                break;
             case STUN_SERVER_PORT:
-            	SipConnectorDefinition.STUN_SERVER_PORT.parseAndSetParameter(value, connector, reader);
-            	break;                
+                SipConnectorDefinition.STUN_SERVER_PORT.parseAndSetParameter(value, connector, reader);
+                break;
             default:
                 throw unexpectedAttribute(reader, i);
             }

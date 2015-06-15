@@ -28,16 +28,16 @@ import org.mobicents.servlet.sip.core.descriptor.MatchingRule;
 
 /**
  * @author Thomas Leseney
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class ExistsRule extends RequestRule implements MatchingRule {
 
     public ExistsRule(String var) {
         super(var);
     }
-    
+
     public boolean matches(SipServletRequest request) {
-    	return getValue(request) != null;
+        return getValue(request) != null;
     }
 
     public String getExpression() {

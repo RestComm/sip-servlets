@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -35,9 +35,9 @@ import org.mobicents.metadata.sip.spec.SipMetaData;
 import org.wildfly.extension.undertow.UndertowService;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
 /**
- *@author alerant.appngin@gmail.com
+ *@author kakonyi.istvan@alerant.hu
  */
-public class UndertowDeploymentInfoServiceReflectionProcessor implements DeploymentUnitProcessor{
+public class UndertowSipDeploymentInfoProcessor implements DeploymentUnitProcessor{
 
     @Override
     public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
@@ -58,34 +58,31 @@ public class UndertowDeploymentInfoServiceReflectionProcessor implements Deploym
             }
         }
 
-        
         final WarMetaData warMetaData = deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
         final JBossWebMetaData metaData = warMetaData.getMergedJBossWebMetaData();
         // TODO:
         final String defaultHost = "default-host";
         final String defaultServer = "default-server";
-        
+
         String hostName = /* TODO:UndertowDeploymentProcessor. */UndertowSipDeploymentProcessor.hostNameOfDeployment(warMetaData, defaultHost);
         final String pathName = /* TODO:UndertowDeploymentProcessor. */UndertowSipDeploymentProcessor.pathNameOfDeployment(deploymentUnit, metaData);
 
         String serverInstanceName = metaData.getServerInstanceName() == null ? defaultServer : metaData
                 .getServerInstanceName();
 
-        
         final ServiceName deploymentServiceName = UndertowService.deploymentServiceName(serverInstanceName, hostName,
                 pathName);
 
         final ServiceName deploymentInfoServiceName = deploymentServiceName
                 .append(UndertowDeploymentInfoService.SERVICE_NAME);
-        
 
         //instantiate injector service
-        UndertowDeploymentInfoReflectionService deploymentInfoReflectionService = new UndertowDeploymentInfoReflectionService(deploymentUnit);
-        final ServiceName deploymentInfoReflectionServiceName = deploymentServiceName.append(UndertowDeploymentInfoReflectionService.SERVICE_NAME);
+        UndertowSipDeploymentInfoService sipDeploymentInfoService = new UndertowSipDeploymentInfoService(deploymentUnit);
+        final ServiceName sipDeploymentInfoServiceName = deploymentServiceName.append(UndertowSipDeploymentInfoService.SERVICE_NAME);
         //lets earn that deploymentService will depend on this service:
-        phaseContext.getDeploymentUnit().getAttachment(WebComponentDescription.WEB_COMPONENTS).add(deploymentInfoReflectionServiceName);
+        phaseContext.getDeploymentUnit().getAttachment(WebComponentDescription.WEB_COMPONENTS).add(sipDeploymentInfoServiceName);
         //make injector service to be dependent from deploymentInfoService:
-        ServiceBuilder<UndertowDeploymentInfoReflectionService> infoInjectorBuilder = phaseContext.getServiceTarget().addService(deploymentInfoReflectionServiceName, deploymentInfoReflectionService);
+        ServiceBuilder<UndertowSipDeploymentInfoService> infoInjectorBuilder = phaseContext.getServiceTarget().addService(sipDeploymentInfoServiceName, sipDeploymentInfoService);
         infoInjectorBuilder.addDependency(deploymentInfoServiceName);
         infoInjectorBuilder.install();
     }
@@ -93,7 +90,6 @@ public class UndertowDeploymentInfoServiceReflectionProcessor implements Deploym
     @Override
     public void undeploy(DeploymentUnit context) {
         // TODO Auto-generated method stub
-        
     }
 
 }

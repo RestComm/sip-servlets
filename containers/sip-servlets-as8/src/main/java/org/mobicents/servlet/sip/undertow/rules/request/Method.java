@@ -26,16 +26,16 @@ import javax.servlet.sip.SipServletRequest;
 
 /**
  * @author Thomas Leseney
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class Method implements Extractor {
-	public Method(String token) {
-		if (!token.equals("request")) {
-			throw new IllegalArgumentException("Invalid expression: method after " + token);
-		}
-	}
-	
-	public Object extract(Object input) {
-		return ((SipServletRequest) input).getMethod();
-	}
+    public Method(String token) {
+        if (!token.equals("request")) {
+            throw new IllegalArgumentException("Invalid expression: method after " + token);
+        }
+    }
+
+    public Object extract(Object input) {
+        return ((SipServletRequest) input).getMethod();
+    }
 }

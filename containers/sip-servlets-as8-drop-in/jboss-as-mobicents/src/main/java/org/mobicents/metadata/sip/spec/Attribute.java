@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -28,7 +28,7 @@ import java.util.Map;
  * An enumeration of all the possible XML attributes in the web-app 3.0 schema, by name.
  *
  * @author Remy Maucherat
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public enum Attribute {
     // always first

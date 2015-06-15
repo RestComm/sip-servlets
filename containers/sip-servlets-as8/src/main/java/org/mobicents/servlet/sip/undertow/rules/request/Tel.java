@@ -28,36 +28,36 @@ import javax.servlet.sip.URI;
 
 /**
  * @author Thomas Leseney
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
-public class Tel implements Extractor {	
-	public Tel(String token) {
-		if (!token.equals("uri")) {
-			throw new IllegalArgumentException("Invalid expression: tel after " + token);
-		}
-	}
-	
-	public Object extract(Object input) {
-		URI uri = (URI) input;
-		if (uri.isSipURI()) {
-	        SipURI sipuri = (SipURI) uri;
-	        if ("phone".equals(sipuri.getParameter("user"))) {
-	        	return stripVisuals(sipuri.getUser()); 	
-	        }	        
-	    } else if ("tel".equals(uri.getScheme())) {
-	        return stripVisuals(((TelURL) uri).getPhoneNumber());
-	    }
-	    return null;
-	}
+public class Tel implements Extractor {
+    public Tel(String token) {
+        if (!token.equals("uri")) {
+            throw new IllegalArgumentException("Invalid expression: tel after " + token);
+        }
+    }
 
-	private String stripVisuals(String s) {
-	    StringBuffer buf = new StringBuffer(s.length());
-	    for (int i = 0; i < s.length(); i++) {
-	        char c = s.charAt(i);
-	        if ("-.()".indexOf(c) < 0) {
-	            buf.append(c);
-	        }
-	    }
-	    return buf.toString();
-	}
+    public Object extract(Object input) {
+        URI uri = (URI) input;
+        if (uri.isSipURI()) {
+            SipURI sipuri = (SipURI) uri;
+            if ("phone".equals(sipuri.getParameter("user"))) {
+                return stripVisuals(sipuri.getUser());
+            }
+        } else if ("tel".equals(uri.getScheme())) {
+            return stripVisuals(((TelURL) uri).getPhoneNumber());
+        }
+        return null;
+    }
+
+    private String stripVisuals(String s) {
+        StringBuffer buf = new StringBuffer(s.length());
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if ("-.()".indexOf(c) < 0) {
+                buf.append(c);
+            }
+        }
+        return buf.toString();
+    }
 }

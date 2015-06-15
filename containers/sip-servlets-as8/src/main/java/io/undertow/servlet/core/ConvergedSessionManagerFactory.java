@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -26,9 +26,8 @@ import org.mobicents.servlet.sip.undertow.UndertowSipManager;
 import io.undertow.server.session.SessionManager;
 import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.api.SessionManagerFactory;
-import io.undertow.servlet.core.InMemorySessionManagerFactory;
 /**
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  *
  */
 public class ConvergedSessionManagerFactory extends InMemorySessionManagerFactory implements SessionManagerFactory{
@@ -37,7 +36,7 @@ public class ConvergedSessionManagerFactory extends InMemorySessionManagerFactor
     public ConvergedSessionManagerFactory() {
         this(-1);
     }
-    
+
     public ConvergedSessionManagerFactory(int maxSessions) {
         super(maxSessions);
         this.maxSessions = maxSessions;

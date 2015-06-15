@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -29,11 +29,11 @@ import org.jboss.msc.service.StopContext;
 
 /**
  * A service starting a sip deployment.
- * For sip, this is required so far only as a way to provide the context to management methods 
+ * For sip, this is required so far only as a way to provide the context to management methods
  *
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 class SipDeploymentService implements Service<SIPWebContext> {
 
@@ -41,7 +41,7 @@ class SipDeploymentService implements Service<SIPWebContext> {
     private final DeploymentUnit anchorDu;
 
     public SipDeploymentService(final DeploymentUnit du) {
-    	this.anchorDu =SIPWebContext.getSipContextAnchorDu(du);
+        this.anchorDu =SIPWebContext.getSipContextAnchorDu(du);
     }
 
     /**
@@ -49,7 +49,7 @@ class SipDeploymentService implements Service<SIPWebContext> {
      */
     public synchronized void start(StartContext startContext) throws StartException {
         if (sipContext == null) {
-        	this.sipContext = anchorDu.getAttachment(SIPWebContext.ATTACHMENT_KEY);
+            this.sipContext = anchorDu.getAttachment(SIPWebContext.ATTACHMENT_KEY);
         }
     }
 

@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -29,8 +29,8 @@ import org.jboss.metadata.web.jboss.JBossServletMetaData;
  *
  * @author Scott.Stark@jboss.org
  * @version $Revision: 66673 $
- * 
- * @author alerant.appngin@gmail.com
+ *
+ * @author kakonyi.istvan@alerant.hu
  */
 public class JBossSipServletsMetaData extends AbstractMappedMetaData<JBossServletMetaData> {
     private static final long serialVersionUID = 1;

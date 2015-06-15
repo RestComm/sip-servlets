@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -25,7 +25,7 @@ package org.mobicents.metadata.sip.spec;
  * Sip application spec metadata.
  *
  * @author jean.deruelle@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class Sip11MetaData extends SipMetaData {
     private static final long serialVersionUID = 1;

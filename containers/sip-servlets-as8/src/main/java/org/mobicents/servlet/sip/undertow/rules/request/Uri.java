@@ -27,33 +27,32 @@ import javax.servlet.sip.SipServletRequest;
 
 /**
  * @author Thomas Leseney
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class Uri implements Extractor {
-	
-	private static final int REQUEST = 1;
-	private static final int ADDRESS = 2;
-	
+
+    private static final int REQUEST = 1;
+    private static final int ADDRESS = 2;
+
     private int inputType;
-    
-	public Uri(String token) 
-    {
-		if (token.equals("request")) {
-			inputType = REQUEST;
-		} else if (token.equals("from")) {
-			inputType = ADDRESS;
-    	} else if (token.equals("to")) {
-			inputType = ADDRESS;
-		} else {
-			throw new IllegalArgumentException("Invalid expression: uri after " + token);
-		}
+
+    public Uri(String token){
+        if (token.equals("request")) {
+            inputType = REQUEST;
+        } else if (token.equals("from")) {
+            inputType = ADDRESS;
+        } else if (token.equals("to")) {
+            inputType = ADDRESS;
+        } else {
+            throw new IllegalArgumentException("Invalid expression: uri after " + token);
+        }
     }
-    
-	public Object extract(Object input) {
-		if (inputType == REQUEST) {
-			return ((SipServletRequest) input).getRequestURI();
-		} else { 
-			return ((Address) input).getURI();
-		}
-	}
+
+    public Object extract(Object input) {
+        if (inputType == REQUEST) {
+            return ((SipServletRequest) input).getRequestURI();
+        } else {
+            return ((Address) input).getURI();
+        }
+    }
 }

@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -32,7 +32,7 @@ import org.jboss.dmr.ModelNode;
  * Update removing a web connector
  *
  * @author Emanuel Muckenhuber
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 class SipConnectorRemove extends AbstractRemoveStepHandler {
 

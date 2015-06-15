@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+* TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -21,7 +21,6 @@
  */
 package org.mobicents.as8;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.management.MBeanServer;
@@ -53,7 +52,6 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceBuilder.DependencyType;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
-import org.jboss.msc.service.ServiceListener;
 import org.jboss.msc.service.ServiceName;
 //import org.mobicents.as7.clustering.sip.MockDistributedCacheManagerFactoryService;
 import org.mobicents.as8.deployment.AttachSipServerServiceProcessor;
@@ -63,17 +61,15 @@ import org.mobicents.as8.deployment.SipContextFactoryDeploymentProcessor;
 import org.mobicents.as8.deployment.SipJndiBindingProcessor;
 import org.mobicents.as8.deployment.SipParsingDeploymentProcessor;
 import org.mobicents.as8.deployment.SipWarDeploymentProcessor;
-import org.mobicents.as8.deployment.UndertowDeploymentInfoServiceReflectionProcessor;
+import org.mobicents.as8.deployment.UndertowSipDeploymentInfoProcessor;
 import org.mobicents.as8.deployment.UndertowSipDeploymentProcessor;
-import org.wildfly.extension.undertow.ServletContainerService;
-import org.wildfly.extension.undertow.UndertowService;
 
 /**
  * Adds the sip subsystem.
  *
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 @SuppressWarnings({ "deprecation", "unused" })
 class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
@@ -195,16 +191,16 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
         final ModelNode dnsServerLocatorClassModel = SipDefinition.DNS_SERVER_LOCATOR_CLASS.resolveModelAttribute(context, fullModel);
         final String dnsServerLocatorClass = dnsServerLocatorClassModel.isDefined() ? dnsServerLocatorClassModel.asString() : null;
-        
+
         final ModelNode dnsResolverClassModel = SipDefinition.DNS_SERVER_LOCATOR_CLASS.resolveModelAttribute(context, fullModel);
         final String dnsResolverClass = dnsResolverClassModel.isDefined() ? dnsResolverClassModel.asString() : null;
-        
+
         final ModelNode callIdMaxLengthModel = SipDefinition.CALL_ID_MAX_LENGTH.resolveModelAttribute(context, fullModel);
         final int callIdMaxLength = callIdMaxLengthModel.isDefined() ? callIdMaxLengthModel.asInt() : -1;
-        
+
         final ModelNode tagHashMaxLengthModel = SipDefinition.TAG_HASH_MAX_LENGTH.resolveModelAttribute(context, fullModel);
         final int tagHashMaxLength = callIdMaxLengthModel.isDefined() ? tagHashMaxLengthModel.asInt() : -1;
-                
+
         final ModelNode canceledTimerTasksPurgePeriodModel = SipDefinition.CANCELED_TIMER_TASKS_PURGE_PERIOD
                 .resolveModelAttribute(context, fullModel);
         final int canceledTimerTasksPurgePeriod = canceledTimerTasksPurgePeriodModel.isDefined() ? canceledTimerTasksPurgePeriodModel
@@ -242,8 +238,8 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 sipAppDispatcherClass, additionalParameterableHeaders, sipCongestionControlInterval,
                 congestionControlPolicy, sipConcurrencyControlMode, usePrettyEncoding, baseTimerInterval, t2Interval,
                 t4Interval, timerDInterval, dialogPendingRequestChecking, dnsServerLocatorClass, dnsResolverClass,
-        		callIdMaxLength, tagHashMaxLength, canceledTimerTasksPurgePeriod, memoryThreshold, 
-        		backToNormalMemoryThreshold, outboundProxy, instanceId);
+                callIdMaxLength, tagHashMaxLength, canceledTimerTasksPurgePeriod, memoryThreshold,
+                backToNormalMemoryThreshold, outboundProxy, instanceId);
         newControllers.add(context
                 .getServiceTarget()
                 .addService(SipSubsystemServices.JBOSS_SIP, service)
@@ -275,14 +271,14 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
                         Phase.POST_MODULE_INJECTION_ANNOTATION - 1, new SipJndiBindingProcessor());
                 //change DeploymentInfo to ConvergedDeploymentInfo in case of sip deployment in DeploymentInfoService using reflection API
                 processorTarget.addDeploymentProcessor(SipExtension.SUBSYSTEM_NAME, Phase.INSTALL,
-                        Phase.INSTALL_WAR_DEPLOYMENT, new UndertowDeploymentInfoServiceReflectionProcessor());
+                        Phase.INSTALL_WAR_DEPLOYMENT, new UndertowSipDeploymentInfoProcessor());
                 // setup management objects for servlets, etc.
                 processorTarget.addDeploymentProcessor(SipExtension.SUBSYSTEM_NAME, Phase.INSTALL,
                         Phase.INSTALL_WAR_DEPLOYMENT, new SipWarDeploymentProcessor());
-                // add DeploymentInfoService to UndertowDeploymentInfoServiceReflectionProcessor
+                // add DeploymentInfoService to UndertowSipDeploymentInfoProcessor
                 processorTarget.addDeploymentProcessor(SipExtension.SUBSYSTEM_NAME, Phase.INSTALL,
                         Phase.INSTALL_WAR_DEPLOYMENT+1, new UndertowSipDeploymentProcessor());
-                
+
                 // // Add the SIP specific deployment processor
                 // processorTarget.addDeploymentProcessor(Phase.PARSE, DEPLOYMENT_PROCESS_PRIORITY,
                 // SipMetaDataDeploymentProcessor.INSTANCE);
@@ -347,8 +343,6 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         //get servletContainerService:
     }
 
-    
-    
     @Override
     protected boolean requiresRuntimeVerification() {
         return false;

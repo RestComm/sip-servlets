@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -42,7 +42,7 @@ import static org.mobicents.as8.SipMessages.MESSAGES;
  * Service creating and starting a web connector.
  *
  * @author Emanuel Muckenhuber
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 class SipConnectorService implements Service<SipConnectorListener> {
 
@@ -56,7 +56,7 @@ class SipConnectorService implements Service<SipConnectorListener> {
     private int stunServerPort = -1;
 
     private SipConnectorListener connector;
-    
+
     private final InjectedValue<Executor> executor = new InjectedValue<Executor>();
     private final InjectedValue<SocketBinding> binding = new InjectedValue<SocketBinding>();
     private final InjectedValue<SipServer> server = new InjectedValue<SipServer>();
@@ -73,7 +73,7 @@ class SipConnectorService implements Service<SipConnectorListener> {
         this.useStun = useStun;
         if (stunServerAddress != null)
             this.stunServerAddress = stunServerAddress;
-        this.stunServerPort = stunServerPort;        
+        this.stunServerPort = stunServerPort;
     }
 
     /**
@@ -101,8 +101,8 @@ class SipConnectorService implements Service<SipConnectorListener> {
             sipConnector.setUseStun(useStun);
             sipConnector.setStunServerAddress(stunServerAddress);
             sipConnector.setStunServerPort(stunServerPort);
-            
-            /*TODO: 
+
+            /*TODO:
              * enableLookups
              * proxyName
              * proxyPort
@@ -110,9 +110,9 @@ class SipConnectorService implements Service<SipConnectorListener> {
              * secure
              * maxPostSize
              * maxSavePostSize
-             * */ 
+             * */
 
-            
+
             SipProtocolHandler sipProtocolHandler = new SipProtocolHandler(sipConnector);
 
             // TODO set Executor on ProtocolHandler

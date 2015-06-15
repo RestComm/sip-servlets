@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -30,7 +30,7 @@ import org.jboss.vfs.VirtualFile;
  * Date: 05.11.2011
  *
  * @author <a href="mailto:jperkins@redhat.com">James R. Perkins</a>
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 @MessageBundle(projectCode = "MSS")
 public interface SipMessages {
@@ -54,7 +54,7 @@ public interface SipMessages {
 
     @Message(id = 18009, value = "Error starting sip container")
     String errorStartingSip();
-    
+
     @Message(id = 18026, value = "Failed to resolve module for deployment %s")
     String failedToResolveModule(VirtualFile deploymentRoot);
 

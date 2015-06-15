@@ -39,13 +39,13 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 
 /**
  * @author jean.deruelle@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  *
  */
 public class Servlet3SipServletRequestImpl extends SipServletRequestImpl implements MobicentsSipServletRequest {
 
     /**
-     * 
+     *
      */
     public Servlet3SipServletRequestImpl() {
     }
@@ -65,7 +65,7 @@ public class Servlet3SipServletRequestImpl extends SipServletRequestImpl impleme
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.servlet.ServletRequest#getParameterMap()
      */
     public Map<String, String[]> getParameterMap() {
@@ -109,7 +109,7 @@ public class Servlet3SipServletRequestImpl extends SipServletRequestImpl impleme
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.servlet.ServletRequest#getAsyncContext()
      */
     @Override
@@ -120,7 +120,7 @@ public class Servlet3SipServletRequestImpl extends SipServletRequestImpl impleme
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.servlet.ServletRequest#getDispatcherType()
      */
     @Override
@@ -131,7 +131,7 @@ public class Servlet3SipServletRequestImpl extends SipServletRequestImpl impleme
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.servlet.ServletRequest#getServletContext()
      */
     @Override
@@ -142,7 +142,7 @@ public class Servlet3SipServletRequestImpl extends SipServletRequestImpl impleme
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.servlet.ServletRequest#isAsyncStarted()
      */
     @Override
@@ -153,7 +153,7 @@ public class Servlet3SipServletRequestImpl extends SipServletRequestImpl impleme
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.servlet.ServletRequest#isAsyncSupported()
      */
     @Override
@@ -164,7 +164,7 @@ public class Servlet3SipServletRequestImpl extends SipServletRequestImpl impleme
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.servlet.ServletRequest#startAsync()
      */
     @Override
@@ -175,7 +175,7 @@ public class Servlet3SipServletRequestImpl extends SipServletRequestImpl impleme
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see javax.servlet.ServletRequest#startAsync(javax.servlet.ServletRequest, javax.servlet.ServletResponse)
      */
     @Override

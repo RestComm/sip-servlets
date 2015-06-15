@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -27,7 +27,7 @@ import org.mobicents.metadata.sip.spec.SipMetaData;
  * Sip application spec metadata if no xsd is defined in the sip.xml.
  *
  * @author jean.deruelle@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class JBossSip11MetaData extends SipMetaData {
     private static final long serialVersionUID = 1;

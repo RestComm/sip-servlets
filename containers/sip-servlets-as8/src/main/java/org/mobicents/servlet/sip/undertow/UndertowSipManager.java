@@ -42,7 +42,7 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.core.session.SipStandardManagerDelegate;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 /**
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  *
  */
 public class UndertowSipManager extends InMemorySessionManager implements SipManager {

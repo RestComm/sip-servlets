@@ -34,7 +34,7 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 
 /**
  * @author jean.deruelle@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  *
  */
 public class Servlet3SipServletMessageFactory implements MobicentsSipServletMessageFactory {
@@ -43,7 +43,7 @@ public class Servlet3SipServletMessageFactory implements MobicentsSipServletMess
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mobicents.servlet.sip.core.MobicentsSipServletMessageFactory#
      * createSipServletRequest(javax.sip.message.Request, org.mobicents.servlet.sip.core.MobicentsSipFactory,
      * org.mobicents.servlet.sip.core.session.MobicentsSipSession, javax.sip.Transaction, javax.sip.Dialog, boolean)
@@ -56,7 +56,7 @@ public class Servlet3SipServletMessageFactory implements MobicentsSipServletMess
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mobicents.servlet.sip.core.MobicentsSipServletMessageFactory#
      * createSipServletResponse(javax.sip.message.Response, org.mobicents.servlet.sip.core.MobicentsSipFactory,
      * javax.sip.Transaction, org.mobicents.servlet.sip.core.session.MobicentsSipSession, javax.sip.Dialog, boolean,

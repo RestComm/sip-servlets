@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -32,7 +32,7 @@ import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
  * The sip-app spec metadata. This class is based on the CR12 Tag of the WebMetaData class
  *
  * @author jean.deruelle@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 //public abstract class SipMetaData extends IdMetaDataImplWithDescriptionGroup implements Environment {
 public abstract class SipMetaData extends WebMetaData implements Environment {
@@ -63,7 +63,7 @@ public abstract class SipMetaData extends WebMetaData implements Environment {
 //    private MessageDestinationsMetaData messageDestinations;
 
     // AS7 isolated class loading does not allow to fetch Method,
-    // so processors fill SipApplicationKeyMethodInfo and Method is fetched afterwards 
+    // so processors fill SipApplicationKeyMethodInfo and Method is fetched afterwards
     // private Method sipApplicationKeyMethod;
     private SipApplicationKeyMethodInfo sipApplicationKeyMethodInfo;
     private ConcurrencyControlMode concurrencyControlMode;

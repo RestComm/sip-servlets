@@ -28,18 +28,18 @@ import org.mobicents.servlet.sip.core.descriptor.MatchingRule;
 
 /**
  * @author Thomas Leseney
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class NotRule implements MatchingRule {
-    
-	private MatchingRule criterion;
-    
+
+    private MatchingRule criterion;
+
     public NotRule() { }
-    
+
     public void setCriterion(MatchingRule c) {
-    	 criterion = c;
+        criterion = c;
     }
-    
+
     public boolean matches(SipServletRequest request) {
         return !criterion.matches(request);
     }

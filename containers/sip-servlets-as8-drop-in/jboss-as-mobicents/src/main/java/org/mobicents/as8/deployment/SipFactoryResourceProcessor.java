@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -34,7 +34,7 @@ import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
  * <p/>
  *
  * @author Jaikiran Pai
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public final class SipFactoryResourceProcessor implements EEResourceReferenceProcessor {
 

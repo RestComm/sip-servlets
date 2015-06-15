@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -26,33 +26,33 @@ package org.mobicents.metadata.sip.spec;
  * No need to store the args and return type, they are always the same (String, SipServletRequest)
  *
  * @author josemrecio@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class SipApplicationKeyMethodInfo {
-	
-	final String className;
-	final String methodName;
-	
-	public SipApplicationKeyMethodInfo(String className, String methodName) {
-		this.className = className;
-		this.methodName = methodName;
-	}
 
-	/**
-	 * @return the className
-	 */
-	public String getClassName() {
-		return className;
-	}
+    final String className;
+    final String methodName;
 
-	/**
-	 * @return the methodName
-	 */
-	public String getMethodName() {
-		return methodName;
-	}
-	
-	public String toString() {
-		return new StringBuilder(className).append("-").append(methodName).toString();
-	}
+    public SipApplicationKeyMethodInfo(String className, String methodName) {
+        this.className = className;
+        this.methodName = methodName;
+    }
+
+    /**
+     * @return the className
+     */
+    public String getClassName() {
+        return className;
+    }
+
+    /**
+     * @return the methodName
+     */
+    public String getMethodName() {
+        return methodName;
+    }
+
+    public String toString() {
+        return new StringBuilder(className).append("-").append(methodName).toString();
+    }
 }

@@ -129,7 +129,7 @@ public class SIPWebContext extends SipContextImpl {
     @Override
     public void init(Deployment deployment, ClassLoader sipContextClassLoader) throws ServletException {
         super.deploymentInfoFacade = deploymentUnit.getAttachment(DeploymentInfoFacade.ATTACHMENT_KEY);
-        
+
         super.init(deployment, sipContextClassLoader);
     }
 

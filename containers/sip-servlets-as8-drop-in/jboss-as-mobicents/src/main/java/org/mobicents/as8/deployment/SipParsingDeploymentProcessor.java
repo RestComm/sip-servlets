@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -44,7 +44,7 @@ import org.mobicents.metadata.sip.spec.SipMetaData;
  * @author Jean-Frederic Clere
  * @author Thomas.Diesler@jboss.com
  * @author josemrecio@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class SipParsingDeploymentProcessor implements DeploymentUnitProcessor {
 

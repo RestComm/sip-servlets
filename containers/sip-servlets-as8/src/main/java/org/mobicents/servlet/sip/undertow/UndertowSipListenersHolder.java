@@ -31,7 +31,7 @@ import org.mobicents.servlet.sip.core.MobicentsSipServlet;
 import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
 /**
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  *
  */
 public class UndertowSipListenersHolder extends SipListenersHolder {
@@ -44,7 +44,7 @@ public class UndertowSipListenersHolder extends SipListenersHolder {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.mobicents.servlet.sip.core.session.SipListenersHolder#loadListeners(java.lang.String[],
      * java.lang.ClassLoader)
      */

@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -44,7 +44,7 @@ import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentService;
 
 /**
- *@author alerant.appngin@gmail.com
+ *@author kakonyi.istvan@alerant.hu
  */
 public class UndertowSipDeploymentProcessor implements DeploymentUnitProcessor {
 
@@ -131,14 +131,14 @@ public class UndertowSipDeploymentProcessor implements DeploymentUnitProcessor {
         UndertowDeploymentInfoService deploymentInfoService = (UndertowDeploymentInfoService) deploymentInfoServiceController
                 .getService();
 
-        // lets inject undertowdeployment service to reflection service:
-        final ServiceName deploymentInfoReflectionServiceName = deploymentServiceName
-                .append(UndertowDeploymentInfoReflectionService.SERVICE_NAME);
-        ServiceController<?> deplyomentInfoReflectionServiceController = phaseContext.getServiceRegistry().getService(
-                deploymentInfoReflectionServiceName);
-        UndertowDeploymentInfoReflectionService deplyomentInfoReflectionService = (UndertowDeploymentInfoReflectionService) deplyomentInfoReflectionServiceController
+        // lets inject undertowdeployment service to sip deploymentinfo service:
+        final ServiceName sipDeploymentInfoServiceName = deploymentServiceName
+                .append(UndertowSipDeploymentInfoService.SERVICE_NAME);
+        ServiceController<?> sipDeplyomentInfoServiceController = phaseContext.getServiceRegistry().getService(
+                sipDeploymentInfoServiceName);
+        UndertowSipDeploymentInfoService sipDeplyomentInfoService = (UndertowSipDeploymentInfoService) sipDeplyomentInfoServiceController
                 .getService();
-        deplyomentInfoReflectionService.getDeploymentInfoServiceInjectedValue().setValue(
+        sipDeplyomentInfoService.getDeploymentInfoServiceInjectedValue().setValue(
                 new ImmediateValue<UndertowDeploymentInfoService>(deploymentInfoService));
 
         // initiate undertowsipdeployment service:

@@ -27,22 +27,22 @@ import javax.servlet.sip.URI;
 
 /**
  * @author Thomas Leseney
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class User implements Extractor {
-	
-	public User(String token) {
-		if (!token.equals("uri")) { 
-			throw new IllegalArgumentException("Invalid expression: user after " + token);
-		}
-	}
-	
-	public Object extract(Object input) {
-		URI uri = (URI) input;
-		if (uri.isSipURI()) {
+
+    public User(String token) {
+        if (!token.equals("uri")) {
+            throw new IllegalArgumentException("Invalid expression: user after " + token);
+        }
+    }
+
+    public Object extract(Object input) {
+        URI uri = (URI) input;
+        if (uri.isSipURI()) {
             return ((SipURI)uri).getUser();
-		} else {
+        } else {
             return null;
-		}
-	}
+        }
+    }
 }

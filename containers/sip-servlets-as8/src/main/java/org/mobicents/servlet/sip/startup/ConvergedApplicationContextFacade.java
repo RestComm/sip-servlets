@@ -5,9 +5,9 @@
  * The ASF licenses this file to You under the Apache License, Version 2.0
  * (the "License"); you may not use this file except in compliance with
  * the License.  You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -62,8 +62,8 @@ import org.mobicents.servlet.sip.undertow.SipServletImpl;
  * @author Remy Maucherat
  * @author Jean-Francois Arcand
  * @version $Id: ApplicationContextFacade.java 1002556 2010-09-29 10:07:10Z markt $
- * 
- * @author alerant.appngin@gmail.com
+ *
+ * @author kakonyi.istvan@alerant.hu
  */
 
 public final class ConvergedApplicationContextFacade implements ServletContext {
@@ -646,7 +646,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
     }
 
     /**
-     * Use reflection to invoke the requested method. Cache the method object 
+     * Use reflection to invoke the requested method. Cache the method object
      * to speed up the process
      * @param methodName The method to call.
      * @param params The arguments passed to the called method.
@@ -660,7 +660,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
     }
 
     /**
-     * Use reflection to invoke the requested method. Cache the method object 
+     * Use reflection to invoke the requested method. Cache the method object
      * to speed up the process
      * @param appContext The AppliationContext object on which the method
      *                   will be invoked
@@ -687,7 +687,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
     }
 
     /**
-     * Use reflection to invoke the requested method. Cache the method object 
+     * Use reflection to invoke the requested method. Cache the method object
      * to speed up the process
      * @param methodName The method to invoke.
      * @param clazz The class where the method is.

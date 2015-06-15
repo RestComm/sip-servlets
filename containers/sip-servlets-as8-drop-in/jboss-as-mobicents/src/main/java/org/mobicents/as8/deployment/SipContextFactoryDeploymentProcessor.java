@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -35,7 +35,7 @@ import org.mobicents.metadata.sip.spec.SipMetaData;
  *
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class SipContextFactoryDeploymentProcessor implements DeploymentUnitProcessor {
 
@@ -51,16 +51,16 @@ public class SipContextFactoryDeploymentProcessor implements DeploymentUnitProce
         if(sipMetaData == null) {
             if (logger.isDebugEnabled()) logger.debug(deploymentUnit.getName() + " has null sipMetaData, checking annotations");
             SipAnnotationMetaData sipAnnotationMetaData = deploymentUnit.getAttachment(SipAnnotationMetaData.ATTACHMENT_KEY);
-            if(sipAnnotationMetaData == null || !sipAnnotationMetaData.isSipApplicationAnnotationPresent()) {   
-            	// http://code.google.com/p/sipservlets/issues/detail?id=168
-            	// When no sip.xml but annotations only, Application is not recognized as SIP App by AS7
-            	
-	            // In case there is no metadata attached, it means this is not a sip deployment, so we can safely ignore it!
-            	if (logger.isDebugEnabled()) logger.debug(deploymentUnit.getName() + " has null sipMetaData and no SipApplication annotation, no Sip context factory installed");
-	            return;
+            if(sipAnnotationMetaData == null || !sipAnnotationMetaData.isSipApplicationAnnotationPresent()) {
+                // http://code.google.com/p/sipservlets/issues/detail?id=168
+                // When no sip.xml but annotations only, Application is not recognized as SIP App by AS7
+
+                // In case there is no metadata attached, it means this is not a sip deployment, so we can safely ignore it!
+                if (logger.isDebugEnabled()) logger.debug(deploymentUnit.getName() + " has null sipMetaData and no SipApplication annotation, no Sip context factory installed");
+                return;
             }
         }
-        
+
         if (logger.isDebugEnabled()) logger.debug(deploymentUnit.getName() + " sip context factory installed");
         // Just attach the context factory, the web subsystem will pick it up
         final SIPContextFactory contextFactory = new SIPContextFactory();

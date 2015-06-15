@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -27,7 +27,7 @@ import java.util.Map;
 /**
  * @author Emanuel Muckenhuber
  * @author Jean-Frederic Clere
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 enum Attribute {
     UNKNOWN(null),
@@ -115,7 +115,7 @@ enum Attribute {
     STUN_SERVER_PORT(Constants.STUN_SERVER_PORT),
     SUBSTITUTION(Constants.SUBSTITUTION),
     T2_INTERVAL(Constants.T2_INTERVAL),
-    T4_INTERVAL(Constants.T4_INTERVAL),    
+    T4_INTERVAL(Constants.T4_INTERVAL),
     TARGET_VM(Constants.TARGET_VM),
     TIMER_D_INTERVAL(Constants.TIMER_D_INTERVAL),
     TRIM_SPACES(Constants.TRIM_SPACES),

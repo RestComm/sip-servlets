@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -40,10 +40,10 @@ import org.mobicents.servlet.sip.undertow.SipStandardService;
  * Service configuring and starting the web container.
  *
  * @author Emanuel Muckenhuber
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 class SipServerService implements SipServer, Service<SipServer> {
-	private static final Logger logger = Logger.getLogger(SipServerService.class);
+    private static final Logger logger = Logger.getLogger(SipServerService.class);
     // FIXME: josemrecio - settle on using the proper name
     private static final String JBOSS_SIP = "jboss.sip";
 
@@ -51,7 +51,7 @@ class SipServerService implements SipServer, Service<SipServer> {
 
 //    private final String defaultHost;
 //    private final boolean useNative;
-	private static final String FILE_PREFIX_PATH = "file:///";
+    private static final String FILE_PREFIX_PATH = "file:///";
     private String sipAppRouterFile;
     private String sipStackPropertiesFile;
     final String sipPathName;
@@ -61,20 +61,20 @@ class SipServerService implements SipServer, Service<SipServer> {
     final String congestionControlPolicy;
     final String sipConcurrencyControlMode;
     final boolean usePrettyEncoding;
- 	final int baseTimerInterval;
- 	final int t2Interval;
- 	final int t4Interval;
- 	final int timerDInterval;
- 	final boolean dialogPendingRequestChecking;
- 	final String dnsServerLocatorClass;
- 	final String dnsResolverClass;
- 	final int callIdMaxLength;
-	final int tagHashMaxLength;
- 	final int canceledTimerTasksPurgePeriod;
- 	final int memoryThreshold;
- 	final int backToNormalMemoryThreshold;
- 	final String outboundProxy;
- 	
+    final int baseTimerInterval;
+    final int t2Interval;
+    final int t4Interval;
+    final int timerDInterval;
+    final boolean dialogPendingRequestChecking;
+    final String dnsServerLocatorClass;
+    final String dnsResolverClass;
+    final int callIdMaxLength;
+    final int tagHashMaxLength;
+    final int canceledTimerTasksPurgePeriod;
+    final int memoryThreshold;
+    final int backToNormalMemoryThreshold;
+    final String outboundProxy;
+
     private final String instanceId;
 
 //    private Engine engine;
@@ -88,39 +88,39 @@ class SipServerService implements SipServer, Service<SipServer> {
     private final InjectedValue<PathManager> pathManagerInjector = new InjectedValue<PathManager>();
 
     public SipServerService(
-    		final String sipAppRouterFile, 
-    		final String sipStackPropertiesFile, 
-    		final String sipPathName, 
-    		String sipAppDispatcherClass, 
-    		String additionalParameterableHeaders, 
-    		int sipCongestionControlInterval,
-    		String congestionControlPolicy,
-    		String sipConcurrencyControlMode, 
-    		boolean usePrettyEncoding, 
-    		int baseTimerInterval, 
-    		int t2Interval, 
-    		int t4Interval, 
-    		int timerDInterval, 
-    		boolean dialogPendingRequestChecking, 
-    		String dnsServerLocatorClass,
-    		String dnsResolverClass,
-    		int callIdMaxLength,
-    		int tagHashMaxLength,
-    		int canceledTimerTasksPurgePeriod, 
-    		int memoryThreshold,
-    	 	int backToNormalMemoryThreshold,
-    	 	String outboundProxy,
-    		String instanceId) {
+            final String sipAppRouterFile,
+            final String sipStackPropertiesFile,
+            final String sipPathName,
+            String sipAppDispatcherClass,
+            String additionalParameterableHeaders,
+            int sipCongestionControlInterval,
+            String congestionControlPolicy,
+            String sipConcurrencyControlMode,
+            boolean usePrettyEncoding,
+            int baseTimerInterval,
+            int t2Interval,
+            int t4Interval,
+            int timerDInterval,
+            boolean dialogPendingRequestChecking,
+            String dnsServerLocatorClass,
+            String dnsResolverClass,
+            int callIdMaxLength,
+            int tagHashMaxLength,
+            int canceledTimerTasksPurgePeriod,
+            int memoryThreshold,
+            int backToNormalMemoryThreshold,
+            String outboundProxy,
+            String instanceId) {
 //        this.defaultHost = defaultHost;
 //        this.useNative = useNative;
-    	this.sipAppRouterFile = sipAppRouterFile;
-    	this.sipStackPropertiesFile = sipStackPropertiesFile;
-    	this.sipPathName = sipPathName;
-    	this.sipAppDispatcherClass = sipAppDispatcherClass;
-    	this.additionalParameterableHeaders = additionalParameterableHeaders;
-    	this.sipCongestionControlInterval = sipCongestionControlInterval;
-    	this.congestionControlPolicy = congestionControlPolicy;
-    	this.sipConcurrencyControlMode = sipConcurrencyControlMode;
+        this.sipAppRouterFile = sipAppRouterFile;
+        this.sipStackPropertiesFile = sipStackPropertiesFile;
+        this.sipPathName = sipPathName;
+        this.sipAppDispatcherClass = sipAppDispatcherClass;
+        this.additionalParameterableHeaders = additionalParameterableHeaders;
+        this.sipCongestionControlInterval = sipCongestionControlInterval;
+        this.congestionControlPolicy = congestionControlPolicy;
+        this.sipConcurrencyControlMode = sipConcurrencyControlMode;
         this.instanceId = instanceId;
         this.usePrettyEncoding = usePrettyEncoding;
         this.baseTimerInterval = baseTimerInterval;
@@ -144,13 +144,12 @@ class SipServerService implements SipServer, Service<SipServer> {
             // Set the MBeanServer
             final MBeanServer mbeanServer = this.mbeanServer.getOptionalValue();
             if(mbeanServer != null) {
-            	//Registry.getRegistry(null, null).setMBeanServer(mbeanServer);
+                //Registry.getRegistry(null, null).setMBeanServer(mbeanServer);
             }
         //}
 
         System.setProperty("catalina.home", pathManagerInjector.getValue().getPathEntry(TEMP_DIR).resolvePath());
         //server = new StandardServer();
-        
 //        final StandardService service = new StandardService();
 //        service.setName(JBOSS_SIP);
 //        service.setServer(server);
@@ -178,36 +177,36 @@ class SipServerService implements SipServer, Service<SipServer> {
         // Add the Service and sip app dispatched right away so apps can get the needed objects
         // when they deploy fast
         //server.addService(sipService);
-        
+
         if (sipAppDispatcherClass != null) {
-        	sipService.setSipApplicationDispatcherClassName(sipAppDispatcherClass);        	
+            sipService.setSipApplicationDispatcherClassName(sipAppDispatcherClass);
         }
         else {
-        	sipService.setSipApplicationDispatcherClassName(SipApplicationDispatcherImpl.class.getName());
+            sipService.setSipApplicationDispatcherClassName(SipApplicationDispatcherImpl.class.getName());
         }
         //
-		final String baseDir = System.getProperty("jboss.server.base.dir");
-    	if(sipAppRouterFile != null) {
-    		if(!sipAppRouterFile.startsWith(FILE_PREFIX_PATH)) {
-    			sipAppRouterFile = FILE_PREFIX_PATH.concat(baseDir).concat("/").concat(sipAppRouterFile);
-    		}
-    		System.setProperty("javax.servlet.sip.dar", sipAppRouterFile);
-    	}
-    	//
-    	sipService.setSipPathName(sipPathName);
-    	//
-    	if(sipStackPropertiesFile != null) {
-    		if(!sipStackPropertiesFile.startsWith(FILE_PREFIX_PATH)) {
-    			sipStackPropertiesFile = FILE_PREFIX_PATH.concat(baseDir).concat("/").concat(sipStackPropertiesFile);
-    		}
-    	}
+        final String baseDir = System.getProperty("jboss.server.base.dir");
+        if(sipAppRouterFile != null) {
+            if(!sipAppRouterFile.startsWith(FILE_PREFIX_PATH)) {
+                sipAppRouterFile = FILE_PREFIX_PATH.concat(baseDir).concat("/").concat(sipAppRouterFile);
+            }
+            System.setProperty("javax.servlet.sip.dar", sipAppRouterFile);
+        }
+        //
+        sipService.setSipPathName(sipPathName);
+        //
+        if(sipStackPropertiesFile != null) {
+            if(!sipStackPropertiesFile.startsWith(FILE_PREFIX_PATH)) {
+                sipStackPropertiesFile = FILE_PREFIX_PATH.concat(baseDir).concat("/").concat(sipStackPropertiesFile);
+            }
+        }
         sipService.setSipStackPropertiesFile(sipStackPropertiesFile);
         //
         if (sipConcurrencyControlMode != null) {
-        	sipService.setConcurrencyControlMode(sipConcurrencyControlMode);
+            sipService.setConcurrencyControlMode(sipConcurrencyControlMode);
         }
         else {
-        	sipService.setConcurrencyControlMode("None");
+            sipService.setConcurrencyControlMode("None");
         }
         //
         sipService.setCongestionControlCheckingInterval(sipCongestionControlInterval);
@@ -219,7 +218,7 @@ class SipServerService implements SipServer, Service<SipServer> {
         sipService.setT4Interval(t4Interval);
         sipService.setTimerDInterval(timerDInterval);
         if(additionalParameterableHeaders != null) {
-        	sipService.setAdditionalParameterableHeaders(additionalParameterableHeaders);
+            sipService.setAdditionalParameterableHeaders(additionalParameterableHeaders);
         }
         sipService.setDialogPendingRequestChecking(dialogPendingRequestChecking);
         sipService.setCanceledTimerTasksPurgePeriod(canceledTimerTasksPurgePeriod);

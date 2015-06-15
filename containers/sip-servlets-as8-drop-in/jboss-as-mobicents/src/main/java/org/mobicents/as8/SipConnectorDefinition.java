@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -32,13 +32,12 @@ import org.jboss.as.controller.registry.AttributeAccess;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
-import org.mobicents.as8.Constants;
 
 /**
  * @author Tomaz Cerar
  * @created 22.2.12 15:03
  * @author josemrecio@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class SipConnectorDefinition extends SimpleResourceDefinition {
     public static final SipConnectorDefinition INSTANCE = new SipConnectorDefinition();
@@ -134,21 +133,20 @@ public class SipConnectorDefinition extends SimpleResourceDefinition {
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .setRequires(Constants.USE_STUN)
                     .build();
-    
-    
+
     protected static final SimpleAttributeDefinition[] CONNECTOR_ATTRIBUTES = {
             //NAME, // name is read-only
             // IMPORTANT -- keep these in xsd order as this order controls marshalling
-	        PROTOCOL,
-	        SCHEME,
-	        SOCKET_BINDING,
-	        ENABLED,
-	        USE_STATIC_ADDRESS,
-	        STATIC_SERVER_ADDRESS,
-	        STATIC_SERVER_PORT,
-	        USE_STUN,
-	        STUN_SERVER_ADDRESS,
-	        STUN_SERVER_PORT
+        PROTOCOL,
+        SCHEME,
+        SOCKET_BINDING,
+        ENABLED,
+        USE_STATIC_ADDRESS,
+        STATIC_SERVER_ADDRESS,
+        STATIC_SERVER_PORT,
+        USE_STUN,
+        STUN_SERVER_ADDRESS,
+        STUN_SERVER_PORT
     };
 
     private SipConnectorDefinition() {

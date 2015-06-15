@@ -26,16 +26,16 @@ import javax.servlet.sip.Address;
 
 /**
  * @author Thomas Leseney
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class DisplayName implements Extractor  {
-	public DisplayName(String token) {
-		if (!token.equals("from") && !token.equals("to")) {
-			throw new IllegalArgumentException("Invalid expression: display-name after " + token);
-		}
-	}
-	
-	public Object extract(Object input) {
-		return ((Address) input).getDisplayName();
-	}
+    public DisplayName(String token) {
+        if (!token.equals("from") && !token.equals("to")) {
+            throw new IllegalArgumentException("Invalid expression: display-name after " + token);
+        }
+    }
+
+    public Object extract(Object input) {
+        return ((Address) input).getDisplayName();
+    }
 }

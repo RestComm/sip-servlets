@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -26,7 +26,7 @@ package org.mobicents.metadata.sip.jboss;
  * parsing DTD based schema for use with jboss-web.xml without a namespace
  *
  * @author josemrecio@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class JBoss80DTDConvergedSipMetaData extends JBossConvergedSipMetaData {
     private static final long serialVersionUID = 1;

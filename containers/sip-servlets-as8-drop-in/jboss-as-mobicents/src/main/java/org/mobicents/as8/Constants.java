@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -23,7 +23,7 @@ package org.mobicents.as8;
 
 /**
  * @author Emanuel Muckenhuber
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public interface Constants {
 
@@ -44,7 +44,7 @@ public interface Constants {
     String CIPHER_SUITE = "cipher-suite";
     String CONDITION = "condition";
     String CONFIGURATION = "configuration";
-    String CONNECTOR = "connector";    
+    String CONNECTOR = "connector";
     String CANCELED_TIMER_TASKS_PURGE_PERIOD = "canceled-timer-tasks-purge-period";
     String CONCURRENCY_CONTROL_MODE = "concurrency-control-mode";
     String CONGESTION_CONTROL_INTERVAL = "congestion-control-interval";

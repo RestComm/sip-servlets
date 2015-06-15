@@ -24,40 +24,45 @@ package org.mobicents.servlet.sip.undertow;
 
 /**
  * Exception occuring when something goes wrong with the deployment of the sip application
- * 
+ *
  * @author jean.deruelle@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  *
  */
 public class SipDeploymentException extends RuntimeException {
 
-	/**
-	 * 
-	 */
-	public SipDeploymentException() {
-		super();
-	}
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * @param message
-	 */
-	public SipDeploymentException(String message) {
-		super(message);
-	}
+    /**
+     *
+     */
+    public SipDeploymentException() {
+        super();
+    }
 
-	/**
-	 * @param cause
-	 */
-	public SipDeploymentException(Throwable cause) {
-		super(cause);
-	}
+    /**
+     * @param message
+     */
+    public SipDeploymentException(String message) {
+        super(message);
+    }
 
-	/**
-	 * @param message
-	 * @param cause
-	 */
-	public SipDeploymentException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    /**
+     * @param cause
+     */
+    public SipDeploymentException(Throwable cause) {
+        super(cause);
+    }
+
+    /**
+     * @param message
+     * @param cause
+     */
+    public SipDeploymentException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
 }

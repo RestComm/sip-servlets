@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -35,7 +35,7 @@ import org.jboss.msc.service.ServiceBuilder;
  *
  * User: Jaikiran Pai
  * @author josemrecio@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  *
  */
 public class SipFactoryInjectionSource extends InjectionSource {
@@ -73,7 +73,7 @@ public class SipFactoryInjectionSource extends InjectionSource {
             if (sipContext == null) {
                 sipContext = sipDeploymentUnit.getAttachment(SIPWebContext.ATTACHMENT_KEY);
             }
-            
+
             return sipContext.getSipFactoryFacade();
         }
     }

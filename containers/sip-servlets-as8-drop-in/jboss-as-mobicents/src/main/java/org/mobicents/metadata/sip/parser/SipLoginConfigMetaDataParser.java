@@ -29,7 +29,7 @@ import org.mobicents.metadata.sip.spec.SipLoginConfigMetaData;
 /**
  * @author Remy Maucherat
  * @author josemrecio@gmail.com
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  */
 public class SipLoginConfigMetaDataParser extends MetaDataElementParser {
 

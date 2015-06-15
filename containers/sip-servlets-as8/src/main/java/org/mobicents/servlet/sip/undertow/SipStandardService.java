@@ -64,7 +64,7 @@ import org.mobicents.servlet.sip.dns.MobicentsDNSResolver;
 import org.mobicents.servlet.sip.message.Servlet3SipServletMessageFactory;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 /**
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  *
  */
 public class SipStandardService implements SipService {
@@ -114,8 +114,8 @@ public class SipStandardService implements SipService {
     protected String darConfigurationFileLocation;
     protected boolean connectorsStartedExternally = false;
     protected boolean dialogPendingRequestChecking = false;
-	protected int callIdMaxLength;
-	protected int tagHashMaxLength;
+    protected int callIdMaxLength;
+    protected int tagHashMaxLength;
 
     protected boolean httpFollowsSip = false;
     protected String jvmRoute;
@@ -137,7 +137,7 @@ public class SipStandardService implements SipService {
     @Deprecated
     private String addressResolverClass = null;
     private String dnsServerLocatorClass = DefaultDNSServerLocator.class.getName();
-	private String dnsResolverClass = MobicentsDNSResolver.class.getName();
+    private String dnsResolverClass = MobicentsDNSResolver.class.getName();
     private String mobicentsSipServletMessageFactoryClassName = Servlet3SipServletMessageFactory.class.getName();
 
     // the balancers to send heartbeat to and our health info
@@ -362,12 +362,12 @@ public class SipStandardService implements SipService {
                     extendedListeningPoint = (MobicentsExtendedListeningPoint)
                         ((SipProtocolHandler)connector).getAttribute(ExtendedListeningPoint.class.getSimpleName());
                 }
-                if(extendedListeningPoint != null) {                    
+                if(extendedListeningPoint != null) {
                     extendedListeningPoint.getSipProvider().removeSipListener(sipApplicationDispatcher);
                     sipApplicationDispatcher.getSipNetworkInterfaceManager().removeExtendedListeningPoint(extendedListeningPoint);
                 }
             }
-        }   
+        }
         if(!connectorsStartedExternally) {
             sipApplicationDispatcher.stop();
         }
@@ -375,9 +375,9 @@ public class SipStandardService implements SipService {
         if(logger.isDebugEnabled()) {
             logger.debug("SIP Standard Service Stopped.");
         }
-    //  setState(LifecycleState.STOPPING);      
+        //  setState(LifecycleState.STOPPING);
     }
-    
+
     protected String getCatalinaBase() {
         String catalinaBase = System.getProperty("catalina.base");
         if (catalinaBase == null) {
@@ -841,47 +841,47 @@ public class SipStandardService implements SipService {
         }
     }
 
-	public String getDnsServerLocatorClass() {
-		return dnsServerLocatorClass;
-	}
+    public String getDnsServerLocatorClass() {
+        return dnsServerLocatorClass;
+    }
 
-	public void setDnsServerLocatorClass(String dnsServerLocatorClass) {
-		this.dnsServerLocatorClass = dnsServerLocatorClass;
-	}
+    public void setDnsServerLocatorClass(String dnsServerLocatorClass) {
+        this.dnsServerLocatorClass = dnsServerLocatorClass;
+    }
 
-	public String getDnsResolverClass() {
-		return dnsResolverClass;
-	}
+    public String getDnsResolverClass() {
+        return dnsResolverClass;
+    }
 
-	public void setDnsResolverClass(String dnsResolverClass) {
-		this.dnsResolverClass = dnsResolverClass;
-	}
-	
-	/**
-	 * @return the callIdMaxLength
-	 */
-	public int getCallIdMaxLength() {
-		return callIdMaxLength;
-	}
+    public void setDnsResolverClass(String dnsResolverClass) {
+        this.dnsResolverClass = dnsResolverClass;
+    }
 
-	/**
-	 * @param callIdMaxLength the callIdMaxLength to set
-	 */
-	public void setCallIdMaxLength(int callIdMaxLength) {
-		this.callIdMaxLength = callIdMaxLength;
-	}
-	
-	/**
-	 * @return the tagHashMaxLength
-	 */
-	public int getTagHashMaxLength() {
-		return tagHashMaxLength;
-	}
+    /**
+     * @return the callIdMaxLength
+     */
+    public int getCallIdMaxLength() {
+        return callIdMaxLength;
+    }
 
-	/**
-	 * @param tagHashMaxLength the tagHashMaxLength to set
-	 */
-	public void setTagHashMaxLength(int tagHashMaxLength) {
-		this.tagHashMaxLength = tagHashMaxLength;
-	}
+    /**
+     * @param callIdMaxLength the callIdMaxLength to set
+     */
+    public void setCallIdMaxLength(int callIdMaxLength) {
+        this.callIdMaxLength = callIdMaxLength;
+    }
+
+    /**
+     * @return the tagHashMaxLength
+     */
+    public int getTagHashMaxLength() {
+        return tagHashMaxLength;
+    }
+
+    /**
+     * @param tagHashMaxLength the tagHashMaxLength to set
+     */
+    public void setTagHashMaxLength(int tagHashMaxLength) {
+        this.tagHashMaxLength = tagHashMaxLength;
+    }
 }

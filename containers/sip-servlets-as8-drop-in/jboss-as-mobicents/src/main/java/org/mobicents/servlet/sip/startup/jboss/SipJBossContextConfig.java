@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -84,13 +84,13 @@ import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
  * defined servlets. It extends the JbossContextConfig to be able to load sip servlet applications.
  *
  * @author Jean Deruelle
- * @author alerant.appngin@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  *
  */
 public class SipJBossContextConfig{
     DeploymentUnit deploymentUnit;
     UndertowDeploymentInfoService deploymentInfoservice;
-    
+
     public SipJBossContextConfig(DeploymentUnit deploymentUnitContext, UndertowDeploymentInfoService deploymentInfoservice) {
         this.deploymentUnit = deploymentUnitContext;
         this.deploymentInfoservice = deploymentInfoservice;
@@ -137,7 +137,7 @@ public class SipJBossContextConfig{
 
     /**
      * @param convergedMetaData
-     * @throws Exception 
+     * @throws Exception
      */
     public void processSipMetaData(JBossConvergedSipMetaData convergedMetaData, SipContextImpl convergedContext) throws Exception {
         //UndertowSipContextDeployment convergedContext = (CatalinaSipContext) context;
@@ -201,10 +201,10 @@ public class SipJBossContextConfig{
             convergedContext.setSipApplicationSessionTimeout(convergedMetaData.getSipSessionConfig().getSessionTimeout());
         }
 
-        // http://code.google.com/p/sipservlets/issues/detail?id=158 : 	Implement Missing SIP Security in AS7
+        // http://code.google.com/p/sipservlets/issues/detail?id=158 : Implement Missing SIP Security in AS7
         String securityDomain = convergedMetaData.getSecurityDomain();
         //TODO:convergedContext.setSecurityDomain(securityDomain);
-        
+
         // sip security contstraints
         /*TODO:List<SipSecurityConstraintMetaData> sipConstraintMetaDatas = convergedMetaData.getSipSecurityConstraints();
         if (sipConstraintMetaDatas != null) {
@@ -312,7 +312,7 @@ public class SipJBossContextConfig{
 
                 Class<? extends Servlet> servletClass = (Class<? extends Servlet>) convergedContext.getSipContextClassLoader().loadClass(value.getServletClass());
                 ManagedReferenceFactory creator = deploymentInfoservice.getComponentRegistryInjectedValue().getValue().createInstanceFactory(servletClass);
-                
+
                 ServletInfo servletInfo = null;
                 if (creator != null) {
                     InstanceFactory<Servlet> factory = createInstanceFactory(creator);
@@ -320,7 +320,7 @@ public class SipJBossContextConfig{
                 }else{
                     servletInfo = new ServletInfo(value.getName(), servletClass);
                 }
-                
+
                 // no main servlet defined in the sip.xml we take the name of the only sip servlet present
                 if (!servletSelectionSet) {
                     convergedContext.setMainServlet(value.getName());
@@ -355,17 +355,17 @@ public class SipJBossContextConfig{
         }
         final SipApplicationKeyMethodInfo sipApplicationKeyMethodInfo = convergedMetaData.getSipApplicationKeyMethodInfo();
         if(sipApplicationKeyMethodInfo != null) {
-	        final String sipApplicationKeyClassName = sipApplicationKeyMethodInfo.getClassName();
-	        final String sipApplicationKeyMethodName = sipApplicationKeyMethodInfo.getMethodName();
+            final String sipApplicationKeyClassName = sipApplicationKeyMethodInfo.getClassName();
+            final String sipApplicationKeyMethodName = sipApplicationKeyMethodInfo.getMethodName();
 
-	        ClassLoader contextCLoader = convergedContext.getSipContextClassLoader();
-	        Method sipApplicationKeyMethod = null;
-	        try {
-	        	sipApplicationKeyMethod = Class.forName(sipApplicationKeyClassName, true, contextCLoader).getMethod(sipApplicationKeyMethodName, SipServletRequest.class);
-	        } catch (Exception e) {
-	        	throw e;
-	        }
-	        convergedContext.setSipApplicationKeyMethod(sipApplicationKeyMethod);
+            ClassLoader contextCLoader = convergedContext.getSipContextClassLoader();
+            Method sipApplicationKeyMethod = null;
+            try {
+                sipApplicationKeyMethod = Class.forName(sipApplicationKeyClassName, true, contextCLoader).getMethod(sipApplicationKeyMethodName, SipServletRequest.class);
+            } catch (Exception e) {
+                throw e;
+            }
+            convergedContext.setSipApplicationKeyMethod(sipApplicationKeyMethod);
         }
         convergedContext.setConcurrencyControlMode(convergedMetaData.getConcurrencyControlMode());
         //TODO:convergedContext.setWrapperClass(StandardWrapper.class.getName());
@@ -391,7 +391,7 @@ public class SipJBossContextConfig{
             }
         };
     }
-    
+
     public static MatchingRule buildRule(ConditionMetaData condition) {
 
         if (condition instanceof AndMetaData) {

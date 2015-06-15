@@ -1,5 +1,5 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -38,65 +38,65 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
 /**
- *@author alerant.appngin@gmail.com
+ *@author kakonyi.istvan@alerant.hu
  */
-public class UndertowDeploymentInfoReflectionService implements Service<UndertowDeploymentInfoReflectionService> {
-    public static final ServiceName SERVICE_NAME = ServiceName.of("UndertowDeploymentInfoReflectionService");
+public class UndertowSipDeploymentInfoService implements Service<UndertowSipDeploymentInfoService> {
+    public static final ServiceName SERVICE_NAME = ServiceName.of("UndertowSipDeploymentInfoService");
 
     private InjectedValue<UndertowDeploymentInfoService> deploymentInfoService = new InjectedValue<UndertowDeploymentInfoService>();
 
     private DeploymentUnit deploymentUnit = null;
     private SIPWebContext webContext = null;
-    
-    public UndertowDeploymentInfoReflectionService(DeploymentUnit deploymentUnit) throws DeploymentUnitProcessingException{
-    	this.deploymentUnit = deploymentUnit;
+
+    public UndertowSipDeploymentInfoService(DeploymentUnit deploymentUnit) throws DeploymentUnitProcessingException{
+        this.deploymentUnit = deploymentUnit;
 
         //lets init sipWebContext:
-    	this.webContext = new SIPWebContext();
+        this.webContext = new SIPWebContext();
         try {
-        	this.webContext.addDeploymentUnit(this.deploymentUnit);
+            this.webContext.addDeploymentUnit(this.deploymentUnit);
 
-        	this.webContext.initDispatcher();
+            this.webContext.initDispatcher();
             this.webContext.prepareServletContextServices();
             this.webContext.attachContext();
         } catch (ServletException e) {
-			throw new DeploymentUnitProcessingException(e);
-		}
+            throw new DeploymentUnitProcessingException(e);
+        }
     }
 
     @Override
-    public UndertowDeploymentInfoReflectionService getValue() throws IllegalStateException, IllegalArgumentException {
+    public UndertowSipDeploymentInfoService getValue() throws IllegalStateException, IllegalArgumentException {
         return this;
     }
 
     @Override
     public void start(StartContext context) throws StartException {
-        ServerLogger.DEPLOYMENT_LOGGER.debug("UndertowDeploymentInfoReflectionService.start()");
+        ServerLogger.DEPLOYMENT_LOGGER.debug("UndertowSipDeploymentInfoService.start()");
         SIPContextFactory factory = this.deploymentUnit.getAttachment(SIPContextFactory.ATTACHMENT);
 
         //lets add our custom sip session manager factory:
         if(this.deploymentInfoService!=null && this.deploymentInfoService.getValue()!=null && this.deploymentInfoService.getValue().getValue()!=null){
             DeploymentInfo info =  this.deploymentInfoService.getValue().getValue();
-            
+
             DeploymentInfoFacade facade = new DeploymentInfoFacade();
             try {
                 facade.addDeploymentInfo(info);
                 facade.setSessionManagerFactory(new ConvergedSessionManagerFactory());
                 this.deploymentUnit.putAttachment(DeploymentInfoFacade.ATTACHMENT_KEY, facade);
             } catch (ServletException e) {
-                throw new StartException(e);  
+                throw new StartException(e);
             }
         }else{
-            throw new StartException("DeploymentInfoService not properly initialized!");  
+            throw new StartException("DeploymentInfoService not properly initialized!");
         }
-        
-        try {
-			this.webContext = factory.addDeplyomentUnitToContext(this.deploymentUnit, this.deploymentInfoService.getValue(), webContext);
-		} catch (ServletException e) {
-			throw new StartException(e);  
-		}
 
-        ServerLogger.DEPLOYMENT_LOGGER.debug("UndertowDeploymentInfoReflectionService.start() finished");
+        try {
+            this.webContext = factory.addDeplyomentUnitToContext(this.deploymentUnit, this.deploymentInfoService.getValue(), webContext);
+        } catch (ServletException e) {
+            throw new StartException(e);
+        }
+
+        ServerLogger.DEPLOYMENT_LOGGER.debug("UndertowSipDeploymentInfoService.start() finished");
     }
 
     public InjectedValue<UndertowDeploymentInfoService> getDeploymentInfoServiceInjectedValue() {
