@@ -185,7 +185,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	// This field is only used in CANCEL requests where we need the INVITe transaction
 	private transient Transaction inviteTransactionToCancel;
 	
-	private boolean orphanRequest;
+	private boolean isRecordRoute = false;
 	
 	// needed for externalizable
 	public SipServletRequestImpl () {}
@@ -215,6 +215,11 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		 */
 		boolean isSystemHeader = JainSipUtils.SYSTEM_HEADERS.contains(hName);
 
+		// https://github.com/Mobicents/sip-servlets/issues/63 Lync Interop
+		if(headerName.equalsIgnoreCase(RecordRouteHeader.NAME) && isRecordRoute) {
+			return ModifiableRule.Modifiable;
+		}
+		
 		if (isSystemHeader) {
 			return ModifiableRule.NotModifiable;
 		}
@@ -2608,6 +2613,11 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		}
 	}
 
+	@Override
+	public void setRecordRoute(boolean recordRoute) {
+		this.isRecordRoute = recordRoute;
+	}
+	
 	// Issue 2354 : need to clone the original request to create the forked response
 	public Object clone() {
 		SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest((Request)message, sipSession, getTransaction(), null, createDialog);
