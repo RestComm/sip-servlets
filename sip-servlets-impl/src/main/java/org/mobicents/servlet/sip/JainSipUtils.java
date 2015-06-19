@@ -20,6 +20,7 @@
 package org.mobicents.servlet.sip;
 
 
+import gov.nist.javax.sip.ListeningPointExt;
 import gov.nist.javax.sip.TransactionExt;
 import gov.nist.javax.sip.header.extensions.ReferredByHeader;
 import gov.nist.javax.sip.header.extensions.SessionExpiresHeader;
@@ -704,7 +705,16 @@ public final class JainSipUtils {
 								&& transportParam.equalsIgnoreCase(ListeningPoint.TCP)) || 
 								request.getContentLength().getContentLength() > 4096) {
 							transport = ListeningPoint.TCP;
+						} 
+						// https://github.com/Mobicents/sip-servlets/issues/62
+						else if (transportParam != null
+								&& transportParam.equalsIgnoreCase(ListeningPointExt.WS)) {
+							transport = ListeningPointExt.WS;
+						} else if (transportParam != null
+								&& transportParam.equalsIgnoreCase(ListeningPointExt.WSS)) {
+							transport = ListeningPointExt.WSS;
 						}
+						
 					}
 				}
 			}
@@ -730,6 +740,14 @@ public final class JainSipUtils {
 							&& transportParam.equalsIgnoreCase(ListeningPoint.TCP)) || 
 							request.getContentLength().getContentLength() > 4096) {
 						transport = ListeningPoint.TCP;
+					} 
+					// https://github.com/Mobicents/sip-servlets/issues/62
+					else if (transportParam != null
+							&& transportParam.equalsIgnoreCase(ListeningPointExt.WS)) {
+						transport = ListeningPointExt.WS;
+					} else if (transportParam != null
+							&& transportParam.equalsIgnoreCase(ListeningPointExt.WSS)) {
+						transport = ListeningPointExt.WSS;
 					}
 				}
 			}
