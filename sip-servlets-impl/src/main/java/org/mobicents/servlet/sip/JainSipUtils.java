@@ -670,6 +670,9 @@ public final class JainSipUtils {
 		// check if the transport is present in the message application data for maximizing perf
 		String transport = (String)((SIPMessage)message).getApplicationData();
 		if(transport != null) {			
+			if(logger.isDebugEnabled()) {
+				logger.debug("AppData Transport " + transport);
+			}
 			return transport;
 		}
 		//if the request uri doesn't have any param, the request can still be on TCP so we check the topmost via header
@@ -678,6 +681,9 @@ public final class JainSipUtils {
 			String viaTransport = topmostViaHeader.getTransport();
 			if(viaTransport != null && viaTransport.length() > 0) {
 				transport = viaTransport;
+				if(logger.isDebugEnabled()) {
+					logger.debug("Via Transport " + transport);
+				}
 			}
 		}
 		
@@ -695,7 +701,10 @@ public final class JainSipUtils {
 						transport = ListeningPoint.TLS;
 					} else {
 						String transportParam = sipURI.getTransportParam();
-
+						if(logger.isDebugEnabled()) {
+							logger.debug("Route Transport Param " + transport);
+						}
+						
 						if (transportParam != null
 								&& transportParam.equalsIgnoreCase(ListeningPoint.TLS)) {
 							transport = ListeningPoint.TLS;
@@ -731,6 +740,10 @@ public final class JainSipUtils {
 				} else {
 					String transportParam = sruri.getTransportParam();
 
+					if(logger.isDebugEnabled()) {
+						logger.debug("Request URI Param " + transport);
+					}
+					
 					if (transportParam != null
 							&& transportParam.equalsIgnoreCase(ListeningPoint.TLS)) {
 						transport = ListeningPoint.TLS;
