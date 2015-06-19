@@ -52,6 +52,7 @@ import javax.servlet.sip.URI;
 import javax.sip.ListeningPoint;
 
 import org.apache.log4j.Logger;
+import org.mobicents.javax.servlet.sip.SipServletRequestExt;
 import org.mobicents.javax.servlet.sip.SipSessionExt;
 import org.mobicents.javax.servlet.sip.dns.DNSResolver;
 import org.mobicents.servlet.sip.SipConnector;
@@ -385,6 +386,11 @@ public class ShootistSipServlet
 				}
 			} else {
 				sipServletRequest =	sipFactory.createRequest(sipApplicationSession, method, sipFactory.createAddress(fromURI, "from display"), sipFactory.createAddress(toURI,"to display"));
+			}
+			String setRecordRoute = ce.getServletContext().getInitParameter("setRecordRoute");
+			if(setRecordRoute != null) {
+				((SipServletRequestExt)sipServletRequest).setRecordRoute(true);
+				sipServletRequest.addHeader("Record-Route", "sip:mobicents.org");
 			}
 			
 			String authHeader = ce.getServletContext().getInitParameter("auth-header");

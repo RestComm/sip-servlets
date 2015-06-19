@@ -42,6 +42,7 @@ import javax.sip.header.Header;
 import javax.sip.header.ProxyAuthenticateHeader;
 import javax.sip.header.ProxyAuthorizationHeader;
 import javax.sip.header.ReasonHeader;
+import javax.sip.header.RecordRouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.UserAgentHeader;
 import javax.sip.header.ViaHeader;
@@ -320,6 +321,24 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		assertTrue((receiver.getInviteRequest().getHeader("Contact").toString().contains("uriparam=urivalue")));
 		assertTrue((receiver.getInviteRequest().getHeader("Contact").toString().contains("headerparam1=headervalue1")));
 		assertTrue(receiver.getByeReceived());		
+	}
+	
+	// Non regression for https://github.com/Mobicents/sip-servlets/issues/63
+	public void testShootistSetRecordRoute() throws Exception {
+//		receiver.sendInvite();
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();
+		deployApplication("setRecordRoute", "true");
+		Thread.sleep(TIMEOUT);
+		assertNotNull(receiver.getInviteRequest().getHeader(RecordRouteHeader.NAME));
 	}
 	
 	/**
