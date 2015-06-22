@@ -1098,7 +1098,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			}
 			
 			// adding via header and update via branch if null
-			checkViaHeaderAddition();
+			checkViaHeaderAddition(hop);
 						
 			final String transport = JainSipUtils.findTransport(request);
 			if(sessionTransport == null) {
@@ -1113,8 +1113,8 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		    // Bad choice of connectors when multiple of the same transport are available			
 			String outboundInterface = session.getOutboundInterface();
 			if(outboundInterface != null) {
-				if(logger.isTraceEnabled()) {
-					logger.trace("Trying to find listening point with outbound interface " + outboundInterface);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Trying to find listening point with outbound interface " + outboundInterface);
 				}
 				javax.sip.address.SipURI outboundInterfaceURI = null;			
 				try {
@@ -1125,8 +1125,8 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				matchingListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(outboundInterfaceURI, false);
 			}
 			if(matchingListeningPoint == null) {
-				if(logger.isTraceEnabled()) {
-					logger.trace("Trying to find listening point with transport " + transport);
+				if(logger.isDebugEnabled()) {
+					logger.debug("Trying to find listening point with transport " + transport);
 				}
 				matchingListeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(
 						transport, false);
@@ -1370,8 +1370,10 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				if(transactionApplicationData.getHops() != null && transactionApplicationData.getHops().size() > 0) {
 					request.removeFirst(RouteHeader.NAME);
 					// https://code.google.com/p/sipservlets/issues/detail?id=250 retry directly on TCP
-                    visitNextHop();
-                    return;
+                    boolean nextHopVisited = visitNextHop();
+                    if(nextHopVisited) {
+                    	return;
+                    }
 				}
 				request.removeFirst(ViaHeader.NAME);
 				request.removeFirst(ContactHeader.NAME);
@@ -1416,7 +1418,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	/**
 	 * 
 	 */
-	private void checkViaHeaderAddition() throws ParseException {
+	private void checkViaHeaderAddition(Hop hop) throws ParseException {
 		final SipNetworkInterfaceManager sipNetworkInterfaceManager = sipFactoryImpl.getSipNetworkInterfaceManager();		
 		final Request request = (Request) super.message;
 		final MobicentsSipSession session = getSipSession();
@@ -1450,6 +1452,29 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			final String branch = JainSipUtils.createBranch(sipApplicationSession.getKey().getId(),  sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(session.getKey().getApplicationName()));			
 			viaHeader.setBranch(branch);
 		}
+		// https://github.com/Mobicents/sip-servlets/issues/62 modify the Via transport to match either the hop, the route or the request URI transport
+		String transportFromRouteOrRequestUri = JainSipUtils.findRouteOrRequestUriTransport((Request) message);
+		String hopTransport = null;
+		if(hop != null) {
+			hopTransport = hop.getTransport();
+		}
+		String viaTransport = viaHeader.getTransport();
+		if(logger.isDebugEnabled()) {
+	    	logger.debug("viaHeader transport " + viaTransport + 
+	    			", hopTransport " + hopTransport + ", transportFromRouteOrRequestUri " + transportFromRouteOrRequestUri);
+	    }
+		if(hopTransport != null && viaTransport.equalsIgnoreCase(hopTransport)) {
+			if(logger.isDebugEnabled()) {
+		    	logger.debug("updating via transport to hopTransport " + hopTransport);
+		    }
+			viaHeader.setTransport(hopTransport);
+		} else if (transportFromRouteOrRequestUri != null && viaTransport.equalsIgnoreCase(transportFromRouteOrRequestUri)) {
+			if(logger.isDebugEnabled()) {
+		    	logger.debug("updating via transport to transportFromRouteOrRequestUri " + transportFromRouteOrRequestUri);
+		    }
+			viaHeader.setTransport(transportFromRouteOrRequestUri);
+		}
+		
 	}
 
 	/**
@@ -1509,7 +1534,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				
 				
 				if(!viaHeader.getHost().equalsIgnoreCase(ipAddressToCheckAgainst) || 
-						viaHeader.getTransport().equalsIgnoreCase(sipConnector.getTransport()) ||
+						!viaHeader.getTransport().equalsIgnoreCase(sipConnector.getTransport()) ||
 						viaHeader.getPort() != sipConnector.getPort()) {
 					if(logger.isTraceEnabled()) {
 						logger.trace("Via " + viaHeader + " different than outbound SIP Connector picked by the container " + sipConnector + " , updating it");

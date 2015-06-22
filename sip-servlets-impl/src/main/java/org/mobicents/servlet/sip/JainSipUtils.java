@@ -688,86 +688,57 @@ public final class JainSipUtils {
 		}
 		
 		if(transport == null && message instanceof Request) {
+			// https://github.com/Mobicents/sip-servlets/issues/62
+			transport = findRouteOrRequestUriTransport((Request) message);
+		}
 			
-			Request request = (Request)message;
-
-			RouteHeader route = (RouteHeader) request.getHeader(RouteHeader.NAME);
-			if(route != null) {
-				transport = ListeningPoint.UDP;
-				URI uri = route.getAddress().getURI();
-				if(uri instanceof SipURI) {
-					SipURI sipURI = (SipURI) uri;
-					if(sipURI.isSecure()) {
-						transport = ListeningPoint.TLS;
-					} else {
-						String transportParam = sipURI.getTransportParam();
-						if(logger.isDebugEnabled()) {
-							logger.debug("Route Transport Param " + transport);
-						}
-						
-						if (transportParam != null
-								&& transportParam.equalsIgnoreCase(ListeningPoint.TLS)) {
-							transport = ListeningPoint.TLS;
-						}
-						//Fix by Filip Olsson for Issue 112
-						else if ((transportParam != null
-								&& transportParam.equalsIgnoreCase(ListeningPoint.TCP)) || 
-								request.getContentLength().getContentLength() > 4096) {
-							transport = ListeningPoint.TCP;
-						} 
-						// https://github.com/Mobicents/sip-servlets/issues/62
-						else if (transportParam != null
-								&& transportParam.equalsIgnoreCase(ListeningPointExt.WS)) {
-							transport = ListeningPointExt.WS;
-						} else if (transportParam != null
-								&& transportParam.equalsIgnoreCase(ListeningPointExt.WSS)) {
-							transport = ListeningPointExt.WSS;
-						}
-						
-					}
-				}
-			}
-		}
-
-		if(transport == null && message instanceof Request) {
-			transport = ListeningPoint.UDP;
-			Request request = (Request)message;
-			URI ruri = request.getRequestURI();
-			if(ruri instanceof SipURI) {
-				SipURI sruri = ((javax.sip.address.SipURI) ruri);
-				if(sruri.isSecure()) {
-					transport = ListeningPoint.TLS;
-				} else {
-					String transportParam = sruri.getTransportParam();
-
-					if(logger.isDebugEnabled()) {
-						logger.debug("Request URI Param " + transport);
-					}
-					
-					if (transportParam != null
-							&& transportParam.equalsIgnoreCase(ListeningPoint.TLS)) {
-						transport = ListeningPoint.TLS;
-					}
-					//Fix by Filip Olsson for Issue 112
-					else if ((transportParam != null
-							&& transportParam.equalsIgnoreCase(ListeningPoint.TCP)) || 
-							request.getContentLength().getContentLength() > 4096) {
-						transport = ListeningPoint.TCP;
-					} 
-					// https://github.com/Mobicents/sip-servlets/issues/62
-					else if (transportParam != null
-							&& transportParam.equalsIgnoreCase(ListeningPointExt.WS)) {
-						transport = ListeningPointExt.WS;
-					} else if (transportParam != null
-							&& transportParam.equalsIgnoreCase(ListeningPointExt.WSS)) {
-						transport = ListeningPointExt.WSS;
-					}
-				}
-			}
-		}
 		// storing the transport is present in the message application data for maximizing perf 
 		// in speeding up the retrieval later on
 		((SIPMessage)message).setApplicationData(transport);
+		return transport;
+	}
+	
+	// https://github.com/Mobicents/sip-servlets/issues/62
+	public static String findRouteOrRequestUriTransport(Request request) {
+		RouteHeader route = (RouteHeader) request.getHeader(RouteHeader.NAME);
+		if(route != null) {
+			URI uri = route.getAddress().getURI();
+			return findURITransport(uri, request.getContentLength().getContentLength());
+		}
+		URI ruri = request.getRequestURI();
+		return findURITransport(ruri, request.getContentLength().getContentLength());
+	}
+	// https://github.com/Mobicents/sip-servlets/issues/62
+	public static String findURITransport(URI uri, int messageContentLength) {
+		String transport = ListeningPoint.UDP;
+		if(uri instanceof SipURI) {
+			SipURI sipURI = (SipURI) uri;
+			if(sipURI.isSecure()) {
+				transport = ListeningPoint.TLS;
+			} else {
+				String transportParam = sipURI.getTransportParam();
+
+				if (transportParam != null
+						&& transportParam.equalsIgnoreCase(ListeningPoint.TLS)) {
+					transport = ListeningPoint.TLS;
+				}
+				//Fix by Filip Olsson for Issue 112
+				else if ((transportParam != null
+						&& transportParam.equalsIgnoreCase(ListeningPoint.TCP)) || 
+						messageContentLength > 4096) {
+					transport = ListeningPoint.TCP;
+				} 
+				// https://github.com/Mobicents/sip-servlets/issues/62
+				else if (transportParam != null
+						&& transportParam.equalsIgnoreCase(ListeningPointExt.WS)) {
+					transport = ListeningPointExt.WS;
+				} else if (transportParam != null
+						&& transportParam.equalsIgnoreCase(ListeningPointExt.WSS)) {
+					transport = ListeningPointExt.WSS;
+				}
+				
+			}
+		}
 		return transport;
 	}
 	

@@ -495,12 +495,12 @@ public class ShootistSipServlet
 						
 					}
 				}	
-				try {
-					sipServletRequest.setRequestURI(sipFactory.createURI("sip:bob@192.168.2.43:53907;transport=ws"));
-				} catch (ServletParseException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+//				try {
+					sipServletRequest.setRequestURI(requestURI);
+//				} catch (ServletParseException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
 				if(ce.getServletContext().getInitParameter("enum") != null) {
 					sipServletRequest.setRequestURI(toURI);
 				}
