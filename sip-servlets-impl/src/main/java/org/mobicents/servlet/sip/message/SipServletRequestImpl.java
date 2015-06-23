@@ -1463,12 +1463,12 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 	    	logger.debug("viaHeader transport " + viaTransport + 
 	    			", hopTransport " + hopTransport + ", transportFromRouteOrRequestUri " + transportFromRouteOrRequestUri);
 	    }
-		if(hopTransport != null && viaTransport.equalsIgnoreCase(hopTransport)) {
+		if(hopTransport != null && !viaTransport.equalsIgnoreCase(hopTransport)) {
 			if(logger.isDebugEnabled()) {
 		    	logger.debug("updating via transport to hopTransport " + hopTransport);
 		    }
 			viaHeader.setTransport(hopTransport);
-		} else if (transportFromRouteOrRequestUri != null && viaTransport.equalsIgnoreCase(transportFromRouteOrRequestUri)) {
+		} else if (transportFromRouteOrRequestUri != null && !viaTransport.equalsIgnoreCase(transportFromRouteOrRequestUri)) {
 			if(logger.isDebugEnabled()) {
 		    	logger.debug("updating via transport to transportFromRouteOrRequestUri " + transportFromRouteOrRequestUri);
 		    }
