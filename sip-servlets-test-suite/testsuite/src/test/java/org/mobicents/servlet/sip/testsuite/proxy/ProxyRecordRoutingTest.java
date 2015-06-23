@@ -260,6 +260,29 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 	}
 	
 	/*
+	 * https://github.com/Mobicents/sip-servlets/issues/63
+	 */
+	public void testRecordRouteFQDNUriProxying() throws Exception {
+		deployApplication();
+		String fromName = "record-route-uri";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "proxy-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+						
+		receiver.setFinalResponseToSend(302);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false);		
+		Thread.sleep(TIMEOUT);
+		assertEquals(200,sender.getFinalResponseStatus());		
+		assertTrue(sender.isAckSent());
+		assertTrue(((RecordRouteHeader)receiver.getInviteRequest().getHeader(RecordRouteHeader.NAME)).getAddress().getURI().toString().contains("localhost"));
+	}
+	
+	/*
 	 * Non Regression test for https://code.google.com/p/sipservlets/issues/detail?id=2
 	 */
 	public void testCancelRedirectProxying() throws Exception {

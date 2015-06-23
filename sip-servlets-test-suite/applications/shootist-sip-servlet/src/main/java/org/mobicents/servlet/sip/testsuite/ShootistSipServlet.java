@@ -387,11 +387,6 @@ public class ShootistSipServlet
 			} else {
 				sipServletRequest =	sipFactory.createRequest(sipApplicationSession, method, sipFactory.createAddress(fromURI, "from display"), sipFactory.createAddress(toURI,"to display"));
 			}
-			String setRecordRoute = ce.getServletContext().getInitParameter("setRecordRoute");
-			if(setRecordRoute != null) {
-				((SipServletRequestExt)sipServletRequest).setRecordRoute(true);
-				sipServletRequest.addHeader("Record-Route", "sip:mobicents.org");
-			}
 			
 			String authHeader = ce.getServletContext().getInitParameter("auth-header");
 			if(authHeader != null) {

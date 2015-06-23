@@ -351,6 +351,9 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			proxy.setRecordRoute(recordRoute);
 			proxy.setSupervised(true);
 			if(recordRoute) {
+				if(fromURI.getUser().contains("record-route-uri")) {
+					((ProxyExt)proxy).setRecordRouteURI(sipFactory.createSipURI(null, "localhost"));
+				}
 				proxy.getRecordRouteURI().setParameter("testparamname", "TESTVALUE");
 				if((via.contains("TCP") || via.contains("tcp")) && fromURI.getUser().contains("tcp-record-route-tcp")) {
 					proxy.getRecordRouteURI().setTransportParam("TCP");
