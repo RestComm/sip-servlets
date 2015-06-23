@@ -102,6 +102,8 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	private int seqSearchTimeout;
 	private boolean supervised = true; 
 	private boolean recordRoutingEnabled;
+	// https://github.com/Mobicents/sip-servlets/issues/63
+	private boolean appSpecifiedRecordRoutingEnabled = false;
 	private boolean parallel = true;
 	private boolean addToPath;
 	private boolean sipOutboundSupport;
@@ -1195,5 +1197,16 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 		this.sipOutboundSupport = sipOutboundSupport;
 	}
 
+	@Override
+	public void setRecordRouteURI(SipURI uri) {
+		recordRouteURI = uri;
+		appSpecifiedRecordRoutingEnabled = true;
+	}
 
+	/**
+	 * @return the userSpecifiedRecordRoutingEnabled
+	 */
+	public boolean isAppSpecifiedRecordRoutingEnabled() {
+		return appSpecifiedRecordRoutingEnabled;
+	}
 }

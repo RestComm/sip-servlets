@@ -251,7 +251,9 @@ public class ProxyUtils {
 				if(Request.ACK.equals(method) && proxyBranchMatchingRequest != null && proxyBranchMatchingRequest.getTransaction() != null
 						&& proxyBranchMatchingRequest.getTransaction().getState() != TransactionState.TERMINATED) {
 					branchId = proxyBranchMatchingRequest.getTransaction().getBranchId();
-					logger.debug("reusing original branch id " + branchId);
+					if(logger.isDebugEnabled()){
+						logger.debug("reusing original branch id " + branchId);
+					}
 				} else {
 					branchId = JainSipUtils.createBranch(sipAppKey.getId(),  appName);
 				}
@@ -272,7 +274,9 @@ public class ProxyUtils {
 				if(Request.ACK.equals(method) && proxyBranchMatchingRequest != null && proxyBranchMatchingRequest.getTransaction() != null
 						&& proxyBranchMatchingRequest.getTransaction().getState() != TransactionState.TERMINATED) {
 					branchId = proxyBranchMatchingRequest.getTransaction().getBranchId();
-					logger.debug("reusing original branch id " + branchId);
+					if(logger.isDebugEnabled()){
+						logger.debug("reusing original branch id " + branchId);
+					}
 				} else {
 					branchId = JainSipUtils.createBranch(sipAppKey.getId(),  appName);
 				}
@@ -330,7 +334,18 @@ public class ProxyUtils {
 					clonedRequest.addFirst(recordRouteHeader);
 				}
 				javax.sip.address.SipURI rrURI = null;
-				if(proxy.getOutboundInterface() == null) {
+				if(proxy.isAppSpecifiedRecordRoutingEnabled()) {
+					// https://github.com/Mobicents/sip-servlets/issues/63
+					rrURI = ((SipURIImpl)proxy.getRecordRouteURI()).getSipURI();
+					if(logger.isDebugEnabled()){
+						logger.debug("Using Record Route URI specified by application on Proxy " + rrURI);
+					}
+				} else if ( proxyBranch.isAppSpecifiedRecordRoutingEnabled()) {
+					rrURI = ((SipURIImpl)proxyBranch.getRecordRouteURI()).getSipURI();
+					if(logger.isDebugEnabled()){
+						logger.debug("Using Record Route URI specified by application on ProxyBranch " + rrURI);
+					}
+				} else if(proxy.getOutboundInterface() == null) {
 					rrURI = JainSipUtils.createRecordRouteURI(sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest, outboundTransport);
 				} else {
 					rrURI = ((SipURIImpl) proxy.getOutboundInterface()).getSipURI();

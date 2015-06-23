@@ -97,6 +97,8 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	private transient SipURI outboundInterface;
 	private transient SipURI recordRouteURI;
 	private boolean recordRoutingEnabled;
+	// https://github.com/Mobicents/sip-servlets/issues/63
+	private boolean appSpecifiedRecordRoutingEnabled = false;
 	private boolean recurse;
 	private transient SipURI pathURI;
 	private boolean started;
@@ -1172,6 +1174,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		canceled = in.readBoolean();
 		isAddToPath = in.readBoolean();
 		waitingForPrack = in.readBoolean();
+		appSpecifiedRecordRoutingEnabled = in.readBoolean();
 	}
 
 	public void writeExternal(ObjectOutput out) throws IOException {
@@ -1184,6 +1187,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		out.writeBoolean(canceled);
 		out.writeBoolean(isAddToPath);
 		out.writeBoolean(waitingForPrack);
+		out.writeBoolean(appSpecifiedRecordRoutingEnabled);
 	}
 	
 	/*
@@ -1238,4 +1242,15 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		return targetURI;
 	}
 
+	@Override
+	public void setRecordRouteURI(SipURI uri) {
+		this.recordRouteURI = uri;
+	}
+
+	/**
+	 * @return the userSpecifiedRecordRoutingEnabled
+	 */
+	public boolean isAppSpecifiedRecordRoutingEnabled() {
+		return appSpecifiedRecordRoutingEnabled;
+	}
 }

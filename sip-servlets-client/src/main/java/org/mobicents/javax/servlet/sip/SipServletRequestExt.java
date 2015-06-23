@@ -66,22 +66,6 @@ public interface SipServletRequestExt extends SipServletRequest {
 	void addAuthHeader(SipServletResponse challengeResponse, String username, String password, boolean cacheCredentials);
 	
 	/**
-     * Allow setting/modifying RecordRoute Header on a SipServletRequest to allow interoperability with Lync.
-     * Lync allows connections and establishing dialogs. Lync doesn't work well with in-dialog requests. 
-     * If there is no record route, Lync doesn’t send the request. There is no trace of an attempt in its logs.
-     * 
-     * If the record route is present, but using an IP address, 
-     * Lync ignores the record route address and instead sends to a fixed static destination previously administered.
-     * 
-     * Only if the record route is present and an FQDN accessible through DNS does Lync send the in-dialog request back to the sender.
-     * 
-     * Lync requires TLS on all its connections
-     * 
-     * @see https://github.com/Mobicents/sip-servlets/issues/63
-     */
-	void setRecordRoute(boolean recordRoute);
-	
-	/**
 	 * This flag indicates that the sessions for this request has been lost. getSession and getApplicationSession() will return null 
 	 * and these request will just be proxied outside the container. This feature can only work for proxy applications with main-servlet
 	 * declarations. This feature is enabled by the setRouteOrphanRequests method in SipFactoryExt.

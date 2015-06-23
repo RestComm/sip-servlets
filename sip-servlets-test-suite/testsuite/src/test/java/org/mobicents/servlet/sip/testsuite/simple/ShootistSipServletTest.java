@@ -323,24 +323,6 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		assertTrue(receiver.getByeReceived());		
 	}
 	
-	// Non regression for https://github.com/Mobicents/sip-servlets/issues/63
-	public void testShootistSetRecordRoute() throws Exception {
-//		receiver.sendInvite();
-		receiverProtocolObjects =new ProtocolObjects(
-				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
-					
-		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
-		SipProvider senderProvider = receiver.createProvider();			
-		
-		senderProvider.addSipListener(receiver);
-		
-		receiverProtocolObjects.start();
-		tomcat.startTomcat();
-		deployApplication("setRecordRoute", "true");
-		Thread.sleep(TIMEOUT);
-		assertNotNull(receiver.getInviteRequest().getHeader(RecordRouteHeader.NAME));
-	}
-	
 	/**
 	 * non regression test for Issue 676 http://code.google.com/p/mobicents/issues/detail?id=676
 	 *  Tags not removed when using SipFactory.createRequest() 
