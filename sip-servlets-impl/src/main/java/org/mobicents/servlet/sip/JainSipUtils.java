@@ -721,14 +721,7 @@ public final class JainSipUtils {
 				if (transportParam != null
 						&& transportParam.equalsIgnoreCase(ListeningPoint.TLS)) {
 					transport = ListeningPoint.TLS;
-				}
-				//Fix by Filip Olsson for Issue 112
-				else if ((transportParam != null
-						&& transportParam.equalsIgnoreCase(ListeningPoint.TCP)) || 
-						messageContentLength > 4096) {
-					transport = ListeningPoint.TCP;
-				} 
-				// https://github.com/Mobicents/sip-servlets/issues/62
+				} // https://github.com/Mobicents/sip-servlets/issues/62
 				else if (transportParam != null
 						&& transportParam.equalsIgnoreCase(ListeningPointExt.WS)) {
 					transport = ListeningPointExt.WS;
@@ -736,6 +729,13 @@ public final class JainSipUtils {
 						&& transportParam.equalsIgnoreCase(ListeningPointExt.WSS)) {
 					transport = ListeningPointExt.WSS;
 				}
+				// moved TCP at the bottom to avoid having TCP being chosen because of message Content Length being too big for WebRTC
+				//Fix by Filip Olsson for Issue 112
+				else if ((transportParam != null
+						&& transportParam.equalsIgnoreCase(ListeningPoint.TCP)) || 
+						messageContentLength > 4096) {
+					transport = ListeningPoint.TCP;
+				} 
 				
 			}
 		}
