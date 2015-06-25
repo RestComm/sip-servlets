@@ -209,10 +209,10 @@
 					var formInvalid;
 				
 					function addApplication(type) {
-						addApplication(type, null, null, null, null, null, null);
+						addApplication(type, null, null, null, null, null, null, null);
 					}
 					
-	    			function addApplication(type, applicationName, subscriberIdentity, routingRegion, routeModifier, routes, order) {		    				
+	    			function addApplication(type, applicationName, subscriberIdentity, routingRegion, routeModifier, routes, order, platformSpecific) {		    				
 						var id = $("#application-"+ type).children().length; //think about it ;
 				        var tabContent = '<div id="'+type+'-application-content-'+ id +'" class="span3">'
 		        		+ '<div class="control-group">	<label class="control-label">SIP Application Name : </label><div class="controls"><select id="'+type+'-application-content-'+ id +'-sipApplicationName" >';		        		
@@ -228,6 +228,10 @@
 		        		if(order != null) {
 		        			appOrder = order; 
 		        		}
+                                        var platformSpecificForm = "";
+                                        if (platformSpecific != null) {
+                                                platformSpecificForm = platformSpecific;
+                                        }
 		        		for (var i = 0; i < applications.length; i++) {
 		        			if(applicationName != null && applications[i] == applicationName) {
 		        				tabContent = tabContent + '<option value="'+ applications[i] +'" selected>'+ applications[i] +'</option>';
@@ -276,7 +280,9 @@
 						}						
 						tabContent = tabContent + '</select> </div>'
 						+ '</div><div class="control-group">	<label class="control-label">Route : </label><div class="controls"><input id="'+type+'-application-content-'+ id +'-route" type="text" class="input-large" placeholder="Route" value="' + route + '"></input> </div>';
-						tabContent = tabContent + '</div><div class="control-group">	<label class="control-label">Order : </label><div class="controls"><input id="'+type+'-application-content-'+ id +'-order" type="text" class="input-large" placeholder="Order" value="' + appOrder + '"></input> </div></div>';						
+						tabContent = tabContent + '</div><div class="control-group">	<label class="control-label">Order : </label><div class="controls"><input id="'+type+'-application-content-'+ id +'-order" type="text" class="input-large" placeholder="Order" value="' + appOrder + '"></input> </div>';
+						tabContent = tabContent + '</div><div class="control-group">	<label class="control-label">Platform-Specific : </label><div class="controls"><input id="'+type+'-application-content-'+ id +'-platformSpecific" type="text" class="input-large" placeholder="Platform-Specific" value="' + platformSpecificForm + '"></input> </div>';
+                                                abContent = tabContent + '</div>';
 						tabContent = tabContent + '<button id="'+type+'-application-content-remove-application-'+ id +'" class="btn btn-small"><i class="icon-remove"></i> Remove Application</button> <br/><br/></div>';					
 						//console.log("tabContent "+ tabContent);
 						//console.log("tabContent "+ $("#application-" + type + "-add-button"));														
@@ -327,6 +333,7 @@
 					    		routeModifiers = $("#" + methodLowserCase + "-application-content-"+ i +"-routeModifiers").val();
 					    		route = $("#" + methodLowserCase + "-application-content-"+ i +"-route").val();
 					    		order = $("#" + methodLowserCase + "-application-content-"+ i +"-order").val();
+                                                        platformSpecific = $("#" + methodLowserCase + "-application-content-"+ i +"-platformSpecific").val();
 					    		if(subscriberIdentity.trim() == "") {
 					    			$("#" + methodLowserCase + "-application-content-"+ i +"-subscriberIdentity").addClass("required");					    			
 					    			formInvalid = true;
@@ -345,7 +352,8 @@
 					    		darApplication = darApplication + "\"" + routingRegion + "\",";
 					    		darApplication = darApplication + "\"" + route + "\",";
 					    		darApplication = darApplication + "\"" + routeModifiers + "\",";					    		
-					    		darApplication = darApplication + "\"" + order + "\"";
+					    		darApplication = darApplication + "\"" + order + "\",";
+                                                        darApplication = darApplication + "\"" + platformSpecific + "\"";
 					    		darApplication = darApplication + ")"
 					    		darMethodConfiguration = darMethodConfiguration + darApplication;
 					    		if(i+1 < tabMethod.length) {
@@ -421,7 +429,8 @@
 	                    			 methodDARInformation.routingRegion.type, 
 	                    			 methodDARInformation.routeModifier, 
 	                    			 methodDARInformation.routes, 
-	                    			 methodDARInformation.order);
+	                    			 methodDARInformation.order,
+                                                 methodDARInformation.regex);
 	                     }
 					}
 					
