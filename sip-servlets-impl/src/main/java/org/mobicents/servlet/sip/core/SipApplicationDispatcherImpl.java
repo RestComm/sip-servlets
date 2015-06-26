@@ -131,6 +131,7 @@ import org.mobicents.servlet.sip.message.TransactionApplicationData;
 import org.mobicents.servlet.sip.proxy.ProxyBranchImpl;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 import org.mobicents.servlet.sip.router.ManageableApplicationRouter;
+import org.mobicents.servlet.sip.utils.NamingThreadFactory;
 
 /**
  * Implementation of the SipApplicationDispatcher interface.
@@ -383,7 +384,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		applicationServerIdHash = GenericUtils.hashString(applicationServerId, tagHashMaxLength);
 		
 		messageDispatcherFactory = new MessageDispatcherFactory(this);
-		congestionControlThreadPool = new ScheduledThreadPoolExecutor(2,
+		congestionControlThreadPool = new ScheduledThreadPoolExecutor(2, new NamingThreadFactory("sip_servlets_congestion_control"),
 				new ThreadPoolExecutor.CallerRunsPolicy());
 		congestionControlThreadPool.prestartAllCoreThreads();	
 		logger.info("AsynchronousThreadPoolExecutor size is " + sipService.getDispatcherThreadPoolSize());		
