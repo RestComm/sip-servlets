@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -193,6 +194,8 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	Set<String> containerDeployedApplicationNames = null;
 	//List of applications defined in the defautl application router properties file
 	Map<String, List<? extends SipApplicationRouterInfo>> defaultSipApplicationRouterInfos;
+        
+        List<AppRouterCondition> conditions;
 	
 	/**
 	 * Default Constructor
@@ -201,6 +204,8 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 		containerDeployedApplicationNames = new HashSet<String>();
 		defaultApplicationRouterParser = new DefaultApplicationRouterParser();
 		defaultSipApplicationRouterInfos = new ConcurrentHashMap<String, List<? extends SipApplicationRouterInfo>>();
+                conditions = new ArrayList();
+                conditions.add(new HeaderRegexCondition());
 	}
 	
 	/**
@@ -373,6 +378,11 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
                         continue; // pattern not matching, just don't call the application
                     }
                 }
+                
+                if (!checkConditions(initialRequest, defaultSipApplicationRouterInfo))
+                {
+                    continue;
+                }
 				
 				boolean isApplicationPresentInContainer = false;
 				synchronized (containerDeployedApplicationNames) {
@@ -435,6 +445,17 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 		}
 		return null;
 	}
+        
+        private boolean checkConditions(SipServletRequest initialRequest, DefaultSipApplicationRouterInfo info) {
+           boolean allConditionsMet = true;
+            Iterator<AppRouterCondition> iterator = conditions.iterator();
+           while (allConditionsMet && iterator.hasNext())
+           {
+               boolean condMet = iterator.next().checkCondition(initialRequest, info);
+               allConditionsMet = allConditionsMet && condMet;
+           }
+           return allConditionsMet;
+        }
 
 	/**
 	 * load the configuration file as defined in appendix C of JSR289
