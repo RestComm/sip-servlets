@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 import javax.servlet.sip.ar.SipApplicationRouterInfo;
 import javax.servlet.sip.ar.SipApplicationRoutingRegion;
@@ -39,6 +40,9 @@ import javax.servlet.sip.ar.SipRouteModifier;
  *
  */
 public class DefaultSipApplicationRouterInfo extends SipApplicationRouterInfo {
+	private static final String HEADER_REGEX_PREFIX = "HEADER";
+        private static final String HEADER_REGEX_SEPARATOR = "_";
+        
 //	private String applicationName;
 //	private SipApplicationRoutingRegion routingRegion;
 //	private String subscriberIdentity;	
@@ -46,6 +50,8 @@ public class DefaultSipApplicationRouterInfo extends SipApplicationRouterInfo {
 //	private SipRouteModifier routeModifier;
 	private int order;
 	private Map<String, String> optionalParameters;
+        
+        private Map<String, Pattern> headerPatternMap = new HashMap();        
 			
 	
 	/**
@@ -69,11 +75,26 @@ public class DefaultSipApplicationRouterInfo extends SipApplicationRouterInfo {
 		this.order = order;
 		try {
 			this.optionalParameters = stringToMap(optionalParameters);
+                        scanForHeaderRegex();
 		} catch (ParseException e) {
 			throw new RuntimeException("Error", e);
 		}
 		
 	}
+        
+        private void scanForHeaderRegex()
+        {
+            for (String optParamName : optionalParameters.keySet())
+            {
+                
+                if (optParamName.startsWith(HEADER_REGEX_PREFIX))
+                {
+                    int headerNamePos = optParamName.indexOf(HEADER_REGEX_SEPARATOR);
+                    //add 1 to found position to skip SEPARATOR char as the key in the map
+                    headerPatternMap.put(optParamName.substring(headerNamePos + 1), Pattern.compile(optionalParameters.get(optParamName)));
+                }
+            }
+        }
 	
 	public static Map<String, String> stringToMap(String str) throws ParseException {
 		
@@ -147,4 +168,8 @@ public class DefaultSipApplicationRouterInfo extends SipApplicationRouterInfo {
 	public void setOptionalParameters(HashMap<String, String> optionalParameters) {
 		this.optionalParameters = optionalParameters;
 	}
+
+    public Map<String, Pattern> getHeaderPatternMap() {
+        return headerPatternMap;
+    }      
 }

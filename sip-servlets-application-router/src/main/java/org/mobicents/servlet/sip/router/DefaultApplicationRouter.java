@@ -175,7 +175,7 @@ import org.apache.log4j.Logger;
 public class DefaultApplicationRouter implements SipApplicationRouter, ManageableApplicationRouter{	
 	private static final String DIRECTION_PARAMETER = "DIRECTION";
 	private static final String REGEX_PARAMETER = "REGEX";
-	private static final String REGEX_POPPED_ROUTE_PARAMETER = "REGEX_POPPED_ROUTE";
+	private static final String REGEX_POPPED_ROUTE_PARAMETER = "REGEX_POPPED_ROUTE";        
 	private static final String DIRECTION_OUTBOUND = "OUTBOUND";
 	private static final String DIRECTION_INBOUND = "INBOUND";
 	//	the logger
@@ -283,7 +283,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 		}
 		return null;
 	}
-
+        
 	private SipApplicationRouterInfo getNextApplication(
 			SipServletRequest initialRequest,
 			Serializable stateInfo,
@@ -454,7 +454,13 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
 	 * @see javax.servlet.sip.ar.SipApplicationRouter#init(java.util.Properties)
 	 */
 	public void init(Properties properties) {
-		init();		
+            defaultApplicationRouterParser.init(properties);
+            try {
+                    defaultSipApplicationRouterInfos = defaultApplicationRouterParser.parse();
+            } catch (ParseException e) {
+                    log.fatal("Impossible to parse the default application router configuration file",e);
+                    throw new IllegalArgumentException("Impossible to parse the default application router configuration file",e);
+            }	
 	}
 	
 	/* (non-Javadoc)

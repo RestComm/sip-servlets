@@ -64,6 +64,11 @@ public class DefaultApplicationRouterParser {
 	public DefaultApplicationRouterParser() {
 		properties = new Properties();  
 	}
+        
+	public void init(Properties props) {
+            properties = props;
+        }        
+       
 	/**
 	 * Load the configuration file as defined in JSR289 Appendix C ie 
 	 * as a system property "javax.servlet.sip.dar"
