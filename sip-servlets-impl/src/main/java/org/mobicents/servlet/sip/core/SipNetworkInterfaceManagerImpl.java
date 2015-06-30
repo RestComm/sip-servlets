@@ -305,17 +305,20 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 			// then we try to resolve it as a hostname
 			Queue<Hop> hops = null;
 			try {
-				hops = sipApplicationDispatcher.getDNSServerLocator().getDnsLookupPerformer().locateHopsForNonNumericAddressWithPort(ipAddress, port, transport);
+				hops = sipApplicationDispatcher.getDNSServerLocator().getDnsLookupPerformer().locateHopsForNonNumericAddressWithPort(ipAddress, portChecked, tmpTransport.toLowerCase());
 			} catch (Exception e) {
 				// not important it can mean that the ipAddress provided is not a hostname
 				// but an ip address not found in the searched listening points above				
 			}
 			if(hops != null) {
 				for (Hop hop : hops) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("Checking Hop " + hop.getHost() + "/" + portChecked + ":" + tmpTransport.toLowerCase() + " against existing listening points");
+					}
 					listeningPoint = extendedListeningPointsCacheMap.get(hop.getHost() + "/" + portChecked + ":" + tmpTransport.toLowerCase());
 					if(listeningPoint != null) {
-						if(logger.isTraceEnabled()) {
-							logger.trace("Found listening point " + listeningPoint);
+						if(logger.isDebugEnabled()) {
+							logger.debug("Found listening point " + listeningPoint);
 						}
 						return listeningPoint;
 					}
