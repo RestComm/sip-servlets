@@ -221,7 +221,6 @@ class SipServerService implements SipServer, Service<SipServer> {
             sipService.setAdditionalParameterableHeaders(additionalParameterableHeaders);
         }
         sipService.setDialogPendingRequestChecking(dialogPendingRequestChecking);
-        sipService.setCanceledTimerTasksPurgePeriod(canceledTimerTasksPurgePeriod);
         sipService.setDnsServerLocatorClass(dnsServerLocatorClass);
         sipService.setDnsResolverClass(dnsResolverClass);
         sipService.setCanceledTimerTasksPurgePeriod(canceledTimerTasksPurgePeriod);
