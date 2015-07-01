@@ -70,25 +70,15 @@ public class UndertowSipDeploymentService implements Service<UndertowSipDeployme
         ServerLogger.DEPLOYMENT_LOGGER.debug("UndertowSipDeploymentService.start()");
 
         Deployment deployment = this.deploymentService.getDeployment();
-        SIPWebContext sipWebContext = this.deploymentUnit.getAttachment(SIPWebContext.ATTACHMENT_KEY);
 
+        DeploymentUnit anchorDu = SIPWebContext.getSipContextAnchorDu(this.deploymentUnit);
+        SIPWebContext sipWebContext = anchorDu.getAttachment(SIPWebContext.ATTACHMENT_KEY);
+        
         try {
             Module module = this.deploymentUnit.getAttachment(Attachments.MODULE);
             sipWebContext.init(deployment, module.getClassLoader());
             sipWebContext.start();
             sipWebContext.contextListenerStart();
-
-            // lets init http servlets only here to be able to do injections provided by the SIPWebContext
-            // sipServlets initialized earlier in context.start() to be able to notify its contextlisteners
-            List<SipServletImpl> sipServlets = new ArrayList<SipServletImpl>();
-            /*
-             * for (String servletName
-             * :((ConvergedDeploymentInfo)context.getDeploymentInfo()).getSipServlets().keySet()) { SipServletImpl
-             * managedServlet = (SipServletImpl) context.getChildrenMap().get(servletName);
-             * sipServlets.add(managedServlet); }
-             */
-
-            this.createServlets(sipWebContext.getDeployment().getServlets(), sipServlets, sipWebContext);
 
         } catch (ServletException e) {
             ServerLogger.DEPLOYMENT_LOGGER.error(e.getMessage(), e);
@@ -98,7 +88,9 @@ public class UndertowSipDeploymentService implements Service<UndertowSipDeployme
 
     @Override
     public void stop(StopContext context) {
-        SIPWebContext sipWebContext = this.deploymentUnit.getAttachment(SIPWebContext.ATTACHMENT_KEY);
+        DeploymentUnit anchorDu = SIPWebContext.getSipContextAnchorDu(this.deploymentUnit);
+        SIPWebContext sipWebContext = anchorDu.getAttachment(SIPWebContext.ATTACHMENT_KEY);
+
         try {
             if (sipWebContext != null) {
                 sipWebContext.stop();
@@ -107,51 +99,6 @@ public class UndertowSipDeploymentService implements Service<UndertowSipDeployme
         } catch (ServletException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        }
-
-    }
-
-    private void createServlets(ManagedServlets servlets, List<SipServletImpl> sipServlets, SIPWebContext context)
-            throws ServletException {
-        final TreeMap<Integer, List<ManagedServlet>> loadOnStartup = new TreeMap<>();
-        for (Map.Entry<String, ServletHandler> entry : servlets.getServletHandlers().entrySet()) {
-            ManagedServlet servlet = entry.getValue().getManagedServlet();
-            Integer loadOnStartupNumber = servlet.getServletInfo().getLoadOnStartup();
-            if (loadOnStartupNumber != null) {
-                if (loadOnStartupNumber < 0) {
-                    continue;
-                }
-                List<ManagedServlet> list = loadOnStartup.get(loadOnStartupNumber);
-                if (list == null) {
-                    loadOnStartup.put(loadOnStartupNumber, list = new ArrayList<>());
-                }
-                list.add(servlet);
-            }
-        }
-
-        for (SipServletImpl servlet : sipServlets) {
-            Integer loadOnStartupNumber = servlet.getServletInfo().getLoadOnStartup();
-            if (loadOnStartupNumber != null) {
-                if (loadOnStartupNumber < 0) {
-                    continue;
-                }
-                List<ManagedServlet> list = loadOnStartup.get(loadOnStartupNumber);
-                if (list == null) {
-                    loadOnStartup.put(loadOnStartupNumber, list = new ArrayList<>());
-                }
-                list.add(servlet);
-            }
-        }
-
-        for (Map.Entry<Integer, List<ManagedServlet>> load : loadOnStartup.entrySet()) {
-            for (ManagedServlet servlet : load.getValue()) {
-                servlet.createServlet();
-            }
-        }
-        if (context.getDeploymentInfoFacade().getDeploymentInfo().isEagerFilterInit()) {
-            for (ManagedFilter filter : context.getDeployment().getFilters().getFilters().values()) {
-                filter.createFilter();
-            }
         }
     }
 }
