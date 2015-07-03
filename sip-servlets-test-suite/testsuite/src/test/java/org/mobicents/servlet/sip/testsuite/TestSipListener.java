@@ -526,7 +526,9 @@ public class TestSipListener implements SipListener {
 				return;
 			} 
 			
-			if(!sendUpdateAfterUpdate && !waitForCancel)
+			if(!sendUpdateAfterUpdate && !waitForCancel
+					// https://github.com/Mobicents/sip-servlets/issues/66 include UPDATE after PRACK
+					&& !sendUpdateAfterPrack)
 				inviteServerTid.sendResponse(getFinalResponse());
 			else {
 				logger.info("sendUpdateAfterUpdate or Waiting for CANCEL, stopping the PRACK processing and not sending 200 OK to INVITE");
@@ -691,6 +693,12 @@ public class TestSipListener implements SipListener {
 				if(!prackReceived) {
 					sendUpdateAfterUpdate = false;
 				}
+			}
+			// https://github.com/Mobicents/sip-servlets/issues/66 send OK if there was an UPDATE after PRACK
+			if(!sendUpdateAfterUpdate && sendUpdateAfterPrack)
+				inviteServerTid.sendResponse(getFinalResponse());
+			else {
+				logger.info("sendUpdateAfterUpdate or Waiting for CANCEL, stopping the PRACK processing and not sending 200 OK to INVITE");
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
