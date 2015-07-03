@@ -1328,7 +1328,9 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 				Thread.currentThread().setContextClassLoader(cl);
 				// If dialog does not exist or has no state.
 				if (dialog == null || dialog.getState() == null
-						|| (dialog.getState() == DialogState.EARLY && !Request.PRACK.equals(requestMethod)) || Request.CANCEL.equals(requestMethod)) {
+						// https://github.com/Mobicents/sip-servlets/issues/66 include UPDATE as well so it is sent indialog
+						|| (dialog.getState() == DialogState.EARLY && !Request.PRACK.equals(requestMethod) && !Request.UPDATE.equals(requestMethod)) 
+						|| Request.CANCEL.equals(requestMethod)) {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Sending the request " + request);
 					}

@@ -704,6 +704,7 @@ public class CallForwardingB2BUASipServlet extends SipServlet implements SipErro
 				} else {
 				    SipSession peerSession = sipServletResponse.getRequest().getB2buaHelper().getLinkedSession(sipServletResponse.getSession());
 				    try {				    	
+				    	logger.info("Creating response to original request " +  sipServletResponse.getRequest());
 				    	SipServletResponse responseToOriginalRequest = sipServletResponse.getRequest().getB2buaHelper().createResponseToOriginalRequest(peerSession, sipServletResponse.getStatus(), sipServletResponse.getReasonPhrase());
 				    	logger.info("Created response " + responseToOriginalRequest + " to original request " +  sipServletResponse.getRequest());
 				    	responseToOriginalRequest.send();

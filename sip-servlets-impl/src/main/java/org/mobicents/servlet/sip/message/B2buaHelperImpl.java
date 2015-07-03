@@ -577,7 +577,7 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 		final SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipServletMessageImpl;
 		if(RoutingState.FINAL_RESPONSE_SENT.equals(sipServletRequestImpl.getRoutingState())) {
 			// checked by TCK test com.bea.sipservlet.tck.agents.api.javax_servlet_sip.B2buaHelperTest.testCreateResponseToOriginalRequest101 
-			throw new IllegalStateException("subsequent response is inconsistent with an already sent response. a Final response has already been sent ! ");
+			throw new IllegalStateException("subsequent response is inconsistent with an already sent response. a Final response has already been sent for this request " + sipServletRequestImpl);
 		}
 		if(logger.isDebugEnabled()) {
 			logger.debug("creating response to original request " + sipServletRequestImpl + " on session " + session);

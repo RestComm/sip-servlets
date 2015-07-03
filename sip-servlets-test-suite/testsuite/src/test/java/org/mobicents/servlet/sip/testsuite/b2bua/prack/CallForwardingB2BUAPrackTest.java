@@ -115,6 +115,49 @@ public class CallForwardingB2BUAPrackTest extends SipServletTestCase {
 		assertTrue(sender.getOkToByeReceived());
 		assertTrue(receiver.getByeReceived());
 	}
+	
+	// non regression test for https://github.com/Mobicents/sip-servlets/issues/66
+	public void testCallForwardingCallerPrackUpdateSendBye() throws Exception {
+		tomcat.startTomcat();
+		deployApplication();
+		
+		sender = new TestSipListener(5080, 5070, senderProtocolObjects, true);
+		SipProvider senderProvider = sender.createProvider();
+
+		receiver = new TestSipListener(5090, 5070, receiverProtocolObjects, false);
+		SipProvider receiverProvider = receiver.createProvider();
+
+		receiverProvider.addSipListener(receiver);
+		senderProvider.addSipListener(sender);
+
+		senderProtocolObjects.start();
+		receiverProtocolObjects.start();
+
+		String fromName = "forward-sender";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+		
+		String[] headerNames = new String[]{"require"};
+		String[] headerValues = new String[]{"100rel"};
+		
+//		sender.setSendUpdateOn180(true);
+//		receiver.setTimeToWaitBeforeAck(5000);
+		sender.setSendUpdateAfterPrack(true);
+		sender.setTimeToWaitBeforeBye(1000);
+		receiver.setSendUpdateAfterPrack(true);
+		receiver.setWaitBeforeFinalResponse(3000);
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, headerNames, headerValues, true);		
+		Thread.sleep(TIMEOUT);
+		assertTrue(sender.getOkToByeReceived());
+		assertTrue(receiver.getByeReceived());
+		assertEquals(4, ((RequestExt)receiver.getByeRequestReceived()).getCSeqHeader().getSeqNumber());
+	}
 
 	public void testCallForwardingCalleeSendBye() throws Exception {
 		tomcat.startTomcat();
