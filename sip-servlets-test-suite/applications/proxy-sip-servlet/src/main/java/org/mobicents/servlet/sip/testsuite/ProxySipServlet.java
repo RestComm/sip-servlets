@@ -115,6 +115,10 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			req.getSession().setAttribute("h", "hhh");			
 			return;
 		}
+		if(request.getFrom().toString().contains("popped-route-uri") && 
+				(request.getPoppedRoute()== null || !request.getPoppedRoute().getURI().toString().contains("test.mobicents.org"))) {
+			throw new IllegalArgumentException("We didn't have the expected test.mobicents.org in the following popped route " + request.getPoppedRoute());
+		}
 		if(request.getFrom().toString().contains("proxy-orphan")) {
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
 			SipFactoryExt sipFactoryExt = (SipFactoryExt) sipFactory;

@@ -22,14 +22,19 @@
 
 package org.mobicents.servlet.sip.dns;
 
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+
 import javax.servlet.sip.SipURI;
 import javax.servlet.sip.URI;
+import javax.sip.address.Hop;
 
 import org.mobicents.ext.javax.sip.dns.DNSServerLocator;
 import org.mobicents.javax.servlet.sip.dns.DNSResolver;
+import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.address.URIImpl;
-import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 
 /**
  * @author jean.deruelle@gmail.com
@@ -62,4 +67,17 @@ public class MobicentsDNSResolver implements DNSResolver {
 		return dnsServerLocator.getDnsLookupPerformer().getDNSTimeout();
 	}
 
+	@Override
+	public Set<String> resolveHost(String host) {
+		Set<String> ipAddresses = new CopyOnWriteArraySet<String>();
+		Queue<Hop> hops = dnsServerLocator.resolveHostByAandAAAALookup(host, -1, null);
+		if(hops != null) {
+			for (Hop hop : hops) {
+				ipAddresses.add(hop.getHost());
+			}
+		}
+		return ipAddresses;
+	}
+
+	
 }

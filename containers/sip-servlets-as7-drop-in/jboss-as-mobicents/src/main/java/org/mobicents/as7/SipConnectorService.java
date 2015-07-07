@@ -54,6 +54,8 @@ class SipConnectorService implements Service<Connector> {
     private Boolean useStun = false;
     private String stunServerAddress = null;
     private int stunServerPort = -1;
+    
+    private String hostNames = null;
 
     private Boolean enableLookups = null;
     private String proxyName = null;
@@ -69,7 +71,7 @@ class SipConnectorService implements Service<Connector> {
     private final InjectedValue<SocketBinding> binding = new InjectedValue<SocketBinding>();
     private final InjectedValue<SipServer> server = new InjectedValue<SipServer>();
 
-    public SipConnectorService(String protocol, String scheme, boolean useStaticAddress, String staticServerAddress, int staticServerPort, boolean useStun, String stunServerAddress, int stunServerPort) {
+    public SipConnectorService(String protocol, String scheme, boolean useStaticAddress, String staticServerAddress, int staticServerPort, boolean useStun, String stunServerAddress, int stunServerPort, String hostNames) {
         if (protocol != null)
             this.protocol = protocol;
         if (scheme != null)
@@ -82,6 +84,7 @@ class SipConnectorService implements Service<Connector> {
         if (stunServerAddress != null)
             this.stunServerAddress = stunServerAddress;
         this.stunServerPort = stunServerPort;
+        this.hostNames = hostNames;
     }
 
     /**
@@ -111,7 +114,9 @@ class SipConnectorService implements Service<Connector> {
             sipConnector.setUseStun(useStun);
             sipConnector.setStunServerAddress(stunServerAddress);
             sipConnector.setStunServerPort(stunServerPort);
+            sipConnector.setHostNames(hostNames);
             Logger.getLogger("org.mobicents.as7").debug("SipConnectorService.start(), address = " + address.getAddress().getHostAddress() + " - port = " + address.getPort());
+            Logger.getLogger("org.mobicents.as7").debug("SipConnectorService.start(), hostnames = " + hostNames);
             SipProtocolHandler sipProtocolHandler = (SipProtocolHandler) connector.getProtocolHandler();
             sipProtocolHandler.setSipConnector(sipConnector);
             if (enableLookups != null)

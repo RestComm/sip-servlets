@@ -521,6 +521,14 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 		sipConnector.setUseStaticAddress(useStaticAddress);
 	}
 	
+	public String getHostNames() {
+		return sipConnector.getHostNames();
+	}
+
+	public void setHostNames(String hostNames) {
+		sipConnector.setHostNames(hostNames);
+	}
+	
 	public String getAddress() {
 		return getName();
 	}
