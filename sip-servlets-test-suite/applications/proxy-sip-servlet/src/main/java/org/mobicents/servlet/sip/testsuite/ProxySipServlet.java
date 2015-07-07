@@ -28,6 +28,7 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
@@ -62,6 +63,7 @@ import org.mobicents.javax.servlet.sip.ResponseType;
 import org.mobicents.javax.servlet.sip.SipFactoryExt;
 import org.mobicents.javax.servlet.sip.SipServletRequestExt;
 import org.mobicents.javax.servlet.sip.SipServletResponseExt;
+import org.mobicents.javax.servlet.sip.dns.DNSResolver;
 import org.mobicents.servlet.sip.proxy.ProxyImpl;
 
 public class ProxySipServlet extends SipServlet implements SipErrorListener, ProxyBranchListener, SipSessionListener, SipApplicationSessionListener, TimerListener {
@@ -115,9 +117,17 @@ public class ProxySipServlet extends SipServlet implements SipErrorListener, Pro
 			req.getSession().setAttribute("h", "hhh");			
 			return;
 		}
-		if(request.getFrom().toString().contains("popped-route-uri") && 
-				(request.getPoppedRoute()== null || !request.getPoppedRoute().getURI().toString().contains("test.mobicents.org"))) {
-			throw new IllegalArgumentException("We didn't have the expected test.mobicents.org in the following popped route " + request.getPoppedRoute());
+		if(request.getFrom().toString().contains("popped-route-uri")) {
+			if (request.getPoppedRoute()== null || !request.getPoppedRoute().getURI().toString().contains("test.mobicents.org")) {
+				throw new IllegalArgumentException("We didn't have the expected test.mobicents.org in the following popped route " + request.getPoppedRoute());
+			} else {
+				DNSResolver dnsResolver = (DNSResolver) getServletContext().getAttribute("org.mobicents.servlet.sip.DNS_RESOLVER");
+				Set<String> ipAddresses = dnsResolver.resolveHost(((SipURI)request.getPoppedRoute().getURI()).getHost());
+				logger.info(ipAddresses.toArray().toString());
+				if(!ipAddresses.contains("127.0.0.1")) {
+					throw new IllegalArgumentException("Couldn't resolve test.mobicents.org to 127.0.0.1");
+				}
+			}
 		}
 		if(request.getFrom().toString().contains("proxy-orphan")) {
 			SipFactory sipFactory = (SipFactory) getServletContext().getAttribute(SIP_FACTORY);
