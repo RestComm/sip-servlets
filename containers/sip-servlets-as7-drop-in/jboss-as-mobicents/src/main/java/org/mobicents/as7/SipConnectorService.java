@@ -115,7 +115,7 @@ class SipConnectorService implements Service<Connector> {
             sipConnector.setStunServerAddress(stunServerAddress);
             sipConnector.setStunServerPort(stunServerPort);
             sipConnector.setHostNames(hostNames);
-            Logger.getLogger("org.mobicents.as7").debug("SipConnectorService.start(), address = " + address.getAddress().getHostAddress() + " - port = " + address.getPort());
+            Logger.getLogger("org.mobicents.as7").debug("SipConnectorService.start(), address = " + address.getAddress().getHostAddress() + " - port = " + address.getPort() + " - transport = " + sipConnector.getTransport());
             Logger.getLogger("org.mobicents.as7").debug("SipConnectorService.start(), hostnames = " + hostNames);
             SipProtocolHandler sipProtocolHandler = (SipProtocolHandler) connector.getProtocolHandler();
             sipProtocolHandler.setSipConnector(sipConnector);

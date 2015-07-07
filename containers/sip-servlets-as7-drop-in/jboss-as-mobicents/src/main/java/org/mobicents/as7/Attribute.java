@@ -126,6 +126,7 @@ enum Attribute {
     TEST(Constants.TEST),
     USE_PRETTY_ENCODING(Constants.USE_PRETTY_ENCODING),
     USE_STATIC_ADDRESS(Constants.USE_STATIC_ADDRESS),
+    HOSTNAMES(Constants.HOSTNAMES),
     USE_STUN(Constants.USE_STUN),
     VERIFY_CLIENT(Constants.VERIFY_CLIENT),
     VERIFY_DEPTH(Constants.VERIFY_DEPTH),

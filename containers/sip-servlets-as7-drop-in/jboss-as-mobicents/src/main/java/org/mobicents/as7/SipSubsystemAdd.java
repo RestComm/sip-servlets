@@ -52,6 +52,7 @@ import org.mobicents.as7.deployment.SipContextFactoryDeploymentProcessor;
 import org.mobicents.as7.deployment.SipJndiBindingProcessor;
 import org.mobicents.as7.deployment.SipParsingDeploymentProcessor;
 import org.mobicents.as7.deployment.SipWarDeploymentProcessor;
+import org.mobicents.ext.javax.sip.dns.DefaultDNSServerLocator;
 
 /**
  * Adds the sip subsystem.
@@ -158,12 +159,12 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final boolean dialogPendingRequestChecking = dialogPendingRequestCheckingModel.isDefined() ? dialogPendingRequestCheckingModel.asBoolean() : false;
         
         final ModelNode dnsServerLocatorClassModel = SipDefinition.DNS_SERVER_LOCATOR_CLASS.resolveModelAttribute(context, fullModel);
-        final String dnsServerLocatorClass = dnsServerLocatorClassModel.isDefined() ? dnsServerLocatorClassModel.asString() : null;
+        final String dnsServerLocatorClass = dnsServerLocatorClassModel.isDefined() ? dnsServerLocatorClassModel.asString() : DefaultDNSServerLocator.class.getName();
         
         final ModelNode dnsTimeoutModel = SipDefinition.DNS_TIMEOUT.resolveModelAttribute(context, fullModel);
         final int dnsTimeout = dnsTimeoutModel.isDefined() ? dnsTimeoutModel.asInt() : null;
         
-        final ModelNode dnsResolverClassModel = SipDefinition.DNS_SERVER_LOCATOR_CLASS.resolveModelAttribute(context, fullModel);
+        final ModelNode dnsResolverClassModel = SipDefinition.DNS_RESOLVER_CLASS.resolveModelAttribute(context, fullModel);
         final String dnsResolverClass = dnsResolverClassModel.isDefined() ? dnsResolverClassModel.asString() : null;
         
         final ModelNode callIdMaxLengthModel = SipDefinition.CALL_ID_MAX_LENGTH.resolveModelAttribute(context, fullModel);
