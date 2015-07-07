@@ -154,7 +154,9 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 		    	while(tokenizer.hasMoreTokens()) {
 		    		String localHostName = tokenizer.nextToken();
 		    		extendedListeningPointsCacheMap.put(localHostName + "/" + extendedListeningPoint.getPort() + ":" + extendedListeningPoint.getTransport().toLowerCase(), extendedListeningPoint);
-		    		sipApplicationDispatcher.getDNSServerLocator().mapLocalHostNameToIP(localHostName, new CopyOnWriteArraySet<String>(extendedListeningPoint.getIpAddresses()));
+		    		if(sipApplicationDispatcher.getDNSServerLocator() != null) {
+		    			sipApplicationDispatcher.getDNSServerLocator().mapLocalHostNameToIP(localHostName, new CopyOnWriteArraySet<String>(extendedListeningPoint.getIpAddresses()));
+			    	}
 				}
 		    }
 		    
@@ -201,7 +203,9 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 		    	while(tokenizer.hasMoreTokens()) {
 		    		String localHostName = tokenizer.nextToken();
 		    		extendedListeningPointsCacheMap.remove(localHostName + "/" + extendedListeningPoint.getPort() + ":" + extendedListeningPoint.getTransport().toLowerCase());
-		    		sipApplicationDispatcher.getDNSServerLocator().unmapLocalHostNameToIP(localHostName);
+		    		if(sipApplicationDispatcher.getDNSServerLocator() != null) {
+		    			sipApplicationDispatcher.getDNSServerLocator().unmapLocalHostNameToIP(localHostName);
+		    		}
 				}
 		    }
 		}

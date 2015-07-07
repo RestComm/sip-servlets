@@ -222,6 +222,9 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
             case STUN_SERVER_PORT:
             	SipConnectorDefinition.STUN_SERVER_PORT.parseAndSetParameter(value, connector, reader);
             	break;
+            case HOSTNAMES:
+            	SipConnectorDefinition.HOSTNAMES.parseAndSetParameter(value, connector, reader);
+            	break;
             default:
                 throw unexpectedAttribute(reader, i);
             }
