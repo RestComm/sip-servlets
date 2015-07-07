@@ -179,6 +179,7 @@
 			<groupId>org.mobicents.tools</groupId>
 			<artifactId>sip-balancer-jar</artifactId>
 			<version>${mobicents.balancer.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>			
@@ -200,7 +201,7 @@
 		</dependency-->
 		
 		<!-- clustering deps -->
-		<dependency>
+		<!--dependency>
 			<groupId>jboss</groupId>
 			<artifactId>jboss-cache</artifactId>
 			<version>1.4.1.SP5</version>
@@ -219,7 +220,7 @@
 			<artifactId>jta</artifactId>
 			<version>1.0.1B</version>
 			<scope>test</scope>
-		</dependency>	
+		</dependency-->	
 		
 		<dependency>
 		    <groupId>nl.jqno.equalsverifier</groupId>
