@@ -152,7 +152,9 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 		    if(extendedListeningPoint.getSipConnector().getHostNames() != null) {
 		    	StringTokenizer tokenizer = new StringTokenizer(extendedListeningPoint.getSipConnector().getHostNames(), ",");
 		    	while(tokenizer.hasMoreTokens()) {
-		    		extendedListeningPointsCacheMap.put(tokenizer.nextToken() + "/" + extendedListeningPoint.getPort() + ":" + extendedListeningPoint.getTransport().toLowerCase(), extendedListeningPoint);
+		    		String localHostName = tokenizer.nextToken();
+		    		extendedListeningPointsCacheMap.put(localHostName + "/" + extendedListeningPoint.getPort() + ":" + extendedListeningPoint.getTransport().toLowerCase(), extendedListeningPoint);
+		    		sipApplicationDispatcher.getDNSServerLocator().mapLocalHostNameToIP(localHostName, new CopyOnWriteArraySet<String>(extendedListeningPoint.getIpAddresses()));
 				}
 		    }
 		    
@@ -194,6 +196,14 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 		    	extendedListeningPointsCacheMap.remove(extendedListeningPoint.getGlobalIpAddress() + "/" + extendedListeningPoint.getPort() + ":" + extendedListeningPoint.getTransport().toLowerCase());
 		    	extendedListeningPointsCacheMap.remove(extendedListeningPoint.getGlobalIpAddress() + "/" + extendedListeningPoint.getGlobalPort() + ":" + extendedListeningPoint.getTransport().toLowerCase());
 		    }	
+		    if(extendedListeningPoint.getSipConnector().getHostNames() != null) {
+		    	StringTokenizer tokenizer = new StringTokenizer(extendedListeningPoint.getSipConnector().getHostNames(), ",");
+		    	while(tokenizer.hasMoreTokens()) {
+		    		String localHostName = tokenizer.nextToken();
+		    		extendedListeningPointsCacheMap.remove(localHostName + "/" + extendedListeningPoint.getPort() + ":" + extendedListeningPoint.getTransport().toLowerCase());
+		    		sipApplicationDispatcher.getDNSServerLocator().unmapLocalHostNameToIP(localHostName);
+				}
+		    }
 		}
 	}
 	
