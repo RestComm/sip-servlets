@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -146,6 +147,13 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 		    if(extendedListeningPoint.getGlobalIpAddress() != null) {
 		    	extendedListeningPointsCacheMap.put(extendedListeningPoint.getGlobalIpAddress() + "/" + extendedListeningPoint.getPort() + ":" + extendedListeningPoint.getTransport().toLowerCase(), extendedListeningPoint);
 		    	extendedListeningPointsCacheMap.put(extendedListeningPoint.getGlobalIpAddress() + "/" + extendedListeningPoint.getGlobalPort() + ":" + extendedListeningPoint.getTransport().toLowerCase(), extendedListeningPoint);
+		    }
+		    // Adding local hostnames if any to the triplet cache map
+		    if(extendedListeningPoint.getSipConnector().getHostNames() != null) {
+		    	StringTokenizer tokenizer = new StringTokenizer(extendedListeningPoint.getSipConnector().getHostNames(), ",");
+		    	while(tokenizer.hasMoreTokens()) {
+		    		extendedListeningPointsCacheMap.put(tokenizer.nextToken() + "/" + extendedListeningPoint.getPort() + ":" + extendedListeningPoint.getTransport().toLowerCase(), extendedListeningPoint);
+				}
 		    }
 		    
 		    Iterator<SipContext> sipContextIterator = sipApplicationDispatcher.findSipApplications();
@@ -297,8 +305,12 @@ public class SipNetworkInterfaceManagerImpl implements SipNetworkInterfaceManage
 		if(tmpTransport == null) {
 			tmpTransport = ListeningPoint.UDP;
 		}	
+		
 		// we check first if a listening point can be found (we only do the host resolving if not found to have better perf )
 		MobicentsExtendedListeningPoint listeningPoint = extendedListeningPointsCacheMap.get(ipAddress + "/" + portChecked + ":" + tmpTransport.toLowerCase());
+		if(logger.isDebugEnabled()) {
+			logger.debug("Checked Listening Point " + ipAddress + "/" + portChecked + ":" + tmpTransport.toLowerCase() + " against existing listening points, found " + listeningPoint);
+		}
 		if(listeningPoint == null && !Inet6Util.isValidIP6Address(ipAddress) 
 					&& !Inet6Util.isValidIPV4Address(ipAddress)) {
 			// if no listening point has been found and the ipaddress is not a valid IP6 address nor a valid IPV4 address 

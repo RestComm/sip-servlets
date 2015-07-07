@@ -126,6 +126,7 @@ interface Constants {
     String STATIC_SERVER_PORT = "static-server-port";
     String STUN_SERVER_ADDRESS = "stun-server-address";
     String STUN_SERVER_PORT = "stun-server-port";
+    String HOSTNAMES = "hostnames";
     String SUBSTITUTION = "substitution";
     String SUBSYSTEM = "subsystem";
     String T2_INTERVAL = "t2-interval";

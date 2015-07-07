@@ -303,7 +303,9 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 		.append(", globalIpAddress=")
 		.append(globalIpAddress)
 		.append(", gloablPort=")
-		.append(globalPort);
+		.append(globalPort)
+		.append(", hostNames=")
+		.append(sipConnector.getHostNames());
 		return stringBuilder.toString();
 	}
 

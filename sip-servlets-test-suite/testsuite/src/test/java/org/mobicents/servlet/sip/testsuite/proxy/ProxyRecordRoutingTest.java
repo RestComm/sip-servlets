@@ -31,11 +31,14 @@ import javax.sip.SipProvider;
 import javax.sip.address.SipURI;
 import javax.sip.header.Header;
 import javax.sip.header.RecordRouteHeader;
+import javax.sip.header.RouteHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ReasonHeader;
 
+import org.apache.catalina.connector.Connector;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.SipServletTestCase;
+import org.mobicents.servlet.sip.catalina.SipProtocolHandler;
 import org.mobicents.servlet.sip.testsuite.ProtocolObjects;
 import org.mobicents.servlet.sip.testsuite.TestSipListener;
 
@@ -280,6 +283,39 @@ public class ProxyRecordRoutingTest extends SipServletTestCase {
 		assertEquals(200,sender.getFinalResponseStatus());		
 		assertTrue(sender.isAckSent());
 		assertTrue(((RecordRouteHeader)receiver.getInviteRequest().getHeader(RecordRouteHeader.NAME)).getAddress().getURI().toString().contains("localhost"));
+	}
+	
+	/*
+	 * 
+	 */
+	public void testPoppedRouteFQDN() throws Exception {
+		deployApplication();
+		tomcat.removeConnector(sipConnector);
+		Connector udpSipConnector = new Connector(
+				SipProtocolHandler.class.getName());
+		SipProtocolHandler udpProtocolHandler = (SipProtocolHandler) udpSipConnector
+				.getProtocolHandler();
+		udpProtocolHandler.setPort(5070);
+		udpProtocolHandler.setIpAddress(sipIpAddress);
+		udpProtocolHandler.setSignalingTransport(listeningPointTransport);		
+		udpProtocolHandler.setHostNames("test.mobicents.org");
+		tomcat.getSipService().addConnector(udpSipConnector);
+
+		String fromName = "popped-route-uri";
+		String fromSipAddress = "sip-servlets.com";
+		SipURI fromAddress = senderProtocolObjects.addressFactory.createSipURI(
+				fromName, fromSipAddress);		
+		
+		String toSipAddress = "sip-servlets.com";
+		String toUser = "proxy-receiver";
+		SipURI toAddress = senderProtocolObjects.addressFactory.createSipURI(
+				toUser, toSipAddress);
+						
+		sender.sendSipRequest("INVITE", fromAddress, toAddress, null, null, false, new String[]{RouteHeader.NAME}, new String[]{"<sip:test.mobicents.org:5070;lr;maddr="+ sipIpAddress+">"}, true);		
+		Thread.sleep(TIMEOUT);
+		assertEquals(200,sender.getFinalResponseStatus());		
+		assertTrue(sender.isAckSent());
+		assertNull(((RecordRouteHeader)receiver.getInviteRequest().getHeader(RouteHeader.NAME)));
 	}
 	
 	/*
