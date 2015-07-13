@@ -37,6 +37,7 @@
         <module name="javax.activation.api"/>
         <module name="org.jboss.as.web"/>
         <!-- new entries starts-->
+        <module name="org.jboss.sasl"/>
         <module name="org.jboss.as.web-common"/>
         <module name="org.jboss.as.server"/>        
         <module name="io.undertow.core"/>

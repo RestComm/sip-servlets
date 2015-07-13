@@ -337,16 +337,17 @@
                         <policy-module code="Delegating" flag="required"/>
                     </authorization>
                 </security-domain>
-                <security-domain name="sip-servlets">
+                <security-domain name="sip-servlets" cache-type="default">
                     <authentication>
-                        <login-module code="UsersRoles" flag="required">
+                        <login-module code="org.jboss.security.auth.spi.UsersRolesLoginModule" flag="required">
                             <module-option name="usersProperties" value="${jboss.server.config.dir}/sip-servlets-users.properties"/>
                             <module-option name="rolesProperties" value="${jboss.server.config.dir}/sip-servlets-roles.properties"/>
                             <module-option name="hashAlgorithm" value="MD5"/>
                             <module-option name="hashEncoding" value="RFC2617"/>
                             <module-option name="hashUserPassword" value="false"/>
-                            <module-option name="hashStorePassword" value="true"/>
+                            <module-option name="hashStorePassword" value="false"/>
                             <module-option name="passwordIsA1Hash" value="true"/>
+                            <module-option name="digestCallback" value="org.jboss.security.auth.callback.RFC2617Digest"/>
                             <module-option name="storeDigestCallback" value="org.jboss.security.auth.callback.RFC2617Digest"/>
                         </login-module>
                     </authentication>

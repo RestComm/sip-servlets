@@ -50,6 +50,7 @@ import org.jboss.metadata.javaee.spec.SecurityRoleRefMetaData;
 import org.jboss.metadata.javaee.spec.SecurityRoleRefsMetaData;
 import org.jboss.metadata.web.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.ServletMetaData;
+import org.jboss.metadata.web.spec.TransportGuaranteeType;
 import org.mobicents.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.mobicents.metadata.sip.jboss.JBossSipServletsMetaData;
 import org.mobicents.metadata.sip.spec.AndMetaData;
@@ -61,11 +62,18 @@ import org.mobicents.metadata.sip.spec.NotMetaData;
 import org.mobicents.metadata.sip.spec.OrMetaData;
 import org.mobicents.metadata.sip.spec.PatternMetaData;
 import org.mobicents.metadata.sip.spec.SipApplicationKeyMethodInfo;
+import org.mobicents.metadata.sip.spec.SipLoginConfigMetaData;
+import org.mobicents.metadata.sip.spec.SipResourceCollectionMetaData;
+import org.mobicents.metadata.sip.spec.SipResourceCollectionsMetaData;
+import org.mobicents.metadata.sip.spec.SipSecurityConstraintMetaData;
 import org.mobicents.metadata.sip.spec.SipServletMappingMetaData;
 import org.mobicents.metadata.sip.spec.SipServletSelectionMetaData;
 import org.mobicents.metadata.sip.spec.SubdomainOfMetaData;
 import org.mobicents.servlet.sip.undertow.SipContextImpl;
 import org.mobicents.servlet.sip.undertow.SipDeploymentException;
+import org.mobicents.servlet.sip.undertow.SipLoginConfig;
+import org.mobicents.servlet.sip.undertow.SipSecurityCollection;
+import org.mobicents.servlet.sip.undertow.SipSecurityConstraint;
 import org.mobicents.servlet.sip.undertow.SipServletImpl;
 import org.mobicents.servlet.sip.undertow.rules.AndRule;
 import org.mobicents.servlet.sip.undertow.rules.ContainsRule;
@@ -203,24 +211,36 @@ public class SipJBossContextConfig{
 
         // http://code.google.com/p/sipservlets/issues/detail?id=158 : Implement Missing SIP Security in AS7
         String securityDomain = convergedMetaData.getSecurityDomain();
-        //TODO:convergedContext.setSecurityDomain(securityDomain);
+        convergedContext.setSecurityDomain(securityDomain);
 
         // sip security contstraints
-        /*TODO:List<SipSecurityConstraintMetaData> sipConstraintMetaDatas = convergedMetaData.getSipSecurityConstraints();
+        List<SipSecurityConstraintMetaData> sipConstraintMetaDatas = convergedMetaData.getSipSecurityConstraints();
         if (sipConstraintMetaDatas != null) {
             for (SipSecurityConstraintMetaData sipConstraintMetaData : sipConstraintMetaDatas) {
                 SipSecurityConstraint sipSecurityConstraint = new SipSecurityConstraint();
                 sipSecurityConstraint.setDisplayName(sipConstraintMetaData.getDisplayName());
                 if (sipConstraintMetaData.getAuthConstraint() != null) {
                     for (String role : sipConstraintMetaData.getAuthConstraint().getRoleNames()) {
-                        sipSecurityConstraint.addAuthRole(role);
+                        //TODO addAuthRole() helyett:
+                        sipSecurityConstraint.addRoleAllowed(role);
                     }
                 }
                 if (sipConstraintMetaData.getProxyAuthentication() != null) {
                     sipSecurityConstraint.setProxyAuthentication(true);
                 }
+                
                 TransportGuaranteeType tg = sipConstraintMetaData.getTransportGuarantee();
-                sipSecurityConstraint.setUserConstraint(tg.name());
+                io.undertow.servlet.api.TransportGuaranteeType undertowTg = null;
+                if (tg==TransportGuaranteeType.CONFIDENTIAL){
+                    undertowTg = io.undertow.servlet.api.TransportGuaranteeType.CONFIDENTIAL;
+                }else if (tg==TransportGuaranteeType.INTEGRAL){
+                    undertowTg = io.undertow.servlet.api.TransportGuaranteeType.INTEGRAL;
+                }else if (tg==TransportGuaranteeType.NONE){
+                    undertowTg = io.undertow.servlet.api.TransportGuaranteeType.NONE;
+                }else {
+                    undertowTg = io.undertow.servlet.api.TransportGuaranteeType.REJECTED;
+                }
+                sipSecurityConstraint.setTransportGuaranteeType(undertowTg);
 
                 SipResourceCollectionsMetaData srcs = sipConstraintMetaData.getResourceCollections();
                 if (srcs != null) {
@@ -242,21 +262,21 @@ public class SipJBossContextConfig{
                         sipSecurityConstraint.addCollection(securityCollection);
                     }
                 }
-                convergedContext.addConstraint(sipSecurityConstraint);
+                convergedContext.getDeploymentInfoFacade().getDeploymentInfo().addSecurityConstraint(sipSecurityConstraint);
             }
-        }*/
+        }
         // sip login config
-        /*TODO:SipLoginConfigMetaData sipLoginConfig = convergedMetaData.getSipLoginConfig();
+        SipLoginConfigMetaData sipLoginConfig = convergedMetaData.getSipLoginConfig();
         if (sipLoginConfig != null) {
-            SipLoginConfig sipLoginConfig2 = new SipLoginConfig();
-            sipLoginConfig2.setAuthMethod(sipLoginConfig.getAuthMethod());
-            sipLoginConfig2.setRealmName(sipLoginConfig.getRealmName());
+            //TODO authmethod =?= mechanismname
+            SipLoginConfig sipLoginConfig2 = new SipLoginConfig(sipLoginConfig.getAuthMethod(),sipLoginConfig.getRealmName());
+
             if (sipLoginConfig.getIdentityAssertion() != null) {
                 sipLoginConfig2.addIdentityAssertion(sipLoginConfig.getIdentityAssertion().getIdentityAssertionScheme(),
                         sipLoginConfig.getIdentityAssertion().getIdentityAssertionSupport());
             }
             convergedContext.setSipLoginConfig(sipLoginConfig2);
-        }*/
+        }
         // Sip Listeners
         List<ListenerMetaData> sipListeners = convergedMetaData.getSipListeners();
         if (sipListeners != null) {
@@ -350,7 +370,6 @@ public class SipJBossContextConfig{
 
                 convergedContext.getDeploymentInfoFacade().addSipServlets(servletInfo);
                 convergedContext.addChild(wrapper);
-                ((DeploymentImpl)convergedContext.getDeployment()).addLifecycleObjects(wrapper);
             }
         }
         final SipApplicationKeyMethodInfo sipApplicationKeyMethodInfo = convergedMetaData.getSipApplicationKeyMethodInfo();

@@ -22,10 +22,12 @@
 package org.mobicents.servlet.sip.undertow;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletContextEvent;
@@ -41,6 +43,10 @@ import javax.servlet.sip.TimerService;
 import io.undertow.server.session.SessionManager;
 import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.api.DeploymentInfoFacade;
+import io.undertow.servlet.api.ServletInfo;
+import io.undertow.servlet.core.Lifecycle;
+import io.undertow.servlet.core.ManagedFilter;
+import io.undertow.servlet.core.ManagedServlet;
 import io.undertow.servlet.spec.ServletContextImpl;
 
 import org.apache.log4j.Logger;
@@ -75,6 +81,8 @@ import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.ruby.SipRubyController;
 import org.mobicents.servlet.sip.startup.ConvergedApplicationContextFacade;
+import org.mobicents.servlet.sip.undertow.security.SipSecurityUtils;
+import org.mobicents.servlet.sip.undertow.security.authentication.SipDigestAuthenticationMechanism;
 
 /**
 * @author kakonyi.istvan@alerant.hu
@@ -91,7 +99,6 @@ public class SipContextImpl implements SipContext {
     private Deployment deployment;
 
     protected DeploymentInfoFacade deploymentInfoFacade;
-    // TODO setter
     protected transient SipApplicationDispatcher sipApplicationDispatcher = null;
     // TODO setter
     protected boolean hasDistributableManager;
@@ -104,8 +111,8 @@ public class SipContextImpl implements SipContext {
     protected transient SipListeners sipListeners;
     protected transient SipFactoryFacade sipFactoryFacade;
     protected transient SipSessionsUtilImpl sipSessionsUtil;
-    // TODO:protected transient SipSecurityUtils sipSecurityUtils;
-    // TODO:protected transient SipDigestAuthenticator sipDigestAuthenticator;
+    protected transient SipSecurityUtils sipSecurityUtils;
+    protected transient SipDigestAuthenticator sipDigestAuthenticator;
     protected transient String securityDomain;
 
     protected String displayName;
@@ -189,13 +196,52 @@ public class SipContextImpl implements SipContext {
         if ((mainServlet == null || mainServlet.length() < 1) && childrenMap.size() == 1) {
             setMainServlet(childrenMap.keySet().iterator().next());
         }
-        // TODO:sipSecurityUtils = new SipSecurityUtils(this);
 
-        // TODO:sipDigestAuthenticator = new
-        // DigestAuthenticator(sipApplicationDispatcher.getSipFactory().getHeaderFactory());
+        sipSecurityUtils = new SipSecurityUtils(this);
+
+        String realmName=null;
+        if(((SipLoginConfig)this.getSipLoginConfig())!=null){
+            realmName = ((SipLoginConfig)this.getSipLoginConfig()).getRealmName();
+        }
+        sipDigestAuthenticator = new SipDigestAuthenticationMechanism(realmName, sipApplicationDispatcher.getSipFactory().getHeaderFactory());
         // JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
         // called implicitly within sipApplicationDispatcher.addSipApplication
         sipApplicationDispatcher.addSipApplication(this.getApplicationName(), this);
+
+        //lests starts sipServlets too!!
+        ArrayList<Lifecycle> lifecycles = new ArrayList<>();
+        for(MobicentsSipServlet sipServlet : this.getChildrenMap().values()){
+            lifecycles.add((SipServletImpl) sipServlet);
+        }
+        for (Lifecycle object : lifecycles) {
+            object.start();
+        }
+        final TreeMap<Integer, List<ManagedServlet>> loadOnStartup = new TreeMap<>();
+        for(MobicentsSipServlet sipServlet : this.getChildrenMap().values()){
+            SipServletImpl servlet = (SipServletImpl) sipServlet;
+
+            Integer loadOnStartupNumber = servlet.getServletInfo().getLoadOnStartup();
+            if (loadOnStartupNumber != null) {
+                if (loadOnStartupNumber < 0) {
+                    continue;
+                }
+                List<ManagedServlet> list = loadOnStartup.get(loadOnStartupNumber);
+                if (list == null) {
+                    loadOnStartup.put(loadOnStartupNumber, list = new ArrayList<>());
+                }
+                list.add(servlet);
+            }
+        }
+        for(Map.Entry<Integer, List<ManagedServlet>> load : loadOnStartup.entrySet()) {
+            for(ManagedServlet servlet : load.getValue()) {
+                servlet.createServlet();
+            }
+        }
+        if (deployment.getDeploymentInfo().isEagerFilterInit()){
+            for(ManagedFilter filter: deployment.getFilters().getFilters().values()) {
+                filter.createFilter();
+            }
+        }
 
         if (logger.isDebugEnabled()) {
             logger.debug("sip application session timeout for this context is "
@@ -224,6 +270,15 @@ public class SipContextImpl implements SipContext {
                 + ((UndertowSipManager) this.getSessionManager()).getActiveSipSessions());
         logger.warn("number of active sip application sessions : "
                 + ((UndertowSipManager) this.getSessionManager()).getActiveSipApplicationSessions());
+
+        //lests stop sipServlets lifecycle objects:
+        ArrayList<Lifecycle> lifecycles = new ArrayList<>();
+        for(MobicentsSipServlet sipServlet : this.getChildrenMap().values()){
+            lifecycles.add((SipServletImpl) sipServlet);
+        }
+        for (Lifecycle object : lifecycles) {
+            object.stop();
+        }
 
         // this should happen after so that applications can still do some processing
         // in destroy methods to notify that context is getting destroyed and app removed
@@ -990,19 +1045,28 @@ public class SipContextImpl implements SipContext {
 
     @Override
     public boolean isPackageProtectionEnabled() {
-        // TODO
+        //Got from org.apache.catalina.security.SecurityUtil:
+        boolean packageDefinitionEnabled = (System.getProperty("package.definition") == null && System.getProperty("package.access") == null) ? false : true;
+        boolean isSecurityEnabled = (System.getSecurityManager() != null);
+
+        if (packageDefinitionEnabled && isSecurityEnabled){
+            return true;
+        }
         return false;
     }
 
     @Override
-    public boolean authorize(MobicentsSipServletRequest request) {
-        // TODO
-        return true;
+    public boolean authorize(MobicentsSipServletRequest request){
+        String servletInfoName = request.getSipSession().getHandler();
+        ServletInfo servletInfo = this.getDeploymentInfoFacade().getSipServlets().get(servletInfoName);
+
+        return sipSecurityUtils.authorize(request, servletInfo, this.getSipApplicationDispatcher().getSipStack());
+
     }
 
     @Override
     public SipDigestAuthenticator getDigestAuthenticator() {
-        return this.getDigestAuthenticator();
+        return this.sipDigestAuthenticator;
     }
 
     @Override
@@ -1034,5 +1098,13 @@ public class SipContextImpl implements SipContext {
 
     public Deployment getDeployment() {
         return deployment;
+    }
+
+    public String getSecurityDomain() {
+        return securityDomain;
+    }
+
+    public void setSecurityDomain(String securityDomain) {
+        this.securityDomain = securityDomain;
     }
 }
