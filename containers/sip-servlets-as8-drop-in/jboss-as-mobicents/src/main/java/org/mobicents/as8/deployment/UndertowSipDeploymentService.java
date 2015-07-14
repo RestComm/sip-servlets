@@ -22,15 +22,6 @@
 package org.mobicents.as8.deployment;
 
 import io.undertow.servlet.api.Deployment;
-import io.undertow.servlet.core.ManagedFilter;
-import io.undertow.servlet.core.ManagedServlet;
-import io.undertow.servlet.core.ManagedServlets;
-import io.undertow.servlet.handlers.ServletHandler;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 
@@ -43,7 +34,6 @@ import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
-import org.mobicents.servlet.sip.undertow.SipServletImpl;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentService;
 
 /**
@@ -73,7 +63,7 @@ public class UndertowSipDeploymentService implements Service<UndertowSipDeployme
 
         DeploymentUnit anchorDu = SIPWebContext.getSipContextAnchorDu(this.deploymentUnit);
         SIPWebContext sipWebContext = anchorDu.getAttachment(SIPWebContext.ATTACHMENT_KEY);
-        
+
         try {
             Module module = this.deploymentUnit.getAttachment(Attachments.MODULE);
             sipWebContext.init(deployment, module.getClassLoader());
@@ -97,8 +87,7 @@ public class UndertowSipDeploymentService implements Service<UndertowSipDeployme
                 sipWebContext.listenerStop();
             }
         } catch (ServletException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            ServerLogger.DEPLOYMENT_LOGGER.error("UndertowSipDeploymentService.stop() ends with error: "+e.getMessage(), e);
         }
     }
 }

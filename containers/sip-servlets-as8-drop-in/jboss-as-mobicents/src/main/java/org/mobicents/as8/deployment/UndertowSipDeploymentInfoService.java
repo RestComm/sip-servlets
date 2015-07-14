@@ -105,6 +105,5 @@ public class UndertowSipDeploymentInfoService implements Service<UndertowSipDepl
 
     @Override
     public void stop(StopContext context) {
-        // TODO Auto-generated method stub
     }
 }

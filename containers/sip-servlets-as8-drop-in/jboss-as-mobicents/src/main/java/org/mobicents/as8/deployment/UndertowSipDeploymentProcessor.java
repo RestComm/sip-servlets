@@ -39,6 +39,7 @@ import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.value.ImmediateValue;
 import org.mobicents.metadata.sip.spec.SipAnnotationMetaData;
 import org.mobicents.metadata.sip.spec.SipMetaData;
+import org.wildfly.extension.undertow.Server;
 import org.wildfly.extension.undertow.UndertowService;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentService;
@@ -48,6 +49,7 @@ import org.wildfly.extension.undertow.deployment.UndertowDeploymentService;
  */
 public class UndertowSipDeploymentProcessor implements DeploymentUnitProcessor {
 
+    //copied from "protected" UndertowDeploymentProcessor.hostNameOfDeployment()
     public static String hostNameOfDeployment(final WarMetaData metaData, final String defaultHost) {
         Collection<String> hostNames = null;
         if (metaData.getMergedJBossWebMetaData() != null) {
@@ -63,6 +65,7 @@ public class UndertowSipDeploymentProcessor implements DeploymentUnitProcessor {
         return hostName;
     }
 
+    //copied from "protected" UndertowDeploymentProcessor.pathNameOfDeployment()
     public static String pathNameOfDeployment(final DeploymentUnit deploymentUnit, final JBossWebMetaData metaData) {
         String pathName;
         if (metaData.getContextRoot() == null) {
@@ -86,7 +89,6 @@ public class UndertowSipDeploymentProcessor implements DeploymentUnitProcessor {
 
     @Override
     public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-
         final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
         SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
         if (sipMetaData == null) {
@@ -105,53 +107,45 @@ public class UndertowSipDeploymentProcessor implements DeploymentUnitProcessor {
 
         final WarMetaData warMetaData = deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
         final JBossWebMetaData metaData = warMetaData.getMergedJBossWebMetaData();
-        // TODO:
-        final String defaultHost = "default-host";
-        final String defaultServer = "default-server";
 
-        String hostName = /* TODO:UndertowDeploymentProcessor. */hostNameOfDeployment(warMetaData, defaultHost);
-        final String pathName = /* TODO:UndertowDeploymentProcessor. */pathNameOfDeployment(deploymentUnit, metaData);
+        //lets find default server service:
+        final ServiceName defaultServerServiceName = UndertowService.DEFAULT_SERVER;
+        ServiceController<?> defaultServerServiceController = phaseContext.getServiceRegistry().getService(defaultServerServiceName);
+        Server defaultServerService = (Server) defaultServerServiceController.getValue();
 
-        String serverInstanceName = metaData.getServerInstanceName() == null ? defaultServer : metaData
-                .getServerInstanceName();
+        final String defaultServer = defaultServerService.getName();
+        final String defaultHost = defaultServerService.getDefaultHost();
+
+        String hostName = UndertowSipDeploymentProcessor.hostNameOfDeployment(warMetaData, defaultHost);
+        final String pathName = UndertowSipDeploymentProcessor.pathNameOfDeployment(deploymentUnit, metaData);
+
+        String serverInstanceName = metaData.getServerInstanceName() == null ? defaultServer : metaData.getServerInstanceName();
 
         // lets find udertowdeployment service
-        final ServiceName deploymentServiceName = UndertowService.deploymentServiceName(serverInstanceName, hostName,
-                pathName);
-        ServiceController<?> deploymentServiceController = phaseContext.getServiceRegistry().getService(
-                deploymentServiceName);
-        UndertowDeploymentService deploymentService = (UndertowDeploymentService) deploymentServiceController
-                .getValue();
+        final ServiceName deploymentServiceName = UndertowService.deploymentServiceName(serverInstanceName, hostName, pathName);
+        ServiceController<?> deploymentServiceController = phaseContext.getServiceRegistry().getService(deploymentServiceName);
+        UndertowDeploymentService deploymentService = (UndertowDeploymentService) deploymentServiceController.getValue();
 
         // lets find udertowdeploymentinfo service
         final ServiceName deploymentInfoServiceName = deploymentServiceName
                 .append(UndertowDeploymentInfoService.SERVICE_NAME);
-        ServiceController<?> deploymentInfoServiceController = phaseContext.getServiceRegistry().getService(
-                deploymentInfoServiceName);
-        UndertowDeploymentInfoService deploymentInfoService = (UndertowDeploymentInfoService) deploymentInfoServiceController
-                .getService();
+        ServiceController<?> deploymentInfoServiceController = phaseContext.getServiceRegistry().getService(deploymentInfoServiceName);
+        UndertowDeploymentInfoService deploymentInfoService = (UndertowDeploymentInfoService) deploymentInfoServiceController.getService();
 
         // lets inject undertowdeployment service to sip deploymentinfo service:
-        final ServiceName sipDeploymentInfoServiceName = deploymentServiceName
-                .append(UndertowSipDeploymentInfoService.SERVICE_NAME);
-        ServiceController<?> sipDeplyomentInfoServiceController = phaseContext.getServiceRegistry().getService(
-                sipDeploymentInfoServiceName);
-        UndertowSipDeploymentInfoService sipDeplyomentInfoService = (UndertowSipDeploymentInfoService) sipDeplyomentInfoServiceController
-                .getService();
-        sipDeplyomentInfoService.getDeploymentInfoServiceInjectedValue().setValue(
-                new ImmediateValue<UndertowDeploymentInfoService>(deploymentInfoService));
+        final ServiceName sipDeploymentInfoServiceName = deploymentServiceName.append(UndertowSipDeploymentInfoService.SERVICE_NAME);
+        ServiceController<?> sipDeplyomentInfoServiceController = phaseContext.getServiceRegistry().getService(sipDeploymentInfoServiceName);
+        UndertowSipDeploymentInfoService sipDeplyomentInfoService = (UndertowSipDeploymentInfoService) sipDeplyomentInfoServiceController.getService();
+        sipDeplyomentInfoService.getDeploymentInfoServiceInjectedValue().setValue(new ImmediateValue<UndertowDeploymentInfoService>(deploymentInfoService));
 
         // initiate undertowsipdeployment service:
-        final ServiceName sipDeploymentServiceName = deploymentServiceName
-                .append(UndertowSipDeploymentService.SERVICE_NAME);
-        UndertowSipDeploymentService sipDeploymentService = new UndertowSipDeploymentService(deploymentService,
-                deploymentUnit);
-        ServiceBuilder<UndertowSipDeploymentService> sipDeploymentServiceBuilder = phaseContext.getServiceTarget()
-                .addService(sipDeploymentServiceName, sipDeploymentService);
+        final ServiceName sipDeploymentServiceName = deploymentServiceName.append(UndertowSipDeploymentService.SERVICE_NAME);
+        UndertowSipDeploymentService sipDeploymentService = new UndertowSipDeploymentService(deploymentService,deploymentUnit);
+        ServiceBuilder<UndertowSipDeploymentService> sipDeploymentServiceBuilder = phaseContext.getServiceTarget().addService(sipDeploymentServiceName, sipDeploymentService);
+
         // this service depends on the base undertowdeployment service:
         sipDeploymentServiceBuilder.addDependency(deploymentServiceName);
         sipDeploymentServiceBuilder.install();
-
     }
 
     @Override
