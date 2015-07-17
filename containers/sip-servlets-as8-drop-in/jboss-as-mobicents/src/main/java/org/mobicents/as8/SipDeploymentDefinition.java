@@ -51,6 +51,8 @@ import org.mobicents.servlet.sip.core.SipManager;
  * @author <a href="mailto:torben@jit-central.com">Torben Jaeger</a>
  * @created 23.2.12 18:32
  * @author josemrecio@gmail.com
+ *
+ * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class SipDeploymentDefinition extends SimpleResourceDefinition {

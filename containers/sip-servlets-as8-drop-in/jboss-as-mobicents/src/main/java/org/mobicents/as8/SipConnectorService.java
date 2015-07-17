@@ -42,6 +42,8 @@ import static org.mobicents.as8.SipMessages.MESSAGES;
  * Service creating and starting a web connector.
  *
  * @author Emanuel Muckenhuber
+ *
+ * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 class SipConnectorService implements Service<SipConnectorListener> {
@@ -102,7 +104,7 @@ class SipConnectorService implements Service<SipConnectorListener> {
             sipConnector.setStunServerAddress(stunServerAddress);
             sipConnector.setStunServerPort(stunServerPort);
 
-            /*TODO:
+            /*FIXME: kakonyii: need an implementation in SipConnector class for the following fields:
              * enableLookups
              * proxyName
              * proxyPort

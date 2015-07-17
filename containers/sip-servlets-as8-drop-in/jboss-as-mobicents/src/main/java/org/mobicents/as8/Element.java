@@ -26,6 +26,8 @@ import java.util.Map;
 
 /**
  * @author Emanuel Muckenhuber
+ *
+ * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 enum Element {

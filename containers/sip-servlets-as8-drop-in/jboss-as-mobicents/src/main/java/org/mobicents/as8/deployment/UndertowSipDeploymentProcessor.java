@@ -43,7 +43,6 @@ import org.wildfly.extension.undertow.Server;
 import org.wildfly.extension.undertow.UndertowService;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentService;
-
 /**
  *@author kakonyi.istvan@alerant.hu
  */

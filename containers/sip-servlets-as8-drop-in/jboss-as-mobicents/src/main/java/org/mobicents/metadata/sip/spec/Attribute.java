@@ -28,6 +28,8 @@ import java.util.Map;
  * An enumeration of all the possible XML attributes in the web-app 3.0 schema, by name.
  *
  * @author Remy Maucherat
+ *
+ * This class is based on the contents of org.mobicents.metadata.sip.spec package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public enum Attribute {

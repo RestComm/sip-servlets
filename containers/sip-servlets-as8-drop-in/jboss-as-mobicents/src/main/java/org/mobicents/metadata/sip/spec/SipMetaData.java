@@ -32,6 +32,8 @@ import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
  * The sip-app spec metadata. This class is based on the CR12 Tag of the WebMetaData class
  *
  * @author jean.deruelle@gmail.com
+ *
+ * This class is based on the contents of org.mobicents.metadata.sip.spec package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 //public abstract class SipMetaData extends IdMetaDataImplWithDescriptionGroup implements Environment {

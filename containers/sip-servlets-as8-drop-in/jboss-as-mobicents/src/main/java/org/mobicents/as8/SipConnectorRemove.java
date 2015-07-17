@@ -32,6 +32,8 @@ import org.jboss.dmr.ModelNode;
  * Update removing a web connector
  *
  * @author Emanuel Muckenhuber
+ *
+ * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 class SipConnectorRemove extends AbstractRemoveStepHandler {

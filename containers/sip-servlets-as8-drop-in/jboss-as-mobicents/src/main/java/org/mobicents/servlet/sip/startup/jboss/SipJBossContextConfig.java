@@ -24,7 +24,6 @@ package org.mobicents.servlet.sip.startup.jboss;
 import io.undertow.servlet.api.InstanceFactory;
 import io.undertow.servlet.api.InstanceHandle;
 import io.undertow.servlet.api.ServletInfo;
-import io.undertow.servlet.core.DeploymentImpl;
 
 import java.lang.reflect.Method;
 import java.util.Iterator;
@@ -37,7 +36,6 @@ import org.jboss.as.naming.ManagedReference;
 import org.jboss.as.naming.ManagedReferenceFactory;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.web.common.ServletContextAttribute;
-import org.jboss.logging.Logger;
 import org.jboss.metadata.javaee.spec.DescriptionGroupMetaData;
 import org.jboss.metadata.javaee.spec.DescriptionImpl;
 import org.jboss.metadata.javaee.spec.DescriptionsImpl;
@@ -92,6 +90,8 @@ import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
  * defined servlets. It extends the JbossContextConfig to be able to load sip servlet applications.
  *
  * @author Jean Deruelle
+ *
+ * This class is based on org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig class from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  *
  */
@@ -103,8 +103,6 @@ public class SipJBossContextConfig{
         this.deploymentUnit = deploymentUnitContext;
         this.deploymentInfoservice = deploymentInfoservice;
     }
-
-    private static transient Logger logger = Logger.getLogger(SipJBossContextConfig.class);
 
     /**
      * Process the context parameters defined in sip.xml. Let a user application override the sharedMetaData values.
@@ -185,7 +183,7 @@ public class SipJBossContextConfig{
 
         // sip context params
         this.processSipContextParameters(convergedMetaData);
-        //TODO which one is correct?
+
         List<? extends ParamValueMetaData> sipContextParams = convergedMetaData.getSipContextParams();
         if (sipContextParams != null) {
             for (ParamValueMetaData param : sipContextParams) {
@@ -221,14 +219,13 @@ public class SipJBossContextConfig{
                 sipSecurityConstraint.setDisplayName(sipConstraintMetaData.getDisplayName());
                 if (sipConstraintMetaData.getAuthConstraint() != null) {
                     for (String role : sipConstraintMetaData.getAuthConstraint().getRoleNames()) {
-                        //TODO addAuthRole() helyett:
                         sipSecurityConstraint.addRoleAllowed(role);
                     }
                 }
                 if (sipConstraintMetaData.getProxyAuthentication() != null) {
                     sipSecurityConstraint.setProxyAuthentication(true);
                 }
-                
+
                 TransportGuaranteeType tg = sipConstraintMetaData.getTransportGuarantee();
                 io.undertow.servlet.api.TransportGuaranteeType undertowTg = null;
                 if (tg==TransportGuaranteeType.CONFIDENTIAL){
@@ -268,7 +265,6 @@ public class SipJBossContextConfig{
         // sip login config
         SipLoginConfigMetaData sipLoginConfig = convergedMetaData.getSipLoginConfig();
         if (sipLoginConfig != null) {
-            //TODO authmethod =?= mechanismname
             SipLoginConfig sipLoginConfig2 = new SipLoginConfig(sipLoginConfig.getAuthMethod(),sipLoginConfig.getRealmName());
 
             if (sipLoginConfig.getIdentityAssertion() != null) {
@@ -364,7 +360,7 @@ public class SipJBossContextConfig{
                         servletInfo.addSecurityRoleRef(ref.getRoleName(), ref.getRoleLink());
                     }
                 }
-                SipServletImpl wrapper = new SipServletImpl(servletInfo, convergedContext.getServletContext());//TODO:listeners, etc (SipServletImpl) convergedContext.createWrapper();
+                SipServletImpl wrapper = new SipServletImpl(servletInfo, convergedContext.getServletContext());
                 wrapper.setupMultipart(convergedContext.getServletContext());
                 wrapper.setServletName(value.getServletName());
 
@@ -387,7 +383,7 @@ public class SipJBossContextConfig{
             convergedContext.setSipApplicationKeyMethod(sipApplicationKeyMethod);
         }
         convergedContext.setConcurrencyControlMode(convergedMetaData.getConcurrencyControlMode());
-        //TODO:convergedContext.setWrapperClass(StandardWrapper.class.getName());
+        //FIXME: kakonyii: no wrapperclass in wildfly, do we need this? convergedContext.setWrapperClass(StandardWrapper.class.getName());
     }
 
     //copied from UndertowDeploymentInfoService

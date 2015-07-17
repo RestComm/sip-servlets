@@ -35,7 +35,6 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentService;
-
 /**
  *@author kakonyi.istvan@alerant.hu
  */

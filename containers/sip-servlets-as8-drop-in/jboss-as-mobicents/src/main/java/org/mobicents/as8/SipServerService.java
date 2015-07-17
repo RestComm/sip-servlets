@@ -40,6 +40,8 @@ import org.mobicents.servlet.sip.undertow.SipStandardService;
  * Service configuring and starting the web container.
  *
  * @author Emanuel Muckenhuber
+ *
+ * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 class SipServerService implements SipServer, Service<SipServer> {
@@ -77,10 +79,12 @@ class SipServerService implements SipServer, Service<SipServer> {
 
     private final String instanceId;
 
-//    private Engine engine;
+    //FIXME: kakonyii
+    //private Engine engine;
     //private StandardServer server;
-//    private StandardService service;
+    //private StandardService service;
 
+    //FIXME: kakonyii
     //private SipStandardEngine sipEngine;
     private SipStandardService sipService;
 
@@ -111,8 +115,10 @@ class SipServerService implements SipServer, Service<SipServer> {
             int backToNormalMemoryThreshold,
             String outboundProxy,
             String instanceId) {
-//        this.defaultHost = defaultHost;
-//        this.useNative = useNative;
+
+        //FIXME: kakonyii
+        //this.defaultHost = defaultHost;
+        //this.useNative = useNative;
         this.sipAppRouterFile = sipAppRouterFile;
         this.sipStackPropertiesFile = sipStackPropertiesFile;
         this.sipPathName = sipPathName;
@@ -140,6 +146,7 @@ class SipServerService implements SipServer, Service<SipServer> {
 
     /** {@inheritDoc} */
     public synchronized void start(StartContext context) throws StartException {
+        //FIXME: kakonyii
         //if (org.apache.tomcat.util.Constants.ENABLE_MODELER) {
             // Set the MBeanServer
             final MBeanServer mbeanServer = this.mbeanServer.getOptionalValue();
@@ -149,33 +156,35 @@ class SipServerService implements SipServer, Service<SipServer> {
         //}
 
         System.setProperty("catalina.home", pathManagerInjector.getValue().getPathEntry(TEMP_DIR).resolvePath());
+        //FIXME: kakonyii
         //server = new StandardServer();
-//        final StandardService service = new StandardService();
-//        service.setName(JBOSS_SIP);
-//        service.setServer(server);
-//        server.addService(service);
+        //final StandardService service = new StandardService();
+        //service.setName(JBOSS_SIP);
+        //service.setServer(server);
+        //server.addService(service);
 
-//        final Engine engine = new StandardEngine();
-//        engine.setName(JBOSS_SIP);
-//        engine.setService(service);
-//        engine.setDefaultHost(defaultHost);
-//        if (instanceId != null) {
-//            engine.setJvmRoute(instanceId);
-//        }
-//
-//        service.setContainer(engine);
+        //final Engine engine = new StandardEngine();
+        //engine.setName(JBOSS_SIP);
+        //engine.setService(service);
+        //engine.setDefaultHost(defaultHost);
+        //if (instanceId != null) {
+            //engine.setJvmRoute(instanceId);
+        //}
 
-//        if (useNative) {
-//            final AprLifecycleListener apr = new AprLifecycleListener();
-//            apr.setSSLEngine("on");
-//            server.addLifecycleListener(apr);
-//        }
-//        server.addLifecycleListener(new JasperListener());
+        //service.setContainer(engine);
+
+        //if (useNative) {
+            //final AprLifecycleListener apr = new AprLifecycleListener();
+            //apr.setSSLEngine("on");
+            //server.addLifecycleListener(apr);
+        //}
+        //server.addLifecycleListener(new JasperListener());
 
         sipService = new SipStandardService();
         // https://code.google.com/p/sipservlets/issues/detail?id=277
         // Add the Service and sip app dispatched right away so apps can get the needed objects
         // when they deploy fast
+        //FIXME: kakonyii
         //server.addService(sipService);
 
         if (sipAppDispatcherClass != null) {
@@ -192,9 +201,9 @@ class SipServerService implements SipServer, Service<SipServer> {
             }
             System.setProperty("javax.servlet.sip.dar", sipAppRouterFile);
         }
-        //
+
         sipService.setSipPathName(sipPathName);
-        //
+
         if(sipStackPropertiesFile != null) {
             if(!sipStackPropertiesFile.startsWith(FILE_PREFIX_PATH)) {
                 sipStackPropertiesFile = FILE_PREFIX_PATH.concat(baseDir).concat("/").concat(sipStackPropertiesFile);
@@ -208,11 +217,11 @@ class SipServerService implements SipServer, Service<SipServer> {
         else {
             sipService.setConcurrencyControlMode("None");
         }
-        //
+
         sipService.setCongestionControlCheckingInterval(sipCongestionControlInterval);
-        //
+
         sipService.setUsePrettyEncoding(usePrettyEncoding);
-        //
+
         sipService.setBaseTimerInterval(baseTimerInterval);
         sipService.setT2Interval(t2Interval);
         sipService.setT4Interval(t4Interval);
@@ -229,12 +238,13 @@ class SipServerService implements SipServer, Service<SipServer> {
         sipService.setCongestionControlPolicy(congestionControlPolicy);
         sipService.setOutboundProxy(outboundProxy);
         sipService.setName(JBOSS_SIP);
-        //sipService.setServer(server);
 
+        //FIXME: kakonyii
+        //sipService.setServer(server);
         //sipEngine = new SipStandardEngine();
         //sipEngine.setName(JBOSS_SIP);
         //sipEngine.setService(sipService);
-//        sipEngine.setDefaultHost(defaultHost);
+        //sipEngine.setDefaultHost(defaultHost);
         if (instanceId != null) {
             //sipEngine.setJvmRoute(instanceId);
         }
@@ -243,6 +253,7 @@ class SipServerService implements SipServer, Service<SipServer> {
         try {
             sipService.initialize();
             sipService.start();
+            //FIXME: kakonyii
             //server.init();
             //server.start();
         } catch (Exception e) {
@@ -255,11 +266,13 @@ class SipServerService implements SipServer, Service<SipServer> {
     public synchronized void stop(StopContext context) {
         try {
             sipService.stop();
+            //FIXME: kakonyii
             //server.stop();
         } catch (Exception e) {
         }
-//        engine = null;
-//        service = null;
+        //FIXME: kakonyii
+        //engine = null;
+        //service = null;
         //server = null;
         //sipEngine = null;
         sipService = null;
@@ -287,20 +300,22 @@ class SipServerService implements SipServer, Service<SipServer> {
     }
 
     /** {@inheritDoc} */
-/*    public synchronized void addHost(Host host) {
-//        final Engine engine = this.engine;
-//        engine.addChild(host);
-        final SipStandardEngine sipEngine = this.sipEngine;
-        sipEngine.addChild(host);
-    }
-*/
+    //FIXME: kakonyii
+    //public synchronized void addHost(Host host) {
+    //    final Engine engine = this.engine;
+    //    engine.addChild(host);
+    //    final SipStandardEngine sipEngine = this.sipEngine;
+    //   sipEngine.addChild(host);
+    //}
+
     /** {@inheritDoc} */
-    /*public synchronized void removeHost(Host host) {
-//        final Engine engine = this.engine;
-//        engine.removeChild(host);
-        final SipStandardEngine sipEngine = this.sipEngine;
-        sipEngine.removeChild(host);
-    }*/
+    //FIXME: kakonyii
+    //public synchronized void removeHost(Host host) {
+    //    final Engine engine = this.engine;
+    //    engine.removeChild(host);
+    //    final SipStandardEngine sipEngine = this.sipEngine;
+    //    sipEngine.removeChild(host);
+    //}
 
     InjectedValue<MBeanServer> getMbeanServer() {
         return mbeanServer;
@@ -310,13 +325,15 @@ class SipServerService implements SipServer, Service<SipServer> {
         return pathManagerInjector;
     }
 
-/*    public StandardServer getServer() {
-        return server;
-    }
+    //FIXME: kakonyii
+    //public StandardServer getServer() {
+    //    return server;
+    //}
 
-    public StandardService getService() {
-        return sipService;
-    }*/
+    //FIXME: kakonyii
+    //public StandardService getService() {
+    //    return sipService;
+    //}
 
     public SipStandardService getSipService() {
         return sipService;

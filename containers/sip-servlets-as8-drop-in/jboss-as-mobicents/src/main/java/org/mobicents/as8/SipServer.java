@@ -29,6 +29,8 @@ import org.mobicents.servlet.sip.undertow.SipStandardService;
  *
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
+ *
+ * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public interface SipServer {
@@ -53,19 +55,19 @@ public interface SipServer {
      *
      * @param host the virtual host
      */
-//TODO:    void addHost(Host host);
+//FIXME:    void addHost(Host host);
 
     /**
      * Remove a virtual host.
      *
      * @param host the virtual host
      */
-//TODO:    void removeHost(Host host);
+//FIXME:    void removeHost(Host host);
 
     /**
      * return the server (StandardServer)
      */
-//TODO:    Server getServer();
+//FIXME:    Server getServer();
 
     /**
      * return the service (StandardService)

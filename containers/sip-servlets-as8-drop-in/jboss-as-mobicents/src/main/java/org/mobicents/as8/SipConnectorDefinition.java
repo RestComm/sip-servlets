@@ -37,6 +37,8 @@ import org.jboss.dmr.ModelType;
  * @author Tomaz Cerar
  * @created 22.2.12 15:03
  * @author josemrecio@gmail.com
+ *
+ * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class SipConnectorDefinition extends SimpleResourceDefinition {

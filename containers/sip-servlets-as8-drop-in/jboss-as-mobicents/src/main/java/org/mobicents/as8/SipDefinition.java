@@ -46,8 +46,10 @@ import org.jboss.dmr.ModelType;
 
 /**
  * @author Tomaz Cerar
- * @author kakonyi.istvan@alerant.hu
  * @created 22.2.12 14:29
+ *
+ * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ * @author kakonyi.istvan@alerant.hu
  */
 public class SipDefinition extends SimpleResourceDefinition {
     public static final SipDefinition INSTANCE = new SipDefinition();

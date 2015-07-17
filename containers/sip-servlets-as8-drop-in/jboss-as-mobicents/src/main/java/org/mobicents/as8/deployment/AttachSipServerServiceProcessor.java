@@ -31,6 +31,8 @@ import org.mobicents.as8.SipServer;
  * Attaches SipServer to the deploymentUnit so can be recovered afterwards
  *
  * @author josemrecio@gmail.com
+ *
+ * This class is based on the contents of org.mobicents.as7.deployment package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class AttachSipServerServiceProcessor implements DeploymentUnitProcessor {

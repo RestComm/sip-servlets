@@ -47,6 +47,8 @@ import org.wildfly.extension.undertow.deployment.UndertowMetricsCollector;
  * @author Tomaz Cerar
  * @created 23.2.12 18:35
  * @author josemrecio@gmail.com
+ *
+ * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class SipDeploymentServletDefinition extends SimpleResourceDefinition {
@@ -69,7 +71,8 @@ public class SipDeploymentServletDefinition extends SimpleResourceDefinition {
         registration.registerMetric(LOAD_TIME, new AbstractMetricsHandler() {
             @Override
             void handle(final ModelNode response, final String name, final MetricsHandler.MetricResult metricResult) {
-                //FIXME:response.set(metricResult.getLoadTime());
+                //FIXME: kakonyii: no getLoadTime() in undertow's MetricResult...
+                //response.set(metricResult.getLoadTime());
             }
         });
         registration.registerMetric(MAX_TIME, new AbstractMetricsHandler() {

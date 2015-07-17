@@ -38,6 +38,8 @@ import org.jboss.as.controller.registry.OperationEntry;
  *
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
+ *
+ * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class SipExtension implements Extension {

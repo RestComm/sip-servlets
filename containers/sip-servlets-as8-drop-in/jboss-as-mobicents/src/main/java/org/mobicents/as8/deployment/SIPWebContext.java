@@ -60,6 +60,8 @@ import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
  *
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
+ *
+ * This class is based on the contents of org.mobicents.as7.deployment package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class SIPWebContext extends SipContextImpl {
@@ -348,11 +350,9 @@ public class SIPWebContext extends SipContextImpl {
         sipJBossContextConfig.processSipMetaData((JBossConvergedSipMetaData) mergedMetaData, this);
     }
 
-    private SipJBossContextConfig createContextConfig(
-    /* SipStandardContext sipContext, */DeploymentUnit deploymentUnit,
-            UndertowDeploymentInfoService deploymentInfoservice) {
+    private SipJBossContextConfig createContextConfig(DeploymentUnit deploymentUnit, UndertowDeploymentInfoService deploymentInfoservice) {
         SipJBossContextConfig config = new SipJBossContextConfig(deploymentUnit, deploymentInfoservice);
-        // TODO:sipContext.addLifecycleListener(config);
+        // FIXME: kakonyii: sipContext.addLifecycleListener(config);
         return config;
     }
 

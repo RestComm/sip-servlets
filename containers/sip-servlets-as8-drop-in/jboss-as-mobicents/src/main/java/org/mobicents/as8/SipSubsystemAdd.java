@@ -69,6 +69,8 @@ import org.mobicents.as8.deployment.UndertowSipDeploymentProcessor;
  *
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
+ *
+ * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 @SuppressWarnings({ "deprecation", "unused" })
@@ -217,22 +219,14 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ModelNode outboundProxyModel = SipDefinition.OUTBOUND_PROXY.resolveModelAttribute(context, fullModel);
         final String outboundProxy = outboundProxyModel.isDefined() ? outboundProxyModel.asString() : null;
 
-        // final String instanceId = operation.hasDefined(Constants.INSTANCE_ID) ?
-        // operation.get(Constants.INSTANCE_ID).asString() : null;
-        // final String sipAppRouterFile = operation.hasDefined(Constants.APPLICATION_ROUTER) ?
-        // operation.get(Constants.APPLICATION_ROUTER).asString() : null;
-        // final String sipStackPropertiesFile = operation.hasDefined(Constants.SIP_STACK_PROPS) ?
-        // operation.get(Constants.SIP_STACK_PROPS).asString() : null;
-        // final String sipPathName = operation.hasDefined(Constants.SIP_PATH_NAME) ?
-        // operation.get(Constants.SIP_PATH_NAME).asString() : null;
-        // final String sipAppDispatcherClass = operation.hasDefined(Constants.SIP_APP_DISPATCHER_CLASS) ?
-        // operation.get(Constants.SIP_APP_DISPATCHER_CLASS).asString() : null;
-        // final int sipCongestionControlInterval = operation.hasDefined(Constants.CONGESTION_CONTROL_INTERVAL) ?
-        // operation.get(Constants.CONGESTION_CONTROL_INTERVAL).asInt() : -1;
-        // final String sipConcurrencyControlMode = operation.hasDefined(Constants.CONCURRENCY_CONTROL_MODE) ?
-        // operation.get(Constants.CONCURRENCY_CONTROL_MODE).asString() : null;
-        // final boolean usePrettyEncoding = operation.hasDefined(Constants.USE_PRETTY_ENCODING) ?
-        // operation.get(Constants.USE_PRETTY_ENCODING).asBoolean() : true;
+        // final String instanceId = operation.hasDefined(Constants.INSTANCE_ID) ? operation.get(Constants.INSTANCE_ID).asString() : null;
+        // final String sipAppRouterFile = operation.hasDefined(Constants.APPLICATION_ROUTER) ? operation.get(Constants.APPLICATION_ROUTER).asString() : null;
+        // final String sipStackPropertiesFile = operation.hasDefined(Constants.SIP_STACK_PROPS) ? operation.get(Constants.SIP_STACK_PROPS).asString() : null;
+        // final String sipPathName = operation.hasDefined(Constants.SIP_PATH_NAME) ? operation.get(Constants.SIP_PATH_NAME).asString() : null;
+        // final String sipAppDispatcherClass = operation.hasDefined(Constants.SIP_APP_DISPATCHER_CLASS) ? operation.get(Constants.SIP_APP_DISPATCHER_CLASS).asString() : null;
+        // final int sipCongestionControlInterval = operation.hasDefined(Constants.CONGESTION_CONTROL_INTERVAL) ? operation.get(Constants.CONGESTION_CONTROL_INTERVAL).asInt() : -1;
+        // final String sipConcurrencyControlMode = operation.hasDefined(Constants.CONCURRENCY_CONTROL_MODE) ? operation.get(Constants.CONCURRENCY_CONTROL_MODE).asString() : null;
+        // final boolean usePrettyEncoding = operation.hasDefined(Constants.USE_PRETTY_ENCODING) ? operation.get(Constants.USE_PRETTY_ENCODING).asBoolean() : true;
 
         final SipServerService service = new SipServerService(sipAppRouterFile, sipStackPropertiesFile, sipPathName,
                 sipAppDispatcherClass, additionalParameterableHeaders, sipCongestionControlInterval,
@@ -280,67 +274,50 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
                         Phase.INSTALL_WAR_DEPLOYMENT+1, new UndertowSipDeploymentProcessor());
 
                 // // Add the SIP specific deployment processor
-                // processorTarget.addDeploymentProcessor(Phase.PARSE, DEPLOYMENT_PROCESS_PRIORITY,
-                // SipMetaDataDeploymentProcessor.INSTANCE);
+                // processorTarget.addDeploymentProcessor(Phase.PARSE, DEPLOYMENT_PROCESS_PRIORITY, SipMetaDataDeploymentProcessor.INSTANCE);
                 // // Add the context in a different phase
-                // processorTarget.addDeploymentProcessor(Phase.POST_MODULE, DEPLOYMENT_PROCESS_PRIORITY,
-                // SipContextFactoryDeploymentProcessor.INSTANCE);
+                // processorTarget.addDeploymentProcessor(Phase.POST_MODULE, DEPLOYMENT_PROCESS_PRIORITY, SipContextFactoryDeploymentProcessor.INSTANCE);
 
                 // final SharedWebMetaDataBuilder sharedWebBuilder = new SharedWebMetaDataBuilder(config.clone());
                 // final SharedTldsMetaDataBuilder sharedTldsBuilder = new SharedTldsMetaDataBuilder(config.clone());
                 //
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.STRUCTURE,
-                // Phase.STRUCTURE_WAR_DEPLOYMENT_INIT, new WarDeploymentInitializingProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.STRUCTURE,
-                // Phase.STRUCTURE_WAR, new WarStructureDeploymentProcessor(sharedWebBuilder.create(),
-                // sharedTldsBuilder));
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE,
-                // Phase.PARSE_WEB_DEPLOYMENT, new WebParsingDeploymentProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE,
-                // Phase.PARSE_WEB_DEPLOYMENT_FRAGMENT, new WebFragmentParsingDeploymentProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE,
-                // Phase.PARSE_JSF_VERSION, new JsfVersionProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE,
-                // Phase.PARSE_JBOSS_WEB_DEPLOYMENT, new JBossWebParsingDeploymentProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE,
-                // Phase.PARSE_TLD_DEPLOYMENT, new TldParsingDeploymentProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE,
-                // Phase.PARSE_ANNOTATION_WAR, new WarAnnotationDeploymentProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE,
-                // Phase.PARSE_WEB_COMPONENTS, new WebComponentProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE,
-                // Phase.PARSE_EAR_CONTEXT_ROOT, new EarContextRootProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE,
-                // Phase.PARSE_WEB_MERGE_METADATA, new WarMetaDataProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE,
-                // Phase.POST_MODULE_JSF_MANAGED_BEANS, new JsfManagedBeanProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE,
-                // Phase.PARSE_WEB_INITIALIZE_IN_ORDER, new WebInitializeInOrderProcessor(defaultVirtualServer));
-                //
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.DEPENDENCIES,
-                // Phase.DEPENDENCIES_WAR_MODULE, new WarClassloadingDependencyProcessor());
-                //
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.POST_MODULE,
-                // Phase.POST_MODULE_JSF_MANAGED_BEANS, new JsfManagedBeanProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.INSTALL,
-                // Phase.INSTALL_SERVLET_INIT_DEPLOYMENT, new ServletContainerInitializerDeploymentProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.INSTALL,
-                // Phase.INSTALL_JSF_ANNOTATIONS, new JsfAnnotationProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.INSTALL,
-                // Phase.INSTALL_WAR_DEPLOYMENT, new WarDeploymentProcessor(defaultVirtualServer));
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.STRUCTURE, Phase.STRUCTURE_WAR_DEPLOYMENT_INIT, new WarDeploymentInitializingProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.STRUCTURE, Phase.STRUCTURE_WAR, new WarStructureDeploymentProcessor(sharedWebBuilder.create(), sharedTldsBuilder));
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_WEB_DEPLOYMENT, new WebParsingDeploymentProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_WEB_DEPLOYMENT_FRAGMENT, new WebFragmentParsingDeploymentProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_JSF_VERSION, new JsfVersionProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_JBOSS_WEB_DEPLOYMENT, new JBossWebParsingDeploymentProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_TLD_DEPLOYMENT, new TldParsingDeploymentProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_ANNOTATION_WAR, new WarAnnotationDeploymentProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_WEB_COMPONENTS, new WebComponentProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_EAR_CONTEXT_ROOT, new EarContextRootProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_WEB_MERGE_METADATA, new WarMetaDataProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.POST_MODULE_JSF_MANAGED_BEANS, new JsfManagedBeanProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_WEB_INITIALIZE_IN_ORDER, new WebInitializeInOrderProcessor(defaultVirtualServer));
+
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.DEPENDENCIES, Phase.DEPENDENCIES_WAR_MODULE, new WarClassloadingDependencyProcessor());
+
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.POST_MODULE, Phase.POST_MODULE_JSF_MANAGED_BEANS, new JsfManagedBeanProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.INSTALL, Phase.INSTALL_SERVLET_INIT_DEPLOYMENT, new ServletContainerInitializerDeploymentProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.INSTALL, Phase.INSTALL_JSF_ANNOTATIONS, new JsfAnnotationProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.INSTALL, Phase.INSTALL_WAR_DEPLOYMENT, new WarDeploymentProcessor(defaultVirtualServer));
             }
         }, OperationContext.Stage.RUNTIME);
 
-        /*
-         * TODO:final ServiceTarget target = context.getServiceTarget(); final DistributedCacheManagerFactory factory =
-         * new MockDistributedCacheManagerFactoryService().getValue(); if (factory != null) { final
-         * InjectedValue<SipServer> server = new InjectedValue<SipServer>();
-         * newControllers.add(target.addService(MockDistributedCacheManagerFactoryService
-         * .JVM_ROUTE_REGISTRY_ENTRY_PROVIDER_SERVICE_NAME, new JvmRouteRegistryEntryProviderService(server))
-         * .addDependency(SipSubsystemServices.JBOSS_SIP, SipServer.class, server) .setInitialMode(Mode.ON_DEMAND)
-         * .install()); newControllers.addAll(factory.installServices(target)); }
-         */
-        //get servletContainerService:
+
+        //FIXME: kakonyii, no MockDistributedCacheManagerFactoryService in wildfly, need to find another solution to intsall this service:
+        //final ServiceTarget target = context.getServiceTarget();
+        //final DistributedCacheManagerFactory factory = new MockDistributedCacheManagerFactoryService().getValue();
+        //if (factory != null) {
+            //final InjectedValue<SipServer> server = new InjectedValue<SipServer>();
+            //newControllers.add(
+                    //target.addService(MockDistributedCacheManagerFactoryService.JVM_ROUTE_REGISTRY_ENTRY_PROVIDER_SERVICE_NAME, new JvmRouteRegistryEntryProviderService(server))
+                        //.addDependency(SipSubsystemServices.JBOSS_SIP, SipServer.class, server)
+                        //.setInitialMode(Mode.ON_DEMAND)
+                        //.install()
+                    //);
+            //newControllers.addAll(factory.installServices(target));
+        //}
     }
 
     @Override

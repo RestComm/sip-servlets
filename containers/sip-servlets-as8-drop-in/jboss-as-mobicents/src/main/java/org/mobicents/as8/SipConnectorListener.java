@@ -65,7 +65,6 @@ public class SipConnectorListener {
         try {
             this.protocolHandler.destroy();
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

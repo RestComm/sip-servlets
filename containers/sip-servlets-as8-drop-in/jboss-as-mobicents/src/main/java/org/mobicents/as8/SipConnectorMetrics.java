@@ -37,6 +37,8 @@ import static org.mobicents.as8.SipMessages.MESSAGES;
 
 /**
  * @author Emanuel Muckenhuber
+ *
+ * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 class SipConnectorMetrics implements OperationStepHandler {
@@ -99,7 +101,8 @@ class SipConnectorMetrics implements OperationStepHandler {
                             final SipConnectorListener connector = (SipConnectorListener) controller.getValue();
                             final ModelNode result = context.getResult();
                             if (connector.getProtocolHandler() != null /*FIXME:&& connector.getProtocolHandler().getRequestGroupInfo() != null*/) {
-                                /*FIXME:RequestGroupInfo info = connector.getProtocolHandler().getRequestGroupInfo();
+                                /*FIXME: kakonyii: currently there is no requestGroupInfo in SipProtocolHandler, so we need to find other solution to implement this:
+                                RequestGroupInfo info = connector.getProtocolHandler().getRequestGroupInfo();
                                 if (org.mobicents.as8.Constants.BYTES_SENT.equals(attributeName)) {
                                     result.set("" + info.getBytesSent());
                                 } else if (org.mobicents.as8.Constants.BYTES_RECEIVED.equals(attributeName)) {

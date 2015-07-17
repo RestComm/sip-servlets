@@ -34,6 +34,8 @@ import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
  *
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
+ *
+ * This class is based on the contents of org.mobicents.as7.deployment package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 class SIPContextFactory{
