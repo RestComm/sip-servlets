@@ -58,6 +58,7 @@ public interface Constants {
     String DEVELOPMENT = "development";
     String DIALOG_PENDING_REQUEST_CHECKING = "dialog-pending-request-checking";
     String DNS_SERVER_LOCATOR_CLASS = "dns-server-locator-class";
+    String DNS_TIMEOUT = "dns-timeout";
     String DNS_RESOLVER_CLASS = "dns-resolver-class";
     String CALL_ID_MAX_LENGTH = "call-id-max-length";
     String TAG_HASH_MAX_LENGTH = "tag-hash-max-length";
@@ -128,6 +129,7 @@ public interface Constants {
     String STATIC_SERVER_PORT = "static-server-port";
     String STUN_SERVER_ADDRESS = "stun-server-address";
     String STUN_SERVER_PORT = "stun-server-port";
+    String HOSTNAMES = "hostnames";
     String SUBSTITUTION = "substitution";
     String SUBSYSTEM = "subsystem";
     String T2_INTERVAL = "t2-interval";

@@ -69,6 +69,7 @@ class SipServerService implements SipServer, Service<SipServer> {
     final int timerDInterval;
     final boolean dialogPendingRequestChecking;
     final String dnsServerLocatorClass;
+    int dnsTimeout;
     final String dnsResolverClass;
     final int callIdMaxLength;
     final int tagHashMaxLength;
@@ -107,6 +108,7 @@ class SipServerService implements SipServer, Service<SipServer> {
             int timerDInterval,
             boolean dialogPendingRequestChecking,
             String dnsServerLocatorClass,
+            int dnsTimeout,
             String dnsResolverClass,
             int callIdMaxLength,
             int tagHashMaxLength,
@@ -135,6 +137,7 @@ class SipServerService implements SipServer, Service<SipServer> {
         this.timerDInterval = timerDInterval;
         this.dialogPendingRequestChecking = dialogPendingRequestChecking;
         this.dnsServerLocatorClass = dnsServerLocatorClass;
+        this.dnsTimeout = dnsTimeout;
         this.dnsResolverClass = dnsResolverClass;
         this.callIdMaxLength = callIdMaxLength;
         this.tagHashMaxLength = tagHashMaxLength;
@@ -231,6 +234,7 @@ class SipServerService implements SipServer, Service<SipServer> {
         }
         sipService.setDialogPendingRequestChecking(dialogPendingRequestChecking);
         sipService.setDnsServerLocatorClass(dnsServerLocatorClass);
+        sipService.setDnsTimeout(dnsTimeout);
         sipService.setDnsResolverClass(dnsResolverClass);
         sipService.setCanceledTimerTasksPurgePeriod(canceledTimerTasksPurgePeriod);
         sipService.setMemoryThreshold(memoryThreshold);

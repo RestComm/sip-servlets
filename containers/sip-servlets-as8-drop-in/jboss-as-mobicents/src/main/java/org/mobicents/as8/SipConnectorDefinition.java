@@ -136,6 +136,14 @@ public class SipConnectorDefinition extends SimpleResourceDefinition {
                     .setRequires(Constants.USE_STUN)
                     .build();
 
+    protected static final SimpleAttributeDefinition HOSTNAMES =
+            new SimpleAttributeDefinitionBuilder(Constants.HOSTNAMES, ModelType.STRING)
+                    .setXmlName(Constants.HOSTNAMES)
+                    .setAllowNull(true)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setValidator(new StringLengthValidator(1))
+                    .build();
+
     protected static final SimpleAttributeDefinition[] CONNECTOR_ATTRIBUTES = {
             //NAME, // name is read-only
             // IMPORTANT -- keep these in xsd order as this order controls marshalling
@@ -148,7 +156,8 @@ public class SipConnectorDefinition extends SimpleResourceDefinition {
         STATIC_SERVER_PORT,
         USE_STUN,
         STUN_SERVER_ADDRESS,
-        STUN_SERVER_PORT
+        STUN_SERVER_PORT,
+        HOSTNAMES
     };
 
     private SipConnectorDefinition() {

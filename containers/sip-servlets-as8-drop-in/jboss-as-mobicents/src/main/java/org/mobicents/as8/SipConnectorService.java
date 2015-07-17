@@ -56,6 +56,7 @@ class SipConnectorService implements Service<SipConnectorListener> {
     private Boolean useStun = false;
     private String stunServerAddress = null;
     private int stunServerPort = -1;
+    private String hostNames = null;
 
     private SipConnectorListener connector;
 
@@ -63,7 +64,7 @@ class SipConnectorService implements Service<SipConnectorListener> {
     private final InjectedValue<SocketBinding> binding = new InjectedValue<SocketBinding>();
     private final InjectedValue<SipServer> server = new InjectedValue<SipServer>();
 
-    public SipConnectorService(String protocol, String scheme, boolean useStaticAddress, String staticServerAddress, int staticServerPort, boolean useStun, String stunServerAddress, int stunServerPort) {
+    public SipConnectorService(String protocol, String scheme, boolean useStaticAddress, String staticServerAddress, int staticServerPort, boolean useStun, String stunServerAddress, int stunServerPort, String hostNames) {
         if (protocol != null)
             this.protocol = protocol;
         if (scheme != null)
@@ -76,6 +77,7 @@ class SipConnectorService implements Service<SipConnectorListener> {
         if (stunServerAddress != null)
             this.stunServerAddress = stunServerAddress;
         this.stunServerPort = stunServerPort;
+        this.hostNames = hostNames;
     }
 
     /**
@@ -93,7 +95,7 @@ class SipConnectorService implements Service<SipConnectorListener> {
         try {
 
             SipConnector sipConnector = new SipConnector();
-            sipConnector.setIpAddress(address.getHostName());
+            sipConnector.setIpAddress(address.getAddress().getHostAddress());
             sipConnector.setPort(address.getPort());
             // https://github.com/Mobicents/sip-servlets/issues/44 support multiple connectors
             sipConnector.setTransport(binding.getName().substring(binding.getName().lastIndexOf("sip-")+("sip-".length())));
@@ -103,7 +105,11 @@ class SipConnectorService implements Service<SipConnectorListener> {
             sipConnector.setUseStun(useStun);
             sipConnector.setStunServerAddress(stunServerAddress);
             sipConnector.setStunServerPort(stunServerPort);
+            sipConnector.setHostNames(hostNames);
 
+            Logger.getLogger("org.mobicents.as8").debug("SipConnectorService.start(), address = " + address.getAddress().getHostAddress() + " - port = " + address.getPort() + " - transport = " + sipConnector.getTransport());
+            Logger.getLogger("org.mobicents.as8").debug("SipConnectorService.start(), hostnames = " + hostNames);
+            
             /*FIXME: kakonyii: need an implementation in SipConnector class for the following fields:
              * enableLookups
              * proxyName

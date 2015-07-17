@@ -26,6 +26,7 @@ import static org.mobicents.as8.Constants.STATIC_SERVER_ADDRESS;
 import static org.mobicents.as8.Constants.STATIC_SERVER_PORT;
 import static org.mobicents.as8.Constants.STUN_SERVER_ADDRESS;
 import static org.mobicents.as8.Constants.STUN_SERVER_PORT;
+import static org.mobicents.as8.Constants.HOSTNAMES;
 import static org.mobicents.as8.SipConnectorDefinition.CONNECTOR_ATTRIBUTES;
 
 import java.util.List;
@@ -92,7 +93,9 @@ class SipConnectorAdd extends AbstractAddStepHandler {
         final String stunServerAddress = operation.hasDefined(STUN_SERVER_ADDRESS) ? SipConnectorDefinition.STUN_SERVER_ADDRESS.resolveModelAttribute(context, fullModel).asString() : null;
         final int stunServerPort = operation.hasDefined(STUN_SERVER_PORT) ? SipConnectorDefinition.STUN_SERVER_PORT.resolveModelAttribute(context, fullModel).asInt() : -1;
 
-        final SipConnectorService service = new SipConnectorService(protocol, scheme, useStaticAddress, staticServerAddress, staticServerPort, useStun, stunServerAddress, stunServerPort);
+        final String hostNames = operation.hasDefined(HOSTNAMES) ? SipConnectorDefinition.HOSTNAMES.resolveModelAttribute(context, fullModel).asString() : null;
+        
+        final SipConnectorService service = new SipConnectorService(protocol, scheme, useStaticAddress, staticServerAddress, staticServerPort, useStun, stunServerAddress, stunServerPort, hostNames);
 
         final ServiceBuilder<SipConnectorListener> serviceBuilder = context
                 .getServiceTarget()

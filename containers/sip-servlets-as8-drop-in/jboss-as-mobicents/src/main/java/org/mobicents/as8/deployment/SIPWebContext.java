@@ -205,7 +205,7 @@ public class SIPWebContext extends SipContextImpl {
                 if (sipMetaData.getSipServlets() != null) {
                     logger.debug("SipServlets: " + sipMetaData.getSipServlets().size());
                     for (ServletMetaData check : sipMetaData.getSipServlets()) {
-                        logger.debug("SipServlet: " + check.getServletClass());
+                        logger.debug("SipServlet: " + check.getName() + " - class: " + check.getServletClass() + " - load-on-startup: " + check.getLoadOnStartup());
                     }
                 }
                 logger.debug("</Before clumsy augmentation>");
@@ -334,7 +334,7 @@ public class SIPWebContext extends SipContextImpl {
                 if (sipMetaData.getSipServlets() != null) {
                     logger.debug("SipServlets: " + sipMetaData.getSipServlets().size());
                     for (ServletMetaData check : sipMetaData.getSipServlets()) {
-                        logger.debug("SipServlet: " + check.getName() + " - class: " + check.getServletClass());
+                        logger.debug("SipServlet: " + check.getName() + " - class: " + check.getServletClass() + " - load-on-startup: " + check.getLoadOnStartup());
                     }
                 }
                 logger.debug("</After clumsy augmentation>");

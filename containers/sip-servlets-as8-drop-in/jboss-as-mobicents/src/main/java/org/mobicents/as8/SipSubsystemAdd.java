@@ -36,6 +36,7 @@ import javax.management.MBeanServer;
 
 
 
+
 //import org.jboss.as.clustering.web.DistributedCacheManagerFactory;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
@@ -63,6 +64,7 @@ import org.mobicents.as8.deployment.SipParsingDeploymentProcessor;
 import org.mobicents.as8.deployment.SipWarDeploymentProcessor;
 import org.mobicents.as8.deployment.UndertowSipDeploymentInfoProcessor;
 import org.mobicents.as8.deployment.UndertowSipDeploymentProcessor;
+import org.mobicents.ext.javax.sip.dns.DefaultDNSServerLocator;
 
 /**
  * Adds the sip subsystem.
@@ -114,6 +116,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         SipDefinition.TIMER_D_INTERVAL.validateAndSet(operation, model);
         SipDefinition.DIALOG_PENDING_REQUEST_CHECKING.validateAndSet(operation, model);
         SipDefinition.DNS_SERVER_LOCATOR_CLASS.validateAndSet(operation, model);
+        SipDefinition.DNS_TIMEOUT.validateAndSet(operation, model);
         SipDefinition.DNS_RESOLVER_CLASS.validateAndSet(operation, model);
         SipDefinition.CANCELED_TIMER_TASKS_PURGE_PERIOD.validateAndSet(operation, model);
         SipDefinition.MEMORY_THRESHOLD.validateAndSet(operation, model);
@@ -192,9 +195,12 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 .asBoolean() : false;
 
         final ModelNode dnsServerLocatorClassModel = SipDefinition.DNS_SERVER_LOCATOR_CLASS.resolveModelAttribute(context, fullModel);
-        final String dnsServerLocatorClass = dnsServerLocatorClassModel.isDefined() ? dnsServerLocatorClassModel.asString() : null;
+        final String dnsServerLocatorClass = dnsServerLocatorClassModel.isDefined() ? dnsServerLocatorClassModel.asString() : DefaultDNSServerLocator.class.getName();
 
-        final ModelNode dnsResolverClassModel = SipDefinition.DNS_SERVER_LOCATOR_CLASS.resolveModelAttribute(context, fullModel);
+        final ModelNode dnsTimeoutModel = SipDefinition.DNS_TIMEOUT.resolveModelAttribute(context, fullModel);
+        final int dnsTimeout = dnsTimeoutModel.isDefined() ? dnsTimeoutModel.asInt() : null;
+        
+        final ModelNode dnsResolverClassModel = SipDefinition.DNS_RESOLVER_CLASS.resolveModelAttribute(context, fullModel);
         final String dnsResolverClass = dnsResolverClassModel.isDefined() ? dnsResolverClassModel.asString() : null;
 
         final ModelNode callIdMaxLengthModel = SipDefinition.CALL_ID_MAX_LENGTH.resolveModelAttribute(context, fullModel);
@@ -231,7 +237,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final SipServerService service = new SipServerService(sipAppRouterFile, sipStackPropertiesFile, sipPathName,
                 sipAppDispatcherClass, additionalParameterableHeaders, sipCongestionControlInterval,
                 congestionControlPolicy, sipConcurrencyControlMode, usePrettyEncoding, baseTimerInterval, t2Interval,
-                t4Interval, timerDInterval, dialogPendingRequestChecking, dnsServerLocatorClass, dnsResolverClass,
+                t4Interval, timerDInterval, dialogPendingRequestChecking, dnsServerLocatorClass, dnsTimeout, dnsResolverClass,
                 callIdMaxLength, tagHashMaxLength, canceledTimerTasksPurgePeriod, memoryThreshold,
                 backToNormalMemoryThreshold, outboundProxy, instanceId);
         newControllers.add(context
