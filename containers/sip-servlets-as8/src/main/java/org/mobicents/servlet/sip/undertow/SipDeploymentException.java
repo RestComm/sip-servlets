@@ -26,6 +26,8 @@ package org.mobicents.servlet.sip.undertow;
  * Exception occuring when something goes wrong with the deployment of the sip application
  *
  * @author jean.deruelle@gmail.com
+ *
+ * This class is based on org.mobicents.servlet.sip.catalina.SipDeploymentException from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  *
  */

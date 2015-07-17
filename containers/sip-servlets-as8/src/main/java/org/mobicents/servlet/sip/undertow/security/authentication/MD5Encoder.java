@@ -25,6 +25,9 @@ package org.mobicents.servlet.sip.undertow.security.authentication;
  *
  * @author Remy Maucherat
  * @version $Revision: 467222 $ $Date: 2006-10-24 05:17:11 +0200 (Tue, 24 Oct 2006) $
+ * 
+ * This class is based org.mobicents.servlet.sip.catalina.security.authentication.MD5Encoder class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ * @author kakonyi.istvan@alerant.hu
  */
 
 public final class MD5Encoder {

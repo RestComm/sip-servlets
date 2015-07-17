@@ -42,6 +42,9 @@ import static org.wildfly.extension.undertow.UndertowMessages.MESSAGES;
  * taken from https://github.com/jbossas/jboss-as/blob/7.1.2.Final/web/src/main/java/org/jboss/as/web/security/SecurityActions.java
  * @author jean.deruelle@gmail.com
  *
+ * This class is based on org.mobicents.servlet.sip.security.SecurityActions class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ * @author kakonyi.istvan@alerant.hu
+ *
  */
 public class SecurityActions {
     /**

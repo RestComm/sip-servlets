@@ -64,6 +64,7 @@ import org.mobicents.servlet.sip.dns.MobicentsDNSResolver;
 import org.mobicents.servlet.sip.message.Servlet3SipServletMessageFactory;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 /**
+ * This class is based on org.mobicents.servlet.sip.catalina.SipStandardService class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by
  * @author kakonyi.istvan@alerant.hu
  *
  */
@@ -81,10 +82,7 @@ public class SipStandardService implements SipService {
     public static final String SERVER_HEADER = "org.mobicents.servlet.sip.SERVER_HEADER";
     public static final String USER_AGENT_HEADER = "org.mobicents.servlet.sip.USER_AGENT_HEADER";
     public static final String JVM_ROUTE = "jvmRoute";
-    /**
-     * The descriptive information string for this implementation.
-     */
-    private static final String INFO = "org.mobicents.servlet.sip.startup.SipStandardService/1.0";
+
     // the sip application dispatcher class name defined in the server.xml
     protected String sipApplicationDispatcherClassName = "org.mobicents.servlet.sip.core.SipApplicationDispatcherImpl";
     // instatiated class from the sipApplicationDispatcherClassName of the sip application dispatcher
@@ -201,23 +199,26 @@ public class SipStandardService implements SipService {
             }
             if (j < 0)
                 return;
-            /*
-             * TODO:if (!DELAY_CONNECTOR_STARTUP) { if (started && (connectors[j] instanceof Lifecycle)) { try {
-             * ((Lifecycle) connectors[j]).stop(); } catch (LifecycleException e) {
-             * CatalinaLogger.CORE_LOGGER.errorStoppingConnector(e); } } }
-             */
-            // connectors[j].setContainer(null);
-            // connector.setService(null);
-            int k = 0;
-            SipProtocolHandler results[] = new SipProtocolHandler[connectors.length - 1];
-            for (int i = 0; i < connectors.length; i++) {
-                if (i != j)
-                    results[k++] = connectors[i];
-            }
-            connectors = results;
+            //
+            //FIXME:
+            //kakonyii: this code snippets copied from org.apache.catalina.core.StandardService, needs to check whether we have to do more here:
+             try {
+                 connectors[j].destroy();
+             } catch (Exception e) {
+                 logger.error("Error while destroy sipProtocolHandler!", e);
+             }
+
+
+             int k = 0;
+             SipProtocolHandler results[] = new SipProtocolHandler[connectors.length - 1];
+             for (int i = 0; i < connectors.length; i++) {
+                 if (i != j)
+                     results[k++] = connectors[i];
+             }
+             connectors = results;
 
             // Report this property change to interested listeners
-            // TODO:support.firePropertyChange("connector", connector, null);
+            // FIXME:support.firePropertyChange("connector", connector, null);
         }
 
     }
@@ -252,7 +253,7 @@ public class SipStandardService implements SipService {
         sipApplicationDispatcher.getSipFactory().initialize(sipPathName, usePrettyEncoding);
 
         String catalinaBase = getCatalinaBase();
-        // TODO: undertow base dir
+
         if (darConfigurationFileLocation != null) {
             if (!darConfigurationFileLocation.startsWith("file:///")) {
                 darConfigurationFileLocation = "file:///" + catalinaBase.replace(File.separatorChar, '/') + "/"
@@ -282,20 +283,16 @@ public class SipStandardService implements SipService {
         sipApplicationDispatcher.setBypassResponseExecutor(bypassResponseExecutor);
         sipApplicationDispatcher.setSipStack(sipStack);
         sipApplicationDispatcher.init();
-        // Tomcat specific loading case where the connectors are added even before the service is initialized
+
+        // kakonyii: I think this code is not necesary as we always start connectors programmatically during sip subsystem startup:
+        // Specific loading case where the connectors are added even before the service is initialized
         // so we need to set the sip stack before it starts
-        // TODO:synchronized (connectors) {
-        // for (Connector connector : connectors) {
-        // ProtocolHandler protocolHandler = connector.getProtocolHandler();
-        // if(protocolHandler instanceof SipProtocolHandler) {
-        // connector.setPort(((SipProtocolHandler)protocolHandler).getPort());
-        // ((SipProtocolHandler)protocolHandler).setSipStack(sipStack);
-        // ((SipProtocolHandler)protocolHandler).setAttribute(SipApplicationDispatcher.class.getSimpleName(),
-        // sipApplicationDispatcher);
-        // registerSipConnector(connector);
-        // }
-        // }
-        // }
+        //synchronized (connectors) {
+        //    for (SipProtocolHandler protocolHandler : connectors) {
+        //        protocolHandler.setSipStack(sipStack);
+        //        protocolHandler.setAttribute(SipApplicationDispatcher.class.getSimpleName(),sipApplicationDispatcher);
+        //    }
+        //}
     }
 
     public void start() throws Exception {
@@ -579,7 +576,10 @@ public class SipStandardService implements SipService {
             LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = null;
             if (sipStack instanceof ClusteredSipStack) {
                 loadBalancerHeartBeatingService = ((ClusteredSipStack) sipStack).getLoadBalancerHeartBeatingService();
-                // TODO:if ((this.container != null) && (this.container instanceof Engine) &&
+
+                // FIXME
+                // kakonyii: needs to find a way to get jvmRoute in case of wildfly implementation
+                // if ((this.container != null) && (this.container instanceof Engine) &&
                 // ((Engine)container).getJvmRoute() != null) {
                 // final String jvmRoute = ((Engine)container).getJvmRoute();
                 // if(jvmRoute != null) {
@@ -631,7 +631,9 @@ public class SipStandardService implements SipService {
     }
 
     public void initializeSystemPortProperties() {
-        // TODO:for (Connector connector : connectors) {
+        //FIXME:
+        //kakonyii: Our custom SipConnector class's secure feature not yet implemented!
+        // for (Connector connector : connectors) {
         // if(connector.getProtocol().contains("HTTP")) {
         // if(connector.getSecure()) {
         // System.setProperty("org.mobicents.properties.sslPort", Integer.toString(connector.getPort()));
@@ -658,20 +660,96 @@ public class SipStandardService implements SipService {
         return memoryThreshold;
     }
 
+    public void setSipMessageQueueSize(int sipMessageQueueSize) {
+        this.sipMessageQueueSize = sipMessageQueueSize;
+    }
+
     public int getSipMessageQueueSize() {
         return sipMessageQueueSize;
     }
 
+    public boolean addSipConnector(SipConnector sipConnector) throws Exception {
+        if(sipConnector == null) {
+            throw new IllegalArgumentException("The sip connector passed is null");
+        }
+
+        SipProtocolHandler connectorToAdd = findSipConnector(sipConnector.getIpAddress(), sipConnector.getPort(), sipConnector.getTransport());
+        if(connectorToAdd == null) {
+
+            SipProtocolHandler sipProtocolHandler = new SipProtocolHandler(sipConnector);
+            sipProtocolHandler.setSipStack(sipStack);
+            sipProtocolHandler.init();
+
+            addConnector(sipProtocolHandler);
+
+            MobicentsExtendedListeningPoint extendedListeningPoint = (MobicentsExtendedListeningPoint) sipProtocolHandler.getAttribute(ExtendedListeningPoint.class.getSimpleName());
+            if(extendedListeningPoint != null) {
+                try {
+                    extendedListeningPoint.getSipProvider().addSipListener(sipApplicationDispatcher);
+                    sipApplicationDispatcher.getSipNetworkInterfaceManager().addExtendedListeningPoint(extendedListeningPoint);
+                } catch (TooManyListenersException e) {
+                    logger.error("Connector.initialize", e);
+                    removeConnector(sipProtocolHandler);
+                    return false;
+                }
+            }
+            if(!sipProtocolHandler.isStarted()) {
+                if(logger.isDebugEnabled()) {
+                    logger.debug("Sip Connector couldn't be started, removing it automatically");
+                }
+                removeConnector(sipProtocolHandler);
+            }
+            return sipProtocolHandler.isStarted();
+        }
+        return false;
+    }
+
+    public boolean removeSipConnector(String ipAddress, int port, String transport) throws Exception {
+        SipProtocolHandler connectorToRemove = findSipConnector(ipAddress, port, transport);
+        if(connectorToRemove != null) {
+            removeConnector(connectorToRemove);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Find a sip Connector by it's ip address, port and transport
+     * @param ipAddress ip address of the connector to find
+     * @param port port of the connector to find
+     * @param transport transport of the connector to find
+     * @return the found sip connector or null if noting found
+     */
+    private SipProtocolHandler findSipConnector(String ipAddress, int port, String transport) {
+        SipConnector connectorToRemove = null;
+        for (SipProtocolHandler protocolHandler : connectors) {
+            if(protocolHandler.getIpAddress().equals(ipAddress) && protocolHandler.getPort() == port && protocolHandler.getSignalingTransport().equals(transport)) {
+                connectorToRemove = protocolHandler.getSipConnector();
+                return protocolHandler;
+            }
+        }
+        return null;
+    }
+
     @Override
-    public SipConnector findSipConnector(String arg0) {
-        // TODO Auto-generated method stub
+    public SipConnector findSipConnector(String transport) {
+
+        List<SipConnector> sipConnectors = new ArrayList<SipConnector>();
+        for (SipProtocolHandler protocolHandler : connectors) {
+            SipConnector sc =  protocolHandler.getSipConnector();
+            if(sc.getTransport().equalsIgnoreCase(transport)) return sc;
+        }
         return null;
     }
 
     @Override
     public SipConnector[] findSipConnectors() {
-        // TODO Auto-generated method stub
-        return null;
+        List<SipConnector> sipConnectors = new ArrayList<SipConnector>();
+        for (SipProtocolHandler protocolHandler : connectors) {
+            sipConnectors.add(protocolHandler.getSipConnector());
+
+        }
+        return sipConnectors.toArray(new SipConnector[sipConnectors.size()]);
     }
 
     @Override
@@ -684,9 +762,17 @@ public class SipStandardService implements SipService {
         return dispatcherThreadPoolSize;
     }
 
+    public void setDispatcherThreadPoolSize(int dispatcherThreadPoolSize) {
+        this.dispatcherThreadPoolSize = dispatcherThreadPoolSize;
+    }
+
     @Override
     public String getJvmRoute() {
         return jvmRoute;
+    }
+
+    public void setJvmRoute(String jvmRoute) {
+        this.jvmRoute = jvmRoute;
     }
 
     @Override
@@ -719,15 +805,27 @@ public class SipStandardService implements SipService {
         return dialogPendingRequestChecking;
     }
 
+    public void setDialogPendingRequestChecking(boolean dialogPendingRequestChecking) {
+        this.dialogPendingRequestChecking = dialogPendingRequestChecking;
+    }
+
     @Override
     public boolean isHttpFollowsSip() {
 
         return this.httpFollowsSip;
     }
 
+    public void setHttpFollowsSip(boolean httpFollowsSip) {
+        this.httpFollowsSip = httpFollowsSip;
+    }
+
     @Override
     public boolean isMd5ContactUserPart() {
         return md5ContactUserPart;
+    }
+
+    public void setMd5ContactUserPart(boolean md5ContactUserPart) {
+        this.md5ContactUserPart = md5ContactUserPart;
     }
 
     @Override
@@ -757,6 +855,10 @@ public class SipStandardService implements SipService {
         this.sipPathName = sipPathName;
     }
 
+    public String getSipPathName() {
+        return sipPathName;
+    }
+
     public void setCongestionControlCheckingInterval(long congestionControlCheckingInterval) {
         this.congestionControlCheckingInterval = congestionControlCheckingInterval;
     }
@@ -773,8 +875,16 @@ public class SipStandardService implements SipService {
         this.sipStackProperties = sipStackProperties;
     }
 
+    public Properties getSipStackProperties() {
+        return sipStackProperties;
+    }
+
     public void setUsePrettyEncoding(boolean usePrettyEncoding) {
         this.usePrettyEncoding = usePrettyEncoding;
+    }
+
+    public boolean isUsePrettyEncoding() {
+        return usePrettyEncoding;
     }
 
     public String getSipApplicationDispatcherClassName() {
@@ -783,6 +893,33 @@ public class SipStandardService implements SipService {
 
     public void setSipStackPropertiesFile(String sipStackPropertiesFileLocation) {
         this.sipStackPropertiesFileLocation = sipStackPropertiesFileLocation;
+    }
+
+    /**
+     * @return the sipStackPropertiesFile
+     */
+    public String getSipStackPropertiesFile() {
+        return sipStackPropertiesFileLocation;
+    }
+
+    /**
+     * @param dnsAddressResolverClass the dnsAddressResolverClass to set
+     */
+    @Deprecated
+    public void setAddressResolverClass(String dnsAddressResolverClass) {
+        this.addressResolverClass = dnsAddressResolverClass;
+    }
+
+    /**
+     * @return the dnsAddressResolverClass
+     */
+    @Deprecated
+    public String getAddressResolverClass() {
+        return addressResolverClass;
+    }
+
+    public int getBaseTimerInterval() {
+        return baseTimerInterval;
     }
 
     public void setBaseTimerInterval(int baseTimerInterval2) {
@@ -794,28 +931,52 @@ public class SipStandardService implements SipService {
         this.t2Interval = t2Interval;
     }
 
+    public int getT2Interval() {
+        return t2Interval;
+    }
+
     public void setT4Interval(int t4Interval) {
         this.t4Interval = t4Interval;
+    }
+
+    public int getT4Interval() {
+        return t4Interval;
     }
 
     public void setTimerDInterval(int timerDInterval) {
         this.timerDInterval = timerDInterval;
     }
 
-    public void setAdditionalParameterableHeaders(String additionalParameterableHeaders) {
-        this.additionalParameterableHeaders = additionalParameterableHeaders;
+    public int getTimerDInterval() {
+        return timerDInterval;
     }
 
-    public void setDialogPendingRequestChecking(boolean dialogPendingRequestChecking) {
-        this.dialogPendingRequestChecking = dialogPendingRequestChecking;
+    public String getAdditionalParameterableHeaders() {
+        return additionalParameterableHeaders;
+    }
+
+    public void setAdditionalParameterableHeaders(String additionalParameterableHeaders) {
+        this.additionalParameterableHeaders = additionalParameterableHeaders;
     }
 
     public void setCanceledTimerTasksPurgePeriod(int canceledTimerTasksPurgePeriod) {
         this.canceledTimerTasksPurgePeriod = canceledTimerTasksPurgePeriod;
     }
 
+    /**
+     * @deprecated
+     * @param balancers the balancers to set
+     */
+    public void setBalancers(String balancers) {
+        this.balancers = balancers;
+    }
+
     public void setMemoryThreshold(int memoryThreshold) {
         this.memoryThreshold = memoryThreshold;
+    }
+
+    public int getBackToNormalMemoryThreshold() {
+        return backToNormalMemoryThreshold;
     }
 
     public void setBackToNormalMemoryThreshold(int backToNormalMemoryThreshold) {
@@ -883,5 +1044,45 @@ public class SipStandardService implements SipService {
      */
     public void setTagHashMaxLength(int tagHashMaxLength) {
         this.tagHashMaxLength = tagHashMaxLength;
+    }
+
+    public boolean isGatherStatistics() {
+        return gatherStatistics;
+    }
+
+    public void setGatherStatistics(boolean gatherStatistics) {
+        this.gatherStatistics = gatherStatistics;
+    }
+
+    public int getBackToNormalSipMessageQueueSize() {
+        return backToNormalSipMessageQueueSize;
+    }
+
+    public void setBackToNormalSipMessageQueueSize(int backToNormalSipMessageQueueSize) {
+        this.backToNormalSipMessageQueueSize = backToNormalSipMessageQueueSize;
+    }
+
+    public boolean isBypassResponseExecutor() {
+        return bypassResponseExecutor;
+    }
+
+    public void setBypassResponseExecutor(boolean bypassResponseExecutor) {
+        this.bypassResponseExecutor = bypassResponseExecutor;
+    }
+
+    public boolean isBypassRequestExecutor() {
+        return bypassRequestExecutor;
+    }
+
+    public void setBypassRequestExecutor(boolean bypassRequestExecutor) {
+        this.bypassRequestExecutor = bypassRequestExecutor;
+    }
+
+    public SipProtocolHandler[] getConnectors() {
+        return connectors;
+    }
+
+    public void setConnectors(SipProtocolHandler[] connectors) {
+        this.connectors = connectors;
     }
 }

@@ -33,6 +33,9 @@ import org.apache.log4j.Logger;
  * according to the MD5 algorithm
  *
  * @author Emil Ivov
+ *
+ * This class is based org.mobicents.servlet.sip.catalina.security.authentication.MessageDigestResponseAlgorithm class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ * @author kakonyi.istvan@alerant.hu
  */
 
 public class MessageDigestResponseAlgorithm{

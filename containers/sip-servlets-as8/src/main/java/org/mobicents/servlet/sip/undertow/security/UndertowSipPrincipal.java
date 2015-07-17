@@ -33,8 +33,9 @@ import java.util.Set;
 import org.mobicents.servlet.sip.core.security.SipPrincipal;
 
 /**
- * @author jean.deruelle@gmail.com
  *
+ * This class is based org.mobicents.servlet.sip.catalina.security.CatalinaSipPrincipal class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ * @author kakonyi.istvan@alerant.hu
  */
 public class UndertowSipPrincipal implements SipPrincipal {
 
@@ -61,7 +62,7 @@ public class UndertowSipPrincipal implements SipPrincipal {
     public boolean isUserInRole(String role) {
         final Map<String, Set<String>> principalVersusRolesMap = deployment.getDeploymentInfo().getPrincipalVersusRolesMap();
         final Set<String> roles = principalVersusRolesMap.get(account.getPrincipal().getName());
-        //TODO: a more efficient imple
+
         for (SecurityRoleRef ref : servletInfo.getSecurityRoleRefs()) {
             if (ref.getRole().equals(role)) {
                 if (roles != null && roles.contains(ref.getLinkedRole())) {

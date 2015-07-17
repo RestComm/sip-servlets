@@ -62,6 +62,8 @@ import org.mobicents.servlet.sip.undertow.security.authentication.SipDigestAuthe
 import org.wildfly.extension.undertow.security.JAASIdentityManagerImpl;
 
 /**
+ *
+ * This class is based org.mobicents.servlet.sip.catalina.security.SipSecurityUtils class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  *
  */
@@ -199,7 +201,7 @@ public class SipSecurityUtils {
     /*
      *  This method attempts to obtain the Principal of a user from an auth cache without having to
      *  authenticate with a password or certificate. If cache-entry is set in standalone.xml, this method tries
-     *  to use reflection to get the data TODO: implementing security cache flush
+     *  to use reflection to get the data FIXME: implementing security cache flush
      */
     public static SipPrincipal impersonatePrincipal(String username, Deployment deployment, ServletInfo servletInfo, String securityDomain, String realmName){
         if(username==null){

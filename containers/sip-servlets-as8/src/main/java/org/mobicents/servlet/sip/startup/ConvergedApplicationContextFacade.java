@@ -45,10 +45,6 @@ import javax.servlet.ServletRegistration;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
 
-
-
-
-//TODO JASPER security???
 import org.apache.jasper.Constants;
 import org.apache.jasper.security.SecurityUtil;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
@@ -63,6 +59,7 @@ import org.mobicents.servlet.sip.undertow.SipServletImpl;
  * @author Jean-Francois Arcand
  * @version $Id: ApplicationContextFacade.java 1002556 2010-09-29 10:07:10Z markt $
  *
+ * This class is based on org.mobicents.servlet.sip.startup.ConvergedApplicationContextFacade class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 

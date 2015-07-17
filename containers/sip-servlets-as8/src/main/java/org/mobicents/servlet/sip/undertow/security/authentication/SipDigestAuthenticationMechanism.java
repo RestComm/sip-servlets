@@ -72,8 +72,10 @@ import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.api.ServletInfo;
 
 /**
-* @author kakonyi.istvan@alerant.hu
-*
+ *
+ * This class is based org.mobicents.servlet.sip.catalina.security.authentication.DigestAuthenticator class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ * @author kakonyi.istvan@alerant.hu
+ *
 */
 public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator {
     // ----------------------------------------------------- Instance Variables

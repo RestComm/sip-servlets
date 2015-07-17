@@ -28,7 +28,6 @@ import javax.servlet.http.HttpSession;
 
 import io.undertow.server.session.InMemorySessionManager;
 
-import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.MobicentsSipFactory;
 import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.SipManager;
@@ -42,12 +41,13 @@ import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.core.session.SipStandardManagerDelegate;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 /**
+ *
+ * This class is based on org.mobicents.servlet.sip.catalina.SipStandardManager class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  *
  */
 public class UndertowSipManager extends InMemorySessionManager implements SipManager {
 
-    private static final Logger logger = Logger.getLogger(UndertowSipManager.class);
     private SipManagerDelegate sipManagerDelegate;
     private SipContext container;
 
@@ -68,14 +68,15 @@ public class UndertowSipManager extends InMemorySessionManager implements SipMan
     public void setContainer(SipContext container) {
 
         // De-register from the old Container (if any)
+        // kakonyii: There is no such thing in wildfly, so we skip this part
         // if ((this.container != null) && (this.container instanceof Context))
         // ((Context) this.container).removePropertyChangeListener(this);
 
         this.container = container;
-        if (container instanceof SipContext)
-            sipManagerDelegate.setContainer((SipContext) container);
+        sipManagerDelegate.setContainer(container);
 
         // Register with the new Container (if any)
+        // kakonyii: There is no such thing in wildfly, so we skip this part
         // if ((this.container != null) && (this.container instanceof Context)) {
         // setMaxInactiveInterval
         // ( ((Context) this.container).getSessionTimeout()*60 );
@@ -83,14 +84,9 @@ public class UndertowSipManager extends InMemorySessionManager implements SipMan
         // }
     }
 
-    // TODO!!!
+    // There is no getNewSession() in wildfly (there was in catalina's StandardManager interface),
+    // so we don't implement this method:
     // protected StandardSession getNewSession() {
-    // return a converged session only if it is managing a sipcontext
-    // if(container instanceof SipContext) {
-    // return new ConvergedStandardSession(this);
-    // } else {
-    // return super.getNewSession();
-    // }
     // }
 
     @Override
@@ -326,7 +322,6 @@ public class UndertowSipManager extends InMemorySessionManager implements SipMan
 
     @Override
     public Object findSession(String id) throws IOException {
-        // TODO:
         return super.getSession(id);
     }
 

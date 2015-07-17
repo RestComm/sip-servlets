@@ -85,8 +85,9 @@ import org.mobicents.servlet.sip.undertow.security.SipSecurityUtils;
 import org.mobicents.servlet.sip.undertow.security.authentication.SipDigestAuthenticationMechanism;
 
 /**
-* @author kakonyi.istvan@alerant.hu
-*
+ *
+ * This class is based on org.mobicents.servlet.sip.startup.SipStandardContext from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ * @author kakonyi.istvan@alerant.hu
 */
 public class SipContextImpl implements SipContext {
 
@@ -100,7 +101,7 @@ public class SipContextImpl implements SipContext {
 
     protected DeploymentInfoFacade deploymentInfoFacade;
     protected transient SipApplicationDispatcher sipApplicationDispatcher = null;
-    // TODO setter
+
     protected boolean hasDistributableManager;
     // timer service used to schedule sip application session expiration timer
     protected transient SipApplicationSessionTimerService sasTimerService = null;
@@ -181,7 +182,7 @@ public class SipContextImpl implements SipContext {
 
         prepareServletContext();
 
-        // TODO:
+        // FIXME: kakonyii: DistributableSipManager handling implementation
         hasDistributableManager = false;
         ((UndertowSipManager) this.getSessionManager())
                 .setMobicentsSipFactory(sipApplicationDispatcher.getSipFactory());
@@ -249,7 +250,6 @@ public class SipContextImpl implements SipContext {
         }
 
         if (logger.isDebugEnabled()) {
-            // TODO:
             logger.debug("http session timeout for this context is "
                     + this.deploymentInfoFacade.getDeploymentInfo().getDefaultSessionTimeout() + " minutes");
         }
@@ -329,26 +329,23 @@ public class SipContextImpl implements SipContext {
                     continue;
 
                 try {
-                    // TODO:fireContainerEvent("beforeContextDestroyed", servletContextListener);
+                    // FIXME: fireContainerEvent("beforeContextDestroyed", servletContextListener);
                     servletContextListener.contextDestroyed(event);
-                    // TODO:fireContainerEvent("afterContextDestroyed", servletContextListener);
+                    // FIXME: fireContainerEvent("afterContextDestroyed", servletContextListener);
                 } catch (Throwable t) {
-                    // TODO:fireContainerEvent("afterContextDestroyed", servletContextListener);
+                    // FIXME: fireContainerEvent("afterContextDestroyed", servletContextListener);
                     // getLogger().error
                     // (sm.getString("standardContext.listenerStop",
                     // servletContextListener.getClass().getName()), t);
                     // getLogger().error
                     // (MESSAGES.errorSendingContextDestroyedEvent(servletContextListener.getClass().getName()), t);
-                    // TODO:
+
+                    logger.error("Failed to destroy servletContext.", t);
                     t.printStackTrace();
                     ok = false;
                 }
-
-                // TODO Annotation processing
             }
         }
-
-        // TODO Annotation processing check super class on tomcat 6
 
         sipListeners.clean();
 
@@ -457,7 +454,6 @@ public class SipContextImpl implements SipContext {
             logger.debug("Configuring sip listeners");
 
         // Instantiate the required listeners
-        // TODO jó-e:
         ClassLoader loader = this.getSipContextClassLoader();
         boolean ok = sipListeners.loadListeners(findSipApplicationListeners(), loader);
         if (!ok) {
@@ -472,20 +468,19 @@ public class SipContextImpl implements SipContext {
                     continue;
 
                 try {
-                    // TODO:fireContainerEvent("beforeContextInitialized", servletContextListener);
+                    // FIXME: fireContainerEvent("beforeContextInitialized", servletContextListener);
                     servletContextListener.contextInitialized(event);
-                    // TODO:fireContainerEvent("afterContextInitialized", servletContextListener);
+                    // FIXME: fireContainerEvent("afterContextInitialized", servletContextListener);
                 } catch (Throwable t) {
-                    // TODO:fireContainerEvent("afterContextInitialized", servletContextListener);
+                    // FIXME: fireContainerEvent("afterContextInitialized", servletContextListener);
                     // getLogger().error
                     // (sm.getString("standardContext.listenerStart",
                     // servletContextListener.getClass().getName()), t);
                     // getLogger().error
                     // (MESSAGES.errorSendingContextInitializedEvent(servletContextListener.getClass().getName()), t);
                     ok = false;
+                    logger.error("Failed to initialize context!", t);
                 }
-
-                // TODO Annotation processing
             }
         }
 
@@ -499,8 +494,6 @@ public class SipContextImpl implements SipContext {
     public ServletContextImpl getServletContext() {
         if (context == null) {
             context = new ConvergedApplicationContextFacade(deployment.getServletContext(), this);
-            // TODO if (getAltDDName() != null)
-            // context.setAttribute(Globals.ALT_DD_ATTR,getAltDDName());
         }
         return context.getContext();
     }
@@ -522,7 +515,6 @@ public class SipContextImpl implements SipContext {
 
     @Override
     public void setApplicationName(String applicationName) {
-        // TODO hívni deploy során, sip-xml parse-olásakor
         deploymentInfoFacade.setApplicationName(applicationName);
     }
 
@@ -533,7 +525,6 @@ public class SipContextImpl implements SipContext {
 
     @Override
     public void setDescription(String description) {
-        // TODO hívni deploy során, sip-xml parse-olásakor
         deploymentInfoFacade.setDescription(description);
 
     }
@@ -545,9 +536,7 @@ public class SipContextImpl implements SipContext {
 
     @Override
     public void setLargeIcon(String largeIcon) {
-        // TODO hívni deploy során, sip-xml parse-olásakor
         this.deploymentInfoFacade.setLargeIcon(largeIcon);
-
     }
 
     @Override
@@ -625,14 +614,14 @@ public class SipContextImpl implements SipContext {
     @Override
     public void addSipApplicationListener(String listener) {
         this.deploymentInfoFacade.addSipApplicationListener(listener);
-        // TODO:fireContainerEvent("addSipApplicationListener", listener);
+        // FIXME: fireContainerEvent("addSipApplicationListener", listener);
 
     }
 
     @Override
     public void removeSipApplicationListener(String listener) {
         this.deploymentInfoFacade.removeSipApplicationListener(listener);
-        // TODO:fireContainerEvent("removeSipApplicationListener", listener);
+        // FIXME: fireContainerEvent("removeSipApplicationListener", listener);
     }
 
     @Override
@@ -696,17 +685,17 @@ public class SipContextImpl implements SipContext {
 
     @Override
     public String getEngineName() {
-        // TODO???
+        // FIXME: kakonyii: i think this is not necessary for wildfy, have to review later
         return null;
     }
 
     // @Override
     // public String getBasePath() {
-    // TODO???
+    // FIXME: kakonyii: this method was used in SipStandardContext's start() method to add missing components as necessary, review later to figure out how to do something similar in wildfly
     // return null;
     // }
 
-    // callers: SipApplicationDispatcher.addSipApplications
+    // callers: SipApplicationDispatcher.addSipApplications()
     @Override
     public boolean notifySipContextListeners(SipContextEvent event) {
         boolean ok = true;
@@ -753,7 +742,8 @@ public class SipContextImpl implements SipContext {
                             final ClassLoader cl = this.getSipContextClassLoader();
                             Thread.currentThread().setContextClassLoader(cl);
                             // http://code.google.com/p/sipservlets/issues/detail?id=135
-                            // TODO:bindThreadBindingListener();
+                            // FIXME: kakonyii: in SipStandardContext, there was a threadBindingListener, review this later to figure out how to do something similar in wildfly
+                            //bindThreadBindingListener();
 
                             switch (event.getEventType()) {
                             case SERVLET_INITIALIZED: {
@@ -813,7 +803,8 @@ public class SipContextImpl implements SipContext {
                             }
                         } finally {
                             // http://code.google.com/p/sipservlets/issues/detail?id=135
-                            // TODO:unbindThreadBindingListener();
+                            // FIXME: kakonyii: in SipStandardContext, there was a threadBindingListener, review this later to figure out how to do something similar in wildfly
+                            // unbindThreadBindingListener();
                             Thread.currentThread().setContextClassLoader(oldClassLoader);
                         }
                     }
@@ -826,13 +817,19 @@ public class SipContextImpl implements SipContext {
                             + " of the event " + event.getEventType(), e);
                     ok = false;
                 }
-                /*
-                 * try { if(sipServlet != null) { //TODO??wrapper.deallocate(sipServlet); } } catch (ServletException e)
-                 * { logger.error("Deallocate exception for servlet" + wrapper.getName(), e); ok = false; } catch
-                 * (Throwable e) { logger.error("Deallocate exception for servlet" + wrapper.getName(), e); ok = false;
-                 * }
-                 */
 
+                //FIXME: kakonyii: do we need this deallocation in wildfly?
+                //try {
+                //    if(sipServlet != null) {
+                //        wrapper.deallocate(sipServlet);
+                //    }
+                //} catch (ServletException e) {
+                //    logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
+                //    ok = false;
+                //} catch (Throwable e) {
+                //    logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
+                //    ok = false;
+                //}
             }
         } finally {
             exitSipAppHa(null, null, batchStarted);
@@ -957,8 +954,7 @@ public class SipContextImpl implements SipContext {
     @Override
     public void exitSipAppHa(MobicentsSipServletRequest request, MobicentsSipServletResponse response,
             boolean batchStarted) {
-        // TODO Auto-generated method stub
-
+     // FIXME: distributable not supported
     }
 
     @Override
@@ -1015,7 +1011,7 @@ public class SipContextImpl implements SipContext {
 
     @Override
     public String getPath() {
-        // TODO:
+        // FIXME: kakonyii: currrently we don't use this method anywhere in as8 container packages
         return this.deploymentInfoFacade.getDeploymentInfo().getDeploymentName();
     }
 
@@ -1074,13 +1070,15 @@ public class SipContextImpl implements SipContext {
         final ClassLoader cl = getSipContextClassLoader();
         Thread.currentThread().setContextClassLoader(cl);
         // http://code.google.com/p/sipservlets/issues/detail?id=135
-        // TODO:bindThreadBindingListener();
+        // FIXME: kakonyii: in SipStandardContext, there was a threadBindingListener, review this later to figure out how to do something similar in wildfly
+        //bindThreadBindingListener();
     }
 
     @Override
     public void exitSipContext(ClassLoader oldClassLoader) {
         // http://code.google.com/p/sipservlets/issues/detail?id=135
-        // TODO:unbindThreadBindingListener();
+        // FIXME: kakonyii: in SipStandardContext, there was a threadBindingListener, review this later to figure out how to do something similar in wildfly
+        //unbindThreadBindingListener();
         Thread.currentThread().setContextClassLoader(oldClassLoader);
     }
 

@@ -34,6 +34,8 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 
 /**
  * @author jean.deruelle@gmail.com
+ *
+ * This class is based on org.mobicents.servlet.sip.message.Servlet3SipServletResponseImpl class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  *
  */
