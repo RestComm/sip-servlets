@@ -45,7 +45,8 @@ import org.mobicents.metadata.sip.spec.SipMetaData;
  * @author Thomas.Diesler@jboss.com
  * @author josemrecio@gmail.com
  *
- * This class is based on the contents of org.mobicents.as7.deployment package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7.deployment package from jboss-as7-mobicents project,
+ *         re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class SipParsingDeploymentProcessor implements DeploymentUnitProcessor {
@@ -55,8 +56,8 @@ public class SipParsingDeploymentProcessor implements DeploymentUnitProcessor {
 
     public SipParsingDeploymentProcessor() {
         // TODO: josemrecio - is this needed?
-//        String property = SecurityActions.getSystemProperty(XMLSchemaValidator.PROPERTY_SCHEMA_VALIDATION, "false");
-//        this.schemaValidation = Boolean.parseBoolean(property);
+        // String property = SecurityActions.getSystemProperty(XMLSchemaValidator.PROPERTY_SCHEMA_VALIDATION, "false");
+        // this.schemaValidation = Boolean.parseBoolean(property);
     }
 
     @Override
@@ -75,15 +76,11 @@ public class SipParsingDeploymentProcessor implements DeploymentUnitProcessor {
         // }
 
         VirtualFile sipXml = null;
-        /*if (DeploymentTypeMarker.isType(DeploymentType.EAR, deploymentUnit)) {
-            List<VirtualFile> children = rootFile.getChildren();
-            for (VirtualFile child: children) {
-                if (child.getChild(SIP_XML).exists()) {
-                    sipXml = child.getChild(SIP_XML);
-                }
-            }
-        }
-        else */if (DeploymentTypeMarker.isType(DeploymentType.WAR, deploymentUnit)) {
+        /*
+         * if (DeploymentTypeMarker.isType(DeploymentType.EAR, deploymentUnit)) { List<VirtualFile> children =
+         * rootFile.getChildren(); for (VirtualFile child: children) { if (child.getChild(SIP_XML).exists()) { sipXml =
+         * child.getChild(SIP_XML); } } } else
+         */if (DeploymentTypeMarker.isType(DeploymentType.WAR, deploymentUnit)) {
             sipXml = rootFile.getChild(SIP_XML);
         }
         if ((sipXml == null) || !sipXml.exists()) {
@@ -101,8 +98,8 @@ public class SipParsingDeploymentProcessor implements DeploymentUnitProcessor {
             SipMetaData sipMetaData = SipMetaDataParser.parse(xmlReader, dtdInfo);
             deploymentUnit.putAttachment(SipMetaData.ATTACHMENT_KEY, sipMetaData);
         } catch (XMLStreamException e) {
-            throw new DeploymentUnitProcessingException("Failed to parse " + sipXml + " at ["
-                    + e.getLocation().getLineNumber() + "," + e.getLocation().getColumnNumber() + "]");
+            throw new DeploymentUnitProcessingException("Failed to parse " + sipXml + " at [" + e.getLocation().getLineNumber()
+                    + "," + e.getLocation().getColumnNumber() + "]");
         } catch (IOException e) {
             throw new DeploymentUnitProcessingException("Failed to parse " + sipXml, e);
         } finally {

@@ -41,7 +41,8 @@ import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
  *
  * @author jean.deruelle@gmail.com
  *
- * This class is based on the contents of org.mobicents.metadata.sip.jboss package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.metadata.sip.jboss package from jboss-as7-mobicents project,
+ *         re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  *
  */
@@ -192,19 +193,19 @@ public class JBossConvergedSipMetaData extends JBossWebMetaData {
         return sipSessionConfig;
     }
 
-//    /**
-//     * @param sipApplicationKeyMethod the sipApplicationKeyMethod to set
-//     */
-//    public void setSipApplicationKeyMethod(Method sipApplicationKeyMethod) {
-//        this.sipApplicationKeyMethod = sipApplicationKeyMethod;
-//    }
-//
-//    /**
-//     * @return the sipApplicationKeyMethod
-//     */
-//    public Method getSipApplicationKeyMethod() {
-//        return sipApplicationKeyMethod;
-//    }
+    // /**
+    // * @param sipApplicationKeyMethod the sipApplicationKeyMethod to set
+    // */
+    // public void setSipApplicationKeyMethod(Method sipApplicationKeyMethod) {
+    // this.sipApplicationKeyMethod = sipApplicationKeyMethod;
+    // }
+    //
+    // /**
+    // * @return the sipApplicationKeyMethod
+    // */
+    // public Method getSipApplicationKeyMethod() {
+    // return sipApplicationKeyMethod;
+    // }
 
     /**
      * @param sipApplicationKeyMethodInfo the sipApplicationKeyMethodInfo to set

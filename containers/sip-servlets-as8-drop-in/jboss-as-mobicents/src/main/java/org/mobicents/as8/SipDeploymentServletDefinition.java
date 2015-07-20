@@ -48,22 +48,26 @@ import org.wildfly.extension.undertow.deployment.UndertowMetricsCollector;
  * @created 23.2.12 18:35
  * @author josemrecio@gmail.com
  *
- * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for
+ *         jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class SipDeploymentServletDefinition extends SimpleResourceDefinition {
     public static final SipDeploymentServletDefinition INSTANCE = new SipDeploymentServletDefinition();
 
-    protected static final SimpleAttributeDefinition LOAD_TIME = new SimpleAttributeDefinitionBuilder(Constants.LOAD_TIME, ModelType.LONG, true).build();
-    protected static final SimpleAttributeDefinition MAX_TIME = new SimpleAttributeDefinitionBuilder(Constants.MAX_TIME, ModelType.LONG, true).build();
-    protected static final SimpleAttributeDefinition MIN_TIME = new SimpleAttributeDefinitionBuilder(Constants.MIN_TIME, ModelType.LONG, true).build();
-    protected static final SimpleAttributeDefinition PROCESSING_TIME = new SimpleAttributeDefinitionBuilder(Constants.PROCESSING_TIME, ModelType.LONG, true).build();
-    protected static final SimpleAttributeDefinition REQUEST_COUNT = new SimpleAttributeDefinitionBuilder(Constants.REQUEST_COUNT, ModelType.INT, true).build();
-
+    protected static final SimpleAttributeDefinition LOAD_TIME = new SimpleAttributeDefinitionBuilder(Constants.LOAD_TIME,
+            ModelType.LONG, true).build();
+    protected static final SimpleAttributeDefinition MAX_TIME = new SimpleAttributeDefinitionBuilder(Constants.MAX_TIME,
+            ModelType.LONG, true).build();
+    protected static final SimpleAttributeDefinition MIN_TIME = new SimpleAttributeDefinitionBuilder(Constants.MIN_TIME,
+            ModelType.LONG, true).build();
+    protected static final SimpleAttributeDefinition PROCESSING_TIME = new SimpleAttributeDefinitionBuilder(
+            Constants.PROCESSING_TIME, ModelType.LONG, true).build();
+    protected static final SimpleAttributeDefinition REQUEST_COUNT = new SimpleAttributeDefinitionBuilder(
+            Constants.REQUEST_COUNT, ModelType.INT, true).build();
 
     private SipDeploymentServletDefinition() {
-        super(PathElement.pathElement("servlet"),
-                SipExtension.getResourceDescriptionResolver("deployment.servlet"));
+        super(PathElement.pathElement("servlet"), SipExtension.getResourceDescriptionResolver("deployment.servlet"));
     }
 
     @Override
@@ -71,8 +75,8 @@ public class SipDeploymentServletDefinition extends SimpleResourceDefinition {
         registration.registerMetric(LOAD_TIME, new AbstractMetricsHandler() {
             @Override
             void handle(final ModelNode response, final String name, final MetricsHandler.MetricResult metricResult) {
-                //FIXME: kakonyii: no getLoadTime() in undertow's MetricResult...
-                //response.set(metricResult.getLoadTime());
+                // FIXME: kakonyii: no getLoadTime() in undertow's MetricResult...
+                // response.set(metricResult.getLoadTime());
             }
         });
         registration.registerMetric(MAX_TIME, new AbstractMetricsHandler() {
@@ -116,10 +120,11 @@ public class SipDeploymentServletDefinition extends SimpleResourceDefinition {
             final String path = DeploymentDefinition.CONTEXT_ROOT.resolveModelAttribute(context, subModel).asString();
             final String server = DeploymentDefinition.SERVER.resolveModelAttribute(context, subModel).asString();
 
-            final ServiceController<?> controller = context.getServiceRegistry(false).getService(UndertowService.deploymentServiceName(server, host, path));
+            final ServiceController<?> controller = context.getServiceRegistry(false).getService(
+                    UndertowService.deploymentServiceName(server, host, path));
             final UndertowDeploymentService deploymentService = (UndertowDeploymentService) controller.getService();
             final DeploymentInfo deploymentInfo = deploymentService.getDeploymentInfoInjectedValue().getValue();
-            final UndertowMetricsCollector collector = (UndertowMetricsCollector)deploymentInfo.getMetricsCollector();
+            final UndertowMetricsCollector collector = (UndertowMetricsCollector) deploymentInfo.getMetricsCollector();
             context.addStep(new OperationStepHandler() {
                 @Override
                 public void execute(final OperationContext context, final ModelNode operation) throws OperationFailedException {

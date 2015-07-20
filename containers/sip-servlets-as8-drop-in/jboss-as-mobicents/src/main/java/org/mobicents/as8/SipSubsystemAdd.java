@@ -1,5 +1,5 @@
 /*
-* TeleStax, Open Source Cloud Communications  Copyright 2012.
+ * TeleStax, Open Source Cloud Communications  Copyright 2012.
  * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
@@ -24,18 +24,6 @@ package org.mobicents.as8;
 import java.util.List;
 
 import javax.management.MBeanServer;
-
-
-
-
-
-
-
-
-
-
-
-
 
 //import org.jboss.as.clustering.web.DistributedCacheManagerFactory;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
@@ -72,10 +60,11 @@ import org.mobicents.ext.javax.sip.dns.DefaultDNSServerLocator;
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
  *
- * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for
+ *         jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
-@SuppressWarnings({ "deprecation", "unused" })
+@SuppressWarnings({ "deprecation"})
 class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
 
     // FIXME: these priorities should be substituted by values from with org.jboss.as.server.deployment.Phase
@@ -134,50 +123,45 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ModelNode instanceIdModel = SipDefinition.INSTANCE_ID.resolveModelAttribute(context, fullModel);
         final String instanceId = instanceIdModel.isDefined() ? instanceIdModel.asString() : null;
 
-        final ModelNode sipAppRouterFileModel = SipDefinition.APPLICATION_ROUTER.resolveModelAttribute(context,
-                fullModel);
+        final ModelNode sipAppRouterFileModel = SipDefinition.APPLICATION_ROUTER.resolveModelAttribute(context, fullModel);
         final String sipAppRouterFile = sipAppRouterFileModel.isDefined() ? sipAppRouterFileModel.asString() : null;
 
-        final ModelNode sipStackPropertiesFileModel = SipDefinition.SIP_STACK_PROPS.resolveModelAttribute(context,
-                fullModel);
-        final String sipStackPropertiesFile = sipStackPropertiesFileModel.isDefined() ? sipStackPropertiesFileModel
-                .asString() : null;
+        final ModelNode sipStackPropertiesFileModel = SipDefinition.SIP_STACK_PROPS.resolveModelAttribute(context, fullModel);
+        final String sipStackPropertiesFile = sipStackPropertiesFileModel.isDefined() ? sipStackPropertiesFileModel.asString()
+                : null;
 
         final ModelNode sipPathNameModel = SipDefinition.SIP_PATH_NAME.resolveModelAttribute(context, fullModel);
         final String sipPathName = sipPathNameModel.isDefined() ? sipPathNameModel.asString() : null;
 
-        final ModelNode sipAppDispatcherClassModel = SipDefinition.SIP_APP_DISPATCHER_CLASS.resolveModelAttribute(
-                context, fullModel);
-        final String sipAppDispatcherClass = sipAppDispatcherClassModel.isDefined() ? sipAppDispatcherClassModel
-                .asString() : null;
+        final ModelNode sipAppDispatcherClassModel = SipDefinition.SIP_APP_DISPATCHER_CLASS.resolveModelAttribute(context,
+                fullModel);
+        final String sipAppDispatcherClass = sipAppDispatcherClassModel.isDefined() ? sipAppDispatcherClassModel.asString()
+                : null;
 
-        final ModelNode usePrettyEncodingModel = SipDefinition.USE_PRETTY_ENCODING.resolveModelAttribute(
-                context, fullModel);
-        final boolean usePrettyEncoding = usePrettyEncodingModel.isDefined() ? usePrettyEncodingModel.asBoolean()
-                : true;
+        final ModelNode usePrettyEncodingModel = SipDefinition.USE_PRETTY_ENCODING.resolveModelAttribute(context, fullModel);
+        final boolean usePrettyEncoding = usePrettyEncodingModel.isDefined() ? usePrettyEncodingModel.asBoolean() : true;
 
         final ModelNode additionalParameterableHeadersModel = SipDefinition.ADDITIONAL_PARAMETERABLE_HEADERS
                 .resolveModelAttribute(context, fullModel);
         final String additionalParameterableHeaders = additionalParameterableHeadersModel.isDefined() ? additionalParameterableHeadersModel
                 .asString() : null;
 
-        final ModelNode sipCongestionControlIntervalModel = SipDefinition.CONGESTION_CONTROL_INTERVAL
-                .resolveModelAttribute(context, fullModel);
+        final ModelNode sipCongestionControlIntervalModel = SipDefinition.CONGESTION_CONTROL_INTERVAL.resolveModelAttribute(
+                context, fullModel);
         final int sipCongestionControlInterval = sipCongestionControlIntervalModel.isDefined() ? sipCongestionControlIntervalModel
                 .asInt() : -1;
 
-        final ModelNode congestionControlPolicyModel = SipDefinition.CONGESTION_CONTROL_POLICY.resolveModelAttribute(
-                context, fullModel);
+        final ModelNode congestionControlPolicyModel = SipDefinition.CONGESTION_CONTROL_POLICY.resolveModelAttribute(context,
+                fullModel);
         final String congestionControlPolicy = congestionControlPolicyModel.isDefined() ? congestionControlPolicyModel
                 .asString() : "ErrorResponse";
 
-        final ModelNode sipConcurrencyControlModeModel = SipDefinition.CONCURRENCY_CONTROL_MODE.resolveModelAttribute(
-                context, fullModel);
+        final ModelNode sipConcurrencyControlModeModel = SipDefinition.CONCURRENCY_CONTROL_MODE.resolveModelAttribute(context,
+                fullModel);
         final String sipConcurrencyControlMode = sipConcurrencyControlModeModel.isDefined() ? sipConcurrencyControlModeModel
                 .asString() : null;
 
-        final ModelNode baseTimerIntervalModel = SipDefinition.BASE_TIMER_INTERVAL.resolveModelAttribute(context,
-                fullModel);
+        final ModelNode baseTimerIntervalModel = SipDefinition.BASE_TIMER_INTERVAL.resolveModelAttribute(context, fullModel);
         final int baseTimerInterval = baseTimerIntervalModel.isDefined() ? baseTimerIntervalModel.asInt() : 500;
 
         final ModelNode t2IntervalModel = SipDefinition.T2_INTERVAL.resolveModelAttribute(context, fullModel);
@@ -194,12 +178,14 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final boolean dialogPendingRequestChecking = dialogPendingRequestCheckingModel.isDefined() ? dialogPendingRequestCheckingModel
                 .asBoolean() : false;
 
-        final ModelNode dnsServerLocatorClassModel = SipDefinition.DNS_SERVER_LOCATOR_CLASS.resolveModelAttribute(context, fullModel);
-        final String dnsServerLocatorClass = dnsServerLocatorClassModel.isDefined() ? dnsServerLocatorClassModel.asString() : DefaultDNSServerLocator.class.getName();
+        final ModelNode dnsServerLocatorClassModel = SipDefinition.DNS_SERVER_LOCATOR_CLASS.resolveModelAttribute(context,
+                fullModel);
+        final String dnsServerLocatorClass = dnsServerLocatorClassModel.isDefined() ? dnsServerLocatorClassModel.asString()
+                : DefaultDNSServerLocator.class.getName();
 
         final ModelNode dnsTimeoutModel = SipDefinition.DNS_TIMEOUT.resolveModelAttribute(context, fullModel);
         final int dnsTimeout = dnsTimeoutModel.isDefined() ? dnsTimeoutModel.asInt() : null;
-        
+
         final ModelNode dnsResolverClassModel = SipDefinition.DNS_RESOLVER_CLASS.resolveModelAttribute(context, fullModel);
         final String dnsResolverClass = dnsResolverClassModel.isDefined() ? dnsResolverClassModel.asString() : null;
 
@@ -217,29 +203,37 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ModelNode memoryThresholdModel = SipDefinition.MEMORY_THRESHOLD.resolveModelAttribute(context, fullModel);
         final int memoryThreshold = memoryThresholdModel.isDefined() ? memoryThresholdModel.asInt() : -1;
 
-        final ModelNode backToNormalMemoryThresholdModel = SipDefinition.BACK_TO_NORMAL_MEMORY_THRESHOLD
-                .resolveModelAttribute(context, fullModel);
+        final ModelNode backToNormalMemoryThresholdModel = SipDefinition.BACK_TO_NORMAL_MEMORY_THRESHOLD.resolveModelAttribute(
+                context, fullModel);
         final int backToNormalMemoryThreshold = backToNormalMemoryThresholdModel.isDefined() ? backToNormalMemoryThresholdModel
                 .asInt() : -1;
 
         final ModelNode outboundProxyModel = SipDefinition.OUTBOUND_PROXY.resolveModelAttribute(context, fullModel);
         final String outboundProxy = outboundProxyModel.isDefined() ? outboundProxyModel.asString() : null;
 
-        // final String instanceId = operation.hasDefined(Constants.INSTANCE_ID) ? operation.get(Constants.INSTANCE_ID).asString() : null;
-        // final String sipAppRouterFile = operation.hasDefined(Constants.APPLICATION_ROUTER) ? operation.get(Constants.APPLICATION_ROUTER).asString() : null;
-        // final String sipStackPropertiesFile = operation.hasDefined(Constants.SIP_STACK_PROPS) ? operation.get(Constants.SIP_STACK_PROPS).asString() : null;
-        // final String sipPathName = operation.hasDefined(Constants.SIP_PATH_NAME) ? operation.get(Constants.SIP_PATH_NAME).asString() : null;
-        // final String sipAppDispatcherClass = operation.hasDefined(Constants.SIP_APP_DISPATCHER_CLASS) ? operation.get(Constants.SIP_APP_DISPATCHER_CLASS).asString() : null;
-        // final int sipCongestionControlInterval = operation.hasDefined(Constants.CONGESTION_CONTROL_INTERVAL) ? operation.get(Constants.CONGESTION_CONTROL_INTERVAL).asInt() : -1;
-        // final String sipConcurrencyControlMode = operation.hasDefined(Constants.CONCURRENCY_CONTROL_MODE) ? operation.get(Constants.CONCURRENCY_CONTROL_MODE).asString() : null;
-        // final boolean usePrettyEncoding = operation.hasDefined(Constants.USE_PRETTY_ENCODING) ? operation.get(Constants.USE_PRETTY_ENCODING).asBoolean() : true;
+        // final String instanceId = operation.hasDefined(Constants.INSTANCE_ID) ?
+        // operation.get(Constants.INSTANCE_ID).asString() : null;
+        // final String sipAppRouterFile = operation.hasDefined(Constants.APPLICATION_ROUTER) ?
+        // operation.get(Constants.APPLICATION_ROUTER).asString() : null;
+        // final String sipStackPropertiesFile = operation.hasDefined(Constants.SIP_STACK_PROPS) ?
+        // operation.get(Constants.SIP_STACK_PROPS).asString() : null;
+        // final String sipPathName = operation.hasDefined(Constants.SIP_PATH_NAME) ?
+        // operation.get(Constants.SIP_PATH_NAME).asString() : null;
+        // final String sipAppDispatcherClass = operation.hasDefined(Constants.SIP_APP_DISPATCHER_CLASS) ?
+        // operation.get(Constants.SIP_APP_DISPATCHER_CLASS).asString() : null;
+        // final int sipCongestionControlInterval = operation.hasDefined(Constants.CONGESTION_CONTROL_INTERVAL) ?
+        // operation.get(Constants.CONGESTION_CONTROL_INTERVAL).asInt() : -1;
+        // final String sipConcurrencyControlMode = operation.hasDefined(Constants.CONCURRENCY_CONTROL_MODE) ?
+        // operation.get(Constants.CONCURRENCY_CONTROL_MODE).asString() : null;
+        // final boolean usePrettyEncoding = operation.hasDefined(Constants.USE_PRETTY_ENCODING) ?
+        // operation.get(Constants.USE_PRETTY_ENCODING).asBoolean() : true;
 
         final SipServerService service = new SipServerService(sipAppRouterFile, sipStackPropertiesFile, sipPathName,
-                sipAppDispatcherClass, additionalParameterableHeaders, sipCongestionControlInterval,
-                congestionControlPolicy, sipConcurrencyControlMode, usePrettyEncoding, baseTimerInterval, t2Interval,
-                t4Interval, timerDInterval, dialogPendingRequestChecking, dnsServerLocatorClass, dnsTimeout, dnsResolverClass,
-                callIdMaxLength, tagHashMaxLength, canceledTimerTasksPurgePeriod, memoryThreshold,
-                backToNormalMemoryThreshold, outboundProxy, instanceId);
+                sipAppDispatcherClass, additionalParameterableHeaders, sipCongestionControlInterval, congestionControlPolicy,
+                sipConcurrencyControlMode, usePrettyEncoding, baseTimerInterval, t2Interval, t4Interval, timerDInterval,
+                dialogPendingRequestChecking, dnsServerLocatorClass, dnsTimeout, dnsResolverClass, callIdMaxLength,
+                tagHashMaxLength, canceledTimerTasksPurgePeriod, memoryThreshold, backToNormalMemoryThreshold, outboundProxy,
+                instanceId);
         newControllers.add(context
                 .getServiceTarget()
                 .addService(SipSubsystemServices.JBOSS_SIP, service)
@@ -251,8 +245,8 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
             @Override
             protected void execute(DeploymentProcessorTarget processorTarget) {
                 // sip.xml parsing
-                processorTarget.addDeploymentProcessor(SipExtension.SUBSYSTEM_NAME, Phase.PARSE,
-                        PARSE_SIP_DEPLOYMENT_PRIORITY, new SipParsingDeploymentProcessor());
+                processorTarget.addDeploymentProcessor(SipExtension.SUBSYSTEM_NAME, Phase.PARSE, PARSE_SIP_DEPLOYMENT_PRIORITY,
+                        new SipParsingDeploymentProcessor());
                 // handles annotations
                 processorTarget.addDeploymentProcessor(SipExtension.SUBSYSTEM_NAME, Phase.PARSE,
                         SIP_ANNOTATION_DEPLOYMENT_PRIORITY, new SipAnnotationDeploymentProcessor());
@@ -269,7 +263,8 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 // binds sip resources to JNDI - Before POST_MODULE_INJECTION_ANNOTATION !!!
                 processorTarget.addDeploymentProcessor(SipExtension.SUBSYSTEM_NAME, Phase.POST_MODULE,
                         Phase.POST_MODULE_INJECTION_ANNOTATION - 1, new SipJndiBindingProcessor());
-                //change DeploymentInfo to ConvergedDeploymentInfo in case of sip deployment in DeploymentInfoService using reflection API
+                // change DeploymentInfo to ConvergedDeploymentInfo in case of sip deployment in DeploymentInfoService using
+                // reflection API
                 processorTarget.addDeploymentProcessor(SipExtension.SUBSYSTEM_NAME, Phase.INSTALL,
                         Phase.INSTALL_WAR_DEPLOYMENT, new UndertowSipDeploymentInfoProcessor());
                 // setup management objects for servlets, etc.
@@ -277,53 +272,74 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
                         Phase.INSTALL_WAR_DEPLOYMENT, new SipWarDeploymentProcessor());
                 // add DeploymentInfoService to UndertowSipDeploymentInfoProcessor
                 processorTarget.addDeploymentProcessor(SipExtension.SUBSYSTEM_NAME, Phase.INSTALL,
-                        Phase.INSTALL_WAR_DEPLOYMENT+1, new UndertowSipDeploymentProcessor());
+                        Phase.INSTALL_WAR_DEPLOYMENT + 1, new UndertowSipDeploymentProcessor());
 
                 // // Add the SIP specific deployment processor
-                // processorTarget.addDeploymentProcessor(Phase.PARSE, DEPLOYMENT_PROCESS_PRIORITY, SipMetaDataDeploymentProcessor.INSTANCE);
+                // processorTarget.addDeploymentProcessor(Phase.PARSE, DEPLOYMENT_PROCESS_PRIORITY,
+                // SipMetaDataDeploymentProcessor.INSTANCE);
                 // // Add the context in a different phase
-                // processorTarget.addDeploymentProcessor(Phase.POST_MODULE, DEPLOYMENT_PROCESS_PRIORITY, SipContextFactoryDeploymentProcessor.INSTANCE);
+                // processorTarget.addDeploymentProcessor(Phase.POST_MODULE, DEPLOYMENT_PROCESS_PRIORITY,
+                // SipContextFactoryDeploymentProcessor.INSTANCE);
 
                 // final SharedWebMetaDataBuilder sharedWebBuilder = new SharedWebMetaDataBuilder(config.clone());
                 // final SharedTldsMetaDataBuilder sharedTldsBuilder = new SharedTldsMetaDataBuilder(config.clone());
                 //
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.STRUCTURE, Phase.STRUCTURE_WAR_DEPLOYMENT_INIT, new WarDeploymentInitializingProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.STRUCTURE, Phase.STRUCTURE_WAR, new WarStructureDeploymentProcessor(sharedWebBuilder.create(), sharedTldsBuilder));
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_WEB_DEPLOYMENT, new WebParsingDeploymentProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_WEB_DEPLOYMENT_FRAGMENT, new WebFragmentParsingDeploymentProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_JSF_VERSION, new JsfVersionProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_JBOSS_WEB_DEPLOYMENT, new JBossWebParsingDeploymentProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_TLD_DEPLOYMENT, new TldParsingDeploymentProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_ANNOTATION_WAR, new WarAnnotationDeploymentProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_WEB_COMPONENTS, new WebComponentProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_EAR_CONTEXT_ROOT, new EarContextRootProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_WEB_MERGE_METADATA, new WarMetaDataProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.POST_MODULE_JSF_MANAGED_BEANS, new JsfManagedBeanProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_WEB_INITIALIZE_IN_ORDER, new WebInitializeInOrderProcessor(defaultVirtualServer));
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.STRUCTURE,
+                // Phase.STRUCTURE_WAR_DEPLOYMENT_INIT, new WarDeploymentInitializingProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.STRUCTURE, Phase.STRUCTURE_WAR, new
+                // WarStructureDeploymentProcessor(sharedWebBuilder.create(), sharedTldsBuilder));
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_WEB_DEPLOYMENT,
+                // new WebParsingDeploymentProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE,
+                // Phase.PARSE_WEB_DEPLOYMENT_FRAGMENT, new WebFragmentParsingDeploymentProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_JSF_VERSION, new
+                // JsfVersionProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE,
+                // Phase.PARSE_JBOSS_WEB_DEPLOYMENT, new JBossWebParsingDeploymentProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_TLD_DEPLOYMENT,
+                // new TldParsingDeploymentProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_ANNOTATION_WAR,
+                // new WarAnnotationDeploymentProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE, Phase.PARSE_WEB_COMPONENTS,
+                // new WebComponentProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE,
+                // Phase.PARSE_EAR_CONTEXT_ROOT, new EarContextRootProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE,
+                // Phase.PARSE_WEB_MERGE_METADATA, new WarMetaDataProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE,
+                // Phase.POST_MODULE_JSF_MANAGED_BEANS, new JsfManagedBeanProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.PARSE,
+                // Phase.PARSE_WEB_INITIALIZE_IN_ORDER, new WebInitializeInOrderProcessor(defaultVirtualServer));
 
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.DEPENDENCIES, Phase.DEPENDENCIES_WAR_MODULE, new WarClassloadingDependencyProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.DEPENDENCIES,
+                // Phase.DEPENDENCIES_WAR_MODULE, new WarClassloadingDependencyProcessor());
 
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.POST_MODULE, Phase.POST_MODULE_JSF_MANAGED_BEANS, new JsfManagedBeanProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.INSTALL, Phase.INSTALL_SERVLET_INIT_DEPLOYMENT, new ServletContainerInitializerDeploymentProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.INSTALL, Phase.INSTALL_JSF_ANNOTATIONS, new JsfAnnotationProcessor());
-                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.INSTALL, Phase.INSTALL_WAR_DEPLOYMENT, new WarDeploymentProcessor(defaultVirtualServer));
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.POST_MODULE,
+                // Phase.POST_MODULE_JSF_MANAGED_BEANS, new JsfManagedBeanProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.INSTALL,
+                // Phase.INSTALL_SERVLET_INIT_DEPLOYMENT, new ServletContainerInitializerDeploymentProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.INSTALL,
+                // Phase.INSTALL_JSF_ANNOTATIONS, new JsfAnnotationProcessor());
+                // processorTarget.addDeploymentProcessor(WebExtension.SUBSYSTEM_NAME, Phase.INSTALL,
+                // Phase.INSTALL_WAR_DEPLOYMENT, new WarDeploymentProcessor(defaultVirtualServer));
             }
         }, OperationContext.Stage.RUNTIME);
 
-
-        //FIXME: kakonyii, no MockDistributedCacheManagerFactoryService in wildfly, need to find another solution to intsall this service:
-        //final ServiceTarget target = context.getServiceTarget();
-        //final DistributedCacheManagerFactory factory = new MockDistributedCacheManagerFactoryService().getValue();
-        //if (factory != null) {
-            //final InjectedValue<SipServer> server = new InjectedValue<SipServer>();
-            //newControllers.add(
-                    //target.addService(MockDistributedCacheManagerFactoryService.JVM_ROUTE_REGISTRY_ENTRY_PROVIDER_SERVICE_NAME, new JvmRouteRegistryEntryProviderService(server))
-                        //.addDependency(SipSubsystemServices.JBOSS_SIP, SipServer.class, server)
-                        //.setInitialMode(Mode.ON_DEMAND)
-                        //.install()
-                    //);
-            //newControllers.addAll(factory.installServices(target));
-        //}
+        // FIXME: kakonyii, no MockDistributedCacheManagerFactoryService in wildfly, need to find another solution to intsall
+        // this service:
+        // final ServiceTarget target = context.getServiceTarget();
+        // final DistributedCacheManagerFactory factory = new MockDistributedCacheManagerFactoryService().getValue();
+        // if (factory != null) {
+        // final InjectedValue<SipServer> server = new InjectedValue<SipServer>();
+        // newControllers.add(
+        // target.addService(MockDistributedCacheManagerFactoryService.JVM_ROUTE_REGISTRY_ENTRY_PROVIDER_SERVICE_NAME, new
+        // JvmRouteRegistryEntryProviderService(server))
+        // .addDependency(SipSubsystemServices.JBOSS_SIP, SipServer.class, server)
+        // .setInitialMode(Mode.ON_DEMAND)
+        // .install()
+        // );
+        // newControllers.addAll(factory.installServices(target));
+        // }
     }
 
     @Override

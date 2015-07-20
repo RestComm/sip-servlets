@@ -57,10 +57,12 @@ import org.jboss.staxmapper.XMLExtendedStreamWriter;
  * @author Tomaz Cerar
  * @author josemrecio@gmail.com
  *
- * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for
+ *         jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
-class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<ModelNode>>, XMLElementWriter<SubsystemMarshallingContext> {
+class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<ModelNode>>,
+        XMLElementWriter<SubsystemMarshallingContext> {
 
     private static final SipSubsystemParser INSTANCE = new SipSubsystemParser();
 
@@ -99,8 +101,8 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         SipDefinition.MEMORY_THRESHOLD.marshallAsAttribute(node, false, writer);
         SipDefinition.BACK_TO_NORMAL_MEMORY_THRESHOLD.marshallAsAttribute(node, false, writer);
         SipDefinition.OUTBOUND_PROXY.marshallAsAttribute(node, false, writer);
-        if(node.hasDefined(CONNECTOR)) {
-            for(final Property connector : node.get(CONNECTOR).asPropertyList()) {
+        if (node.hasDefined(CONNECTOR)) {
+            for (final Property connector : node.get(CONNECTOR).asPropertyList()) {
                 final ModelNode config = connector.getValue();
                 writer.writeStartElement(Element.CONNECTOR.getLocalName());
                 writer.writeAttribute(NAME, connector.getName());
@@ -117,7 +119,6 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
     @Override
     public void readElement(XMLExtendedStreamReader reader, List<ModelNode> list) throws XMLStreamException {
         PathAddress address = PathAddress.pathAddress(PathElement.pathElement(SUBSYSTEM, SipExtension.SUBSYSTEM_NAME));
-
 
         final ModelNode subsystem = new ModelNode();
         subsystem.get(OP).set(ADD);
@@ -161,11 +162,11 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         // elements
         while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
             switch (Namespace.forUri(reader.getNamespaceURI())) {
-                case SIP_1_0:{
+                case SIP_1_0: {
                     final Element element = Element.forName(reader.getLocalName());
                     switch (element) {
                         case CONNECTOR: {
-                            parseConnector(reader,address, list);
+                            parseConnector(reader, address, list);
                             break;
                         }
                         default: {
@@ -173,14 +174,16 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
                         }
                     }
                     break;
-                } default: {
+                }
+                default: {
                     throw unexpectedElement(reader);
                 }
             }
         }
     }
 
-    static void parseConnector(XMLExtendedStreamReader reader, PathAddress parent, List<ModelNode> list) throws XMLStreamException {
+    static void parseConnector(XMLExtendedStreamReader reader, PathAddress parent, List<ModelNode> list)
+            throws XMLStreamException {
         String name = null;
         String bindingRef = null;
         final ModelNode connector = new ModelNode();
@@ -191,45 +194,45 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
             final String value = reader.getAttributeValue(i);
             final Attribute attribute = Attribute.forName(reader.getAttributeLocalName(i));
             switch (attribute) {
-            case NAME:
-                name = value;
-                break;
-            case SOCKET_BINDING:
-                bindingRef = value;
-                SipConnectorDefinition.SOCKET_BINDING.parseAndSetParameter(value, connector, reader);
-                break;
-            case SCHEME:
-                SipConnectorDefinition.SCHEME.parseAndSetParameter(value, connector, reader);
-                break;
-            case PROTOCOL:
-                SipConnectorDefinition.PROTOCOL.parseAndSetParameter(value, connector, reader);
-                break;
-            case ENABLED:
-                SipConnectorDefinition.ENABLED.parseAndSetParameter(value, connector, reader);
-                break;
-            case USE_STATIC_ADDRESS:
-                SipConnectorDefinition.USE_STATIC_ADDRESS.parseAndSetParameter(value, connector, reader);
-                break;
-            case STATIC_SERVER_ADDRESS:
-                SipConnectorDefinition.STATIC_SERVER_ADDRESS.parseAndSetParameter(value, connector, reader);
-                break;
-            case STATIC_SERVER_PORT:
-                SipConnectorDefinition.STATIC_SERVER_PORT.parseAndSetParameter(value, connector, reader);
-                break;
-            case USE_STUN:
-                SipConnectorDefinition.USE_STUN.parseAndSetParameter(value, connector, reader);
-                break;
-            case STUN_SERVER_ADDRESS:
-                SipConnectorDefinition.STUN_SERVER_ADDRESS.parseAndSetParameter(value, connector, reader);
-                break;
-            case STUN_SERVER_PORT:
-                SipConnectorDefinition.STUN_SERVER_PORT.parseAndSetParameter(value, connector, reader);
-                break;
-            case HOSTNAMES:
-                SipConnectorDefinition.HOSTNAMES.parseAndSetParameter(value, connector, reader);
-                break;                
-            default:
-                throw unexpectedAttribute(reader, i);
+                case NAME:
+                    name = value;
+                    break;
+                case SOCKET_BINDING:
+                    bindingRef = value;
+                    SipConnectorDefinition.SOCKET_BINDING.parseAndSetParameter(value, connector, reader);
+                    break;
+                case SCHEME:
+                    SipConnectorDefinition.SCHEME.parseAndSetParameter(value, connector, reader);
+                    break;
+                case PROTOCOL:
+                    SipConnectorDefinition.PROTOCOL.parseAndSetParameter(value, connector, reader);
+                    break;
+                case ENABLED:
+                    SipConnectorDefinition.ENABLED.parseAndSetParameter(value, connector, reader);
+                    break;
+                case USE_STATIC_ADDRESS:
+                    SipConnectorDefinition.USE_STATIC_ADDRESS.parseAndSetParameter(value, connector, reader);
+                    break;
+                case STATIC_SERVER_ADDRESS:
+                    SipConnectorDefinition.STATIC_SERVER_ADDRESS.parseAndSetParameter(value, connector, reader);
+                    break;
+                case STATIC_SERVER_PORT:
+                    SipConnectorDefinition.STATIC_SERVER_PORT.parseAndSetParameter(value, connector, reader);
+                    break;
+                case USE_STUN:
+                    SipConnectorDefinition.USE_STUN.parseAndSetParameter(value, connector, reader);
+                    break;
+                case STUN_SERVER_ADDRESS:
+                    SipConnectorDefinition.STUN_SERVER_ADDRESS.parseAndSetParameter(value, connector, reader);
+                    break;
+                case STUN_SERVER_PORT:
+                    SipConnectorDefinition.STUN_SERVER_PORT.parseAndSetParameter(value, connector, reader);
+                    break;
+                case HOSTNAMES:
+                    SipConnectorDefinition.HOSTNAMES.parseAndSetParameter(value, connector, reader);
+                    break;
+                default:
+                    throw unexpectedAttribute(reader, i);
             }
         }
         if (name == null) {
@@ -245,16 +248,16 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
 
         while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
             switch (Namespace.forUri(reader.getNamespaceURI())) {
-            case SIP_1_0: {
-                final Element element = Element.forName(reader.getLocalName());
-                switch (element) {
+                case SIP_1_0: {
+                    final Element element = Element.forName(reader.getLocalName());
+                    switch (element) {
+                        default:
+                            throw unexpectedElement(reader);
+                    }
+                    // break;
+                }
                 default:
                     throw unexpectedElement(reader);
-                }
-                //break;
-            }
-            default:
-                throw unexpectedElement(reader);
             }
         }
     }

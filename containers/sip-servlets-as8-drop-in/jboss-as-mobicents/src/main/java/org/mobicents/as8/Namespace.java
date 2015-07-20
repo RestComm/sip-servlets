@@ -27,7 +27,8 @@ import java.util.Map;
 /**
  * @author Emanuel Muckenhuber
  *
- * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for
+ *         jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 enum Namespace {
@@ -35,8 +36,7 @@ enum Namespace {
     // must be first
     UNKNOWN(null),
 
-    SIP_1_0("urn:org.mobicents:sip-servlets-as8:1.0"),
-    ;
+    SIP_1_0("urn:org.mobicents:sip-servlets-as8:1.0"), ;
 
     /**
      * The current namespace version.

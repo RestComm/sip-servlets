@@ -32,7 +32,8 @@ import org.mobicents.metadata.sip.spec.SipServletMappingMetaData;
  *
  * @author josemrecio@gmail.com
  *
- * This class is based on the contents of org.mobicents.metadata.sip.parser package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.metadata.sip.parser package from jboss-as7-mobicents project,
+ *         re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  *
  */
@@ -63,7 +64,7 @@ public class SipServletMappingMetaDataParser extends MetaDataElementParser {
                     servletMapping.setServletName(getElementText(reader));
                     break;
                 case PATTERN:
-                    //throw unexpectedElement(reader);
+                    // throw unexpectedElement(reader);
                     servletMapping.setPattern(SipServletMappingPatternMetaDataParser.parse(reader));
                     break;
                 default:

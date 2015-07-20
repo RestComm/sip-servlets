@@ -21,7 +21,6 @@
  */
 package org.mobicents.as8;
 
-
 import org.mobicents.servlet.sip.undertow.SipProtocolHandler;
 
 /**
@@ -41,7 +40,7 @@ public class SipConnectorListener {
         return protocolHandler;
     }
 
-    public void init(){
+    public void init() {
         try {
             this.protocolHandler.init();
         } catch (Exception e) {
@@ -49,7 +48,7 @@ public class SipConnectorListener {
         }
     }
 
-    public void start(){
+    public void start() {
         try {
             this.protocolHandler.start();
         } catch (Exception e) {
@@ -57,11 +56,11 @@ public class SipConnectorListener {
         }
     }
 
-    public void pause(){
+    public void pause() {
         this.protocolHandler.resume();
     }
 
-    public void stop(){
+    public void stop() {
         try {
             this.protocolHandler.destroy();
         } catch (Exception e) {

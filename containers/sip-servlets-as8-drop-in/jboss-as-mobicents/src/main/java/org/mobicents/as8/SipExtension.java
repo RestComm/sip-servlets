@@ -39,7 +39,8 @@ import org.jboss.as.controller.registry.OperationEntry;
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
  *
- * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for
+ *         jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class SipExtension implements Extension {
@@ -60,41 +61,53 @@ public class SipExtension implements Extension {
     @Override
     public void initialize(ExtensionContext context) {
 
-        //final boolean registerRuntimeOnly = context.isRuntimeOnlyRegistrationValid();
+        // final boolean registerRuntimeOnly = context.isRuntimeOnlyRegistrationValid();
 
-        final SubsystemRegistration subsystem = context.registerSubsystem(SUBSYSTEM_NAME, MANAGEMENT_API_MAJOR_VERSION, MANAGEMENT_API_MINOR_VERSION);
+        final SubsystemRegistration subsystem = context.registerSubsystem(SUBSYSTEM_NAME, MANAGEMENT_API_MAJOR_VERSION,
+                MANAGEMENT_API_MINOR_VERSION);
         final ManagementResourceRegistration registration = subsystem.registerSubsystemModel(SipDefinition.INSTANCE);
-        registration.registerOperationHandler(DESCRIBE, GenericSubsystemDescribeHandler.INSTANCE, GenericSubsystemDescribeHandler.INSTANCE, false, OperationEntry.EntryType.PRIVATE);
-        //final ManagementResourceRegistration registration = subsystem.registerSubsystemModel(SipSubsystemDescriptionProviders.SUBSYSTEM);
-        //registration.registerOperationHandler(ADD, SipSubsystemAdd.INSTANCE, SipSubsystemAdd.INSTANCE, false);
-        //registration.registerOperationHandler(DESCRIBE, SipSubsystemDescribe.INSTANCE, SipSubsystemDescribe.INSTANCE, false, OperationEntry.EntryType.PRIVATE);
-        //registration.registerOperationHandler(REMOVE, ReloadRequiredRemoveStepHandler.INSTANCE, SipSubsystemDescriptionProviders.SUBSYSTEM_REMOVE, false);
+        registration.registerOperationHandler(DESCRIBE, GenericSubsystemDescribeHandler.INSTANCE,
+                GenericSubsystemDescribeHandler.INSTANCE, false, OperationEntry.EntryType.PRIVATE);
+        // final ManagementResourceRegistration registration =
+        // subsystem.registerSubsystemModel(SipSubsystemDescriptionProviders.SUBSYSTEM);
+        // registration.registerOperationHandler(ADD, SipSubsystemAdd.INSTANCE, SipSubsystemAdd.INSTANCE, false);
+        // registration.registerOperationHandler(DESCRIBE, SipSubsystemDescribe.INSTANCE, SipSubsystemDescribe.INSTANCE, false,
+        // OperationEntry.EntryType.PRIVATE);
+        // registration.registerOperationHandler(REMOVE, ReloadRequiredRemoveStepHandler.INSTANCE,
+        // SipSubsystemDescriptionProviders.SUBSYSTEM_REMOVE, false);
         subsystem.registerXMLElementWriter(SipSubsystemParser.getInstance());
 
         // connectors
         final ManagementResourceRegistration connectors = registration.registerSubModel(SipConnectorDefinition.INSTANCE);
-//        final ManagementResourceRegistration connectors = registration.registerSubModel(CONNECTOR_PATH, SipSubsystemDescriptionProviders.CONNECTOR);
-//        connectors.registerOperationHandler(ADD, SipConnectorAdd.INSTANCE, SipConnectorAdd.INSTANCE, false);
-//        connectors.registerOperationHandler(REMOVE, SipConnectorRemove.INSTANCE, SipConnectorRemove.INSTANCE, false);
-//        if (registerRuntimeOnly) {
-//            for (final String attributeName : SipConnectorMetrics.ATTRIBUTES) {
-//                connectors.registerMetric(attributeName, SipConnectorMetrics.INSTANCE);
-//            }
-//        }
-//        connectors.registerReadWriteAttribute(Constants.PROTOCOL, null, new WriteAttributeHandlers.StringLengthValidatingHandler(1, true), Storage.CONFIGURATION);
-//        connectors.registerReadWriteAttribute(Constants.SCHEME, null, new WriteAttributeHandlers.StringLengthValidatingHandler(1, true), Storage.CONFIGURATION);
-//        connectors.registerReadWriteAttribute(Constants.SOCKET_BINDING, null, new WriteAttributeHandlers.StringLengthValidatingHandler(1), Storage.CONFIGURATION);
-//        connectors.registerReadWriteAttribute(Constants.ENABLED, null, new WriteAttributeHandlers.ModelTypeValidatingHandler(ModelType.BOOLEAN, true), Storage.CONFIGURATION);
+        // final ManagementResourceRegistration connectors = registration.registerSubModel(CONNECTOR_PATH,
+        // SipSubsystemDescriptionProviders.CONNECTOR);
+        // connectors.registerOperationHandler(ADD, SipConnectorAdd.INSTANCE, SipConnectorAdd.INSTANCE, false);
+        // connectors.registerOperationHandler(REMOVE, SipConnectorRemove.INSTANCE, SipConnectorRemove.INSTANCE, false);
+        // if (registerRuntimeOnly) {
+        // for (final String attributeName : SipConnectorMetrics.ATTRIBUTES) {
+        // connectors.registerMetric(attributeName, SipConnectorMetrics.INSTANCE);
+        // }
+        // }
+        // connectors.registerReadWriteAttribute(Constants.PROTOCOL, null, new
+        // WriteAttributeHandlers.StringLengthValidatingHandler(1, true), Storage.CONFIGURATION);
+        // connectors.registerReadWriteAttribute(Constants.SCHEME, null, new
+        // WriteAttributeHandlers.StringLengthValidatingHandler(1, true), Storage.CONFIGURATION);
+        // connectors.registerReadWriteAttribute(Constants.SOCKET_BINDING, null, new
+        // WriteAttributeHandlers.StringLengthValidatingHandler(1), Storage.CONFIGURATION);
+        // connectors.registerReadWriteAttribute(Constants.ENABLED, null, new
+        // WriteAttributeHandlers.ModelTypeValidatingHandler(ModelType.BOOLEAN, true), Storage.CONFIGURATION);
 
-        //deployment
+        // deployment
         final ManagementResourceRegistration deployments = subsystem.registerDeploymentModel(SipDeploymentDefinition.INSTANCE);
         deployments.registerSubModel(SipDeploymentServletDefinition.INSTANCE);
 
-//        if (registerRuntimeOnly) {
-//            final ManagementResourceRegistration deployments = subsystem.registerDeploymentModel(SipSubsystemDescriptionProviders.DEPLOYMENT);
-//            final ManagementResourceRegistration servlets = deployments.registerSubModel(PathElement.pathElement("servlet"), SipSubsystemDescriptionProviders.SERVLET);
-//            ServletDeploymentStats.register(servlets);
-//        }
+        // if (registerRuntimeOnly) {
+        // final ManagementResourceRegistration deployments =
+        // subsystem.registerDeploymentModel(SipSubsystemDescriptionProviders.DEPLOYMENT);
+        // final ManagementResourceRegistration servlets = deployments.registerSubModel(PathElement.pathElement("servlet"),
+        // SipSubsystemDescriptionProviders.SERVLET);
+        // ServletDeploymentStats.register(servlets);
+        // }
     }
 
     /** {@inheritDoc} */

@@ -30,12 +30,14 @@ import org.mobicents.servlet.sip.undertow.SipStandardService;
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
  *
- * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for
+ *         jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public interface SipServer {
 
     AttachmentKey<SipServer> ATTACHMENT_KEY = AttachmentKey.create(SipServer.class);
+
     /**
      * Add a connector.
      *
@@ -55,19 +57,19 @@ public interface SipServer {
      *
      * @param host the virtual host
      */
-//FIXME:    void addHost(Host host);
+    // FIXME: void addHost(Host host);
 
     /**
      * Remove a virtual host.
      *
      * @param host the virtual host
      */
-//FIXME:    void removeHost(Host host);
+    // FIXME: void removeHost(Host host);
 
     /**
      * return the server (StandardServer)
      */
-//FIXME:    Server getServer();
+    // FIXME: Server getServer();
 
     /**
      * return the service (StandardService)

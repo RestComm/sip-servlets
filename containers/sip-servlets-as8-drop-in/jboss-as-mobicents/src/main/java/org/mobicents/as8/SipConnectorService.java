@@ -43,7 +43,8 @@ import static org.mobicents.as8.SipMessages.MESSAGES;
  *
  * @author Emanuel Muckenhuber
  *
- * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for
+ *         jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 class SipConnectorService implements Service<SipConnectorListener> {
@@ -64,7 +65,8 @@ class SipConnectorService implements Service<SipConnectorListener> {
     private final InjectedValue<SocketBinding> binding = new InjectedValue<SocketBinding>();
     private final InjectedValue<SipServer> server = new InjectedValue<SipServer>();
 
-    public SipConnectorService(String protocol, String scheme, boolean useStaticAddress, String staticServerAddress, int staticServerPort, boolean useStun, String stunServerAddress, int stunServerPort, String hostNames) {
+    public SipConnectorService(String protocol, String scheme, boolean useStaticAddress, String staticServerAddress,
+            int staticServerPort, boolean useStun, String stunServerAddress, int stunServerPort, String hostNames) {
         if (protocol != null)
             this.protocol = protocol;
         if (scheme != null)
@@ -98,7 +100,7 @@ class SipConnectorService implements Service<SipConnectorListener> {
             sipConnector.setIpAddress(address.getAddress().getHostAddress());
             sipConnector.setPort(address.getPort());
             // https://github.com/Mobicents/sip-servlets/issues/44 support multiple connectors
-            sipConnector.setTransport(binding.getName().substring(binding.getName().lastIndexOf("sip-")+("sip-".length())));
+            sipConnector.setTransport(binding.getName().substring(binding.getName().lastIndexOf("sip-") + ("sip-".length())));
             sipConnector.setUseStaticAddress(useStaticAddress);
             sipConnector.setStaticServerAddress(staticServerAddress);
             sipConnector.setStaticServerPort(staticServerPort);
@@ -107,19 +109,15 @@ class SipConnectorService implements Service<SipConnectorListener> {
             sipConnector.setStunServerPort(stunServerPort);
             sipConnector.setHostNames(hostNames);
 
-            Logger.getLogger("org.mobicents.as8").debug("SipConnectorService.start(), address = " + address.getAddress().getHostAddress() + " - port = " + address.getPort() + " - transport = " + sipConnector.getTransport());
+            Logger.getLogger("org.mobicents.as8").debug(
+                    "SipConnectorService.start(), address = " + address.getAddress().getHostAddress() + " - port = "
+                            + address.getPort() + " - transport = " + sipConnector.getTransport());
             Logger.getLogger("org.mobicents.as8").debug("SipConnectorService.start(), hostnames = " + hostNames);
-            
-            /*FIXME: kakonyii: need an implementation in SipConnector class for the following fields:
-             * enableLookups
-             * proxyName
-             * proxyPort
-             * redirectPort
-             * secure
-             * maxPostSize
-             * maxSavePostSize
-             * */
 
+            /*
+             * FIXME: kakonyii: need an implementation in SipConnector class for the following fields: enableLookups proxyName
+             * proxyPort redirectPort secure maxPostSize maxSavePostSize
+             */
 
             SipProtocolHandler sipProtocolHandler = new SipProtocolHandler(sipConnector);
 
@@ -131,7 +129,6 @@ class SipConnectorService implements Service<SipConnectorListener> {
             connector.init();
             getSipServer().addConnector(connector);
             connector.start();
-
 
             this.connector = connector;
         } catch (Exception e) {

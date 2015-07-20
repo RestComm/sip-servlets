@@ -61,7 +61,8 @@ import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
  * @author Emanuel Muckenhuber
  * @author josemrecio@gmail.com
  *
- * This class is based on the contents of org.mobicents.as7.deployment package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7.deployment package from jboss-as7-mobicents project,
+ *         re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class SIPWebContext extends SipContextImpl {
@@ -88,8 +89,7 @@ public class SIPWebContext extends SipContextImpl {
         return this;
     }
 
-    public SIPWebContext createContextConfig(UndertowDeploymentInfoService deploymentInfoservice)
-            throws ServletException {
+    public SIPWebContext createContextConfig(UndertowDeploymentInfoService deploymentInfoservice) throws ServletException {
         if (this.deploymentUnit == null) {
             throw new ServletException("deploymentUnit not set, call SIPWebContext.addDeploymentUnit() first");
         }
@@ -141,8 +141,7 @@ public class SIPWebContext extends SipContextImpl {
             logger.debugf("Starting sip web context for deployment %s", deploymentUnit.getName());
         }
         SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
-        SipAnnotationMetaData sipAnnotationMetaData = deploymentUnit
-                .getAttachment(SipAnnotationMetaData.ATTACHMENT_KEY);
+        SipAnnotationMetaData sipAnnotationMetaData = deploymentUnit.getAttachment(SipAnnotationMetaData.ATTACHMENT_KEY);
 
         JBossWebMetaData mergedMetaData = null;
         mergedMetaData = new JBossConvergedSipMetaData();
@@ -155,8 +154,7 @@ public class SIPWebContext extends SipContextImpl {
             logger.debugf("security domain " + mergedMetaData.getSecurityDomain() + " for deployment %s",
                     deploymentUnit.getName());
         }
-        if (sipMetaData == null && sipAnnotationMetaData != null
-                && sipAnnotationMetaData.isSipApplicationAnnotationPresent()) {
+        if (sipMetaData == null && sipAnnotationMetaData != null && sipAnnotationMetaData.isSipApplicationAnnotationPresent()) {
             // http://code.google.com/p/sipservlets/issues/detail?id=168
             // When no sip.xml but annotations only, Application is not recognized as SIP App by AS7
             logger.debugf("sip meta data is null, creating a new one");
@@ -205,7 +203,8 @@ public class SIPWebContext extends SipContextImpl {
                 if (sipMetaData.getSipServlets() != null) {
                     logger.debug("SipServlets: " + sipMetaData.getSipServlets().size());
                     for (ServletMetaData check : sipMetaData.getSipServlets()) {
-                        logger.debug("SipServlet: " + check.getName() + " - class: " + check.getServletClass() + " - load-on-startup: " + check.getLoadOnStartup());
+                        logger.debug("SipServlet: " + check.getName() + " - class: " + check.getServletClass()
+                                + " - load-on-startup: " + check.getLoadOnStartup());
                     }
                 }
                 logger.debug("</Before clumsy augmentation>");
@@ -253,8 +252,7 @@ public class SIPWebContext extends SipContextImpl {
                         if (annotatedSipMetaData.getApplicationName() != null) {
                             if (sipMetaData.getApplicationName() == null) {
                                 sipMetaData.setApplicationName(annotatedSipMetaData.getApplicationName());
-                            } else if (sipMetaData.getApplicationName().compareTo(
-                                    annotatedSipMetaData.getApplicationName()) != 0) {
+                            } else if (sipMetaData.getApplicationName().compareTo(annotatedSipMetaData.getApplicationName()) != 0) {
                                 throw (new ServletException("Sip application name mismatch: "
                                         + sipMetaData.getApplicationName() + " (from sip.xml) vs "
                                         + annotatedSipMetaData.getApplicationName() + " (from annotations)"));
@@ -279,8 +277,7 @@ public class SIPWebContext extends SipContextImpl {
                             for (ListenerMetaData check : sipMetaData.getListeners()) {
                                 if (check.getListenerClass().equals(listenerMetaData.getListenerClass())) {
                                     if (logger.isDebugEnabled())
-                                        logger.debug("@SipListener already present: "
-                                                + listenerMetaData.getListenerClass());
+                                        logger.debug("@SipListener already present: " + listenerMetaData.getListenerClass());
                                     found = true;
                                 }
                             }
@@ -300,8 +297,7 @@ public class SIPWebContext extends SipContextImpl {
                             for (ServletMetaData check : sipMetaData.getSipServlets()) {
                                 if (check.getServletClass().equals(servletMetaData.getServletClass())) {
                                     if (logger.isDebugEnabled())
-                                        logger.debug("@SipServlet already present: "
-                                                + servletMetaData.getServletClass());
+                                        logger.debug("@SipServlet already present: " + servletMetaData.getServletClass());
                                     found = true;
                                 }
                             }
@@ -334,7 +330,8 @@ public class SIPWebContext extends SipContextImpl {
                 if (sipMetaData.getSipServlets() != null) {
                     logger.debug("SipServlets: " + sipMetaData.getSipServlets().size());
                     for (ServletMetaData check : sipMetaData.getSipServlets()) {
-                        logger.debug("SipServlet: " + check.getName() + " - class: " + check.getServletClass() + " - load-on-startup: " + check.getLoadOnStartup());
+                        logger.debug("SipServlet: " + check.getName() + " - class: " + check.getServletClass()
+                                + " - load-on-startup: " + check.getLoadOnStartup());
                     }
                 }
                 logger.debug("</After clumsy augmentation>");
@@ -350,7 +347,8 @@ public class SIPWebContext extends SipContextImpl {
         sipJBossContextConfig.processSipMetaData((JBossConvergedSipMetaData) mergedMetaData, this);
     }
 
-    private SipJBossContextConfig createContextConfig(DeploymentUnit deploymentUnit, UndertowDeploymentInfoService deploymentInfoservice) {
+    private SipJBossContextConfig createContextConfig(DeploymentUnit deploymentUnit,
+            UndertowDeploymentInfoService deploymentInfoservice) {
         SipJBossContextConfig config = new SipJBossContextConfig(deploymentUnit, deploymentInfoservice);
         // FIXME: kakonyii: sipContext.addLifecycleListener(config);
         return config;

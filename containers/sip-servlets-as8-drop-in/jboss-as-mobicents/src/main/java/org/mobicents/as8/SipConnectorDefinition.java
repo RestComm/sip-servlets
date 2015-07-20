@@ -38,12 +38,12 @@ import org.jboss.dmr.ModelType;
  * @created 22.2.12 15:03
  * @author josemrecio@gmail.com
  *
- * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for
+ *         jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class SipConnectorDefinition extends SimpleResourceDefinition {
     public static final SipConnectorDefinition INSTANCE = new SipConnectorDefinition();
-
 
     protected static final SimpleAttributeDefinition NAME =
             new SimpleAttributeDefinitionBuilder(Constants.NAME, ModelType.STRING)
@@ -73,7 +73,7 @@ public class SipConnectorDefinition extends SimpleResourceDefinition {
                     .setAllowNull(false)
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .setValidator(new StringLengthValidator(1))
-                    //.setDefaultValue(new ModelNode("http"))
+                    // .setDefaultValue(new ModelNode("http"))
                     .build();
 
     protected static final SimpleAttributeDefinition ENABLED =
@@ -123,7 +123,7 @@ public class SipConnectorDefinition extends SimpleResourceDefinition {
                     .setXmlName(Constants.STUN_SERVER_ADDRESS)
                     .setAllowNull(true)
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
-                    .setValidator(new InetAddressValidator(true,false))
+                    .setValidator(new InetAddressValidator(true, false))
                     .setRequires(Constants.USE_STUN)
                     .build();
 
@@ -145,8 +145,8 @@ public class SipConnectorDefinition extends SimpleResourceDefinition {
                     .build();
 
     protected static final SimpleAttributeDefinition[] CONNECTOR_ATTRIBUTES = {
-            //NAME, // name is read-only
-            // IMPORTANT -- keep these in xsd order as this order controls marshalling
+        // NAME, // name is read-only
+        // IMPORTANT -- keep these in xsd order as this order controls marshalling
         PROTOCOL,
         SCHEME,
         SOCKET_BINDING,
@@ -161,12 +161,9 @@ public class SipConnectorDefinition extends SimpleResourceDefinition {
     };
 
     private SipConnectorDefinition() {
-        super(SipExtension.CONNECTOR_PATH,
-                SipExtension.getResourceDescriptionResolver(Constants.CONNECTOR),
-                SipConnectorAdd.INSTANCE,
-                SipConnectorRemove.INSTANCE);
+        super(SipExtension.CONNECTOR_PATH, SipExtension.getResourceDescriptionResolver(Constants.CONNECTOR),
+                SipConnectorAdd.INSTANCE, SipConnectorRemove.INSTANCE);
     }
-
 
     @Override
     public void registerAttributes(ManagementResourceRegistration connectors) {

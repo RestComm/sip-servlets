@@ -34,9 +34,11 @@ import org.jboss.msc.service.ServiceBuilder;
  * {@link InjectionSource} for {@link javax.servlet.sip.SipFactory} resource.
  *
  * User: Jaikiran Pai
+ *
  * @author josemrecio@gmail.com
  *
- * This class is based on the contents of org.mobicents.as7.deployment package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7.deployment package from jboss-as7-mobicents project,
+ *         re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  *
  */
@@ -51,7 +53,9 @@ public class SipFactoryInjectionSource extends InjectionSource {
     }
 
     @Override
-    public void getResourceValue(ResolutionContext resolutionContext, ServiceBuilder<?> serviceBuilder, DeploymentPhaseContext phaseContext, Injector<ManagedReferenceFactory> injector) throws DeploymentUnitProcessingException {
+    public void getResourceValue(ResolutionContext resolutionContext, ServiceBuilder<?> serviceBuilder,
+            DeploymentPhaseContext phaseContext, Injector<ManagedReferenceFactory> injector)
+            throws DeploymentUnitProcessingException {
         injector.inject(new SipFactoryManagedReferenceFactory());
     }
 

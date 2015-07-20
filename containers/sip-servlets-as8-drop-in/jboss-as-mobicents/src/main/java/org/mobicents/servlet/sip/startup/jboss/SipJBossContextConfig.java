@@ -84,18 +84,18 @@ import org.mobicents.servlet.sip.core.descriptor.MatchingRule;
 import org.mobicents.servlet.sip.startup.loading.SipServletMapping;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
 
-
 /**
  * Startup event listener for a the <b>SipStandardContext</b> that configures the properties of that Context, and the associated
  * defined servlets. It extends the JbossContextConfig to be able to load sip servlet applications.
  *
  * @author Jean Deruelle
  *
- * This class is based on org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig class from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on org.mobicents.servlet.sip.startup.jboss.SipJBossContextConfig class from jboss-as7-mobicents
+ *         project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  *
  */
-public class SipJBossContextConfig{
+public class SipJBossContextConfig {
     DeploymentUnit deploymentUnit;
     UndertowDeploymentInfoService deploymentInfoservice;
 
@@ -116,48 +116,49 @@ public class SipJBossContextConfig{
         }
     }
 
-//    // guess that this method matches with JBoss5 processContextParameters() method?
-//    @Override
-//    protected void processJBossWebMetaData(JBossWebMetaData metaData) {
-//        if (metaData instanceof JBossConvergedSipMetaData && context instanceof SipStandardContext) {
-//            processSipContextParameters((JBossConvergedSipMetaData) metaData);
-//        }
-//        super.processJBossWebMetaData(metaData);
-//    }
+    // // guess that this method matches with JBoss5 processContextParameters() method?
+    // @Override
+    // protected void processJBossWebMetaData(JBossWebMetaData metaData) {
+    // if (metaData instanceof JBossConvergedSipMetaData && context instanceof SipStandardContext) {
+    // processSipContextParameters((JBossConvergedSipMetaData) metaData);
+    // }
+    // super.processJBossWebMetaData(metaData);
+    // }
 
-//    @Override
-//    protected void processWebMetaData(JBossWebMetaData metaData) {
-//        if (metaData instanceof JBossConvergedSipMetaData && context instanceof SipContext) {
-//            processSipMetaData((JBossConvergedSipMetaData) metaData);
-//            // Issue 1522 http://code.google.com/p/mobicents/issues/detail?id=1522 :
-//            // when converged distributable app deployed is missing distributable in one of the Deployment descriptor
-//            // throw a better exception
-//            if (metaData.getDistributable() != null && metaData.getReplicationConfig() == null) {
-//                throw new SipDeploymentException(
-//                        "the <distributable/> element should be present in both web.xml and sip.xml so that the application can be correctly clustered");
-//            }
-//        }
-//        super.processWebMetaData(metaData);
-//
-//    }
+    // @Override
+    // protected void processWebMetaData(JBossWebMetaData metaData) {
+    // if (metaData instanceof JBossConvergedSipMetaData && context instanceof SipContext) {
+    // processSipMetaData((JBossConvergedSipMetaData) metaData);
+    // // Issue 1522 http://code.google.com/p/mobicents/issues/detail?id=1522 :
+    // // when converged distributable app deployed is missing distributable in one of the Deployment descriptor
+    // // throw a better exception
+    // if (metaData.getDistributable() != null && metaData.getReplicationConfig() == null) {
+    // throw new SipDeploymentException(
+    // "the <distributable/> element should be present in both web.xml and sip.xml so that the application can be correctly clustered");
+    // }
+    // }
+    // super.processWebMetaData(metaData);
+    //
+    // }
 
     /**
      * @param convergedMetaData
      * @throws Exception
      */
-    public void processSipMetaData(JBossConvergedSipMetaData convergedMetaData, SipContextImpl convergedContext) throws Exception {
-        //UndertowSipContextDeployment convergedContext = (CatalinaSipContext) context;
-        //convergedContext.setWrapperClass(SipServletImpl.class.getName());
+    public void processSipMetaData(JBossConvergedSipMetaData convergedMetaData, SipContextImpl convergedContext)
+            throws Exception {
+        // UndertowSipContextDeployment convergedContext = (CatalinaSipContext) context;
+        // convergedContext.setWrapperClass(SipServletImpl.class.getName());
         /*
          * sip specific treatment
          */
         // description
         DescriptionGroupMetaData descriptionGroupMetaData = convergedMetaData.getDescriptionGroup();
-//        // FIXME: josemrecio - dirty way to detect we are in defaultWebConfig() phase
-//        // if so, as there is no defaultSipConfig() equivalent, we just return
-//        if (descriptionGroupMetaData == null) {
-//            return;
-//        }
+        // // FIXME: josemrecio - dirty way to detect we are in defaultWebConfig() phase
+        // // if so, as there is no defaultSipConfig() equivalent, we just return
+        // if (descriptionGroupMetaData == null) {
+        // return;
+        // }
         if (descriptionGroupMetaData != null) {
             DescriptionsImpl descriptionsImpl = (DescriptionsImpl) descriptionGroupMetaData.getDescriptions();
             if (descriptionsImpl != null && !descriptionsImpl.isEmpty()) {
@@ -187,7 +188,8 @@ public class SipJBossContextConfig{
         List<? extends ParamValueMetaData> sipContextParams = convergedMetaData.getSipContextParams();
         if (sipContextParams != null) {
             for (ParamValueMetaData param : sipContextParams) {
-                convergedContext.getDeploymentInfoFacade().getDeploymentInfo().addServletContextAttribute(param.getParamName(), param.getParamValue());
+                convergedContext.getDeploymentInfoFacade().getDeploymentInfo()
+                        .addServletContextAttribute(param.getParamName(), param.getParamValue());
             }
         }
 
@@ -228,13 +230,13 @@ public class SipJBossContextConfig{
 
                 TransportGuaranteeType tg = sipConstraintMetaData.getTransportGuarantee();
                 io.undertow.servlet.api.TransportGuaranteeType undertowTg = null;
-                if (tg==TransportGuaranteeType.CONFIDENTIAL){
+                if (tg == TransportGuaranteeType.CONFIDENTIAL) {
                     undertowTg = io.undertow.servlet.api.TransportGuaranteeType.CONFIDENTIAL;
-                }else if (tg==TransportGuaranteeType.INTEGRAL){
+                } else if (tg == TransportGuaranteeType.INTEGRAL) {
                     undertowTg = io.undertow.servlet.api.TransportGuaranteeType.INTEGRAL;
-                }else if (tg==TransportGuaranteeType.NONE){
+                } else if (tg == TransportGuaranteeType.NONE) {
                     undertowTg = io.undertow.servlet.api.TransportGuaranteeType.NONE;
-                }else {
+                } else {
                     undertowTg = io.undertow.servlet.api.TransportGuaranteeType.REJECTED;
                 }
                 sipSecurityConstraint.setTransportGuaranteeType(undertowTg);
@@ -265,7 +267,7 @@ public class SipJBossContextConfig{
         // sip login config
         SipLoginConfigMetaData sipLoginConfig = convergedMetaData.getSipLoginConfig();
         if (sipLoginConfig != null) {
-            SipLoginConfig sipLoginConfig2 = new SipLoginConfig(sipLoginConfig.getAuthMethod(),sipLoginConfig.getRealmName());
+            SipLoginConfig sipLoginConfig2 = new SipLoginConfig(sipLoginConfig.getAuthMethod(), sipLoginConfig.getRealmName());
 
             if (sipLoginConfig.getIdentityAssertion() != null) {
                 sipLoginConfig2.addIdentityAssertion(sipLoginConfig.getIdentityAssertion().getIdentityAssertionScheme(),
@@ -326,14 +328,16 @@ public class SipJBossContextConfig{
             }
             for (ServletMetaData value : sipServlets) {
 
-                Class<? extends Servlet> servletClass = (Class<? extends Servlet>) convergedContext.getSipContextClassLoader().loadClass(value.getServletClass());
-                ManagedReferenceFactory creator = deploymentInfoservice.getComponentRegistryInjectedValue().getValue().createInstanceFactory(servletClass);
+                Class<? extends Servlet> servletClass = (Class<? extends Servlet>) convergedContext.getSipContextClassLoader()
+                        .loadClass(value.getServletClass());
+                ManagedReferenceFactory creator = deploymentInfoservice.getComponentRegistryInjectedValue().getValue()
+                        .createInstanceFactory(servletClass);
 
                 ServletInfo servletInfo = null;
                 if (creator != null) {
                     InstanceFactory<Servlet> factory = createInstanceFactory(creator);
-                    servletInfo = new ServletInfo(value.getName(), servletClass,factory);
-                }else{
+                    servletInfo = new ServletInfo(value.getName(), servletClass, factory);
+                } else {
                     servletInfo = new ServletInfo(value.getName(), servletClass);
                 }
 
@@ -369,24 +373,26 @@ public class SipJBossContextConfig{
             }
         }
         final SipApplicationKeyMethodInfo sipApplicationKeyMethodInfo = convergedMetaData.getSipApplicationKeyMethodInfo();
-        if(sipApplicationKeyMethodInfo != null) {
+        if (sipApplicationKeyMethodInfo != null) {
             final String sipApplicationKeyClassName = sipApplicationKeyMethodInfo.getClassName();
             final String sipApplicationKeyMethodName = sipApplicationKeyMethodInfo.getMethodName();
 
             ClassLoader contextCLoader = convergedContext.getSipContextClassLoader();
             Method sipApplicationKeyMethod = null;
             try {
-                sipApplicationKeyMethod = Class.forName(sipApplicationKeyClassName, true, contextCLoader).getMethod(sipApplicationKeyMethodName, SipServletRequest.class);
+                sipApplicationKeyMethod = Class.forName(sipApplicationKeyClassName, true, contextCLoader).getMethod(
+                        sipApplicationKeyMethodName, SipServletRequest.class);
             } catch (Exception e) {
                 throw e;
             }
             convergedContext.setSipApplicationKeyMethod(sipApplicationKeyMethod);
         }
         convergedContext.setConcurrencyControlMode(convergedMetaData.getConcurrencyControlMode());
-        //FIXME: kakonyii: no wrapperclass in wildfly, do we need this? convergedContext.setWrapperClass(StandardWrapper.class.getName());
+        // FIXME: kakonyii: no wrapperclass in wildfly, do we need this?
+        // convergedContext.setWrapperClass(StandardWrapper.class.getName());
     }
 
-    //copied from UndertowDeploymentInfoService
+    // copied from UndertowDeploymentInfoService
     private static <T> InstanceFactory<T> createInstanceFactory(final ManagedReferenceFactory creator) {
         return new InstanceFactory<T>() {
             @Override

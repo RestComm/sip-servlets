@@ -37,8 +37,9 @@ import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
+
 /**
- *@author kakonyi.istvan@alerant.hu
+ * @author kakonyi.istvan@alerant.hu
  */
 public class UndertowSipDeploymentInfoService implements Service<UndertowSipDeploymentInfoService> {
     public static final ServiceName SERVICE_NAME = ServiceName.of("UndertowSipDeploymentInfoService");
@@ -48,10 +49,10 @@ public class UndertowSipDeploymentInfoService implements Service<UndertowSipDepl
     private DeploymentUnit deploymentUnit = null;
     private SIPWebContext webContext = null;
 
-    public UndertowSipDeploymentInfoService(DeploymentUnit deploymentUnit) throws DeploymentUnitProcessingException{
+    public UndertowSipDeploymentInfoService(DeploymentUnit deploymentUnit) throws DeploymentUnitProcessingException {
         this.deploymentUnit = deploymentUnit;
 
-        //lets init sipWebContext:
+        // lets init sipWebContext:
         this.webContext = new SIPWebContext();
         try {
             this.webContext.addDeploymentUnit(this.deploymentUnit);
@@ -74,9 +75,10 @@ public class UndertowSipDeploymentInfoService implements Service<UndertowSipDepl
         ServerLogger.DEPLOYMENT_LOGGER.debug("UndertowSipDeploymentInfoService.start()");
         SIPContextFactory factory = this.deploymentUnit.getAttachment(SIPContextFactory.ATTACHMENT);
 
-        //lets add our custom sip session manager factory:
-        if(this.deploymentInfoService!=null && this.deploymentInfoService.getValue()!=null && this.deploymentInfoService.getValue().getValue()!=null){
-            DeploymentInfo info =  this.deploymentInfoService.getValue().getValue();
+        // lets add our custom sip session manager factory:
+        if (this.deploymentInfoService != null && this.deploymentInfoService.getValue() != null
+                && this.deploymentInfoService.getValue().getValue() != null) {
+            DeploymentInfo info = this.deploymentInfoService.getValue().getValue();
 
             DeploymentInfoFacade facade = new DeploymentInfoFacade();
             try {
@@ -86,12 +88,13 @@ public class UndertowSipDeploymentInfoService implements Service<UndertowSipDepl
             } catch (ServletException e) {
                 throw new StartException(e);
             }
-        }else{
+        } else {
             throw new StartException("DeploymentInfoService not properly initialized!");
         }
 
         try {
-            this.webContext = factory.addDeplyomentUnitToContext(this.deploymentUnit, this.deploymentInfoService.getValue(), webContext);
+            this.webContext = factory.addDeplyomentUnitToContext(this.deploymentUnit, this.deploymentInfoService.getValue(),
+                    webContext);
         } catch (ServletException e) {
             throw new StartException(e);
         }

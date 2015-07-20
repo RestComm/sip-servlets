@@ -36,7 +36,8 @@ import org.mobicents.metadata.sip.spec.SipSecurityConstraintMetaData;
 /**
  * @author Remy Maucherat
  *
- * This class is based on the contents of org.mobicents.metadata.sip.parser package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.metadata.sip.parser package from jboss-as7-mobicents project,
+ *         re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class SipSecurityConstraintMetaDataParser extends MetaDataElementParser {
@@ -46,7 +47,7 @@ public class SipSecurityConstraintMetaDataParser extends MetaDataElementParser {
 
         // Handle attributes
         final int count = reader.getAttributeCount();
-        for (int i = 0; i < count; i ++) {
+        for (int i = 0; i < count; i++) {
             final String value = reader.getAttributeValue(i);
             if (attributeHasNamespace(reader, i)) {
                 continue;
@@ -57,7 +58,8 @@ public class SipSecurityConstraintMetaDataParser extends MetaDataElementParser {
                     sipSecurityConstraint.setId(value);
                     break;
                 }
-                default: throw unexpectedAttribute(reader, i);
+                default:
+                    throw unexpectedAttribute(reader, i);
             }
         }
 
@@ -81,11 +83,13 @@ public class SipSecurityConstraintMetaDataParser extends MetaDataElementParser {
                     break;
                 case AUTH_CONSTRAINT:
                     // FIXME: 7.1.2.Final - setup proper ProperlyReplacer
-                    sipSecurityConstraint.setAuthConstraint(AuthConstraintMetaDataParser.parse(reader, PropertyReplacers.noop()));
+                    sipSecurityConstraint
+                            .setAuthConstraint(AuthConstraintMetaDataParser.parse(reader, PropertyReplacers.noop()));
                     break;
                 case USER_DATA_CONSTRAINT:
                     // FIXME: 7.1.2.Final - setup proper ProperlyReplacer
-                    sipSecurityConstraint.setUserDataConstraint(UserDataConstraintMetaDataParser.parse(reader, PropertyReplacers.noop()));
+                    sipSecurityConstraint.setUserDataConstraint(UserDataConstraintMetaDataParser.parse(reader,
+                            PropertyReplacers.noop()));
                     break;
                 default:
                     throw unexpectedElement(reader);

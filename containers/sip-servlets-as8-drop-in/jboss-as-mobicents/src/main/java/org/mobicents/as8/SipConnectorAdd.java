@@ -49,7 +49,8 @@ import org.jboss.msc.service.ServiceController.Mode;
  *
  * @author Emanuel Muckenhuber
  *
- * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for
+ *         jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 class SipConnectorAdd extends AbstractAddStepHandler {
@@ -78,31 +79,35 @@ class SipConnectorAdd extends AbstractAddStepHandler {
         final String name = address.getLastElement().getValue();
 
         ModelNode fullModel = Resource.Tools.readModel(context.readResource(PathAddress.EMPTY_ADDRESS));
-        final String bindingRef = SipConnectorDefinition.SOCKET_BINDING.resolveModelAttribute(context, fullModel)
-                .asString();
+        final String bindingRef = SipConnectorDefinition.SOCKET_BINDING.resolveModelAttribute(context, fullModel).asString();
 
         final boolean enabled = SipConnectorDefinition.ENABLED.resolveModelAttribute(context, fullModel).asBoolean();
         final String protocol = SipConnectorDefinition.PROTOCOL.resolveModelAttribute(context, fullModel).asString();
         final String scheme = SipConnectorDefinition.SCHEME.resolveModelAttribute(context, fullModel).asString();
 
-        final boolean useStaticAddress = SipConnectorDefinition.USE_STATIC_ADDRESS.resolveModelAttribute(context, fullModel).asBoolean();
-        final String staticServerAddress = operation.hasDefined(STATIC_SERVER_ADDRESS) ? SipConnectorDefinition.STATIC_SERVER_ADDRESS.resolveModelAttribute(context, fullModel).asString() : null;
-        final int staticServerPort = operation.hasDefined(STATIC_SERVER_PORT) ? SipConnectorDefinition.STATIC_SERVER_PORT.resolveModelAttribute(context, fullModel).asInt() : -1;
+        final boolean useStaticAddress = SipConnectorDefinition.USE_STATIC_ADDRESS.resolveModelAttribute(context, fullModel)
+                .asBoolean();
+        final String staticServerAddress = operation.hasDefined(STATIC_SERVER_ADDRESS) ? SipConnectorDefinition.STATIC_SERVER_ADDRESS
+                .resolveModelAttribute(context, fullModel).asString() : null;
+        final int staticServerPort = operation.hasDefined(STATIC_SERVER_PORT) ? SipConnectorDefinition.STATIC_SERVER_PORT
+                .resolveModelAttribute(context, fullModel).asInt() : -1;
 
         final boolean useStun = SipConnectorDefinition.USE_STUN.resolveModelAttribute(context, fullModel).asBoolean();
-        final String stunServerAddress = operation.hasDefined(STUN_SERVER_ADDRESS) ? SipConnectorDefinition.STUN_SERVER_ADDRESS.resolveModelAttribute(context, fullModel).asString() : null;
-        final int stunServerPort = operation.hasDefined(STUN_SERVER_PORT) ? SipConnectorDefinition.STUN_SERVER_PORT.resolveModelAttribute(context, fullModel).asInt() : -1;
+        final String stunServerAddress = operation.hasDefined(STUN_SERVER_ADDRESS) ? SipConnectorDefinition.STUN_SERVER_ADDRESS
+                .resolveModelAttribute(context, fullModel).asString() : null;
+        final int stunServerPort = operation.hasDefined(STUN_SERVER_PORT) ? SipConnectorDefinition.STUN_SERVER_PORT
+                .resolveModelAttribute(context, fullModel).asInt() : -1;
 
-        final String hostNames = operation.hasDefined(HOSTNAMES) ? SipConnectorDefinition.HOSTNAMES.resolveModelAttribute(context, fullModel).asString() : null;
-        
-        final SipConnectorService service = new SipConnectorService(protocol, scheme, useStaticAddress, staticServerAddress, staticServerPort, useStun, stunServerAddress, stunServerPort, hostNames);
+        final String hostNames = operation.hasDefined(HOSTNAMES) ? SipConnectorDefinition.HOSTNAMES.resolveModelAttribute(
+                context, fullModel).asString() : null;
 
-        final ServiceBuilder<SipConnectorListener> serviceBuilder = context
-                .getServiceTarget()
+        final SipConnectorService service = new SipConnectorService(protocol, scheme, useStaticAddress, staticServerAddress,
+                staticServerPort, useStun, stunServerAddress, stunServerPort, hostNames);
+
+        final ServiceBuilder<SipConnectorListener> serviceBuilder = context.getServiceTarget()
                 .addService(SipSubsystemServices.JBOSS_SIP_CONNECTOR.append(name), service)
                 .addDependency(SipSubsystemServices.JBOSS_SIP, SipServer.class, service.getServer())
-                .addDependency(SocketBinding.JBOSS_BINDING_NAME.append(bindingRef), SocketBinding.class,
-                        service.getBinding());
+                .addDependency(SocketBinding.JBOSS_BINDING_NAME.append(bindingRef), SocketBinding.class, service.getBinding());
         serviceBuilder.setInitialMode(enabled ? Mode.ACTIVE : Mode.NEVER);
         if (enabled) {
             serviceBuilder.addListener(verificationHandler);

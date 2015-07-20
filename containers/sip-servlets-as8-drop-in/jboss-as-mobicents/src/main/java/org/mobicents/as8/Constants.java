@@ -24,7 +24,8 @@ package org.mobicents.as8;
 /**
  * @author Emanuel Muckenhuber
  *
- * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for
+ *         jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public interface Constants {
@@ -117,7 +118,7 @@ public interface Constants {
     String SESSION_CACHE_SIZE = "session-cache-size";
     String SESSION_TIMEOUT = "session-timeout";
     String SIP_APP_DISPATCHER_CLASS = "app-dispatcher-class";
-    String SIP_PATH_NAME ="path-name";
+    String SIP_PATH_NAME = "path-name";
     String SIP_STACK_PROPS = "stack-properties";
     String SMAP = "smap";
     String SOCKET_BINDING = "socket-binding";
@@ -159,7 +160,7 @@ public interface Constants {
     String MAX_TIME = "maxTime";
     String REQUEST_COUNT = "requestCount";
 
-    String LOAD_TIME ="load-time";
+    String LOAD_TIME = "load-time";
     String MIN_TIME = "min-time";
 
 }

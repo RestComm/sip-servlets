@@ -38,43 +38,34 @@ import static org.mobicents.as8.SipMessages.MESSAGES;
 /**
  * @author Emanuel Muckenhuber
  *
- * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for
+ *         jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 class SipConnectorMetrics implements OperationStepHandler {
 
     static SipConnectorMetrics INSTANCE = new SipConnectorMetrics();
 
-    protected static final SimpleAttributeDefinition BYTES_SENT =
-            new SimpleAttributeDefinitionBuilder(org.mobicents.as8.Constants.BYTES_SENT, ModelType.INT, true)
-                    .setStorageRuntime()
-                    .build();
+    protected static final SimpleAttributeDefinition BYTES_SENT = new SimpleAttributeDefinitionBuilder(
+            org.mobicents.as8.Constants.BYTES_SENT, ModelType.INT, true).setStorageRuntime().build();
 
-    protected static final SimpleAttributeDefinition BYTES_RECEIVED =
-            new SimpleAttributeDefinitionBuilder(org.mobicents.as8.Constants.BYTES_RECEIVED, ModelType.INT, true)
-                    .setStorageRuntime()
-                    .build();
-    protected static final SimpleAttributeDefinition PROCESSING_TIME =
-            new SimpleAttributeDefinitionBuilder(org.mobicents.as8.Constants.PROCESSING_TIME, ModelType.INT, true)
-                    .setStorageRuntime()
-                    .build();
-    protected static final SimpleAttributeDefinition ERROR_COUNT =
-            new SimpleAttributeDefinitionBuilder(org.mobicents.as8.Constants.ERROR_COUNT, ModelType.INT, true)
-                    .setStorageRuntime()
-                    .build();
+    protected static final SimpleAttributeDefinition BYTES_RECEIVED = new SimpleAttributeDefinitionBuilder(
+            org.mobicents.as8.Constants.BYTES_RECEIVED, ModelType.INT, true).setStorageRuntime().build();
+    protected static final SimpleAttributeDefinition PROCESSING_TIME = new SimpleAttributeDefinitionBuilder(
+            org.mobicents.as8.Constants.PROCESSING_TIME, ModelType.INT, true).setStorageRuntime().build();
+    protected static final SimpleAttributeDefinition ERROR_COUNT = new SimpleAttributeDefinitionBuilder(
+            org.mobicents.as8.Constants.ERROR_COUNT, ModelType.INT, true).setStorageRuntime().build();
 
-    protected static final SimpleAttributeDefinition MAX_TIME =
-            new SimpleAttributeDefinitionBuilder(org.mobicents.as8.Constants.MAX_TIME, ModelType.INT, true)
-                    .setStorageRuntime()
-                    .build();
-    protected static final SimpleAttributeDefinition REQUEST_COUNT =
-            new SimpleAttributeDefinitionBuilder(org.mobicents.as8.Constants.REQUEST_COUNT, ModelType.INT, true)
-                    .setStorageRuntime()
-                    .build();
-
+    protected static final SimpleAttributeDefinition MAX_TIME = new SimpleAttributeDefinitionBuilder(
+            org.mobicents.as8.Constants.MAX_TIME, ModelType.INT, true).setStorageRuntime().build();
+    protected static final SimpleAttributeDefinition REQUEST_COUNT = new SimpleAttributeDefinitionBuilder(
+            org.mobicents.as8.Constants.REQUEST_COUNT, ModelType.INT, true).setStorageRuntime().build();
 
     @Deprecated
-    static final String[] ATTRIBUTES_OLD = {org.mobicents.as8.Constants.BYTES_SENT, org.mobicents.as8.Constants.BYTES_RECEIVED, org.mobicents.as8.Constants.PROCESSING_TIME, org.mobicents.as8.Constants.ERROR_COUNT, org.mobicents.as8.Constants.MAX_TIME, org.mobicents.as8.Constants.REQUEST_COUNT};
+    static final String[] ATTRIBUTES_OLD = { org.mobicents.as8.Constants.BYTES_SENT,
+            org.mobicents.as8.Constants.BYTES_RECEIVED, org.mobicents.as8.Constants.PROCESSING_TIME,
+            org.mobicents.as8.Constants.ERROR_COUNT, org.mobicents.as8.Constants.MAX_TIME,
+            org.mobicents.as8.Constants.REQUEST_COUNT };
     static final SimpleAttributeDefinition[] ATTRIBUTES = {
             BYTES_SENT,
             BYTES_RECEIVED,
@@ -94,28 +85,35 @@ class SipConnectorMetrics implements OperationStepHandler {
                     final String name = address.getLastElement().getValue();
                     final String attributeName = operation.require(NAME).asString();
 
-                    final ServiceController<?> controller = context.getServiceRegistry(false)
-                            .getService(SipSubsystemServices.JBOSS_SIP_CONNECTOR.append(name));
+                    final ServiceController<?> controller = context.getServiceRegistry(false).getService(
+                            SipSubsystemServices.JBOSS_SIP_CONNECTOR.append(name));
                     if (controller != null) {
                         try {
                             final SipConnectorListener connector = (SipConnectorListener) controller.getValue();
                             final ModelNode result = context.getResult();
-                            if (connector.getProtocolHandler() != null /*FIXME:&& connector.getProtocolHandler().getRequestGroupInfo() != null*/) {
-                                /*FIXME: kakonyii: currently there is no requestGroupInfo in SipProtocolHandler, so we need to find other solution to implement this:
-                                RequestGroupInfo info = connector.getProtocolHandler().getRequestGroupInfo();
-                                if (org.mobicents.as8.Constants.BYTES_SENT.equals(attributeName)) {
-                                    result.set("" + info.getBytesSent());
-                                } else if (org.mobicents.as8.Constants.BYTES_RECEIVED.equals(attributeName)) {
-                                    result.set("" + info.getBytesReceived());
-                                } else if (org.mobicents.as8.Constants.PROCESSING_TIME.equals(attributeName)) {
-                                    result.set("" + info.getProcessingTime());
-                                } else if (org.mobicents.as8.Constants.ERROR_COUNT.equals(attributeName)) {
-                                    result.set("" + info.getErrorCount());
-                                } else if (org.mobicents.as8.Constants.MAX_TIME.equals(attributeName)) {
-                                    result.set("" + info.getMaxTime());
-                                } else if (org.mobicents.as8.Constants.REQUEST_COUNT.equals(attributeName)) {
-                                    result.set("" + info.getRequestCount());
-                                }*/
+                            if (connector.getProtocolHandler() != null /*
+                                                                        * FIXME:&&
+                                                                        * connector.getProtocolHandler().getRequestGroupInfo()
+                                                                        * != null
+                                                                        */) {
+                                // FIXME: kakonyii: currently there is no requestGroupInfo in SipProtocolHandler, so we need to
+                                // find other solution to implement this:
+                                // RequestGroupInfo info =
+                                // connector.getProtocolHandler().getRequestGroupInfo();
+                                // if (org.mobicents.as8.Constants.BYTES_SENT.equals(attributeName)) {
+                                // result.set("" + info.getBytesSent());
+                                // } else if (org.mobicents.as8.Constants.BYTES_RECEIVED.equals(attributeName)) {
+                                // result.set("" + info.getBytesReceived());
+                                // } else if (org.mobicents.as8.Constants.PROCESSING_TIME.equals(attributeName)) {
+                                // result.set("" + info.getProcessingTime());
+                                // } else if (org.mobicents.as8.Constants.ERROR_COUNT.equals(attributeName)) {
+                                // result.set("" + info.getErrorCount());
+                                // } else if (org.mobicents.as8.Constants.MAX_TIME.equals(attributeName)) {
+                                // result.set("" + info.getMaxTime());
+                                // } else if (org.mobicents.as8.Constants.REQUEST_COUNT.equals(attributeName)) {
+                                // result.set("" + info.getRequestCount());
+                                // }
+
                             }
                         } catch (Exception e) {
                             throw new OperationFailedException(new ModelNode().set(MESSAGES.failedToGetMetrics(e.getMessage())));

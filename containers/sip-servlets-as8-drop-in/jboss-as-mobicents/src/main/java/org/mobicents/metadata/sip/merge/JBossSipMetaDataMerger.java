@@ -40,7 +40,8 @@ import org.mobicents.metadata.sip.spec.SipServletsMetaData;
  *
  * @author josemrecio@gmail.com
  *
- * This class is based on the contents of org.mobicents.metadata.sip.merge package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.metadata.sip.merge package from jboss-as7-mobicents project,
+ *         re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  *
  */
@@ -50,8 +51,8 @@ public class JBossSipMetaDataMerger extends NamedModuleImplMerger {
         merge(dest, override, original, null, "sip.xml", false);
     }
 
-    public static void merge(JBossConvergedSipMetaData dest, JBossConvergedSipMetaData override, SipMetaData original, String overrideFile, String overridenFile,
-            boolean mustOverride) {
+    public static void merge(JBossConvergedSipMetaData dest, JBossConvergedSipMetaData override, SipMetaData original,
+            String overrideFile, String overridenFile, boolean mustOverride) {
 
         NamedModuleImplMerger.merge(dest, override, original);
 
@@ -113,8 +114,8 @@ public class JBossSipMetaDataMerger extends NamedModuleImplMerger {
             overrideMsgDests = override.getSipMessageDestinations();
         if (original != null && original.getMessageDestinations() != null)
             originalMsgDests = original.getMessageDestinations();
-        dest.setSipMessageDestinations(MessageDestinationsMetaDataMerger.merge(overrideMsgDests, originalMsgDests, overridenFile,
-                overrideFile));
+        dest.setSipMessageDestinations(MessageDestinationsMetaDataMerger.merge(overrideMsgDests, originalMsgDests,
+                overridenFile, overrideFile));
 
         if (dest.getSipSecurityRoles() == null)
             dest.setSipSecurityRoles(new SecurityRolesMetaData());
@@ -139,10 +140,10 @@ public class JBossSipMetaDataMerger extends NamedModuleImplMerger {
         if (override != null && override.isMetadataComplete() != false)
             dest.setMetadataComplete(override.isMetadataComplete());
         if (original instanceof Sip11MetaData) {
-            //if either original or override is MD complete the result is MD complete
+            // if either original or override is MD complete the result is MD complete
             Sip11MetaData sip11MD = (Sip11MetaData) original;
             dest.setMetadataComplete(sip11MD.isMetadataComplete());
         }
 
-   }
+    }
 }

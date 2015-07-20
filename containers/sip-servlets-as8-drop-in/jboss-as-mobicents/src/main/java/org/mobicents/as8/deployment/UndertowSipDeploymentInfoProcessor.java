@@ -36,10 +36,11 @@ import org.mobicents.metadata.sip.spec.SipMetaData;
 import org.wildfly.extension.undertow.Server;
 import org.wildfly.extension.undertow.UndertowService;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
+
 /**
- *@author kakonyi.istvan@alerant.hu
+ * @author kakonyi.istvan@alerant.hu
  */
-public class UndertowSipDeploymentInfoProcessor implements DeploymentUnitProcessor{
+public class UndertowSipDeploymentInfoProcessor implements DeploymentUnitProcessor {
 
     @Override
     public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
@@ -62,9 +63,10 @@ public class UndertowSipDeploymentInfoProcessor implements DeploymentUnitProcess
         final WarMetaData warMetaData = deploymentUnit.getAttachment(WarMetaData.ATTACHMENT_KEY);
         final JBossWebMetaData metaData = warMetaData.getMergedJBossWebMetaData();
 
-        //lets find default server service:
+        // lets find default server service:
         final ServiceName defaultServerServiceName = UndertowService.DEFAULT_SERVER;
-        final ServiceController<?> defaultServerServiceController = phaseContext.getServiceRegistry().getService(defaultServerServiceName);
+        final ServiceController<?> defaultServerServiceController = phaseContext.getServiceRegistry().getService(
+                defaultServerServiceName);
         final Server defaultServerService = (Server) defaultServerServiceController.getValue();
 
         final String defaultHost = defaultServerService.getDefaultHost();
@@ -73,18 +75,22 @@ public class UndertowSipDeploymentInfoProcessor implements DeploymentUnitProcess
         final String hostName = UndertowSipDeploymentProcessor.hostNameOfDeployment(warMetaData, defaultHost);
         final String pathName = UndertowSipDeploymentProcessor.pathNameOfDeployment(deploymentUnit, metaData);
 
-        final String serverInstanceName = metaData.getServerInstanceName() == null ? defaultServer : metaData.getServerInstanceName();
+        final String serverInstanceName = metaData.getServerInstanceName() == null ? defaultServer : metaData
+                .getServerInstanceName();
         final ServiceName deploymentServiceName = UndertowService.deploymentServiceName(serverInstanceName, hostName, pathName);
         final ServiceName deploymentInfoServiceName = deploymentServiceName.append(UndertowDeploymentInfoService.SERVICE_NAME);
 
-        //instantiate injector service
+        // instantiate injector service
         final UndertowSipDeploymentInfoService sipDeploymentInfoService = new UndertowSipDeploymentInfoService(deploymentUnit);
-        final ServiceName sipDeploymentInfoServiceName = deploymentServiceName.append(UndertowSipDeploymentInfoService.SERVICE_NAME);
-        //lets earn that deploymentService will depend on this service:
-        phaseContext.getDeploymentUnit().getAttachment(WebComponentDescription.WEB_COMPONENTS).add(sipDeploymentInfoServiceName);
+        final ServiceName sipDeploymentInfoServiceName = deploymentServiceName
+                .append(UndertowSipDeploymentInfoService.SERVICE_NAME);
+        // lets earn that deploymentService will depend on this service:
+        phaseContext.getDeploymentUnit().getAttachment(WebComponentDescription.WEB_COMPONENTS)
+                .add(sipDeploymentInfoServiceName);
 
-        //make injector service to be dependent from deploymentInfoService:
-        final ServiceBuilder<UndertowSipDeploymentInfoService> infoInjectorBuilder = phaseContext.getServiceTarget().addService(sipDeploymentInfoServiceName, sipDeploymentInfoService);
+        // make injector service to be dependent from deploymentInfoService:
+        final ServiceBuilder<UndertowSipDeploymentInfoService> infoInjectorBuilder = phaseContext.getServiceTarget()
+                .addService(sipDeploymentInfoServiceName, sipDeploymentInfoService);
         infoInjectorBuilder.addDependency(deploymentInfoServiceName);
         infoInjectorBuilder.install();
     }

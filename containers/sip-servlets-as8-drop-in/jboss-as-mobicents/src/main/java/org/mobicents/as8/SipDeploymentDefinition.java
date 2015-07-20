@@ -52,19 +52,20 @@ import org.mobicents.servlet.sip.core.SipManager;
  * @created 23.2.12 18:32
  * @author josemrecio@gmail.com
  *
- * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for
+ *         jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class SipDeploymentDefinition extends SimpleResourceDefinition {
     public static final SipDeploymentDefinition INSTANCE = new SipDeploymentDefinition();
 
-    public static final AttributeDefinition APP_NAME = new SimpleAttributeDefinitionBuilder("app-name", ModelType.STRING).setStorageRuntime().build();
+    public static final AttributeDefinition APP_NAME = new SimpleAttributeDefinitionBuilder("app-name", ModelType.STRING)
+            .setStorageRuntime().build();
 
     private SipDeploymentDefinition() {
-        super(PathElement.pathElement(SUBSYSTEM, SipExtension.SUBSYSTEM_NAME),
-              SipExtension.getResourceDescriptionResolver("deployment"));
+        super(PathElement.pathElement(SUBSYSTEM, SipExtension.SUBSYSTEM_NAME), SipExtension
+                .getResourceDescriptionResolver("deployment"));
     }
-
 
     @Override
     public void registerAttributes(ManagementResourceRegistration resourceRegistration) {
@@ -95,28 +96,30 @@ public class SipDeploymentDefinition extends SimpleResourceDefinition {
 
             final String appName = APP_NAME.resolveModelAttribute(context, subModel).asString();
 
-            final ServiceController<?> controller = context.getServiceRegistry(false).getService(SipSubsystemServices.deploymentServiceName(appName));
+            final ServiceController<?> controller = context.getServiceRegistry(false).getService(
+                    SipSubsystemServices.deploymentServiceName(appName));
             SessionStat stat = SessionStat.getStat(operation.require(ModelDescriptionConstants.NAME).asString());
 
             if (stat == null) {
-                context.getFailureDescription().set(SipMessages.MESSAGES.unknownMetric(operation.require(ModelDescriptionConstants.NAME).asString()));
+                context.getFailureDescription().set(
+                        SipMessages.MESSAGES.unknownMetric(operation.require(ModelDescriptionConstants.NAME).asString()));
             } else {
                 final SIPWebContext sipContext = SIPWebContext.class.cast(controller.getValue());
                 SipManager sm = (SipManager) sipContext.getSessionManager();
                 ModelNode result = new ModelNode();
                 switch (stat) {
                     case ACTIVE_SIP_SESSIONS:
-//                      // TODO: what about other manager implementations?
-//                      if (sm.getDistributable() && (sm instanceof DistributableSessionManager)) {
-//                          result.set(((DistributableSessionManager)sm).getActiveSessionCount());
-//                      }
+                        // // TODO: what about other manager implementations?
+                        // if (sm.getDistributable() && (sm instanceof DistributableSessionManager)) {
+                        // result.set(((DistributableSessionManager)sm).getActiveSessionCount());
+                        // }
                         result.set(sm.getActiveSipSessions());
                         break;
                     case ACTIVE_SIP_APP_SESSIONS:
-//                      // TODO: what about other manager implementations?
-//                      if (sm.getDistributable() && (sm instanceof DistributableSessionManager)) {
-//                          result.set(((DistributableSessionManager)sm).getActiveSessionCount());
-//                      }
+                        // // TODO: what about other manager implementations?
+                        // if (sm.getDistributable() && (sm instanceof DistributableSessionManager)) {
+                        // result.set(((DistributableSessionManager)sm).getActiveSessionCount());
+                        // }
                         result.set(sm.getActiveSipApplicationSessions());
                         break;
                     case EXPIRED_SIP_SESSIONS:
@@ -170,21 +173,21 @@ public class SipDeploymentDefinition extends SimpleResourceDefinition {
     }
 
     public enum SessionStat {
-        ACTIVE_SIP_SESSIONS(new SimpleAttributeDefinition("active-sip-sessions", ModelType.INT, false)),
-        ACTIVE_SIP_APP_SESSIONS(new SimpleAttributeDefinition("active-sip-application-sessions", ModelType.INT, false)),
-        EXPIRED_SIP_SESSIONS(new SimpleAttributeDefinition("expired-sip-sessions", ModelType.INT, false)),
-        EXPIRED_SIP_APP_SESSIONS(new SimpleAttributeDefinition("expired-sip-application-sessions", ModelType.INT, false)),
-        SIP_SESSIONS_CREATED(new SimpleAttributeDefinition("sip-sessions-created", ModelType.INT, false)),
-        SIP_APP_SESSIONS_CREATED(new SimpleAttributeDefinition("sip-application-sessions-created", ModelType.INT, false)),
-        SIP_SESSIONS_CREATION_RATE(new SimpleAttributeDefinition("sip-sessions-per-sec", ModelType.INT, false)),
-        SIP_APP_SESSIONS_CREATION_RATE(new SimpleAttributeDefinition("sip-application-sessions-per-sec", ModelType.INT, false)),
-        SIP_SESSION_AVG_ALIVE_TIME(new SimpleAttributeDefinition("sip-session-avg-alive-time", ModelType.INT, false)),
-        SIP_APP_SESSION_AVG_ALIVE_TIME(new SimpleAttributeDefinition("sip-application-session-avg-alive-time", ModelType.INT, false)),
-        SIP_SESSION_MAX_ALIVE_TIME(new SimpleAttributeDefinition("sip-session-max-alive-time", ModelType.INT, false)),
-        SIP_APP_SESSION_MAX_ALIVE_TIME(new SimpleAttributeDefinition("sip-application-session-max-alive-time", ModelType.INT, false)),
-        REJECTED_SIP_SESSIONS(new SimpleAttributeDefinition("rejected-sip-sessions", ModelType.INT, false)),
-        REJECTED_SIP_APP_SESSIONS(new SimpleAttributeDefinition("rejected-sip-application-sessions", ModelType.INT, false)),
-        MAX_ACTIVE_SIP_SESSIONS(new SimpleAttributeDefinition("max-active-sip-sessions", ModelType.INT, false));
+        ACTIVE_SIP_SESSIONS(new SimpleAttributeDefinition("active-sip-sessions", ModelType.INT, false)), ACTIVE_SIP_APP_SESSIONS(
+                new SimpleAttributeDefinition("active-sip-application-sessions", ModelType.INT, false)), EXPIRED_SIP_SESSIONS(
+                new SimpleAttributeDefinition("expired-sip-sessions", ModelType.INT, false)), EXPIRED_SIP_APP_SESSIONS(
+                new SimpleAttributeDefinition("expired-sip-application-sessions", ModelType.INT, false)), SIP_SESSIONS_CREATED(
+                new SimpleAttributeDefinition("sip-sessions-created", ModelType.INT, false)), SIP_APP_SESSIONS_CREATED(
+                new SimpleAttributeDefinition("sip-application-sessions-created", ModelType.INT, false)), SIP_SESSIONS_CREATION_RATE(
+                new SimpleAttributeDefinition("sip-sessions-per-sec", ModelType.INT, false)), SIP_APP_SESSIONS_CREATION_RATE(
+                new SimpleAttributeDefinition("sip-application-sessions-per-sec", ModelType.INT, false)), SIP_SESSION_AVG_ALIVE_TIME(
+                new SimpleAttributeDefinition("sip-session-avg-alive-time", ModelType.INT, false)), SIP_APP_SESSION_AVG_ALIVE_TIME(
+                new SimpleAttributeDefinition("sip-application-session-avg-alive-time", ModelType.INT, false)), SIP_SESSION_MAX_ALIVE_TIME(
+                new SimpleAttributeDefinition("sip-session-max-alive-time", ModelType.INT, false)), SIP_APP_SESSION_MAX_ALIVE_TIME(
+                new SimpleAttributeDefinition("sip-application-session-max-alive-time", ModelType.INT, false)), REJECTED_SIP_SESSIONS(
+                new SimpleAttributeDefinition("rejected-sip-sessions", ModelType.INT, false)), REJECTED_SIP_APP_SESSIONS(
+                new SimpleAttributeDefinition("rejected-sip-application-sessions", ModelType.INT, false)), MAX_ACTIVE_SIP_SESSIONS(
+                new SimpleAttributeDefinition("max-active-sip-sessions", ModelType.INT, false));
 
         private static final Map<String, SessionStat> MAP = new HashMap<String, SessionStat>();
 

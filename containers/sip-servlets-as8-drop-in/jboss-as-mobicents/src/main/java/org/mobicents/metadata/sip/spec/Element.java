@@ -27,7 +27,8 @@ import java.util.Map;
 /**
  * @author Jean Deruelle
  *
- * This class is based on the contents of org.mobicents.metadata.sip.spec package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.metadata.sip.spec package from jboss-as7-mobicents project,
+ *         re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public enum Element {
@@ -53,8 +54,7 @@ public enum Element {
     LOGIN_CONFIG("login-config"),
     MAIN_SERVLET("main-servlet"),
     MESSAGE_DESTINATION("message-destination"),
-    NOT("not"),
-    OR("or"),
+    NOT("not"), OR("or"),
     PATTERN("pattern"),
     PROXY_AUTHENTICATION("proxy-authentication"),
     PROXY_CONFIG("proxy-config"),

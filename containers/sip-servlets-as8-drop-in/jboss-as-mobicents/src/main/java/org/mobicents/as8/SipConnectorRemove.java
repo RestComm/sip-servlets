@@ -33,7 +33,8 @@ import org.jboss.dmr.ModelNode;
  *
  * @author Emanuel Muckenhuber
  *
- * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for
+ *         jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 class SipConnectorRemove extends AbstractRemoveStepHandler {
@@ -51,7 +52,7 @@ class SipConnectorRemove extends AbstractRemoveStepHandler {
     }
 
     protected void recoverServices(OperationContext context, ModelNode operation, ModelNode model) {
-        // TODO:  RE-ADD SERVICES
+        // TODO: RE-ADD SERVICES
     }
 
 }

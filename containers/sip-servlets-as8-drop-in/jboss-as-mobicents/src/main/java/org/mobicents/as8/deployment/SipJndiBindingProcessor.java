@@ -37,12 +37,13 @@ import org.mobicents.metadata.sip.spec.SipMetaData;
  * @author Stuart Douglas
  * @author josemrecio@gmail.com
  *
- * This class is based on the contents of org.mobicents.as7.deployment package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7.deployment package from jboss-as7-mobicents project,
+ *         re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class SipJndiBindingProcessor implements DeploymentUnitProcessor {
 
-    static final String[] JNDI_BASE_FOR_SIP = {"java:comp/env/", "java:app/"};
+    static final String[] JNDI_BASE_FOR_SIP = { "java:comp/env/", "java:app/" };
     static final String SIP_PREFIX_JNDI = "sip/";
     static final String SIP_FACTORY_JNDI = "SipFactory";
     static final String SIP_SESSIONS_UTIL_JNDI = "SipSessionsUtil";
@@ -60,21 +61,19 @@ public class SipJndiBindingProcessor implements DeploymentUnitProcessor {
         SipAnnotationMetaData sipAnnotationMetaData = deploymentUnit.getAttachment(SipAnnotationMetaData.ATTACHMENT_KEY);
         if (sipMetaData != null) {
             sipApplicationName = sipMetaData.getApplicationName();
-        }
-        else if (sipAnnotationMetaData != null && sipAnnotationMetaData.isSipApplicationAnnotationPresent()) {
+        } else if (sipAnnotationMetaData != null && sipAnnotationMetaData.isSipApplicationAnnotationPresent()) {
             // FIXME: very dirty fix, this should be done in a separate function
             sipApplicationName = sipAnnotationMetaData.get("classes").getApplicationName();
-        }
-        else if (parentDU != null){
-            AttachmentList<DeploymentUnit> subDeploymentList = parentDU.getAttachment(org.jboss.as.server.deployment.Attachments.SUB_DEPLOYMENTS);
+        } else if (parentDU != null) {
+            AttachmentList<DeploymentUnit> subDeploymentList = parentDU
+                    .getAttachment(org.jboss.as.server.deployment.Attachments.SUB_DEPLOYMENTS);
             for (final DeploymentUnit subDeployment : subDeploymentList) {
                 sipMetaData = subDeployment.getAttachment(SipMetaData.ATTACHMENT_KEY);
                 sipAnnotationMetaData = deploymentUnit.getAttachment(SipAnnotationMetaData.ATTACHMENT_KEY);
                 if (sipMetaData != null) {
                     sipApplicationName = sipMetaData.getApplicationName();
                     break;
-                }
-                else if (sipAnnotationMetaData != null && sipAnnotationMetaData.isSipApplicationAnnotationPresent()) {
+                } else if (sipAnnotationMetaData != null && sipAnnotationMetaData.isSipApplicationAnnotationPresent()) {
                     // FIXME: very dirty fix, this should be done in a separate function
                     sipApplicationName = sipAnnotationMetaData.get("classes").getApplicationName();
                     break;
@@ -96,8 +95,10 @@ public class SipJndiBindingProcessor implements DeploymentUnitProcessor {
 
     }
 
-    private static void setupSipJndiBindingsPerDeploymentUnit(final DeploymentUnit anchorDU, final DeploymentUnit subDU, final String sipApplicationName) {
-        final EEResourceReferenceProcessorRegistry registry = subDU.getAttachment(Attachments.RESOURCE_REFERENCE_PROCESSOR_REGISTRY);
+    private static void setupSipJndiBindingsPerDeploymentUnit(final DeploymentUnit anchorDU, final DeploymentUnit subDU,
+            final String sipApplicationName) {
+        final EEResourceReferenceProcessorRegistry registry = subDU
+                .getAttachment(Attachments.RESOURCE_REFERENCE_PROCESSOR_REGISTRY);
         // Add a EEResourceReferenceProcessor which handles @Resource references with no mappedName
         registry.registerResourceReferenceProcessor(new SipFactoryResourceProcessor(anchorDU));
         registry.registerResourceReferenceProcessor(new SipSessionsUtilResourceProcessor(anchorDU));
@@ -109,11 +110,16 @@ public class SipJndiBindingProcessor implements DeploymentUnitProcessor {
             return;
         }
         // Add bindings proper
-        for (String jndiBaseSip: JNDI_BASE_FOR_SIP) {
+        for (String jndiBaseSip : JNDI_BASE_FOR_SIP) {
             final String jndiBaseMapped = jndiBaseSip + SIP_PREFIX_JNDI + sipApplicationName + "/";
-            description.getBindingConfigurations().add(new BindingConfiguration(jndiBaseMapped + SIP_FACTORY_JNDI, new SipFactoryInjectionSource(anchorDU)));
-            description.getBindingConfigurations().add(new BindingConfiguration(jndiBaseMapped + SIP_SESSIONS_UTIL_JNDI, new SipSessionsUtilInjectionSource(anchorDU)));
-            description.getBindingConfigurations().add(new BindingConfiguration(jndiBaseMapped + SIP_TIMER_SERVICE_JNDI, new SipTimerServiceInjectionSource(anchorDU)));
+            description.getBindingConfigurations().add(
+                    new BindingConfiguration(jndiBaseMapped + SIP_FACTORY_JNDI, new SipFactoryInjectionSource(anchorDU)));
+            description.getBindingConfigurations().add(
+                    new BindingConfiguration(jndiBaseMapped + SIP_SESSIONS_UTIL_JNDI, new SipSessionsUtilInjectionSource(
+                            anchorDU)));
+            description.getBindingConfigurations().add(
+                    new BindingConfiguration(jndiBaseMapped + SIP_TIMER_SERVICE_JNDI, new SipTimerServiceInjectionSource(
+                            anchorDU)));
         }
     }
 }

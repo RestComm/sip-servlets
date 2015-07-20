@@ -80,37 +80,39 @@ import org.mobicents.metadata.sip.spec.SipServletsMetaData;
  * @author Remy Maucherat
  * @author josemrecio@gmail.com
  *
- * This class is based on the contents of org.mobicents.as7.deployment package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.as7.deployment package from jboss-as7-mobicents project,
+ *         re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor {
 
     private static final Logger logger = Logger.getLogger(SipAnnotationDeploymentProcessor.class);
 
-//    // @RunAs
-//    addTypeProcessor(new RunAsProcessor(finder));
-//    // @DeclareRoles
-//    addTypeProcessor(new DeclareRolesProcessor(finder));
-//    // @SipServlet
-//    addTypeProcessor(new SipServletProcessor(finder));
-//    // @SipListener
-//    addTypeProcessor(new SipListenerProcessor(finder));
-//    // @ConcurrencyControl
-//    addTypeProcessor(new ConcurrencyControlProcessor(finder));
-//    // @SipApplicationKey
-//    addMethodProcessor(new SipApplicationKeyProcessor(finder));
+    // // @RunAs
+    // addTypeProcessor(new RunAsProcessor(finder));
+    // // @DeclareRoles
+    // addTypeProcessor(new DeclareRolesProcessor(finder));
+    // // @SipServlet
+    // addTypeProcessor(new SipServletProcessor(finder));
+    // // @SipListener
+    // addTypeProcessor(new SipListenerProcessor(finder));
+    // // @ConcurrencyControl
+    // addTypeProcessor(new ConcurrencyControlProcessor(finder));
+    // // @SipApplicationKey
+    // addMethodProcessor(new SipApplicationKeyProcessor(finder));
 
-//    protected static final DotName webFilter = DotName.createSimple(WebFilter.class.getName());
+    // protected static final DotName webFilter = DotName.createSimple(WebFilter.class.getName());
     protected static final DotName sipListener = DotName.createSimple(SipListener.class.getName());
     protected static final DotName sipServlet = DotName.createSimple(SipServlet.class.getName());
     protected static final DotName sipApplication = DotName.createSimple(SipApplication.class.getName());
     protected static final DotName sipApplicationKey = DotName.createSimple(SipApplicationKey.class.getName());
     protected static final DotName concurrencyControl = DotName.createSimple(ConcurrencyControl.class.getName());
-//    protected static final DotName webServlet = DotName.createSimple(WebServlet.class.getName());
-//    protected static final DotName runAs = DotName.createSimple(RunAs.class.getName());
-//    protected static final DotName declareRoles = DotName.createSimple(DeclareRoles.class.getName());
-//    protected static final DotName multipartConfig = DotName.createSimple(MultipartConfig.class.getName());
-//    protected static final DotName servletSecurity = DotName.createSimple(ServletSecurity.class.getName());
+
+    // protected static final DotName webServlet = DotName.createSimple(WebServlet.class.getName());
+    // protected static final DotName runAs = DotName.createSimple(RunAs.class.getName());
+    // protected static final DotName declareRoles = DotName.createSimple(DeclareRoles.class.getName());
+    // protected static final DotName multipartConfig = DotName.createSimple(MultipartConfig.class.getName());
+    // protected static final DotName servletSecurity = DotName.createSimple(ServletSecurity.class.getName());
 
     /**
      * Process web annotations.
@@ -120,10 +122,10 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
         final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
         // Commented for http://code.google.com/p/sipservlets/issues/detail?id=168
         // When no sip.xml but annotations only, Application is not recognized as SIP App by AS7
-//        SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
-//        if (sipMetaData == null) {
-//            return;
-//        }
+        // SipMetaData sipMetaData = deploymentUnit.getAttachment(SipMetaData.ATTACHMENT_KEY);
+        // if (sipMetaData == null) {
+        // return;
+        // }
         SipAnnotationMetaData sipAnnotationsMetaData = deploymentUnit.getAttachment(SipAnnotationMetaData.ATTACHMENT_KEY);
         if (sipAnnotationsMetaData == null) {
             sipAnnotationsMetaData = new SipAnnotationMetaData();
@@ -133,7 +135,8 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
 
         // Process components
         for (final Entry<ResourceRoot, Index> entry : indexes.entrySet()) {
-            if (logger.isDebugEnabled()) logger.debug("doDeploy(): processing annotations from " + entry.getKey().getRootName());
+            if (logger.isDebugEnabled())
+                logger.debug("doDeploy(): processing annotations from " + entry.getKey().getRootName());
             final Index jarIndex = entry.getValue();
             sipAnnotationsMetaData.put(entry.getKey().getRootName(), processAnnotations(sipAnnotationsMetaData, jarIndex));
         }
@@ -145,14 +148,16 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
      * @param index the annotation index
      * @throws DeploymentUnitProcessingException
      */
-    protected SipMetaData processAnnotations(SipAnnotationMetaData sipAnotationsMetaData, Index index) throws DeploymentUnitProcessingException {
+    protected SipMetaData processAnnotations(SipAnnotationMetaData sipAnotationsMetaData, Index index)
+            throws DeploymentUnitProcessingException {
         Sip11MetaData sipMetaData = new Sip11MetaData();
         // @SipListener
         final List<AnnotationInstance> sipListenerAnnotations = index.getAnnotations(sipListener);
         if (sipListenerAnnotations != null && sipListenerAnnotations.size() > 0) {
             List<ListenerMetaData> listeners = new ArrayList<ListenerMetaData>();
             for (final AnnotationInstance annotation : sipListenerAnnotations) {
-                if (logger.isDebugEnabled()) logger.debug("processAnnotations(): @SipListener: " + annotation);
+                if (logger.isDebugEnabled())
+                    logger.debug("processAnnotations(): @SipListener: " + annotation);
                 ListenerMetaData listener = new ListenerMetaData();
                 AnnotationTarget target = annotation.target();
                 if (!(target instanceof ClassInfo)) {
@@ -167,24 +172,27 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
                         listener.setDescriptionGroup(descriptionGroup);
                     }
                 }
-                for (AnnotationValue value: annotation.values()) {
+                for (AnnotationValue value : annotation.values()) {
                     if (value.name().compareTo("name") == 0) {
                         // listener name not supported
-                        //listener.setName(value.asString());
-                    }
-                    else if (value.name().compareTo("applicationName") == 0) {
+                        // listener.setName(value.asString());
+                    } else if (value.name().compareTo("applicationName") == 0) {
                         if (sipMetaData.getApplicationName() == null) {
                             sipMetaData.setApplicationName(value.asString());
-                        }
-                        else if ((sipMetaData.getApplicationName() != null) && (sipMetaData.getApplicationName().compareTo(value.asString()) != 0)) {
-                            throw (new DeploymentUnitProcessingException("Sip Application Name mismatch: already loaded: " + sipMetaData.getApplicationName() + " - from @SipListener annotation (" + listener.getListenerClass() + "): " + value.asString()));
+                        } else if ((sipMetaData.getApplicationName() != null)
+                                && (sipMetaData.getApplicationName().compareTo(value.asString()) != 0)) {
+                            throw (new DeploymentUnitProcessingException("Sip Application Name mismatch: already loaded: "
+                                    + sipMetaData.getApplicationName() + " - from @SipListener annotation ("
+                                    + listener.getListenerClass() + "): " + value.asString()));
                         }
                     }
                 }
-                if (logger.isDebugEnabled()) logger.debug("processAnnotations(): sipListener added " + listener);
+                if (logger.isDebugEnabled())
+                    logger.debug("processAnnotations(): sipListener added " + listener);
                 listeners.add(listener);
             }
-            if (logger.isDebugEnabled()) logger.debug("processAnnotations(): " + listeners.size() + " sipListeners added");
+            if (logger.isDebugEnabled())
+                logger.debug("processAnnotations(): " + listeners.size() + " sipListeners added");
             sipMetaData.setListeners(listeners);
         }
 
@@ -200,7 +208,8 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
                 sipApplicationPresent = true;
             }
             for (final AnnotationInstance annotation : sipServletAnnotations) {
-                if (logger.isDebugEnabled()) logger.debug("processAnnotations(): @SipServlet: " + annotation);
+                if (logger.isDebugEnabled())
+                    logger.debug("processAnnotations(): @SipServlet: " + annotation);
                 ServletMetaData servlet = new ServletMetaData();
                 AnnotationTarget target = annotation.target();
                 if (!(target instanceof ClassInfo)) {
@@ -215,19 +224,19 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
                         servlet.setDescriptionGroup(descriptionGroup);
                     }
                 }
-                for (AnnotationValue value: annotation.values()) {
+                for (AnnotationValue value : annotation.values()) {
                     if (value.name().compareTo("name") == 0) {
                         servlet.setName(value.asString());
-                    }
-                    else if (value.name().compareTo("loadOnStartup") == 0) {
+                    } else if (value.name().compareTo("loadOnStartup") == 0) {
                         servlet.setLoadOnStartup(value.asString());
-                    }
-                    else if (value.name().compareTo("applicationName") == 0) {
+                    } else if (value.name().compareTo("applicationName") == 0) {
                         if (sipMetaData.getApplicationName() == null) {
                             sipMetaData.setApplicationName(value.asString());
-                        }
-                        else if ((sipMetaData.getApplicationName() != null) && (sipMetaData.getApplicationName().compareTo(value.asString()) != 0)) {
-                            throw (new DeploymentUnitProcessingException("Sip Application Name mismatch: already loaded: " + sipMetaData.getApplicationName() + " - from @SipServlet annotation (" + servlet.getServletClass() + "): " + value.asString()));
+                        } else if ((sipMetaData.getApplicationName() != null)
+                                && (sipMetaData.getApplicationName().compareTo(value.asString()) != 0)) {
+                            throw (new DeploymentUnitProcessingException("Sip Application Name mismatch: already loaded: "
+                                    + sipMetaData.getApplicationName() + " - from @SipServlet annotation ("
+                                    + servlet.getServletClass() + "): " + value.asString()));
                         }
                     }
                 }
@@ -238,69 +247,85 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
                 if (sipApplicationPresent) {
                     sipAnotationsMetaData.setSipApplicationAnnotationPresent(true);
                     AnnotationInstance sipAppAnnotation = sipApplicationAnnotations.get(0);
-                    if (logger.isDebugEnabled()) logger.debug("processAnnotations(): @SipAnnotation: " + annotation);
+                    if (logger.isDebugEnabled())
+                        logger.debug("processAnnotations(): @SipAnnotation: " + annotation);
                     AnnotationTarget sipAppTarget = sipAppAnnotation.target();
                     if (!(target instanceof ClassInfo)) {
                         throw new DeploymentUnitProcessingException("@SipAnnotation is only allowed at class level " + target);
                     }
                     ClassInfo sipAppClassInfo = ClassInfo.class.cast(sipAppTarget);
-                    String packageName = sipAppClassInfo.toString().substring(0,sipAppClassInfo.toString().lastIndexOf('.'));
+                    String packageName = sipAppClassInfo.toString().substring(0, sipAppClassInfo.toString().lastIndexOf('.'));
                     if (parsedAnnotatedPackage != null && !parsedAnnotatedPackage.equals(packageName)) {
-                        throw new DeploymentUnitProcessingException("Cant have two different applications in a single context - " + packageName + " and " + parsedAnnotatedPackage);
+                        throw new DeploymentUnitProcessingException(
+                                "Cant have two different applications in a single context - " + packageName + " and "
+                                        + parsedAnnotatedPackage);
                     }
                     if (parsedAnnotatedPackage == null) {
                         parsedAnnotatedPackage = packageName;
-                        parseSipApplication(sipMetaData,sipAppAnnotation, packageName);
+                        parseSipApplication(sipMetaData, sipAppAnnotation, packageName);
                     }
                 }
-                if (logger.isDebugEnabled()) logger.debug("processAnnotations(): sipServlet added " + servlet);
+                if (logger.isDebugEnabled())
+                    logger.debug("processAnnotations(): sipServlet added " + servlet);
                 sipServlets.add(servlet);
             }
-            if (logger.isDebugEnabled()) logger.debug("processAnnotations(): " + sipServlets.size() + " sipServlets added");
+            if (logger.isDebugEnabled())
+                logger.debug("processAnnotations(): " + sipServlets.size() + " sipServlets added");
             sipMetaData.setSipServlets(sipServlets);
         }
 
-        //@SipApplicationKey
+        // @SipApplicationKey
         final List<AnnotationInstance> sipApplicationKeyAnnotations = index.getAnnotations(sipApplicationKey);
         if (sipApplicationKeyAnnotations != null && sipApplicationKeyAnnotations.size() > 0) {
             for (final AnnotationInstance annotation : sipApplicationKeyAnnotations) {
-                if (logger.isDebugEnabled()) logger.debug("processAnnotations(): @SipApplicationKey: " + annotation);
+                if (logger.isDebugEnabled())
+                    logger.debug("processAnnotations(): @SipApplicationKey: " + annotation);
                 final AnnotationTarget target = annotation.target();
                 if (!(target instanceof MethodInfo)) {
                     throw new DeploymentUnitProcessingException("@SipApplicationKey is only allowed at method level " + target);
                 }
                 final MethodInfo methodInfo = MethodInfo.class.cast(target);
-                if(!Modifier.isStatic(methodInfo.flags()) || !Modifier.isPublic(methodInfo.flags())) {
-                    throw new DeploymentUnitProcessingException("A method annotated with the @SipApplicationKey annotation MUST be public and static");
+                if (!Modifier.isStatic(methodInfo.flags()) || !Modifier.isPublic(methodInfo.flags())) {
+                    throw new DeploymentUnitProcessingException(
+                            "A method annotated with the @SipApplicationKey annotation MUST be public and static");
                 }
-                if(!methodInfo.returnType().name().toString().equals(String.class.getName())) {
-                    throw new DeploymentUnitProcessingException("A method annotated with the @SipApplicationKey annotation MUST return a String");
+                if (!methodInfo.returnType().name().toString().equals(String.class.getName())) {
+                    throw new DeploymentUnitProcessingException(
+                            "A method annotated with the @SipApplicationKey annotation MUST return a String");
                 }
                 final Type[] types = methodInfo.args();
-                if(types.length != 1 || !types[0].name().toString().equals(SipServletRequest.class.getName())) {
-                    throw new DeploymentUnitProcessingException("A method annotated with the @SipApplicationKey annotation MUST have a single argument of type SipServletRequest");
+                if (types.length != 1 || !types[0].name().toString().equals(SipServletRequest.class.getName())) {
+                    throw new DeploymentUnitProcessingException(
+                            "A method annotated with the @SipApplicationKey annotation MUST have a single argument of type SipServletRequest");
                 }
-                if(sipMetaData.getSipApplicationKeyMethodInfo() != null && !sipMetaData.getSipApplicationKeyMethodInfo().equals(methodInfo)) {
+                if (sipMetaData.getSipApplicationKeyMethodInfo() != null
+                        && !sipMetaData.getSipApplicationKeyMethodInfo().equals(methodInfo)) {
                     // https://code.google.com/p/sipservlets/issues/detail?id=37
-                    throw new DeploymentUnitProcessingException("More than one SipApplicationKey annotated method is not allowed.");
+                    throw new DeploymentUnitProcessingException(
+                            "More than one SipApplicationKey annotated method is not allowed.");
                 }
-                final SipApplicationKeyMethodInfo sipApplicationKeyMethodInfo = new SipApplicationKeyMethodInfo(methodInfo.declaringClass().name().toString(), methodInfo.name());
+                final SipApplicationKeyMethodInfo sipApplicationKeyMethodInfo = new SipApplicationKeyMethodInfo(methodInfo
+                        .declaringClass().name().toString(), methodInfo.name());
                 sipMetaData.setSipApplicationKeyMethodInfo(sipApplicationKeyMethodInfo);
-                if (logger.isDebugEnabled()) logger.debug("processAnnotations(): added " + sipApplicationKeyMethodInfo + " as @SipApplicationKey method");
+                if (logger.isDebugEnabled())
+                    logger.debug("processAnnotations(): added " + sipApplicationKeyMethodInfo + " as @SipApplicationKey method");
             }
         }
-        //@ConcurrencyControl
+        // @ConcurrencyControl
         final List<AnnotationInstance> concurrencyControlAnnotations = index.getAnnotations(concurrencyControl);
         if (concurrencyControlAnnotations != null && concurrencyControlAnnotations.size() > 0) {
             for (final AnnotationInstance annotation : concurrencyControlAnnotations) {
-                if (logger.isDebugEnabled()) logger.debug("processAnnotations(): @ConcurrencyControl: " + annotation);
+                if (logger.isDebugEnabled())
+                    logger.debug("processAnnotations(): @ConcurrencyControl: " + annotation);
                 final AnnotationTarget target = annotation.target();
                 if (!(target instanceof ClassInfo)) {
-                    throw new DeploymentUnitProcessingException("@ConcurrencyControl is only allowed at package level " + target);
+                    throw new DeploymentUnitProcessingException("@ConcurrencyControl is only allowed at package level "
+                            + target);
                 }
                 ConcurrencyControlMode mode = ConcurrencyControlMode.valueOf(annotation.value("mode").asString());
                 sipMetaData.setConcurrencyControlMode(mode);
-                if (logger.isDebugEnabled()) logger.debug("processAnnotations(): ConcurrencyControl set to " + mode);
+                if (logger.isDebugEnabled())
+                    logger.debug("processAnnotations(): ConcurrencyControl set to " + mode);
             }
         }
         return sipMetaData;
@@ -369,29 +394,34 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
     }
 
     private static SipApplication getApplicationAnnotation(Package pack) {
-        if(pack == null) return null;
+        if (pack == null)
+            return null;
         SipApplication sipApp = (SipApplication) pack.getAnnotation(SipApplication.class);
-        if(sipApp != null) {
+        if (sipApp != null) {
             return sipApp;
         }
         return null;
     }
 
-    private void parseSipApplication(SipMetaData sipMetaData, AnnotationInstance sipAppAnnInstance, String packageName) throws DeploymentUnitProcessingException {
+    private void parseSipApplication(SipMetaData sipMetaData, AnnotationInstance sipAppAnnInstance, String packageName)
+            throws DeploymentUnitProcessingException {
         String description = null;
         String displayName = null;
         String largeIcon = null;
         String smallIcon = null;
 
-        for (AnnotationValue value: sipAppAnnInstance.values()) {
+        for (AnnotationValue value : sipAppAnnInstance.values()) {
             // application name
             if (value.name().compareTo("name") == 0) {
                 if (sipMetaData.getApplicationName() == null) {
-                    if (logger.isDebugEnabled()) logger.debug("parseSipApplication(): @SipApplication: " + value.asString());
+                    if (logger.isDebugEnabled())
+                        logger.debug("parseSipApplication(): @SipApplication: " + value.asString());
                     sipMetaData.setApplicationName(value.asString());
-                }
-                else if ((sipMetaData.getApplicationName() != null) && (sipMetaData.getApplicationName().compareTo(value.asString()) != 0)) {
-                    throw (new DeploymentUnitProcessingException("Sip Application Name mismatch! Already defined: " + sipMetaData.getApplicationName() + " - from @SipAnnotation (package " + packageName + "): " + value.asString()));
+                } else if ((sipMetaData.getApplicationName() != null)
+                        && (sipMetaData.getApplicationName().compareTo(value.asString()) != 0)) {
+                    throw (new DeploymentUnitProcessingException("Sip Application Name mismatch! Already defined: "
+                            + sipMetaData.getApplicationName() + " - from @SipAnnotation (package " + packageName + "): "
+                            + value.asString()));
                 }
             }
             // description
@@ -418,21 +448,18 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
             // small icon
             else if (value.name().compareTo("smallIcon") == 0) {
                 smallIcon = value.asString();
-            }
-            else if (value.name().compareTo("mainServlet") == 0) {
+            } else if (value.name().compareTo("mainServlet") == 0) {
                 if (sipMetaData.getServletSelection() == null) {
                     sipMetaData.setServletSelection(new SipServletSelectionMetaData());
                 }
                 sipMetaData.getServletSelection().setMainServlet(value.asString());
-            }
-            else if (value.name().compareTo("proxyTimeout") == 0) {
-                if(sipMetaData.getProxyConfig() == null) {
+            } else if (value.name().compareTo("proxyTimeout") == 0) {
+                if (sipMetaData.getProxyConfig() == null) {
                     sipMetaData.setProxyConfig(new ProxyConfigMetaData());
                 }
                 sipMetaData.getProxyConfig().setProxyTimeout(value.asInt());
-            }
-            else if (value.name().compareTo("sessionTimeout") == 0) {
-                if(sipMetaData.getSessionConfig() == null) {
+            } else if (value.name().compareTo("sessionTimeout") == 0) {
+                if (sipMetaData.getSessionConfig() == null) {
                     sipMetaData.setSessionConfig(new SessionConfigMetaData());
                 }
                 sipMetaData.getSessionConfig().setSessionTimeout(value.asInt());
@@ -447,7 +474,8 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
             getOrCreateIs(getOrCreateDG(sipMetaData)).add(icon);
         }
         if (sipMetaData.getApplicationName() == null) {
-            if (logger.isDebugEnabled()) logger.debug("parseSipApplication(): @SipApplication: " + packageName);
+            if (logger.isDebugEnabled())
+                logger.debug("parseSipApplication(): @SipApplication: " + packageName);
             sipMetaData.setApplicationName(packageName);
         }
     }
@@ -488,11 +516,10 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
         return ii;
     }
 
-
     static final String SIP_XML = "WEB-INF/sip.xml";
 
     protected boolean canHandle(DeploymentUnit deploymentUnit) {
-        //return DeploymentTypeMarker.isType(DeploymentType.WAR, deploymentUnit);
+        // return DeploymentTypeMarker.isType(DeploymentType.WAR, deploymentUnit);
         final ResourceRoot deploymentRoot = deploymentUnit.getAttachment(Attachments.DEPLOYMENT_ROOT);
         final VirtualFile sipXml = deploymentRoot.getRoot().getChild(SIP_XML);
         if (DeploymentTypeMarker.isType(DeploymentType.WAR, deploymentUnit) && sipXml.exists()) {

@@ -43,12 +43,12 @@ import org.jboss.as.controller.registry.OperationEntry;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 
-
 /**
  * @author Tomaz Cerar
  * @created 22.2.12 14:29
  *
- * This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *          This class is based on the contents of org.mobicents.as7 package from jboss-as7-mobicents project, re-implemented
+ *          for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class SipDefinition extends SimpleResourceDefinition {
@@ -101,7 +101,7 @@ public class SipDefinition extends SimpleResourceDefinition {
                     .setAllowExpression(true)
                     .setXmlName(Constants.CONGESTION_CONTROL_INTERVAL)
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
-                    //.setValidator(new IntRangeValidator(1, true))
+                    // .setValidator(new IntRangeValidator(1, true))
                     .setDefaultValue(new ModelNode(-1))
                     .build();
     protected static final SimpleAttributeDefinition CONGESTION_CONTROL_POLICY =
@@ -109,7 +109,7 @@ public class SipDefinition extends SimpleResourceDefinition {
                     .setAllowExpression(true)
                     .setXmlName(Constants.CONGESTION_CONTROL_POLICY)
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
-                    //.setValidator(new IntRangeValidator(1, true))
+                    // .setValidator(new IntRangeValidator(1, true))
                     .setDefaultValue(new ModelNode("ErrorResponse"))
                     .build();
     protected static final SimpleAttributeDefinition USE_PRETTY_ENCODING =
@@ -174,7 +174,7 @@ public class SipDefinition extends SimpleResourceDefinition {
                     .setXmlName(Constants.DNS_TIMEOUT)
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .setDefaultValue(new ModelNode(1))
-                    .build();    
+                    .build();
     protected static final SimpleAttributeDefinition DNS_RESOLVER_CLASS =
             new SimpleAttributeDefinitionBuilder(Constants.DNS_RESOLVER_CLASS, ModelType.STRING, true)
                     .setAllowExpression(true)
@@ -226,43 +226,62 @@ public class SipDefinition extends SimpleResourceDefinition {
                     .build();
 
     private SipDefinition() {
-        super(PathElement.pathElement(ModelDescriptionConstants.SUBSYSTEM, SipExtension.SUBSYSTEM_NAME),
-                SipExtension.getResourceDescriptionResolver(null));
+        super(PathElement.pathElement(ModelDescriptionConstants.SUBSYSTEM, SipExtension.SUBSYSTEM_NAME), SipExtension
+                .getResourceDescriptionResolver(null));
     }
 
     @Override
     public void registerOperations(final ManagementResourceRegistration rootResourceRegistration) {
         final ResourceDescriptionResolver rootResolver = getResourceDescriptionResolver();
         // Ops to add and remove the root resource
-        final DescriptionProvider subsystemAddDescription = new DefaultResourceAddDescriptionProvider(rootResourceRegistration, rootResolver);
-        rootResourceRegistration.registerOperationHandler(ADD, SipSubsystemAdd.INSTANCE, subsystemAddDescription, EnumSet.of(OperationEntry.Flag.RESTART_ALL_SERVICES));
+        final DescriptionProvider subsystemAddDescription = new DefaultResourceAddDescriptionProvider(rootResourceRegistration,
+                rootResolver);
+        rootResourceRegistration.registerOperationHandler(ADD, SipSubsystemAdd.INSTANCE, subsystemAddDescription,
+                EnumSet.of(OperationEntry.Flag.RESTART_ALL_SERVICES));
         final DescriptionProvider subsystemRemoveDescription = new DefaultResourceRemoveDescriptionProvider(rootResolver);
-        rootResourceRegistration.registerOperationHandler(REMOVE, ReloadRequiredRemoveStepHandler.INSTANCE, subsystemRemoveDescription, EnumSet.of(OperationEntry.Flag.RESTART_ALL_SERVICES));
+        rootResourceRegistration.registerOperationHandler(REMOVE, ReloadRequiredRemoveStepHandler.INSTANCE,
+                subsystemRemoveDescription, EnumSet.of(OperationEntry.Flag.RESTART_ALL_SERVICES));
     }
 
     @Override
     public void registerAttributes(ManagementResourceRegistration registration) {
         registration.registerReadWriteAttribute(INSTANCE_ID, null, new ReloadRequiredWriteAttributeHandler(INSTANCE_ID));
-        registration.registerReadWriteAttribute(APPLICATION_ROUTER, null, new ReloadRequiredWriteAttributeHandler(APPLICATION_ROUTER));
-        registration.registerReadWriteAttribute(SIP_STACK_PROPS, null, new ReloadRequiredWriteAttributeHandler(SIP_STACK_PROPS));
+        registration.registerReadWriteAttribute(APPLICATION_ROUTER, null, new ReloadRequiredWriteAttributeHandler(
+                APPLICATION_ROUTER));
+        registration
+                .registerReadWriteAttribute(SIP_STACK_PROPS, null, new ReloadRequiredWriteAttributeHandler(SIP_STACK_PROPS));
         registration.registerReadWriteAttribute(SIP_PATH_NAME, null, new ReloadRequiredWriteAttributeHandler(SIP_PATH_NAME));
-        registration.registerReadWriteAttribute(SIP_APP_DISPATCHER_CLASS, null, new ReloadRequiredWriteAttributeHandler(SIP_APP_DISPATCHER_CLASS));
-        registration.registerReadWriteAttribute(CONGESTION_CONTROL_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(CONGESTION_CONTROL_INTERVAL));
-        registration.registerReadWriteAttribute(CONGESTION_CONTROL_POLICY, null, new ReloadRequiredWriteAttributeHandler(CONGESTION_CONTROL_POLICY));
-        registration.registerReadWriteAttribute(CONCURRENCY_CONTROL_MODE, null, new ReloadRequiredWriteAttributeHandler(CONCURRENCY_CONTROL_MODE));
-        registration.registerReadWriteAttribute(USE_PRETTY_ENCODING, null, new ReloadRequiredWriteAttributeHandler(USE_PRETTY_ENCODING));
-        registration.registerReadWriteAttribute(ADDITIONAL_PARAMETERABLE_HEADERS, null, new ReloadRequiredWriteAttributeHandler(ADDITIONAL_PARAMETERABLE_HEADERS));
-        registration.registerReadWriteAttribute(BASE_TIMER_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(BASE_TIMER_INTERVAL));
+        registration.registerReadWriteAttribute(SIP_APP_DISPATCHER_CLASS, null, new ReloadRequiredWriteAttributeHandler(
+                SIP_APP_DISPATCHER_CLASS));
+        registration.registerReadWriteAttribute(CONGESTION_CONTROL_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(
+                CONGESTION_CONTROL_INTERVAL));
+        registration.registerReadWriteAttribute(CONGESTION_CONTROL_POLICY, null, new ReloadRequiredWriteAttributeHandler(
+                CONGESTION_CONTROL_POLICY));
+        registration.registerReadWriteAttribute(CONCURRENCY_CONTROL_MODE, null, new ReloadRequiredWriteAttributeHandler(
+                CONCURRENCY_CONTROL_MODE));
+        registration.registerReadWriteAttribute(USE_PRETTY_ENCODING, null, new ReloadRequiredWriteAttributeHandler(
+                USE_PRETTY_ENCODING));
+        registration.registerReadWriteAttribute(ADDITIONAL_PARAMETERABLE_HEADERS, null,
+                new ReloadRequiredWriteAttributeHandler(ADDITIONAL_PARAMETERABLE_HEADERS));
+        registration.registerReadWriteAttribute(BASE_TIMER_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(
+                BASE_TIMER_INTERVAL));
         registration.registerReadWriteAttribute(T2_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(T2_INTERVAL));
         registration.registerReadWriteAttribute(T4_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(T4_INTERVAL));
-        registration.registerReadWriteAttribute(TIMER_D_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(TIMER_D_INTERVAL));
-        registration.registerReadWriteAttribute(DIALOG_PENDING_REQUEST_CHECKING, null, new ReloadRequiredWriteAttributeHandler(DIALOG_PENDING_REQUEST_CHECKING));
-        registration.registerReadWriteAttribute(DNS_SERVER_LOCATOR_CLASS, null, new ReloadRequiredWriteAttributeHandler(DNS_SERVER_LOCATOR_CLASS));
+        registration.registerReadWriteAttribute(TIMER_D_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(
+                TIMER_D_INTERVAL));
+        registration.registerReadWriteAttribute(DIALOG_PENDING_REQUEST_CHECKING, null, new ReloadRequiredWriteAttributeHandler(
+                DIALOG_PENDING_REQUEST_CHECKING));
+        registration.registerReadWriteAttribute(DNS_SERVER_LOCATOR_CLASS, null, new ReloadRequiredWriteAttributeHandler(
+                DNS_SERVER_LOCATOR_CLASS));
         registration.registerReadWriteAttribute(DNS_TIMEOUT, null, new ReloadRequiredWriteAttributeHandler(DNS_TIMEOUT));
-        registration.registerReadWriteAttribute(DNS_RESOLVER_CLASS, null, new ReloadRequiredWriteAttributeHandler(DNS_RESOLVER_CLASS));
-        registration.registerReadWriteAttribute(CANCELED_TIMER_TASKS_PURGE_PERIOD, null, new ReloadRequiredWriteAttributeHandler(CANCELED_TIMER_TASKS_PURGE_PERIOD));
-        registration.registerReadWriteAttribute(MEMORY_THRESHOLD, null, new ReloadRequiredWriteAttributeHandler(MEMORY_THRESHOLD));
-        registration.registerReadWriteAttribute(BACK_TO_NORMAL_MEMORY_THRESHOLD, null, new ReloadRequiredWriteAttributeHandler(BACK_TO_NORMAL_MEMORY_THRESHOLD));
+        registration.registerReadWriteAttribute(DNS_RESOLVER_CLASS, null, new ReloadRequiredWriteAttributeHandler(
+                DNS_RESOLVER_CLASS));
+        registration.registerReadWriteAttribute(CANCELED_TIMER_TASKS_PURGE_PERIOD, null,
+                new ReloadRequiredWriteAttributeHandler(CANCELED_TIMER_TASKS_PURGE_PERIOD));
+        registration.registerReadWriteAttribute(MEMORY_THRESHOLD, null, new ReloadRequiredWriteAttributeHandler(
+                MEMORY_THRESHOLD));
+        registration.registerReadWriteAttribute(BACK_TO_NORMAL_MEMORY_THRESHOLD, null, new ReloadRequiredWriteAttributeHandler(
+                BACK_TO_NORMAL_MEMORY_THRESHOLD));
         registration.registerReadWriteAttribute(OUTBOUND_PROXY, null, new ReloadRequiredWriteAttributeHandler(OUTBOUND_PROXY));
     }
 }

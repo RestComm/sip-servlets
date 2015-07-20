@@ -35,8 +35,9 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentService;
+
 /**
- *@author kakonyi.istvan@alerant.hu
+ * @author kakonyi.istvan@alerant.hu
  */
 public class UndertowSipDeploymentService implements Service<UndertowSipDeploymentService> {
     public static final ServiceName SERVICE_NAME = ServiceName.of("UndertowSipDeploymentService");
@@ -86,7 +87,7 @@ public class UndertowSipDeploymentService implements Service<UndertowSipDeployme
                 sipWebContext.listenerStop();
             }
         } catch (ServletException e) {
-            ServerLogger.DEPLOYMENT_LOGGER.error("UndertowSipDeploymentService.stop() ends with error: "+e.getMessage(), e);
+            ServerLogger.DEPLOYMENT_LOGGER.error("UndertowSipDeploymentService.stop() ends with error: " + e.getMessage(), e);
         }
     }
 }

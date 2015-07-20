@@ -49,7 +49,8 @@ import org.mobicents.metadata.sip.spec.SipServletsMetaData;
  * @author Remy Maucherat
  * @author josemrecio@gmail.com
  *
- * This class is based on the contents of org.mobicents.metadata.sip.parser package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.metadata.sip.parser package from jboss-as7-mobicents project,
+ *         re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  *
  */
@@ -63,10 +64,10 @@ public class SipCommonMetaDataParser extends MetaDataElementParser {
                 smd.setApplicationName(getElementText(reader));
                 break;
             // DescriptionGroup is parsed by SipMetaDataParser
-            //case DISPLAY_NAME:
-            //    break;
-            //case DESCRIPTION:
-            //    break;
+            // case DISPLAY_NAME:
+            // break;
+            // case DESCRIPTION:
+            // break;
             case DISTRIBUTABLE:
                 // TODO
                 throw unexpectedElement(reader);
@@ -106,11 +107,11 @@ public class SipCommonMetaDataParser extends MetaDataElementParser {
                 smd.setProxyConfig(ProxyConfigMetaDataParser.parse(reader));
                 break;
             case SESSION_CONFIG:
-                 if (smd.getSessionConfig() != null)
-                     throw new XMLStreamException("Multiple session-config elements detected", reader.getLocation());
-                 // FIXME: 7.1.2.Final - setup proper ProperlyReplacer
-                 smd.setSessionConfig(SessionConfigMetaDataParser.parse(reader, PropertyReplacers.noop()));
-                 break;
+                if (smd.getSessionConfig() != null)
+                    throw new XMLStreamException("Multiple session-config elements detected", reader.getLocation());
+                // FIXME: 7.1.2.Final - setup proper ProperlyReplacer
+                smd.setSessionConfig(SessionConfigMetaDataParser.parse(reader, PropertyReplacers.noop()));
+                break;
             case SECURITY_CONSTRAINT:
                 List<SipSecurityConstraintMetaData> sipSecurityConstraints = smd.getSipSecurityConstraints();
                 if (sipSecurityConstraints == null) {

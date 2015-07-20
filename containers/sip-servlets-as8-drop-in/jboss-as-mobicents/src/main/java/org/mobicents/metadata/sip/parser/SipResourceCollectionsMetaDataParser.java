@@ -37,7 +37,8 @@ import org.mobicents.metadata.sip.spec.SipResourceCollectionMetaData;
 /**
  * @author Remy Maucherat
  *
- * This class is based on the contents of org.mobicents.metadata.sip.parser package from jboss-as7-mobicents project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.metadata.sip.parser package from jboss-as7-mobicents project,
+ *         re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class SipResourceCollectionsMetaDataParser extends MetaDataElementParser {
@@ -47,7 +48,7 @@ public class SipResourceCollectionsMetaDataParser extends MetaDataElementParser 
 
         // Handle attributes
         final int count = reader.getAttributeCount();
-        for (int i = 0; i < count; i ++) {
+        for (int i = 0; i < count; i++) {
             final String value = reader.getAttributeValue(i);
             if (attributeHasNamespace(reader, i)) {
                 continue;
@@ -58,7 +59,8 @@ public class SipResourceCollectionsMetaDataParser extends MetaDataElementParser 
                     sipResourceCollection.setId(value);
                     break;
                 }
-                default: throw unexpectedAttribute(reader, i);
+                default:
+                    throw unexpectedAttribute(reader, i);
             }
         }
 
