@@ -63,7 +63,9 @@ import org.wildfly.extension.undertow.security.JAASIdentityManagerImpl;
 
 /**
  *
- * This class is based org.mobicents.servlet.sip.catalina.security.SipSecurityUtils class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ * This class is based org.mobicents.servlet.sip.catalina.security.SipSecurityUtils class from sip-servlet-as7 project,
+ * re-implemented for jboss as8 (wildfly) by:
+ *
  * @author kakonyi.istvan@alerant.hu
  *
  */
@@ -75,40 +77,44 @@ public class SipSecurityUtils {
         this.sipStandardContext = sipContext;
     }
 
-    public boolean authenticate(MobicentsSipServletRequest request, SipSecurityConstraint sipConstraint, ServletInfo servletInfo, SipStack sipStack)
-    {
+    public boolean authenticate(MobicentsSipServletRequest request, SipSecurityConstraint sipConstraint,
+            ServletInfo servletInfo, SipStack sipStack) {
         boolean authenticated = false;
         SipLoginConfig loginConfig = (SipLoginConfig) sipStandardContext.getSipLoginConfig();
-        try{
-            if(loginConfig != null) {
-                for(AuthMethodConfig authmethodConfig : loginConfig.getAuthMethods()){
+        try {
+            if (loginConfig != null) {
+                for (AuthMethodConfig authmethodConfig : loginConfig.getAuthMethods()) {
                     String authMethod = authmethodConfig.getName();
-                    if(authMethod != null){
+                    if (authMethod != null) {
                         // (1) First check for Proxy Asserted Identity
-                        String pAssertedIdentitySetting = loginConfig.getIdentitySchemeSettings(MobicentsSipLoginConfig.IDENTITY_SCHEME_P_ASSERTED);
-                        if(pAssertedIdentitySetting != null) {
-                            if(request.getHeader(PAssertedIdentityHeader.NAME) != null) {
+                        String pAssertedIdentitySetting = loginConfig
+                                .getIdentitySchemeSettings(MobicentsSipLoginConfig.IDENTITY_SCHEME_P_ASSERTED);
+                        if (pAssertedIdentitySetting != null) {
+                            if (request.getHeader(PAssertedIdentityHeader.NAME) != null) {
                                 String pAssertedHeaderValue = request.getHeader(PAssertedIdentityHeader.NAME);
 
-                                //If P-Identity is required we must send error message immediately
-                                if(pAssertedHeaderValue == null &&
-                                        MobicentsSipLoginConfig.IDENTITY_SCHEME_REQUIRED.equals(pAssertedIdentitySetting)) {
+                                // If P-Identity is required we must send error message immediately
+                                if (pAssertedHeaderValue == null
+                                        && MobicentsSipLoginConfig.IDENTITY_SCHEME_REQUIRED.equals(pAssertedIdentitySetting)) {
                                     request.createResponse(428, "P-Asserted-Identity header is required!").send();
                                     return false;
                                 }
-                                javax.sip.address.Address address =
-                                    sipStandardContext.getSipApplicationDispatcher().getSipFactory().getAddressFactory().createAddress(pAssertedHeaderValue);
+                                javax.sip.address.Address address = sipStandardContext.getSipApplicationDispatcher()
+                                        .getSipFactory().getAddressFactory().createAddress(pAssertedHeaderValue);
                                 String username = null;
-                                if(address.getURI().isSipURI()) {
-                                    SipURI sipUri = (SipURI)address.getURI();
+                                if (address.getURI().isSipURI()) {
+                                    SipURI sipUri = (SipURI) address.getURI();
                                     username = sipUri.getUser();
                                 } else {
-                                    TelURL telUri = (TelURL)address.getURI();
+                                    TelURL telUri = (TelURL) address.getURI();
                                     username = telUri.getPhoneNumber();
                                 }
-                                SipPrincipal principal = impersonatePrincipal(username, ((SipContextImpl)sipStandardContext).getDeployment(), servletInfo, ((SipContextImpl)sipStandardContext).getSecurityDomain(), ((SipLoginConfig)sipStandardContext.getSipLoginConfig()).getRealmName());
+                                SipPrincipal principal = impersonatePrincipal(username,
+                                        ((SipContextImpl) sipStandardContext).getDeployment(), servletInfo,
+                                        ((SipContextImpl) sipStandardContext).getSecurityDomain(),
+                                        ((SipLoginConfig) sipStandardContext.getSipLoginConfig()).getRealmName());
 
-                                if(principal != null) {
+                                if (principal != null) {
                                     authenticated = true;
                                     request.setUserPrincipal(principal);
                                     request.getSipSession().setUserPrincipal(principal);
@@ -117,19 +123,22 @@ public class SipSecurityUtils {
                             }
                         }
                         // (2) Then if P-Identity has failed and is not required attempt DIGEST auth
-                        if(!authenticated && authMethod.equalsIgnoreCase("DIGEST")) {
-                            SipDigestAuthenticationMechanism digestAuthenticator = new SipDigestAuthenticationMechanism(((SipLoginConfig)sipStandardContext.getSipLoginConfig()).getRealmName(), sipStandardContext.getSipApplicationDispatcher().getSipFactory().getHeaderFactory());
+                        if (!authenticated && authMethod.equalsIgnoreCase("DIGEST")) {
+                            SipDigestAuthenticationMechanism digestAuthenticator = new SipDigestAuthenticationMechanism(
+                                    ((SipLoginConfig) sipStandardContext.getSipLoginConfig()).getRealmName(),
+                                    sipStandardContext.getSipApplicationDispatcher().getSipFactory().getHeaderFactory());
                             digestAuthenticator.setContext(sipStandardContext);
                             MobicentsSipServletResponse response = createErrorResponse(request, sipConstraint);
-                            authenticated = digestAuthenticator.authenticate(request, response, loginConfig, ((SipContextImpl)sipStandardContext).getSecurityDomain(), ((SipContextImpl)sipStandardContext).getDeployment(), servletInfo, sipStack);
+                            authenticated = digestAuthenticator.authenticate(request, response, loginConfig,
+                                    ((SipContextImpl) sipStandardContext).getSecurityDomain(),
+                                    ((SipContextImpl) sipStandardContext).getDeployment(), servletInfo, sipStack);
                             request.setUserPrincipal(digestAuthenticator.getPrincipal());
-                        } else if(authMethod.equalsIgnoreCase("BASIC")) {
+                        } else if (authMethod.equalsIgnoreCase("BASIC")) {
                             throw new IllegalStateException("Basic authentication not supported in JSR 289");
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 log.debug("No login configuration found in sip.xml. We won't authenticate.");
                 return true; // There is no auth config in sip.xml. So don't authenticate.
             }
@@ -139,55 +148,54 @@ public class SipSecurityUtils {
         return authenticated;
     }
 
-    private static MobicentsSipServletResponse createErrorResponse(MobicentsSipServletRequest request, SipSecurityConstraint sipConstraint)
-    {
+    private static MobicentsSipServletResponse createErrorResponse(MobicentsSipServletRequest request,
+            SipSecurityConstraint sipConstraint) {
         SipServletResponse response = null;
-        if(sipConstraint.isProxyAuthentication()) {
-            response = (MobicentsSipServletResponse)
-                request.createResponse(MobicentsSipServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED);
+        if (sipConstraint.isProxyAuthentication()) {
+            response = (MobicentsSipServletResponse) request
+                    .createResponse(MobicentsSipServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED);
         } else {
-            response = (MobicentsSipServletResponse)
-                request.createResponse(MobicentsSipServletResponse.SC_UNAUTHORIZED);
+            response = (MobicentsSipServletResponse) request.createResponse(MobicentsSipServletResponse.SC_UNAUTHORIZED);
         }
         return (MobicentsSipServletResponse) response;
     }
 
-    public boolean authorize(MobicentsSipServletRequest request, ServletInfo servletInfo, SipStack sipStack)
-    {
+    public boolean authorize(MobicentsSipServletRequest request, ServletInfo servletInfo, SipStack sipStack) {
         boolean allConstrainsSatisfied = true;
-        Object[] constraints = ((SipContextImpl)sipStandardContext).getDeploymentInfoFacade().getDeploymentInfo().getSecurityConstraints().toArray();
+        Object[] constraints = ((SipContextImpl) sipStandardContext).getDeploymentInfoFacade().getDeploymentInfo()
+                .getSecurityConstraints().toArray();
 
         // If we have no constraints, just authorize the request;
-        if(constraints.length == 0) {
+        if (constraints.length == 0) {
             return true;
         }
 
-        for(Object constraint:constraints){
-            if(constraint instanceof SipSecurityConstraint){
+        for (Object constraint : constraints) {
+            if (constraint instanceof SipSecurityConstraint) {
                 SipSecurityConstraint sipConstraint = (SipSecurityConstraint) constraint;
-                for(WebResourceCollection security:sipConstraint.getWebResourceCollections()) {
+                for (WebResourceCollection security : sipConstraint.getWebResourceCollections()) {
 
                     // For each secured resource see if it's bound to the current
                     // request method and servlet name.
-                    SipSecurityCollection sipSecurity = (SipSecurityCollection)security;
+                    SipSecurityCollection sipSecurity = (SipSecurityCollection) security;
                     String servletName = request.getSipSession().getHandler();
-                    if(sipSecurity.findMethod(request.getMethod())
-                            && sipSecurity.findServletName(servletName)) {
+                    if (sipSecurity.findMethod(request.getMethod()) && sipSecurity.findServletName(servletName)) {
                         boolean constraintSatisfied = false;
                         // If yes, see if the current user is in a role compatible with the
                         // required roles for the resource.
-                        if(authenticate(request, sipConstraint, servletInfo, sipStack)) {
+                        if (authenticate(request, sipConstraint, servletInfo, sipStack)) {
                             UndertowSipPrincipal principal = (UndertowSipPrincipal) request.getUserPrincipal();
-                            if(principal == null) return false;
+                            if (principal == null)
+                                return false;
 
-                            for(String assignedRole:((SecurityConstraint)constraint).getRolesAllowed()) {
-                                if(principal.isUserInRole(assignedRole)) {
+                            for (String assignedRole : ((SecurityConstraint) constraint).getRolesAllowed()) {
+                                if (principal.isUserInRole(assignedRole)) {
                                     constraintSatisfied = true;
                                     break;
                                 }
                             }
                         }
-                        if(!constraintSatisfied) {
+                        if (!constraintSatisfied) {
                             allConstrainsSatisfied = false;
                             log.error("Constraint \"" + sipConstraint.getDisplayName() + "\" not satifsied");
                         }
@@ -199,21 +207,22 @@ public class SipSecurityUtils {
     }
 
     /*
-     *  This method attempts to obtain the Principal of a user from an auth cache without having to
-     *  authenticate with a password or certificate. If cache-entry is set in standalone.xml, this method tries
-     *  to use reflection to get the data FIXME: implementing security cache flush
+     * This method attempts to obtain the Principal of a user from an auth cache without having to authenticate with a password
+     * or certificate. If cache-entry is set in standalone.xml, this method tries to use reflection to get the data FIXME:
+     * implementing security cache flush
      */
-    public static SipPrincipal impersonatePrincipal(String username, Deployment deployment, ServletInfo servletInfo, String securityDomain, String realmName){
-        if(username==null){
+    public static SipPrincipal impersonatePrincipal(String username, Deployment deployment, ServletInfo servletInfo,
+            String securityDomain, String realmName) {
+        if (username == null) {
             return null;
         }
 
         final IdentityManager identityManager = deployment.getDeploymentInfo().getIdentityManager();
 
-        PasswordCredential credential=new PasswordCredential("".toCharArray());
+        PasswordCredential credential = new PasswordCredential("".toCharArray());
 
-        //get securityDomainContext from identityManager
-        if(identityManager instanceof JAASIdentityManagerImpl){
+        // get securityDomainContext from identityManager
+        if (identityManager instanceof JAASIdentityManagerImpl) {
             Field securityDomainContextField = null;
             Field domainCacheField = null;
             Field credentialField = null;
@@ -222,27 +231,29 @@ public class SipSecurityUtils {
                 securityDomainContextField = identityManager.getClass().getDeclaredField("securityDomainContext");
                 securityDomainContextField.setAccessible(true);
 
-                SecurityDomainContext securityDomainContext = (SecurityDomainContext) securityDomainContextField.get(identityManager);
+                SecurityDomainContext securityDomainContext = (SecurityDomainContext) securityDomainContextField
+                        .get(identityManager);
 
-                if(securityDomainContext!=null) {
+                if (securityDomainContext != null) {
                     AuthenticationManager authManager = securityDomainContext.getAuthenticationManager();
 
-                    //gets the cache from the manager:
-                    if(authManager != null && authManager instanceof JBossCachedAuthenticationManager){
+                    // gets the cache from the manager:
+                    if (authManager != null && authManager instanceof JBossCachedAuthenticationManager) {
                         domainCacheField = authManager.getClass().getDeclaredField("domainCache");
                         domainCacheField.setAccessible(true);
 
-                        ConcurrentMap<Principal, DomainInfo> domainCache = (ConcurrentMap<Principal, DomainInfo>) domainCacheField.get(authManager);
-                        if(domainCache != null) {
-                            for(Principal p : domainCache.keySet()){
-                                if(username.equalsIgnoreCase(p.getName())){
+                        ConcurrentMap<Principal, DomainInfo> domainCache = (ConcurrentMap<Principal, DomainInfo>) domainCacheField
+                                .get(authManager);
+                        if (domainCache != null) {
+                            for (Principal p : domainCache.keySet()) {
+                                if (username.equalsIgnoreCase(p.getName())) {
                                     DomainInfo d = domainCache.get(p);
 
-                                    //gets the credential from the stored DomainInfo:
+                                    // gets the credential from the stored DomainInfo:
                                     credentialField = d.getClass().getDeclaredField("credential");
                                     credentialField.setAccessible(true);
 
-                                    credential = new PasswordCredential((char[])credentialField.get(d));
+                                    credential = new PasswordCredential((char[]) credentialField.get(d));
 
                                     break;
                                 }
@@ -250,31 +261,34 @@ public class SipSecurityUtils {
                         }
                     }
                 }
-            } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException | SecurityException e){
-                log.warn("Exception occured, while try to impersonate the security principal, please check secuirty settings!", e);
-            } finally{
-                if(securityDomainContextField != null){
+            } catch (NoSuchFieldException | IllegalArgumentException | IllegalAccessException | SecurityException e) {
+                log.warn("Exception occured, while try to impersonate the security principal, please check secuirty settings!",
+                        e);
+            } finally {
+                if (securityDomainContextField != null) {
                     securityDomainContextField.setAccessible(false);
                 }
-                if(domainCacheField != null){
+                if (domainCacheField != null) {
                     domainCacheField.setAccessible(false);
                 }
-                if(credentialField != null){
+                if (credentialField != null) {
                     credentialField.setAccessible(false);
                 }
             }
         }
 
-        //taken from https://github.com/jbossas/jboss-as/blob/7.1.2.Final/web/src/main/java/org/jboss/as/web/security/SecurityContextAssociationValve.java#L86
+        // taken from
+        // https://github.com/jbossas/jboss-as/blob/7.1.2.Final/web/src/main/java/org/jboss/as/web/security/SecurityContextAssociationValve.java#L86
         SecurityContext sc = SecurityActions.getSecurityContext();
 
-        if (sc == null){
-            if (log.isDebugEnabled()){
+        if (sc == null) {
+            if (log.isDebugEnabled()) {
                 log.debug("Security Domain " + securityDomain + " for Realm " + realmName);
             }
-            if (securityDomain == null){
-                if (log.isDebugEnabled()){
-                    log.debug("Security Domain is null using default security domain " + SIPSecurityConstants.DEFAULT_SIP_APPLICATION_POLICY + " for Realm " + realmName);
+            if (securityDomain == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Security Domain is null using default security domain "
+                            + SIPSecurityConstants.DEFAULT_SIP_APPLICATION_POLICY + " for Realm " + realmName);
                 }
                 securityDomain = SIPSecurityConstants.DEFAULT_SIP_APPLICATION_POLICY;
             }
@@ -291,9 +305,9 @@ public class SipSecurityUtils {
             SecurityRolesAssociation.setSecurityRoles(null);
         }
 
-        if(account!=null){
+        if (account != null) {
             return new UndertowSipPrincipal(account, deployment, servletInfo);
-        }else{
+        } else {
             return null;
         }
     }

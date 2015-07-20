@@ -34,7 +34,9 @@ import org.mobicents.servlet.sip.core.security.SipPrincipal;
 
 /**
  *
- * This class is based org.mobicents.servlet.sip.catalina.security.CatalinaSipPrincipal class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ * This class is based org.mobicents.servlet.sip.catalina.security.CatalinaSipPrincipal class from sip-servlet-as7 project,
+ * re-implemented for jboss as8 (wildfly) by:
+ *
  * @author kakonyi.istvan@alerant.hu
  */
 public class UndertowSipPrincipal implements SipPrincipal {
@@ -49,14 +51,18 @@ public class UndertowSipPrincipal implements SipPrincipal {
         this.servletInfo = servletInfo;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see java.security.Principal#getName()
      */
     public String getName() {
         return account.getPrincipal().getName();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     *
      * @see org.mobicents.servlet.sip.core.security.SipPrincipal#isUserRole(java.lang.String)
      */
     public boolean isUserInRole(String role) {

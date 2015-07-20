@@ -21,7 +21,6 @@
  */
 package org.mobicents.servlet.sip.undertow.security.authentication;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -73,10 +72,12 @@ import io.undertow.servlet.api.ServletInfo;
 
 /**
  *
- * This class is based org.mobicents.servlet.sip.catalina.security.authentication.DigestAuthenticator class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ * This class is based org.mobicents.servlet.sip.catalina.security.authentication.DigestAuthenticator class from sip-servlet-as7
+ * project, re-implemented for jboss as8 (wildfly) by:
+ *
  * @author kakonyi.istvan@alerant.hu
  *
-*/
+ */
 public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator {
     // ----------------------------------------------------- Instance Variables
     private static final Logger log = Logger.getLogger(SipDigestAuthenticationMechanism.class);
@@ -90,11 +91,11 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
     /**
      * MD5 message digest provider.
      */
-    protected volatile static MessageDigest md5Helper;
+    protected static volatile MessageDigest md5Helper;
 
     static {
         try {
-             md5Helper = MessageDigest.getInstance("MD5");
+            md5Helper = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException(e);
         }
@@ -109,19 +110,16 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
     private SipPrincipal principal;
     // ------------------------------------------------------------- Properties
     /**
-     * The default message digest algorithm to use if we cannot use
-     * the requested one.
+     * The default message digest algorithm to use if we cannot use the requested one.
      */
     protected static final String DEFAULT_ALGORITHM = "MD5";
     /**
-     * The message digest algorithm to be used when generating session
-     * identifiers.  This must be an algorithm supported by the
+     * The message digest algorithm to be used when generating session identifiers. This must be an algorithm supported by the
      * <code>java.security.MessageDigest</code> class on your platform.
      */
     protected String algorithm = DEFAULT_ALGORITHM;
     /**
-     * Should we cache authenticated Principals if the request is part of
-     * an HTTP session?
+     * Should we cache authenticated Principals if the request is part of an HTTP session?
      */
     protected boolean cache = true;
     /**
@@ -129,13 +127,11 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
      */
     protected SipContext context = null;
     /**
-     * Return the MessageDigest implementation to be used when
-     * creating session identifiers.
+     * Return the MessageDigest implementation to be used when creating session identifiers.
      */
     protected MessageDigest digest = null;
     /**
-     * A String initialization parameter used to increase the entropy of
-     * the initialization of our random number generator.
+     * A String initialization parameter used to increase the entropy of the initialization of our random number generator.
      */
     protected String entropy = null;
     /**
@@ -147,8 +143,7 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
      */
     protected Random random = null;
     /**
-     * The Java class name of the random number generator class to be used
-     * when generating session identifiers.
+     * The Java class name of the random number generator class to be used when generating session identifiers.
      */
     protected String randomClass = "java.security.SecureRandom";
     /**
@@ -168,24 +163,22 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
     // --------------------------------------------------------- Public Methods
 
     /**
-     * Authenticate the user making this request, based on the specified
-     * login configuration.  Return <code>true</code> if any specified
-     * constraint has been satisfied, or <code>false</code> if we have
-     * created a response challenge already.
+     * Authenticate the user making this request, based on the specified login configuration. Return <code>true</code> if any
+     * specified constraint has been satisfied, or <code>false</code> if we have created a response challenge already.
      *
      * @param request Request we are processing
      * @param response Response we are creating
-     * @param config Login configuration describing how authentication
-     *              should be performed
+     * @param config Login configuration describing how authentication should be performed
      * @param securityDomain
      * @param deployment
      * @param servletInfo
      * @param sipStack
      *
      * @exception IOException if an input/output error occurs
-    */
+     */
     public boolean authenticate(MobicentsSipServletRequest request, MobicentsSipServletResponse response,
-            MobicentsSipLoginConfig config, String securityDomain, Deployment deployment, ServletInfo servletInfo, SipStack sipStack) throws IOException {
+            MobicentsSipLoginConfig config, String securityDomain, Deployment deployment, ServletInfo servletInfo,
+            SipStack sipStack) throws IOException {
 
         principal = null;
 
@@ -227,10 +220,8 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
     }
 
     /**
-     * Parse the specified authorization credentials, and return the
-     * associated Principal that these credentials authenticate (if any)
-     * from the specified Realm.  If there is no such Principal, return
-     * <code>null</code>.
+     * Parse the specified authorization credentials, and return the associated Principal that these credentials authenticate
+     * (if any) from the specified Realm. If there is no such Principal, return <code>null</code>.
      *
      * @param request HTTP servlet request
      * @param authorization Authorization credentials from this request
@@ -239,29 +230,25 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
      * @param deployment
      * @param servletInfo
      * @param sipStack
-    */
-    protected static SipPrincipal findPrincipal(MobicentsSipServletRequest request,
-                                             String authorization,
-                                             String realmName,
-                                             String securityDomain,
-                                             Deployment deployment,
-                                             ServletInfo servletInfo,
-                                             SipStack sipStack) {
+     */
+    protected static SipPrincipal findPrincipal(MobicentsSipServletRequest request, String authorization, String realmName,
+            String securityDomain, Deployment deployment, ServletInfo servletInfo, SipStack sipStack) {
 
-        //System.out.println("Authorization token : " + authorization);
+        // System.out.println("Authorization token : " + authorization);
         // Validate the authorization credentials format
-        if (authorization == null){
+        if (authorization == null) {
             return (null);
         }
-        if (!authorization.startsWith("Digest ")){
+        if (!authorization.startsWith("Digest ")) {
             return (null);
         }
         String tmpAuthorization = authorization.substring(7).trim();
 
         // Bugzilla 37132: http://issues.apache.org/bugzilla/show_bug.cgi?id=37132
-        // The solution of 37132 doesn't work with : response="2d05f1206becab904c1f311f205b405b",cnonce="5644k1k670",username="admin",nc=00000001,qop=auth,nonce="b6c73ab509830b8c0897984f6b0526e8",realm="sip-servlets-realm",opaque="9ed6d115d11f505f9ee20f6a68654cc2",uri="sip:192.168.1.142",algorithm=MD5
+        // The solution of 37132 doesn't work with :
+        // response="2d05f1206becab904c1f311f205b405b",cnonce="5644k1k670",username="admin",nc=00000001,qop=auth,nonce="b6c73ab509830b8c0897984f6b0526e8",realm="sip-servlets-realm",opaque="9ed6d115d11f505f9ee20f6a68654cc2",uri="sip:192.168.1.142",algorithm=MD5
         // That's why I am going back to simple comma (Vladimir). TODO: Review this.
-        String[] tokens = tmpAuthorization.split(",");//(?=(?:[^\"]*\"[^\"]*\")+$)");
+        String[] tokens = tmpAuthorization.split(",");// (?=(?:[^\"]*\"[^\"]*\")+$)");
 
         String userName = null;
         String nOnce = null;
@@ -274,70 +261,69 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
 
         for (int i = 0; i < tokens.length; i++) {
             String currentToken = tokens[i];
-            if (currentToken.length() == 0){
+            if (currentToken.length() == 0) {
                 continue;
             }
             int equalSign = currentToken.indexOf('=');
-            if (equalSign < 0){
+            if (equalSign < 0) {
                 return null;
             }
-            String currentTokenName =
-                currentToken.substring(0, equalSign).trim();
-            String currentTokenValue =
-                currentToken.substring(equalSign + 1).trim();
-            if ("username".equals(currentTokenName)){
+            String currentTokenName = currentToken.substring(0, equalSign).trim();
+            String currentTokenValue = currentToken.substring(equalSign + 1).trim();
+            if ("username".equals(currentTokenName)) {
                 userName = removeQuotes(currentTokenValue);
             }
-            if ("realm".equals(currentTokenName)){
+            if ("realm".equals(currentTokenName)) {
                 realmName = removeQuotes(currentTokenValue, true);
             }
-            if ("nonce".equals(currentTokenName)){
+            if ("nonce".equals(currentTokenName)) {
                 nOnce = removeQuotes(currentTokenValue);
             }
-            if ("nc".equals(currentTokenName)){
+            if ("nc".equals(currentTokenName)) {
                 nc = removeQuotes(currentTokenValue);
             }
-            if ("cnonce".equals(currentTokenName)){
+            if ("cnonce".equals(currentTokenName)) {
                 cnonce = removeQuotes(currentTokenValue);
             }
-            if ("qop".equals(currentTokenName)){
+            if ("qop".equals(currentTokenName)) {
                 qop = removeQuotes(currentTokenValue);
                 DigestQop qopObj = DigestQop.forName(qop);
             }
-            if ("uri".equals(currentTokenName)){
+            if ("uri".equals(currentTokenName)) {
                 uri = removeQuotes(currentTokenValue);
             }
-            if ("response".equals(currentTokenName)){
+            if ("response".equals(currentTokenName)) {
                 response = removeQuotes(currentTokenValue);
             }
         }
 
-        if ( (userName == null) || (realmName == null) || (nOnce == null)
-             || (uri == null) || (response == null) ){
+        if ((userName == null) || (realmName == null) || (nOnce == null) || (uri == null) || (response == null)) {
             return null;
         }
 
         // Second MD5 digest used to calculate the digest :
         // MD5(Method + ":" + uri)
         String a2 = method + ":" + uri;
-        //System.out.println("A2:" + a2);
+        // System.out.println("A2:" + a2);
 
         byte[] buffer = null;
-        synchronized (md5Helper){
+        synchronized (md5Helper) {
             buffer = md5Helper.digest(a2.getBytes());
         }
         String md5a2 = MD5_ENCODER.encode(buffer);
 
-        //taken from https://github.com/jbossas/jboss-as/blob/7.1.2.Final/web/src/main/java/org/jboss/as/web/security/SecurityContextAssociationValve.java#L86
+        // taken from
+        // https://github.com/jbossas/jboss-as/blob/7.1.2.Final/web/src/main/java/org/jboss/as/web/security/SecurityContextAssociationValve.java#L86
         SecurityContext sc = SecurityActions.getSecurityContext();
 
-        if (sc == null){
-            if (log.isDebugEnabled()){
+        if (sc == null) {
+            if (log.isDebugEnabled()) {
                 log.debug("Security Domain " + securityDomain + " for Realm " + realmName);
             }
-            if (securityDomain == null){
-                if (log.isDebugEnabled()){
-                    log.debug("Security Domain is null using default security domain " + SIPSecurityConstants.DEFAULT_SIP_APPLICATION_POLICY + " for Realm " + realmName);
+            if (securityDomain == null) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Security Domain is null using default security domain "
+                            + SIPSecurityConstants.DEFAULT_SIP_APPLICATION_POLICY + " for Realm " + realmName);
                 }
                 securityDomain = SIPSecurityConstants.DEFAULT_SIP_APPLICATION_POLICY;
             }
@@ -347,30 +333,34 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
         }
 
         try {
-            Properties users=new Properties();
+            Properties users = new Properties();
             String dir = System.getProperty("jboss.server.config.dir");
             String fileName = "sip-servlets-users.properties";
             boolean storedPasswordIsA1Hash = true;
 
-            if(sipStack instanceof SipStackImpl){
-                Properties stackProperties = ((SipStackImpl)sipStack).getConfigurationProperties();
-                fileName = stackProperties.getProperty(SipDigestAuthenticationMechanism.DIGEST_AUTH_USERS_PROPERTIES, "sip-servlets-users.properties");
-                storedPasswordIsA1Hash = Boolean.parseBoolean(stackProperties.getProperty(SipDigestAuthenticationMechanism.DIGEST_AUTH_PASSWORD_IS_A1HASH, "true"));
+            if (sipStack instanceof SipStackImpl) {
+                Properties stackProperties = ((SipStackImpl) sipStack).getConfigurationProperties();
+                fileName = stackProperties.getProperty(SipDigestAuthenticationMechanism.DIGEST_AUTH_USERS_PROPERTIES,
+                        "sip-servlets-users.properties");
+                storedPasswordIsA1Hash = Boolean.parseBoolean(stackProperties.getProperty(
+                        SipDigestAuthenticationMechanism.DIGEST_AUTH_PASSWORD_IS_A1HASH, "true"));
             }
 
             try {
-                users = SipDigestAuthenticationMechanism.loadProperties(dir+"/"+fileName, dir+"/"+fileName);
+                users = SipDigestAuthenticationMechanism.loadProperties(dir + "/" + fileName, dir + "/" + fileName);
             } catch (IOException e) {
-                log.warn("Failed to load user properties file from location " + dir+"/"+fileName + ", please check digest security config in standalone and mss sip stack property files!");
+                log.warn("Failed to load user properties file from location " + dir + "/" + fileName
+                        + ", please check digest security config in standalone and mss sip stack property files!");
             }
 
             String storedPassword = users.getProperty(userName, "");
-            Account account = SipDigestAuthenticationMechanism.authenticate(userName, storedPassword, response, nOnce, nc, cnonce, method, uri, qop, realmName, md5a2, deployment, storedPasswordIsA1Hash);
+            Account account = SipDigestAuthenticationMechanism.authenticate(userName, storedPassword, response, nOnce, nc,
+                    cnonce, method, uri, qop, realmName, md5a2, deployment, storedPasswordIsA1Hash);
 
-            if(account==null){
+            if (account == null) {
                 return null;
-            }else{
-                return (new UndertowSipPrincipal(account,deployment,servletInfo));
+            } else {
+                return (new UndertowSipPrincipal(account, deployment, servletInfo));
             }
         } finally {
             SecurityActions.clearSecurityContext();
@@ -379,73 +369,80 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
     }
 
     /*
-     * Return the Account associated with the specified username, which matches the digest calculated using the given parameters using the method described in rfc2617; otherwise return null.
+     * Return the Account associated with the specified username, which matches the digest calculated using the given parameters
+     * using the method described in rfc2617; otherwise return null.
+     *
      * @param userName Username of the Principal to look up
+     *
      * @param storedPassword
+     *
      * @param clientDigest Digest which has been submitted by the client
+     *
      * @param nOnce Unique (or supposedly unique) token which has been used for this request
+     *
      * @param nc
+     *
      * @param cnonce
+     *
      * @param method
+     *
      * @param uri
+     *
      * @param qop
+     *
      * @param realmName Realm name
+     *
      * @param md5a2 Second MD5 digest used to calculate the digest : MD5(Method + ":" + uri)
+     *
      * @param deployment
+     *
      * @param storedPasswordIsA1Hash
-    */
-    private static Account authenticate(String userName,
-            String storedPassword,
-            String clientDigest,
-            String nOnce,
-            String nc,
-            String cnonce,
-            String method,
-            String uri,
-            String qop,
-            String realmName,
-            String md5a2,
-            Deployment deployment,
+     */
+    private static Account authenticate(String userName, String storedPassword, String clientDigest, String nOnce, String nc,
+            String cnonce, String method, String uri, String qop, String realmName, String md5a2, Deployment deployment,
             boolean storedPasswordIsA1Hash) {
 
-        CallbackHandlerPolicyContextHandler.setCallbackHandler(new DigestCallbackHandler(userName, nOnce, nc, cnonce, qop, realmName, md5a2));
+        CallbackHandlerPolicyContextHandler.setCallbackHandler(new DigestCallbackHandler(userName, nOnce, nc, cnonce, qop,
+                realmName, md5a2));
 
         String serverDigest = "";
-        if(storedPasswordIsA1Hash){
-            //storedPassword is HA1 in this case
-            serverDigest = MessageDigestResponseAlgorithm.calculateResponse(md5Helper.getAlgorithm(), storedPassword, nOnce, nc, cnonce, method, uri, "", qop) ;
-        }else{
-            serverDigest = MessageDigestResponseAlgorithm.calculateResponse(md5Helper.getAlgorithm(), userName, realmName, storedPassword, nOnce, nc, cnonce, method, uri, "", qop) ;
+        if (storedPasswordIsA1Hash) {
+            // storedPassword is HA1 in this case
+            serverDigest = MessageDigestResponseAlgorithm.calculateResponse(md5Helper.getAlgorithm(), storedPassword, nOnce,
+                    nc, cnonce, method, uri, "", qop);
+        } else {
+            serverDigest = MessageDigestResponseAlgorithm.calculateResponse(md5Helper.getAlgorithm(), userName, realmName,
+                    storedPassword, nOnce, nc, cnonce, method, uri, "", qop);
         }
 
         if (serverDigest.equals(clientDigest)) {
-            //lest's reauth with stored password (to force successful authentication) to make wildfly to create Account and Principal for us
-            //this is because wildfly bug: https://issues.jboss.org/browse/WFLY-3659
+            // lest's reauth with stored password (to force successful authentication) to make wildfly to create Account and
+            // Principal for us
+            // this is because wildfly bug: https://issues.jboss.org/browse/WFLY-3659
             final IdentityManager identityManager = deployment.getDeploymentInfo().getIdentityManager();
             PasswordCredential credential = new PasswordCredential(storedPassword.toCharArray());
             Account account = identityManager.verify(userName, credential);
 
             return account;
-       }
-       return null;
+        }
+        return null;
     }
 
-    //helper method to load digest user property file. Copied from org.jboss.security.auth.spi.Util
-    private static Properties loadProperties(String defaultsName, String propertiesName)
-        throws IOException{
+    // helper method to load digest user property file. Copied from org.jboss.security.auth.spi.Util
+    private static Properties loadProperties(String defaultsName, String propertiesName) throws IOException {
         Properties bundle = new Properties();
         ClassLoader loader = SecurityActions.getContextClassLoader();
         URL defaultUrl = null;
         URL url = null;
         // First check for local visibility via a URLClassLoader.findResource
-        if( loader instanceof URLClassLoader ){
+        if (loader instanceof URLClassLoader) {
             URLClassLoader ucl = (URLClassLoader) loader;
-            defaultUrl = SecurityActions.findResource(ucl,defaultsName);
-            url = SecurityActions.findResource(ucl,propertiesName);
+            defaultUrl = SecurityActions.findResource(ucl, defaultsName);
+            url = SecurityActions.findResource(ucl, propertiesName);
             PicketBoxLogger.LOGGER.traceAttemptToLoadResource(propertiesName);
         }
         // Do a general resource search
-        if( defaultUrl == null ) {
+        if (defaultUrl == null) {
             defaultUrl = loader.getResource(defaultsName);
             if (defaultUrl == null) {
                 try {
@@ -453,13 +450,13 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
                 } catch (MalformedURLException mue) {
                     PicketBoxLogger.LOGGER.debugFailureToOpenPropertiesFromURL(mue);
                     File tmp = new File(defaultsName);
-                    if (tmp.exists()){
+                    if (tmp.exists()) {
                         defaultUrl = tmp.toURI().toURL();
                     }
                 }
             }
         }
-        if( url == null ) {
+        if (url == null) {
             url = loader.getResource(propertiesName);
             if (url == null) {
                 try {
@@ -467,13 +464,13 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
                 } catch (MalformedURLException mue) {
                     PicketBoxLogger.LOGGER.debugFailureToOpenPropertiesFromURL(mue);
                     File tmp = new File(propertiesName);
-                    if (tmp.exists()){
+                    if (tmp.exists()) {
                         url = tmp.toURI().toURL();
                     }
                 }
             }
         }
-        if( url == null && defaultUrl == null ){
+        if (url == null && defaultUrl == null) {
 
             String propertiesFiles = propertiesName + "/" + defaultsName;
             throw PicketBoxMessages.MESSAGES.unableToFindPropertiesFile(propertiesFiles);
@@ -511,24 +508,22 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
         return bundle;
     }
 
-    private static void safeClose(InputStream fis){
-        try{
-            if(fis != null){
+    private static void safeClose(InputStream fis) {
+        try {
+            if (fis != null) {
                 fis.close();
             }
+        } catch (Exception e) {
         }
-        catch(Exception e)
-        {}
     }
 
     /**
-     * Parse the username from the specified authorization string.  If none
-     * can be identified, return <code>null</code>
+     * Parse the username from the specified authorization string. If none can be identified, return <code>null</code>
      *
      * @param authorization Authorization string to be parsed
      */
     protected String parseUsername(String authorization) {
-        //System.out.println("Authorization token : " + authorization);
+        // System.out.println("Authorization token : " + authorization);
         // Validate the authorization credentials format
         if (authorization == null)
             return (null);
@@ -536,18 +531,15 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
             return (null);
         String tmpAuthorization = authorization.substring(7).trim();
 
-        StringTokenizer commaTokenizer =
-            new StringTokenizer(tmpAuthorization, ",");
+        StringTokenizer commaTokenizer = new StringTokenizer(tmpAuthorization, ",");
 
         while (commaTokenizer.hasMoreTokens()) {
             String currentToken = commaTokenizer.nextToken();
             int equalSign = currentToken.indexOf('=');
             if (equalSign < 0)
                 return null;
-            String currentTokenName =
-                currentToken.substring(0, equalSign).trim();
-            String currentTokenValue =
-                currentToken.substring(equalSign + 1).trim();
+            String currentTokenName = currentToken.substring(0, equalSign).trim();
+            String currentTokenValue = currentToken.substring(equalSign + 1).trim();
             if ("username".equals(currentTokenName))
                 return (removeQuotes(currentTokenValue));
         }
@@ -555,14 +547,11 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
     }
 
     /**
-     * Removes the quotes on a string. RFC2617 states quotes are optional for
-     * all parameters except realm.
+     * Removes the quotes on a string. RFC2617 states quotes are optional for all parameters except realm.
      */
-    protected static String removeQuotes(String quotedString,
-                                         boolean quotesRequired) {
-        //support both quoted and non-quoted
-        if (quotedString.length() > 0 && quotedString.charAt(0) != '"' &&
-                !quotesRequired) {
+    protected static String removeQuotes(String quotedString, boolean quotesRequired) {
+        // support both quoted and non-quoted
+        if (quotedString.length() > 0 && quotedString.charAt(0) != '"' && !quotesRequired) {
             return quotedString;
         } else if (quotedString.length() > 2) {
             return quotedString.substring(1, quotedString.length() - 1);
@@ -579,17 +568,15 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
     }
 
     /**
-     * Generate a unique token. The token is generated according to the
-     * following pattern. NOnceToken = Base64 ( MD5 ( client-IP ":"
-     * time-stamp ":" private-key ) ).
+     * Generate a unique token. The token is generated according to the following pattern. NOnceToken = Base64 ( MD5 ( client-IP
+     * ":" time-stamp ":" private-key ) ).
      *
      * @param request HTTP Servlet request
      */
     protected String generateNOnce(MobicentsSipServletRequest request) {
         long currentTime = System.currentTimeMillis();
 
-        String nOnceValue = request.getRemoteAddr() + ":" +
-            currentTime + ":" + key;
+        String nOnceValue = request.getRemoteAddr() + ":" + currentTime + ":" + key;
 
         byte[] buffer = null;
         synchronized (md5Helper) {
@@ -600,7 +587,7 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
         return nOnceValue;
     }
 
-    /**
+/**
      * Generates the WWW-Authenticate header.
      * <p>
      * The header MUST follow this template :
@@ -627,28 +614,23 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
      *              should be performed
      * @param nOnce nonce token
     */
-    protected void setAuthenticateHeader(MobicentsSipServletRequest request,
-                                         MobicentsSipServletResponse response,
-                                         MobicentsSipLoginConfig config,
-                                         String nOnce) {
+    protected void setAuthenticateHeader(MobicentsSipServletRequest request, MobicentsSipServletResponse response,
+            MobicentsSipLoginConfig config, String nOnce) {
         // Get the realm name
-        String realmName = ((SipLoginConfig)config).getRealmName();
+        String realmName = ((SipLoginConfig) config).getRealmName();
         if (realmName == null)
-            realmName = request.getServerName() + ":"
-                + request.getServerPort();
+            realmName = request.getServerName() + ":" + request.getServerPort();
 
         byte[] buffer = null;
         synchronized (md5Helper) {
             buffer = md5Helper.digest(nOnce.getBytes());
         }
 
-        String authenticateHeader = "Digest realm=\"" + realmName + "\", "
-            +  "qop=\"auth\", nonce=\"" + nOnce + "\", " + "opaque=\""
-            + MD5_ENCODER.encode(buffer) + "\"";
+        String authenticateHeader = "Digest realm=\"" + realmName + "\", " + "qop=\"auth\", nonce=\"" + nOnce + "\", "
+                + "opaque=\"" + MD5_ENCODER.encode(buffer) + "\"";
 
         // There are different headers for different types of auth
-        if(response.getStatus() ==
-            MobicentsSipServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED) {
+        if (response.getStatus() == MobicentsSipServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED) {
             response.setHeader("Proxy-Authenticate", authenticateHeader);
         } else {
             response.setHeader("WWW-Authenticate", authenticateHeader);
@@ -668,66 +650,59 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
      * @return an authorisation header in response to authHeader.
      *
      * @throws OperationFailedException if auth header was malformated.
-    */
+     */
     @Override
-    public AuthorizationHeader getAuthorizationHeader(
-                String                method,
-                String                uri,
-                String                requestBody,
-                Header                authHeader,
-                String                username,
-                String                password,
-                String                nonce,
-                int                   nc){
+    public AuthorizationHeader getAuthorizationHeader(String method, String uri, String requestBody, Header authHeader,
+            String username, String password, String nonce, int nc) {
         String response = null;
         boolean isResponseHeader = true;
         WWWAuthenticateHeader wwwAuthenticateHeader = null;
-        if(authHeader instanceof WWWAuthenticateHeader) {
+        if (authHeader instanceof WWWAuthenticateHeader) {
             wwwAuthenticateHeader = (WWWAuthenticateHeader) authHeader;
         }
 
         AuthorizationHeader authorizationHeader = null;
-        if(authHeader instanceof AuthorizationHeader) {
-            authorizationHeader =  (AuthorizationHeader) authHeader;
+        if (authHeader instanceof AuthorizationHeader) {
+            authorizationHeader = (AuthorizationHeader) authHeader;
             isResponseHeader = false;
         }
 
         // JvB: authHeader.getQop() is a quoted _list_ of qop values
         // (e.g. "auth,auth-int") Client is supposed to pick one
         String qopList = null;
-        if(isResponseHeader) {
+        if (isResponseHeader) {
             qopList = wwwAuthenticateHeader.getQop();
         } else {
             qopList = authorizationHeader.getQop();
         }
         String algorithm = null;
-        if(isResponseHeader) {
+        if (isResponseHeader) {
             algorithm = wwwAuthenticateHeader.getAlgorithm();
         } else {
             algorithm = authorizationHeader.getAlgorithm();
         }
         String realm = null;
-        if(isResponseHeader) {
+        if (isResponseHeader) {
             realm = wwwAuthenticateHeader.getRealm();
         } else {
             realm = authorizationHeader.getRealm();
         }
         String scheme = null;
-        if(isResponseHeader) {
+        if (isResponseHeader) {
             scheme = wwwAuthenticateHeader.getScheme();
         } else {
             scheme = authorizationHeader.getScheme();
         }
         String opaque = null;
-        if(isResponseHeader) {
+        if (isResponseHeader) {
             opaque = wwwAuthenticateHeader.getOpaque();
         } else {
             opaque = authorizationHeader.getOpaque();
         }
         String qop = (qopList != null) ? "auth" : null;
-        //String nc_value = "00000001";
+        // String nc_value = "00000001";
         String nc_value = String.format("%08x", nc);
-        //String cnonce = "xyz";
+        // String cnonce = "xyz";
         long currentTime = System.currentTimeMillis();
         String nOnceValue = currentTime + ":" + "mobicents" + response;
         byte[] buffer = null;
@@ -737,21 +712,12 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
         String cnonce = MD5_ENCODER.encode(buffer);
 
         try {
-            response = MessageDigestResponseAlgorithm.calculateResponse(
-                algorithm,
-                username,
-                realm,
-                password,
-                nonce,
-                nc_value, // JvB added
-                cnonce,   // JvB added
-                method,
-                uri,
-                requestBody,
-                qop);//jvb changed
+            response = MessageDigestResponseAlgorithm.calculateResponse(algorithm, username, realm, password, nonce, nc_value, // JvB
+                                                                                                                               // added
+                    cnonce, // JvB added
+                    method, uri, requestBody, qop);// jvb changed
         } catch (NullPointerException exc) {
-            throw new IllegalStateException(
-                "The authenticate header was malformatted", exc);
+            throw new IllegalStateException("The authenticate header was malformatted", exc);
         }
 
         AuthorizationHeader authorization = null;
@@ -776,18 +742,16 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
             }
 
             // jvb added
-            if (qop!=null) {
+            if (qop != null) {
                 authorization.setQop(qop);
                 authorization.setCNonce(cnonce);
-                authorization.setNonceCount( Integer.parseInt(nc_value, 16) );
+                authorization.setNonceCount(Integer.parseInt(nc_value, 16));
             }
 
             authorization.setResponse(response);
 
-        }
-        catch (ParseException ex) {
-            throw new SecurityException(
-                "Failed to create an authorization header!", ex);
+        } catch (ParseException ex) {
+            throw new SecurityException("Failed to create an authorization header!", ex);
         }
 
         return authorization;
@@ -798,8 +762,7 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
     }
 
     /**
-     * Return the MessageDigest object to be used for calculating
-     * session identifiers.  If none has been created yet, initialize
+     * Return the MessageDigest object to be used for calculating session identifiers. If none has been created yet, initialize
      * one the first time this method is called.
      */
     protected synchronized MessageDigest getDigest() {
@@ -818,9 +781,8 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
     }
 
     /**
-     * Return the random number generator instance we should use for
-     * generating session identifiers.  If there is no such generator
-     * currently defined, construct and seed a new one.
+     * Return the random number generator instance we should use for generating session identifiers. If there is no such
+     * generator currently defined, construct and seed a new one.
      */
     protected synchronized Random getRandom() {
         if (this.random == null) {
@@ -828,7 +790,7 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
                 Class clazz = Class.forName(randomClass);
                 this.random = (Random) clazz.newInstance();
                 long seed = System.currentTimeMillis();
-                char entropy[] = getEntropy().toCharArray();
+                char[] entropy = getEntropy().toCharArray();
                 for (int i = 0; i < entropy.length; i++) {
                     long update = ((byte) entropy[i]) << ((i % 8) * 8);
                     seed ^= update;
@@ -842,10 +804,8 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
     }
 
     /**
-     * Register an authenticated Principal and authentication type in our
-     * request, in the current session (if there is one), and with our
-     * SingleSignOn valve, if there is one.  Set the appropriate cookie
-     * to be returned.
+     * Register an authenticated Principal and authentication type in our request, in the current session (if there is one), and
+     * with our SingleSignOn valve, if there is one. Set the appropriate cookie to be returned.
      *
      * @param request The servlet request we are processing
      * @param response The servlet response we are generating
@@ -854,8 +814,8 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
      * @param username Username used to authenticate (if any)
      * @param password Password used to authenticate (if any)
      */
-    protected void register(MobicentsSipServletRequest request, MobicentsSipServletResponse response,
-            SipPrincipal principal, String authType, String username, String password) {
+    protected void register(MobicentsSipServletRequest request, MobicentsSipServletResponse response, SipPrincipal principal,
+            String authType, String username, String password) {
 
         if (log.isDebugEnabled()) {
             // Bugzilla 39255: http://issues.apache.org/bugzilla/show_bug.cgi?id=39255
@@ -904,12 +864,11 @@ public class SipDigestAuthenticationMechanism implements SipDigestAuthenticator 
     }
 
     /**
-     * Return the entropy increaser value, or compute a semi-useful value
-     * if this String has not yet been set.
+     * Return the entropy increaser value, or compute a semi-useful value if this String has not yet been set.
      */
     public String getEntropy() {
         // Calculate a semi-useful value if this has not been set
-        if (this.entropy == null){
+        if (this.entropy == null) {
             setEntropy(this.toString());
         }
         return (this.entropy);

@@ -40,9 +40,12 @@ import org.mobicents.servlet.sip.core.session.SipManagerDelegate;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.core.session.SipStandardManagerDelegate;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+
 /**
  *
- * This class is based on org.mobicents.servlet.sip.catalina.SipStandardManager class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ * This class is based on org.mobicents.servlet.sip.catalina.SipStandardManager class from sip-servlet-as7 project,
+ * re-implemented for jboss as8 (wildfly) by:
+ *
  * @author kakonyi.istvan@alerant.hu
  *
  */
@@ -105,8 +108,8 @@ public class UndertowSipManager extends InMemorySessionManager implements SipMan
     }
 
     @Override
-    public MobicentsSipSession getSipSession(MobicentsSipSessionKey key, boolean create,
-            MobicentsSipFactory sipFactoryImpl, MobicentsSipApplicationSession mobicentsSipApplicationSession) {
+    public MobicentsSipSession getSipSession(MobicentsSipSessionKey key, boolean create, MobicentsSipFactory sipFactoryImpl,
+            MobicentsSipApplicationSession mobicentsSipApplicationSession) {
         return sipManagerDelegate.getSipSession((SipSessionKey) key, create, (SipFactoryImpl) sipFactoryImpl,
                 mobicentsSipApplicationSession);
     }

@@ -52,14 +52,14 @@ import org.mobicents.servlet.sip.undertow.SipContextImpl;
 import org.mobicents.servlet.sip.undertow.SipServletImpl;
 
 /**
- * Facade object which masks the internal <code>ApplicationContext</code>
- * object from the web application.
+ * Facade object which masks the internal <code>ApplicationContext</code> object from the web application.
  *
  * @author Remy Maucherat
  * @author Jean-Francois Arcand
  * @version $Id: ApplicationContextFacade.java 1002556 2010-09-29 10:07:10Z markt $
  *
- * This class is based on org.mobicents.servlet.sip.startup.ConvergedApplicationContextFacade class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ *          This class is based on org.mobicents.servlet.sip.startup.ConvergedApplicationContextFacade class from
+ *          sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 
@@ -79,8 +79,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
     // ----------------------------------------------------------- Constructors
 
     /**
-     * Construct a new instance of this class, associated with the specified
-     * Context instance.
+     * Construct a new instance of this class, associated with the specified Context instance.
      *
      * @param context The associated Context instance
      */
@@ -399,8 +398,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
 
     public FilterRegistration.Dynamic addFilter(String filterName, Class<? extends Filter> filterClass) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (FilterRegistration.Dynamic) doPrivileged("addFilter",
-                    new Object[] { filterName, filterClass.getName() });
+            return (FilterRegistration.Dynamic) doPrivileged("addFilter", new Object[] { filterName, filterClass.getName() });
         } else {
             return context.addFilter(filterName, filterClass);
         }
@@ -442,8 +440,8 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
 
     public ServletRegistration.Dynamic addServlet(String servletName, Servlet servlet) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (ServletRegistration.Dynamic) doPrivileged("addServlet",
-                    new Class[] { String.class, Servlet.class }, new Object[] { servletName, servlet });
+            return (ServletRegistration.Dynamic) doPrivileged("addServlet", new Class[] { String.class, Servlet.class },
+                    new Object[] { servletName, servlet });
         } else {
             return context.addServlet(servletName, servlet);
         }
@@ -643,8 +641,8 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
     }
 
     /**
-     * Use reflection to invoke the requested method. Cache the method object
-     * to speed up the process
+     * Use reflection to invoke the requested method. Cache the method object to speed up the process
+     *
      * @param methodName The method to call.
      * @param params The arguments passed to the called method.
      */
@@ -657,15 +655,13 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
     }
 
     /**
-     * Use reflection to invoke the requested method. Cache the method object
-     * to speed up the process
-     * @param appContext The AppliationContext object on which the method
-     *                   will be invoked
+     * Use reflection to invoke the requested method. Cache the method object to speed up the process
+     *
+     * @param appContext The AppliationContext object on which the method will be invoked
      * @param methodName The method to call.
      * @param params The arguments passed to the called method.
      */
-    private Object invokeMethod(ServletContextImpl appContext, final String methodName, Object[] params)
-            throws Throwable {
+    private Object invokeMethod(ServletContextImpl appContext, final String methodName, Object[] params) throws Throwable {
 
         try {
             Method method = objectCache.get(methodName);
@@ -684,8 +680,8 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
     }
 
     /**
-     * Use reflection to invoke the requested method. Cache the method object
-     * to speed up the process
+     * Use reflection to invoke the requested method. Cache the method object to speed up the process
+     *
      * @param methodName The method to invoke.
      * @param clazz The class where the method is.
      * @param params The arguments passed to the called method.
@@ -710,9 +706,9 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
 
     /**
      * Executes the method of the specified <code>ApplicationContext</code>
+     *
      * @param method The method object to be invoked.
-     * @param context The AppliationContext object on which the method
-     *                   will be invoked
+     * @param context The AppliationContext object on which the method will be invoked
      * @param params The arguments passed to the called method.
      */
     private Object executeMethod(final Method method, final ServletContextImpl context, final Object[] params)
@@ -732,6 +728,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
     /**
      *
      * Throw the real exception.
+     *
      * @param ex The current exception
      */
     private void handleException(Exception ex) throws Throwable {

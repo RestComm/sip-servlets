@@ -35,7 +35,8 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 /**
  * @author jean.deruelle@gmail.com
  *
- * This class is based on org.mobicents.servlet.sip.message.Servlet3SipServletResponseImpl class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on org.mobicents.servlet.sip.message.Servlet3SipServletResponseImpl class from sip-servlet-as7
+ *         project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  *
  */
@@ -46,9 +47,9 @@ public class Servlet3SipServletMessageFactory implements MobicentsSipServletMess
     /*
      * (non-Javadoc)
      *
-     * @see org.mobicents.servlet.sip.core.MobicentsSipServletMessageFactory#
-     * createSipServletRequest(javax.sip.message.Request, org.mobicents.servlet.sip.core.MobicentsSipFactory,
-     * org.mobicents.servlet.sip.core.session.MobicentsSipSession, javax.sip.Transaction, javax.sip.Dialog, boolean)
+     * @see org.mobicents.servlet.sip.core.MobicentsSipServletMessageFactory# createSipServletRequest(javax.sip.message.Request,
+     * org.mobicents.servlet.sip.core.MobicentsSipFactory, org.mobicents.servlet.sip.core.session.MobicentsSipSession,
+     * javax.sip.Transaction, javax.sip.Dialog, boolean)
      */
     @Override
     public MobicentsSipServletRequest createSipServletRequest(Request request, MobicentsSipSession sipSession,
@@ -61,19 +62,17 @@ public class Servlet3SipServletMessageFactory implements MobicentsSipServletMess
      *
      * @see org.mobicents.servlet.sip.core.MobicentsSipServletMessageFactory#
      * createSipServletResponse(javax.sip.message.Response, org.mobicents.servlet.sip.core.MobicentsSipFactory,
-     * javax.sip.Transaction, org.mobicents.servlet.sip.core.session.MobicentsSipSession, javax.sip.Dialog, boolean,
-     * boolean)
+     * javax.sip.Transaction, org.mobicents.servlet.sip.core.session.MobicentsSipSession, javax.sip.Dialog, boolean, boolean)
      */
     @Override
     public MobicentsSipServletResponse createSipServletResponse(Response response, Transaction transaction,
             MobicentsSipSession session, Dialog dialog, boolean hasBeenReceived, boolean isRetransmission) {
-        return new Servlet3SipServletResponseImpl(response, sipFactoryImpl, transaction, session, dialog,
-                hasBeenReceived, isRetransmission);
+        return new Servlet3SipServletResponseImpl(response, sipFactoryImpl, transaction, session, dialog, hasBeenReceived,
+                isRetransmission);
     }
 
     /**
-     * @param mobicentsSipFactory
-     *            the mobicentsSipFactory to set
+     * @param mobicentsSipFactory the mobicentsSipFactory to set
      */
     public void setMobicentsSipFactory(MobicentsSipFactory mobicentsSipFactory) {
         this.sipFactoryImpl = (SipFactoryImpl) mobicentsSipFactory;

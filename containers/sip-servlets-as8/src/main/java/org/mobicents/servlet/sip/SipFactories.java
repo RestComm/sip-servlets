@@ -30,14 +30,17 @@ import javax.sip.header.HeaderFactory;
 import javax.sip.message.MessageFactory;
 
 import org.apache.log4j.Logger;
+
 /**
- * 
- * This class is based on org.mobicents.servlet.sip.SipFactories class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ *
+ * This class is based on org.mobicents.servlet.sip.SipFactories class from sip-servlet-as7 project, re-implemented for jboss
+ * as8 (wildfly) by:
+ *
  * @author kakonyi.istvan@alerant.hu
  *
  */
 public class SipFactories {
-    private final static Logger logger = Logger.getLogger(SipFactories.class.getCanonicalName());
+    private static final Logger logger = Logger.getLogger(SipFactories.class.getCanonicalName());
 
     private static boolean initialized;
 

@@ -26,9 +26,12 @@ import io.undertow.servlet.api.LoginConfig;
 import java.util.HashMap;
 
 import org.mobicents.servlet.sip.core.security.MobicentsSipLoginConfig;
+
 /**
  *
- * This class is based on  org.mobicents.servlet.sip.catalina.SipLoginConfig class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ * This class is based on org.mobicents.servlet.sip.catalina.SipLoginConfig class from sip-servlet-as7 project, re-implemented
+ * for jboss as8 (wildfly) by:
+ *
  * @author kakonyi.istvan@alerant.hu
  *
  */
@@ -38,7 +41,7 @@ public class SipLoginConfig extends LoginConfig implements MobicentsSipLoginConf
     private HashMap<String, String> identityAssertionSchemes = new HashMap<String, String>();
 
     public SipLoginConfig(String realmName, String loginPage, String errorPage) {
-        super(realmName,loginPage,errorPage);
+        super(realmName, loginPage, errorPage);
     }
 
     public SipLoginConfig(String realmName) {
@@ -46,7 +49,7 @@ public class SipLoginConfig extends LoginConfig implements MobicentsSipLoginConf
     }
 
     public SipLoginConfig(String mechanismName, String realmName, String loginPage, String errorPage) {
-        super(realmName,loginPage,errorPage);
+        super(realmName, loginPage, errorPage);
         super.addFirstAuthMethod(mechanismName);
     }
 

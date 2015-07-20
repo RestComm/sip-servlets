@@ -44,7 +44,7 @@ import org.mobicents.servlet.sip.ruby.SipRubyController;
  * @author kakonyi.istvan@alerant.hu
  *
  */
-public class DeploymentInfoFacade implements Cloneable{
+public class DeploymentInfoFacade implements Cloneable {
     public static AttachmentKey<DeploymentInfoFacade> ATTACHMENT_KEY = AttachmentKey.create(DeploymentInfoFacade.class);
 
     private DeploymentInfo deploymentInfo;
@@ -75,17 +75,18 @@ public class DeploymentInfoFacade implements Cloneable{
     protected transient Map<String, MobicentsSipServlet> childrenMap;
     protected transient Map<String, MobicentsSipServlet> childrenMapByClassName;
 
-    //default constructor:
-    public DeploymentInfoFacade(){}
+    // default constructor:
+    public DeploymentInfoFacade() {
+    }
 
-    public void addDeploymentInfo(DeploymentInfo info) throws ServletException{
-        if(this.deploymentInfo==null){
-            if(info!=null){
-                this.deploymentInfo=info;
-            }else{
+    public void addDeploymentInfo(DeploymentInfo info) throws ServletException {
+        if (this.deploymentInfo == null) {
+            if (info != null) {
+                this.deploymentInfo = info;
+            } else {
                 throw new ServletException("Cannot set deploymentInfo to null!");
             }
-        }else{
+        } else {
             throw new ServletException("DeploymentInfo already set!");
         }
     }
@@ -206,9 +207,8 @@ public class DeploymentInfoFacade implements Cloneable{
             if (sipServletMapping.getMatchingRule().matches(sipServletRequest)) {
                 return sipServletMapping;
             } else {
-                logger.debug("Following mapping rule didn't match : servletName => "
-                        + sipServletMapping.getServletName() + " | expression = "
-                        + sipServletMapping.getMatchingRule().getExpression());
+                logger.debug("Following mapping rule didn't match : servletName => " + sipServletMapping.getServletName()
+                        + " | expression = " + sipServletMapping.getMatchingRule().getExpression());
             }
         }
         return null;

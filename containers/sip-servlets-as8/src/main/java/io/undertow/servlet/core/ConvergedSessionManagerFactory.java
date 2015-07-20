@@ -26,11 +26,12 @@ import org.mobicents.servlet.sip.undertow.UndertowSipManager;
 import io.undertow.server.session.SessionManager;
 import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.api.SessionManagerFactory;
+
 /**
  * @author kakonyi.istvan@alerant.hu
  *
  */
-public class ConvergedSessionManagerFactory extends InMemorySessionManagerFactory implements SessionManagerFactory{
+public class ConvergedSessionManagerFactory extends InMemorySessionManagerFactory implements SessionManagerFactory {
     private final int maxSessions;
 
     public ConvergedSessionManagerFactory() {

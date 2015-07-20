@@ -29,7 +29,8 @@ import org.mobicents.servlet.sip.core.descriptor.MatchingRule;
 /**
  * @author Thomas Leseney
  *
- * This class is based on the contents of org.mobicents.servlet.sip.catalina.rules package from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.servlet.sip.catalina.rules package from sip-servlet-as7 project,
+ *         re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class SubdomainRule extends RequestRule implements MatchingRule {
@@ -49,7 +50,7 @@ public class SubdomainRule extends RequestRule implements MatchingRule {
         if (requestValue.endsWith(value)) {
             int len1 = requestValue.length();
             int len2 = value.length();
-            return (len1 == len2 || (requestValue.charAt(len1-len2-1) == '.'));
+            return (len1 == len2 || (requestValue.charAt(len1 - len2 - 1) == '.'));
         }
         return false;
     }

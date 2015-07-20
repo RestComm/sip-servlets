@@ -23,9 +23,10 @@ package org.mobicents.servlet.sip.undertow;
 
 import io.undertow.servlet.api.SecurityConstraint;
 
-
 /**
- * This class is based on org.mobicents.servlet.sip.catalina.SipSecurityConstraint class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ * This class is based on org.mobicents.servlet.sip.catalina.SipSecurityConstraint class from sip-servlet-as7 project,
+ * re-implemented for jboss as8 (wildfly) by:
+ *
  * @author kakonyi.istvan@alerant.hu
  */
 public class SipSecurityConstraint extends SecurityConstraint {

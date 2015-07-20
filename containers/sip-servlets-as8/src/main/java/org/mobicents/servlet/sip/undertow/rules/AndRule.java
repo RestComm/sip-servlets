@@ -32,14 +32,16 @@ import org.mobicents.servlet.sip.core.descriptor.MatchingRule;
 /**
  * @author Thomas Leseney
  *
- * This class is based on the contents of org.mobicents.servlet.sip.catalina.rules package from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.servlet.sip.catalina.rules package from sip-servlet-as7 project,
+ *         re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public class AndRule implements MatchingRule {
 
     private List<MatchingRule> criteria = new ArrayList<MatchingRule>();
 
-    public AndRule() { }
+    public AndRule() {
+    }
 
     public void addCriterion(MatchingRule c) {
         criteria.add(c);

@@ -27,7 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class is based on org.mobicents.servlet.sip.catalina.SipSecurityCollection class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ * This class is based on org.mobicents.servlet.sip.catalina.SipSecurityCollection class from sip-servlet-as7 project,
+ * re-implemented for jboss as8 (wildfly) by:
+ *
  * @author kakonyi.istvan@alerant.hu
  */
 public class SipSecurityCollection extends WebResourceCollection {
@@ -52,8 +54,8 @@ public class SipSecurityCollection extends WebResourceCollection {
      * @param description
      */
     public SipSecurityCollection(String name, String description) {
-        this.name=name;
-        this.description=description;
+        this.name = name;
+        this.description = description;
     }
 
     /**
@@ -61,7 +63,7 @@ public class SipSecurityCollection extends WebResourceCollection {
      * @param name
      */
     public SipSecurityCollection(String name) {
-        this.name=name;
+        this.name = name;
     }
 
     /**
@@ -69,7 +71,7 @@ public class SipSecurityCollection extends WebResourceCollection {
      * @param servletName
      */
     public void addServletName(String servletName) {
-        if(servletName == null) {
+        if (servletName == null) {
             return;
         }
         servletNames.add(servletName);
@@ -80,23 +82,23 @@ public class SipSecurityCollection extends WebResourceCollection {
      * @param servletName
      */
     public void removeServletName(String servletName) {
-        if(servletName == null) {
+        if (servletName == null) {
             return;
         }
         servletNames.remove(servletName);
     }
 
     public boolean findServletName(String servletName) {
-        for(String servletNameFromList:servletNames) {
-            if(servletNameFromList.equals(servletName))
+        for (String servletNameFromList : servletNames) {
+            if (servletNameFromList.equals(servletName))
                 return true;
         }
         return false;
     }
 
     public boolean findMethod(String method) {
-        for(String declaredMethods:sipMethods) {
-            if(method.equals(declaredMethods))
+        for (String declaredMethods : sipMethods) {
+            if (method.equals(declaredMethods))
                 return true;
         }
         return false;
@@ -113,7 +115,7 @@ public class SipSecurityCollection extends WebResourceCollection {
      * @param sipMethod
      */
     public void addSipMethod(String sipMethod) {
-        if(sipMethod == null) {
+        if (sipMethod == null) {
             return;
         }
         sipMethods.add(sipMethod);
@@ -124,7 +126,7 @@ public class SipSecurityCollection extends WebResourceCollection {
      * @param sipMethod
      */
     public void removeSipMethod(String sipMethod) {
-        if(sipMethod == null) {
+        if (sipMethod == null) {
             return;
         }
         sipMethods.remove(sipMethod);

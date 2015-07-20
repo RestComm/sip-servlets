@@ -27,7 +27,8 @@ package org.mobicents.servlet.sip.undertow;
  *
  * @author jean.deruelle@gmail.com
  *
- * This class is based on org.mobicents.servlet.sip.catalina.SipDeploymentException from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on org.mobicents.servlet.sip.catalina.SipDeploymentException from sip-servlet-as7 project,
+ *         re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  *
  */

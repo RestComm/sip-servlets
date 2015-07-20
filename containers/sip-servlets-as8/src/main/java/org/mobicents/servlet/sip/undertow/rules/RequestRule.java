@@ -45,7 +45,8 @@ import org.mobicents.servlet.sip.core.descriptor.MatchingRule;
 /**
  * @author Thomas Leseney
  *
- * This class is based on the contents of org.mobicents.servlet.sip.catalina.rules package from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on the contents of org.mobicents.servlet.sip.catalina.rules package from sip-servlet-as7 project,
+ *         re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
 public abstract class RequestRule implements MatchingRule {
@@ -93,8 +94,7 @@ public abstract class RequestRule implements MatchingRule {
                 if (st.hasMoreTokens()) {
                     throw new IllegalArgumentException("Invalid var: " + st.nextToken() + " in " + varName);
                 }
-            }
-            else {
+            } else {
                 throw new IllegalArgumentException("Invalid property: " + token + " in " + varName);
             }
             lastToken = token;

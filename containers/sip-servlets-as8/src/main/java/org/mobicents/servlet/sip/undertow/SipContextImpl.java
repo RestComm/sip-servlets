@@ -86,9 +86,11 @@ import org.mobicents.servlet.sip.undertow.security.authentication.SipDigestAuthe
 
 /**
  *
- * This class is based on org.mobicents.servlet.sip.startup.SipStandardContext from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ * This class is based on org.mobicents.servlet.sip.startup.SipStandardContext from sip-servlet-as7 project, re-implemented for
+ * jboss as8 (wildfly) by:
+ *
  * @author kakonyi.istvan@alerant.hu
-*/
+ */
 public class SipContextImpl implements SipContext {
 
     private static final Logger logger = Logger.getLogger(SipContextImpl.class);
@@ -184,8 +186,7 @@ public class SipContextImpl implements SipContext {
 
         // FIXME: kakonyii: DistributableSipManager handling implementation
         hasDistributableManager = false;
-        ((UndertowSipManager) this.getSessionManager())
-                .setMobicentsSipFactory(sipApplicationDispatcher.getSipFactory());
+        ((UndertowSipManager) this.getSessionManager()).setMobicentsSipFactory(sipApplicationDispatcher.getSipFactory());
         ((UndertowSipManager) this.getSessionManager()).setContainer(this);
 
         // JSR 289 16.2 Servlet Selection
@@ -200,25 +201,26 @@ public class SipContextImpl implements SipContext {
 
         sipSecurityUtils = new SipSecurityUtils(this);
 
-        String realmName=null;
-        if(((SipLoginConfig)this.getSipLoginConfig())!=null){
-            realmName = ((SipLoginConfig)this.getSipLoginConfig()).getRealmName();
+        String realmName = null;
+        if (((SipLoginConfig) this.getSipLoginConfig()) != null) {
+            realmName = ((SipLoginConfig) this.getSipLoginConfig()).getRealmName();
         }
-        sipDigestAuthenticator = new SipDigestAuthenticationMechanism(realmName, sipApplicationDispatcher.getSipFactory().getHeaderFactory());
+        sipDigestAuthenticator = new SipDigestAuthenticationMechanism(realmName, sipApplicationDispatcher.getSipFactory()
+                .getHeaderFactory());
         // JSR 289 Section 2.1.1 Step 3.Invoke SipApplicationRouter.applicationDeployed() for this application.
         // called implicitly within sipApplicationDispatcher.addSipApplication
         sipApplicationDispatcher.addSipApplication(this.getApplicationName(), this);
 
-        //lests starts sipServlets too!!
+        // lests starts sipServlets too!!
         ArrayList<Lifecycle> lifecycles = new ArrayList<>();
-        for(MobicentsSipServlet sipServlet : this.getChildrenMap().values()){
+        for (MobicentsSipServlet sipServlet : this.getChildrenMap().values()) {
             lifecycles.add((SipServletImpl) sipServlet);
         }
         for (Lifecycle object : lifecycles) {
             object.start();
         }
         final TreeMap<Integer, List<ManagedServlet>> loadOnStartup = new TreeMap<>();
-        for(MobicentsSipServlet sipServlet : this.getChildrenMap().values()){
+        for (MobicentsSipServlet sipServlet : this.getChildrenMap().values()) {
             SipServletImpl servlet = (SipServletImpl) sipServlet;
 
             Integer loadOnStartupNumber = servlet.getServletInfo().getLoadOnStartup();
@@ -233,20 +235,20 @@ public class SipContextImpl implements SipContext {
                 list.add(servlet);
             }
         }
-        for(Map.Entry<Integer, List<ManagedServlet>> load : loadOnStartup.entrySet()) {
-            for(ManagedServlet servlet : load.getValue()) {
+        for (Map.Entry<Integer, List<ManagedServlet>> load : loadOnStartup.entrySet()) {
+            for (ManagedServlet servlet : load.getValue()) {
                 servlet.createServlet();
             }
         }
-        if (deployment.getDeploymentInfo().isEagerFilterInit()){
-            for(ManagedFilter filter: deployment.getFilters().getFilters().values()) {
+        if (deployment.getDeploymentInfo().isEagerFilterInit()) {
+            for (ManagedFilter filter : deployment.getFilters().getFilters().values()) {
                 filter.createFilter();
             }
         }
 
         if (logger.isDebugEnabled()) {
-            logger.debug("sip application session timeout for this context is "
-                    + this.getSipApplicationSessionTimeout() + " minutes");
+            logger.debug("sip application session timeout for this context is " + this.getSipApplicationSessionTimeout()
+                    + " minutes");
         }
 
         if (logger.isDebugEnabled()) {
@@ -266,14 +268,13 @@ public class SipContextImpl implements SipContext {
 
         ((UndertowSipManager) this.getSessionManager()).dumpSipSessions();
         ((UndertowSipManager) this.getSessionManager()).dumpSipApplicationSessions();
-        logger.warn("number of active sip sessions : "
-                + ((UndertowSipManager) this.getSessionManager()).getActiveSipSessions());
+        logger.warn("number of active sip sessions : " + ((UndertowSipManager) this.getSessionManager()).getActiveSipSessions());
         logger.warn("number of active sip application sessions : "
                 + ((UndertowSipManager) this.getSessionManager()).getActiveSipApplicationSessions());
 
-        //lests stop sipServlets lifecycle objects:
+        // lests stop sipServlets lifecycle objects:
         ArrayList<Lifecycle> lifecycles = new ArrayList<>();
-        for(MobicentsSipServlet sipServlet : this.getChildrenMap().values()){
+        for (MobicentsSipServlet sipServlet : this.getChildrenMap().values()) {
             lifecycles.add((SipServletImpl) sipServlet);
         }
         for (Lifecycle object : lifecycles) {
@@ -437,8 +438,7 @@ public class SipContextImpl implements SipContext {
     public void setApplicationDispatcher(SipApplicationDispatcher dispatcher) throws ServletException {
         sipApplicationDispatcher = dispatcher;
         if (sipApplicationDispatcher == null) {
-            throw new ServletException("cannot find any application dispatcher for this context "
-                    + this.getApplicationName());
+            throw new ServletException("cannot find any application dispatcher for this context " + this.getApplicationName());
         }
     }
 
@@ -691,7 +691,8 @@ public class SipContextImpl implements SipContext {
 
     // @Override
     // public String getBasePath() {
-    // FIXME: kakonyii: this method was used in SipStandardContext's start() method to add missing components as necessary, review later to figure out how to do something similar in wildfly
+    // FIXME: kakonyii: this method was used in SipStandardContext's start() method to add missing components as necessary,
+    // review later to figure out how to do something similar in wildfly
     // return null;
     // }
 
@@ -700,8 +701,7 @@ public class SipContextImpl implements SipContext {
     public boolean notifySipContextListeners(SipContextEvent event) {
         boolean ok = true;
         if (logger.isDebugEnabled()) {
-            logger.debug(this.deploymentInfoFacade.getSipServlets().size() + " container to notify of "
-                    + event.getEventType());
+            logger.debug(this.deploymentInfoFacade.getSipServlets().size() + " container to notify of " + event.getEventType());
         }
         if (event.getEventType() == SipContextEventType.SERVLET_INITIALIZED) {
             if (!timerService.isStarted()) {
@@ -742,94 +742,94 @@ public class SipContextImpl implements SipContext {
                             final ClassLoader cl = this.getSipContextClassLoader();
                             Thread.currentThread().setContextClassLoader(cl);
                             // http://code.google.com/p/sipservlets/issues/detail?id=135
-                            // FIXME: kakonyii: in SipStandardContext, there was a threadBindingListener, review this later to figure out how to do something similar in wildfly
-                            //bindThreadBindingListener();
+                            // FIXME: kakonyii: in SipStandardContext, there was a threadBindingListener, review this later to
+                            // figure out how to do something similar in wildfly
+                            // bindThreadBindingListener();
 
                             switch (event.getEventType()) {
-                            case SERVLET_INITIALIZED: {
-                                SipServletContextEvent sipServletContextEvent = new SipServletContextEvent(
-                                        getServletContext(), (SipServlet) sipServlet);
-                                List<SipServletListener> sipServletListeners = sipListeners.getSipServletsListeners();
-                                if (logger.isDebugEnabled()) {
-                                    logger.debug(sipServletListeners.size()
-                                            + " SipServletListener to notify of servlet initialization");
+                                case SERVLET_INITIALIZED: {
+                                    SipServletContextEvent sipServletContextEvent = new SipServletContextEvent(
+                                            getServletContext(), (SipServlet) sipServlet);
+                                    List<SipServletListener> sipServletListeners = sipListeners.getSipServletsListeners();
+                                    if (logger.isDebugEnabled()) {
+                                        logger.debug(sipServletListeners.size()
+                                                + " SipServletListener to notify of servlet initialization");
+                                    }
+                                    for (SipServletListener sipServletListener : sipServletListeners) {
+                                        sipServletListener.servletInitialized(sipServletContextEvent);
+                                    }
+                                    break;
                                 }
-                                for (SipServletListener sipServletListener : sipServletListeners) {
-                                    sipServletListener.servletInitialized(sipServletContextEvent);
-                                }
-                                break;
-                            }
-                            case SIP_CONNECTOR_ADDED: {
-                                // reload the outbound interfaces if they have changed
-                                this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
-                                        sipApplicationDispatcher.getOutboundInterfaces());
-                                // https://code.google.com/p/sipservlets/issues/detail?id=246
-                                this.getServletContext().setAttribute("org.mobicents.servlet.sip.SIP_CONNECTORS",
-                                        sipApplicationDispatcher.getSipService().findSipConnectors());
+                                case SIP_CONNECTOR_ADDED: {
+                                    // reload the outbound interfaces if they have changed
+                                    this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
+                                            sipApplicationDispatcher.getOutboundInterfaces());
+                                    // https://code.google.com/p/sipservlets/issues/detail?id=246
+                                    this.getServletContext().setAttribute("org.mobicents.servlet.sip.SIP_CONNECTORS",
+                                            sipApplicationDispatcher.getSipService().findSipConnectors());
 
-                                List<SipConnectorListener> sipConnectorListeners = sipListeners
-                                        .getSipConnectorListeners();
-                                if (logger.isDebugEnabled()) {
-                                    logger.debug(sipConnectorListeners.size()
-                                            + " SipConnectorListener to notify of sip connector addition");
+                                    List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
+                                    if (logger.isDebugEnabled()) {
+                                        logger.debug(sipConnectorListeners.size()
+                                                + " SipConnectorListener to notify of sip connector addition");
+                                    }
+                                    for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {
+                                        sipConnectorListener.sipConnectorAdded((SipConnector) event.getEventObject());
+                                    }
+                                    break;
                                 }
-                                for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {
-                                    sipConnectorListener.sipConnectorAdded((SipConnector) event.getEventObject());
-                                }
-                                break;
-                            }
-                            case SIP_CONNECTOR_REMOVED: {
-                                // reload the outbound interfaces if they have changed
-                                this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
-                                        sipApplicationDispatcher.getOutboundInterfaces());
-                                // https://code.google.com/p/sipservlets/issues/detail?id=246
-                                this.getServletContext().setAttribute("org.mobicents.servlet.sip.SIP_CONNECTORS",
-                                        sipApplicationDispatcher.getSipService().findSipConnectors());
+                                case SIP_CONNECTOR_REMOVED: {
+                                    // reload the outbound interfaces if they have changed
+                                    this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.OUTBOUND_INTERFACES,
+                                            sipApplicationDispatcher.getOutboundInterfaces());
+                                    // https://code.google.com/p/sipservlets/issues/detail?id=246
+                                    this.getServletContext().setAttribute("org.mobicents.servlet.sip.SIP_CONNECTORS",
+                                            sipApplicationDispatcher.getSipService().findSipConnectors());
 
-                                List<SipConnectorListener> sipConnectorListeners = sipListeners
-                                        .getSipConnectorListeners();
-                                if (logger.isDebugEnabled()) {
-                                    logger.debug(sipConnectorListeners.size()
-                                            + " SipConnectorListener to notify of sip connector removal");
+                                    List<SipConnectorListener> sipConnectorListeners = sipListeners.getSipConnectorListeners();
+                                    if (logger.isDebugEnabled()) {
+                                        logger.debug(sipConnectorListeners.size()
+                                                + " SipConnectorListener to notify of sip connector removal");
+                                    }
+                                    for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {
+                                        sipConnectorListener.sipConnectorRemoved((SipConnector) event.getEventObject());
+                                    }
+                                    break;
                                 }
-                                for (SipConnectorListener sipConnectorListener : sipConnectorListeners) {
-                                    sipConnectorListener.sipConnectorRemoved((SipConnector) event.getEventObject());
-                                }
-                                break;
-                            }
                             }
                             if (servletHandlerWasNull) {
                                 this.setServletHandler("");
                             }
                         } finally {
                             // http://code.google.com/p/sipservlets/issues/detail?id=135
-                            // FIXME: kakonyii: in SipStandardContext, there was a threadBindingListener, review this later to figure out how to do something similar in wildfly
+                            // FIXME: kakonyii: in SipStandardContext, there was a threadBindingListener, review this later to
+                            // figure out how to do something similar in wildfly
                             // unbindThreadBindingListener();
                             Thread.currentThread().setContextClassLoader(oldClassLoader);
                         }
                     }
                 } catch (ServletException e) {
-                    logger.error("Cannot allocate the servlet " + managedServlet.getClass()
-                            + " for notifying the listener " + " of the event " + event.getEventType(), e);
+                    logger.error("Cannot allocate the servlet " + managedServlet.getClass() + " for notifying the listener "
+                            + " of the event " + event.getEventType(), e);
                     ok = false;
                 } catch (Throwable e) {
-                    logger.error("An error occured when notifying the servlet " + managedServlet.getClass()
-                            + " of the event " + event.getEventType(), e);
+                    logger.error("An error occured when notifying the servlet " + managedServlet.getClass() + " of the event "
+                            + event.getEventType(), e);
                     ok = false;
                 }
 
-                //FIXME: kakonyii: do we need this deallocation in wildfly?
-                //try {
-                //    if(sipServlet != null) {
-                //        wrapper.deallocate(sipServlet);
-                //    }
-                //} catch (ServletException e) {
-                //    logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
-                //    ok = false;
-                //} catch (Throwable e) {
-                //    logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
-                //    ok = false;
-                //}
+                // FIXME: kakonyii: do we need this deallocation in wildfly?
+                // try {
+                // if(sipServlet != null) {
+                // wrapper.deallocate(sipServlet);
+                // }
+                // } catch (ServletException e) {
+                // logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
+                // ok = false;
+                // } catch (Throwable e) {
+                // logger.error("Deallocate exception for servlet" + wrapper.getName(), e);
+                // ok = false;
+                // }
             }
         } finally {
             exitSipAppHa(null, null, batchStarted);
@@ -843,104 +843,103 @@ public class SipContextImpl implements SipContext {
     public void enterSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession,
             boolean checkIsManagedThread, boolean isContainerManaged) {
         switch (this.getConcurrencyControlMode()) {
-        case SipSession:
-            if (sipSession != null) {
-                sipSession.acquire();
-            }
-            break;
-        case SipApplicationSession:
-            if (logger.isDebugEnabled()) {
-                logger.debug("checkIsManagedThread " + checkIsManagedThread + " , isManagedThread "
-                        + isManagedThread.get() + ", isContainerManaged " + isContainerManaged);
-            }
-            // http://code.google.com/p/mobicents/issues/detail?id=2534 &&
-            // http://code.google.com/p/mobicents/issues/detail?id=2526
-            if (!checkIsManagedThread || (checkIsManagedThread && Boolean.TRUE.equals(isManagedThread.get()))) {
-                if (isManagedThread.get() == null) {
-                    isManagedThread.set(Boolean.TRUE);
+            case SipSession:
+                if (sipSession != null) {
+                    sipSession.acquire();
                 }
-                if (sipApplicationSession != null) {
-                    SipApplicationSessionCreationThreadLocal sipApplicationSessionCreationThreadLocal = sipApplicationSessionsAccessedThreadLocal
-                            .get();
-                    if (sipApplicationSessionCreationThreadLocal == null) {
-                        sipApplicationSessionCreationThreadLocal = new SipApplicationSessionCreationThreadLocal();
-                        sipApplicationSessionsAccessedThreadLocal.set(sipApplicationSessionCreationThreadLocal);
-                    }
-                    boolean notPresent = sipApplicationSessionCreationThreadLocal.getSipApplicationSessions().add(
-                            sipApplicationSession);
-                    if (notPresent && isContainerManaged) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("acquiring sipApplicationSession="
-                                    + sipApplicationSession
-                                    + " since it is not present in our local thread of accessed sip application sessions ");
-                        }
-                        sipApplicationSession.acquire();
-                    } else if (logger.isDebugEnabled()) {
-                        if (!isContainerManaged) {
-                            logger.debug("not acquiring sipApplicationSession=" + sipApplicationSession
-                                    + " since application specified the container shouldn't manage it ");
-                        } else {
-                            logger.debug("not acquiring sipApplicationSession=" + sipApplicationSession
-                                    + " since it is present in our local thread of accessed sip application sessions ");
-                        }
-                    }
-                }
-            } else {
+                break;
+            case SipApplicationSession:
                 if (logger.isDebugEnabled()) {
-                    logger.debug("not acquiring sipApplicationSession=" + sipApplicationSession
-                            + " since isManagedThread is " + isManagedThread.get());
+                    logger.debug("checkIsManagedThread " + checkIsManagedThread + " , isManagedThread " + isManagedThread.get()
+                            + ", isContainerManaged " + isContainerManaged);
                 }
-            }
-            break;
-        case None:
-            break;
+                // http://code.google.com/p/mobicents/issues/detail?id=2534 &&
+                // http://code.google.com/p/mobicents/issues/detail?id=2526
+                if (!checkIsManagedThread || (checkIsManagedThread && Boolean.TRUE.equals(isManagedThread.get()))) {
+                    if (isManagedThread.get() == null) {
+                        isManagedThread.set(Boolean.TRUE);
+                    }
+                    if (sipApplicationSession != null) {
+                        SipApplicationSessionCreationThreadLocal sipApplicationSessionCreationThreadLocal = sipApplicationSessionsAccessedThreadLocal
+                                .get();
+                        if (sipApplicationSessionCreationThreadLocal == null) {
+                            sipApplicationSessionCreationThreadLocal = new SipApplicationSessionCreationThreadLocal();
+                            sipApplicationSessionsAccessedThreadLocal.set(sipApplicationSessionCreationThreadLocal);
+                        }
+                        boolean notPresent = sipApplicationSessionCreationThreadLocal.getSipApplicationSessions().add(
+                                sipApplicationSession);
+                        if (notPresent && isContainerManaged) {
+                            if (logger.isDebugEnabled()) {
+                                logger.debug("acquiring sipApplicationSession=" + sipApplicationSession
+                                        + " since it is not present in our local thread of accessed sip application sessions ");
+                            }
+                            sipApplicationSession.acquire();
+                        } else if (logger.isDebugEnabled()) {
+                            if (!isContainerManaged) {
+                                logger.debug("not acquiring sipApplicationSession=" + sipApplicationSession
+                                        + " since application specified the container shouldn't manage it ");
+                            } else {
+                                logger.debug("not acquiring sipApplicationSession=" + sipApplicationSession
+                                        + " since it is present in our local thread of accessed sip application sessions ");
+                            }
+                        }
+                    }
+                } else {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("not acquiring sipApplicationSession=" + sipApplicationSession
+                                + " since isManagedThread is " + isManagedThread.get());
+                    }
+                }
+                break;
+            case None:
+                break;
         }
     }
 
     @Override
     public void exitSipApp(MobicentsSipApplicationSession sipApplicationSession, MobicentsSipSession sipSession) {
         switch (this.getConcurrencyControlMode()) {
-        case SipSession:
-            if (sipSession != null) {
-                sipSession.release();
-            } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("NOT RELEASING SipSession on exit sipApplicationSession=" + sipApplicationSession
-                            + " sipSession=" + sipSession + " semaphore=null");
-                }
-            }
-            break;
-        case SipApplicationSession:
-            boolean wasSessionReleased = false;
-            SipApplicationSessionCreationThreadLocal sipApplicationSessionCreationThreadLocal = sipApplicationSessionsAccessedThreadLocal
-                    .get();
-            if (sipApplicationSessionCreationThreadLocal != null) {
-                for (MobicentsSipApplicationSession sipApplicationSessionAccessed : sipApplicationSessionsAccessedThreadLocal
-                        .get().getSipApplicationSessions()) {
-                    sipApplicationSessionAccessed.release();
-                    if (sipApplicationSessionAccessed.equals(sipApplicationSession)) {
-                        wasSessionReleased = true;
-                    }
-                }
-                sipApplicationSessionsAccessedThreadLocal.get().getSipApplicationSessions().clear();
-                sipApplicationSessionsAccessedThreadLocal.set(null);
-                sipApplicationSessionsAccessedThreadLocal.remove();
-            }
-            isManagedThread.set(null);
-            isManagedThread.remove();
-            if (!wasSessionReleased) {
-                if (sipApplicationSession != null) {
-                    sipApplicationSession.release();
+            case SipSession:
+                if (sipSession != null) {
+                    sipSession.release();
                 } else {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("NOT RELEASING SipApplicationSession on exit sipApplicationSession="
-                                + sipApplicationSession + " sipSession=" + sipSession + " semaphore=null");
+                        logger.debug("NOT RELEASING SipSession on exit sipApplicationSession=" + sipApplicationSession
+                                + " sipSession=" + sipSession + " semaphore=null");
                     }
                 }
-            }
-            break;
-        case None:
-            break;
+                break;
+            case SipApplicationSession:
+                boolean wasSessionReleased = false;
+                SipApplicationSessionCreationThreadLocal sipApplicationSessionCreationThreadLocal = sipApplicationSessionsAccessedThreadLocal
+                        .get();
+                if (sipApplicationSessionCreationThreadLocal != null) {
+                    for (MobicentsSipApplicationSession sipApplicationSessionAccessed : sipApplicationSessionsAccessedThreadLocal
+                            .get().getSipApplicationSessions()) {
+                        sipApplicationSessionAccessed.release();
+                        if (sipApplicationSessionAccessed.equals(sipApplicationSession)) {
+                            wasSessionReleased = true;
+                        }
+                    }
+                    sipApplicationSessionsAccessedThreadLocal.get().getSipApplicationSessions().clear();
+                    sipApplicationSessionsAccessedThreadLocal.set(null);
+                    sipApplicationSessionsAccessedThreadLocal.remove();
+                }
+                isManagedThread.set(null);
+                isManagedThread.remove();
+                if (!wasSessionReleased) {
+                    if (sipApplicationSession != null) {
+                        sipApplicationSession.release();
+                    } else {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("NOT RELEASING SipApplicationSession on exit sipApplicationSession="
+                                    + sipApplicationSession + " sipSession=" + sipSession + " semaphore=null");
+                        }
+                    }
+                }
+                break;
+            case None:
+                break;
         }
 
     }
@@ -952,9 +951,8 @@ public class SipContextImpl implements SipContext {
     }
 
     @Override
-    public void exitSipAppHa(MobicentsSipServletRequest request, MobicentsSipServletResponse response,
-            boolean batchStarted) {
-     // FIXME: distributable not supported
+    public void exitSipAppHa(MobicentsSipServletRequest request, MobicentsSipServletResponse response, boolean batchStarted) {
+        // FIXME: distributable not supported
     }
 
     @Override
@@ -987,9 +985,8 @@ public class SipContextImpl implements SipContext {
     public void setConcurrencyControlMode(ConcurrencyControlMode mode) {
         this.deploymentInfoFacade.setConcurrencyControlMode(mode);
         if (this.deploymentInfoFacade.getConcurrencyControlMode() != null && logger.isDebugEnabled()) {
-            logger.debug("Concurrency Control set to "
-                    + this.deploymentInfoFacade.getConcurrencyControlMode().toString() + " for application "
-                    + this.deploymentInfoFacade.getApplicationName());
+            logger.debug("Concurrency Control set to " + this.deploymentInfoFacade.getConcurrencyControlMode().toString()
+                    + " for application " + this.deploymentInfoFacade.getApplicationName());
         }
     }
 
@@ -1041,18 +1038,19 @@ public class SipContextImpl implements SipContext {
 
     @Override
     public boolean isPackageProtectionEnabled() {
-        //Got from org.apache.catalina.security.SecurityUtil:
-        boolean packageDefinitionEnabled = (System.getProperty("package.definition") == null && System.getProperty("package.access") == null) ? false : true;
+        // Got from org.apache.catalina.security.SecurityUtil:
+        boolean packageDefinitionEnabled = (System.getProperty("package.definition") == null && System
+                .getProperty("package.access") == null) ? false : true;
         boolean isSecurityEnabled = (System.getSecurityManager() != null);
 
-        if (packageDefinitionEnabled && isSecurityEnabled){
+        if (packageDefinitionEnabled && isSecurityEnabled) {
             return true;
         }
         return false;
     }
 
     @Override
-    public boolean authorize(MobicentsSipServletRequest request){
+    public boolean authorize(MobicentsSipServletRequest request) {
         String servletInfoName = request.getSipSession().getHandler();
         ServletInfo servletInfo = this.getDeploymentInfoFacade().getSipServlets().get(servletInfoName);
 
@@ -1070,15 +1068,17 @@ public class SipContextImpl implements SipContext {
         final ClassLoader cl = getSipContextClassLoader();
         Thread.currentThread().setContextClassLoader(cl);
         // http://code.google.com/p/sipservlets/issues/detail?id=135
-        // FIXME: kakonyii: in SipStandardContext, there was a threadBindingListener, review this later to figure out how to do something similar in wildfly
-        //bindThreadBindingListener();
+        // FIXME: kakonyii: in SipStandardContext, there was a threadBindingListener, review this later to figure out how to do
+        // something similar in wildfly
+        // bindThreadBindingListener();
     }
 
     @Override
     public void exitSipContext(ClassLoader oldClassLoader) {
         // http://code.google.com/p/sipservlets/issues/detail?id=135
-        // FIXME: kakonyii: in SipStandardContext, there was a threadBindingListener, review this later to figure out how to do something similar in wildfly
-        //unbindThreadBindingListener();
+        // FIXME: kakonyii: in SipStandardContext, there was a threadBindingListener, review this later to figure out how to do
+        // something similar in wildfly
+        // unbindThreadBindingListener();
         Thread.currentThread().setContextClassLoader(oldClassLoader);
     }
 

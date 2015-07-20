@@ -54,14 +54,15 @@ import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
 
 /**
  *
- * This class is based on org.mobicents.servlet.sip.catalina.SipProtocolHandler class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ * This class is based on org.mobicents.servlet.sip.catalina.SipProtocolHandler class from sip-servlet-as7 project,
+ * re-implemented for jboss as8 (wildfly) by:
+ *
  * @author kakonyi.istvan@alerant.hu
  *
  */
 public class SipProtocolHandler implements MBeanRegistration {
     // the logger
-    private static final Logger logger = Logger
-            .getLogger(SipProtocolHandler.class.getName());
+    private static final Logger logger = Logger.getLogger(SipProtocolHandler.class.getName());
 
     public static final String IS_SIP_CONNECTOR = "isSipConnector";
 
@@ -106,44 +107,35 @@ public class SipProtocolHandler implements MBeanRegistration {
                 logger.debug("Removing the Sip Application Dispatcher as a sip listener for listening point "
                         + extendedListeningPoint);
             }
-            extendedListeningPoint.getSipProvider().removeSipListener(
-                    sipApplicationDispatcher);
-            sipApplicationDispatcher.getSipNetworkInterfaceManager()
-                .removeExtendedListeningPoint(extendedListeningPoint);
+            extendedListeningPoint.getSipProvider().removeSipListener(sipApplicationDispatcher);
+            sipApplicationDispatcher.getSipNetworkInterfaceManager().removeExtendedListeningPoint(extendedListeningPoint);
         }
         // removing listening point and sip provider
         if (sipStack != null) {
             if (extendedListeningPoint != null) {
-                if (extendedListeningPoint.getSipProvider()
-                        .getListeningPoints().length == 1) {
-                    sipStack.deleteSipProvider(extendedListeningPoint
-                            .getSipProvider());
+                if (extendedListeningPoint.getSipProvider().getListeningPoints().length == 1) {
+                    sipStack.deleteSipProvider(extendedListeningPoint.getSipProvider());
                     if (logger.isDebugEnabled()) {
                         logger.debug("Removing the sip provider");
                     }
                 } else {
                     if (logger.isDebugEnabled()) {
-                        logger.debug("Removing the following Listening Point "
-                                + extendedListeningPoint
+                        logger.debug("Removing the following Listening Point " + extendedListeningPoint
                                 + " from the sip provider");
                     }
-                    extendedListeningPoint.getSipProvider()
-                            .removeListeningPoint(
-                                    extendedListeningPoint.getListeningPoint());
+                    extendedListeningPoint.getSipProvider().removeListeningPoint(extendedListeningPoint.getListeningPoint());
                 }
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Removing the following Listening Point "
-                            + extendedListeningPoint);
+                    logger.debug("Removing the following Listening Point " + extendedListeningPoint);
                 }
-                sipStack.deleteListeningPoint(extendedListeningPoint
-                        .getListeningPoint());
+                sipStack.deleteListeningPoint(extendedListeningPoint.getListeningPoint());
                 extendedListeningPoint = null;
             }
         }
-        if (tpOname != null){
+        if (tpOname != null) {
             ManagementFactory.getPlatformMBeanServer().unregisterMBean(tpOname);
         }
-        if (rgOname != null){
+        if (rgOname != null) {
             ManagementFactory.getPlatformMBeanServer().unregisterMBean(rgOname);
         }
         setStarted(false);
@@ -211,35 +203,39 @@ public class SipProtocolHandler implements MBeanRegistration {
             boolean useStun = sipConnector.isUseStun();
 
             if (useStun) {
-                if(InetAddress.getByName(ipAddress).isLoopbackAddress()) {
+                if (InetAddress.getByName(ipAddress).isLoopbackAddress()) {
                     logger.warn("The Ip address provided is the loopback address, stun won't be enabled for it");
                 } else {
-                    //chooses stun port randomly
+                    // chooses stun port randomly
                     DatagramSocket randomSocket = initRandomPortSocket();
                     int randomPort = randomSocket.getLocalPort();
                     randomSocket.disconnect();
                     randomSocket.close();
                     randomSocket = null;
                     StunAddress localStunAddress = new StunAddress(ipAddress, randomPort);
-                    StunAddress serverStunAddress = new StunAddress( sipConnector.getStunServerAddress(), sipConnector.getStunServerPort());
+                    StunAddress serverStunAddress = new StunAddress(sipConnector.getStunServerAddress(),
+                            sipConnector.getStunServerPort());
 
-                    NetworkConfigurationDiscoveryProcess addressDiscovery = new NetworkConfigurationDiscoveryProcess(localStunAddress, serverStunAddress);
+                    NetworkConfigurationDiscoveryProcess addressDiscovery = new NetworkConfigurationDiscoveryProcess(
+                            localStunAddress, serverStunAddress);
                     addressDiscovery.start();
                     StunDiscoveryReport report = addressDiscovery.determineAddress();
-                    if(report.getPublicAddress() != null) {
+                    if (report.getPublicAddress() != null) {
                         globalIpAddress = report.getPublicAddress().getSocketAddress().getAddress().getHostAddress();
                         globalPort = report.getPublicAddress().getPort();
-                        //TODO set a timer to retry the binding and provide a callback to update the global ip address and port
+                        // TODO set a timer to retry the binding and provide a callback to update the global ip address and port
                     } else {
                         useStun = false;
                         logger.error("Stun discovery failed to find a valid public ip address, disabling stun !");
                     }
-                    logger.info("Stun report = " + report); addressDiscovery.shutDown();
+                    logger.info("Stun report = " + report);
+                    addressDiscovery.shutDown();
                 }
-                //TODO add it as a listener for global ip address changes if STUN rediscover a new addess at some point
+                // TODO add it as a listener for global ip address changes if STUN rediscover a new addess at some point
             }
 
-            ListeningPointExt listeningPoint = (ListeningPointExt) sipStack.createListeningPoint(ipAddress, port, signalingTransport);
+            ListeningPointExt listeningPoint = (ListeningPointExt) sipStack.createListeningPoint(ipAddress, port,
+                    signalingTransport);
 
             if (useStun) {
                 // TODO: (ISSUE-CONFUSION) Check what is the confusion here, why not use the globalport. It ends up
@@ -296,64 +292,56 @@ public class SipProtocolHandler implements MBeanRegistration {
                             + port);
                 }
                 sipProvider.addSipListener(sipApplicationDispatcher);
-                sipApplicationDispatcher.getSipNetworkInterfaceManager().addExtendedListeningPoint(
-                        extendedListeningPoint);
+                sipApplicationDispatcher.getSipNetworkInterfaceManager().addExtendedListeningPoint(extendedListeningPoint);
             }
 
             logger.info("Sip Connector started on ip address: " + ipAddress + ", port " + port + ", transport "
                     + signalingTransport + ", useStun " + sipConnector.isUseStun() + ", stunAddress "
                     + sipConnector.getStunServerAddress() + ", stunPort : " + sipConnector.getStunServerPort()
                     + ", useStaticAddress: " + sipConnector.isUseStaticAddress() + ", staticServerAddress "
-                    + sipConnector.getStaticServerAddress() + ", staticServerPort "
-                    + sipConnector.getStaticServerPort());
+                    + sipConnector.getStaticServerAddress() + ", staticServerPort " + sipConnector.getStaticServerPort());
 
             if (this.domain != null) {
-                rgOname=new ObjectName
-                        (domain + ":type=GlobalRequestProcessor,name=" + getName());
+                rgOname = new ObjectName(domain + ":type=GlobalRequestProcessor,name=" + getName());
                 ManagementFactory.getPlatformMBeanServer().registerMBean(sipStack, rgOname);
             }
             setStarted(true);
         } catch (Exception ex) {
             logger.error("A problem occured while setting up SIP Connector " + ipAddress + ":" + port + "/"
                     + signalingTransport + "-- check server.xml for tomcat. ", ex);
-        }finally {
-            if(!isStarted()) {
+        } finally {
+            if (!isStarted()) {
                 destroy();
             }
         }
     }
 
     /**
-     * Initializes and binds a socket that on a random port number. The method
-     * would try to bind on a random port and retry 5 times until a free port
-     * is found.
+     * Initializes and binds a socket that on a random port number. The method would try to bind on a random port and retry 5
+     * times until a free port is found.
      *
      * @return the socket that we have initialized on a randomport number.
      */
     private DatagramSocket initRandomPortSocket() {
         int bindRetries = 5;
-        int currentlyTriedPort =
-                getRandomPortNumber(JainSipUtils.MIN_PORT_NUMBER, JainSipUtils.MAX_PORT_NUMBER);
+        int currentlyTriedPort = getRandomPortNumber(JainSipUtils.MIN_PORT_NUMBER, JainSipUtils.MAX_PORT_NUMBER);
 
         DatagramSocket resultSocket = null;
-        //we'll first try to bind to a random port. if this fails we'll try
-        //again (bindRetries times in all) until we find a free local port.
+        // we'll first try to bind to a random port. if this fails we'll try
+        // again (bindRetries times in all) until we find a free local port.
         for (int i = 0; i < bindRetries; i++) {
             try {
                 resultSocket = new DatagramSocket(currentlyTriedPort);
-                //we succeeded - break so that we don't try to bind again
+                // we succeeded - break so that we don't try to bind again
                 break;
-            }
-            catch (SocketException exc) {
+            } catch (SocketException exc) {
                 if (exc.getMessage().indexOf("Address already in use") == -1) {
-                    logger.fatal("An exception occurred while trying to create"
-                            + "a local host discovery socket.", exc);
+                    logger.fatal("An exception occurred while trying to create" + "a local host discovery socket.", exc);
                     return null;
                 }
-                //port seems to be taken. try another one.
+                // port seems to be taken. try another one.
                 logger.debug("Port " + currentlyTriedPort + " seems in use.");
-                currentlyTriedPort =
-                        getRandomPortNumber(JainSipUtils.MIN_PORT_NUMBER, JainSipUtils.MAX_PORT_NUMBER);
+                currentlyTriedPort = getRandomPortNumber(JainSipUtils.MIN_PORT_NUMBER, JainSipUtils.MAX_PORT_NUMBER);
                 logger.debug("Retrying bind on port " + currentlyTriedPort);
             }
         }
@@ -381,13 +369,12 @@ public class SipProtocolHandler implements MBeanRegistration {
     }
 
     /**
-     * @param signalingTransport
-     *            the signalingTransport to set
+     * @param signalingTransport the signalingTransport to set
      * @throws Exception
      */
     public void setSignalingTransport(String transport) throws Exception {
         sipConnector.setTransport(transport);
-        if(isStarted()) {
+        if (isStarted()) {
             destroy();
             start();
         }
@@ -401,13 +388,12 @@ public class SipProtocolHandler implements MBeanRegistration {
     }
 
     /**
-     * @param port
-     *            the port to set
+     * @param port the port to set
      * @throws Exception
      */
     public void setPort(int port) throws Exception {
         sipConnector.setPort(port);
-        if(isStarted()) {
+        if (isStarted()) {
             destroy();
             start();
         }
@@ -415,7 +401,7 @@ public class SipProtocolHandler implements MBeanRegistration {
 
     public void setIpAddress(String ipAddress) throws Exception {
         sipConnector.setIpAddress(ipAddress);
-        if(isStarted()) {
+        if (isStarted()) {
             destroy();
             start();
         }
@@ -538,14 +524,12 @@ public class SipProtocolHandler implements MBeanRegistration {
         return sipConnector.isReplaceStaticServerAddressForInternalRoutingRequest();
     }
 
-    public void setReplaceStaticServerAddressForInternalRoutingRequest(
-            boolean value) {
+    public void setReplaceStaticServerAddressForInternalRoutingRequest(boolean value) {
         sipConnector.setReplaceStaticServerAddressForInternalRoutingRequest(value);
     }
 
     /**
-     * @param sipConnector
-     *            the sipConnector to set
+     * @param sipConnector the sipConnector to set
      */
     public void setSipConnector(SipConnector sipConnector) {
         this.sipConnector = sipConnector;
@@ -577,8 +561,7 @@ public class SipProtocolHandler implements MBeanRegistration {
     protected ObjectName oname;
     protected MBeanServer mserver;
 
-    public ObjectName preRegister(MBeanServer server, ObjectName name)
-            throws Exception {
+    public ObjectName preRegister(MBeanServer server, ObjectName name) throws Exception {
         oname = name;
         mserver = server;
         domain = name.getDomain();

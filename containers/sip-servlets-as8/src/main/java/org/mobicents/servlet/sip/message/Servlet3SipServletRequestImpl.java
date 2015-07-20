@@ -40,7 +40,8 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 /**
  * @author jean.deruelle@gmail.com
  *
- * This class is based on org.mobicents.servlet.sip.message.Servlet3SipServletRequestImpl class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on org.mobicents.servlet.sip.message.Servlet3SipServletRequestImpl class from sip-servlet-as7
+ *         project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  *
  */
@@ -60,8 +61,8 @@ public class Servlet3SipServletRequestImpl extends SipServletRequestImpl impleme
      * @param dialog
      * @param createDialog
      */
-    public Servlet3SipServletRequestImpl(Request request, SipFactoryImpl sipFactoryImpl,
-            MobicentsSipSession sipSession, Transaction transaction, Dialog dialog, boolean createDialog) {
+    public Servlet3SipServletRequestImpl(Request request, SipFactoryImpl sipFactoryImpl, MobicentsSipSession sipSession,
+            Transaction transaction, Dialog dialog, boolean createDialog) {
         super(request, sipFactoryImpl, sipSession, transaction, dialog, createDialog);
     }
 

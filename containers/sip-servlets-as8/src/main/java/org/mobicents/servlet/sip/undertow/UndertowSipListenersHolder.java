@@ -30,10 +30,12 @@ import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.MobicentsSipServlet;
 import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.session.SipListenersHolder;
+
 /**
  * @author jean.deruelle@gmail.com
  *
- * This class is based on org.mobicents.servlet.sip.catalina.CatalinaSipListenersHolder class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on org.mobicents.servlet.sip.catalina.CatalinaSipListenersHolder class from sip-servlet-as7
+ *         project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  *
  */
@@ -48,8 +50,7 @@ public class UndertowSipListenersHolder extends SipListenersHolder {
     /*
      * (non-Javadoc)
      *
-     * @see org.mobicents.servlet.sip.core.session.SipListenersHolder#loadListeners(java.lang.String[],
-     * java.lang.ClassLoader)
+     * @see org.mobicents.servlet.sip.core.session.SipListenersHolder#loadListeners(java.lang.String[], java.lang.ClassLoader)
      */
     @Override
     public boolean loadListeners(String[] listeners, ClassLoader classLoader) {
@@ -59,12 +60,12 @@ public class UndertowSipListenersHolder extends SipListenersHolder {
                 Class listenerClass = Class.forName(className, false, classLoader);
                 EventListener listener = (EventListener) listenerClass.newInstance();
 
-                //copied from org.mobicents.servlet.sip.catalina.CatalinaSipListenersHolder, still need to fix this:
+                // copied from org.mobicents.servlet.sip.catalina.CatalinaSipListenersHolder, still need to fix this:
                 // FIXME !!! SipInstanceManager sipInstanceManager = ((CatalinaSipContext)sipContext).getSipInstanceManager();
-                // FIXME !! sipInstanceManager.processAnnotations(listener, sipInstanceManager.getInjectionMap(listenerClass.getName()));
+                // FIXME !! sipInstanceManager.processAnnotations(listener,
+                // sipInstanceManager.getInjectionMap(listenerClass.getName()));
 
-                MobicentsSipServlet sipServletImpl = (MobicentsSipServlet) sipContext
-                        .findSipServletByClassName(className);
+                MobicentsSipServlet sipServletImpl = (MobicentsSipServlet) sipContext.findSipServletByClassName(className);
                 if (sipServletImpl != null) {
                     listener = (EventListener) sipServletImpl.allocate();
                     listenerServlets.put(listener, sipServletImpl);

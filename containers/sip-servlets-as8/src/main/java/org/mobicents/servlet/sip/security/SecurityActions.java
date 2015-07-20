@@ -39,10 +39,13 @@ import org.jboss.security.SecurityContextFactory;
 import static org.wildfly.extension.undertow.UndertowMessages.MESSAGES;
 
 /**
- * taken from https://github.com/jbossas/jboss-as/blob/7.1.2.Final/web/src/main/java/org/jboss/as/web/security/SecurityActions.java
+ * taken from
+ * https://github.com/jbossas/jboss-as/blob/7.1.2.Final/web/src/main/java/org/jboss/as/web/security/SecurityActions.java
+ *
  * @author jean.deruelle@gmail.com
  *
- * This class is based on org.mobicents.servlet.sip.security.SecurityActions class from sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
+ *         This class is based on org.mobicents.servlet.sip.security.SecurityActions class from sip-servlet-as7 project,
+ *         re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  *
  */
@@ -190,66 +193,58 @@ public class SecurityActions {
         }
     }
 
-    public static ClassLoader getContextClassLoader(){
-       return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>(){
-          public ClassLoader run(){
-             return Thread.currentThread().getContextClassLoader();
-          }
-           });
-    }
-
-    public static Void setContextClassLoader(final ClassLoader cl){
-       return AccessController.doPrivileged(new PrivilegedAction<Void>()
-       {
-          public Void run(){
-             Thread.currentThread().setContextClassLoader(cl);
-             return null;
-          }
-       });
-    }
-
-    public static URL findResource(final URLClassLoader cl, final String name){
-       return AccessController.doPrivileged(new PrivilegedAction<URL>()
-       {
-          public URL run(){
-             return cl.findResource(name);
-          }
+    public static ClassLoader getContextClassLoader() {
+        return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+            public ClassLoader run() {
+                return Thread.currentThread().getContextClassLoader();
+            }
         });
     }
 
-    public static InputStream openStream(final URL url) throws PrivilegedActionException
-    {
-       return AccessController.doPrivileged(new PrivilegedExceptionAction<InputStream>()
-       {
-          public InputStream run() throws IOException{
-             return url.openStream();
-          }
+    public static Void setContextClassLoader(final ClassLoader cl) {
+        return AccessController.doPrivileged(new PrivilegedAction<Void>() {
+            public Void run() {
+                Thread.currentThread().setContextClassLoader(cl);
+                return null;
+            }
         });
     }
 
-    public static Class<?> loadClass(final String name) throws PrivilegedActionException
-    {
-       return AccessController.doPrivileged(new PrivilegedExceptionAction<Class<?>>()
-       {
-          public Class<?> run() throws ClassNotFoundException{
-             ClassLoader[] cls = new ClassLoader[] {
-                   getContextClassLoader(), // User defined classes
-                   SecurityActions.class.getClassLoader(), // PB classes (not always on TCCL [modular env])
-                   ClassLoader.getSystemClassLoader() }; // System loader, usually has app class path
+    public static URL findResource(final URLClassLoader cl, final String name) {
+        return AccessController.doPrivileged(new PrivilegedAction<URL>() {
+            public URL run() {
+                return cl.findResource(name);
+            }
+        });
+    }
 
-             ClassNotFoundException e = null;
-             for (ClassLoader cl : cls){
-                if (cl == null)
-                   continue;
-                try{
-                   return cl.loadClass(name);
+    public static InputStream openStream(final URL url) throws PrivilegedActionException {
+        return AccessController.doPrivileged(new PrivilegedExceptionAction<InputStream>() {
+            public InputStream run() throws IOException {
+                return url.openStream();
+            }
+        });
+    }
+
+    public static Class<?> loadClass(final String name) throws PrivilegedActionException {
+        return AccessController.doPrivileged(new PrivilegedExceptionAction<Class<?>>() {
+            public Class<?> run() throws ClassNotFoundException {
+                ClassLoader[] cls = new ClassLoader[] { getContextClassLoader(), // User defined classes
+                        SecurityActions.class.getClassLoader(), // PB classes (not always on TCCL [modular env])
+                        ClassLoader.getSystemClassLoader() }; // System loader, usually has app class path
+
+                ClassNotFoundException e = null;
+                for (ClassLoader cl : cls) {
+                    if (cl == null)
+                        continue;
+                    try {
+                        return cl.loadClass(name);
+                    } catch (ClassNotFoundException ce) {
+                        e = ce;
+                    }
                 }
-                catch (ClassNotFoundException ce){
-                   e = ce;
-                }
-             }
-             throw e != null ? e : new ClassNotFoundException(name);
-          }
-       });
+                throw e != null ? e : new ClassNotFoundException(name);
+            }
+        });
     }
 }
