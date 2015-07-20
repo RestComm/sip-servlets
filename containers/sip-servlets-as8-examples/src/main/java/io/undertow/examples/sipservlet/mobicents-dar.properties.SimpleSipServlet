@@ -1,6 +1,0 @@
-INVITE: ("io.undertow.examples.sipservlet.SimpleSipServlet", "DAR:From", "NEUTRAL", "", "NO_ROUTE", "0")
-REGISTER: ("io.undertow.examples.sipservlet.SimpleSipServlet", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0")
-OPTIONS: ("io.undertow.examples.sipservlet.SimpleSipServlet", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0")
-MESSAGE: ("io.undertow.examples.sipservlet.SimpleSipServlet", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0")
-NOTIFY: ("io.undertow.examples.sipservlet.SimpleSipServlet", "DAR:From", "NEUTRAL", "", "NO_ROUTE", "0")
-SUBSCRIBE: ("io.undertow.examples.sipservlet.SimpleSipServlet", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0")
