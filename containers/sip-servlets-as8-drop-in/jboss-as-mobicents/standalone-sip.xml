@@ -20,9 +20,7 @@
         <extension module="org.jboss.as.remoting"/>
         <extension module="org.jboss.as.sar"/>
         <extension module="org.jboss.as.security"/>
-        <!-- extension module="org.jboss.as.threads" -->
         <extension module="org.jboss.as.transactions"/>
-        <!-- extension module="org.jboss.as.web"/ -->
         <extension module="org.jboss.as.webservices"/>
         <extension module="org.jboss.as.weld"/>
         <extension module="org.mobicents.as8"/>
@@ -368,7 +366,6 @@
             <buffer-cache name="default"/>
             <server name="default-server">
                 <http-listener name="default" socket-binding="http"/>
-                <udp-listener name="sip-udp" socket-binding="sip-udp"/>
                 <host name="default-host" alias="localhost">
                     <location name="/" handler="welcome-content"/>
                     <filter-ref name="server-header"/>
@@ -414,6 +411,9 @@
         <interface name="unsecure">
             <inet-address value="${jboss.bind.address.unsecure:127.0.0.1}"/>
         </interface>
+       <interface name="sip_lan">
+            <inet-address value="${jboss.bind.address.sip_lan:127.0.0.1}"/>
+        </interface>
     </interfaces>
 
     <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
@@ -423,7 +423,7 @@
         <socket-binding name="ajp" port="${jboss.ajp.port:8009}"/>
         <socket-binding name="http" port="${jboss.http.port:8080}"/>
         <socket-binding name="https" port="${jboss.https.port:8443}"/>
-        <socket-binding name="sip-udp" port="5080"/>
+        <socket-binding name="sip-udp" interface="sip_lan" port="5080"/>
         <socket-binding name="sip-ws" port="5082"/>
         <socket-binding name="txn-recovery-environment" port="4712"/>
         <socket-binding name="txn-status-manager" port="4713"/>
