@@ -28,6 +28,7 @@ import javax.servlet.sip.TimerListener;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.SipService;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.utils.NamingThreadFactory;
 
 public class TimerServiceImpl implements SipServletTimerService {
 	
@@ -40,7 +41,7 @@ public class TimerServiceImpl implements SipServletTimerService {
 	private transient ScheduledThreadPoolExecutor scheduledExecutor;
 	
 	public TimerServiceImpl(SipService sipService) {		
-		scheduledExecutor = new ScheduledThreadPoolExecutor(SCHEDULER_THREAD_POOL_DEFAULT_SIZE);
+		scheduledExecutor = new ScheduledThreadPoolExecutor(SCHEDULER_THREAD_POOL_DEFAULT_SIZE, new NamingThreadFactory("sip_servlets_timer_service"));
 		int purgePeriod = sipService.getCanceledTimerTasksPurgePeriod();
 		if(purgePeriod > 0) {
 			Runnable r = new Runnable() {			
