@@ -325,7 +325,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
             }
         }, OperationContext.Stage.RUNTIME);
 
-        // FIXME: kakonyii, no MockDistributedCacheManagerFactoryService in wildfly, need to find another solution to intsall
+        // FIXME: kakonyii, no MockDistributedCacheManagerFactoryService in wildfly, need to find another solution to install
         // this service:
         // final ServiceTarget target = context.getServiceTarget();
         // final DistributedCacheManagerFactory factory = new MockDistributedCacheManagerFactoryService().getValue();
