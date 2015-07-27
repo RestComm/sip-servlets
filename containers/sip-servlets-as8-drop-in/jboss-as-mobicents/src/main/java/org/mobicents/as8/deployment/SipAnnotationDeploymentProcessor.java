@@ -138,7 +138,13 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
             if (logger.isDebugEnabled())
                 logger.debug("doDeploy(): processing annotations from " + entry.getKey().getRootName());
             final Index jarIndex = entry.getValue();
-            sipAnnotationsMetaData.put(entry.getKey().getRootName(), processAnnotations(sipAnnotationsMetaData, jarIndex));
+
+            SipMetaData sipMetaData = processAnnotations(sipAnnotationsMetaData, jarIndex);
+            if(sipMetaData != null) {
+                // https://github.com/Mobicents/sip-servlets/issues/68 Adding only the ones that actually have annotations
+                // to save memory and computing time later on
+                sipAnnotationsMetaData.put(entry.getKey().getRootName(), sipMetaData);
+            }
         }
     }
 
@@ -150,10 +156,11 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
      */
     protected SipMetaData processAnnotations(SipAnnotationMetaData sipAnotationsMetaData, Index index)
             throws DeploymentUnitProcessingException {
-        Sip11MetaData sipMetaData = new Sip11MetaData();
+        Sip11MetaData sipMetaData = null;
         // @SipListener
         final List<AnnotationInstance> sipListenerAnnotations = index.getAnnotations(sipListener);
         if (sipListenerAnnotations != null && sipListenerAnnotations.size() > 0) {
+            sipMetaData = new Sip11MetaData();
             List<ListenerMetaData> listeners = new ArrayList<ListenerMetaData>();
             for (final AnnotationInstance annotation : sipListenerAnnotations) {
                 if (logger.isDebugEnabled())
@@ -199,6 +206,9 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
         // @SipServlet
         final List<AnnotationInstance> sipServletAnnotations = index.getAnnotations(sipServlet);
         if (sipServletAnnotations != null && sipServletAnnotations.size() > 0) {
+            if(sipMetaData == null) {
+                sipMetaData = new Sip11MetaData();
+            }
             SipServletsMetaData sipServlets = new SipServletsMetaData();
             // @SipApplication
             final List<AnnotationInstance> sipApplicationAnnotations = index.getAnnotations(sipApplication);
@@ -277,6 +287,9 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
         // @SipApplicationKey
         final List<AnnotationInstance> sipApplicationKeyAnnotations = index.getAnnotations(sipApplicationKey);
         if (sipApplicationKeyAnnotations != null && sipApplicationKeyAnnotations.size() > 0) {
+            if(sipMetaData == null) {
+                sipMetaData = new Sip11MetaData();
+            }
             for (final AnnotationInstance annotation : sipApplicationKeyAnnotations) {
                 if (logger.isDebugEnabled())
                     logger.debug("processAnnotations(): @SipApplicationKey: " + annotation);
@@ -314,6 +327,9 @@ public class SipAnnotationDeploymentProcessor implements DeploymentUnitProcessor
         // @ConcurrencyControl
         final List<AnnotationInstance> concurrencyControlAnnotations = index.getAnnotations(concurrencyControl);
         if (concurrencyControlAnnotations != null && concurrencyControlAnnotations.size() > 0) {
+            if(sipMetaData == null) {
+                sipMetaData = new Sip11MetaData();
+            }
             for (final AnnotationInstance annotation : concurrencyControlAnnotations) {
                 if (logger.isDebugEnabled())
                     logger.debug("processAnnotations(): @ConcurrencyControl: " + annotation);
