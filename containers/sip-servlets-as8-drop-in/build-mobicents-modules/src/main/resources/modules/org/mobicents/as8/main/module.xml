@@ -50,6 +50,8 @@
         <module name="org.wildfly.extension.io"/>
         <module name="org.jboss.xnio"/>
         <module name="org.jboss.xnio.nio"/>
+        <module name="javax.ejb.api"/>
+        <module name="javax.annotation.api"/>        
         <!-- new entries ends-->
         <module name="javax.api"/>
         <module name="org.jboss.as.network"/>

@@ -24,11 +24,25 @@ package org.mobicents.as8.deployment;
 import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.api.DeploymentInfoFacade;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
+import javax.ejb.EJB;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
+import javax.servlet.sip.SipFactory;
+import javax.servlet.sip.SipSessionsUtil;
+import javax.servlet.sip.TimerService;
 
 import org.jboss.as.ee.structure.DeploymentType;
 import org.jboss.as.ee.structure.DeploymentTypeMarker;
@@ -43,6 +57,7 @@ import org.jboss.metadata.web.spec.ServletMetaData;
 import org.jboss.metadata.web.spec.SessionConfigMetaData;
 import org.jboss.metadata.web.spec.WebMetaData;
 import org.mobicents.as8.SipServer;
+import org.mobicents.javax.servlet.sip.dns.DNSResolver;
 import org.mobicents.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.mobicents.metadata.sip.merge.JBossSipMetaDataMerger;
 import org.mobicents.metadata.sip.spec.ProxyConfigMetaData;
@@ -138,6 +153,90 @@ public class SIPWebContext extends SipContextImpl {
     }
 
     @Override
+    public boolean contextListenerStart() throws ServletException{
+        boolean ok = super.contextListenerStart();
+
+        ArrayList<EventListener> eventListeners = new ArrayList<EventListener>();
+        eventListeners.add(super.sipListeners.getContainerListener());
+        eventListeners.addAll(super.sipListeners.getProxyBranchListeners());
+        eventListeners.addAll(super.sipListeners.getServletContextListeners());
+        eventListeners.addAll(super.sipListeners.getSipApplicationSessionAttributeListeners());
+        eventListeners.addAll(super.sipListeners.getSipApplicationSessionListeners());
+        eventListeners.addAll(super.sipListeners.getSipConnectorListeners());
+        eventListeners.addAll(super.sipListeners.getSipErrorListeners());
+        eventListeners.addAll(super.sipListeners.getSipServletsListeners());
+        eventListeners.addAll(super.sipListeners.getSipSessionAttributeListeners());
+        eventListeners.addAll(super.sipListeners.getSipSessionListeners());
+        eventListeners.add(super.sipListeners.getTimerListener());
+
+        //inject resources:
+        for (EventListener listener : eventListeners) {
+            if(listener!=null) {
+                Class listenerClass = listener.getClass();
+                for (Field field : listenerClass.getDeclaredFields()) {
+                    Annotation[] annotations = field.getAnnotations();
+                    for(Annotation ann : annotations){
+                        try {
+                            field.setAccessible(true);
+                            if (ann instanceof Resource && SipFactory.class.isAssignableFrom(field.getType())) {
+                                field.set(listener, super.sipFactoryFacade);
+                            }else if (ann instanceof Resource && SipSessionsUtil.class.isAssignableFrom(field.getType())){
+                                field.set(listener, super.sipSessionsUtil);
+                            }else if (ann instanceof Resource && DNSResolver.class.isAssignableFrom(field.getType())){
+                                field.set(listener, super.getServletContext().getAttribute("org.mobicents.servlet.sip.DNS_RESOLVER"));
+                            }else if (ann instanceof Resource && TimerService.class.isAssignableFrom(field.getType())){
+                                field.set(listener, super.timerService);
+                            }else if (ann instanceof EJB){
+                                //jndi lookup:
+                                String name = ((EJB)ann).name();
+                                if(name == null || "".equals(name)){
+                                    name = field.getType().getSimpleName();
+                                }
+                                //get deployment archive names:
+                                String deployment =  deploymentUnit.getName().substring(0, deploymentUnit.getName().lastIndexOf("."));
+                                DeploymentUnit parent = deploymentUnit.getParent();
+                                while(parent!=null){
+                                    deployment = parent.getName().substring(0, parent.getName().lastIndexOf(".")) + "/"+deployment;
+                                    parent = parent.getParent();
+                                }
+
+                                Object ejb = InitialContext.doLookup("java:global/"+deployment+"/"+name);
+                                field.set(listener, ejb);
+                            }
+                        } catch (IllegalArgumentException | IllegalAccessException | NamingException e) {
+                            throw new ServletException("Exception occured while injecting resources!",e);
+                        } finally {
+                            field.setAccessible(false);
+                        }
+                    }
+                }
+            }
+        }
+
+        //call @PostConstruct methods:
+        for(EventListener listener: eventListeners){
+            if(listener != null){
+                Method[] methods = listener.getClass().getDeclaredMethods();
+                for(Method method : methods){
+                    Annotation ann = method.getAnnotation(PostConstruct.class);
+                    if(ann!=null){
+                        try {
+                            if(method.getParameterCount() == 0){
+                                method.invoke(listener, new Object[0]);
+                            }else{
+                                throw new IllegalArgumentException("@PostContstruct annotated methods must have 0 parameters.");
+                            }
+                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                            throw new ServletException("Exception occured while calling @PostConstruct methods!",e);
+                        }
+                    }
+                }
+            }
+        }
+        return ok;
+    }
+
+    @Override
     public void start() throws ServletException {
         if (logger.isDebugEnabled()) {
             logger.debugf("Starting sip web context for deployment %s", deploymentUnit.getName());
@@ -171,6 +270,46 @@ public class SIPWebContext extends SipContextImpl {
         }
 
         super.start();
+    }
+
+    @Override
+    public void stop() throws ServletException{
+
+        ArrayList<EventListener> listeners = new ArrayList<EventListener>();
+        listeners.add(super.sipListeners.getContainerListener());
+        listeners.addAll(super.sipListeners.getProxyBranchListeners());
+        listeners.addAll(super.sipListeners.getServletContextListeners());
+        listeners.addAll(super.sipListeners.getSipApplicationSessionAttributeListeners());
+        listeners.addAll(super.sipListeners.getSipApplicationSessionListeners());
+        listeners.addAll(super.sipListeners.getSipConnectorListeners());
+        listeners.addAll(super.sipListeners.getSipErrorListeners());
+        listeners.addAll(super.sipListeners.getSipServletsListeners());
+        listeners.addAll(super.sipListeners.getSipSessionAttributeListeners());
+        listeners.addAll(super.sipListeners.getSipSessionListeners());
+        listeners.add(super.sipListeners.getTimerListener());
+
+        //call @PreDestroy methods:
+        for(EventListener listener: listeners){
+            if(listener != null){
+                Method[] methods = listener.getClass().getDeclaredMethods();
+                for(Method method : methods){
+                    Annotation ann = method.getAnnotation(PreDestroy.class);
+                    if(ann!=null){
+                        try {
+                            if(method.getParameterCount() == 0){
+                                method.invoke(listener, new Object[0]);
+                            }else{
+                                throw new IllegalArgumentException("@PreDestroy annotated methods must have 0 parameters.");
+                            }
+                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                            throw new ServletException("Exception occured while calling @PreDestroy methods!",e);
+                        }
+                    }
+                }
+            }
+        }
+
+        super.stop();
     }
 
     private void augmentAnnotations(JBossWebMetaData mergedMetaData, SipMetaData sipMetaData,
