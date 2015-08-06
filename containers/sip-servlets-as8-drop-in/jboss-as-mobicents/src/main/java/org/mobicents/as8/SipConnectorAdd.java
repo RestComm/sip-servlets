@@ -108,7 +108,9 @@ class SipConnectorAdd extends AbstractAddStepHandler {
                 .addService(SipSubsystemServices.JBOSS_SIP_CONNECTOR.append(name), service)
                 .addDependency(SipSubsystemServices.JBOSS_SIP, SipServer.class, service.getServer())
                 .addDependency(SocketBinding.JBOSS_BINDING_NAME.append(bindingRef), SocketBinding.class, service.getBinding());
-        serviceBuilder.setInitialMode(enabled ? Mode.ACTIVE : Mode.NEVER);
+        //kakonyii: set initialMode to PASSIVE to prevent the connector to receive messages. Connector will be enabled later by UndertowSipConnectorActivate service after all sip deployments finished:
+        serviceBuilder.setInitialMode(enabled ? Mode.PASSIVE : Mode.NEVER);
+
         if (enabled) {
             serviceBuilder.addListener(verificationHandler);
         }
