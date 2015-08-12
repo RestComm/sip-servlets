@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
+>
+    <modelVersion>4.0.0</modelVersion>
+    <packaging>pom</packaging>
+    <artifactId>mobicents-all-documentation-checkout</artifactId>
+    <groupId>org.mobicents</groupId>
+    <version>1.0</version>
+    
+    <properties>
+        <checkout.basedir>${basedir}/documentation</checkout.basedir>
+        <checkout.username>mobicents-read-only</checkout.username>
+        <checkout.password></checkout.password>
+        
+        <!--media.docs.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/tags/servers/media/2.x.y/core/mms-core-2.0.0.CR2/docs</media.docs.connectionURL-->
+        <!--sipservlets.docs.connectionURL>scm:svn:https://svn.devel.redhat.com/repos/ecs/JBoss_Communications_Platform/1.2.0/SIP_Servlets_Server_User_Guide</sipservlets.docs.connectionURL-->        
+        <sipservlets.docs.connectionURL>scm:svn:http://mobicents.googlecode.com/svn/trunk/servers/sip-servlets/docs</sipservlets.docs.connectionURL>
+        
+    </properties>
+    
+    <profiles>
+    
+        <profile>
+            <id>checkout</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-scm-plugin</artifactId>
+                        <inherited>false</inherited>
+                        <executions>
+                            <!--execution>
+                                <id>media-docs-checkout</id>
+                                <goals>
+                                    <goal>checkout</goal>
+                                </goals>
+                                <phase>validate</phase>
+                                <configuration>
+                                    <scmVersion>HEAD</scmVersion>
+                                    <scmVersionType>revision</scmVersionType>
+                                    <skipCheckoutIfExists>true</skipCheckoutIfExists>
+                                    <checkoutDirectory>${checkout.basedir}/media</checkoutDirectory>
+                                    <connectionUrl>${media.docs.connectionURL}</connectionUrl>                                    
+                                </configuration>
+                            </execution-->
+                            <execution>
+                                <id>sipservlets-docs-checkout</id>
+                                <goals>
+                                    <goal>checkout</goal>
+                                </goals>
+                                <phase>validate</phase>
+                                <configuration>
+                                    <scmVersion>HEAD</scmVersion>
+                                    <scmVersionType>revision</scmVersionType>
+                                    <skipCheckoutIfExists>true</skipCheckoutIfExists>
+                                    <checkoutDirectory>${checkout.basedir}/sip-servlets</checkoutDirectory>
+                                    <connectionUrl>${sipservlets.docs.connectionURL}</connectionUrl>                                    
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        
+        <profile>
+            <id>update</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-scm-plugin</artifactId>
+                        <inherited>false</inherited>
+                        <executions>
+                            <!--execution>
+                                <id>media-docs-update</id>
+                                <goals>
+                                    <goal>update</goal>
+                                </goals>
+                                <phase>validate</phase>
+                                <configuration>
+                                    <basedir>${checkout.basedir}/media</basedir>
+                                    <scmVersion>HEAD</scmVersion>
+                                    <scmVersionType>revision</scmVersionType>
+                                    <connectionUrl>${media.docs.connectionURL}</connectionUrl>                                    
+                                </configuration>
+                            </execution-->
+                            <execution>
+                                <id>sipservlets-docs-update</id>
+                                <goals>
+                                    <goal>update</goal>
+                                </goals>
+                                <phase>validate</phase>
+                                <configuration>
+                                    <basedir>${checkout.basedir}/sip-servlets</basedir>
+                                    <scmVersion>HEAD</scmVersion>
+                                    <scmVersionType>revision</scmVersionType>
+                                    <connectionUrl>${sipservlets.docs.connectionURL}</connectionUrl>                                   
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        
+    </profiles>
+    
+</project>

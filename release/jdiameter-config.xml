@@ -1,0 +1,125 @@
+<?xml version="1.0"?>
+<Configuration xmlns="http://www.jdiameter.org/jdiameter-server">
+
+  <LocalPeer>
+    <URI value="aaa://127.0.0.1:3868" />
+    <!-- URI value="aaa://mobicents.open-ims.test:1812" /-->
+    <IPAddresses>
+      <IPAddress value="127.0.0.1" />
+    </IPAddresses>
+    <Realm value="mobicents.org" />
+    <VendorID value="193" />
+    <ProductName value="jDiameter" />
+    <FirmwareRevision value="1" />
+    <OverloadMonitor>
+      <Entry index="1" lowThreshold="0.5" highThreshold="0.6">
+        <ApplicationID>
+          <VendorId value="193" />
+          <AuthApplId value="0" />
+          <AcctApplId value="19302" />
+        </ApplicationID>
+      </Entry>
+    </OverloadMonitor>
+  </LocalPeer>
+
+  <Parameters>
+    <AcceptUndefinedPeer value="true" />
+    <DuplicateProtection value="true" />
+    <DuplicateTimer value="240000" />
+    <UseUriAsFqdn value="true" /> <!-- Needed for Ericsson Emulator (set to true) -->
+    <QueueSize value="10000" />
+    <MessageTimeOut value="60000" />
+    <StopTimeOut value="10000" />
+    <CeaTimeOut value="10000" />
+    <IacTimeOut value="30000" />
+    <DwaTimeOut value="10000" />
+    <DpaTimeOut value="5000" />
+    <RecTimeOut value="10000" />
+
+    <!-- Statistics Logger Configuration -->
+    <StatisticLogger pause="30000" delay="30000" />
+
+    <Concurrent>
+      <Entity name="ThreadGroup" size="64"/> // Common Thread Pool
+      <Entity name="ProcessingMessageTimer" size="1"/>
+      <Entity name="DuplicationMessageTimer" size="1"/>
+      <Entity name="RedirectMessageTimer" size="1"/>
+      <Entity name="PeerOverloadTimer" size="1"/>
+      <Entity name="ConnectionTimer" size="1"/>
+      <Entity name="StatisticTimer" size="1"/>
+    </Concurrent>
+    <Dictionary enabled="false" sendLevel="MESSAGE" receiveLevel="OFF" />    
+    <!-- To enable clustering uncomment the following lines
+    <SessionDatasource value="org.mobicents.diameter.impl.ha.data.ReplicatedDataSource"/>
+    <TimerFacility value="org.mobicents.diameter.impl.ha.timer.ReplicatedTimerFacilityImpl"/>
+	-->
+    </Parameters>
+
+  <Network>
+    <Peers>
+      <!-- Testsuite -->
+      <!--Peer name="aaa://127.0.0.1:21812" attempt_connect="false" rating="1" /-->
+      
+      <!-- Ericsson SDK Client -->
+      <!-- Peer name="aaa://127.0.0.1:11812" attempt_connect="false" rating="1"/-->
+      
+      <!-- Ericsson SDK Emulator -->
+      <Peer name="aaa://127.0.0.1:21812" attempt_connect="true" rating="1" />
+      
+      <!-- Sh / CCA / Cx/Dx -->
+      <!-- Peer name="aaa://uac.mobicents.org" attempt_connect="false" rating="1" /-->
+
+      <!-- Sh (OpenIMS) -->
+      <!-- Peer name="aaa://192.168.124.132:3868" attempt_connect="true" rating="1" /-->
+    </Peers>
+    <Realms>
+      <!-- Ericsson SDK Client/Emulator and Testsuite -->
+      <Realm name="mobicents.org" peers="127.0.0.1" local_action="LOCAL" dynamic="false" exp_time="1">
+        <ApplicationID>
+          <VendorId value="193" />
+          <AuthApplId value="0" />
+          <AcctApplId value="19302" />
+        </ApplicationID>
+      </Realm>
+
+      <!-- Sh -->
+      <!-- Realm name="mobicents.org" peers="127.0.0.1" local_action="LOCAL" dynamic="false" exp_time="1">
+        <ApplicationID>
+          <VendorId value="10415" />
+          <AuthApplId value="16777217" />
+          <AcctApplId value="0" />
+        </ApplicationID>
+      </Realm-->
+      
+      <!-- Sh (OpenIMS) -->
+      <!-- Realm name="mobicents.org" peers="192.168.124.1,192.168.124.132" local_action="LOCAL" dynamic="false" exp_time="1">
+        <ApplicationID>
+          <VendorId value="10415" />
+          <AuthApplId value="16777217" />
+          <AcctApplId value="0" />
+        </ApplicationID>
+      </Realm-->
+      
+      <!--  CCA -->
+      <!-- Realm name="mobicents.org" peers="127.0.0.1" local_action="LOCAL" dynamic="false" exp_time="1">
+        <ApplicationID>
+          <VendorId value="0" />
+          <AuthApplId value="4" />
+          <AcctApplId value="0" />
+        </ApplicationID>
+      </Realm -->
+      
+      <!-- Cx/Dx -->
+      <!-- Realm name="mobicents.org" peers="127.0.0.1" local_action="LOCAL" dynamic="false" exp_time="1">
+        <ApplicationID>
+          <VendorId value="10415" />
+          <AuthApplId value="16777216" />
+          <AcctApplId value="0" />
+        </ApplicationID>
+      </Realm-->
+    </Realms>
+  </Network>
+
+  <Extensions />
+
+</Configuration>
