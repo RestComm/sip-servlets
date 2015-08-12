@@ -1,6 +1,6 @@
 #!/bin/sh -e
-BUILD_DIR=./sip-servlets-bootstrap/release/target/mss-as8
-CHECKOUT_DIR=./sip-servlets-bootstrap/release/target/dependencies
+BUILD_DIR=./build/release/target/mss-as8
+CHECKOUT_DIR=./build/release/target/dependencies
 #
 # set AS8_TAG as name of the AS8 release/tag
 AS8_FINAL_NAME=wildfly-8.2.1.Final

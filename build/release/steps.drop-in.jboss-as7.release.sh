@@ -1,6 +1,6 @@
 #!/bin/sh -e
-BUILD_DIR=./sip-servlets-bootstrap/release/target/mss-as7
-CHECKOUT_DIR=./sip-servlets-bootstrap/release/target/dependencies
+BUILD_DIR=./build/release/target/mss-as7
+CHECKOUT_DIR=./build/release/target/dependencies
 #
 # set AS7_TAG as name of the AS7 release/tag
 AS7_FINAL_NAME=jboss-as-7.2.0.Final
