@@ -762,5 +762,14 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
     public ServletContextImpl getContext() {
         return context;
     }
+    
+    @Override
+    public String getVirtualServerName() {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (String) doPrivileged("getVirtualServerName", null);
+        } else  {
+            return context.getVirtualServerName();
+        }
+    }
 
 }
