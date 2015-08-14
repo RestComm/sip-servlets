@@ -57,10 +57,10 @@ fi
 JAVA_OPTS="$JAVA_OPTS -Djboss.server.default.config=standalone-sip.xml"
 
 # Sample JPDA settings for remote socket debugging
-#JAVA_OPTS="$JAVA_OPTS -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n"
+#JAVA_OPTS="$JAVA_OPTS -agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=n"
 
 # Sample JPDA settings for shared memory debugging
-#JAVA_OPTS="$JAVA_OPTS -Xrunjdwp:transport=dt_shmem,server=y,suspend=n,address=jboss"
+#JAVA_OPTS="$JAVA_OPTS -agentlib:jdwp=transport=dt_shmem,server=y,suspend=n,address=jboss"
 
 # Uncomment to not use JBoss Modules lockless mode
 #JAVA_OPTS="$JAVA_OPTS -Djboss.modules.lockless=false"
@@ -68,3 +68,6 @@ JAVA_OPTS="$JAVA_OPTS -Djboss.server.default.config=standalone-sip.xml"
 # Uncomment to gather JBoss Modules metrics
 #JAVA_OPTS="$JAVA_OPTS -Djboss.modules.metrics=true"
 
+# Uncomment this in order to be able to run WildFly on FreeBSD
+# when you get "epoll_create function not implemented" message in dmesg output
+#JAVA_OPTS="$JAVA_OPTS -Djava.nio.channels.spi.SelectorProvider=sun.nio.ch.PollSelectorProvider"

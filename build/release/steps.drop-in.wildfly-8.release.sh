@@ -50,7 +50,7 @@ cp $BUILD_DIR/../../../../sip-servlets-examples/websocket-b2bua/websocket-dar.pr
 cp $BUILD_DIR/../../mss-sip-stack.properties $BUILD_DIR/$MSS_FINAL_NAME/standalone/configuration/
 cp $BUILD_DIR/../../mss-sip-stack.properties $BUILD_DIR/$MSS_FINAL_NAME/domain/configuration/mss-sip-stack.properties
 #Copy conf settings for standalone and domain profiles
-#cp -vpr $BUILD_DIR/../../wildfly-8-standalone-conf $BUILD_DIR/$MSS_FINAL_NAME/bin/standalone.conf
+cp -vpr $BUILD_DIR/../../wildfly-8-standalone-conf $BUILD_DIR/$MSS_FINAL_NAME/bin/standalone.conf
 #cp -vpr $BUILD_DIR/../../as8-domain-conf $BUILD_DIR/$MSS_FINAL_NAME/bin/domain.conf
 
 cd $BUILD_DIR/$MSS_FINAL_NAME
