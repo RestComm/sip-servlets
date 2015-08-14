@@ -41,6 +41,7 @@ import io.undertow.server.session.SessionManager;
 import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.api.DeploymentInfoFacade;
 import io.undertow.servlet.api.ServletInfo;
+import io.undertow.servlet.api.ThreadSetupAction.Handle;
 import io.undertow.servlet.core.Lifecycle;
 import io.undertow.servlet.core.ManagedFilter;
 import io.undertow.servlet.core.ManagedServlet;
@@ -440,7 +441,7 @@ public class SipContextImpl implements SipContext {
     }
 
     // ConvergedDeploymentManager should call this after web listeners starts
-    public boolean contextListenerStart() {
+    public boolean contextListenerStart() throws ServletException{
         // boolean ok = super.contextListenerStart();
         // the web listeners couldn't be started so we don't even try to load the sip ones
         /*
@@ -1060,22 +1061,30 @@ public class SipContextImpl implements SipContext {
         return this.sipDigestAuthenticator;
     }
 
+    private Handle handle;
+    public void bindThreadBindingListener() {
+        handle=getDeployment().getThreadSetupAction().setup(null);
+    }
+    public void unbindThreadBindingListener() {
+        handle.tearDown();
+    }
+
     @Override
     public void enterSipContext() {
         final ClassLoader cl = getSipContextClassLoader();
         Thread.currentThread().setContextClassLoader(cl);
         // http://code.google.com/p/sipservlets/issues/detail?id=135
-        // FIXME: kakonyii: in SipStandardContext, there was a threadBindingListener, review this later to figure out how to do
-        // something similar in wildfly
-        // bindThreadBindingListener();
+        // kakonyii: in SipStandardContext, there was a threadBindingListener which handled thread context switches (to get proper jndi context namespace selector, etc),
+        // in wildfly we use threadSetupAction from the deployment object for that purpose:
+        bindThreadBindingListener();
     }
 
     @Override
     public void exitSipContext(ClassLoader oldClassLoader) {
         // http://code.google.com/p/sipservlets/issues/detail?id=135
-        // FIXME: kakonyii: in SipStandardContext, there was a threadBindingListener, review this later to figure out how to do
-        // something similar in wildfly
-        // unbindThreadBindingListener();
+        // kakonyii: in SipStandardContext, there was a threadBindingListener which handled thread context switches (to get proper jndi context namespace selector, etc),
+        // in wildfly we use threadSetupAction from the deployment object for that purpose:
+        unbindThreadBindingListener();
         Thread.currentThread().setContextClassLoader(oldClassLoader);
     }
 

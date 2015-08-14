@@ -21,9 +21,25 @@ package org.mobicents.as8.deployment;
 import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.api.DeploymentInfoFacade;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.EventListener;
+import java.util.Map.Entry;
+import java.util.Set;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
+import javax.ejb.EJB;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.servlet.ServletException;
+import javax.servlet.sip.SipFactory;
+import javax.servlet.sip.SipSessionsUtil;
+import javax.servlet.sip.TimerService;
 
 import org.jboss.as.ee.structure.DeploymentType;
 import org.jboss.as.ee.structure.DeploymentTypeMarker;
@@ -38,6 +54,7 @@ import org.jboss.metadata.web.spec.ServletMetaData;
 import org.jboss.metadata.web.spec.SessionConfigMetaData;
 import org.jboss.metadata.web.spec.WebMetaData;
 import org.mobicents.as8.SipServer;
+import org.mobicents.javax.servlet.sip.dns.DNSResolver;
 import org.mobicents.metadata.sip.jboss.JBossConvergedSipMetaData;
 import org.mobicents.metadata.sip.merge.JBossSipMetaDataMerger;
 import org.mobicents.metadata.sip.spec.ProxyConfigMetaData;
@@ -133,6 +150,90 @@ public class SIPWebContext extends SipContextImpl {
     }
 
     @Override
+    public boolean contextListenerStart() throws ServletException{
+        boolean ok = super.contextListenerStart();
+
+        ArrayList<EventListener> eventListeners = new ArrayList<EventListener>();
+        eventListeners.add(super.sipListeners.getContainerListener());
+        eventListeners.addAll(super.sipListeners.getProxyBranchListeners());
+        eventListeners.addAll(super.sipListeners.getServletContextListeners());
+        eventListeners.addAll(super.sipListeners.getSipApplicationSessionAttributeListeners());
+        eventListeners.addAll(super.sipListeners.getSipApplicationSessionListeners());
+        eventListeners.addAll(super.sipListeners.getSipConnectorListeners());
+        eventListeners.addAll(super.sipListeners.getSipErrorListeners());
+        eventListeners.addAll(super.sipListeners.getSipServletsListeners());
+        eventListeners.addAll(super.sipListeners.getSipSessionAttributeListeners());
+        eventListeners.addAll(super.sipListeners.getSipSessionListeners());
+        eventListeners.add(super.sipListeners.getTimerListener());
+
+        //inject resources:
+        for (EventListener listener : eventListeners) {
+            if(listener!=null) {
+                Class listenerClass = listener.getClass();
+                for (Field field : listenerClass.getDeclaredFields()) {
+                    Annotation[] annotations = field.getAnnotations();
+                    for(Annotation ann : annotations){
+                        try {
+                            field.setAccessible(true);
+                            if (ann instanceof Resource && SipFactory.class.isAssignableFrom(field.getType())) {
+                                field.set(listener, super.sipFactoryFacade);
+                            }else if (ann instanceof Resource && SipSessionsUtil.class.isAssignableFrom(field.getType())){
+                                field.set(listener, super.sipSessionsUtil);
+                            }else if (ann instanceof Resource && DNSResolver.class.isAssignableFrom(field.getType())){
+                                field.set(listener, super.getServletContext().getAttribute("org.mobicents.servlet.sip.DNS_RESOLVER"));
+                            }else if (ann instanceof Resource && TimerService.class.isAssignableFrom(field.getType())){
+                                field.set(listener, super.timerService);
+                            }else if (ann instanceof EJB){
+                                //jndi lookup:
+                                String name = ((EJB)ann).name();
+                                if(name == null || "".equals(name)){
+                                    name = field.getType().getSimpleName();
+                                }
+                                //get deployment archive names:
+                                String deployment =  deploymentUnit.getName().substring(0, deploymentUnit.getName().lastIndexOf("."));
+                                DeploymentUnit parent = deploymentUnit.getParent();
+                                while(parent!=null){
+                                    deployment = parent.getName().substring(0, parent.getName().lastIndexOf(".")) + "/"+deployment;
+                                    parent = parent.getParent();
+                                }
+
+                                Object ejb = InitialContext.doLookup("java:global/"+deployment+"/"+name);
+                                field.set(listener, ejb);
+                            }
+                        } catch (IllegalArgumentException | IllegalAccessException | NamingException e) {
+                            throw new ServletException("Exception occured while injecting resources!",e);
+                        } finally {
+                            field.setAccessible(false);
+                        }
+                    }
+                }
+            }
+        }
+
+        //call @PostConstruct methods:
+        for(EventListener listener: eventListeners){
+            if(listener != null){
+                Method[] methods = listener.getClass().getDeclaredMethods();
+                for(Method method : methods){
+                    Annotation ann = method.getAnnotation(PostConstruct.class);
+                    if(ann!=null){
+                        try {
+                            if(method.getParameterCount() == 0){
+                                method.invoke(listener, new Object[0]);
+                            }else{
+                                throw new IllegalArgumentException("@PostContstruct annotated methods must have 0 parameters.");
+                            }
+                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                            throw new ServletException("Exception occured while calling @PostConstruct methods!",e);
+                        }
+                    }
+                }
+            }
+        }
+        return ok;
+    }
+
+    @Override
     public void start() throws ServletException {
         if (logger.isDebugEnabled()) {
             logger.debugf("Starting sip web context for deployment %s", deploymentUnit.getName());
@@ -168,173 +269,236 @@ public class SIPWebContext extends SipContextImpl {
         super.start();
     }
 
-    private void augmentAnnotations(JBossWebMetaData mergedMetaData, SipMetaData sipMetaData,
-            SipAnnotationMetaData sipAnnotationMetaData) throws ServletException {
-        if (logger.isDebugEnabled()) {
-            if (sipAnnotationMetaData != null) {
-                SipMetaData annotatedSipMetaData = sipAnnotationMetaData.get("classes");
-                if (annotatedSipMetaData.getListeners() != null) {
-                    for (ListenerMetaData listenerMetaData : annotatedSipMetaData.getListeners()) {
-                        if (logger.isDebugEnabled())
-                            logger.debug("@SipListener: " + listenerMetaData.getListenerClass());
+    @Override
+    public void stop() throws ServletException{
+
+        ArrayList<EventListener> listeners = new ArrayList<EventListener>();
+        listeners.add(super.sipListeners.getContainerListener());
+        listeners.addAll(super.sipListeners.getProxyBranchListeners());
+        listeners.addAll(super.sipListeners.getServletContextListeners());
+        listeners.addAll(super.sipListeners.getSipApplicationSessionAttributeListeners());
+        listeners.addAll(super.sipListeners.getSipApplicationSessionListeners());
+        listeners.addAll(super.sipListeners.getSipConnectorListeners());
+        listeners.addAll(super.sipListeners.getSipErrorListeners());
+        listeners.addAll(super.sipListeners.getSipServletsListeners());
+        listeners.addAll(super.sipListeners.getSipSessionAttributeListeners());
+        listeners.addAll(super.sipListeners.getSipSessionListeners());
+        listeners.add(super.sipListeners.getTimerListener());
+
+        //call @PreDestroy methods:
+        for(EventListener listener: listeners){
+            if(listener != null){
+                Method[] methods = listener.getClass().getDeclaredMethods();
+                for(Method method : methods){
+                    Annotation ann = method.getAnnotation(PreDestroy.class);
+                    if(ann!=null){
+                        try {
+                            if(method.getParameterCount() == 0){
+                                method.invoke(listener, new Object[0]);
+                            }else{
+                                throw new IllegalArgumentException("@PreDestroy annotated methods must have 0 parameters.");
+                            }
+                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                            throw new ServletException("Exception occured while calling @PreDestroy methods!",e);
+                        }
                     }
                 }
-                if (annotatedSipMetaData.getSipServlets() != null) {
-                    for (ServletMetaData sipServletMetaData : annotatedSipMetaData.getSipServlets()) {
-                        if (logger.isDebugEnabled())
-                            logger.debug("@SipServlet: " + sipServletMetaData.getServletClass());
+            }
+        }
+
+        super.stop();
+    }
+
+    private void augmentAnnotations(JBossWebMetaData mergedMetaData, SipMetaData sipMetaData,
+            SipAnnotationMetaData sipAnnotationMetaData) throws ServletException {
+        // https://github.com/Mobicents/sip-servlets/issues/68 iterating through all entry set and not only classes directory
+        Set<Entry<String, SipMetaData>> annotationsEntrySet = sipAnnotationMetaData.entrySet();
+        if (logger.isDebugEnabled()) {
+            logger.debug("sipAnnotationMetaData " + sipAnnotationMetaData);
+            if (sipAnnotationMetaData != null) {
+                for (Entry<String, SipMetaData> annotationEntry : annotationsEntrySet) {
+                    String annotatedSipMetaDataKey = annotationEntry.getKey();
+                    SipMetaData annotatedSipMetaData = annotationEntry.getValue();
+                    logger.debug("sipAnnotationMetaDataKey " + annotatedSipMetaDataKey + " value " + annotatedSipMetaData);
+                    if (annotatedSipMetaData.getListeners() != null) {
+                        for (ListenerMetaData listenerMetaData : annotatedSipMetaData.getListeners()) {
+                            if (logger.isDebugEnabled())
+                                logger.debug("@SipListener: " + listenerMetaData.getListenerClass() + " in "
+                                        + annotatedSipMetaDataKey);
+                        }
+                    }
+                    if (annotatedSipMetaData.getSipServlets() != null) {
+                        for (ServletMetaData sipServletMetaData : annotatedSipMetaData.getSipServlets()) {
+                            if (logger.isDebugEnabled())
+                                logger.debug("@SipServlet: " + sipServletMetaData.getServletClass() + " in "
+                                        + annotatedSipMetaDataKey);
+                        }
                     }
                 }
             }
         }
         // merging sipMetaData and clumsy sip annotation processing
-        {
-            if (logger.isDebugEnabled()) {
-                logger.debug("<Before clumsy augmentation>");
-                if (sipMetaData.getListeners() != null) {
-                    logger.debug("Listeners: " + sipMetaData.getListeners().size());
-                    for (ListenerMetaData check : sipMetaData.getListeners()) {
-                        logger.debug("Listener: " + check.getListenerClass());
-                    }
-                }
-                if (sipMetaData.getSipServlets() != null) {
-                    logger.debug("SipServlets: " + sipMetaData.getSipServlets().size());
-                    for (ServletMetaData check : sipMetaData.getSipServlets()) {
-                        logger.debug("SipServlet: " + check.getName() + " - class: " + check.getServletClass()
-                                + " - load-on-startup: " + check.getLoadOnStartup());
-                    }
-                }
-                logger.debug("</Before clumsy augmentation>");
-            }
-            // FIXME: josemrecio - clumsy annotation augmentation, this should be done by SipAnnotationMergedView or
-            // similar
-            // FIXME: josemrecio - SipAnnotation is supported, full merge is needed (e.g. main servlet selection) but
-            // not done yet
-            {
-                if (sipAnnotationMetaData != null) {
-                    SipMetaData annotatedMetaData = sipAnnotationMetaData.get("classes");
-                    SipMetaData annotatedSipMetaData = (SipMetaData) annotatedMetaData;
-
-                    // @SipApplication processing
-                    // existing sipMetaData overrides annotations
-                    {
-                        // main servlet
-                        if (annotatedSipMetaData.getServletSelection() != null
-                                && annotatedSipMetaData.getServletSelection().getMainServlet() != null) {
-                            if (sipMetaData.getServletSelection() == null) {
-                                sipMetaData.setServletSelection(new SipServletSelectionMetaData());
-                                sipMetaData.getServletSelection().setMainServlet(
-                                        annotatedSipMetaData.getServletSelection().getMainServlet());
-                            }
-                        }
-                        // proxy timeout
-                        if (annotatedSipMetaData.getProxyConfig() != null
-                                && annotatedSipMetaData.getProxyConfig().getProxyTimeout() != 0) {
-                            if (sipMetaData.getProxyConfig() == null) {
-                                sipMetaData.setProxyConfig(new ProxyConfigMetaData());
-                                sipMetaData.getProxyConfig().setProxyTimeout(
-                                        annotatedSipMetaData.getProxyConfig().getProxyTimeout());
-                            }
-                        }
-                        // session timeout
-                        if (annotatedSipMetaData.getSessionConfig() != null
-                                && annotatedSipMetaData.getSessionConfig().getSessionTimeout() != 0) {
-                            if (sipMetaData.getSessionConfig() == null) {
-                                sipMetaData.setSessionConfig(new SessionConfigMetaData());
-                                sipMetaData.getSessionConfig().setSessionTimeout(
-                                        annotatedSipMetaData.getSessionConfig().getSessionTimeout());
-                            }
-                        }
-                        // application name
-                        if (annotatedSipMetaData.getApplicationName() != null) {
-                            if (sipMetaData.getApplicationName() == null) {
-                                sipMetaData.setApplicationName(annotatedSipMetaData.getApplicationName());
-                            } else if (sipMetaData.getApplicationName().compareTo(annotatedSipMetaData.getApplicationName()) != 0) {
-                                throw (new ServletException("Sip application name mismatch: "
-                                        + sipMetaData.getApplicationName() + " (from sip.xml) vs "
-                                        + annotatedSipMetaData.getApplicationName() + " (from annotations)"));
-                            }
-                        }
-                        // description
-                        if (annotatedSipMetaData.getDescriptionGroup() != null) {
-                            if (sipMetaData.getDescriptionGroup() == null) {
-                                sipMetaData.setDescriptionGroup(annotatedMetaData.getDescriptionGroup());
-                            }
-                        }
-                        // distributable
-                        // TODO: josemrecio - distributable not supported yet
-                    }
-
-                    if (annotatedSipMetaData.getListeners() != null) {
-                        if (sipMetaData.getListeners() == null) {
-                            sipMetaData.setListeners(new ArrayList<ListenerMetaData>());
-                        }
-                        for (ListenerMetaData listenerMetaData : annotatedSipMetaData.getListeners()) {
-                            boolean found = false;
-                            for (ListenerMetaData check : sipMetaData.getListeners()) {
-                                if (check.getListenerClass().equals(listenerMetaData.getListenerClass())) {
-                                    if (logger.isDebugEnabled())
-                                        logger.debug("@SipListener already present: " + listenerMetaData.getListenerClass());
-                                    found = true;
-                                }
-                            }
-                            if (!found) {
-                                if (logger.isDebugEnabled())
-                                    logger.debug("Added @SipListener: " + listenerMetaData.getListenerClass());
-                                sipMetaData.getListeners().add(listenerMetaData);
-                            }
-                        }
-                    }
-                    if (annotatedSipMetaData.getSipServlets() != null) {
-                        if (sipMetaData.getSipServlets() == null) {
-                            sipMetaData.setSipServlets(new SipServletsMetaData());
-                        }
-                        for (ServletMetaData servletMetaData : annotatedSipMetaData.getSipServlets()) {
-                            boolean found = false;
-                            for (ServletMetaData check : sipMetaData.getSipServlets()) {
-                                if (check.getServletClass().equals(servletMetaData.getServletClass())) {
-                                    if (logger.isDebugEnabled())
-                                        logger.debug("@SipServlet already present: " + servletMetaData.getServletClass());
-                                    found = true;
-                                }
-                            }
-                            if (!found) {
-                                if (logger.isDebugEnabled())
-                                    logger.debug("Added @SipServlet: " + servletMetaData.getServletClass());
-                                sipMetaData.getSipServlets().add(servletMetaData);
-                            }
-                        }
-                    }
-                    if (annotatedMetaData.getSipApplicationKeyMethodInfo() != null) {
-                        sipMetaData.setSipApplicationKeyMethodInfo(annotatedMetaData.getSipApplicationKeyMethodInfo());
-                    }
-                    if (annotatedMetaData.getConcurrencyControlMode() != null) {
-                        if (sipMetaData.getConcurrencyControlMode() == null) {
-                            sipMetaData.setConcurrencyControlMode(annotatedMetaData.getConcurrencyControlMode());
-                        }
-                    }
+        if (logger.isDebugEnabled()) {
+            logger.debug("<Before clumsy augmentation>");
+            if (sipMetaData.getListeners() != null) {
+                logger.debug("Listeners: " + sipMetaData.getListeners().size());
+                for (ListenerMetaData check : sipMetaData.getListeners()) {
+                    logger.debug("Listener: " + check.getListenerClass());
                 }
             }
-            if (logger.isDebugEnabled()) {
-                logger.debug("<After clumsy augmentation>");
-
-                if (sipMetaData.getListeners() != null) {
-                    logger.debug("Listeners: " + sipMetaData.getListeners().size());
-                    for (ListenerMetaData check : sipMetaData.getListeners()) {
-                        logger.debug("Listener: " + check.getListenerClass());
-                    }
+            if (sipMetaData.getSipServlets() != null) {
+                logger.debug("SipServlets: " + sipMetaData.getSipServlets().size());
+                for (ServletMetaData check : sipMetaData.getSipServlets()) {
+                    logger.debug("SipServlet: " + check.getName() + " - class: " + check.getServletClass()
+                            + " - load-on-startup: " + check.getLoadOnStartup());
                 }
-                if (sipMetaData.getSipServlets() != null) {
-                    logger.debug("SipServlets: " + sipMetaData.getSipServlets().size());
-                    for (ServletMetaData check : sipMetaData.getSipServlets()) {
-                        logger.debug("SipServlet: " + check.getName() + " - class: " + check.getServletClass()
-                                + " - load-on-startup: " + check.getLoadOnStartup());
-                    }
-                }
-                logger.debug("</After clumsy augmentation>");
             }
-            JBossSipMetaDataMerger.merge((JBossConvergedSipMetaData) mergedMetaData, null, sipMetaData);
+            logger.debug("</Before clumsy augmentation>");
         }
+        // FIXME: josemrecio - clumsy annotation augmentation, this should be done by SipAnnotationMergedView or
+        // similar
+        // FIXME: josemrecio - SipAnnotation is supported, full merge is needed (e.g. main servlet selection) but
+        // not done yet
+        if (sipAnnotationMetaData != null) {
+            for (Entry<String, SipMetaData> annotationEntry : annotationsEntrySet) {
+                String annotatedSipMetaDataKey = annotationEntry.getKey();
+
+                SipMetaData annotatedSipMetaData = annotationEntry.getValue();
+
+                // @SipApplication processing
+                // existing sipMetaData overrides annotations
+
+                // main servlet
+                if (annotatedSipMetaData.getServletSelection() != null
+                        && annotatedSipMetaData.getServletSelection().getMainServlet() != null) {
+
+                    if (sipMetaData.getServletSelection() == null) {
+                        sipMetaData.setServletSelection(new SipServletSelectionMetaData());
+                        sipMetaData.getServletSelection().setMainServlet(
+                                annotatedSipMetaData.getServletSelection().getMainServlet());
+
+                    }
+                }
+                // proxy timeout
+                if (annotatedSipMetaData.getProxyConfig() != null
+                        && annotatedSipMetaData.getProxyConfig().getProxyTimeout() != 0) {
+
+                    if (sipMetaData.getProxyConfig() == null) {
+                        sipMetaData.setProxyConfig(new ProxyConfigMetaData());
+                        sipMetaData.getProxyConfig().setProxyTimeout(annotatedSipMetaData.getProxyConfig().getProxyTimeout());
+
+                    }
+                }
+                // session timeout
+                if (annotatedSipMetaData.getSessionConfig() != null
+                        && annotatedSipMetaData.getSessionConfig().getSessionTimeout() != 0) {
+
+                    if (sipMetaData.getSessionConfig() == null) {
+                        sipMetaData.setSessionConfig(new SessionConfigMetaData());
+                        sipMetaData.getSessionConfig().setSessionTimeout(
+                                annotatedSipMetaData.getSessionConfig().getSessionTimeout());
+
+                    }
+                }
+                // application name
+                if (annotatedSipMetaData.getApplicationName() != null) {
+                    if (sipMetaData.getApplicationName() == null) {
+                        sipMetaData.setApplicationName(annotatedSipMetaData.getApplicationName());
+                    } else if (sipMetaData.getApplicationName().compareTo(annotatedSipMetaData.getApplicationName()) != 0) {
+                        throw (new ServletException("Sip application name mismatch: " + sipMetaData.getApplicationName()
+                                + " (from sip.xml) vs " + annotatedSipMetaData.getApplicationName() + " from annotations "
+                                + annotatedSipMetaDataKey));
+
+                    }
+                }
+                // description
+                if (annotatedSipMetaData.getDescriptionGroup() != null) {
+                    if (sipMetaData.getDescriptionGroup() == null) {
+                        sipMetaData.setDescriptionGroup(annotatedSipMetaData.getDescriptionGroup());
+                    }
+                }
+                // distributable
+                // TODO: josemrecio - distributable not supported yet
+
+                if (annotatedSipMetaData.getListeners() != null) {
+                    if (sipMetaData.getListeners() == null) {
+                        sipMetaData.setListeners(new ArrayList<ListenerMetaData>());
+                    }
+                    for (ListenerMetaData listenerMetaData : annotatedSipMetaData.getListeners()) {
+                        boolean found = false;
+                        for (ListenerMetaData check : sipMetaData.getListeners()) {
+                            if (check.getListenerClass().equals(listenerMetaData.getListenerClass())) {
+                                if (logger.isDebugEnabled())
+                                    logger.debug("@SipListener already present: " + listenerMetaData.getListenerClass()
+                                            + " from " + annotatedSipMetaDataKey);
+
+                                found = true;
+                            }
+                        }
+                        if (!found) {
+                            if (logger.isDebugEnabled())
+                                logger.debug("Added @SipListener: " + listenerMetaData.getListenerClass() + " from "
+                                        + annotatedSipMetaDataKey);
+
+                            sipMetaData.getListeners().add(listenerMetaData);
+                        }
+                    }
+                }
+                if (annotatedSipMetaData.getSipServlets() != null) {
+                    if (sipMetaData.getSipServlets() == null) {
+                        sipMetaData.setSipServlets(new SipServletsMetaData());
+                    }
+                    for (ServletMetaData servletMetaData : annotatedSipMetaData.getSipServlets()) {
+                        boolean found = false;
+                        for (ServletMetaData check : sipMetaData.getSipServlets()) {
+                            if (check.getServletClass().equals(servletMetaData.getServletClass())) {
+                                if (logger.isDebugEnabled())
+                                    logger.debug("@SipServlet already present: " + servletMetaData.getServletClass() + " from "
+                                            + annotatedSipMetaDataKey);
+
+                                found = true;
+                            }
+                        }
+                        if (!found) {
+                            if (logger.isDebugEnabled())
+                                logger.debug("Added @SipServlet: " + servletMetaData.getServletClass() + " from "
+                                        + annotatedSipMetaDataKey);
+
+                            sipMetaData.getSipServlets().add(servletMetaData);
+                        }
+                    }
+                }
+                if (annotatedSipMetaData.getSipApplicationKeyMethodInfo() != null) {
+                    sipMetaData.setSipApplicationKeyMethodInfo(annotatedSipMetaData.getSipApplicationKeyMethodInfo());
+                }
+                if (annotatedSipMetaData.getConcurrencyControlMode() != null) {
+                    if (sipMetaData.getConcurrencyControlMode() == null) {
+                        sipMetaData.setConcurrencyControlMode(annotatedSipMetaData.getConcurrencyControlMode());
+                    }
+                }
+            }
+        }
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("<After clumsy augmentation>");
+
+            if (sipMetaData.getListeners() != null) {
+                logger.debug("Listeners: " + sipMetaData.getListeners().size());
+                for (ListenerMetaData check : sipMetaData.getListeners()) {
+                    logger.debug("Listener: " + check.getListenerClass());
+                }
+            }
+            if (sipMetaData.getSipServlets() != null) {
+                logger.debug("SipServlets: " + sipMetaData.getSipServlets().size());
+                for (ServletMetaData check : sipMetaData.getSipServlets()) {
+                    logger.debug("SipServlet: " + check.getName() + " - class: " + check.getServletClass()
+                            + " - load-on-startup: " + check.getLoadOnStartup());
+
+                }
+            }
+            logger.debug("</After clumsy augmentation>");
+        }
+        JBossSipMetaDataMerger.merge((JBossConvergedSipMetaData) mergedMetaData, null, sipMetaData);
     }
 
     private void processMetaData(JBossWebMetaData mergedMetaData, SipMetaData sipMetaData) throws Exception {
