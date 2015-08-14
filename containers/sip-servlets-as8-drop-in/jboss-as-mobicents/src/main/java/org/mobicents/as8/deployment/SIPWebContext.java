@@ -218,7 +218,7 @@ public class SIPWebContext extends SipContextImpl {
                     Annotation ann = method.getAnnotation(PostConstruct.class);
                     if(ann!=null){
                         try {
-                            if(method.getParameterCount() == 0){
+                            if(method.getParameterTypes().length == 0){
                                 method.invoke(listener, new Object[0]);
                             }else{
                                 throw new IllegalArgumentException("@PostContstruct annotated methods must have 0 parameters.");
@@ -293,7 +293,7 @@ public class SIPWebContext extends SipContextImpl {
                     Annotation ann = method.getAnnotation(PreDestroy.class);
                     if(ann!=null){
                         try {
-                            if(method.getParameterCount() == 0){
+                            if(method.getParameterTypes().length == 0){
                                 method.invoke(listener, new Object[0]);
                             }else{
                                 throw new IllegalArgumentException("@PreDestroy annotated methods must have 0 parameters.");
