@@ -308,5 +308,46 @@
   </section> 
 
 
+<section id="sss-Secure_SIP_Over_WebSockets">
+      <title>Production Setup</title>
+       <para>In addition to securing your SIP TLS, you may want to secure your HTTPS and SIP Over WebSockets Connectors too.</para>
+     <procedure>
+       <step>
+          <title>Secure HTTPS on JBoss 7/EAP 6</title>
+          <para>Assuming that you already followed the previous steps, you now have a private key and a self signed certificate. 
+          You will need to configure your <literal>$JBOSS_HOME/standalone/configuration/standalone-sip.xml</literal> to enable HTTPS connector:</para>
+            
+            <para><programlisting>
+            &lt;subsystem xmlns="urn:jboss:domain:web:1.4" default-virtual-server="default-host" native="false"&gt;
+            &lt;connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http"/&gt;
+	    &lt;connector name="https" protocol="HTTP/1.1" scheme="https" socket-binding="https" secure="true"&gt;
+		&lt;ssl protocol="TLSv1,TLSv1.1,TLSv1.2" certificate-key-file="/path/to/myserver.jks" certificate-file="/path/to/myserver.jks" password="secret"/&gt;
+	    &lt;/connector&gt;
+            </programlisting></para>
+       </step>
+
+       <step>
+          <title>Add SIP Over WebSockets Secure Connector</title>
+
+          <para>Make sure the following connector is present in <literal>$JBOSS_HOME/standalone/configuration/standalone-sip.xml</literal></para>
+		  <para><programlisting>&lt;connector name="sip-wss" protocol="SIP/2.0" scheme="sip" socket-binding="sip-wss"/&gt;</programlisting></para>
+		  <para>Make sure the following socket-binding is present in <literal>$JBOSS_HOME/standalone/configuration/standalone-sip.xml</literal></para>
+		  <para><programlisting>&lt;socket-binding name="sip-wss" port="5083"/&gt;.</programlisting></para>
+	   </step>
+
+       <step>
+          <title>For self-signed certificates, import the pkcs file to your Browser</title>
+          <para>To make that the WebSockets connection is not refused with a self-signed certificate, 
+          you need to import the pkcs file generated in 7.2.2 to Google Chrome (Settings =&gt; Show Advanced Settings =&gt; Manage Certificates Button, then import your
+		  mystorage.pkcs12 file) or Firefox.</para>
+       </step>
+
+	    <step>
+          <title>Test!</title>
+          <para>Go to your WebRTC favorite example through <ulink url="https://localhost:8443/webrtc/">https://localhost:8443/webrtc/</ulink>, and use <ulink url="wss://localhost:5083">wss://localhost:5083</ulink> to connect over Secure SIP Over WebSockets.</para>
+       </step>
+     </procedure>
+  </section> 
+
 
 </section> 
