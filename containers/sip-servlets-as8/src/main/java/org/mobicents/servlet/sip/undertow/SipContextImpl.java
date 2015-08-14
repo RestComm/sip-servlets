@@ -725,24 +725,25 @@ public class SipContextImpl implements SipContext {
                             + managedServlet.getClass().getName());
                 }
                 try {
-                    Servlet sipServlet = managedServlet.getServlet().getInstance();
+                    final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
 
-                    if (sipServlet instanceof SipServlet) {
-                        // Fix for issue 1086 (http://code.google.com/p/mobicents/issues/detail?id=1086) :
-                        // Cannot send a request in SipServletListener.initialize() for servlet-selection applications
-                        boolean servletHandlerWasNull = false;
-                        if (this.getServletHandler() == null) {
-                            this.setServletHandler(managedServlet.getServletInfo().getName());
-                            servletHandlerWasNull = true;
-                        }
-                        final ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-                        try {
-                            final ClassLoader cl = this.getSipContextClassLoader();
-                            Thread.currentThread().setContextClassLoader(cl);
-                            // http://code.google.com/p/sipservlets/issues/detail?id=135
-                            // FIXME: kakonyii: in SipStandardContext, there was a threadBindingListener, review this later to
-                            // figure out how to do something similar in wildfly
-                            // bindThreadBindingListener();
+                    try {
+                        final ClassLoader cl = this.getSipContextClassLoader();
+                        Thread.currentThread().setContextClassLoader(cl);
+                        // http://code.google.com/p/sipservlets/issues/detail?id=135
+                        // kakonyii: in SipStandardContext, there was a threadBindingListener which handled thread context switches (to get proper jndi context namespace selector, etc),
+                        // in wildfly we use threadSetupAction from the deployment object for that purpose:
+                        bindThreadBindingListener();
+
+                        Servlet sipServlet = managedServlet.getServlet().getInstance();
+                        if (sipServlet instanceof SipServlet) {
+                            // Fix for issue 1086 (http://code.google.com/p/mobicents/issues/detail?id=1086) :
+                            // Cannot send a request in SipServletListener.initialize() for servlet-selection applications
+                            boolean servletHandlerWasNull = false;
+                            if (this.getServletHandler() == null) {
+                                this.setServletHandler(managedServlet.getServletInfo().getName());
+                                servletHandlerWasNull = true;
+                            }
 
                             switch (event.getEventType()) {
                                 case SERVLET_INITIALIZED: {
@@ -798,13 +799,13 @@ public class SipContextImpl implements SipContext {
                             if (servletHandlerWasNull) {
                                 this.setServletHandler("");
                             }
-                        } finally {
-                            // http://code.google.com/p/sipservlets/issues/detail?id=135
-                            // FIXME: kakonyii: in SipStandardContext, there was a threadBindingListener, review this later to
-                            // figure out how to do something similar in wildfly
-                            // unbindThreadBindingListener();
-                            Thread.currentThread().setContextClassLoader(oldClassLoader);
                         }
+                    } finally {
+                        // http://code.google.com/p/sipservlets/issues/detail?id=135
+                        // kakonyii: in SipStandardContext, there was a threadBindingListener which handled thread context switches (to get proper jndi context namespace selector, etc),
+                        // in wildfly we use threadSetupAction from the deployment object for that purpose:
+                        unbindThreadBindingListener();
+                        Thread.currentThread().setContextClassLoader(oldClassLoader);
                     }
                 } catch (ServletException e) {
                     logger.error("Cannot allocate the servlet " + managedServlet.getClass() + " for notifying the listener "

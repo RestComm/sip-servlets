@@ -22,6 +22,7 @@ import java.util.List;
 
 import javax.management.MBeanServer;
 
+
 //import org.jboss.as.clustering.web.DistributedCacheManagerFactory;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
@@ -47,6 +48,7 @@ import org.mobicents.as8.deployment.SipContextFactoryDeploymentProcessor;
 import org.mobicents.as8.deployment.SipJndiBindingProcessor;
 import org.mobicents.as8.deployment.SipParsingDeploymentProcessor;
 import org.mobicents.as8.deployment.SipWarDeploymentProcessor;
+import org.mobicents.as8.deployment.UndertowSipConnectorActivateProcessor;
 import org.mobicents.as8.deployment.UndertowSipDeploymentInfoProcessor;
 import org.mobicents.as8.deployment.UndertowSipDeploymentProcessor;
 import org.mobicents.ext.javax.sip.dns.DefaultDNSServerLocator;
@@ -270,6 +272,9 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 // add DeploymentInfoService to UndertowSipDeploymentInfoProcessor
                 processorTarget.addDeploymentProcessor(SipExtension.SUBSYSTEM_NAME, Phase.INSTALL,
                         Phase.INSTALL_WAR_DEPLOYMENT + 1, new UndertowSipDeploymentProcessor());
+                // add sip connector activator service:
+                processorTarget.addDeploymentProcessor(SipExtension.SUBSYSTEM_NAME, Phase.INSTALL,
+                        Phase.INSTALL_WAR_DEPLOYMENT + 2, new UndertowSipConnectorActivateProcessor());
 
                 // // Add the SIP specific deployment processor
                 // processorTarget.addDeploymentProcessor(Phase.PARSE, DEPLOYMENT_PROCESS_PRIORITY,

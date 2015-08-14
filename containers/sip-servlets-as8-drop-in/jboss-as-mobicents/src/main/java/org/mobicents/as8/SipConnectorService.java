@@ -44,7 +44,7 @@ import static org.mobicents.as8.SipMessages.MESSAGES;
  *         jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
-class SipConnectorService implements Service<SipConnectorListener> {
+public class SipConnectorService implements Service<SipConnectorListener> {
 
     private String protocol = "SIP/2.0";
     private String scheme = "sip";

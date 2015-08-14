@@ -35,6 +35,8 @@ import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.naming.InitialContext;
+import javax.naming.NameClassPair;
+import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.sip.SipFactory;
@@ -185,10 +187,7 @@ public class SIPWebContext extends SipContextImpl {
                                 field.set(listener, super.timerService);
                             }else if (ann instanceof EJB){
                                 //jndi lookup:
-                                String name = ((EJB)ann).name();
-                                if(name == null || "".equals(name)){
-                                    name = field.getType().getSimpleName();
-                                }
+
                                 //get deployment archive names:
                                 String deployment =  deploymentUnit.getName().substring(0, deploymentUnit.getName().lastIndexOf("."));
                                 DeploymentUnit parent = deploymentUnit.getParent();
@@ -196,9 +195,28 @@ public class SIPWebContext extends SipContextImpl {
                                     deployment = parent.getName().substring(0, parent.getName().lastIndexOf(".")) + "/"+deployment;
                                     parent = parent.getParent();
                                 }
+                                String lookupString="java:global/"+deployment+"/";
+                                
+                                String name = ((EJB)ann).name();
+                                //if annotation has no name, check for assignable types in the jndi tree for injection:
+                                if(name == null || "".equals(name)){
+                                    InitialContext ctx = new InitialContext();
+                                    NamingEnumeration<NameClassPair> list = ctx.list("java:global/"+deployment);
+                                    while(list.hasMore()){
+                                        NameClassPair element = list.next();
+                                        name = element.getName();
+                                        Object ejb = InitialContext.doLookup(lookupString+name);
 
-                                Object ejb = InitialContext.doLookup("java:global/"+deployment+"/"+name);
-                                field.set(listener, ejb);
+                                        if(field.getType().isAssignableFrom(ejb.getClass())){
+                                            field.set(listener, ejb);
+                                            break;
+                                        }
+                                    }
+                                }else{
+                                    //if annotation has a name, use it for lookup:
+                                    Object ejb = InitialContext.doLookup(lookupString+name);
+                                    field.set(listener, ejb);
+                                }
                             }
                         } catch (IllegalArgumentException | IllegalAccessException | NamingException e) {
                             throw new ServletException("Exception occured while injecting resources!",e);
