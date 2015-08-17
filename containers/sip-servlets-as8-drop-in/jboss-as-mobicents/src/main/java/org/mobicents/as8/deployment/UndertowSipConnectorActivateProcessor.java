@@ -23,6 +23,7 @@ package org.mobicents.as8.deployment;
 
 import java.util.List;
 
+import org.jboss.as.server.ServerLogger;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
@@ -57,27 +58,41 @@ public class UndertowSipConnectorActivateProcessor implements DeploymentUnitProc
             }
         }
 
-        //this service will start up and activate sip connector(s) AFTER all sip deployments finished in order to prevent the sip server to handle incoming messages before sip applications ready:
-        final UndertowSipConnectorActivateService sipConnectorActivateService = new UndertowSipConnectorActivateService();
-        final ServiceName sipConnectorActivateServiceName = UndertowSipConnectorActivateService.SERVICE_NAME;
+        //only one thread can execute this part of the method at any time:
+        synchronized(UndertowSipConnectorActivateProcessor.class){
+            // lets check first if any other sip deployment chain added this service already:
+            final ServiceName sipConnectorActivateServiceName = UndertowSipConnectorActivateService.SERVICE_NAME;
 
-        final ServiceBuilder<UndertowSipConnectorActivateService> sipConnectorActivateServiceBuilder = phaseContext.getServiceTarget()
-                .addService(sipConnectorActivateServiceName, sipConnectorActivateService);
+            ServiceController<?> sipConnectorActivateServiceController = phaseContext.getServiceRegistry().getService(sipConnectorActivateServiceName);
 
-        List<ServiceName> serviceNames = phaseContext.getServiceRegistry().getServiceNames();
-        for(ServiceName serviceName: serviceNames){
-            ServiceController<?> serviceController = phaseContext.getServiceRegistry().getService(serviceName);
-            if(serviceController.getService() instanceof UndertowSipDeploymentService){
-                //don't start connnector service activator until all sip deployments finished:
-                sipConnectorActivateServiceBuilder.addDependency(serviceName);
-            }
-            else if(serviceController.getService() instanceof SipConnectorService) {
-                //set connector service controller to activator service:
-                sipConnectorActivateService.addServiceController((ServiceController<SipConnectorService>)serviceController);
+            if(sipConnectorActivateServiceController==null){
+                //this service will start up and activate sip connector(s) AFTER all sip deployments finished in order to prevent the sip server to handle incoming messages before sip applications ready:
+                final UndertowSipConnectorActivateService sipConnectorActivateService = new UndertowSipConnectorActivateService();
+
+                final ServiceBuilder<UndertowSipConnectorActivateService> sipConnectorActivateServiceBuilder = phaseContext.getServiceTarget()
+                        .addService(sipConnectorActivateServiceName, sipConnectorActivateService);
+
+                List<ServiceName> serviceNames = phaseContext.getServiceRegistry().getServiceNames();
+                for(ServiceName serviceName: serviceNames){
+                    ServiceController<?> serviceController = phaseContext.getServiceRegistry().getService(serviceName);
+                    if(serviceController!=null){
+                        if(serviceController.getService() instanceof UndertowSipDeploymentService){
+                            //don't start connector service activator until all sip deployments finished:
+                            sipConnectorActivateServiceBuilder.addDependency(serviceName);
+                        }
+                        else if(serviceController.getService() instanceof SipConnectorService) {
+                            //set connector service controller to activator service:
+                            sipConnectorActivateService.addServiceController((ServiceController<SipConnectorService>)serviceController);
+                        }
+                    }else{
+                        ServerLogger.DEPLOYMENT_LOGGER.warn("ServiceController with name '"+serviceName+"' is null!");
+                    }
+                }
+                sipConnectorActivateServiceBuilder.install();
+            }else{
+                ServerLogger.DEPLOYMENT_LOGGER.debug("SIP connector activator service has been already installed!");
             }
         }
-        sipConnectorActivateServiceBuilder.install();
-
     }
 
     @Override
