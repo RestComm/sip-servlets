@@ -21,8 +21,8 @@
  */
 package org.mobicents.as8.deployment;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceController;
@@ -41,13 +41,20 @@ import org.mobicents.as8.SipConnectorService;
 public class UndertowSipConnectorActivateService implements Service<UndertowSipConnectorActivateService> {
     public static final ServiceName SERVICE_NAME = ServiceName.of("UndertowSipConnectorActivateService");
 
-    private List<ServiceController<SipConnectorService>> serviceControllers = null;
+    private Map<ServiceName,ServiceController<SipConnectorService>> serviceControllers = null;
 
     public void addServiceController(ServiceController<SipConnectorService> serviceController){
         if(serviceControllers == null){
-            serviceControllers = new ArrayList<>();
+            serviceControllers = new LinkedHashMap<ServiceName,ServiceController<SipConnectorService>>();
         }
-        this.serviceControllers.add(serviceController);
+        this.serviceControllers.put(serviceController.getName(),serviceController);
+    }
+
+    public ServiceController<SipConnectorService> getServiceController(ServiceName serviceName){
+        if(serviceControllers == null){
+            return null;
+        }
+        return this.serviceControllers.get(serviceName);
     }
 
     @Override
@@ -57,10 +64,12 @@ public class UndertowSipConnectorActivateService implements Service<UndertowSipC
 
     @Override
     public void start(StartContext context) throws StartException {
-        for(ServiceController<SipConnectorService> serviceController : serviceControllers){
-            //activate the sip connector:
-            if(serviceController.getMode() != Mode.ACTIVE){
-                serviceController.setMode(Mode.ACTIVE);
+        if(serviceControllers!=null){
+            for(ServiceController<SipConnectorService> serviceController : serviceControllers.values()){
+                //activate the sip connector:
+                if(serviceController!=null && serviceController.getMode() != Mode.ACTIVE){
+                    serviceController.setMode(Mode.ACTIVE);
+                }
             }
         }
     }
