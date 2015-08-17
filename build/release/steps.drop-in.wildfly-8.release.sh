@@ -45,19 +45,19 @@ cp -pr ./management/sip-servlets-management/target/sip-servlets-management.war $
 wget -nc http://labs.consol.de/maven/repository/org/jolokia/jolokia-war/1.1.0/jolokia-war-1.1.0.war -O  $BUILD_DIR/$MSS_FINAL_NAME/standalone/deployments/jolokia.war
 mkdir -p $BUILD_DIR/$MSS_FINAL_NAME/standalone/configuration/dars
 mkdir -p $BUILD_DIR/$MSS_FINAL_NAME/domain/configuration/dars
-cp $BUILD_DIR/../../../../sip-servlets-examples/websocket-b2bua/websocket-dar.properties $BUILD_DIR/$MSS_FINAL_NAME/standalone/configuration/dars/mobicents-dar.properties
-cp $BUILD_DIR/../../../../sip-servlets-examples/websocket-b2bua/websocket-dar.properties $BUILD_DIR/$MSS_FINAL_NAME/domain/configuration/dars/mobicents-dar.properties
-cp $BUILD_DIR/../../mss-sip-stack.properties $BUILD_DIR/$MSS_FINAL_NAME/standalone/configuration/
-cp $BUILD_DIR/../../mss-sip-stack.properties $BUILD_DIR/$MSS_FINAL_NAME/domain/configuration/mss-sip-stack.properties
+cp -vprf $BUILD_DIR/../../../../sip-servlets-examples/websocket-b2bua/websocket-dar.properties $BUILD_DIR/$MSS_FINAL_NAME/standalone/configuration/dars/mobicents-dar.properties
+cp -vprf $BUILD_DIR/../../../../sip-servlets-examples/websocket-b2bua/websocket-dar.properties $BUILD_DIR/$MSS_FINAL_NAME/domain/configuration/dars/mobicents-dar.properties
+cp -vpr $BUILD_DIR/../../mss-sip-stack.properties $BUILD_DIR/$MSS_FINAL_NAME/standalone/configuration/
+cp -vpr $BUILD_DIR/../../mss-sip-stack.properties $BUILD_DIR/$MSS_FINAL_NAME/domain/configuration/
 #Copy conf settings for standalone and domain profiles
-cp -vpr $BUILD_DIR/../../wildfly-8-standalone-conf $BUILD_DIR/$MSS_FINAL_NAME/bin/standalone.conf
+cp -vprf $BUILD_DIR/../../wildfly-8-standalone-conf $BUILD_DIR/$MSS_FINAL_NAME/bin/standalone.conf
 #cp -vpr $BUILD_DIR/../../as8-domain-conf $BUILD_DIR/$MSS_FINAL_NAME/bin/domain.conf
 
 cd $BUILD_DIR/$MSS_FINAL_NAME
 
 # Create standalone-sip.xml file
 #cp ./standalone/configuration/standalone.xml ./standalone/configuration/standalone-sip.xml
-cp ../../../../../containers/sip-servlets-as8-drop-in/jboss-as-mobicents/standalone-sip.xml ./standalone/configuration/standalone-sip.xml
+cp -vpr ../../../../../containers/sip-servlets-as8-drop-in/jboss-as-mobicents/standalone-sip.xml ./standalone/configuration/standalone-sip.xml
 
 #patch -p0 --verbose < ../../../../../containers/sip-servlets-as8-drop-in/patches/patch.7.2.0.Final.standalone.sip.dropin.xml
 #patch -p0 --verbose < ../../../../../containers/sip-servlets-as8-drop-in/patches/patch.domain.sip.dropin.xml
