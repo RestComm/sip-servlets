@@ -656,11 +656,11 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	}
 
 	@Override
-	public void loadOnStartup(Container[] containers) {
+	public boolean loadOnStartup(Container[] containers) {
 		if(!sipJNDIContextLoaded) {
 			loadSipJNDIContext();
 		}
-		super.loadOnStartup(containers);	
+		return super.loadOnStartup(containers);	
 	}
 	
 	protected void loadSipJNDIContext() {

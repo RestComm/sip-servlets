@@ -43,6 +43,7 @@ import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.core.StandardHost;
 import org.apache.catalina.core.StandardWrapper;
+import org.apache.catalina.deploy.WebXml;
 import org.apache.catalina.startup.Constants;
 import org.apache.catalina.startup.ContextConfig;
 import org.apache.catalina.startup.DigesterFactory;
@@ -369,12 +370,12 @@ public class SipContextConfig extends ContextConfig {
 			// Nothing to do.
 			return;
 		} else if ("jar".equals(webinfClasses.getProtocol())) {
-			processAnnotationsJar(webinfClasses);
+			processAnnotationsJar(webinfClasses, null, false);
 		} else if ("jndi".equals(webinfClasses.getProtocol())) {
-			processAnnotationsJndi(webinfClasses);
+			processAnnotationsJndi(webinfClasses, null, false);
 		} else if ("file".equals(webinfClasses.getProtocol())) {
 			try {
-				processAnnotationsFile(new File(webinfClasses.toURI()));
+				processAnnotationsFile(new File(webinfClasses.toURI()), null, false);
 			} catch (URISyntaxException e) {
 				logger.error(sm.getString("contextConfig.fileUrl", webinfClasses), e);
 			} 
@@ -384,18 +385,19 @@ public class SipContextConfig extends ContextConfig {
 		}
 	}
 
-	protected void processAnnotationsFile(File file){
+	protected void processAnnotationsFile(File file, WebXml fragment,
+            boolean handlesTypesOnly) {
 
 		if (file.isDirectory()) {
 			String[] dirs = file.list();
 			for (String dir : dirs) {
-				processAnnotationsFile(new File(file,dir));
+				processAnnotationsFile(new File(file,dir), fragment, handlesTypesOnly);
 			}
 		} else if (file.canRead() && file.getName().endsWith(".class")) {
 			FileInputStream fis = null;
 			try {
 				fis = new FileInputStream(file);
-				processAnnotationsStream(fis);
+				processAnnotationsStream(fis, fragment, handlesTypesOnly);
 			} catch (IOException e) {
 				logger.error(sm.getString("contextConfig.inputStreamFile",
 						file.getAbsolutePath()),e);
@@ -411,7 +413,8 @@ public class SipContextConfig extends ContextConfig {
 		}
 	}
 
-	protected void processAnnotationsJar(URL url) {
+	protected void processAnnotationsJar(URL url, WebXml fragment,
+            boolean handlesTypesOnly) {
 
 		JarFile jarFile = null;
 
@@ -436,7 +439,7 @@ public class SipContextConfig extends ContextConfig {
 					InputStream is = null;
 					try {
 						is = jarFile.getInputStream(jarEntry);
-						processAnnotationsStream(is);
+						processAnnotationsStream(is, fragment, handlesTypesOnly);
 					} catch (IOException e) {
 						logger.error(sm.getString("contextConfig.inputStreamJar",
 								entryName, url),e);
@@ -464,7 +467,8 @@ public class SipContextConfig extends ContextConfig {
 		}
 	}
 
-	protected void processAnnotationsJndi(URL url) {
+	protected void processAnnotationsJndi(URL url, WebXml fragment,
+            boolean handlesTypesOnly) {
 		try {
 			URLConnection urlConn = url.openConnection();
 			DirContextURLConnection dcUrlConn;
@@ -484,7 +488,7 @@ public class SipContextConfig extends ContextConfig {
 				while (dirs.hasMoreElements()) {
 					String dir = dirs.nextElement();
 					URL dirUrl = new URL(url.toString() + '/' + dir);
-					processAnnotationsJndi(dirUrl);
+					processAnnotationsJndi(dirUrl, fragment, handlesTypesOnly);
 				}
 
 			} else {
@@ -493,7 +497,7 @@ public class SipContextConfig extends ContextConfig {
 					InputStream is = null;
 					try {
 						is = dcUrlConn.getInputStream();
-						processAnnotationsStream(is);
+						processAnnotationsStream(is, fragment, handlesTypesOnly);
 					} catch (IOException e) {
 						logger.error(sm.getString("contextConfig.inputStreamJndi",
 								url),e);
@@ -513,11 +517,17 @@ public class SipContextConfig extends ContextConfig {
 		} 
 	}
 
-	protected void processAnnotationsStream(InputStream is)
+	protected void processAnnotationsStream(InputStream is, WebXml fragment,
+            boolean handlesTypesOnly)
 	throws ClassFormatException, IOException {
 
-		ClassParser parser = new ClassParser(is, null);
+		ClassParser parser = new ClassParser(is);
 		JavaClass clazz = parser.parse();
+		checkHandlesTypes(clazz);
+
+        if (handlesTypesOnly) {
+            return;
+        }
 
 		AnnotationEntry[] annotationsEntries = clazz.getAnnotationEntries();
 

@@ -24,13 +24,13 @@
   <classpathentry kind="var" path="M2_REPO/org/jboss/cache/jbosscache-pojo/3.0.0.GA/jbosscache-pojo-3.0.0.GA.jar"/>
   <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.17/log4j-1.2.17.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/sun/jdmk/jmxtools/1.2.1/jmxtools-1.2.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.50/tomcat-catalina-7.0.50.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.50/tomcat-servlet-api-7.0.50.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.50/tomcat-juli-7.0.50.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.50/tomcat-annotations-api-7.0.50.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.50/tomcat-api-7.0.50.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.50/tomcat-util-7.0.50.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.50/tomcat-coyote-7.0.50.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-catalina/7.0.63/tomcat-catalina-7.0.63.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-servlet-api/7.0.63/tomcat-servlet-api-7.0.63.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-juli/7.0.63/tomcat-juli-7.0.63.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-annotations-api/7.0.63/tomcat-annotations-api-7.0.63.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-api/7.0.63/tomcat-api-7.0.63.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-util/7.0.63/tomcat-util-7.0.63.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/apache/tomcat/tomcat-coyote/7.0.63/tomcat-coyote-7.0.63.jar"/>
   <classpathentry kind="var" path="M2_REPO/geronimo-spec/geronimo-spec-j2ee-jacc/1.0-rc4/geronimo-spec-j2ee-jacc-1.0-rc4.jar"/>
   <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/javaee-web-api/6.0/javaee-web-api-6.0.jar"/>
