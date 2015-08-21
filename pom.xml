@@ -342,7 +342,7 @@
 				<module>containers/tomcat-8</module>
 			</modules>
 			<properties>
-				<tomcat-8.version>8.0.18</tomcat-8.version>
+				<tomcat-8.version>8.0.24</tomcat-8.version>
 			</properties>
 			<dependencies>
 				<!-- j2ee dependencies -->
@@ -375,7 +375,7 @@
 				<module>containers/tomcat-8</module>
 			</modules>
 			<properties>
-				<tomcat-8.version>8.0.18</tomcat-8.version>
+				<tomcat-8.version>8.0.24</tomcat-8.version>
 			</properties>
 			<dependencies>
 				<!-- j2ee dependencies -->
