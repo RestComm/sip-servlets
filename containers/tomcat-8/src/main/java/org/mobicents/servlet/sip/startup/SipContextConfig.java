@@ -457,7 +457,7 @@ public class SipContextConfig extends ContextConfig {
 	
 	
 	// Check for web servlet annotation in the /WEB-INF/classes	
-	protected void checkWebAnnotations(){
+    protected void checkWebAnnotations(){
 		URL webinfClasses = null;
 		try{
 			webinfClasses = context.getServletContext().getResource("/WEB-INF/classes");
@@ -469,13 +469,13 @@ public class SipContextConfig extends ContextConfig {
 			// Nothing to do.
 			return;
 		} else if ("jar".equals(webinfClasses.getProtocol())) {
-			processAnnotationsJar(webinfClasses);
-		// Removed from Tomcat 8	
+			processAnnotationsJar(webinfClasses, null, false);
+			// removed from Tomcat 8
 //		} else if ("jndi".equals(webinfClasses.getProtocol())) {
-//			processAnnotationsJndi(webinfClasses);
+//			processAnnotationsJndi(webinfClasses, null, false);
 		} else if ("file".equals(webinfClasses.getProtocol())) {
 			try {
-				processAnnotationsFile(new File(webinfClasses.toURI()));
+				processAnnotationsFile(new File(webinfClasses.toURI()), null, false);
 			} catch (URISyntaxException e) {
 				logger.error(sm.getString("contextConfig.fileUrl", webinfClasses), e);
 			} 
@@ -485,18 +485,19 @@ public class SipContextConfig extends ContextConfig {
 		}
 	}
 
-	protected void processAnnotationsFile(File file){
+	protected void processAnnotationsFile(File file, org.apache.tomcat.util.descriptor.web.WebXml fragment,
+            boolean handlesTypesOnly){
 
 		if (file.isDirectory()) {
 			String[] dirs = file.list();
 			for (String dir : dirs) {
-				processAnnotationsFile(new File(file,dir));
+				processAnnotationsFile(new File(file,dir), fragment, handlesTypesOnly);
 			}
 		} else if (file.canRead() && file.getName().endsWith(".class")) {
 			FileInputStream fis = null;
 			try {
 				fis = new FileInputStream(file);
-				processAnnotationsStream(fis);
+				processAnnotationsStream(fis, fragment, handlesTypesOnly);
 			} catch (IOException e) {
 				logger.error(sm.getString("contextConfig.inputStreamFile",
 						file.getAbsolutePath()),e);
@@ -512,7 +513,8 @@ public class SipContextConfig extends ContextConfig {
 		}
 	}
 
-	protected void processAnnotationsJar(URL url) {
+	protected void processAnnotationsJar(URL url, org.apache.tomcat.util.descriptor.web.WebXml fragment,
+            boolean handlesTypesOnly) {
 
 		JarFile jarFile = null;
 
@@ -537,7 +539,7 @@ public class SipContextConfig extends ContextConfig {
 					InputStream is = null;
 					try {
 						is = jarFile.getInputStream(jarEntry);
-						processAnnotationsStream(is);
+						processAnnotationsStream(is, fragment, handlesTypesOnly);
 					} catch (IOException e) {
 						logger.error(sm.getString("contextConfig.inputStreamJar",
 								entryName, url),e);
@@ -615,15 +617,20 @@ public class SipContextConfig extends ContextConfig {
 //		} 
 //	}
 
-	protected void processAnnotationsStream(InputStream is)
+	protected void processAnnotationsStream(InputStream is, org.apache.tomcat.util.descriptor.web.WebXml fragment,
+            boolean handlesTypesOnly)
 	throws ClassFormatException, IOException {
 
 		ClassParser parser = new ClassParser(is);
 		JavaClass clazz = parser.parse();
+		checkHandlesTypes(clazz);
+
+        if (handlesTypesOnly) {
+            return;
+        }
 
 		AnnotationEntry[] annotationsEntries = clazz.getAnnotationEntries();
 		if (annotationsEntries != null) {
-            String className = clazz.getClassName();
 			for (AnnotationEntry ae : annotationsEntries) {
 				String type = ae.getAnnotationType();
 				if ("Ljavax/servlet/annotation/WebServlet;".equals(type)) {

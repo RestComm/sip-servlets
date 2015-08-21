@@ -165,12 +165,11 @@ public class SipRuleSet extends RuleSetBase {
         //Handles Servlets
         digester.addRule(prefix + "sip-app/servlet",
                          new WrapperCreateRule());
-        digester.addSetNext(prefix + "/servlet",
-                "addServlet",
-                "org.apache.tomcat.util.descriptor.web.ServletDef");
 //        digester.addSetNext(prefix + "sip-app/servlet",
-//                            "addChild");
-//                            ,"org.apache.catalina.Container");
+//                "addServlet",
+//                "org.apache.tomcat.util.descriptor.web.ServletDef");
+        digester.addSetNext(prefix + "sip-app/servlet",
+                            "addChild", "org.apache.catalina.Container");
         digester.addCallMethod(prefix + "sip-app/servlet/icon/smallIcon",
                 "setSmallIcon", 0);
         digester.addCallMethod(prefix + "sip-app/servlet/icon/largeIcon",
@@ -612,8 +611,8 @@ final class WrapperCreateRule extends Rule {
             (Context) digester.peek(digester.getCount() - 1);
         Wrapper wrapper = context.createWrapper();
         digester.push(wrapper);
-//        if (digester.getLogger().isDebugEnabled())
-//            digester.getLogger().debug("new " + wrapper.getClass().getName());
+        if (digester.getLogger().isDebugEnabled())
+            digester.getLogger().debug("new " + wrapper.getClass().getName());
     }
 
     public void end(String namespace, String name)

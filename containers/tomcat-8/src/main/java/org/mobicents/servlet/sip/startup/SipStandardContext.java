@@ -845,7 +845,11 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	@Override
 	public void addChild(Container container) {
 		if(children.get(container.getName()) == null) {
-			super.addChild(container);
+			if(container instanceof SipServletImpl) {
+				this.addChild((SipServletImpl)container);
+			} else {
+				super.addChild(container);
+			}
 		} else {
 			if(logger.isDebugEnabled()) {
 				logger.debug(container.getName() + " already present as a Sip Servlet not adding it again");

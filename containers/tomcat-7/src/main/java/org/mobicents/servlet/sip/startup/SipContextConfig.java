@@ -530,21 +530,22 @@ public class SipContextConfig extends ContextConfig {
         }
 
 		AnnotationEntry[] annotationsEntries = clazz.getAnnotationEntries();
-
-		for (AnnotationEntry ae : annotationsEntries) {
-			String type = ae.getAnnotationType();
-			if ("Ljavax/servlet/annotation/WebServlet;".equals(type)) {
-				hasWebAnnotations=true;
-			}else if ("Ljavax/servlet/annotation/WebFilter;".equals(type)) {
-				hasWebAnnotations=true;
-			}else if ("Ljavax/servlet/annotation/WebListener;".equals(type)) {
-				hasWebAnnotations=true;
-			}else if ("Ljavax/servlet/annotation/WebInitParam;".equals(type)) {
-				hasWebAnnotations=true;
-			}else if ("Ljavax/servlet/annotation/MultipartConfig;".equals(type)) {
-				hasWebAnnotations=true;
-			} else {
-				// Unknown annotation - ignore
+		if (annotationsEntries != null) {
+			for (AnnotationEntry ae : annotationsEntries) {
+				String type = ae.getAnnotationType();
+				if ("Ljavax/servlet/annotation/WebServlet;".equals(type)) {
+					hasWebAnnotations=true;
+				}else if ("Ljavax/servlet/annotation/WebFilter;".equals(type)) {
+					hasWebAnnotations=true;
+				}else if ("Ljavax/servlet/annotation/WebListener;".equals(type)) {
+					hasWebAnnotations=true;
+				}else if ("Ljavax/servlet/annotation/WebInitParam;".equals(type)) {
+					hasWebAnnotations=true;
+				}else if ("Ljavax/servlet/annotation/MultipartConfig;".equals(type)) {
+					hasWebAnnotations=true;
+				} else {
+					// Unknown annotation - ignore
+				}
 			}
 		}
 	}
