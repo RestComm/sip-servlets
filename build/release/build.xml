@@ -75,7 +75,8 @@
 	<!-- Release target -->
 	
 	<!--target name="release" depends="clean,build-documentation,release-tomcat7,release-tomcat,release-jboss-5-jdk6,make-src-zip" /-->
-	<target name="release" depends="clean,build-documentation,release-tomcat7,release-tomcat8,make-src-zip" />
+	<target name="release" depends="clean,build-documentation,release-tomcat-7,release-tomcat8,make-src-zip" />
+	<target name="release-MSS-4" depends="clean,build-documentation,release-tomcat8,make-src-zip" />
 	
 	<!-- Tomcat version -->
 	
