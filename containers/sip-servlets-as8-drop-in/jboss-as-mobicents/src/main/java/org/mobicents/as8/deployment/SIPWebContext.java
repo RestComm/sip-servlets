@@ -175,7 +175,9 @@ public class SIPWebContext extends SipContextImpl {
                 for (Field field : listenerClass.getDeclaredFields()) {
                     Annotation[] annotations = field.getAnnotations();
                     for(Annotation ann : annotations){
+                        Boolean origAccessible = null;
                         try {
+                            origAccessible = new Boolean(field.isAccessible());
                             field.setAccessible(true);
                             if (ann instanceof Resource && SipFactory.class.isAssignableFrom(field.getType())) {
                                 field.set(listener, super.sipFactoryFacade);
@@ -196,7 +198,7 @@ public class SIPWebContext extends SipContextImpl {
                                     parent = parent.getParent();
                                 }
                                 String lookupString="java:global/"+deployment+"/";
-                                
+
                                 String name = ((EJB)ann).name();
                                 //if annotation has no name, check for assignable types in the jndi tree for injection:
                                 if(name == null || "".equals(name)){
@@ -221,7 +223,9 @@ public class SIPWebContext extends SipContextImpl {
                         } catch (IllegalArgumentException | IllegalAccessException | NamingException e) {
                             throw new ServletException("Exception occured while injecting resources!",e);
                         } finally {
-                            field.setAccessible(false);
+                            if(origAccessible!=null){
+                                field.setAccessible(origAccessible);
+                            }
                         }
                     }
                 }
@@ -235,14 +239,21 @@ public class SIPWebContext extends SipContextImpl {
                 for(Method method : methods){
                     Annotation ann = method.getAnnotation(PostConstruct.class);
                     if(ann!=null){
+                        Boolean origAccessible = null;
                         try {
                             if(method.getParameterCount() == 0){
+                                origAccessible = new Boolean(method.isAccessible());
+                                method.setAccessible(true);
                                 method.invoke(listener, new Object[0]);
                             }else{
                                 throw new IllegalArgumentException("@PostContstruct annotated methods must have 0 parameters.");
                             }
                         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                             throw new ServletException("Exception occured while calling @PostConstruct methods!",e);
+                        } finally {
+                            if(origAccessible!=null){
+                                method.setAccessible(origAccessible);
+                            }
                         }
                     }
                 }
@@ -310,7 +321,10 @@ public class SIPWebContext extends SipContextImpl {
                 for(Method method : methods){
                     Annotation ann = method.getAnnotation(PreDestroy.class);
                     if(ann!=null){
+                        Boolean origAccessible = null;
                         try {
+                            origAccessible = new Boolean(method.isAccessible());
+                            method.setAccessible(true);
                             if(method.getParameterCount() == 0){
                                 method.invoke(listener, new Object[0]);
                             }else{
@@ -318,6 +332,10 @@ public class SIPWebContext extends SipContextImpl {
                             }
                         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                             throw new ServletException("Exception occured while calling @PreDestroy methods!",e);
+                        } finally {
+                            if(origAccessible != null){
+                                method.setAccessible(origAccessible);
+                            }
                         }
                     }
                 }
