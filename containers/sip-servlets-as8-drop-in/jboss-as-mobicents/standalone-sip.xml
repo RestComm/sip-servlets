@@ -421,8 +421,8 @@
         <socket-binding name="http" port="${jboss.http.port:8080}"/>
         <socket-binding name="https" port="${jboss.https.port:8443}"/>
         <socket-binding name="sip-udp" port="5080"/>
-		<socket-binding name="sip-tcp" port="5081"/>
-		<socket-binding name="sip-tls" port="5081"/>
+	<socket-binding name="sip-tcp" port="5080"/>
+	<socket-binding name="sip-tls" port="5081"/>
         <socket-binding name="sip-ws" port="5082"/>
         <socket-binding name="txn-recovery-environment" port="4712"/>
         <socket-binding name="txn-status-manager" port="4713"/>
