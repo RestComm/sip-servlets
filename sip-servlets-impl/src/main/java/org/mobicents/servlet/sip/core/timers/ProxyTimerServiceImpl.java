@@ -37,7 +37,7 @@ public class ProxyTimerServiceImpl extends Timer implements ProxyTimerService {
 	private static final Logger logger = Logger.getLogger(ProxyTimerServiceImpl.class
 			.getName());
 	private AtomicBoolean started = new AtomicBoolean(false);
-	
+
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.timers.ProxyTimerService#cancel(org.mobicents.servlet.sip.proxy.ProxyBranchTimerTask)
 	 */

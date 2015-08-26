@@ -42,5 +42,4 @@ public interface MobicentsProxy extends Proxy, ProxyExt {
 	void setOriginalRequest(MobicentsSipServletRequest sipServletRequest);
 	// https://code.google.com/p/sipservlets/issues/detail?id=266
 	void cancelAllExcept(ProxyBranch except, String[] protocol, int[] reasonCode, String[] reasonText, boolean throwExceptionIfCannotCancel);
-
 }

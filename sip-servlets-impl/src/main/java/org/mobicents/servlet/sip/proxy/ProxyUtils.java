@@ -427,7 +427,7 @@ public class ProxyUtils {
 				proxyBranch.cancel1xxTimer();
 			}
 			if(Response.TRYING < status && status < Response.OK) {
-				proxyBranch.updateTimer(true);
+				proxyBranch.updateTimer(true, sipServetResponse.getSipApplicationSession(false));
 			} else if(status >= Response.OK) {
 				//remove it if response is final
 				proxyBranch.cancel1xxTimer();

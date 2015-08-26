@@ -251,11 +251,11 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		checkReadOnly();
 		if (!((Request) message).getMethod().equals(Request.INVITE)) {
 			throw new IllegalStateException(
-					"Cannot create CANCEL for non inivte");
+					"Cannot create CANCEL for non invite " + message);
 		}
 		if (super.getTransaction() == null
 				|| super.getTransaction() instanceof ServerTransaction)
-			throw new IllegalStateException("No client transaction found!");
+			throw new IllegalStateException("No client transaction found! " + super.getTransaction());
 
 		if(RoutingState.FINAL_RESPONSE_SENT.equals(routingState) || lastFinalResponse != null) {
 			if(lastFinalResponse != null) {

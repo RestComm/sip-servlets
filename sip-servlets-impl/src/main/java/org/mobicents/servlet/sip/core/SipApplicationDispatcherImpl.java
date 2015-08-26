@@ -1534,6 +1534,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}		
 		
 		final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
+		final String branchId = transaction.getBranchId();
 		if(tad != null && tad.getSipServletMessage() != null) {
 			getAsynchronousExecutor().execute(new Runnable() {
 				public void run() {
@@ -1552,7 +1553,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 						}
 
 						if(tad.getProxyBranch() != null) {
-							tad.getProxyBranch().removeTransaction(transaction.getBranchId());
+							tad.getProxyBranch().removeTransaction(branchId);
 						}
 
 						// Issue 1333 : B2buaHelper.getPendingMessages(linkedSession, UAMode.UAC) returns empty list
@@ -1560,7 +1561,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 						// to create the ACK on second leg for B2BUA apps
 						if(sipSession != null) {
 							boolean removeTx = true;
-							if(b2buaHelperImpl != null && transaction instanceof ClientTransaction && Request.INVITE.equals(sipServletMessageImpl.getMethod())) {
+							if(b2buaHelperImpl != null && (transaction == null || transaction instanceof ClientTransaction) 
+									&& Request.INVITE.equals(sipServletMessageImpl.getMethod())) {
 								removeTx = false;
 							}							
 							SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());					
