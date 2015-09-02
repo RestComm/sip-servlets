@@ -228,9 +228,9 @@
 		        		if(order != null) {
 		        			appOrder = order; 
 		        		}
-                                        var platformSpecificForm = "";
-                                        if (platformSpecific != null) {
-                                                platformSpecificForm = platformSpecific;
+		        		var platformSpecificForm = "";
+		        		if (platformSpecific != null) {
+		        		        platformSpecificForm = platformSpecific;
                                         }
 		        		for (var i = 0; i < applications.length; i++) {
 		        			if(applicationName != null && applications[i] == applicationName) {
@@ -282,7 +282,7 @@
 						+ '</div><div class="control-group">	<label class="control-label">Route : </label><div class="controls"><input id="'+type+'-application-content-'+ id +'-route" type="text" class="input-large" placeholder="Route" value="' + route + '"></input> </div>';
 						tabContent = tabContent + '</div><div class="control-group">	<label class="control-label">Order : </label><div class="controls"><input id="'+type+'-application-content-'+ id +'-order" type="text" class="input-large" placeholder="Order" value="' + appOrder + '"></input> </div>';
 						tabContent = tabContent + '</div><div class="control-group">	<label class="control-label">Platform-Specific : </label><div class="controls"><input id="'+type+'-application-content-'+ id +'-platformSpecific" type="text" class="input-large" placeholder="Platform-Specific" value="' + platformSpecificForm + '"></input> </div>';
-                                                abContent = tabContent + '</div>';
+                                                tabContent = tabContent + '</div>';
 						tabContent = tabContent + '<button id="'+type+'-application-content-remove-application-'+ id +'" class="btn btn-small"><i class="icon-remove"></i> Remove Application</button> <br/><br/></div>';					
 						//console.log("tabContent "+ tabContent);
 						//console.log("tabContent "+ $("#application-" + type + "-add-button"));														
@@ -333,7 +333,7 @@
 					    		routeModifiers = $("#" + methodLowserCase + "-application-content-"+ i +"-routeModifiers").val();
 					    		route = $("#" + methodLowserCase + "-application-content-"+ i +"-route").val();
 					    		order = $("#" + methodLowserCase + "-application-content-"+ i +"-order").val();
-                                                        platformSpecific = $("#" + methodLowserCase + "-application-content-"+ i +"-platformSpecific").val();
+					    		platformSpecific = $("#" + methodLowserCase + "-application-content-"+ i +"-platformSpecific").val();
 					    		if(subscriberIdentity.trim() == "") {
 					    			$("#" + methodLowserCase + "-application-content-"+ i +"-subscriberIdentity").addClass("required");					    			
 					    			formInvalid = true;
@@ -353,7 +353,7 @@
 					    		darApplication = darApplication + "\"" + route + "\",";
 					    		darApplication = darApplication + "\"" + routeModifiers + "\",";					    		
 					    		darApplication = darApplication + "\"" + order + "\",";
-                                                        darApplication = darApplication + "\"" + platformSpecific + "\"";
+					    		darApplication = darApplication + "\"" + platformSpecific + "\"";
 					    		darApplication = darApplication + ")"
 					    		darMethodConfiguration = darMethodConfiguration + darApplication;
 					    		if(i+1 < tabMethod.length) {
@@ -402,15 +402,23 @@
 							}
 							else {			
 								mbean = html.value[0];
-								var j4p = new Jolokia({url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/" });
-								j4p.execute(mbean, "updateApplicationRouterConfiguration(java.lang.Object)", darConfiguration, {
-									success: function(value) {					                	 					                	
+                                                                //https://github.com/Mobicents/sip-servlets/pull/64
+                                                                //Better to use a proper POST request to submit the configuration.
+                                                                //This prevents errors when hadnling special characters
+								var j4p = new Jolokia({url: window.jolokiaProtocol + window.jolokiaAddress + ":" + window.jolokiaPort + "/jolokia/",
+                                                                    method: "post",
+                                                                    success: function(value) {					                	 					                	
 										logToConsole("INFO", "DAR Information successfully updated");
-						            }, 
-									error: function(value) {					                	 					                	
+        						            }, 
+                                                                    error: function(value) {					                	 					                	
 										logToConsole("ERROR", "Problem updating the DAR Information:" + JSON.stringify(value)); 
-						            } 
-								});								
+        						            } 
+                                                                });
+                                                                var updateDarReq = { type: "exec", 
+                                                                                    mbean: mbean, 
+                                                                                    operation: "updateApplicationRouterConfiguration(java.lang.Object)", 
+                                                                                    arguments : [darConfiguration] };                                                                
+                                                                j4p.request(updateDarReq);
 							}
 						})
 						.fail(function() {
