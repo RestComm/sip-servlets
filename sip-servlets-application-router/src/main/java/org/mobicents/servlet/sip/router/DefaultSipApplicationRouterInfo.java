@@ -34,142 +34,141 @@ import javax.servlet.sip.ar.SipApplicationRoutingRegion;
 import javax.servlet.sip.ar.SipRouteModifier;
 
 /**
- * This class contains one information parsed in the dar configuration file.
- * Example : ("OriginatingCallWaiting", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0")
+ * This class contains one information parsed in the dar configuration file. Example : ("OriginatingCallWaiting", "DAR:From",
+ * "ORIGINATING", "", "NO_ROUTE", "0")
+ * 
  * @author Jean Deruelle
- *
+ * 
  */
 public class DefaultSipApplicationRouterInfo extends SipApplicationRouterInfo {
-	private static final String HEADER_REGEX_PREFIX = "HEADER";
-        private static final String HEADER_REGEX_SEPARATOR = "_";
-        
-//	private String applicationName;
-//	private SipApplicationRoutingRegion routingRegion;
-//	private String subscriberIdentity;	
-//	private String[] routes;
-//	private SipRouteModifier routeModifier;
-	private int order;
-	private Map<String, String> optionalParameters;
-        
-        private Map<String, Pattern> headerPatternMap = new HashMap();        
-			
-	
-	/**
-	 * @param applicationName
-	 * @param subscriberIdentity
-	 * @param routingRegionType
-	 * @param route
-	 * @param routeModifier
-	 * @param order
-	 */
-	public DefaultSipApplicationRouterInfo(String applicationName,
-			String subscriberIdentity,
-			SipApplicationRoutingRegion routingRegion, String[] routes,
-			SipRouteModifier routeModifier, int order, String optionalParameters) {
-		super(applicationName, routingRegion, subscriberIdentity, routes, routeModifier, null);
-//		this.applicationName = applicationName;
-//		this.subscriberIdentity = subscriberIdentity;
-//		this.routingRegion = routingRegion;
-//		this.routes = routes;
-//		this.routeModifier = routeModifier;
-		this.order = order;
-		try {
-			this.optionalParameters = stringToMap(optionalParameters);
-                        scanForHeaderRegex();
-		} catch (ParseException e) {
-			throw new RuntimeException("Error", e);
-		}
-		
-	}
-        
-        private void scanForHeaderRegex()
-        {
-            for (String optParamName : optionalParameters.keySet())
-            {
-                
-                if (optParamName.startsWith(HEADER_REGEX_PREFIX))
-                {
-                    int headerNamePos = optParamName.indexOf(HEADER_REGEX_SEPARATOR);
-                    //add 1 to found position to skip SEPARATOR char as the key in the map
-                    headerPatternMap.put(optParamName.substring(headerNamePos + 1), Pattern.compile(optionalParameters.get(optParamName)));
-                }
+    private static final String HEADER_REGEX_PREFIX = "HEADER";
+    private static final String HEADER_REGEX_SEPARATOR = "_";
+
+    // private String applicationName;
+    // private SipApplicationRoutingRegion routingRegion;
+    // private String subscriberIdentity;
+    // private String[] routes;
+    // private SipRouteModifier routeModifier;
+    private int order;
+    private Map<String, String> optionalParameters;
+
+    private Map<String, Pattern> headerPatternMap = new HashMap();
+
+    /**
+     * @param applicationName
+     * @param subscriberIdentity
+     * @param routingRegionType
+     * @param route
+     * @param routeModifier
+     * @param order
+     */
+    public DefaultSipApplicationRouterInfo(String applicationName, String subscriberIdentity,
+            SipApplicationRoutingRegion routingRegion, String[] routes, SipRouteModifier routeModifier, int order,
+            String optionalParameters) {
+        super(applicationName, routingRegion, subscriberIdentity, routes, routeModifier, null);
+        // this.applicationName = applicationName;
+        // this.subscriberIdentity = subscriberIdentity;
+        // this.routingRegion = routingRegion;
+        // this.routes = routes;
+        // this.routeModifier = routeModifier;
+        this.order = order;
+        try {
+            this.optionalParameters = stringToMap(optionalParameters);
+            scanForHeaderRegex();
+        } catch (ParseException e) {
+            throw new RuntimeException("Error", e);
+        }
+
+    }
+
+    private void scanForHeaderRegex() {
+        for (String optParamName : optionalParameters.keySet()) {
+
+            if (optParamName.startsWith(HEADER_REGEX_PREFIX)) {
+                int headerNamePos = optParamName.indexOf(HEADER_REGEX_SEPARATOR);
+                // add 1 to found position to skip SEPARATOR char as the key in the map
+                headerPatternMap.put(optParamName.substring(headerNamePos + 1),
+                        Pattern.compile(optionalParameters.get(optParamName)));
             }
         }
-	
-	public static Map<String, String> stringToMap(String str) throws ParseException {
-		
-		Map<String, String> map = new HashMap<String, String>();
-		if(str == null) return map;
-		String[] props = str.split(" ");
-		for(String prop : props) {
-			if(prop.equals("") || prop.equals(" ")) continue;
-			
-			int indexOfEq = prop.indexOf('=');
-			if(indexOfEq == -1) {
-				throw new RuntimeException("Expected '=' sign in the optional Parameters");
-			}
-			
-			String key = prop.substring(0, indexOfEq);
-			String value = prop.substring(indexOfEq + 1);
-			map.put(key, value);
-		}
-		return map;
-	}
-	
-	public static String mapToString(Map<String, String> map) {
-		StringBuilder str = new StringBuilder("");
-		Set<Entry<String, String>> entries = map.entrySet();
-		for(Entry<String, String> entry : entries) {
-			str.append(entry.getKey()).append("=").append(entry.getValue()).append(" ");
-		}
-		return str.toString();
-	}
-	
-	/**
-	 * @return the applicationName
-	 */
-	public String getApplicationName() {
-		return getNextApplicationName();
-	}
-	
-	/**
-	 * @return the subscriberIdentity
-	 */
-	public String getSubscriberIdentity() {
-		return getSubscriberURI();
-	}
-	
-	
-	/**
-	 * @return the order
-	 */
-	public int getOrder() {
-		return order;
-	}
-	/**
-	 * @param order the order to set
-	 */
-	public void setStateInfo(int stateInfo) {
-		this.order = stateInfo;
-	}
-	
-	/**
-	 * 
-	 * @return optional params as a string (command separated key=value pairs)
-	 */
-	public Map<String, String> getOptionalParameters() {
-		return optionalParameters;
-	}
-	
-	/**
-	 * 
-	 * @param optionalParameters
-	 */
-	public void setOptionalParameters(HashMap<String, String> optionalParameters) {
-		this.optionalParameters = optionalParameters;
-	}
+    }
+
+    public static Map<String, String> stringToMap(String str) throws ParseException {
+
+        Map<String, String> map = new HashMap<String, String>();
+        if (str == null)
+            return map;
+        String[] props = str.split(" ");
+        for (String prop : props) {
+            if (prop.equals("") || prop.equals(" "))
+                continue;
+
+            int indexOfEq = prop.indexOf('=');
+            if (indexOfEq == -1) {
+                throw new RuntimeException("Expected '=' sign in the optional Parameters");
+            }
+
+            String key = prop.substring(0, indexOfEq);
+            String value = prop.substring(indexOfEq + 1);
+            map.put(key, value);
+        }
+        return map;
+    }
+
+    public static String mapToString(Map<String, String> map) {
+        StringBuilder str = new StringBuilder("");
+        Set<Entry<String, String>> entries = map.entrySet();
+        for (Entry<String, String> entry : entries) {
+            str.append(entry.getKey()).append("=").append(entry.getValue()).append(" ");
+        }
+        return str.toString();
+    }
+
+    /**
+     * @return the applicationName
+     */
+    public String getApplicationName() {
+        return getNextApplicationName();
+    }
+
+    /**
+     * @return the subscriberIdentity
+     */
+    public String getSubscriberIdentity() {
+        return getSubscriberURI();
+    }
+
+    /**
+     * @return the order
+     */
+    public int getOrder() {
+        return order;
+    }
+
+    /**
+     * @param order the order to set
+     */
+    public void setStateInfo(int stateInfo) {
+        this.order = stateInfo;
+    }
+
+    /**
+     * 
+     * @return optional params as a string (command separated key=value pairs)
+     */
+    public Map<String, String> getOptionalParameters() {
+        return optionalParameters;
+    }
+
+    /**
+     * 
+     * @param optionalParameters
+     */
+    public void setOptionalParameters(HashMap<String, String> optionalParameters) {
+        this.optionalParameters = optionalParameters;
+    }
 
     public Map<String, Pattern> getHeaderPatternMap() {
         return headerPatternMap;
-    }      
+    }
 }
