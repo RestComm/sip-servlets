@@ -50,238 +50,250 @@ import javax.servlet.sip.ar.SipRouteModifier;
 import org.apache.log4j.Logger;
 
 /**
- * This is a utility class used for parsing the default application router file as
- * defined in Appendix C of JSR289.
- *
+ * This is a utility class used for parsing the default application router file as defined in Appendix C of JSR289.
+ * 
  */
 public class DefaultApplicationRouterParser {
-	private static final int SIP_APPLICATION_ROUTER_INFO_PARAM_NB = 6;
-	
-	//the logger
-	private static Logger log = Logger.getLogger(DefaultApplicationRouterParser.class);
-	private Properties properties;
-	
-	public DefaultApplicationRouterParser() {
-		properties = new Properties();  
-	}
-        
-	public void init(Properties props) {
-            properties = props;
-        }        
-       
-	/**
-	 * Load the configuration file as defined in JSR289 Appendix C ie 
-	 * as a system property "javax.servlet.sip.dar"
-	 * @throws IllegalArgumentException if anything goes wrong when trying to load the configuration file
-	 */
-	public void init() {
-		//load the configuration file
-		String darConfigurationFileLocation = getDarConfigurationFileLocation();
-		if(log.isDebugEnabled()) {
-			log.debug("Default Application Router file Location : "+darConfigurationFileLocation);
-		}
-		File darConfigurationFile = null;
-		//hack to get around space char in path see http://weblogs.java.net/blog/kohsuke/archive/2007/04/how_to_convert.html, 
-		// we create a URL since it's permissive enough
-		URL url = null;
-		try {
-			url = new URL(darConfigurationFileLocation);
-		} catch (MalformedURLException e) {
-			log.fatal("Cannot find the default application router file ! ",e);
-			throw new IllegalArgumentException("The Default Application Router file Location : "+darConfigurationFileLocation+" is not valid ! ",e);
-		}
-		try {
-			darConfigurationFile = new File(new URI(darConfigurationFileLocation));
-		} catch (URISyntaxException e) {
-			//if the uri contains space this will fail, so getting the path will work
-			darConfigurationFile = new File(url.getPath());
-		}				
-		FileInputStream fis = null;
-		try {
-			fis = new FileInputStream(darConfigurationFile);
-			properties.load(fis);
-		} catch (FileNotFoundException e) {
-			log.fatal("Cannot find the default application router file ! ",e);
-			throw new IllegalArgumentException("The Default Application Router file Location : "+darConfigurationFileLocation+" is not valid ! ",e);
-		} catch (IOException e) {
-			log.fatal("Cannot load the default application router file ! ",e);
-			throw new IllegalArgumentException("The Default Application Router file Location : "+darConfigurationFileLocation+" cannot be loaded ! ",e);
-		} finally {			
-			if(fis != null) {
-				try {
-					fis.close();
-				} catch (IOException e) {
-					log.error("fail to close the following file " + darConfigurationFile.getAbsolutePath(), e);
-				}
-			}
-		}		
-	}
-	
-	/**
-	 * Parse the global default application router file from the loaded properties file from the init method
-	 * @return a Map of key as sip method and value as a list of SipApplicationRouterInfo
-	 * @throws ParseException if anything goes wrong during the parsing
-	 */
-	public Map<String, List<? extends SipApplicationRouterInfo>> parse() throws ParseException {
-		Map<String, List<? extends SipApplicationRouterInfo>> sipApplicationRoutingInfo = 
-			new HashMap<String, List<? extends SipApplicationRouterInfo>>();
-		
-		Iterator darEntriesIterator = properties.entrySet().iterator();
-		while(darEntriesIterator.hasNext()) {
-			Entry<String, String> darEntry = (Entry<String, String>)darEntriesIterator.next();
-			//get the key
-			String sipMethod = darEntry.getKey();
-			String sipApplicationRouterInfosStringified = darEntry.getValue();
-			//parse the corresponding value  
-			List<? extends SipApplicationRouterInfo> sipApplicationRouterInfoList = 
-				parseSipApplicationRouterInfos(sipApplicationRouterInfosStringified);
-			sipApplicationRoutingInfo.put(sipMethod, sipApplicationRouterInfoList);
-		}
-		return sipApplicationRoutingInfo;
-	}
-	
-	/**
-	 * Same method as above, but loads DAR configuration from a string.
-	 * @param configuration
-	 * @return
-	 * @throws ParseException
-	 */
-	public Map<String, List<? extends SipApplicationRouterInfo>> parse(String configuration) throws ParseException {
-		Properties tempProperties = new Properties();
-		// tempProperties.load(new StringReader(configuration)); // This needs Java 1.6
-		ByteArrayInputStream stringStream = new ByteArrayInputStream(configuration.getBytes());
-		try {
-			tempProperties.load(stringStream);
-		} catch (IOException e) {
-			log.warn("Failed to update AR configuration. Will use the old properties.");
-			return null;
-		}
-		this.properties = tempProperties;
-		return parse();
-	}
-	
-	/**
-	 * Same method as above, but loads DAR configuration from properties.
-	 * @param configuration
-	 * @return
-	 * @throws ParseException
-	 */
-	public Map<String, List<? extends SipApplicationRouterInfo>> parse(Properties properties) throws ParseException {
-		this.properties = properties;
-		return parse();
-	}
-		
-	/**
-	 * Parse a string corresponding to one or more definition of SipApplicationRouterInfo
-	 * ex : ("SimpleSipServlet", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0"), ("SimpleSipServlet", "DAR:To", "TERMINATING", "", "NO_ROUTE", "1")
-	 * and return the corresponding object list  
-	 * @param sipApplicationRouterInfosStringified the stringified list of SipApplicationRouterInfo
-	 * @return a list of SipApplicationRouterInfo
-	 * @throws ParseException if anything goes wrong during the parsing
-	 */
-	private List<? extends SipApplicationRouterInfo> parseSipApplicationRouterInfos(String sipApplicationRouterInfosStringified) throws ParseException {
-		List<DefaultSipApplicationRouterInfo> sipApplicationRouterInfos = new ArrayList<DefaultSipApplicationRouterInfo>();
-		while(sipApplicationRouterInfosStringified.indexOf("(") != -1) {
-			int indexOfLeftParenthesis = sipApplicationRouterInfosStringified.indexOf("(");
-			int indexOfRightParenthesis = sipApplicationRouterInfosStringified.indexOf(")");
-			if(indexOfLeftParenthesis == -1 || indexOfRightParenthesis == -1) {
-				throw new ParseException("Parenthesis expectected. Cannot parse the following string from the default application router file" + sipApplicationRouterInfosStringified,0);
-			}
-				
-			String sipApplicationRouterInfoStringified = 
-				sipApplicationRouterInfosStringified.substring(indexOfLeftParenthesis, indexOfRightParenthesis +1);
-			DefaultSipApplicationRouterInfo sipApplicationRouterInfo = parseSipApplicationRouterInfo(sipApplicationRouterInfoStringified);
-			//get the index order from the default application router properties file			
-			sipApplicationRouterInfos.add(sipApplicationRouterInfo);
-			sipApplicationRouterInfosStringified = sipApplicationRouterInfosStringified.substring(indexOfRightParenthesis + 1);
-		}
-		
-		// Sort based on the app number
-		Collections.sort(sipApplicationRouterInfos, new Comparator<DefaultSipApplicationRouterInfo>() {
+    private static final int SIP_APPLICATION_ROUTER_INFO_PARAM_NB = 6;
 
-			public int compare(DefaultSipApplicationRouterInfo arg0,
-					DefaultSipApplicationRouterInfo arg1) {
-				if(arg0.getOrder()==arg1.getOrder()) return 0;
-				if(arg0.getOrder()>arg1.getOrder()) return 1;
-				return -1;
-			}
-			
-		});
-		return sipApplicationRouterInfos;
-	}
+    // the logger
+    private static Logger log = Logger.getLogger(DefaultApplicationRouterParser.class);
+    private Properties properties;
 
-	/**
-	 * Parse a string corresponding to one definition of SipApplicationRouterInfo and return the corresponding Object
-	 * ex : ("SimpleSipServlet", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0") 
-	 * @param sipApplicationRouterInfoStringified the stringified SipApplicationRouterInfo
-	 * @return the corresponding SipApplicationRouterInfo
-	 * @throws ParseException if anything goes wrong during the parsing
-	 */
-	private DefaultSipApplicationRouterInfo parseSipApplicationRouterInfo(String sipApplicationRouterInfoStringified) throws ParseException {
-		//there will always have 6 parameters in a SipApplicationRouterInfo for the default applicationRouterInfo
-		String[] sipApplicationRouterInfoParameters = new String[SIP_APPLICATION_ROUTER_INFO_PARAM_NB];
-		
-		for (int i = 0; i < SIP_APPLICATION_ROUTER_INFO_PARAM_NB; i++) {
-			int indexOfLeftQuote = sipApplicationRouterInfoStringified.indexOf("\"");
-			if(indexOfLeftQuote == -1) {
-				throw new ParseException("Left quote expected. Cannot parse the following string from the default application router file" + sipApplicationRouterInfoStringified,0);
-			}
-			int indexOfRightQuote = sipApplicationRouterInfoStringified.substring(indexOfLeftQuote + 1).indexOf("\"");
-			if(indexOfRightQuote == -1) {				
-				throw new ParseException("Right quote expected. Cannot parse the following string from the default application router file " + sipApplicationRouterInfoStringified,0);
-			}				
-			indexOfRightQuote += indexOfLeftQuote;
-			String sipApplicationRouterInfoParameter = 
-				sipApplicationRouterInfoStringified.substring(indexOfLeftQuote + 1, indexOfRightQuote + 1);
-			sipApplicationRouterInfoParameters[i] = sipApplicationRouterInfoParameter;
-			sipApplicationRouterInfoStringified = sipApplicationRouterInfoStringified.substring(indexOfRightQuote + 2);
-		}		
-		
-		// Parse optional DAR field while is a set of key/value pairs
-		String optionalParameters = null;
-		int indexOfLeftQuote = sipApplicationRouterInfoStringified.indexOf("\"");
-		if(indexOfLeftQuote != -1) {
-			int indexOfRightQuote = sipApplicationRouterInfoStringified.substring(indexOfLeftQuote + 1).indexOf("\"");
-			if(indexOfRightQuote != -1) {				
-				indexOfRightQuote += indexOfLeftQuote;
-				optionalParameters = 
-					sipApplicationRouterInfoStringified.substring(indexOfLeftQuote + 1, indexOfRightQuote + 1);
-			} else {
-				throw new ParseException("Expected a right quote in the optiona parameters", indexOfLeftQuote);
-			}
+    public DefaultApplicationRouterParser() {
+        properties = new Properties();
+    }
 
-		}
-	
-		// Parsing is done
-		int order = -1;
-		try{
-			order = Integer.parseInt(sipApplicationRouterInfoParameters[5]);
-		} catch (NumberFormatException nfe) {
-			throw new ParseException("Impossible to parse the state info into an integer for this line " + sipApplicationRouterInfoStringified, 0);
-		}
-		return new DefaultSipApplicationRouterInfo(
-				//application name
-				sipApplicationRouterInfoParameters[0],
-				//subsriberURI
-				sipApplicationRouterInfoParameters[1],
-				//routing region
-				new SipApplicationRoutingRegion(
-						sipApplicationRouterInfoParameters[2],
-						SipApplicationRoutingRegionType.valueOf(
-								SipApplicationRoutingRegionType.class,sipApplicationRouterInfoParameters[2])),
-				//route
-				new String[]{sipApplicationRouterInfoParameters[3]},
-				//sip route modifier
-				SipRouteModifier.valueOf(SipRouteModifier.class,sipApplicationRouterInfoParameters[4]),
-				//stateinfo
-				order, optionalParameters);		
-	}
-	
-	public String getDarConfigurationFileLocation() {
-		return System.getProperty("javax.servlet.sip.dar");
-	}
-	
-	public Properties getProperties() {
-		return properties;
-	}
+    public void init(Properties props) {
+        properties = props;
+    }
+
+    /**
+     * Load the configuration file as defined in JSR289 Appendix C ie as a system property "javax.servlet.sip.dar"
+     * 
+     * @throws IllegalArgumentException if anything goes wrong when trying to load the configuration file
+     */
+    public void init() {
+        // load the configuration file
+        String darConfigurationFileLocation = getDarConfigurationFileLocation();
+        if (log.isDebugEnabled()) {
+            log.debug("Default Application Router file Location : " + darConfigurationFileLocation);
+        }
+        File darConfigurationFile = null;
+        // hack to get around space char in path see http://weblogs.java.net/blog/kohsuke/archive/2007/04/how_to_convert.html,
+        // we create a URL since it's permissive enough
+        URL url = null;
+        try {
+            url = new URL(darConfigurationFileLocation);
+        } catch (MalformedURLException e) {
+            log.fatal("Cannot find the default application router file ! ", e);
+            throw new IllegalArgumentException("The Default Application Router file Location : " + darConfigurationFileLocation
+                    + " is not valid ! ", e);
+        }
+        try {
+            darConfigurationFile = new File(new URI(darConfigurationFileLocation));
+        } catch (URISyntaxException e) {
+            // if the uri contains space this will fail, so getting the path will work
+            darConfigurationFile = new File(url.getPath());
+        }
+        FileInputStream fis = null;
+        try {
+            fis = new FileInputStream(darConfigurationFile);
+            properties.load(fis);
+        } catch (FileNotFoundException e) {
+            log.fatal("Cannot find the default application router file ! ", e);
+            throw new IllegalArgumentException("The Default Application Router file Location : " + darConfigurationFileLocation
+                    + " is not valid ! ", e);
+        } catch (IOException e) {
+            log.fatal("Cannot load the default application router file ! ", e);
+            throw new IllegalArgumentException("The Default Application Router file Location : " + darConfigurationFileLocation
+                    + " cannot be loaded ! ", e);
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    log.error("fail to close the following file " + darConfigurationFile.getAbsolutePath(), e);
+                }
+            }
+        }
+    }
+
+    /**
+     * Parse the global default application router file from the loaded properties file from the init method
+     * 
+     * @return a Map of key as sip method and value as a list of SipApplicationRouterInfo
+     * @throws ParseException if anything goes wrong during the parsing
+     */
+    public Map<String, List<? extends SipApplicationRouterInfo>> parse() throws ParseException {
+        Map<String, List<? extends SipApplicationRouterInfo>> sipApplicationRoutingInfo = new HashMap<String, List<? extends SipApplicationRouterInfo>>();
+
+        Iterator darEntriesIterator = properties.entrySet().iterator();
+        while (darEntriesIterator.hasNext()) {
+            Entry<String, String> darEntry = (Entry<String, String>) darEntriesIterator.next();
+            // get the key
+            String sipMethod = darEntry.getKey();
+            String sipApplicationRouterInfosStringified = darEntry.getValue();
+            // parse the corresponding value
+            List<? extends SipApplicationRouterInfo> sipApplicationRouterInfoList = parseSipApplicationRouterInfos(sipApplicationRouterInfosStringified);
+            sipApplicationRoutingInfo.put(sipMethod, sipApplicationRouterInfoList);
+        }
+        return sipApplicationRoutingInfo;
+    }
+
+    /**
+     * Same method as above, but loads DAR configuration from a string.
+     * 
+     * @param configuration
+     * @return
+     * @throws ParseException
+     */
+    public Map<String, List<? extends SipApplicationRouterInfo>> parse(String configuration) throws ParseException {
+        Properties tempProperties = new Properties();
+        // tempProperties.load(new StringReader(configuration)); // This needs Java 1.6
+        ByteArrayInputStream stringStream = new ByteArrayInputStream(configuration.getBytes());
+        try {
+            tempProperties.load(stringStream);
+        } catch (IOException e) {
+            log.warn("Failed to update AR configuration. Will use the old properties.");
+            return null;
+        }
+        this.properties = tempProperties;
+        return parse();
+    }
+
+    /**
+     * Same method as above, but loads DAR configuration from properties.
+     * 
+     * @param configuration
+     * @return
+     * @throws ParseException
+     */
+    public Map<String, List<? extends SipApplicationRouterInfo>> parse(Properties properties) throws ParseException {
+        this.properties = properties;
+        return parse();
+    }
+
+    /**
+     * Parse a string corresponding to one or more definition of SipApplicationRouterInfo ex : ("SimpleSipServlet", "DAR:From",
+     * "ORIGINATING", "", "NO_ROUTE", "0"), ("SimpleSipServlet", "DAR:To", "TERMINATING", "", "NO_ROUTE", "1") and return the
+     * corresponding object list
+     * 
+     * @param sipApplicationRouterInfosStringified the stringified list of SipApplicationRouterInfo
+     * @return a list of SipApplicationRouterInfo
+     * @throws ParseException if anything goes wrong during the parsing
+     */
+    private List<? extends SipApplicationRouterInfo> parseSipApplicationRouterInfos(String sipApplicationRouterInfosStringified)
+            throws ParseException {
+        List<DefaultSipApplicationRouterInfo> sipApplicationRouterInfos = new ArrayList<DefaultSipApplicationRouterInfo>();
+        while (sipApplicationRouterInfosStringified.indexOf("(") != -1) {
+            int indexOfLeftParenthesis = sipApplicationRouterInfosStringified.indexOf("(");
+            int indexOfRightParenthesis = sipApplicationRouterInfosStringified.indexOf(")");
+            if (indexOfLeftParenthesis == -1 || indexOfRightParenthesis == -1) {
+                throw new ParseException(
+                        "Parenthesis expectected. Cannot parse the following string from the default application router file"
+                                + sipApplicationRouterInfosStringified, 0);
+            }
+
+            String sipApplicationRouterInfoStringified = sipApplicationRouterInfosStringified.substring(indexOfLeftParenthesis,
+                    indexOfRightParenthesis + 1);
+            DefaultSipApplicationRouterInfo sipApplicationRouterInfo = parseSipApplicationRouterInfo(sipApplicationRouterInfoStringified);
+            // get the index order from the default application router properties file
+            sipApplicationRouterInfos.add(sipApplicationRouterInfo);
+            sipApplicationRouterInfosStringified = sipApplicationRouterInfosStringified.substring(indexOfRightParenthesis + 1);
+        }
+
+        // Sort based on the app number
+        Collections.sort(sipApplicationRouterInfos, new Comparator<DefaultSipApplicationRouterInfo>() {
+
+            public int compare(DefaultSipApplicationRouterInfo arg0, DefaultSipApplicationRouterInfo arg1) {
+                if (arg0.getOrder() == arg1.getOrder())
+                    return 0;
+                if (arg0.getOrder() > arg1.getOrder())
+                    return 1;
+                return -1;
+            }
+
+        });
+        return sipApplicationRouterInfos;
+    }
+
+    /**
+     * Parse a string corresponding to one definition of SipApplicationRouterInfo and return the corresponding Object ex :
+     * ("SimpleSipServlet", "DAR:From", "ORIGINATING", "", "NO_ROUTE", "0")
+     * 
+     * @param sipApplicationRouterInfoStringified the stringified SipApplicationRouterInfo
+     * @return the corresponding SipApplicationRouterInfo
+     * @throws ParseException if anything goes wrong during the parsing
+     */
+    private DefaultSipApplicationRouterInfo parseSipApplicationRouterInfo(String sipApplicationRouterInfoStringified)
+            throws ParseException {
+        // there will always have 6 parameters in a SipApplicationRouterInfo for the default applicationRouterInfo
+        String[] sipApplicationRouterInfoParameters = new String[SIP_APPLICATION_ROUTER_INFO_PARAM_NB];
+
+        for (int i = 0; i < SIP_APPLICATION_ROUTER_INFO_PARAM_NB; i++) {
+            int indexOfLeftQuote = sipApplicationRouterInfoStringified.indexOf("\"");
+            if (indexOfLeftQuote == -1) {
+                throw new ParseException(
+                        "Left quote expected. Cannot parse the following string from the default application router file"
+                                + sipApplicationRouterInfoStringified, 0);
+            }
+            int indexOfRightQuote = sipApplicationRouterInfoStringified.substring(indexOfLeftQuote + 1).indexOf("\"");
+            if (indexOfRightQuote == -1) {
+                throw new ParseException(
+                        "Right quote expected. Cannot parse the following string from the default application router file "
+                                + sipApplicationRouterInfoStringified, 0);
+            }
+            indexOfRightQuote += indexOfLeftQuote;
+            String sipApplicationRouterInfoParameter = sipApplicationRouterInfoStringified.substring(indexOfLeftQuote + 1,
+                    indexOfRightQuote + 1);
+            sipApplicationRouterInfoParameters[i] = sipApplicationRouterInfoParameter;
+            sipApplicationRouterInfoStringified = sipApplicationRouterInfoStringified.substring(indexOfRightQuote + 2);
+        }
+
+        // Parse optional DAR field while is a set of key/value pairs
+        String optionalParameters = null;
+        int indexOfLeftQuote = sipApplicationRouterInfoStringified.indexOf("\"");
+        if (indexOfLeftQuote != -1) {
+            int indexOfRightQuote = sipApplicationRouterInfoStringified.substring(indexOfLeftQuote + 1).indexOf("\"");
+            if (indexOfRightQuote != -1) {
+                indexOfRightQuote += indexOfLeftQuote;
+                optionalParameters = sipApplicationRouterInfoStringified.substring(indexOfLeftQuote + 1, indexOfRightQuote + 1);
+            } else {
+                throw new ParseException("Expected a right quote in the optiona parameters", indexOfLeftQuote);
+            }
+
+        }
+
+        // Parsing is done
+        int order = -1;
+        try {
+            order = Integer.parseInt(sipApplicationRouterInfoParameters[5]);
+        } catch (NumberFormatException nfe) {
+            throw new ParseException("Impossible to parse the state info into an integer for this line "
+                    + sipApplicationRouterInfoStringified, 0);
+        }
+        return new DefaultSipApplicationRouterInfo(
+        // application name
+                sipApplicationRouterInfoParameters[0],
+                // subsriberURI
+                sipApplicationRouterInfoParameters[1],
+                // routing region
+                new SipApplicationRoutingRegion(sipApplicationRouterInfoParameters[2], SipApplicationRoutingRegionType.valueOf(
+                        SipApplicationRoutingRegionType.class, sipApplicationRouterInfoParameters[2])),
+                // route
+                new String[] { sipApplicationRouterInfoParameters[3] },
+                // sip route modifier
+                SipRouteModifier.valueOf(SipRouteModifier.class, sipApplicationRouterInfoParameters[4]),
+                // stateinfo
+                order, optionalParameters);
+    }
+
+    public String getDarConfigurationFileLocation() {
+        return System.getProperty("javax.servlet.sip.dar");
+    }
+
+    public Properties getProperties() {
+        return properties;
+    }
 }

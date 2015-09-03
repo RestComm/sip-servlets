@@ -4,7 +4,7 @@ import java.util.Properties;
 import junit.framework.TestCase;
 
 public class DefaultApplicationRouterTest extends TestCase {
-    
+
     public DefaultApplicationRouterTest(String testName) {
         super(testName);
     }
@@ -12,8 +12,10 @@ public class DefaultApplicationRouterTest extends TestCase {
     public void testInitWithProperties() {
         DefaultApplicationRouter router = new DefaultApplicationRouter();
         Properties properties = new Properties();
-        properties.setProperty("ALL" ,"(\"PlayMyBand\",\"DAR:From\",\"NEUTRAL\",\"\",\"NO_ROUTE\",\"0\",\"HEADER_FROM=.*sip:.*@sip-servlets\\.com\")");
+        properties
+                .setProperty("ALL",
+                        "(\"PlayMyBand\",\"DAR:From\",\"NEUTRAL\",\"\",\"NO_ROUTE\",\"0\",\"HEADER_FROM=.*sip:.*@sip-servlets\\.com\")");
         router.init(properties);
     }
-    
+
 }
