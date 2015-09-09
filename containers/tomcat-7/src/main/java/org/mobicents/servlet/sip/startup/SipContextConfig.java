@@ -81,7 +81,8 @@ public class SipContextConfig extends ContextConfig {
 
 	private static transient final Logger logger = Logger.getLogger(SipContextConfig.class);
 	//Issue 77: http://code.google.com/p/sipservlets/issues/detail?id=77
-	private Boolean hasWebAnnotations = false;
+	//commenting out to avoid double parsing of annotations if there is some  
+//	private Boolean hasWebAnnotations = false;
 
 
 	/**
@@ -96,31 +97,36 @@ public class SipContextConfig extends ContextConfig {
 	}
 
 	@Override
-	protected synchronized void configureStart() {		
+	protected synchronized void configureStart() {
+		super.configureStart();
 		if(context instanceof SipContext) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("starting sipContextConfig");
 			}
 			ServletContext servletContext = context.getServletContext();
+			
+			// commenting out to avoid double parsing of annotations if there is some and calling 
+			// super.configureStart at the beginning of the method to make sure we always parse annotations 
+			
 			// calling start on the parent to initialize web resources of the web
 			// app if any. That mean that this is a converged application.
-			InputStream webXmlInputStream = servletContext
-				.getResourceAsStream(Constants.ApplicationWebXml);
-			context.setWrapperClass(StandardWrapper.class.getName());						
-			if (webXmlInputStream != null) {
-				if(logger.isDebugEnabled()) {
-					logger.debug(Constants.ApplicationWebXml + " has been found, calling super.start() !");
-				}
-				super.configureStart();
-			} else {
-				//Java Servlets 3.0 makes web.xml optional if the servlet is using annotations.
-				//So here we check for web servlet annotations.
-				checkWebAnnotations();
-			}
-
-			if(hasWebAnnotations){
-				super.configureStart();
-			}
+//			InputStream webXmlInputStream = servletContext
+//				.getResourceAsStream(Constants.ApplicationWebXml);
+//			context.setWrapperClass(StandardWrapper.class.getName());						
+//			if (webXmlInputStream != null) {
+//				if(logger.isDebugEnabled()) {
+//					logger.debug(Constants.ApplicationWebXml + " has been found, calling super.start() !");
+//				}
+//				super.configureStart();
+//			} else {
+//				//Java Servlets 3.0 makes web.xml optional if the servlet is using annotations.
+//				//So here we check for web servlet annotations.
+//				checkWebAnnotations();
+//			}
+//
+//			if(hasWebAnnotations){
+//				super.configureStart();
+//			}
 
 			context.setWrapperClass(org.mobicents.servlet.sip.catalina.SipServletImpl.class.getName());
 
@@ -198,9 +204,10 @@ public class SipContextConfig extends ContextConfig {
 				logger.warn("sipContextConfig didn't start properly");
 				context.setConfigured(false);
 			}			
-		} else {
-			super.configureStart();
-		}				
+		} 
+//		else {
+//			super.configureStart();
+//		}				
 	}
 
 	private void checkSipDeploymentRequirements(Context context) {
@@ -355,199 +362,199 @@ public class SipContextConfig extends ContextConfig {
 		}
 	}
 
-	
+	// commenting out to avoid the parent calls out to those overidden methods and don't parse the annotations 
 	
 	// Check for web servlet annotation in the /WEB-INF/classes	
-	protected void checkWebAnnotations(){
-		URL webinfClasses = null;
-		try{
-			webinfClasses = context.getServletContext().getResource("/WEB-INF/classes");
-		} catch (MalformedURLException e){
-			logger.error(sm.getString("contextConfig.webinfClassesUrl"),e);
-		}
-
-		if (webinfClasses == null) {
-			// Nothing to do.
-			return;
-		} else if ("jar".equals(webinfClasses.getProtocol())) {
-			processAnnotationsJar(webinfClasses, null, false);
-		} else if ("jndi".equals(webinfClasses.getProtocol())) {
-			processAnnotationsJndi(webinfClasses, null, false);
-		} else if ("file".equals(webinfClasses.getProtocol())) {
-			try {
-				processAnnotationsFile(new File(webinfClasses.toURI()), null, false);
-			} catch (URISyntaxException e) {
-				logger.error(sm.getString("contextConfig.fileUrl", webinfClasses), e);
-			} 
-		} else {
-			logger.error(sm.getString("contextConfig.unknownUrlProtocol",
-					webinfClasses.getProtocol(), webinfClasses));
-		}
-	}
-
-	protected void processAnnotationsFile(File file, WebXml fragment,
-            boolean handlesTypesOnly) {
-
-		if (file.isDirectory()) {
-			String[] dirs = file.list();
-			for (String dir : dirs) {
-				processAnnotationsFile(new File(file,dir), fragment, handlesTypesOnly);
-			}
-		} else if (file.canRead() && file.getName().endsWith(".class")) {
-			FileInputStream fis = null;
-			try {
-				fis = new FileInputStream(file);
-				processAnnotationsStream(fis, fragment, handlesTypesOnly);
-			} catch (IOException e) {
-				logger.error(sm.getString("contextConfig.inputStreamFile",
-						file.getAbsolutePath()),e);
-			} finally {
-				if (fis != null) {
-					try {
-						fis.close();
-					} catch (Throwable t) {
-						ExceptionUtils.handleThrowable(t);
-					}
-				}
-			}
-		}
-	}
-
-	protected void processAnnotationsJar(URL url, WebXml fragment,
-            boolean handlesTypesOnly) {
-
-		JarFile jarFile = null;
-
-		try {
-			URLConnection urlConn = url.openConnection();
-			JarURLConnection jarUrlConn;
-			if (!(urlConn instanceof JarURLConnection)) {
-				// This should never happen
-				sm.getString("contextConfig.jarUrl", url);
-				return;
-			}
-
-			jarUrlConn = (JarURLConnection) urlConn;
-			jarUrlConn.setUseCaches(false);
-			jarFile = jarUrlConn.getJarFile();
-
-			Enumeration<JarEntry> jarEntries = jarFile.entries();
-			while (jarEntries.hasMoreElements()) {
-				JarEntry jarEntry = jarEntries.nextElement();
-				String entryName = jarEntry.getName();
-				if (entryName.endsWith(".class")) {
-					InputStream is = null;
-					try {
-						is = jarFile.getInputStream(jarEntry);
-						processAnnotationsStream(is, fragment, handlesTypesOnly);
-					} catch (IOException e) {
-						logger.error(sm.getString("contextConfig.inputStreamJar",
-								entryName, url),e);
-					} finally {
-						if (is != null) {
-							try {
-								is.close();
-							} catch (Throwable t) {
-								ExceptionUtils.handleThrowable(t);
-							}
-						}
-					}
-				}
-			}
-		} catch (IOException e) {
-			logger.error(sm.getString("contextConfig.jarFile", url), e);
-		} finally {
-			if (jarFile != null) {
-				try {
-					jarFile.close();
-				} catch (Throwable t) {
-					ExceptionUtils.handleThrowable(t);
-				}
-			}
-		}
-	}
-
-	protected void processAnnotationsJndi(URL url, WebXml fragment,
-            boolean handlesTypesOnly) {
-		try {
-			URLConnection urlConn = url.openConnection();
-			DirContextURLConnection dcUrlConn;
-			if (!(urlConn instanceof DirContextURLConnection)) {
-				// This should never happen
-				sm.getString("contextConfig.jndiUrlNotDirContextConn", url);
-				return;
-			}
-
-			dcUrlConn = (DirContextURLConnection) urlConn;
-			dcUrlConn.setUseCaches(false);
-
-			String type = dcUrlConn.getHeaderField(ResourceAttributes.TYPE);
-			if (ResourceAttributes.COLLECTION_TYPE.equals(type)) {
-				// Collection
-				Enumeration<String> dirs = dcUrlConn.list();
-				while (dirs.hasMoreElements()) {
-					String dir = dirs.nextElement();
-					URL dirUrl = new URL(url.toString() + '/' + dir);
-					processAnnotationsJndi(dirUrl, fragment, handlesTypesOnly);
-				}
-
-			} else {
-				// Single file
-				if (url.getPath().endsWith(".class")) {
-					InputStream is = null;
-					try {
-						is = dcUrlConn.getInputStream();
-						processAnnotationsStream(is, fragment, handlesTypesOnly);
-					} catch (IOException e) {
-						logger.error(sm.getString("contextConfig.inputStreamJndi",
-								url),e);
-					} finally {
-						if (is != null) {
-							try {
-								is.close();
-							} catch (Throwable t) {
-								ExceptionUtils.handleThrowable(t);
-							}
-						}
-					}
-				}
-			}
-		} catch (IOException e) {
-			logger.error(sm.getString("contextConfig.jndiUrl", url), e);
-		} 
-	}
-
-	protected void processAnnotationsStream(InputStream is, WebXml fragment,
-            boolean handlesTypesOnly)
-	throws ClassFormatException, IOException {
-
-		ClassParser parser = new ClassParser(is);
-		JavaClass clazz = parser.parse();
-		checkHandlesTypes(clazz);
-
-        if (handlesTypesOnly) {
-            return;
-        }
-
-		AnnotationEntry[] annotationsEntries = clazz.getAnnotationEntries();
-		if (annotationsEntries != null) {
-			for (AnnotationEntry ae : annotationsEntries) {
-				String type = ae.getAnnotationType();
-				if ("Ljavax/servlet/annotation/WebServlet;".equals(type)) {
-					hasWebAnnotations=true;
-				}else if ("Ljavax/servlet/annotation/WebFilter;".equals(type)) {
-					hasWebAnnotations=true;
-				}else if ("Ljavax/servlet/annotation/WebListener;".equals(type)) {
-					hasWebAnnotations=true;
-				}else if ("Ljavax/servlet/annotation/WebInitParam;".equals(type)) {
-					hasWebAnnotations=true;
-				}else if ("Ljavax/servlet/annotation/MultipartConfig;".equals(type)) {
-					hasWebAnnotations=true;
-				} else {
-					// Unknown annotation - ignore
-				}
-			}
-		}
-	}
+//	protected void checkWebAnnotations(){
+//		URL webinfClasses = null;
+//		try{
+//			webinfClasses = context.getServletContext().getResource("/WEB-INF/classes");
+//		} catch (MalformedURLException e){
+//			logger.error(sm.getString("contextConfig.webinfClassesUrl"),e);
+//		}
+//
+//		if (webinfClasses == null) {
+//			// Nothing to do.
+//			return;
+//		} else if ("jar".equals(webinfClasses.getProtocol())) {
+//			processAnnotationsJar(webinfClasses, null, false);
+//		} else if ("jndi".equals(webinfClasses.getProtocol())) {
+//			processAnnotationsJndi(webinfClasses, null, false);
+//		} else if ("file".equals(webinfClasses.getProtocol())) {
+//			try {
+//				processAnnotationsFile(new File(webinfClasses.toURI()), null, false);
+//			} catch (URISyntaxException e) {
+//				logger.error(sm.getString("contextConfig.fileUrl", webinfClasses), e);
+//			} 
+//		} else {
+//			logger.error(sm.getString("contextConfig.unknownUrlProtocol",
+//					webinfClasses.getProtocol(), webinfClasses));
+//		}
+//	}
+//
+//	protected void processAnnotationsFile(File file, WebXml fragment,
+//            boolean handlesTypesOnly) {
+//
+//		if (file.isDirectory()) {
+//			String[] dirs = file.list();
+//			for (String dir : dirs) {
+//				processAnnotationsFile(new File(file,dir), fragment, handlesTypesOnly);
+//			}
+//		} else if (file.canRead() && file.getName().endsWith(".class")) {
+//			FileInputStream fis = null;
+//			try {
+//				fis = new FileInputStream(file);
+//				processAnnotationsStream(fis, fragment, handlesTypesOnly);
+//			} catch (IOException e) {
+//				logger.error(sm.getString("contextConfig.inputStreamFile",
+//						file.getAbsolutePath()),e);
+//			} finally {
+//				if (fis != null) {
+//					try {
+//						fis.close();
+//					} catch (Throwable t) {
+//						ExceptionUtils.handleThrowable(t);
+//					}
+//				}
+//			}
+//		}
+//	}
+//
+//	protected void processAnnotationsJar(URL url, WebXml fragment,
+//            boolean handlesTypesOnly) {
+//
+//		JarFile jarFile = null;
+//
+//		try {
+//			URLConnection urlConn = url.openConnection();
+//			JarURLConnection jarUrlConn;
+//			if (!(urlConn instanceof JarURLConnection)) {
+//				// This should never happen
+//				sm.getString("contextConfig.jarUrl", url);
+//				return;
+//			}
+//
+//			jarUrlConn = (JarURLConnection) urlConn;
+//			jarUrlConn.setUseCaches(false);
+//			jarFile = jarUrlConn.getJarFile();
+//
+//			Enumeration<JarEntry> jarEntries = jarFile.entries();
+//			while (jarEntries.hasMoreElements()) {
+//				JarEntry jarEntry = jarEntries.nextElement();
+//				String entryName = jarEntry.getName();
+//				if (entryName.endsWith(".class")) {
+//					InputStream is = null;
+//					try {
+//						is = jarFile.getInputStream(jarEntry);
+//						processAnnotationsStream(is, fragment, handlesTypesOnly);
+//					} catch (IOException e) {
+//						logger.error(sm.getString("contextConfig.inputStreamJar",
+//								entryName, url),e);
+//					} finally {
+//						if (is != null) {
+//							try {
+//								is.close();
+//							} catch (Throwable t) {
+//								ExceptionUtils.handleThrowable(t);
+//							}
+//						}
+//					}
+//				}
+//			}
+//		} catch (IOException e) {
+//			logger.error(sm.getString("contextConfig.jarFile", url), e);
+//		} finally {
+//			if (jarFile != null) {
+//				try {
+//					jarFile.close();
+//				} catch (Throwable t) {
+//					ExceptionUtils.handleThrowable(t);
+//				}
+//			}
+//		}
+//	}
+//
+//	protected void processAnnotationsJndi(URL url, WebXml fragment,
+//            boolean handlesTypesOnly) {
+//		try {
+//			URLConnection urlConn = url.openConnection();
+//			DirContextURLConnection dcUrlConn;
+//			if (!(urlConn instanceof DirContextURLConnection)) {
+//				// This should never happen
+//				sm.getString("contextConfig.jndiUrlNotDirContextConn", url);
+//				return;
+//			}
+//
+//			dcUrlConn = (DirContextURLConnection) urlConn;
+//			dcUrlConn.setUseCaches(false);
+//
+//			String type = dcUrlConn.getHeaderField(ResourceAttributes.TYPE);
+//			if (ResourceAttributes.COLLECTION_TYPE.equals(type)) {
+//				// Collection
+//				Enumeration<String> dirs = dcUrlConn.list();
+//				while (dirs.hasMoreElements()) {
+//					String dir = dirs.nextElement();
+//					URL dirUrl = new URL(url.toString() + '/' + dir);
+//					processAnnotationsJndi(dirUrl, fragment, handlesTypesOnly);
+//				}
+//
+//			} else {
+//				// Single file
+//				if (url.getPath().endsWith(".class")) {
+//					InputStream is = null;
+//					try {
+//						is = dcUrlConn.getInputStream();
+//						processAnnotationsStream(is, fragment, handlesTypesOnly);
+//					} catch (IOException e) {
+//						logger.error(sm.getString("contextConfig.inputStreamJndi",
+//								url),e);
+//					} finally {
+//						if (is != null) {
+//							try {
+//								is.close();
+//							} catch (Throwable t) {
+//								ExceptionUtils.handleThrowable(t);
+//							}
+//						}
+//					}
+//				}
+//			}
+//		} catch (IOException e) {
+//			logger.error(sm.getString("contextConfig.jndiUrl", url), e);
+//		} 
+//	}
+//
+//	protected void processAnnotationsStream(InputStream is, WebXml fragment,
+//            boolean handlesTypesOnly)
+//	throws ClassFormatException, IOException {
+//
+//		ClassParser parser = new ClassParser(is);
+//		JavaClass clazz = parser.parse();
+//		checkHandlesTypes(clazz);
+//
+//        if (handlesTypesOnly) {
+//            return;
+//        }
+//
+//		AnnotationEntry[] annotationsEntries = clazz.getAnnotationEntries();
+//		if (annotationsEntries != null) {
+//			for (AnnotationEntry ae : annotationsEntries) {
+//				String type = ae.getAnnotationType();
+//				if ("Ljavax/servlet/annotation/WebServlet;".equals(type)) {
+//					hasWebAnnotations=true;
+//				}else if ("Ljavax/servlet/annotation/WebFilter;".equals(type)) {
+//					hasWebAnnotations=true;
+//				}else if ("Ljavax/servlet/annotation/WebListener;".equals(type)) {
+//					hasWebAnnotations=true;
+//				}else if ("Ljavax/servlet/annotation/WebInitParam;".equals(type)) {
+//					hasWebAnnotations=true;
+//				}else if ("Ljavax/servlet/annotation/MultipartConfig;".equals(type)) {
+//					hasWebAnnotations=true;
+//				} else {
+//					// Unknown annotation - ignore
+//				}
+//			}
+//		}
+//	}
 
 }

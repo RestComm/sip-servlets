@@ -15,12 +15,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
+
 //@author gvagenas
 
 @WebServlet(urlPatterns={"/status"}, asyncSupported=true, loadOnStartup=1)
 public class StatusServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-
+	private static Logger logger = Logger.getLogger(StatusServlet.class);
+	
 	private static final Queue<AsyncContext> queue = new ConcurrentLinkedQueue<AsyncContext>();
 
 	private static final String JUNK = "<!-- Click-to-Call Application using Servlet 3.0 Server Push -->\n";
@@ -43,6 +46,7 @@ public class StatusServlet extends HttpServlet {
 				
 		notifierThread = new Thread(data);
 		notifierThread.start();
+		logger.info("the StatusServlet has been started");
 	}
 	/*
 	 * doGet will will start an AsyncContext, store the new AsyncContext in order for this to get processed later and last

@@ -100,7 +100,6 @@ import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.SipServletTimerService;
 import org.mobicents.servlet.sip.core.timers.StandardSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
-import org.mobicents.servlet.sip.dns.MobicentsDNSResolver;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -710,6 +709,9 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	@Override
 	public void addChild(Container container) {
 		if(children.get(container.getName()) == null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Adding " + container.getName() + " as a Web Servlet");
+			}
 			super.addChild(container);
 		} else {
 			if(logger.isDebugEnabled()) {
