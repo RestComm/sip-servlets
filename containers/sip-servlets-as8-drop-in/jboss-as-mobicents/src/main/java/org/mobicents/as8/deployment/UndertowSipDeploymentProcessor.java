@@ -37,6 +37,7 @@ import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.value.ImmediateValue;
+import org.mobicents.as8.ConvergedServletContainerService;
 import org.mobicents.metadata.sip.spec.SipAnnotationMetaData;
 import org.mobicents.metadata.sip.spec.SipMetaData;
 import org.wildfly.extension.undertow.Server;
@@ -151,6 +152,8 @@ public class UndertowSipDeploymentProcessor implements DeploymentUnitProcessor {
 
         // this service depends on the base undertowdeployment service:
         sipDeploymentServiceBuilder.addDependency(deploymentServiceName);
+        //this service depends on convergedservletcontainer service:
+        sipDeploymentServiceBuilder.addDependency(ConvergedServletContainerService.SERVICE_NAME);
         sipDeploymentServiceBuilder.install();
     }
 
