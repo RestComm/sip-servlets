@@ -19,8 +19,8 @@
 package org.mobicents.as8.deployment;
 
 import io.undertow.servlet.api.DeploymentInfo;
-import io.undertow.servlet.api.DeploymentInfoFacade;
-import io.undertow.servlet.core.ConvergedSessionManagerFactory;
+import org.mobicents.io.undertow.servlet.api.DeploymentInfoFacade;
+import org.mobicents.io.undertow.servlet.core.ConvergedSessionManagerFactory;
 
 import javax.servlet.ServletException;
 
@@ -33,6 +33,8 @@ import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
+import org.wildfly.extension.undertow.Host;
+import org.wildfly.extension.undertow.Server;
 import org.wildfly.extension.undertow.deployment.UndertowDeploymentInfoService;
 
 /**
@@ -45,9 +47,11 @@ public class UndertowSipDeploymentInfoService implements Service<UndertowSipDepl
 
     private DeploymentUnit deploymentUnit = null;
     private SIPWebContext webContext = null;
+    private Server server = null;
 
-    public UndertowSipDeploymentInfoService(DeploymentUnit deploymentUnit) throws DeploymentUnitProcessingException {
+    public UndertowSipDeploymentInfoService(DeploymentUnit deploymentUnit, Server server) throws DeploymentUnitProcessingException {
         this.deploymentUnit = deploymentUnit;
+        this.server = server;
 
         // lets init sipWebContext:
         this.webContext = new SIPWebContext();
@@ -82,6 +86,16 @@ public class UndertowSipDeploymentInfoService implements Service<UndertowSipDepl
                 facade.addDeploymentInfo(info);
                 facade.setSessionManagerFactory(new ConvergedSessionManagerFactory());
                 this.deploymentUnit.putAttachment(DeploymentInfoFacade.ATTACHMENT_KEY, facade);
+
+                if(server!=null){
+                    this.webContext.setWebServerListeners(server.getListeners());
+                    for(Host host: server.getHosts()){
+                        if(host!=null && host.getName().equals(info.getHostName())){
+                            this.webContext.setHostOfDeployment(host);
+                            break;
+                        }
+                    }
+                }
             } catch (ServletException e) {
                 throw new StartException(e);
             }

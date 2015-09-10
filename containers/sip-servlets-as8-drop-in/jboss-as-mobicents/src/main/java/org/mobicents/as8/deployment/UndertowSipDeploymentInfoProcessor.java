@@ -28,6 +28,7 @@ import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
+import org.mobicents.as8.ConvergedServletContainerService;
 import org.mobicents.metadata.sip.spec.SipAnnotationMetaData;
 import org.mobicents.metadata.sip.spec.SipMetaData;
 import org.wildfly.extension.undertow.Server;
@@ -74,11 +75,17 @@ public class UndertowSipDeploymentInfoProcessor implements DeploymentUnitProcess
 
         final String serverInstanceName = metaData.getServerInstanceName() == null ? defaultServer : metaData
                 .getServerInstanceName();
+
+        //lets find server service:
+        final ServiceName serverName = UndertowService.SERVER.append(serverInstanceName);
+        ServiceController<?> serverServiceController = phaseContext.getServiceRegistry().getService(serverName);
+        Server serverService =  (Server) serverServiceController.getValue();
+
         final ServiceName deploymentServiceName = UndertowService.deploymentServiceName(serverInstanceName, hostName, pathName);
         final ServiceName deploymentInfoServiceName = deploymentServiceName.append(UndertowDeploymentInfoService.SERVICE_NAME);
 
         // instantiate injector service
-        final UndertowSipDeploymentInfoService sipDeploymentInfoService = new UndertowSipDeploymentInfoService(deploymentUnit);
+        final UndertowSipDeploymentInfoService sipDeploymentInfoService = new UndertowSipDeploymentInfoService(deploymentUnit,serverService);
         final ServiceName sipDeploymentInfoServiceName = deploymentServiceName
                 .append(UndertowSipDeploymentInfoService.SERVICE_NAME);
         // lets earn that deploymentService will depend on this service:
@@ -89,6 +96,8 @@ public class UndertowSipDeploymentInfoProcessor implements DeploymentUnitProcess
         final ServiceBuilder<UndertowSipDeploymentInfoService> infoInjectorBuilder = phaseContext.getServiceTarget()
                 .addService(sipDeploymentInfoServiceName, sipDeploymentInfoService);
         infoInjectorBuilder.addDependency(deploymentInfoServiceName);
+        //this service depends on convergedservletcontainer service:
+        infoInjectorBuilder.addDependency(ConvergedServletContainerService.SERVICE_NAME);
         infoInjectorBuilder.install();
     }
 

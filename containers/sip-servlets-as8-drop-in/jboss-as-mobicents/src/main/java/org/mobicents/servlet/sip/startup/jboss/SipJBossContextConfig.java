@@ -361,8 +361,8 @@ public class SipJBossContextConfig {
                         servletInfo.addSecurityRoleRef(ref.getRoleName(), ref.getRoleLink());
                     }
                 }
-                SipServletImpl wrapper = new SipServletImpl(servletInfo, convergedContext.getServletContext());
-                wrapper.setupMultipart(convergedContext.getServletContext());
+                SipServletImpl wrapper = new SipServletImpl(servletInfo, convergedContext.getServletContext().getDelegatedContext());
+                wrapper.setupMultipart(convergedContext.getServletContext().getDelegatedContext());
                 wrapper.setServletName(value.getServletName());
 
                 convergedContext.getDeploymentInfoFacade().addSipServlets(servletInfo);

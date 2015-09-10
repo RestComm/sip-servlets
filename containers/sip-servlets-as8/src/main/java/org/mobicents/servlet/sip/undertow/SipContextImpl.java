@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -39,15 +40,14 @@ import javax.servlet.sip.TimerService;
 
 import io.undertow.server.session.SessionManager;
 import io.undertow.servlet.api.Deployment;
-import io.undertow.servlet.api.DeploymentInfoFacade;
 import io.undertow.servlet.api.ServletInfo;
 import io.undertow.servlet.api.ThreadSetupAction.Handle;
 import io.undertow.servlet.core.Lifecycle;
 import io.undertow.servlet.core.ManagedFilter;
 import io.undertow.servlet.core.ManagedServlet;
-import io.undertow.servlet.spec.ServletContextImpl;
 
 import org.apache.log4j.Logger;
+import org.mobicents.io.undertow.servlet.api.DeploymentInfoFacade;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.MobicentsSipServlet;
@@ -78,9 +78,11 @@ import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
 import org.mobicents.servlet.sip.ruby.SipRubyController;
-import org.mobicents.servlet.sip.startup.ConvergedApplicationContextFacade;
+import org.mobicents.servlet.sip.startup.ConvergedServletContextImpl;
 import org.mobicents.servlet.sip.undertow.security.SipSecurityUtils;
 import org.mobicents.servlet.sip.undertow.security.authentication.SipDigestAuthenticationMechanism;
+import org.wildfly.extension.undertow.Host;
+import org.wildfly.extension.undertow.ListenerService;
 
 /**
  *
@@ -123,9 +125,11 @@ public class SipContextImpl implements SipContext {
     // http://code.google.com/p/mobicents/issues/detail?id=2526
     private transient ThreadLocal<Boolean> isManagedThread = new ThreadLocal<Boolean>();
 
-    ConvergedApplicationContextFacade context;
+    ConvergedServletContextImpl context;
 
     private ClassLoader sipContextClassLoader;
+    private Host hostOfDeployment;
+    List<ListenerService<?>> webServerListeners = new LinkedList<>();
 
     // default constructor:
     public SipContextImpl() {
@@ -489,11 +493,12 @@ public class SipContextImpl implements SipContext {
         return this.deployment.getSessionManager();
     }
 
-    public ServletContextImpl getServletContext() {
+    public ConvergedServletContextImpl getServletContext() {
         if (context == null) {
-            context = new ConvergedApplicationContextFacade(deployment.getServletContext(), this);
+            context = new ConvergedServletContextImpl(deployment.getServletContext());
+            context.addSipContext(this);
         }
-        return context.getContext();
+        return context;
     }
 
     @Override
@@ -1007,8 +1012,9 @@ public class SipContextImpl implements SipContext {
 
     @Override
     public String getPath() {
-        // FIXME: kakonyii: currrently we don't use this method anywhere in as8 container packages
-        return this.deploymentInfoFacade.getDeploymentInfo().getDeploymentName();
+        // kakonyii: currrently we use this method at ConvergedSessionDelegate encodeURL()
+        return this.deployment.getServletContext().getContextPath();
+        //return this.deploymentInfoFacade.getDeploymentInfo().getContextPath();
     }
 
     @Override
@@ -1111,5 +1117,21 @@ public class SipContextImpl implements SipContext {
 
     public void setSecurityDomain(String securityDomain) {
         this.securityDomain = securityDomain;
+    }
+
+    public Host getHostOfDeployment() {
+        return hostOfDeployment;
+    }
+
+    public void setHostOfDeployment(Host hostOfDeployment) {
+        this.hostOfDeployment = hostOfDeployment;
+    }
+
+    public List<ListenerService<?>> getWebServerListeners() {
+        return webServerListeners;
+    }
+
+    public void setWebServerListeners(List<ListenerService<?>> webServerListeners) {
+        this.webServerListeners = webServerListeners;
     }
 }

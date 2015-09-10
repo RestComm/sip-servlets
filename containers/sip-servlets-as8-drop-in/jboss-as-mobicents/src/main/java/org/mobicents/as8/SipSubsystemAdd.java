@@ -18,9 +18,14 @@
  */
 package org.mobicents.as8;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.management.MBeanServer;
+
+
+
 
 
 //import org.jboss.as.clustering.web.DistributedCacheManagerFactory;
@@ -52,6 +57,7 @@ import org.mobicents.as8.deployment.UndertowSipConnectorActivateProcessor;
 import org.mobicents.as8.deployment.UndertowSipDeploymentInfoProcessor;
 import org.mobicents.as8.deployment.UndertowSipDeploymentProcessor;
 import org.mobicents.ext.javax.sip.dns.DefaultDNSServerLocator;
+import org.wildfly.extension.undertow.UndertowService;
 
 /**
  * Adds the sip subsystem.
@@ -239,6 +245,27 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 .addDependency(PathManagerService.SERVICE_NAME, PathManager.class, service.getPathManagerInjector())
                 .addDependency(DependencyType.OPTIONAL, ServiceName.JBOSS.append("mbean", "server"), MBeanServer.class,
                         service.getMbeanServer()).setInitialMode(Mode.ACTIVE).install());
+
+
+        //lets find undertow subsystem's servlet container elements:
+        //FIXME: kakonyii: maybe we should use global undertow constants instead of hard coded strings:
+        ModelNode undertowNode = Resource.Tools.readModel(context.readResourceFromRoot(PathAddress.pathAddress("subsystem", "undertow")));
+        ModelNode servletContainerNode = undertowNode.get("servlet-container");
+
+        Set<String> servletContainerNames = servletContainerNode.keys();
+        List<ServiceName> servletConatinerServiceNames = new ArrayList<>();
+        for(String name : servletContainerNames){
+            servletConatinerServiceNames.add(UndertowService.SERVLET_CONTAINER.append(name));
+        }
+
+        //add ConvergedServletContainerService to replace servletContainer to convergedServletContainer during startup:
+        final ConvergedServletContainerService convergedServletContainerService = new ConvergedServletContainerService(context,servletConatinerServiceNames);
+        newControllers.add(context
+                .getServiceTarget()
+                .addService(ConvergedServletContainerService.SERVICE_NAME, convergedServletContainerService)
+                //depends on undertow servlet container services:
+                .addDependencies(servletConatinerServiceNames)
+                .setInitialMode(Mode.ACTIVE).install());
 
         context.addStep(new AbstractDeploymentChainStep() {
             @Override

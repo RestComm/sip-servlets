@@ -19,7 +19,7 @@
 package org.mobicents.as8.deployment;
 
 import io.undertow.servlet.api.Deployment;
-import io.undertow.servlet.api.DeploymentInfoFacade;
+import org.mobicents.io.undertow.servlet.api.DeploymentInfoFacade;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
