@@ -225,7 +225,7 @@ public class SipSecurityUtils {
             Field credentialField = null;
 
             try {
-                securityDomainContextField = identityManager.getClass().getDeclaredField("securityDomainContext");
+                securityDomainContextField = JAASIdentityManagerImpl.class.getDeclaredField("securityDomainContext");
                 securityDomainContextField.setAccessible(true);
 
                 SecurityDomainContext securityDomainContext = (SecurityDomainContext) securityDomainContextField
@@ -236,7 +236,7 @@ public class SipSecurityUtils {
 
                     // gets the cache from the manager:
                     if (authManager != null && authManager instanceof JBossCachedAuthenticationManager) {
-                        domainCacheField = authManager.getClass().getDeclaredField("domainCache");
+                        domainCacheField = JBossCachedAuthenticationManager.class.getDeclaredField("domainCache");
                         domainCacheField.setAccessible(true);
 
                         ConcurrentMap<Principal, DomainInfo> domainCache = (ConcurrentMap<Principal, DomainInfo>) domainCacheField
@@ -247,7 +247,7 @@ public class SipSecurityUtils {
                                     DomainInfo d = domainCache.get(p);
 
                                     // gets the credential from the stored DomainInfo:
-                                    credentialField = d.getClass().getDeclaredField("credential");
+                                    credentialField = DomainInfo.class.getDeclaredField("credential");
                                     credentialField.setAccessible(true);
 
                                     credential = new PasswordCredential((char[]) credentialField.get(d));

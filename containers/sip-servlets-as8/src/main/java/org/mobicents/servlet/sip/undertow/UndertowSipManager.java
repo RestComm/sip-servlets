@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
+
 package org.mobicents.servlet.sip.undertow;
 
 import java.io.IOException;
@@ -23,8 +24,7 @@ import java.util.Iterator;
 
 import javax.servlet.http.HttpSession;
 
-import io.undertow.server.session.InMemorySessionManager;
-
+import org.mobicents.io.undertow.server.session.ConvergedInMemorySessionManager;
 import org.mobicents.servlet.sip.core.MobicentsSipFactory;
 import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.SipManager;
@@ -37,6 +37,7 @@ import org.mobicents.servlet.sip.core.session.SipManagerDelegate;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.core.session.SipStandardManagerDelegate;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
+import org.mobicents.servlet.sip.startup.ConvergedServletContextImpl;
 
 /**
  *
@@ -46,7 +47,7 @@ import org.mobicents.servlet.sip.message.SipFactoryImpl;
  * @author kakonyi.istvan@alerant.hu
  *
  */
-public class UndertowSipManager extends InMemorySessionManager implements SipManager {
+public class UndertowSipManager extends ConvergedInMemorySessionManager implements SipManager {
 
     private SipManagerDelegate sipManagerDelegate;
     private SipContext container;
@@ -322,7 +323,8 @@ public class UndertowSipManager extends InMemorySessionManager implements SipMan
 
     @Override
     public Object findSession(String id) throws IOException {
-        return super.getSession(id);
+        ConvergedServletContextImpl servletContext = (ConvergedServletContextImpl) container.getServletContext();
+        return servletContext.getSession(id);
     }
 
 }

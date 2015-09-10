@@ -19,7 +19,7 @@
 package org.mobicents.as8.deployment;
 
 import io.undertow.servlet.api.Deployment;
-import io.undertow.servlet.api.DeploymentInfoFacade;
+import org.mobicents.io.undertow.servlet.api.DeploymentInfoFacade;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -241,7 +241,7 @@ public class SIPWebContext extends SipContextImpl {
                     if(ann!=null){
                         Boolean origAccessible = null;
                         try {
-                            if(method.getParameterCount() == 0){
+                            if(method.getParameterTypes().length == 0){
                                 origAccessible = new Boolean(method.isAccessible());
                                 method.setAccessible(true);
                                 method.invoke(listener, new Object[0]);
@@ -325,7 +325,7 @@ public class SIPWebContext extends SipContextImpl {
                         try {
                             origAccessible = new Boolean(method.isAccessible());
                             method.setAccessible(true);
-                            if(method.getParameterCount() == 0){
+                            if(method.getParameterTypes().length == 0){
                                 method.invoke(listener, new Object[0]);
                             }else{
                                 throw new IllegalArgumentException("@PreDestroy annotated methods must have 0 parameters.");
