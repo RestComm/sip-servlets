@@ -16,7 +16,11 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
-package io.undertow.servlet.api;
+package org.mobicents.io.undertow.servlet.api;
+
+import io.undertow.servlet.api.DeploymentInfo;
+import io.undertow.servlet.api.ServletInfo;
+import io.undertow.servlet.api.SessionManagerFactory;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;

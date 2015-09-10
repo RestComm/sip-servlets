@@ -16,15 +16,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
-package io.undertow.servlet.core;
+package org.mobicents.io.undertow.servlet.core;
 
 import org.mobicents.servlet.sip.undertow.UndertowSipManager;
 
 import io.undertow.server.session.SessionManager;
 import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.api.SessionManagerFactory;
+import io.undertow.servlet.core.InMemorySessionManagerFactory;
 
 /**
+ * Factory class to create ConvergedInMemorySessionManagers.
+ *
  * @author kakonyi.istvan@alerant.hu
  *
  */

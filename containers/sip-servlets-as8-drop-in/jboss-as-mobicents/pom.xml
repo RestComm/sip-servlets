@@ -137,16 +137,16 @@
 		<version>8.2.0.Final</version>
 		<scope>provided</scope>
 	</dependency>		
-	<!-- dependency>
+	<dependency>
 		<groupId>io.undertow</groupId>
 		<artifactId>undertow-core</artifactId>
-		<version>1.2.0.Beta9-SNAPSHOT</version>
+		<version>1.1.0.Final</version>
 	</dependency>
 	<dependency>
 		<groupId>io.undertow</groupId>
 		<artifactId>undertow-servlet</artifactId>
-		<version>1.2.0.Beta9-SNAPSHOT</version>
-	</dependency -->	
+		<version>1.1.0.Final</version>
+	</dependency>	
 
 	<dependency>
            <groupId>org.jboss</groupId>
