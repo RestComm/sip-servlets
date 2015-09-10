@@ -1,23 +1,20 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012.
- * and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications
+ * Copyright 2011-2015, Telestax Inc and individual contributors
+ * by the @authors tag.
  *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
+ * This program is free software: you can redistribute it and/or modify
+ * under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
  *
- * This software is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 package org.mobicents.as8.deployment;
 
@@ -31,6 +28,7 @@ import org.jboss.metadata.web.jboss.JBossWebMetaData;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
+import org.mobicents.as8.ConvergedServletContainerService;
 import org.mobicents.metadata.sip.spec.SipAnnotationMetaData;
 import org.mobicents.metadata.sip.spec.SipMetaData;
 import org.wildfly.extension.undertow.Server;
@@ -77,11 +75,17 @@ public class UndertowSipDeploymentInfoProcessor implements DeploymentUnitProcess
 
         final String serverInstanceName = metaData.getServerInstanceName() == null ? defaultServer : metaData
                 .getServerInstanceName();
+
+        //lets find server service:
+        final ServiceName serverName = UndertowService.SERVER.append(serverInstanceName);
+        ServiceController<?> serverServiceController = phaseContext.getServiceRegistry().getService(serverName);
+        Server serverService =  (Server) serverServiceController.getValue();
+
         final ServiceName deploymentServiceName = UndertowService.deploymentServiceName(serverInstanceName, hostName, pathName);
         final ServiceName deploymentInfoServiceName = deploymentServiceName.append(UndertowDeploymentInfoService.SERVICE_NAME);
 
         // instantiate injector service
-        final UndertowSipDeploymentInfoService sipDeploymentInfoService = new UndertowSipDeploymentInfoService(deploymentUnit);
+        final UndertowSipDeploymentInfoService sipDeploymentInfoService = new UndertowSipDeploymentInfoService(deploymentUnit,serverService);
         final ServiceName sipDeploymentInfoServiceName = deploymentServiceName
                 .append(UndertowSipDeploymentInfoService.SERVICE_NAME);
         // lets earn that deploymentService will depend on this service:
@@ -92,6 +96,8 @@ public class UndertowSipDeploymentInfoProcessor implements DeploymentUnitProcess
         final ServiceBuilder<UndertowSipDeploymentInfoService> infoInjectorBuilder = phaseContext.getServiceTarget()
                 .addService(sipDeploymentInfoServiceName, sipDeploymentInfoService);
         infoInjectorBuilder.addDependency(deploymentInfoServiceName);
+        //this service depends on convergedservletcontainer service:
+        infoInjectorBuilder.addDependency(ConvergedServletContainerService.SERVICE_NAME);
         infoInjectorBuilder.install();
     }
 

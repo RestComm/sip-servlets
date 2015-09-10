@@ -1,24 +1,31 @@
 /*
- * Licensed to the Apache Software Foundation (ASF) under one or more
- * contributor license agreements.  See the NOTICE file distributed with
- * this work for additional information regarding copyright ownership.
- * The ASF licenses this file to You under the Apache License, Version 2.0
- * (the "License"); you may not use this file except in compliance with
- * the License.  You may obtain a copy of the License at
+ * TeleStax, Open Source Cloud Communications
+ * Copyright 2011-2015, Telestax Inc and individual contributors
+ * by the @authors tag.
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * This program is free software: you can redistribute it and/or modify
+ * under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation; either version 3 of
+ * the License, or (at your option) any later version.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
-
 package org.mobicents.servlet.sip.startup;
 
+import io.undertow.server.HttpServerExchange;
+import io.undertow.server.session.Session;
+import io.undertow.server.session.SessionConfig;
+import io.undertow.server.session.SessionManager;
+import io.undertow.servlet.api.Deployment;
 import io.undertow.servlet.spec.ServletContextImpl;
 import io.undertow.servlet.spec.SessionCookieConfigImpl;
+import io.undertow.util.AttachmentKey;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -32,6 +39,7 @@ import java.util.EnumSet;
 import java.util.Enumeration;
 import java.util.EventListener;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,9 +52,12 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
 import javax.servlet.SessionTrackingMode;
 import javax.servlet.descriptor.JspConfigDescriptor;
+import javax.servlet.http.HttpSession;
 
 import org.apache.jasper.Constants;
 import org.apache.jasper.security.SecurityUtil;
+import org.mobicents.io.undertow.server.session.ConvergedInMemorySessionManager;
+import org.mobicents.io.undertow.servlet.spec.ConvergedHttpSessionFacade;
 import org.mobicents.servlet.sip.core.session.SipRequestDispatcher;
 import org.mobicents.servlet.sip.undertow.SipContextImpl;
 import org.mobicents.servlet.sip.undertow.SipServletImpl;
@@ -62,8 +73,7 @@ import org.mobicents.servlet.sip.undertow.SipServletImpl;
  *          sip-servlet-as7 project, re-implemented for jboss as8 (wildfly) by:
  * @author kakonyi.istvan@alerant.hu
  */
-
-public final class ConvergedApplicationContextFacade implements ServletContext {
+public final class ConvergedServletContextImpl implements ServletContext {
 
     // ---------------------------------------------------------- Attributes
     /**
@@ -76,6 +86,8 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
      */
     private HashMap<String, Method> objectCache;
 
+    private final AttachmentKey<ConvergedHttpSessionFacade> sessionAttachmentKey = AttachmentKey.create(ConvergedHttpSessionFacade.class);
+
     // ----------------------------------------------------------- Constructors
 
     /**
@@ -83,12 +95,16 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
      *
      * @param context The associated Context instance
      */
-    public ConvergedApplicationContextFacade(ServletContextImpl context, SipContextImpl sipContext) {
+    public ConvergedServletContextImpl(ServletContextImpl context) {
+
         this.context = context;
-        this.sipContext = sipContext;
         this.classCache = new HashMap<String, Class<?>[]>();
         this.objectCache = new HashMap<String, Method>();
         initClassCache();
+    }
+
+    public void addSipContext(SipContextImpl sipContext){
+        this.sipContext = sipContext;
     }
 
     private void initClassCache() {
@@ -127,7 +143,87 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
     private ServletContextImpl context = null;
     private SipContextImpl sipContext = null;
 
+    // ------------------------------------------------- ServletContextImpl Methods
+    public void initDone() {
+        context.initDone();
+    }
+
+    public HttpSession getSession(final String sessionId) {
+        final SessionManager sessionManager = context.getDeployment().getSessionManager();
+        Session session = sessionManager.getSession(sessionId);
+        if (session != null) {
+            return SecurityActions.forSession(session, this, false, sessionManager);
+        }
+        return null;
+    }
+
+    public HttpSession getSession(final ServletContextImpl originalServletContext, final HttpServerExchange exchange, boolean create) {
+        SessionConfig c = originalServletContext.getSessionConfig();
+        ConvergedHttpSessionFacade httpSession = exchange.getAttachment(sessionAttachmentKey);
+        if (httpSession != null && httpSession.isValidIntern()) {
+            exchange.removeAttachment(sessionAttachmentKey);
+            httpSession = null;
+        }
+        if (httpSession == null) {
+            final SessionManager sessionManager = context.getDeployment().getSessionManager();
+            Session session = sessionManager.getSession(exchange, c);
+            if (session != null) {
+                httpSession = (ConvergedHttpSessionFacade) SecurityActions.forSession(session, this, false, sessionManager);
+                exchange.putAttachment(sessionAttachmentKey, httpSession);
+            } else if (create) {
+
+                String existing = c.findSessionId(exchange);
+                if (originalServletContext != this.context) {
+                    //this is a cross context request
+                    //we need to make sure there is a top level session
+                    originalServletContext.getSession(originalServletContext, exchange, true);
+                } else if (existing != null) {
+                    c.clearSession(exchange, existing);
+                }
+
+                final Session newSession = sessionManager.createSession(exchange, c);
+                httpSession = (ConvergedHttpSessionFacade) SecurityActions.forSession(newSession, this, true, sessionManager);
+                //call access after creation to set LastAccessTime at sipAppSession.
+                httpSession.access();
+                //add delegate to InMemorySession to call sipAppSession.access(), when necessary:
+                ((ConvergedInMemorySessionManager)sessionManager).addConvergedSessionDeletegateToSession(c, exchange, httpSession.getConvergedSessionDelegate());
+
+                exchange.putAttachment(sessionAttachmentKey, httpSession);
+            }
+        }
+        return httpSession;
+    }
+
+    public void updateSessionAccessTime(final HttpServerExchange exchange) {
+        context.updateSessionAccessTime(exchange);
+    }
+
+    public Deployment getDeployment() {
+        return context.getDeployment();
+    }
+
+    public SessionConfig getSessionConfig() {
+        return context.getSessionConfig();
+    }
+
+    public void destroy() {
+        context.destroy();
+    }
+
+    public void setDefaultSessionTrackingModes(HashSet<SessionTrackingMode> sessionTrackingModes) {
+        context.setDefaultSessionTrackingModes(sessionTrackingModes);
+    }
+
     // ------------------------------------------------- ServletContext Methods
+
+    @Override
+    public String getContextPath() {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (String) doPrivileged("getContextPath", null);
+        } else {
+            return context.getContextPath();
+        }
+    }
 
     @Override
     public ServletContext getContext(String uripath) {
@@ -138,19 +234,48 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
             theContext = context.getContext(uripath);
         }
         if ((theContext != null) && (theContext instanceof ServletContextImpl)) {
-            theContext = this.context;
+            //theContext = this.context;
         }
         return theContext;
     }
 
+    @Override
     public int getMajorVersion() {
-        return context.getMajorVersion();
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return ((Integer) doPrivileged("getMajorVersion", null)).intValue();
+        } else {
+            return context.getMajorVersion();
+        }
     }
 
+    @Override
     public int getMinorVersion() {
-        return context.getMinorVersion();
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return ((Integer) doPrivileged("getMinorVersion", null)).intValue();
+        } else {
+            return context.getMinorVersion();
+        }
     }
 
+    @Override
+    public int getEffectiveMajorVersion() {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return ((Integer) doPrivileged("getEffectiveMajorVersion", null)).intValue();
+        } else {
+            return context.getEffectiveMajorVersion();
+        }
+    }
+
+    @Override
+    public int getEffectiveMinorVersion() {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return ((Integer) doPrivileged("getEffectiveMinorVersion", null)).intValue();
+        } else {
+            return context.getEffectiveMinorVersion();
+        }
+    }
+
+    @Override
     public String getMimeType(String file) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (String) doPrivileged("getMimeType", new Object[] { file });
@@ -159,6 +284,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     // doPrivileged() returns the correct type
     public Set<String> getResourcePaths(String path) {
@@ -169,6 +295,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     public URL getResource(String path) throws MalformedURLException {
         if (Constants.IS_SECURITY_ENABLED) {
             try {
@@ -184,6 +311,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     public InputStream getResourceAsStream(String path) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (InputStream) doPrivileged("getResourceAsStream", new Object[] { path });
@@ -192,6 +320,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     public RequestDispatcher getRequestDispatcher(final String path) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (RequestDispatcher) doPrivileged("getRequestDispatcher", new Object[] { path });
@@ -200,6 +329,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     public RequestDispatcher getNamedDispatcher(String name) {
         // Validate the name argument
         if (name == null)
@@ -222,8 +352,10 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
     /**
      * @deprecated
      */
+    @Override
     @Deprecated
     public Servlet getServlet(String name) throws ServletException {
+        //FIXME: kakonyii: also return sip servlets?
         if (SecurityUtil.isPackageProtectionEnabled()) {
             try {
                 return (Servlet) invokeMethod(context, "getServlet", new Object[] { name });
@@ -242,6 +374,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
     /**
      * @deprecated
      */
+    @Override
     @SuppressWarnings("unchecked")
     // doPrivileged() returns the correct type
     @Deprecated
@@ -256,6 +389,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
     /**
      * @deprecated
      */
+    @Override
     @SuppressWarnings("unchecked")
     // doPrivileged() returns the correct type
     @Deprecated
@@ -267,6 +401,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     public void log(String msg) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("log", new Object[] { msg });
@@ -278,6 +413,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
     /**
      * @deprecated
      */
+    @Override
     @Deprecated
     public void log(Exception exception, String msg) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
@@ -287,6 +423,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     public void log(String message, Throwable throwable) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("log", new Class[] { String.class, Throwable.class }, new Object[] { message, throwable });
@@ -295,6 +432,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     public String getRealPath(String path) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (String) doPrivileged("getRealPath", new Object[] { path });
@@ -303,6 +441,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     public String getServerInfo() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (String) doPrivileged("getServerInfo", null);
@@ -311,6 +450,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     public String getInitParameter(String name) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (String) doPrivileged("getInitParameter", new Object[] { name });
@@ -319,6 +459,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     // doPrivileged() returns the correct type
     public Enumeration<String> getInitParameterNames() {
@@ -329,6 +470,16 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
+    public boolean setInitParameter(String name, String value) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return ((Boolean) doPrivileged("setInitParameter", new Object[] { name, value })).booleanValue();
+        } else {
+            return context.setInitParameter(name, value);
+        }
+    }
+
+    @Override
     public Object getAttribute(String name) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return doPrivileged("getAttribute", new Object[] { name });
@@ -337,6 +488,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     // doPrivileged() returns the correct type
     public Enumeration<String> getAttributeNames() {
@@ -347,6 +499,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     public void setAttribute(String name, Object object) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("setAttribute", new Object[] { name, object });
@@ -355,6 +508,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     public void removeAttribute(String name) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("removeAttribute", new Object[] { name });
@@ -363,6 +517,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     public String getServletContextName() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (String) doPrivileged("getServletContextName", null);
@@ -371,65 +526,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
-    public String getContextPath() {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (String) doPrivileged("getContextPath", null);
-        } else {
-            return context.getContextPath();
-        }
-    }
-
-    public FilterRegistration.Dynamic addFilter(String filterName, String className) {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (FilterRegistration.Dynamic) doPrivileged("addFilter", new Object[] { filterName, className });
-        } else {
-            return context.addFilter(filterName, className);
-        }
-    }
-
-    public FilterRegistration.Dynamic addFilter(String filterName, Filter filter) {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (FilterRegistration.Dynamic) doPrivileged("addFilter", new Class[] { String.class, Filter.class },
-                    new Object[] { filterName, filter });
-        } else {
-            return context.addFilter(filterName, filter);
-        }
-    }
-
-    public FilterRegistration.Dynamic addFilter(String filterName, Class<? extends Filter> filterClass) {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (FilterRegistration.Dynamic) doPrivileged("addFilter", new Object[] { filterName, filterClass.getName() });
-        } else {
-            return context.addFilter(filterName, filterClass);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    // doPrivileged() returns the correct type
-    public <T extends Filter> T createFilter(Class<T> c) throws ServletException {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            try {
-                return (T) invokeMethod(context, "createFilter", new Object[] { c });
-            } catch (Throwable t) {
-                handleThrowable(t);
-                if (t instanceof ServletException) {
-                    throw (ServletException) t;
-                }
-                return null;
-            }
-        } else {
-            return context.createFilter(c);
-        }
-    }
-
-    public FilterRegistration getFilterRegistration(String filterName) {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (FilterRegistration) doPrivileged("getFilterRegistration", new Object[] { filterName });
-        } else {
-            return context.getFilterRegistration(filterName);
-        }
-    }
-
+    @Override
     public ServletRegistration.Dynamic addServlet(String servletName, String className) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (ServletRegistration.Dynamic) doPrivileged("addServlet", new Object[] { servletName, className });
@@ -438,6 +535,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     public ServletRegistration.Dynamic addServlet(String servletName, Servlet servlet) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (ServletRegistration.Dynamic) doPrivileged("addServlet", new Class[] { String.class, Servlet.class },
@@ -447,6 +545,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     public ServletRegistration.Dynamic addServlet(String servletName, Class<? extends Servlet> servletClass) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (ServletRegistration.Dynamic) doPrivileged("addServlet",
@@ -456,6 +555,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     // doPrivileged() returns the correct type
     public <T extends Servlet> T createServlet(Class<T> c) throws ServletException {
@@ -474,6 +574,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     public ServletRegistration getServletRegistration(String servletName) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (ServletRegistration) doPrivileged("getServletRegistration", new Object[] { servletName });
@@ -482,6 +583,85 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    // doPrivileged() returns the correct type
+    public Map<String, ? extends ServletRegistration> getServletRegistrations() {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (Map<String, ? extends ServletRegistration>) doPrivileged("getServletRegistrations", null);
+        } else {
+            return context.getServletRegistrations();
+        }
+    }
+
+    @Override
+    public FilterRegistration.Dynamic addFilter(String filterName, String className) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (FilterRegistration.Dynamic) doPrivileged("addFilter", new Object[] { filterName, className });
+        } else {
+            return context.addFilter(filterName, className);
+        }
+    }
+
+    @Override
+    public FilterRegistration.Dynamic addFilter(String filterName, Filter filter) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (FilterRegistration.Dynamic) doPrivileged("addFilter", new Class[] { String.class, Filter.class },
+                    new Object[] { filterName, filter });
+        } else {
+            return context.addFilter(filterName, filter);
+        }
+    }
+
+    @Override
+    public FilterRegistration.Dynamic addFilter(String filterName, Class<? extends Filter> filterClass) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (FilterRegistration.Dynamic) doPrivileged("addFilter", new Object[] { filterName, filterClass.getName() });
+        } else {
+            return context.addFilter(filterName, filterClass);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    // doPrivileged() returns the correct type
+    public <T extends Filter> T createFilter(Class<T> c) throws ServletException {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            try {
+                return (T) invokeMethod(context, "createFilter", new Object[] { c });
+            } catch (Throwable t) {
+                handleThrowable(t);
+                if (t instanceof ServletException) {
+                    throw (ServletException) t;
+                }
+                return null;
+            }
+        } else {
+            return context.createFilter(c);
+        }
+    }
+
+    @Override
+    public FilterRegistration getFilterRegistration(String filterName) {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (FilterRegistration) doPrivileged("getFilterRegistration", new Object[] { filterName });
+        } else {
+            return context.getFilterRegistration(filterName);
+        }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    // doPrivileged() returns the correct type
+    public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
+        if (SecurityUtil.isPackageProtectionEnabled()) {
+            return (Map<String, ? extends FilterRegistration>) doPrivileged("getFilterRegistrations", null);
+        } else {
+            return context.getFilterRegistrations();
+        }
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     // doPrivileged() returns the correct type
     public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
@@ -492,6 +672,8 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+
+    @Override
     @SuppressWarnings("unchecked")
     // doPrivileged() returns the correct type
     public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
@@ -502,6 +684,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
+    @Override
     public SessionCookieConfigImpl getSessionCookieConfig() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             return (SessionCookieConfigImpl) doPrivileged("getSessionCookieConfig", null);
@@ -510,19 +693,12 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
-    public void setSessionTrackingModes(Set<SessionTrackingMode> sessionTrackingModes) {
+   @Override
+   public void setSessionTrackingModes(Set<SessionTrackingMode> sessionTrackingModes) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
             doPrivileged("setSessionTrackingModes", new Object[] { sessionTrackingModes });
         } else {
             context.setSessionTrackingModes(sessionTrackingModes);
-        }
-    }
-
-    public boolean setInitParameter(String name, String value) {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            return ((Boolean) doPrivileged("setInitParameter", new Object[] { name, value })).booleanValue();
-        } else {
-            return context.setInitParameter(name, value);
         }
     }
 
@@ -573,12 +749,11 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
     }
 
     @Override
-    public void declareRoles(String... roleNames) {
+    public JspConfigDescriptor getJspConfigDescriptor() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            // FIXME
-            doPrivileged("declareRoles", new Object[] { roleNames });
+            return (JspConfigDescriptor) doPrivileged("getJspConfigDescriptor", null);
         } else {
-            context.declareRoles(roleNames);
+            return context.getJspConfigDescriptor();
         }
     }
 
@@ -591,52 +766,21 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         }
     }
 
-    @Override
-    public int getEffectiveMajorVersion() {
+    public String getVirtualServerName() {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return ((Integer) doPrivileged("getEffectiveMajorVersion", null)).intValue();
+            return (String) doPrivileged("getVirtualServerName", null);
         } else {
-            return context.getEffectiveMajorVersion();
+            return context.getVirtualServerName();
         }
     }
 
     @Override
-    public int getEffectiveMinorVersion() {
+    public void declareRoles(String... roleNames) {
         if (SecurityUtil.isPackageProtectionEnabled()) {
-            return ((Integer) doPrivileged("getEffectiveMinorVersion", null)).intValue();
+            // FIXME
+            doPrivileged("declareRoles", new Object[] { roleNames });
         } else {
-            return context.getEffectiveMinorVersion();
-        }
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    // doPrivileged() returns the correct type
-    public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (Map<String, ? extends FilterRegistration>) doPrivileged("getFilterRegistrations", null);
-        } else {
-            return context.getFilterRegistrations();
-        }
-    }
-
-    @Override
-    public JspConfigDescriptor getJspConfigDescriptor() {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (JspConfigDescriptor) doPrivileged("getJspConfigDescriptor", null);
-        } else {
-            return context.getJspConfigDescriptor();
-        }
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    // doPrivileged() returns the correct type
-    public Map<String, ? extends ServletRegistration> getServletRegistrations() {
-        if (SecurityUtil.isPackageProtectionEnabled()) {
-            return (Map<String, ? extends ServletRegistration>) doPrivileged("getServletRegistrations", null);
-        } else {
-            return context.getServletRegistrations();
+            context.declareRoles(roleNames);
         }
     }
 
@@ -759,8 +903,7 @@ public final class ConvergedApplicationContextFacade implements ServletContext {
         // All other instances of Throwable will be silently swallowed
     }
 
-    public ServletContextImpl getContext() {
+    public ServletContextImpl getDelegatedContext() {
         return context;
     }
-
 }

@@ -1,29 +1,31 @@
 /*
- * TeleStax, Open Source Cloud Communications  Copyright 2012.
- * and individual contributors
- * by the @authors tag. See the copyright.txt in the distribution for a
- * full listing of individual contributors.
+ * TeleStax, Open Source Cloud Communications
+ * Copyright 2011-2015, Telestax Inc and individual contributors
+ * by the @authors tag.
  *
- * This is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation; either version 2.1 of
+ * This program is free software: you can redistribute it and/or modify
+ * under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation; either version 3 of
  * the License, or (at your option) any later version.
  *
- * This software is distributed in the hope that it will be useful,
+ * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * Lesser General Public License for more details.
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this software; if not, write to the Free
- * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
- * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 package org.mobicents.as8;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.management.MBeanServer;
+
+
+
 
 
 //import org.jboss.as.clustering.web.DistributedCacheManagerFactory;
@@ -55,6 +57,7 @@ import org.mobicents.as8.deployment.UndertowSipConnectorActivateProcessor;
 import org.mobicents.as8.deployment.UndertowSipDeploymentInfoProcessor;
 import org.mobicents.as8.deployment.UndertowSipDeploymentProcessor;
 import org.mobicents.ext.javax.sip.dns.DefaultDNSServerLocator;
+import org.wildfly.extension.undertow.UndertowService;
 
 /**
  * Adds the sip subsystem.
@@ -242,6 +245,27 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 .addDependency(PathManagerService.SERVICE_NAME, PathManager.class, service.getPathManagerInjector())
                 .addDependency(DependencyType.OPTIONAL, ServiceName.JBOSS.append("mbean", "server"), MBeanServer.class,
                         service.getMbeanServer()).setInitialMode(Mode.ACTIVE).install());
+
+
+        //lets find undertow subsystem's servlet container elements:
+        //FIXME: kakonyii: maybe we should use global undertow constants instead of hard coded strings:
+        ModelNode undertowNode = Resource.Tools.readModel(context.readResourceFromRoot(PathAddress.pathAddress("subsystem", "undertow")));
+        ModelNode servletContainerNode = undertowNode.get("servlet-container");
+
+        Set<String> servletContainerNames = servletContainerNode.keys();
+        List<ServiceName> servletConatinerServiceNames = new ArrayList<>();
+        for(String name : servletContainerNames){
+            servletConatinerServiceNames.add(UndertowService.SERVLET_CONTAINER.append(name));
+        }
+
+        //add ConvergedServletContainerService to replace servletContainer to convergedServletContainer during startup:
+        final ConvergedServletContainerService convergedServletContainerService = new ConvergedServletContainerService(context,servletConatinerServiceNames);
+        newControllers.add(context
+                .getServiceTarget()
+                .addService(ConvergedServletContainerService.SERVICE_NAME, convergedServletContainerService)
+                //depends on undertow servlet container services:
+                .addDependencies(servletConatinerServiceNames)
+                .setInitialMode(Mode.ACTIVE).install());
 
         context.addStep(new AbstractDeploymentChainStep() {
             @Override
