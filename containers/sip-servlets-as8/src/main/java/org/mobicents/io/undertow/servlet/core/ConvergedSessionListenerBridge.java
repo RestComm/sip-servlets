@@ -46,8 +46,8 @@ public class ConvergedSessionListenerBridge extends SessionListenerBridge{
     private final ServletContext servletContext;
     private final SessionManager manager;
 
-    public ConvergedSessionListenerBridge(ThreadSetupAction threadSetup, ApplicationListeners applicationListeners,
-            ServletContext servletContext, SessionManager manager) {
+    public ConvergedSessionListenerBridge(final ThreadSetupAction threadSetup, final ApplicationListeners applicationListeners,
+            final ServletContext servletContext, final SessionManager manager) {
         super(threadSetup, applicationListeners, servletContext);
         this.threadSetup = threadSetup;
         this.applicationListeners = applicationListeners;

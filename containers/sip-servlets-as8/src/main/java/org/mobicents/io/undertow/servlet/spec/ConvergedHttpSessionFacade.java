@@ -200,4 +200,9 @@ public class ConvergedHttpSessionFacade implements ConvergedSession{
     public boolean isNew() {
         return httpSessionDelegate.isNew();
     }
+
+    public Session getSession() {
+        return httpSessionDelegate.getSession();
+    }
+
 }

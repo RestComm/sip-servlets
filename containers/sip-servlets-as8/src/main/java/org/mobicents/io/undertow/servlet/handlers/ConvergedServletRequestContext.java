@@ -41,8 +41,8 @@ public class ConvergedServletRequestContext extends ServletRequestContext{
     private ServletResponse servletResponse;
     private ServletRequest servletRequest;
 
-    public ConvergedServletRequestContext(Deployment deployment, ConvergedHttpServletRequestFacade originalRequest,
-            ConvergedHttpServletResponseFacade originalResponse, ServletPathMatch originalServletPathMatch) {
+    public ConvergedServletRequestContext(final Deployment deployment, final ConvergedHttpServletRequestFacade originalRequest,
+            final ConvergedHttpServletResponseFacade originalResponse, final ServletPathMatch originalServletPathMatch) {
         super(deployment, originalRequest.getHttpServletRequestDelegated(), originalResponse.getHttpServletResponseDelegated(), originalServletPathMatch);
         this.originalRequest = originalRequest;
         this.originalResponse = originalResponse;
