@@ -103,7 +103,7 @@ public class ConvergedInMemorySessionManager implements SessionManager{
     }
 
     @Override
-    public Session createSession(HttpServerExchange serverExchange, SessionConfig sessionCookieConfig) {
+    public Session createSession(final HttpServerExchange serverExchange, final SessionConfig config) {
         if (evictionQueue != null) {
             while (sessions.size() >= maxSize && !evictionQueue.isEmpty()) {
                 String key = evictionQueue.poll();
@@ -114,10 +114,10 @@ public class ConvergedInMemorySessionManager implements SessionManager{
                 }
             }
         }
-        if (sessionCookieConfig == null) {
+        if (config == null) {
             throw UndertowMessages.MESSAGES.couldNotFindSessionCookieConfig();
         }
-        String sessionID = sessionCookieConfig.findSessionId(serverExchange);
+        String sessionID = config.findSessionId(serverExchange);
         int count = 0;
         while (sessionID == null) {
             sessionID = sessionIdGenerator.createSessionId();
@@ -136,10 +136,10 @@ public class ConvergedInMemorySessionManager implements SessionManager{
         } else {
             evictionToken = null;
         }
-        final ConvergedSessionImpl session = new ConvergedSessionImpl(this, sessionID, sessionCookieConfig, serverExchange.getIoThread(), serverExchange.getConnection().getWorker(), evictionToken);
+        final ConvergedSessionImpl session = new ConvergedSessionImpl(this, sessionID, config, serverExchange.getIoThread(), serverExchange.getConnection().getWorker(), evictionToken);
         ConvergedInMemorySession im = new ConvergedInMemorySession(session, defaultSessionTimeout);
         sessions.put(sessionID, im);
-        sessionCookieConfig.setSessionId(serverExchange, session.getId());
+        config.setSessionId(serverExchange, session.getId());
         im.lastAccessed = System.currentTimeMillis();
         session.bumpTimeout();
         sessionListeners.sessionCreated(session, serverExchange);
@@ -158,7 +158,7 @@ public class ConvergedInMemorySessionManager implements SessionManager{
     }
 
     @Override
-    public Session getSession(HttpServerExchange serverExchange, SessionConfig sessionCookieConfig) {
+    public Session getSession(final HttpServerExchange serverExchange, final SessionConfig sessionCookieConfig) {
         String sessionId = sessionCookieConfig.findSessionId(serverExchange);
         return getSession(sessionId);
     }
@@ -182,12 +182,12 @@ public class ConvergedInMemorySessionManager implements SessionManager{
     }
 
     @Override
-    public void removeSessionListener(SessionListener listener) {
+    public synchronized void removeSessionListener(final SessionListener listener) {
         sessionListeners.removeSessionListener(listener);
     }
 
     @Override
-    public void setDefaultSessionTimeout(int timeout) {
+    public void setDefaultSessionTimeout(final int timeout) {
         defaultSessionTimeout = timeout;
     }
 
@@ -204,6 +204,23 @@ public class ConvergedInMemorySessionManager implements SessionManager{
     @Override
     public Set<String> getAllSessions() {
         return new HashSet<>(sessions.keySet());
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (!(object instanceof SessionManager)) return false;
+        SessionManager manager = (SessionManager) object;
+        return this.deploymentName.equals(manager.getDeploymentName());
+    }
+
+    @Override
+    public int hashCode() {
+        return this.deploymentName.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return this.deploymentName;
     }
 
     /**
@@ -235,6 +252,7 @@ public class ConvergedInMemorySessionManager implements SessionManager{
         private volatile Object evictionToken;
         private final SessionConfig sessionCookieConfig;
         private volatile long expireTime = -1;
+        private volatile boolean invalidationStarted = false;
 
         final XnioExecutor executor;
         final XnioWorker worker;
@@ -268,9 +286,13 @@ public class ConvergedInMemorySessionManager implements SessionManager{
         }
 
         synchronized void bumpTimeout() {
+            if(invalidationStarted) {
+                return;
+            }
+
             final int maxInactiveInterval = getMaxInactiveInterval();
             if (maxInactiveInterval > 0) {
-                long newExpireTime = System.currentTimeMillis() + (maxInactiveInterval * 1000);
+                long newExpireTime = System.currentTimeMillis() + (maxInactiveInterval * 1000L);
                 if(timerCancelKey != null && (newExpireTime < expireTime)) {
                     // We have to re-schedule as the new maxInactiveInterval is lower than the old one
                     if (!timerCancelKey.remove()) {
@@ -283,7 +305,7 @@ public class ConvergedInMemorySessionManager implements SessionManager{
                     //+1 second, to make sure that the time has actually expired
                     //we don't re-schedule every time, as it is expensive
                     //instead when it expires we check if the timeout has been bumped, and if so we re-schedule
-                    timerCancelKey = executor.executeAfter(cancelTask, (maxInactiveInterval * 1000) + 1, TimeUnit.MILLISECONDS);
+                    timerCancelKey = executor.executeAfter(cancelTask, (maxInactiveInterval * 1000L) + 1, TimeUnit.MILLISECONDS);
                 }
             }
             if (evictionToken != null) {
@@ -405,22 +427,27 @@ public class ConvergedInMemorySessionManager implements SessionManager{
             invalidate(exchange, SessionListener.SessionDestroyedReason.INVALIDATED);
         }
 
-        synchronized void invalidate(final HttpServerExchange exchange, SessionListener.SessionDestroyedReason reason) {
-            if (timerCancelKey != null) {
-                timerCancelKey.remove();
-            }
-            ConvergedInMemorySession sess = sessionManager.sessions.get(sessionId);
-            if (sess == null) {
-                if (reason == SessionListener.SessionDestroyedReason.INVALIDATED) {
-                    throw UndertowMessages.MESSAGES.sessionAlreadyInvalidated();
+        void invalidate(final HttpServerExchange exchange, SessionListener.SessionDestroyedReason reason) {
+            synchronized(ConvergedSessionImpl.this) {
+                if (timerCancelKey != null) {
+                    timerCancelKey.remove();
                 }
-                return;
+                ConvergedInMemorySession sess = sessionManager.sessions.get(sessionId);
+                if (sess == null) {
+                    if (reason == SessionListener.SessionDestroyedReason.INVALIDATED) {
+                        throw UndertowMessages.MESSAGES.sessionAlreadyInvalidated();
+                    }
+                    return;
+                }
+                invalidationStarted = true;
             }
-            sessionManager.sessionListeners.sessionDestroyed(sess.session, exchange, reason);
+            sessionManager.sessionListeners.sessionDestroyed(this, exchange, reason);
+
             sessionManager.sessions.remove(sessionId);
             if (exchange != null) {
                 sessionCookieConfig.clearSession(exchange, this.getId());
             }
+                
         }
 
         @Override

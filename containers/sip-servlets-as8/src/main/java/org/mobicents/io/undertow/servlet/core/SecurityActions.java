@@ -43,6 +43,18 @@ import org.mobicents.servlet.sip.startup.ConvergedServletContextImpl;
  */
 class SecurityActions {
 
+    static String getSystemProperty(final String prop) {
+        if (System.getSecurityManager() == null) {
+           return System.getProperty(prop);
+        } else {
+            return (String) AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                public Object run() {
+                    return System.getProperty(prop);
+                }
+            });
+        }
+    }
+    
     static HttpSession forSession(final Session session, final ServletContext servletContext, final boolean newSession, final SessionManager manager) {
         if (System.getSecurityManager() == null) {
             return ConvergedHttpSessionFacade.forConvergedSession(session, servletContext, newSession, manager);
@@ -69,18 +81,34 @@ class SecurityActions {
         }
     }
 
-    static String getSystemProperty(final String prop) {
+    static void setCurrentRequestContext(final ServletRequestContext servletRequestContext) {
         if (System.getSecurityManager() == null) {
-           return System.getProperty(prop);
+            ServletRequestContext.setCurrentRequestContext(servletRequestContext);
         } else {
-            return (String) AccessController.doPrivileged(new PrivilegedAction<Object>() {
+            AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                @Override
                 public Object run() {
-                    return System.getProperty(prop);
+                    ServletRequestContext.setCurrentRequestContext(servletRequestContext);
+                    return null;
                 }
             });
         }
     }
 
+    static void clearCurrentServletAttachments() {
+        if (System.getSecurityManager() == null) {
+            ServletRequestContext.clearCurrentServletAttachments();
+        } else {
+            AccessController.doPrivileged(new PrivilegedAction<Object>() {
+                @Override
+                public Object run() {
+                    ServletRequestContext.clearCurrentServletAttachments();
+                    return null;
+                }
+            });
+        }
+    }
+    
     static ServletInitialHandler createServletInitialHandler(final ServletPathMatches paths, final HttpHandler next, final CompositeThreadSetupAction setupAction, final ServletContext servletContext) {
         if (System.getSecurityManager() == null) {
             return new ConvergedServletInitialHandler(paths, next, setupAction, /*TODO*/(ConvergedServletContextImpl) servletContext);

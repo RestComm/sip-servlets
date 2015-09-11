@@ -30,6 +30,7 @@ import javax.servlet.http.HttpSessionActivationListener;
 import javax.servlet.http.HttpSessionEvent;
 
 import org.mobicents.servlet.sip.startup.ConvergedServletContextImpl;
+import org.wildfly.extension.undertow.UndertowLogger;
 
 import io.undertow.server.HttpHandler;
 import io.undertow.server.session.Session;
@@ -105,7 +106,9 @@ public class ConvergedSessionRestoringHandler extends SessionRestoringHandler{
             sessionPersistenceManager.persistSessions(deploymentName, objectData);
             data.clear();
         }catch(NoSuchFieldException | IllegalAccessException e){
+            UndertowLogger.ROOT_LOGGER.warn("Exception occured during setting SessionRestoringHandler fields:",e);
             //FIXME: kakonyii: handle reflection errors or just omit them.
+            
         }finally {
             setTccl(old);
         }
