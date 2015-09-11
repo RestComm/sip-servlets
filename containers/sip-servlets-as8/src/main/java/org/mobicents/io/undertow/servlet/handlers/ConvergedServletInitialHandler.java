@@ -66,6 +66,7 @@ import io.undertow.util.Headers;
 import io.undertow.util.HttpString;
 import io.undertow.util.Protocols;
 import io.undertow.util.RedirectBuilder;
+import io.undertow.util.StatusCodes;
 
 /**
  * This class extends io.undertow.servlet.handlers.ServletInitialHandler to create ConvergedServletRequestContext with
@@ -78,11 +79,94 @@ public class ConvergedServletInitialHandler extends ServletInitialHandler{
 
     private final ConvergedServletContextImpl convergedServletContext;
 
-    public ConvergedServletInitialHandler(ServletPathMatches paths, HttpHandler next, CompositeThreadSetupAction setupAction,
-            ConvergedServletContextImpl servletContext) {
+    public ConvergedServletInitialHandler(final ServletPathMatches paths,final HttpHandler next,final CompositeThreadSetupAction setupAction,
+            final ConvergedServletContextImpl servletContext) {
         super(paths, next, setupAction, servletContext.getDelegatedContext());
         this.convergedServletContext = servletContext;
 
+    }
+
+    @Override
+    public void handleRequest(final HttpServerExchange exchange) throws Exception {
+        ServletPathMatches paths=null;
+        try{
+            //lets get access of superclass private fields using reflection:
+            Field pathsField = ServletInitialHandler.class.getDeclaredField("paths");
+            pathsField.setAccessible(true);
+            paths = (ServletPathMatches)pathsField.get(this);
+            pathsField.setAccessible(false);
+        }catch(NoSuchFieldException | IllegalAccessException e){
+            throw new ServletException(e);
+        }
+
+        final String path = exchange.getRelativePath();
+        if(isForbiddenPath(path)) {
+            exchange.setResponseCode(StatusCodes.NOT_FOUND);
+            return;
+        }
+        final ServletPathMatch info = paths.getServletHandlerByPath(path);
+        //https://issues.jboss.org/browse/WFLY-3439
+        //if the request is an upgrade request then we don't want to redirect
+        //as there is a good chance the web socket client won't understand the redirect
+        //we make an exception for HTTP2 upgrade requests, as this would have already be handled at
+        //the connector level if it was going to be handled.
+        String upgradeString = exchange.getRequestHeaders().getFirst(Headers.UPGRADE);
+        boolean isUpgradeRequest = upgradeString != null && !upgradeString.startsWith(HTTP2_UPGRADE_PREFIX);
+        if (info.getType() == ServletPathMatch.Type.REDIRECT && !isUpgradeRequest) {
+            //UNDERTOW-89
+            //we redirect on GET requests to the root context to add an / to the end
+            exchange.setResponseCode(StatusCodes.TEMPORARY_REDIRECT);
+            exchange.getResponseHeaders().put(Headers.LOCATION, RedirectBuilder.redirect(exchange, exchange.getRelativePath() + "/", true));
+            return;
+        } else if (info.getType() == ServletPathMatch.Type.REWRITE) {
+            //this can only happen if the path ends with a /
+            //otherwise there would be a rewrite instead
+            exchange.setRelativePath(exchange.getRelativePath() + info.getRewriteLocation());
+            exchange.setRequestURI(exchange.getRequestURI() + info.getRewriteLocation());
+            exchange.setRequestPath(exchange.getRequestPath() + info.getRewriteLocation());
+        }
+
+        final HttpServletResponseImpl response = new HttpServletResponseImpl(exchange, convergedServletContext.getDelegatedContext());
+        final HttpServletRequestImpl request = new HttpServletRequestImpl(exchange, convergedServletContext.getDelegatedContext());
+        final ConvergedHttpServletResponseFacade convergedResponse = new ConvergedHttpServletResponseFacade(response,convergedServletContext);
+        final ConvergedHttpServletRequestFacade convergedRequest = new ConvergedHttpServletRequestFacade(request,convergedServletContext);
+        final ServletRequestContext servletRequestContext = new ConvergedServletRequestContext(convergedServletContext.getDeployment(), convergedRequest, convergedResponse, info);
+        //set the max request size if applicable
+        if (info.getServletChain().getManagedServlet().getMaxRequestSize() > 0) {
+            exchange.setMaxEntitySize(info.getServletChain().getManagedServlet().getMaxRequestSize());
+        }
+        exchange.putAttachment(ServletRequestContext.ATTACHMENT_KEY, servletRequestContext);
+
+        exchange.startBlocking(new ServletBlockingHttpExchange(exchange));
+        servletRequestContext.setServletPathMatch(info);
+
+        Executor executor = info.getServletChain().getExecutor();
+        if (executor == null) {
+            executor = convergedServletContext.getDeployment().getExecutor();
+        }
+
+        if (exchange.isInIoThread() || executor != null) {
+            //either the exchange has not been dispatched yet, or we need to use a special executor
+            exchange.dispatch(executor, new HttpHandler() {
+                @Override
+                public void handleRequest(final HttpServerExchange exchange) throws Exception {
+                    if(System.getSecurityManager() == null) {
+                        dispatchRequest(exchange, servletRequestContext, info.getServletChain(), DispatcherType.REQUEST);
+                    } else {
+                        //sometimes thread pools inherit some random
+                        AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
+                            @Override
+                            public Object run() throws Exception{
+                                dispatchRequest(exchange, servletRequestContext, info.getServletChain(), DispatcherType.REQUEST);
+                                return null;
+                            }
+                        });
+                    }
+                }
+            });
+        } else {
+            dispatchRequest(exchange, servletRequestContext, info.getServletChain(), DispatcherType.REQUEST);
+        }
     }
 
     @Override
@@ -134,89 +218,6 @@ public class ConvergedServletInitialHandler extends ServletInitialHandler{
                 throw (RuntimeException) e;
             }
             throw new ServletException(e);
-        }
-    }
-
-    @Override
-    public void handleRequest(final HttpServerExchange exchange) throws Exception {
-        ServletPathMatches paths=null;
-        try{
-            //lets get access of superclass private fields using reflection:
-            Field pathsField = ServletInitialHandler.class.getDeclaredField("paths");
-            pathsField.setAccessible(true);
-            paths = (ServletPathMatches)pathsField.get(this);
-            pathsField.setAccessible(false);
-        }catch(NoSuchFieldException | IllegalAccessException e){
-            throw new ServletException(e);
-        }
-
-        final String path = exchange.getRelativePath();
-        if(isForbiddenPath(path)) {
-            exchange.setResponseCode(404);
-            return;
-        }
-        final ServletPathMatch info = paths.getServletHandlerByPath(path);
-        //https://issues.jboss.org/browse/WFLY-3439
-        //if the request is an upgrade request then we don't want to redirect
-        //as there is a good chance the web socket client won't understand the redirect
-        //we make an exception for HTTP2 upgrade requests, as this would have already be handled at
-        //the connector level if it was going to be handled.
-        String upgradeString = exchange.getRequestHeaders().getFirst(Headers.UPGRADE);
-        boolean isUpgradeRequest = upgradeString != null && !upgradeString.startsWith(HTTP2_UPGRADE_PREFIX);
-        if (info.getType() == ServletPathMatch.Type.REDIRECT && !isUpgradeRequest) {
-            //UNDERTOW-89
-            //we redirect on GET requests to the root context to add an / to the end
-            exchange.setResponseCode(302);
-            exchange.getResponseHeaders().put(Headers.LOCATION, RedirectBuilder.redirect(exchange, exchange.getRelativePath() + "/", true));
-            return;
-        } else if (info.getType() == ServletPathMatch.Type.REWRITE) {
-            //this can only happen if the path ends with a /
-            //otherwise there would be a rewrite instead
-            exchange.setRelativePath(exchange.getRelativePath() + info.getRewriteLocation());
-            exchange.setRequestURI(exchange.getRequestURI() + info.getRewriteLocation());
-            exchange.setRequestPath(exchange.getRequestPath() + info.getRewriteLocation());
-        }
-
-        final HttpServletResponseImpl response = new HttpServletResponseImpl(exchange, convergedServletContext.getDelegatedContext());
-        final HttpServletRequestImpl request = new HttpServletRequestImpl(exchange, convergedServletContext.getDelegatedContext());
-        final ConvergedHttpServletResponseFacade convergedResponse = new ConvergedHttpServletResponseFacade(response,convergedServletContext);
-        final ConvergedHttpServletRequestFacade convergedRequest = new ConvergedHttpServletRequestFacade(request,convergedServletContext);
-        final ServletRequestContext servletRequestContext = new ConvergedServletRequestContext(convergedServletContext.getDeployment(), convergedRequest, convergedResponse, info);
-        //set the max request size if applicable
-        if (info.getServletChain().getManagedServlet().getMaxRequestSize() > 0) {
-            exchange.setMaxEntitySize(info.getServletChain().getManagedServlet().getMaxRequestSize());
-        }
-        exchange.putAttachment(ServletRequestContext.ATTACHMENT_KEY, servletRequestContext);
-
-        exchange.startBlocking(new ServletBlockingHttpExchange(exchange));
-        servletRequestContext.setServletPathMatch(info);
-
-        Executor executor = info.getServletChain().getExecutor();
-        if (executor == null) {
-            executor = convergedServletContext.getDeployment().getExecutor();
-        }
-
-        if (exchange.isInIoThread() || executor != null) {
-            //either the exchange has not been dispatched yet, or we need to use a special executor
-            exchange.dispatch(executor, new HttpHandler() {
-                @Override
-                public void handleRequest(final HttpServerExchange exchange) throws Exception {
-                    if(System.getSecurityManager() == null) {
-                        dispatchRequest(exchange, servletRequestContext, info.getServletChain(), DispatcherType.REQUEST);
-                    } else {
-                        //sometimes thread pools inherit some random
-                        AccessController.doPrivileged(new PrivilegedExceptionAction<Object>() {
-                            @Override
-                            public Object run() throws Exception{
-                                dispatchRequest(exchange, servletRequestContext, info.getServletChain(), DispatcherType.REQUEST);
-                                return null;
-                            }
-                        });
-                    }
-                }
-            });
-        } else {
-            dispatchRequest(exchange, servletRequestContext, info.getServletChain(), DispatcherType.REQUEST);
         }
     }
 
