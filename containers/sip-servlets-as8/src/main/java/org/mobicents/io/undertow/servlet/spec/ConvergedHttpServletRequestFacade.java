@@ -19,6 +19,7 @@
 package org.mobicents.io.undertow.servlet.spec;
 
 import io.undertow.server.HttpServerExchange;
+import io.undertow.servlet.UndertowServletLogger;
 import io.undertow.servlet.spec.AsyncContextImpl;
 import io.undertow.servlet.spec.HttpServletRequestImpl;
 import io.undertow.servlet.spec.ServletContextImpl;
@@ -39,6 +40,7 @@ import java.util.Map;
 import javax.servlet.AsyncContext;
 import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletRequest;
@@ -63,7 +65,7 @@ public class ConvergedHttpServletRequestFacade implements HttpServletRequest{
     private final ServletContextImpl originalServletContext;
     private ConvergedServletContextImpl servletContext;
 
-    public ConvergedHttpServletRequestFacade(HttpServletRequestImpl httpServletRequest, ConvergedServletContextImpl servletContext){
+    public ConvergedHttpServletRequestFacade(HttpServletRequestImpl httpServletRequest, final ConvergedServletContextImpl servletContext){
         this.httpServletRequest = httpServletRequest;
         this.originalServletContext = httpServletRequest.getServletContext();
         this.servletContext = servletContext;
@@ -401,8 +403,8 @@ public class ConvergedHttpServletRequestFacade implements HttpServletRequest{
     }
 
     @Override
-    public ServletContextImpl getServletContext() {
-        return httpServletRequest.getServletContext();
+    public ServletContext getServletContext() {
+        return servletContext;
     }
 
     @Override
@@ -462,6 +464,7 @@ public class ConvergedHttpServletRequestFacade implements HttpServletRequest{
             asyncRequestDispatched.invoke(httpServletRequest, null);
             asyncRequestDispatched.setAccessible(false);
         }catch(NoSuchMethodException | InvocationTargetException | IllegalAccessException e){
+            UndertowServletLogger.REQUEST_LOGGER.warn("Exception occured during invoking HttpServletRequestImpl.asyncRequestDispatched() method using reflection:",e);
             //FIXME: kakonyii: handle reflection errors or just omit them.
         }
 
@@ -490,5 +493,14 @@ public class ConvergedHttpServletRequestFacade implements HttpServletRequest{
 
     public HttpServletRequestImpl getHttpServletRequestDelegated() {
         return httpServletRequest;
+    }
+
+    @Override
+    public String toString() {
+        return "ConvergedHttpServletRequestFacade [ " + getMethod() + ' ' + getRequestURI() + " ]";
+    }
+
+    public void clearAttributes() {
+        httpServletRequest.clearAttributes();
     }
 }
