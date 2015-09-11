@@ -26,11 +26,13 @@ import java.util.Collection;
 import java.util.Locale;
 
 import io.undertow.server.HttpServerExchange;
+import io.undertow.servlet.UndertowServletLogger;
 import io.undertow.servlet.spec.HttpServletResponseImpl;
 import io.undertow.servlet.spec.ServletContextImpl;
 import io.undertow.util.HttpString;
 import io.undertow.util.RedirectBuilder;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -209,6 +211,7 @@ public class ConvergedHttpServletResponseFacade implements HttpServletResponse{
             result=(boolean)isIgnoredFlushPerformed.invoke(httpServletResponse, null);
             isIgnoredFlushPerformed.setAccessible(false);
         }catch(NoSuchMethodException | InvocationTargetException | IllegalAccessException e){
+            UndertowServletLogger.ROOT_LOGGER.warn("Exception occured during invoking HttpServletResponseImpl.isIgnoredFlushPerformed() method using reflection:",e);
             //FIXME: kakonyii: handle reflection errors or just omit them.
         }
         return result;
@@ -223,6 +226,7 @@ public class ConvergedHttpServletResponseFacade implements HttpServletResponse{
             setIgnoredFlushPerformed.invoke(httpServletResponse, ignoredFlushPerformed);
             setIgnoredFlushPerformed.setAccessible(false);
         }catch(NoSuchMethodException | InvocationTargetException | IllegalAccessException e){
+            UndertowServletLogger.ROOT_LOGGER.warn("Exception occured during invoking HttpServletResponseImpl.setIgnoredFlushPerformed() method using reflection:",e);
             //FIXME: kakonyii: handle reflection errors or just omit them.
         }
     }
@@ -297,8 +301,8 @@ public class ConvergedHttpServletResponseFacade implements HttpServletResponse{
         httpServletResponse.setServletContext(servletContext.getDelegatedContext());
     }
 
-    public ServletContextImpl getServletContext() {
-        return httpServletResponse.getServletContext();
+    public ServletContext getServletContext() {
+        return servletContext;
     }
 
     public String encodeURL(String url) {
@@ -325,7 +329,7 @@ public class ConvergedHttpServletResponseFacade implements HttpServletResponse{
         if (isEncodeable(toAbsolute(url))) {
             return originalServletContext.getSessionConfig().rewriteUrl(url, servletContext.getSession(originalServletContext, httpServletResponse.getExchange(), true).getId());
         } else {
-            return (url);
+            return url;
         }
     }
 
@@ -394,6 +398,7 @@ public class ConvergedHttpServletResponseFacade implements HttpServletResponse{
             result= (boolean) isEncodeable.invoke(httpServletResponse, location);
             isEncodeable.setAccessible(false);
         }catch(NoSuchMethodException | InvocationTargetException | IllegalAccessException e){
+            UndertowServletLogger.ROOT_LOGGER.warn("Exception occured during invoking HttpServletResponseImpl.isEncodeable() method using reflection:",e);
             //FIXME: kakonyii: handle reflection errors or just omit them.
         }
         return result;

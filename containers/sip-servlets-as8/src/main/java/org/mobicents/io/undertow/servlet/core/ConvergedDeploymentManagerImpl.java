@@ -185,6 +185,7 @@ public class ConvergedDeploymentManagerImpl extends DeploymentManagerImpl{
         }
 
         final List<ThreadSetupAction> setup = new ArrayList<>();
+        setup.add(ServletRequestContextThreadSetupAction.INSTANCE);
         setup.add(new ContextClassLoaderSetupAction(deploymentInfo.getClassLoader()));
         setup.addAll(deploymentInfo.getThreadSetupActions());
         final CompositeThreadSetupAction threadSetupAction = new CompositeThreadSetupAction(setup);
