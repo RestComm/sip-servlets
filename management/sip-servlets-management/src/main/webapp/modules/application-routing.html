@@ -426,6 +426,24 @@
 						})						
 					}
 					
+                                        //this helper methods converts the JSONified params into the 
+                                        //original format the user entered.
+                                        function stringifyOptionalParams(optionalParameters){
+                                            var stringifiedParams = "";
+                                            var PARAM_SEPARATOR = "" ;
+                                            var PARAM_NAME_VALUE_SEPARATOR = "=";
+                                            for(var key in optionalParameters){
+                                                var attrName = key;
+                                                var attrValue = optionalParameters[key];
+                                                if (stringifiedParams !== "")
+                                                {
+                                                    stringifiedParams = stringifiedParams + PARAM_SEPARATOR;
+                                                }
+                                                stringifiedParams = stringifiedParams + attrName + PARAM_NAME_VALUE_SEPARATOR + attrValue;
+                                            }
+                                            return stringifiedParams;
+                                        }
+                                        
 					function addMethodApplicationFromDar(method, methodString) {
 						for (var i = 0; i < method.length; i++) {
 	                    	 methodDARInformation = method[i];
@@ -438,7 +456,7 @@
 	                    			 methodDARInformation.routeModifier, 
 	                    			 methodDARInformation.routes, 
 	                    			 methodDARInformation.order,
-                                                 methodDARInformation.regex);
+                                                 stringifyOptionalParams(methodDARInformation.optionalParameters));
 	                     }
 					}
 					
