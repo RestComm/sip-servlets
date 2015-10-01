@@ -31,15 +31,14 @@ import javax.servlet.sip.ar.spi.SipApplicationRouterProvider;
  * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
  * 
  */
-public class DefaultApplicationRouterProvider extends
-		SipApplicationRouterProvider {
-	private final DefaultApplicationRouter appRouter = new DefaultApplicationRouter();
+public class DefaultApplicationRouterProvider extends SipApplicationRouterProvider {
+    private final DefaultApplicationRouter appRouter = new DefaultApplicationRouter();
 
-	public DefaultApplicationRouterProvider() {
-	}
+    public DefaultApplicationRouterProvider() {
+    }
 
-	public SipApplicationRouter getSipApplicationRouter() {
-		return appRouter;
-	}
+    public SipApplicationRouter getSipApplicationRouter() {
+        return appRouter;
+    }
 
 }
