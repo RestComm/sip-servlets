@@ -254,7 +254,7 @@ public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 	}
 
 	public boolean canRun() {
-		return !this.future.isCancelled() && !this.future.isDone();
+		return this.future!=null && !this.future.isCancelled() && !this.future.isDone();
 
 	}
 
@@ -294,7 +294,12 @@ public class ServletTimerImpl implements MobicentsServletTimer, Runnable {
 			sipContext.enterSipContext();	
 			sipContext.enterSipApp(sipApplicationSession, null, false, true);
 			batchStarted = sipContext.enterSipAppHa(true);
-			listener.timeout(this);
+			
+			if(isCanceled==false){
+			    listener.timeout(this);
+			}else{
+			    logger.debug("running Servlet Timer " + id + " for sip application session " + sipApplicationSession + " is cancelled, so we skip its timerListener's timeout() method call!");
+			}
 		} catch(Throwable t) {
 			logger.error("An unexpected exception happened in the timer callback!",t);
 		} finally {		
