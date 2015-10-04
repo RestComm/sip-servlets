@@ -24,13 +24,22 @@ package org.mobicents.as7;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REMOVE;
 
+import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.jboss.as.controller.AbstractRuntimeOnlyHandler;
+import org.jboss.as.controller.AttributeDefinition;
+import org.jboss.as.controller.OperationContext;
+import org.jboss.as.controller.OperationFailedException;
+import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
 import org.jboss.as.controller.ReloadRequiredWriteAttributeHandler;
 import org.jboss.as.controller.SimpleAttributeDefinition;
 import org.jboss.as.controller.SimpleAttributeDefinitionBuilder;
+import org.jboss.as.controller.SimpleMapAttributeDefinition;
 import org.jboss.as.controller.SimpleResourceDefinition;
 import org.jboss.as.controller.descriptions.DefaultResourceAddDescriptionProvider;
 import org.jboss.as.controller.descriptions.DefaultResourceRemoveDescriptionProvider;
@@ -40,8 +49,16 @@ import org.jboss.as.controller.descriptions.ResourceDescriptionResolver;
 import org.jboss.as.controller.registry.AttributeAccess;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.as.controller.registry.OperationEntry;
+import org.jboss.as.controller.registry.Resource;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
+import org.jboss.msc.service.ServiceController;
+import org.mobicents.as7.SipDeploymentDefinition.SessionManagerStatsHandler;
+import org.mobicents.as7.SipDeploymentDefinition.SessionStat;
+import org.mobicents.as7.deployment.SIPWebContext;
+import org.mobicents.ext.javax.sip.SipStackExtension;
+import org.mobicents.ext.javax.sip.SipStackImpl;
+import org.mobicents.servlet.sip.core.SipManager;
 
 /**
  * @author Tomaz Cerar
@@ -261,5 +278,200 @@ public class SipDefinition extends SimpleResourceDefinition {
         registration.registerReadWriteAttribute(MEMORY_THRESHOLD, null, new ReloadRequiredWriteAttributeHandler(MEMORY_THRESHOLD));
         registration.registerReadWriteAttribute(BACK_TO_NORMAL_MEMORY_THRESHOLD, null, new ReloadRequiredWriteAttributeHandler(BACK_TO_NORMAL_MEMORY_THRESHOLD));
         registration.registerReadWriteAttribute(OUTBOUND_PROXY, null, new ReloadRequiredWriteAttributeHandler(OUTBOUND_PROXY));
+        for (SipStackStat stat : SipStackStat.values()) {
+            registration.registerMetric(stat.definition, SipStackStatsHandler.getInstance());
+        }
+        for (SipApplicationDispatcherStat stat : SipApplicationDispatcherStat.values()) {
+            registration.registerMetric(stat.definition, SipApplicationDispatcherStatsHandler.getInstance());
+        }
     }
+
+    static class SipStackStatsHandler extends AbstractRuntimeOnlyHandler {
+
+        static SipStackStatsHandler INSTANCE = new SipStackStatsHandler();
+
+        private SipStackStatsHandler() {
+        }
+
+        public static SipStackStatsHandler getInstance() {
+            return INSTANCE;
+        }
+
+        @Override
+        protected void executeRuntimeStep(OperationContext context, ModelNode operation) throws OperationFailedException {
+
+        	final PathAddress address = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.OP_ADDR));
+
+            final Resource sip = context.readResourceFromRoot(address.subAddress(0, address.size()), false);
+            final ModelNode subModel = sip.getModel();
+
+        	final ServiceController<?> controller = context.getServiceRegistry(false).getService(SipSubsystemServices.JBOSS_SIP);
+        	SipStackStat stat = SipStackStat.getStat(operation.require(ModelDescriptionConstants.NAME).asString());
+
+        	if (stat == null) {
+        		context.getFailureDescription().set(SipMessages.MESSAGES.unknownMetric(operation.require(ModelDescriptionConstants.NAME).asString()));
+            } else {
+                final SipServerService sipServerService = SipServerService.class.cast(controller.getValue());
+                ModelNode result = new ModelNode();
+                switch (stat) {
+                    case NUMBER_CLIENT_TRANSACTIONS:
+                    	result.set(((SipStackImpl)sipServerService.getSipService().getSipStack()).getNumberOfClientTransactions());
+                        break;
+                    case NUMBER_SERVER_TRANSACTIONS:
+                    	result.set(((SipStackImpl)sipServerService.getSipService().getSipStack()).getNumberOfServerTransactions());
+                        break;
+                    case NUMBER_DIALOG:
+                    	result.set(((SipStackImpl)sipServerService.getSipService().getSipStack()).getNumberOfDialogs());
+                        break;
+                    case NUMBER_EARY_DIALOG:
+                    	result.set(((SipStackImpl)sipServerService.getSipService().getSipStack()).getNumberOfEarlyDialogs());
+                        break;
+                    default:
+                        throw new IllegalStateException(SipMessages.MESSAGES.unknownMetric(stat));
+                }
+                context.getResult().set(result);
+            }
+
+            context.completeStep();
+        }
+
+    }
+
+    public enum SipStackStat {
+        NUMBER_CLIENT_TRANSACTIONS(new SimpleAttributeDefinition("number-client-transaction", ModelType.INT, false)),
+        NUMBER_SERVER_TRANSACTIONS(new SimpleAttributeDefinition("number-server-transaction", ModelType.INT, false)),
+        NUMBER_DIALOG(new SimpleAttributeDefinition("number-dialog", ModelType.INT, false)),
+        NUMBER_EARY_DIALOG(new SimpleAttributeDefinition("number-early-dialog", ModelType.INT, false));
+//        EXPIRED_SIP_APP_SESSIONS(new SimpleAttributeDefinition("expired-sip-application-sessions", ModelType.INT, false)),
+//        SIP_SESSIONS_CREATED(new SimpleAttributeDefinition("sip-sessions-created", ModelType.INT, false)),
+//        SIP_APP_SESSIONS_CREATED(new SimpleAttributeDefinition("sip-application-sessions-created", ModelType.INT, false)),
+//        SIP_SESSIONS_CREATION_RATE(new SimpleAttributeDefinition("sip-sessions-per-sec", ModelType.INT, false)),
+//        SIP_APP_SESSIONS_CREATION_RATE(new SimpleAttributeDefinition("sip-application-sessions-per-sec", ModelType.INT, false)),
+//        SIP_SESSION_AVG_ALIVE_TIME(new SimpleAttributeDefinition("sip-session-avg-alive-time", ModelType.INT, false)),
+//        SIP_APP_SESSION_AVG_ALIVE_TIME(new SimpleAttributeDefinition("sip-application-session-avg-alive-time", ModelType.INT, false)),
+//        SIP_SESSION_MAX_ALIVE_TIME(new SimpleAttributeDefinition("sip-session-max-alive-time", ModelType.INT, false)),
+//        SIP_APP_SESSION_MAX_ALIVE_TIME(new SimpleAttributeDefinition("sip-application-session-max-alive-time", ModelType.INT, false)),
+//        REJECTED_SIP_SESSIONS(new SimpleAttributeDefinition("rejected-sip-sessions", ModelType.INT, false)),
+//        REJECTED_SIP_APP_SESSIONS(new SimpleAttributeDefinition("rejected-sip-application-sessions", ModelType.INT, false)),
+//        MAX_ACTIVE_SIP_SESSIONS(new SimpleAttributeDefinition("max-active-sip-sessions", ModelType.INT, false));
+
+        private static final Map<String, SipStackStat> MAP = new HashMap<String, SipStackStat>();
+
+        static {
+            for (SipStackStat stat : EnumSet.allOf(SipStackStat.class)) {
+                MAP.put(stat.toString(), stat);
+            }
+        }
+
+        final AttributeDefinition definition;
+
+        private SipStackStat(final AttributeDefinition definition) {
+            this.definition = definition;
+        }
+
+        @Override
+        public final String toString() {
+            return definition.getName();
+        }
+
+        public static synchronized SipStackStat getStat(final String stringForm) {
+            return MAP.get(stringForm);
+        }
+    }
+    
+    static class SipApplicationDispatcherStatsHandler extends AbstractRuntimeOnlyHandler {
+
+        static SipApplicationDispatcherStatsHandler INSTANCE = new SipApplicationDispatcherStatsHandler();
+
+        private SipApplicationDispatcherStatsHandler() {
+        }
+
+        public static SipApplicationDispatcherStatsHandler getInstance() {
+            return INSTANCE;
+        }
+
+        @Override
+        protected void executeRuntimeStep(OperationContext context, ModelNode operation) throws OperationFailedException {
+
+        	final PathAddress address = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.OP_ADDR));
+
+            final Resource sip = context.readResourceFromRoot(address.subAddress(0, address.size()), false);
+            final ModelNode subModel = sip.getModel();
+
+        	final ServiceController<?> controller = context.getServiceRegistry(false).getService(SipSubsystemServices.JBOSS_SIP);
+        	SipApplicationDispatcherStat stat = SipApplicationDispatcherStat.getStat(operation.require(ModelDescriptionConstants.NAME).asString());
+
+        	if (stat == null) {
+        		context.getFailureDescription().set(SipMessages.MESSAGES.unknownMetric(operation.require(ModelDescriptionConstants.NAME).asString()));
+            } else {
+                final SipServerService sipServerService = SipServerService.class.cast(controller.getValue());
+                ModelNode result = new ModelNode();
+                switch (stat) {
+                    case REQUESTS_PROCESSED_BY_METHOD:
+                    	result.set(Arrays.toString(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod().entrySet().toArray()));
+                        break;
+                    case RESPONSES_PROCESSED_BY_STATUS_CODE:
+                    	result.set(Arrays.toString(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode().entrySet().toArray()));
+                        break;
+                    case REQUESTS_SENT_BY_METHOD:
+                    	result.set(Arrays.toString(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod().entrySet().toArray()));
+                        break;
+                    case RESPONSES_SENT_BY_STATUS_CODE:
+                    	result.set(Arrays.toString(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode().entrySet().toArray()));
+                        break;
+                    default:
+                        throw new IllegalStateException(SipMessages.MESSAGES.unknownMetric(stat));
+                }
+                context.getResult().set(result);
+            }
+
+            context.completeStep();
+        }
+
+    }
+
+    public enum SipApplicationDispatcherStat {
+    	REQUESTS_PROCESSED_BY_METHOD(new SimpleAttributeDefinition("requests-processed-by-method", ModelType.STRING, false)),
+    	RESPONSES_PROCESSED_BY_STATUS_CODE(new SimpleAttributeDefinition("responses-processed-by-status-code", ModelType.STRING, false)),
+    	REQUESTS_SENT_BY_METHOD(new SimpleAttributeDefinition("requests-sent-by-method", ModelType.STRING, false)),
+    	RESPONSES_SENT_BY_STATUS_CODE(new SimpleAttributeDefinition("responses-sent-by-status-code", ModelType.STRING, false));
+//        NUMBER_DIALOG(new SimpleAttributeDefinition("number-dialog", ModelType.INT, false)),
+//        NUMBER_EARY_DIALOG(new SimpleAttributeDefinition("number-early-dialog", ModelType.INT, false));
+////        EXPIRED_SIP_APP_SESSIONS(new SimpleAttributeDefinition("expired-sip-application-sessions", ModelType.INT, false)),
+//        SIP_SESSIONS_CREATED(new SimpleAttributeDefinition("sip-sessions-created", ModelType.INT, false)),
+//        SIP_APP_SESSIONS_CREATED(new SimpleAttributeDefinition("sip-application-sessions-created", ModelType.INT, false)),
+//        SIP_SESSIONS_CREATION_RATE(new SimpleAttributeDefinition("sip-sessions-per-sec", ModelType.INT, false)),
+//        SIP_APP_SESSIONS_CREATION_RATE(new SimpleAttributeDefinition("sip-application-sessions-per-sec", ModelType.INT, false)),
+//        SIP_SESSION_AVG_ALIVE_TIME(new SimpleAttributeDefinition("sip-session-avg-alive-time", ModelType.INT, false)),
+//        SIP_APP_SESSION_AVG_ALIVE_TIME(new SimpleAttributeDefinition("sip-application-session-avg-alive-time", ModelType.INT, false)),
+//        SIP_SESSION_MAX_ALIVE_TIME(new SimpleAttributeDefinition("sip-session-max-alive-time", ModelType.INT, false)),
+//        SIP_APP_SESSION_MAX_ALIVE_TIME(new SimpleAttributeDefinition("sip-application-session-max-alive-time", ModelType.INT, false)),
+//        REJECTED_SIP_SESSIONS(new SimpleAttributeDefinition("rejected-sip-sessions", ModelType.INT, false)),
+//        REJECTED_SIP_APP_SESSIONS(new SimpleAttributeDefinition("rejected-sip-application-sessions", ModelType.INT, false)),
+//        MAX_ACTIVE_SIP_SESSIONS(new SimpleAttributeDefinition("max-active-sip-sessions", ModelType.INT, false));
+
+        private static final Map<String, SipApplicationDispatcherStat> MAP = new HashMap<String, SipApplicationDispatcherStat>();
+
+        static {
+            for (SipApplicationDispatcherStat stat : EnumSet.allOf(SipApplicationDispatcherStat.class)) {
+                MAP.put(stat.toString(), stat);
+            }
+        }
+
+        final AttributeDefinition definition;
+
+        private SipApplicationDispatcherStat(final AttributeDefinition definition) {
+            this.definition = definition;
+        }
+
+        @Override
+        public final String toString() {
+            return definition.getName();
+        }
+
+        public static synchronized SipApplicationDispatcherStat getStat(final String stringForm) {
+            return MAP.get(stringForm);
+        }
+    }
+
 }
