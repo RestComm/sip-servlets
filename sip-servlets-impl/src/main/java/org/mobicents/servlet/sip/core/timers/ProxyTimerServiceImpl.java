@@ -23,7 +23,6 @@
 package org.mobicents.servlet.sip.core.timers;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.TimerTask;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ScheduledFuture;
@@ -120,21 +119,19 @@ public class ProxyTimerServiceImpl extends ScheduledThreadPoolExecutor implement
     public void cancel(TimerTask task) {
         //CANCEL needs to remove the shceduled timer see http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6602600
         //to improve perf
-        
+
         ScheduledFuture<?> future = null;
         Object[] array = super.getQueue().toArray();
-        for(int i = 0; i<array.length; i++)
-        {   
+        for(int i = 0; i<array.length; i++) {
             if(array[i] instanceof ScheduledFuture<?>){
                 future = (ScheduledFuture<?>)array[i];
-            
                 try {
-    
+
                     Field callableField = future.getClass().getDeclaredField("callable");
                     callableField.setAccessible(true);
                     Object callable = callableField.get(future);
                     callableField.setAccessible(false);
-                    
+
                     if(callable!=null){
                         Field taskField = callable.getClass().getDeclaredField("task");
                         taskField.setAccessible(true);
@@ -143,7 +140,7 @@ public class ProxyTimerServiceImpl extends ScheduledThreadPoolExecutor implement
                              scheduledTask = (TimerTask) taskField.get(callable);
                         }
                         taskField.setAccessible(false);
-                        
+
                         if(scheduledTask!=null && scheduledTask.equals(task)){
                             break;
                         }
@@ -154,7 +151,7 @@ public class ProxyTimerServiceImpl extends ScheduledThreadPoolExecutor implement
                 }
             }
         }
-        
+
         if(future != null) {
             boolean removed = super.remove((Runnable) future);
             if(logger.isDebugEnabled()) {
