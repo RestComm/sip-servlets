@@ -56,7 +56,6 @@ public class Servlet3SipServletResponseImpl extends SipServletResponseImpl imple
         super(response, sipFactoryImpl, transaction, session, dialog, hasBeenReceived, isRetransmission);
     }
 
-    @Override
 	public void setContentLengthLong(long len) {
 		setContentLength((int)len);
 	}

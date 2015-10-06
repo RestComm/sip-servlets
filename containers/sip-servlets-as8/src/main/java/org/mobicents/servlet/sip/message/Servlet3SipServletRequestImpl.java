@@ -183,8 +183,7 @@ public class Servlet3SipServletRequestImpl extends SipServletRequestImpl impleme
         // TODO Auto-generated method stub
         return null;
     }
-    
-    @Override
+
 	public long getContentLengthLong() {
 		return (long) getContentLength();
 	}
