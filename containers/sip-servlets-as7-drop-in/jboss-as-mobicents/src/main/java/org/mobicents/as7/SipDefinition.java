@@ -408,17 +408,143 @@ public class SipDefinition extends SimpleResourceDefinition {
                 final SipServerService sipServerService = SipServerService.class.cast(controller.getValue());
                 ModelNode result = new ModelNode();
                 switch (stat) {
-                    case REQUESTS_PROCESSED_BY_METHOD:
-                    	result.set(Arrays.toString(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod().entrySet().toArray()));
+                    case PRACK_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod().get("PRACK").longValue());
                         break;
-                    case RESPONSES_PROCESSED_BY_STATUS_CODE:
-                    	result.set(Arrays.toString(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode().entrySet().toArray()));
+                    case SUBSCRIBE_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod().get("SUBSCRIBE").longValue());
                         break;
-                    case REQUESTS_SENT_BY_METHOD:
-                    	result.set(Arrays.toString(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod().entrySet().toArray()));
+                    case INVITE_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod().get("INVITE").longValue());
                         break;
-                    case RESPONSES_SENT_BY_STATUS_CODE:
-                    	result.set(Arrays.toString(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode().entrySet().toArray()));
+                    case REFER_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod().get("REFER").longValue());
+                        break;
+                    case ACK_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod().get("ACK").longValue());
+                        break;
+                    case NOTIFY_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod().get("NOTIFY").longValue());
+                        break;
+                    case MESSAGE_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod().get("MESSAGE").longValue());
+                        break;
+                    case REGISTER_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod().get("REGISTER").longValue());
+                        break;
+                    case BYE_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod().get("BYE").longValue());
+                        break;
+                    case OPTIONS_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod().get("OPTIONS").longValue());
+                        break;
+                    case INFO_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod().get("INFO").longValue());
+                        break;
+                    case PUBLISH_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod().get("PUBLISH").longValue());
+                        break;
+                    case UPDATE_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod().get("UPDATE").longValue());
+                        break;
+                    case CANCEL_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsProcessedByMethod().get("CANCEL").longValue());
+                        break;
+                    case PRACK_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod().get("PRACK").longValue());
+                        break;
+                    case SUBSCRIBE_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod().get("SUBSCRIBE").longValue());
+                        break;
+                    case INVITE_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod().get("INVITE").longValue());
+                        break;
+                    case REFER_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod().get("REFER").longValue());
+                        break;
+                    case ACK_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod().get("ACK").longValue());
+                        break;
+                    case NOTIFY_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod().get("NOTIFY").longValue());
+                        break;
+                    case MESSAGE_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod().get("MESSAGE").longValue());
+                        break;
+                    case REGISTER_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod().get("REGISTER").longValue());
+                        break;
+                    case BYE_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod().get("BYE").longValue());
+                        break;
+                    case OPTIONS_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod().get("OPTIONS").longValue());
+                        break;
+                    case INFO_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod().get("INFO").longValue());
+                        break;
+                    case PUBLISH_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod().get("PUBLISH").longValue());
+                        break;
+                    case UPDATE_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod().get("UPDATE").longValue());
+                        break;
+                    case CANCEL_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getRequestsSentByMethod().get("CANCEL").longValue());
+                        break;
+                    case ONEXX_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode().get("1XX").longValue());
+                        break;
+                    case TWOXX_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode().get("2XX").longValue());
+                        break;
+                    case THREEXX_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode().get("3XX").longValue());
+                        break;
+                    case FOURXX_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode().get("4XX").longValue());
+                        break;
+                    case FIVEXX_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode().get("5XX").longValue());
+                        break;
+                    case SIXXX_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode().get("6XX").longValue());
+                        break;
+                    case SEVENXX_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode().get("7XX").longValue());
+                        break;
+                    case EIGHTXX_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode().get("8XX").longValue());
+                        break;
+                    case NINEXX_PROCESSED:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesProcessedByStatusCode().get("9XX").longValue());
+                        break;
+                    case ONEXX_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode().get("1XX").longValue());
+                        break;
+                    case TWOXX_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode().get("2XX").longValue());
+                        break;
+                    case THREEXX_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode().get("3XX").longValue());
+                        break;
+                    case FOURXX_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode().get("4XX").longValue());
+                        break;
+                    case FIVEXX_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode().get("5XX").longValue());
+                        break;
+                    case SIXXX_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode().get("6XX").longValue());
+                        break;
+                    case SEVENXX_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode().get("7XX").longValue());
+                        break;
+                    case EIGHTXX_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode().get("8XX").longValue());
+                        break;
+                    case NINEXX_SENT:
+                    	result.set(sipServerService.getSipService().getSipApplicationDispatcher().getResponsesSentByStatusCode().get("9XX").longValue());
                         break;
                     default:
                         throw new IllegalStateException(SipMessages.MESSAGES.unknownMetric(stat));
@@ -432,25 +558,56 @@ public class SipDefinition extends SimpleResourceDefinition {
     }
 
     public enum SipApplicationDispatcherStat {
-    	REQUESTS_PROCESSED_BY_METHOD(new SimpleAttributeDefinition("requests-processed-by-method", ModelType.STRING, false)),
-    	RESPONSES_PROCESSED_BY_STATUS_CODE(new SimpleAttributeDefinition("responses-processed-by-status-code", ModelType.STRING, false)),
-    	REQUESTS_SENT_BY_METHOD(new SimpleAttributeDefinition("requests-sent-by-method", ModelType.STRING, false)),
-    	RESPONSES_SENT_BY_STATUS_CODE(new SimpleAttributeDefinition("responses-sent-by-status-code", ModelType.STRING, false));
-//        NUMBER_DIALOG(new SimpleAttributeDefinition("number-dialog", ModelType.INT, false)),
-//        NUMBER_EARY_DIALOG(new SimpleAttributeDefinition("number-early-dialog", ModelType.INT, false));
-////        EXPIRED_SIP_APP_SESSIONS(new SimpleAttributeDefinition("expired-sip-application-sessions", ModelType.INT, false)),
-//        SIP_SESSIONS_CREATED(new SimpleAttributeDefinition("sip-sessions-created", ModelType.INT, false)),
-//        SIP_APP_SESSIONS_CREATED(new SimpleAttributeDefinition("sip-application-sessions-created", ModelType.INT, false)),
-//        SIP_SESSIONS_CREATION_RATE(new SimpleAttributeDefinition("sip-sessions-per-sec", ModelType.INT, false)),
-//        SIP_APP_SESSIONS_CREATION_RATE(new SimpleAttributeDefinition("sip-application-sessions-per-sec", ModelType.INT, false)),
-//        SIP_SESSION_AVG_ALIVE_TIME(new SimpleAttributeDefinition("sip-session-avg-alive-time", ModelType.INT, false)),
-//        SIP_APP_SESSION_AVG_ALIVE_TIME(new SimpleAttributeDefinition("sip-application-session-avg-alive-time", ModelType.INT, false)),
-//        SIP_SESSION_MAX_ALIVE_TIME(new SimpleAttributeDefinition("sip-session-max-alive-time", ModelType.INT, false)),
-//        SIP_APP_SESSION_MAX_ALIVE_TIME(new SimpleAttributeDefinition("sip-application-session-max-alive-time", ModelType.INT, false)),
-//        REJECTED_SIP_SESSIONS(new SimpleAttributeDefinition("rejected-sip-sessions", ModelType.INT, false)),
-//        REJECTED_SIP_APP_SESSIONS(new SimpleAttributeDefinition("rejected-sip-application-sessions", ModelType.INT, false)),
-//        MAX_ACTIVE_SIP_SESSIONS(new SimpleAttributeDefinition("max-active-sip-sessions", ModelType.INT, false));
-
+    	PRACK_PROCESSED(new SimpleAttributeDefinition("prack-processed", ModelType.STRING, false)),
+    	SUBSCRIBE_PROCESSED(new SimpleAttributeDefinition("subscribe-processed", ModelType.STRING, false)),
+    	INVITE_PROCESSED(new SimpleAttributeDefinition("invite-processed", ModelType.STRING, false)),
+    	REFER_PROCESSED(new SimpleAttributeDefinition("refer-processed", ModelType.STRING, false)),
+    	ACK_PROCESSED(new SimpleAttributeDefinition("ack-processed", ModelType.STRING, false)),
+    	NOTIFY_PROCESSED(new SimpleAttributeDefinition("notify-processed", ModelType.STRING, false)),
+    	MESSAGE_PROCESSED(new SimpleAttributeDefinition("message-processed", ModelType.STRING, false)),
+    	REGISTER_PROCESSED(new SimpleAttributeDefinition("register-processed", ModelType.STRING, false)),
+    	BYE_PROCESSED(new SimpleAttributeDefinition("bye-processed", ModelType.STRING, false)),
+    	OPTIONS_PROCESSED(new SimpleAttributeDefinition("options-processed", ModelType.STRING, false)),
+    	INFO_PROCESSED(new SimpleAttributeDefinition("info-processed", ModelType.STRING, false)),
+    	PUBLISH_PROCESSED(new SimpleAttributeDefinition("publish-processed", ModelType.STRING, false)),
+    	UPDATE_PROCESSED(new SimpleAttributeDefinition("update-processed", ModelType.STRING, false)),
+    	CANCEL_PROCESSED(new SimpleAttributeDefinition("cancel-processed", ModelType.STRING, false)),
+    	
+    	ONEXX_PROCESSED(new SimpleAttributeDefinition("1xx-processed", ModelType.STRING, false)),
+    	TWOXX_PROCESSED(new SimpleAttributeDefinition("2xx-processed", ModelType.STRING, false)),
+    	THREEXX_PROCESSED(new SimpleAttributeDefinition("3xx-processed", ModelType.STRING, false)),
+    	FOURXX_PROCESSED(new SimpleAttributeDefinition("4xx-processed", ModelType.STRING, false)),
+    	FIVEXX_PROCESSED(new SimpleAttributeDefinition("5xx-processed", ModelType.STRING, false)),
+    	SIXXX_PROCESSED(new SimpleAttributeDefinition("6xx-processed", ModelType.STRING, false)),
+    	SEVENXX_PROCESSED(new SimpleAttributeDefinition("7xx-processed", ModelType.STRING, false)),
+    	EIGHTXX_PROCESSED(new SimpleAttributeDefinition("8xx-processed", ModelType.STRING, false)),
+    	NINEXX_PROCESSED(new SimpleAttributeDefinition("9xx-processed", ModelType.STRING, false)),
+    	
+    	PRACK_SENT(new SimpleAttributeDefinition("prack-sent", ModelType.STRING, false)),
+    	SUBSCRIBE_SENT(new SimpleAttributeDefinition("subscribe-sent", ModelType.STRING, false)),
+    	INVITE_SENT(new SimpleAttributeDefinition("invite-sent", ModelType.STRING, false)),
+    	REFER_SENT(new SimpleAttributeDefinition("refer-sent", ModelType.STRING, false)),
+    	ACK_SENT(new SimpleAttributeDefinition("ack-sent", ModelType.STRING, false)),
+    	NOTIFY_SENT(new SimpleAttributeDefinition("notify-sent", ModelType.STRING, false)),
+    	MESSAGE_SENT(new SimpleAttributeDefinition("message-sent", ModelType.STRING, false)),
+    	REGISTER_SENT(new SimpleAttributeDefinition("register-sent", ModelType.STRING, false)),
+    	BYE_SENT(new SimpleAttributeDefinition("bye-sent", ModelType.STRING, false)),
+    	OPTIONS_SENT(new SimpleAttributeDefinition("options-sent", ModelType.STRING, false)),
+    	INFO_SENT(new SimpleAttributeDefinition("info-sent", ModelType.STRING, false)),
+    	PUBLISH_SENT(new SimpleAttributeDefinition("publish-sent", ModelType.STRING, false)),
+    	UPDATE_SENT(new SimpleAttributeDefinition("update-sent", ModelType.STRING, false)),
+    	CANCEL_SENT(new SimpleAttributeDefinition("cancel-sent", ModelType.STRING, false)),
+    	
+    	ONEXX_SENT(new SimpleAttributeDefinition("1xx-sent", ModelType.STRING, false)),
+    	TWOXX_SENT(new SimpleAttributeDefinition("2xx-sent", ModelType.STRING, false)),
+    	THREEXX_SENT(new SimpleAttributeDefinition("3xx-sent", ModelType.STRING, false)),
+    	FOURXX_SENT(new SimpleAttributeDefinition("4xx-sent", ModelType.STRING, false)),
+    	FIVEXX_SENT(new SimpleAttributeDefinition("5xx-sent", ModelType.STRING, false)),
+    	SIXXX_SENT(new SimpleAttributeDefinition("6xx-sent", ModelType.STRING, false)),
+    	SEVENXX_SENT(new SimpleAttributeDefinition("7xx-sent", ModelType.STRING, false)),
+    	EIGHTXX_SENT(new SimpleAttributeDefinition("8xx-sent", ModelType.STRING, false)),
+    	NINEXX_SENT(new SimpleAttributeDefinition("9xx-sent", ModelType.STRING, false));
+    	
         private static final Map<String, SipApplicationDispatcherStat> MAP = new HashMap<String, SipApplicationDispatcherStat>();
 
         static {
