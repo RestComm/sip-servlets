@@ -206,6 +206,17 @@
 				</dependency>
 
 				<dependency>
+					<groupId>org.mobicents.commons</groupId>
+					<artifactId>commons-congestion</artifactId>
+					<version>${mobicents.commons.version}</version>
+				</dependency>	
+				<dependency>
+					<groupId>javolution</groupId>
+					<artifactId>javolution</artifactId>
+					<version>${javolution.version}</version>			
+				</dependency>	
+
+				<dependency>
 					<groupId>dnsjava</groupId>
 					<artifactId>dnsjava</artifactId>
 					<version>2.0.6</version>
