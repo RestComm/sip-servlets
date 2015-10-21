@@ -231,6 +231,22 @@ public class SIPWebContext extends SipContextImpl {
                 }
             }
         }
+        return ok;
+    }
+
+    private void callPostConstructsOnEventListeners() throws ServletException{
+        ArrayList<EventListener> eventListeners = new ArrayList<EventListener>();
+        eventListeners.add(super.sipListeners.getContainerListener());
+        eventListeners.addAll(super.sipListeners.getProxyBranchListeners());
+        eventListeners.addAll(super.sipListeners.getServletContextListeners());
+        eventListeners.addAll(super.sipListeners.getSipApplicationSessionAttributeListeners());
+        eventListeners.addAll(super.sipListeners.getSipApplicationSessionListeners());
+        eventListeners.addAll(super.sipListeners.getSipConnectorListeners());
+        eventListeners.addAll(super.sipListeners.getSipErrorListeners());
+        eventListeners.addAll(super.sipListeners.getSipServletsListeners());
+        eventListeners.addAll(super.sipListeners.getSipSessionAttributeListeners());
+        eventListeners.addAll(super.sipListeners.getSipSessionListeners());
+        eventListeners.add(super.sipListeners.getTimerListener());
 
         //call @PostConstruct methods:
         for(EventListener listener: eventListeners){
@@ -259,7 +275,6 @@ public class SIPWebContext extends SipContextImpl {
                 }
             }
         }
-        return ok;
     }
 
     @Override
@@ -297,8 +312,9 @@ public class SIPWebContext extends SipContextImpl {
 
         //in order to initialize listeners before the servlets:
         this.contextListenerStart();
-
         super.start();
+        //call PostContructs on eventListeners after the context is started!
+        this.callPostConstructsOnEventListeners();
     }
 
     @Override
