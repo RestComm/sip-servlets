@@ -297,7 +297,7 @@ public class SIPWebContext extends SipContextImpl {
 
         //in order to initialize listeners before the servlets:
         this.contextListenerStart();
-        
+
         super.start();
     }
 
