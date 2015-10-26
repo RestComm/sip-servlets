@@ -112,6 +112,22 @@ public class SipDefinition extends SimpleResourceDefinition {
                     // .setValidator(new IntRangeValidator(1, true))
                     .setDefaultValue(new ModelNode(-1))
                     .build();
+    protected static final SimpleAttributeDefinition PROXY_TIMER_SERVICE_IMPEMENTATION_TYPE =
+            new SimpleAttributeDefinitionBuilder(Constants.PROXY_TIMER_SERVICE_IMPEMENTATION_TYPE, ModelType.STRING, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.PROXY_TIMER_SERVICE_IMPEMENTATION_TYPE)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    // .setValidator(new IntRangeValidator(1, true))
+                    .setDefaultValue(new ModelNode("standard"))
+                    .build();
+    protected static final SimpleAttributeDefinition SAS_TIMER_SERVICE_IMPEMENTATION_TYPE =
+            new SimpleAttributeDefinitionBuilder(Constants.SAS_TIMER_SERVICE_IMPEMENTATION_TYPE, ModelType.STRING, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.SAS_TIMER_SERVICE_IMPEMENTATION_TYPE)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    // .setValidator(new IntRangeValidator(1, true))
+                    .setDefaultValue(new ModelNode("standard"))
+                    .build();
     protected static final SimpleAttributeDefinition CONGESTION_CONTROL_POLICY =
             new SimpleAttributeDefinitionBuilder(Constants.CONGESTION_CONTROL_POLICY, ModelType.STRING, true)
                     .setAllowExpression(true)
@@ -261,6 +277,10 @@ public class SipDefinition extends SimpleResourceDefinition {
         registration.registerReadWriteAttribute(SIP_PATH_NAME, null, new ReloadRequiredWriteAttributeHandler(SIP_PATH_NAME));
         registration.registerReadWriteAttribute(SIP_APP_DISPATCHER_CLASS, null, new ReloadRequiredWriteAttributeHandler(
                 SIP_APP_DISPATCHER_CLASS));
+        registration.registerReadWriteAttribute(PROXY_TIMER_SERVICE_IMPEMENTATION_TYPE, null, new ReloadRequiredWriteAttributeHandler(
+                PROXY_TIMER_SERVICE_IMPEMENTATION_TYPE));
+        registration.registerReadWriteAttribute(SAS_TIMER_SERVICE_IMPEMENTATION_TYPE, null, new ReloadRequiredWriteAttributeHandler(
+                SAS_TIMER_SERVICE_IMPEMENTATION_TYPE));
         registration.registerReadWriteAttribute(CONGESTION_CONTROL_INTERVAL, null, new ReloadRequiredWriteAttributeHandler(
                 CONGESTION_CONTROL_INTERVAL));
         registration.registerReadWriteAttribute(CONGESTION_CONTROL_POLICY, null, new ReloadRequiredWriteAttributeHandler(

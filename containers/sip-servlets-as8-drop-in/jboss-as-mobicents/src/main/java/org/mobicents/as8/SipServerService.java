@@ -57,6 +57,8 @@ class SipServerService implements SipServer, Service<SipServer> {
     final String sipPathName;
     final String sipAppDispatcherClass;
     final String additionalParameterableHeaders;
+    final String proxyTimerServiceImplementationType;
+    final String sasTimerServiceImplementationType;
     final int sipCongestionControlInterval;
     final String congestionControlPolicy;
     final String sipConcurrencyControlMode;
@@ -96,6 +98,8 @@ class SipServerService implements SipServer, Service<SipServer> {
             final String sipPathName,
             String sipAppDispatcherClass,
             String additionalParameterableHeaders,
+            String proxyTimerServiceImplementationType,
+            String sasTimerServiceImplementationType,
             int sipCongestionControlInterval,
             String congestionControlPolicy,
             String sipConcurrencyControlMode,
@@ -124,6 +128,8 @@ class SipServerService implements SipServer, Service<SipServer> {
         this.sipPathName = sipPathName;
         this.sipAppDispatcherClass = sipAppDispatcherClass;
         this.additionalParameterableHeaders = additionalParameterableHeaders;
+        this.proxyTimerServiceImplementationType = proxyTimerServiceImplementationType;
+        this.sasTimerServiceImplementationType = sasTimerServiceImplementationType;
         this.sipCongestionControlInterval = sipCongestionControlInterval;
         this.congestionControlPolicy = congestionControlPolicy;
         this.sipConcurrencyControlMode = sipConcurrencyControlMode;
@@ -216,6 +222,9 @@ class SipServerService implements SipServer, Service<SipServer> {
         } else {
             sipService.setConcurrencyControlMode("None");
         }
+
+        sipService.setProxyTimerServiceImplementationType(proxyTimerServiceImplementationType);
+        sipService.setSasTimerServiceImplementationType(sasTimerServiceImplementationType);
 
         sipService.setCongestionControlCheckingInterval(sipCongestionControlInterval);
 

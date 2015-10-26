@@ -67,6 +67,8 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSessionsUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionCreationThreadLocal;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
+import org.mobicents.servlet.sip.core.timers.DefaultProxyTimerService;
+import org.mobicents.servlet.sip.core.timers.DefaultSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.ProxyTimerService;
 import org.mobicents.servlet.sip.core.timers.ProxyTimerServiceImpl;
 import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerService;
@@ -107,10 +109,12 @@ public class SipContextImpl implements SipContext {
     protected boolean hasDistributableManager;
     // timer service used to schedule sip application session expiration timer
     protected transient SipApplicationSessionTimerService sasTimerService = null;
+    protected TimerServiceType sasTimerServiceType = null;
     // timer service used to schedule sip servlet originated timer tasks
     protected transient SipServletTimerService timerService = null;
     // timer service used to schedule proxy timer tasks
     protected transient ProxyTimerService proxyTimerService = null;
+    protected TimerServiceType proxyTimerServiceType = null;
     protected transient SipListeners sipListeners;
     protected transient SipFactoryFacade sipFactoryFacade;
     protected transient SipSessionsUtilImpl sipSessionsUtil;
@@ -375,7 +379,13 @@ public class SipContextImpl implements SipContext {
             timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService());
         }
         if (proxyTimerService == null) {
-            proxyTimerService = new ProxyTimerServiceImpl();
+            if(proxyTimerServiceType == TimerServiceType.STANDARD){
+                proxyTimerService = new ProxyTimerServiceImpl();
+            }else if(proxyTimerServiceType == TimerServiceType.DEFAULT){
+                proxyTimerService = new DefaultProxyTimerService();
+            }else{
+                proxyTimerService = new ProxyTimerServiceImpl();
+            }
         }
         if (sasTimerService == null || !sasTimerService.isStarted()) {
             // FIXME: distributable not supported
@@ -384,7 +394,13 @@ public class SipContextImpl implements SipContext {
             // } else {
             // sasTimerService = new StandardSipApplicationSessionTimerService();
             // }
-            sasTimerService = new StandardSipApplicationSessionTimerService();
+            if(sasTimerServiceType == TimerServiceType.STANDARD){
+                sasTimerService = new StandardSipApplicationSessionTimerService();
+            }else if (sasTimerServiceType == TimerServiceType.DEFAULT){
+                sasTimerService = new DefaultSipApplicationSessionTimerService();
+            }else{
+                sasTimerService = new StandardSipApplicationSessionTimerService();
+            }
         }
     }
 
@@ -1127,4 +1143,10 @@ public class SipContextImpl implements SipContext {
     public void setWebServerListeners(List<ListenerService<?>> webServerListeners) {
         this.webServerListeners = webServerListeners;
     }
+
+    public enum TimerServiceType{
+        STANDARD,
+        DEFAULT;
+    };
+
 }

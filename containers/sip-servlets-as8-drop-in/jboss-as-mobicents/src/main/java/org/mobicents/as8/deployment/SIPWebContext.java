@@ -19,6 +19,7 @@
 package org.mobicents.as8.deployment;
 
 import io.undertow.servlet.api.Deployment;
+
 import org.mobicents.io.undertow.servlet.api.DeploymentInfoFacade;
 
 import java.lang.annotation.Annotation;
@@ -55,6 +56,7 @@ import org.jboss.metadata.web.spec.ListenerMetaData;
 import org.jboss.metadata.web.spec.ServletMetaData;
 import org.jboss.metadata.web.spec.SessionConfigMetaData;
 import org.jboss.metadata.web.spec.WebMetaData;
+import org.mobicents.as8.Constants;
 import org.mobicents.as8.SipServer;
 import org.mobicents.javax.servlet.sip.dns.DNSResolver;
 import org.mobicents.metadata.sip.jboss.JBossConvergedSipMetaData;
@@ -141,6 +143,22 @@ public class SIPWebContext extends SipContextImpl {
         SipServer sipServer = deploymentUnit.getAttachment(SipServer.ATTACHMENT_KEY);
         if (sipServer.getService() instanceof SipService) {
             super.sipApplicationDispatcher = ((SipService) sipServer.getService()).getSipApplicationDispatcher();
+        }
+
+        if(Constants.DEFAULT.equalsIgnoreCase(sipServer.getService().getProxyTimerServiceImplementationType())){
+            super.proxyTimerServiceType = SipContextImpl.TimerServiceType.DEFAULT;
+        }else if (Constants.STANDARD.equalsIgnoreCase(sipServer.getService().getProxyTimerServiceImplementationType())){
+            super.proxyTimerServiceType = SipContextImpl.TimerServiceType.STANDARD;
+        }else{
+            super.proxyTimerServiceType = SipContextImpl.TimerServiceType.STANDARD;
+        }
+
+        if(Constants.DEFAULT.equalsIgnoreCase(sipServer.getService().getSasTimerServiceImplementationType())){
+            super.sasTimerServiceType = SipContextImpl.TimerServiceType.DEFAULT;
+        }else if (Constants.STANDARD.equalsIgnoreCase(sipServer.getService().getSasTimerServiceImplementationType())){
+            super.sasTimerServiceType = SipContextImpl.TimerServiceType.STANDARD;
+        }else{
+            super.sasTimerServiceType = SipContextImpl.TimerServiceType.STANDARD;
         }
     }
 

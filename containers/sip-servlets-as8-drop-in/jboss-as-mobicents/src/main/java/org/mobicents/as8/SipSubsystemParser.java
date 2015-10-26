@@ -82,6 +82,8 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         SipDefinition.SIP_PATH_NAME.marshallAsAttribute(node, false, writer);
         SipDefinition.SIP_APP_DISPATCHER_CLASS.marshallAsAttribute(node, false, writer);
         SipDefinition.CONCURRENCY_CONTROL_MODE.marshallAsAttribute(node, false, writer);
+        SipDefinition.PROXY_TIMER_SERVICE_IMPEMENTATION_TYPE.marshallAsAttribute(node, false, writer);
+        SipDefinition.SAS_TIMER_SERVICE_IMPEMENTATION_TYPE.marshallAsAttribute(node, false, writer);
         SipDefinition.CONGESTION_CONTROL_INTERVAL.marshallAsAttribute(node, false, writer);
         SipDefinition.CONGESTION_CONTROL_POLICY.marshallAsAttribute(node, false, writer);
         SipDefinition.USE_PRETTY_ENCODING.marshallAsAttribute(node, false, writer);
@@ -141,6 +143,8 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
                 case DNS_TIMEOUT:
                 case DNS_RESOLVER_CLASS:
                 case CANCELED_TIMER_TASKS_PURGE_PERIOD:
+                case PROXY_TIMER_SERVICE_IMPEMENTATION_TYPE:
+                case SAS_TIMER_SERVICE_IMPEMENTATION_TYPE:
                 case CONGESTION_CONTROL_INTERVAL:
                 case CONGESTION_CONTROL_POLICY:
                 case MEMORY_THRESHOLD:

@@ -99,6 +99,8 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         SipDefinition.SIP_STACK_PROPS.validateAndSet(operation, model);
         SipDefinition.SIP_PATH_NAME.validateAndSet(operation, model);
         SipDefinition.SIP_APP_DISPATCHER_CLASS.validateAndSet(operation, model);
+        SipDefinition.PROXY_TIMER_SERVICE_IMPEMENTATION_TYPE.validateAndSet(operation, model);
+        SipDefinition.SAS_TIMER_SERVICE_IMPEMENTATION_TYPE.validateAndSet(operation, model);
         SipDefinition.CONGESTION_CONTROL_INTERVAL.validateAndSet(operation, model);
         SipDefinition.CONGESTION_CONTROL_POLICY.validateAndSet(operation, model);
         SipDefinition.CONCURRENCY_CONTROL_MODE.validateAndSet(operation, model);
@@ -150,6 +152,16 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
                 .resolveModelAttribute(context, fullModel);
         final String additionalParameterableHeaders = additionalParameterableHeadersModel.isDefined() ? additionalParameterableHeadersModel
                 .asString() : null;
+
+        final ModelNode proxyTimerServiceImplementationTypeModel = SipDefinition.PROXY_TIMER_SERVICE_IMPEMENTATION_TYPE.resolveModelAttribute(
+                context, fullModel);
+        final String proxyTimerServiceImplementationType = proxyTimerServiceImplementationTypeModel.isDefined() ? proxyTimerServiceImplementationTypeModel
+                .asString() : Constants.STANDARD;
+
+        final ModelNode sasTimerServiceImplementationTypeModel = SipDefinition.SAS_TIMER_SERVICE_IMPEMENTATION_TYPE.resolveModelAttribute(
+                context, fullModel);
+        final String sasTimerServiceImplementationType = sasTimerServiceImplementationTypeModel.isDefined() ? sasTimerServiceImplementationTypeModel
+                .asString() : Constants.STANDARD;
 
         final ModelNode sipCongestionControlIntervalModel = SipDefinition.CONGESTION_CONTROL_INTERVAL.resolveModelAttribute(
                 context, fullModel);
@@ -234,7 +246,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         // operation.get(Constants.USE_PRETTY_ENCODING).asBoolean() : true;
 
         final SipServerService service = new SipServerService(sipAppRouterFile, sipStackPropertiesFile, sipPathName,
-                sipAppDispatcherClass, additionalParameterableHeaders, sipCongestionControlInterval, congestionControlPolicy,
+                sipAppDispatcherClass, additionalParameterableHeaders, proxyTimerServiceImplementationType, sasTimerServiceImplementationType, sipCongestionControlInterval, congestionControlPolicy,
                 sipConcurrencyControlMode, usePrettyEncoding, baseTimerInterval, t2Interval, t4Interval, timerDInterval,
                 dialogPendingRequestChecking, dnsServerLocatorClass, dnsTimeout, dnsResolverClass, callIdMaxLength,
                 tagHashMaxLength, canceledTimerTasksPurgePeriod, memoryThreshold, backToNormalMemoryThreshold, outboundProxy,

@@ -51,6 +51,7 @@ public interface Constants {
     String CONGESTION_CONTROL_POLICY = "congestion-control-policy";
     String CONTAINER = "container";
     String CONTAINER_CONFIG = CONFIGURATION;
+    String DEFAULT = "default";
     String DEFAULT_VIRTUAL_SERVER = "default-virtual-server";
     String DEFAULT_WEB_MODULE = "default-web-module";
     String DEVELOPMENT = "development";
@@ -99,6 +100,7 @@ public interface Constants {
     String PROTOCOL = "protocol";
     String PROXY_NAME = "proxy-name";
     String PROXY_PORT = "proxy-port";
+    String PROXY_TIMER_SERVICE_IMPEMENTATION_TYPE="proxy-timer-service-implementation-type";
     String REAUTHENTICATE = "reauthenticate";
     String READ_ONLY = "read-only";
     String RECOMPILE_ON_FAIL = "recompile-on-fail";
@@ -107,6 +109,7 @@ public interface Constants {
     String RESOLVE_HOSTS = "resolve-hosts";
     String REWRITE = "rewrite";
     String ROTATE = "rotate";
+    String SAS_TIMER_SERVICE_IMPEMENTATION_TYPE="sas-timer-service-implementation-type";
     String SCHEME = "scheme";
     String SCRATCH_DIR = "scratch-dir";
     String SECRET = "secret";
@@ -122,6 +125,7 @@ public interface Constants {
     String SOURCE_VM = "source-vm";
     String SSL = "ssl";
     String SSO = "sso";
+    String STANDARD = "standard";
     String STATIC_RESOURCES = "static-resources";
     String STATIC_SERVER_ADDRESS = "static-server-address";
     String STATIC_SERVER_PORT = "static-server-port";
