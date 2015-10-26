@@ -33,6 +33,7 @@ import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
  * @author jean.deruelle@gmail.com
+ * @author kakonyi.istvan@alerant.hu
  *
  */
 public class StandardSipApplicationSessionTimerService extends
