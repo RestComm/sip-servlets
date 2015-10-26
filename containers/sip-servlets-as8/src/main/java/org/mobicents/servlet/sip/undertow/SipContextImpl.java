@@ -444,14 +444,7 @@ public class SipContextImpl implements SipContext {
         }
     }
 
-    // ConvergedDeploymentManager should call this after web listeners starts
     public boolean contextListenerStart() throws ServletException{
-        // boolean ok = super.contextListenerStart();
-        // the web listeners couldn't be started so we don't even try to load the sip ones
-        /*
-         * if(!ok) { return ok; }
-         */
-
         if (logger.isDebugEnabled())
             logger.debug("Configuring sip listeners");
 

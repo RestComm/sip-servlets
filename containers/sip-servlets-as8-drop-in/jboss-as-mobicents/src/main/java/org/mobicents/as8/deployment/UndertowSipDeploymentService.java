@@ -65,7 +65,6 @@ public class UndertowSipDeploymentService implements Service<UndertowSipDeployme
             Module module = this.deploymentUnit.getAttachment(Attachments.MODULE);
             sipWebContext.init(deployment, module.getClassLoader());
             sipWebContext.start();
-            sipWebContext.contextListenerStart();
 
         } catch (ServletException e) {
             ServerLogger.DEPLOYMENT_LOGGER.error(e.getMessage(), e);
