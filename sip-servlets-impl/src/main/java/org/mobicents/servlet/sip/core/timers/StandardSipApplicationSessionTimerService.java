@@ -23,11 +23,13 @@
 package org.mobicents.servlet.sip.core.timers;
 
 import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
+import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
  * @author jean.deruelle@gmail.com
@@ -39,14 +41,47 @@ public class StandardSipApplicationSessionTimerService extends
 
 	private static final Logger logger = Logger.getLogger(StandardSipApplicationSessionTimerService.class
 			.getName());
+
+    // Counts the number of cancelled tasks
+    private static volatile int numCancelled = 0;
+
 	private AtomicBoolean started = new AtomicBoolean(false);
 	/**
 	 * @param corePoolSize
 	 */
 	public StandardSipApplicationSessionTimerService() {
 		super();
+		schedulePurgeTaskIfNeeded();
 	}
 
+    private void schedulePurgeTaskIfNeeded() {
+        int purgePeriod = StaticServiceHolder.sipStandardService.getCanceledTimerTasksPurgePeriod();
+        if(purgePeriod > 0) {
+            TimerTask t = new TimerTask() {
+                
+                @Override
+                public void run() {
+                    try {
+                        if(logger.isDebugEnabled()) {
+                            logger.debug("Purging canceled timer tasks...");
+                        }
+                        purge();
+                        if(logger.isDebugEnabled()) {
+                            logger.debug("Purging canceled timer tasks completed.");
+                        }                       
+                    }
+                    catch (Exception e) {
+                        logger.error("failed to execute purge",e);
+                    }
+                }
+            };
+            //purgePeriod originally set in minutes, but needed in millis: 
+            purgePeriod = purgePeriod * 60 * 1000;
+            
+            super.scheduleAtFixedRate(t, purgePeriod, purgePeriod);
+        }
+    }
+	
 	/* (non-Javadoc)
 	 * @see org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerFactory#createSipApplicationSessionTimerTask()
 	 */
@@ -58,7 +93,15 @@ public class StandardSipApplicationSessionTimerService extends
 	 * @see org.mobicents.servlet.sip.startup.SipApplicationSessionTimerService#cancel(org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask)
 	 */
 	public boolean cancel(SipApplicationSessionTimerTask expirationTimerTask) {
-		return ((StandardSasTimerTask)expirationTimerTask).cancel();
+	    boolean cancelled = ((StandardSasTimerTask)expirationTimerTask).cancel();
+	    // Purge is expensive when called frequently, only call it every now and then.
+        // We do not sync the numCancelled variable. We dont care about correctness of
+        // the number, and we will still call purge rought once on every 25 cancels.
+        numCancelled++;
+        if(numCancelled % 100 == 0) {
+            super.purge();
+        }   
+        return cancelled;
 	}
 
 	/* (non-Javadoc)
