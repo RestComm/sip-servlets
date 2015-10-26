@@ -184,7 +184,6 @@ public class Servlet3SipServletRequestImpl extends SipServletRequestImpl impleme
         return null;
     }
     
-    @Override
 	public long getContentLengthLong() {
 		return (long) getContentLength();
 	}
