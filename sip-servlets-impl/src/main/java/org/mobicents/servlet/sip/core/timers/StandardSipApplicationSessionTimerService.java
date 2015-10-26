@@ -36,29 +36,29 @@ import org.mobicents.servlet.sip.startup.StaticServiceHolder;
  *
  */
 public class StandardSipApplicationSessionTimerService extends
-		Timer implements
-		SipApplicationSessionTimerService {
+        Timer implements
+        SipApplicationSessionTimerService {
 
-	private static final Logger logger = Logger.getLogger(StandardSipApplicationSessionTimerService.class
-			.getName());
+    private static final Logger logger = Logger.getLogger(StandardSipApplicationSessionTimerService.class
+            .getName());
 
     // Counts the number of cancelled tasks
     private static volatile int numCancelled = 0;
 
-	private AtomicBoolean started = new AtomicBoolean(false);
-	/**
-	 * @param corePoolSize
-	 */
-	public StandardSipApplicationSessionTimerService() {
-		super();
-		schedulePurgeTaskIfNeeded();
-	}
+    private AtomicBoolean started = new AtomicBoolean(false);
+    /**
+     * @param corePoolSize
+     */
+    public StandardSipApplicationSessionTimerService() {
+        super();
+        schedulePurgeTaskIfNeeded();
+    }
 
     private void schedulePurgeTaskIfNeeded() {
         int purgePeriod = StaticServiceHolder.sipStandardService.getCanceledTimerTasksPurgePeriod();
         if(purgePeriod > 0) {
             TimerTask t = new TimerTask() {
-                
+
                 @Override
                 public void run() {
                     try {
@@ -68,72 +68,72 @@ public class StandardSipApplicationSessionTimerService extends
                         purge();
                         if(logger.isDebugEnabled()) {
                             logger.debug("Purging canceled timer tasks completed.");
-                        }                       
+                        }
                     }
                     catch (Exception e) {
                         logger.error("failed to execute purge",e);
                     }
                 }
             };
-            //purgePeriod originally set in minutes, but needed in millis: 
+            //purgePeriod originally set in minutes, but needed in millis:
             purgePeriod = purgePeriod * 60 * 1000;
-            
+
             super.scheduleAtFixedRate(t, purgePeriod, purgePeriod);
         }
     }
-	
-	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerFactory#createSipApplicationSessionTimerTask()
-	 */
-	public SipApplicationSessionTimerTask createSipApplicationSessionTimerTask(MobicentsSipApplicationSession sipApplicationSession) {		
-		return new StandardSasTimerTask(sipApplicationSession);
-	}
-	
-	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.SipApplicationSessionTimerService#cancel(org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask)
-	 */
-	public boolean cancel(SipApplicationSessionTimerTask expirationTimerTask) {
-	    boolean cancelled = ((StandardSasTimerTask)expirationTimerTask).cancel();
-	    // Purge is expensive when called frequently, only call it every now and then.
+
+    /* (non-Javadoc)
+     * @see org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerFactory#createSipApplicationSessionTimerTask()
+     */
+    public SipApplicationSessionTimerTask createSipApplicationSessionTimerTask(MobicentsSipApplicationSession sipApplicationSession) {
+        return new StandardSasTimerTask(sipApplicationSession);
+    }
+
+    /* (non-Javadoc)
+     * @see org.mobicents.servlet.sip.startup.SipApplicationSessionTimerService#cancel(org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask)
+     */
+    public boolean cancel(SipApplicationSessionTimerTask expirationTimerTask) {
+        boolean cancelled = ((StandardSasTimerTask)expirationTimerTask).cancel();
+        // Purge is expensive when called frequently, only call it every now and then.
         // We do not sync the numCancelled variable. We dont care about correctness of
         // the number, and we will still call purge rought once on every 25 cancels.
         numCancelled++;
         if(numCancelled % 100 == 0) {
             super.purge();
-        }   
+        }
         return cancelled;
-	}
+    }
 
-	/* (non-Javadoc)
-	 * @see org.mobicents.servlet.sip.startup.SipApplicationSessionTimerService#schedule(org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask, long, java.util.concurrent.TimeUnit)
-	 */
-	public SipApplicationSessionTimerTask schedule(
-			SipApplicationSessionTimerTask expirationTimerTask, long delay,
-			TimeUnit unit) {
-		if(logger.isDebugEnabled()) {
-			logger.debug("Scheduling sip application session "+ expirationTimerTask.getSipApplicationSession().getKey() +" to expire in " + (delay / (double) 1000 / (double) 60) + " minutes");
-		}
-		super.schedule(((StandardSasTimerTask)expirationTimerTask), delay);
-		return expirationTimerTask;
-	}
+    /* (non-Javadoc)
+     * @see org.mobicents.servlet.sip.startup.SipApplicationSessionTimerService#schedule(org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerTask, long, java.util.concurrent.TimeUnit)
+     */
+    public SipApplicationSessionTimerTask schedule(
+            SipApplicationSessionTimerTask expirationTimerTask, long delay,
+            TimeUnit unit) {
+        if(logger.isDebugEnabled()) {
+            logger.debug("Scheduling sip application session "+ expirationTimerTask.getSipApplicationSession().getKey() +" to expire in " + (delay / (double) 1000 / (double) 60) + " minutes");
+        }
+        super.schedule(((StandardSasTimerTask)expirationTimerTask), delay);
+        return expirationTimerTask;
+    }
 
-	public void stop() {		
-		started.set(false);
-		super.cancel();
-		if(logger.isDebugEnabled()) {
-			logger.debug("Stopped timer service "+ this);
-		}
-	}
+    public void stop() {
+        started.set(false);
+        super.cancel();
+        if(logger.isDebugEnabled()) {
+            logger.debug("Stopped timer service "+ this);
+        }
+    }
 
-	public void start() {	
-		started.set(true);
-		if(logger.isDebugEnabled()) {
-			logger.debug("Started timer service "+ this);
-		}
-	}
+    public void start() {
+        started.set(true);
+        if(logger.isDebugEnabled()) {
+            logger.debug("Started timer service "+ this);
+        }
+    }
 
-	public boolean isStarted() {
-		return started.get();
-	}
+    public boolean isStarted() {
+        return started.get();
+    }
 
 }
