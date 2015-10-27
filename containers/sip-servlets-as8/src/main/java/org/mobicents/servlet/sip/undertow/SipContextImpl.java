@@ -387,7 +387,7 @@ public class SipContextImpl implements SipContext {
                 proxyTimerService = new ProxyTimerServiceImpl();
             }
         }
-        if (sasTimerService == null || !sasTimerService.isStarted()) {
+        if (sasTimerService == null /*kakonyii: prevent creating sasTimerService's threads multiple times by commenting this out: || !sasTimerService.isStarted()*/) {
             // FIXME: distributable not supported
             // distributable if(getDistributable() && hasDistributableManager) {
             // sasTimerService = new FaultTolerantSasTimerService((DistributableSipManager)getSipManager(), 4);
