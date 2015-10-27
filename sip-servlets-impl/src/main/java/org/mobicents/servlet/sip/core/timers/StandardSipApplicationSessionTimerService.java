@@ -51,7 +51,7 @@ public class StandardSipApplicationSessionTimerService extends
      * @param corePoolSize
      */
     public StandardSipApplicationSessionTimerService() {
-        super();
+        super("sip_standard_sas_timer_service");
         schedulePurgeTaskIfNeeded();
     }
 

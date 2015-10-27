@@ -44,7 +44,7 @@ public class ProxyTimerServiceImpl extends Timer implements ProxyTimerService {
     private static volatile int numCancelled = 0;
 
     public ProxyTimerServiceImpl(){
-        super();
+        super("sip_standard_proxy_timer_service");
         schedulePurgeTaskIfNeeded();
     }
 
