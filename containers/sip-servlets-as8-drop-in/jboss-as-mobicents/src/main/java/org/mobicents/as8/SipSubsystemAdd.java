@@ -245,6 +245,15 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         // final boolean usePrettyEncoding = operation.hasDefined(Constants.USE_PRETTY_ENCODING) ?
         // operation.get(Constants.USE_PRETTY_ENCODING).asBoolean() : true;
 
+        if(sasTimerServiceImplementationType!=null &&
+                !Constants.DEFAULT.equalsIgnoreCase(sasTimerServiceImplementationType) && !Constants.STANDARD.equalsIgnoreCase(sasTimerServiceImplementationType)) {
+            throw new OperationFailedException("Invalid value is set for "+Constants.SAS_TIMER_SERVICE_IMPEMENTATION_TYPE+" property: "+sasTimerServiceImplementationType+"! Valid values are: "+Constants.DEFAULT +", "+Constants.STANDARD+".");
+        }
+        if(sasTimerServiceImplementationType!=null &&
+                !Constants.DEFAULT.equalsIgnoreCase(proxyTimerServiceImplementationType) && !Constants.STANDARD.equalsIgnoreCase(proxyTimerServiceImplementationType)) {
+            throw new OperationFailedException("Invalid value is set for "+Constants.PROXY_TIMER_SERVICE_IMPEMENTATION_TYPE+" property: "+proxyTimerServiceImplementationType+"! Valid values are: "+Constants.DEFAULT +", "+Constants.STANDARD+".");
+        }
+
         final SipServerService service = new SipServerService(sipAppRouterFile, sipStackPropertiesFile, sipPathName,
                 sipAppDispatcherClass, additionalParameterableHeaders, proxyTimerServiceImplementationType, sasTimerServiceImplementationType, sipCongestionControlInterval, congestionControlPolicy,
                 sipConcurrencyControlMode, usePrettyEncoding, baseTimerInterval, t2Interval, t4Interval, timerDInterval,
