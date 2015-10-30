@@ -29,7 +29,7 @@
              </security-domains>
          </subsystem>
          <subsystem xmlns="urn:jboss:domain:threads:1.1"/>
-@@ -267,6 +282,12 @@
+@@ -267,6 +283,13 @@
                  <alias name="example.com"/>
              </virtual-server>
          </subsystem>
@@ -38,11 +38,12 @@
 +            <connector name="sip-tcp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tcp"/>
 +            <connector name="sip-tls" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tls"/>
 +            <connector name="sip-ws" protocol="SIP/2.0" scheme="sip" socket-binding="sip-ws"/>
++            <connector name="sip-wss" protocol="SIP/2.0" scheme="sip" socket-binding="sip-wss"/>
 +        </subsystem>
          <subsystem xmlns="urn:jboss:domain:webservices:1.1">
              <modify-wsdl-address>true</modify-wsdl-address>
              <wsdl-host>${jboss.bind.address:127.0.0.1}</wsdl-host>
-@@ -302,6 +323,10 @@
+@@ -303,6 +324,11 @@
          <socket-binding name="ajp" port="8009"/>
          <socket-binding name="http" port="8080"/>
          <socket-binding name="https" port="8443"/>
@@ -50,6 +51,7 @@
 +        <socket-binding name="sip-tcp" port="5080"/>
 +        <socket-binding name="sip-tls" port="5081"/>
 +        <socket-binding name="sip-ws" port="5082"/>
++        <socket-binding name="sip-wss" port="5083"/>
          <socket-binding name="osgi-http" interface="management" port="8090"/>
          <socket-binding name="remoting" port="4447"/>
          <socket-binding name="txn-recovery-environment" port="4712"/>

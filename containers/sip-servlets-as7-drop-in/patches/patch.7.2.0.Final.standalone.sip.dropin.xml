@@ -54,7 +54,7 @@
              <virtual-server name="default-host" enable-welcome-root="true">
                  <alias name="localhost"/>
                  <alias name="example.com"/>
-@@ -273,6 +297,12 @@
+@@ -273,6 +298,13 @@
              <client-config name="Standard-Client-Config"/>
          </subsystem>
          <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
@@ -63,11 +63,12 @@
 +            <connector name="sip-tcp" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tcp"/>
 +            <connector name="sip-tls" protocol="SIP/2.0" scheme="sip" socket-binding="sip-tls"/>
 +            <connector name="sip-ws" protocol="SIP/2.0" scheme="sip" socket-binding="sip-ws"/>
++	     <connector name="sip-wss" protocol="SIP/2.0" scheme="sip" socket-binding="sip-wss"/>
 +        </subsystem>
      </profile>
      <interfaces>
          <interface name="management">
-@@ -297,6 +327,10 @@
+@@ -298,6 +329,11 @@
          <socket-binding name="ajp" port="8009"/>
          <socket-binding name="http" port="8080"/>
          <socket-binding name="https" port="8443"/>
@@ -75,6 +76,7 @@
 +        <socket-binding name="sip-tcp" port="5080"/>
 +        <socket-binding name="sip-tls" port="5081"/>
 +        <socket-binding name="sip-ws" port="5082"/>
++        <socket-binding name="sip-wss" port="5083"/>
          <socket-binding name="remoting" port="4447"/>
          <socket-binding name="txn-recovery-environment" port="4712"/>
          <socket-binding name="txn-status-manager" port="4713"/>
