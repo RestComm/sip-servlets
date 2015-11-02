@@ -89,6 +89,8 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         SipDefinition.SIP_STACK_PROPS.validateAndSet(operation, model);
         SipDefinition.SIP_PATH_NAME.validateAndSet(operation, model);
         SipDefinition.SIP_APP_DISPATCHER_CLASS.validateAndSet(operation, model);
+        SipDefinition.PROXY_TIMER_SERVICE_IMPEMENTATION_TYPE.validateAndSet(operation, model);
+        SipDefinition.SAS_TIMER_SERVICE_IMPEMENTATION_TYPE.validateAndSet(operation, model);
         SipDefinition.CONGESTION_CONTROL_INTERVAL.validateAndSet(operation, model);
         SipDefinition.CONGESTION_CONTROL_POLICY.validateAndSet(operation, model);
         SipDefinition.CONCURRENCY_CONTROL_MODE.validateAndSet(operation, model);
@@ -136,6 +138,12 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ModelNode additionalParameterableHeadersModel = SipDefinition.ADDITIONAL_PARAMETERABLE_HEADERS.resolveModelAttribute(context, fullModel);
         final String additionalParameterableHeaders = additionalParameterableHeadersModel.isDefined() ? additionalParameterableHeadersModel.asString() : null;
 
+        final ModelNode proxyTimerServiceImplementationTypeModel = SipDefinition.PROXY_TIMER_SERVICE_IMPEMENTATION_TYPE.resolveModelAttribute(context, fullModel);
+        final String proxyTimerServiceImplementationType = proxyTimerServiceImplementationTypeModel.isDefined() ? proxyTimerServiceImplementationTypeModel.asString() : Constants.STANDARD;
+
+        final ModelNode sasTimerServiceImplementationTypeModel = SipDefinition.SAS_TIMER_SERVICE_IMPEMENTATION_TYPE.resolveModelAttribute(context, fullModel);
+        final String sasTimerServiceImplementationType = sasTimerServiceImplementationTypeModel.isDefined() ? sasTimerServiceImplementationTypeModel.asString() : Constants.STANDARD;
+        
         final ModelNode sipCongestionControlIntervalModel = SipDefinition.CONGESTION_CONTROL_INTERVAL.resolveModelAttribute(context, fullModel);
         final int sipCongestionControlInterval = sipCongestionControlIntervalModel.isDefined() ? sipCongestionControlIntervalModel.asInt() : -1;
 
@@ -199,12 +207,23 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
 //    	final String sipConcurrencyControlMode = operation.hasDefined(Constants.CONCURRENCY_CONTROL_MODE) ? operation.get(Constants.CONCURRENCY_CONTROL_MODE).asString() : null;
 //    	final boolean usePrettyEncoding = operation.hasDefined(Constants.USE_PRETTY_ENCODING) ? operation.get(Constants.USE_PRETTY_ENCODING).asBoolean() : true;
 
+        if(sasTimerServiceImplementationType!=null &&
+                !Constants.DEFAULT.equalsIgnoreCase(sasTimerServiceImplementationType) && !Constants.STANDARD.equalsIgnoreCase(sasTimerServiceImplementationType)) {
+            throw new OperationFailedException("Invalid value is set for "+Constants.SAS_TIMER_SERVICE_IMPEMENTATION_TYPE+" property: "+sasTimerServiceImplementationType+"! Valid values are: "+Constants.DEFAULT +", "+Constants.STANDARD+".");
+        }
+        if(sasTimerServiceImplementationType!=null &&
+                !Constants.DEFAULT.equalsIgnoreCase(proxyTimerServiceImplementationType) && !Constants.STANDARD.equalsIgnoreCase(proxyTimerServiceImplementationType)) {
+            throw new OperationFailedException("Invalid value is set for "+Constants.PROXY_TIMER_SERVICE_IMPEMENTATION_TYPE+" property: "+proxyTimerServiceImplementationType+"! Valid values are: "+Constants.DEFAULT +", "+Constants.STANDARD+".");
+        }
+        
         final SipServerService service = new SipServerService(
         		sipAppRouterFile, 
         		sipStackPropertiesFile, 
         		sipPathName, 
         		sipAppDispatcherClass, 
         		additionalParameterableHeaders, 
+        		proxyTimerServiceImplementationType, 
+        		sasTimerServiceImplementationType, 
         		sipCongestionControlInterval,
         		congestionControlPolicy,
         		sipConcurrencyControlMode, 

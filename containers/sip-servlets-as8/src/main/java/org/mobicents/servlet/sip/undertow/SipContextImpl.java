@@ -379,11 +379,11 @@ public class SipContextImpl implements SipContext {
             timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService());
         }
         if (proxyTimerService == null) {
-            if(proxyTimerServiceType == TimerServiceType.STANDARD){
+            if(proxyTimerServiceType != null && proxyTimerServiceType == TimerServiceType.STANDARD) {
                 proxyTimerService = new ProxyTimerServiceImpl();
-            }else if(proxyTimerServiceType == TimerServiceType.DEFAULT){
+            } else if(proxyTimerServiceType != null && proxyTimerServiceType == TimerServiceType.DEFAULT) {
                 proxyTimerService = new DefaultProxyTimerService();
-            }else{
+            } else {
                 proxyTimerService = new ProxyTimerServiceImpl();
             }
         }
@@ -394,9 +394,9 @@ public class SipContextImpl implements SipContext {
             // } else {
             // sasTimerService = new StandardSipApplicationSessionTimerService();
             // }
-            if(sasTimerServiceType == TimerServiceType.STANDARD){
+            if(sasTimerServiceType != null && sasTimerServiceType == TimerServiceType.STANDARD){
                 sasTimerService = new StandardSipApplicationSessionTimerService();
-            }else if (sasTimerServiceType == TimerServiceType.DEFAULT){
+            }else if (sasTimerServiceType != null && sasTimerServiceType == TimerServiceType.DEFAULT){
                 sasTimerService = new DefaultSipApplicationSessionTimerService();
             }else{
                 sasTimerService = new StandardSipApplicationSessionTimerService();

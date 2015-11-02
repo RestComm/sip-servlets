@@ -75,4 +75,7 @@ public interface SipService {
 	
 	public String getMobicentsSipServletMessageFactoryClassName();
 	public void setMobicentsSipServletMessageFactoryClassName(String mobicentsSipServletMessageFactoryClassName);
+	
+	public String getProxyTimerServiceImplementationType();
+	public String getSasTimerServiceImplementationType();
 }

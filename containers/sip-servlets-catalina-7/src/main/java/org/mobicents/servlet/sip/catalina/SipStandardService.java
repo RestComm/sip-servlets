@@ -116,6 +116,8 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	protected int memoryThreshold = 95;
 	private int backToNormalMemoryThreshold = 90;
 	protected OutboundProxy outboundProxy;
+	protected String proxyTimerServiceImplementationType;
+    protected String sasTimerServiceImplementationType;
 	protected long congestionControlCheckingInterval = 30000;
 	private int canceledTimerTasksPurgePeriod = 0;
 	// base timer interval for jain sip tx 
@@ -1318,4 +1320,20 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 	public void setDnsTimeout(int dnsTimeout) {
 		this.dnsTimeout = dnsTimeout;
 	}
+	
+	public String getProxyTimerServiceImplementationType() {
+        return proxyTimerServiceImplementationType;
+    }
+
+    public void setProxyTimerServiceImplementationType(String proxyTimerServiceImplementationType) {
+        this.proxyTimerServiceImplementationType = proxyTimerServiceImplementationType;
+    }
+
+    public String getSasTimerServiceImplementationType() {
+        return sasTimerServiceImplementationType;
+    }
+
+    public void setSasTimerServiceImplementationType(String sasTimerServiceImplementationType) {
+        this.sasTimerServiceImplementationType = sasTimerServiceImplementationType;
+    }
 }

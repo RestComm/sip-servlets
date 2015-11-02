@@ -32,7 +32,6 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -51,7 +50,6 @@ import javax.servlet.sip.TimerService;
 import org.apache.catalina.Container;
 import org.apache.catalina.Engine;
 import org.apache.catalina.Globals;
-import org.apache.catalina.Host;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.Loader;
@@ -80,7 +78,6 @@ import org.mobicents.servlet.sip.annotations.DefaultSipInstanceManager;
 import org.mobicents.servlet.sip.catalina.CatalinaSipContext;
 import org.mobicents.servlet.sip.catalina.CatalinaSipListenersHolder;
 import org.mobicents.servlet.sip.catalina.CatalinaSipManager;
-import org.mobicents.servlet.sip.catalina.ContextGracefulStopTask;
 import org.mobicents.servlet.sip.catalina.SipSecurityConstraint;
 import org.mobicents.servlet.sip.catalina.SipServletImpl;
 import org.mobicents.servlet.sip.catalina.SipStandardManager;
@@ -104,13 +101,14 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionCreationThreadLocal;
 import org.mobicents.servlet.sip.core.session.SipSessionsUtilImpl;
+import org.mobicents.servlet.sip.core.timers.DefaultProxyTimerService;
+import org.mobicents.servlet.sip.core.timers.DefaultSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.ProxyTimerService;
 import org.mobicents.servlet.sip.core.timers.ProxyTimerServiceImpl;
 import org.mobicents.servlet.sip.core.timers.SipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.SipServletTimerService;
 import org.mobicents.servlet.sip.core.timers.StandardSipApplicationSessionTimerService;
 import org.mobicents.servlet.sip.core.timers.TimerServiceImpl;
-import org.mobicents.servlet.sip.dns.MobicentsDNSResolver;
 import org.mobicents.servlet.sip.listener.SipConnectorListener;
 import org.mobicents.servlet.sip.message.SipFactoryFacade;
 import org.mobicents.servlet.sip.message.SipFactoryImpl;
@@ -250,12 +248,26 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		if(timerService == null) {			
 			timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService());			
 		}
-		if(proxyTimerService == null) {			
-			proxyTimerService = new ProxyTimerServiceImpl();			
+		if(proxyTimerService == null) {
+			String proxyTimerServiceType = sipApplicationDispatcher.getSipService().getProxyTimerServiceImplementationType();
+			if(proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Standard")) {
+                proxyTimerService = new ProxyTimerServiceImpl();
+            } else if(proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Default")) {
+                proxyTimerService = new DefaultProxyTimerService();
+            } else {
+                proxyTimerService = new ProxyTimerServiceImpl();
+            }
 		}
 
 		if(sasTimerService == null || !sasTimerService.isStarted()) {
-			sasTimerService = new StandardSipApplicationSessionTimerService();
+			String sasTimerServiceType = sipApplicationDispatcher.getSipService().getSasTimerServiceImplementationType();
+			if(sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Standard")) {
+                sasTimerService = new StandardSipApplicationSessionTimerService();
+            } else if (sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Default")) {
+                sasTimerService = new DefaultSipApplicationSessionTimerService();
+            } else {
+                sasTimerService = new StandardSipApplicationSessionTimerService();
+            }
 		}
 		//needed when restarting applications through the tomcat manager 
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.SIP_FACTORY,

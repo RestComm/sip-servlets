@@ -26,7 +26,7 @@ package org.mobicents.as7;
  */
 interface Constants {
 
-    String ACCESS_LOG = "access-log";
+	String ACCESS_LOG = "access-log";
     String ADDITIONAL_PARAMETERABLE_HEADERS = "additional-parameterable-headers";
     String ALIAS = "alias";
     String APPLICATION_ROUTER = "application-router";
@@ -43,13 +43,14 @@ interface Constants {
     String CIPHER_SUITE = "cipher-suite";
     String CONDITION = "condition";
     String CONFIGURATION = "configuration";
-    String CONNECTOR = "connector";    
+    String CONNECTOR = "connector";
     String CANCELED_TIMER_TASKS_PURGE_PERIOD = "canceled-timer-tasks-purge-period";
     String CONCURRENCY_CONTROL_MODE = "concurrency-control-mode";
     String CONGESTION_CONTROL_INTERVAL = "congestion-control-interval";
     String CONGESTION_CONTROL_POLICY = "congestion-control-policy";
     String CONTAINER = "container";
     String CONTAINER_CONFIG = CONFIGURATION;
+    String DEFAULT = "default";
     String DEFAULT_VIRTUAL_SERVER = "default-virtual-server";
     String DEFAULT_WEB_MODULE = "default-web-module";
     String DEVELOPMENT = "development";
@@ -99,6 +100,7 @@ interface Constants {
     String PROTOCOL = "protocol";
     String PROXY_NAME = "proxy-name";
     String PROXY_PORT = "proxy-port";
+    String PROXY_TIMER_SERVICE_IMPEMENTATION_TYPE="proxy-timer-service-implementation-type";
     String REAUTHENTICATE = "reauthenticate";
     String READ_ONLY = "read-only";
     String RECOMPILE_ON_FAIL = "recompile-on-fail";
@@ -107,6 +109,7 @@ interface Constants {
     String RESOLVE_HOSTS = "resolve-hosts";
     String REWRITE = "rewrite";
     String ROTATE = "rotate";
+    String SAS_TIMER_SERVICE_IMPEMENTATION_TYPE="sas-timer-service-implementation-type";
     String SCHEME = "scheme";
     String SCRATCH_DIR = "scratch-dir";
     String SECRET = "secret";
@@ -115,13 +118,14 @@ interface Constants {
     String SESSION_CACHE_SIZE = "session-cache-size";
     String SESSION_TIMEOUT = "session-timeout";
     String SIP_APP_DISPATCHER_CLASS = "app-dispatcher-class";
-    String SIP_PATH_NAME ="path-name";
+    String SIP_PATH_NAME = "path-name";
     String SIP_STACK_PROPS = "stack-properties";
     String SMAP = "smap";
     String SOCKET_BINDING = "socket-binding";
     String SOURCE_VM = "source-vm";
     String SSL = "ssl";
     String SSO = "sso";
+    String STANDARD = "standard";
     String STATIC_RESOURCES = "static-resources";
     String STATIC_SERVER_ADDRESS = "static-server-address";
     String STATIC_SERVER_PORT = "static-server-port";
@@ -157,7 +161,7 @@ interface Constants {
     String MAX_TIME = "maxTime";
     String REQUEST_COUNT = "requestCount";
 
-    String LOAD_TIME ="load-time";
+    String LOAD_TIME = "load-time";
     String MIN_TIME = "min-time";
 
 }
