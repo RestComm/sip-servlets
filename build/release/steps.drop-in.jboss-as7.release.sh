@@ -55,10 +55,6 @@ cp -vpr $BUILD_DIR/../../as7-domain-conf $BUILD_DIR/$MSS_FINAL_NAME/bin/domain.c
 
 cd $BUILD_DIR/$MSS_FINAL_NAME
 
-#replace hornetq with the fixed version to avoid issues encountered at Telenor
-rm -rf ./modules/system/layers/base/org/hornetq
-cp -rf $CHECKOUT_DIR/hornetq ./modules/system/layers/base/org/hornetq
-
 # Create standalone-sip.xml file
 cp ./standalone/configuration/standalone.xml ./standalone/configuration/standalone-sip.xml
 
