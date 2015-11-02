@@ -31,10 +31,12 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
+import org.mobicents.servlet.sip.utils.NamingThreadFactory;
 
 /**
  * @author jean.deruelle@gmail.com
- *
+ * @author kakonyi.istvan@alerant.hu
+ * 
  */
 public class DefaultSipApplicationSessionTimerService extends
 		ScheduledThreadPoolExecutor implements
@@ -45,7 +47,15 @@ public class DefaultSipApplicationSessionTimerService extends
 	
 	// Counts the number of cancelled tasks
     private static volatile int numCancelled = 0;
-	/**
+
+    public static final int SCHEDULER_THREAD_POOL_DEFAULT_SIZE = 4;
+
+    public DefaultSipApplicationSessionTimerService() {
+        super(SCHEDULER_THREAD_POOL_DEFAULT_SIZE ,new NamingThreadFactory("sip_default_sas_timer_service"));
+        schedulePurgeTaskIfNeeded();
+    }
+
+    /**
 	 * @param corePoolSize
 	 */
 	public DefaultSipApplicationSessionTimerService(int corePoolSize) {
