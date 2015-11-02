@@ -38,6 +38,7 @@ import org.jboss.as.server.AbstractDeploymentChainStep;
 import org.jboss.as.server.DeploymentProcessorTarget;
 import org.jboss.as.server.deployment.Phase;
 import org.jboss.dmr.ModelNode;
+import org.jboss.logging.Logger;
 import org.jboss.msc.service.ServiceBuilder.DependencyType;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
@@ -61,7 +62,7 @@ import org.mobicents.ext.javax.sip.dns.DefaultDNSServerLocator;
  * @author josemrecio@gmail.com
  */
 class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
-
+	private static final Logger logger = Logger.getLogger(SipServerService.class);
 	// FIXME: these priorities should be substituted by values from with org.jboss.as.server.deployment.Phase
 	//   aligned with those used by web subsystem
     static int PARSE_SIP_DEPLOYMENT_PRIORITY = 0x4000;
@@ -92,6 +93,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         SipDefinition.CONGESTION_CONTROL_POLICY.validateAndSet(operation, model);
         SipDefinition.CONCURRENCY_CONTROL_MODE.validateAndSet(operation, model);
         SipDefinition.USE_PRETTY_ENCODING.validateAndSet(operation, model);
+        SipDefinition.GATHER_STATISTICS.validateAndSet(operation, model);
         SipDefinition.ADDITIONAL_PARAMETERABLE_HEADERS.validateAndSet(operation, model);
         SipDefinition.BASE_TIMER_INTERVAL.validateAndSet(operation, model);
         SipDefinition.T2_INTERVAL.validateAndSet(operation, model);
