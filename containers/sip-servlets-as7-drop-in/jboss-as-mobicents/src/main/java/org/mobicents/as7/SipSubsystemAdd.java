@@ -157,6 +157,9 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ModelNode timerDIntervalModel = SipDefinition.TIMER_D_INTERVAL.resolveModelAttribute(context, fullModel);
         final int timerDInterval = timerDIntervalModel.isDefined() ? timerDIntervalModel.asInt() : 32000;
         
+        final ModelNode gatherStatisticsModel = SipDefinition.GATHER_STATISTICS.resolveModelAttribute(context, fullModel);
+        final boolean gatherStatistics = gatherStatisticsModel.isDefined() ? gatherStatisticsModel.asBoolean() : false;
+        
         final ModelNode dialogPendingRequestCheckingModel = SipDefinition.DIALOG_PENDING_REQUEST_CHECKING.resolveModelAttribute(context, fullModel);
         final boolean dialogPendingRequestChecking = dialogPendingRequestCheckingModel.isDefined() ? dialogPendingRequestCheckingModel.asBoolean() : false;
         

@@ -103,6 +103,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         SipDefinition.CONGESTION_CONTROL_POLICY.validateAndSet(operation, model);
         SipDefinition.CONCURRENCY_CONTROL_MODE.validateAndSet(operation, model);
         SipDefinition.USE_PRETTY_ENCODING.validateAndSet(operation, model);
+        SipDefinition.GATHER_STATISTICS.validateAndSet(operation, model);
         SipDefinition.ADDITIONAL_PARAMETERABLE_HEADERS.validateAndSet(operation, model);
         SipDefinition.BASE_TIMER_INTERVAL.validateAndSet(operation, model);
         SipDefinition.T2_INTERVAL.validateAndSet(operation, model);
@@ -178,6 +179,9 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ModelNode timerDIntervalModel = SipDefinition.TIMER_D_INTERVAL.resolveModelAttribute(context, fullModel);
         final int timerDInterval = timerDIntervalModel.isDefined() ? timerDIntervalModel.asInt() : 32000;
 
+        final ModelNode gatherStatisticsModel = SipDefinition.GATHER_STATISTICS.resolveModelAttribute(context, fullModel);
+        final boolean gatherStatistics = gatherStatisticsModel.isDefined() ? gatherStatisticsModel.asBoolean() : false;
+        
         final ModelNode dialogPendingRequestCheckingModel = SipDefinition.DIALOG_PENDING_REQUEST_CHECKING
                 .resolveModelAttribute(context, fullModel);
         final boolean dialogPendingRequestChecking = dialogPendingRequestCheckingModel.isDefined() ? dialogPendingRequestCheckingModel

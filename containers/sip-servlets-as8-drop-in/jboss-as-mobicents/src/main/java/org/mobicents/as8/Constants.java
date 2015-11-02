@@ -73,6 +73,7 @@ public interface Constants {
     String EXTENDED = "extended";
     String FILE_ENCODING = "file-encoding";
     String FLAGS = "flags";
+    String GATHER_STATISTICS = "gather-statistics";
     String GENERATE_STRINGS_AS_CHAR_ARRAYS = "generate-strings-as-char-arrays";
     String INSTANCE_ID = "instance-id";
     String JAVA_ENCODING = "java-encoding";

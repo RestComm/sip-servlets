@@ -167,6 +167,13 @@ public class SipDefinition extends SimpleResourceDefinition {
                     .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
                     .setDefaultValue(new ModelNode(32000))
                     .build();
+    protected static final SimpleAttributeDefinition GATHER_STATISTICS =
+            new SimpleAttributeDefinitionBuilder(Constants.GATHER_STATISTICS, ModelType.BOOLEAN, true)
+                    .setAllowExpression(true)
+                    .setXmlName(Constants.GATHER_STATISTICS)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(false))
+                    .build();
     protected static final SimpleAttributeDefinition DIALOG_PENDING_REQUEST_CHECKING =
             new SimpleAttributeDefinitionBuilder(Constants.DIALOG_PENDING_REQUEST_CHECKING, ModelType.BOOLEAN, true)
                     .setAllowExpression(true)

@@ -90,6 +90,7 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
         SipDefinition.T2_INTERVAL.marshallAsAttribute(node, false, writer);
         SipDefinition.T4_INTERVAL.marshallAsAttribute(node, false, writer);
         SipDefinition.TIMER_D_INTERVAL.marshallAsAttribute(node, false, writer);
+        SipDefinition.GATHER_STATISTICS.marshallAsAttribute(node, false, writer);
         SipDefinition.DIALOG_PENDING_REQUEST_CHECKING.marshallAsAttribute(node, false, writer);
         SipDefinition.DNS_SERVER_LOCATOR_CLASS.marshallAsAttribute(node, false, writer);
         SipDefinition.DNS_TIMEOUT.marshallAsAttribute(node, false, writer);
@@ -136,6 +137,7 @@ class SipSubsystemParser implements XMLStreamConstants, XMLElementReader<List<Mo
                 case T2_INTERVAL:
                 case T4_INTERVAL:
                 case TIMER_D_INTERVAL:
+                case GATHER_STATISTICS:
                 case DIALOG_PENDING_REQUEST_CHECKING:
                 case DNS_SERVER_LOCATOR_CLASS:
                 case DNS_TIMEOUT:
