@@ -1053,6 +1053,32 @@ public class ShootistSipServletTest extends SipServletTestCase {
 		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));
 	}
 	
+	// Tests Issue 1693 http://code.google.com/p/mobicents/issues/detail?id=1693
+	public void testShootistOptionsTimeout() throws Exception {
+		receiverProtocolObjects =new ProtocolObjects(
+				"sender", "gov.nist", TRANSPORT, AUTODIALOG, null, null, null);
+					
+		receiver = new TestSipListener(5080, 5070, receiverProtocolObjects, false);
+		receiver.setProvisionalResponsesToSend(new ArrayList<Integer>());
+		receiver.setWaitForCancel(true);
+		SipProvider senderProvider = receiver.createProvider();			
+		
+		senderProvider.addSipListener(receiver);
+		
+		receiverProtocolObjects.start();
+		tomcat.startTomcat();	
+		Map<String, String> params = new HashMap<String, String>();
+		params.put("testErrorResponse", "true");
+		params.put("method", "OPTIONS");
+		deployApplication(params);
+		Thread.sleep(DIALOG_TIMEOUT + TIMEOUT);
+		List<String> allMessagesContent = receiver.getAllMessagesContent();
+		assertEquals(1,allMessagesContent.size());
+//		assertTrue("sipSessionReadyToInvalidate", allMessagesContent.contains("sipSessionReadyToInvalidate"));
+//		assertTrue("sipAppSessionReadyToInvalidate", allMessagesContent.contains("sipAppSessionReadyToInvalidate"));
+		assertTrue("408 received", allMessagesContent.contains("408 received"));
+	}
+	
 	// Tests Issue 143 http://code.google.com/p/mobicents/issues/detail?id=143
 	public void testShootist422Response() throws Exception {
 		receiverProtocolObjects =new ProtocolObjects(

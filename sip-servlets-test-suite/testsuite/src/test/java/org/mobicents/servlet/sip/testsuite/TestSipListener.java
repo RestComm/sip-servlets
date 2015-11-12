@@ -722,13 +722,15 @@ public class TestSipListener implements SipListener {
 			if(dialog != null) {
 				logger.info("Dialog State = " + dialog.getState());
 			}
-			Response response = protocolObjects.messageFactory.createResponse(
-					200, request);
-			serverTransactionId.sendResponse(response);
-			this.transactionCount++;
-			logger.info("shootist:  Sending OK.");
-			if(dialog != null) {
-				logger.info("Dialog State = " + dialog.getState());
+			if(!waitForCancel) {
+				Response response = protocolObjects.messageFactory.createResponse(
+						200, request);
+				serverTransactionId.sendResponse(response);
+				this.transactionCount++;
+				logger.info("shootist:  Sending OK.");
+				if(dialog != null) {
+					logger.info("Dialog State = " + dialog.getState());
+				}
 			}
 			this.optionsRequest = request;		
 		} catch (Exception ex) {
