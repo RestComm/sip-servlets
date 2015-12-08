@@ -132,7 +132,7 @@ class SipSubsystemAdd extends AbstractBoottimeAddStepHandler {
         final ModelNode sipAppDispatcherClassModel = SipDefinition.SIP_APP_DISPATCHER_CLASS.resolveModelAttribute(context, fullModel);
         final String sipAppDispatcherClass = sipAppDispatcherClassModel.isDefined() ? sipAppDispatcherClassModel.asString() : null;
         
-        final ModelNode usePrettyEncodingModel = SipDefinition.CANCELED_TIMER_TASKS_PURGE_PERIOD.resolveModelAttribute(context, fullModel);
+        final ModelNode usePrettyEncodingModel = SipDefinition.USE_PRETTY_ENCODING.resolveModelAttribute(context, fullModel);
         final boolean usePrettyEncoding = usePrettyEncodingModel.isDefined() ? usePrettyEncodingModel.asBoolean() : true;
         
         final ModelNode additionalParameterableHeadersModel = SipDefinition.ADDITIONAL_PARAMETERABLE_HEADERS.resolveModelAttribute(context, fullModel);
