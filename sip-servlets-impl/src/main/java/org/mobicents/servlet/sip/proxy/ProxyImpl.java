@@ -222,7 +222,9 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 		// https://code.google.com/p/sipservlets/issues/detail?id=275
 		// we should use the contact header from the originating endpoint
 		ContactHeader contact = (ContactHeader) request.getMessage().getHeader(ContactHeader.NAME);
-		if(contact != null) { 
+                //https://telestax.desk.com/web/agent/case/1779
+                //check is not wildcard to prevent NPE while encoding URI
+		if(contact != null && !contact.isWildCard()) { 
 			return ((javax.sip.address.SipURI)contact.getAddress().getURI()).toString();
 //			uri = new SipURIImpl(contactUri, ModifiableRule.NotModifiable);
 		} else {
