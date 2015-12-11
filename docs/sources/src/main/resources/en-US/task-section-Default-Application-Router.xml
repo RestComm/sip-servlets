@@ -134,6 +134,9 @@ ALL: (sip-router-info-5), (sip-router-info-6)..</screen>
 					<para>
 						Applications that do not exist in the DAR list for the container are assumed to be <literal>OUTBOUND</literal>. Because undefined applications are incapable of serving external requests, they must have self-initiated the request. The Sip Servlets Management Console can be used to specify the <literal>DIRECTION</literal> parameter.
 					</para>
+					<para>
+						If an application is marked <literal>DIRECTION=UAC_ROUTE_BACK</literal>, the Application that acted as UAC will be called back if it present in the list of applications to be called for that particular message SIP method.
+					</para>
 				</listitem>
 				<listitem>
 					<para>

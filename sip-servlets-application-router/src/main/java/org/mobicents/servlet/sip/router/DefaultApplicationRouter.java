@@ -28,7 +28,7 @@ import java.io.Serializable;
 import java.io.StringReader;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -152,6 +152,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
     private static final String REGEX_POPPED_ROUTE_PARAMETER = "REGEX_POPPED_ROUTE";
     private static final String DIRECTION_OUTBOUND = "OUTBOUND";
     private static final String DIRECTION_INBOUND = "INBOUND";
+    private static final String DIRECTION_UAC_ROUTE_BACK = "UAC_ROUTE_BACK";
     // the logger
     private static Logger log = Logger.getLogger(DefaultApplicationRouter.class);
     // the prefix used in the dar configuration file to specify the subscriber URI to use
@@ -174,7 +175,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
      * Default Constructor
      */
     public DefaultApplicationRouter() {
-        containerDeployedApplicationNames = new HashSet<String>();
+        containerDeployedApplicationNames = Collections.newSetFromMap(new ConcurrentHashMap<String, Boolean>());
         defaultApplicationRouterParser = new DefaultApplicationRouterParser();
         defaultSipApplicationRouterInfos = new ConcurrentHashMap<String, List<? extends SipApplicationRouterInfo>>();
         conditions = new ArrayList();
@@ -186,9 +187,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
      */
     public void applicationDeployed(List<String> newlyDeployedApplicationNames) {
         init();
-        synchronized (containerDeployedApplicationNames) {
-            containerDeployedApplicationNames.addAll(newlyDeployedApplicationNames);
-        }
+        containerDeployedApplicationNames.addAll(newlyDeployedApplicationNames);
     }
 
     /**
@@ -196,18 +195,14 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
      */
     public void applicationUndeployed(List<String> undeployedApplicationNames) {
         init();
-        synchronized (containerDeployedApplicationNames) {
-            containerDeployedApplicationNames.removeAll(undeployedApplicationNames);
-        }
+        containerDeployedApplicationNames.removeAll(undeployedApplicationNames);
     }
 
     /**
      * {@inheritDoc}
      */
     public void destroy() {
-        synchronized (containerDeployedApplicationNames) {
-            containerDeployedApplicationNames.clear();
-        }
+        containerDeployedApplicationNames.clear();
     }
 
     /**
@@ -361,14 +356,16 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
                 }
 
                 boolean isApplicationPresentInContainer = false;
-                synchronized (containerDeployedApplicationNames) {
-                    if (containerDeployedApplicationNames.contains(defaultSipApplicationRouterInfo.getApplicationName())) {
-                        isApplicationPresentInContainer = true;
-                        if (log.isDebugEnabled()) {
-                            log.debug(defaultSipApplicationRouterInfo.getApplicationName() + " is present in the container.");
-                        }
+                if (containerDeployedApplicationNames.contains(defaultSipApplicationRouterInfo.getApplicationName())) {
+                    isApplicationPresentInContainer = true;
+                    if (log.isDebugEnabled()) {
+                        log.debug(defaultSipApplicationRouterInfo.getApplicationName() + " is present in the container.");
                     }
-                }
+			    } else {
+					if(log.isDebugEnabled()) {
+					    log.debug("this " + this + " " + defaultSipApplicationRouterInfo.getApplicationName() + " is NOT present in the container.");
+					}
+			    }
                 if (log.isDebugEnabled()) {
                     log.debug("Route Modifier : " + defaultSipApplicationRouterInfo.getRouteModifier());
                     log.debug("Previous App Name : "
@@ -403,7 +400,10 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
                     // https://code.google.com/p/sipservlets/issues/detail?id=273 allowing to route to the same app with
                     // different routing regions
                             ((defaultSipApplicationRouterAppName.equals(initialAppName) && !(initialRoutingRegion
-                                    .equals(defaultSipApplicationRouterRoutingRegion))))) {
+                                    .equals(defaultSipApplicationRouterRoutingRegion)))) || 
+                            // https://github.com/Mobicents/sip-servlets/issues/94
+                            ((requestDirection != null &&  defaultSipApplicationRouterAppName.equals(initialAppName) && 
+                            		DIRECTION_UAC_ROUTE_BACK.equals(requestDirection) && stateInfo == null))) {
                         String subscriberIdentity = defaultSipApplicationRouterInfo.getSubscriberIdentity();
                         if (subscriberIdentity.indexOf(DAR_SUSCRIBER_PREFIX) != -1) {
                             String headerName = subscriberIdentity.substring(DAR_SUSCRIBER_PREFIX_LENGTH);
@@ -469,7 +469,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
      * 
      * @see org.mobicents.servlet.sip.router.ManageableApplicationRouter#configure(java.lang.Object)
      */
-    public synchronized void configure(Object configuration) {
+    public void configure(Object configuration) {
 
         if (!(configuration instanceof Properties) && !(configuration.toString() instanceof String))
             throw new IllegalArgumentException("Configuration for DAR must be of type Properties or String; "
@@ -533,7 +533,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
      * 
      * @see org.mobicents.servlet.sip.router.ManageableApplicationRouter#getCurrentConfiguration()
      */
-    public synchronized Object getCurrentConfiguration() {
+    public Object getCurrentConfiguration() {
         return defaultApplicationRouterParser.getProperties();
     }
 
@@ -542,7 +542,7 @@ public class DefaultApplicationRouter implements SipApplicationRouter, Manageabl
      * 
      * @see org.mobicents.servlet.sip.router.ManageableApplicationRouter#getCurrentConfiguration()
      */
-    public synchronized Map<String, List<? extends SipApplicationRouterInfo>> getConfiguration() {
+    public Map<String, List<? extends SipApplicationRouterInfo>> getConfiguration() {
         return defaultSipApplicationRouterInfos;
     }
 
