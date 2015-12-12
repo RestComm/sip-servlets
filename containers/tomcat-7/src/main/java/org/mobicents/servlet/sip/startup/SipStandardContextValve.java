@@ -141,6 +141,14 @@ final class SipStandardContextValve extends org.apache.catalina.valves.ValveBase
             return;
         }
 
+        // http://code.google.com/p/sipservlets/issues/detail?id=195 
+        // If the context is stopping and the request is a new request not tied to 
+        // an existing session
+        if(context.isStoppingGracefully() && request.getSession(false) == null) {
+        	notFound(response);
+        	return;
+        }
+        
         // Wait if we are reloading
         boolean reloaded = false;
         while (context.getPaused()) {

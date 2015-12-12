@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
@@ -62,6 +64,7 @@ import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.catalina.CatalinaSipContext;
 import org.mobicents.servlet.sip.catalina.CatalinaSipListenersHolder;
 import org.mobicents.servlet.sip.catalina.CatalinaSipManager;
+import org.mobicents.servlet.sip.catalina.ContextGracefulStopTask;
 import org.mobicents.servlet.sip.catalina.SARDirContext;
 import org.mobicents.servlet.sip.catalina.SipDeploymentException;
 import org.mobicents.servlet.sip.catalina.SipSecurityConstraint;
@@ -176,6 +179,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
     private transient ThreadLocal<SipApplicationSessionCreationThreadLocal> sipApplicationSessionsAccessedThreadLocal = new ThreadLocal<SipApplicationSessionCreationThreadLocal>();
     // http://code.google.com/p/mobicents/issues/detail?id=2534 && http://code.google.com/p/mobicents/issues/detail?id=2526
     private transient ThreadLocal<Boolean> isManagedThread = new ThreadLocal<Boolean>();
+    // http://code.google.com/p/sipservlets/issues/detail?id=195
+    private ScheduledFuture<?> gracefulStopFuture;
 	/**
 	 * 
 	 */
@@ -241,16 +246,16 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 //			} else {
 //				timerService = new TimerServiceImpl();
 //			}
-			timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService());
+			timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService(), applicationName);
 		}
 		if(proxyTimerService == null) {
 			String proxyTimerServiceType = sipApplicationDispatcher.getSipService().getProxyTimerServiceImplementationType();
 			if(proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Standard")) {
-                proxyTimerService = new ProxyTimerServiceImpl();
+                proxyTimerService = new ProxyTimerServiceImpl(applicationName);
             } else if(proxyTimerServiceType != null && proxyTimerServiceType.equalsIgnoreCase("Default")) {
-                proxyTimerService = new DefaultProxyTimerService();
+                proxyTimerService = new DefaultProxyTimerService(applicationName);
             } else {
-                proxyTimerService = new ProxyTimerServiceImpl();
+                proxyTimerService = new ProxyTimerServiceImpl(applicationName);
             }
 		}
 		if(sasTimerService == null || !sasTimerService.isStarted()) {
@@ -262,11 +267,11 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 //			}
 			String sasTimerServiceType = sipApplicationDispatcher.getSipService().getSasTimerServiceImplementationType();
 			if(sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Standard")) {
-                sasTimerService = new StandardSipApplicationSessionTimerService();
+                sasTimerService = new StandardSipApplicationSessionTimerService(applicationName);
             } else if (sasTimerServiceType != null && sasTimerServiceType.equalsIgnoreCase("Default")) {
-                sasTimerService = new DefaultSipApplicationSessionTimerService();
+                sasTimerService = new DefaultSipApplicationSessionTimerService(applicationName);
             } else {
-                sasTimerService = new StandardSipApplicationSessionTimerService();
+                sasTimerService = new StandardSipApplicationSessionTimerService(applicationName);
             }
 		}
 		this.getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE,
@@ -545,8 +550,8 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 	
 	@Override
 	public synchronized void stop() throws LifecycleException {
-		if(logger.isDebugEnabled()) {
-			logger.debug("Stopping the sip context " + getName());
+		if(logger.isInfoEnabled()) {
+			logger.info("Stopping the sip context " + getName());
 		}
 		if(manager instanceof SipManager) {
 			((SipManager)manager).dumpSipSessions();
@@ -585,8 +590,16 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		// Issue 1478 : nullify the ref to avoid reusing it
 		timerService = null;
 		getServletContext().setAttribute(javax.servlet.sip.SipServlet.TIMER_SERVICE, null);
-		if(logger.isDebugEnabled()) {
-			logger.debug("sip context stopped " + getName());
+		// Issue 48 (https://bitbucket.org/telestax/telscale-sip-servlets/issue/48/sipstandardservice-stopgracefuly-for)
+		if(gracefulStopFuture != null) {
+			gracefulStopFuture.cancel(false);
+			gracefulStopFuture = null;
+			if(logger.isDebugEnabled()) {
+				logger.debug("context graceful task cancelled " + getName());
+			}
+		}
+		if(logger.isInfoEnabled()) {
+			logger.info("sip context stopped " + getName());
 		}
 	}
 
@@ -1482,6 +1495,47 @@ public class SipStandardContext extends StandardContext implements CatalinaSipCo
 		// http://code.google.com/p/sipservlets/issues/detail?id=135
 		unbindThreadBindingListener();
 		Thread.currentThread().setContextClassLoader(oldClassLoader);
+	}
+
+
+	@Override
+	public void stopGracefully(long timeToWait) {
+		// http://code.google.com/p/sipservlets/issues/detail?id=195 
+		// Support for Graceful Shutdown of SIP Applications and Overall Server
+		if(logger.isInfoEnabled()) {
+			logger.info("Stopping the Context " + getName() + " Gracefully in " + timeToWait + " ms");
+		}
+		// Guarantees that the application won't be routed any initial requests anymore but will still handle subsequent requests
+		List<String> applicationsUndeployed = new ArrayList<String>();
+		applicationsUndeployed.add(applicationName);
+		sipApplicationDispatcher.getSipApplicationRouter().applicationUndeployed(applicationsUndeployed);
+		if(timeToWait == 0) {
+			// equivalent to forceful stop
+			if(gracefulStopFuture != null) {
+				gracefulStopFuture.cancel(false);
+			}
+			try {
+				stop();
+			} catch (LifecycleException e) {
+				logger.error("The server couldn't be stopped", e);
+			}
+		} else { 
+			long gracefulStopTaskInterval = 30000;
+			if(timeToWait > 0 && timeToWait < gracefulStopTaskInterval) {
+				// if the time to Wait is positive and < to the gracefulStopTaskInterval then we schedule the task directly once to the time to wait
+				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().schedule(new ContextGracefulStopTask(this, timeToWait), timeToWait, TimeUnit.MILLISECONDS);         
+			} else {
+				// if the time to Wait is > to the gracefulStopTaskInterval or infinite (negative value) then we schedule the task to run every gracefulStopTaskInterval, not needed to be exactly precise on the timeToWait in this case
+				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ContextGracefulStopTask(this, timeToWait), gracefulStopTaskInterval, gracefulStopTaskInterval, TimeUnit.MILLISECONDS);                      
+			}
+		}		
+	}
+
+	@Override
+	public boolean isStoppingGracefully() {
+		if(gracefulStopFuture != null)
+			return true;
+		return false;
 	}
 	
 	// https://github.com/Mobicents/sip-servlets/issues/52

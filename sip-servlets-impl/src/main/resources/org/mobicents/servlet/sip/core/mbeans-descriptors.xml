@@ -154,6 +154,20 @@
 		<operation name="stop" description="Stop" impact="ACTION"
 			returnType="void" />
 
+		<operation name="stopGracefully" description="Stop Gracefully" impact="ACTION"
+			returnType="void">
+			<parameter name="timeToWait"
+				description="the container will wait for the time specified in this parameter before forcefully killing the remaining sessions (HTTP and SIP) for each application deployed, if a negative value is provided the container will wait until there is no remaining Session before shutting down"
+				type="long" />
+		</operation>
+		
+		<operation name="stopGracefully" description="Stop Gracefully" impact="ACTION"
+			returnType="void">
+			<parameter name="timeToWait"
+				description="the container will wait for the time specified in this parameter before forcefully killing the remaining sessions (HTTP and SIP) for each application deployed, if a negative value is provided the container will wait until there is no remaining Session before shutting down"
+				type="java.lang.String" />
+		</operation>
+
 		<operation name="getSipFactory"
 			description="retrieve the sip factory used by this application dispatcher"
 			impact="ACTION" returnType="javax.servlet.sip.SipFactory" />

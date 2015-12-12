@@ -25,17 +25,27 @@ import gov.nist.javax.sip.message.MessageFactoryExt;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.lang.reflect.Constructor;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.TooManyListenersException;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
+import javax.management.InstanceNotFoundException;
+import javax.management.MBeanException;
+import javax.management.MBeanServerConnection;
+import javax.management.MalformedObjectNameException;
+import javax.management.ObjectName;
+import javax.management.ReflectionException;
 import javax.sip.SipStack;
 import javax.sip.header.ServerHeader;
 import javax.sip.header.UserAgentHeader;
@@ -55,6 +65,7 @@ import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
+import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.SipService;
 import org.mobicents.servlet.sip.core.message.OutboundProxy;
 import org.mobicents.servlet.sip.dns.MobicentsDNSResolver;
@@ -121,6 +132,7 @@ public class SipStandardService implements SipService {
     protected String jvmRoute;
     protected ReplicationStrategy replicationStrategy;
 
+    private ScheduledFuture<?> gracefulStopFuture;
     /**
      * the sip stack path name. Since the sip factory is per classloader it should be set here for all underlying stacks
      */
@@ -1109,4 +1121,54 @@ public class SipStandardService implements SipService {
     public void setSasTimerServiceImplementationType(String sasTimerServiceImplementationType) {
         this.sasTimerServiceImplementationType = sasTimerServiceImplementationType;
     }
+    
+    protected void shutdownServer() throws MalformedObjectNameException, NullPointerException, InstanceNotFoundException, MBeanException, ReflectionException, IOException{
+		MBeanServerConnection mbeanServerConnection = ManagementFactory.getPlatformMBeanServer();
+		ObjectName mbeanName = new ObjectName("jboss.as:management-root=server");
+		Object[] args = {false};
+		String[] sigs = {"java.lang.Boolean"};
+		mbeanServerConnection.invoke(mbeanName, "shutdown", args, sigs);
+	}
+    
+    @Override
+	public void stopGracefully(long timeToWait) {
+		if(logger.isInfoEnabled()) {
+			logger.info("Stopping the Server Gracefully in " + timeToWait + " ms");
+		}
+		if(timeToWait == 0) {
+			if(gracefulStopFuture != null) {
+				gracefulStopFuture.cancel(false);
+			}
+			try {
+				stop();
+				shutdownServer();
+			} catch (Exception e){
+				logger.error("The server couldn't be stopped", e);
+			}
+
+		} else {
+			sipApplicationDispatcher.setGracefulShutdown(true);
+			Iterator<SipContext> sipContexts = sipApplicationDispatcher.findSipApplications();
+			while (sipContexts.hasNext()) {
+				SipContext sipContext = sipContexts.next();
+				sipContext.stopGracefully(timeToWait);
+			}
+			gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ServiceGracefulStopTask(this), 30000, 30000, TimeUnit.MILLISECONDS);
+			if(timeToWait > 0) {
+				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().schedule(
+						new Runnable() {
+							public void run() { 
+								gracefulStopFuture.cancel(false);
+								try {
+									stop();
+									shutdownServer();
+								} catch (Exception e) {
+									logger.error("The server couldn't be stopped", e);
+								}
+							}
+						}
+	                , timeToWait, TimeUnit.MILLISECONDS);
+			}
+		}		
+	}
 }

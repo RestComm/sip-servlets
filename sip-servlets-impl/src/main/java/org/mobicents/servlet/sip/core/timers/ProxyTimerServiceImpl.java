@@ -43,8 +43,8 @@ public class ProxyTimerServiceImpl extends Timer implements ProxyTimerService {
     // Counts the number of cancelled tasks
     private static volatile int numCancelled = 0;
 
-    public ProxyTimerServiceImpl(){
-        super("sip_standard_proxy_timer_service");
+    public ProxyTimerServiceImpl(String applicationName){
+        super(applicationName + "_sip_standard_proxy_timer_service");
         schedulePurgeTaskIfNeeded();
     }
 

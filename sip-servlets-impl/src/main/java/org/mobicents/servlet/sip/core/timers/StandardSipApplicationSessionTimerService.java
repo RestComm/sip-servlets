@@ -50,8 +50,8 @@ public class StandardSipApplicationSessionTimerService extends
     /**
      * @param corePoolSize
      */
-    public StandardSipApplicationSessionTimerService() {
-        super("sip_standard_sas_timer_service");
+    public StandardSipApplicationSessionTimerService(String applicationName) {
+        super(applicationName + "_sip_standard_sas_timer_service");
         schedulePurgeTaskIfNeeded();
     }
 

@@ -243,6 +243,7 @@ public class ProxyUtils {
 			final SipServletRequestImpl proxyBranchMatchingRequest = (SipServletRequestImpl) proxyBranch.getMatchingRequest(originalRequest);
 			
 			//Add via header
+			ViaHeader viaHeader = null;
 			if(proxy.getOutboundInterface() == null) {
 				String branchId = null;
 				
@@ -257,8 +258,7 @@ public class ProxyUtils {
 				} else {
 					branchId = JainSipUtils.createBranch(sipAppKey.getId(),  appName);
 				}
-				// Issue 					
-				proxyBranch.viaHeader = JainSipUtils.createViaHeader(
+				viaHeader = JainSipUtils.createViaHeader(
 						sipFactoryImpl.getSipNetworkInterfaceManager(), clonedRequest, branchId, null);
 			} else { 
 				//If outbound interface is specified use it
@@ -281,14 +281,14 @@ public class ProxyUtils {
 					branchId = JainSipUtils.createBranch(sipAppKey.getId(),  appName);
 				}
 
-				proxyBranch.viaHeader = SipFactoryImpl.headerFactory.createViaHeader(
+				viaHeader = SipFactoryImpl.headerFactory.createViaHeader(
 						proxy.getOutboundInterface().getHost(),
 						proxy.getOutboundInterface().getPort(),
 						outboundTransport,
 						branchId);
 			}
 
-			clonedRequest.addHeader(proxyBranch.viaHeader);		
+			clonedRequest.addHeader(viaHeader);		
 			
 			// Correction for misbehaving clients and unit testing
 			if(clonedRequest.getHeader(RouteHeader.NAME) == null) {

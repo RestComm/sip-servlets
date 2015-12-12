@@ -565,5 +565,15 @@ public class SipStandardManager extends StandardManager implements CatalinaSipMa
 	public void updateStats() {
 		sipManagerDelegate.updateStats();
 	}
+
+	@Override
+	public void stopGracefully(long timeToWait) {
+		sipManagerDelegate.getContainer().stopGracefully(timeToWait);
+	}
+
+	@Override
+	public boolean isStoppingGracefully() {
+		return sipManagerDelegate.getContainer().isStoppingGracefully();
+	}
 	
 }

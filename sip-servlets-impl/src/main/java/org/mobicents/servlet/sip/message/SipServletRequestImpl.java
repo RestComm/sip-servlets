@@ -1782,13 +1782,19 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 			if(transaction != null) {
 				final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
 				final MobicentsB2BUAHelper b2buaHelperImpl = sipSession.getB2buaHelper();
-				if(b2buaHelperImpl != null && tad != null) {
-					// we unlink the originalRequest early to avoid keeping the messages in mem for too long
-					b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
-				}				
-				session.removeOngoingTransaction(transaction);					
+//				if(b2buaHelperImpl != null && tad != null) {
+//					// we unlink the originalRequest early to avoid keeping the messages in mem for too long
+//					b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
+//				}
+				if(b2buaHelperImpl == null) {
+					session.removeOngoingTransaction(transaction);
+				}
 				if(tad != null) {
 					tad.cleanUp();
+					transaction.setApplicationData(null);
+					if(b2buaHelperImpl == null && sipSession.getProxy() == null) {
+						tad.cleanUpMessage();
+					}
 				}
 			}
 			final SipProvider sipProvider = matchingListeningPoint.getSipProvider();	

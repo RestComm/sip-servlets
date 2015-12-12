@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.servlet.sip.SipURI;
@@ -74,6 +75,15 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 	 * Stop the sip application dispatcher
 	 */
 	void stop();
+	
+	/**
+	 * Stop the Server GraceFully, ie the server will stop only when all applications
+	 * will have no outstanding SIP or HTTP Sessions
+	 * @param timeToWait - the container will wait for the time specified in this parameter before forcefully killing
+	 * the remaining sessions (HTTP and SIP) for each application deployed, if a negative value is provided the container 
+	 * will wait until there is no remaining Session before shutting down
+	 */
+	public void stopGracefully(long timeToWait);
 	
 	/**
 	 * Add a new sip application to which sip messages can be routed
@@ -159,11 +169,14 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 
 	// should be in a seperate HA interface, but this may become deprecated in the future
 	void sendSwitchoverInstruction(String fromJvmRoute, String toJvmRoute);
+	// tell the application Disptacher to shutdown gracefully
+	void setGracefulShutdown(boolean shuttingDownGracefully);
 	
 	String getApplicationNameFromHash(String hash);
 	String getHashFromApplicationName(String appName);
 	
 	ConcurrencyControlMode getConcurrencyControlMode();
+	String getConcurrencyControlModeByName();
 	void setConcurrencyControlMode(ConcurrencyControlMode concurrencyControlMode);
 	void setConcurrencyControlModeByName(String concurrencyControlMode);
 
@@ -226,6 +239,7 @@ public interface SipApplicationDispatcher extends SipListenerExt {
 	int getBackToNormalQueueSize();
 
 	ExecutorService getAsynchronousExecutor();
+	ScheduledExecutorService getAsynchronousScheduledExecutor();
 
 	void setSipStack(SipStack sipStack);
 	SipStack getSipStack();

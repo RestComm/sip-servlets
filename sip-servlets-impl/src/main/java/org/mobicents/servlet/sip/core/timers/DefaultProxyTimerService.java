@@ -47,8 +47,8 @@ public class DefaultProxyTimerService extends ScheduledThreadPoolExecutor implem
 
     public static final int SCHEDULER_THREAD_POOL_DEFAULT_SIZE = 4;
 
-    public DefaultProxyTimerService() {
-        super(SCHEDULER_THREAD_POOL_DEFAULT_SIZE, new NamingThreadFactory("sip_default_proxy_timer_service"));
+    public DefaultProxyTimerService(String applicationName) {
+        super(SCHEDULER_THREAD_POOL_DEFAULT_SIZE, new NamingThreadFactory(applicationName + "_sip_default_proxy_timer_service"));
         schedulePurgeTaskIfNeeded();
     }
 
@@ -143,9 +143,8 @@ public class DefaultProxyTimerService extends ScheduledThreadPoolExecutor implem
                             break;
                         }
                     }
-                } catch (NoSuchFieldException | SecurityException | IllegalAccessException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    logger.warn("Couldn't clean the timer from the JVM GC ", e);
                 }
             }
         }

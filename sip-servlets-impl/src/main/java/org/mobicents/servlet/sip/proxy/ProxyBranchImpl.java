@@ -85,6 +85,7 @@ import org.mobicents.servlet.sip.startup.StaticServiceHolder;
  */
 public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 
+	private static final String DEFAULT_RECORD_ROUTE_URI = "sip:proxy@localhost";
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = Logger.getLogger(ProxyBranchImpl.class);
 	private transient ProxyImpl proxy;
@@ -93,8 +94,13 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	// From javadoc : object representing the request that is or to be proxied.
 	private transient SipServletRequestImpl outgoingRequest;
 	private transient SipServletResponseImpl lastResponse;
-	private URI targetURI;
+	// https://telestax.atlassian.net/browse/MSS-153 moving to String to optimize memory usage
+	private String targetURI;
 	private transient SipURI outboundInterface;
+	// https://telestax.atlassian.net/browse/MSS-153 moving to String to optimize memory usage
+	private transient String recordRouteURIString;
+	// https://telestax.atlassian.net/browse/MSS-153 need to keep it as URI for the time of the transaction as
+	// com.bea.sipservlet.tck.agents.spec.ProxyBranchTest.testAddNoSysHeader adds parameters to it that need to be passed on the outgoing invite
 	private transient SipURI recordRouteURI;
 	private boolean recordRoutingEnabled;
 	// https://github.com/Mobicents/sip-servlets/issues/63
@@ -114,7 +120,8 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	private boolean isAddToPath;
 	private transient List<ProxyBranch> recursedBranches;
 	private boolean waitingForPrack;
-	public transient ViaHeader viaHeader;
+	// https://telestax.atlassian.net/browse/MSS-153 not needing to store it
+//	public transient ViaHeader viaHeader;
 	
 	/*
 	 * It is best to use a linked list here because we expect more than one tx only very rarely.
@@ -139,20 +146,25 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	
 	public ProxyBranchImpl(URI uri, ProxyImpl proxy)
 	{
-		this.targetURI = uri;
+		this.targetURI = uri.toString();
 		this.proxy = proxy;
 		isAddToPath = proxy.getAddToPath();
 		this.originalRequest = (SipServletRequestImpl) proxy.getOriginalRequest();
+		if(proxy.recordRouteURI != null) {
 		this.recordRouteURI = proxy.recordRouteURI;
+		}
+		if(proxy.recordRouteURIString != null) {
+			this.recordRouteURIString = proxy.recordRouteURIString;
+		}
 		this.pathURI = proxy.pathURI;
 		this.outboundInterface = proxy.getOutboundInterface();
-		if(recordRouteURI != null) {
-			this.recordRouteURI = (SipURI)((SipURIImpl)recordRouteURI).clone();			
-		}
+//		if(recordRouteURI != null) {
+//			this.recordRouteURI = (SipURI)((SipURIImpl)recordRouteURI).clone();			
+//		}
 		this.proxyBranchTimeout = proxy.getProxyTimeout();
 		this.proxyBranch1xxTimeout = proxy.getProxy1xxTimeout();
 		this.canceled = false;
-		this.recursedBranches = new ArrayList<ProxyBranch>();
+		this.recursedBranches = null;
 		proxyBranchTimerStarted = false;
 		cTimerLock = new Object();
 		
@@ -287,9 +299,19 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	 */
 	public SipURI getRecordRouteURI() {
 		if(this.getRecordRoute()) {
-			if(this.recordRouteURI == null) 
-				this.recordRouteURI = proxy.getSipFactoryImpl().createSipURI("proxy", "localhost");
-			return this.recordRouteURI;
+			if(this.recordRouteURI == null && this.recordRouteURIString == null) 
+				this.recordRouteURIString = DEFAULT_RECORD_ROUTE_URI;
+			
+			if(recordRouteURIString != null) {
+				try {
+					recordRouteURI = ((SipURI)proxy.getSipFactoryImpl().createURI(recordRouteURIString));
+					recordRouteURIString = null;
+				} catch (ServletParseException e) {
+					logger.error("A problem occured while setting the target URI while proxying a request " + recordRouteURI, e);
+					return null;
+				}
+			}
+			return recordRouteURI;
 		}
 		
 		else throw new IllegalStateException("Record Route not enabled for this ProxyBranch. You must call proxyBranch.setRecordRoute(true) before getting an URI.");
@@ -299,10 +321,16 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	 * @see javax.servlet.sip.ProxyBranch#getRecursedProxyBranches()
 	 */
 	public List<ProxyBranch> getRecursedProxyBranches() {
+		if(recursedBranches == null) {
+			return new ArrayList<ProxyBranch>();
+		}
 		return recursedBranches;
 	}
 	
 	public void addRecursedBranch(ProxyBranchImpl branch) {
+		if(recursedBranches == null) {
+			recursedBranches = new ArrayList<ProxyBranch>();
+		}
 		recursedBranches.add(branch);
 	}
 
@@ -405,17 +433,32 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		// If the proxy is not adding record-route header, set it to null and it
 		// will be ignored in the Proxying
 		if(proxy.getRecordRoute() || this.getRecordRoute()) {
-			if(recordRouteURI == null) {
-				recordRouteURI = proxy.getSipFactoryImpl().createSipURI("proxy", "localhost");
+			if(recordRouteURI == null && recordRouteURIString == null) {
+				recordRouteURIString = DEFAULT_RECORD_ROUTE_URI;
+			}
+			if(recordRouteURIString != null) {
+				try {
+					recordRouteURI = ((SipURI)proxy.getSipFactoryImpl().createURI(recordRouteURIString));
+				} catch (ServletParseException e) {
+					logger.error("A problem occured while setting the target URI while proxying a request " + recordRouteURIString, e);
+				}
 			}
 			recordRoute = recordRouteURI;
 		}
 		addTransaction(originalRequest);
-						
+		
+		URI destination = null;
+		if(targetURI != null) {
+			try {
+				destination = proxy.getSipFactoryImpl().createURI(targetURI);
+			} catch (ServletParseException e) {
+				logger.error("A problem occured while setting the target URI while proxying a request " + targetURI, e);
+			}
+		}				
 		Request cloned = ProxyUtils.createProxiedRequest(
 				outgoingRequest,
 				this,
-				this.targetURI,
+				destination,
 				this.outboundInterface,
 				recordRoute, 
 				this.pathURI);
@@ -693,6 +736,7 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	 */
 	public void proxySubsequentRequest(MobicentsSipServletRequest sipServletRequest) {
 		SipServletRequestImpl request = (SipServletRequestImpl) sipServletRequest;
+		
 		MobicentsSipServletResponse lastFinalResponse = (MobicentsSipServletResponse) request.getLastFinalResponse();
 		if(lastFinalResponse != null && lastFinalResponse.isMessageSent()) {
 		    // https://code.google.com/p/sipservlets/issues/detail?id=21
@@ -718,8 +762,10 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		
 		// Update the last proxied request
 		request.setRoutingState(RoutingState.PROXIED);
+		if(!request.getMethod().equalsIgnoreCase(Request.ACK) ) {
 		proxy.setOriginalRequest(request);
 		this.originalRequest = request;
+		}
 		
 		// No proxy params, sine the target is already in the Route headers
 //		final ProxyParams params = new ProxyParams(null, null, null, null);
@@ -734,8 +780,11 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 //			}
 //		}
 
-		updateTimer(false, request.getSipApplicationSession(false)); 
-
+		// https://telestax.atlassian.net/browse/MSS-153 perf optimization : we update the timer only on non ACK
+		if(!clonedRequest.getMethod().equalsIgnoreCase(Request.ACK) ) { 
+			updateTimer(false, request.getSipApplicationSession(false)); 
+		}
+ 
 		try {
 			// Reset the proxy supervised state to default Chapter 6.2.1 - page down list bullet number 6
 			proxy.setSupervised(true);
@@ -807,21 +856,39 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 		this.prackOriginalRequest = request;
 				
 		URI targetURI = null; 
+		String targetURIString = null; 
 		if(request.getMethod().equals(Request.PRACK) || request.getMethod().equals(Request.ACK)) {
-			targetURI = this.targetURI;
+			targetURIString = this.targetURI;
 		}
 		
 		// Determine the direction of the request. Either it's from the dialog initiator (the caller)
 		// or from the callee
 		if(!((MessageExt)request.getMessage()).getFromHeader().getTag().toString().equals(proxy.getCallerFromTag())) {
 			// If it's from the callee we should send it in the other direction
-			targetURI = proxy.getPreviousNode();
+			targetURIString = proxy.getPreviousNode();
+		}
+		if(targetURIString != null) {
+			try {
+				targetURI = sipFactoryImpl.createURI(targetURIString);
+			} catch (ServletParseException e) {
+				logger.error("A problem occured while setting the target URI while proxying a request " + targetURIString, e);
+			}
+		}
+		SipURI recordRoute = null;
+		if(recordRouteURI != null) {
+			recordRoute = recordRouteURI;
+		} else if (recordRouteURIString != null){
+			try {
+				recordRoute = ((SipURI)proxy.getSipFactoryImpl().createURI(recordRouteURIString));
+			} catch (ServletParseException e) {
+				logger.error("A problem occured while setting the target URI while proxying a request " + recordRouteURI, e);
+			}
 		}
 		// https://code.google.com/p/sipservlets/issues/detail?id=274
 		// as described in https://lists.cs.columbia.edu/pipermail/sip-implementors/2003-June/004986.html
 		// we should record route on reINVITE as well for robustness in case of UA crash, so adding recordRouteURI in the call to this method
 		Request clonedRequest = 
-			ProxyUtils.createProxiedRequest(request, this, targetURI, null, recordRouteURI, null);
+			ProxyUtils.createProxiedRequest(request, this, targetURI, null, recordRoute, null);
 
 		ViaHeader viaHeader = (ViaHeader) clonedRequest.getHeader(ViaHeader.NAME);
 		try {
@@ -921,11 +988,13 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 				cancel1xxTimer();
 			}
 			this.timedOut = true;
+			if(originalRequest != null) {
 			List<ProxyBranchListener> proxyBranchListeners = originalRequest.getSipSession().getSipApplicationSession().getSipContext().getListeners().getProxyBranchListeners();
 			if(proxyBranchListeners != null) {
 				for (ProxyBranchListener proxyBranchListener : proxyBranchListeners) {
 					proxyBranchListener.onProxyBranchResponseTimeout(responseType, this);
 				}
+			}
 			}
 			// Just do a timeout response
 			proxy.onBranchTimeOut(this);
@@ -1222,6 +1291,10 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	 */
 	public void setOriginalRequest(SipServletRequestImpl originalRequest) {
 		this.originalRequest = originalRequest;
+		if(originalRequest == null && recordRouteURI != null) {
+			recordRouteURIString = recordRouteURI.toString();
+			recordRouteURI = null;
+		}
 	}
 
 	/**
@@ -1234,20 +1307,21 @@ public class ProxyBranchImpl implements MobicentsProxyBranch, Externalizable {
 	/**
 	 * @param targetURI the targetURI to set
 	 */
-	public void setTargetURI(URI targetURI) {
+	public void setTargetURI(String targetURI) {
 		this.targetURI = targetURI;
 	}
 
 	/**
 	 * @return the targetURI
 	 */
-	public URI getTargetURI() {
+	public String getTargetURI() {
 		return targetURI;
 	}
 
 	@Override
 	public void setRecordRouteURI(SipURI uri) {
 		this.recordRouteURI = uri;
+		this.recordRouteURIString = null;
 	}
 
 	/**

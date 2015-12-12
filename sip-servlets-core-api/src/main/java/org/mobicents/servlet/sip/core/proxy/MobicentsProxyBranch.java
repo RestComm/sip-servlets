@@ -42,7 +42,7 @@ public interface MobicentsProxyBranch extends ProxyBranch, ProxyBranchExt {
 
 	void start();
 
-	URI getTargetURI();
+	String getTargetURI();
 
 	void cancel1xxTimer();
 

@@ -210,11 +210,20 @@
 					<artifactId>commons-congestion</artifactId>
 					<version>${mobicents.commons.version}</version>
 				</dependency>	
+
 				<dependency>
 					<groupId>javolution</groupId>
 					<artifactId>javolution</artifactId>
 					<version>${javolution.version}</version>			
 				</dependency>	
+
+				<!-- for hashed wheel timers and Netty IO layer -->
+				<dependency>
+					<groupId>io.netty</groupId>
+					<artifactId>netty-all</artifactId>
+					<version>4.0.33.Final</version>
+					<scope>provided</scope>
+				</dependency>
 
 				<dependency>
 					<groupId>dnsjava</groupId>

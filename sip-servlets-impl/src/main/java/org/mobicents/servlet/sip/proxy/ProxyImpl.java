@@ -109,6 +109,10 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	private boolean sipOutboundSupport;
 	private int bestResponseSent = -1;
 	protected transient SipURIImpl pathURI;
+	// https://telestax.atlassian.net/browse/MSS-153 moving to String to optimize memory usage
+	protected transient String recordRouteURIString;
+	// https://telestax.atlassian.net/browse/MSS-153 need to keep it as URI for the time of the transaction as
+	// com.bea.sipservlet.tck.agents.spec.ProxyBranchTest.testAddNoSysHeader adds parameters to it that need to be passed on the outgoing invite
 	protected transient SipURI recordRouteURI;
 	private transient SipURI outboundInterface;
 	private transient SipFactoryImpl sipFactoryImpl;
@@ -119,13 +123,14 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	private transient Map<URI, ProxyBranchImpl> proxyBranches;
 	private boolean started; 
 	private boolean ackReceived = false;
-	private boolean tryingSent = false;
+	// https://telestax.atlassian.net/browse/MSS-153 removing can use start flag to optimize memory usage
+//	private boolean tryingSent = false;
 	// This branch is the final branch (set when the final response has been sent upstream by the proxy) 
 	// that will be used for proxying subsequent requests
 	private ProxyBranchImpl finalBranchForSubsequentRequests;
 	
-	// Keep the URI of the previous SIP entity that sent the original request to us (either another proxy or UA)
-	private SipURI previousNode;
+	// Keep the URI (// https://telestax.atlassian.net/browse/MSS-153 as String to save memory) of the previous SIP entity that sent the original request to us (either another proxy or UA)
+	private String previousNode;
 	
 	// The From-header of the initiator of the request. Used to determine the direction of the request.
 	// Caller -> Callee or Caller <- Callee
@@ -134,8 +139,6 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	private transient ProxyTimerService proxyTimerService;
 
 	// Information required to implement 3GPP TS 24.229 section 5.2.8.1.2. ie Termination of Session originating from the proxy.
-	private long callerCSeq; 	 // Last CSeq seen from caller
-	private long calleeCSeq = 0; // Last CSeq seen from callee (We may never see one if the callee never sends a request)
 	private boolean storeTerminationInfo = false; // Enables storage of termination information.
 	private ProxyTerminationInfo terminationInfo; // Object to store termination information	
 
@@ -160,10 +163,9 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 		}
 		this.callerFromTag = ((MessageExt)request.getMessage()).getFromHeader().getTag();
 		this.previousNode = extractPreviousNodeFromRequest(request);
-		this.callerCSeq = ((MessageExt)request.getMessage()).getCSeqHeader().getSeqNumber();
 		putTransaction(originalRequest);
     }
-    // https://code.google.com/p/sipservlets/issues/detail?id=238
+	// https://code.google.com/p/sipservlets/issues/detail?id=238
     public void putTransaction(SipServletRequestImpl request) {
             final String txId = ((ViaHeader) request.getMessage().getHeader(ViaHeader.NAME)).getBranch();
             final TransactionApplicationData txData = request.getTransactionApplicationData();
@@ -179,30 +181,57 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
                     if(logger.isDebugEnabled()) {
                             logger.debug("Transaction "+txId+" removed from proxy.");
                     }
-            }                                       
+            }
+            checkAndCleanProxy();
     }
 	
+    public void checkAndCleanProxy() {
+    	// https://telestax.atlassian.net/browse/MSS-153 optimize performance by cleaning up the original request to reduce the retained mem size
+        if(this.transactionMap.size() == 0 && originalRequest != null) {
+        	if(logger.isDebugEnabled()) {
+                logger.debug("Cleaning Proxy to optimize perf " + this);
+        	}
+        	originalRequest.cleanUp();
+        	originalRequest.cleanUpLastResponses();
+        	originalRequest = null;
+        	if(recordRouteURI != null) {
+        		recordRouteURIString = recordRouteURI.toString();
+        		recordRouteURI = null;
+        	}
+        	if(finalBranchForSubsequentRequests != null) {
+        		if(logger.isDebugEnabled()) {
+                    logger.debug("Cleaning proxy finalBranchForSubsequentRequests to optimize perf " + this);
+            	}
+            	finalBranchForSubsequentRequests.cancelTimer();
+            	finalBranchForSubsequentRequests.setResponse(null);
+            	finalBranchForSubsequentRequests.setOriginalRequest(null);
+            	finalBranchForSubsequentRequests.setOutgoingRequest(null);
+            	
+        	}
+        }
+    }
+
 	/*
 	 * This method will find the address of the machine that is the previous dialog path node.
 	 * If there are proxies before the current one that are adding Record-Route we should visit them,
 	 * otherwise just send to the client directly. And we don't want to visit proxies that are not
 	 * Record-Routing, because they are not in the dialog path.
 	 */
-	private SipURI extractPreviousNodeFromRequest(SipServletRequestImpl request) {
-		SipURI uri = null;
+	private String extractPreviousNodeFromRequest(SipServletRequestImpl request) {
+//		SipURI uri = null;
 		// https://code.google.com/p/sipservlets/issues/detail?id=275
 		// we should use the contact header from the originating endpoint
 		ContactHeader contact = (ContactHeader) request.getMessage().getHeader(ContactHeader.NAME);
 		if(contact != null) { 
-			javax.sip.address.SipURI contactUri = ((javax.sip.address.SipURI)contact.getAddress().getURI());
-			uri = new SipURIImpl(contactUri, ModifiableRule.NotModifiable);
+			return ((javax.sip.address.SipURI)contact.getAddress().getURI()).toString();
+//			uri = new SipURIImpl(contactUri, ModifiableRule.NotModifiable);
 		} else {
 			try {
 				// First check for record route
 				RecordRouteHeader rrh = (RecordRouteHeader) request.getMessage().getHeader(RecordRouteHeader.NAME);
 				if(rrh != null) {
-					javax.sip.address.SipURI sipUri = (javax.sip.address.SipURI) rrh.getAddress().getURI();
-					uri = new SipURIImpl(sipUri, ModifiableRule.NotModifiable);
+					return ((javax.sip.address.SipURI) rrh.getAddress().getURI()).toString();
+//					uri = new SipURIImpl(sipUri, ModifiableRule.NotModifiable);
 				} else { 
 					ListIterator<ViaHeader> viaHeaders = request.getMessage().getHeaders(ViaHeader.NAME);
 					ViaHeader lastVia = null;
@@ -210,19 +239,21 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 						lastVia = viaHeaders.next();
 					} 
 					String uriString = ((Via)lastVia).getSentBy().toString();
-					uri = sipFactoryImpl.createSipURI(null, uriString);
+					SipURI uri = sipFactoryImpl.createSipURI(null, uriString);
 					if(lastVia.getTransport() != null) {
 						uri.setTransportParam(lastVia.getTransport());
 					} else {
 						uri.setTransportParam("udp");
 					}
+					return uri.toString();
 				}
 			} catch (Exception e) {
 				// We shouldn't completely fail in this case because it is rare to visit this code
 				logger.error("Failed parsing previous address ", e);
+				return null;
 			}
 		}
-		return uri;
+//		return uri;
 
 	}
 	
@@ -369,6 +400,15 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	 */
 	public SipURI getRecordRouteURI() {
 		if(!this.recordRoutingEnabled) throw new IllegalStateException("You must setRecordRoute(true) before getting URI");
+		if(recordRouteURI == null && recordRouteURIString != null) {
+			try {
+				recordRouteURI = new SipURIImpl(((SipURIImpl)sipFactoryImpl.createURI(recordRouteURIString)).getSipURI(), ModifiableRule.ProxyRecordRouteNotModifiable);
+				recordRouteURIString = null;
+			} catch (ServletParseException e) {
+				logger.error("A problem occured while setting the target URI while proxying a request " + recordRouteURIString, e);
+				return null;
+			}
+		}
 		return this.recordRouteURI;
 	}
 
@@ -498,14 +538,14 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 			// record route should be based on the original received message
 			javax.sip.address.SipURI flowUri= originalRequest.getSipSession().getFlow();
 			if(flowUri != null) {				
-				this.recordRouteURI = new SipURIImpl (flowUri, ModifiableRule.ProxyRecordRouteNotModifiable);
+				this.recordRouteURIString = flowUri.toString();
 				if(logger.isDebugEnabled())
-					logger.debug("Using Session Flow URI as record route URI " + recordRouteURI);
+					logger.debug("Using Session Flow URI as record route URI " + recordRouteURIString);
 			} else {
-				this.recordRouteURI = new SipURIImpl ( JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipNetworkInterfaceManager(), message), ModifiableRule.ProxyRecordRouteNotModifiable);
+				this.recordRouteURIString = JainSipUtils.createRecordRouteURI( sipFactoryImpl.getSipNetworkInterfaceManager(), message).toString();
 			}
 			if(logger.isDebugEnabled()) {
-				logger.debug("Record routing enabled for proxy, Record Route used will be : " + recordRouteURI.toString());
+				logger.debug("Record routing enabled for proxy, Record Route used will be : " + recordRouteURIString);
 			}
 		}		
 		this.recordRoutingEnabled = rr;
@@ -556,11 +596,11 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 					" path.");
 
 		// Only send TRYING when the request is INVITE, needed by testProxyGen2xx form TCK (it sends MESSAGE)
-		if(this.originalRequest.getMethod().equals(Request.INVITE) && !tryingSent) {
+		if(this.originalRequest.getMethod().equals(Request.INVITE) && !started) {
 			// Send provisional TRYING. Chapter 10.2
 			// We must send only one TRYING no matter how many branches we spawn later.
 			// This is needed for tests like testProxyBranchRecurse
-			tryingSent = true;
+//			tryingSent = true;
 			TransactionState transactionState = null;
 			if(originalRequest.getTransaction() != null) {
 				transactionState = originalRequest.getTransaction().getState();
@@ -690,7 +730,10 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 					if(logger.isDebugEnabled())
 						logger.debug("Trying new branch in proxy" );
 					startNextUntriedBranch();
-					branch.onBranchTerminated();
+					// commenting as this is causing NPE in the application if the application tries to get the original request
+					// on a retransmission, removing the transaction too fast will lead to an NPE. 
+					// The transaction should be removed anyway through processTransactionTerminated
+//					branch.onBranchTerminated();
 				}
 			}
 		}
@@ -875,6 +918,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 							logger.debug("storing termination Info for request " + proxiedResponse.getRequest());
 						}
 						terminationInfo = new ProxyTerminationInfo(proxiedResponse, getRecordRouteURI(), this);
+						terminationInfo.setCallerCSeq(((MessageExt)proxiedResponse.getRequest()).getCSeqHeader().getSeqNumber());
 					}
 				} catch (Exception e) {
 					logger.error("A problem occured while proxying the final response", e);
@@ -910,11 +954,13 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	public void setOriginalRequest(MobicentsSipServletRequest originalRequest) {
 		// Determine the direction of the request. Either it's from the dialog initiator (the caller)
 		// or from the callee
+		if(storeTerminationInfo) {
 		if(((MessageExt)originalRequest.getMessage()).getFromHeader().getTag().equals(callerFromTag)) {
-			callerCSeq = (((MessageExt)originalRequest.getMessage()).getCSeqHeader().getSeqNumber());
+				terminationInfo.setCallerCSeq((((MessageExt)originalRequest.getMessage()).getCSeqHeader().getSeqNumber()));
 		} else {
 			// If it's from the callee we should send it in the other direction
-		    calleeCSeq = (((MessageExt)originalRequest.getMessage()).getCSeqHeader().getSeqNumber());
+				terminationInfo.setCalleeCSeq((((MessageExt)originalRequest.getMessage()).getCSeqHeader().getSeqNumber()));
+			}
 		}
 		this.originalRequest = (SipServletRequestImpl) originalRequest;
 	}
@@ -1027,7 +1073,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 		return this.ackReceived;
 	}
 	
-	public SipURI getPreviousNode() {
+	public String getPreviousNode() {
 		return previousNode;
 	}
 
@@ -1061,15 +1107,13 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 		isNoCancel = in.readBoolean();
 		started = in.readBoolean();
 		ackReceived = in.readBoolean();
-		tryingSent = in.readBoolean();
+//		tryingSent = in.readBoolean();
 		finalBranchForSubsequentRequests = (ProxyBranchImpl) in.readObject();
 		if(finalBranchForSubsequentRequests != null) {
 			finalBranchForSubsequentRequests.setProxy(this);
 		}
-		previousNode = (SipURI) in.readObject();
+		previousNode = in.readUTF();
 		callerFromTag = in.readUTF();
-		calleeCSeq = in.readLong();
-		callerCSeq = in.readLong();
 		storeTerminationInfo = in.readBoolean();
 		if (storeTerminationInfo) {
 			terminationInfo = (ProxyTerminationInfo) in.readObject();
@@ -1098,12 +1142,10 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 		out.writeBoolean(isNoCancel);
 		out.writeBoolean(started);
 		out.writeBoolean(ackReceived);
-		out.writeBoolean(tryingSent);
+//		out.writeBoolean(tryingSent);
 		out.writeObject(finalBranchForSubsequentRequests);
-		out.writeObject(previousNode);
+		out.writeUTF(previousNode);
 		out.writeUTF(callerFromTag);
-		out.writeLong(calleeCSeq);
-		out.writeLong(callerCSeq);
 		out.writeBoolean(storeTerminationInfo);
 		if (storeTerminationInfo) {
 			out.writeObject(terminationInfo);
@@ -1132,12 +1174,12 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 		return proxyTimerService;
 	}
 
-	public void addProxyBranch(ProxyBranchImpl proxyBranchImpl) {
-		if(proxyBranches == null) {
-			this.proxyBranches = new LinkedHashMap<URI, ProxyBranchImpl> ();
-		}
-		this.proxyBranches.put(proxyBranchImpl.getTargetURI(), proxyBranchImpl);
-	}
+//	public void addProxyBranch(ProxyBranchImpl proxyBranchImpl) {
+//		if(proxyBranches == null) {
+//			this.proxyBranches = new LinkedHashMap<URI, ProxyBranchImpl> ();
+//		}
+//		this.proxyBranches.put(proxyBranchImpl.getTargetURI(), proxyBranchImpl);
+//	}
 	
 	/*
 	 * (non-Javadoc)
@@ -1167,7 +1209,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
     		}
     		throw new IllegalStateException("No termination information stored.Call storeTerminationInformation before final response arrives.");
     	}
-    	terminationInfo.terminate(session, callerCSeq, calleeCSeq, calleeResponseCode, calleeResponseText, callerResponseCode, callerResponseText);
+    	terminationInfo.terminate(session, calleeResponseCode, calleeResponseText, callerResponseCode, callerResponseText);
     }	
 
 	/**
@@ -1200,6 +1242,7 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 	@Override
 	public void setRecordRouteURI(SipURI uri) {
 		recordRouteURI = uri;
+		recordRouteURIString = null;
 		appSpecifiedRecordRoutingEnabled = true;
 	}
 

@@ -53,7 +53,7 @@ public class Version {
 					}
 					if(releaseDisclaimer != null) {
 						logger.info(releaseDisclaimer);
-					}
+					}					
 				} else {
 					logger.warn("Unable to extract the version of Mobicents Sip Servlets currently running");
 				}

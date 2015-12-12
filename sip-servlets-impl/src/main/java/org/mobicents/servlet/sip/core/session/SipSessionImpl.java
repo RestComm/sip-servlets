@@ -267,7 +267,7 @@ public class SipSessionImpl implements MobicentsSipSession {
 	//Subscriptions used for RFC 3265 compliance to be able to determine when the session can be invalidated
 	//  A subscription is destroyed when a notifier sends a NOTIFY request with a "Subscription-State" of "terminated".
 	// If a subscription's destruction leaves no other application state associated with the dialog, the dialog terminates
-	volatile protected transient Set<EventHeader> subscriptions = null;
+	volatile protected transient Set<String> subscriptions = null;
 	//original transaction that started this session is stored so that we know if the session should end when all subscriptions have terminated or when the BYE has come
 	protected transient String originalMethod = null;
 	protected transient boolean okToByeSentOrReceived = false;
@@ -1492,7 +1492,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * Remove an ongoing tx to the session.
 	 */
 	public void removeOngoingTransaction(Transaction transaction) {
-
 		boolean removed = false;
 		if(this.ongoingTransactions != null) {
 			removed = this.ongoingTransactions.remove(transaction);
@@ -1502,11 +1501,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 //			sessionCreatingTransactionRequest = null;
 //		}
 				
-		if(sessionCreatingTransactionRequest != null && 				
-				transaction.equals(sessionCreatingTransactionRequest.getTransaction())) {
-			sessionCreatingTransactionRequest.cleanUp();
-		}
-		
 		if (proxy != null) {
 		    proxy.removeTransaction(transaction.getBranchId());
 		}
@@ -1516,6 +1510,37 @@ public class SipSessionImpl implements MobicentsSipSession {
 		}	
 		
 		updateReadyToInvalidate(transaction);
+		// nullify the sessionCreatingTransactionRequest only after updateReadyToInvalidate as it is used for error response checking
+		if(sessionCreatingTransactionRequest != null && 				
+				transaction.equals(sessionCreatingTransactionRequest.getTransaction())) {
+			sessionCreatingTransactionRequest.cleanUp();
+			// https://telestax.atlassian.net/browse/MSS-153 improve performance by cleaning the request for dialog based requests
+			// or proxy case or dialog creating methods
+			if(sessionCreatingDialog != null || proxy != null || JainSipUtils.DIALOG_CREATING_METHODS.contains(sessionCreatingTransactionRequest.getMethod())) {
+				sessionCreatingTransactionRequest = null;
+			}
+		}
+	}
+	
+	public void cleanDialogInformation() {
+		if(logger.isDebugEnabled()) {
+			logger.debug("cleanDialogInformation "+ sessionCreatingDialog);
+		}
+		if(sessionCreatingDialog != null && sessionCreatingDialog.getApplicationData() != null && 
+				((TransactionApplicationData)sessionCreatingDialog.getApplicationData()).getSipServletMessage() != null) {
+			TransactionApplicationData dialogAppData = ((TransactionApplicationData)sessionCreatingDialog.getApplicationData());
+			SipServletMessageImpl sipServletMessage = dialogAppData.getSipServletMessage();
+			// https://telestax.atlassian.net/browse/MSS-153  
+			// if we are not an INVITE Based Dialog or we are INVITE but ACK have been received, we can clean up the app data of its servletmessage to clean memory
+			if(!Request.INVITE.equalsIgnoreCase(sipServletMessage.getMethod()) ||
+				(Request.INVITE.equalsIgnoreCase(sipServletMessage.getMethod()) && isAckReceived(((MessageExt)sipServletMessage.getMessage()).getCSeqHeader().getSeqNumber()))) {
+				dialogAppData.cleanUpMessage();
+				dialogAppData.cleanUp();
+				if(logger.isDebugEnabled()) {
+					logger.debug("cleaned DialogInformation "+ sessionCreatingDialog);
+				}
+			}
+		}
 	}
 	
 	
@@ -2114,20 +2139,22 @@ public class SipSessionImpl implements MobicentsSipSession {
 		} else {
 			eventHeader =  (EventHeader) sipServletMessageImpl.getMessage().getHeader(EventHeader.NAME);
 		}
-		if(logger.isDebugEnabled()) {
-			logger.debug("adding subscription " + eventHeader + " to sip session " + getId());
-		}
-		if(subscriptions == null) {
-			this.subscriptions = new CopyOnWriteArraySet<EventHeader>();
-		}
-		subscriptions.add(eventHeader);	
-				
-		if(logger.isDebugEnabled()) {
-			logger.debug("Request from Original Transaction is " + originalMethod);
-			logger.debug("Dialog is " + sessionCreatingDialog);
-		}
-		if(subscriptions.size() < 2 && Request.INVITE.equals(originalMethod)) {
-			sessionCreatingDialog.terminateOnBye(false);
+		if(eventHeader != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("adding subscription " + eventHeader + " to sip session " + getId());
+			}
+			if(subscriptions == null) {
+				this.subscriptions = new CopyOnWriteArraySet<String>();
+			}
+			subscriptions.add(eventHeader.toString());	
+					
+			if(logger.isDebugEnabled()) {
+				logger.debug("Request from Original Transaction is " + originalMethod);
+				logger.debug("Dialog is " + sessionCreatingDialog);
+			}
+			if(subscriptions.size() < 2 && Request.INVITE.equals(originalMethod)) {
+				sessionCreatingDialog.terminateOnBye(false);
+			}
 		}
 	}
 	
@@ -2136,21 +2163,23 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 */
 	public void removeSubscription(MobicentsSipServletMessage sipServletMessageImpl) {
 		EventHeader eventHeader =  (EventHeader) sipServletMessageImpl.getMessage().getHeader(EventHeader.NAME);
-		if(logger.isDebugEnabled()) {
-			logger.debug("removing subscription " + eventHeader + " to sip session " + getId());
-		}
-		boolean hasOngoingSubscriptions = false;
-		if(subscriptions != null) {
-			subscriptions.remove(eventHeader);
-			if(subscriptions.size() > 0) {
-				hasOngoingSubscriptions = true;
+		if(eventHeader != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("removing subscription " + eventHeader + " to sip session " + getId());
 			}
-			if(!hasOngoingSubscriptions) {		
-				if(subscriptions.size() < 1) {
-					if((originalMethod != null && okToByeSentOrReceived) || !Request.INVITE.equals(originalMethod) ) {
-						setState(State.TERMINATED);
-					}
-				}			
+			boolean hasOngoingSubscriptions = false;
+			if(subscriptions != null) {
+				subscriptions.remove(eventHeader.toString());
+				if(subscriptions.size() > 0) {
+					hasOngoingSubscriptions = true;
+				}
+				if(!hasOngoingSubscriptions) {		
+					if(subscriptions.size() < 1) {
+						if((originalMethod != null && okToByeSentOrReceived) || !Request.INVITE.equals(originalMethod) ) {
+							setState(State.TERMINATED);
+						}
+					}			
+				}
 			}
 		}
 		if(isReadyToInvalidateInternal()) {

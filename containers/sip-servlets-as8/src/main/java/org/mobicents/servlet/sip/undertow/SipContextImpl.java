@@ -18,6 +18,14 @@
  */
 package org.mobicents.servlet.sip.undertow;
 
+import io.undertow.server.session.SessionManager;
+import io.undertow.servlet.api.Deployment;
+import io.undertow.servlet.api.ServletInfo;
+import io.undertow.servlet.api.ThreadSetupAction.Handle;
+import io.undertow.servlet.core.Lifecycle;
+import io.undertow.servlet.core.ManagedFilter;
+import io.undertow.servlet.core.ManagedServlet;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +34,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletContextEvent;
@@ -37,14 +47,6 @@ import javax.servlet.sip.SipServletContextEvent;
 import javax.servlet.sip.SipServletListener;
 import javax.servlet.sip.SipServletRequest;
 import javax.servlet.sip.TimerService;
-
-import io.undertow.server.session.SessionManager;
-import io.undertow.servlet.api.Deployment;
-import io.undertow.servlet.api.ServletInfo;
-import io.undertow.servlet.api.ThreadSetupAction.Handle;
-import io.undertow.servlet.core.Lifecycle;
-import io.undertow.servlet.core.ManagedFilter;
-import io.undertow.servlet.core.ManagedServlet;
 
 import org.apache.log4j.Logger;
 import org.mobicents.io.undertow.servlet.api.DeploymentInfoFacade;
@@ -135,6 +137,9 @@ public class SipContextImpl implements SipContext {
     private Host hostOfDeployment;
     List<ListenerService<?>> webServerListeners = new LinkedList<>();
 
+    // http://code.google.com/p/sipservlets/issues/detail?id=195
+    private ScheduledFuture<?> gracefulStopFuture;
+    
     // default constructor:
     public SipContextImpl() {
     }
@@ -376,15 +381,15 @@ public class SipContextImpl implements SipContext {
             // } else {
             // timerService = new TimerServiceImpl();
             // }
-            timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService());
+            timerService = new TimerServiceImpl(sipApplicationDispatcher.getSipService(), getApplicationName());
         }
         if (proxyTimerService == null) {
             if(proxyTimerServiceType != null && proxyTimerServiceType == TimerServiceType.STANDARD) {
-                proxyTimerService = new ProxyTimerServiceImpl();
+                proxyTimerService = new ProxyTimerServiceImpl(getApplicationName());
             } else if(proxyTimerServiceType != null && proxyTimerServiceType == TimerServiceType.DEFAULT) {
-                proxyTimerService = new DefaultProxyTimerService();
+                proxyTimerService = new DefaultProxyTimerService(getApplicationName());
             } else {
-                proxyTimerService = new ProxyTimerServiceImpl();
+                proxyTimerService = new ProxyTimerServiceImpl(getApplicationName());
             }
         }
         if (sasTimerService == null /*kakonyii: prevent creating sasTimerService's threads multiple times by commenting this out: || !sasTimerService.isStarted()*/) {
@@ -395,11 +400,11 @@ public class SipContextImpl implements SipContext {
             // sasTimerService = new StandardSipApplicationSessionTimerService();
             // }
             if(sasTimerServiceType != null && sasTimerServiceType == TimerServiceType.STANDARD){
-                sasTimerService = new StandardSipApplicationSessionTimerService();
+                sasTimerService = new StandardSipApplicationSessionTimerService(getApplicationName());
             }else if (sasTimerServiceType != null && sasTimerServiceType == TimerServiceType.DEFAULT){
-                sasTimerService = new DefaultSipApplicationSessionTimerService();
+                sasTimerService = new DefaultSipApplicationSessionTimerService(getApplicationName());
             }else{
-                sasTimerService = new StandardSipApplicationSessionTimerService();
+                sasTimerService = new StandardSipApplicationSessionTimerService(getApplicationName());
             }
         }
     }
@@ -1147,6 +1152,46 @@ public class SipContextImpl implements SipContext {
     public enum TimerServiceType{
         STANDARD,
         DEFAULT;
-    };
+    }
+
+    @Override
+	public void stopGracefully(long timeToWait) {
+		// http://code.google.com/p/sipservlets/issues/detail?id=195 
+		// Support for Graceful Shutdown of SIP Applications and Overall Server
+		if(logger.isInfoEnabled()) {
+			logger.info("Stopping the Context " + getApplicationName() + " Gracefully in " + timeToWait + " ms");
+		}
+		// Guarantees that the application won't be routed any initial requests anymore but will still handle subsequent requests
+		List<String> applicationsUndeployed = new ArrayList<String>();
+		applicationsUndeployed.add(getApplicationName());
+		sipApplicationDispatcher.getSipApplicationRouter().applicationUndeployed(applicationsUndeployed);
+		if(timeToWait == 0) {
+			// equivalent to forceful stop
+			if(gracefulStopFuture != null) {
+				gracefulStopFuture.cancel(false);
+			}
+			try {
+				stop();
+			} catch (ServletException e) {
+				logger.error("The server couldn't be stopped", e);
+			}
+		} else { 
+			long gracefulStopTaskInterval = 30000;
+			if(timeToWait > 0 && timeToWait < gracefulStopTaskInterval) {
+				// if the time to Wait is positive and < to the gracefulStopTaskInterval then we schedule the task directly once to the time to wait
+				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().schedule(new ContextGracefulStopTask(this, timeToWait), timeToWait, TimeUnit.MILLISECONDS);         
+			} else {
+				// if the time to Wait is > to the gracefulStopTaskInterval or infinite (negative value) then we schedule the task to run every gracefulStopTaskInterval, not needed to be exactly precise on the timeToWait in this case
+				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ContextGracefulStopTask(this, timeToWait), gracefulStopTaskInterval, gracefulStopTaskInterval, TimeUnit.MILLISECONDS);                      
+			}
+		}		
+	}
+
+	@Override
+	public boolean isStoppingGracefully() {
+		if(gracefulStopFuture != null)
+			return true;
+		return false;
+	}
 
 }

@@ -32,6 +32,7 @@ import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.sip.ProxyBranch;
+import javax.servlet.sip.ServletParseException;
 import javax.servlet.sip.SipServletResponse;
 import javax.sip.Dialog;
 import javax.sip.ServerTransaction;
@@ -59,6 +60,7 @@ import org.mobicents.servlet.sip.core.DispatcherException;
 import org.mobicents.servlet.sip.core.MobicentsSipFactory;
 import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.SipManager;
+import org.mobicents.servlet.sip.core.b2bua.MobicentsB2BUAHelper;
 import org.mobicents.servlet.sip.core.proxy.MobicentsProxy;
 import org.mobicents.servlet.sip.core.proxy.MobicentsProxyBranch;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -684,6 +686,27 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					}
 				}
 				
+				if(Request.ACK.equals(requestMethod)){
+					Transaction transaction = sipServletRequest.getTransaction();
+					if(transaction != null) {
+						final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
+						final MobicentsProxy proxy = sipSession.getProxy();
+						if(proxy == null && tad != null) {
+							tad.cleanUp();
+							transaction.setApplicationData(null);
+//							tad.cleanUpMessage();
+						}
+						final MobicentsB2BUAHelper b2buaHelperImpl = sipSession.getB2buaHelper();
+//						if(b2buaHelperImpl != null && tad != null) {
+//							// we unlink the originalRequest early to avoid keeping the messages in mem for too long
+//							b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
+//						}	
+						if(proxy == null && b2buaHelperImpl == null) {
+							sipSession.removeOngoingTransaction(sipServletRequest.getTransaction());
+						}
+					}
+				}
+				
 				// exitSipAppHa completes the replication task. It might block for a while if the state is too big
 				// We should never call exitAipApp before exitSipAppHa, because exitSipApp releases the lock on the
 				// Application of SipSession (concurrency control lock). If this happens a new request might arrive
@@ -695,7 +718,7 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 		}
 		
 		// Issue 2850 :	Use Request-URI custom Mobicents parameters to route request for misbehaving agents, workaround for Cisco-SIPGateway/IOS-12.x user agent
-		private void checkRequestURIForNonCompliantAgents(MobicentsProxyBranch finalBranch, Request request) {
+		private void checkRequestURIForNonCompliantAgents(MobicentsProxyBranch finalBranch, Request request) throws ServletParseException {
 			URI requestURI = request.getRequestURI();
 			if(request.getRequestURI() instanceof javax.sip.address.SipURI && ((Parameters)requestURI).getParameter(MessageDispatcher.RR_PARAM_PROXY_APP) != null && requestURI instanceof SipURI) {								
 				final String host = ((SipURI) requestURI).getHost();
@@ -706,7 +729,9 @@ public class SubsequentRequestDispatcher extends RequestDispatcher {
 					if(logger.isDebugEnabled()) {
 						logger.debug("Non Compliant Agent targeting Mobicents directly, Changing the request URI from " + requestURI + " to " + finalBranch.getTargetURI() + " to avoid going in a loop");
 					}
-					request.setRequestURI(((URIImpl)finalBranch.getTargetURI()).getURI());
+					request.setRequestURI(
+							((URIImpl)(StaticServiceHolder.sipStandardService.getSipApplicationDispatcher().getSipFactory().createURI(
+							finalBranch.getTargetURI()))).getURI());
 				}								
 			}
 		}

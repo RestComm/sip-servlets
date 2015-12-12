@@ -1,6 +1,6 @@
 /*
- * JBoss, Home of Professional Open Source
- * Copyright 2011, Red Hat, Inc. and individual contributors
+ * TeleStax, Open Source Cloud Communications  Copyright 2012. 
+ * and individual contributors
  * by the @authors tag. See the copyright.txt in the distribution for a
  * full listing of individual contributors.
  *
@@ -75,6 +75,15 @@ public interface SipService {
 	
 	public String getMobicentsSipServletMessageFactoryClassName();
 	public void setMobicentsSipServletMessageFactoryClassName(String mobicentsSipServletMessageFactoryClassName);
+
+	/**
+	 * Stop the Server GraceFully, ie the server will stop only when all applications
+	 * will have no outstanding SIP or HTTP Sessions
+	 * @param timeToWait - the container will wait for the time specified in this parameter before forcefully killing
+	 * the remaining sessions (HTTP and SIP) for each application deployed, if a negative value is provided the container 
+	 * will wait until there is no remaining Session before shutting down
+	 */
+	public void stopGracefully(long timeToWait);
 	
 	public String getProxyTimerServiceImplementationType();
 	public String getSasTimerServiceImplementationType();

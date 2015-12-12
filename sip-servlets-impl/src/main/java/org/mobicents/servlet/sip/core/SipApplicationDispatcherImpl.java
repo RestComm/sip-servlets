@@ -159,7 +159,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	/**
 	 * Timer task that will gather information about congestion control 
 	 * @author <A HREF="mailto:jean.deruelle@gmail.com">Jean Deruelle</A>
+	 * @deprecated use JAIN SIP Ext Congestion Control innstead
 	 */
+	@Deprecated
 	public class CongestionControlTimerTask implements Runnable {		
 		
 		public void run() {
@@ -246,16 +248,22 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	private int memoryThreshold;
 	private int backToNormalMemoryThreshold;
 	private boolean rejectSipMessages = false;
-	private long congestionControlCheckingInterval; //30 sec		
+	private long congestionControlCheckingInterval; //30 sec
+	@Deprecated
 	protected transient CongestionControlTimerTask congestionControlTimerTask;
+	@Deprecated
 	protected transient ScheduledFuture congestionControlTimerFuture;
 	private CongestionControlPolicy congestionControlPolicy;
+	@Deprecated
 	private int numberOfMessagesInQueue;
+	@Deprecated
 	private double percentageOfMemoryUsed;	
+	@Deprecated
 	private int queueSize;
+	@Deprecated
 	private int backToNormalQueueSize;
-	//used for the congestion control mechanism
-	private ScheduledThreadPoolExecutor congestionControlThreadPool = null;
+	//used for graceful stops and congestion control mechanism (which is now deprecated)
+	private ScheduledThreadPoolExecutor asynchronousScheduledThreadPoolExecutor = null;
 	
 	// configuration
 	private boolean bypassResponseExecutor = true;
@@ -399,9 +407,9 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		applicationServerIdHash = GenericUtils.hashString(applicationServerId, tagHashMaxLength);
 		
 		messageDispatcherFactory = new MessageDispatcherFactory(this);
-		congestionControlThreadPool = new ScheduledThreadPoolExecutor(2, new NamingThreadFactory("sip_servlets_congestion_control"),
+		asynchronousScheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(2, new NamingThreadFactory("sip_servlets_congestion_control"),
 				new ThreadPoolExecutor.CallerRunsPolicy());
-		congestionControlThreadPool.prestartAllCoreThreads();	
+		asynchronousScheduledThreadPoolExecutor.prestartAllCoreThreads();	
 		logger.info("AsynchronousThreadPoolExecutor size is " + sipService.getDispatcherThreadPoolSize());		
 		asynchronousExecutor = new ThreadPoolExecutor(sipService.getDispatcherThreadPoolSize(), 64, 90, TimeUnit.SECONDS,
 				new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
@@ -439,7 +447,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}		
 		congestionControlTimerTask = new CongestionControlTimerTask();
 		if(congestionControlTimerFuture == null && congestionControlCheckingInterval > 0) { 
-				congestionControlTimerFuture = congestionControlThreadPool.scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
+				congestionControlTimerFuture = asynchronousScheduledThreadPoolExecutor.scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
 		 	if(logger.isInfoEnabled()) {
 		 		logger.info("Congestion control background task started and checking every " + congestionControlCheckingInterval + " milliseconds.");
 		 	}
@@ -473,6 +481,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}	
 	}	
 	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#stopGracefully(long)
+	 */
+	public void stopGracefully(long timeToWait) {
+		sipService.stopGracefully(timeToWait);
+	}
+	
 	/**
 	 * {@inheritDoc}
 	 */
@@ -486,7 +502,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		} finally {
 			statusLock.unlock();
 		}
-		congestionControlThreadPool.shutdownNow();
+		asynchronousScheduledThreadPoolExecutor.shutdownNow();
 		asynchronousExecutor.shutdownNow();						
 		sipApplicationRouter.destroy();
 		
@@ -527,12 +543,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		//if the application has not set any concurrency control mode, we default to the container wide one
 		if(sipApplication.getConcurrencyControlMode() == null) {			
 			sipApplication.setConcurrencyControlMode(concurrencyControlMode);
-			if(logger.isDebugEnabled()) {
-				logger.debug("No concurrency control mode for application " + sipApplicationName + " , defaulting to the container wide one : " + concurrencyControlMode);
+			if(logger.isInfoEnabled()) {
+				logger.info("No concurrency control mode for application " + sipApplicationName + " , defaulting to the container wide one : " + concurrencyControlMode);
 			}
 		} else {
-			if(logger.isDebugEnabled()) {
-				logger.debug("Concurrency control mode for application " + sipApplicationName + " is " + sipApplication.getConcurrencyControlMode());
+			if(logger.isInfoEnabled()) {
+				logger.info("Concurrency control mode for application " + sipApplicationName + " is " + sipApplication.getConcurrencyControlMode());
 			}
 		}
 		sipApplication.getServletContext().setAttribute(ConcurrencyControlMode.class.getCanonicalName(), sipApplication.getConcurrencyControlMode());		
@@ -545,7 +561,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		
 		List<String> newlyApplicationsDeployed = new ArrayList<String>();
 		newlyApplicationsDeployed.add(sipApplicationName);
-		sipApplicationRouter.applicationDeployed(newlyApplicationsDeployed);
+		if(sipApplicationRouter != null) {
+			// https://code.google.com/p/sipservlets/issues/detail?id=277
+			// sipApplicationRouter may not be initialized yet if container is fast to boot
+			sipApplicationRouter.applicationDeployed(newlyApplicationsDeployed);
+		}
 		//if the ApplicationDispatcher is started, notification is sent that the servlets are ready for service
 		//otherwise the notification will be delayed until the ApplicationDispatcher has started
 		statusLock.lock();
@@ -556,16 +576,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		} finally {
 			statusLock.unlock();
 		}
-		if(logger.isDebugEnabled()) {
-			logger.debug("the following sip servlet application has been added : " + sipApplicationName);
+		if(logger.isInfoEnabled()) {
+			logger.info(this + " the following sip servlet application has been added : " + sipApplicationName);
 		}
-		if(logger.isDebugEnabled()) {
-			logger.debug("It contains the following Sip Servlets : ");
+		if(logger.isInfoEnabled()) {
+			logger.info("It contains the following Sip Servlets : ");
 			for(String servletName : sipApplication.getChildrenMap().keySet()) {
-				logger.debug("SipApplicationName : " + sipApplicationName + "/ServletName : " + servletName);
+				logger.info("SipApplicationName : " + sipApplicationName + "/ServletName : " + servletName);
 			}
 			if(sipApplication.getSipRubyController() != null) {
-				logger.debug("It contains the following Sip Ruby Controller : " + sipApplication.getSipRubyController());
+				logger.info("It contains the following Sip Ruby Controller : " + sipApplication.getSipRubyController());
 			}
 		}
 	}
@@ -583,8 +603,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		String hash = GenericUtils.hashString(sipApplicationName, tagHashMaxLength);
 		mdToApplicationName.remove(hash);
 		applicationNameToMd.remove(sipApplicationName);
-		if(logger.isDebugEnabled()) {
-			logger.debug("the following sip servlet application has been removed : " + sipApplicationName);
+		if(logger.isInfoEnabled()) {
+			logger.info("the following sip servlet application has been removed : " + sipApplicationName);
 		}
 		return sipContext;
 	}
@@ -1127,8 +1147,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 								txAppData.cleanUp();
 							}
 						} else {
-							SipServletMessageImpl sipServletMessageImpl = dialogAppData.getSipServletMessage();
-							MobicentsSipSessionKey sipSessionKey = sipServletMessageImpl.getSipSessionKey();
+							MobicentsSipSessionKey sipSessionKey = dialogAppData.getSipSessionKey();
 							tryToInvalidateSession(sipSessionKey, false);				
 						}
 						dialogAppData.cleanUp();
@@ -1289,7 +1308,8 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 									tryToInvalidateSession(sipSessionKey, false);						
 								}					
 							}
-							tad.cleanUp();	
+							tad.cleanUp();
+							tad.cleanUpMessage();
 							dialog.setApplicationData(null);
 						} catch (Exception e) {
 							logger.error("Problem handling dialog timeout", e);
@@ -1575,8 +1595,14 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 										b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
 									}
 									if(removeTx) {
+										if(b2buaHelperImpl != null && tad.getSipServletMessage() instanceof SipServletRequestImpl) {
+											b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
+										}
 										sipSession.removeOngoingTransaction(transaction);
 										tad.cleanUp();
+										if(b2buaHelperImpl == null) {
+											sipSession.cleanDialogInformation();
+										}
 										// Issue 1468 : to handle forking, we shouldn't cleanup the app data since it is needed for the forked responses
 										boolean nullifyAppData = true;					
 										if(((SipStackImpl)((SipProvider)transactionTerminatedEvent.getSource()).getSipStack()).getMaxForkTime() > 0 && Request.INVITE.equals(sipServletMessageImpl.getMethod())) {
@@ -1861,6 +1887,10 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 	public ThreadPoolExecutor getAsynchronousExecutor() {
 		return asynchronousExecutor;
 	}
+	
+	public ScheduledThreadPoolExecutor getAsynchronousScheduledExecutor() {
+		return asynchronousScheduledThreadPoolExecutor;
+	}
 
 	/**
 	 * Serialize the state info in memory and deserialize it and return the new object. 
@@ -2083,7 +2113,12 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 			logger.info("Container wide Concurrency Control set to " + concurrencyControlMode);
 		}
 	}	
-
+	
+	@Override
+	public String getConcurrencyControlModeByName() {
+		return concurrencyControlMode.toString();
+	}
+	
 	/**
 	 * @return the requestsProcessed
 	 */
@@ -2192,7 +2227,7 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 						congestionControlTimerFuture.cancel(false);
 					}
 					if(congestionControlCheckingInterval > 0) {
-						congestionControlTimerFuture = congestionControlThreadPool.scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
+						congestionControlTimerFuture = asynchronousScheduledThreadPoolExecutor.scheduleWithFixedDelay(congestionControlTimerTask, congestionControlCheckingInterval, congestionControlCheckingInterval, TimeUnit.MILLISECONDS);
 						if(logger.isInfoEnabled()) {
 					 		logger.info("Congestion control background task modified to check every " + congestionControlCheckingInterval + " milliseconds.");
 					 	}
@@ -2440,6 +2475,19 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		for(SipLoadBalancer  sipLoadBalancer : sipLoadBalancers) {
 			sipLoadBalancer.switchover(fromJvmRoute, toJvmRoute);			
 		}		
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.SipApplicationDispatcher#setGracefulShutdown(boolean)
+	 */
+	public void setGracefulShutdown(boolean shuttingDownGracefully) {
+		if(logger.isDebugEnabled()) {
+			logger.debug("sending graceful shutdown to Load Balancers");
+		}
+//		for(SipLoadBalancer  sipLoadBalancer : sipLoadBalancers) {
+//			sipLoadBalancer.setGracefulShutdown(shuttingDownGracefully);			
+//		}		
 	}
 
 	/**

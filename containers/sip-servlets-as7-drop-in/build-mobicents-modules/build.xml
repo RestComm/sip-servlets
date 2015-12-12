@@ -65,6 +65,7 @@
             <maven-resource group="net.java.stun4j" artifact="stun4j"/>
 	    <maven-resource group="org.mobicents.commons" artifact="commons-congestion"/>
 	    <maven-resource group="javolution" artifact="javolution"/>
+	    <maven-resource group="io.netty" artifact="netty-all"/>
         </module-def>
 
     </target>

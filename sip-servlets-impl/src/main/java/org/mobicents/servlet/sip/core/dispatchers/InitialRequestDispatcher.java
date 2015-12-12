@@ -230,7 +230,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 				
 				//Otherwise if no match is found, the UAS rejects the INVITE and returns a 481 Call/Transaction Does Not Exist response.
 //				throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "Join/Replaces Header : no match is found as per RFC 3911, Section 4 or RFC 3891, Section 3 in the request " + request);
-			} else if(joinReplacesDialog != null && ((TransactionApplicationData)joinReplacesDialog.getApplicationData()) != null && !Request.INVITE.equals(((TransactionApplicationData)joinReplacesDialog.getApplicationData()).getSipServletMessage().getMethod())) {
+			} else if(joinReplacesDialog != null && ((TransactionApplicationData)joinReplacesDialog.getApplicationData()) != null && !Request.INVITE.equals(((TransactionApplicationData)joinReplacesDialog.getApplicationData()).getMethod())) {
 				//Likewise, if the Join/Replaces header field matches a dialog which was not created with an INVITE, the UAS MUST reject the request with a 481 response.
 				throw new DispatcherException(Response.CALL_OR_TRANSACTION_DOES_NOT_EXIST, "Join/Replaces header field matches a dialog which was not created with an INVITE as per RFC 3911, Section 4 or RFC 3891, Section 3 in the request " + request);
 			} else if(joinReplacesDialog != null && DialogState.TERMINATED.equals(joinReplacesDialog.getState())) {

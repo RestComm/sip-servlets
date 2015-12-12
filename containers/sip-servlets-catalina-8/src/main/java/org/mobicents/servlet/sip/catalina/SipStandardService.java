@@ -271,6 +271,20 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 			throw new LifecycleException("It's forbidden to set the Base Timer Interval to a non positive value");		
 		}
 		initSipStack();
+		// https://telestax.atlassian.net/browse/MSS-148 make sure we have a default to bin direction for better out of the box experience 
+		if(System.getProperty("telscale.license.dir") == null) {
+			System.setProperty("telscale.license.dir", getCatalinaBase() + File.separatorChar + "bin");
+			if(logger.isDebugEnabled()) {
+				logger.debug("Setting telscale.license.dir directory to : " + getCatalinaBase() + File.separatorChar + "bin");
+			}
+		}
+		if(System.getProperty("telscale.license.key.location") == null) {
+			System.setProperty("telscale.license.key.location", getCatalinaBase() + File.separatorChar + "bin");
+			if(logger.isDebugEnabled()) {
+				logger.debug("Setting telscale.license.key.location directory to : " + getCatalinaBase() + File.separatorChar + "bin");
+			}
+		}
+		
 		sipApplicationDispatcher.setBaseTimerInterval(baseTimerInterval);
 		sipApplicationDispatcher.setT2Interval(t2Interval);
 		sipApplicationDispatcher.setT4Interval(t4Interval);
@@ -453,6 +467,7 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
 				sipStackProperties.setProperty(LOOSE_DIALOG_VALIDATION, "true");
 				sipStackProperties.setProperty(PASS_INVITE_NON_2XX_ACK_TO_LISTENER, "true");
 				sipStackProperties.setProperty("gov.nist.javax.sip.AUTOMATIC_DIALOG_ERROR_HANDLING", "false");
+				sipStackProperties.setProperty("gov.nist.javax.sip.AGGRESSIVE_CLEANUP", "true");
 			}
 			
 			if(sipStackProperties.get(TCP_POST_PARSING_THREAD_POOL_SIZE) == null) {
@@ -1308,7 +1323,49 @@ public class SipStandardService extends StandardService implements CatalinaSipSe
         sipStack.closeReliableConnection(sipConnector.getIpAddress(),sipConnector.getPort(), sipConnector.getTransport(),
                 clientAddress, clientPort);
     }
-    
+
+    /*
+	 * (non-Javadoc)
+	 * @see org.mobicents.servlet.sip.core.SipService#stopGracefully(long)
+	 */
+	public void stopGracefully(long timeToWait) {
+		if(logger.isInfoEnabled()) {
+			logger.info("Stopping the Server Gracefully in " + timeToWait + " ms");
+		}
+		if(timeToWait == 0) {
+			if(gracefulStopFuture != null) {
+				gracefulStopFuture.cancel(false);
+			}
+			try {
+				getServer().stop();
+			} catch (LifecycleException e) {
+				logger.error("The server couldn't be stopped", e);
+			}
+		} else {
+			sipApplicationDispatcher.setGracefulShutdown(true);
+			Iterator<SipContext> sipContexts = sipApplicationDispatcher.findSipApplications();
+			while (sipContexts.hasNext()) {
+				SipContext sipContext = sipContexts.next();
+				sipContext.stopGracefully(timeToWait);
+			}
+			gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().scheduleWithFixedDelay(new ServiceGracefulStopTask(this), 30000, 30000, TimeUnit.MILLISECONDS);
+			if(timeToWait > 0) {
+				gracefulStopFuture = sipApplicationDispatcher.getAsynchronousScheduledExecutor().schedule(
+						new Runnable() {
+							public void run() { 
+								gracefulStopFuture.cancel(false);
+								try {
+									getServer().stop();
+								} catch (LifecycleException e) {
+									logger.error("The server couldn't be stopped", e);
+								}
+							}
+						}
+	                , timeToWait, TimeUnit.MILLISECONDS);
+			}
+		}
+	}
+
 	/**
 	 * @return the dnsTimeout
 	 */

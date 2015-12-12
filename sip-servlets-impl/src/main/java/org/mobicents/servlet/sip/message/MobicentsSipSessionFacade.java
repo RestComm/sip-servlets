@@ -571,4 +571,9 @@ public class MobicentsSipSessionFacade implements MobicentsSipSession, Serializa
     public boolean getBypassProxy() {
         return this.sipSession.getBypassProxy();
     }
+    
+    @Override
+	public void cleanDialogInformation() {
+		this.cleanDialogInformation();
+	}
 }

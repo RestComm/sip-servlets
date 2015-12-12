@@ -50,8 +50,8 @@ public class DefaultSipApplicationSessionTimerService extends
 
     public static final int SCHEDULER_THREAD_POOL_DEFAULT_SIZE = 4;
 
-    public DefaultSipApplicationSessionTimerService() {
-        super(SCHEDULER_THREAD_POOL_DEFAULT_SIZE ,new NamingThreadFactory("sip_default_sas_timer_service"));
+    public DefaultSipApplicationSessionTimerService(String applicationName) {
+        super(SCHEDULER_THREAD_POOL_DEFAULT_SIZE ,new NamingThreadFactory(applicationName + "_sip_default_sas_timer_service"));
         schedulePurgeTaskIfNeeded();
     }
 

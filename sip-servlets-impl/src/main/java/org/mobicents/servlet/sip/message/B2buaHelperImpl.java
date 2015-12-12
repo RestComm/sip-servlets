@@ -727,12 +727,16 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 				for (Transaction transaction: ongoingTransactions) {
 					if (transaction instanceof ServerTransaction) {
 						final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
-						final SipServletMessage sipServletMessage = tad.getSipServletMessage();
-						//not specified if ACK is a committed message in the spec but it seems not since Proxy api test
-						//testCanacel101 method adds a header to the ACK and it cannot be on a committed message
-						//so we don't want to return ACK as pending messages here. related to TCK test B2BUAHelper.testCreateRequest002
-						if (!sipServletMessage.isCommitted() && !Request.ACK.equals(sipServletMessage.getMethod())) {
-							retval.add(sipServletMessage);
+						if(tad != null) {
+							final SipServletMessage sipServletMessage = tad.getSipServletMessage();
+							if(sipServletMessage != null) {
+								//not specified if ACK is a committed message in the spec but it seems not since Proxy api test
+								//testCanacel101 method adds a header to the ACK and it cannot be on a committed message
+								//so we don't want to return ACK as pending messages here. related to TCK test B2BUAHelper.testCreateRequest002
+								if (!sipServletMessage.isCommitted() && !Request.ACK.equals(sipServletMessage.getMethod())) {
+									retval.add(sipServletMessage);
+								}
+							}
 						}
 					}
 				}
@@ -907,22 +911,52 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 							logger.debug("linked transaction state " + linkedTransaction.getState());
 						}
 					}
-					if(force || ((transaction == null || TransactionState.TERMINATED.equals(transaction.getState())) &&
-							(linkedTransaction == null || TransactionState.TERMINATED.equals(linkedTransaction.getState())))) {
+					if(!Request.ACK.equalsIgnoreCase(sipServletRequestImpl.getMethod()) && (force || ((transaction == null || TransactionState.TERMINATED.equals(transaction.getState())) &&
+							(linkedTransaction == null || TransactionState.TERMINATED.equals(linkedTransaction.getState()))))) {
 						this.originalRequestMap.remove(sipServletRequestImpl);	
 						this.originalRequestMap.remove(linkedRequest);
 						if(logger.isDebugEnabled()) {
 							logger.debug("following linked request " + linkedRequest + " unlinked from " + sipServletRequestImpl);
 						}
+						if(!force) {
+							// in case of forceful invalidate there is no need to clean up everything here as we will use standard transaction terminated events
+							// TCK com.bea.sipservlet.tck.apps.apitestapp.B2buaHelper.testGetPendingMessages101 and testGetLinkedSession101
+							// don't remove the Linked Transaction if force is null as the response on the original cannot be sent as the transaction will be null 
+							if(linkedTransaction != null) {
+								linkedRequest.getSipSession().removeOngoingTransaction(linkedTransaction);
+								if(linkedTransaction.getApplicationData() != null) {
+									((TransactionApplicationData)linkedTransaction.getApplicationData()).cleanUp();
+									((TransactionApplicationData)linkedTransaction.getApplicationData()).cleanUpMessage();
+					}
+				}
+							if(transaction != null) {
+								sipServletRequestImpl.getSipSession().removeOngoingTransaction(transaction);
+								if(transaction.getApplicationData() != null) {
+									((TransactionApplicationData)transaction.getApplicationData()).cleanUp();
+									((TransactionApplicationData)transaction.getApplicationData()).cleanUpMessage();
+			}
+		}
+							if(linkedRequest.getSipSession().getOngoingTransactions().isEmpty()) {
+								linkedRequest.getSipSession().cleanDialogInformation();
+							}
+							if(sipServletRequestImpl.getSipSession().getOngoingTransactions().isEmpty()) {
+								sipServletRequestImpl.getSipSession().cleanDialogInformation();
+							}
+							if(!force && linkedRequest.getSipSession().isValidInternal() &&
+									// https://code.google.com/p/sipservlets/issues/detail?id=279
+									linkedRequest.getSipSession().isReadyToInvalidateInternal()) {														
+								linkedRequest.getSipSession().onTerminatedState();							
+							}
+							if(sipServletRequestImpl.getSipSession().isValidInternal() &&
+									// https://code.google.com/p/sipservlets/issues/detail?id=279
+									sipServletRequestImpl.getSipSession().isReadyToInvalidateInternal()) {														
+								sipServletRequestImpl.getSipSession().onTerminatedState();							
+							}
+						}
 					}
 				}
 			}
 		}
-		// Makes TCK B2buaHelperTest.testLinkUnlinkSipSessions001 && B2buaHelperTest.testB2buaHelper 
-		// fails because it cleans up the tx and the response cannot thus be created
-//		if(sipServletRequestImpl != null){
-//			sipServletRequestImpl.cleanUp();
-//		}
 	}
 	
 	/*

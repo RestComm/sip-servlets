@@ -76,6 +76,9 @@ public class ProxyTerminationInfo implements Externalizable {
 	private String callId;
 	private boolean terminationSent; 
 	
+	private long callerCSeq; 	 // Last CSeq seen from caller
+	private long calleeCSeq = 0; // Last CSeq seen from callee (We may never see one if the callee never sends a request)
+	
 	private ProxyImpl proxyImpl;
 	
 	// empty constructor used only for Externalizable interface
@@ -140,6 +143,8 @@ public class ProxyTerminationInfo implements Externalizable {
 			ClassNotFoundException {
 
 		try {
+			calleeCSeq = in.readLong();
+			callerCSeq = in.readLong();
 			calleeContact = SipFactoryImpl.addressFactory.createURI(in.readUTF());
 			callerContact = SipFactoryImpl.addressFactory.createURI(in.readUTF());
 
@@ -171,6 +176,8 @@ public class ProxyTerminationInfo implements Externalizable {
 	 */
 	public void writeExternal(ObjectOutput out) throws IOException {
 
+		out.writeLong(calleeCSeq);
+		out.writeLong(callerCSeq);
 		out.writeUTF(calleeContact.toString());
 		out.writeUTF(callerContact.toString());
 
@@ -246,7 +253,7 @@ public class ProxyTerminationInfo implements Externalizable {
 		sipServletRequest.send();		
 	}
 	
-	public void terminate(final SipSession session, long callerCSeq, long calleeCSeq,
+	public void terminate(final SipSession session, 
 						  final int calleeResponseCode, final String calleeResponseText,
 						  final int callerResponseCode, final String callerResponseText) throws IOException {
 		if(terminationSent) {
@@ -262,5 +269,33 @@ public class ProxyTerminationInfo implements Externalizable {
 	 */
 	public boolean isTerminationSent() {
 		return terminationSent;
+	}
+
+	/**
+	 * @return the callerCSeq
+	 */
+	public long getCallerCSeq() {
+		return callerCSeq;
+	}
+
+	/**
+	 * @param callerCSeq the callerCSeq to set
+	 */
+	public void setCallerCSeq(long callerCSeq) {
+		this.callerCSeq = callerCSeq;
+	}
+
+	/**
+	 * @return the calleeCSeq
+	 */
+	public long getCalleeCSeq() {
+		return calleeCSeq;
+	}
+
+	/**
+	 * @param calleeCSeq the calleeCSeq to set
+	 */
+	public void setCalleeCSeq(long calleeCSeq) {
+		this.calleeCSeq = calleeCSeq;
 	}
 }

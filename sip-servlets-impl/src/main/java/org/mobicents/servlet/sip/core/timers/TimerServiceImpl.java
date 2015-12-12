@@ -40,8 +40,8 @@ public class TimerServiceImpl implements SipServletTimerService {
 	
 	private transient ScheduledThreadPoolExecutor scheduledExecutor;
 	
-	public TimerServiceImpl(SipService sipService) {		
-		scheduledExecutor = new ScheduledThreadPoolExecutor(SCHEDULER_THREAD_POOL_DEFAULT_SIZE, new NamingThreadFactory("sip_servlets_timer_service"));
+	public TimerServiceImpl(SipService sipService, String applicationName) {		
+		scheduledExecutor = new ScheduledThreadPoolExecutor(SCHEDULER_THREAD_POOL_DEFAULT_SIZE,new NamingThreadFactory(applicationName + "_sip_default_sas_timer_service"));
 		int purgePeriod = sipService.getCanceledTimerTasksPurgePeriod();
 		if(purgePeriod > 0) {
 			Runnable r = new Runnable() {			

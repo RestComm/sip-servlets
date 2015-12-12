@@ -320,15 +320,27 @@ public class ResponseDispatcher extends MessageDispatcher {
 			}			
 			
 			if(sipServletResponse.getRequest() == null && tmpSession.getProxy() != null) {
-				for(ProxyBranch pbi:tmpSession.getProxy().getProxyBranches()) {
-					ProxyBranchImpl pb = (ProxyBranchImpl) pbi;
-					Request r = (Request) ((SipServletRequestImpl)pb.getRequest()).getMessage();
-					ViaHeader via1 = (ViaHeader) r.getHeader(ViaHeader.NAME);
-					ViaHeader via2 = (ViaHeader) response.getHeader(ViaHeader.NAME);
-					if(via1.getBranch().equals(via2.getBranch())) {
-						sipServletResponse.setOriginalRequest(((SipServletRequestImpl)pb.getRequest()));
-						break;
+				if(!tmpSession.getProxy().getProxyBranches().isEmpty()) {
+					for(ProxyBranch pbi:tmpSession.getProxy().getProxyBranches()) {
+						ProxyBranchImpl pb = (ProxyBranchImpl) pbi;
+						Request r = (Request) ((SipServletRequestImpl)pb.getRequest()).getMessage();
+						ViaHeader via1 = (ViaHeader) r.getHeader(ViaHeader.NAME);
+						ViaHeader via2 = (ViaHeader) response.getHeader(ViaHeader.NAME);
+						if(via1.getBranch().equals(via2.getBranch())) {
+							if(logger.isDebugEnabled()) {
+								logger.debug("setting original request for response on proxy branch " + pb.getTargetURI());
+							}
+							sipServletResponse.setOriginalRequest(((SipServletRequestImpl)pb.getRequest()));
+							break;
+						}
 					}
+				} else if(tmpSession.getProxy().getFinalBranchForSubsequentRequests() != null) {
+					// the list of proxy branches may be empty on retransmissions as the branches may have been cleaned up already
+					// so we use the final branch
+					if(logger.isDebugEnabled()) {
+						logger.debug("setting original request for response on proxy final branch " + tmpSession.getProxy().getFinalBranchForSubsequentRequests().getTargetURI());
+					}
+					sipServletResponse.setOriginalRequest(((SipServletRequestImpl)tmpSession.getProxy().getFinalBranchForSubsequentRequests().getRequest()));
 				}
 			}
 			
