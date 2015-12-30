@@ -2357,6 +2357,12 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
                 return null;
             }
             return ((SIPRequest)message).getRemoteAddress().getHostAddress();
+        } else if (message != null && 
+                message instanceof SIPRequest && 
+                ((SIPRequest)message).getRemoteAddress() != null ) {
+            //https://github.com/Mobicents/jain-sip/issues/42
+            //take advantage of new message methods to extract addr from msg            
+            return ((SIPRequest)message).getRemoteAddress().getHostAddress();
         } else if(getTransaction() != null) {
             if(logger.isTraceEnabled()) {
                 logger.trace("transaction not null, returning packet source ip address");
@@ -2397,6 +2403,11 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
             if(message == null ) {
                 return -1;
             }
+            return ((SIPRequest)message).getRemotePort();
+        } else if (message != null && 
+                message instanceof SIPRequest ) {
+            //https://github.com/Mobicents/jain-sip/issues/42
+            //take advantage of new message methods to extract port from msg
             return ((SIPRequest)message).getRemotePort();
         } else if(getTransaction() != null) {
             if(logger.isTraceEnabled()) {
