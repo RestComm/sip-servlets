@@ -684,16 +684,22 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 			}
 		}
 		
-		// Sort best do far				
-		if(bestResponse == null || bestResponse.getStatus() > status)
+		// https://telestax.desk.com/web/agent/case/1805
+                //Check priority if not 6XX, the lower response is the best
+                //Otherwise, 6XX must always win(first received).
+		if(bestResponse == null || bestResponse.getStatus() < 600)
 		{
-			//Assume 600 and 400 are equally bad, the better one is the one that came first (TCK doBranchBranchTest)
 			if(bestResponse != null) {
-				if(status < 400) {
+                            //we know current best response is not 6XX
+                            //if new response is 6XX or less than bestResponse, 
+                            //update best response
+                            if (status >= 600 || 
+                                    status < bestResponse.getStatus()) {
 					bestResponse = response;
 					bestBranch = branch;
 				}
 			} else {
+                            //no previous response, just take new one
 				bestResponse = response;
 				bestBranch = branch;
 			}
