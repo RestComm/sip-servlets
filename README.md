@@ -19,7 +19,7 @@ Architecture
 ========
 RestComm SIP Servlets implements the latest SIP Servlet v1.1 (JSR 289) standard. It can be plugged into any Application Server container (currently 7.X and JBoss 7.X) and also offers High Availability and Failover on its corresponding product from [TeleStax, Inc.](http://www.telestax.com) 
 
-![](https://raw.githubusercontent.com/wiki/RestComm/sip-servlets/images/MSS%20WebSockets%20Stack.png)
+![](https://raw.githubusercontent.com/wiki/RestComm/sip-servlets/images/RestComm-SIP-Servlets-Stack.png)
 
 Downloads
 ========
@@ -39,7 +39,7 @@ Issue Tracking and Roadmap
 
 Questions ?
 ========
-Please ask your question on [StackOverflow](http://stackoverflow.com/search?q=RestComm) or the Google [public forum](http://groups.google.com/group/RestComm-public)
+Please ask your question on [StackOverflow](http://stackoverflow.com/questions/tagged/restcomm) or the Google [public forum](http://groups.google.com/group/restcomm)
 
 License
 ========
@@ -50,7 +50,7 @@ RestComm SIP Servlets is licensed under dual license policy. The default license
 
 Continuous Integration and Delivery
 ========
-[![RestComm SIP Servlets Continuous Job](http://www.cloudbees.com/sites/default/files/Button-Built-on-CB-1.png)](https://RestComm.ci.cloudbees.com/job/RestCommSipServlets-Release/)
+[![RestComm SIP Servlets Continuous Job](http://www.cloudbees.com/sites/default/files/Button-Built-on-CB-1.png)](https://mobicents.ci.cloudbees.com/job/MobicentsSipServlets-Release/)
 
 Acknowledgements
 ========
