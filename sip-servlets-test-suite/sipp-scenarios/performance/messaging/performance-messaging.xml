@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE scenario SYSTEM "sipp.dtd">
+
+<scenario name="UAC for SIP-Servlets Tests">
+
+  <send retrans="500">
+    <![CDATA[
+
+      MESSAGE sip:[service]@[remote_ip]:[remote_port] SIP/2.0
+      Via: SIP/2.0/[transport] [local_ip]:[local_port];branch=[branch]
+      From: sipp <sip:sipp@[local_ip]:[local_port]>;tag=[call_number]
+      To: sut <sip:[service]@[remote_ip]:[remote_port]>
+      Call-ID: [call_id]
+      CSeq: 1 MESSAGE
+      Contact: sip:sipp@[local_ip]:[local_port]
+      Max-Forwards: 70
+      Content-Type: text/plain
+      Content-Length: [len]
+
+      Hello World!
+
+    ]]>
+  </send>
+
+  <recv response="100" optional="true">
+  </recv>
+  
+  <recv response="200" rtd="true" rrs="true">
+  </recv>
+
+  <pause milliseconds="3000"/>
+
+</scenario>
