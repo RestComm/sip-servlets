@@ -43,24 +43,22 @@ public class ProxyBranchTimerTask extends TimerTask{
 	@Override
 	public void run()
 	{
+		final SipContext sipContext = sipApplicationSession.getSipContext();
+		boolean batchStarted = false;
 		try {
-				final SipContext sipContext = sipApplicationSession.getSipContext();
 				// https://github.com/Mobicents/sip-servlets/issues/70 This timer task needs to be executed 
 				// only if the sipapplicationsession is not currently in use or there is concurrency issues
 				sipContext.enterSipApp(sipApplicationSession, null, false, true);
-				boolean batchStarted = sipContext.enterSipAppHa(true);
+				batchStarted = sipContext.enterSipAppHa(true);
 				if(proxyBranch != null) {
-					try {
-						proxyBranch.onTimeout(this.responseType);
-					} finally {							
-						sipContext.exitSipAppHa(null, null, batchStarted);
-						sipContext.exitSipApp(sipApplicationSession, null);
-					}
+					proxyBranch.onTimeout(this.responseType);
 				}
 		} catch (Exception e) {
 			logger.error("Problem in timeout task", e);
 		} finally {
 			this.proxyBranch = null;
+			sipContext.exitSipAppHa(null, null, batchStarted);
+			sipContext.exitSipApp(sipApplicationSession, null);
 		}
 	}
 	
