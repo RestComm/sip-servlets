@@ -257,8 +257,14 @@ public class TransactionApplicationData implements Serializable, MobicentsTransa
 		}
 	}
 
+	// https://github.com/RestComm/sip-servlets/issues/107
+	// this one may need to nbe synchronized as it can be called 
+	// for cleanup from multiple places and may result in 
+	// sipservletmessage being null sometimes and throwing NPE
 	public void cleanUpMessage() {
 		if(sipServletMessage != null) {
+			sipSessionKey = sipServletMessage.getSipSessionKey();
+			method = sipServletMessage.getMethod();
 			if(logger.isDebugEnabled()) {
 				logger.debug("cleaning up the application data from the sipservletmessage");
 			}
@@ -266,8 +272,6 @@ public class TransactionApplicationData implements Serializable, MobicentsTransa
 			if(sipServletMessage instanceof SipServletRequestImpl) {
 				((SipServletRequestImpl)sipServletMessage).cleanUpLastResponses();
 			}
-			sipSessionKey = sipServletMessage.getSipSessionKey();
-			method = sipServletMessage.getMethod();
 			sipServletMessage = null;
 		}
 	}
