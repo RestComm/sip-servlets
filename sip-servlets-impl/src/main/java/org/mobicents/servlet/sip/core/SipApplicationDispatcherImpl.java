@@ -1134,10 +1134,11 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		}
 		
 		getAsynchronousExecutor().execute(new Runnable() {
+			// https://github.com/RestComm/sip-servlets/issues/107 guard against NPEon concurrent cleanup
+			final TransactionApplicationData dialogAppData = (TransactionApplicationData) dialog.getApplicationData();
 			public void run() {			
 				try {
 					boolean appDataFound = false;
-					TransactionApplicationData dialogAppData = (TransactionApplicationData) dialog.getApplicationData();
 					TransactionApplicationData txAppData = null; 
 					if(dialogAppData != null) {						
 						if(dialogAppData.getSipServletMessage() == null) {
@@ -1281,15 +1282,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		if(timeoutEvent.getReason() == Reason.AckNotReceived) {
 			final TransactionApplicationData tad = (TransactionApplicationData) dialog.getApplicationData();
 			if(tad != null && tad.getSipServletMessage() != null) {
+				// https://github.com/RestComm/sip-servlets/issues/107 guard against NPEon concurrent cleanup
+				final SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
+				final MobicentsSipSessionKey sipSessionKey = sipServletMessage.getSipSessionKey();
+				final MobicentsSipSession sipSession = sipServletMessage.getSipSession();
 				getAsynchronousExecutor().execute(new Runnable() {
 					public void run() {			
 						if(logger.isDebugEnabled()) {
 							logger.info("Running process dialog timeout " + dialog + " reason => " + timeoutEvent.getReason());
 						}	
 						try {
-							final SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
-							final MobicentsSipSessionKey sipSessionKey = sipServletMessage.getSipSessionKey();
-							final MobicentsSipSession sipSession = sipServletMessage.getSipSession();
 							if(sipSession != null) {
 								SipContext sipContext = findSipApplication(sipSessionKey.getApplicationName());					
 								//the context can be null if the server is being shutdown
@@ -1349,16 +1351,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 
 		final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
 		if(tad != null && tad.getSipServletMessage() != null) {
-
+			// https://github.com/RestComm/sip-servlets/issues/107 guard against NPEon concurrent cleanup
+			final SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
+			final MobicentsSipSessionKey sipSessionKey = sipServletMessage.getSipSessionKey();
+			final MobicentsSipSession sipSession = sipServletMessage.getSipSession();
 			getAsynchronousExecutor().execute(new Runnable() {
 				public void run() {
 					try {
 						if(logger.isDebugEnabled()) {
 							logger.debug("transaction " + transaction + " timed out => " + transaction.getRequest().toString());
 						}
-						SipServletMessageImpl sipServletMessage = tad.getSipServletMessage();
-						MobicentsSipSessionKey sipSessionKey = sipServletMessage.getSipSessionKey();
-						MobicentsSipSession sipSession = sipServletMessage.getSipSession();					
 						boolean appNotifiedOfPrackNotReceived = false;
 						// session can be null if a message was sent outside of the container by the container itself during Initial request dispatching
 						// but the external host doesn't send any response so we call out to the application only if the session is not null
@@ -1556,12 +1558,13 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 		final TransactionApplicationData tad = (TransactionApplicationData) transaction.getApplicationData();
 		final String branchId = transaction.getBranchId();
 		if(tad != null && tad.getSipServletMessage() != null) {
+			// https://github.com/RestComm/sip-servlets/issues/107 guard against NPEon concurrent cleanup
+			final SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
+			final MobicentsSipSessionKey sipSessionKey = sipServletMessageImpl.getSipSessionKey();
+			final MobicentsSipSession sipSession = sipServletMessageImpl.getSipSession();
 			getAsynchronousExecutor().execute(new Runnable() {
 				public void run() {
 					try {
-						SipServletMessageImpl sipServletMessageImpl = tad.getSipServletMessage();
-						MobicentsSipSessionKey sipSessionKey = sipServletMessageImpl.getSipSessionKey();
-						MobicentsSipSession sipSession = sipServletMessageImpl.getSipSession();
 						MobicentsB2BUAHelper b2buaHelperImpl = null;
 						if(sipSession != null) {
 							b2buaHelperImpl = sipSession.getB2buaHelper();
