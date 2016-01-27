@@ -20,6 +20,7 @@
 package org.mobicents.servlet.sip.core.dispatchers;
 
 import gov.nist.javax.sip.SipStackExt;
+import gov.nist.javax.sip.address.GenericURI;
 import gov.nist.javax.sip.header.extensions.JoinHeader;
 import gov.nist.javax.sip.header.extensions.ReplacesHeader;
 
@@ -468,8 +469,10 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 			logger.info("Dispatching the request event outside the container");
 		}
 		//check if the request point to another domain
-		if(request.getRequestURI() instanceof TelURL) {
-			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot dispatch a request with a tel url request uri outside the container ");
+		if(request.getRequestURI() instanceof TelURL ||
+				// https://github.com/RestComm/sip-servlets/issues/108
+				request.getRequestURI() instanceof GenericURI) {
+			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot dispatch a request with a tel url or generic request uri outside the container ");
 		}
 		javax.sip.address.SipURI sipRequestUri = (javax.sip.address.SipURI)request.getRequestURI();
 		
