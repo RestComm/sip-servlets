@@ -9,20 +9,20 @@
 		<version>3.0.0-SNAPSHOT</version>
 	</parent>
 	
-	<artifactId>sip-servlets-docs-sources-mobicents</artifactId>
+	<artifactId>sip-servlets-docs-sources-restcomm</artifactId>
 			
 	<properties>
-		<platform.name>Mobicents</platform.name>
+		<platform.name>RestComm</platform.name>
 		<short.platform.name>MSS</short.platform.name>
 		<cmd.platform.name>mss</cmd.platform.name>		
 		<home.link>mobicents-all-1.2.1.GA-jboss-4.2.3.GA/jboss/</home.link>
-		<mss4j.release.zip>mss-1.6.0.FINAL-jboss-jdk6-5.1.0.GA-1007051519.zip</mss4j.release.zip>
-		<mss4t.release.zip>mss-1.6.0.FINAL-apache-tomcat-6.0.20-1007051527.zip</mss4t.release.zip>	
+		<mss4j.release.zip>mss-3.1.633-jboss-as-7.2.0.Final.zip</mss4j.release.zip>
+		<mss4t.release.zip>mss-3.1.633-apache-tomcat-8.0.26.zip</mss4t.release.zip>	
 		<author.email.ivelin>ivelin.atanasoff.ivanov (at) gmail.com</author.email.ivelin>
 		<author.email.jean>jean.deruelle (at) gmail.com</author.email.jean>
 		<author.email.vlad>vladimir.ralev (at) gmail.com</author.email.vlad>
 		<author.email.charles>charles.roufay (at) gmail.com</author.email.charles>
-		<download.link>https://code.google.com/p/sipservlets/wiki/Downloads</download.link>
+		<download.link>https://github.com/RestComm/sip-servlets/releases/latest</download.link>
 	</properties>
 	
 	<build>
