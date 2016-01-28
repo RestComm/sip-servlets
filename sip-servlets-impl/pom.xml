@@ -12,7 +12,7 @@
 	<url>https://github.com/RestComm/sip-servlets</url>
 
 	<properties>
-		<mobicents.name>Restcomm</mobicents.name>
+		<restcomm.name>Restcomm</restcomm.name>
 		<maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
 		<release.timestamp>${maven.build.timestamp}</release.timestamp>		
 	</properties>
