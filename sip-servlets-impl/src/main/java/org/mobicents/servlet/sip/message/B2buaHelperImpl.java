@@ -927,15 +927,15 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 								if(linkedTransaction.getApplicationData() != null) {
 									((TransactionApplicationData)linkedTransaction.getApplicationData()).cleanUp();
 									((TransactionApplicationData)linkedTransaction.getApplicationData()).cleanUpMessage();
-					}
-				}
+								}
+							}
 							if(transaction != null) {
 								sipServletRequestImpl.getSipSession().removeOngoingTransaction(transaction);
 								if(transaction.getApplicationData() != null) {
 									((TransactionApplicationData)transaction.getApplicationData()).cleanUp();
 									((TransactionApplicationData)transaction.getApplicationData()).cleanUpMessage();
-			}
-		}
+								}
+							}
 							if(linkedRequest.getSipSession().getOngoingTransactions().isEmpty()) {
 								linkedRequest.getSipSession().cleanDialogInformation();
 							}
