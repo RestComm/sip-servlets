@@ -10,7 +10,7 @@
 	<artifactId>sip-servlets-tomcat-7</artifactId>
 	<packaging>jar</packaging>
 	<name>Sip Servlets Loading Specifics for Tomcat 7</name>
-	<url>http://www.mobicents.org/products_sip_servlets.html</url>
+	<url>https://github.com/RestComm/sip-servlets</url>
 	<dependencies>
 		<dependency>
 			<groupId>javax.sip</groupId>
@@ -76,15 +76,15 @@
 
 		<dependency>			
 			<groupId>org.mobicents.javax.sip</groupId>
-			<artifactId>mobicents-jain-sip-ext</artifactId>
-			<version>${mobicents.jain.sip.ext.version}</version>
+			<artifactId>restcomm-jain-sip-ext</artifactId>
+			<version>${restcomm.jain.sip.ext.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.mobicents.tools</groupId>
 			<artifactId>sip-balancer-jar</artifactId>
-			<version>${mobicents.balancer.version}</version>
+			<version>${restcomm.balancer.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -128,7 +128,7 @@
 			<plugin>
 				<artifactId>maven-eclipse-plugin</artifactId>
 				<groupId>org.mobicents.tools</groupId>
-				<version>${mobicents.tools.mavenplugin.eclipse.version}</version>
+				<version>${restcomm.tools.mavenplugin.eclipse.version}</version>
 				<inherited>false</inherited>
 				<executions />
 				<configuration>

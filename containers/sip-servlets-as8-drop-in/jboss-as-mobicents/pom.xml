@@ -32,11 +32,11 @@
     </parent>
 
     <groupId>org.mobicents.servlet.sip.containers</groupId>
-    <artifactId>jboss-as8-mobicents</artifactId>
+    <artifactId>jboss-as8-restcomm</artifactId>
     <packaging>jar</packaging>
 
-    <name>JBoss Application Server: Mobicents Sip Servlets Adaptation Layer</name>
-    <description>&gt;JBoss Application Server: Mobicents Sip Servlets Adaptation Layer</description>
+    <name>JBoss Application Server: Restcomm Sip Servlets Adaptation Layer</name>
+    <description>&gt;JBoss Application Server: Restcomm Sip Servlets Adaptation Layer</description>
 
     <properties>
         <junit.version>4.1</junit.version>
@@ -205,8 +205,8 @@
         <!-- mobicents sip stack extensions deps -->
         <dependency>            
             <groupId>org.mobicents.javax.sip</groupId>
-            <artifactId>mobicents-jain-sip-ext</artifactId>
-            <version>${mobicents.jain.sip.ext.version}</version>
+            <artifactId>restcomm-jain-sip-ext</artifactId>
+            <version>${restcomm.jain.sip.ext.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -223,8 +223,8 @@
         </dependency>
         <dependency>
             <groupId>org.mobicents.ha.javax.sip</groupId>
-            <artifactId>mobicents-jain-sip-ha-core</artifactId>
-            <version>${mobicents.jain.sip.ha.version}</version>
+            <artifactId>restcomm-jain-sip-ha-core</artifactId>
+            <version>${restcomm.jain.sip.ha.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -9,8 +9,8 @@
 	<groupId>org.mobicents.servlet.sip.containers</groupId>
 	<artifactId>sip-servlets-as8</artifactId>
 	<packaging>jar</packaging>
-	<name>Mobicents Sip Servlets AS8 Abstract Layer</name>
-	<url>http://www.mobicents.org/products_sip_servlets.html</url>
+	<name>Sip Servlets AS8 Abstract Layer</name>
+	<url>https://github.com/RestComm/sip-servlets</url>
 	<dependencies>
 		<!-- dependency>
 		    <groupId>javax</groupId>
@@ -103,14 +103,14 @@
 		<!-- mobicents sip stack extensions deps -->
 		<dependency>			
 			<groupId>org.mobicents.ha.javax.sip</groupId>
-			<artifactId>mobicents-jain-sip-ha-core</artifactId>
-			<version>${mobicents.jain.sip.ha.version}</version>	
+			<artifactId>restcomm-jain-sip-ha-core</artifactId>
+			<version>${restcomm.jain.sip.ha.version}</version>	
 			<scope>provided</scope>
 		</dependency>
 		<dependency>			
 			<groupId>org.mobicents.javax.sip</groupId>
-			<artifactId>mobicents-jain-sip-ext</artifactId>
-			<version>${mobicents.jain.sip.ext.version}</version>
+			<artifactId>restcomm-jain-sip-ext</artifactId>
+			<version>${restcomm.jain.sip.ext.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -158,7 +158,7 @@
 			<plugin>
 				<artifactId>maven-eclipse-plugin</artifactId>
    				<groupId>org.mobicents.tools</groupId>
-    				<version>${mobicents.tools.mavenplugin.eclipse.version}</version>
+    				<version>${restcomm.tools.mavenplugin.eclipse.version}</version>
 				<inherited>false</inherited>
 				<executions />
 				<configuration>

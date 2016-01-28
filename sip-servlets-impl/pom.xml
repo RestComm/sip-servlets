@@ -9,10 +9,10 @@
 	<artifactId>sip-servlets-impl</artifactId>
 	<packaging>jar</packaging>
 	<name>Sip Servlets Implementation</name>
-	<url>http://www.mobicents.org/products_sip_servlets.html</url>
+	<url>https://github.com/RestComm/sip-servlets</url>
 
 	<properties>
-		<mobicents.name>Mobicents</mobicents.name>
+		<mobicents.name>Restcomm</mobicents.name>
 		<maven.build.timestamp.format>yyyyMMddHHmm</maven.build.timestamp.format>
 		<release.timestamp>${maven.build.timestamp}</release.timestamp>		
 	</properties>
@@ -118,15 +118,15 @@
 		<!-- mobicents sip stack extensions deps -->
 		<dependency>
 			<groupId>org.mobicents.ha.javax.sip</groupId>
-			<artifactId>mobicents-jain-sip-ha-core</artifactId>
-			<version>${mobicents.jain.sip.ha.version}</version>
+			<artifactId>restcomm-jain-sip-ha-core</artifactId>
+			<version>${restcomm.jain.sip.ha.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.mobicents.javax.sip</groupId>
-			<artifactId>mobicents-jain-sip-ext</artifactId>
-			<version>${mobicents.jain.sip.ext.version}</version>
+			<artifactId>restcomm-jain-sip-ext</artifactId>
+			<version>${restcomm.jain.sip.ext.version}</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
@@ -159,7 +159,7 @@
 			<plugin>
 				<artifactId>maven-eclipse-plugin</artifactId>
 				<groupId>org.mobicents.tools</groupId>
-				<version>${mobicents.tools.mavenplugin.eclipse.version}</version>
+				<version>${restcomm.tools.mavenplugin.eclipse.version}</version>
 				<inherited>false</inherited>
 				<executions />
 				<configuration>
@@ -213,7 +213,7 @@
 									<goal> copy-dependencies </goal>
 								</goals>
 								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,activation,mail,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext,commons-codec</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec</includeArtifactIds>
 									<outputDirectory>${CATALINA_HOME}/lib</outputDirectory>
 								</configuration>
 							</execution>
@@ -264,7 +264,7 @@
 									<goal> copy-dependencies </goal>
 								</goals>
 								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext,commons-codec</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec</includeArtifactIds>
 									<outputDirectory>${env.CATALINA_HOME}/lib</outputDirectory>
 								</configuration>
 							</execution>
@@ -315,7 +315,7 @@
 									<goal> copy-dependencies </goal>
 								</goals>
 								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,activation,mail,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext,commons-codec</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec</includeArtifactIds>
 									<outputDirectory>${CATALINA_HOME}/lib</outputDirectory>
 								</configuration>
 							</execution>
@@ -366,7 +366,7 @@
 									<goal> copy-dependencies </goal>
 								</goals>
 								<configuration>
-									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,mobicents-jain-sip-ha-core,mobicents-jain-sip-ext,commons-codec</includeArtifactIds>
+									<includeArtifactIds>jain-sip-api,jain-sip-ri,concurrent,log4j,commons-logging,dnsjava,stun4j,activation,mail,restcomm-jain-sip-ha-core,restcomm-jain-sip-ext,commons-codec</includeArtifactIds>
 									<outputDirectory>${env.CATALINA_HOME}/lib</outputDirectory>
 								</configuration>
 							</execution>

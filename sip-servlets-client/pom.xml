@@ -9,7 +9,7 @@
 	<artifactId>sip-servlets-client</artifactId>
 	<packaging>jar</packaging>
 	<name>Mobicents Sip Servlets Client</name>
-	<url>http://www.mobicents.org/products_sip_servlets.html</url>
+	<url>https://github.com/RestComm/sip-servlets</url>
 	<dependencies>
 		<!-- sip servlet spec dependency -->
 		<dependency>
@@ -30,7 +30,7 @@
 			<plugin>
 				<artifactId>maven-eclipse-plugin</artifactId>
    				<groupId>org.mobicents.tools</groupId>
-    				<version>${mobicents.tools.mavenplugin.eclipse.version}</version>
+    				<version>${restcomm.tools.mavenplugin.eclipse.version}</version>
 				<inherited>false</inherited>
 				<executions />
 				<configuration>
