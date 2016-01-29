@@ -587,12 +587,18 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 						applicationName, message, false);
 			}
 		}
+		if(logger.isDebugEnabled()) {
+			logger.debug("app name" + applicationName + " and sessionKey = " + sessionKey);
+		}
 		if(applicationName != null && sessionKey != null) {
 			final SipContext sipContext = sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(applicationName);
 			//call id not needed anymore since the sipappsessionkey is not a callid anymore but a random uuid
 			final SipApplicationSessionKey sipApplicationSessionKey = SessionManagerUtil.getSipApplicationSessionKey(
 					applicationName, 
 					sessionKey.getApplicationSessionId(), null);
+			if(logger.isDebugEnabled()) {
+				logger.debug("trying to load the sip app session with Key " + sipApplicationSessionKey + " and create = " + true);
+			}
 			MobicentsSipApplicationSession applicationSession =  sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, create);
 			if(applicationSession != null) {
 				// application session can be null if create is false and it is an orphan request
@@ -1113,11 +1119,21 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 */
 	public final MobicentsSipSession getSipSession() {	
 		if(sipSession == null && sessionKey != null) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("session is null, trying to load the session from the sessionKey " + sessionKey);
+			}
 			final String applicationName = sessionKey.getApplicationName(); 
 			final SipContext sipContext = sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(applicationName);
 			SipApplicationSessionKey sipApplicationSessionKey = new SipApplicationSessionKey(sessionKey.getApplicationSessionId(), sessionKey.getApplicationName(), null);
 			MobicentsSipApplicationSession sipApplicationSession = sipContext.getSipManager().getSipApplicationSession(sipApplicationSessionKey, false);
 			sipSession = sipContext.getSipManager().getSipSession(sessionKey, false, sipFactoryImpl, sipApplicationSession);	
+			if(logger.isDebugEnabled()) {
+				if(sipSession == null) {
+					logger.debug("couldn't find any session with sessionKey " + sessionKey);
+				} else {
+					logger.debug("relaoded session session " + sipSession + " with sessionKey " + sessionKey);
+				}
+			}
 		} 
 		return sipSession; 
 	}
@@ -1132,11 +1148,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		this.sipSession = session;
         if (session != null){
             this.sessionKey = session.getKey();
-        } 
-        // overkill, => is causing https://github.com/RestComm/sip-servlets/issues/101
-//        else {
-//            this.sessionKey = null;
-//        }
+        } else {
+            this.sessionKey = null;
+        }
 	}
 
 	/**
