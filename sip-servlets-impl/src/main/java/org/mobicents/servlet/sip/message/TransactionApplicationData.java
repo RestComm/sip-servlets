@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.sip.Address;
@@ -43,6 +44,7 @@ public class TransactionApplicationData implements Serializable, MobicentsTransa
 
 	private static final long serialVersionUID = 9170581635026591070L;
 	private static final Logger logger = Logger.getLogger(TransactionApplicationData.class);
+	private AtomicBoolean messageCleanedUp; 
 	private ProxyBranchImpl proxyBranch;	
 	private SipServletMessageImpl sipServletMessage;
 	private String method;
@@ -65,7 +67,8 @@ public class TransactionApplicationData implements Serializable, MobicentsTransa
 	
 	public TransactionApplicationData(SipServletMessageImpl sipServletMessage ) {		
 		this.sipServletMessage = sipServletMessage;
-		sipServletResponses = null;		
+		sipServletResponses = null;
+		messageCleanedUp = new AtomicBoolean(false);
 	}
 	
 	public void setProxyBranch(ProxyBranchImpl proxyBranch) {
@@ -257,22 +260,24 @@ public class TransactionApplicationData implements Serializable, MobicentsTransa
 		}
 	}
 
-	// https://github.com/RestComm/sip-servlets/issues/107
-	// this one may need to nbe synchronized as it can be called 
-	// for cleanup from multiple places and may result in 
-	// sipservletmessage being null sometimes and throwing NPE
 	public void cleanUpMessage() {
-		if(sipServletMessage != null) {
-			sipSessionKey = sipServletMessage.getSipSessionKey();
-			method = sipServletMessage.getMethod();
-			if(logger.isDebugEnabled()) {
-				logger.debug("cleaning up the application data from the sipservletmessage");
+		// https://github.com/RestComm/sip-servlets/issues/107
+		// this one may need to be synchronized as it can be called 
+		// for cleanup from multiple places and may result in 
+		// sipservletmessage being null sometimes and throwing NPE
+		if(messageCleanedUp.compareAndSet(false, true)) {
+			if(sipServletMessage != null) {
+				sipSessionKey = sipServletMessage.getSipSessionKey();
+				method = sipServletMessage.getMethod();
+				if(logger.isDebugEnabled()) {
+					logger.debug("cleaning up the application data from the sipservletmessage");
+				}
+				sipServletMessage.cleanUp();
+				if(sipServletMessage instanceof SipServletRequestImpl) {
+					((SipServletRequestImpl)sipServletMessage).cleanUpLastResponses();
+				}
+				sipServletMessage = null;
 			}
-			sipServletMessage.cleanUp();
-			if(sipServletMessage instanceof SipServletRequestImpl) {
-				((SipServletRequestImpl)sipServletMessage).cleanUpLastResponses();
-			}
-			sipServletMessage = null;
 		}
 	}
 	
