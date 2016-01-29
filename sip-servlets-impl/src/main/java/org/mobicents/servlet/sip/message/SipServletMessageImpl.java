@@ -185,6 +185,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		this.message = message;
 		this.transaction = transaction;
 		if(sipSession != null) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("SESSIONKEY before:" + sessionKey);
+                        }                    
 			this.sessionKey = sipSession.getKey();
                         if (logger.isDebugEnabled()) {
                             logger.debug("SESSIONKEY SET to:" + sessionKey);
@@ -585,6 +588,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 					logger.debug("Orphans session " + applicationName + " " + sessionKey);
 				}
 				orphan = true;
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug("SESSIONKEY before:" + sessionKey);
+                                }
 				sessionKey = SessionManagerUtil.getSipSessionKey(
 						SessionManagerUtil.getSipApplicationSessionKey(applicationName, getAppSessionId(), null).getId(),
 						applicationName, message, false);
@@ -1110,6 +1116,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 					sipFactoryImpl, sipApplicationSessionImpl);
 			session.setSessionCreatingTransactionRequest(this);
 			session.setOrphan(isOrphan());
+                        if (logger.isDebugEnabled()) {
+                                    logger.debug("SESSIONKEY before:" + sessionKey);
+                                }
 			sessionKey = session.getKey();
                         if (logger.isDebugEnabled()) {
                                     logger.debug("SESSIONKEY SET to:" + sessionKey);
@@ -1156,6 +1165,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		// but it will not be persisted to avoid unecessary replication if the message is persisted
 		this.sipSession = session;
         if (session != null){
+            if (logger.isDebugEnabled()) {
+                                    logger.debug("SESSIONKEY before:" + sessionKey);
+                                }
             this.sessionKey = session.getKey();
             if (logger.isDebugEnabled()) {
                 logger.debug("SESSIONKEY SET to:" +sessionKey);
@@ -1176,6 +1188,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	}
 
 	public void setSipSessionKey(MobicentsSipSessionKey sessionKey) {
+            if (logger.isDebugEnabled()) {
+                                    logger.debug("SESSIONKEY before:" + sessionKey);
+                                }
 		this.sessionKey = sessionKey;
                 if (logger.isDebugEnabled() ) {
                                     logger.debug("SESSIONKEY SET to:" + sessionKey);
@@ -2106,6 +2121,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		String sessionKeyString = in.readUTF();
 		if (sessionKeyString.length() > 0) {
 			try {
+                            if (logger.isDebugEnabled()) {
+                                    logger.debug("SESSIONKEY before:" + sessionKey);
+                                }
 				sessionKey = SessionManagerUtil.parseSipSessionKey(sessionKeyString);
                                 if (logger.isDebugEnabled()) {
                                     logger.debug("SESSIONKEY SET to:" + sessionKey);
