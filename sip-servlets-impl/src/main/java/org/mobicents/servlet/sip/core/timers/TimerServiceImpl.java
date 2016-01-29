@@ -36,7 +36,9 @@ public class TimerServiceImpl implements SipServletTimerService {
 	private static final Logger logger = Logger.getLogger(TimerServiceImpl.class
 			.getName());
 	
-	public static final int SCHEDULER_THREAD_POOL_DEFAULT_SIZE = 4;
+        //Partly fixes https://github.com/RestComm/RestComm-Core/issues/789
+        //TODO make it configurable
+	public static final int SCHEDULER_THREAD_POOL_DEFAULT_SIZE = 64;
 	
 	private transient ScheduledThreadPoolExecutor scheduledExecutor;
 	
