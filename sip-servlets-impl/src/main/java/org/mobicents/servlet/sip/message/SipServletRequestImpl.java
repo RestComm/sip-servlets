@@ -1371,10 +1371,12 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
                     	return;
                     }
 				}
-				request.removeFirst(ViaHeader.NAME);
-				request.removeFirst(ContactHeader.NAME);
-				setTransaction(null);
+
 				message = (Request) request.clone();
+                message.removeFirst(ViaHeader.NAME);
+                message.removeFirst(ContactHeader.NAME);
+				setTransaction(null);
+
 				if(ex.getCause() != null && ex.getCause() instanceof IOException) {				
 					throw (IOException) ex.getCause();
 				}
