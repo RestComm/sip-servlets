@@ -21,20 +21,20 @@
 		<profile>
 			<id>all</id>			
 			<modules>
-				<module>sources-mobicents</module>
+				<module>sources-restcomm</module>
 				<module>sources-telscale</module>
-				<module>jdocbook-mobicents</module>
+				<module>jdocbook-restcomm</module>
 				<module>jdocbook-telscale</module>
 			</modules>
 		</profile>
 		<profile>
-			<id>mobicents</id>
+			<id>restcomm</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>			
 			<modules>
-				<module>sources-mobicents</module>
-				<module>jdocbook-mobicents</module>				
+				<module>sources-restcomm</module>
+				<module>jdocbook-restcomm</module>				
 			</modules>
 		</profile>
 		<profile>

@@ -33,10 +33,10 @@
     </parent>
 
     <groupId>org.mobicents.servlet.sip.containers</groupId>
-    <artifactId>jboss-as7-mobicents-build</artifactId>
+    <artifactId>jboss-as8-restcomm-build</artifactId>
 
-    <name>JBoss Application Server: Build Mobicents Add-on Modules</name>
-	<description>&gt;JBoss Application Server: Build Mobicents Add-on Modules</description>
+    <name>JBoss Application Server: Build RestComm SIP Servlets Add-on Modules</name>
+	<description>&gt;JBoss Application Server: Build Restcomm SIP Sevlets Add-on Modules</description>
 	<packaging>pom</packaging>
 	<properties>
 		<!-- generated configs root dirs -->
@@ -46,9 +46,9 @@
 		<generated.configs.examples>${generated.configs}/docs/examples/configs</generated.configs.examples>
 		<generated.configs.src.dir>${basedir}/src/main/resources</generated.configs.src.dir>
 		<!-- MSS -->
-		<jboss.as.release.version>7.2.0.Final</jboss.as.release.version>
+		<jboss.as.release.version>8.2.1.Final</jboss.as.release.version>
 		<junit.version>4.10</junit.version>
-		<version.org.jboss.jandex>1.0.3.Final</version.org.jboss.jandex>
+		<version.org.jboss.jandex>1.2.1.Final</version.org.jboss.jandex>
 		<version.rhino.js>1.7R2</version.rhino.js>
 		<version.org.apache.ant>1.8.2</version.org.apache.ant>
 	</properties>
@@ -128,7 +128,6 @@
 			</activation>
 
 			<dependencies>
-
 				<dependency>
 					<groupId>javax.sip</groupId>
 					<artifactId>jain-sip-api</artifactId>
@@ -145,7 +144,7 @@
 
 				<dependency>
 					<groupId>org.mobicents.servlet.sip.containers</groupId>
-					<artifactId>jboss-as7-mobicents</artifactId>
+					<artifactId>jboss-as8-restcomm</artifactId>
 					<version>${project.version}</version>
 					<scope>provided</scope>
 				</dependency>
@@ -193,24 +192,24 @@
 
 				<dependency>
 					<groupId>org.mobicents.servlet.sip.containers</groupId>
-					<artifactId>sip-servlets-as7</artifactId>
+					<artifactId>sip-servlets-as8</artifactId>
 					<version>${project.version}</version>
 					<scope>provided</scope>
 				</dependency>
 
 				<dependency>
 					<groupId>org.mobicents.javax.sip</groupId>
-					<artifactId>mobicents-jain-sip-ext</artifactId>
-					<version>${mobicents.jain.sip.ext.version}</version>
+					<artifactId>restcomm-jain-sip-ext</artifactId>
+					<version>${restcomm.jain.sip.ext.version}</version>
 					<scope>provided</scope>
 				</dependency>
 
 				<dependency>
 					<groupId>org.mobicents.commons</groupId>
 					<artifactId>commons-congestion</artifactId>
-					<version>${mobicents.commons.version}</version>
+					<version>${restcomm.commons.version}</version>
 				</dependency>	
-
+				
 				<dependency>
 					<groupId>javolution</groupId>
 					<artifactId>javolution</artifactId>
@@ -241,8 +240,8 @@
 
 				<dependency>
 					<groupId>org.mobicents.ha.javax.sip</groupId>
-					<artifactId>mobicents-jain-sip-ha-core</artifactId>
-					<version>${mobicents.jain.sip.ha.version}</version>
+					<artifactId>restcomm-jain-sip-ha-core</artifactId>
+					<version>${restcomm.jain.sip.ha.version}</version>
 					<scope>provided</scope>
 				</dependency>
 
@@ -255,10 +254,9 @@
 				<dependency>
 					<groupId>org.mobicents.tools</groupId>
 					<artifactId>sip-balancer-jar</artifactId>
-					<version>${mobicents.balancer.version}</version>
+					<version>${restcomm.balancer.version}</version>
 					<scope>provided</scope>
 				</dependency>				
-
 			</dependencies>
 
 			<properties>

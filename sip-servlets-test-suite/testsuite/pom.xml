@@ -7,7 +7,7 @@
 	</parent>
 	<artifactId>sip-servlets-test-suite</artifactId>
 	<packaging>jar</packaging>
-	<name>Mobicents Sip Servlets Test Suite</name>
+	<name>Restcomm Sip Servlets Test Suite</name>
 	<dependencies>
 		<!-- testing dependency -->
 		<dependency>
@@ -178,26 +178,26 @@
 		<dependency>
 			<groupId>org.mobicents.tools</groupId>
 			<artifactId>sip-balancer-jar</artifactId>
-			<version>${mobicents.balancer.version}</version>
+			<version>${restcomm.balancer.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>			
 			<groupId>org.mobicents.ha.javax.sip</groupId>
-			<artifactId>mobicents-jain-sip-ha-core</artifactId>
-			<version>${mobicents.jain.sip.ha.version}</version>				
+			<artifactId>restcomm-jain-sip-ha-core</artifactId>
+			<version>${restcomm.jain.sip.ha.version}</version>				
 		</dependency>
 		
 		<dependency>			
 			<groupId>org.mobicents.javax.sip</groupId>
-			<artifactId>mobicents-jain-sip-ext</artifactId>
-			<version>${mobicents.jain.sip.ext.version}</version>				
+			<artifactId>restcomm-jain-sip-ext</artifactId>
+			<version>${restcomm.jain.sip.ext.version}</version>				
 		</dependency>
 		<!--		
 		<dependency>			
 			<groupId>org.mobicents.ha.javax.sip</groupId>
 			<artifactId>mobicents-jain-sip-jboss4</artifactId>
-			<version>${mobicents.jain.sip.ha.version}</version>				
+			<version>${restcomm.jain.sip.ha.version}</version>				
 		</dependency-->
 		
 		<!-- clustering deps -->

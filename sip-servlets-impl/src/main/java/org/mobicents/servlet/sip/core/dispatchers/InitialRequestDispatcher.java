@@ -471,7 +471,7 @@ public class InitialRequestDispatcher extends RequestDispatcher {
 		//check if the request point to another domain
 		if(request.getRequestURI() instanceof TelURL ||
 				// https://github.com/RestComm/sip-servlets/issues/108
-				request.getRequestURI() instanceof GenericURI) {
+				!(request.getRequestURI() instanceof javax.sip.address.SipURI)) {
 			throw new DispatcherException(Response.SERVER_INTERNAL_ERROR, "cannot dispatch a request with a tel url or generic request uri outside the container ");
 		}
 		javax.sip.address.SipURI sipRequestUri = (javax.sip.address.SipURI)request.getRequestURI();

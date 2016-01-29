@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<project name="mobicents.sipservlets.tck" default="prepare-mss-tck" basedir=".">
+	<property environment="sys"/>
+	<condition property="mvn.executable" value="${sys.M2_HOME}\bin\mvn.bat" else="mvn">
+		<os family="windows"/>
+	</condition>
+		
+	<target name="prepare-mss-tck">
+		<fixcrlf srcdir="." includes="${mss.version.file}" eol="lf" eof="remove"/>
+		<loadfile srcfile="${mss.version.file}" property="mss.release.version">
+			<filterchain>
+				<headfilter lines="1" />
+				<striplinebreaks />
+			</filterchain>
+		</loadfile>		
+		<echo message="${mss.release.version}"/>
+		<replaceregexp file="${mss.home}/modules/system/layers/base/org/mobicents/as7/main/module.xml" match="jboss-as7-restcomm-(.*).jar" replace="jboss-as7-restcomm-${mss.release.version}.jar" byline="true"/>
+	</target>
+</project>

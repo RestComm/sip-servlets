@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
-<project name="mobicents.sipservlets.release" default="release" basedir=".">
+<project name="restcomm.sipservlets.release" default="release" basedir=".">
 	<property environment="sys"/>
-	<property name="release.path" location="${ant.file.mobicents.sipservlets.release}/../target" />
-	<property name="base.path" location="${ant.file.mobicents.sipservlets.release}/.." />
-	<property name="docs.stage.dir" location="${ant.file.mobicents.sipservlets.release}/../documentation" />
+	<property name="release.path" location="${ant.file.restcomm.sipservlets.release}/../target" />
+	<property name="base.path" location="${ant.file.restcomm.sipservlets.release}/.." />
+	<property name="docs.stage.dir" location="${ant.file.restcomm.sipservlets.release}/../documentation" />
 	
 	<!--property name="mss.release.version" value="3.0.0-SNAPSHOT" /-->
 	<property name="mss.release.configurations" value="all,default" />
@@ -68,7 +68,7 @@
 	
 	<taskdef onerror="fail" resource="net/sf/antcontrib/antlib.xml">
 		<classpath>
-			<pathelement location="${ant.file.mobicents.release}/../ant-contrib-1.0b3.jar" />
+			<pathelement location="${ant.file.restcomm.release}/../ant-contrib-1.0b3.jar" />
 		</classpath>
 	</taskdef>
 	
@@ -146,7 +146,7 @@
 				<param name="management.deploy.folder" value="${tomcat7.home}/webapps" />
 			</antcall>
 			
-			<!--antcall target="build-mobicents-sip-load-balancer">
+			<!--antcall target="build-restcomm-sip-load-balancer">
 				<param name="mss.home" value="${tomcat7.home}"/>
 			</antcall-->
 
@@ -191,7 +191,7 @@
 			<param name="management.deploy.folder" value="${tomcat8.home}/webapps" />
 		</antcall>
 
-		<!--antcall target="build-mobicents-sip-load-balancer">
+		<!--antcall target="build-restcomm-sip-load-balancer">
 			<param name="mss.home" value="${tomcat8.home}"/>
 		</antcall-->
 		
@@ -212,7 +212,7 @@
 				</ant>				
 			</sequential>
 		</for>
-		<ant dir="${base.path}" antfile="build.xml" target="build-mobicents-diameter-jboss-5">
+		<ant dir="${base.path}" antfile="build.xml" target="build-restcomm-diameter-jboss-5">
 			<property name="mss.home" value="${jboss-5-jdk6.home}"/>
 			<property name="jboss.config" value="default"/>
 		</ant>
@@ -234,7 +234,7 @@
 			<fileset dir="${base.path}/../../sip-servlets-examples/media-jsr309-servlet/target/" includes="media-jsr309-servlet.war" />
 		</copy>		
 		<copy file="JBOSS-SIP-SERVLETS-README.txt" todir="${jboss-5-jdk6.home}" />
-		<antcall target="build-mobicents-sip-load-balancer">
+		<antcall target="build-restcomm-sip-load-balancer">
 			<param name="mss.home" value="${jboss-5-jdk6.home}"/>
 		</antcall>
 		<antcall target="copy-documentation">
@@ -270,12 +270,12 @@
 			<arg line="clean buildnumber:create install -P set-git-hash,jboss-5-distro -DJBOSS_HOME=${mss.home} -Dnode=${jboss.config}" />
 		</exec>		
 		
-		<antcall target="build-mobicents-sglc">
+		<antcall target="build-restcomm-sglc">
 			<param name="mss.home" value="${mss.home}"/>
 			<param name="node" value="${jboss.config}"/>
 		</antcall>
 		
-		<antcall target="build-mobicents-snmp">
+		<antcall target="build-restcomm-snmp">
 			<param name="mss.home" value="${mss.home}"/>
 			<param name="node" value="${jboss.config}"/>
 		</antcall>
@@ -374,7 +374,7 @@
 	
 	<!-- Build dependencies-->
 	
-	<target name="build-mobicents-sip-load-balancer" depends="get-deps">
+	<target name="build-restcomm-sip-load-balancer" depends="get-deps">
 		<echo>Building Mobicents SIP Load Balancer</echo>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/sip-balancer/jar">
 			<arg line="clean install -P set-git-hash -Dmaven.test.skip=true" />
@@ -387,13 +387,13 @@
 		</copy>
 		<mkdir dir="${mss.home}/sip-balancer/docs"/>
 		<copy todir="${mss.home}/sip-balancer/docs">
-			<fileset dir="${base.path}/target/dependencies/sip-balancer/docs/jdocbook-mobicents/target/docbook/publish/en-US" includes="**/*" />
+			<fileset dir="${base.path}/target/dependencies/sip-balancer/docs/jdocbook-restcomm/target/docbook/publish/en-US" includes="**/*" />
 		</copy>		
 		<copy file="${base.path}/target/dependencies/sip-balancer/jar/src/test/resources/lb-configuration.properties"
 			tofile="${mss.home}/sip-balancer/lb-configuration.properties" />
 	</target>
 	
-	<target name="build-mobicents-sglc" depends="get-deps">
+	<target name="build-restcomm-sglc" depends="get-deps">
 		<echo>Building Mobicents Simple Global Logging Configuration</echo>
 		<echo message="jboss.home= ${mss.home}"/>
 		<echo message="node= ${node}"/>
@@ -408,7 +408,7 @@
 	</target>
 	
 	<!-- only for telscale -->
-	<!--target name="build-mobicents-snmp" depends="get-deps">
+	<!--target name="build-restcomm-snmp" depends="get-deps">
 		<echo>Building Mobicents SNMP Adaptor</echo>
 		<echo message="jboss.home= ${mss.home}"/>
 		<echo message="node= ${node}"/>	
@@ -432,13 +432,13 @@
 	
 	<!-- Download dependencies from SourceForge -->
 	
-	<target name="build-mobicents-diameter-jboss-5" depends="get-mobicents-diameter-jboss-5">		
+	<target name="build-restcomm-diameter-jboss-5" depends="get-restcomm-diameter-jboss-5">		
 		<unzip dest="${mss.home}/server/${jboss.config}/deploy/${diameter-jboss-5.name}" src="${diameter-jboss-5.distro.path}"/>
 		<copy overwrite="true" file="${base.path}/jdiameter-config.xml" tofile="${mss.home}/server/${jboss.config}/deploy/${diameter-jboss-5.name}/config/jdiameter-config.xml" />
 	</target>
 	
 	<available file="${diameter-jboss-5.distro.path}" property="got.mobicents-diameter-jboss-5" />
-		<target name="get-mobicents-diameter-jboss-5" unless="got.mobicents-diameter-jboss-5">
+		<target name="get-restcomm-diameter-jboss-5" unless="got.mobicents-diameter-jboss-5">
 			<echo>Downloading Mobicents Diameter JBoss5</echo>
 				<get dest="${diameter-jboss-5.distro.path}" src="${diameter-jboss-5.download.url}" />
 		</target>
@@ -454,7 +454,7 @@
 	
 	<target name="copy-documentation">
 		<copy overwrite="true" todir="${mss.home}/docs/mobicents-sip-servlets">
-			<fileset dir="${base.path}/../../docs/jdocbook-mobicents/target/docbook/publish/en-US/" />
+			<fileset dir="${base.path}/../../docs/jdocbook-restcomm/target/docbook/publish/en-US/" />
 		</copy>
 		
 		<!--delete dir="${docs.stage.dir}" /-->

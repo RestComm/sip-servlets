@@ -50,7 +50,7 @@ RestComm SIP Servlets is licensed under dual license policy. The default license
 
 Continuous Integration and Delivery
 ========
-[![RestComm SIP Servlets Continuous Job](http://www.cloudbees.com/sites/default/files/Button-Built-on-CB-1.png)](https://mobicents.ci.cloudbees.com/job/MobicentsSipServlets-Release/)
+[![RestComm SIP Servlets Continuous Job](http://www.cloudbees.com/sites/default/files/Button-Built-on-CB-1.png)](https://mobicents.ci.cloudbees.com/job/RestcommSipServlets-Release/)
 
 Acknowledgements
 ========

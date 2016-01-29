@@ -33,7 +33,7 @@ mv $BUILD_DIR/$AS8_FINAL_NAME $BUILD_DIR/$MSS_FINAL_NAME
 mvn clean install -Pas8
 
 # modules installation
-cp -vpr ./containers/sip-servlets-as8-drop-in/build-mobicents-modules/target/$AS8_FINAL_NAME/modules/system/layers/base/org/mobicents $BUILD_DIR/$MSS_FINAL_NAME/modules/system/layers/base/org/mobicents
+cp -vpr ./containers/sip-servlets-as8-drop-in/build-restcomm-modules/target/$AS8_FINAL_NAME/modules/system/layers/base/org/mobicents $BUILD_DIR/$MSS_FINAL_NAME/modules/system/layers/base/org/mobicents
 mvn clean install war:inplace -f ./sip-servlets-examples/click-to-call/pom.xml
 cp -pr ./sip-servlets-examples/click-to-call/target/click-to-call-servlet-*.war $BUILD_DIR/$MSS_FINAL_NAME/standalone/deployments/click2call.war
 mvn clean install war:inplace -f ./sip-servlets-examples/websocket-b2bua/pom.xml
@@ -57,7 +57,7 @@ cd $BUILD_DIR/$MSS_FINAL_NAME
 
 # Create standalone-sip.xml file
 #cp ./standalone/configuration/standalone.xml ./standalone/configuration/standalone-sip.xml
-cp -vpr ../../../../../containers/sip-servlets-as8-drop-in/jboss-as-mobicents/standalone-sip.xml ./standalone/configuration/standalone-sip.xml
+cp -vpr ../../../../../containers/sip-servlets-as8-drop-in/jboss-as-restcomm/standalone-sip.xml ./standalone/configuration/standalone-sip.xml
 
 #patch -p0 --verbose < ../../../../../containers/sip-servlets-as8-drop-in/patches/patch.7.2.0.Final.standalone.sip.dropin.xml
 #patch -p0 --verbose < ../../../../../containers/sip-servlets-as8-drop-in/patches/patch.domain.sip.dropin.xml
