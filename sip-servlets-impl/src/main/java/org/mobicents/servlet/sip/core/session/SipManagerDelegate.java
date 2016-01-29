@@ -23,6 +23,7 @@
 package org.mobicents.servlet.sip.core.session;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -465,8 +466,9 @@ public abstract class SipManagerDelegate {
 		if(logger.isDebugEnabled()) {
 			logger.debug("sip sessions present in the session manager");
 		
-			for (SipSessionKey sipSessionKey : sipSessions.keySet()) {
-				logger.debug(sipSessionKey.toString());
+			Enumeration<SipSessionKey> keys = sipSessions.keys();
+			while(keys.hasMoreElements()) {
+				logger.debug(keys.nextElement().toString());
 			}
 		}
 	}
@@ -478,7 +480,9 @@ public abstract class SipManagerDelegate {
 		if(logger.isDebugEnabled()) {
 			logger.debug("sip application sessions present in the session manager");
 		
-			for (SipApplicationSessionKey sipApplicationSessionKey : sipApplicationSessions.keySet()) {
+			Enumeration<SipApplicationSessionKey> keys = sipApplicationSessions.keys();
+			while(keys.hasMoreElements()) {
+				SipApplicationSessionKey sipApplicationSessionKey = keys.nextElement(); 
 				logger.debug(sipApplicationSessionKey.toString() + "/hashed_app_name=" + sipFactoryImpl.getSipApplicationDispatcher().getHashFromApplicationName(sipApplicationSessionKey.getApplicationName()));
 			}
 		}
