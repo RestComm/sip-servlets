@@ -252,11 +252,11 @@ public class TransactionApplicationData implements Serializable, MobicentsTransa
 		if(hops != null
 		        // https://code.google.com/p/sipservlets/issues/detail?id=249
 		        && hops.size() <= 1) {
-		    if(logger.isDebugEnabled()) {
-	            logger.debug("cleaning up tx app data hops");
-	        }
 			hops.clear();
 			hops = null;
+		    if(logger.isDebugEnabled()) {
+	            logger.debug("cleaned up tx app data hops");
+	        }
 		}
 	}
 

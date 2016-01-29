@@ -1148,9 +1148,11 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		this.sipSession = session;
         if (session != null){
             this.sessionKey = session.getKey();
-        } else {
-            this.sessionKey = null;
-        }
+        } 
+        // overkill, => is causing https://github.com/RestComm/sip-servlets/issues/101
+//        else {
+//            this.sessionKey = null;
+//        }
 	}
 
 	/**
