@@ -186,6 +186,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		this.transaction = transaction;
 		if(sipSession != null) {
 			this.sessionKey = sipSession.getKey();
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("SESSIONKEY SET to:" + sessionKey);
+                        }
 		}
 		if(transaction != null && getMethod().equals(Request.INVITE)) {
 			if(transaction.getApplicationData() != null) {
@@ -585,6 +588,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 				sessionKey = SessionManagerUtil.getSipSessionKey(
 						SessionManagerUtil.getSipApplicationSessionKey(applicationName, getAppSessionId(), null).getId(),
 						applicationName, message, false);
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug("SESSIONKEY SET to:" + sessionKey);
+                                }
 			}
 		}
 		if(logger.isDebugEnabled()) {
@@ -1105,6 +1111,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 			session.setSessionCreatingTransactionRequest(this);
 			session.setOrphan(isOrphan());
 			sessionKey = session.getKey();
+                        if (logger.isDebugEnabled()) {
+                                    logger.debug("SESSIONKEY SET to:" + sessionKey);
+                                }
 		}
 		
 		if(session != null) {
@@ -1148,7 +1157,11 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		this.sipSession = session;
         if (session != null){
             this.sessionKey = session.getKey();
+            if (logger.isDebugEnabled()) {
+                logger.debug("SESSIONKEY SET to:" +sessionKey);
+            }
         } 
+        
         // overkill, => is causing https://github.com/RestComm/sip-servlets/issues/101
 //        else {
 //            this.sessionKey = null;
@@ -1164,6 +1177,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 
 	public void setSipSessionKey(MobicentsSipSessionKey sessionKey) {
 		this.sessionKey = sessionKey;
+                if (logger.isDebugEnabled() ) {
+                                    logger.debug("SESSIONKEY SET to:" + sessionKey);
+                                }
 	}
 	
 	/*
@@ -2091,6 +2107,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		if (sessionKeyString.length() > 0) {
 			try {
 				sessionKey = SessionManagerUtil.parseSipSessionKey(sessionKeyString);
+                                if (logger.isDebugEnabled()) {
+                                    logger.debug("SESSIONKEY SET to:" + sessionKey);
+                                }
 			} catch (ParseException e) {
 				throw new IllegalArgumentException("SIP Sesion Key " + sessionKeyString + " previously serialized could not be reparsed", e);
 			}
