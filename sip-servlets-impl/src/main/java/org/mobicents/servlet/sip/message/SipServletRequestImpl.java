@@ -113,6 +113,7 @@ import org.mobicents.servlet.sip.core.SipNetworkInterfaceManager;
 import org.mobicents.servlet.sip.core.b2bua.MobicentsB2BUAHelper;
 import org.mobicents.servlet.sip.core.dispatchers.MessageDispatcher;
 import org.mobicents.servlet.sip.core.message.MobicentsSipServletRequest;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletResponse;
 import org.mobicents.servlet.sip.core.proxy.MobicentsProxy;
 import org.mobicents.servlet.sip.core.security.MobicentsAuthInfoEntry;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
@@ -2654,6 +2655,24 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 		}
 	}
 
+	@Override
+	public MobicentsSipSessionKey getSipSessionKey() {
+		if(sipSession == null && sessionKey == null) {
+			if(lastFinalResponse != null) {
+				this.sessionKey = ((MobicentsSipServletResponse)lastFinalResponse).getSipSessionKey();
+				if(logger.isDebugEnabled()) {
+					logger.debug("session Key is " + sessionKey + ", retrieved from the lastfinalresponse " + lastFinalResponse);
+				}
+			} else if(lastInformationalResponse != null) {
+				this.sessionKey = ((MobicentsSipServletResponse)lastInformationalResponse).getSipSessionKey();
+				if(logger.isDebugEnabled()) {
+					logger.debug("session Key is " + sessionKey + ", retrieved from the lastInformationalResponse " + lastInformationalResponse);
+				}
+			}
+		}
+		return super.getSipSessionKey();
+	}
+	
 	// Issue 2354 : need to clone the original request to create the forked response
 	public Object clone() {
 		SipServletRequestImpl sipServletRequestImpl = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest((Request)message, sipSession, getTransaction(), null, createDialog);

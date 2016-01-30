@@ -410,8 +410,9 @@ public abstract class MessageDispatcher {
                     logger.error("transaction " + transaction.getBranchId() + " for request " + request + " couldn't be terminated");
                 }
             }
-
-            request.setSipSession(null);
+            // https://github.com/RestComm/sip-servlets/issues/101 
+            // trying to avoid NPE on null sipsession when response arrives
+//            request.setSipSession(null);
 		}
 	}
 	

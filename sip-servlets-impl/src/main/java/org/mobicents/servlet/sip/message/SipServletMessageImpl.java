@@ -97,6 +97,7 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
+import org.mobicents.servlet.sip.core.session.SipSessionKey;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
 /**
@@ -136,7 +137,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	private String transactionId;
 	private boolean transactionType;
 	
-	// We need this object separate from transaction.getApplicationData, because the actualy transaction
+	// We need this object separate from transaction.getApplicationData, because the actual transaction
 	// may be create later and we still need to accumulate useful data. Also the transaction might be
 	// cleaned up earlier. The transaction and this object have different lifecycle.
 	protected TransactionApplicationData transactionApplicationData;		
@@ -1139,6 +1140,9 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 * @return the sip session implementation
 	 */
 	public final MobicentsSipSession getSipSession() {	
+		if(sipSession == null && sessionKey == null) {
+			sessionKey = getSipSessionKey();
+		}
 		if(sipSession == null && sessionKey != null) {
 			if(logger.isDebugEnabled()) {
 				logger.debug("session is null, trying to load the session from the sessionKey " + sessionKey);
@@ -1187,6 +1191,28 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	 * @param session the session to set
 	 */
 	public MobicentsSipSessionKey getSipSessionKey() {
+		if(sessionKey == null) {
+			if(sipSession == null) {
+				if(transactionApplicationData != null) {
+					this.sessionKey =  transactionApplicationData.getSipSessionKey();
+					if(logger.isDebugEnabled()) {
+						logger.debug("session Key is " + sessionKey + ", retrieved from the txAppData " + transactionApplicationData);
+					}
+				} else if (transaction != null && transaction.getApplicationData() != null) {
+					this.sessionKey =  ((TransactionApplicationData)transaction.getApplicationData()).getSipSessionKey();
+					if(logger.isDebugEnabled()) {
+						logger.debug("session Key is " + sessionKey + ", retrieved from the transaction txAppData " + 
+								(TransactionApplicationData)transaction.getApplicationData());
+					}
+				} else {
+					if(logger.isDebugEnabled()) {
+						logger.debug("txAppData and transaction txAppData are both null, there is no wya to retrieve the sessionKey anymore");
+					}
+				}
+			} else {
+				this.sessionKey = sipSession.getKey();
+			}
+		}
 		return this.sessionKey;
 	}
 
