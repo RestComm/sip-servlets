@@ -336,8 +336,15 @@ public class TransactionApplicationData implements Serializable, MobicentsTransa
 	 * @return the sipSessionKey
 	 */
 	public MobicentsSipSessionKey getSipSessionKey() {
-		if(sipServletMessage != null) {
-			return sipServletMessage.getSipSessionKey();
+		if(logger.isDebugEnabled()) {
+			logger.debug("local session Key is " + sipSessionKey);
+		}
+		if(sipSessionKey == null && sipServletMessage != null) {
+			MobicentsSipSessionKey sessionKey = sipServletMessage.getSipSessionKey();
+			if(logger.isDebugEnabled()) {
+				logger.debug("session Key from sipservletmessage is " + sessionKey);
+			}
+			sipSessionKey = sessionKey;
 		}
 		return sipSessionKey;
 	}	
