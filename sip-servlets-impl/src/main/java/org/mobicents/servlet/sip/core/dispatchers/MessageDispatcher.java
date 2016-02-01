@@ -411,7 +411,8 @@ public abstract class MessageDispatcher {
                 }
             }
 
-            request.setSipSession(null);
+            // Issue #101 Trying to avoid setting the session to null so it can be retrieved
+//            request.setSipSession(null);
 		}
 	}
 	
