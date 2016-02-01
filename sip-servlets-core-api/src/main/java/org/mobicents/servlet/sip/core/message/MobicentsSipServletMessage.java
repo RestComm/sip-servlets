@@ -25,6 +25,7 @@ import javax.sip.message.Message;
 
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 
 /**
  * Extension to the Sip Servlet Message interface from JSR 289
@@ -35,6 +36,9 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
 public interface MobicentsSipServletMessage extends SipServletMessage {
 	MobicentsSipSession getSipSession();
 	void setSipSession(MobicentsSipSession sipSession);
+	
+	MobicentsSipSessionKey getSipSessionKey();
+	void setSipSessionKey(MobicentsSipSessionKey sipSession);
 	
 	Transaction getTransaction();
 	void setTransaction(Transaction transaction);

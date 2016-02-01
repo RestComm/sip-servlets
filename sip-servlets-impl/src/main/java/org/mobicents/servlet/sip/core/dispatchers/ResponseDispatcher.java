@@ -54,10 +54,13 @@ import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
 import org.mobicents.servlet.sip.core.DispatcherException;
 import org.mobicents.servlet.sip.core.SipContext;
 import org.mobicents.servlet.sip.core.SipManager;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletRequest;
+import org.mobicents.servlet.sip.core.message.MobicentsSipServletResponse;
 import org.mobicents.servlet.sip.core.proxy.MobicentsProxyBranch;
 import org.mobicents.servlet.sip.core.session.DistributableSipManager;
 import org.mobicents.servlet.sip.core.session.MobicentsSipApplicationSession;
 import org.mobicents.servlet.sip.core.session.MobicentsSipSession;
+import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 import org.mobicents.servlet.sip.core.session.SessionManagerUtil;
 import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.core.session.SipSessionKey;
@@ -108,10 +111,17 @@ public class ResponseDispatcher extends MessageDispatcher {
 			
 			TransactionApplicationData applicationData = null;
 			SipServletRequestImpl tmpOriginalRequest = null;
+			if(logger.isDebugEnabled()) {
+				logger.debug("Client tx = " + clientTransaction);
+				logger.debug("Dialog = " + dialog);
+			}
 			if(clientTransaction != null) {
 				applicationData = (TransactionApplicationData)clientTransaction.getApplicationData();
 				if(applicationData.getSipServletMessage() instanceof SipServletRequestImpl) {
 					tmpOriginalRequest = (SipServletRequestImpl)applicationData.getSipServletMessage();
+					if(logger.isDebugEnabled()) {
+						logger.debug("Original message from ctx = " + tmpOriginalRequest);
+					}
 					// clearing the hops found by RFC 3263
 					if(applicationData.getHops() != null 
 							// https://code.google.com/p/sipservlets/issues/detail?id=267 clearing the hops only on final response so it can be reused for CANCEL requests
@@ -138,6 +148,9 @@ public class ResponseDispatcher extends MessageDispatcher {
 				if(applicationData != null) {
 					if(applicationData.getSipServletMessage() instanceof SipServletRequestImpl) {
 						tmpOriginalRequest = (SipServletRequestImpl)applicationData.getSipServletMessage();
+						if(logger.isDebugEnabled()) {
+							logger.debug("Original message from dialog = " + tmpOriginalRequest);
+						}
 					}
 					// Retrans drop logic removed from here due to AR case Proxy-B2bua for http://code.google.com/p/mobicents/issues/detail?id=1986
 				} else {
@@ -151,6 +164,9 @@ public class ResponseDispatcher extends MessageDispatcher {
 				}
 			} 
 			if(tmpOriginalRequest == null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("Original message is null");
+				}
 				// our backup plan
 				SIPTransaction tx = null;
 				if(clientTransaction != null) {
@@ -158,8 +174,14 @@ public class ResponseDispatcher extends MessageDispatcher {
 				} else {
 					tx = (SIPTransaction) ((SIPTransactionStack)sipProvider.getSipStack()).findTransaction((SIPMessage) response, true);
 				}
+				if(logger.isDebugEnabled()) {
+					logger.debug("newly found transaction = " + tx);
+				}
 				if(tx != null) {
 					tmpOriginalRequest = (SipServletRequestImpl) sipFactoryImpl.getMobicentsSipServletMessageFactory().createSipServletRequest(tx.getRequest(), null, null, null, false);
+					if(logger.isDebugEnabled()) {
+						logger.debug("Original message from newly found tx = " + tmpOriginalRequest);
+					}
 				}
 				
 			}
@@ -342,6 +364,13 @@ public class ResponseDispatcher extends MessageDispatcher {
 					}
 					sipServletResponse.setOriginalRequest(((SipServletRequestImpl)tmpSession.getProxy().getFinalBranchForSubsequentRequests().getRequest()));
 				}
+			}
+			
+			if(sipServletResponse.getRequest() != null && ((MobicentsSipServletRequest)sipServletResponse.getRequest()).getSipSessionKey() == null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("setting original request sessionKey to " + sessionKey);
+				}
+				((MobicentsSipServletRequest)sipServletResponse.getRequest()).setSipSessionKey((MobicentsSipSessionKey)sessionKey);
 			}
 			
 			if(logger.isDebugEnabled()) {
