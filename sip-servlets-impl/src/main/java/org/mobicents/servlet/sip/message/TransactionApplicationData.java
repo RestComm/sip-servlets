@@ -69,6 +69,7 @@ public class TransactionApplicationData implements Serializable, MobicentsTransa
 		this.sipServletMessage = sipServletMessage;
 		this.sipSessionKey = sipServletMessage.getSipSessionKey();
 		sipServletResponses = null;
+		// Added for https://github.com/RestComm/sip-servlets/issues/107
 		messageCleanedUp = new AtomicBoolean(false);
 	}
 	

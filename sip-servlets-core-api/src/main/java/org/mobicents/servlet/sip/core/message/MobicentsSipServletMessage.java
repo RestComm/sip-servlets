@@ -36,7 +36,7 @@ import org.mobicents.servlet.sip.core.session.MobicentsSipSessionKey;
 public interface MobicentsSipServletMessage extends SipServletMessage {
 	MobicentsSipSession getSipSession();
 	void setSipSession(MobicentsSipSession sipSession);
-	
+	// https://github.com/RestComm/sip-servlets/issues/101
 	MobicentsSipSessionKey getSipSessionKey();
 	void setSipSessionKey(MobicentsSipSessionKey sipSession);
 	

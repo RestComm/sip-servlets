@@ -185,13 +185,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		this.message = message;
 		this.transaction = transaction;
 		if(sipSession != null) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("(" + System.identityHashCode(this) + ")SESSIONKEY before:" + sessionKey);
-                        }                    
 			this.sessionKey = sipSession.getKey();
-                        if (logger.isDebugEnabled()) {
-                            logger.debug("(" + System.identityHashCode(this) + ")SESSIONKEY SET to:" + sessionKey);
-                        }
 		}
 		if(transaction != null && getMethod().equals(Request.INVITE)) {
 			if(transaction.getApplicationData() != null) {
@@ -571,9 +565,6 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	}
 	
 	public MobicentsSipApplicationSession getSipApplicationSession(boolean create) {
-		if(logger.isDebugEnabled()) {
-			logger.debug("(" + System.identityHashCode(this) + ")SESSIONKEY :" + sessionKey);
-		}            
 		MobicentsSipSession sipSession = getSipSession();
 		if(sipSession != null) {
 			MobicentsSipApplicationSession sipApplicationSession = sipSession.getSipApplicationSession();
@@ -591,19 +582,10 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 					logger.debug("Orphans session " + applicationName + " " + sessionKey);
 				}
 				orphan = true;
-                                if (logger.isDebugEnabled()) {
-                                    logger.debug("(" + System.identityHashCode(this) + ")SESSIONKEY before:" + sessionKey);
-                                }
 				sessionKey = SessionManagerUtil.getSipSessionKey(
 						SessionManagerUtil.getSipApplicationSessionKey(applicationName, getAppSessionId(), null).getId(),
 						applicationName, message, false);
-                                if (logger.isDebugEnabled()) {
-                                    logger.debug("(" + System.identityHashCode(this) + ")SESSIONKEY SET to:" + sessionKey);
-                                }
 			}
-		}
-		if(logger.isDebugEnabled()) {
-			logger.debug("(" + System.identityHashCode(this) + ")app name" + applicationName + " and sessionKey = " + sessionKey);
 		}
 		if(applicationName != null && sessionKey != null) {
 			final SipContext sipContext = sipFactoryImpl.getSipApplicationDispatcher().findSipApplication(applicationName);
@@ -1119,13 +1101,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 					sipFactoryImpl, sipApplicationSessionImpl);
 			session.setSessionCreatingTransactionRequest(this);
 			session.setOrphan(isOrphan());
-                        if (logger.isDebugEnabled()) {
-                                    logger.debug("(" + System.identityHashCode(this) + ")SESSIONKEY before:" + sessionKey);
-                                }
 			sessionKey = session.getKey();
-                        if (logger.isDebugEnabled()) {
-                                    logger.debug("(" + System.identityHashCode(this) + ")SESSIONKEY SET to:" + sessionKey);
-                                }
 		}
 		
 		if(session != null) {
@@ -1183,7 +1159,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 				if(sipSession == null) {
 					logger.debug("couldn't find any session with sessionKey " + sessionKey);
 				} else {
-					logger.debug("relaoded session session " + sipSession + " with sessionKey " + sessionKey);
+					logger.debug("reloaded session session " + sipSession + " with sessionKey " + sessionKey);
 				}
 			}
 		} 
@@ -1199,19 +1175,10 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		// but it will not be persisted to avoid unecessary replication if the message is persisted
 		this.sipSession = session;
         if (session != null){
-            if (logger.isDebugEnabled()) {
-                                    logger.debug("(" + System.identityHashCode(this) + ")SESSIONKEY before:" + sessionKey);
-                                }
             this.sessionKey = session.getKey();
-            if (logger.isDebugEnabled()) {
-                logger.debug("(" + System.identityHashCode(this) + ")SESSIONKEY SET to:" +sessionKey);
-            }
+        } else {
+            this.sessionKey = null;
         } 
-        
-        // overkill, => is causing https://github.com/RestComm/sip-servlets/issues/101
-//        else {
-//            this.sessionKey = null;
-//        }
 	}
 
 	/**
@@ -1222,13 +1189,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 	}
 
 	public void setSipSessionKey(MobicentsSipSessionKey sessionKey) {
-            if (logger.isDebugEnabled()) {
-                                    logger.debug("(" + System.identityHashCode(this) + ")SESSIONKEY before:" + sessionKey);
-                                }
 		this.sessionKey = sessionKey;
-                if (logger.isDebugEnabled() ) {
-                                    logger.debug("(" + System.identityHashCode(this) + ")SESSIONKEY SET to:" + sessionKey);
-                                }
 	}
 	
 	/*
@@ -2155,13 +2116,7 @@ public abstract class SipServletMessageImpl implements MobicentsSipServletMessag
 		String sessionKeyString = in.readUTF();
 		if (sessionKeyString.length() > 0) {
 			try {
-                            if (logger.isDebugEnabled()) {
-                                    logger.debug("(" + System.identityHashCode(this) + ")SESSIONKEY before:" + sessionKey);
-                                }
 				sessionKey = SessionManagerUtil.parseSipSessionKey(sessionKeyString);
-                                if (logger.isDebugEnabled()) {
-                                    logger.debug("(" + System.identityHashCode(this) + ")SESSIONKEY SET to:" + sessionKey);
-                                }
 			} catch (ParseException e) {
 				throw new IllegalArgumentException("SIP Sesion Key " + sessionKeyString + " previously serialized could not be reparsed", e);
 			}
