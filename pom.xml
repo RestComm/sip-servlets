@@ -91,7 +91,7 @@
 		<restcomm.tools.mavenplugin.eclipse.version>1.0.0.FINAL</restcomm.tools.mavenplugin.eclipse.version>
 		<restcomm.cluster.version>1.15.12</restcomm.cluster.version>
 		<restcomm.balancer.version>2.0.19</restcomm.balancer.version>
-		<restcomm.jain.sip.ha.version>1.5.8</restcomm.jain.sip.ha.version>
+		<restcomm.jain.sip.ha.version>1.5.11</restcomm.jain.sip.ha.version>
 		<restcomm.jain.sip.ext.version>1.3.13</restcomm.jain.sip.ext.version>
 		<restcomm.commons.version>1.0.134</restcomm.commons.version>
 		<tomcat-7.version>7.0.64</tomcat-7.version>
