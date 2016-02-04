@@ -51,6 +51,8 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.modeler.Registry;
+import org.mobicents.ha.javax.sip.ClusteredSipStack;
+import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingService;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
@@ -144,6 +146,14 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 					logger.debug("Removing the following Listening Point " + extendedListeningPoint);
 				}				
 				sipStack.deleteListeningPoint(extendedListeningPoint.getListeningPoint());
+				if(sipConnector.isUseLoadBalancer() && sipStack instanceof ClusteredSipStack && 
+						((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService() != null) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("SipConnector " + extendedListeningPoint.getListeningPoint() + " remove to use Load Balancer for outbound traffic");
+					}
+					LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = ((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService();
+					loadBalancerHeartBeatingService.removeSipConnector(extendedListeningPoint.getListeningPoint());
+				}
 				extendedListeningPoint = null;
 			}				
 		}
@@ -285,6 +295,16 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			} else {
 				createSipProvider = true;
 			}
+			// https://github.com/RestComm/sip-servlets/issues/111
+			if(sipConnector.isUseLoadBalancer() && sipStack instanceof ClusteredSipStack && 
+					((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService() != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("SipConnector " + listeningPoint + " set to use Load Balancer for outbound traffic");
+				}
+				LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = ((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService();
+				loadBalancerHeartBeatingService.addSipConnector(listeningPoint);
+			}
+			
 			if(createSipProvider) {
 				sipProvider = sipStack.createSipProvider(listeningPoint);
 			} else {
@@ -479,6 +499,20 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 		sipConnector.setStunServerPort(stunServerPort);
 	}
 
+	/**
+	 * @return the useLoadBalancer
+	 */
+	public boolean isUseLoadBalancer() {
+		return sipConnector.isUseLoadBalancer();
+	}
+	
+	/**
+	 * @param useLoadBalancer the useLoadBalancer to set
+	 */
+	public void setLoadBalancer(boolean useLoadBalancer) {
+		sipConnector.setUseLoadBalancer(useLoadBalancer);
+	}
+	
 	/**
 	 * @return the useStun
 	 */

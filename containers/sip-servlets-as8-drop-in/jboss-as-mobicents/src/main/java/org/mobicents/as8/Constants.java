@@ -143,6 +143,7 @@ public interface Constants {
     String TIMER_D_INTERVAL = "timer-d-interval";
     String TRIM_SPACES = "trim-spaces";
     String TRUSTSTORE_TYPE = "truststore-type";
+    String USE_LOAD_BALANCER = "use-load-balancer";
     String USE_PRETTY_ENCODING = "use-pretty-encoding";
     String USE_STATIC_ADDRESS = "use-static-address";
     String USE_STUN = "use-stun";

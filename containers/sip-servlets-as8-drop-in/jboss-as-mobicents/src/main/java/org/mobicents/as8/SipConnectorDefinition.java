@@ -81,6 +81,14 @@ public class SipConnectorDefinition extends SimpleResourceDefinition {
                     .setDefaultValue(new ModelNode(true))
                     .build();
 
+    protected static final SimpleAttributeDefinition USE_LOAD_BALANCER =
+            new SimpleAttributeDefinitionBuilder(Constants.USE_LOAD_BALANCER, ModelType.BOOLEAN)
+                    .setXmlName(Constants.USE_LOAD_BALANCER)
+                    .setAllowNull(true)
+                    .setFlags(AttributeAccess.Flag.RESTART_ALL_SERVICES)
+                    .setDefaultValue(new ModelNode(false))
+                    .build();
+    
     protected static final SimpleAttributeDefinition USE_STATIC_ADDRESS =
             new SimpleAttributeDefinitionBuilder(Constants.USE_STATIC_ADDRESS, ModelType.BOOLEAN)
                     .setXmlName(Constants.USE_STATIC_ADDRESS)
@@ -148,6 +156,7 @@ public class SipConnectorDefinition extends SimpleResourceDefinition {
         SCHEME,
         SOCKET_BINDING,
         ENABLED,
+        USE_LOAD_BALANCER,
         USE_STATIC_ADDRESS,
         STATIC_SERVER_ADDRESS,
         STATIC_SERVER_PORT,

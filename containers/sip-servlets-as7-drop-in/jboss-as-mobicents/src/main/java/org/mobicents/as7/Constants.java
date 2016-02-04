@@ -143,6 +143,7 @@ interface Constants {
     String TRIM_SPACES = "trim-spaces";
     String TRUSTSTORE_TYPE = "truststore-type";
     String USE_PRETTY_ENCODING = "use-pretty-encoding";
+    String USE_LOAD_BALANCER = "use-load-balancer";
     String USE_STATIC_ADDRESS = "use-static-address";
     String USE_STUN = "use-stun";
     String VALUE = "value";

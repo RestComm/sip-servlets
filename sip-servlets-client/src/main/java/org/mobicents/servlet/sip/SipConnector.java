@@ -83,6 +83,7 @@ public class SipConnector implements Serializable {
 	private int staticServerPort;
 	private boolean useStaticAddress;
 	private boolean replaceStaticServerAddressForInternalRoutingRequest = true;
+	private boolean useLoadBalancer;
 	
 	/**
 	 * @return the Transport
@@ -191,6 +192,15 @@ public class SipConnector implements Serializable {
 	public void setUseStaticAddress(boolean useStaticAddress) {
 		this.useStaticAddress = useStaticAddress;
 	}
+	// https://github.com/RestComm/sip-servlets/issues/111
+	public boolean isUseLoadBalancer() {
+		return useLoadBalancer;
+	}
+
+	public void setUseLoadBalancer(boolean useLoadBalancer) {
+		this.useLoadBalancer = useLoadBalancer;
+	}
+
 	
 	public boolean isReplaceStaticServerAddressForInternalRoutingRequest() {
 		return replaceStaticServerAddressForInternalRoutingRequest;

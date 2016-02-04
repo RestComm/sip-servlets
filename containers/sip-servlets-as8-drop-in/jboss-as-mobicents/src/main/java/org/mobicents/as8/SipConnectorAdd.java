@@ -82,6 +82,9 @@ class SipConnectorAdd extends AbstractAddStepHandler {
         final String protocol = SipConnectorDefinition.PROTOCOL.resolveModelAttribute(context, fullModel).asString();
         final String scheme = SipConnectorDefinition.SCHEME.resolveModelAttribute(context, fullModel).asString();
 
+        final boolean useLoadBalancer = SipConnectorDefinition.USE_LOAD_BALANCER.resolveModelAttribute(context, fullModel)
+                .asBoolean();
+        
         final boolean useStaticAddress = SipConnectorDefinition.USE_STATIC_ADDRESS.resolveModelAttribute(context, fullModel)
                 .asBoolean();
         final String staticServerAddress = operation.hasDefined(STATIC_SERVER_ADDRESS) ? SipConnectorDefinition.STATIC_SERVER_ADDRESS
@@ -98,7 +101,7 @@ class SipConnectorAdd extends AbstractAddStepHandler {
         final String hostNames = operation.hasDefined(HOSTNAMES) ? SipConnectorDefinition.HOSTNAMES.resolveModelAttribute(
                 context, fullModel).asString() : null;
 
-        final SipConnectorService service = new SipConnectorService(protocol, scheme, useStaticAddress, staticServerAddress,
+        final SipConnectorService service = new SipConnectorService(protocol, scheme, useLoadBalancer, useStaticAddress, staticServerAddress,
                 staticServerPort, useStun, stunServerAddress, stunServerPort, hostNames);
 
         final ServiceBuilder<SipConnectorListener> serviceBuilder = context.getServiceTarget()

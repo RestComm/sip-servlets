@@ -51,6 +51,8 @@ import org.apache.coyote.Adapter;
 import org.apache.coyote.ProtocolHandler;
 import org.apache.log4j.Logger;
 import org.apache.tomcat.util.modeler.Registry;
+import org.mobicents.ha.javax.sip.ClusteredSipStack;
+import org.mobicents.ha.javax.sip.LoadBalancerHeartBeatingService;
 import org.mobicents.servlet.sip.JainSipUtils;
 import org.mobicents.servlet.sip.SipConnector;
 import org.mobicents.servlet.sip.core.ExtendedListeningPoint;
@@ -144,6 +146,14 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 					logger.debug("Removing the following Listening Point " + extendedListeningPoint);
 				}				
 				sipStack.deleteListeningPoint(extendedListeningPoint.getListeningPoint());
+				if(sipConnector.isUseLoadBalancer() && sipStack instanceof ClusteredSipStack && 
+						((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService() != null) {
+					if(logger.isDebugEnabled()) {
+						logger.debug("SipConnector " + extendedListeningPoint.getListeningPoint() + " remove to use Load Balancer for outbound traffic");
+					}
+					LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = ((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService();
+					loadBalancerHeartBeatingService.removeSipConnector(extendedListeningPoint.getListeningPoint());
+				}
 				extendedListeningPoint = null;
 			}				
 		}
@@ -215,7 +225,9 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			if(setNumber>0 && setNumber<10) {
 				setIncrememt = (setNumber) * 100; // don't attempt to compute if the port set is custom outside that range
 			}
-			logger.info("Computed port increment for MSS SIP ports is " + setIncrememt + " from " + set);
+			if(logger.isInfoEnabled()) {
+				logger.info("Computed port increment for MSS SIP ports is " + setIncrememt + " from " + set);
+			}
 		}
 		portFromConfig += setIncrememt;
 	    sipConnector.setPort(portFromConfig);
@@ -258,7 +270,9 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 						useStun = false;
 						logger.error("Stun discovery failed to find a valid public ip address, disabling stun !");
 					}
-					logger.info("Stun report = " + report);
+					if(logger.isInfoEnabled()) {
+						logger.info("Stun report = " + report);
+					}
 					addressDiscovery.shutDown();
 				}
 				//TODO add it as a listener for global ip address changes if STUN rediscover a new addess at some point
@@ -284,6 +298,15 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 				}					
 			} else {
 				createSipProvider = true;
+			}
+			// https://github.com/RestComm/sip-servlets/issues/111
+			if(sipConnector.isUseLoadBalancer() && sipStack instanceof ClusteredSipStack && 
+					((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService() != null) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("SipConnector " + listeningPoint + " set to use Load Balancer for outbound traffic");
+				}
+				LoadBalancerHeartBeatingService loadBalancerHeartBeatingService = ((ClusteredSipStack)sipStack).getLoadBalancerHeartBeatingService();
+				loadBalancerHeartBeatingService.addSipConnector(listeningPoint);
 			}
 			if(createSipProvider) {
 				sipProvider = sipStack.createSipProvider(listeningPoint);
@@ -480,17 +503,31 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	}
 
 	/**
-	 * @return the useStun
+	 * @return the useLoadBalancer
 	 */
-	public boolean isUseStun() {
-		return sipConnector.isUseStun();
+	public boolean isUseLoadBalancer() {
+		return sipConnector.isUseLoadBalancer();
 	}
-
+	
+	/**
+	 * @param useLoadBalancer the useLoadBalancer to set
+	 */
+	public void setLoadBalancer(boolean useLoadBalancer) {
+		sipConnector.setUseLoadBalancer(useLoadBalancer);
+	}
+	
 	/**
 	 * @param useStun the useStun to set
 	 */
 	public void setUseStun(boolean useStun) {
 		sipConnector.setUseStun(useStun);
+	}
+	
+	/**
+	 * @return the useStun
+	 */
+	public boolean isUseStun() {
+		return sipConnector.isUseStun();
 	}
 
 	public String getStaticServerAddress() {

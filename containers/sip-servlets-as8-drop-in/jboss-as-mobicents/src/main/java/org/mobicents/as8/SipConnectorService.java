@@ -48,6 +48,7 @@ public class SipConnectorService implements Service<SipConnectorListener> {
 
     private String protocol = "SIP/2.0";
     private String scheme = "sip";
+    private Boolean useLoadBalancer = false;
     private Boolean useStaticAddress = false;
     private String staticServerAddress = null;
     private int staticServerPort = -1;
@@ -62,12 +63,13 @@ public class SipConnectorService implements Service<SipConnectorListener> {
     private final InjectedValue<SocketBinding> binding = new InjectedValue<SocketBinding>();
     private final InjectedValue<SipServer> server = new InjectedValue<SipServer>();
 
-    public SipConnectorService(String protocol, String scheme, boolean useStaticAddress, String staticServerAddress,
+    public SipConnectorService(String protocol, String scheme, boolean useLoadBalancer, boolean useStaticAddress, String staticServerAddress,
             int staticServerPort, boolean useStun, String stunServerAddress, int stunServerPort, String hostNames) {
         if (protocol != null)
             this.protocol = protocol;
         if (scheme != null)
             this.scheme = scheme;
+        this.useLoadBalancer = useLoadBalancer;
         this.useStaticAddress = useStaticAddress;
         if (staticServerAddress != null)
             this.staticServerAddress = staticServerAddress;
@@ -98,6 +100,7 @@ public class SipConnectorService implements Service<SipConnectorListener> {
             sipConnector.setPort(address.getPort());
             // https://github.com/Mobicents/sip-servlets/issues/44 support multiple connectors
             sipConnector.setTransport(binding.getName().substring(binding.getName().lastIndexOf("sip-") + ("sip-".length())));
+            sipConnector.setUseLoadBalancer(useLoadBalancer);
             sipConnector.setUseStaticAddress(useStaticAddress);
             sipConnector.setStaticServerAddress(staticServerAddress);
             sipConnector.setStaticServerPort(staticServerPort);
