@@ -1,5 +1,5 @@
 #!/bin/sh -e
-BUILD_DIR=./build/release/target/mss-as8
+BUILD_DIR=./build/release/target/restcomm-sip-servlets-as8
 CHECKOUT_DIR=./build/release/target/dependencies
 #
 # set AS8_TAG as name of the AS8 release/tag
@@ -73,7 +73,7 @@ cp -vpr ../../../../../containers/sip-servlets-as8-drop-in/jboss-as-restcomm/sta
 cd ..
 
 
-ant extract-mms -f ../../build.xml -Dmss.home=./target/mss-as8/$MSS_FINAL_NAME
+ant extract-mms -f ../../build.xml -Dmss.home=./target/restcomm-sip-servlets-as8/$MSS_FINAL_NAME
 #ant build-mobicents-sip-load-balancer -f ../../build.xml -Dmss.home=./target/mss-as8/$MSS_FINAL_NAME
 
 zip -r $MSS_FINAL_NAME.zip $MSS_FINAL_NAME
