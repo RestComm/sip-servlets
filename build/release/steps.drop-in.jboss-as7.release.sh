@@ -7,7 +7,7 @@ AS7_FINAL_NAME=jboss-as-7.2.0.Final
 #AS7_NAME=jboss-as-7.2.0.Final
 AS7_TAG=7.2.0.Final	
 VERSION=$1
-MSS_FINAL_NAME=mss-$VERSION-$AS7_FINAL_NAME
+MSS_FINAL_NAME=restcomm-sip-servlets-$VERSION-$AS7_FINAL_NAME
 
 rm -rf $BUILD_DIR
 mkdir -p $BUILD_DIR

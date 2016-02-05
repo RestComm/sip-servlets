@@ -375,7 +375,7 @@
 	<!-- Build dependencies-->
 	
 	<target name="build-restcomm-sip-load-balancer" depends="get-deps">
-		<echo>Building Mobicents SIP Load Balancer</echo>
+		<echo>Building Restcomm SIP Load Balancer</echo>
 		<exec failonerror="true" executable="${mvn.executable}" dir="${base.path}/target/dependencies/sip-balancer/jar">
 			<arg line="clean install -P set-git-hash -Dmaven.test.skip=true" />
 		</exec>
@@ -394,7 +394,7 @@
 	</target>
 	
 	<target name="build-restcomm-sglc" depends="get-deps">
-		<echo>Building Mobicents Simple Global Logging Configuration</echo>
+		<echo>Building Restcomm Simple Global Logging Configuration</echo>
 		<echo message="jboss.home= ${mss.home}"/>
 		<echo message="node= ${node}"/>
 		<copy overwrite="true" verbose="true" todir="${base.path}/target/dependencies/sglc/sar/target/mobicents-sglc/log4j-templates">
@@ -453,7 +453,7 @@
 	</target>
 	
 	<target name="copy-documentation">
-		<copy overwrite="true" todir="${mss.home}/docs/mobicents-sip-servlets">
+		<copy overwrite="true" todir="${mss.home}/docs/restcomm-sip-servlets">
 			<fileset dir="${base.path}/../../docs/jdocbook-restcomm/target/docbook/publish/en-US/" />
 		</copy>
 		
@@ -484,7 +484,7 @@
 	<target name="make-src-zip"  depends="set-time-stamp,set-src-excludes">
 		<property name="zip.filename" value="mss-${mss.release.version}-src.zip" />
 		
-		<copy todir="${release.path}/src/mobicents/servers/sip-servlets" includeEmptyDirs="false">
+		<copy todir="${release.path}/src/restcomm/servers/sip-servlets" includeEmptyDirs="false">
 			<fileset dir="${base.path}/../.."
 				includes="**/pom.xml **/sip-servlets-annotations/** **/docs/** **/sip-servlets-application-router/** **/sip-servlets-bootstrap/** **/containers/** **/sip-servlets-client/** **/sip-servlets-core-api/** **/sip-servlets-examples/** **/sip-servlets-impl/** **/sip-servlets-jruby/** **/management/** **/sip-servlets-spec/**"
 				excludes="**/mobicents-skin/** **/sip-servlets-bootstrap/src/site/** **/sip-servlets-impl/null/** **/www/**" />
@@ -498,81 +498,29 @@
 	
 	<!-- zip binary distributions -->
 	
-	<target name="make-final-zip-jboss-5-jdk6" depends="set-time-stamp">
-		<fixcrlf srcdir="${jboss-5-jdk6.home}/bin" includes="*.sh" eol="lf" eof="remove" />
-		<fixcrlf srcdir="${jboss-5-jdk6.home}/mobicents-media-server/mms-server/bin" includes="*.sh" eol="lf" eof="remove" />
-		<zip destfile="${base.path}/mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}-full.zip" filesonly="false">
-			<zipfileset dir="${jboss-5-jdk6.home}/bin" filemode="755" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}/bin">
-				<include name="*.sh" />
-			</zipfileset>			
-			<zipfileset dir="${jboss-5-jdk6.home}/bin" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}/bin">
-				<exclude name="*.sh" />
-			</zipfileset>
-			<zipfileset dir="${jboss-5-jdk6.home}/mobicents-media-server/mms-server/bin" filemode="755" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}/mobicents-media-server/mms-server/bin">
-				<include name="*.sh" />
-			</zipfileset>
-			<zipfileset dir="${jboss-5-jdk6.home}/mobicents-media-server/mms-server/bin" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}/mobicents-media-server/mms-server/bin">
-				<exclude name="*.sh" />
-			</zipfileset>
-			<zipfileset dir="${jboss-5-jdk6.home}" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}" excludes="**/bin/** **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**"/>
-		</zip>
-	</target>
-	
-	<target name="make-final-zip-jboss-5-jdk6-lgpl" depends="set-time-stamp">
-		<delete dir="${jboss-5-jdk6.home}/mobicents-media-server"/>
-		<delete dir="${jboss-5-jdk6.home}/server/default/deploy/${diameter-jboss-5.name}"/>		
-		<delete file="${jboss-5-jdk6.home}/server/default/deploy/diameter-event-charging.war"/>
-		<delete file="${jboss-5-jdk6.home}/server/default/deploy/media-jsr309-servlet.war"/>
-		<delete file="${jboss-5-jdk6.home}/docs/licenses/GPL-LICENSE.TXT"/>
-		<fixcrlf srcdir="${jboss-5-jdk6.home}/bin" includes="*.sh" eol="lf" eof="remove" />		
-		<zip destfile="${base.path}/mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}-LGPL.zip" filesonly="false">
-			<zipfileset dir="${jboss-5-jdk6.home}/bin" filemode="755" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}/bin">
-				<include name="*.sh" />
-			</zipfileset>			
-			<zipfileset dir="${jboss-5-jdk6.home}/bin" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}/bin">
-				<exclude name="*.sh" />
-			</zipfileset>			
-			<zipfileset dir="${jboss-5-jdk6.home}" prefix="mss-${mss.release.version}-jboss-jdk6-${jboss-5.version}" excludes="**/bin/** **/server/*/data/** **/server/*/log/** **/server/*/tmp/** **/server/*/work/** **/server/tmp/**"/>
-		</zip>
-	</target>
-	
-	<target name="make-final-zip-tomcat" depends="set-time-stamp">
-		<fixcrlf srcdir="${tomcat.home}/bin" includes="*.sh" eol="lf" eof="remove" />
-		<zip destfile="${base.path}/mss-${mss.release.version}-apache-tomcat-${tomcat.version}.zip" filesonly="false">
-			<zipfileset dir="${tomcat.home}/bin" filemode="755" prefix="mss-${mss.release.version}-apache-tomcat-${tomcat.version}/bin">
-				<include name="*.sh" />
-			</zipfileset>
-			<zipfileset dir="${tomcat.home}/bin" prefix="mss-${mss.release.version}-apache-tomcat-${tomcat.version}/bin">
-				<exclude name="*.sh" />
-			</zipfileset>
-			<zipfileset dir="${tomcat.home}" prefix="mss-${mss.release.version}-apache-tomcat-${tomcat.version}" excludes="**/bin/**"/>
-		</zip>
-	</target>
-	
 	<target name="make-final-zip-tomcat7" depends="set-time-stamp">
 		<fixcrlf srcdir="${tomcat7.home}/bin" includes="*.sh" eol="lf" eof="remove" />
-		<zip destfile="${base.path}/mss-${mss.release.version}-apache-tomcat-${tomcat7.version}.zip" filesonly="false">
-			<zipfileset dir="${tomcat7.home}/bin" filemode="755" prefix="mss-${mss.release.version}-apache-tomcat-${tomcat7.version}/bin">
+		<zip destfile="${base.path}/restcomm-sip-servlets-${mss.release.version}-apache-tomcat-${tomcat7.version}.zip" filesonly="false">
+			<zipfileset dir="${tomcat7.home}/bin" filemode="755" prefix="restcomm-sip-servlets-${mss.release.version}-apache-tomcat-${tomcat7.version}/bin">
 				<include name="*.sh" />
 			</zipfileset>
-			<zipfileset dir="${tomcat7.home}/bin" prefix="mss-${mss.release.version}-apache-tomcat-${tomcat7.version}/bin">
+			<zipfileset dir="${tomcat7.home}/bin" prefix="restcomm-sip-servlets-${mss.release.version}-apache-tomcat-${tomcat7.version}/bin">
 				<exclude name="*.sh" />
 			</zipfileset>
-			<zipfileset dir="${tomcat7.home}" prefix="mss-${mss.release.version}-apache-tomcat-${tomcat7.version}" excludes="**/bin/**"/>
+			<zipfileset dir="${tomcat7.home}" prefix="restcomm-sip-servlets-${mss.release.version}-apache-tomcat-${tomcat7.version}" excludes="**/bin/**"/>
 		</zip>
 	</target>
 
 	<target name="make-final-zip-tomcat8" depends="set-time-stamp">
 		<fixcrlf srcdir="${tomcat8.home}/bin" includes="*.sh" eol="lf" eof="remove" />
-		<!--zip destfile="${base.path}/mss-${mss.release.version}-apache-tomcat-${tomcat8.version}-${time.stamp}.zip" filesonly="false"-->
-		<zip destfile="${base.path}/mss-${mss.release.version}-apache-tomcat-${tomcat8.version}.zip" filesonly="false">
-			<zipfileset dir="${tomcat8.home}/bin" filemode="755" prefix="mss-${mss.release.version}-apache-tomcat-${tomcat8.version}/bin">
+		<zip destfile="${base.path}/restcomm-sip-servlets-${mss.release.version}-apache-tomcat-${tomcat8.version}.zip" filesonly="false">
+			<zipfileset dir="${tomcat8.home}/bin" filemode="755" prefix="restcomm-sip-servlets-${mss.release.version}-apache-tomcat-${tomcat8.version}/bin">
 				<include name="*.sh" />
 			</zipfileset>
-			<zipfileset dir="${tomcat8.home}/bin" prefix="mss-${mss.release.version}-apache-tomcat-${tomcat8.version}/bin">
+			<zipfileset dir="${tomcat8.home}/bin" prefix="restcomm-sip-servlets-${mss.release.version}-apache-tomcat-${tomcat8.version}/bin">
 				<exclude name="*.sh" />
 			</zipfileset>
-			<zipfileset dir="${tomcat8.home}" prefix="mss-${mss.release.version}-apache-tomcat-${tomcat8.version}" excludes="**/bin/**"/>
+			<zipfileset dir="${tomcat8.home}" prefix="restcomm-sip-servlets-${mss.release.version}-apache-tomcat-${tomcat8.version}" excludes="**/bin/**"/>
 		</zip>
 	</target>
 	
@@ -605,7 +553,7 @@
 	
 	<available file="${mms.zip.path}" property="got.mms" />
 	<target name="get-mms" unless="got.mms">
-		<echo>Downloading Mobicents Media Server ${mms-version}</echo>
+		<echo>Downloading Restcomm Media Server ${mms-version}</echo>
 		<get dest="${mms.zip.path}" src="${mms.download.url}"/>
 	</target>
 	

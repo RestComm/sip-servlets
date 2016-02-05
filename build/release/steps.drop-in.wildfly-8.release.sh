@@ -7,7 +7,7 @@ AS8_FINAL_NAME=wildfly-8.2.1.Final
 #AS8_NAME=wildfly-8.2.1.Final
 #AS8_TAG=8.2.1.Final	
 VERSION=$1
-MSS_FINAL_NAME=mss-$VERSION-$AS8_FINAL_NAME
+MSS_FINAL_NAME=restcomm-sip-servlets-$VERSION-$AS8_FINAL_NAME
 
 rm -rf $BUILD_DIR
 mkdir -p $BUILD_DIR
