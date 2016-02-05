@@ -482,7 +482,7 @@
 	</target>
 	
 	<target name="make-src-zip"  depends="set-time-stamp,set-src-excludes">
-		<property name="zip.filename" value="mss-${mss.release.version}-src.zip" />
+		<property name="zip.filename" value="restcomm-sip-servlets-${mss.release.version}-src.zip" />
 		
 		<copy todir="${release.path}/src/restcomm/servers/sip-servlets" includeEmptyDirs="false">
 			<fileset dir="${base.path}/../.."
@@ -544,37 +544,11 @@
 	</target>
 	
 	<!-- Download and dependency building -->
-	
-	<available file="${jboss-5-jdk6.distro.zip.path}" property="got.jboss-5-jdk6" />
-	<target name="get-jboss-5-jdk6" unless="got.jboss-5-jdk6">
-		<echo>Downloading JBoss AS 5</echo>
-		<get dest="${jboss-5-jdk6.distro.zip.path}" src="${jboss-5-jdk6.download.url}"/>
-	</target>
-	
+
 	<available file="${mms.zip.path}" property="got.mms" />
 	<target name="get-mms" unless="got.mms">
 		<echo>Downloading Restcomm Media Server ${mms-version}</echo>
 		<get dest="${mms.zip.path}" src="${mms.download.url}"/>
-	</target>
-	
-	<available file="${jboss-5.torquebox.deployer.zip.path}" property="got.jboss-5-torquebox-deployer" />
-	<target name="get-jboss-5-torquebox-deployer" unless="got.jboss-5-torquebox-deployer">
-		<echo>Downloading JBoss AS 5 Torquebox Deployer</echo>
-		<get dest="${jboss-5.torquebox.deployer.zip.path}" src="${jboss-5.torquebox.deployer.url}"/>
-	</target>
-	
-	<target name="extract-jboss-5-jdk6" depends="get-jboss-5-jdk6">
-		<delete dir="${jboss-5-jdk6.home}" failonerror="true" />
-		<unzip src="${jboss-5-jdk6.distro.zip.path}" dest="${jboss-5-jdk6.home.temp}"/>
-		<move todir="${jboss-5-jdk6.home}">
-			<fileset dir="${jboss-5-jdk6.home.temp}/jboss-${jboss-5.version}"/>
-		</move>
-		
-		<echo>Included profiles: ${mss.release.configurations.jboss5} -&gt; Excludes list: ${used.configurations.jboss5}</echo>
-		
-		<delete dir="${jboss-5-jdk6.home}/server/minimal" includeemptydirs="true" failonerror="false" verbose="false"/>			
-		<delete dir="${jboss-5-jdk6.home}/server/web" includeemptydirs="true" failonerror="false" verbose="false"/>
-		<delete dir="${jboss-5-jdk6.home}/server/standard" includeemptydirs="true" failonerror="false" verbose="false"/>
 	</target>
 	
 	<target name="extract-mms" depends="get-mms">
@@ -582,29 +556,10 @@
 		<unzip src="${mms.zip.path}" dest="${mss.home}/mobicents-media-server" />
 	</target>
 	
-	<target name="extract-jboss-5-torquebox-deployer" depends="get-jboss-5-torquebox-deployer">			
-		<unzip src="${jboss-5.torquebox.deployer.zip.path}" dest="${jboss-5.home}/server/default/deployers/torquebox.deployer" />					
-	</target>
-	
-	<target name="extract-jboss-5-torquebox-deployer-for-jdk6" depends="get-jboss-5-torquebox-deployer">			
-		<unzip src="${jboss-5.torquebox.deployer.zip.path}" dest="${jboss-5-jdk6.home}/server/default/deployers/torquebox.deployer" />					
-	</target>
-	
-	<available file="${tomcat.distro.zip.path}" property="got.tomcat" />
-	<target name="get-tomcat" unless="got.tomcat">
-		<echo>Downloading Apache Tomcat</echo>
-		<get dest="${tomcat.distro.zip.path}" src="${tomcat.download.url}"/>
-	</target>
-	
 	<available file="${tomcat7.distro.zip.path}" property="got.tomcat7" />
 	<target name="get-tomcat7" unless="got.tomcat7">
 		<echo>Downloading Apache Tomcat</echo>
 		<get dest="${tomcat7.distro.zip.path}" src="${tomcat7.download.url}"/>
-	</target>
-	
-	<target name="extract-tomcat" depends="get-tomcat">
-		<delete dir="${tomcat.home}" failonerror="true" />
-		<unzip src="${tomcat.distro.zip.path}" dest="${tomcat.home}/.." />
 	</target>
 	
 	<target name="extract-tomcat7" depends="get-tomcat7">
