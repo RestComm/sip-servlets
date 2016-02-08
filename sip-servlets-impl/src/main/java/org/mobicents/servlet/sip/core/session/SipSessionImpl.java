@@ -97,6 +97,7 @@ import org.mobicents.servlet.sip.address.AddressImpl;
 import org.mobicents.servlet.sip.address.AddressImpl.ModifiableRule;
 import org.mobicents.servlet.sip.address.SipURIImpl;
 import org.mobicents.servlet.sip.annotation.ConcurrencyControlMode;
+import org.mobicents.servlet.sip.core.MobicentsExtendedListeningPoint;
 import org.mobicents.servlet.sip.core.MobicentsSipServlet;
 import org.mobicents.servlet.sip.core.RoutingState;
 import org.mobicents.servlet.sip.core.SipApplicationDispatcher;
@@ -424,19 +425,30 @@ public class SipSessionImpl implements MobicentsSipSession {
 							userName = ((javax.sip.address.SipURI)uri).getUser();
 						}
 						if(sipFactory.isUseLoadBalancer()) {
-							SipLoadBalancer loadBalancerToUse = sipFactory.getLoadBalancerToUse();
-							javax.sip.address.SipURI sipURI = SipFactoryImpl.addressFactory.createSipURI(userName, loadBalancerToUse.getAddress().getHostAddress());
-							sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
-							sipURI.setPort(loadBalancerToUse.getSipPort());
-
-							// TODO: Is this enough or we must specify the transport somewhere?
-							// We can leave it like this. It will be updated if needed in the send() method
-							sipURI.setTransportParam(ListeningPoint.UDP);
-							
-							javax.sip.address.Address contactAddress = SipFactoryImpl.addressFactory.createAddress(sipURI);
-							contactHeader = SipFactoryImpl.headerFactory.createContactHeader(contactAddress);													
-						} else {											
-
+							// https://github.com/RestComm/sip-servlets/issues/111
+							MobicentsExtendedListeningPoint listeningPoint = JainSipUtils.findListeningPoint(sipFactory.getSipNetworkInterfaceManager(), methodRequest, outboundInterface);
+							if(listeningPoint != null && listeningPoint.isUseLoadBalancer()) {
+								if(logger.isDebugEnabled()) {
+									logger.debug("Using listeningPoint " + listeningPoint + " for load balancer " + sipFactory.getLoadBalancerToUse());
+								}
+								SipLoadBalancer loadBalancerToUse = sipFactory.getLoadBalancerToUse();
+								javax.sip.address.SipURI sipURI = SipFactoryImpl.addressFactory.createSipURI(userName, loadBalancerToUse.getAddress().getHostAddress());
+								sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
+								sipURI.setPort(loadBalancerToUse.getSipPort());
+	
+								// TODO: Is this enough or we must specify the transport somewhere?
+								// We can leave it like this. It will be updated if needed in the send() method
+								sipURI.setTransportParam(ListeningPoint.UDP);
+								
+								javax.sip.address.Address contactAddress = SipFactoryImpl.addressFactory.createAddress(sipURI);
+								contactHeader = SipFactoryImpl.headerFactory.createContactHeader(contactAddress);
+							} else {
+								if(logger.isDebugEnabled()) {
+									logger.debug("Not Using load balancer as it is not enabled for listeningPoint " + listeningPoint);
+								}
+								contactHeader = JainSipUtils.createContactHeader(sipFactory.getSipNetworkInterfaceManager(), methodRequest, displayName, userName, outboundInterface);
+							}
+						} else {
 							contactHeader = JainSipUtils.createContactHeader(sipFactory.getSipNetworkInterfaceManager(), methodRequest, displayName, userName, outboundInterface);
 						}
 						methodRequest.setHeader(contactHeader);

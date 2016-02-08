@@ -320,7 +320,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 			extendedListeningPoint.setUseStaticAddress(false);
 			extendedListeningPoint.setGlobalIpAddress(globalIpAddress);
 			extendedListeningPoint.setGlobalPort(globalPort);
-		
+			extendedListeningPoint.setUseLoadBalancer(sipConnector.isUseLoadBalancer());
 			
 			//make the extended listening Point available to the service implementation			
 			setAttribute(ExtendedListeningPoint.class.getSimpleName(), extendedListeningPoint);
@@ -514,7 +514,7 @@ public class SipProtocolHandler implements ProtocolHandler, MBeanRegistration {
 	/**
 	 * @param useLoadBalancer the useLoadBalancer to set
 	 */
-	public void setLoadBalancer(boolean useLoadBalancer) {
+	public void setUseLoadBalancer(boolean useLoadBalancer) {
 		sipConnector.setUseLoadBalancer(useLoadBalancer);
 	}
 	

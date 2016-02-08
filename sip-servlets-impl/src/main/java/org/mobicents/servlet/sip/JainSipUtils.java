@@ -520,18 +520,8 @@ public final class JainSipUtils {
 	public static ViaHeader createViaHeader(
 			SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String branch, String outboundInterface) {		
 		MobicentsExtendedListeningPoint listeningPoint = null;
-		if(outboundInterface == null) {
-			String transport = findTransport(request);
-			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
-		} else {
-			javax.sip.address.SipURI outboundInterfaceURI = null;			
-			try {
-				outboundInterfaceURI = (javax.sip.address.SipURI) SipFactoryImpl.addressFactory.createURI(outboundInterface);
-			} catch (ParseException e) {
-				throw new IllegalArgumentException("couldn't parse the outbound interface " + outboundInterface, e);
-			}
-			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(outboundInterfaceURI, false);
-		}
+		listeningPoint = findListeningPoint(sipNetworkInterfaceManager,
+				request, outboundInterface);
 		boolean usePublicAddress = findUsePublicAddress(
 				sipNetworkInterfaceManager, request, listeningPoint);
 		return listeningPoint.createViaHeader(branch, usePublicAddress);		
@@ -560,19 +550,9 @@ public final class JainSipUtils {
 	 * @return
 	 */
 	public static ContactHeader createContactHeader(SipNetworkInterfaceManager sipNetworkInterfaceManager, Request request, String displayName, String userName, String outboundInterface) {		
-		MobicentsExtendedListeningPoint listeningPoint = null;
-		if(outboundInterface == null) {
-			String transport = findTransport(request);
-			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
-		} else {
-			javax.sip.address.SipURI outboundInterfaceURI = null;			
-			try {
-				outboundInterfaceURI = (javax.sip.address.SipURI) SipFactoryImpl.addressFactory.createURI(outboundInterface);
-			} catch (ParseException e) {
-				throw new IllegalArgumentException("couldn't parse the outbound interface " + outboundInterface, e);
-			}			
-			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(outboundInterfaceURI, false);
-		}
+		MobicentsExtendedListeningPoint listeningPoint = 
+			findListeningPoint(sipNetworkInterfaceManager, request, outboundInterface);
+		
 		boolean usePublicAddress = findUsePublicAddress(
 				sipNetworkInterfaceManager, request, listeningPoint);
 		ContactHeader ch = null;
@@ -594,6 +574,27 @@ public final class JainSipUtils {
 		}
 		
 		return ch;
+	}
+
+	public static MobicentsExtendedListeningPoint findListeningPoint(
+			SipNetworkInterfaceManager sipNetworkInterfaceManager,
+			Request request, String outboundInterface) {
+		
+		MobicentsExtendedListeningPoint listeningPoint;
+		
+		if(outboundInterface == null) {
+			String transport = findTransport(request);
+			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(transport, false);
+		} else {
+			javax.sip.address.SipURI outboundInterfaceURI = null;			
+			try {
+				outboundInterfaceURI = (javax.sip.address.SipURI) SipFactoryImpl.addressFactory.createURI(outboundInterface);
+			} catch (ParseException e) {
+				throw new IllegalArgumentException("couldn't parse the outbound interface " + outboundInterface, e);
+			}			
+			listeningPoint = sipNetworkInterfaceManager.findMatchingListeningPoint(outboundInterfaceURI, false);
+		}
+		return listeningPoint;
 	}
 	
 	private static ThreadLocal<MessageDigest> localDigest = new ThreadLocal<MessageDigest>();

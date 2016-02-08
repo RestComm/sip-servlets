@@ -95,6 +95,8 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
+import com.sun.org.apache.bcel.internal.generic.IUSHR;
+
 public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {	
 
 	private static final long serialVersionUID = 1L;
@@ -108,6 +110,7 @@ public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {
 	private static final String LR_PARAM = "lr";
 
 	private boolean useLoadBalancer = false;
+	private boolean useLoadBalancerForAllRequests = true;
 	private boolean routeOrphanRequests = false;
 	private SipLoadBalancer loadBalancerToUse = null;
 	

@@ -257,16 +257,27 @@ public class B2buaHelperImpl implements MobicentsB2BUAHelper, Serializable {
 				// if a sip load balancer is present in front of the server, the contact header is the one from the sip lb
 				// so that the subsequent requests can be failed over
 				if(sipFactoryImpl.isUseLoadBalancer()) {
-					final SipLoadBalancer loadBalancerToUse = sipFactoryImpl.getLoadBalancerToUse();
-					javax.sip.address.SipURI sipURI = sipFactoryImpl.getAddressFactory().createSipURI(fromName, loadBalancerToUse.getAddress().getHostAddress());
-					sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
-					sipURI.setPort(loadBalancerToUse.getSipPort());			
-					sipURI.setTransportParam(ListeningPoint.UDP);
-					javax.sip.address.Address contactAddress = sipFactoryImpl.getAddressFactory().createAddress(sipURI);
-					if(diaplayName != null && diaplayName.length() > 0) {
-						contactAddress.setDisplayName(diaplayName);
+					MobicentsExtendedListeningPoint listeningPoint = JainSipUtils.findListeningPoint(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, session.getOutboundInterface());
+					if(listeningPoint != null && listeningPoint.isUseLoadBalancer()) {
+						if(logger.isDebugEnabled()) {
+							logger.debug("Using listeningPoint " + listeningPoint + " for load balancer " + sipFactoryImpl.getLoadBalancerToUse());
+						}
+						final SipLoadBalancer loadBalancerToUse = sipFactoryImpl.getLoadBalancerToUse();
+						javax.sip.address.SipURI sipURI = sipFactoryImpl.getAddressFactory().createSipURI(fromName, loadBalancerToUse.getAddress().getHostAddress());
+						sipURI.setHost(loadBalancerToUse.getAddress().getHostAddress());
+						sipURI.setPort(loadBalancerToUse.getSipPort());			
+						sipURI.setTransportParam(ListeningPoint.UDP);
+						javax.sip.address.Address contactAddress = sipFactoryImpl.getAddressFactory().createAddress(sipURI);
+						if(diaplayName != null && diaplayName.length() > 0) {
+							contactAddress.setDisplayName(diaplayName);
+						}
+						contactHeader = sipFactoryImpl.getHeaderFactory().createContactHeader(contactAddress);
+					} else {
+						if(logger.isDebugEnabled()) {
+							logger.debug("Not Using load balancer as it is not enabled for listeningPoint " + listeningPoint);
+						}
+						contactHeader = JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, diaplayName, fromName, session.getOutboundInterface());
 					}
-					contactHeader = sipFactoryImpl.getHeaderFactory().createContactHeader(contactAddress);													
 				} else {					
 					contactHeader = JainSipUtils.createContactHeader(sipFactoryImpl.getSipNetworkInterfaceManager(), newRequest, diaplayName, fromName, session.getOutboundInterface());
 				}	
