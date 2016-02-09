@@ -95,8 +95,6 @@ import org.mobicents.servlet.sip.core.session.SipApplicationSessionKey;
 import org.mobicents.servlet.sip.security.AuthInfoImpl;
 import org.mobicents.servlet.sip.startup.StaticServiceHolder;
 
-import com.sun.org.apache.bcel.internal.generic.IUSHR;
-
 public class SipFactoryImpl implements MobicentsSipFactory,  Externalizable {	
 
 	private static final long serialVersionUID = 1L;
