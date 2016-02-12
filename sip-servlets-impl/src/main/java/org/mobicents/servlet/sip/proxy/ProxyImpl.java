@@ -926,7 +926,8 @@ public class ProxyImpl implements MobicentsProxy, Externalizable {
 							logger.debug("storing termination Info for request " + proxiedResponse.getRequest());
 						}
 						terminationInfo = new ProxyTerminationInfo(proxiedResponse, getRecordRouteURI(), this);
-						terminationInfo.setCallerCSeq(((MessageExt)proxiedResponse.getRequest()).getCSeqHeader().getSeqNumber());
+						terminationInfo.setCallerCSeq(
+								((MessageExt)((MobicentsSipServletRequest)proxiedResponse.getRequest()).getMessage()).getCSeqHeader().getSeqNumber());
 					}
 				} catch (Exception e) {
 					logger.error("A problem occured while proxying the final response", e);
