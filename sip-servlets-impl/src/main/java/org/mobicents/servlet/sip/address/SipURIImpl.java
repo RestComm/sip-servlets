@@ -414,7 +414,7 @@ public class SipURIImpl extends URIImpl implements SipURI {
 			// Done to pass UriServlet.testSetParameter101 TCK test waiting for an NPE
 			throw new NullPointerException("Value is not allowed to be NULL as per method contract");
 		}
-		if(value != null && value.trim().length() > 1) {
+		if(value != null && value.trim().length() >= 1) {
 			escapedValue = RFC2396UrlDecoder.encode(value);
 		}
 		super.setParameter(name, value);
