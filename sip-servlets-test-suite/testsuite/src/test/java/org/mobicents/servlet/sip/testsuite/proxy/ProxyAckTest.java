@@ -20,10 +20,15 @@
 package org.mobicents.servlet.sip.testsuite.proxy;
 
 import java.util.ArrayList;
+<<<<<<< HEAD
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+=======
+import java.util.Iterator;
+import java.util.List;
+>>>>>>> 4c443bd033467ed87c5d6923dabcec94077f1ea3
 
 import javax.sip.ListeningPoint;
 import javax.sip.SipProvider;
