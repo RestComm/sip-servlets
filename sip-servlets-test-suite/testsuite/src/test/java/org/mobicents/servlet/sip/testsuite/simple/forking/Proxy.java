@@ -138,6 +138,11 @@ public class Proxy implements SipListener {
              
                
 
+            } else if (request.getMethod().equals(Request.CANCEL)) {
+            	ClientTransaction clientTransaction = ((ClientTransaction)clientTxTable.get(new Integer(5081)));
+            	Request cancelRequest = clientTransaction.createCancel();
+            	sipProvider.sendRequest(cancelRequest);
+            	
             } else {
                 // Remove the topmost route header
                 // The route header will make sure it gets to the right place.

@@ -366,6 +366,17 @@ public class Shootist implements SipListener {
 							logger.info("Sending ACK");
 							dialog.sendAck(ackRequest);	
 							
+							if(!byeTaskRunning) {
+								try {					
+									System.out.println("Waiting for " + pauseBeforeBye + " before sending BYE");
+									Thread.sleep(pauseBeforeBye);
+									Request byeRequest = dialog.createRequest(Request.BYE);
+									ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
+									dialog.sendRequest(ct);
+								} catch (Exception ex) {
+									ex.printStackTrace();
+								}
+							}
 //						} else {
 //							// Kill the first dialog by sending a bye.
 //							//assertTrue (dialog == this.dialog);
@@ -813,4 +824,7 @@ public class Shootist implements SipListener {
 		return isRequestTerminatedReceived;
 	}
 
+	public void stop() {
+        this.sipStack.stop();
+    }
 }

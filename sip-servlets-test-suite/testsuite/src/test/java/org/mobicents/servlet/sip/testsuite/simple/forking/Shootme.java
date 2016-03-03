@@ -108,6 +108,10 @@ public class Shootme   implements SipListener {
     private static Timer timer = new Timer();
 
     private long waitBeforeFinalResponse = 0;
+    
+    private boolean waitForCancel = false;
+    
+    private String toTag = null;
 
     class MyTimerTask extends TimerTask {
         RequestEvent  requestEvent;
@@ -223,7 +227,7 @@ public class Shootme   implements SipListener {
             dialog.setApplicationData(st);
 
             this.inviteSeen = true;
-
+            this.toTag = toTag;
             timer.schedule(new MyTimerTask(requestEvent,st,toTag), this.delay);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -240,9 +244,15 @@ public class Shootme   implements SipListener {
 
                 SipProvider sipProvider = (SipProvider) requestEvent.getSource();
                 Request request = requestEvent.getRequest();
-                Response okResponse = messageFactory.createResponse(Response.OK,
+                Response okResponse = null;
+                if(!waitForCancel) {
+                		okResponse = messageFactory.createResponse(Response.OK,
                         request);
-                    ListeningPoint lp = sipProvider.getListeningPoint(transport);
+                } else {
+                	okResponse = messageFactory.createResponse(183,
+                            request);
+                }
+                ListeningPoint lp = sipProvider.getListeningPoint(transport);
                 int myPort = lp.getPort();
 
 
@@ -259,7 +269,9 @@ public class Shootme   implements SipListener {
                 inviteTid.sendResponse(okResponse);
                 logger.info("shootme: Dialog state after OK: "
                         + inviteTid.getDialog().getState());
-                TestCase.assertEquals( DialogState.CONFIRMED , inviteTid.getDialog().getState() );
+                if(!waitForCancel) {
+//                	TestCase.assertEquals( DialogState.CONFIRMED , inviteTid.getDialog().getState() );
+                }
             } else {
                 logger.info("semdInviteOK: inviteTid = " + inviteTid + " state = " + inviteTid.getState());
             }
@@ -313,6 +325,7 @@ public class Shootme   implements SipListener {
                     serverTx.getState().equals(TransactionState.PROCEEDING))) {
                 Request originalRequest = serverTx.getRequest();
                 Response resp = messageFactory.createResponse(Response.REQUEST_TERMINATED,originalRequest);
+                ((ToHeader)resp.getHeader(ToHeader.NAME)).setTag(toTag);
                 serverTx.sendResponse(resp);
             }
 
@@ -414,6 +427,20 @@ public class Shootme   implements SipListener {
 
     public void setWaitBeforeFinalResponse(long waitBeforeFinalResponse) {
 		this.waitBeforeFinalResponse = waitBeforeFinalResponse;
+	}
+
+	/**
+	 * @return the waitForCancel
+	 */
+	public boolean isWaitForCancel() {
+		return waitForCancel;
+	}
+
+	/**
+	 * @param waitForCancel the waitForCancel to set
+	 */
+	public void setWaitForCancel(boolean waitForCancel) {
+		this.waitForCancel = waitForCancel;
 	}
 
 }

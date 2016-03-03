@@ -1602,16 +1602,16 @@ public class SipApplicationDispatcherImpl implements SipApplicationDispatcher, S
 											b2buaHelperImpl.unlinkOriginalRequestInternal((SipServletRequestImpl)tad.getSipServletMessage(), false);
 										}
 										sipSession.removeOngoingTransaction(transaction);
-										tad.cleanUp();
-										if(b2buaHelperImpl == null) {
-											sipSession.cleanDialogInformation();
-										}
 										// Issue 1468 : to handle forking, we shouldn't cleanup the app data since it is needed for the forked responses
 										boolean nullifyAppData = true;					
 										if(((SipStackImpl)((SipProvider)transactionTerminatedEvent.getSource()).getSipStack()).getMaxForkTime() > 0 && Request.INVITE.equals(sipServletMessageImpl.getMethod())) {
 											nullifyAppData = false;
 										}
 										if(nullifyAppData) {
+											tad.cleanUp();
+											if(b2buaHelperImpl == null) {
+												sipSession.cleanDialogInformation();
+											}
 											transaction.setApplicationData(null);
 										}
 									} else {

@@ -143,10 +143,48 @@ public class B2BUASipServletForkingTest extends SipServletTestCase {
 		proxy.stop();
 		shootme1.stop();
 		shootme2.stop();
+		shootist.stop();
 		assertTrue(shootme1.isAckSeen());		
 		assertTrue(shootme1.checkBye());
 		assertTrue(shootme2.isAckSeen());
 		assertTrue(shootme2.checkBye());	
+		assertEquals(0, sipContext.getSipManager().getActiveSipSessions());
+		assertEquals(0, sipContext.getSipManager().getActiveSipApplicationSessions());
+		
+	}
+	
+	public void testB2BUAForkingWithCANCEL() throws Exception {		
+        Shootme shootme1 = new Shootme(5080, true, 2500);
+        SipProvider shootmeProvider = shootme1.createProvider();
+        shootmeProvider.addSipListener(shootme1);
+        Shootme shootme2 = new Shootme(5081, true, 1500);
+        SipProvider shootme2Provider = shootme2.createProvider();
+        shootme2Provider.addSipListener(shootme2);
+        shootme2.setWaitForCancel(true);
+		Proxy proxy = new Proxy(5070,2);
+		SipProvider provider = proxy.createSipProvider();
+        provider.addSipListener(proxy);
+        Shootist shootist = new Shootist(true, "5060");
+        shootist.pauseBeforeBye = 20000;
+        shootist.setFromHost("sip-servlets.com");
+        
+        sipConnector = tomcat.addSipConnector(serverName, sipIpAddress, 5060, listeningPointTransport);
+		tomcat.startTomcat();
+		Map<String, String> params= new HashMap<String, String>();
+		params.put("route", "sip:" + System.getProperty("org.mobicents.testsuite.testhostaddr") + ":5070");
+		params.put("timeToWaitForBye", "20000");
+		params.put("dontSetRURI", "true");
+		SipStandardContext sipContext = deployApplication(params);
+		shootist.init("forward-sender-forking-pending", false, null);
+		Thread.sleep(TIMEOUT);
+		proxy.stop();
+		shootme1.stop();
+		shootme2.stop();
+		shootist.stop();
+//		assertTrue(shootme1.isAckSeen());		
+		assertTrue(shootme1.checkBye());
+//		assertTrue(shootme2.isAckSeen());
+//		assertTrue(shootme2.checkBye());	
 		assertEquals(0, sipContext.getSipManager().getActiveSipSessions());
 		assertEquals(0, sipContext.getSipManager().getActiveSipApplicationSessions());
 		

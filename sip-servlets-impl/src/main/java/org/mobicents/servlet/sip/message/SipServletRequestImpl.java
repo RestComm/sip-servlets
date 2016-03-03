@@ -1802,10 +1802,17 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 					session.removeOngoingTransaction(transaction);
 				}
 				if(tad != null) {
-					tad.cleanUp();
-					transaction.setApplicationData(null);
-					if(b2buaHelperImpl == null && sipSession.getProxy() == null) {
-						tad.cleanUpMessage();
+					// Issue 1468 : to handle forking, we shouldn't cleanup the app data since it is needed for the forked responses
+					boolean nullifyAppData = true;					
+					if(((SipStackImpl)(sipFactoryImpl.getSipApplicationDispatcher().getSipStack())).getMaxForkTime() > 0) {
+						nullifyAppData = false;
+					}
+					if(nullifyAppData) {
+						tad.cleanUp();
+						transaction.setApplicationData(null);
+						if(b2buaHelperImpl == null && sipSession.getProxy() == null) {
+							tad.cleanUpMessage();
+						}
 					}
 				}
 			}

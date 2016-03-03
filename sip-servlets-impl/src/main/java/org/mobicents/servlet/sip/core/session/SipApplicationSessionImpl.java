@@ -234,7 +234,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 					logger.debug("Derived sip sessions left are : ");
 					while (itDerivedSessions.hasNext()) {
 						MobicentsSipSession derivedSipSession = itDerivedSessions.next();
-						logger.debug("Derived sip session : " + derivedSipSession.getKey());
+						logger.debug("Derived sip session : " + derivedSipSession.getKey() + " isValid " + derivedSipSession.isValidInternal() + " isReadyToInvalidate " + derivedSipSession.isReadyToInvalidateInternal());
 					}
 				} 
 				return null;
@@ -253,7 +253,7 @@ public class SipApplicationSessionImpl implements MobicentsSipApplicationSession
 				logger.debug("Derived sip sessions left are : ");
 				while (itDerivedSessions.hasNext()) {
 					MobicentsSipSession derivedSipSession = itDerivedSessions.next();
-					logger.debug("Derived sip session : " + derivedSipSession.getKey());
+					logger.debug("Derived sip session : " + derivedSipSession.getKey() + " isValid " + derivedSipSession.isValidInternal() + " isReadyToInvalidate " + derivedSipSession.isReadyToInvalidateInternal());
 				}
 			}
 			return null;

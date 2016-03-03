@@ -19,6 +19,7 @@
 
 package org.mobicents.servlet.sip.core.dispatchers;
 
+import gov.nist.javax.sip.SipStackImpl;
 import gov.nist.javax.sip.message.MessageExt;
 import gov.nist.javax.sip.message.SIPMessage;
 import gov.nist.javax.sip.stack.SIPTransaction;
@@ -277,6 +278,14 @@ public class ResponseDispatcher extends MessageDispatcher {
 				logger.debug("session found is " + tmpSession);
 				if(tmpSession == null) {
 					sipManager.dumpSipSessions();
+				} else if (((SipStackImpl)sipApplicationDispatcher.getSipStack()).getMaxForkTime() > 0) {
+					logger.debug("trying to find derived session to Tag " + sessionKey.getToTag());
+					MobicentsSipSession derivedSipSession = tmpSession.findDerivedSipSession(sessionKey.getToTag());
+					if(derivedSipSession != null) {
+						tmpSession = derivedSipSession;
+						logger.debug("derived session found is " + tmpSession);
+					}
+					
 				}
 			}	
 			

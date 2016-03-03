@@ -938,13 +938,6 @@ public class SipSessionImpl implements MobicentsSipSession {
 			logger.info("Invalidating the sip session " + key);
 		}
 				
-		// No need for checks after JSR 289 PFD spec
-		//checkInvalidation();
-		if(sipSessionAttributeMap != null) {
-			for (String key : sipSessionAttributeMap.keySet()) {
-				removeAttribute(key, true);
-			}
-		}
 		
 		final MobicentsSipApplicationSession sipApplicationSession = getSipApplicationSession();
         SipManager manager = sipApplicationSession.getSipContext().getSipManager();
@@ -959,12 +952,41 @@ public class SipSessionImpl implements MobicentsSipSession {
         		if(logger.isDebugEnabled()) {
             		logger.debug("sip session " + key + " has no derived sessions removing it from the manager");
             	}
+        		// No need for checks after JSR 289 PFD spec
+         		//checkInvalidation();
+         		if(sipSessionAttributeMap != null) {
+         			for (String key : sipSessionAttributeMap.keySet()) {
+         				removeAttribute(key, true);
+         			}
+         		}
 				manager.removeSipSession(key);		
 				sipApplicationSession.getSipContext().getSipSessionsUtil().removeCorrespondingSipSession(key);
         	} else {
-        		if(logger.isDebugEnabled()) {
-            		logger.debug("sip session " + key + " is the parent session, not removing it from the manager yet as there is still derived sessions");
+    			if(logger.isDebugEnabled()) {
+            		logger.debug("sip session " + key + " is the parent session, checking derived sessions");
             	}
+    			if(derivedSipSessions != null) {
+    				for (MobicentsSipSession session: derivedSipSessions.values()) {
+    					if(logger.isDebugEnabled()) {
+    						logger.debug("derived session " + session + " " + isValidInternal + " " + readyToInvalidate + " " + state);
+    					}
+    					if(session.isReadyToInvalidateInternal() && state == State.TERMINATED) {
+    						if(logger.isDebugEnabled()) {
+        						logger.debug("Invalidating derived sipsession " + session);
+        					}
+    						session.invalidate(true);
+    					}
+    				}
+    			}
+    			// No need for checks after JSR 289 PFD spec
+         		//checkInvalidation();
+         		if(sipSessionAttributeMap != null) {
+         			for (String key : sipSessionAttributeMap.keySet()) {
+         				removeAttribute(key, true);
+         			}
+         		}
+    			manager.removeSipSession(key);		
+				sipApplicationSession.getSipContext().getSipSessionsUtil().removeCorrespondingSipSession(key);
         	}
         } else {
         	// https://github.com/Mobicents/sip-servlets/issues/41
@@ -972,12 +994,17 @@ public class SipSessionImpl implements MobicentsSipSession {
         		logger.debug("sip session " + key + " is a derived session, so not removing it from the manager, only from the parent session " + parentSipSession.getKey());
         	}
     		// Handle forking case to remove the session only if the parent session is not valid anymore otherwise remove only from the list of derived sessions
-    		MobicentsSipSession removedSession = parentSipSession.removeDerivedSipSession(key.getToTag());
+    		MobicentsSipSession removedSession = null;
+			try {
+				removedSession = parentSipSession.removeDerivedSipSession(SessionManagerUtil.parseSipSessionKey(key.toString()).getToTag());
+			} catch (ParseException e) {
+				logger.error("couldn't parse " + key);
+			}
 			if(logger.isDebugEnabled() && removedSession != null) {
 				logger.debug("removed derived sip session " + key + " from the list of derived sessions from the parent session " + parentSipSession.getKey());
 			}
         }
-		
+        
 		/*
          * Compute how long this session has been alive, and update
          * session manager's related properties accordingly
@@ -1791,6 +1818,13 @@ public class SipSessionImpl implements MobicentsSipSession {
     	// 3. A SipSession acting as a UAC transitions from the EARLY state back to 
     	// the INITIAL state on account of receiving a non-2xx final response (6.2.1 Relationship to SIP Dialogs, point 4)
     	// and has not initiated any new requests (does not have any pending transactions)."
+    	if(logger.isDebugEnabled()) {
+    		if(ongoingTransactions != null) {
+    			logger.debug("ongoingTransactions " + ongoingTransactions.isEmpty() + " for sipsession " + key);
+    		} else {
+    			logger.debug("ongoingTransactions " + null + " for sipsession " + key);
+    		}
+    	}
     	if(!readyToInvalidate && (ongoingTransactions == null || ongoingTransactions.isEmpty()) && 
     			transaction instanceof ClientTransaction && getProxy() == null && 
     			state != null && state.equals(State.INITIAL) && 
@@ -2068,10 +2102,22 @@ public class SipSessionImpl implements MobicentsSipSession {
 	 * @see org.mobicents.servlet.sip.core.session.MobicentsSipSession#findDerivedSipSession(java.lang.String)
 	 */
 	public MobicentsSipSession findDerivedSipSession(String toTag) {
+		dumpDerivedSipSessions();
 		if(derivedSipSessions != null) {
 			return derivedSipSessions.get(toTag);
 		}
 		return null;
+	}
+	
+	private void dumpDerivedSipSessions() {
+		if(logger.isDebugEnabled()) {
+			logger.debug("derived sessions contained in the following sip session " + key);
+			if(derivedSipSessions != null) {
+				for (MobicentsSipSession session: derivedSipSessions.values()) {
+					logger.debug("derived session " + session + " " + isValidInternal + " " + readyToInvalidate + " " + state);
+				}
+			}
+		}
 	}
 	
 	/*
