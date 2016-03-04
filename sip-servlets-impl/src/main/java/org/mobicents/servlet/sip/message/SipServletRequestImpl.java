@@ -1175,7 +1175,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 							if(logger.isDebugEnabled()) {
 								logger.debug("Using listeningPoint " + matchingListeningPoint + " for load balancer " + sipFactoryImpl.getLoadBalancerToUse());
 							}
-							sipFactoryImpl.addLoadBalancerRouteHeader(request);
+							sipFactoryImpl.addLoadBalancerRouteHeader(request, matchingListeningPoint);
 							addDNSRoute = false;
 							if(logger.isDebugEnabled()) {
 								logger.debug("adding route to Load Balancer since we are in a HA configuration " +
@@ -1189,7 +1189,7 @@ public abstract class SipServletRequestImpl extends SipServletMessageImpl implem
 					}
 					//Issue: https://code.google.com/p/sipservlets/issues/detail?id=284
 					else if(!session.getBypassProxy() && StaticServiceHolder.sipStandardService.getOutboundProxy() != null) {
-						sipFactoryImpl.addLoadBalancerRouteHeader(request);
+						sipFactoryImpl.addLoadBalancerRouteHeader(request, null);
 						addDNSRoute = false;
 						if(logger.isDebugEnabled()) {
 							logger.debug("adding route to outbound proxy (no load balancer set) since we have outboundProxy configured " +

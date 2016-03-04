@@ -305,7 +305,9 @@ public class ExtendedListeningPoint implements MobicentsExtendedListeningPoint {
 		.append(", hostNames=")
 		.append(sipConnector.getHostNames())
 		.append(", useLoadBalancer=")
-		.append(useLoadBalancer);
+		.append(useLoadBalancer)
+		.append(", mostOutboundAddress=")
+		.append(mostOutboundAddress);
 		return stringBuilder.toString();
 	}
 
