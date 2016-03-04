@@ -1511,12 +1511,25 @@ public class SipSessionImpl implements MobicentsSipSession {
 		
 		updateReadyToInvalidate(transaction);
 		// nullify the sessionCreatingTransactionRequest only after updateReadyToInvalidate as it is used for error response checking
-		if(sessionCreatingTransactionRequest != null && 				
-				transaction.equals(sessionCreatingTransactionRequest.getTransaction())) {
+		if(sessionCreatingTransactionRequest != null && 
+				transaction.getBranchId() != null && 
+				sessionCreatingTransactionRequest.getTransaction() != null &&  
+				// https://github.com/RestComm/sip-servlets/issues/101 fix the equals comparison
+				transaction.getBranchId().equals(sessionCreatingTransactionRequest.getTransaction().getBranchId())) {
+			if(logger.isDebugEnabled()) {
+				logger.debug("Session " + key + ": cleaning up "+ sessionCreatingTransactionRequest 
+						+ " since transaction " + transaction + " with branch id " + transaction.getBranchId() 
+						+ " is the same as sessionCreatingRequestTransaction " + sessionCreatingTransactionRequest.getTransaction() 
+						+ " with branch id " + sessionCreatingTransactionRequest.getTransaction().getBranchId());
+			}
 			sessionCreatingTransactionRequest.cleanUp();
 			// https://telestax.atlassian.net/browse/MSS-153 improve performance by cleaning the request for dialog based requests
 			// or proxy case or dialog creating methods
 			if(sessionCreatingDialog != null || proxy != null || JainSipUtils.DIALOG_CREATING_METHODS.contains(sessionCreatingTransactionRequest.getMethod())) {
+				if(logger.isDebugEnabled()) {
+					logger.debug("nullifying  sessionCreatingTransactionRequest" + sessionCreatingTransactionRequest 
+							+ " from Session " + key);
+				}
 				sessionCreatingTransactionRequest = null;
 			}
 		}
