@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry including="**/*.java" kind="src" output="target/test-classes" path="src/test/java"/>
+	<classpathentry including="**/*.java" kind="src" path="src/main/java"/>
+	<classpathentry kind="var" path="M2_REPO/javax/validation/validation-api/1.1.0.Final/validation-api-1.1.0.Final.jar" sourcepath="M2_REPO/javax/validation/validation-api/1.1.0.Final/validation-api-1.1.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/transaction/jta/1.1/jta-1.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-api/1.2.0/jain-sip-api-1.2.0.jar" sourcepath="C:/Users/Kákonyi/.m2/repository/javax/sip/jain-sip-api/1.2.0/jain-sip-api-1.2.0-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/javax/sip/jain-sip-ri/1.2.230/jain-sip-ri-1.2.230.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-undertow/8.2.0.Final/wildfly-undertow-8.2.0.Final.jar" sourcepath="C:/Users/Kákonyi/.m2/repository/org/wildfly/wildfly-undertow/8.2.0.Final/wildfly-undertow-8.2.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/common/jboss-common-beans/1.1.0.Final/jboss-common-beans-1.1.0.Final.jar" sourcepath="M2_REPO/org/jboss/common/jboss-common-beans/1.1.0.Final/jboss-common-beans-1.1.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-controller/8.2.0.Final/wildfly-controller-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/jboss-dmr/1.2.0.Final/jboss-dmr-1.2.0.Final.jar" sourcepath="M2_REPO/org/jboss/jboss-dmr/1.2.0.Final/jboss-dmr-1.2.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-controller-client/8.2.0.Final/wildfly-controller-client-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-protocol/8.2.0.Final/wildfly-protocol-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/logging/jboss-logging/3.1.2.GA/jboss-logging-3.1.2.GA.jar" sourcepath="M2_REPO/org/jboss/logging/jboss-logging/3.1.2.GA/jboss-logging-3.1.2.GA-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/remoting/jboss-remoting/2.5.1/jboss-remoting-2.5.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/sasl/jboss-sasl/1.0.4.Final/jboss-sasl-1.0.4.Final.jar" sourcepath="M2_REPO/org/jboss/sasl/jboss-sasl/1.0.4.Final/jboss-sasl-1.0.4.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/threads/jboss-threads/1.0.0.GA/jboss-threads-1.0.0.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/xnio/xnio-api/1.2.1.GA/xnio-api-1.2.1.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/xnio/xnio-nio/1.2.1.GA/xnio-nio-1.2.1.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-build-config/8.2.0.Final/wildfly-build-config-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/security/wildfly-security-manager/1.0.0.Final/wildfly-security-manager-1.0.0.Final.jar" sourcepath="M2_REPO/org/wildfly/security/wildfly-security-manager/1.0.0.Final/wildfly-security-manager-1.0.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-core-security/8.2.0.Final/wildfly-core-security-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-core-security-api/8.2.0.Final/wildfly-core-security-api-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/modules/jboss-modules/1.3.3.Final/jboss-modules-1.3.3.Final.jar" sourcepath="M2_REPO/org/jboss/modules/jboss-modules/1.3.3.Final/jboss-modules-1.3.3.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/msc/jboss-msc/1.2.2.Final/jboss-msc-1.2.2.Final.jar" sourcepath="M2_REPO/org/jboss/msc/jboss-msc/1.2.2.Final/jboss-msc-1.2.2.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/logmanager/jboss-logmanager/1.0.0.GA/jboss-logmanager-1.0.0.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/staxmapper/1.1.0.Final/staxmapper-1.1.0.Final.jar" sourcepath="M2_REPO/org/jboss/staxmapper/1.1.0.Final/staxmapper-1.1.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-ee/8.2.0.Final/wildfly-ee-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/glassfish/javax.enterprise.concurrent/1.0/javax.enterprise.concurrent-1.0.jar" sourcepath="M2_REPO/org/glassfish/javax.enterprise.concurrent/1.0/javax.enterprise.concurrent-1.0-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate-validator/3.1.0.GA/hibernate-validator-3.1.0.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate-core/3.3.1.GA/hibernate-core-3.3.1.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/antlr/antlr/2.7.6-brew/antlr-2.7.6-brew.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-collections/commons-collections/3.1/commons-collections-3.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/dom4j/dom4j/1.6.1/dom4j-1.6.1.jar" sourcepath="M2_REPO/dom4j/dom4j/1.6.1/dom4j-1.6.1-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/hibernate/hibernate-commons-annotations/3.1.0.GA/hibernate-commons-annotations-3.1.0.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.5.6/slf4j-api-1.5.6.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/metadata/jboss-metadata-common/8.0.0.Final/jboss-metadata-common-8.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/metadata/jboss-metadata-common/8.0.0.Final/jboss-metadata-common-8.0.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/metadata/jboss-metadata-ear/8.0.0.Final/jboss-metadata-ear-8.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/metadata/jboss-metadata-ear/8.0.0.Final/jboss-metadata-ear-8.0.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/spec/javax/enterprise/concurrent/jboss-concurrency-api_1.0_spec/1.0.0.Final/jboss-concurrency-api_1.0_spec-1.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/spec/javax/enterprise/concurrent/jboss-concurrency-api_1.0_spec/1.0.0.Final/jboss-concurrency-api_1.0_spec-1.0.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/spec/javax/transaction/jboss-transaction-api_1.2_spec/1.0.0.Final/jboss-transaction-api_1.2_spec-1.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/spec/javax/transaction/jboss-transaction-api_1.2_spec/1.0.0.Final/jboss-transaction-api_1.2_spec-1.0.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/spec/javax/annotation/jboss-annotations-api_1.2_spec/1.0.0.Final/jboss-annotations-api_1.2_spec-1.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/spec/javax/annotation/jboss-annotations-api_1.2_spec/1.0.0.Final/jboss-annotations-api_1.2_spec-1.0.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-server/8.2.0.Final/wildfly-server-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-domain-http-interface/8.2.0.Final/wildfly-domain-http-interface-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-domain-management/8.2.0.Final/wildfly-domain-management-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/jboss-common-core/2.2.14.GA/jboss-common-core-2.2.14.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-deployment-repository/8.2.0.Final/wildfly-deployment-repository-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/jboss-vfs/2.1.2.GA/jboss-vfs-2.1.2.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/logging/jboss-logging-spi/2.1.0.GA/jboss-logging-spi-2.1.0.GA.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-patching/8.2.0.Final/wildfly-patching-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-cli/8.2.0.Final/wildfly-cli-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/aesh/aesh/0.33.11/aesh-0.33.11.jar" sourcepath="M2_REPO/org/jboss/aesh/aesh/0.33.11/aesh-0.33.11-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/fusesource/jansi/jansi/1.9/jansi-1.9.jar" sourcepath="M2_REPO/org/fusesource/jansi/jansi/1.9/jansi-1.9-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/remotingjmx/remoting-jmx/2.0.0.Final/remoting-jmx-2.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/remotingjmx/remoting-jmx/2.0.0.Final/remoting-jmx-2.0.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/marshalling/jboss-marshalling/1.4.9.Final/jboss-marshalling-1.4.9.Final.jar" sourcepath="M2_REPO/org/jboss/marshalling/jboss-marshalling/1.4.9.Final/jboss-marshalling-1.4.9.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/marshalling/jboss-marshalling-river/1.4.3.Final/jboss-marshalling-river-1.4.3.Final.jar"/>
+	<classpathentry kind="lib" path="C:/work/jdk1.7.0_55/lib/jconsole.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-version/8.2.0.Final/wildfly-version-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-platform-mbean/8.2.0.Final/wildfly-platform-mbean-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-process-controller/8.2.0.Final/wildfly-process-controller-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-remoting/8.2.0.Final/wildfly-remoting-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-io/8.2.0.Final/wildfly-io-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-network/8.2.0.Final/wildfly-network-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/jandex/1.2.1.Final/jandex-1.2.1.Final.jar" sourcepath="M2_REPO/org/jboss/jandex/1.2.1.Final/jandex-1.2.1.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/invocation/jboss-invocation/1.2.1.Final/jboss-invocation-1.2.1.Final.jar" sourcepath="M2_REPO/org/jboss/invocation/jboss-invocation/1.2.1.Final/jboss-invocation-1.2.1.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/stdio/jboss-stdio/1.0.2.GA/jboss-stdio-1.0.2.GA.jar" sourcepath="M2_REPO/org/jboss/stdio/jboss-stdio/1.0.2.GA/jboss-stdio-1.0.2.GA-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-naming/8.2.0.Final/wildfly-naming-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/jboss-remote-naming/2.0.1.Final/jboss-remote-naming-2.0.1.Final.jar" sourcepath="M2_REPO/org/jboss/jboss-remote-naming/2.0.1.Final/jboss-remote-naming-2.0.1.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/jboss-ejb-client/2.0.0.Final/jboss-ejb-client-2.0.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/spec/javax/interceptor/jboss-interceptors-api_1.2_spec/1.0.0.Final/jboss-interceptors-api_1.2_spec-1.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/spec/javax/interceptor/jboss-interceptors-api_1.2_spec/1.0.0.Final/jboss-interceptors-api_1.2_spec-1.0.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/picketbox/picketbox/4.0.21.Final/picketbox-4.0.21.Final.jar" sourcepath="M2_REPO/org/picketbox/picketbox/4.0.21.Final/picketbox-4.0.21.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-security/8.2.0.Final/wildfly-security-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-clustering-infinispan/8.2.0.Final/wildfly-clustering-infinispan-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-clustering-jgroups/8.2.0.Final/wildfly-clustering-jgroups-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-clustering-common/8.2.0.Final/wildfly-clustering-common-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-jmx/8.2.0.Final/wildfly-jmx-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-threads/8.2.0.Final/wildfly-threads-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jgroups/jgroups/3.4.5.Final/jgroups-3.4.5.Final.jar" sourcepath="M2_REPO/org/jgroups/jgroups/3.4.5.Final/jgroups-3.4.5.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-transactions/8.2.0.Final/wildfly-transactions-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-jacorb/8.2.0.Final/wildfly-jacorb-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jacorb/jacorb/2.3.2-jbossorg-5/jacorb-2.3.2-jbossorg-5.jar" sourcepath="M2_REPO/org/jacorb/jacorb/2.3.2-jbossorg-5/jacorb-2.3.2-jbossorg-5-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/narayana/jts/narayana-jts-jacorb/5.0.0.Final/narayana-jts-jacorb-5.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/narayana/jts/narayana-jts-jacorb/5.0.0.Final/narayana-jts-jacorb-5.0.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/hornetq/hornetq-journal/2.3.9.Final/hornetq-journal-2.3.9.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/hornetq/hornetq-commons/2.3.9.Final/hornetq-commons-2.3.9.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/spec/javax/rmi/jboss-rmi-api_1.0_spec/1.0.4.Final/jboss-rmi-api_1.0_spec-1.0.4.Final.jar" sourcepath="M2_REPO/org/jboss/spec/javax/rmi/jboss-rmi-api_1.0_spec/1.0.4.Final/jboss-rmi-api_1.0_spec-1.0.4.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/metadata/jboss-metadata-ejb/8.0.0.Final/jboss-metadata-ejb-8.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/metadata/jboss-metadata-ejb/8.0.0.Final/jboss-metadata-ejb-8.0.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/jboss-transaction-spi/7.1.0.Final/jboss-transaction-spi-7.1.0.Final.jar" sourcepath="M2_REPO/org/jboss/jboss-transaction-spi/7.1.0.Final/jboss-transaction-spi-7.1.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/narayana/jts/narayana-jts-integration/5.0.0.Final/narayana-jts-integration-5.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/narayana/jts/narayana-jts-integration/5.0.0.Final/narayana-jts-integration-5.0.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/spec/javax/resource/jboss-connector-api_1.7_spec/1.0.0.Final/jboss-connector-api_1.7_spec-1.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/spec/javax/resource/jboss-connector-api_1.7_spec/1.0.0.Final/jboss-connector-api_1.7_spec-1.0.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/infinispan/infinispan-core/6.0.2.Final/infinispan-core-6.0.2.Final.jar" sourcepath="M2_REPO/org/infinispan/infinispan-core/6.0.2.Final/infinispan-core-6.0.2.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/infinispan/infinispan-commons/6.0.2.Final/infinispan-commons-6.0.2.Final.jar" sourcepath="M2_REPO/org/infinispan/infinispan-commons/6.0.2.Final/infinispan-commons-6.0.2.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/infinispan/infinispan-cachestore-jdbc/6.0.2.Final/infinispan-cachestore-jdbc-6.0.2.Final.jar" sourcepath="M2_REPO/org/infinispan/infinispan-cachestore-jdbc/6.0.2.Final/infinispan-cachestore-jdbc-6.0.2.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/infinispan/infinispan-cachestore-remote/6.0.2.Final/infinispan-cachestore-remote-6.0.2.Final.jar" sourcepath="M2_REPO/org/infinispan/infinispan-cachestore-remote/6.0.2.Final/infinispan-cachestore-remote-6.0.2.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/infinispan/infinispan-client-hotrod/6.0.2.Final/infinispan-client-hotrod-6.0.2.Final.jar" sourcepath="M2_REPO/org/infinispan/infinispan-client-hotrod/6.0.2.Final/infinispan-client-hotrod-6.0.2.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-pool/commons-pool/1.4/commons-pool-1.4.jar"/>
+	<classpathentry kind="var" path="M2_REPO/net/jcip/jcip-annotations/1.0/jcip-annotations-1.0.jar" sourcepath="M2_REPO/net/jcip/jcip-annotations/1.0/jcip-annotations-1.0-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/security/jboss-negotiation-extras/2.2.7.Final/jboss-negotiation-extras-2.2.7.Final.jar" sourcepath="M2_REPO/org/jboss/security/jboss-negotiation-extras/2.2.7.Final/jboss-negotiation-extras-2.2.7.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/security/jboss-negotiation-common/2.2.7.Final/jboss-negotiation-common-2.2.7.Final.jar" sourcepath="M2_REPO/org/jboss/security/jboss-negotiation-common/2.2.7.Final/jboss-negotiation-common-2.2.7.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/spec/javax/servlet/jboss-servlet-api_3.0_spec/1.0.1.Final/jboss-servlet-api_3.0_spec-1.0.1.Final.jar" sourcepath="C:/Users/Kákonyi/.m2/repository/org/jboss/spec/javax/servlet/jboss-servlet-api_3.0_spec/1.0.1.Final/jboss-servlet-api_3.0_spec-1.0.1.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/picketbox/picketbox-commons/1.0.0.final/picketbox-commons-1.0.0.final.jar" sourcepath="M2_REPO/org/picketbox/picketbox-commons/1.0.0.final/picketbox-commons-1.0.0.final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/security/jboss-negotiation-spnego/2.2.7.Final/jboss-negotiation-spnego-2.2.7.Final.jar" sourcepath="M2_REPO/org/jboss/security/jboss-negotiation-spnego/2.2.7.Final/jboss-negotiation-spnego-2.2.7.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/spec/javax/security/jacc/jboss-jacc-api_1.5_spec/1.0.0.Final/jboss-jacc-api_1.5_spec-1.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/spec/javax/security/jacc/jboss-jacc-api_1.5_spec/1.0.0.Final/jboss-jacc-api_1.5_spec-1.0.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/spec/javax/servlet/jboss-servlet-api_3.1_spec/1.0.0.Final/jboss-servlet-api_3.1_spec-1.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/spec/javax/servlet/jboss-servlet-api_3.1_spec/1.0.0.Final/jboss-servlet-api_3.1_spec-1.0.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/picketbox/picketbox-infinispan/4.0.21.Final/picketbox-infinispan-4.0.21.Final.jar" sourcepath="M2_REPO/org/picketbox/picketbox-infinispan/4.0.21.Final/picketbox-infinispan-4.0.21.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2.jar" sourcepath="M2_REPO/commons-cli/commons-cli/1.2/commons-cli-1.2-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-web-common/8.2.0.Final/wildfly-web-common-8.2.0.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/metadata/jboss-metadata-web/8.0.0.Final/jboss-metadata-web-8.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/metadata/jboss-metadata-web/8.0.0.Final/jboss-metadata-web-8.0.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/spec/javax/security/auth/message/jboss-jaspi-api_1.1_spec/1.0.0.Final/jboss-jaspi-api_1.1_spec-1.0.0.Final.jar" sourcepath="M2_REPO/org/jboss/spec/javax/security/auth/message/jboss-jaspi-api_1.1_spec/1.0.0.Final/jboss-jaspi-api_1.1_spec-1.0.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/spec/javax/servlet/jsp/jboss-jsp-api_2.3_spec/1.0.1.Final/jboss-jsp-api_2.3_spec-1.0.1.Final.jar" sourcepath="M2_REPO/org/jboss/spec/javax/servlet/jsp/jboss-jsp-api_2.3_spec/1.0.1.Final/jboss-jsp-api_2.3_spec-1.0.1.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/spec/javax/el/jboss-el-api_3.0_spec/1.0.2.Final/jboss-el-api_3.0_spec-1.0.2.Final.jar"/>
+	<classpathentry kind="var" path="M2_REPO/io/undertow/undertow-websockets-jsr/1.1.0.Final/undertow-websockets-jsr-1.1.0.Final.jar" sourcepath="M2_REPO/io/undertow/undertow-websockets-jsr/1.1.0.Final/undertow-websockets-jsr-1.1.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/jboss/spec/javax/websocket/jboss-websocket-api_1.1_spec/1.1.0.Final/jboss-websocket-api_1.1_spec-1.1.0.Final.jar" sourcepath="M2_REPO/org/jboss/spec/javax/websocket/jboss-websocket-api_1.1_spec/1.1.0.Final/jboss-websocket-api_1.1_spec-1.1.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/io/undertow/jastow/jastow/1.0.0.Final/jastow-1.0.0.Final.jar" sourcepath="M2_REPO/io/undertow/jastow/jastow/1.0.0.Final/jastow-1.0.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/wildfly/wildfly-web/8.2.0.Final/wildfly-web-8.2.0.Final.jar" sourcepath="M2_REPO/org/wildfly/wildfly-web/8.2.0.Final/wildfly-web-8.2.0.Final-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-spec/3.0.0-SNAPSHOT/sip-servlets-spec-3.0.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-impl/3.0.0-SNAPSHOT/sip-servlets-impl-3.0.0-SNAPSHOT.jar" sourcepath="/GIT_HOME/sip-servlets/sip-servlets-impl"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-core-api/3.0.0-SNAPSHOT/sip-servlets-core-api-3.0.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-jruby/3.0.0-SNAPSHOT/sip-servlets-jruby-3.0.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-client/3.0.0-SNAPSHOT/sip-servlets-client-3.0.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/servlet/sip/sip-servlets-annotations/3.0.0-SNAPSHOT/sip-servlets-annotations-3.0.0-SNAPSHOT.jar"/>
+	<classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.17/log4j-1.2.17.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/ha/javax/sip/mobicents-jain-sip-ha-core/1.5.5/mobicents-jain-sip-ha-core-1.5.5.jar"/>
+	<classpathentry kind="var" path="M2_REPO/org/mobicents/javax/sip/mobicents-jain-sip-ext/1.3.3/mobicents-jain-sip-ext-1.3.3.jar"/>
+	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/net/java/stun4j/stun4j/1.0.MOBICENTS/stun4j-1.0.MOBICENTS.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jain-sip-undertow-ext"/>
+	<classpathentry kind="lib" path="lib/xnio-api-3.3.0.Final.jar" sourcepath="C:/Users/Kákonyi/.m2/repository/org/jboss/xnio/xnio-api/3.3.0.Final/xnio-api-3.3.0.Final-sources.jar"/>
+	<classpathentry kind="lib" path="lib/xnio-nio-3.3.0.Final.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/undertow-core"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/undertow-servlet"/>
+	<classpathentry kind="var" path="M2_REPO/io/undertow/undertow-core/1.2.0.Beta9-SNAPSHOT/undertow-core-1.2.0.Beta9-SNAPSHOT.jar " sourcepath="C:/Users/Kákonyi/.m2/repository/io/undertow/undertow-core/1.2.0.Beta9-SNAPSHOT/undertow-core-1.2.0.Beta9-SNAPSHOT-sources.jar"/>
+	<classpathentry kind="var" path="M2_REPO/io/undertow/undertow-servlet/1.2.0.Beta9-SNAPSHOT/undertow-servlet-1.2.0.Beta9-SNAPSHOT.jar " sourcepath="/M2_REPO/io/undertow/undertow-servlet/1.2.0.Beta9-SNAPSHOT/undertow-servlet-1.2.0.Beta9-SNAPSHOT-sources.jar "/>
+	<classpathentry kind="output" path="target/classes"/>
+</classpath>
