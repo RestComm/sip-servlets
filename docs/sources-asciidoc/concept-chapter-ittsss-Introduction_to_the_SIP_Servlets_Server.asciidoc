@@ -1,0 +1,62 @@
+
+
+++++++++++++++++++++++++++++++++++++++
+<!-- chapter id nickname: ittsss -->
+++++++++++++++++++++++++++++++++++++++
+    
+[[ittsss-Introduction_to_the_SIP_Servlets_Server]]
+
+== Introduction
+
+
+
+===Overview of ${platform.name} SIP Servlets within the Telecommunications Industry
+
+
+
+The link:$$http://www.mobicents.org/$$[ Mobicents Communication Platform ] is the best architecture to create, deploy and manage services and applications integrating voice, video and data across a range of IP and legacy communications networks. It drives convergence with the following key enablers:
+
+
+
+            .Mobicents Architecture Overview
+image::[]
+
+
+
+
+
+
+
+===Overview of SIP Servlets Server
+
+
+
+${platform.name} SIP Servlets is a modern communications middleware platform. ${platform.name} SIP Servlets facilitates the shift towards Cloud Communications by enabling deployment and autoscaling of real time SIP Servlets apps across all major IaaS (Infrastructure as a Service) providers and also brings realtime communications (voice and video) to your Browser using HTML5 link:$$http://www.webrtc.org/$$[WebRTC ] and SIP Over WebSockets !
+
+
+
+
+The link:$$ http://code.google.com/p/sipservlets/wiki/HTML5WebRTCVideoApplication$$[ ${platform.name} HTML5 WebRTC Client ]allows you to make video calls from and to any Web Browser supporting link:$$http://www.webrtc.org/$$[WebRTC ] , (only Google Chrome supports it so far but all major browsers should support it in the next 6 months) as well as SIP Endpoints.
+
+
+
+${platform.name} SIP Servlets enables turnkey SaaS offerings such as link:$$http://www.restcomm.org/$$[ RestComm ].
+
+
+
+${platform.name} SIP Servlets implements the latest SIP Servlet v1.1 (JSR 289) standard. It can be plugged into any Application Server container (currently 7.X and JBoss 7.X) and also offers High Availability and Failover.
+
+
+
+${platform.name} SIP Servlets is lead by link:$$http://www.telestax.com/$$[TeleStax, Inc ]. and developed collaboratively by a community of individual and enterprise contributors. 
+
+
+
+
+            .Mobicents WebRTC SIP Stack
+image::[]
+
+
+
+
+
