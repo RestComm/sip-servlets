@@ -8,27 +8,27 @@
 
 == Best Practices
 
-This chapter discusses Best Practices related to ${platform.name}
+This chapter discusses Best Practices related to Restcomm
   SIP Servlets usage in real world deployments.
 
 [[bp-Best_Practices_Perf_Tips]]
 
 
-===${platform.name} SIP Servlets Performance Tips
+=== Restcomm SIP Servlets Performance Tips
 
-Because the default profile of ${platform.name} SIP Servlets is targeted at a
+Because the default profile of Restcomm SIP Servlets is targeted at a
     development environment, some tuning is required to make the server performance suitable for a production environment.
 
 A useful presentation from OKI Japan 
 
 
 
-====Tuning JBoss
+==== Tuning JBoss
 
 To ensure the server is finely tuned for a production envirionment, certain configuration must be changed. Visit the link:$$http://wiki.jboss.org/wiki/Wiki.jsp?page=JBossASTuningSliming$$[JBoss Application Server Tuning] wiki page to learn about optimization techniques.
        
 
-While it is preferable to have a fast Application Server, most of the information doesn't apply to ${platform.name}. In summary, the most important optimization technique is to remove logs, leaving only what is required.
+While it is preferable to have a fast Application Server, most of the information doesn't apply to Restcomm. In summary, the most important optimization technique is to remove logs, leaving only what is required.
 
  Check the log configuration file in
       the following location and review the information.
@@ -39,7 +39,7 @@ While it is preferable to have a fast Application Server, most of the informatio
 
 
 
-====Tuning ${platform.name} SIP Servlets
+==== Tuning Restcomm SIP Servlets
 
 
 * __Congestion Control__: It is recommended that this feature is enabled to avoid overload of the server and that the __sipMessageQueueSize__ and __memoryThreshold__ parameters are tuned according to <<sscacc-MSS_Concurrency_and_Congestion_Control>>.
@@ -50,7 +50,7 @@ While it is preferable to have a fast Application Server, most of the informatio
 
 
 
-====Tuning The JAIN SIP Stack
+==== Tuning The JAIN SIP Stack
 
 The stack can be fine-tuned by altering the SIP stack properties, defined in the external properties file specified by the __sipStackPropertiesFile__ attribute as described in <<bsssc-binary-SIP_Servlets_Server-Adding_SIP_Connectors>>.
 
@@ -81,7 +81,7 @@ This flag indicates whether the
           SIP stack listener is executed by a single thread, or concurrently
           by the threads that parse the messages. 
 +
-${platform.name} SIP
+Restcomm SIP
           Servlets expects this flag to be set to **`true`**, therefore do not change the value.
 
 
@@ -139,7 +139,7 @@ The full list of JAIN SIP stack properties is available from
 
 
 
-====Tuning The JVM
+==== Tuning The JVM
 
 The following tuning information applies to Sun JDK 1.6, however the information should also apply
       to Sun JDK 1.5.
@@ -147,7 +147,7 @@ The following tuning information applies to Sun JDK 1.6, however the information
 
 [NOTE]
 ====
-For more information on tuning ${platform.name} SIP Servlets performance, refer to the link:$$http://www.slideshare.net/jean.deruelle/tuning-and-development-with-sip-servlets-on-mobicents$$[OKI Japan Presentation].
+For more information on tuning Restcomm SIP Servlets performance, refer to the link:$$http://www.slideshare.net/jean.deruelle/tuning-and-development-with-sip-servlets-on-mobicents$$[OKI Japan Presentation].
 
 For more information on performance, refer to the link:$$http://java.sun.com/performance/reference/whitepapers/6_performance.html$$[Performance White Paper].
 
@@ -184,7 +184,7 @@ Small heap sizes are not
 
 
 
-====Tuning The Operating System
+==== Tuning The Operating System
 
 The following tuning information is provided for Red Hat Enterprise Linux (RHEL) servers that are running high-load configurations. The tuning information should also apply to other Linux distributions.
 
@@ -239,7 +239,7 @@ Replace [eth0] with the correct name of the
 [[bp-Best_Practices_NAT]]
 
 
-===NAT Traversal
+=== NAT Traversal
 
 In a production environment, it is common to see SIP and Media
     data passing through different kinds of Network Address Translation (NAT) to reach the
@@ -247,7 +247,7 @@ In a production environment, it is common to see SIP and Media
 
 
 
-====STUN
+==== STUN
 
 STUN (Session Traversal Utilities for NAT) is not generally
       considered a viable solution for enterprises because STUN cannot be used
@@ -263,7 +263,7 @@ Most of the proxy and media gateways installed by VoIP providers
 
 
 
-====TURN
+==== TURN
 
 TURN (Traversal Using Relay NAT) is an IETF standard, which
       implements media relays for SIP end-points. The standard overcomes the problems of
@@ -284,7 +284,7 @@ This can result in scalability issues,
 
 
 
-====ICE
+==== ICE
 
 ICE (Interactive Connection Establishment) leverages both
       STUN and TURN to solve the NAT traversal issues.
@@ -312,7 +312,7 @@ If the
 
 
 
-====Other Approaches
+==== Other Approaches
 
 While the above is a good solution to circumvent NAT issues. There might be cases where it is not possible to use those solutions at all.
 
